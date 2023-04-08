@@ -32,7 +32,7 @@ public:
 			virtual	uint64				Blockno()				=	0;
 			virtual	uint64				Lsn()					=	0;
 			virtual	uint64				Owner()					=	0;
-			virtual	uuid_t*				Uuid()					=	0;
+			virtual	const uuid_t&		Uuid()					=	0;
 			virtual	uint16				Count()					=	0;
 			virtual	uint32				Forw()					=	0;
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
@@ -47,6 +47,12 @@ public:
 //xfs_dir_leaf_hdr_t
 class ExtentLeafHeaderV4 : public ExtentLeafHeader {
 public:
+			struct OnDiskData {
+			public:
+				BlockInfo			info;
+				uint16				count;
+				uint16				stale;
+			};
 
 								ExtentLeafHeaderV4(const char* buffer);
 								~ExtentLeafHeaderV4();
@@ -55,20 +61,24 @@ public:
 			uint64				Blockno();
 			uint64				Lsn();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 			uint16				Count();
 			uint32				Forw();
 
-			BlockInfo			info;
 private:
-			uint16				count;
-			uint16				stale;
+			OnDiskData			fData;
 };
 
 
 // xfs_dir3_leaf_hdr_t
 class ExtentLeafHeaderV5 : public ExtentLeafHeader {
 public:
+			struct OnDiskData {
+				BlockInfoV5			info;
+				uint16				count;
+				uint16				stale;
+				uint32				pad;
+			};
 
 								ExtentLeafHeaderV5(const char* buffer);
 								~ExtentLeafHeaderV5();
@@ -77,20 +87,14 @@ public:
 			uint64				Blockno();
 			uint64				Lsn();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 			uint16				Count();
 			uint32				Forw();
+			
 
-			BlockInfoV5			info;
 private:
-			uint16				count;
-			uint16				stale;
-			uint32				pad;
+			OnDiskData			fData;
 };
-
-#define XFS_LEAF_CRC_OFF offsetof(ExtentLeafHeaderV5, info.crc)
-#define XFS_LEAF_V5_VPTR_OFF offsetof(ExtentLeafHeaderV5, info.forw)
-#define XFS_LEAF_V4_VPTR_OFF offsetof(ExtentLeafHeaderV4, info.forw)
 
 
 // xfs_dir2_leaf_tail_t

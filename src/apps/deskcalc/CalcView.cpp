@@ -1376,28 +1376,22 @@ CalcView::_FlashKey(int32 key, uint32 flashFlags)
 void
 CalcView::_Colorize()
 {
-	// calculate light and dark color from base color
-	fLightColor.red		= (uint8)(fBaseColor.red * 1.25);
-	fLightColor.green	= (uint8)(fBaseColor.green * 1.25);
-	fLightColor.blue	= (uint8)(fBaseColor.blue * 1.25);
-	fLightColor.alpha	= 255;
+	if (fHasCustomBaseColor) {
+		// keypad text color
+		if (fBaseColor.Brightness() > 100)
+			fButtonTextColor = (rgb_color){ 0, 0, 0, 255 };
+		else
+			fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
 
-	fDarkColor.red		= (uint8)(fBaseColor.red * 0.75);
-	fDarkColor.green	= (uint8)(fBaseColor.green * 0.75);
-	fDarkColor.blue		= (uint8)(fBaseColor.blue * 0.75);
-	fDarkColor.alpha	= 255;
-
-	// keypad text color
-	if (fBaseColor.Brightness() > 100)
-		fButtonTextColor = (rgb_color){ 0, 0, 0, 255 };
-	else
-		fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
-
-	// expression text color
-	if (fExpressionBGColor.Brightness() > 100)
-		fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
-	else
-		fExpressionTextColor = (rgb_color){ 255, 255, 255, 255 };
+		// expression text color
+		if (fExpressionBGColor.Brightness() > 100)
+			fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
+		else
+			fExpressionTextColor = (rgb_color){ 255, 255, 255, 255 };
+	} else {
+		fExpressionTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+		fButtonTextColor = ui_color(B_PANEL_TEXT_COLOR);
+	}
 }
 
 

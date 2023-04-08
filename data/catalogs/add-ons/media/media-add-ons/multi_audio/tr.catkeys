@@ -13,11 +13,11 @@ Headphones	MultiAudio		Kulaklık
 Beep	MultiAudio		Bip
 Output mono mix	MultiAudio		Tek kanallı çıktı karışımı
 Output stereo mix	MultiAudio		Çift kanallı çıktı karışımı
-Input	MultiAudio		Girdi
+Input	MultiAudio		Giriş
 Output treble	MultiAudio		Çıktı tizi
 Mono mix	MultiAudio		Tek kanallı karışım
 General	MultiAudio		Genel
-Input & Output	MultiAudio		Girdi ve çıktı
+Input & Output	MultiAudio		Giriş ve çıkış
 Enhanced Setup	MultiAudio		Genişletilmiş kurulum
 Stereo mix	MultiAudio		Çift kanallı karışım
 Output 3D depth	MultiAudio		3B çıktı derinliği

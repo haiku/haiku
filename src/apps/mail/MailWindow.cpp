@@ -51,6 +51,7 @@ of their respective holders. All rights reserved.
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <E-mail.h>
 #include <File.h>
@@ -646,7 +647,8 @@ TMailWindow::_RetrieveVectorIcon(int32 id)
 	if (!data)
 		return NULL;
 
-	BBitmap* bitmap = new BBitmap(BRect(0, 0, 21, 21), B_RGBA32);
+	BBitmap* bitmap = new BBitmap(BRect(BPoint(0, 0),
+		be_control_look->ComposeIconSize(22)), B_RGBA32);
 	status_t status = BIconUtils::GetVectorIcon((uint8*)data, size, bitmap);
 	if (status == B_OK) {
 		item = (BitmapItem*)malloc(sizeof(BitmapItem));
@@ -1327,11 +1329,6 @@ TMailWindow::MessageReceived(BMessage* msg)
 				PostMessage(&message);
 			} else {
 				BRect r = Frame();
-				r.left += ((r.Width() - STATUS_WIDTH) / 2);
-				r.right = r.left + STATUS_WIDTH;
-				r.top += 40;
-				r.bottom = r.top + STATUS_HEIGHT;
-
 				BString string = "could not read";
 				BNode node(fRef);
 				if (node.InitCheck() == B_OK)
@@ -1772,16 +1769,8 @@ void
 TMailWindow::AddEnclosure(BMessage* msg)
 {
 	if (fEnclosuresView == NULL && !fIncoming) {
-		BRect r;
-		r.left = 0;
-		r.top = fHeaderView->Frame().bottom - 1;
-		r.right = Frame().Width() + 2;
-		r.bottom = r.top + ENCLOSURES_HEIGHT;
-
-		fEnclosuresView = new TEnclosuresView(r, Frame());
+		fEnclosuresView = new TEnclosuresView;
 		AddChild(fEnclosuresView, fContentView);
-		fContentView->ResizeBy(0, -ENCLOSURES_HEIGHT);
-		fContentView->MoveBy(0, ENCLOSURES_HEIGHT);
 	}
 
 	if (fEnclosuresView == NULL)

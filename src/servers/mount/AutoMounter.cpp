@@ -338,6 +338,15 @@ ArchiveVisitor::Visit(BPartition* partition, int32 level)
 	info.AddString("deviceName", path.Path());
 	info.AddString("volumeName", partition->ContentName());
 	info.AddString("fsName", partition->ContentType());
+	BVolume volume;
+	partition->GetVolume(&volume);
+	fs_info fsInfo;
+	if (fs_stat_dev(volume.Device(), &fsInfo) == 0) {
+		if ((fsInfo.flags & B_FS_IS_READONLY) != 0)
+			info.AddUInt32("mountFlags", B_MOUNT_READ_ONLY);
+		else
+			info.AddUInt32("mountFlags", 0);
+	}
 
 	fMessage.AddMessage("info", &info);
 	return false;

@@ -25,6 +25,7 @@
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <NumberFormat.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Roster.h>
@@ -306,8 +307,9 @@ MediaConverterWindow::MessageReceived(BMessage* message)
 {
 	entry_ref inRef;
 
-	char buffer[40];
 	BEntry inEntry;
+	BNumberFormat fNumberFormat;
+	BString buffer;
 
 	switch (message->what) {
 		#if B_BEOS_VERSION <= B_BEOS_VERSION_6
@@ -489,22 +491,34 @@ MediaConverterWindow::MessageReceived(BMessage* message)
 		case VIDEO_QUALITY_CHANGED_MESSAGE:
 		{
 			int32 value;
+			BString data;
+
 			message->FindInt32("be:value", &value);
-			snprintf(buffer, sizeof(buffer),
-				B_TRANSLATE("Video quality: %3d%%"), (int8)value);
-			fVideoQualitySlider->SetLabel(buffer);
-			fVideoQuality = value;
+			double percentValue = value / 100.0;
+
+			if (fNumberFormat.FormatPercent(data, percentValue) != B_OK)
+				data.SetToFormat("%d%%", (int8)value);
+
+			buffer.SetToFormat(B_TRANSLATE("Video quality: %s"), data.String());
+			fVideoQualitySlider->SetLabel(buffer.String());
+			fVideoQuality = (int)percentValue;
 			break;
 		}
 
 		case AUDIO_QUALITY_CHANGED_MESSAGE:
 		{
 			int32 value;
+			BString data;
+
 			message->FindInt32("be:value", &value);
-			snprintf(buffer, sizeof(buffer),
-				B_TRANSLATE("Audio quality: %3d%%"), (int8)value);
-			fAudioQualitySlider->SetLabel(buffer);
-			fAudioQuality = value;
+			double percentValue = value / 100.0;
+
+			if (fNumberFormat.FormatPercent(data, percentValue) != B_OK)
+				data.SetToFormat("%d%%", (int8)value);
+
+			buffer.SetToFormat(B_TRANSLATE("Audio quality: %s"), data.String());
+			fAudioQualitySlider->SetLabel(buffer.String());
+			fAudioQuality = (int)percentValue;
 			break;
 		}
 
@@ -896,6 +910,8 @@ MediaConverterWindow::TruncateOutputFolderPath()
 void
 MediaConverterWindow::_UpdateLabels()
 {
+	BNumberFormat fNumberFormat;
+
 	if (fSourcesBox != NULL) {
 		fSourcesBox->SetLabel(B_TRANSLATE("Source files"));
 		_UpdateBBoxLayoutInsets(fSourcesBox);
@@ -919,21 +935,32 @@ MediaConverterWindow::_UpdateLabels()
 		fDestButton->SetLabel(B_TRANSLATE("Output folder"));
 
 	if (fVideoQualitySlider != NULL) {
-		char buffer[40];
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Video quality: %3d%%"),
-			(int8)fVideoQuality);
-		fVideoQualitySlider->SetLabel(buffer);
-		fVideoQualitySlider->SetLimitLabels(B_TRANSLATE("Low"),
-			B_TRANSLATE("High"));
+		BString buffer;
+		BString data;
+		double percentValue = fVideoQuality / 100.0;
+
+		if (fNumberFormat.FormatPercent(data, percentValue) != B_OK)
+			data.SetToFormat("%d%%", (int8)fVideoQuality);
+
+		buffer.SetToFormat(B_TRANSLATE("Video quality: %s"), data.String());
+		fVideoQuality = (int)percentValue;
+		fVideoQualitySlider->SetLabel(buffer.String());
+		fVideoQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
 	}
 
 	if (fAudioQualitySlider != NULL) {
-		char buffer[40];
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Audio quality: %3d%%"),
-			(int8)fAudioQuality);
-		fAudioQualitySlider->SetLabel(buffer);
-		fAudioQualitySlider->SetLimitLabels(B_TRANSLATE("Low"),
-			B_TRANSLATE("High"));
+		BString buffer;
+		BString data;
+		double percentValue = fAudioQuality / 100.0;
+
+		if (fNumberFormat.FormatPercent(data, percentValue) != B_OK) {
+			data.SetToFormat("%d%%", (int8)fAudioQuality);
+		}
+
+		buffer.SetToFormat(B_TRANSLATE("Audio quality: %s"), data.String());
+		fAudioQuality = (int)percentValue;
+		fAudioQualitySlider->SetLabel(buffer.String());
+		fAudioQualitySlider->SetLimitLabels(B_TRANSLATE("Low"), B_TRANSLATE("High"));
 	}
 
 	if (fStartDurationTC != NULL)

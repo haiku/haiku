@@ -5,16 +5,16 @@ OK	VirtualMemoryApp		ОК
 Use volume:	SettingsWindow		Використати том:
 Turn off	SettingsWindow		Вимкнути
 Changes will take effect upon reboot.	SettingsWindow		Зміни вступлять в силу після перезавантаження.
-Revert	SettingsWindow		Без змін
+Revert	SettingsWindow		Відкат змін
 Keep enabled	SettingsWindow		Залишити ввімкненим
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметри у файлі налаштувань хибні. Ви можете завантажити за замовчуванням або вийти.
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Параметри у файлі налаштувань хибні. Ви можете завантажити типові настройки або вийти.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tавтор Axel Dörfler\n\tCopyright 2005, Haiku.\n
 The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Розділ, вказаний в файлі налаштувань не знайдено. Ви можете використати завантажувальний розділ або вийти.
 Current Swap:	SettingsWindow		Поточний файл підкачки:
-Load defaults	SettingsWindow		Завантажити за замовчуванням
+Load defaults	SettingsWindow		Завантажити типові настройки
 Use boot volume	SettingsWindow		Використати завантажувальний том
 Automatic swap management	SettingsWindow		Автоматичне обслуговування підкачки
-Defaults	SettingsWindow		За замовчуванням
+Defaults	SettingsWindow		Типові настройки
 Quit	SettingsWindow		Вийти
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Вимкнення віртуальної пам'яті, може мати небажаний вплив на стабільність системи, при задіянні всієї доступної фізичної.\nВіртуальна пам'ять не впливає на продуктивність системи аж до цього моменту.\n\nВи дійсно бажаєте її вимкнути?
 Enable virtual memory	SettingsWindow		Увімкнути віртуальну пам'ять

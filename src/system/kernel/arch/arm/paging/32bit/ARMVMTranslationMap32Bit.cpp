@@ -394,7 +394,7 @@ ARMVMTranslationMap32Bit::UnmapPage(VMArea* area, addr_t address,
 		// PageUnmapped() will unlock for us
 
 	PageUnmapped(area, (oldEntry & ARM_PTE_ADDRESS_MASK) / B_PAGE_SIZE,
-		true /*(oldEntry & ARM_PTE_ACCESSED) != 0*/, true /*(oldEntry & ARM_PTE_DIRTY) != 0*/,
+		true /*(oldEntry & ARM_PTE_ACCESSED) != 0*/, false /*(oldEntry & ARM_PTE_DIRTY) != 0*/,
 		updatePageQueue);
 
 	return B_OK;
@@ -462,7 +462,7 @@ ARMVMTranslationMap32Bit::UnmapPages(VMArea* area, addr_t base, size_t size,
 				// transfer the accessed/dirty flags to the page
 				if (/*(oldEntry & ARM_PTE_ACCESSED) != 0*/ true) // XXX IRA
 					page->accessed = true;
-				if (/*(oldEntry & ARM_PTE_DIRTY) != 0 */ true)
+				if (/*(oldEntry & ARM_PTE_DIRTY) != 0 */ false)
 					page->modified = true;
 
 				// remove the mapping object/decrement the wired_count of the
@@ -590,7 +590,7 @@ ARMVMTranslationMap32Bit::UnmapArea(VMArea* area, bool deletingAddressSpace,
 					InvalidatePage(address);
 			}
 
-			if (true /*(oldEntry & ARM_PTE_DIRTY) != 0*/)
+			if (false /*(oldEntry & ARM_PTE_DIRTY) != 0*/)
 				page->modified = true;
 
 			if (pageFullyUnmapped) {
@@ -855,7 +855,7 @@ ARMVMTranslationMap32Bit::ClearAccessedAndModified(VMArea* area, addr_t address,
 
 	pinner.Unlock();
 
-	_modified = true /* (oldEntry & X86_PTE_DIRTY) != 0 */; // XXX IRA
+	_modified = false /* (oldEntry & X86_PTE_DIRTY) != 0 */; // XXX IRA
 
 	if (true /*(oldEntry & ARM_PTE_ACCESSED) != 0*/) {
 		// Note, that we only need to invalidate the address, if the

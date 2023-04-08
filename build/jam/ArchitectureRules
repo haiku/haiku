@@ -738,7 +738,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel file_systems reiserfs ;
 	EnableWerror src add-ons kernel file_systems udf ;
 	EnableWerror src add-ons kernel file_systems userlandfs ;
-#	EnableWerror src add-ons kernel file_systems xfs ;
+	EnableWerror src add-ons kernel file_systems xfs ;
 	EnableWerror src add-ons kernel generic ;
 	EnableWerror src add-ons kernel network ;
 	EnableWerror src add-ons kernel partitioning_systems ;

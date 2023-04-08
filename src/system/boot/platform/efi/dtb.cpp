@@ -568,9 +568,6 @@ dtb_handle_fdt(const void* fdt, int node)
 					uart.clock);
 			}
 		}
-
-		if (gUART != NULL)
-			gUART->InitEarly();
 	}
 }
 

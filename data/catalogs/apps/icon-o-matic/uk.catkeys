@@ -105,7 +105,7 @@ Overwrite	Icon-O-Matic-SVGExport		Перезаписати
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Змінити контрольну точку
 Cancel	Icon-O-Matic-SVGExport		Скасувати
 Open…	Icon-O-Matic-Menu-File		Відкрити…
-Redo	Icon-O-Matic-Main		Повторити
+Redo	Icon-O-Matic-Main		Повтор дії
 Change Color	Icon-O-Matic-SetColorCmd		Змінити Колір
 Remove	Icon-O-Matic-ShapesList		Вилучити
 Drop shapes	Icon-O-Matic-ShapesList		Скинути форми

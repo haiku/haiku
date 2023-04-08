@@ -24,9 +24,11 @@ public:
 	virtual	void		tearDown();
 
 		void		TestLegacy();
+		void		TestLegacyBSD();
 		void		TestCustomSalt();
 		void		TestSaltGeneration();
 		void		TestBadSalt();
+		void		TestCryptR();
 
 	static	void		AddTests(BTestSuite& suite);
 };

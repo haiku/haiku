@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-WebPositive	939428532
+1	slovak	x-vnd.Haiku-WebPositive	2199373698
 Authentication required	Authentication Panel		Vyžaduje sa overenie totožnosti
 Previous	WebPositive Window		Predošlé
 (Finish: %date)	Download Window		(Dokončenie: %date)
@@ -27,7 +27,6 @@ Start page:	Settings Window		Počiatočná stránka:
 Cancel	Download Window		Zrušiť
 Settings	Settings Window		Nastavenia
 Downloads	WebPositive Window		Sťahovania
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Záložka tejto stránky (%bookmarkName) už existuje.
 Match case	WebPositive Window		Rozlišovať veľkosť písmen
 Proxy password:	Settings Window		Heslo proxy:
 Size:	Font Selection view		Veľkosť:
@@ -100,8 +99,8 @@ Copy	WebPositive Window		Skopírovať
 Default standard font size:	Settings Window		Predvolená veľkosť štandardného písma:
 Bookmark this page	WebPositive Window		Uložiť stránku do záložiek
 Show tabs if only one page is open	Settings Window		Zobrazovať karty ak je otvorená iba jedna karta
-Close tab	WebPositive Window		Zatvoriť kartu
 Remove	Download Window		Odstrániť
+Close tab	WebPositive Window		Zatvoriť kartu
 About	WebPositive Window		O aplikácii
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Priebieha sťahovanie. Skutočne chcete teraz ukončiť WebPositive?
 Continue downloads	WebPositive		Pokračovať v sťahovaní
@@ -148,7 +147,6 @@ Downloads	Download Window		Sťahovania
 Open blank page	Settings Window		Otvoriť prázdnu stránku
 Clear history	WebPositive Window		Vymazať históriu
 Cancel	WebPositive Window		Zrušiť
-Bookmark info	WebPositive Window		Informácie záložky
 Script console	Console Window		Konzola skriptov
 Copy	URL Bar		Skopírovať
 Open start page	Settings Window		Otvoriť úvodnú stránku

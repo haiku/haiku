@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src add-ons kernel file_systems websearchfs ;
+
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders netservices ;
+
+#SubDirCcFlags -DTRACK_FILENAME ;
+SubDirCcFlags -D_IMPEXP_KERNEL= ;
+
+Addon websearchfs :
+	attrs.c
+	duckduckgo_request.cpp
+	websearchfs.c
+	lists2.c
+	parse_duckduckgo_html.c
+	query.c
+	settings.c
+	string_utils.c
+	vnidpool.c
+	: libuserlandfs_haiku_kernel.so libnetservices.a bnetapi be network shared [ TargetLibstdc++ ]
+;

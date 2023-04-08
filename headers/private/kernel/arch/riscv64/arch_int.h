@@ -12,7 +12,7 @@
 #include <SupportDefs.h>
 #include <arch_cpu_defs.h>
 
-#define NUM_IO_VECTORS	256
+#define NUM_IO_VECTORS	4096
 
 
 #ifdef __cplusplus

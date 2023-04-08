@@ -8,7 +8,6 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems cdda ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems exfat ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ext2 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems fat ;
-SubInclude HAIKU_TOP src add-ons kernel file_systems googlefs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems iso9660 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems netfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems nfs ;
@@ -20,6 +19,7 @@ SubInclude HAIKU_TOP src add-ons kernel file_systems reiserfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems udf ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems ufs2 ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems userlandfs ;
+SubInclude HAIKU_TOP src add-ons kernel file_systems websearchfs ;
 SubInclude HAIKU_TOP src add-ons kernel file_systems xfs ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems layers ;

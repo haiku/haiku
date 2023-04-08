@@ -1,4 +1,4 @@
-1	thai	x-vnd.Be-MAIL	1477453861
+1	thai	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		ตั้งเป็นบันทึก
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		ข้อความหลักของคุณมีอักขระที่ไม่สามารถถอดรหัสได้ %ld บางทีชุดอักขระที่แตกต่างกัน กดส่งเพื่อส่งต่อไป (ตัวอักขระทดแทนจะถูกใช้แทนตัวอักษรที่ไม่สามารถถอดรหัสได้) หรือเลือกยกเลิกเพื่อย้อนกลับไปและลองแก้ไข
 Text wrapping:	Mail		การตัดข้อความ:
@@ -42,7 +42,6 @@ Copy link location	Mail		คัดลอกตำแหน่งลิงก์
 Attachments: 	Mail		สิ่งที่แนบมา:
 Remove enclosure	Mail		ลบกรอบออก
 Next	Mail		ถัดไป
-Attachments:	Mail		สิ่งที่แนบมา:
 Show icons only	Mail		แสดงไอคอนเท่านั้น
 Subject:	Mail		เรื่อง:
 OK	Mail		ตกลง

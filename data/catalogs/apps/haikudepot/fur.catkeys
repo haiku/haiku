@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pac
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
 <no info>	PackageInfoView		<nessune informazion>
 Usage conditions download problem	UserUsageConditions		Probleme tal discjamâ lis condizions di utilizazion
-Rating	PackageListView		Valutazion
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
+Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 Show	MainWindow		Mostre
 Settings…	MainWindow		Impostazions…
@@ -157,8 +157,8 @@ Close	PackageManager		Siere
 Changelog	PackageInfoView		Regjistri modifichis
 About	PackageInfoView		Informazions su
 Password:	UserLoginWindow		Peraule d'ordin:
-Stability	RatePackageWindow		Stabilitât
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul servidôr. Oten une version plui resinte inzornant il sisteme. La version minime domandade e je la \"%s\".
+Stability	RatePackageWindow		Stabilitât
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Si scugne ripeti la peraule d'ordin par podê diminuî lis pussibilitâts di inserîle sbaliade.
 Cancel	SettingsWindow		Anule
 Cancel	RatePackageWindow		Anule

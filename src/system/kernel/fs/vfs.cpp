@@ -3489,6 +3489,7 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 	if (!doWrite && vecOffset == 0) {
 		// now directly read the data from the device
 		// the first file_io_vec can be read directly
+		// TODO: we could also write directly
 
 		if (fileVecs[0].length < (off_t)numBytes)
 			size = fileVecs[0].length;
@@ -3505,17 +3506,6 @@ common_file_io_vec_pages(struct vnode* vnode, void* cookie,
 		}
 		if (status != B_OK)
 			return status;
-
-		// TODO: this is a work-around for buggy device drivers!
-		//	When our own drivers honour the length, we can:
-		//	a) also use this direct I/O for writes (otherwise, it would
-		//	   overwrite precious data)
-		//	b) panic if the term below is true (at least for writes)
-		if ((off_t)size > fileVecs[0].length) {
-			//dprintf("warning: device driver %p doesn't respect total length "
-			//	"in read_pages() call!\n", ref->device);
-			size = fileVecs[0].length;
-		}
 
 		ASSERT((off_t)size <= fileVecs[0].length);
 
@@ -8019,7 +8009,7 @@ fs_sync(dev_t device)
 
 		if (vnode != NULL) {
 			// insert marker vnode again
-			mount->vnodes.Insert(mount->vnodes.GetNext(vnode), &marker);
+			mount->vnodes.InsertBefore(mount->vnodes.GetNext(vnode), &marker);
 			marker.SetRemoved(false);
 		}
 

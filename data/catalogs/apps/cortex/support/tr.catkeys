@@ -49,7 +49,7 @@ Top-Back-center	MediaString		Üst arka merkez
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Üstten alta, soldan sağa
 (unknown run mode)	MediaString		(bilinmeyen çalıştırma kipi)
- kb/s	MediaString		 kb/s
+ kb/s	MediaString		 kb/sn
 24 bit HSI	MediaString		24 bit HSI
 User-defined media type	MediaString		Kullanıcı tanımlı ortam türü
 32 bit CMYA	MediaString		32 bit CMYA
@@ -115,7 +115,7 @@ Typeless media	MediaString		Türsüz ortam
  (PAL)	MediaString		 (PAL)
 32 bit RGBA	MediaString		32 bit RGBA
 YCbCr420	MediaString		YCbCr420
- kb/s (avg)	MediaString		 kb/s (ort.)
+ kb/s (avg)	MediaString		 kb/sn (ort.)
 HTML	MediaString		HTML
 Time source	MediaString		Zaman kaynağı
 15 bit RGB	MediaString		15 bit RGB

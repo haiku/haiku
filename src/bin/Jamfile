@@ -35,7 +35,6 @@ StdBinCommands
 	error.c
 	fortune.c
 	finddir.c
-	fstrim.cpp
 	get_driver_settings.cpp
 	hd.c
 	listarea.c
@@ -112,6 +111,11 @@ if $(TARGET_PLATFORM) = libbe_test {
 	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : setdecor
 		: tests!apps ;
 }
+
+# standard commands that need libbe.so, libshared.a
+StdBinCommands
+	fstrim.cpp
+	: shared be : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so and libsupc++.so
 StdBinCommands

@@ -201,13 +201,11 @@ TransformBox::MouseOver(BPoint where)
 {
 	TransformToCanvas(where);
 
-	_SetState(_DragStateFor(where, ZoomLevel()));
 	fMousePos = where;
-	if (fCurrentState) {
-		fCurrentState->UpdateViewCursor(fView, fMousePos);
-		return true;
-	}
-	return false;
+	fCurrentState = _DragStateFor(where, ZoomLevel());
+	fCurrentState->UpdateViewCursor(fView, fMousePos);
+
+	return true;
 }
 
 
@@ -722,20 +720,6 @@ TransformBox::_NotifyDeleted() const
 		TransformBoxListener* listener
 			= (TransformBoxListener*)listeners.ItemAtFast(i);
 		listener->TransformBoxDeleted(this);
-	}
-}
-
-
-// #pragma mark -
-
-
-// _SetState
-void
-TransformBox::_SetState(DragState* state)
-{
-	if (state != fCurrentState) {
-		fCurrentState = state;
-		fCurrentState->UpdateViewCursor(fView, fMousePos);
 	}
 }
 

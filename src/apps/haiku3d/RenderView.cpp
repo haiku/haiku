@@ -256,8 +256,8 @@ RenderView::_Render()
 		UnlockGL();
 		return false;
 	}
-	UnlockGL();
 	SwapBuffers(false); // true = vsync
+	UnlockGL();
 	return true;
 }
 

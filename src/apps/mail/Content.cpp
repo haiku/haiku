@@ -83,9 +83,7 @@ of their respective holders. All rights reserved.
 #define B_TRANSLATION_CONTEXT "Mail"
 
 
-const rgb_color kNormalTextColor = {0, 0, 0, 255};
 const rgb_color kSpellTextColor = {255, 0, 0, 255};
-const rgb_color kHyperLinkColor = {0, 0, 255, 255};
 const rgb_color kHeaderColor = {72, 72, 72, 255};
 
 const rgb_color kQuoteColors[] = {
@@ -487,7 +485,7 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 				runs[index].offset = pos;
 				runs[index].font = font;
 				runs[index].color = level > 0
-					? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
+					? kQuoteColors[level % kNumQuoteColors] : ui_color(B_PANEL_TEXT_COLOR);
 
 				pos = next;
 				if (++index >= maxStyles)
@@ -514,7 +512,7 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 				runs[index].color = kDiffColors[diff_mode('@') - 1];
 			else if (diffMode <= 0) {
 				runs[index].color = level > 0
-					? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
+					? kQuoteColors[level % kNumQuoteColors] : ui_color(B_PANEL_TEXT_COLOR);
 			} else
 				runs[index].color = kDiffColors[diffMode - 1];
 
@@ -2412,11 +2410,11 @@ TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink,
 		array.count = 1;
 		array.runs[0].offset = 0;
 		if (isHeader) {
-			array.runs[0].color = isHyperLink ? kHyperLinkColor : kHeaderColor;
+			array.runs[0].color = isHyperLink ? ui_color(B_LINK_TEXT_COLOR) : kHeaderColor;
 			font.SetSize(font.Size() * 0.9);
 		} else {
 			array.runs[0].color = isHyperLink
-				? kHyperLinkColor : kNormalTextColor;
+				? ui_color(B_LINK_TEXT_COLOR) : ui_color(B_PANEL_TEXT_COLOR);
 		}
 		array.runs[0].font = font;
 	}
@@ -2688,7 +2686,7 @@ TTextView::InsertText(const char *insertText, int32 length, int32 offset,
 		style.count = 1;
 		style.runs[0].offset = 0;
 		style.runs[0].font = fFont;
-		style.runs[0].color = kNormalTextColor;
+		style.runs[0].color = ui_color(B_PANEL_TEXT_COLOR);
 		runs = &style;
 	}
 
@@ -2780,6 +2778,8 @@ TTextView::CheckSpelling(int32 start, int32 end, int32 flags)
 	bool		isAlpha;
 	bool		isApost;
 
+	rgb_color normalColor = ui_color(B_PANEL_TEXT_COLOR);
+
 	for (next = text + start, endPtr = text + end; next <= endPtr; next++) {
 		//printf("next=%c\n", *next);
 		// ToDo: this has to be refined to other languages...
@@ -2857,7 +2857,7 @@ TTextView::CheckSpelling(int32 start, int32 end, int32 flags)
 	if (nextHighlight <= end
 		&& (flags & S_CLEAR_ERRORS) != 0
 		&& nextHighlight < TextLength())
-		SetFontAndColor(nextHighlight, end, NULL, B_FONT_ALL, &kNormalTextColor);
+		SetFontAndColor(nextHighlight, end, NULL, B_FONT_ALL, &normalColor);
 }
 
 

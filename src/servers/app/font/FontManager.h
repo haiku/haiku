@@ -10,9 +10,8 @@
 #define FONT_MANAGER_H
 
 
-#include <AutoDeleter.h>
 #include <HashMap.h>
-#include <Looper.h>
+#include <Node.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
 
@@ -20,30 +19,22 @@
 #include FT_FREETYPE_H
 
 
-class BEntry;
-class BPath;
-struct node_ref;
-
 class FontFamily;
 class FontStyle;
-class ServerFont;
 
 
 /*!
 	\class FontManager FontManager.h
 	\brief Base class interface used by GlobalFontManager and AppFontManager
 */
-class FontManagerBase : public BLooper {
+class FontManager {
 public:
-								FontManagerBase(bool init_freetype,
-									const char* className = "FontManagerBase");
-	virtual						~FontManagerBase();
+								FontManager();
+	virtual						~FontManager();
 
-			status_t			InitCheck() { return fInitStatus; }
-			void  				SetInitStatus(status_t new_status)
-									{ fInitStatus = new_status; }
-
-	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				Lock() = 0;
+	virtual	void				Unlock() = 0;
+	virtual	bool				IsLocked() const = 0;
 
 	virtual	int32				CountFamilies();
 
@@ -72,14 +63,20 @@ public:
 				// FontStyle.
 
 
+protected:
 			FT_CharMap			_GetSupportedCharmap(const FT_Face& face);
 
-protected:
 			FontFamily*			_FindFamily(const char* family) const;
 
-			static int 			compare_font_families(const FontFamily* a,
-									const FontFamily* b);
+			status_t			_AddFont(FT_Face face, node_ref nodeRef,
+									const char* path,
+									uint16& familyID, uint16& styleID);
+			FontStyle*			_RemoveFont(uint16 familyID, uint16 styleID);
+			void				_RemoveAllFonts();
 
+	virtual	uint16				_NextID();
+
+private:
 			struct FontKey {
 				FontKey(uint16 family, uint16 style)
 					: familyID(family), styleID(style) {}
@@ -98,17 +95,13 @@ protected:
 				uint16 familyID, styleID;
 			};
 
-			status_t			fInitStatus;
-
+private:
 			typedef BObjectList<FontFamily>			FamilyList;
 			FamilyList			fFamilies;
 
 			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
 
 			uint16				fNextID;
-			bool  				fHasFreetypeLibrary;
 };
-
-extern FT_Library gFreeTypeLibrary;
 
 #endif	/* FONT_MANAGER_H */

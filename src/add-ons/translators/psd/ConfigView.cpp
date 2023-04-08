@@ -27,7 +27,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	BPopUpMenu* compressionPopupMenu = new BPopUpMenu("popup_compression");
 
-	uint32 currentCompression = 
+	uint32 currentCompression =
 		fSettings->SetGetInt32(PSD_SETTING_COMPRESSION);
 
 	_AddItemToMenu(compressionPopupMenu, B_TRANSLATE("Uncompressed"),
@@ -41,7 +41,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	BPopUpMenu* versionPopupMenu = new BPopUpMenu("popup_version");
 
-	uint32 currentVersion = 
+	uint32 currentVersion =
 		fSettings->SetGetInt32(PSD_SETTING_VERSION);
 
 	_AddItemToMenu(versionPopupMenu,
@@ -71,7 +71,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		B_UTF8_COPYRIGHT "2005-2013 Haiku Inc.");
 	BStringView *copyright2View = new BStringView("my_copyright",
 		B_UTF8_COPYRIGHT "2012-2013 Gerasim Troeglazov <3dEyes@gmail.com>");
-	
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(titleView)
@@ -92,9 +92,6 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		.End()
 		.AddGlue()
 		.Add(copyright2View);
-
-
-	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
 
 
@@ -131,7 +128,7 @@ ConfigView::MessageReceived(BMessage* message)
 				fSettings->SaveSettings();
 			}
 			break;
-		}		
+		}
 		default:
 			BView::MessageReceived(message);
 	}

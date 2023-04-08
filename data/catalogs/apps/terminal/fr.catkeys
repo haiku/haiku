@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2536107739
+1	french	x-vnd.Haiku-Terminal	1367625978
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
@@ -14,28 +14,37 @@ Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
 Print	Terminal TermWindow		Imprimer
 Settings	Terminal TermWindow		Réglages
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
+ANSI bright black color	Terminal ThemeView		Gris foncé ANSI
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail actuel du processus actif.\n\t\t\tEn option, le nombre maximum de composants du chemin\n\t\t\tpeut être spécifié. Ex. « %2d » pour au plus deux composants.\n\t%i\t-\tL’index de l’onglet.\n\t%e\t-\tL’encodage de l’onglet actuel. Non affiché pour UTF-8.\n\t%p\t-\tLe nom du processus actif.
 Use default	Terminal SetTitleWindow		Par défaut
 Close tab	Terminal TermWindow		Fermer l’onglet
 Error!	Terminal getString		Erreur !
+Colors…	Terminal TermWindow		Couleurs…
 Appearance	Terminal PrefWindow		Apparence
 Set tab title	Terminal TermWindow		Changer le titre de l’onglet
 Create link here	Terminal TermView		Créer un raccourci ici
 Encoding:	Terminal AppearancePrefView		Encodage :
+yellow	Terminal ThemeView		Jaune
 Change directory	Terminal TermView		Changer de répertoire
 Custom	Terminal AppearancePrefView	Window size	Personnalisé
 Page setup…	Terminal TermWindow		Mise en page…
+ANSI yellow color	Terminal ThemeView		Marron ANSI
 Cancel	Terminal TermView		Annuler
 Defaults	Terminal PrefWindow		Paramètres par défaut
+black	Terminal ThemeView		noir
 Revert	Terminal PrefWindow		Rétablir
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Utiliser la sélection
 Find next	Terminal TermWindow		Rechercher le suivant
 Copy link location	Terminal TermView		Copier l’emplacement du lien
+Background	Terminal ThemeView		Arrière-plan
 Window title:	Terminal AppearancePrefView		Titre de la fenêtre :
 New tab	Terminal TermWindow		Nouvel onglet
+magenta	Terminal ThemeView		magenta
 Allow bold text	Terminal AppearancePrefView		Autoriser le texte en gras
 Window title…	Terminal TermWindow		Titre de la fenêtre…
+ANSI blue color	Terminal ThemeView		Bleu ANSI
+blue	Terminal ThemeView		blue
 Open path	Terminal TermView		Ouvrir l’emplacement
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d’exécuter « %command » :\n\t%error
 Terminal	System name		Terminal
@@ -43,6 +52,7 @@ Custom	Terminal colors scheme		Personnalisé
 Really close?	Terminal TermWindow		Êtes-vous sûr de vouloir fermer ?
 Font size	Terminal TermWindow		Taille de la police
 OK	Terminal TermApp		OK
+ANSI bright blue color	Terminal ThemeView		Bleu vif ANSI
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		L’application « %1 » fonctionne encore.\nSi vous fermez le Terminal, l’application sera interrompue.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Option « %s » non reconnue\n
 Tab title:	Terminal AppearancePrefView		Titre de l’onglet :
@@ -58,14 +68,19 @@ Close	Terminal TermWindow		Fermer
 Save to file…	Terminal PrefWindow		Enregistrer sous…
 Copy path	Terminal TermView		Copier le chemin
 Window size	Terminal TermWindow		Taille de la fenêtre
+Selected text	Terminal ThemeView		Texte sélectionné
 Copy absolute path	Terminal TermView		Copier le chemin absolu
 Cancel	Terminal TermWindow		Annuler
+ANSI cyan color	Terminal ThemeView		Cyan ANSI
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		L’application « %1 » fonctionne encore.\nSi vous fermez l’onglet, l’application sera interrompue.
 Full screen	Terminal TermWindow		Plein écran
 Shell 	Terminal TermWindow		Interpréteur de commande
+ANSI green color	Terminal ThemeView		Vert ANSI
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLe caractère « % ».\n\t%<\t-\tDémarre une section qui ne sera affiché que si un\n\t\t\tparamètre qui suit n’est pas vide.\n\t%>\t-\tDémarre une section qui ne sera affiché que si un paramètre\n\t\t\tentre la précédente section %< et si celui-ci n’est pas vide.\n\t%-\t-\tTermine une section. %< ou %>.\n\nTout caractère non alphanumérique entre « % » et la lettre de format insérera un espace\nque si la valeur du paramètre n’est pas vide. Il s’ajoutera à la section %<.
+ANSI bright cyan color	Terminal ThemeView		Turquoise ANSI
 Tab title:	Terminal TermWindow		Titre de l’onglet :
 Window title:	Terminal TermWindow		Titre de la fenêtre :
+ANSI white color	Terminal ThemeView		Gris clair ANSI
 Window size:	Terminal AppearancePrefView		Taille de la fenêtre :
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Decrease	Terminal TermWindow		Réduire
@@ -77,25 +92,40 @@ Close active tab	Terminal TermWindow		Fermer l’onglet actif
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
+ANSI bright red color	Terminal ThemeView		Rouge vif ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Utiliser la touche Option gauche comme touche Meta
 Find	Terminal FindWindow		Rechercher
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l’onglet actif peut\ncontenir les éléments suivants :\n
 Font:	Terminal AppearancePrefView		Police :
 Paste	Terminal TermWindow		Coller
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre de la fenêtre. Vous pouvez\nutiliser les variables suivantes :
+ANSI bright magenta color	Terminal ThemeView		Magenta clair ANSI
 Copy here	Terminal TermView		Copier ici
 Use default shell	Terminal Shell		Utiliser l’interpréteur de commande par défaut
+red	Terminal ThemeView		rouge
+white	Terminal ThemeView		blanc
 Open link	Terminal TermView		Ouvrir le lien
+Text	Terminal ThemeView		Texte
+ANSI bright yellow color	Terminal ThemeView		Jaune ANSI
 Not found.	Terminal TermWindow		Non trouvé.
+ANSI black color	Terminal ThemeView		Noir ANSI
 Find…	Terminal TermWindow		Rechercher…
 No search string was entered.	Terminal TermWindow		Aucun texte à rechercher n’a été indiqué.
 Move here	Terminal TermView		Déplacer ici
 Abort	Terminal Shell		Abandonner
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Les applications suivantes sont encore en fonctionnement :\n\n\t%1\n\nSi vous fermez le Terminal, les applications seront interrompues.
 Set window title	Terminal TermWindow		Changer le titre de la fenêtre
+ANSI red color	Terminal ThemeView		Rouge ANSI
 Increase	Terminal TermWindow		Augmenter
+green	Terminal ThemeView		vert
+ANSI bright green color	Terminal ThemeView		Vert clair ANSI
 OK	Terminal TermWindow		OK
+ANSI bright white color	Terminal ThemeView		Blanc ANSI
 Close window	Terminal TermWindow		Fermer la fenêtre
+ANSI magenta color	Terminal ThemeView		Magenta ANSI
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright ©1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
+cyan	Terminal ThemeView		cyan
+Colors	System name		Couleurs
 Clear all	Terminal TermWindow		Effacer tout
+Cursor	Terminal ThemeView		Curseur
 Search forward	Terminal FindWindow		Rechercher en avant

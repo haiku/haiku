@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src system libroot posix musl crypt ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_musl_crypt.o :
+			crypt_des.c
+			encrypt.c
+			;
+	}
+}

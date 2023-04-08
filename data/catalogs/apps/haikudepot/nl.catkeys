@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Starten van de pakket-daemon
 No user ratings available.	PackageInfoView		Geen beoordelingen beschikbaar.
 <no info>	PackageInfoView		<geen info>
 Usage conditions download problem	UserUsageConditions		Gebruikersvoorwaarden download probleem
-Rating	PackageListView		Beoordeling
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Een netwerk transport fout is opgetreden bij het communiceren met het server systeem: %s
+Rating	PackageListView		Beoordeling
 Synchronizing icons	ServerIconExportUpdateProcess		Iconen synchroniseren
 Show	MainWindow		Toon
 Settings…	MainWindow		Instellingen…
@@ -157,8 +157,8 @@ Close	PackageManager		Sluiten
 Changelog	PackageInfoView		Changelog
 About	PackageInfoView		Over
 Password:	UserLoginWindow		Wachtwoord:
-Stability	RatePackageWindow		Stabiliteit
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Deze toepassing is te oud om te communiceren met de server. Update naar een nieuwere versie van deze toepassing door het systeem te updaten. De minimum versie vereist voor deze toepassing is \"%s\".
+Stability	RatePackageWindow		Stabiliteit
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Het wachtwoord moet tweemaal ingevuld worden om te kans op een verkeerde invoer te verkleinen.
 Cancel	SettingsWindow		Annuleren
 Cancel	RatePackageWindow		Annuleren

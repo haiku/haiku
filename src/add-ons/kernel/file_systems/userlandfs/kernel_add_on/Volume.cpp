@@ -1045,7 +1045,7 @@ Volume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 	char* readBuffer = (char*)reply->buffer.GetData();
 	size_t nameLen = reply->buffer.GetSize();
 	nameLen = strnlen(readBuffer, nameLen);
-	if (nameLen <= 1 || nameLen >= bufferSize)
+	if (nameLen <= 0 || nameLen >= bufferSize)
 		RETURN_ERROR(B_BAD_DATA);
 
 	memcpy(buffer, readBuffer, nameLen);

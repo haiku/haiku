@@ -265,11 +265,25 @@ patch_syscalls()
 	// instead of having this done here manually we should either add the
 	// patching step to gensyscalls also manually or add metadata to
 	// kernel/syscalls.h and have it parsed automatically
+
 	extern void patch_fcntl();
 	extern void patch_ioctl();
+	extern void patch_area();
+
+	for (size_t i = 0; i < sSyscallVector.size(); i++) {
+		Syscall *syscall = sSyscallVector[i];
+
+		// patch return type handlers
+		const string returnTypeName = syscall->ReturnType()->TypeName();
+		if (returnTypeName == "status_t" || returnTypeName == "ssize_t"
+				|| returnTypeName == "int") {
+			syscall->ReturnType()->SetHandler(create_status_t_type_handler());
+		}
+	}
 
 	patch_fcntl();
 	patch_ioctl();
+	patch_area();
 
 	Syscall *poll = get_syscall("_kern_poll");
 	poll->ParameterAt(0)->SetInOut(true);
@@ -384,16 +398,18 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 
 	// print syscall name, without the "_kern_"
 	if (colorize) {
-		print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s(",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s",
 			message.origin.thread, kTerminalTextBlue,
 			syscall->Name().c_str() + 6, kTerminalTextNormal);
 	} else {
-		print_to_string(&string, &length, "[%6" B_PRId32 "] %s(",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] %s",
 			message.origin.thread, syscall->Name().c_str() + 6);
 	}
 
 	// print arguments
 	if (printArguments) {
+		print_to_string(&string, &length, "(");
+
 		int32 count = syscall->CountParameters();
 		for (int32 i = 0; i < count; i++) {
 			// get the value
@@ -408,9 +424,9 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 			print_to_string(&string, &length, (i > 0 ? ", %s" : "%s"),
 				value.c_str());
 		}
-	}
 
-	print_to_string(&string, &length, ")");
+		print_to_string(&string, &length, ")");
+	}
 
 	print_buffer(outputFile, buffer, sizeof(buffer) - length);
 }
@@ -451,43 +467,40 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 					syscall->Name().c_str() + 6);
 			}
 		}
+
 		Type *returnType = syscall->ReturnType();
 		TypeHandler *handler = returnType->Handler();
 		::string value = handler->GetReturnValue(ctx, message.return_value);
-		if (value.length() > 0) {
+		if (value.length() > 0)
 			print_to_string(&string, &length, " = %s", value.c_str());
-
-			// if the return type is status_t or ssize_t, print human-readable
-			// error codes
-			if (returnType->TypeName() == "status_t"
-				|| ((returnType->TypeName() == "ssize_t"
-						|| returnType->TypeName() == "int")
-					&& message.return_value < 0)) {
-				print_to_string(&string, &length, " %s", strerror(message.return_value));
-			}
-		}
 	}
 
 	// print arguments
 	if (printArguments) {
 		int32 count = syscall->CountParameters();
 		int added = 0;
-		print_to_string(&string, &length, " (");
+		bool printedParen = false;
 		for (int32 i = 0; i < count; i++) {
 			// get the value
 			Parameter *parameter = syscall->ParameterAt(i);
 			if (!parameter->InOut() && !parameter->Out())
 				continue;
+
 			TypeHandler *handler = parameter->Handler();
 			::string value =
 				handler->GetParameterValue(ctx, parameter,
-						ctx.GetValue(parameter));
+					ctx.GetValue(parameter));
 
+			if (!printedParen) {
+				print_to_string(&string, &length, " (");
+				printedParen = true;
+			}
 			print_to_string(&string, &length, (added > 0 ? ", %s" : "%s"),
 				value.c_str());
 			added++;
 		}
-		print_to_string(&string, &length, ")");
+		if (printedParen)
+			print_to_string(&string, &length, ")");
 	}
 
 	if (colorize) {
@@ -682,43 +695,43 @@ main(int argc, const char *const *argv)
 							tok++;
 							// the following should be metadata in kernel/syscalls.h
 							if (strcmp(tok, "memory") == 0) {
-								sSyscallMap["clone_area"]->EnableTracing(true);
-								sSyscallMap["create_area"]->EnableTracing(true);
-								sSyscallMap["delete_area"]->EnableTracing(true);
-								sSyscallMap["find_area"]->EnableTracing(true);
-								sSyscallMap["resize_area"]->EnableTracing(true);
-								sSyscallMap["transfer_area"]->EnableTracing(true);
-								sSyscallMap["mlock"]->EnableTracing(true);
-								sSyscallMap["munlock"]->EnableTracing(true);
-								sSyscallMap["set_memory_protection"]->EnableTracing(true);
-								sSyscallMap["get_memory_properties"]->EnableTracing(true);
-								sSyscallMap["sync_memory"]->EnableTracing(true);
-								sSyscallMap["unmap_memory"]->EnableTracing(true);
-								sSyscallMap["memory_advice"]->EnableTracing(true);
-								sSyscallMap["reserve_address_range"]->EnableTracing(true);
-								sSyscallMap["unreserve_address_range"]->EnableTracing(true);
-								sSyscallMap["set_area_protection"]->EnableTracing(true);
-								sSyscallMap["map_file"]->EnableTracing(true);
+								sSyscallMap["_kern_clone_area"]->EnableTracing(true);
+								sSyscallMap["_kern_create_area"]->EnableTracing(true);
+								sSyscallMap["_kern_delete_area"]->EnableTracing(true);
+								sSyscallMap["_kern_find_area"]->EnableTracing(true);
+								sSyscallMap["_kern_resize_area"]->EnableTracing(true);
+								sSyscallMap["_kern_transfer_area"]->EnableTracing(true);
+								sSyscallMap["_kern_mlock"]->EnableTracing(true);
+								sSyscallMap["_kern_munlock"]->EnableTracing(true);
+								sSyscallMap["_kern_set_memory_protection"]->EnableTracing(true);
+								sSyscallMap["_kern_get_memory_properties"]->EnableTracing(true);
+								sSyscallMap["_kern_sync_memory"]->EnableTracing(true);
+								sSyscallMap["_kern_unmap_memory"]->EnableTracing(true);
+								sSyscallMap["_kern_memory_advice"]->EnableTracing(true);
+								sSyscallMap["_kern_reserve_address_range"]->EnableTracing(true);
+								sSyscallMap["_kern_unreserve_address_range"]->EnableTracing(true);
+								sSyscallMap["_kern_set_area_protection"]->EnableTracing(true);
+								sSyscallMap["_kern_map_file"]->EnableTracing(true);
 							} else if (strcmp(tok, "network") == 0 || strcmp(tok, "net") == 0) {
-								sSyscallMap["socket"]->EnableTracing(true);
-								sSyscallMap["bind"]->EnableTracing(true);
-								sSyscallMap["shutdown_socket"]->EnableTracing(true);
-								sSyscallMap["connect"]->EnableTracing(true);
-								sSyscallMap["listen"]->EnableTracing(true);
-								sSyscallMap["accept"]->EnableTracing(true);
-								sSyscallMap["recv"]->EnableTracing(true);
-								sSyscallMap["recvfrom"]->EnableTracing(true);
-								sSyscallMap["recvmsg"]->EnableTracing(true);
-								sSyscallMap["send"]->EnableTracing(true);
-								sSyscallMap["sendto"]->EnableTracing(true);
-								sSyscallMap["sendmsg"]->EnableTracing(true);
-								sSyscallMap["getsockopt"]->EnableTracing(true);
-								sSyscallMap["setsockopt"]->EnableTracing(true);
-								sSyscallMap["getpeername"]->EnableTracing(true);
-								sSyscallMap["getsockname"]->EnableTracing(true);
-								sSyscallMap["sockatmark"]->EnableTracing(true);
-								sSyscallMap["socketpair"]->EnableTracing(true);
-								sSyscallMap["get_next_socket_stat"]->EnableTracing(true);
+								sSyscallMap["_kern_socket"]->EnableTracing(true);
+								sSyscallMap["_kern_bind"]->EnableTracing(true);
+								sSyscallMap["_kern_shutdown_socket"]->EnableTracing(true);
+								sSyscallMap["_kern_connect"]->EnableTracing(true);
+								sSyscallMap["_kern_listen"]->EnableTracing(true);
+								sSyscallMap["_kern_accept"]->EnableTracing(true);
+								sSyscallMap["_kern_recv"]->EnableTracing(true);
+								sSyscallMap["_kern_recvfrom"]->EnableTracing(true);
+								sSyscallMap["_kern_recvmsg"]->EnableTracing(true);
+								sSyscallMap["_kern_send"]->EnableTracing(true);
+								sSyscallMap["_kern_sendto"]->EnableTracing(true);
+								sSyscallMap["_kern_sendmsg"]->EnableTracing(true);
+								sSyscallMap["_kern_getsockopt"]->EnableTracing(true);
+								sSyscallMap["_kern_setsockopt"]->EnableTracing(true);
+								sSyscallMap["_kern_getpeername"]->EnableTracing(true);
+								sSyscallMap["_kern_getsockname"]->EnableTracing(true);
+								sSyscallMap["_kern_sockatmark"]->EnableTracing(true);
+								sSyscallMap["_kern_socketpair"]->EnableTracing(true);
+								sSyscallMap["_kern_get_next_socket_stat"]->EnableTracing(true);
 							} else
 								print_usage_and_exit(true);
 						} else {

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	2259131995
+1	swedish	x-vnd.Haiku-About	677050232
 Revision	AboutView		Utgåva
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
@@ -9,7 +9,7 @@ Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Upphovsrätt © 1999-2000 Y. Takagi. Med ensamrätt.
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google och deras Google Summer of Code och Google Code In program\n
 Contributors:\n	AboutView		Medarbetare:\n
-Kernel:	AboutView		Kärna:
+Kernel:	AboutView		OS Kärna:
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Upphovsrätt © 2006-2012 Kentaro Fukuchi
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Upphovsrätt © 1991-2000 Silicon Graphics, Inc. Med ensamrätt.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Upphovsrätt © 1990-2002 Info-ZIP. Med ensamrätt.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundare)
 Remove replicant	AboutView		Ta bort replikanten
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Om Haiku
-%d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Alla rättigheter förbehållna.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Upphovsrätt © 1999-2010 skaparna av Gutenprint. Med ensamrätt.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Upphovsrätt © 1994-1997 Mark Kilard. Med ensamrätt.
@@ -62,6 +61,7 @@ Current maintainers:\n	AboutView		Nuvarande projektledare:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Upphovsrätt © 1995, 1998-2001 Jef Poskanzer. Med ensamrätt.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Alla rättigheter förbehållna.
+%d MiB used (%s)	AboutView		%d MiB använd (%s)
 Version:	AboutView		Version:
 The BeGeistert team\n	AboutView		BeGeistert-teamet\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1

@@ -1,50 +1,49 @@
-1	greek, modern (1453-)	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Απενεργοποίηση
-Sort applications by name	PreferencesWindow		Ταξινόμηση εφαρμογών κατά όνομα
-Suspend	DeskbarMenu		Αναστολή
-Hide clock	TimeView		Απόκρυψη ρολογιού
-Applications	PreferencesWindow		Εφαρμογές
-Time preferences…	TimeView		Προτιμήσεις ώρας…
-About Haiku	DeskbarMenu		Σχετικά με το Haiku
-Edit in Tracker…	PreferencesWindow		Επεξεργασία στον Ιχνηλάτη…
-Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
-Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
-Find…	DeskbarMenu		Αναζήτηση…
-Show clock	Tray		Εμφάνιση ρολογιού
-Window	PreferencesWindow		Παράθυρο
-Defaults	PreferencesWindow		Προεπιλεγμένα
-Menu	PreferencesWindow		Μενού
-Recent documents	DeskbarMenu		Πρόσφατα έγγραφα
+1	greek, modern (1453-)	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Αυτόματη απόκρυψη
-Always on top	PreferencesWindow		Πάντα στην κορυφή
-<Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος γραμμής εργασιών είναι άδειος>
 Show all	WindowMenu		Εμφάνιση όλων
-No windows	WindowMenu		Χωρίς παράθυρα
-Deskbar	System name		Γραμμή Εργασιών
-Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
+Edit in Tracker…	PreferencesWindow		Επεξεργασία στον Ιχνηλάτη…
+Menu	PreferencesWindow		Μενού
+Tracker always first	PreferencesWindow		Να βρίσκεται ο Ιχνηλάτης πάντα στην κορυφή
+Hide clock	TimeView		Απόκρυψη ρολογιού
 Large	PreferencesWindow		Μεγάλο
+<Deskbar folder is empty>	DeskbarMenu		<Ο φάκελος γραμμής εργασιών είναι άδειος>
+Recent documents	DeskbarMenu		Πρόσφατα έγγραφα
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Εφαρμογές
+Always on top	PreferencesWindow		Πάντα στην κορυφή
+Restart system	DeskbarMenu		Επανεκκίνηση συστήματος
+Recent documents:	PreferencesWindow		Πρόσφατα έγγραφα:
 Auto-raise	PreferencesWindow		Αυτόματη ανύψωση
-Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
-Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Αποσυμπιεστής
+Mount	DeskbarMenu		Προσάρτηση
+Icon size	PreferencesWindow		Μέγεθος εικονιδίων
+About Haiku	DeskbarMenu		Σχετικά με το Haiku
+Small	PreferencesWindow		Μικρό
+Show calendar…	TimeView		Εμφάνιση ημερολογίου…
+Find…	DeskbarMenu		Αναζήτηση…
+Power off	DeskbarMenu		Απενεργοποίηση
+Defaults	PreferencesWindow		Προεπιλεγμένα
+Show replicants	DeskbarMenu		Εμφάνιση ρέπλικας
+No windows	WindowMenu		Χωρίς παράθυρα
+Show clock	Tray		Εμφάνιση ρολογιού
 Close all	WindowMenu		Κλείσιμο όλων
 Deskbar preferences	PreferencesWindow		Προτιμήσεις Γραμμής Εργασιών
-Mount	DeskbarMenu		Προσάρτηση
-Revert	PreferencesWindow		Επαναφορά
-Small	PreferencesWindow		Μικρό
-Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
-Shutdown…	DeskbarMenu		Κλείσιμο…
-Tracker always first	PreferencesWindow		Να βρίσκεται ο Ιχνηλάτης πάντα στην κορυφή
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Προτιμήσεις
-Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
 About this system	DeskbarMenu		Πληροφορίες συστήματος
-Show calendar…	TimeView		Εμφάνιση ημερολογίου…
-Deskbar preferences…	DeskbarMenu		Προτιμήσεις Γραμμής Εργασιών…
-Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
-Show replicants	DeskbarMenu		Εμφάνιση ρέπλικας
-Hide application names	PreferencesWindow		Απόκρυψη ονομάτων εφαρμογών
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις
-Icon size	PreferencesWindow		Μέγεθος εικονιδίων
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applets επιφάνειας εργασίας
-Hide all	WindowMenu		Απόκρυψη όλων
 Quit application	WindowMenu		Έξοδος εφαρμογής
+Hide application names	PreferencesWindow		Απόκρυψη ονομάτων εφαρμογών
+Applications	PreferencesWindow		Εφαρμογές
+Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Αποσυμπιεστής
+Deskbar preferences…	DeskbarMenu		Προτιμήσεις Γραμμής Εργασιών…
+Suspend	DeskbarMenu		Αναστολή
+Shutdown…	DeskbarMenu		Κλείσιμο…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Επιδείξεις
+Expand new applications	PreferencesWindow		Επέκταση νέων εφαρμογών
+Recent applications:	PreferencesWindow		Πρόσφατες εφαρμογές:
+Recent folders:	PreferencesWindow		Πρόσφατοι φάκελοι:
+Recent folders	DeskbarMenu		Πρόσφατοι φάκελοι
+Recent applications	DeskbarMenu		Πρόσφατες εφαρμογές
+Hide all	WindowMenu		Απόκρυψη όλων
+Sort applications by name	PreferencesWindow		Ταξινόμηση εφαρμογών κατά όνομα
+Revert	PreferencesWindow		Επαναφορά
+Window	PreferencesWindow		Παράθυρο
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Προτιμήσεις
+Time preferences…	TimeView		Προτιμήσεις ώρας…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applets επιφάνειας εργασίας

@@ -22,8 +22,8 @@ public:
 			uint64				Blockno()
 								{ return B_BENDIAN_TO_HOST_INT64(sl_blkno); }
 
-			uuid_t*				Uuid()
-								{ return &sl_uuid; }
+			const uuid_t&		Uuid()
+								{ return sl_uuid; }
 
 			uint64				Owner()
 								{ return B_BENDIAN_TO_HOST_INT64(sl_owner); }
@@ -38,9 +38,7 @@ private:
 			uint32				sl_magic;
 			uint32				sl_offset;
 			uint32				sl_bytes;
-public:
 			uint32				sl_crc;
-private:
 			uuid_t				sl_uuid;
 			uint64				sl_owner;
 			uint64				sl_blkno;

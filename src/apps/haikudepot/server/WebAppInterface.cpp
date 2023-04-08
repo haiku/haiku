@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -736,6 +736,57 @@ WebAppInterface::IncrementViewCounter(const PackageInfoRef package,
 	requestEnvelopeWriter.WriteObjectEnd();
 
 	return _SendJsonRequest("pkg/increment-view-counter",
+		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+		0, message);
+}
+
+
+status_t
+WebAppInterface::RetrievePasswordRequirements(
+	PasswordRequirements& passwordRequirements)
+{
+	BMessage responseEnvelopeMessage;
+	status_t result = _RetrievePasswordRequirementsMeta(
+		responseEnvelopeMessage);
+
+	if (result != B_OK)
+		return result;
+
+	BMessage resultMessage;
+
+	result = responseEnvelopeMessage.FindMessage("result", &resultMessage);
+
+	if (result != B_OK) {
+		HDERROR("bad response envelope missing 'result' entry");
+		return result;
+	}
+
+	double value;
+
+	if (resultMessage.FindDouble("minPasswordLength", &value) == B_OK)
+		passwordRequirements.SetMinPasswordLength((uint32) value);
+
+	if (resultMessage.FindDouble("minPasswordUppercaseChar", &value) == B_OK)
+		passwordRequirements.SetMinPasswordUppercaseChar((uint32) value);
+
+	if (resultMessage.FindDouble("minPasswordDigitsChar", &value) == B_OK)
+		passwordRequirements.SetMinPasswordDigitsChar((uint32) value);
+
+	return result;
+}
+
+
+status_t
+WebAppInterface::_RetrievePasswordRequirementsMeta(BMessage& message)
+{
+	BMallocIO* requestEnvelopeData = new BMallocIO();
+		// BHttpRequest later takes ownership of this.
+	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+
+	requestEnvelopeWriter.WriteObjectStart();
+	requestEnvelopeWriter.WriteObjectEnd();
+
+	return _SendJsonRequest("user/get-password-requirements",
 		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
 		0, message);
 }

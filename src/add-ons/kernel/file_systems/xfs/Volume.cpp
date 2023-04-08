@@ -56,7 +56,7 @@ Volume::Identify(int fd, XfsSuperBlock *superBlock)
 
 		TRACE("Superblock Crc: (%" B_PRIu32 ")\n", superBlock->Crc());
 
-		if(!xfs_verify_cksum(buf, 512, offsetof(XfsSuperBlock, sb_crc))) {
+		if(!xfs_verify_cksum(buf, 512, XfsSuperBlock::Offset_crc())) {
 			 ERROR("Filesystem is corrupted");
 			 return B_BAD_VALUE;
 		}

@@ -124,8 +124,8 @@ Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de 
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
 <no info>	PackageInfoView		<pas d’info>
 Usage conditions download problem	UserUsageConditions		Problème de téléchargement des conditions d'utilisation
-Rating	PackageListView		Évaluation
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Une erreur de transport réseau est survenue lors de la communication avec le serveur : %s
+Rating	PackageListView		Évaluation
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisation des icônes
 Show	MainWindow		Afficher
 Settings…	MainWindow		Réglages…
@@ -154,8 +154,8 @@ Close	PackageManager		Fermer
 Changelog	PackageInfoView		Journal des modifications
 About	PackageInfoView		À propos
 Password:	UserLoginWindow		Mot de passe :
-Stability	RatePackageWindow		Stabilité
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cette application est trop ancienne pour communiquer avec le serveur. Obtenez une version plus récente de cette application en mettant à jour votre système. La version minimale requise de cette application est « %s ».
+Stability	RatePackageWindow		Stabilité
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Le mot de passe doit être répété afin de réduire le risque d’une saisie erronée.
 Cancel	SettingsWindow		Annuler
 Cancel	RatePackageWindow		Annuler

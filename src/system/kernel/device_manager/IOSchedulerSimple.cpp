@@ -679,7 +679,7 @@ panic("no more requests for owner %p (thread %" B_PRId32 ")", owner, owner->thre
 		// insert our marker, since the owner will be gone in the next
 		// iteration.
 		if (owner->requests.IsEmpty()) {
-			fActiveRequestOwners.Insert(owner, &marker);
+			fActiveRequestOwners.InsertBefore(owner, &marker);
 			owner = NULL;
 		}
 

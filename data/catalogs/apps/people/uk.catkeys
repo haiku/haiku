@@ -17,7 +17,7 @@ Edit	People		Редагувати
 Save changes before closing?	People		Зберегти зміни перед закриттям?
 People	System name		People
 Error	People		Помилка
-Revert	People		Без змін
+Revert	People		Відкат змін
 Country	People		Країна
 Person	Short mimetype description		Персона
 New person	People		Нова персона
@@ -40,11 +40,11 @@ State	People		Держава
 Nickname	People		Псевдонім
 OK	People		ОК
 File	People		Файл
-Redo	People		Повторити
+Redo	People		Повтор дії
 Close	People		Закрити
 Copy	People		Копіювати
 Paste	People		Вставити
-E-mail	People		Пошта
+E-mail	People		E-mail
 Group	People		Група
 Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використовуйте контекстне меню.
 Load image…	People		Завантажити зображення…

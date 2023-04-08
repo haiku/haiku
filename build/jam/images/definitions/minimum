@@ -39,7 +39,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	BootManager@x86,x86_64
 	CharacterMap
 	Debugger@libedit DeskCalc Devices DiskProbe DiskUsage DriveSetup
-	Expander
+	Expander Installer
 	NetworkStatus
 	ProcessController
 	ShowImage StyledEdit
@@ -50,7 +50,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 DESKBAR_APPLICATIONS =
 	CharacterMap
 	DeskCalc Devices DiskProbe DiskUsage DriveSetup
-	Expander
+	Expander Installer
 	StyledEdit
 	Terminal
 ;
@@ -191,7 +191,7 @@ SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
 
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
-	x86,x86_64 @{
+	x86,x86_64,riscv64 @{
 		3com
 		atheros813x atheros81xx attansic_l1 attansic_l2
 		broadcom440x broadcom570x
@@ -205,7 +205,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		rtl8125 rtl8139 rtl81xx
 		sis19x sis900 syskonnect
 		via_rhine vt612x
-	}@ # x86,x86_64
+	}@ # x86,x86_64,riscv64
 
 	etherpci
 	pegasus

@@ -1,9 +1,9 @@
-1	czech	x-vnd.Haiku-MediaConverter	2816184527
+1	czech	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
 Source files	MediaConverter		Zdrojový soubor
 Error writing video frame %lld	MediaConverter		Chyba zápisu snímku videa %lld
+Audio quality: %s	MediaConverter		Kvalita zvuku: %s
 Error converting '%filename'	MediaConverter		Chyba převádění '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Vybraný adresář nebyl nalezen. Použije se výchozí /boot/home
 Conversion completed	MediaConverter		Převod dokončen
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Chyba při vytváření videa.
 Cancelling	MediaConverter		Rušení
 None available	Audio codecs		Žádný po ruce
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Soubor obsahuje více zvukových či obrazových stop, převedeny budou pouze první z nich.
 No file selected	MediaConverter-FileInfo		Nebyl zvolen žádný soubor
 High	MediaConverter		Vysoká
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Soubor nebyl rozeznán jako podporovaný typ multimédií:} few{# soubory nebyly rozeznány jako podporované typy multimédií:} other{# souborů nebylo rozeznáno jako podporované typy multimédií:}}
@@ -26,7 +27,7 @@ Error loading a file	MediaConverter		CHyba otevírání souboru
 Encoder parameters	MediaConverter-EncoderWindow		Parametry Enkderu
 Open…	Menu		Otevřít...
 Audio encoding:	MediaConverter		Kódování zvuku:
-Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
+Multi-track file detected	MediaConverter		Zjištěn vícestopý soubor
 Cancelling…	MediaConverter		Rušení...
 Output file '%filename' created	MediaConverter		Byl vytvořen výstupní soubor '%filename'
 Output folder	MediaConverter		Výstupní adresář
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Převod zrušen
 Low	MediaConverter		Nízký
 Error loading files	MediaConverter		Chyba otevírání souborů
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} other{# bitů}}
+Video quality: %s	MediaConverter		Kvalita videa: %s
 End   [ms]: 	MediaConverter		Konec [ms]: 
 Cancel	MediaConverter		Zrušit
 OK	MediaConverter-FileInfo		OK
@@ -48,21 +50,22 @@ Error	MediaConverter		Chyba
 File details	MediaConverter		Podrobnosti souboru
 No audio	Audio codecs list		Bez zvuku
 Drop media files onto this window	MediaConverter		Soubory médií přetáhni do tohoto okna
-Writing video track: %ld%% complete	MediaConverter		Zápis obrazové stopy: %ld%% hotovo
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# snímek} few{# snímky} other{# snímků}}
 Error read audio frame %lld	MediaConverter		Chyba čtení zvukového snímku %lld
 Quit	Menu		Konec
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} other{# bajty} other{# bajtů}}
+Writing audio track: %s complete	MediaConverter		Zápis zvukové stopy: %s hotovo
 Duration:	MediaConverter-FileInfo		Tvání:
 MediaConverter	System name		Konvertor multimédií
+Writing video track: %s complete	MediaConverter		Zápis obrazové stopy: %s hotovo
 Error launching: %strError%	MediaConverter		Chyba otevírání: %strError%
 Error writing audio frame %lld	MediaConverter		Chyba při zápisu zvukového snímku %lld
-Writing audio track: %ld%% complete	MediaConverter		Zápis zvukové stopy: %ld%% hotovo
 File format:	MediaConverter		Formát souboru:
 File	Menu		Soubor
 Video quality not supported	MediaConverter		Nepodporovaná videokvalita
 Select this folder	MediaConverter		Zvolit tento adresář
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
+Understood	MediaConverter		Rozuměno
 %d bit 	MediaFileInfo		%d bitový
 No video	Video codecs list		Bez videa
 Continue	MediaConverter		Pokračovat

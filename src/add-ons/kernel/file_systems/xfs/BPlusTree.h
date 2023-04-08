@@ -42,11 +42,14 @@ public:
 			uint64				Lsn()
 								{ return B_BENDIAN_TO_HOST_INT64(bb_lsn); }
 
-			uuid_t*				Uuid()
-								{ return &bb_uuid; }
+			const uuid_t&		Uuid()
+								{ return bb_uuid; }
 
 			uint64				Owner()
 								{ return B_BENDIAN_TO_HOST_INT64(bb_owner); }
+
+	static  uint32				Offset_v5()
+								{ return offsetof(LongBlock, bb_blkno); }
 
 	static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
@@ -62,7 +65,6 @@ private:
 			uint64				bb_rightsib;
 
 			// Version 5 fields start here
-public:
 			uint64				bb_blkno;
 			uint64				bb_lsn;
 			uuid_t				bb_uuid;

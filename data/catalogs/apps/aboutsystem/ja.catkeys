@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	2259131995
+1	japanese	x-vnd.Haiku-About	677050232
 Revision	AboutView		リビジョン
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (プロジェク�
 Remove replicant	AboutView		レプリカントの除去
 BSD (3-clause)	AboutWindow		BSD (三条項)
 About this system	AboutWindow		このシステムについて
-%d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. All rights reserved.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.
@@ -62,6 +61,7 @@ Current maintainers:\n	AboutView		現在のメンテナー:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
 Intel WiFi Firmware	AboutWindow		Intel WiFi ファームウェア
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.
+%d MiB used (%s)	AboutView		%d MiB 使用済 (%s)
 Version:	AboutView		バージョン:
 The BeGeistert team\n	AboutView		BeGeistert チーム\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1

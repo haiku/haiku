@@ -247,36 +247,24 @@ BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 }
 
 
-BMenuField::BMenuField(const char* label, BMenu* menu, uint32 flags)
-	:
-	BView(NULL, flags | B_FRAME_EVENTS)
-{
-	InitObject(label);
-
-	_InitMenuBar(menu, BRect(0, 0, 100, 15), true);
-
-	InitObject2();
-}
-
-
-//! Copy&Paste error, should be removed at some point (already private)
 BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
-		BMessage* message, uint32 flags)
+	bool fixedSize, uint32 flags)
 	:
 	BView(name, flags | B_FRAME_EVENTS)
 {
 	InitObject(label);
 
-	_InitMenuBar(menu, BRect(0, 0, 100, 15), true);
+	fFixedSizeMB = fixedSize;
+
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), fixedSize);
 
 	InitObject2();
 }
 
 
-//! Copy&Paste error, should be removed at some point (already private)
-BMenuField::BMenuField(const char* label, BMenu* menu, BMessage* message)
+BMenuField::BMenuField(const char* label, BMenu* menu, uint32 flags)
 	:
-	BView(NULL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS)
+	BView(NULL, flags | B_FRAME_EVENTS)
 {
 	InitObject(label);
 

@@ -19,8 +19,7 @@
 
 
 enum {
-	MSG_BROWSE_TEAM		= 'brte',
-	MSG_SET_TEAM_PATH	= 'setp'
+	MSG_BROWSE_TEAM		= 'brte'
 };
 
 
@@ -161,7 +160,6 @@ StartTeamWindow::MessageReceived(BMessage* message)
 				if (alert != NULL)
 					alert->Go();
 			} else {
-				be_app->PostMessage(MSG_START_TEAM_WINDOW_CLOSED);
 				PostMessage(B_QUIT_REQUESTED);
 			}
 			break;
@@ -171,4 +169,12 @@ StartTeamWindow::MessageReceived(BMessage* message)
 			break;
 	}
 
+}
+
+
+bool
+StartTeamWindow::QuitRequested()
+{
+	be_app->PostMessage(MSG_START_TEAM_WINDOW_CLOSED);
+	return true;
 }

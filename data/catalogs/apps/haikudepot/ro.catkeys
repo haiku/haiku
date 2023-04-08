@@ -100,8 +100,8 @@ Develop packages	MainWindow		Pachete de dezvoltare
 Starting the package daemon failed:\n\n%Error%	App		Pornirea serviciului de pachete a eșuat:\n\n%Error%
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluări ale utilizatorilor.
 <no info>	PackageInfoView		<no info>
-Rating	PackageListView		Evaluare
 A network transport error has arisen communicating with the server system: %s	ServerHelper		A apărut o eroare de transport în rețea la comunicarea cu sistemul de server: %s
+Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează pictogramele
 Show	MainWindow		Arată
 Settings…	MainWindow		Configurări…
@@ -125,8 +125,8 @@ Close	PackageManager		Închide
 Changelog	PackageInfoView		Istoric de modificări
 About	PackageInfoView		Despre
 Password:	UserLoginWindow		Parolă:
-Stability	RatePackageWindow		Stabilitate
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Această aplicație este prea veche pentru a comunica cu sistemul de servere. Obțineți o versiune mai nouă a acestei aplicații prin actualizarea sistemului. Versiunea minimă necesară a acestei aplicații este \„%s\”.
+Stability	RatePackageWindow		Stabilitate
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Parola trebuie repetată pentru a reduce șansa introducerii incorecte a parolei.
 Cancel	SettingsWindow		Anulează
 Cancel	RatePackageWindow		Anulează

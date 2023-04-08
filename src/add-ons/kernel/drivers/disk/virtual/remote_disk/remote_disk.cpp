@@ -250,13 +250,16 @@ remote_disk_control(void* cookie, uint32 op, void* arg, size_t len)
 
 		case B_GET_BIOS_GEOMETRY:
 		case B_GET_GEOMETRY:
+		{
 			TRACE(("remote_disk: %s\n",
 				op == B_GET_BIOS_GEOMETRY ? "B_GET_BIOS_GEOMETRY" : "B_GET_GEOMETRY"));
-			if (buffer == NULL || length > sizeof(device_geometry))
+			if (arg == NULL || len > sizeof(device_geometry))
 				return B_BAD_VALUE;
+
 			device_geometry geometry;
 			device->GetGeometry(&geometry, op == B_GET_BIOS_GEOMETRY);
-			return user_memcpy(buffer, &geometry, length);
+			return user_memcpy(arg, &geometry, len);
+		}
 
 		case B_GET_MEDIA_STATUS:
 			TRACE(("remote_disk: B_GET_MEDIA_STATUS\n"));

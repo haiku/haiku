@@ -1,9 +1,9 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	338319367
+1	hungarian	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		A bemeneti fájl nem azonosítható hang- vagy videóként
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
 Source files	MediaConverter		Forrásfájlok
 Error writing video frame %lld	MediaConverter		Nem sikerült a képkocka írása: %lld
+Audio quality: %s	MediaConverter		Hangminőség: %s
 Error converting '%filename'	MediaConverter		Hiba történt a(z) '%filename' fájl átalakítása közben
 Selected directory not found. Defaulting to /boot/home	MediaConverter		A választott mappa nem található. Használom az alapértelmezettet: /boot/home
 Conversion completed	MediaConverter		Átalakítás kész
@@ -28,7 +28,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
 Open…	Menu		Megnyitás…
 Audio encoding:	MediaConverter		Audió kódolása:
 Multi-track file detected	MediaConverter		Több sávos fájl azonosítva
-Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
 Cancelling…	MediaConverter		Megszakítás…
 Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
 Output folder	MediaConverter		Kimeneti mappa
@@ -41,6 +40,7 @@ Conversion cancelled	MediaConverter		Konvertálás megszakítva
 Low	MediaConverter		Alacsony
 Error loading files	MediaConverter		Hiba történt a fájlok betöltése során
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+Video quality: %s	MediaConverter		Video-minőség: %s
 End   [ms]: 	MediaConverter		Vége [ms]:
 Cancel	MediaConverter		Mégse
 OK	MediaConverter-FileInfo		Rendben
@@ -50,16 +50,16 @@ Error	MediaConverter		Hiba
 File details	MediaConverter		Fájl részletei
 No audio	Audio codecs list		Nincs hang
 Drop media files onto this window	MediaConverter		Húzzon médiafájlokat erre az ablakra
-Writing video track: %ld%% complete	MediaConverter		Videósáv írása: %ld%% kész
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# képkocka} other{# képkocka}}
 Error read audio frame %lld	MediaConverter		Hang olvasási hiba:%lld
 Quit	Menu		Kilépés
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bájt} other{# bájt}}
+Writing audio track: %s complete	MediaConverter		Hangsáv írása: %s kész
 Duration:	MediaConverter-FileInfo		Időtartam:
 MediaConverter	System name		Médiaátalakító
+Writing video track: %s complete	MediaConverter		Video-sáv írása: %s kész
 Error launching: %strError%	MediaConverter		Hiba történt a %strError% indítása közben
 Error writing audio frame %lld	MediaConverter		Hang írási hiba: %lld
-Writing audio track: %ld%% complete	MediaConverter		Hangsáv írása: %ld%% kész
 File format:	MediaConverter		Fájlformátum:
 File	Menu		Fájl
 Video quality not supported	MediaConverter		Nem támogatott videóminőség

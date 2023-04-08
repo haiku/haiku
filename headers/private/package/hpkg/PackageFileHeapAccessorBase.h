@@ -98,6 +98,9 @@ public:
 
 public:
 	static	const size_t		kChunkSize = 64 * 1024;
+#if defined(_KERNEL_MODE)
+	static	void*				sChunkCache;
+#endif
 
 protected:
 	virtual	status_t			ReadAndDecompressChunk(size_t chunkIndex,

@@ -2,7 +2,7 @@
 Account settings	AutoConfigWindow		Параметри облікового запису
 \t\t· Outgoing	Config Window		\t\t· Вихідні
 An error occurred while creating the config view: %error.	Config Views		Сталася помилка при створенні конфігурації : %error.
-E-mail address:	E-Mail		Поштова адреса:
+E-mail address:	E-Mail		Адреса E-mail:
 Create new account	AutoConfigWindow		Створити обліковий запис
 While sending and receiving	Config Window		При відправленні та отриманні
 Error!	Config Views		Помилка!
@@ -14,7 +14,7 @@ Add	Config Window		Додати
 Back	AutoConfigWindow		Назад
 Real name:	E-Mail		Справжнє ім'я:
 Real name:	Config Views		Справжнє ім'я:
-\t\t· E-mail filters	Config Window		\t\t· Поштові фільтри
+\t\t· E-mail filters	Config Window		\t\t· Фільтри E-mail
 Outgoing	E-Mail		Вихідні
 Accounts	Config Window		Облікові записи
 Outgoing	Config Window		Вихідні
@@ -24,7 +24,7 @@ Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
 Account name:	Config Views		Назва облікового запису:
 \t\t· Incoming	Config Window		\t\t· Вхідні
-Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу пошти.
+Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу e-пошти.
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nЗагальні налаштування неможливо повернути.\n\nПомилка при отриманні загальних налаштувань:\n%s\n
 Incoming	E-Mail		Вхідні
 Choose Protocol	E-Mail		Вибрати протокол
@@ -33,7 +33,7 @@ Password:	E-Mail		Пароль:
 Error retrieving general settings: %s\n	Config Window		Помилка при отриманні загальних налаштувань: %s\n
 The filter could not be moved. Deleting filter.	Config Views		Фільтр неможливо перемістити. Видалення фільтра.
 OK	Config Views		ОК
-Revert	Config Window		Без змін
+Revert	Config Window		Відкат змін
 Incoming	Config Window		Вхідні
 Finish	AutoConfigWindow		Завершення
 Add filter	Config Views		Додати фільтр

@@ -4,7 +4,7 @@ Control mark	Colors tab		Відмітка
 Off	AntialiasingSettingsView		Вимкнути
 Window border	Colors tab		Рамка вікна
 Inactive window tab	Colors tab		Заголовок неактивного вікна
-Defaults	APRWindow		За замовчуванням
+Defaults	APRWindow		Типові настройки
 Shadow	Colors tab		Тінь
 Document background	Colors tab		Фон документа
 List background	Colors tab		Фон списку
@@ -24,7 +24,7 @@ Arrow style	DecorSettingsView		Стиль стрілок
 On	AntialiasingSettingsView		Увімкнути
 Decorator:	DecorSettingsView		Декоратор:
 Menu background	Colors tab		Фон меню
-Revert	APRWindow		Без змін
+Revert	APRWindow		Відкат змін
 List item text	Colors tab		Текст елементів списку
 OK	DecorSettingsView		ОК
 Control text	Colors tab		Текст елемента

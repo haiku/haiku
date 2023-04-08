@@ -1,12 +1,14 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	3896191867
+1	catalan; valencian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
+Copy	Console Window		Copia
 (Finish: %date)	Download Window		(Acabament: %date)
 Open bookmarks confirmation	WebPositive Window		Confirmació de l'obertura d'adreces d'interès
 Download folder:	Settings Window		Carpeta de baixada:
 Close window	WebPositive Window		Tanca la finestra
 Find:	WebPositive Window		Troba:
 Script console	WebPositive Window		Script de consola
+There was an error setting up the bookmark.	WebPositive Window		Hi ha hagut un error en configurar l'adreça d'interès.
 Fonts	Settings Window		Lletres
 Path	Cookie Manager		Camí
 Bookmarks	WebPositive Window		Adreces d'interès
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Suprimeix
 Open containing folder	Download Window		Obre la carpeta que ho conté
 Find previous	WebPositive Window		Troba'n l'anterior
 Full screen	WebPositive Window		Pantalla completa
+Bookmark bar	WebPositive Window		Barra d'adreces d'interès
 Downloads in progress	WebPositive		Baixada en progrés
 Copy URL to clipboard	Download Window		Copia l'URL al porta-retalls
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voleu obrir %addedCount adreces d'interès alhora?
@@ -28,7 +31,6 @@ Cancel	Download Window		Cancel·la
 Settings	Settings Window		Paràmetres
 Downloads	WebPositive Window		Baixades
 Browse…	Settings Window		Navega...
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ja hi ha una adreça d'interès per a aquesta pàgina: %bookmarkName.
 Resume prior session	Settings Window		Continua la sessió anterior
 Match case	WebPositive Window		Coincidència de caixa
 Proxy password:	Settings Window		Contrasenya del servidor intermediari:
@@ -102,12 +104,13 @@ Apply	Settings Window		Aplica-ho
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hi ha hagut un error en intentar mostrar la carpeta d'adreces d'interès.\n\nError: %error
 Revert	Settings Window		Reverteix
 Copy	WebPositive Window		Copia
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{S'ha repetit la darrera línia # cop.}other{S'ha repetit la darrera línia # cops.}}
 Default standard font size:	Settings Window		Mida de la lletra estàndard per defecte:
 Custom	Settings Window		Personalitzat
 Bookmark this page	WebPositive Window		Afegeix aquesta pàgina a les adreces d'interès
 Show tabs if only one page is open	Settings Window		Mostra les pestanyes si només s’obre una pàgina.
-Close tab	WebPositive Window		Tanca la pestanya
 Remove	Download Window		Suprimeix
+Close tab	WebPositive Window		Tanca la pestanya
 About	WebPositive Window		Quant a
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Encara hi ha baixades en curs, realment voleu sortir del WebPositive ara?
 Continue downloads	WebPositive		Continua les baixades
@@ -158,7 +161,6 @@ Downloads	Download Window		Baixades
 Open blank page	Settings Window		Obre una pàgina en blanc
 Clear history	WebPositive Window		Neteja'n l'historial
 Cancel	WebPositive Window		Cancel·la
-Bookmark info	WebPositive Window		Informació de l'adreça d'interès
 Script console	Console Window		Script de consola
 Copy	URL Bar		Copia
 Open start page	Settings Window		Obre la pàgina d'inici

@@ -85,7 +85,8 @@ TDeskbarMenu* TBarWindow::sDeskbarMenu = NULL;
 TBarWindow::TBarWindow()
 	:
 	BWindow(BRect(-1000.0f, -1000.0f, -1000.0f, -1000.0f),
-		B_TRANSLATE_SYSTEM_NAME("Deskbar"), B_BORDERED_WINDOW,
+		"Deskbar", /* no B_TRANSLATE_SYSTEM_NAME, for binary compatibility */
+		B_BORDERED_WINDOW,
 		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_CLOSABLE
 			| B_NOT_MINIMIZABLE | B_NOT_MOVABLE | B_NOT_V_RESIZABLE
 			| B_AVOID_FRONT | B_ASYNCHRONOUS_CONTROLS,

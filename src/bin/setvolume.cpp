@@ -17,6 +17,21 @@ extern const char *__progname;
 static const char *sProgramName = __progname;
 
 
+// without parameters to get the actual mute status
+int
+handleMute(BParameter *muteParameter, int mute = 2, bool toggle = false) {
+	int32 muted = 0;
+	bigtime_t lastChange = 0;
+	size_t size = sizeof(int32);
+	muteParameter->GetValue(&muted, &size, &lastChange);
+	if (toggle)
+		mute = 1 - muted;
+	if (muted != mute && mute < 2)
+		muteParameter->SetValue(&mute, sizeof(int32), system_time());
+	return muted;
+}
+
+
 int
 main(int argc, char **argv)
 {
@@ -72,22 +87,15 @@ main(int argc, char **argv)
 
 	if (argc > 1) {
 		if (strcmp(argv[1], "-m") == 0 || strcmp(argv[1], "--mute") == 0) {
-			int32 muted = 1;
-			mute->SetValue(&muted, sizeof(int32), system_time());
+			handleMute(mute, 1);
 			printf("Muted\n");
 			return 0;
 		} else if (strcmp(argv[1], "-u") == 0 || strcmp(argv[1], "--unmute") == 0) {
-			int32 muted = 0;
-			mute->SetValue(&muted, sizeof(int32), system_time());
+			handleMute(mute, 0);
 			printf("Unmuted\n");
 			return 0;
 		} else if (strcmp(argv[1], "-t") == 0 || strcmp(argv[1], "--togglemute") == 0) {
-			int32 muted = 0;
-			bigtime_t lastChange = 0;
-			size_t size = sizeof(int32);
-			mute->GetValue(&muted, &size, &lastChange);
-			muted = 1 - muted;
-			mute->SetValue(&muted, sizeof(int32), system_time());
+			int32 muted = handleMute(mute, 0, true);
 			printf("%s\n", muted ? "Muted" : "Unmuted");
 			return 0;
 		} else {
@@ -99,10 +107,18 @@ main(int argc, char **argv)
 				size_t step = 3;
 				if (argc > 2)
 					step = atoi(argv[2]);
-				if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--increase") == 0)
-					volume += step;
-				else
+				if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--increase") == 0) {
+					// make sure it's unmuted
+					int muted = handleMute(mute, 0);
+					if (muted == 0 || volume <= gain->MinValue())
+						volume += step;
+				} else if (handleMute(mute) == 0) {
+					// not already muted
 					volume -= step;
+					// make sure it's muted
+					if (volume <= gain->MinValue())
+						handleMute(mute, 1);
+				}
 			} else {
 				char *end;
 				volume = strtod(argv[1], &end);

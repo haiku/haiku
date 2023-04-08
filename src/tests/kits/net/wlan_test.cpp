@@ -108,10 +108,12 @@ main(int argc, char** argv)
 				show(network);
 			} else {
 				// list all
-				wireless_network network;
-				uint32 cookie = 0;
-				while (device.GetNextNetwork(cookie, network) == B_OK)
-					show(network);
+				uint32 networksCount = 0;
+				wireless_network* networks = NULL;
+				device.GetNetworks(networks, networksCount);
+				for (uint32 i = 0; i < networksCount; i++)
+					show(networks[i]);
+				delete[] networks;
 			}
 		} else
 			usage();

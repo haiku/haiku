@@ -98,8 +98,8 @@ Develop packages	MainWindow		Пакеты для разработчиков
 Starting the package daemon failed:\n\n%Error%	App		Не удалось запустить пакетный демон:\n\n%Error%
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
 <no info>	PackageInfoView		<нет информации>
-Rating	PackageListView		Оценка
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Произошла ошибка при обмене данными с сервером HaikuDepot: %s
+Rating	PackageListView		Оценка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронизация значков
 Show	MainWindow		Показывать
 Settings…	MainWindow		Настройки…
@@ -123,8 +123,8 @@ Close	PackageManager		Закрыть
 Changelog	PackageInfoView		История изменений
 About	PackageInfoView		О программе
 Password:	UserLoginWindow		Пароль:
-Stability	RatePackageWindow		Стабильность
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Версия этого приложения слишком старая для связи с серверной частью. Обновите свою систему. Минимальная версия этого приложения \"%s\".
+Stability	RatePackageWindow		Стабильность
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пожалуйста, повторите пароль, чтобы уменьшить вероятность его неправильного ввода.
 Cancel	SettingsWindow		Отмена
 Cancel	RatePackageWindow		Отмена

@@ -424,7 +424,7 @@ Decrease size	DeskWindow		Diminuìs dimensions
 Emptying Trash… 	StatusWindow		Daûr a disvuedâ la scovacere… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # file}}
 KiB	WidgetAttributeText		KiB
-Revert	TrackerSettingsWindow		Torne indaûr
+Revert	TrackerSettingsWindow		Ripristine
 trash	B_TRASH_DIRECTORY		scovacere
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele di sisteme o il so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele di sisteme o il so contingût, ten fracât il tast Maiusc e fâs clic su \"Sposte\".
 Close all in workspace	ContainerWindow		Siere dut tal spazi di lavôr

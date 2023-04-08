@@ -18,7 +18,7 @@ All workspaces	Screen		Всі робочі області
 Use laptop panel:	Screen		Використовувати панель ноутбука:
 Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
 Display info	Screen		Інфо про дісплей
-Settings will revert in %seconds.	Screen		Налаштування повернуться через %seconds.
+Settings will revert in %seconds.	Screen		Відкат налаштувань через %seconds.
 Cancel	Screen		Скасувати
 Other…	Screen		Інше…
 Screen	Screen		Екран
@@ -27,7 +27,7 @@ yes	Screen		так
 Swap displays:	Screen		Поміняти дисплеї:
 %sSerial no.: %s	Screen		%sSerial no.: %s
 8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
-Revert	Screen		Без змін
+Revert	Screen		Відкат змін
 always	Screen		завжди
 Confirm changes	Screen		Підтвердити зміни
 Warning	Screen		Увага

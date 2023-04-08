@@ -15,20 +15,9 @@
 
 #include <new>
 
-#include <Autolock.h>
 #include <Debug.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Message.h>
-#include <NodeMonitor.h>
-#include <Path.h>
-#include <String.h>
 
 #include "FontFamily.h"
-#include "ServerConfig.h"
-#include "ServerFont.h"
 
 
 //#define TRACE_FONT_MANAGER
@@ -41,49 +30,28 @@
 
 FT_Library gFreeTypeLibrary;
 
-//	#pragma mark -
 
-
-int
-FontManagerBase::compare_font_families(const FontFamily* a, const FontFamily* b)
+static int
+compare_font_families(const FontFamily* a, const FontFamily* b)
 {
 	return strcmp(a->Name(), b->Name());
 }
 
 
-//! Initializes FreeType if requested
-FontManagerBase::FontManagerBase(bool init_freetype, const char* className)
-	: BLooper(className),
+//	#pragma mark -
+
+
+FontManager::FontManager()
+	:
 	fFamilies(20),
-	fNextID(0),
-	fHasFreetypeLibrary(init_freetype)
+	fNextID(0)
 {
-	if (init_freetype == true)
-		fInitStatus = FT_Init_FreeType(&gFreeTypeLibrary) == 0 ? B_OK : B_ERROR;
 }
 
 
-//! Frees font families shuts down FreeType if it was initialized
-FontManagerBase::~FontManagerBase()
+FontManager::~FontManager()
 {
-	// free families before we're done with FreeType
-
-	for (int32 i = fFamilies.CountItems(); i-- > 0;)
-		delete fFamilies.ItemAt(i);
-
-	if (fHasFreetypeLibrary == true)
-		FT_Done_FreeType(gFreeTypeLibrary);
-}
-
-
-void
-FontManagerBase::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		default:
-			BLooper::MessageReceived(message);
-			break;
-	}
+	_RemoveAllFonts();
 }
 
 
@@ -93,7 +61,7 @@ FontManagerBase::MessageReceived(BMessage* message)
 	\return An FT_CharMap or NULL if unsuccessful
 */
 FT_CharMap
-FontManagerBase::_GetSupportedCharmap(const FT_Face& face)
+FontManager::_GetSupportedCharmap(const FT_Face& face)
 {
 	for (int32 i = 0; i < face->num_charmaps; i++) {
 		FT_CharMap charmap = face->charmaps[i];
@@ -131,7 +99,7 @@ FontManagerBase::_GetSupportedCharmap(const FT_Face& face)
 	\return The number of unique font families currently available
 */
 int32
-FontManagerBase::CountFamilies()
+FontManager::CountFamilies()
 {
 	return fFamilies.CountItems();
 }
@@ -142,10 +110,10 @@ FontManagerBase::CountFamilies()
 	\return The number of font styles currently available for the font family
 */
 int32
-FontManagerBase::CountStyles(const char *familyName)
+FontManager::CountStyles(const char *familyName)
 {
 	FontFamily *family = GetFamily(familyName);
-	if (family)
+	if (family != NULL)
 		return family->CountStyles();
 
 	return 0;
@@ -157,10 +125,10 @@ FontManagerBase::CountStyles(const char *familyName)
 	\return The number of font styles currently available for the font family
 */
 int32
-FontManagerBase::CountStyles(uint16 familyID)
+FontManager::CountStyles(uint16 familyID)
 {
 	FontFamily *family = GetFamily(familyID);
-	if (family)
+	if (family != NULL)
 		return family->CountStyles();
 
 	return 0;
@@ -168,7 +136,7 @@ FontManagerBase::CountStyles(uint16 familyID)
 
 
 FontFamily*
-FontManagerBase::FamilyAt(int32 index) const
+FontManager::FamilyAt(int32 index) const
 {
 	ASSERT(IsLocked());
 
@@ -181,21 +149,17 @@ FontManagerBase::FamilyAt(int32 index) const
 	\return Pointer to the specified family or NULL if not found.
 */
 FontFamily*
-FontManagerBase::GetFamily(const char* name)
+FontManager::GetFamily(const char* name)
 {
 	if (name == NULL)
 		return NULL;
-
-	FontFamily* family = _FindFamily(name);
-	if (family != NULL)
-		return family;
 
 	return _FindFamily(name);
 }
 
 
 FontFamily*
-FontManagerBase::GetFamily(uint16 familyID) const
+FontManager::GetFamily(uint16 familyID) const
 {
 	FontKey key(familyID, 0);
 	FontStyle* style = fStyleHashTable.Get(key);
@@ -207,7 +171,7 @@ FontManagerBase::GetFamily(uint16 familyID) const
 
 
 FontStyle*
-FontManagerBase::GetStyleByIndex(const char* familyName, int32 index)
+FontManager::GetStyleByIndex(const char* familyName, int32 index)
 {
 	FontFamily* family = GetFamily(familyName);
 	if (family != NULL)
@@ -218,7 +182,7 @@ FontManagerBase::GetStyleByIndex(const char* familyName, int32 index)
 
 
 FontStyle*
-FontManagerBase::GetStyleByIndex(uint16 familyID, int32 index)
+FontManager::GetStyleByIndex(uint16 familyID, int32 index)
 {
 	FontFamily* family = GetFamily(familyID);
 	if (family != NULL)
@@ -234,7 +198,7 @@ FontManagerBase::GetStyleByIndex(uint16 familyID, int32 index)
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontManagerBase::GetStyle(uint16 familyID, uint16 styleID) const
+FontManager::GetStyle(uint16 familyID, uint16 styleID) const
 {
 	ASSERT(IsLocked());
 
@@ -256,7 +220,7 @@ FontManagerBase::GetStyle(uint16 familyID, uint16 styleID) const
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontManagerBase::GetStyle(const char* familyName, const char* styleName,
+FontManager::GetStyle(const char* familyName, const char* styleName,
 	uint16 familyID, uint16 styleID, uint16 face)
 {
 	ASSERT(IsLocked());
@@ -275,13 +239,8 @@ FontManagerBase::GetStyle(const char* familyName, const char* styleName,
 
 	// find style
 
-	if (styleName != NULL && styleName[0]) {
-		FontStyle* fontStyle = family->GetStyle(styleName);
-		if (fontStyle != NULL)
-			return fontStyle;
-
+	if (styleName != NULL && styleName[0])
 		return family->GetStyle(styleName);
-	}
 
 	if (styleID != 0xffff)
 		return family->GetStyleByID(styleID);
@@ -295,7 +254,7 @@ FontManagerBase::GetStyle(const char* familyName, const char* styleName,
 		to have one fitting your needs, you may want to use this method.
 */
 FontStyle*
-FontManagerBase::FindStyleMatchingFace(uint16 face) const
+FontManager::FindStyleMatchingFace(uint16 face) const
 {
 	int32 count = fFamilies.CountItems();
 
@@ -315,7 +274,7 @@ FontManagerBase::FindStyleMatchingFace(uint16 face) const
 	At this point, the style is already no longer available to the user.
 */
 void
-FontManagerBase::RemoveStyle(FontStyle* style)
+FontManager::RemoveStyle(FontStyle* style)
 {
 	ASSERT(IsLocked());
 
@@ -328,13 +287,83 @@ FontManagerBase::RemoveStyle(FontStyle* style)
 		debugger("style removed but still available!");
 
 	if (family->RemoveStyle(style)
-		&& family->CountStyles() == 0)
+		&& family->CountStyles() == 0) {
 		fFamilies.RemoveItem(family);
+		delete family;
+	}
+}
+
+
+status_t
+FontManager::_AddFont(FT_Face face, node_ref nodeRef, const char* path,
+	uint16& familyID, uint16& styleID)
+{
+	ASSERT(IsLocked());
+
+	FontFamily* family = _FindFamily(face->family_name);
+	bool isNewFontFamily = family == NULL;
+
+	if (family != NULL && family->HasStyle(face->style_name)) {
+		// prevent adding the same style twice
+		// (this indicates a problem with the installed fonts maybe?)
+		FT_Done_Face(face);
+		return B_NAME_IN_USE;
+	}
+
+	if (family == NULL) {
+		family = new (std::nothrow) FontFamily(face->family_name, _NextID());
+
+		if (family == NULL
+			|| !fFamilies.BinaryInsert(family, compare_font_families)) {
+			delete family;
+			FT_Done_Face(face);
+			return B_NO_MEMORY;
+		}
+	}
+
+	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
+
+	// the FontStyle takes over ownership of the FT_Face object
+	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path, face, this);
+
+	if (style == NULL || !family->AddStyle(style)) {
+		delete style;
+		if (isNewFontFamily)
+			delete family;
+		return B_NO_MEMORY;
+	}
+
+	familyID = style->Family()->ID();
+	styleID = style->ID();
+
+	fStyleHashTable.Put(FontKey(familyID, styleID), style);
+	style->ReleaseReference();
+
+	return B_OK;
+}
+
+
+FontStyle*
+FontManager::_RemoveFont(uint16 familyID, uint16 styleID)
+{
+	ASSERT(IsLocked());
+
+	return fStyleHashTable.Remove(FontKey(familyID, styleID));
+}
+
+
+void
+FontManager::_RemoveAllFonts()
+{
+	for (int32 i = fFamilies.CountItems(); i-- > 0;)
+		delete fFamilies.RemoveItemAt(i);
+
+	fStyleHashTable.Clear();
 }
 
 
 FontFamily*
-FontManagerBase::_FindFamily(const char* name) const
+FontManager::_FindFamily(const char* name) const
 {
 	if (name == NULL)
 		return NULL;
@@ -342,4 +371,11 @@ FontManagerBase::_FindFamily(const char* name) const
 	FontFamily family(name, 0);
 	return const_cast<FontFamily*>(fFamilies.BinarySearch(family,
 		compare_font_families));
+}
+
+
+uint16
+FontManager::_NextID()
+{
+	return fNextID++;
 }

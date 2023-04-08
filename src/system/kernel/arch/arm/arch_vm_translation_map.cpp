@@ -75,29 +75,9 @@ arch_vm_translation_map_init(kernel_args *args,
 	}
 	#endif
 
-	#if B_HAIKU_PHYSICAL_BITS == 64 //IRA: Check 64 bit code and adjust for ARM
-	bool paeAvailable = x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON);
-	bool paeNeeded = false;
-	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		phys_addr_t end = args->physical_memory_range[i].start
-			+ args->physical_memory_range[i].size;
-		if (end > 0x100000000LL) {
-			paeNeeded = true;
-			break;
-		}
-	}
-
-	if (paeAvailable && paeNeeded) {
-		dprintf("using PAE paging\n");
-		gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethodPAE;
-	} else {
-		dprintf("using 32 bit paging (PAE not %s)\n",
-			paeNeeded ? "available" : "needed");
-		gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethod32Bit;
-	}
-	#else
+	//TODO: check for LPAE / long-descriptor format
+	//for now only short-descriptor format is implemented
 	gARMPagingMethod = new(&sPagingMethodBuffer) ARMPagingMethod32Bit;
-	#endif
 
 	return gARMPagingMethod->Init(args, _physicalPageMapper);
 }

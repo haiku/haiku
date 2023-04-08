@@ -154,7 +154,7 @@ CatchUpManager::MessageReceived(BMessage *message)
 	CatchUpAnalyser* analyser;
 	switch (message->what) {
 		case kCatchUpDone:
-			message->AddPointer("Analyser", &analyser);
+			message->GetPointer("Analyser", &analyser);
 			fCatchUpAnalyserList.RemoveItem(analyser);
 			analyser->PostMessage(B_QUIT_REQUESTED);
 		break;

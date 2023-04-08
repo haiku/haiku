@@ -11,6 +11,9 @@
 
 #include <algorithm>
 #include <new>
+#ifdef _KERNEL_MODE
+#include <slab/Slab.h>
+#endif
 
 #include <ByteOrder.h>
 #include <DataIO.h>
@@ -25,6 +28,11 @@ namespace BPackageKit {
 namespace BHPKG {
 
 namespace BPrivate {
+
+
+#if defined(_KERNEL_MODE)
+void* PackageFileHeapAccessorBase::sChunkCache = NULL;
+#endif
 
 
 // #pragma mark - OffsetArray
@@ -209,10 +217,43 @@ PackageFileHeapAccessorBase::ReadDataToOutput(off_t offset, size_t size,
 	}
 
 	// allocate buffers for compressed and uncompressed data
-	uint16* compressedDataBuffer = (uint16*)malloc(kChunkSize);
-	uint16* uncompressedDataBuffer = (uint16*)malloc(kChunkSize);
-	MemoryDeleter compressedDataBufferDeleter(compressedDataBuffer);
-	MemoryDeleter uncompressedDataBufferDeleter(uncompressedDataBuffer);
+	uint16* compressedDataBuffer, *uncompressedDataBuffer;
+	MemoryDeleter compressedMemoryDeleter, uncompressedMemoryDeleter;
+
+#if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
+	struct ObjectCacheDeleter {
+		object_cache* cache;
+		void* object;
+
+		ObjectCacheDeleter(object_cache* c)
+			: cache(c)
+			, object(NULL)
+		{
+		}
+
+		~ObjectCacheDeleter()
+		{
+			if (cache != NULL && object != NULL)
+				object_cache_free(cache, object, 0);
+		}
+	};
+
+	ObjectCacheDeleter compressedCacheDeleter((object_cache*)sChunkCache),
+		uncompressedCacheDeleter((object_cache*)sChunkCache);
+	if (sChunkCache != NULL) {
+		compressedDataBuffer = (uint16*)object_cache_alloc((object_cache*)sChunkCache, 0);
+		uncompressedDataBuffer = (uint16*)object_cache_alloc((object_cache*)sChunkCache, 0);
+		compressedCacheDeleter.object = compressedDataBuffer;
+		uncompressedCacheDeleter.object = uncompressedDataBuffer;
+	} else
+#endif
+	{
+		compressedDataBuffer = (uint16*)malloc(kChunkSize);
+		uncompressedDataBuffer = (uint16*)malloc(kChunkSize);
+		compressedMemoryDeleter.SetTo(compressedDataBuffer);
+		uncompressedMemoryDeleter.SetTo(uncompressedDataBuffer);
+	}
+
 	if (compressedDataBuffer == NULL || uncompressedDataBuffer == NULL)
 		return B_NO_MEMORY;
 

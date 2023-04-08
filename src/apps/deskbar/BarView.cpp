@@ -617,10 +617,8 @@ TBarView::PlaceApplicationBar()
 		// top or bottom
 		expandoFrame.top = 0;
 		expandoFrame.bottom = TeamMenuItemHeight();
-		expandoFrame.left = gMinimumWindowWidth / 2 + be_control_look->ComposeSpacing(kIconPadding);
-		expandoFrame.right = screenFrame.Width();
-		if (fTrayLocation != 0 && fDragRegion != NULL)
-			expandoFrame.right -= fDragRegion->Frame().Width() + 1;
+		expandoFrame.left = screenFrame.left + fBarMenuBar->Frame().Width();
+		expandoFrame.right = screenFrame.right - fDragRegion->Frame().Width() - 1;
 	}
 
 	fInlineScrollView->DetachScrollers();

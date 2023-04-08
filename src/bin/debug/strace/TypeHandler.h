@@ -9,8 +9,9 @@
 #ifndef STRACE_TYPE_HANDLER_H
 #define STRACE_TYPE_HANDLER_H
 
-#include <string>
+#include <list>
 #include <map>
+#include <string>
 
 #include <arch_config.h>
 #include <SupportDefs.h>
@@ -49,6 +50,25 @@ private:
 	const EnumMap &fMap;
 };
 
+class FlagsTypeHandler : public TypeHandler {
+public:
+	struct FlagInfo {
+		unsigned int value;
+		const char* name;
+	};
+	typedef std::list<FlagInfo> FlagsList;
+
+	FlagsTypeHandler(const FlagsList &);
+
+	string GetParameterValue(Context &c, Parameter *, const void *);
+	string GetReturnValue(Context &, uint64 value);
+
+private:
+	string RenderValue(Context &, unsigned int value) const;
+
+	const FlagsList &fList;
+};
+
 // currently limited to select ints
 class TypeHandlerSelector : public TypeHandler {
 public:
@@ -77,6 +97,7 @@ struct TypeHandlerFactory {
 
 extern TypeHandler *create_pointer_type_handler();
 extern TypeHandler *create_string_type_handler();
+extern TypeHandler *create_status_t_type_handler();
 
 // specialization for "const char*"
 template<>
@@ -127,6 +148,14 @@ DEFINE_FACTORY(longlong_ptr, long long *);
 DEFINE_FACTORY(uint_ptr, unsigned int *);
 DEFINE_FACTORY(ulong_ptr, unsigned long *);
 DEFINE_FACTORY(ulonglong_ptr, unsigned long long *);
+
+template<>
+struct TypeHandlerFactory<void**> {
+	static inline TypeHandler *Create()
+	{
+		return TypeHandlerFactory<addr_t*>::Create();
+	}
+};
 
 // partial specialization for generic pointers
 template<typename Type>

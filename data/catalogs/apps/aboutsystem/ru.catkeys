@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	1839294148
+1	russian	x-vnd.Haiku-About	2228890381
 Revision	AboutView		Ревизия
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Все права защищены © 1999-2007 Michael C. Ring.
@@ -37,7 +37,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-х пунктная)
 About this system	AboutWindow		Об этой системе
-%d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 авторы Gutenprint.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Все права защищены © 1994-1997 Mark Kilgard.
 AboutSystem	System name		О системе

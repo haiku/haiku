@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-About	4168448386
+1	danish	x-vnd.Haiku-About	263077323
 Revision	AboutView		Revision
 The Haikuware team and their bounty program\n	AboutView		Haikuware-holdet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Ophavsret © 1999-2007 Michael C. Ring. Alle rettigheder forbeholdes.
@@ -37,7 +37,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundlægger)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-klausul)
 About this system	AboutWindow		Om systemet
-%d MiB used (%d%%)	AboutView		%d MiB brugt (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Ophavsret © 1999-2010 af forfatterne af Gutenprint. Alle rettigheder forbeholdes.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Ophavsret © 1994-1997 Mark Kilgard. Alle rettigheder forbeholdes.
 AboutSystem	System name		Om systemet

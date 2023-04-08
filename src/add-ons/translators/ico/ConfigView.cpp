@@ -40,7 +40,7 @@ ConfigView::ConfigView()
 	BStringView *copyrightView = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2005-2006 Haiku Inc.");
 
-	BCheckBox *colorCheckBox = new BCheckBox("color", 
+	BCheckBox *colorCheckBox = new BCheckBox("color",
 		B_TRANSLATE("Write 32 bit images on true color input"), NULL);
 
 	BCheckBox *sizeCheckBox = new BCheckBox("size",
@@ -64,8 +64,6 @@ ConfigView::ConfigView()
 		.Add(infoView)
 		.Add(info2View)
 		.AddGlue();
-
-	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
 
 

@@ -8,6 +8,7 @@
 
 
 #include <assert.h>
+#include <crypt.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -17,15 +18,15 @@
 
 #include <SupportDefs.h>
 
-#include "crypt_legacy.h"
+#include "../musl/crypt/crypt_des.h"
 #include "crypto_scrypt.h"
 
 #define SALT_BYTES 32
 #define SALT_STR_BYTES (SALT_BYTES * 2 + 1)
 #define DEFAULT_N_LOG2 14
 
-//                      $s$99$ salt  $  hash  \0
 #define CRYPT_OUTPUT_BYTES (6 + 64 + 1 + 64 + 1)
+#define SALT_OUTPUT_BYTES (6 + 64 + 1 + 1)
 
 static const char* kHexAlphabet = "0123456789abcdef";
 static const int8 kHexLookup[] = {
@@ -97,17 +98,16 @@ fromHex(const char* hex, uint8* outBuffer, size_t outBufferLength)
 
 
 //! Generate a new salt appropriate for crypt().
-static char*
-crypt_gensalt()
+static int
+crypt_gensalt_rn(char *outbuf, size_t bufsize)
 {
-	static char result[CRYPT_OUTPUT_BYTES];
 	uint8 salt[SALT_BYTES];
 	char saltString[SALT_STR_BYTES];
 	size_t totalBytesRead = 0;
 
 	int fd = open("/dev/random", O_RDONLY, 0);
 	if (fd < 0)
-		return NULL;
+		return -1;
 
 	while (totalBytesRead < sizeof(salt)) {
 		const ssize_t bytesRead = read(fd,
@@ -115,7 +115,7 @@ crypt_gensalt()
 			sizeof(salt) - totalBytesRead);
 		if (bytesRead <= 0) {
 			close(fd);
-			return NULL;
+			return -1;
 		}
 
 		totalBytesRead += bytesRead;
@@ -123,34 +123,36 @@ crypt_gensalt()
 	close(fd);
 
 	assert(toHex(salt, sizeof(salt), saltString, sizeof(saltString)) == 0);
-	snprintf(result, sizeof(result), "$s$%d$%s$", DEFAULT_N_LOG2, saltString);
-	return result;
+	snprintf(outbuf, bufsize, "$s$%d$%s$", DEFAULT_N_LOG2, saltString);
+	return 0;
 }
 
 
-char *
-crypt(const char* key, const char* setting)
+extern "C" char *
+_crypt_rn(const char* key, const char* setting, struct crypt_data* data, size_t size)
 {
-	static char outBuffer[CRYPT_OUTPUT_BYTES];
 	uint8 saltBinary[SALT_BYTES];
 	char saltString[SALT_STR_BYTES];
+	char gensaltResult[SALT_OUTPUT_BYTES];
 	uint8 resultBuffer[32];
 	char hexResultBuffer[64 + 1];
 	int nLog2 = DEFAULT_N_LOG2;
 
 	if (setting == NULL) {
-		setting = crypt_gensalt();
-		if (setting == NULL) {
-			// crypt_gensalt should set errno itself.
+		int res = crypt_gensalt_rn(gensaltResult, sizeof(gensaltResult));
+
+		// crypt_gensalt_r should set errno itself.
+		if (res < 0)
 			return NULL;
-		}
+
+		setting = gensaltResult;
 	}
 
 	// Some idioms existed where the password was also used as the salt.
 	// As a crude heuristic, use the old crypt algorithm if the salt is
 	// shortish.
 	if (strlen(setting) < 16)
-		return crypt_legacy(key, setting);
+		return _crypt_des_r(key, setting, data->buf);
 
 	// We don't want to fall into the old algorithm by accident somehow, so
 	// if our salt is kind of like our salt, but not exactly, return an
@@ -183,10 +185,18 @@ crypt(const char* key, const char* setting)
 
 	assert(toHex(resultBuffer, sizeof(resultBuffer), hexResultBuffer,
 		sizeof(hexResultBuffer)) == 0);
-	snprintf(outBuffer, sizeof(outBuffer), "$s$%d$%s$%s", nLog2, saltString,
+	snprintf(data->buf, size - sizeof(int), "$s$%d$%s$%s", nLog2, saltString,
 		hexResultBuffer);
 
-	return outBuffer;
+	return data->buf;
+}
+
+
+char *
+crypt(const char* key, const char* salt)
+{
+	static struct crypt_data data;
+	return _crypt_rn(key, salt, &data, sizeof(struct crypt_data));
 }
 
 

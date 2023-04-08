@@ -8,7 +8,7 @@ Frame color	ConfigView		Колір рамки
 Error	PulseApp		Помилка
 Bar colors	ConfigView		Кольори індикатора
 %.2f GHz	NormalPulseView		%.2f ГГц
-Defaults	PrefsWindow		За замовчуванням
+Defaults	PrefsWindow		Типові настройки
 %ld MHz	NormalPulseView		%ld МГц
 Mini mode	PrefsWindow		Режим міні
 CPU progress bar	NormalPulseView		Індикатор CPU

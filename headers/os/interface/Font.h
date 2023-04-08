@@ -284,7 +284,7 @@ public:
 
 			status_t			LoadFont(const char* path);
 			status_t			LoadFont(const area_id fontAreaID,
-									uint32 size = 0, uint32 offset = 0);
+									size_t size = 0, size_t offset = 0);
 			status_t			UnloadFont();
 
 private:

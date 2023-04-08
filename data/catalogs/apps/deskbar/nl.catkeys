@@ -1,50 +1,49 @@
-1	dutch; flemish	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Uitzetten
-Sort applications by name	PreferencesWindow		Sorteer toepassingen op naam
-Suspend	DeskbarMenu		Opschorten
-Hide clock	TimeView		Klok verbergen
-Applications	PreferencesWindow		Toepassingen
-Time preferences…	TimeView		Tijdsvoorkeuren…
-About Haiku	DeskbarMenu		Over Haiku
-Edit in Tracker…	PreferencesWindow		In Tracker bewerken…
-Recent documents:	PreferencesWindow		Recente documenten:
-Recent applications	DeskbarMenu		Recente toepassingen
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Toepassingen
-Find…	DeskbarMenu		Vind...
-Show clock	Tray		Klok tonen
-Window	PreferencesWindow		Venster
-Defaults	PreferencesWindow		Standaardwaarden
-Menu	PreferencesWindow		Menu
-Recent documents	DeskbarMenu		Recente documenten
+1	dutch; flemish	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Automatisch verbergen
-Always on top	PreferencesWindow		Altijd bovenop
-<Deskbar folder is empty>	DeskbarMenu		<Deskbar map is leeg>
 Show all	WindowMenu		Toon alles
-No windows	WindowMenu		Geen vensters
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Systeem herstarten
+Edit in Tracker…	PreferencesWindow		In Tracker bewerken…
+Menu	PreferencesWindow		Menu
+Tracker always first	PreferencesWindow		Tracker altijd eerst
+Hide clock	TimeView		Klok verbergen
 Large	PreferencesWindow		Groot
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar map is leeg>
+Recent documents	DeskbarMenu		Recente documenten
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Toepassingen
+Always on top	PreferencesWindow		Altijd bovenop
+Restart system	DeskbarMenu		Systeem herstarten
+Recent documents:	PreferencesWindow		Recente documenten:
 Auto-raise	PreferencesWindow		Automatisch naar boven
-Recent folders:	PreferencesWindow		Recente mappen:
-Show application expander	PreferencesWindow		Toon toepassing-expander
+Mount	DeskbarMenu		Betrek
+Icon size	PreferencesWindow		Pictogramgrootte
+About Haiku	DeskbarMenu		Over Haiku
+Small	PreferencesWindow		Klein
+Show calendar…	TimeView		Toon kalender
+Find…	DeskbarMenu		Vind...
+Power off	DeskbarMenu		Uitzetten
+Defaults	PreferencesWindow		Standaardwaarden
+Show replicants	DeskbarMenu		Toon replicants
+No windows	WindowMenu		Geen vensters
+Show clock	Tray		Klok tonen
 Close all	WindowMenu		Alles sluiten
 Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
-Mount	DeskbarMenu		Betrek
-Revert	PreferencesWindow		Herstellen
-Small	PreferencesWindow		Klein
-Recent applications:	PreferencesWindow		Recente toepassingen:
-Shutdown…	DeskbarMenu		Afsluiten...
-Tracker always first	PreferencesWindow		Tracker altijd eerst
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Voorkeuren
-Recent folders	DeskbarMenu		Recente mappen
 About this system	DeskbarMenu		Over dit systeem
-Show calendar…	TimeView		Toon kalender
-Deskbar preferences…	DeskbarMenu		Deskbar-voorkeuren...
-Expand new applications	PreferencesWindow		Toon nieuwe toepassingen
-Show replicants	DeskbarMenu		Toon replicants
-Hide application names	PreferencesWindow		Programmanamen verbergen
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo's
-Icon size	PreferencesWindow		Pictogramgrootte
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Bureaubladapplets
-Hide all	WindowMenu		Alles verbergen
 Quit application	WindowMenu		Programma afsluiten
+Hide application names	PreferencesWindow		Programmanamen verbergen
+Applications	PreferencesWindow		Toepassingen
+Show application expander	PreferencesWindow		Toon toepassing-expander
+Deskbar preferences…	DeskbarMenu		Deskbar-voorkeuren...
+Suspend	DeskbarMenu		Opschorten
+Shutdown…	DeskbarMenu		Afsluiten...
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo's
+Expand new applications	PreferencesWindow		Toon nieuwe toepassingen
+Recent applications:	PreferencesWindow		Recente toepassingen:
+Recent folders:	PreferencesWindow		Recente mappen:
+Recent folders	DeskbarMenu		Recente mappen
+Recent applications	DeskbarMenu		Recente toepassingen
+Hide all	WindowMenu		Alles verbergen
+Sort applications by name	PreferencesWindow		Sorteer toepassingen op naam
+Revert	PreferencesWindow		Herstellen
+Window	PreferencesWindow		Venster
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Voorkeuren
+Time preferences…	TimeView		Tijdsvoorkeuren…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Bureaubladapplets

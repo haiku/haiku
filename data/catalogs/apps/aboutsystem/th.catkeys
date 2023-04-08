@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-About	1839294148
+1	thai	x-vnd.Haiku-About	2228890381
 Revision	AboutView		ปรับปรุง
 The Haikuware team and their bounty program\n	AboutView		ทีมไฮกุแวร์และโปรแกรมสนับสนุนของพวกเขา\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2007 Michael C. Ring สงวนลิขสิทธิ์.
@@ -37,7 +37,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ผู้ก่อตั้งโครงการ)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		เกี่ยวกับระบบนี้
-%d MiB used (%d%%)	AboutView		%d MiB ใช้ (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		ลิขสิทธิ์ © 1999-2010 โดยผู้เขียน Gutenprint สงวนลิขสิทธิ์
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		ลิขสิทธิ์ © 1994-1997 Mark Kilgard สงวนลิขสิทธิ์
 AboutSystem	System name		เกี่ยวกับระบบ

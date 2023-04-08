@@ -122,6 +122,10 @@ StyleView::~StyleView()
 	SetStyle(NULL);
 	SetCurrentColor(NULL);
 	fGradientControl->Gradient()->RemoveObserver(this);
+
+	if (fGradient.IsSet()) {
+		fGradient->RemoveObserver(this);
+	}
 }
 
 
@@ -193,7 +197,7 @@ StyleView::ObjectChanged(const Observable* object)
 	// NOTE: it is important to compare the gradients
 	// before assignment, or we will get into an endless loop
 	if (object == controlGradient) {
-		if (!fGradient)
+		if (!fGradient.IsSet())
 			return;
 		if (fIgnoreControlGradientNotifications)
 			return;
@@ -305,21 +309,19 @@ void
 StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate,
 	bool sendMessage)
 {
-	if (!forceControlUpdate && fGradient == gradient)
+	if (!forceControlUpdate && gradient == fGradient)
 		return;
 
-	Gradient* oldGradient = fGradient;
-	if (oldGradient != NULL)
-		oldGradient->RemoveObserver(this);
+	if (fGradient.IsSet())
+		fGradient->RemoveObserver(this);
 
-	fGradient = gradient;
+	fGradient.SetTo(gradient);
 
-	if (fGradient) {
-		fGradient->AcquireReference();
+	if (fGradient.IsSet()) {
 		fGradient->AddObserver(this);
 	}
 
-	if (fGradient) {
+	if (fGradient.IsSet()) {
 		fGradientControl->SetEnabled(true);
 		fGradientControl->SetGradient(fGradient);
 		fGradientType->SetEnabled(true);
@@ -331,9 +333,6 @@ StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate,
 		_MarkType(fStyleType->Menu(), STYLE_TYPE_COLOR);
 		_MarkType(fGradientType->Menu(), -1);
 	}
-
-	if (oldGradient != NULL)
-		oldGradient->ReleaseReference();
 
 	if (sendMessage) {
 		BMessage message(MSG_STYLE_TYPE_CHANGED);
@@ -398,7 +397,7 @@ StyleView::_AdoptCurrentColor(rgb_color color)
 	if (!fStyle)
 		return;
 
-	if (fGradient) {
+	if (fGradient.IsSet()) {
 		// set the focused gradient color stop
 		if (fGradientControl->IsFocus()) {
 			fGradientControl->SetCurrentStop(color);

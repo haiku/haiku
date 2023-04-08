@@ -69,7 +69,7 @@ Rate:	CodyCam		Періодичність:
 Couldn't find requested directory on server	VideoConsumer.cpp		Неможливо знайти потрібний каталог на сервері
 Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
 Type:	CodyCam		Тип:
-Rename failed	VideoConsumer.cpp		Збій переіменування
+Rename failed	VideoConsumer.cpp		Збій перейменування
 unrecognized upload client specified	CodyCam		нерозпізнаний клієнт вивантаження
 Server:	CodyCam		Сервер:
 Login:	CodyCam		Логін:

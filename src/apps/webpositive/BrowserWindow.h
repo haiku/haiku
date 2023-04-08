@@ -179,6 +179,11 @@ private:
 			void				_TabChanged(int32 index);
 
 			status_t			_BookmarkPath(BPath& path) const;
+			void				_CreateBookmark(const BPath& path,
+									BString fileName, const BString& title,
+									const BString& url,	const BBitmap* miniIcon,
+									const BBitmap* largeIcon);
+			void				_CreateBookmark(BMessage* message);
 			void				_CreateBookmark();
 			void				_ShowBookmarks();
 			bool				_CheckBookmarkExists(BDirectory& directory,

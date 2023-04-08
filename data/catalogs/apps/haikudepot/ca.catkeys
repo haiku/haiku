@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	4143471163
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Cal propor
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat "%Property%".
 A requested object or an object involved in the request was not found on the server.	ServerHelper		No s'ha trobat al servidor un objecte sol·licitat o un objecte implicat en la sol·licitud.
 Logout	ToLatestUserUsageConditionsWindow		Tanca la sessió
+Password requirements	UserLoginWindow		Requisits de la contrasenya
 The following additional package changes have to be made:	PackageResult		S'han de fer els canvis addicionals de paquet següents:
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		S'han acordat les condicions d'ús actuals.
@@ -126,8 +127,9 @@ Starting the package daemon failed:\n\n%Error%	App		Ha fallat iniciar el dimoni 
 No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
 <no info>	PackageInfoView		<cap informació>
 Usage conditions download problem	UserUsageConditions		Problema de baixada de les condicions d'ús
-Rating	PackageListView		Puntuació
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hi ha hagut un error en baixar els requisits de la contrasenya necessaris per crear un usuari nou. Comproveu el registre per obtenir més informació i torneu-ho a provar.\nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari de Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
+Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Show	MainWindow		Mostra...
 Settings…	MainWindow		Paràmetres...
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Puntuació de l'usuari
 Installed packages	MainWindow		Paquets instal·lats
 Date	PackageListView		Data
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La contrasenya ha de tenir un mínim de %MinPasswordLength% caràcters. Els caràcters %MinPasswordUppercaseChar% han de ser majúscules i els caràcters %MinPasswordDigitsChar% han de ser dígits.
 Error	App		Error
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		S'ha produït un error en baixar les condicions d'ús. Comproveu el registre per obtenir-ne més informació i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari del Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Hi ha hagut una resposta desconcertant del servei web.
@@ -156,9 +159,10 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Comparteix dade
 Close	PackageManager		Tanca
 Changelog	PackageInfoView		Registre de canvis
 About	PackageInfoView		Quant a
+Password requirements download problem	UserLoginWindow		Problema de baixada dels requisits de la contrasenya
 Password:	UserLoginWindow		Contrasenya:
-Stability	RatePackageWindow		Estabilitat
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema del servidor. Obtingueu-ne una versió més recent actualitzant el sistema. La versió mínima requerida d’aquesta aplicació és \"%s\".
+Stability	RatePackageWindow		Estabilitat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Cal repetir la contrasenya per reduir la possibilitat d’introduir-la incorrectament.
 Cancel	SettingsWindow		Cancel·la
 Cancel	RatePackageWindow		Cancel·la
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		Consulteu les condicions d’ús aco
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'usuari [%Nickname%] s'ha autenticat, però abans de continuar, heu d'acceptar les condicions d'ús més recents.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Sembla que aquest paquet no és al servidor del Dipòsit del Haiku, per la qual cosa no és possible crear una puntuació nova ni editar-ne una d'existent.
 Apply	SettingsWindow		Aplica-ho
+View the password requirements	UserLoginWindow		Mostra els requisits de la contrasenya
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		L'usuari \"%Nickname%\" va acceptar prèviament les condicions d'ús, però les condicions d'ús s'han actualitzat des d'aleshores. Ara cal acceptar les condicions d'ús actualitzades.
 Log out	MainWindow		Surt
 Comment language:	RatePackageWindow		Llengua del comentari:

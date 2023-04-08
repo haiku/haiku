@@ -65,7 +65,7 @@ public:
 			bool 				IsValidFeatureMask() const;
 			bool				IsVersion5() const;
 			bool				XfsHasIncompatFeature() const;
-			bool				UuidEquals(const uuid_t *u1);
+			bool				UuidEquals(const uuid_t& u1);
 			const char*			Name() const;
 			uint32				BlockSize() const;
 			uint8				BlockLog() const;
@@ -90,6 +90,8 @@ public:
 			uint32				Features2() const;
 			uint32				Crc() const;
 			uint32				MagicNum() const;
+	static size_t				Offset_crc()
+								{ return offsetof(XfsSuperBlock, sb_crc);}
 private:
 
 			uint32				sb_magicnum;
@@ -145,7 +147,6 @@ private:
 			uint32				sb_features_ro_compat;
 			uint32				sb_features_incompat;
 			uint32				sb_features_log_incompat;
-public:
 			uint32				sb_crc;
 private:
 			xfs_extlen_t		sb_spino_align;

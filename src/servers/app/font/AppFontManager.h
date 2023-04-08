@@ -12,24 +12,13 @@
 
 #include "FontManager.h"
 
-
-#include <AutoDeleter.h>
-#include <HashMap.h>
-#include <Looper.h>
-#include <ObjectList.h>
-#include <Referenceable.h>
+#include <Locker.h>
 
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-class BEntry;
-class BPath;
 struct node_ref;
-
-class FontFamily;
-class FontStyle;
-class ServerFont;
 
 
 // font areas should be less than 20MB
@@ -40,26 +29,25 @@ class ServerFont;
 	\class AppFontManager AppFontManager.h
 	\brief Manager for application-added fonts in the font subsystem
 */
-class AppFontManager : public FontManagerBase {
+class AppFontManager : public FontManager, BLocker {
 public:
 								AppFontManager();
-	virtual						~AppFontManager();
 
-	virtual	void				MessageReceived(BMessage* message);
+			bool				Lock() { return BLocker::Lock(); }
+			void				Unlock() { BLocker::Unlock(); }
+			bool				IsLocked() const { return BLocker::IsLocked(); }
 
 			status_t			AddUserFontFromFile(const char* path,
 									uint16& familyID, uint16& styleID);
 			status_t			AddUserFontFromMemory(const FT_Byte* fontAddress,
-									uint32 size, uint16& familyID, uint16& styleID);
+									size_t size, uint16& familyID, uint16& styleID);
 			status_t			RemoveUserFont(uint16 familyID, uint16 styleID);
 
 private:
-			status_t			_AddUserFont(FT_Face face, node_ref nodeRef,
-									const char* path,
-									uint16& familyID, uint16& styleID);
-private:
+			uint16				_NextID();
 
-			int32				fNextID;
+private:
+			uint16				fNextID;
 };
 
 

@@ -143,13 +143,9 @@ arch_start_kernel(addr_t kernelEntry)
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
 			descriptor_size, descriptor_version);
 
+	// Re-init and activate serial in a horrific post-EFI landscape. Clowns roam the land freely.
+	serial_init();
 	serial_enable();
-
-	dprintf("[PRE] SetSatp()\n");
-	SetSatp(satp);
-	dprintf("[POST] SetSatp()\n");
-	FlushTlbAll();
-	dprintf("[POST] FlushTlbAll()\n");
 
 	// Copy final kernel args
 	// This should be the last step before jumping to the kernel

@@ -1,5 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MediaConverter	3017975112
-Video quality: %3d%%	MediaConverter		Vaizdo takelio kokybė: %3d%%
+1	lithuanian	x-vnd.Haiku-MediaConverter	3812660503
 Source files	MediaConverter		Pirminiai failai
 Error converting '%filename'	MediaConverter		Klaida konvertuojant „%filename“
 Conversion completed	MediaConverter		Konvertavimas baigtas
@@ -18,7 +17,6 @@ Error loading a file	MediaConverter		Klaida įkeliant failą
 Encoder parameters	MediaConverter-EncoderWindow		Kodavimo parametrai
 Open…	Menu		Atverti…
 Audio encoding:	MediaConverter		Garso takelio kodavimas:
-Audio quality: %3d%%	MediaConverter		Garso takelio kokybė: %3d%%
 Cancelling…	MediaConverter		Nutraukiama…
 Output file '%filename' created	MediaConverter		Sukurtas išvesties failas „%filename“
 Output folder	MediaConverter		Paskirties aplankas

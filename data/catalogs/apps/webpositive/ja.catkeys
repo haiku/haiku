@@ -1,12 +1,14 @@
-1	japanese	x-vnd.Haiku-WebPositive	3896191867
+1	japanese	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
+Copy	Console Window		コピー
 (Finish: %date)	Download Window		(完了: %date)
 Open bookmarks confirmation	WebPositive Window		ブックマーク表示確認を開く
 Download folder:	Settings Window		ダウンロードフォルダー:
 Close window	WebPositive Window		ウィンドウを閉じる
 Find:	WebPositive Window		検索:
 Script console	WebPositive Window		スクリプトコンソール
+There was an error setting up the bookmark.	WebPositive Window		ブックマークの設定時にエラーが発生しました。
 Fonts	Settings Window		フォント
 Path	Cookie Manager		パス
 Bookmarks	WebPositive Window		ブックマーク
@@ -19,6 +21,7 @@ Delete	Cookie Manager		削除
 Open containing folder	Download Window		フォルダーを開く
 Find previous	WebPositive Window		前を検索
 Full screen	WebPositive Window		全画面表示
+Bookmark bar	WebPositive Window		ブックマークバー
 Downloads in progress	WebPositive		ダウンロードが進行中です
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount 個のブックマークを同時に開きますか?
@@ -28,7 +31,6 @@ Cancel	Download Window		中止
 Settings	Settings Window		設定
 Downloads	WebPositive Window		ダウンロード
 Browse…	Settings Window		ブラウズ...
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでに存在します。
 Resume prior session	Settings Window		以前のセッションを再開
 Match case	WebPositive Window		大文字小文字を区別
 Proxy password:	Settings Window		プロキシのパスワード:
@@ -102,12 +104,13 @@ Apply	Settings Window		適用
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	ブックマークフォルダーを表示する際にエラーが発生しました。\n\nエラー: %error
 Revert	Settings Window		戻す
 Copy	WebPositive Window		コピー
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{最後の行が # 回繰り返されました。}other{最後の行が # 回繰り返されました。}}
 Default standard font size:	Settings Window		標準フォントサイズ:
 Custom	Settings Window		ユーザー設定
 Bookmark this page	WebPositive Window		このページをブックマーク
 Show tabs if only one page is open	Settings Window		ページがひとつだけでもタブを表示
-Close tab	WebPositive Window		タブを閉じる
 Remove	Download Window		除去
+Close tab	WebPositive Window		タブを閉じる
 About	WebPositive Window		このソフトウェアについて
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		まだダウンロードが進行中です。本当に WebPositive をすぐに終了しますか?
 Continue downloads	WebPositive		ダウンロードを続ける
@@ -158,7 +161,6 @@ Downloads	Download Window		ダウンロード
 Open blank page	Settings Window		空白のページを表示
 Clear history	WebPositive Window		履歴の消去
 Cancel	WebPositive Window		中止
-Bookmark info	WebPositive Window		ブックマーク情報
 Script console	Console Window		スクリプトコンソール
 Copy	URL Bar		コピー
 Open start page	Settings Window		スタートページを開く

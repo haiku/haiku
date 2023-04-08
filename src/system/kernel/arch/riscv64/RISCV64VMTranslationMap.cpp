@@ -327,8 +327,10 @@ RISCV64VMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 			newPte.flags |= (1 << pteRead);
 		if ((attributes & B_WRITE_AREA) != 0)
 			newPte.flags |= (1 << pteWrite);
-		if ((attributes & B_EXECUTE_AREA) != 0)
+		if ((attributes & B_EXECUTE_AREA) != 0) {
 			newPte.flags |= (1 << pteExec);
+			fInvalidCode = true;
+		}
 	} else {
 		if ((attributes & B_KERNEL_READ_AREA) != 0)
 			newPte.flags |= (1 << pteRead);

@@ -1,12 +1,14 @@
-1	swedish	x-vnd.Haiku-WebPositive	3896191867
+1	swedish	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
+Copy	Console Window		Kopiera
 (Finish: %date)	Download Window		(Avsluta: %date)
 Open bookmarks confirmation	WebPositive Window		Öppna bokmärkesbekräftelse
 Download folder:	Settings Window		Nedladdningskatalog:
 Close window	WebPositive Window		Stäng fönster
 Find:	WebPositive Window		Hitta:
 Script console	WebPositive Window		Skriptkonsoll
+There was an error setting up the bookmark.	WebPositive Window		Det uppstod ett fel när bokmärket skulle ställas in.
 Fonts	Settings Window		Teckensnitt
 Path	Cookie Manager		Sökväg
 Bookmarks	WebPositive Window		Bokmärken
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Ta bort
 Open containing folder	Download Window		Öppna innehållande mapp
 Find previous	WebPositive Window		Hitta tidigare
 Full screen	WebPositive Window		Fullskärm
+Bookmark bar	WebPositive Window		Bokmärkesfältet
 Downloads in progress	WebPositive		Nedladdningar pågår
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på samma gång?
@@ -28,7 +31,6 @@ Cancel	Download Window		Avbryt
 Settings	Settings Window		Inställningar
 Downloads	WebPositive Window		Nedladdningar
 Browse…	Settings Window		Bläddra…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ett bokmärke för denna sida (%bookmarkName) finns redan.
 Resume prior session	Settings Window		Återuppta föregående session
 Match case	WebPositive Window		Matcha skiftläge
 Proxy password:	Settings Window		Lösenord för proxy:
@@ -102,12 +104,13 @@ Apply	Settings Window		Tillämpa
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Det inträffade ett fel vid visning av bokmärkesmappen.\n\nFel: %error
 Revert	Settings Window		Återgå
 Copy	WebPositive Window		Kopiera
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Sista raden upprepades # gång.}other{Sista raden upprepades # gånger.}}
 Default standard font size:	Settings Window		Förinställd storlek för standardtypsnitt:
 Custom	Settings Window		Egen inställning
 Bookmark this page	WebPositive Window		Bokmärk den här sidan
 Show tabs if only one page is open	Settings Window		Visa flikar om endast en sida är öppen
-Close tab	WebPositive Window		Stäng flik
 Remove	Download Window		Ta bort
+Close tab	WebPositive Window		Stäng flik
 About	WebPositive Window		Om
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Nedladdningar pågår fortfarande. Vill du verkligen stänga WebPositive nu?
 Continue downloads	WebPositive		Återuppta nedladdningar
@@ -158,7 +161,6 @@ Downloads	Download Window		Nedladdningar
 Open blank page	Settings Window		Öppna tom sida
 Clear history	WebPositive Window		Töm historik
 Cancel	WebPositive Window		Avbryt
-Bookmark info	WebPositive Window		Bokmärkesinfo
 Script console	Console Window		Skriptkonsoll
 Copy	URL Bar		Kopiera
 Open start page	Settings Window		Öppna startsida

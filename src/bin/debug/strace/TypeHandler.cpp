@@ -10,6 +10,7 @@
 #include "TypeHandler.h"
 
 #include <string.h>
+#include <String.h>
 
 #include "Context.h"
 #include "MemoryReader.h"
@@ -90,6 +91,39 @@ TypeHandlerFactory<bool>::Create()
 	return new TypeHandlerImpl<bool>();
 }
 
+// status_t
+class StatusTypeHandler : public TypeHandler {
+public:
+	StatusTypeHandler() {}
+
+	string GetParameterValue(Context &context, Parameter *, const void *address)
+	{
+		return RenderValue(context, get_value<status_t>(address));
+	}
+
+	string GetReturnValue(Context &context, uint64 value)
+	{
+		return RenderValue(context, value);
+	}
+
+private:
+	string RenderValue(Context &context, uint64 value) const
+	{
+		string rendered = context.FormatUnsigned(value);
+		if (value <= UINT32_MAX && (status_t)value <= 0) {
+			rendered += " ";
+			rendered += strerror(value);
+		}
+		return rendered;
+	}
+};
+
+TypeHandler *
+create_status_t_type_handler()
+{
+	return new StatusTypeHandler;
+}
+
 // read_string
 static
 string
@@ -102,22 +136,10 @@ read_string(Context &context, void *data)
 	int32 bytesRead;
 	status_t error = context.Reader().Read(data, buffer, sizeof(buffer), bytesRead);
 	if (error == B_OK) {
-//		return string("\"") + string(buffer, bytesRead) + "\"";
-//string result("\"");
-//result += string(buffer, bytesRead);
-//result += "\"";
-//return result;
-
-// TODO: Unless I'm missing something obvious, our STL string class is broken.
-// The appended "\"" doesn't appear in either of the above cases.
-
-		int32 len = strnlen(buffer, sizeof(buffer));
-		char largeBuffer[259];
-		largeBuffer[0] = '"';
-		memcpy(largeBuffer + 1, buffer, len);
-		largeBuffer[len + 1] = '"';
-		largeBuffer[len + 2] = '\0';
-		return largeBuffer;
+		string result("\"");
+		result += string(buffer, strnlen(buffer, sizeof(buffer)));
+		result += "\"";
+		return result;
 	}
 
 	return context.FormatPointer(data) + " (" + strerror(error) + ")";
@@ -177,6 +199,56 @@ EnumTypeHandler::RenderValue(Context &context, unsigned int value) const
 		EnumMap::const_iterator i = fMap.find(value);
 		if (i != fMap.end() && i->second != NULL)
 			return i->second;
+	}
+
+	return context.FormatUnsigned(value);
+}
+
+FlagsTypeHandler::FlagsTypeHandler(const FlagsList &m) : fList(m) {}
+
+string
+FlagsTypeHandler::GetParameterValue(Context &context, Parameter *,
+	const void *address)
+{
+	return RenderValue(context, get_value<unsigned int>(address));
+}
+
+string
+FlagsTypeHandler::GetReturnValue(Context &context, uint64 value)
+{
+	return RenderValue(context, value);
+}
+
+string
+FlagsTypeHandler::RenderValue(Context &context, unsigned int value) const
+{
+	if (context.GetContents(Context::ENUMERATIONS)) {
+		// Enumerate the list in reverse. That way, any later values which use
+		// the same bits as earlier values will be processed correctly.
+		string rendered;
+		FlagsList::const_reverse_iterator i = fList.rbegin();
+		for (; i != fList.rend(); i++) {
+			if (value == 0)
+				break;
+			if ((value & i->value) != i->value)
+				continue;
+
+			if (!rendered.empty())
+				rendered.insert(0, " | ");
+			rendered.insert(0, i->name);
+			value &= ~(i->value);
+		}
+		if (value != 0) {
+			if (!rendered.empty())
+				rendered += " | ";
+
+			char hex[20];
+			snprintf(hex, sizeof(hex), "0x%x", value);
+			rendered += hex;
+		}
+		if (rendered.empty())
+			rendered = "0";
+		return rendered;
 	}
 
 	return context.FormatUnsigned(value);

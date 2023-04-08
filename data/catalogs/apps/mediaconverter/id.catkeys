@@ -1,7 +1,6 @@
-1	indonesian	x-vnd.Haiku-MediaConverter	1322040280
+1	indonesian	x-vnd.Haiku-MediaConverter	2116725671
 Input file not recognized as Audio or Video	MediaConverter		Berkas masukan tidak dikenali sebagai Audio atau Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Kualitas video: %3d%%
 Source files	MediaConverter		Berkas sumber
 Error converting '%filename'	MediaConverter		Ada galat saat mengonversi '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Direktori yang dipilih tidak ditemukan. Atur standar ke /boot/home
@@ -25,7 +24,6 @@ Error loading a file	MediaConverter		Galat memuat berkas
 Encoder parameters	MediaConverter-EncoderWindow		Parameter enkoder
 Open…	Menu		Buka…
 Audio encoding:	MediaConverter		Penyandi audio:
-Audio quality: %3d%%	MediaConverter		Kualitas audio: %3d%%
 Cancelling…	MediaConverter		Membatalkan…
 Output file '%filename' created	MediaConverter		Berkas keluaran '%filename' dibuat
 Output folder	MediaConverter		Folder keluaran

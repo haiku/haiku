@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Be-MAIL	1477453861
+1	greek, modern (1453-)	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Ορισμός ως Αποθηκευμένο
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Το κύριο κείμενό σας περιέχει %ld που δεν μπορούν να κωδικοποιηθούν. Ίσως μία άλλη μέθοδος κωδικοποίησης να λειτουργήσει καλύτερα. Πατήστε Αποστολή για να στείλετε το μήνυμά σας (οι χαρακτήρες που δεν μπορούν να κωδικοποιηθούν θα αντικατασταθούν με έναν υποκατάστατο χαρακτήρα) ούτως ή άλλως, ή επιλέξτε Ακύρωση για να ακυρώσετε την αποστολή και να διορθώσετε το πρόβλημα.
 Text wrapping:	Mail		Αναδίπλωση κειμένου:
@@ -42,7 +42,6 @@ Copy link location	Mail		Αντιγραφή υπερσυνδέσμου
 Attachments: 	Mail		Επισυνάψεις: 
 Remove enclosure	Mail		Αφαίρεση επισύναψης
 Next	Mail		Επόμενο
-Attachments:	Mail		Επισυνάψεις:
 Show icons only	Mail		Εμφάνιση μόνο των εικονιδίων
 Subject:	Mail		Θέμα:
 OK	Mail		Εντάξει

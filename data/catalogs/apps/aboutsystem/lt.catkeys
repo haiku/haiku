@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-About	1517831446
+1	lithuanian	x-vnd.Haiku-About	1907427679
 Revision	AboutView		modifikacija
 The Haikuware team and their bounty program\n	AboutView		„Haikuware“ komandai už premijavimo programą bei šios programos dalyviams\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		© 1999-2007 Michael C. Ring. Visos teisės saugomos.
@@ -36,7 +36,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael'ui Phipps'ui (projekto įkūrėjui)\n\n
 BSD (3-clause)	AboutWindow		BSD (3 punktų)
 About this system	AboutWindow		Apie šią sistemą
-%d MiB used (%d%%)	AboutView		%d MiB naudojama (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		© 1999-2010 „Gutenprint“ autoriai. Visos teisės saugomos.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		© 1994-1997 Mark Kilgard. Visos teisės saugomos.
 AboutSystem	System name		Apie šią sistemą

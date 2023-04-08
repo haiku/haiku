@@ -1,50 +1,49 @@
-1	catalan; valencian	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Atura
-Sort applications by name	PreferencesWindow		Ordena les aplicacions pel nom
-Suspend	DeskbarMenu		Suspensió
-Hide clock	TimeView		Amaga el rellotge
-Applications	PreferencesWindow		Aplicacions
-Time preferences…	TimeView		Preferències de l'hora...
-About Haiku	DeskbarMenu		Quant al Haiku
-Edit in Tracker…	PreferencesWindow		Edita-ho al Rastrejador...
-Recent documents:	PreferencesWindow		Documents recents:
-Recent applications	DeskbarMenu		Aplicacions usades recentment
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicacions
-Find…	DeskbarMenu		Troba...
-Show clock	Tray		Mostra el rellotge
-Window	PreferencesWindow		Finestra
-Defaults	PreferencesWindow		Valors predeterminats
-Menu	PreferencesWindow		Menú
-Recent documents	DeskbarMenu		Documents recents
+1	catalan; valencian	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Amaga-ho automàticament
-Always on top	PreferencesWindow		Sempre en primer pla
-<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la Barra d'escriptori és buida>
 Show all	WindowMenu		Mostra-ho tot
-No windows	WindowMenu		Sense finestres
-Deskbar	System name		Barra d'escriptori
-Restart system	DeskbarMenu		Reinicia el sistema
+Edit in Tracker…	PreferencesWindow		Edita-ho al Rastrejador...
+Menu	PreferencesWindow		Menú
+Tracker always first	PreferencesWindow		El Rastrejador sempre primer
+Hide clock	TimeView		Amaga el rellotge
 Large	PreferencesWindow		Grossa
+<Deskbar folder is empty>	DeskbarMenu		<La carpeta de la Barra d'escriptori és buida>
+Recent documents	DeskbarMenu		Documents recents
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicacions
+Always on top	PreferencesWindow		Sempre en primer pla
+Restart system	DeskbarMenu		Reinicia el sistema
+Recent documents:	PreferencesWindow		Documents recents:
 Auto-raise	PreferencesWindow		Alçament automàtic
-Recent folders:	PreferencesWindow		Carpetes recents:
-Show application expander	PreferencesWindow		Mostra l'expandidora d'aplicacions
+Mount	DeskbarMenu		Munta
+Icon size	PreferencesWindow		Mida de la icona
+About Haiku	DeskbarMenu		Quant al Haiku
+Small	PreferencesWindow		Petita
+Show calendar…	TimeView		Mostra el calendari...
+Find…	DeskbarMenu		Troba...
+Power off	DeskbarMenu		Atura
+Defaults	PreferencesWindow		Valors predeterminats
+Show replicants	DeskbarMenu		Mostra els replicants
+No windows	WindowMenu		Sense finestres
+Show clock	Tray		Mostra el rellotge
 Close all	WindowMenu		Tanca-ho tot
 Deskbar preferences	PreferencesWindow		Preferències de la barra d'escriptori
-Mount	DeskbarMenu		Munta
-Revert	PreferencesWindow		Reverteix
-Small	PreferencesWindow		Petita
-Recent applications:	PreferencesWindow		Aplicacions recents:
-Shutdown…	DeskbarMenu		Atura...
-Tracker always first	PreferencesWindow		El Rastrejador sempre primer
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferències
-Recent folders	DeskbarMenu		Carpetes recents
 About this system	DeskbarMenu		Quant al sistema
-Show calendar…	TimeView		Mostra el calendari...
-Deskbar preferences…	DeskbarMenu		Preferències de la barra d'escriptori...
-Expand new applications	PreferencesWindow		Expandeix les aplicacions noves
-Show replicants	DeskbarMenu		Mostra els replicants
-Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions
-Icon size	PreferencesWindow		Mida de la icona
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicacions de l'escriptori
-Hide all	WindowMenu		Amaga-ho tot
 Quit application	WindowMenu		Surt de l'aplicació
+Hide application names	PreferencesWindow		Amaga el nom de les aplicacions
+Applications	PreferencesWindow		Aplicacions
+Show application expander	PreferencesWindow		Mostra l'expandidora d'aplicacions
+Deskbar preferences…	DeskbarMenu		Preferències de la barra d'escriptori...
+Suspend	DeskbarMenu		Suspensió
+Shutdown…	DeskbarMenu		Atura...
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demostracions
+Expand new applications	PreferencesWindow		Expandeix les aplicacions noves
+Recent applications:	PreferencesWindow		Aplicacions recents:
+Recent folders:	PreferencesWindow		Carpetes recents:
+Recent folders	DeskbarMenu		Carpetes recents
+Recent applications	DeskbarMenu		Aplicacions usades recentment
+Hide all	WindowMenu		Amaga-ho tot
+Sort applications by name	PreferencesWindow		Ordena les aplicacions pel nom
+Revert	PreferencesWindow		Reverteix
+Window	PreferencesWindow		Finestra
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferències
+Time preferences…	TimeView		Preferències de l'hora...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicacions de l'escriptori

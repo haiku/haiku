@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-About	3479326282
+1	slovak	x-vnd.Haiku-About	3868922515
 Revision	AboutView		Revízia
 The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Všetky práva vyhradené.
@@ -35,7 +35,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (zakladateľ projektu)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-bodová)
 About this system	AboutWindow		O tomto systéme
-%d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autori Gutenprint. Všetky práva vyhradené.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Všetky práva vyhradené.
 AboutSystem	System name		O systéme

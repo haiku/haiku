@@ -116,8 +116,8 @@ Develop packages	MainWindow		开发软件包
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 No user ratings available.	PackageInfoView		未发现用户评分。
 <no info>	PackageInfoView		<无信息>
-Rating	PackageListView		评级
 A network transport error has arisen communicating with the server system: %s	ServerHelper		与服务器系统通信时出现网络传输错误：%s
+Rating	PackageListView		评级
 Synchronizing icons	ServerIconExportUpdateProcess		正在同步图标
 Show	MainWindow		显示
 Settings…	MainWindow		设置…
@@ -141,8 +141,8 @@ Close	PackageManager		关闭
 Changelog	PackageInfoView		更新记录
 About	PackageInfoView		关于
 Password:	UserLoginWindow		密码：
-Stability	RatePackageWindow		稳定性
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		此应用程序太旧，无法与服务器通信。请更新系统，获取新版本的应用程序。此应用程序要求的最低版本为 \"%s\"。
+Stability	RatePackageWindow		稳定性
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		必须重复输入密码以减少输错密码的可能性。
 Cancel	SettingsWindow		取消
 Cancel	RatePackageWindow		取消

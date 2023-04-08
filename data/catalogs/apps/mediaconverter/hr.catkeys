@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-MediaConverter	2214135523
+1	croatian	x-vnd.Haiku-MediaConverter	3008820914
 Input file not recognized as Audio or Video	MediaConverter		Datoteka unosa nije prepoznata kao Audio ili Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Video kvaliteta: %3d%%
 Source files	MediaConverter		Izvorne datoteke
 Audio:	MediaConverter-FileInfo		Audio:
 Error creating video.	MediaConverter		Greška pri stvaranju videa.
@@ -18,7 +17,6 @@ OK	MediaConverter		U redu
 Error creating '%filename'	MediaConverter		Greška pri stvaranju '%filename'
 Error loading a file	MediaConverter		Greška pri učitavanju datoteke
 Open…	Menu		Otvori...
-Audio quality: %3d%%	MediaConverter		Audio kvaliteta: %3d%%
 Cancelling…	MediaConverter		Otkazujem...
 Output file '%filename' created	MediaConverter		Izlazna datoteka '%filename' napravljena
 Output folder	MediaConverter		Izlazna mapa

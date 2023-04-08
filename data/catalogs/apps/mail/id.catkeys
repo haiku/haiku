@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Be-MAIL	1477453861
+1	indonesian	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Setel ke Disimpan
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Teks utama Anda mengandung %ld karakter tak bisa terenkod. Mungkin set karakter lain akan bekerja lebih baik? Tekan kirim untuk tetap mengirim (sebuah karakter pengganti akan digunakan pada karakter yang tak terenkod), atau tekan Batal untuk kembali dan membetulkannya.
 Text wrapping:	Mail		Pembungkus teks:
@@ -42,7 +42,6 @@ Copy link location	Mail		Salin lokasi tautan
 Attachments: 	Mail		Lampiran: 
 Remove enclosure	Mail		Hapus lampiran
 Next	Mail		Selanjutnya
-Attachments:	Mail		Lampiran:
 Show icons only	Mail		Tampilkan ikon saja
 Subject:	Mail		Subyek:
 OK	Mail		OKE

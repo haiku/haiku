@@ -1,0 +1,12 @@
+# websearchfs configuration file
+#
+
+# max number of vnodes allowed in the fs (to limit RAM usage)
+# 10 <= allowed <= 1000000
+max_nodes 5000
+
+# maximum number of results to ask google for
+max_results 50
+
+# delete result entries on last query close
+sync_unlink 0

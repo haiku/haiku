@@ -364,6 +364,42 @@ fdt_device_get_prop(fdt_device* dev, const char* name, int* len)
 }
 
 
+static uint32
+fdt_get_address_cells(const void* fdt, int node)
+{
+	uint32 res = 2;
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return res;
+
+	uint32 *prop = (uint32*)fdt_getprop(fdt, parent, "#address-cells", NULL);
+	if (prop == NULL)
+		return res;
+
+	res = fdt32_to_cpu(*prop);
+	return res;
+}
+
+
+static uint32
+fdt_get_size_cells(const void* fdt, int node)
+{
+	uint32 res = 1;
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return res;
+
+	uint32 *prop = (uint32*)fdt_getprop(fdt, parent, "#size-cells", NULL);
+	if (prop == NULL)
+		return res;
+
+	res = fdt32_to_cpu(*prop);
+	return res;
+}
+
+
 static bool
 fdt_device_get_reg(fdt_device* dev, uint32 ord, uint64* regs, uint64* len)
 {
@@ -378,17 +414,36 @@ fdt_device_get_reg(fdt_device* dev, uint32 ord, uint64* regs, uint64* len)
 	if (prop == NULL)
 		return false;
 
-	// TODO: use '#address-cells', '#size-cells' in parent node to identify
-	// field sizes
+	uint32 addressCells = fdt_get_address_cells(gFDT, fdtNode);
+	uint32 sizeCells = fdt_get_size_cells(gFDT, fdtNode);
+	size_t entrySize = 4 * (addressCells + sizeCells);
 
-	if ((ord + 1)*16 > (uint32)propLen)
+	if ((ord + 1) * entrySize > (uint32)propLen)
 		return false;
 
-	if (regs != NULL)
-		*regs = fdt64_to_cpu(*(((uint64*)prop) + 2*ord));
+	const void* addressPtr = (const uint8*)prop + ord * entrySize;
+	const void* sizePtr = (const uint32*)addressPtr + addressCells;
 
-	if (len != NULL)
-		*len = fdt64_to_cpu(*(((uint64*)prop) + 2*ord + 1));
+	switch (addressCells) {
+		case 1:
+			*regs = fdt32_to_cpu(*(const uint32*)addressPtr);
+			break;
+		case 2:
+			*regs = fdt64_to_cpu(*(const uint64*)addressPtr);
+			break;
+		default:
+			return false;
+	}
+	switch (sizeCells) {
+		case 1:
+			*len = fdt32_to_cpu(*(const uint32*)sizePtr);
+			break;
+		case 2:
+			*len = fdt64_to_cpu(*(const uint64*)sizePtr);
+			break;
+		default:
+			return false;
+	}
 
 	return true;
 }

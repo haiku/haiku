@@ -4,7 +4,7 @@ Error mounting volume:\n\n%s	AutoMounter		Bölümü bağlarken hata:\n\n%s
 Cancel	AutoMounter		Vazgeç
 OK	AutoMounter		Tamam
 Unmount error	AutoMounter		Ayırma hatası
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Bu diskteki dosya sistemi Be dosya sistemi değil. Haiku'daki olası hatalardan dolayı veri kaybına neden olmamak için saltokunur bağlamanız önerilir.
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Bu diskteki dosya sistemi Be Dosya Sistemi değil. Haiku'daki olası hatalardan dolayı veri kaybına neden olmamak için saltokunur bağlamanız önerilir.
 Mount read/write	AutoMounter		Okunabilir/yazılabilir olarak bağla
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		\"%s\" diskinin bağlantısı kesilemiyor:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Disk bağlanıyor: '%s'\n\n

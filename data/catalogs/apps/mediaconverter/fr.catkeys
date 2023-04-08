@@ -1,7 +1,6 @@
-1	french	x-vnd.Haiku-MediaConverter	2816184527
+1	french	x-vnd.Haiku-MediaConverter	1883936613
 Input file not recognized as Audio or Video	MediaConverter		Le fichier d’entrée n’est pas reconnu comme un fichier audio ou vidéo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
-Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
 Source files	MediaConverter		Fichiers sources
 Error writing video frame %lld	MediaConverter		Erreur d’écriture de l’image vidéo %lld
 Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »
@@ -26,7 +25,6 @@ Error loading a file	MediaConverter		Erreur au chargement d’un fichier
 Encoder parameters	MediaConverter-EncoderWindow		Paramètres d’encodage
 Open…	Menu		Ouvrir…
 Audio encoding:	MediaConverter		Encodage audio :
-Audio quality: %3d%%	MediaConverter		Qualité audio : %3d%%
 Cancelling…	MediaConverter		Annulation…
 Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
 Output folder	MediaConverter		Dossier de sortie
@@ -48,7 +46,6 @@ Error	MediaConverter		Erreur
 File details	MediaConverter		Détails du fichier
 No audio	Audio codecs list		Pas de son
 Drop media files onto this window	MediaConverter		Déposez les médias à convertir dans cette fenêtre
-Writing video track: %ld%% complete	MediaConverter		Écriture de la piste vidéo : %ld%% réalisé
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# trame} other{# trames}}
 Error read audio frame %lld	MediaConverter		Erreur de lecture de la trame audio %lld
 Quit	Menu		Quitter
@@ -57,7 +54,6 @@ Duration:	MediaConverter-FileInfo		Durée :
 MediaConverter	System name		Convertisseur de média
 Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
 Error writing audio frame %lld	MediaConverter		Erreur d’écriture de la trame audio %lld
-Writing audio track: %ld%% complete	MediaConverter		Écriture de la piste audio : %ld%% réalisé
 File format:	MediaConverter		Format de fichier :
 File	Menu		Fichier
 Video quality not supported	MediaConverter		Qualité vidéo non prise en charge

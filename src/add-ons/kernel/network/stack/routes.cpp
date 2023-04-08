@@ -513,7 +513,7 @@ add_route(struct net_domain* _domain, const struct net_route* newRoute)
 		}
 	}
 
-	domain->routes.Insert(before, route);
+	domain->routes.InsertBefore(before, route);
 	update_route_infos(domain);
 
 	return B_OK;

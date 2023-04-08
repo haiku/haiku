@@ -7,6 +7,30 @@
 
 #include <kernel.h>
 
+
+/* raw exception frames */
+struct iframe {
+	uint32 spsr;
+	uint32 r0;
+	uint32 r1;
+	uint32 r2;
+	uint32 r3;
+	uint32 r4;
+	uint32 r5;
+	uint32 r6;
+	uint32 r7;
+	uint32 r8;
+	uint32 r9;
+	uint32 r10;
+	uint32 r11;
+	uint32 r12;
+	uint32 usr_sp;
+	uint32 usr_lr;
+	uint32 svc_sp;
+	uint32 svc_lr;
+	uint32 pc;
+} _PACKED;
+
 #define	IFRAME_TRACE_DEPTH 4
 
 struct iframe_stack {
@@ -26,6 +50,9 @@ struct arch_thread {
 
 	// used to track interrupts on this thread
 	struct iframe_stack	iframes;
+
+	struct iframe*	userFrame;
+	uint32	oldR0;
 };
 
 struct arch_team {
@@ -36,10 +63,7 @@ struct arch_team {
 };
 
 struct arch_fork_arg {
-	// gcc treats empty structures as zero-length in C, but as if they contain
-	// a char in C++. So we have to put a dummy in to be able to use the struct
-	// from both in a consistent way.
-	char	dummy;
+	struct iframe	frame;
 };
 
 

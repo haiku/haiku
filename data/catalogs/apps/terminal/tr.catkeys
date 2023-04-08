@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	3017699344
+1	turkish	x-vnd.Haiku-Terminal	4000370057
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Uçbirim kabuğu başlatamadı. Üzgünüz.
@@ -8,12 +8,14 @@ Edit	Terminal TermWindow		Düzen
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h, --help              bu yardımı yazdır\n  -t, --title             pencere başlığını ayarla\n  -f, --fullscreen        tam ekranı başlat\n  -w, --working-directory başlangıç çalışma dizinini ayarla\n
 Select all	Terminal TermWindow		Tümünü seç
 Confirm exit if active programs exist	Terminal AppearancePrefView		Etkin program varsa çıkarken onay iste
+Color scheme:	Terminal ThemeView		Renk şeması:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tSekmede çalışan etkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için '%2d'.\n\t%T\t-\Geçerli yerelleştirme için Uçbirim uygulaması adı\n\t%e\t-\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%i\t-\tPencere sırası\n\t%p\t-\tSekmedeki etkin işlemin adı\n\t%t\t-\tSekme başlığı
 Copy	Terminal TermWindow		Kopyala
 Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
 Print	Terminal TermWindow		Yazdır
 Settings	Terminal TermWindow		Ayarlar
 %app% settings	Terminal PrefWindow	window title	%app% ayarları
+ANSI bright black color	Terminal ThemeView		ANSI açık siyah
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için '%2d'.\n\t%i\t-\tSekmenin indeksi.\n\t%e\t-\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin sürecin adı.
 Use default	Terminal SetTitleWindow		Öntanımlıları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
@@ -23,20 +25,27 @@ Appearance	Terminal PrefWindow		Görünüş
 Set tab title	Terminal TermWindow		Sekme başlığını ayarla
 Create link here	Terminal TermView		Burada bağlantı oluştur
 Encoding:	Terminal AppearancePrefView		Kodlama:
+yellow	Terminal ThemeView		sarı
 Change directory	Terminal TermView		Dizini değiştir
 Custom	Terminal AppearancePrefView	Window size	Özel
 Page setup…	Terminal TermWindow		Sayfa düzeni…
+ANSI yellow color	Terminal ThemeView		ANSI sarı
 Cancel	Terminal TermView		Vazgeç
 Defaults	Terminal PrefWindow		Öntanımlılar
+black	Terminal ThemeView		siyah
 Revert	Terminal PrefWindow		Eski haline döndür
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Uçbirim
 Use selection	Terminal FindWindow		Seçimi kullan
 Find next	Terminal TermWindow		Sonrakini bul
 Copy link location	Terminal TermView		Bağlantı konumunu kopyala
+Background	Terminal ThemeView		Arka plan
 Window title:	Terminal AppearancePrefView		Pencere başlığı:
 New tab	Terminal TermWindow		Yeni sekme
+magenta	Terminal ThemeView		mor
 Allow bold text	Terminal AppearancePrefView		Kalın metne izin ver
 Window title…	Terminal TermWindow		Pencere başlığı…
+ANSI blue color	Terminal ThemeView		ANSI mavi
+blue	Terminal ThemeView		mavi
 Open path	Terminal TermView		Yol aç
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" çalıştırılamadı:\n\t%error
 Terminal	System name		Uçbirim
@@ -44,6 +53,7 @@ Custom	Terminal colors scheme		Özel
 Really close?	Terminal TermWindow		Gerçekten kapatılsın mı?
 Font size	Terminal TermWindow		Yazıtipi boyutu
 OK	Terminal TermApp		Tamam
+ANSI bright blue color	Terminal ThemeView		ANSI açık mavi
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" süreci hâlâ çalışıyor.\nUçbirimi kapatırsanız süreç sonlandırılacaktır.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tanımlanamayan seçenek \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Sekme başlığı:
@@ -57,16 +67,23 @@ Find previous	Terminal TermWindow		Öncekini bul
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Sekme başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
 Close	Terminal TermWindow		Kapat
 Save to file…	Terminal PrefWindow		Dosyaya kaydet…
+Defaults	Terminal ThemeWindow		Öntanımlılar
 Copy path	Terminal TermView		Yolu kopyala
 Window size	Terminal TermWindow		Pencere boyutu
+Selected text	Terminal ThemeView		Seçili metin
 Copy absolute path	Terminal TermView		Tam yolu kopyala
 Cancel	Terminal TermWindow		Vazgeç
+ANSI cyan color	Terminal ThemeView		ANSI camgöbeği
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" işlemi hâlâ çalışıyor.\nBu sekmeyi kapatırsanız işlem sonlandırılacaktır.
 Full screen	Terminal TermWindow		Tam ekran
 Shell 	Terminal TermWindow		Kabuk 
+Revert	Terminal ThemeWindow		Eski haline döndür
+ANSI green color	Terminal ThemeView		ANSI yeşil
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' karakteri\n\t%<\t-\tYalnızca sonraki gelen yer tutucu boş\n\t\t\tdeğilse gösterilecek bir bölüm başlatır.\n\t%>\t-\tYalnızca bir önceki %< bölümü ve bunun arasındaki\n\t\t\tyer tutucu boş değilse gösterilecek bir bölüm başlatır.\n\t%-\t-\tBir %< veya %> bölümünü sonlandırır.\n\n'%' ve biçimlendirme harfi arasına konulacak her bir abece-sayısal olmayan karakter\nbir boşluk ekleyecektir. Ekleme %< bölümüne yapılacaktır.
+ANSI bright cyan color	Terminal ThemeView		ANSI açık camgöbeği
 Tab title:	Terminal TermWindow		Sekme başlığı:
 Window title:	Terminal TermWindow		Pencere başlığı:
+ANSI white color	Terminal ThemeView		ANSI beyaz
 Window size:	Terminal AppearancePrefView		Pencere boyutu:
 Switch Terminals	Terminal TermWindow		Diğer uçbirime geç
 Decrease	Terminal TermWindow		Azalt
@@ -76,27 +93,45 @@ Blinking cursor	Terminal AppearancePrefView		Yanıp sönen imleç
 Use text:	Terminal FindWindow		Şu metni kullan:
 Close active tab	Terminal TermWindow		Etkin sekmeyi kapat
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
+Selected background	Terminal ThemeView		Seçili arka plan
 Save as default	Terminal TermWindow		Öntanımlı olarak kaydet
 Nothing is selected.	Terminal TermWindow		Hiçbir şey seçilmedi.
+ANSI bright red color	Terminal ThemeView		ANSI açık kırmızı
 Use left Option as Meta key	Terminal AppearancePrefView		Sol Alt düğmesini Meta düğmesi olarak kullan
 Find	Terminal FindWindow		Bul
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Etkin sekme başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
+Save to file…	Terminal ThemeWindow		Dosyaya kaydet…
 Font:	Terminal AppearancePrefView		Yazıtipi:
 Paste	Terminal TermWindow		Yapıştır
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pencere başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
+ANSI bright magenta color	Terminal ThemeView		ANSI açık mor
 Copy here	Terminal TermView		Buraya kopyala
 Use default shell	Terminal Shell		Öntanımlı kabuğu kullan
+red	Terminal ThemeView		kırmızı
+white	Terminal ThemeView		beyaz
 Open link	Terminal TermView		Bağlantıyı aç
+Text	Terminal ThemeView		Metin
+ANSI bright yellow color	Terminal ThemeView		ANSI açık sarı
 Not found.	Terminal TermWindow		Bulunamadı.
+ANSI black color	Terminal ThemeView		ANSI siyah
 Find…	Terminal TermWindow		Bul…
 No search string was entered.	Terminal TermWindow		Hiçbir arama dizisi girilmedi.
 Move here	Terminal TermView		Buraya taşı
 Abort	Terminal Shell		İptal et
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Aşağıdaki süreçler hâlâ çalışıyor:\n\n\t%1\n\nUçbirim'i kapatırsanız süreçler sonlandırılacak.
 Set window title	Terminal TermWindow		Pencere başlığını ayarla
+ANSI red color	Terminal ThemeView		ANSI kırmızı
 Increase	Terminal TermWindow		Artır
+green	Terminal ThemeView		yeşil
+ANSI bright green color	Terminal ThemeView		ANSI açık yeşil
 OK	Terminal TermWindow		Tamam
+Text under cursor	Terminal ThemeView		İmleç altındaki metin
+ANSI bright white color	Terminal ThemeView		ANSI açık beyaz
 Close window	Terminal TermWindow		Pencereyi kapat
+ANSI magenta color	Terminal ThemeView		ANSI mor
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nCopyright 2001-2020 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ve Takaşi Murai.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
+cyan	Terminal ThemeView		camgöbeği
+Colors	System name		Renkler
 Clear all	Terminal TermWindow		Tümünü temizle
+Cursor	Terminal ThemeView		İmleç
 Search forward	Terminal FindWindow		İleri doğru ara

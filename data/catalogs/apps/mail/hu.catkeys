@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	1477453861
+1	hungarian	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Mentésre jelöl
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
@@ -42,7 +42,6 @@ Copy link location	Mail		Hivatkozás címének másolása
 Attachments: 	Mail		Mellékletek:
 Remove enclosure	Mail		Melléklet eltávolítása
 Next	Mail		Következő
-Attachments:	Mail		Mellékletek:
 Show icons only	Mail		Csak ikonok megjelenítése
 Subject:	Mail		Tárgy:
 OK	Mail		Rendben

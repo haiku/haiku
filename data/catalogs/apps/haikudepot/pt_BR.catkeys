@@ -98,8 +98,8 @@ Develop packages	MainWindow		Desenvolver pacotes
 Starting the package daemon failed:\n\n%Error%	App		A inicialização do daemon de pacote falhou:\n\n%Error%
 No user ratings available.	PackageInfoView		Nenhuma avaliação de usuário disponível.
 <no info>	PackageInfoView		<sem informação>
-Rating	PackageListView		Avaliação
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ocorreu um erro de transporte de rede na comunicação com o sistema do servidor: %s
+Rating	PackageListView		Avaliação
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizando ícones
 Show	MainWindow		Exibir
 Settings…	MainWindow		Configurações…
@@ -123,8 +123,8 @@ Close	PackageManager		Fechar
 Changelog	PackageInfoView		Registro de alterações
 About	PackageInfoView		Sobre
 Password:	UserLoginWindow		Senha:
-Stability	RatePackageWindow		Estabilidade
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Este aplicativo é muito antigo para se comunicar com o sistema do servidor. Obtenha uma versão mais recente deste aplicativo atualizando seu sistema. A versão mínima necessária deste aplicativo é \"%s\".
+Stability	RatePackageWindow		Estabilidade
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		A senha deve ser repetida para reduzir a chance de digitação incorreta da senha.
 Cancel	SettingsWindow		Cancelar
 Cancel	RatePackageWindow		Cancelar

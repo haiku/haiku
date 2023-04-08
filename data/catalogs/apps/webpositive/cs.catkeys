@@ -1,12 +1,14 @@
-1	czech	x-vnd.Haiku-WebPositive	3896191867
+1	czech	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
+Copy	Console Window		Kopírovat
 (Finish: %date)	Download Window		(Dokončeno: %date)
 Open bookmarks confirmation	WebPositive Window		Otevřít potvrzení záložek
 Download folder:	Settings Window		Složka stahování:
 Close window	WebPositive Window		Zavřít okno
 Find:	WebPositive Window		Najít:
 Script console	WebPositive Window		Skriptovací konzole
+There was an error setting up the bookmark.	WebPositive Window		Chyba při nastavení záložky.
 Fonts	Settings Window		Písma
 Path	Cookie Manager		Cesta
 Bookmarks	WebPositive Window		Záložky
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Smazat
 Open containing folder	Download Window		Otevřít nahrazenou složku
 Find previous	WebPositive Window		Najít předchozí
 Full screen	WebPositive Window		Celá obrazovka
+Bookmark bar	WebPositive Window		Lišta záložek
 Downloads in progress	WebPositive		Stahování probíhá
 Copy URL to clipboard	Download Window		Zkopírovat adresu URL do schránky
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otevřít %addedCount záložek naráz?
@@ -28,7 +31,6 @@ Cancel	Download Window		Zrušit
 Settings	Settings Window		Nastavení
 Downloads	WebPositive Window		Stažené
 Browse…	Settings Window		Procházet…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Záložka pro tuto stránku (%bookmarkName) již existuje.
 Resume prior session	Settings Window		Pokračovat v předchozí relaci
 Match case	WebPositive Window		Rozlišovat velikost písmen
 Proxy password:	Settings Window		Heslo proxy:
@@ -102,12 +104,13 @@ Apply	Settings Window		Použít
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Při pokusu o zobrazení adresáře záložek došlo k chybě.\n\nChyba: %error
 Revert	Settings Window		Vrátit zpět
 Copy	WebPositive Window		Kopírovat
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Poslední řádek se opakoval.}other{Poslední řádek se opakoval # krát.}}
 Default standard font size:	Settings Window		Výchozí velikost standardního písma:
 Custom	Settings Window		Vlastní
 Bookmark this page	WebPositive Window		Přidat tuto stránku do záložek
 Show tabs if only one page is open	Settings Window		Zobrazit karty, je-li otevřena pouze jedna karta
-Close tab	WebPositive Window		Zavřít kartu
 Remove	Download Window		Odebrat
+Close tab	WebPositive Window		Zavřít kartu
 About	WebPositive Window		O aplikaci
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Stále probíhá stahování, opravdu ukončit WebPositive?
 Continue downloads	WebPositive		Pokračovat ve stahování
@@ -158,7 +161,6 @@ Downloads	Download Window		Stažené
 Open blank page	Settings Window		Otevřít prázdnou stránku
 Clear history	WebPositive Window		Smazat historii
 Cancel	WebPositive Window		Zrušit
-Bookmark info	WebPositive Window		Informace záložky
 Script console	Console Window		Skriptovací konzole
 Copy	URL Bar		Kopírovat
 Open start page	Settings Window		Otevřít úvodní stránku

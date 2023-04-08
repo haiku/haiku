@@ -27,6 +27,10 @@ public:
 								BMenuField(const char* name,
 									const char* label, BMenu* menu,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+								BMenuField(const char* name,
+									const char* label, BMenu* menu,
+									bool fixed_size,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(const char* label, BMenu* menu,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(BMessage* data);
@@ -112,13 +116,6 @@ private:
 	friend class LabelLayoutItem;
 	friend class MenuBarLayoutItem;
 	friend struct LayoutData;
-
-								BMenuField(const char* name,
-									const char* label, BMenu* menu,
-									BMessage* message,
-									uint32 flags);
-								BMenuField(const char* label,
-									BMenu* menu, BMessage* message);
 
 			void				_DrawLabel(BRect updateRect);
 			void				_DrawMenuBar(BRect updateRect);

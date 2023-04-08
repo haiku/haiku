@@ -575,34 +575,18 @@ MainWindow::WorkspaceActivated(int32 workspace, bool active)
 {
 	BWindow::WorkspaceActivated(workspace, active);
 
-	// NOTE: hack to workaround buggy BScreen::DesktopColor() on R5
-
-	uint32 workspaces = Workspaces();
-	if (!active || ((1 << workspace) & workspaces) == 0)
-		return;
-
-	WorkspacesChanged(workspaces, workspaces);
+	if (active)
+		_WorkspaceEntered();
 }
 
 
 void
 MainWindow::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
-	if (oldWorkspaces != newWorkspaces)
-		BWindow::WorkspacesChanged(oldWorkspaces, newWorkspaces);
+	BWindow::WorkspacesChanged(oldWorkspaces, newWorkspaces);
 
-	BScreen screen(this);
-
-	// Unfortunately, this is buggy on R5: screen.DesktopColor()
-	// as well as ui_color(B_DESKTOP_COLOR) return the color
-	// of the *active* screen, not the one on which this window
-	// is. So this trick only works when you drag this window
-	// from another workspace onto the current workspace, not
-	// when you drag the window from the current workspace onto
-	// another workspace and then switch to the other workspace.
-
-	fIconPreview32Desktop->SetIconBGColor(screen.DesktopColor());
-	fIconPreview64->SetIconBGColor(screen.DesktopColor());
+	if((1 << current_workspace() & newWorkspaces) != 0)
+		_WorkspaceEntered();
 }
 
 
@@ -1268,6 +1252,18 @@ MainWindow::_ImproveScrollBarLayout(BView* target)
 		scrollBar->MoveBy(0, -1);
 		scrollBar->ResizeBy(0, 1);
 	}
+}
+
+
+// #pragma mark -
+
+
+void
+MainWindow::_WorkspaceEntered()
+{
+	BScreen screen(this);
+	fIconPreview32Desktop->SetIconBGColor(screen.DesktopColor());
+	fIconPreview64->SetIconBGColor(screen.DesktopColor());
 }
 
 

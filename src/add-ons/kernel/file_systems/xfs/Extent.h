@@ -51,15 +51,16 @@ struct FreeRegion {
 
 
 // This class will act as interface for V4 and V5 data header
-class ExtentDataHeader {
+class ExtentDataHeader
+{
 public:
-
 			virtual						~ExtentDataHeader()			=	0;
-			virtual uint32				Magic()						=	0;
-			virtual uint64				Blockno()					=	0;
-			virtual uint64				Lsn()						=	0;
-			virtual uint64				Owner()						=	0;
-			virtual uuid_t*				Uuid()						=	0;
+			virtual	uint32				Magic()						=	0;
+			virtual	uint64				Blockno()					=	0;
+			virtual	uint64				Lsn()						=	0;
+			virtual	uint64				Owner()						=	0;
+			virtual	const uuid_t&		Uuid()						=	0;
+
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
 			static	uint32				CRCOffset();
@@ -68,51 +69,62 @@ public:
 };
 
 
-//xfs_dir_data_hdr_t
-class ExtentDataHeaderV4 : public ExtentDataHeader {
+// xfs_dir_data_hdr_t
+class ExtentDataHeaderV4 : public ExtentDataHeader
+{
 public :
+			struct	OnDiskData {
+			public:
+					uint32				magic;
+					FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
+			};
 
 								ExtentDataHeaderV4(const char* buffer);
 								~ExtentDataHeaderV4();
-			void				SwapEndian();
 			uint32				Magic();
 			uint64				Blockno();
 			uint64				Lsn();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 
-			uint32				magic;
 private:
-			FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
+			void				_SwapEndian();
+
+private:
+			OnDiskData			fData;
 };
 
 
 // xfs_dir3_data_hdr_t
-class ExtentDataHeaderV5 : public ExtentDataHeader {
+class ExtentDataHeaderV5 : public ExtentDataHeader
+{
 public:
+			struct OnDiskData {
+			public:
+				uint32				magic;
+				uint32				crc;
+				uint64				blkno;
+				uint64				lsn;
+				uuid_t				uuid;
+				uint64				owner;
+				FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
+				uint32				pad;
+			};
+
 								ExtentDataHeaderV5(const char* buffer);
 								~ExtentDataHeaderV5();
-			void				SwapEndian();
 			uint32				Magic();
 			uint64				Blockno();
 			uint64				Lsn();
 			uint64				Owner();
-			uuid_t*				Uuid();
-public:
-			uint32				magic;
-			uint32				crc;
-private:
-			uint64				blkno;
-			uint64				lsn;
-			uuid_t				uuid;
-			uint64				owner;
-			FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
-			uint32				pad;
-};
+			const uuid_t&		Uuid();
 
-#define XFS_EXTENT_CRC_OFF  offsetof(ExtentDataHeaderV5, crc)
-#define XFS_EXTENT_V5_VPTR_OFF offsetof(ExtentDataHeaderV5, magic)
-#define XFS_EXTENT_V4_VPTR_OFF offsetof(ExtentDataHeaderV4, magic)
+private:
+			void				_SwapEndian();
+
+private:
+			OnDiskData 			fData;
+};
 
 
 // xfs_dir2_data_entry_t
@@ -131,7 +143,7 @@ struct ExtentUnusedEntry {
 			uint16				freetag;
 				// takes the value 0xffff
 			uint16				length;
-				// freetag+length overrides the inumber of an entry
+				// freetag + length overrides the inumber of an entry
 			uint16				tag;
 };
 

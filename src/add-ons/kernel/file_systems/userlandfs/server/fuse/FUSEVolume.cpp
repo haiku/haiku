@@ -14,9 +14,11 @@
 #include <NodeMonitor.h>
 
 #include <AutoDeleter.h>
+#include <StackOrHeapArray.h>
 
 #include "FUSELowLevel.h"
 
+#include "../IORequestInfo.h"
 #include "../kernel_emu.h"
 #include "../RequestThread.h"
 
@@ -894,7 +896,7 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 	// from statfs and make reasonable guesses for the rest of them.
 	struct statvfs st;
 	int fuseError;
-	
+
 	if (fOps != NULL) {
 		fuseError = fuse_ll_statfs(fOps, FUSE_ROOT_ID, &st);
 	} else {
@@ -959,6 +961,9 @@ FUSEVolume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 	if (entry == NULL)
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
+	if (entry->name == NULL || entry->name[0] == '\0')
+		RETURN_ERROR(B_BAD_DATA);
+
 	if (strlcpy(buffer, entry->name, bufferSize) >= bufferSize)
 		RETURN_ERROR(B_NAME_TOO_LONG);
 
@@ -1005,6 +1010,94 @@ FUSEVolume::RemoveVNode(void* node, bool reenter)
 {
 	// TODO: Implement for real!
 	return WriteVNode(node, reenter);
+}
+
+
+// #pragma mark - asynchronous I/O
+
+
+status_t
+FUSEVolume::DoIO(void* _node, void* _cookie, const IORequestInfo& requestInfo)
+{
+	FUSENode* node = (FUSENode*)_node;
+	FileCookie* cookie = (FileCookie*)_cookie;
+
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	if (!S_ISREG(node->type))
+		RETURN_ERROR(B_BAD_VALUE);
+
+	BStackOrHeapArray<char, B_PAGE_SIZE> buffer(requestInfo.length);
+
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+
+	int fuseError = 0;
+	status_t error = B_OK;
+
+	FileCookie alternativeCookie(requestInfo.isWrite ? O_WRONLY : O_RDONLY);
+	if (cookie == NULL) {
+		cookie = &alternativeCookie;
+
+		if (fOps != NULL) {
+			fuseError = fuse_ll_open(fOps, node->id, cookie);
+		} else {
+			AutoLocker<Locker> locker(fLock);
+
+			error = _BuildPath(node, path, pathLen);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			locker.Unlock();
+
+			fuseError = fuse_fs_open(fFS, path, cookie);
+		}
+	}
+
+	if (fuseError != 0)
+		RETURN_ERROR(fuseError);
+
+	RWLockableReadLocker cookieLocker(this, cookie);
+
+	if (requestInfo.isWrite) {
+		error = UserlandFS::KernelEmu::read_from_io_request(GetID(), requestInfo.id, buffer,
+			requestInfo.length);
+	}
+
+	if (error == B_OK) {
+		size_t bytesTransferred = 0;
+		while (bytesTransferred < requestInfo.length) {
+			size_t bytes = requestInfo.length - bytesTransferred;
+			error = _InternalIO(node, cookie, path, requestInfo.offset + bytesTransferred,
+				buffer + bytesTransferred, bytes, requestInfo.isWrite);
+
+			if (error == B_OK)
+				bytesTransferred += bytes;
+			else
+				break;
+		}
+	}
+
+	if (error == B_OK && !requestInfo.isWrite) {
+		error = UserlandFS::KernelEmu::write_to_io_request(GetID(), requestInfo.id, buffer,
+			requestInfo.length);
+	}
+
+	UserlandFS::KernelEmu::notify_io_request(GetID(), requestInfo.id, error);
+
+	if (cookie == &alternativeCookie) {
+		if (fOps != NULL)
+			fuse_ll_release(fOps, node->id, cookie);
+		else
+			fuse_fs_release(fFS, path, cookie);
+	}
+
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	return B_OK;
 }
 
 
@@ -1715,6 +1808,39 @@ FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 			NULL);
 	}
 
+	if (S_ISREG(node->type)) {
+		if (cookie->direct_io || llCookie.direct_io) {
+			if (node->cacheCount > 0) {
+				// In some very rare cases, for the same node, the first `open`
+				// indicates that caching is allowed (by not setting `direct_io`),
+				// but a subsequent `open` on the same node indicates that it is
+				// NOT allowed (by setting `direct_io` to 1).
+				debugger("FUSEVolume::Open(): inconsistent direct_io flags!");
+				UserlandFS::KernelEmu::file_cache_delete(GetID(), node->id);
+				node->cacheCount = 0;
+			}
+		} else {
+			if (node->cacheCount == 0) {
+				struct stat st;
+				if (fOps != NULL) {
+					fuseError = fuse_ll_getattr(fOps, node->id, &st);
+				} else {
+					fuseError = fuse_fs_getattr(fFS, path, &st);
+				}
+				if (fuseError != 0) {
+					RETURN_ERROR(fuseError);
+				}
+				status_t error = UserlandFS::KernelEmu::file_cache_create(GetID(), node->id, st.st_size);
+				if (error != B_OK) {
+					RETURN_ERROR(error);
+				}
+			}
+			// Increment cacheCount by extra 1 if the cache is kept to prevent
+			// the cache from being deleted at close().
+			node->cacheCount += 1 + cookie->keep_cache + llCookie.keep_cache;
+		}
+	}
+
 	cookieDeleter.Detach();
 	*_cookie = cookie;
 
@@ -1756,6 +1882,13 @@ FUSEVolume::Close(void* _node, void* _cookie)
 	}
 	if (fuseError != 0)
 		return fuseError;
+
+	if (S_ISREG(node->type) && node->cacheCount > 0) {
+		--node->cacheCount;
+		if (node->cacheCount == 0) {
+			UserlandFS::KernelEmu::file_cache_delete(GetID(), node->id);
+		}
+	}
 
 	return B_OK;
 }
@@ -1811,36 +1944,23 @@ FUSEVolume::Read(void* _node, void* _cookie, off_t pos, void* buffer,
 
 	RWLockableReadLocker cookieLocker(this, cookie);
 
-	*_bytesRead = 0;
-
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
 	if (nodeLocker.Status() != B_OK)
 		RETURN_ERROR(nodeLocker.Status());
 
-	int bytesRead;
+	*_bytesRead = bufferSize;
+	status_t error = B_OK;
 
-	if (fOps != NULL) {
-		bytesRead = fuse_ll_read(fOps, node->id, (char*)buffer, bufferSize, pos, cookie);
-	} else {
-		AutoLocker<Locker> locker(fLock);
+	if (S_ISREG(node->type) && node->cacheCount > 0) {
+		error = UserlandFS::KernelEmu::file_cache_read(GetID(), node->id, cookie, pos,
+			buffer, _bytesRead);
+	} else
+		error = _InternalIO(node, cookie, NULL, pos, (char *)buffer, *_bytesRead, false);
 
-		// get a path for the node
-		char path[B_PATH_NAME_LENGTH];
-		size_t pathLen;
-		status_t error = _BuildPath(node, path, pathLen);
-		if (error != B_OK)
-			RETURN_ERROR(error);
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
-		locker.Unlock();
-
-		// read the file
-		bytesRead = fuse_fs_read(fFS, path, (char*)buffer, bufferSize, pos, cookie);
-	}
-	if (bytesRead < 0)
-		return bytesRead;
-
-	*_bytesRead = bytesRead;
 	return B_OK;
 }
 
@@ -1861,27 +1981,17 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 	if (nodeLocker.Status() != B_OK)
 		RETURN_ERROR(nodeLocker.Status());
 
-	int bytesWritten;
-	if (fOps != NULL) {
-		bytesWritten = fuse_ll_write(fOps, node->id, (const char*)buffer, bufferSize, pos, cookie);
-	} else {
-		AutoLocker<Locker> locker(fLock);
+	*_bytesWritten = bufferSize;
+	status_t error = B_OK;
 
-		// get a path for the node
-		char path[B_PATH_NAME_LENGTH];
-		size_t pathLen;
-		status_t error = _BuildPath(node, path, pathLen);
-		if (error != B_OK)
-			RETURN_ERROR(error);
+	if (S_ISREG(node->type) && node->cacheCount > 0) {
+		error = UserlandFS::KernelEmu::file_cache_write(GetID(), node->id, cookie, pos,
+			buffer, _bytesWritten);
+	} else
+		error = _InternalIO(node, cookie, NULL, pos, (char *)buffer, *_bytesWritten, true);
 
-		locker.Unlock();
-
-		// write the file
-		bytesWritten = fuse_fs_write(fFS, path, (const char*)buffer, bufferSize,
-			pos, cookie);
-	}
-	if (bytesWritten < 0)
-		return bytesWritten;
+	if (error != B_OK)
+		RETURN_ERROR(error);
 
 	// mark the node dirty
 	AutoLocker<Locker> locker(fLock);
@@ -1895,7 +2005,6 @@ FUSEVolume::Write(void* _node, void* _cookie, off_t pos, const void* buffer,
 		// TODO: Avoid message flooding -- use a timeout and set the
 		// B_STAT_INTERIM_UPDATE flag.
 
-	*_bytesWritten = bytesWritten;
 	return B_OK;
 }
 
@@ -2710,6 +2819,8 @@ FUSEVolume::_PutNode(FUSENode* node)
 {
 	if (--node->refCount == 0) {
 		fNodes.Remove(node);
+		if (node->cacheCount != 0)
+			UserlandFS::KernelEmu::file_cache_delete(GetID(), node->id);
 		delete node;
 	}
 }
@@ -3495,4 +3606,47 @@ FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name,
 	}
 
 	return 0;
+}
+
+
+status_t
+FUSEVolume::_InternalIO(FUSENode* node, FileCookie* cookie, const char* path,
+	off_t pos, char* buffer, size_t& length, bool write)
+{
+	PRINT(("FUSEVolume::_InternalIO(%p, %p, %s, %" B_PRIdOFF ", %p, %" B_PRIuSIZE ", %d)\n",
+		node, cookie, path, pos, buffer, length, write));
+
+	int fuseError;
+	if (fOps != NULL) {
+		if (write)
+			fuseError = fuse_ll_write(fOps, node->id, buffer, length, pos, cookie);
+		else
+			fuseError = fuse_ll_read(fOps, node->id, buffer, length, pos, cookie);
+	} else {
+		char pathBuf[B_PATH_NAME_LENGTH];
+
+		if (path == NULL) {
+			AutoLocker<Locker> locker(fLock);
+
+			size_t pathLen;
+			status_t error = _BuildPath(node, pathBuf, pathLen);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			locker.Unlock();
+
+			path = pathBuf;
+		}
+
+		if (write)
+			fuseError = fuse_fs_write(fFS, path, buffer, length, pos, cookie);
+		else
+			fuseError = fuse_fs_read(fFS, path, buffer, length, pos, cookie);
+	}
+
+	if (fuseError < 0)
+		return fuseError;
+
+	length = fuseError;
+	return B_OK;
 }

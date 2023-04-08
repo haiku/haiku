@@ -36,6 +36,7 @@
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
+#include <NumberFormat.h>
 #include <ObjectList.h>
 #include <OS.h>
 #include <Path.h>
@@ -250,23 +251,26 @@ private:
 			float			_BaseWidth();
 			float			_BaseHeight();
 
-			const char*		_GetOSVersion();
-			const char*		_GetRamSize(system_info*);
-			const char*		_GetRamUsage(system_info*);
-			const char*		_GetUptime();
+			BString			_GetOSVersion();
+			BString			_GetRamSize(system_info*);
+			BString			_GetRamUsage(system_info*);
+			BString			_GetKernelDateTime(system_info*);
+			BString			_GetUptime();
 
 			float			_UptimeHeight();
 
 private:
-			BString			fText;
 			rgb_color		fDesktopTextColor;
 
 			BStringView*	fOSVersionView;
 			BStringView*	fMemSizeView;
 			BStringView*	fMemUsageView;
+			BStringView*	fKernelDateTimeView;
 			BTextView*		fUptimeView;
 
 			BDragger*		fDragger;
+
+			BNumberFormat	fNumberFormat;
 
 			float			fCachedBaseWidth;
 			float			fCachedMinWidth;
@@ -525,6 +529,7 @@ SysInfoView::SysInfoView()
 	fOSVersionView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
+	fKernelDateTimeView(NULL),
 	fUptimeView(NULL),
 	fDragger(NULL),
 	fCachedBaseWidth(kSysInfoMinWidth),
@@ -616,20 +621,7 @@ SysInfoView::SysInfoView()
 	fMemUsageView = _CreateSubtext("ramusagetext", _GetRamUsage(&sysInfo));
 
 	// Kernel build time/date
-	BString kernelTimeDate;
-	kernelTimeDate << sysInfo.kernel_build_date << " "
-		<< sysInfo.kernel_build_time;
-	BString buildTimeDate;
-
-	time_t buildTimeDateStamp = parsedate(kernelTimeDate, -1);
-	if (buildTimeDateStamp > 0) {
-		if (BDateTimeFormat().Format(buildTimeDate, buildTimeDateStamp,
-			B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) != B_OK)
-			buildTimeDate.SetTo(kernelTimeDate);
-	} else
-		buildTimeDate.SetTo(kernelTimeDate);
-
-	BStringView* kernelText = _CreateSubtext("kerneltext", buildTimeDate.String());
+	fKernelDateTimeView = _CreateSubtext("kerneltext", _GetKernelDateTime(&sysInfo));
 
 	// Uptime
 	fUptimeView = new BTextView("uptimetext");
@@ -660,7 +652,7 @@ SysInfoView::SysInfoView()
 		.AddStrut(offset)
 		// Kernel:
 		.Add(kernelLabel)
-		.Add(kernelText)
+		.Add(fKernelDateTimeView)
 		.AddStrut(offset)
 		// Time running:
 		.Add(uptimeLabel)
@@ -679,6 +671,7 @@ SysInfoView::SysInfoView(BMessage* archive)
 	fOSVersionView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
+	fKernelDateTimeView(NULL),
 	fUptimeView(NULL),
 	fDragger(NULL),
 	fCachedBaseWidth(kSysInfoMinWidth),
@@ -708,12 +701,18 @@ SysInfoView::SysInfoView(BMessage* archive)
 				fMemSizeView = dynamic_cast<BStringView*>(view);
 			else if (name == "ramusagetext")
 				fMemUsageView = dynamic_cast<BStringView*>(view);
+			else if (name == "kerneltext")
+				fKernelDateTimeView = dynamic_cast<BStringView*>(view);
 		} else if (name.IEndsWith("label"))
 			_UpdateLabel(dynamic_cast<BStringView*>(view));
 	}
 
-	// This might have changed after an update/reboot cycle;
+	system_info sysInfo;
+	get_system_info(&sysInfo);
+
+	// These might have changed after an update/reboot cycle;
 	fOSVersionView->SetText(_GetOSVersion());
+	fKernelDateTimeView->SetText(_GetKernelDateTime(&sysInfo));
 
 	fDragger = dynamic_cast<BDragger*>(ChildAt(0));
 }
@@ -1094,7 +1093,7 @@ SysInfoView::_BaseHeight()
 }
 
 
-const char*
+BString
 SysInfoView::_GetOSVersion()
 {
 	BString osVersion;
@@ -1123,42 +1122,70 @@ SysInfoView::_GetOSVersion()
 	if (hrev != NULL)
 		osVersion << " (" << B_TRANSLATE("Revision") << " " << hrev << ")";
 
-	return osVersion.String();
+	return osVersion;
 }
 
 
-const char*
+BString
 SysInfoView::_GetRamSize(system_info* sysInfo)
 {
+	BString ramSize;
 	int inaccessibleMemory = ignored_pages(sysInfo);
 
 	if (inaccessibleMemory <= 0)
-		fText.SetToFormat(B_TRANSLATE("%d MiB total"), max_pages(sysInfo));
+		ramSize.SetToFormat(B_TRANSLATE("%d MiB total"), max_pages(sysInfo));
 	else {
 		BString temp;
-		fText = B_TRANSLATE("%total MiB total, %inaccessible MiB inaccessible");
+		ramSize = B_TRANSLATE("%total MiB total, %inaccessible MiB inaccessible");
 		temp << max_and_ignored_pages(sysInfo);
-		fText.ReplaceFirst("%total", temp);
+		ramSize.ReplaceFirst("%total", temp);
 		temp.SetTo("");
 		temp << inaccessibleMemory;
-		fText.ReplaceFirst("%inaccessible", temp);
+		ramSize.ReplaceFirst("%inaccessible", temp);
 	}
 
-	return fText.String();
+	return ramSize;
 }
 
 
-const char*
+BString
 SysInfoView::_GetRamUsage(system_info* sysInfo)
 {
-	fText.SetToFormat(B_TRANSLATE("%d MiB used (%d%%)"), used_pages(sysInfo),
-		(int)(100 * sysInfo->used_pages / sysInfo->max_pages));
+	BString ramUsage;
+	BString data;
+	double usedMemoryPercent = double(sysInfo->used_pages) / sysInfo->max_pages;
 
-	return fText.String();
+	if (fNumberFormat.FormatPercent(data, usedMemoryPercent) != B_OK)
+		data.SetToFormat("%d%%", (int)(100 * usedMemoryPercent));
+
+	ramUsage.SetToFormat(B_TRANSLATE("%d MiB used (%s)"), used_pages(sysInfo), data.String());
+
+	return ramUsage;
 }
 
 
-const char*
+BString
+SysInfoView::_GetKernelDateTime(system_info* sysInfo)
+{
+	BString kernelDateTime;
+
+	BString buildDateTime;
+	buildDateTime << sysInfo->kernel_build_date << " " << sysInfo->kernel_build_time;
+
+	time_t buildDateTimeStamp = parsedate(buildDateTime, -1);
+
+	if (buildDateTimeStamp > 0) {
+		if (BDateTimeFormat().Format(kernelDateTime, buildDateTimeStamp,
+			B_LONG_DATE_FORMAT, B_MEDIUM_TIME_FORMAT) != B_OK)
+			kernelDateTime.SetTo(buildDateTime);
+	} else
+		kernelDateTime.SetTo(buildDateTime);
+
+	return kernelDateTime;
+}
+
+
+BString
 SysInfoView::_GetUptime()
 {
 	BDurationFormat formatter;
@@ -1168,7 +1195,7 @@ SysInfoView::_GetUptime()
 	bigtime_t now = (bigtime_t)time(NULL) * 1000000;
 	formatter.Format(uptimeText, now - uptime, now);
 
-	return uptimeText.String();
+	return uptimeText;
 }
 
 

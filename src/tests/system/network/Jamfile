@@ -24,6 +24,5 @@ SubInclude HAIKU_TOP src tests system network icmp ;
 SubInclude HAIKU_TOP src tests system network ipv6 ;
 SubInclude HAIKU_TOP src tests system network multicast ;
 SubInclude HAIKU_TOP src tests system network posixnet ;
-SubInclude HAIKU_TOP src tests system network sock ;
 SubInclude HAIKU_TOP src tests system network tcp_shell ;
 SubInclude HAIKU_TOP src tests system network tcptester ;

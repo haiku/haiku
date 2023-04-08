@@ -122,8 +122,8 @@ Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio 
 No user ratings available.	PackageInfoView		No hay valoraciones de usuario disponibles.
 <no info>	PackageInfoView		<no hay información>
 Usage conditions download problem	UserUsageConditions		Problema con la descarga de las condiciones de uso
-Rating	PackageListView		Valoraciones
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ha ocurrido un error de red al comunicarse con el sistema de servidores: %s
+Rating	PackageListView		Valoraciones
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizando iconos
 Show	MainWindow		Mostrar
 Settings…	MainWindow		Configuración…
@@ -152,8 +152,8 @@ Close	PackageManager		Cerrar
 Changelog	PackageInfoView		Registro de cambios
 About	PackageInfoView		Acerca de
 Password:	UserLoginWindow		Contraseña:
-Stability	RatePackageWindow		Estabilidad
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Esta aplicación es demasiado antigua para comunicarse con el sistema de servidores. Actualice su sistema para obtener una versión nueva de esta aplicación. La versión mínima requerida es «%s».
+Stability	RatePackageWindow		Estabilidad
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La contraseña debe ser repetida para evitar la posibilidad de un error en el ingreso de la misma.
 Cancel	SettingsWindow		Cancelar
 Cancel	RatePackageWindow		Cancelar

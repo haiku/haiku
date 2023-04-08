@@ -18,6 +18,14 @@
 
 #include "partition_support.h"
 
+#if (!defined(__BEOS__) && !defined(__HAIKU__))
+	// Defined in libroot_build.so.
+#	define _kern_readv	_kernbuild_readv
+#	define _kern_writev	_kernbuild_writev
+	extern "C" ssize_t _kern_readv(int fd, off_t pos, const struct iovec *vecs, size_t count);
+	extern "C" ssize_t _kern_writev(int fd, off_t pos, const struct iovec *vecs, size_t count);
+#endif
+
 
 static const int kMaxIOVecs = 1024;
 
@@ -55,14 +63,13 @@ fssh_readv(int fd, const struct fssh_iovec *vector, int count)
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 		return readv(fd, systemVecs, count);
 	#else
-		return readv_pos(fd, lseek(fd, 0, SEEK_CUR), systemVecs, count);
+		return _kern_readv(fd, lseek(fd, 0, SEEK_CUR), systemVecs, count);
 	#endif
 }
 
 
 fssh_ssize_t
-fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
-	int count)
+fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec, int count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vec, count, systemVecs))
@@ -72,7 +79,11 @@ fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
 	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
 		return -1;
 
+#if defined(__HAIKU__)
 	return readv_pos(fd, pos, systemVecs, count);
+#else
+	return _kern_readv(fd, pos, systemVecs, count);
+#endif
 }
 
 
@@ -91,14 +102,13 @@ fssh_writev(int fd, const struct fssh_iovec *vector, int count)
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 		return writev(fd, systemVecs, count);
 	#else
-		return writev_pos(fd, lseek(fd, 0, SEEK_CUR), systemVecs, count);
+		return _kern_writev(fd, lseek(fd, 0, SEEK_CUR), systemVecs, count);
 	#endif
 }
 
 
 fssh_ssize_t
-fssh_writev_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
-				int count)
+fssh_writev_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec, int count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vec, count, systemVecs))
@@ -108,5 +118,9 @@ fssh_writev_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
 	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
 		return -1;
 
+#if defined(__HAIKU__)
 	return writev_pos(fd, pos, systemVecs, count);
+#else
+	return _kern_writev(fd, pos, systemVecs, count);
+#endif
 }

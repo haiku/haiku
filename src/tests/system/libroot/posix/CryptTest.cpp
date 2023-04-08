@@ -7,6 +7,7 @@
  */
 
 
+#include <crypt.h>
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -23,6 +24,12 @@
 
 // This salt is only 31 bytes, while we need 32 bytes
 #define HASH_BAD_SALT "$s$12$101f2cf1a3b35aa671b8e006c6fb037e429d5b4ecb8dab16919097789e2d3a$ignorethis"
+
+#define LEGACY_SALT "1d"
+#define LEGACY_RESULT "1dVzQK99LSks6"
+
+#define BSD_SALT "_7C/.Bf/4"
+#define BSD_RESULT "_7C/.Bf/4gZk10RYRs4Y"
 
 
 CryptTest::CryptTest()
@@ -50,9 +57,18 @@ CryptTest::tearDown()
 void
 CryptTest::TestLegacy()
 {
-	char* buf = crypt(PASSWORD, "1d");
+	char* buf = crypt(PASSWORD, LEGACY_SALT);
 	CPPUNIT_ASSERT(buf != NULL);
-	CPPUNIT_ASSERT(strcmp(buf, "1dVzQK99LSks6") == 0);
+	CPPUNIT_ASSERT(strcmp(buf, LEGACY_RESULT) == 0);
+}
+
+
+void
+CryptTest::TestLegacyBSD()
+{
+	char* buf = crypt(PASSWORD, BSD_SALT);
+	CPPUNIT_ASSERT(buf != NULL);
+	CPPUNIT_ASSERT(strcmp(buf, BSD_RESULT) == 0);
 }
 
 
@@ -88,12 +104,31 @@ CryptTest::TestBadSalt()
 
 
 void
+CryptTest::TestCryptR()
+{
+	char tmp[200];
+
+	struct crypt_data data;
+	data.initialized = 0;
+
+	char* buf = crypt_r(PASSWORD, NULL, &data);
+	CPPUNIT_ASSERT(buf != NULL);
+	strlcpy(tmp, buf, sizeof(tmp));
+	buf = crypt(PASSWORD, tmp);
+	CPPUNIT_ASSERT(strcmp(buf, tmp) == 0);
+}
+
+
+void
 CryptTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("CryptTest");
 	suite.addTest(new CppUnit::TestCaller<CryptTest>(
 		"CryptTest::TestLegacy",
 		&CryptTest::TestLegacy));
+	suite.addTest(new CppUnit::TestCaller<CryptTest>(
+		"CryptTest::TestLegacyBSD",
+		&CryptTest::TestLegacyBSD));
 	suite.addTest(new CppUnit::TestCaller<CryptTest>(
 		"CryptTest::TestCustomSalt",
 		&CryptTest::TestCustomSalt));
@@ -103,5 +138,8 @@ CryptTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<CryptTest>(
 		"CryptTest::TestBadSalt",
 		&CryptTest::TestBadSalt));
+	suite.addTest(new CppUnit::TestCaller<CryptTest>(
+		"CryptTest::TestCryptR",
+		&CryptTest::TestCryptR));
 	parent.addTest("CryptTest", &suite);
 }

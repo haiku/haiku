@@ -14,11 +14,6 @@ typedef dev_t nspace_id;
 #	define WSTAT_ATIME B_STAT_ACCESS_TIME
 #	define WSTAT_MTIME B_STAT_MODIFICATION_TIME
 #	define WSTAT_CRTIME B_STAT_CREATION_TIME
-
-#else
-#	include "fsproto.h"
-#	define publish_vnode new_vnode
-typedef int socklen_t;
 #endif
 
 #include "RPCPendingCalls.h"

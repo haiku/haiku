@@ -11,7 +11,7 @@ Double-click speed	SettingsView		Velocitât dopli-clic
 5-Button	SettingsView		5-Botons
 Typing test area	KeyboardView		Aree di prove batidure
 Mouse type:	SettingsView		Gjenar di mouse:
-Revert	InputKeyboard		Torne indaûr
+Revert	InputKeyboard		Ripristine
 Fast	KeyboardView		Svelte
 Off	TouchpadPrefView		Distudât
 Never	TouchpadPrefView		Mai
@@ -37,7 +37,7 @@ Defaults	InputKeyboard		Predefinîts
 Quick	TouchpadPrefView		Veloç
 Short	KeyboardView		Curt
 Slow	KeyboardView		Lente
-Revert	InputMouse		Torne indaûr
+Revert	InputMouse		Ripristine
 Key repeat rate	KeyboardView		Velocitât ripetizion tast
 2-Button	SettingsView		2-Botons
 Click to focus and raise	SettingsView		Clic par meti a fûc e parâ denant
@@ -47,4 +47,4 @@ Focus follows mouse	SettingsView		Focalizazion daûr dal mouse
 Focus mode:	SettingsView		Mût par meti a fûc:
 Double-click test area	SettingsView		Aree di prove dopli-clic
 3-Button	SettingsView		3-Botons
-Revert	TouchpadPrefView		Torne indaûr
+Revert	TouchpadPrefView		Ripristine

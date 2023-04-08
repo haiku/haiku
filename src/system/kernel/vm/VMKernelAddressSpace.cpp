@@ -545,7 +545,7 @@ VMKernelAddressSpace::_InsertRange(Range* range)
 
 	// insert at the correct position in the range list
 	Range* insertBeforeRange = fRangeTree.FindClosest(range->base, true);
-	fRangeList.Insert(
+	fRangeList.InsertBefore(
 		insertBeforeRange != NULL
 			? fRangeList.GetNext(insertBeforeRange) : fRangeList.Head(),
 		range);

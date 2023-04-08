@@ -1,50 +1,49 @@
-1	polish	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Wyłącz
-Sort applications by name	PreferencesWindow		Sortuj aplikacje po nazwie
-Suspend	DeskbarMenu		Uśpij
-Hide clock	TimeView		Ukryj zegar
-Applications	PreferencesWindow		Aplikacje
-Time preferences…	TimeView		Ustawienia czasu...
-About Haiku	DeskbarMenu		Informacje o Haiku
-Edit in Tracker…	PreferencesWindow		Edytuj w Trakerze…
-Recent documents:	PreferencesWindow		Ostatnio używane dokumenty:
-Recent applications	DeskbarMenu		Ostatnio uruchamiane aplikacje
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
-Find…	DeskbarMenu		Znajdź…
-Show clock	Tray		Pokaż zegar
-Window	PreferencesWindow		Położenie
-Defaults	PreferencesWindow		Przywróć domyślne
-Menu	PreferencesWindow		Menu
-Recent documents	DeskbarMenu		Ostatnio używane dokumenty
+1	polish	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Autoukrywanie
-Always on top	PreferencesWindow		Zawsze na wierzchu
-<Deskbar folder is empty>	DeskbarMenu		<Katalog Deskbara jest pusty>
 Show all	WindowMenu		Pokaż wszystkie
-No windows	WindowMenu		Brak okien aplikacji
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Uruchom ponownie
+Edit in Tracker…	PreferencesWindow		Edytuj w Trakerze…
+Menu	PreferencesWindow		Menu
+Tracker always first	PreferencesWindow		Tracker zawsze na początku
+Hide clock	TimeView		Ukryj zegar
 Large	PreferencesWindow		Duże
+<Deskbar folder is empty>	DeskbarMenu		<Katalog Deskbara jest pusty>
+Recent documents	DeskbarMenu		Ostatnio używane dokumenty
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikacje
+Always on top	PreferencesWindow		Zawsze na wierzchu
+Restart system	DeskbarMenu		Uruchom ponownie
+Recent documents:	PreferencesWindow		Ostatnio używane dokumenty:
 Auto-raise	PreferencesWindow		Autoaktywacja
-Recent folders:	PreferencesWindow		Ostatnio przeglądane katalogi:
-Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
+Mount	DeskbarMenu		Zamontuj
+Icon size	PreferencesWindow		Rozmiar ikon
+About Haiku	DeskbarMenu		Informacje o Haiku
+Small	PreferencesWindow		Małe
+Show calendar…	TimeView		Pokaż kalendarz…
+Find…	DeskbarMenu		Znajdź…
+Power off	DeskbarMenu		Wyłącz
+Defaults	PreferencesWindow		Przywróć domyślne
+Show replicants	DeskbarMenu		Pokaż replikanty
+No windows	WindowMenu		Brak okien aplikacji
+Show clock	Tray		Pokaż zegar
 Close all	WindowMenu		Zamknij wszystkie
 Deskbar preferences	PreferencesWindow		Ustawienia Deskbara
-Mount	DeskbarMenu		Zamontuj
-Revert	PreferencesWindow		Cofnij
-Small	PreferencesWindow		Małe
-Recent applications:	PreferencesWindow		Ostatnio uruchamiane aplikacje:
-Shutdown…	DeskbarMenu		Wyłącz komputer…
-Tracker always first	PreferencesWindow		Tracker zawsze na początku
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Ustawienia
-Recent folders	DeskbarMenu		Ostatnio przeglądane katalogi
 About this system	DeskbarMenu		Informacje o systemie
-Show calendar…	TimeView		Pokaż kalendarz…
-Deskbar preferences…	DeskbarMenu		Ustawienia Deskbara…
-Expand new applications	PreferencesWindow		Rozwijaj uruchamiane aplikacje
-Show replicants	DeskbarMenu		Pokaż replikanty
-Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
-Icon size	PreferencesWindow		Rozmiar ikon
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety pulpitu
-Hide all	WindowMenu		Ukryj wszystkie
 Quit application	WindowMenu		Zakończ aplikację
+Hide application names	PreferencesWindow		Ukryj nazwy aplikacji
+Applications	PreferencesWindow		Aplikacje
+Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
+Deskbar preferences…	DeskbarMenu		Ustawienia Deskbara…
+Suspend	DeskbarMenu		Uśpij
+Shutdown…	DeskbarMenu		Wyłącz komputer…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dema
+Expand new applications	PreferencesWindow		Rozwijaj uruchamiane aplikacje
+Recent applications:	PreferencesWindow		Ostatnio uruchamiane aplikacje:
+Recent folders:	PreferencesWindow		Ostatnio przeglądane katalogi:
+Recent folders	DeskbarMenu		Ostatnio przeglądane katalogi
+Recent applications	DeskbarMenu		Ostatnio uruchamiane aplikacje
+Hide all	WindowMenu		Ukryj wszystkie
+Sort applications by name	PreferencesWindow		Sortuj aplikacje po nazwie
+Revert	PreferencesWindow		Cofnij
+Window	PreferencesWindow		Położenie
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Ustawienia
+Time preferences…	TimeView		Ustawienia czasu...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Aplety pulpitu

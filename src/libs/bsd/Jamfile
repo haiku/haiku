@@ -24,6 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			signal.c
 			string.cpp
 			stringlist.c
+			termios.c
 			unvis.c
 			usershell.c
 			vis.c

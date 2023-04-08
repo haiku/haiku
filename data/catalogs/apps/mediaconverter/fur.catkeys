@@ -1,7 +1,6 @@
-1	friulian	x-vnd.Haiku-MediaConverter	2816184527
+1	friulian	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Cualitât video: %3d%%
 Source files	MediaConverter		File sorzints
 Error writing video frame %lld	MediaConverter		Erôr tal scrivi il fotogram video %lld
 Error converting '%filename'	MediaConverter		Erôr tal convertî '%filename'
@@ -12,6 +11,7 @@ MediaConverter+:SaveDirectory	MediaConverter		ConvertidôrMultimediâl+:CarteleS
 Error creating video.	MediaConverter		Erôr tal creâ il video.
 Cancelling	MediaConverter		Daûr a cancelâ
 None available	Audio codecs		Nissun disponibil
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Il file al à plui liniis audio o video, a vignaran convertidis dome la prime dal audio e dal video.
 No file selected	MediaConverter-FileInfo		Nissun file selezionât
 High	MediaConverter		Alt
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Il file nol è stât ricognossût tra chei multimediâi supuartâts:} other{# file no son stâts ricognossûts tra chei multimediâi supuartâts:}}
@@ -26,7 +26,7 @@ Error loading a file	MediaConverter		Erôr tal cjariâ un file
 Encoder parameters	MediaConverter-EncoderWindow		Parametris dal codificadôr
 Open…	Menu		Vierç…
 Audio encoding:	MediaConverter		Codifiche Audio:
-Audio quality: %3d%%	MediaConverter		Cualitât audio: %3d%%
+Multi-track file detected	MediaConverter		Rilevât file cun plui liniis
 Cancelling…	MediaConverter		Anulament di…
 Output file '%filename' created	MediaConverter		File di jessude '%filename' creât
 Output folder	MediaConverter		Cartele di jessude
@@ -48,7 +48,6 @@ Error	MediaConverter		Erôr
 File details	MediaConverter		Detais dai file
 No audio	Audio codecs list		Nissun audio
 Drop media files onto this window	MediaConverter		Strissine i file multimediâi su chest barcon
-Writing video track: %ld%% complete	MediaConverter		Scriture de linie video: %ld%% completade
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# fotogram/campion} other{# fotograms/campions}}
 Error read audio frame %lld	MediaConverter		Erôr tal lei il pacut audio %lld
 Quit	Menu		Jes
@@ -57,12 +56,12 @@ Duration:	MediaConverter-FileInfo		Durade:
 MediaConverter	System name		ConvertidôrMultimediâl
 Error launching: %strError%	MediaConverter		Erôr tal inviâ: %strError%
 Error writing audio frame %lld	MediaConverter		Erôr tal scrivi il pacut audio %lld
-Writing audio track: %ld%% complete	MediaConverter		Scriture de linie audio: %ld%% completade
 File format:	MediaConverter		Formât file:
 File	Menu		File
 Video quality not supported	MediaConverter		Cualitât video no supuartade
 Select this folder	MediaConverter		Selezione cheste cartele
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canâl
+Understood	MediaConverter		Capît
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Nissun video
 Continue	MediaConverter		Continue

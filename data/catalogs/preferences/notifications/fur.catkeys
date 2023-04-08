@@ -12,7 +12,7 @@ Notifications preflet sample	PrefletWin		Esempli di notifiche preflet
 Mute notifications from this application	NotificationView		Cidine lis notifichis di cheste aplicazion
 wide	GeneralView	Window width: Slider high text	larc
 narrow	GeneralView	Window width: Slider low text	stret
-Revert	PrefletWin		Torne indaûr
+Revert	PrefletWin		Ripristine
 Applications	PrefletView		Aplicazions
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # secont}other{Timeout: # seconts}}
 Upper right	GeneralView		In alt a diestre

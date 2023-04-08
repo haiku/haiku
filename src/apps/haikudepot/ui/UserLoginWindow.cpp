@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -47,6 +47,7 @@
 #define KEY_USER_CREDENTIALS			"userCredentials"
 #define KEY_CAPTCHA_IMAGE				"captchaImage"
 #define KEY_USER_USAGE_CONDITIONS		"userUsageConditions"
+#define KEY_PASSWORD_REQUIREMENTS		"passwordRequirements"
 #define KEY_VALIDATION_FAILURES			"validationFailures"
 
 
@@ -67,7 +68,8 @@ enum {
 	MSG_LOGIN_ERROR						= 'lter',
 	MSG_CREATE_ACCOUNT_SUCCESS			= 'csuc',
 	MSG_CREATE_ACCOUNT_FAILED			= 'cfai',
-	MSG_CREATE_ACCOUNT_ERROR			= 'cfae'
+	MSG_CREATE_ACCOUNT_ERROR			= 'cfae',
+	MSG_VIEW_PASSWORD_REQUIREMENTS		= 'vpar'
 };
 
 
@@ -78,7 +80,8 @@ enum {
 
 enum CreateAccountSetupMask {
 	CREATE_CAPTCHA						= 1 << 1,
-	FETCH_USER_USAGE_CONDITIONS			= 1 << 2
+	FETCH_USER_USAGE_CONDITIONS			= 1 << 2,
+	FETCH_PASSWORD_REQUIREMENTS			= 1 << 3
 };
 
 
@@ -121,6 +124,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE),
+	fPasswordRequirements(NULL),
 	fUserUsageConditions(NULL),
 	fCaptcha(NULL),
 	fPreferredLanguageCode(LANGUAGE_DEFAULT_CODE),
@@ -178,6 +182,10 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		B_TRANSLATE("View the usage conditions"),
 		new BMessage(MSG_VIEW_LATEST_USER_USAGE_CONDITIONS));
 	fUserUsageConditionsLink->SetTarget(this);
+	fPasswordRequirementsLink = new LinkView("password requirements view",
+		B_TRANSLATE("View the password requirements"),
+		new BMessage(MSG_VIEW_PASSWORD_REQUIREMENTS));
+	fPasswordRequirementsLink->SetTarget(this);
 
 	// Setup modification messages on all text fields to trigger validation
 	// of input
@@ -208,14 +216,15 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	BLayoutBuilder::Grid<>(createAccountCard)
 		.AddTextControl(fNewNicknameField, 0, 0)
 		.AddTextControl(fNewPasswordField, 0, 1)
-		.AddTextControl(fRepeatPasswordField, 0, 2)
-		.AddTextControl(fEmailField, 0, 3)
-		.AddMenuField(fLanguageCodeField, 0, 4)
-		.Add(fCaptchaView, 0, 5)
-		.Add(fCaptchaResultField, 1, 5)
-		.Add(fConfirmMinimumAgeCheckBox, 1, 6)
-		.Add(fConfirmUserUsageConditionsCheckBox, 1, 7)
-		.Add(fUserUsageConditionsLink, 1, 8)
+		.Add(fPasswordRequirementsLink, 1, 2)
+		.AddTextControl(fRepeatPasswordField, 0, 3)
+		.AddTextControl(fEmailField, 0, 4)
+		.AddMenuField(fLanguageCodeField, 0, 5)
+		.Add(fCaptchaView, 0, 6)
+		.Add(fCaptchaResultField, 1, 6)
+		.Add(fConfirmMinimumAgeCheckBox, 1, 7)
+		.Add(fConfirmUserUsageConditionsCheckBox, 1, 8)
+		.Add(fUserUsageConditionsLink, 1, 9)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 	;
 	fTabView->AddTab(createAccountCard);
@@ -263,6 +272,10 @@ UserLoginWindow::MessageReceived(BMessage* message)
 
 		case MSG_VIEW_LATEST_USER_USAGE_CONDITIONS:
 			_ViewUserUsageConditions();
+			break;
+
+		case MSG_VIEW_PASSWORD_REQUIREMENTS:
+			_ViewPasswordRequirements();
 			break;
 
 		case MSG_SEND:
@@ -401,6 +414,7 @@ UserLoginWindow::_EnableMutableControls(bool enabled)
 	fConfirmMinimumAgeCheckBox->SetEnabled(enabled);
 	fConfirmUserUsageConditionsCheckBox->SetEnabled(enabled);
 	fUserUsageConditionsLink->SetEnabled(enabled);
+	fPasswordRequirementsLink->SetEnabled(enabled);
 	fSendButton->SetEnabled(enabled);
 }
 
@@ -667,6 +681,8 @@ UserLoginWindow::_CreateAccountSetupIfNecessary()
 		setupMask |= CREATE_CAPTCHA;
 	if (fUserUsageConditions == NULL)
 		setupMask |= FETCH_USER_USAGE_CONDITIONS;
+	if (fPasswordRequirements == NULL)
+		setupMask |= FETCH_PASSWORD_REQUIREMENTS;
 	_CreateAccountSetup(setupMask);
 }
 
@@ -695,6 +711,8 @@ UserLoginWindow::_CreateAccountSetup(uint32 mask)
 		_SetCaptcha(NULL);
 	if ((mask & FETCH_USER_USAGE_CONDITIONS) != 0)
 		_SetUserUsageConditions(NULL);
+	if ((mask & FETCH_PASSWORD_REQUIREMENTS) != 0)
+		_SetPasswordRequirements(NULL);
 
 	Unlock();
 
@@ -722,15 +740,29 @@ UserLoginWindow::_CreateAccountSetupThreadEntry(void* data)
 	status_t result = B_OK;
 	Captcha captcha;
 	UserUsageConditions userUsageConditions;
+	PasswordRequirements passwordRequirements;
+
 	bool shouldCreateCaptcha = (threadData->mask & CREATE_CAPTCHA) != 0;
 	bool shouldFetchUserUsageConditions
 		= (threadData->mask & FETCH_USER_USAGE_CONDITIONS) != 0;
+	bool shouldFetchPasswordRequirements
+		= (threadData->mask & FETCH_PASSWORD_REQUIREMENTS) != 0;
 
 	if (result == B_OK && shouldCreateCaptcha)
 		result = threadData->window->_CreateAccountCaptchaSetupThread(captcha);
 	if (result == B_OK && shouldFetchUserUsageConditions) {
 		result = threadData->window
 			->_CreateAccountUserUsageConditionsSetupThread(userUsageConditions);
+	}
+	if (result == B_OK && shouldFetchPasswordRequirements) {
+		result = threadData->window
+			->_CreateAccountPasswordRequirementsSetupThread(
+				passwordRequirements);
+		HDINFO("password requirements fetched; len %" B_PRId32
+			", caps %" B_PRId32 ", digits %" B_PRId32,
+			passwordRequirements.MinPasswordLength(),
+			passwordRequirements.MinPasswordUppercaseChar(),
+			passwordRequirements.MinPasswordUppercaseChar());
 	}
 
 	if (result == B_OK) {
@@ -747,6 +779,14 @@ UserLoginWindow::_CreateAccountSetupThreadEntry(void* data)
 			if (result == B_OK) {
 				result = message.AddMessage(KEY_USER_USAGE_CONDITIONS,
 					&userUsageConditionsMessage);
+			}
+		}
+		if (result == B_OK && shouldFetchPasswordRequirements) {
+			BMessage passwordRequirementsMessage;
+			result = passwordRequirements.Archive(&passwordRequirementsMessage);
+			if (result == B_OK) {
+				result = message.AddMessage(KEY_PASSWORD_REQUIREMENTS,
+					&passwordRequirementsMessage);
 			}
 		}
 		if (result == B_OK) {
@@ -784,6 +824,27 @@ UserLoginWindow::_CreateAccountUserUsageConditionsSetupThread(
 			B_TRANSLATE("Usage conditions download problem"),
 			B_TRANSLATE("An error has arisen downloading the usage "
 				"conditions required to create a new user. Check the log for "
+				"details and try again. "
+				ALERT_MSG_LOGS_USER_GUIDE));
+	}
+
+	return result;
+}
+
+
+status_t
+UserLoginWindow::_CreateAccountPasswordRequirementsSetupThread(
+	PasswordRequirements& passwordRequirements)
+{
+	WebAppInterface interface = fModel.GetWebAppInterface();
+	status_t result = interface.RetrievePasswordRequirements(
+		passwordRequirements);
+
+	if (result != B_OK) {
+		AppUtils::NotifySimpleError(
+			B_TRANSLATE("Password requirements download problem"),
+			B_TRANSLATE("An error has arisen downloading the password "
+				"requirements required to create a new user. Check the log for "
 				"details and try again. "
 				ALERT_MSG_LOGS_USER_GUIDE));
 	}
@@ -891,8 +952,10 @@ void
 UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 {
 	HDDEBUG("handling account setup success");
+
 	BMessage captchaMessage;
 	BMessage userUsageConditionsMessage;
+	BMessage passwordRequirementsMessage;
 
 	if (message->FindMessage(KEY_CAPTCHA_IMAGE, &captchaMessage) == B_OK)
 		_SetCaptcha(new Captcha(&captchaMessage));
@@ -901,6 +964,12 @@ UserLoginWindow::_HandleCreateAccountSetupSuccess(BMessage* message)
 			&userUsageConditionsMessage) == B_OK) {
 		_SetUserUsageConditions(
 			new UserUsageConditions(&userUsageConditionsMessage));
+	}
+
+	if (message->FindMessage(KEY_PASSWORD_REQUIREMENTS,
+			&passwordRequirementsMessage) == B_OK) {
+		_SetPasswordRequirements(
+			new PasswordRequirements(&passwordRequirementsMessage));
 	}
 
 	_EnableMutableControls(true);
@@ -949,6 +1018,24 @@ UserLoginWindow::_SetUserUsageConditions(
 		fConfirmMinimumAgeCheckBox->SetLabel(PLACEHOLDER_TEXT);
 		fConfirmMinimumAgeCheckBox->SetValue(0);
 		fConfirmUserUsageConditionsCheckBox->SetValue(0);
+	}
+}
+
+
+void
+UserLoginWindow::_SetPasswordRequirements(
+	PasswordRequirements* passwordRequirements)
+{
+	HDDEBUG("setting password requirements");
+	if (fPasswordRequirements != NULL)
+		delete fPasswordRequirements;
+	fPasswordRequirements = passwordRequirements;
+	if (fPasswordRequirements != NULL) {
+		HDDEBUG("password requirements set to; len %" B_PRId32
+			", caps %" B_PRId32 ", digits %" B_PRId32,
+			fPasswordRequirements->MinPasswordLength(),
+			fPasswordRequirements->MinPasswordUppercaseChar(),
+			fPasswordRequirements->MinPasswordUppercaseChar());
 	}
 }
 
@@ -1356,4 +1443,28 @@ UserLoginWindow::_ViewUserUsageConditions()
 	UserUsageConditionsWindow* window = new UserUsageConditionsWindow(
 		fModel, *fUserUsageConditions);
 	window->Show();
+}
+
+
+void
+UserLoginWindow::_ViewPasswordRequirements()
+{
+	if (fPasswordRequirements == NULL)
+		HDFATAL("the password requirements must have been setup");
+	BString msg = B_TRANSLATE("The password must be a minimum of "
+		"%MinPasswordLength% characters. "
+		"%MinPasswordUppercaseChar% characters must be upper-case and "
+		"%MinPasswordDigitsChar% characters must be digits.");
+	msg.ReplaceAll("%MinPasswordLength%",
+		BString() << fPasswordRequirements->MinPasswordLength());
+	msg.ReplaceAll("%MinPasswordUppercaseChar%",
+		BString() << fPasswordRequirements->MinPasswordUppercaseChar());
+	msg.ReplaceAll("%MinPasswordDigitsChar%",
+		BString() << fPasswordRequirements->MinPasswordDigitsChar());
+
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE("Password requirements"), msg, B_TRANSLATE("OK"));
+
+	if (alert != NULL)
+		alert->Go();
 }

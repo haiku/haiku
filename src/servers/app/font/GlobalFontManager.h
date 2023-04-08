@@ -13,13 +13,8 @@
 #include "FontManager.h"
 
 #include <AutoDeleter.h>
-#include <HashMap.h>
 #include <Looper.h>
 #include <ObjectList.h>
-#include <Referenceable.h>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 
 class BEntry;
@@ -36,10 +31,16 @@ class ServerFont;
 	\class GlobalFontManager GlobalFontManager.h
 	\brief Manager for system fonts within the font subsystem
 */
-class GlobalFontManager : public FontManagerBase {
+class GlobalFontManager : public FontManager, public BLooper {
 public:
 								GlobalFontManager();
 	virtual						~GlobalFontManager();
+
+			bool				Lock() { return BLooper::Lock(); }
+			void				Unlock() { BLooper::Unlock(); }
+			bool				IsLocked() const { return BLooper::IsLocked(); }
+
+			status_t			InitCheck() { return fInitStatus; }
 
 			void				SaveRecentFontMappings();
 
@@ -58,11 +59,11 @@ public:
 
 			void				AttachUser(uid_t userID);
 			void				DetachUser(uid_t userID);
-	virtual FontFamily*			GetFamily(uint16 familyID) const;
-	virtual	FontFamily*			GetFamily(const char* name);
-	virtual	FontStyle*			GetStyle(uint16 familyID,
-									uint16 styleID) const;
 
+	virtual	FontFamily*			GetFamily(uint16 familyID) const;
+	virtual	FontFamily*			GetFamily(const char* name);
+
+	virtual	FontStyle*			GetStyle(uint16 familyID, uint16 styleID) const;
 	virtual	FontStyle*			GetStyle(const char* familyName,
 									const char* styleName,
 									uint16 familyID = 0xffff,
@@ -102,6 +103,7 @@ private:
 									const char* fallbackStyle,
 									uint16 fallbackFace);
 			status_t			_SetDefaultFonts();
+
 private:
 			status_t			fInitStatus;
 
@@ -124,7 +126,5 @@ private:
 
 
 extern GlobalFontManager* gFontManager;
-
-extern FT_Library gFreeTypeLibrary;
 
 #endif	/* GLOBAL_FONT_MANAGER_H */

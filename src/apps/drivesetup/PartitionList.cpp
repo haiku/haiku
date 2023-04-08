@@ -413,7 +413,7 @@ PartitionListRow::DevicePath()
 
 
 PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
-	: Inherited(frame, "storagelist", resizeMode, 0, B_NO_BORDER, true)
+	: Inherited(frame, "partitionlist", resizeMode, 0, B_NO_BORDER, true)
 {
 	AddColumn(new PartitionColumn(B_TRANSLATE("Device"), 150, 50, 500,
 		B_TRUNCATE_MIDDLE), kDeviceColumn);

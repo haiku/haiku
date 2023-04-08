@@ -1,6 +1,7 @@
 // NetAddress.cpp
 
 #include <new>
+#include <compatibility/bsd/features.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <unistd.h>

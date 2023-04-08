@@ -161,16 +161,6 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, PageTableDumper& du
 }
 
 
-static VMArea* LookupArea(area_id id)
-{
-	VMAreaHash::ReadLock();
-	VMArea* area = VMAreaHash::LookupLocked(id);
-	VMAreaHash::ReadUnlock();
-
-	return area;
-}
-
-
 static int
 DumpPageTable(int argc, char** argv)
 {
@@ -198,7 +188,7 @@ DumpPageTable(int argc, char** argv)
 			uint64 areaId;
 			if (!evaluate_debug_expression(argv[curArg++], &areaId, false))
 				return 0;
-			VMArea* area = LookupArea((area_id)areaId);
+			VMArea* area = VMAreas::Lookup((area_id)areaId);
 			if (area == NULL) {
 				kprintf("could not find area %" B_PRId32 "\n", (area_id)areaId);
 				return 0;

@@ -171,6 +171,9 @@ class ServerFont {
 			status_t			IncludesUnicodeBlock(uint32 start, uint32 end,
 									bool &hasBlock);
 
+			FontManager*		Manager() const
+									{ return fStyle->Manager(); }
+
 			void  				SetFontData(FT_Byte* location, uint32 size);
 			uint32				FontDataSize() const
 									{ return fStyle->FontDataSize(); }

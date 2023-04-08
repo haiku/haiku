@@ -140,6 +140,7 @@ local applicationSources =
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
+	PasswordRequirements.cpp
 	RatePackageWindow.cpp
 	RatingView.cpp
 	RatingStability.cpp

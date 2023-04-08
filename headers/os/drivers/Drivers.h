@@ -33,9 +33,9 @@ typedef status_t (*device_select_hook)(void *cookie, uint8 event, uint32 ref,
 	selectsync *sync);
 typedef status_t (*device_deselect_hook)(void *cookie, uint8 event,
 	selectsync *sync);
-typedef status_t (*device_read_pages_hook)(void *cookie, off_t position,
+typedef status_t (*device_readv_hook)(void *cookie, off_t position,
 	const iovec *vec, size_t count, size_t *_numBytes);
-typedef status_t (*device_write_pages_hook)(void *cookie, off_t position,
+typedef status_t (*device_writev_hook)(void *cookie, off_t position,
 	const iovec *vec, size_t count, size_t *_numBytes);
 
 #define	B_CUR_DRIVER_API_VERSION	2
@@ -50,10 +50,10 @@ typedef struct {
 	device_write_hook		write;			/* writes to the device */
 	device_select_hook		select;			/* start select */
 	device_deselect_hook	deselect;		/* stop select */
-	device_read_pages_hook	read_pages;
-		/* scatter-gather physical read from the device */
-	device_write_pages_hook	write_pages;
-		/* scatter-gather physical write to the device */
+	device_readv_hook	readv;
+		/* scatter-gather read from the device */
+	device_writev_hook	writev;
+		/* scatter-gather write to the device */
 } device_hooks;
 
 /* Driver functions needed to be exported by legacy drivers */

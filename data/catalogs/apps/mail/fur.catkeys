@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	1477453861
+1	friulian	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Met come Salvât
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressie lâ ben forsit une cumbinazion di caratars diferente? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
@@ -42,7 +42,6 @@ Copy link location	Mail		Copie posizion colegament
 Attachments: 	Mail		Zontis: 
 Remove enclosure	Mail		Gjave zonte
 Next	Mail		Sucessîf
-Attachments:	Mail		Zontis:
 Show icons only	Mail		Mostre dome lis iconis
 Subject:	Mail		Ogjet:
 OK	Mail		Va ben
@@ -163,7 +162,7 @@ Delete	Mail		Elimine
 Put your favorite e-mail queries and query templates in this folder.	Mail		Met lis tôs interogazions di e-mail preferidis e i modei di interogazion in cheste cartele.
 Spam	Mail		Malvolude
 Couldn't open this signature. Sorry.	Mail		Impussibil vierzi cheste firme. Scuse.
-Revert	Mail		Torne indaûr
+Revert	Mail		Ripristine
 Unknown	Mail		No cognossût
 Increase quote level	Mail		Aumente nivel di citazion
 Add enclosure…	Mail		Inserìs zonte…

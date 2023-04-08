@@ -1,50 +1,49 @@
-1	danish	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Sluk
-Sort applications by name	PreferencesWindow		Sortér programmer efter navn
-Suspend	DeskbarMenu		Suspendér
-Hide clock	TimeView		Skjul ur
-Applications	PreferencesWindow		Programmer
-Time preferences…	TimeView		Tidspræferencer…
-About Haiku	DeskbarMenu		Om Haiku
-Edit in Tracker…	PreferencesWindow		Rediger i Tracker…
-Recent documents:	PreferencesWindow		Seneste dokumenter:
-Recent applications	DeskbarMenu		Seneste programmer
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
-Find…	DeskbarMenu		Find…
-Show clock	Tray		Vis ur
-Window	PreferencesWindow		Vindue
-Defaults	PreferencesWindow		Standarder
-Menu	PreferencesWindow		Menu
-Recent documents	DeskbarMenu		Seneste dokumenter
+1	danish	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Skjul automatisk
-Always on top	PreferencesWindow		Altid øverst
-<Deskbar folder is empty>	DeskbarMenu		<Skrivebordslinje-mappe er tom>
 Show all	WindowMenu		Vis alle
-No windows	WindowMenu		Ingen vinduer
-Deskbar	System name		Skrivebordslinje
-Restart system	DeskbarMenu		Genstart systemet
+Edit in Tracker…	PreferencesWindow		Rediger i Tracker…
+Menu	PreferencesWindow		Menu
+Tracker always first	PreferencesWindow		Tracker altid først
+Hide clock	TimeView		Skjul ur
 Large	PreferencesWindow		Stor
+<Deskbar folder is empty>	DeskbarMenu		<Skrivebordslinje-mappe er tom>
+Recent documents	DeskbarMenu		Seneste dokumenter
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
+Always on top	PreferencesWindow		Altid øverst
+Restart system	DeskbarMenu		Genstart systemet
+Recent documents:	PreferencesWindow		Seneste dokumenter:
 Auto-raise	PreferencesWindow		Auto hæv
-Recent folders:	PreferencesWindow		Seneste mapper:
-Show application expander	PreferencesWindow		Vis programudvider
+Mount	DeskbarMenu		Montér
+Icon size	PreferencesWindow		Ikonstørrelse
+About Haiku	DeskbarMenu		Om Haiku
+Small	PreferencesWindow		Lille
+Show calendar…	TimeView		Vis kalender…
+Find…	DeskbarMenu		Find…
+Power off	DeskbarMenu		Sluk
+Defaults	PreferencesWindow		Standarder
+Show replicants	DeskbarMenu		Vis replikanter
+No windows	WindowMenu		Ingen vinduer
+Show clock	Tray		Vis ur
 Close all	WindowMenu		Luk alle
 Deskbar preferences	PreferencesWindow		Præferencer for skrivebordslinje
-Mount	DeskbarMenu		Montér
-Revert	PreferencesWindow		Tilbagefør
-Small	PreferencesWindow		Lille
-Recent applications:	PreferencesWindow		Seneste programmer:
-Shutdown…	DeskbarMenu		Luk ned…
-Tracker always first	PreferencesWindow		Tracker altid først
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Præferencer
-Recent folders	DeskbarMenu		Seneste mapper
 About this system	DeskbarMenu		Om systemet
-Show calendar…	TimeView		Vis kalender…
-Deskbar preferences…	DeskbarMenu		Præferencer for skrivebordslinje…
-Expand new applications	PreferencesWindow		Udvid nye programmer
-Show replicants	DeskbarMenu		Vis replikanter
-Hide application names	PreferencesWindow		Skjul programnavne
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
-Icon size	PreferencesWindow		Ikonstørrelse
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivebordsappletter
-Hide all	WindowMenu		Skjul alle
 Quit application	WindowMenu		Afslut program
+Hide application names	PreferencesWindow		Skjul programnavne
+Applications	PreferencesWindow		Programmer
+Show application expander	PreferencesWindow		Vis programudvider
+Deskbar preferences…	DeskbarMenu		Præferencer for skrivebordslinje…
+Suspend	DeskbarMenu		Suspendér
+Shutdown…	DeskbarMenu		Luk ned…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
+Expand new applications	PreferencesWindow		Udvid nye programmer
+Recent applications:	PreferencesWindow		Seneste programmer:
+Recent folders:	PreferencesWindow		Seneste mapper:
+Recent folders	DeskbarMenu		Seneste mapper
+Recent applications	DeskbarMenu		Seneste programmer
+Hide all	WindowMenu		Skjul alle
+Sort applications by name	PreferencesWindow		Sortér programmer efter navn
+Revert	PreferencesWindow		Tilbagefør
+Window	PreferencesWindow		Vindue
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Præferencer
+Time preferences…	TimeView		Tidspræferencer…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivebordsappletter

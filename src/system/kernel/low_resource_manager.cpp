@@ -488,7 +488,7 @@ register_low_resource_handler(low_resource_func function, void* data,
 		low_resource_handler *handler = iterator.Next();
 
 		if (handler->priority >= priority) {
-			sLowResourceHandlers.Insert(last, newHandler);
+			sLowResourceHandlers.InsertBefore(last, newHandler);
 			return B_OK;
 		}
 		last = handler;

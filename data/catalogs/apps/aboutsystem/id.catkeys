@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-About	4168448386
+1	indonesian	x-vnd.Haiku-About	263077323
 Revision	AboutView		Revisi
 The Haikuware team and their bounty program\n	AboutView		Tim Haikuware dan Program hadiah mereka\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Hak Cipta © 1999-2007 Michael C. Ring. Hak cipta dilindungi undang-undang.
@@ -37,7 +37,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (pendiri proyek)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Tentang sistem ini
-%d MiB used (%d%%)	AboutView		%d MiB terpakai (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Hak Cipta © 1999-2010 oleh penulis Gutenprint. Hak cipta dilindungi Undang-Undang.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Hak Cipta © 1994-1997 Mark Kilgard. Hak cipta dilindungi undang-undang.
 AboutSystem	System name		AboutSystem

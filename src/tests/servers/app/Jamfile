@@ -109,12 +109,14 @@ local decorator_src =
 	;
 
 local font_src =
+	AppFontManager.cpp
 	FontCache.cpp
 	FontCacheEntry.cpp
 	FontEngine.cpp
 	FontFamily.cpp
 	FontManager.cpp
 	FontStyle.cpp
+	GlobalFontManager.cpp
 	;
 
 # These files are shared between the test_app_server and the libhwintreface, so

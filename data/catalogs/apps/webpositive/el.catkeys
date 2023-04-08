@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	3896191867
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Ακύρωση
 Settings	Settings Window		Ρυθμίσεις
 Downloads	WebPositive Window		Λήψεις
 Browse…	Settings Window		Περιήγηση…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Υπάρχει ήδη σελιδοδείκτης για αυτήν την σελίδα (%bookmarkName).
 Resume prior session	Settings Window		Επαναφορά προηγούμενης συνεδρίας
 Match case	WebPositive Window		Ταίριασμα πεζών-κεφαλαίων
 Proxy password:	Settings Window		Κωδικός μεσολαβητή:
@@ -106,8 +105,8 @@ Default standard font size:	Settings Window		Προεπιλεγμένο μέγε
 Custom	Settings Window		Προσαρμογή
 Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες
 Show tabs if only one page is open	Settings Window		Να εμφανίζονται οι καρτέλες όταν μόνο μία σελίδα είναι ανοιχτή
-Close tab	WebPositive Window		Κλείσιμο καρτέλας
 Remove	Download Window		Αφαίρεση
+Close tab	WebPositive Window		Κλείσιμο καρτέλας
 About	WebPositive Window		Σχετικά
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Υπάρχουν ακόμα λήψεις που βρίσκονται σε εξέλιξη, είστε σίγουρος ότι θέλετε να κλείσετε τον Περιηγητή Ιστού τώρα;
 Continue downloads	WebPositive		Συνέχιση λήψεων
@@ -158,7 +157,6 @@ Downloads	Download Window		Λήψεις
 Open blank page	Settings Window		Άνοιγμα κενής σελίδας
 Clear history	WebPositive Window		Καθαρισμός ιστορικού
 Cancel	WebPositive Window		Ακύρωση
-Bookmark info	WebPositive Window		Πληροφορίες σελιδοδείκτη
 Script console	Console Window		Κονσόλα σεναρίων
 Copy	URL Bar		Αντιγραφή
 Open start page	Settings Window		Άνοιγμα αρχικής σελίδας

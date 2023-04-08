@@ -1,12 +1,14 @@
-1	german	x-vnd.Haiku-WebPositive	3896191867
+1	german	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
+Copy	Console Window		Kopieren
 (Finish: %date)	Download Window		(Fertig: %date)
 Open bookmarks confirmation	WebPositive Window		Lesezeichen öffnen
 Download folder:	Settings Window		Download-Ordner:
 Close window	WebPositive Window		Fenster schließen
 Find:	WebPositive Window		Suchen:
 Script console	WebPositive Window		Skript-Konsole
+There was an error setting up the bookmark.	WebPositive Window		Fehler beim erstellen des Lesezeichens.
 Fonts	Settings Window		Schriftarten
 Path	Cookie Manager		Pfad
 Bookmarks	WebPositive Window		Lesezeichen
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Löschen
 Open containing folder	Download Window		Speicherort öffnen
 Find previous	WebPositive Window		Vorheriger Treffer
 Full screen	WebPositive Window		Vollbild
+Bookmark bar	WebPositive Window		Lesezeichenleiste
 Downloads in progress	WebPositive		Download Warnung
 Copy URL to clipboard	Download Window		Adresse kopieren
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
@@ -28,7 +31,6 @@ Cancel	Download Window		Abbrechen
 Settings	Settings Window		Einstellungen
 Downloads	WebPositive Window		Downloads
 Browse…	Settings Window		Auswählen …
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
 Resume prior session	Settings Window		Vorige Sitzung fortsetzen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
 Proxy password:	Settings Window		Proxy-Passwort:
@@ -102,12 +104,13 @@ Apply	Settings Window		Anwenden
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
 Revert	Settings Window		Anfangswerte
 Copy	WebPositive Window		Kopieren
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Die letzte Zeile wurde einmal wiederholt.}other{Die letzte Zeile wurde # mal wiederholt.}}
 Default standard font size:	Settings Window		Größe der Standard-Schrift:
 Custom	Settings Window		Benutzerdefiniert
 Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
 Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
-Close tab	WebPositive Window		Reiter schließen
 Remove	Download Window		Entfernen
+Close tab	WebPositive Window		Reiter schließen
 About	WebPositive Window		Über
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
 Continue downloads	WebPositive		Downloads fortsetzen
@@ -158,7 +161,6 @@ Downloads	Download Window		Downloads
 Open blank page	Settings Window		Leere Seite öffnen
 Clear history	WebPositive Window		Verlauf leeren
 Cancel	WebPositive Window		Abbrechen
-Bookmark info	WebPositive Window		Lesezeichen Info
 Script console	Console Window		Skript-Konsole
 Copy	URL Bar		Kopieren
 Open start page	Settings Window		Startseite öffnen

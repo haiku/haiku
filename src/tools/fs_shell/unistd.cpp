@@ -41,8 +41,12 @@
 
 #if (!defined(__BEOS__) && !defined(__HAIKU__))
 	// Defined in libroot_build.so.
+#	define _kern_read	_kernbuild_read
+#	define _kern_write	_kernbuild_write
 #	define _kern_dup	_kernbuild_dup
 #	define _kern_close	_kernbuild_close
+	extern "C" ssize_t _kern_read(int fd, off_t pos, void *buffer, size_t bufferSize);
+	extern "C" ssize_t _kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
 	extern "C" int _kern_dup(int fd);
 	extern "C" status_t _kern_close(int fd);
 #endif
@@ -372,7 +376,7 @@ fssh_read(int fd, void *buffer, fssh_size_t count)
 			return -1;
 		return read(fd, buffer, count);
 	#else
-		fssh_ssize_t bytesRead = read_pos(fd, fssh_lseek(fd, 0, FSSH_SEEK_CUR),
+		fssh_ssize_t bytesRead = _kern_read(fd, fssh_lseek(fd, 0, FSSH_SEEK_CUR),
 			buffer, count);
 		if (bytesRead > 0)
 			fssh_lseek(fd, bytesRead, FSSH_SEEK_CUR);
@@ -386,7 +390,11 @@ fssh_read_pos(int fd, fssh_off_t pos, void *buffer, fssh_size_t count)
 {
 	if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
 		return -1;
+#if defined(__HAIKU__)
 	return read_pos(fd, pos, buffer, count);
+#else
+	return _kern_read(fd, pos, buffer, count);
+#endif
 }
 
 
@@ -413,7 +421,11 @@ fssh_write_pos(int fd, fssh_off_t pos, const void *buffer, fssh_size_t count)
 {
 	if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
 		return -1;
+#if defined(__HAIKU__)
 	return write_pos(fd, pos, buffer, count);
+#else
+	return _kern_write(fd, pos, buffer, count);
+#endif
 }
 
 

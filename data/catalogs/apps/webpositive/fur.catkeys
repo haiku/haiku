@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	3896191867
+1	friulian	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Cartele dai file discjariâts:
 Close window	WebPositive Window		Siere barcon
 Find:	WebPositive Window		Cjate:
 Script console	WebPositive Window		Console script
+There was an error setting up the bookmark.	WebPositive Window		Al è vignût fûr un erôr tal configurâ il segnelibri.
 Fonts	Settings Window		Caratars
 Path	Cookie Manager		Percors
 Bookmarks	WebPositive Window		Segnelibris
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Elimine
 Open containing folder	Download Window		Mostre te cartele
 Find previous	WebPositive Window		Cjate precedent
 Full screen	WebPositive Window		Plen visôr
+Bookmark bar	WebPositive Window		Sbare dai segnelibris
 Downloads in progress	WebPositive		Discjariaments in pîts
 Copy URL to clipboard	Download Window		Copie URL tes notis
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
@@ -28,7 +30,6 @@ Cancel	Download Window		Anule
 Settings	Settings Window		Impostazions
 Downloads	WebPositive Window		File discjariâts
 Browse…	Settings Window		Esplore…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnelibri par cheste pagjine (%bookmarkName) al esist za.
 Resume prior session	Settings Window		Ripie la session precedente
 Match case	WebPositive Window		Corispondence maiusc./minusc.
 Proxy password:	Settings Window		Peraule di ordin dal proxy:
@@ -100,14 +101,14 @@ Restart	Download Window		Torne invie
 Serif font:	Settings Window		Caratar Serif:
 Apply	Settings Window		Apliche
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Al è vignût fûr un erôr tal cirî di mostrâ la cartele dai segnelibris.\n\nErôr: %error
-Revert	Settings Window		Torne indaûr
+Revert	Settings Window		Ripristine
 Copy	WebPositive Window		Copie
 Default standard font size:	Settings Window		Dimension dal caratar standard predefinide:
 Custom	Settings Window		Personalizât
 Bookmark this page	WebPositive Window		Zonte cheste pagjine ai segnelibris
 Show tabs if only one page is open	Settings Window		Mostre schedis ancje se e je vierte dome une pagjine
-Close tab	WebPositive Window		Siere schede
 Remove	Download Window		Gjave
+Close tab	WebPositive Window		Siere schede
 About	WebPositive Window		Informazions
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		A son ancjemò in pîts dai discjariaments, jessî pardabon di WebPositive cumò?
 Continue downloads	WebPositive		Ripie i discjariaments
@@ -158,7 +159,6 @@ Downloads	Download Window		File discjariâts
 Open blank page	Settings Window		Vierç pagjine vueide
 Clear history	WebPositive Window		Nete cronologjie
 Cancel	WebPositive Window		Anule
-Bookmark info	WebPositive Window		Informazions segnelibri
 Script console	Console Window		Console script
 Copy	URL Bar		Copie
 Open start page	Settings Window		Vierç pagjine iniziâl

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	4143471163
+1	japanese	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		キャプ�
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		予期しないエラー '%Message%' が、プロパティ '%Property%' で発生しました。
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
 Logout	ToLatestUserUsageConditionsWindow		ログアウト
+Password requirements	UserLoginWindow		パスワードの要件
 The following additional package changes have to be made:	PackageResult		以下の追加パッケージの変更が必要です:
 No changelog available.	PackageInfoView		変更記録はありません。
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		現在の使用条件は同意されています。
@@ -126,8 +127,9 @@ Starting the package daemon failed:\n\n%Error%	App		パッケージデーモン�
 No user ratings available.	PackageInfoView		ユーザー評価はありません。
 <no info>	PackageInfoView		<情報無し>
 Usage conditions download problem	UserUsageConditions		使用条件のダウンロードで問題
-Rating	PackageListView		評価
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要なパスワード要件のダウンロードの際にエラーを生じました。詳しくはログを確認して再度試してみてください。 \nログを見るための情報は Haiku ユーザーガイドの HaikuDepot の章で得られます。
 A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
+Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。
 Show	MainWindow		表示
 Settings…	MainWindow		設定...
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
 Date	PackageListView		日付
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		パスワードは %MinPasswordLength% 文字以上である必要があります。%MinPasswordUppercaseChar% 個の文字は大文字で、%MinPasswordDigitsChar% 個の文字は数字である必要があります。
 Error	App		エラー
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		新しいユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
@@ -156,9 +159,10 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		匿名の使用
 Close	PackageManager		閉じる
 Changelog	PackageInfoView		変更履歴
 About	PackageInfoView		パッケージについて
+Password requirements download problem	UserLoginWindow		パスワード要件ダウンロード不具合
 Password:	UserLoginWindow		パスワード:
-Stability	RatePackageWindow		安定度
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		このアプリケーションはサーバーシステムと通信するには古すぎます。システムをアップデートして新しいバージョンを入手してください。必要な最小限のバージョンは\"%s\"です。
+Stability	RatePackageWindow		安定度
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		間違って入力する可能性を減らすため、パスワードを繰り返す必要があります。
 Cancel	SettingsWindow		キャンセル
 Cancel	RatePackageWindow		中止
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		同意した使用条件を見る...
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		ユーザー [%Nickname%] は認証されましたが、次に進む前に最新の利用条件に同意することが求められます。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		このパッケージは HaikuDepot Server 上には無いようです。従って評価の作成や更新はできません。
 Apply	SettingsWindow		適用
+View the password requirements	UserLoginWindow		パスワード要件を表示
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		ユーザー \"%Nickname%\" は以前に使用条件に同意していますが、使用条件が更新されています。更新された使用条件に同意する必要があります。
 Log out	MainWindow		ログアウト
 Comment language:	RatePackageWindow		コメント言語:

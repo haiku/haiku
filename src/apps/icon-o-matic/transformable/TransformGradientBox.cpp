@@ -36,7 +36,7 @@ TransformGradientBox::TransformGradientBox(CanvasView* view, Gradient* gradient,
 		fShape->AcquireReference();
 		fShape->AddObserver(this);
 	}
-	if (fGradient) {
+	if (fGradient.IsSet()) {
 		// trigger init
 		ObjectChanged(fGradient);
 	} else {
@@ -52,8 +52,9 @@ TransformGradientBox::~TransformGradientBox()
 		fShape->RemoveObserver(this);
 		fShape->ReleaseReference();
 	}
-	if (fGradient)
+	if (fGradient.IsSet()) {
 		fGradient->RemoveObserver(this);
+	}
 }
 
 
@@ -69,7 +70,7 @@ TransformGradientBox::Update(bool deep)
 	dirty.InsetBy(-8, -8);
 	fView->Invalidate(dirty);
 
-	if (!deep || !fGradient)
+	if (!deep || !fGradient.IsSet())
 		return;
 
 	fGradient->RemoveObserver(this);
@@ -95,7 +96,7 @@ TransformGradientBox::Update(bool deep)
 void
 TransformGradientBox::ObjectChanged(const Observable* object)
 {
-	if (!fGradient || !fView->LockLooper())
+	if (!fGradient.IsSet() || !fView->LockLooper())
 		return;
 
 	if (object == fShape) {

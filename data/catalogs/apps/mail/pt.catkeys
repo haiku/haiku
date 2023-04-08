@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-MAIL	1477453861
+1	portuguese	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Marcar como guardada
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto contém %ld caracteres não codificáveis. Talvez funcionasse melhor um conjunto de caracteres diferente? Clique em Enviar para enviar de qualquer modo (será utilizado um caracter de substituição no lugar dos caracteres não codificáveis) ou escolha Cancelar para voltar atrás e tentar corrigir.
 Text wrapping:	Mail		Translineação:
@@ -42,7 +42,6 @@ Copy link location	Mail		Copiar localização da hiperligação
 Attachments: 	Mail		Anexos: 
 Remove enclosure	Mail		Remover anexo
 Next	Mail		Próximo
-Attachments:	Mail		Anexos:
 Show icons only	Mail		Mostrar apenas ícones
 Subject:	Mail		Assunto:
 OK	Mail		OK

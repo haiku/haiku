@@ -41,7 +41,7 @@ Time	System name		Ore
 Show time zone	Time		Mostre fûs orari
 Synchronize at boot	Time		Sincronize al inviament
 Indian	Time		Indian
-Revert	Time		Torne indaûr
+Revert	Time		Ripristine
 Date and time	Time		Date e ore
 The following error occured while synchronizing:\n%s	Time		Si è verificât l'erôr chi sot intant che si sincronizave:\n%s
 Synchronize	Time		Sincronize

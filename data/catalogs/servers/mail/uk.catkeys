@@ -16,4 +16,4 @@ Mail status	Notifier		Статус пошти
 Check for mails only	DeskbarView		Перевірити тільки пошту
 Check for mail now	DeskbarView		Перевірити пошту зараз
 Sending mail for %name	Notifier		Відправка пошти для %name
-Mail daemon status log	MailDaemon		Лог стану почтового демона
+Mail daemon status log	MailDaemon		Журнал стану поштового демона

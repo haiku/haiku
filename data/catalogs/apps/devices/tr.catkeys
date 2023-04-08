@@ -29,7 +29,7 @@ Device name	Device		Aygıt adı
 Satellite communications controller	Device		Uydu iletişimi denetleyicisi
 Device class	DeviceSCSI		Aygıt sınıfı
 Device	Device		Aygıt
-Input device controller	Device		Girdi aygıtı denetleyicisi
+Input device controller	Device		Giriş aygıtı denetleyicisi
 PCI bus	DevicesView		PCI veri yolu
 ACPI System Indicator	DeviceACPI		ACPI sistem belirteci
 ACPI System Bus	DeviceACPI		ACPI sistem veri yolu
@@ -60,7 +60,7 @@ Enclosure	DeviceSCSI		Koruncak
 ACPI Thermal Zone	DeviceACPI		ACPI ısıl bölgesi
 Order by:	DevicesView		Sıralama:
 Intelligent controller	Device		Akıllı denetleyici
-Multimedia controller	Device		Çokluortam denetleyicisi
+Multimedia controller	Device		Çoklu ortam denetleyici
 Quit	DevicesView		Çık
 ISA bus	Device		ISA veri yolu
 ISA bus	DevicesView		ISA veri yolu

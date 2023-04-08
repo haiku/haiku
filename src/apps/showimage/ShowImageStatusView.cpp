@@ -14,6 +14,7 @@
 #include <ControlLook.h>
 #include <Entry.h>
 #include <MenuItem.h>
+#include <NumberFormat.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
@@ -178,7 +179,13 @@ ShowImageStatusView::_SetFrameText(const BString& text)
 void
 ShowImageStatusView::_SetZoomText(float zoom)
 {
-	fCellText[kZoomCell].SetToFormat("%.0f%%", zoom * 100);
+	BNumberFormat numberFormat;
+	BString data;
+
+	if (numberFormat.FormatPercent(data, zoom) != B_OK)
+		data.SetToFormat("%.0f%%", zoom * 100);
+
+	fCellText[kZoomCell] = data;
 }
 
 

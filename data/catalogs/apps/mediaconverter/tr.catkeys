@@ -1,9 +1,9 @@
-1	turkish	x-vnd.Haiku-MediaConverter	338319367
+1	turkish	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Video kalitesi: %%%3d
 Source files	MediaConverter		Kaynak dosyaları
 Error writing video frame %lld	MediaConverter		Video çerçevesi %lld yazılırken hata
+Audio quality: %s	MediaConverter		Ses kalitesi: %s
 Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken hata
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Seçili dizin bulunamadı. Yerine /boot/home kullanılacak.
 Conversion completed	MediaConverter		Dönüştürme tamamlandı
@@ -28,7 +28,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Kodlayıcı parametreleri
 Open…	Menu		Aç…
 Audio encoding:	MediaConverter		Ses kodlaması:
 Multi-track file detected	MediaConverter		Çok parçalı dosya algılandı
-Audio quality: %3d%%	MediaConverter		Ses kalitesi: %%%3d
 Cancelling…	MediaConverter		İptal ediliyor…
 Output file '%filename' created	MediaConverter		'%filename' çıktı dosyası oluşturuldu
 Output folder	MediaConverter		Çıktı klasörü
@@ -41,6 +40,7 @@ Conversion cancelled	MediaConverter		Dönüştürme iptal edildi
 Low	MediaConverter		Düşük
 Error loading files	MediaConverter		Dosyalar yüklenirken hata
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, other{# bit}}
+Video quality: %s	MediaConverter		Video kalitesi: %s
 End   [ms]: 	MediaConverter		Son [ms]: 
 Cancel	MediaConverter		Vazgeç
 OK	MediaConverter-FileInfo		Tamam
@@ -50,16 +50,16 @@ Error	MediaConverter		Hata
 File details	MediaConverter		Dosya ayrıntıları
 No audio	Audio codecs list		Ses yok
 Drop media files onto this window	MediaConverter		Bu pencereye ortam dosyalarını bırakın
-Writing video track: %ld%% complete	MediaConverter		Video parçası yazılıyor: %%%ld tamamlandı
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, other{# kare}}
 Error read audio frame %lld	MediaConverter		Ses çerçevesi %lld okunurken hata
 Quit	Menu		Çık
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, other{# bayt}}
+Writing audio track: %s complete	MediaConverter		Ses izi yazılıyor: %s tamamlandı
 Duration:	MediaConverter-FileInfo		Uzunluk:
 MediaConverter	System name		Ortam Dönüştürücü
+Writing video track: %s complete	MediaConverter		Video izi yazılıyor: %s tamamlandı
 Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
 Error writing audio frame %lld	MediaConverter		Ses çerçevesi %lld yazılırken hata
-Writing audio track: %ld%% complete	MediaConverter		Ses parçası yazılıyor: %%%ld tamamlandı
 File format:	MediaConverter		Dosya biçimi:
 File	Menu		Dosya
 Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor

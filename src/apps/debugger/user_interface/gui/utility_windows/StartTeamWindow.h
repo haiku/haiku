@@ -16,6 +16,11 @@ class BTextControl;
 class TargetHostInterface;
 
 
+enum {
+	MSG_SET_TEAM_PATH	= 'setp'
+};
+
+
 class StartTeamWindow : public BWindow
 {
 public:
@@ -29,6 +34,7 @@ public:
 
 
 	virtual	void				MessageReceived(BMessage* message);
+	virtual bool				QuitRequested();
 
 	virtual	void				Show();
 

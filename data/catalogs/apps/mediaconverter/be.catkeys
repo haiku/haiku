@@ -1,5 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaConverter	3017975112
-Video quality: %3d%%	MediaConverter		Якасць відэа: %3d%%
+1	belarusian	x-vnd.Haiku-MediaConverter	3812660503
 Source files	MediaConverter		Зыходныя файлы
 Error converting '%filename'	MediaConverter		Немагчыма канвертаваць '%filename'
 Conversion completed	MediaConverter		Апрацоўка завершана
@@ -18,7 +17,6 @@ Error loading a file	MediaConverter		Немагчыма адкрыць файл
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кадыроўшчыка
 Open…	Menu		Адкрыць…
 Audio encoding:	MediaConverter		Аўдыё кадаванне:
-Audio quality: %3d%%	MediaConverter		Якасць аўдыё: %3d%%
 Cancelling…	MediaConverter		Адмена…
 Output file '%filename' created	MediaConverter		Выходны файл '%filename' быў створаны
 Output folder	MediaConverter		Папка для выходных файлаў

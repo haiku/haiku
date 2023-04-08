@@ -3,68 +3,38 @@ Package Management
 ==================
 This is a short index of the available package management related documentation.
 
-- `Package Management Infrastructure`_ provides an overview of what components
+- :doc:`Infrastructure` provides an overview of what components
   belong to Haiku's package management infrastructure and how they work and
   interact.
 
-  .. _Package Management Infrastructure: Infrastructure.rst
-
-- `Building Packages`_ gives information on various aspects of the package
+- :doc:`BuildingPackages` gives information on various aspects of the package
   building process.
 
-  .. _Building Packages: BuildingPackages.rst
-
-- `Boot Volume Directory Structure`_ outlines the directory structure of a
+- :doc:`DirectoryStructure` outlines the directory structure of a
   package management powered Haiku boot volume.
 
-  .. _Boot Volume Directory Structure: DirectoryStructure.rst
-
-- `Haiku Package File Format`_ specifies in detail the file format of Haiku
+- :doc:`FileFormat` specifies in detail the file format of Haiku
   package files (HPKG) and Haiku package repository files (HPKR).
 
-  .. _Haiku Package File Format: FileFormat.rst
+- :doc:`PackagingPolicy` defines the policy for creating Haiku packages.
 
-- `Packaging Policy`_ defines the policy for creating Haiku packages.
+- :doc:`HybridBuilds` provides some information regarding hybrid builds.
 
-  .. _Packaging Policy: PackagingPolicy.rst
-
-- `Packages Status`_ gives an overview of the packages needed for a Haiku
-  standard build and their current status.
-
-  .. _Packages Status: PackagesStatus.rst
-
-- `Hybrid Builds`_ provides some information regarding hybrid builds.
-
-  .. _Hybrid Builds: HybridBuilds.rst
-
-- HaikuDepot_ explains the concept and ideas behind HaikuDepot, the GUI package
-  manager in the making.
-
-  .. _HaikuDepot: HaikuDepot.rst
-
-- Migration_ lists the changes that users should expect when migrating to a
+- :doc:`Migration` lists the changes that users should expect when migrating to a
   package management Haiku.
 
-  .. _Migration: Migration.rst
+- :doc:`Bootstrapping` explains the process of bootstrapping Haiku and third-party packages.
 
-- `Bootstrapping Haiku`_ explains the process of bootstrapping Haiku and third-party packages.
-
-  .. _Bootstrapping Haiku: Bootstrapping.rst
-
-- TODO_ is a list of package management related work still to be done.
-
-  .. _TODO: TODO.rst
+- :doc:`TODO <TODO>` is a list of package management related work still to be done.
 
 - `Blog posts`_ on package management (the Batisseur ones are only indirectly
   package management related).
 
   .. _Blog posts: https://www.haiku-os.org/tags/package-management/
 
-- `(Old) Package Management Ideas`_ is a collection of thoughts and discussions
+- :doc:`OldIdeas` is a collection of thoughts and discussions
   regarding package management. It has been partially obsoleted by the progress
   on the package management implementation.
-
-  .. _(Old) Package Management Ideas: OldIdeas.rst
 
 - http://www.youtube.com/watch?v=rNZQQM5zU-Q&list=PL3FFCD4C6D384A302 is a video
   playlist of Ingo and Oliver explaining and demonstrating the package

@@ -97,8 +97,8 @@ Develop packages	MainWindow		Programistaj pakaĵoj
 Starting the package daemon failed:\n\n%Error%	App		Ekrulado de la pakaĵa demono malsukcesis:\n\n%Error%
 No user ratings available.	PackageInfoView		Uzantaj taksoj ne estas disponeblaj
 <no info>	PackageInfoView		<ne estas informo>
-Rating	PackageListView		Takso
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Eraro de reta transporto dum konversacio kun servilo: %s
+Rating	PackageListView		Takso
 Synchronizing icons	ServerIconExportUpdateProcess		Sinkronigas piktogramojn
 Show	MainWindow		Montri
 Settings…	MainWindow		Agordo…
@@ -122,8 +122,8 @@ Close	PackageManager		Fermi
 Changelog	PackageInfoView		Ŝanĝoprotokolo
 About	PackageInfoView		Pri
 Password:	UserLoginWindow		Pasvorto:
-Stability	RatePackageWindow		Stabileco
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		La programo estas tro malnova por komuniki kun la servilo. Akiru pli novan version de la programo per ĝisdatigo de via sistemo. La minimuma necesa versio de la programo estas \"%s\".
+Stability	RatePackageWindow		Stabileco
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
 Cancel	SettingsWindow		Nuligi
 Cancel	RatePackageWindow		Nuligi

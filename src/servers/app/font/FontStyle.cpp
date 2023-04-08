@@ -11,8 +11,8 @@
 
 
 #include "FontFamily.h"
+#include "FontManager.h"
 #include "ServerFont.h"
-#include "GlobalFontManager.h"
 
 #include <FontPrivate.h>
 
@@ -28,7 +28,8 @@ static BLocker sFontLock("font lock");
 	\param face FreeType handle for the font file after it is loaded - it will
 		   be kept open until the FontStyle is destroyed
 */
-FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
+FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face,
+	FontManager* fontManager)
 	:
 	fFreeTypeFace(face),
 	fName(face->style_name),
@@ -39,7 +40,8 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 	fBounds(0, 0, 0, 0),
 	fFace(_TranslateStyleToFace(face->style_name)),
 	fFullAndHalfFixed(false),
-	fFontData(NULL)
+	fFontData(NULL),
+	fFontManager(fontManager)
 {
 	fName.Truncate(B_FONT_STYLE_LENGTH);
 		// make sure this style can be found using the Be API
@@ -94,14 +96,9 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 FontStyle::~FontStyle()
 {
 	// make sure the font server is ours
-	if (fFamily != NULL) {
-		if (fFontManager != NULL && fFontManager->Lock()) {
-			fFontManager->RemoveStyle(this);
-			fFontManager->Unlock();
-		} else if (gFontManager->Lock()) {
-			gFontManager->RemoveStyle(this);
-			gFontManager->Unlock();
-		}
+	if (fFamily != NULL && fFontManager->Lock()) {
+		fFontManager->RemoveStyle(this);
+		fFontManager->Unlock();
 	}
 
 	FT_Done_Face(fFreeTypeFace);

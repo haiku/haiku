@@ -1,9 +1,9 @@
-1	german	x-vnd.Haiku-MediaConverter	524485290
+1	german	x-vnd.Haiku-MediaConverter	2019737152
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
-Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
 Source files	MediaConverter		Quelldateien
 Error writing video frame %lld	MediaConverter		Fehler beim Schreiben von Video-Frame %lld
+Audio quality: %s	MediaConverter		Audioqualität: %s
 Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Der gewählte Ordner wurde nicht gefunden. Versuche /boot/home stattdessen.
 Conversion completed	MediaConverter		Konvertierung abgeschlossen
@@ -28,7 +28,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Encoder-Parameter
 Open…	Menu		Öffnen …
 Audio encoding:	MediaConverter		Audiokodierung:
 Multi-track file detected	MediaConverter		Datei mit mehreren Spuren erkannt
-Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
 Cancelling…	MediaConverter		Wird abgebrochen …
 Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
 Output folder	MediaConverter		Ausgabeordner
@@ -41,6 +40,7 @@ Conversion cancelled	MediaConverter		Konvertierung abgebrochen
 Low	MediaConverter		Niedrig
 Error loading files	MediaConverter		Fehler beim Laden der Dateien
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# Bit} other{# Bits}}
+Video quality: %s	MediaConverter		Videoqualität:: %s
 End   [ms]: 	MediaConverter		Ende [ms]:
 Cancel	MediaConverter		Abbrechen
 OK	MediaConverter-FileInfo		OK
@@ -50,15 +50,15 @@ Error	MediaConverter		Fehler
 File details	MediaConverter		Dateidetails
 No audio	Audio codecs list		Keine Tonspur
 Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenster fallen lassen.
-Writing video track: %ld%% complete	MediaConverter		Schreibe Videospur: %ld%% fertig
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# Bild} other{# Bilder}}
 Error read audio frame %lld	MediaConverter		Fehler beim Lesen von Audio-Frame %lld
 Quit	Menu		Beenden
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# Byte} other{# Bytes}}
+Writing audio track: %s complete	MediaConverter		Schreibe Audiospur: %s fertig
 Duration:	MediaConverter-FileInfo		Dauer:
+Writing video track: %s complete	MediaConverter		Schreibe Videospur: %s fertig
 Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
 Error writing audio frame %lld	MediaConverter		Fehler beim Schreiben von Audio-Frame %lld
-Writing audio track: %ld%% complete	MediaConverter		Schreibe Audiospur: %ld%% fertig
 File format:	MediaConverter		Dateiformat:
 File	Menu		Datei
 Video quality not supported	MediaConverter		Videoqualität nicht einstellbar

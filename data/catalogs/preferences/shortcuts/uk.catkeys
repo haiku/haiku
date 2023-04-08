@@ -3,7 +3,7 @@
 Application	ShortcutsWindow		Програма
 Option	ShortcutsSpec	Name for modifier on keyboard	Option
 Save changes before closing?	ShortcutsWindow		Зберегти зміни перед закриттям?
-Revert to saved	ShortcutsWindow		Повернутися до збереженого
+Revert to saved	ShortcutsWindow		Відкат до збереженого
 Don't save	ShortcutsWindow		Не зберігати
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep

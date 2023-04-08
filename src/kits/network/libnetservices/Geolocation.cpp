@@ -81,13 +81,14 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	int32 count = 0;
 
 	while (roster.GetNextInterface(&interfaceCookie, interface) == B_OK) {
-		uint32 networkCookie = 0;
-		wireless_network network;
-
 		BNetworkDevice device(interface.Name());
 			// TODO is that the correct way to enumerate devices?
 
-		while (device.GetNextNetwork(networkCookie, network) == B_OK) {
+		uint32 networksCount = 0;
+		wireless_network* networks = NULL;
+		device.GetNetworks(networks, networksCount);
+		for (uint32 i = 0; i < networksCount; i++) {
+			const wireless_network& network = networks[i];
 			if (count != 0)
 				query += ',';
 
@@ -101,7 +102,7 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 			query << (int)network.noise_level;
 			query += " }";
 		}
-
+		delete[] networks;
 	}
 
 	query += "\n\t]\n}\n";

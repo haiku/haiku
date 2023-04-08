@@ -1,50 +1,49 @@
-1	french	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Éteindre
-Sort applications by name	PreferencesWindow		Trier les applications par nom
-Suspend	DeskbarMenu		Mettre en veille
-Hide clock	TimeView		Masquer l’horloge
-Applications	PreferencesWindow		Applications
-Time preferences…	TimeView		Préférences de l’heure…
-About Haiku	DeskbarMenu		À propos de Haiku
-Edit in Tracker…	PreferencesWindow		Éditer dans le Tracker…
-Recent documents:	PreferencesWindow		Documents récents :
-Recent applications	DeskbarMenu		Applications récentes
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
-Find…	DeskbarMenu		Rechercher…
-Show clock	Tray		Afficher l’horloge
-Window	PreferencesWindow		Fenêtre
-Defaults	PreferencesWindow		Valeurs par défaut
-Menu	PreferencesWindow		Menu
-Recent documents	DeskbarMenu		Documents récents
+1	french	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Masquer automatiquement
-Always on top	PreferencesWindow		Toujours au dessus
-<Deskbar folder is empty>	DeskbarMenu		<Le dossier Deskbar est vide>
 Show all	WindowMenu		Montrer tout
-No windows	WindowMenu		Pas de fenêtres
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Redémarrer l’ordinateur
+Edit in Tracker…	PreferencesWindow		Éditer dans le Tracker…
+Menu	PreferencesWindow		Menu
+Tracker always first	PreferencesWindow		Lister le Tracker en premier
+Hide clock	TimeView		Masquer l’horloge
 Large	PreferencesWindow		Grande
+<Deskbar folder is empty>	DeskbarMenu		<Le dossier Deskbar est vide>
+Recent documents	DeskbarMenu		Documents récents
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applications
+Always on top	PreferencesWindow		Toujours au dessus
+Restart system	DeskbarMenu		Redémarrer l’ordinateur
+Recent documents:	PreferencesWindow		Documents récents :
 Auto-raise	PreferencesWindow		Rehausser automatiquement
-Recent folders:	PreferencesWindow		Dossiers récents :
-Show application expander	PreferencesWindow		Montrer le dérouleur d’application
+Mount	DeskbarMenu		Monter
+Icon size	PreferencesWindow		Taille des icônes
+About Haiku	DeskbarMenu		À propos de Haiku
+Small	PreferencesWindow		Petite
+Show calendar…	TimeView		Montrer le calendrier…
+Find…	DeskbarMenu		Rechercher…
+Power off	DeskbarMenu		Éteindre
+Defaults	PreferencesWindow		Valeurs par défaut
+Show replicants	DeskbarMenu		Afficher les réplicants
+No windows	WindowMenu		Pas de fenêtres
+Show clock	Tray		Afficher l’horloge
 Close all	WindowMenu		Tout fermer
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
-Mount	DeskbarMenu		Monter
-Revert	PreferencesWindow		Rétablir
-Small	PreferencesWindow		Petite
-Recent applications:	PreferencesWindow		Applications récentes :
-Shutdown…	DeskbarMenu		Arrêter…
-Tracker always first	PreferencesWindow		Lister le Tracker en premier
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Préférences
-Recent folders	DeskbarMenu		Dossiers récents
 About this system	DeskbarMenu		À propos de ce système
-Show calendar…	TimeView		Montrer le calendrier…
-Deskbar preferences…	DeskbarMenu		Réglages de la Deskbar…
-Expand new applications	PreferencesWindow		Développer les nouvelles applications
-Show replicants	DeskbarMenu		Afficher les réplicants
-Hide application names	PreferencesWindow		Cacher le nom des applications
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Démos
-Icon size	PreferencesWindow		Taille des icônes
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Gadgets
-Hide all	WindowMenu		Tout cacher
 Quit application	WindowMenu		Quitter l’application
+Hide application names	PreferencesWindow		Cacher le nom des applications
+Applications	PreferencesWindow		Applications
+Show application expander	PreferencesWindow		Montrer le dérouleur d’application
+Deskbar preferences…	DeskbarMenu		Réglages de la Deskbar…
+Suspend	DeskbarMenu		Mettre en veille
+Shutdown…	DeskbarMenu		Arrêter…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Démos
+Expand new applications	PreferencesWindow		Développer les nouvelles applications
+Recent applications:	PreferencesWindow		Applications récentes :
+Recent folders:	PreferencesWindow		Dossiers récents :
+Recent folders	DeskbarMenu		Dossiers récents
+Recent applications	DeskbarMenu		Applications récentes
+Hide all	WindowMenu		Tout cacher
+Sort applications by name	PreferencesWindow		Trier les applications par nom
+Revert	PreferencesWindow		Rétablir
+Window	PreferencesWindow		Fenêtre
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Préférences
+Time preferences…	TimeView		Préférences de l’heure…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Gadgets

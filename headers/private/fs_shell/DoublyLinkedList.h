@@ -327,8 +327,9 @@ public:
 
 	inline bool IsEmpty() const			{ return (fFirst == NULL); }
 
-	inline void Insert(Element *element, bool back = true);
-	inline void Insert(Element *before, Element *element);
+	inline void InsertBefore(Element* insertBefore, Element* element);
+	inline void InsertAfter(Element* insertAfter, Element* element);
+	inline void Insert(Element* element, bool back = true);
 	inline void Add(Element *element, bool back = true);
 	inline void Remove(Element *element);
 
@@ -360,6 +361,10 @@ public:
 		{ return ReverseIterator(this); }
 	inline ConstReverseIterator GetReverseIterator() const
 		{ return ConstReverseIterator(this); }
+
+private:
+	inline void Insert(Element* before, Element* element);
+		// TODO: Obsolete! Use InsertBefore() instead!
 
 private:
 	Element	*fFirst;
@@ -401,10 +406,10 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *element, bool back)
 	}
 }
 
-// Insert
+
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
-DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *before, Element *element)
+DOUBLY_LINKED_LIST_CLASS_NAME::InsertBefore(Element* before, Element* element)
 {
 	if (before == NULL) {
 		Insert(element);
@@ -425,6 +430,40 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element *before, Element *element)
 	if (fFirst == before)
 		fFirst = element;
 }
+
+
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::InsertAfter(Element* after, Element* element)
+{
+	ASSERT(element != NULL);
+
+	if (after == NULL) {
+		Insert(element, false);
+		return;
+	}
+
+	Link* afterLink = sGetLink(after);
+	Link* link = sGetLink(element);
+
+	link->previous = after;
+	link->next = afterLink->next;
+	afterLink->next = element;
+
+	if (link->next != NULL)
+		sGetLink(link->next)->previous = element;
+	else
+		fLast = element;
+}
+
+
+DOUBLY_LINKED_LIST_TEMPLATE_LIST
+void
+DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* before, Element* element)
+{
+	InsertBefore(before, element);
+}
+
 
 // Add
 DOUBLY_LINKED_LIST_TEMPLATE_LIST

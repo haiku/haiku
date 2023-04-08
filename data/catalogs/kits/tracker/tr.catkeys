@@ -210,7 +210,7 @@ by name	FindPanel		ad ile
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Üzgünüm, sistem kök dizinine dosya kaydedilemez.
 Restore	ContainerWindow		Geri yükle
 Location	ContainerWindow		Konum
-Warning space color	SettingsView		Uyarı boşluk rengi
+Warning space color	SettingsView		Uyarı alanı rengi
 Skip	FSUtils		Atla
 Text list	AttributesView		Metin listesi
 Used space color	SettingsView		Kullanılan alan rengi

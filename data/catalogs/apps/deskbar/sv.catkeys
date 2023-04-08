@@ -1,50 +1,49 @@
-1	swedish	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Stäng av
-Sort applications by name	PreferencesWindow		Sortera program efter namn
-Suspend	DeskbarMenu		Vänteläge
-Hide clock	TimeView		Dölj klockan
-Applications	PreferencesWindow		Program
-Time preferences…	TimeView		Tidsinställningar...
-About Haiku	DeskbarMenu		Om Haiku
-Edit in Tracker…	PreferencesWindow		Editera i Tracker…
-Recent documents:	PreferencesWindow		Senaste dokument:
-Recent applications	DeskbarMenu		Senaste program
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
-Find…	DeskbarMenu		Sök...
-Show clock	Tray		Visa klockan
-Window	PreferencesWindow		Fönster
-Defaults	PreferencesWindow		Standardvärden
-Menu	PreferencesWindow		Meny
-Recent documents	DeskbarMenu		Senaste dokument
+1	swedish	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Dölj automatiskt
-Always on top	PreferencesWindow		Alltid överst
-<Deskbar folder is empty>	DeskbarMenu		<Deskbar mappen är tom>
 Show all	WindowMenu		Visa alla
-No windows	WindowMenu		Saknar fönster
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Starta om
+Edit in Tracker…	PreferencesWindow		Editera i Tracker…
+Menu	PreferencesWindow		Meny
+Tracker always first	PreferencesWindow		Visa Tracker först
+Hide clock	TimeView		Dölj klockan
 Large	PreferencesWindow		Stor
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar mappen är tom>
+Recent documents	DeskbarMenu		Senaste dokument
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
+Always on top	PreferencesWindow		Alltid överst
+Restart system	DeskbarMenu		Starta om
+Recent documents:	PreferencesWindow		Senaste dokument:
 Auto-raise	PreferencesWindow		Höj vid närkontakt
-Recent folders:	PreferencesWindow		Senaste mappar:
-Show application expander	PreferencesWindow		Visa programexpanderare
+Mount	DeskbarMenu		Montera
+Icon size	PreferencesWindow		Ikonstorlek
+About Haiku	DeskbarMenu		Om Haiku
+Small	PreferencesWindow		Liten
+Show calendar…	TimeView		Visa kalender...
+Find…	DeskbarMenu		Sök...
+Power off	DeskbarMenu		Stäng av
+Defaults	PreferencesWindow		Standardvärden
+Show replicants	DeskbarMenu		Visa replikanter
+No windows	WindowMenu		Saknar fönster
+Show clock	Tray		Visa klockan
 Close all	WindowMenu		Stäng alla
 Deskbar preferences	PreferencesWindow		Inställningar för Deskbar
-Mount	DeskbarMenu		Montera
-Revert	PreferencesWindow		Återgå
-Small	PreferencesWindow		Liten
-Recent applications:	PreferencesWindow		Senaste program:
-Shutdown…	DeskbarMenu		Stäng av…
-Tracker always first	PreferencesWindow		Visa Tracker först
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
-Recent folders	DeskbarMenu		Senaste mappar
 About this system	DeskbarMenu		Om detta system
-Show calendar…	TimeView		Visa kalender...
-Deskbar preferences…	DeskbarMenu		Inställningar för Deskbar...
-Expand new applications	PreferencesWindow		Expandera nya program
-Show replicants	DeskbarMenu		Visa replikanter
-Hide application names	PreferencesWindow		Göm programnamnen
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
-Icon size	PreferencesWindow		Ikonstorlek
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram
-Hide all	WindowMenu		Göm alla
 Quit application	WindowMenu		Avsluta program
+Hide application names	PreferencesWindow		Göm programnamnen
+Applications	PreferencesWindow		Program
+Show application expander	PreferencesWindow		Visa programexpanderare
+Deskbar preferences…	DeskbarMenu		Inställningar för Deskbar...
+Suspend	DeskbarMenu		Vänteläge
+Shutdown…	DeskbarMenu		Stäng av…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
+Expand new applications	PreferencesWindow		Expandera nya program
+Recent applications:	PreferencesWindow		Senaste program:
+Recent folders:	PreferencesWindow		Senaste mappar:
+Recent folders	DeskbarMenu		Senaste mappar
+Recent applications	DeskbarMenu		Senaste program
+Hide all	WindowMenu		Göm alla
+Sort applications by name	PreferencesWindow		Sortera program efter namn
+Revert	PreferencesWindow		Återgå
+Window	PreferencesWindow		Fönster
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
+Time preferences…	TimeView		Tidsinställningar...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram

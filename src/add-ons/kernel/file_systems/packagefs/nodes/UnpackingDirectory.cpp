@@ -113,7 +113,7 @@ UnpackingDirectory::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 		|| packageDirectory->HasPrecedenceOver(other);
 
 	if (overridesHead) {
-		fPackageDirectories.Insert(other, packageDirectory);
+		fPackageDirectories.InsertBefore(other, packageDirectory);
 		NodeReinitVFS(deviceID, fID, packageDirectory, other, fFlags);
 	} else
 		fPackageDirectories.Add(packageDirectory);
@@ -141,7 +141,7 @@ UnpackingDirectory::RemovePackageNode(PackageNode* packageNode, dev_t deviceID)
 		}
 
 		fPackageDirectories.Remove(newestNode);
-		fPackageDirectories.Insert(fPackageDirectories.Head(), newestNode);
+		fPackageDirectories.InsertBefore(fPackageDirectories.Head(), newestNode);
 		NodeReinitVFS(deviceID, fID, newestNode, packageNode, fFlags);
 	}
 }

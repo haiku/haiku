@@ -19,6 +19,7 @@
 #include <Drivers.h>
 
 #include <AutoDeleter.h>
+#include <StringForSize.h>
 
 
 static struct option const kLongOptions[] = {
@@ -262,9 +263,14 @@ main(int argc, char** argv)
 		retval = EXIT_FAILURE;
 	}
 
-	printf("Trimmed %" B_PRIu64 " bytes from device%s.\n",
-		trimData.trimmed_size,
-		retval == EXIT_SUCCESS ? "" : " (number may be inaccurate)");
+	if (retval == EXIT_SUCCESS || trimData.trimmed_size > 0) {
+		char trimmedSize[128];
+		string_for_size(trimData.trimmed_size, trimmedSize, 128);
+
+		printf("Trimmed %" B_PRIu64 " bytes (%s) from device%s.\n",
+			trimData.trimmed_size, trimmedSize,
+			retval == EXIT_SUCCESS ? "" : " (number may be inaccurate)");
+	}
 
 	return retval;
 }

@@ -49,7 +49,7 @@ Font size	ProbeView		Розмір шрифту
 Type editor not supported	ProbeView		Редактор типу не підтримується
 Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
 Copy	ProbeView		Копіювати
-Redo	ProbeView		Повторити
+Redo	ProbeView		Повтор дії
 Floating-point value:	TypeEditors		Значення з рухомою комою:
 Cancel	AttributeWindow		Скасувати
 16 bit signed value:	TypeEditors		16 бітове знакове значення:

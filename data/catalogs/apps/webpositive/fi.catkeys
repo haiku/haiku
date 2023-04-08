@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	3896191867
+1	finnish	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Latauskansio:
 Close window	WebPositive Window		Sulje ikkuna
 Find:	WebPositive Window		Etsi:
 Script console	WebPositive Window		Skriptipääteikkuna
+There was an error setting up the bookmark.	WebPositive Window		Kirjanmerkin asettamisessa tapahtui virhe.
 Fonts	Settings Window		Kirjasimet
 Path	Cookie Manager		Polku
 Bookmarks	WebPositive Window		Kirjanmerkit
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Poista
 Open containing folder	Download Window		Avaa sisältyvä kansio
 Find previous	WebPositive Window		Etsi edellinen
 Full screen	WebPositive Window		Kokonäyttö
+Bookmark bar	WebPositive Window		Kirjanmerkkipalkki
 Downloads in progress	WebPositive		Käynnissä olevat lataukset
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount kirjanmerkkiä heti?
@@ -28,7 +30,6 @@ Cancel	Download Window		Peru
 Settings	Settings Window		Asetukset
 Downloads	WebPositive Window		Lataukset
 Browse…	Settings Window		Selaa…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki tälle sivulle (%bookmarkName) on jo olemassa.
 Resume prior session	Settings Window		Aloita uudelleen varhaisempi istunto
 Match case	WebPositive Window		Täsmää kirjainkoko
 Proxy password:	Settings Window		Välityspalvelimen salasana:
@@ -106,8 +107,8 @@ Default standard font size:	Settings Window		Vakiokirjasimen oletuskoko:
 Custom	Settings Window		Mukautettu
 Bookmark this page	WebPositive Window		Merkitse tämä sivu kirjanmerkillä
 Show tabs if only one page is open	Settings Window		Näytä välilehdet jos vain yksi sivu on avoinna
-Close tab	WebPositive Window		Sulje välilehti
 Remove	Download Window		Poista
+Close tab	WebPositive Window		Sulje välilehti
 About	WebPositive Window		Ohjelmasta
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Latauksia on yhä käynnissä, haluatko todella poistua WebPositive-ohjelmasta nyt?
 Continue downloads	WebPositive		Jatka latauksia
@@ -158,7 +159,6 @@ Downloads	Download Window		Lataukset
 Open blank page	Settings Window		Avaa tyhjä sivu
 Clear history	WebPositive Window		Tyhjennä historia
 Cancel	WebPositive Window		Peru
-Bookmark info	WebPositive Window		Kirjanmerkkitiedot
 Script console	Console Window		Skriptipääteikkuna
 Copy	URL Bar		Kopioi
 Open start page	Settings Window		Avaa avaussivu

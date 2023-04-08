@@ -375,23 +375,6 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		descriptor_size, descriptor_version,
 		PHYSICAL_MEMORY_LOW, PHYSICAL_MEMORY_HIGH);
 
-	TRACE("Mapping Code & Data\n");
-
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(memory_map_addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE,
-				ARMv8TranslationTableDescriptor::DefaultCodeAttribute
-				| currentMair.MaskOf(MAIR_NORMAL_WB));
-			break;
-		default:
-			;
-		}
-	}
-
 	TRACE("Mapping EFI_MEMORY_RUNTIME\n");
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor* entry = (efi_memory_descriptor*)(memory_map_addr + i * descriptor_size);

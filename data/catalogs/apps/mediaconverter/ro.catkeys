@@ -1,7 +1,6 @@
-1	romanian	x-vnd.Haiku-MediaConverter	1322040280
+1	romanian	x-vnd.Haiku-MediaConverter	2116725671
 Input file not recognized as Audio or Video	MediaConverter		Fișierul de intrare nu este recunoscut ca audio sau video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Calitate video: %3d%%
 Source files	MediaConverter		Fișiere sursă
 Error converting '%filename'	MediaConverter		Eroare la convertirea „%filename”
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Directorul selectat nu a fost găsit. Se întoarce la implicitul /boot/home
@@ -25,7 +24,6 @@ Error loading a file	MediaConverter		Eroare la încărcarea unui fișier
 Encoder parameters	MediaConverter-EncoderWindow		Parametri de codor
 Open…	Menu		Deschide…
 Audio encoding:	MediaConverter		Codare audio:
-Audio quality: %3d%%	MediaConverter		Calitate audio: %3d%%
 Cancelling…	MediaConverter		Se anulează…
 Output file '%filename' created	MediaConverter		Fișierul de ieșire „%filename” a fost creat
 Output folder	MediaConverter		Dosar de ieșire

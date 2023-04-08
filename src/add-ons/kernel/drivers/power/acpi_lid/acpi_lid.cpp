@@ -54,8 +54,7 @@ acpi_lid_read_status(acpi_lid_device_info *device)
 	acpi_data buf;
 	buf.pointer = NULL;
 	buf.length = ACPI_ALLOCATE_BUFFER;
-	if (device->acpi->evaluate_method(device->acpi_cookie, "_LID", NULL,
-			&buf) != B_OK
+	if (device->acpi->evaluate_method(device->acpi_cookie, "_LID", NULL, &buf) != B_OK
 		|| buf.pointer == NULL
 		|| ((acpi_object_type*)buf.pointer)->object_type != ACPI_TYPE_INTEGER) {
 		ERROR("couldn't get status\n");
@@ -63,9 +62,9 @@ acpi_lid_read_status(acpi_lid_device_info *device)
 		acpi_object_type* object = (acpi_object_type*)buf.pointer;
 		device->last_status = object->integer.integer;
 		device->updated = true;
-		free(buf.pointer);
 		TRACE("status %d\n", device->last_status);
 	}
+	free(buf.pointer);
 }
 
 
@@ -152,7 +151,7 @@ acpi_lid_select(void *_cookie, uint8 event, selectsync *sync)
 	status_t error = add_select_sync_pool_entry(&device->select_pool, sync,
 		event);
 	if (error != B_OK) {
-		ERROR("add_select_sync_pool_entry() failed: %#lx\n", error);
+		ERROR("add_select_sync_pool_entry() failed: %#" B_PRIx32 "\n", error);
 		return error;
 	}
 

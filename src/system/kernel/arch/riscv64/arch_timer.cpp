@@ -22,41 +22,47 @@
 
 extern uint32 gPlatform;
 
+static uint64 sTimerConversionFactor;
+
 
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
-	// dprintf("arch_timer_set_hardware_timer(%" B_PRIu64 "), cpu: %" B_PRId32 "\n", timeout, smp_get_current_cpu());
+/*
+	dprintf("arch_timer_set_hardware_timer(%" B_PRIu64 "), cpu: %" B_PRId32 "\n", timeout,
+		smp_get_current_cpu());
+*/
+	uint64 scaledTimeout = (static_cast<__uint128_t>(timeout) * sTimerConversionFactor) >> 32;
 
-	// TODO: Read timer frequency from FDT
+	SetBitsSie(1 << sTimerInt);
+
 	switch (gPlatform) {
 		case kPlatformMNative:
-			MSyscall(kMSyscallSetTimer, true,
-				gClintRegs->mtime + timeout * 10);
+			MSyscall(kMSyscallSetTimer, true, gClintRegs->mtime + scaledTimeout);
 			break;
 		case kPlatformSbi: {
-			sbi_set_timer(CpuTime() + timeout);
+			sbi_set_timer(CpuTime() + scaledTimeout);
 			break;
 		}
 		default:
 			;
 	}
-
-	// SetSie(Sie() | (1 << sTimerInt));
 }
 
 
 void
 arch_timer_clear_hardware_timer()
 {
-	// SetSie(Sie() & ~(1 << sTimerInt));
+	ClearBitsSie(1 << sTimerInt);
 
 	switch (gPlatform) {
 		case kPlatformMNative:
 			MSyscall(kMSyscallSetTimer, false);
 			break;
 		case kPlatformSbi: {
-			sbi_set_timer(CpuTime() + (uint64)10000000 * 3600);
+			// Do nothing, it is not possible to clear SBI timer, so we only disable supervisor
+			// timer interrupt. SBI timer still can be triggered, but its interrupt will be not
+			// delivered to kernel.
 			break;
 		}
 		default:
@@ -68,5 +74,7 @@ arch_timer_clear_hardware_timer()
 int
 arch_init_timer(kernel_args *args)
 {
+	sTimerConversionFactor = (1LL << 32) * args->arch_args.timerFrequency / 1000000LL;
+
 	return B_OK;
 }

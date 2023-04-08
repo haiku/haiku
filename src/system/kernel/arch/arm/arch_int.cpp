@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2022, Haiku Inc. All rights reserved.
+ * Copyright 2003-2023, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -276,6 +276,10 @@ arch_arm_syscall(struct iframe *iframe)
 		}
 	}
 
+	thread_get_current_thread()->arch_info.userFrame = iframe;
+	thread_get_current_thread()->arch_info.oldR0 = iframe->r0;
+	thread_at_kernel_entry(system_time());
+
 	enable_interrupts();
 
 	uint64 returnValue = 0;
@@ -283,6 +287,24 @@ arch_arm_syscall(struct iframe *iframe)
 
 	TRACE("returning %" B_PRId64 "\n", returnValue);
 	iframe->r0 = returnValue;
+
+	disable_interrupts();
+	atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
+	if ((thread_get_current_thread()->flags & (THREAD_FLAGS_SIGNALS_PENDING
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_TRAP_FOR_CORE_DUMP)) != 0) {
+		enable_interrupts();
+		thread_at_kernel_exit();
+	} else {
+		thread_at_kernel_exit_no_signals();
+	}
+	if ((thread_get_current_thread()->flags & THREAD_FLAGS_RESTART_SYSCALL) != 0) {
+		atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+		atomic_or(&thread_get_current_thread()->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
+		iframe->r0 = thread_get_current_thread()->arch_info.oldR0;
+		iframe->pc -= 4;
+	}
+
+	thread_get_current_thread()->arch_info.userFrame = NULL;
 }
 
 

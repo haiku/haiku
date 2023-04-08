@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-About	2259131995
+1	turkish	x-vnd.Haiku-About	677050232
 Revision	AboutView		Revizyon
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999-2007 Michael C. Ring. Tüm hakları saklıdır.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (proje kurucusu)\
 Remove replicant	AboutView		Yineleneni kaldır
 BSD (3-clause)	AboutWindow		BSD (3 koşullu)
 About this system	AboutWindow		Sistem Hakkında
-%d MiB used (%d%%)	AboutView		%d MiB kullanılan (%%%d)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2003-2006 Intel Corporation. Tüm hakları saklıdır.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Telif hakkı © 1999-2010 Gutenprint yazarları. Tüm hakları saklıdır.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Telif hakkı © 1994-1997 Mark Kilgard. Tüm hakları saklıdır.
@@ -62,6 +61,7 @@ Current maintainers:\n	AboutView		Geliştiriciler:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Telif hakkı © 1995, 1998-2001 Jef Poskanzer. Tüm hakları saklıdır.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Telif hakkı © 2007-2009 Marvell Semiconductor, Inc. Tüm hakları saklıdır.
+%d MiB used (%s)	AboutView		%d MiB kullanılan (%s)
 Version:	AboutView		Sürüm:
 The BeGeistert team\n	AboutView		BeGeistert takımı\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1

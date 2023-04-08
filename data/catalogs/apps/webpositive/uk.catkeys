@@ -1,12 +1,14 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	3896191867
+1	ukrainian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
+Copy	Console Window		Копіювати
 (Finish: %date)	Download Window		(Завершення: %date)
 Open bookmarks confirmation	WebPositive Window		Відкрити підтвердження закладок
 Download folder:	Settings Window		Папка завантажень:
 Close window	WebPositive Window		Закрити вікно
 Find:	WebPositive Window		Знайти:
 Script console	WebPositive Window		Консоль сценаріїв
+There was an error setting up the bookmark.	WebPositive Window		Під час настройки закладки сталася помилка.
 Fonts	Settings Window		Шрифти
 Path	Cookie Manager		Шлях
 Bookmarks	WebPositive Window		Закладки
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Видалити
 Open containing folder	Download Window		Відкрити папку з файлом
 Find previous	WebPositive Window		Знайти попереднє
 Full screen	WebPositive Window		Повний екран
+Bookmark bar	WebPositive Window		Панель закладок
 Downloads in progress	WebPositive		Завантаження триває
 Copy URL to clipboard	Download Window		Копіювати до буферу обміну
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити відразу %addedCount закладок?
@@ -28,7 +31,6 @@ Cancel	Download Window		Скасувати
 Settings	Settings Window		Налаштування
 Downloads	WebPositive Window		Завантаження
 Browse…	Settings Window		Переглянути…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
 Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховувати регістр
 Proxy password:	Settings Window		Пароль проксі:
@@ -100,14 +102,15 @@ Restart	Download Window		Перезапустити
 Serif font:	Settings Window		Шрифт Serif:
 Apply	Settings Window		Застосувати
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при спробі показати папку закладок.\n\nПомилка: %error
-Revert	Settings Window		Без змін
+Revert	Settings Window		Відкат змін
 Copy	WebPositive Window		Копіювати
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Останній рядок повторено # раз.} few{Останній рядок повторено # рази.} other{Останній рядок повторено # разів.}}
 Default standard font size:	Settings Window		Розмір шрифту за замовчуванням:
 Custom	Settings Window		Вибір користувача
 Bookmark this page	WebPositive Window		Додати до закладок
 Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
-Close tab	WebPositive Window		Закрити вкладку
 Remove	Download Window		Вилучити
+Close tab	WebPositive Window		Закрити вкладку
 About	WebPositive Window		Про програму
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, Ви дійсно бажаєте вийти з WebPositive зараз?
 Continue downloads	WebPositive		Продовжити завантаження
@@ -158,7 +161,6 @@ Downloads	Download Window		Завантаження
 Open blank page	Settings Window		Відкрити порожню сторінку
 Clear history	WebPositive Window		Очистити історію
 Cancel	WebPositive Window		Скасувати
-Bookmark info	WebPositive Window		Інформація про закладку
 Script console	Console Window		Консоль сценаріїв
 Copy	URL Bar		Копіювати
 Open start page	Settings Window		Відкрити стартову сторінку

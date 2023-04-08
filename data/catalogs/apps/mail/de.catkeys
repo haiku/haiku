@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	58052085
+1	german	x-vnd.Be-MAIL	1709032125
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -41,7 +41,6 @@ Copy link location	Mail		Linkadresse kopieren
 Attachments: 	Mail		Anhänge: 
 Remove enclosure	Mail		Anhang entfernen
 Next	Mail		Nächste
-Attachments:	Mail		Anhänge: 
 Show icons only	Mail		Nur Icons zeigen
 Subject:	Mail		Betreff:
 OK	Mail		OK

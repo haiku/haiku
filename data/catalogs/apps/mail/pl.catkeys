@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	1477453861
+1	polish	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Ustaw do Zapisanych
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld niekodowalnych znaków. Być może inny zestaw znaków będzie lepiej działać? Wybierz Wyślij aby wysłać mimo wszystko (znak zastępczy będzie użyty w miejscach niekodowalnych znaków), lub wybierz Anuluj aby wrócić i poprawić to.
 Text wrapping:	Mail		Zawijanie tekstu:
@@ -42,7 +42,6 @@ Copy link location	Mail		Kopiuj adres odnośnika
 Attachments: 	Mail		Załączniki:
 Remove enclosure	Mail		Usuń załącznik
 Next	Mail		Następne
-Attachments:	Mail		Załączniki:
 Show icons only	Mail		Pokaż tylko ikony
 Subject:	Mail		Temat:
 OK	Mail		OK

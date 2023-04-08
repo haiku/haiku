@@ -112,8 +112,6 @@ public:
 			status_t			Scan(bool wait = true,
 									bool forceRescan = true);
 
-			status_t			GetNextNetwork(uint32& cookie,
-									wireless_network& network);
 			status_t			GetNetworks(wireless_network*& networks,
 									uint32& count);
 			status_t			GetNetwork(const char* name,

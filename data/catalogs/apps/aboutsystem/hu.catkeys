@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	2259131995
+1	hungarian	x-vnd.Haiku-About	677050232
 Revision	AboutView		kiadás:
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Minden jog fenntartva.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapí
 Remove replicant	AboutView		Replikáns eltávolítása
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Haiku névjegye
-%d MiB used (%d%%)	AboutView		%d MiB használt (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Minden jog fenntartva.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Minden jog fenntartva.
@@ -62,6 +61,7 @@ Current maintainers:\n	AboutView		Jelenlegi karbantartók:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Minden jog fenntartva.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Minden jog fenntartva.
+%d MiB used (%s)	AboutView		%d MiB használt (%s)
 Version:	AboutView		Verzió:
 The BeGeistert team\n	AboutView		A BeGeistert csapatának\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
