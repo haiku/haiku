@@ -382,7 +382,7 @@ setstate(char *arg_state)
 	uint32_t rear = new_state[0] / MAX_TYPES;
 	char *ostate = (char *)(&state[-1]);
 
-	if (type != TYPE_0 && rear >= degrees[type])
+	if (type != TYPE_0 && rear >= (uint32_t)degrees[type])
 		return (NULL);
 	if (rand_type == TYPE_0)
 		state[-1] = rand_type;
