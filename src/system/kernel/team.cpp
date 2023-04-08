@@ -1765,11 +1765,13 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		return B_NO_MEMORY;
 	BReference<Team> teamReference(team, true);
 
+	BReference<Team> teamLoadingReference;
 	if ((flags & B_WAIT_TILL_LOADED) != 0) {
 		loadingInfo.condition.Init(team, "image load");
 		loadingInfo.condition.Add(&loadingWaitEntry);
 		loadingInfo.result = B_ERROR;
 		team->loading_info = &loadingInfo;
+		teamLoadingReference = teamReference;
 	}
 
 	// get the parent team
@@ -1891,6 +1893,14 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		// going to die (e.g. is killed). In either case the one notifying is
 		// responsible for unsetting `loading_info` in the team structure.
 		loadingWaitEntry.Wait();
+
+		// We must synchronize with the thread that woke us up, to ensure
+		// there are no remaining consumers of the team_loading_info.
+		team->Lock();
+		if (team->loading_info != NULL)
+			panic("team loading wait complete, but loading_info != NULL");
+		team->Unlock();
+		teamLoadingReference.Unset();
 
 		if (loadingInfo.result < B_OK)
 			return loadingInfo.result;
@@ -3288,15 +3298,13 @@ team_delete_team(Team* team, port_id debuggerPort)
 
 	TeamLocker teamLocker(team);
 
-	if (team->loading_info) {
+	if (team->loading_info != NULL) {
 		// there's indeed someone waiting
-		struct team_loading_info* loadingInfo = team->loading_info;
-		team->loading_info = NULL;
-
-		loadingInfo->result = B_ERROR;
+		team->loading_info->result = B_ERROR;
 
 		// wake up the waiting thread
-		loadingInfo->condition.NotifyAll();
+		team->loading_info->condition.NotifyAll();
+		team->loading_info = NULL;
 	}
 
 	// notify team watchers

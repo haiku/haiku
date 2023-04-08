@@ -426,20 +426,18 @@ notify_loading_app(status_t result, bool suspend)
 
 	TeamLocker teamLocker(team);
 
-	if (team->loading_info) {
+	if (team->loading_info != NULL) {
 		// there's indeed someone waiting
-		struct team_loading_info* loadingInfo = team->loading_info;
-		team->loading_info = NULL;
-
-		loadingInfo->result = result;
-
-		// we're done with the team stuff, get the scheduler lock instead
-		teamLocker.Unlock();
 
 		thread_prepare_suspend();
 
 		// wake up the waiting thread
-		loadingInfo->condition.NotifyAll();
+		team->loading_info->result = result;
+		team->loading_info->condition.NotifyAll();
+		team->loading_info = NULL;
+
+		// we're done with the team stuff
+		teamLocker.Unlock();
 
 		// suspend ourselves, if desired
 		if (suspend)
