@@ -139,6 +139,13 @@ ICUCollateData::Strxfrm(char* out, const char* in,
 
 	requiredSize = fCollator->getSortKey(unicodeIn, (uint8_t*)out, outSize);
 
+	// Do not include terminating NULL byte in the required-size.
+	if (requiredSize > 0) {
+		if (outSize >= requiredSize)
+			assert(out[requiredSize - 1] == '\0');
+		requiredSize--;
+	}
+
 	return B_OK;
 }
 
@@ -206,6 +213,13 @@ ICUCollateData::Wcsxfrm(wchar_t* out, const wchar_t* in, size_t outSize,
 	// convert 1-byte characters to 4-byte wide characters:
 	for (size_t i = 0; i < outSize; ++i)
 		out[outSize - 1 - i] = buffer[outSize - 1 - i];
+
+	// Do not include terminating NULL character in the required-size.
+	if (requiredSize > 0) {
+		if (outSize >= requiredSize)
+			assert(out[requiredSize - 1] == 0);
+		requiredSize--;
+	}
 
 	return B_OK;
 }
