@@ -155,10 +155,6 @@ BButton::Draw(BRect updateRect)
 			base, flags);
 	}
 
-	// always leave some room around the label
-	float labelMargin = be_control_look->DefaultLabelSpacing() / 2;
-	rect.InsetBy(labelMargin, labelMargin);
-
 	const BBitmap* icon = IconBitmap(
 		(Value() == B_CONTROL_OFF
 				? B_INACTIVE_ICON_BITMAP : B_ACTIVE_ICON_BITMAP)
