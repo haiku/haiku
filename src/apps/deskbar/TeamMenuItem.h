@@ -46,6 +46,9 @@ All rights reserved.
 
 const float kSwitchWidth = 12.0f;
 
+const uint32 kMinimizeTeam = 'mntm';
+const uint32 kBringTeamToFront = 'bftm';
+
 
 class BBitmap;
 class TBarView;
@@ -60,6 +63,7 @@ public:
 									float height = -1.0f);
 	virtual						~TTeamMenuItem();
 
+			bool				HandleMouseDown(BPoint where);
 			status_t			Invoke(BMessage* message = NULL);
 
 			void				SetOverrideWidth(float width)

@@ -191,3 +191,64 @@ TTeamMenu::DetachedFromWindow()
 	BMessenger self(this);
 	TBarApp::Unsubscribe(self);
 }
+
+
+void
+TTeamMenu::MessageReceived(BMessage* message)
+{
+	TTeamMenuItem* item = NULL;
+
+	switch (message->what) {
+		case B_SOME_APP_QUIT:
+		case kRemoveTeam:
+		{
+			int32 itemIndex = -1;
+			message->FindInt32("itemIndex", &itemIndex);
+			team_id team = -1;
+			message->FindInt32("team", &team);
+
+			item = dynamic_cast<TTeamMenuItem*>(ItemAt(itemIndex));
+			if (item != NULL && item->Teams()->HasItem((void*)(addr_t)team)) {
+				item->Teams()->RemoveItem(team);
+				RemoveItem(itemIndex);
+				delete item;
+			}
+			break;
+		}
+
+		default:
+			BMenu::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+TTeamMenu::MouseDown(BPoint where)
+{
+	if (fBarView == NULL || fBarView->Dragging())
+		return BMenu::MouseDown(where);
+
+	BMenuItem* item = ItemAtPoint(where);
+	if (item == NULL)
+		return BMenu::MouseDown(where);
+
+	TTeamMenuItem* teamItem = dynamic_cast<TTeamMenuItem*>(item);
+	if (teamItem == NULL || !teamItem->HandleMouseDown(where))
+		BMenu::MouseDown(where);
+}
+
+
+BMenuItem*
+TTeamMenu::ItemAtPoint(BPoint point)
+{
+	int32 itemCount = CountItems();
+	for (int32 index = 0; index < itemCount; index++) {
+		BMenuItem* item = ItemAt(index);
+		if (item != NULL && item->Frame().Contains(point))
+			return item;
+	}
+
+	// no item found
+	return NULL;
+}

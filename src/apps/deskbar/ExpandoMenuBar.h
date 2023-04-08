@@ -83,6 +83,7 @@ public:
 
 			void			BuildItems();
 
+			BMenuItem*		ItemAtPoint(BPoint point);
 			TTeamMenuItem*	TeamItemAtPoint(BPoint location,
 								BMenuItem** _item = NULL);
 			bool			InDeskbarMenu(BPoint) const;

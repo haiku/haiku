@@ -50,6 +50,7 @@ All rights reserved.
 #include <Region.h>
 #include <Roster.h>
 #include <Resources.h>
+#include <Window.h>
 
 #include "BarApp.h"
 #include "BarMenuBar.h"
@@ -91,6 +92,67 @@ TTeamMenuItem::~TTeamMenuItem()
 	delete fTeam;
 	delete fIcon;
 	free(fSignature);
+}
+
+
+/*!	Vulcan Death Grip and other team mouse button handling
+
+	\returns true if handled, false otherwise
+*/
+bool
+TTeamMenuItem::HandleMouseDown(BPoint where)
+{
+	BMenu* menu = Menu();
+	if (menu == NULL)
+		return false;
+
+	BWindow* window = menu->Window();
+	if (window == NULL)
+		return false;
+
+	BMessage* message = window->CurrentMessage();
+	if (message == NULL)
+		return false;
+
+	int32 modifiers = 0;
+	int32 buttons = 0;
+	message->FindInt32("modifiers", &modifiers);
+	message->FindInt32("buttons", &buttons);
+
+	// check for three finger salute, a.k.a. Vulcan Death Grip
+	if ((modifiers & B_COMMAND_KEY) != 0
+		&& (modifiers & B_CONTROL_KEY) != 0
+		&& (modifiers & B_SHIFT_KEY) != 0) {
+		BMessage appMessage(B_SOME_APP_QUIT);
+		int32 teamCount = fTeam->CountItems();
+		BMessage quitMessage(teamCount == 1 ? B_SOME_APP_QUIT : kRemoveTeam);
+		quitMessage.AddInt32("itemIndex", menu->IndexOf(this));
+		for (int32 index = 0; index < teamCount; index++) {
+			team_id team = (addr_t)fTeam->ItemAt(index);
+			appMessage.AddInt32("be:team", team);
+			quitMessage.AddInt32("team", team);
+
+			kill_team(team);
+		}
+		be_app->PostMessage(&appMessage);
+		TExpandoMenuBar* expando = dynamic_cast<TExpandoMenuBar*>(menu);
+		window->PostMessage(&quitMessage, expando != NULL ? expando : menu);
+		return true;
+	} else if ((modifiers & B_SHIFT_KEY) == 0
+		&& (buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+		// launch new team
+		be_roster->Launch(Signature());
+		return true;
+	} else if ((modifiers & B_CONTROL_KEY) != 0) {
+		// control click - show all/hide all shortcut
+		BMessage showMessage((modifiers & B_SHIFT_KEY) != 0
+			? kMinimizeTeam : kBringTeamToFront);
+		showMessage.AddInt32("itemIndex", menu->IndexOf(this));
+		window->PostMessage(&showMessage, menu);
+		return true;
+	}
+
+	return false;
 }
 
 

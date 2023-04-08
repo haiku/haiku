@@ -50,8 +50,12 @@ class TTeamMenu : public BMenu {
 public:
 							TTeamMenu(TBarView* barView = NULL);
 
-			void			AttachedToWindow();
-			void			DetachedFromWindow();
+	virtual	void			AttachedToWindow();
+	virtual	void			DetachedFromWindow();
+	virtual	void			MessageReceived(BMessage* message);
+	virtual	void			MouseDown(BPoint where);
+
+			BMenuItem*		ItemAtPoint(BPoint point);
 
 	static	int				CompareByName(const void* first,
 								const void* second);
