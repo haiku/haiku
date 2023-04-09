@@ -138,6 +138,7 @@ do {									      \
 									      \
       /* We use a full nibble for the leading digit.  */		      \
       leading = *numstr++;						      \
+      wnumstr++;							      \
 									      \
       /* We have 3 bits from the mantissa in the leading nibble.	      \
 	 Therefore we are here using `IEEE854_LONG_DOUBLE_BIAS + 3'.  */      \
