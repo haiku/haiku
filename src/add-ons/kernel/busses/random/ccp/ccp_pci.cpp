@@ -10,7 +10,6 @@
 
 #include <ByteOrder.h>
 #include <bus/PCI.h>
-#include <PCI_x86.h>
 
 #define DRIVER_NAME "ccp_rng_pci"
 #include "ccp.h"

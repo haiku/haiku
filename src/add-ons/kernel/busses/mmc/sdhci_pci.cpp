@@ -12,7 +12,6 @@
 #include <string.h>
 
 #include <bus/PCI.h>
-#include <PCI_x86.h>
 
 #include <KernelExport.h>
 
