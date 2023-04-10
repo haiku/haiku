@@ -34,6 +34,8 @@ __mbrtowc(wchar_t* pwc, const char* s, size_t n, mbstate_t* ps)
 
 	if (s == NULL)
 		return __mbrtowc(NULL, "", 1, ps);
+	if (n == 0)
+		return (size_t)-2;
 
 	LocaleBackend* backend = GetCurrentLocaleBackend();
 
