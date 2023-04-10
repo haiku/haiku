@@ -1,11 +1,14 @@
 /*
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 #include <pthread.h>
+#include <threads.h>
 
 #include <OS.h>
+#include <Debug.h>
 
 
 enum {
@@ -14,6 +17,11 @@ enum {
 	STATE_SPINNING		= -3,
 	STATE_INITIALIZED	= -4
 };
+
+#if __cplusplus >= 201103L
+STATIC_ASSERT(((pthread_once_t)ONCE_FLAG_INIT).state == ((pthread_once_t)PTHREAD_ONCE_INIT).state);
+STATIC_ASSERT(((pthread_once_t)PTHREAD_ONCE_INIT).state == STATE_UNINITIALIZED);
+#endif
 
 
 /*!	Called when the thread performing the initialization function was canceled.
