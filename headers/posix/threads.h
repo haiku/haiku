@@ -63,7 +63,7 @@ enum {
 #if !defined(__cplusplus) || __cplusplus < 201103L
 #define	thread_local		_Thread_local
 #endif
-#define	ONCE_FLAG_INIT		{ 0 }
+#define	ONCE_FLAG_INIT		{ -1 }
 #define	TSS_DTOR_ITERATIONS	4
 
 #ifdef __cplusplus
@@ -89,8 +89,7 @@ int	thrd_create(thrd_t *thread, thrd_start_t, void *);
 thrd_t	thrd_current(void);
 int	thrd_detach(thrd_t);
 int	thrd_equal(thrd_t, thrd_t);
-_Noreturn void
-	thrd_exit(int);
+void thrd_exit(int) __attribute__((noreturn));
 int	thrd_join(thrd_t, int *);
 int	thrd_sleep(const struct timespec *, struct timespec *);
 void	thrd_yield(void);
