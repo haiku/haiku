@@ -12,7 +12,6 @@ extern "C" {
 }
 
 #include <PCI.h>
-#include <PCI_x86.h>
 
 
 //#define DEBUG_PCI
@@ -24,7 +23,6 @@ extern "C" {
 
 
 pci_module_info *gPci;
-struct pci_x86_module_info *gPCIx86;
 
 
 status_t
@@ -37,10 +35,6 @@ init_pci()
 	if (status != B_OK)
 		return status;
 
-	// if it fails we just don't support x86 specific features (like MSIs)
-	if (get_module(B_PCI_X86_MODULE_NAME, (module_info **)&gPCIx86) != B_OK)
-		gPCIx86 = NULL;
-
 	return B_OK;
 }
 
@@ -50,8 +44,6 @@ uninit_pci()
 {
 	if (gPci != NULL)
 		put_module(B_PCI_MODULE_NAME);
-	if (gPCIx86 != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
 }
 
 
@@ -264,23 +256,17 @@ pci_find_extcap(device_t dev, int capability, int *capreg)
 int
 pci_msi_count(device_t dev)
 {
-	if (gPCIx86 == NULL)
-		return 0;
-
 	pci_info* info = get_device_pci_info(dev);
-	return gPCIx86->get_msi_count(info->bus, info->device, info->function);
+	return gPci->get_msi_count(info->bus, info->device, info->function);
 }
 
 
 int
 pci_alloc_msi(device_t dev, int *count)
 {
-	if (gPCIx86 == NULL)
-		return ENODEV;
-
 	pci_info* info = get_device_pci_info(dev);
 	uint8 startVector = 0;
-	if (gPCIx86->configure_msi(info->bus, info->device, info->function, *count,
+	if (gPci->configure_msi(info->bus, info->device, info->function, *count,
 			&startVector) != B_OK) {
 		return ENODEV;
 	}
@@ -294,11 +280,8 @@ pci_alloc_msi(device_t dev, int *count)
 int
 pci_release_msi(device_t dev)
 {
-	if (gPCIx86 == NULL)
-		return ENODEV;
-
 	pci_info* info = get_device_pci_info(dev);
-	gPCIx86->unconfigure_msi(info->bus, info->device, info->function);
+	gPci->unconfigure_msi(info->bus, info->device, info->function);
 	((struct root_device_softc *)dev->root->softc)->is_msi = false;
 	((struct root_device_softc *)dev->root->softc)->is_msix = false;
 	return EOK;
@@ -326,23 +309,17 @@ pci_msix_table_bar(device_t dev)
 int
 pci_msix_count(device_t dev)
 {
-	if (gPCIx86 == NULL)
-		return 0;
-
 	pci_info* info = get_device_pci_info(dev);
-	return gPCIx86->get_msix_count(info->bus, info->device, info->function);
+	return gPci->get_msix_count(info->bus, info->device, info->function);
 }
 
 
 int
 pci_alloc_msix(device_t dev, int *count)
 {
-	if (gPCIx86 == NULL)
-		return ENODEV;
-
 	pci_info* info = get_device_pci_info(dev);
 	uint8 startVector = 0;
-	if (gPCIx86->configure_msix(info->bus, info->device, info->function, *count,
+	if (gPci->configure_msix(info->bus, info->device, info->function, *count,
 			&startVector) != B_OK) {
 		return ENODEV;
 	}

@@ -10,7 +10,6 @@ extern "C" {
 }
 
 #include <cstdlib>
-#include <PCI_x86.h>
 
 #include <arch/cpu.h>
 #include <int.h>
@@ -421,18 +420,18 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 			intr_wrapper, intr, 0);
 	}
 
-	if (status == B_OK && res->r_bustag == BUS_SPACE_TAG_MSI && gPCIx86 != NULL) {
+	if (status == B_OK && res->r_bustag == BUS_SPACE_TAG_MSI) {
 		// this is an msi, enable it
 		struct root_device_softc* root_softc = ((struct root_device_softc *)dev->root->softc);
 		if (root_softc->is_msi) {
-			if (gPCIx86->enable_msi(root_softc->pci_info.bus, root_softc->pci_info.device,
+			if (gPci->enable_msi(root_softc->pci_info.bus, root_softc->pci_info.device,
 					root_softc->pci_info.function) != B_OK) {
 				device_printf(dev, "enabling msi failed\n");
 				bus_teardown_intr(dev, res, intr);
 				return ENODEV;
 			}
 		} else if (root_softc->is_msix) {
-			if (gPCIx86->enable_msix(root_softc->pci_info.bus, root_softc->pci_info.device,
+			if (gPci->enable_msix(root_softc->pci_info.bus, root_softc->pci_info.device,
 					root_softc->pci_info.function) != B_OK) {
 				device_printf(dev, "enabling msix failed\n");
 				bus_teardown_intr(dev, res, intr);
@@ -462,10 +461,10 @@ bus_teardown_intr(device_t dev, struct resource *res, void *arg)
 
 	struct root_device_softc *root = (struct root_device_softc *)dev->root->softc;
 
-	if ((root->is_msi || root->is_msix) && gPCIx86 != NULL) {
+	if (root->is_msi || root->is_msix) {
 		// disable msi generation
 		pci_info *info = &root->pci_info;
-		gPCIx86->disable_msi(info->bus, info->device, info->function);
+		gPci->disable_msi(info->bus, info->device, info->function);
 	}
 
 	if (intr->filter != NULL) {
