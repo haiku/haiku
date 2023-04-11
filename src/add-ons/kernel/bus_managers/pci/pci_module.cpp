@@ -7,7 +7,6 @@
 
 
 #include <PCI.h>
-#include <PCI_x86.h>
 #include "pci_msi.h"
 
 #include "pci_private.h"
@@ -42,29 +41,6 @@ pci_old_module_std_ops(int32 op, ...)
 		case B_MODULE_UNINIT:
 			TRACE(("PCI: pci_module_uninit\n"));
 			pci_uninit();
-			return B_OK;
-	}
-
-	return B_BAD_VALUE;
-}
-
-
-static int32
-pci_arch_module_std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		{
-			module_info *dummy;
-			status_t result = get_module(B_PCI_MODULE_NAME, &dummy);
-			if (result != B_OK)
-				return result;
-
-			return B_OK;
-		}
-
-		case B_MODULE_UNINIT:
-			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
 	}
 
@@ -161,57 +137,6 @@ static struct pci_module_info sOldPCIModule = {
 };
 
 
-static pci_x86_module_info sPCIArchModule = {
-	{
-		B_PCI_X86_MODULE_NAME,
-		0,
-		pci_arch_module_std_ops
-	},
-	.get_msi_count = [](uint8 bus, uint8 device, uint8 function) {
-		PCIDev* dev;
-		if (ResolveBDF(bus, device, function, dev) < B_OK)
-			return (uint8)0;
-		return gPCI->GetMSICount(dev);
-	},
-	.configure_msi = [](uint8 bus, uint8 device, uint8 function, uint8 count, uint8 *startVector) {
-		PCIDev* dev;
-		CHECK_RET(ResolveBDF(bus, device, function, dev));
-		return gPCI->ConfigureMSI(dev, count, startVector);
-	},
-	.unconfigure_msi = [](uint8 bus, uint8 device, uint8 function) {
-		PCIDev* dev;
-		CHECK_RET(ResolveBDF(bus, device, function, dev));
-		return gPCI->UnconfigureMSI(dev);
-	},
-	.enable_msi = [](uint8 bus, uint8 device, uint8 function) {
-		PCIDev* dev;
-		CHECK_RET(ResolveBDF(bus, device, function, dev));
-		return gPCI->EnableMSI(dev);
-	},
-	.disable_msi = [](uint8 bus, uint8 device, uint8 function) {
-		PCIDev* dev;
-		CHECK_RET(ResolveBDF(bus, device, function, dev));
-		return gPCI->DisableMSI(dev);
-	},
-	.get_msix_count = [](uint8 bus, uint8 device, uint8 function) {
-		PCIDev* dev;
-		if (ResolveBDF(bus, device, function, dev) < B_OK)
-			return (uint8)0;
-		return gPCI->GetMSIXCount(dev);
-	},
-	.configure_msix = [](uint8 bus, uint8 device, uint8 function, uint8 count, uint8 *startVector) {
-		PCIDev* dev;
-		CHECK_RET(ResolveBDF(bus, device, function, dev));
-		return gPCI->ConfigureMSIX(dev, count, startVector);
-	},
-	.enable_msix = [](uint8 bus, uint8 device, uint8 function) {
-		PCIDev* dev;
-		CHECK_RET(ResolveBDF(bus, device, function, dev));
-		return gPCI->EnableMSIX(dev);
-	}
-};
-
-
 module_dependency module_dependencies[] = {
 	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager},
 	{}
@@ -231,6 +156,5 @@ module_info *modules[] = {
 	(module_info *)&gPCIRootModule,
 	(module_info *)&gPCIDeviceModule,
 	(module_info *)&gPCILegacyDriverModule,
-	(module_info *)&sPCIArchModule,
 	NULL
 };
