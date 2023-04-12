@@ -73,6 +73,7 @@ local sources =
 	CliContinueCommand.cpp
 	CliDebugReportCommand.cpp
 	CliDumpMemoryCommand.cpp
+	CliDumpStringCommand.cpp
 	CliPrintVariableCommand.cpp
 	CliQuitCommand.cpp
 	CliStackFrameCommand.cpp

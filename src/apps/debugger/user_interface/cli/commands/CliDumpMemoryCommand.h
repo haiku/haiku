@@ -8,13 +8,17 @@
 
 #include "CliCommand.h"
 
+#include <String.h>
+
 
 class SourceLanguage;
 
 
 class CliDumpMemoryCommand : public CliCommand {
 public:
-								CliDumpMemoryCommand();
+								CliDumpMemoryCommand(int itemSize,
+										const char* itemSizeNoun,
+										int displayWidth);
 	virtual						~CliDumpMemoryCommand();
 
 	virtual	void				Execute(int argc, const char* const* argv,
@@ -22,6 +26,10 @@ public:
 
 private:
 	SourceLanguage*				fLanguage;
+	BString						fSummaryString;
+	BString						fUsageString;
+	int							itemSize;
+	int							displayWidth;
 };
 
 

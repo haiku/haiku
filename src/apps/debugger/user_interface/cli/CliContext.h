@@ -19,6 +19,7 @@
 #include "ValueNodeContainer.h"
 
 
+class SourceLanguage;
 class StackFrame;
 class StackTrace;
 class Team;
@@ -77,14 +78,11 @@ public:
 									{ return fCurrentStackFrameIndex; }
 			void				SetCurrentStackFrameIndex(int32 index);
 
-			TeamMemoryBlock*	CurrentBlock() const { return fCurrentBlock; }
+			status_t			EvaluateExpression(const char * expression,
+									SourceLanguage* language, target_addr_t& address);
 
-			ExpressionInfo*		GetExpressionInfo() const
-									{ return fExpressionInfo; }
-			status_t			GetExpressionResult() const
-									{ return fExpressionResult; }
-			ExpressionResult*	GetExpressionValue() const
-									{ return fExpressionValue; }
+			status_t			GetMemoryBlock(target_addr_t address,
+									TeamMemoryBlock*& block);
 
 			const char*			PromptUser(const char* prompt);
 			void				AddLineToInputHistory(const char* line);

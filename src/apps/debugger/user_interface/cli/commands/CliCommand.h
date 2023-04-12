@@ -26,7 +26,7 @@ public:
 	virtual	void				Execute(int argc, const char* const* argv,
 									CliContext& context) = 0;
 
-private:
+protected:
 			const char*			fSummary;
 			const char*			fUsage;
 };

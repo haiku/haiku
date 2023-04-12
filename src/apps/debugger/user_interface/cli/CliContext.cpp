@@ -12,6 +12,7 @@
 
 #include "StackTrace.h"
 #include "UserInterface.h"
+#include "Value.h"
 #include "ValueNodeManager.h"
 #include "Variable.h"
 
@@ -285,6 +286,57 @@ CliContext::SetCurrentStackFrameIndex(int32 index)
 	StackFrame* frame = fCurrentStackTrace->FrameAt(index);
 	if (frame != NULL)
 		fNodeManager->SetStackFrame(fCurrentThread, frame);
+}
+
+
+status_t
+CliContext::EvaluateExpression(const char* expression,
+		SourceLanguage* language, target_addr_t& address)
+{
+	fExpressionInfo->SetTo(expression);
+
+	fListener->ExpressionEvaluationRequested(
+		language, fExpressionInfo);
+	WaitForEvents(CliContext::EVENT_EXPRESSION_EVALUATED);
+	if (fTerminating)
+		return B_INTERRUPTED;
+
+	BString errorMessage;
+	if (fExpressionValue != NULL) {
+		if (fExpressionValue->Kind() == EXPRESSION_RESULT_KIND_PRIMITIVE) {
+			Value* value = fExpressionValue->PrimitiveValue();
+			BVariant variantValue;
+			value->ToVariant(variantValue);
+			if (variantValue.Type() == B_STRING_TYPE)
+				errorMessage.SetTo(variantValue.ToString());
+			else
+				address = variantValue.ToUInt64();
+		}
+	} else
+		errorMessage = strerror(fExpressionResult);
+
+	if (!errorMessage.IsEmpty()) {
+		printf("Unable to evaluate expression: %s\n",
+			errorMessage.String());
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+CliContext::GetMemoryBlock(target_addr_t address, TeamMemoryBlock*& block)
+{
+	if (fCurrentBlock == NULL || !fCurrentBlock->Contains(address)) {
+		GetUserInterfaceListener()->InspectRequested(address, this);
+		WaitForEvents(CliContext::EVENT_TEAM_MEMORY_BLOCK_RETRIEVED);
+		if (fTerminating)
+			return B_INTERRUPTED;
+	}
+
+	block = fCurrentBlock;
+	return B_OK;
 }
 
 

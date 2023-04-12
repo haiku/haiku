@@ -9,7 +9,7 @@
  */
 
 
-#include "CliDumpMemoryCommand.h"
+#include "CliDumpStringCommand.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -26,30 +26,19 @@
 #include "Variable.h"
 
 
-CliDumpMemoryCommand::CliDumpMemoryCommand(int itemSize,
-	const char* itemSizeNoun, int displayWidth)
+CliDumpStringCommand::CliDumpStringCommand()
 	:
-	CliCommand(NULL, NULL),
-	itemSize(itemSize),
-	displayWidth(displayWidth)
+	CliCommand("dump contents of a string in the debugged team's memory",
+			"%s [\"]address|expression[\"]\n"
+			"Reads and displays the contents of a null-terminated string at the target address.")
 {
-	// BString manages the lifetime of the const char* put in fSummary and fUsage
-	fSummaryString.SetToFormat("dump contents of debugged team's memory in %s-sized increments",
-		itemSizeNoun);
-	fUsageString.SetToFormat("%%s [\"]address|expression[\"] [num]\n"
-		"Reads and displays the contents of memory at the target address in %d-byte increments",
-		itemSize);
-
-	fSummary = fSummaryString.String();
-	fUsage = fUsageString.String();
-
 	// TODO: this should be retrieved via some indirect helper rather
 	// than instantiating the specific language directly.
 	fLanguage = new(std::nothrow) CppLanguage();
 }
 
 
-CliDumpMemoryCommand::~CliDumpMemoryCommand()
+CliDumpStringCommand::~CliDumpStringCommand()
 {
 	if (fLanguage != NULL)
 		fLanguage->ReleaseReference();
@@ -57,7 +46,7 @@ CliDumpMemoryCommand::~CliDumpMemoryCommand()
 
 
 void
-CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
+CliDumpStringCommand::Execute(int argc, const char* const* argv,
 	CliContext& context)
 {
 	if (argc < 2) {
@@ -78,20 +67,27 @@ CliDumpMemoryCommand::Execute(int argc, const char* const* argv,
 	if (context.GetMemoryBlock(address, block) != B_OK)
 		return;
 
-	int32 num = 0;
-	if (argc == 3) {
-		char *remainder;
-		num = strtol(argv[2], &remainder, 0);
-		if (*remainder != '\0') {
-			printf("Error: invalid parameter \"%s\"\n", argv[2]);
+	printf("%p \"", (char*)address);
+
+	target_addr_t offset = address;
+	char c;
+	while (block->Contains(offset)) {
+		c = *(block->Data() + offset - block->BaseAddress());
+
+		if (c == '\0')
+			break;
+		if (c == '\n')
+			printf("\\n");
+		else if (c == '\t')
+			printf("\\t");
+		else {
+			if (!isprint(c))
+				c = '.';
+
+			printf("%c", c);
 		}
+		++offset;
 	}
 
-	if (num <= 0)
-		num = displayWidth;
-
-	BString output;
-	UiUtils::DumpMemory(output, 0, block, address, itemSize, displayWidth,
-		num);
-	printf("%s\n", output.String());
+	printf("\"\n");
 }
