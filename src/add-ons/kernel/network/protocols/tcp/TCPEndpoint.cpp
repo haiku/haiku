@@ -2062,9 +2062,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		availableBytes = (fReceiveMaxAdvertised - fReceiveNext).Number();
 
 	if (fFlags & FLAG_OPTION_WINDOW_SCALE)
-		segment.advertised_window = availableBytes >> fReceiveWindowShift;
-	else
-		segment.advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
+		availableBytes >>= fReceiveWindowShift;
+	segment.advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
 
 	segment.acknowledge = fReceiveNext.Number();
 
