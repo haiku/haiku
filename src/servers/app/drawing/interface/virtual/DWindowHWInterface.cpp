@@ -407,7 +407,7 @@ DWindowHWInterface::_OpenGraphicsDevice(int deviceNumber)
 {
 	DIR *directory = opendir("/dev/graphics");
 	if (!directory)
-		return -1;
+		return B_ENTRY_NOT_FOUND;
 
 	// TODO: We do not need to avoid the "vesa" or "framebuffer" drivers this way
 	// once they been ported to the new driver architecture - the special case here

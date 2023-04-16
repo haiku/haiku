@@ -239,7 +239,7 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	if (!use_fail_safe_video_mode()) {
 		DIR *directory = opendir("/dev/graphics");
 		if (!directory)
-			return -1;
+			return B_ENTRY_NOT_FOUND;
 
 		struct dirent *entry;
 		char path[PATH_MAX];
