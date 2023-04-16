@@ -630,8 +630,6 @@ command_cd(int argc, const char* const* argv)
 static fssh_status_t
 command_chmod(int argc, const char* const* argv)
 {
-	bool recursive = false;
-
 	// parse parameters
 	int argi = 1;
 	for (argi = 1; argi < argc; argi++) {
@@ -647,7 +645,6 @@ command_chmod(int argc, const char* const* argv)
 		for (int i = 1; arg[i]; i++) {
 			switch (arg[i]) {
 				case 'R':
-					recursive = true;
 					fprintf(stderr, "Sorry, recursive mode not supported "
 						"yet.\n");
 					return FSSH_B_BAD_VALUE;

@@ -1464,7 +1464,6 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, fssh_size_t bufferSize)
 		char nameBuffer[sizeof(struct fssh_dirent) + FSSH_B_FILE_NAME_LENGTH];
 		char *name = &((struct fssh_dirent *)nameBuffer)->d_name[0];
 		struct vnode *parentVnode;
-		fssh_vnode_id parentID;
 
 		// lookup the parent vnode
 		status = lookup_dir_entry(vnode, "..", &parentVnode);
@@ -1480,7 +1479,6 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, fssh_size_t bufferSize)
 		if (mountPoint) {
 			put_vnode(parentVnode);
 			parentVnode = mountPoint;
-			parentID = parentVnode->id;
 		}
 
 		bool hitRoot = (parentVnode == vnode);
