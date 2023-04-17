@@ -52,6 +52,7 @@ const char* kUTF8ControlMap[] = {
 	"\xe2\x86\x92", /* B_RIGHT_ARROW */
 	"\xe2\x86\x91", /* B_UP_ARROW */
 	"\xe2\x86\x93", /* B_DOWN_ARROW */
+	"\xe2\x90\xA3"  /* B_SPACE */
 };
 
 
@@ -759,7 +760,7 @@ BMenuItem::_DrawShortcutSymbol(bool submenus)
 		where.x -= fBounds.Height() / 2;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
-	if (fShortcutChar < B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
+	if (fShortcutChar <= B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
 		_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
 	else
 		fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
