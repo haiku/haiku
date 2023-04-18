@@ -195,18 +195,25 @@ _callout_stop(struct callout *c, bool drain, bool locked = false)
 	if (!locked)
 		locker.SetTo(sLock, false);
 
+	bool lockHeld = false;
 	if (!drain && c->c_mtx != NULL) {
-		// The documentation for callout_stop() confirms any associated locks
-		// must be held when invoking it. We depend on this behavior for
-		// synchronization with the callout thread, which can modify c_due
-		// with only the callout's lock held.
-		mtx_assert(c->c_mtx, MA_OWNED);
+		if (c->c_mtx != &Giant) {
+			// The documentation for callout_stop() confirms any associated locks
+			// must be held when invoking it. We depend on this behavior for
+			// synchronization with the callout thread, which can modify c_due
+			// with only the callout's lock held.
+			mtx_assert(c->c_mtx, MA_OWNED);
+			lockHeld = true;
+		} else {
+			// FreeBSD is lenient and does not assert if the callout mutex is &Giant.
+			lockHeld = mtx_owned(&Giant);
+		}
 	}
 
 	int ret = -1;
 	if (callout_active(c)) {
 		ret = 0;
-		if (!drain && c->c_mtx != NULL && c->c_due == 0) {
+		if (!drain && lockHeld && c->c_due == 0) {
 			// The callout is active, but c_due == 0 and we hold the locks: this
 			// means the callout thread has dequeued it and is waiting for c_mtx.
 			// Clear c_due to signal the callout thread.
