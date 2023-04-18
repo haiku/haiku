@@ -63,7 +63,6 @@ private:
 			friend struct HelpCommand;
 
 private:
-	static	status_t			_InputLoopEntry(void* data);
 			status_t			_InputLoop();
 
 			status_t			_RegisterCommands();

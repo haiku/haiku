@@ -241,13 +241,6 @@ CommandLineUserInterface::Run()
 }
 
 
-/*static*/ status_t
-CommandLineUserInterface::_InputLoopEntry(void* data)
-{
-	return ((CommandLineUserInterface*)data)->_InputLoop();
-}
-
-
 status_t
 CommandLineUserInterface::_InputLoop()
 {
