@@ -247,14 +247,15 @@
 	         it to /boot, but is prevented by the kernel.
 
 	\param name The new name of the volume, must not be longer than
-		   \c B_FILE_NAME_LENGTH (including the terminating \c NULL).
+	       \c B_FILE_NAME_LENGTH (including the terminating \c NULL).
 
 	\return A status code.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a name was \c NULL or the object was not properly
 	        initialized.
+	\retval B_NAME_TOO_LONG \a name was >= \c B_FILE_NAME_LENGTH.
 
-	\since Haiku R1
+	\since BeOS R4
 */
 
 
