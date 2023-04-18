@@ -84,6 +84,7 @@ compat_close(void *cookie)
 	struct ifnet *ifp = cookie;
 
 	if_printf(ifp, "compat_close()\n");
+	IFF_LOCKGIANT(ifp);
 
 	atomic_or(&ifp->flags, DEVICE_CLOSED);
 
@@ -91,6 +92,7 @@ compat_close(void *cookie)
 
 	release_sem_etc(ifp->receive_sem, 1, B_RELEASE_ALL);
 
+	IFF_UNLOCKGIANT(ifp);
 	return B_OK;
 }
 
