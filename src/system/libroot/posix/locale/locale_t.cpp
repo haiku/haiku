@@ -81,6 +81,8 @@ duplocale(locale_t l)
         newBackend->SetLocale(lc, backend->SetLocale(lc, NULL));
     }
 
+    newObj->magic = LOCALE_T_MAGIC;
+
     return (locale_t)newObj;
 }
 
