@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2003-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -301,7 +301,7 @@ void
 BeControlLook::DrawRadioButton(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
@@ -401,14 +401,12 @@ BeControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
@@ -575,14 +573,12 @@ BeControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation, uint32 knobStyle)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 
@@ -747,7 +743,7 @@ void
 BeControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 direction, uint32 flags, float tint)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
@@ -811,7 +807,7 @@ BeControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
@@ -863,7 +859,7 @@ BeControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
 	const BRect& updateRect, float, float, float, float, const rgb_color& base,
 	const rgb_color& background, uint32 flags, uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
@@ -940,7 +936,7 @@ BeControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
@@ -957,7 +953,7 @@ BeControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
@@ -973,7 +969,7 @@ void
 BeControlLook::DrawStatusBar(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, const rgb_color& barColor, float progressPosition)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
@@ -1026,10 +1022,8 @@ BeControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color leftFillColor, rgb_color rightFillColor,
 	float sliderScale, uint32 flags, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
-
-	view->PushState();
 
 	// separate the bar in two sides
 	float sliderPosition;
@@ -1049,29 +1043,18 @@ BeControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		rightBarSide.bottom = sliderPosition - 1;
 	}
 
-	// fill the background for the corners, exclude the middle bar for now
-	BRegion region(rect);
-	region.Exclude(rightBarSide);
-	view->ConstrainClippingRegion(&region);
-
 	view->PushState();
+	view->ClipToRect(leftBarSide);
 
 	DrawSliderBar(view, rect, updateRect, base, leftFillColor, flags,
 		orientation);
-
 	view->PopState();
 
-	region.Set(rect);
-	region.Exclude(leftBarSide);
-	view->ConstrainClippingRegion(&region);
-
 	view->PushState();
+	view->ClipToRect(rightBarSide);
 
 	DrawSliderBar(view, rect, updateRect, base, rightFillColor, flags,
 		orientation);
-
-	view->PopState();
-
 	view->PopState();
 }
 
@@ -1081,7 +1064,7 @@ BeControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color fillColor, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->SetHighColor(fillColor);
@@ -1126,7 +1109,7 @@ void
 BeControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color lighten2 = tint_color(base, B_LIGHTEN_2_TINT);
@@ -1214,7 +1197,7 @@ BeControlLook::DrawSliderTriangle(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, const rgb_color& fill,
 	uint32 flags, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color lighten1 = tint_color(base, B_LIGHTEN_1_TINT);
@@ -1276,7 +1259,7 @@ BeControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, int32 count,
 	hash_mark_location location, uint32 flags, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color lightColor;
@@ -1405,14 +1388,13 @@ BeControlLook::DrawActiveTab(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect plus 2px extra
-	BRegion clipping(updateRect.InsetByCopy(-2, -2));
-	view->ConstrainClippingRegion(&clipping);
+	// clip draw rect to rect plus 2px
+	view->ClipToRect(rect.InsetByCopy(-2, -2));
 
 	// set colors and draw
 
@@ -1628,7 +1610,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 	uint32 borders, uint32 side, int32 index, int32 selected,
 	int32 first, int32 last)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	bool isFirst = index == first;
@@ -1636,9 +1618,8 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 
 	view->PushState();
 
-	// set clipping constraints to updateRect plus 2px extra
-	BRegion clipping(updateRect.InsetByCopy(-2, -2));
-	view->ConstrainClippingRegion(&clipping);
+	// clip draw rect to rect plus 2px
+	view->ClipToRect(rect.InsetByCopy(-2, -2));
 
 	// set colors and draw
 
@@ -1844,7 +1825,7 @@ BeControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, orientation orientation, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color background;
@@ -1962,13 +1943,12 @@ BeControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 	if (borderStyle == B_NO_BORDER)
 		return;
 
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	rgb_color lightColor;
 	rgb_color shadowColor;
@@ -2063,13 +2043,12 @@ BeControlLook::DrawRaisedBorder(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	rgb_color lightColor;
 	rgb_color shadowColor;
@@ -2129,13 +2108,12 @@ BeControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
@@ -2339,7 +2317,7 @@ BeControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags,
 	const BAlignment& alignment, const rgb_color* textColor)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	if (label == NULL && icon == NULL)
@@ -2533,14 +2511,12 @@ BeControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	const rgb_color& background, float contrast, float brightness,
 	uint32 flags, uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	// flags
 	bool isEnabled = (flags & B_DISABLED) == 0;
@@ -2755,7 +2731,7 @@ BeControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	const BRect& updateRect, float, float, float, float, const rgb_color& base,
 	bool popupIndicator, uint32 flags, uint32 borders, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// fill the button area
@@ -2767,12 +2743,9 @@ BeControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 
 	if (isEnabled && isActivated) {
 		// invert if clicked without altering rect
-		BRect invertRect(rect);
-		invertRect.left -= 3;
-		invertRect.top -= 3;
-		invertRect.right += 3;
-		invertRect.bottom += 3;
-		view->InvertRect(invertRect);
+		BRect invertRect(rect.InsetByCopy(-3, -3));
+		view->SetDrawingMode(B_OP_INVERT);
+		view->FillRect(invertRect);
 	}
 }
 
@@ -2808,7 +2781,7 @@ BeControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 	const BRect& updateRect, float, float, float, float, const rgb_color& base,
 	bool popupIndicator, uint32 flags)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// BeControlLook does not support rounded corners and it never will
@@ -2831,14 +2804,12 @@ BeControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 	const BRect& updateRect, float, float, float, float, const rgb_color& base,
 	uint32 flags, uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	// flags
 	bool isEnabled = (flags & B_DISABLED) == 0;
@@ -2910,13 +2881,12 @@ BeControlLook::_DrawScrollBarBackgroundFirst(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	BRect orig(rect);
@@ -3005,13 +2975,12 @@ BeControlLook::_DrawScrollBarBackgroundSecond(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 
