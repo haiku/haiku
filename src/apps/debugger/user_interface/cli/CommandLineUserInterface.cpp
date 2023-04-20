@@ -248,6 +248,8 @@ CommandLineUserInterface::_InputLoop()
 	thread_id currentThread = -1;
 
 	while (!fTerminating) {
+		fContext.ProcessPendingEvents();
+
 		// Wait for a thread or Ctrl-C.
 		fContext.WaitForThreadOrUser();
 		if (fContext.IsTerminating())

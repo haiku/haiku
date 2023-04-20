@@ -38,7 +38,7 @@ public:
 				EVENT_USER_INTERRUPT				= 0x02,
 				EVENT_THREAD_ADDED					= 0x04,
 				EVENT_THREAD_REMOVED				= 0x08,
-				EVENT_THREAD_STOPPED				= 0x10,
+				EVENT_THREAD_STATE_CHANGED			= 0x10,
 				EVENT_THREAD_STACK_TRACE_CHANGED	= 0x20,
 				EVENT_VALUE_NODE_CHANGED			= 0x40,
 				EVENT_TEAM_MEMORY_BLOCK_RETRIEVED	= 0x80,
@@ -151,6 +151,7 @@ private:
 			bool				fInputLoopWaiting;
 	volatile bool				fTerminating;
 
+			BReference<Thread>	fStoppedThread;
 			Thread*				fCurrentThread;
 			StackTrace*			fCurrentStackTrace;
 			int32				fCurrentStackFrameIndex;

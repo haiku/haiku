@@ -100,6 +100,7 @@ CliContext::CliContext()
 	fEventsOccurred(0),
 	fInputLoopWaiting(false),
 	fTerminating(false),
+	fStoppedThread(NULL),
 	fCurrentThread(NULL),
 	fCurrentStackTrace(NULL),
 	fCurrentStackFrameIndex(-1),
@@ -381,43 +382,24 @@ CliContext::QuitSession(bool killTeam)
 void
 CliContext::WaitForThreadOrUser()
 {
-	ProcessPendingEvents();
-
 // TODO: Deal with SIGINT as well!
-	for (;;) {
+
+	// if no thread has been stopped, wait till one is
+	while (fStoppedThread == NULL) {
 		_PrepareToWaitForEvents(
-			EVENT_USER_INTERRUPT | EVENT_THREAD_STOPPED);
-
-		// check whether there are any threads stopped already
-		Thread* stoppedThread = NULL;
-		BReference<Thread> stoppedThreadReference;
-
-		AutoLocker<Team> teamLocker(fTeam);
-
-		for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
-				Thread* thread = it.Next();) {
-			if (thread->State() == THREAD_STATE_STOPPED) {
-				stoppedThread = thread;
-				stoppedThreadReference.SetTo(thread);
-				break;
-			}
-		}
-
-		teamLocker.Unlock();
-
-		if (stoppedThread != NULL) {
-			if (fCurrentThread == NULL)
-				SetCurrentThread(stoppedThread);
-
-			_SignalInputLoop(EVENT_THREAD_STOPPED);
-		}
-
+			EVENT_USER_INTERRUPT | EVENT_THREAD_STATE_CHANGED);
 		uint32 events = _WaitForEvents();
-		if ((events & EVENT_QUIT) != 0 || stoppedThread != NULL) {
-			ProcessPendingEvents();
+
+		ProcessPendingEvents();
+			// updates fStoppedThread if any thread has been stopped
+
+		if ((events & EVENT_QUIT) != 0) {
 			return;
 		}
 	}
+
+	if (fCurrentThread == NULL)
+		SetCurrentThread(fStoppedThread);
 }
 
 
@@ -470,9 +452,14 @@ CliContext::ProcessPendingEvents()
 				printf("[thread terminated: %" B_PRId32 " \"%s\"]\n",
 					thread->ID(), thread->Name());
 				break;
-			case EVENT_THREAD_STOPPED:
-				printf("[thread stopped: %" B_PRId32 " \"%s\"]\n",
-					thread->ID(), thread->Name());
+			case EVENT_THREAD_STATE_CHANGED:
+				if (thread->State() == THREAD_STATE_STOPPED) {
+					printf("[thread stopped: %" B_PRId32 " \"%s\"]\n",
+						thread->ID(), thread->Name());
+					fStoppedThread.SetTo(thread);
+				} else {
+					fStoppedThread = NULL;
+				}
 				break;
 			case EVENT_THREAD_STACK_TRACE_CHANGED:
 				if (thread == fCurrentThread) {
@@ -524,12 +511,9 @@ CliContext::ThreadRemoved(const Team::ThreadEvent& threadEvent)
 void
 CliContext::ThreadStateChanged(const Team::ThreadEvent& threadEvent)
 {
-	if (threadEvent.GetThread()->State() != THREAD_STATE_STOPPED)
-		return;
-
 	_QueueEvent(
-		new(std::nothrow) Event(EVENT_THREAD_STOPPED, threadEvent.GetThread()));
-	_SignalInputLoop(EVENT_THREAD_STOPPED);
+		new(std::nothrow) Event(EVENT_THREAD_STATE_CHANGED, threadEvent.GetThread()));
+	_SignalInputLoop(EVENT_THREAD_STATE_CHANGED);
 }
 
 
