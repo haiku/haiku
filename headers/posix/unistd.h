@@ -362,6 +362,17 @@ extern int		symlinkat(const char *toPath, int fd, const char *symlinkPath);
 extern int      ftruncate(int fd, off_t newSize);
 extern int      truncate(const char *path, off_t newSize);
 
+/* We want the 3rd and 4th arguments to ioctl to be optional, but we can't use varargs because
+ * then we have no way to know if the optional arguments are present, and calling va_next is
+ * undefined behavior (it may or may not work depending on the calling convention).
+ *
+ * In C++, we implement ioctl using default function arguments, but in C this isn't possible.
+ * So, the C implementation is done as vararg macro that use preprocessor magic to call the
+ * 4 argument function and fill in the omitted arguments.
+ *
+ * The legacy ioctl function in C with vararg arguments is still provided for ABI compatibility
+ * with existing applications, but should not be used anymore by newly compiled code.
+ */
 extern int		__ioctl(int fd, ulong cmd, void* argument, size_t size);
 #ifndef __cplusplus
 extern int		ioctl(int fd, unsigned long op, ...);

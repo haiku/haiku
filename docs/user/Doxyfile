@@ -948,6 +948,7 @@ INPUT                  = . \
                          ../../headers/os/support \
                          ../../headers/os/translation \
                          ../../headers/posix/syslog.h \
+                         ../../headers/posix/unistd.h \
                          ../../src/kits/game/GameProducer.h
 
 # This tag can be used to specify the character encoding of the source files

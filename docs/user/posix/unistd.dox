@@ -1,0 +1,48 @@
+/*
+ * Copyright 2023 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/posix/unistd.h	hrev56953
+ */
+
+/*!
+	\file unistd.h
+	\ingroup libroot
+	\brief Standard symbolic constants and types
+*/
+
+/*!
+	\fn int ioctl(int fd, unsigned long op, void* argument, size_t size)
+	\brief Send a control command to a device through a file descriptor
+
+	ioctls are usually sent to file descriptors corresponding to files in the devfs filesystem
+	(mounted in /dev). It allows sending commands to devices that wouldn't fit the usual flow of
+	the read and write operations.
+
+	The action to perform is identified by the "op" parameter. Each driver can implement its own
+	custom operations as needed, depending on the device being controlled. There are also a few
+	standard ones implemented by most drivers.
+
+	In the standard UNIX version of this function, there is support for only one extra argument,
+	which can be either an integer, or a pointer, either pointing to some data to send to the
+	driver, or some buffer to receive a response. In most UNIX systems, further details about the
+	operation are encoded in the "op" parameter, with bits indicating the direction and size of
+	the buffer.
+
+	In BeOS and Haiku, the allocation of "op" values is done freely in each driver, and no bits are
+	reserved for such use. Instead, a 4th argument is allowed, and can be used to indicate the
+	buffer size. There is no need to encode the transfer direction, as this can be agreed between
+	the calling application and the driver.
+
+	Both the 3rd and 4th parameters are optional. In C++, this is done using C++ function default
+	arguments and causes no problems. However, the C language has no such feature. Therefore, the
+	C implementation is a macro implementing a similar behavior.
+
+	To avoid these divergences between implementations of ioctl, portable applications should
+	consider using the newly standardized posix_devctl function from POSIX 1.2024, which is
+	equivalent to the BeOS/Haiku implementation of ioctl and also has an explicit size parameter.
+*/

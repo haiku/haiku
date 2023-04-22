@@ -7,7 +7,7 @@
  */
 
 /*!
-\page libroot C, POSIX, GNU and BSD functions
+\defgroup libroot C, POSIX, GNU and BSD functions
 
 Haiku implements a standard library containing the standard functions from C
 (https://www.iso.org/standard/29237.html) and POSIX
