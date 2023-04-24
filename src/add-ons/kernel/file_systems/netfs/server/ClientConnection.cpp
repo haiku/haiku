@@ -2405,11 +2405,11 @@ ClientConnection::VisitReadQueryRequest(ReadQueryRequest* request)
 
 	// create an array for the IDs of the client volumes a found entry may
 	// reside on
-	status_t result = B_OK;
 	int32 volumeCount = fVolumes->Size();
 	int32* volumeIDs = new(std::nothrow) int32[volumeCount];
 	if (!volumeIDs)
-		result = B_NO_MEMORY;
+		return B_NO_MEMORY;
+
 	ArrayDeleter<int32> volumeIDsDeleter(volumeIDs);
 
 	// get the query handle
@@ -2585,11 +2585,11 @@ ClientConnection::ProcessQueryEvent(NodeMonitoringEvent* event)
 
 	// create an array for the IDs of the client volumes a found entry may
 	// reside on
-	status_t result = B_OK;
 	int32 volumeCount = fVolumes->Size();
 	int32* volumeIDs = new(std::nothrow) int32[volumeCount];
 	if (!volumeIDs)
-		result = B_NO_MEMORY;
+		return;
+
 	ArrayDeleter<int32> volumeIDsDeleter(volumeIDs);
 
 	HasQueryPermissionClientVolumeFilter filter;
