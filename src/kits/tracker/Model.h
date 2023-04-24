@@ -229,18 +229,18 @@ private:
 	CanHandleResult CanHandleDrops() const;
 
 	enum NodeType {
-		kDesktopNode,
-		kDirectoryNode,
-		kExecutableNode,
-		kLinkNode,
 		kPlainNode,
+		kExecutableNode,
+		kDirectoryNode,
+		kLinkNode,
 		kQueryNode,
 		kQueryTemplateNode,
-		kRootNode,
 		kVolumeNode,
+		kRootNode,
 		kTrashNode,
-		kUnknownNode,
-		kVirtualDirectoryNode
+		kDesktopNode,
+		kVirtualDirectoryNode,
+		kUnknownNode
 	};
 
 	entry_ref fEntryRef;
