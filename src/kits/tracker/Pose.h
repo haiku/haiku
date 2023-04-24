@@ -192,7 +192,7 @@ BPose::Select(bool on)
 
 
 inline bigtime_t
-BPose::SelectionTime()	const
+BPose::SelectionTime() const
 {
 	return fSelectionTime;
 }

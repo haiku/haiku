@@ -358,13 +358,13 @@ TrackerCopyLoopControl::FileError(const char* message, const char* name,
 	buffer.ReplaceFirst("%error", strerror(error));
 
 	if (allowContinue) {
-		BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"),
+		BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("Cancel"),
 			B_TRANSLATE("OK"), 0, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 		return alert->Go() != 0;
 	}
 
-	BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"), 0, 0,
+	BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("Cancel"), 0, 0,
 		B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
@@ -1308,7 +1308,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 
 	size_t bufsize = kMinBufferSize;
 	if ((off_t)bufsize < srcStat->st_size) {
-		//	File bigger than the buffer size: determine an optimal buffer size
+		// File bigger than the buffer size: determine an optimal buffer size
 		system_info sinfo;
 		get_system_info(&sinfo);
 		size_t freesize = static_cast<size_t>(
@@ -1940,8 +1940,8 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 
 		// if it's a volume, try to unmount
 		if (dir.IsRootDirectory()) {
-			BVolume	volume(nodeRef.device);
-			BVolume	boot;
+			BVolume volume(nodeRef.device);
+			BVolume boot;
 
 			BVolumeRoster().GetBootVolume(&boot);
 			if (volume == boot) {
@@ -2060,7 +2060,7 @@ PreFlightNameCheck(BObjectList<entry_ref>* srcList, const BDirectory* destDir,
 	// single collision case will be handled as a "Prompt" case by CheckName
 	if (*collisionCount > 1) {
 		const char* verb = (moveMode == kMoveSelectionTo)
-			? B_TRANSLATE("moving")	: B_TRANSLATE("copying");
+			? B_TRANSLATE("moving") : B_TRANSLATE("copying");
 		BString replaceMsg(B_TRANSLATE_NOCOLLECT(kReplaceManyStr));
 		replaceMsg.ReplaceAll("%verb", verb);
 
@@ -2159,7 +2159,7 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 		return B_OK;
 	}
 
-	if (moveMode == kCreateLink	|| moveMode == kCreateRelativeLink) {
+	if (moveMode == kCreateLink || moveMode == kCreateRelativeLink) {
 		// if we are creating link in the same directory, the conflict will
 		// be handled later by giving the link a unique name
 		sourceEntry->GetParent(&srcDirectory);
@@ -2192,7 +2192,7 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 			? B_TRANSLATE("You cannot replace a file with a folder or a "
 				"symbolic link.")
 			: B_TRANSLATE("You cannot replace a folder or a symbolic link "
-				"with a file."), B_TRANSLATE("OK"),	0, 0, B_WIDTH_AS_USUAL,
+				"with a file."), B_TRANSLATE("OK"), 0, 0, B_WIDTH_AS_USUAL,
 			B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();

@@ -32,8 +32,8 @@ names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
 
-//	DesktopPoseView adds support for displaying integrated desktops
-//	from multiple volumes to BPoseView
+// DesktopPoseView adds support for displaying integrated desktops
+// from multiple volumes to BPoseView
 #ifndef _DESKTOP_POSE_VIEW_H
 #define _DESKTOP_POSE_VIEW_H
 

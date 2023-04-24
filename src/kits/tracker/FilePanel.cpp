@@ -329,7 +329,7 @@ BFilePanel::SetPanelDirectory(const BEntry* entry)
 void
 BFilePanel::SetPanelDirectory(const BDirectory* dir)
 {
-	BEntry	entry;
+	BEntry entry;
 
 	if (dir && (dir->GetEntry(&entry) == B_OK))
 		SetPanelDirectory(&entry);

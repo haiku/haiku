@@ -2858,7 +2858,7 @@ BContainerWindow::ShowContextMenu(BPoint loc, const entry_ref* ref, BView*)
 							ejectableVolumeSelected = true;
 
 						EnableNamedMenuItem(fContextMenu,
-							B_TRANSLATE("Unmount"),	ejectableVolumeSelected);
+							B_TRANSLATE("Unmount"), ejectableVolumeSelected);
 					}
 				}
 
@@ -2912,7 +2912,7 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 
 	if (!IsTrash() && !InTrash()) {
 		menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
-			? B_TRANSLATE("Delete")	: B_TRANSLATE("Move to Trash"),
+			? B_TRANSLATE("Delete") : B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T'));
 		if (!IsPrintersDir()) {
 			// add separator for copy to/move to items (navigation items)
@@ -3365,7 +3365,7 @@ BContainerWindow::LoadAddOn(BMessage* message)
 		buffer.ReplaceFirst("%error", strerror(result));
 		buffer.ReplaceFirst("%name", addonRef.name);
 
-		BAlert* alert = new BAlert("", buffer.String(),	B_TRANSLATE("Cancel"),
+		BAlert* alert = new BAlert("", buffer.String(), B_TRANSLATE("Cancel"),
 			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();

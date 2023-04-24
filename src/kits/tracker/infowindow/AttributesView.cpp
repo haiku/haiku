@@ -406,7 +406,7 @@ AttributesView::AttributesView(Model* model)
 				break;
 			case B_RGB_32_BIT_TYPE:
 				row->SetField(new BStringField(B_TRANSLATE(
-					"True-color picture")),	kTypeColumn);
+					"True-color picture")), kTypeColumn);
 				break;
 			case B_RGB_COLOR_TYPE:
 				row->SetField(new BStringField(B_TRANSLATE("Color")),

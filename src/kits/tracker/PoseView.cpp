@@ -4465,11 +4465,11 @@ BPoseView::HandleMessageDropped(BMessage* message)
 
 	BContainerWindow* window = dynamic_cast<BContainerWindow*>(Window());
 	if (window != NULL && message->HasData("RGBColor", 'RGBC')) {
- 		// do not handle roColor-style drops here, pass them on to the desktop
+		// do not handle roColor-style drops here, pass them on to the desktop
 		BMessenger((BHandler*)window).SendMessage(message);
 
 		return true;
- 	}
+	}
 
 	if (fDropTarget && !DragSelectionContains(fDropTarget, message))
 		HiliteDropTarget(false);
@@ -6186,7 +6186,7 @@ CheckVolumeReadOnly(const entry_ref* ref)
 {
 	BVolume volume (ref->device);
 	if (volume.IsReadOnly()) {
-		BAlert* alert = new BAlert ("",
+		BAlert* alert = new BAlert("",
 			B_TRANSLATE("Files cannot be moved or deleted from a read-only "
 			"volume."), B_TRANSLATE("Cancel"), NULL, NULL, B_WIDTH_AS_USUAL,
 			B_STOP_ALERT);

@@ -113,7 +113,6 @@ HeaderView::HeaderView(Model* model)
 		else
 			delete resolvedModel;
 	}
-
 }
 
 
@@ -713,5 +712,3 @@ HeaderView::CurrentFontHeight()
 
 	return fontHeight.ascent + fontHeight.descent + fontHeight.leading + 2;
 }
-
-
