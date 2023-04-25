@@ -177,6 +177,22 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 		return B_BAD_ADDRESS;
 
 	switch (ireq.i_type) {
+		case IEEE80211_IOC_SCAN_REQ: {
+			if (op != SIOCS80211)
+				return B_BAD_VALUE;
+
+			// SIOCS80211SCAN is a no-op, scans cannot actually be initiated.
+			// But we can at least check if one is already in progress.
+			status_t status = EBUSY;
+
+			IFF_LOCKGIANT(ifp);
+			if (ic->ic_state == IEEE80211_S_SCAN || (ic->ic_flags & IEEE80211_F_BGSCAN) != 0)
+				status = EINPROGRESS;
+			IFF_UNLOCKGIANT(ifp);
+
+			return status;
+		}
+
 		case IEEE80211_IOC_SCAN_RESULTS: {
 			if (op != SIOCG80211)
 				return B_BAD_VALUE;
