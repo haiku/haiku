@@ -8,6 +8,7 @@
 #define _PCICONTROLLERDW_H_
 
 #include <bus/PCI.h>
+#include <arch/generic/msi.h>
 
 #include <AutoDeleterOS.h>
 #include <lock.h>
