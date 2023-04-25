@@ -6,6 +6,8 @@
 
 #include "DWPCIController.h"
 
+#include <int.h>
+
 
 status_t
 MsiInterruptCtrlDW::Init(PciDbiRegs volatile* dbiRegs, int32 msiIrq)
