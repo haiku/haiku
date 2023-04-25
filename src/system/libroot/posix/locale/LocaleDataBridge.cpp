@@ -89,7 +89,8 @@ LocaleMonetaryDataBridge::LocaleMonetaryDataBridge()
 LocaleNumericDataBridge::LocaleNumericDataBridge(bool isGlobal)
 	:
 	posixLocaleConv(&gPosixLocaleConv),
-	glibcNumericLocale(&glibcNumericLocaleData)
+	glibcNumericLocale(&glibcNumericLocaleData),
+	isGlobal(isGlobal)
 {
 
 	memcpy(glibcNumericLocale, _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC),
