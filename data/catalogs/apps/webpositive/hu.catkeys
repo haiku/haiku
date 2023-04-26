@@ -1,6 +1,7 @@
-1	hungarian	x-vnd.Haiku-WebPositive	951718264
+1	hungarian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
+Copy	Console Window		Másolás
 (Finish: %date)	Download Window		(Befejezés: %date)
 Open bookmarks confirmation	WebPositive Window		Könyvjelzők megnyitásának megerősítése
 Download folder:	Settings Window		Letöltések mappája:
@@ -103,6 +104,7 @@ Apply	Settings Window		Alkalmaz
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	A Könyvjelzők mappa nem nyitható meg.\n\nHiba: %error
 Revert	Settings Window		Visszaállít
 Copy	WebPositive Window		Másolás
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Az utolsó sor # alkalommal ismétlődik.}other{Az utolsó sor # alkalommal ismétlődik.}}
 Default standard font size:	Settings Window		Alapértelmezett betűméret:
 Custom	Settings Window		Egyéni
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz

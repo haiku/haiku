@@ -23,7 +23,7 @@ Set target…	GrepWindow		Встановити ціль…
 Failed to open input pipe!	Grepper		Збій при відкритті вхідного каналу!
 Search	GrepWindow		Пошук
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
-Show lines	GrepWindow		Показати лінії
+Show lines	GrepWindow		Показати рядки
 Failed to open errors pipe!	Grepper		Збій при відкритті каналу помилок!
 The unselected files will be removed from the list.	GrepWindow		Файли, які не вибрані, будуть вилучені зі списку.
 Open files in code editor	GrepWindow		Відкрвати файли в редакторі коду

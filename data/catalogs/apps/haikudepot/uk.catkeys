@@ -31,7 +31,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
 Logout	ToLatestUserUsageConditionsWindow		Вийти
 Password requirements	UserLoginWindow		Вимоги до пароля
-The following additional package changes have to be made:	PackageResult		Необхідно внести наступні додаткові зміни в пакет:
+The following additional package changes have to be made:	PackageResult		Додатково необхідно встановити/замінити наступні пакети:
 No changelog available.	PackageInfoView		Історія змін недоступна
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Поточні Умови користування також узгоджені.
 Cancel	PackageProblem		Скасувати
@@ -99,7 +99,7 @@ Pending…	PackageListView		Очікування…
 Search terms:	FilterView		Умови пошуку:
 Quit	App		Вийти
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Псевдонім складений не за правилами. Вигадане інше ім'я (нікнейм) повинно містити лише цифри та малі латинські символи, мати довжину від чотирьох до шістнадцяти символів.
-Authentication failed	UserLoginWindow		Авторизацію призупинено
+Authentication failed	UserLoginWindow		Автентифікацію призупинено
 Captcha error	UserLoginWindow		Помилкова капча
 Manage repositories…	MainWindow		Управління репозитаріями…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Псевдонім повинен бути унікальним, а запропонований псевдонім вже існує. Вигадайте інший нікнейм.
@@ -138,7 +138,7 @@ This application writes and reads some working files on your computer in order t
 Ratings	PackageInfoView		Оцінки
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Були виявлені наступні проблеми. Будь ласка, виберіть рішення для кожної:
 Local	LocalPkgDataLoadProcess		Локальний
-Package changes	PackageResult	Window title	Зміни у пакеті
+Package changes	PackageResult	Window title	Залежності пакетів
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Вам прийнятна відправка анонімних даних про використання в систему HaikuDepotServer з цього комп'ютера? Пізніше, Ви можете змінити свої уподобання у вікні \"Налаштування\".
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
@@ -205,7 +205,7 @@ Fatal error	InstallPackageProcess		Критична помилка
 A validation error has occurred	ServerHelper		Сталася помилка перевірки достовірності
 The nickname is required.	UserLoginWindow		Псевдонім обов'язковий.
 -	no package size		-
-Apply changes	PackageResult		Застосувати зміни
+Apply changes	PackageResult		Застосувати
 Rate package	RatePackageWindow		Оцінка пакета
 Server error	ServerHelper		Помилка серверу
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Перегляд запису \"%PackageName%\"

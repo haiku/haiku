@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	romanian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Echipe
 Semaphores	DataSource		Semafoare
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Configurări…
 Block cache	DataSource		Cache de bloc
 Memory	DataSource		Memorie
 CPU usage	DataSource		Utilizare CPU
+CPU speed	DataSource		Viteză CPU
 Quit	ActivityWindow		Ieșire
 Raw clipboard	DataSource		Clipboard brut
 Settings	ActivityWindow		Configurări
@@ -32,6 +33,7 @@ Used memory	DataSource		Memorie utilizată
 Show legend	ActivityView		Arată legenda
 Cached memory	DataSource		Memorie în cache
 CPU %d usage	DataSource		Utilizare CPU %d
+CPU %d speed	DataSource		Viteză %d CPU
 File	ActivityWindow		Fișier
 Ports	DataSource		Porturi
 Page faults	DataSource		Defecțiuni de pagină

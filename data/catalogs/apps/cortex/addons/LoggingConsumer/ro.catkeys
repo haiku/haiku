@@ -1,5 +1,7 @@
-1	romanian	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	romanian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nu s-au putut obține informațiile despre nod (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioritate
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nu s-a putut găsi nodul (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latență
 Logged input	CortexAddOnsLoggingConsumer		Intrare înregistrată
 CPU spin percentage	CortexAddOnsLoggingConsumer		Procentaj de rotire CPU
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controale
 controls	CortexAddOnsCommonMediaNodeControlApp		controale
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Conectare
 percent	CortexAddOnsLoggingConsumer		procent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nu există parametri pentru nod (%ld):\n%s\n

@@ -1,19 +1,19 @@
 1	ukrainian	x-vnd.Haiku-PoorMan	1829050509
-Select web folder	PoorMan		Вибрати папку веб
-Console logging	PoorMan		Консоль логування
-Create Log File	PoorMan		Створити лог файл
-File logging	PoorMan		Файл реєстрації
-Website options	PoorMan		Налаштування веб сайту
-Log to file	PoorMan		Зберегти лог в файл
+Select web folder	PoorMan		Вибрати веб-папку
+Console logging	PoorMan		Консольний лог-файл
+Create Log File	PoorMan		Створити лог-файл
+File logging	PoorMan		Файл журналу роботи
+Website options	PoorMan		Налаштування веб-сайту
+Log to file	PoorMan		Зберегти журнал в файл
 Shutting down.	PoorMan		Вимкнути
 Error Dir	PoorMan		Помилка директорії
 Web folder:	PoorMan		Веб-папка:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть папку для публікації в інтернеті.\n\nPoorMan може створити папку за замовчуванням \"public_html\" у вашій домашній папці.\nАбо виберіть одну з своїх власних папок.
-Log To Console	PoorMan		Лог в консоль
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть папку для публікації в мережі Інтернет.\n\nPoorMan може створити типову папку \"public_html\" у Вашому домашньому каталозі.\nАбо виберіть одну з своїх власних папок.
+Log To Console	PoorMan		Виводити лог в консоль
 File Name	PoorMan		Назва файлу
 Starting up... 	PoorMan		Запускаєтся… 
 Select	PoorMan		Вибрати
-Logging view	PoorMan		Перегляд реєстрації
+Logging view	PoorMan		Перегляд журналу
 Save console as…	PoorMan		Зберегти консоль як…
 Edit	PoorMan		Редагувати
 Cancel	PoorMan		Скасувати
@@ -25,23 +25,23 @@ Select all	PoorMan		Вибрати все
 Error Server	PoorMan		Помилка сервера
 Send file listing if there's no start page	PoorMan		Відправити список файлів, якщо немає домашньої сторінки
 Create PoorMan log	PoorMan		Створити логи PoorMan
-Max. simultaneous connections:	PoorMan		Максимально одночасних підключень:
+Max. simultaneous connections:	PoorMan		Максимум одночасних підключень:
 Done	PoorMan		Готово
 Site	PoorMan		Сайт
 Cannot start the server	PoorMan		Не вдалося запустити сервер
-Create log file	PoorMan		Очистити лог файл
+Create log file	PoorMan		Очистити лог-файл
 Create public_html	PoorMan		Створити public_html
-Clear hit counter	PoorMan		Очистити лічильник пошуку
+Clear hit counter	PoorMan		Очистити лічильник відвідувань
 Status: Stopped	PoorMan		Статус: Зупинено
 File	PoorMan		Файл
 Settings…	PoorMan		Налаштування…
-Log To File	PoorMan		Лог в файл
+Log To File	PoorMan		Зберегти журнал в файл
 Connections	PoorMan		Підє'днання
 Controls	PoorMan		Управління
 Log to console	PoorMan		Виводити лог в консоль
 Advanced	PoorMan		Розширені
 Copy	PoorMan		Копіювати
-Logging	PoorMan		Реєстрація
+Logging	PoorMan		Ведення журналу
 PoorMan	System name		PoorMan
 Clear console log	PoorMan		Очистити лог консолі
 Run server	PoorMan		Запустити сервер
@@ -49,14 +49,14 @@ Create	PoorMan		Створити
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# з'єднання} few{# з'єднання} other{# з'єднань}}
 done.\n	PoorMan		готово.\n
 PoorMan settings	PoorMan		Налаштування PoorMan
-Console Logging	PoorMan		Консоль логування
-Clear log file	PoorMan		Очистити лог файл
+Console Logging	PoorMan		Консольний лог-файл
+Clear log file	PoorMan		Очистити лог-файл
 Save log console selection	PoorMan		Зберегти логи вибраної консолі
-File Logging	PoorMan		Логування в файл
-Log file name:	PoorMan		Ім'я лог файлу:
+File Logging	PoorMan		Файл журналу роботи
+Log file name:	PoorMan		Назва лог-файлу:
 Status: Running	PoorMan		Стан: Виконується
 Directory: (none)	PoorMan		Каталог: (пусто)
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна папка веб була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній в цій папці файл HTML під назвою \"index.html\".
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб-папка була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній в цій папці HTML-файл з назвою \"index.html\".
 Dir Created	PoorMan		Каталог створено
 Save console selections as…	PoorMan		Зберегти вибране з консолі як…
 Quit	PoorMan		Вийти

@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Be-PEPL	2634915100
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Не вдалося запустити префлет FileTypes для налаштування атрибутів Person.\n\nПомилка: 
-Mobile phone	People		Мобільний телефон
-Unnamed person	People		Неіменнована персона
-New person…	People		Нова персона…
+Mobile phone	People		Мобільний тел.
+Unnamed person	People		Контакт без назви
+New person…	People		Новий контакт…
 Address	People		Адреса
 Zip	People		Індекс
 Select all	People		Вибрати всіх
@@ -19,24 +19,24 @@ People	System name		People
 Error	People		Помилка
 Revert	People		Відкат змін
 Country	People		Країна
-Person	Short mimetype description		Персона
+Person	Short mimetype description		Контакт
 New person	People		Нова персона
 Save	People		Зберегти
 Fax	People		Факс
 URL	People		URL
-%name% picture	People		%name% малюнок
-Home phone	People		Домашній телефон
+%name% picture	People		Аватар %name%
+Home phone	People		Домашній тел.
 none	Groups list		пусто
 Save as…	People		Зберегти як…
 Cut	People		Вирізати
-Contact information for a person.	Long mimetype description		Контактна інформація персони
+Contact information for a person.	Long mimetype description		Контактна інформація
 Remove image	People		Вилучити зображення
 City	People		Місто
 Undo	People		Відкат дії
 Don't save	People		Не зберігати
 Configure attributes	People		Встановити атрибути
-Work phone	People		Робочий телефон
-State	People		Держава
+Work phone	People		Робочий тел.
+State	People		Область
 Nickname	People		Псевдонім
 OK	People		ОК
 File	People		Файл

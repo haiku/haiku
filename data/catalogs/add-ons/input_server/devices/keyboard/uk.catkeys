@@ -5,7 +5,7 @@ Open Terminal	Team monitor		Відкрити Terminal
 {0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural, one{Утримуйте CONTROL+ALT+DELETE протягом # секунди, щоб перезавантажитися.} other{Утримуйте CONTROL+ALT+DELETE протягом # секунд, щоб перезавантажитися.}}
 Restart the desktop	Team monitor		Перезапустити Робочий стіл
 Force reboot	Team monitor		Перезавантажити примусово
-Team monitor	Team monitor		Монітор 'Команд'
+Team monitor	Team monitor		Монітор процесів
 Kill application	Team monitor		Знищити програму
 Cancel	Team monitor		Скасувати
-(This team is a system component)	Team monitor		(Ця "команда" є системним компонентом)
+(This team is a system component)	Team monitor		(Цей процес є системним компонентом)

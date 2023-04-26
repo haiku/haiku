@@ -46,7 +46,7 @@ Replace all	FindandReplaceWindow		Замінити все
 Close	Menus		Закрити
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		Помилка завантаження \"%s\":\n\tФормат не підтримується
 Left	Menus		Вліво
-Default	Menus		За замовчуванням
+Default	Menus		Стандартний
 OK	SaveAlert		ОК
 Color	Menus		Колір
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 

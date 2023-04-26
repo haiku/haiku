@@ -1,6 +1,7 @@
-1	friulian	x-vnd.Haiku-WebPositive	951718264
+1	friulian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
+Copy	Console Window		Copie
 (Finish: %date)	Download Window		(Terminât: %date)
 Open bookmarks confirmation	WebPositive Window		Conferme vierzidure dai segnelibris
 Download folder:	Settings Window		Cartele dai file discjariâts:
@@ -103,6 +104,7 @@ Apply	Settings Window		Apliche
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Al è vignût fûr un erôr tal cirî di mostrâ la cartele dai segnelibris.\n\nErôr: %error
 Revert	Settings Window		Ripristine
 Copy	WebPositive Window		Copie
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Ultime rie ripetude # volte.}other{Ultime rie ripetude # voltis.}}
 Default standard font size:	Settings Window		Dimension dal caratar standard predefinide:
 Custom	Settings Window		Personalizât
 Bookmark this page	WebPositive Window		Zonte cheste pagjine ai segnelibris

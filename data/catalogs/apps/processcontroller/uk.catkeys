@@ -2,11 +2,11 @@
 Error saving file	ProcessController		Помилка при збереженні файлу
 Display priority	ProcessController		Пріоритет відображення
 That's no Fun!	ProcessController		Це не жарт!
-What do you want to do with the team \"%s\"?	ProcessController		Що Ви бажаєте зробити з потоком \"%s\"?
+What do you want to do with the team \"%s\"?	ProcessController		Що Ви бажаєте зробити з процесом \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		Файл настройки не був збережений!\n(%s)
 Processor %d	ProcessController		Процесор %d
 Live in the Deskbar	ProcessController		Відображати у Deskbar
-Kill this team!	ProcessController		Знищити цю команду!
+Kill this team!	ProcessController		Знищити цей процес!
 OK	ProcessController		ОК
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Ви можете запустити Контролер процесів у вікні або встановити у Deskbar.
 Real-time priority	ProcessController		Пріоритет реального часу
@@ -30,12 +30,12 @@ Threads and CPU usage	ProcessController		Потоки і використанн�
 Quit application	ProcessController		Вийти з програми
 Info	ProcessController		Інфо
 Kill this thread!	ProcessController		Знищити цей потік!
-This team is already gone…	ProcessController		Цієї команди вже немає…
-Gone teams…	ProcessController		Завершені команди…
+This team is already gone…	ProcessController		Процес вже завершено…
+Gone teams…	ProcessController		Завершені процеси…
 Quit an application	ProcessController		Вийти з програми
 Cancel	ProcessController		Скасувати
 Install in Deskbar	ProcessController		Встановити у Deskbar
-Debug this team!	ProcessController		Відладити цю команду!
+Debug this team!	ProcessController		Відладити цей процес!
 ProcessController	System name		ProcessController
 Lowest active priority	ProcessController		Найнижча перевага
 Restart Tracker	ProcessController		Перезапустити Tracker

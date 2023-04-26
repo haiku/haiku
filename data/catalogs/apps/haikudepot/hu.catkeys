@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	4143471163
+1	hungarian	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Szüksége
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Váratlan hiba '%Message%' lépett fel '%Property%' jellemzőnél
 A requested object or an object involved in the request was not found on the server.	ServerHelper		A kért objektum vagy a kérésben szereplő objektum nem található a kiszolgálón.
 Logout	ToLatestUserUsageConditionsWindow		Kilépés
+Password requirements	UserLoginWindow		Jelszókövetelmények
 The following additional package changes have to be made:	PackageResult		Az alábbi módosítások elvégzése szükséges a csomagon:
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		A jelenlegi felhasználási feltételek elfogadásra kerültek.
@@ -126,6 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása s
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 <no info>	PackageInfoView		<nincs információ>
 Usage conditions download problem	UserUsageConditions		Hiba történt a felhasználási feltételek letöltésekor
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hiba történt az új felhasználó létrehozásához szükséges jelszókövetelmények letöltése során. Ellenőrizd a naplót a részletekért, majd próbálkozz újra.\nA naplók megtekintésével kapcsolatos információk a Haiku Felhasználói kézikönyv Raktár részében találhatók.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hálózati hiba lépett fel a szerverrel való kommunikáció során: %s
 Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
 Date	PackageListView		Dátum
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		A jelszónak legalább %MinPasswordLength% karakter hosszúnak kell lennie és tartalmaznia kell legalább %MinPasswordUppercaseChar% kis- és nagybetűt illetve %MinPasswordDigitsChar% számot.
 Error	App		Hiba
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Hiba történt a használati feltételek letöltése során. Nézd meg a naplót a részletekért, és próbáld újra. \nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot részében találhatók.
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
@@ -156,6 +159,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Névtelen felha
 Close	PackageManager		Bezárás
 Changelog	PackageInfoView		Változásnapló
 About	PackageInfoView		Névjegy
+Password requirements download problem	UserLoginWindow		A jelszókövetelményeket nem sikerült letölteni
 Password:	UserLoginWindow		Jelszó:
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Ez az alkalmazás túl régi ahhoz, hogy kommunikáljon a kiszolgálóval. Telepítd az alkalmazás újabb verzióját a rendszer frissítésével. Az alkalmazás minimálisan szükséges verziója \"%s\".
 Stability	RatePackageWindow		Stabilitás
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		Jóváhagyott felhasználási felté
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		[%Nickname%] felhasználóval bejelentkeztél, de a folytatás előtt el kell fogadnod a legújabb használati feltételeket.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Úgy tűnik, hogy ez a csomag nincs a HaikuDepot kiszolgálón, ezért nem lehet új minősítést létrehozni vagy meglévő értékelést szerkeszteni.
 Apply	SettingsWindow		Alkalmaz
+View the password requirements	UserLoginWindow		Jelszókövetelmények megjelenítése
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		\"%Nickname%\" korábban elfogadta a használati feltételeket, de a használati feltételek azóta frissültek. A frissített használati feltételeket most el kell fogadni.
 Log out	MainWindow		Kijelentkezés
 Comment language:	RatePackageWindow		Hozzászólás nyelve:

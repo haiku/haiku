@@ -1,4 +1,4 @@
-1	romanian	application/x-vnd.Cortex.support	1625162530
+1	romanian	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Antetul are fanioane
 32 bit HLS	MediaString		HLS pe 32 biți
 Recording	MediaString		Înregistare
@@ -31,6 +31,7 @@ Back-center	MediaString		Spate-centru
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit integer}}
 Ambisonic WXYZ	MediaString		WXYZ ambisonic
 (unknown video format)	MediaString		(format video necunoscut)
+Video data between line %lu and %lu	MediaString		Datele video între linia %lu și %lu
 AVI format family	MediaString		Familie de format AVI
 Homogenous buffers	MediaString		Preîncărcări omogene
 Interlaced 	MediaString		Întrețesut 

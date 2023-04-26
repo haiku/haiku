@@ -1,5 +1,8 @@
-1	romanian	x-vnd.Haiku-PNGTranslator	272367625
+1	romanian	x-vnd.Haiku-PNGTranslator	775334266
 PNG Settings	PNGTranslator		Configurări PNG
 None	PNGTranslator		Nimic
 PNG image	PNGTranslator		Imagine PNG
 PNG images	PNGTranslator		Imagini PNG
+PNGTranslator Settings	PNGTranslator		Configurări PNGTranslator
+Version %d.%d.%d, %s	PNGTranslator		Versiunea %d.%d.%d, %s
+PNG image translator	PNGTranslator		Traducător de imagine PNG

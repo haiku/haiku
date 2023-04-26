@@ -34,7 +34,7 @@ Show application expander	PreferencesWindow		Показати експандер
 Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
 Suspend	DeskbarMenu		Призупинити
 Shutdown…	DeskbarMenu		Завершити роботу...
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демонстраційні
 Expand new applications	PreferencesWindow		Розкривати список після запуску
 Recent applications:	PreferencesWindow		Недавні програми:
 Recent folders:	PreferencesWindow		Недавні папки:
@@ -46,4 +46,4 @@ Revert	PreferencesWindow		Відкат змін
 Window	PreferencesWindow		Вікно
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Налаштування
 Time preferences…	TimeView		Налаштування часу…
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Аплети екрану
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Аплети Робочого стола

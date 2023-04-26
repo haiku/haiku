@@ -1,7 +1,13 @@
-1	romanian	x-vnd.Haiku-TIFFTranslator	2836877076
+1	romanian	x-vnd.Haiku-TIFFTranslator	4004730938
 TIFF Library:	TIFFView		Bibliotecă TIFF:
+Use compression:	TIFFView		Utilizare compresie:
+TIFF image translator	TIFFView		Traducător imagine TIFF
 TIFF image	TIFFTranslator		Imagine TIFF
 TIFF Settings	TIFFMain		Configurări TIFF
+TIFF image translator	TIFFTranslator		Traducător imagine TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nu s-a putut stabili directorul\n
+Version %d.%d.%d, %s	TIFFView		Versiunea %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		Configurări TIFFTranslator
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Imagini TIFF
 None	TIFFView		Nimic

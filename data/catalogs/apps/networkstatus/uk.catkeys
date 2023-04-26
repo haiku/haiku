@@ -10,7 +10,7 @@ NetworkStatus	System name		NetworkStatus
 Broadcast:	NetworkStatusView		Широкомовна передача:
 OK	NetworkStatusView		ОК
 No link	NetworkStatusView		З'єднання відсутнє
-Could not join wireless network:\n	NetworkStatusView		Бездротові мережі не під'єднані:\n
+Could not join wireless network:\n	NetworkStatusView		Не вдалося під'єднатися до безпровідної мережі:\n
 Ready	NetworkStatusView		Під'єднано
 Network Status	NetworkStatusView		Стан мережі
 Deskbar is not running, giving up.	NetworkStatus		Облиште, Deskbar не працює.
@@ -20,5 +20,5 @@ You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatu
 IPv4 address:	NetworkStatusView		Адреса IPv4:
 %ifaceName information:\n	NetworkStatusView		%ifaceName інформація:\n
 Run in window	NetworkStatus		Виконувати у вікні
-<no wireless networks found>	NetworkStatusView		<бездротова мережа не знайдена>
+<no wireless networks found>	NetworkStatusView		<безпровідні мережі не знайдені>
 Configuring	NetworkStatusView		Конфігурування

@@ -28,7 +28,7 @@ Line	MultiAudio		Лінійний
 Mic	MultiAudio		Мікрофон
  frequency:	MultiAudio		 частота:
 Enable	MultiAudio		Увімкнути
-Mute	MultiAudio		Приглушити
+Mute	MultiAudio		Без звуку
 Wave	MultiAudio		Хвиля
 Setup	MultiAudio		Настройки
 Level	MultiAudio		Рівень

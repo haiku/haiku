@@ -14,13 +14,13 @@ Katakana	UnicodeBlocks		Катакана
 Miao	UnicodeBlocks		Письмо Полларда
 Mro	UnicodeBlocks		Кукі-чінські мови
 Mongolian	UnicodeBlocks		Монгольська
-Pau Cin Hau	UnicodeBlocks		Pau Cin Hau
+Pau Cin Hau	UnicodeBlocks		Пау Цин Хау
 Yezidi	UnicodeBlocks		Єзіді
 Linear B ideograms	UnicodeBlocks		Ідеограми лінійного письма Б
 Caucasian Albanian	UnicodeBlocks		Агванська
 CJK unified ideographs extension D	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення D
 Sharada	UnicodeBlocks		Шарада
-Multani	UnicodeBlocks		Multani
+Multani	UnicodeBlocks		Мултані
 Linear A	UnicodeBlocks		Лінійне письмо А
 CJK compatibility ideographs Supplement	UnicodeBlocks		Доповнення CJK суміснісних ієрогліфів
 Pahawh Hmong	UnicodeBlocks		Хмонг
@@ -29,7 +29,7 @@ Bassa Vah	UnicodeBlocks		Басса
 Georgian extended	UnicodeBlocks		Розширена грузинська
 Mathematical alphanumeric symbols	UnicodeBlocks		Математичні буквено-цифрові символи
 Coptic	UnicodeBlocks		Коптська
-Masaram Gondi	UnicodeBlocks		Masaram Gondi
+Masaram Gondi	UnicodeBlocks		Масарам Гонді
 Cuneiform numbers and punctuation	UnicodeBlocks		Клинописні цифри і знаки пунктуації
 Miscellaneous symbols	UnicodeBlocks		Різноманітні символи
 Kana supplement	UnicodeBlocks		Доповнена Кана
@@ -45,17 +45,17 @@ Hangul syllables	UnicodeBlocks		Склади Хенгал
 Modifier tone letters	UnicodeBlocks		Модифікатор тонових літер
 Kaithi	UnicodeBlocks		Кайтхі
 Psalter Pahlavi	UnicodeBlocks		Пахлеві
-Newa	UnicodeBlocks		Newa
+Newa	UnicodeBlocks		Неварська писемність
 View	CharacterWindow		Режим перегляду
 Rumi numeral symbols	UnicodeBlocks		Числові символи Румі
 Enclosed CJK letters and months	UnicodeBlocks		Вкладені букви и місяці CJK
 Deseret	UnicodeBlocks		Дезерет
-Cham	UnicodeBlocks		Cham
+Cham	UnicodeBlocks		Чамська писемність
 Cyrillic	UnicodeBlocks		Кирилиця
 Makasar	UnicodeBlocks		Макасарський
 Palmyrene	UnicodeBlocks		Пальмірський
 Shavian	UnicodeBlocks		Шавіанська
-Tangut	UnicodeBlocks		Tangut
+Tangut	UnicodeBlocks		Тангутська писемність
 CJK unified ideographs extension C	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення C
 Ancient Greek musical notation	UnicodeBlocks		Давньогрецький нотний запис
 Thai	UnicodeBlocks		Тайська
@@ -86,7 +86,7 @@ Latin extended C	UnicodeBlocks		Розширена латиниця C
 Old Turkic	UnicodeBlocks		Старотюркські мови
 Meroitic hieroglyphs	UnicodeBlocks		Мероїтська ієрогліфічна
 Combining diacritical marks for symbols	UnicodeBlocks		Об'єднуючі діакритичні знаки для символів
-Osage	UnicodeBlocks		Osage
+Osage	UnicodeBlocks		Осейдж
 Combining diacritical marks supplement	UnicodeBlocks		Додаткові комбіновані діакритичні знаки
 Cherokee	UnicodeBlocks		Черокі
 Balinese	UnicodeBlocks		Балінезійська
@@ -95,7 +95,7 @@ CJK compatibility forms	UnicodeBlocks		Форми CJK сумісності
 Old Hungarian	UnicodeBlocks		Староугорська
 CJK unified ideographs extension B	UnicodeBlocks		CJK об'єднані ієроглифи розширення В
 Meroitic cursive	UnicodeBlocks		Мероїтська курсивна
-Ahom	UnicodeBlocks		Ahom
+Ahom	UnicodeBlocks		Ахом
 Nyiakeng Puachue Hmong	UnicodeBlocks		Білий, Зелений Хмонг
 Duployan	UnicodeBlocks		Система Дюплойє
 Early Dynastic Cuneiform	UnicodeBlocks		Клинопис ранніх династій
@@ -106,7 +106,7 @@ Small Kana extension	UnicodeBlocks		Мала Кана розширена
 Kannada	UnicodeBlocks		Каннада
 Brahmi	UnicodeBlocks		Брахмі
 Lydian	UnicodeBlocks		Лідійська
-Hatran	UnicodeBlocks		Hatran
+Hatran	UnicodeBlocks		Хатран
 Glagolitic supplement	UnicodeBlocks		Глаголітичний додаток
 Elymaic	UnicodeBlocks		Elymaean Aramaic (Елімаіда)
 Gurmukhi	UnicodeBlocks		Гурмухі
@@ -130,7 +130,7 @@ Latin-1 supplement	UnicodeBlocks		Додаток латиниці 1
 CJK unified ideographs extension A	UnicodeBlocks		Уніфіковані ієрогліфи CJK розширення А
 Linear B syllabary	UnicodeBlocks		Лінійні склади B
 Yi syllables	UnicodeBlocks		Склади Юі
-Khojki	UnicodeBlocks		Khojki
+Khojki	UnicodeBlocks		Ходжикі
 Currency symbols	UnicodeBlocks		Символи валют
 Soyombo	UnicodeBlocks		Сойомбо
 Khitan small script	UnicodeBlocks		Киданська мала абетка
@@ -158,10 +158,10 @@ Sundanese	UnicodeBlocks		Сунданська
 Geometric shapes	UnicodeBlocks		Геометричні фігури
 Clear	CharacterWindow		Очистити
 Symbols and pictographs extended A	UnicodeBlocks		Символи та піктограми розширення A
-Adlam	UnicodeBlocks		Adlam
+Adlam	UnicodeBlocks		Адлам
 Arabic	UnicodeBlocks		Арабська
 Khmer symbols	UnicodeBlocks		Кхмерські символи
-Ol Chiki	UnicodeBlocks		Ol Chiki
+Ol Chiki	UnicodeBlocks		Ол-чикі
 Wancho	UnicodeBlocks		Ванчо
 Box drawing	UnicodeBlocks		Символи малювання рамок
 Egyptian hieroglyphs	UnicodeBlocks		Єгипетські ієрогліфи
@@ -169,7 +169,7 @@ Vai	UnicodeBlocks		Ваї
 Meetei Mayek extensions	UnicodeBlocks		Мейтей Маєк розширення
 Ethiopic extended	UnicodeBlocks		Ефіопська розширена
 CJK compatibility	UnicodeBlocks		Символи сумісності CJK
-Tai Le	UnicodeBlocks		Tai Le
+Tai Le	UnicodeBlocks		Тай Ли
 Old Sogdian	UnicodeBlocks		Согдійське письмо
 Devanagari extended	UnicodeBlocks		Деванагарі розширений
 Lao	UnicodeBlocks		Лаоська
@@ -263,14 +263,14 @@ Khudawadi	UnicodeBlocks		Синдхі
 Glagotic	UnicodeBlocks		Глаготична
 Cyrillic extended B	UnicodeBlocks		Кирилиця розширення В
 Anatolian hieroglyphs	UnicodeBlocks		Анатолійські ієрогліфи
-Copy as escaped byte string	CharacterView		Скопіювати як екрановану стрічку байтів
+Copy as escaped byte string	CharacterView		Копіювати як екрановану стрічку байтів
 Tai Xuan Jing symbols	UnicodeBlocks		Символи Тай Сюань Цзін
 Hiragana	UnicodeBlocks		Хірагана
 Tagbanwa	UnicodeBlocks		Тагбанва
 Basic Latin	UnicodeBlocks		Базова латиниця
 Greek and Coptic	UnicodeBlocks		Грецька і коптська
 Kangxi radicals	UnicodeBlocks		Корені Кансі
-Copy character	CharacterView		Зкопіювати символ
+Copy character	CharacterView		Копіювати символ
 Hangul Jamo	UnicodeBlocks		Хангуль Джамо
 Font	CharacterWindow		Шрифт
 Ornamental dingbats	UnicodeBlocks		Декоративні позначки (дінгбати)
@@ -296,7 +296,7 @@ Old Persian	UnicodeBlocks		Староперсидська
 Malayalam	UnicodeBlocks		Малайялам
 CJK radicals supplement	UnicodeBlocks		Додаткові ієрогліфічні ключі CJK
 Old South Arabian	UnicodeBlocks		Південноарабська абетка
-Marchen	UnicodeBlocks		Marchen
+Marchen	UnicodeBlocks		Марчхен
 Sogdian	UnicodeBlocks		Согдійська
 Control pictures	UnicodeBlocks		Малюнки управління
 Tai Tham	UnicodeBlocks		Тай тхам

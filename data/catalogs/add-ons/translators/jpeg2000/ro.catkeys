@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-JPEG2000Translator	828292783
+1	romanian	x-vnd.Haiku-JPEG2000Translator	1200710305
 High	JPEG2000Translator		Ridicat
 Low	JPEG2000Translator		Scăzut
 Output quality	JPEG2000Translator		Calitate de ieșire
@@ -7,4 +7,5 @@ About	JPEG2000Translator		Despre
 Version %d.%d.%d	JPEG2000Translator		Versiunea %d.%d.%d
 Read	JPEG2000Translator		Citire
 Read greyscale images as RGB32	JPEG2000Translator		Citește imaginile în scală de gri ca RGB32
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBazat pe biblioteca JasPer:\n© 1999-2000, Image Power, Inc. și\nUniversity of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nCodecul jp2 al lui ImageMagick a fost utilizat ca \„tutorial\”.\n\thttp://www.imagemagick.org/\n
 Write	JPEG2000Translator		Scrie

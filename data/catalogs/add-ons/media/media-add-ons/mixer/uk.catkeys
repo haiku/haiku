@@ -16,7 +16,7 @@ Setup	AudioMixer		Настройки
 Physical input channels	AudioMixer		Фізичні вхідні канали
 Input channel destinations	AudioMixer		Напрямки вхідних каналів
 Resampling algorithm:	AudioMixer		Алгоритм передискретизації:
-Mute	AudioMixer		Заглушити
+Mute	AudioMixer		Без звуку
 Output mapping	AudioMixer		Перепризначення виходу
 Virtual output channels	AudioMixer		Віртуальні вихідні канали
 Allow output channel remapping	AudioMixer		Дозволити перепризначення вихідного каналу

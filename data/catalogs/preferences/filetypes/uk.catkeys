@@ -86,7 +86,7 @@ New resource file…	FileTypes Window		Новий файл ресурсів…
 [Multiple files] file types	FileType Window		[Множинні файли] типи файлів
 Application type	Application Type Window		Тип програми
 Show in Tracker…	Application Types Window		Показати в Tracker…
-Type name:	FileTypes Window		І'мя типу:
+Type name:	FileTypes Window		Назва типу:
 Visible	Attribute Window		Видимий
 Select preferred application	FileTypes Window		Вибрати пріоритетну програму
 Path:	Application Types Window		Шлях:
@@ -94,7 +94,7 @@ rating	Attribute ListView		рейтинг
 Could not install file type	New File Type Window		Неможливо встановити тип файла
 Same as…	FileTypes Window		Така як…
 Golden master	Application Type Window		Золотий майстер
-Checkbox	Attribute ListView		Чек-бокс
+Checkbox	Attribute ListView		Чекбокс
 FileTypes request	Preferred App Menu		Запит Типів файлів
 no icon	FileTypes Window		значок відсутній
 Single launch	Application Type Window		Одноразовий запуск
@@ -108,12 +108,12 @@ Boolean	Attribute ListView		Булевий
 Cancel	Extension Window		Скасувати
 Alignment:	Attribute Window		Вирівнювання:
 Icon	FileType Window		Значок
-Signature:	Application Type Window		Підпис:
+Signature:	Application Type Window		Сигнатура:
 Development	Application Type Window		Розробка
 Golden master	Application Types Window		Золотий майстер
 Add	Extension Window		Додати
 Open…	FileTypes Window		Відкрити…
-checkbox	Attribute ListView		чек-бокс
+checkbox	Attribute ListView		чекбокс
 Could not change file extensions	Extension Window		Неможливо змінити розширення файлу
 Could not open file	FileType Window		Неможливо відкрити файл
 Choose type	Type List Window		Вибрати тип
@@ -125,7 +125,7 @@ Cancel	FileTypes Window		Скасувати
 Save into resource file…	Application Type Window		Зберегти в файлі ресурсів…
 Special:	Attribute Window		Особливий:
 Type:	Attribute Window		Тип:
-Could not retrieve application signature	Preferred App Menu		Неможливо визначити підпис програми
+Could not retrieve application signature	Preferred App Menu		Неможливо визначити сигнатуру програми
 Beta	Application Types Window		Бета
 Add group	New File Type Window		Додати групу
 Cancel	Attribute Window		Скасувати
@@ -136,7 +136,7 @@ Beta	Application Type Window		Бета
 Could not retrieve preferred application of this file	Preferred App Menu		Неможливо визначити пріоритетну програму для цього файлу
 Application flags	Application Type Window		Флаги програм
 OK	FileTypes		ОК
-Group name:	New File Type Window		Ім'я групи:
+Group name:	New File Type Window		Назва групи:
 Move up	FileTypes Window		Вгору
 File	FileTypes Window		Файл
 Add	Attribute Window		Додати
@@ -152,7 +152,7 @@ Save request	Application Type Window		Зберегти запит
 Could not remove file type: %s\n	FileTypes Window		Неможливо вилучити тип файлу: %s\n
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Показати як:
 Done	Type List Window		Готово
-Extra attributes	FileTypes Window		Суператрибути
+Extra attributes	FileTypes Window		Додаткові атрибути
 Group:	New File Type Window		Група:
 Alpha	Application Types Window		Aльфа
 Close	Application Type Window		Закрити
@@ -163,10 +163,10 @@ FileTypes	System name		FileTypes
 Version	Application Types Window		Версія
 Quit	FileTypes Window		Вийти
 File type	FileType Window		Тип файлу
-Internal name:	FileTypes Window		Внутрішнє ім'я:
+Internal name:	FileTypes Window		MIME-тип:
 Add…	FileTypes Window		Додати…
 Edit icon…	Icon View		Редагувати значок…
-Internal name:	Attribute Window		Внутрішнє ім'я:
+Internal name:	Attribute Window		MIME-тип:
 Show recognition rule	FileTypes Window		Показати правило розпізнавання
 Double	Attribute ListView		Подвійної точності
 Move down	FileTypes Window		Вниз

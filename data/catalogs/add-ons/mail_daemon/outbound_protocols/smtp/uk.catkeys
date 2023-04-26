@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-SMTP	815985329
-POP3 authentication failed. The server said:\n	smtp		Аутентифікація POP3 не вдалась. Сервер повідомив:\n
+POP3 authentication failed. The server said:\n	smtp		Автентифікація POP3 не вдалась. Сервер повідомив:\n
 Destination:	ConfigView		Призначення:
 Error while logging in to %serv	smtp		Помилка при авторизації на %serv
 Connecting to server…	smtp		З'єднання з сервером…

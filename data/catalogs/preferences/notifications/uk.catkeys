@@ -4,12 +4,12 @@ Application does not have a valid signature	NotificationView	Alert message	Пр�
 Status	NotificationView		Стан
 Add…	NotificationView		Додати…
 Lower right	GeneralView		Нижній правий
-Muted	NotificationView		Приглушити
+Muted	NotificationView		Без звуку
  is already listed	NotificationView	Alert message	 вже перелічено
 OK	PrefletWin		ОК
 Notifications	PrefletWin		Оповіщення
 Notifications preflet sample	PrefletWin		Зразок префлета повідомлень
-Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
+Mute notifications from this application	NotificationView		Відключити сповіщення від цієї програми
 wide	GeneralView	Window width: Slider high text	широке
 narrow	GeneralView	Window width: Slider low text	вузьке
 Revert	PrefletWin		Відкат змін

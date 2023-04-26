@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-Network	543099905
-Ethernet device	InterfaceListItem		Мережева карта
+Ethernet device	InterfaceListItem		Провідний пристрій (Ethernet)
 Link speed:	IntefaceView		Швидкість з'єднання:
 disconnected	IntefaceView		від'єднано
 WPA	WPA protected network		WPA
@@ -10,8 +10,8 @@ no link	InterfaceListItem		немає з'єднання
 Other	NetworkWindow		Інший
 Sent:	IntefaceView		Відправлено:
 Gateway:	IntefaceAddressView		Шлюз:
-The netmask defines your local network	IntefaceAddressView		Маска підмережі визначає вашу локальну мережу
-Your IP address	IntefaceAddressView		Ваша IP адреса
+The netmask defines your local network	IntefaceAddressView		Маска підмережі визначає Вашу локальну мережу
+Your IP address	IntefaceAddressView		Ваша IP-адреса
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		IP-адреса:
 Netmask:	IntefaceAddressView		Маска підмережі:
@@ -21,7 +21,7 @@ Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не вдалос�
 Revert	NetworkWindow		Відкат змін
 off	ServiceListItem		зупинено
 WEP	WEP protected network		WEP
-<no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
+<no wireless networks found>	IntefaceView		<безпровідні мережі не знайдені>
 Enable	IntefaceView		Доступно
 connected	IntefaceView		під'єднано
 Apply	IntefaceAddressView		Застосувати
@@ -29,19 +29,19 @@ Disable	ServiceView		Відключити
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Відображати стан мережі у Deskbar
 Mode:	IntefaceAddressView		Режим:
-connected	InterfaceListItem		під'єднання
+connected	InterfaceListItem		під'єднано
 OK	NetworkWindow		ОК
 Static	IntefaceAddressView		Статичний
 launch error	NetworkWindow		помилка запуску
 Renegotiate	IntefaceView		Під'єднати 
-MAC address:	IntefaceView		MAC адреса:
+MAC address:	IntefaceView		MAC-адреса:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		заборонити
 Dial-up connection	InterfaceListItem		Dial-up з'єднання 
 on	ServiceListItem		працює
-The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
+The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP-адреси
 disconnected	InterfaceListItem		роз'єднано
-Automatic	IntefaceAddressView		Автоматично
+Automatic	IntefaceAddressView		Автоматичний
 Choose automatically	IntefaceView		Вибрати автоматично
 Status:	IntefaceView		Стан:
 Disable	IntefaceView		Відключити
@@ -50,6 +50,6 @@ open	Open network		відкрити
 Network	System name		Network
 Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
 Enable	ServiceView		Старт
-Wireless device	InterfaceListItem		Бездротова карта
+Wireless device	InterfaceListItem		Безпровідний пристрій (Wireless)
 Disabled	IntefaceAddressView		Відключити
 VPN connection	InterfaceListItem		VPN з'єднання

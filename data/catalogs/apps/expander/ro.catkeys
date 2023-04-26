@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-Expander	3300517306
+1	romanian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destinație
 Other	ExpanderPreferences		Altele
 Automatically show contents listing	ExpanderPreferences		Arată automat listarea conținutului
 Expander	System name		Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: alege destinația
 Set source…	ExpanderMenu		Stabilire sursă…
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Dosarul a fost mutat, redenumit sau nu a fost suportat.
 Close window when done expanding	ExpanderPreferences		Închide fereastra când se termină extinderea

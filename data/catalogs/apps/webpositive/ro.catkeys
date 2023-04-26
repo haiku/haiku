@@ -1,12 +1,14 @@
-1	romanian	x-vnd.Haiku-WebPositive	1510673556
+1	romanian	x-vnd.Haiku-WebPositive	1477961135
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
+Copy	Console Window		Copiază
 (Finish: %date)	Download Window		(Finalizare: %date)
 Open bookmarks confirmation	WebPositive Window		Deschide confirmarea marcajelor
 Download folder:	Settings Window		Dosar de descărcări:
 Close window	WebPositive Window		Închide fereastra
 Find:	WebPositive Window		Găsește:
 Script console	WebPositive Window		Consolă de script
+There was an error setting up the bookmark.	WebPositive Window		A apărut o eroare la configurarea marcajului.
 Fonts	Settings Window		Fonturi
 Path	Cookie Manager		Cale
 Bookmarks	WebPositive Window		Marcaje
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Șterge
 Open containing folder	Download Window		Deschide dosarul conținător
 Find previous	WebPositive Window		Găsește anteriorul
 Full screen	WebPositive Window		Ecran complet
+Bookmark bar	WebPositive Window		Bară de marcaje
 Downloads in progress	WebPositive		Descărcări în progres
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Doriți să deschideți %addedCount marcaje în același timp?
@@ -148,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		La pornire:
 Confirmation	WebPositive Window		Confirmare
 Session cookie	Cookie Manager		Cookie de sesiune
+No SSE2 support	WebPositive		Fără suport SSE2
 Open all	WebPositive Window		Deschide toate
 Cut	WebPositive Window		Taie
 Downloads	Download Window		Descărcări

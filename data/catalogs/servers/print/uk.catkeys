@@ -7,7 +7,7 @@ Retrieve or select the active printer	PrintServerApp Scripting		Отримати
 Cancel	PrintServerApp		Скасувати
 Retrieve a specific printer	PrintServerApp Scripting		Отримати визначений принтер
 Page %1 to %2	ConfigWindow		Стор. %1 до %2
-Get name of the printer add-on used for this printer	Printer Scripting		Отримати і'мя додатка, що працює з цим принтером.
+Get name of the printer add-on used for this printer	Printer Scripting		Отримати назву доповнення, що працює з цим принтером.
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		ОК
 Cancel	ConfigWindow		Скасувати
@@ -37,7 +37,7 @@ Get the transport configuration for this printer	Printer Scripting		Отрима
 Landscape	ConfigWindow		Альбом
 Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
 There are no printers set up.	PrintServerApp		Принтери не встановлені.
-Get name of the transport add-on used for this printer	Printer Scripting		Отримати ім'я транспорту для цього принтера
+Get name of the transport add-on used for this printer	Printer Scripting		Отримати назву доповнення транспорту для цього принтера
 All pages, %1 copies	ConfigWindow		Всі сторінки, %1 копій
 Delete a specific printer	PrintServerApp Scripting		Видалити зазначений принтер
 Create a new printer	PrintServerApp Scripting		Створити новий принтер

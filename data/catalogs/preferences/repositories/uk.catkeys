@@ -5,8 +5,8 @@ There was an error refreshing the repository cache for %name%	TaskLooper	Error m
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Сталася помилка відімкнення репозитарія %name%
 Unknown	Constants	Unknown repository name	Невідомо
 Remove all	RepositoriesView	Button label	Вилучити всі
-Enable repositories to use with package management:	RepositoriesView	Label text	Доступні репозитарії для роботи з менеджером пакетів:
-Disable	RepositoriesView	Button label	Відімкнути
+Enable repositories to use with package management:	RepositoriesView	Label text	Репозитарії для роботи з менеджером пакетів:
+Disable	RepositoriesView	Button label	Від'єднати
 Cancel task	TaskTimer	Button label	Скасувати завдання
 Changes completed	RepositoriesView	Status view text	Зміни проведені
 Details	TaskLooper	Job log details header	Деталі
@@ -23,14 +23,14 @@ Add	AddRepoWindow	Button label	Додати
 Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Не вдалося отримати імена під'єднаних в даний час репозитаріїв.
 Enable all	RepositoriesView	Button label	Під'єднати всі
 Aborted	TaskLooper	Aborted task status message	Перервано
-URL	RepositoriesView	Column title	URL адреса
+URL	RepositoriesView	Column title	URL-адреса
 Enable	RepositoriesView	Button label	Під'єднати
 Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Помилка при отриманні параметрів налаштування для %name%.
 Description	TaskLooper	Failed task error description	Опис
 Failed	TaskLooper	Failed task status message	Невдало
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Добра новина! Завдання для репозитарія %name% завершене.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Деякі завдання ще виконуються. Зупинити їх та вийти?
-This repository URL already exists.	RepositoriesView	Error message	URL адреса цього репозитарія вже є.
+This repository URL already exists.	RepositoriesView	Error message	URL-адреса цього репозитарія вже є.
 Repositories	System name		Repositories
 Changes pending:	RepositoriesView	Status view text	Очікування змін:
 Remove	RepositoriesView	Button label	Вилучити

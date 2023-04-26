@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	4143471163
+1	friulian	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis condizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Si scugne 
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Al è vignût fûr un erôr '%Message%' inspietât cun proprietât '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
 Logout	ToLatestUserUsageConditionsWindow		Jes
+Password requirements	UserLoginWindow		Recuisîts de password
 The following additional package changes have to be made:	PackageResult		Al è necessari fâ chestis modifichis adizionâls al pachets:
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Li condizions di utilizazion atuâls a son stadis acetadis.
@@ -126,6 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pac
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
 <no info>	PackageInfoView		<nessune informazion>
 Usage conditions download problem	UserUsageConditions		Probleme tal discjamâ lis condizions di utilizazion
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjamant i recuisîts de password necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su cemût visualizâ i regjistris a son disponibilis te sezion di HaikuDepot de Vuide utent di Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 Date	PackageListView		Date
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La password e scugne jessi di almancul %MinPasswordLength% caratars. %MinPasswordUppercaseChar% caratars a scugnin jessi maiusculis e %MinPasswordDigitsChar% caratars a scugnin jessi numars.
 Error	App		Erôr
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Al è vignût fûr un erôr tal discjamâ lis condizions di utilizazion. Controle il regjistri pai detais e torne prove.\nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
@@ -156,6 +159,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Condivît dâts
 Close	PackageManager		Siere
 Changelog	PackageInfoView		Regjistri modifichis
 About	PackageInfoView		Informazions su
+Password requirements download problem	UserLoginWindow		Probleme tal tirâ jù i recuisîts de password
 Password:	UserLoginWindow		Peraule d'ordin:
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul servidôr. Oten une version plui resinte inzornant il sisteme. La version minime domandade e je la \"%s\".
 Stability	RatePackageWindow		Stabilitât
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'utent [%Nickname%] si è autenticât, ma prime di podê continuâ, al è necessari che tu acetis lis plui resintis condizions di utilizazion.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol semee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.
 Apply	SettingsWindow		Apliche
+View the password requirements	UserLoginWindow		Viôt i recuisîts de password
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		L'utent \"%Nickname%\" al à acetât in precedence lis condizions di utilizazion, ma di chê volte chestis a son stadis inzornadis. Si scugne cumò acetâ lis condizions di utilizazion inzornadis.
 Log out	MainWindow		Termine session
 Comment language:	RatePackageWindow		Lenghe dal coment:

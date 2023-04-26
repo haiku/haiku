@@ -42,7 +42,7 @@ Error	PrintJob		Помилка
 About %app%	AboutWindow		Про %app%
 About %app…	Dragger		Про %app…
 Version history:	AboutWindow		Історія версій:
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити програму для репліканта. Не знайдено підпису програми.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити програму для репліканта. Не знайдено сигнатуру програми.\n%error
 %3.2f KiB	StringForSize		%3.2f КБ
 Blue:	ColorControl		Синій:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%description\".\n%error

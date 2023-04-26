@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3915129360
+1	romanian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -85,6 +85,7 @@ Include trash	FindPanel		Include gunoiul
 GiB	WidgetAttributeText		GiO
 Clean up	ContainerWindow		Curăță
 Modified	FindPanel		Modificat
+ (block size: 	InfoWindow		 (dimensiune bloc: 
 Select all	QueryContainerWindow		Selectează toate
 Generate image thumbnails	SettingsView		Generează miniaturile imaginii
 Select…	FilePanelPriv		Selectare…

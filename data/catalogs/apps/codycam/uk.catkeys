@@ -45,7 +45,7 @@ Cannot find an available video stream	CodyCam		Неможливо знайти �
 Upload…	VideoConsumer.cpp		Вивантаження…
 password expected	CodyCam		очікується пароль
 SFTP	CodyCam		SFTP
-Output	CodyCam		Вивід
+Output	CodyCam		Вивід знімків
 server address expected	CodyCam		вкажіть адресу сервера
 Cannot start the video window	CodyCam		Неможливо запустити вікно відео
 reply: %d, %d\n	FtpClient		відповідь: %d, %d\n
@@ -85,4 +85,4 @@ Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не з�
 Logging in…	VideoConsumer.cpp		Авторизація…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Помилка запису вихідного файлу
-Capture controls	CodyCam		Управління захопленням
+Capture controls	CodyCam		Настройки стоп-кадру

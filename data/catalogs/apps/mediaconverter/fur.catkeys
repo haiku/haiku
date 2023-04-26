@@ -1,8 +1,9 @@
-1	friulian	x-vnd.Haiku-MediaConverter	3701038749
+1	friulian	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		File sorzints
 Error writing video frame %lld	MediaConverter		Erôr tal scrivi il fotogram video %lld
+Audio quality: %s	MediaConverter		Cualitât audio: %s
 Error converting '%filename'	MediaConverter		Erôr tal convertî '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		La cartele selezionade no je stade cjatade. Si stabilìs chê predefinide: /boot/home
 Conversion completed	MediaConverter		Conversion completade
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Conversion anulade
 Low	MediaConverter		Bas
 Error loading files	MediaConverter		Erôr tal cjariâ i file
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+Video quality: %s	MediaConverter		Cualitât video: %s
 End   [ms]: 	MediaConverter		Fin    [ms]: 
 Cancel	MediaConverter		Cancele
 OK	MediaConverter-FileInfo		Va ben
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Strissine i file multimediâi 
 Error read audio frame %lld	MediaConverter		Erôr tal lei il pacut audio %lld
 Quit	Menu		Jes
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# byte}}
+Writing audio track: %s complete	MediaConverter		Daûr a scrivi la linie audio: %s completât
 Duration:	MediaConverter-FileInfo		Durade:
 MediaConverter	System name		ConvertidôrMultimediâl
+Writing video track: %s complete	MediaConverter		Daûr a scrivi la linie video: %s completât
 Error launching: %strError%	MediaConverter		Erôr tal inviâ: %strError%
 Error writing audio frame %lld	MediaConverter		Erôr tal scrivi il pacut audio %lld
 File format:	MediaConverter		Formât file:

@@ -98,7 +98,7 @@ The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущен�
 <no account found>	Mail		<обліковий запис не знайдено>
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
 Mail preferences	Mail		Налаштування пошти
-helpful message	Mail		щасливе повідомлення
+helpful message	Mail		корисне повідомлення
  Read 	Mail		 Прочитаним 
 Font:	Mail		Шрифт:
 Accounts…	Mail		Аккаунти…

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	4048496535
+1	romanian	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Nu s-a putut demonta partiția %s.
 Mount all	MainWindow		Montează toate
 Disk	MainWindow		Disc
@@ -14,6 +14,7 @@ Block size	PartitionList		Dimensiune bloc
 The panel experienced a problem!	MainWindow		Panoul a întâmpinat o problemă!
 Device	DiskView		Dispozitiv
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați partiția extinsă Intel? Orice subpartiții pe care le conține vor fi suprascrise dacă veți continua. Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
+Physical block size	PartitionList		Dimensiune bloc fizică
 Unmount	MainWindow		Demontează
 Failed to format the partition %s!\n	MainWindow		Nu s-a putut formata partiția %s!\n
 Partition size	CreateParametersPanel		Dimensiune partiție
