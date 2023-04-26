@@ -65,6 +65,7 @@ public:
 	static	void				NotifyAll(const void* object, status_t result);
 
 			void				Add(ConditionVariableEntry* entry);
+			int32				EntriesCount()		{ return atomic_get(&fEntriesCount); }
 
 	// Convenience methods, no ConditionVariableEntry required.
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
