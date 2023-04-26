@@ -214,6 +214,11 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 	if (variable == NULL)
 		return fWaitStatus;
 
+	if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0) {
+		_RemoveFromVariable();
+		return B_WOULD_BLOCK;
+	}
+
 	InterruptsLocker _;
 	SpinLocker schedulerLocker(thread_get_current_thread()->scheduler_lock);
 
