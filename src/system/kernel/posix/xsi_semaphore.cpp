@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,23 +36,6 @@
 
 
 namespace {
-
-// Queue for holding blocked threads
-struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
-	queued_thread(Thread *thread, int32 count)
-		:
-		thread(thread),
-		count(count),
-		queued(false)
-	{
-	}
-
-	Thread	*thread;
-	int32	count;
-	bool	queued;
-};
-
-typedef DoublyLinkedList<queued_thread> ThreadQueue;
 
 class XsiSemaphoreSet;
 
@@ -101,25 +84,21 @@ namespace {
 class XsiSemaphore {
 public:
 	XsiSemaphore()
-		: fLastPidOperation(0),
-		fThreadsWaitingToIncrease(0),
-		fThreadsWaitingToBeZero(0),
+		:
+		fLastPidOperation(0),
 		fValue(0)
 	{
+		fWaitingToIncrease.Init(this, "XsiSemaphore");
+		fWaitingToBeZero.Init(this, "XsiSemaphore");
 	}
 
 	~XsiSemaphore()
 	{
 		// For some reason the semaphore is getting destroyed.
 		// Wake up any remaing awaiting threads
-		while (queued_thread *entry = fWaitingToIncreaseQueue.RemoveHead()) {
-			entry->queued = false;
-			thread_unblock(entry->thread, EIDRM);
-		}
-		while (queued_thread *entry = fWaitingToBeZeroQueue.RemoveHead()) {
-			entry->queued = false;
-			thread_unblock(entry->thread, EIDRM);
-		}
+		fWaitingToIncrease.NotifyAll(EIDRM);
+		fWaitingToBeZero.NotifyAll(EIDRM);
+
 		// No need to remove any sem_undo request still
 		// hanging. When the process exit and doesn't found
 		// the semaphore set, it'll just ignore the sem_undo
@@ -138,51 +117,33 @@ public:
 			return true;
 		} else {
 			fValue += value;
-			if (fValue == 0 && fThreadsWaitingToBeZero > 0)
-				WakeUpThread(true);
-			else if (fValue > 0 && fThreadsWaitingToIncrease > 0)
-				WakeUpThread(false);
+			if (fValue == 0)
+				WakeUpThreads(true);
+			else if (fValue > 0)
+				WakeUpThreads(false);
 			return false;
 		}
 	}
 
-	status_t BlockAndUnlock(Thread *thread, MutexLocker *setLocker)
+	status_t BlockAndUnlock(ConditionVariableEntry *queueEntry, MutexLocker *setLocker)
 	{
-		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
-			THREAD_BLOCK_TYPE_OTHER, (void*)"xsi semaphore");
 		// Unlock the set before blocking
 		setLocker->Unlock();
-
-// TODO: We've got a serious race condition: If BlockAndUnlock() returned due to
-// interruption, we will still be queued. A WakeUpThread() at this point will
-// call thread_unblock() and might thus screw with our trying to re-lock the
-// mutex.
-		return thread_block();
+		return queueEntry->Wait(B_CAN_INTERRUPT);
 	}
 
-	void Deque(queued_thread *queueEntry, bool waitForZero)
+	void Dequeue(ConditionVariableEntry *queueEntry, bool waitForZero)
 	{
-		if (queueEntry->queued) {
-			if (waitForZero) {
-				fWaitingToBeZeroQueue.Remove(queueEntry);
-				fThreadsWaitingToBeZero--;
-			} else {
-				fWaitingToIncreaseQueue.Remove(queueEntry);
-				fThreadsWaitingToIncrease--;
-			}
-		}
+		queueEntry->Wait(B_RELATIVE_TIMEOUT, 0);
 	}
 
-	void Enqueue(queued_thread *queueEntry, bool waitForZero)
+	void Enqueue(ConditionVariableEntry *queueEntry, bool waitForZero)
 	{
 		if (waitForZero) {
-			fWaitingToBeZeroQueue.Add(queueEntry);
-			fThreadsWaitingToBeZero++;
+			fWaitingToBeZero.Add(queueEntry);
 		} else {
-			fWaitingToIncreaseQueue.Add(queueEntry);
-			fThreadsWaitingToIncrease++;
+			fWaitingToIncrease.Add(queueEntry);
 		}
-		queueEntry->queued = true;
 	}
 
 	pid_t LastPid() const
@@ -193,10 +154,10 @@ public:
 	void Revert(short value)
 	{
 		fValue -= value;
-		if (fValue == 0 && fThreadsWaitingToBeZero > 0)
-			WakeUpThread(true);
-		else if (fValue > 0 && fThreadsWaitingToIncrease > 0)
-			WakeUpThread(false);
+		if (fValue == 0)
+			WakeUpThreads(true);
+		else if (fValue > 0)
+			WakeUpThreads(false);
 	}
 
 	void SetPid(pid_t pid)
@@ -209,14 +170,14 @@ public:
 		fValue = value;
 	}
 
-	ushort ThreadsWaitingToIncrease() const
+	ushort ThreadsWaitingToIncrease()
 	{
-		return fThreadsWaitingToIncrease;
+		return fWaitingToIncrease.EntriesCount();
 	}
 
-	ushort ThreadsWaitingToBeZero() const
+	ushort ThreadsWaitingToBeZero()
 	{
-		return fThreadsWaitingToBeZero;
+		return fWaitingToBeZero.EntriesCount();
 	}
 
 	ushort Value() const
@@ -224,33 +185,21 @@ public:
 		return fValue;
 	}
 
-	void WakeUpThread(bool waitingForZero)
+	void WakeUpThreads(bool waitingForZero)
 	{
 		if (waitingForZero) {
-			// Wake up all threads waiting on zero
-			while (queued_thread *entry = fWaitingToBeZeroQueue.RemoveHead()) {
-				entry->queued = false;
-				fThreadsWaitingToBeZero--;
-				thread_unblock(entry->thread, 0);
-			}
+			fWaitingToBeZero.NotifyAll();
 		} else {
-			// Wake up all threads even though they might go back to sleep
-			while (queued_thread *entry = fWaitingToIncreaseQueue.RemoveHead()) {
-				entry->queued = false;
-				fThreadsWaitingToIncrease--;
-				thread_unblock(entry->thread, 0);
-			}
+			fWaitingToIncrease.NotifyAll();
 		}
 	}
 
 private:
 	pid_t				fLastPidOperation;				// sempid
-	ushort				fThreadsWaitingToIncrease;		// semncnt
-	ushort				fThreadsWaitingToBeZero;		// semzcnt
 	ushort				fValue;							// semval
 
-	ThreadQueue			fWaitingToIncreaseQueue;
-	ThreadQueue			fWaitingToBeZeroQueue;
+	ConditionVariable	fWaitingToIncrease;
+	ConditionVariable	fWaitingToBeZero;
 };
 
 #define MAX_XSI_SEMS_PER_TEAM	128
@@ -1191,33 +1140,31 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			if (operations[i].sem_op != 0)
 				waitOnZero = false;
 
-			Thread *thread = thread_get_current_thread();
-			queued_thread queueEntry(thread, (int32)operations[i].sem_op);
+			ConditionVariableEntry queueEntry;
 			semaphore->Enqueue(&queueEntry, waitOnZero);
 
 			uint32 sequenceNumber = semaphoreSet->SequenceNumber();
 
 			TRACE(("xsi_semop: thread %d going to sleep\n", (int)thread->id));
-			result = semaphore->BlockAndUnlock(thread, &setLocker);
+			result = semaphore->BlockAndUnlock(&queueEntry, &setLocker);
 			TRACE(("xsi_semop: thread %d back to life\n", (int)thread->id));
 
 			// We are back to life. Find out why!
-			// Make sure the set hasn't been deleted or worst yet
-			// replaced.
+			// Make sure the set hasn't been deleted or worst yet replaced.
 			setHashLocker.Lock();
 			semaphoreSet = sSemaphoreHashTable.Lookup(semaphoreID);
 			if (result == EIDRM || semaphoreSet == NULL || (semaphoreSet != NULL
-				&& sequenceNumber != semaphoreSet->SequenceNumber())) {
-				TRACE_ERROR(("xsi_semop: semaphore set id %d (sequence = "
+					&& sequenceNumber != semaphoreSet->SequenceNumber())) {
+				TRACE(("xsi_semop: semaphore set id %d (sequence = "
 					"%" B_PRIu32 ") got destroyed\n", semaphoreID,
 					sequenceNumber));
 				notDone = false;
 				result = EIDRM;
 			} else if (result == B_INTERRUPTED) {
-				TRACE_ERROR(("xsi_semop: thread %d got interrupted while "
-					"waiting on semaphore set id %d\n",(int)thread->id,
+				TRACE(("xsi_semop: thread %d got interrupted while "
+					"waiting on semaphore set id %d\n", (int)thread_get_current_thread_id(),
 					semaphoreID));
-				semaphore->Deque(&queueEntry, waitOnZero);
+				semaphore->Dequeue(&queueEntry, waitOnZero);
 				result = EINTR;
 				notDone = false;
 			} else {
