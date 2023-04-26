@@ -952,7 +952,7 @@ VMCache::WaitForPageEvents(vm_page* page, uint32 events, bool relock)
 
 	fPageEventWaiters = &waiter;
 
-	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_OTHER, page);
+	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_OTHER_OBJECT, page);
 
 	Unlock();
 	thread_block();
