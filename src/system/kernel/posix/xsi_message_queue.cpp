@@ -491,11 +491,11 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 	MutexLocker messageQueueHashLocker(sXsiMessageQueueLock);
 	XsiMessageQueue *messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
 	if (messageQueue == NULL) {
-		TRACE_ERROR(("xsi_msgctl: message queue id %d not valid\n", messageQueueID));
+		TRACE(("xsi_msgctl: message queue id %d not valid\n", messageQueueID));
 		return EINVAL;
 	}
 	if (buffer != NULL && !IS_USER_ADDRESS(buffer)) {
-		TRACE_ERROR(("xsi_msgctl: buffer address is not valid\n"));
+		TRACE(("xsi_msgctl: buffer address is not valid\n"));
 		return B_BAD_ADDRESS;
 	}
 
@@ -517,7 +517,7 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 	switch (command) {
 		case IPC_STAT: {
 			if (!messageQueue->HasReadPermission()) {
-				TRACE_ERROR(("xsi_msgctl: calling process has not read "
+				TRACE(("xsi_msgctl: calling process has not read "
 					"permission on message queue %d, key %d\n", messageQueueID,
 					(int)messageQueue->IpcKey()));
 				return EACCES;
@@ -532,7 +532,7 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 
 		case IPC_SET: {
 			if (!messageQueue->HasPermission()) {
-				TRACE_ERROR(("xsi_msgctl: calling process has not permission "
+				TRACE(("xsi_msgctl: calling process has not permission "
 					"on message queue %d, key %d\n", messageQueueID,
 					(int)messageQueue->IpcKey()));
 				return EPERM;
@@ -543,12 +543,12 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 				return B_BAD_ADDRESS;
 			}
 			if (msg.msg_qbytes > messageQueue->MaxBytes() && getuid() != 0) {
-				TRACE_ERROR(("xsi_msgctl: user does not have permission to "
+				TRACE(("xsi_msgctl: user does not have permission to "
 					"increase the maximum number of bytes allowed on queue\n"));
 				return EPERM;
 			}
 			if (msg.msg_qbytes == 0) {
-				TRACE_ERROR(("xsi_msgctl: can't set msg_qbytes to 0!\n"));
+				TRACE(("xsi_msgctl: can't set msg_qbytes to 0!\n"));
 				return EINVAL;
 			}
 
@@ -562,7 +562,7 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 			// message queue lock itself. This prevents other process
 			// to try and acquire a destroyed mutex
 			if (!messageQueue->HasPermission()) {
-				TRACE_ERROR(("xsi_msgctl: calling process has not permission "
+				TRACE(("xsi_msgctl: calling process has not permission "
 					"on message queue %d, key %d\n", messageQueueID,
 					(int)messageQueue->IpcKey()));
 				return EPERM;
@@ -610,14 +610,14 @@ _user_xsi_msgget(key_t key, int flags)
 		ipcKey = sIpcHashTable.Lookup(key);
 		if (ipcKey == NULL || ipcKey->MessageQueueID() == -1) {
 			if (!(flags & IPC_CREAT)) {
-				TRACE_ERROR(("xsi_msgget: key %d does not exist, but the "
+				TRACE(("xsi_msgget: key %d does not exist, but the "
 					"caller did not ask for creation\n", (int)key));
 				return ENOENT;
 			}
 			if (ipcKey == NULL) {
 				ipcKey = new(std::nothrow) Ipc(key);
 				if (ipcKey == NULL) {
-					TRACE_ERROR(("xsi_msgget: failed to create new Ipc object "
+					TRACE(("xsi_msgget: failed to create new Ipc object "
 						"for key %d\n", (int)key));
 					return ENOMEM;
 				}
@@ -634,7 +634,7 @@ _user_xsi_msgget(key_t key, int flags)
 			MutexLocker _(sXsiMessageQueueLock);
 			messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
 			if (!messageQueue->HasPermission()) {
-				TRACE_ERROR(("xsi_msgget: calling process has not permission "
+				TRACE(("xsi_msgget: calling process has not permission "
 					"on message queue %d, key %d\n", messageQueue->ID(),
 					(int)key));
 				return EACCES;
@@ -683,7 +683,7 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 	MutexLocker messageQueueHashLocker(sXsiMessageQueueLock);
 	XsiMessageQueue *messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
 	if (messageQueue == NULL) {
-		TRACE_ERROR(("xsi_msgrcv: message queue id %d not valid\n",
+		TRACE(("xsi_msgrcv: message queue id %d not valid\n",
 			messageQueueID));
 		return EINVAL;
 	}
@@ -695,13 +695,13 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 		return EINVAL;
 	}
 	if (!messageQueue->HasPermission()) {
-		TRACE_ERROR(("xsi_msgrcv: calling process has not permission "
+		TRACE(("xsi_msgrcv: calling process has not permission "
 			"on message queue id %d, key %d\n", messageQueueID,
 			(int)messageQueue->IpcKey()));
 		return EACCES;
 	}
 	if (!IS_USER_ADDRESS(messagePointer)) {
-		TRACE_ERROR(("xsi_msgrcv: message address is not valid\n"));
+		TRACE(("xsi_msgrcv: message address is not valid\n"));
 		return B_BAD_ADDRESS;
 	}
 
@@ -781,7 +781,7 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 	MutexLocker messageQueueHashLocker(sXsiMessageQueueLock);
 	XsiMessageQueue *messageQueue = sMessageQueueHashTable.Lookup(messageQueueID);
 	if (messageQueue == NULL) {
-		TRACE_ERROR(("xsi_msgsnd: message queue id %d not valid\n",
+		TRACE(("xsi_msgsnd: message queue id %d not valid\n",
 			messageQueueID));
 		return EINVAL;
 	}
@@ -793,13 +793,13 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 		return EINVAL;
 	}
 	if (!messageQueue->HasPermission()) {
-		TRACE_ERROR(("xsi_msgsnd: calling process has not permission "
+		TRACE(("xsi_msgsnd: calling process has not permission "
 			"on message queue id %d, key %d\n", messageQueueID,
 			(int)messageQueue->IpcKey()));
 		return EACCES;
 	}
 	if (!IS_USER_ADDRESS(messagePointer)) {
-		TRACE_ERROR(("xsi_msgsnd: message address is not valid\n"));
+		TRACE(("xsi_msgsnd: message address is not valid\n"));
 		return B_BAD_ADDRESS;
 	}
 
