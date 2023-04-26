@@ -494,7 +494,7 @@ _user_xsi_msgctl(int messageQueueID, int command, struct msqid_ds *buffer)
 		TRACE_ERROR(("xsi_msgctl: message queue id %d not valid\n", messageQueueID));
 		return EINVAL;
 	}
-	if (!IS_USER_ADDRESS(buffer)) {
+	if (buffer != NULL && !IS_USER_ADDRESS(buffer)) {
 		TRACE_ERROR(("xsi_msgctl: buffer address is not valid\n"));
 		return B_BAD_ADDRESS;
 	}
