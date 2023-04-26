@@ -1492,6 +1492,7 @@ printf("failed to read event!\n");
 					case THREAD_BLOCK_TYPE_MUTEX:
 					case THREAD_BLOCK_TYPE_RW_LOCK:
 					case THREAD_BLOCK_TYPE_OTHER:
+					case THREAD_BLOCK_TYPE_OTHER_OBJECT:
 					default:
 						break;
 				}

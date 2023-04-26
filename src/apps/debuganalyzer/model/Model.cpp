@@ -49,6 +49,7 @@ wait_object_type_name(uint32 type)
 		case THREAD_BLOCK_TYPE_USER:
 			return "user";
 		case THREAD_BLOCK_TYPE_OTHER:
+		case THREAD_BLOCK_TYPE_OTHER_OBJECT:
 			return "other";
 		case THREAD_BLOCK_TYPE_SNOOZE:
 			return "snooze";

@@ -533,6 +533,7 @@ private:
 				strlcpy(waitObject->name, name, sizeof(waitObject->name));
 			}
 
+			case THREAD_BLOCK_TYPE_OTHER_OBJECT:
 			case THREAD_BLOCK_TYPE_SNOOZE:
 			case THREAD_BLOCK_TYPE_SIGNAL:
 			default:

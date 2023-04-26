@@ -1276,6 +1276,7 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 			break;
 		}
 
+		case THREAD_BLOCK_TYPE_OTHER_OBJECT:
 		case THREAD_BLOCK_TYPE_SNOOZE:
 		case THREAD_BLOCK_TYPE_SIGNAL:
 		default:

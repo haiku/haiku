@@ -1728,6 +1728,10 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 					kprintf("other%*s", B_PRINTF_POINTER_WIDTH + 10, "");
 					break;
 
+				case THREAD_BLOCK_TYPE_OTHER_OBJECT:
+					kprintf("other     %p   ", thread->wait.object);
+					break;
+
 				default:
 					kprintf("???       %p   ", thread->wait.object);
 					break;
@@ -1813,6 +1817,10 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 
 			case THREAD_BLOCK_TYPE_OTHER:
 				kprintf("other (%s)\n", (char*)thread->wait.object);
+				break;
+
+			case THREAD_BLOCK_TYPE_OTHER_OBJECT:
+				kprintf("other (%p)\n", thread->wait.object);
 				break;
 
 			default:
