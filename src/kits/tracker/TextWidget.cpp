@@ -440,12 +440,6 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	if (!IsEditable() || IsActive())
 		return;
 
-	BEntry entry(pose->TargetModel()->EntryRef());
-	if (entry.InitCheck() == B_OK
-		&& !ConfirmChangeIfWellKnownDirectory(&entry, kRename)) {
-		return;
-	}
-
 	view->SetActiveTextWidget(this);
 
 	// TODO fix text rect being off by a pixel on some files
@@ -461,7 +455,12 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	fText->SetUpEditing(textView);
 
 	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewKeyDownFilter));
-	textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
+
+	if (view->TargetVolumeIsReadOnly()) {
+		textView->MakeEditable(false);
+		textView->MakeSelectable(true);
+	} else
+		textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
 
 	// get full text length
 	rect.right = rect.left + textView->LineWidth();
@@ -612,28 +611,25 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 {
 	textRect.OffsetBy(offset);
 
+	// We are only concerned with setting the correct text color.
+
+	// For active views the selection is drawn as inverse text
+	// (background color for the text, solid black for the background).
+	// For inactive windows the text is drawn normally, then the
+	// selection rect is alpha-blended on top. This all happens in
+	// BPose::Draw before and after calling this function.
+
 	if (direct) {
 		// draw selection box if selected
 		if (selected) {
 			drawView->SetDrawingMode(B_OP_COPY);
-//			eraseRect.OffsetBy(offset);
-//			drawView->FillRect(eraseRect, B_SOLID_LOW);
 			drawView->FillRect(textRect, B_SOLID_LOW);
 		} else
 			drawView->SetDrawingMode(B_OP_OVER);
 
 		// set high color
 		rgb_color highColor;
-		// for active views, the selection is drawn as inverse text (background color for the text,
-		// solid black for the background).
-		// For inactive windows, the text is drawn normally, then the selection rect is
-		// alpha-blended on top of it.
-		// This all happens in BPose::Draw before and after calling this function, here we are
-		// only concerned with setting the correct color for the text.
-		if (selected && view->Window()->IsActive())
-			highColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-		else
-			highColor = view->DeskTextColor();
+		highColor = view->TextColor(selected && view->Window()->IsActive());
 
 		if (clipboardMode == kMoveSelectionTo && !selected) {
 			drawView->SetDrawingMode(B_OP_ALPHA);
@@ -641,7 +637,10 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 			highColor.alpha = 64;
 		}
 		drawView->SetHighColor(highColor);
-	}
+	} else if (selected && view->Window()->IsActive())
+		drawView->SetHighColor(view->BackColor(true)); // inverse
+	else if (!selected)
+		drawView->SetHighColor(view->TextColor());
 
 	BPoint location;
 	location.y = textRect.bottom - view->FontInfo().descent;
@@ -654,7 +653,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 	// not fully correct, since an offscreen view is also used in some
 	// other rare cases (something to do with columns). But for now, this
 	// fixes the broken drag bitmaps when dragging icons from the Desktop.
-	if (!selected && view == drawView && view->WidgetTextOutline()) {
+	if (direct && !selected && view->WidgetTextOutline()) {
 		// draw a halo around the text by using the "false bold"
 		// feature for text rendering. Either black or white is used for
 		// the glow (whatever acts as contrast) with a some alpha value,
@@ -664,10 +663,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 		BFont font;
 		drawView->GetFont(&font);
 
-		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-		if (view->IsDesktopWindow())
-			textColor = view->DeskTextColor();
-
+		rgb_color textColor = view->TextColor();
 		if (textColor.Brightness() < 100) {
 			// dark text on light outline
 			rgb_color glowColor = ui_color(B_SHINE_COLOR);

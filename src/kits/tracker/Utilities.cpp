@@ -548,7 +548,6 @@ FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from,
 	}
 }
 
-
 }	// namespace BPrivate
 
 

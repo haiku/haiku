@@ -1009,7 +1009,7 @@ Model::IsDropTarget(const Model* forDocument, bool traverse) const
 Model::CanHandleResult
 Model::CanHandleDrops() const
 {
-	if (IsDirectory()) {
+	if (IsDirectory() || IsVirtualDirectory()) {
 		// directories take anything
 		// resolve permissions here
 		return kCanHandle;

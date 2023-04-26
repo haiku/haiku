@@ -58,8 +58,6 @@ All rights reserved.
 #include <VolumeRoster.h>
 
 #include "Attributes.h"
-#include "FindPanel.h"
-#include "FSUndoRedo.h"
 #include "FSUtils.h"
 #include "Model.h"
 #include "OpenWithWindow.h"
@@ -496,8 +494,7 @@ WidgetAttributeText::AttrAsString(const Model* model, BString* outString,
 bool
 WidgetAttributeText::IsEditable() const
 {
-	return fColumn->Editable()
-		&& !BVolume(fModel->StatBuf()->st_dev).IsReadOnly();
+	return fColumn->Editable();
 }
 
 
@@ -815,58 +812,16 @@ NameAttributeText::SetUpEditing(BTextView* textView)
 bool
 NameAttributeText::CommitEditedTextFlavor(BTextView* textView)
 {
-	const char* text = textView->Text();
+	if (textView == NULL)
+		return false;
+
+	const char* name = textView->Text();
+	size_t length = (size_t)textView->TextLength();
 
 	BEntry entry(fModel->EntryRef());
-	if (entry.InitCheck() != B_OK)
-		return false;
-
-	BDirectory	parent;
-	if (entry.GetParent(&parent) != B_OK)
-		return false;
-
-	bool removeExisting = false;
-	if (parent.Contains(text)) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("That name is already taken. "
-			"Please type another one."),
-			B_TRANSLATE("Replace other file"),
-			B_TRANSLATE("OK"),
-			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, 'r');
-		if (alert->Go())
-			return false;
-
-		removeExisting = true;
-	}
-
-	// TODO:
-	// use model-flavor specific virtuals for all of these special
-	// renamings
-	status_t result;
-	if (fModel->IsVolume()) {
-		BVolume	volume(fModel->NodeRef()->device);
-		result = volume.InitCheck();
-		if (result == B_OK) {
-			RenameVolumeUndo undo(volume, text);
-
-			result = volume.SetName(text);
-			if (result != B_OK)
-				undo.Remove();
-		}
-	} else {
-		if (fModel->IsQuery()) {
-			BModelWriteOpener opener(fModel);
-			ASSERT(fModel->Node());
-			MoreOptionsStruct::SetQueryTemporary(fModel->Node(), false);
-		}
-
-		RenameUndo undo(entry, text);
-
-		result = entry.Rename(text, removeExisting);
-		if (result != B_OK)
-			undo.Remove();
-	}
+	status_t result = entry.InitCheck();
+	if (result == B_OK)
+		result = EditModelName(fModel, name, length);
 
 	return result == B_OK;
 }
@@ -882,8 +837,7 @@ NameAttributeText::SetSortFolderNamesFirst(bool enabled)
 bool
 NameAttributeText::IsEditable() const
 {
-	return StringAttributeText::IsEditable()
-		&& !fModel->HasLocalizedName();
+	return StringAttributeText::IsEditable();
 }
 
 
@@ -893,7 +847,7 @@ NameAttributeText::IsEditable() const
 RealNameAttributeText::RealNameAttributeText(const Model* model,
 	const BColumn* column)
 	:
-	StringAttributeText(model, column)
+	NameAttributeText(model, column)
 {
 }
 
@@ -945,68 +899,6 @@ RealNameAttributeText::SetUpEditing(BTextView* textView)
 
 	textView->SetMaxBytes(B_FILE_NAME_LENGTH);
 	textView->SetText(fFullValueText.String(), fFullValueText.Length());
-}
-
-
-bool
-RealNameAttributeText::CommitEditedTextFlavor(BTextView* textView)
-{
-	const char* text = textView->Text();
-
-	BEntry entry(fModel->EntryRef());
-	if (entry.InitCheck() != B_OK)
-		return false;
-
-	BDirectory	parent;
-	if (entry.GetParent(&parent) != B_OK)
-		return false;
-
-	bool removeExisting = false;
-	if (parent.Contains(text)) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("That name is already taken. "
-			"Please type another one."),
-			B_TRANSLATE("Replace other file"),
-			B_TRANSLATE("OK"),
-			NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-
-		alert->SetShortcut(0, 'r');
-
-		if (alert->Go())
-			return false;
-
-		removeExisting = true;
-	}
-
-	// TODO:
-	// use model-flavor specific virtuals for all of these special
-	// renamings
-	status_t result;
-	if (fModel->IsVolume()) {
-		BVolume volume(fModel->NodeRef()->device);
-		result = volume.InitCheck();
-		if (result == B_OK) {
-			RenameVolumeUndo undo(volume, text);
-
-			result = volume.SetName(text);
-			if (result != B_OK)
-				undo.Remove();
-		}
-	} else {
-		if (fModel->IsQuery()) {
-			BModelWriteOpener opener(fModel);
-			ASSERT(fModel->Node());
-			MoreOptionsStruct::SetQueryTemporary(fModel->Node(), false);
-		}
-
-		RenameUndo undo(entry, text);
-
-		result = entry.Rename(text, removeExisting);
-		if (result != B_OK)
-			undo.Remove();
-	}
-
-	return result == B_OK;
 }
 
 

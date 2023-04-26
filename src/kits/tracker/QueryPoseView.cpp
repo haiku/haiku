@@ -140,15 +140,6 @@ BQueryPoseView::SetUpDefaultColumnsIfNeeded()
 
 
 void
-BQueryPoseView::AttachedToWindow()
-{
-	_inherited::AttachedToWindow();
-	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, B_DARKEN_1_TINT);
-	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, B_DARKEN_1_TINT);
-}
-
-
-void
 BQueryPoseView::RestoreState(AttributeStreamNode* node)
 {
 	_inherited::RestoreState(node);

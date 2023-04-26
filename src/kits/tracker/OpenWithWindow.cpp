@@ -350,8 +350,9 @@ OpenWithContainerWindow::ShouldAddMenus() const
 
 
 void
-OpenWithContainerWindow::ShowContextMenu(BPoint, const entry_ref*, BView*)
+OpenWithContainerWindow::ShowContextMenu(BPoint, const entry_ref*)
 {
+	// do nothing here so open with context menu doesn't get shown
 }
 
 

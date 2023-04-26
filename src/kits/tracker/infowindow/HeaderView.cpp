@@ -218,59 +218,31 @@ HeaderView::BeginEditingTitle()
 void
 HeaderView::FinishEditingTitle(bool commit)
 {
-	if (fTitleEditView == NULL)
+	if (fTitleEditView == NULL || !commit)
 		return;
 
-	bool reopen = false;
+	const char* name = fTitleEditView->Text();
+	size_t length = (size_t)fTitleEditView->TextLength();
 
-	const char* text = fTitleEditView->Text();
-	uint32 length = strlen(text);
-	if (commit && strcmp(text, fModel->Name()) != 0
-		&& length < B_FILE_NAME_LENGTH) {
-		BEntry entry(fModel->EntryRef());
-		BDirectory parent;
-		if (entry.InitCheck() == B_OK
-			&& entry.GetParent(&parent) == B_OK) {
-			if (parent.Contains(text)) {
-				BAlert* alert = new BAlert("",
-					B_TRANSLATE("That name is already taken. "
-					"Please type another one."),
-					B_TRANSLATE("OK"),
-					0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-				alert->Go();
-				reopen = true;
-			} else {
-				if (fModel->IsVolume()) {
-					BVolume	volume(fModel->NodeRef()->device);
-					if (volume.InitCheck() == B_OK)
-						volume.SetName(text);
-				} else
-					entry.Rename(text);
+	status_t result = EditModelName(fModel, name, length);
+	bool reopen = (result == B_NAME_TOO_LONG || result == B_NAME_IN_USE);
 
-				// Adjust the size of the text rect
-				BFont currentFont(be_plain_font);
-				currentFont.SetSize(currentFont.Size() + 2);
-				fTitleRect.right = min_c(fTitleRect.left
-						+ currentFont.StringWidth(fTitleEditView->Text()),
-					Bounds().Width() - 5);
-			}
-		}
-	} else if (length >= B_FILE_NAME_LENGTH) {
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("That name is too long. Please type another one."),
-			B_TRANSLATE("OK"),
-			0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();
-		reopen = true;
+	if (result == B_OK) {
+		// Adjust the size of the text rect
+		BFont currentFont(be_plain_font);
+		currentFont.SetSize(currentFont.Size() + 2);
+		float stringWidth = currentFont.StringWidth(fTitleEditView->Text());
+		fTitleRect.right = std::min(fTitleRect.left + stringWidth,
+			Bounds().Width() - 5);
 	}
 
 	// Remove view
 	BView* scrollView = fTitleEditView->Parent();
-	RemoveChild(scrollView);
-	delete scrollView;
-	fTitleEditView = NULL;
+	if (scrollView != NULL) {
+		RemoveChild(scrollView);
+		delete scrollView;
+		fTitleEditView = NULL;
+	}
 
 	if (reopen)
 		BeginEditingTitle();
@@ -352,17 +324,11 @@ HeaderView::MouseDown(BPoint where)
 	// Assume this isn't part of a double click
 	fDoubleClick = false;
 
-	BEntry entry;
-	fModel->GetEntry(&entry);
-
-	if (fTitleRect.Contains(where)) {
-		if (!fModel->HasLocalizedName()
-			&& ConfirmChangeIfWellKnownDirectory(&entry, kRename, true)) {
-			BeginEditingTitle();
-		}
-	} else if (fTitleEditView) {
+	if (fTitleRect.Contains(where) && fTitleEditView == NULL)
+		BeginEditingTitle();
+	else if (fTitleEditView != NULL)
 		FinishEditingTitle(true);
-	} else if (fIconRect.Contains(where)) {
+	else if (fIconRect.Contains(where)) {
 		uint32 buttons;
 		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 		if (SecondaryMouseButtonDown(modifiers(), buttons)) {
@@ -619,8 +585,7 @@ HeaderView::BuildContextMenu(BMenu* parent)
 	parent->AddItem(new BMenuItem(B_TRANSLATE("Open"),
 		new BMessage(kOpenSelection), 'O'));
 
-	if (!model.IsDesktop() && !model.IsRoot() && !model.IsTrash()
-		&& !fModel->HasLocalizedName()) {
+	if (!model.IsDesktop() && !model.IsRoot() && !model.IsTrash()) {
 		parent->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
 			new BMessage(kEditItem), 'E'));
 		parent->AddSeparatorItem();

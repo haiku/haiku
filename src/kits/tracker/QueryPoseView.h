@@ -65,7 +65,6 @@ public:
 		// the contents
 
 protected:
-	virtual void AttachedToWindow();
 	virtual void RestoreState(AttributeStreamNode*);
 	virtual void RestoreState(const BMessage&);
 	virtual void SavePoseLocations(BRect* = NULL);

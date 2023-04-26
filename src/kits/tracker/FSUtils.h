@@ -263,6 +263,11 @@ bool ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 	DestructiveAction action, bool dontAsk = false,
 	int32* confirmedAlready = NULL);
 
+status_t EditModelName(const Model* model, const char* name, size_t);
+	// return B_OK if name was edited
+status_t ShouldEditRefName(const entry_ref* ref, const char* name, size_t);
+	// return B_OK if name should be edited
+
 bool CheckDevicesEqual(const entry_ref* entry, const Model* targetModel);
 
 // Deprecated calls use newer calls above instead

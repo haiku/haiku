@@ -341,7 +341,7 @@ protected:
 };
 
 
-class RealNameAttributeText : public StringAttributeText {
+class RealNameAttributeText : public NameAttributeText {
 public:
 	RealNameAttributeText(const Model*, const BColumn*);
 
@@ -351,7 +351,6 @@ public:
 	static void SetSortFolderNamesFirst(bool);
 
 protected:
-	virtual bool CommitEditedTextFlavor(BTextView*);
 	virtual int Compare(WidgetAttributeText&, BPoseView* view);
 	virtual void ReadValue(BString* result);
 

@@ -113,8 +113,8 @@ public:
 
 	virtual void CreatePoseView(Model*);
 
-	virtual void ShowContextMenu(BPoint, const entry_ref*, BView*);
-	virtual uint32 ShowDropContextMenu(BPoint);
+	virtual void ShowContextMenu(BPoint, const entry_ref*);
+	virtual uint32 ShowDropContextMenu(BPoint, BPoseView* source = NULL);
 	virtual void MenusBeginning();
 	virtual void MenusEnded();
 	virtual void MessageReceived(BMessage*);
@@ -288,6 +288,7 @@ protected:
 	BGroupView* fVScrollBarContainer;
 	BGroupView* fCountContainer;
 
+	BPopUpMenu* fContextMenu;
 	BPopUpMenu* fFileContextMenu;
 	BPopUpMenu* fWindowContextMenu;
 	BPopUpMenu* fDropContextMenu;
@@ -331,7 +332,6 @@ private:
 
 	static BRect sNewWindRect;
 
-	BPopUpMenu* fContextMenu;
 	BMessage* fDragMessage;
 	BObjectList<BString>* fCachedTypesList;
 	bool fWaitingForRefs;

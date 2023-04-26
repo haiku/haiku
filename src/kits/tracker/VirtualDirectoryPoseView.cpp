@@ -56,16 +56,19 @@ VirtualDirectoryPoseView::~VirtualDirectoryPoseView()
 void
 VirtualDirectoryPoseView::MessageReceived(BMessage* message)
 {
+	if (message->WasDropped())
+		return _inherited::MessageReceived(message);
+
 	switch (message->what) {
 		// ignore all edit operations
 		case B_CUT:
+		case B_PASTE:
 		case kCutMoreSelectionToClipboard:
 		case kDelete:
 		case kDuplicateSelection:
 		case kMoveToTrash:
 		case kNewEntryFromTemplate:
 		case kNewFolder:
-		case kEditItem:
 			break;
 
 		default:
@@ -79,8 +82,7 @@ void
 VirtualDirectoryPoseView::AttachedToWindow()
 {
 	_inherited::AttachedToWindow();
-	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, B_DARKEN_1_TINT);
-	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, B_DARKEN_1_TINT);
+	AddFilter(new TPoseViewFilter(this));
 }
 
 

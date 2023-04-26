@@ -563,7 +563,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 	} else
 		fBackgroundClean = false;
 
-	bool directDraw = (drawView == poseView);
+	bool direct = (drawView == poseView);
 	bool windowActive = poseView->Window()->IsActive();
 	bool showSelectionWhenInactive = poseView->fShowSelectionWhenInactive;
 	bool isDrawingSelectionRect = poseView->fIsDrawingSelectionRect;
@@ -571,11 +571,12 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 	ModelNodeLazyOpener modelOpener(fModel);
 
 	if (poseView->ViewMode() == kListMode) {
+		// draw in list mode
 		BRect iconRect = _IconRect(poseView, rect.LeftTop());
 		if (updateRect.Intersects(iconRect)) {
 			iconRect.OffsetBy(offset);
 			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(),
-				directDraw, !windowActive && !showSelectionWhenInactive);
+				direct, !windowActive && !showSelectionWhenInactive);
 		}
 
 		// draw text
@@ -590,50 +591,53 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 
 			// if widget doesn't exist, create it
 			BTextWidget* widget = WidgetFor(column, poseView, modelOpener);
+			if (widget == NULL || !widget->IsVisible())
+				continue;
 
-			if (widget != NULL && widget->IsVisible()) {
-				BRect widgetRect(widget->ColumnRect(rect.LeftTop(), column,
-					poseView));
+			BRect widgetRect(widget->ColumnRect(rect.LeftTop(), column,
+				poseView));
+			if (!updateRect.Intersects(widgetRect))
+				continue;
 
-				if (updateRect.Intersects(widgetRect)) {
-					BRect widgetTextRect(widget->CalcRect(rect.LeftTop(),
-						column, poseView));
+			BRect widgetTextRect(widget->CalcRect(rect.LeftTop(),
+				column, poseView));
 
-					bool selectDuringDraw = directDraw && selected
-						&& windowActive;
+			bool selectDuringDraw = direct && selected
+				&& windowActive;
 
-					if (index == 0 && selectDuringDraw) {
-						// draw with "reverse video" to select text
-						drawView->PushState();
-						drawView->SetLowColor(ui_color(B_DOCUMENT_TEXT_COLOR));
-					}
+			if (index == 0 && selectDuringDraw) {
+				// draw with "reverse video" to select text
+				drawView->PushState();
+				drawView->SetLowColor(poseView->BackColor(true));
+			} else if (!direct && index == 0 && selected
+				&& (windowActive || isDrawingSelectionRect)) {
+				drawView->SetLowColor(poseView->TextColor(true)); // inverse
+				drawView->FillRect(widgetTextRect.OffsetByCopy(offset), B_SOLID_LOW);
+			}
 
-					if (index == 0) {
-						widget->Draw(widgetRect, widgetTextRect,
-							column->Width(), poseView, drawView, selected,
-							fClipboardMode, offset, directDraw);
-					} else {
-						widget->Draw(widgetTextRect, widgetTextRect,
-							column->Width(), poseView, drawView, false,
-							fClipboardMode, offset, directDraw);
-					}
+			if (index == 0) {
+				widget->Draw(widgetRect, widgetTextRect,
+					column->Width(), poseView, drawView, selected,
+					fClipboardMode, offset, direct);
+			} else {
+				widget->Draw(widgetTextRect, widgetTextRect,
+					column->Width(), poseView, drawView, false,
+					fClipboardMode, offset, direct);
+			}
 
-					if (index == 0 && selectDuringDraw)
-						drawView->PopState();
-					else if (index == 0 && selected) {
-						if (windowActive || isDrawingSelectionRect) {
-							widgetTextRect.OffsetBy(offset);
-							drawView->InvertRect(widgetTextRect);
-						} else if (!windowActive
-							&& showSelectionWhenInactive) {
-							widgetTextRect.OffsetBy(offset);
-							drawView->PushState();
-							drawView->SetDrawingMode(B_OP_BLEND);
-							drawView->SetHighColor(128, 128, 128, 255);
-							drawView->FillRect(widgetTextRect);
-							drawView->PopState();
-						}
-					}
+			if (index == 0 && selected) {
+				if (selectDuringDraw)
+					drawView->PopState();
+				else if (windowActive || isDrawingSelectionRect) {
+					drawView->SetLowColor(poseView->LowColor());
+					drawView->InvertRect(widgetTextRect.OffsetByCopy(offset));
+				} else if (!windowActive && showSelectionWhenInactive) {
+					widgetTextRect.OffsetBy(offset);
+					drawView->PushState();
+					drawView->SetDrawingMode(B_OP_BLEND);
+					drawView->SetHighColor(128, 128, 128, 255);
+					drawView->FillRect(widgetTextRect);
+					drawView->PopState();
 				}
 			}
 		}
@@ -643,7 +647,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 		BPoint iconOrigin(location);
 		iconOrigin += offset;
 
-		DrawIcon(iconOrigin, drawView, poseView->IconSize(), directDraw,
+		DrawIcon(iconOrigin, drawView, poseView->IconSize(), direct,
 			!windowActive && !showSelectionWhenInactive);
 
 		BColumn* column = poseView->FirstColumn();
@@ -656,20 +660,20 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 
 		rect = widget->CalcRect(location, NULL, poseView);
 
-		bool selectDuringDraw = directDraw && selected && windowActive;
+		bool selectDuringDraw = direct && selected && windowActive;
 
 		if (selectDuringDraw) {
-			// draw with dark background to select text
+			// draw with "reverse video" to select text
 			drawView->PushState();
-			drawView->SetLowColor(0, 0, 0);
+			drawView->SetLowColor(poseView->BackColor(true));
 		}
 
 		widget->Draw(rect, rect, rect.Width(), poseView, drawView,
-			selected, fClipboardMode, offset, directDraw);
+			selected, fClipboardMode, offset, direct);
 
 		if (selectDuringDraw)
 			drawView->PopState();
-		else if (selected && directDraw) {
+		else if (selected && direct) {
 			if (windowActive || isDrawingSelectionRect) {
 				rect.OffsetBy(offset);
 				drawView->InvertRect(rect);

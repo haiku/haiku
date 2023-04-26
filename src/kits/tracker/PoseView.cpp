@@ -51,7 +51,6 @@ All rights reserved.
 #include <Application.h>
 #include <Catalog.h>
 #include <Clipboard.h>
-#include <ColorConversion.h>
 #include <ControlLook.h>
 #include <Debug.h>
 #include <Dragger.h>
@@ -207,6 +206,13 @@ CopySelectionListToEntryRefList(const PoseList* original,
 		copy->AddItem(new entry_ref(*(original->ItemAt(
 			index)->TargetModel()->EntryRef())));
 	}
+}
+
+
+static rgb_color
+invert_color(rgb_color color)
+{
+	return make_color(255 - color.red, 255 - color.green, 255 - color.blue);
 }
 
 
@@ -971,10 +977,8 @@ BPoseView::AttachedToWindow()
 	fIsDesktopWindow = dynamic_cast<BDeskWindow*>(Window()) != NULL;
 	if (fIsDesktopWindow)
 		AddFilter(new TPoseViewFilter(this));
-	else {
-		SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
-		SetLowUIColor(ViewUIColor());
-	}
+	else
+		ApplyBackgroundColor();
 
 	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection,
 		this));
@@ -4217,7 +4221,7 @@ bool
 BPoseView::CanCopyOrMoveForeignDrag(const Model* targetModel,
 	const BMessage* dragMessage)
 {
-	if (!targetModel->IsDirectory())
+	if (!targetModel->IsDirectory() && !targetModel->IsVirtualDirectory())
 		return false;
 
 	// in order to handle a clipping file, the drag initiator must be able
@@ -4264,9 +4268,11 @@ BPoseView::CanHandleDragSelection(const Model* target,
 			// target->IsDropTargetForList(mimeTypeList);
 		}
 
-		// handle an old style entry_refs only darg message
-		if (dragMessage->HasRef("refs") && target->IsDirectory())
+		// handle an old style entry_refs only drag message
+		if (dragMessage->HasRef("refs")
+			&& (target->IsDirectory() || target->IsVirtualDirectory())) {
 			return true;
+		}
 
 		// handle simple text clipping drag&drop message
 		if (dragMessage->HasData(kPlainTextMimeType, B_MIME_TYPE)
@@ -4663,7 +4669,8 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			// look for specific command or bring up popup
 			// Unify this with local drag&drop
 
-			if (!targetModel->IsDirectory()) {
+			if (!targetModel->IsDirectory()
+				&& !targetModel->IsVirtualDirectory()) {
 				// bail if we are not a directory
 				return false;
 			}
@@ -4671,7 +4678,8 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			bool canRelativeLink = false;
 			if (!canCopy && !canMove && !canLink && containerWindow) {
 				if (SecondaryMouseButtonDown(modifiers(), buttons)) {
-					switch (containerWindow->ShowDropContextMenu(dropPoint)) {
+					switch (containerWindow->ShowDropContextMenu(dropPoint,
+							srcWindow != NULL ? srcWindow->PoseView() : NULL)) {
 						case kCreateRelativeLink:
 							canRelativeLink = true;
 							break;
@@ -4895,7 +4903,7 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 
 	if (targetModel != NULL && containerWindow != NULL) {
 		// TODO: pick files to drop/launch on a case by case basis
-		if (targetModel->IsDirectory()) {
+		if (targetModel->IsDirectory() || targetModel->IsVirtualDirectory()) {
 			MoveSelectionInto(targetModel, srcWindow, containerWindow,
 				buttons, dropPoint, false);
 			wasHandled = true;
@@ -5009,7 +5017,8 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	bool createRelativeLink = relativeLink;
 	if (SecondaryMouseButtonDown(modifiers(), buttons)
 		&& destWindow != NULL) {
-		switch (destWindow->ShowDropContextMenu(loc)) {
+		switch (destWindow->ShowDropContextMenu(loc,
+				srcWindow != NULL ? srcWindow->PoseView() : NULL)) {
 			case kCreateRelativeLink:
 				createRelativeLink = true;
 				break;
@@ -5092,6 +5101,16 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 			B_TRANSLATE("You must drop items on one of the disk icons "
 			"in the \"Disks\" window."), B_TRANSLATE("Cancel"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
+		okToMove = false;
+	}
+
+	// can't copy to read-only volume
+	if (destWindow->PoseView()->TargetVolumeIsReadOnly()) {
+		BAlert* alert = new BAlert("",
+			B_TRANSLATE("You can't move or copy items to read-only volumes."),
+			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		okToMove = false;
@@ -7104,8 +7123,8 @@ BPoseView::ShowContextMenu(BPoint where)
 
 	window->Activate();
 	window->UpdateIfNeeded();
-	window->ShowContextMenu(where,
-		pose ? pose->TargetModel()->EntryRef() : 0, this);
+	window->ShowContextMenu(where, pose == NULL ? NULL
+		: pose->TargetModel()->EntryRef());
 
 	if (fSelectionChangedHook)
 		window->SelectionChanged();
@@ -8352,6 +8371,27 @@ BPoseView::DrawOpenAnimation(BRect rect)
 
 
 void
+BPoseView::ApplyBackgroundColor()
+{
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, BackTint());
+	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, BackTint());
+}
+
+
+float
+BPoseView::BackTint() const
+{
+	// darken background if read-only (or lighten if background is dark)
+	rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	int viewBrightness = BPrivate::perceptual_brightness(background);
+	float roTint = viewBrightness > 127 ? B_DARKEN_1_TINT : 0.85;
+	float tint = TargetVolumeIsReadOnly() ? roTint : B_NO_TINT;
+
+	return tint;
+}
+
+
+void
 BPoseView::UnmountSelectedVolumes()
 {
 	BVolume boot;
@@ -8501,6 +8541,9 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	else
 		AddPoses(TargetModel());
 	TargetModel()->CloseNode();
+
+	if (!IsDesktopWindow())
+		ApplyBackgroundColor();
 
 	Invalidate();
 
@@ -8857,6 +8900,31 @@ BPoseView::AddRemovePoseFromSelection(BPose* pose, int32 index, bool select)
 }
 
 
+bool
+BPoseView::SelectedVolumeIsReadOnly() const
+{
+	BVolume volume;
+	BPose* firstPose = fSelectionList->FirstItem();
+	if (firstPose != NULL)
+		volume.SetTo(firstPose->TargetModel()->NodeRef()->device);
+
+	return volume.InitCheck() == B_OK && volume.IsReadOnly();
+}
+
+
+bool
+BPoseView::TargetVolumeIsReadOnly() const
+{
+	Model* target = TargetModel();
+	BVolume volume;
+	volume.SetTo(target->NodeRef()->device);
+
+	return target->IsQuery() || target->IsQueryTemplate()
+		|| target->IsVirtualDirectory()
+		|| (volume.InitCheck() == B_OK && volume.IsReadOnly());
+}
+
+
 void
 BPoseView::RemoveFromExtent(const BRect &rect)
 {
@@ -9027,70 +9095,50 @@ BPoseView::DrawPose(BPose* pose, int32 index, bool fullDraw)
 
 
 rgb_color
-BPoseView::DeskTextColor() const
+BPoseView::TextColor(bool selected) const
 {
-	// The desktop color is chosen independently for the desktop.
-	// The text color is chosen globally for all directories.
-	// It's fairly easy to get something unreadable (even with the default
-	// settings, it's expected that text will be black on white in Tracker
-	// folders, but white on blue on the desktop).
-	// So here we check if the colors are different enough, and otherwise,
-	// force the text to be either white or black.
-	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	rgb_color viewColor;
 	if (IsDesktopWindow())
-		viewColor = ViewColor();
+		return DeskTextColor();
+
+	if (selected)
+		return ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	else
-		viewColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+		return ui_color(B_DOCUMENT_TEXT_COLOR);
+}
 
-	int textBrightness = BPrivate::perceptual_brightness(textColor);
-	int viewBrightness = BPrivate::perceptual_brightness(viewColor);
-	if (abs(viewBrightness - textBrightness) > 127) {
-		// The colors are different enough, we can use them as is
-		return textColor;
+
+rgb_color
+BPoseView::BackColor(bool selected) const
+{
+	if (selected) {
+		if (IsDesktopWindow())
+			return DeskTextBackColor();
+
+		return InvertedBackColor();
 	} else {
-		if (viewBrightness > 127) {
-			textColor.red = 0;
-			textColor.green = 0;
-			textColor.blue = 0;
-		} else {
-			textColor.red = 255;
-			textColor.green = 255;
-			textColor.blue = 255;
-		}
+		if (IsDesktopWindow())
+			return BView::ViewColor();
 
-		return textColor;
+		return tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), BackTint());
 	}
 }
 
 
 rgb_color
-BPoseView::DeskTextBackColor() const
+BPoseView::InvertedBackColor() const
 {
-	// returns black or white color depending on the desktop background
-	int32 thresh = 0;
-	rgb_color color = LowColor();
+	rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color inverted = invert_color(background);
+	int textBrightness = BPrivate::perceptual_brightness(inverted);
+	int viewBrightness = BPrivate::perceptual_brightness(background);
 
-	if (color.red > 150)
-		thresh++;
-
-	if (color.green > 150)
-		thresh++;
-
-	if (color.blue > 150)
-		thresh++;
-
-	if (thresh > 1) {
-		color.red = 255;
-		color.green = 255;
-		color.blue = 255;
- 	} else {
-		color.red = 0;
-		color.green = 0;
-		color.blue = 0;
+	if (abs(viewBrightness - textBrightness) > 127) {
+		// The colors are different enough, we can use inverted
+		return inverted;
+	} else {
+		// use black or white
+		return (viewBrightness > 127 ? kBlack : kWhite);
 	}
-
-	return color;
 }
 
 
@@ -9195,12 +9243,14 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	// used for dynamic column resizing using an offscreen draw buffer
 	ASSERT(ViewMode() == kListMode);
 
+#if COLUMN_MODE_ON_DESKTOP
 	if (IsDesktopWindow()) {
 		BScreen screen(Window());
 		rgb_color d = screen.DesktopColor();
 		SetLowColor(d);
 		SetViewColor(d);
 	}
+#endif
 
 	int32 startIndex
 		= (int32)((updateRect.top - fListElemHeight) / fListElemHeight);
@@ -9243,6 +9293,7 @@ BPoseView::ColumnRedraw(BRect updateRect)
 		if (location.y > updateRect.bottom)
 			break;
 	}
+
 	sOffscreen->DoneUsing();
 	ConstrainClippingRegion(0);
 }

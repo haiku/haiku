@@ -158,7 +158,7 @@ protected:
 	virtual BPoseView* NewPoseView(Model* model, uint32 viewMode);
 
 	virtual bool ShouldAddMenus() const;
-	virtual void ShowContextMenu(BPoint, const entry_ref*, BView*);
+	virtual void ShowContextMenu(BPoint, const entry_ref*);
 	virtual void AddShortcuts();
 	virtual void NewAttributeMenu(BMenu*);
 
