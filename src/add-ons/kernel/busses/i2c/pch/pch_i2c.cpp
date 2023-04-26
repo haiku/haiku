@@ -10,7 +10,6 @@
 
 #include <ACPI.h>
 #include <ByteOrder.h>
-#include <condition_variable.h>
 #include <bus/PCI.h>
 
 
@@ -76,12 +75,12 @@ pch_i2c_interrupt_handler(pch_i2c_sim_info* bus)
 	/*if ((status & PCH_IC_INTR_STAT_TX_ABRT) != 0)
 		tx error */
 	if ((status & PCH_IC_INTR_STAT_RX_FULL) != 0)
-		ConditionVariable::NotifyAll(&bus->readwait, B_OK);
+		bus->wait_read.NotifyAll();
 	if ((status & PCH_IC_INTR_STAT_TX_EMPTY) != 0)
-		ConditionVariable::NotifyAll(&bus->writewait, B_OK);
+		bus->wait_write.NotifyAll();
 	if ((status & PCH_IC_INTR_STAT_STOP_DET) != 0) {
 		bus->busy = 0;
-		ConditionVariable::NotifyAll(&bus->busy, B_OK);
+		bus->wait_busy.NotifyAll();
 	}
 
 	return handled;
@@ -194,22 +193,25 @@ exec_command(i2c_bus_cookie cookie, i2c_op op, i2c_addr slaveAddress,
 			write32(bus->registers + PCH_IC_INTR_MASK,
 				PCH_IC_INTR_STAT_RX_FULL);
 
-			// sleep until wake up by intr handler
-			struct ConditionVariable condition;
-			condition.Publish(&bus->readwait, "pch_i2c");
-			ConditionVariableEntry variableEntry;
-			status_t status = variableEntry.Wait(&bus->readwait,
-				B_RELATIVE_TIMEOUT, 500000L);
-			condition.Unpublish();
-			if (status != B_OK)
-				ERROR("exec_command timed out waiting for read\n");
+			ConditionVariableEntry waiter;
+			bus->wait_read.Add(&waiter);
+
 			uint32 rxBytes = read32(bus->registers + PCH_IC_RXFLR);
 			if (rxBytes == 0) {
-				ERROR("exec_command timed out reading %" B_PRIuSIZE " bytes\n",
-					dataLength - readPos);
-				bus->busy = 0;
-				return B_ERROR;
+				// sleep until wake up by intr handler
+				status = waiter.Wait(B_RELATIVE_TIMEOUT, 500000L);
+				if (status != B_OK)
+					ERROR("exec_command timed out waiting for read\n");
+
+				rxBytes = read32(bus->registers + PCH_IC_RXFLR);
+				if (rxBytes == 0) {
+					ERROR("exec_command timed out reading %" B_PRIuSIZE " bytes\n",
+						dataLength - readPos);
+					bus->busy = 0;
+					return B_ERROR;
+				}
 			}
+
 			for (; rxBytes > 0; rxBytes--) {
 				uint32 read = read32(bus->registers + PCH_IC_DATA_CMD);
 				if (readPos < dataLength)
@@ -231,17 +233,18 @@ exec_command(i2c_bus_cookie cookie, i2c_op op, i2c_addr slaveAddress,
 	status_t err = B_OK;
 	if (IS_STOP_OP(op) && IS_WRITE_OP(op)) {
 		TRACE("exec_command: waiting busy condition\n");
-		while (bus->busy == 1) {
+		while (bus->busy) {
 			write32(bus->registers + PCH_IC_INTR_MASK,
 				PCH_IC_INTR_STAT_STOP_DET);
 
+			ConditionVariableEntry waiter;
+			bus->wait_busy.Add(&waiter);
+
+			if (!bus->busy)
+				break;
+
 			// sleep until wake up by intr handler
-			struct ConditionVariable condition;
-			condition.Publish(&bus->busy, "pch_i2c");
-			ConditionVariableEntry variableEntry;
-			err = variableEntry.Wait(&bus->busy, B_RELATIVE_TIMEOUT,
-				500000L);
-			condition.Unpublish();
+			err = waiter.Wait(B_RELATIVE_TIMEOUT, 500000L);
 			if (err != B_OK)
 				ERROR("exec_command timed out waiting for busy\n");
 		}
@@ -487,7 +490,11 @@ init_bus(device_node* node, void** bus_cookie)
 		goto err;
 	}
 
+	bus->wait_read.Init(bus, "pch_i2c bus");
+	bus->wait_write.Init(bus, "pch_i2c bus");
+	bus->wait_busy.Init(bus, "pch_i2c bus");
 	mutex_init(&bus->lock, "pch_i2c");
+
 	*bus_cookie = bus;
 	return status;
 
