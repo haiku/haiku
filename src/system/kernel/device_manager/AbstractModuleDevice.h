@@ -46,6 +46,10 @@ public:
 	virtual	status_t		Free(void* cookie);
 
 protected:
+			status_t 		_DoIO(void* cookie, off_t pos,
+								void* buffer, size_t* _length, bool isWrite);
+
+protected:
 	device_node*			fNode;
 	int32					fInitialized;
 	device_module_info*		fDeviceModule;

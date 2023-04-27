@@ -326,54 +326,6 @@ das_free(void* cookie)
 
 
 static status_t
-das_read(void* cookie, off_t pos, void* buffer, size_t* _length)
-{
-	das_handle* handle = (das_handle*)cookie;
-	size_t length = *_length;
-
-	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
-	if (status != B_OK)
-		return status;
-
-	status = handle->info->io_scheduler->ScheduleRequest(&request);
-	if (status != B_OK)
-		return status;
-
-	status = request.Wait(0, 0);
-	*_length = request.TransferredBytes();
-	if (status != B_OK)
-		dprintf("das_read: request.Wait() returned: %s\n", strerror(status));
-
-	return status;
-}
-
-
-static status_t
-das_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
-{
-	das_handle* handle = (das_handle*)cookie;
-	size_t length = *_length;
-
-	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
-	if (status != B_OK)
-		return status;
-
-	status = handle->info->io_scheduler->ScheduleRequest(&request);
-	if (status != B_OK)
-		return status;
-
-	status = request.Wait(0, 0);
-	*_length = request.TransferredBytes();
-	if (status != B_OK)
-		dprintf("das_write: request.Wait() returned: %s\n", strerror(status));
-
-	return status;
-}
-
-
-static status_t
 das_io(void *cookie, io_request *request)
 {
 	das_handle* handle = (das_handle*)cookie;
@@ -702,8 +654,8 @@ struct device_module_info sSCSIDiskDevice = {
 	das_open,
 	das_close,
 	das_free,
-	das_read,
-	das_write,
+	NULL,	// read
+	NULL,	// write
 	das_io,
 	das_ioctl,
 

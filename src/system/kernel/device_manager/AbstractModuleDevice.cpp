@@ -7,6 +7,8 @@
 
 #include "AbstractModuleDevice.h"
 
+#include "IORequest.h"
+
 
 AbstractModuleDevice::AbstractModuleDevice()
 	:
@@ -66,10 +68,33 @@ AbstractModuleDevice::Open(const char* path, int openMode, void** _cookie)
 
 
 status_t
+AbstractModuleDevice::_DoIO(void* cookie, off_t pos,
+	void* buffer, size_t* _length, bool isWrite)
+{
+	IORequest request;
+	status_t status = request.Init(pos, (addr_t)buffer, *_length, isWrite, 0);
+	if (status != B_OK)
+		return status;
+
+	status = IO(cookie, &request);
+	if (status != B_OK)
+		return status;
+
+	status = request.Wait(0, 0);
+	*_length = request.TransferredBytes();
+	return status;
+}
+
+
+status_t
 AbstractModuleDevice::Read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
-	if (Module()->read == NULL)
-		return BaseDevice::Read(cookie, pos, buffer, _length);
+	if (Module()->read == NULL) {
+		if (Module()->io == NULL)
+			return BaseDevice::Read(cookie, pos, buffer, _length);
+
+		return _DoIO(cookie, pos, buffer, _length, false);
+	}
 	return Module()->read(cookie, pos, buffer, _length);
 }
 
@@ -77,8 +102,12 @@ AbstractModuleDevice::Read(void* cookie, off_t pos, void* buffer, size_t* _lengt
 status_t
 AbstractModuleDevice::Write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 {
-	if (Module()->write == NULL)
-		return BaseDevice::Write(cookie, pos, buffer, _length);
+	if (Module()->write == NULL) {
+		if (Module()->io == NULL)
+			return BaseDevice::Write(cookie, pos, buffer, _length);
+
+		return _DoIO(cookie, pos, const_cast<void*>(buffer), _length, true);
+	}
 	return Module()->write(cookie, pos, buffer, _length);
 }
 

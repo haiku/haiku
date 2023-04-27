@@ -336,57 +336,6 @@ virtio_block_free(void* cookie)
 
 
 static status_t
-virtio_block_read(void* cookie, off_t pos, void* buffer, size_t* _length)
-{
-	CALLED();
-	virtio_block_handle* handle = (virtio_block_handle*)cookie;
-	size_t length = *_length;
-
-	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
-	if (status != B_OK)
-		return status;
-
-	status = handle->info->io_scheduler->ScheduleRequest(&request);
-	if (status != B_OK)
-		return status;
-
-	status = request.Wait(0, 0);
-	*_length = request.TransferredBytes();
-	if (status != B_OK)
-		dprintf("virtio_block_read: request.Wait() returned: %s\n", strerror(status));
-
-	return status;
-}
-
-
-static status_t
-virtio_block_write(void* cookie, off_t pos, const void* buffer,
-	size_t* _length)
-{
-	CALLED();
-	virtio_block_handle* handle = (virtio_block_handle*)cookie;
-	size_t length = *_length;
-
-	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
-	if (status != B_OK)
-		return status;
-
-	status = handle->info->io_scheduler->ScheduleRequest(&request);
-	if (status != B_OK)
-		return status;
-
-	status = request.Wait(0, 0);
-	*_length = request.TransferredBytes();
-	if (status != B_OK)
-		dprintf("virtio_block_write: request.Wait() returned: %s\n", strerror(status));
-
-	return status;
-}
-
-
-static status_t
 virtio_block_io(void *cookie, io_request *request)
 {
 	CALLED();
@@ -655,8 +604,8 @@ struct device_module_info sVirtioBlockDevice = {
 	virtio_block_open,
 	virtio_block_close,
 	virtio_block_free,
-	virtio_block_read,
-	virtio_block_write,
+	NULL,	// read
+	NULL,	// write
 	virtio_block_io,
 	virtio_block_ioctl,
 

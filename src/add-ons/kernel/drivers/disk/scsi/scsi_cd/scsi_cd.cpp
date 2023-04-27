@@ -762,46 +762,6 @@ cd_io(void* cookie, io_request* request)
 
 
 static status_t
-cd_read(void* cookie, off_t pos, void* buffer, size_t* _length)
-{
-	size_t length = *_length;
-
-	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
-	if (status != B_OK)
-		return status;
-
-	status = cd_io(cookie, &request);
-	if (status != B_OK)
-		return status;
-
-	status = request.Wait(0, 0);
-	*_length = request.TransferredBytes();
-	return status;
-}
-
-
-static status_t
-cd_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
-{
-	size_t length = *_length;
-
-	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
-	if (status != B_OK)
-		return status;
-
-	status = cd_io(cookie, &request);
-	if (status != B_OK)
-		return status;
-
-	status = request.Wait(0, 0);
-	*_length = request.TransferredBytes();
-	return status;
-}
-
-
-static status_t
 cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 {
 	cd_handle* handle = (cd_handle*)cookie;
@@ -1186,8 +1146,8 @@ struct device_module_info sSCSICDDevice = {
 	cd_open,
 	cd_close,
 	cd_free,
-	cd_read,
-	cd_write,
+	NULL,	// read
+	NULL,	// write
 	cd_io,
 	cd_ioctl,
 
