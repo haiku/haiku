@@ -1093,6 +1093,8 @@ IORequest::SetTransferredBytes(bool partialTransfer,
 
 	MutexLocker _(fLock);
 
+	ASSERT(transferredBytes <= fLength);
+
 	fPartialTransfer = partialTransfer;
 	fTransferSize = transferredBytes;
 }
