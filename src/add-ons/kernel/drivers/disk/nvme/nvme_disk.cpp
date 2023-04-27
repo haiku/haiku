@@ -570,7 +570,6 @@ nvme_disk_bounced_io(nvme_disk_handle* handle, io_request* request)
 		if (status != B_OK)
 			break;
 
-		size_t transferredBytes = 0;
 		do {
 			TRACE("%p: IOO offset: %" B_PRIdOFF ", length: %" B_PRIuGENADDR
 				", write: %s\n", request, operation.Offset(),
@@ -583,10 +582,9 @@ nvme_disk_bounced_io(nvme_disk_handle* handle, io_request* request)
 			nvme_request.iovec_count = operation.VecCount();
 
 			status = do_nvme_io_request(handle->info, &nvme_request);
-			if (status == B_OK && nvme_request.write == request->IsWrite())
-				transferredBytes += operation.OriginalLength();
 
-			operation.SetStatus(status);
+			operation.SetStatus(status,
+				status == B_OK ? operation.Length() : 0);
 		} while (status == B_OK && !operation.Finish());
 
 		if (status == B_OK && operation.Status() != B_OK) {
@@ -594,9 +592,7 @@ nvme_disk_bounced_io(nvme_disk_handle* handle, io_request* request)
 			status = operation.Status();
 		}
 
-		operation.SetTransferredBytes(transferredBytes);
-		request->OperationFinished(&operation, status, status != B_OK,
-			operation.OriginalOffset() + transferredBytes);
+		request->OperationFinished(&operation);
 
 		handle->info->dma_resource.RecycleBuffer(operation.Buffer());
 

@@ -203,6 +203,8 @@ void
 IOCache::OperationCompleted(IOOperation* operation, status_t status,
 	generic_size_t transferredBytes)
 {
+	operation->SetStatus(status, transferredBytes);
+
 	if (status == B_OK) {
 		// always fail in case of partial transfers
 		((Operation*)operation)->finishedCondition.NotifyAll(
@@ -466,8 +468,7 @@ IOCache::_TransferRequestLineUncached(IORequest* request, off_t lineOffset,
 
 		error = _DoOperation(operation);
 
-		request->OperationFinished(&operation, error, false,
-			error == B_OK ? operation.OriginalLength() : 0);
+		request->OperationFinished(&operation);
 		request->SetUnfinished();
 			// Keep the request in unfinished state. ScheduleRequest() will set
 			// the final status and notify.

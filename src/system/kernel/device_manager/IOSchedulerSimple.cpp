@@ -291,13 +291,7 @@ IOSchedulerSimple::OperationCompleted(IOOperation* operation, status_t status,
 	if (operation->Status() <= 0)
 		return;
 
-	operation->SetStatus(status);
-
-	// set the bytes transferred (of the net data)
-	generic_size_t partialBegin
-		= operation->OriginalOffset() - operation->Offset();
-	operation->SetTransferredBytes(
-		transferredBytes > partialBegin ? transferredBytes - partialBegin : 0);
+	operation->SetStatus(status, transferredBytes);
 
 	fCompletedOperations.Add(operation);
 	fFinishedOperationCondition.NotifyAll();
@@ -344,7 +338,6 @@ IOSchedulerSimple::_Finisher()
 		if (!operationFinished) {
 			TRACE("  operation: %p not finished yet\n", operation);
 			MutexLocker _(fLock);
-			operation->SetTransferredBytes(0);
 			operation->Parent()->Owner()->operations.Add(operation);
 			fPendingOperations--;
 			continue;
@@ -353,13 +346,7 @@ IOSchedulerSimple::_Finisher()
 		// notify request and remove operation
 		IORequest* request = operation->Parent();
 
-		generic_size_t operationOffset
-			= operation->OriginalOffset() - request->Offset();
-		request->OperationFinished(operation, operation->Status(),
-			operation->TransferredBytes() < operation->OriginalLength(),
-			operation->Status() == B_OK
-				? operationOffset + operation->OriginalLength()
-				: operationOffset);
+		request->OperationFinished(operation);
 
 		// recycle the operation
 		MutexLocker _(fLock);

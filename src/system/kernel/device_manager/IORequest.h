@@ -127,6 +127,9 @@ struct IOOperation : IORequestChunk, DoublyLinkedListLinkImpl<IOOperation> {
 public:
 			bool				Finish();
 									// returns true, if it can be recycled
+									// otherwise, there is more to be done
+
+			void				SetStatus(status_t status, generic_size_t completedLength);
 
 			status_t			Prepare(IORequest* request);
 			void				SetOriginalRange(off_t offset,
@@ -134,11 +137,9 @@ public:
 									// also sets range
 			void				SetRange(off_t offset, generic_size_t length);
 
-			void				SetStatus(status_t status)
-									{ IORequestChunk::SetStatus(status); }
-
 			off_t				Offset() const;
 			generic_size_t		Length() const;
+
 			off_t				OriginalOffset() const
 									{ return fOriginalOffset; }
 			generic_size_t		OriginalLength() const
@@ -146,8 +147,6 @@ public:
 
 			generic_size_t		TransferredBytes() const
 									{ return fTransferredBytes; }
-			void				SetTransferredBytes(generic_size_t bytes)
-									{ fTransferredBytes = bytes; }
 
 			generic_io_vec*		Vecs() const;
 			uint32				VecCount() const;
@@ -256,9 +255,7 @@ struct IORequest : IORequestChunk, DoublyLinkedListLinkImpl<IORequest> {
 			bool				HasCallbacks() const;
 			void				SetStatusAndNotify(status_t status);
 
-			void				OperationFinished(IOOperation* operation,
-									status_t status, bool partialTransfer,
-									generic_size_t transferEndOffset);
+			void				OperationFinished(IOOperation* operation);
 			void				SubRequestFinished(IORequest* request,
 									status_t status, bool partialTransfer,
 									generic_size_t transferEndOffset);

@@ -291,10 +291,33 @@ IOBuffer::Dump() const
 // #pragma mark -
 
 
+void
+IOOperation::SetStatus(status_t status, generic_size_t completedLength)
+{
+	IORequestChunk::SetStatus(status);
+	if (IsWrite() == fParent->IsWrite()) {
+		// Determine how many bytes we actually read or wrote,
+		// relative to the original range, not the translated range.
+		const generic_size_t partialBegin = (fOriginalOffset - fOffset);
+		generic_size_t originalTransferredBytes = completedLength;
+		if (originalTransferredBytes < partialBegin)
+			originalTransferredBytes = 0;
+		else
+			originalTransferredBytes -= partialBegin;
+
+		if (originalTransferredBytes > fOriginalLength)
+			originalTransferredBytes = fOriginalLength;
+
+		fTransferredBytes += originalTransferredBytes;
+	}
+}
+
+
 bool
 IOOperation::Finish()
 {
 	TRACE("IOOperation::Finish()\n");
+
 	if (fStatus == B_OK) {
 		if (fParent->IsWrite()) {
 			TRACE("  is write\n");
@@ -318,7 +341,7 @@ IOOperation::Finish()
 					return false;
 				}
 
-				SetStatus(error);
+				IORequestChunk::SetStatus(error);
 			} else if (fPhase == PHASE_READ_END) {
 				TRACE("  phase read end\n");
 				// repair phase adjusted vec
@@ -338,7 +361,7 @@ IOOperation::Finish()
 					return false;
 				}
 
-				SetStatus(error);
+				IORequestChunk::SetStatus(error);
 			}
 		}
 	}
@@ -402,7 +425,7 @@ IOOperation::Finish()
 		}
 
 		if (error != B_OK)
-			SetStatus(error);
+			IORequestChunk::SetStatus(error);
 	}
 
 	return true;
@@ -1012,8 +1035,7 @@ IORequest::SetStatusAndNotify(status_t status)
 
 
 void
-IORequest::OperationFinished(IOOperation* operation, status_t status,
-	bool partialTransfer, generic_size_t transferEndOffset)
+IORequest::OperationFinished(IOOperation* operation)
 {
 	TRACE("IORequest::OperationFinished(%p, %#" B_PRIx32 "): request: %p\n",
 		operation, status, this);
@@ -1022,6 +1044,12 @@ IORequest::OperationFinished(IOOperation* operation, status_t status,
 
 	fChildren.Remove(operation);
 	operation->SetParent(NULL);
+
+	const status_t status = operation->Status();
+	const bool partialTransfer =
+		(operation->TransferredBytes() < operation->OriginalLength());
+	const generic_size_t transferEndOffset =
+		(operation->OriginalOffset() + operation->TransferredBytes());
 
 	if (status != B_OK || partialTransfer) {
 		if (fTransferSize > transferEndOffset)
