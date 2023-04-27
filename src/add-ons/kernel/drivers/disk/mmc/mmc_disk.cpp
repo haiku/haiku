@@ -360,10 +360,21 @@ mmc_block_open(void* _info, const char* path, int openMode, void** _cookie)
 	// allocate cookie
 	mmc_disk_handle* handle = new(std::nothrow) mmc_disk_handle;
 	*_cookie = handle;
-	if (handle == NULL) {
+	if (handle == NULL)
 		return B_NO_MEMORY;
-	}
+
 	handle->info = info;
+
+	if (handle->info->geometry.bytes_per_sector == 0) {
+		status_t error = mmc_block_get_geometry(handle->info,
+			&handle->info->geometry);
+		if (error != B_OK) {
+			TRACE("Failed to get disk capacity");
+			delete handle;
+			*_cookie = NULL;
+			return error;
+		}
+	}
 
 	return B_OK;
 }
@@ -391,30 +402,19 @@ mmc_block_free(void* cookie)
 
 
 static status_t
-mmc_block_read(void* cookie, off_t pos, void* buffer, size_t* _length)
+mmc_block_read(void* cookie, off_t position, void* buffer, size_t* _length)
 {
 	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 
 	size_t length = *_length;
-
-	if (handle->info->geometry.bytes_per_sector == 0) {
-		status_t error = mmc_block_get_geometry(handle->info,
-			&handle->info->geometry);
-		if (error != B_OK) {
-			TRACE("Failed to get disk capacity");
-			return error;
-		}
-	}
-
-	// Do not allow reading past device end
-	if (pos >= handle->info->DeviceSize())
-		return B_BAD_VALUE;
-	if (pos + (off_t)length > handle->info->DeviceSize())
-		length = handle->info->DeviceSize() - pos;
+	if (position >= handle->info->DeviceSize())
+		return ERANGE;
+	if ((position + (off_t)length) > handle->info->DeviceSize())
+		length = (handle->info->DeviceSize() - position);
 
 	IORequest request;
-	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
+	status_t status = request.Init(position, (addr_t)buffer, length, false, 0);
 	if (status != B_OK)
 		return status;
 
@@ -423,8 +423,7 @@ mmc_block_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
+	*_length = request.TransferredBytes();
 	return status;
 }
 
@@ -437,20 +436,10 @@ mmc_block_write(void* cookie, off_t position, const void* buffer,
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
 
 	size_t length = *_length;
-
-	if (handle->info->geometry.bytes_per_sector == 0) {
-		status_t error = mmc_block_get_geometry(handle->info,
-			&handle->info->geometry);
-		if (error != B_OK) {
-			TRACE("Failed to get disk capacity");
-			return error;
-		}
-	}
-
 	if (position >= handle->info->DeviceSize())
-		return B_BAD_VALUE;
-	if (position + (off_t)length > handle->info->DeviceSize())
-		length = handle->info->DeviceSize() - position;
+		return ERANGE;
+	if ((position + (off_t)length) > handle->info->DeviceSize())
+		length = (handle->info->DeviceSize() - position);
 
 	IORequest request;
 	status_t status = request.Init(position, (addr_t)buffer, length, true, 0);
@@ -462,9 +451,7 @@ mmc_block_write(void* cookie, off_t position, const void* buffer,
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-
+	*_length = request.TransferredBytes();
 	return status;
 }
 
@@ -474,6 +461,9 @@ mmc_block_io(void* cookie, io_request* request)
 {
 	CALLED();
 	mmc_disk_handle* handle = (mmc_disk_handle*)cookie;
+
+	if ((request->Offset() + (off_t)request->Length()) > handle->info->DeviceSize())
+		return ERANGE;
 
 	return handle->info->scheduler->ScheduleRequest(request);
 }
@@ -591,13 +581,6 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		case B_GET_DEVICE_SIZE:
 		{
 			// Legacy ioctl, use B_GET_GEOMETRY
-			if (info->geometry.bytes_per_sector == 0) {
-				status_t error = mmc_block_get_geometry(info, &info->geometry);
-				if (error != B_OK) {
-					TRACE("Failed to get disk capacity");
-					return error;
-				}
-			}
 
 			uint64_t size = info->DeviceSize();
 			if (size > SIZE_MAX)
@@ -610,14 +593,6 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 		{
 			if (buffer == NULL || length > sizeof(device_geometry))
 				return B_BAD_VALUE;
-
-			if (info->geometry.bytes_per_sector == 0) {
-				status_t error = mmc_block_get_geometry(info, &info->geometry);
-				if (error != B_OK) {
-					TRACE("Failed to get disk capacity");
-					return error;
-				}
-			}
 
 			return user_memcpy(buffer, &info->geometry, length);
 		}
