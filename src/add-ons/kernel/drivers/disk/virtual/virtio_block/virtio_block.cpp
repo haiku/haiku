@@ -352,10 +352,9 @@ virtio_block_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-	else
-		dprintf("read(): request.Wait() returned: %s\n", strerror(status));
+	*_length = request.TransferredBytes();
+	if (status != B_OK)
+		dprintf("virtio_block_read: request.Wait() returned: %s\n", strerror(status));
 
 	return status;
 }
@@ -379,10 +378,9 @@ virtio_block_write(void* cookie, off_t pos, const void* buffer,
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-	else
-		dprintf("write(): request.Wait() returned: %s\n", strerror(status));
+	*_length = request.TransferredBytes();
+	if (status != B_OK)
+		dprintf("virtio_block_write: request.Wait() returned: %s\n", strerror(status));
 
 	return status;
 }

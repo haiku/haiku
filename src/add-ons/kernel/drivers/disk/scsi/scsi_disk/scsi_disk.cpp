@@ -341,10 +341,9 @@ das_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-	else
-		dprintf("das_read(): request.Wait() returned: %s\n", strerror(status));
+	*_length = request.TransferredBytes();
+	if (status != B_OK)
+		dprintf("das_read: request.Wait() returned: %s\n", strerror(status));
 
 	return status;
 }
@@ -366,10 +365,9 @@ das_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-	else
-		dprintf("das_write(): request.Wait() returned: %s\n", strerror(status));
+	*_length = request.TransferredBytes();
+	if (status != B_OK)
+		dprintf("das_write: request.Wait() returned: %s\n", strerror(status));
 
 	return status;
 }

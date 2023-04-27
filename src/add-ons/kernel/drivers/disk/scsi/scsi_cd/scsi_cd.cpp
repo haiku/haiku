@@ -748,32 +748,35 @@ cd_free(void* cookie)
 
 
 static status_t
-cd_read(void* cookie, off_t pos, void* buffer, size_t* _length)
+cd_io(void* cookie, io_request* request)
 {
 	cd_handle* handle = (cd_handle*)cookie;
-	size_t length = *_length;
 
-	if (handle->info->capacity == 0)
+	if (handle->info->capacity == 0 || handle->info->io_scheduler == NULL) {
+		notify_io_request(request, B_DEV_NO_MEDIA);
 		return B_DEV_NO_MEDIA;
+	}
+
+	return handle->info->io_scheduler->ScheduleRequest(request);
+}
+
+
+static status_t
+cd_read(void* cookie, off_t pos, void* buffer, size_t* _length)
+{
+	size_t length = *_length;
 
 	IORequest request;
 	status_t status = request.Init(pos, (addr_t)buffer, length, false, 0);
 	if (status != B_OK)
 		return status;
 
-	if (handle->info->io_scheduler == NULL)
-		return B_DEV_NO_MEDIA;
-
-	status = handle->info->io_scheduler->ScheduleRequest(&request);
+	status = cd_io(cookie, &request);
 	if (status != B_OK)
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-	else
-		dprintf("cd_read(): request.Wait() returned: %s\n", strerror(status));
-
+	*_length = request.TransferredBytes();
 	return status;
 }
 
@@ -781,45 +784,20 @@ cd_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 static status_t
 cd_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 {
-	cd_handle* handle = (cd_handle*)cookie;
 	size_t length = *_length;
-
-	if (handle->info->capacity == 0)
-		return B_DEV_NO_MEDIA;
 
 	IORequest request;
 	status_t status = request.Init(pos, (addr_t)buffer, length, true, 0);
 	if (status != B_OK)
 		return status;
 
-	if (handle->info->io_scheduler == NULL)
-		return B_DEV_NO_MEDIA;
-
-	status = handle->info->io_scheduler->ScheduleRequest(&request);
+	status = cd_io(cookie, &request);
 	if (status != B_OK)
 		return status;
 
 	status = request.Wait(0, 0);
-	if (status == B_OK)
-		*_length = length;
-	else
-		dprintf("cd_write(): request.Wait() returned: %s\n", strerror(status));
-
+	*_length = request.TransferredBytes();
 	return status;
-}
-
-
-static status_t
-cd_io(void* cookie, io_request* request)
-{
-	cd_handle* handle = (cd_handle*)cookie;
-
-	if (handle->info->capacity == 0) {
-		notify_io_request(request, B_DEV_NO_MEDIA);
-		return B_DEV_NO_MEDIA;
-	}
-
-	return handle->info->io_scheduler->ScheduleRequest(request);
 }
 
 
