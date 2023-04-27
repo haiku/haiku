@@ -624,6 +624,10 @@ nvme_disk_io(void* cookie, io_request* request)
 
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 
+	const off_t ns_end = (handle->info->capacity * handle->info->block_size);
+	if ((request->Offset() + (off_t)request->Length()) > ns_end)
+		return ERANGE;
+
 	nvme_io_request nvme_request;
 	memset(&nvme_request, 0, sizeof(nvme_io_request));
 
@@ -797,11 +801,11 @@ nvme_disk_read(void* cookie, off_t pos, void* buffer, size_t* length)
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 
-	const off_t end = (handle->info->capacity * handle->info->block_size);
-	if (pos >= end)
+	const off_t ns_end = (handle->info->capacity * handle->info->block_size);
+	if (pos >= ns_end)
 		return B_BAD_VALUE;
-	if (pos + (off_t)*length > end)
-		*length = end - pos;
+	if ((pos + (off_t)*length) > ns_end)
+		*length = ns_end - pos;
 
 	IORequest request;
 	status_t status = request.Init(pos, (addr_t)buffer, *length, false, 0);
@@ -820,11 +824,11 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 	CALLED();
 	nvme_disk_handle* handle = (nvme_disk_handle*)cookie;
 
-	const off_t end = (handle->info->capacity * handle->info->block_size);
-	if (pos >= end)
+	const off_t ns_end = (handle->info->capacity * handle->info->block_size);
+	if (pos >= ns_end)
 		return B_BAD_VALUE;
-	if (pos + (off_t)*length > end)
-		*length = end - pos;
+	if ((pos + (off_t)*length) > ns_end)
+		*length = ns_end - pos;
 
 	IORequest request;
 	status_t status = request.Init(pos, (addr_t)buffer, *length, true, 0);
