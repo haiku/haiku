@@ -27,7 +27,7 @@ if $(NET_BOOT) = 1 {
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	acpi@x86,x86_64 ata dpc pci
-	isa@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
+	isa@x86,x86_64 <pci>x86@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	attribute_overlay@!m68k bfs iso9660@!m68k packagefs write_overlay@!m68k
