@@ -252,6 +252,9 @@ private:
 			float			_BaseHeight();
 
 			BString			_GetOSVersion();
+			BString			_GetCPUCount(system_info*);
+			BString			_GetCPUInfo();
+			BString			_GetCPUFrequency();
 			BString			_GetRamSize(system_info*);
 			BString			_GetRamUsage(system_info*);
 			BString			_GetKernelDateTime(system_info*);
@@ -263,6 +266,9 @@ private:
 			rgb_color		fDesktopTextColor;
 
 			BStringView*	fOSVersionView;
+			BStringView*	fCPULabelView;
+			BStringView*	fCPUInfoView;
+			BStringView*	fCPUFreqView;
 			BStringView*	fMemSizeView;
 			BStringView*	fMemUsageView;
 			BStringView*	fKernelDateTimeView;
@@ -527,6 +533,9 @@ SysInfoView::SysInfoView()
 	:
 	BView("AboutSystem", B_WILL_DRAW | B_PULSE_NEEDED),
 	fOSVersionView(NULL),
+	fCPULabelView(NULL),
+	fCPUInfoView(NULL),
+	fCPUFreqView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
 	fKernelDateTimeView(NULL),
@@ -544,91 +553,32 @@ SysInfoView::SysInfoView()
 
 	// Create all the various labels for system infomation.
 
-	/* labels */
-
-	// OS Version
+	// OS Version / ABI
 	BStringView* osLabel = _CreateLabel("oslabel", B_TRANSLATE("Version:"));
 	fOSVersionView = _CreateSubtext("ostext", _GetOSVersion());
-
-	// CPU count
-	static BStringFormat format(B_TRANSLATE_COMMENT(
-		"{0, plural, one{Processor:} other{# Processors:}}",
-		"\"Processor:\" or \"2 Processors:\""));
-	BString processorLabel;
-	format.Format(processorLabel, sysInfo.cpu_count);
-	BStringView* cpuLabel = _CreateLabel("cpulabel", processorLabel.String());
-
-	// Memory
-	BStringView* memoryLabel = _CreateLabel("memlabel", B_TRANSLATE("Memory:"));
-
-	// Kernel
-	BStringView* kernelLabel = _CreateLabel("kernellabel", B_TRANSLATE("Kernel:"));
-
-	// Time running
-	BStringView* uptimeLabel = _CreateLabel("uptimelabel", B_TRANSLATE("Time running:"));
-
-	// x86_gcc2 or x86_64
 	BStringView* abiText = _CreateSubtext("abitext", B_HAIKU_ABI_NAME);
 
 	// CPU count, type and clock speed
-	uint32 topologyNodeCount = 0;
-	cpu_topology_node_info* topology = NULL;
-	get_cpu_topology_info(NULL, &topologyNodeCount);
-	if (topologyNodeCount != 0)
-		topology = new cpu_topology_node_info[topologyNodeCount];
-	get_cpu_topology_info(topology, &topologyNodeCount);
-
-	enum cpu_platform platform = B_CPU_UNKNOWN;
-	enum cpu_vendor cpuVendor = B_CPU_VENDOR_UNKNOWN;
-	uint32 cpuModel = 0;
-	for (uint32 i = 0; i < topologyNodeCount; i++) {
-		switch (topology[i].type) {
-			case B_TOPOLOGY_ROOT:
-				platform = topology[i].data.root.platform;
-				break;
-
-			case B_TOPOLOGY_PACKAGE:
-				cpuVendor = topology[i].data.package.vendor;
-				break;
-
-			case B_TOPOLOGY_CORE:
-				cpuModel = topology[i].data.core.model;
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	delete[] topology;
-
-	BString cpuType;
-	cpuType << get_cpu_vendor_string(cpuVendor) << " "
-		<< get_cpu_model_string(platform, cpuVendor, cpuModel);
-	BStringView* cpuText = _CreateSubtext("cputext", cpuType.String());
-
-	BString clockSpeed;
-	int32 frequency = get_rounded_cpu_speed();
-	if (frequency < 1000)
-		clockSpeed.SetToFormat(B_TRANSLATE("%ld MHz"), frequency);
-	else
-		clockSpeed.SetToFormat(B_TRANSLATE("%.2f GHz"), frequency / 1000.0f);
-
-	BStringView* frequencyText = _CreateSubtext("frequencytext", clockSpeed);
+	fCPULabelView = _CreateLabel("cpulabel", _GetCPUCount(&sysInfo));
+	fCPUInfoView = _CreateSubtext("cputext", _GetCPUInfo());
+	fCPUFreqView = _CreateSubtext("frequencytext", _GetCPUFrequency());
 
 	// Memory size and usage
+	BStringView* memoryLabel = _CreateLabel("memlabel", B_TRANSLATE("Memory:"));
 	fMemSizeView = _CreateSubtext("ramsizetext", _GetRamSize(&sysInfo));
 	fMemUsageView = _CreateSubtext("ramusagetext", _GetRamUsage(&sysInfo));
 
 	// Kernel build time/date
+	BStringView* kernelLabel = _CreateLabel("kernellabel", B_TRANSLATE("Kernel:"));
 	fKernelDateTimeView = _CreateSubtext("kerneltext", _GetKernelDateTime(&sysInfo));
 
 	// Uptime
+	BStringView* uptimeLabel = _CreateLabel("uptimelabel", B_TRANSLATE("Time running:"));
 	fUptimeView = new BTextView("uptimetext");
 	fUptimeView->SetText(_GetUptime());
 	_UpdateText(fUptimeView);
 
-	/* layout */
+	// Now comes the layout
 
 	const float offset = be_control_look->DefaultLabelSpacing();
 	const float inset = offset;
@@ -641,9 +591,9 @@ SysInfoView::SysInfoView()
 		.Add(abiText)
 		.AddStrut(offset)
 		// Processors:
-		.Add(cpuLabel)
-		.Add(cpuText)
-		.Add(frequencyText)
+		.Add(fCPULabelView)
+		.Add(fCPUInfoView)
+		.Add(fCPUFreqView)
 		.AddStrut(offset)
 		// Memory:
 		.Add(memoryLabel)
@@ -669,6 +619,9 @@ SysInfoView::SysInfoView(BMessage* archive)
 	:
 	BView(archive),
 	fOSVersionView(NULL),
+	fCPULabelView(NULL),
+	fCPUInfoView(NULL),
+	fCPUFreqView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
 	fKernelDateTimeView(NULL),
@@ -684,6 +637,9 @@ SysInfoView::SysInfoView(BMessage* archive)
 	int32 itemCount = layout->CountItems() - 1;
 		// leave out dragger
 
+	system_info sysInfo;
+	get_system_info(&sysInfo);
+
 	for (int32 index = 0; index < itemCount; index++) {
 		BView* view = layout->ItemAt(index)->View();
 		if (view == NULL)
@@ -697,21 +653,28 @@ SysInfoView::SysInfoView(BMessage* archive)
 			_UpdateSubtext(dynamic_cast<BStringView*>(view));
 			if (name == "ostext")
 				fOSVersionView = dynamic_cast<BStringView*>(view);
+			else if (name == "cputext")
+				fCPUInfoView = dynamic_cast<BStringView*>(view);
+			else if (name == "frequencytext")
+				fCPUFreqView = dynamic_cast<BStringView*>(view);
 			else if (name == "ramsizetext")
 				fMemSizeView = dynamic_cast<BStringView*>(view);
 			else if (name == "ramusagetext")
 				fMemUsageView = dynamic_cast<BStringView*>(view);
 			else if (name == "kerneltext")
 				fKernelDateTimeView = dynamic_cast<BStringView*>(view);
-		} else if (name.IEndsWith("label"))
+		} else if (name.IEndsWith("label")) {
 			_UpdateLabel(dynamic_cast<BStringView*>(view));
+			if (name == "cpulabel")
+				fCPULabelView = dynamic_cast<BStringView*>(view);
+		}
 	}
 
-	system_info sysInfo;
-	get_system_info(&sysInfo);
-
-	// These might have changed after an update/reboot cycle;
+	// These might have changed since the replicant instance was created;
 	fOSVersionView->SetText(_GetOSVersion());
+	fCPULabelView->SetText(_GetCPUCount(&sysInfo));
+	fCPUInfoView->SetText(_GetCPUInfo());
+	fCPUFreqView->SetText(_GetCPUFrequency());
 	fKernelDateTimeView->SetText(_GetKernelDateTime(&sysInfo));
 
 	fDragger = dynamic_cast<BDragger*>(ChildAt(0));
@@ -1123,6 +1086,78 @@ SysInfoView::_GetOSVersion()
 		osVersion << " (" << B_TRANSLATE("Revision") << " " << hrev << ")";
 
 	return osVersion;
+}
+
+
+BString
+SysInfoView::_GetCPUCount(system_info* sysInfo)
+{
+	static BStringFormat format(B_TRANSLATE_COMMENT(
+		"{0, plural, one{Processor:} other{# Processors:}}",
+		"\"Processor:\" or \"2 Processors:\""));
+
+	BString processorLabel;
+	format.Format(processorLabel, sysInfo->cpu_count);
+	return processorLabel;
+}
+
+
+BString
+SysInfoView::_GetCPUInfo()
+{
+	uint32 topologyNodeCount = 0;
+	cpu_topology_node_info* topology = NULL;
+
+	get_cpu_topology_info(NULL, &topologyNodeCount);
+	if (topologyNodeCount != 0)
+		topology = new cpu_topology_node_info[topologyNodeCount];
+	get_cpu_topology_info(topology, &topologyNodeCount);
+
+	enum cpu_platform platform = B_CPU_UNKNOWN;
+	enum cpu_vendor cpuVendor = B_CPU_VENDOR_UNKNOWN;
+	uint32 cpuModel = 0;
+
+	for (uint32 i = 0; i < topologyNodeCount; i++) {
+		switch (topology[i].type) {
+			case B_TOPOLOGY_ROOT:
+				platform = topology[i].data.root.platform;
+				break;
+
+			case B_TOPOLOGY_PACKAGE:
+				cpuVendor = topology[i].data.package.vendor;
+				break;
+
+			case B_TOPOLOGY_CORE:
+				cpuModel = topology[i].data.core.model;
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	delete[] topology;
+
+	BString cpuType;
+	cpuType << get_cpu_vendor_string(cpuVendor) << " "
+		<< get_cpu_model_string(platform, cpuVendor, cpuModel);
+
+	return cpuType;
+}
+
+
+BString
+SysInfoView::_GetCPUFrequency()
+{
+	BString clockSpeed;
+
+	int32 frequency = get_rounded_cpu_speed();
+	if (frequency < 1000)
+		clockSpeed.SetToFormat(B_TRANSLATE("%ld MHz"), frequency);
+	else
+		clockSpeed.SetToFormat(B_TRANSLATE("%.2f GHz"), frequency / 1000.0f);
+
+	return clockSpeed;
 }
 
 
