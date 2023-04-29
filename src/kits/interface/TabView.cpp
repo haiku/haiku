@@ -937,38 +937,14 @@ BTabView::DrawTabs()
 		borders, fBorderStyle, fTabSide);
 
 	// draw the tabs on top of the tab frame
-	BRect activeTabFrame;
 	int32 tabCount = CountTabs();
 	for (int32 i = 0; i < tabCount; i++) {
 		BRect tabFrame = TabFrame(i);
-		if (i == fSelection)
-			activeTabFrame = tabFrame;
 
 		TabAt(i)->DrawTab(this, tabFrame,
 			i == fSelection ? B_TAB_FRONT
 				: (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			i != fSelection - 1);
-	}
-
-	BRect tabsBounds;
-	float last = 0.0f;
-	float lastTab = 0.0f;
-	if (fTabSide == kTopSide || fTabSide == kBottomSide) {
-		lastTab = TabFrame(tabCount - 1).right;
-		last = tabFrame.right;
-		tabsBounds.left = tabsBounds.right = lastTab;
-		borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
-	} else if (fTabSide == kLeftSide || fTabSide == kRightSide) {
-		lastTab = TabFrame(tabCount - 1).bottom;
-		last = tabFrame.bottom;
-		tabsBounds.top = tabsBounds.bottom = lastTab;
-		borders = BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER;
-	}
-
-	if (lastTab < last) {
-		// draw a 1px right border on the last tab
-		be_control_look->DrawInactiveTab(this, tabsBounds, tabsBounds, base, 0,
-			borders, fTabSide);
 	}
 
 	return fSelection < CountTabs() ? TabFrame(fSelection) : BRect();
