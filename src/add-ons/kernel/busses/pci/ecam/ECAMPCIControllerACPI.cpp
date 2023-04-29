@@ -102,13 +102,23 @@ ECAMPCIControllerACPI::AcpiCrsScanCallbackInt(acpi_resource *res)
 	switch (res->type) {
 		case ACPI_RESOURCE_TYPE_ADDRESS16: {
 			const auto &address = res->data.address16.address;
+			// If address_length isn't set, compute it from minimum and maximum
+			auto address_length = address.address_length;
+			if (address_length == 0)
+				address_length = address.maximum - address.minimum + 1;
+			ASSERT(address.minimum + address_length - 1 == address.maximum);
 			range.host_addr = address.minimum + address.translation_offset;
 			range.pci_addr  = address.minimum;
-			range.size = address.address_length;
+			range.size = address_length;
 			break;
 		}
 		case ACPI_RESOURCE_TYPE_ADDRESS32: {
 			const auto &address = res->data.address32.address;
+			// If address_length isn't set, compute it from minimum and maximum
+			auto address_length = address.address_length;
+			if (address_length == 0)
+				address_length = address.maximum - address.minimum + 1;
+			ASSERT(address.minimum + address_length - 1 == address.maximum);
 			range.host_addr = address.minimum + address.translation_offset;
 			range.pci_addr  = address.minimum;
 			range.size = address.address_length;
@@ -116,6 +126,11 @@ ECAMPCIControllerACPI::AcpiCrsScanCallbackInt(acpi_resource *res)
 		}
 		case ACPI_RESOURCE_TYPE_ADDRESS64: {
 			const auto &address = res->data.address64.address;
+			// If address_length isn't set, compute it from minimum and maximum
+			auto address_length = address.address_length;
+			if (address_length == 0)
+				address_length = address.maximum - address.minimum + 1;
+			ASSERT(address.minimum + address_length - 1 == address.maximum);
 			range.host_addr = address.minimum + address.translation_offset;
 			range.pci_addr  = address.minimum;
 			range.size = address.address_length;
