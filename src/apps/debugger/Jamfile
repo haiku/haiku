@@ -137,6 +137,7 @@ local sources =
 
 	# user_interface/gui/util
 	ActionMenuItem.cpp
+	AlertWithCheckbox.cpp
 	GuiSettingsUtils.cpp
 	SettingsMenu.cpp
 	SignalDispositionMenu.cpp

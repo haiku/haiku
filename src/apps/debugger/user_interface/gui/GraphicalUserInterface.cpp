@@ -13,6 +13,7 @@
 #include <FilePanel.h>
 #include <Locker.h>
 
+#include "AlertWithCheckbox.h"
 #include "GuiTeamUiSettings.h"
 #include "MessageCodes.h"
 #include "TeamWindow.h"
@@ -129,7 +130,8 @@ GraphicalUserInterface::GraphicalUserInterface()
 	fTeamWindow(NULL),
 	fTeamWindowMessenger(NULL),
 	fFilePanelHandler(NULL),
-	fFilePanel(NULL)
+	fFilePanel(NULL),
+	fDefaultActions(10, true)
 {
 }
 
@@ -271,11 +273,35 @@ GraphicalUserInterface::SynchronouslyAskUser(const char* title,
 	const char* message, const char* choice1, const char* choice2,
 	const char* choice3)
 {
-	BAlert* alert = new(std::nothrow) BAlert(title, message,
-		choice1, choice2, choice3);
+	// If the user already answered the question and asked for their choice to be remembered,
+	// return the previously made choice again
+	BString key(title);
+	key += choice1;
+	key += choice2;
+	key += choice3;
+
+	for (int i = 0; i < fDefaultActions.CountItems(); i++) {
+		if (fDefaultActions.ItemAt(i)->fKey == key)
+			return fDefaultActions.ItemAt(i)->fDecision;
+	}
+
+	AlertWithCheckbox* alert = new(std::nothrow) AlertWithCheckbox(title, message,
+		"Don't ask again", choice1, choice2, choice3);
+
 	if (alert == NULL)
 		return 0;
-	return alert->Go();
+
+	bool dontAskAgain = false;
+	int result = alert->Go(dontAskAgain);
+
+	if (dontAskAgain) {
+		DefaultAction* defaultAction = new DefaultAction;
+		defaultAction->fKey = key;
+		defaultAction->fDecision = result;
+		fDefaultActions.AddItem(defaultAction);
+	}
+
+	return result;
 }
 
 

@@ -9,6 +9,9 @@
 
 #include "UserInterface.h"
 
+#include "ObjectList.h"
+#include "String.h"
+
 
 class BFilePanel;
 class BHandler;
@@ -54,6 +57,12 @@ private:
 			BMessenger*			fTeamWindowMessenger;
 			FilePanelHandler*	fFilePanelHandler;
 			BFilePanel*			fFilePanel;
+
+			struct DefaultAction {
+				BString fKey;
+				int fDecision;
+			};
+			BObjectList<DefaultAction>	fDefaultActions;
 };
 
 
