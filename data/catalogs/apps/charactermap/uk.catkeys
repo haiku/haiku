@@ -263,7 +263,7 @@ Khudawadi	UnicodeBlocks		Синдхі
 Glagotic	UnicodeBlocks		Глаготична
 Cyrillic extended B	UnicodeBlocks		Кирилиця розширення В
 Anatolian hieroglyphs	UnicodeBlocks		Анатолійські ієрогліфи
-Copy as escaped byte string	CharacterView		Копіювати як екрановану стрічку байтів
+Copy as escaped byte string	CharacterView		Копіювати як екранований рядок байтів
 Tai Xuan Jing symbols	UnicodeBlocks		Символи Тай Сюань Цзін
 Hiragana	UnicodeBlocks		Хірагана
 Tagbanwa	UnicodeBlocks		Тагбанва

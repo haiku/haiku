@@ -6,6 +6,6 @@ Open Terminal	Team monitor		Відкрити Terminal
 Restart the desktop	Team monitor		Перезапустити Робочий стіл
 Force reboot	Team monitor		Перезавантажити примусово
 Team monitor	Team monitor		Монітор процесів
-Kill application	Team monitor		Знищити програму
+Kill application	Team monitor		Припинити примусово
 Cancel	Team monitor		Скасувати
 (This team is a system component)	Team monitor		(Цей процес є системним компонентом)

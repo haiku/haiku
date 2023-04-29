@@ -1,5 +1,6 @@
-1	danish	x-vnd.Haiku-mixer.media_addon	3463574286
+1	danish	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Inputkortlægning
+High quality (linear interpolation)	AudioMixer		Høj kvalitet (lineær interpolation)
 To output	AudioMixer		Til output
 Gain	AudioMixer		Gain
 To master	AudioMixer		Til master
@@ -7,13 +8,17 @@ not connected	AudioMixer		ikke tilsluttet
 Master output	AudioMixer		Master-output
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Gain-styringer
+Low quality (drop/repeat samples)	AudioMixer		Lav kvalitet (drop/gentag stykker)
 Output channel sources	AudioMixer		Kilder for outputkanal
 Allow input channel remapping	AudioMixer		Tillad genkortlæsning af inputkanaler
 Display balance control for stereo connections	AudioMixer		Vis balancestyring til stereoforbindelser
 Setup	AudioMixer		Opsætning
 Physical input channels	AudioMixer		Fysiske inputkanaler
 Input channel destinations	AudioMixer		Destinationer for inputkanal
+Resampling algorithm:	AudioMixer		Resamplingsalgoritme:
 Mute	AudioMixer		Mute
 Output mapping	AudioMixer		Outportkortlægning
 Virtual output channels	AudioMixer		Virtuelle outputkaneler
 Allow output channel remapping	AudioMixer		Tillad kortlægning af outputkanal
+Input gain controls represent:	AudioMixer		Indgangsforstærkningskontroller repræsenterer:
+Attenuate mixer output by 3 dB	AudioMixer		Dæmp mixeruddata med 3 dB

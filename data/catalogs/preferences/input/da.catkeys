@@ -2,7 +2,7 @@
 Scrolling	TouchpadPrefView		Rulning
 Defaults	InputMouse		Standarder
 Long	KeyboardView		Lang
-Cancel	TouchpadPrefView		Annuller
+Cancel	TouchpadPrefView		Afbryd
 4-Button	SettingsView		4-knap
 Slow	TouchpadPrefView		Langsom
 Tapping sensitivity	TouchpadPrefView		Trykfølsomhed
@@ -22,7 +22,7 @@ Click to focus	SettingsView		Klik for at fokusere
 Acceleration	TouchpadPrefView		Acceleration
 Mouse speed	SettingsView		Musehastighed
 Accept first click	SettingsView		Acceptér første klik
-OK	TouchpadPrefView		OK
+OK	TouchpadPrefView		O.k.
 Horizontal scrolling	TouchpadPrefView		Vandret rulning
 Delay until key repeat	KeyboardView		Forsinkelse før gentagelse af tast
 Keyboard Lock Delay	TouchpadPrefView		Forsinkelse ved tastaturlås

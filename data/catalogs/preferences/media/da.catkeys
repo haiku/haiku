@@ -7,9 +7,9 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		Kunne ikke fjerne l
 Video output:	Media views		Videooutput:
 Video input:	Media views		Videoinput:
 Audio output:	Media views		Lydoutput:
-Please select a SoundFont.	Midi View		Vælg venligst en LydSkrifttype.
-There are no SoundFonts installed.	Midi View		Der er ikke installeret nogen LydSkrifttyper.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Hvis mediet afsluttes nu vil det stoppe genstarten af medietjenesten. Problematisk eller utilgængelig mediefunktionalitet er sandsynligvist resultatet.
+Please select a SoundFont.	Midi View		Vælg venligst en SoundFont.
+There are no SoundFonts installed.	Midi View		Der er ikke installeret nogen SoundFonts.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Hvis mediet afsluttes nu, vil det stoppe genstarten af medietjenesten. Problematisk eller utilgængelig mediefunktionalitet er sandsynligvis resultatet.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Kunne ikke oprette forbindelse til medieserveren.\nVil du starte den ?
 Video settings	Media Window		Videoindstillinger
 Audio mixer	Media Window		Lydmixer
@@ -20,10 +20,10 @@ Quit anyway	Media Window		Afslut alligevel
 Media	System name		Medier
 Warning!	Media Window		Advarsel!
 MIDI Settings	Media Window		MIDI-indstillinger
-SoundFonts	Midi View		LydSkrifttyper
+SoundFonts	Midi View		SoundFonts
 Audio input:	Media views		Lydinput:
 <none>	Media views		<ingen>
 Channel:	Media views		Kanal:
-This hardware has no controls.	Media Window		Hardwaren har ingen styringer.
+This hardware has no controls.	Media Window		Hardwaren har ingen kontroller.
 Defaults	Media views		Standarder
 <none>	VideoOutputMenu	Used when no video output is available	<ingen>

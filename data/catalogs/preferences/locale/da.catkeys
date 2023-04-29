@@ -9,22 +9,22 @@ Time	TimeFormatSettings		Tid
 Defaults	Locale Preflet Window		Standarder
 Locale	System name		Sprog
 Date	TimeFormatSettings		Dato
-OK	Locale Preflet Window		OK
+OK	Locale Preflet Window		O.k.
 Long format:	TimeFormatSettings		Langt format:
 Numbers	TimeFormatSettings		Tal
 Available languages	Locale Preflet Window		Tilgængelige sprog
 Locale	Locale Preflet		Sprog
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Det var ikke muligt at finde tilgængelige sprog! Du kan ikke bruger prefletten!
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Det var ikke muligt at finde tilgængelige sprog! Disse indstillinger kan ikke anvendes!
 Formatting	Locale Preflet Window		Formatering
 Use month/day-names from preferred language	TimeFormatSettings		Brug måneds-/dagnavne fra foretrukne sprog
 already chosen	LanguageListView		allerede valgt
 Preferred languages	Locale Preflet Window		Foretrukne sprog
 Full format:	TimeFormatSettings		Fuldt format:
-Cancel	Locale Preflet Window		Annuller
+Cancel	Locale Preflet Window		Afbryd
 Revert	Locale Preflet Window		Tilbagefør
 Translate application and folder names	TimeFormatSettings		Oversæt program- og mappenavne
 12 hour	TimeFormatSettings		12 timer
 Positive:	TimeFormatSettings		Positivt:
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Skrivebordslinje eller tracker skal genstartes før ændringerne kan træde i kraft. Vil du genstarte dem nu?
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Skrivebordslinje eller Tracker skal genstartes før ændringerne kan træde i kraft. Vil du genstarte dem nu?
 Restart	Locale Preflet Window		Genstart
 Currency	TimeFormatSettings		Møntfod

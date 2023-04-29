@@ -1,54 +1,54 @@
 1	danish	x-vnd.Haiku-Screen	133788249
 no	Screen		nej
-bits/pixel	Screen		bit/pixel
-15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 farver
+bits/pixel	Screen		bit/billedpunkt
+15 bits/pixel, 32768 colors	Screen		15 bit/billedpunkt, 32768 farver
 Rows:	Screen		Rækker:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Skærmens tilstand kunne ikke blive indstillet:\n\t%s\n
 Keep	Screen		Behold
 /other…	Screen		/andet…
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vandret frekvens:\t%lu - %lu kHz\nLodret frekvens:\t%lu - %lu Hz\n\nMaksimal pixel-ur:\t%g MHz
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vandret frekvens:\t%lu - %lu kHz\nLodret frekvens:\t%lu - %lu Hz\n\nMaksimal billedpunktsfrekvens:\t%g MHz
 Refresh rate:	Screen		Opdateringshastighed:
 Video format:	Screen		Videoformat:
 Undo	Screen		Fortryd
-OK	Screen		OK
+OK	Screen		O.k.
 Current workspace	Screen		Nuværende arbejdsområde
 vertically	Screen		lodret
 All workspaces	Screen		Alle arbejdsområder
-Use laptop panel:	Screen		Brug bærbar computer panel:
+Use laptop panel:	Screen		Brug bærbar computerpanel:
 Could not write VESA mode settings file:\n\t	Screen		Kunne ikke skrive VESA-tilstand indstillingsfil:\n\t
-Display info	Screen		Skærminformation
+Display info	Screen		Skærmoplysninger
 Settings will revert in %seconds.	Screen		Indstillingerne tilbageføres om %seconds.
-Cancel	Screen		Annuller
+Cancel	Screen		Afbryd
 Other…	Screen		Andet…
 Screen	Screen		Skærm
 Colors:	Screen		Farver:
 yes	Screen		ja
 Swap displays:	Screen		Skift skærme:
 %sSerial no.: %s	Screen		%sSerienummer: %s
-8 bits/pixel, 256 colors	Screen		8 bit/pixel, 256 farver
+8 bits/pixel, 256 colors	Screen		8 bit/billedpunkt, 256 farver
 Revert	Screen		Tilbagefør
 always	Screen		altid
 Confirm changes	Screen		Bekræft ændringer
 Warning	Screen		Advarsel
-24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 millioner farver
+24 bits/pixel, 16 Million colors	Screen		24 bit/billedpunkt, 16 millioner farver
 Hz	Screen		Hz
-Workspaces	Screen		Arbejdsrum
+Workspaces	Screen		Arbejdsområder
 Brightness:	Screen		Lysstyrke:
-32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 millioner farver
+32 bits/pixel, 16 Million colors	Screen		32 bit/billedpunkt, 16 millioner farver
 Done	Screen		Færdig
-16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65536 farver
-Screen preferences by the Haiku team	Screen		Skærmpræferencer af Haiku-holdet
-Refresh rate	Screen		Opdateringshastighed
+16 bits/pixel, 65536 colors	Screen		16 bit/billedpunkt, 65536 farver
+Screen preferences by the Haiku team	Screen		Skærmindstillinger af Haiku-holdet
+Refresh rate	Screen		Opdateringsfrekvens
 if needed	Screen		hvis nødvendigt
-Combine displays:	Screen		Kombinere displays:
+Combine displays:	Screen		Kombinere skærme:
 Unknown mode	Screen		Ukendt tilstand
 About	Screen		Om
 Columns:	Screen		Kolonner:
 Resolution:	Screen		Opløsning:
 Apply	Screen		Anvend
 horizontally	Screen		vandret
-disable	Screen		deaktivér
+disable	Screen		slå fra
 Set background…	Screen		Sæt baggrund…
 Type or use the left and right arrow keys.	Screen		Skriv eller brug højre og venstre piletasterne.
 Screen	System name		Skærm

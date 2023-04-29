@@ -4,10 +4,10 @@
 All Rights Reserved.	AboutWindow		Alle rettigheder forbeholdes.
 gold master	AboutWindow		guldmaster
 Undo	TextView		Fortryd
-OK	PrintJob		OK
+OK	PrintJob		O.k.
 gamma	AboutWindow		gamma
 development	AboutWindow		udvikling
-OK	Dragger		OK
+OK	Dragger		O.k.
 %3.2f GiB/s	StringForRate		%3.2f GiB/s
 Print Server is not responding.	PrintJob		Udskriftsserveren svarer ikke.
 About %app%	AboutMenuItem		Om %app%
@@ -17,17 +17,17 @@ Green:	ColorControl		Grøn:
 Redo	TextView		Omgør
 No pages to print!	PrintJob		Ingen sider at udskrive!
 beta	AboutWindow		beta
-OK	ZombieReplicantView		OK
+OK	ZombieReplicantView		O.k.
 Cut	TextView		Klip
 %3.2f GiB	StringForSize		%3.2f GiB
 Default	Default decorator about box		Standard
 Can't delete this replicant from its original application. Life goes on.	Dragger		Kan ikke slette replikanten fra dets oprindelige program. Livet fortsætter som vanligt.
 Error	ZombieReplicantView		Fejl
 Paste	TextView		Indsæt
-OK	AboutWindow		OK
+OK	AboutWindow		O.k.
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/s} other{# bytes/s}}
 Special Thanks:	AboutWindow		Særlig tak til:
-Default Haiku window decorator.	Default decorator about box		Standard-Haiku-vinduesdekoration.
+Default Haiku window decorator.	Default decorator about box		Standard Haiku-vinduesdekoratør.
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Fjern replikant
 Version	AboutWindow		Version
@@ -35,7 +35,7 @@ Red:	ColorControl		Rød:
 <empty>	Menu		<tom>
 Copy	TextView		Kopiér
 Select all	TextView		Vælg alle
-alpha	AboutWindow		alfa
+alpha	AboutWindow		alpha
 %3.2f MiB	StringForSize		%3.2f MiB
 %3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Fejl

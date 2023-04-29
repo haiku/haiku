@@ -10,19 +10,19 @@ Display Power Management Signaling not available	ScreenSaver		Signalering til sk
 ScreenSaver	System name		Pauseskærm
 Test	ScreenSaver		Test
 General	ScreenSaver		Generelt
-Fade now when mouse is here	ScreenSaver		Fade nu når musen er her
-Enable screensaver	ScreenSaver		Aktivér pauseskærm
-Don't fade when mouse is here	ScreenSaver		Fade ikke når musen er her
-Cancel	ScreenSaver		Annuller
+Fade now when mouse is here	ScreenSaver		Ton ud, når musen er her
+Enable screensaver	ScreenSaver		Slå pauseskærm til
+Don't fade when mouse is here	ScreenSaver		Ton ikke ud, når musen er her
+Cancel	ScreenSaver		Afbryd
 Turn off screen	ScreenSaver		Sluk skærm
-No options available	ScreenSaver		Ingen valgmuligheder tilgængelig
+No options available	ScreenSaver		Ingen valgmuligheder tilgængelige
 Password Window	ScreenSaver		Adgangskodevindue
 Screensaver settings	ScreenSaver		Pauseskærmsindstillinger
-Passwords don't match. Please try again.	ScreenSaver		Adgangskoder er ikke ens. Prøv venligst igen.
-OK	ScreenSaver		OK
+Passwords don't match. Please try again.	ScreenSaver		Adgangskoder er ikke ens. Prøv igen.
+OK	ScreenSaver		O.k.
 Blackness	ScreenSaver		Sorthed
 Use custom password	ScreenSaver		Brug brugerdefineret adgangskode
 Done	ScreenSaver		Færdig
 Confirm password:	ScreenSaver		Bekræft adgangskode:
-No preview available	PreviewView		Ingen forhåndsvisning tilgængelig
+No preview available	PreviewView		Ingen forhåndsvisning er tilgængelig
 Use network password	ScreenSaver		Brug netværksadgangskode

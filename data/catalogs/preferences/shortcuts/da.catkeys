@@ -16,8 +16,8 @@ Key	ShortcutsWindow		Tast
 Select	ShortcutsWindow		Vælg
 Shortcuts	System name		Genveje
 Quit	ShortcutsWindow		Afslut
-(Choose application with file requester)	ShortcutsWindow		(Vælg program med fil-forespørger)
-Cancel	ShortcutsWindow		Annuller
+(Choose application with file requester)	ShortcutsWindow		(Vælg program med filforespørger)
+Cancel	ShortcutsWindow		Afbryd
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
 Left	ShortcutsSpec		Venstre
@@ -37,7 +37,7 @@ Append KeySet…	ShortcutsWindow		Tilføj KeySet…
 *MouseButton 1	ShortcutsWindow		*Mousebutton 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 Right	ShortcutsSpec		Højre
-OK	ShortcutsWindow		OK
+OK	ShortcutsWindow		O.k.
 Add new shortcut	ShortcutsWindow		Tilføj ny genvej
 (None)	ShortcutsSpec		(ingen)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Skift

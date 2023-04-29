@@ -2,9 +2,9 @@
 Start bluetooth services…	Window		Start bluetooth-tjenester…
 From all devices	Settings view		Fra alle enheder
 Defaults	Window		Standarder
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Tjek at Bluetooth er aktiveret på din fjern enhed. Tryk på 'Forespørgsel' for at starte søgningen. Tiden der skal bruges for at finde navnene er ukendt, men det burde ikke tage mere end 3 sekunder per enhed. Du kan efterfølgende tilføje dem til din hovedliste, hvor du kan parre med enhederne.
-Laptop	Settings view		Laptop
-Scanning progress	Inquiry panel		Søgnings status
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Tjek at Bluetooth er slået til på din fjern enhed. Tryk på 'Forespørgsel' for at starte søgningen. Tiden, der skal bruges for at finde navnene er ukendt, men det burde ikke tage mere end tre sekunder per enhed. Du kan efterfølgende tilføje dem til din hovedliste, hvor du kan parre med enhederne.
+Laptop	Settings view		Bærbar
+Scanning progress	Inquiry panel		Søgningsstatus
 Only from trusted devices	Settings view		Kun fra betroede enheder
 Launch now	main		Start nu
 Bluetooth	System name		Bluetooth
@@ -20,12 +20,12 @@ Pair…	Remote devices		Parre…
 Desktop	Settings view		Skrivebord
 Server	Window		Server
 Retrieving name of %1	Inquiry panel		Hentning af navn af %1
-Identify host as:	Settings view		Identificer host som:
+Identify host as:	Settings view		Identificér vært som:
 Inquiry	Inquiry panel		Forespørgsel
 Local devices found on system:	Settings view		Lokale enheder fundet på systemet:
-Service classes: 	Device View		Tjeneste klasser: 
+Service classes: 	Device View		Tjenesteklasser: 
 Incoming connections policy:	Settings view		Regler for indgående forbindelser:
-Remote devices	Window		Fjerne enheder
+Remote devices	Window		Fjernenheder
 Retrieving names…	Inquiry panel		Henter navne …
 Add device to list	Inquiry panel		Tilføj enhed til listen
 Show name	Extended local device view		Vis navn

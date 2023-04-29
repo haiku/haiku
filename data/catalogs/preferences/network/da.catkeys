@@ -22,21 +22,21 @@ Revert	NetworkWindow		Tilbagefør
 off	ServiceListItem		fra
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<fandt ingen trådløse netværk>
-Enable	IntefaceView		Aktivér
+Enable	IntefaceView		Slå til
 connected	IntefaceView		tilsluttet
 Apply	IntefaceAddressView		Anvend
-Disable	ServiceView		Deaktivér
+Disable	ServiceView		Slå fra
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Vis netværksstatus i skrivebordslinje
 Mode:	IntefaceAddressView		Tilstand:
 connected	InterfaceListItem		tilsluttet
-OK	NetworkWindow		OK
+OK	NetworkWindow		O.k.
 Static	IntefaceAddressView		Statisk
 launch error	NetworkWindow		fejl ved start
 Renegotiate	IntefaceView		Genforhandl
 MAC address:	IntefaceView		MAC-adresse:
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-disabled	InterfaceListItem		deaktiveret
+disabled	InterfaceListItem		slået fra
 Dial-up connection	InterfaceListItem		Opkaldsforbindelse
 on	ServiceListItem		til
 The method for obtaining an IP address	IntefaceAddressView		Metoden til at indhente en IP-adresse
@@ -44,12 +44,12 @@ disconnected	InterfaceListItem		ikke forbundet
 Automatic	IntefaceAddressView		Automatisk
 Choose automatically	IntefaceView		Vælg automatisk
 Status:	IntefaceView		Status:
-Disable	IntefaceView		Deaktivér
+Disable	IntefaceView		Slå fra
 Manage…	NetworkWindow		Håndter…
 open	Open network		åben
 Network	System name		Netværk
 Your gateway to the internet	IntefaceAddressView		Din indgang til internettet
-Enable	ServiceView		Aktivér
+Enable	ServiceView		Slå til
 Wireless device	InterfaceListItem		Trådløs enhed
-Disabled	IntefaceAddressView		Deaktiveret
+Disabled	IntefaceAddressView		Slået fra
 VPN connection	InterfaceListItem		VPN-forbindelse

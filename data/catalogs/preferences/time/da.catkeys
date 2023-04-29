@@ -1,13 +1,13 @@
 1	danish	x-vnd.Haiku-Time	3691539601
-OK	Time		OK
-Message receiving failed	Time		Modtagning af meddelelse mislykkedes
+OK	Time		O.k.
+Message receiving failed	Time		Modtagelse af meddelelse mislykkedes
 Australia	Time		Australien
 America	Time		Amerika
 Reset to default server list	Time		Nulstil til standard serverliste
 Could not resolve server address	Time		Kunne ikke løse serveradresse
 Time & Date	System name		Tid og klokkeslæt
 Set time zone	Time		Sæt tidszone
-Waiting for answer failed	Time		Ventning af meddelelse mislykkedes
+Waiting for answer failed	Time		Afventning på meddelelse mislykkedes
 <Other>	Time		<Andet>
 Received invalid time	Time		Ugyldig tid modtaget
 Remove	Time		Fjern
@@ -30,7 +30,7 @@ Time zone	Time		Tidszone
 Clock	Time		Ur
 Network time	Time		Netværkstid
 Sending request failed	Time		Afsendelse af forespørgsel mislykkedes
-Preview time:	Time		Forhåndsvisningstid:
+Preview time:	Time		Forhåndsvisning af tid:
 \nNow: 	Time		\nNu: 
 Could not create socket	Time		Kunne ikke oprette sokkel
 Pacific	Time		Stillehavsområdet

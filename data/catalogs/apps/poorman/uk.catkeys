@@ -8,7 +8,7 @@ Log to file	PoorMan		Зберегти журнал в файл
 Shutting down.	PoorMan		Вимкнути
 Error Dir	PoorMan		Помилка директорії
 Web folder:	PoorMan		Веб-папка:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть папку для публікації в мережі Інтернет.\n\nPoorMan може створити типову папку \"public_html\" у Вашому домашньому каталозі.\nАбо виберіть одну з своїх власних папок.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть папку для публікації в мережі Інтернет.\n\nPoorMan може створити типову папку \«public_html\» у Вашому домашньому каталозі.\nАбо виберіть одну з своїх власних папок.
 Log To Console	PoorMan		Виводити лог в консоль
 File Name	PoorMan		Назва файлу
 Starting up... 	PoorMan		Запускаєтся… 
@@ -18,8 +18,8 @@ Save console as…	PoorMan		Зберегти консоль як…
 Edit	PoorMan		Редагувати
 Cancel	PoorMan		Скасувати
 Directory: 	PoorMan		Каталог: 
-Hits: %lu	PoorMan		Підказки: %lu
-Hits: 0	PoorMan		Підказка: 0
+Hits: %lu	PoorMan		Відвідувань: %lu
+Hits: 0	PoorMan		Відвідувань: 0
 Shutting down.\n	PoorMan		Вимкнення.\n
 Select all	PoorMan		Вибрати все
 Error Server	PoorMan		Помилка сервера
@@ -32,7 +32,7 @@ Cannot start the server	PoorMan		Не вдалося запустити серв
 Create log file	PoorMan		Очистити лог-файл
 Create public_html	PoorMan		Створити public_html
 Clear hit counter	PoorMan		Очистити лічильник відвідувань
-Status: Stopped	PoorMan		Статус: Зупинено
+Status: Stopped	PoorMan		Стан: Зупинено
 File	PoorMan		Файл
 Settings…	PoorMan		Налаштування…
 Log To File	PoorMan		Зберегти журнал в файл
@@ -54,9 +54,9 @@ Clear log file	PoorMan		Очистити лог-файл
 Save log console selection	PoorMan		Зберегти логи вибраної консолі
 File Logging	PoorMan		Файл журналу роботи
 Log file name:	PoorMan		Назва лог-файлу:
-Status: Running	PoorMan		Стан: Виконується
+Status: Running	PoorMan		Стан: Працює
 Directory: (none)	PoorMan		Каталог: (пусто)
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб-папка була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній в цій папці HTML-файл з назвою \"index.html\".
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб-папка була створена в \«/boot/home/public_html.\»\n Перевірте чи присутній в цій папці HTML-файл з назвою \«index.html\».
 Dir Created	PoorMan		Каталог створено
 Save console selections as…	PoorMan		Зберегти вибране з консолі як…
 Quit	PoorMan		Вийти

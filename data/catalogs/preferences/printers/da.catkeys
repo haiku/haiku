@@ -5,7 +5,7 @@ Red	TestPageView		Rød
 Default Printer	PrinterListView		Standardprinter
 <pick one>	AddPrinterDialog		<vælg en>
 Connected to:	AddPrinterDialog		Forbundet til:
-Make default	PrintersWindow		Gør standard
+Make default	PrintersWindow		Gør til standard
 Cyan	TestPageView		Cyan
 Completed	JobListView		Fuldført
 Test page	PrintersWindow		Testside
@@ -14,9 +14,9 @@ Failed	JobListView		Mislykkedes
 Blue	TestPageView		Blå
 Waiting	JobListView		Venter
 Processing	JobListView		Behandler
-Cancel	AddPrinterDialog		Annuller
+Cancel	AddPrinterDialog		Afbryd
 Unknown status	JobListView		Ukendt status
-Print jobs for %printer_name%	PrintersWindow		Udskrivningsjobs for %printer_name%
+Print jobs for %printer_name%	PrintersWindow		Udskrivningsjob for %printer_name%
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sider}=1{# side}other{# sider}}
 Add printer	AddPrinterDialog		Tilføj printer
 Printers	PrintersWindow		Printere
@@ -25,7 +25,7 @@ Add…	PrintersWindow		Tilføj…
 Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Add	AddPrinterDialog		Tilføj
-Print jobs: No printer selected	PrintersWindow		Udskrivningsjobs: Der er ikke valgt nogen printer
+Print jobs: No printer selected	PrintersWindow		Udskrivningsjob: Der er ikke valgt nogen printer
 Printer name:	AddPrinterDialog		Printernavn:
 Yellow	TestPageView		Gul
 Black	TestPageView		Sort
@@ -37,5 +37,5 @@ Green	TestPageView		Grøn
 Print test page	PrintersWindow		Udskriv testside
 Restart job	PrintersWindow		Genstart job
 Driver: %driver%	PrinterListView		Driver: %driver%
-Cancel job	PrintersWindow		Annuller job
+Cancel job	PrintersWindow		Afbryd job
 %.2f KB	JobListView		%.2f KB

@@ -1,20 +1,20 @@
 1	danish	x-vnd.Haiku-VirtualMemory	2090796060
 Requested swap file size:	SettingsWindow		Ønsket størrelse på sidefil:
 VirtualMemory	System name		Virtuel hukommelse
-OK	VirtualMemoryApp		OK
+OK	VirtualMemoryApp		O.k.
 Use volume:	SettingsWindow		Anvend diskområde:
-Turn off	SettingsWindow		Deaktivér
-Changes will take effect upon reboot.	SettingsWindow		Ændringerne træder i kraft ved genstarter.
+Turn off	SettingsWindow		Slå fra
+Changes will take effect upon reboot.	SettingsWindow		Ændringerne træder i kraft ved genstart.
 Revert	SettingsWindow		Tilbagefør
-Keep enabled	SettingsWindow		Behold
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Indstillingerne som er angivet i indstillingsfilen er ugyldige. Du kan indlæse standarder eller afslutte.
-VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtuel hukommelse\n\tskrevet af Axel Dörfler\n\tOphavsret 2005, Haiku.\n
-The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Kunne ikke finde diskområdet som er angivet i indstillingsfilen. Du kan bruge opstartsdiskområdet eller afslutte.
+Keep enabled	SettingsWindow		Behold slået til
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Indstillingerne angivet i indstillingsfilen er ugyldige. Du kan indlæse standardværdierne eller afslutte.
+VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tskrevet af Axel Dörfler\n\tOphavsret 2005, Haiku.\n
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Kunne ikke finde diskområdet angivet i indstillingsfilen. Du kan bruge opstartsdiskområdet eller afslutte.
 Current Swap:	SettingsWindow		Nuværende swap:
 Load defaults	SettingsWindow		Indlæs standarder
 Use boot volume	SettingsWindow		Brug opstartsdiskområde
 Automatic swap management	SettingsWindow		Automatisk swap-håndtering
 Defaults	SettingsWindow		Standarder
 Quit	SettingsWindow		Afslut
-Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Deaktivering af virtuel hukommelse vil give uønskede side-effekter på systemets stabilitet, når der ikke er mere hukommelse.\nVirtuel hukommelse påvirker ikke systemets ydelse indtil dette punkt et nået.\n\nEr du sikker på, at du vil deaktivere det?
-Enable virtual memory	SettingsWindow		Aktivér virtuel hukommelse
+Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Hvis du slår virtuel hukommelse fra, vil det have uønskede bivirkninger på systemets stabilitet, når der ikke er mere hukommelse.\nVirtuel hukommelse påvirker ikke systemets ydelse indtil dette punkt et nået.\n\nEr du sikker på, at du vil slå det fra?
+Enable virtual memory	SettingsWindow		Slå virtuel hukommelse til

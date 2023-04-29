@@ -6,7 +6,7 @@ Add…	NotificationView		Tilføj…
 Lower right	GeneralView		Nederst til højre
 Muted	NotificationView		Lydløst
  is already listed	NotificationView	Alert message	 er allerede oplistet
-OK	PrefletWin		OK
+OK	PrefletWin		O.k.
 Notifications	PrefletWin		Underretninger
 Notifications preflet sample	PrefletWin		Prøve for underretningspreflet
 Mute notifications from this application	NotificationView		Sæt underretninger fra programmet på lydløst
@@ -16,19 +16,19 @@ Revert	PrefletWin		Tilbagefør
 Applications	PrefletView		Programmer
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # sekund}other{Timeout: # sekunder}}
 Upper right	GeneralView		Øverst til højre
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Der opstod en fejl ved gemning af præferencerne.\nDu er muligvis løbet tør for diskplads.
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Der opstod en fejl ved gemning af indstillingerne.\nDu er muligvis løbet tør for diskplads.
 Defaults	PrefletWin		Standarder
 Upper left	GeneralView		Øverst til venstre
 Window width	GeneralView		Vinduesbredde
 Applications	NotificationView		Programmer
 General	PrefletView		Generelt
-OK	NotificationView		OK
+OK	NotificationView		O.k.
 Follow Deskbar	GeneralView		Følg skrivebordslinje
 Notifications	System name		Underretninger
 Allowed	NotificationView		Tilladt
 Duration:	GeneralView		Varighed:
 Application	NotificationView		Program
-Enable notifications	GeneralView		Aktivér underretninger
+Enable notifications	GeneralView		Slå underretninger til
 This is a test notification message	PrefletWin		Dette er en test-underretningsmeddelelese
 Remove	NotificationView		Fjern
 Position:	GeneralView		Placering:

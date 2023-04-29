@@ -1,7 +1,7 @@
 1	danish	x-vnd.Haiku-Bluetooth	3550394259
 Positioning	DeviceClass		Placering
 Controller	DeviceClass		Controller
-Common ISDN access	DeviceClass		Almindelig ISDN-adgang
+Common ISDN access	DeviceClass		Almen ISDN-adgang
 Unknown (reserved) minor device class	DeviceClass		Ukendt (reserveret) mindre enhedsklasse
 Uncategorized	DeviceClass		Ukategoriseret
 Keyboard	DeviceClass		Tastatur
@@ -19,7 +19,7 @@ Jacket	DeviceClass		Udtag
 50-67% utilized	DeviceClass		50-67% brugt
 Headphones	DeviceClass		Høretelefoner
 Imaging	DeviceClass		Billedebehandling
-Device conforms to the headset profile	DeviceClass		Enhed stemmer overens med høretelefonsprofilen
+Device conforms to the headset profile	DeviceClass		Enhed passer til høretelefonsprofilen
 Remote control	DeviceClass		Fjernbetjening
 Fully available	DeviceClass		Fuldt ud tilgængeligt
 #CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ikke gyldigt navn
@@ -58,7 +58,7 @@ Loudspeaker	DeviceClass		Højttaler
 SIM card reader	DeviceClass		SIM-kortlæser
 Computer	DeviceClass		Computer
 Scanner	DeviceClass		Skanner
-Wearable	DeviceClass	A wearable computer	Bærbar
+Wearable	DeviceClass	A wearable computer	Wearable
 Display	DeviceClass		Skærm
 Gamepad	DeviceClass		Spilcontroller
 Video monitor	DeviceClass		Videomonitor
@@ -72,8 +72,8 @@ Wrist watch	DeviceClass		Armbåndsur
 Sensing device	DeviceClass		Sensorenhed
 Pointing device	DeviceClass		Pegeenhed
 (reserved)	DeviceClass		(reserveret)
-Rendering	DeviceClass		Gengivning
-Information	DeviceClass		Information
+Rendering	DeviceClass		Gengivelse
+Information	DeviceClass		Oplysninger
 Helmet	DeviceClass		Hjelm
 Pager	DeviceClass	A small radio device to receive short text messages	Personsøger
 Hands-free	DeviceClass		Håndfri
