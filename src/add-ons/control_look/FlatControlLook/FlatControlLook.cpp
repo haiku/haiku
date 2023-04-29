@@ -119,7 +119,7 @@ FlatControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// the surface edges
@@ -244,7 +244,7 @@ FlatControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// surface top color
@@ -277,7 +277,7 @@ FlatControlLook::DrawMenuItemBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// surface edges
@@ -316,14 +316,13 @@ FlatControlLook::DrawScrollBarBorder(BView* view, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
@@ -372,7 +371,7 @@ FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	int32 direction, orientation orientation, bool down)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	bool dark = (base.red + base.green + base.blue <= 128 * 3);
@@ -395,8 +394,8 @@ FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	}
 
 	// clip to button
-	BRegion buttonRegion(rect);
-	view->ConstrainClippingRegion(&buttonRegion);
+	view->PushState();
+	view->ClipToRect(rect);
 
 	flags &= ~B_FLAT;
 
@@ -405,8 +404,7 @@ FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	DrawArrowShape(view, rect, updateRect, arrowColor, direction, flags, 1.0f);
 
 	// revert clipping constraints
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	view->PopState();
 }
 
 
@@ -425,14 +423,13 @@ FlatControlLook::DrawScrollBarBackground(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
 
@@ -475,14 +472,13 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	orientation orientation, uint32 knobStyle)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	// flags
 	bool isEnabled = (flags & B_DISABLED) == 0;
@@ -504,9 +500,7 @@ FlatControlLook::DrawScrollBarThumb(BView* view, BRect& rect,
 	// draw scroll thumb
 	if (isEnabled) {
 		// fill the clickable surface of the thumb
-		// set clipping constraints to updateRect
 		BRegion clipping(updateRect);
-		view->ConstrainClippingRegion(&clipping);
 		DrawScrollBarBackground(view, rect, updateRect, base_panel, flags, orientation);
 		rect.InsetBy(3, 3);
 		view->SetHighColor(base_panel);
@@ -752,11 +746,8 @@ FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color leftFillColor, rgb_color rightFillColor,
 	float sliderScale, uint32 flags, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
-
-	// save the clipping constraints of the view
-	view->PushState();
 
 	// separate the bar in two sides
 	float sliderPosition;
@@ -776,30 +767,20 @@ FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 		rightBarSide.bottom = sliderPosition - 1;
 	}
 
-	// fill the background for the corners, exclude the middle bar for now
-	BRegion region(rect);
-	region.Exclude(rightBarSide);
-	view->ConstrainClippingRegion(&region);
-
 	view->PushState();
+	view->ClipToRect(leftBarSide);
 
 	DrawSliderBar(view, rect, updateRect, base, leftFillColor, flags,
 		orientation);
 
 	view->PopState();
 
-	region.Set(rect);
-	region.Exclude(leftBarSide);
-	view->ConstrainClippingRegion(&region);
-
 	view->PushState();
+	view->ClipToRect(rightBarSide);
 
 	DrawSliderBar(view, rect, updateRect, base, rightFillColor, flags,
 		orientation);
 
-	view->PopState();
-
-	// restore the clipping constraints of the view
 	view->PopState();
 }
 
@@ -809,7 +790,7 @@ FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	const rgb_color& base, rgb_color fillColor, uint32 flags,
 	orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// separate the rect into corners
@@ -830,9 +811,9 @@ FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	}
 
 	// fill the background for the corners, exclude the middle bar for now
-	BRegion region(rect);
-	region.Exclude(barRect);
-	view->ConstrainClippingRegion(&region);
+	view->PushState();
+	view->ClipToRect(rect);
+	view->ClipToInverseRect(barRect);
 
 	if ((flags & B_BLEND_FRAME) == 0) {
 		view->SetHighColor(base);
@@ -920,7 +901,9 @@ FlatControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 			fillShadowColor, 1.0, 0.0, -1.0, -1.0, orientation);
 	}
 
-	view->ConstrainClippingRegion(NULL);
+	view->PopState();
+	if ((flags & B_BLEND_FRAME) != 0)
+		view->SetDrawingMode(B_OP_ALPHA);
 
 	view->BeginLineArray(4);
 	if (orientation == B_HORIZONTAL) {
@@ -959,7 +942,7 @@ void
 FlatControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, orientation orientation)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color thumbColor = tint_color(ui_color(B_SCROLL_BAR_THUMB_COLOR), 1.0);
@@ -1037,7 +1020,7 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// Snap the rectangle to pixels to avoid rounding errors.
@@ -1049,9 +1032,8 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 	// save the clipping constraints of the view
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	rgb_color edgeShadowColor;
 	rgb_color edgeLightColor;
@@ -1106,10 +1088,12 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 		- kRoundCornerRadius);
 	rightBottomCorner.top = floorf(rect.bottom - kRoundCornerRadius);
 
+	BRect roundCorner[2];
+
 	switch (side) {
 		case B_TOP_BORDER:
-			clipping.Exclude(leftTopCorner);
-			clipping.Exclude(rightTopCorner);
+			roundCorner[0] = leftTopCorner;
+			roundCorner[1] = rightTopCorner;
 
 			// draw the left top corner
 			_DrawRoundCornerLeftTop(view, leftTopCorner, updateRect, base,
@@ -1122,8 +1106,8 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 				fillGradient);
 			break;
 		case B_BOTTOM_BORDER:
-			clipping.Exclude(leftBottomCorner);
-			clipping.Exclude(rightBottomCorner);
+			roundCorner[0] = leftBottomCorner;
+			roundCorner[1] = rightBottomCorner;
 
 			// draw the left bottom corner
 			_DrawRoundCornerLeftBottom(view, leftBottomCorner, updateRect, base,
@@ -1136,8 +1120,8 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 				fillGradient);
 			break;
 		case B_LEFT_BORDER:
-			clipping.Exclude(leftTopCorner);
-			clipping.Exclude(leftBottomCorner);
+			roundCorner[0] = leftTopCorner;
+			roundCorner[1] = leftBottomCorner;
 
 			// draw the left top corner
 			_DrawRoundCornerLeftTop(view, leftTopCorner, updateRect, base,
@@ -1150,8 +1134,8 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 				fillGradient);
 			break;
 		case B_RIGHT_BORDER:
-			clipping.Exclude(rightTopCorner);
-			clipping.Exclude(rightBottomCorner);
+			roundCorner[0] = rightTopCorner;
+			roundCorner[1] = rightBottomCorner;
 
 			// draw the right top corner
 			_DrawRoundCornerRightTop(view, rightTopCorner, updateRect, base,
@@ -1166,7 +1150,8 @@ FlatControlLook::DrawActiveTab(BView* view, BRect& rect,
 	}
 
 	// clip out the corners
-	view->ConstrainClippingRegion(&clipping);
+	view->ClipToInverseRect(roundCorner[0]);
+	view->ClipToInverseRect(roundCorner[1]);
 
 	uint32 bordersToDraw = 0;
 	switch (side) {
@@ -1217,7 +1202,7 @@ FlatControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, orientation orientation, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color background;
@@ -1368,7 +1353,7 @@ FlatControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
 	uint32 borders)
 {
-	if (!rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	rgb_color dark1BorderColor;
@@ -1521,9 +1506,8 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	// save the clipping constraints of the view
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	// If the button is flat and neither activated nor otherwise highlighted
 	// (mouse hovering or focussed), draw it flat.
@@ -1604,9 +1588,10 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
 			floorf(rect.left + leftTopRadius),
 			floorf(rect.top + leftTopRadius));
-		clipping.Exclude(leftTopCorner);
+		BRect cornerRect(leftTopCorner);
 		_DrawRoundCornerFrameLeftTop(view, leftTopCorner, updateRect,
 			cornerBgColor, edgeShadowColor, frameLightColor);
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
@@ -1615,10 +1600,11 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		BRect rightTopCorner(floorf(rect.right - rightTopRadius),
 			floorf(rect.top), floorf(rect.right),
 			floorf(rect.top + rightTopRadius));
-		clipping.Exclude(rightTopCorner);
+		BRect cornerRect(rightTopCorner);
 		_DrawRoundCornerFrameRightTop(view, rightTopCorner, updateRect,
 			cornerBgColor, edgeShadowColor, edgeLightColor,
 			frameLightColor, frameShadowColor);
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
@@ -1627,10 +1613,11 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		BRect leftBottomCorner(floorf(rect.left),
 			floorf(rect.bottom - leftBottomRadius),
 			floorf(rect.left + leftBottomRadius), floorf(rect.bottom));
-		clipping.Exclude(leftBottomCorner);
+		BRect cornerRect(leftBottomCorner);
 		_DrawRoundCornerFrameLeftBottom(view, leftBottomCorner, updateRect,
 			cornerBgColor, edgeShadowColor, edgeLightColor,
 			frameLightColor, frameShadowColor);
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
@@ -1639,13 +1626,11 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 		BRect rightBottomCorner(floorf(rect.right - rightBottomRadius),
 			floorf(rect.bottom - rightBottomRadius), floorf(rect.right),
 			floorf(rect.bottom));
-		clipping.Exclude(rightBottomCorner);
+		BRect cornerRect(rightBottomCorner);
 		_DrawRoundCornerFrameRightBottom(view, rightBottomCorner,
 			updateRect, cornerBgColor, edgeLightColor, frameShadowColor);
+		view->ClipToInverseRect(cornerRect);
 	}
-
-	// clip out the corners
-	view->ConstrainClippingRegion(&clipping);
 
 #if 0
 		// draw outer edge only for default button!!! B_SUCCESS_COLOR
@@ -1715,9 +1700,8 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 	// save the clipping constraints of the view
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	// If is a default button, set backcolor to the tab color.
 	if ((flags & B_DEFAULT_BUTTON) != 0)
@@ -1739,6 +1723,7 @@ FlatControlLook::_DrawButtonBackground(BView* view, BRect& rect,
 		_DrawFlatButtonBackground(view, rect, updateRect, customColor, popupIndicator,
 			flags, borders, orientation);
 	} else {
+		BRegion clipping(rect);
 		_DrawNonFlatButtonBackground(view, rect, updateRect, clipping,
 			leftTopRadius, rightTopRadius, leftBottomRadius, rightBottomRadius,
 			customColor, popupIndicator, flags, borders, orientation);
@@ -1778,8 +1763,10 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 			floorf(rect.left + leftTopRadius - 2.0),
 			floorf(rect.top + leftTopRadius - 2.0));
 		clipping.Exclude(leftTopCorner);
+		BRect cornerRect(leftTopCorner);
 		_DrawRoundCornerBackgroundLeftTop(view, leftTopCorner, updateRect,
 			bevelLightColor, fillGradient);
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
@@ -1789,8 +1776,10 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 			floorf(rect.top), floorf(rect.right),
 			floorf(rect.top + rightTopRadius - 2.0));
 		clipping.Exclude(rightTopCorner);
+		BRect cornerRect(rightTopCorner);
 		_DrawRoundCornerBackgroundRightTop(view, rightTopCorner,
 			updateRect, bevelLightColor, bevelShadowColor, fillGradient);
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
@@ -1801,8 +1790,10 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 			floorf(rect.left + leftBottomRadius - 2.0),
 			floorf(rect.bottom));
 		clipping.Exclude(leftBottomCorner);
+		BRect cornerRect(leftBottomCorner);
 		_DrawRoundCornerBackgroundLeftBottom(view, leftBottomCorner,
 			updateRect, bevelLightColor, bevelShadowColor, fillGradient);
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
@@ -1812,12 +1803,11 @@ FlatControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 			floorf(rect.bottom - rightBottomRadius + 2.0), floorf(rect.right),
 			floorf(rect.bottom));
 		clipping.Exclude(rightBottomCorner);
+		BRect cornerRect(rightBottomCorner);
 		_DrawRoundCornerBackgroundRightBottom(view, rightBottomCorner,
 			updateRect, bevelShadowColor, fillGradient);
+		view->ClipToInverseRect(cornerRect);
 	}
-
-	// clip out the corners
-	view->ConstrainClippingRegion(&clipping);
 
 	// draw inner bevel
 
@@ -1934,7 +1924,7 @@ FlatControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
 	bool popupIndicator, uint32 flags)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	if (popupIndicator) {
@@ -1979,15 +1969,14 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 	float leftBottomRadius, float rightBottomRadius, const rgb_color& base,
 	uint32 flags, uint32 borders)
 {
-	if (!rect.IsValid() || !rect.Intersects(updateRect))
+	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
 	// save the clipping constraints of the view
 	view->PushState();
 
-	// set clipping constraints to updateRect
-	BRegion clipping(updateRect);
-	view->ConstrainClippingRegion(&clipping);
+	// set clipping constraints to rect
+	view->ClipToRect(rect);
 
 	// frame colors
 	rgb_color frameLightColor  = _FrameLightColor(base, flags);
@@ -2034,10 +2023,10 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		BRect leftTopCorner(floorf(rect.left), floorf(rect.top),
 			floorf(rect.left + leftTopRadius - 2.0),
 			floorf(rect.top + leftTopRadius - 2.0));
-		clipping.Exclude(leftTopCorner);
+		BRect cornerRect(leftTopCorner);
 
-		BRegion cornerClipping(leftTopCorner);
-		view->ConstrainClippingRegion(&cornerClipping);
+		view->PushState();
+		view->ClipToRect(cornerRect);
 
 		BRect ellipseRect(leftTopCorner);
 		ellipseRect.InsetBy(-1.0, -1.0);
@@ -2051,6 +2040,9 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		// draw the bevel and background
 		_DrawRoundCornerBackgroundLeftTop(view, leftTopCorner, updateRect,
 			bevelColor1, fillGradient);
+
+		view->PopState();
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_TOP_BORDER) != 0 && (borders & B_RIGHT_BORDER) != 0
@@ -2059,10 +2051,10 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		BRect rightTopCorner(floorf(rect.right - rightTopRadius + 2.0),
 			floorf(rect.top), floorf(rect.right),
 			floorf(rect.top + rightTopRadius - 2.0));
-		clipping.Exclude(rightTopCorner);
+		BRect cornerRect(rightTopCorner);
 
-		BRegion cornerClipping(rightTopCorner);
-		view->ConstrainClippingRegion(&cornerClipping);
+		view->PushState();
+		view->ClipToRect(cornerRect);
 
 		BRect ellipseRect(rightTopCorner);
 		ellipseRect.InsetBy(-1.0, -1.0);
@@ -2085,6 +2077,9 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		// draw the bevel and background
 		_DrawRoundCornerBackgroundRightTop(view, rightTopCorner, updateRect,
 			bevelColor1, bevelColor3, fillGradient);
+
+		view->PopState();
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_LEFT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
@@ -2094,10 +2089,10 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 			floorf(rect.bottom - leftBottomRadius + 2.0),
 			floorf(rect.left + leftBottomRadius - 2.0),
 			floorf(rect.bottom));
-		clipping.Exclude(leftBottomCorner);
+		BRect cornerRect(leftBottomCorner);
 
-		BRegion cornerClipping(leftBottomCorner);
-		view->ConstrainClippingRegion(&cornerClipping);
+		view->PushState();
+		view->ClipToRect(cornerRect);
 
 		BRect ellipseRect(leftBottomCorner);
 		ellipseRect.InsetBy(-1.0, -1.0);
@@ -2120,6 +2115,9 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		// draw the bevel and background
 		_DrawRoundCornerBackgroundLeftBottom(view, leftBottomCorner,
 			updateRect, bevelColor2, bevelColor3, fillGradient);
+
+		view->PopState();
+		view->ClipToInverseRect(cornerRect);
 	}
 
 	if ((borders & B_RIGHT_BORDER) != 0 && (borders & B_BOTTOM_BORDER) != 0
@@ -2128,10 +2126,10 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		BRect rightBottomCorner(floorf(rect.right - rightBottomRadius + 2.0),
 			floorf(rect.bottom - rightBottomRadius + 2.0), floorf(rect.right),
 			floorf(rect.bottom));
-		clipping.Exclude(rightBottomCorner);
+		BRect cornerRect(rightBottomCorner);
 
-		BRegion cornerClipping(rightBottomCorner);
-		view->ConstrainClippingRegion(&cornerClipping);
+		view->PushState();
+		view->ClipToRect(cornerRect);
 
 		BRect ellipseRect(rightBottomCorner);
 		ellipseRect.InsetBy(-1.0, -1.0);
@@ -2145,10 +2143,10 @@ FlatControlLook::_DrawMenuFieldBackgroundInside(BView* view, BRect& rect,
 		// draw the bevel and background
 		_DrawRoundCornerBackgroundRightBottom(view, rightBottomCorner,
 			updateRect, bevelColor3, fillGradient);
-	}
 
-	// clip out the corners
-	view->ConstrainClippingRegion(&clipping);
+		view->PopState();
+		view->ClipToInverseRect(cornerRect);
+	}
 
 	// draw the bevel
 	_DrawFrame(view, rect,
