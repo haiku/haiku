@@ -344,7 +344,7 @@ public:
 		return true;
 	}
 
-	/*! \brief Iterator for BOpenHashMap
+	/*! \brief Iterator for BOpenHashTable
 
 		The iterator is not invalidated when removing the current element from
 		the table, unless the removal triggers a resize.
