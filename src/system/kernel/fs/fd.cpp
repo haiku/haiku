@@ -747,7 +747,7 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 	}
 
 	bool movePosition = false;
-	if (pos == -1) {
+	if (pos == -1 && descriptor->ops->fd_seek != NULL) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -806,7 +806,7 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	}
 
 	bool movePosition = false;
-	if (pos == -1) {
+	if (pos == -1 && descriptor->ops->fd_seek != NULL) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
