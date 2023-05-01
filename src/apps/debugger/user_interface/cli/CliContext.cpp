@@ -29,7 +29,7 @@ static CliContext* sCurrentContext;
 
 
 struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
-	Event(int type, Thread* thread = NULL, TeamMemoryBlock* block = NULL,
+	Event(int type, ::Thread* thread = NULL, TeamMemoryBlock* block = NULL,
 		ExpressionInfo* info = NULL, status_t expressionResult = B_OK,
 		ExpressionResult* expressionValue = NULL)
 		:
@@ -47,7 +47,7 @@ struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 		return fType;
 	}
 
-	Thread* GetThread() const
+	::Thread* GetThread() const
 	{
 		return fThreadReference.Get();
 	}
@@ -75,7 +75,7 @@ struct CliContext::Event : DoublyLinkedListLinkImpl<CliContext::Event> {
 
 private:
 	int					fType;
-	BReference<Thread>	fThreadReference;
+	BReference< ::Thread>	fThreadReference;
 	BReference<TeamMemoryBlock> fMemoryBlockReference;
 	BReference<ExpressionInfo> fExpressionInfo;
 	status_t			fExpressionResult;
@@ -88,6 +88,7 @@ private:
 
 CliContext::CliContext()
 	:
+	BLooper("CliContext"),
 	fLock("CliContext"),
 	fTeam(NULL),
 	fListener(NULL),
@@ -95,10 +96,8 @@ CliContext::CliContext()
 	fEditLine(NULL),
 	fHistory(NULL),
 	fPrompt(NULL),
-	fBlockingSemaphore(-1),
-	fInputLoopWaitingForEvents(0),
-	fEventsOccurred(0),
-	fInputLoopWaiting(false),
+	fWaitForEventSemaphore(-1),
+	fEventOccurred(0),
 	fTerminating(false),
 	fStoppedThread(NULL),
 	fCurrentThread(NULL),
@@ -118,14 +117,16 @@ CliContext::~CliContext()
 	Cleanup();
 	sCurrentContext = NULL;
 
-	if (fBlockingSemaphore >= 0)
-		delete_sem(fBlockingSemaphore);
+	if (fWaitForEventSemaphore >= 0)
+		delete_sem(fWaitForEventSemaphore);
 }
 
 
 status_t
-CliContext::Init(Team* team, UserInterfaceListener* listener)
+CliContext::Init(::Team* team, UserInterfaceListener* listener)
 {
+	AutoLocker<BLocker> locker(fLock);
+
 	fTeam = team;
 	fListener = listener;
 
@@ -135,9 +136,9 @@ CliContext::Init(Team* team, UserInterfaceListener* listener)
 	if (error != B_OK)
 		return error;
 
-	fBlockingSemaphore = create_sem(0, "CliContext block");
-	if (fBlockingSemaphore < 0)
-		return fBlockingSemaphore;
+	fWaitForEventSemaphore = create_sem(0, "CliContext wait for event");
+	if (fWaitForEventSemaphore < 0)
+		return fWaitForEventSemaphore;
 
 	fEditLine = el_init("Debugger", stdin, stdout, stderr);
 	if (fEditLine == NULL)
@@ -171,10 +172,8 @@ CliContext::Init(Team* team, UserInterfaceListener* listener)
 void
 CliContext::Cleanup()
 {
+	AutoLocker<BLocker> locker(fLock);
 	Terminating();
-
-	while (Event* event = fPendingEvents.RemoveHead())
-		delete event;
 
 	if (fEditLine != NULL) {
 		el_end(fEditLine);
@@ -208,13 +207,16 @@ CliContext::Cleanup()
 }
 
 
+// TODO: Use the lifecycle methods of BLooper instead
 void
 CliContext::Terminating()
 {
 	AutoLocker<BLocker> locker(fLock);
 
 	fTerminating = true;
-	_SignalInputLoop(EVENT_QUIT);
+
+	BMessage message(MSG_QUIT);
+	PostMessage(&message);
 
 	// TODO: Signal the input loop, should it be in PromptUser()!
 }
@@ -223,12 +225,13 @@ CliContext::Terminating()
 thread_id
 CliContext::CurrentThreadID() const
 {
+	AutoLocker<BLocker> locker(fLock);
 	return fCurrentThread != NULL ? fCurrentThread->ID() : -1;
 }
 
 
 void
-CliContext::SetCurrentThread(Thread* thread)
+CliContext::SetCurrentThread(::Thread* thread)
 {
 	AutoLocker<BLocker> locker(fLock);
 
@@ -262,7 +265,8 @@ CliContext::SetCurrentThread(Thread* thread)
 void
 CliContext::PrintCurrentThread()
 {
-	AutoLocker<Team> teamLocker(fTeam);
+	AutoLocker< ::Team> teamLocker(fTeam);
+	AutoLocker<BLocker> locker(fLock);
 
 	if (fCurrentThread != NULL) {
 		printf("current thread: %" B_PRId32 " \"%s\"\n", fCurrentThread->ID(),
@@ -294,11 +298,12 @@ status_t
 CliContext::EvaluateExpression(const char* expression,
 		SourceLanguage* language, target_addr_t& address)
 {
+	AutoLocker<BLocker> locker(fLock);
 	fExpressionInfo->SetTo(expression);
 
 	fListener->ExpressionEvaluationRequested(
 		language, fExpressionInfo);
-	WaitForEvents(CliContext::EVENT_EXPRESSION_EVALUATED);
+	_WaitForEvent(MSG_EXPRESSION_EVALUATED);
 	if (fTerminating)
 		return B_INTERRUPTED;
 
@@ -329,9 +334,10 @@ CliContext::EvaluateExpression(const char* expression,
 status_t
 CliContext::GetMemoryBlock(target_addr_t address, TeamMemoryBlock*& block)
 {
+	AutoLocker<BLocker> locker(fLock);
 	if (fCurrentBlock == NULL || !fCurrentBlock->Contains(address)) {
 		GetUserInterfaceListener()->InspectRequested(address, this);
-		WaitForEvents(CliContext::EVENT_TEAM_MEMORY_BLOCK_RETRIEVED);
+		_WaitForEvent(MSG_TEAM_MEMORY_BLOCK_RETRIEVED);
 		if (fTerminating)
 			return B_INTERRUPTED;
 	}
@@ -351,8 +357,6 @@ CliContext::PromptUser(const char* prompt)
 
 	fPrompt = NULL;
 
-	ProcessPendingEvents();
-
 	return line;
 }
 
@@ -368,14 +372,12 @@ CliContext::AddLineToInputHistory(const char* line)
 void
 CliContext::QuitSession(bool killTeam)
 {
-	_PrepareToWaitForEvents(EVENT_QUIT);
-
 	fListener->UserInterfaceQuitRequested(
 		killTeam
 			? UserInterfaceListener::QUIT_OPTION_ASK_KILL_TEAM
 			: UserInterfaceListener::QUIT_OPTION_ASK_RESUME_TEAM);
 
-	_WaitForEvents();
+	WaitForEvent(MSG_QUIT);
 }
 
 
@@ -384,19 +386,10 @@ CliContext::WaitForThreadOrUser()
 {
 // TODO: Deal with SIGINT as well!
 
-	// if no thread has been stopped, wait till one is
-	while (fStoppedThread == NULL) {
-		_PrepareToWaitForEvents(
-			EVENT_USER_INTERRUPT | EVENT_THREAD_STATE_CHANGED);
-		uint32 events = _WaitForEvents();
+	AutoLocker<BLocker> locker(fLock);
 
-		ProcessPendingEvents();
-			// updates fStoppedThread if any thread has been stopped
-
-		if ((events & EVENT_QUIT) != 0) {
-			return;
-		}
-	}
+	while (fStoppedThread == NULL)
+		_WaitForEvent(MSG_THREAD_STATE_CHANGED);
 
 	if (fCurrentThread == NULL)
 		SetCurrentThread(fStoppedThread);
@@ -404,116 +397,138 @@ CliContext::WaitForThreadOrUser()
 
 
 void
-CliContext::WaitForEvents(int32 eventMask)
-{
-	for (;;) {
-		_PrepareToWaitForEvents(eventMask | EVENT_USER_INTERRUPT);
-		uint32 events = fEventsOccurred;
-		if ((events & eventMask) == 0) {
-			events = _WaitForEvents();
-		}
-
-		if ((events & EVENT_QUIT) != 0 || (events & eventMask) != 0) {
-			_SignalInputLoop(eventMask);
-			ProcessPendingEvents();
-			return;
-		}
-	}
+CliContext::WaitForEvent(uint32 event) {
+	AutoLocker<BLocker> locker(fLock);
+	_WaitForEvent(event);
 }
 
 
 void
-CliContext::ProcessPendingEvents()
+CliContext::MessageReceived(BMessage* message)
 {
-	AutoLocker<Team> teamLocker(fTeam);
+	fLock.Lock();
 
-	for (;;) {
-		// get the next event
-		AutoLocker<BLocker> locker(fLock);
-		Event* event = fPendingEvents.RemoveHead();
-		locker.Unlock();
-		if (event == NULL)
+	int32 threadID;
+	message->FindInt32("thread", &threadID);
+
+	const char* threadName;
+	message->FindString("threadName", &threadName);
+
+	switch (message->what) {
+		case MSG_THREAD_ADDED:
+			printf("[new thread: %" B_PRId32 " \"%s\"]\n", threadID,
+				threadName);
 			break;
-		ObjectDeleter<Event> eventDeleter(event);
+		case MSG_THREAD_REMOVED:
+			printf("[thread terminated: %" B_PRId32 " \"%s\"]\n",
+				threadID, threadName);
+			break;
+		case MSG_THREAD_STATE_CHANGED:
+		{
+			AutoLocker< ::Team> locker(fTeam);
+			::Thread* thread = fTeam->ThreadByID(threadID);
 
-		// process the event
-		Thread* thread = event->GetThread();
-
-		switch (event->Type()) {
-			case EVENT_QUIT:
-			case EVENT_DEBUG_REPORT_CHANGED:
-			case EVENT_USER_INTERRUPT:
-				break;
-			case EVENT_THREAD_ADDED:
-				printf("[new thread: %" B_PRId32 " \"%s\"]\n", thread->ID(),
-					thread->Name());
-				break;
-			case EVENT_THREAD_REMOVED:
-				printf("[thread terminated: %" B_PRId32 " \"%s\"]\n",
-					thread->ID(), thread->Name());
-				break;
-			case EVENT_THREAD_STATE_CHANGED:
-				if (thread->State() == THREAD_STATE_STOPPED) {
-					printf("[thread stopped: %" B_PRId32 " \"%s\"]\n",
-						thread->ID(), thread->Name());
-					fStoppedThread.SetTo(thread);
-				} else {
-					fStoppedThread = NULL;
-				}
-				break;
-			case EVENT_THREAD_STACK_TRACE_CHANGED:
-				if (thread == fCurrentThread) {
-					fCurrentStackTrace = thread->GetStackTrace();
-					fCurrentStackTrace->AcquireReference();
-					SetCurrentStackFrameIndex(0);
-				}
-				break;
-			case EVENT_TEAM_MEMORY_BLOCK_RETRIEVED:
-				if (fCurrentBlock != NULL) {
-					fCurrentBlock->ReleaseReference();
-					fCurrentBlock = NULL;
-				}
-				fCurrentBlock = event->GetMemoryBlock();
-				break;
-			case EVENT_EXPRESSION_EVALUATED:
-				fExpressionResult = event->GetExpressionResult();
-				if (fExpressionValue != NULL) {
-					fExpressionValue->ReleaseReference();
-					fExpressionValue = NULL;
-				}
-				fExpressionValue = event->GetExpressionValue();
-				if (fExpressionValue != NULL)
-					fExpressionValue->AcquireReference();
-				break;
+			if (thread->State() == THREAD_STATE_STOPPED) {
+				printf("[thread stopped: %" B_PRId32 " \"%s\"]\n",
+					threadID, threadName);
+				fStoppedThread.SetTo(thread);
+			} else {
+				fStoppedThread = NULL;
+			}
+			break;
 		}
+		case MSG_THREAD_STACK_TRACE_CHANGED:
+			if (threadID == fCurrentThread->ID()) {
+				AutoLocker< ::Team> locker(fTeam);
+				::Thread* thread = fTeam->ThreadByID(threadID);
+
+				fCurrentStackTrace = thread->GetStackTrace();
+				fCurrentStackTrace->AcquireReference();
+				SetCurrentStackFrameIndex(0);
+			}
+			break;
+		case MSG_TEAM_MEMORY_BLOCK_RETRIEVED:
+		{
+			TeamMemoryBlock* block = NULL;
+			if (message->FindPointer("block",
+					reinterpret_cast<void **>(&block)) != B_OK) {
+				break;
+			}
+
+			if (fCurrentBlock != NULL) {
+				fCurrentBlock->ReleaseReference();
+			}
+
+			// reference acquired in MemoryBlockRetrieved
+			fCurrentBlock = block;
+			break;
+		}
+		case MSG_EXPRESSION_EVALUATED:
+		{
+			status_t result;
+			if (message->FindInt32("result", &result) != B_OK) {
+				break;
+			}
+
+			fExpressionResult = result;
+
+			ExpressionResult* value = NULL;
+			message->FindPointer("value", reinterpret_cast<void**>(&value));
+
+			if (fExpressionValue != NULL) {
+				fExpressionValue->ReleaseReference();
+			}
+
+			// reference acquired in ExpressionEvaluated
+			fExpressionValue = value;
+			break;
+		}
+		default:
+			BLooper::MessageReceived(message);
+			break;
 	}
+
+	fEventOccurred = message->what;
+
+	fLock.Unlock();
+
+	release_sem(fWaitForEventSemaphore);
+	// all of the code that was waiting on the semaphore runs
+	acquire_sem(fWaitForEventSemaphore);
+
+	fLock.Lock();
+	fEventOccurred = 0;
+	fLock.Unlock();
 }
 
 
 void
 CliContext::ThreadAdded(const Team::ThreadEvent& threadEvent)
 {
-	_QueueEvent(
-		new(std::nothrow) Event(EVENT_THREAD_ADDED, threadEvent.GetThread()));
-	_SignalInputLoop(EVENT_THREAD_ADDED);
+	BMessage message(MSG_THREAD_ADDED);
+	message.AddInt32("thread", threadEvent.GetThread()->ID());
+	message.AddString("threadName", threadEvent.GetThread()->Name());
+	PostMessage(&message);
 }
 
 
 void
 CliContext::ThreadRemoved(const Team::ThreadEvent& threadEvent)
 {
-	_QueueEvent(
-		new(std::nothrow) Event(EVENT_THREAD_REMOVED, threadEvent.GetThread()));
-	_SignalInputLoop(EVENT_THREAD_REMOVED);
+	BMessage message(MSG_THREAD_REMOVED);
+	message.AddInt32("thread", threadEvent.GetThread()->ID());
+	message.AddString("threadName", threadEvent.GetThread()->Name());
+	PostMessage(&message);
 }
 
 
 void
 CliContext::ThreadStateChanged(const Team::ThreadEvent& threadEvent)
 {
-	_QueueEvent(
-		new(std::nothrow) Event(EVENT_THREAD_STATE_CHANGED, threadEvent.GetThread()));
-	_SignalInputLoop(EVENT_THREAD_STATE_CHANGED);
+	BMessage message(MSG_THREAD_STATE_CHANGED);
+	message.AddInt32("thread", threadEvent.GetThread()->ID());
+	message.AddString("threadName", threadEvent.GetThread()->Name());
+	PostMessage(&message);
 }
 
 
@@ -523,10 +538,10 @@ CliContext::ThreadStackTraceChanged(const Team::ThreadEvent& threadEvent)
 	if (threadEvent.GetThread()->State() != THREAD_STATE_STOPPED)
 		return;
 
-	_QueueEvent(
-		new(std::nothrow) Event(EVENT_THREAD_STACK_TRACE_CHANGED,
-			threadEvent.GetThread()));
-	_SignalInputLoop(EVENT_THREAD_STACK_TRACE_CHANGED);
+	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
+	message.AddInt32("thread", threadEvent.GetThread()->ID());
+	message.AddString("threadName", threadEvent.GetThread()->Name());
+	PostMessage(&message);
 }
 
 
@@ -534,10 +549,15 @@ void
 CliContext::ExpressionEvaluated(ExpressionInfo* info, status_t result,
 	ExpressionResult* value)
 {
-	_QueueEvent(
-		new(std::nothrow) Event(EVENT_EXPRESSION_EVALUATED,
-			NULL, NULL, info, result, value));
-	_SignalInputLoop(EVENT_EXPRESSION_EVALUATED);
+	BMessage message(MSG_EXPRESSION_EVALUATED);
+	message.AddInt32("result", result);
+
+	if (value != NULL) {
+		value->AcquireReference();
+		message.AddPointer("value", value);
+	}
+
+	PostMessage(&message);
 }
 
 
@@ -551,9 +571,6 @@ CliContext::DebugReportChanged(const Team::DebugReportEvent& event)
 		fprintf(stderr, "Failed to write debug report: %s\n", strerror(
 				event.GetFinalStatus()));
 	}
-
-	_QueueEvent(new(std::nothrow) Event(EVENT_DEBUG_REPORT_CHANGED));
-	_SignalInputLoop(EVENT_DEBUG_REPORT_CHANGED);
 }
 
 
@@ -562,19 +579,18 @@ CliContext::CoreFileChanged(const Team::CoreFileChangedEvent& event)
 {
 	printf("Successfully saved core file to %s\n",
 		event.GetTargetPath());
-
-	_QueueEvent(new(std::nothrow) Event(EVENT_CORE_FILE_CHANGED));
-	_SignalInputLoop(EVENT_CORE_FILE_CHANGED);
 }
 
 
 void
 CliContext::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
-	_QueueEvent(
-		new(std::nothrow) Event(EVENT_TEAM_MEMORY_BLOCK_RETRIEVED,
-			NULL, block));
-	_SignalInputLoop(EVENT_TEAM_MEMORY_BLOCK_RETRIEVED);
+	if (block != NULL)
+		block->AcquireReference();
+
+	BMessage message(MSG_TEAM_MEMORY_BLOCK_RETRIEVED);
+	message.AddPointer("block", block);
+	PostMessage(&message);
 }
 
 
@@ -582,92 +598,32 @@ void
 CliContext::ValueNodeChanged(ValueNodeChild* nodeChild, ValueNode* oldNode,
 	ValueNode* newNode)
 {
-	_SignalInputLoop(EVENT_VALUE_NODE_CHANGED);
+	BMessage message(MSG_VALUE_NODE_CHANGED);
+	PostMessage(&message);
 }
 
 
 void
 CliContext::ValueNodeChildrenCreated(ValueNode* node)
 {
-	_SignalInputLoop(EVENT_VALUE_NODE_CHANGED);
+	BMessage message(MSG_VALUE_NODE_CHANGED);
+	PostMessage(&message);
 }
 
 
 void
 CliContext::ValueNodeChildrenDeleted(ValueNode* node)
 {
-	_SignalInputLoop(EVENT_VALUE_NODE_CHANGED);
+	BMessage message(MSG_VALUE_NODE_CHANGED);
+	PostMessage(&message);
 }
 
 
 void
 CliContext::ValueNodeValueChanged(ValueNode* oldNode)
 {
-	_SignalInputLoop(EVENT_VALUE_NODE_CHANGED);
-}
-
-
-void
-CliContext::_QueueEvent(Event* event)
-{
-	if (event == NULL) {
-		// no memory -- can't do anything about it
-		return;
-	}
-
-	AutoLocker<BLocker> locker(fLock);
-	fPendingEvents.Add(event);
-}
-
-
-void
-CliContext::_PrepareToWaitForEvents(uint32 eventMask)
-{
-	// Set the events we're going to wait for -- always wait for "quit".
-	AutoLocker<BLocker> locker(fLock);
-	fInputLoopWaitingForEvents = eventMask | EVENT_QUIT;
-	fEventsOccurred = fTerminating ? EVENT_QUIT : 0;
-}
-
-
-uint32
-CliContext::_WaitForEvents()
-{
-	AutoLocker<BLocker> locker(fLock);
-
-	if (fEventsOccurred == 0) {
-		sem_id blockingSemaphore = fBlockingSemaphore;
-		fInputLoopWaiting = true;
-
-		locker.Unlock();
-
-		while (acquire_sem(blockingSemaphore) == B_INTERRUPTED) {
-		}
-
-		locker.Lock();
-	}
-
-	uint32 events = fEventsOccurred;
-	fEventsOccurred = 0;
-	return events;
-}
-
-
-void
-CliContext::_SignalInputLoop(uint32 events)
-{
-	AutoLocker<BLocker> locker(fLock);
-
-	if ((fInputLoopWaitingForEvents & events) == 0)
-		return;
-
-	fEventsOccurred = fInputLoopWaitingForEvents & events;
-	fInputLoopWaitingForEvents = 0;
-
-	if (fInputLoopWaiting) {
-		fInputLoopWaiting = false;
-		release_sem(fBlockingSemaphore);
-	}
+	BMessage message(MSG_VALUE_NODE_CHANGED);
+	PostMessage(&message);
 }
 
 
@@ -676,3 +632,19 @@ CliContext::_GetPrompt(EditLine* editLine)
 {
 	return sCurrentContext != NULL ? sCurrentContext->fPrompt : NULL;
 }
+
+
+void
+CliContext::_WaitForEvent(uint32 event) {
+	if (fTerminating)
+		return;
+
+	do {
+		fLock.Unlock();
+		while (acquire_sem(fWaitForEventSemaphore) == B_INTERRUPTED) {
+		}
+		fLock.Lock();
+		release_sem(fWaitForEventSemaphore);
+	} while (fEventOccurred != event && !fTerminating);
+}
+

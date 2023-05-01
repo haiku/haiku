@@ -77,7 +77,7 @@ private:
 									const CommandEntry* command2);
 
 private:
-			CliContext			fContext;
+			CliContext*			fContext;
 			CommandList			fCommands;
 			sem_id				fShowSemaphore;
 			bool				fShown;

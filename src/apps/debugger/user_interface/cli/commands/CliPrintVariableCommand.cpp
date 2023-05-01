@@ -119,7 +119,7 @@ CliPrintVariableCommand::_ResolveValueIfNeeded(ValueNode* node,
 		while (node->LocationAndValueResolutionState()
 			== VALUE_NODE_UNRESOLVED) {
 			containerLocker.Unlock();
-			context.WaitForEvents(CliContext::EVENT_VALUE_NODE_CHANGED);
+			context.WaitForEvent(CliContext::MSG_VALUE_NODE_CHANGED);
 			containerLocker.Lock();
 			if (context.IsTerminating())
 				return B_ERROR;

@@ -97,6 +97,7 @@ private:
 
 CommandLineUserInterface::CommandLineUserInterface()
 	:
+	fContext(new CliContext()),
 	fCommands(20, true),
 	fShowSemaphore(-1),
 	fShown(false),
@@ -122,7 +123,7 @@ CommandLineUserInterface::ID() const
 status_t
 CommandLineUserInterface::Init(Team* team, UserInterfaceListener* listener)
 {
-	status_t error = fContext.Init(team, listener);
+	status_t error = fContext->Init(team, listener);
 	if (error != B_OK)
 		return error;
 
@@ -152,7 +153,7 @@ CommandLineUserInterface::Terminate()
 	fTerminating = true;
 
 	if (fShown) {
-		fContext.Terminating();
+		fContext->Terminating();
 
 		// Wait for input loop to finish.
 		while (acquire_sem(fShowSemaphore) == B_INTERRUPTED) {
@@ -163,7 +164,10 @@ CommandLineUserInterface::Terminate()
 		fShowSemaphore = -1;
 	}
 
-	fContext.Cleanup();
+	fContext->Cleanup();
+
+	BMessage message(B_QUIT_REQUESTED);
+	fContext->PostMessage(&message);
 }
 
 
@@ -236,6 +240,7 @@ CommandLineUserInterface::Run()
 	if (error != B_OK)
 		return;
 
+	fContext->Run();
 	_InputLoop();
 	// Release the Show() semaphore to signal Terminate().
 	release_sem(fShowSemaphore);
@@ -248,21 +253,19 @@ CommandLineUserInterface::_InputLoop()
 	thread_id currentThread = -1;
 
 	while (!fTerminating) {
-		fContext.ProcessPendingEvents();
-
 		// Wait for a thread or Ctrl-C.
-		fContext.WaitForThreadOrUser();
-		if (fContext.IsTerminating())
+		fContext->WaitForThreadOrUser();
+		if (fContext->IsTerminating())
 			break;
 
 		// Print the active thread, if it changed.
-		if (fContext.CurrentThreadID() != currentThread) {
-			fContext.PrintCurrentThread();
-			currentThread = fContext.CurrentThreadID();
+		if (fContext->CurrentThreadID() != currentThread) {
+			fContext->PrintCurrentThread();
+			currentThread = fContext->CurrentThreadID();
 		}
 
 		// read a command line
-		const char* line = fContext.PromptUser(kDebuggerPrompt);
+		const char* line = fContext->PromptUser(kDebuggerPrompt);
 		if (line == NULL)
 			break;
 
@@ -288,7 +291,7 @@ CommandLineUserInterface::_InputLoop()
 			continue;
 
 		// add line to history
-		fContext.AddLineToInputHistory(line);
+		fContext->AddLineToInputHistory(line);
 
 		// execute command
 		_ExecuteCommand(args.ArgumentCount(), args.Arguments());
@@ -369,7 +372,7 @@ CommandLineUserInterface::_ExecuteCommand(int argc, const char* const* argv)
 {
 	CommandEntry* commandEntry = _FindCommand(argv[0]);
 	if (commandEntry != NULL)
-		commandEntry->Command()->Execute(argc, argv, fContext);
+		commandEntry->Command()->Execute(argc, argv, *fContext);
 }
 
 

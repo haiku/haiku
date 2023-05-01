@@ -46,7 +46,7 @@ CliStackTraceCommand::Execute(int argc, const char* const* argv,
 	// get its stack trace
 	StackTrace* stackTrace = thread->GetStackTrace();
 	while (stackTrace == NULL) {
-		context.WaitForEvents(CliContext::EVENT_THREAD_STACK_TRACE_CHANGED);
+		context.WaitForEvent(CliContext::MSG_THREAD_STACK_TRACE_CHANGED);
 		if (context.IsTerminating())
 			return;
 		stackTrace = thread->GetStackTrace();
