@@ -205,6 +205,7 @@ Inode::XfsModeToFtype() const
 	}
 }
 
+
 bool
 Inode::VerifyFork(int whichFork) const
 {
@@ -239,6 +240,7 @@ Inode::VerifyFork(int whichFork) const
 
 	return true;
 }
+
 
 bool
 Inode::VerifyForkoff() const

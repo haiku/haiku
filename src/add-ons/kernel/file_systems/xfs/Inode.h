@@ -63,8 +63,6 @@
 					(void*)((char*)DIR_DFORK_PTR(dir_ino_ptr, DATA_FORK_OFFSET) + \
 					(((uint32)forkoff)<<3))
 
-#define DIR_AFORK_EXIST(dir_ino_ptr)	(dir_ino_ptr->di_forkoff != 0)
-
 #define MASK(n)	((1UL << n) - 1)
 #define FSBLOCKS_TO_AGNO(n, volume)	((n) >> volume->AgBlocksLog())
 #define FSBLOCKS_TO_AGBLOCKNO(n, volume)	((n) & MASK(volume->AgBlocksLog()))
@@ -72,7 +70,6 @@
 	((n) >> (volume->BlockLog()))
 #define BLOCKOFFSET_FROM_POSITION(n, inode)	((n) & (inode->BlockSize() - 1))
 
-#define MAXINUMBER	((xfs_ino_t)((1ULL << 56) - 1ULL))
 
 // Inode fork identifiers
 #define XFS_DATA_FORK	0
@@ -162,14 +159,6 @@ enum xfs_dinode_fmt_t {
 		XFS_DINODE_FMT_UUID,
 			// Not used
 };
-
-
-#define XFS_INODE_FORMAT_STR \
-	{ XFS_DINODE_FMT_DEV,		"dev" }, \
-	{ XFS_DINODE_FMT_LOCAL,		"local" }, \
-	{ XFS_DINODE_FMT_EXTENTS,	"extent" }, \
-	{ XFS_DINODE_FMT_BTREE,		"btree" }, \
-	{ XFS_DINODE_FMT_UUID,		"uuid" }
 
 
 /*
@@ -269,64 +258,6 @@ struct xfs_inode_t {
 			uuid_t				di_uuid;
 };
 
-
-// Values for di_flags
-#define XFS_DIFLAG_REALTIME_BIT  0	// file's blocks come from rt area
-#define XFS_DIFLAG_PREALLOC_BIT  1	// file space has been preallocated
-#define XFS_DIFLAG_NEWRTBM_BIT   2	// for rtbitmap inode, new format
-#define XFS_DIFLAG_IMMUTABLE_BIT 3	// inode is immutable
-#define XFS_DIFLAG_APPEND_BIT    4	// inode is append-only
-#define XFS_DIFLAG_SYNC_BIT      5	// inode is written synchronously
-#define XFS_DIFLAG_NOATIME_BIT   6	// do not update atime
-#define XFS_DIFLAG_NODUMP_BIT    7	// do not dump
-#define XFS_DIFLAG_RTINHERIT_BIT 8	// create with realtime bit set
-#define XFS_DIFLAG_PROJINHERIT_BIT   9	// create with parents projid
-#define XFS_DIFLAG_NOSYMLINKS_BIT   10	// disallow symlink creation
-#define XFS_DIFLAG_EXTSIZE_BIT      11	// inode extent size allocator hint
-#define XFS_DIFLAG_EXTSZINHERIT_BIT 12	// inherit inode extent size
-#define XFS_DIFLAG_NODEFRAG_BIT     13	// do not reorganize/defragment
-#define XFS_DIFLAG_FILESTREAM_BIT   14  // use filestream allocator
-
-#define XFS_DIFLAG_REALTIME      (1 << XFS_DIFLAG_REALTIME_BIT)
-#define XFS_DIFLAG_PREALLOC      (1 << XFS_DIFLAG_PREALLOC_BIT)
-#define XFS_DIFLAG_NEWRTBM       (1 << XFS_DIFLAG_NEWRTBM_BIT)
-#define XFS_DIFLAG_IMMUTABLE     (1 << XFS_DIFLAG_IMMUTABLE_BIT)
-#define XFS_DIFLAG_APPEND        (1 << XFS_DIFLAG_APPEND_BIT)
-#define XFS_DIFLAG_SYNC          (1 << XFS_DIFLAG_SYNC_BIT)
-#define XFS_DIFLAG_NOATIME       (1 << XFS_DIFLAG_NOATIME_BIT)
-#define XFS_DIFLAG_NODUMP        (1 << XFS_DIFLAG_NODUMP_BIT)
-#define XFS_DIFLAG_RTINHERIT     (1 << XFS_DIFLAG_RTINHERIT_BIT)
-#define XFS_DIFLAG_PROJINHERIT   (1 << XFS_DIFLAG_PROJINHERIT_BIT)
-#define XFS_DIFLAG_NOSYMLINKS    (1 << XFS_DIFLAG_NOSYMLINKS_BIT)
-#define XFS_DIFLAG_EXTSIZE       (1 << XFS_DIFLAG_EXTSIZE_BIT)
-#define XFS_DIFLAG_EXTSZINHERIT  (1 << XFS_DIFLAG_EXTSZINHERIT_BIT)
-#define XFS_DIFLAG_NODEFRAG      (1 << XFS_DIFLAG_NODEFRAG_BIT)
-#define XFS_DIFLAG_FILESTREAM    (1 << XFS_DIFLAG_FILESTREAM_BIT)
-
-#define XFS_DIFLAG_ANY \
-	(XFS_DIFLAG_REALTIME | XFS_DIFLAG_PREALLOC | XFS_DIFLAG_NEWRTBM | \
-	 XFS_DIFLAG_IMMUTABLE | XFS_DIFLAG_APPEND | XFS_DIFLAG_SYNC | \
-	 XFS_DIFLAG_NOATIME | XFS_DIFLAG_NODUMP | XFS_DIFLAG_RTINHERIT | \
-	 XFS_DIFLAG_PROJINHERIT | XFS_DIFLAG_NOSYMLINKS | XFS_DIFLAG_EXTSIZE | \
-	 XFS_DIFLAG_EXTSZINHERIT | XFS_DIFLAG_NODEFRAG | XFS_DIFLAG_FILESTREAM)
-
-/*
-	Values for di_flags2 These start by being exposed to userspace in the upper
-	16 bits of the XFS_XFLAG_S range.
-*/
-#define XFS_DIFLAG2_DAX_BIT	0	// use DAX for this inode
-#define XFS_DIFLAG2_REFLINK_BIT	1	// file's blocks may be shared
-#define XFS_DIFLAG2_COWEXTSIZE_BIT 2  // copy on write extent size hint
-#define XFS_DIFLAG2_BIGTIME_BIT	3	// big timestamps
-
-#define XFS_DIFLAG2_DAX		(1 << XFS_DIFLAG2_DAX_BIT)
-#define XFS_DIFLAG2_REFLINK     (1 << XFS_DIFLAG2_REFLINK_BIT)
-#define XFS_DIFLAG2_COWEXTSIZE  (1 << XFS_DIFLAG2_COWEXTSIZE_BIT)
-#define XFS_DIFLAG2_BIGTIME	(1 << XFS_DIFLAG2_BIGTIME_BIT)
-
-#define XFS_DIFLAG2_ANY \
-	(XFS_DIFLAG2_DAX | XFS_DIFLAG2_REFLINK | XFS_DIFLAG2_COWEXTSIZE | \
-	 XFS_DIFLAG2_BIGTIME)
 
 class Inode {
 public:

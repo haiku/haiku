@@ -18,20 +18,11 @@
 	// for v5 system
 #define DIR2_FREE_TAG 0xffff
 #define XFS_DIR2_DATA_FD_COUNT 3
-#define EXTENT_REC_SIZE		128
 #define EXTENT_SIZE 16
 #define BLOCKNO_FROM_ADDRESS(n, volume) \
 	((n) >> (volume->BlockLog() + volume->DirBlockLog()))
 #define BLOCKOFFSET_FROM_ADDRESS(n, inode) ((n) & (inode->DirBlockSize() - 1))
 #define LEAF_STARTOFFSET(n) 1UL << (35 - (n))
-
-
-// xfs_exntst_t
-enum ExtentState {
-	XFS_EXT_NORM,
-	XFS_EXT_UNWRITTEN,
-	XFS_EXT_INVALID
-};
 
 
 // Enum values to check which directory we are reading

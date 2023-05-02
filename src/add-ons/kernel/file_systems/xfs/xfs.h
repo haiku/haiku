@@ -164,14 +164,8 @@ private:
 *checked. If it's equal to 5, it's version 5.
 */
 
-#define XFS_SB_VERSION_ATTRBIT 0x0010
-#define XFS_SB_VERSION_NLINKBIT 0x0020
-#define XFS_SB_VERSION_QUOTABIT 0x0040
-#define XFS_SB_VERSION_ALIGNBIT 0x0080
-#define XFS_SB_VERSION_DALIGNBIT 0x0100
+
 #define XFS_SB_VERSION_SHAREDBIT 0x0200
-#define XFS_SB_VERSION_LOGV2BIT 0x0400
-#define XFS_SB_VERSION_SECTORBIT 0x0800
 #define XFS_SB_VERSION_EXTFLGBIT 0x1000
 #define XFS_SB_VERSION_DIRV2BIT 0x2000
 #define XFS_SB_VERSION_MOREBITSBIT 0x4000
@@ -180,26 +174,16 @@ private:
 	((XFS_SB_VERSION_NUMBITS | XFS_SB_VERSION_ALLFBITS) & \
 		~XFS_SB_VERSION_SHAREDBIT)
 
+
 /*
 Superblock quota flags - sb_qflags
 */
-#define XFS_UQUOTA_ACCT 0x0001
-#define XFS_UQUOTA_ENFD 0x0002
-#define XFS_UQUOTA_CHKD 0x0004
-#define XFS_PQUOTA_ACCT 0x0008
 #define XFS_OQUOTA_ENFD 0x0010
 #define XFS_OQUOTA_CHKD 0x0020
-#define XFS_GQUOTA_ACCT 0x0040
 #define XFS_GQUOTA_ENFD 0x0080
 #define XFS_GQUOTA_CHKD 0x0100
 #define XFS_PQUOTA_ENFD 0x0200
 #define XFS_PQUOTA_CHKD 0x0400
-
-
-/*
-	Superblock flags - sb_flags
-*/
-#define XFS_SBF_READONLY 0x1
 
 
 /*
@@ -210,9 +194,7 @@ Superblock quota flags - sb_qflags
 	// update global free space and inode on clean unmount
 #define XFS_SB_VERSION2_ATTR2BIT	0x00000002
 	// optimises the inode layout of ext-attr
-#define XFS_SB_VERSION2_PARENTBIT 0x00000010	/* Parent pointers */
 #define XFS_SB_VERSION2_PROJID32BIT 0x00000080	/* 32-bit project id */
-#define XFS_SB_VERSION2_CRCBIT 0x00000100		/* Metadata checksumming */
 #define XFS_SB_VERSION2_FTYPE 0x00000200
 
 #define	XFS_SB_VERSION2_OKBITS		\
