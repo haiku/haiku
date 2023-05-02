@@ -932,7 +932,7 @@ BContainerWindow::RepopulateMenus()
 
 		PopulateArrangeByMenu(fArrangeByMenu);
 
-		int32 selectCount = PoseView()->SelectionList()->CountItems();
+		int32 selectCount = PoseView()->CountSelected();
 
 		SetupOpenWithMenu(fFileMenu);
 		SetupMoveCopyMenus(selectCount ? PoseView()->SelectionList()
@@ -2302,9 +2302,7 @@ BContainerWindow::MenusBeginning()
 		BVolumeRoster().GetBootVolume(&boot);
 
 		bool ejectableVolumeSelected = false;
-
-		int32 count = PoseView()->SelectionList()->CountItems();
-		for (int32 index = 0; index < count; index++) {
+		for (int32 index = 0; index < selectCount; index++) {
 			Model* model
 				= PoseView()->SelectionList()->ItemAt(index)->TargetModel();
 			if (model->IsVolume()) {
@@ -2417,7 +2415,7 @@ BContainerWindow::SetUpEditQueryItem(BMenu* menu)
 {
 	ASSERT(menu);
 	// File menu
-	int32 selectCount = PoseView()->SelectionList()->CountItems();
+	int32 selectCount = PoseView()->CountSelected();
 
 	// add Edit query if appropriate
 	bool queryInSelection = false;
@@ -2471,7 +2469,8 @@ BContainerWindow::SetupOpenWithMenu(BMenu* parent)
 		fOpenWithItem = 0;
 	}
 
-	if (PoseView()->SelectionList()->CountItems() == 0) {
+	int32 selectCount = PoseView()->CountSelected();
+	if (selectCount <= 0) {
 		// no selection, nothing to open
 		return;
 	}
@@ -2488,13 +2487,9 @@ BContainerWindow::SetupOpenWithMenu(BMenu* parent)
 	// add after "Open"
 	BMenuItem* item = parent->FindItem(kOpenSelection);
 
-	int32 count = PoseView()->SelectionList()->CountItems();
-	if (count == 0)
-		return;
-
 	// build a list of all refs to open
 	BMessage message(B_REFS_RECEIVED);
-	for (int32 index = 0; index < count; index++) {
+	for (int32 index = 0; index < selectCount; index++) {
 		BPose* pose = PoseView()->SelectionList()->ItemAt(index);
 		message.AddRef("refs", pose->TargetModel()->EntryRef());
 	}
@@ -3144,13 +3139,13 @@ BContainerWindow::EachAddon(bool (*eachAddon)(const Model*, const char*,
 void
 BContainerWindow::BuildMimeTypeList(BStringList& mimeTypes)
 {
-	int32 count = PoseView()->SelectionList()->CountItems();
-	if (count <= 0) {
+	int32 selectCount = PoseView()->CountSelected();
+	if (selectCount <= 0) {
 		// just add the type of the current directory
 		AddMimeTypeString(mimeTypes, TargetModel());
 	} else {
 		_UpdateSelectionMIMEInfo();
-		for (int32 index = 0; index < count; index++) {
+		for (int32 index = 0; index < selectCount; index++) {
 			BPose* pose = PoseView()->SelectionList()->ItemAt(index);
 			AddMimeTypeString(mimeTypes, pose->TargetModel());
 			// If it's a symlink, resolves it and add the Target's MimeType
@@ -3231,8 +3226,8 @@ BContainerWindow::BuildAddOnMenu(BMenu* parentMenu)
 void
 BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 {
-	const int32 selectCount = PoseView()->SelectionList()->CountItems();
-	const int32 count = PoseView()->CountItems();
+	const int32 selectCount = PoseView()->CountSelected();
+	const int32 poseCount = PoseView()->CountItems();
 
 	if (context == kMenuBarContext) {
 		EnableNamedMenuItem(menu, kOpenSelection, selectCount > 0);
@@ -3319,8 +3314,8 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 				|| TrackerSettings().ShowDisksIcon()
 				|| (modifiers() & B_CONTROL_KEY) != 0));
 
-		EnableNamedMenuItem(menu, kEmptyTrash, count > 0);
-		EnableNamedMenuItem(menu, B_SELECT_ALL, count > 0);
+		EnableNamedMenuItem(menu, kEmptyTrash, poseCount > 0);
+		EnableNamedMenuItem(menu, B_SELECT_ALL, poseCount > 0);
 
 		BMenuItem* item = menu->FindItem(B_TRANSLATE("New"));
 		if (item != NULL) {

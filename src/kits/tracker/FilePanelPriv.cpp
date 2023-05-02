@@ -1330,7 +1330,7 @@ TFilePanel::MessageReceived(BMessage* message)
 		case kDefaultButton:
 			if (fIsSavePanel) {
 				if (PoseView()->IsFocus()
-					&& PoseView()->SelectionList()->CountItems() == 1) {
+					&& PoseView()->CountSelected() == 1) {
 					Model* model = (PoseView()->SelectionList()->
 						FirstItem())->TargetModel();
 					if (model->ResolveIfLink()->IsDirectory()) {

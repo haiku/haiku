@@ -301,6 +301,7 @@ public:
 	void ShowSelection(bool);
 	void AddRemovePoseFromSelection(BPose* pose, int32 index,
 		bool select);
+	int32 CountSelected() const;
 
 	void SetSelectionHandler(BLooper* looper);
 
@@ -915,6 +916,11 @@ BPoseView::SelectionList() const
 	return fSelectionList;
 }
 
+inline int32
+BPoseView::CountSelected() const
+{
+	return fSelectionList->CountItems();
+}
 
 inline BObjectList<BString>*
 BPoseView::MimeTypesInSelection()
