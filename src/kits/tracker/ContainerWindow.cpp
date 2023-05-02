@@ -116,7 +116,7 @@ class DraggableContainerIcon : public BView {
 
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint);
-		virtual void MouseMoved(BPoint point, uint32, const BMessage*);
+		virtual void MouseMoved(BPoint where, uint32, const BMessage*);
 		virtual void Draw(BRect updateRect);
 
 	private:
@@ -1362,7 +1362,7 @@ BContainerWindow::SetLayoutState(BNode* node, const BMessage* message)
 
 	for (int32 globalIndex = 0; ;) {
 #if B_BEOS_VERSION_DANO
- 		const char* name;
+		const char* name;
 #else
 		char* name;
 #endif
@@ -1845,8 +1845,9 @@ BContainerWindow::SetCutItem(BMenu* menu)
 {
 	BMenuItem* item;
 	if ((item = menu->FindItem(B_CUT)) == NULL
-		&& (item = menu->FindItem(kCutMoreSelectionToClipboard)) == NULL)
+		&& (item = menu->FindItem(kCutMoreSelectionToClipboard)) == NULL) {
 		return;
+	}
 
 	item->SetEnabled(PoseView()->SelectionList()->CountItems() > 0
 		|| PoseView() != CurrentFocus());
@@ -2075,6 +2076,7 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 				new BMessage(B_PASTE), 'V');
 			menu->AddItem(pasteItem);
 			menu->AddSeparatorItem();
+
 			menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"),
 				new BMessage(kIdentifyEntry)));
 		}
@@ -2543,7 +2545,7 @@ BContainerWindow::PopulateMoveCopyNavMenu(BNavMenu* navMenu, uint32 what,
 		menu->SetNavDir(model.EntryRef());
 		menu->SetShowParent(true);
 
-		BMenuItem* item = new SpecialModelMenuItem(&model,menu);
+		BMenuItem* item = new SpecialModelMenuItem(&model, menu);
 		item->SetMessage(new BMessage((uint32)what));
 
 		navMenu->AddItem(item);
@@ -2558,7 +2560,7 @@ BContainerWindow::PopulateMoveCopyNavMenu(BNavMenu* navMenu, uint32 what,
 			BMenu* menu = new RecentsMenu(B_TRANSLATE("Recent folders"),
 				kRecentFolders, what, this);
 
-			BMenuItem* item = new SpecialModelMenuItem(&model,menu);
+			BMenuItem* item = new SpecialModelMenuItem(&model, menu);
 			item->SetMessage(new BMessage((uint32)what));
 
 			navMenu->AddItem(item);
@@ -2715,9 +2717,9 @@ BContainerWindow::SetupMoveCopyMenus(const entry_ref* item_ref, BMenu* parent)
 
 
 uint32
-BContainerWindow::ShowDropContextMenu(BPoint loc)
+BContainerWindow::ShowDropContextMenu(BPoint where)
 {
-	BPoint global(loc);
+	BPoint global(where);
 
 	PoseView()->ConvertToScreen(&global);
 	PoseView()->CommitActivePose();
@@ -3378,6 +3380,9 @@ BContainerWindow::LoadAddOn(BMessage* message)
 	LaunchInNewThread("Add-on", B_NORMAL_PRIORITY, &AddOnThread, refs,
 		addonRef, *TargetModel()->EntryRef());
 }
+
+
+//	#pragma mark - BContainerWindow private methods
 
 
 void

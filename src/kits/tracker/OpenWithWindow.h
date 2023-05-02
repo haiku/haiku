@@ -157,18 +157,18 @@ public:
 protected:
 	virtual BPoseView* NewPoseView(Model* model, uint32 viewMode);
 
-	virtual	bool ShouldAddMenus() const;
-	virtual	void ShowContextMenu(BPoint, const entry_ref*, BView*);
+	virtual bool ShouldAddMenus() const;
+	virtual void ShowContextMenu(BPoint, const entry_ref*, BView*);
 	virtual void AddShortcuts();
 	virtual void NewAttributeMenu(BMenu*);
 
 	virtual void RestoreState();
-	virtual	void RestoreState(const BMessage&);
+	virtual void RestoreState(const BMessage&);
 	virtual void RestoreWindowState(AttributeStreamNode*);
 	virtual void RestoreWindowState(const BMessage&);
 	virtual bool NeedsDefaultStateSetup();
-	virtual	void SaveState(bool hide = true);
-	virtual	void SaveState(BMessage&) const;
+	virtual void SaveState(bool hide = true);
+	virtual void SaveState(BMessage&) const;
 	virtual void SetUpDefaultState();
 
 	virtual bool IsShowing(const node_ref*) const;

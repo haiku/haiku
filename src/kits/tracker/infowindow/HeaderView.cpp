@@ -35,6 +35,8 @@ All rights reserved.
 
 #include "HeaderView.h"
 
+#include <algorithm>
+
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
@@ -93,7 +95,7 @@ HeaderView::HeaderView(Model* model)
 	fTitleRect.left = fIconRect.right + labelSpacing;
 	fTitleRect.top = 0;
 	fTitleRect.bottom = fontMetrics.ascent + 1;
-	fTitleRect.right = min_c(
+	fTitleRect.right = std::min(
 		fTitleRect.left + currentFont.StringWidth(fModel->Name()),
 		Bounds().Width() - labelSpacing);
 	// Offset so that it centers with the icon
@@ -309,8 +311,8 @@ HeaderView::Draw(BRect)
 		MovePenTo(BPoint(fIconRect.right + 6, lineBase));
 
 		// Recalculate the rect width
-		fTitleRect.right = min_c(
-				fTitleRect.left + currentFont.StringWidth(fModel->Name()),
+		fTitleRect.right = std::min(fTitleRect.left
+				+ currentFont.StringWidth(fModel->Name()),
 			Bounds().Width() - 5);
 		// Check for possible need of truncation
 		if (StringWidth(fModel->Name()) > fTitleRect.Width()) {
@@ -440,7 +442,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 
 				float height = CurrentFontHeight()
 					+ fIconRect.Height() + 8;
-				BRect rect(0, 0, min_c(fIconRect.Width()
+				BRect rect(0, 0, std::min(fIconRect.Width()
 						+ font.StringWidth(fModel->Name()) + 4,
 					fIconRect.Width() * 3), height);
 				BBitmap* dragBitmap = new BBitmap(rect, B_RGBA32, true);

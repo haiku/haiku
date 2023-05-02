@@ -637,12 +637,13 @@ TFilePanel::AdjustButton()
 				// selection mode then we don't disable button ever
 				if ((modelFlavor == B_DIRECTORY_NODE
 						|| linkFlavor == B_DIRECTORY_NODE)
-					&& count == 1)
-				  break;
+					&& count == 1) {
+					break;
+				}
 
 				if ((fNodeFlavors & modelFlavor) == 0
 					&& (fNodeFlavors & linkFlavor) == 0) {
-		    		enabled = false;
+					enabled = false;
 					break;
 				}
 			}
@@ -978,11 +979,13 @@ TFilePanel::AddFileContextMenus(BMenu* menu)
 		new BMessage(kGetInfo), 'I'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
 		new BMessage(kEditItem), 'E'));
+
 	menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
 		? B_TRANSLATE("Delete")
 		: B_TRANSLATE("Move to Trash"),
 		new BMessage(kMoveToTrash), 'T'));
 	menu->AddSeparatorItem();
+
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Cut"),
 		new BMessage(B_CUT), 'X'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy"),
@@ -1227,13 +1230,13 @@ TFilePanel::MessageReceived(BMessage* message)
 							break;
 						}
 
-					  	// send handler a message and close
+						// send handler a message and close
 						BMessage openMessage(*fMessage);
 						for (int32 index = 0; ; index++) {
-					  		if (message->FindRef("refs", index, &ref) != B_OK)
+							if (message->FindRef("refs", index, &ref) != B_OK)
 								break;
 							openMessage.AddRef("refs", &ref);
-					  	}
+						}
 						OpenSelectionCommon(&openMessage);
 					}
 				}
@@ -1411,8 +1414,8 @@ TFilePanel::OpenParent()
 		PoseView()->SwitchDir(&ref);
 		SwitchDirMenuTo(&ref);
 
-		// make sure the child get's selected in the new view once it
-		// shows up
+		// Make sure the child gets selected in the new view
+		// once it shows up.
 		fTaskLoop->RunLater(NewMemberFunctionObjectWithResult
 			(&TFilePanel::SelectChildInParent, this,
 			const_cast<const entry_ref*>(&ref),
@@ -1871,7 +1874,7 @@ BFilePanelPoseView::AdaptToVolumeChange(BMessage* message)
 		monitorMsg.AddInt64("directory", model.EntryRef()->directory);
 		monitorMsg.AddString("name", model.EntryRef()->name);
 		TrackerSettings().SetShowDisksIcon(showDisksIcon);
-		if (Window())
+		if (Window() != NULL)
 			Window()->PostMessage(&monitorMsg, this);
 	}
 

@@ -598,8 +598,8 @@ ClearViewOriginOne(const char* DEBUG_ONLY(name), uint32 type, off_t size,
 		return false;
 
 	// this is why we are here - zero out
-	viewstate->SetListOrigin(BPoint(0, 0));
-	viewstate->SetIconOrigin(BPoint(0, 0));
+	viewstate->SetListOrigin(B_ORIGIN);
+	viewstate->SetIconOrigin(B_ORIGIN);
 
 	stream.Seek(0, SEEK_SET);
 	viewstate->ArchiveToStream(&stream);

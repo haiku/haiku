@@ -520,15 +520,15 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 
 
 bool
-BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
+BPose::PointInPose(BPoint where, const BPoseView* poseView, BPoint point,
 	BTextWidget** hitWidget) const
 {
 	if (hitWidget != NULL)
 		*hitWidget = NULL;
 
 	// check intersection with icon
-	BRect rect = _IconRect(poseView, loc);
-	if (rect.Contains(where))
+	BRect rect = _IconRect(poseView, where);
+	if (rect.Contains(point))
 		return true;
 
 	for (int32 index = 0; ; index++) {
@@ -538,7 +538,7 @@ BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
 
 		BTextWidget* widget = WidgetFor(column->AttrHash());
 		if (widget != NULL
-			&& widget->CalcClickRect(loc, column, poseView).Contains(where)) {
+			&& widget->CalcClickRect(where, column, poseView).Contains(point)) {
 			if (hitWidget != NULL)
 				*hitWidget = widget;
 

@@ -643,9 +643,9 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 		drawView->SetHighColor(highColor);
 	}
 
-	BPoint loc;
-	loc.y = textRect.bottom - view->FontInfo().descent;
-	loc.x = textRect.left + 1;
+	BPoint location;
+	location.y = textRect.bottom - view->FontInfo().descent;
+	location.x = textRect.left + 1;
 
 	const char* fittingText = fText->FittingText(view);
 
@@ -677,14 +677,14 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 			glowColor.alpha = 30;
 			drawView->SetHighColor(glowColor);
 
-			drawView->DrawString(fittingText, loc);
+			drawView->DrawString(fittingText, location);
 
 			font.SetFalseBoldWidth(1.0);
 			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 			glowColor.alpha = 65;
 			drawView->SetHighColor(glowColor);
 
-			drawView->DrawString(fittingText, loc);
+			drawView->DrawString(fittingText, location);
 
 			font.SetFalseBoldWidth(0.0);
 			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
@@ -697,7 +697,7 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 			outlineColor.alpha = 30;
 			drawView->SetHighColor(outlineColor);
 
-			drawView->DrawString(fittingText, loc);
+			drawView->DrawString(fittingText, location);
 
 			font.SetFalseBoldWidth(0.0);
 			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
@@ -705,14 +705,14 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 			outlineColor.alpha = 200;
 			drawView->SetHighColor(outlineColor);
 
-			drawView->DrawString(fittingText, loc + BPoint(1, 1));
+			drawView->DrawString(fittingText, location + BPoint(1, 1));
 		}
 
 		drawView->SetDrawingMode(B_OP_OVER);
 		drawView->SetHighColor(textColor);
 	}
 
-	drawView->DrawString(fittingText, loc);
+	drawView->DrawString(fittingText, location);
 
 	if (fSymLink && (fAttrHash == view->FirstColumn()->AttrHash())) {
 		// TODO:

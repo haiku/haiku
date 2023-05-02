@@ -70,8 +70,8 @@ class BPoseView;
 class Model;
 
 // global variables
-static const rgb_color kBlack = {0, 0, 0, 255};
-static const rgb_color kWhite = {255, 255, 255 ,255};
+static const rgb_color kBlack = make_color(0, 0, 0, 255);
+static const rgb_color kWhite = make_color(255, 255, 255 ,255);
 
 const int64 kHalfKBSize = 512;
 const int64 kKBSize = 1024;

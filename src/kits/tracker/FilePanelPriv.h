@@ -108,9 +108,9 @@ public:
 
 protected:
 	BPoseView* NewPoseView(Model* model, uint32);
-	virtual	void Init(const BMessage* message = NULL);
-	virtual	void SaveState(bool hide = true);
-	virtual	void SaveState(BMessage &) const;
+	virtual void Init(const BMessage* message = NULL);
+	virtual void SaveState(bool hide = true);
+	virtual void SaveState(BMessage &) const;
 	virtual void RestoreState();
 	virtual void RestoreWindowState(AttributeStreamNode*);
 	virtual void RestoreWindowState(const BMessage&);
@@ -138,8 +138,7 @@ private:
 	bool CanOpenParent() const;
 	void SwitchDirMenuTo(const entry_ref* ref);
 	void AdjustButton();
-	bool SelectChildInParent(const entry_ref* parent,
-		const node_ref* child);
+	bool SelectChildInParent(const entry_ref* parent, const node_ref* child);
 	void OpenSelectionCommon(BMessage*);
 	bool IsOpenButtonAlwaysEnabled() const;
 

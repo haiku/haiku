@@ -185,7 +185,7 @@ BTextWidget::Draw(BRect widgetRect, BRect widgetTextRect, float width,
 	BPoseView* view, bool selected, uint32 clipboardMode)
 {
 	Draw(widgetRect, widgetTextRect, width, view, (BView*)view, selected,
-		clipboardMode, BPoint(0, 0), true);
+		clipboardMode, B_ORIGIN, true);
 }
 
 } // namespace BPrivate
