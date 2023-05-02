@@ -467,7 +467,7 @@ static status_t
 xfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	delete (DirectoryIterator*)_cookie;
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
