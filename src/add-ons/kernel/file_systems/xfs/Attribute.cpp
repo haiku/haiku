@@ -26,6 +26,10 @@ Attribute::Init(Inode* inode)
 	}
 	if (inode->AttrFormat() == XFS_DINODE_FMT_EXTENTS) {
 		TRACE("Attribute::Init: EXTENTS\n");
+		// check if Inode has extents or not?
+		if (inode->AttrExtentsCount() == 0)
+			return NULL;
+
 		LeafAttribute* leafAttr = new(std::nothrow) LeafAttribute(inode);
 		if (leafAttr == NULL)
 			return NULL;
