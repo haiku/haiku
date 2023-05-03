@@ -474,8 +474,15 @@ DrawState::GetCombinedClippingRegion(BRegion* region) const
 bool
 DrawState::ClipToRect(BRect rect, bool inverse)
 {
-	if (!rect.IsValid())
+	if (!rect.IsValid()) {
+		if (!inverse) {
+			if (!fClippingRegion.IsSet())
+				fClippingRegion.SetTo(new(nothrow) BRegion());
+			else
+				fClippingRegion->MakeEmpty();
+		}
 		return false;
+	}
 
 	if (!fCombinedTransform.IsIdentity()) {
 		if (fCombinedTransform.IsDilation()) {
