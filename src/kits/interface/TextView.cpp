@@ -792,7 +792,7 @@ BTextView::KeyDown(const char* bytes, int32 numBytes)
 void
 BTextView::Pulse()
 {
-	if (fActive && fEditable && fSelStart == fSelEnd) {
+	if (fActive && (fEditable || fSelectable) && fSelStart == fSelEnd) {
 		if (system_time() > (fCaretTime + 500000.0))
 			_InvertCaret();
 	}
@@ -2380,7 +2380,8 @@ BTextView::MakeEditable(bool editable)
 		fStyles->InvalidateNullStyle();
 	if (Window() != NULL && fActive) {
 		if (!fEditable) {
-			_HideCaret();
+			if (!fSelectable)
+				_HideCaret();
 			_CancelInputMethod();
 		}
 	}
@@ -2418,7 +2419,7 @@ BTextView::SetWordWrap(bool wrap)
 	else
 		_Refresh(0, fText->Length());
 
-	if (fEditable)
+	if (fEditable || fSelectable)
 		ScrollToOffset(fCaretOffset);
 
 	// redraw text rect and update scroll bars if bounds have changed
@@ -3240,6 +3241,9 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 void
 BTextView::_HandleBackspace(int32 modifiers)
 {
+	if (!fEditable)
+		return;
+
 	if (modifiers < 0) {
 		BMessage* currentMessage = Window()->CurrentMessage();
 		if (currentMessage == NULL
@@ -3315,7 +3319,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 
 	switch (arrowKey) {
 		case B_LEFT_ARROW:
-			if (!fEditable)
+			if (!fEditable && !fSelectable)
 				_ScrollBy(-1 * kHorizontalScrollBarStep, 0);
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
@@ -3342,7 +3346,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 			break;
 
 		case B_RIGHT_ARROW:
-			if (!fEditable)
+			if (!fEditable && !fSelectable)
 				_ScrollBy(kHorizontalScrollBarStep, 0);
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelEnd;
@@ -3370,7 +3374,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 
 		case B_UP_ARROW:
 		{
-			if (!fEditable)
+			if (!fEditable && !fSelectable)
 				_ScrollBy(0, -1 * kVerticalScrollBarStep);
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
@@ -3414,7 +3418,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 
 		case B_DOWN_ARROW:
 		{
-			if (!fEditable)
+			if (!fEditable && !fSelectable)
 				_ScrollBy(0, kVerticalScrollBarStep);
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelEnd;
@@ -3451,7 +3455,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 
 	fStyles->InvalidateNullStyle();
 
-	if (fEditable) {
+	if (fEditable || fSelectable) {
 		if (shiftKeyDown)
 			Select(selStart, selEnd);
 		else
@@ -3467,6 +3471,9 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 void
 BTextView::_HandleDelete(int32 modifiers)
 {
+	if (!fEditable)
+		return;
+
 	if (modifiers < 0) {
 		BMessage* currentMessage = Window()->CurrentMessage();
 		if (currentMessage == NULL
@@ -3538,7 +3545,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 	int32 lastClickOffset = fCaretOffset;
 	switch (pageKey) {
 		case B_HOME:
-			if (!fEditable) {
+			if (!fEditable && !fSelectable) {
 				fCaretOffset = 0;
 				_ScrollTo(0, 0);
 				break;
@@ -3571,7 +3578,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 			break;
 
 		case B_END:
-			if (!fEditable) {
+			if (!fEditable && !fSelectable) {
 				fCaretOffset = fText->Length();
 				_ScrollTo(0, fTextRect.bottom + fLayoutData->bottomInset);
 				break;
@@ -3627,7 +3634,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 			nextPos = PointAt(fCaretOffset);
 			_ScrollBy(0, nextPos.y - currentPos.y);
 
-			if (!fEditable)
+			if (!fEditable && !fSelectable)
 				break;
 
 			if (!shiftKeyDown)
@@ -3657,7 +3664,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 			nextPos = PointAt(fCaretOffset);
 			_ScrollBy(0, nextPos.y - currentPos.y);
 
-			if (!fEditable)
+			if (!fEditable && !fSelectable)
 				break;
 
 			if (!shiftKeyDown)
@@ -3680,7 +3687,7 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 		}
 	}
 
-	if (fEditable) {
+	if (fEditable || fSelectable) {
 		if (shiftKeyDown)
 			Select(selStart, selEnd);
 		else
@@ -3699,7 +3706,9 @@ BTextView::_HandlePageKey(uint32 pageKey, int32 modifiers)
 void
 BTextView::_HandleAlphaKey(const char* bytes, int32 numBytes)
 {
-	// TODO: block input if not editable (Andrew)
+	if (!fEditable)
+		return;
+
 	if (fUndo) {
 		TypingUndoBuffer* undoBuffer = dynamic_cast<TypingUndoBuffer*>(fUndo);
 		if (!undoBuffer) {
