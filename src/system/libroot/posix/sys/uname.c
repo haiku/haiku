@@ -74,15 +74,6 @@ uname(struct utsname *info)
 			case B_CPU_ARM_64:
 				platform = "aarch64";
 				break;
-			case B_CPU_ALPHA:
-				platform = "alpha";
-				break;
-			case B_CPU_MIPS:
-				platform = "mips";
-				break;
-			case B_CPU_SH:
-				platform = "sh4";
-				break;
 			case B_CPU_RISC_V:
 				platform = "riscv64";
 				break;
