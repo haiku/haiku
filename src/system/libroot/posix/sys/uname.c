@@ -69,17 +69,7 @@ uname(struct utsname *info)
 				platform = "m68k";
 				break;
 			case B_CPU_ARM:
-				/* The minimal ARM version emulated by QEMU
-				 * XXX: use armv6 (raspberry Pi)?
-				 * XXX: should we really use B_HOST_IS_LENDIAN here?
-				 * XXX: use real cpu version as on Linux?
-				 *	cf. http://git.qemu.org/?p=qemu.git;a=blob;f=linux-user/uname.c
-				 */
-#if B_HOST_IS_LENDIAN
-				platform = "armv5tel";
-#else
-				platform = "armv5teb";
-#endif
+				platform = "arm";
 				break;
 			case B_CPU_ARM_64:
 				platform = "aarch64";
