@@ -91,7 +91,7 @@ TTeamMenu::AttachedToWindow()
 
 	bool dragging = fBarView != NULL && fBarView->Dragging();
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
-	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	int32 iconSize = static_cast<TBarApp*>(be_app)->TeamIconSize();
 	float iconOnlyWidth = iconSize + be_control_look->ComposeSpacing(kIconPadding);
 
 	// calculate the minimum item width based on font and icon size

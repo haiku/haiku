@@ -207,7 +207,7 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 		*width = fOverrideWidth;
 	else {
 		bool hideLabels = static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
-		float iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+		float iconSize = static_cast<TBarApp*>(be_app)->TeamIconSize();
 		float iconOnlyWidth = (be_control_look->ComposeSpacing(kIconPadding) * 2) + iconSize;
 
 		if (fBarView->MiniState()) {

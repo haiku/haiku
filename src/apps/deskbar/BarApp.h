@@ -130,7 +130,7 @@ public:
 										BList*);
 	static	void					Unsubscribe(const BMessenger &subscriber);
 
-			int32					IconSize();
+			int32					TeamIconSize();
 
 private:
 			void					AddTeam(team_id team, uint32 flags,

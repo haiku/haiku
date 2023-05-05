@@ -147,7 +147,7 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 {
 	// scale replicants by font size
 	fMaxReplicantHeight = std::max(gMinReplicantHeight,
-		float(((TBarApp*)be_app)->IconSize()));
+		float(((TBarApp*)be_app)->TeamIconSize()));
 	// but not bigger than TabHeight which depends on be_bold_font
 	// TODO this should only apply to mini-mode but we set it once here for all
 	fMaxReplicantHeight = std::min(fMaxReplicantHeight,
@@ -1190,7 +1190,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 		loc.y = floorf((fBarView->TabHeight() - fMaxReplicantHeight) / 2) - 1;
 	} else {
 		loc.x -= 2; // keeps everything lined up nicely
-		const int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+		const int32 iconSize = static_cast<TBarApp*>(be_app)->TeamIconSize();
 		float yOffset = iconSize > B_MINI_ICON ? 3 : 2;
 			// squeeze icons in there at 16x16, reduce border by 1px
 

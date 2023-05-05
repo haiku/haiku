@@ -1261,7 +1261,7 @@ TBarView::IconFrame(const char* name) const
 float
 TBarView::TeamMenuItemHeight() const
 {
-	const int32 iconSize = fBarApp->IconSize();
+	const int32 iconSize = fBarApp->TeamIconSize();
 	float iconSizePadded = iconSize +
 		ceilf(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 2);
 

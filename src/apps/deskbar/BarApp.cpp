@@ -919,7 +919,7 @@ TBarApp::ResizeTeamIcons()
 
 
 int32
-TBarApp::IconSize()
+TBarApp::TeamIconSize()
 {
 	static int32 iconSize = 0, composedIconSize = 0;
 	if (iconSize != fSettings.iconSize) {
@@ -966,7 +966,7 @@ TBarApp::QuitPreferencesWindow()
 void
 TBarApp::FetchAppIcon(BarTeamInfo* barInfo)
 {
-	const int32 width = IconSize();
+	const int32 width = TeamIconSize();
 	const int32 index = (fSettings.iconSize - kMinimumIconSize) / kIconSizeInterval;
 
 	// first look in the icon cache
@@ -1024,7 +1024,7 @@ TBarApp::FetchAppIcon(BarTeamInfo* barInfo)
 BRect
 TBarApp::IconRect()
 {
-	int32 iconSize = IconSize();
+	int32 iconSize = TeamIconSize();
 	return BRect(0, 0, iconSize - 1, iconSize - 1);
 }
 
