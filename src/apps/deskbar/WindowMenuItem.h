@@ -51,15 +51,14 @@ public:
 									bool mini, bool currentWorkSpace,
 									bool dragging = false);
 
-			void				SetTo(const char* name, int32 id, bool mini,
-									bool currentWorkSpace,
-									bool dragging = false);
+			void				SetTo(const char* name, int32 id, bool minimized,
+									bool local, bool dragging = false);
 
 			bool				Expanded() const { return fExpanded; };
 			void				SetExpanded(bool expand) { fExpanded = expand; };
 
 			int32				ID() const { return fID; };
-			bool				Modified() const { return fModified; };
+			bool				Modified() const { return fIsModified; };
 
 			bool				RequiresUpdate() { return fRequireUpdate; };
 			void				SetRequireUpdate(bool update)
@@ -77,17 +76,21 @@ protected:
 private:
 			void				_Init(const char* name);
 
-			int32				fID;
-			bool				fMini;
-			bool				fCurrentWorkSpace;
+private:
 			const BBitmap*		fBitmap;
+
+			int32				fID;
+
 			float				fLabelWidth;
 			float				fLabelAscent;
 			float				fLabelDescent;
-			bool				fDragging;
-			bool				fExpanded;
-			bool				fRequireUpdate;
-			bool				fModified;
+
+			bool				fIsModified : 1;
+			bool				fIsMinimized : 1;
+			bool				fIsLocal : 1;
+			bool				fDragging : 1;
+			bool				fExpanded : 1;
+			bool				fRequireUpdate : 1;
 };
 
 

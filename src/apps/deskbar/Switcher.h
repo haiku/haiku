@@ -52,7 +52,7 @@ struct client_window_info;
 
 class TSwitchManager : public BHandler {
 public:
-							TSwitchManager(BPoint where);
+							TSwitchManager();
 	virtual					~TSwitchManager();
 
 	virtual void			MessageReceived(BMessage* message);
@@ -75,6 +75,14 @@ public:
 			int32			CountWindows(int32 groupIndex,
 								bool inCurrentWorkspace = false);
 			TTeamGroup*		FindTeam(team_id, int32* index);
+
+			int32			LargeIconSize() { return fLargeIconSize; }
+			int32			SmallIconSize() { return fSmallIconSize; }
+			int32			SlotSize() { return fSlotSize; }
+			int32			ScrollStep() { return fScrollStep; }
+			int32			SlotCount() { return fSlotCount; }
+			int32			CenterSlot() { return fCenterSlot; }
+			BRect			CenterRect();
 
 private:
 			void			MainEntry(BMessage* message);
@@ -101,6 +109,13 @@ private:
 			int32			fCurrentWindow;
 			int32			fCurrentSlot;
 			int32			fWindowID;
+
+			int32			fLargeIconSize;
+			int32			fSmallIconSize;
+			int32			fSlotSize;
+			int32			fScrollStep;
+			int32			fSlotCount;
+			int32			fCenterSlot;
 };
 
 
