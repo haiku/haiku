@@ -41,6 +41,7 @@ All rights reserved.
 #include <Application.h>
 #include <AutoDeleter.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <Path.h>
@@ -700,6 +701,7 @@ TBarWindow::SetSizeLimits()
 		} else {
 			// horizontal
 			if (fBarView->MiniState()) {
+				// horizontal mini-mode
 				minWidth = gMinimumWindowWidth;
 				maxWidth = B_SIZE_UNLIMITED;
 				minHeight = fBarView->TabHeight();
@@ -707,9 +709,16 @@ TBarWindow::SetSizeLimits()
 					+ fBarView->ReplicantTray()->MaxReplicantHeight()
 					+ kGutter);
 			} else {
+				// horizontal expando-mode
+				const int32 max
+					= be_control_look->ComposeIconSize(kMaximumIconSize)
+						.IntegerWidth() + 1;
+				const float iconPadding
+					= be_control_look->ComposeSpacing(kIconPadding);
+
 				minWidth = maxWidth = screenFrame.Width();
 				minHeight = kMenuBarHeight - 1;
-				maxHeight = kMaximumIconSize + 4;
+				maxHeight = max + iconPadding / 2;
 			}
 		}
 

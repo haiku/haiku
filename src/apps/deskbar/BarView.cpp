@@ -473,7 +473,8 @@ TBarView::PlaceDeskbarMenu()
 			height = std::max(fTabHeight,
 				kGutter + fReplicantTray->MaxReplicantHeight() + kGutter);
 		} else {
-			width = gMinimumWindowWidth / 2 + be_control_look->ComposeSpacing(kIconPadding);
+			width = gMinimumWindowWidth / 2
+				+ be_control_look->ComposeSpacing(kIconPadding);
 			height = std::max(TeamMenuItemHeight(),
 				kGutter + fReplicantTray->MaxReplicantHeight() + kGutter);
 		}
@@ -1262,8 +1263,10 @@ float
 TBarView::TeamMenuItemHeight() const
 {
 	const int32 iconSize = fBarApp->TeamIconSize();
-	float iconSizePadded = iconSize +
-		ceilf(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 2);
+	const float iconPadding = be_control_look->ComposeSpacing(kIconPadding);
+	float iconOnlyHeight = iconSize + iconPadding / 2;
+	const int32 large = be_control_look->ComposeIconSize(B_LARGE_ICON)
+		.IntegerWidth() + 1;
 
 	font_height fontHeight;
 	if (fExpandoMenuBar != NULL)
@@ -1275,17 +1278,16 @@ TBarView::TeamMenuItemHeight() const
 	labelHeight = labelHeight < kMinTeamItemHeight ? kMinTeamItemHeight
 		: ceilf(labelHeight * 1.1f);
 
-	bool hideLabels = static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
-	if (hideLabels && iconSize > B_MINI_ICON) {
+	if (fBarApp->Settings()->hideLabels && iconSize > B_MINI_ICON) {
 		// height is determined based solely on icon size
-		return iconSizePadded;
-	} else if (!fVertical || (fVertical && iconSize <= B_LARGE_ICON)) {
+		return iconOnlyHeight;
+	} else if (!fVertical || (fVertical && iconSize <= large)) {
 		// horizontal or vertical with label on same row as icon:
 		// height based on icon size or font size, whichever is bigger
-		return std::max(iconSizePadded, labelHeight);
-	} else if (fVertical && iconSize > B_LARGE_ICON) {
+		return std::max(iconOnlyHeight, labelHeight);
+	} else if (fVertical && iconSize > large) {
 		// vertical with label below icon: height based on icon and label
-		return ceilf(iconSizePadded + labelHeight);
+		return ceilf(iconOnlyHeight + labelHeight);
 	} else {
 		// height is determined based solely on label height
 		return labelHeight;

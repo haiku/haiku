@@ -206,12 +206,14 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 	if (fOverrideWidth != -1.0f)
 		*width = fOverrideWidth;
 	else {
-		bool hideLabels = static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
-		float iconSize = static_cast<TBarApp*>(be_app)->TeamIconSize();
-		float iconOnlyWidth = (be_control_look->ComposeSpacing(kIconPadding) * 2) + iconSize;
+		const float iconSize = static_cast<TBarApp*>(be_app)->TeamIconSize();
+		const float iconPadding = be_control_look->ComposeSpacing(kIconPadding);
+		float iconOnlyWidth = iconSize + iconPadding;
+		if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels)
+			iconOnlyWidth += iconPadding; // add an extra icon padding
 
 		if (fBarView->MiniState()) {
-			if (hideLabels)
+			if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels)
 				*width = iconOnlyWidth;
 			else
 				*width = gMinimumWindowWidth - (gDragRegionWidth + kGutter) * 2;
@@ -287,14 +289,15 @@ TTeamMenuItem::DrawContent()
 		} else
 			menu->SetDrawingMode(B_OP_OVER);
 
-		BRect iconBounds = fIcon != NULL ? fIcon->Bounds()
-			: BRect(0, 0, kMinimumIconSize - 1, kMinimumIconSize - 1);
+		BRect iconBounds = fIcon->Bounds();
 		BRect updateRect = iconBounds;
 		BPoint contentLocation = ContentLocation();
 		BPoint drawLocation = contentLocation + BPoint(sHPad, sVPad);
+		const int32 large = be_control_look->ComposeIconSize(B_LARGE_ICON)
+			.IntegerWidth() + 1;
 
 		if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels
-			|| (fBarView->Vertical() && iconBounds.Width() > 32)) {
+			|| (fBarView->Vertical() && iconBounds.Width() > large)) {
 			// determine icon location (centered horizontally)
 			float offsetx = contentLocation.x
 				+ floorf((frame.Width() - iconBounds.Width()) / 2);
