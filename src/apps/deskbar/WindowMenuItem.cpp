@@ -255,7 +255,7 @@ TWindowMenuItem::InsertIndexFor(BMenu* menu, int32 startIndex,
 }
 
 
-//	#pragma mark - private methods
+//	#pragma mark - TWindowMenuItem private methods
 
 
 void

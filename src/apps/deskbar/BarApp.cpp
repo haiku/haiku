@@ -50,9 +50,9 @@ All rights reserved.
 #include <File.h>
 #include <FindDirectory.h>
 #include <Locale.h>
-#include <Mime.h>
 #include <Message.h>
 #include <Messenger.h>
+#include <Mime.h>
 #include <Path.h>
 #include <Roster.h>
 
@@ -757,7 +757,7 @@ TBarApp::Subscribe(const BMessenger &subscriber, BList* list)
 	int32 numTeams = sBarTeamInfoList.CountItems();
 	for (int32 i = 0; i < numTeams; i++) {
 		BarTeamInfo* barInfo = (BarTeamInfo*)sBarTeamInfoList.ItemAt(i);
-		BarTeamInfo* newBarInfo = new (std::nothrow) BarTeamInfo(*barInfo);
+		BarTeamInfo* newBarInfo = new(std::nothrow) BarTeamInfo(*barInfo);
 		if (newBarInfo != NULL)
 			list->AddItem(newBarInfo);
 	}
@@ -1029,7 +1029,7 @@ TBarApp::IconRect()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BarTeamInfo
 
 
 BarTeamInfo::BarTeamInfo(BList* teams, uint32 flags, char* sig, BBitmap* icon,

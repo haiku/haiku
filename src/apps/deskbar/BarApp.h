@@ -89,6 +89,7 @@ class PreferencesWindow;
 class TBarView;
 class TBarWindow;
 
+
 class BarTeamInfo {
 public:
 									BarTeamInfo(BList* teams, uint32 flags,

@@ -57,6 +57,7 @@ All rights reserved.
 #include "icons.h"
 #include "tracker_private.h"
 
+
 #define _ALLOW_STICKY_ 0
 	// allows you to press 's' to keep the switcher window on screen
 
@@ -91,6 +92,7 @@ private:
 			uint32			fFlags;
 			char			fSignature[B_MIME_TYPE_LENGTH];
 			char*			fName;
+
 			BBitmap*		fSmallIcon;
 			BBitmap*		fLargeIcon;
 };
@@ -331,7 +333,7 @@ SmartStrcmp(const char* s1, const char* s2)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TTeamGroup
 
 
 TTeamGroup::TTeamGroup()
@@ -1208,7 +1210,7 @@ TSwitchManager::GroupList()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TBox
 
 
 TBox::TBox(BRect bounds, TSwitchManager* manager, TSwitcherWindow* window,
@@ -1594,12 +1596,12 @@ TBox::DrawWindowScrollers(bool force)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TSwitcherWindow
 
 
 TSwitcherWindow::TSwitcherWindow(BRect frame, TSwitchManager* manager)
 	:
-	BWindow(frame, "Twitcher", B_MODAL_WINDOW_LOOK,	B_MODAL_ALL_WINDOW_FEEL,
+	BWindow(frame, "Twitcher", B_MODAL_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_NOT_RESIZABLE, B_ALL_WORKSPACES),
 	fManager(manager),
 	fHairTrigger(true)
@@ -1826,13 +1828,12 @@ TSwitcherWindow::WindowView()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TIconView
 
 
 TIconView::TIconView(BRect frame, TSwitchManager* manager,
-		TSwitcherWindow* switcherWindow)
-	: BView(frame, "main_view", B_FOLLOW_NONE,
-		B_WILL_DRAW | B_PULSE_NEEDED),
+	TSwitcherWindow* switcherWindow)
+	: BView(frame, "main_view", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
 	fAutoScrolling(false),
 	fSwitcher(switcherWindow),
 	fManager(manager)
@@ -2126,7 +2127,7 @@ TIconView::Hiding()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TWindowView
 
 
 TWindowView::TWindowView(BRect rect, TSwitchManager* manager,
@@ -2324,7 +2325,7 @@ TWindowView::Draw(BRect update)
 
 
 void
-TWindowView::UpdateGroup(int32 , int32 windowIndex)
+TWindowView::UpdateGroup(int32, int32 windowIndex)
 {
 	ScrollTo(0, windowIndex * fItemHeight);
 	Invalidate(Bounds());

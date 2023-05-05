@@ -109,10 +109,10 @@ TTeamMenu::AttachedToWindow()
 
 	float maxItemWidth = minItemWidth;
 
-	int32 itemCount = teamList.CountItems();
+	int32 teamCount = teamList.CountItems();
 	if (!settings->hideLabels) {
 		// go through list and find the widest label
-		for (int32 i = 0; i < itemCount; i++) {
+		for (int32 i = 0; i < teamCount; i++) {
 			BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
 			float labelWidth = StringWidth(barInfo->name);
 			// label wraps after 32x32
@@ -133,7 +133,7 @@ TTeamMenu::AttachedToWindow()
 		teamList.SortItems(TTeamMenu::CompareByName);
 
 	// go through list and add the items
-	for (int32 i = 0; i < itemCount; i++) {
+	for (int32 i = 0; i < teamCount; i++) {
 		// add items back
 		BarTeamInfo* barInfo = (BarTeamInfo*)teamList.ItemAt(i);
 		TTeamMenuItem* item = new TTeamMenuItem(barInfo->teams,
