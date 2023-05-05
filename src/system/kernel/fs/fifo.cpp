@@ -615,16 +615,15 @@ Inode::NotifyEndClosed(bool writer)
 				request->Notify();
 
 			if (fReadSelectSyncPool)
-				notify_select_event_pool(fReadSelectSyncPool, B_SELECT_READ);
+				notify_select_event_pool(fReadSelectSyncPool, B_SELECT_DISCONNECTED);
+
 		}
 	} else {
 		// Last reader is gone. Wake up all writers.
 		fWriteCondition.NotifyAll();
 
-		if (fWriteSelectSyncPool) {
-			notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_WRITE);
+		if (fWriteSelectSyncPool)
 			notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_ERROR);
-		}
 	}
 }
 
@@ -713,14 +712,13 @@ Inode::Select(uint8 event, selectsync* sync, int openMode)
 
 	// signal right away, if the condition holds already
 	if (writer) {
-		if ((event == B_SELECT_WRITE
-				&& (fBuffer.Writable() > 0 || fReaderCount == 0))
+		if ((event == B_SELECT_WRITE && fBuffer.Writable() > 0)
 			|| (event == B_SELECT_ERROR && fReaderCount == 0)) {
 			return notify_select_event(sync, event);
 		}
 	} else {
-		if (event == B_SELECT_READ
-				&& (fBuffer.Readable() > 0 || fWriterCount == 0)) {
+		if ((event == B_SELECT_READ && fBuffer.Readable() > 0)
+			|| (event == B_SELECT_DISCONNECTED && fWriterCount == 0)) {
 			return notify_select_event(sync, event);
 		}
 	}
