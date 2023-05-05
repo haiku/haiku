@@ -1708,6 +1708,7 @@ TSwitcherWindow::CenterWindow(BRect screenFrame, BSize windowSize)
 	BPoint centered = BLayoutUtils::AlignInFrame(screenFrame, windowSize,
 		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER))
 			.LeftTop();
+	centered.y -= roundf(screenFrame.Height() / 16);
 
 	MoveTo(centered);
 }
