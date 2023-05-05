@@ -226,7 +226,7 @@ private:
 static const int32 kHorizontalMargin = 11;
 static const int32 kVerticalMargin = 10;
 
-static const int32 kTeamIconSize = 32;
+static const int32 kTeamIconSize = 48;
 
 static const int32 kWindowScrollSteps = 3;
 
