@@ -698,10 +698,12 @@ Inode::Select(uint8 event, selectsync* sync, int openMode)
 {
 	bool writer = true;
 	select_sync_pool** pool;
-	if (event == B_SELECT_READ || (openMode & O_RWMASK) == O_RDONLY) {
+	// B_SELECT_READ can happen on write-only opened fds, so restrain B_SELECT_READ to O_RDWR
+	if ((event == B_SELECT_READ && (openMode & O_RWMASK) == O_RDWR)
+		|| (openMode & O_RWMASK) == O_RDONLY) {
 		pool = &fReadSelectSyncPool;
 		writer = false;
-	} else if ((openMode & O_RWMASK) == O_WRONLY) {
+	} else if ((openMode & O_RWMASK) == O_RDWR || (openMode & O_RWMASK) == O_WRONLY) {
 		pool = &fWriteSelectSyncPool;
 	} else
 		return B_NOT_ALLOWED;
@@ -731,9 +733,10 @@ status_t
 Inode::Deselect(uint8 event, selectsync* sync, int openMode)
 {
 	select_sync_pool** pool;
-	if (event == B_SELECT_READ || (openMode & O_RWMASK) == O_RDONLY) {
+	if ((event == B_SELECT_READ && (openMode & O_RWMASK) == O_RDWR)
+		|| (openMode & O_RWMASK) == O_RDONLY) {
 		pool = &fReadSelectSyncPool;
-	} else if ((openMode & O_RWMASK) == O_WRONLY) {
+	} else if ((openMode & O_RWMASK) == O_RDWR || (openMode & O_RWMASK) == O_WRONLY) {
 		pool = &fWriteSelectSyncPool;
 	} else
 		return B_NOT_ALLOWED;
