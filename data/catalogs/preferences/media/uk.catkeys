@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		Неможливо додати регулятор гучності в Deskbar: %s\n
-Restart media services	Media views		Перезапустити медіа-служби
+Restart media services	Media views		Перезапустити медіаслужби
 Quit	Media Window		Вихід
 <none>	VideoInputMenu	Used when no video input is available	<пусто>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Неможливо вилучити регулятор гучності з Deskbar: %s\n
@@ -8,22 +8,22 @@ Video output:	Media views		Вихід відео:
 Video input:	Media views		Вхід відео:
 Audio output:	Media views		Вихід аудіо:
 Please select a SoundFont.	Midi View		Будь ласка, виберіть SoundFont.
-There are no SoundFonts installed.	Midi View		Жодного SoundFont не встановлено.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Вихід з Медіа зупинить перезапуск медіа-служб. Імовірний результат - нестабільна робота або недоступність медіа.
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіа-сервер не запущено\nЗапустити його?
-Video settings	Media Window		Налаштування відео
-Audio mixer	Media Window		Аудіо мікшер
+There are no SoundFonts installed.	Midi View		Бібліотеки SoundFont не встановлені.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Вихід з Медіа зупинить перезапуск медіаслужб. Імовірний результат – нестабільна робота або недоступність медіа.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Медіасервер не запущено\nЗапустити його?
+Video settings	Media Window		Настройки відео
+Audio mixer	Media Window		Аудіомікшер
 Show volume control on Deskbar	Media views		Показати регулятор гучності в Deskbar
-Start media server	Media Window		Запуск медіа сервера
-Audio settings	Media Window		Налаштування аудіо
+Start media server	Media Window		Запуск медіасервера
+Audio settings	Media Window		Настройки аудіо
 Quit anyway	Media Window		Вийти будь-що
 Media	System name		Media
 Warning!	Media Window		Попередження!
-MIDI Settings	Media Window		Налаштування MIDI
+MIDI Settings	Media Window		Настройки MIDI
 SoundFonts	Midi View		SoundFonts
 Audio input:	Media views		Вхід аудіо:
 <none>	Media views		<пусто>
 Channel:	Media views		Канал:
-This hardware has no controls.	Media Window		Це обладнання не має параметрів контролю.
+This hardware has no controls.	Media Window		У цього обладнання відсутні елементи управління.
 Defaults	Media views		Типові настройки
 <none>	VideoOutputMenu	Used when no video output is available	<пусто>

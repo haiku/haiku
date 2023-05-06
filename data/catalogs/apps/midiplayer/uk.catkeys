@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-MidiPlayer	1046133011
-This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Ця крихітна програмка\nЗнає як заграти тисячі\nвеселих пісеньок
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Ця крихітна програмка\nЗнає як заграти тисячі\nвеселих мелодій
 Dungeon	Main Window		Підземелля
 Could not load song	Main Window		Не вдалося завантажити мелодію
 Igor's lab	Main Window		Igor's lab
@@ -8,7 +8,7 @@ Loading instruments…	Scope View		Завантажити інструменти
 Volume:	Main Window		Гучність:
 Closet	Main Window		Комірка
 Scope	Main Window		Осцилоскоп
-Drop MIDI file here	Scope View		Перемістити MIDI файл сюди
+Drop MIDI file here	Scope View		Перетягніть сюди MIDI-файл
 None	Main Window		Пусто
 Reverb:	Main Window		Відбиття:
 MidiPlayer	System name		MidiPlayer
@@ -16,5 +16,5 @@ OK	Main Window		ОК
 Stop	Main Window		Зупинити
 Live input:	Main Window		Прямий вхід:
 Garage	Main Window		Гараж
-Play	Main Window		Грати
+Play	Main Window		Програти
 Cavern	Main Window		Печера

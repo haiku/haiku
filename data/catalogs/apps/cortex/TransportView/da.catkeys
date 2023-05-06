@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.TransportView	1198513874
+1	danish	application/x-vnd.Cortex.TransportView	3739685609
 Roll	TransportView		Rul
 (none)	TransportView		(ingen)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# knudepunkt} other{# knudepunkter}}
@@ -14,6 +14,7 @@ To:	TransportView		Til:
 Recording	TransportView		Optager
 Time source:	TransportView		Tidskilde:
 DAC time source	TransportView		DAC-tidskilde
+Decrease precision	TransportView		Formindsk præcisionen
 System clock	TransportView		Systemets ur
 From:	TransportView		Fra:
 Roll from	TransportView		Rul fra

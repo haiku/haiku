@@ -1,2 +1,25 @@
-1	danish	x-vnd.Haiku-WebPTranslator	1475550615
+1	danish	x-vnd.Haiku-WebPTranslator	828165164
+High	ConfigView		Høj
+WebPTranslator Settings	ConfigView		WebPTranslator-indstillinger
+Low	ConfigView		Lav
+WebP image translator	ConfigView		WebP-billedoversætter
+Photo	ConfigView		Foto
+WebP image translator	WebPTranslator		WebP-billedeoversætter
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Billede
+Default	ConfigView		Standard
+Text	ConfigView		Tekst
+Preprocessing filter	ConfigView		Forbehandlingsfilter
+Compression method:	ConfigView		Komprimeringsmetode:
+Preset	ConfigView		Forvalg
+Drawing	ConfigView		Tegning
+Output preset:	ConfigView		Uddataforvalg:
 WebP Settings	main		WebP-indstillinger
+Icon	ConfigView		Ikon
+WebP image	WebPTranslator		WebP-billede
+Output quality:	ConfigView		Uddatakvalitet:
+Slower but better	ConfigView		Langsommere, men bedre
+Based on libwebp %version%	ConfigView		Baseret på libwebp %version%
+Fast	ConfigView		Hurtig
+WebP images	WebPTranslator		WebP-billeder

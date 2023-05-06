@@ -1,8 +1,10 @@
-1	danish	application/x-vnd.moon-AudioAdapter.media_addon	1575326340
+1	danish	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
 Input format	CortexAudioAdapter		Inputformat
 Channels:	CortexAudioAdapter		Kanaler:
 stereo	CortexAudioAdapter		stereo
 mono	CortexAudioAdapter		mono
 Output format	CortexAudioAdapter		Outputformat
 Audio input	CortexAddOnsCommon		Lydinput
+Sample format:	CortexAudioAdapter		Prøveformat:
 Audio output	CortexAddOnsCommon		Lydoutput
+%groupname% parameters	CortexAddOnsCommon		%groupname% parametre

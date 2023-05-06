@@ -6,7 +6,7 @@ short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
 %s: this option requires a parameter\n	FilePanelApp		%s: tilvalget kræver en parameter\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvis anvendelse\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbrug et indlæs-filpanel (standard)\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsæt standardnavnet til når der gemmes\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsæt standardnavnet for, når der gemmes\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\tslags punkter der kan åbnes (variant): enhver kombination af f, d, s (fil (standard), mappe, symlink)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		anvendelse: %s [-h]     [-d mappe]              [-l|-s]     [-t ttl]      [-1]       [-m]
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		anvendelse: %s [--help] [--directory mappe] [--load|--save] [--title ttl] [--single] [--modal]\n

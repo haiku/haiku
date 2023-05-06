@@ -1,6 +1,14 @@
-1	danish	application/x-vnd.Cortex.support	4267636659
+1	danish	application/x-vnd.Cortex.support	893232212
+Header has flags	MediaString		Header har flag
+32 bit HLS	MediaString		32 bit HLS
+Recording	MediaString		Optagelse
+(unknown format)	MediaString		(ukendt format)
+Clean buffers	MediaString		Ryd buffere
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# ramme fremad}other{# rammer fremad}}
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# billedpunkt} other{# billedpunkter}}
 Mono	MediaString		Mono
 MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF-formatfamilie
 YUV444	MediaString		YUV444
 Port	MediaString		Port
 16 bit integer	MediaString		16 bit heltal
@@ -8,8 +16,10 @@ Port	MediaString		Port
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Offline
 YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(ukendt videorientering)
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 bit HLSA
+BeOS format family	MediaString		BeOS-formatfamilie
 24 bit HSV	MediaString		24 bit HSV
 32 bit CMY	MediaString		32 bit CMY
 15 bit RGBA	MediaString		15 bit RGBA

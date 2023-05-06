@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.InfoView	4133381354
+1	danish	application/x-vnd.Cortex.InfoView	3600330889
 Offset	InfoView		Forskydning
 Description	DormantNodeInfoView		Beskrivelse
 Byte order	InfoView		Byterækkefølge
@@ -7,6 +7,8 @@ Output formats	DormantNodeInfoView		Outputformater
 History	InfoView		Historik
 Input formats	DormantNodeInfoView		Inputformater
 Signature	AppNodeInfoView		Underskrift
+Video data between	InfoView		Videodata mellem
+Any number	DormantNodeInfoView	For 'Max. instances' field	Vilkårligt nummer
 Flags	InfoView		Flag
 Media output	InfoView		Medieoutput
 Active lines	InfoView		Aktive linjer
@@ -14,24 +16,43 @@ Buffer size	InfoView		Bufferstørrelse
 \n- Quality:	FileNodeInfoView		\n- Kvalitet:
 Kinds	LiveNodeInfoView		Slags
 Application	AppNodeInfoView		Program
+Flavor flags	DormantNodeInfoView		Smagsflag
+Max. instances	DormantNodeInfoView		Max. instancer
 \n- Duration:	FileNodeInfoView		\n- Varighed:
+Dormant media node	DormantNodeInfoView		Hvilende medienode
 Media type	InfoView		Medietype
+Live media node	LiveNodeInfoView		Levende medienode
+Field rate	InfoView		Felthastighed
+Kinds	DormantNodeInfoView		Typer
+%title% info	InfoView		%title% info
+Node ID	LiveNodeInfoView		Node-ID
 Resolution	InfoView		Opløsning
+Chunk size	InfoView		Fragmentstørrelse
 File format	AppNodeInfoView		Filformat
+Matrix mask	InfoView		Matricemaske
 Channel mask	InfoView		Kanalmaske
+Orientation	InfoView		Orientering
+Live file-interface node	FileNodeInfoView		Levende filgrænsefladenode
 Channels	InfoView		Kanaler
+Sample rate	InfoView		Samplingshastighed
 File format	FileNodeInfoView		Filformat
 (no file)	FileNodeInfoView		(ingen fil)
 Media input	InfoView		Medieinput
+Bit rate	InfoView		Bithastighed
 Input format	DormantNodeInfoView		Inputformat
 Format	InfoView		Format
 Version	AppNodeInfoView		Version
 AddOn ID	DormantNodeInfoView		Tilføjelses-id
+Frame size	InfoView		Rammestørrelse
+Flavor ID	DormantNodeInfoView		Smags-ID
 Run mode	LiveNodeInfoView		Kørselstilstand
+\n- Codec:	FileNodeInfoView		\n- Codec:
 Port	LiveNodeInfoView		Port
 Output format	DormantNodeInfoView		Outputformat
 Aspect ratio	InfoView		Højde-bredde-forhold
+Application-owned node	AppNodeInfoView		Programejet node
 Tracks	FileNodeInfoView		Spor
 Source	InfoView		Kilde
 Destination	InfoView		Destination
 Copyright	FileNodeInfoView		Ophavsret
+ID:	FileNodeInfoView		ID:

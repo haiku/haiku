@@ -4,13 +4,13 @@ Remove	AttributeWindow		Вилучити
 Close	ProbeView		Закрити
 Boolean value:	TypeEditors		Булево значення:
 File	ProbeView		Файл
-Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Розмір блоку
+Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Розмір блока
 MIME type editor	TypeEditors		Редактор MIME-типу
-Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятковий
+Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцяткова
 16 bit unsigned value:	TypeEditors		16 бітове беззнакове значення:
 8 bit signed value:	TypeEditors		8 бітове знакове значення:
- (native)	ProbeView		 (native)
-Attribute offset: 	ProbeView		Зміщення атрибуту: 
+ (native)	ProbeView		 (нативний)
+Attribute offset: 	ProbeView		Зміщення атрибута: 
 Text	TypeEditors	This is the type of editor	Текст
 File offset: 	ProbeView		Зміщення файлу: 
 Add	ProbeView		Додати
@@ -28,7 +28,7 @@ Base	ProbeView	A menu item, the number that is basis for a system of calculation
 Open file…	FileWindow		Відкрити файл…
 32 bit unsigned pointer:	TypeEditors		32-бітовий беззнаковий вказівник:
 DiskProbe request	DiskProbe		Запит DiskProbe
-Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцятковий
+Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцяткова
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Збій запису до файлу:\n%s\n\nВсі зміни будуть втрачені при виході.
 Examine device:	OpenWindow		Дослідити пристрій:
 Number editor	TypeEditors		Числовий редактор
@@ -47,14 +47,14 @@ Cancel	ProbeView		Скасувати
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Неможливо відкрити \"%s\":\n%s
 Font size	ProbeView		Розмір шрифту
 Type editor not supported	ProbeView		Редактор типу не підтримується
-Native: 0x%0*Lx	ProbeView		Native: 0x%0*Lx
+Native: 0x%0*Lx	ProbeView		Нативний: 0x%0*Lx
 Copy	ProbeView		Копіювати
 Redo	ProbeView		Повтор дії
 Floating-point value:	TypeEditors		Значення з рухомою комою:
 Cancel	AttributeWindow		Скасувати
 16 bit signed value:	TypeEditors		16 бітове знакове значення:
 DiskProbe request	AttributeWindow		Запит DiskProbe
-Next	ProbeView		Наступне
+Next	ProbeView		Наступний
 64 bit signed offset:	TypeEditors		64 бітове знакове зміщення
 32 bit signed value:	TypeEditors		32-бітове знакове значення:
 Could not find search string.	ProbeView		Не вдалося знайти рядок.
@@ -91,7 +91,7 @@ Type editor	ProbeView		Редактор типу
 File	FileWindow		Файл
 Grayscale	TypeEditors		Відтінки сірого
 32 bit	TypeEditors		32 біти
-Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
+Native: %Ld (0x%0*Lx)	ProbeView		Нативний: %Ld (0x%0*Lx)
 Device	ProbeView		Пристрій
 Close	AttributeWindow		Закрити
 Type editor	AttributeWindow		Редактор типу
@@ -101,15 +101,15 @@ Attribute type: 	ProbeView		Тип атрибуту:
 15 bit	TypeEditors		15 біт
 Page setup…	ProbeView		Налаштування сторінки…
 Boolean	TypeEditors	This is the type of editor	Boolean
-Icon view	TypeEditors		Значки
+Icon view	TypeEditors		Перегляд значків
 Select all	ProbeView		Вибрати все
 64 bit unsigned value:	TypeEditors		64 бітове беззнакове значення:
 OK	ProbeView		ОК
-Previous	ProbeView		Попереднє
+Previous	ProbeView		Попередній
 Selection	ProbeView		Вибір
 Find	FindWindow		Знайти
 8 bit unsigned value:	TypeEditors		8 бітове беззнакове значення:
-%ld (native)	ProbeView		%ld (native)
+%ld (native)	ProbeView		%ld (нативний)
 Attribute: 	ProbeView		Атрибут: 
 Block	ProbeView		Блок
 Find again	ProbeView		Знайти далі
@@ -127,7 +127,7 @@ Boolean editor	TypeEditors		Булевий редактор
 Device offset: 	ProbeView		Зміщення пристрою: 
 Find…	ProbeView		Знайти…
 8 bit palette	TypeEditors		8 бітова палітра
-Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десятковий
+Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десяткова
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Зображення
 Paste	ProbeView		Вставити
 32 bit unsigned size:	TypeEditors		32-бітовий беззнаковий розмір:

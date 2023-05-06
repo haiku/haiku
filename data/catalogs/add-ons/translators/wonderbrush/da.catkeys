@@ -1,5 +1,9 @@
-1	danish	x-vnd.Haiku-WonderBrushTranslator	2764474812
+1	danish	x-vnd.Haiku-WonderBrushTranslator	1289038178
+WonderBrush image translator	WonderBrushTranslator		WonderBrush-billedoversætter
 WBI Settings	WonderBrushMain		WBI-indstillinger
 Version %d.%d.%d, %s	WonderBrushView		Version %d.%d.%d, %s
 written by:	WonderBrushView		skrevet af:
+WonderBrush images	WonderBrushTranslator		WonderBrush-billeder
 WonderBrush image translator	WonderBrushView		WonderBrush-billedoversætter
+WonderBrush image	WonderBrushTranslator		WonderBrush-billede
+WBI Settings	WonderBrushTranslator		WBI-indstillinger

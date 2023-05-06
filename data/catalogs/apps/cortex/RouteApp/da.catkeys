@@ -1,10 +1,22 @@
-1	danish	application/x-vnd.Cortex.Route	3241560755
+1	danish	application/x-vnd.Cortex.Route	3538183694
+Node '%name%' released	CortexRouteApp		Node '%name%' frigivet
 OK	CortexRouteApp		OK
+About Cortex/Route…	CortexRouteApp		Om Cortex/Route…
 File	CortexRouteApp		Fil
+%producer% and %consumer%	CortexRouteApp		%producer% og %consumer%
+Node '%name%' created	CortexRouteApp		Node '%name%' oprettet
+Negotiated format:	CortexRouteApp		Forhandlet format:
 Window	CortexRouteApp		Vindue
 Transport	CortexRouteApp		Styring
+Connection broken	CortexRouteApp		Forbindelse afbrudt
 Untitled group	CortexRouteApp		Unavngivet gruppe
+Connection failed	CortexRouteApp		Forbindelse mislykkedes
+Between:	CortexRouteApp		Mellem:
+Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Åbn…
+Connection made	CortexRouteApp		Forbindelse oprettet
 Show transport	CortexRouteApp		Vis styring
 Show add-ons	CortexRouteApp		Vis tilføjelser
 Quit	CortexRouteApp		Afslut
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAlle rettigheder forbeholdes.\n\nCortex-teamet:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nTak til:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nVisse ikoner brugt heri er tilhører\nBe, Inc. og bruges med tilladelse.
+Tried format:	CortexRouteApp		Forsøgt format:
