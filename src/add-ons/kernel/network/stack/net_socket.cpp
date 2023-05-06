@@ -540,12 +540,12 @@ socket_control(net_socket* socket, uint32 op, void* data, size_t length)
 
 		case FIONREAD:
 		{
-			if (data == NULL)
+			if (data == NULL || (socket->options & SO_ACCEPTCONN) != 0)
 				return B_BAD_VALUE;
 
 			int available = (int)socket_read_avail(socket);
 			if (available < 0)
-				return available;
+				available = 0;
 
 			if (is_syscall()) {
 				if (!IS_USER_ADDRESS(data)

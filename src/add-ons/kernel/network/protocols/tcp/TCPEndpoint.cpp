@@ -964,6 +964,8 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		if (fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
 			|| fState == TIME_WAIT) {
 			// ``Connection closing''.
+			if (fReceiveQueue.Available() > 0)
+				break;
 			return B_OK;
 		}
 
@@ -1345,7 +1347,8 @@ TCPEndpoint::_AvailableData() const
 
 	if (availableData == 0 && !_ShouldReceive())
 		return ENOTCONN;
-
+	if (availableData == 0 && (fState == FINISH_RECEIVED || fState == WAIT_FOR_FINISH_ACKNOWLEDGE))
+		return ESHUTDOWN;
 	return availableData;
 }
 
