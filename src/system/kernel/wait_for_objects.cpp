@@ -461,10 +461,14 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 		sync->set[fd].selected_events = 0;
 		sync->set[fd].events = 0;
 
-		if (readSet && FD_ISSET(fd, readSet))
-			sync->set[fd].selected_events = SELECT_FLAG(B_SELECT_READ);
-		if (writeSet && FD_ISSET(fd, writeSet))
-			sync->set[fd].selected_events |= SELECT_FLAG(B_SELECT_WRITE);
+		if (readSet && FD_ISSET(fd, readSet)) {
+			sync->set[fd].selected_events = SELECT_FLAG(B_SELECT_READ)
+				| SELECT_FLAG(B_SELECT_DISCONNECTED) | SELECT_FLAG(B_SELECT_ERROR);
+		}
+		if (writeSet && FD_ISSET(fd, writeSet)) {
+			sync->set[fd].selected_events |= SELECT_FLAG(B_SELECT_WRITE)
+				| SELECT_FLAG(B_SELECT_ERROR);
+		}
 		if (errorSet && FD_ISSET(fd, errorSet))
 			sync->set[fd].selected_events |= SELECT_FLAG(B_SELECT_ERROR);
 
@@ -523,12 +527,14 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	if (status == B_OK) {
 		for (count = 0, fd = 0;fd < numFDs; fd++) {
-			if (readSet && sync->set[fd].events & SELECT_FLAG(B_SELECT_READ)) {
+			if (readSet && sync->set[fd].events & (SELECT_FLAG(B_SELECT_READ)
+					| SELECT_FLAG(B_SELECT_DISCONNECTED) | SELECT_FLAG(B_SELECT_ERROR))) {
 				FD_SET(fd, readSet);
 				count++;
 			}
 			if (writeSet
-				&& sync->set[fd].events & SELECT_FLAG(B_SELECT_WRITE)) {
+				&& sync->set[fd].events & (SELECT_FLAG(B_SELECT_WRITE)
+					| SELECT_FLAG(B_SELECT_ERROR))) {
 				FD_SET(fd, writeSet);
 				count++;
 			}
