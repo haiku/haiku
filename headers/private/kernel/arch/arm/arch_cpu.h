@@ -60,8 +60,8 @@ extern addr_t arm_get_ifar(void);
 
 extern addr_t arm_get_fp(void);
 
-extern int mmu_read_c1(void);
-extern int mmu_write_c1(int val);
+extern int arm_get_sctlr(void);
+extern int arm_set_sctlr(int val);
 
 void arch_cpu_invalidate_TLB_page(addr_t page);
 

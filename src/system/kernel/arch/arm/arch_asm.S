@@ -1,5 +1,5 @@
 /*
- * Copyright 2022, Haiku Inc. All rights reserved.
+ * Copyright 2022-2023, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2009, Wischert, johanneswi@gmail.com.
@@ -20,18 +20,18 @@
 .text
 
 
-/* int mmu_read_c1(void); */
-FUNCTION(mmu_read_c1):
+/* int arm_get_sctlr(void); */
+FUNCTION(arm_get_sctlr):
 	mrc	p15, 0, r0, c1, c0, 0
 	bx	lr
-FUNCTION_END(mmu_read_c1)
+FUNCTION_END(arm_get_sctlr)
 
 
-/* void mmu_write_c1(int val); */
-FUNCTION(mmu_write_c1):
+/* void arm_set_sctlr(int val); */
+FUNCTION(arm_set_sctlr):
 	mcr	p15, 0, r0, c1, c0, 0
 	bx	lr
-FUNCTION_END(mmu_write_c1)
+FUNCTION_END(arm_set_sctlr)
 
 
 /* NOTE: the I bit in cpsr (bit 7) is *set* to disable... */
