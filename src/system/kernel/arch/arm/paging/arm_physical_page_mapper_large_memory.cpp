@@ -485,11 +485,12 @@ void*
 LargeMemoryPhysicalPageMapper::InterruptGetPageTableAt(
 	phys_addr_t physicalAddress)
 {
-	ASSERT(physicalAddress % B_PAGE_SIZE == 0);
+	phys_addr_t off = physicalAddress & (B_PAGE_SIZE -1);
+	physicalAddress &= ~(B_PAGE_SIZE -1);
 
 	PhysicalPageSlot* slot = fPerCPUData[smp_get_current_cpu()].interruptSlot;
 	slot->Map(physicalAddress);
-	return (void*)slot->address;
+	return (void*)slot->address + off;
 }
 
 
