@@ -764,7 +764,10 @@ load_driver_settings(const char *driverName)
 					return NULL;
 
 				memcpy(text, settings->buffer, settings->size + 1);
-				return new_settings(text, driverName);
+				settings_handle *handle =  new_settings(text, driverName);
+				if (handle == NULL)
+					free(text);
+				return handle;
 			}
 			settings = settings->next;
 		}
