@@ -1680,6 +1680,39 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			return B_OK;
 		}
 
+		case 'ichr':			// BeOS (int*) (pre- select() support)
+		{
+			int wanted;
+			int toRead;
+
+			// help identify apps using it
+			//dprintf("tty: warning: legacy BeOS opcode 'ichr'\n");
+
+			if (user_memcpy(&wanted, buffer, sizeof(int)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			// release the mutex and grab a read lock
+			locker.Unlock();
+			ReaderLocker readLocker(cookie);
+
+			bigtime_t timeout = wanted == 0 ? 0 : B_INFINITE_TIMEOUT;
+
+			// TODO: If wanted is > the TTY buffer size, this loop cannot work
+			// correctly. Refactor the read code!
+			do {
+				status_t status = readLocker.AcquireReader(timeout, wanted);
+				if (status != B_OK)
+					return status;
+
+				toRead = readLocker.AvailableBytes();
+			} while (toRead < wanted);
+
+			if (user_memcpy(buffer, &toRead, sizeof(int)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			return B_OK;
+		}
+
 		case FIONREAD:
 		{
 			int toRead = 0;
