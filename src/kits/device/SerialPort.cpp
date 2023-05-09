@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include <termios.h>
 
 
@@ -469,10 +470,18 @@ BSerialPort::IsDCD(void)
 ssize_t
 BSerialPort::WaitForInput(void)
 {
-	ssize_t size;
-	int err = ioctl(ffd, TCWAITEVENT, &size, sizeof size);
+	object_wait_info info[1];
+	info[0].type = B_OBJECT_TYPE_FD;
+	info[0].object = ffd;
+	info[0].events = B_EVENT_READ | B_EVENT_ERROR | B_EVENT_DISCONNECTED;
+	status_t status = wait_for_objects_etc(info, 1, B_RELATIVE_TIMEOUT, fTimeout);
+	if (status < 0)
+		return status;
 
-	return (err < B_OK) ? errno : size;
+	int size;
+	if (ioctl(ffd, FIONREAD, &size, sizeof(size)) < 0)
+		return errno;
+	return size;
 }
 
 
