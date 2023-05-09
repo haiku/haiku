@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2023 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -27,8 +27,9 @@
 #endif
 
 
-//#define TRACE_MEMORY_MAP
-//#define TRACE_PAGE_DIRECTORY
+static constexpr bool kTraceMemoryMap = false;
+static constexpr bool kTracePageDirectory = false;
+
 
 // Ignore memory above 512GB
 #define PHYSICAL_MEMORY_LOW		0x00000000
@@ -43,7 +44,6 @@ static uint32_t *sNextPageTable = NULL;
 static uint32_t *sLastPageTable = NULL;
 
 
-#ifdef TRACE_PAGE_DIRECTORY
 static void
 dump_page_dir(void)
 {
@@ -67,7 +67,6 @@ dump_page_dir(void)
 		}
 	}
 }
-#endif
 
 
 static uint32 *
@@ -177,39 +176,39 @@ arch_mmu_post_efi_setup(size_t memoryMapSize,
 	kRuntimeServices->SetVirtualAddressMap(memoryMapSize, descriptorSize,
 		descriptorVersion, memoryMap);
 
-#ifdef TRACE_MEMORY_MAP
-	dprintf("phys memory ranges:\n");
-	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-		uint64 start = gKernelArgs.physical_memory_range[i].start;
-		uint64 size = gKernelArgs.physical_memory_range[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
-	}
+	if (kTraceMemoryMap) {
+		dprintf("phys memory ranges:\n");
+		for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+			uint64 start = gKernelArgs.physical_memory_range[i].start;
+			uint64 size = gKernelArgs.physical_memory_range[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 
-	dprintf("allocated phys memory ranges:\n");
-	for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-		uint64 start = gKernelArgs.physical_allocated_range[i].start;
-		uint64 size = gKernelArgs.physical_allocated_range[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
-	}
+		dprintf("allocated phys memory ranges:\n");
+		for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
+			uint64 start = gKernelArgs.physical_allocated_range[i].start;
+			uint64 size = gKernelArgs.physical_allocated_range[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 
-	dprintf("allocated virt memory ranges:\n");
-	for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-		uint64 start = gKernelArgs.virtual_allocated_range[i].start;
-		uint64 size = gKernelArgs.virtual_allocated_range[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
-	}
+		dprintf("allocated virt memory ranges:\n");
+		for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
+			uint64 start = gKernelArgs.virtual_allocated_range[i].start;
+			uint64 size = gKernelArgs.virtual_allocated_range[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 
-	dprintf("virt memory ranges to keep:\n");
-	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
-		uint32 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
-		uint32 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
-		dprintf("    0x%08" B_PRIx32 "-0x%08" B_PRIx32 ", length 0x%08" B_PRIx32 "\n",
-			start, start + size, size);
+		dprintf("virt memory ranges to keep:\n");
+		for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
+			uint32 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+			uint32 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+			dprintf("    0x%08" B_PRIx32 "-0x%08" B_PRIx32 ", length 0x%08" B_PRIx32 "\n",
+				start, start + size, size);
+		}
 	}
-#endif
 }
 
 
@@ -286,9 +285,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	TRACE("gKernelArgs.arch_args.last_pagetable = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.last_pagetable);
 
-#ifdef TRACE_PAGE_DIRECTORY
-	dump_page_dir();
-#endif
+	if (kTracePageDirectory)
+		dump_page_dir();
 
 	return (uint32_t)sPageDirectory;
 }
