@@ -356,6 +356,8 @@ arch_arm_page_fault(struct iframe *frame, addr_t far, uint32 fsr, bool isWrite, 
 			far);
 	} else if (!isExec && ((fsr & 0x060f) == FSR_FS_ALIGNMENT_FAULT)) {
 		panic("unhandled alignment exception\n");
+	} else if ((fsr & 0x060f) == FSR_FS_ACCESS_FLAG_FAULT) {
+		panic("unhandled access flag fault\n");
 	} else if ((frame->spsr & CPSR_I) != 0) {
 		// interrupts disabled
 
