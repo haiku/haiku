@@ -138,7 +138,7 @@ struct tty {
 	uint32				pending_eof;
 	bool				is_master;
 	recursive_lock*		lock;
-	tty_settings		settings;
+	tty_settings*		settings;
 	uint8				hardware_bits;
 };
 

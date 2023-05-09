@@ -506,7 +506,7 @@ WriterLocker::WriterLocker(tty_cookie* sourceCookie)
 
 		// get the echo mode
 		fEcho = (fSource->is_master
-			&& fSource->settings.termios.c_lflag & ECHO) != 0;
+			&& fSource->settings->termios.c_lflag & ECHO) != 0;
 
 		// enqueue ourselves in the respective request queues
 		RecursiveLocker locker(gTTYRequestLock);
@@ -687,10 +687,10 @@ ReaderLocker::_CheckAvailableBytes() const
 {
 	// Reading from the slave with canonical input processing enabled means
 	// that we read at max until hitting a line end or EOF.
-	if (!fTTY->is_master && (fTTY->settings.termios.c_lflag & ICANON) != 0) {
+	if (!fTTY->is_master && (fTTY->settings->termios.c_lflag & ICANON) != 0) {
 		return line_buffer_readable_line(fTTY->input_buffer,
-			fTTY->settings.termios.c_cc[VEOL],
-			fTTY->settings.termios.c_cc[VEOF]);
+			fTTY->settings->termios.c_cc[VEOL],
+			fTTY->settings->termios.c_cc[VEOF]);
 	}
 
 	return line_buffer_readable(fTTY->input_buffer);
@@ -751,36 +751,36 @@ reset_tty_settings(tty_settings& settings)
 static void
 tty_input_putc_locked(struct tty* tty, int c)
 {
-	// process signals if needed
+	const termios& termios = tty->settings->termios;
 
-	if ((tty->settings.termios.c_lflag & ISIG) != 0) {
+	// process signals if needed
+	if ((termios.c_lflag & ISIG) != 0) {
 		// enable signals, process INTR, QUIT, and SUSP
 		int signal = -1;
 
-		if (c == tty->settings.termios.c_cc[VINTR])
+		if (c == termios.c_cc[VINTR])
 			signal = SIGINT;
-		else if (c == tty->settings.termios.c_cc[VQUIT])
+		else if (c == termios.c_cc[VQUIT])
 			signal = SIGQUIT;
-		else if (c == tty->settings.termios.c_cc[VSUSP])
+		else if (c == termios.c_cc[VSUSP])
 			signal = SIGTSTP;
 
 		// do we need to deliver a signal?
 		if (signal != -1) {
 			// we may have to flush the input buffer
-			if ((tty->settings.termios.c_lflag & NOFLSH) == 0)
+			if ((termios.c_lflag & NOFLSH) == 0)
 				clear_line_buffer(tty->input_buffer);
 
-			if (tty->settings.pgrp_id != 0)
-				send_signal(-tty->settings.pgrp_id, signal);
+			if (tty->settings->pgrp_id != 0)
+				send_signal(-tty->settings->pgrp_id, signal);
 			return;
 		}
 	}
 
 	// process special canonical input characters
-
-	if ((tty->settings.termios.c_lflag & ICANON) != 0) {
+	if ((termios.c_lflag & ICANON) != 0) {
 		// canonical mode, process ERASE and KILL
-		cc_t* controlChars = tty->settings.termios.c_cc;
+		const cc_t* controlChars = termios.c_cc;
 
 		if (c == controlChars[VERASE]) {
 			// erase one character
@@ -824,10 +824,10 @@ tty_input_putc_locked(struct tty* tty, int c)
 static int32
 tty_readable(struct tty* tty)
 {
-	if (!tty->is_master && (tty->settings.termios.c_lflag & ICANON) != 0) {
+	if (!tty->is_master && (tty->settings->termios.c_lflag & ICANON) != 0) {
 		return line_buffer_readable_line(tty->input_buffer,
-			tty->settings.termios.c_cc[VEOL],
-			tty->settings.termios.c_cc[VEOF]);
+			tty->settings->termios.c_cc[VEOL],
+			tty->settings->termios.c_cc[VEOF]);
 	}
 
 	return line_buffer_readable(tty->input_buffer);
@@ -906,13 +906,14 @@ static bool
 process_input_char(struct tty* tty, char c, char* buffer,
 	size_t* _bytesNeeded)
 {
-	tcflag_t flags = tty->settings.termios.c_iflag;
+	const termios& termios = tty->settings->termios;
+	tcflag_t flags = termios.c_iflag;
 
 	// signals
-	if (tty->settings.termios.c_lflag & ISIG) {
-		if (c == tty->settings.termios.c_cc[VINTR]
-			|| c == tty->settings.termios.c_cc[VQUIT]
-			|| c == tty->settings.termios.c_cc[VSUSP]) {
+	if (termios.c_lflag & ISIG) {
+		if (c == termios.c_cc[VINTR]
+			|| c == termios.c_cc[VQUIT]
+			|| c == termios.c_cc[VSUSP]) {
 			*buffer = c;
 			*_bytesNeeded = 0;
 			return true;
@@ -920,9 +921,9 @@ process_input_char(struct tty* tty, char c, char* buffer,
 	}
 
 	// canonical input characters
-	if (tty->settings.termios.c_lflag & ICANON) {
-		if (c == tty->settings.termios.c_cc[VERASE]
-			|| c == tty->settings.termios.c_cc[VKILL]) {
+	if (termios.c_lflag & ICANON) {
+		if (c == termios.c_cc[VERASE]
+			|| c == termios.c_cc[VKILL]) {
 			*buffer = c;
 			*_bytesNeeded = 0;
 			return true;
@@ -961,11 +962,12 @@ static void
 process_output_char(struct tty* tty, char c, char* buffer,
 	size_t* _bytesWritten, bool echoed)
 {
-	tcflag_t flags = tty->settings.termios.c_oflag;
+	const termios& termios = tty->settings->termios;
+	tcflag_t flags = termios.c_oflag;
 
 	if (flags & OPOST) {
-		if (echoed && c == tty->settings.termios.c_cc[VERASE]) {
-			if (tty->settings.termios.c_lflag & ECHOE) {
+		if (echoed && c == termios.c_cc[VERASE]) {
+			if (termios.c_lflag & ECHOE) {
 				// ERASE -> BS SPACE BS
 				buffer[0] = CTRL('H');
 				buffer[1] = ' ';
@@ -973,18 +975,18 @@ process_output_char(struct tty* tty, char c, char* buffer,
 				*_bytesWritten = 3;
 				return;
 			}
-		} else if (echoed && c == tty->settings.termios.c_cc[VKILL]) {
-			if (!(tty->settings.termios.c_lflag & ECHOK)) {
+		} else if (echoed && c == termios.c_cc[VKILL]) {
+			if (!(termios.c_lflag & ECHOK)) {
 				// don't echo KILL
 				*_bytesWritten = 0;
 				return;
 			}
-		} else if (echoed && c == tty->settings.termios.c_cc[VEOF]) {
+		} else if (echoed && c == termios.c_cc[VEOF]) {
 			// don't echo EOF
 			*_bytesWritten = 0;
 			return;
 		} else if (c == '\n') {
-			if (echoed && !(tty->settings.termios.c_lflag & ECHONL)) {
+			if (echoed && !(termios.c_lflag & ECHONL)) {
 				// don't echo NL
 				*_bytesWritten = 0;
 				return;
@@ -1040,7 +1042,7 @@ tty_write_to_tty_master_unsafe(tty_cookie* sourceCookie, const char* data,
 	if (target->open_count <= 0)
 		return B_FILE_ERROR;
 
-	bool echo = (source->settings.termios.c_lflag & ECHO) != 0;
+	bool echo = (source->settings->termios.c_lflag & ECHO) != 0;
 
 	TRACE(("tty_write_to_tty_master(source = %p, target = %p, "
 		"length = %lu%s)\n", source, target, length,
@@ -1282,14 +1284,20 @@ tty_create(tty_service_func func, struct tty* master)
 	if (master == NULL) {
 		tty->is_master = true;
 		tty->lock = new(std::nothrow) recursive_lock;
-		if (tty->lock == NULL) {
+		tty->settings = new(std::nothrow) tty_settings;
+		if (tty->lock == NULL || tty->settings == NULL) {
+			delete tty->lock;
+			delete tty->settings;
 			delete tty;
 			return NULL;
 		}
+
 		recursive_lock_init(tty->lock, "tty lock");
+		reset_tty_settings(*tty->settings);
 	} else {
 		tty->is_master = false;
 		tty->lock = master->lock;
+		tty->settings = master->settings;
 	}
 
 	tty->ref_count = 0;
@@ -1298,8 +1306,6 @@ tty_create(tty_service_func func, struct tty* master)
 	tty->select_pool = NULL;
 	tty->pending_eof = 0;
 	tty->hardware_bits = 0;
-
-	reset_tty_settings(tty->settings);
 
 	if (init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE) < B_OK) {
 		if (tty->is_master) {
@@ -1325,6 +1331,7 @@ tty_destroy(struct tty* tty)
 	if (tty->is_master) {
 		recursive_lock_destroy(tty->lock);
 		delete tty->lock;
+		delete tty->settings;
 	}
 
 	delete tty;
@@ -1501,12 +1508,12 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	ReaderLocker locker(cookie);
 
 	// handle raw mode
-	if ((!tty->is_master) && ((tty->settings.termios.c_lflag & ICANON) == 0)) {
+	if ((!tty->is_master) && ((tty->settings->termios.c_lflag & ICANON) == 0)) {
 		canon = false;
 		if (!dontBlock) {
 			// Non-blocking mode. Handle VMIN and VTIME.
-			bytesNeeded = tty->settings.termios.c_cc[VMIN];
-			bigtime_t vtime = tty->settings.termios.c_cc[VTIME] * 100000;
+			bytesNeeded = tty->settings->termios.c_cc[VMIN];
+			bigtime_t vtime = tty->settings->termios.c_cc[VTIME] * 100000;
 			TRACE(("tty_input_read: icanon vmin %lu, vtime %" B_PRIdBIGTIME
 				"us\n", bytesNeeded, vtime));
 
@@ -1547,7 +1554,7 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 		bool* hitEOF = canon && tty->pending_eof > 0 ? &_hitEOF : NULL;
 
 		ssize_t bytesRead = line_buffer_user_read(tty->input_buffer, buffer,
-			toRead, tty->settings.termios.c_cc[VEOF], hitEOF);
+			toRead, tty->settings->termios.c_cc[VEOF], hitEOF);
 		if (bytesRead < 0) {
 			status = bytesRead;
 			break;
@@ -1622,7 +1629,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 		case TCGETA:
 			TRACE(("tty: get attributes\n"));
-			return user_memcpy(buffer, &tty->settings.termios,
+			return user_memcpy(buffer, &tty->settings->termios,
 				sizeof(struct termios));
 
 		case TCSETA:
@@ -1631,16 +1638,16 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		{
 			TRACE(("tty: set attributes (iflag = %" B_PRIx32 ", oflag = %"
 				B_PRIx32 ", cflag = %" B_PRIx32 ", lflag = %" B_PRIx32 ")\n",
-				tty->settings.termios.c_iflag, tty->settings.termios.c_oflag,
-				tty->settings.termios.c_cflag,
-				tty->settings.termios.c_lflag));
+				tty->settings->termios.c_iflag, tty->settings->termios.c_oflag,
+				tty->settings->termios.c_cflag,
+				tty->settings->termios.c_lflag));
 
-			status_t status = user_memcpy(&tty->settings.termios, buffer,
+			status_t status = user_memcpy(&tty->settings->termios, buffer,
 				sizeof(struct termios));
 			if (status != B_OK)
 				return status;
 
-			tty->service_func(tty, TTYSETMODES, &tty->settings.termios,
+			tty->service_func(tty, TTYSETMODES, &tty->settings->termios,
 				sizeof(struct termios));
 			return status;
 		}
@@ -1649,25 +1656,25 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 		case TIOCGWINSZ:
 			TRACE(("tty: get window size\n"));
-			return user_memcpy(buffer, &tty->settings.window_size,
+			return user_memcpy(buffer, &tty->settings->window_size,
 				sizeof(struct winsize));
 
 		case TIOCSWINSZ:
 		{
-			uint16 oldColumns = tty->settings.window_size.ws_col;
-			uint16 oldRows = tty->settings.window_size.ws_row;
+			uint16 oldColumns = tty->settings->window_size.ws_col;
+			uint16 oldRows = tty->settings->window_size.ws_row;
 
 			TRACE(("tty: set window size\n"));
-			if (user_memcpy(&tty->settings.window_size, buffer,
+			if (user_memcpy(&tty->settings->window_size, buffer,
 					sizeof(struct winsize)) < B_OK) {
 				return B_BAD_ADDRESS;
 			}
 
 			// send a signal only if the window size has changed
-			if ((oldColumns != tty->settings.window_size.ws_col
-					|| oldRows != tty->settings.window_size.ws_row)
-				&& tty->settings.pgrp_id != 0) {
-				send_signal(-tty->settings.pgrp_id, SIGWINCH);
+			if ((oldColumns != tty->settings->window_size.ws_col
+					|| oldRows != tty->settings->window_size.ws_row)
+				&& tty->settings->pgrp_id != 0) {
+				send_signal(-tty->settings->pgrp_id, SIGWINCH);
 			}
 
 			return B_OK;
@@ -1855,7 +1862,7 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 			// In case input is echoed, we have to check, whether we can
 			// currently can write to our TTY as well.
 			bool echo = (tty->is_master
-				&& tty->settings.termios.c_lflag & ECHO);
+				&& tty->settings->termios.c_lflag & ECHO);
 
 			if (otherTTY->writer_queue.IsEmpty()
 				&& line_buffer_writable(otherTTY->input_buffer) > 0) {

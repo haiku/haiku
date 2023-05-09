@@ -64,7 +64,7 @@ dump_tty_struct(struct tty& tty)
 	kprintf("  writer queue:\n");
 	tty.writer_queue.Dump("    ");
 
-	dump_tty_settings(tty.settings);
+	dump_tty_settings(*tty.settings);
 
 	kprintf("  cookies:     ");
 	TTYCookieList::Iterator it = tty.cookies.GetIterator();
