@@ -161,7 +161,7 @@ SerialDevice::SetModes(struct termios *tios)
 		// disable
 		MaskReg8(MCR, MCR_DTR);
 	} else {
-		// set FCR now, 
+		// set FCR now,
 		// 16650 and later chips have another reg at 2 when DLAB=1
 		uint8 fcr = FCR_ENABLE | FCR_RX_RST | FCR_TX_RST | FCR_F_8 | FCR_F64EN;
 		// enable fifo
@@ -283,7 +283,7 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 			SignalControlLineState(TTYHWCTS, msr & MSR_CTS);
 
 			if (enable) {
-				// 
+				//
 				WriteReg8(MCR, MCR_DTR | MCR_RTS | MCR_IRQ_EN /*| MCR_LOOP*//*XXXXXXX*/);
 				// enable irqs
 				fCachedIER = IER_RLS | IER_MS | IER_RDA;
@@ -424,7 +424,7 @@ SerialDevice::InterruptHandler()
 		size_t readable = 0;
 		size_t fifoavail = 1;
 		size_t i;
-		
+
 		//DEBUG
 //		for (int count = 0; ReadReg8(LSR) & LSR_DR; count++)
 //			gTTYModule->ttyin(&fTTY, &fRover, ReadReg8(RBR));
@@ -545,36 +545,34 @@ SerialDevice::Open(uint32 flags)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	fMasterTTY = gTTYModule->tty_create(pc_serial_service, NULL);
-	if (fMasterTTY == NULL) {
+	status = gTTYModule->tty_create(pc_serial_service, NULL, &fMasterTTY);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init master tty\n");
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	fSlaveTTY = gTTYModule->tty_create(pc_serial_service, fMasterTTY);
-	if (fSlaveTTY == NULL) {
+	status = gTTYModule->tty_create(pc_serial_service, fMasterTTY, &fSlaveTTY);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init slave tty\n");
 		gTTYModule->tty_destroy(fMasterTTY);
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	fSystemTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY,
-		O_RDWR);
-	if (fSystemTTYCookie == NULL) {
+	status = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY, O_RDWR, &fSystemTTYCookie);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init system tty cookie\n");
 		gTTYModule->tty_destroy(fMasterTTY);
 		gTTYModule->tty_destroy(fSlaveTTY);
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	fDeviceTTYCookie = gTTYModule->tty_create_cookie(fSlaveTTY, fMasterTTY,
-		O_RDWR);
-	if (fDeviceTTYCookie == NULL) {
+	status = gTTYModule->tty_create_cookie(fSlaveTTY, fMasterTTY, O_RDWR, &fDeviceTTYCookie);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init device tty cookie\n");
 		gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 		gTTYModule->tty_destroy(fMasterTTY);
 		gTTYModule->tty_destroy(fSlaveTTY);
-		return B_NO_MEMORY;
+		return status;
 	}
 
 	ResetDevice();

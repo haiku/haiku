@@ -287,42 +287,42 @@ SerialDevice::Service(struct tty *tty, uint32 op, void *buffer, size_t length)
 status_t
 SerialDevice::Open(uint32 flags)
 {
+	status_t status = B_OK;
+
 	if (fDeviceOpen)
 		return B_BUSY;
 
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	fMasterTTY = gTTYModule->tty_create(usb_serial_service, NULL);
-	if (fMasterTTY == NULL) {
+	status = gTTYModule->tty_create(usb_serial_service, NULL, &fMasterTTY);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init master tty\n");
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	fSlaveTTY = gTTYModule->tty_create(usb_serial_service, fMasterTTY);
-	if (fSlaveTTY == NULL) {
+	status = gTTYModule->tty_create(usb_serial_service, fMasterTTY, &fSlaveTTY);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init slave tty\n");
 		gTTYModule->tty_destroy(fMasterTTY);
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	fSystemTTYCookie = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY,
-		O_RDWR);
-	if (fSystemTTYCookie == NULL) {
+	status = gTTYModule->tty_create_cookie(fMasterTTY, fSlaveTTY, O_RDWR, &fSystemTTYCookie);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init system tty cookie\n");
 		gTTYModule->tty_destroy(fMasterTTY);
 		gTTYModule->tty_destroy(fSlaveTTY);
-		return B_NO_MEMORY;
+		return status;
 	}
 
-	fDeviceTTYCookie = gTTYModule->tty_create_cookie(fSlaveTTY, fMasterTTY,
-		O_RDWR);
-	if (fDeviceTTYCookie == NULL) {
+	status = gTTYModule->tty_create_cookie(fSlaveTTY, fMasterTTY, O_RDWR, &fDeviceTTYCookie);
+	if (status != B_OK) {
 		TRACE_ALWAYS("open: failed to init device tty cookie\n");
 		gTTYModule->tty_destroy_cookie(fSystemTTYCookie);
 		gTTYModule->tty_destroy(fMasterTTY);
 		gTTYModule->tty_destroy(fSlaveTTY);
-		return B_NO_MEMORY;
+		return status;
 	}
 
 	ResetDevice();
@@ -342,9 +342,8 @@ SerialDevice::Open(uint32 flags)
 		| USB_CDC_CONTROL_SIGNAL_STATE_RTS;
 	SetControlLineState(fControlOut);
 
-	status_t status = gUSBModule->queue_interrupt(fControlPipe,
-		fInterruptBuffer, fInterruptBufferSize, _InterruptCallbackFunction,
-		this);
+	status = gUSBModule->queue_interrupt(fControlPipe, fInterruptBuffer, fInterruptBufferSize,
+		_InterruptCallbackFunction, this);
 	if (status < B_OK)
 		TRACE_ALWAYS("failed to queue initial interrupt\n");
 

@@ -222,21 +222,23 @@ master_open(const char *name, uint32 flags, void **_cookie)
 		return B_BUSY;
 	}
 
+	status_t status = B_OK;
+
 	if (gMasterTTYs[index] == NULL) {
-		gMasterTTYs[index] = gTTYModule->tty_create(master_service, NULL);
-		if (gMasterTTYs[index] == NULL)
-			return B_NO_MEMORY;
+		status = gTTYModule->tty_create(master_service, NULL, &gMasterTTYs[index]);
+		if (status != B_OK)
+			return status;
 	}
 	if (gSlaveTTYs[index] == NULL) {
-		gSlaveTTYs[index] = gTTYModule->tty_create(slave_service, gMasterTTYs[index]);
-		if (gSlaveTTYs[index] == NULL)
-			return B_NO_MEMORY;
+		status = gTTYModule->tty_create(slave_service, gMasterTTYs[index], &gSlaveTTYs[index]);
+		if (status != B_OK)
+			return status;
 	}
 
-	tty_cookie *cookie = gTTYModule->tty_create_cookie(gMasterTTYs[index],
-		gSlaveTTYs[index], flags);
-	if (cookie == NULL)
-		return B_NO_MEMORY;
+	tty_cookie *cookie;
+	status = gTTYModule->tty_create_cookie(gMasterTTYs[index], gSlaveTTYs[index], flags, &cookie);
+	if (status != B_OK)
+		return status;
 
 	*_cookie = cookie;
 	return B_OK;
@@ -301,12 +303,11 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 		gSlaveTTYs[index]->settings->pgrp_id = -1;
 	}
 
-	tty_cookie *cookie = gTTYModule->tty_create_cookie(gSlaveTTYs[index],
-		gMasterTTYs[index], flags);
-	if (cookie == NULL) {
-		gSlaveTTYs[index] = NULL;
-		return B_NO_MEMORY;
-	}
+	tty_cookie *cookie;
+	status_t status = gTTYModule->tty_create_cookie(gSlaveTTYs[index], gMasterTTYs[index], flags,
+		&cookie);
+	if (status != B_OK)
+		return status;
 
 	if (makeControllingTTY) {
 		gSlaveTTYs[index]->settings->session_id = sessionID;

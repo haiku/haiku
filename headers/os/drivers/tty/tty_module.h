@@ -46,12 +46,12 @@ typedef struct tty_module_info tty_module_info;
 struct tty_module_info {
 	module_info	mi;
 
-	struct tty *(*tty_create)(tty_service_func serviceFunction, struct tty* master);
+	status_t	(*tty_create)(tty_service_func serviceFunction, struct tty *master,
+					struct tty **tty);
 	void		(*tty_destroy)(struct tty *tty);
 
-	struct tty_cookie *
-				(*tty_create_cookie)(struct tty *masterTTY, struct tty *slaveTTY,
-					uint32 openMode);
+	status_t	(*tty_create_cookie)(struct tty *masterTTY, struct tty *slaveTTY,
+					uint32 openMode, struct tty_cookie **cookie);
 	void		(*tty_close_cookie)(struct tty_cookie *cookie);
 	void		(*tty_destroy_cookie)(struct tty_cookie *cookie);
 

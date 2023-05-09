@@ -1324,12 +1324,12 @@ tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
 // #pragma mark - public API
 
 
-struct tty*
-tty_create(tty_service_func func, struct tty* master)
+status_t
+tty_create(tty_service_func func, struct tty* master, struct tty** _tty)
 {
 	struct tty* tty = new(std::nothrow) (struct tty);
 	if (tty == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
 	if (master == NULL) {
 		tty->is_master = true;
@@ -1339,7 +1339,7 @@ tty_create(tty_service_func func, struct tty* master)
 			delete tty->lock;
 			delete tty->settings;
 			delete tty;
-			return NULL;
+			return B_NO_MEMORY;
 		}
 
 		recursive_lock_init(tty->lock, "tty lock");
@@ -1356,19 +1356,24 @@ tty_create(tty_service_func func, struct tty* master)
 	tty->select_pool = NULL;
 	tty->pending_eof = 0;
 	tty->hardware_bits = 0;
+	tty->is_exclusive = false;
 
-	if (init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE) < B_OK) {
+	status_t status = init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE);
+
+	if (status < B_OK) {
 		if (tty->is_master) {
 			recursive_lock_destroy(tty->lock);
 			delete tty->lock;
 		}
 		delete tty;
-		return NULL;
+		return status;
 	}
 
 	tty->service_func = func;
 
-	return tty;
+	*_tty = tty;
+
+	return B_OK;
 }
 
 
@@ -1388,17 +1393,18 @@ tty_destroy(struct tty* tty)
 }
 
 
-tty_cookie*
-tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
+status_t
+tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode, tty_cookie** _cookie)
 {
 	tty_cookie* cookie = new(std::nothrow) tty_cookie;
 	if (cookie == NULL)
-		return NULL;
+		return B_NO_MEMORY;
 
 	cookie->blocking_semaphore = create_sem(0, "wait for tty close");
 	if (cookie->blocking_semaphore < 0) {
+		status_t status = cookie->blocking_semaphore;
 		delete cookie;
-		return NULL;
+		return status;
 	}
 
 	cookie->tty = tty;
@@ -1410,13 +1416,21 @@ tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
 
 	RecursiveLocker locker(cookie->tty->lock);
 
+	if (tty->is_exclusive && geteuid() != 0) {
+		delete_sem(cookie->blocking_semaphore);
+		delete cookie;
+		return B_BUSY;
+	}
+
 	// add to the TTY's cookie list
 	tty->cookies.Add(cookie);
 	tty->open_count++;
 	tty->ref_count++;
 	tty->opened_count++;
 
-	return cookie;
+	*_cookie = cookie;
+
+	return B_OK;
 }
 
 
@@ -1513,6 +1527,8 @@ tty_close_cookie(tty_cookie* cookie)
 		// notify a select write event on the other tty, if we've closed this tty
 		if (cookie->other_tty->open_count > 0)
 			tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
+
+		cookie->tty->is_exclusive = false;
 	}
 }
 
@@ -1943,6 +1959,18 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 				return B_OK;
 
 			return B_ERROR;
+		}
+
+		case TIOCEXCL:
+		{
+			tty->is_exclusive = true;
+			return B_OK;
+		}
+
+		case TIOCNXCL:
+		{
+			tty->is_exclusive = false;
+			return B_OK;
 		}
 	}
 

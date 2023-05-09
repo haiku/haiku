@@ -140,17 +140,19 @@ struct tty {
 	recursive_lock*		lock;
 	tty_settings*		settings;
 	uint8				hardware_bits;
+	bool				is_exclusive;
 };
 
 
 extern struct mutex gTTYCookieLock;
 extern struct recursive_lock gTTYRequestLock;
 
-extern struct tty *tty_create(tty_service_func func, struct tty* masterTTY);
+extern status_t tty_create(tty_service_func func, struct tty *masterTTY,
+	struct tty **tty);
 extern void tty_destroy(struct tty *tty);
 
-extern tty_cookie *tty_create_cookie(struct tty *tty, struct tty *otherTTY,
-	uint32 openMode);
+extern status_t tty_create_cookie(struct tty *tty, struct tty *otherTTY,
+	uint32 openMode, struct tty_cookie **cookie);
 extern void tty_destroy_cookie(tty_cookie *cookie);
 extern void tty_close_cookie(tty_cookie *cookie);
 
