@@ -115,6 +115,7 @@ public:
 
 private:
 			size_t				_CheckAvailableBytes() const;
+			status_t			_CheckBackgroundWrite() const;
 
 			struct tty*			fSource;
 			struct tty*			fTarget;
@@ -133,6 +134,7 @@ public:
 
 private:
 			size_t				_CheckAvailableBytes() const;
+			status_t			_CheckBackgroundRead() const;
 
 			struct tty*			fTTY;
 			RequestOwner		fRequestOwner;
@@ -599,9 +601,32 @@ WriterLocker::AcquireWriter(bool dontBlock, size_t bytesNeeded)
 	}
 
 	if (status == B_OK)
+		status = _CheckBackgroundWrite();
+
+	if (status == B_OK)
 		fBytes = _CheckAvailableBytes();
 
 	return status;
+}
+
+
+status_t
+WriterLocker::_CheckBackgroundWrite() const
+{
+	// only relevant for the slave end and only when TOSTOP is set
+	if (fSource->is_master
+		|| (fSource->settings->termios.c_lflag & TOSTOP) == 0) {
+		return B_OK;
+	}
+
+	pid_t processGroup = getpgid(0);
+	if (fSource->settings->pgrp_id != 0
+			&& processGroup != fSource->settings->pgrp_id) {
+		if (team_get_controlling_tty() == fSource)
+			send_signal(-processGroup, SIGTTOU);
+	}
+
+	return B_OK;
 }
 
 
@@ -646,6 +671,10 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t bytesNeeded)
 	if (fCookie->closed)
 		return B_FILE_ERROR;
 
+	status_t status = _CheckBackgroundRead();
+	if (status != B_OK)
+		return status;
+
 	// check, if we're first in queue, and if there is something to read
 	if (fRequestOwner.IsFirstInQueues()) {
 		fBytes = _CheckAvailableBytes();
@@ -670,8 +699,11 @@ ReaderLocker::AcquireReader(bigtime_t timeout, size_t bytesNeeded)
 
 	// block until something happens
 	Unlock();
-	status_t status = fRequestOwner.Wait(true, timeout);
+	status = fRequestOwner.Wait(true, timeout);
 	Lock();
+
+	if (status == B_OK)
+		status = _CheckBackgroundRead();
 
 	fBytes = _CheckAvailableBytes();
 
@@ -694,6 +726,24 @@ ReaderLocker::_CheckAvailableBytes() const
 	}
 
 	return line_buffer_readable(fTTY->input_buffer);
+}
+
+
+status_t
+ReaderLocker::_CheckBackgroundRead() const
+{
+	// only relevant for the slave end
+	if (fTTY->is_master)
+		return B_OK;
+
+	pid_t processGroup = getpgid(0);
+	if (fTTY->settings->pgrp_id != 0
+			&& processGroup != fTTY->settings->pgrp_id) {
+		if (team_get_controlling_tty() == fTTY)
+			send_signal(-processGroup, SIGTTIN);
+	}
+
+	return B_OK;
 }
 
 
@@ -1650,6 +1700,53 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			tty->service_func(tty, TTYSETMODES, &tty->settings->termios,
 				sizeof(struct termios));
 			return status;
+		}
+
+		// get and set process group ID
+
+		case TIOCGPGRP:
+			TRACE(("tty: get pgrp_id\n"));
+			return user_memcpy(buffer, &tty->settings->pgrp_id, sizeof(pid_t));
+
+		case TIOCSPGRP:
+		{
+			TRACE(("tty: set pgrp_id\n"));
+			pid_t groupID;
+
+			if (user_memcpy(&groupID, buffer, sizeof(pid_t)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			status_t error = team_set_foreground_process_group(tty,
+				groupID);
+			if (error == B_OK)
+				tty->settings->pgrp_id = groupID;
+			return error;
+		}
+
+		// become controlling TTY
+		case TIOCSCTTY:
+		{
+			TRACE(("tty: become controlling tty\n"));
+			pid_t processID = getpid();
+			pid_t sessionID = getsid(processID);
+			// Only session leaders can become controlling tty
+			if (processID != sessionID)
+				return B_NOT_ALLOWED;
+			// Check if already controlling tty
+			if (team_get_controlling_tty() == tty)
+				return B_OK;
+			tty->settings->session_id = sessionID;
+			tty->settings->pgrp_id = sessionID;
+			team_set_controlling_tty(tty);
+			return B_OK;
+		}
+
+		// get session leader process group ID
+		case TIOCGSID:
+		{
+			TRACE(("tty: get session_id\n"));
+			return user_memcpy(buffer, &tty->settings->session_id,
+				sizeof(pid_t));
 		}
 
 		// get and set window size

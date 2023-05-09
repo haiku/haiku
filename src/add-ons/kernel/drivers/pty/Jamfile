@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel drivers pty ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel generic tty ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers tty ] : true ;
+
+KernelAddon <driver>tty :
+	driver.cpp
+;

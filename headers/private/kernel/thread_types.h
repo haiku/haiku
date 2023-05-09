@@ -638,8 +638,7 @@ private:
 
 struct ProcessSession : BReferenceable {
 	pid_t				id;
-	int32				controlling_tty;	// index of the controlling tty,
-											// -1 if none
+	void*				controlling_tty;
 	pid_t				foreground_group;
 
 public:

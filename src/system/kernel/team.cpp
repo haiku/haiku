@@ -1117,7 +1117,7 @@ ProcessGroup::UnsetOrphanedCheck()
 ProcessSession::ProcessSession(pid_t id)
 	:
 	id(id),
-	controlling_tty(-1),
+	controlling_tty(NULL),
 	foreground_group(-1)
 {
 	char lockName[32];
@@ -2988,7 +2988,7 @@ team_get_team_struct_locked(team_id id)
 
 
 void
-team_set_controlling_tty(int32 ttyIndex)
+team_set_controlling_tty(void* tty)
 {
 	// lock the team, so its session won't change while we're playing with it
 	Team* team = thread_get_current_thread()->team;
@@ -2999,12 +2999,12 @@ team_set_controlling_tty(int32 ttyIndex)
 	AutoLocker<ProcessSession> sessionLocker(session);
 
 	// set the session's fields
-	session->controlling_tty = ttyIndex;
+	session->controlling_tty = tty;
 	session->foreground_group = -1;
 }
 
 
-int32
+void*
 team_get_controlling_tty()
 {
 	// lock the team, so its session won't change while we're playing with it
@@ -3021,7 +3021,7 @@ team_get_controlling_tty()
 
 
 status_t
-team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
+team_set_foreground_process_group(void* tty, pid_t processGroupID)
 {
 	// lock the team, so its session won't change while we're playing with it
 	Thread* thread = thread_get_current_thread();
@@ -3033,7 +3033,7 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 	AutoLocker<ProcessSession> sessionLocker(session);
 
 	// check given TTY -- must be the controlling tty of the calling process
-	if (session->controlling_tty != ttyIndex)
+	if (session->controlling_tty != tty)
 		return ENOTTY;
 
 	// check given process group -- must belong to our session
@@ -3121,14 +3121,14 @@ team_remove_team(Team* team, pid_t& _signalGroup)
 	_signalGroup = -1;
 	bool isSessionLeader = false;
 	if (team->session_id == team->id
-		&& team->group->Session()->controlling_tty >= 0) {
+		&& team->group->Session()->controlling_tty != NULL) {
 		isSessionLeader = true;
 
 		ProcessSession* session = team->group->Session();
 
 		AutoLocker<ProcessSession> sessionLocker(session);
 
-		session->controlling_tty = -1;
+		session->controlling_tty = NULL;
 		_signalGroup = session->foreground_group;
 	}
 
