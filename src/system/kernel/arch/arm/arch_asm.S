@@ -20,20 +20,6 @@
 .text
 
 
-/* int arm_get_sctlr(void); */
-FUNCTION(arm_get_sctlr):
-	mrc	p15, 0, r0, c1, c0, 0
-	bx	lr
-FUNCTION_END(arm_get_sctlr)
-
-
-/* void arm_set_sctlr(int val); */
-FUNCTION(arm_set_sctlr):
-	mcr	p15, 0, r0, c1, c0, 0
-	bx	lr
-FUNCTION_END(arm_set_sctlr)
-
-
 /* NOTE: the I bit in cpsr (bit 7) is *set* to disable... */
 
 
@@ -106,41 +92,6 @@ FUNCTION(arm_restore_fpu):
 	vmsr		fpscr, r1
 	bx			lr
 FUNCTION_END(arm_restore_fpu)
-
-
-/* uint32 arm_get_dfsr(void); */
-FUNCTION(arm_get_dfsr):
-	mrc	p15, 0, r0, c5, c0, 0		@ get DFSR
-	bx	lr
-FUNCTION_END(arm_get_dfsr)
-
-
-/* uint32 arm_get_ifsr(void) */
-FUNCTION(arm_get_ifsr):
-	mrc p15, 0, r0, c5, c0, 1		@ get IFSR
-	bx	lr
-FUNCTION_END(arm_get_ifsr)
-
-
-/* addr_t arm_get_dfar(void); */
-FUNCTION(arm_get_dfar):
-	mrc	p15, 0, r0, c6, c0, 0		@ get DFAR
-	bx	lr
-FUNCTION_END(arm_get_dfar)
-
-
-/* addr_t arm_get_ifar(void) */
-FUNCTION(arm_get_ifar):
-	MRC p15, 0, r0, c6, c0, 2		@ get IFAR
-	bx	lr
-FUNCTION_END(arm_get_ifar)
-
-
-/* addr_t arm_get_fp(void); */
-FUNCTION(arm_get_fp):
-	mov	r0, fp				@ get framepointer
-	bx	lr
-FUNCTION_END(arm_get_fp);
 
 
 /* status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler) */
