@@ -188,6 +188,7 @@ struct termios {
 #define TIOCMBIS			(TCGETA + 22)	/* set bits in line state */
 #define TIOCMBIC			(TCGETA + 23)	/* clear bits in line state */
 #define	TIOCGSID			(TCGETA + 24)	/* get session leader process group ID */
+#define TIOCOUTQ			(TCGETA + 25)	/* get output queue size */
 
 /* Event codes.  Returned from TCWAITEVENT */
 #define EV_RING			0x0001
