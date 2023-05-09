@@ -167,21 +167,21 @@ struct termios {
 #define TCSETA				(TCGETA + 1)
 #define TCSETAF				(TCGETA + 2)
 #define TCSETAW				(TCGETA + 3)
-#define TCWAITEVENT			(TCGETA + 4)
+/* TCWAITEVENT				(TCGETA + 4) */
 #define TCSBRK				(TCGETA + 5)
 #define TCFLSH				(TCGETA + 6)
 #define TCXONC				(TCGETA + 7)
-#define TCQUERYCONNECTED	(TCGETA + 8)
-#define TCGETBITS			(TCGETA + 9)
+/* TCQUERYCONNECTED			(TCGETA + 8) */
+#define TCGETBITS			(TCGETA + 9)	/* same as TIOCMGET */
 #define	TCSETDTR			(TCGETA + 10)
 #define TCSETRTS			(TCGETA + 11)
 #define TIOCGWINSZ			(TCGETA + 12)	/* pass in a struct winsize */
 #define TIOCSWINSZ			(TCGETA + 13)	/* pass in a struct winsize */
-#define TCVTIME				(TCGETA + 14)	/* pass in bigtime_t, old value saved */
+/* TCVTIME					(TCGETA + 14) */
 #define TIOCGPGRP			(TCGETA + 15)	/* Gets the process group ID of the TTY device */
 #define TIOCSPGRP			(TCGETA + 16)	/* Sets the process group ID ('pgid' in BeOS) */
 #define TIOCSCTTY			(TCGETA + 17)	/* Become controlling TTY */
-#define TIOCMGET			(TCGETA + 18)	/* get line state, like TCGETBITS */
+#define TIOCMGET			(TCGETA + 18)	/* get line state */
 #define TIOCMSET			(TCGETA + 19)	/* does TCSETDTR/TCSETRTS */
 #define TIOCSBRK			(TCGETA + 20)	/* set txd pin */
 #define TIOCCBRK			(TCGETA + 21)	/* both are a frontend to TCSBRK */
@@ -191,12 +191,6 @@ struct termios {
 #define TIOCOUTQ			(TCGETA + 25)	/* get output queue size */
 #define TIOCEXCL			(TCGETA + 26)	/* set exclusive use of tty */
 #define TIOCNXCL			(TCGETA + 27)	/* clear exclusive use of tty */
-
-/* Event codes.  Returned from TCWAITEVENT */
-#define EV_RING			0x0001
-#define EV_BREAK		0x0002
-#define EV_CARRIER		0x0004
-#define EV_CARRIERLOST	0x0008
 
 /* for TIOCGWINSZ */
 struct winsize {
