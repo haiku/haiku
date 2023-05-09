@@ -212,8 +212,9 @@ struct winsize {
 /* Bits for the TIOCMGET / TIOCMSET control */
 #define TIOCM_CTS		TCGB_CTS	/* clear to send */
 #define TIOCM_CD		TCGB_DCD	/* carrier detect */
-#define TIOCM_CAR		TIOCM_CD
+#define TIOCM_CAR		TCGB_DCD
 #define TIOCM_RI		TCGB_RI		/* ring indicator */
+#define TIOCM_RNG		TCGB_RI
 #define TIOCM_DSR		TCGB_DSR	/* dataset ready */
 #define TIOCM_DTR		0x10		/* data terminal ready */
 #define TIOCM_RTS		0x20		/* request to send */
