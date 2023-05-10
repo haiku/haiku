@@ -88,7 +88,7 @@ _pl1_entry:
 
 	// enable MMU and caches
 	mrc		p15, 0, r9, c1, c0, 0
-	bic		r9, r9, #0x20000000		// access flag disabled
+	orr		r9, r9, #0x20000000		// access flag enabled
 	bic		r9, r9, #0x10000000		// TEX remap disabled
 	orr		r9, r9, #0x00001000		// i-cache enabled
 	orr		r9, r9, #0x00000004		// d-cache enabled
