@@ -146,25 +146,20 @@ ARMPagingMethod32Bit::ClearPageTableEntryFlags(page_table_entry* entry, uint32 f
 /*static*/ inline uint32
 ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(uint32 attributes)
 {
-	int apFlags = 0;
+	int apFlags;
 
-	if ((attributes & B_WRITE_AREA) != 0) {
-		// kernel rw user rw
-		apFlags = ARM_MMU_L2_FLAG_AP1 | ARM_MMU_L2_FLAG_AP0;
-	} else if ((attributes & B_READ_AREA) != 0) {
-		if ((attributes & B_KERNEL_WRITE_AREA) != 0) {
-			// kernel rw user ro
-			apFlags = ARM_MMU_L2_FLAG_AP1;
-		} else {
-			// kernel ro user ro
-			apFlags = ARM_MMU_L2_FLAG_AP2 | ARM_MMU_L2_FLAG_AP1;
+	if ((attributes & B_READ_AREA) != 0) {
+		// user accessible
+		apFlags = ARM_MMU_L2_FLAG_AP1;
+		if ((attributes & B_WRITE_AREA) == 0) {
+			apFlags |= ARM_MMU_L2_FLAG_AP2;
 		}
-	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0) {
-		// kernel rw
-		apFlags = ARM_MMU_L2_FLAG_AP0;
-	} else {
+	} else if ((attributes & B_KERNEL_WRITE_AREA) == 0) {
 		// kernel ro
-		apFlags = ARM_MMU_L2_FLAG_AP2 | ARM_MMU_L2_FLAG_AP0;
+		apFlags = ARM_MMU_L2_FLAG_AP2;
+	} else {
+		// kernel rw
+		apFlags = 0;
 	}
 
 	if (((attributes & B_KERNEL_EXECUTE_AREA) == 0) &&
@@ -183,23 +178,15 @@ ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(uint32 pageTableEntry)
 
 	if ((pageTableEntry & ARM_MMU_L2_FLAG_AP2) == 0) {
 		if ((pageTableEntry & ARM_MMU_L2_FLAG_AP1) != 0) {
-			if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
-				attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA;
-			else
-				attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA;
+			attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA;
 		} else {
-			if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
-				attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
-			else
-				attributes = 0;
+			attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 		}
 	} else {
 		if ((pageTableEntry & ARM_MMU_L2_FLAG_AP1) != 0)
 			attributes = B_KERNEL_READ_AREA | B_READ_AREA;
-		else if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
-			attributes = B_KERNEL_READ_AREA;
 		else
-			attributes = 0;
+			attributes = B_KERNEL_READ_AREA;
 	}
 
 	if ((pageTableEntry & ARM_MMU_L2_FLAG_XN) == 0) {

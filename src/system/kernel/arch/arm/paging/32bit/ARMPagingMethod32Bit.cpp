@@ -510,6 +510,7 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 		| ARM_MMU_L2_TYPE_SMALLNEW
 		| MemoryTypeToPageTableEntryFlags(memoryType)
 		| AttributesToPageTableEntryFlags(attributes)
+		| ARM_MMU_L2_FLAG_AP0
 		| (globalPage ? 0 : ARM_MMU_L2_FLAG_NG);
 
 	// put it in the page table
