@@ -48,6 +48,8 @@ struct ARMVMTranslationMap32Bit : ARMVMTranslationMap {
 	virtual	status_t			Protect(addr_t base, addr_t top,
 									uint32 attributes, uint32 memoryType);
 
+	virtual status_t			SetFlags(addr_t virtualAddress, uint32 flags);
+
 	virtual	status_t			ClearFlags(addr_t virtualAddress,
 									uint32 flags);
 

@@ -38,6 +38,8 @@ struct ARMVMTranslationMap : VMTranslationMap {
 
 	inline	void				InvalidatePage(addr_t address);
 
+	virtual	status_t			SetFlags(addr_t virtualAddress, uint32 flags) = 0;
+
 protected:
 			TranslationMapPhysicalPageMapper* fPageMapper;
 			int					fInvalidPagesCount;

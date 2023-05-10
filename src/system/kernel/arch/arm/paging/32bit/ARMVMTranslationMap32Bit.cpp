@@ -759,6 +759,33 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 
 
 status_t
+ARMVMTranslationMap32Bit::SetFlags(addr_t virtualAddress, uint32 flags)
+{
+	int index = VADDR_TO_PDENT(virtualAddress);
+	page_directory_entry* pd = fPagingStructures->pgdir_virt;
+	if ((pd[index] & ARM_PDE_TYPE_MASK) == 0) {
+		// no pagetable here
+		return B_OK;
+	}
+
+	uint32 flagsToSet = (flags & PAGE_ACCESSED) ? ARM_MMU_L2_FLAG_AP0 : 0;
+
+	page_table_entry* pt = (page_table_entry*)ARMPagingMethod32Bit::Method()
+		->PhysicalPageMapper()->InterruptGetPageTableAt(
+			pd[index] & ARM_PDE_ADDRESS_MASK);
+	index = VADDR_TO_PTENT(virtualAddress);
+
+	ARMPagingMethod32Bit::SetPageTableEntryFlags(&pt[index], flagsToSet);
+
+	// No need to flush TLB as we currently handle only accessed flag.
+	// TLB flush will be needed once modified flag is implemented.
+	//InvalidatePage(virtualAddress);
+
+	return B_OK;
+}
+
+
+status_t
 ARMVMTranslationMap32Bit::ClearFlags(addr_t va, uint32 flags)
 {
 	int index = VADDR_TO_PDENT(va);

@@ -26,6 +26,7 @@
 #include <syscall_numbers.h>
 #include <thread.h>
 #include <timer.h>
+#include <AutoDeleterDrivers.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
@@ -42,6 +43,8 @@
 #include "soc_pxa.h"
 #include "soc_omap3.h"
 #include "soc_sun4i.h"
+
+#include "ARMVMTranslationMap.h"
 
 //#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
@@ -308,9 +311,45 @@ arch_arm_syscall(struct iframe *iframe)
 }
 
 
+static bool
+arch_arm_handle_access_flag_fault(addr_t far, uint32 fsr, bool isWrite, bool isExec)
+{
+	VMAddressSpacePutter addressSpace;
+	if (IS_KERNEL_ADDRESS(far))
+		addressSpace.SetTo(VMAddressSpace::GetKernel());
+	else if (IS_USER_ADDRESS(far))
+		addressSpace.SetTo(VMAddressSpace::GetCurrent());
+
+	if (!addressSpace.IsSet())
+		return false;
+
+	ARMVMTranslationMap *map = (ARMVMTranslationMap *)addressSpace->TranslationMap();
+
+	if ((fsr & 0x060f) == FSR_FS_ACCESS_FLAG_FAULT) {
+		phys_addr_t physAddr;
+		uint32 pageFlags;
+
+		map->QueryInterrupt(far, &physAddr, &pageFlags);
+
+		if ((PAGE_PRESENT & pageFlags) == 0)
+			return false;
+
+		if ((pageFlags & PAGE_ACCESSED) == 0) {
+			map->SetFlags(far, PAGE_ACCESSED);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 static void
 arch_arm_page_fault(struct iframe *frame, addr_t far, uint32 fsr, bool isWrite, bool isExec)
 {
+	if (arch_arm_handle_access_flag_fault(far, fsr, isWrite, isExec))
+		return;
+
 	Thread *thread = thread_get_current_thread();
 	bool isUser = (frame->spsr & CPSR_MODE_MASK) == CPSR_MODE_USR;
 	addr_t newip = 0;
