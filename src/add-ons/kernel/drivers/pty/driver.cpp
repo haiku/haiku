@@ -166,7 +166,7 @@ get_tty_index(struct tty *tty)
 {
 	int32 index = -1;
 	for (uint32 i = 0; i < kNumTTYs; i++) {
-		if (tty == gMasterTTYs[i]) {
+		if (tty == gMasterTTYs[i] || tty == gSlaveTTYs[i]) {
 			index = i;
 			break;
 		}
