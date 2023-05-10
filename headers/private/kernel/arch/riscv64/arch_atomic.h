@@ -12,23 +12,21 @@
 static inline void
 memory_read_barrier_inline(void)
 {
-	// TODO: investigate reparate read/write barriers
-	__sync_synchronize();
+	asm volatile("fence ir, ir" : : : "memory");
 }
 
 
 static inline void
 memory_write_barrier_inline(void)
 {
-	// TODO: investigate reparate read/write barriers
-	__sync_synchronize();
+	asm volatile("fence ow, ow" : : : "memory");
 }
 
 
 static inline void
 memory_full_barrier_inline(void)
 {
-	__sync_synchronize();
+	asm volatile("fence iorw, iorw" : : : "memory");
 }
 
 
