@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2023 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -21,8 +21,9 @@
 #endif
 
 
-//#define TRACE_MEMORY_MAP
-//#define TRACE_PAGE_DIRECTORY
+static constexpr bool kTraceMemoryMap = false;
+static constexpr bool kTracePageDirectory = false;
+
 
 // Ignore memory above 512GB
 #define PHYSICAL_MEMORY_LOW		0x00000000
@@ -94,7 +95,6 @@ arch_mmu_dump_table(uint64* table, uint8 currentLevel)
 }
 
 
-#ifdef TRACE_PAGE_DIRECTORY
 void
 arch_mmu_dump_present_tables()
 {
@@ -110,7 +110,6 @@ arch_mmu_dump_present_tables()
 	dprintf("Under allocated TTBR1_EL1:\n");
 	arch_mmu_dump_table(sPageDirectory, 0);
 }
-#endif
 
 
 void arch_mmu_setup_EL1(uint64 tcr) {
@@ -291,39 +290,39 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
 
-#ifdef TRACE_MEMORY_MAP
-	dprintf("phys memory ranges:\n");
-	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-		uint64 start = gKernelArgs.physical_memory_range[i].start;
-		uint64 size = gKernelArgs.physical_memory_range[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
-	}
+	if (kTraceMemoryMap) {
+		dprintf("phys memory ranges:\n");
+		for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+			uint64 start = gKernelArgs.physical_memory_range[i].start;
+			uint64 size = gKernelArgs.physical_memory_range[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 
-	dprintf("allocated phys memory ranges:\n");
-	for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-		uint64 start = gKernelArgs.physical_allocated_range[i].start;
-		uint64 size = gKernelArgs.physical_allocated_range[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
-	}
+		dprintf("allocated phys memory ranges:\n");
+		for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
+			uint64 start = gKernelArgs.physical_allocated_range[i].start;
+			uint64 size = gKernelArgs.physical_allocated_range[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 
-	dprintf("allocated virt memory ranges:\n");
-	for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-		uint64 start = gKernelArgs.virtual_allocated_range[i].start;
-		uint64 size = gKernelArgs.virtual_allocated_range[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
-	}
+		dprintf("allocated virt memory ranges:\n");
+		for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
+			uint64 start = gKernelArgs.virtual_allocated_range[i].start;
+			uint64 size = gKernelArgs.virtual_allocated_range[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 
-	dprintf("virt memory ranges to keep:\n");
-	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
-		uint64 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
-		uint64 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
-		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
-			start, start + size, size);
+		dprintf("virt memory ranges to keep:\n");
+		for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
+			uint64 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+			uint64 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+			dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+				start, start + size, size);
+		}
 	}
-#endif
 }
 
 
@@ -431,9 +430,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	TRACE("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.next_pagetable);
 
-#ifdef TRACE_PAGE_DIRECTORY
-	arch_mmu_dump_present_tables();
-#endif
+	if (kTracePageDirectory)
+		arch_mmu_dump_present_tables();
 
 	return (uint64_t)sPageDirectory;
 }
