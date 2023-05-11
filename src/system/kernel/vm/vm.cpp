@@ -3810,7 +3810,8 @@ vm_area_for(addr_t address, bool kernel)
 
 	VMArea* area = locker.AddressSpace()->LookupArea(address);
 	if (area != NULL) {
-		if (!kernel && (area->protection & (B_READ_AREA | B_WRITE_AREA)) == 0)
+		if (!kernel && (area->protection & (B_READ_AREA | B_WRITE_AREA)) == 0
+				&& (area->protection & B_KERNEL_AREA) != 0)
 			return B_ERROR;
 
 		return area->id;
