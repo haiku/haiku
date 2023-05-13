@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1336536367
+1	slovak	x-vnd.Haiku-libtracker	1637138669
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -46,7 +46,6 @@ matches wildcard expression	SelectionWindow		zodpovedá výrazu so zástupnými 
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Názov
 Identify	ContainerWindow		Identifikovať
-You can't move or copy items to read-only volumes.	FSUtils		Nemôžete presúvať alebo kopírovať položky na zväzky, ktoré sú len na čítanie.
 Create link	ContainerWindow		Vytvoriť odkaz
 starts with	FindPanel		začína
 Replace	FSUtils		Nahradiť
@@ -129,7 +128,6 @@ Disks	Model		Disky
 Create a Query template	FindPanel		Vytvoriť šablónu Požiadavky
 Size	FindPanel		Veľkosť
 Window	FilePanelPriv		Okno
-Replace other file	WidgetAttributeText		Nahradiť iný súbor
 OK	Email Query Columns		OK
 Location	QueryPoseView		Umiestnenie
 Edit query	ContainerWindow		Upraviť Požiadavku
@@ -347,7 +345,6 @@ If you alter %target, %osName may not behave properly!\n\nAre you sure you want 
 Sorry, you can't copy items to the Trash.	FSClipBoard		Ľutujeme, nemôžete kopírovať položky do Koša.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Niektoré položku už existujú v tomto priečinku s rovnakými názvami ako majú položky, ktoré sa pokúšate %verb.\n \nChcete ich nahradiť položkami z priečinka, ktorý sa pokúšate %verb alebo chcete byť vyzvaný pri každej položke zvlášť?
 When	Email Query Columns		Kedy
-Paste	FilePanelPriv		Vložiť
 Paste	ContainerWindow		Vložiť
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Položka s názvom „%name“ už v tomto priečinku existuje a môže obsahovať\npoložky s rovnakým názvom. Chcete ich nahradiť položkami z priečinka, ktorý sa pokúšate %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Nie je možné odpojiť zavádzací zväzok „%name“.
@@ -403,7 +400,6 @@ New folder %ld	FSUtils		Nový priečinok %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name“ je spustiteľný súbor v starom formáte. Prosím, zožeňte si aktualizovanú verziu alebo znovu skompilujte aplikáciu.
 Only the boot disk	AutoMounterSettings		Iba zavádzací disk
-That name is already taken. Please type another one.	WidgetAttributeText		Uvedený názov je už použitý. Prosím, napíšte iný.
 Modified	Default Query Columns		Zmenené
 Default application	InfoWindow		Predvolená aplikácia
 Untitled bitmap	PoseView		Bitmapa bez názvu
@@ -452,5 +448,4 @@ Icon view	ContainerWindow		Zobrazenie ikon
 Name	ContainerWindow		Názov
 Preferred for %type	OpenWithWindow		Preferovaná pre %type
 Free space color	SettingsView		Farba voľného miesta
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

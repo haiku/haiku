@@ -8,7 +8,7 @@ Frame color	ConfigView		Çerçeve rengi
 Error	PulseApp		Hata
 Bar colors	ConfigView		Çubuk renkleri
 %.2f GHz	NormalPulseView		%.2f GHz
-Defaults	PrefsWindow		Öntanımlılar
+Defaults	PrefsWindow		Saptanmışlar
 %ld MHz	NormalPulseView		%ld MHz
 Mini mode	PrefsWindow		Ufak kip
 CPU progress bar	NormalPulseView		CPU ilerleme çubuğu

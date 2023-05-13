@@ -2,12 +2,12 @@
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kunne ikke oprette forbindelse til serveren \"%server%\":\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Opdaterer abonneringer på IMAP-mapper, vent venligst…
 Failed to fetch available storage.	IMAPFolderConfig		Kunne ikke hente tilgængeligt lager.
-Cancel	IMAPFolderConfig		Annuller
-OK	IMAPFolderConfig		OK
+Cancel	IMAPFolderConfig		Afbryd
+OK	IMAPFolderConfig		O.k.
 Server storage: %s / %s used.	IMAPFolderConfig		Serverlager: %s/%s brugt.
 No encryption	imap_config		Ingen kryptering
 Fetching IMAP folders, please be patient…	IMAPFolderConfig		Henter IMAP-mapper, vent venligst…
-Configure IMAP Folders	imap_config		Konfigurer IMAP-mapper
+Configure IMAP Folders	imap_config		Opsætning af IMAP-mapper
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Anvend
 status	IMAPFolderConfig		status

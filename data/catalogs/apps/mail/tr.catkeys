@@ -15,7 +15,7 @@ Encoding:	Mail		Kodlama:
 Print	Mail		Yazdır
 Decrease quote level	Mail		Alıntı düzeyini azalt
 Encoding	Mail		Kodlama
-Default account:	Mail		Öntanımlı hesap
+Default account:	Mail		Saptanmış hesap
 Message	Mail		İleti
 Bcc:	Mail		Gizli:
 New	Mail		Yeni
@@ -60,7 +60,7 @@ Copy	Mail		Kopyala
 Add signature	Mail		İmza ekle
 %n - Full name	Mail		%n - Tam ad
 Signature	Mail		İmza
-Use default account	Mail		Öntanımlı hesabı kullan
+Use default account	Mail		Saptanmış hesabı kullan
 draft	B_USER_DIRECTORY/mail/draft		taslaklar
 Really delete this signature? This cannot be undone.	Mail		İmza silinsin mi? Bu işlem geri alınamaz.
 spam	B_USER_DIRECTORY/mail/spam		istenmeyen

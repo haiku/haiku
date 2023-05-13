@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3380227078
+1	esperanto	x-vnd.Haiku-libtracker	3680829380
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -56,7 +56,6 @@ matches wildcard expression	SelectionWindow		taŭgas al ĵokera esprimo
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titolo
 Identify	ContainerWindow		Identigi
-You can't move or copy items to read-only volumes.	FSUtils		Vi ne povas kopii aŭ movi elementojn al nurlegeblaj diskoj.
 Create link	ContainerWindow		Krei ligilon
 starts with	FindPanel		komenciĝas per
 Replace	FSUtils		Anstataŭigi
@@ -149,7 +148,6 @@ Disks	Model		Diskoj
 Create a Query template	FindPanel		Krei serĉmendan ŝablonon
 Size	FindPanel		Grando
 Window	FilePanelPriv		Fenestro
-Replace other file	WidgetAttributeText		Anstataŭigi alian dosieron
 OK	Email Query Columns		Bone
 Location	QueryPoseView		Loko
 Edit query	ContainerWindow		Redakti serĉmendon
@@ -405,7 +403,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Pardonon, vi ne povas kop
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Kelkaj elementoj jam ekzistas en ĉi tiu dosierujo kun la samaj nomoj kiel la elementoj kiujn vi %verb.\n\nĈu vi volas anstataŭigi ilin per tiuj kiujn vi %verb, aŭ petiĝi pri ĉiu unuope?
 When	Email Query Columns		Kiam
 Object	AttributesView		Objekto
-Paste	FilePanelPriv		Alglui
 Paste	ContainerWindow		Alglui
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Elemento nomita \"%name\" jam ekzistas en ĉi tiu dosierujo, kaj eble\nenhavas elementojn samnomitajn. Ĉu vi volus anstataŭigi ilin per tiuj enhavataj de la dosierujo kiun vi %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Neeblas demeti la praŝarĝan portilon \"%name\".
@@ -469,7 +466,6 @@ New folder %ld	FSUtils		Nova dosierujo %Id
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" estas malaktuala rulebla dosiero. Bonvolu akiri ĝisdatigitan version aŭ rekompili la programon.
 Only the boot disk	AutoMounterSettings		Nur la praŝarga disko
-That name is already taken. Please type another one.	WidgetAttributeText		Tiu nomo estas jam uzata. Bonvolu tajpi alian.
 Message	AttributesView		Mesaĝo
 Modified	Default Query Columns		Redaktita
 Default application	InfoWindow		Defaŭlta programo
@@ -529,5 +525,4 @@ Icon view	ContainerWindow		Piktograma vido
 Name	ContainerWindow		Nomo
 Preferred for %type	OpenWithWindow		Preferata por %type
 Free space color	SettingsView		Liberspaca koloro
-OK	WidgetAttributeText		Bone
 OK	FSUtils		Bone

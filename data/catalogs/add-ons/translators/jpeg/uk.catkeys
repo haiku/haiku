@@ -17,6 +17,6 @@ Read greyscale images as RGB32	JPEGTranslator		Зчитувати зображе
 Output quality	JPEGTranslator		Якість виводу
 Low	JPEGTranslator		Низька
 Write	JPEGTranslator		Запис
-Prevent colors 'washing out'	JPEGTranslator		Запобігання 'вимиванню' кольорів
+Prevent colors 'washing out'	JPEGTranslator		Запобігання «вимиванню» кольорів
 JPEG Library Warning: %s\n	be_jerror		Попередження бібліотеки JPEG: %s\n
 JPEG images	JPEGTranslator		Зображення JPEG

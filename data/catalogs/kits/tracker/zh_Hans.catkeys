@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	464753347
+1	english	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		匹配通配符表达式
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		标题
 Identify	ContainerWindow		标识
-You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
 Create link	ContainerWindow		创造链接
 starts with	FindPanel		启动方式：
 Replace	FSUtils		替换
@@ -152,7 +151,6 @@ Disks	Model		磁盘
 Create a Query template	FindPanel		创建查询模板
 Size	FindPanel		尺寸
 Window	FilePanelPriv		窗口
-Replace other file	WidgetAttributeText		替换其他文件
 OK	Email Query Columns		确定
 Location	QueryPoseView		位置
 Edit query	ContainerWindow		编辑查询
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		对不起，您不能够�
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？
 When	Email Query Columns		何时
 Object	AttributesView		对象
-Paste	FilePanelPriv		粘贴
 Paste	ContainerWindow		粘贴
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在, 可能包括 \nitems 用同样的名称,你愿意用在该文件夹包中含由 %verb替代它吗?
 Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		新建目录 %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" 为遗留可执行文件。请获取更新版本或者重新编译应用。
 Only the boot disk	AutoMounterSettings		仅引导磁盘
-That name is already taken. Please type another one.	WidgetAttributeText		该名称已被使用。请重新命名。
 Message	AttributesView		消息
 Modified	Default Query Columns		修改
 Default application	InfoWindow		默认程序
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		图标视图
 Name	ContainerWindow		名称
 Preferred for %type	OpenWithWindow		首选 %type
 Free space color	SettingsView		空闲空间颜色
-OK	WidgetAttributeText		确定
 OK	FSUtils		确定

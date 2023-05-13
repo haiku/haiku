@@ -1,7 +1,7 @@
 1	danish	x-vnd.mmu.AutoRaise	3527604525
 AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		Autoløft, (c) 2002, mmu_man\nNyd det :-)
 2 s	AutoRaiseIcon		2 s
-OK	AutoRaiseIcon		OK
+OK	AutoRaiseIcon		O.k.
 AutoRaise	System name		Autoløft
 0.2 s	AutoRaiseIcon		0,2 s
 1 s	AutoRaiseIcon		1 s
@@ -9,15 +9,15 @@ Delay	AutoRaiseIcon		Forsinkelse
 5 s	AutoRaiseIcon		5 s
 Active	AutoRaiseIcon		Aktiv
 0.1 s	AutoRaiseIcon		0,1 s
-Default (all windows)	AutoRaiseIcon		Standard (alle vinduer)
+Default (all windows)	AutoRaiseIcon		Forvalg (alle vinduer)
 Instant warping (ffm)	AutoRaiseIcon		Warping med det samme (ffm)
 About AutoRaise…	AutoRaiseIcon		Om Autoløft…
 Normal	AutoRaiseIcon		Normal
 0.5 s	AutoRaiseIcon		0,5 s
-Deskbar only (touch)	AutoRaiseIcon		Kun skrivebordslinje (rør)
+Deskbar only (touch)	AutoRaiseIcon		Kun Deskbar (berøring)
 4 s	AutoRaiseIcon		4 s
 Focus follows mouse	AutoRaiseIcon		Fokus følger mus
-Deskbar only (over its area)	AutoRaiseIcon		Kun skrivebordslinje (over dets område)
+Deskbar only (over its area)	AutoRaiseIcon		Kun Deskbar (over dets område)
 Inactive behaviour	AutoRaiseIcon		Inaktiv opførsel
 Mode	AutoRaiseIcon		Tilstand
 Warping (ffm)	AutoRaiseIcon		Warping (ffm)

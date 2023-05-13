@@ -4,13 +4,13 @@ Decrease pixel size	Magnify-Main		Зменшити розмір пікселя
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
 Increase pixel size	Magnify-Main		Збільшити розмір пікселя
 magnify: size must be a multiple of 4	Console		збільшення: розмір має бути кратним 4
-Stick coordinates	Magnify-Main		Вісь кординат
+Stick coordinates	Magnify-Main		Закріпити координати
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# піксель/піксель} few{# пікселя/піксель} other{# пікселів/піксель}}
 Copy image	Magnify-Main		Копіювати зображення
 Decrease window size	Magnify-Main		Зменшити розмір вікна
-Remove a crosshair	Magnify-Main		Видалити перехрестя
+Remove a crosshair	Magnify-Main		Прибрати перехрестя
 Add a crosshair	Magnify-Main		Додати перехрестя
-Freeze image	Magnify-Main		Зображення заморожено
+Freeze image	Magnify-Main		Стоп-кадр
 usage: magnify [size] (magnify size * size pixels)	Console		використання: збільшення [розмір] (розмір збільшення * розмір пікселя)
 Increase window size	Magnify-Main		Збільшити розмір вікна
 Save image	Magnify-Main		Зберегти зображення
@@ -18,4 +18,4 @@ Show grid	Magnify-Main		Показати сітку
 Magnify	System name		Magnify
 Info	Magnify-Main		Інфо
 Show info	Magnify-Main		Показати інфо
-Make square	Magnify-Main		Задати площу
+Make square	Magnify-Main		Зробити квадратним

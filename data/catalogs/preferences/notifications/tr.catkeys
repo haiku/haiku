@@ -17,7 +17,7 @@ Applications	PrefletView		Uygulamalar
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Zaman aşımı: # saniye}other{Zaman aşımı: # saniye}}
 Upper right	GeneralView		Sağ üst
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Tercihler kaydedilirken bir hata oluştu.\nDiskinizde yeterli boş alan olmayabilir.
-Defaults	PrefletWin		Öntanımlılar
+Defaults	PrefletWin		Saptanmışlar
 Upper left	GeneralView		Sol üst
 Window width	GeneralView		Pencere genişliği
 Applications	NotificationView		Uygulamalar

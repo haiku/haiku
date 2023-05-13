@@ -22,7 +22,7 @@ cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Kompakt
 Calculating	CalcView		Hesaplanıyor
-Enable Num Lock on startup	CalcView		Başlangıçta Num Lock'u etkinleştir
+Enable Num Lock on startup	CalcView		Başlangıçta Sayı Kilidi'ni etkinleştir
 4	CalcView		4
 Scientific	CalcView		Bilimsel
 )	CalcView		)

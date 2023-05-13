@@ -70,7 +70,7 @@ Cancel	AbstractParametersPanel		Vazgeç
 Format	MainWindow		Biçimlendir
 OK	MainWindow		Tamam
 Empty space	DiskView		Boş alan
-Open with DiskProbe	MainWindow		DiskProbe ile aç
+Open with DiskProbe	MainWindow		Disk Sondası ile aç
 Could not delete the selected partition.	MainWindow		Seçili bölüntü silinemedi.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.

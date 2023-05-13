@@ -22,7 +22,7 @@ Serbian (Cyrillic)	KeymapNames		Сербська (Кирилиця)
 Belgian (point)	KeymapNames		Бельгійська (point)
 Finnish	KeymapNames		Фінська
 Num lock	Keyboard Layout View		Num lock
-Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати швидкі кнопки як у Linux/Windows
+Switch shortcut keys to Windows/Linux mode	Keymap window		Переключити комбінації клавіш у режим Linux/Windows
 Spanish (Dvorak)	KeymapNames		Іспанська (Dvorak)
 Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Scroll lock
@@ -65,7 +65,7 @@ ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 міжнародна
 Kazakh	KeymapNames		Казахська
 Save as…	Keymap window		Зберегти як…
 Lithuanian (Standard)	KeymapNames		Литовська (Standard)
-Error: duplicate keys	Modifier keys window		Помилка: дублювання клавіш
+Error: duplicate keys	Modifier keys window		Помилка: дубль клавіш
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
 Bulgarian (Phonetic)	KeymapNames		Болгарська (Фонетична)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
@@ -141,7 +141,7 @@ Keymap	System name		Keymap
 Slovene	KeymapNames		Словенська
 Lithuanian	KeymapNames		Литовська
 Set modifier keys…	Keymap window		Призначити клавіші-модифікатори...
-Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
+Switch shortcut keys to Haiku mode	Keymap window		Переключити комбінації клавіш у режим Haiku
 Defaults	Keymap window		Типові настройки
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Системні:

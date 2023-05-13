@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	464753347
+1	swedish	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		matchar jokeruttryck
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identifiera
-You can't move or copy items to read-only volumes.	FSUtils		Du kan inte flytta eller kopiera saker till skrivskyddade volymer.
 Create link	ContainerWindow		Skapa länk
 starts with	FindPanel		börjar med
 Replace	FSUtils		Ersätt
@@ -152,7 +151,6 @@ Disks	Model		Volymer
 Create a Query template	FindPanel		Skapa en sökmall
 Size	FindPanel		Storlek
 Window	FilePanelPriv		Fönster
-Replace other file	WidgetAttributeText		Ersätt annan fil
 OK	Email Query Columns		OK
 Location	QueryPoseView		Plats
 Edit query	ContainerWindow		Redigera sökning
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Du kan inte kopiera saker
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Vissa objekt finns redan i denna katalog med samma namn som de objekt du %verb.\n\nVill du ersätta dem med de du %verb eller bli tillfrågad för var och en?
 When	Email Query Columns		När
 Object	AttributesView		Objekt
-Paste	FilePanelPriv		Klistra in
 Paste	ContainerWindow		Klistra in
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ett objekt \"%name\" finns redan i katalogen och kan innehålla\nobjekt med samma namn. Vill du byta dem med de objekt i katalogen du %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Kan inte avmontera startvolymen \"%name\.
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Ny mapp %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" Den körbara filen är från ett gammalt system. Var vänlig uppdatera din fil eller bygg om programmet.
 Only the boot disk	AutoMounterSettings		Bara uppstartsdisken
-That name is already taken. Please type another one.	WidgetAttributeText		Namnet är upptaget. Vänligen försök med ett annat namn.
 Message	AttributesView		Meddelande
 Modified	Default Query Columns		Modifierad
 Default application	InfoWindow		Förvalt program
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Ikonvy
 Name	ContainerWindow		Namn
 Preferred for %type	OpenWithWindow		Föredras för %type
 Free space color	SettingsView		Färg för ledigt utrymme
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

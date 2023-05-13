@@ -17,7 +17,7 @@ Settings	Terminal TermWindow		Ayarlar
 %app% settings	Terminal PrefWindow	window title	%app% ayarları
 ANSI bright black color	Terminal ThemeView		ANSI açık siyah
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için '%2d'.\n\t%i\t-\tSekmenin indeksi.\n\t%e\t-\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin sürecin adı.
-Use default	Terminal SetTitleWindow		Öntanımlıları kullan
+Use default	Terminal SetTitleWindow		Saptanmışları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
 Error!	Terminal getString		Hata!
 Colors…	Terminal TermWindow		Renkler…
@@ -31,7 +31,7 @@ Custom	Terminal AppearancePrefView	Window size	Özel
 Page setup…	Terminal TermWindow		Sayfa düzeni…
 ANSI yellow color	Terminal ThemeView		ANSI sarı
 Cancel	Terminal TermView		Vazgeç
-Defaults	Terminal PrefWindow		Öntanımlılar
+Defaults	Terminal PrefWindow		Saptanmışlar
 black	Terminal ThemeView		siyah
 Revert	Terminal PrefWindow		Eski haline döndür
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Uçbirim
@@ -67,7 +67,7 @@ Find previous	Terminal TermWindow		Öncekini bul
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Sekme başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
 Close	Terminal TermWindow		Kapat
 Save to file…	Terminal PrefWindow		Dosyaya kaydet…
-Defaults	Terminal ThemeWindow		Öntanımlılar
+Defaults	Terminal ThemeWindow		Saptanmışlar
 Copy path	Terminal TermView		Yolu kopyala
 Window size	Terminal TermWindow		Pencere boyutu
 Selected text	Terminal ThemeView		Seçili metin
@@ -94,10 +94,10 @@ Use text:	Terminal FindWindow		Şu metni kullan:
 Close active tab	Terminal TermWindow		Etkin sekmeyi kapat
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
 Selected background	Terminal ThemeView		Seçili arka plan
-Save as default	Terminal TermWindow		Öntanımlı olarak kaydet
+Save as default	Terminal TermWindow		Saptanmış olarak kaydet
 Nothing is selected.	Terminal TermWindow		Hiçbir şey seçilmedi.
 ANSI bright red color	Terminal ThemeView		ANSI açık kırmızı
-Use left Option as Meta key	Terminal AppearancePrefView		Sol Alt düğmesini Meta düğmesi olarak kullan
+Use left Option as Meta key	Terminal AppearancePrefView		Sol Seçenek düğmesini Meta düğmesi olarak kullan
 Find	Terminal FindWindow		Bul
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Etkin sekme başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
 Save to file…	Terminal ThemeWindow		Dosyaya kaydet…
@@ -106,7 +106,7 @@ Paste	Terminal TermWindow		Yapıştır
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pencere başlıklarını belirten dizgi. Aşağıdaki yer tutucular kullanılabilir:\n
 ANSI bright magenta color	Terminal ThemeView		ANSI açık mor
 Copy here	Terminal TermView		Buraya kopyala
-Use default shell	Terminal Shell		Öntanımlı kabuğu kullan
+Use default shell	Terminal Shell		Saptanmış kabuğu kullan
 red	Terminal ThemeView		kırmızı
 white	Terminal ThemeView		beyaz
 Open link	Terminal TermView		Bağlantıyı aç

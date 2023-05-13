@@ -49,7 +49,7 @@ Open downloads folder	Download Window		İndirilenler klasörünü aç
 Proxy server	Settings Window		Vekil sunucu
 Darn!	WebPositive		Tüh!
 Decrease size	WebPositive Window		Küçült
-Default fixed font size:	Settings Window		Öntanımlı eş aralıklı yazıtipi boyutu:
+Default fixed font size:	Settings Window		Saptanmış eş aralıklı yazıtipi boyutu:
 Sans serif font:	Settings Window		Sans serif yazıtipi:
 Clear	WebPositive Window		Temizle
 The download could not be opened.	Download Window		İndirilen öge açılamadı.
@@ -105,7 +105,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Eski haline döndür
 Copy	WebPositive Window		Kopyala
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Son satır # kez yinelendi.}other{Son satır # kez yinelendi.}}
-Default standard font size:	Settings Window		Öntanımlı standart yazıtipi boyutu:
+Default standard font size:	Settings Window		Saptanmış standart yazıtipi boyutu:
 Custom	Settings Window		Özel
 Bookmark this page	WebPositive Window		Bu sayfayı yer imlerine ekle
 Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile sekmeleri göster
@@ -126,7 +126,7 @@ Find previous occurrence of search terms	WebPositive Window	find bar previous bu
 Remember username and password for this site	Authentication Panel		Bu site için kullanıcı adı ve parolayı hatırla
 (Finish: %date - %duration left)	Download Window		(Bitiş: %date - %duration kaldı)
 Cookie manager	Cookie Manager		Çerez yöneticisi
-Show home button	Settings Window		Anasayfa düğmesini göster
+Show home button	Settings Window		Ana sayfa düğmesini göster
 Start new session	Settings Window		Yeni oturum başlat
 The cookie jar is empty!	Cookie Manager		Çerez kavanozu boş!
 Value	Cookie Manager		Değer

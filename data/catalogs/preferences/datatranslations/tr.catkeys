@@ -8,7 +8,7 @@ OK	DataTranslations		Tamam
 Cancel	DataTranslations		Vazgeç
 Info:	DataTranslations		Bilgi:
 DataTranslations - Error	DataTranslations		Veri Çevirileri - Hata
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Bu denetim panelini çeviriciler için öntanımlı değerler atamak için kullanın. Bu ayarlar uygulamalar kendi ayarlarını belirtmezler ise kullanılırlar.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Bu denetim panelini çeviriciler için saptanmış değerler atamak için kullanın. Bu ayarlar uygulamalar kendi ayarlarını belirtmezlerse kullanılırlar.
 The new translator has been installed successfully.	DataTranslations		Yeni çevirmen başarıyla kuruldu.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' adlı bir öge Çevirmenler klasöründe hâlihazırda var! Var olan çevirmenin üzerine yazılsın mı?
 DataTranslations	System name		Veri Çevirileri

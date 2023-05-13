@@ -2,7 +2,7 @@
 Themes	ParameterWindow		Temaer
 Start control panel	ParameterWindow		Start kontrolpanel
 %nodeinfo% parameters	ParameterWindow		%nodeinfo%-parametre
-OK	ParameterWindow		OK
+OK	ParameterWindow		O.k.
 Window	ParameterWindow		Vindue
 Could not start control panel (%error%)	ParameterWindow		Kunne ikke starte kontrolpanel (%error%)
 Close	ParameterWindow		Luk

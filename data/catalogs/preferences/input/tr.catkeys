@@ -1,6 +1,6 @@
 1	turkish	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		Kaydırma
-Defaults	InputMouse		Öntanımlılar
+Defaults	InputMouse		Saptanmışlar
 Long	KeyboardView		Uzun
 Cancel	TouchpadPrefView		Vazgeç
 4-Button	SettingsView		4 düğmeli
@@ -23,17 +23,17 @@ Acceleration	TouchpadPrefView		İvmelenme
 Mouse speed	SettingsView		Fare hızı
 Accept first click	SettingsView		İlk tıklamayı kabul et
 OK	TouchpadPrefView		Tamam
-Horizontal scrolling	TouchpadPrefView		Yatay kaydırma
+Horizontal scrolling	TouchpadPrefView		Yatay sarma
 Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
 Keyboard Lock Delay	TouchpadPrefView		Klavye Kilit Gecikmesi
-Two finger scrolling	TouchpadPrefView		İki parmak kaydırma
+Two finger scrolling	TouchpadPrefView		İki parmak sarma
 Input	System name		Girdi Aygıtları
 Mouse acceleration	SettingsView		Fare ivmelenmesi
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni kaydırma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Yeni sarma alanı çok geniş ve normal fare işlemlerine engel olabilir. Değiştirmek istediğinizden emin misiniz?
 High	TouchpadPrefView		Yüksek
-Defaults	TouchpadPrefView		Öntanımlılar
+Defaults	TouchpadPrefView		Saptanmışlar
 1-Button	SettingsView		1 düğmeli
-Defaults	InputKeyboard		Öntanımlılar
+Defaults	InputKeyboard		Saptanmışlar
 Quick	TouchpadPrefView		Hızlı
 Short	KeyboardView		Kısa
 Slow	KeyboardView		Yavaş

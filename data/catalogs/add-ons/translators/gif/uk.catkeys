@@ -16,4 +16,4 @@ Use RGB color	GIFView		Кольори RGB
 Use dithering	GIFView		Задіяти згладжування
 GIF Settings	GIFTranslator		Налаштування GIF
 BeOS system	GIFView		Системи BeOS
-Automatic (from alpha channel)	GIFView		Авто (з альфа каналу)
+Automatic (from alpha channel)	GIFView		Автоматично (з альфа каналу)

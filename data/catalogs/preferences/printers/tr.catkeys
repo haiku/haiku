@@ -2,10 +2,10 @@
 Test page	TestPageView		Sınama sayfası
 Remove	PrintersWindow		Kaldır
 Red	TestPageView		Kırmızı
-Default Printer	PrinterListView		Öntanımlı yazıcı
+Default Printer	PrinterListView		Saptanmış yazıcı
 <pick one>	AddPrinterDialog		<birini seçin>
 Connected to:	AddPrinterDialog		Şuraya bağlı:
-Make default	PrintersWindow		Öntanımlı yap
+Make default	PrintersWindow		Saptanmış kıl
 Cyan	TestPageView		Camgöbeği
 Completed	JobListView		Tamamlandı
 Test page	PrintersWindow		Sınama sayfası

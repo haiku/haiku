@@ -1,4 +1,4 @@
-1	english (united kingdom)	x-vnd.Haiku-libtracker	1484787188
+1	english (united kingdom)	x-vnd.Haiku-libtracker	898606582
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error moving \"%name\" to the Rubbish Bin. (%error)
 Error emptying Trash	FSUtils		Error emptying the Rubbish Bin
 OK	OpenWithWindow		Alright
@@ -31,5 +31,4 @@ True-color picture	AttributesView		True-colour picture
 Move to Trash	FSUtils		Move to the Rubbish Bin
 Sorry, you can't copy items to the Trash.	PoseView		Sorry, you can't copy items to the Rubbish Bin.
 Free space color	SettingsView		Free space colour
-OK	WidgetAttributeText		Alright
 OK	FSUtils		Alright

@@ -11,7 +11,7 @@ Version %d.%d.%d	JPEGTranslator		Sürüm %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Siyah-beyaz görselleri RGB24 olarak yaz
 Output smoothing strength	JPEGTranslator		Çıkış düzgünleştirme kuvveti
 Use progressive compression	JPEGTranslator		İlerlemeci sıkıştırma kullan
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Dosyayı daha küçük yap (biraz daha kötü kalite)
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Dosyayı daha küçük kıl (biraz daha kötü kalite)
 High	JPEGTranslator		Yüksek
 Read greyscale images as RGB32	JPEGTranslator		Gri tonlu görselleri RGB32 olarak oku
 Output quality	JPEGTranslator		Çıkış kalitesi

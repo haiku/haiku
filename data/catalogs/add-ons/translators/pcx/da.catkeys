@@ -3,6 +3,6 @@ PCX Settings	main		PCX-indstillinger
 Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCXTranslator-indstillinger
 PCX image translator	PCXTranslator		PCX-billedoversætter
-PCX %lu bit image	PCXTranslator		PCX %lu bit billede
+PCX %lu bit image	PCXTranslator		PCX %lu bit-billede
 PCX images	PCXTranslator		PCX-billeder
 PCX image translator	ConfigView		PCX-billedoversætter

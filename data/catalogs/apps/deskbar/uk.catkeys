@@ -12,7 +12,7 @@ Applications	B_USER_DESKBAR_DIRECTORY/Applications		Програми
 Always on top	PreferencesWindow		Завжди зверху
 Restart system	DeskbarMenu		Перезапустити систему
 Recent documents:	PreferencesWindow		Недавні документи:
-Auto-raise	PreferencesWindow		Авто-випливати
+Auto-raise	PreferencesWindow		Випливати автоматично
 Mount	DeskbarMenu		Підключити
 Icon size	PreferencesWindow		Розмір значків
 About Haiku	DeskbarMenu		Про систему Haiku

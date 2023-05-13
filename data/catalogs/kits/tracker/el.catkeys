@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	464753347
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		αντιστοιχεί με την 
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Τίτλος
 Identify	ContainerWindow		Αναγνώριση
-You can't move or copy items to read-only volumes.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στοιχεία σε τόμους μόνο ανάγνωσης.
 Create link	ContainerWindow		Δημιουργία σύνδεσμου
 starts with	FindPanel		ξεκινά με
 Replace	FSUtils		Αντικατάσταση
@@ -152,7 +151,6 @@ Disks	Model		Δίσκοι
 Create a Query template	FindPanel		Δημιουργία ενός προτύπου Ερωτημάτος
 Size	FindPanel		Μέγεθος
 Window	FilePanelPriv		Παράθυρο
-Replace other file	WidgetAttributeText		Αντικατάσταση άλλου αρχείου
 OK	Email Query Columns		Εντάξει
 Location	QueryPoseView		Τοποθεσία
 Edit query	ContainerWindow		Επεξεργασία ερωτήματος
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Συγνώμη, δεν μ
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Ορισμένα στοιχεία υπάρχουν ήδη σε αυτόν το φάκελο με τα ίδια ονόματα με τα στοιχεία που %verb.\n \nΘα θέλατε να τα αντικαταστήσετε με αυτά που %verb ή θα θέλατε να αποφασίσετε για κάθε αρχείο μεμονωμένα;
 When	Email Query Columns		Πότε
 Object	AttributesView		Αντικείμενο
-Paste	FilePanelPriv		Επικόλληση
 Paste	ContainerWindow		Επικόλληση
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο μπορεί να περιέχει\nστοιχεία με ίδια ονόματα.  Θα θέλατε να τα αντικαταστήσετε με αυτά που περιέχονται στο φάκελο που %verb;
 Cannot unmount the boot volume \"%name\".	FSUtils		Αδυναμία αποπροσάρτησης του τόμου εκκίνησης \"%name\".
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Νέος φάκελος %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		Το \"%name\" είναι ένα απαρχαιωμένο εκτελέσιμο αρχείο. Παρακαλώ βρείτε μία ενημερωμένη έκδοση ή δημιουργήστε το δικό σας εκτελέσιμο αρχείο.
 Only the boot disk	AutoMounterSettings		Μόνο ο δίσκος εκκίνησης
-That name is already taken. Please type another one.	WidgetAttributeText		Αυτό το όνομα είναι κατηλειμμένο. Παρακαλώ πληκτρολογήστε κάποιο άλλο.
 Message	AttributesView		Μήνυμα
 Modified	Default Query Columns		Τροποποιήθηκε
 Default application	InfoWindow		Προεπιλεγμένη εφαρμογή
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Προβολή εικονιδίου
 Name	ContainerWindow		Όνομα
 Preferred for %type	OpenWithWindow		Προτινόμενο για %type
 Free space color	SettingsView		Χρώμα ελεύθερου χώρου
-OK	WidgetAttributeText		Εντάξει
 OK	FSUtils		Εντάξει

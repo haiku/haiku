@@ -1,14 +1,16 @@
-1	danish	application/x-vnd.moon-Flanger.media_addon	2110823484
+1	danish	application/x-vnd.moon-Flanger.media_addon	278353351
 MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke hente nodeoplysninger (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		En tilføjelsesversion af FlangerNode.\naf Eric Moon (16 Juni, 1999)
 Delay	CortexAddOnsFlanger		Forsinkelse
 MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke finde node (%ld):\n%s\n
 Depth	CortexAddOnsFlanger		Dybde
-Feedback	CortexAddOnsFlanger		Feedback
+Feedback	CortexAddOnsFlanger		Tilbagemelding
+Sweep rate	CortexAddOnsFlanger		Sweeprate
 Mix ratio	CortexAddOnsFlanger		Blandingsforhold
 FlangerNode parameters	CortexAddOnsFlanger		FlangerNode-parametre
-OK	CortexAddOnsCommonMediaNodeControlApp		OK
-controls	CortexAddOnsCommonMediaNodeControlApp		styringer
+OK	CortexAddOnsCommonMediaNodeControlApp		O.k.
+controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
 Mix output	CortexAddOnsFlanger		Bland uddata
+Flanger	CortexAddOnsFlanger		Flanger
 MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ingen parametre for node (%ld):\n%s\n
-Audio input	CortexAddOnsFlanger		Lydinput
+Audio input	CortexAddOnsFlanger		Lydindgang

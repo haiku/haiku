@@ -20,14 +20,14 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		Tamam
 Cut	TextView		Kes
 %3.2f GiB	StringForSize		%3.2f GiB
-Default	Default decorator about box		Öntanımlı
+Default	Default decorator about box		Saptanmış
 Can't delete this replicant from its original application. Life goes on.	Dragger		Bu yinelenen kendi özgün uygulamasından silinemiyor.
 Error	ZombieReplicantView		Hata
 Paste	TextView		Yapıştır
 OK	AboutWindow		Tamam
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# bayt/sn} other{# bayt/sn}}
 Special Thanks:	AboutWindow		Özel teşekkürlerimizle:
-Default Haiku window decorator.	Default decorator about box		Öntanımlı Haiku pencere dekorcusu.
+Default Haiku window decorator.	Default decorator about box		Saptanmış Haiku pencere dekorcusu.
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Yineleneni kaldır
 Version	AboutWindow		Sürüm

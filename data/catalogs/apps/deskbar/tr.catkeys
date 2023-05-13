@@ -20,7 +20,7 @@ Small	PreferencesWindow		Küçük
 Show calendar…	TimeView		Takvimi göster…
 Find…	DeskbarMenu		Bul…
 Power off	DeskbarMenu		Kapat
-Defaults	PreferencesWindow		Öntanımlılar
+Defaults	PreferencesWindow		Saptanmışlar
 Show replicants	DeskbarMenu		Yinelenenleri göster
 No windows	WindowMenu		Pencere yok
 Show clock	Tray		Saati göster

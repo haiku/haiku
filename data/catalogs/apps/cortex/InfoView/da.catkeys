@@ -1,25 +1,26 @@
-1	danish	application/x-vnd.Cortex.InfoView	3600330889
+1	danish	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Forskydning
 Description	DormantNodeInfoView		Beskrivelse
 Byte order	InfoView		Byterækkefølge
 Connection	InfoView		Forbindelse
-Output formats	DormantNodeInfoView		Outputformater
+Output formats	DormantNodeInfoView		Uddataformater
 History	InfoView		Historik
-Input formats	DormantNodeInfoView		Inputformater
-Signature	AppNodeInfoView		Underskrift
+Input formats	DormantNodeInfoView		Inddataformater
+Signature	AppNodeInfoView		Signatur
 Video data between	InfoView		Videodata mellem
-Any number	DormantNodeInfoView	For 'Max. instances' field	Vilkårligt nummer
+Any number	DormantNodeInfoView	For 'Max. instances' field	Vilkårligt tal
 Flags	InfoView		Flag
-Media output	InfoView		Medieoutput
+Media output	InfoView		Medieuddata
 Active lines	InfoView		Aktive linjer
 Buffer size	InfoView		Bufferstørrelse
 \n- Quality:	FileNodeInfoView		\n- Kvalitet:
 Kinds	LiveNodeInfoView		Slags
 Application	AppNodeInfoView		Program
 Flavor flags	DormantNodeInfoView		Smagsflag
-Max. instances	DormantNodeInfoView		Max. instancer
+Max. instances	DormantNodeInfoView		Maks. instanser
 \n- Duration:	FileNodeInfoView		\n- Varighed:
 Dormant media node	DormantNodeInfoView		Hvilende medienode
+Latency	LiveNodeInfoView		Forsinkelse
 Media type	InfoView		Medietype
 Live media node	LiveNodeInfoView		Levende medienode
 Field rate	InfoView		Felthastighed
@@ -37,18 +38,18 @@ Channels	InfoView		Kanaler
 Sample rate	InfoView		Samplingshastighed
 File format	FileNodeInfoView		Filformat
 (no file)	FileNodeInfoView		(ingen fil)
-Media input	InfoView		Medieinput
+Media input	InfoView		Medieinddata
 Bit rate	InfoView		Bithastighed
-Input format	DormantNodeInfoView		Inputformat
+Input format	DormantNodeInfoView		Inddataformat
 Format	InfoView		Format
 Version	AppNodeInfoView		Version
 AddOn ID	DormantNodeInfoView		Tilføjelses-id
 Frame size	InfoView		Rammestørrelse
 Flavor ID	DormantNodeInfoView		Smags-ID
 Run mode	LiveNodeInfoView		Kørselstilstand
-\n- Codec:	FileNodeInfoView		\n- Codec:
+\n- Codec:	FileNodeInfoView		\n- Kodning:
 Port	LiveNodeInfoView		Port
-Output format	DormantNodeInfoView		Outputformat
+Output format	DormantNodeInfoView		Uddataformat
 Aspect ratio	InfoView		Højde-bredde-forhold
 Application-owned node	AppNodeInfoView		Programejet node
 Tracks	FileNodeInfoView		Spor

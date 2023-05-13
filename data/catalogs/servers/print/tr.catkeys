@@ -21,7 +21,7 @@ Print job setup:	ConfigWindow		Yazdırma işi kurulumu:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Dikey
 All pages	ConfigWindow		Tüm sayfalar
-There is no default printer set up.	PrintServerApp		Öntanımlı bir yazıcı ayarlanmamış.
+There is no default printer set up.	PrintServerApp		Saptanmış bir yazıcı yok.
 B5	ConfigWindow	ISO 216 paper size	B5
 A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
@@ -49,7 +49,7 @@ Get name of printer	Printer Scripting		Yazıcının adını al
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Taşıyıcının adını al
 A5	ConfigWindow	ISO 216 paper size	A5
-Would you like to make @ the default printer?	PrintServerApp		@ yazıcısını öntanımlı yapmak ister misiniz?
+Would you like to make @ the default printer?	PrintServerApp		@ yazıcısını saptanmış kılmak ister misiniz?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
 Page setup	ConfigWindow		Sayfa yapısı
 Paper setup:	ConfigWindow		Kâğıt yapısı:

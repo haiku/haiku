@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	464753347
+1	friulian	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		al coincît cu la espression cun ma
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titul
 Identify	ContainerWindow		Identifiche
-You can't move or copy items to read-only volumes.	FSUtils		No si pues spostâ o copiâ elements su volums in dome-leture.
 Create link	ContainerWindow		Cree colegament
 starts with	FindPanel		al tache cun
 Replace	FSUtils		Sostituìs
@@ -152,7 +151,6 @@ Disks	Model		Discs
 Create a Query template	FindPanel		Cree un model di interogazion
 Size	FindPanel		Dimension
 Window	FilePanelPriv		Barcon
-Replace other file	WidgetAttributeText		Sostituìs l'altri file
 OK	Email Query Columns		Va ben
 Location	QueryPoseView		Posizion
 Edit query	ContainerWindow		Modifiche interogazion
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		No si pues copiâ i eleme
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Cualchi element al esist za in cheste cartele cui stes non di chei che si sta %verb.\n \nSostituîju cun chei che si sta %verb o domandâ par ogniun di lôr?
 When	Email Query Columns		Cuant
 Object	AttributesView		Ogjet
-Paste	FilePanelPriv		Tache
 Paste	ContainerWindow		Tache
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un element clamât \"%name\" al esist za in cheste cartele e al podarès contignî\nelements cui stes nons. Sostituîju cun chei contignûts te cartele che si sta %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Impussibil dismontâ il volum di inviament \"%name\".
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Gnove cartele %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" al è un eseguibil de vecje maniere. Si pree di otignî une version inzornade de aplicazion o di tornâ a compilâle.
 Only the boot disk	AutoMounterSettings		Dome il disc di inviament
-That name is already taken. Please type another one.	WidgetAttributeText		Chel non al è za doprât. Scrîf un altri.
 Message	AttributesView		Messaç
 Modified	Default Query Columns		Modificât
 Default application	InfoWindow		Aplicazion predefinide
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Viodude a iconis
 Name	ContainerWindow		Non
 Preferred for %type	OpenWithWindow		Preferît par %type
 Free space color	SettingsView		Colôr spazi libar
-OK	WidgetAttributeText		Va ben
 OK	FSUtils		Va ben

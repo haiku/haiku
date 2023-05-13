@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	464753347
+1	hungarian	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezé
 96 x 96	ContainerWindow		96 × 96
 Title	Bookmark Query Columns		Cím
 Identify	ContainerWindow		Azonosítás
-You can't move or copy items to read-only volumes.	FSUtils		Írásvédett lemezre nem lehet mozgatni vagy átmásolni elemeket.
 Create link	ContainerWindow		Hivatkozás készítése
 starts with	FindPanel		eleje
 Replace	FSUtils		Csere
@@ -152,7 +151,6 @@ Disks	Model		Lemezek
 Create a Query template	FindPanel		Keresési sablon készítése
 Size	FindPanel		Méret
 Window	FilePanelPriv		Ablak
-Replace other file	WidgetAttributeText		Másik fájl felülírása
 OK	Email Query Columns		Rendben
 Location	QueryPoseView		Hely
 Edit query	ContainerWindow		Keresés szerkesztése
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Sajnálom, de nem lehet a
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		A mappában már néhány elem neve megyegyezik azzal, amit %verb akarsz.\n\nSzeretnéd lecserélni őket azokkal amiket szeretnél most %verb, vagy minden elemnél kérdezzem meg?
 When	Email Query Columns		Érkezett
 Object	AttributesView		Objektum
-Paste	FilePanelPriv		Beillesztés
 Paste	ContainerWindow		Beillesztés
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Már van a mappában egy ilyen nevű elem: \"%name\", és lehet, hogy\nugyanilyen nevű elemeket tartalmaz. Szeretnéd felülírni őket azzal a mappával amit %verb akarsz?
 Cannot unmount the boot volume \"%name\".	FSUtils		Nem sikerült a lemez (\"%name\") leválasztása.
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Új mappa %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" egy régebbi futtatható fájl. Frissítés vagy újra felépítés szükséges.
 Only the boot disk	AutoMounterSettings		Csak a rendszer lemezt
-That name is already taken. Please type another one.	WidgetAttributeText		Ez a név már foglalt. Kérlek válassz egy másikat.
 Message	AttributesView		Üzenet
 Modified	Default Query Columns		Módosítva
 Default application	InfoWindow		Alapértelmezett program
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Ikon nézet
 Name	ContainerWindow		Név
 Preferred for %type	OpenWithWindow		Előnyben részesítve ehhez: %type
 Free space color	SettingsView		Szabad terület színe
-OK	WidgetAttributeText		Rendben
 OK	FSUtils		Rendben

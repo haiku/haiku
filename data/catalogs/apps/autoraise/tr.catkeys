@@ -9,7 +9,7 @@ Delay	AutoRaiseIcon		Gecikme
 5 s	AutoRaiseIcon		5 sn
 Active	AutoRaiseIcon		Etkin
 0.1 s	AutoRaiseIcon		0,1 sn
-Default (all windows)	AutoRaiseIcon		Öntanımlı (tüm pencereler)
+Default (all windows)	AutoRaiseIcon		Saptanmış (tüm pencereler)
 Instant warping (ffm)	AutoRaiseIcon		Anında büküm (ffm)
 About AutoRaise…	AutoRaiseIcon		AutoRaise hakkında…
 Normal	AutoRaiseIcon		Normal

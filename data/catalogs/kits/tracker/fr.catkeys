@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3029918032
+1	french	x-vnd.Haiku-libtracker	3330520334
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		correspond à l’expression géné
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titre
 Identify	ContainerWindow		Identifier
-You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
 Create link	ContainerWindow		Créer un lien
 starts with	FindPanel		commence par
 Replace	FSUtils		Remplacer
@@ -152,7 +151,6 @@ Disks	Model		Disques
 Create a Query template	FindPanel		Créer un modèle de requête
 Size	FindPanel		Taille
 Window	FilePanelPriv		Fenêtre
-Replace other file	WidgetAttributeText		Remplacer l’autre fichier
 OK	Email Query Columns		OK
 Location	QueryPoseView		Emplacement
 Edit query	ContainerWindow		Éditer la requète
@@ -406,7 +404,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Désolé, vous ne pouvez 
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Plusieurs éléments de ce dossier portent les mêmes noms que des éléments que vous êtes en train de %verb.\n\nVoulez-vous les remplacer par ceux que vous êtes en train de %verb ou voulez-vous qu’une confirmation vous soit demandée pour chacun d’eux ?
 When	Email Query Columns		Quand
 Object	AttributesView		Objet
-Paste	FilePanelPriv		Coller
 Paste	ContainerWindow		Coller
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un élément nommé « %name » existe déjà dans ce dossier, et peut contenir\ndes éléments de même noms. Voulez vous les remplacer par ceux contenu dans le dossier que vous êtes en train de %verb ?
 Cannot unmount the boot volume \"%name\".	FSUtils		Impossible de démonter le volume de démarrage « %name ».
@@ -470,7 +467,6 @@ New folder %ld	FSUtils		Nouveau dossier %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		« %name » est un exécutable ancien. Veuillez vous procurer une version mise à jour, ou recompiler l’application.
 Only the boot disk	AutoMounterSettings		Seulement le disque de démarrage
-That name is already taken. Please type another one.	WidgetAttributeText		Ce nom est déjà utilisé. Veuillez en saisir un autre.
 Message	AttributesView		Message
 Modified	Default Query Columns		Modifié
 Default application	InfoWindow		Application par défaut
@@ -530,5 +526,4 @@ Icon view	ContainerWindow		Vue en icônes
 Name	ContainerWindow		Nom
 Preferred for %type	OpenWithWindow		Préférence pour %type
 Free space color	SettingsView		Couleur de l’espace libre
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

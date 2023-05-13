@@ -19,14 +19,14 @@ Quit	ShortcutsWindow		Çık
 (Choose application with file requester)	ShortcutsWindow		(Dosya isteyicisi olan bir uygulama seçin)
 Cancel	ShortcutsWindow		Vazgeç
 *MoveMouse +20 +0	ShortcutsWindow		*FareyiHareketEttir +20 +0
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
 Left	ShortcutsSpec		Sol
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı işleyemedi!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı kaydedemedi!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir \"Buraya metin girin\"
 Remove selected shortcut	ShortcutsWindow		Seçili kestirmeyi kaldır
 Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?
-Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Alt	ShortcutsSpec	Name for modifier on keyboard	Seçenek
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümenizi açamadı!
 Save & apply	ShortcutsWindow		Kaydet ve uygula
 Open	ShortcutsWindow		Aç

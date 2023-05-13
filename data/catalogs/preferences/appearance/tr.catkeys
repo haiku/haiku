@@ -4,7 +4,7 @@ Control mark	Colors tab		Denetim imi
 Off	AntialiasingSettingsView		Kapalı
 Window border	Colors tab		Pencere kenarlığı
 Inactive window tab	Colors tab		Etkin olmayan pencere sekmesi
-Defaults	APRWindow		Öntanımlılar
+Defaults	APRWindow		Saptanmışlar
 Shadow	Colors tab		Gölge
 Document background	Colors tab		Belge arka planı
 List background	Colors tab		Liste arka planı
@@ -13,7 +13,7 @@ Fixed font:	Font view		Eş aralıklı yazıtipi:
 Appearance	System name		Görünüş
 Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş uç ışıma düzeyi:
 Glyph hinting:	AntialiasingSettingsView		Glif düzgünleştirme:
-Default Haiku ControlLook	DecorSettingsView		Öntanımlı Haiku Görünüm Denetimcisi
+Default Haiku ControlLook	DecorSettingsView		Saptanmış Haiku Görünüm Denetimcisi
 Menu item text	Colors tab		Menü ögesi metni
 About decorator	DecorSettingsView		Dekorcu hakkında
 Antialiasing menu	AntialiasingSettingsView		Yumuşatma menüsü
@@ -50,8 +50,8 @@ Window tab	Colors tab		Pencere sekmesi
 Link text	Colors tab		Bağlantı metni
 Tooltip background	Colors tab		Araç ipucu arka planı
 ControlLook:	DecorSettingsView		Görünüm Denetimci:
-Scroll bar thumb	Colors tab		Kaydırma çubuğu başı
-Default	DecorSettingsView		Öntanımlı
+Scroll bar thumb	Colors tab		Sarma çubuğu başı
+Default	DecorSettingsView		Saptanmış
 Link visited	Colors tab		Ziyaret edilmiş bağlantı
 Selected menu item border	Colors tab		Seçili menü ögesi kenarlığı
 Tooltip text	Colors tab		Araç ipucu metni
@@ -66,7 +66,7 @@ Grayscale	AntialiasingSettingsView		Gri tonlama
 Antialiasing type:	AntialiasingSettingsView		Yumuşatma türü:
 Panel text	Colors tab		Panel metni
 Hinting menu	AntialiasingSettingsView		Düzgünleştirme menüsü
-Scroll bar:	DecorSettingsView		Kaydırma çubuğu:
+Scroll bar:	DecorSettingsView		Sarma çubuğu:
 Choose ControlLook	DecorSettingsView		Görünüm Denetimci seç
 Monospaced fonts only	AntialiasingSettingsView		Yalnızca eş aralıklı yazıtipleri
 Document text	Colors tab		Belge metni

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	464753347
+1	czech	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		Shoda s výrazem se zástupnými zn
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Název
 Identify	ContainerWindow		Rozpoznat
-You can't move or copy items to read-only volumes.	FSUtils		Na svazky přiojené pouze pro čtení nelze nic přesouvat ani kopírovat.
 Create link	ContainerWindow		Vytvořit odkaz
 starts with	FindPanel		začínající
 Replace	FSUtils		Nahradit
@@ -152,7 +151,6 @@ Disks	Model		Disky
 Create a Query template	FindPanel		Vytvořit šablonu Dotazu
 Size	FindPanel		Velikost
 Window	FilePanelPriv		Okno
-Replace other file	WidgetAttributeText		Nahradit jiný soubor
 OK	Email Query Columns		OK
 Location	QueryPoseView		Umístnění
 Edit query	ContainerWindow		Změnit dotaz
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Bohužel, nelze kopírova
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Některé položky již existují v tomto adresáři se stejnými názvy jako položky, které %verb.\n \nPřejete si je nahradit těmi %verb nebo se dotázat pro každou zvlášť?
 When	Email Query Columns		Když
 Object	AttributesView		Objekt
-Paste	FilePanelPriv		Vložit
 Paste	ContainerWindow		Vložit
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Položka jménem \"%name\" již existuje v tomto adresáři a může obsahovat\npoložky se stejnými názvy. Chcete je nahradit položkami z adresáře, kterého se pokoušíte %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Nelze odpojit zaváděcí svazek \"%name\".
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Nový adresář %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" je zastaralý spustitelný soubor. Sežeňte prosím novější verzi nebo překompilujte aplikaci.
 Only the boot disk	AutoMounterSettings		Pouze startovní disk
-That name is already taken. Please type another one.	WidgetAttributeText		Název je již obsazen. Zvolte jiný název.
 Message	AttributesView		Zpráva
 Modified	Default Query Columns		Změněno
 Default application	InfoWindow		Výchozí aplikace
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Zobrazení ikon
 Name	ContainerWindow		Jméno
 Preferred for %type	OpenWithWindow		Doporučeno pro %type
 Free space color	SettingsView		Barva volného místa
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

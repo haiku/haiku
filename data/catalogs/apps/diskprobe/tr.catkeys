@@ -21,13 +21,13 @@ Print…	ProbeView		Yazdır…
 New…	FileWindow		Yeni…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: '%.4s'\n\n
 OK	DiskProbe		Tamam
-DiskProbe	System name		DiskProbe
+DiskProbe	System name		Disk Sondası
 Back	ProbeView		Geri
 Device: 	ProbeView		Aygıt: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Sayı sistemi
 Open file…	FileWindow		Dosya aç…
 32 bit unsigned pointer:	TypeEditors		32 bit imzalanmamış işaretleyici:
-DiskProbe request	DiskProbe		DiskProbe isteği
+DiskProbe request	DiskProbe		Disk Sondası isteği
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Onaltılık
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Dosyaya yazma başarısız oldu:\n%s\n\nÇıktığınız zaman tüm değişiklikler kaybolacaktır.
 Examine device:	OpenWindow		Aygıtı incele:
@@ -53,7 +53,7 @@ Redo	ProbeView		Yinele
 Floating-point value:	TypeEditors		Kayan nokta değeri:
 Cancel	AttributeWindow		Vazgeç
 16 bit signed value:	TypeEditors		16 bit imzalanmış değer:
-DiskProbe request	AttributeWindow		DiskProbe isteği
+DiskProbe request	AttributeWindow		Disk Sondası isteği
 Next	ProbeView		Sonraki
 64 bit signed offset:	TypeEditors		64 bit imzalanmış ofset:
 32 bit signed value:	TypeEditors		32 bit imzalanmış değer:
@@ -115,7 +115,7 @@ Block	ProbeView		Blok
 Find again	ProbeView		Yeniden bul
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Görüntü
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Görsel okunamadı
-DiskProbe request	ProbeView		DiskProbe isteği
+DiskProbe request	ProbeView		Disk Sondası isteği
 Double precision floating-point value:	TypeEditors		Çifte kesinlikli kayan noktalı değer:
 Image	TypeEditors	This is the type of view	Görsel
 Save changes before closing?	ProbeView		Kapatmadan önce değişiklikler kaydedilsin mi?

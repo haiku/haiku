@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	256413178
+1	russian	x-vnd.Haiku-libtracker	557015480
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -56,7 +56,6 @@ matches wildcard expression	SelectionWindow		совпадает с шаблон�
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Заголовок
 Identify	ContainerWindow		Опознать
-You can't move or copy items to read-only volumes.	FSUtils		Невозможно перемещать или копировать что-либо на раздел в режиме только для чтения.
 Create link	ContainerWindow		Создать ссылку в
 starts with	FindPanel		начинается на
 Replace	FSUtils		Заменить
@@ -149,7 +148,6 @@ Disks	Model		Диски
 Create a Query template	FindPanel		Создать шаблон запроса
 Size	FindPanel		Размер
 Window	FilePanelPriv		Окно
-Replace other file	WidgetAttributeText		Заменить существующий файл
 OK	Email Query Columns		ОК
 Location	QueryPoseView		Путь
 Edit query	ContainerWindow		Изменить запрос
@@ -404,7 +402,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Извините, но в
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некоторые объекты с такими же именами, которые вы %verb, уже существуют в этой папке.\n \nЗаменить их теми, которые вы %verb или спрашивать для каждого объекта?
 When	Email Query Columns		Когда
 Object	AttributesView		Объект
-Paste	FilePanelPriv		Вставить
 Paste	ContainerWindow		Вставить
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Папка \"%name\" уже существует.\nЗаменить существующие файлы при совпадении имён?
 Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \"%name\".
@@ -468,7 +465,6 @@ New folder %ld	FSUtils		Новая папка %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" программа устаревшего типа. Пожалуйста получите обновленную версию.
 Only the boot disk	AutoMounterSettings		Только загрузочный диск
-That name is already taken. Please type another one.	WidgetAttributeText		Это имя уже занято. Пожалуйста, введите другое имя.
 Message	AttributesView		Сообщение
 Modified	Default Query Columns		Изменён
 Default application	InfoWindow		приложении по умолчанию
@@ -527,5 +523,4 @@ Icon view	ContainerWindow		Большие значки
 Name	ContainerWindow		Имя
 Preferred for %type	OpenWithWindow		Предпочтительный для %type
 Free space color	SettingsView		Цвет свободного места
-OK	WidgetAttributeText		ОК
 OK	FSUtils		ОК

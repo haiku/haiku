@@ -6,7 +6,7 @@ BS	CalcView		BS
 1	CalcView		1
 acos	CalcView		acos
 E	CalcView		E
-/	CalcView		/
+/	CalcView		:
 C	CalcView		C
 8	CalcView		8
 ceil	CalcView		ceil
@@ -21,8 +21,8 @@ tanh	CalcView		tanh
 cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Kompakt
-Calculating	CalcView		Udregner
-Enable Num Lock on startup	CalcView		Aktivér Num Lock ved opstart
+Calculating	CalcView		Beregner
+Enable Num Lock on startup	CalcView		Slå 'Num Lock' til ved opstart
 4	CalcView		4
 Scientific	CalcView		Videnskabelig
 )	CalcView		)
@@ -39,11 +39,11 @@ exp	CalcView		exp
 atan	CalcView		atan
 9	CalcView		9
 .	CalcView		.
-DeskCalc	System name		Skrivebordslommeregner
+DeskCalc	System name		Regnemaskine
 Degrees	CalcView		Grader
 7	CalcView		7
 !	CalcView		!
 π	CalcView		π
 5	CalcView		5
-Basic	CalcView		Grundlæggende
+Basic	CalcView		Enkel
 *	CalcView		*

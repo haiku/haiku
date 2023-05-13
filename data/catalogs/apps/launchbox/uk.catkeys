@@ -1,9 +1,9 @@
 1	ukrainian	x-vnd.Haiku-LaunchBox	1530497419
-Set description…	LaunchBox		Встановити опис…
+Set description…	LaunchBox		Додати опис…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
 OK	LaunchBox		ОК
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
-Show on all workspaces	LaunchBox		Показати на всіх робочих областях
+Show on all workspaces	LaunchBox		Показувати на усіх робочих областях
 Name Panel	LaunchBox		Назва панелі
 Autostart	LaunchBox		Автозапуск
 Clone	LaunchBox		Клонувати
@@ -12,25 +12,25 @@ Show window border	LaunchBox		Показувати рамку вікна
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nНе вдалось запустити програму з сигнатурою'%2'.\n\nПомилка:
 Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'дещо'. Помилка в даних панелі.
 LaunchBox	System name		LaunchBox
-Auto-raise	LaunchBox		Авто-випливати
+Auto-raise	LaunchBox		Випливати автоматично
 Icon size	LaunchBox		Розмір значка
-Open containing folder	LaunchBox		Відкрити папку що містить
-Add button here	LaunchBox		Додати кнопку тут
+Open containing folder	LaunchBox		Відкрити папку програми
+Add button here	LaunchBox		Додати сюди кнопку
 Cancel	LaunchBox		Скасувати
 launch popup	LaunchBox		launch popup
 Clear button	LaunchBox		Очистити кнопку
 Bummer	LaunchBox		Помилка
 last chance	LaunchBox		остання спроба
-You can drag an icon here.	LaunchBox		Ви можете перемістити значок сюди.
+You can drag an icon here.	LaunchBox		Ви можете перетягнути значок сюди.
 Pad 1	LaunchBox		Панель 1
 Failed to launch '%1'.\n\nError:	LaunchBox		Невдалий запуск '%1'.\n\nПомилка:
 Settings	LaunchBox		Налаштування
-Vertical layout	LaunchBox		Вертикальне розташування
+Vertical layout	LaunchBox		Розмістити вертикально
 Pad	LaunchBox		Панель
 Close	LaunchBox		Закрити
-Remove button	LaunchBox		Вилучити кнопку
+Remove button	LaunchBox		Прибрати кнопку
 Quit	LaunchBox		Вийти
-Horizontal layout	LaunchBox		Горизонтальне розташування
+Horizontal layout	LaunchBox		Розмістити горизонтально
 New	LaunchBox		Нова
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Невдала команда 'відкрити папку' для Tracker.\n\nПомилка: 
 Pad %1	LaunchBox		Панель %1

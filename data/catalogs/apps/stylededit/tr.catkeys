@@ -37,7 +37,7 @@ Lines:	Statistics		Satır:
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yok saymak istediğinizden emin misiniz?
 Save	SaveAlert		Kaydet
-Default	Open_and_SaveAsPanel		Öntanımlı
+Default	Open_and_SaveAsPanel		Saptanmış
 Cancel	RevertToSavedAlert		Vazgeç
 Cancel	FindandReplaceWindow		Vazgeç
 Statistics…	Menus		İstatistikler…
@@ -46,7 +46,7 @@ Replace all	FindandReplaceWindow		Tümünü değiştir
 Close	Menus		Kapat
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" yüklenirken hata:\n\tDesteklenmeyen biçim
 Left	Menus		Sol
-Default	Menus		Öntanımlı
+Default	Menus		Saptanmış
 OK	SaveAlert		Tamam
 Color	Menus		Renk
 Save changes to the document \"%s\"? 	QuitAlert		\"%s\" içindeki değişiklikler kaydedilsin mi?

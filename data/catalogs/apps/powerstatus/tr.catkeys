@@ -36,7 +36,7 @@ Capacity granularity 1: 	PowerStatus		Sığa tanecikliği 1:
 The battery level is getting low, please plug in the device.	PowerStatus		Pil düzeyi düşük, lütfen aygıtınızı fişe takın.
 Design capacity warning: 	PowerStatus		Fabrika çıkış sığası uyarısı: 
 Capacity granularity 2: 	PowerStatus		Sığa tanecikliği 2: 
-Too bad!	PowerStatus		Pek fena!
+Too bad!	PowerStatus		Neyse artık!
 Technology: 	PowerStatus		Teknoloji: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Güç Durumu

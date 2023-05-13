@@ -8,7 +8,7 @@ WebP image translator	WebPTranslator		WebP görseli çevirmeni
 ©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
 ©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc
 Picture	ConfigView		Resim
-Default	ConfigView		Öntanımlı
+Default	ConfigView		Saptanmış
 Text	ConfigView		Metin
 Preprocessing filter	ConfigView		Ön işleme süzgeci
 Compression method:	ConfigView		Sıkıştırma yöntemi:

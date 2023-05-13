@@ -13,7 +13,7 @@ Select	Icon-O-Matic-Properties		Вибрати
 Reset transformation	Icon-O-Matic-ShapesList		Скинути трансформацію
 Duplicate	Icon-O-Matic-StylesList		Дублікат
 Rotate	Icon-O-Matic-TransformationBoxStates		Обертати
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Вилучити контрольні точки
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Прибрати контрольні точки
 Shorten	Icon-O-Matic-PropertyNames		Скоротити
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Незв'язана смуга
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Текст який ви намагаєтесь імпортувати досить довгий, продовжити?
@@ -32,7 +32,7 @@ Add shape with style	Icon-O-Matic-Menu-Shape		Додати фігуру зі с�
 Assign Path	Icon-O-Matic-AddPathsCmd		Прив'язати смугу
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Скинути трансформацію
 Transformation	Transformation		Трансформація
-Remove	Icon-O-Matic-StylesList		Вилучити
+Remove	Icon-O-Matic-StylesList		Прибрати
 Cancel	Icon-O-Matic-Menu-Settings		Скасувати
 Assign Style	Icon-O-Matic-AssignStyleCmd		Прив'язати стиль
 Transformation	Icon-O-Matic-TransformationBoxStates		Трансформація
@@ -57,7 +57,7 @@ OK	Icon-O-Matic-ColorPicker		ОК
 Error: 	Icon-O-Matic-Main		Помилка: 
 bad news	Icon-O-Matic-Exporter		погані новини
 Saving your document failed!	Icon-O-Matic-Exporter		Збій збереження Вашого документу!
-Snap to grid	Icon-O-Matic-Menu-Settings		Приладнати до сітки
+Snap to grid	Icon-O-Matic-Menu-Settings		Припасувати до сітки
 Opening the document failed!	Icon-O-Matic-Main		Збій відкриття документу!
 Shape	Icon-O-Matic-Menus		Фігура
 Add with path & style	Icon-O-Matic-ShapesList		Додати зі смугою & стилем
@@ -72,7 +72,7 @@ Settings	Icon-O-Matic-Menus		Налаштування
 Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
 Add	Icon-O-Matic-PathsList		Додати
 Add Styles	Icon-O-Matic-AddStylesCmd		Додати стилі
-Remove	Icon-O-Matic-PathManipulator		Вилучити
+Remove	Icon-O-Matic-PathManipulator		Прибрати
 Duplicate	Icon-O-Matic-ShapesList		Дублікат
 Contour	Transformation		Контур
 Perspective	Icon-O-Matic-TransformersList		Перспектива
@@ -82,12 +82,12 @@ Rounding	Icon-O-Matic-PropertyNames		Округлення
 Joins	Icon-O-Matic-PropertyNames		З'єднання
 Cancel	Icon-O-Matic-ColorPicker		Скасувати
 Duplicate	Icon-O-Matic-PathsList		Дублікат
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Вилучити фігури
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Прибрати фігури
 Save	Icon-O-Matic-Menu-Settings		Зберегти
 Export as…	Icon-O-Matic-Menu-File		Експортувати як…
 Error: 	Icon-O-Matic-Exporter		Помилка: 
 Move Path	Icon-O-Matic-MovePathsCmd		Перемістити смугу
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Вилучити смуги
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Прибрати смуги
 Assign Paths	Icon-O-Matic-AddPathsCmd		Прив'язати смуги
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидний
 Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
@@ -107,7 +107,7 @@ Cancel	Icon-O-Matic-SVGExport		Скасувати
 Open…	Icon-O-Matic-Menu-File		Відкрити…
 Redo	Icon-O-Matic-Main		Повтор дії
 Change Color	Icon-O-Matic-SetColorCmd		Змінити Колір
-Remove	Icon-O-Matic-ShapesList		Вилучити
+Remove	Icon-O-Matic-ShapesList		Прибрати
 Drop shapes	Icon-O-Matic-ShapesList		Скинути фігури
 PNG Set	Icon-O-Matic-SavePanel		Комплект PNG
 to attach transformers.	Empty transformers list - 2nd line		для прив'язки трансформаторів.
@@ -118,25 +118,25 @@ Flip Control Point	Icon-O-Matic-FlipPointsCmd		Віддзеркалити кон
 Add Paths	Icon-O-Matic-AddPathsCmd		Додати смуги
 Color (#%02x%02x%02x)	Style name after dropping a color		Колір (#%02x%02x%02x)
 Clean up	Icon-O-Matic-PathsList		Очистити
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Вилучити стиль
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Прибрати стиль
 Split	Icon-O-Matic-PathManipulator		Розділити
 Move	Icon-O-Matic-TransformationBoxStates		Перемістити
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Скинути трансформацію
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Розділити контрольні точки
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Вилучити контрольну точку
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Прибрати контрольну точку
 Conic	Icon-O-Matic-StyleTypes		Конічний
-Name	Icon-O-Matic-PropertyNames		Ім’я
+Name	Icon-O-Matic-PropertyNames		Назва
 Multi paste	Icon-O-Matic-Properties		Мультивставка
 Add Shapes	Icon-O-Matic-AddShapesCmd		Додати фігури
 Reset transformation	Icon-O-Matic-StylesList		Скинути трансформацію
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Додати трансформатор
 Reverse	Icon-O-Matic-PathsList		Реверс
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Перемістити вісь
-Remove	Icon-O-Matic-PathsList		Вилучити
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Вилучити трансформатори
+Remove	Icon-O-Matic-PathsList		Прибрати
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Прибрати трансформатори
 Style type	Icon-O-Matic-StyleTypes		Тип стилю
 Quit	Icon-O-Matic-Menu-File		Вийти
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Вилучити стилі
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Прибрати стилі
 Gradient	Icon-O-Matic-StyleTypes		Градієнт
 bad news	Title of error alert		погані новини
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Вставити контрольну точку
@@ -177,7 +177,7 @@ Add	Icon-O-Matic-StylesList		Додати
 Translation Y	Icon-O-Matic-PropertyNames		Перенести по Y
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Зафіксувати фігуру
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Вилучити фігуру
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Прибрати фігуру
 All	Icon-O-Matic-Properties		Всі
 Transformer	Icon-O-Matic-Menus		Трансформатор
 Invert selection	Icon-O-Matic-Properties		Інвертувати вибір
@@ -188,7 +188,7 @@ Settings…	Icon-O-Matic-SavePanel		Налаштування…
 Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
 New	Icon-O-Matic-Menu-File		Новий
 Yes	Icon-O-Matic-StyledTextImport		Так
-Remove Path	Icon-O-Matic-RemovePathsCmd		Вилучити смугу
+Remove Path	Icon-O-Matic-RemovePathsCmd		Прибрати смугу
 Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перемістити трансформатор
 Perspective	Transformation		Перспектива

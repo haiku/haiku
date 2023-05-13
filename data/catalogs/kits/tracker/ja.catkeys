@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	464753347
+1	japanese	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		ワイルドカード表現と一�
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		タイトル
 Identify	ContainerWindow		ファイル形式を判別
-You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
 Create link	ContainerWindow		リンクの作成
 starts with	FindPanel		指定文字列で始まる
 Replace	FSUtils		置換
@@ -152,7 +151,6 @@ Disks	Model		ディスク
 Create a Query template	FindPanel		クエリ雛型の作成
 Size	FindPanel		サイズ
 Window	FilePanelPriv		ウィンドウ
-Replace other file	WidgetAttributeText		既存の項目を置き換える
 OK	Email Query Columns		OK
 Location	QueryPoseView		場所
 Edit query	ContainerWindow		クエリの編集
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		ごみ箱にコピーで�
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダー内に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか?
 When	Email Query Columns		受信日
 Object	AttributesView		オブジェクト
-Paste	FilePanelPriv		貼り付け
 Paste	ContainerWindow		貼り付け
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		このフォルダーに \"%name\" という項目がすでに存在して、中に同じ名前の項目が入っている可能性もあります。%verbしようとしている項目と置き換えますか?
 Cannot unmount the boot volume \"%name\".	FSUtils		起動ボリューム \"%name\" をマウント解除できません。
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		新規フォルダー %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションを再コンパイルしてください。
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
-That name is already taken. Please type another one.	WidgetAttributeText		指定された名前はすでに使用されています。別の名前を指定してください。
 Message	AttributesView		Message
 Modified	Default Query Columns		更新日時
 Default application	InfoWindow		デフォルトアプリケーション
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		アイコン表示
 Name	ContainerWindow		名前
 Preferred for %type	OpenWithWindow		%type対応優先アプリ
 Free space color	SettingsView		空き容量の色
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

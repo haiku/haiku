@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	464753347
+1	finnish	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		täsmää jokerimerkkilausekkeeseen
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Otsikko
 Identify	ContainerWindow		Tunnista
-You can't move or copy items to read-only volumes.	FSUtils		Et voi siirtää tai kopioida kohteita kirjoitussuojatuille taltioille.
 Create link	ContainerWindow		Luo linkki
 starts with	FindPanel		alkaa kohteella
 Replace	FSUtils		Korvaa
@@ -152,7 +151,6 @@ Disks	Model		Levyt
 Create a Query template	FindPanel		Luo kyselymallinne
 Size	FindPanel		Koko
 Window	FilePanelPriv		Ikkuna
-Replace other file	WidgetAttributeText		Korvaa muu tiedosto
 OK	Email Query Columns		Valmis
 Location	QueryPoseView		Sijainti
 Edit query	ContainerWindow		Muokkaa kyselyä
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Et voi kopioida kohteita 
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Tässä kansiossa on jo joitakin kohteita, joilla on samat nimet kuin kohteilla, joille haluat suorittaa toiminnon ”%verb”.\n \nHaluaisitko korvata ne niillä kohteilla, jotka joille haluat suorittaa toiminnon ”%verb” vai haluatko kysymyskehotteen jokaiselle?
 When	Email Query Columns		Milloin
 Object	AttributesView		Objekti
-Paste	FilePanelPriv		Liitä
 Paste	ContainerWindow		Liitä
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Kohde nimellä ”%name” on jo olemassa tässä kansiossa, ja saattaa sisältää\nsamannimisiä kohteita. Haluaisitko korvata ne kansiossa, johon %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa käynnistystaltiota ”%name”.
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Uusi kansio %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		”%name” on perinnäisjärjestelmän suoritettava tiedosto. Hanki päivitetty versio tai käännä sovellus uudelleen.
 Only the boot disk	AutoMounterSettings		Vain käynnistyslevy
-That name is already taken. Please type another one.	WidgetAttributeText		Tuo nimi on jo varattu. Kirjoita joku toinen.
 Message	AttributesView		Viesti
 Modified	Default Query Columns		Muokattu
 Default application	InfoWindow		Oletussovellus
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Kuvakenäkymä
 Name	ContainerWindow		Nimi
 Preferred for %type	OpenWithWindow		Ensisijainen tyypille %type
 Free space color	SettingsView		Vapaan tilan väri
-OK	WidgetAttributeText		Valmis
 OK	FSUtils		Valmis

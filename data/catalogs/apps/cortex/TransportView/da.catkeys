@@ -1,4 +1,4 @@
-1	danish	application/x-vnd.Cortex.TransportView	3739685609
+1	danish	application/x-vnd.Cortex.TransportView	1534931965
 Roll	TransportView		Rul
 (none)	TransportView		(ingen)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# knudepunkt} other{# knudepunkter}}
@@ -9,13 +9,15 @@ Offline	TransportView		Offline
 (???)	TransportView		(???)
 Stop	TransportView		Stop
 (no group)	TransportView		(ingen gruppe)
-Drop data	TransportView		Drop data
+Drop data	TransportView		Slip data
 To:	TransportView		Til:
 Recording	TransportView		Optager
+Increase latency	TransportView		Øg forsinkelse
 Time source:	TransportView		Tidskilde:
 DAC time source	TransportView		DAC-tidskilde
 Decrease precision	TransportView		Formindsk præcisionen
 System clock	TransportView		Systemets ur
 From:	TransportView		Fra:
 Roll from	TransportView		Rul fra
+Preroll	TransportView		Forrul
 Run mode:	TransportView		Kørselstilstand:

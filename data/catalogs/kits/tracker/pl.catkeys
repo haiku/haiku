@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	464753347
+1	polish	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		pasuje do wyrażenia ze znakami wie
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Tytuł
 Identify	ContainerWindow		Rozpoznaj
-You can't move or copy items to read-only volumes.	FSUtils		Nie możesz kopiować ani przenosić plików do woluminów będących w trybie tylko do odczytu.
 Create link	ContainerWindow		Utwórz dowiązanie
 starts with	FindPanel		zaczyna się od
 Replace	FSUtils		Zamień
@@ -152,7 +151,6 @@ Disks	Model		Dyski
 Create a Query template	FindPanel		Stwórz szablon Zapytania
 Size	FindPanel		Rozmiar
 Window	FilePanelPriv		Okno
-Replace other file	WidgetAttributeText		Zastąp pozostałe pliki
 OK	Email Query Columns		OK
 Location	QueryPoseView		Ścieżka
 Edit query	ContainerWindow		Edytuj zapytanie
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Przepraszamy, nie możesz
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Niektóre elementy, które chcesz %verb, mają nazwy identyczne z elementami już istniejącymi w tym katalogu.\n \nCzy chcesz je zamienić z tymi, które chcesz %verb, czy wolisz być pytany o każdy z nich?
 When	Email Query Columns		Kiedy
 Object	AttributesView		Obiekt
-Paste	FilePanelPriv		Wklej
 Paste	ContainerWindow		Wklej
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Obiekt o nazwie „%name” już istnieje w tej lokalizacji, oraz może zawierać\nelementy z tymi samymi nazwami. Czy chcesz podmienić je z tymi znajdującymi się w folderu w którym się %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Nie można odmontować woluminu rozruchowego „%name”.
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Nowy katalog %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name” jest plikiem wykonywalnym w starym formacie. Zdobądź zaktualizowaną wersję lub skompiluj aplikację jeszcze raz.
 Only the boot disk	AutoMounterSettings		Tylko dysk bootujący
-That name is already taken. Please type another one.	WidgetAttributeText		Ta nazwa jest już zajęta. Proszę wybrać inną.
 Message	AttributesView		Wiadomość
 Modified	Default Query Columns		Zmodyfikowany
 Default application	InfoWindow		Domyślna aplikacja
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Widok ikon
 Name	ContainerWindow		Nazwa
 Preferred for %type	OpenWithWindow		Preferowane dla %type
 Free space color	SettingsView		Kolor wolnego miejsca
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

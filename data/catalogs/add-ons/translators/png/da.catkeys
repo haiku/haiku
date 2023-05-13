@@ -1,8 +1,10 @@
-1	danish	x-vnd.Haiku-PNGTranslator	775334266
+1	danish	x-vnd.Haiku-PNGTranslator	993682334
 PNG Settings	PNGTranslator		PNG-indstillinger
 None	PNGTranslator		Ingen
 PNG image	PNGTranslator		PNG-billede
 PNG images	PNGTranslator		PNG-billeder
+Interlacing type:	PNGTranslator		Interlacingtype:
 PNGTranslator Settings	PNGTranslator		PNGTranslator-indstillinger
 Version %d.%d.%d, %s	PNGTranslator		Version %d.%d.%d, %s
 PNG image translator	PNGTranslator		PNG-billedoversætter
+Interlace Option	PNGTranslator		Interlacevalg

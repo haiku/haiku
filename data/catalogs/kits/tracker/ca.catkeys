@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	464753347
+1	catalan; valencian	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		es correspon amb l'expressió regul
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Títol
 Identify	ContainerWindow		Identifica com a
-You can't move or copy items to read-only volumes.	FSUtils		No podeu moure o copiar elements als volums de només lectura.
 Create link	ContainerWindow		Crea un enllaç
 starts with	FindPanel		comença amb
 Replace	FSUtils		Reemplaça
@@ -152,7 +151,6 @@ Disks	Model		Discs
 Create a Query template	FindPanel		Crea una plantilla de consulta
 Size	FindPanel		Mida
 Window	FilePanelPriv		Finestra
-Replace other file	WidgetAttributeText		Reemplaça un altre fitxer
 OK	Email Query Columns		D'acord
 Location	QueryPoseView		Ubicació
 Edit query	ContainerWindow		Edita la consulta
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Disculpeu, no podeu copia
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alguns elements d'aquesta carpeta tenen el mateix nom que els elements que "%verb".\n \nVoleu reemplaçar-los pels que "%verb" o que se us pregunti per cada un?
 When	Email Query Columns		Quan
 Object	AttributesView		Objecte
-Paste	FilePanelPriv		Enganxa
 Paste	ContainerWindow		Enganxa
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ja existeix un element amb el nom \"%name\" en aquesta carpeta, i podria incloure\nelements amb els mateixos noms. Els voleu reemplaçar pels de la carpeta que "%verb"?
 Cannot unmount the boot volume \"%name\".	FSUtils		No es pot desmuntar el volum d'arrencada \"%name\".
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Carpeta nova %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" és un executable de llegat. Si us plau, obteniu-ne una versió actualitzada o recompileu l'aplicació.
 Only the boot disk	AutoMounterSettings		Només el disc de l'arrencada
-That name is already taken. Please type another one.	WidgetAttributeText		Ja existeix aquest nom. Si us plau, escriviu-ne un altre.
 Message	AttributesView		Missatge
 Modified	Default Query Columns		Modificat
 Default application	InfoWindow		Aplicació per defecte
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Mostra les icones
 Name	ContainerWindow		Nom
 Preferred for %type	OpenWithWindow		Preferit per a %type
 Free space color	SettingsView		Color de l'espai lliure
-OK	WidgetAttributeText		D'acord
 OK	FSUtils		D'acord

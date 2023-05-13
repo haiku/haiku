@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	464753347
+1	danish	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og lav foretrukket
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		matcher jokertegnudtryk
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identificér
-You can't move or copy items to read-only volumes.	FSUtils		Du kan ikke flytte eller kopiere elementer til skrivebeskyttede diskområder.
 Create link	ContainerWindow		Opret lænke
 starts with	FindPanel		begynder med
 Replace	FSUtils		Erstat
@@ -152,7 +151,6 @@ Disks	Model		Diske
 Create a Query template	FindPanel		Opret en forespørgselsskabelon
 Size	FindPanel		Størrelse
 Window	FilePanelPriv		Vindue
-Replace other file	WidgetAttributeText		Erstat anden fil
 OK	Email Query Columns		O.k.
 Location	QueryPoseView		Sted
 Edit query	ContainerWindow		Redigér forespørgsel
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Beklager, du kan ikke kop
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Nogle af elementerne eksisterer allerede i mappen med de samme navne som de elementer du %verb.\n \nVil du erstatte dem med dem du %verb eller blive bedt om for hver eneste?
 When	Email Query Columns		Når
 Object	AttributesView		Objekt
-Paste	FilePanelPriv		Indsæt
 Paste	ContainerWindow		Indsæt
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Et element ved navn \"%name\" eksisterer allerede i mappen, og indeholder\nelementer med de samme navne. Vil du erstatte dem med de filer i den mappe du %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Kunne ikke afmontere opstartsdiskområdet \"%name\".
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Ny mappe %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" er en forældet eksekverbar. Hent venligst en opdateret version eller genoversæt programmet.
 Only the boot disk	AutoMounterSettings		Kun opstartsdisken
-That name is already taken. Please type another one.	WidgetAttributeText		Det navn er allerede taget. Skriv et andet.
 Message	AttributesView		Meddelelse
 Modified	Default Query Columns		Ændret
 Default application	InfoWindow		Standardprogram
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Ikonvisning
 Name	ContainerWindow		Navn
 Preferred for %type	OpenWithWindow		Anbefalet for %type
 Free space color	SettingsView		Farve for ledig plads
-OK	WidgetAttributeText		O.k.
 OK	FSUtils		O.k.

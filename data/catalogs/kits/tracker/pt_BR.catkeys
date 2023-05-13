@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	2915475646
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	3216077948
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -56,7 +56,6 @@ matches wildcard expression	SelectionWindow		encaixa na expressão coringa
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Título
 Identify	ContainerWindow		Identificar
-You can't move or copy items to read-only volumes.	FSUtils		Não é possível mover ou copiar itens para volumes em modo somente leitura.
 Create link	ContainerWindow		Criar atalho
 starts with	FindPanel		inicia com
 Replace	FSUtils		Substituir
@@ -150,7 +149,6 @@ Disks	Model		Discos
 Create a Query template	FindPanel		Criar um modelo de consulta
 Size	FindPanel		Tamanho
 Window	FilePanelPriv		Janela
-Replace other file	WidgetAttributeText		Substituir outro arquivo
 OK	Email Query Columns		OK
 Location	QueryPoseView		Local
 Edit query	ContainerWindow		Editar consulta
@@ -406,7 +404,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Desculpe, você não pode
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Alguns itens já existem nesta pasta com os mesmos nomes dos itens que você quer %verb.\n \nVocê gostaria de substituí-los com aqueles que você vai %verb ou ser perguntado em cada um?
 When	Email Query Columns		Quando
 Object	AttributesView		Objeto
-Paste	FilePanelPriv		Colar
 Paste	ContainerWindow		Colar
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Um item chamado \"%name\" já existe nesta pasta, e pode conter\nitens com os mesmos nomes. Gostaria de substituí-los com aqueles na pasta que está %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Não foi possível desmontar volume de inicialização \"%name\".
@@ -470,7 +467,6 @@ New folder %ld	FSUtils		Nova pasta %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" é um executável legado. Por favor obtenha uma versão atualizada ou recompile o aplicativo.
 Only the boot disk	AutoMounterSettings		Somente o disco de inicialização
-That name is already taken. Please type another one.	WidgetAttributeText		Este nome já pertence a alguém. Por favor digite outro.
 Message	AttributesView		Mensagem
 Modified	Default Query Columns		Modificado
 Default application	InfoWindow		Aplicativo padrão
@@ -530,5 +526,4 @@ Icon view	ContainerWindow		Visualizar ícone
 Name	ContainerWindow		Nome
 Preferred for %type	OpenWithWindow		Preferido por %type
 Free space color	SettingsView		Cor do espaço vazio
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

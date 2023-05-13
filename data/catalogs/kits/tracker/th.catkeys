@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	2730310071
+1	thai	x-vnd.Haiku-libtracker	3030912373
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -54,7 +54,6 @@ matches wildcard expression	SelectionWindow		จับคู่แสดงส�
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		ชื่อเรื่อง
 Identify	ContainerWindow		แสดง
-You can't move or copy items to read-only volumes.	FSUtils		คุณไม่สามารถย้ายหรือคัดลอกรายการไปยังไดรฟ์ข้อมูลแบบอ่านอย่างเดียว
 Create link	ContainerWindow		สร้างลิงค์
 starts with	FindPanel		เริ่มต้นด้วย
 Replace	FSUtils		แทนที่
@@ -145,7 +144,6 @@ Disks	Model		ดิสก์
 Create a Query template	FindPanel		สร้างแม่แบบ Query
 Size	FindPanel		ขนาด
 Window	FilePanelPriv		หน้าต่าง
-Replace other file	WidgetAttributeText		แทนที่ไฟล์อื่น
 OK	Email Query Columns		ตกลง
 Location	QueryPoseView		สถานที่
 Edit query	ContainerWindow		แก้ไข query
@@ -397,7 +395,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		ขออภัยคุ�
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		มีบางรายการในโฟลเดอร์นี้ที่มีชื่อเดียวกันกับรายการที่คุณเป็น %verb\n\nคุณต้องการแทนที่พวกเขาด้วยสิ่งที่คุณเป็น %verb หรือได้รับแจ้งสำหรับแต่ละคน?
 When	Email Query Columns		เมื่อ
 Object	AttributesView		วัตถุ
-Paste	FilePanelPriv		วาง
 Paste	ContainerWindow		วาง
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		มีรายการชื่อ \"%name\" อยู่แล้วในโฟลเดอร์นี้และอาจมี \nรายการที่มีชื่อเดียวกัน คุณต้องการแทนที่พวกเขาด้วยที่อยู่ในโฟลเดอร์ที่คุณเป็น %verb หรือไม่?
 Cannot unmount the boot volume \"%name\".	FSUtils		ไม่สามารถยกเลิกการต่อเชื่อมวอลุ่มสำหรับบูต \"%name\"
@@ -460,7 +457,6 @@ New folder %ld	FSUtils		โฟลเดอร์ใหม่ %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" เป็นไฟล์ปฏิบัติการแบบเก่า โปรดรับรุ่นที่ปรับปรุงแล้วหรือคอมไพล์แอปพลิเคชันใหม่
 Only the boot disk	AutoMounterSettings		เฉพาะดิสก์สำหรับบูต
-That name is already taken. Please type another one.	WidgetAttributeText		มีรายชื่อนี้อยู่แล้ว โปรดพิมพ์รายการอื่น
 Message	AttributesView		ข้อความ
 Modified	Default Query Columns		แก้ไข
 Default application	InfoWindow		แอปพลิเคชันเริ่มต้น
@@ -519,5 +515,4 @@ Icon view	ContainerWindow		ดูไอคอน
 Name	ContainerWindow		ชื่อ
 Preferred for %type	OpenWithWindow		ที่ต้องการสำหรับ %type
 Free space color	SettingsView		แถบสีว่าง
-OK	WidgetAttributeText		ตกลง
 OK	FSUtils		ตกลง

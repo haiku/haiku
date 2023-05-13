@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1356723787
+1	lithuanian	x-vnd.Haiku-libtracker	1657326089
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -42,7 +42,6 @@ Size	PoseView		Dydis
 matches wildcard expression	SelectionWindow		atitinka šabloną
 96 x 96	ContainerWindow		96×96
 Identify	ContainerWindow		Atpažinti
-You can't move or copy items to read-only volumes.	FSUtils		Perkelti ar kopijuoti objektų į tomus, prijungtus tik skaitymui, negalima.
 Create link	ContainerWindow		Kurti nuorodą
 starts with	FindPanel		prasideda
 Replace	FSUtils		Pakeisti
@@ -113,7 +112,6 @@ Disks	Model		Tomai
 Create a Query template	FindPanel		Sukurti užklausos šabloną
 Size	FindPanel		Dydis
 Window	FilePanelPriv		Langas
-Replace other file	WidgetAttributeText		Pakeisti kitą failą
 OK	Email Query Columns		Gerai
 Location	QueryPoseView		Vieta
 Edit query	ContainerWindow		Taisyti užklausą
@@ -313,7 +311,6 @@ New	ContainerWindow		Naujas
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
 Sorry, you can't copy items to the Trash.	FSClipBoard		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Šiame aplanke, jau yra objektų, kurių vardai sutampa su objektų, kuriuos %verb, pavadinimais.\n\nAr norite visus konfliktinius objektus pakeisti tais, kuriuos %verb, ar geriau Jūsų atsiklausti dėl kiekvieno atskirai?
-Paste	FilePanelPriv		Įdėti
 Paste	ContainerWindow		Įdėti
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Aplankas vardu „%name“ jau egzistuoja šiame aplanke ir gali būti, jog jame yra kitų objektų sutampančiais vardais. Ar norite šiuos konfliktinius objektus pakeisti esančiais aplanke, kurį %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Paleidimo tomo „%name“ atjungti negalima.
@@ -362,7 +359,6 @@ New folder %ld	FSUtils		Naujas aplankas %ld
 64 x 64	DeskWindow		64×64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name%“ yra pasenusio tipo vykdomasis failas. Įsigykite naujesnę programos versiją arba ją perkompiliuokite.
 Only the boot disk	AutoMounterSettings		Tik paleidimo tomą
-That name is already taken. Please type another one.	WidgetAttributeText		Šis vardas jau užimtas. Įveskite kitą
 Modified	Default Query Columns		Modifikavimo data
 Default application	InfoWindow		numatytąją programą
 Untitled bitmap	PoseView		Bevardis paveikslas
@@ -403,5 +399,4 @@ Icon view	ContainerWindow		Rodyti piktogramas
 Name	ContainerWindow		Vardas
 Preferred for %type	OpenWithWindow		Numatytoji %type objektams
 Free space color	SettingsView		Laisvos vietos spalva
-OK	WidgetAttributeText		Gerai
 OK	FSUtils		Gerai

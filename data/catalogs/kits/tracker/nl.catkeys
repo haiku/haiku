@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	464753347
+1	dutch; flemish	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		komt overeen met wildcardtekens
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identificeren
-You can't move or copy items to read-only volumes.	FSUtils		U kunt items niet naar alleen-lezen-gegevensdragers verplaatsen of kopiëren.
 Create link	ContainerWindow		Een link maken
 starts with	FindPanel		begint met
 Replace	FSUtils		Vervangen
@@ -152,7 +151,6 @@ Disks	Model		Schijven
 Create a Query template	FindPanel		Maak een Zoekopdracht-sjabloon
 Size	FindPanel		Grootte
 Window	FilePanelPriv		Venster
-Replace other file	WidgetAttributeText		Ander bestand vervangen
 OK	Email Query Columns		OK
 Location	QueryPoseView		Locatie
 Edit query	ContainerWindow		Zoekopdracht aanpassen
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Sorry, u kunt geen items 
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Enkele items met dezelfde namen als de items die u %verb bestaan al in deze map.\n \nWilt u deze vervangen door de items die u %verb of wilt u voor elk bestand afzonderlijk beslissen?
 When	Email Query Columns		Wanneer
 Object	AttributesView		Object
-Paste	FilePanelPriv		Plakken
 Paste	ContainerWindow		Plakken
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Er bestaat al een item met de naam \"%name\" in deze map, en deze kan\n items bevatten met dezelfde namen. Wilt u die vervangen door de items in de map die u %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Kan het opstartvolume \"%name\" niet ontkoppelen.
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Nieuwe map %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" is in een oud programmaformaat. Zorg dat u een bijgewerkte versie krijgt, of compileer deze zelf.
 Only the boot disk	AutoMounterSettings		Alleen de opstartschijf
-That name is already taken. Please type another one.	WidgetAttributeText		Deze naam is al in gebruik. Typ alstublieft een andere in.
 Message	AttributesView		Bericht
 Modified	Default Query Columns		Gewijzigd
 Default application	InfoWindow		Standaardprogramma
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		Icoonweergave
 Name	ContainerWindow		Naam
 Preferred for %type	OpenWithWindow		Geschikt voor %type
 Free space color	SettingsView		Kleur voor vrije ruimte
-OK	WidgetAttributeText		OK
 OK	FSUtils		Oké

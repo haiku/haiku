@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	464753347
+1	ukrainian	x-vnd.Haiku-libtracker	765355649
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		відповідає шаблону
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Назва
 Identify	ContainerWindow		Визначити
-You can't move or copy items to read-only volumes.	FSUtils		Ви не можете перемістити або копіювати елементи до томів тільки для читання.
 Create link	ContainerWindow		Створити посилання
 starts with	FindPanel		почати з
 Replace	FSUtils		Замінити
@@ -152,7 +151,6 @@ Disks	Model		Диски
 Create a Query template	FindPanel		Створення шаблону запиту
 Size	FindPanel		Розмір
 Window	FilePanelPriv		Вікно
-Replace other file	WidgetAttributeText		Замінити інший файл
 OK	Email Query Columns		ОК
 Location	QueryPoseView		Розташування
 Edit query	ContainerWindow		Редагувати запит
@@ -409,7 +407,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Вибачте, ви не
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Деякі елементи присутні у цій папці мають ті самі імена що Ви %verb.\n \nБажаєте замінити їх з тими що Ви %verb або питати про кожний окремо?
 When	Email Query Columns		Коли
 Object	AttributesView		Об'єкт
-Paste	FilePanelPriv		Вставити
 Paste	ContainerWindow		Вставити
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Елемент з назвою \"%name\" вже існує у цій папці, і може містити\nелементи з такими ж іменами. Ви дійсно бажаєте перемістити його разом з вмістом у теку де Ви є %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Неможливо відключити завантажувальний том \"%name\".
@@ -473,7 +470,6 @@ New folder %ld	FSUtils		Нова папка %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" програма застарілого типу. Будь-ласка отримайте оновлену версію.
 Only the boot disk	AutoMounterSettings		Тільки завантажувальний диск
-That name is already taken. Please type another one.	WidgetAttributeText		Ім'я вже зайняте. Спробуйте інше.
 Message	AttributesView		Повідомлення
 Modified	Default Query Columns		Змінений
 Default application	InfoWindow		Програма за замовчуванням
@@ -534,5 +530,4 @@ Icon view	ContainerWindow		У вигляді значків
 Name	ContainerWindow		Ім'я
 Preferred for %type	OpenWithWindow		Насамперед для %type
 Free space color	SettingsView		Колір вільного місця
-OK	WidgetAttributeText		ОК
 OK	FSUtils		ОК

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	4292131264
+1	indonesian	x-vnd.Haiku-libtracker	297766270
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -55,7 +55,6 @@ matches wildcard expression	SelectionWindow		sesuai dengan ungkapan wildcard
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Judul
 Identify	ContainerWindow		Identitas
-You can't move or copy items to read-only volumes.	FSUtils		Anda tidak dapat memindahkan atau menyalin item ke volume hanya-baca.
 Create link	ContainerWindow		Buat link
 starts with	FindPanel		diawali dengan
 Replace	FSUtils		Ganti
@@ -146,7 +145,6 @@ Disks	Model		Diska
 Create a Query template	FindPanel		Membuat template pencarian
 Size	FindPanel		Ukuran
 Window	FilePanelPriv		Jendela
-Replace other file	WidgetAttributeText		Ganti file lainnya
 OK	Email Query Columns		OKE
 Location	QueryPoseView		Lokasi
 Edit query	ContainerWindow		Sunting kueri
@@ -398,7 +396,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Maaf, Anda tidak dapat me
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Beberapa item sudah ada di folder ini dengan nama yang sama dengan item Anda%verb.\n \nApakah Anda ingin menggantinya dengan yang Anda %verb atau diminta untuk masing-masing?
 When	Email Query Columns		Ketika
 Object	AttributesView		Obyek
-Paste	FilePanelPriv		Tempel
 Paste	ContainerWindow		Tempel
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Item bernama\"%name\" sudah ada di folder ini, dan mungkin berisi\nitem dengan nama yang sama. Apakah anda ingin menggantinya dengan yang tercantum dalam folder anda %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Tidak bisa unmount boot volume \"%name\".
@@ -461,7 +458,6 @@ New folder %ld	FSUtils		Folder baru %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" adalah warisan yang dapat dijalankan. Silakan dapatkan versi terbaru atau kompilasi ulang aplikasi.
 Only the boot disk	AutoMounterSettings		Hanya disk boot
-That name is already taken. Please type another one.	WidgetAttributeText		Nama tersebut telah dipakai. Silakan ketik lainnya.
 Message	AttributesView		Pesan
 Modified	Default Query Columns		Diubah
 Default application	InfoWindow		Aplikasi standar
@@ -520,5 +516,4 @@ Icon view	ContainerWindow		Tampilan ikon
 Name	ContainerWindow		Nama
 Preferred for %type	OpenWithWindow		Disukai untuk %type
 Free space color	SettingsView		Warna untuk ruang bebas
-OK	WidgetAttributeText		OKE
 OK	FSUtils		OKE

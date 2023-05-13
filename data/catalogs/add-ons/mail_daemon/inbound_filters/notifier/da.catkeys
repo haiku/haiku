@@ -3,7 +3,7 @@ Log window	NotifierConfigView		Logvindue
 none	NotifierConfigView		ingen
 New mails notification	NotifierFilter		Underretning om ny post
 Alert	NotifierConfigView		Besked
-OK	NotifierFilter		OK
+OK	NotifierFilter		O.k.
 Central alert	NotifierConfigView		Central besked
 Beep	NotifierConfigView		Bip
 Central beep	NotifierConfigView		Centralt bip

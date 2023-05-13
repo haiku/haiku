@@ -1,5 +1,5 @@
 1	danish	x-vnd.Haiku-KeyboardInputServerDevice	131044710
-If the application will not quit you may have to kill it.	Team monitor		Hvis programmet ikke vil afslutte, kan det hænde du må dræbe det.
+If the application will not quit you may have to kill it.	Team monitor		Hvis programmet ikke vil afslutte, kan det hænde, du må dræbe det.
 Quit application	Team monitor		Afslut program
 Open Terminal	Team monitor		Åbn terminal
 {0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE nede i # sekund for at genstarte.}other{Hold CONTROL+ALT+DELETE nede i # sekunder for at genstarte.}}
@@ -7,5 +7,5 @@ Restart the desktop	Team monitor		Genstart skrivebordet
 Force reboot	Team monitor		Gennemtving genstart
 Team monitor	Team monitor		Gruppemonitor
 Kill application	Team monitor		Dræb program
-Cancel	Team monitor		Annuller
+Cancel	Team monitor		Afbryd
 (This team is a system component)	Team monitor		(Holdet er en systemkomponent)

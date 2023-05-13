@@ -2,4 +2,4 @@
 Continue	CortexAddOnHost		Fortsæt
 Cortex AddOnHost	CortexAddOnHost		Cortex-tilføjelsesvært
 Quit	CortexAddOnHost		Afslut
-This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Programmet kører i baggrunden og startes automatisk af Cortex når det er nødvendigt. Du ønsker formodentligt ikke at starte den manuelt.
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Programmet kører i baggrunden og startes automatisk af Cortex, når det er nødvendigt. Du ønsker formodentligt ikke at starte den manuelt.

@@ -6,7 +6,7 @@ Short format:	TimeFormatSettings		Kısa biçim:
 24 hour	TimeFormatSettings		24 saat
 Locale	Locale Preflet Window		Yerel Ayarlar
 Time	TimeFormatSettings		Zaman
-Defaults	Locale Preflet Window		Öntanımlılar
+Defaults	Locale Preflet Window		Saptanmışlar
 Locale	System name		Yerel Ayarlar
 Date	TimeFormatSettings		Tarih
 OK	Locale Preflet Window		Tamam

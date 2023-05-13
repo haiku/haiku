@@ -1,17 +1,17 @@
 1	danish	application/x-vnd.Cortex.MediaRoutingView	3442339205
 Lock group	MediaNodePanel		Lås gruppe
 %refname% (no file)	MediaNodePanel		%refname% (ingen fil)
-Video output	MediaRoutingView		Videooutput
+Video output	MediaRoutingView		Videoudgang
 Icon view	MediaRoutingView		Ikonvisning
-OK	MediaRoutingView		OK
+OK	MediaRoutingView		O.k.
 Cycle	MediaNodePanel		Omløbstid
 Advanced	MediaNodePanel		Avanceret
-Audio input	MediaRoutingView		Lydinput
+Audio input	MediaRoutingView		Lydindgang
 Run mode	MediaNodePanel		Kørselstilstand
 Could not load '%filename%'	MediaRoutingView		Kunne ikke indlæse '%filename%'
 Stop time source	MediaNodePanel		Stop tidskilde
 Be Audio Mixer	MediaRoutingView		Be-lydmixer
-Video input	MediaRoutingView		Videoinput
+Video input	MediaRoutingView		Videoindgang
 Release	MediaNodePanel		Slip
 Disconnect	MediaRoutingView		Afbryd forbindelse
 Could not disconnect	MediaRoutingView		Kunne ikke afbryde forbindelse
@@ -19,16 +19,16 @@ Could not instantiate '%infoname%'	MediaRoutingView		Kunne ikke starte '%infonam
 Mini icon view	MediaRoutingView		Miniikonvisning
 Select all	MediaRoutingView		Vælg alt
 (same as group)	MediaNodePanel		(samme som gruppe)
-Input	MediaJack		Input
-Get info	MediaJack		Hent information
+Input	MediaJack		Inddata
+Get info	MediaJack		Hent oplysninger
 Start time source	MediaNodePanel		Start tidskilde
 Error	MediaRoutingView		Fejl
 Could not release '%refname%'	MediaRoutingView		Kunne ikke frigive '%refname%'
-Output	MediaJack		Output
-Get info	MediaNodePanel		Hent information
-Get info	MediaRoutingView		Hent information
+Output	MediaJack		Uddata
+Get info	MediaNodePanel		Hent oplysninger
+Get info	MediaRoutingView		Hent oplysninger
 Clean up	MediaRoutingView		Ryd op
 Start control panel	MediaNodePanel		Start kontrolpanel
-Tweak parameters	MediaNodePanel		Finjuster parametre
+Tweak parameters	MediaNodePanel		Justér parametre
 Could not connect	MediaRoutingView		Kunne ikke tilslutte
-Unlock group	MediaNodePanel		Lås op for gruppe
+Unlock group	MediaNodePanel		Lås gruppe op

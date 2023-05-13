@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3698762573
+1	german	x-vnd.Haiku-libtracker	3999364875
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -57,7 +57,6 @@ matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
 96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identifizieren
-You can't move or copy items to read-only volumes.	FSUtils		Auf schreibgeschützte Datenträger können keine Objekte kopiert oder verschoben werden.
 Create link	ContainerWindow		Verknüpfung erstellen
 starts with	FindPanel		beginnt mit
 Replace	FSUtils		Ersetzen
@@ -150,7 +149,6 @@ Disks	Model		Datenträger
 Create a Query template	FindPanel		Query als Vorlage erstellen
 Size	FindPanel		Größe
 Window	FilePanelPriv		Fenster
-Replace other file	WidgetAttributeText		Andere Datei ersetzen
 OK	Email Query Columns		OK
 Location	QueryPoseView		Ort
 Edit query	ContainerWindow		Query bearbeiten
@@ -404,7 +402,6 @@ Sorry, you can't copy items to the Trash.	FSClipBoard		Objekte können leider ni
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Manche Objekte in diesem Ordner heißen genauso wie Objekte, die gerade %verb werden sollen.\n\nSollen sie alle ersetzt werden, oder soll jedes Mal einzeln nachgefragt werden?
 When	Email Query Columns		Wann
 Object	AttributesView		Objekt
-Paste	FilePanelPriv		Einfügen
 Paste	ContainerWindow		Einfügen
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Ein Objekt mit dem Namen \"%name\" existiert bereits in diesem Ordner und könnte\nObjekte mit gleichen Namen enthalten. Sollen sie mit denen des Ordners ersetzt werden, der %verb werden soll?
 Cannot unmount the boot volume \"%name\".	FSUtils		Das Boot-Laufwerk \"%name\" kann nicht ausgehängt werden.
@@ -468,7 +465,6 @@ New folder %ld	FSUtils		Neuer Ordner %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" hat ein veraltetest Programmformat. Die Anwendung muss neu kompiliert, bzw. eine aktualisierte Version installiert werden.
 Only the boot disk	AutoMounterSettings		Nur den Boot-Datenträger
-That name is already taken. Please type another one.	WidgetAttributeText		Dieser Name wird schon benutzt. Bitte einen anderen wählen.
 Message	AttributesView		Message
 Modified	Default Query Columns		Geändert
 Default application	InfoWindow		Standardanwendung
@@ -529,5 +525,4 @@ Icon view	ContainerWindow		Icon-Ansicht
 Name	ContainerWindow		Name
 Preferred for %type	OpenWithWindow		Bevorzugt für %type
 Free space color	SettingsView		Farbe für freien Speicher
-OK	WidgetAttributeText		OK
 OK	FSUtils		OK

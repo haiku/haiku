@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3473072398
+1	belarusian	x-vnd.Haiku-libtracker	3773674700
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -41,7 +41,6 @@ Size	PoseView		Памер
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
 96 x 96	ContainerWindow		96 x 96
 Identify	ContainerWindow		Ідэнтыфікаваць
-You can't move or copy items to read-only volumes.	FSUtils		Нельга перамяшчаць ці капіяваць элементы на тамы толькі для чытання.
 Create link	ContainerWindow		Стварыць спасылку
 starts with	FindPanel		пачынаецца з
 Replace	FSUtils		Замяніць
@@ -112,7 +111,6 @@ Disks	Model		Дыскі
 Create a Query template	FindPanel		Стварыць шаблон Запыту
 Size	FindPanel		Памер
 Window	FilePanelPriv		Вакно
-Replace other file	WidgetAttributeText		Замяніць іншы файл
 OK	Email Query Columns		ОК
 Location	QueryPoseView		Месцазнаходжанне
 Edit query	ContainerWindow		Правіць запыт
@@ -311,7 +309,6 @@ New	ContainerWindow		Новы
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Трэба перацягнуць элементы на іконку аднаго з дыскаў у вакне \"Дыскі\".
 Sorry, you can't copy items to the Trash.	FSClipBoard		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некаторыя элементы ужо існуюць у гэтым каталозе з тымі ж імёнамі, як і ў элементаў, якія вы %verb.\n \nЖадаеце замяніць іх тымі, што вы %verb, або вырашыць асобна для кожнага элемента?
-Paste	FilePanelPriv		Уставіць
 Paste	ContainerWindow		Уставіць
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Элемент \"%name\" ужо ёсць у каталозе, і можа мясціць\nэлементы з такімі ж імёнамі. Жадаеце замяніць іх файламі з каталога, які вы %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Немагчыма размантаваць загрузачны том \"%name\".
@@ -359,7 +356,6 @@ New folder %ld	FSUtils		Новы каталог %ld
 64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" есць праграмай старога тыпу. Калі ласка набудзце ці збярыце яе новую версію.
 Only the boot disk	AutoMounterSettings		Толькі загрузачны дыск
-That name is already taken. Please type another one.	WidgetAttributeText		Імя ўжо занятае. Калі ласка, выберыце іншае.
 Modified	Default Query Columns		Зменены
 Default application	InfoWindow		Прадвызначаная праграма
 Untitled bitmap	PoseView		Неназваны бітмап
@@ -400,5 +396,4 @@ Icon view	ContainerWindow		Від іконак
 Name	ContainerWindow		Імя
 Preferred for %type	OpenWithWindow		Пажаданая для %type
 Free space color	SettingsView		Колер свабоднага месца
-OK	WidgetAttributeText		ОК
 OK	FSUtils		ОК

@@ -5,13 +5,13 @@ short\tlong\tdescription\n	FilePanelApp		kısa\tuzun\taçıklama\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tFilePanel kaydet kullan\n
 %s: this option requires a parameter\n	FilePanelApp		%s: bu seçenek bir parametre gerektiriyor\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tkullanımı görüntüle\n
--l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tFilePanel yükle kullan (öntanımlı)\n
--n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tkaydetme için öntanımlı adı kullan\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\taçılabilir girdilerin türü (tür): herhangi bir d, d, s (dosya (öntanımlı), dizin, sembol bağı)\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tFilePanel yükle kullan (saptanmış)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tkaydetme için saptanmış adı kullan\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\taçılabilir girdilerin türü (tür): herhangi bir d, d, s (dosya (saptanmış), dizin, sembol bağı)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		kullanım: %s [-h] [-d folder] [-l|-s] [-t ttl] [-1] [-m]
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		kullanım: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tFilePanel penceresi başlığını ayarla\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tyalnızca 1 dosyanın seçilmesine izin ver\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tFilePanel'ı kipsel yapar\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tFilePanel'ı kipsel kılar\n
 options:\n	FilePanelApp		seçenekler:\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t<klasör> içinde aç\n

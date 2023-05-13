@@ -2,28 +2,28 @@
 Teams	DataSource		Hold
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
-Block cache memory	DataSource		Blok mellemlager hukommelse
+Block cache memory	DataSource		Blokmellemlagershukommelse
 %lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		Medienoder
-Text clipboard	DataSource		Tekst udklipsholder
-Network send	DataSource		Netværk afsende
+Text clipboard	DataSource		Tekstudklipsholder
+Network send	DataSource		Netværkssending
 Running applications	DataSource		Kørende programmer
 Cache	DataSource		Mellemlager
-CPU usage (combined)	DataSource		CPU forbrug (samlet)
+CPU usage (combined)	DataSource		CPU-forbrug (samlet)
 Threads	DataSource		Tråde
 Receiving	DataSource		Modtager
 Remove graph	ActivityView		Fjern graf
-Swap space	DataSource		Udvekslings plads
+Swap space	DataSource		Swapplads
 CPU	DataSource		CPU
 ActivityMonitor	System name		Aktivitetsmonitor
 CPU %d	DataSource		CPU %d
-Update time interval:	SettingsWindow		Opdatering tids interval:
+Update time interval:	SettingsWindow		Opdateringsinterval:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Indstillinger…
-Block cache	DataSource		Blok mellemlager
+Block cache	DataSource		Blokmellemlager
 Memory	DataSource		Hukommelse
-CPU usage	DataSource		CPU forbrug
+CPU usage	DataSource		CPU-forbrug
 CPU speed	DataSource		CPU-hastighed
 Quit	ActivityWindow		Afslut
 Raw clipboard	DataSource		Rå udklipsholder
@@ -31,20 +31,20 @@ Settings	ActivityWindow		Indstillinger
 Used memory	DataSource		Brugt hukommelse
 %.1f faults/s	DataSource		%.1f fejl/s
 Show legend	ActivityView		Vis forklaring
-Cached memory	DataSource		Mellemlager hukommelse
+Cached memory	DataSource		Mellemlagerhukommelse
 CPU %d usage	DataSource		CPU %d forbrug
 CPU %d speed	DataSource		CPU %d hastighed
 File	ActivityWindow		Fil
 Ports	DataSource		Porte
-Page faults	DataSource		Side fejl
+Page faults	DataSource		Sidefejl
 Apps	DataSource		Programmer
 Additional items	ActivityView		Yderligere elementer
 Add graph	ActivityWindow		Tilføj graf
-Sending	DataSource		Afsender
+Sending	DataSource		Sender
 %.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Altid øverst
-Swap	DataSource		Udveksling
+Swap	DataSource		Swap
 %lld sec.	SettingsWindow		%lld sek.
 P-faults	DataSource		P-fejl
-Sems	DataSource		Semas
-Network receive	DataSource		Netværks modtag
+Sems	DataSource		Semaforer
+Network receive	DataSource		Netværksmodtagning

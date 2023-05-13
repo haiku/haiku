@@ -8,7 +8,7 @@ Log to file	PoorMan		Dosyaya günlükle
 Shutting down.	PoorMan		Kapatılıyor…
 Error Dir	PoorMan		Hata dizini
 Web folder:	PoorMan		Web klasörü:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web'de yayımlanacak klasörü seçin.\n\nPoorMan sizin yerinize Ev klasörünüzde \"public_html\" adında öntanımlı bir klasör oluşturabilir.\nİsterseniz kendi belirleyeceğiniz bir klasörü de seçebilirsiniz.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web'de yayımlanacak klasörü seçin.\n\nPoorMan sizin yerinize Ev klasörünüzde \"public_html\" adında saptanmış bir klasör oluşturabilir.\nİsterseniz kendi belirleyeceğiniz bir klasörü de seçebilirsiniz.
 Log To Console	PoorMan		Konsola günlükle
 File Name	PoorMan		Dosya adı
 Starting up... 	PoorMan		Başlatılıyor… 
@@ -56,7 +56,7 @@ File Logging	PoorMan		Dosya günlükleme
 Log file name:	PoorMan		Günlük dosyası adı:
 Status: Running	PoorMan		Durum: Çalışıyor
 Directory: (none)	PoorMan		Dizin: (yok)
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Öntanımlı bir web klasörü \"/boot/home/public_html\" konumunda oluşturuldu.\nBu klasörde \"index.html\" adında bir dosya olduğundan emin olun.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Saptanmış bir web klasörü \"/boot/home/public_html\" konumunda oluşturuldu.\nBu klasörde \"index.html\" adında bir dosya olduğundan emin olun.
 Dir Created	PoorMan		Dizin oluşturuldu
 Save console selections as…	PoorMan		Konsol seçimlerini farklı kaydet…
 Quit	PoorMan		Çık

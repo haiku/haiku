@@ -6,20 +6,20 @@ Open selection	GrepWindow		Відкрити вибране
 Actions	GrepWindow		Дії
 New window	GrepWindow		Нове вікно
 Encoding	GrepWindow		Кодування
-Set target to parent folder	GrepWindow		Зробити батьківську папку цільовою
+Set target to parent folder	GrepWindow		Зробити батьківський каталог цільовим
 OK	GrepWindow		ОК
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Закрити
 Look in sub-folders	GrepWindow		Дивитися в підпапках
 %s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця щоб екранувати ім'я файлу.
-Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
+Follow symbolic links	GrepWindow		Переходити за символьними посиланнями
 Regular expression	GrepWindow		Регулярний вираз
 Text files only	GrepWindow		Тільки текстові файли
 Quit	GrepWindow		Вийти
 Show files in Tracker	GrepWindow		Показати файли у Tracker
-Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли в яких Ви хочете продовжити пошук.
-Trim to selection	GrepWindow		Обмежитись вибраними
-Set target…	GrepWindow		Встановити ціль…
+Please select the files you wish to keep searching.	GrepWindow		Виберіть файли в яких Ви хочете продовжити пошук.
+Trim to selection	GrepWindow		Обмежитись вибраним
+Set target…	GrepWindow		Вибрати цільовий об'єкт…
 Failed to open input pipe!	Grepper		Збій при відкритті вхідного каналу!
 Search	GrepWindow		Пошук
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну

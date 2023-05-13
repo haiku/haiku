@@ -1,24 +1,24 @@
 1	danish	x-vnd.Haiku-mixer.media_addon	275473112
-Input mapping	AudioMixer		Inputkortlægning
+Input mapping	AudioMixer		Indgangskortlægning
 High quality (linear interpolation)	AudioMixer		Høj kvalitet (lineær interpolation)
-To output	AudioMixer		Til output
-Gain	AudioMixer		Gain
-To master	AudioMixer		Til master
+To output	AudioMixer		Til udgang
+Gain	AudioMixer		Volume
+To master	AudioMixer		Til hovedkanal
 not connected	AudioMixer		ikke tilsluttet
-Master output	AudioMixer		Master-output
+Master output	AudioMixer		Udgang for hovedkanal
 dB	AudioMixer		dB
-Gain controls	AudioMixer		Gain-styringer
+Gain controls	AudioMixer		Volumekontroller
 Low quality (drop/repeat samples)	AudioMixer		Lav kvalitet (drop/gentag stykker)
-Output channel sources	AudioMixer		Kilder for outputkanal
-Allow input channel remapping	AudioMixer		Tillad genkortlæsning af inputkanaler
+Output channel sources	AudioMixer		Kilder for udgangskanal
+Allow input channel remapping	AudioMixer		Tillad omlægning af indgangskanaler
 Display balance control for stereo connections	AudioMixer		Vis balancestyring til stereoforbindelser
-Setup	AudioMixer		Opsætning
-Physical input channels	AudioMixer		Fysiske inputkanaler
-Input channel destinations	AudioMixer		Destinationer for inputkanal
+Setup	AudioMixer		Indstillinger
+Physical input channels	AudioMixer		Fysiske indgangskanaler
+Input channel destinations	AudioMixer		Destinationer for indgangskanal
 Resampling algorithm:	AudioMixer		Resamplingsalgoritme:
-Mute	AudioMixer		Mute
-Output mapping	AudioMixer		Outportkortlægning
-Virtual output channels	AudioMixer		Virtuelle outputkaneler
-Allow output channel remapping	AudioMixer		Tillad kortlægning af outputkanal
+Mute	AudioMixer		Gør tavs
+Output mapping	AudioMixer		Udgangskortlægning
+Virtual output channels	AudioMixer		Virtuelle udgangskanaler
+Allow output channel remapping	AudioMixer		Tillad omlægning af udgangskanal
 Input gain controls represent:	AudioMixer		Indgangsforstærkningskontroller repræsenterer:
-Attenuate mixer output by 3 dB	AudioMixer		Dæmp mixeruddata med 3 dB
+Attenuate mixer output by 3 dB	AudioMixer		Dæmp mixerudgang med 3 dB

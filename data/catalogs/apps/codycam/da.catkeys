@@ -1,88 +1,88 @@
 1	danish	x-vnd.Haiku-CodyCam	12021044
-destination directory expected	CodyCam		destinationsmappe forventet
+destination directory expected	CodyCam		Målkatalog forventet
 reply: '%s'\n	SftpClient		svar: '%s'\n
-PASS <suppressed>  (real password sent)	FtpClient		PASS <udeladt>  (rigtige adgangskode sendt)
-JPEG image	CodyCam		JPEG billede
-Remote host has closed the connection.\n	FtpClient		Modpart har lukket forbindelsen.\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <udeladt>  (rigtig adgangskode sendt)
+JPEG image	CodyCam		JPEG-billede
+Remote host has closed the connection.\n	FtpClient		Fjernvært har lukket forbindelsen.\n
 image file format expected	CodyCam		billedfilformat forventet
 Every 30 minutes	CodyCam		Hvert 30. minut
-Capturing Image…	VideoConsumer.cpp		Henter billede…
-Cannot start time source!	CodyCam		Kan ikke starte tids kilde!
+Capturing Image…	VideoConsumer.cpp		Tager billede…
+Cannot start time source!	CodyCam		Kan ikke starte tidskilde!
 Waiting…	CodyCam		Venter…
 Passive FTP	CodyCam		Passiv FTP
-Every 10 minutes	CodyCam		Hvert 10. minut
+Every 10 minutes	CodyCam		Hvert tiende minut
 Every minute	CodyCam		Hvert minut
-Capture Rate Menu	CodyCam		Optagelsesrate-menu
-Cannot seek time source!	CodyCam		Kan ikke søge i tids kilden!
-Server login failed	VideoConsumer.cpp		Serverlogin mislykkedes
+Capture Rate Menu	CodyCam		Optagelsesratemenu
+Cannot seek time source!	CodyCam		Kan ikke søge i tidskilden!
+Server login failed	VideoConsumer.cpp		Serverlogind mislykkedes
 on or off expected	Settings	Do not translate 'on' and 'off'	on eller off forventet
-invalid upload client %ld\n	VideoConsumer.cpp		ugyldig upload klient %ld\n
+invalid upload client %ld\n	VideoConsumer.cpp		ugyldig klient for overførsler %ld\n
 Every 30 seconds	CodyCam		Hvert 30. sekund
-Cannot create a video window	CodyCam		Kan ikke oprette et video vindue
-Cannot register the video window	CodyCam		Kan ikke registrere video vinduet
-capture rate expected	CodyCam		hentningsfrekvens forventet
+Cannot create a video window	CodyCam		Kan ikke oprette et videovindue
+Cannot register the video window	CodyCam		Kan ikke registrere videovinduet
+capture rate expected	CodyCam		optagelsesrate forventet
 Quit	CodyCam		Afslut
-Cannot connect the video source to the video window	CodyCam		Kan ikke forbinde video kilden til video vinduet
+Cannot connect the video source to the video window	CodyCam		Kan ikke forbinde videokilden til videovinduet
 read: %d\n	SftpClient		læst: %d\n
-Every 2 hours	CodyCam		Hver 2. time
-Cannot get a time source	CodyCam		Kan ikke finde en tids kilde
-Every 4 hours	CodyCam		Hver 4. time
+Every 2 hours	CodyCam		Hver anden time
+Cannot get a time source	CodyCam		Kan ikke finde en tidskilde
+Every 4 hours	CodyCam		Hver fjerde time
 cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Closing the window	VideoConsumer.cpp		Lukker vinduet
 Never	CodyCam		Aldrig
-Every 8 hours	CodyCam		Hver 8. time
-Cannot start the video source	CodyCam		Kan ikke starte video kilden
-Cannot set the time source for the video source	CodyCam		Kan ikke sætte tids kilden for video kilden
+Every 8 hours	CodyCam		Hver ottende time
+Cannot start the video source	CodyCam		Kan ikke starte videokilden
+Cannot set the time source for the video source	CodyCam		Kan ikke sætte tidskilden for videokilden
 Renaming…	VideoConsumer.cpp		Omdøber…
 Send to…	CodyCam		Send til…
 Password:	CodyCam		Adgangskode:
 still image filename expected	CodyCam		billedfilnavn forventet
 File name:	CodyCam		Filnavn:
-Directory:	CodyCam		Mappe:
-Error setting type of output file	VideoConsumer.cpp		Fejl ved indstilling af typen på outputfil
+Directory:	CodyCam		Katalog:
+Error setting type of output file	VideoConsumer.cpp		Fejl ved indstilling af typen på uddatafil
 Locking the window	VideoConsumer.cpp		Låser vinduet
-Cannot find an available video stream	CodyCam		Kunne ikke finde tilgængelig video strøm
-Upload…	VideoConsumer.cpp		Upload…
+Cannot find an available video stream	CodyCam		Kunne ikke finde tilgængelig videostrøm
+Upload…	VideoConsumer.cpp		Overførsel…
 password expected	CodyCam		adgangskode forventet
 SFTP	CodyCam		SFTP
-Output	CodyCam		Output
-server address expected	CodyCam		server adresse forventet
-Cannot start the video window	CodyCam		Kan ikke starte video vinduet
+Output	CodyCam		Uddata
+server address expected	CodyCam		serveradresse forventet
+Cannot start the video window	CodyCam		Kan ikke starte videovinduet
 reply: %d, %d\n	FtpClient		svar: %d, %d\n
-Cannot set the time source for the video window	CodyCam		Kan ikke sætte tids kilden for video vinduet
+Cannot set the time source for the video window	CodyCam		Kan ikke sætte tidskilden for videovinduet
 Every 15 minutes	CodyCam		Hvert 15. minut
 Every 24 hours	CodyCam		Hver 24. time
-Image Format Menu	CodyCam		Billedformat-menu
-Every 5 minutes	CodyCam		Hvert 5. minut
-File upload failed	VideoConsumer.cpp		Upload af fil mislykkedes
+Image Format Menu	CodyCam		Billedformatmenu
+Every 5 minutes	CodyCam		Hvert femte minut
+File upload failed	VideoConsumer.cpp		Overførsel af fil mislykkedes
 Format:	CodyCam		Format:
 Start video	CodyCam		Start video
 Connected…	VideoConsumer.cpp		Forbundet…
-upload client name expected	CodyCam		upload klient navn forventet
+upload client name expected	CodyCam		overførselsklientnavn forventet
 Every 15 seconds	CodyCam		Hvert 15. sekund
-Error getting initial latency for the capture node	CodyCam		Fejl ved hentning af tidsforskydning for hentningsnode
+Error getting initial latency for the capture node	CodyCam		Fejl ved hentning af indledende tidsforskydning for optagelsesnode
 password	CodyCam		adgangskode
 Local	CodyCam		Lokal
 Stop video	CodyCam		Stop video
 Last Capture: 	VideoConsumer.cpp		Sidste optagelse: 
-Rate:	CodyCam		Frekvens:
-Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finde mappe på serveren
+Rate:	CodyCam		Rate:
+Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finde forespurgt katalog på server
 Cannot find the media roster	CodyCam		Kan ikke finde medielisten
 Type:	CodyCam		Type:
 Rename failed	VideoConsumer.cpp		Omdøbning mislykkedes
-unrecognized upload client specified	CodyCam		ikke identificeret upload klient specificeret
+unrecognized upload client specified	CodyCam		ugenkendt overførselsklient angivet
 Server:	CodyCam		Server:
-Login:	CodyCam		Login:
+Login:	CodyCam		Logind:
 File	CodyCam		Fil
 read: %ld\n	SftpClient		læst: %ld\n
 Every hour	CodyCam		Hver time
-login ID expected	CodyCam		login-id forventet
+login ID expected	CodyCam		logind-id forventet
 Video settings	CodyCam		Videoindstillinger
-Can't find an available connection to the video window	CodyCam		Kan ikke finde en tilgængelig forbindelse til video vinduet
+Can't find an available connection to the video window	CodyCam		Kan ikke finde en tilgængelig forbindelse til videovinduet
 FTP	CodyCam		FTP
-Error creating output file	VideoConsumer.cpp		Fejl ved oprettelse af outputfil
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Kan ikke finde en videokilde.\nDu skal have et webcam for at bruge CodyCam.
+Error creating output file	VideoConsumer.cpp		Fejl ved oprettelse af uddatafil
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Kan ikke finde en videokilde.\nDu skal have et webkamera for at bruge CodyCam.
 Logging in…	VideoConsumer.cpp		Logger ind…
 CodyCam	System name		CodyCam
-Error writing output file	VideoConsumer.cpp		Fejl ved skrivning til outputfil
-Capture controls	CodyCam		Optagelse-styringer
+Error writing output file	VideoConsumer.cpp		Fejl ved skrivning til uddatafil
+Capture controls	CodyCam		Optagelsesstyringer

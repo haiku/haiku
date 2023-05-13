@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	3555867652
+1	croatian	x-vnd.Haiku-libtracker	1448839225
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -111,7 +111,6 @@ Cut	ContainerWindow		Izreži
 Disks	Model		Diskovi
 Size	FindPanel		Veličina
 Window	FilePanelPriv		Prozor
-Replace other file	WidgetAttributeText		Zamjeni drugu datoteku
 OK	Email Query Columns		U redu
 Location	QueryPoseView		Lokacija
 Previously mounted disks	AutoMounterSettings		Prethodno montirani diskovi
@@ -294,7 +293,6 @@ New	ContainerWindow		Novo
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Moraš spustiti stavke na jednu od ikona diska u \"Disks\" prozoru.
 Sorry, you can't copy items to the Trash.	FSClipBoard		Oprostite,ne možete kopirati stavke u smeće.
 When	Email Query Columns		Kada
-Paste	FilePanelPriv		Zalijepi
 Paste	ContainerWindow		Zalijepi
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nemože se otvoriti \"%document\" sa programom \"%app\" (Nedostaje simbol: %symbol). \n
 New folder	ContainerWindow		Nova mapa
@@ -340,7 +338,6 @@ is	FindPanel		je
 Permissions	FilePermissionsView		Dozvole
 New folder %ld	FSUtils		Nova mapa %ld
 64 x 64	DeskWindow		64 x 64
-That name is already taken. Please type another one.	WidgetAttributeText		Ime je već zauzeto. Molim upišite drugo.
 Message	AttributesView		Poruka
 Modified	Default Query Columns		Izmjenjeno
 Default application	InfoWindow		Zadani program
@@ -383,5 +380,4 @@ Icon view	ContainerWindow		Pregled ikona
 Name	ContainerWindow		Ime
 Preferred for %type	OpenWithWindow		Poželjno za %type
 Free space color	SettingsView		Boja slobodnog prostora
-OK	WidgetAttributeText		U redu
 OK	FSUtils		U redu

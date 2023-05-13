@@ -1,16 +1,22 @@
-1	danish	application/x-vnd.Be.LoggingConsumerApp	3890049710
+1	danish	application/x-vnd.Be.LoggingConsumerApp	3475739170
 MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke hente nodeoplysninger (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioritet
 MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke finde node (%ld):\n%s\n
-Logged input	CortexAddOnsLoggingConsumer		Logget inddata
+Latency	CortexAddOnsLoggingConsumer		Forsinkelse
+Logged input	CortexAddOnsLoggingConsumer		Logget indgang
+CPU spin percentage	CortexAddOnsLoggingConsumer		Procent af CPU-spin
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
 Thread priority	CortexAddOnsLoggingConsumer		Trådprioritet
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer-parametre
+Latency control	CortexAddOnsLoggingConsumer		Forsinkelseskontrol
 CPU percentage	CortexAddOnsLoggingConsumer		CPU-procent
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stop
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		En tillægsversion af LoggingConsumer-noden.\nSe Be Developer Newsletter III.18: 5 May, 1999\ntilpasset af Eric Moon (4 June, 1999)
-OK	CortexAddOnsCommonMediaNodeControlApp		OK
-Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Styringer
-controls	CortexAddOnsCommonMediaNodeControlApp		styringer
+OK	CortexAddOnsCommonMediaNodeControlApp		O.k.
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Kontroller
+controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Forbind
 percent	CortexAddOnsLoggingConsumer		procent
 MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ingen parametre for node (%ld):\n%s\n
