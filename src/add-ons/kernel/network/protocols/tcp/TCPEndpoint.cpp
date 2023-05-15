@@ -545,11 +545,18 @@ TCPEndpoint::Close()
 		return B_OK;
 	}
 
+	// handle linger with zero timeout
+	if ((socket->options & SO_LINGER) != 0 && socket->linger == 0) {
+		fState = CLOSED;
+		T(State(this));
+		return _SendQueued(true);
+	}
+
 	status_t status = _Disconnect(true);
 	if (status != B_OK)
 		return status;
 
-	if (socket->options & SO_LINGER) {
+	if ((socket->options & SO_LINGER) != 0) {
 		TRACE("Close(): Lingering for %i secs", socket->linger);
 
 		bigtime_t maximum = absolute_timeout(socket->linger * 1000000LL);
@@ -933,8 +940,11 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	*_buffer = NULL;
 
-	if (fState == CLOSED)
+	if (fState == CLOSED) {
+		if (socket->error != B_OK)
+			return socket->error;
 		return ENOTCONN;
+	}
 
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
 	if (gStackModule->is_restarted_syscall())
