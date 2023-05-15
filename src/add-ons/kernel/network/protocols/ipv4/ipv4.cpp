@@ -1431,7 +1431,7 @@ ipv4_bind(net_protocol* protocol, const struct sockaddr* address)
 		return B_OK;
 	}
 
-	return B_ERROR;
+	return EADDRNOTAVAIL;
 		// address is unknown on this host
 }
 
