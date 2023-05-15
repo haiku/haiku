@@ -1006,12 +1006,8 @@ socket_bind(net_socket* socket, const struct sockaddr* address,
 		addressLength = sizeof(sockaddr);
 	}
 
-	if (socket->address.ss_len != 0) {
-		status_t status = socket->first_info->unbind(socket->first_protocol,
-			(sockaddr*)&socket->address);
-		if (status != B_OK)
-			return status;
-	}
+	if (socket->address.ss_len != 0)
+		return B_BAD_VALUE;
 
 	memcpy(&socket->address, address, sizeof(sockaddr));
 	socket->address.ss_len = sizeof(sockaddr_storage);
