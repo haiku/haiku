@@ -419,7 +419,7 @@ UnixEndpoint::Accept(net_socket **_acceptedSocket)
 		error = acquire_sem_etc(fAcceptSemaphore, 1,
 			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 		if (error < B_OK)
-			RETURN_ERROR(error);
+			break;
 
 		locker.Lock();
 		error = gSocketModule->dequeue_connected(socket, _acceptedSocket);
