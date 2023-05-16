@@ -323,13 +323,6 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 }
 
 
-void
-arch_check_syscall_restart(Thread *thread)
-{
-	panic("arch_check_syscall_restart(): not yet implemented\n");
-}
-
-
 /**	Saves everything needed to restore the frame in the child fork in the
  *	arch_fork_arg structure to be passed to arch_restore_fork_frame().
  *	Also makes sure to return the right value.

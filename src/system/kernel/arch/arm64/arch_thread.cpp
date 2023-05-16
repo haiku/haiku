@@ -165,12 +165,6 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 
 
 void
-arch_check_syscall_restart(Thread *thread)
-{
-}
-
-
-void
 arch_store_fork_frame(struct arch_fork_arg *arg)
 {
 	panic("arch_store_fork_frame");
