@@ -35,19 +35,13 @@ kill_team(team_id team)
 status_t
 _get_team_info(team_id team, team_info *info, size_t size)
 {
-	if (info == NULL || size != sizeof(team_info))
-		return B_BAD_VALUE;
-
-	return _kern_get_team_info(team, info);
+	return _kern_get_team_info(team, info, size);
 }
 
 
 status_t
 _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 {
-	if (info == NULL || size != sizeof(team_info))
-		return B_BAD_VALUE;
-
-	return _kern_get_next_team_info(cookie, info);
+	return _kern_get_next_team_info(cookie, info, size);
 }
 

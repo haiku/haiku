@@ -574,6 +574,8 @@ Team::Create(team_id id, const char* name, bool kernel)
 			return NULL;
 	}
 
+	team->start_time = system_time();
+
 	// everything went fine
 	return teamDeleter.Detach();
 }
@@ -2676,7 +2678,7 @@ wait_for_child(pid_t child, uint32 flags, siginfo_t& _info,
 static status_t
 fill_team_info(Team* team, team_info* info, size_t size)
 {
-	if (size != sizeof(team_info))
+	if (size > sizeof(team_info))
 		return B_BAD_VALUE;
 
 	// TODO: Set more informations for team_info
@@ -2699,6 +2701,21 @@ fill_team_info(Team* team, team_info* info, size_t size)
 
 	strlcpy(info->args, team->Args(), sizeof(info->args));
 	info->argc = 1;
+
+	if (size > offsetof(team_info, real_uid)) {
+		info->real_uid = team->real_uid;
+		info->real_gid = team->real_gid;
+		info->group_id = team->group_id;
+		info->session_id = team->session_id;
+
+		if (team->parent != NULL)
+			info->parent = team->parent->id;
+		else
+			info->parent = -1;
+
+		strlcpy(info->name, team->Name(), sizeof(info->name));
+		info->start_time = team->start_time;
+	}
 
 	return B_OK;
 }
@@ -4360,17 +4377,20 @@ _user_kill_team(team_id team)
 
 
 status_t
-_user_get_team_info(team_id id, team_info* userInfo)
+_user_get_team_info(team_id id, team_info* userInfo, size_t size)
 {
 	status_t status;
 	team_info info;
 
+	if (size > sizeof(team_info))
+		return B_BAD_VALUE;
+
 	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
-	status = _get_team_info(id, &info, sizeof(team_info));
+	status = _get_team_info(id, &info, size);
 	if (status == B_OK) {
-		if (user_memcpy(userInfo, &info, sizeof(team_info)) < B_OK)
+		if (user_memcpy(userInfo, &info, size) < B_OK)
 			return B_BAD_ADDRESS;
 	}
 
@@ -4379,23 +4399,26 @@ _user_get_team_info(team_id id, team_info* userInfo)
 
 
 status_t
-_user_get_next_team_info(int32* userCookie, team_info* userInfo)
+_user_get_next_team_info(int32* userCookie, team_info* userInfo, size_t size)
 {
 	status_t status;
 	team_info info;
 	int32 cookie;
+
+	if (size > sizeof(team_info))
+		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userCookie)
 		|| !IS_USER_ADDRESS(userInfo)
 		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status = _get_next_team_info(&cookie, &info, sizeof(team_info));
+	status = _get_next_team_info(&cookie, &info, size);
 	if (status != B_OK)
 		return status;
 
 	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
-		|| user_memcpy(userInfo, &info, sizeof(team_info)) < B_OK)
+		|| user_memcpy(userInfo, &info, size) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;

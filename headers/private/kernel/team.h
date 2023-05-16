@@ -80,8 +80,8 @@ pid_t _user_process_info(pid_t process, int32 which);
 pid_t _user_setpgid(pid_t process, pid_t group);
 pid_t _user_setsid(void);
 
-status_t _user_get_team_info(team_id id, team_info *info);
-status_t _user_get_next_team_info(int32 *cookie, team_info *info);
+status_t _user_get_team_info(team_id id, team_info *info, size_t size);
+status_t _user_get_next_team_info(int32 *cookie, team_info *info, size_t size);
 status_t _user_get_team_usage_info(team_id team, int32 who,
 			team_usage_info *info, size_t size);
 status_t _user_get_extended_team_info(team_id teamID, uint32 flags,

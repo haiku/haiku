@@ -247,6 +247,15 @@ typedef struct {
 	char			args[64];
 	uid_t			uid;
 	gid_t			gid;
+
+	/* Haiku R1 extensions */
+	uid_t			real_uid;
+	gid_t			real_gid;
+	pid_t			group_id;
+	pid_t			session_id;
+	team_id			parent;
+	char			name[B_OS_NAME_LENGTH];
+	bigtime_t		start_time;
 } team_info;
 
 #define B_CURRENT_TEAM	0

@@ -275,6 +275,8 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 
 	struct team_debug_info debug_info;
 
+	bigtime_t		start_time;
+
 	// protected by time_lock
 	bigtime_t		dead_threads_kernel_time;
 	bigtime_t		dead_threads_user_time;
