@@ -13,6 +13,7 @@
 
 #include "DocumentSaver.h"
 
+/*! Interface for saving to a file */
 class FileSaver : public DocumentSaver {
  public:
 								FileSaver(const entry_ref& ref);

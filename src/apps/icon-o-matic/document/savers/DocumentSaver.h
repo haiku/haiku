@@ -13,6 +13,7 @@
 
 class Document;
 
+/*! Interface for all the other savers to implement */
 class DocumentSaver {
  public:
 								DocumentSaver();

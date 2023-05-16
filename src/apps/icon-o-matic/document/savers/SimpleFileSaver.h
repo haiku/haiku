@@ -11,7 +11,7 @@
 
 class Exporter;
 
-
+/*! Uses the specified Exporter to export the icon to a file */
 class SimpleFileSaver : public FileSaver {
 public:
 								SimpleFileSaver(Exporter* exporter,

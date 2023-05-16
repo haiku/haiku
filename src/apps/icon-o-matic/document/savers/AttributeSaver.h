@@ -14,6 +14,7 @@
 
 #include "DocumentSaver.h"
 
+/*! Saves the HVIF to a file's attribute */
 class AttributeSaver : public DocumentSaver {
  public:
 								AttributeSaver(const entry_ref& ref,

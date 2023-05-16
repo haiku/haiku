@@ -11,6 +11,7 @@
 
 #include "FileSaver.h"
 
+/*! Saves a set of png images of various sizes */
 class BitmapSetSaver : public FileSaver {
  public:
 								BitmapSetSaver(const entry_ref& ref);

@@ -9,7 +9,7 @@
 #include "AttributeSaver.h"
 #include "SimpleFileSaver.h"
 
-
+/*! Exports to the native Icon-O-Matic format */
 class NativeSaver : public SimpleFileSaver {
  public:
 								NativeSaver(const entry_ref& ref);

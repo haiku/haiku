@@ -13,6 +13,7 @@
 
 #include "DocumentSaver.h"
 
+/*! Sends a message with the HVIF file data over the given messenger */
 class MessengerSaver : public DocumentSaver {
  public:
 								MessengerSaver(const BMessenger& messenger);
