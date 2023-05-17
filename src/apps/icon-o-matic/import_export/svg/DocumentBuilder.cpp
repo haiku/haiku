@@ -63,8 +63,7 @@ DocumentBuilder::SetDimensions(uint32 width, uint32 height, BRect viewBox)
 
 // GetIcon
 status_t
-DocumentBuilder::GetIcon(Icon* icon, SVGImporter* importer,
-						 const char* fallbackName)
+DocumentBuilder::GetIcon(Icon* icon, const char* fallbackName)
 {
 	double xMin = 0;
 	double yMin = 0;

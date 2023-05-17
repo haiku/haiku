@@ -74,7 +74,7 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 	}
 
 	DocumentBuilder builder(svg);
-	ret = builder.GetIcon(icon, this, ref->name);
+	ret = builder.GetIcon(icon, ref->name);
 	nsvgDelete(svg);
 
 	return ret;

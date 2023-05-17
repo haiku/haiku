@@ -39,7 +39,6 @@ class DocumentBuilder {
 
 
 			status_t			GetIcon(Icon* icon,
-										SVGImporter* importer,
 										const char* fallbackName);
 
  private:
