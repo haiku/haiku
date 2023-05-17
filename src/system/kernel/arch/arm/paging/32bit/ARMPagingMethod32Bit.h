@@ -11,6 +11,8 @@
 #include "paging/ARMPagingMethod.h"
 #include "paging/ARMPagingStructures.h"
 
+#include <vm/VMAddressSpace.h>
+
 
 class TranslationMapPhysicalPageMapper;
 class ARMPhysicalPageMapper;
@@ -188,6 +190,9 @@ ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(uint32 pageTableEntry)
 		else
 			attributes = B_KERNEL_READ_AREA;
 	}
+
+	if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
+		attributes |= PAGE_ACCESSED;
 
 	if ((pageTableEntry & ARM_MMU_L2_FLAG_XN) == 0) {
 		if ((attributes & B_KERNEL_READ_AREA) != 0)
