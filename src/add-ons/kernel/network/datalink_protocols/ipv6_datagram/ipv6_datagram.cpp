@@ -36,7 +36,7 @@
 #include "ndp.h"
 
 
-#define TRACE_NDP
+//#define TRACE_NDP
 #ifdef TRACE_NDP
 #	define TRACE(x) dprintf x
 #else
@@ -782,7 +782,7 @@ ndp_receive_router_advertisement(net_buffer* buffer)
 static status_t
 ndp_receive_data(net_buffer* buffer)
 {
-	dprintf("ndp_receive_data\n");
+	TRACE("ndp_receive_data\n");
 
 	NetBufferHeaderReader<icmp6_hdr> icmp6Header(buffer);
 	if (icmp6Header.Status() < B_OK)

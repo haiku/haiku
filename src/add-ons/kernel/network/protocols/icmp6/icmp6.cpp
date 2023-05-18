@@ -23,7 +23,7 @@
 #include <ipv6_datagram/ndp.h>
 
 
-#define TRACE_ICMP6
+//#define TRACE_ICMP6
 #ifdef TRACE_ICMP6
 #	define TRACE(x) dprintf x
 #else
