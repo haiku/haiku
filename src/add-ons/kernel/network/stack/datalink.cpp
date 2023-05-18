@@ -360,6 +360,14 @@ datalink_send_routed_data(struct net_route* route, net_buffer* buffer)
 		return ENETUNREACH;
 	}
 
+	if ((route->flags & RTF_HOST) != 0) {
+		TRACE("  host route\n");
+		// We set the interface address here, so the buffer is delivered
+		// directly to the domain in interfaces.cpp:device_consumer_thread()
+		address->AcquireReference();
+		set_interface_address(buffer->interface_address, address);
+	}
+
 	if ((route->flags & RTF_LOCAL) != 0) {
 		TRACE("  local route\n");
 

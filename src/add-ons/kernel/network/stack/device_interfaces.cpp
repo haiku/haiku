@@ -821,7 +821,13 @@ device_enqueue_buffer(net_device* device, net_buffer* buffer)
 	if (interface == NULL)
 		return B_DEVICE_NOT_FOUND;
 
-	status_t status = fifo_enqueue_buffer(&interface->receive_queue, buffer);
+	status_t status = interface->deframe_func(interface->device, buffer);
+	if (status != B_OK) {
+		gNetBufferModule.free(buffer);
+		return status;
+	}
+
+	status = fifo_enqueue_buffer(&interface->receive_queue, buffer);
 
 	put_device_interface(interface);
 	return status;
