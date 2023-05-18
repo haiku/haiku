@@ -56,4 +56,10 @@ status_t init_stack();
 status_t uninit_stack();
 
 
+class StackNetBufferModuleGetter {
+	public:
+		static net_buffer_module_info *Get() { return &gNetBufferModule; }
+};
+
+
 #endif	// STACK_PRIVATE_H
