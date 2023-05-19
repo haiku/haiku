@@ -22,7 +22,6 @@
 #include <string.h>
 
 
-
 struct net_buffer_module_info* gBufferModule;
 static struct net_stack_module_info* sStackModule;
 
@@ -51,9 +50,18 @@ tun_init(const char* name, net_device** _device)
 	memset(device, 0, sizeof(tun_device));
 
 	strcpy(device->name, name);
-	device->flags = IFF_LINK;
-	device->type = strncmp(name, "tap", 3) ? IFT_TUN : IFT_ETHER;
-	device->mtu = 16384;
+
+	if (strncmp(name, "tun", 3) == 0) {
+		device->flags = IFF_LOOPBACK | IFF_LINK;
+		device->type = IFT_TUN;
+	} else if (strncmp(name, "tap", 3) == 0) {
+		device->flags = IFF_BROADCAST | IFF_ALLMULTI | IFF_LINK;
+		device->type = IFT_ETHER;
+	} else {
+		return B_BAD_VALUE;
+	}
+
+	device->mtu = 1500; /* Almost all VPN MTU's are no more than 1500 bytes */
 	device->media = IFM_ACTIVE;
 
 	*_device = device;
