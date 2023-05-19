@@ -609,11 +609,11 @@ list_interface(const char* name)
 
 	ifreq_stats stats;
 	if (interface.GetStats(stats) == B_OK) {
-		printf("\tReceive: %d packets, %d errors, %Ld bytes, %d mcasts, %d "
+		printf("\tReceive: %d packets, %d errors, %" B_PRId64 " bytes, %d mcasts, %d "
 			"dropped\n", stats.receive.packets, stats.receive.errors,
 			stats.receive.bytes, stats.receive.multicast_packets,
 			stats.receive.dropped);
-		printf("\tTransmit: %d packets, %d errors, %Ld bytes, %d mcasts, %d "
+		printf("\tTransmit: %d packets, %d errors, %" B_PRId64 " bytes, %d mcasts, %d "
 			"dropped\n", stats.send.packets, stats.send.errors,
 			stats.send.bytes, stats.send.multicast_packets, stats.send.dropped);
 		printf("\tCollisions: %d\n", stats.collisions);
@@ -696,6 +696,14 @@ configure_interface(const char* name, char* const* args, int32 argCount)
 	int family = get_address_family(args[i]);
 	if (family != AF_UNSPEC)
 		i++;
+	int socket = ::socket(family, SOCK_DGRAM, 0);
+	if (socket < 0) {
+		fprintf(stderr, "%s: The requested address family is not available.\n",
+			kProgramName);
+		exit(1);
+	}
+	close(socket);
+
 
 	// try to parse address
 
