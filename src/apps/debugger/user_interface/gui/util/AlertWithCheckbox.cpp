@@ -58,11 +58,15 @@ AlertWithCheckbox::AlertWithCheckbox(const char* title, const char* messageText,
 	message->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 	message->MakeEditable(false);
 	message->MakeSelectable(false);
-	message->SetWordWrap(true);
 	message->SetText(messageText);
+	BRect textRect = message->TextRect();
+	textRect.PrintToStream();
+	message->SetWordWrap(true);
 	message->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNSET));
 	float width = message->StringWidth("W") * 40;
-	message->SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	if (width < textRect.Width()) {
+		message->SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
+	}
 
 	fDontAskAgain = new BCheckBox("checkbox",
 		checkboxLabel, NULL);
