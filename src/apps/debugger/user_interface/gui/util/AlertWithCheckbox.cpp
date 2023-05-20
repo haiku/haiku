@@ -68,13 +68,28 @@ AlertWithCheckbox::AlertWithCheckbox(const char* title, const char* messageText,
 		message->SetExplicitMinSize(BSize(width, B_SIZE_UNSET));
 	}
 
-	fDontAskAgain = new BCheckBox("checkbox",
-		checkboxLabel, NULL);
+	fDontAskAgain = new BCheckBox("checkbox", checkboxLabel, NULL);
 
-	BButton* button1 = new BButton(label1, label1, new BMessage(kButton1Message));
-	BButton* button2 = new BButton(label2, label2, new BMessage(kButton2Message));
-	BButton* button3 = new BButton(label3, label3, new BMessage(kButton3Message));
-	button1->MakeDefault(true);
+	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL);
+	BLayoutBuilder::Group<> layoutBuilder(buttonGroup);
+
+	layoutBuilder.AddGlue();
+
+	if (label1) {
+		BButton* button = new BButton(label1, label1, new BMessage(kButton1Message));
+		button->MakeDefault(true);
+		layoutBuilder.Add(button);
+	}
+
+	if (label2) {
+		BButton* button = new BButton(label2, label2, new BMessage(kButton2Message));
+		layoutBuilder.Add(button);
+	}
+
+	if (label3) {
+		BButton* button = new BButton(label3, label3, new BMessage(kButton3Message));
+		layoutBuilder.Add(button);
+	}
 
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL)
@@ -86,12 +101,7 @@ AlertWithCheckbox::AlertWithCheckbox(const char* title, const char* messageText,
 					.Add(fDontAskAgain)
 					.AddGlue()
 				.End()
-				.AddGroup(B_HORIZONTAL)
-					.AddGlue()
-					.Add(button1)
-					.Add(button2)
-					.Add(button3)
-				.End()
+				.Add(buttonGroup)
 			.End()
 		.End();
 
