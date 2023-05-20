@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	765355649
+1	japanese	x-vnd.Haiku-libtracker	1644621968
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -269,6 +269,7 @@ Cut	FilePanelPriv		切り取り
 Finish: after several years	StatusWindow		終了: 数年後
 Favorites	FilePanelPriv		お気に入り
 Point	AttributesView		点
+You can't move or copy items to read-only volumes.	PoseView		読み取り専用のボリュームへ移動やコピーはできません。
 home	B_USER_DIRECTORY		ホーム
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		新規 Tracker テンプレート
 Disk mounting during boot	AutoMounterSettings		起動時の設定

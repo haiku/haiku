@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	765355649
+1	ukrainian	x-vnd.Haiku-libtracker	1644621968
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -253,7 +253,7 @@ Recent queries	FindPanel		Недавні запити
 Mount all	MountMenu		Підключити все
 128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Розмір
-Favorites	FavoritesMenu		Вибране
+Favorites	FavoritesMenu		Вибрані папки
 Delete	FilePanelPriv		Видалити
 <No recent items>	FavoritesMenu		<Немає недавніх елементів>
 Formula %formula	FindPanel	FindResultTitle	Формула %formula
@@ -269,9 +269,10 @@ Cut	FilePanelPriv		Вирізати
 Finish: after several years	StatusWindow		Фініш: через кілька років
 Favorites	FilePanelPriv		Вибрані
 Point	AttributesView		Вказівник
+You can't move or copy items to read-only volumes.	PoseView		Ви не можете переміщати або копіювати елементи до томів, доступних лише для читання.
 home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Нові шаблони Tracker
-Disk mounting during boot	AutoMounterSettings		Підключення дисків при завантаженні
+Disk mounting during boot	AutoMounterSettings		Підключення при завантаженні
 Don't automount	AutoMounterSettings		Не підключати автоматично
 Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		Програма \"%appname\" не знайдена
@@ -363,7 +364,7 @@ Permissions	ContainerWindow		Дозволи
 Size:	InfoWindow		Розмір:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені у смітник. Можливо Ви бажаєте видалити їх все одно? (Операція незворотня.)
 Copy	ContainerWindow		Копіювати
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прикро, атрибут 'Символ' не може містити багатобайтовий знак.
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прикро, атрибут «Символ» не може містити багатобайтовий знак.
 Open parent	VirtualDirectoryWindow		Відкрити батьківську папку
 And	FindPanel		І
 Palette-indexed picture	AttributesView		Малюнок з індексованими кольорами
@@ -376,7 +377,7 @@ Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils
 You cannot create a link to the root directory.	FSUtils		Ви не можете створювати посилання на кореневий каталог.
 Select all	FilePanelPriv		Вибрати все
 Other	FilePermissionsView		Інший
-Automatic disk mounting	AutoMounterSettings		Автоматичне підключення диску
+Automatic disk mounting	AutoMounterSettings		Автоматичне підключення
 parent folder	NavMenu		батьківська тека
 Create link here	ContainerWindow		Створити посилання тут
 Force identify	ContainerWindow		Ідентифікувати примусово
@@ -398,7 +399,7 @@ All disks	AutoMounterSettings		Всі диски
 link	FSUtils	filename link	посилання
 16-bit unsigned integer	AttributesView		16-бітове ціле беззнакове
 Proceed	FSUtils		Продовжити
-Edit favorites…	FilePanelPriv		Редагувати вибране…
+Edit favorites…	FilePanelPriv		Змінити вибрані…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ви не можете перемістити папку в саму себе або в будь-яку з її власних підпапок.
 New	ContainerWindow		Новий…
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ви повинні скинути об'єкт на один із значків диску у вікні\"Диски\".

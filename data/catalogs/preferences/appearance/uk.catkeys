@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Рамка елемента
 Control mark	Colors tab		Відмітка
-Off	AntialiasingSettingsView		Вимкнути
+Off	AntialiasingSettingsView		Вимкнено
 Window border	Colors tab		Рамка вікна
 Inactive window tab	Colors tab		Заголовок неактивного вікна
 Defaults	APRWindow		Типові настройки
@@ -12,7 +12,7 @@ No effect on running applications	DecorSettingsView		Не впливає на з
 Fixed font:	Font view		Моноширинний шрифт:
 Appearance	System name		Appearance
 Reduce colored edges filter strength:	AntialiasingSettingsView		Фільтрація забарвлення кромок:
-Glyph hinting:	AntialiasingSettingsView		Уточнення:
+Glyph hinting:	AntialiasingSettingsView		Хінтінг гліфів:
 Default Haiku ControlLook	DecorSettingsView		Haiku ControlLook за замовчуванням
 Menu item text	Colors tab		Текст елемента меню
 About decorator	DecorSettingsView		Про Декоратор
@@ -21,7 +21,7 @@ Success	Colors tab		Успішно
 About	DecorSettingsView		Про це
 Shine	Colors tab		Сяйво
 Arrow style	DecorSettingsView		Стиль стрілок
-On	AntialiasingSettingsView		Увімкнути
+On	AntialiasingSettingsView		Увімкнено
 Decorator:	DecorSettingsView		Декоратор:
 Menu background	Colors tab		Фон меню
 Revert	APRWindow		Відкат змін
@@ -74,6 +74,6 @@ Inactive window border	Colors tab		Рамка неактивного вікна
 Colors	APRWindow		Кольори
 About control look	DecorSettingsView		Про вигляд віджетів
 Control highlight	Colors tab		Виділення елемента
-Status bar	Colors tab		Смуга стану
+Status bar	Colors tab		Рядок стану
 Link hover	Colors tab		Посилання під курсором
 Single:	DecorSettingsView		Одинарний:

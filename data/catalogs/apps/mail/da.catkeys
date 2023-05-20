@@ -1,6 +1,6 @@
 1	danish	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Indstil til gemt
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodbare tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodbare), eller vælg Annuller for at gå tilbage og prøve at rette det igen.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodelige tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodelige), eller vælg Afbryd for at gå tilbage, og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
 Show icons & labels	Mail		Vis ikoner og etiketter
 (Date unavailable)	Mail		(dato utilgængelig)
@@ -12,8 +12,8 @@ Same sender	Mail		Samme afsender
 Copy to new	Mail		Kopiér til ny
 Save as draft	Mail		Gem som kladde
 Encoding:	Mail		Kodning:
-Print	Mail		Print
-Decrease quote level	Mail		Lavere kvoteniveau
+Print	Mail		Udskriv
+Decrease quote level	Mail		Sænk kvoteniveau
 Encoding	Mail		Kodning
 Default account:	Mail		Standardkonto:
 Message	Mail		Meddelelse
@@ -21,12 +21,12 @@ Bcc:	Mail		Bcc:
 New	Mail		Ny
 Save	Mail		Gem
 Undo	Mail		Fortryd
-Button bar:	Mail		Knaplinje:
+Button bar:	Mail		Værktøjslinje:
 %e wrote:\\n	Mail		%e skrev:\\n
 Save changes to this signature?	Mail		Gem ændringer til signaturen?
 Save attachment…	Mail		Gem vedhæftning…
 Paste	Mail		Indsæt
-E-mail draft could not be saved!	Mail		E-mail-kladde kunne ikke gemmes!
+E-mail draft could not be saved!	Mail		E-postkladde kunne ikke gemmes!
 Don't send	Mail		Send ikke
 sent	B_USER_DIRECTORY/mail/sent		sendt
 Only files can be added as attachments.	Mail		Der kan kun tilføjes filer som vedhæftninger.
@@ -37,24 +37,24 @@ Same recipient	Mail		Samme modtager
 Previous message	Mail		Forrige meddelelse
 (Address unavailable)	Mail		(adresse utilgængelig)
 Mail	System name		Post
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Enclosure: %name% (type: %type%)
-Copy link location	Mail		Kopiér linkplacering
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Område: %name% (Type: %type%)
+Copy link location	Mail		Kopiér lænkeplacering
 Attachments: 	Mail		Vedhæftninger: 
-Remove enclosure	Mail		Fjern enclosure
+Remove enclosure	Mail		Fjern område
 Next	Mail		Næste
 Show icons only	Mail		Vis kun ikoner
 Subject:	Mail		Emne:
-OK	Mail		OK
+OK	Mail		O.k.
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Quit	Mail		Afslut
 Title:	Mail		Titel:
-Account from mail	Mail		Konto fra mail
-%e - E-mail address	Mail		%e - E-mailadresse
+Account from mail	Mail		Konto fra e-post
+%e - E-mail address	Mail		%e - E-postadresse
 Cc:	Mail		Cc:
 No matches	Mail		Ingen match
 Queries	Mail		Forespørgsler
 Cut	Mail		Klip
-Reply to sender	Mail		Besvar afsender
+Reply to sender	Mail		Svar til afsender
 \\n - Newline	Mail		\\n - Linjeskift
 Copy	Mail		Kopiér
 Add signature	Mail		Tilføj signatur
@@ -62,46 +62,46 @@ Add signature	Mail		Tilføj signatur
 Signature	Mail		Signatur
 Use default account	Mail		Brug standardkonto
 draft	B_USER_DIRECTORY/mail/draft		kladde
-Really delete this signature? This cannot be undone.	Mail		Skal signaturen virkelig slettes? Det kan ikke fortrydes.
+Really delete this signature? This cannot be undone.	Mail		Skal signaturen slettes? Det kan ikke fortrydes.
 spam	B_USER_DIRECTORY/mail/spam		spam
-Reply to all	Mail		Svar alle
-Cancel	Mail		Annuller
+Reply to all	Mail		Svar til alle
+Cancel	Mail		Afbryd
 Off	Mail		Fra
-Set to %s	Mail		Indstil til %s
+Set to %s	Mail		Sæt til %s
 Signature:	Mail		Signatur:
 Forward without attachments	Mail		Videresend uden vedhæftninger
 queries	B_USER_DIRECTORY/mail/queries		forespørgsler
-View	Mail		Se
+View	Mail		Vis
 Signatures	Mail		Signaturer
 On	Mail		Til
-Find	Mail		Find
+Find	Mail		Søg
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Beklager, kunne ikke finde et program som understøtter 'Person'-datatypen.
 Date:	Mail		Dato:
 Expert	Mail		Ekspert
-Automatically mark mail as read:	Mail		Automatisk marker e-mail som læst:
+Automatically mark mail as read:	Mail		Automatisk markér e-post som læst:
 Close and 	Mail		Luk og 
 Colored quotes:	Mail		Farvede citater:
 Automatic	Mail		Automatisk
-Open this link	Mail		Åbn linket
+Open this link	Mail		Åbn lænken
 Auto signature:	Mail		Automatisk signatur:
 Same subject	Mail		Samme emne
 Send	Mail		Send
 Open draft	Mail		Åbn kladde
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lad være som 'New'
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lad være som 'Ny'
 Random	Mail		Tilfældig
 Attach attributes:	Mail		Vedhæft attributter:
 Find again	Mail		Søg igen
 Size:	Mail		Størrelse:
 To:	Mail		Til:
-Need Tracker to move items to trash	Mail		Behøber tracker for at flytte elementer til papirkurv
+Need Tracker to move items to trash	Mail		Behøver Tracker for at flytte elementer til papirkurv
 The mail_daemon could not be started:\n\t	Mail		mail_daemon kunne ikke startes:\n\t
 <no account found>	Mail		<ingen konto fundet>
 Mail couldn't find its dictionary.	Mail		Mail kunne ikke finde sin mappe.
-Mail preferences	Mail		Præferencer for mail
+Mail preferences	Mail		Postindstillinger
 helpful message	Mail		hjælpsom meddelelse
  Read 	Mail		 Læs 
 Font:	Mail		Skrifttype:
-Accounts…	Mail		Konti…
+Accounts…	Mail		Kontoer…
 Previous	Mail		Forrige
 Include file attributes in attachments	Mail		Medtag filattributter i vedhæftninger
 Start now	Mail		Start nu
@@ -109,22 +109,22 @@ Start now	Mail		Start nu
 Move to trash	Mail		Flyt til papirkurven
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Dato
-Check spelling	Mail		Stavekontrol
+Check spelling	Mail		Efterse stavning
 Redo	Mail		Omgør
 Leave as '%s'	Mail		Lad være som '%s'
 Print…	Mail		Udskriv…
 Settings…	Mail		Indstillinger…
-Warn unencodable:	Mail		Advar om ukodbar:
+Warn unencodable:	Mail		Advar om ukodelige tegn:
 Trash	Mail		Papirkurv
 Show raw message	Mail		Vis rå meddelelse
-Find…	Mail		Find…
+Find…	Mail		Søg…
 Select all	Mail		Vælg alle
 Show header	Mail		Vis header
-Reply account:	Mail		Svar konto:
-Sorry	Mail		Beklager
+Reply account:	Mail		Svarkonto:
+Sorry	Mail		Desværre
 Forward	Mail		Videresend
 Open attachment	Mail		Åbn vedhæftning
-mail	B_USER_DIRECTORY/mail		mail
+mail	B_USER_DIRECTORY/mail		post
 Save this message as a draft before closing?	Mail		Gem meddelelsen som en kladde inden lukning?
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon kører ikke. Meddelelsen er sat i kø og sendes når mail_daemon startes.
 None	Mail		Ingen
@@ -139,30 +139,30 @@ in	B_USER_DIRECTORY/mail/in		i
 Open	Mail		Åbn
 Don't save	Mail		Undlad at gemme
 Leave same	Mail		Lad være som samme
-An error occurred trying to save the attachment.	Mail		Der opstod en fejl ved gemning af det vedhæftede.
+An error occurred trying to save the attachment.	Mail		Der opstod en fejl ved gemning af vedhæftning.
 Save address	Mail		Gem adresse
-Initial spell check mode:	Mail		Indledende stavekontrol-tilstand:
-Edit queries…	Mail		Rediger forespørgsler…
-There is no installed handler for URL links.	Mail		Der er ikke installeret nogen behandler for URL-links.
+Initial spell check mode:	Mail		Indledende stavekontrolstilstand:
+Edit queries…	Mail		Redigér forespørgsler…
+There is no installed handler for URL links.	Mail		Der er ikke installeret nogen behandler for URL-lænker.
 File	Mail		Fil
 Reply preamble:	Mail		Svarets indledning:
-New mail message	Mail		Ny e-mailmeddelelse
+New mail message	Mail		Ny e-postmeddelelse
 An error occurred trying to open this signature.	Mail		Der opstod en fejl ved forsøg på at åbne signaturen.
-Edit signatures…	Mail		Rediger signaturer…
-User interface	Mail		Brugerflade
-Inconsistency occurred in the undo/redo buffer.	Mail		Der skete en konsistens fejl i fortryd/gør historikken.
+Edit signatures…	Mail		Redigér signaturer…
+User interface	Mail		Brugergrænseflade
+Inconsistency occurred in the undo/redo buffer.	Mail		Der skete en konsistensfejl i fortryd/gør-historikken.
 Remove attachment	Mail		Fjern vedhæftning
-Set to…	Mail		Indstil til…
-Edit	Mail		Rediger
+Set to…	Mail		Sæt til…
+Edit	Mail		Redigér
 Page setup…	Mail		Sideopsætning…
 An error occurred trying to save this signature.	Mail		Der opstod en fejl ved forsøg på at gemme signaturen.
 Beginner	Mail		Begynder
 Send message	Mail		Send meddelelse
 Delete	Mail		Slet
-Put your favorite e-mail queries and query templates in this folder.	Mail		Læg dine favorit e-mail-forespørgsler og forespørgsler i denne mappe.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Læg dine favorit e-postforespørgsler og forespørgselsskabeloner i denne mappe.
 Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Kunne ikke åbne signaturen. Beklager.
 Revert	Mail		Tilbagefør
 Unknown	Mail		Ukendt
-Increase quote level	Mail		Højere kvoteniveau
-Add enclosure…	Mail		Tilføj enclosure…
+Increase quote level	Mail		Øg kvoteniveau
+Add enclosure…	Mail		Tilføj område…

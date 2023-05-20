@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	765355649
+1	swedish	x-vnd.Haiku-libtracker	1644621968
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -269,6 +269,7 @@ Cut	FilePanelPriv		Klipp ut
 Finish: after several years	StatusWindow		Slutför: efter flera år
 Favorites	FilePanelPriv		Favoriter
 Point	AttributesView		Punkt
+You can't move or copy items to read-only volumes.	PoseView		Du kan inte flytta eller kopiera objekt till skrivskyddade volymer
 home	B_USER_DIRECTORY		hem
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Nya Mallar
 Disk mounting during boot	AutoMounterSettings		Diskmontering under uppstart

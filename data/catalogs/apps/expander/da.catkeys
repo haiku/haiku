@@ -1,51 +1,52 @@
-1	danish	x-vnd.Haiku-Expander	3300517306
-Destination	ExpanderWindow		Destination
+1	danish	x-vnd.Haiku-Expander	3239308358
+Destination	ExpanderWindow		Mål
 Other	ExpanderPreferences		Andre
-Automatically show contents listing	ExpanderPreferences		Automatisk visning af indholdets oplistning
+Automatically show contents listing	ExpanderPreferences		Vis indholdsliste automatisk
 Expander	System name		Udvider
-Expander: Choose destination	DirectoryFilePanel		Expander: Vælg destination
+Expander: Choose destination	DirectoryFilePanel		Expander: Vælg mål
 Set source…	ExpanderMenu		Vælg kilde…
-The destination is not a folder.	ExpanderWindow		Destinationen er ikke en mappe.
+OK	ExpanderWindow		O.k.
+The destination is not a folder.	ExpanderWindow		Målet er ikke en mappe.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen blev enten flyttet, omdøbt eller understøttes ikke.
-Close window when done expanding	ExpanderPreferences		Luk vindue når færdig med at udvide
+Close window when done expanding	ExpanderPreferences		Luk vinduet, når udpakingen er færdig
 Close	ExpanderMenu		Luk
 Create	ExpanderWindow		Opret
-Creating listing for '%s'…	ExpanderWindow		Opretter oplistning til '%s'…
+Creating listing for '%s'…	ExpanderWindow		Opretter indholdsliste for '%s'...
 Show contents	ExpanderMenu		Vis indhold
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på, at du vil stoppe udvidelsen af arkivet? De udvidede elementer er måske ikke fuldførte.
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på, du vil stoppe udvidelsen af arkivet? De udvidede elementer er muligvis ikke fuldførte.
 Settings	ExpanderMenu		Indstillinger
 Expand	ExpanderWindow		Pak ud
-Open destination folder after extraction	ExpanderPreferences		Åbn destinationsmappe efter udpakning
+Open destination folder after extraction	ExpanderPreferences		Åbn målmappe efter udpakning
 Same directory as source (archive) file	ExpanderPreferences		Samme mappe som kildefil (arkiv)
-Stop	ExpanderWindow		Stop
-Cancel	ExpanderWindow		Annuller
+Stop	ExpanderWindow		Stands
+Cancel	ExpanderWindow		Afbryd
 Expander settings	ExpanderPreferences		Udvider-indstillinger
 Error when expanding archive	ExpanderWindow		Fejl ved udpakning af arkiv
 Expand	ExpanderMenu		Pak ud
-Failed to create the destination folder.	ExpanderWindow		Kunne ikke oprette destinationsmappen.
+Failed to create the destination folder.	ExpanderWindow		Kunne ikke oprette målmappen.
 Settings…	ExpanderMenu		Indstillinger…
 Select current	DirectoryFilePanel		Vælg nuværende
 Expanding '%s'…	ExpanderWindow		Udvider '%s'…
-OK	ExpanderPreferences		OK
+OK	ExpanderPreferences		O.k.
 File expanded	ExpanderWindow		Fil pakket ud
-Automatically expand files	ExpanderPreferences		Udvid automatisk filer
+Automatically expand files	ExpanderPreferences		Udpak automatisk filer
 Select	DirectoryFilePanel		Vælg
 Show contents	ExpanderWindow		Vis indhold
-Stop	ExpanderMenu		Stop
+Stop	ExpanderMenu		Stands
 Select '%s'…	DirectoryFilePanel		Vælg '%s'…
 Expansion	ExpanderPreferences		Udvidelse
-Set destination…	ExpanderMenu		Sæt destination…
+Set destination…	ExpanderMenu		Sæt mål…
 Continue	ExpanderWindow		Fortsæt
  is not supported	ExpanderWindow		 understøttes ikke
-Cancel	ExpanderPreferences		Annuller
+Cancel	ExpanderPreferences		Afbryd
 Use:	ExpanderPreferences		Brug:
-Destination folder	ExpanderPreferences		Destinationsmappe
+Destination folder	ExpanderPreferences		Målmappe
 Expander: Open	ExpanderWindow		Expander: Åben
-Leave destination folder path empty	ExpanderPreferences		Lad stien til destinationsmappen være tom
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Destinationmappen findes ikke. Vil du oprette den?
+Leave destination folder path empty	ExpanderPreferences		Lad stien til målmappen være tom
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Målmappen findes ikke. Vil du oprette den?
 The file doesn't exist	ExpanderWindow		Filen findes ikke
 Hide contents	ExpanderWindow		Skjul indhold
 Source	ExpanderWindow		Kilde
-The destination is read only.	ExpanderWindow		Destination er kun læsebar.
+The destination is read only.	ExpanderWindow		Målet er skrivebeskyttet.
 Select	ExpanderPreferences		Vælg
 File	ExpanderMenu		Fil

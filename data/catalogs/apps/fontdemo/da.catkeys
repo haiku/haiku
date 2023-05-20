@@ -1,17 +1,17 @@
 1	danish	x-vnd.Haiku-FontDemo	3449067186
-Stop cycling	ControlView		Stop gennemgang
+Stop cycling	ControlView		Stands gennemgang
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Rotation: %d
 Shear: %d	ControlView		Vridning: %d
-Spacing: %d	ControlView		Mellemrum: %d
+Spacing: %d	ControlView		Afstand: %d
 Cycle fonts	ControlView		Gennemløb skrifttyper
 Font:	ControlView		Skrifttype:
 Drawing mode:	ControlView		Tegningstilstand:
 Haiku, Inc.	ControlView		Haiku, Inc.
-Controls	FontDemo		Styringer
+Controls	FontDemo		Kontroller
 FontDemo	System name		Skrifttypedemo
 Outline: %d	ControlView		Omrids: %d
 Text:	ControlView		Tekst:
-Antialiased text	ControlView		Antialiased tekst
-Bounding boxes	ControlView		Bundne bokse
+Antialiased text	ControlView		Kantudjævnet tekst
+Bounding boxes	ControlView		Afgrænsningsfelter
 Size: %d	ControlView		Størrelse: %d

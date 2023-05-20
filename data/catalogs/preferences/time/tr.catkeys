@@ -5,44 +5,44 @@ Australia	Time		Avustralya
 America	Time		Amerika
 Reset to default server list	Time		Saptanmış sunucu listesine sıfırla
 Could not resolve server address	Time		Sunucu adı çözülemedi
-Time & Date	System name		Tarih ve Saat
-Set time zone	Time		Saat dilimini ayarla
+Time & Date	System name		Tarih ve Zaman
+Set time zone	Time		Zaman dilimini ayarla
 Waiting for answer failed	Time		Yanıt bekleme başarısız
 <Other>	Time		<Diğer>
-Received invalid time	Time		Geçersiz saat alındı
+Received invalid time	Time		Geçersiz zaman alındı
 Remove	Time		Kaldır
 Synchronize again	Time		Yeniden eşitle
 Asia	Time		Asya
 Try all servers	Time		Tüm sunucuları dene
-Time	Time		Tarih ve Saat
+Time	Time		Tarih ve Zaman
 Current time:	Time		Geçerli zaman:
 The following error occured while synchronizing:\n%s: %s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s: %s
 Europe	Time		Avrupa
 Show day of week	Time		Haftanın gününü göster
-Local time (Windows compatible)	Time		Yerel saat (Windows uyumlu)
+Local time (Windows compatible)	Time		Yerel zaman (Windows uyumlu)
 Hardware clock set to:	Time		Donanım saati şuna ayarlı:
 Arctic	Time		Kuzey Kutup Bölgesi
 Antarctica	Time		Antartika
 GMT (UNIX compatible)	Time		GMT (UNIX uyumlu)
 Africa	Time		Afrika
 Stop	Time		Durdur
-Time zone	Time		Saat dilimi
+Time zone	Time		Zaman dilimi
 Clock	Time		Saat
-Network time	Time		Ağ saati
+Network time	Time		Ağ zamanı
 Sending request failed	Time		Gönderme isteği başarısız
-Preview time:	Time		Saati önizle:
+Preview time:	Time		Zamanı önizle:
 \nNow: 	Time		\nŞimdi: 
 Could not create socket	Time		Uç oluşturulamadı
 Pacific	Time		Pasifik
 Atlantic	Time		Atlantik
 Show clock in Deskbar	Time		Saati Masaüstü Çubuğu'nda göster
 Display time with seconds	Time		Saniyeleri göster
-Time	System name		Tarih ve Saat
-Show time zone	Time		Saat dilimini göster
+Time	System name		Tarih ve Zaman
+Show time zone	Time		Zaman dilimini göster
 Synchronize at boot	Time		Önyükleme sırasında eşitle
 Indian	Time		Hint
 Revert	Time		Eski haline döndür
-Date and time	Time		Tarih ve saat
+Date and time	Time		Tarih ve zaman
 The following error occured while synchronizing:\n%s	Time		Eşitleme sırasında aşağıdaki hatalar oluştu:\n%s
 Synchronize	Time		Eşitle
 Add	Time		Ekle

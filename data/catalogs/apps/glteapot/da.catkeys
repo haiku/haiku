@@ -11,14 +11,14 @@ Quit	TeapotWindow		Afslut
 Filled polygons	TeapotWindow		Udfyldte polygoner
 Settings	TeapotWindow		Indstillinger
 Fog	TeapotWindow		Tåge
-Backface culling	TeapotWindow		Backface culling
+Backface culling	TeapotWindow		Bortfiltrér bagvendte polygoner
 Z-buffered	TeapotWindow		Z-bufferet
 File	TeapotWindow		Fil
 Perspective	TeapotWindow		Perspektiv
 GLTeapot	System name		GLTekande
 Green	TeapotWindow		Grøn
 Right	TeapotWindow		Højre
-FPS display	TeapotWindow		FPS-display
+FPS display	TeapotWindow		Vis billedrammer pr. sekund
 Add a teapot	TeapotWindow		Tilføj en tekande
 Red	TeapotWindow		Rød
 Lights	TeapotWindow		Lys

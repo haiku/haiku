@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3999364875
+1	german	x-vnd.Haiku-libtracker	583663898
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -266,6 +266,7 @@ Cut	FilePanelPriv		Ausschneiden
 Finish: after several years	StatusWindow		Fertig: in einigen Jahren
 Favorites	FilePanelPriv		Favoriten
 Point	AttributesView		Punkt
+You can't move or copy items to read-only volumes.	PoseView		Auf schreibgeschützte Datenträger kann nichts verschoben oder kopiert werden.
 home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Trackers 'Neu'-Vorlagen
 Disk mounting during boot	AutoMounterSettings		Einhängen beim Systemstart

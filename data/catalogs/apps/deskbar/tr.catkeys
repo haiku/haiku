@@ -45,5 +45,5 @@ Sort applications by name	PreferencesWindow		Uygulamaları ada göre sırala
 Revert	PreferencesWindow		Eski haline döndür
 Window	PreferencesWindow		Pencere
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Tercihler
-Time preferences…	TimeView		Tarih ve Saat tercihleri…
+Time preferences…	TimeView		Tarih ve Zaman tercihleri…
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Masaüstü uygulamacıkları

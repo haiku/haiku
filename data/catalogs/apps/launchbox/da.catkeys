@@ -1,8 +1,8 @@
 1	danish	x-vnd.Haiku-LaunchBox	1530497419
-Set description…	LaunchBox		Indstil beskrivelse…
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du virkelig lukke pad'en?\n(pad'en vil ikke blive husket).
-OK	LaunchBox		OK
-Ignore double-click	LaunchBox		Ignorer dobbeltklik
+Set description…	LaunchBox		Sæt beskrivelse…
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du lukke pad'en?\n(pad'en vil ikke blive husket).
+OK	LaunchBox		O.k.
+Ignore double-click	LaunchBox		Ignorér dobbeltklik
 Show on all workspaces	LaunchBox		Vis på alle arbejdsområder
 Name Panel	LaunchBox		Navngiv panel
 Autostart	LaunchBox		Automatisk start
@@ -16,21 +16,21 @@ Auto-raise	LaunchBox		Løft automatisk
 Icon size	LaunchBox		Ikonstørrelse
 Open containing folder	LaunchBox		Åbn indeholdende mappe
 Add button here	LaunchBox		Tilføj knap her
-Cancel	LaunchBox		Annuller
-launch popup	LaunchBox		start pop op
-Clear button	LaunchBox		Ryd-knap
-Bummer	LaunchBox		Øv
+Cancel	LaunchBox		Afbryd
+launch popup	LaunchBox		start popup
+Clear button	LaunchBox		Ryd knap
+Bummer	LaunchBox		Ærgerligt
 last chance	LaunchBox		sidste chance
 You can drag an icon here.	LaunchBox		Du kan trække et ikon hertil.
 Pad 1	LaunchBox		Pad 1
 Failed to launch '%1'.\n\nError:	LaunchBox		Kunne ikke starte '%1'.\n\nFejl:
 Settings	LaunchBox		Indstillinger
-Vertical layout	LaunchBox		Lodret layout
+Vertical layout	LaunchBox		Lodret opsætning
 Pad	LaunchBox		Pad
 Close	LaunchBox		Luk
 Remove button	LaunchBox		Fjern knap
 Quit	LaunchBox		Afslut
-Horizontal layout	LaunchBox		Vandret layout
+Horizontal layout	LaunchBox		Vandret opsætning
 New	LaunchBox		Ny
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Kunne ikke sende 'åbn mappe'-kommando til tracker.\n\nFejl: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Kunne ikke sende 'åbn mappe'-kommando til Tracker.\n\nFejl: 
 Pad %1	LaunchBox		Pad %1

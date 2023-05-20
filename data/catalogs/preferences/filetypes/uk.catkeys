@@ -14,7 +14,7 @@ Select same preferred application as	FileTypes Window		Вибрати таку �
 Could not change attributes	Attribute Window		Неможливо змінити атрибути
 Icon	FileTypes Window		Значок
 Add…	Application Type Window		Додати…
-Attribute name:	Attribute Window		Ім'я атрибута:
+Attribute name:	Attribute Window		Назва атрибута:
 Long description:	Application Type Window		Докладний опис:
 Cancel	Preferred App Menu		Скасувати
 Remove	FileTypes Window		Вилучити
@@ -40,7 +40,7 @@ Don't save	Application Type Window		Не зберігати
 Center	Attribute Window	Attribute column alignment in Tracker	Центр
 Done	Extension Window		Готово
 Development	Application Types Window		Розробка
-Same as…	FileType Window	The same APPLICATION as ...	Таке як…
+Same as…	FileType Window	The same APPLICATION as ...	Така як…
 Abort	Application Types Window		Перервати
 Save	Application Type Window		Зберегти
 %1 application type	Application Type Window		%1 тип програми
@@ -64,8 +64,8 @@ Select…	FileType Window		Вибрати…
 Information	Application Types Window		Інформація
 Settings	FileTypes Window		Налаштування
 Done	Attribute Window		Готово
-FileTypes request	FileTypes		Запит Типів файлів
-Select same type as	FileType Window		Вибрати такий тип як
+FileTypes request	FileTypes		Запит FileTypes
+Select same type as	FileType Window		Вибрати такий тип як у
 Version:	Application Types Window		Версія:
 (from application)	FileTypes Window		(з програми)
 Application types	Application Types Window		Типи програм
@@ -95,12 +95,12 @@ Could not install file type	New File Type Window		Неможливо встан�
 Same as…	FileTypes Window		Така як…
 Golden master	Application Type Window		Золотий майстер
 Checkbox	Attribute ListView		Чекбокс
-FileTypes request	Preferred App Menu		Запит Типів файлів
+FileTypes request	Preferred App Menu		Запит FileTypes
 no icon	FileTypes Window		значок відсутній
 Single launch	Application Type Window		Одноразовий запуск
 %s file type	FileType Window		%s тип файлу
 Default	Attribute ListView		За замовчуванням
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Вилучення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені, що бажаєте цього? Щоб вилучити цілу групу, утримуйти клавішу Shift та натисніть \"Вилучити\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Вилучення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені, що бажаєте цього? Щоб вилучити цілу групу, утримуйти клавішу Shift та натисніть \«Вилучити\».
 String	Attribute ListView		Рядок
 Add type	New File Type Window		Додати тип
 Remove icon	Icon View		Вилучити значок
@@ -130,7 +130,7 @@ Beta	Application Types Window		Бета
 Add group	New File Type Window		Додати групу
 Cancel	Attribute Window		Скасувати
 Gamma	Application Types Window		Гамма
-Supported types	Application Type Window		Типи, що підтримуються
+Supported types	Application Type Window		Типи файлів, які підтримуються
 Integer 32 bit	Attribute ListView		Ціле 32 біта
 Beta	Application Type Window		Бета
 Could not retrieve preferred application of this file	Preferred App Menu		Неможливо визначити пріоритетну програму для цього файлу
@@ -142,9 +142,9 @@ File	FileTypes Window		Файл
 Add	Attribute Window		Додати
 Open file	FileTypes		Відкрити файл
 Version info	Application Type Window		Інформація про версію
-Final	Application Type Window		Завершення
+Final	Application Type Window		Фінальна
 Preferred application	FileType Window		Пріоритетна програма
-FileTypes	FileTypes		Типи файлів
+FileTypes	FileTypes		FileTypes
 Set preferred application	Preferred App Menu		Вибрати пріоритетну програму
 New file type	New File Type Window		Новий тип файлу
 Short description:	Application Type Window		Короткий опис:

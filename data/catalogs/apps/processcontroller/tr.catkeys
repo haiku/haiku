@@ -39,7 +39,7 @@ Debug this team!	ProcessController		Hata ayıkla
 ProcessController	System name		Süreç Denetimcisi
 Lowest active priority	ProcessController		En düşük etkin öncelik
 Restart Tracker	ProcessController		İzleyici'yi yeniden başlat
-System resources & caches…	ProcessController		Sistem kaynakları ve önbellekler…
+System resources & caches…	ProcessController		Sistem özkaynakları ve önbellekler…
 Damned!	ProcessController		Hadi be!
 New Terminal	ProcessController		Yeni uçbirim
 Power saving	ProcessController		Güç tasarrufu

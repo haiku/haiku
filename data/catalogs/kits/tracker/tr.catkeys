@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2439227145
+1	turkish	x-vnd.Haiku-libtracker	3318493464
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -228,7 +228,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Üzgünüm, bu özni
 Memory pointer	AttributesView		Bellek işaretçisi
 Cancel	OpenWithWindow		Vazgeç
 Select…	DeskWindow		Seç…
-Files cannot be moved or deleted from a read-only volume.	PoseView		Dosyalar saltokunur bir diskten taşınamaz veya silinemez.
+Files cannot be moved or deleted from a read-only volume.	PoseView		Dosyalar saltokunur bir disk bölümünden taşınamaz veya silinemez.
 Edit name	FilePanelPriv		Yeniden adlandır
 There was an error deleting \"%name\":\n\t%error	FSUtils		\%name\" silinirken hata:\n\t%error
 Resize to fit	ContainerWindow		Sığacak biçimde boyutlandır
@@ -269,6 +269,7 @@ Cut	FilePanelPriv		Kes
 Finish: after several years	StatusWindow		Bitiş: Birkaç yıl içinde
 Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
+You can't move or copy items to read-only volumes.	PoseView		Saltokunur disk bölümlerine ögeleri taşıyamaz veya kopyalayamazsınız.
 home	B_USER_DIRECTORY		ev
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Yeni İzleyici Şablonları
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
@@ -301,7 +302,7 @@ Get info	FilePanelPriv		Bilgi al
 MIME String	AttributesView		MIME dizisi
 Delete	ContainerWindow		Sil
 Execute	FilePermissionsView		Çalıştırma
-Show volumes on Desktop	SettingsView		Diskleri Masaüstü'nde göster
+Show volumes on Desktop	SettingsView		Disk bölümlerini Masaüstü'nde göster
 no	AttributesView		hayır
 Recent folders	ContainerWindow		Son klasörler
 Desktop	Model		Masaüstü
@@ -409,13 +410,13 @@ When	Email Query Columns		Ne zaman
 Object	AttributesView		Nesne
 Paste	ContainerWindow		Yapıştır
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		\"%name\" adındaki bir öge bu klasörde hâlihazırda var ve aynı adlı ögeler\niçeriyor olabilir. Bu ögeleri %verb ögelerle değiştirmek ister misiniz?
-Cannot unmount the boot volume \"%name\".	FSUtils		\"%name\" önyükleme diskinin bağlantısı kesilemez.
+Cannot unmount the boot volume \"%name\".	FSUtils		\"%name\" önyükleme disk bölümünün bağlantısı kesilemez.
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" \"%app\" uygulaması ile açılamadı (Eksik sembol: %symbol). \n
 New folder	ContainerWindow		Yeni klasör
 Name	OpenWithWindow		Ad
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\" ögesi değiştirilmeye çalışılırken bir sorun çıktı. Öge açık veya meşgul olabilir.
 Windows	TrackerSettingsWindow		Pencereler
-Show space bars on volumes	SettingsView		Disklerde doluluk çubuklarını göster
+Show space bars on volumes	SettingsView		Disk bölümlerinde doluluk çubuklarını göster
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\" dosyasının izinleri güncellenemedi. %error
 Decrease size	DeskWindow		Küçült
 Emptying Trash… 	StatusWindow		Çöp boşaltılıyor… 
@@ -500,7 +501,7 @@ Are you sure you want to move or copy the selected item(s) to this folder?	PoseV
 Find	FindPanel		Bul
 Empty folder	NavMenu		Boş klasör
 Defaults	TrackerSettingsWindow		Saptanmışlar
-Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Üzgünüm, hedef diskte seçimi kopyalayabilecek kadar boş alan yok.
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Üzgünüm, hedef disk bölümünde seçimi kopyalayabilecek kadar boş alan yok.
 True-color picture	AttributesView		Gerçek renkli resim
 Add-ons	FilePanelPriv		Eklentiler
 96 x 96	DeskWindow		96 x 96

@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Середній формат:
-Negative:	TimeFormatSettings		Від'ємний:
+Negative:	TimeFormatSettings		Від'ємні:
 Language	Locale Preflet Window		Мова
 Short format:	TimeFormatSettings		Короткий формат:
 24 hour	TimeFormatSettings		24 години
@@ -16,7 +16,7 @@ Available languages	Locale Preflet Window		Наявні мови
 Locale	Locale Preflet		Локаль
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Не вдалося знайти наявні мови! Ви не можете використовувати цей префлет!
 Formatting	Locale Preflet Window		Формати
-Use month/day-names from preferred language	TimeFormatSettings		Використовувати назви місяця/дня з мови за вподобанням
+Use month/day-names from preferred language	TimeFormatSettings		Назви місяця/дня як у мові за вподобанням
 already chosen	LanguageListView		вже вибрано
 Preferred languages	Locale Preflet Window		Мови за вподобанням
 Full format:	TimeFormatSettings		Повний формат:
@@ -24,7 +24,7 @@ Cancel	Locale Preflet Window		Скасувати
 Revert	Locale Preflet Window		Відкат змін
 Translate application and folder names	TimeFormatSettings		Перекладати назви програм та папок
 12 hour	TimeFormatSettings		12 годин
-Positive:	TimeFormatSettings		Додатній:
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Щоб застосувати зміни Deskbar і Tracker потребують перезапуску. Ви бажаєте зробити це зараз?
+Positive:	TimeFormatSettings		Додатні:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Щоб застосувати зміни Deskbar і Tracker потрібно перезапустити. Ви бажаєте зробити це зараз?
 Restart	Locale Preflet Window		Перезапустити
-Currency	TimeFormatSettings		Валюта
+Currency	TimeFormatSettings		Грошова одиниця

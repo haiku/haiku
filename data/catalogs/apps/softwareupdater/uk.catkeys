@@ -5,7 +5,7 @@ Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Паке�
 No active network connection was found	UpdateManager	Error message	Не знайдено активного мережевого з'єднання.
 Quit	SoftwareUpdaterWindow	Alert button label	Вийти
 There were no updates found.	CheckManager		Оновлень не знайдено.
-Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Оновлення не були завершені, Ви впевнені, що хочете вийти?
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Оновлення не було завершене, Ви впевнені, що хочете вийти?
 Updates found	SoftwareUpdaterWindow		Знайдено оновлення
 Update now	SoftwareUpdaterWindow		Оновити зараз
 For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		З якоїсь причини не вдалося перезавантажити комп'ютер.
@@ -14,7 +14,7 @@ Unrecognized argument	SoftwareUpdaterApp	Error message	Нерозпізнани�
 There were no updates found.	CheckAction		Оновлень не знайдено.
 No updates available	UpdateAction		Немає доступних оновлень
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Нові пакети будуть інстальовані
-Packages to be updated	SoftwareUpdaterWindow	List super item label	Пакети будуть оновлені
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Наступні пакети будуть оновлені
 to	SoftwareUpdaterWindow	List item text	до
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Спроба скасувати оновлення…
 Contacting software repositories to check for package updates.	CheckManager		Встановлюється зв'язок з репозитаріями щоб перевірити наявність оновлень.
@@ -60,5 +60,5 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Деінсталяці
 Quit	SoftwareUpdaterWindow		Вийти
 No updates available	CheckManager		Нема доступних оновлень
 Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Використання:  SoftwareUpdater <command> [ <option> ]\nОновлює встановлені пакети.\n\nКоманди:\n  update    - Шукати оновлення в репозитаріях для всіх пакетів.\n  check      - Перевірити наявність оновлень, та повідомити якщо вони доступні.\n  full-sync  - Синхронізувати встановлені пакети з репозитаріями.\n\nОпції:\n  -h or --help       Показати довідку\n  -v or --verbose    Вивести докладну інформацію\n
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Віддалені репозитарії недоступні. Переконайтеся, що репозитарії підключені за допомогою префлета Repositories або команди 'pkgman'.
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Віддалені репозитарії недоступні. Переконайтеся, що репозитарії підключені за допомогою префлета Repositories або команди «pkgman».
 Downloading packages	UpdateManager		Завантаження пакетів

@@ -13,7 +13,7 @@ Cache	DataSource		Кеш
 CPU usage (combined)	DataSource		Використання СPU (загальне)
 Threads	DataSource		Потоки
 Receiving	DataSource		Отримання
-Remove graph	ActivityView		Вилучити графік
+Remove graph	ActivityView		Прибрати графік
 Swap space	DataSource		Розмір файлу підкачки
 CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
@@ -36,7 +36,7 @@ CPU %d usage	DataSource		Використання CPU %d
 CPU %d speed	DataSource		Частота CPU %d
 File	ActivityWindow		Файл
 Ports	DataSource		Порти
-Page faults	DataSource		Відмова сторінки
+Page faults	DataSource		Відмови сторінки
 Apps	DataSource		Програми
 Additional items	ActivityView		Додаткові елементи
 Add graph	ActivityWindow		Додати графік
@@ -45,6 +45,6 @@ Sending	DataSource		Відправка
 Always on top	ActivityWindow		Завжди зверху
 Swap	DataSource		Файл підкачки
 %lld sec.	SettingsWindow		%lld сек.
-P-faults	DataSource		Р-відмови
+P-faults	DataSource		Відмови сторінки
 Sems	DataSource		Семафори
 Network receive	DataSource		Отримано по мережі

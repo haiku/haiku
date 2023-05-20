@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	765355649
+1	catalan; valencian	x-vnd.Haiku-libtracker	1644621968
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -269,6 +269,7 @@ Cut	FilePanelPriv		Retalla
 Finish: after several years	StatusWindow		Acabament: al cap d'uns quants anys
 Favorites	FilePanelPriv		Preferits
 Point	AttributesView		Punt
+You can't move or copy items to read-only volumes.	PoseView		No podeu moure ni copiar elements a volums de només lectura.
 home	B_USER_DIRECTORY		inici
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Plantilles noves del Rastrejador
 Disk mounting during boot	AutoMounterSettings		Muntatge de disc a l'arrencada

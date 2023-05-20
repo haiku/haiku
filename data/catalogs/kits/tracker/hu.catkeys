@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	765355649
+1	hungarian	x-vnd.Haiku-libtracker	1644621968
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -269,6 +269,7 @@ Cut	FilePanelPriv		Kivágás
 Finish: after several years	StatusWindow		Befejezés: néhány év múlva
 Favorites	FilePanelPriv		Kedvencek
 Point	AttributesView		Pont
+You can't move or copy items to read-only volumes.	PoseView		Nem másolhatóak, mozgathatóak elemek egy írásvédett lemezre.
 home	B_USER_DIRECTORY		Saját mappa
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Új Nyomkövető sablon
 Disk mounting during boot	AutoMounterSettings		Lemezek csatolása bekapcsoláskor

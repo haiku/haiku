@@ -1,53 +1,60 @@
-1	danish	x-vnd.Haiku-MediaConverter	2116725671
-Input file not recognized as Audio or Video	MediaConverter		Inputfil ikke genkendt som lyd eller video
+1	danish	x-vnd.Haiku-MediaConverter	249642350
+Input file not recognized as Audio or Video	MediaConverter		Inddatafil ikke genkendt som lyd eller video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
 Source files	MediaConverter		Kildefiler
+Error writing video frame %lld	MediaConverter		Fejl ved skrivning af videoframe %lld
+Audio quality: %s	MediaConverter		Lydkvalitet: %s
 Error converting '%filename'	MediaConverter		Fejl ved konvertering af '%filename'
-Selected directory not found. Defaulting to /boot/home	MediaConverter		Fandt ikke den valgte mappe. Bruger standard /boot/home
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Fandt ikke den valgte mappe. Bruger som standard /boot/home
 Conversion completed	MediaConverter		Konvertering fuldført
 Audio:	MediaConverter-FileInfo		Lyd:
-MediaConverter+:SaveDirectory	MediaConverter		Mediekonvertering+:Gemmemappe
+MediaConverter+:SaveDirectory	MediaConverter		Mediekonvertering+:SaveDirectory
 Error creating video.	MediaConverter		Fejl ved oprettelse af video.
-Cancelling	MediaConverter		Annullerer
+Cancelling	MediaConverter		Afbryder
 None available	Audio codecs		Ingen tilgængelig
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Filen har flere lyd- eller videospor, kun det første af hver vil blive konverteret.
 No file selected	MediaConverter-FileInfo		Ingen fil valgt
 High	MediaConverter		Høj
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Filen blev ikke genkendt som en understøttede mediefil:} other{# filer blev ikke genkendt som understøttede mediefiler:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Filen blev ikke genkendt som en understøttet mediefil:} other{# filer blev ikke genkendt som understøttede mediefiler:}}
 File Error	MediaConverter-FileInfo		Filfejl
 None available	Video codecs		Ingen tilgængelig
-Output format	MediaConverter		Outputformat
+Output format	MediaConverter		Uddataformat
 %.1f kHz mono	MediaFileInfo		%.1f kHz mono
 %.1f kHz stereo	MediaFileInfo		%.1f kHz stereo
-OK	MediaConverter		OK
+OK	MediaConverter		O.k.
 Error creating '%filename'	MediaConverter		Fejl ved oprettelse af '%filename'
 Error loading a file	MediaConverter		Fejl ved indlæsning af fil
 Encoder parameters	MediaConverter-EncoderWindow		Koderparametre
 Open…	Menu		Åbn…
 Audio encoding:	MediaConverter		Lydkodning:
-Cancelling…	MediaConverter		Annullerer…
-Output file '%filename' created	MediaConverter		Outputfilen '%filename' blev oprettet
-Output folder	MediaConverter		Outputmappe
+Multi-track file detected	MediaConverter		Flersporsfil opdaget
+Cancelling…	MediaConverter		Afbryder…
+Output file '%filename' created	MediaConverter		Uddatafilen '%filename' blev oprettet
+Output folder	MediaConverter		Uddatamappe
 Error creating track.	MediaConverter		Fejl ved oprettelse af spor.
  seconds	MediaFileInfo		 sekunder
-Video using parameters form settings	MediaConverter		Video med parameterens formularindstillinger
+Video using parameters form settings	MediaConverter		Video bruger parametre fra indstillinger
 Video:	MediaConverter-FileInfo		Video:
 Select	MediaConverter		Vælg
-Conversion cancelled	MediaConverter		Konvertering annulleret
+Conversion cancelled	MediaConverter		Konvertering afbrudt
 Low	MediaConverter		Lav
 Error loading files	MediaConverter		Fejl ved indlæsning af filer
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+Video quality: %s	MediaConverter		Videokvalitet: %s
 End   [ms]: 	MediaConverter		Slut   [ms]: 
-Cancel	MediaConverter		Annuller
-OK	MediaConverter-FileInfo		OK
+Cancel	MediaConverter		Afbryd
+OK	MediaConverter-FileInfo		O.k.
 Video encoding:	MediaConverter		Videokodning:
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Der opstod en fejl ved læsning af filinfoen.\n\nFejl : 
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Der opstod en fejl ved læsning af filoplysningerne.\n\nFejl : 
 Error	MediaConverter		Fejl
 File details	MediaConverter		Fildetaljer
 No audio	Audio codecs list		Ingen lyd
 Drop media files onto this window	MediaConverter		Drop mediefiler i vinduet
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# billede} other{# billeder}}
+Error read audio frame %lld	MediaConverter		Fejl ved læsning af lydframe %lld
 Quit	Menu		Afslut
-{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# byte}}
+Writing audio track: %s complete	MediaConverter		Skriver lydspor: %s fuldført
 Duration:	MediaConverter-FileInfo		Varighed:
 MediaConverter	System name		Mediekonvertering
 Error launching: %strError%	MediaConverter		Fejl ved start: %strError%

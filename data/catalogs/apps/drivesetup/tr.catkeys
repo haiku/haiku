@@ -59,7 +59,7 @@ BitLocker encrypted	Encryption utils		BitLocker şifreli
 You need to select a partition entry from the list.	MainWindow		Listeden bir bölüntü seçmelisiniz.
 Offset: %s	Support		Ofset: %s
 SafeBoot encrypted	Encryption utils		SafeBoot şifreli
-Volume name	PartitionList		Disk adı
+Volume name	PartitionList		Bölüm adı
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Şimdi değişiklikleri diske yazmak istediğinizden emin misiniz?\n\nBölüntü üzerindeki tüm veri geri alınamayacak bir biçimde kaybolur!
 Change	ChangeParametersPanel		Değiştir
 Partition name:	ChangeParametersPanel		Bölüntü adı:
@@ -75,7 +75,7 @@ Could not delete the selected partition.	MainWindow		Seçili bölüntü silineme
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
 The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilklendirildi.\n
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Disk bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama diske yazmaktaysa disk bağlantısını kesmek veri kaybına neden olabilir.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Bölüm bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama bu bölüme yazıyorsa bağlantıyı kesmek veri kaybına neden olabilir.\n
 Cancel	MainWindow		Vazgeç
 Free space	PartitionList		Boş alan
 Queries	PartitionList		Sorgular
