@@ -28,7 +28,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local libbe = [ MultiArchDefaultGristFiles libbe.so ] ;
 
 		AddResources $(libbe) :
-			libbe_version.rdef CountryFlags.rdef LanguageFlags.rdef
+			libbe_version.rdef CountryFlags.rdef Icons.rdef LanguageFlags.rdef
 			;
 
 		SetVersionScript $(libbe) : libbe_versions ;

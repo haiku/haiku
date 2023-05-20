@@ -42,14 +42,7 @@ AlertWithCheckbox::AlertWithCheckbox(const char* title, const char* messageText,
 	fSemaphore(create_sem(0, "AlertWithCheckbox")),
 	fAction(0)
 {
-	BResources resources;
-	resources.SetToImage(B_TRANSLATION_CONTEXT);
-	size_t size;
-	const uint8* iconData = (const uint8*)resources.LoadResource('VICN', 1,
-		&size);
-
-	// TODO load "info" icon from app_server instead?
-	BIconUtils::GetVectorIcon(iconData, size, &fBitmap);
+	BIconUtils::GetSystemIcon("dialog-information", &fBitmap);
 	BStripeView *stripeView = new BStripeView(fBitmap);
 
 	BTextView *message = new BTextView("_tv_");

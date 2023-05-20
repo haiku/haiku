@@ -530,45 +530,21 @@ BAlert::_CreateTypeIcon()
 
 	// The icons are in the app_server resources
 	BBitmap* icon = NULL;
-	BPath path;
-	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-	if (status != B_OK) {
-		FTRACE((stderr, "BAlert::_CreateTypeIcon() - find_directory "
-			"failed: %s\n", strerror(status)));
-		return NULL;
-	}
-
-	path.Append("app_server");
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status != B_OK) {
-		FTRACE((stderr, "BAlert::_CreateTypeIcon() - BFile init failed: %s\n",
-			strerror(status)));
-		return NULL;
-	}
-
-	BResources resources;
-	status = resources.SetTo(&file);
-	if (status != B_OK) {
-		FTRACE((stderr, "BAlert::_CreateTypeIcon() - BResources init "
-			"failed: %s\n", strerror(status)));
-		return NULL;
-	}
 
 	// Which icon are we trying to load?
 	const char* iconName;
 	switch (fType) {
 		case B_INFO_ALERT:
-			iconName = "info";
+			iconName = "dialog-information";
 			break;
 		case B_IDEA_ALERT:
-			iconName = "idea";
+			iconName = "dialog-idea";
 			break;
 		case B_WARNING_ALERT:
-			iconName = "warn";
+			iconName = "dialog-warning";
 			break;
 		case B_STOP_ALERT:
-			iconName = "stop";
+			iconName = "dialog-error";
 			break;
 
 		default:
@@ -587,31 +563,7 @@ BAlert::_CreateTypeIcon()
 	}
 
 	// Load the raw icon data
-	size_t size = 0;
-	const uint8* rawIcon;
-
-	// Try to load vector icon
-	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
-		iconName, &size);
-	if (rawIcon != NULL
-		&& BIconUtils::GetVectorIcon(rawIcon, size, icon) == B_OK) {
-		return icon;
-	}
-
-	// Fall back to bitmap icon
-	rawIcon = (const uint8*)resources.LoadResource(B_LARGE_ICON_TYPE,
-		iconName, &size);
-	if (rawIcon == NULL) {
-		FTRACE((stderr, "BAlert::_CreateTypeIcon() - Icon resource not found\n"));
-		delete icon;
-		return NULL;
-	}
-
-	// Handle color space conversion
-	if (icon->ColorSpace() != B_CMAP8) {
-		BIconUtils::ConvertFromCMAP8(rawIcon, B_LARGE_ICON, B_LARGE_ICON,
-			B_LARGE_ICON, icon);
-	}
+	BIconUtils::GetSystemIcon(iconName, icon);
 
 	return icon;
 }

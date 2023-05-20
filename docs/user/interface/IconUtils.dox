@@ -1,13 +1,13 @@
 /*
- * Copyright 2011 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrien Destugues, pulkomandy@pulkomandy.ath.cx
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/interface/IconUtils.h	rev 42600
- *		src/kits/interface/IconUtils.cpp	rev 42600
+ *		headers/os/interface/IconUtils.h	hrev57019
+ *		src/kits/interface/IconUtils.cpp	hrev57019
  */
 
 
@@ -109,6 +109,32 @@
 	either the small icon attribute or the large icon attribute as given in
 	\a smallIconAttrName and \a largeIconAttrName. Which icon is loaded depends
 	on the given \a size.
+
+	\since Haiku R1
+*/
+
+
+/*
+	\fn static status_t BIconUtils::GetSystemIcon(const char* iconName, BBitmap* result)
+	\brief Load an icon from the set of system icons.
+
+	To provide some uniformity between different applications, a base set of icons is provided
+	with Haiku. Whenever possible, these should be used instead of application specific icons,
+	to ensure consistency and ease of discovering application functions.
+
+	The available icons follow the FreeDesktop icon-naming-spec convention. At this time the
+	following icons are available:
+
+	- Flag icons for 245 countries
+	- dialog-error, dialog-information, and dialog-warning
+	- As an extension not available in FreeDesktop specifications, dialog-idea is also available
+	  and corresponds to the icon used in BAlert of type B_IDEA_ALERT.
+
+	The icon is automatically scaled to fit the \a result bitmap, which must be allocated and
+	valid before calling this function.
+
+	\return B_OK if the icon could be loaded into the \a result BBitmap. B_ENTRY_NOT_FOUND if the
+	requested icon is not currently available.
 
 	\since Haiku R1
 */

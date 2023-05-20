@@ -370,10 +370,11 @@ BLocaleRoster::GetFlagIconForCountry(BBitmap* flagIcon, const char* countryCode)
 	if (codeLength < 2)
 		return B_BAD_VALUE;
 
-	char normalizedCode[3];
-	normalizedCode[0] = toupper(countryCode[codeLength - 2]);
-	normalizedCode[1] = toupper(countryCode[codeLength - 1]);
-	normalizedCode[2] = '\0';
+	char normalizedCode[8];
+	strcpy(normalizedCode, "flag-");
+	normalizedCode[5] = tolower(countryCode[codeLength - 2]);
+	normalizedCode[6] = tolower(countryCode[codeLength - 1]);
+	normalizedCode[7] = '\0';
 
 	size_t size;
 	const void* buffer = resources->LoadResource(B_VECTOR_ICON_TYPE,

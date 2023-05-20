@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,8 +18,11 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <FindDirectory.h>
 #include <Node.h>
 #include <NodeInfo.h>
+#include <Path.h>
+#include <Resources.h>
 #include <String.h>
 #include <TypeConstants.h>
 
@@ -611,6 +614,69 @@ BIconUtils::GetCMAP8Icon(BNode* node, const char* smallIconAttrName,
 	}
 
 	return result;
+}
+
+
+status_t
+BIconUtils::GetSystemIcon(const char* iconName, BBitmap* icon)
+{
+	static BResources resources;
+	static bool resourcesAreLoaded = false;
+
+	if (!resourcesAreLoaded) {
+		BPath path;
+		status_t status = find_directory(B_SYSTEM_LIB_DIRECTORY, &path);
+		if (status != B_OK) {
+			return status;
+		}
+
+		path.Append("libbe.so");
+		BFile file;
+		status = file.SetTo(path.Path(), B_READ_ONLY);
+		if (status != B_OK) {
+			return status;
+		}
+
+		status = resources.SetTo(&file);
+		if (status != B_OK) {
+			return status;
+		}
+
+		resourcesAreLoaded = true;
+	}
+
+	// Check the icon bitmap
+	if (icon == NULL || icon->InitCheck() < B_OK) {
+		return B_BAD_DATA;
+	}
+
+	// Load the raw icon data
+	size_t size = 0;
+	const uint8* rawIcon;
+
+	// Try to load vector icon
+	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
+		iconName, &size);
+	if (rawIcon != NULL
+		&& BIconUtils::GetVectorIcon(rawIcon, size, icon) == B_OK) {
+		return B_OK;
+	}
+
+	// Fall back to bitmap icon
+	rawIcon = (const uint8*)resources.LoadResource(B_LARGE_ICON_TYPE,
+		iconName, &size);
+	if (rawIcon == NULL) {
+		delete icon;
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	// Handle color space conversion
+	if (icon->ColorSpace() != B_CMAP8) {
+		BIconUtils::ConvertFromCMAP8(rawIcon, B_LARGE_ICON, B_LARGE_ICON,
+			B_LARGE_ICON, icon);
+	}
+
+	return B_OK;
 }
 
 

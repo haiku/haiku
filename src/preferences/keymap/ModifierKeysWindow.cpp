@@ -151,42 +151,6 @@ ConflictView::SetWarnIcon(bool show)
 void
 ConflictView::_FillIcons()
 {
-	// return if the icons have already been filled out
-	if (fStopIcon != NULL && fStopIcon->InitCheck() == B_OK
-		&& fWarnIcon != NULL && fWarnIcon->InitCheck() == B_OK) {
-		return;
-	}
-
-	BPath path;
-	status_t status = find_directory(B_BEOS_SERVERS_DIRECTORY, &path);
-	if (status < B_OK) {
-		FTRACE((stderr,
-			"_FillIcons() - find_directory failed: %s\n",
-			strerror(status)));
-		return;
-	}
-
-	path.Append("app_server");
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status < B_OK) {
-		FTRACE((stderr,
-			"_FillIcons() - BFile init failed: %s\n",
-			strerror(status)));
-		return;
-	}
-
-	BResources resources;
-	status = resources.SetTo(&file);
-	if (status < B_OK) {
-		FTRACE((stderr,
-			"_FillIcons() - BResources init failed: %s\n",
-			strerror(status)));
-		return;
-	}
-
-	size_t size = 0;
-
 	if (fStopIcon == NULL) {
 		// Allocate the fStopIcon bitmap
 		fStopIcon = new (std::nothrow) BBitmap(Bounds(), 0,
@@ -198,15 +162,11 @@ ConflictView::_FillIcons()
 			return;
 		}
 
-		// load stop icon bitmap from app_server
-		const uint8* stopVector
-			= (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "stop",
-				&size);
-		if (stopVector == NULL
-			|| BIconUtils::GetVectorIcon(stopVector, size, fStopIcon)
-				!= B_OK) {
+		// load dialog-error icon bitmap
+		if (BIconUtils::GetSystemIcon("dialog-error", fStopIcon) != B_OK) {
 			delete fStopIcon;
 			fStopIcon = NULL;
+			return;
 		}
 	}
 
@@ -221,15 +181,11 @@ ConflictView::_FillIcons()
 			return;
 		}
 
-		// load warn icon bitmap from app_server
-		const uint8* warnVector
-			= (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE, "warn",
-				&size);
-		if (warnVector == NULL
-			|| BIconUtils::GetVectorIcon(warnVector, size, fWarnIcon)
-				!= B_OK) {
+		// load dialog-warning icon bitmap
+		if (BIconUtils::GetSystemIcon("dialog-warning", fWarnIcon) != B_OK) {
 			delete fWarnIcon;
 			fWarnIcon = NULL;
+			return;
 		}
 	}
 }

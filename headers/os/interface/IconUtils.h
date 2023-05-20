@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku. All rights reserved.
+ * Copyright 2006-2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ICON_UTILS_H
@@ -35,6 +35,8 @@ public:
 									const char* smallIconAttrName,
 									const char* largeIconAttrName,
 									icon_size size, BBitmap* icon);
+
+	static	status_t			GetSystemIcon(const char* iconName, BBitmap* result);
 
 	static	status_t			ConvertFromCMAP8(BBitmap* source,
 									BBitmap* result);
