@@ -404,7 +404,7 @@ TouchpadPrefView::SetupView()
 		B_TRANSLATE("Slow"), B_TRANSLATE("Fast"));
 
 	fPadBlockerSlider
-		= new BSlider("padblocker", B_TRANSLATE("Keyboard Lock Delay"),
+		= new BSlider("padblocker", B_TRANSLATE("Keyboard lock delay"),
 			new BMessage(PADBLOCK_TIME_CHANGED), 5, 1000, B_HORIZONTAL);
 	fPadBlockerSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fPadBlockerSlider->SetHashMarkCount(10);
