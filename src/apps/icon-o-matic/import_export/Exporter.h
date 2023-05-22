@@ -22,12 +22,17 @@ _END_ICON_NAMESPACE
 
 _USING_ICON_NAMESPACE
 
-
+/*! Base class for all exporters to implement. */
 class Exporter {
  public:
 								Exporter();
 	virtual						~Exporter();
 
+	/*! Export the Document to the specified entry_ref.
+		Spawns a separate thread to do the actual exporting.
+		Uses the virtual Export function defined after this function to do the
+		actual export.
+	*/
 			status_t			Export(Document* document,
 									   const entry_ref& ref);
 
@@ -36,6 +41,9 @@ class Exporter {
 
 	virtual	const char*			MIMEType() = 0;
 
+	/*! If \a selfDestroy is true, class deletes itself when export thread is
+		finished.
+	*/
 			void				SetSelfDestroy(bool selfDestroy);
 
 			void				WaitForExportThread();

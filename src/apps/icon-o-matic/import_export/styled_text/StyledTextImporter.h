@@ -31,6 +31,10 @@ struct style_map {
 	Style *style;
 };
 
+/*! Turns text into its associated paths and shapes.
+	Coloring can also be imported from applications, such as StyledEdit, that
+	specify it.
+*/
 class StyledTextImporter : public Importer {
  public:
 								StyledTextImporter();

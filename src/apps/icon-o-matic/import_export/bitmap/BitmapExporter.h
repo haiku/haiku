@@ -11,6 +11,11 @@
 
 #include "Exporter.h"
 
+/*! Exports to an arbitrary image format.
+	Uses BBitmap and a Translator to turn an image into the desired format.
+
+	\note Currently only exports to the PNG format.
+*/
 class BitmapExporter : public Exporter {
  public:
 								BitmapExporter(uint32 size);

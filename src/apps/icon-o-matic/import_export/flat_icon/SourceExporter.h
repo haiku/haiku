@@ -11,6 +11,7 @@
 
 #include "FlatIconExporter.h"
 
+/*! Exports HVIF file data into a C/C++ array */
 class SourceExporter : public FlatIconExporter {
  public:
 								SourceExporter();

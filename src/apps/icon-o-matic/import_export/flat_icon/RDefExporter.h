@@ -11,6 +11,7 @@
 
 #include "FlatIconExporter.h"
 
+/*! Exports HVIF file data to an RDef file. */
 class RDefExporter : public FlatIconExporter {
  public:
 								RDefExporter();

@@ -24,7 +24,7 @@ _BEGIN_ICON_NAMESPACE
 	class VectorPath;
 _END_ICON_NAMESPACE
 
-
+/** Exporter for the native Icon-O-Matic save format. */
 class MessageExporter : public Exporter {
  public:
 								MessageExporter();

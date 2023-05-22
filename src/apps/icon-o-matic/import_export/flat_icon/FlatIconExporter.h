@@ -47,6 +47,7 @@ class PointHash {
 typedef hash_set<BPoint, PointHash> PointSet;
 #endif
 
+/*! Export to HVIF file or to an existing file's attribute. */
 class FlatIconExporter : public Exporter {
  public:
 								FlatIconExporter();
@@ -58,7 +59,7 @@ class FlatIconExporter : public Exporter {
 
 	virtual	const char*			MIMEType();
 
-	// FlatIconExporter
+	/*! Export to file attribute */
 	status_t					Export(const Icon* icon, BNode* node,
 									   const char* attrName);
 
