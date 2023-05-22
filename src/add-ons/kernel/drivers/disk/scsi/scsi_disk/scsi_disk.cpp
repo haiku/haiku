@@ -219,20 +219,6 @@ trim_device(das_driver_info* device, fs_trim_data* trimData)
 }
 
 
-static int
-log2(uint32 x)
-{
-	int y;
-
-	for (y = 31; y >= 0; --y) {
-		if (x == ((uint32)1 << y))
-			break;
-	}
-
-	return y;
-}
-
-
 static status_t
 do_io(void* cookie, IOOperation* operation)
 {
@@ -424,12 +410,6 @@ das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize, uint3
 {
 	TRACE("das_set_capacity(device = %p, capacity = %" B_PRIu64
 		", blockSize = %" B_PRIu32 ")\n", info, capacity, blockSize);
-
-	// get log2, if possible
-	uint32 blockShift = log2(blockSize);
-
-	if ((1UL << blockShift) != blockSize)
-		blockShift = 0;
 
 	info->capacity = capacity;
 
