@@ -233,14 +233,14 @@ DumpInterface(const BUSBInterface* interface)
 
 	char classInfo[128];
 	usb_get_class_info(interface->Class(), 0, 0, classInfo, sizeof(classInfo));
-	printf("                Class .............. 0x%02x (%s)\n",
+	printf("                Class .............. 0x%02x %s\n",
 		interface->Class(), classInfo);
 	usb_get_class_info(interface->Class(), interface->Subclass(), 0, classInfo, sizeof(classInfo));
-	printf("                Subclass ........... 0x%02x%s\n",
+	printf("                Subclass ........... 0x%02x %s\n",
 		interface->Subclass(), classInfo);
 	usb_get_class_info(interface->Class(), interface->Subclass(), interface->Protocol(), classInfo,
 		sizeof(classInfo));
-	printf("                Protocol ........... 0x%02x%s\n",
+	printf("                Protocol ........... 0x%02x %s\n",
 		interface->Protocol(), classInfo);
 	printf("                Interface String ... \"%s\"\n",
 		interface->InterfaceString());
@@ -323,12 +323,12 @@ DumpInfo(BUSBDevice& device, bool verbose)
 	char classInfo[128];
 	printf("[Device /dev/bus/usb%s]\n", device.Location());
 	usb_get_class_info(device.Class(), 0, 0, classInfo, sizeof(classInfo));
-	printf("    Class .................. 0x%02x (%s)\n", device.Class(), classInfo);
+	printf("    Class .................. 0x%02x %s\n", device.Class(), classInfo);
 	usb_get_class_info(device.Class(), device.Subclass(), 0, classInfo, sizeof(classInfo));
-	printf("    Subclass ............... 0x%02x%s\n", device.Subclass(), classInfo);
+	printf("    Subclass ............... 0x%02x %s\n", device.Subclass(), classInfo);
 	usb_get_class_info(device.Class(), device.Subclass(), device.Protocol(), classInfo,
 		sizeof(classInfo));
-	printf("    Protocol ............... 0x%02x%s\n", device.Protocol(), classInfo);
+	printf("    Protocol ............... 0x%02x %s\n", device.Protocol(), classInfo);
 	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
 	uint32_t version = device.USBVersion();
 	printf("    USB Version ............ %d.%d\n", version >> 8, version & 0xFF);
