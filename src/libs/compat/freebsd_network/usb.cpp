@@ -121,7 +121,7 @@ get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_a
 
 	const usb_device_descriptor* device_desc =
 		sUSB->get_device_descriptor(device->haiku_usb_device);
-	if (!device_desc)
+	if (device_desc == NULL)
 		return B_BAD_VALUE;
 
 	uaa->info.idVendor = device_desc->vendor_id;
@@ -132,11 +132,13 @@ get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_a
 	uaa->info.bDeviceProtocol = device_desc->device_protocol;
 
 	const usb_configuration_info* config = sUSB->get_configuration(device->haiku_usb_device);
-	if (!device_desc)
+	if (device_desc == NULL)
 		return B_BAD_VALUE;
 
 	// TODO: represent more than just interface[0], but how?
 	usb_interface_info* iface = config->interface[0].active;
+	if (iface == NULL)
+		return B_NO_INIT;
 
 	uaa->info.bInterfaceClass = iface->descr->interface_class;
 	uaa->info.bInterfaceSubClass = iface->descr->interface_subclass;
