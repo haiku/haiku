@@ -21,7 +21,7 @@ class SourceExporter : public FlatIconExporter {
 	virtual	status_t			Export(const Icon* icon,
 									   BPositionIO* stream);
 
-	virtual	const char*			MIMEType();
+	virtual	const char*			MIMEType() { return "text/x-source-code"; }
 
  private:
 			status_t			_Export(const uint8* source,

@@ -89,13 +89,6 @@ FlatIconExporter::Export(const Icon* icon, BPositionIO* stream)
 	return B_OK;
 }
 
-// MIMEType
-const char*
-FlatIconExporter::MIMEType()
-{
-	return NULL;
-}
-
 // Export
 status_t
 FlatIconExporter::Export(const Icon* icon, BNode* node,

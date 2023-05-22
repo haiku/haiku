@@ -125,20 +125,6 @@ SVGExporter::Export(const Icon* icon, BPositionIO* stream)
 	return ret;
 }
 
-// MIMEType
-const char*
-SVGExporter::MIMEType()
-{
-	return "image/svg+xml";
-}
-
-// Extension
-const char*
-SVGExporter::Extension()
-{
-	return "svg";
-}
-
 // #pragma mark -
 
 // SetOriginalEntry

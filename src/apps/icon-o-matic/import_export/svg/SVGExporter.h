@@ -32,8 +32,8 @@ class SVGExporter : public Exporter {
 	// Exporter
 	virtual	status_t			Export(const Icon* icon, BPositionIO* stream);
 
-	virtual	const char*			MIMEType();
-	virtual	const char*			Extension();
+	virtual	const char*			MIMEType() { return "image/svg+xml"; }
+	virtual	const char*			Extension() { return "svg"; }
 
 	// SVGExporter
 			void				SetOriginalEntry(const entry_ref* ref);

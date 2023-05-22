@@ -37,13 +37,6 @@ SourceExporter::Export(const Icon* icon, BPositionIO* stream)
 		stream);
 }
 
-// MIMEType
-const char*
-SourceExporter::MIMEType()
-{
-	return "text/x-source-code";
-}
-
 // #pragma mark -
 
 // _Export

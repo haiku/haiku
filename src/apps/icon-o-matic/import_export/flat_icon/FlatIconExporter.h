@@ -57,7 +57,7 @@ class FlatIconExporter : public Exporter {
 	virtual	status_t			Export(const Icon* icon,
 									   BPositionIO* stream);
 
-	virtual	const char*			MIMEType();
+	virtual	const char*			MIMEType() { return NULL; }
 
 	/*! Export to file attribute */
 	status_t					Export(const Icon* icon, BNode* node,

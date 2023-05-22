@@ -36,13 +36,6 @@ RDefExporter::Export(const Icon* icon, BPositionIO* stream)
 	return _Export((const uint8*)buffer.Buffer(), buffer.BufferLength(), stream);
 }
 
-// MIMEType
-const char*
-RDefExporter::MIMEType()
-{
-	return "text/x-vnd.Be.ResourceDef";
-}
-
 // #pragma mark -
 
 // _Export
