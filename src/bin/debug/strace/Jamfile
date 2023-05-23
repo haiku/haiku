@@ -20,9 +20,10 @@ local straceSources =
 	NetworkTypes.cpp
 	MemoryReader.cpp
 
+	area.cpp
 	fcntl.cpp
 	ioctl.cpp
-	area.cpp
+	network.cpp
 ;
 
 # Our compiler badly chokes when compiling the generated file. So will

@@ -234,13 +234,13 @@ FlagsTypeHandler::RenderValue(Context &context, unsigned int value) const
 				continue;
 
 			if (!rendered.empty())
-				rendered.insert(0, " | ");
+				rendered.insert(0, "|");
 			rendered.insert(0, i->name);
 			value &= ~(i->value);
 		}
 		if (value != 0) {
 			if (!rendered.empty())
-				rendered += " | ";
+				rendered += "|";
 
 			char hex[20];
 			snprintf(hex, sizeof(hex), "0x%x", value);

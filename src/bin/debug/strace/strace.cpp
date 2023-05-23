@@ -266,9 +266,10 @@ patch_syscalls()
 	// patching step to gensyscalls also manually or add metadata to
 	// kernel/syscalls.h and have it parsed automatically
 
+	extern void patch_area();
 	extern void patch_fcntl();
 	extern void patch_ioctl();
-	extern void patch_area();
+	extern void patch_network();
 
 	for (size_t i = 0; i < sSyscallVector.size(); i++) {
 		Syscall *syscall = sSyscallVector[i];
@@ -281,29 +282,10 @@ patch_syscalls()
 		}
 	}
 
+	patch_area();
 	patch_fcntl();
 	patch_ioctl();
-	patch_area();
-
-	Syscall *poll = get_syscall("_kern_poll");
-	poll->ParameterAt(0)->SetInOut(true);
-
-	Syscall *select = get_syscall("_kern_select");
-	select->ParameterAt(1)->SetInOut(true);
-	select->ParameterAt(2)->SetInOut(true);
-	select->ParameterAt(3)->SetInOut(true);
-
-	Syscall *wait = get_syscall("_kern_wait_for_child");
-	wait->ParameterAt(2)->SetOut(true);
-	wait->ParameterAt(3)->SetOut(true);
-
-	Syscall *createPipe = get_syscall("_kern_create_pipe");
-	createPipe->ParameterAt(0)->SetOut(true);
-	createPipe->ParameterAt(0)->SetCount(2);
-
-	Syscall *socketPair = get_syscall("_kern_socketpair");
-	socketPair->ParameterAt(3)->SetOut(true);
-	socketPair->ParameterAt(3)->SetCount(2);
+	patch_network();
 }
 
 
