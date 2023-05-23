@@ -145,6 +145,7 @@ MainWindow::~MainWindow()
 	// stuff is properly detached
 	delete fDocument;
 
+	delete fCurrentColor;
 	delete fMessageAfterSave;
 }
 
