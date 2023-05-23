@@ -37,9 +37,29 @@ DumpDescriptorData(const usb_generic_descriptor* descriptor)
 
 
 void
+DumpEndpointSSCompanionDescriptor(
+	const usb_endpoint_ss_companion_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x Endpoint SuperSpeed Companion\n",
+		descriptor->descriptor_type);
+	printf("                    MaxBurst .......... 0x%02x\n",
+		descriptor->max_burst);
+	printf("                    Attributes ........ 0x%02x\n",
+		descriptor->attributes);
+	printf("                    Bytes per Interval  0x%02x\n",
+		descriptor->bytes_per_interval);
+}
+
+
+void
 DumpDescriptor(const usb_generic_descriptor* descriptor,
 	int classNum, int subclass)
 {
+	if (descriptor->descriptor_type == USB_DESCRIPTOR_ENDPOINT_SS_COMPANION) {
+		DumpEndpointSSCompanionDescriptor((const usb_endpoint_ss_companion_descriptor*)descriptor);
+		return;
+	}
+
 	switch (classNum) {
 		case USB_AUDIO_DEVICE_CLASS:
 			DumpAudioDescriptor(descriptor, subclass);
