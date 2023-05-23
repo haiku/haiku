@@ -543,20 +543,33 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				return B_BUFFER_OVERFLOW;
 
 			size_t actualLength = 0;
-			uint8 firstTwoBytes[2];
+			uint8 temp[4];
 			status = B_OK;
 
+			// We need to fetch the default language code, first.
 			if (gUSBModule->get_descriptor(device->device,
-				USB_DESCRIPTOR_STRING, command.string.string_index, 0,
-				firstTwoBytes, 2, &actualLength) < B_OK
+				USB_DESCRIPTOR_STRING, 0, 0,
+				temp, 4, &actualLength) < B_OK
+				|| actualLength != 4
+				|| temp[1] != USB_DESCRIPTOR_STRING) {
+				command.string.status = B_USB_RAW_STATUS_ABORTED;
+				command.string.length = 0;
+				break;
+			}
+			const uint16 langid = (temp[2] | (temp[3] << 8));
+
+			// Now fetch the string length.
+			if (gUSBModule->get_descriptor(device->device,
+				USB_DESCRIPTOR_STRING, command.string.string_index, langid,
+				temp, 2, &actualLength) < B_OK
 				|| actualLength != 2
-				|| firstTwoBytes[1] != USB_DESCRIPTOR_STRING) {
+				|| temp[1] != USB_DESCRIPTOR_STRING) {
 				command.string.status = B_USB_RAW_STATUS_ABORTED;
 				command.string.length = 0;
 				break;
 			}
 
-			uint8 stringLength = MIN(firstTwoBytes[0], command.string.length);
+			uint8 stringLength = MIN(temp[0], command.string.length);
 			char *string = (char *)malloc(stringLength);
 			if (string == NULL) {
 				command.string.status = B_USB_RAW_STATUS_ABORTED;
@@ -566,7 +579,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			if (gUSBModule->get_descriptor(device->device,
-				USB_DESCRIPTOR_STRING, command.string.string_index, 0,
+				USB_DESCRIPTOR_STRING, command.string.string_index, langid,
 				string, stringLength, &actualLength) < B_OK
 				|| actualLength != stringLength) {
 				command.string.status = B_USB_RAW_STATUS_ABORTED;
