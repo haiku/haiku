@@ -501,7 +501,15 @@ XHCI::XHCI(pci_info *info, 	pci_device_module_info* pci, pci_device* device, Sta
 
 	// Find the right interrupt vector, using MSIs if available.
 	fIRQ = fPCIInfo->u.h0.interrupt_line;
-	if (fPci->get_msi_count(fDevice) >= 1) {
+	if (fPci->get_msix_count(fDevice) >= 1) {
+		uint8 msiVector = 0;
+		if (fPci->configure_msix(fDevice, 1, &msiVector) == B_OK
+			&& fPci->enable_msix(fDevice) == B_OK) {
+			TRACE_ALWAYS("using MSI-X\n");
+			fIRQ = msiVector;
+			fUseMSI = true;
+		}
+	} else if (fPci->get_msi_count(fDevice) >= 1) {
 		uint8 msiVector = 0;
 		if (fPci->configure_msi(fDevice, 1, &msiVector) == B_OK
 			&& fPci->enable_msi(fDevice) == B_OK) {
