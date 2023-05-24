@@ -12,6 +12,8 @@
 #include <AutoDeleterOS.h>
 #include <lock.h>
 
+#include "../ecam/ECAMPCIController.h"
+
 
 #define CHECK_RET(err) {status_t _err = (err); if (_err < B_OK) return _err;}
 
@@ -37,6 +39,10 @@ public:
 
 	virtual status_t GetMaxBusDevices(int32& count) = 0;
 
+	virtual status_t GetRange(uint32 index, pci_resource_range* range);
+
+	virtual status_t Finalize() = 0;
+
 	status_t ReadIrq(
 		uint8 bus, uint8 device, uint8 function,
 		uint8 pin, uint8& irq);
@@ -44,8 +50,6 @@ public:
 	status_t WriteIrq(
 		uint8 bus, uint8 device, uint8 function,
 		uint8 pin, uint8 irq);
-
-	status_t GetRange(uint32 index, pci_resource_range* range);
 
 protected:
 	static status_t CreateDriver(device_node* node, X86PCIController* driver,
@@ -56,10 +60,6 @@ protected:
 	spinlock fLock = B_SPINLOCK_INITIALIZER;
 
 	device_node* fNode{};
-
-	addr_t fPCIeBase{};
-	uint8 fStartBusNumber{};
-	uint8 fEndBusNumber{};
 };
 
 
@@ -78,6 +78,8 @@ public:
 		uint16 offset, uint8 size, uint32 value) override;
 
 	status_t GetMaxBusDevices(int32& count) override;
+
+	status_t Finalize() override;
 };
 
 
@@ -96,6 +98,8 @@ public:
 		uint16 offset, uint8 size, uint32 value) final;
 
 	status_t GetMaxBusDevices(int32& count) final;
+
+	status_t Finalize() final;
 };
 
 
@@ -114,6 +118,13 @@ public:
 		uint16 offset, uint8 size, uint32 value) final;
 
 	status_t GetMaxBusDevices(int32& count) final;
+
+	status_t GetRange(uint32 index, pci_resource_range* range) final;
+
+	status_t Finalize() final;
+
+private:
+	ECAMPCIControllerACPI fECAMPCIController;
 };
 
 

@@ -5,11 +5,9 @@
 
 
 #include "X86PCIController.h"
-#include "pci_acpi.h"
 
 #include <AutoDeleterDrivers.h>
 #include <util/AutoLock.h>
-#include "acpi.h"
 
 #include <string.h>
 #include <new>
@@ -240,6 +238,13 @@ status_t X86PCIControllerMeth1::GetMaxBusDevices(int32& count)
 }
 
 
+status_t
+X86PCIControllerMeth1::Finalize()
+{
+	return B_OK;
+}
+
+
 //#pragma mark - X86PCIControllerMeth2
 
 
@@ -327,46 +332,39 @@ status_t X86PCIControllerMeth2::GetMaxBusDevices(int32& count)
 }
 
 
+status_t
+X86PCIControllerMeth2::Finalize()
+{
+	return B_OK;
+}
+
+
 //#pragma mark - X86PCIControllerMethPcie
-
-
-#define PCIE_VADDR(base, bus, slot, func, reg)  ((base) + \
-	((((bus) & 0xff) << 20) | (((slot) & 0x1f) << 15) |   \
-    (((func) & 0x7) << 12) | ((reg) & 0xfff)))
 
 
 status_t
 X86PCIControllerMethPcie::InitDriverInt(device_node* node)
 {
-	CHECK_RET(X86PCIController::InitDriverInt(node));
+	status_t status = X86PCIController::InitDriverInt(node);
+	if (status != B_OK)
+		return status;
 
-	acpi_init();
-	struct acpi_table_mcfg* mcfg =
-		(struct acpi_table_mcfg*)acpi_find_table("MCFG");
-	if (mcfg != NULL) {
-		struct acpi_mcfg_allocation* end = (struct acpi_mcfg_allocation*)
-			((char*)mcfg + mcfg->Header.Length);
-		struct acpi_mcfg_allocation* alloc = (struct acpi_mcfg_allocation*)
-			(mcfg + 1);
-		for (; alloc < end; alloc++) {
-			dprintf("PCI: mechanism addr: %" B_PRIx64 ", seg: %x, start: "
-				"%x, end: %x\n", alloc->Address, alloc->PciSegment,
-				alloc->StartBusNumber, alloc->EndBusNumber);
-			if (alloc->PciSegment == 0) {
-				area_id mcfgArea = map_physical_memory("acpi mcfg",
-					alloc->Address, (alloc->EndBusNumber + 1) << 20,
-					B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA
-						| B_KERNEL_WRITE_AREA, (void **)&fPCIeBase);
-				if (mcfgArea < 0)
-					break;
-				fStartBusNumber = alloc->StartBusNumber;
-				fEndBusNumber = alloc->EndBusNumber;
-				dprintf("PCI: mechanism pcie controller found\n");
-				return B_OK;
-			}
-		}
+	// search ACPI
+	device_node *acpiNode = NULL;
+	{
+		device_node* deviceRoot = gDeviceManager->get_root_node();
+		device_attr acpiAttrs[] = {
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
+			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { .string = "PNP0A08" }},
+			{ NULL }
+		};
+		if (gDeviceManager->find_child_node(deviceRoot, acpiAttrs, &acpiNode) != B_OK)
+			return ENODEV;
 	}
-	return B_ERROR;
+
+	status = fECAMPCIController.ReadResourceInfo(acpiNode);
+	gDeviceManager->put_node(acpiNode);
+	return status;
 }
 
 
@@ -376,27 +374,12 @@ X86PCIControllerMethPcie::ReadConfig(
 	uint16 offset, uint8 size, uint32 &value)
 {
 	// fallback to mechanism 1 for out of range busses
-	if (bus < fStartBusNumber || bus > fEndBusNumber) {
+	if (bus < fECAMPCIController.fStartBusNumber || bus > fECAMPCIController.fEndBusNumber) {
 		return X86PCIControllerMeth1::ReadConfig(bus, device, function, offset,
 			size, value);
 	}
 
-	addr_t address = PCIE_VADDR(fPCIeBase, bus, device, function, offset);
-
-	switch (size) {
-		case 1:
-			value = *(uint8*)address;
-			break;
-		case 2:
-			value = *(uint16*)address;
-			break;
-		case 4:
-			value = *(uint32*)address;
-			break;
-		default:
-			return B_ERROR;
-	}
-	return B_OK;
+	return fECAMPCIController.ReadConfig(bus, device, function, offset, size, value);
 }
 
 
@@ -406,32 +389,32 @@ X86PCIControllerMethPcie::WriteConfig(
 	uint16 offset, uint8 size, uint32 value)
 {
 	// fallback to mechanism 1 for out of range busses
-	if (bus < fStartBusNumber || bus > fEndBusNumber) {
+	if (bus < fECAMPCIController.fStartBusNumber || bus > fECAMPCIController.fEndBusNumber) {
 		return X86PCIControllerMeth1::WriteConfig(bus, device, function, offset,
 			size, value);
 	}
 
-	addr_t address = PCIE_VADDR(fPCIeBase, bus, device, function, offset);
-	switch (size) {
-		case 1:
-			*(uint8*)address = value;
-			break;
-		case 2:
-			*(uint16*)address = value;
-			break;
-		case 4:
-			*(uint32*)address = value;
-			break;
-		default:
-			return B_ERROR;
-	}
-
-	return B_OK;
+	return fECAMPCIController.WriteConfig(bus, device, function, offset, size, value);
 }
 
 
-status_t X86PCIControllerMethPcie::GetMaxBusDevices(int32& count)
+status_t
+X86PCIControllerMethPcie::GetMaxBusDevices(int32& count)
 {
-	count = 32;
+	return fECAMPCIController.GetMaxBusDevices(count);
+}
+
+
+status_t
+X86PCIControllerMethPcie::GetRange(uint32 index, pci_resource_range* range)
+{
+	return fECAMPCIController.GetRange(index, range);
+}
+
+
+status_t
+X86PCIControllerMethPcie::Finalize()
+{
+	// No need to call fECAMPCIController.Finalize(): IRQ routing is handled by IOAPIC on x86.
 	return B_OK;
 }

@@ -140,8 +140,14 @@ public:
 
 protected:
 	status_t ReadResourceInfo() final;
+	status_t ReadResourceInfo(device_node* parent);
+
+	uint8 fStartBusNumber{};
+	uint8 fEndBusNumber{};
 
 private:
+	friend class X86PCIControllerMethPcie;
+
 	static acpi_status AcpiCrsScanCallback(acpi_resource *res, void *context);
 	inline acpi_status AcpiCrsScanCallbackInt(acpi_resource *res);
 };

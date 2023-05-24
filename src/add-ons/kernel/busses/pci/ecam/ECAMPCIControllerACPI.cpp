@@ -18,7 +18,13 @@ status_t
 ECAMPCIControllerACPI::ReadResourceInfo()
 {
 	DeviceNodePutter<&gDeviceManager> parent(gDeviceManager->get_parent_node(fNode));
+	return ReadResourceInfo(parent.Get());
+}
 
+
+status_t
+ECAMPCIControllerACPI::ReadResourceInfo(device_node* parent)
+{
 	dprintf("initialize PCI controller from ACPI\n");
 
 	acpi_module_info* acpiModule;
@@ -30,7 +36,7 @@ ECAMPCIControllerACPI::ReadResourceInfo()
 	acpi_mcfg *mcfg;
 	CHECK_RET(acpiModule->get_table(ACPI_MCFG_SIGNATURE, 0, (void**)&mcfg));
 
-	CHECK_RET(gDeviceManager->get_driver(parent.Get(), (driver_module_info**)&acpiDeviceModule,
+	CHECK_RET(gDeviceManager->get_driver(parent, (driver_module_info**)&acpiDeviceModule,
 		(void**)&acpiDevice));
 
 	acpi_status acpi_res = acpiDeviceModule->walk_resources(acpiDevice, (char *)"_CRS",
@@ -54,10 +60,10 @@ ECAMPCIControllerACPI::ReadResourceInfo()
 			continue;
 		}
 
-		uint8 startBusNumber = alloc->start_bus_number;
-		uint8 endBusNumber = alloc->end_bus_number;
+		fStartBusNumber = alloc->start_bus_number;
+		fEndBusNumber = alloc->end_bus_number;
 
-		fRegsLen = (endBusNumber - startBusNumber + 1) << 20;
+		fRegsLen = (fEndBusNumber - fStartBusNumber + 1) << 20;
 		fRegsArea.SetTo(map_physical_memory("PCI Config MMIO",
 			alloc->address, fRegsLen, B_ANY_KERNEL_ADDRESS,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&fRegs));
