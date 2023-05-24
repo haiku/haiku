@@ -166,10 +166,7 @@ ECAMPCIController::ConfigAddress(uint8 bus, uint8 device, uint8 function, uint16
 		.device = device,
 		.bus = bus
 	};
-	PciAddressEcam addressEnd = address;
-	addressEnd.offset = /*~(uint32)0*/ 4095;
-
-	if (addressEnd.val >= fRegsLen)
+	if ((address.val + 4) > fRegsLen)
 		return 0;
 
 	return (addr_t)fRegs + address.val;

@@ -57,8 +57,9 @@ ECAMPCIControllerACPI::ReadResourceInfo()
 		uint8 startBusNumber = alloc->start_bus_number;
 		uint8 endBusNumber = alloc->end_bus_number;
 
+		fRegsLen = (endBusNumber - startBusNumber + 1) << 20;
 		fRegsArea.SetTo(map_physical_memory("PCI Config MMIO",
-			alloc->address, (endBusNumber - startBusNumber + 1) << 20, B_ANY_KERNEL_ADDRESS,
+			alloc->address, fRegsLen, B_ANY_KERNEL_ADDRESS,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&fRegs));
 		CHECK_RET(fRegsArea.Get());
 
