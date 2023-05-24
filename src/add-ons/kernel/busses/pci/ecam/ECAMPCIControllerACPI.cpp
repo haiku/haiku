@@ -121,7 +121,7 @@ ECAMPCIControllerACPI::AcpiCrsScanCallbackInt(acpi_resource *res)
 			ASSERT(address.minimum + address_length - 1 == address.maximum);
 			range.host_addr = address.minimum + address.translation_offset;
 			range.pci_addr  = address.minimum;
-			range.size = address.address_length;
+			range.size = address_length;
 			break;
 		}
 		case ACPI_RESOURCE_TYPE_ADDRESS64: {
@@ -133,7 +133,7 @@ ECAMPCIControllerACPI::AcpiCrsScanCallbackInt(acpi_resource *res)
 			ASSERT(address.minimum + address_length - 1 == address.maximum);
 			range.host_addr = address.minimum + address.translation_offset;
 			range.pci_addr  = address.minimum;
-			range.size = address.address_length;
+			range.size = address_length;
 			break;
 		}
 	}
