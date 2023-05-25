@@ -1106,8 +1106,15 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	// order to avoid a deadlock, we must unlock the endpoint.
 	endpointLocker.Unlock();
 	status_t status = StopEndpoint(false, endpoint);
+	if (status != B_OK && status != B_DEV_STALLED) {
+		// It is possible that the endpoint was stopped by the controller at the
+		// same time our STOP command was in progress, causing a "Context State"
+		// error. In that case, try again; if the endpoint is already stopped,
+		// StopEndpoint will notice this. (XHCI 1.2 § 4.6.9 p137.)
+		status = StopEndpoint(false, endpoint);
+	}
 	if (status == B_DEV_STALLED) {
-		// Only exit from a Halted state is a reset. (XHCI 1.2 § 4.8.3 p163.)
+		// Only exit from a Halted state is a RESET. (XHCI 1.2 § 4.8.3 p163.)
 		TRACE_ERROR("cancel queued transfers: halted endpoint, reset!\n");
 		status = ResetEndpoint(false, endpoint);
 	}
