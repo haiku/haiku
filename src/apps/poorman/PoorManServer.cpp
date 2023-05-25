@@ -45,7 +45,7 @@ PoorManServer::PoorManServer(const char* webDir,
 		(unsigned short)80,//port
 		(char*)0,//cgi pattern
 		0,//cgi_limit
-		(char *)"iso-8859-1",//charset
+		(char*)"utf-8",//charset
 		(char *)"",//p3p
 		-1,//max_age
 		const_cast<char*>(webDir),//cwd
