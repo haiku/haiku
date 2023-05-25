@@ -585,13 +585,18 @@ usb_disk_clear_halt(usb_pipe pipe)
 
 
 void
-usb_disk_reset_recovery(disk_device *device)
+usb_disk_reset_recovery(disk_device *device, err_act *_action)
 {
+	TRACE("reset recovery\n");
+
 	usb_disk_mass_storage_reset(device);
 	usb_disk_clear_halt(device->bulk_in);
 	usb_disk_clear_halt(device->bulk_out);
 	if (device->is_ufi)
 		usb_disk_clear_halt(device->interrupt);
+
+	if (_action != NULL)
+		*_action = err_act_retry;
 }
 
 
@@ -735,8 +740,8 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 				usb_disk_clear_halt(directionIn ? device->bulk_in : device->bulk_out);
 			} else {
 				TRACE_ALWAYS("sending or receiving of the data failed\n");
-				usb_disk_reset_recovery(device);
-				return B_ERROR;
+				usb_disk_reset_recovery(device, _action);
+				return B_IO_ERROR;
 			}
 		}
 	}
@@ -755,7 +760,7 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 
 		if (result != B_OK) {
 			TRACE_ALWAYS("receiving the command status interrupt failed\n");
-			usb_disk_reset_recovery(device);
+			usb_disk_reset_recovery(device, _action);
 			return result;
 		}
 
@@ -799,8 +804,8 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 		// sending the command block wrapper failed
 		TRACE_ALWAYS("sending the command block wrapper failed: %s\n",
 			strerror(device->status));
-		usb_disk_reset_recovery(device);
-		return B_ERROR;
+		usb_disk_reset_recovery(device, _action);
+		return B_IO_ERROR;
 	}
 
 	size_t transferedData = 0;
@@ -820,8 +825,8 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 			} else {
 				TRACE_ALWAYS("sending or receiving of the data failed: %s\n",
 					strerror(device->status));
-				usb_disk_reset_recovery(device);
-				return B_ERROR;
+				usb_disk_reset_recovery(device, _action);
+				return B_IO_ERROR;
 			}
 		}
 	}
@@ -837,7 +842,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 	if (result != B_OK) {
 		TRACE_ALWAYS("receiving the command status wrapper failed: %s\n",
 			strerror(result));
-		usb_disk_reset_recovery(device);
+		usb_disk_reset_recovery(device, _action);
 		return result;
 	}
 
@@ -846,7 +851,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 		// the command status wrapper is not valid
 		TRACE_ALWAYS("command status wrapper is not valid: %#" B_PRIx32 "\n",
 			status.signature);
-		usb_disk_reset_recovery(device);
+		usb_disk_reset_recovery(device, _action);
 		return B_ERROR;
 	}
 
@@ -891,7 +896,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 			// a protocol or device error occured
 			TRACE_ALWAYS("phase error in operation %#" B_PRIx8 "\n",
 				operation[0]);
-			usb_disk_reset_recovery(device);
+			usb_disk_reset_recovery(device, _action);
 			return B_ERROR;
 		}
 
@@ -899,7 +904,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 		{
 			// command status wrapper is not meaningful
 			TRACE_ALWAYS("command status wrapper has invalid status\n");
-			usb_disk_reset_recovery(device);
+			usb_disk_reset_recovery(device, _action);
 			return B_ERROR;
 		}
 	}
