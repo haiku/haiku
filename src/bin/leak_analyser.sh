@@ -137,7 +137,7 @@ ALLOCATIONS=$(cat "$FILENAME" | grep -E "^allocation: |^	" | tr '\n' '^' \
 
 if [ ! -z "$EXCLUDE_PATTERN" ]
 then
-	ALLOCATIONS=$(echo "$ALLOCATIONS" | egrep -v "$EXCLUDE_PATTERN")
+	ALLOCATIONS=$(echo "$ALLOCATIONS" | grep -E -v "$EXCLUDE_PATTERN")
 fi
 
 if [ -z "$ALLOCATIONS" ]
