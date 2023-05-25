@@ -576,14 +576,22 @@ usb_disk_get_max_lun(disk_device *device)
 }
 
 
+static void
+usb_disk_clear_halt(usb_pipe pipe)
+{
+	gUSBModule->cancel_queued_transfers(pipe);
+	gUSBModule->clear_feature(pipe, USB_FEATURE_ENDPOINT_HALT);
+}
+
+
 void
 usb_disk_reset_recovery(disk_device *device)
 {
 	usb_disk_mass_storage_reset(device);
-	gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
-	gUSBModule->clear_feature(device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
+	usb_disk_clear_halt(device->bulk_in);
+	usb_disk_clear_halt(device->bulk_out);
 	if (device->is_ufi)
-		gUSBModule->clear_feature(device->interrupt, USB_FEATURE_ENDPOINT_HALT);
+		usb_disk_clear_halt(device->interrupt);
 }
 
 
@@ -724,8 +732,7 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 			// sending or receiving of the data failed
 			if (device->status == B_DEV_STALLED) {
 				TRACE("stall while transfering data\n");
-				gUSBModule->clear_feature(directionIn ? device->bulk_in
-					: device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
+				usb_disk_clear_halt(directionIn ? device->bulk_in : device->bulk_out);
 			} else {
 				TRACE_ALWAYS("sending or receiving of the data failed\n");
 				usb_disk_reset_recovery(device);
@@ -742,8 +749,7 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 			// in case of a stall or error clear the stall and try again
 			TRACE("Error receiving interrupt: %s. Retrying...\n",
 				strerror(result));
-			gUSBModule->clear_feature(device->bulk_in,
-				USB_FEATURE_ENDPOINT_HALT);
+			usb_disk_clear_halt(device->bulk_in);
 			result = usb_disk_receive_csw_interrupt(device, &status);
 		}
 
@@ -810,8 +816,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 			// sending or receiving of the data failed
 			if (device->status == B_DEV_STALLED) {
 				TRACE("stall while transfering data\n");
-				gUSBModule->clear_feature(directionIn ? device->bulk_in
-					: device->bulk_out, USB_FEATURE_ENDPOINT_HALT);
+				usb_disk_clear_halt(directionIn ? device->bulk_in : device->bulk_out);
 			} else {
 				TRACE_ALWAYS("sending or receiving of the data failed: %s\n",
 					strerror(device->status));
@@ -825,7 +830,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 	result =  usb_disk_receive_csw_bulk(device, &status);
 	if (result != B_OK) {
 		// in case of a stall or error clear the stall and try again
-		gUSBModule->clear_feature(device->bulk_in, USB_FEATURE_ENDPOINT_HALT);
+		usb_disk_clear_halt(device->bulk_in);
 		result = usb_disk_receive_csw_bulk(device, &status);
 	}
 
