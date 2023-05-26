@@ -1743,7 +1743,6 @@ void
 NodeIconCache::Deleting(const node_ref* node)
 {
 	NodeCacheEntry* entry = FindItem(node);
-	ASSERT(entry != NULL);
 	if (entry == NULL || entry->Permanent())
 		return;
 
