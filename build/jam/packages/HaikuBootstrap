@@ -48,7 +48,6 @@ AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToPackage bus				: usb_raw ;
-AddDriversToPackage disk usb		: usb_disk ;
 AddDriversToPackage disk virtual	: nbd ;
 AddDriversToPackage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
 AddDriversToPackage input			: ps2_hid usb_hid wacom ;
@@ -151,7 +150,7 @@ AddBootModuleSymlinksToPackage
 	highpoint_ide_pci
 	ide_isa@x86
 	<usb>uhci <usb>ohci <usb>ehci
-	scsi_cd scsi_disk usb_disk
+	scsi_cd scsi_disk
 	virtio virtio_pci virtio_block virtio_scsi
 	efi_gpt
 	intel

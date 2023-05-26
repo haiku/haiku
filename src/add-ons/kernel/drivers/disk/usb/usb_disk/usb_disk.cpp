@@ -11,6 +11,7 @@
 
 #include <ByteOrder.h>
 #include <Drivers.h>
+#include <bus/USB.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,28 +26,29 @@
 #include "usb_disk_scsi.h"
 
 
+#define USB_DISK_DEVICE_MODULE_NAME		"drivers/disk/usb_disk/device_v1"
+#define USB_DISK_DRIVER_MODULE_NAME		"drivers/disk/usb_disk/driver_v1"
+#define USB_DISK_DEVICE_ID_GENERATOR	"usb_disk/device_id"
+
 #define DRIVER_NAME			"usb_disk"
 #define DEVICE_NAME_BASE	"disk/usb/"
-#define DEVICE_NAME			DEVICE_NAME_BASE"%" B_PRIu32 "/%d/raw"
+#define DEVICE_NAME			DEVICE_NAME_BASE "%" B_PRIu32 "/%d/raw"
 
 
 //#define TRACE_USB_DISK
 #ifdef TRACE_USB_DISK
 #define TRACE(x...)			dprintf(DRIVER_NAME ": " x)
 #define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
+#define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 #else
 #define TRACE(x...)			/* nothing */
+#define CALLED()
 #define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 #endif
 
 
-int32 api_version = B_CUR_DRIVER_API_VERSION;
+device_manager_info *gDeviceManager;
 static usb_module_info *gUSBModule = NULL;
-static disk_device *gDeviceList = NULL;
-static uint32 gDeviceCount = 0;
-static uint32 gLunCount = 0;
-static mutex gDeviceListLock;
-static char **gDeviceNames = NULL;
 
 static const uint8 kDeviceIcon[] = {
 	0x6e, 0x63, 0x69, 0x66, 0x0a, 0x04, 0x01, 0x73, 0x05, 0x01, 0x02, 0x01,
@@ -1331,10 +1333,11 @@ usb_disk_callback(void *cookie, status_t status, void *data,
 
 
 static status_t
-usb_disk_device_added(usb_device newDevice, void **cookie)
+usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 {
 	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
 	disk_device *device = (disk_device *)malloc(sizeof(disk_device));
+	device->node = node;
 	device->device = newDevice;
 	device->removed = false;
 	device->open_count = 0;
@@ -1523,60 +1526,26 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		return result;
 	}
 
-	mutex_lock(&gDeviceListLock);
-	device->device_number = 0;
-	disk_device *other = gDeviceList;
-	while (other != NULL) {
-		if (other->device_number >= device->device_number)
-			device->device_number = other->device_number + 1;
-
-		other = (disk_device *)other->link;
-	}
-
-	device->link = (void *)gDeviceList;
-	gDeviceList = device;
-	gLunCount += device->lun_count;
-	for (uint8 i = 0; i < device->lun_count; i++)
-		sprintf(device->luns[i]->name, DEVICE_NAME, device->device_number, i);
-	mutex_unlock(&gDeviceListLock);
-
 	TRACE("new device: 0x%p\n", device);
 	*cookie = (void *)device;
 	return B_OK;
 }
 
 
-static status_t
+static void
 usb_disk_device_removed(void *cookie)
 {
 	TRACE("device_removed(0x%p)\n", cookie);
 	disk_device *device = (disk_device *)cookie;
 
-	mutex_lock(&gDeviceListLock);
-	if (gDeviceList == device) {
-		gDeviceList = (disk_device *)device->link;
-	} else {
-		disk_device *element = gDeviceList;
-		while (element) {
-			if (element->link == device) {
-				element->link = device->link;
-				break;
-			}
-
-			element = (disk_device *)element->link;
-		}
-	}
-	gLunCount -= device->lun_count;
-	gDeviceCount--;
+	for (uint8 i = 0; i < device->lun_count; i++)
+		gDeviceManager->unpublish_device(device->node, device->luns[i]->name);
 
 	device->removed = true;
 	gUSBModule->cancel_queued_transfers(device->bulk_in);
 	gUSBModule->cancel_queued_transfers(device->bulk_out);
 	if (device->open_count == 0)
 		usb_disk_free_device_and_luns(device);
-
-	mutex_unlock(&gDeviceListLock);
-	return B_OK;
 }
 
 
@@ -1770,50 +1739,57 @@ usb_disk_prepare_partial_buffer(device_lun *lun, off_t position, size_t length,
 
 
 static status_t
-usb_disk_open(const char *name, uint32 flags, void **cookie)
+usb_disk_init_device(void* _info, void** _cookie)
 {
-	TRACE("open(%s)\n", name);
-	if (strncmp(name, DEVICE_NAME_BASE, strlen(DEVICE_NAME_BASE)) != 0)
+	CALLED();
+	*_cookie = _info;
+	return B_OK;
+}
+
+
+static void
+usb_disk_uninit_device(void* _cookie)
+{
+	// Nothing to do.
+}
+
+
+static status_t
+usb_disk_open(void *deviceCookie, const char *path, int flags, void **_cookie)
+{
+	TRACE("open(%s)\n", path);
+	if (strncmp(path, DEVICE_NAME_BASE, strlen(DEVICE_NAME_BASE)) != 0)
 		return B_NAME_NOT_FOUND;
 
 	int32 lastPart = 0;
-	size_t nameLength = strlen(name);
+	size_t nameLength = strlen(path);
 	for (int32 i = nameLength - 1; i >= 0; i--) {
-		if (name[i] == '/') {
+		if (path[i] == '/') {
 			lastPart = i;
 			break;
 		}
 	}
 
 	char rawName[nameLength + 4];
-	strncpy(rawName, name, lastPart + 1);
+	strncpy(rawName, path, lastPart + 1);
 	rawName[lastPart + 1] = 0;
 	strcat(rawName, "raw");
-	TRACE("opening raw device %s for %s\n", rawName, name);
 
-	mutex_lock(&gDeviceListLock);
-	disk_device *device = gDeviceList;
-	while (device) {
-		for (uint8 i = 0; i < device->lun_count; i++) {
-			device_lun *lun = device->luns[i];
-			if (strncmp(rawName, lun->name, 32) == 0) {
-				// found the matching device/lun
-				if (device->removed) {
-					mutex_unlock(&gDeviceListLock);
-					return B_ERROR;
-				}
+	disk_device *device = (disk_device *)deviceCookie;
+	MutexLocker locker(device->lock);
+	for (uint8 i = 0; i < device->lun_count; i++) {
+		device_lun *lun = device->luns[i];
+		if (strncmp(rawName, lun->name, 32) == 0) {
+			// found the matching device/lun
+			if (device->removed)
+				return B_ERROR;
 
-				device->open_count++;
-				*cookie = lun;
-				mutex_unlock(&gDeviceListLock);
-				return B_OK;
-			}
+			device->open_count++;
+			*_cookie = lun;
+			return B_OK;
 		}
-
-		device = (disk_device *)device->link;
 	}
 
-	mutex_unlock(&gDeviceListLock);
 	return B_NAME_NOT_FOUND;
 }
 
@@ -1838,10 +1814,11 @@ static status_t
 usb_disk_free(void *cookie)
 {
 	TRACE("free()\n");
-	mutex_lock(&gDeviceListLock);
 
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
+	MutexLocker locker(device->lock);
+
 	device->open_count--;
 	if (device->open_count == 0 && device->removed) {
 		// we can simply free the device here as it has been removed from
@@ -1849,7 +1826,6 @@ usb_disk_free(void *cookie)
 		usb_disk_free_device_and_luns(device);
 	}
 
-	mutex_unlock(&gDeviceListLock);
 	return B_OK;
 }
 
@@ -2201,27 +2177,38 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 }
 
 
-//
-//#pragma mark - Driver Entry Points
-//
+//	#pragma mark - driver module API
 
 
-status_t
-init_hardware()
+static float
+usb_disk_supports_device(device_node *parent)
 {
-	TRACE("init_hardware()\n");
-	return B_OK;
-}
+	CALLED();
+	const char *bus;
 
+	// make sure parent is really the usb bus manager
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return -1;
 
-status_t
-init_driver()
-{
-	TRACE("init_driver()\n");
-	static usb_notify_hooks notifyHooks = {
-		&usb_disk_device_added,
-		&usb_disk_device_removed
-	};
+	if (strcmp(bus, "usb"))
+		return 0.0;
+
+	device_attr *attr = NULL;
+	uint8 baseClass = 0, subclass = 0, protocol = 0;
+	while (gDeviceManager->get_next_attr(parent, &attr) == B_OK) {
+		if (attr->type != B_UINT8_TYPE)
+			continue;
+
+		if (!strcmp(attr->name, USB_DEVICE_CLASS))
+			baseClass = attr->value.ui8;
+		if (!strcmp(attr->name, USB_DEVICE_SUBCLASS))
+			subclass = attr->value.ui8;
+		if (!strcmp(attr->name, USB_DEVICE_PROTOCOL))
+			protocol = attr->value.ui8;
+
+		if (baseClass != 0 && subclass != 0 && protocol != 0)
+			break;
+	}
 
 	static usb_support_descriptor supportedDevices[] = {
 		{ 0x08 /* mass storage */, 0x06 /* SCSI */, 0x50 /* bulk */, 0, 0 },
@@ -2229,93 +2216,129 @@ init_driver()
 		{ 0x08 /* mass storage */, 0x05 /* ATAPI */, 0x50 /* bulk */, 0, 0 },
 		{ 0x08 /* mass storage */, 0x04 /* UFI */, 0x00, 0, 0 }
 	};
+	for (size_t i = 0; i < B_COUNT_OF(supportedDevices); i++) {
+		if (baseClass != supportedDevices[i].dev_class)
+			continue;
+		if (subclass != supportedDevices[i].dev_subclass)
+			continue;
+		if (supportedDevices[i].dev_protocol != 0 && protocol != supportedDevices[i].dev_protocol)
+			continue;
 
-	gDeviceList = NULL;
-	gDeviceCount = 0;
-	gLunCount = 0;
-	mutex_init(&gDeviceListLock, "usb_disk device list lock");
-
-	TRACE("trying module %s\n", B_USB_MODULE_NAME);
-	status_t result = get_module(B_USB_MODULE_NAME,
-		(module_info **)&gUSBModule);
-	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed: %s\n", strerror(result));
-		mutex_destroy(&gDeviceListLock);
-		return result;
+		TRACE("USB disk device found!\n");
+		return 0.6;
 	}
 
-	gUSBModule->register_driver(DRIVER_NAME, supportedDevices, 4, NULL);
-	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
-	return B_OK;
+	return 0.0;
 }
 
 
-void
-uninit_driver()
+static status_t
+usb_disk_register_device(device_node *node)
 {
-	TRACE("uninit_driver()\n");
-	gUSBModule->uninstall_notify(DRIVER_NAME);
-	mutex_lock(&gDeviceListLock);
+	CALLED();
 
-	if (gDeviceNames) {
-		for (int32 i = 0; gDeviceNames[i]; i++)
-			free(gDeviceNames[i]);
-		free(gDeviceNames);
-		gDeviceNames = NULL;
-	}
-
-	mutex_destroy(&gDeviceListLock);
-	put_module(B_USB_MODULE_NAME);
-}
-
-
-const char **
-publish_devices()
-{
-	TRACE("publish_devices()\n");
-	if (gDeviceNames) {
-		for (int32 i = 0; gDeviceNames[i]; i++)
-			free(gDeviceNames[i]);
-		free(gDeviceNames);
-		gDeviceNames = NULL;
-	}
-
-	gDeviceNames = (char **)malloc(sizeof(char *) * (gLunCount + 1));
-	if (gDeviceNames == NULL)
-		return NULL;
-
-	int32 index = 0;
-	mutex_lock(&gDeviceListLock);
-	disk_device *device = gDeviceList;
-	while (device) {
-		for (uint8 i = 0; i < device->lun_count; i++)
-			gDeviceNames[index++] = strdup(device->luns[i]->name);
-
-		device = (disk_device *)device->link;
-	}
-
-	gDeviceNames[index++] = NULL;
-	mutex_unlock(&gDeviceListLock);
-	return (const char **)gDeviceNames;
-}
-
-
-device_hooks *
-find_device(const char *name)
-{
-	TRACE("find_device()\n");
-	static device_hooks hooks = {
-		&usb_disk_open,
-		&usb_disk_close,
-		&usb_disk_free,
-		&usb_disk_ioctl,
-		&usb_disk_read,
-		&usb_disk_write,
-		NULL,
-		NULL,
-		NULL,
-		NULL
+	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "USB Disk"} },
+		{ NULL }
 	};
 
-	return &hooks;
+	return gDeviceManager->register_node(node, USB_DISK_DRIVER_MODULE_NAME,
+		attrs, NULL, NULL);
 }
+
+
+static status_t
+usb_disk_init_driver(device_node *node, void **cookie)
+{
+	CALLED();
+
+	usb_device usb_device;
+	if (gDeviceManager->get_attr_uint32(node, USB_DEVICE_ID_ITEM, &usb_device, true) != B_OK)
+		return B_BAD_VALUE;
+
+	return usb_disk_attach(node, usb_device, cookie);
+}
+
+
+static void
+usb_disk_uninit_driver(void *_cookie)
+{
+	CALLED();
+	// Nothing to do.
+}
+
+
+static status_t
+usb_disk_register_child_devices(void* _cookie)
+{
+	CALLED();
+	disk_device *device = (disk_device *)_cookie;
+
+	device->number = gDeviceManager->create_id(USB_DISK_DEVICE_ID_GENERATOR);
+	if (device->number < 0)
+		return device->number;
+
+	status_t status = B_OK;
+	for (uint8 i = 0; i < device->lun_count; i++) {
+		sprintf(device->luns[i]->name, DEVICE_NAME, device->number, i);
+		status = gDeviceManager->publish_device(device->node, device->luns[i]->name,
+			USB_DISK_DEVICE_MODULE_NAME);
+	}
+
+	return status;
+}
+
+
+//	#pragma mark -
+
+
+module_dependency module_dependencies[] = {
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager },
+	{ B_USB_MODULE_NAME, (module_info**)&gUSBModule},
+	{ NULL }
+};
+
+struct device_module_info sUsbDiskDevice = {
+	{
+		USB_DISK_DEVICE_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	usb_disk_init_device,
+	usb_disk_uninit_device,
+	usb_disk_device_removed,
+
+	usb_disk_open,
+	usb_disk_close,
+	usb_disk_free,
+	usb_disk_read,
+	usb_disk_write,
+	NULL,	// io
+	usb_disk_ioctl,
+
+	NULL,	// select
+	NULL,	// deselect
+};
+
+struct driver_module_info sUsbDiskDriver = {
+	{
+		USB_DISK_DRIVER_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	usb_disk_supports_device,
+	usb_disk_register_device,
+	usb_disk_init_driver,
+	usb_disk_uninit_driver,
+	usb_disk_register_child_devices,
+	NULL,	// rescan
+	NULL,	// removed
+};
+
+module_info* modules[] = {
+	(module_info*)&sUsbDiskDriver,
+	(module_info*)&sUsbDiskDevice,
+	NULL
+};
