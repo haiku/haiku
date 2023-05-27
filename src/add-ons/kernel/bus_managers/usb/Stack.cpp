@@ -211,43 +211,49 @@ Stack::ExploreThread(void *data)
 
 	while (acquire_sem_etc(stack->fExploreSem, 1, B_RELATIVE_TIMEOUT,
 		USB_DELAY_HUB_EXPLORE) != B_BAD_SEM_ID) {
-		if (mutex_lock(&stack->fExploreLock) != B_OK)
-			break;
-
-		int32 semCount = 0;
-		get_sem_count(stack->fExploreSem, &semCount);
-		if (semCount > 0)
-			acquire_sem_etc(stack->fExploreSem, semCount, B_RELATIVE_TIMEOUT, 0);
-
-		rescan_item *rescanList = NULL;
-		change_item *changeItem = NULL;
-		for (int32 i = 0; i < stack->fBusManagers.Count(); i++) {
-			Hub *rootHub = stack->fBusManagers.ElementAt(i)->GetRootHub();
-			if (rootHub)
-				rootHub->Explore(&changeItem);
-		}
-
-		while (changeItem) {
-			stack->NotifyDeviceChange(changeItem->device, &rescanList, changeItem->added);
-			if (!changeItem->added) {
-				// everyone possibly holding a reference is now notified so we
-				// can delete the device
-				changeItem->device->GetBusManager()->FreeDevice(changeItem->device);
-			}
-
-			change_item *next = changeItem->link;
-			delete changeItem;
-			changeItem = next;
-		}
-
-		stack->fFirstExploreDone = true;
-		mutex_unlock(&stack->fExploreLock);
-		stack->RescanDrivers(rescanList);
+		stack->Explore();
 	}
 
 	return B_OK;
 }
 
+
+void
+Stack::Explore()
+{
+	if (mutex_lock(&fExploreLock) != B_OK)
+		return;
+
+	int32 semCount = 0;
+	get_sem_count(fExploreSem, &semCount);
+	if (semCount > 0)
+		acquire_sem_etc(fExploreSem, semCount, B_RELATIVE_TIMEOUT, 0);
+
+	rescan_item *rescanList = NULL;
+	change_item *changeItem = NULL;
+	for (int32 i = 0; i < fBusManagers.Count(); i++) {
+		Hub *rootHub = fBusManagers.ElementAt(i)->GetRootHub();
+		if (rootHub)
+			rootHub->Explore(&changeItem);
+	}
+
+	while (changeItem) {
+		NotifyDeviceChange(changeItem->device, &rescanList, changeItem->added);
+		if (!changeItem->added) {
+			// everyone possibly holding a reference is now notified so we
+			// can delete the device
+			changeItem->device->GetBusManager()->FreeDevice(changeItem->device);
+		}
+
+		change_item *next = changeItem->link;
+		delete changeItem;
+		changeItem = next;
+	}
+
+	fFirstExploreDone = true;
+	mutex_unlock(&fExploreLock);
+	RescanDrivers(rescanList);
+}
 
 void
 Stack::AddBusManager(BusManager *busManager)
@@ -521,9 +527,3 @@ Stack::UninstallNotify(const char *driverName)
 	return B_NAME_NOT_FOUND;
 }
 
-
-void
-Stack::TriggerExplore()
-{
-	release_sem(fExploreSem);
-}

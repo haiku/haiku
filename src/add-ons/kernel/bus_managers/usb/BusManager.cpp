@@ -260,6 +260,7 @@ BusManager::Start()
 {
 	fStack->AddBusManager(this);
 	fStackIndex = fStack->IndexOfBusManager(this);
+	fStack->Explore();
 	return B_OK;
 }
 

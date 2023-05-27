@@ -913,7 +913,6 @@ struct usb_module_info_v2 gModuleInfoV2 = {
 status_t
 usb_added_device(device_node *parent)
 {
-	gUSBStack->TriggerExplore();
 	return B_OK;
 }
 
