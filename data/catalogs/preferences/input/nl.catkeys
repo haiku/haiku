@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Input	3312605348
+1	dutch; flemish	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Scrollen
 Defaults	InputMouse		Standaarden
 Long	KeyboardView		Lang
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Eerste klik accepteren
 OK	TouchpadPrefView		Okee
 Horizontal scrolling	TouchpadPrefView		Horizontaal scrollen
 Delay until key repeat	KeyboardView		Vertragen totdat de toets herhaalt
-Keyboard Lock Delay	TouchpadPrefView		Vertraging toetsenbord vergrendeling
 Two finger scrolling	TouchpadPrefView		Met twee vingers scrollen
 Input	System name		Invoer
 Mouse acceleration	SettingsView		Muisversnelling

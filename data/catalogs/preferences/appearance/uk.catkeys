@@ -16,7 +16,7 @@ Glyph hinting:	AntialiasingSettingsView		Хінтінг гліфів:
 Default Haiku ControlLook	DecorSettingsView		Haiku ControlLook за замовчуванням
 Menu item text	Colors tab		Текст елемента меню
 About decorator	DecorSettingsView		Про Декоратор
-Antialiasing menu	AntialiasingSettingsView		Меню зглажування
+Antialiasing menu	AntialiasingSettingsView		Меню згладжування
 Success	Colors tab		Успішно
 About	DecorSettingsView		Про це
 Shine	Colors tab		Сяйво
@@ -45,7 +45,7 @@ Panel background	Colors tab		Фон панелі
 Plain font:	Font view		Простий шрифт:
 Window tab text	Colors tab		Текст заголовку вікна
 Navigation pulse	Colors tab		Навігація pulse
-LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
+LCD subpixel	AntialiasingSettingsView		Субпіксельне згладжування
 Window tab	Colors tab		Заголовок вікна
 Link text	Colors tab		Текст посилання
 Tooltip background	Colors tab		Фон підказки

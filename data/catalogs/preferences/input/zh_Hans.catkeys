@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Input	3312605348
+1	english	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		滚动
 Defaults	InputMouse		默认
 Long	KeyboardView		长
@@ -25,7 +25,6 @@ Accept first click	SettingsView		接受首次点击
 OK	TouchpadPrefView		确认
 Horizontal scrolling	TouchpadPrefView		水平滚动
 Delay until key repeat	KeyboardView		重复前延迟
-Keyboard Lock Delay	TouchpadPrefView		键盘锁定延迟
 Two finger scrolling	TouchpadPrefView		双指滚动
 Input	System name		输入
 Mouse acceleration	SettingsView		鼠标加速

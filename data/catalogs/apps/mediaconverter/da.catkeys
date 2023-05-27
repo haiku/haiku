@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-MediaConverter	249642350
+1	danish	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Inddatafil ikke genkendt som lyd eller video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
 Source files	MediaConverter		Kildefiler
@@ -49,7 +49,7 @@ An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo
 Error	MediaConverter		Fejl
 File details	MediaConverter		Fildetaljer
 No audio	Audio codecs list		Ingen lyd
-Drop media files onto this window	MediaConverter		Drop mediefiler i vinduet
+Drop media files onto this window	MediaConverter		Slip mediefiler i vinduet
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# billede} other{# billeder}}
 Error read audio frame %lld	MediaConverter		Fejl ved læsning af lydframe %lld
 Quit	Menu		Afslut
@@ -57,17 +57,21 @@ Quit	Menu		Afslut
 Writing audio track: %s complete	MediaConverter		Skriver lydspor: %s fuldført
 Duration:	MediaConverter-FileInfo		Varighed:
 MediaConverter	System name		Mediekonvertering
+Writing video track: %s complete	MediaConverter		Skriver videospor: %s fuldført
 Error launching: %strError%	MediaConverter		Fejl ved start: %strError%
+Error writing audio frame %lld	MediaConverter		Fejl ved skrivning af lydframe %lld
 File format:	MediaConverter		Filformat:
 File	Menu		Fil
 Video quality not supported	MediaConverter		Videokvalitet understøttes ikke
-Select this folder	MediaConverter		Vælg mappen
+Select this folder	MediaConverter		Vælg denne mappe
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
+Understood	MediaConverter		Forstået
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Ingen video
 Continue	MediaConverter		Fortsæt
 Convert	MediaConverter		Konverter
 Audio quality not supported	MediaConverter		Lydkvalitet understøttes ikke
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Fejl ved skrivning til placering: %strPath%. Bruger standardplacering: /boot/home
-Preview	MediaConverter		Forhåndsvis
+Error read video frame %lld	MediaConverter		Fejl ved læsning af videoframe %lld
+Preview	MediaConverter		Forhåndsvisning
 Start [ms]: 	MediaConverter		Start [ms]: 

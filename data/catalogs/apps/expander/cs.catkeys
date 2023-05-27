@@ -6,7 +6,7 @@ Expander	System name		Rozbalovač
 Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
 Set source…	ExpanderMenu		Nastavit zdroj...
 OK	ExpanderWindow		OK
-The destination is not a folder.	ExpanderWindow		Cíl není složka.
+The destination is not a folder.	ExpanderWindow		Cíl není adresář.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
 Close window when done expanding	ExpanderPreferences		Zavřít okno po skončení rozbalování
 Close	ExpanderMenu		Zavřít
@@ -16,7 +16,7 @@ Show contents	ExpanderMenu		Zobrazit obsah
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Opravdu chcete přerušit rozbalování tohoto archívu? Rozbalené položky nemusí být úplné.
 Settings	ExpanderMenu		Nastavení
 Expand	ExpanderWindow		Rozbalit
-Open destination folder after extraction	ExpanderPreferences		Otevřít cílový soubor po rozbalení
+Open destination folder after extraction	ExpanderPreferences		Otevřít cílový adresář po rozbalení
 Same directory as source (archive) file	ExpanderPreferences		Stejná složka, jako zdrojový soubor (archív)
 Stop	ExpanderWindow		Zastavit
 Cancel	ExpanderWindow		Zrušit

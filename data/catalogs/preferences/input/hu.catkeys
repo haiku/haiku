@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Input	3312605348
+1	hungarian	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Görgetés
 Defaults	InputMouse		Alapértékek
 Long	KeyboardView		Hosszú
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Érvényesítés első kattintásra
 OK	TouchpadPrefView		Rendben
 Horizontal scrolling	TouchpadPrefView		Vízszintes görgetés
 Delay until key repeat	KeyboardView		Billentyű-ismétlés késleltetése
-Keyboard Lock Delay	TouchpadPrefView		Billentyűzár késleltetés
 Two finger scrolling	TouchpadPrefView		Két ujjas görgetés
 Input	System name		Bemenet
 Mouse acceleration	SettingsView		Egér gyorsítása

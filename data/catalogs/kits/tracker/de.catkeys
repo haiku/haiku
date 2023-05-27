@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	583663898
+1	german	x-vnd.Haiku-libtracker	3714382983
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -87,6 +87,7 @@ Modified	FindPanel		Geändert
 Select all	QueryContainerWindow		Alles auswählen
 Generate image thumbnails	SettingsView		Miniaturbilder erstellen
 Select…	FilePanelPriv		Auswählen …
+An item named '%filename%' already exists.	FSUtils		Ein Objekt '%filename%' existiert bereits.
 Name	Person Query Columns		Name
 Skip all	FSUtils		Alle überspringen
 Corrupted opcode.	libtracker		Fehlerhafter Opcode.
@@ -353,6 +354,7 @@ after	FindPanel		nach
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# Datenbyte>} other{<# Datenbytes>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
+The entered file name is too long.	FSUtils		Der eingegebene Dateiname ist zu lang.
 Add printer…	ContainerWindow		Drucker hinzufügen …
 On	FindPanel		auf
 Permissions	ContainerWindow		Berechtigungen
@@ -523,6 +525,7 @@ I know what I'm doing	FSUtils	button label	Ich bin sicher
 Preparing to copy items…	StatusWindow		Kopieren wird vorbereitet …
 Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		Icon-Ansicht
+The entered folder name is too long.	FSUtils		Der eingegebene Ordnername ist zu lang.
 Name	ContainerWindow		Name
 Preferred for %type	OpenWithWindow		Bevorzugt für %type
 Free space color	SettingsView		Farbe für freien Speicher

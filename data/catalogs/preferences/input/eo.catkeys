@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Input	3312605348
+1	esperanto	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Rulumado
 Defaults	InputMouse		Defaŭltoj
 Long	KeyboardView		Longa
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Akcepti unuan klakon
 OK	TouchpadPrefView		Bone
 Horizontal scrolling	TouchpadPrefView		Horizontala rulumado
 Delay until key repeat	KeyboardView		Prokrasto dum klava ripeto
-Keyboard Lock Delay	TouchpadPrefView		Prokrasto de klavara ŝlosigo
 Two finger scrolling	TouchpadPrefView		Rulumado per du fingroj
 Input	System name		Enigo
 Mouse acceleration	SettingsView		Akcelado de muso

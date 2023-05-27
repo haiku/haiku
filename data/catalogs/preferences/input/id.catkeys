@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Input	3312605348
+1	indonesian	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Menggulung
 Defaults	InputMouse		Bawaan
 Long	KeyboardView		Panjang
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Terima klik pertama
 OK	TouchpadPrefView		Oke
 Horizontal scrolling	TouchpadPrefView		Pengguliran horizontal
 Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
-Keyboard Lock Delay	TouchpadPrefView		Penundaan Kunci Keyboard
 Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
 Input	System name		Masukan
 Mouse acceleration	SettingsView		Akselerasi mouse

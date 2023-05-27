@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1644621968
+1	swedish	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -88,6 +88,7 @@ Modified	FindPanel		Modifierad
 Select all	QueryContainerWindow		Markera allt
 Generate image thumbnails	SettingsView		Generera bildminiatyrer
 Select…	FilePanelPriv		Markera...
+An item named '%filename%' already exists.	FSUtils		Ett objekt med namnet '%filename%' finns redan.
 preferences	B_PREFERENCES_DIRECTORY		inställningar
 Name	Person Query Columns		Namn
 Skip all	FSUtils		Hoppa över alla
@@ -358,6 +359,7 @@ after	FindPanel		efter
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes av data>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Vissa av de markerade objekten kan inte flyttas till Papperskorgen. Vill du ta bort dem istället? (Denna operation kan inte ångras.)
+The entered file name is too long.	FSUtils		Det angivna filnamnet är för långt.
 Add printer…	ContainerWindow		Lägg till skrivare...
 On	FindPanel		På
 Permissions	ContainerWindow		Behörigheter
@@ -528,6 +530,7 @@ I know what I'm doing	FSUtils	button label	Jag vet vad jag håller på med
 Preparing to copy items…	StatusWindow		Förbereder kopiering av objekt...
 Entry ref	AttributesView		Inträdes ref
 Icon view	ContainerWindow		Ikonvy
+The entered folder name is too long.	FSUtils		Det angivna mappnamnet är för långt.
 Name	ContainerWindow		Namn
 Preferred for %type	OpenWithWindow		Föredras för %type
 Free space color	SettingsView		Färg för ledigt utrymme

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Input	3312605348
+1	ukrainian	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Прокрутка
 Defaults	InputMouse		Типові настройки
 Long	KeyboardView		Більше
@@ -25,7 +25,6 @@ Accept first click	SettingsView		По першому кліку
 OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
 Delay until key repeat	KeyboardView		Затримка до повтору клавіші
-Keyboard Lock Delay	TouchpadPrefView		Затримка блокування клавіатури
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
 Input	System name		Input
 Mouse acceleration	SettingsView		Прискорення миші

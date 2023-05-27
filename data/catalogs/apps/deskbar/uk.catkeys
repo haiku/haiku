@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Ховати автоматично
 Show all	WindowMenu		Показати все
-Edit in Tracker…	PreferencesWindow		Змінити меню Tracker…
+Edit in Tracker…	PreferencesWindow		Змінити меню у Tracker…
 Menu	PreferencesWindow		Меню
 Tracker always first	PreferencesWindow		Tracker завжди перший
 Hide clock	TimeView		Сховати годинник
@@ -30,7 +30,7 @@ About this system	DeskbarMenu		Про цю систему
 Quit application	WindowMenu		Вийти з програми
 Hide application names	PreferencesWindow		Сховати назви програм
 Applications	PreferencesWindow		Програми
-Show application expander	PreferencesWindow		Показати експандер у меню програми
+Show application expander	PreferencesWindow		Показати експандер списку вікон
 Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...
 Suspend	DeskbarMenu		Призупинити
 Shutdown…	DeskbarMenu		Завершити роботу...

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Input	3312605348
+1	japanese	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		スクロール
 Defaults	InputMouse		デフォルト
 Long	KeyboardView		長く
@@ -25,7 +25,6 @@ Accept first click	SettingsView		最初のクリックを受け入れる
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		水平スクロール
 Delay until key repeat	KeyboardView		キーリピート開始までの時間
-Keyboard Lock Delay	TouchpadPrefView		キーボードをロックするまでの時間
 Two finger scrolling	TouchpadPrefView		2本指スクロール
 Input	System name		入力機器
 Mouse acceleration	SettingsView		マウスの加速度

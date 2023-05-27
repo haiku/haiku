@@ -5,7 +5,7 @@ Medium	PairsWindow		Mellem
 Game	PairsWindow		Spil
 Expert (8x8)	PairsWindow		Ekspert (8x8)
 New	PairsWindow		Ny
-OK	Pairs		OK
+OK	Pairs		O.k.
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Par fandt ikke nok vektorikoner til at starte — det behøver mindst %zu, fandt %zu.\n
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Du fuldførte partiet i {0, plural, one{# klik} other{# klik}}.\n
 Small	PairsWindow		Lille

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1644621968
+1	hungarian	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -88,6 +88,7 @@ Modified	FindPanel		Módosítva
 Select all	QueryContainerWindow		Összes kijelölése
 Generate image thumbnails	SettingsView		Képek előnézetének létrehozása
 Select…	FilePanelPriv		Kijelölés…
+An item named '%filename%' already exists.	FSUtils		Már létezik egy '%filename%' nevű elem.
 preferences	B_PREFERENCES_DIRECTORY		Beállítások
 Name	Person Query Columns		Név
 Skip all	FSUtils		Mindet kihagyja
@@ -358,6 +359,7 @@ after	FindPanel		utána
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# adat bájt>} other{<# adat bájt>}}
 Version	OpenWithWindow		Verzió
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Néhányat a kiválasztott elem közül nem lehet a Szemetesbe mozgatni. Szeretnéd inkább törölni? (Nem vonható vissza.)
+The entered file name is too long.	FSUtils		A megadott fájlnév túl hosszú.
 Add printer…	ContainerWindow		Nyomtató hozzáadása…
 On	FindPanel		Hol:
 Permissions	ContainerWindow		Engedélyek
@@ -528,6 +530,7 @@ I know what I'm doing	FSUtils	button label	Tudom, mit csinálok
 Preparing to copy items…	StatusWindow		Felkészülés az elemek másolására…
 Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		Ikon nézet
+The entered folder name is too long.	FSUtils		A megadott mappanév túl hosszú.
 Name	ContainerWindow		Név
 Preferred for %type	OpenWithWindow		Előnyben részesítve ehhez: %type
 Free space color	SettingsView		Szabad terület színe

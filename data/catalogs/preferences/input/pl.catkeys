@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Input	3312605348
+1	polish	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Przewijanie
 Defaults	InputMouse		Przywróć domyślne
 Long	KeyboardView		Długie
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Akceptuj pierwsze kliknięcie
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Przesuwanie poziome
 Delay until key repeat	KeyboardView		Opóźnienie przed powtórzeniem
-Keyboard Lock Delay	TouchpadPrefView		Blokowanie klawiatury
 Two finger scrolling	TouchpadPrefView		Przewijanie dwoma palcami
 Input	System name		Urządzenia wejściowe
 Mouse acceleration	SettingsView		Przyspieszenie myszy

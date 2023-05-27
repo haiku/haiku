@@ -1,11 +1,11 @@
-1	german	x-vnd.Haiku-Input	3312605348
+1	german	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Scrollen
 Defaults	InputMouse		Standardwerte
 Long	KeyboardView		Lang
 Cancel	TouchpadPrefView		Abbrechen
 4-Button	SettingsView		4-Tasten
 Slow	TouchpadPrefView		Langsam
-Tapping sensitivity	TouchpadPrefView		Tipp-Empfindlichkeit
+Tapping sensitivity	TouchpadPrefView		Empfindlichkeit
 Device List	InputWindow		Geräteliste
 Double-click speed	SettingsView		Doppelklick-Geschwindigkeit
 5-Button	SettingsView		5-Tasten
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Auf ersten Klick reagieren
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Horizontales Scrollen
 Delay until key repeat	KeyboardView		Verzögerung bis Tastenwiederholung
-Keyboard Lock Delay	TouchpadPrefView		Verzögerung der Tastatursperre
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
 Input	System name		Eingabegeräte
 Mouse acceleration	SettingsView		Beschleunigung

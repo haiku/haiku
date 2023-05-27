@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Input	3312605348
+1	swedish	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Rulla
 Defaults	InputMouse		Förvalt
 Long	KeyboardView		Lång
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Acceptera vid första klickningen
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Horisontell rullning
 Delay until key repeat	KeyboardView		Fördröjning tills upprepning av tangent
-Keyboard Lock Delay	TouchpadPrefView		Fördröjning av tangentbordslås
 Two finger scrolling	TouchpadPrefView		Rulla med två fingrar
 Input	System name		Inmatning
 Mouse acceleration	SettingsView		Mus acceleration

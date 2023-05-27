@@ -2,23 +2,23 @@
 IPv6 address:	NetworkStatusView		IPv6-adresse:
 Quit	NetworkStatusView		Afslut
 Unknown	NetworkStatusView		Ukendt
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Start af netværk-preflet mislykkedes.\n\nFejl: 
-Install in Deskbar	NetworkStatus		Installer i skrivebordslinje
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Valgmuligheder for Netværksstatus:\n\t--deskbar\ttilføj automatisk replikant til skrivebordslinje\n\t--help\t\tvis denne hjælp og afslut
-Open network preferences…	NetworkStatusView		Åbn netværkspræferencer…
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Åbning af netværksindstillinger mislykkedes.\n\nFejl: 
+Install in Deskbar	NetworkStatus		Installér i Deskbar
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Valgmuligheder for netværksstatus:\n\t--deskbar\ttilføj automatisk replikant til Deskbar\n\t--help\t\tvis denne hjælp og afslut
+Open network preferences…	NetworkStatusView		Åbn netværksindstillinger…
 NetworkStatus	System name		Netværksstatus
 Broadcast:	NetworkStatusView		Udsend:
-OK	NetworkStatusView		OK
-No link	NetworkStatusView		Intet link
-Could not join wireless network:\n	NetworkStatusView		Kunne ikke deltage i trådløst netværk:\n
+OK	NetworkStatusView		O.k.
+No link	NetworkStatusView		Ingen lænke
+Could not join wireless network:\n	NetworkStatusView		Kunne ikke tilslutte trådløst netværk:\n
 Ready	NetworkStatusView		Klar
 Network Status	NetworkStatusView		Netværksstatus
-Deskbar is not running, giving up.	NetworkStatus		Skrivebordslinje kører ikke, giver op.
+Deskbar is not running, giving up.	NetworkStatus		Deskbar kører ikke, giver op.
 Netmask:	NetworkStatusView		Netmaske:
-No stateful configuration	NetworkStatusView		Ingen tilstandsfuld konfiguration
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan køre netværksstatus i et vindue eller installere det i skrivebordslinjen.
+No stateful configuration	NetworkStatusView		Ingen tilstandsbaseret opsætning
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan køre netværksstatus i et vindue, eller installere det i Deskbar.
 IPv4 address:	NetworkStatusView		IPv4-adresse:
-%ifaceName information:\n	NetworkStatusView		Information om %ifaceName:\n
+%ifaceName information:\n	NetworkStatusView		Oplysninger om %ifaceName:\n
 Run in window	NetworkStatus		Kør i vindue
 <no wireless networks found>	NetworkStatusView		<fandt ingen trådløse netværk>
-Configuring	NetworkStatusView		Konfigurering
+Configuring	NetworkStatusView		Opsætter

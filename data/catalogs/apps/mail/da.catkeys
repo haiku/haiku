@@ -15,7 +15,7 @@ Encoding:	Mail		Kodning:
 Print	Mail		Udskriv
 Decrease quote level	Mail		Sænk kvoteniveau
 Encoding	Mail		Kodning
-Default account:	Mail		Standardkonto:
+Default account:	Mail		Forvalgt konto:
 Message	Mail		Meddelelse
 Bcc:	Mail		Bcc:
 New	Mail		Ny
@@ -60,7 +60,7 @@ Copy	Mail		Kopiér
 Add signature	Mail		Tilføj signatur
 %n - Full name	Mail		%n - Fuldt navn
 Signature	Mail		Signatur
-Use default account	Mail		Brug standardkonto
+Use default account	Mail		Brug forvalgt konto
 draft	B_USER_DIRECTORY/mail/draft		kladde
 Really delete this signature? This cannot be undone.	Mail		Skal signaturen slettes? Det kan ikke fortrydes.
 spam	B_USER_DIRECTORY/mail/spam		spam
@@ -82,12 +82,12 @@ Automatically mark mail as read:	Mail		Automatisk markér e-post som læst:
 Close and 	Mail		Luk og 
 Colored quotes:	Mail		Farvede citater:
 Automatic	Mail		Automatisk
-Open this link	Mail		Åbn lænken
+Open this link	Mail		Åbn denne lænke
 Auto signature:	Mail		Automatisk signatur:
 Same subject	Mail		Samme emne
 Send	Mail		Send
 Open draft	Mail		Åbn kladde
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lad være som 'Ny'
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Lad være som 'New'
 Random	Mail		Tilfældig
 Attach attributes:	Mail		Vedhæft attributter:
 Find again	Mail		Søg igen
@@ -96,7 +96,7 @@ To:	Mail		Til:
 Need Tracker to move items to trash	Mail		Behøver Tracker for at flytte elementer til papirkurv
 The mail_daemon could not be started:\n\t	Mail		mail_daemon kunne ikke startes:\n\t
 <no account found>	Mail		<ingen konto fundet>
-Mail couldn't find its dictionary.	Mail		Mail kunne ikke finde sin mappe.
+Mail couldn't find its dictionary.	Mail		Postprogrammet kunne ikke finde sin arbejdsmappe.
 Mail preferences	Mail		Postindstillinger
 helpful message	Mail		hjælpsom meddelelse
  Read 	Mail		 Læs 
@@ -133,9 +133,9 @@ Hide	Mail		Skjul
 From:	Mail		Fra:
 No file attributes, just plain data	Mail		Ingen filattributter, blot ren data
 Add	Mail		Tilføj
-out	B_USER_DIRECTORY/mail/out		ud
+out	B_USER_DIRECTORY/mail/out		udgående
 Send this message before closing?	Mail		Send meddelelsen inden lukning?
-in	B_USER_DIRECTORY/mail/in		i
+in	B_USER_DIRECTORY/mail/in		indkommende
 Open	Mail		Åbn
 Don't save	Mail		Undlad at gemme
 Leave same	Mail		Lad være som samme
@@ -159,7 +159,7 @@ An error occurred trying to save this signature.	Mail		Der opstod en fejl ved fo
 Beginner	Mail		Begynder
 Send message	Mail		Send meddelelse
 Delete	Mail		Slet
-Put your favorite e-mail queries and query templates in this folder.	Mail		Læg dine favorit e-postforespørgsler og forespørgselsskabeloner i denne mappe.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Læg dine foretrukne e-postforespørgsler og forespørgselsskabeloner i denne mappe.
 Spam	Mail		Spam
 Couldn't open this signature. Sorry.	Mail		Kunne ikke åbne signaturen. Beklager.
 Revert	Mail		Tilbagefør

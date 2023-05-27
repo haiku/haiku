@@ -1,12 +1,14 @@
-1	danish	x-vnd.Haiku-Terminal	3964119708
+1	danish	x-vnd.Haiku-Terminal	2769289662
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
 Text encoding	Terminal TermWindow		Tekstkodning
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Rediger
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               udskriv denne hjælp\n  -t,     --title              angiv vinduestitel\n  -f,     --fullscreen         start i fuldskærm\n  -w,     --working-directory  angiv indledende arbejdskatalog\n
 Select all	Terminal TermWindow		Vælg alt
 Confirm exit if active programs exist	Terminal AppearancePrefView		Bekræft lukning, hvis aktive programmer eksisterer
+Color scheme:	Terminal ThemeView		Farveskema:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen nuværende arbejdsmappe for den aktive proces i det\n\t\t\tnuværende faneblad. Det maksimale antal stikomponenter kan\n\t\t\tvalgfrit angives. F.eks. '%2d' for højst to komponenter.\n\t%T\t-\tTerminal-programnavnet for den nuværende lokalitet.\n\t%e\t-\tKodningen på det nuværende faneblad. Vises ikke ved UTF-8.\n\t%i\t-\tIndekset på vinduet.\n\t%p\t-\tNavnet på den aktive proces i det nuværende faneblad.\n\t%t\t-\tTitlen på det nuværende faneblad.
 Copy	Terminal TermWindow		Kopiér
 Edit tab title…	Terminal TermWindow		Rediger fanebladstitel…

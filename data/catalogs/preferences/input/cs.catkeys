@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Input	3312605348
+1	czech	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Rolování
 Defaults	InputMouse		Výchozí hodnoty
 Long	KeyboardView		Dlouhá
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Přijmout první klepnutí
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Vodorovné rolování
 Delay until key repeat	KeyboardView		Zpoždění opakování
-Keyboard Lock Delay	TouchpadPrefView		Doba do uzamčení klávesnice
 Two finger scrolling	TouchpadPrefView		Rolování dvěma prsty
 Input	System name		Vstup
 Mouse acceleration	SettingsView		Zrychlení myši

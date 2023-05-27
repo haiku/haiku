@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	765355649
+1	czech	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -88,6 +88,7 @@ Modified	FindPanel		Upravené
 Select all	QueryContainerWindow		Vybrat vše
 Generate image thumbnails	SettingsView		Vytvořit náhledy
 Select…	FilePanelPriv		Vybrat...
+An item named '%filename%' already exists.	FSUtils		Položka jménem '%filename%' už existuje.
 preferences	B_PREFERENCES_DIRECTORY		předvolby
 Name	Person Query Columns		Jméno
 Skip all	FSUtils		Přeskočit vše
@@ -269,6 +270,7 @@ Cut	FilePanelPriv		Vyjmout
 Finish: after several years	StatusWindow		Dokončení: za několik let
 Favorites	FilePanelPriv		Oblíbené
 Point	AttributesView		Bod
+You can't move or copy items to read-only volumes.	PoseView		Na svazky jen pro čtení nelze kopírovat či přesouvat položky.
 home	B_USER_DIRECTORY		domov
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nové šablony Trackeru
 Disk mounting during boot	AutoMounterSettings		Připojení disku během startu
@@ -357,6 +359,7 @@ after	FindPanel		po
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# bajt dat>} few{<# bajty dat>} other{<# bajtů dat>}}
 Version	OpenWithWindow		Verze
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Některé vybrané položky nemohou být přesunuty do Koše. Přejete si je místo toho odstranit? (Tato operace je nevratná.)
+The entered file name is too long.	FSUtils		Zvolené jméno souboru je příliš dlouhé.
 Add printer…	ContainerWindow		Přidat tiskárnu...
 On	FindPanel		Zapnuto
 Permissions	ContainerWindow		Oprávnění
@@ -527,6 +530,7 @@ I know what I'm doing	FSUtils	button label	Vím co dělám
 Preparing to copy items…	StatusWindow		Příprava kopírování položek...
 Entry ref	AttributesView		Reference položky
 Icon view	ContainerWindow		Zobrazení ikon
+The entered folder name is too long.	FSUtils		Zvolené jméno adresáře je příliš dlouhé.
 Name	ContainerWindow		Jméno
 Preferred for %type	OpenWithWindow		Doporučeno pro %type
 Free space color	SettingsView		Barva volného místa

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Input	3312605348
+1	danish	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Rulning
 Defaults	InputMouse		Standarder
 Long	KeyboardView		Lang
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Acceptér første klik
 OK	TouchpadPrefView		O.k.
 Horizontal scrolling	TouchpadPrefView		Vandret rulning
 Delay until key repeat	KeyboardView		Forsinkelse før gentagelse af tast
-Keyboard Lock Delay	TouchpadPrefView		Forsinkelse ved tastaturlås
 Two finger scrolling	TouchpadPrefView		Rulning med 2 fingre
 Input	System name		Input
 Mouse acceleration	SettingsView		Museacceleration

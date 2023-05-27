@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Input	3312605348
+1	turkish	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Kaydırma
 Defaults	InputMouse		Saptanmışlar
 Long	KeyboardView		Uzun
@@ -25,7 +25,6 @@ Accept first click	SettingsView		İlk tıklamayı kabul et
 OK	TouchpadPrefView		Tamam
 Horizontal scrolling	TouchpadPrefView		Yatay sarma
 Delay until key repeat	KeyboardView		Düğme yinelemesine kadar olan gecikme
-Keyboard Lock Delay	TouchpadPrefView		Klavye Kilit Gecikmesi
 Two finger scrolling	TouchpadPrefView		İki parmak sarma
 Input	System name		Girdi Aygıtları
 Mouse acceleration	SettingsView		Fare ivmelenmesi

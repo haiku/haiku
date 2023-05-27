@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Input	3312605348
+1	finnish	x-vnd.Haiku-Input	4063065788
 Scrolling	TouchpadPrefView		Vieritettään
 Defaults	InputMouse		Oletukset
 Long	KeyboardView		Pitkä
@@ -25,7 +25,6 @@ Accept first click	SettingsView		Hyväksy ensimmäisellä napsautuksella
 OK	TouchpadPrefView		Valmis
 Horizontal scrolling	TouchpadPrefView		Vaakasuora vieritys
 Delay until key repeat	KeyboardView		Näppäintoiston viive
-Keyboard Lock Delay	TouchpadPrefView		Näppäimistön lukkoviive
 Two finger scrolling	TouchpadPrefView		Kaksisormivieritys
 Input	System name		Syöte
 Mouse acceleration	SettingsView		Hiirikiihdytys

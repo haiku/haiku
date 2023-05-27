@@ -1,5 +1,5 @@
 1	danish	x-vnd.Be-PEPL	2634915100
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Start af filtyper-preflet'en til at konfigurere person-attributter mislykkedes.\n\nFejl: 
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Kunne ikke åbne filtypeindstillinger for opsætning af personattributter.\n\nFejl: 
 Mobile phone	People		Mobiltelefon
 Unnamed person	People		Unavngivet person
 New person…	People		Ny person…
@@ -12,8 +12,8 @@ Company	People		Virksomhed
 Name	People		Navn
 The file '%name%' could not be written.	People		Filen '%name%' kunne ikke skrives.
 Contact name	People		Kontaktnavn
-Cancel	People		Annuller
-Edit	People		Rediger
+Cancel	People		Afbryd
+Edit	People		Redigér
 Save changes before closing?	People		Gem ændringer inden lukning?
 People	System name		Personer
 Error	People		Fejl
@@ -29,23 +29,23 @@ Home phone	People		Hjemmetelefon
 none	Groups list		ingen
 Save as…	People		Gem som…
 Cut	People		Klip
-Contact information for a person.	Long mimetype description		Kontaktinformation for en person.
+Contact information for a person.	Long mimetype description		Kontaktoplysninger for en person.
 Remove image	People		Fjern billede
 City	People		By
 Undo	People		Fortryd
 Don't save	People		Gem ikke
-Configure attributes	People		Konfigurer attributter
+Configure attributes	People		Opsætning af attributter
 Work phone	People		Arbejdstelefon
 State	People		Tilstand
 Nickname	People		Kaldenavn
-OK	People		OK
+OK	People		O.k.
 File	People		Fil
 Redo	People		Omgør
 Close	People		Luk
 Copy	People		Kopiér
 Paste	People		Indsæt
-E-mail	People		E-mail
+E-mail	People		E-post
 Group	People		Gruppe
 Drop an image here,\nor use the contextual menu.	People		Slip et billede her,\neller brug genvejsmenuen.
 Load image…	People		Indlæs billede…
-Sorry	People		Beklager
+Sorry	People		Desværre

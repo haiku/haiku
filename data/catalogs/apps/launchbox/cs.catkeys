@@ -14,7 +14,7 @@ Failed to launch 'something', error in Pad data.	LaunchBox		Nepodařilo se spust
 LaunchBox	System name		Spouštěč
 Auto-raise	LaunchBox		Automaticky vyvolat
 Icon size	LaunchBox		Velikost ikony
-Open containing folder	LaunchBox		Otevřít složku obsahující
+Open containing folder	LaunchBox		Otevřít obsahující adresář
 Add button here	LaunchBox		Přidat sem tlačítko
 Cancel	LaunchBox		Zrušit
 launch popup	LaunchBox		spustit popup
@@ -32,5 +32,5 @@ Remove button	LaunchBox		Odstranit tlačítko
 Quit	LaunchBox		Ukončit
 Horizontal layout	LaunchBox		Horizontální rozvržení
 New	LaunchBox		Nový
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Příkaz 'open folder' se nepodařilo odeslat do Trackeru.\n\nChyba: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Příkaz 'otevřít adresář' se nepodařilo odeslat do Trackeru.\n\nChyba: 
 Pad %1	LaunchBox		Blok %1

@@ -1,14 +1,14 @@
 1	danish	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Kør i vindue
-Extended battery info	PowerStatus		Udviddet batteriinfo
+Extended battery info	PowerStatus		Yderligere batterioplysninger
 Show status icon	PowerStatus		Vis statusikon
 Battery charging	PowerStatus		Batteri oplader
-Design capacity low warning: 	PowerStatus		Advarsel om designkapacitet lav: 
+Design capacity low warning: 	PowerStatus		Advarsel om lav designkapacitet: 
 The battery level is critical, please plug in the device immediately.	PowerStatus		Batteriniveauet er kritisk, sæt venligst strømstikket i enheden med det samme.
 non-rechargeable	PowerStatus		ikke-genopladelig
 Last full charge: 	PowerStatus		Sidste fulde opladning: 
  mV	PowerStatus		 mV
-Current rate: 	PowerStatus		Nuværende rate: 
+Current rate: 	PowerStatus		Nuværende værdi: 
 Show text label	PowerStatus		Vis tekstetiket
 Quit	PowerStatus		Afslut
 Battery low	PowerStatus		Batteriet er lavt
@@ -16,13 +16,13 @@ Model number: 	PowerStatus		Modelnummer:
 Battery unused	PowerStatus		Batteri ubrugt
 Type: 	PowerStatus		Type: 
 Damaged battery	PowerStatus		Beskadiget batteri
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan køre strømstatus i et vindue eller installer det i skrivebordslinjen.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan køre strømstatus i et vindue, eller installer det i Deskbar.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batteri aflader
 Design voltage: 	PowerStatus		Designspænding: 
 discharging	PowerStatus		aflader
 rechargeable	PowerStatus		genopladeligt
-Battery info…	PowerStatus		Batteriinfo…
+Battery info…	PowerStatus		Batterioplysninger…
 Show time	PowerStatus		Vis tid
  mA	PowerStatus		 mA
 About…	PowerStatus		Om…
@@ -32,17 +32,17 @@ Capacity: 	PowerStatus		Kapacitet:
  mW	PowerStatus		 mW
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Der er ikke registreret noget understøttet batteri. Strømstatus kan ikke bruges på dit system.
 Show percent	PowerStatus		Vis procent
-Capacity granularity 1: 	PowerStatus		Kapacitet kornethed 1: 
+Capacity granularity 1: 	PowerStatus		Kapacitetskornethed 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Batteriniveauet er ved at være lavt, sæt venligst strømstikket i enheden.
 Design capacity warning: 	PowerStatus		Advarsel om designkapacitet: 
-Capacity granularity 2: 	PowerStatus		Kapacitet kornethed 2: 
+Capacity granularity 2: 	PowerStatus		Kapacitetskornethed 2: 
 Too bad!	PowerStatus		Øv!
 Technology: 	PowerStatus		Teknologi: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Strømstatus
 Design capacity: 	PowerStatus		Designkapacitet: 
-OEM info: 	PowerStatus		Information om OEM: 
+OEM info: 	PowerStatus		Oplysninger om OEM: 
 no battery	PowerStatus		intet batteri
-Empty battery slot	PowerStatus		Tom batteri plads
-Install in Deskbar	PowerStatus		Installer i skrivebordslinje
+Empty battery slot	PowerStatus		Tom batteriplads
+Install in Deskbar	PowerStatus		Installér i Deskbar
 charging	PowerStatus		oplader

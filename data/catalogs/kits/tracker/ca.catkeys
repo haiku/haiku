@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1644621968
+1	catalan; valencian	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -88,6 +88,7 @@ Modified	FindPanel		Modificat
 Select all	QueryContainerWindow		Selecciona-ho tot
 Generate image thumbnails	SettingsView		Genera miniatures d’imatges
 Select…	FilePanelPriv		Seleccioneu...
+An item named '%filename%' already exists.	FSUtils		Ja existeix un element anomenat %filename%.
 preferences	B_PREFERENCES_DIRECTORY		preferències
 Name	Person Query Columns		Nom
 Skip all	FSUtils		Omet-ho tot
@@ -358,6 +359,7 @@ after	FindPanel		després
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte de dades>} other{<# bytes de dades>}}
 Version	OpenWithWindow		Versió
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dels elements seleccionats no es poden moure a la paperera. Els voleu suprimir? (Aquesta operació no es pot desfer.)
+The entered file name is too long.	FSUtils		El nom de fitxer introduït és massa llarg.
 Add printer…	ContainerWindow		Afegeix-hi una impressora...
 On	FindPanel		A
 Permissions	ContainerWindow		Permisos
@@ -528,6 +530,7 @@ I know what I'm doing	FSUtils	button label	Sé el que faig
 Preparing to copy items…	StatusWindow		Es prepara la còpia d'elements...
 Entry ref	AttributesView		Ref. de l'entrada
 Icon view	ContainerWindow		Mostra les icones
+The entered folder name is too long.	FSUtils		El nom de carpeta introduït és massa llarg.
 Name	ContainerWindow		Nom
 Preferred for %type	OpenWithWindow		Preferit per a %type
 Free space color	SettingsView		Color de l'espai lliure
