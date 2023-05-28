@@ -97,8 +97,6 @@ requires {
 	lib:libicudata
 	lib:libicui18n
 	lib:libicuio
-	lib:libicutest
-	lib:libicutu
 	lib:libicuuc
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ncurses_ENABLED
