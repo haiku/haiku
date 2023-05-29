@@ -93,6 +93,7 @@ DMABuffer::Dump() const
 
 DMAResource::DMAResource()
 	:
+	fBlockSize(0),
 	fScratchVecs(NULL)
 {
 	mutex_init(&fLock, "dma resource");
@@ -159,6 +160,7 @@ DMAResource::Init(const dma_restrictions& restrictions,
 	generic_size_t blockSize, uint32 bufferCount, uint32 bounceBufferCount)
 {
 	ASSERT(restrictions.alignment <= blockSize);
+	ASSERT(fBlockSize == 0);
 
 	fRestrictions = restrictions;
 	fBlockSize = blockSize == 0 ? 1 : blockSize;
