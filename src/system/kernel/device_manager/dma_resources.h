@@ -13,17 +13,12 @@
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
+#include <util/iovec_support.h>
 
 
 struct device_node;
 struct IOOperation;
 struct IORequest;
-
-
-typedef struct generic_io_vec {
-	generic_addr_t	base;
-	generic_size_t	length;
-} generic_io_vec;
 
 
 struct dma_restrictions {

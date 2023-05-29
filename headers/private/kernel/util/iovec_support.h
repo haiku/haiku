@@ -9,6 +9,13 @@
 #include <KernelExport.h>
 
 
+typedef struct generic_io_vec {
+	generic_addr_t	base;
+	generic_size_t	length;
+} generic_io_vec;
+
+
+#ifdef IS_USER_ADDRESS
 static inline status_t
 get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec*& vecs,
 	bool permitNull = false)
@@ -46,6 +53,7 @@ get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec*& vecs,
 
 	return B_OK;
 }
+#endif
 
 
 #endif	// _UTIL_IOVEC_SUPPORT_H
