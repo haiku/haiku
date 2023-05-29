@@ -930,7 +930,7 @@ UHCI::CheckDebugTransfer(Transfer *transfer)
 		uint8 lastDataToggle = 0;
 		if (transfer->TransferPipe()->Direction() == Pipe::In) {
 			// data to read out
-			iovec *vector = transfer->Vector();
+			generic_io_vec *vector = transfer->Vector();
 			size_t vectorCount = transfer->VectorCount();
 
 			ReadDescriptorChain(transferData->first_descriptor,
@@ -1091,9 +1091,9 @@ UHCI::SubmitRequest(Transfer *transfer)
 		return B_NO_MEMORY;
 	}
 
-	iovec vector;
-	vector.iov_base = requestData;
-	vector.iov_len = sizeof(usb_request_data);
+	generic_io_vec vector;
+	vector.base = (generic_addr_t)requestData;
+	vector.length = sizeof(usb_request_data);
 	WriteDescriptorChain(setupDescriptor, &vector, 1);
 
 	statusDescriptor->status |= TD_CONTROL_IOC;
@@ -1311,7 +1311,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 
 	// If direction is out set every descriptor data
 	if (!directionIn) {
-		iovec *vector = transfer->Vector();
+		generic_io_vec *vector = transfer->Vector();
 		WriteIsochronousDescriptorChain(isoRequest,
 			isochronousData->packet_count, vector);
 	} else {
@@ -1613,7 +1613,7 @@ UHCI::FinishTransfers()
 					uint8 lastDataToggle = 0;
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
-						iovec *vector = transfer->transfer->Vector();
+						generic_io_vec *vector = transfer->transfer->Vector();
 						size_t vectorCount = transfer->transfer->VectorCount();
 
 						transfer->transfer->PrepareKernelAccess();
@@ -1788,7 +1788,7 @@ UHCI::FinishIsochronousTransfers()
 					// remove the descriptors.
 				if (transfer && transfer->is_active) {
 					if (current->token & TD_TOKEN_IN) {
-						iovec *vector = transfer->transfer->Vector();
+						generic_io_vec *vector = transfer->transfer->Vector();
 						transfer->transfer->PrepareKernelAccess();
 						ReadIsochronousDescriptorChain(transfer, vector);
 					}
@@ -2276,7 +2276,7 @@ UHCI::LinkDescriptors(uhci_td *first, uhci_td *second)
 
 
 size_t
-UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
+UHCI::WriteDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
 	size_t vectorCount)
 {
 	uhci_td *current = topDescriptor;
@@ -2291,19 +2291,19 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 		while (true) {
 			size_t length = min_c(current->buffer_size - bufferOffset,
-				vector[vectorIndex].iov_len - vectorOffset);
+				vector[vectorIndex].length - vectorOffset);
 
 			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
 				vectorOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)current->buffer_log + bufferOffset,
-				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
+				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
 
 			actualLength += length;
 			vectorOffset += length;
 			bufferOffset += length;
 
-			if (vectorOffset >= vector[vectorIndex].iov_len) {
+			if (vectorOffset >= vector[vectorIndex].length) {
 				if (++vectorIndex >= vectorCount) {
 					TRACE("wrote descriptor chain (%ld bytes, no more vectors)\n",
 						actualLength);
@@ -2331,7 +2331,7 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 
 size_t
-UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
+UHCI::ReadDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
 	size_t vectorCount, uint8 *lastDataToggle)
 {
 	uint8 dataToggle = 0;
@@ -2350,19 +2350,19 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, iovec *vector,
 
 		while (true) {
 			size_t length = min_c(bufferSize - bufferOffset,
-				vector[vectorIndex].iov_len - vectorOffset);
+				vector[vectorIndex].length - vectorOffset);
 
 			TRACE("copying %ld bytes to vectorOffset %ld from"
 				" bufferOffset %ld at index %ld of %ld\n", length, vectorOffset,
 				bufferOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
+			memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
 				(uint8 *)current->buffer_log + bufferOffset, length);
 
 			actualLength += length;
 			vectorOffset += length;
 			bufferOffset += length;
 
-			if (vectorOffset >= vector[vectorIndex].iov_len) {
+			if (vectorOffset >= vector[vectorIndex].length) {
 				if (++vectorIndex >= vectorCount) {
 					TRACE("read descriptor chain (%ld bytes, no more vectors)\n",
 						actualLength);
@@ -2421,13 +2421,13 @@ UHCI::ReadActualLength(uhci_td *topDescriptor, uint8 *lastDataToggle)
 
 void
 UHCI::WriteIsochronousDescriptorChain(uhci_td **isoRequest, uint32 packetCount,
-	iovec *vector)
+	generic_io_vec *vector)
 {
 	size_t vectorOffset = 0;
 	for (uint32 i = 0; i < packetCount; i++) {
 		size_t bufferSize = isoRequest[i]->buffer_size;
 		memcpy((uint8 *)isoRequest[i]->buffer_log,
-			(uint8 *)vector->iov_base + vectorOffset, bufferSize);
+			(uint8 *)vector->base + vectorOffset, bufferSize);
 		vectorOffset += bufferSize;
 	}
 }
@@ -2435,7 +2435,7 @@ UHCI::WriteIsochronousDescriptorChain(uhci_td **isoRequest, uint32 packetCount,
 
 void
 UHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer,
-	iovec *vector)
+	generic_io_vec *vector)
 {
 	size_t vectorOffset = 0;
 	usb_isochronous_data *isochronousData
@@ -2456,7 +2456,7 @@ UHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer,
 			vectorOffset += bufferSize;
 			continue;
 		}
-		memcpy((uint8 *)vector->iov_base + vectorOffset,
+		memcpy((uint8 *)vector->base + vectorOffset,
 			(uint8 *)current->buffer_log, bufferSize);
 
 		vectorOffset += bufferSize;

@@ -1261,7 +1261,7 @@ OHCI::_FinishTransfers()
 				if (callbackStatus == B_OK) {
 					if (transfer->data_descriptor && transfer->incoming) {
 						// data to read out
-						iovec *vector = transfer->transfer->Vector();
+						generic_io_vec *vector = transfer->transfer->Vector();
 						size_t vectorCount = transfer->transfer->VectorCount();
 
 						transfer->transfer->PrepareKernelAccess();
@@ -1430,7 +1430,7 @@ OHCI::_FinishIsochronousTransfer(transfer_data *transfer,
 		if (callbackStatus == B_OK && actualLength > 0) {
 			if (transfer->data_descriptor && transfer->incoming) {
 				// data to read out
-				iovec *vector = transfer->transfer->Vector();
+				generic_io_vec *vector = transfer->transfer->Vector();
 				size_t vectorCount = transfer->transfer->VectorCount();
 
 				transfer->transfer->PrepareKernelAccess();
@@ -1482,9 +1482,9 @@ OHCI::_SubmitRequest(Transfer *transfer)
 		| OHCI_TD_TOGGLE_1
 		| OHCI_TD_SET_DELAY_INTERRUPT(OHCI_TD_INTERRUPT_IMMEDIATE);
 
-	iovec vector;
-	vector.iov_base = requestData;
-	vector.iov_len = sizeof(usb_request_data);
+	generic_io_vec vector;
+	vector.base = (generic_addr_t)requestData;
+	vector.length = sizeof(usb_request_data);
 	_WriteDescriptorChain(setupDescriptor, &vector, 1);
 
 	status_t result;
@@ -2278,7 +2278,7 @@ OHCI::_FreeIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor)
 
 
 size_t
-OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
+OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vector,
 	size_t vectorCount)
 {
 	ohci_general_td *current = topDescriptor;
@@ -2293,19 +2293,19 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 		while (true) {
 			size_t length = min_c(current->buffer_size - bufferOffset,
-				vector[vectorIndex].iov_len - vectorOffset);
+				vector[vectorIndex].length - vectorOffset);
 
 			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
 				vectorOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)current->buffer_logical + bufferOffset,
-				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
+				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
 
 			actualLength += length;
 			vectorOffset += length;
 			bufferOffset += length;
 
-			if (vectorOffset >= vector[vectorIndex].iov_len) {
+			if (vectorOffset >= vector[vectorIndex].length) {
 				if (++vectorIndex >= vectorCount) {
 					TRACE("wrote descriptor chain (%ld bytes, no"
 						" more vectors)\n", actualLength);
@@ -2334,7 +2334,7 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 size_t
 OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
-	iovec *vector, size_t vectorCount)
+	generic_io_vec *vector, size_t vectorCount)
 {
 	ohci_isochronous_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2348,19 +2348,19 @@ OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 
 		while (true) {
 			size_t length = min_c(current->buffer_size - bufferOffset,
-				vector[vectorIndex].iov_len - vectorOffset);
+				vector[vectorIndex].length - vectorOffset);
 
 			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
 				vectorOffset, vectorIndex, vectorCount);
 			memcpy((uint8 *)current->buffer_logical + bufferOffset,
-				(uint8 *)vector[vectorIndex].iov_base + vectorOffset, length);
+				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
 
 			actualLength += length;
 			vectorOffset += length;
 			bufferOffset += length;
 
-			if (vectorOffset >= vector[vectorIndex].iov_len) {
+			if (vectorOffset >= vector[vectorIndex].length) {
 				if (++vectorIndex >= vectorCount) {
 					TRACE("wrote descriptor chain (%ld bytes, no"
 						" more vectors)\n", actualLength);
@@ -2388,7 +2388,7 @@ OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 
 
 size_t
-OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
+OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vector,
 	size_t vectorCount)
 {
 	ohci_general_td *current = topDescriptor;
@@ -2410,19 +2410,19 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 		while (true) {
 			size_t length = min_c(bufferSize - bufferOffset,
-				vector[vectorIndex].iov_len - vectorOffset);
+				vector[vectorIndex].length - vectorOffset);
 
 			TRACE("copying %ld bytes to vectorOffset %ld from"
 				" bufferOffset %ld at index %ld of %ld\n", length, vectorOffset,
 				bufferOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
+			memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
 				(uint8 *)current->buffer_logical + bufferOffset, length);
 
 			actualLength += length;
 			vectorOffset += length;
 			bufferOffset += length;
 
-			if (vectorOffset >= vector[vectorIndex].iov_len) {
+			if (vectorOffset >= vector[vectorIndex].length) {
 				if (++vectorIndex >= vectorCount) {
 					TRACE("read descriptor chain (%ld bytes, no more vectors)\n",
 						actualLength);
@@ -2448,7 +2448,7 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, iovec *vector,
 
 void
 OHCI::_ReadIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
-	iovec *vector, size_t vectorCount)
+	generic_io_vec *vector, size_t vectorCount)
 {
 	ohci_isochronous_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2462,19 +2462,19 @@ OHCI::_ReadIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 		if (current->buffer_logical != NULL && bufferSize > 0) {
 			while (true) {
 				size_t length = min_c(bufferSize - bufferOffset,
-					vector[vectorIndex].iov_len - vectorOffset);
+					vector[vectorIndex].length - vectorOffset);
 
 				TRACE("copying %ld bytes to vectorOffset %ld from bufferOffset"
 					" %ld at index %ld of %ld\n", length, vectorOffset,
 					bufferOffset, vectorIndex, vectorCount);
-				memcpy((uint8 *)vector[vectorIndex].iov_base + vectorOffset,
+				memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
 					(uint8 *)current->buffer_logical + bufferOffset, length);
 
 				actualLength += length;
 				vectorOffset += length;
 				bufferOffset += length;
 
-				if (vectorOffset >= vector[vectorIndex].iov_len) {
+				if (vectorOffset >= vector[vectorIndex].length) {
 					if (++vectorIndex >= vectorCount) {
 						TRACE("read descriptor chain (%ld bytes, "
 							"no more vectors)\n", actualLength);

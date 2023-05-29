@@ -162,9 +162,9 @@ private:
 			void				FreeDescriptor(xhci_td *descriptor);
 
 			size_t				WriteDescriptor(xhci_td *descriptor,
-									iovec *vector, size_t vectorCount);
+									generic_io_vec *vector, size_t vectorCount);
 			size_t				ReadDescriptor(xhci_td *descriptor,
-									iovec *vector, size_t vectorCount);
+									generic_io_vec *vector, size_t vectorCount);
 
 			status_t			_LinkDescriptorForPipe(xhci_td *descriptor,
 									xhci_endpoint *endpoint);

@@ -235,8 +235,9 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
+	if (physical)
+		return B_NOT_SUPPORTED;
 
-	transfer->SetPhysical(physical);
 	transfer->SetVector(vector, vectorCount);
 	transfer->SetCallback(callback, callbackCookie);
 

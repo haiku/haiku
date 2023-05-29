@@ -63,9 +63,10 @@ Transfer::SetIsochronousData(usb_isochronous_data *data)
 void
 Transfer::SetData(uint8 *data, size_t dataLength)
 {
+	fPhysical = false;
 	fBaseAddress = data;
-	fData.iov_base = data;
-	fData.iov_len = dataLength;
+	fData.base = (generic_addr_t)data;
+	fData.length = dataLength;
 
 	if (data && dataLength > 0)
 		fVectorCount = 1;
@@ -81,23 +82,20 @@ Transfer::SetData(uint8 *data, size_t dataLength)
 
 
 void
-Transfer::SetPhysical(bool physical)
-{
-	fPhysical = physical;
-}
-
-
-void
 Transfer::SetVector(iovec *vector, size_t vectorCount)
 {
-	fVector = new(std::nothrow) iovec[vectorCount];
-	memcpy(fVector, vector, vectorCount * sizeof(iovec));
+	fPhysical = false;
+	fVector = new(std::nothrow) generic_io_vec[vectorCount];
+	for (size_t i = 0; i < vectorCount; i++) {
+		fVector[i].base = (generic_addr_t)vector[i].iov_base;
+		fVector[i].length = vector[i].iov_len;
+	}
 	fVectorCount = vectorCount;
-	fBaseAddress = fVector[0].iov_base;
+	fBaseAddress = vector[0].iov_base;
 
 	size_t length = 0;
 	for (size_t i = 0; i < fVectorCount && length <= USB_MAX_FRAGMENT_SIZE; i++)
-		length += fVector[i].iov_len;
+		length += fVector[i].length;
 
 	fFragmented = length > USB_MAX_FRAGMENT_SIZE;
 }
@@ -108,7 +106,7 @@ Transfer::FragmentLength() const
 {
 	size_t length = 0;
 	for (size_t i = 0; i < fVectorCount; i++)
-		length += fVector[i].iov_len;
+		length += fVector[i].length;
 
 	if (length > USB_MAX_FRAGMENT_SIZE)
 		length = USB_MAX_FRAGMENT_SIZE;
@@ -122,14 +120,14 @@ Transfer::AdvanceByFragment(size_t actualLength)
 {
 	size_t length = USB_MAX_FRAGMENT_SIZE;
 	for (size_t i = 0; i < fVectorCount; i++) {
-		if (fVector[i].iov_len <= length) {
-			length -= fVector[i].iov_len;
-			fVector[i].iov_len = 0;
+		if (fVector[i].length <= length) {
+			length -= fVector[i].length;
+			fVector[i].length = 0;
 			continue;
 		}
 
-		fVector[i].iov_base = (uint8 *)fVector[i].iov_base + length;
-		fVector[i].iov_len -= length;
+		fVector[i].base = fVector[i].base + length;
+		fVector[i].length -= length;
 		break;
 	}
 
@@ -148,10 +146,10 @@ Transfer::InitKernelAccess()
 	// be possible in the kernel space finisher thread unless we
 	// get the proper area id for the space we need and then clone it
 	// before reading from or writing to it.
-	iovec *vector = fVector;
+	generic_io_vec *vector = fVector;
 	for (size_t i = 0; i < fVectorCount; i++) {
-		if (IS_USER_ADDRESS(vector[i].iov_base)) {
-			fUserArea = area_for(vector[i].iov_base);
+		if (IS_USER_ADDRESS(vector[i].base)) {
+			fUserArea = area_for((void*)vector[i].base);
 			if (fUserArea < B_OK) {
 				TRACE_ERROR("failed to find area for user space buffer!\n");
 				return B_BAD_ADDRESS;
@@ -171,10 +169,10 @@ Transfer::InitKernelAccess()
 	}
 
 	for (size_t i = 0; i < fVectorCount; i++) {
-		vector[i].iov_base = (uint8 *)vector[i].iov_base - (addr_t)areaInfo.address;
+		vector[i].base = vector[i].base - (addr_t)areaInfo.address;
 
-		if ((size_t)vector[i].iov_base > areaInfo.size
-			|| (size_t)vector[i].iov_base + vector[i].iov_len > areaInfo.size) {
+		if (vector[i].base > areaInfo.size
+				|| (vector[i].base + vector[i].length) > areaInfo.size) {
 			TRACE_ERROR("data buffer spans across multiple areas!\n");
 			return B_BAD_ADDRESS;
 		}
@@ -200,7 +198,7 @@ Transfer::PrepareKernelAccess()
 		return fClonedArea;
 
 	for (size_t i = 0; i < fVectorCount; i++)
-		fVector[i].iov_base = (uint8 *)fVector[i].iov_base + (addr_t)clonedMemory;
+		fVector[i].base = fVector[i].base + (addr_t)clonedMemory;
 	return B_OK;
 }
 
@@ -244,11 +242,11 @@ Transfer::_CalculateBandwidth()
 			// Direction doesn't matter for highspeed
 			if (type & USB_OBJECT_ISO_PIPE)
 				bandwidthNS = (uint16)((38 * 8 * 2.083)
-					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.iov_len))))
+					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.length))))
 					+ USB_BW_HOST_DELAY);
 			else
 				bandwidthNS = (uint16)((55 * 8 * 2.083)
-					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.iov_len))))
+					+ (2.083 * ((uint32)(3.167 * (1.1667 * 8 * fData.length))))
 					+ USB_BW_HOST_DELAY);
 			break;
 		}
@@ -258,11 +256,11 @@ Transfer::_CalculateBandwidth()
 			if (type & USB_OBJECT_ISO_PIPE)
 				bandwidthNS = (uint16)
 					(((fPipe->Direction() == Pipe::In) ? 7268 : 6265)
-					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
 					+ USB_BW_HOST_DELAY);
 			else
 				bandwidthNS = (uint16)(9107
-					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ (83.54 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
 					+ USB_BW_HOST_DELAY);
 			break;
 		}
@@ -270,11 +268,11 @@ Transfer::_CalculateBandwidth()
 		{
 			if (fPipe->Direction() == Pipe::In)
 				bandwidthNS = (uint16) (64060 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
-					+ (676.67 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ (676.67 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
 					+ USB_BW_HOST_DELAY);
 			else
 				bandwidthNS = (uint16)(64107 + (2 * USB_BW_SETUP_LOW_SPEED_PORT_DELAY)
-					+ (667.0 * ((uint32)(3.167 + (1.1667 * 8 * fData.iov_len))))
+					+ (667.0 * ((uint32)(3.167 + (1.1667 * 8 * fData.length))))
 					+ USB_BW_HOST_DELAY);
 			break;
 		}

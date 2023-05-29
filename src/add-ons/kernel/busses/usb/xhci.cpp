@@ -878,7 +878,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		if (!directionIn) {
 			transfer->PrepareKernelAccess();
 			memcpy(descriptor->buffers[0],
-				(uint8 *)transfer->Vector()[0].iov_base, requestData->Length);
+				(uint8 *)transfer->Vector()[0].base, requestData->Length);
 		}
 
 		index++;
@@ -1427,18 +1427,18 @@ XHCI::FreeDescriptor(xhci_td *descriptor)
 
 
 size_t
-XHCI::WriteDescriptor(xhci_td *descriptor, iovec *vector, size_t vectorCount)
+XHCI::WriteDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorCount)
 {
 	size_t written = 0;
 
 	size_t bufIdx = 0, bufUsed = 0;
 	for (size_t vecIdx = 0; vecIdx < vectorCount; vecIdx++) {
-		size_t length = vector[vecIdx].iov_len;
+		size_t length = vector[vecIdx].length;
 
 		while (length > 0 && bufIdx < descriptor->buffer_count) {
 			size_t toCopy = min_c(length, descriptor->buffer_size - bufUsed);
 			memcpy((uint8 *)descriptor->buffers[bufIdx] + bufUsed,
-				(uint8 *)vector[vecIdx].iov_base + (vector[vecIdx].iov_len - length),
+				(uint8 *)vector[vecIdx].base + (vector[vecIdx].length - length),
 				toCopy);
 
 			written += toCopy;
@@ -1457,17 +1457,17 @@ XHCI::WriteDescriptor(xhci_td *descriptor, iovec *vector, size_t vectorCount)
 
 
 size_t
-XHCI::ReadDescriptor(xhci_td *descriptor, iovec *vector, size_t vectorCount)
+XHCI::ReadDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorCount)
 {
 	size_t read = 0;
 
 	size_t bufIdx = 0, bufUsed = 0;
 	for (size_t vecIdx = 0; vecIdx < vectorCount; vecIdx++) {
-		size_t length = vector[vecIdx].iov_len;
+		size_t length = vector[vecIdx].length;
 
 		while (length > 0 && bufIdx < descriptor->buffer_count) {
 			size_t toCopy = min_c(length, descriptor->buffer_size - bufUsed);
-			memcpy((uint8 *)vector[vecIdx].iov_base + (vector[vecIdx].iov_len - length),
+			memcpy((uint8 *)vector[vecIdx].base + (vector[vecIdx].length - length),
 				(uint8 *)descriptor->buffers[bufIdx] + bufUsed, toCopy);
 
 			read += toCopy;

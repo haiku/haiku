@@ -16,6 +16,7 @@
 #include "usbspec_private.h"
 #include <lock.h>
 #include <util/Vector.h>
+#include <util/iovec_support.h>
 
 
 #define TRACE_OUTPUT(x, y, z...) \
@@ -714,15 +715,13 @@ public:
 
 		void						SetData(uint8 *buffer, size_t length);
 		uint8 *						Data() const
-										{ return (uint8 *)fData.iov_base; }
-		size_t						DataLength() const { return fData.iov_len; }
+										{ return fPhysical ? NULL : (uint8 *)fData.base; }
+		size_t						DataLength() const { return fData.length; }
 
-		void						SetPhysical(bool physical);
 		bool						IsPhysical() const { return fPhysical; }
 
-		void						SetVector(iovec *vector,
-										size_t vectorCount);
-		iovec *						Vector() { return fVector; }
+		void						SetVector(iovec *vector, size_t vectorCount);
+		generic_io_vec *			Vector() { return fVector; }
 		size_t						VectorCount() const { return fVectorCount; }
 
 		uint16						Bandwidth() const { return fBandwidth; }
@@ -752,8 +751,8 @@ private:
 
 		// Data that is related to the transfer
 		Pipe *						fPipe;
-		iovec						fData;
-		iovec *						fVector;
+		generic_io_vec				fData;
+		generic_io_vec *			fVector;
 		size_t						fVectorCount;
 		void *						fBaseAddress;
 		bool						fPhysical;

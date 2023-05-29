@@ -184,19 +184,19 @@ static int32						FinishIsochronousThread(void *data);
 										uhci_td *second);
 
 		size_t						WriteDescriptorChain(uhci_td *topDescriptor,
-										iovec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount);
 		size_t						ReadDescriptorChain(uhci_td *topDescriptor,
-										iovec *vector, size_t vectorCount,
+										generic_io_vec *vector, size_t vectorCount,
 										uint8 *lastDataToggle);
 		size_t						ReadActualLength(uhci_td *topDescriptor,
 										uint8 *lastDataToggle);
 		void						WriteIsochronousDescriptorChain(
 										uhci_td **isoRequest,
 										uint32 packetCount,
-										iovec *vector);
+										generic_io_vec *vector);
 		void						ReadIsochronousDescriptorChain(
 										isochronous_transfer_data *transfer,
-										iovec *vector);
+										generic_io_vec *vector);
 
 		// Register functions
 inline	void						WriteReg8(uint32 reg, uint8 value);
