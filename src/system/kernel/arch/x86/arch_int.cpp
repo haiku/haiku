@@ -467,7 +467,7 @@ status_t
 arch_int_init_io(kernel_args* args)
 {
 	msi_init(args);
-	ioapic_init(args);
+	ioapic_preinit(args);
 	return B_OK;
 }
 

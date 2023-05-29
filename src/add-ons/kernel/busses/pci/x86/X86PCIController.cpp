@@ -6,6 +6,8 @@
 
 #include "X86PCIController.h"
 
+#include <ioapic.h>
+
 #include <AutoDeleterDrivers.h>
 #include <util/AutoLock.h>
 
@@ -152,8 +154,15 @@ X86PCIController::WriteIrq(uint8 bus, uint8 device, uint8 function,
 status_t
 X86PCIController::GetRange(uint32 index, pci_resource_range* range)
 {
-
 	return B_BAD_INDEX;
+}
+
+
+status_t
+X86PCIController::Finalize()
+{
+	ioapic_init();
+	return B_OK;
 }
 
 
@@ -234,13 +243,6 @@ X86PCIControllerMeth1::WriteConfig(
 status_t X86PCIControllerMeth1::GetMaxBusDevices(int32& count)
 {
 	count = 32;
-	return B_OK;
-}
-
-
-status_t
-X86PCIControllerMeth1::Finalize()
-{
 	return B_OK;
 }
 
@@ -332,13 +334,6 @@ status_t X86PCIControllerMeth2::GetMaxBusDevices(int32& count)
 }
 
 
-status_t
-X86PCIControllerMeth2::Finalize()
-{
-	return B_OK;
-}
-
-
 //#pragma mark - X86PCIControllerMethPcie
 
 
@@ -409,12 +404,4 @@ status_t
 X86PCIControllerMethPcie::GetRange(uint32 index, pci_resource_range* range)
 {
 	return fECAMPCIController.GetRange(index, range);
-}
-
-
-status_t
-X86PCIControllerMethPcie::Finalize()
-{
-	// No need to call fECAMPCIController.Finalize(): IRQ routing is handled by IOAPIC on x86.
-	return B_OK;
 }

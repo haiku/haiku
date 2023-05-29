@@ -41,7 +41,7 @@ public:
 
 	virtual status_t GetRange(uint32 index, pci_resource_range* range);
 
-	virtual status_t Finalize() = 0;
+	virtual status_t Finalize() final;
 
 	status_t ReadIrq(
 		uint8 bus, uint8 device, uint8 function,
@@ -78,8 +78,6 @@ public:
 		uint16 offset, uint8 size, uint32 value) override;
 
 	status_t GetMaxBusDevices(int32& count) override;
-
-	status_t Finalize() override;
 };
 
 
@@ -98,8 +96,6 @@ public:
 		uint16 offset, uint8 size, uint32 value) final;
 
 	status_t GetMaxBusDevices(int32& count) final;
-
-	status_t Finalize() final;
 };
 
 
@@ -120,8 +116,6 @@ public:
 	status_t GetMaxBusDevices(int32& count) final;
 
 	status_t GetRange(uint32 index, pci_resource_range* range) final;
-
-	status_t Finalize() final;
 
 private:
 	ECAMPCIControllerACPI fECAMPCIController;
