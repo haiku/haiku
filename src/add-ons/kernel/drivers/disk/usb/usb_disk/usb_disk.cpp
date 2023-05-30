@@ -106,6 +106,26 @@ status_t	usb_disk_synchronize(device_lun *lun, bool force);
 // #pragma mark - disk_device helper functions
 
 
+disk_device_s::disk_device_s()
+	:
+	notify(-1),
+	interruptLock(-1)
+{
+	mutex_init(&lock, "usb_disk device lock");
+}
+
+
+disk_device_s::~disk_device_s()
+{
+	mutex_destroy(&lock);
+
+	if (notify >= 0)
+		delete_sem(notify);
+	if (interruptLock >= 0)
+		delete_sem(interruptLock);
+}
+
+
 static DMAResource*
 get_dma_resource(disk_device *device, uint32 blockSize)
 {
@@ -122,11 +142,8 @@ void
 usb_disk_free_device_and_luns(disk_device *device)
 {
 	mutex_lock(&device->lock);
-	mutex_destroy(&device->lock);
 	for (int32 i = 0; i < device->dma_resources.Count(); i++)
 		delete device->dma_resources[i];
-	delete_sem(device->notify);
-	delete_sem(device->interruptLock);
 	for (uint8 i = 0; i < device->lun_count; i++)
 		free(device->luns[i]);
 	free(device->luns);
@@ -596,7 +613,7 @@ usb_disk_send_diagnostic(device_lun *lun)
 
 	int retry = 100;
 	err_act action = err_act_ok;
-	while(result == B_DEV_NO_MEDIA && retry > 0) {
+	while (result == B_DEV_NO_MEDIA && retry > 0) {
 		snooze(10000);
 		result = usb_disk_request_sense(lun, &action);
 		retry--;
@@ -1090,11 +1107,8 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 		return B_ERROR;
 	}
 
-	mutex_init(&device->lock, "usb_disk device lock");
-
 	device->notify = create_sem(0, "usb_disk callback notify");
 	if (device->notify < B_OK) {
-		mutex_destroy(&device->lock);
 		status_t result = device->notify;
 		delete device;
 		return result;
@@ -1103,8 +1117,6 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	if (device->is_ufi) {
 		device->interruptLock = create_sem(0, "usb_disk interrupt lock");
 		if (device->interruptLock < B_OK) {
-			mutex_destroy(&device->lock);
-			delete_sem(device->notify);
 			status_t result = device->interruptLock;
 			delete device;
 			return result;
@@ -1491,7 +1503,8 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		return B_DEV_NOT_READY;
 
 	switch (op) {
-		case B_GET_DEVICE_SIZE: {
+		case B_GET_DEVICE_SIZE:
+		{
 			if (lun->media_changed) {
 				status_t result = usb_disk_update_capacity(lun);
 				if (result != B_OK)

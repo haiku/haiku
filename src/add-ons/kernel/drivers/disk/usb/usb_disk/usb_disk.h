@@ -31,6 +31,9 @@ typedef struct device_lun_s device_lun;
 
 // holds common information about an attached device (pointed to by luns)
 typedef struct disk_device_s {
+	disk_device_s();
+	~disk_device_s();
+
 	int32		number;
 	device_node	*node;
 
