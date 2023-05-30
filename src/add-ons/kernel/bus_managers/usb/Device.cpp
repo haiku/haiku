@@ -10,6 +10,8 @@
 
 #include "usb_private.h"
 
+#include <StackOrHeapArray.h>
+
 
 Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor& desc, int8 deviceAddress, usb_speed speed,
@@ -843,18 +845,24 @@ Device::RegisterNode(device_node *parent)
 	if (parent == NULL)
 		parent = ((Device*)Parent())->Node();
 
-	device_attr attrs[128] = {
-		{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "usb" }},
+	// determine how many attributes we will need
+	uint32 deviceAttrTotal = 1;
+	for (uint32 j = 0; j < fDeviceDescriptor.num_configurations; j++) {
+		for (uint32 k = 0; k < fConfigurations[j].interface_count; k++) {
+			for (uint32 l = 0; l < fConfigurations[j].interface[k].alt_count; l++) {
+				deviceAttrTotal += 3;
+			}
+		}
+	}
 
-		// location
-		{ USB_DEVICE_ID_ITEM, B_UINT32_TYPE, { .ui32 = id }},
+	BStackOrHeapArray<device_attr, 16> attrs(deviceAttrTotal + 4 + 5);
+	attrs[0] = { B_DEVICE_BUS, B_STRING_TYPE, { .string = "usb" } };
 
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN }},
+	// location
+	attrs[1] = { USB_DEVICE_ID_ITEM, B_UINT32_TYPE, { .ui32 = id } };
+	attrs[2] = { B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN } };
+	attrs[3] = { B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "USB device" } };
 
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "USB device" }},
-
-		{ NULL }
-	};
 	uint32 attrCount = 4;
 
 	if (fDeviceDescriptor.vendor_id != 0) {
@@ -862,6 +870,7 @@ Device::RegisterNode(device_node *parent)
 		attrs[attrCount].type = B_UINT16_TYPE;
 		attrs[attrCount].value.ui16 = fDeviceDescriptor.vendor_id;
 		attrCount++;
+
 		attrs[attrCount].name = B_DEVICE_ID;
 		attrs[attrCount].type = B_UINT16_TYPE;
 		attrs[attrCount].value.ui16 = fDeviceDescriptor.product_id;
@@ -875,10 +884,12 @@ Device::RegisterNode(device_node *parent)
 		attrs[attrCount].type = B_UINT8_TYPE;
 		attrs[attrCount].value.ui8 = fDeviceDescriptor.device_class;
 		attrCount++;
+
 		attrs[attrCount].name = USB_DEVICE_SUBCLASS;
 		attrs[attrCount].type = B_UINT8_TYPE;
 		attrs[attrCount].value.ui8 = fDeviceDescriptor.device_subclass;
 		attrCount++;
+
 		attrs[attrCount].name = USB_DEVICE_PROTOCOL;
 		attrs[attrCount].type = B_UINT8_TYPE;
 		attrs[attrCount].value.ui8 = fDeviceDescriptor.device_protocol;
@@ -903,14 +914,17 @@ Device::RegisterNode(device_node *parent)
 				}
 				if (found)
 					continue;
+
 				attrs[attrCount].name = USB_DEVICE_CLASS;
 				attrs[attrCount].type = B_UINT8_TYPE;
 				attrs[attrCount].value.ui8 = descriptor->interface_class;
 				attrCount++;
+
 				attrs[attrCount].name = USB_DEVICE_SUBCLASS;
 				attrs[attrCount].type = B_UINT8_TYPE;
 				attrs[attrCount].value.ui8 = descriptor->interface_subclass;
 				attrCount++;
+
 				attrs[attrCount].name = USB_DEVICE_PROTOCOL;
 				attrs[attrCount].type = B_UINT8_TYPE;
 				attrs[attrCount].value.ui8 = descriptor->interface_protocol;
@@ -919,10 +933,14 @@ Device::RegisterNode(device_node *parent)
 		}
 	}
 
+	attrs[attrCount].name = NULL;
+	attrs[attrCount].type = 0;
+	attrs[attrCount].value.string = NULL;
+	attrCount++;
 
 	device_node* node = NULL;
 	if (gDeviceManager->register_node(parent, USB_DEVICE_MODULE_NAME, attrs,
-		NULL, &node) != B_OK) {
+			NULL, &node) != B_OK) {
 		TRACE_ERROR("failed to register device node\n");
 	} else
 		fNode = node;
