@@ -1840,26 +1840,16 @@ usb_disk_supports_device(device_node *parent)
 	// make sure parent is really the usb bus manager
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return -1;
-
-	if (strcmp(bus, "usb"))
+	if (strcmp(bus, "usb") != 0)
 		return 0.0;
 
-	device_attr *attr = NULL;
 	uint8 baseClass = 0, subclass = 0, protocol = 0;
-	while (gDeviceManager->get_next_attr(parent, &attr) == B_OK) {
-		if (attr->type != B_UINT8_TYPE)
-			continue;
-
-		if (!strcmp(attr->name, USB_DEVICE_CLASS))
-			baseClass = attr->value.ui8;
-		if (!strcmp(attr->name, USB_DEVICE_SUBCLASS))
-			subclass = attr->value.ui8;
-		if (!strcmp(attr->name, USB_DEVICE_PROTOCOL))
-			protocol = attr->value.ui8;
-
-		if (baseClass != 0 && subclass != 0 && protocol != 0)
-			break;
-	}
+	if (gDeviceManager->get_attr_uint8(parent, USB_DEVICE_CLASS, &baseClass, false) != B_OK)
+		return 0.0;
+	if (gDeviceManager->get_attr_uint8(parent, USB_DEVICE_SUBCLASS, &subclass, false) != B_OK)
+		return 0.0;
+	if (gDeviceManager->get_attr_uint8(parent, USB_DEVICE_PROTOCOL, &protocol, false) != B_OK)
+		return 0.0;
 
 	static usb_support_descriptor supportedDevices[] = {
 		{ 0x08 /* mass storage */, 0x06 /* SCSI */, 0x50 /* bulk */, 0, 0 },
