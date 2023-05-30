@@ -60,7 +60,6 @@ loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	status_t status = get_module(NET_STACK_MODULE_NAME, (module_info**)&stack);
 	if (status != B_OK)
 		return status;
-
 	status = stack->register_device_deframer(interface->device,
 		&loopback_deframe);
 	if (status != B_OK)
@@ -112,7 +111,13 @@ loopback_frame_send_data(net_datalink_protocol* protocol, net_buffer* buffer)
 
 	ether_header &header = bufferHeader.Data();
 
-	switch (buffer->interface_address->domain->family) {
+	int family;
+	if (buffer->interface_address != NULL)
+		family = buffer->interface_address->domain->family;
+	else
+		family = buffer->destination->sa_family;
+
+	switch (family) {
 		case AF_INET:
 			header.type = B_HOST_TO_BENDIAN_INT16(ETHER_TYPE_IP);
 			break;
