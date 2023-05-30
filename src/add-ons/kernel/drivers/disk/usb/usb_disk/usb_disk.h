@@ -40,6 +40,7 @@ typedef struct disk_device_s {
 	usb_device	device;
 	bool		removed;
 	uint32		open_count;
+	recursive_lock io_lock;
 	mutex		lock;
 
 	// IO operations

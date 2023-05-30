@@ -87,7 +87,6 @@ struct {
 static void	usb_disk_callback(void *cookie, status_t status, void *data,
 				size_t actualLength);
 
-status_t	usb_disk_mass_storage_reset(disk_device *device);
 uint8		usb_disk_get_max_lun(disk_device *device);
 void		usb_disk_reset_recovery(disk_device *device);
 status_t	usb_disk_receive_csw(disk_device *device,
@@ -111,12 +110,14 @@ disk_device_s::disk_device_s()
 	notify(-1),
 	interruptLock(-1)
 {
+	recursive_lock_init(&io_lock, "usb_disk i/o lock");
 	mutex_init(&lock, "usb_disk device lock");
 }
 
 
 disk_device_s::~disk_device_s()
 {
+	recursive_lock_destroy(&io_lock);
 	mutex_destroy(&lock);
 
 	if (notify >= 0)
@@ -156,7 +157,7 @@ usb_disk_free_device_and_luns(disk_device *device)
 //
 
 
-status_t
+static status_t
 usb_disk_mass_storage_reset(disk_device *device)
 {
 	return gUSBModule->send_request(device->device, USB_REQTYPE_INTERFACE_OUT
@@ -168,6 +169,8 @@ usb_disk_mass_storage_reset(disk_device *device)
 uint8
 usb_disk_get_max_lun(disk_device *device)
 {
+	ASSERT_LOCKED_RECURSIVE(&device->io_lock);
+
 	uint8 result = 0;
 	size_t actualLength = 0;
 
@@ -200,6 +203,7 @@ void
 usb_disk_reset_recovery(disk_device *device, err_act *_action)
 {
 	TRACE("reset recovery\n");
+	ASSERT_LOCKED_RECURSIVE(&device->io_lock);
 
 	usb_disk_mass_storage_reset(device);
 	usb_disk_clear_halt(device->bulk_in);
@@ -240,6 +244,7 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, const transfer_dat
 		return result;
 	}
 
+	mutex_unlock(&device->lock);
 	do {
 		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT,
 			10 * 1000 * 1000);
@@ -253,6 +258,7 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, const transfer_dat
 			acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, 0);
 		}
 	} while (result == B_INTERRUPTED);
+	mutex_lock(&device->lock);
 
 	if (result != B_OK) {
 		TRACE_ALWAYS("acquire_sem failed while waiting for data transfer: %s\n",
@@ -280,8 +286,8 @@ usb_disk_transfer_data(disk_device *device, bool directionIn,
 }
 
 
-void
-usb_disk_interrupt(void* cookie, int32 status, void* data, size_t length)
+static void
+callback_interrupt(void* cookie, int32 status, void* data, size_t length)
 {
 	disk_device* device = (disk_device*)cookie;
 	// We release the lock even if the interrupt is invalid. This way there
@@ -300,17 +306,18 @@ usb_disk_interrupt(void* cookie, int32 status, void* data, size_t length)
 
 	// Reschedule the interrupt for next time
 	gUSBModule->queue_interrupt(device->interrupt, device->interruptBuffer, 2,
-		usb_disk_interrupt, cookie);
+		callback_interrupt, cookie);
 }
 
 
-status_t
-usb_disk_receive_csw_interrupt(disk_device *device,
+static status_t
+receive_csw_interrupt(disk_device *device,
 	interrupt_status_wrapper *status)
 {
 	TRACE("Waiting for result...\n");
+
 	gUSBModule->queue_interrupt(device->interrupt,
-			device->interruptBuffer, 2, usb_disk_interrupt, device);
+			device->interruptBuffer, 2, callback_interrupt, device);
 
 	acquire_sem(device->interruptLock);
 
@@ -320,8 +327,9 @@ usb_disk_receive_csw_interrupt(disk_device *device,
 	return B_OK;
 }
 
-status_t
-usb_disk_receive_csw_bulk(disk_device *device,
+
+static status_t
+receive_csw_bulk(disk_device *device,
 	usb_massbulk_command_status_wrapper *status)
 {
 	status_t result = usb_disk_transfer_data(device, true, status,
@@ -348,6 +356,7 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 	TRACE("operation: lun: %u; op: 0x%x; data: %p; dlen: %p (%lu); in: %c\n",
 		lun->logical_unit_number, operation[0], data.vecs, dataLength,
 		dataLength ? *dataLength : 0, directionIn ? 'y' : 'n');
+	ASSERT_LOCKED_RECURSIVE(&lun->device->io_lock);
 
 	disk_device* device = lun->device;
 
@@ -395,13 +404,13 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 	// step 3 : wait for the device to send the interrupt ACK
 	if (operation[0] != SCSI_REQUEST_SENSE_6) {
 		interrupt_status_wrapper status;
-		result =  usb_disk_receive_csw_interrupt(device, &status);
+		result =  receive_csw_interrupt(device, &status);
 		if (result != B_OK) {
 			// in case of a stall or error clear the stall and try again
 			TRACE("Error receiving interrupt: %s. Retrying...\n",
 				strerror(result));
 			usb_disk_clear_halt(device->bulk_in);
-			result = usb_disk_receive_csw_interrupt(device, &status);
+			result = receive_csw_interrupt(device, &status);
 		}
 
 		if (result != B_OK) {
@@ -426,6 +435,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLengt
 		lun->logical_unit_number, operation[0],
 		data.vecs, dataLength, dataLength ? *dataLength : 0,
 		directionIn ? 'y' : 'n');
+	ASSERT_LOCKED_RECURSIVE(&lun->device->io_lock);
 
 	disk_device *device = lun->device;
 	usb_massbulk_command_block_wrapper command;
@@ -477,11 +487,11 @@ usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLengt
 	}
 
 	usb_massbulk_command_status_wrapper status;
-	result =  usb_disk_receive_csw_bulk(device, &status);
+	result =  receive_csw_bulk(device, &status);
 	if (result != B_OK) {
 		// in case of a stall or error clear the stall and try again
 		usb_disk_clear_halt(device->bulk_in);
-		result = usb_disk_receive_csw_bulk(device, &status);
+		result = receive_csw_bulk(device, &status);
 	}
 
 	if (result != B_OK) {
@@ -1020,6 +1030,9 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 {
 	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
 	disk_device *device = new(std::nothrow) disk_device;
+	recursive_lock_lock(&device->io_lock);
+	mutex_lock(&device->lock);
+
 	device->node = node;
 	device->device = newDevice;
 	device->removed = false;
@@ -1203,6 +1216,9 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 		usb_disk_free_device_and_luns(device);
 		return result;
 	}
+
+	mutex_unlock(&device->lock);
+	recursive_lock_unlock(&device->io_lock);
 
 	TRACE("new device: 0x%p\n", device);
 	*cookie = (void *)device;
@@ -1443,10 +1459,11 @@ usb_disk_close(void *cookie)
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 
-	mutex_lock(&device->lock);
+	RecursiveLocker ioLocker(device->io_lock);
+	MutexLocker deviceLocker(device->lock);
+
 	if (!device->removed)
 		usb_disk_synchronize(lun, false);
-	mutex_unlock(&device->lock);
 
 	return B_OK;
 }
@@ -1494,6 +1511,42 @@ normalize_name(char *name, size_t nameLength)
 
 
 static status_t
+acquire_io_lock(disk_device *device, MutexLocker& locker, RecursiveLocker& ioLocker)
+{
+	locker.Unlock();
+	ioLocker.SetTo(device->io_lock, false, true);
+	locker.Lock();
+
+	if (!locker.IsLocked() || !ioLocker.IsLocked())
+		return B_ERROR;
+
+	if (device->removed)
+		return B_DEV_NOT_READY;
+
+	return B_OK;
+}
+
+
+static status_t
+handle_media_change(device_lun *lun, MutexLocker& locker)
+{
+	RecursiveLocker ioLocker;
+	status_t result = acquire_io_lock(lun->device, locker, ioLocker);
+	if (result != B_OK)
+		return result;
+
+	// It may have been handled while we were waiting for locks.
+	if (lun->media_changed) {
+		result = usb_disk_update_capacity(lun);
+		if (result != B_OK)
+			return result;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
 usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	device_lun *lun = (device_lun *)cookie;
@@ -1501,12 +1554,13 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 	MutexLocker locker(&device->lock);
 	if (device->removed)
 		return B_DEV_NOT_READY;
+	RecursiveLocker ioLocker;
 
 	switch (op) {
 		case B_GET_DEVICE_SIZE:
 		{
 			if (lun->media_changed) {
-				status_t result = usb_disk_update_capacity(lun);
+				status_t result = handle_media_change(lun, locker);
 				if (result != B_OK)
 					return result;
 			}
@@ -1517,6 +1571,10 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_GET_MEDIA_STATUS:
 		{
+			status_t result = acquire_io_lock(lun->device, locker, ioLocker);
+			if (result != B_OK)
+				return result;
+
 			err_act action = err_act_ok;
 			status_t ready;
 			for (uint32 tries = 0; tries < 3; tries++) {
@@ -1544,7 +1602,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			if (buffer == NULL || length > sizeof(device_geometry))
 				return B_BAD_VALUE;
 			if (lun->media_changed) {
-				status_t result = usb_disk_update_capacity(lun);
+				status_t result = handle_media_change(lun, locker);
 				if (result != B_OK)
 					return result;
 			}
@@ -1565,11 +1623,22 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		}
 
 		case B_FLUSH_DRIVE_CACHE:
+		{
 			TRACE("B_FLUSH_DRIVE_CACHE\n");
+
+			status_t result = acquire_io_lock(lun->device, locker, ioLocker);
+			if (result != B_OK)
+				return result;
+
 			return usb_disk_synchronize(lun, true);
+		}
 
 		case B_EJECT_DEVICE:
 		{
+			status_t result = acquire_io_lock(lun->device, locker, ioLocker);
+			if (result != B_OK)
+				return result;
+
 			uint8 commandBlock[12];
 			memset(commandBlock, 0, sizeof(commandBlock));
 
@@ -1583,6 +1652,10 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 		case B_LOAD_MEDIA:
 		{
+			status_t result = acquire_io_lock(lun->device, locker, ioLocker);
+			if (result != B_OK)
+				return result;
+
 			uint8 commandBlock[12];
 			memset(commandBlock, 0, sizeof(commandBlock));
 
@@ -1818,11 +1891,12 @@ usb_disk_io(void *cookie, io_request *request)
 
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
-	mutex_lock(&device->lock);
-	if (device->removed) {
-		mutex_unlock(&device->lock);
+
+	RecursiveLocker ioLocker(device->io_lock);
+	MutexLocker deviceLocker(device->lock);
+
+	if (device->removed)
 		return B_DEV_NOT_READY;
-	}
 
 	status_t status;
 	if (!usb_disk_needs_bounce(lun, request)) {
@@ -1831,7 +1905,8 @@ usb_disk_io(void *cookie, io_request *request)
 		status = usb_disk_bounced_io(lun, request);
 	}
 
-	mutex_unlock(&device->lock);
+	deviceLocker.Unlock();
+	ioLocker.Unlock();
 
 	if (request->Status() > 0)
 		request->SetStatusAndNotify(status);
