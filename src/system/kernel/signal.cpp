@@ -821,8 +821,19 @@ notify_debugger(Thread* thread, Signal* signal, struct sigaction& handler,
 
 	threadDebugInfoLocker.Unlock();
 
+	siginfo_t info;
+	info.si_signo = signal->Number();
+	info.si_code = signal->SignalCode();
+	info.si_errno = signal->ErrorCode();
+	info.si_pid = signal->SendingProcess();
+	info.si_uid = signal->SendingUser();
+	info.si_addr = signal->Address();
+	info.si_status = signal->Status();
+	info.si_band = signal->PollBand();
+	info.si_value = signal->UserValue();
+
 	// deliver the event
-	return user_debug_handle_signal(signal->Number(), &handler, deadly);
+	return user_debug_handle_signal(signal->Number(), &handler, &info, deadly);
 }
 
 

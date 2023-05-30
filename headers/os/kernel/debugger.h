@@ -533,6 +533,7 @@ typedef struct {
 	debug_origin		origin;
 	int					signal;		// the signal
 	struct sigaction	handler;	// the signal handler
+	siginfo_t			info;		// the signal info
 	bool				deadly;		// true, if handling the signal will kill
 									// the team
 } debug_signal_received;

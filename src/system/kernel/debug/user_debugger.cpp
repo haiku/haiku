@@ -928,7 +928,8 @@ user_debug_exception_occurred(debug_exception_type exception, int signal)
 
 
 bool
-user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
+user_debug_handle_signal(int signal, struct sigaction *handler, siginfo_t *info,
+	bool deadly)
 {
 	// check, if a debugger is installed and is interested in signals
 	Thread *thread = thread_get_current_thread();
@@ -942,6 +943,7 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 	debug_signal_received message;
 	message.signal = signal;
 	message.handler = *handler;
+	message.info = *info;
 	message.deadly = deadly;
 
 	status_t result = thread_hit_debug_event(B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED,

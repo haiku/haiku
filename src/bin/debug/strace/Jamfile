@@ -24,6 +24,7 @@ local straceSources =
 	fcntl.cpp
 	ioctl.cpp
 	network.cpp
+	signals.cpp
 ;
 
 # Our compiler badly chokes when compiling the generated file. So will
