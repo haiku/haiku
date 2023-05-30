@@ -35,6 +35,8 @@ static constexpr bool kTracePageDirectory = false;
 #define PHYSICAL_MEMORY_LOW		0x00000000
 #define PHYSICAL_MEMORY_HIGH	0x8000000000ull
 
+#define USER_VECTOR_ADDR_HIGH	0xffff0000
+
 #define ALIGN_PAGEDIR			(1024 * 16)
 #define MAX_PAGE_TABLES			192
 #define PAGE_TABLE_AREA_SIZE	(MAX_PAGE_TABLES * ARM_MMU_L2_COARSE_TABLE_SIZE)
@@ -42,6 +44,7 @@ static constexpr bool kTracePageDirectory = false;
 static uint32_t *sPageDirectory = NULL;
 static uint32_t *sNextPageTable = NULL;
 static uint32_t *sLastPageTable = NULL;
+static uint32_t *sVectorTable = (uint32_t*)USER_VECTOR_ADDR_HIGH;
 
 
 static void
@@ -232,12 +235,23 @@ arch_mmu_allocate_page_tables(void)
 }
 
 
+static void
+arch_mmu_allocate_vector_table(void)
+{
+	if (platform_allocate_region((void **)&sVectorTable, B_PAGE_SIZE, 0, false) != B_OK)
+		panic("Failed to allocate vector table.");
+
+	memset(sVectorTable, 0, B_PAGE_SIZE);
+}
+
+
 uint32_t
 arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	efi_memory_descriptor *memoryMap, size_t descriptorSize,
 	uint32_t descriptorVersion)
 {
 	arch_mmu_allocate_page_tables();
+	arch_mmu_allocate_vector_table();
 
 	build_physical_memory_list(memoryMapSize, memoryMap,
 		descriptorSize, descriptorVersion,

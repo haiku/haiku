@@ -24,6 +24,8 @@
 #define CPSR_F				0x40
 #define CPSR_I				0x80
 
+#define SCTLR_HIGH_VECTORS	0x00002000
+
 #define FSR_WNR				0x800
 #define FSR_LPAE			0x200
 

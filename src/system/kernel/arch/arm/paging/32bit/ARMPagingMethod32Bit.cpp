@@ -408,7 +408,7 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 
 	// now, fill in the pentry
 	PutPageTableEntryInTable(ptEntry,
-		physicalAddress, attributes, 0, IS_KERNEL_ADDRESS(virtualAddress));
+		physicalAddress, attributes | PAGE_ACCESSED, 0, IS_KERNEL_ADDRESS(virtualAddress));
 
 	return B_OK;
 }
@@ -502,7 +502,6 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 		| ARM_MMU_L2_TYPE_SMALLNEW
 		| MemoryTypeToPageTableEntryFlags(memoryType)
 		| AttributesToPageTableEntryFlags(attributes)
-		| ARM_MMU_L2_FLAG_AP0
 		| (globalPage ? 0 : ARM_MMU_L2_FLAG_NG);
 
 	// put it in the page table

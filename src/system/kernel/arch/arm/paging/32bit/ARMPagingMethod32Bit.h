@@ -169,6 +169,9 @@ ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(uint32 attributes)
 		apFlags |= ARM_MMU_L2_FLAG_XN;
 	}
 
+	if ((attributes & PAGE_ACCESSED) != 0)
+		apFlags |= ARM_MMU_L2_FLAG_AP0;
+
 	return apFlags;
 }
 

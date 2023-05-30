@@ -60,8 +60,6 @@
 extern int _vectors_start;
 extern int _vectors_end;
 
-static area_id sVectorPageArea;
-static void *sVectorPageAddress;
 static area_id sUserVectorPageArea;
 static void *sUserVectorPageAddress;
 //static fdt_module_info *sFdtModule;
@@ -120,52 +118,40 @@ print_iframe(const char *event, struct iframe *frame)
 }
 
 
+extern "C" void arm_vector_init(void);
+
+
 status_t
 arch_int_init(kernel_args *args)
 {
+	TRACE("arch_int_init\n");
+
+	// copy vector code to vector page
+	memcpy((void*)USER_VECTOR_ADDR_HIGH, &_vectors_start, VECTORPAGE_SIZE);
+
+	// initialize stack for vectors
+	arm_vector_init();
+
+	// enable high vectors
+	arm_set_sctlr(arm_get_sctlr() | SCTLR_HIGH_VECTORS);
+
 	return B_OK;
 }
-
-
-extern "C" void arm_vector_init(void);
 
 
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
-	// create a read/write kernel area
-	sVectorPageArea = create_area("vectorpage", (void **)&sVectorPageAddress,
-		B_ANY_ADDRESS, VECTORPAGE_SIZE, B_FULL_LOCK,
-		B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA);
-	if (sVectorPageArea < 0)
-		panic("vector page could not be created!");
+	TRACE("arch_int_init_post_vm\n");
 
-	// clone it at a fixed address with user read/only permissions
 	sUserVectorPageAddress = (addr_t*)USER_VECTOR_ADDR_HIGH;
-	sUserVectorPageArea = clone_area("user_vectorpage",
+	sUserVectorPageArea = create_area("user_vectorpage",
 		(void **)&sUserVectorPageAddress, B_EXACT_ADDRESS,
-		B_READ_AREA | B_EXECUTE_AREA, sVectorPageArea);
+		B_PAGE_SIZE, B_ALREADY_WIRED, B_READ_AREA | B_EXECUTE_AREA);
 
 	if (sUserVectorPageArea < 0)
 		panic("user vector page @ %p could not be created (%x)!",
-			sVectorPageAddress, sUserVectorPageArea);
-
-	// copy vectors into the newly created area
-	memcpy(sVectorPageAddress, &_vectors_start, VECTORPAGE_SIZE);
-
-	arm_vector_init();
-
-	// see if high vectors are enabled
-	if ((arm_get_sctlr() & (1 << 13)) != 0)
-		dprintf("High vectors already enabled\n");
-	else {
-		arm_set_sctlr(arm_get_sctlr() | (1 << 13));
-
-		if ((arm_get_sctlr() & (1 << 13)) == 0)
-			dprintf("Unable to enable high vectors!\n");
-		else
-			dprintf("Enabled high vectors\n");
-	}
+			sUserVectorPageAddress, sUserVectorPageArea);
 
 	if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_GICV2,
 		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
