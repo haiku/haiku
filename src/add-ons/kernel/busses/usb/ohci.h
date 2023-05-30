@@ -135,17 +135,21 @@ static	int32						_FinishThread(void *data);
 
 		size_t						_WriteDescriptorChain(
 										ohci_general_td *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount,
+										bool physical);
 		size_t						_ReadDescriptorChain(
 										ohci_general_td *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount,
+										bool physical);
 
 		size_t						_WriteIsochronousDescriptorChain(
 										ohci_isochronous_td *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount,
+										bool physical);
 		void						_ReadIsochronousDescriptorChain(
 										ohci_isochronous_td *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount,
+										bool physical);
 
 		size_t						_ReadActualLength(
 										ohci_general_td *topDescriptor);

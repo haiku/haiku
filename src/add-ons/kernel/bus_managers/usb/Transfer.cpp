@@ -85,6 +85,7 @@ void
 Transfer::SetVector(iovec *vector, size_t vectorCount)
 {
 	fPhysical = false;
+
 	fVector = new(std::nothrow) generic_io_vec[vectorCount];
 	for (size_t i = 0; i < vectorCount; i++) {
 		fVector[i].base = (generic_addr_t)vector[i].iov_base;
@@ -93,6 +94,30 @@ Transfer::SetVector(iovec *vector, size_t vectorCount)
 	fVectorCount = vectorCount;
 	fBaseAddress = vector[0].iov_base;
 
+	_CheckFragmented();
+}
+
+
+void
+Transfer::SetVector(physical_entry *vector, size_t vectorCount)
+{
+	fPhysical = true;
+
+	fVector = new(std::nothrow) generic_io_vec[vectorCount];
+	for (size_t i = 0; i < vectorCount; i++) {
+		fVector[i].base = (generic_addr_t)vector[i].address;
+		fVector[i].length = vector[i].size;
+	}
+	fVectorCount = vectorCount;
+	fBaseAddress = NULL;
+
+	_CheckFragmented();
+}
+
+
+void
+Transfer::_CheckFragmented()
+{
 	size_t length = 0;
 	for (size_t i = 0; i < fVectorCount && length <= USB_MAX_FRAGMENT_SIZE; i++)
 		length += fVector[i].length;
@@ -138,8 +163,8 @@ Transfer::AdvanceByFragment(size_t actualLength)
 status_t
 Transfer::InitKernelAccess()
 {
-	// nothing to do if we are already prepared
-	if (fClonedArea >= B_OK)
+	// nothing to do if we are already prepared, or have a physical request
+	if (fClonedArea >= B_OK || fPhysical)
 		return B_OK;
 
 	// we might need to access a buffer in userspace. this will not

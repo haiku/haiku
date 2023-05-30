@@ -182,6 +182,11 @@ struct usb_module_info {
 										usb_callback_func callback,
 										void *callbackCookie);
 
+	status_t						(*queue_bulk_v_physical)(usb_pipe pipe,
+										physical_entry *vectors, size_t vectorCount,
+										usb_callback_func callback,
+										void *callbackCookie);
+
 	status_t						(*queue_isochronous)(usb_pipe pipe,
 										void *data, size_t dataLength,
 										usb_iso_packet_descriptor *packetDesc,
@@ -205,6 +210,9 @@ struct usb_module_info {
 
 	/* Cancel all pending async requests in a pipe */
 	status_t						(*cancel_queued_transfers)(usb_pipe pipe);
+
+	/* Cancel all pending async requests in a device control pipe */
+	status_t						(*cancel_queued_requests)(usb_device device);
 
 	/* Tuning, configuration of timeouts, etc */
 	status_t						(*usb_ioctl)(uint32 opcode, void *buffer,
@@ -247,14 +255,10 @@ struct usb_module_info {
 										uint8 portIndex);
 	status_t						(*disable_port)(usb_device hub,
 										uint8 portIndex);
-
-	/* Cancel all pending async requests in a device control pipe */
-	status_t						(*cancel_queued_requests)(usb_device device);
-
 };
 
 
-#define	B_USB_MODULE_NAME		"bus_managers/usb/v3"
+#define	B_USB_MODULE_NAME		"bus_managers/usb/v3.1"
 
 
 #ifdef __cplusplus

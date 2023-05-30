@@ -16,6 +16,9 @@
 #include "usbspec_private.h"
 #include <lock.h>
 #include <util/Vector.h>
+
+// include vm.h before iovec_support.h for generic_memcpy, which is used by the bus drivers.
+#include <vm/vm.h>
 #include <util/iovec_support.h>
 
 
@@ -475,12 +478,10 @@ virtual	const char *					TypeName() const { return "bulk pipe"; }
 											size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
-		status_t						QueueBulkV(iovec *vector,
-											size_t vectorCount,
-											usb_callback_func callback,
-											void *callbackCookie,
-											bool physical);
-};
+		status_t						QueueBulkV(iovec *vector, size_t vectorCount,
+											usb_callback_func callback, void *callbackCookie);
+		status_t						QueueBulkV(physical_entry *vector, size_t vectorCount,
+											usb_callback_func callback, void *callbackCookie);};
 
 
 class IsochronousPipe : public Pipe {
@@ -721,6 +722,7 @@ public:
 		bool						IsPhysical() const { return fPhysical; }
 
 		void						SetVector(iovec *vector, size_t vectorCount);
+		void						SetVector(physical_entry *vector, size_t vectorCount);
 		generic_io_vec *			Vector() { return fVector; }
 		size_t						VectorCount() const { return fVectorCount; }
 
@@ -747,6 +749,7 @@ public:
 		const char *				TypeName() const { return "transfer"; }
 
 private:
+		void						_CheckFragmented();
 		status_t					_CalculateBandwidth();
 
 		// Data that is related to the transfer

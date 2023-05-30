@@ -184,9 +184,9 @@ static int32						FinishIsochronousThread(void *data);
 										uhci_td *second);
 
 		size_t						WriteDescriptorChain(uhci_td *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount, bool physical);
 		size_t						ReadDescriptorChain(uhci_td *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount,
+										generic_io_vec *vector, size_t vectorCount, bool physical,
 										uint8 *lastDataToggle);
 		size_t						ReadActualLength(uhci_td *topDescriptor,
 										uint8 *lastDataToggle);

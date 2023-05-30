@@ -178,16 +178,15 @@ static int32						FinishIsochronousThread(void *data);
 
 		size_t						WriteDescriptorChain(
 										ehci_qtd *topDescriptor,
-										generic_io_vec *vector, size_t vectorCount);
+										generic_io_vec *vector, size_t vectorCount,
+										bool physical);
 		size_t						ReadDescriptorChain(ehci_qtd *topDescriptor,
 										generic_io_vec *vector, size_t vectorCount,
-										bool *nextDataToggle);
+										bool physical, bool *nextDataToggle);
 		size_t						ReadActualLength(ehci_qtd *topDescriptor,
 										bool *nextDataToggle);
 		size_t						WriteIsochronousDescriptorChain(
-										isochronous_transfer_data *transfer,
-										uint32 packetCount,
-										generic_io_vec *vector);
+										isochronous_transfer_data *transfer);
 		size_t						ReadIsochronousDescriptorChain(
 										isochronous_transfer_data *transfer);
 

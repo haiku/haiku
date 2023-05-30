@@ -1267,7 +1267,7 @@ OHCI::_FinishTransfers()
 						transfer->transfer->PrepareKernelAccess();
 						actualLength = _ReadDescriptorChain(
 							transfer->data_descriptor,
-							vector, vectorCount);
+							vector, vectorCount, transfer->transfer->IsPhysical());
 					} else if (transfer->data_descriptor) {
 						// read the actual length that was sent
 						actualLength = _ReadActualLength(
@@ -1436,7 +1436,7 @@ OHCI::_FinishIsochronousTransfer(transfer_data *transfer,
 				transfer->transfer->PrepareKernelAccess();
 				_ReadIsochronousDescriptorChain(
 					(ohci_isochronous_td*)transfer->data_descriptor,
-					vector, vectorCount);
+					vector, vectorCount, transfer->transfer->IsPhysical());
 			}
 		}
 
@@ -1485,7 +1485,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 	generic_io_vec vector;
 	vector.base = (generic_addr_t)requestData;
 	vector.length = sizeof(usb_request_data);
-	_WriteDescriptorChain(setupDescriptor, &vector, 1);
+	_WriteDescriptorChain(setupDescriptor, &vector, 1, false);
 
 	status_t result;
 	ohci_general_td *dataDescriptor = NULL;
@@ -1502,7 +1502,7 @@ OHCI::_SubmitRequest(Transfer *transfer)
 
 		if (!directionIn) {
 			_WriteDescriptorChain(dataDescriptor, transfer->Vector(),
-				transfer->VectorCount());
+				transfer->VectorCount(), transfer->IsPhysical());
 		}
 
 		_LinkDescriptors(setupDescriptor, dataDescriptor);
@@ -1562,7 +1562,7 @@ OHCI::_SubmitTransfer(Transfer *transfer)
 
 	if (!directionIn) {
 		_WriteDescriptorChain(firstDescriptor, transfer->Vector(),
-			transfer->VectorCount());
+			transfer->VectorCount(), transfer->IsPhysical());
 	}
 
 	// Add to the transfer list
@@ -1631,7 +1631,7 @@ OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
 	// If direction is out set every descriptor data
 	if (pipe->Direction() == Pipe::Out)
 		_WriteIsochronousDescriptorChain(firstDescriptor,
-			transfer->Vector(), transfer->VectorCount());
+			transfer->Vector(), transfer->VectorCount(), transfer->IsPhysical());
 	else
 		// Initialize the packet descriptors
 		for (uint32 i = 0; i < isochronousData->packet_count; i++) {
@@ -2279,7 +2279,7 @@ OHCI::_FreeIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor)
 
 size_t
 OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vector,
-	size_t vectorCount)
+	size_t vectorCount, bool physical)
 {
 	ohci_general_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2298,8 +2298,10 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vect
 			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
 				vectorOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)current->buffer_logical + bufferOffset,
-				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
+			status_t status = generic_memcpy(
+				(generic_addr_t)current->buffer_logical + bufferOffset, false,
+				vector[vectorIndex].base + vectorOffset, physical, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2334,7 +2336,7 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vect
 
 size_t
 OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
-	generic_io_vec *vector, size_t vectorCount)
+	generic_io_vec *vector, size_t vectorCount, bool physical)
 {
 	ohci_isochronous_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2353,8 +2355,10 @@ OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
 				vectorOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)current->buffer_logical + bufferOffset,
-				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
+			status_t status = generic_memcpy(
+				(generic_addr_t)current->buffer_logical + bufferOffset, false,
+				vector[vectorIndex].base + vectorOffset, physical, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2389,7 +2393,7 @@ OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 
 size_t
 OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vector,
-	size_t vectorCount)
+	size_t vectorCount, bool physical)
 {
 	ohci_general_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2415,8 +2419,10 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vecto
 			TRACE("copying %ld bytes to vectorOffset %ld from"
 				" bufferOffset %ld at index %ld of %ld\n", length, vectorOffset,
 				bufferOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
-				(uint8 *)current->buffer_logical + bufferOffset, length);
+			status_t status = generic_memcpy(
+				vector[vectorIndex].base + vectorOffset, physical,
+				(generic_addr_t)current->buffer_logical + bufferOffset, false, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2448,7 +2454,7 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vecto
 
 void
 OHCI::_ReadIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
-	generic_io_vec *vector, size_t vectorCount)
+	generic_io_vec *vector, size_t vectorCount, bool physical)
 {
 	ohci_isochronous_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2467,8 +2473,10 @@ OHCI::_ReadIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 				TRACE("copying %ld bytes to vectorOffset %ld from bufferOffset"
 					" %ld at index %ld of %ld\n", length, vectorOffset,
 					bufferOffset, vectorIndex, vectorCount);
-				memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
-					(uint8 *)current->buffer_logical + bufferOffset, length);
+				status_t status = generic_memcpy(
+					vector[vectorIndex].base + vectorOffset, physical,
+					(generic_addr_t)current->buffer_logical + bufferOffset, false, length);
+				ASSERT(status == B_OK);
 
 				actualLength += length;
 				vectorOffset += length;

@@ -15,7 +15,32 @@ typedef struct generic_io_vec {
 } generic_io_vec;
 
 
+#ifdef _KERNEL_VM_VM_H
+
+static inline status_t
+generic_memcpy(generic_addr_t dest, bool destPhysical, generic_addr_t src, bool srcPhysical,
+	generic_size_t size, bool user = false)
+{
+	if (!srcPhysical && !destPhysical) {
+		if (user)
+			return user_memcpy((void*)dest, (void*)src, size);
+		memcpy((void*)dest, (void*)src, size);
+		return B_OK;
+	} else if (destPhysical && !srcPhysical) {
+		return vm_memcpy_to_physical(dest, (const void*)src, size, user);
+	} else if (!destPhysical && srcPhysical) {
+		return vm_memcpy_from_physical((void*)dest, src, size, user);
+	}
+
+	panic("generic_memcpy: physical -> physical not supported!");
+	return B_NOT_SUPPORTED;
+}
+
+#endif
+
+
 #ifdef IS_USER_ADDRESS
+
 static inline status_t
 get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec*& vecs,
 	bool permitNull = false)
@@ -53,6 +78,7 @@ get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec*& vecs,
 
 	return B_OK;
 }
+
 #endif
 
 

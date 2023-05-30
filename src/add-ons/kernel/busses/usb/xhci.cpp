@@ -877,8 +877,8 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 		if (!directionIn) {
 			transfer->PrepareKernelAccess();
-			memcpy(descriptor->buffers[0],
-				(uint8 *)transfer->Vector()[0].base, requestData->Length);
+			WriteDescriptor(descriptor, transfer->Vector(),
+				transfer->VectorCount(), transfer->IsPhysical());
 		}
 
 		index++;
@@ -1045,7 +1045,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 			FreeDescriptor(td);
 			return status;
 		}
-		WriteDescriptor(td, transfer->Vector(), transfer->VectorCount());
+		WriteDescriptor(td, transfer->Vector(),
+			transfer->VectorCount(), transfer->IsPhysical());
 	}
 
 	td->transfer = transfer;
@@ -1236,8 +1237,10 @@ XHCI::CheckDebugTransfer(Transfer *transfer)
 		status_t status = (td->trb_completion_code == COMP_SUCCESS
 			|| td->trb_completion_code == COMP_SHORT_PACKET) ? B_OK : B_ERROR;
 
-		if (status == B_OK && directionIn)
-			ReadDescriptor(td, transfer->Vector(), transfer->VectorCount());
+		if (status == B_OK && directionIn) {
+			ReadDescriptor(td, transfer->Vector(), transfer->VectorCount(),
+				transfer->IsPhysical());
+		}
 
 		FreeDescriptor(td);
 		transfer->SetCallback(NULL, NULL);
@@ -1427,7 +1430,7 @@ XHCI::FreeDescriptor(xhci_td *descriptor)
 
 
 size_t
-XHCI::WriteDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorCount)
+XHCI::WriteDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorCount, bool physical)
 {
 	size_t written = 0;
 
@@ -1437,9 +1440,11 @@ XHCI::WriteDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vector
 
 		while (length > 0 && bufIdx < descriptor->buffer_count) {
 			size_t toCopy = min_c(length, descriptor->buffer_size - bufUsed);
-			memcpy((uint8 *)descriptor->buffers[bufIdx] + bufUsed,
-				(uint8 *)vector[vecIdx].base + (vector[vecIdx].length - length),
+			status_t status = generic_memcpy(
+				(generic_addr_t)descriptor->buffers[bufIdx] + bufUsed, false,
+				vector[vecIdx].base + (vector[vecIdx].length - length), physical,
 				toCopy);
+			ASSERT(status == B_OK);
 
 			written += toCopy;
 			bufUsed += toCopy;
@@ -1457,7 +1462,7 @@ XHCI::WriteDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vector
 
 
 size_t
-XHCI::ReadDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorCount)
+XHCI::ReadDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorCount, bool physical)
 {
 	size_t read = 0;
 
@@ -1467,8 +1472,10 @@ XHCI::ReadDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorC
 
 		while (length > 0 && bufIdx < descriptor->buffer_count) {
 			size_t toCopy = min_c(length, descriptor->buffer_size - bufUsed);
-			memcpy((uint8 *)vector[vecIdx].base + (vector[vecIdx].length - length),
-				(uint8 *)descriptor->buffers[bufIdx] + bufUsed, toCopy);
+			status_t status = generic_memcpy(
+				vector[vecIdx].base + (vector[vecIdx].length - length), physical,
+				(generic_addr_t)descriptor->buffers[bufIdx] + bufUsed, false, toCopy);
+			ASSERT(status == B_OK);
 
 			read += toCopy;
 			bufUsed += toCopy;
@@ -3116,7 +3123,7 @@ XHCI::FinishTransfers()
 				status_t status = transfer->PrepareKernelAccess();
 				if (status == B_OK) {
 					ReadDescriptor(td, transfer->Vector(),
-						transfer->VectorCount());
+						transfer->VectorCount(), transfer->IsPhysical());
 				} else {
 					callbackStatus = status;
 				}

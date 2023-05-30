@@ -1023,7 +1023,7 @@ EHCI::CheckDebugTransfer(Transfer *transfer)
 			size_t vectorCount = transfer->VectorCount();
 
 			ReadDescriptorChain(transferData->data_descriptor,
-				vector, vectorCount, &nextDataToggle);
+				vector, vectorCount, transfer->IsPhysical(), &nextDataToggle);
 		} else if (transferData->data_descriptor != NULL)
 			ReadActualLength(transferData->data_descriptor, &nextDataToggle);
 
@@ -2010,7 +2010,7 @@ EHCI::FinishTransfers()
 						if (callbackStatus == B_OK) {
 							actualLength = ReadDescriptorChain(
 								transfer->data_descriptor,
-								vector, vectorCount,
+								vector, vectorCount, transfer->transfer->IsPhysical(),
 								&nextDataToggle);
 						}
 					} else if (transfer->data_descriptor) {
@@ -2448,7 +2448,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 	generic_io_vec vector;
 	vector.base = (generic_addr_t)requestData;
 	vector.length = sizeof(usb_request_data);
-	WriteDescriptorChain(setupDescriptor, &vector, 1);
+	WriteDescriptorChain(setupDescriptor, &vector, 1, false);
 
 	ehci_qtd *strayDescriptor = queueHead->stray_log;
 	statusDescriptor->token |= EHCI_QTD_IOC | EHCI_QTD_DATA_TOGGLE;
@@ -2476,7 +2476,7 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 				}
 			}
 			WriteDescriptorChain(dataDescriptor, transfer->Vector(),
-				transfer->VectorCount());
+				transfer->VectorCount(), transfer->IsPhysical());
 		}
 
 		LinkDescriptors(setupDescriptor, dataDescriptor, strayDescriptor);
@@ -2523,7 +2523,7 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 			}
 		}
 		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
-			transfer->VectorCount());
+			transfer->VectorCount(), transfer->IsPhysical());
 	}
 
 	queueHead->element_log = firstDescriptor;
@@ -2785,7 +2785,7 @@ EHCI::UnlinkSITDescriptors(ehci_sitd *sitd, ehci_sitd **last)
 
 size_t
 EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
-	size_t vectorCount)
+	size_t vectorCount, bool physical)
 {
 	ehci_qtd *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2801,8 +2801,10 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
 			size_t length = min_c(current->buffer_size - bufferOffset,
 				vector[vectorIndex].length - vectorOffset);
 
-			memcpy((uint8 *)current->buffer_log + bufferOffset,
-				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
+			status_t status = generic_memcpy(
+				(generic_addr_t)current->buffer_log + bufferOffset, false,
+				vector[vectorIndex].base + vectorOffset, physical, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2837,7 +2839,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
 
 size_t
 EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
-	size_t vectorCount, bool *nextDataToggle)
+	size_t vectorCount, bool physical, bool *nextDataToggle)
 {
 	uint32 dataToggle = 0;
 	ehci_qtd *current = topDescriptor;
@@ -2859,8 +2861,10 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
 			size_t length = min_c(bufferSize - bufferOffset,
 				vector[vectorIndex].length - vectorOffset);
 
-			memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
-				(uint8 *)current->buffer_log + bufferOffset, length);
+			status_t status = generic_memcpy(
+				vector[vectorIndex].base + vectorOffset, physical,
+				(generic_addr_t)current->buffer_log + bufferOffset, false, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2922,8 +2926,7 @@ EHCI::ReadActualLength(ehci_qtd *topDescriptor, bool *nextDataToggle)
 
 
 size_t
-EHCI::WriteIsochronousDescriptorChain(isochronous_transfer_data *transfer,
-	uint32 packetCount,	generic_io_vec *vector)
+EHCI::WriteIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 {
 	// TODO implement
 	return 0;
@@ -2935,6 +2938,7 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 {
 	generic_io_vec *vector = transfer->transfer->Vector();
 	size_t vectorCount = transfer->transfer->VectorCount();
+	const bool physical = transfer->transfer->IsPhysical();
 	size_t vectorOffset = 0;
 	size_t vectorIndex = 0;
 	usb_isochronous_data *isochronousData
@@ -2972,8 +2976,11 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 			while (bufferSize > 0) {
 				size_t length = min_c(bufferSize,
 					vector[vectorIndex].length - vectorOffset);
-				memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
-					(uint8 *)transfer->buffer_log + bufferOffset, length);
+				status_t status = generic_memcpy(
+					vector[vectorIndex].base + vectorOffset, physical,
+					(generic_addr_t)transfer->buffer_log + bufferOffset, false, length);
+				ASSERT(status == B_OK);
+
 				offset += length;
 				vectorOffset += length;
 				bufferSize -= length;

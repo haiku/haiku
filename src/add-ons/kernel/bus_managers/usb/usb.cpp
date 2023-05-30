@@ -462,12 +462,12 @@ queue_bulk_v(usb_pipe pipe, iovec *vector, size_t vectorCount,
 		return B_DEV_INVALID_PIPE;
 
 	return ((BulkPipe *)object.Get())->QueueBulkV(vector, vectorCount,
-		callback, callbackCookie, false);
+		callback, callbackCookie);
 }
 
 
 status_t
-queue_bulk_v_physical(usb_pipe pipe, iovec *vector, size_t vectorCount,
+queue_bulk_v_physical(usb_pipe pipe, physical_entry *vector, size_t vectorCount,
 	usb_callback_func callback, void *callbackCookie)
 {
 	TRACE_MODULE("queue_bulk_v_physical(%" B_PRId32 ", %p, %" B_PRIuSIZE
@@ -477,7 +477,7 @@ queue_bulk_v_physical(usb_pipe pipe, iovec *vector, size_t vectorCount,
 		return B_DEV_INVALID_PIPE;
 
 	return ((BulkPipe *)object.Get())->QueueBulkV(vector, vectorCount,
-		callback, callbackCookie, true);
+		callback, callbackCookie);
 }
 
 
@@ -667,7 +667,7 @@ struct usb_module_info gModuleInfoV3 = {
 	// First the bus_manager_info:
 	{
 		{
-			"bus_managers/usb/v3",
+			"bus_managers/usb/v3.1",
 			B_KEEP_LOADED,				// Keep loaded, even if no driver requires it
 			bus_std_ops
 		},
@@ -690,18 +690,18 @@ struct usb_module_info gModuleInfoV3 = {
 	queue_interrupt,					// queue_interrupt
 	queue_bulk,							// queue_bulk
 	queue_bulk_v,						// queue_bulk_v
+	queue_bulk_v_physical,				// queue_bulk_v_physical
 	queue_isochronous,					// queue_isochronous
 	queue_request,						// queue_request
 	set_pipe_policy,					// set_pipe_policy
 	cancel_queued_transfers,			// cancel_queued_transfers
+	cancel_queued_requests,				// cancel_queued_requests
 	usb_ioctl,							// usb_ioctl
 	get_nth_roothub,					// get_nth_roothub
 	get_nth_child,						// get_nth_child
 	get_device_parent,					// get_device_parent
 	reset_port,							// reset_port
 	disable_port,						// disable_port
-	cancel_queued_requests				// cancel_queued_requests
-	//queue_bulk_v_physical				// queue_bulk_v_physical
 };
 
 
@@ -955,10 +955,10 @@ device_std_ops(int32 op, ...)
 			// functions directly instead via official interface, so this
 			// pointer is never read.
 			module_info *dummy;
-			return get_module("bus_managers/usb/v3", &dummy);
+			return get_module(B_USB_MODULE_NAME, &dummy);
 		}
 		case B_MODULE_UNINIT:
-			return put_module("bus_managers/usb/v3");
+			return put_module(B_USB_MODULE_NAME);
 
 		default:
 			return B_ERROR;

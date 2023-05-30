@@ -934,7 +934,7 @@ UHCI::CheckDebugTransfer(Transfer *transfer)
 			size_t vectorCount = transfer->VectorCount();
 
 			ReadDescriptorChain(transferData->first_descriptor,
-				vector, vectorCount, &lastDataToggle);
+				vector, vectorCount, transfer->IsPhysical(), &lastDataToggle);
 		} else {
 			// read the actual length that was sent
 			ReadActualLength(transferData->first_descriptor, &lastDataToggle);
@@ -1094,7 +1094,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 	generic_io_vec vector;
 	vector.base = (generic_addr_t)requestData;
 	vector.length = sizeof(usb_request_data);
-	WriteDescriptorChain(setupDescriptor, &vector, 1);
+	WriteDescriptorChain(setupDescriptor, &vector, 1, false);
 
 	statusDescriptor->status |= TD_CONTROL_IOC;
 	statusDescriptor->token |= TD_TOKEN_DATA1;
@@ -1116,7 +1116,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 
 		if (!directionIn) {
 			WriteDescriptorChain(dataDescriptor, transfer->Vector(),
-				transfer->VectorCount());
+				transfer->VectorCount(), transfer->IsPhysical());
 		}
 
 		LinkDescriptors(setupDescriptor, dataDescriptor);
@@ -1619,7 +1619,7 @@ UHCI::FinishTransfers()
 						transfer->transfer->PrepareKernelAccess();
 						actualLength = ReadDescriptorChain(
 							transfer->data_descriptor,
-							vector, vectorCount,
+							vector, vectorCount, transfer->transfer->IsPhysical(),
 							&lastDataToggle);
 					} else if (transfer->data_descriptor) {
 						// read the actual length that was sent
@@ -2104,7 +2104,7 @@ UHCI::CreateFilledTransfer(Transfer *transfer, uhci_td **_firstDescriptor,
 
 	if (!directionIn) {
 		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
-			transfer->VectorCount());
+			transfer->VectorCount(), transfer->IsPhysical());
 	}
 
 	uhci_qh *transferQueue = CreateTransferQueue(firstDescriptor);
@@ -2277,7 +2277,7 @@ UHCI::LinkDescriptors(uhci_td *first, uhci_td *second)
 
 size_t
 UHCI::WriteDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
-	size_t vectorCount)
+	size_t vectorCount, bool physical)
 {
 	uhci_td *current = topDescriptor;
 	size_t actualLength = 0;
@@ -2296,8 +2296,10 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
 			TRACE("copying %ld bytes to bufferOffset %ld from"
 				" vectorOffset %ld at index %ld of %ld\n", length, bufferOffset,
 				vectorOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)current->buffer_log + bufferOffset,
-				(uint8 *)vector[vectorIndex].base + vectorOffset, length);
+			status_t status = generic_memcpy(
+				(generic_addr_t)current->buffer_log + bufferOffset, false,
+				vector[vectorIndex].base + vectorOffset, physical, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2332,7 +2334,7 @@ UHCI::WriteDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
 
 size_t
 UHCI::ReadDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
-	size_t vectorCount, uint8 *lastDataToggle)
+	size_t vectorCount, bool physical, uint8 *lastDataToggle)
 {
 	uint8 dataToggle = 0;
 	uhci_td *current = topDescriptor;
@@ -2355,8 +2357,10 @@ UHCI::ReadDescriptorChain(uhci_td *topDescriptor, generic_io_vec *vector,
 			TRACE("copying %ld bytes to vectorOffset %ld from"
 				" bufferOffset %ld at index %ld of %ld\n", length, vectorOffset,
 				bufferOffset, vectorIndex, vectorCount);
-			memcpy((uint8 *)vector[vectorIndex].base + vectorOffset,
-				(uint8 *)current->buffer_log + bufferOffset, length);
+			status_t status = generic_memcpy(
+				vector[vectorIndex].base + vectorOffset, physical,
+				(generic_addr_t)current->buffer_log + bufferOffset, false, length);
+			ASSERT(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;

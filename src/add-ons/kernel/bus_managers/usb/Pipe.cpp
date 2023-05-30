@@ -227,7 +227,7 @@ BulkPipe::QueueBulk(void *data, size_t dataLength, usb_callback_func callback,
 
 status_t
 BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
-	usb_callback_func callback, void *callbackCookie, bool physical)
+	usb_callback_func callback, void *callbackCookie)
 {
 	if (vectorCount > 0 && vector == NULL)
 		return B_BAD_VALUE;
@@ -235,8 +235,27 @@ BulkPipe::QueueBulkV(iovec *vector, size_t vectorCount,
 	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer)
 		return B_NO_MEMORY;
-	if (physical)
-		return B_NOT_SUPPORTED;
+
+	transfer->SetVector(vector, vectorCount);
+	transfer->SetCallback(callback, callbackCookie);
+
+	status_t result = GetBusManager()->SubmitTransfer(transfer);
+	if (result < B_OK)
+		delete transfer;
+	return result;
+}
+
+
+status_t
+BulkPipe::QueueBulkV(physical_entry *vector, size_t vectorCount,
+	usb_callback_func callback, void *callbackCookie)
+{
+	if (vectorCount > 0 && vector == NULL)
+		return B_BAD_VALUE;
+
+	Transfer *transfer = new(std::nothrow) Transfer(this);
+	if (!transfer)
+		return B_NO_MEMORY;
 
 	transfer->SetVector(vector, vectorCount);
 	transfer->SetCallback(callback, callbackCookie);
