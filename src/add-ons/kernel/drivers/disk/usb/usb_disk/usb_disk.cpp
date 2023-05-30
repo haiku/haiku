@@ -1,15 +1,17 @@
 /*
- * Copyright 2008-2012, Haiku Inc. All rights reserved.
+ * Copyright 2008-2023, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Augustin Cavalier <waddlesplash>
  */
 
 
 #include "usb_disk.h"
 
 #include <ByteOrder.h>
+#include <StackOrHeapArray.h>
 #include <Drivers.h>
 #include <bus/USB.h>
 
@@ -22,10 +24,14 @@
 #include <syscall_restart.h>
 #include <util/AutoLock.h>
 
+#include "IORequest.h"
+
 #include "scsi_sense.h"
 #include "usb_disk_scsi.h"
 #include "icons.h"
 
+
+#define MAX_IO_BLOCKS					(128)
 
 #define USB_DISK_DEVICE_MODULE_NAME		"drivers/disk/usb_disk/device_v1"
 #define USB_DISK_DRIVER_MODULE_NAME		"drivers/disk/usb_disk/driver_v1"
@@ -84,13 +90,8 @@ static void	usb_disk_callback(void *cookie, status_t status, void *data,
 status_t	usb_disk_mass_storage_reset(disk_device *device);
 uint8		usb_disk_get_max_lun(disk_device *device);
 void		usb_disk_reset_recovery(disk_device *device);
-status_t	usb_disk_transfer_data(disk_device *device, bool directionIn,
-				void *data, size_t dataLength);
 status_t	usb_disk_receive_csw(disk_device *device,
 				usb_massbulk_command_status_wrapper *status);
-status_t	usb_disk_operation(device_lun *lun, uint8* operation,
-				size_t opLength, void *data, size_t *dataLength,
-				bool directionIn, err_act *action = NULL);
 
 status_t	usb_disk_send_diagnostic(device_lun *lun);
 status_t	usb_disk_request_sense(device_lun *lun, err_act *action);
@@ -102,9 +103,19 @@ status_t	usb_disk_update_capacity(device_lun *lun);
 status_t	usb_disk_synchronize(device_lun *lun, bool force);
 
 
-//
-//#pragma mark - Device Allocation Helper Functions
-//
+// #pragma mark - disk_device helper functions
+
+
+static DMAResource*
+get_dma_resource(disk_device *device, uint32 blockSize)
+{
+	for (int32 i = 0; i < device->dma_resources.Count(); i++) {
+		DMAResource* r = device->dma_resources[i];
+		if (r->BlockSize() == blockSize)
+			return r;
+	}
+	return NULL;
+}
 
 
 void
@@ -112,12 +123,14 @@ usb_disk_free_device_and_luns(disk_device *device)
 {
 	mutex_lock(&device->lock);
 	mutex_destroy(&device->lock);
+	for (int32 i = 0; i < device->dma_resources.Count(); i++)
+		delete device->dma_resources[i];
 	delete_sem(device->notify);
 	delete_sem(device->interruptLock);
 	for (uint8 i = 0; i < device->lun_count; i++)
 		free(device->luns[i]);
 	free(device->luns);
-	free(device);
+	delete device;
 }
 
 
@@ -182,12 +195,29 @@ usb_disk_reset_recovery(disk_device *device, err_act *_action)
 }
 
 
-status_t
-usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
-	size_t dataLength)
+struct transfer_data {
+	union {
+		physical_entry* phys_vecs;
+		iovec* vecs;
+	};
+	uint32 vec_count = 0;
+	bool physical = false;
+};
+
+
+static status_t
+usb_disk_transfer_data(disk_device *device, bool directionIn, const transfer_data& data)
 {
-	status_t result = gUSBModule->queue_bulk(directionIn ? device->bulk_in
-		: device->bulk_out, data, dataLength, usb_disk_callback, device);
+	status_t result;
+	if (data.physical) {
+		result = gUSBModule->queue_bulk_v_physical(
+			directionIn ? device->bulk_in : device->bulk_out,
+			data.phys_vecs, data.vec_count, usb_disk_callback, device);
+	} else {
+		result = gUSBModule->queue_bulk_v(
+			directionIn ? device->bulk_in : device->bulk_out,
+			data.vecs, data.vec_count, usb_disk_callback, device);
+	}
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to queue data transfer: %s\n", strerror(result));
 		return result;
@@ -214,6 +244,22 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 	}
 
 	return B_OK;
+}
+
+
+static status_t
+usb_disk_transfer_data(disk_device *device, bool directionIn,
+	void* buffer, size_t dataLength)
+{
+	iovec vec;
+	vec.iov_base = buffer;
+	vec.iov_len = dataLength;
+
+	struct transfer_data data;
+	data.vecs = &vec;
+	data.vec_count = 1;
+
+	return usb_disk_transfer_data(device, directionIn, data);
 }
 
 
@@ -279,10 +325,11 @@ usb_disk_receive_csw_bulk(disk_device *device,
 
 status_t
 usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
-	void *data,	size_t *dataLength, bool directionIn, err_act *_action)
+	const transfer_data& data, size_t *dataLength,
+	bool directionIn, err_act *_action)
 {
 	TRACE("operation: lun: %u; op: 0x%x; data: %p; dlen: %p (%lu); in: %c\n",
-		lun->logical_unit_number, operation[0], data, dataLength,
+		lun->logical_unit_number, operation[0], data.vecs, dataLength,
 		dataLength ? *dataLength : 0, directionIn ? 'y' : 'n');
 
 	disk_device* device = lun->device;
@@ -306,9 +353,9 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 
 	// Step 2 : data phase : send or receive data
 	size_t transferedData = 0;
-	if (data != NULL && dataLength != NULL && *dataLength > 0) {
+	if (data.vec_count != 0) {
 		// we have data to transfer in a data stage
-		result = usb_disk_transfer_data(device, directionIn, data, *dataLength);
+		result = usb_disk_transfer_data(device, directionIn, data);
 		if (result != B_OK) {
 			TRACE("Error %s in data phase\n", strerror(result));
 			return result;
@@ -354,13 +401,13 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 
 
 status_t
-usb_disk_operation_bulk(device_lun *lun, uint8* operation,
-	size_t operationLength, void *data, size_t *dataLength, bool directionIn,
-	err_act *_action)
+usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLength,
+	const transfer_data& data, size_t *dataLength,
+	bool directionIn, err_act *_action)
 {
 	TRACE("operation: lun: %u; op: %u; data: %p; dlen: %p (%lu); in: %c\n",
 		lun->logical_unit_number, operation[0],
-		data, dataLength, dataLength ? *dataLength : 0,
+		data.vecs, dataLength, dataLength ? *dataLength : 0,
 		directionIn ? 'y' : 'n');
 
 	disk_device *device = lun->device;
@@ -391,10 +438,9 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 	}
 
 	size_t transferedData = 0;
-	if (data != NULL && dataLength != NULL && *dataLength > 0) {
+	if (data.vec_count != 0) {
 		// we have data to transfer in a data stage
-		result = usb_disk_transfer_data(device, directionIn, data,
-			*dataLength);
+		result = usb_disk_transfer_data(device, directionIn, data);
 		if (result != B_OK)
 			return result;
 
@@ -493,17 +539,42 @@ usb_disk_operation_bulk(device_lun *lun, uint8* operation,
 }
 
 
-status_t
+static status_t
 usb_disk_operation(device_lun *lun, uint8* operation, size_t opLength,
-	void *data, size_t *dataLength, bool directionIn, err_act *_action)
+	const transfer_data& data, size_t *dataLength,
+	bool directionIn, err_act *_action = NULL)
 {
 	if (lun->device->is_ufi) {
-		return usb_disk_operation_interrupt(lun, operation, data, dataLength,
-			directionIn, _action);
+		return usb_disk_operation_interrupt(lun, operation,
+			data, dataLength, directionIn, _action);
 	} else {
 		return usb_disk_operation_bulk(lun, operation, opLength,
 			data, dataLength, directionIn, _action);
 	}
+}
+
+
+static status_t
+usb_disk_operation(device_lun *lun, uint8* operation, size_t opLength,
+	void *buffer, size_t *dataLength,
+	bool directionIn, err_act *_action = NULL)
+{
+	iovec vec;
+	vec.iov_base = buffer;
+
+	struct transfer_data data;
+	data.vecs = &vec;
+
+	if (dataLength != NULL && *dataLength != 0) {
+		vec.iov_len = *dataLength;
+		data.vec_count = 1;
+	} else {
+		vec.iov_len = 0;
+		data.vec_count = 0;
+	}
+
+	return usb_disk_operation(lun, operation, opLength,
+		data, dataLength, directionIn, _action);
 }
 
 
@@ -521,8 +592,7 @@ usb_disk_send_diagnostic(device_lun *lun)
 	commandBlock[0] = SCSI_SEND_DIAGNOSTIC;
 	commandBlock[1] = (lun->logical_unit_number << 5) | 4;
 
-	status_t result = usb_disk_operation(lun, commandBlock, 6, NULL,
-		NULL, false);
+	status_t result = usb_disk_operation(lun, commandBlock, 6, NULL, NULL, false);
 
 	int retry = 100;
 	err_act action = err_act_ok;
@@ -846,8 +916,24 @@ usb_disk_update_capacity(device_lun *lun)
 		B_BENDIAN_TO_HOST_INT32(parameter.last_logical_block_address) + 1;
 	if (lun->block_count == 0) {
 		// try SCSI_READ_CAPACITY_16
-		return usb_disk_update_capacity_16(lun);
+		result = usb_disk_update_capacity_16(lun);
+		if (result != B_OK)
+			return result;
 	}
+
+	// ensure we have a DMAResource for this block_size
+	if (get_dma_resource(lun->device, lun->block_size) == NULL) {
+		dma_restrictions restrictions = {};
+		restrictions.max_transfer_size = (lun->block_size * MAX_IO_BLOCKS);
+
+		DMAResource* dmaResource = new DMAResource;
+		result = dmaResource->Init(restrictions, lun->block_size, 1, 1);
+		if (result != B_OK)
+			return result;
+
+		lun->device->dma_resources.Add(dmaResource);
+	}
+
 	return B_OK;
 }
 
@@ -916,7 +1002,7 @@ static status_t
 usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 {
 	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
-	disk_device *device = (disk_device *)malloc(sizeof(disk_device));
+	disk_device *device = new(std::nothrow) disk_device;
 	device->node = node;
 	device->device = newDevice;
 	device->removed = false;
@@ -933,7 +1019,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	const usb_configuration_info *configuration
 		= gUSBModule->get_configuration(newDevice);
 	if (configuration == NULL) {
-		free(device);
+		delete device;
 		return B_ERROR;
 	}
 
@@ -1000,7 +1086,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 
 	if (device->interface == 0xff) {
 		TRACE_ALWAYS("no valid bulk-only or CBI interface found\n");
-		free(device);
+		delete device;
 		return B_ERROR;
 	}
 
@@ -1010,7 +1096,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	if (device->notify < B_OK) {
 		mutex_destroy(&device->lock);
 		status_t result = device->notify;
-		free(device);
+		delete device;
 		return result;
 	}
 
@@ -1020,7 +1106,7 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 			mutex_destroy(&device->lock);
 			delete_sem(device->notify);
 			status_t result = device->interruptLock;
-			free(device);
+			delete device;
 			return result;
 		}
 	}
@@ -1129,30 +1215,24 @@ usb_disk_device_removed(void *cookie)
 }
 
 
-//
-//#pragma mark - Partial Buffer Functions
-//
-
-
 static bool
-usb_disk_needs_partial_buffer(device_lun *lun, off_t position, size_t length,
-	uint64 &blockPosition, size_t &blockCount)
+usb_disk_needs_bounce(device_lun *lun, io_request *request)
 {
-	blockPosition = (uint64)(position / lun->block_size);
-	if ((off_t)blockPosition * lun->block_size != position)
+	if (!request->Buffer()->IsVirtual())
 		return true;
-
-	blockCount = length / lun->block_size;
-	if (blockCount * lun->block_size != length)
+	if ((request->Offset() % lun->block_size) != 0)
 		return true;
-
+	if ((request->Length() % lun->block_size) != 0)
+		return true;
+	if (request->Length() > (lun->block_size * MAX_IO_BLOCKS))
+		return true;
 	return false;
 }
 
 
 static status_t
 usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
-	void *buffer, size_t *length)
+	struct transfer_data data, size_t *length)
 {
 	uint8 commandBlock[16];
 	memset(commandBlock, 0, sizeof(commandBlock));
@@ -1170,8 +1250,8 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 
 		status_t result = B_OK;
 		for (int tries = 0; tries < 5; tries++) {
-			result = usb_disk_operation(lun, commandBlock, 12, buffer, length,
-				true);
+			result = usb_disk_operation(lun, commandBlock, 12, data,
+				length, true);
 			if (result == B_OK)
 				break;
 			else
@@ -1188,7 +1268,7 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[7] = blockCount >> 8;
 		commandBlock[8] = blockCount;
 		status_t result = usb_disk_operation(lun, commandBlock, 10,
-			buffer, length, true);
+			data, length, true);
 		return result;
 	} else {
 		commandBlock[0] = SCSI_READ_16;
@@ -1206,7 +1286,7 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[12] = blockCount >> 8;
 		commandBlock[13] = blockCount;
 		status_t result = usb_disk_operation(lun, commandBlock, 16,
-			buffer, length, true);
+			data, length, true);
 		return result;
 	}
 }
@@ -1214,7 +1294,7 @@ usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 
 static status_t
 usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
-	void *buffer, size_t *length)
+	struct transfer_data data, size_t *length)
 {
 	uint8 commandBlock[16];
 	memset(commandBlock, 0, sizeof(commandBlock));
@@ -1232,8 +1312,8 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[9] = blockCount;
 
 		status_t result;
-		result = usb_disk_operation(lun, commandBlock, 12, buffer, length,
-			false);
+		result = usb_disk_operation(lun, commandBlock, 12,
+			data, length, false);
 
 		int retry = 10;
 		err_act action = err_act_ok;
@@ -1255,7 +1335,7 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[7] = blockCount >> 8;
 		commandBlock[8] = blockCount;
 		status_t result = usb_disk_operation(lun, commandBlock, 10,
-			buffer, length, false);
+			data, length, false);
 		if (result == B_OK)
 			lun->should_sync = true;
 		return result;
@@ -1275,41 +1355,11 @@ usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 		commandBlock[12] = blockCount >> 8;
 		commandBlock[13] = blockCount;
 		status_t result = usb_disk_operation(lun, commandBlock, 16,
-			buffer, length, false);
+			data, length, false);
 		if (result == B_OK)
 			lun->should_sync = true;
 		return result;
 	}
-}
-
-
-static status_t
-usb_disk_prepare_partial_buffer(device_lun *lun, off_t position, size_t length,
-	void *&partialBuffer, void *&blockBuffer, uint64 &blockPosition,
-	size_t &blockCount)
-{
-	blockPosition = position / lun->block_size;
-	blockCount = (position + length + lun->block_size - 1)
-		/ lun->block_size - blockPosition;
-	size_t blockLength = blockCount * lun->block_size;
-	blockBuffer = malloc(blockLength);
-	if (blockBuffer == NULL) {
-		TRACE_ALWAYS("no memory to allocate partial buffer\n");
-		return B_NO_MEMORY;
-	}
-
-	status_t result = usb_disk_block_read(lun, blockPosition, blockCount,
-		blockBuffer, &blockLength);
-	if (result != B_OK) {
-		TRACE_ALWAYS("block read failed when filling partial buffer: %s\n",
-			strerror(result));
-		free(blockBuffer);
-		return result;
-	}
-
-	off_t offset = position - (off_t)blockPosition * lun->block_size;
-	partialBuffer = (uint8 *)blockBuffer + offset;
-	return B_OK;
 }
 
 
@@ -1652,108 +1702,129 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 
 
 static status_t
-usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
+usb_disk_bounced_io(device_lun *lun, io_request *request)
 {
-	if (buffer == NULL || length == NULL)
-		return B_BAD_VALUE;
+	DMAResource* dmaResource = get_dma_resource(lun->device, lun->block_size);
+	if (dmaResource == NULL)
+		return B_NO_INIT;
 
-	TRACE("read(%" B_PRIdOFF ", %ld)\n", position, *length);
-	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
-	mutex_lock(&device->lock);
-	if (device->removed) {
-		*length = 0;
-		mutex_unlock(&device->lock);
-		return B_DEV_NOT_READY;
-	}
-
-	status_t result = B_ERROR;
-	uint64 blockPosition = 0;
-	size_t blockCount = 0;
-	bool needsPartial = usb_disk_needs_partial_buffer(lun, position, *length,
-		blockPosition, blockCount);
-	if (needsPartial) {
-		void *partialBuffer = NULL;
-		void *blockBuffer = NULL;
-		result = usb_disk_prepare_partial_buffer(lun, position, *length,
-			partialBuffer, blockBuffer, blockPosition, blockCount);
-		if (result == B_OK) {
-			if (IS_USER_ADDRESS(buffer))
-				result = user_memcpy(buffer, partialBuffer, *length);
-			else
-				memcpy(buffer, partialBuffer, *length);
-			free(blockBuffer);
+	if (!request->Buffer()->IsPhysical()) {
+		status_t status = request->Buffer()->LockMemory(request->TeamID(), request->IsWrite());
+		if (status != B_OK) {
+			TRACE_ALWAYS("failed to lock memory: %s\n", strerror(status));
+			return status;
 		}
-	} else {
-		result = usb_disk_block_read(lun, blockPosition, blockCount, buffer,
-			length);
+		// SetStatusAndNotify() takes care of unlocking memory if necessary.
 	}
 
-	mutex_unlock(&device->lock);
-	if (result == B_OK) {
-		TRACE("read successful with %ld bytes\n", *length);
-		return B_OK;
+	status_t status = B_OK;
+	while (request->RemainingBytes() > 0) {
+		IOOperation operation;
+		status = dmaResource->TranslateNext(request, &operation, 0);
+		if (status != B_OK)
+			break;
+
+		do {
+			TRACE("%p: IOO offset: %" B_PRIdOFF ", length: %" B_PRIuGENADDR
+				", write: %s\n", request, operation.Offset(),
+				operation.Length(), operation.IsWrite() ? "yes" : "no");
+
+			struct transfer_data data;
+			data.physical = true;
+			data.phys_vecs = (physical_entry*)operation.Vecs();
+			data.vec_count = operation.VecCount();
+
+			size_t length = operation.Length();
+			const uint64 blockPosition = operation.Offset() / lun->block_size;
+			const size_t blockCount = length / lun->block_size;
+			if (operation.IsWrite()) {
+				status = usb_disk_block_write(lun,
+					blockPosition, blockCount, data, &length);
+			} else {
+				status = usb_disk_block_read(lun,
+					blockPosition, blockCount, data, &length);
+			}
+
+			operation.SetStatus(status, length);
+		} while (status == B_OK && !operation.Finish());
+
+		if (status == B_OK && operation.Status() != B_OK) {
+			TRACE_ALWAYS("I/O succeeded but IOOperation failed!\n");
+			status = operation.Status();
+		}
+
+		request->OperationFinished(&operation);
+		dmaResource->RecycleBuffer(operation.Buffer());
+
+		TRACE("%p: status %s, remaining bytes %" B_PRIuGENADDR "\n", request,
+			strerror(status), request->RemainingBytes());
+		if (status != B_OK)
+			break;
 	}
 
-	*length = 0;
-	TRACE_ALWAYS("read failed: %s\n", strerror(result));
-	return result;
+	return status;
 }
 
 
 static status_t
-usb_disk_write(void *cookie, off_t position, const void *buffer,
-	size_t *length)
+usb_disk_direct_io(device_lun *lun, io_request *request)
 {
-	if (buffer == NULL || length == NULL)
-		return B_BAD_VALUE;
+	generic_io_vec* genericVecs = request->Buffer()->Vecs();
+	const uint32 count = request->Buffer()->VecCount();
+	BStackOrHeapArray<iovec, 16> vecs(count);
+	for (uint32 i = 0; i < count; i++) {
+		vecs[i].iov_base = (void*)genericVecs[i].base;
+		vecs[i].iov_len = genericVecs[i].length;
+	}
+	struct transfer_data data;
+	data.vecs = vecs;
+	data.vec_count = count;
 
-	TRACE("write(%" B_PRIdOFF", %ld)\n", position, *length);
+	size_t length = request->Length();
+	const uint64 blockPosition = request->Offset() / lun->block_size;
+	const size_t blockCount = length / lun->block_size;
+
+	status_t status;
+	if (request->IsWrite()) {
+		 status = usb_disk_block_write(lun,
+			blockPosition, blockCount, data, &length);
+	} else {
+		status = usb_disk_block_read(lun,
+			blockPosition, blockCount, data, &length);
+	}
+
+	request->SetTransferredBytes(length != request->Length(), length);
+	return status;
+}
+
+
+static status_t
+usb_disk_io(void *cookie, io_request *request)
+{
+	TRACE("io(%p)\n", request);
+
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
 	mutex_lock(&device->lock);
 	if (device->removed) {
-		*length = 0;
 		mutex_unlock(&device->lock);
 		return B_DEV_NOT_READY;
 	}
 
-	status_t result = B_ERROR;
-	uint64 blockPosition = 0;
-	size_t blockCount = 0;
-	bool needsPartial = usb_disk_needs_partial_buffer(lun, position,
-		*length, blockPosition, blockCount);
-	if (needsPartial) {
-		void *partialBuffer = NULL;
-		void *blockBuffer = NULL;
-		result = usb_disk_prepare_partial_buffer(lun, position, *length,
-			partialBuffer, blockBuffer, blockPosition, blockCount);
-		if (result == B_OK) {
-			if (IS_USER_ADDRESS(buffer))
-				result = user_memcpy(partialBuffer, buffer, *length);
-			else
-				memcpy(partialBuffer, buffer, *length);
-		}
-		if (result == B_OK) {
-			size_t blockLength = blockCount * lun->block_size;
-			result = usb_disk_block_write(lun, blockPosition, blockCount,
-				blockBuffer, &blockLength);
-			free(blockBuffer);
-		}
+	status_t status;
+	if (!usb_disk_needs_bounce(lun, request)) {
+		status = usb_disk_direct_io(lun, request);
 	} else {
-		result = usb_disk_block_write(lun, blockPosition, blockCount,
-			(void *)buffer, length);
+		status = usb_disk_bounced_io(lun, request);
 	}
 
 	mutex_unlock(&device->lock);
-	if (result == B_OK) {
-		TRACE("write successful with %ld bytes\n", *length);
-		return B_OK;
-	}
 
-	*length = 0;
-	TRACE_ALWAYS("write failed: %s\n", strerror(result));
-	return result;
+	if (request->Status() > 0)
+		request->SetStatusAndNotify(status);
+	else
+		request->NotifyFinished();
+	return status;
 }
 
 
@@ -1892,9 +1963,9 @@ struct device_module_info sUsbDiskDevice = {
 	usb_disk_open,
 	usb_disk_close,
 	usb_disk_free,
-	usb_disk_read,
-	usb_disk_write,
-	NULL,	// io
+	NULL,	// read
+	NULL,	// write
+	usb_disk_io,
 	usb_disk_ioctl,
 
 	NULL,	// select
