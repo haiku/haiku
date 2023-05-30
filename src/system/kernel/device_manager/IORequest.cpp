@@ -939,6 +939,7 @@ IORequest::NotifyFinished()
 	TRACE("IORequest::NotifyFinished(): request: %p\n", this);
 
 	MutexLocker locker(fLock);
+	ASSERT(fStatus != 1);
 
 	if (fStatus == B_OK && !fPartialTransfer && RemainingBytes() > 0) {
 		// The request is not really done yet. If it has an iteration callback,
