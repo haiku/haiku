@@ -41,6 +41,7 @@ Table of contents
    /build/index
    /release/index
    /libroot/index
+   /kits/debugger/index
    /midi/index
    /net/index
    /packages/README
