@@ -21,6 +21,7 @@
 #include <AboutWindow.h>
 #include <Application.h>
 #include <Bitmap.h>
+#include <Beep.h>
 #include <Catalog.h>
 #include <DataIO.h>
 #include <Deskbar.h>
@@ -61,6 +62,9 @@ const uint32 kMsgToggleExtInfo = 'texi';
 
 const double kLowBatteryPercentage = 0.15;
 const double kNoteBatteryPercentage = 0.3;
+const double kFullBatteryPercentage = 1.0;
+
+const time_t kLowBatteryTimeLeft = 30 * 60;
 
 
 PowerStatusView::PowerStatusView(PowerStatusDriverInterface* interface,
@@ -116,6 +120,11 @@ PowerStatusView::_Init()
 	fPercent = 1.0;
 	fOnline = true;
 	fTimeLeft = 0;
+
+	fHasNotifiedLowBattery = false;
+
+	add_system_beep_event("Low battery");
+	add_system_beep_event("Battery charged");
 }
 
 
@@ -297,6 +306,7 @@ PowerStatusView::Draw(BRect updateRect)
 {
 	DrawTo(this, Bounds());
 }
+
 
 void
 PowerStatusView::DrawTo(BView* view, BRect rect)
@@ -491,9 +501,23 @@ PowerStatusView::Update(bool force, bool notify)
 		Invalidate();
 	}
 
-	if (!fOnline && fHasBattery && previousPercent > kLowBatteryPercentage
-			&& fPercent <= kLowBatteryPercentage && notify) {
+	if (fPercent > kLowBatteryPercentage && fTimeLeft > kLowBatteryTimeLeft)
+		fHasNotifiedLowBattery = false;
+
+	bool justTurnedLowBattery = (previousPercent > kLowBatteryPercentage
+			&& fPercent <= kLowBatteryPercentage)
+		|| (fTimeLeft <= kLowBatteryTimeLeft
+			&& previousTimeLeft > kLowBatteryTimeLeft);
+
+	if (!fOnline && notify && fHasBattery
+		&& !fHasNotifiedLowBattery && justTurnedLowBattery) {
 		_NotifyLowBattery();
+		fHasNotifiedLowBattery = true;
+	}
+
+	if (fOnline && fPercent >= kFullBatteryPercentage
+		&& previousPercent < kFullBatteryPercentage) {
+		system_beep("Battery charged");
 	}
 }
 
@@ -584,6 +608,8 @@ PowerStatusView::_NotifyLowBattery()
 
 	BNotification notification(
 		fHasBattery ? B_INFORMATION_NOTIFICATION : B_ERROR_NOTIFICATION);
+
+	system_beep("Low battery");
 
 	if (fHasBattery) {
 		notification.SetTitle(B_TRANSLATE("Battery low"));

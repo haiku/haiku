@@ -68,6 +68,8 @@ protected:
 			time_t			fTimeLeft;
 			bool			fOnline;
 			bool			fHasBattery;
+
+			bool			fHasNotifiedLowBattery;
 };
 
 
