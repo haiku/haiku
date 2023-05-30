@@ -1931,30 +1931,37 @@ usb_disk_supports_device(device_node *parent)
 	if (strcmp(bus, "usb") != 0)
 		return 0.0;
 
-	uint8 baseClass = 0, subclass = 0, protocol = 0;
-	if (gDeviceManager->get_attr_uint8(parent, USB_DEVICE_CLASS, &baseClass, false) != B_OK)
-		return 0.0;
-	if (gDeviceManager->get_attr_uint8(parent, USB_DEVICE_SUBCLASS, &subclass, false) != B_OK)
-		return 0.0;
-	if (gDeviceManager->get_attr_uint8(parent, USB_DEVICE_PROTOCOL, &protocol, false) != B_OK)
-		return 0.0;
+	usb_device device;
+	if (gDeviceManager->get_attr_uint32(parent, USB_DEVICE_ID_ITEM, &device, true) != B_OK)
+		return -1;
+
+	const usb_configuration_info *configuration = gUSBModule->get_configuration(device);
+	if (configuration == NULL)
+		return -1;
 
 	static usb_support_descriptor supportedDevices[] = {
-		{ 0x08 /* mass storage */, 0x06 /* SCSI */, 0x50 /* bulk */, 0, 0 },
-		{ 0x08 /* mass storage */, 0x02 /* ATAPI */, 0x50 /* bulk */, 0, 0 },
-		{ 0x08 /* mass storage */, 0x05 /* ATAPI */, 0x50 /* bulk */, 0, 0 },
-		{ 0x08 /* mass storage */, 0x04 /* UFI */, 0x00, 0, 0 }
+		{ USB_MASS_STORAGE_DEVICE_CLASS, 0x06 /* SCSI */, 0x50 /* bulk */, 0, 0 },
+		{ USB_MASS_STORAGE_DEVICE_CLASS, 0x02 /* ATAPI */, 0x50 /* bulk */, 0, 0 },
+		{ USB_MASS_STORAGE_DEVICE_CLASS, 0x05 /* ATAPI */, 0x50 /* bulk */, 0, 0 },
+		{ USB_MASS_STORAGE_DEVICE_CLASS, 0x04 /* UFI */, 0x00, 0, 0 }
 	};
-	for (size_t i = 0; i < B_COUNT_OF(supportedDevices); i++) {
-		if (baseClass != supportedDevices[i].dev_class)
-			continue;
-		if (subclass != supportedDevices[i].dev_subclass)
-			continue;
-		if (supportedDevices[i].dev_protocol != 0 && protocol != supportedDevices[i].dev_protocol)
+
+	for (size_t i = 0; i < configuration->interface_count; i++) {
+		usb_interface_info *interface = configuration->interface[i].active;
+		if (interface == NULL)
 			continue;
 
-		TRACE("USB disk device found!\n");
-		return 0.6;
+		for (size_t i = 0; i < B_COUNT_OF(supportedDevices); i++) {
+			if (interface->descr->interface_class != supportedDevices[i].dev_class)
+				continue;
+			if (interface->descr->interface_subclass != supportedDevices[i].dev_subclass)
+				continue;
+			if (interface->descr->interface_protocol != supportedDevices[i].dev_protocol)
+				continue;
+
+			TRACE("USB disk device found!\n");
+			return 0.6;
+		}
 	}
 
 	return 0.0;
