@@ -2489,3 +2489,10 @@ device_manager_init_post_modules(struct kernel_args* args)
 	RecursiveLocker _(sLock);
 	return sRootNode->Reprobe();
 }
+
+
+recursive_lock*
+device_manager_get_lock()
+{
+	return &sLock;
+}

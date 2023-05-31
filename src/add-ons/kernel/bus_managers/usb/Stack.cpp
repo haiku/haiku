@@ -11,10 +11,13 @@
 #include <module.h>
 #include <unistd.h>
 #include <util/kernel_cpp.h>
+#include <util/AutoLock.h>
+
 #include "usb_private.h"
 #include "PhysicalMemoryAllocator.h"
 
 #include <fs/devfs.h>
+#include <kdevice_manager.h>
 
 
 Stack::Stack()
@@ -214,6 +217,9 @@ Stack::ExploreThread(void *data)
 void
 Stack::Explore()
 {
+	// Acquire the device manager lock before the explore lock, to prevent lock-order inversion.
+	RecursiveLocker dmLocker(device_manager_get_lock());
+
 	if (mutex_lock(&fExploreLock) != B_OK)
 		return;
 
