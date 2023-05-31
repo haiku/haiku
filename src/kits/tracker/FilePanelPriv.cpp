@@ -699,8 +699,6 @@ TFilePanel::Init(const BMessage*)
 	fBackView->AddChild(fMenuBar);
 
 	// add directory menu and menufield
-	fDirMenu = new BDirMenu(0, this, kSwitchDirectory, "refs");
-
 	font_height ht;
 	be_plain_font->GetHeight(&ht);
 	const float f_height = ht.ascent + ht.descent + ht.leading;
@@ -712,16 +710,14 @@ TFilePanel::Init(const BMessage*)
 	rect.right = rect.left + (spacing * 50);
 	rect.bottom = rect.top + (f_height > 22 ? f_height : 22);
 
-	fDirMenuField = new BMenuField(rect, "DirMenuField", "", fDirMenu);
+	fDirMenuField = new BMenuField(rect, "DirMenuField", "", NULL);
 	fDirMenuField->MenuBar()->SetFont(be_plain_font);
 	fDirMenuField->SetDivider(0);
 	fDirMenuField->MenuBar()->SetMaxContentWidth(rect.Width() - 26.0f);
 		// Make room for the icon
 
-	fDirMenuField->MenuBar()->RemoveItem((int32)0);
-	fDirMenu->SetMenuBar(fDirMenuField->MenuBar());
-		// the above is a weird call from BDirMenu
-		// ToDo: clean up
+	fDirMenu = new BDirMenu(fDirMenuField->MenuBar(),
+		this, kSwitchDirectory, "refs");
 
 	BEntry entry(TargetModel()->EntryRef());
 	if (entry.InitCheck() == B_OK)
