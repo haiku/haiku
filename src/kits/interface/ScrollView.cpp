@@ -918,11 +918,17 @@ BScrollView::_ComputeFrame(BRect frame, BScrollBar* horizontal,
 {
 	if (vertical != NULL) {
 		frame.right += vertical->PreferredSize().Width();
-		frame.bottom += vertical->MinSize().Height();
+
+		const float minHeight = vertical->MinSize().Height();
+		if (frame.Height() < minHeight)
+			frame.bottom += minHeight - frame.Height();
 	}
 	if (horizontal != NULL) {
-		frame.right += horizontal->MinSize().Width();
 		frame.bottom += horizontal->PreferredSize().Height();
+
+		const float minWidth = horizontal->MinSize().Width();
+		if (frame.Width() < minWidth)
+			frame.right += minWidth - frame.Width();
 	}
 
 	_InsetBorders(frame, border, borders, true);
