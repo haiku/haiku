@@ -66,7 +66,49 @@ Bitmap::Resize(size_t bitCount)
 void
 Bitmap::Shift(ssize_t bitCount)
 {
-	return Bitmap::Shift<addr_t>(fBits, fSize, bitCount);
+	if (bitCount == 0)
+		return;
+
+	const size_t shift = (bitCount > 0) ? bitCount : -bitCount;
+	const size_t nElements = shift / kBitsPerElement, nBits = shift % kBitsPerElement;
+	if (nElements != 0) {
+		if (bitCount > 0) {
+			// "Left" shift.
+			memmove(&fBits[nElements], fBits, sizeof(addr_t) * (fElementsCount - nElements));
+			memset(fBits, 0, sizeof(addr_t) * nElements);
+		} else if (bitCount < 0) {
+			// "Right" shift.
+			memmove(fBits, &fBits[nElements], sizeof(addr_t) * (fElementsCount - nElements));
+			memset(&fBits[fElementsCount - nElements], 0, sizeof(addr_t) * nElements);
+		}
+	}
+
+	// If the shift was by a multiple of the element size, nothing more to do.
+	if (nBits == 0)
+		return;
+
+	// One set of bits comes from the "current" element and are shifted in the
+	// direction of the shift; the other set comes from the next-processed
+	// element and are shifted in the opposite direction.
+	if (bitCount > 0) {
+		// "Left" shift.
+		for (ssize_t i = fElementsCount - 1; i >= 0; i--) {
+			addr_t low = 0;
+			if (i != 0)
+				low = fBits[i - 1] >> (kBitsPerElement - nBits);
+			const addr_t high = fBits[i] << nBits;
+			fBits[i] = low | high;
+		}
+	} else if (bitCount < 0) {
+		// "Right" shift.
+		for (size_t i = 0; i < fElementsCount; i++) {
+			const addr_t low = fBits[i] >> nBits;
+			addr_t high = 0;
+			if (i != (fElementsCount - 1))
+				high = fBits[i + 1] << (kBitsPerElement - nBits);
+			fBits[i] = low | high;
+		}
+	}
 }
 
 

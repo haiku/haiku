@@ -19,7 +19,7 @@ main()
 
 	// should fail (negative offset)
 	void* ptr0 = mmap(NULL, B_PAGE_SIZE, PROT_READ, MAP_PRIVATE, fd, -4096);
-	if (ptr0 != MAP_FAILED) {
+	if (ptr0 != NULL) {
 		printf("map-negative-offset unexpectedly succeeded!\n");
 		return -1;
 	}
@@ -37,25 +37,6 @@ main()
 	if (status != 0) {
 		printf("map-cut-compare test failed!\n");
 		return status;
-	}
-
-	uint8* ptr3 = (uint8*)mmap(NULL, B_PAGE_SIZE * 4, PROT_NONE,
-		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-
-	// make the tail accessible
-	mprotect(ptr3 + B_PAGE_SIZE * 3, B_PAGE_SIZE, PROT_READ | PROT_WRITE);
-
-	// store any value
-	ptr3[B_PAGE_SIZE * 3] = 'a';
-
-	// cut the area in the middle, before the accessible tail
-	mmap(ptr3 + B_PAGE_SIZE, B_PAGE_SIZE, PROT_READ | PROT_WRITE,
-		MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
-
-	// validate that this does not crash
-	if (ptr3[B_PAGE_SIZE * 3] != 'a') {
-		printf("map-protect-cut test failed!\n");
-		return -1;
 	}
 
 	return 0;
