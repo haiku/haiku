@@ -9,6 +9,8 @@
 #define KERNEL_UTIL_BITUTIL_H
 
 
+#include <string.h>
+
 #include <SupportDefs.h>
 
 
@@ -53,6 +55,59 @@ log2(uint32 v)
 	v |= v >> 16;
 
 	return MultiplyDeBruijnBitPosition[(uint32)(v * 0x07C4ACDDU) >> 27];
+}
+
+
+template<typename T>
+void
+bitmap_shift(T* bits, size_t bitCount, ssize_t shift)
+{
+	if (shift == 0)
+		return;
+
+	const size_t bitsPerElement = sizeof(T) * 8;
+	const size_t elementsCount = (bitCount + bitsPerElement - 1) / bitsPerElement;
+	const size_t absoluteShift = (shift > 0) ? shift : -shift;
+	const size_t nElements = absoluteShift / bitsPerElement;
+	const size_t nBits = absoluteShift % bitsPerElement;
+	if (nElements != 0) {
+		if (shift > 0) {
+			// "Left" shift.
+			memmove(&bits[nElements], bits, sizeof(T) * (elementsCount - nElements));
+			memset(bits, 0, sizeof(T) * nElements);
+		} else if (shift < 0) {
+			// "Right" shift.
+			memmove(bits, &bits[nElements], sizeof(T) * (elementsCount - nElements));
+			memset(&bits[elementsCount - nElements], 0, sizeof(T) * nElements);
+		}
+	}
+
+	// If the shift was by a multiple of the element size, nothing more to do.
+	if (nBits == 0)
+		return;
+
+	// One set of bits comes from the "current" element and are shifted in the
+	// direction of the shift; the other set comes from the next-processed
+	// element and are shifted in the opposite direction.
+	if (shift > 0) {
+		// "Left" shift.
+		for (ssize_t i = elementsCount - 1; i >= 0; i--) {
+			T low = 0;
+			if (i != 0)
+				low = bits[i - 1] >> (bitsPerElement - nBits);
+			const T high = bits[i] << nBits;
+			bits[i] = low | high;
+		}
+	} else if (shift < 0) {
+		// "Right" shift.
+		for (size_t i = 0; i < elementsCount; i++) {
+			const T low = bits[i] >> nBits;
+			T high = 0;
+			if (i != (elementsCount - 1))
+				high = bits[i + 1] << (bitsPerElement - nBits);
+			bits[i] = low | high;
+		}
+	}
 }
 
 
