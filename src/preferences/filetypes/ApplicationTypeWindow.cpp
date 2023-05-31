@@ -471,11 +471,6 @@ ApplicationTypeWindow::ApplicationTypeWindow(const BMessage& settings, const BEn
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
 
-	// TODO: remove workaround (bug #5678)
-	BSize minScrollSize = scrollView->ScrollBar(B_VERTICAL)->MinSize();
-	minScrollSize.width += fLongDescriptionView->MinSize().width;
-	scrollView->SetExplicitMinSize(minScrollSize);
-
 	// Manually set a minimum size for the version text controls
 	// TODO: the same does not work when applied to the layout items
 	float width = be_plain_font->StringWidth("99") + 16;
