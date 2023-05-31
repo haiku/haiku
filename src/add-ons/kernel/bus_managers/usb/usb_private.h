@@ -183,7 +183,6 @@ static	int32							ExploreThread(void *data);
 
 		Vector<BusManager *>			fBusManagers;
 		thread_id						fExploreThread;
-		bool							fFirstExploreDone;
 		sem_id							fExploreSem;
 
 		mutex							fStackLock;

@@ -19,7 +19,6 @@
 
 Stack::Stack()
 	:	fExploreThread(-1),
-		fFirstExploreDone(false),
 		fExploreSem(-1),
 		fAllocator(NULL),
 		fObjectIndex(1),
@@ -59,12 +58,6 @@ Stack::Stack()
 	fExploreThread = spawn_kernel_thread(ExploreThread, "usb explore",
 		B_LOW_PRIORITY, this);
 	resume_thread(fExploreThread);
-
-	// wait for the first explore to complete. this ensures that a driver that
-	// is opening the module does not get rescanned while or before installing
-	// its hooks.
-	while (!fFirstExploreDone)
-		snooze(10000);
 }
 
 
@@ -210,7 +203,7 @@ Stack::ExploreThread(void *data)
 	Stack *stack = (Stack *)data;
 
 	while (acquire_sem_etc(stack->fExploreSem, 1, B_RELATIVE_TIMEOUT,
-		USB_DELAY_HUB_EXPLORE) != B_BAD_SEM_ID) {
+			USB_DELAY_HUB_EXPLORE) != B_BAD_SEM_ID) {
 		stack->Explore();
 	}
 
@@ -250,7 +243,6 @@ Stack::Explore()
 		changeItem = next;
 	}
 
-	fFirstExploreDone = true;
 	mutex_unlock(&fExploreLock);
 	RescanDrivers(rescanList);
 }
