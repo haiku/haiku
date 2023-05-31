@@ -17,7 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateSystemHeaders ;
 
 		if [ FIsBuildFeatureEnabled openssl ] {
-			SubDirC++Flags -DOPENSSL_ENABLED ;
+			SubDirC++Flags -DOPENSSL_ENABLED -DOPENSSL_API_COMPAT=10101 -DOPENSSL_NO_DEPRECATED=1 ;
 			UseBuildFeatureHeaders openssl ;
 			sslSources = SSL.cpp ;
 			Includes [ FGristFiles $(sslSources) SecureSocket.cpp

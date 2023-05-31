@@ -39,49 +39,6 @@
 #ifdef OPENSSL_ENABLED
 
 #ifdef TRACE_SESSION_KEY
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
-/*
- * print session id and master key in NSS keylog format (RSA
- * Session-ID:<session id> Master-Key:<master key>)
- */
-int SSL_SESSION_print_keylog(BIO *bp, const SSL_SESSION *x)
-{
-	size_t i;
-
-	if (x == NULL)
-		goto err;
-	if (x->session_id_length == 0 || x->master_key_length == 0)
-		goto err;
-
-	// the RSA prefix is required by the format's definition although there's
-	// nothing RSA-specific in the output, therefore, we don't have to check if
-	// the cipher suite is based on RSA
-	if (BIO_puts(bp, "RSA ") <= 0)
-		goto err;
-
-	if (BIO_puts(bp, "Session-ID:") <= 0)
-		goto err;
-	for (i = 0; i < x->session_id_length; i++) {
-		if (BIO_printf(bp, "%02X", x->session_id[i]) <= 0)
-			goto err;
-	}
-	if (BIO_puts(bp, " Master-Key:") <= 0)
-		goto err;
-	for (i = 0; i < (size_t)x->master_key_length; i++) {
-		if (BIO_printf(bp, "%02X", x->master_key[i]) <= 0)
-			goto err;
-	}
-	if (BIO_puts(bp, "\n") <= 0)
-		goto err;
-
-	return (1);
-err:
-	return (0);
-}
-
-
-#endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
-
 
 // print client random id and master key in NSS keylog format
 // as session ID is not enough.
