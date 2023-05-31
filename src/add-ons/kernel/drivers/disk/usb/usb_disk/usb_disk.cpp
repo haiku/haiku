@@ -142,7 +142,8 @@ get_dma_resource(disk_device *device, uint32 blockSize)
 void
 usb_disk_free_device_and_luns(disk_device *device)
 {
-	mutex_lock(&device->lock);
+	ASSERT_LOCKED_MUTEX(&device->lock);
+
 	for (int32 i = 0; i < device->dma_resources.Count(); i++)
 		delete device->dma_resources[i];
 	for (uint8 i = 0; i < device->lun_count; i++)
@@ -1231,6 +1232,7 @@ usb_disk_device_removed(void *cookie)
 {
 	TRACE("device_removed(0x%p)\n", cookie);
 	disk_device *device = (disk_device *)cookie;
+	mutex_lock(&device->lock);
 
 	for (uint8 i = 0; i < device->lun_count; i++)
 		gDeviceManager->unpublish_device(device->node, device->luns[i]->name);
@@ -1240,6 +1242,8 @@ usb_disk_device_removed(void *cookie)
 	gUSBModule->cancel_queued_transfers(device->bulk_out);
 	if (device->open_count == 0)
 		usb_disk_free_device_and_luns(device);
+	else
+		mutex_unlock(&device->lock);
 }
 
 
@@ -1476,13 +1480,15 @@ usb_disk_free(void *cookie)
 
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
-	MutexLocker locker(device->lock);
+	mutex_lock(&device->lock);
 
 	device->open_count--;
 	if (device->open_count == 0 && device->removed) {
 		// we can simply free the device here as it has been removed from
 		// the device list in the device removed notification hook
 		usb_disk_free_device_and_luns(device);
+	} else {
+		mutex_unlock(&device->lock);
 	}
 
 	return B_OK;
