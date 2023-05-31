@@ -780,6 +780,9 @@ BContainerWindow::Quit()
 	delete fDragContextMenu;
 	fDragContextMenu = NULL;
 
+	delete fTrashContextMenu;
+	fTrashContextMenu = NULL;
+
 	int32 windowCount = 0;
 
 	// This is a deadlock code sequence - need to change this
