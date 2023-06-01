@@ -1234,12 +1234,18 @@ usb_disk_device_removed(void *cookie)
 	disk_device *device = (disk_device *)cookie;
 	mutex_lock(&device->lock);
 
-	for (uint8 i = 0; i < device->lun_count; i++)
+	for (uint8 i = 0; i < device->lun_count; i++) {
+		// unpublish_device() can call close().
+		mutex_unlock(&device->lock);
 		gDeviceManager->unpublish_device(device->node, device->luns[i]->name);
+		mutex_lock(&device->lock);
+	}
 
 	device->removed = true;
 	gUSBModule->cancel_queued_transfers(device->bulk_in);
 	gUSBModule->cancel_queued_transfers(device->bulk_out);
+
+	// At this point, open_count should always be 0 anyway.
 	if (device->open_count == 0)
 		usb_disk_free_device_and_luns(device);
 	else
