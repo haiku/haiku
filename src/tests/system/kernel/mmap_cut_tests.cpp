@@ -4,9 +4,11 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <unistd.h>
 #include <OS.h>
 
 
@@ -73,6 +75,62 @@ map_protect_cut_test()
 
 
 int
+map_cut_fork_test()
+{
+	char name[24];
+	sprintf(name, "/shm-mmap-cut-fork-test-%d", getpid());
+	name[sizeof(name) - 1] = '\0';
+	shm_unlink(name);
+	int fd = shm_open(name, O_RDWR | O_CREAT | O_EXCL | O_NOFOLLOW, 0600);
+	shm_unlink(name);
+
+	if (fd < 0) {
+		printf("failed to create temporary file!\n");
+		return fd;
+	}
+
+	ftruncate(fd, B_PAGE_SIZE * 4);
+
+	uint8* ptr = (uint8*)mmap(NULL, B_PAGE_SIZE * 4, PROT_NONE, MAP_PRIVATE,
+		fd, 0);
+
+	// make the head accessible and also force the kernel to allocate the
+	// page_protections array
+	mprotect(ptr, B_PAGE_SIZE, PROT_READ | PROT_WRITE);
+
+	// store any value
+	ptr[0] = 'a';
+
+	// cut the area in the middle
+	mmap(ptr + B_PAGE_SIZE, B_PAGE_SIZE, PROT_NONE,
+		MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+
+	// validate that the fork does not crash the kernel
+	int pid = fork();
+
+	if (pid == 0)
+	{
+		exit(0);
+	}
+	else if (pid < 0)
+	{
+		printf("failed to fork the test process!\n");
+		return pid;
+	}
+
+	int status;
+	waitpid(pid, &status, 0);
+
+	// validate that this does not crash
+	if (ptr[0] != 'a') {
+		printf("map-cut-fork test failed!\n");
+		return -1;
+	}
+	return 0;
+}
+
+
+int
 main()
 {
 	gTestFd = open("/boot/system/lib/libroot.so", O_CLOEXEC | O_RDONLY);
@@ -88,6 +146,9 @@ main()
 		return status;
 
 	if ((status = map_protect_cut_test()) != 0)
+		return status;
+
+	if ((status = map_cut_fork_test()) != 0)
 		return status;
 
 	return 0;

@@ -443,6 +443,15 @@ virtual_page_address(VMArea* area, vm_page* page)
 }
 
 
+static inline bool
+is_page_in_area(VMArea* area, vm_page* page)
+{
+	off_t pageCacheOffsetBytes = (off_t)(page->cache_offset << PAGE_SHIFT);
+	return pageCacheOffsetBytes >= area->cache_offset
+		&& pageCacheOffsetBytes < area->cache_offset + (off_t)area->Size();
+}
+
+
 //! You need to have the address space locked when calling this function
 static VMArea*
 lookup_area(VMAddressSpace* addressSpace, area_id id)
@@ -924,15 +933,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// Set the correct page protections for the second area.
 		VMTranslationMap* map = addressSpace->TranslationMap();
 		map->Lock();
-		page_num_t firstPageOffset
-			= secondArea->cache_offset / B_PAGE_SIZE;
-		page_num_t lastPageOffset
-			= firstPageOffset + secondArea->Size() / B_PAGE_SIZE;
 		for (VMCachePagesTree::Iterator it
 				= secondArea->cache->pages.GetIterator();
 				vm_page* page = it.Next();) {
-			if (page->cache_offset >= firstPageOffset
-				&& page->cache_offset <= lastPageOffset) {
+			if (is_page_in_area(secondArea, page)) {
 				addr_t address = virtual_page_address(secondArea, page);
 				uint32 pageProtection
 					= get_area_page_protection(secondArea, address);
@@ -2641,6 +2645,9 @@ vm_copy_on_write_area(VMCache* lowerCache,
 				// Change the protection of this page in all areas.
 				for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
 						tempArea = tempArea->cache_next) {
+					if (!is_page_in_area(tempArea, page))
+						continue;
+
 					// The area must be readable in the same way it was
 					// previously writable.
 					addr_t address = virtual_page_address(tempArea, page);
@@ -2671,6 +2678,9 @@ vm_copy_on_write_area(VMCache* lowerCache,
 				map->Lock();
 				for (VMCachePagesTree::Iterator it = lowerCache->pages.GetIterator();
 					vm_page* page = it.Next();) {
+					if (!is_page_in_area(tempArea, page))
+						continue;
+
 					// The area must be readable in the same way it was
 					// previously writable.
 					addr_t address = virtual_page_address(tempArea, page);
