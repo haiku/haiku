@@ -4,8 +4,8 @@ Connect to server…	pop3		Opret forbindelse til server…
 APOP	ConfigView		APOP
 Connecting to POP3 server…	pop3		Opretter forbindelse til POP3-server…
 : The server does not support APOP.	pop3		: Serveren understøtter ikke APOP.
-Error while authenticating user %user	pop3		Fejl ved autentifikation af brugeren %user
-Destination:	ConfigView		Destination:
+Error while authenticating user %user	pop3		Fejl ved godkendelse af brugeren %user
+Destination:	ConfigView		Mål:
 . The server said:\n	pop3		. Serveren sagde:\n
 Plain text	ConfigView		Ren tekst
 Getting mailbox size…	pop3		Henter postkassestørrelse…

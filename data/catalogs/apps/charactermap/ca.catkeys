@@ -118,7 +118,7 @@ Phonetic extensions	UnicodeBlocks		Extensions fonètiques
 Indic Siyaq numbers	UnicodeBlocks		Números Siyaq índics
 Batak	UnicodeBlocks		Batak
 Code	CharacterWindow		Codi
-Block elements	UnicodeBlocks		Bloqueig d'elements
+Block elements	UnicodeBlocks		Blocatge d'elements
 Ethiopic extended A	UnicodeBlocks		Etiòpic ampliat A
 Mahjong tiles	UnicodeBlocks		Fitxes del Mahjong
 Carian	UnicodeBlocks		Caria
@@ -242,7 +242,7 @@ Phags-pa	UnicodeBlocks		Phags-pa
 Nabataean	UnicodeBlocks		Nabateu
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Idiogrames de compatibilitat CJK
-Show private blocks	CharacterWindow		Mostra els bloqueigs privats
+Show private blocks	CharacterWindow		Mostra els blocatges privats
 Samaritan	UnicodeBlocks		Samarità
 Latin extended additional	UnicodeBlocks		Llatí ampliat addicional
 Tibetan	UnicodeBlocks		Tibetà

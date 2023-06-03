@@ -195,7 +195,7 @@ Apply	SettingsWindow		Застосувати
 View the password requirements	UserLoginWindow		Подивитись вимоги до пароля
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Користувач \«%Nickname%\» вже узгоджував Умови користування, але з того часу вони змінилися. Тепер необхідно узгодити оновлені Умови користування.
 Log out	MainWindow		Вийти з системи
-Comment language:	RatePackageWindow		Мова коментарів:
+Comment language:	RatePackageWindow		Мова коментаря:
 The password has been incorrectly repeated.	UserLoginWindow		Пароль був повторений неправильно.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, раніше наданий для користувача [%Nickname%], наразі не дійсний. Користувачеві треба завершити сеанс з цією програмою та знову увійти в систему з оновленим паролем.
 View the usage conditions	ToLatestUserUsageConditionsWindow		Перегляд Умов користування

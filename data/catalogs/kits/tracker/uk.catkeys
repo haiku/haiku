@@ -2,7 +2,7 @@
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
-Kind	ContainerWindow		Різновид
+Kind	ContainerWindow		Тип
 Open with…	ContainerWindow		Відкрити у…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Помилка переміщення \«%name\» до смітника. (%error)
 Or	FindPanel		Або

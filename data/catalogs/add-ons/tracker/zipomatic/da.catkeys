@@ -4,7 +4,7 @@ Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Vil du afbryde dem?
 Error creating archive	file:ZipOMaticWindow.cpp		Fejl ved oprettelse af arkiv
 Stop them	file:ZipOMatic.cpp		Afbryd dem
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på, at du vil afbryde arkiveringen?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på, du vil afbryde arkiveringen?
 Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
 Let them continue	file:ZipOMatic.cpp		Lad dem fortsætte
 Continue	file:ZipOMaticWindow.cpp		Fortsæt

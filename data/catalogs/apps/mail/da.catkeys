@@ -6,7 +6,7 @@ Show icons & labels	Mail		Vis ikoner og etiketter
 (Date unavailable)	Mail		(dato utilgængelig)
 Reply	Mail		Besvar
 Next message	Mail		Næste meddelelse
-Mailing	Mail		Mailing
+Mailing	Mail		Poster
 Unread	Mail		Ulæst
 Same sender	Mail		Samme afsender
 Copy to new	Mail		Kopiér til ny
@@ -37,10 +37,10 @@ Same recipient	Mail		Samme modtager
 Previous message	Mail		Forrige meddelelse
 (Address unavailable)	Mail		(adresse utilgængelig)
 Mail	System name		Post
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Område: %name% (Type: %type%)
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Bilag: %name% (Type: %type%)
 Copy link location	Mail		Kopiér lænkeplacering
 Attachments: 	Mail		Vedhæftninger: 
-Remove enclosure	Mail		Fjern område
+Remove enclosure	Mail		Fjern bilag
 Next	Mail		Næste
 Show icons only	Mail		Vis kun ikoner
 Subject:	Mail		Emne:
@@ -78,7 +78,7 @@ Find	Mail		Søg
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Beklager, kunne ikke finde et program som understøtter 'Person'-datatypen.
 Date:	Mail		Dato:
 Expert	Mail		Ekspert
-Automatically mark mail as read:	Mail		Automatisk markér e-post som læst:
+Automatically mark mail as read:	Mail		Markér automatisk e-post som læst:
 Close and 	Mail		Luk og 
 Colored quotes:	Mail		Farvede citater:
 Automatic	Mail		Automatisk
@@ -105,7 +105,7 @@ Accounts…	Mail		Kontoer…
 Previous	Mail		Forrige
 Include file attributes in attachments	Mail		Medtag filattributter i vedhæftninger
 Start now	Mail		Start nu
-(Name unavailable)	Mail		(navn utilgængeligt)
+(Name unavailable)	Mail		(Navn utilgængeligt)
 Move to trash	Mail		Flyt til papirkurven
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Dato
@@ -126,16 +126,16 @@ Forward	Mail		Videresend
 Open attachment	Mail		Åbn vedhæftning
 mail	B_USER_DIRECTORY/mail		post
 Save this message as a draft before closing?	Mail		Gem meddelelsen som en kladde inden lukning?
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon kører ikke. Meddelelsen er sat i kø og sendes når mail_daemon startes.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon kører ikke. Meddelelsen er sat i kø, og sendes når mail_daemon startes.
 None	Mail		Ingen
 Resend	Mail		Send igen
 Hide	Mail		Skjul
 From:	Mail		Fra:
 No file attributes, just plain data	Mail		Ingen filattributter, blot ren data
 Add	Mail		Tilføj
-out	B_USER_DIRECTORY/mail/out		udgående
+out	B_USER_DIRECTORY/mail/out		udbakke
 Send this message before closing?	Mail		Send meddelelsen inden lukning?
-in	B_USER_DIRECTORY/mail/in		indkommende
+in	B_USER_DIRECTORY/mail/in		indbakke
 Open	Mail		Åbn
 Don't save	Mail		Undlad at gemme
 Leave same	Mail		Lad være som samme
@@ -146,7 +146,7 @@ Edit queries…	Mail		Redigér forespørgsler…
 There is no installed handler for URL links.	Mail		Der er ikke installeret nogen behandler for URL-lænker.
 File	Mail		Fil
 Reply preamble:	Mail		Svarets indledning:
-New mail message	Mail		Ny e-postmeddelelse
+New mail message	Mail		Ny postmeddelelse
 An error occurred trying to open this signature.	Mail		Der opstod en fejl ved forsøg på at åbne signaturen.
 Edit signatures…	Mail		Redigér signaturer…
 User interface	Mail		Brugergrænseflade
@@ -165,4 +165,4 @@ Couldn't open this signature. Sorry.	Mail		Kunne ikke åbne signaturen. Beklager
 Revert	Mail		Tilbagefør
 Unknown	Mail		Ukendt
 Increase quote level	Mail		Øg kvoteniveau
-Add enclosure…	Mail		Tilføj område…
+Add enclosure…	Mail		Tilføj bilag…

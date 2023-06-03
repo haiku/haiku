@@ -1,62 +1,62 @@
 1	danish	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Brug som baggrund…
 File	Menus		Fil
-Slide delay	Menus		Glide forsinkelse
-Selection mode	Menus		Valg
+Slide delay	Menus		Lysbilledeforsinkelse
+Selection mode	Menus		Markeringstilstand
 Zoom in	Menus		Zoom ind
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' er blevet ændret. Vil du lukke dokumentet?
 Page setup…	Menus		Sideopsætning…
 Print…	Menus		Udskriv…
-Get info…	Menus		Hent information…
-OK	SaveToFile		OK
+Get info…	Menus		Hent oplysninger…
+OK	SaveToFile		O.k.
 Previous page	Menus		Forrige side
 View	Menus		Vis
-Full screen	Menus		Fuld skærm
+Full screen	Menus		Fuldskærm
 Go to page	Menus		Gå til side
 Zoom out	Menus		Zoom ud
 Quit	Menus		Afslut
-Rotate counterclockwise	Menus		Roter mod uret
-High-quality zooming	Menus		Højkvalitets zoom
+Rotate counterclockwise	Menus		Rotér mod uret
+High-quality zooming	Menus		Højkvalitetszoom
 Browse	Menus		Gennemse
-Edit	Menus		Rediger
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke indlæse billede! Enten eksisterer filen eller en billedeoversætter for den ikke.
+Edit	Menus		Redigér
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke indlæse billede! Enten eksisterer filen eller en billedeoversætter for den, ikke.
 First page	Menus		Første side
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er blevet ændret. Vil du lukke dokumentet?
-Leave full screen	Menus		Forlad fuld skærm
+Leave full screen	Menus		Forlad fuldskærm
 Close	Menus		Luk
 Close	ClosePrompt		Luk
 Resize to (in 1/72 inches):	PrintOptionsWindow		Sæt størrelse til (i 1/72 tommer):
-Rating	Menus		Ratio
+Rating	Menus		Vurdering
 Flip left to right	Menus		Spejlvend
-Show caption in full screen mode	Menus		Vis billedetekst i fuld skærm
+Show caption in full screen mode	Menus		Vis billedetekst i fuldskærm
 DPI:	PrintOptionsWindow		DPI:
 Open…	Menus		Åbn…
 Next file	Menus		Næste fil
-Clear selection	Menus		Ryd valg
+Clear selection	Menus		Ryd markering
 Close document	ClosePrompt		Luk dokument
 Height: 	PrintOptionsWindow		Højde: 
-The file '%s' could not be written.	SaveToFile		Filen '%s' kunne ikke blive skrevet.
-Cancel	ClosePrompt		Annuller
+The file '%s' could not be written.	SaveToFile		Filen '%s' kunne ikke skrives.
+Cancel	ClosePrompt		Afbryd
 Show tool bar	Menus		Vis værktøjslinje
 Fit to window	Menus		Tilpas til vindue
-Print options	PrintOptionsWindow		Printerindstillinger
+Print options	PrintOptionsWindow		Udskriftsindstillinger
 Copy	Menus		Kopiér
-Progress monitor	ProgressWindow		Fremskridtsmonitor
+Progress monitor	ProgressWindow		Fremgangsoversigt
 Last page	Menus		Sidste side
-Stretch to window	Menus		Valgtilstand
+Stretch to window	Menus		Udstræk til vindue
 Previous file	Menus		Forrige fil
-ShowImage	System name		ShowImage
-Slide show	Menus		Slideshow
+ShowImage	System name		Billedviser
+Slide show	Menus		Lysbilledviser
 Fit image to page	PrintOptionsWindow		Tilpas billedet til siden
 Flip top to bottom	Menus		Vend billedet på hovedet
 Select all	Menus		Vælg alt
-Zoom factor in %:	PrintOptionsWindow		Zoom faktor i %:
+Zoom factor in %:	PrintOptionsWindow		Zoom-faktor i %:
 Width:	PrintOptionsWindow		Bredde:
 Image	Menus		Billede
 Move to Trash	Menus		Flyt til papirkurven
-OK	Alerts		OK
-Rotate clockwise	Menus		Roter med uret
+OK	Alerts		O.k.
+Rotate clockwise	Menus		Rotér med uret
 Job setup	PrintOptionsWindow		Jobopsætning
-Original size	Menus		Original størrelse
+Original size	Menus		Oprindelig størrelse
 Next page	Menus		Næste side
 Save as…	Menus		Gem som…

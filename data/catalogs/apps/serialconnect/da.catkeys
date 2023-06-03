@@ -1,37 +1,37 @@
 1	danish	x-vnd.haiku.SerialConnect	354154115
-Hardware	SerialWindow	Flowcontrol	Hardware
+Hardware	SerialWindow	Flowcontrol	Udstyr
 Connection	SerialWindow		Forbindelse
-Raw send…	SerialWindow		Rå-send…
-Baud rate	SerialWindow		Baudhastighed
-Stop bits	SerialWindow		Stopbits
+Raw send…	SerialWindow		Send rå data…
+Baud rate	SerialWindow		Baudrate
+Stop bits	SerialWindow		Stopbit
 None	SerialWindow	Flowcontrol	Ingen
-Cancel	Custom baudrate window		Annuller
+Cancel	Custom baudrate window		Afbryd
 Sending…	XModemStatus		Sender…
-<no serial port available>	SerialWindow		<ingen seriel port tilgænglig>
+<no serial port available>	SerialWindow		<ingen seriel port tilgængelig>
 Log to file…	SerialWindow		Log til fil…
-Custom baudrate	Custom baudrate window		Tilpasset baudhastighed
+Custom baudrate	Custom baudrate window		Tilpasset baudrate
 File	SerialWindow		Fil
 SerialConnect	System name		Serielforbindelse
 custom…	SerialWindow	Baudrate	tilpas…
 Parity	SerialWindow		Paritet
 None	SerialWindow	Parity	Ingen
 Disconnect	SerialWindow		Afbryd forbindelse
-Everything sent, waiting for acknowledge	XModemStatus		Alt sendt — venter på bekræftelse
+Everything sent, waiting for acknowledge	XModemStatus		Alt sendt, venter på bekræftelse
 Odd	SerialWindow	Parity	Ulige
 Flow control	SerialWindow		Flowstyring
 file transfer progress	SerialWindow		filoverførelsesforløb
 CRC requested	XModemStatus		CRC anmodet
 Data bits	SerialWindow		Databit
 Both	SerialWindow	Flowcontrol	Begge
-Edit	SerialWindow		Rediger
+Edit	SerialWindow		Redigér
 XModem send…	SerialWindow		XModem-send…
-Baudrate:	Custom baudrate window		Baudhastighed:
-OK	Custom baudrate window		OK
+Baudrate:	Custom baudrate window		Baudrate:
+OK	Custom baudrate window		O.k.
 Waiting for receiver…	XModemStatus		Venter på modtager…
 Clear history	SerialWindow		Ryd historik
-Checksum error, re-send block	XModemStatus		Fejl ved tjeksum — send blok igen
+Checksum error, re-send block	XModemStatus		Fejl ved tjeksum, send blok igen
 Settings	SerialWindow		Indstillinger
 Even	SerialWindow	Parity	Lige
-Software	SerialWindow	Flowcontrol	Software
+Software	SerialWindow	Flowcontrol	Programmel
 Line terminator	SerialWindow		Linjeafslutning
-Remote cancelled transfer	XModemStatus		Fjern annullerede overførsel
+Remote cancelled transfer	XModemStatus		Fjern afbrudt overførsel

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Input	4063065788
+1	catalan; valencian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Desplaçament
 Defaults	InputMouse		Valors predeterminats
 Long	KeyboardView		Llarg
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Accepta el primer clic
 OK	TouchpadPrefView		D'acord
 Horizontal scrolling	TouchpadPrefView		Desplaçament horitzontal
 Delay until key repeat	KeyboardView		Retard fins a la repetició de tecla
+Keyboard lock delay	TouchpadPrefView		Retard del blocatge del teclat
 Two finger scrolling	TouchpadPrefView		Desplaçament amb dos dits
 Input	System name		Entrada
 Mouse acceleration	SettingsView		Acceleració del ratolí

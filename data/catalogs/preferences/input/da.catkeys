@@ -1,6 +1,6 @@
-1	danish	x-vnd.Haiku-Input	4063065788
+1	danish	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Rulning
-Defaults	InputMouse		Standarder
+Defaults	InputMouse		Forvalg
 Long	KeyboardView		Lang
 Cancel	TouchpadPrefView		Afbryd
 4-Button	SettingsView		4-knap
@@ -9,7 +9,7 @@ Tapping sensitivity	TouchpadPrefView		Trykfølsomhed
 Device List	InputWindow		Enhedsliste
 Double-click speed	SettingsView		Hastighed for dobbeltklik
 5-Button	SettingsView		5-knap
-Typing test area	KeyboardView		Testområde til skrivning
+Typing test area	KeyboardView		Testområde for indtastning
 Mouse type:	SettingsView		Musetype:
 Revert	InputKeyboard		Omvendt
 Fast	KeyboardView		Hurtig
@@ -25,21 +25,22 @@ Accept first click	SettingsView		Acceptér første klik
 OK	TouchpadPrefView		O.k.
 Horizontal scrolling	TouchpadPrefView		Vandret rulning
 Delay until key repeat	KeyboardView		Forsinkelse før gentagelse af tast
+Keyboard lock delay	TouchpadPrefView		Forsinkelse for tastaturlås
 Two finger scrolling	TouchpadPrefView		Rulning med 2 fingre
 Input	System name		Input
 Mouse acceleration	SettingsView		Museacceleration
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Det nye rulleområde er meget stort og kan vanskeliggøre normal musehandling. Vil du virkelig ændre det?
 High	TouchpadPrefView		Høj
-Defaults	TouchpadPrefView		Standarder
+Defaults	TouchpadPrefView		Forvalg
 1-Button	SettingsView		1-knap
-Defaults	InputKeyboard		Standarder
+Defaults	InputKeyboard		Forvalg
 Quick	TouchpadPrefView		Hurtigt
 Short	KeyboardView		Kort
 Slow	KeyboardView		Langsom
 Revert	InputMouse		Omvendt
 Key repeat rate	KeyboardView		Hastighed for gentagelse af tast
 2-Button	SettingsView		2-knap
-Click to focus and raise	SettingsView		Klik for at fokusere og løft
+Click to focus and raise	SettingsView		Klik for fokusér og løft
 Vertical	TouchpadPrefView		Lodret
 Horizontal	TouchpadPrefView		Vandret
 Focus follows mouse	SettingsView		Fokus følger mus

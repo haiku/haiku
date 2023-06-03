@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1644621968
+1	japanese	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -88,6 +88,7 @@ Modified	FindPanel		更新日時
 Select all	QueryContainerWindow		すべて選択
 Generate image thumbnails	SettingsView		画像のサムネイルを生成
 Select…	FilePanelPriv		選択...
+An item named '%filename%' already exists.	FSUtils		'%filename%' という名前のアイテムはすでに存在します。
 preferences	B_PREFERENCES_DIRECTORY		環境設定
 Name	Person Query Columns		名前
 Skip all	FSUtils		すべてスキップ
@@ -358,6 +359,7 @@ after	FindPanel		以降
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# バイト>} other{<# バイト>}}
 Version	OpenWithWindow		バージョン
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか?元に戻せないので、ご注意ください。
+The entered file name is too long.	FSUtils		入力されたファイル名が長すぎます。
 Add printer…	ContainerWindow		プリンターの追加...
 On	FindPanel		有効
 Permissions	ContainerWindow		アクセス権
@@ -528,6 +530,7 @@ I know what I'm doing	FSUtils	button label	私はなにをするか理解して�
 Preparing to copy items…	StatusWindow		コピーの準備をしています...
 Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		アイコン表示
+The entered folder name is too long.	FSUtils		入力されたフォルダー名が長すぎます。
 Name	ContainerWindow		名前
 Preferred for %type	OpenWithWindow		%type対応優先アプリ
 Free space color	SettingsView		空き容量の色

@@ -1,12 +1,12 @@
 1	danish	x-vnd.Haiku-Sudoku	3382377306
-Restore snapshot	SudokuWindow		Gendan snapshot
+Restore snapshot	SudokuWindow		Gendan øjebliksbillede
 File	SudokuWindow		Fil
-Mark invalid values	SudokuWindow		Markér invalide værdier
-Solve single field	SudokuWindow		Løs enkelt felt
-Hard	SudokuWindow		Svær
-Start again	SudokuWindow		Start igen
+Mark invalid values	SudokuWindow		Markér ugyldige værdier
+Solve single field	SudokuWindow		Løs et enkelt felt
+Hard	SudokuWindow		Hård
+Start again	SudokuWindow		Start på ny
 New	SudokuWindow		Ny
-Easy	SudokuWindow		Nem
+Easy	SudokuWindow		Let
 Undo	SudokuWindow		Fortryd
 Export as…	SudokuWindow		Eksportér som…
 Quit	SudokuWindow		Afslut
@@ -19,17 +19,17 @@ Copy	SudokuWindow		Kopiér
 Solve	SudokuWindow		Løs
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Avanceret
-Set all hints	SudokuWindow		Sæt alle fif
-Searching for removable values	SudokuGenerator		Søg efter fjernbare værdier
+Set all hints	SudokuWindow		Sæt alle ledetråde
+Searching for removable values	SudokuGenerator		Søg efter værdier, der kan fjernes
 Abort	ProgressWindow		Afslut
 Could not set Sudoku:\n%s\n	SudokuWindow		Kunne ikke sætte Sudoku:\n%s\n
 Help	SudokuWindow		Hjælp
-OK	SudokuWindow		OK
+OK	SudokuWindow		O.k.
 Sudoku	System name		Sudoku
-Progress monitor	ProgressWindow		Fremskridtsmonitor
-Creating solvable field	SudokuGenerator		Skab løsbart felt
+Progress monitor	ProgressWindow		Fremgangsoversigt
+Creating solvable field	SudokuGenerator		Skab felt, som kan løses
 View	SudokuWindow		Vis
-Snapshot current	SudokuWindow		Snapshot nuværende
-Mark valid hints	SudokuWindow		Markér valide hints
+Snapshot current	SudokuWindow		Øjebliksbillede nuværende
+Mark valid hints	SudokuWindow		Markér gyldige ledetråde
 Sudoku request	SudokuWindow		Sudoku-forespørgsel
 Open file…	SudokuWindow		Åbn fil…

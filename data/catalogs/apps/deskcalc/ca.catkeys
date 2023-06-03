@@ -22,7 +22,7 @@ cosh	CalcView		cosh
 ln	CalcView		ln
 Compact	CalcView		Compacte
 Calculating	CalcView		Es calcula
-Enable Num Lock on startup	CalcView		Habilita el bloqueig numèric a l'inici.
+Enable Num Lock on startup	CalcView		Habilita el blocatge numèric a l'inici.
 4	CalcView		4
 Scientific	CalcView		Científic
 )	CalcView		)

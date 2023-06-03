@@ -1,21 +1,21 @@
 1	danish	x-vnd.Haiku-StyledEdit	3760185556
-Document statistics	Statistics		Dokumentets statistiker
+Document statistics	Statistics		Dokumentstatistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbageføre, fil ikke fundet: \"%s\".
 Cut	Menus		Klip
-Center	Menus		Centrér
-Increase size	Menus		Større
+Center	Menus		Anbring i midten
+Increase size	Menus		Forøg størrelse
 Page setup…	Menus		Sideopsætning…
-Wrap-around search	FindandReplaceWindow		Indpak-omkring søgning
+Wrap-around search	FindandReplaceWindow		Søg forfra ved enden
 Untitled 	StyledEditWindow		Unavngivet 
-OK	Statistics		OK
-Find	FindandReplaceWindow		Find
+OK	Statistics		O.k.
+Find	FindandReplaceWindow		Søg
 New	Menus		Ny
 Document	Menus		Dokument
 Search backwards	FindandReplaceWindow		Søg baglæns
-Find again	Menus		Find igen
+Find again	Menus		Søg igen
 Read-only	StatusView		Skrivebeskyttet
 Save	Menus		Gem
-Cancel	QuitAlert		Annuller
+Cancel	QuitAlert		Afbryd
 Copy	Menus		Kopiér
 Reload	NodeMonitorAlerts		Genindlæs
 line %d, column %d	StatusView		linje %d, kolonne %d
@@ -23,61 +23,61 @@ Words:	Statistics		Ord:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Gendan
 Error saving \"%s\":\n%s	SaveAlert		Fejl ved gemning \"%s\":\n%s
-OK	RevertToSavedAlert		OK
-Unlock file	StatusView		Lås op for fil
-Italic	Menus		Skrå
+OK	RevertToSavedAlert		O.k.
+Unlock file	StatusView		Lås fil op
+Italic	Menus		Kursiv
 Can't undo	Menus		Kan ikke fortryde
 Replace…	Menus		Erstat…
 File	Menus		Fil
 Paste	Menus		Indsæt
-Bold	Menus		Tyk
+Bold	Menus		Fed
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" blev ændret af et andet program, genindlæs den?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" blev fjernet af et andet program, gendan den?
 Lines:	Statistics		Linjer:
 Replace in all windows	FindandReplaceWindow		Erstat i alle vinduer
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har uændrede ændringer.\nTilbagefør den til den sidste gemte version? 
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har ugemte ændringer.\nTilbagefør den til sidste gemte version? 
 Save	SaveAlert		Gem
-Default	Open_and_SaveAsPanel		Standard
-Cancel	RevertToSavedAlert		Annuller
-Cancel	FindandReplaceWindow		Annuller
-Statistics…	Menus		Statistiker…
+Default	Open_and_SaveAsPanel		Forvalg
+Cancel	RevertToSavedAlert		Afbryd
+Cancel	FindandReplaceWindow		Afbryd
+Statistics…	Menus		Statistikker…
 Encoding	Open_and_SaveAsPanel		Kodning
 Replace all	FindandReplaceWindow		Erstat alle
 Close	Menus		Luk
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fejl ved indlæsning \"%s\":\n\tIkke-understøttet format
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Fejl ved indlæsning \"%s\":\n\tFormatet understøttes ikke
 Left	Menus		Venstre
-Default	Menus		Standard
-OK	SaveAlert		OK
+Default	Menus		Forvalgt
+OK	SaveAlert		O.k.
 Color	Menus		Farve
 Save changes to the document \"%s\"? 	QuitAlert		Gem ændringer til dokumentet \"%s\"? 
 StyledEdit	System name		StyledEdit
 Underline	Menus		Understreget
-Find:	FindandReplaceWindow		Find:
-Undo typing	QuitAlert		Fortryd skrivning
+Find:	FindandReplaceWindow		Søg:
+Undo typing	QuitAlert		Fortryd indtastning
 Error loading \"%s\":\n\t%s	LoadAlert		Fejl ved indlæsning af \"%s\":\n\t%s
 Don't save	SaveAlert		Gem ikke
 Reload…	Menus		Genindlæs…
 Print…	Menus		Udskriv…
 Quit	Menus		Afslut
-Redo typing	QuitAlert		Omgør skrivning
-Ignore	NodeMonitorAlerts		Ignorer
-Wrap lines	Menus		Indpak linjer
+Redo typing	QuitAlert		Omgør indtastning
+Ignore	NodeMonitorAlerts		Ignorér
+Wrap lines	Menus		Tekstombrydning
 Text encoding	Menus		Tekstkodning
 Unable to unlock file\n\t%s	QuitAlert		Kan ikke låse filen op\n\t%s
 Modified	StatusView		Ændret
-OK	LoadAlert		OK
+OK	LoadAlert		O.k.
 Save	QuitAlert		Gem
-Case-sensitive	FindandReplaceWindow		Versalfølsom
-Find selection	Menus		Find valgte
-Find…	Menus		Find…
-Cancel	SaveAlert		Annuller
+Case-sensitive	FindandReplaceWindow		Skel mellem store og små bogstaver
+Find selection	Menus		Søg efter markeret tekst
+Find…	Menus		Søg…
+Cancel	SaveAlert		Afbryd
 Revert	RevertToSavedAlert		Tilbagefør
 Size	Menus		Størrelse
-Decrease size	Menus		Mindre
-Autodetect	Menus		Automatisk registrering
+Decrease size	Menus		Formindsk størrelse
+Autodetect	Menus		Automatisk opdagelse
 Replace next	Menus		Erstat næste
-OK	QuitAlert		OK
-Edit	Menus		Rediger
+OK	QuitAlert		O.k.
+Edit	Menus		Redigér
 Replace with:	FindandReplaceWindow		Erstat med:
 Open…	Menus		Åbn…
 Save as…	Menus		Gem som…
@@ -86,6 +86,6 @@ Characters:	Statistics		Tegn:
 Don't save	QuitAlert		Gem ikke
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Filen er markeret som skrivebeskyttet. Gem ændringer til dokumentet \"%s\"? 
 Font	Menus		Skrifttype
-Align	Menus		Tilpas
+Align	Menus		Justér
 Select all	Menus		Vælg alt
 Right	Menus		Højre

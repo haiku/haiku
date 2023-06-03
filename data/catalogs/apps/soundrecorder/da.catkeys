@@ -1,26 +1,26 @@
 1	danish	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Løkke
-Cannot find default audio hardware	RecorderWindow		Kan ikke finde lyd hardware
+Cannot find default audio hardware	RecorderWindow		Kan ikke finde lydudstyr
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Kan ikke finde den midlertidige fil lavet til at holde den nye optagelse
-Sample size:	RecorderWindow		Prøvestørrelse:
-Nothing to play	RecorderWindow		Intet at spille
+Sample size:	RecorderWindow		Samplestørrelse:
+Nothing to play	RecorderWindow		Intet at afspille
 None of the files appear to be audio files.	RecorderWindow		Ingen af filerne ser ud til at være lydfiler.
 Duration: 	RecorderWindow		Varighed: 
-File info	RecorderWindow		Filinfo
+File info	RecorderWindow		Filoplysninger
 Drop files here	SoundListView		Slip filer her
-Input	RecorderWindow		Input
+Input	RecorderWindow		Inddata
 Some of the files don't appear to be audio files.	RecorderWindow		Nogle af filerne ser ikke ud til at være lydfiler.
-Stop	RecorderWindow		Stop
+Stop	RecorderWindow		Stands
 Format:	RecorderWindow		Format:
 Sound List	RecorderWindow		Lydliste
 Compression: 	RecorderWindow		Komprimering: 
 Rewind	RecorderWindow		Spol tilbage
-Sample rate:	RecorderWindow		Testhastighed:
-Invalid audio files	RecorderWindow		Invalide lydfiler
+Sample rate:	RecorderWindow		Samplingsfrekvens:
+Invalid audio files	RecorderWindow		Ugyldige lydfiler
  seconds	RecorderWindow		 sekunder
-OK	RecorderWindow		OK
+OK	RecorderWindow		O.k.
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Kan ikke åbne den midlertidige fil lavet til at holde den nye optagelse
-Input:	RecorderWindow		Input:
+Input:	RecorderWindow		Inddata:
 Forward	RecorderWindow		Spol fremad
 Play	RecorderWindow		Afspil
 SoundRecorder	System name		Lydoptager
@@ -28,19 +28,19 @@ Channels:	RecorderWindow		Kanaler:
  bits	RecorderWindow		 bit
 None	RecorderWindow		Ingen
 Record	RecorderWindow		Optag
-Sample size: 	RecorderWindow		Prøvestørrelse: 
+Sample size: 	RecorderWindow		Samplestørrelse: 
 Cannot recognize this file as a media file	RecorderWindow		Kan ikke genkende filen som en mediefil
 Format: 	RecorderWindow		Format: 
 File name: 	RecorderWindow		Filnavn: 
-Cannot connect to the selected sound input	RecorderWindow		Kan ikke forbinde til det valgte lydinput
-Cannot get the file to play	RecorderWindow		Kan ikke få filen til at afspille
+Cannot connect to the selected sound input	RecorderWindow		Kan ikke forbinde til den valgte lydindgang
+Cannot get the file to play	RecorderWindow		Kan ikke afspille filen
 Cannot record a sound that long	RecorderWindow		Kan ikke optage en så lang lyd
 Duration:	RecorderWindow		Varighed:
 Compression:	RecorderWindow		Komprimering:
 Cannot find an unused name to use for the new recording	RecorderWindow		Kan ikke finde et ubrugt navn til at bruge til den nye optagelse
 Channels: 	RecorderWindow		Kanaler: 
 Save	RecorderWindow		Gem
-Sample rate: 	RecorderWindow		Testhastighed: 
+Sample rate: 	RecorderWindow		Samplingsfrekvens: 
 Cannot connect to media server	RecorderWindow		Kan ikke oprette forbindelse til medieserver
 The file doesn't appear to be an audio file.	RecorderWindow		Filen ser ikke ud til at være en lydfil.
 File name:	RecorderWindow		Filnavn:

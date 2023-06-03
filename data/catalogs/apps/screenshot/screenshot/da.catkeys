@@ -3,9 +3,9 @@ Include window border	ScreenshotWindow		Medtag vindueskant
 Overwrite	ScreenshotWindow		Overskriv
 Save in:	ScreenshotWindow		Gem i:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		Fejl ved gemning af \"%s\":\n\t%s
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Filen findes allerede.\n Er du sikker på, at du vil overskrive den?
-OK	ScreenshotWindow		OK
-The destination path exists but is not a folder.	ScreenshotWindow		Destinationsstien findes men er ikke en mappe.
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Filen findes allerede.\n Er du sikker på, du vil overskrive den?
+OK	ScreenshotWindow		O.k.
+The destination path exists but is not a folder.	ScreenshotWindow		Målstien findes, men er ikke en mappe.
 Select	ScreenshotWindow		Vælg
 Save as:	ScreenshotWindow		Gem som:
 seconds	ScreenshotWindow		sekunder
@@ -22,7 +22,7 @@ Name:	ScreenshotWindow		Navn:
 Choose folder…	ScreenshotWindow		Vælg mappe …
 Please select	ScreenshotWindow		Vælg venligst
 Failed to save screenshot	ScreenshotWindow		Kunne ikke gemme skærmbillede
-Cancel	ScreenshotWindow		Annuller
+Cancel	ScreenshotWindow		Afbryd
 Delay:	ScreenshotWindow		Forsinkelse:
 Copy to clipboard	ScreenshotWindow		Kopiér til udklipsholder
 screenshot	Screenshot	Base filename of screenshot files	skærmbillede

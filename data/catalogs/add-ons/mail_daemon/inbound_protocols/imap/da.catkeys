@@ -12,4 +12,4 @@ SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Anvend
 status	IMAPFolderConfig		status
 IMAP Folders	IMAPFolderConfig		IMAP-mapper
-Destination:	imap_config		Destination:
+Destination:	imap_config		Mål:

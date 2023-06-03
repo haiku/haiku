@@ -1,5 +1,5 @@
 1	danish	x-vnd.Haiku.TextSearch	1757850908
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vælg venligst de filer du vil have valgt til dig i Trackeren.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vælg de filer, du vil have valgt for dig i Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		Kunne ikke starte xargs-program!
 Open selection	GrepWindow		Åbn valgte
@@ -7,33 +7,33 @@ Actions	GrepWindow		Handlinger
 New window	GrepWindow		Nyt vindue
 Encoding	GrepWindow		Kodning
 Set target to parent folder	GrepWindow		Indstil mål til ophavsmappe
-OK	GrepWindow		OK
+OK	GrepWindow		O.k.
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Luk
 Look in sub-folders	GrepWindow		Kig i undermapper
-%s: Not enough room to escape the filename.	Grepper		%s: Ikke nok plads til at undgå filnavnet.
-Follow symbolic links	GrepWindow		Følg symbolske links
+%s: Not enough room to escape the filename.	Grepper		%s: Ikke nok plads til at omkode filnavnet.
+Follow symbolic links	GrepWindow		Følg symbolske lænker
 Regular expression	GrepWindow		Regulært udtryk
 Text files only	GrepWindow		Kun tekstfiler
 Quit	GrepWindow		Afslut
 Show files in Tracker	GrepWindow		Vis filer i Tracker
-Please select the files you wish to keep searching.	GrepWindow		Vælg venligst de filer du vil fortsat søge efter.
-Trim to selection	GrepWindow		Trim alt andet en markeringen
+Please select the files you wish to keep searching.	GrepWindow		Vælg de filer, du vil fortsat søge efter.
+Trim to selection	GrepWindow		Afgræns til markering
 Set target…	GrepWindow		Sæt mål…
-Failed to open input pipe!	Grepper		Kunne ikke åbne inputledning!
+Failed to open input pipe!	Grepper		Kunne ikke åbne inddataledning!
 Search	GrepWindow		Søg
-Copy text to clipboard	GrepWindow		Kopiér tekst til udklipsholderen
+Copy text to clipboard	GrepWindow		Kopiér tekst til udklipsholder
 Show lines	GrepWindow		Vis linjer
 Failed to open errors pipe!	Grepper		Kunne ikke åbne fejlledning!
-The unselected files will be removed from the list.	GrepWindow		De ikke-valgte filer vil blive slettet fra listen.
-Open files in code editor	GrepWindow		Åbn filer i kodeeditor
-Skip folders starting with a dot	GrepWindow		Spring de mapper over der starter med et punktum
-Failed to open output pipe!	Grepper		Kunne ikke åbne outputledning!
-Cancel	GrepWindow		Annuller
-History	GrepWindow		Historie
+The unselected files will be removed from the list.	GrepWindow		De fravalgte filer vil blive slettet fra listen.
+Open files in code editor	GrepWindow		Åbn filer i koderedigering
+Skip folders starting with a dot	GrepWindow		Spring over mapper, der starter med et punktum
+Failed to open output pipe!	Grepper		Kunne ikke åbne uddataledning!
+Cancel	GrepWindow		Afbryd
+History	GrepWindow		Historik
 TextSearch	System name		Tekstsøgning
 File	GrepWindow		Fil
-Case-sensitive	GrepWindow		Versalfølsom
+Case-sensitive	GrepWindow		Skel mellem store og små bogstaver
 Select all	GrepWindow		Vælg alt
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME kunne ikke åbne en eller flere mapper.
 Settings	GrepWindow		Indstillinger
