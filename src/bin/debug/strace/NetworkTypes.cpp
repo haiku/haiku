@@ -12,6 +12,7 @@
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/un.h>
 
 #include <map>
 #include <utility>
@@ -396,23 +397,67 @@ format_pointer(Context &context, sockaddr *saddr)
 {
 	string r;
 
-	sockaddr_in *sin = (sockaddr_in *)saddr;
-
 	r = format_socket_family(context, saddr->sa_family) + ", ";
 
 	switch (saddr->sa_family) {
 		case AF_INET:
+		{
+			sockaddr_in *sin = (sockaddr_in *)saddr;
 			r += get_ipv4_address(&sin->sin_addr);
 			r += "/";
 			r += format_number(ntohs(sin->sin_port));
 			break;
-
+		}
+		case AF_UNIX:
+		{
+			sockaddr_un *sun = (sockaddr_un *)saddr;
+			r += "path = \"" + string(sun->sun_path) + "\"";
+			break;
+		}
 		default:
 			r += "...";
 			break;
 	}
 
 	return r;
+}
+
+
+static string
+read_sockaddr(Context &context, void *address)
+{
+	sockaddr_storage data;
+	socklen_t addrlen = get_value<socklen_t>(context.GetValue(context.GetSibling(2)));
+
+	if (addrlen > sizeof(data))
+		return context.FormatPointer(address);
+
+	int32 bytesRead;
+	status_t err = context.Reader().Read(address, &data, addrlen, bytesRead);
+	if (err != B_OK)
+		return context.FormatPointer(address);
+
+	return "{" + format_pointer(context, (sockaddr *)&data) + "}";
+}
+
+
+template<>
+string
+TypeHandlerImpl<sockaddr *>::GetParameterValue(Context &context, Parameter *,
+	const void *address)
+{
+	void *data = *(void **)address;
+	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
+		return read_sockaddr(context, data);
+	return context.FormatPointer(data);
+}
+
+
+template<>
+string
+TypeHandlerImpl<sockaddr *>::GetReturnValue(Context &context, uint64 value)
+{
+	return context.FormatPointer((void *)value);
 }
 
 
@@ -726,6 +771,7 @@ POINTER_TYPE(ifreq_ptr, ifreq);
 DEFINE_TYPE(pollfd_ptr, pollfd *);
 POINTER_TYPE(siginfo_t_ptr, siginfo_t);
 POINTER_TYPE(msghdr_ptr, msghdr);
+DEFINE_TYPE(sockaddr_ptr, sockaddr *);
 #if 0
 POINTER_TYPE(message_args_ptr, message_args);
 POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
