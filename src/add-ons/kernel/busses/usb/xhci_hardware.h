@@ -177,7 +177,18 @@
 
 #define PS_PLS_MASK				(0xf << 5)
 #define PS_XDEV_U0				(0x0 << 5)
+#define PS_XDEV_U1				(0x1 << 5)
+#define PS_XDEV_U2				(0x2 << 5)
 #define PS_XDEV_U3				(0x3 << 5)
+#define PS_XDEV_DISABLED		(0x4 << 5)
+#define PS_XDEV_RXDETECT		(0x5 << 5)
+#define PS_XDEV_INACTIVE		(0x6 << 5)
+#define PS_XDEV_POLLING			(0x7 << 5)
+#define PS_XDEV_RECOVERY		(0x8 << 5)
+#define PS_XDEV_HOT_RESET		(0x9 << 5)
+#define PS_XDEV_COMP_MODE		(0xa << 5)
+#define PS_XDEV_TEST_MODE		(0xb << 5)
+#define PS_XDEV_RESUME			(0xf << 5)
 
 
 // Completion Code
