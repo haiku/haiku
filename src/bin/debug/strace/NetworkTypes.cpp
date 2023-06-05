@@ -169,17 +169,6 @@ format_pointer(Context &context, flock *lock)
 
 
 
-template<typename value_t>
-static inline value_t
-get_value(const void *address)
-{
-	if (sizeof(align_t) > sizeof(value_t))
-		return value_t(*(align_t*)address);
-	else
-		return *(value_t*)address;
-}
-
-
 static string
 format_signed_number(int32 value)
 {
@@ -192,7 +181,7 @@ format_signed_number(int32 value)
 static string
 read_pollfd(Context &context, void *data)
 {
-	nfds_t numfds = get_value<nfds_t>(context.GetValue(context.GetSibling(1)));
+	nfds_t numfds = context.ReadValue<nfds_t>(context.GetSibling(1));
 	if ((int64)numfds <= 0)
 		return string();
 
@@ -424,10 +413,15 @@ format_pointer(Context &context, sockaddr *saddr)
 
 
 static string
-read_sockaddr(Context &context, void *address)
+read_sockaddr(Context &context, Parameter *param, void *address)
 {
+	param = context.GetNextSibling(param);
+	if (param == NULL)
+		return context.FormatPointer(address);
+
+	socklen_t addrlen = context.ReadValue<socklen_t>(param);
+
 	sockaddr_storage data;
-	socklen_t addrlen = get_value<socklen_t>(context.GetValue(context.GetSibling(2)));
 
 	if (addrlen > sizeof(data))
 		return context.FormatPointer(address);
@@ -443,12 +437,12 @@ read_sockaddr(Context &context, void *address)
 
 template<>
 string
-TypeHandlerImpl<sockaddr *>::GetParameterValue(Context &context, Parameter *,
-	const void *address)
+TypeHandlerImpl<sockaddr *>::GetParameterValue(Context &context,
+	Parameter *param, const void *address)
 {
 	void *data = *(void **)address;
 	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
-		return read_sockaddr(context, data);
+		return read_sockaddr(context, param, data);
 	return context.FormatPointer(data);
 }
 

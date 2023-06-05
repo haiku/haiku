@@ -33,8 +33,19 @@ public:
 		return fSyscall->ParameterAt(index);
 	}
 
+	Parameter *GetNextSibling(Parameter *param) const;
+
 	const void *GetValue(Parameter *param) const {
 		return fData + param->Offset();
+	}
+
+	template<typename value_t>
+	value_t ReadValue(Parameter *param) const {
+		const void *address = GetValue(param);
+		if (sizeof(align_t) > sizeof(value_t))
+			return value_t(*(align_t*)address);
+		else
+			return *(value_t*)address;
 	}
 
 	uint64 GetReturnValue() const {

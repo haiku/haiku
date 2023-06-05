@@ -12,6 +12,18 @@
 #include <stdio.h>
 #include <string.h>
 
+
+Parameter *
+Context::GetNextSibling(Parameter *param) const
+{
+	for (int32 i = 0; i + 1 < fSyscall->CountParameters(); i++) {
+		if (fSyscall->ParameterAt(i) == param)
+			return fSyscall->ParameterAt(i + 1);
+	}
+	return NULL;
+}
+
+
 string
 Context::FormatSigned(int64 value, int bytes) const
 {
