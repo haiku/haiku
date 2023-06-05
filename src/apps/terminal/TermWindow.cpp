@@ -192,6 +192,7 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 	fEncodingMenu(NULL),
 	fPrintSettings(NULL),
 	fPrefWindow(NULL),
+	fThemeWindow(NULL),
 	fFindPanel(NULL),
 	fSavedFrame(0, 0, -1, -1),
 	fSetWindowTitleDialog(NULL),
