@@ -7,6 +7,7 @@ BinCommand pkgman :
 	command_add_repo.cpp
 	command_drop_repo.cpp
 	command_full_sync.cpp
+	command_info.cpp
 	command_install.cpp
 	command_list_repos.cpp
 	command_update.cpp
