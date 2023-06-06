@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <OS.h>
 
 #define THREAD_COUNT 10
-#define CYCLES 2
+#define CYCLES 20
 
 pthread_barrier_t mybarrier;
 
@@ -14,14 +15,14 @@ void* threadFn(void* id_ptr)
 
 	for (int i = 0; i < CYCLES; ++i) {
 		int wait_sec = 1 + rand() % 10;
-		printf("thread %d: Wait %d seconds.\n", thread_id, wait_sec);
-		sleep(wait_sec);
-		printf("thread %d: Waiting on barrier...\n", thread_id);
+		fprintf(stderr, "thread %d: Wait %d microseconds.\n", thread_id, wait_sec * 100);
+		snooze(wait_sec * 100);
 
+		fprintf(stderr, "thread %d: Waiting on barrier...\n", thread_id);
 		int status = pthread_barrier_wait(&mybarrier);
 		if (status == PTHREAD_BARRIER_SERIAL_THREAD)
-			printf("thread %d: serial thread.\n", thread_id);
-		printf("thread %d: Finished!\n", thread_id);
+			fprintf(stderr, "thread %d: serial thread.\n", thread_id);
+		fprintf(stderr, "thread %d: Finished!\n", thread_id);
 	}
 
 	return NULL;
