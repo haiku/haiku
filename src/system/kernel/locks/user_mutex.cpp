@@ -20,15 +20,12 @@
 #include <vm/VMArea.h>
 
 
-struct UserMutexEntry;
-typedef DoublyLinkedList<UserMutexEntry> UserMutexEntryList;
-
-struct UserMutexEntry : public DoublyLinkedListLinkImpl<UserMutexEntry> {
+struct UserMutexEntry {
 	phys_addr_t			address;
+	UserMutexEntry*		hash_next;
+	int32				ref_count;
+
 	ConditionVariable	condition;
-	bool				locked;
-	UserMutexEntryList	otherEntries;
-	UserMutexEntry*		hashNext;
 };
 
 struct UserMutexHashDefinition {
@@ -52,7 +49,7 @@ struct UserMutexHashDefinition {
 
 	UserMutexEntry*& GetLink(UserMutexEntry* value) const
 	{
-		return value->hashNext;
+		return value->hash_next;
 	}
 };
 
@@ -109,68 +106,68 @@ user_atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst)
 // #pragma mark - user mutex entries
 
 
-static void
-add_user_mutex_entry(UserMutexEntry* entry)
+static UserMutexEntry*
+get_user_mutex_entry(phys_addr_t address)
 {
-	UserMutexEntry* firstEntry = sUserMutexTable.Lookup(entry->address);
-	if (firstEntry != NULL)
-		firstEntry->otherEntries.Add(entry);
-	else
-		sUserMutexTable.Insert(entry);
+	UserMutexEntry* entry = sUserMutexTable.Lookup(address);
+	if (entry != NULL) {
+		atomic_add(&entry->ref_count, 1);
+		return entry;
+	}
+
+	entry = new(std::nothrow) UserMutexEntry;
+	if (entry == NULL)
+		return entry;
+
+	entry->address = address;
+	entry->ref_count = 1;
+	entry->condition.Init(entry, "UserMutexEntry");
+
+	sUserMutexTable.Insert(entry);
+	return entry;
 }
 
 
-static bool
-remove_user_mutex_entry(UserMutexEntry* entry)
+static void
+put_user_mutex_entry(UserMutexEntry* entry, MutexLocker& locker)
 {
-	UserMutexEntry* firstEntry = sUserMutexTable.Lookup(entry->address);
-	if (firstEntry != entry) {
-		// The entry is not the first entry in the table. Just remove it from
-		// the first entry's list.
-		firstEntry->otherEntries.Remove(entry);
-		return true;
-	}
+	const phys_addr_t address = entry->address;
+	if (atomic_add(&entry->ref_count, -1) != 1)
+		return;
 
-	// The entry is the first entry in the table. Remove it from the table and,
-	// if any, add the next entry to the table.
+	locker.Lock();
+
+	// Was it removed & deleted while we were waiting for the lock?
+	if (sUserMutexTable.Lookup(address) != entry)
+		return;
+
+	// Or did someone else acquire a reference to it?
+	if (atomic_get(&entry->ref_count) > 0)
+		return;
+
 	sUserMutexTable.Remove(entry);
-
-	firstEntry = entry->otherEntries.RemoveHead();
-	if (firstEntry != NULL) {
-		firstEntry->otherEntries.MoveFrom(&entry->otherEntries);
-		sUserMutexTable.Insert(firstEntry);
-		return true;
-	}
-
-	return false;
+	delete entry;
 }
 
 
 static status_t
 user_mutex_wait_locked(int32* mutex, phys_addr_t physicalAddress, const char* name,
-	uint32 flags, bigtime_t timeout, MutexLocker& locker, bool& lastWaiter)
+	uint32 flags, bigtime_t timeout, MutexLocker& locker)
 {
-	// add the entry to the table
-	UserMutexEntry entry;
-	entry.address = physicalAddress;
-	entry.locked = false;
-	add_user_mutex_entry(&entry);
+	// add or get the entry from the table
+	UserMutexEntry* entry = get_user_mutex_entry(physicalAddress);
+	if (entry == NULL)
+		return B_NO_MEMORY;
 
 	// wait
-	entry.condition.Init((void*)physicalAddress, "user mutex");
-	status_t error = entry.condition.Wait(locker.Get(), flags, timeout);
+	ConditionVariableEntry waiter;
+	entry->condition.Add(&waiter);
+	locker.Unlock();
 
-	if (error != B_OK && entry.locked)
-		error = B_OK;
+	status_t error = waiter.Wait(flags, timeout);
 
-	if (!entry.locked) {
-		// if nobody woke us up, we have to dequeue ourselves
-		lastWaiter = !remove_user_mutex_entry(&entry);
-	} else {
-		// otherwise the waker has done the work of marking the
-		// mutex or semaphore uncontended
-		lastWaiter = false;
-	}
+	// this will re-lock only if necessary
+	put_user_mutex_entry(entry, locker);
 
 	return error;
 }
@@ -200,14 +197,8 @@ user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
 	if (user_mutex_prepare_to_lock(mutex))
 		return B_OK;
 
-	bool lastWaiter;
-	status_t error = user_mutex_wait_locked(mutex, physicalAddress, name,
-		flags, timeout, locker, lastWaiter);
-
-	if (lastWaiter)
-		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
-
-	return error;
+	return user_mutex_wait_locked(mutex, physicalAddress, name,
+		flags, timeout, locker);
 }
 
 
@@ -221,37 +212,24 @@ user_mutex_unblock_locked(int32* mutex, phys_addr_t physicalAddress, uint32 flag
 		return;
 	}
 
-	// Someone is waiting: try to hand off the lock to them, if possible.
 	int32 oldValue = 0;
 	if ((flags & B_USER_MUTEX_UNBLOCK_ALL) == 0) {
+		// This is not merely an unblock, but a hand-off.
 		oldValue = user_atomic_or(mutex, B_USER_MUTEX_LOCKED);
 		if ((oldValue & B_USER_MUTEX_LOCKED) != 0)
 			return;
-	} else {
-		oldValue = user_atomic_get(mutex);
 	}
-
-	// unblock the first thread
-	entry->locked = true;
-	entry->condition.NotifyOne();
 
 	if ((flags & B_USER_MUTEX_UNBLOCK_ALL) != 0
 			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
-		// unblock and dequeue all the other waiting threads as well
-		while (UserMutexEntry* otherEntry = entry->otherEntries.RemoveHead()) {
-			otherEntry->locked = true;
-			otherEntry->condition.NotifyOne();
-		}
-
-		// dequeue the first thread and mark the mutex uncontended
-		sUserMutexTable.Remove(entry);
-		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+		// unblock and dequeue all the waiting threads
+		entry->condition.NotifyAll(B_OK);
 	} else {
-		bool otherWaiters = remove_user_mutex_entry(entry);
-		if (!otherWaiters) {
-			user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
-		}
+		entry->condition.NotifyOne(B_OK);
 	}
+
+	if (entry->condition.EntriesCount() == 0)
+		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 }
 
 
@@ -269,14 +247,8 @@ user_mutex_sem_acquire_locked(int32* sem, phys_addr_t physicalAddress,
 		oldValue = value;
 	}
 
-	bool lastWaiter;
-	status_t error = user_mutex_wait_locked(sem, physicalAddress, name, flags,
-		timeout, locker, lastWaiter);
-
-	if (lastWaiter)
-		user_atomic_test_and_set(sem, 0, -1);
-
-	return error;
+	return user_mutex_wait_locked(sem, physicalAddress, name, flags,
+		timeout, locker);
 }
 
 
@@ -296,12 +268,8 @@ user_mutex_sem_release_locked(int32* sem, phys_addr_t physicalAddress)
 		}
 	}
 
-	bool otherWaiters = remove_user_mutex_entry(entry);
-
-	entry->locked = true;
-	entry->condition.NotifyOne();
-
-	if (!otherWaiters) {
+	entry->condition.NotifyOne(B_OK);
+	if (entry->condition.EntriesCount() == 0) {
 		// mark the semaphore uncontended
 		user_atomic_test_and_set(sem, 0, -1);
 	}
