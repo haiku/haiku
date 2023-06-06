@@ -24,7 +24,7 @@ struct UserMutexEntry;
 typedef DoublyLinkedList<UserMutexEntry> UserMutexEntryList;
 
 struct UserMutexEntry : public DoublyLinkedListLinkImpl<UserMutexEntry> {
-	addr_t				address;
+	phys_addr_t			address;
 	ConditionVariable	condition;
 	bool				locked;
 	UserMutexEntryList	otherEntries;
@@ -32,7 +32,7 @@ struct UserMutexEntry : public DoublyLinkedListLinkImpl<UserMutexEntry> {
 };
 
 struct UserMutexHashDefinition {
-	typedef addr_t			KeyType;
+	typedef phys_addr_t		KeyType;
 	typedef UserMutexEntry	ValueType;
 
 	size_t HashKey(addr_t key) const
@@ -45,7 +45,7 @@ struct UserMutexHashDefinition {
 		return HashKey(value->address);
 	}
 
-	bool Compare(addr_t key, const UserMutexEntry* value) const
+	bool Compare(phys_addr_t key, const UserMutexEntry* value) const
 	{
 		return value->address == key;
 	}
@@ -147,7 +147,7 @@ remove_user_mutex_entry(UserMutexEntry* entry)
 
 
 static status_t
-user_mutex_wait_locked(int32* mutex, addr_t physicalAddress, const char* name,
+user_mutex_wait_locked(int32* mutex, phys_addr_t physicalAddress, const char* name,
 	uint32 flags, bigtime_t timeout, MutexLocker& locker, bool& lastWaiter)
 {
 	// add the entry to the table
@@ -177,7 +177,7 @@ user_mutex_wait_locked(int32* mutex, addr_t physicalAddress, const char* name,
 
 
 static status_t
-user_mutex_lock_locked(int32* mutex, addr_t physicalAddress,
+user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
 	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
 {
 	// mark the mutex locked + waiting
@@ -204,7 +204,7 @@ user_mutex_lock_locked(int32* mutex, addr_t physicalAddress,
 
 
 static void
-user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
+user_mutex_unlock_locked(int32* mutex, phys_addr_t physicalAddress, uint32 flags)
 {
 	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
 	if (entry == NULL) {
@@ -243,7 +243,7 @@ user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
 
 
 static status_t
-user_mutex_sem_acquire_locked(int32* sem, addr_t physicalAddress,
+user_mutex_sem_acquire_locked(int32* sem, phys_addr_t physicalAddress,
 	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
 {
 	// The semaphore may have been released in the meantime, and we also
@@ -268,7 +268,7 @@ user_mutex_sem_acquire_locked(int32* sem, addr_t physicalAddress,
 
 
 static void
-user_mutex_sem_release_locked(int32* sem, addr_t physicalAddress)
+user_mutex_sem_release_locked(int32* sem, phys_addr_t physicalAddress)
 {
 	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
 	if (!entry) {
