@@ -35,7 +35,7 @@ struct UserMutexHashDefinition {
 	typedef phys_addr_t		KeyType;
 	typedef UserMutexEntry	ValueType;
 
-	size_t HashKey(addr_t key) const
+	size_t HashKey(phys_addr_t key) const
 	{
 		return key >> 2;
 	}
