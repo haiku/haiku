@@ -83,7 +83,7 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 
 	// waiter_count < 0 means other threads are still exiting.
 	// Lock in a loop, if necessary, until this is no longer the case.
-	while (atomic_get(&barrier->waiter_count) < 0) {
+	while (atomic_get((int32*)&barrier->waiter_count) < 0) {
 		status_t status = barrier_lock(&barrier->mutex);
 		if (status != B_OK)
 			return status;
@@ -91,7 +91,7 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 		barrier_unlock(&barrier->mutex);
 	}
 
-	if (atomic_add(&barrier->waiter_count, 1) == (barrier->waiter_max - 1)) {
+	if (atomic_add((int32*)&barrier->waiter_count, 1) == (barrier->waiter_max - 1)) {
 		// We are the last one in. Lock the barrier mutex.
 		barrier_lock(&barrier->mutex);
 
@@ -113,7 +113,7 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 	// Release the barrier, so that any later threads trying to acquire it wake up.
 	barrier_unlock(&barrier->lock);
 
-	if (atomic_add(&barrier->waiter_count, 1) == -1) {
+	if (atomic_add((int32*)&barrier->waiter_count, 1) == -1) {
 		// We are the last one out. Reset state and unlock.
 		barrier->lock = B_USER_MUTEX_LOCKED;
 		barrier_unlock(&barrier->mutex);
