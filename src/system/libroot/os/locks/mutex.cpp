@@ -95,4 +95,7 @@ __mutex_unlock(mutex *lock)
 			&& (oldValue & B_USER_MUTEX_DISABLED) == 0) {
 		_kern_mutex_unlock(&lock->lock, 0);
 	}
+
+	if ((oldValue & B_USER_MUTEX_LOCKED) == 0)
+		debugger("mutex was not actually locked!");
 }

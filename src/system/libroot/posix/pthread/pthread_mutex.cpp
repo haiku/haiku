@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include "pthread_private.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,6 +92,7 @@ __pthread_mutex_lock(pthread_mutex_t* mutex, uint32 flags, bigtime_t timeout)
 	}
 
 	// we have locked the mutex for the first time
+	assert(mutex->owner == -1);
 	mutex->owner = thisThread;
 	mutex->owner_count = 1;
 
@@ -175,6 +177,12 @@ pthread_mutex_unlock(pthread_mutex_t* mutex)
 		~(int32)B_USER_MUTEX_LOCKED);
 	if ((oldValue & B_USER_MUTEX_WAITING) != 0)
 		_kern_mutex_unlock((int32*)&mutex->lock, 0);
+
+	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_ERRORCHECK
+		|| MUTEX_TYPE(mutex) == PTHREAD_MUTEX_DEFAULT) {
+		if ((oldValue & B_USER_MUTEX_LOCKED) == 0)
+			return EPERM;
+	}
 
 	return 0;
 }
