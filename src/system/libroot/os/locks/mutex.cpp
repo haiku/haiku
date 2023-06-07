@@ -65,15 +65,9 @@ __mutex_lock(mutex *lock)
 
 	int32 oldValue;
 	do {
-		// set the locked flag
-		oldValue = atomic_or(&lock->lock, B_USER_MUTEX_LOCKED);
-
-		if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
-				|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
-			// No one has the lock or is waiting for it, or the mutex has been
-			// disabled.
+		oldValue = atomic_test_and_set(&lock->lock, B_USER_MUTEX_LOCKED, 0);
+		if (oldValue == 0 || (oldValue & B_USER_MUTEX_DISABLED) != 0)
 			return B_OK;
-		}
 	} while (count++ < kMaxCount && (oldValue & B_USER_MUTEX_WAITING) != 0);
 
 	// we have to call the kernel
@@ -93,7 +87,7 @@ __mutex_unlock(mutex *lock)
 	int32 oldValue = atomic_and(&lock->lock, ~(int32)B_USER_MUTEX_LOCKED);
 	if ((oldValue & B_USER_MUTEX_WAITING) != 0
 			&& (oldValue & B_USER_MUTEX_DISABLED) == 0) {
-		_kern_mutex_unlock(&lock->lock, 0);
+		_kern_mutex_unblock(&lock->lock, 0);
 	}
 
 	if ((oldValue & B_USER_MUTEX_LOCKED) == 0)

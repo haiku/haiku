@@ -1127,7 +1127,7 @@ void _kern_mutex_lock() {}
 void _kern_mutex_sem_acquire() {}
 void _kern_mutex_sem_release() {}
 void _kern_mutex_switch_lock() {}
-void _kern_mutex_unlock() {}
+void _kern_mutex_unblock() {}
 void _kern_next_device() {}
 void _kern_normalize_path() {}
 void _kern_open() {}

@@ -123,11 +123,9 @@ struct LocalRWLock {
 
 	bool StructureLock()
 	{
-		// Enter critical region: lock the mutex
-		int32 status = atomic_or((int32*)&mutex, B_USER_MUTEX_LOCKED);
-
-		// If already locked, call the kernel
-		if ((status & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) != 0) {
+		const int32 oldValue = atomic_test_and_set((int32*)&mutex, B_USER_MUTEX_LOCKED, 0);
+		if (oldValue != 0) {
+			status_t status;
 			do {
 				status = _kern_mutex_lock((int32*)&mutex, NULL, 0, 0);
 			} while (status == B_INTERRUPTED);
@@ -143,9 +141,8 @@ struct LocalRWLock {
 		// Exit critical region: unlock the mutex
 		int32 status = atomic_and((int32*)&mutex,
 			~(int32)B_USER_MUTEX_LOCKED);
-
 		if ((status & B_USER_MUTEX_WAITING) != 0)
-			_kern_mutex_unlock((int32*)&mutex, 0);
+			_kern_mutex_unblock((int32*)&mutex, 0);
 	}
 
 	status_t ReadLock(uint32 flags, bigtime_t timeout)

@@ -48,8 +48,8 @@ pthread_barrier_init(pthread_barrier_t* barrier,
 static status_t
 barrier_lock(__haiku_std_int32* mutex)
 {
-	int32 oldValue = atomic_or((int32*)mutex, B_USER_MUTEX_LOCKED);
-	if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) != 0) {
+	const int32 oldValue = atomic_test_and_set((int32*)mutex, B_USER_MUTEX_LOCKED, 0);
+	if (oldValue != 0) {
 		status_t error;
 		do {
 			error = _kern_mutex_lock((int32*)mutex, NULL, 0, 0);
@@ -68,7 +68,7 @@ barrier_unlock(__haiku_std_int32* mutex)
 	int32 oldValue = atomic_and((int32*)mutex,
 		~(int32)B_USER_MUTEX_LOCKED);
 	if ((oldValue & B_USER_MUTEX_WAITING) != 0)
-		_kern_mutex_unlock((int32*)mutex, 0);
+		_kern_mutex_unblock((int32*)mutex, 0);
 }
 
 
@@ -98,7 +98,7 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 		// Wake everyone else up.
 		barrier->waiter_count = (-barrier->waiter_max) + 1;
 		atomic_and((int32*)&barrier->lock, ~(int32)B_USER_MUTEX_LOCKED);
-		_kern_mutex_unlock((int32*)&barrier->lock, B_USER_MUTEX_UNBLOCK_ALL);
+		_kern_mutex_unblock((int32*)&barrier->lock, B_USER_MUTEX_UNBLOCK_ALL);
 
 		// Return with the barrier mutex still locked, as waiter_count < 0.
 		// The last thread out will take care of unlocking it and resetting state.

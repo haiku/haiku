@@ -6,7 +6,7 @@
 #define _SYSTEM_USER_MUTEX_DEFS_H
 
 
-// user mutex specific flags passed to _kern_user_mutex_unlock()
+// user mutex specific flags passed to _kern_mutex_unblock()
 #define B_USER_MUTEX_UNBLOCK_ALL	0x80000000
 	// All threads currently waiting on the mutex will be unblocked. The mutex
 	// state will be locked.

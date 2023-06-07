@@ -77,7 +77,7 @@ extern ssize_t		_kern_wait_for_objects(object_wait_info* infos, int numInfos,
 /* user mutex functions */
 extern status_t		_kern_mutex_lock(int32* mutex, const char* name,
 						uint32 flags, bigtime_t timeout);
-extern status_t		_kern_mutex_unlock(int32* mutex, uint32 flags);
+extern status_t		_kern_mutex_unblock(int32* mutex, uint32 flags);
 extern status_t		_kern_mutex_switch_lock(int32* fromMutex, int32* toMutex,
 						const char* name, uint32 flags, bigtime_t timeout);
 extern status_t		_kern_mutex_sem_acquire(int32* sem, const char* name,

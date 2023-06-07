@@ -180,14 +180,13 @@ static status_t
 user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
 	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
 {
-	// mark the mutex locked + waiting
 	int32 oldValue = user_atomic_or(mutex,
 		B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING);
-
-	if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
+	if ((oldValue & B_USER_MUTEX_LOCKED) == 0
 			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
 		// clear the waiting flag and be done
-		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+		if ((oldValue & B_USER_MUTEX_WAITING) == 0)
+			user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 		return B_OK;
 	}
 
@@ -195,28 +194,27 @@ user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
 	status_t error = user_mutex_wait_locked(mutex, physicalAddress, name,
 		flags, timeout, locker, lastWaiter);
 
-	if (lastWaiter) {
+	if (lastWaiter)
 		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
-	}
 
 	return error;
 }
 
 
 static void
-user_mutex_unlock_locked(int32* mutex, phys_addr_t physicalAddress, uint32 flags)
+user_mutex_unblock_locked(int32* mutex, phys_addr_t physicalAddress, uint32 flags)
 {
 	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
 	if (entry == NULL) {
-		// no one is waiting -- clear locked flag
-		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_LOCKED);
+		// no one is waiting
+		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 		return;
 	}
 
-	// Someone is waiting -- set the locked flag. It might still be set,
-	// but when using userland atomic operations, the caller will usually
-	// have cleared it already.
+	// Someone is waiting: try to hand off the lock to them, if possible.
 	int32 oldValue = user_atomic_or(mutex, B_USER_MUTEX_LOCKED);
+	if ((oldValue & B_USER_MUTEX_LOCKED) != 0)
+		return;
 
 	// unblock the first thread
 	entry->locked = true;
@@ -340,7 +338,8 @@ user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 	// unlock the first mutex and lock the second one
 	{
 		MutexLocker locker(sUserMutexTableLock);
-		user_mutex_unlock_locked(fromMutex, fromWiringInfo.physicalAddress,
+		user_atomic_and(fromMutex, ~(int32)B_USER_MUTEX_LOCKED);
+		user_mutex_unblock_locked(fromMutex, fromWiringInfo.physicalAddress,
 			flags);
 
 		error = user_mutex_lock_locked(toMutex, toWiringInfo.physicalAddress,
@@ -386,7 +385,7 @@ _user_mutex_lock(int32* mutex, const char* name, uint32 flags,
 
 
 status_t
-_user_mutex_unlock(int32* mutex, uint32 flags)
+_user_mutex_unblock(int32* mutex, uint32 flags)
 {
 	if (mutex == NULL || !IS_USER_ADDRESS(mutex) || (addr_t)mutex % 4 != 0)
 		return B_BAD_ADDRESS;
@@ -400,7 +399,7 @@ _user_mutex_unlock(int32* mutex, uint32 flags)
 
 	{
 		MutexLocker locker(sUserMutexTableLock);
-		user_mutex_unlock_locked(mutex, wiringInfo.physicalAddress, flags);
+		user_mutex_unblock_locked(mutex, wiringInfo.physicalAddress, flags);
 	}
 
 	vm_unwire_page(&wiringInfo);
