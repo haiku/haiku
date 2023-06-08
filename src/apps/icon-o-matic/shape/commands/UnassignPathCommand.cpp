@@ -12,7 +12,7 @@
 #include <Locale.h>
 
 #include "PathContainer.h"
-#include "Shape.h"
+#include "PathSourceShape.h"
 #include "VectorPath.h"
 
 
@@ -21,7 +21,7 @@
 
 
 // constructor
-UnassignPathCommand::UnassignPathCommand(Shape* shape,
+UnassignPathCommand::UnassignPathCommand(PathSourceShape* shape,
 										 VectorPath* path)
 	: Command(),
 	  fShape(shape),

@@ -27,21 +27,22 @@
 
 using std::nothrow;
 
+
 #ifdef ICON_O_MATIC
-// constructor
 ShapeListener::ShapeListener()
 {
 }
 
-// destructor
+
 ShapeListener::~ShapeListener()
 {
 }
 #endif // ICON_O_MATIC
 
+
 // #pragma mark -
 
-// constructor
+
 Shape::Shape(::Style* style)
 #ifdef ICON_O_MATIC
 	: IconObject("<shape>"),
@@ -61,9 +62,7 @@ Shape::Shape(::Style* style)
 
 	  fLastBounds(0, 0, -1, -1),
 
-	  fHinting(false),
-	  fMinVisibilityScale(0.0),
-	  fMaxVisibilityScale(4.0)
+	  fHinting(false)
 
 #ifdef ICON_O_MATIC
 	, fListeners(8)
@@ -77,7 +76,7 @@ Shape::Shape(::Style* style)
 #endif
 }
 
-// constructor
+
 Shape::Shape(const Shape& other)
 #ifdef ICON_O_MATIC
 	: IconObject(other),
@@ -97,9 +96,7 @@ Shape::Shape(const Shape& other)
 
 	  fLastBounds(0, 0, -1, -1),
 
-	  fHinting(other.fHinting),
-	  fMinVisibilityScale(other.fMinVisibilityScale),
-	  fMaxVisibilityScale(other.fMaxVisibilityScale)
+	  fHinting(false)
 
 #ifdef ICON_O_MATIC
 	, fListeners(8)
@@ -111,6 +108,7 @@ Shape::Shape(const Shape& other)
 #ifdef ICON_O_MATIC
 		fPaths->AddListener(this);
 #endif
+
 		// copy the path references from
 		// the other shape
 		if (other.fPaths) {
@@ -133,7 +131,7 @@ Shape::Shape(const Shape& other)
 	}
 }
 
-// destructor
+
 Shape::~Shape()
 {
 	int32 count = fTransformers.CountItems();
@@ -155,11 +153,12 @@ Shape::~Shape()
 	SetStyle(NULL);
 }
 
+
 // #pragma mark -
 
-// Unarchive
+
 status_t
-Shape::Unarchive(const BMessage* archive)
+Shape::Unarchive(BMessage* archive)
 {
 #ifdef ICON_O_MATIC
 	// IconObject properties
@@ -170,11 +169,15 @@ Shape::Unarchive(const BMessage* archive)
 	status_t ret;
 #endif
 
+	// hinting
+	if (archive->FindBool("hinting", &fHinting) < B_OK)
+		fHinting = false;
+
 	// recreate transformers
 	BMessage transformerArchive;
 	for (int32 i = 0;
 		 archive->FindMessage("transformer", i,
-		 					  &transformerArchive) == B_OK;
+			 &transformerArchive) == B_OK;
 		 i++) {
 		Transformer* transformer
 			= TransformerFactory::TransformerFor(
@@ -189,43 +192,23 @@ Shape::Unarchive(const BMessage* archive)
 	const void* matrix;
 	ssize_t dataSize = size * sizeof(double);
 	ret = archive->FindData("transformation", B_DOUBLE_TYPE,
-							&matrix, &dataSize);
+		&matrix, &dataSize);
 	if (ret == B_OK && dataSize == (ssize_t)(size * sizeof(double)))
 		LoadFrom((const double*)matrix);
-
-	// hinting
-	if (archive->FindBool("hinting", &fHinting) < B_OK)
-		fHinting = false;
-
-	// min visibility scale
-	if (archive->FindFloat("min visibility scale",
-						   &fMinVisibilityScale) < B_OK)
-		fMinVisibilityScale = 0.0;
-
-	// max visibility scale
-	if (archive->FindFloat("max visibility scale",
-						   &fMaxVisibilityScale) < B_OK)
-		fMaxVisibilityScale = 4.0;
-
-	if (fMinVisibilityScale < 0.0)
-		fMinVisibilityScale = 0.0;
-	if (fMinVisibilityScale > 4.0)
-		fMinVisibilityScale = 4.0;
-	if (fMaxVisibilityScale < 0.0)
-		fMaxVisibilityScale = 0.0;
-	if (fMaxVisibilityScale > 4.0)
-		fMaxVisibilityScale = 4.0;
 
 	return B_OK;
 }
 
-#ifdef ICON_O_MATIC
 
-// Archive
+#ifdef ICON_O_MATIC
 status_t
 Shape::Archive(BMessage* into, bool deep) const
 {
 	status_t ret = IconObject::Archive(into, deep);
+
+	// hinting
+	if (ret == B_OK)
+		ret = into->AddBool("hinting", fHinting);
 
 	// transformers
 	if (ret == B_OK) {
@@ -247,69 +230,32 @@ Shape::Archive(BMessage* into, bool deep) const
 		double matrix[size];
 		StoreTo(matrix);
 		ret = into->AddData("transformation", B_DOUBLE_TYPE,
-							matrix, size * sizeof(double));
+			matrix, size * sizeof(double));
 	}
-
-	// hinting
-	if (ret ==B_OK)
-		ret = into->AddBool("hinting", fHinting);
-
-	// min visibility scale
-	if (ret ==B_OK)
-		ret = into->AddFloat("min visibility scale",
-							 fMinVisibilityScale);
-
-	// max visibility scale
-	if (ret ==B_OK)
-		ret = into->AddFloat("max visibility scale",
-							 fMaxVisibilityScale);
 
 	return ret;
 }
 
-// MakePropertyObject
+
 PropertyObject*
 Shape::MakePropertyObject() const
 {
 	PropertyObject* object = IconObject::MakePropertyObject();
-	if (!object)
-		return NULL;
-
-//	object->AddProperty(new BoolProperty(PROPERTY_HINTING, fHinting));
-
-	object->AddProperty(new FloatProperty(PROPERTY_MIN_VISIBILITY_SCALE,
-										  fMinVisibilityScale, 0, 4));
-
-	object->AddProperty(new FloatProperty(PROPERTY_MAX_VISIBILITY_SCALE,
-										  fMaxVisibilityScale, 0, 4));
-
 	return object;
 }
 
-// SetToPropertyObject
+
 bool
 Shape::SetToPropertyObject(const PropertyObject* object)
 {
-	AutoNotificationSuspender _(this);
 	IconObject::SetToPropertyObject(object);
-
-	// hinting
-//	SetHinting(object->Value(PROPERTY_HINTING, fHinting));
-
-	// min visibility scale
-	SetMinVisibilityScale(object->Value(PROPERTY_MIN_VISIBILITY_SCALE,
-										fMinVisibilityScale));
-
-	// max visibility scale
-	SetMaxVisibilityScale(object->Value(PROPERTY_MAX_VISIBILITY_SCALE,
-										fMaxVisibilityScale));
-
-	return HasPendingNotifications();
+	return true;
 }
+
 
 // #pragma mark -
 
-// TransformationChanged
+
 void
 Shape::TransformationChanged()
 {
@@ -317,9 +263,10 @@ Shape::TransformationChanged()
 	_NotifyRerender();
 }
 
+
 // #pragma mark -
 
-// ObjectChanged
+
 void
 Shape::ObjectChanged(const Observable* object)
 {
@@ -329,9 +276,10 @@ Shape::ObjectChanged(const Observable* object)
 	_NotifyRerender();
 }
 
+
 // #pragma mark -
 
-// PathAdded
+
 void
 Shape::PathAdded(VectorPath* path, int32 index)
 {
@@ -340,7 +288,7 @@ Shape::PathAdded(VectorPath* path, int32 index)
 	_NotifyRerender();
 }
 
-// PathRemoved
+
 void
 Shape::PathRemoved(VectorPath* path)
 {
@@ -349,65 +297,66 @@ Shape::PathRemoved(VectorPath* path)
 	path->ReleaseReference();
 }
 
+
 // #pragma mark -
 
-// PointAdded
+
 void
 Shape::PointAdded(int32 index)
 {
 	_NotifyRerender();
 }
 
-// PointRemoved
+
 void
 Shape::PointRemoved(int32 index)
 {
 	_NotifyRerender();
 }
 
-// PointChanged
+
 void
 Shape::PointChanged(int32 index)
 {
 	_NotifyRerender();
 }
 
-// PathChanged
+
 void
 Shape::PathChanged()
 {
 	_NotifyRerender();
 }
 
-// PathClosedChanged
+
 void
 Shape::PathClosedChanged()
 {
 	_NotifyRerender();
 }
 
-// PathReversed
+
 void
 Shape::PathReversed()
 {
 	_NotifyRerender();
 }
-
 #endif // ICON_O_MATIC
 
 
 // #pragma mark -
 
-// InitCheck
+
 status_t
 Shape::InitCheck() const
 {
 	return fPaths ? B_OK : B_NO_MEMORY;
 }
 
+
 // #pragma mark -
 
-// SetStyle
+
 void
 Shape::SetStyle(::Style* style)
 {
@@ -434,9 +383,10 @@ Shape::SetStyle(::Style* style)
 #endif
 }
 
+
 // #pragma mark -
 
-// Bounds
+
 BRect
 Shape::Bounds(bool updateLast) const
 {
@@ -452,9 +402,9 @@ Shape::Bounds(bool updateLast) const
 
 	::VertexSource& source = const_cast<Shape*>(this)->VertexSource();
 	agg::conv_transform< ::VertexSource, Transformable>
-			transformedSource(source, *this);
+		transformedSource(source, *this);
 	agg::bounding_rect(transformedSource, pathID, 0, 1,
-					   &left, &top, &right, &bottom);
+		&left, &top, &right, &bottom);
 
 	BRect bounds(left, top, right, bottom);
 
@@ -464,7 +414,7 @@ Shape::Bounds(bool updateLast) const
 	return bounds;
 }
 
-// VertexSource
+
 ::VertexSource&
 Shape::VertexSource()
 {
@@ -479,28 +429,28 @@ Shape::VertexSource()
 
 	if (fNeedsUpdate) {
 		fPathSource.Update(source->WantsOpenPaths(),
-						   source->ApproximationScale());
+			source->ApproximationScale());
 		fNeedsUpdate = false;
 	}
 
 	return *source;
 }
 
-// SetGlobalScale
+
 void
 Shape::SetGlobalScale(double scale)
 {
 	fPathSource.SetGlobalScale(scale);
 }
 
-// AddTransformer
+
 bool
 Shape::AddTransformer(Transformer* transformer)
 {
 	return AddTransformer(transformer, CountTransformers());
 }
 
-// AddTransformer
+
 bool
 Shape::AddTransformer(Transformer* transformer, int32 index)
 {
@@ -520,7 +470,7 @@ Shape::AddTransformer(Transformer* transformer, int32 index)
 	return true;
 }
 
-// RemoveTransformer
+
 bool
 Shape::RemoveTransformer(Transformer* transformer)
 {
@@ -538,83 +488,49 @@ Shape::RemoveTransformer(Transformer* transformer)
 	return false;
 }
 
+
 // #pragma mark -
 
-// CountShapes
+
 int32
 Shape::CountTransformers() const
 {
 	return fTransformers.CountItems();
 }
 
-// HasTransformer
+
 bool
 Shape::HasTransformer(Transformer* transformer) const
 {
 	return fTransformers.HasItem((void*)transformer);
 }
 
-// IndexOf
+
 int32
 Shape::IndexOf(Transformer* transformer) const
 {
 	return fTransformers.IndexOf((void*)transformer);
 }
 
-// TransformerAt
+
 Transformer*
 Shape::TransformerAt(int32 index) const
 {
 	return (Transformer*)fTransformers.ItemAt(index);
 }
 
-// TransformerAtFast
+
 Transformer*
 Shape::TransformerAtFast(int32 index) const
 {
 	return (Transformer*)fTransformers.ItemAtFast(index);
 }
 
-// #pragma mark -
-
-// SetHinting
-void
-Shape::SetHinting(bool hinting)
-{
-	if (fHinting == hinting)
-		return;
-
-	fHinting = hinting;
-	Notify();
-}
-
-// SetMinVisibilityScale
-void
-Shape::SetMinVisibilityScale(float scale)
-{
-	if (fMinVisibilityScale == scale)
-		return;
-
-	fMinVisibilityScale = scale;
-	Notify();
-}
-
-// SetMaxVisibilityScale
-void
-Shape::SetMaxVisibilityScale(float scale)
-{
-	if (fMaxVisibilityScale == scale)
-		return;
-
-	fMaxVisibilityScale = scale;
-	Notify();
-}
 
 // #pragma mark -
+
 
 #ifdef ICON_O_MATIC
-
-// AddListener
 bool
 Shape::AddListener(ShapeListener* listener)
 {
@@ -623,16 +539,17 @@ Shape::AddListener(ShapeListener* listener)
 	return false;
 }
 
-// RemoveListener
+
 bool
 Shape::RemoveListener(ShapeListener* listener)
 {
 	return fListeners.RemoveItem((void*)listener);
 }
 
+
 // #pragma mark -
 
-// _NotifyTransformerAdded
+
 void
 Shape::_NotifyTransformerAdded(Transformer* transformer, int32 index) const
 {
@@ -647,7 +564,7 @@ Shape::_NotifyTransformerAdded(Transformer* transformer, int32 index) const
 	_NotifyRerender();
 }
 
-// _NotifyTransformerRemoved
+
 void
 Shape::_NotifyTransformerRemoved(Transformer* transformer) const
 {
@@ -662,7 +579,7 @@ Shape::_NotifyTransformerRemoved(Transformer* transformer) const
 	_NotifyRerender();
 }
 
-// _NotifyStyleChanged
+
 void
 Shape::_NotifyStyleChanged(::Style* oldStyle, ::Style* newStyle) const
 {
@@ -677,13 +594,23 @@ Shape::_NotifyStyleChanged(::Style* oldStyle, ::Style* newStyle) const
 	_NotifyRerender();
 }
 
-// _NotifyRerender
+
 void
 Shape::_NotifyRerender() const
 {
 	fNeedsUpdate = true;
 	Notify();
 }
-
 #endif // ICON_O_MATIC
+
+
+void
+Shape::SetHinting(bool hinting)
+{
+	if (fHinting == hinting)
+		return;
+
+	fHinting = hinting;
+	Notify();
+}
 

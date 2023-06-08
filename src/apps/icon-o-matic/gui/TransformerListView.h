@@ -14,6 +14,7 @@
 
 
 class BMenu;
+class BMenuItem;
 class CommandStack;
 class TransformerItem;
 class Selection;
@@ -79,6 +80,8 @@ class TransformerListView : public SimpleListView,
 			CommandStack*		fCommandStack;
 
 			BMenu*				fMenu;
+			BMenuItem*			fContourMI;
+			BMenuItem*			fStrokeMI;
 };
 
 #endif // TRANSFORMER_LIST_VIEW_H

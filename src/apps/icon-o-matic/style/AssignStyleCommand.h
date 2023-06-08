@@ -16,7 +16,7 @@
 
 
 _BEGIN_ICON_NAMESPACE
-	class Shape;
+	class PathSourceShape;
 	class Style;
 _END_ICON_NAMESPACE
 
@@ -25,7 +25,7 @@ _USING_ICON_NAMESPACE
 
 class AssignStyleCommand : public Command {
  public:
-								AssignStyleCommand(Shape* shape,
+								AssignStyleCommand(PathSourceShape* shape,
 												   Style* style);
 	virtual						~AssignStyleCommand();
 
@@ -37,7 +37,7 @@ class AssignStyleCommand : public Command {
 	virtual void				GetName(BString& name);
 
  private:
-			Shape*				fShape;
+			PathSourceShape*	fShape;
 			Style*				fOldStyle;
 			Style*				fNewStyle;
 };

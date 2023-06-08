@@ -16,7 +16,7 @@
 #include <Locale.h>
 
 #include "GradientTransformable.h"
-#include "Shape.h"
+#include "PathSourceShape.h"
 #include "Style.h"
 #include "VectorPath.h"
 
@@ -29,10 +29,10 @@ using std::nothrow;
 
 // constructor
 FreezeTransformationCommand::FreezeTransformationCommand(
-								   Shape** const shapes,
+								   PathSourceShape** const shapes,
 								   int32 count)
 	: Command(),
-	  fShapes(shapes && count > 0 ? new (nothrow) Shape*[count] : NULL),
+	  fShapes(shapes && count > 0 ? new (nothrow) PathSourceShape*[count] : NULL),
 	  fOriginalTransformations(count > 0 ? new (nothrow) double[
 									count * Transformable::matrix_size]
 							   : NULL),
@@ -41,7 +41,7 @@ FreezeTransformationCommand::FreezeTransformationCommand(
 	if (!fShapes || !fOriginalTransformations)
 		return;
 
-	memcpy(fShapes, shapes, sizeof(Shape*) * fCount);
+	memcpy(fShapes, shapes, sizeof(PathSourceShape*) * fCount);
 
 	bool initOk = false;
 
@@ -128,7 +128,7 @@ FreezeTransformationCommand::GetName(BString& name)
 
 // _ApplyTransformation
 void
-FreezeTransformationCommand::_ApplyTransformation(Shape* shape,
+FreezeTransformationCommand::_ApplyTransformation(PathSourceShape* shape,
 									const Transformable& transform)
 {
 	// apply inverse of old shape transformation to every assigned path

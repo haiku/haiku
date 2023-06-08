@@ -14,8 +14,8 @@
 #include <Catalog.h>
 #include <Locale.h>
 
+#include "PathSourceShape.h"
 #include "StyleContainer.h"
-#include "Shape.h"
 #include "Style.h"
 
 
@@ -44,8 +44,9 @@ RemoveStylesCommand::RemoveStylesCommand(StyleContainer* container,
 		if (styles[i]) {
 			int32 listenerCount = styles[i]->CountObservers();
 			for (int32 j = 0; j < listenerCount; j++) {
-				Shape* shape = dynamic_cast<Shape*>(styles[i]->ObserverAtFast(j));
-				if (shape)
+				PathSourceShape* shape
+					= dynamic_cast<PathSourceShape*>(styles[i]->ObserverAtFast(j));
+				if (shape != NULL)
 					fInfos[i].shapes.AddItem((void*)shape);
 			}
 		}
@@ -88,7 +89,7 @@ RemoveStylesCommand::Perform()
 			continue;
 		int32 shapeCount = fInfos[i].shapes.CountItems();
 		for (int32 j = 0; j < shapeCount; j++) {
-			Shape* shape = (Shape*)fInfos[i].shapes.ItemAtFast(j);
+			PathSourceShape* shape = (PathSourceShape*)fInfos[i].shapes.ItemAtFast(j);
 			shape->SetStyle(fContainer->StyleAt(0));
 		}
 	}
@@ -117,7 +118,7 @@ RemoveStylesCommand::Undo()
 			for (int32 j = i - 1; j >= 0; j--) {
 				int32 shapeCount = fInfos[j].shapes.CountItems();
 				for (int32 k = 0; k < shapeCount; k++) {
-					Shape* shape = (Shape*)fInfos[j].shapes.ItemAtFast(k);
+					PathSourceShape* shape = (PathSourceShape*)fInfos[j].shapes.ItemAtFast(k);
 					shape->SetStyle(fContainer->StyleAt(0));
 				}
 			}
@@ -125,7 +126,7 @@ RemoveStylesCommand::Undo()
 		}
 		int32 shapeCount = fInfos[i].shapes.CountItems();
 		for (int32 j = 0; j < shapeCount; j++) {
-			Shape* shape = (Shape*)fInfos[i].shapes.ItemAtFast(j);
+			PathSourceShape* shape = (PathSourceShape*)fInfos[i].shapes.ItemAtFast(j);
 			shape->SetStyle(fInfos[i].style);
 		}
 	}

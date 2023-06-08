@@ -19,7 +19,7 @@
 #include "GradientTransformable.h"
 #include "Icon.h"
 #include "PathContainer.h"
-#include "Shape.h"
+#include "PathSourceShape.h"
 #include "ShapeContainer.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
@@ -112,9 +112,12 @@ printf("scale: %f\n", scale);
 	// clean up styles and paths (remove duplicates)
 	int32 count = icon->Shapes()->CountShapes();
 	for (int32 i = 1; i < count; i++) {
-		Shape* shape = icon->Shapes()->ShapeAtFast(i);
+		PathSourceShape* shape = dynamic_cast<PathSourceShape*>(icon->Shapes()->ShapeAtFast(i));
+		if (shape == NULL)
+			continue;
+
 		Style* style = shape->Style();
-		if (!style)
+		if (style == NULL)
 			continue;
 		int32 styleIndex = icon->Styles()->IndexOf(style);
 		for (int32 j = 0; j < styleIndex; j++) {
@@ -134,7 +137,7 @@ printf("scale: %f\n", scale);
 
 // AddVertexSource
 status_t
-AddPathsFromVertexSource(Icon* icon, Shape* shape, NSVGshape* svgShape)
+AddPathsFromVertexSource(Icon* icon, PathSourceShape* shape, NSVGshape* svgShape)
 {
 //printf("AddPathsFromVertexSource(pathID = %ld)\n", index);
 
@@ -194,7 +197,7 @@ status_t
 DocumentBuilder::_AddShape(NSVGshape* svgShape, bool outline,
 						   const Transformable& transform, Icon* icon)
 {
-	Shape* shape = new (nothrow) Shape(NULL);
+	PathSourceShape* shape = new (nothrow) PathSourceShape(NULL);
 	if (!shape || !icon->Shapes()->AddShape(shape)) {
 		delete shape;
 		return B_NO_MEMORY;
@@ -245,7 +248,7 @@ DocumentBuilder::_AddShape(NSVGshape* svgShape, bool outline,
 		}
 	} else {
 		paint = &svgShape->fill;
-#if 0 // FIXME filling rule are missing from Shape class
+#if 0 // FIXME filling rule are missing from PathSourceShape class
 		if (svgShape->fillRule == NSVG_FILLRULE_EVENODD)
 			shape->SetFillingRule(FILL_MODE_EVEN_ODD);
 		else

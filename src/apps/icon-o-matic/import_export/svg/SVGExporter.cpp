@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include <stdio.h>
@@ -19,6 +20,7 @@
 
 #include "Icon.h"
 #include "GradientTransformable.h"
+#include "PathSourceShape.h"
 #include "Shape.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
@@ -200,14 +202,19 @@ convert_cap_mode_svg(agg::line_cap_e mode)
 status_t
 SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 {
-	if (shape->MaxVisibilityScale() < 1.0
-		|| shape->MinVisibilityScale() > 1.0) {
+	if (!shape->Visible(1.0)) {
 		// don't export shapes which are not visible at the
 		// default scale
 		return B_OK;
 	}
 
-	const Style* style = shape->Style();
+	// only render PathSourceShapes
+	const PathSourceShape* pathSourceShape = dynamic_cast<const PathSourceShape*>(shape);
+	if (pathSourceShape == NULL)
+		return B_OK;
+
+
+	const Style* style = pathSourceShape->Style();
 
 	char color[64];
 	status_t ret = _GetFill(style, color, stream);
@@ -230,7 +237,7 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 
 	// hack to see if this is an outline shape
 	StrokeTransformer* stroke
-		= dynamic_cast<StrokeTransformer*>(shape->TransformerAt(0));
+		= dynamic_cast<StrokeTransformer*>(pathSourceShape->TransformerAt(0));
 	if (stroke) {
 		helper << "style=\"fill:none; stroke:" << color;
 		if (!style->Gradient() && style->Color().alpha < 255) {
@@ -259,8 +266,8 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 			append_float(helper, style->Color().alpha / 255.0);
 		}
 
-//		if (shape->FillingRule() == FILL_MODE_EVEN_ODD &&
-//			shape->Paths()->CountPaths() > 1)
+//		if (pathSourceShape->FillingRule() == FILL_MODE_EVEN_ODD &&
+//			pathSourceShape->Paths()->CountPaths() > 1)
 //			helper << "; fill-rule:evenodd";
 
 		helper << "\"\n";
@@ -272,9 +279,9 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 	if (ret < B_OK)
 		return ret;
 
-	int32 count = shape->Paths()->CountPaths();
+	int32 count = pathSourceShape->Paths()->CountPaths();
 	for (int32 i = 0; i < count; i++) {
-		VectorPath* path = shape->Paths()->PathAtFast(i);
+		VectorPath* path = pathSourceShape->Paths()->PathAtFast(i);
 
 		if (i > 0) {
 			helper << "\n           ";
@@ -340,9 +347,9 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 	}
 	helper << "\"\n";
 
-	if (!shape->IsIdentity()) {
+	if (!pathSourceShape->IsIdentity()) {
 		helper << "        transform=\"";
-		_AppendMatrix(shape, helper);
+		_AppendMatrix(pathSourceShape, helper);
 		helper << "\n";
 	}
 

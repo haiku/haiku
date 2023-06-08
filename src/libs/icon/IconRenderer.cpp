@@ -1,19 +1,23 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2007, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "IconRenderer.h"
 
+#include <algorithm>
 #include <new>
 #include <stdio.h>
 
 #include <Bitmap.h>
 #include <List.h>
 
+#include <agg_image_accessors.h>
+#include <agg_span_image_filter_rgba.h>
 #include <agg_span_gradient.h>
 #include <agg_span_interpolator_linear.h>
 
@@ -33,12 +37,22 @@ class IconRenderer::StyleHandler {
 	};
 
  public:
+#ifdef ICON_O_MATIC
+	StyleHandler(::GammaTable& gammaTable, bool showReferences)
+		: fStyles(20),
+		  fGammaTable(gammaTable),
+		  fShowReferences(showReferences),
+		  fTransparent(0, 0, 0, 0),
+		  fColor(0, 0, 0, 0)
+	{}
+#else
 	StyleHandler(::GammaTable& gammaTable)
 		: fStyles(20),
 		  fGammaTable(gammaTable),
 		  fTransparent(0, 0, 0, 0),
 		  fColor(0, 0, 0, 0)
 	{}
+#endif // ICON_O_MATIC
 
 	~StyleHandler()
 	{
@@ -53,7 +67,15 @@ class IconRenderer::StyleHandler {
 		if (!styleItem)
 			return true;
 
-		return styleItem->style->Gradient() == NULL;
+		if (styleItem->style->Gradient())
+			return false;
+
+#ifdef ICON_O_MATIC
+		if (styleItem->style->Bitmap() && fShowReferences)
+			return false;
+#endif // ICON_O_MATIC
+
+		return true;
 	}
 
 	const agg::rgba8& color(unsigned styleIndex);
@@ -86,14 +108,21 @@ private:
 	void _GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
 		GradientFunction function, int32 start, int32 end,
 		const agg::rgba8* gradientColors, Transformation& gradientTransform);
+#ifdef ICON_O_MATIC
+	void _GenerateImage(agg::rgba8* span, int x, int y,
+	   unsigned len, Style* style, Transformation& transform);
+#endif
 
 	BList				fStyles;
 	::GammaTable&		fGammaTable;
+#ifdef ICON_O_MATIC
+	bool				fShowReferences;
+#endif
 	agg::rgba8			fTransparent;
 	agg::rgba8			fColor;
 };
 
-// color
+
 const agg::rgba8&
 IconRenderer::StyleHandler::color(unsigned styleIndex)
 {
@@ -103,6 +132,13 @@ IconRenderer::StyleHandler::color(unsigned styleIndex)
 		return fTransparent;
 	}
 
+#ifdef ICON_O_MATIC
+	if (styleItem->style->Bitmap() && !fShowReferences) {
+		fColor = agg::rgba8(0,0,0,0);
+		return fColor;
+	}
+#endif
+
 	const rgb_color& c = styleItem->style->Color();
 	fColor = agg::rgba8(fGammaTable.dir(c.red), fGammaTable.dir(c.green),
 		fGammaTable.dir(c.blue), c.alpha);
@@ -110,17 +146,29 @@ IconRenderer::StyleHandler::color(unsigned styleIndex)
     return fColor;
 }
 
-// generate_span
+
 void
 IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 	unsigned len, unsigned styleIndex)
 {
 	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
-	if (!styleItem || !styleItem->style->Gradient()) {
+	if (!styleItem
+			|| (!styleItem->style->Gradient()
+#ifdef ICON_O_MATIC
+				&& !styleItem->style->Bitmap()
+#endif
+		)) {
 		printf("no style/gradient at index: %u!\n", styleIndex);
 		// TODO: memset() span?
 		return;
 	}
+
+#ifdef ICON_O_MATIC
+	if (styleItem->style->Bitmap()) {
+		_GenerateImage(span, x, y, len, styleItem->style, styleItem->transformation);
+		return;
+	}
+#endif // ICON_O_MATIC
 
 	Style* style = styleItem->style;
 	Gradient* gradient = style->Gradient();
@@ -166,7 +214,7 @@ IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 	}
 }
 
-// _GenerateGradient
+
 template<class GradientFunction>
 void
 IconRenderer::StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y,
@@ -189,7 +237,50 @@ IconRenderer::StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y,
 	gradientGenerator.generate(span, x, y, len);
 }
 
+
+#ifdef ICON_O_MATIC
+void
+IconRenderer::StyleHandler::_GenerateImage(agg::rgba8* span, int x, int y,
+	unsigned len, Style* style, Transformation& transform)
+{
+	// bitmap
+	BBitmap* bbitmap = style->Bitmap();
+	agg::rendering_buffer bitmap;
+	bitmap.attach(static_cast<unsigned char*>(bbitmap->Bits()), bbitmap->Bounds().Width() + 1,
+		bbitmap->Bounds().Height() + 1, bbitmap->BytesPerRow());
+
+	// pixel format attached to bitmap
+	PixelFormat pixf_img(bitmap);
+
+	// image interpolator
+	typedef agg::span_interpolator_linear<> interpolator_type;
+	interpolator_type interpolator(transform);
+
+	// image accessor attached to pixel format of bitmap
+	typedef agg::image_accessor_wrap<PixelFormat,
+		agg::wrap_mode_repeat, agg::wrap_mode_repeat> source_type;
+	source_type source(pixf_img);
+
+	// image filter (nearest neighbor)
+	typedef agg::span_image_filter_rgba_nn<
+		source_type, interpolator_type> span_gen_type;
+	span_gen_type spanGenerator(source, interpolator);
+
+	// generate the requested span
+	spanGenerator.generate(span, x, y, len);
+
+	// apply postprocessing
+	for (unsigned i = 0; i < len; i++) {
+		span[i].apply_gamma_dir(fGammaTable);
+		span[i].a = (uint8) ((float) span[i].a * style->Alpha() / 255);
+		span[i].premultiply();
+	}
+}
+#endif // ICON_O_MATIC
+
+
 // #pragma mark -
+
 
 class HintingTransformer {
  public:
@@ -204,7 +295,7 @@ class HintingTransformer {
 
 // #pragma mark -
 
-// constructor
+
 IconRenderer::IconRenderer(BBitmap* bitmap)
 	: fBitmap(bitmap),
 	  fBackground(NULL),
@@ -236,12 +327,12 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 		bitmap->Bounds().IntegerHeight());
 }
 
-// destructor
+
 IconRenderer::~IconRenderer()
 {
 }
 
-// SetIcon
+
 void
 IconRenderer::SetIcon(const Icon* icon)
 {
@@ -252,21 +343,37 @@ IconRenderer::SetIcon(const Icon* icon)
 	// TODO: ... ?
 }
 
-// Render
+
 void
+#ifdef ICON_O_MATIC
+IconRenderer::Render(bool showReferences)
+#else
 IconRenderer::Render()
+#endif
 {
+#ifdef ICON_O_MATIC
+	_Render(fBitmap->Bounds(), showReferences);
+#else
 	_Render(fBitmap->Bounds());
+#endif
 }
 
-// Render
+
 void
+#ifdef ICON_O_MATIC
+IconRenderer::Render(const BRect& area, bool showReferences)
+#else
 IconRenderer::Render(const BRect& area)
+#endif
 {
+#ifdef ICON_O_MATIC
+	_Render(fBitmap->Bounds() & area, showReferences);
+#else
 	_Render(fBitmap->Bounds() & area);
+#endif
 }
 
-//SetScale
+
 void
 IconRenderer::SetScale(double scale)
 {
@@ -274,14 +381,14 @@ IconRenderer::SetScale(double scale)
 	fGlobalTransform.multiply(agg::trans_affine_scaling(scale));
 }
 
-//SetBackground
+
 void
 IconRenderer::SetBackground(const BBitmap* background)
 {
 	fBackground = background;
 }
 
-//SetBackground
+
 void
 IconRenderer::SetBackground(const agg::rgba8& background)
 {
@@ -291,7 +398,7 @@ IconRenderer::SetBackground(const agg::rgba8& background)
 	fBackgroundColor.a = background.a;
 }
 
-// Demultiply
+
 void
 IconRenderer::Demultiply()
 {
@@ -314,14 +421,20 @@ IconRenderer::Demultiply()
 	}
 }
 
+
 // #pragma mark -
+
 
 typedef agg::conv_transform<VertexSource, Transformation> ScaledPath;
 typedef agg::conv_transform<ScaledPath, HintingTransformer> HintedPath;
 
-// _Render
+
 void
+#ifdef ICON_O_MATIC
+IconRenderer::_Render(const BRect& r, bool showReferences)
+#else
 IconRenderer::_Render(const BRect& r)
+#endif
 {
 	if (!fIcon)
 		return;
@@ -336,7 +449,11 @@ IconRenderer::_Render(const BRect& r)
 		fBaseRendererPre.clear(fBackgroundColor);
 
 //bigtime_t start = system_time();
+#ifdef ICON_O_MATIC
+	StyleHandler styleHandler(fGammaTable, showReferences);
+#else
 	StyleHandler styleHandler(fGammaTable);
+#endif
 
 	fRasterizer.reset();
 	// iterate over the shapes in the icon,
@@ -347,12 +464,7 @@ IconRenderer::_Render(const BRect& r)
 	for (int32 i = 0; i < shapeCount; i++) {
 		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
 
-		// Don't render shape if the Level Of Detail falls out of range.
-		// That's unless the scale is bigger than the maximum
-		// MaxVisibilityScale of 4.0f.
-		if (fGlobalTransform.scale() < shape->MinVisibilityScale()
-			|| (fGlobalTransform.scale() > shape->MaxVisibilityScale()
-				&& shape->MaxVisibilityScale() < 4.0f)) {
+		if (!shape->Visible(fGlobalTransform.scale())) {
 			continue;
 		}
 
@@ -385,7 +497,12 @@ IconRenderer::_Render(const BRect& r)
 
 		// if this is not the first shape, and the style contains
 		// transparency, commit a render pass of previous shapes
-		if (i > 0 && style->HasTransparency())
+		if (i > 0
+				&& (style->HasTransparency()
+#ifdef ICON_O_MATIC
+					|| style->Bitmap() != NULL
+#endif
+			))
 			_CommitRenderPass(styleHandler);
 
 		fRasterizer.styles(styleIndex, -1);
@@ -413,7 +530,7 @@ IconRenderer::_Render(const BRect& r)
 //printf("rendering 64x64: %lld\n", system_time() - start);
 }
 
-// _CommitRenderPass
+
 void
 IconRenderer::_CommitRenderPass(StyleHandler& styleHandler, bool reset)
 {
@@ -423,7 +540,4 @@ IconRenderer::_CommitRenderPass(StyleHandler& styleHandler, bool reset)
 	if (reset)
 		fRasterizer.reset();
 }
-
-
-
 

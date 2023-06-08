@@ -14,7 +14,7 @@
 
 
 _BEGIN_ICON_NAMESPACE
-	class Shape;
+	class PathSourceShape;
 	class VectorPath;
 _END_ICON_NAMESPACE
 
@@ -23,7 +23,7 @@ _USING_ICON_NAMESPACE
 
 class UnassignPathCommand : public Command {
  public:
-								UnassignPathCommand(Shape* shape,
+								UnassignPathCommand(PathSourceShape* shape,
 													VectorPath* path);
 	virtual						~UnassignPathCommand();
 
@@ -35,7 +35,7 @@ class UnassignPathCommand : public Command {
 	virtual void				GetName(BString& name);
 
  private:
-			Shape*				fShape;
+			PathSourceShape*	fShape;
 			VectorPath*			fPath;
 			bool				fPathRemoved;
 };

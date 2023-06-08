@@ -14,7 +14,7 @@
 
 
 _BEGIN_ICON_NAMESPACE
-	class Shape;
+	class PathSourceShape;
 	class Transformable;
 _END_ICON_NAMESPACE
 
@@ -24,7 +24,7 @@ _USING_ICON_NAMESPACE
 class FreezeTransformationCommand : public Command {
  public:
 								FreezeTransformationCommand(
-									Shape** const shapes,
+									PathSourceShape** const shapes,
 									int32 count);
 	virtual						~FreezeTransformationCommand();
 
@@ -36,10 +36,10 @@ class FreezeTransformationCommand : public Command {
 	virtual void				GetName(BString& name);
 
  private:
-			void				_ApplyTransformation(Shape* shape,
+			void				_ApplyTransformation(PathSourceShape* shape,
 									const Transformable& transform);
 
-			Shape**				fShapes;
+			PathSourceShape**	fShapes;
 			double*				fOriginalTransformations;
 			int32				fCount;
 };

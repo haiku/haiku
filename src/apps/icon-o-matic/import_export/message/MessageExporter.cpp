@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "MessageExporter.h"
@@ -16,6 +17,8 @@
 #include "Defines.h"
 #include "Icon.h"
 #include "PathContainer.h"
+#include "PathSourceShape.h"
+#include "ReferenceImage.h"
 #include "Shape.h"
 #include "Style.h"
 #include "StyleContainer.h"
@@ -150,26 +153,40 @@ MessageExporter::_Export(const Shape* shape,
 						 const StyleContainer* globalStyles,
 						 BMessage* into) const
 {
-	// NOTE: when the same path is used in two different
-	// documents, and these are to be merged, each path
-	// having a "globally unique" id would make it possible
-	// to reference the same path across documents...
-	// For now, we simply use the index of the path in the
-	// globalPaths container.
+	status_t ret = B_OK;
 
-	// index of used style
-	Style* style = shape->Style();
-	status_t ret = into->AddInt32("style ref", globalStyles->IndexOf(style));
+	const PathSourceShape* pathSourceShape = dynamic_cast<const PathSourceShape*>(shape);
+	if (pathSourceShape != NULL) {
+		ret = into->AddInt32("type", PathSourceShape::archive_code);
 
-	// indices of used paths
-	if (ret == B_OK) {
-		int32 count = shape->Paths()->CountPaths();
-		for (int32 i = 0; i < count; i++) {
-			VectorPath* path = shape->Paths()->PathAtFast(i);
-			ret = into->AddInt32("path ref", globalPaths->IndexOf(path));
-			if (ret < B_OK)
-				break;
+		// NOTE: when the same path is used in two different
+		// documents, and these are to be merged, each path
+		// having a "globally unique" id would make it possible
+		// to reference the same path across documents...
+		// For now, we simply use the index of the path in the
+		// globalPaths container.
+
+		// index of used style
+		if (ret == B_OK) {
+			Style* style = pathSourceShape->Style();
+			ret = into->AddInt32("style ref", globalStyles->IndexOf(style));
 		}
+
+		// indices of used paths
+		if (ret == B_OK) {
+			int32 count = pathSourceShape->Paths()->CountPaths();
+			for (int32 i = 0; i < count; i++) {
+				VectorPath* path = pathSourceShape->Paths()->PathAtFast(i);
+				ret = into->AddInt32("path ref", globalPaths->IndexOf(path));
+				if (ret < B_OK)
+					break;
+			}
+		}
+	}
+
+	const ReferenceImage* referenceImage = dynamic_cast<const ReferenceImage*>(shape);
+	if (referenceImage != NULL) {
+		ret = into->AddInt32("type", ReferenceImage::archive_code);
 	}
 
 	// Shape properties

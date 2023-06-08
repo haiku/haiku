@@ -23,6 +23,14 @@ _BEGIN_ICON_NAMESPACE
 class Transformer;
 class VertexSource;
 
+enum {
+	AFFINE_TRANSFORMER,
+	PERSPECTIVE_TRANSFORMER,
+	CONTOUR_TRANSFORMER,
+	STROKE_TRANSFORMER,
+};
+
+
 class TransformerFactory {
  public:
 
@@ -31,13 +39,6 @@ class TransformerFactory {
 
 	static	Transformer*		TransformerFor(BMessage* archive,
 											   VertexSource& source);
-
-#ifdef ICON_O_MATIC
-	static	bool				NextType(int32* cookie,
-										 uint32* type,
-										 BString* name);
-
-#endif // ICON_O_MATIC
 };
 
 

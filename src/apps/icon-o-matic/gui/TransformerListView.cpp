@@ -24,6 +24,7 @@
 #include "AddTransformersCommand.h"
 #include "CommandStack.h"
 #include "MoveTransformersCommand.h"
+#include "ReferenceImage.h"
 #include "RemoveTransformersCommand.h"
 #include "Transformer.h"
 #include "TransformerFactory.h"
@@ -386,20 +387,31 @@ TransformerListView::SetMenu(BMenu* menu)
 		return;
 
 	BMenu* addMenu = new BMenu(B_TRANSLATE("Add"));
-	int32 cookie = 0;
-	uint32 type;
-	BString name;
-	while (TransformerFactory::NextType(&cookie, &type, &name)) {
-		// TODO: Disable the "Transformation" and "Perspective" transformers
-		// since they are not very useful or even implemented at all.
-		if (name == B_TRANSLATE("Transformation") 
-			|| name == B_TRANSLATE("Perspective"))
-			continue;
-		// End of TODO.
-		BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);
-		message->AddInt32("type", type);
-		addMenu->AddItem(new BMenuItem(name.String(), message));
-	}
+
+	// Keep translated strings that were brought in from another file
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Transformation"
+	BMessage* message = new BMessage(MSG_ADD_TRANSFORMER);
+	message->AddInt32("type", CONTOUR_TRANSFORMER);
+	fContourMI = new BMenuItem(B_TRANSLATE("Contour"), message);
+
+	message = new BMessage(MSG_ADD_TRANSFORMER);
+	message->AddInt32("type", STROKE_TRANSFORMER);
+	fStrokeMI = new BMenuItem(B_TRANSLATE("Stroke"), message);
+
+	// message = new BMessage(MSG_ADD_TRANSFORMER);
+	// message->AddInt32("type", PERSPECTIVE_TRANSFORMER);
+	// fPerspectiveMI = new BMenuItem(B_TRANSLATE("Perspective"), message);
+
+	// message = new BMessage(MSG_ADD_TRANSFORMER);
+	// message->AddInt32("type", AFFINE_TRANSFORMER);
+	// fTransformationMI = new BMenuItem(B_TRANSLATE("Transformation"), message);
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-TransformersList"
+
+	addMenu->AddItem(fContourMI);
+	addMenu->AddItem(fStrokeMI);
+
 	addMenu->SetTargetForItems(this);
 	fMenu->AddItem(addMenu);
 
@@ -480,4 +492,8 @@ void
 TransformerListView::_UpdateMenu()
 {
 	fMenu->SetEnabled(fShape != NULL);
+
+	bool isReferenceImage = dynamic_cast<ReferenceImage*>(fShape) != NULL;
+	fContourMI->SetEnabled(!isReferenceImage);
+	fStrokeMI->SetEnabled(!isReferenceImage);
 }

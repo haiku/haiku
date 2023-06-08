@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "FlatIconExporter.h"
@@ -24,7 +25,9 @@
 #include "LittleEndianBuffer.h"
 #include "PathCommandQueue.h"
 #include "PathContainer.h"
+#include "PathSourceShape.h"
 #include "PerspectiveTransformer.h"
+#include "ReferenceImage.h"
 #include "Shape.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
@@ -477,7 +480,7 @@ _WriteTransformer(LittleEndianBuffer& buffer, Transformer* t)
 
 // _WritePathSourceShape
 static bool
-_WritePathSourceShape(LittleEndianBuffer& buffer, Shape* shape,
+_WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 					  StyleContainer* styles, PathContainer* paths)
 {
 	// find out which style this shape uses
@@ -575,16 +578,31 @@ FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer,
 							   PathContainer* paths,
 							   ShapeContainer* shapes)
 {
-	if (shapes->CountShapes() > 255)
-		return B_RESULT_NOT_REPRESENTABLE;
-	uint8 shapeCount = min_c(255, shapes->CountShapes());
-	if (!buffer.Write(shapeCount))
-		return B_NO_MEMORY;
+	uint32 shapeCount = shapes->CountShapes();
 
+	// Count the number of exportable shapes
+	uint32 pathShapeCount = 0;
 	for (uint32 i = 0; i < shapeCount; i++) {
 		Shape* shape = shapes->ShapeAtFast(i);
-		if (!_WritePathSourceShape(buffer, shape, styles, paths))
-			return B_ERROR;
+		if (dynamic_cast<PathSourceShape*>(shape) != NULL)
+			pathShapeCount++;
+	}
+
+	// Write number of exportable shapes
+	if (pathShapeCount > 255)
+		return B_RESULT_NOT_REPRESENTABLE;
+	if (!buffer.Write((uint8) pathShapeCount))
+		return B_NO_MEMORY;
+
+	// Export each shape
+	for (uint32 i = 0; i < shapeCount; i++) {
+		Shape* shape = shapes->ShapeAtFast(i);
+
+		PathSourceShape* pathSourceShape = dynamic_cast<PathSourceShape*>(shape);
+		if (pathSourceShape != NULL) {
+			if (!_WritePathSourceShape(buffer, pathSourceShape, styles, paths))
+				return B_ERROR;
+		}
 	}
 
 	return B_OK;

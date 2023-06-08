@@ -31,7 +31,7 @@ class IconObject : public Observable,
 	virtual	void				SelectedChanged();
 
 	// IconObject
-	virtual	status_t			Unarchive(const BMessage* archive);
+	virtual	status_t			Unarchive(BMessage* archive);
 	virtual status_t			Archive(BMessage* into,
 										bool deep = true) const;
 

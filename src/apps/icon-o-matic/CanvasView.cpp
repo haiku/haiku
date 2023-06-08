@@ -435,7 +435,7 @@ void
 CanvasView::_DrawInto(BView* view, BRect updateRect)
 {
 	if (fDirtyIconArea.IsValid()) {
-		fRenderer->Render(fDirtyIconArea);
+		fRenderer->Render(fDirtyIconArea, true);
 		fDirtyIconArea.Set(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
 	}
 

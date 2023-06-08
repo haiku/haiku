@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef SHAPE_LIST_VIEW_H
 #define SHAPE_LIST_VIEW_H
@@ -30,6 +31,7 @@ _USING_ICON_NAMESPACE
 
 enum {
 	MSG_ADD_SHAPE					= 'adsh',
+	MSG_ADD_REFERENCE_IMAGE			= 'aimg',
 };
 
 class ShapeListView : public SimpleListView,
@@ -95,6 +97,7 @@ class ShapeListView : public SimpleListView,
 			BMenuItem*			fAddWidthPathMI;
 			BMenuItem*			fAddWidthStyleMI;
 			BMenuItem*			fAddWidthPathAndStyleMI;
+			BMenuItem*			fAddReferenceImageMI;
 			BMenuItem*			fDuplicateMI;
 			BMenuItem*			fResetTransformationMI;
 			BMenuItem*			fFreezeTransformationMI;

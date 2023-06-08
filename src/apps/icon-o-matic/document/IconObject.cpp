@@ -63,7 +63,7 @@ IconObject::SelectedChanged()
 
 // Unarchive
 status_t
-IconObject::Unarchive(const BMessage* archive)
+IconObject::Unarchive(BMessage* archive)
 {
 	if (!archive)
 		return B_BAD_VALUE;

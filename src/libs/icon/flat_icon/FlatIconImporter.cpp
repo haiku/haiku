@@ -24,6 +24,7 @@
 #include "LittleEndianBuffer.h"
 #include "PathCommandQueue.h"
 #include "PathContainer.h"
+#include "PathSourceShape.h"
 #include "PerspectiveTransformer.h"
 #include "Shape.h"
 #include "StrokeTransformer.h"
@@ -543,7 +544,7 @@ FlatIconImporter::_ReadPathSourceShape(LittleEndianBuffer& buffer,
 	}
 
 	// create the shape
-	Shape* shape = new (nothrow) Shape(style);
+	PathSourceShape* shape = new (nothrow) PathSourceShape(style);
 	ObjectDeleter<Shape> shapeDeleter(shape);
 
 	if (!shape || shape->InitCheck() < B_OK)

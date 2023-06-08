@@ -30,6 +30,9 @@ name_for_id(int32 id)
 			name = B_TRANSLATE("Name");
 			break;
 
+		case PROPERTY_ALPHA:
+			name = B_TRANSLATE("Alpha");
+			break;
 		case PROPERTY_OPACITY:
 			name = B_TRANSLATE("Opacity");
 			break;

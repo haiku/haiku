@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "Icon.h"
@@ -12,6 +13,8 @@
 #include <stdio.h>
 
 #include "PathContainer.h"
+#include "PathSourceShape.h"
+#include "ReferenceImage.h"
 #include "Shape.h"
 #include "Style.h"
 #include "StyleContainer.h"
@@ -79,30 +82,37 @@ Icon::Icon(const Icon& other)
 	int32 shapeCount = other.fShapes->CountShapes();
 	for (int32 i = 0; i < shapeCount; i++) {
 		Shape* shape = other.fShapes->ShapeAtFast(i);
-		Shape* clone = new (nothrow) Shape(*shape);
+		Shape* clone = shape->Clone();
 		if (!clone || !fShapes->AddShape(clone)) {
 			delete clone;
 			return;
 		}
-		// the cloned shape references styles and paths in
-		// the "other" icon, replace them with "local" styles
-		// and paths
-		int32 styleIndex = other.fStyles->IndexOf(shape->Style());
-		clone->SetStyle(fStyles->StyleAt(styleIndex));
 
-		clone->Paths()->MakeEmpty();
-		pathCount = shape->Paths()->CountPaths();
-		for (int32 j = 0; j < pathCount; j++) {
-			VectorPath* remote = shape->Paths()->PathAtFast(j);
-			int32 index = other.fPaths->IndexOf(remote);
-			VectorPath* local = fPaths->PathAt(index);
-			if (!local) {
-				printf("failed to match remote and "
-					   "local paths while cloning icon\n");
-				continue;
-			}
-			if (!clone->Paths()->AddPath(local)) {
-				return;
+		// PathSourceShapes require further handling
+		PathSourceShape* pathSourceShape = dynamic_cast<PathSourceShape*>(shape);
+		PathSourceShape* pathSourceShapeClone = dynamic_cast<PathSourceShape*>(clone);
+		if (pathSourceShape != NULL && pathSourceShapeClone != NULL) {
+			// the cloned shape references styles and paths in
+			// the "other" icon, replace them with "local" styles
+			// and paths
+
+			int32 styleIndex = other.fStyles->IndexOf(pathSourceShape->Style());
+			pathSourceShapeClone->SetStyle(fStyles->StyleAt(styleIndex));
+
+			pathSourceShapeClone->Paths()->MakeEmpty();
+			pathCount = pathSourceShape->Paths()->CountPaths();
+			for (int32 j = 0; j < pathCount; j++) {
+				VectorPath* remote = pathSourceShape->Paths()->PathAtFast(j);
+				int32 index = other.fPaths->IndexOf(remote);
+				VectorPath* local = fPaths->PathAt(index);
+				if (!local) {
+					printf("failed to match remote and "
+						   "local paths while cloning icon\n");
+					continue;
+				}
+				if (!pathSourceShapeClone->Paths()->AddPath(local)) {
+					return;
+				}
 			}
 		}
 	}

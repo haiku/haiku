@@ -57,7 +57,7 @@ void
 IconView::Draw(BRect updateRect)
 {
 	if (fDirtyIconArea.IsValid()) {
-		fRenderer->Render(fDirtyIconArea);
+		fRenderer->Render(fDirtyIconArea, false);
 		fDirtyIconArea.Set(LONG_MAX, LONG_MAX, LONG_MIN, LONG_MIN);
 	}
 

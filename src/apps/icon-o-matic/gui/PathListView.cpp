@@ -26,6 +26,7 @@
 #include "CommandStack.h"
 #include "MovePathsCommand.h"
 #include "Observer.h"
+#include "PathSourceShape.h"
 #include "RemovePathsCommand.h"
 #include "ReversePathCommand.h"
 #include "RotatePathIndicesCommand.h"
@@ -242,7 +243,7 @@ public:
 
 
 	// ShapePathListener
-	void SetShape(Shape* shape)
+	void SetShape(PathSourceShape* shape)
 	{
 		if (fShape == shape)
 			return;
@@ -263,8 +264,8 @@ public:
 	}
 
 private:
-	PathListView*	fListView;
-	Shape*			fShape;
+	PathListView*		fListView;
+	PathSourceShape*	fShape;
 };
 
 
@@ -868,8 +869,8 @@ PathListView::SetCurrentShape(Shape* shape)
 	if (fCurrentShape == shape)
 		return;
 
-	fCurrentShape = shape;
-	fShapePathListener->SetShape(shape);
+	fCurrentShape = dynamic_cast<PathSourceShape*>(shape);
+	fShapePathListener->SetShape(fCurrentShape);
 
 	_UpdateMarks();
 }

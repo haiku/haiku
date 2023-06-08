@@ -15,6 +15,7 @@
 #include <Locale.h>
 
 #include "PathContainer.h"
+#include "PathSourceShape.h"
 #include "Shape.h"
 #include "VectorPath.h"
 
@@ -44,7 +45,8 @@ RemovePathsCommand::RemovePathsCommand(PathContainer* container,
 		if (paths[i]) {
 			int32 listenerCount = paths[i]->CountListeners();
 			for (int32 j = 0; j < listenerCount; j++) {
-				Shape* shape = dynamic_cast<Shape*>(paths[i]->ListenerAtFast(j));
+				PathSourceShape* shape
+					= dynamic_cast<PathSourceShape*>(paths[i]->ListenerAtFast(j));
 				if (shape)
 					fInfos[i].shapes.AddItem((void*)shape);
 			}
@@ -82,7 +84,7 @@ RemovePathsCommand::Perform()
 		fContainer->RemovePath(fInfos[i].path);
 		int32 shapeCount = fInfos[i].shapes.CountItems();
 		for (int32 j = 0; j < shapeCount; j++) {
-			Shape* shape = (Shape*)fInfos[i].shapes.ItemAtFast(j);
+			PathSourceShape* shape = (PathSourceShape*)fInfos[i].shapes.ItemAtFast(j);
 			shape->Paths()->RemovePath(fInfos[i].path);
 		}
 	}
@@ -108,7 +110,7 @@ RemovePathsCommand::Undo()
 				fContainer->RemovePath(fInfos[j].path);
 				int32 shapeCount = fInfos[j].shapes.CountItems();
 				for (int32 k = 0; k < shapeCount; k++) {
-					Shape* shape = (Shape*)fInfos[j].shapes.ItemAtFast(k);
+					PathSourceShape* shape = (PathSourceShape*)fInfos[j].shapes.ItemAtFast(k);
 					shape->Paths()->RemovePath(fInfos[j].path);
 				}
 			}
@@ -116,7 +118,7 @@ RemovePathsCommand::Undo()
 		}
 		int32 shapeCount = fInfos[i].shapes.CountItems();
 		for (int32 j = 0; j < shapeCount; j++) {
-			Shape* shape = (Shape*)fInfos[i].shapes.ItemAtFast(j);
+			PathSourceShape* shape = (PathSourceShape*)fInfos[i].shapes.ItemAtFast(j);
 			shape->Paths()->AddPath(fInfos[i].path);
 		}
 	}

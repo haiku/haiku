@@ -19,6 +19,7 @@ class ShapeStyleListener;
 class StyleListItem;
 
 _BEGIN_ICON_NAMESPACE
+	class PathSourceShape;
 	class Shape;
 	class ShapeContainer;
 	class ShapeListener;
@@ -72,7 +73,7 @@ public:
 			void				SetCurrentColor(CurrentColor* color);
 
 			void				SetCurrentShape(Shape* shape);
-			Shape*				CurrentShape() const
+			PathSourceShape*	CurrentShape() const
 									{ return fCurrentShape; }
 
 private:
@@ -93,7 +94,7 @@ private:
 			CommandStack*		fCommandStack;
 			CurrentColor*		fCurrentColor;
 
-			Shape*				fCurrentShape;
+			PathSourceShape*	fCurrentShape;
 				// the style item will be marked that
 				// is referenced by this shape
 

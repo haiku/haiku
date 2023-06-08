@@ -29,7 +29,7 @@
 #include "Defines.h"
 #include "Icon.h"
 #include "PathContainer.h"
-#include "Shape.h"
+#include "PathSourceShape.h"
 #include "Style.h"
 #include "StyleContainer.h"
 #include "VectorPath.h"
@@ -45,7 +45,7 @@ using std::nothrow;
 
 class ShapeIterator : public BShapeIterator {
  public:
-	ShapeIterator(Icon *icon, Shape *to, BPoint offset, const char *name);
+	ShapeIterator(Icon *icon, PathSourceShape *to, BPoint offset, const char *name);
 	~ShapeIterator() {};
 
 	virtual	status_t	IterateMoveTo(BPoint *point);
@@ -58,7 +58,7 @@ class ShapeIterator : public BShapeIterator {
 	void					NextPath();
 
 	Icon *fIcon;
-	Shape *fShape;
+	PathSourceShape *fShape;
 	VectorPath *fPath;
 	BPoint fOffset;
 	const char *fName;
@@ -66,7 +66,7 @@ class ShapeIterator : public BShapeIterator {
 	bool fHasLastPoint;
 };
 
-ShapeIterator::ShapeIterator(Icon *icon, Shape *to, BPoint offset,
+ShapeIterator::ShapeIterator(Icon *icon, PathSourceShape *to, BPoint offset,
 	const char *name)
 {
 	CALLED();
@@ -328,7 +328,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		if (glyph.Bounds().IsValid()) {
 			//offset.x += glyph.Bounds().Width();
 			offset.x += charWidth;
-			Shape* shape = new (nothrow) Shape(NULL);
+			PathSourceShape* shape = new (nothrow) PathSourceShape(NULL);
 			if (shape == NULL)
 				return B_NO_MEMORY;
 			shape->SetName(glyphName.String());

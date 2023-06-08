@@ -18,6 +18,7 @@ class BMenuItem;
 
 _BEGIN_ICON_NAMESPACE
 	class VectorPath;
+	class PathSourceShape;
 	class Shape;
 	class ShapeContainer;
 _END_ICON_NAMESPACE
@@ -74,7 +75,7 @@ class PathListView : public SimpleListView,
 			void				SetMenu(BMenu* menu);
 
 			void				SetCurrentShape(Shape* shape);
-			Shape*				CurrentShape() const
+			PathSourceShape*	CurrentShape() const
 									{ return fCurrentShape; }
 
  private:
@@ -106,7 +107,7 @@ class PathListView : public SimpleListView,
 			ShapeContainer*		fShapeContainer;
 			CommandStack*		fCommandStack;
 
-			Shape*				fCurrentShape;
+			PathSourceShape*	fCurrentShape;
 				// those path items will be marked that
 				// are referenced by this shape
 

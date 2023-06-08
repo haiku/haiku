@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef STYLE_H
 #define STYLE_H
@@ -30,7 +31,10 @@ _BEGIN_ICON_NAMESPACE
 
 
 class Gradient;
+class Shape;
 
+// TODO: This class can represent solid colors, gradients, and bitmaps. It
+// should probably be split into subclasses.
 #ifdef ICON_O_MATIC
 class Style : public IconObject,
 			  public Observer {
@@ -41,6 +45,10 @@ class Style {
 								Style();
 								Style(const Style& other);
 								Style(const rgb_color& color);
+#ifdef ICON_O_MATIC
+								Style(BBitmap* image);
+									// transfers ownership of the image
+#endif
 								Style(BMessage* archive);
 
 	virtual						~Style();
@@ -69,6 +77,19 @@ class Style {
 			_ICON_NAMESPACE Gradient* Gradient() const
 									{ return fGradient; }
 
+#ifdef ICON_O_MATIC
+			void				SetBitmap(BBitmap* image);
+									// transfers ownership of the image
+			BBitmap*			Bitmap() const
+									{ return fImage; }
+
+		// alpha only applies to bitmaps
+			void				SetAlpha(uint8 alpha)
+									{ fAlpha = alpha; Notify(); }
+			uint8				Alpha()
+									{ return fAlpha; }
+#endif // ICON_O_MATIC
+
 			const agg::rgba8*	Colors() const
 									{ return fColors; }
 
@@ -77,10 +98,16 @@ class Style {
 
  private:
 			rgb_color			fColor;
+
 			_ICON_NAMESPACE Gradient* fGradient;
 
 			// hold gradient color array
 			agg::rgba8*			fColors;
+
+#ifdef ICON_O_MATIC
+			BBitmap*			fImage;
+			uint8				fAlpha;
+#endif
 
 			// for caching gamma corrected gradient color array
 	mutable	agg::rgba8*			fGammaCorrectedColors;

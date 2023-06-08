@@ -14,7 +14,8 @@
 enum {
 	PROPERTY_NAME						= 'name',
 
-	PROPERTY_OPACITY					= 'alpa',
+	PROPERTY_ALPHA						= 'alpa',
+	PROPERTY_OPACITY					= 'opac',
 	PROPERTY_COLOR						= 'colr',
 
 	PROPERTY_WIDTH						= 'wdth',

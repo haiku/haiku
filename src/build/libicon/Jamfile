@@ -36,6 +36,8 @@ BuildPlatformStaticLibrary libicon_build.a :
 
 	# shape
 	PathContainer.cpp
+	PathSourceShape.cpp
+	ReferenceImage.cpp
 	Shape.cpp
 	ShapeContainer.cpp
 	VectorPath.cpp

@@ -15,6 +15,8 @@
 
 #include "Icon.h"
 #include "IconRenderer.h"
+#include "ReferenceImage.h"
+
 
 // constructor
 BitmapExporter::BitmapExporter(uint32 size)
@@ -53,7 +55,7 @@ BitmapExporter::Export(const Icon* icon, BPositionIO* stream)
 	IconRenderer renderer(&bitmap);
 	renderer.SetIcon(icon);
 	renderer.SetScale(fSize / 64.0);
-	renderer.Render();
+	renderer.Render(false);
 //	renderer.Demultiply(&bitmap);
 
 	// save bitmap to translator

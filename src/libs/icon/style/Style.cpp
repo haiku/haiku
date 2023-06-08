@@ -1,16 +1,18 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "Style.h"
 
 #include <new>
 
-# include <Message.h>
+#include <Bitmap.h>
+#include <Message.h>
 
 #ifdef ICON_O_MATIC
 # include "ui_defines.h"
@@ -22,7 +24,7 @@
 
 using std::nothrow;
 
-// constructor
+
 Style::Style()
 #ifdef ICON_O_MATIC
 	: IconObject("<style>"),
@@ -34,13 +36,17 @@ Style::Style()
 	  fColor(kWhite),
 	  fGradient(NULL),
 	  fColors(NULL),
+#ifdef ICON_O_MATIC
+	  fImage(NULL),
+	  fAlpha(255),
+#endif
 
 	  fGammaCorrectedColors(NULL),
 	  fGammaCorrectedColorsValid(false)
 {
 }
 
-// constructor
+
 Style::Style(const rgb_color& color)
 #ifdef ICON_O_MATIC
 	: IconObject("<style>"),
@@ -52,13 +58,34 @@ Style::Style(const rgb_color& color)
 	  fColor(color),
 	  fGradient(NULL),
 	  fColors(NULL),
+#ifdef ICON_O_MATIC
+	  fImage(NULL),
+	  fAlpha(255),
+#endif
 
 	  fGammaCorrectedColors(NULL),
 	  fGammaCorrectedColorsValid(false)
 {
 }
 
-// constructor
+
+#ifdef ICON_O_MATIC
+Style::Style(BBitmap* image)
+	: IconObject("<style>"),
+	  Observer(),
+
+	  fColor(kWhite),
+	  fGradient(NULL),
+	  fColors(NULL),
+	  fImage(image),
+
+	  fGammaCorrectedColors(NULL),
+	  fGammaCorrectedColorsValid(false)
+{
+}
+#endif
+
+
 Style::Style(const Style& other)
 #ifdef ICON_O_MATIC
 	: IconObject(other),
@@ -70,6 +97,10 @@ Style::Style(const Style& other)
 	  fColor(other.fColor),
 	  fGradient(NULL),
 	  fColors(NULL),
+#ifdef ICON_O_MATIC
+	  fImage(other.fImage != NULL ? new (nothrow) BBitmap(other.fImage) : NULL),
+	  fAlpha(255),
+#endif
 
 	  fGammaCorrectedColors(NULL),
 	  fGammaCorrectedColorsValid(false)
@@ -89,6 +120,10 @@ Style::Style(BMessage* archive)
 	  fColor(kWhite),
 	  fGradient(NULL),
 	  fColors(NULL),
+#ifdef ICON_O_MATIC
+	  fImage(NULL),
+	  fAlpha(255),
+#endif
 
 	  fGammaCorrectedColors(NULL),
 	  fGammaCorrectedColorsValid(false)
@@ -106,14 +141,18 @@ Style::Style(BMessage* archive)
 	}
 }
 
-// destructor
+
 Style::~Style()
 {
 	SetGradient(NULL);
-}
 
 #ifdef ICON_O_MATIC
-// ObjectChanged
+	delete fImage;
+#endif
+}
+
+
+#ifdef ICON_O_MATIC
 void
 Style::ObjectChanged(const Observable* object)
 {
@@ -124,9 +163,10 @@ Style::ObjectChanged(const Observable* object)
 	}
 }
 
+
 // #pragma mark -
 
-// Archive
+
 status_t
 Style::Archive(BMessage* into, bool deep) const
 {
@@ -142,10 +182,12 @@ Style::Archive(BMessage* into, bool deep) const
 			ret = into->AddMessage("gradient", &gradientArchive);
 	}
 
+	// Archiving the fImage is the responsibility of ReferenceImage
+
 	return ret;
 }
 
-// operator ==
+
 bool
 Style::operator==(const Style& other) const
 {
@@ -161,10 +203,9 @@ Style::operator==(const Style& other) const
 			return false;
 	}
 }
-
 #endif // ICON_O_MATIC
 
-// HasTransparency
+
 bool
 Style::HasTransparency() const
 {
@@ -180,7 +221,7 @@ Style::HasTransparency() const
 	return fColor.alpha < 255;
 }
 
-// SetColor
+
 void
 Style::SetColor(const rgb_color& color)
 {
@@ -191,7 +232,7 @@ Style::SetColor(const rgb_color& color)
 	Notify();
 }
 
-// SetGradient
+
 void
 Style::SetGradient(const ::Gradient* gradient)
 {
@@ -226,6 +267,9 @@ Style::SetGradient(const ::Gradient* gradient)
 #ifdef ICON_O_MATIC
 		if (fGradient != NULL)
 			fGradient->ReleaseReference();
+
+		delete fImage;
+		fImage = NULL;
 #else
 		delete fGradient;
 #endif
@@ -236,8 +280,27 @@ Style::SetGradient(const ::Gradient* gradient)
 	}
 }
 
-// GammaCorrectedColors
-const agg::rgba8*	
+
+#ifdef ICON_O_MATIC
+void
+Style::SetBitmap(BBitmap* image)
+{
+	delete fImage;
+	fImage = image;
+
+	// TODO: This does not reset fGradient or fColors. Currently, this is not
+	// required, since Icon-O-Matic never turns Gradients into Bitmaps. Probably,
+	// this class should be subclassed if this feature is ever required. For more
+	// information, see the todo item in the header file.
+	if (fGradient != NULL)
+		debugger("Not implemented");
+
+	Notify();
+}
+#endif // ICON_O_MATIC
+
+
+const agg::rgba8*
 Style::GammaCorrectedColors(const GammaTable& table) const
 {
 	if (!fColors)

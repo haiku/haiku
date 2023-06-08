@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef ICON_RENDERER_H
 #define ICON_RENDERER_H
@@ -55,8 +56,13 @@ class IconRenderer {
 
 			void				SetIcon(const Icon* icon);
 
+#ifdef ICON_O_MATIC
+			void				Render(bool showReferences);
+			void				Render(const BRect& area, bool showReferences);
+#else
 			void				Render();
 			void				Render(const BRect& area);
+#endif // ICON_O_MATIC
 
 			void				SetScale(double scale);
 			void				SetBackground(const BBitmap* background);
@@ -77,7 +83,11 @@ class IconRenderer {
  private:
 		class StyleHandler;
 
+#ifdef ICON_O_MATIC
+			void				_Render(const BRect& area, bool showReferences);
+#else
 			void				_Render(const BRect& area);
+#endif // ICON_O_MATIC
 			void				_CommitRenderPass(StyleHandler& styleHandler,
 									bool reset = true);
 

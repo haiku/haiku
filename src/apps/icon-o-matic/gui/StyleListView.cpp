@@ -25,6 +25,7 @@
 #include "CommandStack.h"
 #include "GradientTransformable.h"
 #include "MoveStylesCommand.h"
+#include "PathSourceShape.h"
 #include "RemoveStylesCommand.h"
 #include "Style.h"
 #include "Observer.h"
@@ -236,7 +237,7 @@ public:
 	}
 
 	// ShapeStyleListener
-	void SetShape(Shape* shape)
+	void SetShape(PathSourceShape* shape)
 	{
 		if (fShape == shape)
 			return;
@@ -250,14 +251,14 @@ public:
 			fShape->AddListener(this);
 	}
 
-	Shape* CurrentShape() const
+	PathSourceShape* CurrentShape() const
 	{
 		return fShape;
 	}
 
 private:
-	StyleListView*	fListView;
-	Shape*			fShape;
+	StyleListView*		fListView;
+	PathSourceShape*	fShape;
 };
 
 
@@ -769,11 +770,13 @@ StyleListView::SetCurrentColor(CurrentColor* color)
 void
 StyleListView::SetCurrentShape(Shape* shape)
 {
-	if (fCurrentShape == shape)
+	PathSourceShape* pathSourceShape = dynamic_cast<PathSourceShape*>(shape);
+
+	if (fCurrentShape == pathSourceShape)
 		return;
 
-	fCurrentShape = shape;
-	fShapeListener->SetShape(shape);
+	fCurrentShape = pathSourceShape;
+	fShapeListener->SetShape(pathSourceShape);
 
 	_UpdateMarks();
 }

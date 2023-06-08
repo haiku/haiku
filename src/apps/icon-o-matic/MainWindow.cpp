@@ -1,6 +1,10 @@
 /*
  * Copyright 2006-2011, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2023, Haiku, Inc.
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *             Zardshard
  */
 
 #include "MainWindow.h"
@@ -9,6 +13,7 @@
 #include <stdio.h>
 
 #include <Alert.h>
+#include <Bitmap.h>
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <GridLayout.h>
@@ -25,8 +30,10 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Message.h>
+#include <MimeType.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <TranslationUtils.h>
 
 #include "support_ui.h"
 
@@ -73,6 +80,8 @@
 #include "Icon.h"
 #include "MultipleManipulatorState.h"
 #include "PathManipulator.h"
+#include "PathSourceShape.h"
+#include "ReferenceImage.h"
 #include "Shape.h"
 #include "ShapeContainer.h"
 #include "ShapeListView.h"
@@ -207,6 +216,24 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case B_REFS_RECEIVED:
 		case B_SIMPLE_DATA:
+		{
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) != B_OK)
+				break;
+
+			// Check if this is best represented by a ReferenceImage
+			BMimeType type;
+			if (BMimeType::GuessMimeType(&ref, &type) == B_OK) {
+				BMimeType superType;
+				if (type.GetSupertype(&superType) == B_OK
+					&& superType == BMimeType("image")
+					&& !(type == BMimeType("image/svg+xml"))
+					&& !(type == BMimeType("image/x-hvif"))) {
+					AddReferenceImage(ref);
+					break;
+				}
+			}
+
 			// If our icon is empty, open the file in this window,
 			// otherwise forward to the application which will open
 			// it in another window, unless we append.
@@ -214,9 +241,7 @@ MainWindow::MessageReceived(BMessage* message)
 			if (fDocument->Icon()->Styles()->CountStyles() == 0
 				&& fDocument->Icon()->Paths()->CountPaths() == 0
 				&& fDocument->Icon()->Shapes()->CountShapes() == 0) {
-				entry_ref ref;
-				if (message->FindRef("refs", &ref) == B_OK)
-					Open(ref);
+				Open(ref);
 				break;
 			}
 			if (modifiers() & B_SHIFT_KEY) {
@@ -226,6 +251,7 @@ MainWindow::MessageReceived(BMessage* message)
 			}
 			be_app->PostMessage(message);
 			break;
+		}
 
 		case B_PASTE:
 		case B_MIME_DATA:
@@ -272,15 +298,23 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 
 		case MSG_OPEN:
+		{
 			// If our icon is empty, we want the icon to open in this
 			// window.
-			if (fDocument->Icon()->Styles()->CountStyles() == 0
+			bool emptyDocument = fDocument->Icon()->Styles()->CountStyles() == 0
 				&& fDocument->Icon()->Paths()->CountPaths() == 0
-				&& fDocument->Icon()->Shapes()->CountShapes() == 0) {
+				&& fDocument->Icon()->Shapes()->CountShapes() == 0;
+
+			bool openingReferenceImage;
+			if (message->FindBool("reference image", &openingReferenceImage) != B_OK)
+				openingReferenceImage = false;
+
+			if (emptyDocument || openingReferenceImage)
 				message->AddPointer("window", this);
-			}
+
 			be_app->PostMessage(message);
 			break;
+		}
 
 		case MSG_SAVE:
 		case MSG_EXPORT:
@@ -414,11 +448,9 @@ MainWindow::MessageReceived(BMessage* message)
 					style = fDocument->Icon()->Styles()->StyleAt(0);
 			}
 		
-			Shape* shape = new (nothrow) Shape(style);
-			Shape* shapes[1];
-			shapes[0] = shape;
+			PathSourceShape* shape = new (nothrow) PathSourceShape(style);
 			AddShapesCommand* shapeCommand = new (nothrow) AddShapesCommand(
-				fDocument->Icon()->Shapes(), shapes, 1,
+				fDocument->Icon()->Shapes(), (Shape**) &shape, 1,
 				fDocument->Icon()->Shapes()->CountShapes(),
 				fDocument->Selection());
 		
@@ -821,6 +853,29 @@ MainWindow::Open(const BMessenger& externalObserver, const uint8* data,
 	locker.Unlock();
 
 	SetIcon(icon);
+}
+
+
+void
+MainWindow::AddReferenceImage(const entry_ref& ref)
+{
+	BBitmap* image = BTranslationUtils::GetBitmap(&ref);
+	if (image == NULL)
+		return;
+	Shape* shape = new (nothrow) ReferenceImage(image);
+	if (shape == NULL)
+		return;
+
+	AddShapesCommand* shapeCommand = new (nothrow) AddShapesCommand(
+		fDocument->Icon()->Shapes(), &shape, 1,
+		fDocument->Icon()->Shapes()->CountShapes(),
+		fDocument->Selection());
+	if (shapeCommand == NULL) {
+		delete shape;
+		return;
+	}
+
+	fDocument->CommandStack()->Perform(shapeCommand);
 }
 
 

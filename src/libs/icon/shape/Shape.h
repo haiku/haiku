@@ -23,10 +23,12 @@
 #include <Rect.h>
 
 
+class BMessage;
+
 _BEGIN_ICON_NAMESPACE
 
-
 class Style;
+
 
 #ifdef ICON_O_MATIC
 // TODO: merge Observer and ShapeListener interface
@@ -40,6 +42,7 @@ class ShapeListener {
 												 int32 index) = 0;
 	virtual	void				TransformerRemoved(Transformer* t) = 0;
 
+	// TODO: this is not useful for all subclasses of Shape (e.g. ReferenceImage)
 	virtual	void				StyleChanged(::Style* oldStyle,
 											 ::Style* newStyle) = 0;
 };
@@ -61,7 +64,7 @@ class Shape : public _ICON_NAMESPACE Transformable {
 	virtual						~Shape();
 
 	// IconObject interface
-	virtual	status_t			Unarchive(const BMessage* archive);
+	virtual	status_t			Unarchive(BMessage* archive);
 #ifdef ICON_O_MATIC
 	virtual	status_t			Archive(BMessage* into,
 										bool deep = true) const;
@@ -92,12 +95,13 @@ class Shape : public _ICON_NAMESPACE Transformable {
 #endif // ICON_O_MATIC
 
 	// Shape
-			status_t			InitCheck() const;
+	virtual	status_t			InitCheck() const;
+	virtual Shape*				Clone() const = 0;
 
 	inline	PathContainer*		Paths() const
 									{ return fPaths; }
 
-			void				SetStyle(::Style* style);
+public:
 	inline	::Style*			Style() const
 									{ return fStyle; }
 
@@ -124,12 +128,8 @@ class Shape : public _ICON_NAMESPACE Transformable {
 			void				SetHinting(bool hinting);
 			bool				Hinting() const
 									{ return fHinting; }
-			void				SetMinVisibilityScale(float scale);
-			float				MinVisibilityScale() const
-									{ return fMinVisibilityScale; }
-			void				SetMaxVisibilityScale(float scale);
-			float				MaxVisibilityScale() const
-									{ return fMaxVisibilityScale; }
+
+	virtual bool				Visible(float scale) const = 0;
 
 #ifdef ICON_O_MATIC
 			bool				AddListener(ShapeListener* listener);
@@ -146,6 +146,9 @@ class Shape : public _ICON_NAMESPACE Transformable {
 			void				_NotifyRerender() const;
 #endif // ICON_O_MATIC
 
+ protected:
+			void				SetStyle(::Style* style);
+
  private:
 			PathContainer*		fPaths;
 			::Style*			fStyle;
@@ -157,14 +160,11 @@ class Shape : public _ICON_NAMESPACE Transformable {
 	mutable	BRect				fLastBounds;
 
 			bool				fHinting;
-			float				fMinVisibilityScale;
-			float				fMaxVisibilityScale;
 
 #ifdef ICON_O_MATIC
 			BList				fListeners;
 #endif
 };
-
 
 _END_ICON_NAMESPACE
 

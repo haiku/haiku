@@ -11,6 +11,7 @@
 #include <Catalog.h>
 #include <Locale.h>
 
+#include "PathSourceShape.h"
 #include "Shape.h"
 #include "Style.h"
 
@@ -20,7 +21,7 @@
 
 
 // constructor
-AssignStyleCommand::AssignStyleCommand(Shape* shape,
+AssignStyleCommand::AssignStyleCommand(PathSourceShape* shape,
 									   Style* style)
 	: Command(),
 	  fShape(shape),

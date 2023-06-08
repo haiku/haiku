@@ -1,6 +1,10 @@
 /*
  * Copyright 2006-2010, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2023, Haiku, Inc.
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Zardshard
  */
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H
@@ -73,6 +77,7 @@ public:
 									bool append = false);
 			void				Open(const BMessenger& externalObserver,
 									const uint8* data, size_t size);
+			void				AddReferenceImage(const entry_ref& ref);
 
 			void				StoreSettings(BMessage* archive);
 			void				RestoreSettings(const BMessage* archive);
