@@ -285,8 +285,12 @@ pthread_getschedparam(pthread_t thread, int *policy, struct sched_param *param)
 	if (status == B_BAD_THREAD_ID)
 		return ESRCH;
 	param->sched_priority = info.priority;
-	if (policy != NULL)
-		*policy = SCHED_RR;
+	if (policy != NULL) {
+		if (info.priority >= B_FIRST_REAL_TIME_PRIORITY)
+			*policy = SCHED_RR;
+		else
+			*policy = SCHED_OTHER;
+	}
 	return 0;
 }
 
@@ -296,8 +300,12 @@ pthread_setschedparam(pthread_t thread, int policy,
 	const struct sched_param *param)
 {
 	status_t status;
-	if (policy != SCHED_RR)
+	if (policy != SCHED_RR && policy != SCHED_OTHER)
 		return ENOTSUP;
+	if (policy == SCHED_RR && param->sched_priority < B_FIRST_REAL_TIME_PRIORITY)
+		return EINVAL;
+	if (policy == SCHED_OTHER && param->sched_priority >= B_FIRST_REAL_TIME_PRIORITY)
+		return EINVAL;
 	status = _kern_set_thread_priority(thread->id, param->sched_priority);
 	if (status == B_BAD_THREAD_ID)
 		return ESRCH;
