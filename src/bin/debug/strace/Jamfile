@@ -24,6 +24,7 @@ local straceSources =
 	exec.cpp
 	fcntl.cpp
 	ioctl.cpp
+	mutex.cpp
 	network.cpp
 	signals.cpp
 ;

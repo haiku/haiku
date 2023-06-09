@@ -233,6 +233,7 @@ patch_syscalls()
 	extern void patch_exec();
 	extern void patch_fcntl();
 	extern void patch_ioctl();
+	extern void patch_mutex();
 	extern void patch_network();
 
 	for (size_t i = 0; i < sSyscallVector.size(); i++) {
@@ -250,6 +251,7 @@ patch_syscalls()
 	patch_exec();
 	patch_fcntl();
 	patch_ioctl();
+	patch_mutex();
 	patch_network();
 }
 

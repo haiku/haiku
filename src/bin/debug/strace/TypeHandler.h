@@ -63,9 +63,10 @@ public:
 	string GetParameterValue(Context &c, Parameter *, const void *);
 	string GetReturnValue(Context &, uint64 value);
 
-private:
+protected:
 	string RenderValue(Context &, unsigned int value) const;
 
+private:
 	const FlagsList &fList;
 };
 
