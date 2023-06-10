@@ -114,6 +114,22 @@ framebuffer_get_display_mode(display_mode* _currentMode)
 
 
 status_t
+framebuffer_get_edid_info(void* info, size_t size, uint32* _version)
+{
+	TRACE(("framebuffer_get_edid_info()\n"));
+
+	if (!gInfo->shared_info->has_edid)
+		return B_ERROR;
+	if (size < sizeof(struct edid1_info))
+		return B_BUFFER_OVERFLOW;
+
+	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
+	*_version = EDID_VERSION_1;
+	return B_OK;
+}
+
+
+status_t
 framebuffer_get_frame_buffer_config(frame_buffer_config* config)
 {
 	TRACE(("framebuffer_get_frame_buffer_config()\n"));

@@ -150,10 +150,10 @@ typedef struct displayid_info {
 } displayid_info;
 
 // EDID data block
-typedef struct edid1_info {  
+typedef struct edid1_info {
 	edid1_vendor vendor;
 	edid1_version version;
-	edid1_display display;	
+	edid1_display display;
 	edid1_established_timing established_timing;
 	edid1_std_timing std_timing[EDID1_NUM_STD_TIMING];
 

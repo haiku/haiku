@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system boot platform efi ;
 
+UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName kernel boot ] ;
 UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
@@ -38,6 +39,8 @@ local platform_src =
 	quirks.cpp
 	smp.cpp
 	serial.cpp
+
+	decode_edid.c
 	;
 
 local support_libs ;
@@ -50,6 +53,7 @@ if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 {
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
+		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
 		BootMergeObject boot_platform_efi_common.o :
 			$(platform_src)

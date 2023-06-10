@@ -197,6 +197,13 @@ framebuffer_init(framebuffer_info& info)
 	sharedInfo.current_mode.space = get_color_space_for_depth(
 		bufferInfo->depth);
 
+	edid1_info* edidInfo = (edid1_info*)get_boot_item(VESA_EDID_BOOT_INFO,
+		NULL);
+	if (edidInfo != NULL) {
+		sharedInfo.has_edid = true;
+		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
+	}
+
 	dprintf(DEVICE_NAME ": framebuffer_init() completed successfully!\n");
 	return B_OK;
 }

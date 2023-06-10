@@ -29,6 +29,7 @@ uint32 framebuffer_accelerant_mode_count(void);
 status_t framebuffer_get_mode_list(display_mode *dm);
 status_t framebuffer_set_display_mode(display_mode *modeToSet);
 status_t framebuffer_get_display_mode(display_mode *currentMode);
+status_t framebuffer_get_edid_info(void *info, size_t size, uint32 *_version);
 status_t framebuffer_get_frame_buffer_config(frame_buffer_config *config);
 status_t framebuffer_get_pixel_clock_limits(display_mode *dm, uint32 *low,
 	uint32 *high);

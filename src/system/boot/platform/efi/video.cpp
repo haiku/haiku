@@ -15,9 +15,11 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 #include <drivers/driver_settings.h>
+#include <edid.h>
 #include <util/list.h>
 
 #include "efi_platform.h"
+#include <efi/protocol/edid.h>
 #include <efi/protocol/graphics-output.h>
 
 
@@ -37,7 +39,9 @@ struct video_mode {
 
 
 static efi_guid sGraphicsOutputGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
+static efi_guid sEdidActiveGuid = EFI_EDID_ACTIVE_PROTOCOL_GUID;
 static efi_graphics_output_protocol *sGraphicsOutput;
+static efi_edid_protocol *sEdidActiveProtocol;
 static size_t sGraphicsMode;
 static struct list sModeList;
 static uint32 sModeCount;
@@ -151,15 +155,16 @@ platform_init_video(void)
 {
 	list_init(&sModeList);
 
-	// we don't support VESA modes or EDID
+	// we don't support VESA modes
 	gKernelArgs.vesa_modes = NULL;
 	gKernelArgs.vesa_modes_size = 0;
+
 	gKernelArgs.edid_info = NULL;
 
-	// make a guess at the best video mode to use, and save the mode ID
-	// for switching to graphics mode
-	efi_status status = kBootServices->LocateProtocol(&sGraphicsOutputGuid,
-		NULL, (void **)&sGraphicsOutput);
+	// make a guess at the best video mode to use, and save the mode ID for switching to graphics
+	// mode
+	efi_status status = kBootServices->LocateProtocol(&sGraphicsOutputGuid, NULL,
+		(void **)&sGraphicsOutput);
 	if (sGraphicsOutput == NULL || status != EFI_SUCCESS) {
 		dprintf("GOP protocol not found\n");
 		gKernelArgs.frame_buffer.enabled = false;
@@ -228,6 +233,17 @@ platform_init_video(void)
 	gKernelArgs.frame_buffer.enabled = true;
 	sModeChosen = false;
 	sSettingsLoaded = false;
+
+	status = kBootServices->LocateProtocol(&sEdidActiveGuid, NULL, (void **)&sEdidActiveProtocol);
+	if ((sEdidActiveProtocol != NULL) && (status == EFI_SUCCESS)
+		&& (sEdidActiveProtocol->SizeOfEdid) != 0) {
+		edid1_info* edid_info = (edid1_info*)kernel_args_malloc(sizeof(edid1_info));
+		if (edid_info != NULL) {
+			edid_decode(edid_info, (edid1_raw*)sEdidActiveProtocol->Edid);
+			gKernelArgs.edid_info = edid_info;
+		}
+	}
+
 	return B_OK;
 }
 
