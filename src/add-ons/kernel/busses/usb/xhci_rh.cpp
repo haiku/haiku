@@ -76,7 +76,7 @@ static xhci_root_hub_configuration_s sXHCIRootHubConfig =
 	},
 
 	{ // endpoint companion descriptor
-		7,
+		6,
 		USB_DESCRIPTOR_ENDPOINT_SS_COMPANION,
 		0,
 		0,
