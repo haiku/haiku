@@ -694,15 +694,17 @@ configure_interface(const char* name, char* const* args, int32 argCount)
 
 	int32 i = 0;
 	int family = get_address_family(args[i]);
-	if (family != AF_UNSPEC)
+	if (family != AF_UNSPEC) {
 		i++;
-	int socket = ::socket(family, SOCK_DGRAM, 0);
-	if (socket < 0) {
-		fprintf(stderr, "%s: The requested address family is not available.\n",
-			kProgramName);
-		exit(1);
+
+		int socket = ::socket(family, SOCK_DGRAM, 0);
+		if (socket < 0) {
+			fprintf(stderr, "%s: The requested address family is not available.\n",
+				kProgramName);
+			exit(1);
+		}
+		close(socket);
 	}
-	close(socket);
 
 
 	// try to parse address
