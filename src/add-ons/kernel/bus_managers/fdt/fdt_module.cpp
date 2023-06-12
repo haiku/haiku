@@ -247,6 +247,11 @@ fdt_bus_register_child_devices(void* cookie)
 
 	fdt_bus* bus = (fdt_bus*)cookie;
 
+	status_t res = gDeviceManager->publish_device(bus->node, "bus/fdt/blob",
+		"bus_managers/fdt/device/v1");
+	if (res < B_OK)
+		return res;
+
 	int node = -1, depth = -1;
 	node = fdt_next_node(gFDT, node, &depth);
 	fdt_traverse(bus, node, depth, bus->node);
@@ -691,6 +696,33 @@ fdt_device_lookup_interrupt_map(struct fdt_interrupt_map* interruptMap, uint32 c
 }
 
 
+//#pragma mark devfs node
+
+
+static status_t
+fdt_devfs_node_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+{
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	size_t size = fdt_totalsize(gFDT);
+	if ((uint64)pos >= size) {
+		*_length = 0;
+		return B_OK;
+	}
+	size_t readSize = *_length;
+	if (pos + readSize > size)
+		readSize = size - pos;
+
+	status_t res = user_memcpy(buffer, (uint8*)gFDT + pos, readSize);
+	if (res < B_OK)
+		return res;
+
+	*_length = readSize;
+	return B_OK;
+}
+
+
 //#pragma mark -
 
 fdt_bus_module_info gBusModule = {
@@ -739,9 +771,35 @@ fdt_device_module_info gDeviceModule = {
 };
 
 
+device_module_info gDevfsNodeModule = {
+	.info = {
+			.name = "bus_managers/fdt/device/v1"
+	},
+	.init_device = [](void *driverCookie, void **_deviceCookie) {
+		*_deviceCookie = NULL;
+		return B_OK;
+	},
+	.uninit_device = [](void *deviceCookie) {},
+	.open = [](void *deviceCookie, const char *path, int openMode, void **_cookie) {
+		return B_OK;
+	},
+	.close = [](void *cookie) {
+		return B_OK;
+	},
+	.free = [](void *cookie) {
+		return B_OK;
+	},
+	.read = fdt_devfs_node_read,
+	.control = [](void *cookie, uint32 op, void *buffer, size_t length) {
+		return B_DEV_INVALID_IOCTL;
+	},
+};
+
+
 module_info* modules[] = {
 	(module_info*)&gBusModule,
 	(module_info*)&gDeviceModule,
+	(module_info*)&gDevfsNodeModule,
 	NULL
 };
 
