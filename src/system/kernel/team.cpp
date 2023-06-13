@@ -51,6 +51,7 @@
 #include <syscalls.h>
 #include <tls.h>
 #include <tracing.h>
+#include <user_mutex.h>
 #include <user_runtime.h>
 #include <user_thread.h>
 #include <usergroup.h>
@@ -440,6 +441,7 @@ Team::Team(team_id id, bool kernel)
 	state = TEAM_STATE_BIRTH;
 	flags = 0;
 	io_context = NULL;
+	user_mutex_context = NULL;
 	realtime_sem_context = NULL;
 	xsi_sem_context = NULL;
 	death_entry = NULL;
@@ -2026,6 +2028,8 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 	sem_delete_owned_sems(team);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
+	delete_user_mutex_context(team->user_mutex_context);
+	team->user_mutex_context = NULL;
 	delete_realtime_sem_context(team->realtime_sem_context);
 	team->realtime_sem_context = NULL;
 
@@ -3343,6 +3347,7 @@ team_delete_team(Team* team, port_id debuggerPort)
 
 	// free team resources
 
+	delete_user_mutex_context(team->user_mutex_context);
 	delete_realtime_sem_context(team->realtime_sem_context);
 	xsi_sem_undo(team);
 	remove_images(team);

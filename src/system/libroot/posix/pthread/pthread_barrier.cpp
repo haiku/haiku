@@ -46,13 +46,13 @@ pthread_barrier_init(pthread_barrier_t* barrier,
 
 
 static status_t
-barrier_lock(__haiku_std_int32* mutex)
+barrier_lock(__haiku_std_int32* mutex, uint32 flags)
 {
 	const int32 oldValue = atomic_test_and_set((int32*)mutex, B_USER_MUTEX_LOCKED, 0);
 	if (oldValue != 0) {
 		status_t error;
 		do {
-			error = _kern_mutex_lock((int32*)mutex, NULL, 0, 0);
+			error = _kern_mutex_lock((int32*)mutex, NULL, flags, 0);
 		} while (error == B_INTERRUPTED);
 
 		if (error != B_OK)
@@ -63,26 +63,28 @@ barrier_lock(__haiku_std_int32* mutex)
 
 
 static void
-barrier_unlock(__haiku_std_int32* mutex)
+barrier_unlock(__haiku_std_int32* mutex, uint32 flags)
 {
 	int32 oldValue = atomic_and((int32*)mutex,
 		~(int32)B_USER_MUTEX_LOCKED);
 	if ((oldValue & B_USER_MUTEX_WAITING) != 0)
-		_kern_mutex_unblock((int32*)mutex, 0);
+		_kern_mutex_unblock((int32*)mutex, flags);
 }
 
 
 static void
 barrier_ensure_idle(pthread_barrier_t* barrier)
 {
+	const uint32 flags = (barrier->flags & BARRIER_FLAG_SHARED) ? B_USER_MUTEX_SHARED : 0;
+
 	// waiter_count < 0 means other threads are still exiting.
 	// Loop (usually only one iteration needed) until this is no longer the case.
 	while (atomic_get((int32*)&barrier->waiter_count) < 0) {
-		status_t status = barrier_lock(&barrier->mutex);
+		status_t status = barrier_lock(&barrier->mutex, flags);
 		if (status != B_OK)
 			return;
 
-		barrier_unlock(&barrier->mutex);
+		barrier_unlock(&barrier->mutex, flags);
 	}
 }
 
@@ -96,15 +98,16 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 	if (barrier->waiter_max == 1)
 		return PTHREAD_BARRIER_SERIAL_THREAD;
 
+	const uint32 mutexFlags = (barrier->flags & BARRIER_FLAG_SHARED) ? B_USER_MUTEX_SHARED : 0;
 	barrier_ensure_idle(barrier);
 
 	if (atomic_add((int32*)&barrier->waiter_count, 1) == (barrier->waiter_max - 1)) {
 		// We are the last one in. Lock the barrier mutex.
-		barrier_lock(&barrier->mutex);
+		barrier_lock(&barrier->mutex, mutexFlags);
 
 		// Wake everyone else up.
 		barrier->waiter_count = (-barrier->waiter_max) + 1;
-		_kern_mutex_unblock((int32*)&barrier->lock, B_USER_MUTEX_UNBLOCK_ALL);
+		_kern_mutex_unblock((int32*)&barrier->lock, mutexFlags | B_USER_MUTEX_UNBLOCK_ALL);
 
 		// Return with the barrier mutex still locked, as waiter_count < 0.
 		// The last thread out will take care of unlocking it and resetting state.
@@ -113,16 +116,16 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 
 	// We aren't the last one in. Wait until we are woken up.
 	do {
-		_kern_mutex_lock((int32*)&barrier->lock, "barrier wait", 0, 0);
+		_kern_mutex_lock((int32*)&barrier->lock, "barrier wait", mutexFlags, 0);
 	} while (barrier->waiter_count > 0);
 
 	// Release the barrier, so that any later threads trying to acquire it wake up.
-	barrier_unlock(&barrier->lock);
+	barrier_unlock(&barrier->lock, mutexFlags);
 
 	if (atomic_add((int32*)&barrier->waiter_count, 1) == -1) {
 		// We are the last one out. Reset state and unlock.
 		barrier->lock = B_USER_MUTEX_LOCKED;
-		barrier_unlock(&barrier->mutex);
+		barrier_unlock(&barrier->mutex, mutexFlags);
 	}
 
 	return 0;

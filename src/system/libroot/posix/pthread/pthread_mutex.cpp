@@ -17,7 +17,6 @@
 #include <user_mutex_defs.h>
 
 
-#define MUTEX_FLAG_SHARED	0x80000000
 #define MUTEX_TYPE_BITS		0x0000000f
 #define MUTEX_TYPE(mutex)	((mutex)->flags & MUTEX_TYPE_BITS)
 
@@ -79,6 +78,8 @@ __pthread_mutex_lock(pthread_mutex_t* mutex, uint32 flags, bigtime_t timeout)
 		// someone else has the lock or is at least waiting for it
 		if (timeout < 0)
 			return EBUSY;
+		if ((mutex->flags & MUTEX_FLAG_SHARED) != 0)
+			flags |= B_USER_MUTEX_SHARED;
 
 		// we have to call the kernel
 		status_t error;
@@ -174,8 +175,10 @@ pthread_mutex_unlock(pthread_mutex_t* mutex)
 	// clear the locked flag
 	int32 oldValue = atomic_and((int32*)&mutex->lock,
 		~(int32)B_USER_MUTEX_LOCKED);
-	if ((oldValue & B_USER_MUTEX_WAITING) != 0)
-		_kern_mutex_unblock((int32*)&mutex->lock, 0);
+	if ((oldValue & B_USER_MUTEX_WAITING) != 0) {
+		_kern_mutex_unblock((int32*)&mutex->lock,
+			(mutex->flags & MUTEX_FLAG_SHARED) ? B_USER_MUTEX_SHARED : 0);
+	}
 
 	if (MUTEX_TYPE(mutex) == PTHREAD_MUTEX_ERRORCHECK
 		|| MUTEX_TYPE(mutex) == PTHREAD_MUTEX_DEFAULT) {

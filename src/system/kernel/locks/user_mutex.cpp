@@ -16,6 +16,7 @@
 #include <smp.h>
 #include <syscall_restart.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/OpenHashTable.h>
 #include <vm/vm.h>
 #include <vm/VMArea.h>
@@ -29,7 +30,7 @@
  * during unblock, and they can thus safely (without races) unset WAITING.
  */
 struct UserMutexEntry {
-	phys_addr_t			address;
+	generic_addr_t		address;
 	UserMutexEntry*		hash_next;
 	int32				ref_count;
 
@@ -38,10 +39,10 @@ struct UserMutexEntry {
 };
 
 struct UserMutexHashDefinition {
-	typedef phys_addr_t		KeyType;
+	typedef generic_addr_t	KeyType;
 	typedef UserMutexEntry	ValueType;
 
-	size_t HashKey(phys_addr_t key) const
+	size_t HashKey(generic_addr_t key) const
 	{
 		return key >> 2;
 	}
@@ -51,7 +52,7 @@ struct UserMutexHashDefinition {
 		return HashKey(value->address);
 	}
 
-	bool Compare(phys_addr_t key, const UserMutexEntry* value) const
+	bool Compare(generic_addr_t key, const UserMutexEntry* value) const
 	{
 		return value->address == key;
 	}
@@ -65,8 +66,11 @@ struct UserMutexHashDefinition {
 typedef BOpenHashTable<UserMutexHashDefinition> UserMutexTable;
 
 
-static UserMutexTable sUserMutexTable;
-static rw_lock sUserMutexTableLock = RW_LOCK_INITIALIZER("user mutex table");
+struct user_mutex_context {
+	UserMutexTable table;
+	rw_lock lock;
+};
+static user_mutex_context sSharedUserMutexContext;
 
 
 // #pragma mark - user atomics
@@ -112,17 +116,67 @@ user_atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst)
 }
 
 
-// #pragma mark - user mutex entries
+// #pragma mark - user mutex context
+
+
+void
+user_mutex_init()
+{
+	sSharedUserMutexContext.lock = RW_LOCK_INITIALIZER("shared user mutex table");
+	if (sSharedUserMutexContext.table.Init() != B_OK)
+		panic("user_mutex_init(): Failed to init table!");
+}
+
+
+struct user_mutex_context*
+get_team_user_mutex_context()
+{
+	struct user_mutex_context* context =
+		thread_get_current_thread()->team->user_mutex_context;
+	if (context != NULL)
+		return context;
+
+	Team* team = thread_get_current_thread()->team;
+	TeamLocker teamLocker(team);
+	if (team->user_mutex_context != NULL)
+		return team->user_mutex_context;
+
+	context = new(std::nothrow) user_mutex_context;
+	if (context == NULL)
+		return NULL;
+
+	context->lock = RW_LOCK_INITIALIZER("user mutex table");
+	if (context->table.Init() != B_OK) {
+		delete context;
+		return NULL;
+	}
+
+	team->user_mutex_context = context;
+	return context;
+}
+
+
+void
+delete_user_mutex_context(struct user_mutex_context* context)
+{
+	if (context == NULL)
+		return;
+
+	// This should be empty at this point in team destruction.
+	ASSERT(context->table.IsEmpty());
+	delete context;
+}
 
 
 static UserMutexEntry*
-get_user_mutex_entry(phys_addr_t address, bool noInsert = false, bool alreadyLocked = false)
+get_user_mutex_entry(struct user_mutex_context* context,
+	generic_addr_t address, bool noInsert = false, bool alreadyLocked = false)
 {
 	ReadLocker tableReadLocker;
 	if (!alreadyLocked)
-		tableReadLocker.SetTo(sUserMutexTableLock, false);
+		tableReadLocker.SetTo(context->lock, false);
 
-	UserMutexEntry* entry = sUserMutexTable.Lookup(address);
+	UserMutexEntry* entry = context->table.Lookup(address);
 	if (entry != NULL) {
 		atomic_add(&entry->ref_count, 1);
 		return entry;
@@ -130,9 +184,9 @@ get_user_mutex_entry(phys_addr_t address, bool noInsert = false, bool alreadyLoc
 		return entry;
 
 	tableReadLocker.Unlock();
-	WriteLocker tableWriteLocker(sUserMutexTableLock);
+	WriteLocker tableWriteLocker(context->lock);
 
-	entry = sUserMutexTable.Lookup(address);
+	entry = context->table.Lookup(address);
 	if (entry != NULL) {
 		atomic_add(&entry->ref_count, 1);
 		return entry;
@@ -147,32 +201,32 @@ get_user_mutex_entry(phys_addr_t address, bool noInsert = false, bool alreadyLoc
 	rw_lock_init(&entry->lock, "UserMutexEntry lock");
 	entry->condition.Init(entry, "UserMutexEntry");
 
-	sUserMutexTable.Insert(entry);
+	context->table.Insert(entry);
 	return entry;
 }
 
 
 static void
-put_user_mutex_entry(UserMutexEntry* entry)
+put_user_mutex_entry(struct user_mutex_context* context, UserMutexEntry* entry)
 {
 	if (entry == NULL)
 		return;
 
-	const phys_addr_t address = entry->address;
+	const generic_addr_t address = entry->address;
 	if (atomic_add(&entry->ref_count, -1) != 1)
 		return;
 
-	WriteLocker tableWriteLocker(sUserMutexTableLock);
+	WriteLocker tableWriteLocker(context->lock);
 
 	// Was it removed & deleted while we were waiting for the lock?
-	if (sUserMutexTable.Lookup(address) != entry)
+	if (context->table.Lookup(address) != entry)
 		return;
 
 	// Or did someone else acquire a reference to it?
 	if (atomic_get(&entry->ref_count) > 0)
 		return;
 
-	sUserMutexTable.Remove(entry);
+	context->table.Remove(entry);
 	tableWriteLocker.Unlock();
 
 	rw_lock_destroy(&entry->lock);
@@ -314,6 +368,16 @@ user_mutex_sem_release(UserMutexEntry* entry, int32* sem)
 static status_t
 user_mutex_lock(int32* mutex, const char* name, uint32 flags, bigtime_t timeout)
 {
+	struct user_mutex_context* context;
+
+	if ((flags & B_USER_MUTEX_SHARED) == 0) {
+		context = get_team_user_mutex_context();
+		if (context == NULL)
+			return B_NO_MEMORY;
+	} else {
+		context = &sSharedUserMutexContext;
+	}
+
 	// wire the page and get the physical address
 	VMPageWiringInfo wiringInfo;
 	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)mutex, true,
@@ -322,7 +386,7 @@ user_mutex_lock(int32* mutex, const char* name, uint32 flags, bigtime_t timeout)
 		return error;
 
 	// get the lock
-	UserMutexEntry* entry = get_user_mutex_entry(wiringInfo.physicalAddress);
+	UserMutexEntry* entry = get_user_mutex_entry(context, wiringInfo.physicalAddress);
 	if (entry == NULL)
 		return B_NO_MEMORY;
 	{
@@ -330,7 +394,7 @@ user_mutex_lock(int32* mutex, const char* name, uint32 flags, bigtime_t timeout)
 		error = user_mutex_lock_locked(entry, mutex,
 			flags, timeout, entryLocker);
 	}
-	put_user_mutex_entry(entry);
+	put_user_mutex_entry(context, entry);
 
 	// unwire the page
 	vm_unwire_page(&wiringInfo);
@@ -340,9 +404,27 @@ user_mutex_lock(int32* mutex, const char* name, uint32 flags, bigtime_t timeout)
 
 
 static status_t
-user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
-	uint32 flags, bigtime_t timeout)
+user_mutex_switch_lock(int32* fromMutex, uint32 fromFlags,
+	int32* toMutex, const char* name, uint32 toFlags, bigtime_t timeout)
 {
+	struct user_mutex_context* fromContext, *toContext;
+
+	if ((fromFlags & B_USER_MUTEX_SHARED) == 0) {
+		fromContext = get_team_user_mutex_context();
+		if (fromContext == NULL)
+			return B_NO_MEMORY;
+	} else {
+		fromContext = &sSharedUserMutexContext;
+	}
+
+	if ((toFlags & B_USER_MUTEX_SHARED) == 0) {
+		toContext = get_team_user_mutex_context();
+		if (toContext == NULL)
+			return B_NO_MEMORY;
+	} else {
+		toContext = &sSharedUserMutexContext;
+	}
+
 	// wire the pages and get the physical addresses
 	VMPageWiringInfo fromWiringInfo;
 	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)fromMutex, true,
@@ -359,7 +441,7 @@ user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 
 	// unlock the first mutex and lock the second one
 	UserMutexEntry* fromEntry = NULL,
-		*toEntry = get_user_mutex_entry(toWiringInfo.physicalAddress);
+		*toEntry = get_user_mutex_entry(toContext, toWiringInfo.physicalAddress);
 	if (toEntry == NULL)
 		return B_NO_MEMORY;
 	{
@@ -375,32 +457,21 @@ user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 
 		const int32 oldValue = user_atomic_and(fromMutex, ~(int32)B_USER_MUTEX_LOCKED);
 		if ((oldValue & B_USER_MUTEX_WAITING) != 0)
-			 fromEntry = get_user_mutex_entry(fromWiringInfo.physicalAddress, true);
+			 fromEntry = get_user_mutex_entry(fromContext, fromWiringInfo.physicalAddress, true);
 		if (fromEntry != NULL)
-			user_mutex_unblock(fromEntry, fromMutex, flags);
+			user_mutex_unblock(fromEntry, fromMutex, fromFlags);
 
 		if (!alreadyLocked)
-			error = waiter.Wait(flags, timeout);
+			error = waiter.Wait(toFlags, timeout);
 	}
-	put_user_mutex_entry(fromEntry);
-	put_user_mutex_entry(toEntry);
+	put_user_mutex_entry(fromContext, fromEntry);
+	put_user_mutex_entry(toContext, toEntry);
 
 	// unwire the pages
 	vm_unwire_page(&toWiringInfo);
 	vm_unwire_page(&fromWiringInfo);
 
 	return error;
-}
-
-
-// #pragma mark - kernel private
-
-
-void
-user_mutex_init()
-{
-	if (sUserMutexTable.Init() != B_OK)
-		panic("user_mutex_init(): Failed to init table!");
 }
 
 
@@ -429,6 +500,16 @@ _user_mutex_unblock(int32* mutex, uint32 flags)
 	if (mutex == NULL || !IS_USER_ADDRESS(mutex) || (addr_t)mutex % 4 != 0)
 		return B_BAD_ADDRESS;
 
+	struct user_mutex_context* context;
+
+	if ((flags & B_USER_MUTEX_SHARED) == 0) {
+		context = get_team_user_mutex_context();
+		if (context == NULL)
+			return B_NO_MEMORY;
+	} else {
+		context = &sSharedUserMutexContext;
+	}
+
 	// wire the page and get the physical address
 	VMPageWiringInfo wiringInfo;
 	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)mutex, true,
@@ -438,8 +519,8 @@ _user_mutex_unblock(int32* mutex, uint32 flags)
 
 	// In the case where there is no entry, we must hold the read lock until we
 	// unset WAITING, because otherwise some other thread could initiate a wait.
-	ReadLocker tableReadLocker(sUserMutexTableLock);
-	UserMutexEntry* entry = get_user_mutex_entry(wiringInfo.physicalAddress, true, true);
+	ReadLocker tableReadLocker(context->lock);
+	UserMutexEntry* entry = get_user_mutex_entry(context, wiringInfo.physicalAddress, true, true);
 	if (entry == NULL) {
 		user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 		tableReadLocker.Unlock();
@@ -447,7 +528,7 @@ _user_mutex_unblock(int32* mutex, uint32 flags)
 		tableReadLocker.Unlock();
 		user_mutex_unblock(entry, mutex, flags);
 	}
-	put_user_mutex_entry(entry);
+	put_user_mutex_entry(context, entry);
 
 	vm_unwire_page(&wiringInfo);
 
@@ -456,8 +537,8 @@ _user_mutex_unblock(int32* mutex, uint32 flags)
 
 
 status_t
-_user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
-	uint32 flags, bigtime_t timeout)
+_user_mutex_switch_lock(int32* fromMutex, uint32 fromFlags,
+	int32* toMutex, const char* name, uint32 toFlags, bigtime_t timeout)
 {
 	if (fromMutex == NULL || !IS_USER_ADDRESS(fromMutex)
 			|| (addr_t)fromMutex % 4 != 0 || toMutex == NULL
@@ -465,8 +546,8 @@ _user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 		return B_BAD_ADDRESS;
 	}
 
-	return user_mutex_switch_lock(fromMutex, toMutex, name,
-		flags | B_CAN_INTERRUPT, timeout);
+	return user_mutex_switch_lock(fromMutex, fromFlags, toMutex, name,
+		toFlags | B_CAN_INTERRUPT, timeout);
 }
 
 
@@ -479,6 +560,11 @@ _user_mutex_sem_acquire(int32* sem, const char* name, uint32 flags,
 
 	syscall_restart_handle_timeout_pre(flags, timeout);
 
+	struct user_mutex_context* context;
+
+	// TODO: use the per-team context when possible
+	context = &sSharedUserMutexContext;
+
 	// wire the page and get the physical address
 	VMPageWiringInfo wiringInfo;
 	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)sem, true,
@@ -486,7 +572,7 @@ _user_mutex_sem_acquire(int32* sem, const char* name, uint32 flags,
 	if (error != B_OK)
 		return error;
 
-	UserMutexEntry* entry = get_user_mutex_entry(wiringInfo.physicalAddress);
+	UserMutexEntry* entry = get_user_mutex_entry(context, wiringInfo.physicalAddress);
 	if (entry == NULL)
 		return B_NO_MEMORY;
 	{
@@ -494,7 +580,7 @@ _user_mutex_sem_acquire(int32* sem, const char* name, uint32 flags,
 		error = user_mutex_sem_acquire_locked(entry, sem,
 			flags | B_CAN_INTERRUPT, timeout, entryLocker);
 	}
-	put_user_mutex_entry(entry);
+	put_user_mutex_entry(context, entry);
 
 	vm_unwire_page(&wiringInfo);
 	return syscall_restart_handle_timeout_post(error, timeout);
@@ -507,6 +593,11 @@ _user_mutex_sem_release(int32* sem)
 	if (sem == NULL || !IS_USER_ADDRESS(sem) || (addr_t)sem % 4 != 0)
 		return B_BAD_ADDRESS;
 
+	struct user_mutex_context* context;
+
+	// TODO: use the per-team context when possible
+	context = &sSharedUserMutexContext;
+
 	// wire the page and get the physical address
 	VMPageWiringInfo wiringInfo;
 	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)sem, true,
@@ -514,11 +605,12 @@ _user_mutex_sem_release(int32* sem)
 	if (error != B_OK)
 		return error;
 
-	UserMutexEntry* entry = get_user_mutex_entry(wiringInfo.physicalAddress, true);
+	UserMutexEntry* entry = get_user_mutex_entry(context,
+		wiringInfo.physicalAddress, true);
 	{
 		user_mutex_sem_release(entry, sem);
 	}
-	put_user_mutex_entry(entry);
+	put_user_mutex_entry(context, entry);
 
 	vm_unwire_page(&wiringInfo);
 	return B_OK;

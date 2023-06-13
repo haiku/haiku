@@ -65,6 +65,7 @@ struct realtime_sem_context;	// defined in realtime_sem.cpp
 struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
 struct VMAddressSpace;
+struct user_mutex_context;		// defined in user_mutex.cpp
 struct xsi_sem_context;			// defined in xsi_semaphore.cpp
 
 namespace Scheduler {
@@ -240,6 +241,7 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	int				state;			// current team state, see above
 	int32			flags;
 	struct io_context *io_context;
+	struct user_mutex_context *user_mutex_context;
 	struct realtime_sem_context	*realtime_sem_context;
 	struct xsi_sem_context *xsi_sem_context;
 	struct team_death_entry *death_entry;	// protected by fLock

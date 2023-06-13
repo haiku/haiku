@@ -19,6 +19,9 @@
 #define THREAD_CANCEL_ENABLED		0x08
 #define THREAD_CANCEL_ASYNCHRONOUS	0x10
 
+// _pthread_mutex::flags values
+#define MUTEX_FLAG_SHARED	0x80000000
+
 
 struct thread_creation_attributes;
 
