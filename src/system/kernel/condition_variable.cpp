@@ -47,46 +47,6 @@ static ConditionVariableHash sConditionVariableHash;
 static rw_spinlock sConditionVariableHashLock;
 
 
-static int
-list_condition_variables(int argc, char** argv)
-{
-	ConditionVariable::ListAll();
-	return 0;
-}
-
-
-static int
-dump_condition_variable(int argc, char** argv)
-{
-	if (argc != 2) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
-	addr_t address = parse_expression(argv[1]);
-	if (address == 0)
-		return 0;
-
-	ConditionVariable* variable = sConditionVariableHash.Lookup((void*)address);
-
-	if (variable == NULL) {
-		// It must be a direct pointer to a condition variable.
-		variable = (ConditionVariable*)address;
-	}
-
-	if (variable != NULL) {
-		variable->Dump();
-
-		set_debug_variable("_cvar", (addr_t)variable);
-		set_debug_variable("_object", (addr_t)variable->Object());
-
-	} else
-		kprintf("no condition variable at or with key %p\n", (void*)address);
-
-	return 0;
-}
-
-
 // #pragma mark - ConditionVariableEntry
 
 
@@ -463,6 +423,9 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 }
 
 
+// #pragma mark -
+
+
 /*static*/ void
 ConditionVariable::ListAll()
 {
@@ -494,6 +457,46 @@ ConditionVariable::Dump() const
 }
 
 
+static int
+list_condition_variables(int argc, char** argv)
+{
+	ConditionVariable::ListAll();
+	return 0;
+}
+
+
+static int
+dump_condition_variable(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	addr_t address = parse_expression(argv[1]);
+	if (address == 0)
+		return 0;
+
+	ConditionVariable* variable = sConditionVariableHash.Lookup((void*)address);
+
+	if (variable == NULL) {
+		// It must be a direct pointer to a condition variable.
+		variable = (ConditionVariable*)address;
+	}
+
+	if (variable != NULL) {
+		variable->Dump();
+
+		set_debug_variable("_cvar", (addr_t)variable);
+		set_debug_variable("_object", (addr_t)variable->Object());
+
+	} else
+		kprintf("no condition variable at or with key %p\n", (void*)address);
+
+	return 0;
+}
+
+
 // #pragma mark -
 
 
@@ -517,5 +520,20 @@ condition_variable_init()
 	add_debugger_command_etc("cvars", &list_condition_variables,
 		"List condition variables",
 		"\n"
-		"Lists all existing condition variables\n", 0);
+		"Lists all published condition variables\n", 0);
+}
+
+
+ssize_t
+debug_condition_variable_type_strlcpy(ConditionVariable* cvar, char* name, size_t size)
+{
+	const int32 typePointerOffset = offsetof(ConditionVariable, fObjectType);
+
+	const char* pointer;
+	status_t status = debug_memcpy(B_CURRENT_TEAM, &pointer,
+		(int8*)cvar + typePointerOffset, sizeof(const char*));
+	if (status != B_OK)
+		return status;
+
+	return debug_strlcpy(B_CURRENT_TEAM, name, pointer, size);
 }

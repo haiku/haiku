@@ -97,6 +97,8 @@ protected:
 
 			friend struct ConditionVariableEntry;
 			friend struct ConditionVariableHashDefinition;
+			friend ssize_t debug_condition_variable_type_strlcpy(ConditionVariable* cvar,
+				char* name, size_t size);
 };
 
 
