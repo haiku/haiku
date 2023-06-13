@@ -97,7 +97,6 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 
 		// Wake everyone else up.
 		barrier->waiter_count = (-barrier->waiter_max) + 1;
-		atomic_and((int32*)&barrier->lock, ~(int32)B_USER_MUTEX_LOCKED);
 		_kern_mutex_unblock((int32*)&barrier->lock, B_USER_MUTEX_UNBLOCK_ALL);
 
 		// Return with the barrier mutex still locked, as waiter_count < 0.

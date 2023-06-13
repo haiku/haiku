@@ -222,9 +222,14 @@ user_mutex_unblock_locked(int32* mutex, phys_addr_t physicalAddress, uint32 flag
 	}
 
 	// Someone is waiting: try to hand off the lock to them, if possible.
-	int32 oldValue = user_atomic_or(mutex, B_USER_MUTEX_LOCKED);
-	if ((oldValue & B_USER_MUTEX_LOCKED) != 0)
-		return;
+	int32 oldValue = 0;
+	if ((flags & B_USER_MUTEX_UNBLOCK_ALL) == 0) {
+		oldValue = user_atomic_or(mutex, B_USER_MUTEX_LOCKED);
+		if ((oldValue & B_USER_MUTEX_LOCKED) != 0)
+			return;
+	} else {
+		oldValue = user_atomic_get(mutex);
+	}
 
 	// unblock the first thread
 	entry->locked = true;
