@@ -72,6 +72,21 @@ barrier_unlock(__haiku_std_int32* mutex)
 }
 
 
+static void
+barrier_ensure_idle(pthread_barrier_t* barrier)
+{
+	// waiter_count < 0 means other threads are still exiting.
+	// Loop (usually only one iteration needed) until this is no longer the case.
+	while (atomic_get((int32*)&barrier->waiter_count) < 0) {
+		status_t status = barrier_lock(&barrier->mutex);
+		if (status != B_OK)
+			return;
+
+		barrier_unlock(&barrier->mutex);
+	}
+}
+
+
 int
 pthread_barrier_wait(pthread_barrier_t* barrier)
 {
@@ -81,15 +96,7 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 	if (barrier->waiter_max == 1)
 		return PTHREAD_BARRIER_SERIAL_THREAD;
 
-	// waiter_count < 0 means other threads are still exiting.
-	// Lock in a loop, if necessary, until this is no longer the case.
-	while (atomic_get((int32*)&barrier->waiter_count) < 0) {
-		status_t status = barrier_lock(&barrier->mutex);
-		if (status != B_OK)
-			return status;
-
-		barrier_unlock(&barrier->mutex);
-	}
+	barrier_ensure_idle(barrier);
 
 	if (atomic_add((int32*)&barrier->waiter_count, 1) == (barrier->waiter_max - 1)) {
 		// We are the last one in. Lock the barrier mutex.
@@ -125,7 +132,7 @@ pthread_barrier_wait(pthread_barrier_t* barrier)
 int
 pthread_barrier_destroy(pthread_barrier_t* barrier)
 {
-	// No dynamic resources to free
+	barrier_ensure_idle(barrier);
 	return B_OK;
 }
 
