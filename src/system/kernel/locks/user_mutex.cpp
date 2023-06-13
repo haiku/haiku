@@ -72,6 +72,7 @@ struct user_mutex_context {
 	rw_lock lock;
 };
 static user_mutex_context sSharedUserMutexContext;
+static const char* kUserMutexEntryType = "umtx entry";
 
 
 // #pragma mark - user atomics
@@ -149,12 +150,72 @@ user_atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst,
 // #pragma mark - user mutex context
 
 
+static int
+dump_user_mutex(int argc, char** argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	addr_t threadID = parse_expression(argv[1]);
+	if (threadID == 0)
+		return 0;
+
+	Thread* thread = Thread::GetDebug(threadID);
+	if (thread == NULL) {
+		kprintf("no such thread\n");
+		return 0;
+	}
+
+	if (thread->wait.type != THREAD_BLOCK_TYPE_CONDITION_VARIABLE) {
+		kprintf("thread is not blocked on cvar (thus not user_mutex)\n");
+		return 0;
+	}
+
+	ConditionVariable* variable = (ConditionVariable*)thread->wait.object;
+	if (variable->ObjectType() != kUserMutexEntryType) {
+		kprintf("thread is not blocked on user_mutex\n");
+		return 0;
+	}
+
+	UserMutexEntry* entry = (UserMutexEntry*)variable->Object();
+
+	const bool physical = (sSharedUserMutexContext.table.Lookup(entry->address) == entry);
+	kprintf("user mutex entry %p\n", entry);
+	kprintf("  address:  0x%" B_PRIxPHYSADDR " (%s)\n", entry->address,
+		physical ? "physical" : "virtual");
+	kprintf("  refcount: %" B_PRId32 "\n", entry->ref_count);
+	kprintf("  lock:     %p\n", &entry->lock);
+
+	int32 mutex = 0;
+	status_t status = B_ERROR;
+	if (!physical) {
+		status = debug_memcpy(thread->team->id, &mutex,
+			(void*)entry->address, sizeof(mutex));
+	}
+
+	if (status == B_OK)
+		kprintf("  mutex:    0x%" B_PRIx32 "\n", mutex);
+
+	entry->condition.Dump();
+
+	return 0;
+}
+
+
 void
 user_mutex_init()
 {
 	sSharedUserMutexContext.lock = RW_LOCK_INITIALIZER("shared user mutex table");
 	if (sSharedUserMutexContext.table.Init() != B_OK)
 		panic("user_mutex_init(): Failed to init table!");
+
+	add_debugger_command_etc("user_mutex", &dump_user_mutex,
+		"Dump user-mutex info",
+		"<thread>\n"
+		"Prints info about the user-mutex a thread is blocked on.\n"
+		"  <thread>  - Thread ID that is blocked on a user mutex\n", 0);
 }
 
 
@@ -229,7 +290,7 @@ get_user_mutex_entry(struct user_mutex_context* context,
 	entry->address = address;
 	entry->ref_count = 1;
 	rw_lock_init(&entry->lock, "UserMutexEntry lock");
-	entry->condition.Init(entry, "UserMutexEntry");
+	entry->condition.Init(entry, kUserMutexEntryType);
 
 	context->table.Insert(entry);
 	return entry;
