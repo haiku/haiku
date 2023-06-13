@@ -176,9 +176,8 @@ user_mutex_wait_locked(int32* mutex, phys_addr_t physicalAddress, const char* na
 }
 
 
-static status_t
-user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
-	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
+static bool
+user_mutex_prepare_to_lock(int32* mutex)
 {
 	int32 oldValue = user_atomic_or(mutex,
 		B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING);
@@ -187,8 +186,19 @@ user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
 		// clear the waiting flag and be done
 		if ((oldValue & B_USER_MUTEX_WAITING) == 0)
 			user_atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
-		return B_OK;
+		return true;
 	}
+
+	return false;
+}
+
+
+static status_t
+user_mutex_lock_locked(int32* mutex, phys_addr_t physicalAddress,
+	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
+{
+	if (user_mutex_prepare_to_lock(mutex))
+		return B_OK;
 
 	bool lastWaiter;
 	status_t error = user_mutex_wait_locked(mutex, physicalAddress, name,
@@ -338,12 +348,16 @@ user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 	// unlock the first mutex and lock the second one
 	{
 		MutexLocker locker(sUserMutexTableLock);
+
+		const bool alreadyLocked = user_mutex_prepare_to_lock(toMutex);
 		user_atomic_and(fromMutex, ~(int32)B_USER_MUTEX_LOCKED);
 		user_mutex_unblock_locked(fromMutex, fromWiringInfo.physicalAddress,
 			flags);
 
-		error = user_mutex_lock_locked(toMutex, toWiringInfo.physicalAddress,
-			name, flags, timeout, locker);
+		if (!alreadyLocked) {
+			error = user_mutex_lock_locked(toMutex, toWiringInfo.physicalAddress,
+				name, flags, timeout, locker);
+		}
 	}
 
 	// unwire the pages
