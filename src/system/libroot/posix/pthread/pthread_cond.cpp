@@ -74,7 +74,7 @@ cond_wait(pthread_cond_t* cond, pthread_mutex_t* mutex, uint32 flags,
 	cond->waiter_count++;
 
 	// make sure the user mutex we use for blocking is locked
-	atomic_or((int32*)&cond->lock, B_USER_MUTEX_LOCKED);
+	atomic_test_and_set((int32*)&cond->lock, B_USER_MUTEX_LOCKED, 0);
 
 	// atomically unlock the mutex and start waiting on the user mutex
 	mutex->owner = -1;
