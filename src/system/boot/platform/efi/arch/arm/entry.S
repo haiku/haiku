@@ -86,10 +86,34 @@ _pl1_entry:
 	mov		r9, #0x00000001
 	mcr		p15, 0, r9, c3, c0, 0
 
+	// configure PRRR and NMRR for TEX remap
+
+	// set PRRR as follows:
+	// - memory type 0 is Strongly Ordered
+	// - memory type 1 is Shareable Device
+	// - all others are normal memory
+	// - NS/DS bits are configured as 'pass-through'
+	// - all Shareable Normal memory regions are Outer Shareable
+	mov		r9, #0x0000aaa4
+	orr		r9, #0x000a0000
+	mcr		p15, 0, r9, c10, c2, 0
+
+	// set NMRR as follows:
+	// - memory type 2 is Inner/Outer Write-Through
+	// - memory type 3 is Inner/Outer Write-Back, no Write-Allocate
+	// - don't care about the rest
+	mov		r9, #0x000000e0
+	orr		r9, #0x00e00000
+	mcr		p15, 0, r9, c10, c2, 1
+
+	// ensure the PRRR and NMRR registers are updated before enabling MMU
+	dsb
+	isb
+
 	// enable MMU and caches
 	mrc		p15, 0, r9, c1, c0, 0
 	orr		r9, r9, #0x20000000		// access flag enabled
-	bic		r9, r9, #0x10000000		// TEX remap disabled
+	orr		r9, r9, #0x10000000		// TEX remap enabled
 	orr		r9, r9, #0x00001000		// i-cache enabled
 	orr		r9, r9, #0x00000004		// d-cache enabled
 	orr		r9, r9, #0x00000001		// MMU enabled
