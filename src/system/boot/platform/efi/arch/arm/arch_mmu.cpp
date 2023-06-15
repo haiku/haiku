@@ -263,7 +263,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 			(efi_memory_descriptor *)(memoryMapAddr + i * descriptorSize);
 		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0) {
 			map_range_to_new_area(entry,
-				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_KRW);
+				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_HAIKU_KERNEL_RW);
 		}
 	}
 
@@ -273,11 +273,11 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	size_t size;
 	while (mmu_next_region(&cookie, &vaddr, &paddr, &size)) {
 		map_range(vaddr, paddr, size,
-			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_KRW);
+			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_HAIKU_KERNEL_RW);
 	}
 
 	map_range_to_new_area(gKernelArgs.arch_args.uart.regs,
-		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_AP_KRW | ARM_MMU_L2_FLAG_XN);
+		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_HAIKU_KERNEL_RW | ARM_MMU_L2_FLAG_XN);
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);

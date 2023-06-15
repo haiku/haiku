@@ -60,11 +60,13 @@
 #define ARM_MMU_L2_FLAG_S				0x400
 #define ARM_MMU_L2_FLAG_NG				0x800
 
-#define ARM_MMU_L2_FLAG_AP_KRW			0x010
-	// allow read and write for kernel only
+#define ARM_MMU_L2_FLAG_HAIKU_SWDBM		ARM_MMU_L2_FLAG_TEX2
+	// reuse TEX[2] for software-emulated Dirty Bit Modifier
 
-#define ARM_MMU_L2_FLAG_AP_RW			0x030
-	// allow read and write for user and system
+#define ARM_MMU_L2_FLAG_HAIKU_KERNEL_RW	(ARM_MMU_L2_FLAG_TEX2 | ARM_MMU_L2_FLAG_AP0)
+	// allow read and write for kernel only
+	// set Accessed and Modified flag during early page mapping
+	// as the exception handler may be not available yet
 
 #define ARM_MMU_L1_TABLE_ENTRY_COUNT	4096
 #define ARM_MMU_L1_TABLE_SIZE			(ARM_MMU_L1_TABLE_ENTRY_COUNT \
@@ -97,7 +99,7 @@
 #define ARM_PTE_ADDRESS_MASK			0xfffff000
 #define ARM_PTE_TYPE_MASK				0x00000003
 
-#define ARM_PTE_PROTECTION_MASK			0x00000221	// AP[2:1], XN
-#define ARM_PTE_MEMORY_TYPE_MASK		0x000001cc	// TEX, B, C
+#define ARM_PTE_PROTECTION_MASK			0x00000121	// SWDBM, AP[1], XN
+#define ARM_PTE_MEMORY_TYPE_MASK		0x0000004c	// TEX[0], B, C
 
 #endif /* _ARCH_ARM_ARM_MMU_H */

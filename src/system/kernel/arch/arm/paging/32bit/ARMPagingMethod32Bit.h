@@ -70,6 +70,8 @@ public:
 	static	page_table_entry	ClearPageTableEntry(page_table_entry* entry);
 	static	page_table_entry	ClearPageTableEntryFlags(
 									page_table_entry* entry, uint32 flags);
+	static	page_table_entry	SetAndClearPageTableEntryFlags(page_table_entry* entry,
+									uint32 flagsToSet, uint32 flagsToClear);
 
 	static	uint32				AttributesToPageTableEntryFlags(
 									uint32 attributes);
@@ -145,6 +147,23 @@ ARMPagingMethod32Bit::ClearPageTableEntryFlags(page_table_entry* entry, uint32 f
 }
 
 
+/*static*/ inline page_table_entry
+ARMPagingMethod32Bit::SetAndClearPageTableEntryFlags(page_table_entry* entry, uint32 flagsToSet, uint32 flagsToClear)
+{
+	page_table_entry originalValue = *entry;
+
+	while (true) {
+		page_table_entry oldEntry = atomic_test_and_set((int32*)entry,
+			(originalValue & ~flagsToClear) | flagsToSet, originalValue);
+		if (oldEntry == originalValue)
+			break;
+		originalValue = oldEntry;
+	}
+
+	return originalValue;
+}
+
+
 /*static*/ inline uint32
 ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(uint32 attributes)
 {
@@ -153,15 +172,16 @@ ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(uint32 attributes)
 	if ((attributes & B_READ_AREA) != 0) {
 		// user accessible
 		apFlags = ARM_MMU_L2_FLAG_AP1;
-		if ((attributes & B_WRITE_AREA) == 0) {
+		if ((attributes & B_WRITE_AREA) == 0)
 			apFlags |= ARM_MMU_L2_FLAG_AP2;
-		}
+		else
+			apFlags |= ARM_MMU_L2_FLAG_HAIKU_SWDBM;
 	} else if ((attributes & B_KERNEL_WRITE_AREA) == 0) {
 		// kernel ro
 		apFlags = ARM_MMU_L2_FLAG_AP2;
 	} else {
 		// kernel rw
-		apFlags = 0;
+		apFlags = ARM_MMU_L2_FLAG_HAIKU_SWDBM;
 	}
 
 	if (((attributes & B_KERNEL_EXECUTE_AREA) == 0) &&
@@ -172,6 +192,9 @@ ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(uint32 attributes)
 	if ((attributes & PAGE_ACCESSED) != 0)
 		apFlags |= ARM_MMU_L2_FLAG_AP0;
 
+	if ((attributes & PAGE_MODIFIED) == 0)
+		apFlags |= ARM_MMU_L2_FLAG_AP2;
+
 	return apFlags;
 }
 
@@ -181,7 +204,7 @@ ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(uint32 pageTableEntry)
 {
 	uint32 attributes;
 
-	if ((pageTableEntry & ARM_MMU_L2_FLAG_AP2) == 0) {
+	if ((pageTableEntry & ARM_MMU_L2_FLAG_HAIKU_SWDBM) != 0) {
 		if ((pageTableEntry & ARM_MMU_L2_FLAG_AP1) != 0) {
 			attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA;
 		} else {
@@ -196,6 +219,9 @@ ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(uint32 pageTableEntry)
 
 	if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
 		attributes |= PAGE_ACCESSED;
+
+	if ((pageTableEntry & ARM_MMU_L2_FLAG_AP2) == 0)
+		attributes |= PAGE_MODIFIED;
 
 	if ((pageTableEntry & ARM_MMU_L2_FLAG_XN) == 0) {
 		if ((attributes & B_KERNEL_READ_AREA) != 0)
