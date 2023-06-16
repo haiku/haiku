@@ -42,6 +42,7 @@ rule DefineDefaultBuildProfiles
 
 	# nightly profiles
 	DefineBuildProfile nightly-raw : image : "haiku-nightly.image" ;
+	DefineBuildProfile nightly-mmc : haiku-mmc-image : "haiku-nightly.mmc" ;
 	DefineBuildProfile nightly-vmware : vmware-image : "haiku-nightly.vmdk" ;
 	DefineBuildProfile nightly-cd : cd-image : "haiku-nightly.iso" ;
 	DefineBuildProfile nightly-anyboot : anyboot-image
