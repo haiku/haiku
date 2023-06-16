@@ -74,7 +74,9 @@ echo -n "Press enter to begin..."
 read
 
 TEST_SERIALLOG="/tmp/test-$ARCH-serial.mon"
-EXTRAS="$EXTRAS -chardev vc,id=serial,logfile=$TEST_SERIALLOG,signal=off -serial chardev:serial"
+NETWORK="-netdev user,id=testnet,net=192.168.76.0/24,dhcpstart=192.168.76.9,hostfwd=tcp::5555-:22"
+#NETWORK="-netdev tap,id=testnet,ifname=Ethernet"
+EXTRAS="$EXTRAS $NETWORK -chardev vc,id=serial,logfile=$TEST_SERIALLOG,signal=off -serial chardev:serial"
 > $TEST_SERIALLOG
 
 case "$ARCH" in
@@ -118,11 +120,10 @@ case "$ARCH" in
 	$EMULATOR \
 		-cpu max \
 		-global virtio-mmio.force-legacy=false \
-		-device usb-ehci,id=ehci -device usb-tablet -device usb-kbd \
+		-device qemu-xhci -device usb-tablet -device usb-kbd \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
-		-device virtio-net-device,netdev=usernet,bus=virtio-mmio-bus.1 \
-		-drive file=$TEST_FILE,format=raw,if=none,id=x0 \
-		-netdev user,id=usernet
+		-device virtio-net-device,netdev=testnet,bus=virtio-mmio-bus.1 \
+		-drive file=$TEST_FILE,format=raw,if=none,id=x0
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
 	;;
@@ -135,16 +136,17 @@ case "$ARCH" in
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo "+++ Testing $PLATFORM boot..."
 	cp $IMAGE $TEST_FILE
-	# virtio broken currently for input
-	#-device virtio-tablet-device,bus=virtio-mmio-bus.2
-	#-device virtio-keyboard-device,bus=virtio-mmio-bus.3
+	# virtio broken currently for input:
+	#  -device virtio-tablet-device,bus=virtio-mmio-bus.2
+	#  -device virtio-keyboard-device,bus=virtio-mmio-bus.3
+	# Network communication doesn't work:
+	#  -device virtio-net-device,netdev=testnet,bus=virtio-mmio-bus.1 \
 	$EMULATOR -device ati-vga \
 		-global virtio-mmio.force-legacy=false \
-		-device usb-ehci,id=ehci -device usb-tablet -device usb-kbd \
+		-device qemu-xhci -device usb-tablet -device usb-kbd \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
-		-device virtio-net-device,netdev=usernet,bus=virtio-mmio-bus.1 \
-		-drive file=$TEST_FILE,format=raw,if=none,id=x0 \
-		-netdev user,id=usernet
+		-device usb-net,netdev=testnet \
+		-drive file=$TEST_FILE,format=raw,if=none,id=x0
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
 	;;
