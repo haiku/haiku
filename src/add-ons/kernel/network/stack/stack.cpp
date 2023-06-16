@@ -831,6 +831,8 @@ init_stack()
 	scan_modules("network/datalink_protocols");
 
 	// TODO: for now!
+	register_domain_datalink_protocols(AF_INET, IFT_TUN,
+		"network/datalink_protocols/ethernet_frame/v1", NULL);
 	register_domain_datalink_protocols(AF_INET, IFT_LOOP,
 		"network/datalink_protocols/loopback_frame/v1", NULL);
 #if 0 // PPP is not (currently) included in the build
