@@ -1,6 +1,6 @@
 1	danish	x-vnd.Haiku-debug_server	3188340596
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programmet:\n\n      %app\n\ner løbet ind i en fejl, som forhindrer den i at fortsætte. Haiku vil afbryde programmet og rydde op.
-Oh yeah!	DebugServer		Årh ja!
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programmet:\n\n      %app\n\ner løbet ind i en fejl, som forhindrer den i at fortsætte. Haiku vil afbryde programmet, og rydde op.
+Oh yeah!	DebugServer		Åh ja!
 Debug	DebugServer		Fejlret
 Terminate	DebugServer		Terminér
 Save report	DebugServer		Gem rapport

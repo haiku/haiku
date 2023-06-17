@@ -12,5 +12,5 @@ identify_tiff_header: couldn't set directory\n	TIFFTranslator		identifikace_hlav
 Version %d.%d.%d, %s	TIFFView		Verze %d.%d.%d, %s
 TIFFTranslator Settings	TIFFTranslator		Nastavení TIFFPřevaděče
 LZW	TIFFView		LZW
-TIFF images	TIFFTranslator		TIFF obrázky
+TIFF images	TIFFTranslator		Obrázky TIFF
 None	TIFFView		Nic

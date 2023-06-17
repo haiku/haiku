@@ -3,5 +3,5 @@ Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Validní hodnoty: 16, 3
 Valid colors: RGB32, RGBA32	ICNSConfig		Validní barevné modely: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Verze %d.%d.%d, %s
 Apple icon translator	ICNSConfig		Překladač ikon Apple
-Apple icons	ICNSTranslator		Jablečná ikona
+Apple icons	ICNSTranslator		Ikony jablečné
 Apple icon translator	ICNSTranslator		Převaděč jablečných ikon

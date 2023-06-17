@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Input	4063065788
+1	friulian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Scoriment
 Defaults	InputMouse		Predefinîts
 Long	KeyboardView		Lunc
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Acete il prin clic
 OK	TouchpadPrefView		VA BEN
 Horizontal scrolling	TouchpadPrefView		Scoriment orizontâl
 Delay until key repeat	KeyboardView		Ritart pe ripetizion dal tast
+Keyboard lock delay	TouchpadPrefView		Ritart dal bloc de tastiere
 Two finger scrolling	TouchpadPrefView		Scoriment cun doi dêts
 Input	System name		Input
 Mouse acceleration	SettingsView		Acelerazion dal mouse

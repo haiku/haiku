@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-mixer.media_addon	3463574286
+1	russian	x-vnd.Haiku-mixer.media_addon	3417484697
 Input mapping	AudioMixer		Переназначение входа
+High quality (linear interpolation)	AudioMixer		Высокое качество (линейная интерполяция)
 To output	AudioMixer		Выход
 Gain	AudioMixer		Усиление
 To master	AudioMixer		К главному
@@ -7,13 +8,16 @@ not connected	AudioMixer		не подключен
 Master output	AudioMixer		Основной выход
 dB	AudioMixer		дБ
 Gain controls	AudioMixer		Регулировка усиления
+Low quality (drop/repeat samples)	AudioMixer		Плохое качество (пропуск/повтор сэмплов)
 Output channel sources	AudioMixer		Источники выходного канала
 Allow input channel remapping	AudioMixer		Разрешить переназначение входного канала
 Display balance control for stereo connections	AudioMixer		Показывать регулятор баланса для стерео соединений
 Setup	AudioMixer		Настройка
 Physical input channels	AudioMixer		Физические каналы входа
 Input channel destinations	AudioMixer		Направления входных каналов
+Resampling algorithm:	AudioMixer		Алгоритм ресэмплинга:
 Mute	AudioMixer		Выключить звук
 Output mapping	AudioMixer		Переназначение выхода
 Virtual output channels	AudioMixer		Виртуальные каналы выхода
 Allow output channel remapping	AudioMixer		Разрешить переназначение выходного канала
+Attenuate mixer output by 3 dB	AudioMixer		Ослабить вывод микшера на 3 дБ

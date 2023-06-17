@@ -22,4 +22,4 @@ Output quality:	ConfigView		Výstupní kvalita:
 Slower but better	ConfigView		Pomalejší ale lepší
 Based on libwebp %version%	ConfigView		Založeno na libwebp %version%
 Fast	ConfigView		Rychlé
-WebP images	WebPTranslator		obrázky WebP
+WebP images	WebPTranslator		Obrázky WebP

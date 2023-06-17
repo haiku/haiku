@@ -19,4 +19,4 @@ Low	JPEGTranslator		Nízká
 Write	JPEGTranslator		Zápis
 Prevent colors 'washing out'	JPEGTranslator		Zabránit barvám 'vymývání'
 JPEG Library Warning: %s\n	be_jerror		Varování knihovny JPEG: %s\n
-JPEG images	JPEGTranslator		obrázky JPEG
+JPEG images	JPEGTranslator		Obrázky JPEG

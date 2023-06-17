@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CharacterMap	3635187938
+1	russian	x-vnd.Haiku-CharacterMap	2142098242
 Tirhuta	UnicodeBlocks		Тирхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Разнообразные математические символы B
 Latin extended E	UnicodeBlocks		Расширенная латиница E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Объединенные ие�
 Ancient Greek musical notation	UnicodeBlocks		Древнегреческие музыкальные символы
 Thai	UnicodeBlocks		Тайский
 Ethiopic supplement	UnicodeBlocks		Эфиопские дополнения
+Only show blocks contained in font	CharacterWindow		Показать только блоки, которые есть в шрифте
 Chess symbols	UnicodeBlocks		Шахматные символы
 Yijing hexagram symbols	UnicodeBlocks		Гексаграммы Ицзин
 Ottoman Siyaq numbers	UnicodeBlocks		Османские числа Cиак

@@ -3,7 +3,7 @@ RAWTranslator Settings	ConfigView		Nastavení Převaděče RAW
 Version %d.%d.%d, %s	ConfigView		Verze %d.%d.%d, %s
 RAW image translator	RAWTranslator		Převaděč RAW obrázků
 RAW Settings	RAWTranslator main		nastavení RAW
-RAW images	RAWTranslator		obrázky RAW
+RAW images	RAWTranslator		Obrázky RAW
 RAW image translator	ConfigView		Převaděč RAW obrázků
 %s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW obrázek
 Based on Dave Coffin's dcraw 8.63	ConfigView		Vytvořeno na základě dcraw 8.63 Dave Coffina

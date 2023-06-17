@@ -1,14 +1,14 @@
 1	danish	x-vnd.Haiku-mount_server	599204450
-Mount read-only	AutoMounter		Montér skrivebeskyttet
+Mount read-only	AutoMounter		Montér som skrivebeskyttet
 Error mounting volume:\n\n%s	AutoMounter		Fejl ved montering af diskområde:\n\n%s
-Cancel	AutoMounter		Annuller
-OK	AutoMounter		OK
+Cancel	AutoMounter		Afbryd
+OK	AutoMounter		O.k.
 Unmount error	AutoMounter		Fejl ved afmontering
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Filsystemet på diskenheden er ikke Be-filsystemet. Det anbefales at montere det i skrivebeskyttet tilstand, for at forhindre utilsigtet tab af data grundet fejl i Haiku.
-Mount read/write	AutoMounter		Montér læse/skrive
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Filsystemet på diskenheden er ikke Be-filsystemet. Det anbefales at montere det i skrivebeskyttet tilstand for at forhindre utilsigtet tab af data grundet fejl i Haiku.
+Mount read/write	AutoMounter		Montér som læse/skrivebar
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Kunne ikke afmontere disken \"%s\":\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Monterer diskområdet '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Kunne ikke afmontere disken \"%s\":\n\t%s\n\nSkal afmontering gennemtvinges?\n\nBemærk: Hvis et program skriver til diskområdet på nuværende tidspunkt, så kan afmontering måske lede til tab af data.\n
 Force unmount	AutoMounter		Gennemtving afmontering
 Mount error	AutoMounter		Fejl ved montering
-Mount warning	AutoMounter		Advarsel om montering
+Mount warning	AutoMounter		Monteringsadvarsel

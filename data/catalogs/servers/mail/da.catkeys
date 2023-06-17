@@ -11,7 +11,7 @@ Send pending mails	DeskbarView		Send afventende post
 Settings…	DeskbarView		Indstillinger…
 {0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{En ny meddelelse} other{# nye meddelelser}}
 New Messages	MailDaemon		Nye meddelelser
-<no accounts>	DeskbarView		<ingen konti>
+<no accounts>	DeskbarView		<ingen kontoer>
 Mail status	Notifier		Status for post
 Check for mails only	DeskbarView		Søg kun efter post
 Check for mail now	DeskbarView		Søg efter post nu

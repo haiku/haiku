@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	765355649
+1	friulian	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -88,6 +88,7 @@ Modified	FindPanel		Modificât
 Select all	QueryContainerWindow		Selezione dutis
 Generate image thumbnails	SettingsView		Gjenere miniaturis di imagjins
 Select…	FilePanelPriv		Selezione…
+An item named '%filename%' already exists.	FSUtils		Un element clamât '%filename%' al esist za.
 preferences	B_PREFERENCES_DIRECTORY		preferencis
 Name	Person Query Columns		Non
 Skip all	FSUtils		Salte ducj
@@ -269,6 +270,7 @@ Cut	FilePanelPriv		Taie
 Finish: after several years	StatusWindow		Finît: dopo tancj agns
 Favorites	FilePanelPriv		Preferîts
 Point	AttributesView		Pont
+You can't move or copy items to read-only volumes.	PoseView		No tu puedis spostâ o copiâ i elements sui volums in dome-leture.
 home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Gnûfs Modei Tracker
 Disk mounting during boot	AutoMounterSettings		Montaç discs dilunc l'inviament
@@ -357,6 +359,7 @@ after	FindPanel		dopo
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte di dâts>} other{<# byte di dâts>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Cualchidun dai elements selezionâts nol pues jessi spostât te Scovacere. Eliminâju dal dut? (Cheste operazion e sarà permanente.)
+The entered file name is too long.	FSUtils		Il non dal file inserît al è masse lunc.
 Add printer…	ContainerWindow		Zonte stampadore…
 On	FindPanel		Su
 Permissions	ContainerWindow		Permès
@@ -527,6 +530,7 @@ I know what I'm doing	FSUtils	button label	O sai ce che o fâs
 Preparing to copy items…	StatusWindow		Daûr a prontâ la copie dai elements…
 Entry ref	AttributesView		Rif vôs
 Icon view	ContainerWindow		Viodude a iconis
+The entered folder name is too long.	FSUtils		Il non de cartele inserît al è masse lunc.
 Name	ContainerWindow		Non
 Preferred for %type	OpenWithWindow		Preferît par %type
 Free space color	SettingsView		Colôr spazi libar

@@ -1,9 +1,9 @@
 1	danish	x-vnd.Haiku-GLInfo	1282327690
-Maximum clipping planes	Capabilities		Maks. klipningsplaner
+Maximum clipping planes	Capabilities		Højeste antal klipningsplaner
 Maximum evaluators equation order	Capabilities		Maks. evalueringsligningsrækkefølge
-Texture stack size	Capabilities		Stakstørrelse for struktur
-GL Info	System name		Information om GL
-Information	InfoView		Information
+Texture stack size	Capabilities		Stakstørrelse for tekstur
+GL Info	System name		GL-oplysninger
+Information	InfoView		Oplysninger
 Attributes stack size	Capabilities		Stakstørrelse for attributter
 Maximum lights	Capabilities		Maks. lys
 Extensions	Extensions		Udvidelser
@@ -12,15 +12,15 @@ Maximum recommended vertex elements	Capabilities		Maks. anbefalede vertex-elemen
 Value	Capabilities		Værdi
 Name stack size	Capabilities		Stakstørrelse for navn
 Capabilities	Capabilities		Evner
-Maximum texture units	Capabilities		Maks. strukturenheder
+Maximum texture units	Capabilities		Maks. teksturenheder
 Unknown or missing OpenGL renderer.	InfoView		Ukendt eller manglende OpenGL-gengiver.
 Capability	Capabilities		Evne
-Maximum 2D texture size	Capabilities		Maks. størrelse for 2D-struktur
+Maximum 2D texture size	Capabilities		Maks. størrelse for 2D-tekstur
 Auxiliary buffer(s)	Capabilities		Ekstra buffer(e)
 Unknown vendor	InfoView		Ukendt leverandør
 Maximum convolution	Capabilities		Maks. foldning
-Maximum 3D texture size	Capabilities		Maks. størrelse for 3D-struktur
-Maximum recommended index elements	Capabilities		Maks. anbefalede index-elementer
+Maximum 3D texture size	Capabilities		Maks. størrelse for 3D-tekstur
+Maximum recommended index elements	Capabilities		Maks. anbefalede indekselementer
 Unknown version	InfoView		Ukendt version
 List stack size	Capabilities		Stakstørrelse for liste
 Model stack size	Capabilities		Stakstørrelse for model

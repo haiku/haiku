@@ -2,7 +2,7 @@
 PNG Settings	PNGTranslator		Nastavení PNG
 None	PNGTranslator		Nic
 PNG image	PNGTranslator		PNG obrázek
-PNG images	PNGTranslator		PNG obrázky
+PNG images	PNGTranslator		Obrázky PNG
 Interlacing type:	PNGTranslator		Typ prokládání:
 PNGTranslator Settings	PNGTranslator		Nastavení PNGPřevaděče
 Version %d.%d.%d, %s	PNGTranslator		Verze %d.%d.%d, %s

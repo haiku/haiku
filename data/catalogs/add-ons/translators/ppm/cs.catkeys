@@ -14,7 +14,7 @@ PPMTranslator Settings	PPMTranslator		Nastavení PPMPřevaděče
 CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bitů
 OK	PPMMain		OK
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bitů
-PPM image	PPMTranslator		PPM obrázek
+PPM image	PPMTranslator		Obrázky PPM
 Input color space:	PPMTranslator		Vstupní barevný prostor:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bitů velký endián
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bitů velký endián

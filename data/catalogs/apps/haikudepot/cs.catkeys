@@ -58,7 +58,7 @@ No	MainWindow		Ne
 Repository	PackageListView		Repozitář
 Close	RatePackageWindow		Zavřít
 Close	UserLoginWindow		Zavřít
-The email is malformed.	UserLoginWindow		Email je špatně formátovaný.
+The email is malformed.	UserLoginWindow		E-mail je špatně formátovaný.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizuji data balíčků z repozitáře '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Zobrazit podmínky užívání
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování podmínek použití potřebných pro vytvoření nového uživatele. Zkontrolujte log pro více informací a zkuste to znovu. \nV HaikuDepot sekci uživatelské příručky Haiku se dočtete jak zobrazit logy.

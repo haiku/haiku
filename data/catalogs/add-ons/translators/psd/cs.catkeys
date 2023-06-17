@@ -7,7 +7,7 @@ Photoshop image translator	PSDConfig		Překladač obrázků Photoshopu
 Photoshop image translator	PSDTranslator		Překladač obrázků Photoshopu
 Version %d.%d.%d, %s	PSDConfig		Verze %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Dokument Photoshopu (soubor PSD)
-Photoshop image	PSDTranslator		Obrázek Photoshopu
+Photoshop image	PSDTranslator		Obrázky Photoshopu
 RLE	PSDConfig		RLE
 Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big Document (soubor PSB)
 RGBA	PSDLoader		RGBA

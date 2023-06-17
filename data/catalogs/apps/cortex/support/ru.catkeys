@@ -1,9 +1,11 @@
-1	russian	application/x-vnd.Cortex.support	3457841531
+1	russian	application/x-vnd.Cortex.support	2272802441
 Header has flags	MediaString		Заголовок имеет флаги
 32 bit HLS	MediaString		32-битный HLS
 Recording	MediaString		Запись
 (unknown format)	MediaString		(неизвестный формат)
 Clean buffers	MediaString		Очистить данные буфера
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural, one{# кадр вперед} few{# кадра вперед} other{# кадров вперед}}
+Rear-right	MediaString		Задний правый
 Mono	MediaString		Моно
 MPEG1	MediaString		MPEG1
 ASF format family	MediaString		Семейство файловых форматов ASF

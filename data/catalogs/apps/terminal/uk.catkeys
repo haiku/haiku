@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-Terminal	4000370057
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
-Insert path	Terminal TermView		Введіть шлях
+Insert path	Terminal TermView		Вставити шлях
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
 Text encoding	Terminal TermWindow		Кодування тексту
 OK	Terminal SetTitleWindow		ОК
@@ -23,12 +23,12 @@ Error!	Terminal getString		Помилка!
 Colors…	Terminal TermWindow		Кольори…
 Appearance	Terminal PrefWindow		Вигляд
 Set tab title	Terminal TermWindow		Встановити заголовок вкладки
-Create link here	Terminal TermView		Створити посилання тут
+Create link here	Terminal TermView		Створити посилання
 Encoding:	Terminal AppearancePrefView		Кодування:
 yellow	Terminal ThemeView		жовтий
 Change directory	Terminal TermView		Змінити каталог
 Custom	Terminal AppearancePrefView	Window size	Вибір користувача
-Page setup…	Terminal TermWindow		Налаштування друку…
+Page setup…	Terminal TermWindow		Параметри сторінки…
 ANSI yellow color	Terminal ThemeView		ANSI жовтий
 Cancel	Terminal TermView		Скасувати
 Defaults	Terminal PrefWindow		Типові настройки
@@ -115,7 +115,7 @@ ANSI bright yellow color	Terminal ThemeView		ANSI яскравий жовтий
 Not found.	Terminal TermWindow		Не знайдено.
 ANSI black color	Terminal ThemeView		ANSI чорний
 Find…	Terminal TermWindow		Знайти…
-No search string was entered.	Terminal TermWindow		Стрічка для пошуку не введена.
+No search string was entered.	Terminal TermWindow		Пошуковий рядок відсутній.
 Move here	Terminal TermView		Перемістити сюди
 Abort	Terminal Shell		Перервати
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси все ще запущені:\n\n\t%1\n\nЯкщо Ви закриєте Термінал, процеси будуть знищені.

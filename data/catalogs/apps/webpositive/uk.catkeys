@@ -12,12 +12,12 @@ There was an error setting up the bookmark.	WebPositive Window		Під час н
 Fonts	Settings Window		Шрифти
 Path	Cookie Manager		Шлях
 Bookmarks	WebPositive Window		Закладки
-Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для підключення до інтернету
+Use proxy server to connect to the internet	Settings Window		Використовувати проксі-сервер для підключення до Інтернет
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url завантажився
-Auto-hide interface in full screen mode	Settings Window		Автоматично приховувати інтерфейс в повноекранному режимі
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Сталася помилка під час завантаження папки закладок.\n\nПомилка: %error
+Auto-hide interface in full screen mode	Settings Window		Автоматично приховувати інтерфейс у повноекранному режимі
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Сталася помилка під час відкриття папки закладок.\n\nПомилка: %error
 Delete	Cookie Manager		Видалити
-(Finish: %date - Over %duration left)	Download Window		(Завершення: %date - Понад %duration залишилось)
+(Finish: %date - Over %duration left)	Download Window		(Завершення: %date – Понад %duration залишилось)
 Open containing folder	Download Window		Відкрити папку з файлом
 Find previous	WebPositive Window		Знайти попереднє
 Full screen	WebPositive Window		Повний екран
@@ -56,7 +56,7 @@ The download could not be opened.	Download Window		Неможливо відкр
 Cookies for %s	Cookie Manager		Cookies для %s
 Close	Download Window		Закрити
 WebPositive	System name		WebPositive
-%s - Search term	Settings Window		%s - Параметри пошуку
+%s - Search term	Settings Window		%s – Параметри пошуку
 Reload	WebPositive Window		Перезавантажити
 Expiration	Cookie Manager		Термін дії
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процесор занадто старий і не підтримує розширення SSE2, без яких WebPositive не може працювати. Натомість ми рекомендуємо встановити NetSurf.
@@ -66,14 +66,14 @@ OK	Authentication Panel		ОК
 Hide password text	Authentication Panel		Приховати текст пароля
 Username:	Authentication Panel		Користувач:
 Name	Cookie Manager		Ім'я
-Remove finished	Download Window		Вилучити завершене
+Remove finished	Download Window		Прибрати завантажені
 Earlier	WebPositive Window		Раніше
 Edit	WebPositive Window		Редагувати
 Back	WebPositive Window		Назад
 Yesterday	WebPositive Window		Вчора
 Quit	WebPositive		Вийти
 Download aborted	Download Window		Завантаження перерване
-Number of days to keep links in History menu:	Settings Window		Кількість днів збереження посилань в меню 'Історія':
+Number of days to keep links in History menu:	Settings Window		Кількість днів збереження посилань у меню «Історія»:
 Password:	Authentication Panel		Пароль:
 Forward	WebPositive Window		Вперед
 Clear	Console Window		Очистити
@@ -126,11 +126,11 @@ Find previous occurrence of search terms	WebPositive Window	find bar previous bu
 Remember username and password for this site	Authentication Panel		Запам'ятати логін та пароль для цього сайту
 (Finish: %date - %duration left)	Download Window		(Завершення: %date - %duration залишилось)
 Cookie manager	Cookie Manager		Менеджер coookie
-Show home button	Settings Window		Показати кнопку Додому
+Show home button	Settings Window		Показати кнопку «Додому»
 Start new session	Settings Window		Запуск нового сеансу
 The cookie jar is empty!	Cookie Manager		Архів cookie порожній!
 Value	Cookie Manager		Значення
-Remove missing	Download Window		Вилучити відсутні
+Remove missing	Download Window		Прибрати відсутні
 Paste	WebPositive Window		Вставити
 Double-click or middle-click to open new tab.	Tab Manager		Подвійний або середній клік для відкриття нової вкладки.
 Next	WebPositive Window		Наступне

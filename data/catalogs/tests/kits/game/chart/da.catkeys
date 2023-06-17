@@ -1,10 +1,10 @@
 1	danish	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Langsom rotation
+Slow rotation	ChartWindow		Langsom omdrejning
 Pink	ChartWindow		Lyserød
 Comet	ChartWindow		Komet
 DirectWindow	ChartWindow		Direkte vindue
 Orange	ChartWindow		Orange
-Refresh rate	ChartWindow		Opfrisknings-frekvens
+Refresh rate	ChartWindow		Opdateringsfrekvens
 Blue	ChartWindow		Blå
 Colors	ChartWindow		Farver
 Novas	ChartWindow		Novas
@@ -29,7 +29,7 @@ Star density	ChartWindow		Stjernetæthed
 600.0 f/s	ChartWindow		600,0 f/s
 Display:	ChartWindow		Skærm:
 Space color	ChartWindow		Rumfarve
-White	ChartWindow		Hvis
+White	ChartWindow		Hvid
 Chart	System name		Kort
 Animation:	ChartWindow		Animation:
 Frames/s	ChartWindow		Billeder/s
