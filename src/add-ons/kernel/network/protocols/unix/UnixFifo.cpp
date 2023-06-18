@@ -24,7 +24,8 @@
 
 
 UnixRequest::UnixRequest(const iovec* vecs, size_t count,
-		ancillary_data_container* ancillaryData)
+		ancillary_data_container* ancillaryData,
+		struct sockaddr_storage* address)
 	:
 	fVecs(vecs),
 	fVecCount(count),
@@ -32,7 +33,8 @@ UnixRequest::UnixRequest(const iovec* vecs, size_t count,
 	fTotalSize(0),
 	fBytesTransferred(0),
 	fVecIndex(0),
-	fVecOffset(0)
+	fVecOffset(0),
+	fAddress(address)
 {
 	for (size_t i = 0; i < fVecCount; i++)
 		fTotalSize += fVecs[i].iov_len;
@@ -95,10 +97,11 @@ UnixRequest::AddAncillaryData(ancillary_data_container* data)
 // #pragma mark - UnixBufferQueue
 
 
-UnixBufferQueue::UnixBufferQueue(size_t capacity)
+UnixBufferQueue::UnixBufferQueue(size_t capacity, UnixFifoType type)
 	:
 	fBuffer(NULL),
-	fCapacity(capacity)
+	fCapacity(capacity),
+	fType(type)
 {
 }
 
@@ -147,6 +150,19 @@ UnixBufferQueue::Read(UnixRequest& request)
 	void* data;
 	size_t size;
 
+	DatagramEntry* datagramEntry = NULL;
+	if (fType == UnixFifoType::Datagram) {
+		datagramEntry = fDatagrams.Head();
+		if (datagramEntry == NULL)
+			return B_ERROR;
+
+		if (datagramEntry->size > readable)
+			TRACE("UnixBufferQueue::Read(): expected to read a datagram of size %lu, "
+				"but only %lu bytes are readable\n", datagramEntry->size, readable);
+		else
+			readable = datagramEntry->size;
+	}
+
 	while (readable > 0 && request.GetCurrentChunk(data, size)) {
 		if (size > readable)
 			size = readable;
@@ -184,6 +200,30 @@ UnixBufferQueue::Read(UnixRequest& request)
 		readable -= bytesRead;
 	}
 
+	if (fType == UnixFifoType::Datagram) {
+		fDatagrams.RemoveHead();
+
+		memcpy(request.Address(), &datagramEntry->address, sizeof(datagramEntry->address));
+		delete datagramEntry;
+
+		if (readable > 0) {
+			ring_buffer_flush(fBuffer, readable);
+			if (AncillaryDataEntry* entry = fAncillaryData.Head()) {
+				size_t offsetDelta = readable;
+				while (entry != NULL && offsetDelta > entry->offset) {
+					fAncillaryData.RemoveHead();
+					offsetDelta -= entry->offset;
+					delete entry;
+
+					entry = fAncillaryData.Head();
+				}
+
+				if (entry != NULL)
+					entry->offset -= offsetDelta;
+			}
+		}
+	}
+
 	return B_OK;
 }
 
@@ -196,6 +236,26 @@ UnixBufferQueue::Write(UnixRequest& request)
 	size_t writable = Writable();
 	void* data;
 	size_t size;
+
+	DatagramEntry* datagramEntry = NULL;
+	ObjectDeleter<DatagramEntry> datagramEntryDeleter;
+	if (fType == UnixFifoType::Datagram) {
+		datagramEntry = new(std::nothrow) DatagramEntry;
+		if (datagramEntry == NULL)
+			return B_NO_MEMORY;
+
+		datagramEntryDeleter.SetTo(datagramEntry);
+		memcpy(&datagramEntry->address, request.Address(),
+			sizeof(datagramEntry->address));
+		datagramEntry->size = request.TotalSize();
+
+		// This should have been handled in UnixFifo
+		if (writable < datagramEntry->size) {
+			TRACE("UnixBufferQueue::Write(): not enough space for"
+				"datagram of size %lu (%lu bytes left)\n", datagramEntry->size, writable);
+			return B_ERROR;
+		}
+	}
 
 	// If the request has ancillary data create an entry first.
 	AncillaryDataEntry* ancillaryEntry = NULL;
@@ -244,6 +304,11 @@ UnixBufferQueue::Write(UnixRequest& request)
 		writable -= bytesWritten;
 	}
 
+	if (fType == UnixFifoType::Datagram) {
+		fDatagrams.Add(datagramEntry);
+		datagramEntryDeleter.Detach();
+	}
+
 	return B_OK;
 }
 
@@ -259,9 +324,9 @@ return B_ERROR;
 // #pragma mark -
 
 
-UnixFifo::UnixFifo(size_t capacity)
+UnixFifo::UnixFifo(size_t capacity, UnixFifoType type)
 	:
-	fBuffer(capacity),
+	fBuffer(capacity, type),
 	fReaders(),
 	fWriters(),
 	fReadRequested(0),
@@ -306,7 +371,8 @@ UnixFifo::Shutdown(uint32 shutdown)
 
 ssize_t
 UnixFifo::Read(const iovec* vecs, size_t vecCount,
-	ancillary_data_container** _ancillaryData, bigtime_t timeout)
+	ancillary_data_container** _ancillaryData,
+	struct sockaddr_storage* address, bigtime_t timeout)
 {
 	TRACE("[%" B_PRId32 "] %p->UnixFifo::Read(%p, %ld, %" B_PRIdBIGTIME ")\n",
 		find_thread(NULL), this, vecs, vecCount, timeout);
@@ -314,7 +380,7 @@ UnixFifo::Read(const iovec* vecs, size_t vecCount,
 	if (IsReadShutdown() && fBuffer.Readable() == 0)
 		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
 
-	UnixRequest request(vecs, vecCount, NULL);
+	UnixRequest request(vecs, vecCount, NULL, address);
 	fReaders.Add(&request);
 	fReadRequested += request.TotalSize();
 
@@ -351,7 +417,8 @@ UnixFifo::Read(const iovec* vecs, size_t vecCount,
 
 ssize_t
 UnixFifo::Write(const iovec* vecs, size_t vecCount,
-	ancillary_data_container* ancillaryData, bigtime_t timeout)
+	ancillary_data_container* ancillaryData,
+	const struct sockaddr_storage* address, bigtime_t timeout)
 {
 	TRACE("[%" B_PRId32 "] %p->UnixFifo::Write(%p, %ld, %p, %" B_PRIdBIGTIME
 		")\n", find_thread(NULL), this, vecs, vecCount, ancillaryData,
@@ -363,7 +430,8 @@ UnixFifo::Write(const iovec* vecs, size_t vecCount,
 	if (IsReadShutdown())
 		RETURN_ERROR(EPIPE);
 
-	UnixRequest request(vecs, vecCount, ancillaryData);
+	UnixRequest request(vecs, vecCount, ancillaryData,
+		(struct sockaddr_storage*)address);
 	fWriters.Add(&request);
 	fWriteRequested += request.TotalSize();
 
@@ -530,8 +598,8 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 
 	while (error == B_OK && request.BytesRemaining() > 0) {
 		// wait for any space to become available
-		while (error == B_OK && fBuffer.Writable() == 0 && !IsWriteShutdown()
-				&& !IsReadShutdown()) {
+		while (error == B_OK && fBuffer.Writable() < _MinimumWritableSize(request)
+				&& !IsWriteShutdown() && !IsReadShutdown()) {
 			ConditionVariableEntry entry;
 			fWriteCondition.Add(&entry);
 
@@ -567,7 +635,7 @@ UnixFifo::_WriteNonBlocking(UnixRequest& request)
 {
 	// We need to be first in queue and space should be available right now,
 	// otherwise we need to fail.
-	if (fWriters.Head() != &request || fBuffer.Writable() == 0)
+	if (fWriters.Head() != &request || fBuffer.Writable() < _MinimumWritableSize(request))
 		RETURN_ERROR(B_WOULD_BLOCK);
 
 	if (request.TotalSize() == 0)
@@ -577,3 +645,15 @@ UnixFifo::_WriteNonBlocking(UnixRequest& request)
 	RETURN_ERROR(fBuffer.Write(request));
 }
 
+
+size_t
+UnixFifo::_MinimumWritableSize(const UnixRequest& request) const
+{
+	switch (fType) {
+		case UnixFifoType::Datagram:
+			return request.TotalSize();
+		case UnixFifoType::Stream:
+		default:
+			return 1;
+	}
+}

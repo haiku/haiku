@@ -21,6 +21,7 @@
 #include <net_socket.h>
 #include <net_stack.h>
 
+#include "unix.h"
 #include "UnixAddressManager.h"
 #include "UnixEndpoint.h"
 
@@ -67,11 +68,12 @@ unix_init_protocol(net_socket *socket)
 	TRACE("[%" B_PRId32 "] unix_init_protocol(%p)\n", find_thread(NULL),
 		socket);
 
-	UnixEndpoint* endpoint = new(std::nothrow) UnixEndpoint(socket);
-	if (endpoint == NULL)
+	UnixEndpoint* endpoint;
+	status_t error = UnixEndpoint::Create(socket, &endpoint);
+	if (error != B_OK)
 		return NULL;
 
-	status_t error = endpoint->Init();
+	error = endpoint->Init();
 	if (error != B_OK) {
 		delete endpoint;
 		return NULL;
@@ -408,7 +410,8 @@ unix_send_data_no_buffer(net_protocol *_protocol, const iovec *vecs,
 	size_t vecCount, ancillary_data_container *ancillaryData,
 	const struct sockaddr *address, socklen_t addressLength)
 {
-	return ((UnixEndpoint*)_protocol)->Send(vecs, vecCount, ancillaryData);
+	return ((UnixEndpoint*)_protocol)->Send(vecs, vecCount, ancillaryData,
+		address, addressLength);
 }
 
 
@@ -435,6 +438,11 @@ init_unix()
 
 	error = gStackModule->register_domain_protocols(AF_UNIX, SOCK_STREAM, 0,
 		"network/protocols/unix/v1", NULL);
+	if (error == B_OK) {
+		error = gStackModule->register_domain_protocols(AF_UNIX, SOCK_DGRAM, 0,
+			"network/protocols/unix/v1", NULL);
+	}
+
 	if (error != B_OK) {
 		gAddressManager.~UnixAddressManager();
 		return error;

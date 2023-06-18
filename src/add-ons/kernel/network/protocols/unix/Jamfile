@@ -9,4 +9,7 @@ KernelAddon unix :
 	UnixAddress.cpp
 	UnixEndpoint.cpp
 	UnixFifo.cpp
+
+	UnixDatagramEndpoint.cpp
+	UnixStreamEndpoint.cpp
 ;

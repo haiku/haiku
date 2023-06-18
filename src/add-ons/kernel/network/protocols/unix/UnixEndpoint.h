@@ -1,54 +1,24 @@
 /*
- * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2023, Trung Nguyen, trungnt282910@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef UNIX_ENDPOINT_H
 #define UNIX_ENDPOINT_H
 
-#include <sys/stat.h>
-
-#include <Referenceable.h>
-
-#include <lock.h>
-#include <util/DoublyLinkedList.h>
-#include <util/OpenHashTable.h>
-#include <vfs.h>
 
 #include <net_protocol.h>
 #include <net_socket.h>
 #include <ProtocolUtilities.h>
 
-#include "unix.h"
+#include <lock.h>
+#include <vfs.h>
+
 #include "UnixAddress.h"
 
 
-class UnixEndpoint;
-class UnixFifo;
-
-
-enum unix_endpoint_state {
-	UNIX_ENDPOINT_NOT_CONNECTED,
-	UNIX_ENDPOINT_LISTENING,
-	UNIX_ENDPOINT_CONNECTED,
-	UNIX_ENDPOINT_CLOSED
-};
-
-
-typedef AutoLocker<UnixEndpoint> UnixEndpointLocker;
-
-
-class UnixEndpoint : public net_protocol, public ProtocolSocket,
-	public BReferenceable {
+class UnixEndpoint : public net_protocol, public ProtocolSocket {
 public:
-	UnixEndpoint(net_socket* socket);
-	virtual ~UnixEndpoint();
-
-	status_t Init();
-	void Uninit();
-
-	status_t Open();
-	status_t Close();
-	status_t Free();
+	virtual						~UnixEndpoint();
 
 	bool Lock()
 	{
@@ -58,31 +28,6 @@ public:
 	void Unlock()
 	{
 		mutex_unlock(&fLock);
-	}
-
-	status_t Bind(const struct sockaddr *_address);
-	status_t Unbind();
-	status_t Listen(int backlog);
-	status_t Connect(const struct sockaddr *address);
-	status_t Accept(net_socket **_acceptedSocket);
-
-	ssize_t Send(const iovec *vecs, size_t vecCount,
-		ancillary_data_container *ancillaryData);
-	ssize_t Receive(const iovec *vecs, size_t vecCount,
-		ancillary_data_container **_ancillaryData, struct sockaddr *_address,
-		socklen_t *_addressLength);
-
-	ssize_t Sendable();
-	ssize_t Receivable();
-
-	status_t SetReceiveBufferSize(size_t size);
-	status_t GetPeerCredentials(ucred* credentials);
-
-	status_t Shutdown(int direction);
-
-	bool IsBound() const
-	{
-		return !fIsChild && fAddress.IsValid();
 	}
 
 	const UnixAddress& Address() const
@@ -95,31 +40,66 @@ public:
 		return fAddressHashLink;
 	}
 
+	virtual	status_t			Init() = 0;
+	virtual	void				Uninit() = 0;
+
+	virtual	status_t			Open() = 0;
+	virtual	status_t			Close() = 0;
+	virtual	status_t			Free() = 0;
+
+	virtual	status_t			Bind(const struct sockaddr* _address) = 0;
+	virtual	status_t			Unbind() = 0;
+	virtual	status_t			Listen(int backlog) = 0;
+	virtual	status_t			Connect(const struct sockaddr* address) = 0;
+	virtual	status_t			Accept(net_socket** _acceptedSocket) = 0;
+
+	virtual	ssize_t				Send(const iovec* vecs, size_t vecCount,
+									ancillary_data_container* ancillaryData,
+									const struct sockaddr* address,
+									socklen_t addressLength) = 0;
+	virtual	ssize_t				Receive(const iovec* vecs, size_t vecCount,
+									ancillary_data_container** _ancillaryData,
+									struct sockaddr* _address, socklen_t* _addressLength) = 0;
+
+	virtual	ssize_t				Sendable() = 0;
+	virtual	ssize_t				Receivable() = 0;
+
+	virtual	status_t			SetReceiveBufferSize(size_t size) = 0;
+	virtual	status_t			GetPeerCredentials(ucred* credentials) = 0;
+
+	virtual	status_t			Shutdown(int direction) = 0;
+
+	static	status_t			Create(net_socket* socket, UnixEndpoint** _endpoint);
+
+protected:
+								UnixEndpoint(net_socket* socket);
+
+	// These functions perform no locking or checking on the endpoint.
+			status_t			_Bind(const struct sockaddr_un* address);
+			status_t			_Unbind();
+
 private:
-	void _Spawn(UnixEndpoint* connectingEndpoint,
-		UnixEndpoint* listeningEndpoint, UnixFifo* fifo);
-	void _Disconnect();
-	status_t _LockConnectedEndpoints(UnixEndpointLocker& locker,
-		UnixEndpointLocker& peerLocker);
+			status_t			_Bind(struct vnode* vnode);
+			status_t			_Bind(int32 internalID);
 
-	status_t _Bind(struct vnode* vnode);
-	status_t _Bind(int32 internalID);
-	status_t _Unbind();
-
-	void _UnsetReceiveFifo();
-	void _StopListening();
+protected:
+			UnixAddress			fAddress;
 
 private:
-	mutex							fLock;
-	UnixAddress						fAddress;
-	UnixEndpoint*					fAddressHashLink;
-	UnixEndpoint*					fPeerEndpoint;
-	UnixFifo*						fReceiveFifo;
-	unix_endpoint_state				fState;
-	sem_id							fAcceptSemaphore;
-	ucred							fCredentials;
-	bool							fIsChild;
-	bool							fWasConnected;
+			mutex				fLock;
+			UnixEndpoint*		fAddressHashLink;
 };
+
+
+static inline bigtime_t
+absolute_timeout(bigtime_t timeout)
+{
+	if (timeout == 0 || timeout == B_INFINITE_TIMEOUT)
+		return timeout;
+
+// TODO: Make overflow safe!
+	return timeout + system_time();
+}
+
 
 #endif	// UNIX_ENDPOINT_H

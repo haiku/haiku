@@ -25,12 +25,19 @@
 #define UNIX_FIFO_MAXIMAL_CAPACITY	(128 * 1024)
 
 
+enum class UnixFifoType {
+	Stream,
+	Datagram
+};
+
+
 struct ring_buffer;
 
 class UnixRequest : public DoublyLinkedListLinkImpl<UnixRequest> {
 public:
 	UnixRequest(const iovec* vecs, size_t count,
-			ancillary_data_container* ancillaryData);
+			ancillary_data_container* ancillaryData,
+			struct sockaddr_storage* address);
 
 	off_t TotalSize() const			{ return fTotalSize; }
 	off_t BytesTransferred() const	{ return fBytesTransferred; }
@@ -43,20 +50,23 @@ public:
 	void SetAncillaryData(ancillary_data_container* data);
 	void AddAncillaryData(ancillary_data_container* data);
 
+	struct sockaddr_storage* Address() const	{ return fAddress; }
+
 private:
-	const iovec*				fVecs;
-	size_t						fVecCount;
-	ancillary_data_container*	fAncillaryData;
-	off_t						fTotalSize;
-	off_t						fBytesTransferred;
-	size_t						fVecIndex;
-	size_t						fVecOffset;
+	const iovec*					fVecs;
+	size_t							fVecCount;
+	ancillary_data_container*		fAncillaryData;
+	off_t							fTotalSize;
+	off_t							fBytesTransferred;
+	size_t							fVecIndex;
+	size_t							fVecOffset;
+	struct sockaddr_storage*		fAddress;
 };
 
 
 class UnixBufferQueue {
 public:
-	UnixBufferQueue(size_t capacity);
+	UnixBufferQueue(size_t capacity, UnixFifoType type);
 	~UnixBufferQueue();
 
 	status_t Init();
@@ -78,15 +88,24 @@ private:
 
 	typedef DoublyLinkedList<AncillaryDataEntry> AncillaryDataList;
 
+	struct DatagramEntry : DoublyLinkedListLinkImpl<DatagramEntry> {
+		struct sockaddr_storage	address;
+		size_t	size;
+	};
+
+	typedef DoublyLinkedList<DatagramEntry> DatagramList;
+
 	ring_buffer*		fBuffer;
 	size_t				fCapacity;
 	AncillaryDataList	fAncillaryData;
+	DatagramList		fDatagrams;
+	UnixFifoType		fType;
 };
 
 
 class UnixFifo : public BReferenceable {
 public:
-	UnixFifo(size_t capacity);
+	UnixFifo(size_t capacity, UnixFifoType type);
 	~UnixFifo();
 
 	status_t Init();
@@ -114,9 +133,11 @@ public:
 	}
 
 	ssize_t Read(const iovec* vecs, size_t vecCount,
-		ancillary_data_container** _ancillaryData, bigtime_t timeout);
+		ancillary_data_container** _ancillaryData,
+		struct sockaddr_storage* address, bigtime_t timeout);
 	ssize_t Write(const iovec* vecs, size_t vecCount,
-		ancillary_data_container* ancillaryData, bigtime_t timeout);
+		ancillary_data_container* ancillaryData,
+		const struct sockaddr_storage* address, bigtime_t timeout);
 
 	size_t Readable() const;
 	size_t Writable() const;
@@ -130,6 +151,7 @@ private:
 	status_t _Read(UnixRequest& request, bigtime_t timeout);
 	status_t _Write(UnixRequest& request, bigtime_t timeout);
 	status_t _WriteNonBlocking(UnixRequest& request);
+	size_t _MinimumWritableSize(const UnixRequest& request) const;
 
 private:
 	mutex				fLock;
@@ -141,6 +163,7 @@ private:
 	ConditionVariable	fReadCondition;
 	ConditionVariable	fWriteCondition;
 	uint32				fShutdown;
+	UnixFifoType		fType;
 };
 
 
