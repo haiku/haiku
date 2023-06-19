@@ -7,6 +7,7 @@
 
 
 // flags passed to _kern_mutex_{un}block
+// (same uint32 also used for B_TIMEOUT, etc.)
 #define B_USER_MUTEX_SHARED			0x40000000
 	// Mutex is in shared memory.
 #define B_USER_MUTEX_UNBLOCK_ALL	0x80000000
