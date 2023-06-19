@@ -547,6 +547,10 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 	void			(*post_interrupt_callback)(void*);
 	void*			post_interrupt_data;
 
+#if KDEBUG_RW_LOCK_DEBUG
+	rw_lock*		held_read_locks[64] = {}; // only modified by this thread
+#endif
+
 	// architecture dependent section
 	struct arch_thread arch_info;
 

@@ -72,23 +72,27 @@ typedef struct rw_lock {
 #if KDEBUG
 #	define KDEBUG_RW_LOCK_DEBUG 0
 		// Define to 1 if you want to use ASSERT_READ_LOCKED_RW_LOCK().
-		// The rw_lock will just behave like a recursive locker then.
 #	define ASSERT_LOCKED_RECURSIVE(r) \
 		{ ASSERT(find_thread(NULL) == (r)->lock.holder); }
 #	define ASSERT_LOCKED_MUTEX(m) { ASSERT(find_thread(NULL) == (m)->holder); }
 #	define ASSERT_WRITE_LOCKED_RW_LOCK(l) \
 		{ ASSERT(find_thread(NULL) == (l)->holder); }
 #	if KDEBUG_RW_LOCK_DEBUG
+		extern bool _rw_lock_is_read_locked(rw_lock* lock);
 #		define ASSERT_READ_LOCKED_RW_LOCK(l) \
-			{ ASSERT(find_thread(NULL) == (l)->holder); }
+			{ ASSERT_PRINT(_rw_lock_is_read_locked(l), "rwlock %p", l); }
+#		define ASSERT_UNLOCKED_RW_LOCK(l) \
+			{ ASSERT_PRINT(!_rw_lock_is_read_locked(l), "rwlock %p", l); }
 #	else
 #		define ASSERT_READ_LOCKED_RW_LOCK(l) do {} while (false)
+#		define ASSERT_UNLOCKED_RW_LOCK(l)	 do {} while (false)
 #	endif
 #else
 #	define ASSERT_LOCKED_RECURSIVE(r)		do {} while (false)
 #	define ASSERT_LOCKED_MUTEX(m)			do {} while (false)
 #	define ASSERT_WRITE_LOCKED_RW_LOCK(m)	do {} while (false)
 #	define ASSERT_READ_LOCKED_RW_LOCK(l)	do {} while (false)
+#	define ASSERT_UNLOCKED_RW_LOCK(l)		do {} while (false)
 #endif
 
 
@@ -180,7 +184,7 @@ static inline status_t
 rw_lock_read_lock(rw_lock* lock)
 {
 #if KDEBUG_RW_LOCK_DEBUG
-	return rw_lock_write_lock(lock);
+	return _rw_lock_read_lock(lock);
 #else
 	int32 oldCount = atomic_add(&lock->count, 1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
@@ -195,7 +199,7 @@ rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 	bigtime_t timeout)
 {
 #if KDEBUG_RW_LOCK_DEBUG
-	return mutex_lock_with_timeout(lock, timeoutFlags, timeout);
+	return _rw_lock_read_lock_with_timeout(lock, timeoutFlags, timeout);
 #else
 	int32 oldCount = atomic_add(&lock->count, 1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
@@ -209,7 +213,7 @@ static inline void
 rw_lock_read_unlock(rw_lock* lock)
 {
 #if KDEBUG_RW_LOCK_DEBUG
-	rw_lock_write_unlock(lock);
+	_rw_lock_read_unlock(lock);
 #else
 	int32 oldCount = atomic_add(&lock->count, -1);
 	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)

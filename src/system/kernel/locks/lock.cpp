@@ -441,7 +441,53 @@ rw_lock_destroy(rw_lock* lock)
 }
 
 
-#if !KDEBUG_RW_LOCK_DEBUG
+#if KDEBUG_RW_LOCK_DEBUG
+
+bool
+_rw_lock_is_read_locked(rw_lock* lock)
+{
+	if (lock->holder == thread_get_current_thread_id())
+		return true;
+
+	Thread* thread = thread_get_current_thread();
+	for (size_t i = 0; i < B_COUNT_OF(Thread::held_read_locks); i++) {
+		if (thread->held_read_locks[i] == lock)
+			return true;
+	}
+	return false;
+}
+
+
+static void
+_rw_lock_set_read_locked(rw_lock* lock)
+{
+	Thread* thread = thread_get_current_thread();
+	for (size_t i = 0; i < B_COUNT_OF(Thread::held_read_locks); i++) {
+		if (thread->held_read_locks[i] != NULL)
+			continue;
+
+		thread->held_read_locks[i] = lock;
+		return;
+	}
+	panic("too many read locks!");
+}
+
+
+static void
+_rw_lock_unset_read_locked(rw_lock* lock)
+{
+	Thread* thread = thread_get_current_thread();
+	for (size_t i = 0; i < B_COUNT_OF(Thread::held_read_locks); i++) {
+		if (thread->held_read_locks[i] != lock)
+			continue;
+
+		thread->held_read_locks[i] = NULL;
+		return;
+	}
+}
+
+#endif
+
 
 status_t
 _rw_lock_read_lock(rw_lock* lock)
@@ -450,6 +496,14 @@ _rw_lock_read_lock(rw_lock* lock)
 	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("_rw_lock_read_lock(): called with interrupts disabled for lock %p",
 			lock);
+	}
+#endif
+#if KDEBUG_RW_LOCK_DEBUG
+	int32 oldCount = atomic_add(&lock->count, 1);
+	if (oldCount < RW_LOCK_WRITER_COUNT_BASE) {
+		ASSERT_UNLOCKED_RW_LOCK(lock);
+		_rw_lock_set_read_locked(lock);
+		return B_OK;
 	}
 #endif
 
@@ -461,6 +515,8 @@ _rw_lock_read_lock(rw_lock* lock)
 		return B_OK;
 	}
 
+	ASSERT_UNLOCKED_RW_LOCK(lock);
+
 	// The writer that originally had the lock when we called atomic_add() might
 	// already have gone and another writer could have overtaken us. In this
 	// case the original writer set pending_readers, so we know that we don't
@@ -471,13 +527,23 @@ _rw_lock_read_lock(rw_lock* lock)
 		if (lock->count >= RW_LOCK_WRITER_COUNT_BASE)
 			lock->active_readers++;
 
+#if KDEBUG_RW_LOCK_DEBUG
+		_rw_lock_set_read_locked(lock);
+#endif
 		return B_OK;
 	}
 
 	ASSERT(lock->count >= RW_LOCK_WRITER_COUNT_BASE);
 
 	// we need to wait
-	return rw_lock_wait(lock, false, locker);
+	status_t status = rw_lock_wait(lock, false, locker);
+
+#if KDEBUG_RW_LOCK_DEBUG
+	if (status == B_OK)
+		_rw_lock_set_read_locked(lock);
+#endif
+
+	return status;
 }
 
 
@@ -491,6 +557,14 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 			"disabled for lock %p", lock);
 	}
 #endif
+#if KDEBUG_RW_LOCK_DEBUG
+	int32 oldCount = atomic_add(&lock->count, 1);
+	if (oldCount < RW_LOCK_WRITER_COUNT_BASE) {
+		ASSERT_UNLOCKED_RW_LOCK(lock);
+		_rw_lock_set_read_locked(lock);
+		return B_OK;
+	}
+#endif
 
 	InterruptsSpinLocker locker(lock->lock);
 
@@ -499,6 +573,8 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 		lock->owner_count++;
 		return B_OK;
 	}
+
+	ASSERT_UNLOCKED_RW_LOCK(lock);
 
 	// The writer that originally had the lock when we called atomic_add() might
 	// already have gone and another writer could have overtaken us. In this
@@ -510,6 +586,9 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 		if (lock->count >= RW_LOCK_WRITER_COUNT_BASE)
 			lock->active_readers++;
 
+#if KDEBUG_RW_LOCK_DEBUG
+		_rw_lock_set_read_locked(lock);
+#endif
 		return B_OK;
 	}
 
@@ -538,6 +617,9 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 	if (error == B_OK || waiter.thread == NULL) {
 		// We were unblocked successfully -- potentially our unblocker overtook
 		// us after we already failed. In either case, we've got the lock, now.
+#if KDEBUG_RW_LOCK_DEBUG
+		_rw_lock_set_read_locked(lock);
+#endif
 		return B_OK;
 	}
 
@@ -586,6 +668,14 @@ _rw_lock_read_unlock(rw_lock* lock)
 		return;
 	}
 
+#if KDEBUG_RW_LOCK_DEBUG
+	_rw_lock_unset_read_locked(lock);
+
+	int32 oldCount = atomic_add(&lock->count, -1);
+	if (oldCount < RW_LOCK_WRITER_COUNT_BASE)
+		return;
+#endif
+
 	if (--lock->active_readers > 0)
 		return;
 
@@ -597,8 +687,6 @@ _rw_lock_read_unlock(rw_lock* lock)
 
 	rw_lock_unblock(lock);
 }
-
-#endif	// !KDEBUG_RW_LOCK_DEBUG
 
 
 status_t
@@ -620,6 +708,8 @@ rw_lock_write_lock(rw_lock* lock)
 		lock->owner_count += RW_LOCK_WRITER_COUNT_BASE;
 		return B_OK;
 	}
+
+	ASSERT_UNLOCKED_RW_LOCK(lock);
 
 	// announce our claim
 	int32 oldCount = atomic_add(&lock->count, RW_LOCK_WRITER_COUNT_BASE);
@@ -667,6 +757,11 @@ _rw_lock_write_unlock(rw_lock* lock)
 	int32 readerCount = lock->owner_count;
 	lock->holder = -1;
 	lock->owner_count = 0;
+
+#if KDEBUG_RW_LOCK_DEBUG
+	if (readerCount != 0)
+		_rw_lock_set_read_locked(lock);
+#endif
 
 	int32 oldCount = atomic_add(&lock->count, -RW_LOCK_WRITER_COUNT_BASE);
 	oldCount -= RW_LOCK_WRITER_COUNT_BASE;
