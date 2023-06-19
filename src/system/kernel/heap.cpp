@@ -1773,7 +1773,7 @@ heap_set_get_caller(heap_allocator* heap, addr_t (*getCaller)())
 
 static status_t
 heap_realloc(heap_allocator *heap, void *address, void **newAddress,
-	size_t newSize)
+	size_t newSize, uint32 flags)
 {
 	ReadLocker areaReadLocker(heap->area_lock);
 	heap_area *area = heap->all_areas;
@@ -1864,7 +1864,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 #endif
 
 	// if not, allocate a new chunk of memory
-	*newAddress = malloc(newSize);
+	*newAddress = malloc_etc(newSize, flags);
 	T(Reallocate((addr_t)address, (addr_t)*newAddress, newSize));
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
@@ -2402,7 +2402,7 @@ free(void *address)
 
 
 void *
-realloc(void *address, size_t newSize)
+realloc_etc(void *address, size_t newSize, uint32 flags)
 {
 	if (!gKernelStartup && !are_interrupts_enabled()) {
 		panic("realloc(): called with interrupts disabled\n");
@@ -2410,10 +2410,10 @@ realloc(void *address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return malloc(newSize);
+		return malloc_etc(newSize, flags);
 
 	if (newSize == 0) {
-		free(address);
+		free_etc(address, flags);
 		return NULL;
 	}
 
@@ -2421,7 +2421,7 @@ realloc(void *address, size_t newSize)
 	int32 offset = smp_get_current_cpu() * HEAP_CLASS_COUNT;
 	for (uint32 i = 0; i < sHeapCount; i++) {
 		heap_allocator *heap = sHeaps[(i + offset) % sHeapCount];
-		if (heap_realloc(heap, address, &newAddress, newSize) == B_OK) {
+		if (heap_realloc(heap, address, &newAddress, newSize, flags) == B_OK) {
 #if PARANOID_HEAP_VALIDATION
 			heap_validate_heap(heap);
 #endif
@@ -2430,7 +2430,7 @@ realloc(void *address, size_t newSize)
 	}
 
 	// maybe it was allocated from the dedicated grow heap
-	if (heap_realloc(sGrowHeap, address, &newAddress, newSize) == B_OK)
+	if (heap_realloc(sGrowHeap, address, &newAddress, newSize, flags) == B_OK)
 		return newAddress;
 
 	// or maybe it was a huge allocation using an area
@@ -2473,6 +2473,13 @@ realloc(void *address, size_t newSize)
 	panic("realloc(): failed to realloc address %p to size %lu\n", address,
 		newSize);
 	return NULL;
+}
+
+
+void *
+realloc(void *address, size_t newSize)
+{
+	return realloc_etc(address, newSize, 0);
 }
 
 

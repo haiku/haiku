@@ -541,8 +541,7 @@ realloc_page_protections(uint8* pageProtections, size_t areaSize,
 	uint32 allocationFlags)
 {
 	size_t bytes = area_page_protections_size(areaSize);
-	// TODO: Implement realloc_etc and pass allocationFlags.
-	return (uint8*)realloc(pageProtections, bytes);
+	return (uint8*)realloc_etc(pageProtections, bytes, allocationFlags);
 }
 
 

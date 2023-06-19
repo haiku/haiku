@@ -256,15 +256,15 @@ free(void* address)
 
 
 void*
-realloc(void* address, size_t newSize)
+realloc_etc(void* address, size_t newSize, uint32 flags)
 {
 	if (newSize == 0) {
-		block_free(address, 0);
+		block_free(address, flags);
 		return NULL;
 	}
 
 	if (address == NULL)
-		return block_alloc(newSize, 0, 0);
+		return block_alloc(newSize, 0, flags);
 
 	size_t oldSize;
 	ObjectCache* cache = MemoryManager::GetAllocationInfo(address, oldSize);
@@ -276,15 +276,22 @@ realloc(void* address, size_t newSize)
 	if (oldSize == newSize)
 		return address;
 
-	void* newBlock = block_alloc(newSize, 0, 0);
+	void* newBlock = block_alloc(newSize, 0, flags);
 	if (newBlock == NULL)
 		return NULL;
 
 	memcpy(newBlock, address, std::min(oldSize, newSize));
 
-	block_free(address, 0);
+	block_free(address, flags);
 
 	return newBlock;
+}
+
+
+void*
+realloc(void* address, size_t newSize)
+{
+	return realloc_etc(address, newSize, 0);
 }
 
 

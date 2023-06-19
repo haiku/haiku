@@ -60,6 +60,7 @@ extern "C" {
 
 
 void* memalign_etc(size_t alignment, size_t size, uint32 flags) _ALIGNED_BY_ARG(1);
+void* realloc_etc(void* address, size_t newSize, uint32 flags);
 void free_etc(void* address, uint32 flags);
 
 void* memalign(size_t alignment, size_t size) _ALIGNED_BY_ARG(1);

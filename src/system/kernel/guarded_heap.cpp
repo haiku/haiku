@@ -542,7 +542,7 @@ guarded_heap_free(void* address, uint32 flags)
 
 
 static void*
-guarded_heap_realloc(void* address, size_t newSize)
+guarded_heap_realloc(void* address, size_t newSize, uint32 flags)
 {
 	guarded_heap_area* area = guarded_heap_get_locked_area_for(sGuardedHeap,
 		address);
@@ -562,13 +562,13 @@ guarded_heap_realloc(void* address, size_t newSize)
 	if (oldSize == newSize)
 		return address;
 
-	void* newBlock = malloc(newSize);
+	void* newBlock = malloc_etc(newSize, flags);
 	if (newBlock == NULL)
 		return NULL;
 
 	memcpy(newBlock, address, min_c(oldSize, newSize));
 
-	free(address);
+	free_etc(address, flags);
 
 	return newBlock;
 }
@@ -966,17 +966,24 @@ free(void* address)
 
 
 void*
-realloc(void* address, size_t newSize)
+realloc_etc(void* address, size_t newSize, uint32 flags)
 {
 	if (newSize == 0) {
-		free(address);
+		free_etc(address, flags);
 		return NULL;
 	}
 
 	if (address == NULL)
-		return malloc(newSize);
+		return malloc_etc(newSize, flags);
 
-	return guarded_heap_realloc(address, newSize);
+	return guarded_heap_realloc(address, newSize, flags);
+}
+
+
+void*
+realloc(void* address, size_t newSize)
+{
+	return realloc_etc(address, newSize, 0);
 }
 
 
