@@ -92,11 +92,6 @@ The current version of the x86_64 compiler appears is using multilib (to build f
 bit targets) and is working fine, so it's possible that most of the issues in this area have
 already been fixed.
 
-Figure out how to get page flags (modified/accessed) and implement it
-*********************************************************************
-
-use unmapped/read-only mappings to trigger soft faults for tracking used/modified flags for ARMv5 and ARMv6
-
 Seperate ARM architecture/System-On-Chip IP code
 ************************************************
 
