@@ -240,13 +240,7 @@ recursive_lock_switch_from_read_lock(rw_lock* from, recursive_lock* to)
 		to->holder = thread;
 #endif
 	} else {
-#if KDEBUG_RW_LOCK_DEBUG
-		_rw_lock_write_unlock(from);
-#else
-		int32 oldCount = atomic_add(&from->count, -1);
-		if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
-			_rw_lock_read_unlock(from);
-#endif
+		rw_lock_read_unlock(from);
 	}
 
 	to->recursion++;
@@ -859,13 +853,7 @@ mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 
 	InterruptsSpinLocker locker(to->lock);
 
-#if KDEBUG_RW_LOCK_DEBUG
-	_rw_lock_write_unlock(from);
-#else
-	int32 oldCount = atomic_add(&from->count, -1);
-	if (oldCount >= RW_LOCK_WRITER_COUNT_BASE)
-		_rw_lock_read_unlock(from);
-#endif
+	rw_lock_read_unlock(from);
 
 	return mutex_lock_threads_locked(to, &locker);
 }
