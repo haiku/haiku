@@ -7677,15 +7677,16 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 
 	// the root node is supposed to be owned by the file system - it must
 	// exist at this point
+	rw_lock_write_lock(&sVnodeLock);
 	mount->root_vnode = lookup_vnode(mount->id, rootID);
 	if (mount->root_vnode == NULL || mount->root_vnode->ref_count != 1) {
 		panic("fs_mount: file system does not own its root node!\n");
 		status = B_ERROR;
+		rw_lock_write_unlock(&sVnodeLock);
 		goto err4;
 	}
 
 	// set up the links between the root vnode and the vnode it covers
-	rw_lock_write_lock(&sVnodeLock);
 	if (coveredNode != NULL) {
 		if (coveredNode->IsCovered()) {
 			// the vnode is covered now
