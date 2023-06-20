@@ -58,7 +58,7 @@ main(int argc,char **argv)
 	sorted_array *array = gArray.Array();
 	for (int32 i = 0;i < array->count;i++) {
 		if (!gList.HasItem((void *)array->values[i])) {
-			printf("Could not find entry %Ld at %ld in list!\n",array->values[i],i);
+			printf("Could not find entry %lld at %ld in list!\n",array->values[i],i);
 			dumpArray();
 		}
 	}

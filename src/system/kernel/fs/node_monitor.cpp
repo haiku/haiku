@@ -304,7 +304,7 @@ NodeMonitorService::_RemoveListener(io_context *context, dev_t device,
 	ino_t node, NotificationListener& notificationListener,
 	bool isVolumeListener)
 {
-	TRACE(("%s(dev = %ld, node = %Ld, listener = %p\n",
+	TRACE(("%s(dev = %ld, node = %lld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, &notificationListener));
 
 	RecursiveLocker _(fRecursiveLock);
@@ -469,7 +469,7 @@ status_t
 NodeMonitorService::AddListener(io_context *context, dev_t device, ino_t node,
 	uint32 flags, NotificationListener& notificationListener)
 {
-	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
+	TRACE(("%s(dev = %ld, node = %lld, flags = %ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, flags, &notificationListener));
 
 	RecursiveLocker _(fRecursiveLock);
@@ -491,7 +491,7 @@ NodeMonitorService::_UpdateListener(io_context *context, dev_t device,
 	ino_t node, uint32 flags, bool addFlags,
 	NotificationListener& notificationListener)
 {
-	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
+	TRACE(("%s(dev = %ld, node = %lld, flags = %ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, flags, &notificationListener));
 
 	RecursiveLocker _(fRecursiveLock);
@@ -898,7 +898,7 @@ inline status_t
 NodeMonitorService::NotifyMount(dev_t device, dev_t parentDevice,
 	ino_t parentDirectory)
 {
-	TRACE(("mounted device: %ld, parent %ld:%Ld\n", device, parentDevice,
+	TRACE(("mounted device: %ld, parent %ld:%lld\n", device, parentDevice,
 		parentDirectory));
 
 	RecursiveLocker locker(fRecursiveLock);
@@ -1000,7 +1000,7 @@ status_t
 NodeMonitorService::RemoveListener(io_context *context, dev_t device,
 	ino_t node, NotificationListener& notificationListener)
 {
-	TRACE(("%s(dev = %ld, node = %Ld, listener = %p\n",
+	TRACE(("%s(dev = %ld, node = %lld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, &notificationListener));
 
 	RecursiveLocker _(fRecursiveLock);
@@ -1048,7 +1048,7 @@ status_t
 NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 	ino_t node, uint32 flags, UserNodeListener& userListener)
 {
-	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
+	TRACE(("%s(dev = %ld, node = %lld, flags = %ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, flags, &userListener));
 
 	RecursiveLocker _(fRecursiveLock);

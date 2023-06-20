@@ -78,7 +78,7 @@ Index::Dump()
 		PRINT("Index: `%s', type: %lx\n", GetName(), GetType());
 		for (IndexEntryIterator it(this); it.GetCurrent(); it.GetNext()) {
 			Entry *entry = it.GetCurrent();
-			PRINT("  entry: `%s', dir: %Ld\n", entry->GetName(),
+			PRINT("  entry: `%s', dir: %lld\n", entry->GetName(),
 												entry->GetParent()->GetID());
 		}
 	)

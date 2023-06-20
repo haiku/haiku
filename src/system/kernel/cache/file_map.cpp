@@ -278,7 +278,7 @@ FileMap::_Add(file_io_vec* vecs, size_t vecCount, off_t& lastOffset)
 #ifdef TRACE_FILE_MAP
 	for (uint32 i = 0; i < fCount; i++) {
 		file_extent* extent = ExtentAt(i);
-		TRACE("[%ld] extent offset %Ld, disk offset %Ld, length %Ld\n",
+		TRACE("[%ld] extent offset %lld, disk offset %lld, length %lld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
 #endif
@@ -602,7 +602,7 @@ file_map_init(void)
 extern "C" void*
 file_map_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
-	TRACE("file_map_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
+	TRACE("file_map_create(mountID = %ld, vnodeID = %lld, size = %lld)\n",
 		mountID, vnodeID, size);
 
 	// Get the vnode for the object
@@ -664,7 +664,7 @@ extern "C" status_t
 file_map_translate(void* _map, off_t offset, size_t size, file_io_vec* vecs,
 	size_t* _count, size_t align)
 {
-	TRACE("file_map_translate(map %p, offset %Ld, size %ld)\n",
+	TRACE("file_map_translate(map %p, offset %lld, size %ld)\n",
 		_map, offset, size);
 
 	FileMap* map = (FileMap*)_map;

@@ -502,7 +502,7 @@ find_unique_check_sums(NodeList *devices)
 			disk.device.unknown.check_sums[i].offset = offset;
 			disk.device.unknown.check_sums[i].sum = compute_check_sum(drive, offset);
 
-			TRACE(("disk %x, offset %Ld, sum %lu\n", drive->DriveID(), offset,
+			TRACE(("disk %x, offset %lld, sum %lu\n", drive->DriveID(), offset,
 				disk.device.unknown.check_sums[i].sum));
 		}
 
@@ -587,7 +587,7 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("  total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = 512;
 		fSize = fParameters.sectors * fBlockSize;
@@ -601,7 +601,7 @@ BIOSDrive::BIOSDrive(uint8 driveID)
 		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
@@ -632,7 +632,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
 	int32 totalBytesRead = 0;
 
-	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
+	//TRACE(("BIOS reads %lu bytes from %lld (offset = %lu), drive %u\n",
 	//	blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
 
 	uint32 scratchSize = 24 * 1024 / fBlockSize;
@@ -713,7 +713,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			}
 
 			if (!readWorked) {
-				dprintf("reading %ld bytes from drive %u failed at %Ld\n",
+				dprintf("reading %ld bytes from drive %u failed at %lld\n",
 					blocksRead, fDriveID, pos);
 				return B_ERROR;
 			}
@@ -869,7 +869,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		add_block_devices(devicesList, true);
 	}
 
-	TRACE(("boot drive size: %Ld bytes\n", drive->Size()));
+	TRACE(("boot drive size: %lld bytes\n", drive->Size()));
 	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, gBootedFromImage);
 
 	return B_OK;
@@ -883,12 +883,12 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 	BIOSDrive *drive = static_cast<BIOSDrive *>(bootDevice);
 	off_t offset = (off_t)gBootPartitionOffset * drive->BlockSize();
 
-	dprintf("boot partition offset: %Ld\n", offset);
+	dprintf("boot partition offset: %lld\n", offset);
 
 	NodeIterator iterator = list->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
-		TRACE(("partition offset = %Ld, size = %Ld\n", partition->offset, partition->size));
+		TRACE(("partition offset = %lld, size = %lld\n", partition->offset, partition->size));
 		// search for the partition that contains the partition
 		// offset as reported by the BFS boot block
 		if (offset >= partition->offset

@@ -250,7 +250,7 @@ ReplaceChange::Apply(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 		return;
 
 #ifdef TRACE_DATA_EDITOR
-	printf("Apply %p (buffer offset = %Ld):\n", this, bufferOffset);
+	printf("Apply %p (buffer offset = %lld):\n", this, bufferOffset);
 	dump_block(buffer + offset - bufferOffset, size, "old:");
 	dump_block(fNewData + dataOffset, size, "new:");
 #endif
@@ -279,7 +279,7 @@ ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 		return;
 
 #ifdef TRACE_DATA_EDITOR
-	printf("Revert %p (buffer offset = %Ld):\n", this, bufferOffset);
+	printf("Revert %p (buffer offset = %lld):\n", this, bufferOffset);
 	dump_block(buffer + offset - bufferOffset, size, "old:");
 	dump_block(fOldData + dataOffset, size, "new:");
 #endif
@@ -303,7 +303,7 @@ ReplaceChange::Merge(DataChange *_change)
 		// in hex mode editing.
 		fNewData[fSize - 1] = change->fNewData[0];
 #ifdef TRACE_DATA_EDITOR
-		printf("Merge one byte %p (offset = %Ld, size = %lu):\n", this, fOffset,
+		printf("Merge one byte %p (offset = %lld, size = %lu):\n", this, fOffset,
 			fSize);
 		dump_block(fOldData, fSize, "old:");
 		dump_block(fNewData, fSize, "new:");
@@ -349,7 +349,7 @@ ReplaceChange::Merge(DataChange *_change)
 	fSize = size;
 
 #ifdef TRACE_DATA_EDITOR
-	printf("Merge %p (offset = %Ld, size = %lu):\n", this, fOffset, fSize);
+	printf("Merge %p (offset = %lld, size = %lu):\n", this, fOffset, fSize);
 	dump_block(fOldData, fSize, "old:");
 	dump_block(fNewData, fSize, "new:");
 #endif

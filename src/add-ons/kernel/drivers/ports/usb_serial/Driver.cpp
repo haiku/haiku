@@ -237,7 +237,7 @@ usb_serial_open(const char *name, uint32 flags, void **cookie)
 static status_t
 usb_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
-	TRACE_FUNCALLS("> usb_serial_read(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
+	TRACE_FUNCALLS("> usb_serial_read(0x%08x, %lld, 0x%08x, %d)\n", cookie,
 		position, buffer, *numBytes);
 	SerialDevice *device = (SerialDevice *)cookie;
 	status_t status = device->Read((char *)buffer, numBytes);
@@ -251,7 +251,7 @@ static status_t
 usb_serial_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	TRACE_FUNCALLS("> usb_serial_write(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
+	TRACE_FUNCALLS("> usb_serial_write(0x%08x, %lld, 0x%08x, %d)\n", cookie,
 		position, buffer, *numBytes);
 	SerialDevice *device = (SerialDevice *)cookie;
 	status_t status = device->Write((const char *)buffer, numBytes);

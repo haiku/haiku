@@ -93,7 +93,7 @@ AudioAdapter::InitialLatency() const
 status_t
 AudioAdapter::Read(void* buffer, int64 pos, int64 frames)
 {
-	TRACE("AudioAdapter::Read(%p, %Ld, %Ld)\n", buffer, pos, frames);
+	TRACE("AudioAdapter::Read(%p, %lld, %lld)\n", buffer, pos, frames);
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;

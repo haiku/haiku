@@ -21,7 +21,7 @@ main(int argc, char** argv)
 		if (dirent == NULL)
 			break;
 
-		printf("Entry: dev %ld, ino %Ld, name \"%s\"\n", dirent->d_dev,
+		printf("Entry: dev %ld, ino %lld, name \"%s\"\n", dirent->d_dev,
 			dirent->d_ino, dirent->d_name);
 		//printf("  left: %u, next: %d\n", dir->entries_left, dir->next_entry);
 	}
@@ -33,7 +33,7 @@ main(int argc, char** argv)
 		if (dirent == NULL)
 			break;
 
-		printf("Entry: dev %ld, ino %Ld, name \"%s\"\n", dirent->d_dev,
+		printf("Entry: dev %ld, ino %lld, name \"%s\"\n", dirent->d_dev,
 			dirent->d_ino, dirent->d_name);
 		//printf("  left: %u, next: %d\n", dir->entries_left, dir->next_entry);
 	}
@@ -51,7 +51,7 @@ main(int argc, char** argv)
 		if (readdir_r(dir, buf, &dirent) != 0 || dirent == NULL)
 			break;
 
-		printf("Entry: dev %ld, ino %Ld, name \"%s\"\n", dirent->d_dev,
+		printf("Entry: dev %ld, ino %lld, name \"%s\"\n", dirent->d_dev,
 			dirent->d_ino, dirent->d_name);
 		//printf("  left: %u, next: %d\n", dir->entries_left, dir->next_entry);
 	}
@@ -62,7 +62,7 @@ main(int argc, char** argv)
 		if (readdir_r(dir, buf, &dirent) != 0 || dirent == NULL)
 			break;
 
-		printf("Entry: dev %ld, ino %Ld, name \"%s\"\n", dirent->d_dev,
+		printf("Entry: dev %ld, ino %lld, name \"%s\"\n", dirent->d_dev,
 			dirent->d_ino, dirent->d_name);
 		//printf("  left: %u, next: %d\n", dir->entries_left, dir->next_entry);
 	}

@@ -115,7 +115,7 @@ dumpKey(void* key, int32 length)
 			printf("%lu", *(uint32*)key);
 			break;
 		case S_LONG_LONG_INDEX:
-			printf("%Ld", *(int64*)key);
+			printf("%lld", *(int64*)key);
 			break;
 		case S_ULONG_LONG_INDEX:
 			printf("%Lu", *(uint64*)key);
@@ -335,19 +335,19 @@ checkTreeContents(BPlusTree* tree)
 			&value, &duplicate)) == B_OK) {
 		if (value < 0 || value >= gNum) {
 			iterator.Dump();
-			printf("\ninvalid value %Ld in tree: ", value);
+			printf("\ninvalid value %lld in tree: ", value);
 			bailOutWithKey(key, length);
 		}
 		if (gKeys[value].value != value) {
 			iterator.Dump();
-			printf("\nkey pointing to the wrong value %Ld (should be %Ld)\n",
+			printf("\nkey pointing to the wrong value %lld (should be %lld)\n",
 				value, gKeys[value].value);
 			bailOutWithKey(key, length);
 		}
 		if (length != gKeys[value].length
 			|| memcmp(key, gKeys[value].data, length)) {
 			iterator.Dump();
-			printf("\nkeys don't match (key index = %Ld, %ld times in tree, "
+			printf("\nkeys don't match (key index = %lld, %ld times in tree, "
 				"%ld. occassion):\n\tfound: ", value, gKeys[value].in,
 				gKeys[value].count + 1);
 			dumpKey(key, length);

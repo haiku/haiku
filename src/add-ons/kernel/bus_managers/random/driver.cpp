@@ -79,7 +79,7 @@ random_open(void *deviceCookie, const char *name, int flags, void **cookie)
 static status_t
 random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 {
-	TRACE("read(%Ld,, %ld)\n", position, *_numBytes);
+	TRACE("read(%lld,, %ld)\n", position, *_numBytes);
 
 	MutexLocker locker(&sRandomLock);
 	return RANDOM_READ(sRandomCookie, _buffer, _numBytes);
@@ -89,7 +89,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 static status_t
 random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes)
 {
-	TRACE("write(%Ld,, %ld)\n", position, *_numBytes);
+	TRACE("write(%lld,, %ld)\n", position, *_numBytes);
 	MutexLocker locker(&sRandomLock);
 	return RANDOM_WRITE(sRandomCookie, buffer, _numBytes);
 }

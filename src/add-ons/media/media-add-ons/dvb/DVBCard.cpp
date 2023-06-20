@@ -129,7 +129,7 @@ DVBCard::SetTuningParameter(const dvb_tuning_parameters_t& param)
 		
 	printf("DVBCard::SetTuningParameter:\n");
 /*
-	printf("frequency %Ld\n", param.frequency);
+	printf("frequency %lld\n", param.frequency);
 	printf("inversion %d\n", param.inversion);
 	printf("bandwidth %d\n", param.bandwidth);
 	printf("modulation %d\n", param.modulation);

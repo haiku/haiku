@@ -95,7 +95,7 @@ AudioChannelConverter::InitialLatency() const
 status_t
 AudioChannelConverter::Read(void* outBuffer, int64 pos, int64 frames)
 {
-	TRACE("AudioChannelConverter::Read(%p, %Ld, %Ld)\n", outBuffer, pos, frames);
+	TRACE("AudioChannelConverter::Read(%p, %lld, %lld)\n", outBuffer, pos, frames);
 	status_t error = InitCheck();
 	if (error != B_OK)
 		return error;

@@ -140,8 +140,8 @@ MixerInput::GetMixerChannelInfo(int mixerChannel, int64 framepos,
 			fDebugMixBufferFrames)) >= fLastDataAvailableTime) {
 		// Print this error for the first channel only.
 		if (mixerChannel == 0) {
-			ERROR("MixerInput::GetMixerChannelInfo: reading wrong data, have %Ld "
-				"to %Ld, reading from %Ld to %Ld\n",
+			ERROR("MixerInput::GetMixerChannelInfo: reading wrong data, have %lld "
+				"to %lld, reading from %lld to %lld\n",
 				fLastDataAvailableTime - duration_for_frames(fMixBufferFrameRate,
 					fMixBufferFrameCount), fLastDataAvailableTime, time,
 				time + duration_for_frames(fMixBufferFrameRate,

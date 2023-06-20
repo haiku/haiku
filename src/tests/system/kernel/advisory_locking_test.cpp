@@ -28,7 +28,7 @@ type_name(int type)
 int
 do_lock(int fd, int type, off_t start, off_t length)
 {
-	printf("%s lock %Ld:%Ld\n", type_name(type), start, length);
+	printf("%s lock %lld:%lld\n", type_name(type), start, length);
 
 	struct flock flock;
 	flock.l_type = type;
@@ -36,7 +36,7 @@ do_lock(int fd, int type, off_t start, off_t length)
 	flock.l_start = start;
 	flock.l_len = length;
 	if (fcntl(fd, F_SETLK, &flock) != 0) {
-		fprintf(stderr, "ERROR: %s lock %Ld:%Ld failed: %s\n", type_name(type),
+		fprintf(stderr, "ERROR: %s lock %lld:%lld failed: %s\n", type_name(type),
 			start, length, strerror(errno));
 		return -1;
 	}

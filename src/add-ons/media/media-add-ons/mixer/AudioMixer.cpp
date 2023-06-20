@@ -728,7 +728,7 @@ AudioMixer::GetLatency(bigtime_t *out_latency)
 	// report our *total* latency:  internal plus downstream plus scheduling
 	*out_latency = EventLatency() + SchedulingLatency();
 
-	TRACE("AudioMixer::GetLatency %Ld\n", *out_latency);
+	TRACE("AudioMixer::GetLatency %lld\n", *out_latency);
 
 	return B_OK;
 }
@@ -745,7 +745,7 @@ AudioMixer::LatencyChanged(const media_source& source,
 	}
 
 	TRACE("AudioMixer::LatencyChanged: downstream latency from %ld/%ld to "
-		"%ld/%ld changed from %Ld to %Ld\n", source.port, source.id,
+		"%ld/%ld changed from %lld to %lld\n", source.port, source.id,
 		destination.port, destination.id, fDownstreamLatency, new_latency);
 
 #if DEBUG
@@ -753,7 +753,7 @@ AudioMixer::LatencyChanged(const media_source& source,
 		media_node_id id;
 		bigtime_t l;
 		FindLatencyFor(destination, &l, &id);
-		TRACE("AudioMixer: Reported downstream Latency is %Ld usecs\n", l);
+		TRACE("AudioMixer: Reported downstream Latency is %lld usecs\n", l);
 	}
 #endif
 
@@ -917,17 +917,17 @@ AudioMixer::Connect(status_t error, const media_source &source,
 	// Now that we're connected, we can determine our downstream latency.
 	media_node_id id;
 	FindLatencyFor(dest, &fDownstreamLatency, &id);
-	TRACE("AudioMixer: Downstream Latency is %Ld usecs\n", fDownstreamLatency);
+	TRACE("AudioMixer: Downstream Latency is %lld usecs\n", fDownstreamLatency);
 
 	// SetDuration of one buffer
 	SetBufferDuration(buffer_duration(format.u.raw_audio));
-	TRACE("AudioMixer: buffer duration is %Ld usecs\n", BufferDuration());
+	TRACE("AudioMixer: buffer duration is %lld usecs\n", BufferDuration());
 
 	// Our internal latency is at least the length of a full output buffer
 	// plus mixing time, plus jitter
 	fInternalLatency = BufferDuration()
 		+ max(kMinMixingTime, bigtime_t(0.5 * BufferDuration())) + kMaxJitter;
-	TRACE("AudioMixer: Internal latency is %Ld usecs\n", fInternalLatency);
+	TRACE("AudioMixer: Internal latency is %lld usecs\n", fInternalLatency);
 
 	SetEventLatency(fDownstreamLatency + fInternalLatency);
 
@@ -1014,7 +1014,7 @@ AudioMixer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 	// is the only runmode in which we can do anything about this
 	// TODO: quality could be decreased, too
 
-	ERROR("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", howMuch,
+	ERROR("AudioMixer::LateNoticeReceived, %lld too late at %lld\n", howMuch,
 		performanceTime);
 
 	if (what == fCore->Output()->MediaOutput().source
@@ -1147,7 +1147,7 @@ AudioMixer::PublishEventLatencyChange()
 	MixerInput *input;
 	for (int i = 0; (input = fCore->Input(i)) != 0; i++) {
 		TRACE("AudioMixer::PublishEventLatencyChange: SendLatencyChange, "
-			"connection %ld/%ld to %ld/%ld event latency is now %Ld\n",
+			"connection %ld/%ld to %ld/%ld event latency is now %lld\n",
 			input->MediaInput().source.port, input->MediaInput().source.id,
 			input->MediaInput().destination.port,
 			input->MediaInput().destination.id, EventLatency());
@@ -1166,8 +1166,8 @@ AudioMixer::CreateBufferGroup(BBufferGroup** buffer) const
 	// (plus one for rounding up), plus one extra
 	int32 count = int32(fDownstreamLatency / BufferDuration()) + 2;
 
-	TRACE("AudioMixer::CreateBufferGroup: fDownstreamLatency %Ld, "
-		"BufferDuration %Ld, buffer count = %ld\n", fDownstreamLatency,
+	TRACE("AudioMixer::CreateBufferGroup: fDownstreamLatency %lld, "
+		"BufferDuration %lld, buffer count = %ld\n", fDownstreamLatency,
 		BufferDuration(), count);
 
 	if (count < 3)

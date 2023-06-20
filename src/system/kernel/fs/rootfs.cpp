@@ -523,7 +523,7 @@ rootfs_get_vnode(fs_volume* _volume, ino_t id, fs_vnode* _vnode, int* _type,
 	struct rootfs* fs = (struct rootfs*)_volume->private_volume;
 	struct rootfs_vnode* vnode;
 
-	TRACE(("rootfs_getvnode: asking for vnode %Ld, r %d\n", id, reenter));
+	TRACE(("rootfs_getvnode: asking for vnode %lld, r %d\n", id, reenter));
 
 	if (!reenter)
 		rw_lock_read_lock(&fs->lock);

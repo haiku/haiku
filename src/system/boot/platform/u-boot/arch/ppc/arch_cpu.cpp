@@ -126,7 +126,7 @@ enumerate_cpus(void)
 		}
 		gKernelArgs.arch_args.bus_frequency = busFrequency;
 	}
-	TRACE(("  bus clock frequency: %Ld\n",
+	TRACE(("  bus clock frequency: %lld\n",
 		gKernelArgs.arch_args.bus_frequency));
 
 #if 0

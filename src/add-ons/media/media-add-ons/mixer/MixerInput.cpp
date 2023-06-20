@@ -138,7 +138,7 @@ MixerInput::BufferReceived(BBuffer* buffer)
 		size / bytes_per_frame(fInput.format.u.raw_audio));
 	if (start < 0) {
 		ERROR("MixerInput::BufferReceived: buffer with negative start time of "
-			"%Ld dropped\n", start);
+			"%lld dropped\n", start);
 		return;
 	}
 

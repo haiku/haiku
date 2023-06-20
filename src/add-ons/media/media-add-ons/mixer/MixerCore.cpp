@@ -295,7 +295,7 @@ MixerCore::SetTimingInfo(BTimeSource *ts, bigtime_t downstream_latency)
 	fTimeSource = dynamic_cast<BTimeSource *>(ts->Acquire());
 	fDownstreamLatency = downstream_latency;
 
-	TRACE("MixerCore::SetTimingInfo, now = %Ld, downstream latency %Ld\n",
+	TRACE("MixerCore::SetTimingInfo, now = %lld, downstream latency %lld\n",
 		fTimeSource->Now(), fDownstreamLatency);
 }
 
@@ -484,7 +484,7 @@ MixerCore::_MixThread()
 	bigtime_t start = fTimeSource->Now();
 	Unlock();
 	while (start <= 0) {
-		TRACE("MixerCore: delaying _MixThread start, timesource is at %Ld\n",
+		TRACE("MixerCore: delaying _MixThread start, timesource is at %lld\n",
 			start);
 		snooze(5000);
 		if (!Lock())
@@ -500,8 +500,8 @@ MixerCore::_MixThread()
 	bigtime_t bufferRequestTimeout = buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio) / 2;
 
-	TRACE("MixerCore: starting _MixThread at %Ld with latency %Ld and "
-		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start,
+	TRACE("MixerCore: starting _MixThread at %lld with latency %lld and "
+		"downstream latency %lld, bufferRequestTimeout %lld\n", start,
 		fEventLatency, fDownstreamLatency, bufferRequestTimeout);
 
 	// We must read from the input buffer at a position (pos) that is always
@@ -511,8 +511,8 @@ MixerCore::_MixThread()
 		* fMixBufferFrameCount;
 	bigtime_t timeBase = duration_for_frames(fMixBufferFrameRate, frameBase);
 
-	TRACE("MixerCore: starting _MixThread, start %Ld, timeBase %Ld, "
-		"frameBase %Ld\n", start, timeBase, frameBase);
+	TRACE("MixerCore: starting _MixThread, start %lld, timeBase %lld, "
+		"frameBase %lld\n", start, timeBase, frameBase);
 
 	ASSERT(fMixBufferFrameCount > 0);
 
@@ -570,7 +570,7 @@ MixerCore::_MixThread()
 				hdr->start_time = fEventTime;
 				if (fNode->SendBuffer(buffer, fOutput) != B_OK) {
 #if DEBUG
-					ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",
+					ERROR("MixerCore: SendBuffer failed for buffer %lld\n",
 						bufferIndex);
 #else
 					ERROR("MixerCore: SendBuffer failed\n");
@@ -579,7 +579,7 @@ MixerCore::_MixThread()
 				}
 			} else {
 #if DEBUG
-				ERROR("MixerCore: RequestBuffer failed for buffer %Ld\n",
+				ERROR("MixerCore: RequestBuffer failed for buffer %lld\n",
 					bufferIndex);
 #else
 				ERROR("MixerCore: RequestBuffer failed\n");
@@ -594,8 +594,8 @@ MixerCore::_MixThread()
 		// mix all data from all inputs into the mix buffer
 		ASSERT(currentFramePos % fMixBufferFrameCount == 0);
 
-		PRINT(4, "create new buffer event at %Ld, reading input frames at "
-			"%Ld\n", fEventTime, currentFramePos);
+		PRINT(4, "create new buffer event at %lld, reading input frames at "
+			"%lld\n", fEventTime, currentFramePos);
 
 		// Init the channel information for each MixerInput.
 		for (int i = 0; MixerInput* input = Input(i); i++) {
@@ -706,7 +706,7 @@ MixerCore::_MixThread()
 			status_t res = fNode->SendBuffer(buffer, fOutput);
 			if (res != B_OK) {
 #if DEBUG
-				ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",
+				ERROR("MixerCore: SendBuffer failed for buffer %lld\n",
 					bufferIndex);
 #else
 				ERROR("MixerCore: SendBuffer failed\n");
@@ -715,7 +715,7 @@ MixerCore::_MixThread()
 			}
 		} else {
 #if DEBUG
-			ERROR("MixerCore: RequestBuffer failed for buffer %Ld\n",
+			ERROR("MixerCore: RequestBuffer failed for buffer %lld\n",
 				bufferIndex);
 #else
 			ERROR("MixerCore: RequestBuffer failed\n");

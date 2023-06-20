@@ -412,7 +412,7 @@ load_rules()
 						if (name != NULL) {
 							eat_spaces(line);
 							int32 confidence = strtoul(line, &line, 10);
-							TRACE(("c %ld:%Ld:%s %s %ld\n", device, node, fileName, name, confidence));
+							TRACE(("c %ld:%lld:%s %s %ld\n", device, node, fileName, name, confidence));
 
 							struct head *head = new ::head;
 							head->device = device;
@@ -506,7 +506,7 @@ Rule::Apply()
 		if (vfs_entry_ref_to_vnode(head->device, head->parent, head->name, &vnode) == B_OK) {
 			vfs_vnode_to_node_ref(vnode, &head->device, &head->node);
 
-			TRACE(("prefetch: %ld:%Ld:%s\n", head->device, head->parent, head->name));
+			TRACE(("prefetch: %ld:%lld:%s\n", head->device, head->parent, head->name));
 			cache_prefetch(head->device, head->node, 0, ~0UL);
 
 			// ToDo: put head into a hash so that some statistics can be backpropagated quickly
@@ -543,11 +543,11 @@ Rule::Dump()
 
 	struct head *head = NULL;
 	while ((head = (struct head *)list_get_next_item(&fHeads, head)) != NULL) {
-		dprintf("  %ld:%Ld:\"%s\", ", head->device, head->parent, head->name);
+		dprintf("  %ld:%lld:\"%s\", ", head->device, head->parent, head->name);
 		if (head->confidence < sMinConfidence)
 			dprintf("-\n");
 		else
-			dprintf("%ld (%ld), %Ld us\n", head->used_count,
+			dprintf("%ld (%ld), %lld us\n", head->used_count,
 				head->used_count - fAppliedCount, head->timestamp);
 	}
 }
@@ -697,7 +697,7 @@ node_opened(struct vnode *vnode, int32 fdType, dev_t device, vnode_id parent,
 		&& vfs_get_vnode_name(vnode, buffer, sizeof(buffer)) == B_OK)
 		name = buffer;
 
-	//dprintf("opened: %ld:%Ld:%Ld:%s (%s)\n", device, parent, node, name, thread_get_current_thread()->name);
+	//dprintf("opened: %ld:%lld:%lld:%s (%s)\n", device, parent, node, name, thread_get_current_thread()->name);
 	RuleMatcher matcher(team_get_current_team_id(), name);
 	matcher.GotFile(device, node);
 }

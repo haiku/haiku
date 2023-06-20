@@ -287,10 +287,10 @@ slower_sample:
 
 #ifdef TRACE_CPU
 	if (clockSpeed > 1000000000LL) {
-		dprintf("CPU at %Ld.%03Ld GHz\n", clockSpeed / 1000000000LL,
+		dprintf("CPU at %lld.%03Ld GHz\n", clockSpeed / 1000000000LL,
 			(clockSpeed % 1000000000LL) / 1000000LL);
 	} else {
-		dprintf("CPU at %Ld.%03Ld MHz\n", clockSpeed / 1000000LL,
+		dprintf("CPU at %lld.%03Ld MHz\n", clockSpeed / 1000000LL,
 			(clockSpeed % 1000000LL) / 1000LL);
 	}
 #endif

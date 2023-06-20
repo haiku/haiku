@@ -199,7 +199,7 @@ info_for_device(const char *device)
 				* info.geometry.sectors_per_track
 				* info.geometry.cylinder_count
 				* info.geometry.head_count;
-		printf("\tdisk size is %Ld bytes (%g MB)\n", size, size / (1024.0 * 1024));
+		printf("\tdisk size is %lld bytes (%g MB)\n", size, size / (1024.0 * 1024));
 		if (info.halted)
 			printf("\tdevice is currently halted.\n");
 	}

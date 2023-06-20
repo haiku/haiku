@@ -176,7 +176,7 @@ OpenSoundDeviceEngine::PlaybackLatency()
 		cardLatency = latency / 3;
 	}
 	latency += cardLatency;
-//	PRINT(("PlaybackLatency: odelay %d latency %Ld card %Ld\n",
+//	PRINT(("PlaybackLatency: odelay %d latency %lld card %lld\n",
 //		fDriverBufferSize, latency, CardLatency()));
 	return latency;
 }
@@ -327,7 +327,7 @@ OpenSoundDeviceEngine::GetCurrentIPtr(int32 *fifoed, oss_count_t *info)
 						 		* (fMediaFormat.AudioFormat() & media_raw_audio_format::B_AUDIO_SIZE_MASK));
 		info->fifo_samples = 0;
 	}
-	PRINT(("OpenSoundDeviceEngine::%s: IPTR: { samples=%Ld, fifo_samples=%d }\n", __FUNCTION__, info->samples, info->fifo_samples));
+	PRINT(("OpenSoundDeviceEngine::%s: IPTR: { samples=%lld, fifo_samples=%d }\n", __FUNCTION__, info->samples, info->fifo_samples));
 	if (fifoed)
 		*fifoed = info->fifo_samples;
 	return info->samples;
@@ -365,7 +365,7 @@ OpenSoundDeviceEngine::GetCurrentOPtr(int32* fifoed, size_t* fragmentPos)
 		*fragmentPos = cinfo.ptr;
 	}
 
-//	PRINT(("OpenSoundDeviceEngine::%s: OPTR: { samples=%Ld, "
+//	PRINT(("OpenSoundDeviceEngine::%s: OPTR: { samples=%lld, "
 //		"fifo_samples=%d }\n", __FUNCTION__, info->samples,
 //		info->fifo_samples));
 	if (fifoed != NULL)

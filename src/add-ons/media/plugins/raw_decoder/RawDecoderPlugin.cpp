@@ -515,7 +515,7 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 	if (fSwapOutput)
 		fSwapOutput(buffer, *frameCount * fInputFormat.u.raw_audio.channel_count);
 	
-	TRACE("framecount %Ld, time %Ld\n",*frameCount, mediaHeader->start_time);
+	TRACE("framecount %lld, time %lld\n",*frameCount, mediaHeader->start_time);
 		
 	return *frameCount ? B_OK : B_ERROR;
 }

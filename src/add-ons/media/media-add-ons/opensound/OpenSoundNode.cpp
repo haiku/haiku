@@ -1233,10 +1233,10 @@ OpenSoundNode::Connect(status_t error, const media_source& source,
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(channel->fOutput.destination, &fLatency, &id);
-	TRACE("\tdownstream latency = %Ld\n", fLatency);
+	TRACE("\tdownstream latency = %lld\n", fLatency);
 
 	fInternalLatency = BufferDuration();
-	TRACE("\tbuffer-filling took %Ld usec on this machine\n",
+	TRACE("\tbuffer-filling took %lld usec on this machine\n",
 		fInternalLatency);
 	//SetEventLatency(fLatency + fInternalLatency);
 

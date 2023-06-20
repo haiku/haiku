@@ -233,7 +233,7 @@ collectInodes(Disk& disk, RunSet* set, InodeHashtable* hashTable, off_t start,
 		}
 
 		//if ((offset % (disk.BlockSize() << disk.SuperBlock()->ag_shift)) == 0)
-		//	printf("reading block %Ld, allocation group %Ld, %Ld inodes...\33[1A\n", offset / disk.BlockSize(),offset / (disk.BlockSize() << disk.SuperBlock()->ag_shift), count);
+		//	printf("reading block %lld, allocation group %lld, %lld inodes...\33[1A\n", offset / disk.BlockSize(),offset / (disk.BlockSize() << disk.SuperBlock()->ag_shift), count);
 
 		for (uint32 i = 0; i < sizeof(buffer); i += disk.BlockSize()) {
 			inode.SetTo((bfs_inode *)(buffer + i));

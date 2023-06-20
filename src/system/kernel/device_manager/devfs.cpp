@@ -1215,7 +1215,7 @@ devfs_read(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode->private_node;
 	struct devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
 
-	//TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n",
+	//TRACE(("devfs_read: vnode %p, cookie %p, pos %lld, len %p\n",
 	//	vnode, cookie, pos, _length));
 
 	if (!S_ISCHR(vnode->stream.type))
@@ -1248,7 +1248,7 @@ devfs_write(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, off_t pos,
 	struct devfs_vnode* vnode = (struct devfs_vnode*)_vnode->private_node;
 	struct devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
 
-	//TRACE(("devfs_write: vnode %p, cookie %p, pos %Ld, len %p\n",
+	//TRACE(("devfs_write: vnode %p, cookie %p, pos %lld, len %p\n",
 	//	vnode, cookie, pos, _length));
 
 	if (!S_ISCHR(vnode->stream.type))
@@ -1672,7 +1672,7 @@ devfs_read_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	struct devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
 	struct devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
 
-	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
+	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %lld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (!S_ISCHR(vnode->stream.type)
 		|| (!vnode->stream.u.dev.device->HasRead()
@@ -1731,7 +1731,7 @@ devfs_write_pages(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	struct devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
 	struct devfs_cookie* cookie = (struct devfs_cookie*)_cookie;
 
-	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
+	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %lld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
 
 	if (!S_ISCHR(vnode->stream.type)
 		|| (!vnode->stream.u.dev.device->HasWrite()

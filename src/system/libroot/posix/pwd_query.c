@@ -115,7 +115,7 @@ struct pw_tls *get_pw_tls(void)
 int dentopen(struct dirent *dent, char *path)
 {
 	int err;
-	PRINT(("%s({%ld, %Ld, %ld, %Ld, %s}, )\n", __FUNCTION__, dent->d_pdev, dent->d_pino, dent->d_dev, dent->d_ino, dent->d_name));
+	PRINT(("%s({%ld, %lld, %ld, %lld, %s}, )\n", __FUNCTION__, dent->d_pdev, dent->d_pino, dent->d_dev, dent->d_ino, dent->d_name));
 	dent->d_dev = boot_device;
 	err = get_path_for_dirent(dent, path, B_PATH_NAME_LENGTH);
 	if ((err < 0) || (path[0] != '/')) {

@@ -258,7 +258,7 @@ _user_set_timezone(int32 timezoneOffset, const char *name, size_t nameLength)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	TRACE(("old system_time_offset %Ld old %Ld new %Ld gmt %d\n",
+	TRACE(("old system_time_offset %lld old %lld new %lld gmt %d\n",
 		arch_rtc_get_system_time_offset(sRealTimeData), sTimezoneOffset,
 		offset, sIsGMT));
 
@@ -285,7 +285,7 @@ _user_set_timezone(int32 timezoneOffset, const char *name, size_t nameLength)
 
 	sTimezoneOffset = offset;
 
-	TRACE(("new system_time_offset %Ld\n",
+	TRACE(("new system_time_offset %lld\n",
 		arch_rtc_get_system_time_offset(sRealTimeData)));
 
 	return B_OK;

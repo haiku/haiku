@@ -87,7 +87,7 @@ DataContainer::GetCache()
 status_t
 DataContainer::Resize(off_t newSize)
 {
-//	PRINT("DataContainer::Resize(%Ld), fSize: %Ld\n", newSize, fSize);
+//	PRINT("DataContainer::Resize(%lld), fSize: %lld\n", newSize, fSize);
 
 	status_t error = B_OK;
 	if (_RequiresCacheMode(newSize)) {
@@ -125,7 +125,7 @@ DataContainer::Resize(off_t newSize)
 
 	fSize = newSize;
 
-//	PRINT("DataContainer::Resize() done: %lx, fSize: %Ld\n", error, fSize);
+//	PRINT("DataContainer::Resize() done: %lx, fSize: %lld\n", error, fSize);
 	return error;
 }
 
@@ -170,7 +170,7 @@ status_t
 DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 	size_t *bytesWritten)
 {
-	PRINT("DataContainer::WriteAt(%Ld, %p, %lu, %p), fSize: %Ld\n", offset, _buffer, size, bytesWritten, fSize);
+	PRINT("DataContainer::WriteAt(%lld, %p, %lu, %p), fSize: %lld\n", offset, _buffer, size, bytesWritten, fSize);
 
 	const uint8 *buffer = (const uint8*)_buffer;
 	status_t error = (buffer && offset >= 0 && bytesWritten
@@ -202,7 +202,7 @@ DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 	// cache mode
 	error = _DoCacheIO(offset, (uint8*)buffer, size, bytesWritten, true);
 
-	PRINT("DataContainer::WriteAt() done: %lx, fSize: %Ld\n", error, fSize);
+	PRINT("DataContainer::WriteAt() done: %lx, fSize: %lld\n", error, fSize);
 	return error;
 }
 

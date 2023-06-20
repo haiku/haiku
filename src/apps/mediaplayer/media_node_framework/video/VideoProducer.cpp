@@ -555,7 +555,7 @@ void
 VideoProducer::_HandleStart(bigtime_t performanceTime)
 {
 	// Start producing frames, even if the output hasn't been connected yet.
-	TRACE("_HandleStart(%Ld)\n", performanceTime);
+	TRACE("_HandleStart(%lld)\n", performanceTime);
 
 	if (fRunning) {
 		TRACE("_HandleStart: Node already started\n");
@@ -637,7 +637,7 @@ VideoProducer::_FrameGeneratorThread()
 	const int32 kMaxDroppedFrames = 15;
 	bool running = true;
 	while (running) {
-		TRACE("_FrameGeneratorThread: loop: %Ld\n", fFrame);
+		TRACE("_FrameGeneratorThread: loop: %lld\n", fFrame);
 		// lock the node manager
 		status_t err = fManager->LockWithTimeout(10000);
 		bool ignoreEvent = false;
@@ -666,7 +666,7 @@ VideoProducer::_FrameGeneratorThread()
 				bool newPlayingState;
 				playlistFrame = fManager->PlaylistFrameAtFrame(fFrame,
 					playingDirection, newPlayingState);
-				TRACE("_FrameGeneratorThread: performance time: %Ld, "
+				TRACE("_FrameGeneratorThread: performance time: %lld, "
 					"playlist frame: %lld\n", performanceTime, playlistFrame);
 				forceSendingBuffer |= newPlayingState;
 				fManager->SetCurrentVideoTime(nextPerformanceTime);
@@ -688,7 +688,7 @@ VideoProducer::_FrameGeneratorThread()
 				return B_OK;
 		}
 
-		TRACE("_FrameGeneratorThread: waiting (%Ld)...\n", waitUntil);
+		TRACE("_FrameGeneratorThread: waiting (%lld)...\n", waitUntil);
 		// wait until...
 		err = acquire_sem_etc(fFrameSync, 1, B_ABSOLUTE_TIMEOUT, waitUntil);
 		// The only acceptable responses are B_OK and B_TIMED_OUT. Everything
@@ -755,8 +755,8 @@ VideoProducer::_FrameGeneratorThread()
 					h->u.raw_video.line_count
 						= fConnectedFormat.display.line_count;
 					// Fill in a frame
-					TRACE("_FrameGeneratorThread: frame: %Ld, "
-						"playlistFrame: %Ld\n", fFrame, playlistFrame);
+					TRACE("_FrameGeneratorThread: frame: %lld, "
+						"playlistFrame: %lld\n", fFrame, playlistFrame);
 					bool wasCached = false;
 					err = fSupplier->FillBuffer(playlistFrame,
 						buffer->Data(), fConnectedFormat, forceSendingBuffer,

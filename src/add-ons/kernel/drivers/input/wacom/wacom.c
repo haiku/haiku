@@ -532,7 +532,7 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 
 	ret = device->notify_lock;
 
-	DPRINTF_INFO((ID "device_read(%p,%Ld,0x%x,%d) name = \"%s%d\"\n",
+	DPRINTF_INFO((ID "device_read(%p,%lld,0x%x,%d) name = \"%s%d\"\n",
 			 cookie, pos, buf, *count, kBasePublishPath, device->number));
 
 	if (ret >= B_OK) {

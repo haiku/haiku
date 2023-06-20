@@ -154,7 +154,7 @@ checkIndexForNonExistingFiles(Disk &disk,BPlusTree &tree)
 		block_run run = disk.ToBlockRun(offset);
 		if (!gHashtable.Contains(&run))
 		{
-			printf("  inode at (%ld, %d), offset %Ld, doesn't exist!",run.allocation_group,run.start,offset);
+			printf("  inode at (%ld, %d), offset %lld, doesn't exist!",run.allocation_group,run.start,offset);
 			switch (tree.Type())
 			{
 				case BPLUSTREE_STRING_TYPE:
@@ -167,7 +167,7 @@ checkIndexForNonExistingFiles(Disk &disk,BPlusTree &tree)
 					printf(" (uint32 = %lu)",*(uint32 *)&name);
 					break;
 				case BPLUSTREE_INT64_TYPE:
-					printf(" (int64 = %Ld)",*(int64 *)&name);
+					printf(" (int64 = %lld)",*(int64 *)&name);
 					break;
 				case BPLUSTREE_UINT64_TYPE:
 					printf(" (uint64 = %Lu)",*(uint64 *)&name);
@@ -335,7 +335,7 @@ checkFiles(Disk &disk,BPlusTree &tree,char *attribute)
 				tree.Rewind();
 				while (tree.GetNextEntry(name,&length,B_FILE_NAME_LENGTH,&offset) == B_OK)
 				{
-					//printf("search for = %ld, key = %ld -> value = %Ld (%ld, %d)\n",*(int32 *)&key,*(int32 *)&name,offset,disk.ToBlockRun(offset).allocation_group,disk.ToBlockRun(offset).start);
+					//printf("search for = %ld, key = %ld -> value = %lld (%ld, %d)\n",*(int32 *)&key,*(int32 *)&name,offset,disk.ToBlockRun(offset).allocation_group,disk.ToBlockRun(offset).start);
 					if (keyLength == length && !memcmp(key,name,keyLength))
 					{
 						duplicates = true;

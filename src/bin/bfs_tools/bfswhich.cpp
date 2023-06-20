@@ -217,7 +217,7 @@ testBitmap(Disk& disk, const block_run& run)
 		return;
 	}
 
-	printf("Block bitmap sees block %Ld as %s.\n", disk.ToBlock(run),
+	printf("Block bitmap sees block %lld as %s.\n", disk.ToBlock(run),
 		bitmap.UsedAt(disk.ToBlock(run)) ? "used" : "free");
 }
 

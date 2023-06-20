@@ -151,7 +151,7 @@ cache_io(void *_cacheRef, void *cookie, fssh_off_t offset, fssh_addr_t buffer,
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 	fssh_off_t fileSize = ref->virtual_size;
 
-	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %u, %s)\n",
+	TRACE(("cache_io(ref = %p, offset = %lld, buffer = %p, size = %u, %s)\n",
 		ref, offset, (void *)buffer, *_size, doWrite ? "write" : "read"));
 
 	// out of bounds access?
@@ -235,7 +235,7 @@ void *
 fssh_file_cache_create(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	fssh_off_t size)
 {
-	TRACE(("file_cache_create(mountID = %d, vnodeID = %Ld, size = %Ld)\n",
+	TRACE(("file_cache_create(mountID = %d, vnodeID = %lld, size = %lld)\n",
 		mountID, vnodeID, size));
 
 	file_cache_ref *ref = new(nothrow) file_cache_ref;
@@ -309,7 +309,7 @@ fssh_file_cache_set_size(void *_cacheRef, fssh_off_t size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	TRACE(("file_cache_set_size(ref = %p, size = %Ld)\n", ref, size));
+	TRACE(("file_cache_set_size(ref = %p, size = %lld)\n", ref, size));
 
 	if (ref == NULL)
 		return FSSH_B_OK;
@@ -339,7 +339,7 @@ fssh_file_cache_read(void *_cacheRef, void *cookie, fssh_off_t offset,
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %u)\n",
+	TRACE(("file_cache_read(ref = %p, offset = %lld, buffer = %p, size = %u)\n",
 		ref, offset, bufferBase, *_size));
 
 	return cache_io(ref, cookie, offset, (fssh_addr_t)bufferBase, _size, false);
@@ -354,7 +354,7 @@ fssh_file_cache_write(void *_cacheRef, void *cookie, fssh_off_t offset,
 
 	fssh_status_t status = cache_io(ref, cookie, offset,
 		(fssh_addr_t)const_cast<void *>(buffer), _size, true);
-	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %u) = %d\n",
+	TRACE(("file_cache_write(ref = %p, offset = %lld, buffer = %p, size = %u) = %d\n",
 		ref, offset, buffer, *_size, status));
 
 	return status;

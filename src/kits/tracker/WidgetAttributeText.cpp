@@ -109,7 +109,7 @@ TruncFileSizeBase(BString* outString, int64 value, const View* view,
 			"{0, plural, one{# byte} other{# bytes}}"));
 		format.Format(buffer, value);
 		if (view->StringWidth(buffer.String()) > width)
-			buffer.SetToFormat(B_TRANSLATE("%Ld B"), value);
+			buffer.SetToFormat(B_TRANSLATE("%lld B"), value);
 	} else {
 		const char* suffix;
 		float doubleValue;

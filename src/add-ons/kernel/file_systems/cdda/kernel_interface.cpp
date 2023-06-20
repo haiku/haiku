@@ -1689,7 +1689,7 @@ cdda_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t offset,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
-	TRACE(("cdda_read(vnode = %p, offset %Ld, length = %lu, mode = %d)\n",
+	TRACE(("cdda_read(vnode = %p, offset %lld, length = %lu, mode = %d)\n",
 		_node, offset, *_length, cookie->open_mode));
 
 	if (S_ISDIR(inode->Type()))

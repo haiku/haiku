@@ -404,7 +404,7 @@ status_t NodeGroup::setStartPosition(
 	Autolock _l(this);
 	
 	D_METHOD((
-		"NodeGroup::setStartPosition(%Ld)\n", start));
+		"NodeGroup::setStartPosition(%lld)\n", start));
 		
 	if(
 		m_transportState == TRANSPORT_RUNNING ||
@@ -466,7 +466,7 @@ status_t NodeGroup::setEndPosition(
 	Autolock _l(this);
 	
 	D_METHOD((
-		"NodeGroup::setEndPosition(%Ld)\n", end));
+		"NodeGroup::setEndPosition(%lld)\n", end));
 
 	if(
 		m_transportState == TRANSPORT_RUNNING ||
@@ -1121,13 +1121,13 @@ status_t NodeGroup::_preroll() {
 //				strerror(err)));
 //			return;
 //		}
-////		PRINT(("-   %Ld\n", latency));
+////		PRINT(("-   %lld\n", latency));
 //		
 //		bigtime_t add;
 //		err = BMediaRoster::Roster()->GetInitialLatencyFor(
 //			r->node(),
 //			&add);
-////		PRINT(("-   %Ld\n", add));
+////		PRINT(("-   %lld\n", add));
 //		if(err < B_OK) {
 //			PRINT((
 //				"* calcLatencyFn: GetInitialLatencyFor() failed: %s\n",
@@ -1140,7 +1140,7 @@ status_t NodeGroup::_preroll() {
 //			maxLatency = latency;
 //
 ////		PRINT((
-////			"-   max latency: %Ld\n",
+////			"-   max latency: %lld\n",
 ////			maxLatency));
 //	}
 //};
@@ -1482,7 +1482,7 @@ void NodeGroup::_cycleInit(
 	assert_locked(this);
 	ASSERT(m_cycleNodes.size() > 0);
 	D_METHOD((
-		"NodeGroup::_cycleInit(%Ld)\n",
+		"NodeGroup::_cycleInit(%lld)\n",
 		startTime));
 
 	// +++++ rescan latencies?

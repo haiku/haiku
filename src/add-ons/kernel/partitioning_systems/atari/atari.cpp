@@ -173,7 +173,7 @@ atari_scan_partition(int fd, partition_data *partition, void *_cookie)
 			continue;
 		TRACE(("atari: file system: %.3s\n", p->id));
 		if ((p->Start() + p->Size())*(uint64)SECTSZ > (uint64)partition->size) {
-			TRACE(("atari: child partition exceeds existing space (%Ld bytes)\n", p->Size()*SECTSZ));
+			TRACE(("atari: child partition exceeds existing space (%lld bytes)\n", p->Size()*SECTSZ));
 			continue;
 		}
 		if (!isalnum(p->id[0]))

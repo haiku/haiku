@@ -185,7 +185,7 @@ amiga_rdb_scan_partition(int fd, partition_data *partition, void *_cookie)
 
 		if (environment.Start() + environment.Size()
 				> (uint64)partition->size) {
-			TRACE(("amiga_rdb: child partition exceeds existing space (%Ld "
+			TRACE(("amiga_rdb: child partition exceeds existing space (%lld "
 				"bytes)\n", environment.Size()));
 			continue;
 		}

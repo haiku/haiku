@@ -127,7 +127,7 @@ process_file(const file_entry& entry, int number)
 	}
 
 	if (stat.st_ino != entry.node) {
-		fprintf(stderr, "\"%s\": inode changed from %Ld to %Ld\n",
+		fprintf(stderr, "\"%s\": inode changed from %lld to %lld\n",
 			entry.path.c_str(), entry.node, stat.st_ino);
 	}
 

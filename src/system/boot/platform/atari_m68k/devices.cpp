@@ -429,7 +429,7 @@ find_unique_check_sums(NodeList *devices)
 			disk.device.unknown.check_sums[i].offset = offset;
 			disk.device.unknown.check_sums[i].sum = compute_check_sum(drive, offset);
 
-			TRACE(("disk %x, offset %Ld, sum %lu\n", drive->DriveID(), offset,
+			TRACE(("disk %x, offset %lld, sum %lu\n", drive->DriveID(), offset,
 				disk.device.unknown.check_sums[i].sum));
 		}
 
@@ -606,12 +606,12 @@ BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	ssize_t ret;
 	uint32 offset = pos % fBlockSize;
 	pos /= fBlockSize;
-	TRACE(("BlockHandle::%s: (%d) %Ld, %d\n", __FUNCTION__, fHandle, pos, bufferSize));
+	TRACE(("BlockHandle::%s: (%d) %lld, %d\n", __FUNCTION__, fHandle, pos, bufferSize));
 
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
 	int32 totalBytesRead = 0;
 
-	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu)\n",
+	//TRACE(("BIOS reads %lu bytes from %lld (offset = %lu)\n",
 	//	blocksLeft * fBlockSize, pos * fBlockSize, offset));
 
 	// read partial block
@@ -730,7 +730,7 @@ FloppyDrive::FloppyDrive(int handle)
 		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("  total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = 512;
 		fSize = fParameters.sectors * fBlockSize;
@@ -744,7 +744,7 @@ FloppyDrive::FloppyDrive(int handle)
 		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
@@ -827,7 +827,7 @@ FloppyDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 	int sectorsPerTrack = fParameters.sectors_per_track;
 	int heads = fParameters.heads;
 	int32 ret;
-	//TRACE(("FloppyDrive::%s(%Ld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
+	//TRACE(("FloppyDrive::%s(%lld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
 	// force single sector reads to avoid crossing track boundaries
 	for (int i = 0; i < count; i++) {
 		uint8 *buf = (uint8 *)buffer;
@@ -901,7 +901,7 @@ BIOSDrive::BIOSDrive(int handle)
 		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("  total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = 512;
 		fSize = fParameters.sectors * fBlockSize;
@@ -915,7 +915,7 @@ BIOSDrive::BIOSDrive(int handle)
 		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
@@ -978,7 +978,7 @@ BIOSDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 {
 	int sectorsPerBlocks = (fBlockSize / 256);
 	int32 ret;
-	TRACE(("BIOSDrive::%s(%Ld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
+	TRACE(("BIOSDrive::%s(%lld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
 	// XXX: check for AHDI 3.0 before using long recno!!!
 	ret = Rwabs(RW_READ | RW_NOTRANSLATE, buffer, sectorsPerBlocks, -1, fHandle, first * sectorsPerBlocks);
 	if (ret < 0)
@@ -1043,7 +1043,7 @@ XHDIDrive::XHDIDrive(int handle, uint16 major, uint16 minor)
 		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("  total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = 512;
 		fSize = fParameters.sectors * fBlockSize;
@@ -1057,7 +1057,7 @@ XHDIDrive::XHDIDrive(int handle, uint16 major, uint16 minor)
 		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
 			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
 			fParameters.bytes_per_sector));
-		TRACE(("total sectors: %Ld\n", fParameters.sectors));
+		TRACE(("total sectors: %lld\n", fParameters.sectors));
 
 		fBlockSize = fParameters.bytes_per_sector;
 		fSize = fParameters.sectors * fBlockSize;
@@ -1105,7 +1105,7 @@ XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 	int sectorsPerBlock = (fBlockSize / 256);
 	int32 ret;
 	uint16 flags = RW_READ;
-	TRACE(("XHDIDrive::%s(%Ld, %d) (%d,%d)\n", __FUNCTION__, first, count, fMajor, fMinor));
+	TRACE(("XHDIDrive::%s(%lld, %d) (%d,%d)\n", __FUNCTION__, first, count, fMajor, fMinor));
 	ret = XHReadWrite(fMajor, fMinor, flags, (uint32)first, (uint16)count, buffer);
 	if (ret < 0)
 		return xhdierror(ret);
@@ -1181,7 +1181,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		add_block_devices(devicesList, true);
 	}
 
-	TRACE(("boot drive size: %Ld bytes\n", drive->Size()));
+	TRACE(("boot drive size: %lld bytes\n", drive->Size()));
 	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, gBootedFromImage);
 
 	return B_OK;
@@ -1195,12 +1195,12 @@ platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
 	BlockHandle *drive = static_cast<BlockHandle *>(bootDevice);
 	off_t offset = (off_t)gBootPartitionOffset * drive->BlockSize();
 
-	dprintf("boot partition offset: %Ld\n", offset);
+	dprintf("boot partition offset: %lld\n", offset);
 
 	NodeIterator iterator = list->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
-		TRACE(("partition offset = %Ld, size = %Ld\n", partition->offset, partition->size));
+		TRACE(("partition offset = %lld, size = %lld\n", partition->offset, partition->size));
 		// search for the partition that contains the partition
 		// offset as reported by the BFS boot block
 		if (offset >= partition->offset

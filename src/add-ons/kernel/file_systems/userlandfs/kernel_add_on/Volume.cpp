@@ -4441,7 +4441,7 @@ Volume::_IncrementVNodeCount(ino_t vnid)
 	}
 
 	vnode->useCount++;
-//PRINT(("_IncrementVNodeCount(%Ld): count: %ld, fVNodeCountMap size: %ld\n", vnid, *count, fVNodeCountMap->Size()));
+//PRINT(("_IncrementVNodeCount(%lld): count: %ld, fVNodeCountMap size: %ld\n", vnid, *count, fVNodeCountMap->Size()));
 }
 
 
@@ -4462,7 +4462,7 @@ Volume::_DecrementVNodeCount(ino_t vnid)
 	}
 
 	vnode->useCount--;
-//PRINT(("_DecrementVNodeCount(%Ld): count: %ld, fVNodeCountMap size: %ld\n", vnid, tmpCount, fVNodeCountMap->Size()));
+//PRINT(("_DecrementVNodeCount(%lld): count: %ld, fVNodeCountMap size: %ld\n", vnid, tmpCount, fVNodeCountMap->Size()));
 }
 
 

@@ -272,7 +272,7 @@ ESDEndpoint::ConnectThread(void)
 	
 	bigtime_t serverLatency = result * 1000000LL / (ESD_DEFAULT_RATE * 2/*16b*/ * 2/*stereo*/ );
 	bigtime_t netLatency = (fLatency + ping) / 2; /* mean of both */
-	fprintf(stderr, "ESDEndpoint::Connect: Latency: server: %Ld, net1: %Ld, net2: %Ld\n", serverLatency, fLatency, ping);
+	fprintf(stderr, "ESDEndpoint::Connect: Latency: server: %lld, net1: %lld, net2: %lld\n", serverLatency, fLatency, ping);
 	
 	fLatency = netLatency + serverLatency;
 	

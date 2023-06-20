@@ -486,7 +486,7 @@ Test::_CheckWrite()
 			continue;
 
 		if (disk[i] != i % 26 + 'a') {
-			dprintf("disk[i] %c, expected %c, i %lu, fLength + fOffset %Ld\n",
+			dprintf("disk[i] %c, expected %c, i %lu, fLength + fOffset %lld\n",
 				disk[i], (int)(i % 26 + 'a'), i, fLength + fOffset);
 			dprintf("offset %lu differs, touched innocent data:\n", i);
 			i &= ~63;

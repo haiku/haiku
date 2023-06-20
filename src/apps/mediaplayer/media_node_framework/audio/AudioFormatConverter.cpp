@@ -189,7 +189,7 @@ AudioFormatConverter::InitialLatency() const
 status_t
 AudioFormatConverter::Read(void* buffer, int64 pos, int64 frames)
 {
-	TRACE("AudioFormatConverter::Read(%p, %Ld, %Ld)\n", buffer, pos, frames);
+	TRACE("AudioFormatConverter::Read(%p, %lld, %lld)\n", buffer, pos, frames);
 	status_t error = InitCheck();
 	if (error != B_OK) {
 		TRACE("AudioFormatConverter::Read() done 1\n");

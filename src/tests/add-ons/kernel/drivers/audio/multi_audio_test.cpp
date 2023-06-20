@@ -408,7 +408,7 @@ do_play(int argc, char** argv)
 		exchanged++;
 	}
 
-	printf("%ld buffers exchanged while playing (%lu frames played (%Ld)).\n",
+	printf("%ld buffers exchanged while playing (%lu frames played (%lld)).\n",
 		exchanged, x, bufferInfo.played_frames_count);
 
 	// clear buffers

@@ -181,11 +181,11 @@ void scsi_add_queued_request( scsi_ccb *request )
 /*	{
 		scsi_ccb *tmp = device->queued_reqs;
 		
-		dprintf( "pos=%Ld, to_insert=%Ld; ", device->last_sort,
+		dprintf( "pos=%lld, to_insert=%lld; ", device->last_sort,
 			request->sort );
 		
 		do {
-			dprintf( "%Ld, %s", tmp->sort, tmp->next == device->queued_reqs ? "\n" : "" );
+			dprintf( "%lld, %s", tmp->sort, tmp->next == device->queued_reqs ? "\n" : "" );
 			tmp = tmp->next;
 		} while( tmp != device->queued_reqs );
 	}*/

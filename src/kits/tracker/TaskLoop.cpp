@@ -242,7 +242,7 @@ RunWhenIdleTask::RunIfNeeded(bigtime_t currentTime)
 		return false;
 
 	fRunAfter = currentTime + fPeriod;
-//	PRINT(("runWhenIdle: runAfter %Ld, current time %Ld, period %Ld\n",
+//	PRINT(("runWhenIdle: runAfter %lld, current time %lld, period %lld\n",
 //		fRunAfter, currentTime, fPeriod));
 
 	if (fState == kInitialDelay) {
@@ -290,7 +290,7 @@ RunWhenIdleTask::IsIdle(bigtime_t currentTime, float taskOverhead)
 		idle = false;
 	} else if ((currentTime - fLastCPUTooBusyTime) < fIdleFor
 		|| idle_time() < fIdleFor) {
-//		PRINT(("load %f, not idle long enough %Ld, %Ld\n", load,
+//		PRINT(("load %f, not idle long enough %lld, %lld\n", load,
 //			currentTime - fLastCPUTooBusyTime,
 //			idle_time()));
 		idle = false;
@@ -298,7 +298,7 @@ RunWhenIdleTask::IsIdle(bigtime_t currentTime, float taskOverhead)
 
 #if xDEBUG
 	else
-		PRINT(("load %f, idle for %Ld sec, go\n", load,
+		PRINT(("load %f, idle for %lld sec, go\n", load,
 			(currentTime - fLastCPUTooBusyTime) / 1000000));
 #endif
 

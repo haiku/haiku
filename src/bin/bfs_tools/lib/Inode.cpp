@@ -698,7 +698,7 @@ DataStream::FindBlockRun(off_t pos)
 			int32 directSize = fDisk->BlockSize() * 4;
 			int32 index = start / indirectSize;
 
-			//printf("\tstart = %Ld, indirectSize = %ld, directSize = %ld, index = %ld\n",start,indirectSize,directSize,index);
+			//printf("\tstart = %lld, indirectSize = %ld, directSize = %ld, index = %ld\n",start,indirectSize,directSize,index);
 			//printf("\tlook for indirect block at %ld,%d\n",indirect[index].allocation_group,indirect[index].start);
 			indirect = (block_run *)fDisk->ReadBlockRun(indirect[index]);
 			if (indirect == NULL)
@@ -708,7 +708,7 @@ DataStream::FindBlockRun(off_t pos)
 			fRunFileOffset = fInode->data.max_indirect_range + (index * indirectSize) + (fCurrent * directSize);
 			fRunBlockEnd = fRunFileOffset + directSize;
 			fRun = indirect[fCurrent];
-			//printf("\tfCurrent = %ld, fRunFileOffset = %Ld, fRunBlockEnd = %Ld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
+			//printf("\tfCurrent = %ld, fRunFileOffset = %lld, fRunBlockEnd = %lld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
 		} else {
 			// access from indirect blocks
 
@@ -738,7 +738,7 @@ DataStream::FindBlockRun(off_t pos)
 
 			fRun = indirect[fCurrent];
 			//printf("reading from indirect block: %ld,%d\n",fRun.allocation_group,fRun.start);
-			//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
+			//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %lld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 		}
 	} else {
 		// access from direct blocks
@@ -761,7 +761,7 @@ DataStream::FindBlockRun(off_t pos)
 			return B_ERROR;
 
 		fRun = fInode->data.direct[fCurrent];
-		//printf("### run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
+		//printf("### run[%ld] = (%ld,%d,%d), offset = %lld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 	}
 	return B_OK;
 }
@@ -772,7 +772,7 @@ DataStream::ReadAt(off_t pos, void *buffer, size_t size)
 {
 	NodeGetter _(this);
 
-	//printf("DataStream::ReadAt(pos = %Ld,buffer = %p,size = %ld);\n",pos,buffer,size);
+	//printf("DataStream::ReadAt(pos = %lld,buffer = %p,size = %ld);\n",pos,buffer,size);
 	// truncate size to read
 	if (pos + (off_t)size > fInode->data.size) {
 		if (pos > fInode->data.size)	// reading outside the file
@@ -784,7 +784,7 @@ DataStream::ReadAt(off_t pos, void *buffer, size_t size)
 	}
 	ssize_t read = 0;
 
-	//printf("### read %ld bytes at %Ld\n",size,pos);
+	//printf("### read %ld bytes at %lld\n",size,pos);
 	while (size > 0) {
 		status_t status = FindBlockRun(pos);
 		if (status < B_OK)
@@ -792,7 +792,7 @@ DataStream::ReadAt(off_t pos, void *buffer, size_t size)
 
 		ssize_t bytes = min_c((off_t)size, fRunBlockEnd - pos);
 
-		//printf("### read %ld bytes from %Ld\n### --\n",bytes,fDisk->ToOffset(fRun) + pos - fRunFileOffset);
+		//printf("### read %ld bytes from %lld\n### --\n",bytes,fDisk->ToOffset(fRun) + pos - fRunFileOffset);
 		bytes = fDisk->ReadAt(fDisk->ToOffset(fRun) + pos - fRunFileOffset,
 			buffer, bytes);
 		if (bytes <= 0) {
@@ -831,7 +831,7 @@ DataStream::WriteAt(off_t pos, const void *buffer, size_t size)
 	}
 	ssize_t written = 0;
 
-	//printf("### write %ld bytes at %Ld\n",size,pos);
+	//printf("### write %ld bytes at %lld\n",size,pos);
 	while (size > 0) {
 		status_t status = FindBlockRun(pos);
 		if (status < B_OK)
@@ -839,7 +839,7 @@ DataStream::WriteAt(off_t pos, const void *buffer, size_t size)
 
 		ssize_t bytes = min_c((off_t)size, fRunBlockEnd - pos);
 
-		//printf("### write %ld bytes to %Ld\n### --\n",bytes,fDisk->ToOffset(fRun) + pos - fRunFileOffset);
+		//printf("### write %ld bytes to %lld\n### --\n",bytes,fDisk->ToOffset(fRun) + pos - fRunFileOffset);
 		bytes = fDisk->WriteAt(fDisk->ToOffset(fRun) + pos - fRunFileOffset,buffer,bytes);
 		if (bytes < 0)
 			return bytes;

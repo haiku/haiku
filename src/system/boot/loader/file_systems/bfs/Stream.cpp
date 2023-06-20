@@ -220,7 +220,7 @@ Stream::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			if (indirect == NULL)
 				return B_ERROR;
 
-			//printf("\tstart = %Ld, indirectSize = %ld, directSize = %ld, index = %ld\n",start,indirectSize,directSize,index);
+			//printf("\tstart = %lld, indirectSize = %ld, directSize = %ld, index = %ld\n",start,indirectSize,directSize,index);
 			//printf("\tlook for indirect block at %ld,%d\n",indirect[index].allocation_group,indirect[index].start);
 
 			int32 current = (start % indirectSize) / directSize;
@@ -233,7 +233,7 @@ Stream::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			run = indirect[current % runsPerBlock];
 			offset = data.MaxIndirectRange() + (index * indirectSize)
 				+ (current * directSize);
-			//printf("\tfCurrent = %ld, fRunFileOffset = %Ld, fRunBlockEnd = %Ld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
+			//printf("\tfCurrent = %ld, fRunFileOffset = %lld, fRunBlockEnd = %lld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
 		} else {
 			// access to indirect blocks
 
@@ -260,7 +260,7 @@ Stream::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 						offset = runBlockEnd
 							- ((uint32)run.Length() << cached.BlockShift());
 						//printf("reading from indirect block: %ld,%d\n",fRun.allocation_group,fRun.start);
-						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
+						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %lld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 						return fVolume.ValidateBlockRun(run);
 					}
 				}
@@ -281,11 +281,11 @@ Stream::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			if (runBlockEnd > pos) {
 				run = data.direct[current];
 				offset = runBlockEnd - ((uint32)run.Length() << fVolume.BlockShift());
-				//printf("### run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
+				//printf("### run[%ld] = (%ld,%d,%d), offset = %lld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
 				return fVolume.ValidateBlockRun(run);
 			}
 		}
-		//PRINT(("FindBlockRun() failed in direct range: size = %Ld, pos = %Ld\n",data.size,pos));
+		//PRINT(("FindBlockRun() failed in direct range: size = %lld, pos = %lld\n",data.size,pos));
 		return B_ENTRY_NOT_FOUND;
 	}
 	return fVolume.ValidateBlockRun(run);

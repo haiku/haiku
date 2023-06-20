@@ -68,7 +68,7 @@ File::Close(void *cookie)
 ssize_t
 File::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
-	TRACE(("FATFS::File::%s(, %Ld,, %d)\n", __FUNCTION__, pos, bufferSize));
+	TRACE(("FATFS::File::%s(, %lld,, %d)\n", __FUNCTION__, pos, bufferSize));
 	status_t err;
 	err = fStream.ReadAt(pos, buffer, &bufferSize);
 	if (err < B_OK)

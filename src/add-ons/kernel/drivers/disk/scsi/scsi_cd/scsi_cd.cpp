@@ -896,7 +896,7 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 static void
 cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize, uint32 physicalBlockSize)
 {
-	TRACE("cd_set_capacity(info = %p, capacity = %Ld, blockSize = %ld)\n",
+	TRACE("cd_set_capacity(info = %p, capacity = %lld, blockSize = %ld)\n",
 		info, capacity, blockSize);
 
 	if (info->block_size != blockSize) {

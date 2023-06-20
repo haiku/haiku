@@ -66,7 +66,7 @@ main()
 		return -1;
 	}
 
-	//printf("device: %ld, node: %Ld\n", nodeRef.device, nodeRef.node);
+	//printf("device: %ld, node: %lld\n", nodeRef.device, nodeRef.node);
 
 	// start looper
 	Looper& looper = *new Looper(nodeRef);

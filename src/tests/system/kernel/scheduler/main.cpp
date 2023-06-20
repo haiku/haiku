@@ -192,7 +192,7 @@ CPU::_Run()
 	thread_info info;
 	get_thread_info(find_thread(NULL), &info);
 
-	printf("CPU %d has halted, user %Ld, %ld rescheduled.\n",
+	printf("CPU %d has halted, user %lld, %ld rescheduled.\n",
 		fCPU.cpu_num, info.user_time, fRescheduleCount);
 	delete this;
 }

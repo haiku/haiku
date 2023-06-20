@@ -98,7 +98,7 @@ main(int argc, char *argv[])
 				i, status, strerror(status));
 			goto err;
 		}
-		TRACE("main: GetStreamInfo(stream = %d) result: %Ld frames, %.6f sec\n",
+		TRACE("main: GetStreamInfo(stream = %d) result: %lld frames, %.6f sec\n",
 			i, frameCount, duration / 1000000.0);
 	}
 
@@ -122,25 +122,25 @@ main(int argc, char *argv[])
 		TRACE("main: calling Seek(stream = %d, time %.6f forward)\n", i, time / 1000000.0);
 		status = reader->Seek(cookies[i],
 			B_MEDIA_SEEK_TO_TIME | B_MEDIA_SEEK_CLOSEST_FORWARD, &frame, &time);
-		TRACE("main: Seek result: time %.6f, frame %Ld\n", time / 1000000.0, frame);
+		TRACE("main: Seek result: time %.6f, frame %lld\n", time / 1000000.0, frame);
 
 		frame = 1000;
-		TRACE("main: calling Seek(stream = %d, frame %Ld forward)\n", i, frame);
+		TRACE("main: calling Seek(stream = %d, frame %lld forward)\n", i, frame);
 		status = reader->Seek(cookies[i],
 			B_MEDIA_SEEK_TO_FRAME | B_MEDIA_SEEK_CLOSEST_FORWARD, &frame, &time);
-		TRACE("main: Seek result: time %.6f, frame %Ld\n", time / 1000000.0, frame);
+		TRACE("main: Seek result: time %.6f, frame %lld\n", time / 1000000.0, frame);
 
 		time = 1000000; // 1 sec
 		TRACE("main: calling Seek(stream = %d, time %.6f backward)\n", i, time / 1000000.0);
 		status = reader->Seek(cookies[i],
 			B_MEDIA_SEEK_TO_TIME | B_MEDIA_SEEK_CLOSEST_BACKWARD, &frame, &time);
-		TRACE("main: Seek result: time %.6f, frame %Ld\n", time / 1000000.0, frame);
+		TRACE("main: Seek result: time %.6f, frame %lld\n", time / 1000000.0, frame);
 
 		frame = 1000;
-		TRACE("main: calling Seek(stream = %d, frame %Ld backward)\n", i, frame);
+		TRACE("main: calling Seek(stream = %d, frame %lld backward)\n", i, frame);
 		status = reader->Seek(cookies[i],
 			B_MEDIA_SEEK_TO_FRAME | B_MEDIA_SEEK_CLOSEST_BACKWARD, &frame, &time);
-		TRACE("main: Seek result: time %.6f, frame %Ld\n", time / 1000000.0, frame);
+		TRACE("main: Seek result: time %.6f, frame %lld\n", time / 1000000.0, frame);
 	}
 
 	for (int i = 0; i < streamCount; i++) {

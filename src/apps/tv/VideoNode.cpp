@@ -374,7 +374,7 @@ VideoNode::HandleBuffer(BBuffer *buffer)
 						 buffer->Data(), 
 						 fInput.format.u.raw_video.display.bytes_per_row);
 		}
-//		printf("overlay copy: %Ld usec\n", system_time() - start);
+//		printf("overlay copy: %lld usec\n", system_time() - start);
 	}
 	UnlockBitmap();
 

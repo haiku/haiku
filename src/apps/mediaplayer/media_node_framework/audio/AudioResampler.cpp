@@ -109,7 +109,7 @@ AudioResampler::InitialLatency() const
 status_t
 AudioResampler::Read(void* buffer, int64 pos, int64 frames)
 {
-	TRACE("AudioResampler::Read(%p, %Ld, %Ld)\n", buffer, pos, frames);
+	TRACE("AudioResampler::Read(%p, %lld, %lld)\n", buffer, pos, frames);
 
 	status_t error = InitCheck();
 	if (error != B_OK) {

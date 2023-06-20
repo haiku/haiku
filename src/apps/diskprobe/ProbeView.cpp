@@ -1520,7 +1520,7 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: 0x%0*Lx"),
 			size * 2, position);
 	} else {
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: %Ld (0x%0*Lx)"),
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: %lld (0x%0*Lx)"),
 			position, size * 2, position);
 	}
 
@@ -1534,7 +1534,7 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: 0x%0*Lx"),
 			size * 2, position);
 	} else {
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: %Ld (0x%0*Lx)"),
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: %lld (0x%0*Lx)"),
 			position, size * 2, position);
 	}
 
@@ -1562,7 +1562,7 @@ ProbeView::_UpdateBookmarkMenuItems()
 		if (fDataView->Base() == kHexBase)
 			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), block);
 		else
-			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %Ld (0x%Lx)"), block, block);
+			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %lld (0x%Lx)"), block, block);
 
 		item->SetLabel(buffer);
 	}
@@ -1602,7 +1602,7 @@ ProbeView::_AddBookmark(off_t position)
 	if (fDataView->Base() == kHexBase)
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), block);
 	else
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %Ld (0x%Lx)"), block, block);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %lld (0x%Lx)"), block, block);
 
 	BMessage* message;
 	item = new BMenuItem(buffer, message = new BMessage(kMsgPositionUpdate));

@@ -115,7 +115,7 @@ log_node_opened(void *vnode, int32 fdType, mount_id device, vnode_id parent,
 	log->node = node;
 	log->timestamp = system_time();
 
-	TRACE(("log: added entry %s, <%c%d> %ld:%Ld:%Ld:%s\n", log->team_name, log->action,
+	TRACE(("log: added entry %s, <%c%d> %ld:%lld:%lld:%s\n", log->team_name, log->action,
 		log->type, device, parent, node, log->file_name));
 
 	put_log_entry(log);
@@ -141,7 +141,7 @@ log_node_closed(void *vnode, int32 fdType, mount_id device, vnode_id node, int32
 
 	log->access_type = accessType;
 
-	TRACE(("log: added entry %s, <c%d> %ld:%Ld, %ld\n",
+	TRACE(("log: added entry %s, <c%d> %ld:%lld, %ld\n",
 		log->team_name, log->type, device, node, accessType));
 
 	put_log_entry(log);
@@ -196,7 +196,7 @@ log_node_launched(size_t argCount, char * const *args)
 		log->parent = -1;
 	}
 
-	TRACE(("log: added entry %s, <l> %ld:%Ld %s ...\n", log->team_name,
+	TRACE(("log: added entry %s, <l> %ld:%lld %s ...\n", log->team_name,
 		log->device, log->parent, args[0]));
 
 	put_log_entry(log);
@@ -272,7 +272,7 @@ log_writer_daemon(void *arg, int /*iteration*/)
 
 			switch (log->action) {
 				case 'l':	// launch
-					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" l %ld:%Ld %ld \"%s\" ",
+					length = snprintf(line, sizeof(line), "%ld: %lld \"%s\" l %ld:%lld %ld \"%s\" ",
 								log->team, log->timestamp, log->team_name,
 								log->device, log->parent, log->launch.parent,
 								log->launch.args[0]);
@@ -300,14 +300,14 @@ log_writer_daemon(void *arg, int /*iteration*/)
 					break;
 
 				case 'c':	// close
-					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" c%d %ld:%Ld %ld\n",
+					length = snprintf(line, sizeof(line), "%ld: %lld \"%s\" c%d %ld:%lld %ld\n",
 						log->team, log->timestamp, log->team_name, log->type,
 						log->device, log->node, log->access_type);
 					length = std::min(length, (ssize_t)sizeof(line) - 1);
 					break;
 
 				default:	// open, ?
-					length = snprintf(line, sizeof(line), "%ld: %Ld \"%s\" %c%d %ld:%Ld:%Ld:\"%s\"\n",
+					length = snprintf(line, sizeof(line), "%ld: %lld \"%s\" %c%d %ld:%lld:%lld:\"%s\"\n",
 						log->team, log->timestamp, log->team_name, log->action, log->type, log->device,
 						log->parent, log->node, log->file_name);
 					length = std::min(length, (ssize_t)sizeof(line) - 1);

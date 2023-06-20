@@ -211,7 +211,7 @@ cx23882_mpegts_int(cx23882_device *device)
 	
 	if (mstat & TS_INT_STAT_TS_RISC1) {
 		int32 count;
-//		dprintf("cx23882_mpegts_int buffer 1 at %Ld\n", system_time());
+//		dprintf("cx23882_mpegts_int buffer 1 at %lld\n", system_time());
 		device->capture_data = device->dma_buf1_virt;
 		device->capture_end_time = system_time();
 		get_sem_count(device->capture_sem, &count);
@@ -221,7 +221,7 @@ cx23882_mpegts_int(cx23882_device *device)
 
 	if (mstat & TS_INT_STAT_TS_RISC2) {
 		int32 count;
-//		dprintf("cx23882_mpegts_int buffer 2 at %Ld\n", system_time());
+//		dprintf("cx23882_mpegts_int buffer 2 at %lld\n", system_time());
 		device->capture_data = device->dma_buf2_virt;
 		device->capture_end_time = system_time();
 		get_sem_count(device->capture_sem, &count);

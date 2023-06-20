@@ -689,7 +689,7 @@ NumberEditor::_Format(char *buffer)
 			return B_OK;
 		case B_INT64_TYPE:
 		case B_OFF_T_TYPE:
-			strcpy(buffer, "%Ld");
+			strcpy(buffer, "%lld");
 			return B_OK;
 		case B_UINT64_TYPE:
 			strcpy(buffer, "%Lu");

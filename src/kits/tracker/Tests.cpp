@@ -238,11 +238,11 @@ IconSpewer::DrawSomeOld()
 	view->SetHighColor(0, 0, 0);
 	char buffer[256];
 	if (cycleTime) {
-		sprintf(buffer, "last cycle time %Ld ms", cycleTime/1000);
+		sprintf(buffer, "last cycle time %lld ms", cycleTime/1000);
 		view->DrawString(buffer, BPoint(20, bounds.bottom - 20));
 	}
 	if (numDrawn) {
-		sprintf(buffer, "average draw time %Ld us per icon",
+		sprintf(buffer, "average draw time %lld us per icon",
 			watch.ElapsedTime() / numDrawn);
 		view->DrawString(buffer, BPoint(20, bounds.bottom - 30));
 	}

@@ -541,7 +541,7 @@ init_driver(void)
 		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
 	}
-	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08x\n", system_time() - start, val));
+	LOG(("reset finished after %lld, ICH_REG_GLOB_CNT = 0x%08x\n", system_time() - start, val));
 
 	/* detect which codecs are ready */
 	s0cr = s1cr = s2cr = false;
@@ -550,15 +550,15 @@ init_driver(void)
 		val = ich_reg_read_32(ICH_REG_GLOB_STA);
 		if (!s0cr && (val & STA_S0CR)) {
 			s0cr = true;
-			LOG(("AC_SDIN0 codec ready after %Ld us\n",(system_time() - start)));
+			LOG(("AC_SDIN0 codec ready after %lld us\n",(system_time() - start)));
 		}
 		if (!s1cr && (val & STA_S1CR)) {
 			s1cr = true;
-			LOG(("AC_SDIN1 codec ready after %Ld us\n",(system_time() - start)));
+			LOG(("AC_SDIN1 codec ready after %lld us\n",(system_time() - start)));
 		}
 		if (!s2cr && (val & STA_S2CR)) {
 			s2cr = true;
-			LOG(("AC_SDIN2 codec ready after %Ld us\n",(system_time() - start)));
+			LOG(("AC_SDIN2 codec ready after %lld us\n",(system_time() - start)));
 		}
 		snooze(50000);
 	} while ((system_time() - start) < 1000000);
@@ -769,9 +769,9 @@ uninit_driver(void)
 	LOG(("uninit_driver()\n"));
 
 	#if DEBUG
-		if (chan_po) LOG(("chan_po frames_count = %Ld\n",chan_po->played_frames_count));
-		if (chan_pi) LOG(("chan_pi frames_count = %Ld\n",chan_pi->played_frames_count));
-		if (chan_mc) LOG(("chan_mc frames_count = %Ld\n",chan_mc->played_frames_count));
+		if (chan_po) LOG(("chan_po frames_count = %lld\n",chan_po->played_frames_count));
+		if (chan_pi) LOG(("chan_pi frames_count = %lld\n",chan_pi->played_frames_count));
+		if (chan_mc) LOG(("chan_mc frames_count = %lld\n",chan_mc->played_frames_count));
 	#endif
 	
 	/* reset all channels */

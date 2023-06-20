@@ -495,7 +495,7 @@ ResourceFile::WriteTest()
 	uint32 size = GetResourcesSize();
 	if (size != fFileSize) {
 		throw Exception("Calculated resources size differs from actual size "
-						"in file: %lu vs %Ld.", size, fFileSize);
+						"in file: %lu vs %lld.", size, fFileSize);
 	}
 	char* buffer1 = new char[size];
 	char* buffer2 = new char[size];
@@ -508,7 +508,7 @@ ResourceFile::WriteTest()
 				off_t filePosition = fFile.GetOffset() + i;
 				throw Exception("Written resources differ from those in file. "
 								"First difference at byte %lu (file position "
-								"%Ld): %x vs %x.", i, filePosition,
+								"%lld): %x vs %x.", i, filePosition,
 								(int)buffer1[i] & 0xff,
 								(int)buffer2[i] & 0xff);
 			}
@@ -534,7 +534,7 @@ ResourceFile::PrintToStream(bool longInfo)
 		printf("file type              : %s\n", kFileTypeNames[fFileType]);
 		printf("endianess              : %s\n",
 			   (fHostEndianess == (bool)B_HOST_IS_LENDIAN) ? "little" : "big");
-		printf("resource section offset: 0x%08Lx (%Ld)\n", resourcesOffset,
+		printf("resource section offset: 0x%08Lx (%lld)\n", resourcesOffset,
 			   resourcesOffset);
 		if (fInfoTableItem) {
 			int32 offset = fInfoTableItem->GetOffset();

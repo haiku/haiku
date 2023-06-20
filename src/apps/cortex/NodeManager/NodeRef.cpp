@@ -1693,7 +1693,7 @@ status_t NodeRef::_setRunMode(
 	assert_locked(this);
 
 	D_METHOD((
-		"NodeRef('%s')::_setRunMode(%ld : %Ld)\n",
+		"NodeRef('%s')::_setRunMode(%ld : %lld)\n",
 		name(), runMode, delay));
 	status_t err;
 
@@ -1766,7 +1766,7 @@ status_t NodeRef::_preroll(
 	assert_locked(this);
 
 	D_METHOD((
-		"NodeRef('%s')::_preroll(%Ld)\n",
+		"NodeRef('%s')::_preroll(%lld)\n",
 		name(), position));
 	status_t err;
 		
@@ -1867,7 +1867,7 @@ status_t NodeRef::_seekStopped(
 	assert_locked(this);
 	
 	D_METHOD((
-		"NodeRef('%s')::_seekStopped(to %Ld)\n",
+		"NodeRef('%s')::_seekStopped(to %lld)\n",
 		name(), position));	
 
 	if(m_running)
@@ -1887,7 +1887,7 @@ status_t NodeRef::_start(
 	assert_locked(this);
 
 	D_METHOD((
-		"NodeRef('%s')::_start(at %Ld)\n",
+		"NodeRef('%s')::_start(at %lld)\n",
 		name(), when));
 		
 	if(isRunning()) {
@@ -1978,7 +1978,7 @@ status_t NodeRef::_roll(
 	assert_locked(this);
 
 	D_METHOD((
-		"NodeRef('%s')::_roll(%Ld to %Ld, from %Ld)\n",
+		"NodeRef('%s')::_roll(%lld to %lld, from %lld)\n",
 		name(), start, stop, position));
 	status_t err;
 
@@ -2224,8 +2224,8 @@ status_t NodeRef::_schedulePositionUpdate(
 //
 ////	PRINT((
 ////		"NodeRef::_schedulePositionUpdate():\n"
-////		"  when     = %Ld\n"
-////		"  position = %Ld\n",
+////		"  when     = %lld\n"
+////		"  position = %lld\n",
 ////		when, position));
 //
 //	m_positionSyncThread->setPosition(position);

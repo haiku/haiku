@@ -121,7 +121,7 @@ dumpLogEntry(int device, disk_super_block &superBlock, int32 &start, uint8 *bloc
 			+ blockStart++ % superBlock.log_blocks.Length();
 		if (read_pos(device, blockNumber << superBlock.BlockShift(),
 				block, blockSize) != blockSize) {
-			fprintf(stderr, "%s: could not read block %Ld.\n", sProgramName, blockNumber);
+			fprintf(stderr, "%s: could not read block %lld.\n", sProgramName, blockNumber);
 			exit(-1);
 		}
 
@@ -136,7 +136,7 @@ dumpLogEntry(int device, disk_super_block &superBlock, int32 &start, uint8 *bloc
 
 			start += arrayBlocks + count;
 
-			printf("Entry %ld contains %Ld blocks (entry starts at block %Ld):\n", entry, count, blockNumber);
+			printf("Entry %ld contains %lld blocks (entry starts at block %lld):\n", entry, count, blockNumber);
 			first = false;
 		} else
 			indexOffset += arraySize;
@@ -147,7 +147,7 @@ dumpLogEntry(int device, disk_super_block &superBlock, int32 &start, uint8 *bloc
 				break;
 
 			off_t value = array[arrayIndex];
-			printf("%7ld: %Ld%s\n", index, value, value == 0 ? " (superblock)" :
+			printf("%7ld: %lld%s\n", index, value, value == 0 ? " (superblock)" :
 				value < bitmapSize + 1 ? " (bitmap block)" : "");
 
 			if (data != NULL) {
@@ -155,7 +155,7 @@ dumpLogEntry(int device, disk_super_block &superBlock, int32 &start, uint8 *bloc
 					+ ((dataStart + index) % superBlock.log_blocks.Length());
 				if (read_pos(device, blockNumber << superBlock.BlockShift(),
 						data, blockSize) != blockSize) {
-					fprintf(stderr, "%s: could not read block %Ld.\n", sProgramName, blockNumber);
+					fprintf(stderr, "%s: could not read block %lld.\n", sProgramName, blockNumber);
 				} else
 					dumpBlock((char *)data, blockSize);
 			}
@@ -223,7 +223,7 @@ main(int argc, char **argv)
 	}
 
 	off_t bitmapSize = superBlock.AllocationGroups() * superBlock.BlocksPerAllocationGroup();
-	printf("Log area = (%Ld - %Ld), current start = %Ld, end = %Ld, %Ld bitmap blocks\n",
+	printf("Log area = (%lld - %lld), current start = %lld, end = %lld, %lld bitmap blocks\n",
 		toBlock(superBlock, superBlock.log_blocks),
 		toBlock(superBlock, superBlock.log_blocks) + superBlock.log_blocks.Length(),
 		superBlock.LogStart(), superBlock.LogEnd(), bitmapSize);

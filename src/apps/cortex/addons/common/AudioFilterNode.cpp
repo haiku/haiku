@@ -495,7 +495,7 @@ void AudioFilterNode::BufferReceived(
 //	bigtime_t delta = now - m_tpLastReceived;
 //	m_tpLastReceived = now;
 //	PRINT((
-//		"### delta: %Ld (%Ld)\n",
+//		"### delta: %lld (%lld)\n",
 //		delta, buffer->Header()->start_time - now));
 
 	// fetch outbound buffer if needed
@@ -781,7 +781,7 @@ void AudioFilterNode::Connect(
 //
 //	// figure processing time
 //	m_processingLatency = calcProcessingLatency();
-//	PRINT(("\tprocessing latency = %Ld\n", m_processingLatency));
+//	PRINT(("\tprocessing latency = %lld\n", m_processingLatency));
 //	
 //	// store summed latency
 //	SetEventLatency(m_downstreamLatency + m_processingLatency);

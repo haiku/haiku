@@ -1261,7 +1261,7 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
         /* we can call hash_lookup() here because we know it's around */
         ce = hash_lookup(&bc.ht, dev, blocks[i]);
         if (ce == NULL) {
-            beos_panic("*** set_block_info can't find bnum %Ld!\n", blocks[i]);
+            beos_panic("*** set_block_info can't find bnum %lld!\n", blocks[i]);
             UNLOCK(bc.lock);
             return ENOENT;   /* hopefully this doesn't happen... */
         }
@@ -1269,7 +1269,7 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
         ce->flags &= ~(CE_DIRTY | CE_BUSY);
 
         if (ce->func != NULL) {
-            beos_panic("*** set_block_info non-null callback on bnum %Ld\n",
+            beos_panic("*** set_block_info non-null callback on bnum %lld\n",
                     ce->block_num);
         }
 
@@ -1280,7 +1280,7 @@ beos_set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
 
         ce->clone = (void *)malloc(ce->bsize);
         if (ce->clone == NULL)
-            beos_panic("*** can't clone bnum %Ld (bsize %d)\n",
+            beos_panic("*** can't clone bnum %lld (bsize %d)\n",
                     ce->block_num, ce->bsize);
 
 
@@ -1770,10 +1770,10 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
     /* some sanity checks first */
     if (bsize == 0)
-        beos_panic("cache_io: block size == 0 for bnum %Ld?!?\n", bnum);
+        beos_panic("cache_io: block size == 0 for bnum %lld?!?\n", bnum);
 
     if (num_blocks == 0)
-        beos_panic("cache_io: bnum %Ld has num_blocks == 0!\n", bnum);
+        beos_panic("cache_io: bnum %lld has num_blocks == 0!\n", bnum);
 
     if (data == NULL && dataptr == NULL) {
         printf("major butthead move: "
@@ -1784,7 +1784,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 
     if (data == NULL) {
         if (num_blocks != 1)    /* get_block() should never do that */
-            beos_panic("cache_io: num_blocks %Ld but should be 1\n",
+            beos_panic("cache_io: num_blocks %lld but should be 1\n",
                   num_blocks);
 
         if (op & CACHE_WRITE)
@@ -1838,8 +1838,8 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 if (ce) {
                     if (tmp != ce->block_num || dev != ce->dev) {
                         UNLOCK(bc.lock);
-                        beos_panic("*** error4: looked up dev %d block %Ld but "
-                                "found %d %Ld\n", dev, tmp, ce->dev,
+                        beos_panic("*** error4: looked up dev %d block %lld but "
+                                "found %d %lld\n", dev, tmp, ce->dev,
                                 ce->block_num);
                     }
 
@@ -1858,8 +1858,8 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 if (ce) {
                     if (tmp != ce->block_num || dev != ce->dev) {
                         UNLOCK(bc.lock);
-                        beos_panic("*** error5: looked up dev %d block %Ld but "
-                                "found %d %Ld\n", dev, tmp, ce->dev,
+                        beos_panic("*** error5: looked up dev %d block %lld but "
+                                "found %d %lld\n", dev, tmp, ce->dev,
                                 ce->block_num);
                         return EBADF;
                     }

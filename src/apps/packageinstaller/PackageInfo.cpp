@@ -600,7 +600,7 @@ PackageInfo::Parse()
 					}
 					swap_data(B_UINT64_TYPE, &size, sizeof(uint64),
 						B_SWAP_BENDIAN_TO_HOST);
-					parser_debug("DQSz - %Ld\n", size);
+					parser_debug("DQSz - %lld\n", size);
 				} else if (!memcmp(buffer, "DQMi", 5)) {
 					// TODO actually check if the query finds a file with
 					// size found previously

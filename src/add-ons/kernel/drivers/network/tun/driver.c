@@ -352,7 +352,7 @@ tun_deselect(cookie_t *cookie, uint8 event, selectsync *sync)
 status_t
 tun_readv(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size_t *numBytes)
 {
-	dprintf("tun: readv(, %Ld, , %ld)\n", position, count);
+	dprintf("tun: readv(, %lld, , %ld)\n", position, count);
 	return EOPNOTSUPP;
 }
 
@@ -360,7 +360,7 @@ tun_readv(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size
 status_t
 tun_writev(cookie_t *cookie, off_t position, const iovec *vec, size_t count, size_t *numBytes)
 {
-	dprintf("tun: writev(, %Ld, , %ld)\n", position, count);
+	dprintf("tun: writev(, %lld, , %ld)\n", position, count);
 	return EOPNOTSUPP;
 }
 

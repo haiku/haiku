@@ -1208,7 +1208,7 @@ VMCache::Resize(off_t newSize, int priority)
 status_t
 VMCache::Rebase(off_t newBase, int priority)
 {
-	TRACE(("VMCache::Rebase(cache %p, newBase %Ld) old base %Ld\n",
+	TRACE(("VMCache::Rebase(cache %p, newBase %lld) old base %lld\n",
 		this, newBase, this->virtual_base));
 	this->AssertLocked();
 

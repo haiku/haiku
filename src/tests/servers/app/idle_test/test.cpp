@@ -5,6 +5,6 @@
 int main() 
 {
 	BApplication app("application/x-vnd.idle-test");
-	printf("idle_time() : %Ld\n", idle_time());
+	printf("idle_time() : %lld\n", idle_time());
 }
 

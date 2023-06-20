@@ -25,10 +25,10 @@
 
 #define TEST_BLOCK_DATA(block, number, type) \
 	if ((block)->type ## _data != NULL && gBlocks[(number)]. type == 0) \
-		error(line, "Block %Ld: " #type " should be NULL!", (number)); \
+		error(line, "Block %lld: " #type " should be NULL!", (number)); \
 	if ((block)->type ## _data != NULL && gBlocks[(number)]. type != 0 \
 		&& *(int32*)(block)->type ## _data != gBlocks[(number)]. type) { \
-		error(line, "Block %Ld: " #type " wrong (0x%lx should be 0x%lx)!", \
+		error(line, "Block %lld: " #type " wrong (0x%lx should be 0x%lx)!", \
 			(number), *(int32*)(block)->type ## _data, \
 			gBlocks[(number)]. type); \
 	}
@@ -192,14 +192,14 @@ test_blocks(off_t number, int32 count, int32 line)
 		cached_block* block = (cached_block*)hash_lookup(gCache->hash, &number);
 		if (block == NULL) {
 			if (gBlocks[number].present)
-				error(line, "Block %Ld not found!", number);
+				error(line, "Block %lld not found!", number);
 			continue;
 		}
 		if (!gBlocks[number].present)
-			error(line, "Block %Ld is present, but should not!", number);
+			error(line, "Block %lld is present, but should not!", number);
 
 		if (block->is_dirty != gBlocks[number].is_dirty) {
-			error(line, "Block %Ld: dirty bit differs (is %d should be %d)!",
+			error(line, "Block %lld: dirty bit differs (is %d should be %d)!",
 				number, block->is_dirty, gBlocks[number].is_dirty);
 		}
 #if 0
@@ -209,11 +209,11 @@ test_blocks(off_t number, int32 count, int32 line)
 		}
 #endif
 		if (block->discard != gBlocks[number].discard) {
-			error(line, "Block %Ld: discard bit differs (is %d should be %d)!",
+			error(line, "Block %lld: discard bit differs (is %d should be %d)!",
 				number, block->discard, gBlocks[number].discard);
 		}
 		if (gBlocks[number].write && !gBlocks[number].written)
-			error(line, "Block %Ld: has not been written yet!", number);
+			error(line, "Block %lld: has not been written yet!", number);
 
 		TEST_BLOCK_DATA(block, number, current);
 		TEST_BLOCK_DATA(block, number, original);

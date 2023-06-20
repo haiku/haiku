@@ -340,7 +340,7 @@ VideoNode::HandleBuffer(BBuffer *buffer)
 		} else {
 			memcpy(fBitmap->Bits(), buffer->Data(), fBitmap->BitsLength());
 		}
-//		printf("overlay copy: %Ld usec\n", system_time() - start);
+//		printf("overlay copy: %lld usec\n", system_time() - start);
 	}
 	UnlockBitmap();
 

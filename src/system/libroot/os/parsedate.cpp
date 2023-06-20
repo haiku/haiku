@@ -934,7 +934,7 @@ parsedate_etc(const char* dateString, time_t now, int* _flags)
 		parsed_element e = elements[index];
 
 		printf("  %ld: type = %u, base_type = %u, unit = %u, flags = %u, "
-			"modifier = %u, value = %Ld (%s)\n", index, e.type, e.base_type,
+			"modifier = %u, value = %lld (%s)\n", index, e.type, e.base_type,
 			e.unit, e.flags, e.modifier, e.value,
 			e.value_type == VALUE_NUMERICAL ? "numerical"
 				: (e.value_type == VALUE_STRING ? "string" : "char"));

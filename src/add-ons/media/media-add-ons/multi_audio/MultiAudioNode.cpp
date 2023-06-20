@@ -1194,7 +1194,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 			else
 				channel->fBuffer = buffer;
 		} else {
-			//PRINT(("MultiAudioNode::HandleBuffer writing channelId: %li, how_early:%Ld\n", channel->fChannelId, howEarly));
+			//PRINT(("MultiAudioNode::HandleBuffer writing channelId: %li, how_early:%lld\n", channel->fChannelId, howEarly));
 			channel->fBuffer = buffer;
 		}
 	}
@@ -1799,8 +1799,8 @@ MultiAudioNode::_OutputThread()
 		fDevice->BufferExchange(&bufferInfo);
 
 		//PRINT(("MultiAudioNode::RunThread: buffer exchanged\n"));
-		//PRINT(("MultiAudioNode::RunThread: played_real_time: %Ld\n", bufferInfo.played_real_time));
-		//PRINT(("MultiAudioNode::RunThread: played_frames_count: %Ld\n", bufferInfo.played_frames_count));
+		//PRINT(("MultiAudioNode::RunThread: played_real_time: %lld\n", bufferInfo.played_real_time));
+		//PRINT(("MultiAudioNode::RunThread: played_frames_count: %lld\n", bufferInfo.played_frames_count));
 		//PRINT(("MultiAudioNode::RunThread: buffer_cycle: %li\n", bufferInfo.playback_buffer_cycle));
 
 		for (int32 i = 0; i < fInputs.CountItems(); i++) {

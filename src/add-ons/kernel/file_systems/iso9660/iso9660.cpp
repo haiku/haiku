@@ -691,7 +691,7 @@ ISOMount(const char *path, uint32 flags, iso9660_volume **_newVolume,
 					maxBlocks = volume->volSpaceSize[FS_DATA_FORMAT];
 
 				/* Initialize access to the cache so that we can do cached i/o */
-				TRACE(("ISO9660: cache init: dev %d, max blocks %Ld\n", volume->fd, maxBlocks));
+				TRACE(("ISO9660: cache init: dev %d, max blocks %lld\n", volume->fd, maxBlocks));
 				volume->fBlockCache = block_cache_create(volume->fd, maxBlocks,
 					volume->logicalBlkSize[FS_DATA_FORMAT], true);
 				isISO = true;
@@ -802,8 +802,8 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 				if (node.name_length <= nameBufferSize) {
 					// need to do some size checking here.
 					strlcpy(dirent->d_name, node.name, node.name_length + 1);
-					TRACE(("ISOReadDirEnt  - success, name is %s, block %Ld, "
-						"pos %Ld, inode id %Ld\n", dirent->d_name, cookie->block,
+					TRACE(("ISOReadDirEnt  - success, name is %s, block %lld, "
+						"pos %lld, inode id %lld\n", dirent->d_name, cookie->block,
 						cookie->pos, dirent->d_ino));
 				} else {
 					// TODO: this can be just normal if we support reading more

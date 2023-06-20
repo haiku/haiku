@@ -1488,10 +1488,10 @@ pcm_write(
 		{
 			bigtime_t delta = system_time() - the_time;
 			if (delta < 1) {
-				ddprintf(("cmedia_pci: delta %Ld (low!) #%ld\n", delta, put_cnt));
+				ddprintf(("cmedia_pci: delta %lld (low!) #%ld\n", delta, put_cnt));
 			}
 			else if (delta > 2000) {
-				ddprintf(("cmedia_pci: delta %Ld (high!) #%ld\n", delta, put_cnt));
+				ddprintf(("cmedia_pci: delta %lld (high!) #%ld\n", delta, put_cnt));
 			}
 		}
 		if (put_cnt != int_cnt) {

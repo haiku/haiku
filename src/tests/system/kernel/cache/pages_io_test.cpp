@@ -143,7 +143,7 @@ file_map::Add(file_io_vec *vecs, size_t vecCount, off_t &lastOffset)
 #ifdef TRACE_FILE_CACHE
 	for (uint32 i = 0; i < count; i++) {
 		file_extent *extent = ExtentAt(i);
-		dprintf("  [%ld] extend offset %Ld, disk offset %Ld, length %Ld\n",
+		dprintf("  [%ld] extend offset %lld, disk offset %lld, length %lld\n",
 			i, extent->offset, extent->disk.offset, extent->disk.length);
 	}
 #endif
@@ -255,7 +255,7 @@ vfs_get_file_map(void *vnode, off_t offset, size_t size, file_io_vec *vecs,
 	size_t max = *_count;
 	uint32 index = 0;
 
-	printf("vfs_get_file_map(offset = %Ld, size = %lu, count = %lu)\n",
+	printf("vfs_get_file_map(offset = %lld, size = %lu, count = %lu)\n",
 		offset, size, *_count);
 
 	while (true) {
@@ -296,7 +296,7 @@ static status_t
 vfs_read_pages(void *device, void *cookie, off_t offset,
 	const iovec *vecs, size_t count, size_t *bytes, bool kernel)
 {
-	printf("read offset %Ld, length %lu\n", offset, *bytes);
+	printf("read offset %lld, length %lu\n", offset, *bytes);
 	for (uint32 i = 0; i < count; i++) {
 		printf("  [%lu] base %lu, length %lu\n",
 			i, (uint32)vecs[i].iov_base, vecs[i].iov_len);
@@ -309,7 +309,7 @@ static status_t
 vfs_write_pages(void *device, void *cookie, off_t offset,
 	const iovec *vecs, size_t count, size_t *bytes, bool kernel)
 {
-	printf("write offset %Ld, length %lu\n", offset, *bytes);
+	printf("write offset %lld, length %lu\n", offset, *bytes);
 	for (uint32 i = 0; i < count; i++) {
 		printf("  [%lu] base %lu, length %lu\n",
 			i, (uint32)vecs[i].iov_base, vecs[i].iov_len);
@@ -445,7 +445,7 @@ static status_t
 pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	size_t *_numBytes, bool doWrite)
 {
-	TRACE(("pages_io: ref = %p, offset = %Ld, size = %lu, vecCount = %lu, %s\n", ref, offset,
+	TRACE(("pages_io: ref = %p, offset = %lld, size = %lu, vecCount = %lu, %s\n", ref, offset,
 		*_numBytes, count, doWrite ? "write" : "read"));
 
 	// translate the iovecs into direct device accesses
@@ -456,7 +456,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	status_t status = get_file_map(ref, offset, numBytes, fileVecs,
 		&fileVecCount);
 	if (status < B_OK && status != B_BUFFER_OVERFLOW) {
-		TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed: %s\n", offset,
+		TRACE(("get_file_map(offset = %lld, numBytes = %lu) failed: %s\n", offset,
 			numBytes, strerror(status)));
 		return status;
 	}
@@ -464,10 +464,10 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	bool bufferOverflow = status == B_BUFFER_OVERFLOW;
 
 #ifdef TRACE_FILE_CACHE
-	dprintf("got %lu file vecs for %Ld:%lu%s:\n", fileVecCount, offset, numBytes,
+	dprintf("got %lu file vecs for %lld:%lu%s:\n", fileVecCount, offset, numBytes,
 		bufferOverflow ? " (array too small)" : "");
 	for (size_t i = 0; i < fileVecCount; i++) {
-		dprintf("  [%lu] offset = %Ld, size = %Ld\n",
+		dprintf("  [%lu] offset = %lld, size = %lld\n",
 			i, fileVecs[i].offset, fileVecs[i].length);
 	}
 #endif
@@ -475,7 +475,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 	if (fileVecCount == 0) {
 		// There are no file vecs at this offset, so we're obviously trying
 		// to access the file outside of its bounds
-		TRACE(("pages_io: access outside of vnode %p at offset %Ld\n",
+		TRACE(("pages_io: access outside of vnode %p at offset %lld\n",
 			ref->vnode, offset));
 		return B_BAD_VALUE;
 	}
@@ -546,7 +546,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 			off_t fileOffset = fileVec.offset;
 			off_t fileLeft = min_c(fileVec.length, bytesLeft);
 
-			TRACE(("FILE VEC [%lu] length %Ld\n", fileVecIndex, fileLeft));
+			TRACE(("FILE VEC [%lu] length %lld\n", fileVecIndex, fileLeft));
 
 			// process the complete fileVec
 			while (fileLeft > 0) {
@@ -615,7 +615,7 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 			status = get_file_map(ref, offset + totalSize, bytesLeft, fileVecs,
 				&fileVecCount);
 			if (status < B_OK && status != B_BUFFER_OVERFLOW) {
-				TRACE(("get_file_map(offset = %Ld, numBytes = %lu) failed: %s\n",
+				TRACE(("get_file_map(offset = %lld, numBytes = %lu) failed: %s\n",
 					offset, numBytes, strerror(status)));
 				return status;
 			}
@@ -624,11 +624,11 @@ pages_io(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
 			fileVecIndex = 0;
 
 #ifdef TRACE_FILE_CACHE
-			dprintf("got %lu file vecs for %Ld:%lu%s:\n", fileVecCount,
+			dprintf("got %lu file vecs for %lld:%lu%s:\n", fileVecCount,
 				offset + totalSize, numBytes,
 				bufferOverflow ? " (array too small)" : "");
 			for (size_t i = 0; i < fileVecCount; i++) {
-				dprintf("  [%lu] offset = %Ld, size = %Ld\n",
+				dprintf("  [%lu] offset = %lld, size = %lld\n",
 					i, fileVecs[i].offset, fileVecs[i].length);
 			}
 #endif

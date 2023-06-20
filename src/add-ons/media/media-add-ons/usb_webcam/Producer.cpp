@@ -1006,7 +1006,7 @@ VideoProducer::FrameGenerator()
 		fStats[0].actual++;;
 		fStats[0].stamp = system_time();
 
-		//PRINTF(1, ("FrameGenerator: stamp %Ld vs %Ld\n", stamp, h->start_time));
+		//PRINTF(1, ("FrameGenerator: stamp %lld vs %lld\n", stamp, h->start_time));
 		//XXX: that's what we should be doing, but CodyCam drops all frames as they are late. (maybe add latency ??)
 		//h->start_time = TimeSource()->PerformanceTimeFor(stamp);
 		h->start_time = TimeSource()->PerformanceTimeFor(system_time());

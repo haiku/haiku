@@ -620,7 +620,7 @@ NodeManager::_StartNodes()
 			print_error("error getting latency for video producer",
 				status);
 		} else
-			TRACE("video latency: %Ld\n", latency);
+			TRACE("video latency: %lld\n", latency);
 		status = fMediaRoster->SetProducerRunModeDelay(
 			fVideoConnection.producer, latency);
 		if (status < B_OK) {
@@ -643,7 +643,7 @@ NodeManager::_StartNodes()
 		bigtime_t audioLatency = 0;
 		status = fMediaRoster->GetLatencyFor(fAudioConnection.producer,
 			&audioLatency);
-		TRACE("audio latency: %Ld\n", audioLatency);
+		TRACE("audio latency: %lld\n", audioLatency);
 	}
 
 	BTimeSource* timeSource;

@@ -141,7 +141,7 @@ AVCodecDecoder::~AVCodecDecoder()
 
 #if DO_PROFILING
 	if (profileCounter > 0) {
-		printf("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
+		printf("[%c] profile: d1 = %lld, d2 = %lld (%lld)\n",
 			fIsAudio?('a'):('v'), decodingTime / profileCounter,
 			conversionTime / profileCounter, fFrame);
 	}
@@ -1305,7 +1305,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 	conversionTime += doneTime - formatConversionStart;
 	profileCounter++;
 	if (!(fFrame % 5)) {
-		printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required %Ld\n",
+		printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required %lld\n",
 			decodingTime / profileCounter, conversionTime / profileCounter,
 			fFrame, bigtime_t(1000000LL / fOutputFrameRate));
 		decodingTime = 0;

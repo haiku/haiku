@@ -417,7 +417,7 @@ status_t ESDSinkNode::GetLatencyFor(
 	if (netl > 500000)
 		netl = 500000;
 	*out_latency = intl + netl;
-	fprintf(stderr, "int latency %Ld, net latency %Ld, total latency %Ld\n", intl, netl, *out_latency);
+	fprintf(stderr, "int latency %lld, net latency %lld, total latency %lld\n", intl, netl, *out_latency);
 	*out_timesource = TimeSource()->ID();
 	return B_OK;
 }
@@ -750,10 +750,10 @@ ESDSinkNode::Connect(status_t error, const media_source& source, const media_des
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(channel->fOutput.destination, &fLatency, &id);
-	PRINT(("\tdownstream latency = %Ld\n", fLatency));
+	PRINT(("\tdownstream latency = %lld\n", fLatency));
 
 	fInternalLatency = BufferDuration();
-	PRINT(("\tbuffer-filling took %Ld usec on this machine\n", fInternalLatency));
+	PRINT(("\tbuffer-filling took %lld usec on this machine\n", fInternalLatency));
 	//SetEventLatency(fLatency + fInternalLatency);
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
@@ -828,7 +828,7 @@ ESDSinkNode::LateNoticeReceived(const media_source& what, bigtime_t how_much, bi
 		fInternalLatency += how_much;
 		SetEventLatency(fLatency + fInternalLatency);
 
-		fprintf(stderr, "\tincreasing latency to %Ld\n", fLatency + fInternalLatency);
+		fprintf(stderr, "\tincreasing latency to %lld\n", fLatency + fInternalLatency);
 	}
 	else
 	{

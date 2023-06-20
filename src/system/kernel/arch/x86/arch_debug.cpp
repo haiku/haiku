@@ -212,7 +212,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			case B_INT64_TYPE:
 				value = read_function_argument_value<int64>(arg, valueKnown);
 				if (valueKnown)
-					kprintf("int64: \33[34m%Ld\33[0m", value);
+					kprintf("int64: \33[34m%lld\33[0m", value);
 				break;
 			case B_INT32_TYPE:
 				value = read_function_argument_value<int32>(arg, valueKnown);

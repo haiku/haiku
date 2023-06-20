@@ -92,11 +92,11 @@ TransportStreamDemux::ProcessPacket(const mpeg_ts_packet *pkt, bigtime_t start_t
 {
 	fCount++;
 	
-//	printf("ProcessPacket %Ld\n", fCount);
+//	printf("ProcessPacket %lld\n", fCount);
 	
 	if (pkt->SyncByte() != 0x47) {
 //		fCountInvalid++;
-		printf("packet %Ld sync byte error "
+		printf("packet %lld sync byte error "
 			   "%02x %02x %02x %02x %02x %02x %02x %02x "
 			   "%02x %02x %02x %02x %02x %02x %02x %02x\n", fCount,
 		pkt->header[0], pkt->header[1], pkt->header[2], pkt->header[3],
@@ -108,7 +108,7 @@ TransportStreamDemux::ProcessPacket(const mpeg_ts_packet *pkt, bigtime_t start_t
 
 //	if (pkt->TransportError()) {
 //		fCountInvalid++;
-//		printf("invalid packet %Ld (transport_error_indicator)\n", fCount);
+//		printf("invalid packet %lld (transport_error_indicator)\n", fCount);
 //		return;
 //	}
 
@@ -156,10 +156,10 @@ TransportStreamDemux::ProcessPCR(const mpeg_ts_packet *pkt, bigtime_t start_time
 		| (pkt->data[6] >> 7);
 	pcr *= 300;
 	pcr += (pkt->data[6] & 1) | pkt->data[7];
-//	printf("    pcr = %Ld\n", pcr);
+//	printf("    pcr = %lld\n", pcr);
 
 //	bigtime_t now = system_time();
-//	printf("system_time %.3f, PCR-time %.3f, delta %.06f, PCR %Ld\n", now / 1e6, CLOCK_TO_USEC(pcr) / 1e6, (CLOCK_TO_USEC(pcr) - now) / 1e6, pcr);
+//	printf("system_time %.3f, PCR-time %.3f, delta %.06f, PCR %lld\n", now / 1e6, CLOCK_TO_USEC(pcr) / 1e6, (CLOCK_TO_USEC(pcr) - now) / 1e6, pcr);
 
 //	atomic_set64(&fCurrentTime, CLOCK_TO_USEC(pcr));
 
@@ -247,7 +247,7 @@ TransportStreamDemux::ProcessAUD(const mpeg_ts_packet *pkt)
 				| (data[12] << 7) | (data[13] >> 1);
 			pts *= 300;
 		       
-//		    printf("vid pts = %Ld\n", pts);
+//		    printf("vid pts = %lld\n", pts);
 
 			if (data[7] & 0x40) { // DTS
 		
@@ -256,7 +256,7 @@ TransportStreamDemux::ProcessAUD(const mpeg_ts_packet *pkt)
 					| (data[17] << 7) | (data[18] >> 1);
 				dts *= 300;
 
-//				printf("aud dts = %Ld\n", dts);
+//				printf("aud dts = %lld\n", dts);
 			} else {
 				dts = pts;
 			}
@@ -358,7 +358,7 @@ TransportStreamDemux::ProcessVID(const mpeg_ts_packet *pkt)
 				| (data[12] << 7) | (data[13] >> 1);
 			pts *= 300;
 		       
-//		    printf("vid pts = %Ld\n", pts);
+//		    printf("vid pts = %lld\n", pts);
 
 			if (data[7] & 0x40) { // DTS
 		
@@ -367,8 +367,8 @@ TransportStreamDemux::ProcessVID(const mpeg_ts_packet *pkt)
 					| (data[17] << 7) | (data[18] >> 1);
 				dts *= 300;
 
-//				printf("vid dts = %Ld\n", dts);
-//				printf("dts = %Ld, pts = %Ld, delta %Ld ### dts = %Ld, pts = %Ld, delta %Ld\n", 
+//				printf("vid dts = %lld\n", dts);
+//				printf("dts = %lld, pts = %lld, delta %lld ### dts = %lld, pts = %lld, delta %lld\n", 
 //						dts, pts, pts - dts, CLOCK_TO_USEC(dts), CLOCK_TO_USEC(pts), CLOCK_TO_USEC(pts - dts));
 			} else {
 				dts = pts;

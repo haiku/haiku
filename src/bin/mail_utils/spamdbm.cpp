@@ -189,7 +189,7 @@
  * Ooops, int64 doesn't exist, use long long instead.
  *
  * Revision 1.79  2003/04/07 19:05:22  agmsmith
- * Now with Allen Brunson's atoll for PPC (you need the %Ld, but that
+ * Now with Allen Brunson's atoll for PPC (you need the %lld, but that
  * becomes %lld on other systems).
  *
  * Revision 1.78  2003/04/04 22:43:53  agmsmith

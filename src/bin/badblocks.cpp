@@ -46,18 +46,18 @@ int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 	for (; block <= endBlock; block += group, at += len) {
 		int got;
 		if (progress)
-			fprintf(stderr, "checking block %Ld\x1b[1A\n", block);
+			fprintf(stderr, "checking block %lld\x1b[1A\n", block);
 		got = pread(fd, buffer, len, at);
 		if (got == len)
 			continue;
 		if (got >= 0) {
 			if (verbose)
-				fprintf(stderr, "block %Ld (offset %Ld): got %d < %zd\n",
+				fprintf(stderr, "block %lld (offset %lld): got %d < %zd\n",
 					block, at, got, len);
 			break;
 		}
 		if (got < 0) {
-			fprintf(stderr, "block %Ld: error: %s\n", block, strerror(errno));
+			fprintf(stderr, "block %lld: error: %s\n", block, strerror(errno));
 			/*
 			if (errno != EIO && errno != ENXIO) {
 				perror("pread");
@@ -72,10 +72,10 @@ int scan_device(const char *dev, off_t startBlock, off_t endBlock)
 				continue;
 			if (got < blockSize) {
 				if (got < 0)
-					fprintf(stderr, "block %Ld: error: %s\n", block + i, strerror(errno));
+					fprintf(stderr, "block %lld: error: %s\n", block + i, strerror(errno));
 				else
-					fprintf(stderr, "block %Ld: read %d bytes\n", block + i, got);
-				fprintf(outputFile, "%Ld\n", block + i);
+					fprintf(stderr, "block %lld: read %d bytes\n", block + i, got);
+				fprintf(outputFile, "%lld\n", block + i);
 				fflush(stdout);
 			}
 		}

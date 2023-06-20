@@ -689,7 +689,7 @@ pc_serial_open(const char *name, uint32 flags, void **cookie)
 status_t
 pc_serial_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
-	TRACE_FUNCALLS("> pc_serial_read(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
+	TRACE_FUNCALLS("> pc_serial_read(0x%08x, %lld, 0x%08x, %d)\n", cookie,
 		position, buffer, *numBytes);
 	SerialDevice *device = (SerialDevice *)cookie;
 	return device->Read((char *)buffer, numBytes);
@@ -701,7 +701,7 @@ status_t
 pc_serial_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	TRACE_FUNCALLS("> pc_serial_write(0x%08x, %Ld, 0x%08x, %d)\n", cookie,
+	TRACE_FUNCALLS("> pc_serial_write(0x%08x, %lld, 0x%08x, %d)\n", cookie,
 		position, buffer, *numBytes);
 	SerialDevice *device = (SerialDevice *)cookie;
 	return device->Write((const char *)buffer, numBytes);

@@ -143,7 +143,7 @@ static status_t
 nor_read(void *_cookie, off_t position, void *data, size_t *numbytes)
 {
 	nor_driver_info *info = (nor_driver_info*)_cookie;
-	TRACE("read(%Ld,%lu)\n", position, *numbytes);
+	TRACE("read(%lld,%lu)\n", position, *numbytes);
 
 	position += HIDDEN_BLOCKS * info->blocksize;
 
@@ -159,7 +159,7 @@ nor_read(void *_cookie, off_t position, void *data, size_t *numbytes)
 static status_t
 nor_write(void *_cookie, off_t position, const void *data, size_t *numbytes)
 {
-	TRACE("write(%Ld,%lu)\n", position, *numbytes);
+	TRACE("write(%lld,%lu)\n", position, *numbytes);
 	*numbytes = 0;
 	return B_ERROR;
 }

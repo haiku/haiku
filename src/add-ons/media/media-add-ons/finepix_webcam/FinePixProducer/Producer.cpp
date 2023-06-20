@@ -595,7 +595,7 @@ FinePixProducer::HandleStart(bigtime_t performance_time)
 {
 	/* Start producing frames, even if the output hasn't been connected yet. */
 
-	PRINTF(1, ("HandleStart(%Ld)\n", performance_time));
+	PRINTF(1, ("HandleStart(%lld)\n", performance_time));
 
 	if (fRunning) {
 		PRINTF(-1, ("HandleStart: Node already started\n"));

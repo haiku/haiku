@@ -96,10 +96,10 @@ readTest(const char *name, int32 loops)
 
 		ssize_t bytesRead = file.ReadAt(pos, buffer, bytes);
 		if (bytesRead < B_OK) {
-			printf("  Could not read %ld bytes at offset %Ld: %s\n",
+			printf("  Could not read %ld bytes at offset %lld: %s\n",
 				bytes, pos, strerror(bytesRead));
 		} else if (bytesRead != max) {
-			printf("  Could only read %ld bytes instead of %ld at offset %Ld\n",
+			printf("  Could only read %ld bytes instead of %ld at offset %lld\n",
 				bytesRead, bytes, pos);
 		}
 
@@ -126,7 +126,7 @@ readTest(const char *name, int32 loops)
 					break;
 			}
 			if (!correct) {
-				printf("[%Ld,%ld] Bytes at %Ld don't match (partial begin = "
+				printf("[%lld,%ld] Bytes at %lld don't match (partial begin = "
 					"%ld, should be %08lx, is %08lx)!\n", pos, bytes,
 					bufferPos, partial, num, read);
 				faults++;
@@ -144,7 +144,7 @@ readTest(const char *name, int32 loops)
 				return;
 			}
 			if (num != *numBuffer) {
-				printf("[%Ld,%ld] Bytes at %Ld don't match (should be %08lx, "
+				printf("[%lld,%ld] Bytes at %lld don't match (should be %08lx, "
 					"is %08lx)!\n", pos, bytes, bufferPos, num, *numBuffer);
 				faults++;
 			}
@@ -170,7 +170,7 @@ readTest(const char *name, int32 loops)
 					break;
 			}
 			if (!correct) {
-				printf("[%Ld,%ld] Bytes at %Ld don't match (partial end = "
+				printf("[%lld,%ld] Bytes at %lld don't match (partial end = "
 					"%ld, should be %08lx, is %08lx)!\n", pos, bytes,
 					bufferPos, partial, num, read);
 				faults++;

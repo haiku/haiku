@@ -174,7 +174,7 @@ ichaudio_attach(audio_drv_t *drv, void **_cookie)
 		LOG(("reset failed, ICH_REG_GLOB_CNT = 0x%08lx\n", value));
 		goto err;
 	}
-	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08lx\n", system_time() - start, value));
+	LOG(("reset finished after %lld, ICH_REG_GLOB_CNT = 0x%08lx\n", system_time() - start, value));
 
 	/* detect which codecs are ready */
 	s0cr = s1cr = s2cr = false;
@@ -183,15 +183,15 @@ ichaudio_attach(audio_drv_t *drv, void **_cookie)
 		value = ich_reg_read_32(cookie, ICH_REG_GLOB_STA);
 		if (!s0cr && (value & STA_S0CR)) {
 			s0cr = true;
-			LOG(("AC_SDIN0 codec ready after %Ld us\n", system_time() - start));
+			LOG(("AC_SDIN0 codec ready after %lld us\n", system_time() - start));
 		}
 		if (!s1cr && (value & STA_S1CR)) {
 			s1cr = true;
-			LOG(("AC_SDIN1 codec ready after %Ld us\n", system_time() - start));
+			LOG(("AC_SDIN1 codec ready after %lld us\n", system_time() - start));
 		}
 		if (!s2cr && (value & STA_S2CR)) {
 			s2cr = true;
-			LOG(("AC_SDIN2 codec ready after %Ld us\n", system_time() - start));
+			LOG(("AC_SDIN2 codec ready after %lld us\n", system_time() - start));
 		}
 		snooze(50000);
 	} while ((system_time() - start) < 1000000);

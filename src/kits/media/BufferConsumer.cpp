@@ -388,7 +388,7 @@ BBufferConsumer::HandleMessage(int32 message, const void* data, size_t size)
 				buffer->SetHeader(&command->header);
 
 				PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld "
-					"at perf %Ld and TimeSource()->Now() is %Ld\n",
+					"at perf %lld and TimeSource()->Now() is %lld\n",
 					buffer->Header()->buffer, buffer->Header()->start_time,
 					TimeSource()->Now());
 

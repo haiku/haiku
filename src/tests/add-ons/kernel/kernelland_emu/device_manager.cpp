@@ -26,6 +26,6 @@ devfs_publish_partition(const char *path, const partition_info *info)
 	if (info == NULL)
 		return B_BAD_VALUE;
 
-	printf("publish partition: %s (device \"%s\", size %Ld)\n", path, info->device, info->size);
+	printf("publish partition: %s (device \"%s\", size %lld)\n", path, info->device, info->size);
 	return B_OK;
 }

@@ -165,7 +165,7 @@ Bitmap::BackupSet(Inode *inode, bool used)
 	// the attributes are ignored for now, because they will
 	// be added anyway since all inodes from disk are collected.
 	
-//	printf("a: %Ld\n",inode->Block());
+//	printf("a: %lld\n",inode->Block());
 	BackupSetAt(inode->Block(),used);
 
 	// the data stream of symlinks is no real data stream	
@@ -194,7 +194,7 @@ Bitmap::BackupSet(Inode *inode, bool used)
 	if (node->data.max_indirect_range == 0 || node->data.indirect.IsZero())
 		return;
 
-//	printf("c: %Ld\n",fDisk->ToBlock(node->data.indirect));
+//	printf("c: %lld\n",fDisk->ToBlock(node->data.indirect));
 	BackupSetAt(fDisk->ToBlock(node->data.indirect), used);
 
 	DataStream *stream = dynamic_cast<DataStream *>(inode);
@@ -219,7 +219,7 @@ Bitmap::BackupSet(Inode *inode, bool used)
 		off_t start = fDisk->ToBlock(indirect[i]);
 		off_t end = start + indirect[i].length;
 		for (off_t block = start; block < end; block++) {
-//			printf("d: %Ld\n", block);
+//			printf("d: %lld\n", block);
 			if (!BackupSetAt(block, used))
 				break;
 		}
@@ -232,7 +232,7 @@ Bitmap::BackupSet(Inode *inode, bool used)
 		|| node->data.double_indirect.IsZero())
 		return;
 
-//	printf("e: %Ld\n",fDisk->ToBlock(node->data.double_indirect));
+//	printf("e: %lld\n",fDisk->ToBlock(node->data.double_indirect));
 	BackupSetAt(fDisk->ToBlock(node->data.double_indirect), used);
 
 	// FIXME: to be implemented...

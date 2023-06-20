@@ -1369,7 +1369,7 @@ ModuleNotificationService::_AddNode(dev_t device, ino_t node, const char* path,
 		return status;
 	}
 
-	//dprintf("  add %s %ld:%Ld (%s)\n", flags == B_WATCH_DIRECTORY
+	//dprintf("  add %s %ld:%lld (%s)\n", flags == B_WATCH_DIRECTORY
 	//	? "dir" : "file", device, node, path);
 
 	entry->device = device;

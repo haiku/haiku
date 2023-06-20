@@ -108,7 +108,7 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 		k = 0;
 		while ((j = FindEOF(buf + k, bufsize - k, &which)) > -1) {
 			k += j;
-			//PRINT((CH "| EOF[%d] at offset %d; pos %Ld" CT, which, k, fCurrentFrame->Position()));
+			//PRINT((CH "| EOF[%d] at offset %d; pos %lld" CT, which, k, fCurrentFrame->Position()));
 			if (fCurrentFrame->Position()+k >= fMinFrameSize) {
 				i = k;
 				break;

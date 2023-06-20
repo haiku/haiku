@@ -684,11 +684,11 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 
 				case B_INT64_TYPE:
-					print_type<int64>("int64(0x%Lx or %Ld)\n", pointer);
+					print_type<int64>("int64(0x%Lx or %lld)\n", pointer);
 					break;
 
 				case B_UINT64_TYPE:
-					print_type<uint64>("uint64(0x%Lx or %Ld)\n", pointer);
+					print_type<uint64>("uint64(0x%Lx or %lld)\n", pointer);
 					break;
 
 				case B_BOOL_TYPE:

@@ -298,7 +298,7 @@ PartitionMapParser::_ReadPartitionTable(off_t offset, partition_table* table)
 
 	// check the offset
 	if (offset < 0 || offset + toRead > fSessionSize) {
-		TRACE(("intel: _ReadPartitionTable(): bad offset: %Ld\n", offset));
+		TRACE(("intel: _ReadPartitionTable(): bad offset: %lld\n", offset));
 		return B_BAD_VALUE;
 	}
 

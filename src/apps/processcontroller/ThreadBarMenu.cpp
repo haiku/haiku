@@ -88,7 +88,7 @@ ThreadBarMenu::AddNew()
 				k = fThreadsRecCount; // flag that the search didn't work.
 		}
 		if (k == fThreadsRecCount) {
-//			printf("*** Thread %d %s/%s, user %Ld, kernel %Ld\n", info.thread, info.name, info.user_time, info.kernel_time);
+//			printf("*** Thread %d %s/%s, user %lld, kernel %lld\n", info.thread, info.name, info.user_time, info.kernel_time);
 			// this is a new thread...
 			k = 0;
 			while (k < fThreadsRecCount && !(fThreadsRec[k].thread == -1 || fThreadsRec[k].last_round+1 < fRound))

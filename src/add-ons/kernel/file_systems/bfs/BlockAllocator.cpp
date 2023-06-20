@@ -113,7 +113,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:%s: block %Ld (%p), sum %lu, s/l %lu/%lu", fLabel,
+		out.Print("bfs:%s: block %lld (%p), sum %lu, s/l %lu/%lu", fLabel,
 			fBlock, fData, fSum, fStart, fLength);
 	}
 

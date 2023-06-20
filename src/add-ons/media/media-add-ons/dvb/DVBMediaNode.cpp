@@ -274,7 +274,7 @@ DVBMediaNode::SetTimeSource(BTimeSource *time_source)
 {
 	TRACE("DVBMediaNode::SetTimeSource\n");
 	//printf("current RunMode = %d\n", RunMode());
-	//printf("_m_recordDelay = %Ld\n", _m_recordDelay);
+	//printf("_m_recordDelay = %lld\n", _m_recordDelay);
 }
 
 
@@ -283,7 +283,7 @@ DVBMediaNode::SetRunMode(run_mode mode)
 {
 	TRACE("DVBMediaNode::SetRunMode: %d\n", mode);
 	TRACE("current RunMode = %d\n", RunMode());
-	//printf("_m_recordDelay = %Ld\n", _m_recordDelay);
+	//printf("_m_recordDelay = %lld\n", _m_recordDelay);
 }
 
 
@@ -346,7 +346,7 @@ DVBMediaNode::NodeRegistered()
 		// SetRunMode(B_RECORDING);
 
 	//printf("RunMode = %d\n", RunMode());
-	//printf("_m_recordDelay = %Ld\n", _m_recordDelay);
+	//printf("_m_recordDelay = %lld\n", _m_recordDelay);
 
 	Run();
 }
@@ -457,7 +457,7 @@ DVBMediaNode::GetLatency(bigtime_t *out_latency)
 	if (B_OK != BBufferProducer::GetLatency(out_latency))
 		*out_latency = 50000;
 		
-	printf("DVBMediaNode::GetLatency: %Ld\n", *out_latency);
+	printf("DVBMediaNode::GetLatency: %lld\n", *out_latency);
 	*out_latency += PROCESSING_LATENCY;
 	return B_OK;
 }
@@ -845,7 +845,7 @@ DVBMediaNode::Connect(status_t error, const media_source &source,
 		if (B_OK != FindLatencyFor(destination, &latency, &ts))
 			TRACE("FindLatencyFor failed\n");
 		else
-			TRACE("downstream latency %Ld\n", latency);
+			TRACE("downstream latency %lld\n", latency);
 	#endif
 }
 
@@ -891,7 +891,7 @@ void
 DVBMediaNode::LateNoticeReceived(const media_source &source,
 		bigtime_t how_much, bigtime_t performance_time)
 {
-	TRACE("DVBMediaNode::LateNoticeReceived %Ld late at %Ld\n", how_much,
+	TRACE("DVBMediaNode::LateNoticeReceived %lld late at %lld\n", how_much,
 		performance_time);
 }
 
@@ -938,7 +938,7 @@ DVBMediaNode::LatencyChanged(const media_source &source,
 		const media_destination &destination, bigtime_t new_latency,
 		uint32 flags)
 {
-	TRACE("DVBMediaNode::LatencyChanged to %Ld\n", new_latency);
+	TRACE("DVBMediaNode::LatencyChanged to %lld\n", new_latency);
 }
 
 /* DVBMediaNode */
@@ -947,14 +947,14 @@ DVBMediaNode::LatencyChanged(const media_source &source,
 void
 DVBMediaNode::HandleTimeWarp(bigtime_t performance_time)
 {
-	TRACE("DVBMediaNode::HandleTimeWarp at %Ld\n", performance_time);
+	TRACE("DVBMediaNode::HandleTimeWarp at %lld\n", performance_time);
 }
 
 
 void
 DVBMediaNode::HandleSeek(bigtime_t performance_time)
 {
-	TRACE("DVBMediaNode::HandleSeek at %Ld\n", performance_time);
+	TRACE("DVBMediaNode::HandleSeek at %lld\n", performance_time);
 }
 
 
@@ -1773,24 +1773,24 @@ DVBMediaNode::raw_audio_thread()
 
 		bigtime_t delay;
 		delay = start_time - TimeSource()->Now();
-		TRACE_TIMING("audio delay is %Ld\n", delay);
+		TRACE_TIMING("audio delay is %lld\n", delay);
 		if (delay < -AUDIO_MAX_LATE) {
-			printf("audio: decoded packet is %Ldms too late, dropped\n",
+			printf("audio: decoded packet is %lldms too late, dropped\n",
 				-delay / 1000);
 			buf->Recycle();
 			continue;
 		}
 		if (delay < 0)
-//			printf("audio: decoded packet is %Ldms too late\n", -delay / 1000);
+//			printf("audio: decoded packet is %lldms too late\n", -delay / 1000);
 
 		if (delay > AUDIO_MAX_EARLY) {
-			printf("audio: decoded packet is %Ldms too early, dropped\n",
+			printf("audio: decoded packet is %lldms too early, dropped\n",
 				delay / 1000);
 			buf->Recycle();
 			continue;
 		}
 		if (delay > 0)
-//			printf("audio: decoded packet is %Ldms too early\n", delay / 1000);
+//			printf("audio: decoded packet is %lldms too early\n", delay / 1000);
 
 		delay -= PROCESSING_LATENCY;
 		if (delay > 0) {
@@ -1802,7 +1802,7 @@ DVBMediaNode::raw_audio_thread()
 			}
 		}
 
-		TRACE_TIMING("audio playback delay %Ld\n",
+		TRACE_TIMING("audio playback delay %lld\n",
 			start_time - TimeSource()->Now());
 
 		media_header* hdr;
@@ -1993,15 +1993,15 @@ DVBMediaNode::raw_video_thread()
 
 		bigtime_t delay;
 		delay = start_time - TimeSource()->Now();
-		TRACE_TIMING("video delay %Ld\n", delay);
+		TRACE_TIMING("video delay %lld\n", delay);
 		if (delay < -VIDEO_MAX_LATE) {
-			printf("video: decoded packet is %Ldms too late, dropped\n",
+			printf("video: decoded packet is %lldms too late, dropped\n",
 				-delay / 1000);
 			buf->Recycle();
 			continue;
 		}
 		if (delay > VIDEO_MAX_EARLY) {
-			printf("video: decoded packet is %Ldms too early, dropped\n",
+			printf("video: decoded packet is %lldms too early, dropped\n",
 				delay / 1000);
 			buf->Recycle();
 			continue;
@@ -2016,7 +2016,7 @@ DVBMediaNode::raw_video_thread()
 			}
 		}
 
-		TRACE_TIMING("video playback delay %Ld\n", start_time 
+		TRACE_TIMING("video playback delay %lld\n", start_time 
 			- TimeSource()->Now());
 
 		media_header* hdr;
@@ -2103,7 +2103,7 @@ DVBMediaNode::GetNextAudioChunk(const void **chunkData, size_t *chunkLen,
 	// measured in PCR time base
 	mh->start_time = fCurrentAudioPacket->TimeStamp();
 
-//	printf("GetNextAudioChunk: done start_time %Ld\n", mh->start_time);
+//	printf("GetNextAudioChunk: done start_time %lld\n", mh->start_time);
 
 	return B_OK;
 }
@@ -2990,7 +2990,7 @@ DVBMediaNode::ExtractTuningParams(const char *description, int audio_pid_index,
 	TRACE("parsing result: audio pid %d\n", _apid);
 	TRACE("parsing result: PCR pid %d\n", _cpid);
 	TRACE("parsing result: symbol rate %d\n", _srate);
-	TRACE("parsing result: Frequency %Ld Hz, %Ld MHz\n", _freq, _freq / 1000000);
+	TRACE("parsing result: Frequency %lld Hz, %lld MHz\n", _freq, _freq / 1000000);
 
 	if (fInterfaceType == DVB_TYPE_DVB_T) {
 

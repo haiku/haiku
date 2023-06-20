@@ -168,7 +168,7 @@ status_t DormantNodeIO::instantiate(
 //		"  kinds:     %Lx\n"
 //		"  flags:     %lx\n"
 //		"  runMode:   %ld\n"
-//		"  recDelay:  %Ld\n"
+//		"  recDelay:  %lld\n"
 //		"  cycle:     %s\n"
 //		"  entry:     %s\n\n",
 //		m_nodeKey.String(),

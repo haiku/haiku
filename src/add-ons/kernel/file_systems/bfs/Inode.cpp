@@ -39,7 +39,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:Create %Ld (%p), parent %Ld (%p), \"%s\", "
+		out.Print("bfs:Create %lld (%p), parent %lld (%p), \"%s\", "
 			"mode %lx, omode %x, type %lx", fID, fInode, fParentID,
 			fParent, fName, fMode, fOpenMode, fType);
 	}
@@ -68,7 +68,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:Remove %Ld (%p), \"%s\"", fID, fInode, fName);
+		out.Print("bfs:Remove %lld (%p), \"%s\"", fID, fInode, fName);
 	}
 
 private:
@@ -90,7 +90,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:%s %Ld (%p)\n", fAction, fID, fInode);
+		out.Print("bfs:%s %lld (%p)\n", fAction, fID, fInode);
 	}
 
 private:
@@ -114,7 +114,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("bfs:%s %Ld (%p), %Ld -> %Ld", fTrim ? "Trim" : "Resize",
+		out.Print("bfs:%s %lld (%p), %lld -> %lld", fTrim ? "Trim" : "Resize",
 			fID, fInode, fOldSize, fNewSize);
 	}
 

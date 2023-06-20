@@ -406,7 +406,7 @@ FireWireDVNode::Connect(status_t error, const media_source& source,
 		if (B_OK != FindLatencyFor(destination, &latency, &ts))
 			TRACE("FindLatencyFor failed\n");
 		else
-			TRACE("downstream latency %Ld\n", latency);
+			TRACE("downstream latency %lld\n", latency);
 	#endif
 }
 
@@ -427,7 +427,7 @@ void
 FireWireDVNode::LateNoticeReceived(const media_source& source,
 	bigtime_t how_much, bigtime_t performance_time)
 {
-	TRACE("FireWireDVNode::LateNoticeReceived %Ld late at %Ld\n", how_much, performance_time);
+	TRACE("FireWireDVNode::LateNoticeReceived %lld late at %lld\n", how_much, performance_time);
 }
 
 
@@ -455,14 +455,14 @@ FireWireDVNode::AdditionalBufferRequested(const media_source& source,
 void
 FireWireDVNode::HandleTimeWarp(bigtime_t performance_time)
 {
-	TRACE("FireWireDVNode::HandleTimeWarp at %Ld\n", performance_time);
+	TRACE("FireWireDVNode::HandleTimeWarp at %lld\n", performance_time);
 }
 
 
 void
 FireWireDVNode::HandleSeek(bigtime_t performance_time)
 {
-	TRACE("FireWireDVNode::HandleSeek at %Ld\n", performance_time);
+	TRACE("FireWireDVNode::HandleSeek at %lld\n", performance_time);
 }
 
 

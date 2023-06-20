@@ -262,7 +262,7 @@ static inline void
 push_access(file_cache_ref* ref, off_t offset, generic_size_t bytes,
 	bool isWrite)
 {
-	TRACE(("%p: push %Ld, %ld, %s\n", ref, offset, bytes,
+	TRACE(("%p: push %lld, %ld, %s\n", ref, offset, bytes,
 		isWrite ? "write" : "read"));
 
 	int32 index = ref->last_access_index;
@@ -376,7 +376,7 @@ read_into_cache(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	vm_page_reservation* reservation, size_t reservePages)
 {
-	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
+	TRACE(("read_into_cache(offset = %lld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
 
 	VMCache* cache = ref->cache;
@@ -460,7 +460,7 @@ read_from_file(file_cache_ref* ref, void* cookie, off_t offset,
 	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	vm_page_reservation* reservation, size_t reservePages)
 {
-	TRACE(("read_from_file(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
+	TRACE(("read_from_file(offset = %lld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
 
 	if (!useBuffer)
@@ -736,7 +736,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 	VMCache* cache = ref->cache;
 	bool useBuffer = buffer != 0;
 
-	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
+	TRACE(("cache_io(ref = %p, offset = %lld, buffer = %p, size = %lu, %s)\n",
 		ref, offset, (void*)buffer, *_size, doWrite ? "write" : "read"));
 
 	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
@@ -802,7 +802,7 @@ cache_io(void* _cacheRef, void* cookie, off_t offset, addr_t buffer,
 
 		size_t bytesInPage = min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft);
 
-		TRACE(("lookup page from offset %Ld: %p, size = %lu, pageOffset "
+		TRACE(("lookup page from offset %lld: %p, size = %lu, pageOffset "
 			"= %lu\n", offset, page, bytesLeft, pageOffset));
 
 		if (page != NULL) {
@@ -1040,7 +1040,7 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 {
 	// ToDo: schedule prefetch
 
-	TRACE(("cache_prefetch(vnode %ld:%Ld)\n", mountID, vnodeID));
+	TRACE(("cache_prefetch(vnode %ld:%lld)\n", mountID, vnodeID));
 
 	// get the vnode for the object, this also grabs a ref to it
 	struct vnode* vnode;
@@ -1138,7 +1138,7 @@ file_cache_init(void)
 extern "C" void*
 file_cache_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
-	TRACE(("file_cache_create(mountID = %ld, vnodeID = %Ld, size = %Ld)\n",
+	TRACE(("file_cache_create(mountID = %ld, vnodeID = %lld, size = %lld)\n",
 		mountID, vnodeID, size));
 
 	file_cache_ref* ref = new file_cache_ref;
@@ -1254,7 +1254,7 @@ file_cache_set_size(void* _cacheRef, off_t newSize)
 {
 	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
-	TRACE(("file_cache_set_size(ref = %p, size = %Ld)\n", ref, newSize));
+	TRACE(("file_cache_set_size(ref = %p, size = %lld)\n", ref, newSize));
 
 	if (ref == NULL)
 		return B_OK;
@@ -1300,7 +1300,7 @@ file_cache_read(void* _cacheRef, void* cookie, off_t offset, void* buffer,
 {
 	file_cache_ref* ref = (file_cache_ref*)_cacheRef;
 
-	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu)\n",
+	TRACE(("file_cache_read(ref = %p, offset = %lld, buffer = %p, size = %lu)\n",
 		ref, offset, buffer, *_size));
 
 	// Bounds checking. We do this here so it applies to uncached I/O.
@@ -1357,7 +1357,7 @@ file_cache_write(void* _cacheRef, void* cookie, off_t offset,
 	status_t status = cache_io(ref, cookie, offset,
 		(addr_t)const_cast<void*>(buffer), _size, true);
 
-	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu)"
+	TRACE(("file_cache_write(ref = %p, offset = %lld, buffer = %p, size = %lu)"
 		" = %ld\n", ref, offset, buffer, *_size, status));
 
 	return status;

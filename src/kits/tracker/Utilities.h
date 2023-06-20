@@ -518,7 +518,7 @@ inline void PrintDirToStream(const BDirectory*, const char* = 0) {}
 	if (logFile != 0) {														\
 		thread_info info;													\
 		get_thread_info(find_thread(NULL), &info);							\
-		PrintToLogFile("[t %Ld] \"%s\" (%s:%i) ", system_time(),			\
+		PrintToLogFile("[t %lld] \"%s\" (%s:%i) ", system_time(),			\
 			info.name, __FILE__, __LINE__);									\
 		PrintToLogFile _ARGS_;												\
 		PrintToLogFile("\n");												\
