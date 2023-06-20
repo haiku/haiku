@@ -76,7 +76,7 @@ alloc_mem(void **phy, void **log, size_t size, const char *name)
 
 	size = round_to_pagesize(size);
 	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+		B_32_BIT_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		// TODO: The rest of the code doesn't deal correctly with physical
 		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (areaid < B_OK) {
