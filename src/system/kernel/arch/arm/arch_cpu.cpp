@@ -84,26 +84,6 @@ arch_cpu_sync_icache(void *address, size_t len)
 
 
 void
-arch_cpu_memory_read_barrier(void)
-{
-	// TODO: check if we need more here
-	// (or just call the inline version?)
-	// cf. headers/private/kernel/arch/arm/arch_atomic.h
-	asm volatile ("" : : : "memory");
-}
-
-
-void
-arch_cpu_memory_write_barrier(void)
-{
-	// TODO: check if we need more here
-	// (or just call the inline version?)
-	// cf. headers/private/kernel/arch/arm/arch_atomic.h
-	asm volatile ("" : : : "memory");
-}
-
-
-void
 arch_cpu_invalidate_TLB_page(addr_t page)
 {
 	// ensure visibility of the update to translation table walks
