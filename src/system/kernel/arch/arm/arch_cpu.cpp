@@ -14,8 +14,6 @@
 
 #include <arch/cpu.h>
 #include <boot/kernel_args.h>
-#include <commpage.h>
-#include <elf.h>
 
 
 status_t
@@ -52,9 +50,6 @@ arch_cpu_init_post_vm(kernel_args *args)
 status_t
 arch_cpu_init_post_modules(kernel_args *args)
 {
-	// add the functions to the commpage image
-	image_id image = get_commpage_image();
-
 	return B_OK;
 }
 
