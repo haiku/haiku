@@ -21,10 +21,6 @@
 status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
-	// The current thread must be NULL for all CPUs till we have threads.
-	// Some boot code relies on this.
-	arch_thread_set_current_thread(NULL);
-
 	return B_OK;
 }
 
