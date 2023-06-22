@@ -29,6 +29,7 @@ static bool sEFIAvailable = true;
 
 
 DebugUART* gUART = NULL;
+bool gUARTSkipInit = false;
 
 
 static void
@@ -96,7 +97,7 @@ extern "C" void
 serial_enable(void)
 {
 	sSerialEnabled = true;
-	if (gUART != NULL)
+	if ((gUART != NULL) && !gUARTSkipInit)
 		gUART->InitPort(kSerialBaudRate);
 }
 

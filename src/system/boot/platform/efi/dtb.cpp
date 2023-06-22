@@ -566,6 +566,7 @@ dtb_handle_fdt(const void* fdt, int node)
 
 				gUART = kSupportedUarts[i].uart_driver_init(uart.regs.start,
 					uart.clock);
+				gUARTSkipInit = fdt_getprop(fdt, node, "skip-init", NULL) != NULL;
 			}
 		}
 	}

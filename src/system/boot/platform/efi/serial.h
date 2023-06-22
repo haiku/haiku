@@ -11,6 +11,7 @@
 
 class DebugUART;
 extern DebugUART* gUART;
+extern bool gUARTSkipInit;
 
 
 #ifdef __cplusplus
