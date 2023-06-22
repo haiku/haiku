@@ -13,7 +13,7 @@ BootstrapPackageRepository HaikuPortsCross
 	:
 	# repository architecture packages (stage 1)
 	bash_bootstrap-4.4.023-1
-	binutils_bootstrap-2.36.1_2021_09_21-1
+	binutils_bootstrap-2.36.1_2021_09_21-2
 	bison_bootstrap-3.0.5-1
 	coreutils_bootstrap-8.22-1
 	curl_bootstrap-7.40.0-1
@@ -26,8 +26,8 @@ BootstrapPackageRepository HaikuPortsCross
 	freetype_bootstrap_devel-2.6.3-1
 	gawk_bootstrap-3.1.8-2
 	grep_bootstrap-2.14-1
-	icu_bootstrap-67.1-1
-	icu_bootstrap_devel-67.1-1
+	icu_bootstrap-67.1-2
+	icu_bootstrap_devel-67.1-2
 	less_bootstrap-451-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-4.3-1
