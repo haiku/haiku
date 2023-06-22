@@ -20,9 +20,9 @@ if [[ ! -d $REPOFILES ]]; then
 fi
 
 RESULT=0
-for f in $(find $REPOFILES -print); do
+for f in $(find $REPOFILES -maxdepth 1 -type f -print); do
 	ARCHITECTURE=$(cat $f | tr '\n' ' ' | awk '{ print $4 } ')
-	echo "================ Scanning $ARCHITECTURE"
+	echo "================ Scanning $ARCHITECTURE / $f"
 	REPO_EXPECT=$(cat $f | grep -v "#" | grep '-' | grep 'bootstrap' | grep -v 'bootstrap_')
 	for i in $REPO_EXPECT; do
 		PACKAGE=$(echo $i | cut -d'-' -f1)
@@ -36,12 +36,13 @@ for f in $(find $REPOFILES -print); do
 			RESULT=1
 			continue
 		fi
-		grep "REVISION=$REV" $RECIPE > /dev/null
-		#echo $RECIPE
+		REV=$(echo $i | cut -d'-' -f3)
+		grep "REVISION=\"$REV\"" $RECIPE > /dev/null
 		if [[ $? -eq 0 ]]; then
 			echo "    $ARCHITECTURE $i... OK"
 		else
-			echo "    $ARCHITECTURE $i... ERROR (Incorrect revision!)"
+			FOUND_REV=$(grep "REVISION=" $RECIPE | cut -d'=' -f2)
+			echo "    $ARCHITECTURE $i... ERROR (Incorrect revision! Found $FOUND_REV!)"
 			RESULT=1
 		fi
 		#echo $i - $PACKAGE
