@@ -85,7 +85,7 @@ public:
 			status_t		SetVersion(const char* version);
 
 private:
-			const char*		_GetVersionFromSignature(const char* signature);
+			BString			_GetVersionFromSignature(const char* signature);
 			BBitmap*		_GetIconFromSignature(const char* signature);
 
 private:
@@ -175,7 +175,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fNameView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fVersionView = new BStringView("version",
-		_GetVersionFromSignature(signature));
+		_GetVersionFromSignature(signature).String());
 	fVersionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	rgb_color documentColor = ui_color(B_DOCUMENT_TEXT_COLOR);
@@ -235,7 +235,7 @@ AboutView::AllAttached()
 //	#pragma mark - AboutView private methods
 
 
-const char*
+BString
 AboutView::_GetVersionFromSignature(const char* signature)
 {
 	if (signature == NULL)
@@ -289,7 +289,7 @@ AboutView::_GetVersionFromSignature(const char* signature)
 			appVersion << "-" << variety;
 		}
 
-		return appVersion.String();
+		return appVersion;
 	}
 
 	return NULL;
