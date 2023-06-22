@@ -1,0 +1,50 @@
+#!/bin/bash
+# Check if a Bootstrap Jam repository file matches the availability of the contents of haikuports.cross
+
+if [ $# -ne 1 ]; then
+	echo "usage: $0 <haikuports.cross>"
+	exit 1
+fi
+
+if [ ! -d "$1" ]; then
+	echo "Error: Unable to read haikuports directory '$1'!"
+	exit 1
+fi
+
+HAIKUPORTS="$1"
+REPOFILES="build/jam/repositories/HaikuPortsCross"
+
+if [[ ! -d $REPOFILES ]]; then
+	echo "Unable to locate ${REPOFILES}! Run me from the haiku source root!"
+	exit 2
+fi
+
+RESULT=0
+for f in $(find $REPOFILES -print); do
+	ARCHITECTURE=$(cat $f | tr '\n' ' ' | awk '{ print $4 } ')
+	echo "================ Scanning $ARCHITECTURE"
+	REPO_EXPECT=$(cat $f | grep -v "#" | grep '-' | grep 'bootstrap' | grep -v 'bootstrap_')
+	for i in $REPO_EXPECT; do
+		PACKAGE=$(echo $i | cut -d'-' -f1)
+		if [[ $PACKAGE == *_devel* ]]; then
+			continue
+		fi
+		RECIPE_NAME=$(echo $i | sed 's/\-[0-9]$//g')
+		RECIPE=$(find $HAIKUPORTS -name ${RECIPE_NAME}.recipe)
+		if [[ "$RECIPE" == "" ]]; then
+			echo "    $ARCHITECTURE $i... ERROR (Missing recipe $RECIPE_NAME!)"
+			RESULT=1
+			continue
+		fi
+		grep "REVISION=$REV" $RECIPE > /dev/null
+		#echo $RECIPE
+		if [[ $? -eq 0 ]]; then
+			echo "    $ARCHITECTURE $i... OK"
+		else
+			echo "    $ARCHITECTURE $i... ERROR (Incorrect revision!)"
+			RESULT=1
+		fi
+		#echo $i - $PACKAGE
+	done
+done
+exit $RESULT
