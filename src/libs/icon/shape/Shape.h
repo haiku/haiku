@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2007, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef SHAPE_H
 #define SHAPE_H
@@ -13,8 +14,8 @@
 #	include "IconObject.h"
 #	include "Observer.h"
 #endif
+#include "Container.h"
 #include "IconBuild.h"
-#include "PathContainer.h"
 #include "PathSource.h"
 #include "Transformable.h"
 #include "VectorPath.h"
@@ -38,10 +39,6 @@ class ShapeListener {
 								ShapeListener();
 	virtual						~ShapeListener();
 
-	virtual	void				TransformerAdded(Transformer* t,
-												 int32 index) = 0;
-	virtual	void				TransformerRemoved(Transformer* t) = 0;
-
 	// TODO: this is not useful for all subclasses of Shape (e.g. ReferenceImage)
 	virtual	void				StyleChanged(::Style* oldStyle,
 											 ::Style* newStyle) = 0;
@@ -52,117 +49,110 @@ class ShapeListener {
 class Shape : public IconObject,
 			  public _ICON_NAMESPACE Transformable,
 			  public Observer,	// observing all the paths and the style
-			  public PathContainerListener,
+			  public ContainerListener<VectorPath>,
+			  public ContainerListener<Transformer>,
 			  public PathListener {
 #else
 class Shape : public _ICON_NAMESPACE Transformable {
 #endif
 
  public:
-								Shape(::Style* style);
-								Shape(const Shape& other);
-	virtual						~Shape();
+									Shape(::Style* style);
+									Shape(const Shape& other);
+	virtual							~Shape();
 
 	// IconObject interface
-	virtual	status_t			Unarchive(BMessage* archive);
+	virtual	status_t				Unarchive(BMessage* archive);
 #ifdef ICON_O_MATIC
-	virtual	status_t			Archive(BMessage* into,
-										bool deep = true) const;
+	virtual	status_t				Archive(BMessage* into,
+											bool deep = true) const;
 
-	virtual	PropertyObject*		MakePropertyObject() const;
-	virtual	bool				SetToPropertyObject(
-									const PropertyObject* object);
+	virtual	PropertyObject*			MakePropertyObject() const;
+	virtual	bool					SetToPropertyObject(
+										const PropertyObject* object);
 
 	// Transformable interface
-	virtual	void				TransformationChanged();
+	virtual	void					TransformationChanged();
 
 	// Observer interface
-	virtual	void				ObjectChanged(const Observable* object);
+	virtual	void					ObjectChanged(const Observable* object);
 
-	// PathContainerListener interface
-	virtual	void				PathAdded(VectorPath* path, int32 index);
-	virtual	void				PathRemoved(VectorPath* path);
+	// ContainerListener<VectorPath> interface
+	virtual	void					ItemAdded(VectorPath* path, int32 index);
+	virtual	void					ItemRemoved(VectorPath* path);
+
+	// ContainerListener<Transformer> interface
+	virtual	void					ItemAdded(Transformer* t, int32 index);
+	virtual	void					ItemRemoved(Transformer* t);
+
 
 	// PathListener interface
-	virtual	void				PointAdded(int32 index);
-	virtual	void				PointRemoved(int32 index);
-	virtual	void				PointChanged(int32 index);
-	virtual	void				PathChanged();
-	virtual	void				PathClosedChanged();
-	virtual	void				PathReversed();
+	virtual	void					PointAdded(int32 index);
+	virtual	void					PointRemoved(int32 index);
+	virtual	void					PointChanged(int32 index);
+	virtual	void					PathChanged();
+	virtual	void					PathClosedChanged();
+	virtual	void					PathReversed();
 #else
-	inline	void				Notify() {}
+	inline	void					Notify() {}
 #endif // ICON_O_MATIC
 
 	// Shape
-	virtual	status_t			InitCheck() const;
-	virtual Shape*				Clone() const = 0;
+	virtual	status_t				InitCheck() const;
+	virtual Shape*					Clone() const = 0;
 
-	inline	PathContainer*		Paths() const
+	inline	Container<VectorPath>*	Paths() const
 									{ return fPaths; }
+	const	Container<Transformer>*	Transformers() const
+									{ return &fTransformers; }
+			Container<Transformer>* Transformers()
+									{ return &fTransformers; }
 
-public:
-	inline	::Style*			Style() const
-									{ return fStyle; }
+      public:
+	inline	::Style*				Style() const
+										{ return fStyle; }
 
-	inline	BRect				LastBounds() const
-									{ return fLastBounds; }
-			BRect				Bounds(bool updateLast = false) const;
+	inline	BRect					LastBounds() const
+										{ return fLastBounds; }
+			BRect					Bounds(bool updateLast = false) const;
 
-			::VertexSource&		VertexSource();
-			void				SetGlobalScale(double scale);
+			::VertexSource&			VertexSource();
+			void					SetGlobalScale(double scale);
 
-			bool				AddTransformer(Transformer* transformer);
-			bool				AddTransformer(Transformer* transformer,
-											   int32 index);
-			bool				RemoveTransformer(Transformer* transformer);
+			void					SetHinting(bool hinting);
+			bool					Hinting() const
+										{ return fHinting; }
 
-			int32				CountTransformers() const;
-
-			bool				HasTransformer(Transformer* transformer) const;
-			int32				IndexOf(Transformer* transformer) const;
-
-			Transformer*		TransformerAt(int32 index) const;
-			Transformer*		TransformerAtFast(int32 index) const;
-
-			void				SetHinting(bool hinting);
-			bool				Hinting() const
-									{ return fHinting; }
-
-	virtual bool				Visible(float scale) const = 0;
+	virtual bool					Visible(float scale) const = 0;
 
 #ifdef ICON_O_MATIC
-			bool				AddListener(ShapeListener* listener);
-			bool				RemoveListener(ShapeListener* listener);
+			bool					AddListener(ShapeListener* listener);
+			bool					RemoveListener(ShapeListener* listener);
 
  private:
-			void				_NotifyTransformerAdded(Transformer* t,
-														int32 index) const;
-			void				_NotifyTransformerRemoved(Transformer* t) const;
+			void					_NotifyStyleChanged(::Style* oldStyle,
+														::Style* newStyle) const;
 
-			void				_NotifyStyleChanged(::Style* oldStyle,
-													::Style* newStyle) const;
-
-			void				_NotifyRerender() const;
+			void					_NotifyRerender() const;
 #endif // ICON_O_MATIC
 
  protected:
-			void				SetStyle(::Style* style);
+			void					SetStyle(::Style* style);
 
  private:
-			PathContainer*		fPaths;
-			::Style*			fStyle;
+			Container<VectorPath>*	fPaths;
+			::Style*				fStyle;
 
-			PathSource			fPathSource;
-			BList				fTransformers;
-	mutable	bool				fNeedsUpdate;
+			PathSource				fPathSource;
+			Container<Transformer>	fTransformers;
+	mutable	bool					fNeedsUpdate;
 
-	mutable	BRect				fLastBounds;
+	mutable	BRect					fLastBounds;
 
-			bool				fHinting;
+			bool					fHinting;
 
 #ifdef ICON_O_MATIC
-			BList				fListeners;
+			BList					fListeners;
 #endif
 };
 

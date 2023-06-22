@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2009, 2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "TransformerListView.h"
@@ -38,11 +39,11 @@
 
 using std::nothrow;
 
+
 class TransformerItem : public SimpleItem,
 						public Observer {
  public:
-					TransformerItem(Transformer* t,
-									TransformerListView* listView)
+					TransformerItem(Transformer* t, TransformerListView* listView)
 						: SimpleItem(t->Name()),
 						  transformer(NULL),
 						  fListView(listView)
@@ -96,14 +97,16 @@ class TransformerItem : public SimpleItem,
 	TransformerListView* fListView;
 };
 
+
 // #pragma mark -
+
 
 enum {
 	MSG_DRAG_TRANSFORMER			= 'drgt',
 	MSG_ADD_TRANSFORMER				= 'adtr',
 };
 
-// constructor
+
 TransformerListView::TransformerListView(BRect frame, const char* name,
 										 BMessage* message, BHandler* target)
 	: SimpleListView(frame, name,
@@ -116,17 +119,17 @@ TransformerListView::TransformerListView(BRect frame, const char* name,
 	SetTarget(target);
 }
 
-// destructor
+
 TransformerListView::~TransformerListView()
 {
 	_MakeEmpty();
 	delete fMessage;
 
 	if (fShape)
-		fShape->RemoveListener(this);
+		fShape->Transformers()->RemoveListener(this);
 }
 
-// Draw
+
 void
 TransformerListView::Draw(BRect updateRect)
 {
@@ -163,7 +166,7 @@ TransformerListView::Draw(BRect updateRect)
 	DrawString(message2, middle);
 }
 
-// SelectionChanged
+
 void
 TransformerListView::SelectionChanged()
 {
@@ -184,7 +187,7 @@ TransformerListView::SelectionChanged()
 	}
 }
 
-// MessageReceived
+
 void
 TransformerListView::MessageReceived(BMessage* message)
 {
@@ -192,25 +195,25 @@ TransformerListView::MessageReceived(BMessage* message)
 		case MSG_ADD_TRANSFORMER: {
 			if (!fShape || !fCommandStack)
 				break;
-		
+
 			uint32 type;
 			if (message->FindInt32("type", (int32*)&type) < B_OK)
 				break;
-		
+
 			Transformer* transformer
 				= TransformerFactory::TransformerFor(type,
 													 fShape->VertexSource());
 			if (!transformer)
 				break;
-		
+
 			Transformer* transformers[1];
 			transformers[0] = transformer;
 			::Command* command = new (nothrow) AddTransformersCommand(
-				fShape, transformers, 1, fShape->CountTransformers());
-		
+				fShape->Transformers(), transformers, 1, fShape->Transformers()->CountItems());
+
 			if (!command)
 				delete transformer;
-		
+
 			fCommandStack->Perform(command);
 			break;
 		}
@@ -220,7 +223,7 @@ TransformerListView::MessageReceived(BMessage* message)
 	}
 }
 
-// MakeDragMessage
+
 void
 TransformerListView::MakeDragMessage(BMessage* message) const
 {
@@ -236,9 +239,10 @@ TransformerListView::MakeDragMessage(BMessage* message) const
 	}
 }
 
+
 // #pragma mark -
 
-// MoveItems
+
 void
 TransformerListView::MoveItems(BList& items, int32 toIndex)
 {
@@ -257,8 +261,8 @@ TransformerListView::MoveItems(BList& items, int32 toIndex)
 	}
 
 	MoveTransformersCommand* command
-		= new (nothrow) MoveTransformersCommand(fShape,
-												transformers, count, toIndex);
+		= new (nothrow) MoveTransformersCommand(
+			fShape->Transformers(), transformers, count, toIndex);
 	if (!command) {
 		delete[] transformers;
 		return;
@@ -267,7 +271,7 @@ TransformerListView::MoveItems(BList& items, int32 toIndex)
 	fCommandStack->Perform(command);
 }
 
-// CopyItems
+
 void
 TransformerListView::CopyItems(BList& items, int32 toIndex)
 {
@@ -275,7 +279,7 @@ TransformerListView::CopyItems(BList& items, int32 toIndex)
 	// TODO: allow copying items
 }
 
-// RemoveItemList
+
 void
 TransformerListView::RemoveItemList(BList& items)
 {
@@ -288,12 +292,11 @@ TransformerListView::RemoveItemList(BList& items)
 		indices[i] = IndexOf((BListItem*)items.ItemAtFast(i));
 
 	RemoveTransformersCommand* command
-		= new (nothrow) RemoveTransformersCommand(fShape,
-												  indices, count);
+		= new (nothrow) RemoveTransformersCommand(fShape->Transformers(), indices, count);
 	fCommandStack->Perform(command);
 }
 
-// CloneItem
+
 BListItem*
 TransformerListView::CloneItem(int32 index) const
 {
@@ -304,7 +307,7 @@ TransformerListView::CloneItem(int32 index) const
 	return NULL;
 }
 
-// IndexOfSelectable
+
 int32
 TransformerListView::IndexOfSelectable(Selectable* selectable) const
 {
@@ -322,7 +325,7 @@ TransformerListView::IndexOfSelectable(Selectable* selectable) const
 	return -1;
 }
 
-// SelectableFor
+
 Selectable*
 TransformerListView::SelectableFor(BListItem* item) const
 {
@@ -334,9 +337,9 @@ TransformerListView::SelectableFor(BListItem* item) const
 
 // #pragma mark -
 
-// TransformerAdded
+
 void
-TransformerListView::TransformerAdded(Transformer* transformer, int32 index)
+TransformerListView::ItemAdded(Transformer* transformer, int32 index)
 {
 	// NOTE: we are in the thread that messed with the
 	// Shape, so no need to lock the document, when this is
@@ -350,9 +353,9 @@ TransformerListView::TransformerAdded(Transformer* transformer, int32 index)
 	UnlockLooper();
 }
 
-// TransformerRemoved
+
 void
-TransformerListView::TransformerRemoved(Transformer* transformer)
+TransformerListView::ItemRemoved(Transformer* transformer)
 {
 	// NOTE: we are in the thread that messed with the
 	// Shape, so no need to lock the document, when this is
@@ -366,16 +369,10 @@ TransformerListView::TransformerRemoved(Transformer* transformer)
 	UnlockLooper();
 }
 
-// StyleChanged
-void
-TransformerListView::StyleChanged(Style* oldStyle, Style* newStyle)
-{
-	// we don't care
-}
 
 // #pragma mark -
 
-// SetMenu
+
 void
 TransformerListView::SetMenu(BMenu* menu)
 {
@@ -418,7 +415,7 @@ TransformerListView::SetMenu(BMenu* menu)
 	_UpdateMenu();
 }
 
-// SetShape
+
 void
 TransformerListView::SetShape(Shape* shape)
 {
@@ -427,33 +424,34 @@ TransformerListView::SetShape(Shape* shape)
 
 	// detach from old container
 	if (fShape)
-		fShape->RemoveListener(this);
+		fShape->Transformers()->RemoveListener(this);
 
 	_MakeEmpty();
 
 	fShape = shape;
 
 	if (fShape) {
-		fShape->AddListener(this);
-	
-		int32 count = fShape->CountTransformers();
+		fShape->Transformers()->AddListener(this);
+
+		int32 count = fShape->Transformers()->CountItems();
 		for (int32 i = 0; i < count; i++)
-			_AddTransformer(fShape->TransformerAtFast(i), i);
+			_AddTransformer(fShape->Transformers()->ItemAtFast(i), i);
 	}
 
 	_UpdateMenu();
 }
 
-// SetCommandStack
+
 void
 TransformerListView::SetCommandStack(CommandStack* stack)
 {
 	fCommandStack = stack;
 }
 
+
 // #pragma mark -
 
-// _AddTransformer
+
 bool
 TransformerListView::_AddTransformer(Transformer* transformer, int32 index)
 {
@@ -462,7 +460,7 @@ TransformerListView::_AddTransformer(Transformer* transformer, int32 index)
 	return false;
 }
 
-// _RemoveTransformer
+
 bool
 TransformerListView::_RemoveTransformer(Transformer* transformer)
 {
@@ -474,7 +472,7 @@ TransformerListView::_RemoveTransformer(Transformer* transformer)
 	return false;
 }
 
-// _ItemForTransformer
+
 TransformerItem*
 TransformerListView::_ItemForTransformer(Transformer* transformer) const
 {
@@ -487,7 +485,7 @@ TransformerListView::_ItemForTransformer(Transformer* transformer) const
 	return NULL;
 }
 
-// _UpdateMenu
+
 void
 TransformerListView::_UpdateMenu()
 {

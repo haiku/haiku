@@ -11,7 +11,6 @@
 #include <Catalog.h>
 #include <Locale.h>
 
-#include "PathContainer.h"
 #include "PathSourceShape.h"
 #include "VectorPath.h"
 
@@ -49,7 +48,7 @@ status_t
 UnassignPathCommand::Perform()
 {
 	// remove path from shape
-	fShape->Paths()->RemovePath(fPath);
+	fShape->Paths()->RemoveItem(fPath);
 	fPathRemoved = true;
 
 	return B_OK;
@@ -60,7 +59,7 @@ status_t
 UnassignPathCommand::Undo()
 {
 	// add path to shape
-	fShape->Paths()->AddPath(fPath);
+	fShape->Paths()->AddItem(fPath);
 	fPathRemoved = false;
 
 	return B_OK;

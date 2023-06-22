@@ -20,10 +20,6 @@ struct text_run_array;
 _BEGIN_ICON_NAMESPACE
 	class Icon;
 	class Style;
-	class VectorPath;
-	class PathContainer;
-	class ShapeContainer;
-	class StyleContainer;
 _END_ICON_NAMESPACE
 
 struct style_map {

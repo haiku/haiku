@@ -103,9 +103,9 @@ SVGExporter::Export(const Icon* icon, BPositionIO* stream)
 
 		// export all shapes
 		if (ret >= B_OK) {
-			int32 count = icon->Shapes()->CountShapes();
+			int32 count = icon->Shapes()->CountItems();
 			for (int32 i = 0; i < count; i++) {
-				Shape* shape = icon->Shapes()->ShapeAtFast(i);
+				Shape* shape = icon->Shapes()->ItemAtFast(i);
 				ret = _ExportShape(shape, stream);
 				if (ret < B_OK)
 					break;
@@ -237,7 +237,7 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 
 	// hack to see if this is an outline shape
 	StrokeTransformer* stroke
-		= dynamic_cast<StrokeTransformer*>(pathSourceShape->TransformerAt(0));
+		= dynamic_cast<StrokeTransformer*>(pathSourceShape->Transformers()->ItemAt(0));
 	if (stroke) {
 		helper << "style=\"fill:none; stroke:" << color;
 		if (!style->Gradient() && style->Color().alpha < 255) {
@@ -279,9 +279,9 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 	if (ret < B_OK)
 		return ret;
 
-	int32 count = pathSourceShape->Paths()->CountPaths();
+	int32 count = pathSourceShape->Paths()->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		VectorPath* path = pathSourceShape->Paths()->PathAtFast(i);
+		VectorPath* path = pathSourceShape->Paths()->ItemAtFast(i);
 
 		if (i > 0) {
 			helper << "\n           ";

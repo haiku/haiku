@@ -8,11 +8,11 @@
 
 #include "PathSource.h"
 
-#include "PathContainer.h"
+#include "Container.h"
 #include "VectorPath.h"
 
 // constructor
-PathSource::PathSource(PathContainer* paths)
+PathSource::PathSource(Container<VectorPath>* paths)
 	: VertexSource()
 	, fPaths(paths)
 	, fAGGPath()
@@ -64,9 +64,9 @@ PathSource::Update(bool leavePathsOpen, double approximationScale)
 {
 	fAGGPath.remove_all();
 
-	int32 count = fPaths->CountPaths();
+	int32 count = fPaths->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		fPaths->PathAtFast(i)->GetAGGPathStorage(fAGGPath);
+		fPaths->ItemAtFast(i)->GetAGGPathStorage(fAGGPath);
 		if (!leavePathsOpen)
 			fAGGPath.close_polygon();
 	}

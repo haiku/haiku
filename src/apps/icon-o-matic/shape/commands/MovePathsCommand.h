@@ -1,50 +1,37 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef MOVE_PATHS_COMMAND_H
 #define MOVE_PATHS_COMMAND_H
 
 
-#include "Command.h"
 #include "IconBuild.h"
+#include "MoveCommand.h"
 
-
-// TODO: make a templated "move items" command?
 
 _BEGIN_ICON_NAMESPACE
+	template <class Type> class Container;
 	class VectorPath;
-	class PathContainer;
 _END_ICON_NAMESPACE
 
 _USING_ICON_NAMESPACE
 
 
-class MovePathsCommand : public Command {
+class MovePathsCommand : public MoveCommand<VectorPath> {
  public:
-								MovePathsCommand(
-									PathContainer* container,
-									VectorPath** paths,
-									int32 count,
-									int32 toIndex);
-	virtual						~MovePathsCommand();
+							   	MovePathsCommand(
+							   		Container<VectorPath>* container,
+							   		VectorPath** paths,
+							   		int32 count,
+							   		int32 toIndex);
+	virtual					   	~MovePathsCommand();
 
-	virtual	status_t			InitCheck();
-
-	virtual	status_t			Perform();
-	virtual status_t			Undo();
-
-	virtual void				GetName(BString& name);
-
- private:
-			PathContainer*		fContainer;
-			VectorPath**		fPaths;
-			int32*				fIndices;
-			int32				fToIndex;
-			int32				fCount;
+	virtual void			   	GetName(BString& name);
 };
 
 #endif // MOVE_PATHS_COMMAND_H

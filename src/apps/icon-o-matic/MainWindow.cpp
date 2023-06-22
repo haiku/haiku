@@ -83,11 +83,9 @@
 #include "PathSourceShape.h"
 #include "ReferenceImage.h"
 #include "Shape.h"
-#include "ShapeContainer.h"
 #include "ShapeListView.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "VectorPath.h"
 
 #include "StyledTextImporter.h"
@@ -202,9 +200,9 @@ MainWindow::MessageReceived(BMessage* message)
 			Style* style = new (nothrow) Style(*color);
 			style->SetName(name);
 			Style* styles[1] = { style };
-			AddStylesCommand* styleCommand = new (nothrow) AddStylesCommand(
-				fDocument->Icon()->Styles(), styles, 1,
-				fDocument->Icon()->Styles()->CountStyles());
+			AddCommand<Style>* styleCommand = new (nothrow) AddCommand<Style>(
+				fDocument->Icon()->Styles(), styles, 1, true,
+				fDocument->Icon()->Styles()->CountItems());
 			fDocument->CommandStack()->Perform(styleCommand);
 			// don't handle anything else,
 			// or we might paste the clipboard on B_PASTE
@@ -238,9 +236,9 @@ MainWindow::MessageReceived(BMessage* message)
 			// otherwise forward to the application which will open
 			// it in another window, unless we append.
 			message->what = B_REFS_RECEIVED;
-			if (fDocument->Icon()->Styles()->CountStyles() == 0
-				&& fDocument->Icon()->Paths()->CountPaths() == 0
-				&& fDocument->Icon()->Shapes()->CountShapes() == 0) {
+			if (fDocument->Icon()->Styles()->CountItems() == 0
+				&& fDocument->Icon()->Paths()->CountItems() == 0
+				&& fDocument->Icon()->Shapes()->CountItems() == 0) {
 				Open(ref);
 				break;
 			}
@@ -301,9 +299,9 @@ MainWindow::MessageReceived(BMessage* message)
 		{
 			// If our icon is empty, we want the icon to open in this
 			// window.
-			bool emptyDocument = fDocument->Icon()->Styles()->CountStyles() == 0
-				&& fDocument->Icon()->Paths()->CountPaths() == 0
-				&& fDocument->Icon()->Shapes()->CountShapes() == 0;
+			bool emptyDocument = fDocument->Icon()->Styles()->CountItems() == 0
+				&& fDocument->Icon()->Paths()->CountItems() == 0
+				&& fDocument->Icon()->Shapes()->CountItems() == 0;
 
 			bool openingReferenceImage;
 			if (message->FindBool("reference image", &openingReferenceImage) != B_OK)
@@ -443,19 +441,18 @@ MainWindow::MessageReceived(BMessage* message)
 			if (!style) {
 				// use current or first style
 				int32 currentStyle = fStyleListView->CurrentSelection(0);
-				style = fDocument->Icon()->Styles()->StyleAt(currentStyle);
+				style = fDocument->Icon()->Styles()->ItemAt(currentStyle);
 				if (!style)
-					style = fDocument->Icon()->Styles()->StyleAt(0);
+					style = fDocument->Icon()->Styles()->ItemAt(0);
 			}
 		
 			PathSourceShape* shape = new (nothrow) PathSourceShape(style);
 			AddShapesCommand* shapeCommand = new (nothrow) AddShapesCommand(
 				fDocument->Icon()->Shapes(), (Shape**) &shape, 1,
-				fDocument->Icon()->Shapes()->CountShapes(),
-				fDocument->Selection());
+				fDocument->Icon()->Shapes()->CountItems());
 		
 			if (path && shape)
-				shape->Paths()->AddPath(path);
+				shape->Paths()->AddItem(path);
 		
 			::Command* command = NULL;
 			if (styleCommand || pathCommand) {
@@ -503,7 +500,7 @@ case MSG_PATH_SELECTED: {
 	fTransformerListView->SetShape(NULL);
 	
 	fState->DeleteManipulators();
-	if (fDocument->Icon()->Paths()->HasPath(path)) {
+	if (fDocument->Icon()->Paths()->HasItem(path)) {
 		PathManipulator* pathManipulator = new (nothrow) PathManipulator(path);
 		fState->AddManipulator(pathManipulator);
 	}
@@ -514,7 +511,7 @@ case MSG_STYLE_TYPE_CHANGED: {
 	Style* style;
 	if (message->FindPointer("style", (void**)&style) < B_OK)
 		style = NULL;
-	if (!fDocument->Icon()->Styles()->HasStyle(style))
+	if (!fDocument->Icon()->Styles()->HasItem(style))
 		style = NULL;
 
 	fStyleView->SetStyle(style);
@@ -535,7 +532,7 @@ case MSG_SHAPE_SELECTED: {
 	Shape* shape;
 	if (message->FindPointer("shape", (void**)&shape) < B_OK)
 		shape = NULL;
-	if (!fIcon || !fIcon->Shapes()->HasShape(shape))
+	if (!fIcon || !fIcon->Shapes()->HasItem(shape))
 		shape = NULL;
 
 	fPathListView->SetCurrentShape(shape);
@@ -543,10 +540,10 @@ case MSG_SHAPE_SELECTED: {
 	fTransformerListView->SetShape(shape);
 
 	BList selectedShapes;
-	ShapeContainer* shapes = fDocument->Icon()->Shapes();
-	int32 count = shapes->CountShapes();
+	Container<Shape>* shapes = fDocument->Icon()->Shapes();
+	int32 count = shapes->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		shape = shapes->ShapeAtFast(i);
+		shape = shapes->ItemAtFast(i);
 		if (shape->IsSelected()) {
 			selectedShapes.AddItem((void*)shape);
 		}
@@ -868,8 +865,7 @@ MainWindow::AddReferenceImage(const entry_ref& ref)
 
 	AddShapesCommand* shapeCommand = new (nothrow) AddShapesCommand(
 		fDocument->Icon()->Shapes(), &shape, 1,
-		fDocument->Icon()->Shapes()->CountShapes(),
-		fDocument->Selection());
+		fDocument->Icon()->Shapes()->CountItems());
 	if (shapeCommand == NULL) {
 		delete shape;
 		return;

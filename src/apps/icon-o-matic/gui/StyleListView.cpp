@@ -31,7 +31,6 @@
 #include "Observer.h"
 #include "ResetTransformationCommand.h"
 #include "Shape.h"
-#include "ShapeContainer.h"
 #include "Selection.h"
 #include "Util.h"
 
@@ -197,7 +196,7 @@ private:
 
 
 class ShapeStyleListener : public ShapeListener,
-	public ShapeContainerListener {
+	public ContainerListener<Shape> {
 public:
 	ShapeStyleListener(StyleListView* listView)
 		:
@@ -226,12 +225,12 @@ public:
 		fListView->_SetStyleMarked(newStyle, true);
 	}
 
-	// ShapeContainerListener interface
-	virtual void ShapeAdded(Shape* shape, int32 index)
+	// ContainerListener<Shape> interface
+	virtual void ItemAdded(Shape* shape, int32 index)
 	{
 	}
 
-	virtual void ShapeRemoved(Shape* shape)
+	virtual void ItemRemoved(Shape* shape)
 	{
 		fListView->SetCurrentShape(NULL);
 	}
@@ -502,8 +501,8 @@ StyleListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 	if (count == 0)
 		return false;
 
-	AddStylesCommand* command = new(std::nothrow) AddStylesCommand(
-		fStyleContainer, (Style**)styles.Items(), count, dropIndex);
+	AddCommand<Style>* command = new(std::nothrow) AddCommand<Style>(
+		fStyleContainer, (Style**)styles.Items(), count, true, dropIndex);
 
 	if (command == NULL) {
 		for (int32 i = 0; i < count; i++)
@@ -560,9 +559,8 @@ StyleListView::CopyItems(BList& items, int32 toIndex)
 		styles[i] = item ? new (nothrow) Style(*item->style) : NULL;
 	}
 
-	AddStylesCommand* command
-		= new (nothrow) AddStylesCommand(fStyleContainer,
-										 styles, count, toIndex);
+	AddCommand<Style>* command
+		= new (nothrow) AddCommand<Style>(fStyleContainer, styles, count, true, toIndex);
 	if (!command) {
 		for (int32 i = 0; i < count; i++)
 			delete styles[i];
@@ -580,19 +578,12 @@ StyleListView::RemoveItemList(BList& items)
 		return;
 
 	int32 count = items.CountItems();
-	Style* styles[count];
-	for (int32 i = 0; i < count; i++) {
-		StyleListItem* item = dynamic_cast<StyleListItem*>(
-			(BListItem*)items.ItemAtFast(i));
-		if (item)
-			styles[i] = item->style;
-		else
-			styles[i] = NULL;
-	}
+	int32 indices[count];
+	for (int32 i = 0; i < count; i++)
+		indices[i] = IndexOf((BListItem*)items.ItemAtFast(i));
 
 	RemoveStylesCommand* command
-		= new (nothrow) RemoveStylesCommand(fStyleContainer,
-											styles, count);
+		= new (nothrow) RemoveStylesCommand(fStyleContainer, indices, count);
 	fCommandStack->Perform(command);
 }
 
@@ -640,7 +631,7 @@ StyleListView::SelectableFor(BListItem* item) const
 
 
 void
-StyleListView::StyleAdded(Style* style, int32 index)
+StyleListView::ItemAdded(Style* style, int32 index)
 {
 	// NOTE: we are in the thread that messed with the
 	// StyleContainer, so no need to lock the
@@ -657,7 +648,7 @@ StyleListView::StyleAdded(Style* style, int32 index)
 
 
 void
-StyleListView::StyleRemoved(Style* style)
+StyleListView::ItemRemoved(Style* style)
 {
 	// NOTE: we are in the thread that messed with the
 	// StyleContainer, so no need to lock the
@@ -711,7 +702,7 @@ StyleListView::SetMenu(BMenu* menu)
 
 
 void
-StyleListView::SetStyleContainer(StyleContainer* container)
+StyleListView::SetStyleContainer(Container<Style>* container)
 {
 	if (fStyleContainer == container)
 		return;
@@ -730,14 +721,14 @@ StyleListView::SetStyleContainer(StyleContainer* container)
 	fStyleContainer->AddListener(this);
 
 	// sync
-	int32 count = fStyleContainer->CountStyles();
+	int32 count = fStyleContainer->CountItems();
 	for (int32 i = 0; i < count; i++)
-		_AddStyle(fStyleContainer->StyleAtFast(i), i);
+		_AddStyle(fStyleContainer->ItemAtFast(i), i);
 }
 
 
 void
-StyleListView::SetShapeContainer(ShapeContainer* container)
+StyleListView::SetShapeContainer(Container<Shape>* container)
 {
 	if (fShapeContainer == container)
 		return;

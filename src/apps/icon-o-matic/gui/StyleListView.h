@@ -7,7 +7,7 @@
 
 
 #include "ListViews.h"
-#include "StyleContainer.h"
+#include "Container.h"
 
 
 class BMenu;
@@ -21,15 +21,13 @@ class StyleListItem;
 _BEGIN_ICON_NAMESPACE
 	class PathSourceShape;
 	class Shape;
-	class ShapeContainer;
-	class ShapeListener;
 	class Style;
 _END_ICON_NAMESPACE
 
 _USING_ICON_NAMESPACE
 
 
-class StyleListView : public SimpleListView, public StyleContainerListener {
+class StyleListView : public SimpleListView, public ContainerListener<Style> {
 public:
 								StyleListView(BRect frame, const char* name,
 									BMessage* selectionMessage = NULL,
@@ -61,14 +59,14 @@ public:
 	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
 	virtual	Selectable*			SelectableFor(BListItem* item) const;
 
-	// StyleContainerListener interface
-	virtual	void				StyleAdded(Style* style, int32 index);
-	virtual	void				StyleRemoved(Style* style);
+	// ContainerListener<Style> interface
+	virtual	void				ItemAdded(Style* style, int32 index);
+	virtual	void				ItemRemoved(Style* style);
 
 	// StyleListView
 			void				SetMenu(BMenu* menu);
-			void				SetStyleContainer(StyleContainer* container);
-			void				SetShapeContainer(ShapeContainer* container);
+			void				SetStyleContainer(Container<Style>* container);
+			void				SetShapeContainer(Container<Shape>* container);
 			void				SetCommandStack(CommandStack* stack);
 			void				SetCurrentColor(CurrentColor* color);
 
@@ -89,8 +87,8 @@ private:
 
 			BMessage*			fMessage;
 
-			StyleContainer*		fStyleContainer;
-			ShapeContainer*		fShapeContainer;
+			Container<Style>*	fStyleContainer;
+			Container<Shape>*	fShapeContainer;
 			CommandStack*		fCommandStack;
 			CurrentColor*		fCurrentColor;
 

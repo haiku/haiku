@@ -4,6 +4,7 @@ SubDir HAIKU_TOP src build libbe icon ;
 local sourceDirs =
 	$(DOT)
 	flat_icon
+	generic
 	message
 	shape
 	style
@@ -37,17 +38,14 @@ BuildPlatformMergeObjectPIC <libbe_build>icon_kit.o :
 	MessageImporter.cpp
 
 	# shape
-	PathContainer.cpp
 	PathSourceShape.cpp
 	ReferenceImage.cpp
 	Shape.cpp
-	ShapeContainer.cpp
 	VectorPath.cpp
 
 	# style
 	GradientTransformable.cpp
 	Style.cpp
-	StyleContainer.cpp
 
 	# transformable
 	Transformable.cpp

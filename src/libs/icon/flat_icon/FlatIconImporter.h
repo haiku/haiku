@@ -15,6 +15,7 @@
 #	include <SupportDefs.h>
 #endif
 
+#include "Container.h"
 #include "IconBuild.h"
 
 
@@ -29,8 +30,8 @@ class Icon;
 class LittleEndianBuffer;
 class PathContainer;
 class Shape;
-class ShapeContainer;
-class StyleContainer;
+class Style;
+class VectorPath;
 
 #ifdef ICON_O_MATIC
 class FlatIconImporter : public Importer {
@@ -53,17 +54,17 @@ class FlatIconImporter {
 											   Icon* icon);
 
 			status_t			_ParseStyles(LittleEndianBuffer& buffer,
-											 StyleContainer* styles);
+											 Container<Style>* styles);
 			status_t			_ParsePaths(LittleEndianBuffer& buffer,
-											PathContainer* paths);
+											Container<VectorPath>* paths);
 			Shape*				_ReadPathSourceShape(
 									LittleEndianBuffer& buffer,
-									StyleContainer* styles,
-									PathContainer* paths);
+									Container<Style>* styles,
+									Container<VectorPath>* paths);
 			status_t			_ParseShapes(LittleEndianBuffer& buffer,
-											 StyleContainer* styles,
-											 PathContainer* paths,
-											 ShapeContainer* shapes);
+											 Container<Style>* styles,
+											 Container<VectorPath>* paths,
+											 Container<Shape>* shapes);
 };
 
 

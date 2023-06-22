@@ -19,7 +19,7 @@
 _BEGIN_ICON_NAMESPACE
 
 
-class PathContainer;
+template <class Type> class Container;
 class VectorPath;
 
 typedef agg::path_storage					AGGPath;
@@ -27,28 +27,28 @@ typedef agg::conv_curve<AGGPath>			AGGCurvedPath;
 
 class PathSource : public VertexSource {
  public:
-								PathSource(PathContainer* paths);
-	virtual						~PathSource();
+									PathSource(Container<VectorPath>* paths);
+	virtual							~PathSource();
 
-    virtual	void				rewind(unsigned path_id);
-    virtual	unsigned			vertex(double* x, double* y);
+    virtual	void					rewind(unsigned path_id);
+    virtual	unsigned				vertex(double* x, double* y);
 
-	virtual	bool				WantsOpenPaths() const;
-	virtual	double				ApproximationScale() const;
+	virtual	bool					WantsOpenPaths() const;
+	virtual	double					ApproximationScale() const;
 
 	// PathSource
-			void				Update(bool leavePathsOpen,
-									double approximationScale);
+			void					Update(bool leavePathsOpen,
+										double approximationScale);
 
-			void				SetGlobalScale(double scale);
+			void					SetGlobalScale(double scale);
 
  private:
-		 	PathContainer*		fPaths;
-		 	AGGPath				fAGGPath;
-		 	AGGCurvedPath		fAGGCurvedPath;
+		 	Container<VectorPath>*	fPaths;
+		 	AGGPath					fAGGPath;
+		 	AGGCurvedPath			fAGGCurvedPath;
 
-		 	double				fGlobalScale;
-		 	double				fLastTransformerScale;
+		 	double					fGlobalScale;
+		 	double					fLastTransformerScale;
 };
 
 

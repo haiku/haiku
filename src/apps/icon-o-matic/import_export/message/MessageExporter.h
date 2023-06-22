@@ -15,11 +15,10 @@ class BMessage;
 class BPositionIO;
 
 _BEGIN_ICON_NAMESPACE
+	template <class Type> class Container;
 	class Icon;
-	class PathContainer;
 	class Shape;
 	class Style;
-	class StyleContainer;
 	class Transformer;
 	class VectorPath;
 _END_ICON_NAMESPACE
@@ -41,8 +40,8 @@ class MessageExporter : public Exporter {
 			status_t			_Export(const Style* style,
 										BMessage* into) const;
 			status_t			_Export(const Shape* shape,
-										const PathContainer* globalPaths,
-						 				const StyleContainer* globalStyles,
+										const Container<VectorPath>* globalPaths,
+										const Container<Style>* globalStyles,
 										BMessage* into) const;
 };
 

@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "Shape.h"
@@ -22,8 +23,10 @@
 # include "Property.h"
 # include "PropertyObject.h"
 #endif // ICON_O_MATIC
+#include "Container.h"
 #include "Style.h"
 #include "TransformerFactory.h"
+#include "VectorPath.h"
 
 using std::nothrow;
 
@@ -48,16 +51,16 @@ Shape::Shape(::Style* style)
 	: IconObject("<shape>"),
 	  Transformable(),
 	  Observer(),
-	  PathContainerListener(),
+	  ContainerListener<VectorPath>(),
 #else
 	: Transformable(),
 #endif
 
-	  fPaths(new (nothrow) PathContainer(false)),
+	  fPaths(new (nothrow) Container<VectorPath>(false)),
 	  fStyle(NULL),
 
 	  fPathSource(fPaths),
-	  fTransformers(4),
+	  fTransformers(true),
 	  fNeedsUpdate(true),
 
 	  fLastBounds(0, 0, -1, -1),
@@ -73,6 +76,8 @@ Shape::Shape(::Style* style)
 #ifdef ICON_O_MATIC
 	if (fPaths)
 		fPaths->AddListener(this);
+
+	fTransformers.AddListener(this);
 #endif
 }
 
@@ -82,16 +87,16 @@ Shape::Shape(const Shape& other)
 	: IconObject(other),
 	  Transformable(other),
 	  Observer(),
-	  PathContainerListener(),
+	  ContainerListener<VectorPath>(),
 #else
 	: Transformable(other),
 #endif
 
-	  fPaths(new (nothrow) PathContainer(false)),
+	  fPaths(new (nothrow) Container<VectorPath>(false)),
 	  fStyle(NULL),
 
 	  fPathSource(fPaths),
-	  fTransformers(4),
+	  fTransformers(true),
 	  fNeedsUpdate(true),
 
 	  fLastBounds(0, 0, -1, -1),
@@ -107,24 +112,26 @@ Shape::Shape(const Shape& other)
 	if (fPaths) {
 #ifdef ICON_O_MATIC
 		fPaths->AddListener(this);
+
+	fTransformers.AddListener(this);
 #endif
 
 		// copy the path references from
 		// the other shape
 		if (other.fPaths) {
-			int32 count = other.fPaths->CountPaths();
+			int32 count = other.fPaths->CountItems();
 			for (int32 i = 0; i < count; i++) {
-				if (!fPaths->AddPath(other.fPaths->PathAtFast(i)))
+				if (!fPaths->AddItem(other.fPaths->ItemAtFast(i)))
 					break;
 			}
 		}
 	}
 	// clone vertex transformers
-	int32 count = other.CountTransformers();
+	int32 count = other.Transformers()->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		Transformer* original = other.TransformerAtFast(i);
+		Transformer* original = other.Transformers()->ItemAtFast(i);
 		Transformer* cloned = original->Clone(fPathSource);
-		if (!AddTransformer(cloned)) {
+		if (!fTransformers.AddItem(cloned)) {
 			delete cloned;
 			break;
 		}
@@ -134,19 +141,12 @@ Shape::Shape(const Shape& other)
 
 Shape::~Shape()
 {
-	int32 count = fTransformers.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		Transformer* t = (Transformer*)fTransformers.ItemAtFast(i);
-#ifdef ICON_O_MATIC
-		t->RemoveObserver(this);
-		_NotifyTransformerRemoved(t);
-#endif
-		delete t;
-	}
-
 	fPaths->MakeEmpty();
 #ifdef ICON_O_MATIC
 	fPaths->RemoveListener(this);
+
+	fTransformers.MakeEmpty();
+	fTransformers.RemoveListener(this);
 #endif
 	delete fPaths;
 
@@ -182,7 +182,7 @@ Shape::Unarchive(BMessage* archive)
 		Transformer* transformer
 			= TransformerFactory::TransformerFor(
 				&transformerArchive, VertexSource());
-		if (!transformer || !AddTransformer(transformer)) {
+		if (!transformer || !fTransformers.AddItem(transformer)) {
 			delete transformer;
 		}
 	}
@@ -212,9 +212,9 @@ Shape::Archive(BMessage* into, bool deep) const
 
 	// transformers
 	if (ret == B_OK) {
-		int32 count = CountTransformers();
+		int32 count = fTransformers.CountItems();
 		for (int32 i = 0; i < count; i++) {
-			Transformer* transformer = TransformerAtFast(i);
+			Transformer* transformer = fTransformers.ItemAtFast(i);
 			BMessage transformerArchive;
 			ret = transformer->Archive(&transformerArchive);
 			if (ret == B_OK)
@@ -281,7 +281,7 @@ Shape::ObjectChanged(const Observable* object)
 
 
 void
-Shape::PathAdded(VectorPath* path, int32 index)
+Shape::ItemAdded(VectorPath* path, int32 index)
 {
 	path->AcquireReference();
 	path->AddListener(this);
@@ -290,11 +290,41 @@ Shape::PathAdded(VectorPath* path, int32 index)
 
 
 void
-Shape::PathRemoved(VectorPath* path)
+Shape::ItemRemoved(VectorPath* path)
 {
 	path->RemoveListener(this);
 	_NotifyRerender();
 	path->ReleaseReference();
+}
+
+
+// #pragma mark -
+
+
+void
+Shape::ItemAdded(Transformer* transformer, int32 index)
+{
+#ifdef ICON_O_MATIC
+	transformer->AddObserver(this);
+
+	// TODO: merge Observable and ShapeListener interface
+	_NotifyRerender();
+#else
+	fNeedsUpdate = true;
+#endif
+}
+
+
+void
+Shape::ItemRemoved(Transformer* transformer)
+{
+#ifdef ICON_O_MATIC
+	transformer->RemoveObserver(this);
+
+	_NotifyRerender();
+#else
+	fNeedsUpdate = true;
+#endif
 }
 
 
@@ -444,89 +474,6 @@ Shape::SetGlobalScale(double scale)
 }
 
 
-bool
-Shape::AddTransformer(Transformer* transformer)
-{
-	return AddTransformer(transformer, CountTransformers());
-}
-
-
-bool
-Shape::AddTransformer(Transformer* transformer, int32 index)
-{
-	if (!transformer)
-		return false;
-
-	if (!fTransformers.AddItem((void*)transformer, index))
-		return false;
-
-#ifdef ICON_O_MATIC
-	transformer->AddObserver(this);
-
-	_NotifyTransformerAdded(transformer, index);
-#else
-	fNeedsUpdate = true;
-#endif
-	return true;
-}
-
-
-bool
-Shape::RemoveTransformer(Transformer* transformer)
-{
-	if (fTransformers.RemoveItem((void*)transformer)) {
-#ifdef ICON_O_MATIC
-		transformer->RemoveObserver(this);
-		
-		_NotifyTransformerRemoved(transformer);
-#else
-		fNeedsUpdate = true;
-#endif
-		return true;
-	}
-
-	return false;
-}
-
-
-// #pragma mark -
-
-
-int32
-Shape::CountTransformers() const
-{
-	return fTransformers.CountItems();
-}
-
-
-bool
-Shape::HasTransformer(Transformer* transformer) const
-{
-	return fTransformers.HasItem((void*)transformer);
-}
-
-
-int32
-Shape::IndexOf(Transformer* transformer) const
-{
-	return fTransformers.IndexOf((void*)transformer);
-}
-
-
-Transformer*
-Shape::TransformerAt(int32 index) const
-{
-	return (Transformer*)fTransformers.ItemAt(index);
-}
-
-
-Transformer*
-Shape::TransformerAtFast(int32 index) const
-{
-	return (Transformer*)fTransformers.ItemAtFast(index);
-}
-
-
 // #pragma mark -
 
 
@@ -548,36 +495,6 @@ Shape::RemoveListener(ShapeListener* listener)
 
 
 // #pragma mark -
-
-
-void
-Shape::_NotifyTransformerAdded(Transformer* transformer, int32 index) const
-{
-	BList listeners(fListeners);
-	int32 count = listeners.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		ShapeListener* listener
-			= (ShapeListener*)listeners.ItemAtFast(i);
-		listener->TransformerAdded(transformer, index);
-	}
-	// TODO: merge Observable and ShapeListener interface
-	_NotifyRerender();
-}
-
-
-void
-Shape::_NotifyTransformerRemoved(Transformer* transformer) const
-{
-	BList listeners(fListeners);
-	int32 count = listeners.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		ShapeListener* listener
-			= (ShapeListener*)listeners.ItemAtFast(i);
-		listener->TransformerRemoved(transformer);
-	}
-	// TODO: merge Observable and ShapeListener interface
-	_NotifyRerender();
-}
 
 
 void

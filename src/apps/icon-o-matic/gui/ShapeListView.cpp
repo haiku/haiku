@@ -27,22 +27,20 @@
 #include "AddStylesCommand.h"
 #include "CommandStack.h"
 #include "CompoundCommand.h"
+#include "Container.h"
 #include "FreezeTransformationCommand.h"
 #include "MainWindow.h"
 #include "MoveShapesCommand.h"
 #include "Observer.h"
-#include "ReferenceImage.h"
-#include "PathContainer.h"
 #include "PathSourceShape.h"
+#include "ReferenceImage.h"
 #include "RemoveShapesCommand.h"
 #include "ResetTransformationCommand.h"
 #include "Selection.h"
 #include "Shape.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "Util.h"
 #include "VectorPath.h"
-
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Icon-O-Matic-ShapesList"
@@ -268,10 +266,10 @@ ShapeListView::MakeDragMessage(BMessage* message) const
 				shape->Style()->Archive(&styleArchive, true);
 				archive.AddMessage("style", &styleArchive);
 
-				PathContainer* paths = shape->Paths();
-				for (int32 j = 0; j < paths->CountPaths(); j++) {
+				Container<VectorPath>* paths = shape->Paths();
+				for (int32 j = 0; j < paths->CountItems(); j++) {
 					BMessage pathArchive;
-					paths->PathAt(j)->Archive(&pathArchive, true);
+					paths->ItemAt(j)->Archive(&pathArchive, true);
 					archive.AddMessage("path", &pathArchive);
 				}
 
@@ -365,8 +363,8 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 			Style* styleToAssign = style;
 			// Try to find an existing style that is the same as the extracted
 			// style and use that one instead.
-			for (int32 i = 0; i < fStyleContainer->CountStyles(); i++) {
-				Style* other = fStyleContainer->StyleAtFast(i);
+			for (int32 i = 0; i < fStyleContainer->CountItems(); i++) {
+				Style* other = fStyleContainer->ItemAtFast(i);
 				if (*other == *style) {
 					styleToAssign = other;
 					delete style;
@@ -407,8 +405,8 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 					break;
 
 				VectorPath* pathToInclude = path;
-				for (int32 i = 0; i < fPathContainer->CountPaths(); i++) {
-					VectorPath* other = fPathContainer->PathAtFast(i);
+				for (int32 i = 0; i < fPathContainer->CountItems(); i++) {
+					VectorPath* other = fPathContainer->ItemAtFast(i);
 					if (*other == *path) {
 						pathToInclude = other;
 						delete path;
@@ -422,7 +420,7 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 					break;
 				}
 
-				shape->Paths()->AddPath(pathToInclude);
+				shape->Paths()->AddItem(pathToInclude);
 
 				pathIndex++;
 			}
@@ -454,15 +452,14 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 
 	AddStylesCommand* stylesCommand = new(std::nothrow) AddStylesCommand(
 		fStyleContainer, (Style**)styles.Items(), styles.CountItems(),
-		fStyleContainer->CountStyles());
+		fStyleContainer->CountItems());
 
 	AddPathsCommand* pathsCommand = new(std::nothrow) AddPathsCommand(
 		fPathContainer, (VectorPath**)paths.Items(), paths.CountItems(),
-		true, fPathContainer->CountPaths());
+		true, fPathContainer->CountItems());
 
 	AddShapesCommand* shapesCommand = new(std::nothrow) AddShapesCommand(
-		fShapeContainer, (Shape**)shapes.Items(), shapeCount, dropIndex,
-		fSelection);
+		fShapeContainer, (Shape**)shapes.Items(), shapeCount, dropIndex);
 
 	::Command** commands = new(std::nothrow) ::Command*[3];
 
@@ -526,7 +523,7 @@ ShapeListView::CopyItems(BList& items, int32 toIndex)
 	}
 
 	AddShapesCommand* command = new(nothrow) AddShapesCommand(fShapeContainer,
-		shapes, count, toIndex, fSelection);
+		shapes, count, toIndex);
 	if (command == NULL) {
 		for (int32 i = 0; i < count; i++)
 			delete shapes[i];
@@ -578,7 +575,7 @@ ShapeListView::IndexOfSelectable(Selectable* selectable) const
 		int32 count = CountItems();
 		for (int32 i = 0; i < count; i++) {
 			ShapeListItem* item = dynamic_cast<ShapeListItem*>(ItemAt(i));
-			if (item != NULL && item->shape->HasTransformer(transformer))
+			if (item != NULL && item->shape->Transformers()->HasItem(transformer))
 				return i;
 		}
 	} else {
@@ -608,7 +605,7 @@ ShapeListView::SelectableFor(BListItem* item) const
 
 
 void
-ShapeListView::ShapeAdded(Shape* shape, int32 index)
+ShapeListView::ItemAdded(Shape* shape, int32 index)
 {
 	// NOTE: we are in the thread that messed with the
 	// ShapeContainer, so no need to lock the
@@ -625,7 +622,7 @@ ShapeListView::ShapeAdded(Shape* shape, int32 index)
 
 
 void
-ShapeListView::ShapeRemoved(Shape* shape)
+ShapeListView::ItemRemoved(Shape* shape)
 {
 	// NOTE: we are in the thread that messed with the
 	// ShapeContainer, so no need to lock the
@@ -715,7 +712,7 @@ ShapeListView::SetMenu(BMenu* menu)
 
 
 void
-ShapeListView::SetShapeContainer(ShapeContainer* container)
+ShapeListView::SetShapeContainer(Container<Shape>* container)
 {
 	if (fShapeContainer == container)
 		return;
@@ -734,21 +731,21 @@ ShapeListView::SetShapeContainer(ShapeContainer* container)
 	fShapeContainer->AddListener(this);
 
 	// sync
-	int32 count = fShapeContainer->CountShapes();
+	int32 count = fShapeContainer->CountItems();
 	for (int32 i = 0; i < count; i++)
-		_AddShape(fShapeContainer->ShapeAtFast(i), i);
+		_AddShape(fShapeContainer->ItemAtFast(i), i);
 }
 
 
 void
-ShapeListView::SetStyleContainer(StyleContainer* container)
+ShapeListView::SetStyleContainer(Container<Style>* container)
 {
 	fStyleContainer = container;
 }
 
 
 void
-ShapeListView::SetPathContainer(PathContainer* container)
+ShapeListView::SetPathContainer(Container<VectorPath>* container)
 {
 	fPathContainer = container;
 }

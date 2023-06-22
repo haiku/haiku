@@ -1,33 +1,33 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2007, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef REMOVE_STYLES_COMMAND_H
 #define REMOVE_STYLES_COMMAND_H
 
 
-#include "Command.h"
 #include "IconBuild.h"
+#include "RemoveCommand.h"
 
-#include <List.h>
 
+class BList;
 
 _BEGIN_ICON_NAMESPACE
 	class Style;
-	class StyleContainer;
 _END_ICON_NAMESPACE
 
 _USING_ICON_NAMESPACE
 
 
-class RemoveStylesCommand : public Command {
+class RemoveStylesCommand : public RemoveCommand<Style> {
  public:
 								RemoveStylesCommand(
-									StyleContainer* container,
-									Style** const styles,
+									Container<Style>* container,
+									int32* const indices,
 									int32 count);
 	virtual						~RemoveStylesCommand();
 
@@ -39,15 +39,7 @@ class RemoveStylesCommand : public Command {
 	virtual void				GetName(BString& name);
 
  private:
-			StyleContainer*		fContainer;
-			struct StyleInfo {
-				Style*			style;
-				int32			index;
-				BList			shapes;
-			};
-			StyleInfo*			fInfos;
-			int32				fCount;
-			bool				fStylesRemoved;
+			BList*				fShapes;
 };
 
 #endif // REMOVE_STYLES_COMMAND_H

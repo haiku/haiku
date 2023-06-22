@@ -21,16 +21,15 @@
 #include <DataIO.h>
 #include <Message.h>
 
+#include "Container.h"
 #include "Defines.h"
 #include "Icon.h"
-#include "PathContainer.h"
 #include "PathSourceShape.h"
 #ifdef ICON_O_MATIC
 #include "ReferenceImage.h"
 #endif
 #include "Shape.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "VectorPath.h"
 
 
@@ -92,7 +91,7 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 		return ret;
 
 	// paths
-	PathContainer* paths = icon->Paths();
+	Container<VectorPath>* paths = icon->Paths();
 	ret = _ImportPaths(&archive, paths);
 	if (ret < B_OK) {
 		printf("MessageImporter::Import() - "
@@ -101,7 +100,7 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 	}
 
 	// styles
-	StyleContainer* styles = icon->Styles();
+	Container<Style>* styles = icon->Styles();
 	ret = _ImportStyles(&archive, styles);
 	if (ret < B_OK) {
 		printf("MessageImporter::Import() - "
@@ -126,7 +125,7 @@ MessageImporter::Import(Icon* icon, BPositionIO* stream)
 
 status_t
 MessageImporter::_ImportPaths(const BMessage* archive,
-	PathContainer* paths) const
+	Container<VectorPath>* paths) const
 {
 	BMessage allPaths;
 	status_t ret = archive->FindMessage("paths", &allPaths);
@@ -137,7 +136,7 @@ MessageImporter::_ImportPaths(const BMessage* archive,
 	for (int32 i = 0;
 		 allPaths.FindMessage("path", i, &pathArchive) == B_OK; i++) {
 		VectorPath* path = new (nothrow) VectorPath(&pathArchive);
-		if (!path || !paths->AddPath(path)) {
+		if (!path || !paths->AddItem(path)) {
 			delete path;
 			ret = B_NO_MEMORY;
 		}
@@ -151,7 +150,7 @@ MessageImporter::_ImportPaths(const BMessage* archive,
 
 status_t
 MessageImporter::_ImportStyles(const BMessage* archive,
-	StyleContainer* styles) const
+	Container<Style>* styles) const
 {
 	BMessage allStyles;
 	status_t ret = archive->FindMessage("styles", &allStyles);
@@ -162,7 +161,7 @@ MessageImporter::_ImportStyles(const BMessage* archive,
 	for (int32 i = 0;
 		 allStyles.FindMessage("style", i, &styleArchive) == B_OK; i++) {
 		Style* style = new (nothrow) Style(&styleArchive);
-		if (!style || !styles->AddStyle(style)) {
+		if (!style || !styles->AddItem(style)) {
 			delete style;
 			ret = B_NO_MEMORY;
 		}
@@ -175,8 +174,8 @@ MessageImporter::_ImportStyles(const BMessage* archive,
 
 
 status_t
-MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
-	StyleContainer* styles, ShapeContainer* shapes) const
+MessageImporter::_ImportShapes(const BMessage* archive, Container<VectorPath>* paths,
+	Container<Style>* styles, Container<Shape>* shapes) const
 {
 	BMessage allShapes;
 	status_t ret = archive->FindMessage("shapes", &allShapes);
@@ -200,9 +199,9 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 				continue;
 			}
 	#ifdef ICON_O_MATIC
-			Style* style = styles->StyleAt(StyleIndexFor(styleIndex));
+			Style* style = styles->ItemAt(StyleIndexFor(styleIndex));
 	#else
-			Style* style = styles->StyleAt(styleIndex);
+			Style* style = styles->ItemAt(styleIndex);
 	#endif
 			if (style == NULL) {
 				printf("MessageImporter::_ImportShapes() - "
@@ -213,7 +212,7 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 
 			// create shape
 			PathSourceShape* shape = new (nothrow) PathSourceShape(style);
-			if (shape == NULL || shape->InitCheck() < B_OK || !shapes->AddShape(shape)) {
+			if (shape == NULL || shape->InitCheck() < B_OK || !shapes->AddItem(shape)) {
 				delete shape;
 				ret = B_NO_MEMORY;
 			}
@@ -226,9 +225,9 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 				 shapeArchive.FindInt32("path ref", j, &pathIndex) == B_OK;
 				 j++) {
 	#ifdef ICON_O_MATIC
-				VectorPath* path = paths->PathAt(PathIndexFor(pathIndex));
+				VectorPath* path = paths->ItemAt(PathIndexFor(pathIndex));
 	#else
-				VectorPath* path = paths->PathAt(pathIndex);
+				VectorPath* path = paths->ItemAt(pathIndex);
 	#endif
 				if (path == NULL) {
 					printf("MessageImporter::_ImportShapes() - "
@@ -236,7 +235,7 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 						   "which does not exist\n", i, pathIndex);
 					continue;
 				}
-				shape->Paths()->AddPath(path);
+				shape->Paths()->AddItem(path);
 			}
 
 			// Shape properties
@@ -246,7 +245,7 @@ MessageImporter::_ImportShapes(const BMessage* archive, PathContainer* paths,
 	#ifdef ICON_O_MATIC
 		else if (type == ReferenceImage::archive_code) {
 			ReferenceImage* shape = new (nothrow) ReferenceImage(&shapeArchive);
-			if (shape == NULL || shape->InitCheck() < B_OK || !shapes->AddShape(shape)) {
+			if (shape == NULL || shape->InitCheck() < B_OK || !shapes->AddItem(shape)) {
 				delete shape;
 				ret = B_NO_MEMORY;
 			}

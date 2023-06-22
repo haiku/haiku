@@ -10,20 +10,21 @@
 #define SHAPE_LIST_VIEW_H
 
 
+#include "Container.h"
 #include "ListViews.h"
-#include "ShapeContainer.h"
+#include "IconBuild.h"
 
 
 class BMenu;
 class BMenuItem;
 class CommandStack;
 class ShapeListItem;
-class StyleContainer;
-class PathContainer;
 class Selection;
 
 _BEGIN_ICON_NAMESPACE
+	class Style;
 	class Shape;
+	class VectorPath;
 _END_ICON_NAMESPACE
 
 _USING_ICON_NAMESPACE
@@ -35,73 +36,73 @@ enum {
 };
 
 class ShapeListView : public SimpleListView,
-					  public ShapeContainerListener {
+					  public ContainerListener<Shape> {
  public:
-								ShapeListView(BRect frame,
-											  const char* name,
-											  BMessage* selectionMessage = NULL,
-											  BHandler* target = NULL);
-	virtual						~ShapeListView();
+									ShapeListView(BRect frame,
+												  const char* name,
+												  BMessage* selectionMessage = NULL,
+												  BHandler* target = NULL);
+	virtual							~ShapeListView();
 
 	// SimpleListView interface
-	virtual	void				SelectionChanged();
+	virtual	void					SelectionChanged();
 
-	virtual	void				MessageReceived(BMessage* message);
+	virtual	void					MessageReceived(BMessage* message);
 
-	virtual	void				MakeDragMessage(BMessage* message) const;
+	virtual	void					MakeDragMessage(BMessage* message) const;
 
-	virtual	bool				AcceptDragMessage(const BMessage* message) const;
-	virtual	void				SetDropTargetRect(const BMessage* message,
-									BPoint where);
-	virtual	bool				HandleDropMessage(const BMessage* message,
-									int32 dropIndex);
+	virtual	bool					AcceptDragMessage(const BMessage* message) const;
+	virtual	void					SetDropTargetRect(const BMessage* message,
+										BPoint where);
+	virtual	bool					HandleDropMessage(const BMessage* message,
+										int32 dropIndex);
 
-	virtual	void				MoveItems(BList& items, int32 toIndex);
-	virtual	void				CopyItems(BList& items, int32 toIndex);
-	virtual	void				RemoveItemList(BList& items);
+	virtual	void					MoveItems(BList& items, int32 toIndex);
+	virtual	void					CopyItems(BList& items, int32 toIndex);
+	virtual	void					RemoveItemList(BList& items);
 
-	virtual	BListItem*			CloneItem(int32 atIndex) const;
+	virtual	BListItem*				CloneItem(int32 atIndex) const;
 
-	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
-	virtual	Selectable*			SelectableFor(BListItem* item) const;
+	virtual	int32					IndexOfSelectable(Selectable* selectable) const;
+	virtual	Selectable*				SelectableFor(BListItem* item) const;
 
-	// ShapeContainerListener interface
-	virtual	void				ShapeAdded(Shape* shape, int32 index);
-	virtual	void				ShapeRemoved(Shape* shape);
+	// ContainerListener<Shape> interface
+	virtual	void					ItemAdded(Shape* shape, int32 index);
+	virtual	void					ItemRemoved(Shape* shape);
 
 	// ShapeListView
-			void				SetMenu(BMenu* menu);
-			void				SetShapeContainer(ShapeContainer* container);
-			void				SetStyleContainer(StyleContainer* container);
-			void				SetPathContainer(PathContainer* container);
-			void				SetCommandStack(CommandStack* stack);
+			void					SetMenu(BMenu* menu);
+			void					SetShapeContainer(Container<Shape>* container);
+			void					SetStyleContainer(Container<Style>* container);
+			void					SetPathContainer(Container<VectorPath>* container);
+			void					SetCommandStack(CommandStack* stack);
 
  private:
-			bool				_AddShape(Shape* shape, int32 index);
-			bool				_RemoveShape(Shape* shape);
+			bool					_AddShape(Shape* shape, int32 index);
+			bool					_RemoveShape(Shape* shape);
 
-			ShapeListItem*		_ItemForShape(Shape* shape) const;
-			void				_UpdateMenu();
+			ShapeListItem*			_ItemForShape(Shape* shape) const;
+			void					_UpdateMenu();
 
-			void				_GetSelectedShapes(BList& shapes) const;
+			void					_GetSelectedShapes(BList& shapes) const;
 
-			BMessage*			fMessage;
+			BMessage*				fMessage;
 
-			ShapeContainer*		fShapeContainer;
-			StyleContainer*		fStyleContainer;
-			PathContainer*		fPathContainer;
-			CommandStack*		fCommandStack;
+			Container<Shape>*		fShapeContainer;
+			Container<Style>*		fStyleContainer;
+			Container<VectorPath>*	fPathContainer;
+			CommandStack*			fCommandStack;
 
-			BMenu*				fMenu;
-			BMenuItem*			fAddEmptyMI;
-			BMenuItem*			fAddWidthPathMI;
-			BMenuItem*			fAddWidthStyleMI;
-			BMenuItem*			fAddWidthPathAndStyleMI;
-			BMenuItem*			fAddReferenceImageMI;
-			BMenuItem*			fDuplicateMI;
-			BMenuItem*			fResetTransformationMI;
-			BMenuItem*			fFreezeTransformationMI;
-			BMenuItem*			fRemoveMI;
+			BMenu*					fMenu;
+			BMenuItem*				fAddEmptyMI;
+			BMenuItem*				fAddWidthPathMI;
+			BMenuItem*				fAddWidthStyleMI;
+			BMenuItem*				fAddWidthPathAndStyleMI;
+			BMenuItem*				fAddReferenceImageMI;
+			BMenuItem*				fDuplicateMI;
+			BMenuItem*				fResetTransformationMI;
+			BMenuItem*				fFreezeTransformationMI;
+			BMenuItem*				fRemoveMI;
 };
 
 #endif // SHAPE_LIST_VIEW_H

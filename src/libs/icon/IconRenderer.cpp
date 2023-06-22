@@ -24,7 +24,6 @@
 #include "GradientTransformable.h"
 #include "Icon.h"
 #include "Shape.h"
-#include "ShapeContainer.h"
 #include "Style.h"
 #include "VectorPath.h"
 
@@ -459,10 +458,10 @@ IconRenderer::_Render(const BRect& r)
 	// iterate over the shapes in the icon,
 	// add the vector paths to the rasterizer
 	// and associate each shapes style
-	int32 shapeCount = fIcon->Shapes()->CountShapes();
+	int32 shapeCount = fIcon->Shapes()->CountItems();
 	int32 styleIndex = 0;
 	for (int32 i = 0; i < shapeCount; i++) {
-		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
+		Shape* shape = fIcon->Shapes()->ItemAtFast(i);
 
 		if (!shape->Visible(fGlobalTransform.scale())) {
 			continue;

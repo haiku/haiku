@@ -1,16 +1,18 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 #ifndef TRANSFORMER_LIST_VIEW_H
 #define TRANSFORMER_LIST_VIEW_H
 
 
+#include "Container.h"
 #include "ListViews.h"
-#include "Shape.h"
+#include "IconBuild.h"
 
 
 class BMenu;
@@ -20,12 +22,13 @@ class TransformerItem;
 class Selection;
 
 _BEGIN_ICON_NAMESPACE
+	class Shape;
 	class Transformer;
 _END_ICON_NAMESPACE
 
 
 class TransformerListView : public SimpleListView,
-							public ShapeListener {
+							public ContainerListener<Transformer> {
  public:
 								TransformerListView(BRect frame,
 											  const char* name,
@@ -51,12 +54,9 @@ class TransformerListView : public SimpleListView,
 	virtual	int32				IndexOfSelectable(Selectable* selectable) const;
 	virtual	Selectable*			SelectableFor(BListItem* item) const;
 
-	// ShapeListener interface
-	virtual	void				TransformerAdded(Transformer* transformer,
-												 int32 index);
-	virtual	void				TransformerRemoved(Transformer* transformer);
-
-	virtual	void				StyleChanged(Style* oldStyle, Style* newStyle);
+	// ContainerListener<Transformer> interface
+	virtual	void				ItemAdded(Transformer* transformer, int32 index);
+	virtual	void				ItemRemoved(Transformer* transformer);
 
 	// TransformerListView
 			void				SetMenu(BMenu* menu);

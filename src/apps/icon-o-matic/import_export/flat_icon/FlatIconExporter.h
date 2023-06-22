@@ -17,11 +17,11 @@ class BNode;
 class BPositionIO;
 
 _BEGIN_ICON_NAMESPACE
+	template <class Type> class Container;
 	class Gradient;
 	class LittleEndianBuffer;
-	class PathContainer;
-	class ShapeContainer;
-	class StyleContainer;
+	class Shape;
+	class Style;
 	class VectorPath;
 _END_ICON_NAMESPACE
 
@@ -68,13 +68,13 @@ class FlatIconExporter : public Exporter {
 										const Icon* icon);
 
 			status_t			_WriteStyles(LittleEndianBuffer& buffer,
-											 StyleContainer* styles);
+											 const Container<Style>* styles);
 			status_t			_WritePaths(LittleEndianBuffer& buffer,
-											PathContainer* paths);
+											const Container<VectorPath>* paths);
 			status_t			_WriteShapes(LittleEndianBuffer& buffer,
-											 StyleContainer* styles,
-											 PathContainer* paths,
-											 ShapeContainer* shapes);
+											 const Container<Style>* styles,
+											 const Container<VectorPath>* paths,
+											 const Container<Shape>* shapes);
 
 			bool				_WriteGradient(LittleEndianBuffer& buffer,
 											   const Gradient* gradient);

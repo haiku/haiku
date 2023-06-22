@@ -25,10 +25,12 @@ class BPositionIO;
 _BEGIN_ICON_NAMESPACE
 
 
+template <class Type> class Container;
 class Icon;
 class PathContainer;
-class ShapeContainer;
-class StyleContainer;
+class Shape;
+class Style;
+class VectorPath;
 
 
 #ifdef ICON_O_MATIC
@@ -45,13 +47,13 @@ class MessageImporter {
 
  private:
 			status_t			_ImportPaths(const BMessage* archive,
-											 PathContainer* paths) const;
+											 Container<VectorPath>* paths) const;
 			status_t			_ImportStyles(const BMessage* archive,
-											  StyleContainer* styles) const;
+											  Container<Style>* styles) const;
 			status_t			_ImportShapes(const BMessage* archive,
-											  PathContainer* paths,
-											  StyleContainer* styles,
-											  ShapeContainer* shapes) const;
+											  Container<VectorPath>* paths,
+											  Container<Style>* styles,
+											  Container<Shape>* shapes) const;
 };
 
 

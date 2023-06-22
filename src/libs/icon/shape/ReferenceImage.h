@@ -14,7 +14,6 @@
 #include "IconObject.h"
 #include "Observer.h"
 #include "IconBuild.h"
-#include "PathContainer.h"
 #include "PathSource.h"
 #include "Shape.h"
 #include "Transformable.h"

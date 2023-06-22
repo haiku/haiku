@@ -9,8 +9,6 @@
 #include "Importer.h"
 
 #include "Icon.h"
-#include "PathContainer.h"
-#include "StyleContainer.h"
 
 // constructor
 Importer::Importer()
@@ -34,8 +32,8 @@ Importer::Init(Icon* icon)
 	if (!icon || icon->InitCheck() < B_OK)
 		return B_BAD_VALUE;
 
-	fStyleIndexOffset = icon->Styles()->CountStyles();
-	fPathIndexOffset = icon->Paths()->CountPaths();
+	fStyleIndexOffset = icon->Styles()->CountItems();
+	fPathIndexOffset = icon->Paths()->CountItems();
 
 	return B_OK;
 }

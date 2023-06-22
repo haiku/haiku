@@ -132,9 +132,9 @@ FreezeTransformationCommand::_ApplyTransformation(PathSourceShape* shape,
 									const Transformable& transform)
 {
 	// apply inverse of old shape transformation to every assigned path
-	int32 pathCount = shape->Paths()->CountPaths();
+	int32 pathCount = shape->Paths()->CountItems();
 	for (int32 i = 0; i < pathCount; i++) {
-		VectorPath* path = shape->Paths()->PathAtFast(i);
+		VectorPath* path = shape->Paths()->ItemAtFast(i);
 		int32 shapes = 0;
 		int32 listeners = path->CountListeners();
 		for (int32 j = 0; j < listeners; j++) {

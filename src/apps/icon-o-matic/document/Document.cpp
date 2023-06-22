@@ -12,10 +12,7 @@
 #include "CommandStack.h"
 #include "DocumentSaver.h"
 #include "Icon.h"
-#include "PathContainer.h"
 #include "Selection.h"
-#include "ShapeContainer.h"
-#include "StyleContainer.h"
 
 #include <Entry.h>
 
@@ -119,8 +116,8 @@ Document::MakeEmpty(bool includingSavers)
 bool
 Document::IsEmpty() const
 {
-	return fIcon->Styles()->CountStyles() == 0
-		&& fIcon->Paths()->CountPaths() == 0
-		&& fIcon->Shapes()->CountShapes() == 0;
+	return fIcon->Styles()->CountItems() == 0
+		&& fIcon->Paths()->CountItems() == 0
+		&& fIcon->Shapes()->CountItems() == 0;
 }
 

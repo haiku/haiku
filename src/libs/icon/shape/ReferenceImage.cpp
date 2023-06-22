@@ -216,7 +216,7 @@ ReferenceImage::SetImage(BBitmap* image)
 		fPath->AddPoint(BPoint(width, height));
 		fPath->AddPoint(BPoint(width, 0));
 		fPath->SetClosed(true);
-		Paths()->AddPath(fPath);
+		Paths()->AddItem(fPath);
 	}
 }
 

@@ -28,10 +28,8 @@
 
 #include "Defines.h"
 #include "Icon.h"
-#include "PathContainer.h"
 #include "PathSourceShape.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "VectorPath.h"
 
 
@@ -156,8 +154,8 @@ ShapeIterator::NextPath()
 {
 	CALLED();
 	if (fPath) {
-		fIcon->Paths()->AddPath(fPath);
-		fShape->Paths()->AddPath(fPath);
+		fIcon->Paths()->AddItem(fPath);
+		fShape->Paths()->AddItem(fPath);
 	}
 	fPath = NULL;
 }
@@ -332,7 +330,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 			if (shape == NULL)
 				return B_NO_MEMORY;
 			shape->SetName(glyphName.String());
-			if (!icon->Shapes()->AddShape(shape)) {
+			if (!icon->Shapes()->AddItem(shape)) {
 				delete shape;
 				return B_NO_MEMORY;
 			}
@@ -386,7 +384,7 @@ StyledTextImporter::_AddStyle(Icon *icon, text_run *run)
 		}
 	}
 
-	if (!found && !icon->Styles()->AddStyle(style)) {
+	if (!found && !icon->Styles()->AddItem(style)) {
 		delete style;
 		return B_NO_MEMORY;
 	}

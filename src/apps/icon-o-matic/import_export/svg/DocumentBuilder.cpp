@@ -18,12 +18,9 @@
 #include "AutoDeleter.h"
 #include "GradientTransformable.h"
 #include "Icon.h"
-#include "PathContainer.h"
 #include "PathSourceShape.h"
-#include "ShapeContainer.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "SVGImporter.h"
 #include "VectorPath.h"
 
@@ -110,9 +107,9 @@ printf("scale: %f\n", scale);
 	}
 
 	// clean up styles and paths (remove duplicates)
-	int32 count = icon->Shapes()->CountShapes();
+	int32 count = icon->Shapes()->CountItems();
 	for (int32 i = 1; i < count; i++) {
-		PathSourceShape* shape = dynamic_cast<PathSourceShape*>(icon->Shapes()->ShapeAtFast(i));
+		PathSourceShape* shape = dynamic_cast<PathSourceShape*>(icon->Shapes()->ItemAtFast(i));
 		if (shape == NULL)
 			continue;
 
@@ -121,10 +118,10 @@ printf("scale: %f\n", scale);
 			continue;
 		int32 styleIndex = icon->Styles()->IndexOf(style);
 		for (int32 j = 0; j < styleIndex; j++) {
-			Style* earlierStyle = icon->Styles()->StyleAtFast(j);
+			Style* earlierStyle = icon->Styles()->ItemAtFast(j);
 			if (*style == *earlierStyle) {
 				shape->SetStyle(earlierStyle);
-				icon->Styles()->RemoveStyle(style);
+				icon->Styles()->RemoveItem(style);
 				style->ReleaseReference();
 				break;
 			}
@@ -144,12 +141,12 @@ AddPathsFromVertexSource(Icon* icon, PathSourceShape* shape, NSVGshape* svgShape
 	for (NSVGpath* svgPath = svgShape->paths; svgPath != NULL;
 		svgPath = svgPath->next) {
 		VectorPath* path = new (nothrow) VectorPath();
-		if (!path || !icon->Paths()->AddPath(path)) {
+		if (!path || !icon->Paths()->AddItem(path)) {
 			delete path;
 			return B_NO_MEMORY;
 		}
 
-		if (!shape->Paths()->AddPath(path))
+		if (!shape->Paths()->AddItem(path))
 			return B_NO_MEMORY;
 
 		path->SetClosed(svgPath->closed);
@@ -198,7 +195,7 @@ DocumentBuilder::_AddShape(NSVGshape* svgShape, bool outline,
 						   const Transformable& transform, Icon* icon)
 {
 	PathSourceShape* shape = new (nothrow) PathSourceShape(NULL);
-	if (!shape || !icon->Shapes()->AddShape(shape)) {
+	if (!shape || !icon->Shapes()->AddItem(shape)) {
 		delete shape;
 		return B_NO_MEMORY;
 	}
@@ -242,7 +239,7 @@ DocumentBuilder::_AddShape(NSVGshape* svgShape, bool outline,
 			}
 		}
 
-		if (!shape->AddTransformer(stroke)) {
+		if (!shape->Transformers()->AddItem(stroke)) {
 			delete stroke;
 			stroke = NULL;
 		}
@@ -325,16 +322,16 @@ DocumentBuilder::_AddShape(NSVGshape* svgShape, bool outline,
 	color.alpha = (uint8)(color.alpha * svgShape->opacity);
 
 	Style* style = new (nothrow) Style(color);
-	if (!style || !icon->Styles()->AddStyle(style)) {
+	if (!style || !icon->Styles()->AddItem(style)) {
 		delete style;
 		return B_NO_MEMORY;
 	}
 
 	// NOTE: quick hack to freeze all transformations (only works because
 	// paths and styles are not used by multiple shapes!!)
-	int32 pathCount = shape->Paths()->CountPaths();
+	int32 pathCount = shape->Paths()->CountItems();
 	for (int32 i = 0; i < pathCount; i++) {
-		VectorPath* path = shape->Paths()->PathAtFast(i);
+		VectorPath* path = shape->Paths()->ItemAtFast(i);
 		path->ApplyTransform(*shape);
 	}
 

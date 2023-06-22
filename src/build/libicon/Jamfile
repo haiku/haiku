@@ -4,6 +4,7 @@ SubDir HAIKU_TOP src build libicon ;
 local sourceDirs =
 	$(DOT)
 	flat_icon
+	generic
 	message
 	shape
 	style
@@ -35,17 +36,14 @@ BuildPlatformStaticLibrary libicon_build.a :
 	MessageImporter.cpp
 
 	# shape
-	PathContainer.cpp
 	PathSourceShape.cpp
 	ReferenceImage.cpp
 	Shape.cpp
-	ShapeContainer.cpp
 	VectorPath.cpp
 
 	# style
 	GradientTransformable.cpp
 	Style.cpp
-	StyleContainer.cpp
 
 	# transformable
 	Transformable.cpp

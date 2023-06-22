@@ -9,8 +9,8 @@
 #define ICON_H
 
 
+#include "Container.h"
 #include "IconBuild.h"
-#include "ShapeContainer.h"
 
 #ifdef ICON_O_MATIC
 #	include <List.h>
@@ -27,8 +27,9 @@ class BRect;
 _BEGIN_ICON_NAMESPACE
 
 
-class PathContainer;
-class StyleContainer;
+class Shape;
+class Style;
+class VectorPath;
 
 #ifdef ICON_O_MATIC
 class IconListener {
@@ -41,7 +42,7 @@ class IconListener {
 #endif
 
 #ifdef ICON_O_MATIC
-class Icon : public ShapeContainerListener,
+class Icon : public ContainerListener<Shape>,
 			 public Observer,
 			 public BReferenceable {
 #else
@@ -49,45 +50,51 @@ class Icon {
 #endif
 
  public:
-								Icon();
-								Icon(const Icon& other);
-	virtual						~Icon();
+									Icon();
+									Icon(const Icon& other);
+	virtual							~Icon();
 
-			status_t			InitCheck() const;
+			status_t				InitCheck() const;
 
-			StyleContainer*		Styles() const
-									{ return fStyles; }
-			PathContainer*		Paths() const
-									{ return fPaths; }
-			ShapeContainer*		Shapes() const
-									{ return fShapes; }
+			const Container<Style>*	Styles() const
+										{ return &fStyles; }
+			Container<Style>*		Styles()
+										{ return &fStyles; }
+			const Container<VectorPath>*	Paths() const
+										{ return &fPaths; }
+			Container<VectorPath>*	Paths()
+										{ return &fPaths; }
+			const Container<Shape>*	Shapes() const
+										{ return &fShapes; }
+			Container<Shape>*		Shapes()
+										{ return &fShapes; }
 
-			Icon*				Clone() const;
-			void				MakeEmpty();
+			Icon*					Clone() const;
+			void					MakeEmpty();
 
  private:
 
-			StyleContainer*		fStyles;
-			PathContainer*		fPaths;
-			ShapeContainer*		fShapes;
+			Container<Style>		fStyles;
+			Container<VectorPath>	fPaths;
+			Container<Shape>		fShapes;
 
 #ifdef ICON_O_MATIC
  public:
-	// ShapeContainerListener interface
-	virtual	void				ShapeAdded(Shape* shape, int32 index);
-	virtual	void				ShapeRemoved(Shape* shape);
+	// ContainerListener<Shape> interface
+	virtual	void					ItemAdded(Shape* shape, int32 index);
+	virtual	void					ItemRemoved(Shape* shape);
 
 	// Observer interface
-	virtual	void				ObjectChanged(const Observable* object);
+	virtual	void					ObjectChanged(const Observable* object);
 
 	// Icon
-			bool				AddListener(IconListener* listener);
-			bool				RemoveListener(IconListener* listener);
+			bool					AddListener(IconListener* listener);
+			bool					RemoveListener(IconListener* listener);
 
  private:
-			void				_NotifyAreaInvalidated(
-									const BRect& area) const;
-			BList				fListeners;
+			void					_NotifyAreaInvalidated(
+										const BRect& area) const;
+			BList					fListeners;
 #endif
 };
 

@@ -18,25 +18,24 @@
 #include <Node.h>
 
 #include "AffineTransformer.h"
+#include "Container.h"
 #include "ContourTransformer.h"
 #include "FlatIconFormat.h"
 #include "GradientTransformable.h"
 #include "Icon.h"
 #include "LittleEndianBuffer.h"
 #include "PathCommandQueue.h"
-#include "PathContainer.h"
 #include "PathSourceShape.h"
 #include "PerspectiveTransformer.h"
 #include "ReferenceImage.h"
 #include "Shape.h"
 #include "StrokeTransformer.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "VectorPath.h"
 
 using std::nothrow;
 
-// constructor
+
 FlatIconExporter::FlatIconExporter()
 #if PRINT_STATISTICS
 	: fStyleSectionSize(0)
@@ -49,7 +48,7 @@ FlatIconExporter::FlatIconExporter()
 {
 }
 
-// destructor
+
 FlatIconExporter::~FlatIconExporter()
 {
 #if PRINT_STATISTICS
@@ -70,7 +69,7 @@ FlatIconExporter::~FlatIconExporter()
 #endif // PRINT_STATISTICS
 }
 
-// Export
+
 status_t
 FlatIconExporter::Export(const Icon* icon, BPositionIO* stream)
 {
@@ -92,7 +91,7 @@ FlatIconExporter::Export(const Icon* icon, BPositionIO* stream)
 	return B_OK;
 }
 
-// Export
+
 status_t
 FlatIconExporter::Export(const Icon* icon, BNode* node,
 						 const char* attrName)
@@ -128,9 +127,10 @@ FlatIconExporter::Export(const Icon* icon, BNode* node,
 	return B_OK;
 }
 
+
 // #pragma mark -
 
-// _Export
+
 status_t
 FlatIconExporter::_Export(LittleEndianBuffer& buffer, const Icon* icon)
 {
@@ -144,7 +144,7 @@ FlatIconExporter::_Export(LittleEndianBuffer& buffer, const Icon* icon)
 #endif
 
 	// styles
-	StyleContainer* styles = icon->Styles();
+	const Container<Style>* styles = icon->Styles();
 	status_t ret = _WriteStyles(buffer, styles);
 	if (ret < B_OK)
 		return ret;
@@ -154,7 +154,7 @@ FlatIconExporter::_Export(LittleEndianBuffer& buffer, const Icon* icon)
 #endif
 
 	// paths
-	PathContainer* paths = icon->Paths();
+	const Container<VectorPath>* paths = icon->Paths();
 	ret = _WritePaths(buffer, paths);
 	if (ret < B_OK)
 		return ret;
@@ -176,10 +176,9 @@ FlatIconExporter::_Export(LittleEndianBuffer& buffer, const Icon* icon)
 	return B_OK;
 }
 
-// _WriteTransformable
+
 static bool
-_WriteTransformable(LittleEndianBuffer& buffer,
-					const Transformable* transformable)
+_WriteTransformable(LittleEndianBuffer& buffer, const Transformable* transformable)
 {
 	int32 matrixSize = Transformable::matrix_size;
 	double matrix[matrixSize];
@@ -193,29 +192,27 @@ _WriteTransformable(LittleEndianBuffer& buffer,
 	return true;
 }
 
-// _WriteTranslation
+
 static bool
-_WriteTranslation(LittleEndianBuffer& buffer,
-				  const Transformable* transformable)
+_WriteTranslation(LittleEndianBuffer& buffer, const Transformable* transformable)
 {
 	BPoint t(B_ORIGIN);
 	transformable->Transform(&t);
 	return write_coord(buffer, t.x) && write_coord(buffer, t.y);
 }
 
-// _WriteStyles
+
 status_t
-FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer,
-							   StyleContainer* styles)
+FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer, const Container<Style>* styles)
 {
-	if (styles->CountStyles() > 255)
+	if (styles->CountItems() > 255)
 		return B_RESULT_NOT_REPRESENTABLE;
-	uint8 styleCount = min_c(255, styles->CountStyles());
+	uint8 styleCount = min_c(255, styles->CountItems());
 	if (!buffer.Write(styleCount))
 		return B_NO_MEMORY;
 
 	for (int32 i = 0; i < styleCount; i++) {
-		Style* style = styles->StyleAtFast(i);
+		Style* style = styles->ItemAtFast(i);
 
 		// style type
 		uint8 styleType;
@@ -275,7 +272,7 @@ FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer,
 	return B_OK;
 }
 
-// _AnalysePath
+
 bool
 FlatIconExporter::_AnalysePath(VectorPath* path, uint8 pointCount,
 	int32& straightCount, int32& lineCount, int32& curveCount)
@@ -312,10 +309,9 @@ FlatIconExporter::_AnalysePath(VectorPath* path, uint8 pointCount,
 }
 
 
-// write_path_no_curves
+
 static bool
-write_path_no_curves(LittleEndianBuffer& buffer, VectorPath* path,
-					 uint8 pointCount)
+write_path_no_curves(LittleEndianBuffer& buffer, VectorPath* path, uint8 pointCount)
 {
 //printf("write_path_no_curves()\n");
 	for (uint32 p = 0; p < pointCount; p++) {
@@ -328,10 +324,9 @@ write_path_no_curves(LittleEndianBuffer& buffer, VectorPath* path,
 	return true;
 }
 
-// write_path_curves
+
 static bool
-write_path_curves(LittleEndianBuffer& buffer, VectorPath* path,
-				  uint8 pointCount)
+write_path_curves(LittleEndianBuffer& buffer, VectorPath* path, uint8 pointCount)
 {
 //printf("write_path_curves()\n");
 	for (uint32 p = 0; p < pointCount; p++) {
@@ -353,28 +348,27 @@ write_path_curves(LittleEndianBuffer& buffer, VectorPath* path,
 	return true;
 }
 
-// write_path_with_commands
+
 static bool
-write_path_with_commands(LittleEndianBuffer& buffer, VectorPath* path,
-						 uint8 pointCount)
+write_path_with_commands(LittleEndianBuffer& buffer, VectorPath* path, uint8 pointCount)
 {
 	PathCommandQueue queue;
 	return queue.Write(buffer, path, pointCount);
 }
 
 
-// _WritePaths
+
 status_t
-FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, PathContainer* paths)
+FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, const Container<VectorPath>* paths)
 {
-	if (paths->CountPaths() > 255)
+	if (paths->CountItems() > 255)
 		return B_RESULT_NOT_REPRESENTABLE;
-	uint8 pathCount = min_c(255, paths->CountPaths());
+	uint8 pathCount = min_c(255, paths->CountItems());
 	if (!buffer.Write(pathCount))
 		return B_NO_MEMORY;
 
 	for (uint32 i = 0; i < pathCount; i++) {
-		VectorPath* path = paths->PathAtFast(i);
+		VectorPath* path = paths->ItemAtFast(i);
 		uint8 pathFlags = 0;
 		if (path->IsClosed())
 			pathFlags |= PATH_FLAG_CLOSED;
@@ -424,7 +418,7 @@ FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, PathContainer* paths)
 	return B_OK;
 }
 
-// _WriteTransformer
+
 static bool
 _WriteTransformer(LittleEndianBuffer& buffer, Transformer* t)
 {
@@ -478,10 +472,10 @@ _WriteTransformer(LittleEndianBuffer& buffer, Transformer* t)
 	return true;
 }
 
-// _WritePathSourceShape
+
 static bool
 _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
-					  StyleContainer* styles, PathContainer* paths)
+	const Container<Style>* styles, const Container<VectorPath>* paths)
 {
 	// find out which style this shape uses
 	Style* style = shape->Style();
@@ -492,9 +486,9 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 	if (styleIndex < 0 || styleIndex > 255)
 		return false;
 
-	if (shape->Paths()->CountPaths() > 255)
+	if (shape->Paths()->CountItems() > 255)
 		return B_RESULT_NOT_REPRESENTABLE;
-	uint8 pathCount = min_c(255, shape->Paths()->CountPaths());
+	uint8 pathCount = min_c(255, shape->Paths()->CountItems());
 
 	// write shape type and style index
 	if (!buffer.Write((uint8)SHAPE_TYPE_PATH_SOURCE)
@@ -504,7 +498,7 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 
 	// find out which paths this shape uses
 	for (uint32 i = 0; i < pathCount; i++) {
-		VectorPath* path = shape->Paths()->PathAtFast(i);
+		VectorPath* path = shape->Paths()->ItemAtFast(i);
 		int32 pathIndex = paths->IndexOf(path);
 		if (pathIndex < 0 || pathIndex > 255)
 			return false;
@@ -513,9 +507,9 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 			return false;
 	}
 
-	if (shape->CountTransformers() > 255)
+	if (shape->Transformers()->CountItems() > 255)
 		return B_RESULT_NOT_REPRESENTABLE;
-	uint8 transformerCount = min_c(255, shape->CountTransformers());
+	uint8 transformerCount = min_c(255, shape->Transformers()->CountItems());
 
 	// shape flags
 	uint8 shapeFlags = 0;
@@ -562,7 +556,7 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 			return false;
 
 		for (uint32 i = 0; i < transformerCount; i++) {
-			Transformer* transformer = shape->TransformerAtFast(i);
+			Transformer* transformer = shape->Transformers()->ItemAtFast(i);
 			if (!_WriteTransformer(buffer, transformer))
 				return false;
 		}
@@ -571,19 +565,17 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 	return true;
 }
 
-// _WriteShapes
+
 status_t
-FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer,
-							   StyleContainer* styles,
-							   PathContainer* paths,
-							   ShapeContainer* shapes)
+FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer, const Container<Style>* styles,
+	const Container<VectorPath>* paths, const Container<Shape>* shapes)
 {
-	uint32 shapeCount = shapes->CountShapes();
+	uint32 shapeCount = shapes->CountItems();
 
 	// Count the number of exportable shapes
 	uint32 pathShapeCount = 0;
 	for (uint32 i = 0; i < shapeCount; i++) {
-		Shape* shape = shapes->ShapeAtFast(i);
+		Shape* shape = shapes->ItemAtFast(i);
 		if (dynamic_cast<PathSourceShape*>(shape) != NULL)
 			pathShapeCount++;
 	}
@@ -596,7 +588,7 @@ FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer,
 
 	// Export each shape
 	for (uint32 i = 0; i < shapeCount; i++) {
-		Shape* shape = shapes->ShapeAtFast(i);
+		Shape* shape = shapes->ItemAtFast(i);
 
 		PathSourceShape* pathSourceShape = dynamic_cast<PathSourceShape*>(shape);
 		if (pathSourceShape != NULL) {
@@ -608,10 +600,9 @@ FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer,
 	return B_OK;
 }
 
-// _WriteGradient
+
 bool
-FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer,
-								 const Gradient* gradient)
+FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer, const Gradient* gradient)
 {
 #if PRINT_STATISTICS
 	size_t currentSize = buffer.SizeUsed();
@@ -687,6 +678,4 @@ FlatIconExporter::_WriteGradient(LittleEndianBuffer& buffer,
 
 	return true;
 }
-
-
 

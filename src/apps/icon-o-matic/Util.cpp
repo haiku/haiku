@@ -12,16 +12,15 @@
 
 #include "AddPathsCommand.h"
 #include "AddStylesCommand.h"
-#include "PathContainer.h"
+#include "Container.h"
 #include "Style.h"
-#include "StyleContainer.h"
 #include "VectorPath.h"
 
 using std::nothrow;
 
 // new_style
 void
-new_style(rgb_color color, StyleContainer* container,
+new_style(rgb_color color, Container<Style>* container,
 		  Style** style, AddStylesCommand** command)
 {
 	*style = new (nothrow) Style(color);
@@ -30,7 +29,7 @@ new_style(rgb_color color, StyleContainer* container,
 		styles[0] = *style;
 		*command = new (nothrow) AddStylesCommand(
 			container, styles, 1,
-			container->CountStyles());
+			container->CountItems());
 		if (*command == NULL) {
 			delete *style;
 			*style = NULL;
@@ -42,7 +41,7 @@ new_style(rgb_color color, StyleContainer* container,
 
 // new_path
 void
-new_path(PathContainer* container, VectorPath** path,
+new_path(Container<VectorPath>* container, VectorPath** path,
 		 AddPathsCommand** command, VectorPath* other)
 {
 	if (other)
@@ -54,7 +53,7 @@ new_path(PathContainer* container, VectorPath** path,
 		VectorPath* paths[1];
 		paths[0] = *path;
 		int32 insertIndex = other ? container->IndexOf(other) + 1
-								  : container->CountPaths();
+								  : container->CountItems();
 		*command = new (nothrow) AddPathsCommand(
 			container, paths, 1, true, insertIndex);
 		if (*command == NULL) {

@@ -9,6 +9,7 @@ DEFINES = ICON_O_MATIC=1 ;
 local iconSourceDirs =
 	icon
 	icon/flat_icon
+	icon/generic
 	icon/message
 	icon/shape
 	icon/style
@@ -80,17 +81,14 @@ Application Icon-O-Matic :
 	MessageImporter.cpp
 
 	# icon/shape
-	PathContainer.cpp
 	PathSourceShape.cpp
 	ReferenceImage.cpp
 	Shape.cpp
-	ShapeContainer.cpp
 	VectorPath.cpp
 
 	# icon/style
 	GradientTransformable.cpp
 	Style.cpp
-	StyleContainer.cpp
 
 	# icon/transformable
 	Transformable.cpp
