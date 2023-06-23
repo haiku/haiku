@@ -22,7 +22,7 @@ Application ShowImage :
 	ShowImageView.cpp
 	ShowImageWindow.cpp
 	ToolBarIcons.cpp
-	: shared be tracker translation localestub
+	: shared be game tracker translation localestub
 		[ TargetLibstdc++ ] [ TargetLibsupc++ ]
 	: ShowImage.rdef
 ;
