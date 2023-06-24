@@ -4363,8 +4363,14 @@ _user_exit_team(status_t returnValue)
 
 	// Stop the thread, if the team is being debugged and that has been
 	// requested.
+	// Note: GCC 13 marks the following call as potentially overflowing, since it thinks team may
+	//       be `nullptr`. This cannot be the case in reality, therefore ignore this specific
+	//       error.
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
 	if ((atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_PREVENT_EXIT) != 0)
 		user_debug_stop_thread();
+	#pragma GCC diagnostic pop
 
 	// Send this thread a SIGKILL. This makes sure the thread will not return to
 	// userland. The signal handling code forwards the signal to the main

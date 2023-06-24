@@ -3796,7 +3796,13 @@ _user_block_thread(uint32 flags, bigtime_t timeout)
 		return waitStatus;
 
 	// nope, so wait
+	// Note: GCC 13 marks the following call as potentially overflowing, since it thinks `thread`
+	//       may be `nullptr`. This cannot be the case in reality, therefore ignore this specific
+	//       error.
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
 	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_USER, NULL);
+	#pragma GCC diagnostic pop
 
 	threadLocker.Unlock();
 
