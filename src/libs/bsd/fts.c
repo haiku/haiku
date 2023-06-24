@@ -1031,7 +1031,7 @@ static FTSENT *
 fts_sort(FTS *sp, FTSENT *head, size_t nitems)
 {
 	FTSENT **ap, *p;
-	FTSENT **old_array;
+	FTSENT **new_array;
 
 	/*
 	 * Construct an array of pointers to the structures and call qsort(3).
@@ -1042,13 +1042,14 @@ fts_sort(FTS *sp, FTSENT *head, size_t nitems)
 	 */
 	if (nitems > sp->fts_nitems) {
 		sp->fts_nitems = nitems + 40;
-		old_array = sp->fts_array;
-		if ((sp->fts_array = realloc(old_array,
-		    sp->fts_nitems * sizeof(FTSENT *))) == NULL) {
-			free(old_array);
+		new_array = realloc(sp->fts_array, sp->fts_nitems * sizeof(FTSENT *));
+		if (new_array == NULL) {
+			free(sp->fts_array);
+			sp->fts_array = NULL;
 			sp->fts_nitems = 0;
 			return (head);
 		}
+		sp->fts_array = new_array;
 	}
 	for (ap = sp->fts_array, p = head; p; p = p->fts_link)
 		*ap++ = p;
@@ -1127,13 +1128,16 @@ fts_lfree(FTSENT *head)
 static int
 fts_palloc(FTS *sp, size_t more)
 {
-	char *old_path;
+	char *new_path;
 	sp->fts_pathlen += more + 256;
 
-	old_path = sp->fts_path;
-	sp->fts_path = realloc(old_path, sp->fts_pathlen);
-	if (sp->fts_path == NULL)
-		free(old_path);
+	new_path = realloc(sp->fts_path, sp->fts_pathlen);
+	if (new_path == NULL) {
+		free(sp->fts_path);
+		sp->fts_path = NULL;
+	} else {
+		sp->fts_path = new_path;
+	}
 
 	return (sp->fts_path == NULL);
 }
