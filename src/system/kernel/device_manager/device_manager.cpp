@@ -7,7 +7,6 @@
 #include <kdevice_manager.h>
 
 #include <new>
-#include <set>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
