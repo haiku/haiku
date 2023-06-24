@@ -931,6 +931,7 @@ INPUT                  = . \
                          ../../headers/os/device/Joystick.h \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
+                         ../../headers/os/drivers/USB_isochronous.h \
                          ../../headers/os/drivers/USB_spec.h \
                          ../../headers/os/game \
                          ../../headers/os/interface \
@@ -941,6 +942,7 @@ INPUT                  = . \
                          ../../headers/os/midi2 \
                          ../../headers/os/net \
                          ../../headers/private/netservices2 \
+                         ../../headers/private/shared/MemoryRingIO.h \
                          ../../headers/os/storage \
                          ../../headers/os/support \
                          ../../headers/os/translation \

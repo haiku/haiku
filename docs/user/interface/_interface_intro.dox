@@ -11,7 +11,7 @@
 	\page interface_intro Introduction to the Interface Kit
 	\ingroup interface
 
-	\section Overview
+	\section Interface Overview
 
 	The Interface Kit holds all the classes you'll need to develop a GUI.
 	Building on the messaging facilities provided by the Application Kit,
@@ -20,7 +20,7 @@
 
 	The most important class in the Interface Kit is the BView class, which
 	handles drawing and user interaction. Pointer and keyboard events are
-	processed in this class. 
+	processed in this class.
 
 	Another important class is the BWindow class, which holds BViews and makes
 	them visible to the user. The BWindow class also handles BView focusing
@@ -29,7 +29,7 @@
 	A new addition Haiku has added over the BeOS API is the Layout API, which
 	is based around the BLayoutItem and BLayout classes. These classes will
 	take care of making sure all your GUI widgets end up where you want them,
-	with enough space to be useful. You can start learning the Layout API 
+	with enough space to be useful. You can start learning the Layout API
 	by reading the \ref layout_intro.
 
 	\section coordinatespaces Coordinate spaces

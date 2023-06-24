@@ -38,7 +38,7 @@
 	look at the overview, or go straight to the complete
 	\link support list of components \endlink of this kit.
 
-	\section Overview
+	\section Support Overview
 	- Thread Safety:
 		- BLocker provides a semaphore-like locking mechanism allowing for
 			recursive locks.
@@ -79,7 +79,7 @@
 
 
 // Short listing of documents that belong to this module so that people can
-// find these from the module overview. 
+// find these from the module overview.
 // This should become standardized in Doxygen though. There is an item on
 // the todo list on this.
 
