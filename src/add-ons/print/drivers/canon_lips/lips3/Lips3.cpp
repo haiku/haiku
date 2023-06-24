@@ -6,7 +6,7 @@
 
 #include "Lips3.h"
 
-#include <memory>
+#include <vector>
 
 #include <Alert.h>
 #include <Bitmap.h>
@@ -51,7 +51,7 @@ LIPS3Driver::StartDocument()
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -66,7 +66,7 @@ LIPS3Driver::StartPage(int)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -79,7 +79,7 @@ LIPS3Driver::EndPage(int)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -95,7 +95,7 @@ LIPS3Driver::EndDocument(bool)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -162,13 +162,10 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			int compressedSize;
 			const uchar* buffer;
 
-			uchar* in_buffer = new uchar[in_size];
-			uchar* out_buffer = new uchar[out_size];
+			std::vector<uchar> in_buffer(in_size);
+			std::vector<uchar> out_buffer(out_size);
 
-			auto_ptr<uchar> _in_buffer (in_buffer);
-			auto_ptr<uchar> _out_buffer(out_buffer);
-
-			uchar* ptr2 = static_cast<uchar*>(in_buffer);
+			uchar* ptr2 = &in_buffer[0];
 
 			DBGMSG(("move\n"));
 
@@ -181,12 +178,12 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 				y++;
 			}
 
-			compressedSize = compress3(out_buffer, in_buffer, in_size);
+			compressedSize = compress3(&out_buffer[0], &in_buffer[0], in_size);
 
 			if (compressedSize < in_size) {
 				compressionMethod = 9;
 					// compress3
-				buffer = out_buffer;
+				buffer = &out_buffer[0];
 			} else if (compressedSize > out_size) {
 				BAlert* alert = new BAlert("memory overrun!!!", "warning",
 					"OK");
@@ -195,7 +192,7 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 				return false;
 			} else {
 				compressionMethod = 0;
-				buffer = in_buffer;
+				buffer = &in_buffer[0];
 				compressedSize = in_size;
 			}
 
@@ -228,7 +225,7 @@ LIPS3Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
-	} 
+	}
 }
 
 

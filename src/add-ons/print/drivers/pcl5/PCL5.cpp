@@ -7,7 +7,7 @@
 
 #include "PCL5.h"
 
-#include <memory>
+#include <vector>
 
 #include <Alert.h>
 #include <Bitmap.h>
@@ -45,7 +45,7 @@ PCL5Driver::StartDocument()
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -65,7 +65,7 @@ PCL5Driver::EndPage(int)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -82,7 +82,7 @@ PCL5Driver::EndDocument(bool)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -148,11 +148,8 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			int compressedSize;
 			const uchar* buffer;
 
-			uchar* in_buffer  = new uchar[in_size];
-			uchar* out_buffer = new uchar[out_size];
-
-			auto_ptr<uchar> _in_buffer (in_buffer);
-			auto_ptr<uchar> _out_buffer(out_buffer);
+			std::vector<uchar> in_buffer(in_size);
+			std::vector<uchar> out_buffer(out_size);
 
 			DBGMSG(("move\n"));
 
@@ -161,36 +158,36 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 
 			const bool color = GetJobData()->GetColor() == JobData::kColor;
 			const int num_planes = color ? 3 : 1;
-			
+
 			if (color) {
 				fHalftone->SetPlanes(Halftone::kPlaneRGB1);
 				fHalftone->SetBlackValue(Halftone::kLowValueMeansBlack);
 			}
-			
+
 			for (int i = rc.top; i <= rc.bottom; i++) {
-			
+
 				for (int plane = 0; plane < num_planes; plane ++) {
-										
-					fHalftone->Dither(in_buffer, ptr, x, y, width);
-							
-					compressedSize = pack_bits(out_buffer, in_buffer, in_size);
-					
+
+					fHalftone->Dither(&in_buffer[0], ptr, x, y, width);
+
+					compressedSize = pack_bits(&out_buffer[0], &in_buffer[0], in_size);
+
 					if (compressedSize + _BytesToEnterCompressionMethod(2)
 						< in_size + _BytesToEnterCompressionMethod(0)) {
 						compressionMethod = 2; // back bits
-						buffer = out_buffer;
+						buffer = &out_buffer[0];
 					} else {
 						compressionMethod = 0; // uncompressed
-						buffer = in_buffer;
+						buffer = &in_buffer[0];
 						compressedSize = in_size;
 					}
-		
+
 					_RasterGraphics(
 						compressionMethod,
 						buffer,
 						compressedSize,
 						plane == num_planes - 1);
-				
+
 				}
 
 				ptr  += delta;
@@ -216,7 +213,7 @@ PCL5Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
-	} 
+	}
 }
 
 

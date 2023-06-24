@@ -26,7 +26,7 @@
 #include "ValidRect.h"
 
 
-// DeltaRowStreamCompressor writes the delta row directly to the 
+// DeltaRowStreamCompressor writes the delta row directly to the
 // in the contructor specified stream.
 class DeltaRowStreamCompressor : public AbstractDeltaRowCompressor
 {
@@ -37,15 +37,15 @@ public:
 				AbstractDeltaRowCompressor(rowSize, initialSeed),
 				fWriter(writer)
 				{}
-	
+
 protected:
 	void		AppendByteToDeltaRow(uchar byte)
 				{
 					fWriter->Append(byte);
 				}
-	
+
 private:
-	PCL6Writer*	fWriter;	
+	PCL6Writer*	fWriter;
 };
 
 
@@ -79,7 +79,7 @@ PCL6Driver::StartDocument()
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -94,7 +94,7 @@ PCL6Driver::EndDocument(bool)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -105,7 +105,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 
 	try {
 		int y = (int)offset->y;
-	
+
 		PCL6Rasterizer* rasterizer;
 		if (_UseColorMode()) {
 			#if COLOR_DEPTH == 8
@@ -113,7 +113,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			#elif COLOR_DEPTH == 1
 				rasterizer = new ColorRasterizer(fHalftone);
 			#else
-				#error COLOR_DEPTH must be either 1 or 8!		
+				#error COLOR_DEPTH must be either 1 or 8!
 			#endif
 		} else
 			rasterizer = new MonochromeRasterizer(fHalftone);
@@ -121,14 +121,14 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		auto_ptr<Rasterizer> _rasterizer(rasterizer);
 		bool valid = rasterizer->SetBitmap((int)offset->x, (int)offset->y,
 			bitmap, GetPageHeight());
-		
+
 		if (valid) {
 			rasterizer->InitializeBuffer();
-			
+
 			// Use compressor to calculate delta row size
 			DeltaRowCompressor* deltaRowCompressor = NULL;
 			if (_SupportsDeltaRowCompression()) {
-				deltaRowCompressor = 
+				deltaRowCompressor =
 					new DeltaRowCompressor(rasterizer->GetOutRowSize(), 0);
 				if (deltaRowCompressor->InitCheck() != B_OK) {
 					delete deltaRowCompressor;
@@ -137,15 +137,15 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 			}
 			auto_ptr<DeltaRowCompressor>_deltaRowCompressor(deltaRowCompressor);
 			int deltaRowSize = 0;
-		
-			// remember position		
+
+			// remember position
 			int xPage = rasterizer->GetX();
 			int yPage = rasterizer->GetY();
-			
+
 			while (rasterizer->HasNextLine()) {
-				const uchar* rowBuffer = 
+				const uchar* rowBuffer =
 					static_cast<const uchar*>(rasterizer->RasterizeNextLine());
-				
+
 				if (deltaRowCompressor != NULL) {
 					int size =
 						deltaRowCompressor->CalculateSize(rowBuffer, true);
@@ -153,9 +153,9 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 						// two bytes for the row byte count
 				}
 			}
-	
+
 			y = rasterizer->GetY();
-	
+
 			uchar* outBuffer = rasterizer->GetOutBuffer();
 			int outBufferSize = rasterizer->GetOutBufferSize();
 			int outRowSize = rasterizer->GetOutRowSize();
@@ -179,7 +179,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
-	} 
+	}
 }
 
 
@@ -207,17 +207,17 @@ PCL6Driver::_WriteBitmap(const uchar* buffer, int outSize, int rowSize, int x,
 		}
 	}
 #endif
-	
+
 	// write bitmap
 	_Move(x, y);
-	
+
 	_StartRasterGraphics(x, y, width, height, compressionMethod);
 
 	_RasterGraphics(buffer, outSize, dataSize, rowSize, height,
 		compressionMethod);
 
 	_EndRasterGraphics();
-	
+
 #if DISPLAY_COMPRESSION_STATISTICS
 	fprintf(stderr, "Out Size       %d %2.2f\n", (int)outSize, 100.0);
 #if ENABLE_RLE_COMPRESSION
@@ -257,16 +257,16 @@ PCL6Driver::StartPage(int)
 	if (GetJobData()->GetOrientation() == JobData::kLandscape) {
 		orientation = PCL6Writer::kLandscape;
 	}
-	
-	PCL6Writer::MediaSize mediaSize = 
+
+	PCL6Writer::MediaSize mediaSize =
 		_MediaSize(GetJobData()->GetPaper());
-	PCL6Writer::MediaSource mediaSource = 
+	PCL6Writer::MediaSource mediaSource =
 		_MediaSource(GetJobData()->GetPaperSource());
 	if (GetJobData()->GetPrintStyle() == JobData::kSimplex) {
 		fWriter->BeginPage(orientation, mediaSize, mediaSource);
 	} else if (GetJobData()->GetPrintStyle() == JobData::kDuplex) {
 		// TODO move duplex binding option to UI
-		fWriter->BeginPage(orientation, mediaSize, mediaSource, 
+		fWriter->BeginPage(orientation, mediaSize, mediaSource,
 			PCL6Writer::kDuplexVerticalBinding, fMediaSide);
 
 		if (fMediaSide == PCL6Writer::kFrontMediaSide)
@@ -275,7 +275,7 @@ PCL6Driver::StartPage(int)
 			fMediaSide = PCL6Writer::kFrontMediaSide;
 	} else
 		return false;
-	
+
 	// PageOrigin from Windows NT printer driver
 	int x = 142 * GetJobData()->GetXres() / 600;
 	int y = 100 * GetJobData()->GetYres() / 600;
@@ -300,7 +300,7 @@ PCL6Driver::_StartRasterGraphics(int x, int y, int width, int height,
 		#elif COLOR_DEPTH == 1
 			colorDepth = PCL6Writer::k1Bit;
 		#else
-			#error COLOR_DEPTH must be either 1 or 8!		
+			#error COLOR_DEPTH must be either 1 or 8!
 		#endif
 	} else
 		colorDepth = PCL6Writer::k1Bit;
@@ -324,7 +324,7 @@ PCL6Driver::_RasterGraphics(const uchar* buffer, int bufferSize, int dataSize,
 {
 	// write bitmap byte size
 	fWriter->EmbeddedDataPrefix32(dataSize);
-	
+
 	// write data
 	if (compressionMethod == PCL6Writer::kRLECompression) {
 		// use RLE compression
@@ -339,18 +339,18 @@ PCL6Driver::_RasterGraphics(const uchar* buffer, int bufferSize, int dataSize,
 		if (compressor.InitCheck() != B_OK) {
 			return;
 		}
-		
+
 		const uint8* row = buffer;
 		for (int i = 0; i < height; i ++) {
 			// write row byte count
 			int32 size = compressor.CalculateSize(row);
 			fWriter->Append((uint16)size);
-			
+
 			if (size > 0) {
 				// write delta row
 				compressor.Compress(row);
 			}
-			
+
 			row += rowSize;
 		}
 	} else {
@@ -369,7 +369,7 @@ PCL6Driver::EndPage(int)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 

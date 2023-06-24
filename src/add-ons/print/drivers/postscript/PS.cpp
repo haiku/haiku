@@ -8,7 +8,7 @@
 
 #include "PS.h"
 
-#include <memory.h>
+#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -96,7 +96,7 @@ PSDriver::_WritePSString(const char* format, ...)
 }
 
 
-void 
+void
 PSDriver::_WritePSData(const void* data, size_t size)
 {
 	if (fFilterIO)
@@ -120,7 +120,7 @@ PSDriver::StartDocument()
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -149,7 +149,7 @@ PSDriver::EndPage(int)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -165,7 +165,7 @@ PSDriver::_SetupCTM()
 			GetJobData()->GetPaperRect().Height()-topMargin);
 	} else {
 		// landscape:
-		// move origin from bottom left to margin top and left 
+		// move origin from bottom left to margin top and left
 		// and rotate page contents
 		_WritePSString("%f %f translate\n", topMargin, leftMargin);
 		_WritePSString("90 rotate\n");
@@ -190,7 +190,7 @@ PSDriver::EndDocument(bool)
 	}
 	catch (TransportException& err) {
 		return false;
-	} 
+	}
 }
 
 
@@ -202,7 +202,7 @@ ToHexDigit(uchar value)
 }
 
 
-bool 
+bool
 PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
@@ -266,13 +266,10 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 			int compressed_size;
 			const uchar* buffer;
 
-			uchar* in_buffer = new uchar[in_size];
+			std::vector<uchar> in_buffer(in_size);
 				// gray values
-			uchar* out_buffer = new uchar[out_size];
+			std::vector<uchar> out_buffer(out_size);
 				// gray values in hexadecimal
-
-			auto_ptr<uchar> _in_buffer(in_buffer);
-			auto_ptr<uchar> _out_buffer(out_buffer);
 
 			DBGMSG(("move\n"));
 
@@ -281,7 +278,7 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 
 			for (int i = rc.top; i <= rc.bottom; i++) {
 				if (color) {
-					uchar* out = out_buffer;
+					uchar* out = &out_buffer[0];
 					uchar* in  = ptr;
 					for (int w = width; w > 0; w --) {
 						*out++ = ToHexDigit((in[2]) >> 4);
@@ -293,21 +290,21 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 						in += 4;
 					}
 				} else {
-					fHalftone->Dither(in_buffer, ptr, x, y, width);
+					fHalftone->Dither(&in_buffer[0], ptr, x, y, width);
 
-					uchar* in = in_buffer;
-					uchar* out = out_buffer;
-				
+					uchar* in = &in_buffer[0];
+					uchar* out = &out_buffer[0];
+
 					for (int w = in_size; w > 0; w --, in ++) {
 						*in = ~*in; // invert pixels
 						*out++ = ToHexDigit((*in) >> 4);
 						*out++ = ToHexDigit((*in) & 15);
 					}
 				}
-				
-				{	
+
+				{
 					compression_method = 0; // uncompressed
-					buffer = out_buffer;
+					buffer = &out_buffer[0];
 					compressed_size = out_size;
 				}
 
@@ -339,11 +336,11 @@ PSDriver::NextBand(BBitmap* bitmap, BPoint* offset)
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return false;
-	} 
+	}
 }
 
 
-void 
+void
 PSDriver::_JobStart()
 {
 	// PostScript header
@@ -360,14 +357,14 @@ PSDriver::_JobStart()
 		GetJobData()->GetPaperRect().IntegerHeight());
 	_WritePSString("%%%%Pages: (atend)\n");
 	_WritePSString("%%%%EndComments\n");
-	
+
 	_WritePSString("%%%%BeginDefaults\n");
 	_WritePSString("%%%%PageMedia: Plain\n");
 	_WritePSString("%%%%EndDefaults\n");
 }
 
 
-void 
+void
 PSDriver::_StartRasterGraphics(int x, int y, int width, int height,
 	int widthByte)
 {
@@ -391,14 +388,14 @@ PSDriver::_StartRasterGraphics(int x, int y, int width, int height,
 }
 
 
-void 
+void
 PSDriver::_EndRasterGraphics()
 {
 	_WritePSString("grestore\n");
 }
 
 
-void 
+void
 PSDriver::_RasterGraphics(int compression_method, const uchar* buffer,
 	int size)
 {
@@ -410,7 +407,7 @@ PSDriver::_RasterGraphics(int compression_method, const uchar* buffer,
 }
 
 
-void 
+void
 PSDriver::_JobEnd()
 {
 	_WritePSString("%%%%Pages: %d\n", fPrintedPages);
