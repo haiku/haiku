@@ -24,11 +24,11 @@ mtx_init(struct mtx *mutex, const char *name, const char *type,
 			MUTEX_FLAG_CLONE_NAME);
 		mutex->type = MTX_RECURSE;
 	} else if ((options & MTX_SPIN) != 0) {
-		B_INITIALIZE_SPINLOCK(&mutex->u.spinlock.lock);
+		B_INITIALIZE_SPINLOCK(&mutex->u.spinlock_.lock);
 		mutex->type = MTX_SPIN;
 	} else {
-		mutex_init_etc(&mutex->u.mutex.lock, name, MUTEX_FLAG_CLONE_NAME);
-		mutex->u.mutex.owner = -1;
+		mutex_init_etc(&mutex->u.mutex_.lock, name, MUTEX_FLAG_CLONE_NAME);
+		mutex->u.mutex_.owner = -1;
 		mutex->type = MTX_DEF;
 	}
 }
@@ -50,9 +50,9 @@ mtx_destroy(struct mtx *mutex)
 	if ((mutex->type & MTX_RECURSE) != 0) {
 		recursive_lock_destroy(&mutex->u.recursive);
 	} else if ((mutex->type & MTX_SPIN) != 0) {
-		KASSERT(!B_SPINLOCK_IS_LOCKED(&mutex->u.spinlock.lock), ("spin mutex is locked"));
+		KASSERT(!B_SPINLOCK_IS_LOCKED(&mutex->u.spinlock_.lock), ("spin mutex is locked"));
 	} else {
-		mutex_destroy(&mutex->u.mutex.lock);
+		mutex_destroy(&mutex->u.mutex_.lock);
 	}
 }
 
@@ -63,8 +63,8 @@ mtx_lock_spin(struct mtx* mutex)
 	KASSERT(mutex->type == MTX_SPIN, ("not a spin mutex"));
 
 	cpu_status status = disable_interrupts();
-	acquire_spinlock(&mutex->u.spinlock.lock);
-	mutex->u.spinlock.state = status;
+	acquire_spinlock(&mutex->u.spinlock_.lock);
+	mutex->u.spinlock_.state = status;
 }
 
 
@@ -73,8 +73,8 @@ mtx_unlock_spin(struct mtx* mutex)
 {
 	KASSERT(mutex->type == MTX_SPIN, ("not a spin mutex"));
 
-	cpu_status status = mutex->u.spinlock.state;
-	release_spinlock(&mutex->u.spinlock.lock);
+	cpu_status status = mutex->u.spinlock_.state;
+	release_spinlock(&mutex->u.spinlock_.lock);
 	restore_interrupts(status);
 }
 

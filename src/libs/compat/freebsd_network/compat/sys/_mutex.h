@@ -17,12 +17,12 @@ struct mtx {
 		struct {
 			mutex			lock;
 			thread_id		owner;
-		}					mutex;
+		}					mutex_;
 		recursive_lock		recursive;
 		struct {
 			spinlock		lock;
 			cpu_status		state;
-		}					spinlock;
+		}					spinlock_;
 	} u;
 };
 

@@ -50,8 +50,8 @@ static inline void
 mtx_lock(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF) {
-		mutex_lock(&mutex->u.mutex.lock);
-		mutex->u.mutex.owner = find_thread(NULL);
+		mutex_lock(&mutex->u.mutex_.lock);
+		mutex->u.mutex_.owner = find_thread(NULL);
 	} else if (mutex->type == MTX_RECURSE) {
 		recursive_lock_lock(&mutex->u.recursive);
 	} else if (mutex->type == MTX_SPIN) {
@@ -64,9 +64,9 @@ static inline int
 mtx_trylock(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF) {
-		if (mutex_trylock(&mutex->u.mutex.lock) != B_OK)
+		if (mutex_trylock(&mutex->u.mutex_.lock) != B_OK)
 			return 0;
-		mutex->u.mutex.owner = find_thread(NULL);
+		mutex->u.mutex_.owner = find_thread(NULL);
 		return 1;
 	} else if (mutex->type == MTX_RECURSE) {
 		if (recursive_lock_trylock(&mutex->u.recursive) != B_OK)
@@ -83,8 +83,8 @@ static inline void
 mtx_unlock(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF) {
-		mutex->u.mutex.owner = -1;
-		mutex_unlock(&mutex->u.mutex.lock);
+		mutex->u.mutex_.owner = -1;
+		mutex_unlock(&mutex->u.mutex_.lock);
 	} else if (mutex->type == MTX_RECURSE) {
 		recursive_lock_unlock(&mutex->u.recursive);
 	} else if (mutex->type == MTX_SPIN) {
@@ -105,7 +105,7 @@ static inline int
 mtx_owned(struct mtx* mutex)
 {
 	if (mutex->type == MTX_DEF)
-		return mutex->u.mutex.owner == find_thread(NULL);
+		return mutex->u.mutex_.owner == find_thread(NULL);
 	if (mutex->type == MTX_RECURSE) {
 #if KDEBUG
 		return mutex->u.recursive.lock.holder == find_thread(NULL);
@@ -114,7 +114,7 @@ mtx_owned(struct mtx* mutex)
 #endif
 	}
 	if (mutex->type == MTX_SPIN)
-		return mutex->u.spinlock.lock.lock != 0;
+		return mutex->u.spinlock_.lock.lock != 0;
 
 	return 0;
 }
