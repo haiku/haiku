@@ -408,10 +408,20 @@ IMAPFolder::RegisterPendingBodies(IMAP::MessageUIDList& uids,
 
 	IMAP::MessageUIDList::const_iterator iterator = uids.begin();
 	for (; iterator != uids.end(); iterator++) {
-		if (replyTo != NULL)
+		if (replyTo != NULL) {
 			fPendingBodies[*iterator].push_back(*replyTo);
-		else
+		} else {
+			// Note: GCC 13 warns about the unused result of the statement below. This code should
+			//       be reviewed as part of #18478
+			#if __GNUC__ == 13
+			#  pragma GCC diagnostic push
+			#  pragma GCC diagnostic warning "-Wunused-result"
+			#endif
 			fPendingBodies[*iterator].begin();
+			#if __GNUC__ == 13
+			#  pragma GCC diagnostic pop
+			#endif
+		}
 	}
 }
 
