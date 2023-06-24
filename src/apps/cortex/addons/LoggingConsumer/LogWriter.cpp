@@ -136,7 +136,7 @@ LogWriter::~LogWriter()
 {
 	printf("LogWriter::~LogWriter() called\n");
 	status_t err;
-	log_message msg;
+	log_message msg = {};
 
 	Log(LOG_QUIT, msg);
 	::wait_for_thread(mLogThread, &err);
