@@ -254,15 +254,15 @@ Job::Init(const Finder& finder, std::set<BString>& dependencies)
 	// Check dependencies
 
 	for (int32 index = 0; index < Requirements().CountStrings(); index++) {
-		const BString& requires = Requirements().StringAt(index);
-		if (dependencies.find(requires) != dependencies.end()) {
+		const BString& requirement = Requirements().StringAt(index);
+		if (dependencies.find(requirement) != dependencies.end()) {
 			// Found a cyclic dependency
 			// TODO: log error
 			return fInitStatus = B_ERROR;
 		}
-		dependencies.insert(requires);
+		dependencies.insert(requirement);
 
-		Job* dependency = finder.FindJob(requires);
+		Job* dependency = finder.FindJob(requirement);
 		if (dependency != NULL) {
 			std::set<BString> subDependencies = dependencies;
 
@@ -274,7 +274,7 @@ Job::Init(const Finder& finder, std::set<BString>& dependencies)
 
 			fInitStatus = _AddRequirement(dependency);
 		} else {
-			::Target* target = finder.FindTarget(requires);
+			::Target* target = finder.FindTarget(requirement);
 			if (target != NULL)
 				fInitStatus = _AddRequirement(dependency);
 			else {

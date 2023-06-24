@@ -912,10 +912,10 @@ BPackageInfo::ClearRequiresList()
 
 
 status_t
-BPackageInfo::AddRequires(const BPackageResolvableExpression& requires)
+BPackageInfo::AddRequires(const BPackageResolvableExpression& packageRequires)
 {
 	BPackageResolvableExpression* newRequires
-		= new (std::nothrow) BPackageResolvableExpression(requires);
+		= new (std::nothrow) BPackageResolvableExpression(packageRequires);
 	if (newRequires == NULL)
 		return B_NO_MEMORY;
 

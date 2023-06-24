@@ -312,9 +312,9 @@ public:
 		printf("\n");
 	}
 
-	void PrintRequires(const BPackageResolvableExpression& requires) const
+	void PrintRequires(const BPackageResolvableExpression& require) const
 	{
-		_PrintResolvableExpression("requires", requires);
+		_PrintResolvableExpression("requires", require);
 	}
 
 	void PrintSupplements(const BPackageResolvableExpression& supplements)

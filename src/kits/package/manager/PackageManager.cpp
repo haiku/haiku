@@ -726,9 +726,9 @@ BPackageManager::_FindBasePackage(const PackageList& packages,
 	BPackageResolvableExpression* basePackage = NULL;
 	int32 count = info.RequiresList().CountItems();
 	for (int32 i = 0; i < count; i++) {
-		BPackageResolvableExpression* requires = info.RequiresList().ItemAt(i);
-		if (requires->Name() == info.BasePackage()) {
-			basePackage = requires;
+		BPackageResolvableExpression* require = info.RequiresList().ItemAt(i);
+		if (require->Name() == info.BasePackage()) {
+			basePackage = require;
 			break;
 		}
 	}

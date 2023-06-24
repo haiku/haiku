@@ -28,6 +28,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			be [ TargetLibstdc++ ]
 		;
 
+		if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
+			# External headers use the C++20 reserved keyword `requires`
+			ObjectC++Flags LibsolvSolver.cpp : -Wno-error=c++20-compat ;
+		}
+
 		Includes [ FGristFiles LibsolvSolver.cpp ]
 			: [ BuildFeatureAttribute libsolv : headers ] ;
 	}
