@@ -204,7 +204,6 @@ private:
 
 Painter::Painter()
 	:
-	fInternal(fPatternHandler),
 	fSubpixelPrecise(false),
 	fValidClipping(false),
 	fAttached(false),
@@ -221,7 +220,8 @@ Painter::Painter()
 	fPatternHandler(),
 	fTextRenderer(fSubpixRenderer, fRenderer, fRendererBin, fUnpackedScanline,
 		fSubpixUnpackedScanline, fSubpixRasterizer, fMaskedUnpackedScanline,
-		fTransform)
+		fTransform),
+	fInternal(fPatternHandler)
 {
 	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 

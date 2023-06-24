@@ -331,8 +331,6 @@ private:
 	friend class BitmapPainter; // needed only for gcc2
 
 private:
-	mutable	PainterAggInterface	fInternal;
-
 	// for internal coordinate rounding/transformation
 			bool				fSubpixelPrecise : 1;
 			bool				fValidClipping : 1;
@@ -355,6 +353,8 @@ private:
 	// it is setup to load from a specific Freetype supported
 	// font file which it gets from ServerFont
 	mutable	AGGTextRenderer		fTextRenderer;
+
+	mutable	PainterAggInterface	fInternal;
 };
 
 
