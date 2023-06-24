@@ -199,7 +199,7 @@ BTree::Node::_SpaceCheck(int length) const
 {
 	// this is a little bit weird here because we can't find
 	// any suitable error code
-	if (length < 0 && std::abs(length) >= SpaceUsed())
+	if (length < 0 && abs(length) >= SpaceUsed())
 		return B_DIRECTORY_NOT_EMPTY;	// not enough data to delete
 	if (length > 0 && length >= SpaceLeft())
 		return B_DEVICE_FULL;			// no spare space
@@ -474,7 +474,7 @@ BTree::Path::CopyOnWrite(Transaction& transaction, int level, uint32 start,
 status_t
 BTree::Path::InternalCopy(Transaction& transaction, int level)
 {
-	if (std::abs(level) >= fTree->RootLevel())
+	if (abs(level) >= fTree->RootLevel())
 		return B_OK;
 
 	TRACE("Path::InternalCopy() level %i\n", level);
@@ -486,7 +486,7 @@ BTree::Path::InternalCopy(Transaction& transaction, int level)
 
 
 		from = 0;
-		to = std::abs(level);
+		to = abs(level);
 	}
 
 	Node* node = NULL;
