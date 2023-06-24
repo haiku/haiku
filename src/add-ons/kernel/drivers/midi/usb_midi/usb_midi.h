@@ -23,7 +23,7 @@
 #include <USB.h>
 #include <usb/USB_midi.h>
 
-#include "ring_buffer.h"
+#include <util/ring_buffer.h>
 
 /* Three levels of printout for convenience: */
 /* #define DEBUG 1 -- more convenient to define in the code file when needed */

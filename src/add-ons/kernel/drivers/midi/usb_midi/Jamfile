@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers midi usb_midi ;
 
-UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateKernelHeaders ;
 
 KernelAddon usb_midi :
 	usb_midi.cpp
