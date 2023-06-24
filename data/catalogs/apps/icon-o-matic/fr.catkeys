@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	1805671130
+1	french	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Aucun
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotation des indices de chemin
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Attribut META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Ajouter une forme avec un style
 Assign Path	Icon-O-Matic-AddPathsCmd		Assigner un chemin
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Réinitialiser la transformation
-Transformation	Transformation		Transformation
 Remove	Icon-O-Matic-StylesList		Enlever
 Cancel	Icon-O-Matic-Menu-Settings		Annuler
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigner un style
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Ajouter des styles
 Remove	Icon-O-Matic-PathManipulator		Enlever
 Duplicate	Icon-O-Matic-ShapesList		Dupliquer
 Contour	Transformation		Contour
-Perspective	Icon-O-Matic-TransformersList		Perspective
 Save icon	Dialog title		Enregistrer l’icône
 Move Paths	Icon-O-Matic-MovePathsCmd		Déplacer les chemins
 Rounding	Icon-O-Matic-PropertyNames		Arrondi
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Ajouter un chemin
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Sauvegarder les changements de l’icône actuelle avant de fermer ?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Impossible d’ouvrir le fichier « %s » comme un document SVG.\n\n
 load error	Icon-O-Matic-SVGImport		erreur de chargement
-Transformation	Icon-O-Matic-TransformersList		Transformation
 Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…
 Swatches	Icon-O-Matic-Menus		Nuancier
 <modify path>	Icon-O-Matic-PathCmd		<modifier le chemin>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Oui
 Remove Path	Icon-O-Matic-RemovePathsCmd		Enlever le chemin
 Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Déplacer la Transformation
-Perspective	Transformation		Perspective
 Export	Icon-O-Matic-Menu-File		Exporter
 Width	Icon-O-Matic-PropertyNames		Largeur
 Bummer	Cancel button - error alert		Poisse

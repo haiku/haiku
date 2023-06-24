@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	1805671130
+1	turkish	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Yok
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Yol belirtecini döndür
 Add empty	Icon-O-Matic-ShapesList		Boş ekle
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON özniteliği
 Add shape with style	Icon-O-Matic-Menu-Shape		Biçemli şekil ekle
 Assign Path	Icon-O-Matic-AddPathsCmd		Yol ata
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Dönüşümü sıfırla
-Transformation	Transformation		Dönüşüm
 Remove	Icon-O-Matic-StylesList		Kaldır
 Cancel	Icon-O-Matic-Menu-Settings		Vazgeç
 Assign Style	Icon-O-Matic-AssignStyleCmd		Biçem ata
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Biçem ekle
 Remove	Icon-O-Matic-PathManipulator		Kaldır
 Duplicate	Icon-O-Matic-ShapesList		Çoğalt
 Contour	Transformation		Kontur
-Perspective	Icon-O-Matic-TransformersList		Perspektif
 Save icon	Dialog title		Simgeyi kaydet
 Move Paths	Icon-O-Matic-MovePathsCmd		Yolları taşı
 Rounding	Icon-O-Matic-PropertyNames		Yuvarlatma
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Yol ekle
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Kapatmadan önce değişiklikler kaydedilsin mi?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		'%s' dosyası bir SVG belgesi olarak açılamadı.\n\n
 load error	Icon-O-Matic-SVGImport		yükleme hatası
-Transformation	Icon-O-Matic-TransformersList		Dönüşüm
 Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…
 Swatches	Icon-O-Matic-Menus		Örnekler
 <modify path>	Icon-O-Matic-PathCmd		<yol düzenle>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Evet
 Remove Path	Icon-O-Matic-RemovePathsCmd		Yolu kaldır
 Gradient type	Icon-O-Matic-StyleTypes		Gradyan türü
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Dönüştürücüyü taşı
-Perspective	Transformation		Perspektif
 Export	Icon-O-Matic-Menu-File		Dışa aktar
 Width	Icon-O-Matic-PropertyNames		Genişlik
 Bummer	Cancel button - error alert		Hay aksi

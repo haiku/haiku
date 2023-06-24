@@ -5,7 +5,7 @@ Stopping media_addon_server.	MediaDefs		Зупинка media_addon_server.
 Waiting for media_addon_server to quit.	MediaDefs		Чекаємо, поки media_addon_server припиняє роботу.
 Telling media_addon_server to quit.	MediaDefs		Ка́жемо media_addon_server щоб припинив роботу.
 Ready for use.	MediaDefs		Готовий до використання.
-Stopping media server…	MediaDefs		Зупинка медіа-сервера…
+Stopping media server…	MediaDefs		Зупинка медіасервера…
 Waiting for media_server to quit.	MediaDefs		Чекаємо, поки media_server припиняє роботу.
 Done shutting down.	MediaDefs		Виключилося.
 Error occurred starting media services.	MediaDefs		Сталася помилка під час запуску служб медіа.

@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	1805671130
+1	russian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Ничего
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Повернуть направление контура
 Add empty	Icon-O-Matic-ShapesList		Добавить пустую
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Добавить форму со стилем
 Assign Path	Icon-O-Matic-AddPathsCmd		Назначить контур
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Сбросить изменения
-Transformation	Transformation		Изменение
 Remove	Icon-O-Matic-StylesList		Удалить
 Cancel	Icon-O-Matic-Menu-Settings		Отмена
 Assign Style	Icon-O-Matic-AssignStyleCmd		Применить стиль
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Добавить стили
 Remove	Icon-O-Matic-PathManipulator		Удалить
 Duplicate	Icon-O-Matic-ShapesList		Дублировать
 Contour	Transformation		Обводка
-Perspective	Icon-O-Matic-TransformersList		Перспектива
 Save icon	Dialog title		Сохранить значок
 Move Paths	Icon-O-Matic-MovePathsCmd		Переместить контуры
 Rounding	Icon-O-Matic-PropertyNames		Скругление
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Добавить контур
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Сохранить изменения теущего значка перед закрытием?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не удалось открыть файл '%s' как документ SVG.\n\n
 load error	Icon-O-Matic-SVGImport		ошибка загрузки
-Transformation	Icon-O-Matic-TransformersList		Изменение
 Save as…	Icon-O-Matic-Menu-File		Сохранить как…
 Swatches	Icon-O-Matic-Menus		Палитра
 <modify path>	Icon-O-Matic-PathCmd		<изменить путь>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Да
 Remove Path	Icon-O-Matic-RemovePathsCmd		Удалить контур
 Gradient type	Icon-O-Matic-StyleTypes		Тип градиента
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Переместить трансформатор
-Perspective	Transformation		Перспектива
 Export	Icon-O-Matic-Menu-File		Экспортировать
 Width	Icon-O-Matic-PropertyNames		Ширина
 Bummer	Cancel button - error alert		Облом

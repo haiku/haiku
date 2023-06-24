@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	1805671130
+1	indonesian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Tidak ada
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Indeks Jalur Putar
 Add empty	Icon-O-Matic-ShapesList		Tambah kosong
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		META:Atribut IKON
 Add shape with style	Icon-O-Matic-Menu-Shape		Tambah bentuk dengan gaya
 Assign Path	Icon-O-Matic-AddPathsCmd		Tetapkan Jalur
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Reset Transformasi
-Transformation	Transformation		Transformasi
 Remove	Icon-O-Matic-StylesList		Hapus
 Cancel	Icon-O-Matic-Menu-Settings		Batal
 Assign Style	Icon-O-Matic-AssignStyleCmd		Tetapkan Gaya
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Tambah Gaya
 Remove	Icon-O-Matic-PathManipulator		Hapus
 Duplicate	Icon-O-Matic-ShapesList		Duplikat
 Contour	Transformation		Kontur
-Perspective	Icon-O-Matic-TransformersList		Perspektif
 Save icon	Dialog title		Simpan ikon
 Move Paths	Icon-O-Matic-MovePathsCmd		Pindahkan jalur
 Rounding	Icon-O-Matic-PropertyNames		Pembulatan
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Tambah Jalur
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Simpan perubahan ikon sekarang sebelum menutup?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Gagal membuka berkas '%s' sebagai dokumen SVG.\n\n
 load error	Icon-O-Matic-SVGImport		kesalahan memuat
-Transformation	Icon-O-Matic-TransformersList		Transformasi
 Save as…	Icon-O-Matic-Menu-File		Simpan sebagai…
 Swatches	Icon-O-Matic-Menus		Carikan
 <modify path>	Icon-O-Matic-PathCmd		<modify path>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Ya
 Remove Path	Icon-O-Matic-RemovePathsCmd		Hapus Jalur
 Gradient type	Icon-O-Matic-StyleTypes		Jenis gradien
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Pindahkan Transformer
-Perspective	Transformation		Perspektif
 Export	Icon-O-Matic-Menu-File		Ekspor
 Width	Icon-O-Matic-PropertyNames		Lebar
 Bummer	Cancel button - error alert		Kecewa

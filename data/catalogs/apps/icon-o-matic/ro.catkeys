@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	1805671130
+1	romanian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Nespecificat
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotește indicii de cale
 Add empty	Icon-O-Matic-ShapesList		Adaugă gol
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Atribut META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Adaugă o formă cu stil
 Assign Path	Icon-O-Matic-AddPathsCmd		Atribuie calea
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restabilește transformarea
-Transformation	Transformation		Transformare
 Remove	Icon-O-Matic-StylesList		Elimină
 Cancel	Icon-O-Matic-Menu-Settings		Anulează
 Assign Style	Icon-O-Matic-AssignStyleCmd		Atribuie stilul
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Adaugă stiluri
 Remove	Icon-O-Matic-PathManipulator		Elimină
 Duplicate	Icon-O-Matic-ShapesList		Duplică
 Contour	Transformation		Contur
-Perspective	Icon-O-Matic-TransformersList		Perspectivă
 Save icon	Dialog title		Salvează pictograma
 Move Paths	Icon-O-Matic-MovePathsCmd		Mută căile
 Rounding	Icon-O-Matic-PropertyNames		Rotunjire
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Adaugă o cale
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvați modificările pictogramei curente înainte de închidere?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nu s-a putut deschide fișierul „%s” ca un document SVG.\n\n
 load error	Icon-O-Matic-SVGImport		eroare de încărcare
-Transformation	Icon-O-Matic-TransformersList		Transformare
 Save as…	Icon-O-Matic-Menu-File		Salvează ca…
 Swatches	Icon-O-Matic-Menus		Mostre
 <modify path>	Icon-O-Matic-PathCmd		<modify path>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Da
 Remove Path	Icon-O-Matic-RemovePathsCmd		Elimină calea
 Gradient type	Icon-O-Matic-StyleTypes		Tip de gradient
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mută transformatorul
-Perspective	Transformation		Perspectivă
 Export	Icon-O-Matic-Menu-File		Exportă
 Width	Icon-O-Matic-PropertyNames		Lățime
 Bummer	Cancel button - error alert		Păcat

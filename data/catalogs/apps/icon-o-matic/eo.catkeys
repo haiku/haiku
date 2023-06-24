@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.haiku-icon_o_matic	1805671130
+1	esperanto	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Nenio
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Turni Indeksojn de itineroj
 Add empty	Icon-O-Matic-ShapesList		Aldoni malplenan
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Atributo
 Add shape with style	Icon-O-Matic-Menu-Shape		Aldoni formon kun stilo
 Assign Path	Icon-O-Matic-AddPathsCmd		Doni itineron
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Rekomencigi transformon
-Transformation	Transformation		Transformo
 Remove	Icon-O-Matic-StylesList		Forigi
 Cancel	Icon-O-Matic-Menu-Settings		Nuligi
 Assign Style	Icon-O-Matic-AssignStyleCmd		Atribui Stilon
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Aldoni Stilojn
 Remove	Icon-O-Matic-PathManipulator		Forigi
 Duplicate	Icon-O-Matic-ShapesList		Duobligi
 Contour	Transformation		Konturo
-Perspective	Icon-O-Matic-TransformersList		Perspektivo
 Save icon	Dialog title		Konservi piktogramon
 Move Paths	Icon-O-Matic-MovePathsCmd		Movi itinerojn
 Rounding	Icon-O-Matic-PropertyNames		Rondireco
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Aldoni itineron
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ĉu konservi nunan piktogramon antaŭ ĉesi?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Malsukcesis uzi la dosieron '%s' supozante formaton SVG.\n\n
 load error	Icon-O-Matic-SVGImport		eraro de ŝargo
-Transformation	Icon-O-Matic-TransformersList		Transformado
 Save as…	Icon-O-Matic-Menu-File		Konservi kiel…
 Swatches	Icon-O-Matic-Menus		Modeloj
 <modify path>	Icon-O-Matic-PathCmd		<ŝanĝi itineron>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Jes
 Remove Path	Icon-O-Matic-RemovePathsCmd		Forigi itineron
 Gradient type	Icon-O-Matic-StyleTypes		Speco de kolortransiro
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Movi transformilon
-Perspective	Transformation		Perspektivo
 Export	Icon-O-Matic-Menu-File		Eksporti
 Width	Icon-O-Matic-PropertyNames		Larĝo
 Bummer	Cancel button - error alert		Ho ve!

@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	1805671130
+1	english	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		无
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		旋转路径索引
 Add empty	Icon-O-Matic-ShapesList		添加空白
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON 属性
 Add shape with style	Icon-O-Matic-Menu-Shape		添加模型（包含样式）
 Assign Path	Icon-O-Matic-AddPathsCmd		指定路径
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		重置转换
-Transformation	Transformation		转换
 Remove	Icon-O-Matic-StylesList		删除
 Cancel	Icon-O-Matic-Menu-Settings		取消
 Assign Style	Icon-O-Matic-AssignStyleCmd		指定样式
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		添加样式
 Remove	Icon-O-Matic-PathManipulator		删除
 Duplicate	Icon-O-Matic-ShapesList		副本
 Contour	Transformation		轮廓
-Perspective	Icon-O-Matic-TransformersList		透视
 Save icon	Dialog title		保存图标
 Move Paths	Icon-O-Matic-MovePathsCmd		移动路径
 Rounding	Icon-O-Matic-PropertyNames		倒角
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		添加路径
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		关闭前是否保存当前图标修改？
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		打开SVG文档 '%s' 出错。\n\n
 load error	Icon-O-Matic-SVGImport		加载错误
-Transformation	Icon-O-Matic-TransformersList		转换
 Save as…	Icon-O-Matic-Menu-File		保存为...
 Swatches	Icon-O-Matic-Menus		调色板
 <modify path>	Icon-O-Matic-PathCmd		<修改路径>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		是
 Remove Path	Icon-O-Matic-RemovePathsCmd		删除路径
 Gradient type	Icon-O-Matic-StyleTypes		渐变类型
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		移动转换
-Perspective	Transformation		透视
 Export	Icon-O-Matic-Menu-File		导出
 Width	Icon-O-Matic-PropertyNames		宽度
 Bummer	Cancel button - error alert		Bummer

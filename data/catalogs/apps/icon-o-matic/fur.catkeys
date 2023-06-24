@@ -1,4 +1,4 @@
-1	friulian	x-vnd.haiku-icon_o_matic	1805671130
+1	friulian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Nissun
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Volte i indiçs dai percors
 Add empty	Icon-O-Matic-ShapesList		Zonte vueit
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Atribût META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Zonte sagome cun stîl
 Assign Path	Icon-O-Matic-AddPathsCmd		Assegne percors
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Azere trasformazion
-Transformation	Transformation		Trasformazion
 Remove	Icon-O-Matic-StylesList		Gjave
 Cancel	Icon-O-Matic-Menu-Settings		Anule
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assegne stîl
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Zonte stîl
 Remove	Icon-O-Matic-PathManipulator		Gjave
 Duplicate	Icon-O-Matic-ShapesList		Dupliche
 Contour	Transformation		Contor
-Perspective	Icon-O-Matic-TransformersList		Prospetive
 Save icon	Dialog title		Salve icone
 Move Paths	Icon-O-Matic-MovePathsCmd		Sposte percors
 Rounding	Icon-O-Matic-PropertyNames		Staronzament
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Zonte percors
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvâ lis modifichis ae icone prime di sierâ?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No si è rivâts a vierzi il file '%s' come document SVG.\n\n
 load error	Icon-O-Matic-SVGImport		erôr di cjariament
-Transformation	Icon-O-Matic-TransformersList		Trasformazion
 Save as…	Icon-O-Matic-Menu-File		Salve come…
 Swatches	Icon-O-Matic-Menus		Campions
 <modify path>	Icon-O-Matic-PathCmd		<modifiche percors>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Sì
 Remove Path	Icon-O-Matic-RemovePathsCmd		Gjave percors
 Gradient type	Icon-O-Matic-StyleTypes		Gjenar di gradient
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Sposte trasformadôr
-Perspective	Transformation		Prospetive
 Export	Icon-O-Matic-Menu-File		Espuarte
 Width	Icon-O-Matic-PropertyNames		Largjece
 Bummer	Cancel button - error alert		Maledizion

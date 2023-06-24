@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	1805671130
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Ninguno
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotar índices de ruta
 Add empty	Icon-O-Matic-ShapesList		Agregar vacío
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Atributo META::ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Agregar forma con estilo
 Assign Path	Icon-O-Matic-AddPathsCmd		Asignar ruta
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restablecer transformación
-Transformation	Transformation		Transformación
 Remove	Icon-O-Matic-StylesList		Eliminar
 Cancel	Icon-O-Matic-Menu-Settings		Cancelar
 Assign Style	Icon-O-Matic-AssignStyleCmd		Asignar estilo
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Agregar estilos
 Remove	Icon-O-Matic-PathManipulator		Eliminar
 Duplicate	Icon-O-Matic-ShapesList		Duplicar
 Contour	Transformation		Contorno
-Perspective	Icon-O-Matic-TransformersList		Perspectiva
 Save icon	Dialog title		Guardar icono
 Move Paths	Icon-O-Matic-MovePathsCmd		Mover rutas
 Rounding	Icon-O-Matic-PropertyNames		Redondear
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Agregar ruta
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		¿Guardar los cambios al icono actual antes de cerrar?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No se puede abrir el archivo «%s» como documento SVG.\n\n
 load error	Icon-O-Matic-SVGImport		error al cargar
-Transformation	Icon-O-Matic-TransformersList		Transformación
 Save as…	Icon-O-Matic-Menu-File		Guardar como...
 Swatches	Icon-O-Matic-Menus		Muestras
 <modify path>	Icon-O-Matic-PathCmd		<modificar ruta>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Sí
 Remove Path	Icon-O-Matic-RemovePathsCmd		Eliminar ruta
 Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mover transformador
-Perspective	Transformation		Perspectiva
 Export	Icon-O-Matic-Menu-File		Exportar
 Width	Icon-O-Matic-PropertyNames		Ancho
 Bummer	Cancel button - error alert		Latazo

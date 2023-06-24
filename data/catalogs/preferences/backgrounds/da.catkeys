@@ -4,25 +4,25 @@ X:	Main View		X:
 Setting the background image failed:	Main View		Indstilling af baggrundsbilledet mislykkedes:
 Resolution: 	Image Filepanel		Opløsning: 
 pick one	Main View		vælg en
-Default	Main View		Standard
-Center	Main View		Centreret
+Default	Main View		Forvalg
+Center	Main View		I midten
 Folder: %path	Main View		Mappe: %path
-Manual	Main View		Manuel
+Manual	Main View		Manuelt
 Set background image error	Main View		Fejl ved indstilling af baggrundsbillede
-Default folder	Main View		Standard mappe
+Default folder	Main View		Forvalgt mappe
 Revert	Main View		Tilbagefør
 None	Main View		Ingen
 All workspaces	Main View		Alle arbejdsområder
-Icon label outline	Main View		Omrids af ikon etiket
+Icon label outline	Main View		Omrids af ikonetiket
 Other…	Main View		Andre…
 Current workspace	Main View		Nuværende arbejdsområde
-Apply	Main View		Anvend
+Apply	Main View		Tag i brug
 Other folder…	Main View		Anden mappe…
 Y:	Main View		Y:
 Tile	Main View		Side om side
 Select	Main View		Vælg
-Scale to fit	Main View		Skaler så det passer
-OK	Main View		OK
+Scale to fit	Main View		Skalér så det passer
+OK	Main View		O.k.
 Placement:	Main View		Placering:
 Preview	Main View		Forhåndsvisning
 Image:	Main View		Billede:

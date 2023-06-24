@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.haiku-icon_o_matic	799228476
+1	belarusian	x-vnd.haiku-icon_o_matic	3152776406
 None	Icon-O-Matic-Properties		Няма
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Павярнуць Індэксы Шляху
 Add empty	Icon-O-Matic-ShapesList		Дадаць пусты
@@ -30,7 +30,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Атрыбут META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Дадаць фігуру са стылям
 Assign Path	Icon-O-Matic-AddPathsCmd		Прывязаць Шлях
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Скінуць Трансфармацыю
-Transformation	Transformation		Трансфармацыя
 Remove	Icon-O-Matic-StylesList		Выдаліць
 Cancel	Icon-O-Matic-Menu-Settings		Скасаваць
 Assign Style	Icon-O-Matic-AssignStyleCmd		Прывязаць Стыль
@@ -74,7 +73,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Дадаць Стылі
 Remove	Icon-O-Matic-PathManipulator		Выдаліць
 Duplicate	Icon-O-Matic-ShapesList		Дуплікаваць
 Contour	Transformation		Контур
-Perspective	Icon-O-Matic-TransformersList		Перспектыва
 Save icon	Dialog title		Захаваць значак
 Move Paths	Icon-O-Matic-MovePathsCmd		Перамясціць Шляхі
 Rounding	Icon-O-Matic-PropertyNames		Акругленне
@@ -163,7 +161,6 @@ Max LOD	Icon-O-Matic-PropertyNames		Макс. LOD
 Add Path	Icon-O-Matic-AddPathsCmd		Дадаць Шлях
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Захаваць зьмены ў значак перад тым як выйсьці?
 load error	Icon-O-Matic-SVGImport		памылка загрузкі
-Transformation	Icon-O-Matic-TransformersList		Трасфармацыя
 Save as…	Icon-O-Matic-Menu-File		Захаваць як…
 Swatches	Icon-O-Matic-Menus		Узоры
 <modify path>	Icon-O-Matic-PathCmd		<змяніць пуць>
@@ -188,7 +185,6 @@ Yes	Icon-O-Matic-StyledTextImport		Так
 Remove Path	Icon-O-Matic-RemovePathsCmd		Выдаліць Шлях
 Gradient type	Icon-O-Matic-StyleTypes		Тып градыенту
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перамясціць Трансформер
-Perspective	Transformation		Перспэктыва
 Export	Icon-O-Matic-Menu-File		Экспарт
 Width	Icon-O-Matic-PropertyNames		Шырыня
 Bummer	Cancel button - error alert		Якая дасада!

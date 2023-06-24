@@ -1,10 +1,10 @@
 1	danish	x-vnd.Haiku-libpackage	134767648
-Fetching repository-cache from %url	RefreshRepositoryRequest		Henter softwarekilde-mellemlager fra %url
+Fetching repository-cache from %url	RefreshRepositoryRequest		Henter programarkiv-mellemlager fra %url
 Validating checksum for %repositoryName	RefreshRepositoryRequest		Validerer tjeksum for %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Kunne ikke fjerne transaktionsmappe
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente konfiguration til softwarekilden \"%s\". Springer over.
-Refreshing repository \"%s\" failed	PackageManagerKit		Genopfriskning af softwarekilden \"%s\" mislykkedes
-Fetching repository checksum from %url	RefreshRepositoryRequest		Henter softwarekildetjeksum fra %url
-Failed to get repository names	PackageManagerKit		Kunne ikke hente softwarekildenavne
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente mellemlager til softwarekilden \"%s\". Springer over.
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente opsætning til programarkivet \"%s\". Springer over.
+Refreshing repository \"%s\" failed	PackageManagerKit		Genopfriskning af programarkivet \"%s\" mislykkedes
+Fetching repository checksum from %url	RefreshRepositoryRequest		Henter programarkivtjeksum fra %url
+Failed to get repository names	PackageManagerKit		Kunne ikke hente programarkivnavne
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente mellemlager til programarkivet \"%s\". Springer over.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakke %s-%s har ikke en matchende kræves til sin grundpakke \"%s\"

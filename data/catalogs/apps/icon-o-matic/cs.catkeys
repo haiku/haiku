@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-icon_o_matic	1805671130
+1	czech	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Žádný
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Otočit indexy cesty
 Add empty	Icon-O-Matic-ShapesList		Přidat prázdný
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Atribut
 Add shape with style	Icon-O-Matic-Menu-Shape		Přidat tvar se stylem
 Assign Path	Icon-O-Matic-AddPathsCmd		Přiřadit cestu
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Resetovat Transformaci
-Transformation	Transformation		Transformace
 Remove	Icon-O-Matic-StylesList		Odstranit
 Cancel	Icon-O-Matic-Menu-Settings		Zrušit
 Assign Style	Icon-O-Matic-AssignStyleCmd		Přiřadit Styl
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Přidat Styly
 Remove	Icon-O-Matic-PathManipulator		Odstranit
 Duplicate	Icon-O-Matic-ShapesList		Duplikovat
 Contour	Transformation		Obrys
-Perspective	Icon-O-Matic-TransformersList		Perspektiva
 Save icon	Dialog title		Uložit ikonu
 Move Paths	Icon-O-Matic-MovePathsCmd		Přesunout Cesty
 Rounding	Icon-O-Matic-PropertyNames		Zaokrouhlování
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Přidat Cestu
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Uložit před zavřením změny v aktualní ikoně?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nepodařilo se otevřít '%s' jako SVG dokument.\n\n
 load error	Icon-O-Matic-SVGImport		chyba nahrávání
-Transformation	Icon-O-Matic-TransformersList		Transformace
 Save as…	Icon-O-Matic-Menu-File		Uložit jako...
 Swatches	Icon-O-Matic-Menus		Vzorky
 <modify path>	Icon-O-Matic-PathCmd		<změnit cestu>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Ano
 Remove Path	Icon-O-Matic-RemovePathsCmd		Odstranit cestu
 Gradient type	Icon-O-Matic-StyleTypes		Typ gradientu
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Přesunout Transformátory
-Perspective	Transformation		Perspektiva
 Export	Icon-O-Matic-Menu-File		Exportovat
 Width	Icon-O-Matic-PropertyNames		Šířka
 Bummer	Cancel button - error alert		OK

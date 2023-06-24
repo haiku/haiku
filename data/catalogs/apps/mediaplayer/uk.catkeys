@@ -9,44 +9,44 @@ MediaPlayer	System name		MediaPlayer
 Audio track	MediaPlayer-Main		Аудіодоріжка
 Muted	MediaPlayer-SettingsWindow		Без звуку
 OK	MediaPlayer-RemovePLItemsCmd		ОК
-Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
+Open Playlist	MediaPlayer-PlaylistWindow		Відкрити Плейлист
 Subtitles	MediaPlayer-Main		Субтитри
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% викликав внутрішню помилку. Файл неможливо відкрити.
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Інформація про файл
 raw audio	MediaPlayer-InfoWin		необроблене аудіо
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
-New player…	MediaPlayer-Main		Новий програвач…
+New player…	MediaPlayer-Main		Новий Плеєр…
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
 OK	MediaPlayer-Main		ОК
 Remove	MediaPlayer-PlaylistWindow		Вилучити
 <unknown>	MediaPlayer-InfoWin		<невідомий>
-Resume:	MediaPlayer-SettingsWindow		Підсумок:
+Resume:	MediaPlayer-SettingsWindow		Грати після запуску:
 Duration	MediaPlayer-InfoWin		Тривалість
 Import Entries	MediaPlayer-ImportPLItemsCmd		Імпортувати записи
 Open network stream	MediaPlayer-Main		Відкрити мережевий потік
 Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до смітника
 Open file…	MediaPlayer-Main		Відкрити файл…
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабувати кнопки управління в повноекранному режимі
-View options	MediaPlayer-SettingsWindow		Опції перегляду
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштаб кнопок управління у повноекранному режимі
+View options	MediaPlayer-SettingsWindow		Параметри перегляду
 %d kHz	MediaPlayer-InfoWin		%d кГц
 Eject Device	MediaPlayer-Main		Вийняти пристрій
 Full volume	MediaPlayer-SettingsWindow		Повна гучність
 <untitled>	PlaylistItem-title		<без імені>
-Start media server	MediaPlayer-Main		Запустити Медіа сервер
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже, медіа сервер не працює.\nБажаєте запустити його?
+Start media server	MediaPlayer-Main		Запустити Медіасервер
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже, медіасервер не працює.\nБажаєте запустити його?
 Location	MediaPlayer-InfoWin		Шлях
 Opening '%s'.	MediaPlayer-Main		Відкриття '%s'.
 Medium	MediaPlayer-SettingsWindow		Середній
 Play mode	MediaPlayer-SettingsWindow		Режим відтворення
-Playlist	MediaPlayer-PlaylistWindow		Список відтворення
+Playlist	MediaPlayer-PlaylistWindow		Плейлист
 %d Bit	MediaPlayer-InfoWin		%d біт
 Track	Audio Track Menu		Доріжка
 Close	MediaPlayer-Main		Закрити
 Save error	MediaPlayer-PlaylistWindow		Помилка збереження
 Attributes	MediaPlayer-Main		Атрибути
 Bottom of screen	MediaPlayer-SettingsWindow		Нижня частина екрана
-MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіапрогравача
+MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіаплеєра
 Copyright	MediaPlayer-InfoWin		Авторське право
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
@@ -64,13 +64,13 @@ Nothing to Play	MediaPlayer-Main		Нічого відтворювати
 OK	MediaPlayer-SettingsWindow		ОК
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Вилучити записи
 never	MediaPlayer-SettingsWindow		ніколи
-Loop audio	MediaPlayer-SettingsWindow		Циклічний звук
+Loop audio	MediaPlayer-SettingsWindow		Циклічне аудіо
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (неправильне повідомлення). Збій збереження списку відтворення.
 Open…	MediaPlayer-PlaylistWindow		Відкрити…
 Revert	MediaPlayer-SettingsWindow		Відкат змін
 Low volume	MediaPlayer-SettingsWindow		Низька гучність
 Audio	MediaPlayer-Main		Аудіо
-{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Channels}}
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} few{# канали} other{# каналів}}
 Quit	MediaPlayer-Main		Вийти
 Redo	MediaPlayer-PlaylistWindow		Повтор дії
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
@@ -80,14 +80,14 @@ Large	MediaPlayer-SettingsWindow		Великий
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 unknown format	MediaPlayer-InfoWin		невідомий формат
 Track %d	MediaPlayer-Main		Доріжка %d
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не можна відправити всі файли до смітника.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не можна відправити усі файли до смітника.
 Total duration: %s	MediaPlayer-PlaylistWindow		Загальна тривалість: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до смітника
 50% scale	MediaPlayer-Main		Масштаб 50%
 Drop files to play	MediaPlayer-Main		Перетягніть файли для відтворення
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копіювати запис
-Close window after playing audio	MediaPlayer-SettingsWindow		Закрити вікно після відтворення звуку
+Close window after playing audio	MediaPlayer-SettingsWindow		Закрити вікно після відтворення аудіо
 Edit	MediaPlayer-PlaylistWindow		Редагувати
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Копіювати записи
 Always on top	MediaPlayer-Main		Завжди зверху
@@ -96,10 +96,10 @@ always	MediaPlayer-SettingsWindow		завжди
 Loop video	MediaPlayer-SettingsWindow		Циклічне відео
 Stream URL:	MediaPlayer-NetworkStream		URL потоку:
 <unknown>	PlaylistItem-album		<невідомий>
-Stream settings	MediaPlayer-Main		Налаштування потоку
+Stream settings	MediaPlayer-Main		З настройками потоку
 none	Subtitles menu		пусто
-Save Playlist	MediaPlayer-PlaylistWindow		Зберегти список відтворення
-Overlay	MediaPlayer-InfoWin		Накладання
+Save Playlist	MediaPlayer-PlaylistWindow		Зберегти Плейлист
+Overlay	MediaPlayer-InfoWin		Оверлей
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (CinemaScope)
 Rating	MediaPlayer-Main		Рейтинг
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (нестача памяті). Збій збереження списку відтворення.
@@ -108,7 +108,7 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Lock Peaks	MediaPlayer-PeakView		Блокувати піки
 none	Audio track menu		пусто
 Open network stream	MediaPlayer-NetworkStream		Відкрити мережевий потік
-Automatically start playing	MediaPlayer-SettingsWindow		Автоматично почати відтворення
+Automatically start playing	MediaPlayer-SettingsWindow		Почати відтворення автоматично
 Undo	MediaPlayer-PlaylistWindow		Відкат дії
 Display mode	MediaPlayer-InfoWin		Режим показу
 Bottom of video	MediaPlayer-SettingsWindow		Нижня частина відео
@@ -129,11 +129,11 @@ Internal error (locking failed). Saving the playlist failed.	MediaPlayer-Playlis
 Bad URL	MediaPlayer-NetworkStream		Недійсний URL
 Save	MediaPlayer-Main		Зберегти
 Close window after playing video	MediaPlayer-SettingsWindow		Закрити вікно після відтворення відео
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Плавно масштабувати відео (без режиму накладання)
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Плавний масштаб відео (без режиму накладання)
 200% scale	MediaPlayer-Main		Масштаб 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' неможливо відкрити.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден із файлів, які Ви хотіли відтворити не є файлом медіа.
-Remove Entry	MediaPlayer-RemovePLItemsCmd		Видалити запис
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Вилучити запис
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Вилучити записи до смітника
 Subtitle size:	MediaPlayer-SettingsWindow		Розмір субтитрів:
 No aspect correction	MediaPlayer-Main		Без корекції формату

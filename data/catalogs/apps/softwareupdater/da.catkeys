@@ -1,5 +1,5 @@
 1	danish	x-vnd.haiku-softwareupdater	369324613
-Updating version	SoftwareUpdaterWindow	List item text	Opdaterer version
+Updating version	SoftwareUpdaterWindow	List item text	Opdaterer udgave
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klik her for at installere {0, plural, one{# opdateret pakke} other{# opdaterede pakker}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakker, som skal afinstalleres
 No active network connection was found	UpdateManager	Error message	Der blev ikke fundet nogen aktiv netværksforbindelse
@@ -8,7 +8,7 @@ There were no updates found.	CheckManager		Der blev ikke fundet nogen opdatering
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Opdateringer er blevet fuldført. Er du sikker på, du vil afslutte?
 Updates found	SoftwareUpdaterWindow		Der blev fundet opdateringer
 Update now	SoftwareUpdaterWindow		Opdatér nu
-For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Vi kunne, af en eller anden grund, ikke genstarte din computer.
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Af en eller anden grund kunne vi ikke genstarte din computer.
 OK	UpdateManager		O.k.
 Unrecognized argument	SoftwareUpdaterApp	Error message	Argument kunne ikke genkendes
 There were no updates found.	CheckAction		Der blev ikke fundet nogen opdateringer.
@@ -25,7 +25,7 @@ Cancelling updates	SoftwareUpdaterWindow		Afbryder opdateringer
 Cancel	SoftwareUpdaterWindow	Alert button label	Afbryd
 There were no updates found.	UpdateAction		Der blev ikke fundet nogen opdateringer.
 OK	SoftwareUpdaterWindow		O.k.
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vælg venligst fra følgende opdateringsvalgmuligheder:\n\nOpdatér:\n\tOpdaterer alle installerede pakker.\nFuld synkronisering:\n\tSynkroniserer de installerede pakker med softwarekilderne.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Vælg venligst fra følgende opdateringsvalgmuligheder:\n\nOpdatér:\n\tOpdaterer alle installerede pakker.\nFuld synkronisering:\n\tSynkroniserer de installerede pakker med programarkiverne.
 The following changes will be made:	SoftwareUpdaterWindow		Følgende ændringer vil blive foretaget:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabler accepteres ikke længere\n
 Fatal error while checking for updates: %s\n	CheckAction		Fatal fejl ved søgning efter opdateringer: %s\n
@@ -46,7 +46,7 @@ Checking for updates	SoftwareUpdaterWindow		Søger efter opdateringer
 Updates completed	UpdateManager		Opdateringer fuldført
 Reboot	SoftwareUpdaterWindow		Genstart
 Show more details	SoftwareUpdaterWindow		Vis flere detaljer
-Installing version	SoftwareUpdaterWindow	List item text	Installerer version
+Installing version	SoftwareUpdaterWindow	List item text	Installerer udgave
 Checking for updates	CheckManager		Søger efter opdateringer
 No remote repositories are available	UpdateManager	Error message	Der er ikke nogen tilgængelige fjernprogramarkiver
 Software {0, plural, one{update} other{updates}} available	CheckManager		Program {0, plural, one{opdatering} other{opdateringer}} tilgængelig
@@ -55,7 +55,7 @@ Update	SoftwareUpdaterWindow	Alert button label	Opdatér
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Åbn programarkiver
 Updates did not complete	UpdateAction		Opdateringer blev ikke fuldført
 Invalid update type, cannot continue with updates	UpdateAction		Ugyldig opdateringstype, kan ikke fortsætte med opdateringer
-Uninstalling version	SoftwareUpdaterWindow	List item text	Afinstallerer version
+Uninstalling version	SoftwareUpdaterWindow	List item text	Afinstallerer udgave
 %i of %i	UpdateManager	Do not translate %i	%i af %i
 Quit	SoftwareUpdaterWindow		Afslut
 No updates available	CheckManager		Der er ikke nogen opdateringer tilgængelige

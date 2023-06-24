@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-icon_o_matic	1805671130
+1	catalan; valencian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Cap
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Gira els índexs dels camins
 Add empty	Icon-O-Matic-ShapesList		Afegeix-n'hi una de buida
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Atribut META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb un estil
 Assign Path	Icon-O-Matic-AddPathsCmd		Assigna el camí
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restableix la transformació
-Transformation	Transformation		Transformació
 Remove	Icon-O-Matic-StylesList		Suprimeix
 Cancel	Icon-O-Matic-Menu-Settings		Cancel·la
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigna l'estil
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Afegeix-hi estils
 Remove	Icon-O-Matic-PathManipulator		Suprimeix
 Duplicate	Icon-O-Matic-ShapesList		Duplica
 Contour	Transformation		Contorn
-Perspective	Icon-O-Matic-TransformersList		Perspectiva
 Save icon	Dialog title		Desa la icona
 Move Paths	Icon-O-Matic-MovePathsCmd		Mou el camins
 Rounding	Icon-O-Matic-PropertyNames		Arrodoniment
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Afegeix-hi un camí
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Voleu desar els canvis a la icona actual abans de tancar?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Ha fallat obrir el fitxer %s com a document d'SVG.\n\n
 load error	Icon-O-Matic-SVGImport		error de càrrega
-Transformation	Icon-O-Matic-TransformersList		Transformació
 Save as…	Icon-O-Matic-Menu-File		Desa com a...
 Swatches	Icon-O-Matic-Menus		Mostres
 <modify path>	Icon-O-Matic-PathCmd		<modificació del camí>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Sí
 Remove Path	Icon-O-Matic-RemovePathsCmd		Suprimeix el camí
 Gradient type	Icon-O-Matic-StyleTypes		Tipus de gradient
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mou el transformador
-Perspective	Transformation		Perspectiva
 Export	Icon-O-Matic-Menu-File		Exporta
 Width	Icon-O-Matic-PropertyNames		Amplada
 Bummer	Cancel button - error alert		Problema

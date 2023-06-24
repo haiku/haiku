@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	1805671130
+1	polish	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Nic
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Obrócenie wskaźników ścieżki
 Add empty	Icon-O-Matic-ShapesList		Dodaj pusty
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Atrybut META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Dodaj kształt ze stylem
 Assign Path	Icon-O-Matic-AddPathsCmd		Przypisanie ścieżki
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Resetowanie transformacji
-Transformation	Transformation		Transformacja
 Remove	Icon-O-Matic-StylesList		Usuń
 Cancel	Icon-O-Matic-Menu-Settings		Anuluj
 Assign Style	Icon-O-Matic-AssignStyleCmd		Przypisanie stylu
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Dodanie stylów
 Remove	Icon-O-Matic-PathManipulator		Usuń
 Duplicate	Icon-O-Matic-ShapesList		Duplikuj
 Contour	Transformation		Kontur
-Perspective	Icon-O-Matic-TransformersList		Perspektywa
 Save icon	Dialog title		Zapisz ikonę
 Move Paths	Icon-O-Matic-MovePathsCmd		Przesunięcie ścieżki
 Rounding	Icon-O-Matic-PropertyNames		Zaokrąglenie
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Dodanie ścieżki
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Czy zapisać bieżącą ikonę przez zamknięciem?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Otwarcie pliku „%s” jako dokumentu SVG nie powiodło się.\n\n
 load error	Icon-O-Matic-SVGImport		błąd ładowania
-Transformation	Icon-O-Matic-TransformersList		Transformacja
 Save as…	Icon-O-Matic-Menu-File		Zapisz jako…
 Swatches	Icon-O-Matic-Menus		Próbki
 <modify path>	Icon-O-Matic-PathCmd		<modyfikacja ścieżki>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Tak
 Remove Path	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżki
 Gradient type	Icon-O-Matic-StyleTypes		Rodzaj gradientu
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Przesunięcie transformatora
-Perspective	Transformation		Perspektywa
 Export	Icon-O-Matic-Menu-File		Eksportuj
 Width	Icon-O-Matic-PropertyNames		Szerokość
 Bummer	Cancel button - error alert		Klops

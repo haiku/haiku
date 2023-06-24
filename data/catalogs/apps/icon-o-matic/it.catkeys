@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-icon_o_matic	1805671130
+1	italian	x-vnd.haiku-icon_o_matic	4159219060
 None	Icon-O-Matic-Properties		Nessuno
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Ruota gli Indici del Percorso
 Add empty	Icon-O-Matic-ShapesList		Aggiungi vuoto
@@ -31,7 +31,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		Attributo META:ICON
 Add shape with style	Icon-O-Matic-Menu-Shape		Aggiungi sagoma con stile
 Assign Path	Icon-O-Matic-AddPathsCmd		Assegna Percorso
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Ripristina Trasformazione
-Transformation	Transformation		Trasformazione
 Remove	Icon-O-Matic-StylesList		Rimuovi
 Cancel	Icon-O-Matic-Menu-Settings		Annulla
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assegna Stile
@@ -75,7 +74,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Aggiungi Stile
 Remove	Icon-O-Matic-PathManipulator		Rimuovi
 Duplicate	Icon-O-Matic-ShapesList		Duplica
 Contour	Transformation		Contorno
-Perspective	Icon-O-Matic-TransformersList		Prospettiva
 Save icon	Dialog title		Salva icona
 Move Paths	Icon-O-Matic-MovePathsCmd		Sposta Percorso
 Rounding	Icon-O-Matic-PropertyNames		Arrotondamento
@@ -166,7 +164,6 @@ Add Path	Icon-O-Matic-AddPathsCmd		Aggiungi Percorso
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salva le modifiche all'icona corrente prima di chiudere?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Impossibile aprire il file '%s' come documento SVG.\n\n
 load error	Icon-O-Matic-SVGImport		errore di caricamento
-Transformation	Icon-O-Matic-TransformersList		Trasformazione
 Save as…	Icon-O-Matic-Menu-File		Salva come...
 Swatches	Icon-O-Matic-Menus		Campioni
 <modify path>	Icon-O-Matic-PathCmd		<modifica percorso>
@@ -191,7 +188,6 @@ Yes	Icon-O-Matic-StyledTextImport		Sì
 Remove Path	Icon-O-Matic-RemovePathsCmd		Rimuovi Percorso
 Gradient type	Icon-O-Matic-StyleTypes		Tipo di gradiente
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Sposta Trasformatore
-Perspective	Transformation		Prospettiva
 Export	Icon-O-Matic-Menu-File		Esporta
 Width	Icon-O-Matic-PropertyNames		Larghezza
 Bummer	Cancel button - error alert		Bummer

@@ -64,7 +64,7 @@ Replace	FSUtils		Замінити
 Rectangle	AttributesView		Прямокутник
 Move to	ContainerWindow		Перемістити до
 Status	Email Query Columns		Стан
-New folder	FSUtils		Нова папка
+New folder	FSUtils		Каталог/Папка
 Junk on end.	libtracker		Мотлох у кінці.
 New Query	FindPanel		Новий запит
 system	B_SYSTEM_DIRECTORY		Система
@@ -240,7 +240,7 @@ Boolean	AttributesView		Булевий
 Invert selection	FilePanelPriv		Інвертувати виділення
 Memory size	AttributesView		Розмір пам'яті
 TiB	WidgetAttributeText		ТБ
-New folder	TemplatesMenu		Нова папка
+New folder	TemplatesMenu		Каталог/Папка
  (broken)	InfoWindow		 (поламаний)
 Replace all	FSUtils		Замінити все
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Програма \«%appname\» не підтримує відкриття документу даного типу.\nВи дійсно бажаєте відкрити документ у ній?\n\nЯкщо ви знаєте, що програма підтримує цей тип документів, то рекомендуємо зв'язатися с розробниками програми і попросити їх оновити список типів, які підтримуються нею.
@@ -312,7 +312,7 @@ apps	B_APPS_DIRECTORY		Програми
 Error calculating folder size.	InfoWindow		Помилка при обчисленні розміру папки.
 MiB	WidgetAttributeText		МБ
 Delete	FSUtils		Видалити
-Edit name	ContainerWindow		Редагувати ім'я
+Edit name	ContainerWindow		Редагувати назву
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \«%document\» (Очікується символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
 Atom reference	AttributesView		посилання Atom
@@ -414,7 +414,7 @@ Paste	ContainerWindow		Вставити
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Елемент з назвою \«%name\» вже існує у цій папці, і може містити\nелементи з такими ж назвами. Ви дійсно бажаєте перемістити його разом з вмістом у папку де Ви є %verb?
 Cannot unmount the boot volume \"%name\".	FSUtils		Неможливо відключити завантажувальний том \«%name\».
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \«%document\» програмою \«%app\» (Відсутній символ: %symbol). \n
-New folder	ContainerWindow		Каталог/Папка
+New folder	ContainerWindow		Нова папка
 Name	OpenWithWindow		Назва
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \«%name\». Елемент може бути відкритим або зайнятим.
 Windows	TrackerSettingsWindow		Вікна
@@ -518,7 +518,7 @@ Media parameter	AttributesView		Параметри медіа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		При зміні папки home %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього? \n\nЩоб все рівно змінити папку home, затисніть кнопку Shift та натисніть \«Я знаю що роблю\».
 Sorry, you can't copy items to the Trash.	PoseView		Вибачте, Ви не можете копіювати елементи до смітника.
 Invert selection	VirtualDirectoryWindow		Інвертувати вибране
-New folder	FilePanelPriv		Нова папка
+New folder	FilePanelPriv		Каталог/Папка
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# елемент} few{# елементи} other{# елементів}}
 Name	AttributesView		Назва
 Invalid bracket range.	libtracker		Неприпустимий діапазон дужок

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.haiku-icon_o_matic	462511252
+1	croatian	x-vnd.haiku-icon_o_matic	2816059182
 None	Icon-O-Matic-Properties		Nijedan
 Add empty	Icon-O-Matic-ShapesList		Dodaj prazno
 Opening the icon failed!	Icon-O-Matic-Main		Neuspjelo otvaranje ikone!
@@ -17,7 +17,6 @@ Paste	Icon-O-Matic-Properties		Zalijepi
 Close	Icon-O-Matic-Menu-File		Zatvori
 Rotation	Icon-O-Matic-PropertyNames		Rotacija
 Assign Path	Icon-O-Matic-AddPathsCmd		Dodjeli putanju
-Transformation	Transformation		Pretvorba
 Remove	Icon-O-Matic-StylesList		Ukloni
 Cancel	Icon-O-Matic-Menu-Settings		Odustani
 Assign Style	Icon-O-Matic-AssignStyleCmd		Dodjeli stil
@@ -51,7 +50,6 @@ Add	Icon-O-Matic-PathsList		Dodaj
 Add Styles	Icon-O-Matic-AddStylesCmd		Dodaj stilove
 Remove	Icon-O-Matic-PathManipulator		Ukloni
 Duplicate	Icon-O-Matic-ShapesList		Udvostruči
-Perspective	Icon-O-Matic-TransformersList		Perspektiva
 Save icon	Dialog title		Spremi ikonu
 Move Paths	Icon-O-Matic-MovePathsCmd		Premjesti putanje
 Cancel	Icon-O-Matic-ColorPicker		Odustani
@@ -106,7 +104,6 @@ Add circle	Icon-O-Matic-PathsList		Dodaj krug
 Untitled	Icon-O-Matic-Main		Nenaslovljeno
 Add Path	Icon-O-Matic-AddPathsCmd		Dodaj putanju
 load error	Icon-O-Matic-SVGImport		greška učitavanja
-Transformation	Icon-O-Matic-TransformersList		Pretvorba
 Save as…	Icon-O-Matic-Menu-File		Spremi kao...
 <modify path>	Icon-O-Matic-PathCmd		<izmjeni putanju>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF izvorni kod
@@ -121,7 +118,6 @@ Add with style	Icon-O-Matic-ShapesList		Dodaj sa stilom
 New	Icon-O-Matic-Menu-File		Novi
 Yes	Icon-O-Matic-StyledTextImport		Da
 Remove Path	Icon-O-Matic-RemovePathsCmd		Ukloni putanju
-Perspective	Transformation		Perspektiva
 Export	Icon-O-Matic-Menu-File		Izvoz
 Width	Icon-O-Matic-PropertyNames		Širina
 Style	Icon-O-Matic-Menus		Stil

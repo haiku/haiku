@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	799228476
+1	lithuanian	x-vnd.haiku-icon_o_matic	3152776406
 None	Icon-O-Matic-Properties		Nieko
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Perkelti kreivės galus
 Add empty	Icon-O-Matic-ShapesList		Pridėti tuščią
@@ -30,7 +30,6 @@ META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON požymis
 Add shape with style	Icon-O-Matic-Menu-Shape		Pridėti figūrą su stiliumi
 Assign Path	Icon-O-Matic-AddPathsCmd		Priskirti kreivę
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Atšaukti transformaciją
-Transformation	Transformation		Transformacija
 Remove	Icon-O-Matic-StylesList		Pašalinti
 Cancel	Icon-O-Matic-Menu-Settings		Atsisakyti
 Assign Style	Icon-O-Matic-AssignStyleCmd		Priskirti stilių
@@ -74,7 +73,6 @@ Add Styles	Icon-O-Matic-AddStylesCmd		Pridėti stilius
 Remove	Icon-O-Matic-PathManipulator		Pašalinti
 Duplicate	Icon-O-Matic-ShapesList		Dubliuoti
 Contour	Transformation		Kontūras
-Perspective	Icon-O-Matic-TransformersList		Perspektyva
 Save icon	Dialog title		Įrašyti piktogramą
 Move Paths	Icon-O-Matic-MovePathsCmd		Perkelti kreives
 Rounding	Icon-O-Matic-PropertyNames		Apvalinimas
@@ -163,7 +161,6 @@ Max LOD	Icon-O-Matic-PropertyNames		Didž. det. lyg.
 Add Path	Icon-O-Matic-AddPathsCmd		Pridėti kreivę
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ar įrašyti piktogramos pakeitimus prieš ją užveriant?
 load error	Icon-O-Matic-SVGImport		įkėlimo klaida
-Transformation	Icon-O-Matic-TransformersList		Transformacija
 Save as…	Icon-O-Matic-Menu-File		Įrašyti kaip…
 Swatches	Icon-O-Matic-Menus		Paletė
 <modify path>	Icon-O-Matic-PathCmd		<pakeisti kreivę>
@@ -188,7 +185,6 @@ Yes	Icon-O-Matic-StyledTextImport		Taip
 Remove Path	Icon-O-Matic-RemovePathsCmd		Pašalinti kreivę
 Gradient type	Icon-O-Matic-StyleTypes		Gradiento tipas
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Perkelti transformatorių
-Perspective	Transformation		Perspektyva
 Export	Icon-O-Matic-Menu-File		Eksportuoti
 Width	Icon-O-Matic-PropertyNames		Plotis
 Bummer	Cancel button - error alert		Vaje
