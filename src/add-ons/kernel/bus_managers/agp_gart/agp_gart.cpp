@@ -417,6 +417,7 @@ get_aperture(aperture_id id)
 Aperture::Aperture(agp_gart_bus_module_info *module, void *aperture)
 	:
 	fModule(module),
+	fInfo(),
 	fHashTable(fInfo),
 	fFirstMemory(NULL),
 	fPrivateAperture(aperture)
