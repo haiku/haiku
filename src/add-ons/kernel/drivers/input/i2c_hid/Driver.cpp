@@ -377,7 +377,7 @@ i2c_hid_init_driver(device_node *node, void **driverCookie)
 
 	mutex_unlock(&sDriverLock);
 
-	return B_OK;
+	return device->hidDevice != NULL ? B_OK : B_IO_ERROR;
 }
 
 
@@ -397,6 +397,8 @@ i2c_hid_register_child_devices(void *cookie)
 	CALLED();
 	hid_driver_cookie *device = (hid_driver_cookie*)cookie;
 	HIDDevice* hidDevice = device->hidDevice;
+	if (hidDevice == NULL)
+		return B_OK;
 	for (uint32 i = 0;; i++) {
 		ProtocolHandler *handler = hidDevice->ProtocolHandlerAt(i);
 		if (handler == NULL)
