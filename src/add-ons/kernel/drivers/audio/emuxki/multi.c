@@ -34,6 +34,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+
+#include <kernel.h>
+
 #include "hmulti_audio.h"
 #include "multi.h"
 #include "ac97.h"
@@ -926,33 +929,60 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 	data->return_playback_channels = pchannels + pchannels2;		/* playback_buffers[][c] */
 	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
-	for (i = 0; i < current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++) {
+		struct buffer_desc descs[pchannels];
 		for (j=0; j<pchannels; j++)
 			emuxki_stream_get_nth_buffer(card->pstream, j, i,
-				&data->playback_buffers[i][j].base,
-				&data->playback_buffers[i][j].stride);
-
-	for (i = 0; i < current_settings.buffer_count; i++)
+				&descs[j].base,
+				&descs[j].stride);
+		if (!IS_USER_ADDRESS(data->playback_buffers[i])
+			|| user_memcpy(data->playback_buffers[i], descs, sizeof(descs))
+			< B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+	for (i = 0; i < current_settings.buffer_count; i++) {
+		struct buffer_desc descs[pchannels2];
 		for (j=0; j<pchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->pstream2, j, i,
-				&data->playback_buffers[i][pchannels + j].base,
-				&data->playback_buffers[i][pchannels + j].stride);
+				&descs[j].base,
+				&descs[j].stride);
+		if (!IS_USER_ADDRESS(data->playback_buffers[i])
+			|| user_memcpy(&data->playback_buffers[i][pchannels], descs, sizeof(descs))
+			< B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
 
 	data->return_record_buffers = current_settings.buffer_count;
 	data->return_record_channels = rchannels + rchannels2;
 	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 
-	for (i = 0; i < current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++) {
+		struct buffer_desc descs[rchannels];
 		for (j=0; j<rchannels; j++)
 			emuxki_stream_get_nth_buffer(card->rstream, j, i,
-				&data->record_buffers[i][j].base,
-				&data->record_buffers[i][j].stride);
+				&descs[j].base,
+				&descs[j].stride);
+		if (!IS_USER_ADDRESS(data->record_buffers[i])
+			|| user_memcpy(data->record_buffers[i], descs, sizeof(descs))
+			< B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
 
-	for (i = 0; i < current_settings.buffer_count; i++)
+	for (i = 0; i < current_settings.buffer_count; i++) {
+		struct buffer_desc descs[rchannels2];
 		for (j=0; j<rchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->rstream2, j, i,
-				&data->record_buffers[i][rchannels + j].base,
-				&data->record_buffers[i][rchannels + j].stride);
+				&descs[j].base,
+				&descs[j].stride);
+		if (!IS_USER_ADDRESS(data->record_buffers[i])
+			|| user_memcpy(&data->record_buffers[i][rchannels], descs, sizeof(descs))
+			< B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
 
 	return B_OK;
 }

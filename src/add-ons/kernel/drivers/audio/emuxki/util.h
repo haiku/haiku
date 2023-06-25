@@ -30,7 +30,7 @@
 
 #include <KernelExport.h>
 
-area_id alloc_mem(void **phy, void **log, size_t size, const char *name);
+area_id alloc_mem(void **phy, void **log, size_t size, const char *name, bool user);
 
 cpu_status lock(void);
 void unlock(cpu_status status);

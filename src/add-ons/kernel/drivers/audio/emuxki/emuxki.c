@@ -224,7 +224,7 @@ emuxki_mem_new(emuxki_dev *card, int ptbidx, size_t size)
 		return (NULL);
 
 	mem->ptbidx = ptbidx;
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "emuxki buffer");
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "emuxki buffer", true);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);
@@ -2804,11 +2804,11 @@ emuxki_init(emuxki_dev * card)
 
 	/* allocate memory for our Page Table */
 	card->ptb_area = alloc_mem(&card->ptb_phy_base, &card->ptb_log_base,
-		EMU_MAXPTE * sizeof(uint32), "emuxki ptb");
+		EMU_MAXPTE * sizeof(uint32), "emuxki ptb", false);
 
 	/* This is necessary unless you like Metallic noise... */
 	card->silentpage_area = alloc_mem(&card->silentpage_phy_base, &card->silentpage_log_base,
-		EMU_PTESIZE, "emuxki sp");
+		EMU_PTESIZE, "emuxki sp", false);
 
 	if (card->ptb_area < B_OK || card->silentpage_area < B_OK) {
 		PRINT(("couldn't allocate memory\n"));
