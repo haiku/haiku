@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel drivers input i2c_elan ;
+
+SubDirC++Flags -fno-rtti ;
+
+SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+SubDirSysHdrs $(SUBDIR) $(DOTDOT) i2c_hid ;
+SubDirSysHdrs $(SUBDIR) $(DOTDOT) hid_shared ;
+UsePrivateHeaders [ FDirName kernel util ] input drivers device i2c ;
+UsePrivateKernelHeaders ;
+
+KernelAddon i2c_elan :
+	DeviceList.cpp
+	Driver.cpp
+	ELANDevice.cpp
+;
