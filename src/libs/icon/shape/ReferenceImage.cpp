@@ -65,6 +65,7 @@ ReferenceImage::ReferenceImage(const ReferenceImage& other)
 	SetName(other.Name());
 	SetImage(bitmap);
 	SetTransform(other);
+	Style()->SetAlpha(other.Style()->Alpha());
 }
 
 
@@ -92,7 +93,7 @@ ReferenceImage::Unarchive(BMessage* archive)
 	if (ret < B_OK)
 		return ret;
 
-	// read transformation
+	// transformation
 	const double* matrix;
 	ssize_t dataSize;
 	ret = archive->FindData("transformation", B_DOUBLE_TYPE,
@@ -103,10 +104,17 @@ ReferenceImage::Unarchive(BMessage* archive)
 		return B_BAD_VALUE;
 	LoadFrom(matrix);
 
+	// image
 	BBitmap* bitmap = dynamic_cast<BBitmap*>(BBitmap::Instantiate(archive));
 	if (bitmap == NULL)
 		return B_ERROR;
 	SetImage(bitmap);
+
+	// alpha
+	uint8 alpha;
+	if(archive->FindUInt8("alpha", &alpha) < B_OK)
+		alpha = 255;
+	Style()->SetAlpha(alpha);
 
 	return B_OK;
 }
@@ -130,6 +138,12 @@ ReferenceImage::Archive(BMessage* into, bool deep) const
 
 	// image
 	ret = Style()->Bitmap()->Archive(into, deep);
+	if (ret < B_OK)
+		return ret;
+
+	// alpha
+	ret = into->AddUInt8("alpha", Style()->Alpha());
+
 	return ret;
 }
 
