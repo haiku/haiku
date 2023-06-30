@@ -497,6 +497,11 @@ bfs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 static status_t
 bfs_io(fs_volume* _volume, fs_vnode* _node, void* _cookie, io_request* request)
 {
+#if KDEBUG_RW_LOCK_DEBUG
+	// bfs_io depends on read-locks being implicitly transferrable across threads.
+	return B_UNSUPPORTED;
+#endif
+
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
 
