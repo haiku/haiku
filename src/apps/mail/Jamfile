@@ -55,4 +55,5 @@ DoCatalogs Mail :
 	MailWindow.cpp
 	Prefs.cpp
 	Signature.cpp
+	Status.cpp
 ;

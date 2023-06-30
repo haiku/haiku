@@ -55,6 +55,10 @@ All rights reserved.
 #include "Messages.h"
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Mail"
+
+
 enum status_messages {
 	STATUS = 128,
 	OK,
@@ -62,17 +66,17 @@ enum status_messages {
 };
 
 
-TStatusWindow::TStatusWindow(BRect rect, BMessenger target, const char* status)
-	: BWindow(rect, "", B_MODAL_WINDOW, B_NOT_RESIZABLE),
+TStatusWindow::TStatusWindow(BRect frame, BMessenger target, const char* status)
+	: BWindow(BRect(), "", B_MODAL_WINDOW, B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target)
 {
-	fStatus = new BTextControl("status", "Status:", status,
+	fStatus = new BTextControl("status",  B_TRANSLATE("Status:"), status,
 		new BMessage(STATUS));
 
-	BButton *ok = new BButton("ok", "OK", new BMessage(OK));
+	BButton *ok = new BButton("ok", B_TRANSLATE("OK"), new BMessage(OK));
 	ok->MakeDefault(true);
 
-	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL));
+	BButton *cancel = new BButton("cancel", B_TRANSLATE("Cancel"), new BMessage(CANCEL));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)
@@ -86,7 +90,7 @@ TStatusWindow::TStatusWindow(BRect rect, BMessenger target, const char* status)
 			.Add(ok);
 
 	fStatus->BTextControl::MakeFocus(true);
-	ResizeToPreferred();
+	CenterIn(frame);
 	Show();
 }
 
@@ -191,4 +195,3 @@ TStatusWindow::_Exists(const char* status)
 
 	return false;
 }
-
