@@ -118,4 +118,3 @@ SubInclude HAIKU_TOP src tools unflatten ;
 SubInclude HAIKU_TOP src tools unzip ;
 SubInclude HAIKU_TOP src tools update_package_requires ;
 SubInclude HAIKU_TOP src tools vmdkimage ;
-SubInclude HAIKU_TOP src tools zip ;
