@@ -15,7 +15,7 @@ Full screen	Menus		Повний екран
 Go to page	Menus		Перейти до сторінки
 Zoom out	Menus		Зменшити
 Quit	Menus		Вийти
-Rotate counterclockwise	Menus		Повернути проти годинникової стрілки
+Rotate counterclockwise	Menus		Повернути проти годинника
 High-quality zooming	Menus		Високоякісна зміна розміру
 Browse	Menus		Перегляд
 Edit	Menus		Редагувати
@@ -55,7 +55,7 @@ Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Зображення
 Move to Trash	Menus		Перемістити до смітника
 OK	Alerts		ОК
-Rotate clockwise	Menus		Повернути за годинниковою стрілкою
+Rotate clockwise	Menus		Повернути за годинником
 Job setup	PrintOptionsWindow		Завдання для друку
 Original size	Menus		Оригінальний розмір
 Next page	Menus		Наступна сторінка

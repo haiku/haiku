@@ -1,4 +1,4 @@
-1	danish	x-vnd.haiku-icon_o_matic	4159219060
+1	danish	x-vnd.haiku-icon_o_matic	1015615450
 None	Icon-O-Matic-Properties		Ingen
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotér sti-indeks
 Add empty	Icon-O-Matic-ShapesList		Tilføj tom
@@ -73,6 +73,7 @@ Add	Icon-O-Matic-PathsList		Tilføj
 Add Styles	Icon-O-Matic-AddStylesCmd		Tilføj stile
 Remove	Icon-O-Matic-PathManipulator		Fjern
 Duplicate	Icon-O-Matic-ShapesList		Duplikér
+Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Omrids
 Save icon	Dialog title		Gem ikon
 Move Paths	Icon-O-Matic-MovePathsCmd		Flyt stier
@@ -190,6 +191,7 @@ Gradient type	Icon-O-Matic-StyleTypes		Overgangstype
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Flyt omformer
 Export	Icon-O-Matic-Menu-File		Eksportér
 Width	Icon-O-Matic-PropertyNames		Bredde
+Add reference image	Icon-O-Matic-ShapesList		Tilføj referencebillede
 Bummer	Cancel button - error alert		Ærgerligt
 Style	Icon-O-Matic-Menus		Stil
 edit it's properties here.	Empty property list - 3rd line		redigér dens egenskaber her.

@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		До збережених
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть 'Відправити' щоб відправити лист так як є (нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть 'Скасувати' щоб повернутися назад і виправити ситуацію.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Обтікання текстом:
 Show icons & labels	Mail		Показати значки & надписи
 (Date unavailable)	Mail		(Дата недоступна)
@@ -13,12 +13,12 @@ Copy to new	Mail		Копіювати до нового
 Save as draft	Mail		Зберегти як чернетку
 Encoding:	Mail		Кодування:
 Print	Mail		Друкувати
-Decrease quote level	Mail		Прибрати префікс цитування
+Decrease quote level	Mail		Прибрати префікс цитати
 Encoding	Mail		Кодування:
 Default account:	Mail		Обліковий запис за замовчуванням:
 Message	Mail		Повідомлення
 Bcc:	Mail		Bcc:
-New	Mail		Новий
+New	Mail		Нове
 Save	Mail		Зберегти
 Undo	Mail		Відкат дії
 Button bar:	Mail		Панель кнопок:
@@ -41,7 +41,7 @@ Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %
 Copy link location	Mail		Скопіювати розміщення посилання
 Attachments: 	Mail		Вкладення: 
 Remove enclosure	Mail		Вилучити вкладення
-Next	Mail		Наступний
+Next	Mail		Наступне
 Show icons only	Mail		Показувати тільки значки
 Subject:	Mail		Тема:
 OK	Mail		ОК
@@ -49,16 +49,16 @@ UTF-8	Mail	This string is used as a key to set default message compose encoding.
 Quit	Mail		Вийти
 Title:	Mail		Заголовок:
 Account from mail	Mail		Обліковий запис з листа
-%e - E-mail address	Mail		%e - адреса E-mail
+%e - E-mail address	Mail		%e – адреса E-mail
 Cc:	Mail		Cc:
 No matches	Mail		Нема співпадіння
 Queries	Mail		Запити
 Cut	Mail		Вирізати
 Reply to sender	Mail		Відповісти відправникові
-\\n - Newline	Mail		\\n - Нова стрічка
+\\n - Newline	Mail		\\n – Новий рядок
 Copy	Mail		Копіювати
 Add signature	Mail		Додати підпис
-%n - Full name	Mail		%n - повне ім'я
+%n - Full name	Mail		%n – повне ім'я
 Signature	Mail		Підпис
 Use default account	Mail		Використати обліковий запис за замовчуванням
 draft	B_USER_DIRECTORY/mail/draft		Чернетки
@@ -73,7 +73,7 @@ Forward without attachments	Mail		Переслати без вкладень
 queries	B_USER_DIRECTORY/mail/queries		Запити
 View	Mail		Режим перегляду
 Signatures	Mail		Підписи
-On	Mail		Включити
+On	Mail		Увімкнути
 Find	Mail		Знайти
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте, не знайдено програми що підтримує дані типу «Person».
 Date:	Mail		Дата:
@@ -87,7 +87,7 @@ Auto signature:	Mail		Автопідпис:
 Same subject	Mail		Та сама тема
 Send	Mail		Відіслати
 Open draft	Mail		Відкрити чернетки
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити як 'New'
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити як «New»
 Random	Mail		Випадковий
 Attach attributes:	Mail		Додати атрибути:
 Find again	Mail		Знайти далі
@@ -101,22 +101,22 @@ Mail preferences	Mail		Налаштування пошти
 helpful message	Mail		корисне повідомлення
  Read 	Mail		 Прочитаним 
 Font:	Mail		Шрифт:
-Accounts…	Mail		Аккаунти…
+Accounts…	Mail		Облікові записи…
 Previous	Mail		Попередній
-Include file attributes in attachments	Mail		Додавати файлові атрибути у вкладення
+Include file attributes in attachments	Mail		Додавати атрибути файлу у вкладення
 Start now	Mail		Запустити зараз
 (Name unavailable)	Mail		(Ім'я недоступне)
 Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
-%d - Date	Mail		%d - Дата
-Check spelling	Mail		Перевірити правопис
+%d - Date	Mail		%d – Дата
+Check spelling	Mail		Перевіряти орфограцію
 Redo	Mail		Повтор дії
-Leave as '%s'	Mail		Залишити як '%s'
+Leave as '%s'	Mail		Залишити як «%s»
 Print…	Mail		Друкувати…
 Settings…	Mail		Налаштування…
-Warn unencodable:	Mail		Увага нерозкодоване:
+Warn unencodable:	Mail		Увага некодоване:
 Trash	Mail		Смітник
-Show raw message	Mail		Показати чернетку листа
+Show raw message	Mail		Показати чернетку повідомлення
 Find…	Mail		Знайти…
 Select all	Mail		Виділити все
 Show header	Mail		Показати заголовок
@@ -141,12 +141,12 @@ Don't save	Mail		Не зберігати
 Leave same	Mail		Залишити саме це
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
 Save address	Mail		Зберегти адресу
-Initial spell check mode:	Mail		Режим перевірки правопису:
+Initial spell check mode:	Mail		Режим перевірки орфограції:
 Edit queries…	Mail		Редагувати запити…
 There is no installed handler for URL links.	Mail		Не встановлено програму для обробки посилань URL.
 File	Mail		Файл
 Reply preamble:	Mail		Вступ відповіді:
-New mail message	Mail		Новий лист
+New mail message	Mail		Нове повідомлення
 An error occurred trying to open this signature.	Mail		Помилка при спробі відкрити цей підпис.
 Edit signatures…	Mail		Редагувати підписи…
 User interface	Mail		Інтерфейс користувача
@@ -154,15 +154,15 @@ Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідніс
 Remove attachment	Mail		Вилучити вкладення
 Set to…	Mail		Встановити в…
 Edit	Mail		Редагувати
-Page setup…	Mail		Налаштувати сторінку…
+Page setup…	Mail		Настройка сторінки…
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.
 Beginner	Mail		Початківець
-Send message	Mail		Відіслати лист
+Send message	Mail		Відіслати повідомлення
 Delete	Mail		Видалити
 Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть обрані поштові запити і шаблони запитів у цю папку.
 Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
 Revert	Mail		Відкат змін
 Unknown	Mail		Невідомо
-Increase quote level	Mail		Додати префікс цитування
+Increase quote level	Mail		Додати префікс цитати
 Add enclosure…	Mail		Додати вкладення…

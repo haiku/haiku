@@ -37,7 +37,7 @@ Cannot get the file to play	RecorderWindow		Неможливо отримати 
 Cannot record a sound that long	RecorderWindow		Неможливо записати довший звук
 Duration:	RecorderWindow		Тривалість:
 Compression:	RecorderWindow		Компресія:
-Cannot find an unused name to use for the new recording	RecorderWindow		Не вдалося знайти невикористане і'мя для нового запису
+Cannot find an unused name to use for the new recording	RecorderWindow		Не вдалося знайти невикористану назву для нового запису
 Channels: 	RecorderWindow		Канали: 
 Save	RecorderWindow		Зберегти
 Sample rate: 	RecorderWindow		Дискретизація: 

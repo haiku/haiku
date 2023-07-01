@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	4143471163
+1	finnish	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Vastaus ca
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Odottamaton virhe ’%Message%’ ilmeni ’%Property%’-ominaisuudessa
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
 Logout	ToLatestUserUsageConditionsWindow		Uloskirjautuminen
+Password requirements	UserLoginWindow		Salasanavaatimukset
 The following additional package changes have to be made:	PackageResult		Seuraavat lisäpakkausmuutokset on tehtävä:
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Nykyiset käyttöehdot on hyväksytty.
@@ -126,6 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käyn
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 <no info>	PackageInfoView		<ei tietoja>
 Usage conditions download problem	UserUsageConditions		Käyttöehtojen latauspulma
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Tapahtui virhe ladattaessa salasanavaatimuksia uudelle käyttäjälle. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTietoa siitä, kuinka lokitiedostojen katselu onnistuu löytyy Haiku-käyttöohjeen HaikuVarasto-kohdasta.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
 Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
 Date	PackageListView		Päivämäärä
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Salasanan pituuden on oltava vähintään %MinPasswordLength% merkkiä. Vähintään %MinPasswordUppercaseChar% merkin on oltava isoja kirjaimia ja %MinPasswordDigitsChar% merkin on oltava numeroita.
 Error	App		Virhe
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauksessa tapahtui virhe. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen.\nTietoja lokitiedoston katselemisesta on saatavissa Haiku-käyttöoppaan HaikuVarasto-osasta.
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
@@ -156,6 +159,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Jaa anonyymit k
 Close	PackageManager		Sulje
 Changelog	PackageInfoView		Muutosloki
 About	PackageInfoView		Ohjelmasta
+Password requirements download problem	UserLoginWindow		Salasanavaatimusten latauspulma
 Password:	UserLoginWindow		Salasana:
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tämä sovellus on liian vanha palvelinjärjestelmän kanssa viestimiseen. Hanki tämän sovelluksen uudempi versio päivittämällä järjestelmääsi. Sovelluksen vaadittu minimiversio on \"%s\".
 Stability	RatePackageWindow		Stabiilisuus
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja�
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Käyttäjä [%Nickname%] on todennettu, mutta ennen jatkamista sinua pyydetään hyväksymään kaikkein viimeisimmät käyttöehdot.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.
 Apply	SettingsWindow		Toteuta
+View the password requirements	UserLoginWindow		Katso salasanavaatimuksia
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Käyttäjä \"%Nickname%\" on hyväksynyt aikaisemmin käyttöehdot, mutta käyttöehdot ovat muuttuneet sen jälkeen. Nyt on hyväksyttävä päivitetyt käyttöehdot.
 Log out	MainWindow		Kirjaudu ulos
 Comment language:	RatePackageWindow		Kommenttikieli:

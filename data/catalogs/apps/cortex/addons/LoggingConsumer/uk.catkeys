@@ -13,7 +13,7 @@ Latency control	CortexAddOnsLoggingConsumer		Контроль латентнос
 CPU percentage	CortexAddOnsLoggingConsumer		Загрузка CPU
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
-An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Нода LoggingConsumer в версії доповнення.\nДивіться Інформаційний бюлетень Be Developer III.18: 5 травня 1999\nадаптував Eric Moon (4 червня 1999)
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Нода LoggingConsumer у версії доповнення.\nДивіться Інформаційний бюлетень Be Developer III.18: 5 травня 1999\nадаптував Eric Moon (4 червня 1999)
 OK	CortexAddOnsCommonMediaNodeControlApp		ОК
 Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Управління
 controls	CortexAddOnsCommonMediaNodeControlApp		управління

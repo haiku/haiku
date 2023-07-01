@@ -7,9 +7,9 @@ Create new account	AutoConfigWindow		Створити обліковий зап�
 While sending and receiving	Config Window		При відправленні та отриманні
 Error!	Config Views		Помилка!
 Apply	Config Window		Застосувати
-Incoming mail filters	Config Views		Вхідний поштовий фільтр
+Incoming mail filters	Config Views		Фільтри вхідної пошти
 Outgoing mail filters	Config Views		Фільтри вихідної пошти
-Server name:	E-Mail		Ім'я сервера:
+Server name:	E-Mail		Назва сервера:
 Add	Config Window		Додати
 Back	AutoConfigWindow		Назад
 Real name:	E-Mail		Справжнє ім'я:
@@ -19,12 +19,12 @@ Outgoing	E-Mail		Вихідні
 Accounts	Config Window		Облікові записи
 Outgoing	Config Window		Вихідні
 Remove	Config Views		Вилучити
-Show notifications:	Config Window		Показати оповіщення:
+Show notifications:	Config Window		Показати сповіщення:
 Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
 Account name:	Config Views		Назва облікового запису:
 \t\t· Incoming	Config Window		\t\t· Вхідні
-Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу e-пошти.
+Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу E-mail.
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nЗагальні налаштування неможливо повернути.\n\nПомилка при отриманні загальних налаштувань:\n%s\n
 Incoming	E-Mail		Вхідні
 Choose Protocol	E-Mail		Вибрати протокол
@@ -37,17 +37,17 @@ Revert	Config Window		Відкат змін
 Incoming	Config Window		Вхідні
 Finish	AutoConfigWindow		Завершення
 Add filter	Config Views		Додати фільтр
-Account settings	Config Views		Налаштування облікового запису
+Account settings	Config Views		Настройки облікового запису
 minutes	Config Window		хвилин
 E-mail	System name		E-mail
 Check every	Config Window		Перевіряти кожні
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Натисніть 'Додати', щоб створити новий обліковий запис.\n\nНатисніть 'Вилучити', щоб вилучити вибраний обліковий запис.\n\nВиберіть елемент зі списку для зміни його налаштувань.
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Кнопка «Додати» створює новий обліковий запис.\n\nКнопка «Вилучити» прибирає вибраний обліковий запис.\n\nВиберіть запис зі списку для зміни його налаштувань.
 Account name:	E-Mail		Назва облікового запису:
 Edit mailbox menu…	Config Window		Редагувати меню скриньки…
-Server Name:	E-Mail		Ім'я сервера:
+Server Name:	E-Mail		Назва сервера:
 Remove	Config Window		Вилучити
 Login name:	E-Mail		Ім'я для авторизації:
-While sending	Config Window		Поки іде відправка
+While sending	Config Window		Поки йде відправка
 OK	Config Window		ОК
 OK	AutoConfigWindow		ОК
 Next	AutoConfigWindow		Далі

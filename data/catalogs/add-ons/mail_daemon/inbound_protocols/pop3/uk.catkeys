@@ -5,7 +5,7 @@ APOP	ConfigView		APOP
 Connecting to POP3 server…	pop3		Під'єднання до POP3 сервера…
 : The server does not support APOP.	pop3		: Сервер не підтримує APOP.
 Error while authenticating user %user	pop3		Помилка при авторизації користувача %user
-Destination:	ConfigView		Призначення:
+Destination:	ConfigView		Поштовий каталог:
 . The server said:\n	pop3		. Сервер відповідає:\n
 Plain text	ConfigView		Звичайний текст
 Getting mailbox size…	pop3		Отримання розміру скриньки…

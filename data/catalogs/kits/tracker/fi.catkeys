@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	765355649
+1	finnish	x-vnd.Haiku-libtracker	480373757
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -88,6 +88,7 @@ Modified	FindPanel		Muokattu
 Select all	QueryContainerWindow		Valitse kaikki
 Generate image thumbnails	SettingsView		Tuota pienoiskuvat
 Select…	FilePanelPriv		Valitse...
+An item named '%filename%' already exists.	FSUtils		Tiedosto ’%filename%’ on jo olemassa.
 preferences	B_PREFERENCES_DIRECTORY		asetukset
 Name	Person Query Columns		Nimi
 Skip all	FSUtils		Ohita kaikki
@@ -269,6 +270,7 @@ Cut	FilePanelPriv		Leikkaa
 Finish: after several years	StatusWindow		Valmis: useiden vuosien jälkeen
 Favorites	FilePanelPriv		Suosikit
 Point	AttributesView		Piste
+You can't move or copy items to read-only volumes.	PoseView		Kohteiden siirtäminen tai kopioiminen kirjoitussuojatulle taltioille ei onnistu.
 home	B_USER_DIRECTORY		koti
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Seuraajan uudet mallinteet
 Disk mounting during boot	AutoMounterSettings		Levyn liittäminen käynnistyksen aikana
@@ -357,6 +359,7 @@ after	FindPanel		jälkeen
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# datatavu>} other{<# datatavua>}}
 Version	OpenWithWindow		Versio
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
+The entered file name is too long.	FSUtils		Kirjoittamasi tiedostonimi on liian pitkä.
 Add printer…	ContainerWindow		Lisää tulostin...
 On	FindPanel		kohteessa
 Permissions	ContainerWindow		Käyttöoikeudet
@@ -527,6 +530,7 @@ I know what I'm doing	FSUtils	button label	Tiedän, mitä olen tekemässä
 Preparing to copy items…	StatusWindow		Valmistaudutaan kopioimaan kohteita...
 Entry ref	AttributesView		Aloitusviite
 Icon view	ContainerWindow		Kuvakenäkymä
+The entered folder name is too long.	FSUtils		Kirjoittamasi kansionimi on liian pitkä.
 Name	ContainerWindow		Nimi
 Preferred for %type	OpenWithWindow		Ensisijainen tyypille %type
 Free space color	SettingsView		Vapaan tilan väri

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	4159219060
+1	ukrainian	x-vnd.haiku-icon_o_matic	1015615450
 None	Icon-O-Matic-Properties		Пусто
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Зворотній напрямок точок контуру
 Add empty	Icon-O-Matic-ShapesList		Додати порожню
@@ -22,7 +22,7 @@ Detect Orient.	Icon-O-Matic-PropertyNames		Зовні/Зсередини
 Click on a shape above	Empty transformers list - 1st line		Натисніть на форму вище
 Close	Icon-O-Matic-Menu-File		Закрити
 Add rect	Icon-O-Matic-PathsList		Додати прямокутник
-Rotation	Icon-O-Matic-PropertyNames		Обертання
+Rotation	Icon-O-Matic-PropertyNames		Поворот
 Multi Paste Properties	Icon-O-Matic-Properties		Мультивставка властивостей
 Bleep!	Exporter - Continue in error dialog		Bleep!
 Transform	Icon-O-Matic-PathManipulator		Трансформація
@@ -73,6 +73,7 @@ Add	Icon-O-Matic-PathsList		Додати
 Add Styles	Icon-O-Matic-AddStylesCmd		Додати стилі
 Remove	Icon-O-Matic-PathManipulator		Прибрати
 Duplicate	Icon-O-Matic-ShapesList		Дублікат
+Alpha	Icon-O-Matic-PropertyNames		Альфа
 Contour	Transformation		Обрис
 Save icon	Dialog title		Зберегти значок
 Move Paths	Icon-O-Matic-MovePathsCmd		Перемістити контури
@@ -151,7 +152,7 @@ Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колір (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Змінити градієнт
 Set 	Set (property name)		Набір 
 Rotate indices forwards	Icon-O-Matic-PathsList		Обійти точки за годинником
-Click on an object in	Empty property list - 1st line		Виберіть об'єкт в
+Click on an object in	Empty property list - 1st line		Виберіть об'єкт у
 Save	Icon-O-Matic-Menu-File		Зберегти
 No	Icon-O-Matic-StyledTextImport		Ні
 Add circle	Icon-O-Matic-PathsList		Додати коло
@@ -190,6 +191,7 @@ Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перемістити трансформатор
 Export	Icon-O-Matic-Menu-File		Експорт
 Width	Icon-O-Matic-PropertyNames		Ширина
+Add reference image	Icon-O-Matic-ShapesList		Додати референсне зображення
 Bummer	Cancel button - error alert		Облом
 Style	Icon-O-Matic-Menus		Стиль
 edit it's properties here.	Empty property list - 3rd line		тут змінити його властивості.

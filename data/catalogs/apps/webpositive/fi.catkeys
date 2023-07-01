@@ -1,6 +1,7 @@
-1	finnish	x-vnd.Haiku-WebPositive	951718264
+1	finnish	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
+Copy	Console Window		Kopioi
 (Finish: %date)	Download Window		(Päättyi: %date)
 Open bookmarks confirmation	WebPositive Window		Avaa kirjanmerkkien vahvistus
 Download folder:	Settings Window		Latauskansio:
@@ -103,6 +104,7 @@ Apply	Settings Window		Toteuta
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Tapahtui virhe yritettäessä näyttää kirjanmerkkikansiota.\n\nVirhe: %error
 Revert	Settings Window		Palauta
 Copy	WebPositive Window		Kopioi
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Viimeinen rivi toistettiin # kerran.}other{Viimeinen rivi toistettiin # kertaa.}}
 Default standard font size:	Settings Window		Vakiokirjasimen oletuskoko:
 Custom	Settings Window		Mukautettu
 Bookmark this page	WebPositive Window		Merkitse tämä sivu kirjanmerkillä

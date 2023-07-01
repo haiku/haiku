@@ -27,7 +27,7 @@ An error occurred while initializing the package manager: %message%	LocalPkgData
 Quit HaikuDepot	App		Вийти з HaikuDepot
 Category	FilterView		Категорія
 A response to the captcha question must be provided.	UserLoginWindow		Необхідно надати відповідь на питання капчі.
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Виникла несподівана помилка '%Message%' з властивістю '%Property%'
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Виникла несподівана помилка «%Message%» з властивістю «%Property%»
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
 Logout	ToLatestUserUsageConditionsWindow		Вийти
 Password requirements	UserLoginWindow		Вимоги до пароля
@@ -50,7 +50,7 @@ All packages	PackageListView		Усі пакети
 Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів
 There are problems in the supplied data:	UserLoginWindow		У наданих даних існують проблеми:
-The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Користувач '%Nickname%' не погодився з жодними Умовами користування.
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Користувач «%Nickname%» не погодився з Умовами користування.
 Usage conditions download problem	UserLoginWindow		Проблеми при завантаженні Умов користування
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	встановити пакет %s з репозитарію %s\n
 Package daemon problem	App		Проблема демона пакета

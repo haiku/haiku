@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	4159219060
+1	german	x-vnd.haiku-icon_o_matic	1015615450
 None	Icon-O-Matic-Properties		Keine
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Pfadindizes rotieren
 Add empty	Icon-O-Matic-ShapesList		Hinzufügen
@@ -73,6 +73,7 @@ Add	Icon-O-Matic-PathsList		Hinzufügen
 Add Styles	Icon-O-Matic-AddStylesCmd		Stile hinzufügen
 Remove	Icon-O-Matic-PathManipulator		Entfernen
 Duplicate	Icon-O-Matic-ShapesList		Duplizieren
+Alpha	Icon-O-Matic-PropertyNames		Alpha
 Contour	Transformation		Kontur
 Save icon	Dialog title		Icon speichern
 Move Paths	Icon-O-Matic-MovePathsCmd		Pfade umsortieren
@@ -190,6 +191,7 @@ Gradient type	Icon-O-Matic-StyleTypes		Verlaufstyp:
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformator umsortieren
 Export	Icon-O-Matic-Menu-File		Exportieren
 Width	Icon-O-Matic-PropertyNames		Strichstärke
+Add reference image	Icon-O-Matic-ShapesList		Referenzbild hinzufügen
 Bummer	Cancel button - error alert		Herrje!
 Style	Icon-O-Matic-Menus		Stil
 edit it's properties here.	Empty property list - 3rd line		Eigenschaften hier zu ändern.
