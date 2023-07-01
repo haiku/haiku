@@ -36,7 +36,7 @@ SharedLibrary libuserlandfs_fuse.so
 	FUSEVolume.cpp
 	mime_ext_table.c
 	:
-	<nogrist>userlandfs_server shared be [ TargetLibsupc++ ]
+	<nogrist>userlandfs_server shared be [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles mime_ext_table.c ]

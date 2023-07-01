@@ -271,11 +271,6 @@ __asm__ ("__IO_clog")
 #endif
 ;
 
-extern istream& lock(istream& ins);
-extern istream& unlock(istream& ins);
-extern ostream& lock(ostream& outs);
-extern ostream& unlock(ostream& outs);
-
 struct Iostream_init { } ;  // Compatibility hack for AT&T library.
 
 inline ios& dec(ios& i)

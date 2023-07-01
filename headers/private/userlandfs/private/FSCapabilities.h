@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <bitset>
+
 #include "Debug.h"
 
 enum client_fs_type {
@@ -148,7 +150,7 @@ namespace UserlandFSUtil {
 
 template<const int CapabilityCount>
 struct FSCapabilitiesBase {
-			uint8				capabilities[(CapabilityCount + 7) / 8];
+			std::bitset<CapabilityCount>	capabilities;
 
 	inline	void				ClearAll();
 
@@ -171,7 +173,7 @@ template<const int CapabilityCount>
 inline void
 FSCapabilitiesBase<CapabilityCount>::ClearAll()
 {
-	memset(capabilities, 0, sizeof(capabilities));
+	capabilities.reset();
 }
 
 
@@ -183,11 +185,7 @@ FSCapabilitiesBase<CapabilityCount>::Set(uint32 capability, bool set)
 	if (capability >= CapabilityCount)
 		return;
 
-	uint8 flag = uint8(1 << (capability % 8));
-	if (set)
-		capabilities[capability / 8] |= flag;
-	else
-		capabilities[capability / 8] &= ~flag;
+	capabilities.set(capability, set);
 }
 
 
@@ -196,7 +194,10 @@ template<const int CapabilityCount>
 inline void
 FSCapabilitiesBase<CapabilityCount>::Clear(uint32 capability)
 {
-	Set(capability, false);
+	if (capability >= CapabilityCount)
+		return;
+
+	capabilities.reset(capability);
 }
 
 
@@ -208,8 +209,7 @@ FSCapabilitiesBase<CapabilityCount>::Get(uint32 capability) const
 	if (capability >= CapabilityCount)
 		return false;
 
-	uint8 flag = uint8(1 << (capability % 8));
-	return (capabilities[capability / 8] & flag);
+	return capabilities.test(capability);
 }
 
 
@@ -218,12 +218,10 @@ template<const int CapabilityCount>
 inline uint32
 FSCapabilitiesBase<CapabilityCount>::GetHashCode() const
 {
-	uint32 hashCode = 0;
-	int byteCount = sizeof(capabilities);
-	for (int i = 0; i < byteCount; i++)
-		hashCode = hashCode * 37 + capabilities[i];
-
-	return hashCode;
+	uint32 hash = 0;
+	for (int i = 0; i < CapabilityCount; i++)
+		hash ^= capabilities.test(i) << (i % 32);
+	return hash;
 }
 
 
@@ -233,13 +231,7 @@ inline bool
 FSCapabilitiesBase<CapabilityCount>::operator==(
 	const FSCapabilitiesBase<CapabilityCount>& other) const
 {
-	int byteCount = sizeof(capabilities);
-	for (int i = 0; i < byteCount; i++) {
-		if (capabilities[i] != other.capabilities[i])
-			return false;
-	}
-
-	return true;
+	return capabilities == other.capabilities;
 }
 
 
@@ -249,12 +241,7 @@ inline void
 FSCapabilitiesBase<CapabilityCount>::Dump() const
 {
 	D(
-		char buffer[128];
-		int byteCount = sizeof(capabilities);
-		for (int i = 0; i < byteCount; i++)
-			sprintf(buffer + 2 * i, "%02x", (int)capabilities[i]);
-
-		PRINT(("FSCapabilities[%s]\n", buffer));
+		PRINT(("FSCapabilities[%s]\n", capabilities.to_string().c_str()));
 	)
 }
 

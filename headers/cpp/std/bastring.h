@@ -66,8 +66,10 @@ extern void __length_error (const char *);
 #endif
 
 #ifdef __HAIKU__
+#ifndef atomic_add
 extern "C" __haiku_int32 atomic_add(__haiku_int32* value,
 	__haiku_int32 addvalue);
+#endif
 #endif	/* __HAIKU__ */
 
 template <class charT, class traits = string_char_traits<charT>,

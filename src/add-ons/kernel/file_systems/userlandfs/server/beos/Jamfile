@@ -33,5 +33,5 @@ SharedLibrary libuserlandfs_beos_kernel.so
 
 	:
 	<nogrist>userlandfs_server
-	[ TargetLibsupc++ ] libbsd.so
+	[ TargetLibsupc++ ] [ TargetLibstdc++ ] libbsd.so
 ;
