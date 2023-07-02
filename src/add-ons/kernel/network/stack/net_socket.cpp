@@ -1645,7 +1645,7 @@ socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
 		error = socket_bind(sockets[0], NULL, 0);
 
 	// start listening
-	if (error == B_OK)
+	if (error == B_OK && type == SOCK_STREAM)
 		error = socket_listen(sockets[0], 1);
 
 	// connect them
@@ -1654,17 +1654,25 @@ socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
 			sockets[0]->address.ss_len);
 	}
 
-	// accept a socket
-	net_socket* acceptedSocket = NULL;
-	if (error == B_OK)
-		error = socket_accept(sockets[0], NULL, NULL, &acceptedSocket);
-
 	if (error == B_OK) {
-		// everything worked: close the listener socket
-		socket_close(sockets[0]);
-		socket_free(sockets[0]);
-		sockets[0] = acceptedSocket;
-	} else {
+		// accept a socket
+		if (type == SOCK_STREAM) {
+			net_socket* acceptedSocket = NULL;
+			error = socket_accept(sockets[0], NULL, NULL, &acceptedSocket);
+			if (error == B_OK) {
+				// everything worked: close the listener socket
+				socket_close(sockets[0]);
+				socket_free(sockets[0]);
+				sockets[0] = acceptedSocket;
+			}
+		// connect the other side
+		} else {
+			error = socket_connect(sockets[0], (sockaddr*)&sockets[1]->address,
+				sockets[1]->address.ss_len);
+		}
+	}
+
+	if (error != B_OK) {
 		// close sockets on error
 		for (int i = 0; i < 2; i++) {
 			if (sockets[i] != NULL) {
