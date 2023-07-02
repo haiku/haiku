@@ -1524,9 +1524,11 @@ tty_close_cookie(tty_cookie* cookie)
 
 		requestLocker.Unlock();
 
-		// notify a select write event on the other tty, if we've closed this tty
-		if (cookie->other_tty->open_count > 0)
+		// notify a select read and write event on the other tty, if we've closed this tty
+		if (cookie->other_tty->open_count > 0) {
 			tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
+			tty_notify_select_event(cookie->other_tty, B_SELECT_READ);
+		}
 
 		cookie->tty->is_exclusive = false;
 	}
