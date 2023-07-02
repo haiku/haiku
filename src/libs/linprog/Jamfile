@@ -9,6 +9,10 @@ UsePrivateHeaders shared ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		# Applications linking against libalm.so expect to find the liblinprog symbols there.
+		# So, keep all the symbols exported for the time being.
+		NO_HIDDEN_VISIBILITY on [ MultiArchDefaultGristFiles liblinprog.a ] = 1 ;
+
 		StaticLibrary [ MultiArchDefaultGristFiles liblinprog.a ] :
 			ActiveSetSolver.cpp
 			Constraint.cpp
