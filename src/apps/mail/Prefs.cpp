@@ -94,7 +94,7 @@ TPrefsWindow::TPrefsWindow(BPoint leftTop, BFont* font, int32* level,
 	uint8* buttonBar)
 	:
 	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + 100, leftTop.y + 100),
-		B_TRANSLATE("Mail preferences"),
+		B_TRANSLATE("Mail settings"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 
