@@ -43,7 +43,7 @@ public:
 
 	const char* MoveTarget() const
 	{
-		return fSettings.FindString("regex");
+		return fSettings.FindString("move target");
 	}
 
 	const char* SetFlagsTo() const
