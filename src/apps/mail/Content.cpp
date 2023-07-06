@@ -2295,7 +2295,7 @@ TTextView::Reader::ParseMail(BMailContainer *container,
 				strcpy(typeDescription, type.Type() ? type.Type() : B_EMPTY_STRING);
 
 			name = "\n<";
-			name.Append(B_TRANSLATE_COMMENT("Enclosure: %name% (Type: %type%)",
+			name.Append(B_TRANSLATE_COMMENT("Attachment: %name% (Type: %type%)",
 				"Don't translate the variables %name% and %type%."));
 			name.Append(">\n");
 			name.ReplaceFirst("%name%", enclosure->name);

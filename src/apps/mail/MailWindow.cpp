@@ -453,10 +453,10 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			item->SetTarget(be_app);
 			menu->AddSeparatorItem();
 			menu->AddItem(fAdd = new BMenuItem(
-				B_TRANSLATE("Add enclosure" B_UTF8_ELLIPSIS),
+				B_TRANSLATE("Add attachment" B_UTF8_ELLIPSIS),
 				new BMessage(M_ADD), 'E'));
 			menu->AddItem(fRemove = new BMenuItem(
-				B_TRANSLATE("Remove enclosure"),
+				B_TRANSLATE("Remove attachment"),
 				new BMessage(M_REMOVE), 'T'));
 		}
 	}

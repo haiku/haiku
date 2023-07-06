@@ -52,6 +52,7 @@ of their respective holders. All rights reserved.
 #include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <PopUpMenu.h>
+#include <StringForSize.h>
 #include <StringView.h>
 
 #include <MailAttachment.h>
@@ -112,11 +113,12 @@ TEnclosuresView::TEnclosuresView()
 	fList = new TListView(this);
 	fList->SetInvocationMessage(new BMessage(LIST_INVOKED));
 
-	BStringView* label = new BStringView("label", B_TRANSLATE("Attachments: "));
+	BStringView* label = new BStringView("label", B_TRANSLATE("Attachments:"));
 	BScrollView* scroll = new BScrollView("", fList, 0, false, true);
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.SetInsets(0, 0, scroll->ScrollBar(B_VERTICAL)->PreferredSize().width - 2, -2)
+		.SetInsets(B_USE_SMALL_INSETS, 0,
+			scroll->ScrollBar(B_VERTICAL)->PreferredSize().width - 2, -2)
 		.Add(label)
 		.Add(scroll)
 	.End();
@@ -198,22 +200,28 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				int32 index = 0;
 				entry_ref ref;
 				while (msg->FindRef("refs", index++, &ref) == B_NO_ERROR) {
+					BEntry entry(&ref, true);
+					entry.GetRef(&ref);
 					BFile file(&ref, O_RDONLY);
 					if (file.InitCheck() == B_OK && file.IsFile()) {
 						TListItem *item;
+						bool exists = false;
 						for (int32 loop = 0; loop < fList->CountItems(); loop++) {
 							item = (TListItem *) fList->ItemAt(loop);
 							if (ref == *(item->Ref())) {
 								fList->Select(loop);
 								fList->ScrollToSelection();
+								exists = true;
 								continue;
 							}
 						}
-						fList->AddItem(item = new TListItem(&ref));
-						fList->Select(fList->CountItems() - 1);
-						fList->ScrollToSelection();
+						if (exists == false) {
+							fList->AddItem(item = new TListItem(&ref));
+							fList->Select(fList->CountItems() - 1);
+							fList->ScrollToSelection();
 
-						watch_node(item->NodeRef(), B_WATCH_NAME, this);
+							watch_node(item->NodeRef(), B_WATCH_NAME, this);
+						}
 					} else
 						badType = true;
 				}
@@ -463,8 +471,11 @@ TListItem::DrawItem(BView *owner, BRect frame, bool /* complete */)
 		BEntry entry(&fRef);
 		BPath path;
 		if (entry.GetPath(&path) == B_OK && file.InitCheck() == B_OK) {
-			label = path.Path();
-
+			off_t bytes;
+			file.GetSize(&bytes);
+			char size[B_PATH_NAME_LENGTH];
+			string_for_size(bytes, size, sizeof(size));
+			label << path.Path() << " (" << size << ")";
 			BNodeInfo info(&file);
 			iconStatus = info.GetTrackerIcon(&iconBitmap,
 				(icon_size)(iconRect.IntegerWidth() + 1));
