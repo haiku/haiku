@@ -689,12 +689,15 @@ THeaderView::MessageReceived(BMessage *msg)
 		{
 			BTextView* textView = dynamic_cast<BTextView*>(Window()->CurrentFocus());
 			if (dynamic_cast<AddressTextControl *>(textView->Parent()) != NULL)
-				textView->Parent()->MessageReceived(msg);
-			else {
-				BMessage message(*msg);
-				message.what = REFS_RECEIVED;
-				Window()->PostMessage(&message, Window());
-			}
+			BMessage message(*msg);
+			textView->Parent()->MessageReceived(msg);
+			break;
+		}
+		case B_REFS_RECEIVED:
+		{
+			BMessage message(*msg);
+			message.what = REFS_RECEIVED;
+			Window()->PostMessage(&message, Window());
 			break;
 		}
 

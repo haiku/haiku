@@ -1580,6 +1580,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 			break;
 		}
 
+		case B_SIMPLE_DATA:
 		case REFS_RECEIVED:
 			AddEnclosure(msg);
 			break;
