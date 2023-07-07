@@ -47,17 +47,6 @@ arch_thread_init_thread_struct(Thread *thread)
 }
 
 
-static inline VMAddressSpace*
-GetThreadAddressSpace(Thread* thread)
-{
-/*
-	if (thread->team == team_get_kernel_team())
-		return VMAddressSpace::Kernel();
-*/
-	return thread->team->address_space;
-}
-
-
 void
 arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	void (*function)(void*), const void* data)
