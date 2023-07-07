@@ -361,7 +361,7 @@ arch_vm_aspace_swap(struct VMAddressSpace *from, struct VMAddressSpace *to)
 	// go away as long as they are still used on any CPU.
 
 	SetSatp(((RISCV64VMTranslationMap*)to->TranslationMap())->Satp());
-	FlushTlbAll();
+	FlushTlbAllAsid(0);
 }
 
 

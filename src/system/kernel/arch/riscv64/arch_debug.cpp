@@ -15,6 +15,8 @@
 #include <arch/generic/user_memory.h>
 #include <AutoDeleterDrivers.h>
 
+#include "RISCV64VMTranslationMap.h"
+
 
 kernel_args *sKernelArgs;
 bool sInitCalled = false;
@@ -321,11 +323,19 @@ stack_trace(int argc, char **argv)
 			kprintf("could not find thread %" B_PRId32 "\n", id);
 			return 0;
 		}
+
+		auto map = (RISCV64VMTranslationMap*)thread->team->address_space->TranslationMap();
+
 		uint64 oldSatp = Satp();
-		SetSatp(thread->arch_info.context.satp);
+		SetSatp(map->Satp());
+		FlushTlbAllAsid(0);
+
 		DebuggedThreadSetter threadSetter(thread);
 		DoStackTraceEx(thread, thread->arch_info.context.s[0], thread->arch_info.context.ra);
+
 		SetSatp(oldSatp);
+		FlushTlbAllAsid(0);
+
 		return 0;
 	}
 	DoStackTrace(Fp(), 0);

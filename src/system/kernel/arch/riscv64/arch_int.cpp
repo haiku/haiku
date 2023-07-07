@@ -334,9 +334,6 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 				!= (PAGE_ACCESSED | PAGE_MODIFIED)
 		) {
 			map->SetFlags(addr, PAGE_ACCESSED | PAGE_MODIFIED);
-/*
-			dprintf("SetAccessedFlags(%#" B_PRIxADDR ", %d)\n", addr, isWrite);
-*/
 			return true;
 		}
 	} else {
@@ -345,9 +342,6 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 			&& (PAGE_ACCESSED & pageFlags) == 0
 		) {
 			map->SetFlags(addr, PAGE_ACCESSED);
-/*
-			dprintf("SetAccessedFlags(%#" B_PRIxADDR ", %d)\n", addr, isWrite);
-*/
 			return true;
 		}
 	}

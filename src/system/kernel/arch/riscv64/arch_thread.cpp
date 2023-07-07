@@ -68,9 +68,6 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	thread->arch_info.context.s[1] = (addr_t)function;
 	thread->arch_info.context.s[2] = (addr_t)data;
 	thread->arch_info.context.ra = (addr_t)arch_thread_entry;
-	RISCV64VMTranslationMap* map = (RISCV64VMTranslationMap*)
-		thread->team->address_space->TranslationMap();
-	thread->arch_info.context.satp = map->Satp();
 
 	memset(&thread->arch_info.fpuContext, 0, sizeof(fpu_context));
 }
@@ -93,11 +90,8 @@ arch_thread_context_switch(Thread *from, Thread *to)
 		to, to->name);
 	*/
 
-	RISCV64VMTranslationMap* fromMap = (RISCV64VMTranslationMap*)from->team
-		->address_space->TranslationMap();
-
-	RISCV64VMTranslationMap* toMap = (RISCV64VMTranslationMap*)to->team
-		->address_space->TranslationMap();
+	auto fromMap = (RISCV64VMTranslationMap*)from->team->address_space->TranslationMap();
+	auto toMap = (RISCV64VMTranslationMap*)to->team->address_space->TranslationMap();
 
 	int cpu = to->cpu->cpu_num;
 	toMap->ActiveOnCpus().SetBitAtomic(cpu);
@@ -106,6 +100,9 @@ arch_thread_context_switch(Thread *from, Thread *to)
 	// TODO: save/restore FPU only if needed
 	save_fpu(&from->arch_info.fpuContext);
 	restore_fpu(&to->arch_info.fpuContext);
+
+	SetSatp(toMap->Satp());
+	FlushTlbAllAsid(0);
 
 	arch_context_switch(&from->arch_info.context, &to->arch_info.context);
 }

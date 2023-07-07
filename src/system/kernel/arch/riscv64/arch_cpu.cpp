@@ -14,6 +14,8 @@
 #include <Htif.h>
 #include <platform/sbi/sbi_syscalls.h>
 
+#include <algorithm>
+
 
 extern "C" void SVec();
 
@@ -100,24 +102,28 @@ arch_cpu_sync_icache(void *address, size_t len)
 
 
 void
-arch_cpu_memory_read_barrier(void)
-{
-}
-
-
-void
-arch_cpu_memory_write_barrier(void)
-{
-}
-
-
-void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
-	int32 numPages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
-	while (numPages-- >= 0) {
-		FlushTlbPage(start);
-		start += B_PAGE_SIZE;
+	addr_t kernelStart = std::max<addr_t>(start, KERNEL_BASE);
+	addr_t kernelEnd   = std::min<addr_t>(end,   KERNEL_TOP);
+
+	addr_t userStart = std::max<addr_t>(start, USER_BASE);
+	addr_t userEnd   = std::min<addr_t>(end,   USER_TOP);
+
+	if (kernelStart <= kernelEnd) {
+		int64 numPages = kernelStart / B_PAGE_SIZE - kernelEnd / B_PAGE_SIZE;
+		while (numPages-- >= 0) {
+			FlushTlbPage(start);
+			start += B_PAGE_SIZE;
+		}
+	}
+
+	if (userStart <= userEnd) {
+		int64 numPages = userStart / B_PAGE_SIZE - userEnd / B_PAGE_SIZE;
+		while (numPages-- >= 0) {
+			FlushTlbPageAsid(start, 0);
+			start += B_PAGE_SIZE;
+		}
 	}
 }
 
@@ -125,8 +131,13 @@ arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
-	for (int i = 0; i < num_pages; i++)
-		FlushTlbPage(pages[i]);
+	for (int i = 0; i < num_pages; i++) {
+		addr_t page = pages[i];
+		if (IS_KERNEL_ADDRESS(page))
+			FlushTlbPage(page);
+		else
+			FlushTlbPageAsid(page, 0);
+	}
 }
 
 
@@ -140,7 +151,7 @@ arch_cpu_global_TLB_invalidate(void)
 void
 arch_cpu_user_TLB_invalidate(void)
 {
-	FlushTlbAll();
+	FlushTlbAllAsid(0);
 }
 
 

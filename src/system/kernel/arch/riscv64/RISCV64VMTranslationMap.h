@@ -62,7 +62,7 @@ struct RISCV64VMTranslationMap: public VMTranslationMap {
 			status_t			ProtectArea(VMArea* area,
 									uint32 attributes);
 
-			status_t			SetFlags(addr_t virtualAddress,
+			void				SetFlags(addr_t virtualAddress,
 									uint32 flags);
 
 	virtual	status_t			ClearFlags(addr_t virtualAddress,

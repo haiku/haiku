@@ -202,7 +202,7 @@ RISCV64VMTranslationMap::LookupPte(addr_t virtAdr, bool alloc,
 				return NULL;
 			DEBUG_PAGE_ACCESS_END(page);
 			fPageTableSize++;
-			pte->flags |= (1 << pteValid);
+			pte->flags |= (1 << pteValid) | (fIsKernel ? (1 << pteGlobal) : 0);
 		}
 		pte = (Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn);
 	}
@@ -319,7 +319,7 @@ RISCV64VMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 
 	Pte newPte;
 	newPte.ppn = physicalAddress / B_PAGE_SIZE;
-	newPte.flags = (1 << pteValid);
+	newPte.flags = (1 << pteValid) | (fIsKernel ? (1 << pteGlobal) : 0);
 
 	if ((attributes & B_USER_PROTECTION) != 0) {
 		newPte.flags |= (1 << pteUser);
@@ -702,7 +702,7 @@ status_t RISCV64VMTranslationMap::Protect(addr_t base, addr_t top,
 
 		Pte oldPte = *pte;
 		Pte newPte = oldPte;
-		newPte.flags &= (1 << pteValid)
+		newPte.flags &= (1 << pteValid) | (1 << pteGlobal)
 			| (1 << pteAccessed) | (1 << pteDirty);
 
 		if ((attributes & B_USER_PROTECTION) != 0) {
@@ -760,16 +760,24 @@ ConvertAccessedFlags(uint32 flags)
 }
 
 
-status_t
+void
 RISCV64VMTranslationMap::SetFlags(addr_t address, uint32 flags)
 {
-	ThreadCPUPinner pinner(thread_get_current_thread());
+	// Only called from interrupt handler with interrupts disabled for CPUs that don't support
+	// setting accessed/modified flags by hardware.
+
 	Pte* pte = LookupPte(address, false, NULL);
 	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
-		return B_OK;
+		return;
+
 	pte->flags |= ConvertAccessedFlags(flags);
-	FlushTlbPage(address);
-	return B_OK;
+
+	if (IS_KERNEL_ADDRESS(address))
+		FlushTlbPage(address);
+	else
+		FlushTlbPageAsid(address, 0);
+
+	return;
 }
 
 
@@ -852,15 +860,7 @@ RISCV64VMTranslationMap::Flush()
 
 	if (fInvalidPagesCount <= 0)
 		return;
-/*
-	dprintf("+Flush(%p)\n", this);
-	struct ScopeExit {
-		~ScopeExit()
-		{
-			dprintf("-Flush(%p)\n", this);
-		}
-	} scopeExit;
-*/
+
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	if (fInvalidPagesCount > PAGE_INVALIDATE_CACHE_SIZE) {
@@ -871,11 +871,8 @@ RISCV64VMTranslationMap::Flush()
 		if (fIsKernel) {
 			arch_cpu_global_TLB_invalidate();
 
-			// dprintf("+smp_send_broadcast_ici\n");
 			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_SYNC);
-			// dprintf("-smp_send_broadcast_ici\n");
-
 		} else {
 			cpu_status state = disable_interrupts();
 			arch_cpu_user_TLB_invalidate();
@@ -886,10 +883,8 @@ RISCV64VMTranslationMap::Flush()
 			cpuMask.ClearBit(cpu);
 
 			if (!cpuMask.IsEmpty()) {
-				// dprintf("+smp_send_multicast_ici\n");
 				smp_send_multicast_ici(cpuMask, SMP_MSG_USER_INVALIDATE_PAGES,
 					0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-				// dprintf("-smp_send_multicast_ici\n");
 			}
 		}
 	} else {
@@ -899,22 +894,18 @@ RISCV64VMTranslationMap::Flush()
 		arch_cpu_invalidate_TLB_list(fInvalidPages, fInvalidPagesCount);
 
 		if (fIsKernel) {
-			// dprintf("+smp_send_broadcast_ici\n");
 			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
 				(addr_t)fInvalidPages, fInvalidPagesCount, 0, NULL,
 				SMP_MSG_FLAG_SYNC);
-			// dprintf("-smp_send_broadcast_ici\n");
 		} else {
 			int cpu = smp_get_current_cpu();
 			CPUSet cpuMask = fActiveOnCpus;
 			cpuMask.ClearBit(cpu);
 
 			if (!cpuMask.IsEmpty()) {
-				// dprintf("+smp_send_multicast_ici\n");
 				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
 					(addr_t)fInvalidPages, fInvalidPagesCount, 0, NULL,
 					SMP_MSG_FLAG_SYNC);
-				// dprintf("-smp_send_multicast_ici\n");
 			}
 		}
 	}

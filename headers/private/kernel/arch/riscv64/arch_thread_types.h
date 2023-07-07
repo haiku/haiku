@@ -17,9 +17,8 @@ struct iframe {
 	uint64 status;
 	uint64 cause;
 	uint64 tval;
-	uint64 align1; // structure need to be 16 byte aligned
 
-	uint64 ra;
+	uint64 ra __attribute__((aligned (16)));
 	uint64 t6;
 	uint64 sp;
 	uint64 gp;
@@ -58,7 +57,6 @@ struct arch_context {
 	uint64 ra;    //  0
 	uint64 s[12]; // 12
 	uint64 sp;    // 13
-	uint64 satp;  // 14
 };
 
 struct fpu_context {

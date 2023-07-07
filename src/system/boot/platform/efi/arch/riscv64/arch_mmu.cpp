@@ -158,7 +158,7 @@ LookupPte(addr_t virtAdr, bool alloc)
 			if (pte->ppn == 0)
 				return NULL;
 			memset((Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
-			pte->flags |= (1 << pteValid);
+			pte->flags |= (1 << pteValid) | (IS_KERNEL_ADDRESS(virtAdr) ? (1 << pteGlobal) : 0);
 		}
 		pte = (Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn);
 	}
@@ -175,7 +175,9 @@ Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags)
 	if (pte == NULL) panic("can't allocate page table");
 
 	pte->ppn = physAdr / B_PAGE_SIZE;
-	pte->flags = (1 << pteValid) | (1 << pteAccessed) | (1 << pteDirty) | flags;
+	pte->flags = (1 << pteValid) | (1 << pteAccessed) | (1 << pteDirty)
+		| (IS_KERNEL_ADDRESS(virtAdr) ? (1 << pteGlobal) : 0)
+		| flags;
 }
 
 
@@ -232,7 +234,7 @@ PreallocKernelRange()
 		pte->ppn = mmu_allocate_page() / B_PAGE_SIZE;
 		if (pte->ppn == 0) panic("can't alloc early physical page");
 		memset(VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
-		pte->flags |= (1 << pteValid);
+		pte->flags |= (1 << pteValid) | (1 << pteGlobal);
 	}
 }
 

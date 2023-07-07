@@ -33,8 +33,6 @@ FUNCTION(arch_context_switch):
 	sd s10, 11*8(a0)
 	sd s11, 12*8(a0)
 	sd sp,  13*8(a0)
-	csrr t0, satp
-	sd t0,  14*8(a0)
 
 # load `to` context
 	ld ra,   0*8(a1)
@@ -51,9 +49,6 @@ FUNCTION(arch_context_switch):
 	ld s10, 11*8(a1)
 	ld s11, 12*8(a1)
 	ld sp,  13*8(a1)
-	ld t0,  14*8(a1)
-	csrw satp, t0
-	sfence.vma
 
 	ret
 FUNCTION_END(arch_context_switch)

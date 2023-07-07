@@ -256,7 +256,7 @@ static B_ALWAYS_INLINE void FlushTlbPage(uint64 x) {
 static B_ALWAYS_INLINE void FlushTlbAllAsid(uint64 asid) {
 	asm volatile("sfence.vma x0, %0" : : "r" (asid) : "memory");}
 static B_ALWAYS_INLINE void FlushTlbPageAsid(uint64 page, uint64 asid) {
-	asm volatile("sfence.vma %0, %0" : : "r" (page), "r" (asid) : "memory");}
+	asm volatile("sfence.vma %0, %1" : : "r" (page), "r" (asid) : "memory");}
 
 // flush instruction cache
 static B_ALWAYS_INLINE void FenceI() {
