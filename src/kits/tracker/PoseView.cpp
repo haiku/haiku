@@ -8542,8 +8542,11 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 		AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	if (!IsDesktopWindow())
+	if (!IsDesktopWindow()) {
 		ApplyBackgroundColor();
+		if (ContainerWindow() != NULL)
+			ContainerWindow()->UpdateBackgroundImage();
+	}
 
 	Invalidate();
 
