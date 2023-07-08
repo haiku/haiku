@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	3128433901
+1	english	x-vnd.Be-MAIL	16344670
 Set to Saved	Mail		设置为保存
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		你的正文中包含的 %ld 属于无法识别的编码类型。 可能改变编码类型之后会更好的运行？ 点击“发送”继续(系统将会选择一种合适的类型来代替无法编码的类型)，或者点击“取消”，进行修复。
 Text wrapping:	Mail		文本加密：
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		需要使用文件浏览器将其移�
 The mail_daemon could not be started:\n\t	Mail		 mail_daemon 无法启动：\n\t
 <no account found>	Mail		<未发现账户>
 Mail couldn't find its dictionary.	Mail		电子邮件无法找到字典。
-Mail preferences	Mail		邮箱首选项
 helpful message	Mail		帮助消息
  Read 	Mail		阅读
 Font:	Mail		字体：

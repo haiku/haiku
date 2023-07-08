@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	3128433901
+1	friulian	x-vnd.Be-MAIL	16344670
 Set to Saved	Mail		Met come Salvât
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressie lâ ben forsit une cumbinazion di caratars diferente? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Par spostâ i elements te scovacere al
 The mail_daemon could not be started:\n\t	Mail		Nol è stât pussibil inviâ mail_daemon:\n\t
 <no account found>	Mail		<nissun account cjatât>
 Mail couldn't find its dictionary.	Mail		Mail nol rive a cjatâ il so dizionari.
-Mail preferences	Mail		Preferencis di Mail
 helpful message	Mail		messaç util
  Read 	Mail		 Let 
 Font:	Mail		Caratar:

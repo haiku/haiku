@@ -22,7 +22,7 @@ Remove	Config Views		Вилучити
 Show notifications:	Config Window		Показати сповіщення:
 Settings	Config Window		Налаштування
 Never	Config Window	show status window	Ніколи
-Account name:	Config Views		Назва облікового запису:
+Account name:	Config Views		Назва акаунта:
 \t\t· Incoming	Config Window		\t\t· Вхідні
 Enter a valid e-mail address.	AutoConfigWindow		Введіть чинну адресу E-mail.
 \nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nЗагальні налаштування неможливо повернути.\n\nПомилка при отриманні загальних налаштувань:\n%s\n
@@ -35,14 +35,14 @@ The filter could not be moved. Deleting filter.	Config Views		Фільтр не�
 OK	Config Views		ОК
 Revert	Config Window		Відкат змін
 Incoming	Config Window		Вхідні
-Finish	AutoConfigWindow		Завершення
+Finish	AutoConfigWindow		Готово
 Add filter	Config Views		Додати фільтр
 Account settings	Config Views		Настройки облікового запису
 minutes	Config Window		хвилин
 E-mail	System name		E-mail
 Check every	Config Window		Перевіряти кожні
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Кнопка «Додати» створює новий обліковий запис.\n\nКнопка «Вилучити» прибирає вибраний обліковий запис.\n\nВиберіть запис зі списку для зміни його налаштувань.
-Account name:	E-Mail		Назва облікового запису:
+Account name:	E-Mail		Назва акаунта:
 Edit mailbox menu…	Config Window		Редагувати меню скриньки…
 Server Name:	E-Mail		Назва сервера:
 Remove	Config Window		Вилучити

@@ -16,4 +16,4 @@ Use RGB color	GIFView		Použít RGB obrázky
 Use dithering	GIFView		Použít dithering
 GIF Settings	GIFTranslator		předvolby GIF
 BeOS system	GIFView		BeOS systém
-Automatic (from alpha channel)	GIFView		Automaticky (z alfakanálu)
+Automatic (from alpha channel)	GIFView		Automaticky (z kanálu neprůhlednosti)

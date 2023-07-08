@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	1367625978
+1	french	x-vnd.Haiku-Terminal	4000370057
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
@@ -8,6 +8,7 @@ Edit	Terminal TermWindow		Éditer
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial\n
 Select all	Terminal TermWindow		Sélectionner tout
 Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une confirmation à la fermeture si un programme est actif
+Color scheme:	Terminal ThemeView		Schéma de couleurs :
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans\n\t\t\tl’onglet courant. En option, le nombre maximum d’éléments\n\t\t\tdu chemin peut être spécifié. Par exemple « %2d » pour au plus\n\t\t\tdeux éléments.\n\t%T\t-\tLe nom de l’application Terminal pour la langue active.\n\t%e\t-\tLe codage de l’onglet courant. Non affiché pour UTF-8.\n\t%i\t-\tL’index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l’onglet courant.\n\t%t\t-\tLe titre de l’onglet courant.
 Copy	Terminal TermWindow		Copier
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
@@ -66,6 +67,7 @@ Find previous	Terminal TermWindow		Rechercher le précédent
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre des onglets. Vous\npouvez utiliser les variables suivantes :
 Close	Terminal TermWindow		Fermer
 Save to file…	Terminal PrefWindow		Enregistrer sous…
+Defaults	Terminal ThemeWindow		Par défauts
 Copy path	Terminal TermView		Copier le chemin
 Window size	Terminal TermWindow		Taille de la fenêtre
 Selected text	Terminal ThemeView		Texte sélectionné
@@ -75,6 +77,7 @@ ANSI cyan color	Terminal ThemeView		Cyan ANSI
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		L’application « %1 » fonctionne encore.\nSi vous fermez l’onglet, l’application sera interrompue.
 Full screen	Terminal TermWindow		Plein écran
 Shell 	Terminal TermWindow		Interpréteur de commande
+Revert	Terminal ThemeWindow		Annuler
 ANSI green color	Terminal ThemeView		Vert ANSI
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLe caractère « % ».\n\t%<\t-\tDémarre une section qui ne sera affiché que si un\n\t\t\tparamètre qui suit n’est pas vide.\n\t%>\t-\tDémarre une section qui ne sera affiché que si un paramètre\n\t\t\tentre la précédente section %< et si celui-ci n’est pas vide.\n\t%-\t-\tTermine une section. %< ou %>.\n\nTout caractère non alphanumérique entre « % » et la lettre de format insérera un espace\nque si la valeur du paramètre n’est pas vide. Il s’ajoutera à la section %<.
 ANSI bright cyan color	Terminal ThemeView		Turquoise ANSI
@@ -90,12 +93,14 @@ Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
 Use text:	Terminal FindWindow		Utiliser le texte :
 Close active tab	Terminal TermWindow		Fermer l’onglet actif
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
+Selected background	Terminal ThemeView		Arrière-plan sélectionné
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
 ANSI bright red color	Terminal ThemeView		Rouge vif ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Utiliser la touche Option gauche comme touche Meta
 Find	Terminal FindWindow		Rechercher
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l’onglet actif peut\ncontenir les éléments suivants :\n
+Save to file…	Terminal ThemeWindow		Sauvegarder dans le fichier…
 Font:	Terminal AppearancePrefView		Police :
 Paste	Terminal TermWindow		Coller
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre de la fenêtre. Vous pouvez\nutiliser les variables suivantes :
@@ -120,6 +125,7 @@ Increase	Terminal TermWindow		Augmenter
 green	Terminal ThemeView		vert
 ANSI bright green color	Terminal ThemeView		Vert clair ANSI
 OK	Terminal TermWindow		OK
+Text under cursor	Terminal ThemeView		Texte sous le curseur
 ANSI bright white color	Terminal ThemeView		Blanc ANSI
 Close window	Terminal TermWindow		Fermer la fenêtre
 ANSI magenta color	Terminal ThemeView		Magenta ANSI

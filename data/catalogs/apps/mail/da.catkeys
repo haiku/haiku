@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-MAIL	3128433901
+1	danish	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		Indstil til gemt
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodelige tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodelige), eller vælg Afbryd for at gå tilbage, og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Behøver Tracker for at flytte element
 The mail_daemon could not be started:\n\t	Mail		mail_daemon kunne ikke startes:\n\t
 <no account found>	Mail		<ingen konto fundet>
 Mail couldn't find its dictionary.	Mail		Postprogrammet kunne ikke finde sin arbejdsmappe.
-Mail preferences	Mail		Postindstillinger
 helpful message	Mail		hjælpsom meddelelse
  Read 	Mail		 Læs 
 Font:	Mail		Skrifttype:
@@ -110,6 +109,7 @@ Move to trash	Mail		Flyt til papirkurven
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Dato
 Check spelling	Mail		Efterse stavning
+Status:	Mail		Status:
 Redo	Mail		Omgør
 Leave as '%s'	Mail		Lad være som '%s'
 Print…	Mail		Udskriv…

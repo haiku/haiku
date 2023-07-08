@@ -55,7 +55,7 @@ Time	Attribute ListView		Час
 Extensions:	FileTypes Window		Розширення:
 Select preferred application	FileType Window		Вибрати пріоритетну програму
 Description:	FileTypes Window		Опис:
-Multiple files from \"%s\" file type	FileType Window		Багаточисельні файли з\"%s\" типу файлу
+Multiple files from \"%s\" file type	FileType Window		Багаточисельні файли типу \«%s\»
 Add new group	New File Type Window		Додати нову групу
 Remove uninstalled	Application Types Window		Вилучити деінстальовані
 File	Application Type Window		Файл

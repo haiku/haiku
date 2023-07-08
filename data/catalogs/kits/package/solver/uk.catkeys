@@ -30,7 +30,7 @@ allow deinstallation of %source%	SolverProblemSolution		дозволити де�
 keep %source% from excluded repository	SolverProblemSolution		зберегти %source% з виключеного репозитарія
 keep old %source%	SolverProblemSolution		зберегти старий %source%
 package %source% conflicts with %dependency% provided by itself	SolverProblem		пакет %source% конфліктує з %dependency% наданими самому собі
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		дозволити зміну постачальника з \"%sourceVendor%\" (%source%) на \"%targetVendor%\" (%target%)
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		дозволити зміну постачальника з \«%sourceVendor%\» (%source%) на \«%targetVendor%\» (%target%)
 do not lock \"%selection%\"	SolverProblemSolution		не блокувати \"%selection%\"
 do not install \"%selection%\"	SolverProblemSolution		не встановлювати \"%selection%\"
 nothing provides %dependency% needed by %source%	SolverProblem		не забезпечено залежності %dependency% потрібні для %source%

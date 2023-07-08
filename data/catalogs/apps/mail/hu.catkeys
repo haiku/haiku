@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	3128433901
+1	hungarian	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		Mentésre jelöl
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Szükség van a Nyomkövetőre a Szeme
 The mail_daemon could not be started:\n\t	Mail		A mail_daemon nem indítható:\n\t
 <no account found>	Mail		<nem található fiók>
 Mail couldn't find its dictionary.	Mail		Nem található a szótár.
-Mail preferences	Mail		Beállítások
 helpful message	Mail		segítőkész üzenet
  Read 	Mail		Olvas
 Font:	Mail		Betűtípus:
@@ -110,6 +109,7 @@ Move to trash	Mail		Áthelyezés a Szemetesbe
 <none>	Mail		<nincs>
 %d - Date	Mail		%d - dátum
 Check spelling	Mail		Helyesírás-ellenőrzés
+Status:	Mail		Állapot:
 Redo	Mail		Újra
 Leave as '%s'	Mail		Hagyja '%s'-ként
 Print…	Mail		Nyomtatás…

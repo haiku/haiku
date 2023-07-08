@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-MAIL	3210126379
+1	slovak	x-vnd.Be-MAIL	98037148
 Set to Saved	Mail		Nastaviť na Uložené
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Váš hlavný text obsahuje %ld znakov, ktoré nebolo možné zakódovať. Možno by bola vhodná iná znaková sada? Ak chcete správu napriek tomu odoslať, stlačte „Odoslať“ (namiesto nezakódovateľných znakov sa použijú náhradné znaky) alebo sa vráťte späť stlačením „Zrušiť“ a pokúste sa to opraviť.
 Text wrapping:	Mail		Zalamovanie textu:
@@ -93,7 +93,6 @@ Need Tracker to move items to trash	Mail		Na presunutie položiek do Koša je po
 The mail_daemon could not be started:\n\t	Mail		mail_daemon sa nepodarilo spustiť:\n\t
 <no account found>	Mail		<žiaden účet nebol nájdený>
 Mail couldn't find its dictionary.	Mail		Pošta nenašla svoj slovník.
-Mail preferences	Mail		Predvoľby pošty
 helpful message	Mail		užitočná správa
  Read 	Mail		 Prečítané 
 Font:	Mail		Písmo:

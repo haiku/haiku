@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	3128433901
+1	russian	x-vnd.Be-MAIL	16344670
 Set to Saved	Mail		Послать в сохраненные
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
 Text wrapping:	Mail		Перенос строк:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Для перемещение объе
 The mail_daemon could not be started:\n\t	Mail		Невозможно запустить mail_daemon:\n\t
 <no account found>	Mail		<аккаунт не найден>
 Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
-Mail preferences	Mail		Настройки почты
 helpful message	Mail		полезное сообщение
  Read 	Mail		 Прочитанным 
 Font:	Mail		Шрифт:

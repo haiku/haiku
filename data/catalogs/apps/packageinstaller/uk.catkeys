@@ -18,7 +18,7 @@ No installation type selected	PackageView		Не вибрано тип інста
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати вибране рішення для решти до кінця цієї інсталяції?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Вибраний пакет неможливо видалити з системи. Інформаційний файл встановленого пакету ймовірно може бути пошкодженим.
 Install…	UninstallView		Інсталяція…
-The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Елемент з іменем '%s' вже існує за вказаним шляхом.\nЗамінити його подібним з цього пакунку чи пропустити?
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Елемент з назвою '%s' вже існує за вказаним шляхом.\nЗамінити його подібним з цього пакета чи пропустити?
 Installing files and folders	PackageInstall		Інсталяція файлів та папок
 Installed packages	UninstallWindow		Інстальовані пакети
 Remove	UninstallView		Вилучити
@@ -40,7 +40,7 @@ No package selected.	UninstallView		Не вибрано пакет.
 Error while installing the package\n	PackageView		Помилка при інсталяції пакета\n
 Finishing installation	PackageInstall		Завершення інсталяції
 No package available.	PackageInfo		Пакет недоступний.
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт з іменем '%s' вже існує за вказаним шляхом.\nЗамінити його подібним з цього пакета чи пропустити?
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт з назвою '%s' вже існує за вказаним шляхом.\nЗамінити його подібним з цього пакета чи пропустити?
 Installation type:	PackageView		Тип інсталяції:
 The package you selected has been successfully removed from your system.	UninstallView		Вибраний пакет успішно видалений з Вашої системи.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Існує невідповідність розміру файлів в пакеті. Пакет міг бути пошкодженим або зміненим після створення. Ви бажаєте продовжувати далі?
@@ -52,7 +52,7 @@ The package file is not readable.\nOne of the possible reasons for this might be
 Continue	PackageInfo		Продовжити
 No package selected.	PackageInfo		Не вибрано пакет.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Помилка! \"%s\" не є правильним шляхом.\n
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Каталог з іменем '%s' вже ыснуэ за вказаним шляхом.\nЗамінити його подібним з цього пакета чи пропустити?
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Каталог з іменем '%s' вже існує за вказаним шляхом.\nЗамінити його подібним з цього пакета чи пропустити?
 LegacyPackageInstaller	System name		LegacyPackageInstaller
 Ask again	PackageView		Запитати знову
 Begin	PackageView		Почати

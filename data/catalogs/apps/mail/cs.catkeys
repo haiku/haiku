@@ -1,4 +1,4 @@
-1	czech	x-vnd.Be-MAIL	3128433901
+1	czech	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		Nastavit na Uložené
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Zpráva obsahuje %ld nedefinované znaky. Možná by jiné sady znaků fungovaly lépe? Stiskněte tlačítko Odeslat, chcete-li zprávu přesto odeslat (místo původního znaku se použije náhradní znak), nebo zvolte Zrušit, chcete-li se vrátit a opravit.
 Text wrapping:	Mail		Zalamování textu:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Na přesun položek do koše je potře
 The mail_daemon could not be started:\n\t	Mail		Službu mail_daemon nelze spustit:\n\t
 <no account found>	Mail		<žádný účet nenalezen>
 Mail couldn't find its dictionary.	Mail		Pošta nenašla svůj slovník
-Mail preferences	Mail		Předvolby pošty
 helpful message	Mail		užitečná zpráva
  Read 	Mail		 Číst 
 Font:	Mail		Písmo:
@@ -110,6 +109,7 @@ Move to trash	Mail		Přesunout do koše
 <none>	Mail		<není>
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Zkontrolovat pravopis
+Status:	Mail		Stav:
 Redo	Mail		Znovu
 Leave as '%s'	Mail		Nechat jako '%s'
 Print…	Mail		Tisk...
@@ -126,7 +126,7 @@ Forward	Mail		Přeposlat
 Open attachment	Mail		Otevřít přílohu
 mail	B_USER_DIRECTORY/mail		pošta
 Save this message as a draft before closing?	Mail		Uložit tuto zprávu do konceptů před ukončením?
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon není spuštěn. Zpráva je zařazena do fronty a bude odeslána po spuštění služby mail_daemon.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Služba pošty není spuštěna. Zpráva je zařazena do fronty a bude odeslána po spuštění služby.
 None	Mail		Nic
 Resend	Mail		Znovu odeslat
 Hide	Mail		Skrýt
@@ -135,7 +135,7 @@ No file attributes, just plain data	Mail		Žádný typ souboru, pouze data
 Add	Mail		Přidat
 out	B_USER_DIRECTORY/mail/out		odchozí
 Send this message before closing?	Mail		Odeslat tuto zprávu před zavřením?
-in	B_USER_DIRECTORY/mail/in		v
+in	B_USER_DIRECTORY/mail/in		přijato
 Open	Mail		Otevřít
 Don't save	Mail		Neukládat
 Leave same	Mail		Nechat stejné

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Input	4063065788
+1	french	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Défilement
 Defaults	InputMouse		Par défaut
 Long	KeyboardView		Long
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Accepter le premier clic
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Défilement horizontal
 Delay until key repeat	KeyboardView		Délai avant répétition des touches
+Keyboard lock delay	TouchpadPrefView		Délai de verrouillage du clavier
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
 Input	System name		Entrées
 Mouse acceleration	SettingsView		Accélération de la souris

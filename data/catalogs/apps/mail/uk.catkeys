@@ -1,12 +1,12 @@
-1	ukrainian	x-vnd.Be-MAIL	3128433901
+1	ukrainian	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		До збережених
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
-Text wrapping:	Mail		Обтікання текстом:
+Text wrapping:	Mail		Перенос тексту:
 Show icons & labels	Mail		Показати значки & надписи
 (Date unavailable)	Mail		(Дата недоступна)
 Reply	Mail		Відповісти
 Next message	Mail		Наступний лист
-Mailing	Mail		Відправка
+Mailing	Mail		Поштові відправлення
 Unread	Mail		Нечитане
 Same sender	Mail		Той самий відправник
 Copy to new	Mail		Копіювати до нового
@@ -34,7 +34,7 @@ Close	Mail		Закрити
 Untitled	Mail		Без назви
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Видалення вкладень з листа що пересилається не підтримується!\nЦе не працюватиме правильно.
 Same recipient	Mail		Той самий отримувач
-Previous message	Mail		Попередній лист
+Previous message	Mail		Попереднє повідомлення
 (Address unavailable)	Mail		(Адреса недоступна)
 Mail	System name		Mail
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
@@ -42,14 +42,14 @@ Copy link location	Mail		Скопіювати розміщення посила�
 Attachments: 	Mail		Вкладення: 
 Remove enclosure	Mail		Вилучити вкладення
 Next	Mail		Наступне
-Show icons only	Mail		Показувати тільки значки
+Show icons only	Mail		Показати тільки значки
 Subject:	Mail		Тема:
 OK	Mail		ОК
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Quit	Mail		Вийти
 Title:	Mail		Заголовок:
 Account from mail	Mail		Обліковий запис з листа
-%e - E-mail address	Mail		%e – адреса E-mail
+%e - E-mail address	Mail		%e – Адреса E-mail
 Cc:	Mail		Cc:
 No matches	Mail		Нема співпадіння
 Queries	Mail		Запити
@@ -58,7 +58,7 @@ Reply to sender	Mail		Відповісти відправникові
 \\n - Newline	Mail		\\n – Новий рядок
 Copy	Mail		Копіювати
 Add signature	Mail		Додати підпис
-%n - Full name	Mail		%n – повне ім'я
+%n - Full name	Mail		%n – Повне ім'я
 Signature	Mail		Підпис
 Use default account	Mail		Використати обліковий запис за замовчуванням
 draft	B_USER_DIRECTORY/mail/draft		Чернетки
@@ -91,32 +91,32 @@ Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status
 Random	Mail		Випадковий
 Attach attributes:	Mail		Додати атрибути:
 Find again	Mail		Знайти далі
-Size:	Mail		Розмір:
+Size:	Mail		Розмір шрифту:
 To:	Mail		Кому:
 Need Tracker to move items to trash	Mail		Для переміщення до смітника потрібен Tracker
 The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
 <no account found>	Mail		<обліковий запис не знайдено>
 Mail couldn't find its dictionary.	Mail		Пошта не може знайти цього словника.
-Mail preferences	Mail		Налаштування пошти
 helpful message	Mail		корисне повідомлення
  Read 	Mail		 Прочитаним 
 Font:	Mail		Шрифт:
 Accounts…	Mail		Облікові записи…
-Previous	Mail		Попередній
+Previous	Mail		Попереднє
 Include file attributes in attachments	Mail		Додавати атрибути файлу у вкладення
 Start now	Mail		Запустити зараз
 (Name unavailable)	Mail		(Ім'я недоступне)
 Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
 %d - Date	Mail		%d – Дата
-Check spelling	Mail		Перевіряти орфограцію
+Check spelling	Mail		Перевіряти орфографію
+Status:	Mail		Статус:
 Redo	Mail		Повтор дії
 Leave as '%s'	Mail		Залишити як «%s»
 Print…	Mail		Друкувати…
 Settings…	Mail		Налаштування…
-Warn unencodable:	Mail		Увага некодоване:
+Warn unencodable:	Mail		Попередження про символи без кодування:
 Trash	Mail		Смітник
-Show raw message	Mail		Показати чернетку повідомлення
+Show raw message	Mail		Показати необроблене повідомлення
 Find…	Mail		Знайти…
 Select all	Mail		Виділити все
 Show header	Mail		Показати заголовок
@@ -141,7 +141,7 @@ Don't save	Mail		Не зберігати
 Leave same	Mail		Залишити саме це
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
 Save address	Mail		Зберегти адресу
-Initial spell check mode:	Mail		Режим перевірки орфограції:
+Initial spell check mode:	Mail		Перевірка орфографії:
 Edit queries…	Mail		Редагувати запити…
 There is no installed handler for URL links.	Mail		Не встановлено програму для обробки посилань URL.
 File	Mail		Файл
@@ -152,7 +152,7 @@ Edit signatures…	Mail		Редагувати підписи…
 User interface	Mail		Інтерфейс користувача
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/повтора.
 Remove attachment	Mail		Вилучити вкладення
-Set to…	Mail		Встановити в…
+Set to…	Mail		Встановити статус як…
 Edit	Mail		Редагувати
 Page setup…	Mail		Настройка сторінки…
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.

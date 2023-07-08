@@ -1,7 +1,7 @@
 1	czech	x-vnd.Haiku-TGATranslator	3075011211
 Save with RLE compression	TGAView		Uložit s kompresí RLE
 Targa image (%d bits truecolor)	TGATranslator		obrázek Targa (%d bitový truecolor)
-Ignore TGA alpha channel	TGAView		Ignorovat TGA alfakanál
+Ignore TGA alpha channel	TGAView		Ignorovat TGA kanál neprůhlednosti
 Targa image (%d bits colormap)	TGATranslator		obrázek Targa (%d bitové mapování barev)
 TGA image translator	TGAView		převaděč obrázků TGA
 Targa image (%d bits RLE colormap)	TGATranslator		obrázek Targa (%d bitové RLE mapování barev)

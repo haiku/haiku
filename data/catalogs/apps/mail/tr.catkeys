@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Be-MAIL	3128433901
+1	turkish	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		Kaydedilenlere ekle
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder'e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç'e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Ögelerin çöpe taşınabilmesi için
 The mail_daemon could not be started:\n\t	Mail		mail_daemon başlatılamadı:\n\t
 <no account found>	Mail		<hesap bulunamadı>
 Mail couldn't find its dictionary.	Mail		Posta, kendi sözlüğünü bulamadı.
-Mail preferences	Mail		Posta tercihleri
 helpful message	Mail		yararlı ileti
  Read 	Mail		 Oku 
 Font:	Mail		Yazıtipi:
@@ -110,6 +109,7 @@ Move to trash	Mail		Çöpe at
 <none>	Mail		<yok>
 %d - Date	Mail		%d - Tarih
 Check spelling	Mail		Yazımı denetle
+Status:	Mail		Durum:
 Redo	Mail		Yinele
 Leave as '%s'	Mail		'%s' olarak bırak
 Print…	Mail		Yazdır…

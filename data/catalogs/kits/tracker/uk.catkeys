@@ -63,7 +63,7 @@ Replace	FSUtils		Замінити
 ?+* follows nothing.	libtracker		?+* не слід нічого.
 Rectangle	AttributesView		Прямокутник
 Move to	ContainerWindow		Перемістити до
-Status	Email Query Columns		Стан
+Status	Email Query Columns		Статус
 New folder	FSUtils		Каталог/Папка
 Junk on end.	libtracker		Мотлох у кінці.
 New Query	FindPanel		Новий запит
@@ -175,7 +175,7 @@ Media parameter group	AttributesView		Група параметрів медіа
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо Ви перемістите папку home, %osName може вести себе неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення папки home затисніть кнопку Shift та натисніть \«Перемістити\».
 Property info	AttributesView		Інфо про властивості
 Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання в смітнику.
-From	Email Query Columns		З
+From	Email Query Columns		Від
 Invert selection	QueryContainerWindow		Інвертувати вибране
 Open selection with:	OpenWithWindow		Відкрити вибране у:
 Preferences…	ContainerWindow		Налаштування…

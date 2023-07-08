@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Be-MAIL	3128433901
+1	portuguese	x-vnd.Be-MAIL	16344670
 Set to Saved	Mail		Marcar como guardada
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O seu texto contém %ld caracteres não codificáveis. Talvez funcionasse melhor um conjunto de caracteres diferente? Clique em Enviar para enviar de qualquer modo (será utilizado um caracter de substituição no lugar dos caracteres não codificáveis) ou escolha Cancelar para voltar atrás e tentar corrigir.
 Text wrapping:	Mail		Translineação:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		É necessário o Tracker para mover it
 The mail_daemon could not be started:\n\t	Mail		Não foi possível iniciar o mail_daemon:\n\t
 <no account found>	Mail		<nenhuma conta encontrada>
 Mail couldn't find its dictionary.	Mail		O Correio não conseguiu encontrar o seu dicionário.
-Mail preferences	Mail		Preferências de correio
 helpful message	Mail		mensagem útil
  Read 	Mail		 Lido 
 Font:	Mail		Tipo de letra:

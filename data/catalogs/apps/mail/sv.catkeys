@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	3128433901
+1	swedish	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Tracker behöver flytta objekt till pa
 The mail_daemon could not be started:\n\t	Mail		mail_daemon kunde inte startas:\n\t
 <no account found>	Mail		<inget konto hittades>
 Mail couldn't find its dictionary.	Mail		Mail kunde inte hitta arbetskatalogen.
-Mail preferences	Mail		E-postinställningar
 helpful message	Mail		hjälpsamt meddelande
  Read 	Mail		 Läs 
 Font:	Mail		Typsnitt:
@@ -110,6 +109,7 @@ Move to trash	Mail		Flytta till papperskorg
 <none>	Mail		<ingen>
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Kontrollera stavning
+Status:	Mail		Status:
 Redo	Mail		Upprepa
 Leave as '%s'	Mail		Lämna som '%s'
 Print…	Mail		Skriv ut…

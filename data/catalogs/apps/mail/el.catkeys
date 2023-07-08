@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Be-MAIL	3128433901
+1	greek, modern (1453-)	x-vnd.Be-MAIL	16344670
 Set to Saved	Mail		Ορισμός ως Αποθηκευμένο
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Το κύριο κείμενό σας περιέχει %ld που δεν μπορούν να κωδικοποιηθούν. Ίσως μία άλλη μέθοδος κωδικοποίησης να λειτουργήσει καλύτερα. Πατήστε Αποστολή για να στείλετε το μήνυμά σας (οι χαρακτήρες που δεν μπορούν να κωδικοποιηθούν θα αντικατασταθούν με έναν υποκατάστατο χαρακτήρα) ούτως ή άλλως, ή επιλέξτε Ακύρωση για να ακυρώσετε την αποστολή και να διορθώσετε το πρόβλημα.
 Text wrapping:	Mail		Αναδίπλωση κειμένου:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Απαιτείται ο Ιχνηλάτ
 The mail_daemon could not be started:\n\t	Mail		Το mail_daemon δεν μπόρεσε να ξεκινήσει:\n\t
 <no account found>	Mail		<δεν βρέθηκε λογαριασμός>
 Mail couldn't find its dictionary.	Mail		Η εφαρμογή Αλληλογραφία δεν μπόρεσε να εντοπίσει το λεξικό της.
-Mail preferences	Mail		Προτιμήσεις Αλληλογραφίας
 helpful message	Mail		βοηθητικό μήνυμα
  Read 	Mail		 Ανάγνωση 
 Font:	Mail		Γραμματοσειρά:

@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-libpackage	134767648
-Fetching repository-cache from %url	RefreshRepositoryRequest		Видобування кешу-сховища з %url
+Fetching repository-cache from %url	RefreshRepositoryRequest		Отримання кешу репозитарію з %url
 Validating checksum for %repositoryName	RefreshRepositoryRequest		Перевірка контрольної суми для %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Не вдалося видалити каталог транзакцій
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Не вдалося отримати конфігурацію для репозитарія \"%s\". Пропустити.

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	259571489
+1	belarusian	x-vnd.Be-MAIL	1442449554
 Set to Saved	Mail		Пазначыць як захаванае
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 Text wrapping:	Mail		Афармоўка тэксту:
@@ -92,7 +92,6 @@ Need Tracker to move items to trash	Mail		Дзеля таго каб выкін�
 The mail_daemon could not be started:\n\t	Mail		Сервер mail_daemon ня можа быць запушчаны:\n\t
 <no account found>	Mail		<рахунак ня знойдзены>
 Mail couldn't find its dictionary.	Mail		Немагчыма знайсці слоўнік.
-Mail preferences	Mail		Наладкі Пошты
 helpful message	Mail		карыснае паведамленне
  Read 	Mail		 Чытаць 
 Font:	Mail		Шрыфт:

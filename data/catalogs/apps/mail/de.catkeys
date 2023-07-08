@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1709032125
+1	german	x-vnd.Be-MAIL	1239070674
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -96,7 +96,6 @@ Need Tracker to move items to trash	Mail		Um Nachrichten in den Papierkorb zu ve
 The mail_daemon could not be started:\n\t	Mail		Der Maildienst (mail_daemon) konnte nicht gestartet werden:\n\t
 <no account found>	Mail		<kein Konto gefunden>
 Mail couldn't find its dictionary.	Mail		Das Wörterbuch wurde nicht gefunden.
-Mail preferences	Mail		Mail-Einstellungen
 helpful message	Mail		Tipp
  Read 	Mail		 Gelesen 
 Font:	Mail		Schriftart:
@@ -109,6 +108,7 @@ Move to trash	Mail		In den Papierkorb verschieben
 <none>	Mail		<kein>
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Rechtschreibung prüfen
+Status:	Mail		Status:
 Redo	Mail		Wiederholen
 Leave as '%s'	Mail		Status '%s' belassen
 Print…	Mail		Drucken …

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	3128433901
+1	finnish	x-vnd.Be-MAIL	16344670
 Set to Saved	Mail		Aseta tallennetuksi
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
 Text wrapping:	Mail		Tekstin rivitys:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Tarvitsee Seuraajan siirtämään koht
 The mail_daemon could not be started:\n\t	Mail		Taustaprosessin mail_daemon käynnistäminen epäonnistui:\n\t
 <no account found>	Mail		<tiliä ei löytynyt>
 Mail couldn't find its dictionary.	Mail		Sähköpostisovellus ei löytänyt sanakirjaansa.
-Mail preferences	Mail		Sähköpostiasetukset
 helpful message	Mail		hyödyllinen viesti
  Read 	Mail		 Lue 
 Font:	Mail		Kirjasin:

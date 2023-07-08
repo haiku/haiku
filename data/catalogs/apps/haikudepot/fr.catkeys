@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	1549347917
+1	french	x-vnd.Haiku-HaikuDepot	3370106820
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d'utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
@@ -29,6 +29,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Vous devez
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L’objet demandé ou l’objet associé à la requête n’a pas été trouvé sur le serveur.
 Logout	ToLatestUserUsageConditionsWindow		Déconnexion
+Password requirements	UserLoginWindow		Exigences concernant le mot de passe
 The following additional package changes have to be made:	PackageResult		Les changements supplémentaires suivants sont nécessaires :
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Les conditions d'utilisations actuelles n'ont pas été acceptées.
@@ -153,6 +154,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Partager des do
 Close	PackageManager		Fermer
 Changelog	PackageInfoView		Journal des modifications
 About	PackageInfoView		À propos
+Password requirements download problem	UserLoginWindow		Problème de téléchargement des exigences en matière de mot de passe
 Password:	UserLoginWindow		Mot de passe :
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cette application est trop ancienne pour communiquer avec le serveur. Obtenez une version plus récente de cette application en mettant à jour votre système. La version minimale requise de cette application est « %s ».
 Stability	RatePackageWindow		Stabilité
@@ -183,6 +185,7 @@ View agreed usage conditions…	MainWindow		Voir les conditions d’utilisation 
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'utilisateur « %Nickname% » s'est authentifié, mais avant de poursuivre, il vous est demandé d'accepter les conditions d'utilisation les plus récentes. 
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur de dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
 Apply	SettingsWindow		Appliquer
+View the password requirements	UserLoginWindow		Voir les exigences concernant le mot de passe
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Les conditions d'utilisation ont été révisées. L'utilisateur « %Nickname% » doit accepter les nouvelles conditions.
 Log out	MainWindow		Déconnexion
 Comment language:	RatePackageWindow		Langue du commentaire :

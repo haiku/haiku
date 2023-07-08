@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Be-MAIL	3128433901
+1	catalan; valencian	x-vnd.Be-MAIL	2658472450
 Set to Saved	Mail		Estableix com a desat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El vostre text principal conté %ld caràcters no codificables. Potser amb un conjunt de caràcters diferent funcionaria millor? Premeu Envia per enviar-ho tanmateix (se substituiran per altres els caràcters que no es puguin codificar), o bé trieu Cancel·la per tornar enrere i intentar esmenar-ho.
 Text wrapping:	Mail		Ajustament de línia:
@@ -97,7 +97,6 @@ Need Tracker to move items to trash	Mail		Cal el Rastrejador per moure elements 
 The mail_daemon could not be started:\n\t	Mail		No s'ha pogut iniciar el dimoni del correu:\n\t
 <no account found>	Mail		<no s'ha trobat cap compte>
 Mail couldn't find its dictionary.	Mail		El Correu no ha pogut trobar el diccionari.
-Mail preferences	Mail		Preferències del correu
 helpful message	Mail		missatge d'ajuda
  Read 	Mail		 Llegeix 
 Font:	Mail		Tipus de lletra:
@@ -110,6 +109,7 @@ Move to trash	Mail		Mou a la paperera
 <none>	Mail		<cap>
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Revisa'n l'ortografia
+Status:	Mail		Estat:
 Redo	Mail		Refés
 Leave as '%s'	Mail		Deixa-ho com a "%s'"
 Print…	Mail		Imprimeix…

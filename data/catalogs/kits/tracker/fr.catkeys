@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3330520334
+1	french	x-vnd.Haiku-libtracker	3045538442
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -88,6 +88,7 @@ Modified	FindPanel		Modifié
 Select all	QueryContainerWindow		Sélectionner tout
 Generate image thumbnails	SettingsView		Générer des vignettes d’images
 Select…	FilePanelPriv		Sélectionner…
+An item named '%filename%' already exists.	FSUtils		Un élément nommé « %filename% » existe déjà.
 preferences	B_PREFERENCES_DIRECTORY		préférences
 Name	Person Query Columns		Nom
 Skip all	FSUtils		Tout ignorer
@@ -267,6 +268,7 @@ Cut	FilePanelPriv		Couper
 Finish: after several years	StatusWindow		Fin : après plusieurs années
 Favorites	FilePanelPriv		Favoris
 Point	AttributesView		Point
+You can't move or copy items to read-only volumes.	PoseView		Vous ne pouvez pas déplacer ou copier des éléments sur des volumes en lecture seule.
 home	B_USER_DIRECTORY		personnel
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nouveaux modèles
 Disk mounting during boot	AutoMounterSettings		Montage des disques au démarrage
@@ -354,6 +356,7 @@ after	FindPanel		après
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# octet de données>} other{<# octets de données>}}
 Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Certains des éléments sélectionnés ne peuvent pas être envoyés à la Corbeille. Voulez vous les supprimer ? (Cette opération est irrémédiable.)
+The entered file name is too long.	FSUtils		Le nom de fichier saisi est trop long.
 Add printer…	ContainerWindow		Ajouter une imprimante…
 On	FindPanel		Sur
 Permissions	ContainerWindow		Permissions
@@ -523,6 +526,7 @@ I know what I'm doing	FSUtils	button label	Je sais ce que je fais
 Preparing to copy items…	StatusWindow		Copie des éléments en préparation…
 Entry ref	AttributesView		Référence de l'entrée
 Icon view	ContainerWindow		Vue en icônes
+The entered folder name is too long.	FSUtils		Le nom de dossier saisi est trop long.
 Name	ContainerWindow		Nom
 Preferred for %type	OpenWithWindow		Préférence pour %type
 Free space color	SettingsView		Couleur de l’espace libre

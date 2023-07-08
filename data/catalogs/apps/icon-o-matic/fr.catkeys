@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	4159219060
+1	french	x-vnd.haiku-icon_o_matic	1015615450
 None	Icon-O-Matic-Properties		Aucun
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotation des indices de chemin
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
@@ -73,6 +73,7 @@ Add	Icon-O-Matic-PathsList		Ajouter
 Add Styles	Icon-O-Matic-AddStylesCmd		Ajouter des styles
 Remove	Icon-O-Matic-PathManipulator		Enlever
 Duplicate	Icon-O-Matic-ShapesList		Dupliquer
+Alpha	Icon-O-Matic-PropertyNames		Alpha
 Contour	Transformation		Contour
 Save icon	Dialog title		Enregistrer l’icône
 Move Paths	Icon-O-Matic-MovePathsCmd		Déplacer les chemins
@@ -190,6 +191,7 @@ Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Déplacer la Transformation
 Export	Icon-O-Matic-Menu-File		Exporter
 Width	Icon-O-Matic-PropertyNames		Largeur
+Add reference image	Icon-O-Matic-ShapesList		Ajouter une image de référence
 Bummer	Cancel button - error alert		Poisse
 Style	Icon-O-Matic-Menus		Style
 edit it's properties here.	Empty property list - 3rd line		éditer ses propriétés ici.
