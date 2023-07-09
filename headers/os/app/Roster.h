@@ -37,7 +37,7 @@ struct app_info {
 #define _B_APP_INFO_RESERVED1_	(0x10000000)
 
 // watching request flags
-enum {
+enum watching_request_flags {
 	B_REQUEST_LAUNCHED	= 0x00000001,
 	B_REQUEST_QUIT		= 0x00000002,
 	B_REQUEST_ACTIVATED	= 0x00000004,

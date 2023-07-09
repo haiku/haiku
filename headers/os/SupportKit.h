@@ -17,6 +17,7 @@
 #include <Locker.h>
 #include <StopWatch.h>
 #include <String.h>
+#include <StringList.h>
 #include <SupportDefs.h>
 #include <TypeConstants.h>
 #include <UTF8.h>

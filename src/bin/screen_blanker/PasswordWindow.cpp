@@ -46,7 +46,7 @@ PasswordWindow::PasswordWindow()
 	bounds.top += 10.0;
 	fPassword = new BTextControl(bounds, "password",
 		B_TRANSLATE("Enter password:"), "VeryLongPasswordPossible",
-		B_FOLLOW_NONE);
+		NULL, B_FOLLOW_NONE);
 	customBox->AddChild(fPassword);
 	fPassword->MakeFocus(true);
 	fPassword->ResizeToPreferred();

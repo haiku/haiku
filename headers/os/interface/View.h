@@ -51,13 +51,13 @@ enum {
 		// will filter out older mouse moved messages)
 };
 
-enum {
+enum rect_tracking_style {
 	B_TRACK_WHOLE_RECT,
 	B_TRACK_RECT_CORNER
 };
 
 // set font mask
-enum {
+enum set_font_mask {
 	B_FONT_FAMILY_AND_STYLE				= 0x00000001,
 	B_FONT_SIZE							= 0x00000002,
 	B_FONT_SHEAR						= 0x00000004,
@@ -104,25 +104,24 @@ const uint32 _VIEW_BOTTOM_				= 3UL;
 const uint32 _VIEW_RIGHT_				= 4UL;
 const uint32 _VIEW_CENTER_				= 5UL;
 
-inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
-	{ return ((r1 << 12) | (r2 << 8) | (r3 << 4) | r4); }
+#define _rule_(r1, r2, r3, r4) (((r1) << 12) | ((r2) << 8) | ((r3) << 4) | (r4))
 
-#define B_FOLLOW_NONE 0
-#define B_FOLLOW_ALL_SIDES	_rule_(_VIEW_TOP_, _VIEW_LEFT_, _VIEW_BOTTOM_, \
-								_VIEW_RIGHT_)
-#define B_FOLLOW_ALL		B_FOLLOW_ALL_SIDES
+const uint32 B_FOLLOW_NONE 			= 0;
+const uint32 B_FOLLOW_ALL_SIDES		= _rule_(_VIEW_TOP_, _VIEW_LEFT_,
+										_VIEW_BOTTOM_, _VIEW_RIGHT_);
+const uint32 B_FOLLOW_ALL			= B_FOLLOW_ALL_SIDES;
 
-#define B_FOLLOW_LEFT		_rule_(0, _VIEW_LEFT_, 0, _VIEW_LEFT_)
-#define B_FOLLOW_RIGHT		_rule_(0, _VIEW_RIGHT_, 0, _VIEW_RIGHT_)
-#define B_FOLLOW_LEFT_RIGHT	_rule_(0, _VIEW_LEFT_, 0, _VIEW_RIGHT_)
-#define B_FOLLOW_H_CENTER	_rule_(0, _VIEW_CENTER_, 0, _VIEW_CENTER_)
+const uint32 B_FOLLOW_LEFT			= _rule_(0, _VIEW_LEFT_, 0, _VIEW_LEFT_);
+const uint32 B_FOLLOW_RIGHT			= _rule_(0, _VIEW_RIGHT_, 0, _VIEW_RIGHT_);
+const uint32 B_FOLLOW_LEFT_RIGHT	= _rule_(0, _VIEW_LEFT_, 0, _VIEW_RIGHT_);
+const uint32 B_FOLLOW_H_CENTER		= _rule_(0, _VIEW_CENTER_, 0, _VIEW_CENTER_);
 
-#define B_FOLLOW_TOP		_rule_(_VIEW_TOP_, 0, _VIEW_TOP_, 0)
-#define B_FOLLOW_BOTTOM		_rule_(_VIEW_BOTTOM_, 0, _VIEW_BOTTOM_, 0)
-#define B_FOLLOW_TOP_BOTTOM	_rule_(_VIEW_TOP_, 0, _VIEW_BOTTOM_, 0)
-#define B_FOLLOW_V_CENTER	_rule_(_VIEW_CENTER_, 0, _VIEW_CENTER_, 0)
+const uint32 B_FOLLOW_TOP			= _rule_(_VIEW_TOP_, 0, _VIEW_TOP_, 0);
+const uint32 B_FOLLOW_BOTTOM		= _rule_(_VIEW_BOTTOM_, 0, _VIEW_BOTTOM_, 0);
+const uint32 B_FOLLOW_TOP_BOTTOM	= _rule_(_VIEW_TOP_, 0, _VIEW_BOTTOM_, 0);
+const uint32 B_FOLLOW_V_CENTER		= _rule_(_VIEW_CENTER_, 0, _VIEW_CENTER_, 0);
 
-#define B_FOLLOW_LEFT_TOP	B_FOLLOW_TOP | B_FOLLOW_LEFT
+const uint32 B_FOLLOW_LEFT_TOP		= B_FOLLOW_TOP | B_FOLLOW_LEFT;
 
 class BBitmap;
 class BCursor;

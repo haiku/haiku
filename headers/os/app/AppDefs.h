@@ -25,7 +25,7 @@ extern const BCursor *B_CURSOR_I_BEAM;
 
 
 // System Message Codes
-enum {
+enum system_message_code {
 	B_ABOUT_REQUESTED			= '_ABR',
 	B_WINDOW_ACTIVATED			= '_ACT',
 	B_APP_ACTIVATED				= '_ACT',	// Same as B_WINDOW_ACTIVATED
@@ -93,7 +93,7 @@ enum {
 
 
 // Other Commands
-enum {
+enum command_code {
 	B_SET_PROPERTY				= 'PSET',
 	B_GET_PROPERTY				= 'PGET',
 	B_CREATE_PROPERTY			= 'PCRT',

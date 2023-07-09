@@ -10,7 +10,7 @@
 #include <Picture.h>
 
 
-enum {
+enum picture_button_behavior {
 	B_ONE_STATE_BUTTON,
 	B_TWO_STATE_BUTTON
 };
