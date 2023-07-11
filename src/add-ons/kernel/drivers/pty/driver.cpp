@@ -329,6 +329,12 @@ pty_close(void *_cookie)
 
 	MutexLocker globalLocker(gGlobalTTYLock);
 
+	if (cookie->tty->is_master) {
+		// close all connected slave cookies first
+		while (tty_cookie *slave = cookie->other_tty->cookies.Head())
+			gTTYModule->tty_close_cookie(slave);
+	}
+
 	gTTYModule->tty_close_cookie(cookie);
 
 	return B_OK;
