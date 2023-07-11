@@ -129,7 +129,7 @@ TransformShapesBox::ObjectChanged(const Observable* object)
 
 // MakeCommand
 TransformCommand*
-TransformShapesBox::MakeCommand(const char* commandName, uint32 nameIndex)
+TransformShapesBox::MakeCommand(const char* commandName)
 {
 	Transformable* objects[fCount];
 	for (int32 i = 0; i < fCount; i++)
@@ -143,7 +143,6 @@ TransformShapesBox::MakeCommand(const char* commandName, uint32 nameIndex)
 									   LocalXScale(),
 									   LocalYScale(),
 
-									   commandName,
-									   nameIndex);
+									   commandName);
 }
 

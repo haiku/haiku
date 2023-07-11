@@ -117,8 +117,7 @@ TransformPointsBox::Update(bool deep)
 
 // MakeCommand
 TransformCommand*
-TransformPointsBox::MakeCommand(const char* commandName,
-								uint32 nameIndex)
+TransformPointsBox::MakeCommand(const char* commandName)
 {
 	return new TransformPointsCommand(this, fPath,
 
@@ -132,8 +131,7 @@ TransformPointsBox::MakeCommand(const char* commandName,
 									  LocalXScale(),
 									  LocalYScale(),
 
-									  commandName,
-									  nameIndex);
+									  commandName);
 }
 
 // #pragma mark -

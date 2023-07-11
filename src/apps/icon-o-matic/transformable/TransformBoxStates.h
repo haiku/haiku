@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #ifndef TRANSFORM_BOX_STATES_H
@@ -16,15 +17,6 @@
 class BView;
 class TransformBox;
 
-// TODO: remove and replace with translation string indices once multiple
-// languages are supported
-#define TRANSFORMATION 0
-#define ROTATE 0
-#define MOVE 0
-#define SCALE 0
-#define MOVE_PIVOT 0
-// 
-
 // base class
 class DragState {
  public:
@@ -36,11 +28,9 @@ class DragState {
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const = 0;
 
 	virtual	const char*			ActionName() const;
-	virtual	uint32				ActionNameIndex() const;
 
  protected:
-			void				_SetViewCursor(BView* view,
-											   const uchar* cursorData) const;
+			void				_SetViewCursor(BView* view, const uchar* cursorData) const;
 
 			BPoint				fOrigin;
 			TransformBox*		fParent;
@@ -55,8 +45,7 @@ class DragCornerState : public DragState {
 		LEFT_BOTTOM_CORNER,
 		RIGHT_BOTTOM_CORNER,
 	};
-								DragCornerState(TransformBox* parent,
-												uint32 corner);
+								DragCornerState(TransformBox* parent, uint32 corner);
 	virtual						~DragCornerState() {}
 
 	virtual	void				SetOrigin(BPoint origin);
@@ -64,7 +53,6 @@ class DragCornerState : public DragState {
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const;
 
 	virtual	const char*			ActionName() const;
-	virtual	uint32				ActionNameIndex() const;
 
  private:
 			uint32				fCorner;
@@ -87,8 +75,7 @@ class DragSideState : public DragState {
 		RIGHT_SIDE,
 		BOTTOM_SIDE,
 	};
-								DragSideState(TransformBox* parent,
-											  uint32 side);
+								DragSideState(TransformBox* parent, uint32 side);
 	virtual						~DragSideState() {}
 
 	virtual	void				SetOrigin(BPoint origin);
@@ -96,7 +83,6 @@ class DragSideState : public DragState {
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const;
 
 	virtual	const char*			ActionName() const;
-	virtual	uint32				ActionNameIndex() const;
 
  private:
 			uint32				fSide;
@@ -121,7 +107,6 @@ class DragBoxState : public DragState {
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const;
 
 	virtual	const char*			ActionName() const;
-	virtual	uint32				ActionNameIndex() const;
 
  private:
 			BPoint				fOldTranslation;
@@ -138,7 +123,6 @@ class RotateBoxState : public DragState {
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const;
 
 	virtual	const char*			ActionName() const;
-	virtual	uint32				ActionNameIndex() const;
 
  private:
 			double				fOldAngle;
@@ -156,8 +140,6 @@ class OffsetCenterState : public DragState {
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const;
 
 	virtual	const char*			ActionName() const;
-	virtual	uint32				ActionNameIndex() const;
-
 };
 
 #endif // TRANSFORM_BOX_STATES_H

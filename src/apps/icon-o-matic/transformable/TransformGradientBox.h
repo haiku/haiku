@@ -42,8 +42,7 @@ class TransformGradientBox : public TransformBox {
 	virtual	float					ZoomLevel() const;
 	virtual	double					ViewSpaceRotation() const;
 
-	virtual	TransformCommand*		MakeCommand(const char* actionName,
-												uint32 nameIndex);
+	virtual	TransformCommand*		MakeCommand(const char* actionName);
 
 	// TransformGradientBox
 			Command*				Perform();

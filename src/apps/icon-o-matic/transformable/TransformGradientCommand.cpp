@@ -17,10 +17,9 @@ using std::nothrow;
 
 TransformGradientCommand::TransformGradientCommand(TransformBox* box,
 		Gradient* gradient, BPoint pivot, BPoint translation, double rotation,
-		double xScale, double yScale, const char* name, int32 nameIndex)
+		double xScale, double yScale, const char* name)
 	:
-	TransformCommand(pivot, translation, rotation, xScale, yScale, name,
-		nameIndex),
+	TransformCommand(pivot, translation, rotation, xScale, yScale, name),
 	fTransformBox(box),
 	fGradient(gradient)
 {

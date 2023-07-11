@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku.
+ * Copyright 2006-2009, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "TransformBoxStates.h"
@@ -27,7 +28,6 @@
 #define B_TRANSLATION_CONTEXT "Icon-O-Matic-TransformationBoxStates"
 
 
-// constructor
 DragState::DragState(TransformBox* parent)
 	:
 	fOrigin(0.0, 0.0),
@@ -36,7 +36,6 @@ DragState::DragState(TransformBox* parent)
 }
 
 
-// SetOrigin
 void
 DragState::SetOrigin(BPoint origin)
 {
@@ -44,7 +43,6 @@ DragState::SetOrigin(BPoint origin)
 }
 
 
-// ActionName
 const char*
 DragState::ActionName() const
 {
@@ -52,15 +50,6 @@ DragState::ActionName() const
 }
 
 
-// ActionNameIndex
-uint32
-DragState::ActionNameIndex() const
-{
-	return TRANSFORMATION;
-}
-
-
-// _SetViewCursor
 void
 DragState::_SetViewCursor(BView* view, const uchar* cursorData) const
 {
@@ -72,7 +61,6 @@ DragState::_SetViewCursor(BView* view, const uchar* cursorData) const
 // #pragma mark - DragCornerState
 
 
-// constructor
 DragCornerState::DragCornerState(TransformBox* parent, uint32 corner)
 	:
 	DragState(parent),
@@ -81,7 +69,6 @@ DragCornerState::DragCornerState(TransformBox* parent, uint32 corner)
 }
 
 
-// SetOrigin
 void
 DragCornerState::SetOrigin(BPoint origin)
 {
@@ -93,8 +80,7 @@ DragCornerState::SetOrigin(BPoint origin)
 	// copy the matrix at the start of the drag procedure
 	fMatrix.reset();
 	fMatrix.multiply(agg::trans_affine_scaling(fOldXScale, fOldYScale));
-	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation()
-		* M_PI / 180.0));
+	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation() * M_PI / 180.0));
 	fMatrix.multiply(agg::trans_affine_translation(fParent->Translation().x,
 		fParent->Translation().y));
 
@@ -143,7 +129,6 @@ DragCornerState::SetOrigin(BPoint origin)
 }
 
 
-// DragTo
 void
 DragCornerState::DragTo(BPoint current, uint32 modifiers)
 {
@@ -182,12 +167,10 @@ DragCornerState::DragTo(BPoint current, uint32 modifiers)
 	translation.x = x;
 	translation.y = y;
 
-	fParent->SetTranslationAndScale(translation, xScale * fOldXScale,
-		yScale * fOldYScale);
+	fParent->SetTranslationAndScale(translation, xScale * fOldXScale, yScale * fOldYScale);
 }
 
 
-// UpdateViewCursor
 void
 DragCornerState::UpdateViewCursor(BView* view, BPoint current) const
 {
@@ -290,19 +273,10 @@ DragCornerState::UpdateViewCursor(BView* view, BPoint current) const
 }
 
 
-// ActionName
 const char*
 DragCornerState::ActionName() const
 {
 	return B_TRANSLATE("Scale");
-}
-
-
-// ActionNameIndex
-uint32
-DragCornerState::ActionNameIndex() const
-{
-	return SCALE;
 }
 
 
@@ -317,7 +291,6 @@ DragSideState::DragSideState(TransformBox* parent, uint32 side)
 }
 
 
-// SetOrigin
 void
 DragSideState::SetOrigin(BPoint origin)
 {
@@ -329,8 +302,7 @@ DragSideState::SetOrigin(BPoint origin)
 	// copy the matrix at the start of the drag procedure
 	fMatrix.reset();
 	fMatrix.multiply(agg::trans_affine_scaling(fOldXScale, fOldYScale));
-	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation()
-		* M_PI / 180.0));
+	fMatrix.multiply(agg::trans_affine_rotation(fParent->LocalRotation() * M_PI / 180.0));
 	fMatrix.multiply(agg::trans_affine_translation(fParent->Translation().x,
 		fParent->Translation().y));
 
@@ -367,7 +339,6 @@ DragSideState::SetOrigin(BPoint origin)
 }
 
 
-// DragTo
 void
 DragSideState::DragTo(BPoint current, uint32 modifiers)
 {
@@ -400,12 +371,10 @@ DragSideState::DragTo(BPoint current, uint32 modifiers)
 	translation.x = x;
 	translation.y = y;
 
-	fParent->SetTranslationAndScale(translation, xScale * fOldXScale,
-		yScale * fOldYScale);
+	fParent->SetTranslationAndScale(translation, xScale * fOldXScale, yScale * fOldYScale);
 }
 
 
-// UpdateViewCursor
 void
 DragSideState::UpdateViewCursor(BView* view, BPoint current) const
 {
@@ -458,7 +427,6 @@ DragSideState::UpdateViewCursor(BView* view, BPoint current) const
 }
 
 
-// ActionName
 const char*
 DragSideState::ActionName() const
 {
@@ -466,18 +434,9 @@ DragSideState::ActionName() const
 }
 
 
-// ActionNameIndex
-uint32
-DragSideState::ActionNameIndex() const
-{
-	return SCALE;
-}
-
-
 // #pragma mark - DragBoxState
 
 
-// SetOrigin
 void
 DragBoxState::SetOrigin(BPoint origin)
 {
@@ -486,7 +445,6 @@ DragBoxState::SetOrigin(BPoint origin)
 }
 
 
-// DragTo
 void
 DragBoxState::DragTo(BPoint current, uint32 modifiers)
 {
@@ -502,7 +460,6 @@ DragBoxState::DragTo(BPoint current, uint32 modifiers)
 }
 
 
-// UpdateViewCursor
 void
 DragBoxState::UpdateViewCursor(BView* view, BPoint current) const
 {
@@ -510,7 +467,6 @@ DragBoxState::UpdateViewCursor(BView* view, BPoint current) const
 }
 
 
-// ActionName
 const char*
 DragBoxState::ActionName() const
 {
@@ -518,18 +474,9 @@ DragBoxState::ActionName() const
 }
 
 
-// ActionNameIndex
-uint32
-DragBoxState::ActionNameIndex() const
-{
-	return MOVE;
-}
-
-
 // #pragma mark - RotateBoxState
 
 
-// constructor
 RotateBoxState::RotateBoxState(TransformBox* parent)
 	:
 	DragState(parent),
@@ -538,7 +485,6 @@ RotateBoxState::RotateBoxState(TransformBox* parent)
 }
 
 
-// SetOrigin
 void
 RotateBoxState::SetOrigin(BPoint origin)
 {
@@ -547,7 +493,6 @@ RotateBoxState::SetOrigin(BPoint origin)
 }
 
 
-// DragTo
 void
 RotateBoxState::DragTo(BPoint current, uint32 modifiers)
 {
@@ -567,7 +512,6 @@ RotateBoxState::DragTo(BPoint current, uint32 modifiers)
 }
 
 
-// UpdateViewCursor
 void
 RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
 {
@@ -599,7 +543,6 @@ RotateBoxState::UpdateViewCursor(BView* view, BPoint current) const
 }
 
 
-// ActionName
 const char*
 RotateBoxState::ActionName() const
 {
@@ -607,18 +550,9 @@ RotateBoxState::ActionName() const
 }
 
 
-// ActionNameIndex
-uint32
-RotateBoxState::ActionNameIndex() const
-{
-	return ROTATE;
-}
-
-
 // #pragma mark - OffsetCenterState
 
 
-// SetOrigin
 void
 OffsetCenterState::SetOrigin(BPoint origin)
 {
@@ -627,7 +561,6 @@ OffsetCenterState::SetOrigin(BPoint origin)
 }
 
 
-// DragTo
 void
 OffsetCenterState::DragTo(BPoint current, uint32 modifiers)
 {
@@ -637,7 +570,6 @@ OffsetCenterState::DragTo(BPoint current, uint32 modifiers)
 }
 
 
-// UpdateViewCursor
 void
 OffsetCenterState::UpdateViewCursor(BView* view, BPoint current) const
 {
@@ -645,17 +577,8 @@ OffsetCenterState::UpdateViewCursor(BView* view, BPoint current) const
 }
 
 
-// ActionName
 const char*
 OffsetCenterState::ActionName() const
 {
 	return B_TRANSLATE("Move Pivot");
-}
-
-
-// ActionNameIndex
-uint32
-OffsetCenterState::ActionNameIndex() const
-{
-	return MOVE_PIVOT;
 }

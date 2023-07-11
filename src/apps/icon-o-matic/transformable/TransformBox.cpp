@@ -160,8 +160,7 @@ TransformBox::MouseDown(BPoint where)
 		fCurrentState->SetOrigin(where);
 
 		delete fCurrentCommand;
-		fCurrentCommand = MakeCommand(fCurrentState->ActionName(),
-			fCurrentState->ActionNameIndex());
+		fCurrentCommand = MakeCommand(fCurrentState->ActionName());
 	}
 
 	return true;
@@ -302,7 +301,7 @@ TransformBox::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 		return false;
 
 	if (!fCurrentCommand) {
-		fCurrentCommand = MakeCommand("Translate", -1);
+		fCurrentCommand = MakeCommand("Translate");
 	}
 
 	TranslateBy(translation);
@@ -431,7 +430,7 @@ void
 TransformBox::NudgeBy(BPoint offset)
 {
 	if (!fNudging && !fCurrentCommand) {
-		fCurrentCommand = MakeCommand("Move", 0/*MOVE*/);
+		fCurrentCommand = MakeCommand("Move");
 		fNudging = true;
 	}
 	if (fNudging) {

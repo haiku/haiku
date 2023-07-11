@@ -32,9 +32,6 @@ class Command {
 	virtual	bool				CombineWithPrevious(const Command* previous);
 
  protected:
-			const char*			_GetString(uint32 key,
-										   const char* defaultString) const;
-
 			bigtime_t			fTimeStamp;
 };
 

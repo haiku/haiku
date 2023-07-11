@@ -92,5 +92,5 @@ CompoundCommand::Redo()
 void
 CompoundCommand::GetName(BString& name)
 {
-	name << _GetString(fNameIndex, fName.String());
+	name << fName.String();
 }

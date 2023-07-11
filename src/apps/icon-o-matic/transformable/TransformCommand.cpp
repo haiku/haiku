@@ -16,8 +16,7 @@ TransformCommand::TransformCommand(BPoint pivot,
 								   double rotation,
 								   double xScale,
 								   double yScale,
-								   const char* actionName,
-								   uint32 nameIndex)
+								   const char* actionName)
 	: Command(),
 	  fOldPivot(pivot),
 	  fOldTranslation(translation),
@@ -31,14 +30,12 @@ TransformCommand::TransformCommand(BPoint pivot,
 	  fNewXScale(xScale),
 	  fNewYScale(yScale),
 
-	  fName(actionName),
-	  fNameIndex(nameIndex)
+	  fName(actionName)
 {
 }
 
 // constructor
-TransformCommand::TransformCommand(const char* actionName,
-								   uint32 nameIndex)
+TransformCommand::TransformCommand(const char* actionName)
 	: Command(),
 	  fOldPivot(B_ORIGIN),
 	  fOldTranslation(B_ORIGIN),
@@ -52,8 +49,7 @@ TransformCommand::TransformCommand(const char* actionName,
 	  fNewXScale(1.0),
 	  fNewYScale(1.0),
 
-	  fName(actionName),
-	  fNameIndex(nameIndex)
+	  fName(actionName)
 {
 }
 
@@ -112,7 +108,7 @@ TransformCommand::Redo()
 void
 TransformCommand::GetName(BString& name)
 {
-	name << _GetString(fNameIndex, fName.String());
+	name << fName.String();
 }
 
 // SetNewTransformation
@@ -140,9 +136,7 @@ TransformCommand::SetNewTranslation(BPoint translation)
 
 // SetName
 void
-TransformCommand::SetName(const char* actionName, uint32 nameIndex)
+TransformCommand::SetName(const char* actionName)
 {
 	fName.SetTo(actionName);
-	fNameIndex = nameIndex;
 }
-

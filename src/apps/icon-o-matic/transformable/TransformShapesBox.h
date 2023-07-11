@@ -33,8 +33,7 @@ class TransformShapesBox : public CanvasTransformBox {
 	// TransformBox interface
 	virtual	void				Update(bool deep = true);
 
-	virtual	TransformCommand*	MakeCommand(const char* actionName,
-											uint32 nameIndex);
+	virtual	TransformCommand*	MakeCommand(const char* actionName);
 
 	// TransformShapesBox
 			Shape**				Shapes() const

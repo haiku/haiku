@@ -178,10 +178,10 @@ TransformGradientBox::ViewSpaceRotation() const
 
 // MakeCommand
 TransformCommand*
-TransformGradientBox::MakeCommand(const char* commandName, uint32 nameIndex)
+TransformGradientBox::MakeCommand(const char* commandName)
 {
 	return new TransformGradientCommand(this, fGradient, Pivot(),
 	   Translation(), LocalRotation(), LocalXScale(), LocalYScale(),
-	   commandName, nameIndex);
+	   commandName);
 }
 

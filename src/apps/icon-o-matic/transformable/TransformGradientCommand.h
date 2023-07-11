@@ -25,8 +25,7 @@ public:
 									TransformBox* box, Gradient* gradient,
 									BPoint pivot, BPoint translation,
 									double rotation, double xScale,
-									double yScale, const char* name,
-									int32 nameIndex);
+									double yScale, const char* name);
 	virtual						~TransformGradientCommand();
 
 	// Command interface

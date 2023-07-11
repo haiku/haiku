@@ -40,8 +40,7 @@ class TransformPointsCommand : public TransformCommand,
 										double xScale,
 										double yScale,
 
-										const char* name,
-										int32 nameIndex);
+										const char* name);
 	virtual						~TransformPointsCommand();
 
 	// Command interface

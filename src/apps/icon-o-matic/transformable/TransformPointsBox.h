@@ -40,8 +40,7 @@ class TransformPointsBox : public CanvasTransformBox {
 	// TransformBox interface
 	virtual	void				Update(bool deep = true);
 
-	virtual	TransformCommand*	MakeCommand(const char* commandName,
-											uint32 nameIndex);
+	virtual	TransformCommand*	MakeCommand(const char* commandName);
 
 	// TransformPointsBox
 			void				Cancel();

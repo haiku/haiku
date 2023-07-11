@@ -80,8 +80,7 @@ class TransformBox : public ChannelTransform,
 	virtual	float				ZoomLevel() const;
 
 
-	virtual	TransformCommand*	MakeCommand(const char* actionName,
-											uint32 nameIndex) = 0;
+	virtual	TransformCommand*	MakeCommand(const char* actionName) = 0;
 
 			bool				IsRotating() const
 									{ return fCurrentState == fRotateState; }

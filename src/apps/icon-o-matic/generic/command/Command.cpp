@@ -78,14 +78,3 @@ Command::CombineWithPrevious(const Command* previous)
 {
 	return false;
 }
-
-
-// _GetString
-const char*
-Command::_GetString(uint32 key, const char* defaultString) const
-{
-//	if (LanguageManager* manager = LanguageManager::Default())
-//		return manager->GetString(key, defaultString);
-//	else
-		return defaultString;
-}

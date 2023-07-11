@@ -28,15 +28,13 @@ TransformObjectsCommand::TransformObjectsCommand(
 								double xScale,
 								double yScale,
 
-								const char* name,
-								int32 nameIndex)
+								const char* name)
 	: TransformCommand(pivot,
 					   translation,
 					   rotation,
 					   xScale,
 					   yScale,
-					   name,
-					   nameIndex),
+					   name),
 	  fTransformBox(box),
 	  fObjects(objects && count > 0 ?
 	  		   new (nothrow) Transformable*[count] : NULL),

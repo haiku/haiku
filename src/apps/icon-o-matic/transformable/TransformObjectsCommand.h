@@ -36,8 +36,7 @@ class TransformObjectsCommand : public TransformCommand,
 										double xScale,
 										double yScale,
 
-										const char* name,
-										int32 nameIndex);
+										const char* name);
 	virtual						~TransformObjectsCommand();
 
 	// Command interface

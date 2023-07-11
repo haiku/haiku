@@ -22,11 +22,9 @@ class TransformCommand : public Command {
 												 double xScale,
 												 double yScale,
 
-												 const char* actionName,
-												 uint32 nameIndex);
+												 const char* actionName);
 
-								TransformCommand(const char* actionName,
-												 uint32 nameIndex);
+								TransformCommand(const char* actionName);
 
 	virtual						~TransformCommand();
 
@@ -49,8 +47,7 @@ class TransformCommand : public Command {
 			void				SetNewTranslation(BPoint translation);
 				// convinience for "nudging"
 
-			void				SetName(const char* actionName,
-										uint32 nameIndex);
+			void				SetName(const char* actionName);
 
  protected:
 	virtual	status_t			_SetTransformation(BPoint pivot,
@@ -72,7 +69,6 @@ class TransformCommand : public Command {
 			double				fNewYScale;
 
 			BString				fName;
-			uint32				fNameIndex;
 };
 
 #endif // TRANSFORM_COMMAND_H
