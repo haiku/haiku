@@ -1381,6 +1381,8 @@ void
 tty_destroy(struct tty* tty)
 {
 	TRACE(("tty_destroy(%p)\n", tty));
+	ASSERT(tty->ref_count == 0);
+
 	uninit_line_buffer(tty->input_buffer);
 	delete_select_sync_pool(tty->select_pool);
 	if (tty->is_master) {
@@ -1756,6 +1758,10 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			tty->settings->session_id = sessionID;
 			tty->settings->pgrp_id = sessionID;
 			team_set_controlling_tty(tty);
+
+			// NOTE: We do not acquire a reference to the TTY for the team, so
+			// consumers of team_get_controlling_tty() must check the TTY is still
+			// valid before actually using it!
 			return B_OK;
 		}
 
