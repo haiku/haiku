@@ -212,7 +212,7 @@ master_open(const char *name, uint32 flags, void **_cookie)
 
 	if (findUnusedTTY) {
 		for (index = 0; index < (int32)kNumTTYs; index++) {
-			if (gMasterTTYs[index] == NULL || gMasterTTYs[index]->ref_count == 0)
+			if (gMasterTTYs[index] == NULL)
 				break;
 		}
 		if (index >= (int32)kNumTTYs)
@@ -346,8 +346,25 @@ pty_free_cookie(void *_cookie)
 {
 	// The TTY is already closed. We only have to free the cookie.
 	tty_cookie *cookie = (tty_cookie *)_cookie;
+	struct tty *tty = cookie->tty;
+
+	MutexLocker globalLocker(gGlobalTTYLock);
 
 	gTTYModule->tty_destroy_cookie(cookie);
+
+	if (tty->ref_count == 0) {
+		// We need to destroy both master and slave TTYs at the same time,
+		// and in the proper order.
+		int32 index = get_tty_index(tty);
+		if (index < 0)
+			return B_OK;
+
+		if (gMasterTTYs[index]->ref_count == 0 && gSlaveTTYs[index]->ref_count == 0) {
+			gTTYModule->tty_destroy(gSlaveTTYs[index]);
+			gTTYModule->tty_destroy(gMasterTTYs[index]);
+			gMasterTTYs[index] = gSlaveTTYs[index] = NULL;
+		}
+	}
 
 	return B_OK;
 }
