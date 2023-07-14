@@ -8,6 +8,8 @@ SubDirSysHdrs $(SUBDIR) $(DOTDOT) hid_shared ;
 UsePrivateHeaders [ FDirName kernel util ] input drivers device i2c ;
 UsePrivateKernelHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ] ;
+
 KernelAddon i2c_elan :
 	DeviceList.cpp
 	Driver.cpp
