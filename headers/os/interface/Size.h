@@ -10,17 +10,15 @@
 #include <SupportDefs.h>
 
 
-enum {
-	B_SIZE_UNSET		= -2,
-	B_SIZE_UNLIMITED	= 1024 * 1024 * 1024,
-};
+const float B_SIZE_UNSET		= -2;
+const float B_SIZE_UNLIMITED	= 1024 * 1024 * 1024;
 
 
 class BSize {
 public:
 			float				width;
 			float				height;
-	
+
 	inline						BSize();
 	inline						BSize(const BSize& other);
 	inline						BSize(float width, float height);
