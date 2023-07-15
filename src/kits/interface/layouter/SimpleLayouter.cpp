@@ -44,23 +44,23 @@ public:
 	ElementInfo()
 		: index(0),
 		  min(0),
-		  max(B_SIZE_UNLIMITED),
+		  max((int32)B_SIZE_UNLIMITED),
 		  preferred(0),
 		  weight(1),
 		  tempWeight(0)
-	{		
+	{
 	}
-	
+
 	ElementInfo(int index)
 		: index(index),
 		  min(0),
-		  max(B_SIZE_UNLIMITED),
+		  max((int32)B_SIZE_UNLIMITED),
 		  preferred(0),
 		  weight(1),
 		  tempWeight(0)
-	{		
+	{
 	}
-	
+
 	void Assign(const ElementInfo& info)
 	{
 		min = info.min;
@@ -89,7 +89,7 @@ public:
 	{
 		delete[] fElements;
 	}
-	
+
 	virtual float ElementLocation(int32 element)
 	{
 		if (element < 0 || element >= fElementCount) {
@@ -117,7 +117,7 @@ SimpleLayouter::SimpleLayouter(int32 elementCount, float spacing)
 	: fElementCount(elementCount),
 	  fSpacing((int32)spacing),
 	  fMin(0),
-	  fMax(B_SIZE_UNLIMITED),
+	  fMax((int32)B_SIZE_UNLIMITED),
 	  fPreferred(0),
 	  fMinMaxValid(false),
 	  fLayoutInfo(NULL)
@@ -150,7 +150,7 @@ SimpleLayouter::AddConstraints(int32 element, int32 length,
 	int32 min = (int32)_min + 1;
 	int32 max = (int32)_max + 1;
 //	int32 preferred = (int32)_preferred + 1;
-	
+
 	ElementInfo& info = fElements[element];
 	info.min = max_c(info.min, min);
 	info.max = min_c(info.max, max);
@@ -209,7 +209,7 @@ SimpleLayouter::Layout(LayoutInfo* layoutInfo, float _size)
 	int32 size = int32(_size + 1);
 
 	fLayoutInfo = (MyLayoutInfo*)layoutInfo;
-	
+
 	_ValidateMinMax();
 
 	if (fElementCount == 0)
@@ -284,7 +284,7 @@ SimpleLayouter::_CalculateSumWeight(BList& elementInfos)
 	if (elementInfos.IsEmpty())
 		return 0;
 	int32 count = elementInfos.CountItems();
-	
+
 	// sum up the floating point weight, so we get a scale
 	double scale = 0;
 	for (int32 i = 0; i < count; i++) {
@@ -316,11 +316,11 @@ SimpleLayouter::_CalculateSumWeight(BList& elementInfos)
 			weight += info->tempWeight;
 		}
 	}
-	
+
 	return weight;
 }
 
-// _ValidateMinMax	
+// _ValidateMinMax
 void
 SimpleLayouter::_ValidateMinMax()
 {
@@ -331,11 +331,11 @@ SimpleLayouter::_ValidateMinMax()
 
 	if (fElementCount == 0) {
 		fMin = 0;
-		fMax = B_SIZE_UNLIMITED;
+		fMax = (int32)B_SIZE_UNLIMITED;
 		fPreferred = 0;
 		return;
 	}
-	
+
 	int spacing = (fElementCount - 1) * fSpacing;
 	fMin = spacing;
 	fMax = spacing;

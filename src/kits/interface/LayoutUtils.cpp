@@ -43,8 +43,8 @@
 int32
 BLayoutUtils::AddSizesInt32(int32 a, int32 b)
 {
-	if (a >= B_SIZE_UNLIMITED - b)
-		return B_SIZE_UNLIMITED;
+	if (a >= (int32)B_SIZE_UNLIMITED - b)
+		return (int32)B_SIZE_UNLIMITED;
 	return a + b;
 }
 
