@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Be-MAIL	16344670
+1	esperanto	x-vnd.Be-MAIL	4073987023
 Set to Saved	Mail		Atribui al Konservita
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Via ĉefa teksto enhavas %ld da nedekodeblaj signoj. Verŝajne alia signaro pli taŭgus? Premu "Sendi" por sendi ĝin malgraŭe (nedekodeblaj signoj estos anstataŭigitaj), aŭ elektu "Rezigni" por provi korekti ilin.
 Text wrapping:	Mail		Teksta ĉirkaŭfluo:
@@ -37,10 +37,7 @@ Same recipient	Mail		Sama ricevonto
 Previous message	Mail		Antaŭa mesaĝo
 (Address unavailable)	Mail		(Adreso estas nedisponebla)
 Mail	System name		Poŝto
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Kunsendaĵo: %name% (Speco: %type%)
 Copy link location	Mail		Kopii ligilan lokon
-Attachments: 	Mail		Kunsendaĵoj: 
-Remove enclosure	Mail		Forigi kunsendaĵon
 Next	Mail		Sekva
 Show icons only	Mail		Montri nur bildsimbolojn
 Subject:	Mail		Temo:
@@ -164,4 +161,3 @@ Couldn't open this signature. Sorry.	Mail		Ne sukcesis uzi ĉi tiun subskribon. 
 Revert	Mail		Malfari
 Unknown	Mail		Nekonata
 Increase quote level	Mail		Pliigi nivelon de citiloj
-Add enclosure…	Mail		Aldoni kunsendaĵon…

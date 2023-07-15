@@ -1,6 +1,6 @@
 1	danish	x-vnd.Haiku-GIFTranslator	2201651797
 Websafe	GIFView		Websikker
-Write interlaced images	GIFView		Skriv interlaced billeder
+Write interlaced images	GIFView		Skriv sammenflettede billeder
 Optimal	GIFView		Optimal
 Greyscale	GIFView		Gråtone
 Colors:	GIFView		Farver:
@@ -13,7 +13,7 @@ Write transparent images	GIFView		Skriv gennemsigtige billeder
 GIF images	GIFTranslator		GIF-billeder
 Version %d.%d.%d, %s	GIFView		Version %d.%d.%d, %s
 Use RGB color	GIFView		Brug RGB-farve
-Use dithering	GIFView		Brug dithering
+Use dithering	GIFView		Brug farvesimulering
 GIF Settings	GIFTranslator		GIF-indstillinger
 BeOS system	GIFView		BeOS-system
-Automatic (from alpha channel)	GIFView		Automatisk (fra alphakanal)
+Automatic (from alpha channel)	GIFView		Automatisk (fra alfakanal)

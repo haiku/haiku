@@ -14,7 +14,7 @@ Media output	InfoView		Medieuddata
 Active lines	InfoView		Aktive linjer
 Buffer size	InfoView		Bufferstørrelse
 \n- Quality:	FileNodeInfoView		\n- Kvalitet:
-Kinds	LiveNodeInfoView		Slags
+Kinds	LiveNodeInfoView		Typer
 Application	AppNodeInfoView		Program
 Flavor flags	DormantNodeInfoView		Smagsflag
 Max. instances	DormantNodeInfoView		Maks. instanser
@@ -42,7 +42,7 @@ Media input	InfoView		Medieinddata
 Bit rate	InfoView		Bithastighed
 Input format	DormantNodeInfoView		Inddataformat
 Format	InfoView		Format
-Version	AppNodeInfoView		Version
+Version	AppNodeInfoView		Udgave
 AddOn ID	DormantNodeInfoView		Tilføjelses-id
 Frame size	InfoView		Rammestørrelse
 Flavor ID	DormantNodeInfoView		Smags-ID

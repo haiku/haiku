@@ -1,199 +1,199 @@
 1	ukrainian	x-vnd.haiku-icon_o_matic	1015615450
-None	Icon-O-Matic-Properties		Пусто
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Зворотній напрямок точок контуру
 Add empty	Icon-O-Matic-ShapesList		Додати порожню
 Opening the icon failed!	Icon-O-Matic-Main		Збій відкриття значка!
 Add with path	Icon-O-Matic-ShapesList		Додати з контуром
-Copy	Icon-O-Matic-Properties		Копіювати
-Color	Icon-O-Matic-PropertyNames		Колір
 Format	Icon-O-Matic-SavePanel		Формат
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Перемістити форми
-Color	Icon-O-Matic-StyleTypes		Колір
 Select	Icon-O-Matic-Properties		Вибрати
+Color	Icon-O-Matic-StyleTypes		Колір
 Reset transformation	Icon-O-Matic-ShapesList		Скинути трансформацію
-Duplicate	Icon-O-Matic-StylesList		Дублікат
-Rotate	Icon-O-Matic-TransformationBoxStates		Поворот
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Прибрати контрольні точки
 Shorten	Icon-O-Matic-PropertyNames		Скоротити
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Незв'язаний контур
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Текст який ви намагаєтесь імпортувати досить довгий, продовжити?
 Paste	Icon-O-Matic-Properties		Вставити
-Detect Orient.	Icon-O-Matic-PropertyNames		Зовні/Зсередини
-Click on a shape above	Empty transformers list - 1st line		Натисніть на форму вище
-Close	Icon-O-Matic-Menu-File		Закрити
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Незв'язаний контур
 Add rect	Icon-O-Matic-PathsList		Додати прямокутник
-Rotation	Icon-O-Matic-PropertyNames		Поворот
-Multi Paste Properties	Icon-O-Matic-Properties		Мультивставка властивостей
 Bleep!	Exporter - Continue in error dialog		Bleep!
-Transform	Icon-O-Matic-PathManipulator		Трансформація
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Прибрати трансформатор
 META:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут META:ICON
-Add shape with style	Icon-O-Matic-Menu-Shape		Додати форму зі стилем
-Assign Path	Icon-O-Matic-AddPathsCmd		Прив'язати контур
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Скинути трансформацію
-Remove	Icon-O-Matic-StylesList		Прибрати
-Cancel	Icon-O-Matic-Menu-Settings		Скасувати
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Прибрати трансформатор
+Transform	Icon-O-Matic-PathManipulator		Трансформація
 Assign Style	Icon-O-Matic-AssignStyleCmd		Прив'язати стиль
-Transformation	Icon-O-Matic-TransformationBoxStates		Трансформація
-Closed	Icon-O-Matic-PropertyNames		Замкнений
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Розділити контрольну точку
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<нічого повторювати>
 Height	Icon-O-Matic-PropertyNames		Висота
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<нічого повторювати>
 Add Shape	Icon-O-Matic-AddShapesCmd		Додати форму
-warning	Icon-O-Matic-SVGExport		попередження
-File	Icon-O-Matic-Menus		Файл
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Очистити контур
 Move Style	Icon-O-Matic-MoveStylesCmd		Перемістити стиль
 Properties	Icon-O-Matic-Menus		Властивості
 Path	Icon-O-Matic-PropertyNames		Контур
 Add Control Point	Icon-O-Matic-AddPointCmd		Додати контрольну точку
-Path	Icon-O-Matic-Menus		Контур
 Stroke	Transformation		Штрих
 Flip	Icon-O-Matic-PathManipulator		Віддзеркалити
-Select All	Icon-O-Matic-PathManipulator		Вибрати все
 Opacity	Icon-O-Matic-PropertyNames		Прозорість
 OK	Icon-O-Matic-ColorPicker		ОК
-Error: 	Icon-O-Matic-Main		Помилка: 
-bad news	Icon-O-Matic-Exporter		погані новини
-Saving your document failed!	Icon-O-Matic-Exporter		Збій при збереженні документу!
-Snap to grid	Icon-O-Matic-Menu-Settings		Припасувати до сітки
 Opening the document failed!	Icon-O-Matic-Main		Збій при відкритті документу!
 Shape	Icon-O-Matic-Menus		Форма
-Add with path & style	Icon-O-Matic-ShapesList		Додати з контуром & стилем
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступно>
 Min LOD	Icon-O-Matic-PropertyNames		Miн. LOD
 Reverse Path	Icon-O-Matic-ReversePathCmd		Реверс контуру
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Перемістити трансформатори
-Add	Icon-O-Matic-TransformersList		Додати
 Paste Properties	Icon-O-Matic-Properties		Вставити властивості
-Undo	Icon-O-Matic-Main		Відкат дії
-Settings	Icon-O-Matic-Menus		Налаштування
-Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
+Add	Icon-O-Matic-TransformersList		Додати
 Add	Icon-O-Matic-PathsList		Додати
-Add Styles	Icon-O-Matic-AddStylesCmd		Додати стилі
-Remove	Icon-O-Matic-PathManipulator		Прибрати
-Duplicate	Icon-O-Matic-ShapesList		Дублікат
-Alpha	Icon-O-Matic-PropertyNames		Альфа
+Settings	Icon-O-Matic-Menus		Налаштування
 Contour	Transformation		Обрис
 Save icon	Dialog title		Зберегти значок
-Move Paths	Icon-O-Matic-MovePathsCmd		Перемістити контури
 Rounding	Icon-O-Matic-PropertyNames		Округлення
-Joins	Icon-O-Matic-PropertyNames		З'єднання
 Cancel	Icon-O-Matic-ColorPicker		Скасувати
-Duplicate	Icon-O-Matic-PathsList		Дублікат
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Прибрати форми
-Save	Icon-O-Matic-Menu-Settings		Зберегти
 Export as…	Icon-O-Matic-Menu-File		Експортувати як…
 Error: 	Icon-O-Matic-Exporter		Помилка: 
 Move Path	Icon-O-Matic-MovePathsCmd		Перемістити контур
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Прибрати контури
-Assign Paths	Icon-O-Matic-AddPathsCmd		Прив'язати контури
-Diamond	Icon-O-Matic-StyleTypes		Ромбовидний
-Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Змістити контрольну точку
-Move Styles	Icon-O-Matic-MoveStylesCmd		Перемістити стилі
-Don't save	Icon-O-Matic-Menu-Settings		Не зберігати
 Add shape with path	Icon-O-Matic-Menu-Shape		Додати форму з контуром
+Don't save	Icon-O-Matic-Menu-Settings		Не зберігати
+Move Styles	Icon-O-Matic-MoveStylesCmd		Перемістити стилі
 Translation X	Icon-O-Matic-PropertyNames		Перенести по X
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Віддзеркалити контрольні точки
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Додати трансформатори
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Атрибут BEOS:ICON
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG при завантаженні файлу. Якщо перезаписати оригінальний файл, ця інформація буде втрачена.
 Rotate indices backwards	Icon-O-Matic-PathsList		Обійти точки проти годинника
-Overwrite	Icon-O-Matic-SVGExport		Перезаписати
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG при завантаженні файлу. Якщо перезаписати оригінальний файл, ця інформація буде втрачена.
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Змінити контрольну точку
 Cancel	Icon-O-Matic-SVGExport		Скасувати
-Open…	Icon-O-Matic-Menu-File		Відкрити…
 Redo	Icon-O-Matic-Main		Повтор дії
 Change Color	Icon-O-Matic-SetColorCmd		Змінити Колір
-Remove	Icon-O-Matic-ShapesList		Прибрати
-Drop shapes	Icon-O-Matic-ShapesList		Скинути форми
-PNG Set	Icon-O-Matic-SavePanel		Комплект PNG
-to attach transformers.	Empty transformers list - 2nd line		для прив'язки трансформаторів.
 Linear	Icon-O-Matic-StyleTypes		Лінійний
 any of the other lists to	Empty property list - 2nd line		будь-якому з інших списків щоб
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Змістити контрольну точку
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Віддзеркалити контрольну точку
-Add Paths	Icon-O-Matic-AddPathsCmd		Додати контури
 Color (#%02x%02x%02x)	Style name after dropping a color		Колір (#%02x%02x%02x)
-Clean up	Icon-O-Matic-PathsList		Очистити
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Прибрати стиль
-Split	Icon-O-Matic-PathManipulator		Розділити
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Віддзеркалити контрольну точку
 Move	Icon-O-Matic-TransformationBoxStates		Перемістити
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Скинути трансформацію
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Розділити контрольні точки
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Прибрати контрольну точку
-Conic	Icon-O-Matic-StyleTypes		Конічний
 Name	Icon-O-Matic-PropertyNames		Назва
-Multi paste	Icon-O-Matic-Properties		Мультивставка
-Add Shapes	Icon-O-Matic-AddShapesCmd		Додати форму
-Reset transformation	Icon-O-Matic-StylesList		Скинути трансформацію
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Додати трансформатор
 Reverse	Icon-O-Matic-PathsList		Реверс
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Перемістити вісь
 Remove	Icon-O-Matic-PathsList		Прибрати
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Прибрати трансформатори
-Style type	Icon-O-Matic-StyleTypes		Тип стилю
-Quit	Icon-O-Matic-Menu-File		Вийти
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Прибрати стилі
-Gradient	Icon-O-Matic-StyleTypes		Градієнт
 bad news	Title of error alert		погані новини
+Gradient	Icon-O-Matic-StyleTypes		Градієнт
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Прибрати стилі
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Вставити контрольну точку
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Додати форму з контуром & стилем
-Move Shape	Icon-O-Matic-MoveShapesCommand		Перемістити форму
-Radial	Icon-O-Matic-StyleTypes		Радіальний
-Text too long	Icon-O-Matic-StyledTextImport		Текст дуже довгий
-Caps	Icon-O-Matic-PropertyNames		Кінці ліній
 OK	Icon-O-Matic-SVGImport		ОК
 Append…	Icon-O-Matic-Menu-File		Додати…
-Scale Y	Icon-O-Matic-PropertyNames		Масштаб по Y
-Export icon	Dialog title		Експортувати значок
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колір (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Змінити градієнт
 Set 	Set (property name)		Набір 
-Rotate indices forwards	Icon-O-Matic-PathsList		Обійти точки за годинником
-Click on an object in	Empty property list - 1st line		Виберіть об'єкт у
 Save	Icon-O-Matic-Menu-File		Зберегти
-No	Icon-O-Matic-StyledTextImport		Ні
-Add circle	Icon-O-Matic-PathsList		Додати коло
 Freeze transformation	Icon-O-Matic-ShapesList		Зафіксувати трансформацію
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Зафіксувати форми
 Miter Limit	Icon-O-Matic-PropertyNames		Межа вістря
-Untitled	Icon-O-Matic-Main		Неназваний
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Зафіксувати форми
 Max LOD	Icon-O-Matic-PropertyNames		Mакс. LOD
+Untitled	Icon-O-Matic-Main		Неназваний
 Add Path	Icon-O-Matic-AddPathsCmd		Додати контур
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Зберегти зміни поточного значка перед закриттям?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' як документ SVG.\n\n
 load error	Icon-O-Matic-SVGImport		помилка загрузки
-Save as…	Icon-O-Matic-Menu-File		Зберегти як…
 Swatches	Icon-O-Matic-Menus		Палітри
-<modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
 HVIF Source Code	Icon-O-Matic-SavePanel		Віхідний код HVIF
-Icon-O-Matic	System name		Icon-O-Matic
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого відмінити>
-Add	Icon-O-Matic-StylesList		Додати
+<modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
 Translation Y	Icon-O-Matic-PropertyNames		Перенести по Y
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Зафіксувати форму
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Прибрати форму
-All	Icon-O-Matic-Properties		Всі
 Transformer	Icon-O-Matic-Menus		Трансформатор
-Invert selection	Icon-O-Matic-Properties		Інвертувати виділення
-<unkown property>	Icon-O-Matic-PropertyNames		<невідома властивість>
-Pick a color	Icon-O-Matic-ColorPicker		Вибрати колір
 Multi Set 	Multi Set (property name)		Множина 
-Settings…	Icon-O-Matic-SavePanel		Налаштування…
-Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
+Pick a color	Icon-O-Matic-ColorPicker		Вибрати колір
 New	Icon-O-Matic-Menu-File		Новий
 Yes	Icon-O-Matic-StyledTextImport		Так
-Remove Path	Icon-O-Matic-RemovePathsCmd		Прибрати контур
-Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Перемістити трансформатор
 Export	Icon-O-Matic-Menu-File		Експорт
 Width	Icon-O-Matic-PropertyNames		Ширина
 Add reference image	Icon-O-Matic-ShapesList		Додати референсне зображення
 Bummer	Cancel button - error alert		Облом
 Style	Icon-O-Matic-Menus		Стиль
-edit it's properties here.	Empty property list - 3rd line		тут змінити його властивості.
 Off	Icon-O-Matic-Menu-Settings		Прибрати сітку
+None	Icon-O-Matic-Properties		Пусто
+Color	Icon-O-Matic-PropertyNames		Колір
+Copy	Icon-O-Matic-Properties		Копіювати
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Перемістити форми
+Duplicate	Icon-O-Matic-StylesList		Дублікат
+Rotate	Icon-O-Matic-TransformationBoxStates		Поворот
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Прибрати контрольні точки
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Текст який ви намагаєтесь імпортувати досить довгий, продовжити?
+Detect Orient.	Icon-O-Matic-PropertyNames		Зовні/Зсередини
+Click on a shape above	Empty transformers list - 1st line		Натисніть на форму вище
+Close	Icon-O-Matic-Menu-File		Закрити
+Rotation	Icon-O-Matic-PropertyNames		Поворот
+Multi Paste Properties	Icon-O-Matic-Properties		Мультивставка властивостей
+Add shape with style	Icon-O-Matic-Menu-Shape		Додати форму зі стилем
+Assign Path	Icon-O-Matic-AddPathsCmd		Прив'язати контур
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Скинути трансформацію
+Remove	Icon-O-Matic-StylesList		Прибрати
+Cancel	Icon-O-Matic-Menu-Settings		Скасувати
+Closed	Icon-O-Matic-PropertyNames		Замкнений
+Transformation	Icon-O-Matic-TransformationBoxStates		Трансформація
+File	Icon-O-Matic-Menus		Файл
+warning	Icon-O-Matic-SVGExport		попередження
+Path	Icon-O-Matic-Menus		Контур
+Select All	Icon-O-Matic-PathManipulator		Вибрати все
+Error: 	Icon-O-Matic-Main		Помилка: 
+Saving your document failed!	Icon-O-Matic-Exporter		Збій при збереженні документу!
+bad news	Icon-O-Matic-Exporter		погані новини
+Snap to grid	Icon-O-Matic-Menu-Settings		Припасувати до сітки
+Add with path & style	Icon-O-Matic-ShapesList		Додати з контуром & стилем
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Перемістити трансформатори
+Undo	Icon-O-Matic-Main		Відкат дії
+Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
+Add Styles	Icon-O-Matic-AddStylesCmd		Додати стилі
+Alpha	Icon-O-Matic-PropertyNames		Альфа
+Duplicate	Icon-O-Matic-ShapesList		Дублікат
+Remove	Icon-O-Matic-PathManipulator		Прибрати
+Move Paths	Icon-O-Matic-MovePathsCmd		Перемістити контури
+Joins	Icon-O-Matic-PropertyNames		З'єднання
+Duplicate	Icon-O-Matic-PathsList		Дублікат
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Прибрати форми
+Save	Icon-O-Matic-Menu-Settings		Зберегти
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Прибрати контури
+Diamond	Icon-O-Matic-StyleTypes		Ромбовидний
+Assign Paths	Icon-O-Matic-AddPathsCmd		Прив'язати контури
+Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Змістити контрольну точку
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Віддзеркалити контрольні точки
+Overwrite	Icon-O-Matic-SVGExport		Перезаписати
+Open…	Icon-O-Matic-Menu-File		Відкрити…
+Remove	Icon-O-Matic-ShapesList		Прибрати
+Drop shapes	Icon-O-Matic-ShapesList		Скинути форми
+PNG Set	Icon-O-Matic-SavePanel		Комплект PNG
+to attach transformers.	Empty transformers list - 2nd line		для прив'язки трансформаторів.
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Змістити контрольну точку
+Add Paths	Icon-O-Matic-AddPathsCmd		Додати контури
+Clean up	Icon-O-Matic-PathsList		Очистити
+Split	Icon-O-Matic-PathManipulator		Розділити
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Прибрати стиль
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Скинути трансформацію
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Прибрати контрольну точку
+Conic	Icon-O-Matic-StyleTypes		Конічний
+Multi paste	Icon-O-Matic-Properties		Мультивставка
+Reset transformation	Icon-O-Matic-StylesList		Скинути трансформацію
+Add Shapes	Icon-O-Matic-AddShapesCmd		Додати форму
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Прибрати трансформатори
+Quit	Icon-O-Matic-Menu-File		Вийти
+Style type	Icon-O-Matic-StyleTypes		Тип стилю
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Додати форму з контуром & стилем
+Move Shape	Icon-O-Matic-MoveShapesCommand		Перемістити форму
+Radial	Icon-O-Matic-StyleTypes		Радіальний
+Caps	Icon-O-Matic-PropertyNames		Кінці ліній
+Text too long	Icon-O-Matic-StyledTextImport		Текст дуже довгий
+Scale Y	Icon-O-Matic-PropertyNames		Масштаб по Y
+Export icon	Dialog title		Експортувати значок
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колір (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Змінити градієнт
+Rotate indices forwards	Icon-O-Matic-PathsList		Обійти точки за годинником
+Click on an object in	Empty property list - 1st line		Виберіть об'єкт у
+No	Icon-O-Matic-StyledTextImport		Ні
+Add circle	Icon-O-Matic-PathsList		Додати коло
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Зберегти зміни поточного значка перед закриттям?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' як документ SVG.\n\n
+Save as…	Icon-O-Matic-Menu-File		Зберегти як…
+Icon-O-Matic	System name		Icon-O-Matic
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого відмінити>
+Add	Icon-O-Matic-StylesList		Додати
+All	Icon-O-Matic-Properties		Всі
+Invert selection	Icon-O-Matic-Properties		Інвертувати виділення
+<unkown property>	Icon-O-Matic-PropertyNames		<невідома властивість>
+Settings…	Icon-O-Matic-SavePanel		Налаштування…
+Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
+Remove Path	Icon-O-Matic-RemovePathsCmd		Прибрати контур
+Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
+edit it's properties here.	Empty property list - 3rd line		тут змінити його властивості.
 Edit	Icon-O-Matic-Menus		Редагувати

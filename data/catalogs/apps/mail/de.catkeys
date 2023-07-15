@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1239070674
+1	german	x-vnd.Be-MAIL	1001745731
 Set to Saved	Mail		Status setzen: Saved
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Der Text enthält %ld nicht kodierbare Zeichen. Eine andere Zeichenkodierung könnte helfen. 'Senden' klicken, um die Nachricht trotzdem zu senden (Ersatzzeichen werden für die nicht kodierbaren Zeichen verwendet), oder den Vorgang abbrechen, um das Problem zu lösen.
 Text wrapping:	Mail		Zeilenumbruch:
@@ -36,10 +36,7 @@ Removing attachments from a forwarded mail is not yet implemented!\nIt will not 
 Same recipient	Mail		Gleiche Empfänger
 Previous message	Mail		Vorherige Nachricht
 (Address unavailable)	Mail		(Adresse nicht verfügbar)
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Anhang: %name% (Typ: %type%)
 Copy link location	Mail		Linkadresse kopieren
-Attachments: 	Mail		Anhänge: 
-Remove enclosure	Mail		Anhang entfernen
 Next	Mail		Nächste
 Show icons only	Mail		Nur Icons zeigen
 Subject:	Mail		Betreff:
@@ -164,4 +161,3 @@ Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht ge
 Revert	Mail		Anfangswerte
 Unknown	Mail		Unbekannt
 Increase quote level	Mail		Eine Zitatebene tiefer
-Add enclosure…	Mail		Anhang anfügen …

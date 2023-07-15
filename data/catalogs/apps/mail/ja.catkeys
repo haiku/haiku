@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	16344670
+1	japanese	x-vnd.Be-MAIL	4073987023
 Set to Saved	Mail		「保存済み」に設定
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		メッセージ本文には %ld 個エンコードできない文字があります。他の文字セットを使うと修正される可能性があります。そのまま送信する場合、「送信」ボタンを押してください (代用文字が Unicode 化可能な文字に代わって使われます)。文字セットを変更する場合、「中止」ボタンを押してください。
 Text wrapping:	Mail		文字列の折り返し:
@@ -37,10 +37,7 @@ Same recipient	Mail		受信者が同じ
 Previous message	Mail		前のメッセージ
 (Address unavailable)	Mail		(アドレスは利用できません)
 Mail	System name		メール
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	添付ファイル: %name% (タイプ: %type%)
 Copy link location	Mail		このリンクのアドレスをコピー
-Attachments: 	Mail		添付ファイル:
-Remove enclosure	Mail		添付ファイルの削除
 Next	Mail		次へ
 Show icons only	Mail		アイコンのみ
 Subject:	Mail		件名:
@@ -164,4 +161,3 @@ Couldn't open this signature. Sorry.	Mail		この署名を開くことはでき�
 Revert	Mail		戻す
 Unknown	Mail		不明
 Increase quote level	Mail		引用レベルを上げる
-Add enclosure…	Mail		添付ファイルの追加...

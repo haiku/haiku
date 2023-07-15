@@ -1,199 +1,199 @@
 1	catalan; valencian	x-vnd.haiku-icon_o_matic	1015615450
-None	Icon-O-Matic-Properties		Cap
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Gira els índexs dels camins
 Add empty	Icon-O-Matic-ShapesList		Afegeix-n'hi una de buida
 Opening the icon failed!	Icon-O-Matic-Main		Ha fallat obrir la icona!
 Add with path	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb un camí
-Copy	Icon-O-Matic-Properties		Copia
-Color	Icon-O-Matic-PropertyNames		Color
 Format	Icon-O-Matic-SavePanel		Format
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Suprimeix les formes
-Color	Icon-O-Matic-StyleTypes		Color
 Select	Icon-O-Matic-Properties		Selecciona
+Color	Icon-O-Matic-StyleTypes		Color
 Reset transformation	Icon-O-Matic-ShapesList		Restableix la transformació
-Duplicate	Icon-O-Matic-StylesList		Duplica
-Rotate	Icon-O-Matic-TransformationBoxStates		Gira
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Suprimeix-ne els punts de control
 Shorten	Icon-O-Matic-PropertyNames		Escurça
-Unassign Path	Icon-O-Matic-UnassignPathCmd		No assignis el camí
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		El text que intenteu importar és força llarg. N'esteu segur?
 Paste	Icon-O-Matic-Properties		Enganxa
-Detect Orient.	Icon-O-Matic-PropertyNames		Detecta'n l'orientació.
-Click on a shape above	Empty transformers list - 1st line		Cliqueu en una forma de dalt.
-Close	Icon-O-Matic-Menu-File		Tanca
+Unassign Path	Icon-O-Matic-UnassignPathCmd		No assignis el camí
 Add rect	Icon-O-Matic-PathsList		Afegeix-hi un rectangle
-Rotation	Icon-O-Matic-PropertyNames		Rotació
-Multi Paste Properties	Icon-O-Matic-Properties		Propietats de l'enganxat múltiple
 Bleep!	Exporter - Continue in error dialog		Bufa!
-Transform	Icon-O-Matic-PathManipulator		Transforma
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Suprimeix el transformador
 META:ICON Attribute	Icon-O-Matic-SavePanel		Atribut META:ICON
-Add shape with style	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb un estil
-Assign Path	Icon-O-Matic-AddPathsCmd		Assigna el camí
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restableix la transformació
-Remove	Icon-O-Matic-StylesList		Suprimeix
-Cancel	Icon-O-Matic-Menu-Settings		Cancel·la
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Suprimeix el transformador
+Transform	Icon-O-Matic-PathManipulator		Transforma
 Assign Style	Icon-O-Matic-AssignStyleCmd		Assigna l'estil
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformació
-Closed	Icon-O-Matic-PropertyNames		Tancat
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Divideix el punt de control
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<res per refer>
 Height	Icon-O-Matic-PropertyNames		Alçada
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<res per refer>
 Add Shape	Icon-O-Matic-AddShapesCmd		Afegeix-hi una forma
-warning	Icon-O-Matic-SVGExport		avís
-File	Icon-O-Matic-Menus		Fitxer
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Neteja el camí
 Move Style	Icon-O-Matic-MoveStylesCmd		Estil del moviment
 Properties	Icon-O-Matic-Menus		Propietats
 Path	Icon-O-Matic-PropertyNames		Camí
 Add Control Point	Icon-O-Matic-AddPointCmd		Afegeix-hi un punt de control
-Path	Icon-O-Matic-Menus		Camí
 Stroke	Transformation		Traç
 Flip	Icon-O-Matic-PathManipulator		Volteja
-Select All	Icon-O-Matic-PathManipulator		Selecciona-ho tot
 Opacity	Icon-O-Matic-PropertyNames		Opacitat
 OK	Icon-O-Matic-ColorPicker		D'acord
-Error: 	Icon-O-Matic-Main		Error: 
-bad news	Icon-O-Matic-Exporter		males notícies
-Saving your document failed!	Icon-O-Matic-Exporter		Ha fallat desar el document!
-Snap to grid	Icon-O-Matic-Menu-Settings		Canvia a la graella
 Opening the document failed!	Icon-O-Matic-Main		No s'ha pogut obrir el document
 Shape	Icon-O-Matic-Menus		Forma
-Add with path & style	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb camí i estil
 <unavailable>	Icon-O-Matic-StyleTypes		<no disponible>
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
 Reverse Path	Icon-O-Matic-ReversePathCmd		Camí invers
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Mou els transformadors
-Add	Icon-O-Matic-TransformersList		Afegeix
 Paste Properties	Icon-O-Matic-Properties		Enganxa les propietats
-Undo	Icon-O-Matic-Main		Desfés
-Settings	Icon-O-Matic-Menus		Paràmetres
-Scale X	Icon-O-Matic-PropertyNames		Escala X
+Add	Icon-O-Matic-TransformersList		Afegeix
 Add	Icon-O-Matic-PathsList		Afegeix
-Add Styles	Icon-O-Matic-AddStylesCmd		Afegeix-hi estils
-Remove	Icon-O-Matic-PathManipulator		Suprimeix
-Duplicate	Icon-O-Matic-ShapesList		Duplica
-Alpha	Icon-O-Matic-PropertyNames		Alfa
+Settings	Icon-O-Matic-Menus		Paràmetres
 Contour	Transformation		Contorn
 Save icon	Dialog title		Desa la icona
-Move Paths	Icon-O-Matic-MovePathsCmd		Mou el camins
 Rounding	Icon-O-Matic-PropertyNames		Arrodoniment
-Joins	Icon-O-Matic-PropertyNames		Uneix
 Cancel	Icon-O-Matic-ColorPicker		Cancel·la
-Duplicate	Icon-O-Matic-PathsList		Duplica
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Suprimeix formes
-Save	Icon-O-Matic-Menu-Settings		Desa
 Export as…	Icon-O-Matic-Menu-File		Exporta com a…
 Error: 	Icon-O-Matic-Exporter		Error: 
 Move Path	Icon-O-Matic-MovePathsCmd		Mou el camí
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Suprimeix els camins
-Assign Paths	Icon-O-Matic-AddPathsCmd		Assigna camins
-Diamond	Icon-O-Matic-StyleTypes		Diamant
-Add Style	Icon-O-Matic-AddStylesCmd		Afegeix-hi un estil
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Empeny els punts de control
-Move Styles	Icon-O-Matic-MoveStylesCmd		Suprimeix els estils
-Don't save	Icon-O-Matic-Menu-Settings		No ho desis
 Add shape with path	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb camí
+Don't save	Icon-O-Matic-Menu-Settings		No ho desis
+Move Styles	Icon-O-Matic-MoveStylesCmd		Suprimeix els estils
 Translation X	Icon-O-Matic-PropertyNames		Traducció X
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Capgira els punt de control
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Afegeix-hi transformadors
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribut BEOS:ICON
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		L’Iconamàtic pot no haver interpretat totes les dades de l'SVG quan s'ha carregat. En sobreescriure el fitxer original, aquesta informació es perdria.
 Rotate indices backwards	Icon-O-Matic-PathsList		Gira els índexs enrere
-Overwrite	Icon-O-Matic-SVGExport		Sobreescriu
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		L’Iconamàtic pot no haver interpretat totes les dades de l'SVG quan s'ha carregat. En sobreescriure el fitxer original, aquesta informació es perdria.
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifica el punt de control
 Cancel	Icon-O-Matic-SVGExport		Cancel·la
-Open…	Icon-O-Matic-Menu-File		Obre...
 Redo	Icon-O-Matic-Main		Refés
 Change Color	Icon-O-Matic-SetColorCmd		Canvia el Color
-Remove	Icon-O-Matic-ShapesList		Suprimeix
-Drop shapes	Icon-O-Matic-ShapesList		Deixeu-hi anar formes
-PNG Set	Icon-O-Matic-SavePanel		Estableix PNG
-to attach transformers.	Empty transformers list - 2nd line		per adjuntar-hi transformadors.
 Linear	Icon-O-Matic-StyleTypes		Lineal
 any of the other lists to	Empty property list - 2nd line		qualsevol de les altres llistes per
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Empeny el punt de control
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Capgira el punt de control
-Add Paths	Icon-O-Matic-AddPathsCmd		Afegeix-hi camins
 Color (#%02x%02x%02x)	Style name after dropping a color		Color (#%02x%02x%02x)
-Clean up	Icon-O-Matic-PathsList		Neteja
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Suprimeix l'estil
-Split	Icon-O-Matic-PathManipulator		Divideix
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Capgira el punt de control
 Move	Icon-O-Matic-TransformationBoxStates		Mou
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restableix les transformacions
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Divideix els punts de control
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Suprimeix el punt de control
-Conic	Icon-O-Matic-StyleTypes		Cònic
 Name	Icon-O-Matic-PropertyNames		Nom
-Multi paste	Icon-O-Matic-Properties		Enganxament múltiple
-Add Shapes	Icon-O-Matic-AddShapesCmd		Afegeix-hi formes
-Reset transformation	Icon-O-Matic-StylesList		Restableix la transformació
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Afegeix-hi un transformador
 Reverse	Icon-O-Matic-PathsList		Inverteix
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Mou el punt
 Remove	Icon-O-Matic-PathsList		Suprimeix
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Suprimeix els transformadors
-Style type	Icon-O-Matic-StyleTypes		Tipus d'estil
-Quit	Icon-O-Matic-Menu-File		Surt
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Suprimeix els estils
-Gradient	Icon-O-Matic-StyleTypes		Gradient
 bad news	Title of error alert		males notícies
+Gradient	Icon-O-Matic-StyleTypes		Gradient
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Suprimeix els estils
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Insereix un punt de control
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb camí i estil
-Move Shape	Icon-O-Matic-MoveShapesCommand		Mou la forma
-Radial	Icon-O-Matic-StyleTypes		Radial
-Text too long	Icon-O-Matic-StyledTextImport		Text massa llarg
-Caps	Icon-O-Matic-PropertyNames		Maj.
 OK	Icon-O-Matic-SVGImport		D'acord
 Append…	Icon-O-Matic-Menu-File		Afegeix..
-Scale Y	Icon-O-Matic-PropertyNames		Escala Y
-Export icon	Dialog title		Exporta la icona
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Color (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Edita el degradat
 Set 	Set (property name)		Estableix 
-Rotate indices forwards	Icon-O-Matic-PathsList		Gira els índexs endavant
-Click on an object in	Empty property list - 1st line		Cliqueu en un objecte dins
 Save	Icon-O-Matic-Menu-File		Desa
-No	Icon-O-Matic-StyledTextImport		No
-Add circle	Icon-O-Matic-PathsList		Afegeix-hi un cercle
 Freeze transformation	Icon-O-Matic-ShapesList		Congela la transformació
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Congela les formes
 Miter Limit	Icon-O-Matic-PropertyNames		Límit de biaix
-Untitled	Icon-O-Matic-Main		Sense títol
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Congela les formes
 Max LOD	Icon-O-Matic-PropertyNames		LOD màx.
+Untitled	Icon-O-Matic-Main		Sense títol
 Add Path	Icon-O-Matic-AddPathsCmd		Afegeix-hi un camí
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Voleu desar els canvis a la icona actual abans de tancar?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Ha fallat obrir el fitxer %s com a document d'SVG.\n\n
 load error	Icon-O-Matic-SVGImport		error de càrrega
-Save as…	Icon-O-Matic-Menu-File		Desa com a...
 Swatches	Icon-O-Matic-Menus		Mostres
-<modify path>	Icon-O-Matic-PathCmd		<modificació del camí>
 HVIF Source Code	Icon-O-Matic-SavePanel		Codi font HVIF
-Icon-O-Matic	System name		Iconamàtic
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<res per desfer>
-Add	Icon-O-Matic-StylesList		Afegeix
+<modify path>	Icon-O-Matic-PathCmd		<modificació del camí>
 Translation Y	Icon-O-Matic-PropertyNames		Traducció Y
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Congela la forma
 Scale	Icon-O-Matic-TransformationBoxStates		Escala
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Suprimeix la forma
-All	Icon-O-Matic-Properties		Tot
 Transformer	Icon-O-Matic-Menus		Transformador
-Invert selection	Icon-O-Matic-Properties		Selecció inversa
-<unkown property>	Icon-O-Matic-PropertyNames		<propietat desconeguda>
-Pick a color	Icon-O-Matic-ColorPicker		Trieu un color
 Multi Set 	Multi Set (property name)		Establiment múltiple 
-Settings…	Icon-O-Matic-SavePanel		Paràmetres…
-Add with style	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb estil
+Pick a color	Icon-O-Matic-ColorPicker		Trieu un color
 New	Icon-O-Matic-Menu-File		Nou
 Yes	Icon-O-Matic-StyledTextImport		Sí
-Remove Path	Icon-O-Matic-RemovePathsCmd		Suprimeix el camí
-Gradient type	Icon-O-Matic-StyleTypes		Tipus de gradient
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mou el transformador
 Export	Icon-O-Matic-Menu-File		Exporta
 Width	Icon-O-Matic-PropertyNames		Amplada
 Add reference image	Icon-O-Matic-ShapesList		Afegiu-hi una imatge de referència
 Bummer	Cancel button - error alert		Problema
 Style	Icon-O-Matic-Menus		Estil
-edit it's properties here.	Empty property list - 3rd line		editeu-ne les propietats aquí.
 Off	Icon-O-Matic-Menu-Settings		Desactivat
+None	Icon-O-Matic-Properties		Cap
+Color	Icon-O-Matic-PropertyNames		Color
+Copy	Icon-O-Matic-Properties		Copia
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Suprimeix les formes
+Duplicate	Icon-O-Matic-StylesList		Duplica
+Rotate	Icon-O-Matic-TransformationBoxStates		Gira
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Suprimeix-ne els punts de control
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		El text que intenteu importar és força llarg. N'esteu segur?
+Detect Orient.	Icon-O-Matic-PropertyNames		Detecta'n l'orientació.
+Click on a shape above	Empty transformers list - 1st line		Cliqueu en una forma de dalt.
+Close	Icon-O-Matic-Menu-File		Tanca
+Rotation	Icon-O-Matic-PropertyNames		Rotació
+Multi Paste Properties	Icon-O-Matic-Properties		Propietats de l'enganxat múltiple
+Add shape with style	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb un estil
+Assign Path	Icon-O-Matic-AddPathsCmd		Assigna el camí
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Restableix la transformació
+Remove	Icon-O-Matic-StylesList		Suprimeix
+Cancel	Icon-O-Matic-Menu-Settings		Cancel·la
+Closed	Icon-O-Matic-PropertyNames		Tancat
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformació
+File	Icon-O-Matic-Menus		Fitxer
+warning	Icon-O-Matic-SVGExport		avís
+Path	Icon-O-Matic-Menus		Camí
+Select All	Icon-O-Matic-PathManipulator		Selecciona-ho tot
+Error: 	Icon-O-Matic-Main		Error: 
+Saving your document failed!	Icon-O-Matic-Exporter		Ha fallat desar el document!
+bad news	Icon-O-Matic-Exporter		males notícies
+Snap to grid	Icon-O-Matic-Menu-Settings		Canvia a la graella
+Add with path & style	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb camí i estil
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Mou els transformadors
+Undo	Icon-O-Matic-Main		Desfés
+Scale X	Icon-O-Matic-PropertyNames		Escala X
+Add Styles	Icon-O-Matic-AddStylesCmd		Afegeix-hi estils
+Alpha	Icon-O-Matic-PropertyNames		Alfa
+Duplicate	Icon-O-Matic-ShapesList		Duplica
+Remove	Icon-O-Matic-PathManipulator		Suprimeix
+Move Paths	Icon-O-Matic-MovePathsCmd		Mou el camins
+Joins	Icon-O-Matic-PropertyNames		Uneix
+Duplicate	Icon-O-Matic-PathsList		Duplica
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Suprimeix formes
+Save	Icon-O-Matic-Menu-Settings		Desa
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Suprimeix els camins
+Diamond	Icon-O-Matic-StyleTypes		Diamant
+Assign Paths	Icon-O-Matic-AddPathsCmd		Assigna camins
+Add Style	Icon-O-Matic-AddStylesCmd		Afegeix-hi un estil
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Empeny els punts de control
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Capgira els punt de control
+Overwrite	Icon-O-Matic-SVGExport		Sobreescriu
+Open…	Icon-O-Matic-Menu-File		Obre...
+Remove	Icon-O-Matic-ShapesList		Suprimeix
+Drop shapes	Icon-O-Matic-ShapesList		Deixeu-hi anar formes
+PNG Set	Icon-O-Matic-SavePanel		Estableix PNG
+to attach transformers.	Empty transformers list - 2nd line		per adjuntar-hi transformadors.
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Empeny el punt de control
+Add Paths	Icon-O-Matic-AddPathsCmd		Afegeix-hi camins
+Clean up	Icon-O-Matic-PathsList		Neteja
+Split	Icon-O-Matic-PathManipulator		Divideix
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Suprimeix l'estil
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restableix les transformacions
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Suprimeix el punt de control
+Conic	Icon-O-Matic-StyleTypes		Cònic
+Multi paste	Icon-O-Matic-Properties		Enganxament múltiple
+Reset transformation	Icon-O-Matic-StylesList		Restableix la transformació
+Add Shapes	Icon-O-Matic-AddShapesCmd		Afegeix-hi formes
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Suprimeix els transformadors
+Quit	Icon-O-Matic-Menu-File		Surt
+Style type	Icon-O-Matic-StyleTypes		Tipus d'estil
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb camí i estil
+Move Shape	Icon-O-Matic-MoveShapesCommand		Mou la forma
+Radial	Icon-O-Matic-StyleTypes		Radial
+Caps	Icon-O-Matic-PropertyNames		Maj.
+Text too long	Icon-O-Matic-StyledTextImport		Text massa llarg
+Scale Y	Icon-O-Matic-PropertyNames		Escala Y
+Export icon	Dialog title		Exporta la icona
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Color (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Edita el degradat
+Rotate indices forwards	Icon-O-Matic-PathsList		Gira els índexs endavant
+Click on an object in	Empty property list - 1st line		Cliqueu en un objecte dins
+No	Icon-O-Matic-StyledTextImport		No
+Add circle	Icon-O-Matic-PathsList		Afegeix-hi un cercle
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Voleu desar els canvis a la icona actual abans de tancar?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Ha fallat obrir el fitxer %s com a document d'SVG.\n\n
+Save as…	Icon-O-Matic-Menu-File		Desa com a...
+Icon-O-Matic	System name		Iconamàtic
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<res per desfer>
+Add	Icon-O-Matic-StylesList		Afegeix
+All	Icon-O-Matic-Properties		Tot
+Invert selection	Icon-O-Matic-Properties		Selecció inversa
+<unkown property>	Icon-O-Matic-PropertyNames		<propietat desconeguda>
+Settings…	Icon-O-Matic-SavePanel		Paràmetres…
+Add with style	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb estil
+Remove Path	Icon-O-Matic-RemovePathsCmd		Suprimeix el camí
+Gradient type	Icon-O-Matic-StyleTypes		Tipus de gradient
+edit it's properties here.	Empty property list - 3rd line		editeu-ne les propietats aquí.
 Edit	Icon-O-Matic-Menus		Edita

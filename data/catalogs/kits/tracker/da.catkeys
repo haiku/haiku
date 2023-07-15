@@ -120,7 +120,7 @@ Edit templates…	TemplatesMenu		Redigér skabeloner…
 Hide dotfiles	SettingsView		Skjul punktumfiler
 Trash	Model		Papirkurv
 Enable type-ahead filtering	SettingsView		Slå forudskrivningsfiltrering til
-copy	FSUtils	filename copy	kopiér
+copy	FSUtils	filename copy	kopi
 New folder%ld	FSUtils		Ny mappe%ld
 Location	OpenWithWindow		Placering
 %Ld B	WidgetAttributeText		%Ld B

@@ -1,11 +1,11 @@
-1	ukrainian	x-vnd.Be-MAIL	2658472450
+1	ukrainian	x-vnd.Be-MAIL	4110010385
 Set to Saved	Mail		До збережених
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
 Show icons & labels	Mail		Показати значки & надписи
 (Date unavailable)	Mail		(Дата недоступна)
 Reply	Mail		Відповісти
-Next message	Mail		Наступний лист
+Next message	Mail		Наступне повідомлення
 Mailing	Mail		Поштові відправлення
 Unread	Mail		Нечитане
 Same sender	Mail		Той самий відправник
@@ -37,10 +37,7 @@ Same recipient	Mail		Той самий отримувач
 Previous message	Mail		Попереднє повідомлення
 (Address unavailable)	Mail		(Адреса недоступна)
 Mail	System name		Mail
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
-Copy link location	Mail		Скопіювати розміщення посилання
-Attachments: 	Mail		Вкладення: 
-Remove enclosure	Mail		Вилучити вкладення
+Copy link location	Mail		Копіювати адресу посилання
 Next	Mail		Наступне
 Show icons only	Mail		Показати тільки значки
 Subject:	Mail		Тема:
@@ -60,14 +57,14 @@ Copy	Mail		Копіювати
 Add signature	Mail		Додати підпис
 %n - Full name	Mail		%n – Повне ім'я
 Signature	Mail		Підпис
-Use default account	Mail		Використати обліковий запис за замовчуванням
+Use default account	Mail		Використати запис за замовчуванням
 draft	B_USER_DIRECTORY/mail/draft		Чернетки
 Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
 spam	B_USER_DIRECTORY/mail/spam		Спам
 Reply to all	Mail		Відповісти всім
 Cancel	Mail		Скасувати
 Off	Mail		Вимкнути
-Set to %s	Mail		Встановити в %s
+Set to %s	Mail		Встановити статус «%s»
 Signature:	Mail		Підпис:
 Forward without attachments	Mail		Переслати без вкладень
 queries	B_USER_DIRECTORY/mail/queries		Запити
@@ -87,7 +84,7 @@ Auto signature:	Mail		Автопідпис:
 Same subject	Mail		Та сама тема
 Send	Mail		Відіслати
 Open draft	Mail		Відкрити чернетки
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити як «New»
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Залишити статус «New»
 Random	Mail		Випадковий
 Attach attributes:	Mail		Додати атрибути:
 Find again	Mail		Знайти далі
@@ -107,14 +104,15 @@ Start now	Mail		Запустити зараз
 (Name unavailable)	Mail		(Ім'я недоступне)
 Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
+Mail settings	Mail		Пошта – Настройки
 %d - Date	Mail		%d – Дата
 Check spelling	Mail		Перевіряти орфографію
 Status:	Mail		Статус:
 Redo	Mail		Повтор дії
-Leave as '%s'	Mail		Залишити як «%s»
+Leave as '%s'	Mail		Залишити статус «%s»
 Print…	Mail		Друкувати…
 Settings…	Mail		Налаштування…
-Warn unencodable:	Mail		Попередження про символи без кодування:
+Warn unencodable:	Mail		Інфо про символи без кодування:
 Trash	Mail		Смітник
 Show raw message	Mail		Показати необроблене повідомлення
 Find…	Mail		Знайти…
@@ -165,4 +163,3 @@ Couldn't open this signature. Sorry.	Mail		Прикро, неможливо ві
 Revert	Mail		Відкат змін
 Unknown	Mail		Невідомо
 Increase quote level	Mail		Додати префікс цитати
-Add enclosure…	Mail		Додати вкладення…

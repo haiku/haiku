@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-MAIL	2658472450
+1	danish	x-vnd.Be-MAIL	4110010385
 Set to Saved	Mail		Indstil til gemt
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodelige tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodelige), eller vælg Afbryd for at gå tilbage, og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
@@ -37,10 +37,7 @@ Same recipient	Mail		Samme modtager
 Previous message	Mail		Forrige meddelelse
 (Address unavailable)	Mail		(adresse utilgængelig)
 Mail	System name		Post
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Bilag: %name% (Type: %type%)
 Copy link location	Mail		Kopiér lænkeplacering
-Attachments: 	Mail		Vedhæftninger: 
-Remove enclosure	Mail		Fjern bilag
 Next	Mail		Næste
 Show icons only	Mail		Vis kun ikoner
 Subject:	Mail		Emne:
@@ -107,6 +104,7 @@ Start now	Mail		Start nu
 (Name unavailable)	Mail		(Navn utilgængeligt)
 Move to trash	Mail		Flyt til papirkurven
 <none>	Mail		<ingen>
+Mail settings	Mail		Postindstillinger
 %d - Date	Mail		%d - Dato
 Check spelling	Mail		Efterse stavning
 Status:	Mail		Status:
@@ -165,4 +163,3 @@ Couldn't open this signature. Sorry.	Mail		Kunne ikke åbne signaturen. Beklager
 Revert	Mail		Tilbagefør
 Unknown	Mail		Ukendt
 Increase quote level	Mail		Øg kvoteniveau
-Add enclosure…	Mail		Tilføj bilag…

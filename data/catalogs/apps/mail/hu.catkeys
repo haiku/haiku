@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	2658472450
+1	hungarian	x-vnd.Be-MAIL	4110010385
 Set to Saved	Mail		Mentésre jelöl
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
@@ -37,10 +37,7 @@ Same recipient	Mail		Azonos címzett
 Previous message	Mail		Előző levél
 (Address unavailable)	Mail		(A cím nem elérhető)
 Mail	System name		Levelezés
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Ebben: %name% (Típus: %type%)
 Copy link location	Mail		Hivatkozás címének másolása
-Attachments: 	Mail		Mellékletek:
-Remove enclosure	Mail		Melléklet eltávolítása
 Next	Mail		Következő
 Show icons only	Mail		Csak ikonok megjelenítése
 Subject:	Mail		Tárgy:
@@ -107,6 +104,7 @@ Start now	Mail		Kezdés most
 (Name unavailable)	Mail		(A név nem elérhető)
 Move to trash	Mail		Áthelyezés a Szemetesbe
 <none>	Mail		<nincs>
+Mail settings	Mail		Levelezési beállítások
 %d - Date	Mail		%d - dátum
 Check spelling	Mail		Helyesírás-ellenőrzés
 Status:	Mail		Állapot:
@@ -165,4 +163,3 @@ Couldn't open this signature. Sorry.	Mail		Sajnálom, de nem nyitható meg ez az
 Revert	Mail		Visszaállít
 Unknown	Mail		Ismeretlen
 Increase quote level	Mail		Szint növelése
-Add enclosure…	Mail		Melléklet hozzáadása…

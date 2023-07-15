@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	16344670
+1	portuguese (brazil)	x-vnd.Be-MAIL	4073987023
 Set to Saved	Mail		Definir como Salvo
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		O texto principal contém %ld caracteres não codificáveis. Quem sabe um conjunto de caracteres diferente trabalhe melhor? Clique em Enviar para enviar a mensagem como está (um caractere substituto será usado no lugar dos não codificáveis) ou escolha Cancelar para voltar e tentar consertar isso.
 Text wrapping:	Mail		Quebra de texto:
@@ -37,10 +37,7 @@ Same recipient	Mail		Mesmo destinatário
 Previous message	Mail		Mensagem anterior
 (Address unavailable)	Mail		(Endereço indisponível)
 Mail	System name		Correio
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Compartimento: %name% (Tipo: %type%)
 Copy link location	Mail		Copiar endereço do vínculo
-Attachments: 	Mail		Anexos: 
-Remove enclosure	Mail		Remover compartimento
 Next	Mail		Próximo
 Show icons only	Mail		Exibir somente ícones
 Subject:	Mail		Assunto:
@@ -164,4 +161,3 @@ Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinat
 Revert	Mail		Reverter
 Unknown	Mail		Desconhecido
 Increase quote level	Mail		Aumentar o nível de citação
-Add enclosure…	Mail		Adicionar compartimento…

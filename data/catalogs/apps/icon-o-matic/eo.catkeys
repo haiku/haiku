@@ -1,197 +1,197 @@
 1	esperanto	x-vnd.haiku-icon_o_matic	4159219060
-None	Icon-O-Matic-Properties		Nenio
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Turni Indeksojn de itineroj
 Add empty	Icon-O-Matic-ShapesList		Aldoni malplenan
 Opening the icon failed!	Icon-O-Matic-Main		Malsukcesis uzi la piktogramon!
 Add with path	Icon-O-Matic-ShapesList		Aldoni kun itinero
-Copy	Icon-O-Matic-Properties		Kopii
-Color	Icon-O-Matic-PropertyNames		Koloro
 Format	Icon-O-Matic-SavePanel		Formo
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Movi formojn
-Color	Icon-O-Matic-StyleTypes		Koloro
 Select	Icon-O-Matic-Properties		Elekti
+Color	Icon-O-Matic-StyleTypes		Koloro
 Reset transformation	Icon-O-Matic-ShapesList		Restarigi transformon
-Duplicate	Icon-O-Matic-StylesList		Duobligi
-Rotate	Icon-O-Matic-TransformationBoxStates		Turni
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Forigi Apogajn Punktojn
 Shorten	Icon-O-Matic-PropertyNames		Mallongigi
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Forigi itineron
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		La teksto, enportata de vi, estas nemalmulte longa. Ĉu vi certas?
 Paste	Icon-O-Matic-Properties		Alglui
-Detect Orient.	Icon-O-Matic-PropertyNames		Detekti Orientiĝon.
-Click on a shape above	Empty transformers list - 1st line		Alklaki la formon supre
-Close	Icon-O-Matic-Menu-File		Fermi
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Forigi itineron
 Add rect	Icon-O-Matic-PathsList		Aldoni ortangulon
-Rotation	Icon-O-Matic-PropertyNames		Turno
-Multi Paste Properties	Icon-O-Matic-Properties		Multalgluadaj Atributoj
 Bleep!	Exporter - Continue in error dialog		Pep'!
-Transform	Icon-O-Matic-PathManipulator		Transformi
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Forigi Transformilon
 META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Atributo
-Add shape with style	Icon-O-Matic-Menu-Shape		Aldoni formon kun stilo
-Assign Path	Icon-O-Matic-AddPathsCmd		Doni itineron
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Rekomencigi transformon
-Remove	Icon-O-Matic-StylesList		Forigi
-Cancel	Icon-O-Matic-Menu-Settings		Nuligi
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Forigi Transformilon
+Transform	Icon-O-Matic-PathManipulator		Transformi
 Assign Style	Icon-O-Matic-AssignStyleCmd		Atribui Stilon
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformo
-Closed	Icon-O-Matic-PropertyNames		Fermita
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Dividi Apogan Punkton
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<nenio por refari>
 Height	Icon-O-Matic-PropertyNames		Alteco
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nenio por refari>
 Add Shape	Icon-O-Matic-AddShapesCmd		Aldoni formon
-warning	Icon-O-Matic-SVGExport		averto
-File	Icon-O-Matic-Menus		Dosiero
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Purigi itineron
 Move Style	Icon-O-Matic-MoveStylesCmd		Movi Stilon
 Properties	Icon-O-Matic-Menus		Atributoj
 Path	Icon-O-Matic-PropertyNames		Itinero
 Add Control Point	Icon-O-Matic-AddPointCmd		Aldoni Apogan Punkton
-Path	Icon-O-Matic-Menus		Itinero
 Stroke	Transformation		Streko
 Flip	Icon-O-Matic-PathManipulator		Renversi
-Select All	Icon-O-Matic-PathManipulator		Elekti Ĉion
 Opacity	Icon-O-Matic-PropertyNames		Travidebleco
 OK	Icon-O-Matic-ColorPicker		Bone
-Error: 	Icon-O-Matic-Main		Eraro: 
-bad news	Icon-O-Matic-Exporter		malbonaj novaĵoj
-Saving your document failed!	Icon-O-Matic-Exporter		Malsukcesis konservi vian dokumenton!
-Snap to grid	Icon-O-Matic-Menu-Settings		Kapti per krado
 Opening the document failed!	Icon-O-Matic-Main		Malsukcesis uzi la dokumenton!
 Shape	Icon-O-Matic-Menus		Formo
-Add with path & style	Icon-O-Matic-ShapesList		Aldoni kun itinero kaj stilo
 <unavailable>	Icon-O-Matic-StyleTypes		<neakireble>
 Min LOD	Icon-O-Matic-PropertyNames		Minimuma Detalnivelo
 Reverse Path	Icon-O-Matic-ReversePathCmd		Inversigi itineron
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Movtransformiloj
-Add	Icon-O-Matic-TransformersList		Aldoni
 Paste Properties	Icon-O-Matic-Properties		Algluaj Atributoj
-Undo	Icon-O-Matic-Main		Malfari
-Settings	Icon-O-Matic-Menus		Agordo
-Scale X	Icon-O-Matic-PropertyNames		Skaligi X
+Add	Icon-O-Matic-TransformersList		Aldoni
 Add	Icon-O-Matic-PathsList		Aldoni
-Add Styles	Icon-O-Matic-AddStylesCmd		Aldoni Stilojn
-Remove	Icon-O-Matic-PathManipulator		Forigi
-Duplicate	Icon-O-Matic-ShapesList		Duobligi
+Settings	Icon-O-Matic-Menus		Agordo
 Contour	Transformation		Konturo
 Save icon	Dialog title		Konservi piktogramon
-Move Paths	Icon-O-Matic-MovePathsCmd		Movi itinerojn
 Rounding	Icon-O-Matic-PropertyNames		Rondireco
-Joins	Icon-O-Matic-PropertyNames		Ligoj
 Cancel	Icon-O-Matic-ColorPicker		Nuligi
-Duplicate	Icon-O-Matic-PathsList		Duobligi
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Forigi Formojn
-Save	Icon-O-Matic-Menu-Settings		Konservi
 Export as…	Icon-O-Matic-Menu-File		Elporti kiel…
 Error: 	Icon-O-Matic-Exporter		Eraro: 
 Move Path	Icon-O-Matic-MovePathsCmd		Movi itineron
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Forigi ininerojn
-Assign Paths	Icon-O-Matic-AddPathsCmd		Doni itinerojn
-Diamond	Icon-O-Matic-StyleTypes		Rombformo
-Add Style	Icon-O-Matic-AddStylesCmd		Aldoni Stilon
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Moveti Apogajn Punktojn
-Move Styles	Icon-O-Matic-MoveStylesCmd		Movi Stilojn
-Don't save	Icon-O-Matic-Menu-Settings		Nekonservi
 Add shape with path	Icon-O-Matic-Menu-Shape		Aldoni formon laŭ itinero
+Don't save	Icon-O-Matic-Menu-Settings		Nekonservi
+Move Styles	Icon-O-Matic-MoveStylesCmd		Movi Stilojn
 Translation X	Icon-O-Matic-PropertyNames		Konverto X
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Renversi Apogajn Punktojn
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Aldoni Transformilojn
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Atributo
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Piktogramilo ŝajne ne interpretis la tutan datumon de la ŝargita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
 Rotate indices backwards	Icon-O-Matic-PathsList		Turni indeksojn reen.
-Overwrite	Icon-O-Matic-SVGExport		Anstataŭigi
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Piktogramilo ŝajne ne interpretis la tutan datumon de la ŝargita SVG. Per anstataŭigo de originala dosiero ĝia datumo estos perdita.
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifi Apogan Punkton
 Cancel	Icon-O-Matic-SVGExport		Nuligi
-Open…	Icon-O-Matic-Menu-File		Uzi…
 Redo	Icon-O-Matic-Main		Refari
 Change Color	Icon-O-Matic-SetColorCmd		Ŝanĝi Koloron
-Remove	Icon-O-Matic-ShapesList		Forigi
-Drop shapes	Icon-O-Matic-ShapesList		Forigi formojn
-PNG Set	Icon-O-Matic-SavePanel		PNG Aro
-to attach transformers.	Empty transformers list - 2nd line		por alkroĉi transformilojn.
 Linear	Icon-O-Matic-StyleTypes		Linia
 any of the other lists to	Empty property list - 2nd line		iu ajn el aliaj listoj por
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Moveti Apogan Punkton
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Renversi Apogan Punkton
-Add Paths	Icon-O-Matic-AddPathsCmd		Aldoni itinerojn
 Color (#%02x%02x%02x)	Style name after dropping a color		Koloro (#%02x%02x%02x)
-Clean up	Icon-O-Matic-PathsList		Purigi
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Forigi Stilon
-Split	Icon-O-Matic-PathManipulator		Dividi
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Renversi Apogan Punkton
 Move	Icon-O-Matic-TransformationBoxStates		Movi
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restarigi Transformojn
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Dividi Apogajn Punktojn
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Forigi Apogan Punkton
-Conic	Icon-O-Matic-StyleTypes		Koniko
 Name	Icon-O-Matic-PropertyNames		Nomo
-Multi paste	Icon-O-Matic-Properties		Multalglui
-Add Shapes	Icon-O-Matic-AddShapesCmd		Aldoni Formojn
-Reset transformation	Icon-O-Matic-StylesList		Restarigi Transformon
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Aldoni Transformilon
 Reverse	Icon-O-Matic-PathsList		Inversigi
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Movi PIvoton
 Remove	Icon-O-Matic-PathsList		Forigi
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Forigi Transformilojn
-Style type	Icon-O-Matic-StyleTypes		Stiltipo
-Quit	Icon-O-Matic-Menu-File		Ĉesi
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Forigi Stilojn
-Gradient	Icon-O-Matic-StyleTypes		Kolortransiro
 bad news	Title of error alert		malbonaj novaĵoj
+Gradient	Icon-O-Matic-StyleTypes		Kolortransiro
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Forigi Stilojn
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Enigi Apogan Punkton
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Aldoni formon kun vojo kaj stilo
-Move Shape	Icon-O-Matic-MoveShapesCommand		Movi Formon
-Radial	Icon-O-Matic-StyleTypes		Radiusa
-Text too long	Icon-O-Matic-StyledTextImport		Teksto estas tro longa
-Caps	Icon-O-Matic-PropertyNames		Majuskloj
 OK	Icon-O-Matic-SVGImport		Bone
 Append…	Icon-O-Matic-Menu-File		Aldoni…
-Scale Y	Icon-O-Matic-PropertyNames		Skalo Y
-Export icon	Dialog title		Eksporti piktogramon
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Koloro (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Redakti Kolortransiron
 Set 	Set (property name)		Atribui 
-Rotate indices forwards	Icon-O-Matic-PathsList		Turni indeksojn antaŭen
-Click on an object in	Empty property list - 1st line		Klaku iun objekton en
 Save	Icon-O-Matic-Menu-File		Konservi
-No	Icon-O-Matic-StyledTextImport		Ne
-Add circle	Icon-O-Matic-PathsList		Aldoni rondon
 Freeze transformation	Icon-O-Matic-ShapesList		Fiksi transformon
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksi formojn
 Miter Limit	Icon-O-Matic-PropertyNames		Limo de deklivo
-Untitled	Icon-O-Matic-Main		Sennoma
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Fiksi formojn
 Max LOD	Icon-O-Matic-PropertyNames		Maksimumo por LOD
+Untitled	Icon-O-Matic-Main		Sennoma
 Add Path	Icon-O-Matic-AddPathsCmd		Aldoni itineron
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ĉu konservi nunan piktogramon antaŭ ĉesi?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Malsukcesis uzi la dosieron '%s' supozante formaton SVG.\n\n
 load error	Icon-O-Matic-SVGImport		eraro de ŝargo
-Save as…	Icon-O-Matic-Menu-File		Konservi kiel…
 Swatches	Icon-O-Matic-Menus		Modeloj
-<modify path>	Icon-O-Matic-PathCmd		<ŝanĝi itineron>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF fonta kodo
-Icon-O-Matic	System name		Piktogramilo
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<nenio por malfari>
-Add	Icon-O-Matic-StylesList		Aldoni
+<modify path>	Icon-O-Matic-PathCmd		<ŝanĝi itineron>
 Translation Y	Icon-O-Matic-PropertyNames		Transformo de Y
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Fiksi formon
 Scale	Icon-O-Matic-TransformationBoxStates		Skali
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Forigi formon
-All	Icon-O-Matic-Properties		Ĉio
 Transformer	Icon-O-Matic-Menus		Tramsformigilo
-Invert selection	Icon-O-Matic-Properties		Inverti elekton
-<unkown property>	Icon-O-Matic-PropertyNames		<nekonata atributo>
-Pick a color	Icon-O-Matic-ColorPicker		Elektu koloron
 Multi Set 	Multi Set (property name)		Pluraro 
-Settings…	Icon-O-Matic-SavePanel		Agordo…
-Add with style	Icon-O-Matic-ShapesList		Aldoni kun stilo
+Pick a color	Icon-O-Matic-ColorPicker		Elektu koloron
 New	Icon-O-Matic-Menu-File		Nova
 Yes	Icon-O-Matic-StyledTextImport		Jes
-Remove Path	Icon-O-Matic-RemovePathsCmd		Forigi itineron
-Gradient type	Icon-O-Matic-StyleTypes		Speco de kolortransiro
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Movi transformilon
 Export	Icon-O-Matic-Menu-File		Eksporti
 Width	Icon-O-Matic-PropertyNames		Larĝo
 Bummer	Cancel button - error alert		Ho ve!
 Style	Icon-O-Matic-Menus		Stilo
-edit it's properties here.	Empty property list - 3rd line		redakti ĝiajn atributojn ĉi tie.
 Off	Icon-O-Matic-Menu-Settings		Malŝalti
+None	Icon-O-Matic-Properties		Nenio
+Color	Icon-O-Matic-PropertyNames		Koloro
+Copy	Icon-O-Matic-Properties		Kopii
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Movi formojn
+Duplicate	Icon-O-Matic-StylesList		Duobligi
+Rotate	Icon-O-Matic-TransformationBoxStates		Turni
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Forigi Apogajn Punktojn
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		La teksto, enportata de vi, estas nemalmulte longa. Ĉu vi certas?
+Detect Orient.	Icon-O-Matic-PropertyNames		Detekti Orientiĝon.
+Click on a shape above	Empty transformers list - 1st line		Alklaki la formon supre
+Close	Icon-O-Matic-Menu-File		Fermi
+Rotation	Icon-O-Matic-PropertyNames		Turno
+Multi Paste Properties	Icon-O-Matic-Properties		Multalgluadaj Atributoj
+Add shape with style	Icon-O-Matic-Menu-Shape		Aldoni formon kun stilo
+Assign Path	Icon-O-Matic-AddPathsCmd		Doni itineron
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Rekomencigi transformon
+Remove	Icon-O-Matic-StylesList		Forigi
+Cancel	Icon-O-Matic-Menu-Settings		Nuligi
+Closed	Icon-O-Matic-PropertyNames		Fermita
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformo
+File	Icon-O-Matic-Menus		Dosiero
+warning	Icon-O-Matic-SVGExport		averto
+Path	Icon-O-Matic-Menus		Itinero
+Select All	Icon-O-Matic-PathManipulator		Elekti Ĉion
+Error: 	Icon-O-Matic-Main		Eraro: 
+Saving your document failed!	Icon-O-Matic-Exporter		Malsukcesis konservi vian dokumenton!
+bad news	Icon-O-Matic-Exporter		malbonaj novaĵoj
+Snap to grid	Icon-O-Matic-Menu-Settings		Kapti per krado
+Add with path & style	Icon-O-Matic-ShapesList		Aldoni kun itinero kaj stilo
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Movtransformiloj
+Undo	Icon-O-Matic-Main		Malfari
+Scale X	Icon-O-Matic-PropertyNames		Skaligi X
+Add Styles	Icon-O-Matic-AddStylesCmd		Aldoni Stilojn
+Duplicate	Icon-O-Matic-ShapesList		Duobligi
+Remove	Icon-O-Matic-PathManipulator		Forigi
+Move Paths	Icon-O-Matic-MovePathsCmd		Movi itinerojn
+Joins	Icon-O-Matic-PropertyNames		Ligoj
+Duplicate	Icon-O-Matic-PathsList		Duobligi
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Forigi Formojn
+Save	Icon-O-Matic-Menu-Settings		Konservi
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Forigi ininerojn
+Diamond	Icon-O-Matic-StyleTypes		Rombformo
+Assign Paths	Icon-O-Matic-AddPathsCmd		Doni itinerojn
+Add Style	Icon-O-Matic-AddStylesCmd		Aldoni Stilon
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Moveti Apogajn Punktojn
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Renversi Apogajn Punktojn
+Overwrite	Icon-O-Matic-SVGExport		Anstataŭigi
+Open…	Icon-O-Matic-Menu-File		Uzi…
+Remove	Icon-O-Matic-ShapesList		Forigi
+Drop shapes	Icon-O-Matic-ShapesList		Forigi formojn
+PNG Set	Icon-O-Matic-SavePanel		PNG Aro
+to attach transformers.	Empty transformers list - 2nd line		por alkroĉi transformilojn.
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Moveti Apogan Punkton
+Add Paths	Icon-O-Matic-AddPathsCmd		Aldoni itinerojn
+Clean up	Icon-O-Matic-PathsList		Purigi
+Split	Icon-O-Matic-PathManipulator		Dividi
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Forigi Stilon
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Restarigi Transformojn
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Forigi Apogan Punkton
+Conic	Icon-O-Matic-StyleTypes		Koniko
+Multi paste	Icon-O-Matic-Properties		Multalglui
+Reset transformation	Icon-O-Matic-StylesList		Restarigi Transformon
+Add Shapes	Icon-O-Matic-AddShapesCmd		Aldoni Formojn
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Forigi Transformilojn
+Quit	Icon-O-Matic-Menu-File		Ĉesi
+Style type	Icon-O-Matic-StyleTypes		Stiltipo
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Aldoni formon kun vojo kaj stilo
+Move Shape	Icon-O-Matic-MoveShapesCommand		Movi Formon
+Radial	Icon-O-Matic-StyleTypes		Radiusa
+Caps	Icon-O-Matic-PropertyNames		Majuskloj
+Text too long	Icon-O-Matic-StyledTextImport		Teksto estas tro longa
+Scale Y	Icon-O-Matic-PropertyNames		Skalo Y
+Export icon	Dialog title		Eksporti piktogramon
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Koloro (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Redakti Kolortransiron
+Rotate indices forwards	Icon-O-Matic-PathsList		Turni indeksojn antaŭen
+Click on an object in	Empty property list - 1st line		Klaku iun objekton en
+No	Icon-O-Matic-StyledTextImport		Ne
+Add circle	Icon-O-Matic-PathsList		Aldoni rondon
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Ĉu konservi nunan piktogramon antaŭ ĉesi?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Malsukcesis uzi la dosieron '%s' supozante formaton SVG.\n\n
+Save as…	Icon-O-Matic-Menu-File		Konservi kiel…
+Icon-O-Matic	System name		Piktogramilo
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<nenio por malfari>
+Add	Icon-O-Matic-StylesList		Aldoni
+All	Icon-O-Matic-Properties		Ĉio
+Invert selection	Icon-O-Matic-Properties		Inverti elekton
+<unkown property>	Icon-O-Matic-PropertyNames		<nekonata atributo>
+Settings…	Icon-O-Matic-SavePanel		Agordo…
+Add with style	Icon-O-Matic-ShapesList		Aldoni kun stilo
+Remove Path	Icon-O-Matic-RemovePathsCmd		Forigi itineron
+Gradient type	Icon-O-Matic-StyleTypes		Speco de kolortransiro
+edit it's properties here.	Empty property list - 3rd line		redakti ĝiajn atributojn ĉi tie.
 Edit	Icon-O-Matic-Menus		Redakti

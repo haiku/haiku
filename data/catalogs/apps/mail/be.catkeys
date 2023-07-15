@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	1442449554
+1	belarusian	x-vnd.Be-MAIL	1205124611
 Set to Saved	Mail		Пазначыць як захаванае
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 Text wrapping:	Mail		Афармоўка тэксту:
@@ -33,10 +33,7 @@ Removing attachments from a forwarded mail is not yet implemented!\nIt will not 
 Previous message	Mail		Папярэдняе паведамленне
 (Address unavailable)	Mail		(Адрэс невядомы)
 Mail	System name		Пошта
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Укладанне: %name% (Тып: %type%)
 Copy link location	Mail		Капіраваць спасылку
-Attachments: 	Mail		Укладаньні: 
-Remove enclosure	Mail		Выдаліць укладанне
 Next	Mail		Наступнае
 Show icons only	Mail		Паказваць толькі значкі
 Subject:	Mail		Тэма:
@@ -156,4 +153,3 @@ Delete	Mail		Выдаліць
 Put your favorite e-mail queries and query templates in this folder.	Mail		Скапіюйце запыты электроннай пошты і шаблоны такіх запытаў у гэтую папку.
 Couldn't open this signature. Sorry.	Mail		Немагчыма адкрыць гэта подпіс. Выбачайце.
 Revert	Mail		Вярнуць
-Add enclosure…	Mail		Дадаць укладанне…

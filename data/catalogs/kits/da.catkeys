@@ -35,7 +35,7 @@ Red:	ColorControl		Rød:
 <empty>	Menu		<tom>
 Copy	TextView		Kopiér
 Select all	TextView		Vælg alle
-alpha	AboutWindow		alpha
+alpha	AboutWindow		alfa
 %3.2f MiB	StringForSize		%3.2f MiB
 %3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Fejl

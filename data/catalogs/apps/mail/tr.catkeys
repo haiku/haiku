@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Be-MAIL	2658472450
+1	turkish	x-vnd.Be-MAIL	2421147507
 Set to Saved	Mail		Kaydedilenlere ekle
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder'e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç'e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
@@ -37,10 +37,7 @@ Same recipient	Mail		Aynı alıcı
 Previous message	Mail		Önceki ileti
 (Address unavailable)	Mail		(Adres kullanılamıyor)
 Mail	System name		Posta
-Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	İlişik: %name% (Tür: %type%)
 Copy link location	Mail		Bağlantı konumunu kopyala
-Attachments: 	Mail		Ekler: 
-Remove enclosure	Mail		İlişiği kaldır
 Next	Mail		Sonraki
 Show icons only	Mail		Yalnızca simgeler
 Subject:	Mail		Konu:
@@ -165,4 +162,3 @@ Couldn't open this signature. Sorry.	Mail		Üzgünüm, bu imza açılamadı.
 Revert	Mail		Eski haline döndür
 Unknown	Mail		Bilinmeyen
 Increase quote level	Mail		Alıntı düzeyini artır
-Add enclosure…	Mail		İlişik ekle…

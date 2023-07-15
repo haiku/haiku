@@ -1,197 +1,197 @@
 1	polish	x-vnd.haiku-icon_o_matic	4159219060
-None	Icon-O-Matic-Properties		Nic
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Obrócenie wskaźników ścieżki
 Add empty	Icon-O-Matic-ShapesList		Dodaj pusty
 Opening the icon failed!	Icon-O-Matic-Main		Otwieranie ikony nie powiodło się!
 Add with path	Icon-O-Matic-ShapesList		Dodaj ze ścieżką
-Copy	Icon-O-Matic-Properties		Kopiuj
-Color	Icon-O-Matic-PropertyNames		Kolor
 Format	Icon-O-Matic-SavePanel		Format
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Przesunięcie kształtów
-Color	Icon-O-Matic-StyleTypes		Kolor
 Select	Icon-O-Matic-Properties		Zaznacz
+Color	Icon-O-Matic-StyleTypes		Kolor
 Reset transformation	Icon-O-Matic-ShapesList		Resetuj transformację
-Duplicate	Icon-O-Matic-StylesList		Duplikuj
-Rotate	Icon-O-Matic-TransformationBoxStates		Obracanie
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Usunięcie punktów kontrolnych
 Shorten	Icon-O-Matic-PropertyNames		Skróć
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Usunięcie przypisania ścieżki
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Tekst, który zamierzasz zaimportować, jest dość długi. Kontynuować?
 Paste	Icon-O-Matic-Properties		Wklej
-Detect Orient.	Icon-O-Matic-PropertyNames		Wykrywanie orientacji.
-Click on a shape above	Empty transformers list - 1st line		Kliknij na kształt powyżej,
-Close	Icon-O-Matic-Menu-File		Zamknij
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Usunięcie przypisania ścieżki
 Add rect	Icon-O-Matic-PathsList		Dodaj prostokąt
-Rotation	Icon-O-Matic-PropertyNames		Obrót
-Multi Paste Properties	Icon-O-Matic-Properties		Wklej wiele właściwości
 Bleep!	Exporter - Continue in error dialog		Ojej!
-Transform	Icon-O-Matic-PathManipulator		Przekształć
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Usunięcie transformatora
 META:ICON Attribute	Icon-O-Matic-SavePanel		Atrybut META:ICON
-Add shape with style	Icon-O-Matic-Menu-Shape		Dodaj kształt ze stylem
-Assign Path	Icon-O-Matic-AddPathsCmd		Przypisanie ścieżki
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Resetowanie transformacji
-Remove	Icon-O-Matic-StylesList		Usuń
-Cancel	Icon-O-Matic-Menu-Settings		Anuluj
+Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Usunięcie transformatora
+Transform	Icon-O-Matic-PathManipulator		Przekształć
 Assign Style	Icon-O-Matic-AssignStyleCmd		Przypisanie stylu
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformacja
-Closed	Icon-O-Matic-PropertyNames		Zamknij
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Podzielenie punktów kontrolnych
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<nie ma czego powtórzyć>
 Height	Icon-O-Matic-PropertyNames		Wysokość
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<nie ma czego powtórzyć>
 Add Shape	Icon-O-Matic-AddShapesCmd		Dodanie kształtu
-warning	Icon-O-Matic-SVGExport		ostrzeżenie
-File	Icon-O-Matic-Menus		Plik
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Czyszczenie ścieżki
 Move Style	Icon-O-Matic-MoveStylesCmd		Przesunięcie stylu
 Properties	Icon-O-Matic-Menus		Właściwości
 Path	Icon-O-Matic-PropertyNames		Ścieżka
 Add Control Point	Icon-O-Matic-AddPointCmd		Dodaj punkt kontrolny
-Path	Icon-O-Matic-Menus		Ścieżka
 Stroke	Transformation		Kreska
 Flip	Icon-O-Matic-PathManipulator		Odwróć
-Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
 Opacity	Icon-O-Matic-PropertyNames		Przezroczystość
 OK	Icon-O-Matic-ColorPicker		OK
-Error: 	Icon-O-Matic-Main		Błąd: 
-bad news	Icon-O-Matic-Exporter		złe wieści
-Saving your document failed!	Icon-O-Matic-Exporter		Zapisywanie dokumentu nie powiodło się!
-Snap to grid	Icon-O-Matic-Menu-Settings		Przyciąganie do siatki
 Opening the document failed!	Icon-O-Matic-Main		Otwieranie dokumentu nie powiodło się!
 Shape	Icon-O-Matic-Menus		Kształt
-Add with path & style	Icon-O-Matic-ShapesList		Dodaj ze ścieżką i stylem
 <unavailable>	Icon-O-Matic-StyleTypes		<niedostępny>
 Min LOD	Icon-O-Matic-PropertyNames		Min. LOD
 Reverse Path	Icon-O-Matic-ReversePathCmd		Odwrócenie ścieżki
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Przesunięcie transformatorów
-Add	Icon-O-Matic-TransformersList		Dodaj
 Paste Properties	Icon-O-Matic-Properties		Wklej właściwości
-Undo	Icon-O-Matic-Main		Cofnij
-Settings	Icon-O-Matic-Menus		Ustawienia
-Scale X	Icon-O-Matic-PropertyNames		Skala X
+Add	Icon-O-Matic-TransformersList		Dodaj
 Add	Icon-O-Matic-PathsList		Dodaj
-Add Styles	Icon-O-Matic-AddStylesCmd		Dodanie stylów
-Remove	Icon-O-Matic-PathManipulator		Usuń
-Duplicate	Icon-O-Matic-ShapesList		Duplikuj
+Settings	Icon-O-Matic-Menus		Ustawienia
 Contour	Transformation		Kontur
 Save icon	Dialog title		Zapisz ikonę
-Move Paths	Icon-O-Matic-MovePathsCmd		Przesunięcie ścieżki
 Rounding	Icon-O-Matic-PropertyNames		Zaokrąglenie
-Joins	Icon-O-Matic-PropertyNames		Połączenie
 Cancel	Icon-O-Matic-ColorPicker		Anuluj
-Duplicate	Icon-O-Matic-PathsList		Duplikuj
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Usunięcie kształtów
-Save	Icon-O-Matic-Menu-Settings		Zapisz
 Export as…	Icon-O-Matic-Menu-File		Eksportuj jako…
 Error: 	Icon-O-Matic-Exporter		Błąd: 
 Move Path	Icon-O-Matic-MovePathsCmd		Przesunięcie ścieżki
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżek
-Assign Paths	Icon-O-Matic-AddPathsCmd		Przypisanie ścieżek
-Diamond	Icon-O-Matic-StyleTypes		Diament
-Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Przesunięcie punktów kontrolnych
-Move Styles	Icon-O-Matic-MoveStylesCmd		Przesunięcie stylów
-Don't save	Icon-O-Matic-Menu-Settings		Nie zapisuj
 Add shape with path	Icon-O-Matic-Menu-Shape		Dodaj kształt ze ścieżką
+Don't save	Icon-O-Matic-Menu-Settings		Nie zapisuj
+Move Styles	Icon-O-Matic-MoveStylesCmd		Przesunięcie stylów
 Translation X	Icon-O-Matic-PropertyNames		Translacja X
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Odwróć punkty kontrolne
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Dodanie transformatorów
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atrybut BEOS:ICON
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gdy Icon-O-Matic otwierał plik SVG, nie mógł przetworzyć wszystkich danych. Po nadpisaniu oryginalnego pliku, te informacje zostaną utracone.
 Rotate indices backwards	Icon-O-Matic-PathsList		Obróć indeksy do tyłu
-Overwrite	Icon-O-Matic-SVGExport		Nadpisz
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Gdy Icon-O-Matic otwierał plik SVG, nie mógł przetworzyć wszystkich danych. Po nadpisaniu oryginalnego pliku, te informacje zostaną utracone.
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Modyfikację punktu kontrolnego
 Cancel	Icon-O-Matic-SVGExport		Anuluj
-Open…	Icon-O-Matic-Menu-File		Otwórz…
 Redo	Icon-O-Matic-Main		Powtórz
 Change Color	Icon-O-Matic-SetColorCmd		Zmianę koloru
-Remove	Icon-O-Matic-ShapesList		Usuń
-Drop shapes	Icon-O-Matic-ShapesList		Upuść kształty
-PNG Set	Icon-O-Matic-SavePanel		Seria plików PNG
-to attach transformers.	Empty transformers list - 2nd line		żeby przypisać transformator.
 Linear	Icon-O-Matic-StyleTypes		Liniowy
 any of the other lists to	Empty property list - 2nd line		listy, żeby edytować
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Przesunięcie punktu kontrolnego
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Odwróć punkt kontrolny
-Add Paths	Icon-O-Matic-AddPathsCmd		Dodanie ścieżek
 Color (#%02x%02x%02x)	Style name after dropping a color		Kolor (#%02x%02x%02x)
-Clean up	Icon-O-Matic-PathsList		Wyczyść
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Usunięcie stylu
-Split	Icon-O-Matic-PathManipulator		Podziel
+Flip Control Point	Icon-O-Matic-FlipPointsCmd		Odwróć punkt kontrolny
 Move	Icon-O-Matic-TransformationBoxStates		Przesunięcie
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Resetowanie transformacji
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Podział punktów kontrolnych
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Usunięcie punktu kontrolnego
-Conic	Icon-O-Matic-StyleTypes		Stożkowy
 Name	Icon-O-Matic-PropertyNames		Nazwa
-Multi paste	Icon-O-Matic-Properties		Wklej wiele
-Add Shapes	Icon-O-Matic-AddShapesCmd		Dodanie kształtu
-Reset transformation	Icon-O-Matic-StylesList		Resetuj transformację
 Add Transformer	Icon-O-Matic-AddTransformersCmd		Dodanie transformatora
 Reverse	Icon-O-Matic-PathsList		Odwróć
 Move Pivot	Icon-O-Matic-TransformationBoxStates		Przesunięcie osi
 Remove	Icon-O-Matic-PathsList		Usuń
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Usunięcie transformatora
-Style type	Icon-O-Matic-StyleTypes		Typ stylu
-Quit	Icon-O-Matic-Menu-File		Zakończ
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Usunięcie stylów
-Gradient	Icon-O-Matic-StyleTypes		Gradient
 bad news	Title of error alert		złe wieści
+Gradient	Icon-O-Matic-StyleTypes		Gradient
+Remove Styles	Icon-O-Matic-RemoveStylesCmd		Usunięcie stylów
 Insert Control Point	Icon-O-Matic-InsertPointCmd		Wstaw punkt kontrolny
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Dodaj kształt ze ścieżką i stylem
-Move Shape	Icon-O-Matic-MoveShapesCommand		Przesunięcie kształtu
-Radial	Icon-O-Matic-StyleTypes		Promienisty
-Text too long	Icon-O-Matic-StyledTextImport		Tekst jest za długi
-Caps	Icon-O-Matic-PropertyNames		Nasadka
 OK	Icon-O-Matic-SVGImport		OK
 Append…	Icon-O-Matic-Menu-File		Dołącz…
-Scale Y	Icon-O-Matic-PropertyNames		Skala Y
-Export icon	Dialog title		Eksportuj ikonę
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kolor (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Edycję gradientu
 Set 	Set (property name)		Ustaw 
-Rotate indices forwards	Icon-O-Matic-PathsList		Obróć indeksy do przodu
-Click on an object in	Empty property list - 1st line		Wybierz obiekt z innej
 Save	Icon-O-Matic-Menu-File		Zapisz
-No	Icon-O-Matic-StyledTextImport		Nie
-Add circle	Icon-O-Matic-PathsList		Dodaj okrąg
 Freeze transformation	Icon-O-Matic-ShapesList		Zamroź transformację
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zamrożenie kształtów
 Miter Limit	Icon-O-Matic-PropertyNames		Próg ścięcia
-Untitled	Icon-O-Matic-Main		Bez nazwy
+Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zamrożenie kształtów
 Max LOD	Icon-O-Matic-PropertyNames		Maks. LOD
+Untitled	Icon-O-Matic-Main		Bez nazwy
 Add Path	Icon-O-Matic-AddPathsCmd		Dodanie ścieżki
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Czy zapisać bieżącą ikonę przez zamknięciem?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Otwarcie pliku „%s” jako dokumentu SVG nie powiodło się.\n\n
 load error	Icon-O-Matic-SVGImport		błąd ładowania
-Save as…	Icon-O-Matic-Menu-File		Zapisz jako…
 Swatches	Icon-O-Matic-Menus		Próbki
-<modify path>	Icon-O-Matic-PathCmd		<modyfikacja ścieżki>
 HVIF Source Code	Icon-O-Matic-SavePanel		Kod źródłowy HVIF
-Icon-O-Matic	System name		Icon-O-Matic
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<nie ma czego cofnąć>
-Add	Icon-O-Matic-StylesList		Dodaj
+<modify path>	Icon-O-Matic-PathCmd		<modyfikacja ścieżki>
 Translation Y	Icon-O-Matic-PropertyNames		Translacja Y
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Zamrożenie kształtu
 Scale	Icon-O-Matic-TransformationBoxStates		Skalowanie
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Usunięcie kształtu
-All	Icon-O-Matic-Properties		Wszystkie
 Transformer	Icon-O-Matic-Menus		Transformator
-Invert selection	Icon-O-Matic-Properties		Odwróć zaznaczenie
-<unkown property>	Icon-O-Matic-PropertyNames		<nieznana właściwość>
-Pick a color	Icon-O-Matic-ColorPicker		Wybierz kolor
 Multi Set 	Multi Set (property name)		Ustaw wiele 
-Settings…	Icon-O-Matic-SavePanel		Ustawienia…
-Add with style	Icon-O-Matic-ShapesList		Dodaj ze stylem
+Pick a color	Icon-O-Matic-ColorPicker		Wybierz kolor
 New	Icon-O-Matic-Menu-File		Nowy
 Yes	Icon-O-Matic-StyledTextImport		Tak
-Remove Path	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżki
-Gradient type	Icon-O-Matic-StyleTypes		Rodzaj gradientu
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Przesunięcie transformatora
 Export	Icon-O-Matic-Menu-File		Eksportuj
 Width	Icon-O-Matic-PropertyNames		Szerokość
 Bummer	Cancel button - error alert		Klops
 Style	Icon-O-Matic-Menus		Styl
-edit it's properties here.	Empty property list - 3rd line		tu jego właściwości.
 Off	Icon-O-Matic-Menu-Settings		Wyłącz
+None	Icon-O-Matic-Properties		Nic
+Color	Icon-O-Matic-PropertyNames		Kolor
+Copy	Icon-O-Matic-Properties		Kopiuj
+Move Shapes	Icon-O-Matic-MoveShapesCommand		Przesunięcie kształtów
+Duplicate	Icon-O-Matic-StylesList		Duplikuj
+Rotate	Icon-O-Matic-TransformationBoxStates		Obracanie
+Remove Control Points	Icon-O-Matic-RemovePointsCmd		Usunięcie punktów kontrolnych
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Tekst, który zamierzasz zaimportować, jest dość długi. Kontynuować?
+Detect Orient.	Icon-O-Matic-PropertyNames		Wykrywanie orientacji.
+Click on a shape above	Empty transformers list - 1st line		Kliknij na kształt powyżej,
+Close	Icon-O-Matic-Menu-File		Zamknij
+Rotation	Icon-O-Matic-PropertyNames		Obrót
+Multi Paste Properties	Icon-O-Matic-Properties		Wklej wiele właściwości
+Add shape with style	Icon-O-Matic-Menu-Shape		Dodaj kształt ze stylem
+Assign Path	Icon-O-Matic-AddPathsCmd		Przypisanie ścieżki
+Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Resetowanie transformacji
+Remove	Icon-O-Matic-StylesList		Usuń
+Cancel	Icon-O-Matic-Menu-Settings		Anuluj
+Closed	Icon-O-Matic-PropertyNames		Zamknij
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformacja
+File	Icon-O-Matic-Menus		Plik
+warning	Icon-O-Matic-SVGExport		ostrzeżenie
+Path	Icon-O-Matic-Menus		Ścieżka
+Select All	Icon-O-Matic-PathManipulator		Zaznacz wszystko
+Error: 	Icon-O-Matic-Main		Błąd: 
+Saving your document failed!	Icon-O-Matic-Exporter		Zapisywanie dokumentu nie powiodło się!
+bad news	Icon-O-Matic-Exporter		złe wieści
+Snap to grid	Icon-O-Matic-Menu-Settings		Przyciąganie do siatki
+Add with path & style	Icon-O-Matic-ShapesList		Dodaj ze ścieżką i stylem
+Move Transformers	Icon-O-Matic-MoveTransformersCmd		Przesunięcie transformatorów
+Undo	Icon-O-Matic-Main		Cofnij
+Scale X	Icon-O-Matic-PropertyNames		Skala X
+Add Styles	Icon-O-Matic-AddStylesCmd		Dodanie stylów
+Duplicate	Icon-O-Matic-ShapesList		Duplikuj
+Remove	Icon-O-Matic-PathManipulator		Usuń
+Move Paths	Icon-O-Matic-MovePathsCmd		Przesunięcie ścieżki
+Joins	Icon-O-Matic-PropertyNames		Połączenie
+Duplicate	Icon-O-Matic-PathsList		Duplikuj
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Usunięcie kształtów
+Save	Icon-O-Matic-Menu-Settings		Zapisz
+Remove Paths	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżek
+Diamond	Icon-O-Matic-StyleTypes		Diament
+Assign Paths	Icon-O-Matic-AddPathsCmd		Przypisanie ścieżek
+Add Style	Icon-O-Matic-AddStylesCmd		Dodanie stylu
+Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Przesunięcie punktów kontrolnych
+Flip Control Points	Icon-O-Matic-FlipPointsCmd		Odwróć punkty kontrolne
+Overwrite	Icon-O-Matic-SVGExport		Nadpisz
+Open…	Icon-O-Matic-Menu-File		Otwórz…
+Remove	Icon-O-Matic-ShapesList		Usuń
+Drop shapes	Icon-O-Matic-ShapesList		Upuść kształty
+PNG Set	Icon-O-Matic-SavePanel		Seria plików PNG
+to attach transformers.	Empty transformers list - 2nd line		żeby przypisać transformator.
+Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Przesunięcie punktu kontrolnego
+Add Paths	Icon-O-Matic-AddPathsCmd		Dodanie ścieżek
+Clean up	Icon-O-Matic-PathsList		Wyczyść
+Split	Icon-O-Matic-PathManipulator		Podziel
+Remove Style	Icon-O-Matic-RemoveStylesCmd		Usunięcie stylu
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Resetowanie transformacji
+Remove Control Point	Icon-O-Matic-RemovePointsCmd		Usunięcie punktu kontrolnego
+Conic	Icon-O-Matic-StyleTypes		Stożkowy
+Multi paste	Icon-O-Matic-Properties		Wklej wiele
+Reset transformation	Icon-O-Matic-StylesList		Resetuj transformację
+Add Shapes	Icon-O-Matic-AddShapesCmd		Dodanie kształtu
+Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Usunięcie transformatora
+Quit	Icon-O-Matic-Menu-File		Zakończ
+Style type	Icon-O-Matic-StyleTypes		Typ stylu
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Dodaj kształt ze ścieżką i stylem
+Move Shape	Icon-O-Matic-MoveShapesCommand		Przesunięcie kształtu
+Radial	Icon-O-Matic-StyleTypes		Promienisty
+Caps	Icon-O-Matic-PropertyNames		Nasadka
+Text too long	Icon-O-Matic-StyledTextImport		Tekst jest za długi
+Scale Y	Icon-O-Matic-PropertyNames		Skala Y
+Export icon	Dialog title		Eksportuj ikonę
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Kolor (#%02x%02x%02x)
+Edit Gradient	Icon-O-Matic-SetGradientCmd		Edycję gradientu
+Rotate indices forwards	Icon-O-Matic-PathsList		Obróć indeksy do przodu
+Click on an object in	Empty property list - 1st line		Wybierz obiekt z innej
+No	Icon-O-Matic-StyledTextImport		Nie
+Add circle	Icon-O-Matic-PathsList		Dodaj okrąg
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Czy zapisać bieżącą ikonę przez zamknięciem?
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Otwarcie pliku „%s” jako dokumentu SVG nie powiodło się.\n\n
+Save as…	Icon-O-Matic-Menu-File		Zapisz jako…
+Icon-O-Matic	System name		Icon-O-Matic
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<nie ma czego cofnąć>
+Add	Icon-O-Matic-StylesList		Dodaj
+All	Icon-O-Matic-Properties		Wszystkie
+Invert selection	Icon-O-Matic-Properties		Odwróć zaznaczenie
+<unkown property>	Icon-O-Matic-PropertyNames		<nieznana właściwość>
+Settings…	Icon-O-Matic-SavePanel		Ustawienia…
+Add with style	Icon-O-Matic-ShapesList		Dodaj ze stylem
+Remove Path	Icon-O-Matic-RemovePathsCmd		Usunięcie ścieżki
+Gradient type	Icon-O-Matic-StyleTypes		Rodzaj gradientu
+edit it's properties here.	Empty property list - 3rd line		tu jego właściwości.
 Edit	Icon-O-Matic-Menus		Edycja
