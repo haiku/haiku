@@ -97,6 +97,9 @@ private:
 	virtual	void				_ReservedAlert2();
 	virtual	void				_ReservedAlert3();
 
+								BAlert(BAlert&);
+			BAlert&				operator=(BAlert&);
+
 			void				_Init(const char* text, const char* button1,
 									const char* button2, const char* button3,
 									button_width width, button_spacing spacing,
