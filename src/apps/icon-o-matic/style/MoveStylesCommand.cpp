@@ -11,6 +11,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Style.h"
 
@@ -34,8 +35,7 @@ MoveStylesCommand::~MoveStylesCommand()
 void
 MoveStylesCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Move Styles");
-	else
-		name << B_TRANSLATE("Move Style");
+	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
+		"one{Style} other{Styles}}"));
+	format.Format(name, fCount);
 }

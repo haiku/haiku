@@ -11,6 +11,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Transformer.h"
 
@@ -34,12 +35,7 @@ MoveTransformersCommand::~MoveTransformersCommand()
 void
 MoveTransformersCommand::GetName(BString& name)
 {
-//	if (fCount > 1)
-//		name << _GetString(MOVE_TRANSFORMERS, "Move Transformers");
-//	else
-//		name << _GetString(MOVE_TRANSFORMER, "Move Transformer");
-	if (fCount > 1)
-		name << B_TRANSLATE("Move Transformers");
-	else
-		name << B_TRANSLATE("Move Transformer");
+	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
+		"one{Transformer} other{Transformers}}"));
+	format.Format(name, fCount);
 }

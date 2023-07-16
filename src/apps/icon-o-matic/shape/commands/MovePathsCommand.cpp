@@ -11,6 +11,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "VectorPath.h"
 
@@ -34,8 +35,7 @@ MovePathsCommand::~MovePathsCommand()
 void
 MovePathsCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Move Paths");
-	else
-		name << B_TRANSLATE("Move Path");
+	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
+		"one{Path} other{Paths}}"));
+	format.Format(name, fCount);
 }

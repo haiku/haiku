@@ -11,6 +11,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Transformer.h"
 
@@ -34,8 +35,7 @@ AddTransformersCommand::~AddTransformersCommand()
 void
 AddTransformersCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Add Transformers");
-	else
-		name << B_TRANSLATE("Add Transformer");
+	static BStringFormat format(B_TRANSLATE("Add {0, plural, "
+		"one{Transformer} other{Transformers}}"));
+	format.Format(name, fCount);
 }

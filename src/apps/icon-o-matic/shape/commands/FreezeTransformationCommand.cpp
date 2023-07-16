@@ -14,6 +14,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "GradientTransformable.h"
 #include "PathSourceShape.h"
@@ -118,10 +119,9 @@ FreezeTransformationCommand::Undo()
 void
 FreezeTransformationCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Freeze Shapes");
-	else
-		name << B_TRANSLATE("Freeze Shape");
+	static BStringFormat format(B_TRANSLATE("Freeze {0, plural, "
+		"one{Shape} other{Shapes}}"));
+	format.Format(name, fCount);
 }
 
 // #pragma mark -

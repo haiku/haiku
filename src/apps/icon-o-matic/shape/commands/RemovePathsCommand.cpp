@@ -14,6 +14,7 @@
 #include <Catalog.h>
 #include <List.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Container.h"
 #include "PathSourceShape.h"
@@ -118,8 +119,7 @@ RemovePathsCommand::Undo()
 void
 RemovePathsCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Remove Paths");
-	else
-		name << B_TRANSLATE("Remove Path");
+	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
+		"one{Path} other{Paths}}"));
+	format.Format(name, fCount);
 }

@@ -13,6 +13,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "VectorPath.h"
 
@@ -22,6 +23,18 @@
 
 
 using std::nothrow;
+
+
+static BString
+_GetName(int32 count)
+{
+	static BStringFormat format(B_TRANSLATE("Nudge {0, plural, "
+		"one{Control Point} other{Control Points}}"));
+	BString name;
+	format.Format(name, count);
+	return name;
+}
+
 
 // constructor
 NudgePointsCommand::NudgePointsCommand(VectorPath* path,
@@ -33,8 +46,7 @@ NudgePointsCommand::NudgePointsCommand(VectorPath* path,
 					   0.0,
 					   1.0,
 					   1.0,
-					   count > 1 ? B_TRANSLATE("Nudge Control Points") :
-					   B_TRANSLATE("Nudge Control Point")),
+					   _GetName(count)),
 	  fPath(path),
 	  fIndices(NULL),
 	  fPoints(NULL),

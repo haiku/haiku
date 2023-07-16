@@ -14,6 +14,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Command.h"
 #include "Container.h"
@@ -192,9 +193,8 @@ template <class Type>
 void
 MoveCommand<Type>::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Move Items");
-	else
-		name << B_TRANSLATE("Move Item");
+	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
+		"one{Item} other{Items}}"));
+	format.Format(name, fCount);
 }
 #endif // MOVE_COMMAND_H

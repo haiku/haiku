@@ -13,6 +13,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "VectorPath.h"
 
@@ -161,14 +162,9 @@ RemovePointsCommand::Redo()
 void
 RemovePointsCommand::GetName(BString& name)
 {
-//	if (fCount > 1)
-//		name << _GetString(REMOVE_CONTROL_POINTS, "Remove Control Points");
-//	else
-//		name << _GetString(REMOVE_CONTROL_POINT, "Remove Control Point");
-	if (fCount > 1)
-		name << B_TRANSLATE("Remove Control Points");
-	else
-		name << B_TRANSLATE("Remove Control Point");
+	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
+		"one{Control Point} other{Control Points}}"));
+	format.Format(name, fCount);
 }
 
 // _Init

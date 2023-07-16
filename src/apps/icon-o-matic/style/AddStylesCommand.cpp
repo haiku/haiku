@@ -11,6 +11,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Style.h"
 
@@ -33,8 +34,7 @@ AddStylesCommand::~AddStylesCommand()
 void
 AddStylesCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Add Styles");
-	else
-		name << B_TRANSLATE("Add Style");
+	static BStringFormat format(B_TRANSLATE("Add {0, plural, "
+		"one{Style} other{Styles}}"));
+	format.Format(name, fCount);
 }

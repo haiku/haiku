@@ -13,6 +13,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "VectorPath.h"
 
@@ -111,9 +112,8 @@ FlipPointsCommand::Undo()
 void
 FlipPointsCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Flip Control Points");
-	else
-		name << B_TRANSLATE("Flip Control Point");
+	static BStringFormat format(B_TRANSLATE("Flip {0, plural, "
+		"one{Control Point} other{Control Points}}"));
+	format.Format(name, fCount);
 }
 

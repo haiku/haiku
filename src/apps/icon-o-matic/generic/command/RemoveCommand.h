@@ -15,6 +15,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "Command.h"
 #include "Container.h"
@@ -140,13 +141,8 @@ template <class Type>
 void
 RemoveCommand<Type>::GetName(BString& name)
 {
-//	if (fCount > 1)
-//		name << _GetString(MOVE_MODIFIERS, "Move Items");
-//	else
-//		name << _GetString(MOVE_MODIFIER, "Move Item");
-	if (fCount > 1)
-		name << B_TRANSLATE("Remove Items");
-	else
-		name << B_TRANSLATE("Remove Item");
+	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
+		"one{Item} other{Items}}"));
+	format.Format(name, fCount);
 }
 #endif // REMOVE_COMMAND_H

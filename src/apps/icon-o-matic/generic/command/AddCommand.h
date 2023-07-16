@@ -16,6 +16,7 @@
 #include <Catalog.h>
 #include <Locale.h>
 #include <Referenceable.h>
+#include <StringFormat.h>
 
 #include "Command.h"
 #include "Container.h"
@@ -152,9 +153,8 @@ template<class Type>
 void
 AddCommand<Type>::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Add Items");
-	else
-		name << B_TRANSLATE("Add Item");
+	static BStringFormat format(B_TRANSLATE("Add {0, plural, "
+		"one{Item} other{Items}}"));
+	format.Format(name, fCount);
 }
 #endif // ADD_COMMAND_H

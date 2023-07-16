@@ -13,6 +13,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "ChannelTransform.h"
 
@@ -89,8 +90,7 @@ ResetTransformationCommand::Undo()
 void
 ResetTransformationCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Reset Transformations");
-	else
-		name << B_TRANSLATE("Reset Transformation");
+	static BStringFormat format(B_TRANSLATE("Reset {0, plural, "
+		"one{Transformation} other{Transformations}}"));
+	format.Format(name, fCount);
 }

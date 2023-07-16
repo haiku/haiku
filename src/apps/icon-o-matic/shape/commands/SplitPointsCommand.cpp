@@ -13,6 +13,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "VectorPath.h"
 
@@ -154,9 +155,8 @@ SplitPointsCommand::Undo()
 void
 SplitPointsCommand::GetName(BString& name)
 {
-	if (fCount > 1)
-		name << B_TRANSLATE("Split Control Points");
-	else
-		name << B_TRANSLATE("Split Control Point");
+	static BStringFormat format(B_TRANSLATE("Split {0, plural, "
+		"one{Control Point} other{Control Points}}"));
+	format.Format(name, fCount);
 }
 

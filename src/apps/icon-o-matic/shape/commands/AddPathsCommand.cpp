@@ -11,6 +11,7 @@
 
 #include <Catalog.h>
 #include <Locale.h>
+#include <StringFormat.h>
 
 #include "VectorPath.h"
 
@@ -34,15 +35,12 @@ AddPathsCommand::~AddPathsCommand()
 void
 AddPathsCommand::GetName(BString& name)
 {
-	if (fOwnsItems) {
-		if (fCount > 1)
-			name << B_TRANSLATE("Add Paths");
-		else
-			name << B_TRANSLATE("Add Path");
-	} else {
-		if (fCount > 1)
-			name << B_TRANSLATE("Assign Paths");
-		else
-			name << B_TRANSLATE("Assign Path");
-	}
+	static BStringFormat addFormat(B_TRANSLATE("Add {0, plural, "
+		"one{Path} other{Paths}}"));
+	static BStringFormat assignFormat(B_TRANSLATE("Assign {0, plural, "
+		"one{Path} other{Paths}}"));
+	if (fOwnsItems)
+		addFormat.Format(name, fCount);
+	else
+		assignFormat.Format(name, fCount);
 }
