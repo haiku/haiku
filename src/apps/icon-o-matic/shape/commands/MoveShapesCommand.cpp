@@ -36,6 +36,6 @@ void
 MoveShapesCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
-		"one{Shape} other{Shapes}}"));
+		"one{shape} other{shapes}}"));
 	format.Format(name, fCount);
 }

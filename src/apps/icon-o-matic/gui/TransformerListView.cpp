@@ -139,10 +139,10 @@ TransformerListView::Draw(BRect updateRect)
 		return;
 
 	// display helpful messages
-	const char* message1 = B_TRANSLATE_CONTEXT("Click on a shape above", 
-		"Empty transformers list - 1st line");
-	const char* message2 = B_TRANSLATE_CONTEXT("to attach transformers.",
-		"Empty transformers list - 2nd line");
+	const char* message1 = B_TRANSLATE_COMMENT("Click on a shape above",
+ 		"Empty transformers list - 1st line");
+	const char* message2 = B_TRANSLATE_COMMENT("to attach transformers.",
+ 		"Empty transformers list - 2nd line");
 
 	// Dark Themes
 	rgb_color lowColor = LowColor();

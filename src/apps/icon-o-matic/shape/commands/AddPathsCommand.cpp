@@ -36,9 +36,9 @@ void
 AddPathsCommand::GetName(BString& name)
 {
 	static BStringFormat addFormat(B_TRANSLATE("Add {0, plural, "
-		"one{Path} other{Paths}}"));
+		"one{path} other{paths}}"));
 	static BStringFormat assignFormat(B_TRANSLATE("Assign {0, plural, "
-		"one{Path} other{Paths}}"));
+		"one{path} other{paths}}"));
 	if (fOwnsItems)
 		addFormat.Format(name, fCount);
 	else

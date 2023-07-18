@@ -36,6 +36,6 @@ void
 AddTransformersCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Add {0, plural, "
-		"one{Transformer} other{Transformers}}"));
+		"one{transformer} other{transformers}}"));
 	format.Format(name, fCount);
 }

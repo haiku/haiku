@@ -125,6 +125,5 @@ ChangePointCommand::Redo()
 void
 ChangePointCommand::GetName(BString& name)
 {
-//	name << _GetString(MODIFY_CONTROL_POINT, "Modify Control Point");
-	name << B_TRANSLATE("Modify Control Point");
+	name << B_TRANSLATE("Modify vertex");
 }

@@ -120,6 +120,6 @@ void
 RemovePathsCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
-		"one{Path} other{Paths}}"));
+		"one{path} other{paths}}"));
 	format.Format(name, fCount);
 }

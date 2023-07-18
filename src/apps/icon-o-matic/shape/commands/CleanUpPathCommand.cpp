@@ -56,5 +56,5 @@ CleanUpPathCommand::Undo()
 void
 CleanUpPathCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Clean Up Path");
+	name << B_TRANSLATE("Clean up path");
 }

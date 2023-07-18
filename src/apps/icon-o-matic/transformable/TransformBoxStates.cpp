@@ -580,5 +580,5 @@ OffsetCenterState::UpdateViewCursor(BView* view, BPoint current) const
 const char*
 OffsetCenterState::ActionName() const
 {
-	return B_TRANSLATE("Move Pivot");
+	return B_TRANSLATE("Move pivot");
 }

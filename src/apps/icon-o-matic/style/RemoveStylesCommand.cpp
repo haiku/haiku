@@ -118,6 +118,6 @@ void
 RemoveStylesCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
-		"one{Style} other{Styles}}"));
+		"one{style} other{styles}}"));
 	format.Format(name, fCount);
 }

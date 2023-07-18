@@ -255,7 +255,7 @@ StyledTextImporter::_Import(Icon* icon, const char *text, text_run_array *runs)
 		BAlert* alert = new BAlert(B_TRANSLATE("Text too long"),
 			B_TRANSLATE("The text you are trying to import is quite long, "
 				"are you sure?"),
-			B_TRANSLATE("Yes"), B_TRANSLATE("No"), NULL,
+			B_TRANSLATE("Import text"), B_TRANSLATE("Cancel"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		if (alert->Go())
 			return B_CANCELED;
@@ -370,7 +370,8 @@ StyledTextImporter::_AddStyle(Icon *icon, text_run *run)
 	if (style == NULL)
 		return B_NO_MEMORY;
 	char name[30];
-	sprintf(name, B_TRANSLATE("Color (#%02x%02x%02x)"),
+	sprintf(name, B_TRANSLATE_COMMENT("Color (#%02x%02x%02x)",
+		"Style name after dropping a color"),
 		color.red, color.green, color.blue);
 	style->SetName(name);
 

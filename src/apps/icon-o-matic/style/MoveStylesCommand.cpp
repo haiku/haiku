@@ -36,6 +36,6 @@ void
 MoveStylesCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
-		"one{Style} other{Styles}}"));
+		"one{style} other{styles}}"));
 	format.Format(name, fCount);
 }

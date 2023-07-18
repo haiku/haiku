@@ -37,6 +37,6 @@ void
 RemoveTransformersCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
-		"one{Transformer} other{Transformers}}"));
+		"one{transformer} other{transformers}}"));
 	format.Format(name, fCount);
 }

@@ -351,26 +351,6 @@ PropertyListView::SetMenu(BMenu* menu)
 	_CheckMenuStatus();
 }
 
-// UpdateStrings
-void
-PropertyListView::UpdateStrings()
-{
-//	if (fSelectM) {
-//		LanguageManager* m = LanguageManager::Default();
-//	
-//		fSelectM->Superitem()->SetLabel(m->GetString(PROPERTY_SELECTION, "Select"));
-//		fSelectAllMI->SetLabel(m->GetString(SELECT_ALL_PROPERTIES, "All"));
-//		fSelectNoneMI->SetLabel(m->GetString(SELECT_NO_PROPERTIES, "None"));
-//		fInvertSelectionMI->SetLabel(m->GetString(INVERT_SELECTION, "Invert Selection"));
-//	
-//		fPropertyM->Superitem()->SetLabel(m->GetString(PROPERTY, "Property"));
-//		fCopyMI->SetLabel(m->GetString(COPY, "Copy"));
-//		if (IsEditingMultipleObjects())
-//			fPasteMI->SetLabel(m->GetString(MULTI_PASTE, "Multi Paste"));
-//		else
-//			fPasteMI->SetLabel(m->GetString(PASTE, "Paste"));
-//	}
-}
 
 // ScrollView
 ::ScrollView*
@@ -737,12 +717,9 @@ PropertyListView::_CheckMenuStatus()
 	}
 
 	fPasteMI->SetEnabled(clipboardHasData);
-//	LanguageManager* m = LanguageManager::Default();
 	if (IsEditingMultipleObjects())
-//		fPasteMI->SetLabel(m->GetString(MULTI_PASTE, "Multi paste"));
-		fPasteMI->SetLabel(B_TRANSLATE("Multi paste"));
+		fPasteMI->SetLabel(B_TRANSLATE("Multi-paste"));
 	else
-//		fPasteMI->SetLabel(m->GetString(PASTE, "Paste"));
 		fPasteMI->SetLabel(B_TRANSLATE("Paste"));
 
 	bool enableMenu = fPropertyObject;

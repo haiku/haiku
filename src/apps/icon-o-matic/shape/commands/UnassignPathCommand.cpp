@@ -69,5 +69,5 @@ UnassignPathCommand::Undo()
 void
 UnassignPathCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Unassign Path");
+	name << B_TRANSLATE("Unassign path");
 }

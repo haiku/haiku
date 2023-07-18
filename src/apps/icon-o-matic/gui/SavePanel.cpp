@@ -205,12 +205,13 @@ SavePanel::SetExportMode(bool exportMode)
 		return;
 
 	// adjust window title and enable format menu
-	BString title("Icon-O-Matic: ");
+	BString title(B_TRANSLATE_SYSTEM_NAME("Icon-O-Matic"));
+	title  << ": ";
 	if (exportMode) {
 		fFormatMF->SetEnabled(true);
 		SetExportMode(fExportMode);
 		_EnableSettings();
-		title << B_TRANSLATE_CONTEXT("Export icon", "Dialog title");
+		title << B_TRANSLATE_COMMENT("Export icon", "Dialog title");
 	} else {
 		fExportMode = ExportMode();
 			// does not overwrite fExportMode in case we already were
@@ -219,7 +220,7 @@ SavePanel::SetExportMode(bool exportMode)
 
 		fFormatMF->SetEnabled(false);
 		fSettingsB->SetEnabled(false);
-		title << B_TRANSLATE_CONTEXT("Save icon", "Dialog title");
+		title << B_TRANSLATE_COMMENT("Save icon", "Dialog title");
 	}
 
 	window->SetTitle(title);
@@ -412,7 +413,7 @@ SavePanel::_BuildMenu()
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_RDEF);
 	fFormatM->AddItem(fRDefMI);
 
-	fSourceMI = new SaveItem(B_TRANSLATE("HVIF Source Code"),
+	fSourceMI = new SaveItem(B_TRANSLATE("HVIF source code"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_SOURCE);
 	fFormatM->AddItem(fSourceMI);
 
@@ -437,17 +438,17 @@ SavePanel::_BuildMenu()
 		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_64);
 	fFormatM->AddItem(fBitmap64MI);
 
-	fBitmapSetMI = new SaveItem(B_TRANSLATE("PNG Set"),
+	fBitmapSetMI = new SaveItem(B_TRANSLATE("PNG set"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_BITMAP_SET);
 	fFormatM->AddItem(fBitmapSetMI);
 
 	fFormatM->AddSeparatorItem();
 
-	fIconAttrMI = new SaveItem(B_TRANSLATE("BEOS:ICON Attribute"),
+	fIconAttrMI = new SaveItem(B_TRANSLATE("BEOS:ICON attribute"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_ATTR);
 	fFormatM->AddItem(fIconAttrMI);
 
-	fIconMimeAttrMI = new SaveItem(B_TRANSLATE("META:ICON Attribute"),
+	fIconMimeAttrMI = new SaveItem(B_TRANSLATE("META:ICON attribute"),
 		new BMessage(MSG_FORMAT), EXPORT_MODE_ICON_MIME_ATTR);
 
 	fFormatM->AddItem(fIconMimeAttrMI);

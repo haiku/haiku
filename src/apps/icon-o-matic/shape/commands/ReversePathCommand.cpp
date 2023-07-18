@@ -51,5 +51,5 @@ ReversePathCommand::Undo()
 void
 ReversePathCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Reverse Path");
+	name << B_TRANSLATE("Reverse path");
 }

@@ -65,7 +65,7 @@ SVGImporter::Import(Icon* icon, const entry_ref* ref)
 		char error[1024];
 		sprintf(error, B_TRANSLATE("Failed to open the file '%s' as "
 			"an SVG document.\n\n"), ref->name);
-		BAlert* alert = new BAlert(B_TRANSLATE("load error"),
+		BAlert* alert = new BAlert(B_TRANSLATE("Load error"),
 			error, B_TRANSLATE("OK"), NULL, NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

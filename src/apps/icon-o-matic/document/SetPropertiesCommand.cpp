@@ -83,17 +83,19 @@ SetPropertiesCommand::GetName(BString& name)
 {
 	if (fOldProperties->CountProperties() > 1) {
 		if (fObjectCount > 1)
-			name << B_TRANSLATE("Multi Paste Properties");
+			name << B_TRANSLATE("Multi-paste properties");
 		else
-			name << B_TRANSLATE("Paste Properties");
+			name << B_TRANSLATE("Paste properties");
 	} else {
 		BString property = name_for_id(
 			fOldProperties->PropertyAt(0)->Identifier());
-		if (fObjectCount > 1)
-			name << B_TRANSLATE_CONTEXT("Multi Set ",
-				"Multi Set (property name)") << property;
-		else
-			name << B_TRANSLATE_CONTEXT("Set ", "Set (property name)")
-				 << property;
+		if (fObjectCount > 1) {
+			name << B_TRANSLATE_COMMENT("Multi-set %property%",
+				"Don't translate %property%");
+		} else {
+			name << B_TRANSLATE_COMMENT("Set %property%",
+				"Don't translate %property%");
+		}
+		name.ReplaceFirst("%property%", property);
 	}
 }

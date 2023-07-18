@@ -111,9 +111,9 @@ Exporter::_ExportThread()
 		// inform user of failure at this point
 		BString helper(B_TRANSLATE("Saving your document failed!"));
 		helper << "\n\n" << B_TRANSLATE("Error: ") << strerror(ret);
-		BAlert* alert = new BAlert(B_TRANSLATE("bad news"), helper.String(),
-			B_TRANSLATE_CONTEXT("Bleep!", 
-				"Exporter - Continue in error dialog"), 
+		BAlert* alert = new BAlert(B_TRANSLATE_CONTEXT("Bad news", "Title of error alert"),
+			helper.String(),
+			B_TRANSLATE_COMMENT("Bleep!", "Exporter - Continue in error dialog"),
 			NULL, NULL);
 		// launch alert asynchronously
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);

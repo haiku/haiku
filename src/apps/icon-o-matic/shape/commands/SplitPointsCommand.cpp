@@ -156,7 +156,7 @@ void
 SplitPointsCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Split {0, plural, "
-		"one{Control Point} other{Control Points}}"));
+		"one{vertex} other{vertices}}"));
 	format.Format(name, fCount);
 }
 

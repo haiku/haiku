@@ -154,7 +154,7 @@ void
 AddCommand<Type>::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Add {0, plural, "
-		"one{Item} other{Items}}"));
+		"one{item} other{items}}"));
 	format.Format(name, fCount);
 }
 #endif // ADD_COMMAND_H

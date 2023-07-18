@@ -36,6 +36,6 @@ void
 MovePathsCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
-		"one{Path} other{Paths}}"));
+		"one{path} other{paths}}"));
 	format.Format(name, fCount);
 }

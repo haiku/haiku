@@ -120,7 +120,7 @@ void
 FreezeTransformationCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Freeze {0, plural, "
-		"one{Shape} other{Shapes}}"));
+		"one{shape} other{shapes}}"));
 	format.Format(name, fCount);
 }
 

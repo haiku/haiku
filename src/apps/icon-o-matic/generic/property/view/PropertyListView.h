@@ -67,7 +67,6 @@ class PropertyListView : public BView,
 
 			void				SetMenu(BMenu* menu);
 			::ScrollView*		ScrollView() const;
-			void				UpdateStrings();
 
 	// interface for Property framework
 			void				UpdateObject(uint32 propertyID);

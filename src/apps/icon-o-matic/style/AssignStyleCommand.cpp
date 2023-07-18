@@ -72,7 +72,7 @@ AssignStyleCommand::Undo()
 void
 AssignStyleCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Assign Style");
+	name << B_TRANSLATE("Assign style");
 	if (fNewStyle)
 		name << " \"" << fNewStyle->Name() << "\"";
 }

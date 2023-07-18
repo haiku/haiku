@@ -58,7 +58,7 @@ RotatePathIndicesCommand::Undo()
 void
 RotatePathIndicesCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Rotate Path Indices");
+	name << B_TRANSLATE("Rotate path indices");
 }
 
 

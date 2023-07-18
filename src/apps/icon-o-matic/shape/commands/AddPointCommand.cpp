@@ -103,6 +103,5 @@ AddPointCommand::Redo()
 void
 AddPointCommand::GetName(BString& name)
 {
-//	name << _GetString(ADD_CONTROL_POINT, "Add Control Point");
-	name << B_TRANSLATE("Add Control Point");
+	name << B_TRANSLATE("Add vertex");
 }

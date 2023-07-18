@@ -775,7 +775,7 @@ PathManipulator::ShowContextMenu(BPoint where)
 
 	if (fCurrentPathPoint < 0) {
 		message = new BMessage(B_SELECT_ALL);
-		item = new BMenuItem(B_TRANSLATE("Select All"), message, 'A');
+		item = new BMenuItem(B_TRANSLATE("Select all"), message, 'A');
 		menu->AddItem(item);
 	
 		menu->AddSeparatorItem();

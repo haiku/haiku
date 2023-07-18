@@ -91,6 +91,6 @@ void
 ResetTransformationCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Reset {0, plural, "
-		"one{Transformation} other{Transformations}}"));
+		"one{transformation} other{transformations}}"));
 	format.Format(name, fCount);
 }

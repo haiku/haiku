@@ -29,7 +29,7 @@ static BString
 _GetName(int32 count)
 {
 	static BStringFormat format(B_TRANSLATE("Nudge {0, plural, "
-		"one{Control Point} other{Control Points}}"));
+		"one{vertex} other{vertices}}"));
 	BString name;
 	format.Format(name, count);
 	return name;

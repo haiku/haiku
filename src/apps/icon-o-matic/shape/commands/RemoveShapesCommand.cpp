@@ -36,6 +36,6 @@ void
 RemoveShapesCommand::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Remove {0, plural, "
-		"one{Shape} other{Shapes}}"));
+		"one{shape} other{shapes}}"));
 	format.Format(name, fCount);
 }

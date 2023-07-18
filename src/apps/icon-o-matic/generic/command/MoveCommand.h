@@ -194,7 +194,7 @@ void
 MoveCommand<Type>::GetName(BString& name)
 {
 	static BStringFormat format(B_TRANSLATE("Move {0, plural, "
-		"one{Item} other{Items}}"));
+		"one{item} other{items}}"));
 	format.Format(name, fCount);
 }
 #endif // MOVE_COMMAND_H

@@ -59,12 +59,12 @@ IconObjectListView::Draw(BRect updateRect)
 		return;
 
 	// display helpful messages
-	const char* message1 = B_TRANSLATE_CONTEXT(
-		"Click on an object in", "Empty property list - 1st line");
-	const char* message2 = B_TRANSLATE_CONTEXT(
-		"any of the other lists to", "Empty property list - 2nd line");
-	const char* message3 = B_TRANSLATE_CONTEXT(
-		"edit it's properties here.", "Empty property list - 3rd line");
+	const char* message1 = B_TRANSLATE_COMMENT(
+ 		"Click on an object in", "Empty property list - 1st line");
+	const char* message2 = B_TRANSLATE_COMMENT(
+ 		"any of the other lists to", "Empty property list - 2nd line");
+	const char* message3 = B_TRANSLATE_COMMENT(
+		"edit its properties here.", "Empty property list - 3rd line");
 
 	// Dark Themes
 	rgb_color lowColor = LowColor();

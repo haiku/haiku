@@ -74,7 +74,7 @@ SetColorCommand::Undo()
 void
 SetColorCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Change Color");
+	name << B_TRANSLATE("Change color");
 }
 
 // CombineWithNext

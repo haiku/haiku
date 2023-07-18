@@ -102,7 +102,7 @@ SetGradientCommand::Undo()
 void
 SetGradientCommand::GetName(BString& name)
 {
-	name << B_TRANSLATE("Edit Gradient");
+	name << B_TRANSLATE("Edit gradient");
 }
 
 // CombineWithNext
