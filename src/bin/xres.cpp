@@ -746,10 +746,9 @@ parse_resource_id(const char *toParse, ResourceID &resourceID,
 	resourceID.id = (negative ? -id : id);
 
 	if (*toParse == '\0') {
-		if (name) {
+		if (name)
 			*name = kDefaultResourceName;
-			return;
-		}
+		return;
 	}
 
 	if (*toParse != ':')
