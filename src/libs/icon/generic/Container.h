@@ -25,7 +25,6 @@ class BReferenceable;
 _BEGIN_ICON_NAMESPACE
 
 
-#ifdef ICON_O_MATIC
 template<class Type>
 class ContainerListener {
  public:
@@ -35,7 +34,6 @@ class ContainerListener {
 	virtual	void				ItemAdded(Type* item, int32 index) = 0;
 	virtual	void				ItemRemoved(Type* item) = 0;
 };
-#endif // ICON_O_MATIC
 
 
 /*!
@@ -66,12 +64,6 @@ class Container {
 			Type*				ItemAt(int32 index) const;
 			Type*				ItemAtFast(int32 index) const;
 
- private:
-			BList				fItems;
-			bool				fOwnsItems;
-
-#ifdef ICON_O_MATIC
- public:
 			bool				AddListener(ContainerListener<Type>* listener);
 			bool				RemoveListener(ContainerListener<Type>* listener);
 
@@ -79,28 +71,27 @@ class Container {
 			void				_NotifyItemAdded(Type* item, int32 index) const;
 			void				_NotifyItemRemoved(Type* item) const;
 
+ private:
+			BList				fItems;
+			bool				fOwnsItems;
+
 			BList				fListeners;
-#endif // ICON_O_MATIC
 };
 
 
-#ifdef ICON_O_MATIC
 template<class Type>
 ContainerListener<Type>::ContainerListener() {}
 
 
 template<class Type>
 ContainerListener<Type>::~ContainerListener() {}
-#endif
 
 
 template<class Type>
 Container<Type>::Container(bool ownsItems)
 	: fItems(16),
-	  fOwnsItems(ownsItems)
-#ifdef ICON_O_MATIC
-	, fListeners(2)
-#endif
+	  fOwnsItems(ownsItems),
+	  fListeners(2)
 {
 }
 
@@ -108,13 +99,11 @@ Container<Type>::Container(bool ownsItems)
 template<class Type>
 Container<Type>::~Container()
 {
-#ifdef ICON_O_MATIC
 	int32 count = fListeners.CountItems();
 	if (count > 0) {
 		debugger("~Container() - there are still"
 				 "listeners attached\n");
 	}
-#endif // ICON_O_MATIC
 	MakeEmpty();
 }
 
@@ -142,9 +131,7 @@ Container<Type>::AddItem(Type* item, int32 index)
 		return false;
 
 	if (fItems.AddItem((void*)item, index)) {
-#ifdef ICON_O_MATIC
 		_NotifyItemAdded(item, index);
-#endif
 		return true;
 	}
 
@@ -158,9 +145,7 @@ bool
 Container<Type>::RemoveItem(Type* item)
 {
 	if (fItems.RemoveItem((void*)item)) {
-#ifdef ICON_O_MATIC
 		_NotifyItemRemoved(item);
-#endif
 		return true;
 	}
 
@@ -173,11 +158,9 @@ Type*
 Container<Type>::RemoveItem(int32 index)
 {
 	Type* item = (Type*)fItems.RemoveItem(index);
-#ifdef ICON_O_MATIC
 	if (item) {
 		_NotifyItemRemoved(item);
 	}
-#endif
 
 	return item;
 }
@@ -190,8 +173,8 @@ Container<Type>::MakeEmpty()
 	int32 count = CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Type* item = ItemAtFast(i);
-#ifdef ICON_O_MATIC
 		_NotifyItemRemoved(item);
+#ifdef ICON_O_MATIC
 		if (fOwnsItems)
 			item->ReleaseReference();
 #else
@@ -249,7 +232,6 @@ Container<Type>::ItemAtFast(int32 index) const
 // #pragma mark -
 
 
-#ifdef ICON_O_MATIC
 template<class Type>
 bool
 Container<Type>::AddListener(ContainerListener<Type>* listener)
@@ -266,13 +248,11 @@ Container<Type>::RemoveListener(ContainerListener<Type>* listener)
 {
 	return fListeners.RemoveItem(listener);
 }
-#endif // ICON_O_MATIC
 
 
 // #pragma mark -
 
 
-#ifdef ICON_O_MATIC
 template<class Type>
 void
 Container<Type>::_NotifyItemAdded(Type* item, int32 index) const
@@ -299,7 +279,6 @@ Container<Type>::_NotifyItemRemoved(Type* item) const
 		listener->ItemRemoved(item);
 	}
 }
-#endif // ICON_O_MATIC
 
 
 _END_ICON_NAMESPACE

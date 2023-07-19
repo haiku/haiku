@@ -53,7 +53,8 @@ class Shape : public IconObject,
 			  public ContainerListener<Transformer>,
 			  public PathListener {
 #else
-class Shape : public _ICON_NAMESPACE Transformable {
+class Shape : public _ICON_NAMESPACE Transformable,
+			  public ContainerListener<Transformer> {
 #endif
 
  public:
@@ -81,11 +82,6 @@ class Shape : public _ICON_NAMESPACE Transformable {
 	virtual	void					ItemAdded(VectorPath* path, int32 index);
 	virtual	void					ItemRemoved(VectorPath* path);
 
-	// ContainerListener<Transformer> interface
-	virtual	void					ItemAdded(Transformer* t, int32 index);
-	virtual	void					ItemRemoved(Transformer* t);
-
-
 	// PathListener interface
 	virtual	void					PointAdded(int32 index);
 	virtual	void					PointRemoved(int32 index);
@@ -96,6 +92,10 @@ class Shape : public _ICON_NAMESPACE Transformable {
 #else
 	inline	void					Notify() {}
 #endif // ICON_O_MATIC
+
+	// ContainerListener<Transformer> interface
+	virtual	void					ItemAdded(Transformer* t, int32 index);
+	virtual	void					ItemRemoved(Transformer* t);
 
 	// Shape
 	virtual	status_t				InitCheck() const;

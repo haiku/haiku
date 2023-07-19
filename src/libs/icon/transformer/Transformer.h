@@ -30,6 +30,7 @@ class VertexSource {
     virtual	void				rewind(unsigned path_id) = 0;
     virtual	unsigned			vertex(double* x, double* y) = 0;
 
+	/*! Determines whether open paths should be closed or left open. */
 	virtual	bool				WantsOpenPaths() const = 0;
 	virtual	double				ApproximationScale() const = 0;
 };

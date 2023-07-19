@@ -483,10 +483,9 @@ IconRenderer::_Render(const BRect& r)
 		Gradient* gradient = style->Gradient();
 		bool styleAdded = false;
 		if (gradient && !gradient->InheritTransformation()) {
-			styleAdded = styleHandler.AddStyle(shape->Style(),
-				fGlobalTransform);
+			styleAdded = styleHandler.AddStyle(style, fGlobalTransform);
 		} else {
-			styleAdded = styleHandler.AddStyle(shape->Style(), transform);
+			styleAdded = styleHandler.AddStyle(style, transform);
 		}
 
 		if (!styleAdded) {

@@ -73,11 +73,11 @@ Shape::Shape(::Style* style)
 {
 	SetStyle(style);
 
+	fTransformers.AddListener(this);
+
 #ifdef ICON_O_MATIC
 	if (fPaths)
 		fPaths->AddListener(this);
-
-	fTransformers.AddListener(this);
 #endif
 }
 
@@ -109,11 +109,11 @@ Shape::Shape(const Shape& other)
 {
 	SetStyle(other.fStyle);
 
+	fTransformers.AddListener(this);
+
 	if (fPaths) {
 #ifdef ICON_O_MATIC
 		fPaths->AddListener(this);
-
-	fTransformers.AddListener(this);
 #endif
 
 		// copy the path references from
@@ -144,11 +144,11 @@ Shape::~Shape()
 	fPaths->MakeEmpty();
 #ifdef ICON_O_MATIC
 	fPaths->RemoveListener(this);
+#endif
+	delete fPaths;
 
 	fTransformers.MakeEmpty();
 	fTransformers.RemoveListener(this);
-#endif
-	delete fPaths;
 
 	SetStyle(NULL);
 }
@@ -302,36 +302,6 @@ Shape::ItemRemoved(VectorPath* path)
 
 
 void
-Shape::ItemAdded(Transformer* transformer, int32 index)
-{
-#ifdef ICON_O_MATIC
-	transformer->AddObserver(this);
-
-	// TODO: merge Observable and ShapeListener interface
-	_NotifyRerender();
-#else
-	fNeedsUpdate = true;
-#endif
-}
-
-
-void
-Shape::ItemRemoved(Transformer* transformer)
-{
-#ifdef ICON_O_MATIC
-	transformer->RemoveObserver(this);
-
-	_NotifyRerender();
-#else
-	fNeedsUpdate = true;
-#endif
-}
-
-
-// #pragma mark -
-
-
-void
 Shape::PointAdded(int32 index)
 {
 	_NotifyRerender();
@@ -372,6 +342,36 @@ Shape::PathReversed()
 	_NotifyRerender();
 }
 #endif // ICON_O_MATIC
+
+
+// #pragma mark -
+
+
+void
+Shape::ItemAdded(Transformer* transformer, int32 index)
+{
+#ifdef ICON_O_MATIC
+	transformer->AddObserver(this);
+
+	// TODO: merge Observable and ShapeListener interface
+	_NotifyRerender();
+#else
+	fNeedsUpdate = true;
+#endif
+}
+
+
+void
+Shape::ItemRemoved(Transformer* transformer)
+{
+#ifdef ICON_O_MATIC
+	transformer->RemoveObserver(this);
+
+	_NotifyRerender();
+#else
+	fNeedsUpdate = true;
+#endif
+}
 
 
 // #pragma mark -
