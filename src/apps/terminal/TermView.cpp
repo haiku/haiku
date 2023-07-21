@@ -1050,12 +1050,15 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 
 	rgb_color rgb_fore = fTextForeColor;
 	rgb_color rgb_back = fTextBackColor;
+	rgb_color rgb_under = fTextForeColor;
 
 	// color attribute
 	if (attr.IsForeSet())
 		rgb_fore = attr.ForegroundColor(fTextBuffer->Palette());
 	if (attr.IsBackSet())
 		rgb_back = attr.BackgroundColor(fTextBuffer->Palette());
+	if (attr.IsUnderSet())
+		rgb_under = attr.UnderlineColor(fTextBuffer->Palette());
 
 	// Selection check.
 	if (cursor) {
@@ -1077,6 +1080,58 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	inView->SetHighColor(rgb_back);
 	inView->FillRect(BRect(x1, y1, x2 - 1, y2 - 1));
 	inView->SetLowColor(rgb_back);
+
+	// underline attribute
+	if (attr.IsUnder()) {
+		inView->SetHighColor(rgb_under);
+		switch (attr.UnderlineStyle()) {
+			default:
+			case SINGLE_UNDERLINE:
+				inView->MovePenTo(x1, y1 + fFontAscent + 1);
+				inView->StrokeLine(BPoint(x1 , y1 + fFontAscent + 1),
+					BPoint(x2 , y1 + fFontAscent + 1));
+				break;
+			case DOUBLE_UNDERLINE:
+				inView->MovePenTo(x1, y1 + fFontAscent);
+				inView->StrokeLine(BPoint(x1 , y1 + fFontAscent),
+					BPoint(x2 , y1 + fFontAscent));
+				inView->MovePenTo(x1, y1 + fFontAscent + 2);
+				inView->StrokeLine(BPoint(x1 , y1 + fFontAscent + 2),
+					BPoint(x2 , y1 + fFontAscent + 2));
+				break;
+			case CURLY_UNDERLINE:
+			{
+				inView->MovePenTo(x1, y1 + fFontAscent + 1);
+				bool up = true;
+				for (float x = x1; x < x2; x += 3) {
+					inView->StrokeLine(BPoint(x, y1 + fFontAscent + (up ? 0 : 2)),
+						BPoint(std::min(x + 2, x2), y1 + fFontAscent + (up ? 2 : 0)));
+					up = !up;
+				}
+				break;
+			}
+			case DOTTED_UNDERLINE:
+			{
+				inView->MovePenTo(x1, y1 + fFontAscent + 1);
+				for (float x = x1; x < x2; x += 4) {
+					inView->StrokeLine(BPoint(x, y1 + fFontAscent + 1),
+						BPoint(std::min(x, x2), y1 + fFontAscent + 1));
+				}
+				break;
+			}
+			case DASHED_UNDERLINE:
+			{
+				inView->MovePenTo(x1, y1 + fFontAscent + 1);
+				for (float x = x1; x < x2; x += 5) {
+					inView->StrokeLine(BPoint(x, y1 + fFontAscent + 1),
+						BPoint(std::min(x + 2, x2), y1 + fFontAscent + 1));
+				}
+				break;
+			}
+		}
+	}
+
+
 	inView->SetHighColor(rgb_fore);
 
 	// Draw character.
@@ -1100,12 +1155,6 @@ TermView::_DrawLinePart(float x1, float y1, Attributes attr,
 	inView->DrawString((char *)buf);
 	inView->SetDrawingMode(B_OP_COPY);
 
-	// underline attribute
-	if (attr.IsUnder()) {
-		inView->MovePenTo(x1, y1 + fFontAscent);
-		inView->StrokeLine(BPoint(x1 , y1 + fFontAscent),
-			BPoint(x2 , y1 + fFontAscent));
-	}
 }
 
 

@@ -167,6 +167,16 @@ enum {
 };
 
 
+// Underline style
+enum {
+	SINGLE_UNDERLINE = 1,
+	DOUBLE_UNDERLINE,
+	CURLY_UNDERLINE,
+	DOTTED_UNDERLINE,
+	DASHED_UNDERLINE
+};
+
+
 // Preference Folder and setting path
 
 static const int32 DEFAULT = -1;
@@ -206,9 +216,10 @@ enum {
 #define FONT			0x0100
 #define RESERVE			0x0080
 #define DUMPCR			0x0040
+#define UNDERSET		0x0020
 #define FORECOLOR		0xFF0000
 #define BACKCOLOR		0xFF000000
-#define CHAR_ATTRIBUTES	0xFFFF7700
+#define CHAR_ATTRIBUTES	0xFFFF7720
 
 #define FORECOLORED(x) ((x) << 16)
 #define BACKCOLORED(x) ((x) << 24)

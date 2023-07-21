@@ -795,11 +795,41 @@ TermParse::EscParse()
 								break;
 
 							case 4:	/* Underline	*/
-								attributes |= UNDERLINE;
+								if ((row + 1) < nparam) {
+									row++;
+									switch (param[row]) {
+										case 0:
+											attributes.UnsetUnder();
+											break;
+										case 1:
+											attributes.SetUnder(SINGLE_UNDERLINE);
+											break;
+										case 2:
+											attributes.SetUnder(DOUBLE_UNDERLINE);
+											break;
+										case 3:
+											attributes.SetUnder(CURLY_UNDERLINE);
+											break;
+										case 4:
+											attributes.SetUnder(DOTTED_UNDERLINE);
+											break;
+										case 5:
+											attributes.SetUnder(DASHED_UNDERLINE);
+											break;
+										default:
+											row = nparam; // force exit of the parsing
+											break;
+									}
+								} else
+									attributes.SetUnder(SINGLE_UNDERLINE);
 								break;
 
 							case 7:	/* Inverse	*/
 								attributes |= INVERSE;
+								break;
+
+							case 21:	/* Double Underline	*/
+								attributes.SetUnder(DOUBLE_UNDERLINE);
 								break;
 
 							case 22:	/* Not Bold	*/
@@ -807,7 +837,7 @@ TermParse::EscParse()
 								break;
 
 							case 24:	/* Not Underline	*/
-								attributes &= ~UNDERLINE;
+								attributes.UnsetUnder();
 								break;
 
 							case 27:	/* Not Inverse	*/
@@ -890,6 +920,25 @@ TermParse::EscParse()
 
 							case 49:
 								attributes.UnsetBackground();
+								break;
+
+							case 58:
+							{
+								if (nparam >= 3 && param[row+1] == 5) {
+									attributes.SetIndexedUnderline(param[row+2]);
+									row += 2;
+								} else if (nparam >= 5 && param[row+1] == 2) {
+									attributes.SetDirectUnderline(param[row+2], param[row+3], param[row+4]);
+									row += 4;
+								} else {
+									row = nparam; // force exit of the parsing
+								}
+
+								break;
+							}
+
+							case 59:
+								attributes.UnsetUnderline();
 								break;
 						}
 					}
