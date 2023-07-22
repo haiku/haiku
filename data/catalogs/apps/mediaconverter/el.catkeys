@@ -1,8 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	3701038749
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Το αρχείο εισόδου δεν αναγνωρίζεται ως ήχο ή βίντεο
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Πηγαία αρχεία
 Error writing video frame %lld	MediaConverter		Σφάλμα κατά την εγγραφή του βίντεο-κάδρου %lld
+Audio quality: %s	MediaConverter		Ποιότητα ήχου: %s
 Error converting '%filename'	MediaConverter		Σφάλμα κατά τη μετατροπή του '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Δεν βρέθηκε ο επιλεγμένος φάκελος. Θα χρησιμοποιηθεί ο φάκελος /boot/home
 Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθηκε
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Η μετατροπή ακυρώθηκε
 Low	MediaConverter		Χαμηλή
 Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση των αρχείων
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		Ποιότητα βίντεο: %s
 End   [ms]: 	MediaConverter		Τέλος   [ms]: 
 Cancel	MediaConverter		Ακύρωση
 OK	MediaConverter-FileInfo		Εντάξει
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Σύρετε αρχεία πο
 Error read audio frame %lld	MediaConverter		Σφάλμα κατά την ανάνγωση του ηχητικού κάδρου %lld
 Quit	Menu		Έξοδος
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Writing audio track: %s complete	MediaConverter		Εγγραφή τρακ ήχου: %s ολοκληρώθηκε
 Duration:	MediaConverter-FileInfo		Διάρκεια:
 MediaConverter	System name		Μετατροπέας Πολυμέσων
+Writing video track: %s complete	MediaConverter		Εγγραφή τρακ βίντεο: %s ολοκληρώθηκε
 Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
 Error writing audio frame %lld	MediaConverter		Σφάλμα κατά την εγγραφή του ηχητικού κάδρου %lld
 File format:	MediaConverter		Μορφή αρχείου:

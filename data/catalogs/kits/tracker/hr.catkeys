@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	1448839225
+1	croatian	x-vnd.Haiku-libtracker	969849650
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -87,7 +87,6 @@ Trash	Model		Smeće
 copy	FSUtils	filename copy	kopiraj
 New folder%ld	FSUtils		Nova mapa%ld
 Location	OpenWithWindow		Lokacija
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Promjeni veličinu da se uklopi
 List folders first	SettingsView		Najprije izlistaj mape
 Find	FSUtils		Nađi

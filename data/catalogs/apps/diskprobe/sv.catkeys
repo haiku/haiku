@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	2944605311
+1	swedish	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Raw editor
 Remove	AttributeWindow		Ta bort
 Close	ProbeView		Stäng
@@ -37,11 +37,9 @@ Attribute	ProbeView		Attribut
 Don't save	ProbeView		Spara inte
 Undo	ProbeView		Ångra
 Flattened bitmap	TypeEditors		Tillplattad bitmap
-Block %Ld (0x%Lx)	ProbeView		Block %Ld (0x%Lx)
 Cancel	OpenWindow		Avbryt
 Unknown format	TypeEditors		Okänt format
 File: 	ProbeView		Fil: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Växlade: %Ld (0x%0*Lx)
 Stop	ProbeView		Stopp
 Cancel	ProbeView		Avbryt
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kunde inte öppna \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Typredigerare
 File	FileWindow		Arkiv
 Grayscale	TypeEditors		Gråskala
 32 bit	TypeEditors		32 bitar
-Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
 Device	ProbeView		Enhet
 Close	AttributeWindow		Stäng
 Type editor	AttributeWindow		Typredigerare

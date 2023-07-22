@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	480373757
+1	japanese	x-vnd.Haiku-libtracker	1384182
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -123,7 +123,6 @@ Enable type-ahead filtering	SettingsView		先行入力フィルターを有効�
 copy	FSUtils	filename copy	コピー
 New folder%ld	FSUtils		新規フォルダー %ld 
 Location	OpenWithWindow		場所
-%Ld B	WidgetAttributeText		%Ld バイト
 Resize to fit	QueryContainerWindow		最適な表示サイズに変更
 List folders first	SettingsView		フォルダーを先頭に表示
 Find	FSUtils		検索

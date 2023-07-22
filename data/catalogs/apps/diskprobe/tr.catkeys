@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DiskProbe	2944605311
+1	turkish	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Raw düzenleyicisi
 Remove	AttributeWindow		Kaldır
 Close	ProbeView		Kapat
@@ -37,11 +37,9 @@ Attribute	ProbeView		Öznitelik
 Don't save	ProbeView		Kaydetme
 Undo	ProbeView		Geri al
 Flattened bitmap	TypeEditors		Düzleştirilmiş biteşlem
-Block %Ld (0x%Lx)	ProbeView		Blok: %Ld (0x%Lx)
 Cancel	OpenWindow		Vazgeç
 Unknown format	TypeEditors		Bilinmeyen biçim
 File: 	ProbeView		Dosya: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Takas edildi: %Ld (0x%0*Lx)
 Stop	ProbeView		Durdur
 Cancel	ProbeView		Vazgeç
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\" açılamadı:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Tür düzenleyicisi
 File	FileWindow		Dosya
 Grayscale	TypeEditors		Gri tonlu
 32 bit	TypeEditors		32 bit
-Native: %Ld (0x%0*Lx)	ProbeView		Yerel: %Ld (0x%0*Lx)
 Device	ProbeView		Aygıt
 Close	AttributeWindow		Kapat
 Type editor	AttributeWindow		Tür düzenleyicisi

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DiskProbe	2944605311
+1	catalan; valencian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Editor de dades en brut
 Remove	AttributeWindow		Suprimeix
 Close	ProbeView		Tanca
@@ -37,11 +37,9 @@ Attribute	ProbeView		Atribut
 Don't save	ProbeView		No el desis
 Undo	ProbeView		Desfés
 Flattened bitmap	TypeEditors		Mapa de bits aplanat
-Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
 Cancel	OpenWindow		Cancel·la
 Unknown format	TypeEditors		Format desconegut
 File: 	ProbeView		Fitxer: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Intercanviat: %Ld (0x%0*Lx)
 Stop	ProbeView		Interromp
 Cancel	ProbeView		Cancel·la
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	No s'ha pogut obrir \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Editor del tipus de lletra
 File	FileWindow		Fitxer
 Grayscale	TypeEditors		Escala de grisos
 32 bit	TypeEditors		32 bits
-Native: %Ld (0x%0*Lx)	ProbeView		Nadiu: %Ld (0x%0*Lx)
 Device	ProbeView		Dispositiu
 Close	AttributeWindow		Tanca
 Type editor	AttributeWindow		Editor del tipus de lletra

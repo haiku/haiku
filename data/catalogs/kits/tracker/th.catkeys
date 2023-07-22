@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	3030912373
+1	thai	x-vnd.Haiku-libtracker	2551922798
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -115,7 +115,6 @@ Enable type-ahead filtering	SettingsView		เปิดใช้งานกา�
 copy	FSUtils	filename copy	คัดลอก
 New folder%ld	FSUtils		โฟลเดอร์ใหม่%ld
 Location	OpenWithWindow		สถานที่
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		ปรับขนาดให้พอดี
 List folders first	SettingsView		รายการโฟลเดอร์ก่อน
 Find	FSUtils		ค้นหา

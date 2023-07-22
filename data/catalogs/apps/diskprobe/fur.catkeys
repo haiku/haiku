@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DiskProbe	2944605311
+1	friulian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Editôr dâts grês
 Remove	AttributeWindow		Gjave
 Close	ProbeView		Siere
@@ -37,11 +37,9 @@ Attribute	ProbeView		Atribût
 Don't save	ProbeView		No sta salvâ
 Undo	ProbeView		Disfe
 Flattened bitmap	TypeEditors		Bitmap plan
-Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
 Cancel	OpenWindow		Anule
 Unknown format	TypeEditors		Formât no cognossût
 File: 	ProbeView		File: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Scambiât: %Ld (0x%0*Lx)
 Stop	ProbeView		Ferme
 Cancel	ProbeView		Anule
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Impussibil vierzi \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Editôr di gjenars
 File	FileWindow		File
 Grayscale	TypeEditors		Scjale di grîs
 32 bit	TypeEditors		32 bit
-Native: %Ld (0x%0*Lx)	ProbeView		Natîf: %Ld (0x%0*Lx)
 Device	ProbeView		Dispositîf
 Close	AttributeWindow		Siere
 Type editor	AttributeWindow		Editôr di gjenars

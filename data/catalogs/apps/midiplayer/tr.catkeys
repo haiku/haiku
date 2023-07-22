@@ -11,7 +11,7 @@ Scope	Main Window		Kapsam
 Drop MIDI file here	Scope View		MIDI dosyasını buraya bırakın
 None	Main Window		Yok
 Reverb:	Main Window		Yankı:
-MidiPlayer	System name		MIDI Oynatıcı
+MidiPlayer	System name		MIDI Oynatıcısı
 OK	Main Window		Tamam
 Stop	Main Window		Durdur
 Live input:	Main Window		Canlı girdi:

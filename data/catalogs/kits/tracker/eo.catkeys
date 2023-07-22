@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3680829380
+1	esperanto	x-vnd.Haiku-libtracker	3201839805
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -119,7 +119,6 @@ Enable type-ahead filtering	SettingsView		Ŝalti antaŭtajpan filtradon
 copy	FSUtils	filename copy	kopii
 New folder%ld	FSUtils		Nova dosierujo%Id
 Location	OpenWithWindow		Loko
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Adapti laŭ grando
 List folders first	SettingsView		Listigi dosierujojn unue
 Find	FSUtils		Serĉi

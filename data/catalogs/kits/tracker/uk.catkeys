@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	480373757
+1	ukrainian	x-vnd.Haiku-libtracker	1384182
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -64,7 +64,7 @@ Replace	FSUtils		Замінити
 Rectangle	AttributesView		Прямокутник
 Move to	ContainerWindow		Перемістити до
 Status	Email Query Columns		Статус
-New folder	FSUtils		Каталог/Папка
+New folder	FSUtils		Каталог або Папка
 Junk on end.	libtracker		Мотлох у кінці.
 New Query	FindPanel		Новий запит
 system	B_SYSTEM_DIRECTORY		Система
@@ -123,7 +123,6 @@ Enable type-ahead filtering	SettingsView		Включити випереджаю�
 copy	FSUtils	filename copy	копія
 New folder%ld	FSUtils		Нова папка%ld
 Location	OpenWithWindow		Розташування
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Припасувати
 List folders first	SettingsView		Список папок спочатку
 Find	FSUtils		Знайти
@@ -240,7 +239,7 @@ Boolean	AttributesView		Булевий
 Invert selection	FilePanelPriv		Інвертувати виділення
 Memory size	AttributesView		Розмір пам'яті
 TiB	WidgetAttributeText		ТБ
-New folder	TemplatesMenu		Каталог/Папка
+New folder	TemplatesMenu		Каталог або Папка
  (broken)	InfoWindow		 (поламаний)
 Replace all	FSUtils		Замінити все
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Програма \«%appname\» не підтримує відкриття документу даного типу.\nВи дійсно бажаєте відкрити документ у ній?\n\nЯкщо ви знаєте, що програма підтримує цей тип документів, то рекомендуємо зв'язатися с розробниками програми і попросити їх оновити список типів, які підтримуються нею.
@@ -518,7 +517,7 @@ Media parameter	AttributesView		Параметри медіа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		При зміні папки home %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього? \n\nЩоб все рівно змінити папку home, затисніть кнопку Shift та натисніть \«Я знаю що роблю\».
 Sorry, you can't copy items to the Trash.	PoseView		Вибачте, Ви не можете копіювати елементи до смітника.
 Invert selection	VirtualDirectoryWindow		Інвертувати вибране
-New folder	FilePanelPriv		Каталог/Папка
+New folder	FilePanelPriv		Каталог або Папка
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# елемент} few{# елементи} other{# елементів}}
 Name	AttributesView		Назва
 Invalid bracket range.	libtracker		Неприпустимий діапазон дужок

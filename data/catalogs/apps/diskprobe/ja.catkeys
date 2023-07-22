@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	2944605311
+1	japanese	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Raw エディター
 Remove	AttributeWindow		削除
 Close	ProbeView		閉じる
@@ -37,11 +37,9 @@ Attribute	ProbeView		属性
 Don't save	ProbeView		保存しない
 Undo	ProbeView		元に戻す
 Flattened bitmap	TypeEditors		フラット化したビットマップ
-Block %Ld (0x%Lx)	ProbeView		ブロック %Ld (0x%Lx)
 Cancel	OpenWindow		中止
 Unknown format	TypeEditors		不明なフォーマット
 File: 	ProbeView		ファイル:
-Swapped: %Ld (0x%0*Lx)	ProbeView		スワップ: %Ld (0x%0*Lx)
 Stop	ProbeView		中断
 Cancel	ProbeView		中止
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\"を開けません:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		タイプエディター
 File	FileWindow		ファイル
 Grayscale	TypeEditors		グレースケール
 32 bit	TypeEditors		32 ビット
-Native: %Ld (0x%0*Lx)	ProbeView		ネイティブ: %Ld (0x%0*Lx)
 Device	ProbeView		デバイス
 Close	AttributeWindow		閉じる
 Type editor	AttributeWindow		タイプエディター

@@ -1,197 +1,118 @@
-1	friulian	x-vnd.haiku-icon_o_matic	4159219060
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Volte i indiçs dai percors
+1	friulian	x-vnd.haiku-icon_o_matic	157002309
+None	Icon-O-Matic-Properties		Nissun
 Add empty	Icon-O-Matic-ShapesList		Zonte vueit
 Opening the icon failed!	Icon-O-Matic-Main		No si è rivâts a vierzi la icone!
 Add with path	Icon-O-Matic-ShapesList		Zonte cun percors
+Copy	Icon-O-Matic-Properties		Copie
+Color	Icon-O-Matic-PropertyNames		Colôr
 Format	Icon-O-Matic-SavePanel		Formât
-Select	Icon-O-Matic-Properties		Selezione
 Color	Icon-O-Matic-StyleTypes		Colôr
+Select	Icon-O-Matic-Properties		Selezione
 Reset transformation	Icon-O-Matic-ShapesList		Azere trasformazion
+Duplicate	Icon-O-Matic-StylesList		Dupliche
+Rotate	Icon-O-Matic-TransformationBoxStates		Volte
 Shorten	Icon-O-Matic-PropertyNames		Scurte
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Il test che si sta cirint di impuartâ al è une vore lunc, sino sigûrs?
 Paste	Icon-O-Matic-Properties		Tache
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Gjave assegnazion percors
+Close	Icon-O-Matic-Menu-File		Siere
 Add rect	Icon-O-Matic-PathsList		Zonte retangul
-Bleep!	Exporter - Continue in error dialog		Bip!
-META:ICON Attribute	Icon-O-Matic-SavePanel		Atribût META:ICON
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Gjave trasformadôr
+Rotation	Icon-O-Matic-PropertyNames		Rotazion
 Transform	Icon-O-Matic-PathManipulator		Trasforme
-Assign Style	Icon-O-Matic-AssignStyleCmd		Assegne stîl
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Divît ponts di control
-Height	Icon-O-Matic-PropertyNames		Altece
+Add shape with style	Icon-O-Matic-Menu-Shape		Zonte sagome cun stîl
+Remove	Icon-O-Matic-StylesList		Gjave
+Cancel	Icon-O-Matic-Menu-Settings		Anule
+Transformation	Icon-O-Matic-TransformationBoxStates		Trasformazion
+Closed	Icon-O-Matic-PropertyNames		Sierât
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nie di tornâ a fâ>
-Add Shape	Icon-O-Matic-AddShapesCmd		Zonte sagome
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Nete percors
-Move Style	Icon-O-Matic-MoveStylesCmd		Sposte stîl
+Height	Icon-O-Matic-PropertyNames		Altece
+warning	Icon-O-Matic-SVGExport		avertiment
+File	Icon-O-Matic-Menus		File
 Properties	Icon-O-Matic-Menus		Proprietâts
 Path	Icon-O-Matic-PropertyNames		Percors
-Add Control Point	Icon-O-Matic-AddPointCmd		Zonte pont di control
+Path	Icon-O-Matic-Menus		Percors
 Stroke	Transformation		Tresse
 Flip	Icon-O-Matic-PathManipulator		Ribalte
 Opacity	Icon-O-Matic-PropertyNames		Opacitât
 OK	Icon-O-Matic-ColorPicker		Va ben
+Error: 	Icon-O-Matic-Main		Erôr: 
+Saving your document failed!	Icon-O-Matic-Exporter		No si è rivâts a salvâ il document!
+Snap to grid	Icon-O-Matic-Menu-Settings		Vincole ae gridele
 Opening the document failed!	Icon-O-Matic-Main		No si è rivâts a vierzi il document!
+Add with path & style	Icon-O-Matic-ShapesList		Zonte cun percors e stîl
 Shape	Icon-O-Matic-Menus		Sagome
 <unavailable>	Icon-O-Matic-StyleTypes		<no disponibil>
 Min LOD	Icon-O-Matic-PropertyNames		LOD minim
-Reverse Path	Icon-O-Matic-ReversePathCmd		Invertìs percors
-Paste Properties	Icon-O-Matic-Properties		Proprietâts tacament
 Add	Icon-O-Matic-TransformersList		Zonte
-Add	Icon-O-Matic-PathsList		Zonte
 Settings	Icon-O-Matic-Menus		Impostazions
+Scale X	Icon-O-Matic-PropertyNames		Scjale X
+Add	Icon-O-Matic-PathsList		Zonte
+Remove	Icon-O-Matic-PathManipulator		Gjave
+Duplicate	Icon-O-Matic-ShapesList		Dupliche
 Contour	Transformation		Contor
-Save icon	Dialog title		Salve icone
 Rounding	Icon-O-Matic-PropertyNames		Staronzament
+Joins	Icon-O-Matic-PropertyNames		Al unìs
 Cancel	Icon-O-Matic-ColorPicker		Cancele
+Duplicate	Icon-O-Matic-PathsList		Dupliche
+Save	Icon-O-Matic-Menu-Settings		Salve
 Export as…	Icon-O-Matic-Menu-File		Espuarte come…
 Error: 	Icon-O-Matic-Exporter		Erôr: 
-Move Path	Icon-O-Matic-MovePathsCmd		Sposte percors
-Add shape with path	Icon-O-Matic-Menu-Shape		Zonte sagome cun percors
-Don't save	Icon-O-Matic-Menu-Settings		No sta salvâ
-Move Styles	Icon-O-Matic-MoveStylesCmd		Sposte stîi
-Translation X	Icon-O-Matic-PropertyNames		Traslazion X
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Zonte trasformadôrs
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribût BEOS:ICON
-Rotate indices backwards	Icon-O-Matic-PathsList		Volte i indiçs indaûr
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic al podarès no vê interpretât ducj i dâts dal SVG cuant che al è stât cjariât. Sorescrivint il file origjinâl, cheste informazion e larès pierdude.
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifiche pont di control
-Cancel	Icon-O-Matic-SVGExport		Cancele
-Redo	Icon-O-Matic-Main		Torne fâs
-Change Color	Icon-O-Matic-SetColorCmd		Cambie colôr
-Linear	Icon-O-Matic-StyleTypes		Lineâr
-any of the other lists to	Empty property list - 2nd line		cualsisei des altris listis par
-Color (#%02x%02x%02x)	Style name after dropping a color		Colôr (#%02x%02x%02x)
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Ribalte pont di control
-Move	Icon-O-Matic-TransformationBoxStates		Sposte
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Divît ponts di control
-Name	Icon-O-Matic-PropertyNames		Non
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Zonte trasformadôr
-Reverse	Icon-O-Matic-PathsList		Invertìs
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Sposte pivot
-Remove	Icon-O-Matic-PathsList		Gjave
-bad news	Title of error alert		brutis gnovis
-Gradient	Icon-O-Matic-StyleTypes		Gradient
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Gjave stîi
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Inserìs pont di control
-OK	Icon-O-Matic-SVGImport		Va ben
-Append…	Icon-O-Matic-Menu-File		Zonte…
-Set 	Set (property name)		Stabilìs 
-Save	Icon-O-Matic-Menu-File		Salve
-Freeze transformation	Icon-O-Matic-ShapesList		Inglace trasformazion
-Miter Limit	Icon-O-Matic-PropertyNames		Limit dal angul
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Inglace Sagomis
-Max LOD	Icon-O-Matic-PropertyNames		LOD massim
-Untitled	Icon-O-Matic-Main		Cence non
-Add Path	Icon-O-Matic-AddPathsCmd		Zonte percors
-load error	Icon-O-Matic-SVGImport		erôr di cjariament
-Swatches	Icon-O-Matic-Menus		Campions
-HVIF Source Code	Icon-O-Matic-SavePanel		Codiç sorzint HVIF
-<modify path>	Icon-O-Matic-PathCmd		<modifiche percors>
-Translation Y	Icon-O-Matic-PropertyNames		Traslazion Y
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Inglace sagome
-Scale	Icon-O-Matic-TransformationBoxStates		Scjale
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Gjave sagome
-Transformer	Icon-O-Matic-Menus		Trasformadôr
-Multi Set 	Multi Set (property name)		Complès multipli 
-Pick a color	Icon-O-Matic-ColorPicker		Sielç un colôr
-New	Icon-O-Matic-Menu-File		Gnûf
-Yes	Icon-O-Matic-StyledTextImport		Sì
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Sposte trasformadôr
-Export	Icon-O-Matic-Menu-File		Espuarte
-Width	Icon-O-Matic-PropertyNames		Largjece
-Bummer	Cancel button - error alert		Maledizion
-Style	Icon-O-Matic-Menus		Stîl
-Off	Icon-O-Matic-Menu-Settings		Off
-None	Icon-O-Matic-Properties		Nissun
-Color	Icon-O-Matic-PropertyNames		Colôr
-Copy	Icon-O-Matic-Properties		Copie
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Sposte sagomis
-Duplicate	Icon-O-Matic-StylesList		Dupliche
-Rotate	Icon-O-Matic-TransformationBoxStates		Volte
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Gjave ponts di control
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Il test che si sta cirint di impuartâ al è une vore lunc, sino sigûrs?
-Detect Orient.	Icon-O-Matic-PropertyNames		Individue orient.
-Click on a shape above	Empty transformers list - 1st line		Fâs clic suntune sagome parsore
-Close	Icon-O-Matic-Menu-File		Siere
-Rotation	Icon-O-Matic-PropertyNames		Rotazion
-Multi Paste Properties	Icon-O-Matic-Properties		Proprietâts di tacament multipli
-Add shape with style	Icon-O-Matic-Menu-Shape		Zonte sagome cun stîl
-Assign Path	Icon-O-Matic-AddPathsCmd		Assegne percors
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Azere trasformazion
-Remove	Icon-O-Matic-StylesList		Gjave
-Cancel	Icon-O-Matic-Menu-Settings		Anule
-Closed	Icon-O-Matic-PropertyNames		Sierât
-Transformation	Icon-O-Matic-TransformationBoxStates		Trasformazion
-File	Icon-O-Matic-Menus		File
-warning	Icon-O-Matic-SVGExport		avertiment
-Path	Icon-O-Matic-Menus		Percors
-Select All	Icon-O-Matic-PathManipulator		Selezione dut
-Error: 	Icon-O-Matic-Main		Erôr: 
-Saving your document failed!	Icon-O-Matic-Exporter		No si è rivâts a salvâ il document!
-bad news	Icon-O-Matic-Exporter		brutis gnovis
-Snap to grid	Icon-O-Matic-Menu-Settings		Vincole ae gridele
-Add with path & style	Icon-O-Matic-ShapesList		Zonte cun percors e stîl
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Sposte trasformadôrs
-Undo	Icon-O-Matic-Main		Disfe
-Scale X	Icon-O-Matic-PropertyNames		Scjale X
-Add Styles	Icon-O-Matic-AddStylesCmd		Zonte stîl
-Duplicate	Icon-O-Matic-ShapesList		Dupliche
-Remove	Icon-O-Matic-PathManipulator		Gjave
-Move Paths	Icon-O-Matic-MovePathsCmd		Sposte percors
-Joins	Icon-O-Matic-PropertyNames		Al unìs
-Duplicate	Icon-O-Matic-PathsList		Dupliche
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Gjave sagomis
-Save	Icon-O-Matic-Menu-Settings		Salve
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Gjave percors
 Diamond	Icon-O-Matic-StyleTypes		Diamant
-Assign Paths	Icon-O-Matic-AddPathsCmd		Assegne percors
-Add Style	Icon-O-Matic-AddStylesCmd		Zonte stîl
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Sburte ponts di control
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Ribalte ponts di control
+Don't save	Icon-O-Matic-Menu-Settings		No sta salvâ
+Add shape with path	Icon-O-Matic-Menu-Shape		Zonte sagome cun percors
+Translation X	Icon-O-Matic-PropertyNames		Traslazion X
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic al podarès no vê interpretât ducj i dâts dal SVG cuant che al è stât cjariât. Sorescrivint il file origjinâl, cheste informazion e larès pierdude.
+Rotate indices backwards	Icon-O-Matic-PathsList		Volte i indiçs indaûr
 Overwrite	Icon-O-Matic-SVGExport		Sorescrîf
+Cancel	Icon-O-Matic-SVGExport		Cancele
 Open…	Icon-O-Matic-Menu-File		Vierç…
 Remove	Icon-O-Matic-ShapesList		Gjave
 Drop shapes	Icon-O-Matic-ShapesList		Scarte lis formis
-PNG Set	Icon-O-Matic-SavePanel		Complès di PNG
-to attach transformers.	Empty transformers list - 2nd line		par zontâ trasformadôrs.
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Sburte pont di control
-Add Paths	Icon-O-Matic-AddPathsCmd		Zonte percors
+Linear	Icon-O-Matic-StyleTypes		Lineâr
 Clean up	Icon-O-Matic-PathsList		Nete
 Split	Icon-O-Matic-PathManipulator		Divît
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Gjave stîl
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Azere trasformazions
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Gjave pont di control
+Move	Icon-O-Matic-TransformationBoxStates		Sposte
 Conic	Icon-O-Matic-StyleTypes		Conic
-Multi paste	Icon-O-Matic-Properties		Tacament multipli
+Name	Icon-O-Matic-PropertyNames		Non
 Reset transformation	Icon-O-Matic-StylesList		Azere trasformazion
-Add Shapes	Icon-O-Matic-AddShapesCmd		Zonte sagomis
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Gjave trasformadôrs
-Quit	Icon-O-Matic-Menu-File		Jes
+Reverse	Icon-O-Matic-PathsList		Invertìs
+Remove	Icon-O-Matic-PathsList		Gjave
 Style type	Icon-O-Matic-StyleTypes		Gjenar di stîl
+Quit	Icon-O-Matic-Menu-File		Jes
+Gradient	Icon-O-Matic-StyleTypes		Gradient
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Zonte sagome cun percors e stîl
-Move Shape	Icon-O-Matic-MoveShapesCommand		Sposte sagome
 Radial	Icon-O-Matic-StyleTypes		Radiâl
-Caps	Icon-O-Matic-PropertyNames		Cjâfs
 Text too long	Icon-O-Matic-StyledTextImport		Test masse lunc
+Caps	Icon-O-Matic-PropertyNames		Cjâfs
+OK	Icon-O-Matic-SVGImport		Va ben
+Append…	Icon-O-Matic-Menu-File		Zonte…
 Scale Y	Icon-O-Matic-PropertyNames		Scjale Y
-Export icon	Dialog title		Espuarte icone
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Colôr (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Modifiche gradient
 Rotate indices forwards	Icon-O-Matic-PathsList		Volte i indiçs indenant
-Click on an object in	Empty property list - 1st line		Fâs clic suntun ogjet in
-No	Icon-O-Matic-StyledTextImport		No
+Save	Icon-O-Matic-Menu-File		Salve
 Add circle	Icon-O-Matic-PathsList		Zonte cercli
+Freeze transformation	Icon-O-Matic-ShapesList		Inglace trasformazion
+Untitled	Icon-O-Matic-Main		Cence non
+Max LOD	Icon-O-Matic-PropertyNames		LOD massim
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvâ lis modifichis ae icone prime di sierâ?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No si è rivâts a vierzi il file '%s' come document SVG.\n\n
 Save as…	Icon-O-Matic-Menu-File		Salve come…
+Swatches	Icon-O-Matic-Menus		Campions
+<modify path>	Icon-O-Matic-PathCmd		<modifiche percors>
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nuie di disfâ>
 Add	Icon-O-Matic-StylesList		Zonte
+Translation Y	Icon-O-Matic-PropertyNames		Traslazion Y
+Scale	Icon-O-Matic-TransformationBoxStates		Scjale
 All	Icon-O-Matic-Properties		Dut
+Transformer	Icon-O-Matic-Menus		Trasformadôr
 Invert selection	Icon-O-Matic-Properties		Invertìs selezion
 <unkown property>	Icon-O-Matic-PropertyNames		<proprietât no cognossude>
+Pick a color	Icon-O-Matic-ColorPicker		Sielç un colôr
 Settings…	Icon-O-Matic-SavePanel		Impostazions…
 Add with style	Icon-O-Matic-ShapesList		Zonte cun stîl
-Remove Path	Icon-O-Matic-RemovePathsCmd		Gjave percors
+New	Icon-O-Matic-Menu-File		Gnûf
 Gradient type	Icon-O-Matic-StyleTypes		Gjenar di gradient
-edit it's properties here.	Empty property list - 3rd line		modificâ lis sôs proprietâts achì.
+Export	Icon-O-Matic-Menu-File		Espuarte
+Width	Icon-O-Matic-PropertyNames		Largjece
+Style	Icon-O-Matic-Menus		Stîl
+Off	Icon-O-Matic-Menu-Settings		Off
 Edit	Icon-O-Matic-Menus		Modifiche

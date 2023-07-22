@@ -5,7 +5,7 @@ Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Olanaklıysa video donanım bindirmelerini kullan
 Audio	MediaPlayer-InfoWin		Ses
 Subtitle placement:	MediaPlayer-SettingsWindow		Altyazı konumu:
-MediaPlayer	System name		Ortam Oynatıcı
+MediaPlayer	System name		Ortam Oynatıcısı
 Audio track	MediaPlayer-Main		Ses parçası
 Muted	MediaPlayer-SettingsWindow		Sessiz
 OK	MediaPlayer-RemovePLItemsCmd		Tamam
@@ -46,7 +46,7 @@ Close	MediaPlayer-Main		Kapat
 Save error	MediaPlayer-PlaylistWindow		Kaydetme hatası
 Attributes	MediaPlayer-Main		Öznitelikler
 Bottom of screen	MediaPlayer-SettingsWindow		Ekranın alt kısmı
-MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcı ayarları
+MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcısı ayarları
 Copyright	MediaPlayer-InfoWin		Telif hakkı
 Invalid URL inserted!	MediaPlayer-NetworkStream		Geçersiz URL girildi!
 Aspect ratio	MediaPlayer-Main		En boy oranı

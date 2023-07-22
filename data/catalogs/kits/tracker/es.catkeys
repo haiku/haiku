@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	765355649
+1	spanish; castilian	x-vnd.Haiku-libtracker	286366074
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -122,7 +122,6 @@ Enable type-ahead filtering	SettingsView		Habilitar el filtrado de escritura ant
 copy	FSUtils	filename copy	Copiar Nombre
 New folder%ld	FSUtils		Nueva carpeta%ld
 Location	OpenWithWindow		Localización
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Ajustar el tamaño
 List folders first	SettingsView		Lista de carpetas primero
 Find	FSUtils		Encontrar

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DiskProbe	2944605311
+1	esperanto	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Fontforma redaktilo
 Remove	AttributeWindow		Forigi
 Close	ProbeView		Fermi
@@ -37,11 +37,9 @@ Attribute	ProbeView		Atributo
 Don't save	ProbeView		Ne konservi
 Undo	ProbeView		Malfari
 Flattened bitmap	TypeEditors		Platigita bitmapo
-Block %Ld (0x%Lx)	ProbeView		Bloko %Ld (0x%Lx)
 Cancel	OpenWindow		Nuligi
 Unknown format	TypeEditors		Nekonata formo
 File: 	ProbeView		Dosiero: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Permutite: %Ld (0x%0*Lx)
 Stop	ProbeView		Halti
 Cancel	ProbeView		Nuligi
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Ne sukcesis ekuzi \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Laŭtipa redaktilo
 File	FileWindow		Dosiero
 Grayscale	TypeEditors		Grizoskalo
 32 bit	TypeEditors		32 bitoj
-Native: %Ld (0x%0*Lx)	ProbeView		Indiĝena: %Ld (0x%0*Lx)
 Device	ProbeView		Aparato
 Close	AttributeWindow		Fermi
 Type editor	AttributeWindow		Laŭtipa redaktilo

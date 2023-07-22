@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3773674700
+1	belarusian	x-vnd.Haiku-libtracker	3294685125
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -86,7 +86,6 @@ Enable type-ahead filtering	SettingsView		Уключыць фільтар апе
 copy	FSUtils	filename copy	копія
 New folder%ld	FSUtils		Новы каталог%ld
 Location	OpenWithWindow		Месцазнаходжанне
-%Ld B	WidgetAttributeText		%Ld Б
 Resize to fit	QueryContainerWindow		Расцягнуць каб умясціць
 List folders first	SettingsView		Спачатку паказваць спіс каталогаў
 Find	FSUtils		Знайсці

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1657326089
+1	lithuanian	x-vnd.Haiku-libtracker	1178336514
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -87,7 +87,6 @@ Enable type-ahead filtering	SettingsView		Leisti filtravimą renkant tekstą
 copy	FSUtils	filename copy	kopija
 New folder%ld	FSUtils		Naujas aplankas %ld
 Location	OpenWithWindow		Vieta
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
 List folders first	SettingsView		Aplankus rikiuoti pirmiau
 Find	FSUtils		Ieškoti

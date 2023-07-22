@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	297766270
+1	indonesian	x-vnd.Haiku-libtracker	4113743991
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -116,7 +116,6 @@ Enable type-ahead filtering	SettingsView		Aktifkan penyaringan ketik-didepan
 copy	FSUtils	filename copy	salin
 New folder%ld	FSUtils		Folder baru%ld
 Location	OpenWithWindow		Lokasi
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Ubah ukuran agar sesuai
 List folders first	SettingsView		Daftar folder dahulukan
 Find	FSUtils		Cari

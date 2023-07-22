@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DiskProbe	2944605311
+1	indonesian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Penyunting mentah
 Remove	AttributeWindow		Hapus
 Close	ProbeView		Tutup
@@ -37,11 +37,9 @@ Attribute	ProbeView		Atribut
 Don't save	ProbeView		Jangan simpan
 Undo	ProbeView		Batalkan
 Flattened bitmap	TypeEditors		Bitmap dipipihkan
-Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
 Cancel	OpenWindow		Batalkan
 Unknown format	TypeEditors		Format tak dikenal
 File: 	ProbeView		Berkas: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Ditukar: %Ld (0x%0*Lx)
 Stop	ProbeView		Berhenti
 Cancel	ProbeView		Batal
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Tak bisa membuka \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Tipe editor
 File	FileWindow		Berkas
 Grayscale	TypeEditors		Skala abu-abu
 32 bit	TypeEditors		32 bit
-Native: %Ld (0x%0*Lx)	ProbeView		Asli: %Ld (0x%0*Lx)
 Device	ProbeView		Perangkat
 Close	AttributeWindow		Tutup
 Type editor	AttributeWindow		Editor tipe

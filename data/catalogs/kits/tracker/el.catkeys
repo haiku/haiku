@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	765355649
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1384182
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -88,6 +88,7 @@ Modified	FindPanel		Τροποποιήθηκε
 Select all	QueryContainerWindow		Επιλογή όλων
 Generate image thumbnails	SettingsView		Παραγωγή μικρογραφιών εικόνων
 Select…	FilePanelPriv		Επιλογή…
+An item named '%filename%' already exists.	FSUtils		Ένα αντικείμενο με το όνομα "%filename%" υπάρχει ήδη.
 preferences	B_PREFERENCES_DIRECTORY		προτιμήσεις
 Name	Person Query Columns		Όνομα
 Skip all	FSUtils		Παράλειψη όλων
@@ -122,7 +123,6 @@ Enable type-ahead filtering	SettingsView		Ενεργοποίηση προβλε�
 copy	FSUtils	filename copy	αντιγραφή
 New folder%ld	FSUtils		Νέος φάκελος%ld
 Location	OpenWithWindow		Τοποθεσία
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Προσαρμογή μεγέθους
 List folders first	SettingsView		Λίστα φακέλων πρώτα
 Find	FSUtils		Εύρεση
@@ -269,6 +269,7 @@ Cut	FilePanelPriv		Αποκοπή
 Finish: after several years	StatusWindow		Ολοκλήρωση: σε αρκετά χρόνια
 Favorites	FilePanelPriv		Αγαπημένα
 Point	AttributesView		Σημείο
+You can't move or copy items to read-only volumes.	PoseView		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε αντικείμενα σε τόμους που είναι μόνο για ανάγνωση.
 home	B_USER_DIRECTORY		αρχικός
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Νέα πρότυπα Ιχνηλάτη
 Disk mounting during boot	AutoMounterSettings		Προσάρτηση δίσκου κατά την εκκίνηση
@@ -357,6 +358,7 @@ after	FindPanel		μετά
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte δεδομένων>} other {<# bytes δεδομένων>}}
 Version	OpenWithWindow		Έκδοση
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Μερικά από τα επιλεγμένα στοιχεία δεν μπορούν να μετακινηθούν στον Κάδο Απορριμμάτων. Θα θέλατε να τα διαγράψετε αντ' αυτού; (Αυτή η λειτουργία δεν μπορεί να επανέλθει.)
+The entered file name is too long.	FSUtils		Το όνομα αρχείου είναι υπερβολικά μεγάλο.
 Add printer…	ContainerWindow		Προσθήκη εκτυπωτή…
 On	FindPanel		Ενεργοποιημένο
 Permissions	ContainerWindow		Άδειες
@@ -527,6 +529,7 @@ I know what I'm doing	FSUtils	button label	Ξέρω τι κάνω
 Preparing to copy items…	StatusWindow		Προετοιμασία για αντιγραφή στοιχείων…
 Entry ref	AttributesView		Αναφορά καταχώρησης
 Icon view	ContainerWindow		Προβολή εικονιδίου
+The entered folder name is too long.	FSUtils		Το όνομα καταλόγου είναι υπερβολικά μεγάλο.
 Name	ContainerWindow		Όνομα
 Preferred for %type	OpenWithWindow		Προτινόμενο για %type
 Free space color	SettingsView		Χρώμα ελεύθερου χώρου

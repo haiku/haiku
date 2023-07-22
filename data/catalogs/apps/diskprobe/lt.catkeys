@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DiskProbe	2944605311
+1	lithuanian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Neapdorotų duomenų redaktorius
 Remove	AttributeWindow		Pašalinti
 Close	ProbeView		Užverti
@@ -37,11 +37,9 @@ Attribute	ProbeView		Požymis
 Don't save	ProbeView		Neįrašyti
 Undo	ProbeView		Atšaukti
 Flattened bitmap	TypeEditors		Suplotas paveikslėlis
-Block %Ld (0x%Lx)	ProbeView		%Ld blokas (0x%Lx)
 Cancel	OpenWindow		Atsisakyti
 Unknown format	TypeEditors		Formatas nežinomas
 File: 	ProbeView		Failas:
-Swapped: %Ld (0x%0*Lx)	ProbeView		Sukeitus baitų eiliškumą: %Ld (0x%0*Lx)
 Stop	ProbeView		Stabdyti
 Cancel	ProbeView		Atsisakyti
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Atverti „%s“ nepavyko:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Požymio redaktorius
 File	FileWindow		Failas
 Grayscale	TypeEditors		Pilkumo tonai
 32 bit	TypeEditors		32 bitų
-Native: %Ld (0x%0*Lx)	ProbeView		Prigimtinė reikšmė: %Ld (0x%0*Lx)
 Device	ProbeView		Įrenginys
 Close	AttributeWindow		Užverti
 Type editor	AttributeWindow		Požymio redaktorius

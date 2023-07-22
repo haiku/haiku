@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DiskProbe	2944605311
+1	russian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Raw редактор
 Remove	AttributeWindow		Удалить
 Close	ProbeView		Закрыть
@@ -37,11 +37,9 @@ Attribute	ProbeView		Атрибут
 Don't save	ProbeView		Не сохранять
 Undo	ProbeView		Вернуть
 Flattened bitmap	TypeEditors		Плоский образ
-Block %Ld (0x%Lx)	ProbeView		Блок %Ld (0x%Lx)
 Cancel	OpenWindow		Отмена
 Unknown format	TypeEditors		Неизвестный формат
 File: 	ProbeView		Файл: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Перевернутый: %Ld (0x%0*Lx)
 Stop	ProbeView		Остановить
 Cancel	ProbeView		Отмена
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Невозможно открыть \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Редактор типа
 File	FileWindow		Файл
 Grayscale	TypeEditors		Оттенки серого
 32 bit	TypeEditors		32 бита
-Native: %Ld (0x%0*Lx)	ProbeView		Родной: %Ld (0x%0*Lx)
 Device	ProbeView		Устройство
 Close	AttributeWindow		Закрыть
 Type editor	AttributeWindow		Редактор типа

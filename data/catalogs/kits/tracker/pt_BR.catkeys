@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	3216077948
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2737088373
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -120,7 +120,6 @@ Enable type-ahead filtering	SettingsView		Habilitar filtro de autocompletar
 copy	FSUtils	filename copy	cópia
 New folder%ld	FSUtils		Nova pasta%ld
 Location	OpenWithWindow		Local
-%Ld B	WidgetAttributeText		%Ld bytes
 Resize to fit	QueryContainerWindow		Reduzir para caber
 List folders first	SettingsView		Listar pastas primeiro
 Find	FSUtils		Localizar

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	480373757
+1	friulian	x-vnd.Haiku-libtracker	1384182
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -123,7 +123,6 @@ Enable type-ahead filtering	SettingsView		Abilite filtri pe ricercje datilografa
 copy	FSUtils	filename copy	copie
 New folder%ld	FSUtils		Gnove cartele%ld
 Location	OpenWithWindow		Posizion
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Adate
 List folders first	SettingsView		Liste prime lis cartelis
 Find	FSUtils		Cjate

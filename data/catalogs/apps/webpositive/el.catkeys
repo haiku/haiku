@@ -1,12 +1,14 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	861169737
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
+Copy	Console Window		Αντιγραφή
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
 Open bookmarks confirmation	WebPositive Window		Άνοιγμα επιβεβαίωσης σελιδοδεικτών
 Download folder:	Settings Window		Φάκελος λήψεων:
 Close window	WebPositive Window		Κλείσιμο παραθύρου
 Find:	WebPositive Window		Εύρεση:
 Script console	WebPositive Window		Κονσόλα σεναρίων
+There was an error setting up the bookmark.	WebPositive Window		Υπήρξε ένα πρόβλημα κατά την αποθήκευση του σελιδοδείκτη.
 Fonts	Settings Window		Γραμματοσειρές
 Path	Cookie Manager		Διαδρομή
 Bookmarks	WebPositive Window		Σελιδοδείκτες
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Διαγραφή
 Open containing folder	Download Window		Άνοιγμα εμπεριεχόμενου φακέλου
 Find previous	WebPositive Window		Εύρεση προηγούμενου
 Full screen	WebPositive Window		Πλήρης οθόνη
+Bookmark bar	WebPositive Window		Γραμμή σελιδοδεικτών
 Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
 Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
@@ -101,6 +104,7 @@ Apply	Settings Window		Εφαρμογή
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Προέκυψε σφάλμα κατά την εμφάνιση του φακέλου σελιδοδεικτών.\n\nΣφάλμα: %error
 Revert	Settings Window		Επαναφορά
 Copy	WebPositive Window		Αντιγραφή
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Η τελευταία γραμμή επαναλήφθηκε # φορά.}other{Η τελευταία γραμμή επαναλήφθηκε # φορές.}}
 Default standard font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς:
 Custom	Settings Window		Προσαρμογή
 Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες

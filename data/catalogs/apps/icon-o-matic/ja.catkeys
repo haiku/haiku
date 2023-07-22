@@ -1,199 +1,120 @@
-1	japanese	x-vnd.haiku-icon_o_matic	1015615450
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		パスインデックスの回転
+1	japanese	x-vnd.haiku-icon_o_matic	1308365995
+None	Icon-O-Matic-Properties		解除
 Add empty	Icon-O-Matic-ShapesList		空のシェイプの追加
 Opening the icon failed!	Icon-O-Matic-Main		アイコンを開けません!
 Add with path	Icon-O-Matic-ShapesList		パス付きで追加
+Copy	Icon-O-Matic-Properties		コピー
+Color	Icon-O-Matic-PropertyNames		カラー
 Format	Icon-O-Matic-SavePanel		フォーマット
-Select	Icon-O-Matic-Properties		選択
 Color	Icon-O-Matic-StyleTypes		カラー
+Select	Icon-O-Matic-Properties		選択
 Reset transformation	Icon-O-Matic-ShapesList		変形のリセット
+Duplicate	Icon-O-Matic-StylesList		複製
+Rotate	Icon-O-Matic-TransformationBoxStates		回転
 Shorten	Icon-O-Matic-PropertyNames		縮める
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストはとても長いですがよろしいですか?
 Paste	Icon-O-Matic-Properties		貼り付け
-Unassign Path	Icon-O-Matic-UnassignPathCmd		パスの割り当て解除
+Close	Icon-O-Matic-Menu-File		閉じる
 Add rect	Icon-O-Matic-PathsList		四角形の追加
-Bleep!	Exporter - Continue in error dialog		警告!
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON 属性
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		トランスフォーマーの削除
+Rotation	Icon-O-Matic-PropertyNames		回転
 Transform	Icon-O-Matic-PathManipulator		変形する
-Assign Style	Icon-O-Matic-AssignStyleCmd		スタイルの割り当て
-Split Control Point	Icon-O-Matic-SplitPointsCmd		コントロールポイントの分割
-Height	Icon-O-Matic-PropertyNames		高さ
+Add shape with style	Icon-O-Matic-Menu-Shape		スタイル付きシェイプの追加
+Remove	Icon-O-Matic-StylesList		削除
+Cancel	Icon-O-Matic-Menu-Settings		中止
+Transformation	Icon-O-Matic-TransformationBoxStates		変形
+Closed	Icon-O-Matic-PropertyNames		閉じている
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<やり直しできません>
-Add Shape	Icon-O-Matic-AddShapesCmd		シェイプの追加
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		パスのクリーンアップ
-Move Style	Icon-O-Matic-MoveStylesCmd		スタイルの移動
+Height	Icon-O-Matic-PropertyNames		高さ
+warning	Icon-O-Matic-SVGExport		警告
+File	Icon-O-Matic-Menus		ファイル
 Properties	Icon-O-Matic-Menus		プロパティ
 Path	Icon-O-Matic-PropertyNames		パス
-Add Control Point	Icon-O-Matic-AddPointCmd		コントロールポイントの追加
+Path	Icon-O-Matic-Menus		パス
 Stroke	Transformation		ストローク
 Flip	Icon-O-Matic-PathManipulator		反転
 Opacity	Icon-O-Matic-PropertyNames		不透明度
 OK	Icon-O-Matic-ColorPicker		OK
+Error: 	Icon-O-Matic-Main		エラー:
+Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存に失敗しました!
+Snap to grid	Icon-O-Matic-Menu-Settings		グリッドに沿う
 Opening the document failed!	Icon-O-Matic-Main		ドキュメントの読み込みに失敗しました。
+Add with path & style	Icon-O-Matic-ShapesList		パスとスタイル付きで追加
 Shape	Icon-O-Matic-Menus		シェイプ
 <unavailable>	Icon-O-Matic-StyleTypes		<利用できません>
 Min LOD	Icon-O-Matic-PropertyNames		Min LOD
-Reverse Path	Icon-O-Matic-ReversePathCmd		パスの反転
-Paste Properties	Icon-O-Matic-Properties		プロパティの貼り付け
 Add	Icon-O-Matic-TransformersList		追加
-Add	Icon-O-Matic-PathsList		追加
 Settings	Icon-O-Matic-Menus		設定
+Scale X	Icon-O-Matic-PropertyNames		X軸スケール
+Add	Icon-O-Matic-PathsList		追加
+Remove	Icon-O-Matic-PathManipulator		削除
+Duplicate	Icon-O-Matic-ShapesList		複製
+Alpha	Icon-O-Matic-PropertyNames		アルファ
 Contour	Transformation		コンター
-Save icon	Dialog title		アイコンの保存
 Rounding	Icon-O-Matic-PropertyNames		丸め
+Joins	Icon-O-Matic-PropertyNames		結合
 Cancel	Icon-O-Matic-ColorPicker		中止
+Duplicate	Icon-O-Matic-PathsList		複製
+Save	Icon-O-Matic-Menu-Settings		保存
 Export as…	Icon-O-Matic-Menu-File		別形式でエクスポート...
 Error: 	Icon-O-Matic-Exporter		エラー:
-Move Path	Icon-O-Matic-MovePathsCmd		パスの移動
-Add shape with path	Icon-O-Matic-Menu-Shape		パス付きシェイプの追加
-Don't save	Icon-O-Matic-Menu-Settings		保存しない
-Move Styles	Icon-O-Matic-MoveStylesCmd		スタイルの移動
-Translation X	Icon-O-Matic-PropertyNames		X軸移動
-Add Transformers	Icon-O-Matic-AddTransformersCmd		トランスフォーマーの追加
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
-Rotate indices backwards	Icon-O-Matic-PathsList		インデックスの逆回転
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic はロードされた SVG のすべてのデータを解釈できなかったかもしれません。元のファイルを上書きすると、この情報は失われるでしょう。
-Modify Control Point	Icon-O-Matic-ChangePointCmd		コントロールポイントの編集
-Cancel	Icon-O-Matic-SVGExport		中止
-Redo	Icon-O-Matic-Main		やり直し
-Change Color	Icon-O-Matic-SetColorCmd		カラーの変更
-Linear	Icon-O-Matic-StyleTypes		リニア
-any of the other lists to	Empty property list - 2nd line		他のリストの中の
-Color (#%02x%02x%02x)	Style name after dropping a color		カラー (#%02x%02x%02x)
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		コントロールポイントの反転
-Move	Icon-O-Matic-TransformationBoxStates		移動
-Split Control Points	Icon-O-Matic-SplitPointsCmd		コントロールポイントの分割
-Name	Icon-O-Matic-PropertyNames		名前
-Add Transformer	Icon-O-Matic-AddTransformersCmd		トランスフォーマーの追加
-Reverse	Icon-O-Matic-PathsList		反転
-Move Pivot	Icon-O-Matic-TransformationBoxStates		移動の中心
-Remove	Icon-O-Matic-PathsList		削除
-bad news	Title of error alert		悪い知らせ
-Gradient	Icon-O-Matic-StyleTypes		グラデーション
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		スタイルの削除
-Insert Control Point	Icon-O-Matic-InsertPointCmd		コントロールポイントの挿入
-OK	Icon-O-Matic-SVGImport		OK
-Append…	Icon-O-Matic-Menu-File		追加...
-Set 	Set (property name)		セット
-Save	Icon-O-Matic-Menu-File		保存
-Freeze transformation	Icon-O-Matic-ShapesList		変形の維持
-Miter Limit	Icon-O-Matic-PropertyNames		マイターリミット
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		シェイプの固定
-Max LOD	Icon-O-Matic-PropertyNames		Max LOD
-Untitled	Icon-O-Matic-Main		無題
-Add Path	Icon-O-Matic-AddPathsCmd		パスの追加
-load error	Icon-O-Matic-SVGImport		読み込みエラー
-Swatches	Icon-O-Matic-Menus		色見本
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF ソースコード
-<modify path>	Icon-O-Matic-PathCmd		<パスの修正>
-Translation Y	Icon-O-Matic-PropertyNames		Y軸移動
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		シェイプの固定
-Scale	Icon-O-Matic-TransformationBoxStates		拡大縮小
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		シェイプの削除
-Transformer	Icon-O-Matic-Menus		トランスフォーマー
-Multi Set 	Multi Set (property name)		複数セット
-Pick a color	Icon-O-Matic-ColorPicker		カラーの選択
-New	Icon-O-Matic-Menu-File		新規
-Yes	Icon-O-Matic-StyledTextImport		はい
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		トランスフォーマーの移動
-Export	Icon-O-Matic-Menu-File		エクスポート
-Width	Icon-O-Matic-PropertyNames		幅
-Add reference image	Icon-O-Matic-ShapesList		参考画像の追加
-Bummer	Cancel button - error alert		失敗
-Style	Icon-O-Matic-Menus		スタイル
-Off	Icon-O-Matic-Menu-Settings		オフ
-None	Icon-O-Matic-Properties		解除
-Color	Icon-O-Matic-PropertyNames		カラー
-Copy	Icon-O-Matic-Properties		コピー
-Move Shapes	Icon-O-Matic-MoveShapesCommand		シェイプの移動
-Duplicate	Icon-O-Matic-StylesList		複製
-Rotate	Icon-O-Matic-TransformationBoxStates		回転
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		コントロールポイントの削除
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストはとても長いですがよろしいですか?
-Detect Orient.	Icon-O-Matic-PropertyNames		向きをの検出。
-Click on a shape above	Empty transformers list - 1st line		上のシェイプをクリックして
-Close	Icon-O-Matic-Menu-File		閉じる
-Rotation	Icon-O-Matic-PropertyNames		回転
-Multi Paste Properties	Icon-O-Matic-Properties		プロパティの複数貼り付け
-Add shape with style	Icon-O-Matic-Menu-Shape		スタイル付きシェイプの追加
-Assign Path	Icon-O-Matic-AddPathsCmd		パスの割り当て
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		変形のリセット
-Remove	Icon-O-Matic-StylesList		削除
-Cancel	Icon-O-Matic-Menu-Settings		中止
-Closed	Icon-O-Matic-PropertyNames		閉じている
-Transformation	Icon-O-Matic-TransformationBoxStates		変形
-File	Icon-O-Matic-Menus		ファイル
-warning	Icon-O-Matic-SVGExport		警告
-Path	Icon-O-Matic-Menus		パス
-Select All	Icon-O-Matic-PathManipulator		すべて選択
-Error: 	Icon-O-Matic-Main		エラー:
-Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存に失敗しました!
-bad news	Icon-O-Matic-Exporter		悪い知らせ
-Snap to grid	Icon-O-Matic-Menu-Settings		グリッドに沿う
-Add with path & style	Icon-O-Matic-ShapesList		パスとスタイル付きで追加
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		トランスフォーマーの移動
-Undo	Icon-O-Matic-Main		元に戻す
-Scale X	Icon-O-Matic-PropertyNames		X軸スケール
-Add Styles	Icon-O-Matic-AddStylesCmd		スタイルの追加
-Alpha	Icon-O-Matic-PropertyNames		アルファ
-Duplicate	Icon-O-Matic-ShapesList		複製
-Remove	Icon-O-Matic-PathManipulator		削除
-Move Paths	Icon-O-Matic-MovePathsCmd		パスの移動
-Joins	Icon-O-Matic-PropertyNames		結合
-Duplicate	Icon-O-Matic-PathsList		複製
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		シェイプの削除
-Save	Icon-O-Matic-Menu-Settings		保存
-Remove Paths	Icon-O-Matic-RemovePathsCmd		パスの削除
 Diamond	Icon-O-Matic-StyleTypes		ダイヤモンド
-Assign Paths	Icon-O-Matic-AddPathsCmd		パスの割り当て
-Add Style	Icon-O-Matic-AddStylesCmd		スタイルの追加
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		コントロールポイントの移動
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		コントロールポイントの反転
+Don't save	Icon-O-Matic-Menu-Settings		保存しない
+Add shape with path	Icon-O-Matic-Menu-Shape		パス付きシェイプの追加
+Translation X	Icon-O-Matic-PropertyNames		X軸移動
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic はロードされた SVG のすべてのデータを解釈できなかったかもしれません。元のファイルを上書きすると、この情報は失われるでしょう。
+Rotate indices backwards	Icon-O-Matic-PathsList		インデックスの逆回転
 Overwrite	Icon-O-Matic-SVGExport		上書き
+Cancel	Icon-O-Matic-SVGExport		中止
 Open…	Icon-O-Matic-Menu-File		開く...
 Remove	Icon-O-Matic-ShapesList		削除
 Drop shapes	Icon-O-Matic-ShapesList		シェイプをドロップ
-PNG Set	Icon-O-Matic-SavePanel		PNG セット
-to attach transformers.	Empty transformers list - 2nd line		トランスフォーマーの追加。
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		コントロールポイントの移動
-Add Paths	Icon-O-Matic-AddPathsCmd		パスの追加
+Linear	Icon-O-Matic-StyleTypes		リニア
 Clean up	Icon-O-Matic-PathsList		クリーンアップ
 Split	Icon-O-Matic-PathManipulator		分割
-Remove Style	Icon-O-Matic-RemoveStylesCmd		スタイルの削除
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		変形のリセット
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		コントロールポイントの削除
+Move	Icon-O-Matic-TransformationBoxStates		移動
 Conic	Icon-O-Matic-StyleTypes		コニカル
-Multi paste	Icon-O-Matic-Properties		複数貼り付け
+Name	Icon-O-Matic-PropertyNames		名前
 Reset transformation	Icon-O-Matic-StylesList		変形のリセット
-Add Shapes	Icon-O-Matic-AddShapesCmd		シェイプの追加
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		トランスフォーマーの削除
-Quit	Icon-O-Matic-Menu-File		終了
+Reverse	Icon-O-Matic-PathsList		反転
+Remove	Icon-O-Matic-PathsList		削除
 Style type	Icon-O-Matic-StyleTypes		スタイルの形式
+Quit	Icon-O-Matic-Menu-File		終了
+Gradient	Icon-O-Matic-StyleTypes		グラデーション
 Add shape with path & style	Icon-O-Matic-Menu-Shape		パスとスタイル付きのシェイプの追加
-Move Shape	Icon-O-Matic-MoveShapesCommand		シェイプの移動
 Radial	Icon-O-Matic-StyleTypes		ラジアル
-Caps	Icon-O-Matic-PropertyNames		頂点
 Text too long	Icon-O-Matic-StyledTextImport		テキストが長過ぎます
+Caps	Icon-O-Matic-PropertyNames		頂点
+OK	Icon-O-Matic-SVGImport		OK
+Append…	Icon-O-Matic-Menu-File		追加...
 Scale Y	Icon-O-Matic-PropertyNames		Y軸スケール
-Export icon	Dialog title		アイコンのエクスポート
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		カラー (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		グラデーションの編集
 Rotate indices forwards	Icon-O-Matic-PathsList		インデックスの正回転
-Click on an object in	Empty property list - 1st line		ここでプロパティを編集するために
-No	Icon-O-Matic-StyledTextImport		いいえ
+Save	Icon-O-Matic-Menu-File		保存
 Add circle	Icon-O-Matic-PathsList		円の追加
+Freeze transformation	Icon-O-Matic-ShapesList		変形の維持
+Untitled	Icon-O-Matic-Main		無題
+Max LOD	Icon-O-Matic-PropertyNames		Max LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		閉じる前に作業中のアイコンへの変更を保存しますか?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		ファイル '%s' を SVG ドキュメントとして開くのに失敗しました。\n\n
 Save as…	Icon-O-Matic-Menu-File		名前を付けて保存...
+Swatches	Icon-O-Matic-Menus		色見本
+<modify path>	Icon-O-Matic-PathCmd		<パスの修正>
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<元に戻せません>
 Add	Icon-O-Matic-StylesList		追加
+Translation Y	Icon-O-Matic-PropertyNames		Y軸移動
+Scale	Icon-O-Matic-TransformationBoxStates		拡大縮小
 All	Icon-O-Matic-Properties		すべて
+Transformer	Icon-O-Matic-Menus		トランスフォーマー
 Invert selection	Icon-O-Matic-Properties		選択範囲の反転
 <unkown property>	Icon-O-Matic-PropertyNames		<不明なプロパティ>
+Pick a color	Icon-O-Matic-ColorPicker		カラーの選択
 Settings…	Icon-O-Matic-SavePanel		設定...
 Add with style	Icon-O-Matic-ShapesList		スタイル付きで追加
-Remove Path	Icon-O-Matic-RemovePathsCmd		パスの削除
+New	Icon-O-Matic-Menu-File		新規
 Gradient type	Icon-O-Matic-StyleTypes		グラデーションのタイプ
-edit it's properties here.	Empty property list - 3rd line		ここでプロパティを編集。
+Export	Icon-O-Matic-Menu-File		エクスポート
+Width	Icon-O-Matic-PropertyNames		幅
+Add reference image	Icon-O-Matic-ShapesList		参考画像の追加
+Style	Icon-O-Matic-Menus		スタイル
+Off	Icon-O-Matic-Menu-Settings		オフ
 Edit	Icon-O-Matic-Menus		編集

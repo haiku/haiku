@@ -8,7 +8,7 @@ Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken h
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Seçili dizin bulunamadı. Yerine /boot/home kullanılacak.
 Conversion completed	MediaConverter		Dönüştürme tamamlandı
 Audio:	MediaConverter-FileInfo		Ses:
-MediaConverter+:SaveDirectory	MediaConverter		Ortam Dönüştürücü+:KaydetmeDizini
+MediaConverter+:SaveDirectory	MediaConverter		Ortam Dönüştürücüsü+:KaydetmeDizini
 Error creating video.	MediaConverter		Video oluşturulurken hata.
 Cancelling	MediaConverter		İptal ediliyor
 None available	Audio codecs		Kullanılabilir bir tane yok
@@ -56,7 +56,7 @@ Quit	Menu		Çık
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, other{# bayt}}
 Writing audio track: %s complete	MediaConverter		Ses izi yazılıyor: %s tamamlandı
 Duration:	MediaConverter-FileInfo		Uzunluk:
-MediaConverter	System name		Ortam Dönüştürücü
+MediaConverter	System name		Ortam Dönüştürücüsü
 Writing video track: %s complete	MediaConverter		Video izi yazılıyor: %s tamamlandı
 Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
 Error writing audio frame %lld	MediaConverter		Ses çerçevesi %lld yazılırken hata

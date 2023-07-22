@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DiskProbe	2944605311
+1	italian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Editor dati grezzi
 Remove	AttributeWindow		Rimuovi
 Close	ProbeView		Chiudi
@@ -37,11 +37,9 @@ Attribute	ProbeView		Attributo
 Don't save	ProbeView		Non salvare
 Undo	ProbeView		Annulla
 Flattened bitmap	TypeEditors		Bitmap piana
-Block %Ld (0x%Lx)	ProbeView		Blocco %Ld (0x%Lx)
 Cancel	OpenWindow		Annulla
 Unknown format	TypeEditors		Formato sconosciuto
 File: 	ProbeView		File: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Scambiato: %Ld (0x%0*Lx)
 Stop	ProbeView		Interrompi
 Cancel	ProbeView		Annulla
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Impossibile aprire \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Editor di Tipi
 File	FileWindow		File
 Grayscale	TypeEditors		Scala di grigi
 32 bit	TypeEditors		32 bit
-Native: %Ld (0x%0*Lx)	ProbeView		Nativo: %Ld (0x%0*Lx)
 Device	ProbeView		Dispositivo
 Close	AttributeWindow		Chiudi
 Type editor	AttributeWindow		Editor di Tipi

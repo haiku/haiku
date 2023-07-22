@@ -29,7 +29,7 @@ Please choose from these update options:\n\nUpdate:\n\tUpdates all installed pac
 The following changes will be made:	SoftwareUpdaterWindow		Aşağıdaki değişiklikler yapılacak:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Değişkenler artık kabul edilmiyor\n
 Fatal error while checking for updates: %s\n	CheckAction		Güncellemeler denetlenirken onulmaz hata: %s\n
-SoftwareUpdater	System name		Yazılım Güncelleyici
+SoftwareUpdater	System name		Yazılım Güncelleyicisi
 No active network connection was found.\n	CheckManager		Etkin bir ağ bağlantısı bulunamadı.\n
 Applying changes	UpdateManager		Değişiklikler uygulanıyor
 Full sync	SoftwareUpdaterWindow	Alert button label	Tam eşitle
@@ -41,7 +41,7 @@ Exception occurred while checking for updates: %s\n	CheckAction		Güncellemeler 
 Packages are being updated	UpdateManager		Paketler güncelleniyor
 Cancel	SoftwareUpdaterWindow		Vazgeç
 Don't quit	SoftwareUpdaterWindow		Çıkma
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Yazılım Güncelleyici'yi çalıştırmak için buraya tıklayın. Bazı güncellemeler bir sorun çözümünün seçilmesini gerektirecektir.
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Yazılım Güncelleyicisi'ni çalıştırmak için buraya tıklayın. Bazı güncellemeler bir sorun çözümünün seçilmesini gerektirecektir.
 Checking for updates	SoftwareUpdaterWindow		Güncellemeler denetleniyor
 Updates completed	UpdateManager		Güncellemeler tamamlandı
 Reboot	SoftwareUpdaterWindow		Yeniden başlat

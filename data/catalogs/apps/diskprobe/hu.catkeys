@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DiskProbe	2944605311
+1	hungarian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Nyers szerkesztő
 Remove	AttributeWindow		Eltávolítás
 Close	ProbeView		Bezárás
@@ -37,11 +37,9 @@ Attribute	ProbeView		Jellemző
 Don't save	ProbeView		Ne mentse
 Undo	ProbeView		Visszavonás
 Flattened bitmap	TypeEditors		Lapos bittérkép
-Block %Ld (0x%Lx)	ProbeView		Blokk %Ld (0x%Lx)
 Cancel	OpenWindow		Mégse
 Unknown format	TypeEditors		Ismeretlen formátum
 File: 	ProbeView		Fájl:
-Swapped: %Ld (0x%0*Lx)	ProbeView		Cserélve: %Ld (0x%0*Lx)
 Stop	ProbeView		Leállítás
 Cancel	ProbeView		Mégse
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nem sikerült megnyitni: \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Típusszerkesztő
 File	FileWindow		Fájl
 Grayscale	TypeEditors		Szürkeárnyalatos
 32 bit	TypeEditors		32-bites
-Native: %Ld (0x%0*Lx)	ProbeView		Natív: %Ld (0x%0*Lx)
 Device	ProbeView		Eszköz
 Close	AttributeWindow		Bezárás
 Type editor	AttributeWindow		Típusszerkesztő

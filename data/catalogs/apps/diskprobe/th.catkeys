@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-DiskProbe	2944605311
+1	thai	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Raw editor
 Remove	AttributeWindow		ลบ
 Close	ProbeView		ปิด
@@ -37,11 +37,9 @@ Attribute	ProbeView		คุณลักษณะ
 Don't save	ProbeView		ไม่บันทึก
 Undo	ProbeView		ยกเลิก
 Flattened bitmap	TypeEditors		Flattened bitmap
-Block %Ld (0x%Lx)	ProbeView		บล็อก %Ld (0x%Lx)
 Cancel	OpenWindow		ยกเลิก
 Unknown format	TypeEditors		รูปแบบที่ไม่รู้จัก
 File: 	ProbeView		ไฟล์:
-Swapped: %Ld (0x%0*Lx)	ProbeView		สลับ: %Ld (0x%0*Lx)
 Stop	ProbeView		หยุด
 Cancel	ProbeView		ยกเลิก
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	ไม่สามารถเปิดได้ \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Type editor
 File	FileWindow		ไฟล์
 Grayscale	TypeEditors		โทนสีเทา
 32 bit	TypeEditors		32 บิท
-Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
 Device	ProbeView		อุปกรณ์
 Close	AttributeWindow		ปิด
 Type editor	AttributeWindow		ตัวแก้ไขชนิด

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	4110010385
+1	ukrainian	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		До збережених
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld некодованих символів. Можливо інше кодування спрацює краще? Натисніть «Відправити» щоб відправити лист так як є (замість некодованих символів буде використано символ-замінник), або натисніть «Скасувати» щоб повернутися назад і виправити ситуацію.
 Text wrapping:	Mail		Перенос тексту:
@@ -38,7 +38,9 @@ Previous message	Mail		Попереднє повідомлення
 (Address unavailable)	Mail		(Адреса недоступна)
 Mail	System name		Mail
 Copy link location	Mail		Копіювати адресу посилання
+Add attachment…	Mail		Додати вкладення…
 Next	Mail		Наступне
+Attachments:	Mail		Вкладення:
 Show icons only	Mail		Показати тільки значки
 Subject:	Mail		Тема:
 OK	Mail		ОК
@@ -55,6 +57,7 @@ Reply to sender	Mail		Відповісти відправникові
 \\n - Newline	Mail		\\n – Новий рядок
 Copy	Mail		Копіювати
 Add signature	Mail		Додати підпис
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вкладення: %name% (Тип: %type%)
 %n - Full name	Mail		%n – Повне ім'я
 Signature	Mail		Підпис
 Use default account	Mail		Використати запис за замовчуванням
@@ -124,7 +127,7 @@ Forward	Mail		Переслати
 Open attachment	Mail		Відкрити вкладення
 mail	B_USER_DIRECTORY/mail		Пошта
 Save this message as a draft before closing?	Mail		Зберегти це повідомлення як чернетку перед закриттям?
-The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть у черзі і буде відправлений після запуску демона.
 None	Mail		Пусто
 Resend	Mail		Відіслати повторно
 Hide	Mail		Сховати
@@ -149,7 +152,7 @@ An error occurred trying to open this signature.	Mail		Помилка при с�
 Edit signatures…	Mail		Редагувати підписи…
 User interface	Mail		Інтерфейс користувача
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/повтора.
-Remove attachment	Mail		Вилучити вкладення
+Remove attachment	Mail		Прибрати вкладення
 Set to…	Mail		Встановити статус як…
 Edit	Mail		Редагувати
 Page setup…	Mail		Настройка сторінки…

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	2944605311
+1	greek, modern (1453-)	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Επεξεργαστής Raw
 Remove	AttributeWindow		Διαγραφή
 Close	ProbeView		Κλείσιμο
@@ -37,11 +37,9 @@ Attribute	ProbeView		Σημαία
 Don't save	ProbeView		Χωρίς αποθήκευση
 Undo	ProbeView		Αναίρεση
 Flattened bitmap	TypeEditors		Ισοπέδωμένη εικόνα bitmap
-Block %Ld (0x%Lx)	ProbeView		Μπλοκ %Ld (0x%Lx)
 Cancel	OpenWindow		Άκυρο
 Unknown format	TypeEditors		Άγνωστη μορφοποίηση
 File: 	ProbeView		Αρχείο: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Ανταλλάχτηκαν: %Ld (0x%0*Lx)
 Stop	ProbeView		Σταμάτημα
 Cancel	ProbeView		Άκυρο
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Αδυναμία ανοίγματος \"%s\":\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Επεξεργαστής τύπου
 File	FileWindow		Αρχείο
 Grayscale	TypeEditors		Κλίμακα του γκρι
 32 bit	TypeEditors		32 bit
-Native: %Ld (0x%0*Lx)	ProbeView		Φυσικό: %Ld (0x%0*Lx)
 Device	ProbeView		Συσκευή
 Close	AttributeWindow		Κλείσιμο
 Type editor	AttributeWindow		Επεξεργαστής τύπου

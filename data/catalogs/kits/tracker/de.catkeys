@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3714382983
+1	german	x-vnd.Haiku-libtracker	3235393408
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -121,7 +121,6 @@ Enable type-ahead filtering	SettingsView		Filtern während der Eingabe
 copy	FSUtils	filename copy	Kopie
 New folder%ld	FSUtils		Neuer Ordner%ld
 Location	OpenWithWindow		Ort
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Optimale Größe
 List folders first	SettingsView		Ordner zuerst listen
 Find	FSUtils		Suchen

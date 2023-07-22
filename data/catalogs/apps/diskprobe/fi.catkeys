@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	2944605311
+1	finnish	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Raakamuokkain
 Remove	AttributeWindow		Poista
 Close	ProbeView		Sulje
@@ -37,11 +37,9 @@ Attribute	ProbeView		Attribuutti
 Don't save	ProbeView		Älä tallenna
 Undo	ProbeView		Peru
 Flattened bitmap	TypeEditors		Litistetty bittikarttatiedosto
-Block %Ld (0x%Lx)	ProbeView		Lohko %Ld (0x%Lx)
 Cancel	OpenWindow		Peru
 Unknown format	TypeEditors		Tuntematon muoto
 File: 	ProbeView		Tiedosto: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Siiretty näennäismuistiin: %Ld (0x%0*Lx)
 Stop	ProbeView		Pysäytä
 Cancel	ProbeView		Peru
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Puskurin ”%s” avaus epäonnistui:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Tyyppimuokkain
 File	FileWindow		Tiedosto
 Grayscale	TypeEditors		Harmaasävy
 32 bit	TypeEditors		32-bittinen
-Native: %Ld (0x%0*Lx)	ProbeView		Alkuperäinen: %Ld (0x%0*Lx)
 Device	ProbeView		Laite
 Close	AttributeWindow		Sulje
 Type editor	AttributeWindow		Tyyppimuokkain

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	480373757
+1	danish	x-vnd.Haiku-libtracker	1384182
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -123,7 +123,6 @@ Enable type-ahead filtering	SettingsView		Slå forudskrivningsfiltrering til
 copy	FSUtils	filename copy	kopi
 New folder%ld	FSUtils		Ny mappe%ld
 Location	OpenWithWindow		Placering
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Tilpas størrelse
 List folders first	SettingsView		Vis mapper først
 Find	FSUtils		Søg

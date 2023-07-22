@@ -1,199 +1,120 @@
-1	swedish	x-vnd.haiku-icon_o_matic	1015615450
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotera banindex
+1	swedish	x-vnd.haiku-icon_o_matic	1308365995
+None	Icon-O-Matic-Properties		Ingen
 Add empty	Icon-O-Matic-ShapesList		Lägg till tom
 Opening the icon failed!	Icon-O-Matic-Main		Öppning av ikonen misslyckades!
 Add with path	Icon-O-Matic-ShapesList		Lägg till med bana
+Copy	Icon-O-Matic-Properties		Kopiera
+Color	Icon-O-Matic-PropertyNames		Färg
 Format	Icon-O-Matic-SavePanel		Format
-Select	Icon-O-Matic-Properties		Markera
 Color	Icon-O-Matic-StyleTypes		Färg
+Select	Icon-O-Matic-Properties		Markera
 Reset transformation	Icon-O-Matic-ShapesList		Återställ förändring
+Duplicate	Icon-O-Matic-StylesList		Duplicera
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotera
 Shorten	Icon-O-Matic-PropertyNames		Förkorta
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Texten som du försöker importera är ganska lång, är du säker att du vill importera den?
 Paste	Icon-O-Matic-Properties		Klistra in
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Avtilldela bana
+Close	Icon-O-Matic-Menu-File		Stäng
 Add rect	Icon-O-Matic-PathsList		Lägg till rektangel
-Bleep!	Exporter - Continue in error dialog		Pip!
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON attribut
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Ta bort omvandlare
+Rotation	Icon-O-Matic-PropertyNames		Rotation
 Transform	Icon-O-Matic-PathManipulator		Omvandla
-Assign Style	Icon-O-Matic-AssignStyleCmd		Tilldela stil
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Klyv kontrollpunkt
-Height	Icon-O-Matic-PropertyNames		Höjd
+Add shape with style	Icon-O-Matic-Menu-Shape		Lägg till figur med stil
+Remove	Icon-O-Matic-StylesList		Ta bort
+Cancel	Icon-O-Matic-Menu-Settings		Avbryt
+Transformation	Icon-O-Matic-TransformationBoxStates		Omvandling
+Closed	Icon-O-Matic-PropertyNames		Stängd
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<inget att göra om>
-Add Shape	Icon-O-Matic-AddShapesCmd		Lägg till figur
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Rensa upp bana
-Move Style	Icon-O-Matic-MoveStylesCmd		Flytta stil
+Height	Icon-O-Matic-PropertyNames		Höjd
+warning	Icon-O-Matic-SVGExport		varning
+File	Icon-O-Matic-Menus		Arkiv
 Properties	Icon-O-Matic-Menus		Egenskaper
 Path	Icon-O-Matic-PropertyNames		Bana
-Add Control Point	Icon-O-Matic-AddPointCmd		Lägg till kontrollpunkt
+Path	Icon-O-Matic-Menus		Bana
 Stroke	Transformation		Dragning
 Flip	Icon-O-Matic-PathManipulator		Vänd
 Opacity	Icon-O-Matic-PropertyNames		Opacitet
 OK	Icon-O-Matic-ColorPicker		OK
+Error: 	Icon-O-Matic-Main		Fel:
+Saving your document failed!	Icon-O-Matic-Exporter		Misslyckades att spara dokumentet!
+Snap to grid	Icon-O-Matic-Menu-Settings		Fäst i rutnät
 Opening the document failed!	Icon-O-Matic-Main		Öppning av dokument misslyckades!
+Add with path & style	Icon-O-Matic-ShapesList		Lägg till med bana & stil
 Shape	Icon-O-Matic-Menus		Figur
 <unavailable>	Icon-O-Matic-StyleTypes		<ej tillgänglig>
 Min LOD	Icon-O-Matic-PropertyNames		Minsta LOD
-Reverse Path	Icon-O-Matic-ReversePathCmd		Vänd bana
-Paste Properties	Icon-O-Matic-Properties		Klistra in attribut
 Add	Icon-O-Matic-TransformersList		Lägg till
-Add	Icon-O-Matic-PathsList		Lägg till
 Settings	Icon-O-Matic-Menus		Inställningar
+Scale X	Icon-O-Matic-PropertyNames		Skala X
+Add	Icon-O-Matic-PathsList		Lägg till
+Remove	Icon-O-Matic-PathManipulator		Ta bort
+Duplicate	Icon-O-Matic-ShapesList		Duplicera
+Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Kontur
-Save icon	Dialog title		Spara ikon
 Rounding	Icon-O-Matic-PropertyNames		Avrunda
+Joins	Icon-O-Matic-PropertyNames		Sammanfogningar
 Cancel	Icon-O-Matic-ColorPicker		Avbryt
+Duplicate	Icon-O-Matic-PathsList		Duplicera
+Save	Icon-O-Matic-Menu-Settings		Spara
 Export as…	Icon-O-Matic-Menu-File		Exportera som...
 Error: 	Icon-O-Matic-Exporter		Fel:
-Move Path	Icon-O-Matic-MovePathsCmd		Flytta bana
-Add shape with path	Icon-O-Matic-Menu-Shape		Lägg till figur med bana
-Don't save	Icon-O-Matic-Menu-Settings		Spara inte
-Move Styles	Icon-O-Matic-MoveStylesCmd		Flytta stilar
-Translation X	Icon-O-Matic-PropertyNames		Förflyttning X
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Lägg till omvandlare
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribut
-Rotate indices backwards	Icon-O-Matic-PathsList		Rotera indexpunkter moturs
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		IkonRedigeraren har kanske inte tolkat all data från SVGn när den laddades. Genom att skriva över originalfilen förloras denna information.
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifiera kontrollpunkt
-Cancel	Icon-O-Matic-SVGExport		Avbryt
-Redo	Icon-O-Matic-Main		Gör om
-Change Color	Icon-O-Matic-SetColorCmd		Byt färg
-Linear	Icon-O-Matic-StyleTypes		Linjär
-any of the other lists to	Empty property list - 2nd line		någon av dom andra listorna till
-Color (#%02x%02x%02x)	Style name after dropping a color		Färg (#%02x%02x%02x)
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Skifta kontrollpunkter
-Move	Icon-O-Matic-TransformationBoxStates		Flytta
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Sära kontrollpunkter
-Name	Icon-O-Matic-PropertyNames		Namn
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Lägg till omvandlare
-Reverse	Icon-O-Matic-PathsList		Vänd
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Flytta Nav
-Remove	Icon-O-Matic-PathsList		Ta bort
-bad news	Title of error alert		dåliga nyheter
-Gradient	Icon-O-Matic-StyleTypes		Övergång
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Ta bort stilar
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Infoga kontrollpunkt
-OK	Icon-O-Matic-SVGImport		OK
-Append…	Icon-O-Matic-Menu-File		Bifoga...
-Set 	Set (property name)		Mängd
-Save	Icon-O-Matic-Menu-File		Spara
-Freeze transformation	Icon-O-Matic-ShapesList		Frys omvandling
-Miter Limit	Icon-O-Matic-PropertyNames		Ledbegränsning
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Frys figurer
-Max LOD	Icon-O-Matic-PropertyNames		Max LOD
-Untitled	Icon-O-Matic-Main		Namnlös
-Add Path	Icon-O-Matic-AddPathsCmd		Skapa bana
-load error	Icon-O-Matic-SVGImport		laddningsfel
-Swatches	Icon-O-Matic-Menus		Penslar
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-källkod
-<modify path>	Icon-O-Matic-PathCmd		<modifiera bana>
-Translation Y	Icon-O-Matic-PropertyNames		Förflyttning Y
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Frys figur
-Scale	Icon-O-Matic-TransformationBoxStates		Skala
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Ta bort figur
-Transformer	Icon-O-Matic-Menus		Omvandlare
-Multi Set 	Multi Set (property name)		Mängduppsättning
-Pick a color	Icon-O-Matic-ColorPicker		Välj en färg
-New	Icon-O-Matic-Menu-File		Ny
-Yes	Icon-O-Matic-StyledTextImport		Ja
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Förflyttningsomvandlare
-Export	Icon-O-Matic-Menu-File		Exportera
-Width	Icon-O-Matic-PropertyNames		Bredd
-Add reference image	Icon-O-Matic-ShapesList		Lägg till referensbild
-Bummer	Cancel button - error alert		Kasst
-Style	Icon-O-Matic-Menus		Stil
-Off	Icon-O-Matic-Menu-Settings		Av
-None	Icon-O-Matic-Properties		Ingen
-Color	Icon-O-Matic-PropertyNames		Färg
-Copy	Icon-O-Matic-Properties		Kopiera
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Flytta figurer
-Duplicate	Icon-O-Matic-StylesList		Duplicera
-Rotate	Icon-O-Matic-TransformationBoxStates		Rotera
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Ta bort kontrollpunkter
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Texten som du försöker importera är ganska lång, är du säker att du vill importera den?
-Detect Orient.	Icon-O-Matic-PropertyNames		Finn orientering.
-Click on a shape above	Empty transformers list - 1st line		Klicka på en figur ovan
-Close	Icon-O-Matic-Menu-File		Stäng
-Rotation	Icon-O-Matic-PropertyNames		Rotation
-Multi Paste Properties	Icon-O-Matic-Properties		Flerinklistringsinställningar
-Add shape with style	Icon-O-Matic-Menu-Shape		Lägg till figur med stil
-Assign Path	Icon-O-Matic-AddPathsCmd		Tilldela bana
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		nollställ omvandling
-Remove	Icon-O-Matic-StylesList		Ta bort
-Cancel	Icon-O-Matic-Menu-Settings		Avbryt
-Closed	Icon-O-Matic-PropertyNames		Stängd
-Transformation	Icon-O-Matic-TransformationBoxStates		Omvandling
-File	Icon-O-Matic-Menus		Arkiv
-warning	Icon-O-Matic-SVGExport		varning
-Path	Icon-O-Matic-Menus		Bana
-Select All	Icon-O-Matic-PathManipulator		Markera allt
-Error: 	Icon-O-Matic-Main		Fel:
-Saving your document failed!	Icon-O-Matic-Exporter		Misslyckades att spara dokumentet!
-bad news	Icon-O-Matic-Exporter		dåliga nyheter
-Snap to grid	Icon-O-Matic-Menu-Settings		Fäst i rutnät
-Add with path & style	Icon-O-Matic-ShapesList		Lägg till med bana & stil
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Förflyttningsomvandlare
-Undo	Icon-O-Matic-Main		Ångra
-Scale X	Icon-O-Matic-PropertyNames		Skala X
-Add Styles	Icon-O-Matic-AddStylesCmd		Lägg till stilar
-Alpha	Icon-O-Matic-PropertyNames		Alfa
-Duplicate	Icon-O-Matic-ShapesList		Duplicera
-Remove	Icon-O-Matic-PathManipulator		Ta bort
-Move Paths	Icon-O-Matic-MovePathsCmd		Flytta banor
-Joins	Icon-O-Matic-PropertyNames		Sammanfogningar
-Duplicate	Icon-O-Matic-PathsList		Duplicera
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Ta bort figurer
-Save	Icon-O-Matic-Menu-Settings		Spara
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Ta bort banor
 Diamond	Icon-O-Matic-StyleTypes		Diamant
-Assign Paths	Icon-O-Matic-AddPathsCmd		Tilldela banor
-Add Style	Icon-O-Matic-AddStylesCmd		Lägg till stil
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Nudda kontrollpunkter
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Skifta kontrollpunkter
+Don't save	Icon-O-Matic-Menu-Settings		Spara inte
+Add shape with path	Icon-O-Matic-Menu-Shape		Lägg till figur med bana
+Translation X	Icon-O-Matic-PropertyNames		Förflyttning X
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		IkonRedigeraren har kanske inte tolkat all data från SVGn när den laddades. Genom att skriva över originalfilen förloras denna information.
+Rotate indices backwards	Icon-O-Matic-PathsList		Rotera indexpunkter moturs
 Overwrite	Icon-O-Matic-SVGExport		Skriv över
+Cancel	Icon-O-Matic-SVGExport		Avbryt
 Open…	Icon-O-Matic-Menu-File		Öppna...
 Remove	Icon-O-Matic-ShapesList		Ta bort
 Drop shapes	Icon-O-Matic-ShapesList		Överge form
-PNG Set	Icon-O-Matic-SavePanel		PNG Mängd
-to attach transformers.	Empty transformers list - 2nd line		att tilldela omvandlare
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Nudda kontrollpunkt
-Add Paths	Icon-O-Matic-AddPathsCmd		Lägg till banor
+Linear	Icon-O-Matic-StyleTypes		Linjär
 Clean up	Icon-O-Matic-PathsList		Rensa upp
 Split	Icon-O-Matic-PathManipulator		Klyv
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Ta bort stil
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Återställ omvandlingar
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Ta bort kontrollpunkt
+Move	Icon-O-Matic-TransformationBoxStates		Flytta
 Conic	Icon-O-Matic-StyleTypes		Konisk
-Multi paste	Icon-O-Matic-Properties		Klistra in flera
+Name	Icon-O-Matic-PropertyNames		Namn
 Reset transformation	Icon-O-Matic-StylesList		Nollställ omvandlare
-Add Shapes	Icon-O-Matic-AddShapesCmd		Lägg till figurer
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Ta bort omvandlare
-Quit	Icon-O-Matic-Menu-File		Avsluta
+Reverse	Icon-O-Matic-PathsList		Vänd
+Remove	Icon-O-Matic-PathsList		Ta bort
 Style type	Icon-O-Matic-StyleTypes		Stiltyp
+Quit	Icon-O-Matic-Menu-File		Avsluta
+Gradient	Icon-O-Matic-StyleTypes		Övergång
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Lägg till figur med bana & stil
-Move Shape	Icon-O-Matic-MoveShapesCommand		Flytta figur
 Radial	Icon-O-Matic-StyleTypes		Radiell
-Caps	Icon-O-Matic-PropertyNames		Versaler
 Text too long	Icon-O-Matic-StyledTextImport		Texten är för långt
+Caps	Icon-O-Matic-PropertyNames		Versaler
+OK	Icon-O-Matic-SVGImport		OK
+Append…	Icon-O-Matic-Menu-File		Bifoga...
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
-Export icon	Dialog title		Exportera ikon
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Färg (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Redigera övergång
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotera indexpunkter medurs
-Click on an object in	Empty property list - 1st line		Klicka på ett objekt i
-No	Icon-O-Matic-StyledTextImport		Nej
+Save	Icon-O-Matic-Menu-File		Spara
 Add circle	Icon-O-Matic-PathsList		Lägg till cirkel
+Freeze transformation	Icon-O-Matic-ShapesList		Frys omvandling
+Untitled	Icon-O-Matic-Main		Namnlös
+Max LOD	Icon-O-Matic-PropertyNames		Max LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Spara ändringarna till ikonen innan stängning?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Det gick inte att öppna filen '%s' som ett SVG-dokument.\n\n
 Save as…	Icon-O-Matic-Menu-File		Spara som...
+Swatches	Icon-O-Matic-Menus		Penslar
+<modify path>	Icon-O-Matic-PathCmd		<modifiera bana>
 Icon-O-Matic	System name		IkonRedigerare
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<inget att ångra>
 Add	Icon-O-Matic-StylesList		Lägg till
+Translation Y	Icon-O-Matic-PropertyNames		Förflyttning Y
+Scale	Icon-O-Matic-TransformationBoxStates		Skala
 All	Icon-O-Matic-Properties		Alla
+Transformer	Icon-O-Matic-Menus		Omvandlare
 Invert selection	Icon-O-Matic-Properties		Invertera markering
 <unkown property>	Icon-O-Matic-PropertyNames		<okänt attribut>
+Pick a color	Icon-O-Matic-ColorPicker		Välj en färg
 Settings…	Icon-O-Matic-SavePanel		Inställningar...
 Add with style	Icon-O-Matic-ShapesList		Lägg till med stil
-Remove Path	Icon-O-Matic-RemovePathsCmd		Ta bort bana
+New	Icon-O-Matic-Menu-File		Ny
 Gradient type	Icon-O-Matic-StyleTypes		Övergångstyp
-edit it's properties here.	Empty property list - 3rd line		redigera dess egenskaper här.
+Export	Icon-O-Matic-Menu-File		Exportera
+Width	Icon-O-Matic-PropertyNames		Bredd
+Add reference image	Icon-O-Matic-ShapesList		Lägg till referensbild
+Style	Icon-O-Matic-Menus		Stil
+Off	Icon-O-Matic-Menu-Settings		Av
 Edit	Icon-O-Matic-Menus		Redigera

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DiskProbe	2944605311
+1	dutch; flemish	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Onbewerkt-editor
 Remove	AttributeWindow		Verwijderen
 Close	ProbeView		Sluiten
@@ -37,11 +37,9 @@ Attribute	ProbeView		Eigenschap
 Don't save	ProbeView		Niet opslaan
 Undo	ProbeView		Ongedaan maken
 Flattened bitmap	TypeEditors		Afgeplatte bitmap
-Block %Ld (0x%Lx)	ProbeView		Blokkeer %Ld (0x%Lx)
 Cancel	OpenWindow		Annuleren
 Unknown format	TypeEditors		Onbekend formaat
 File: 	ProbeView		Bestand:
-Swapped: %Ld (0x%0*Lx)	ProbeView		Verwisseld: %Ld (0x%0*Lx)
 Stop	ProbeView		Stop
 Cancel	ProbeView		Annuleren
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Kon \"%s\" niet openen:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Type-editor
 File	FileWindow		Bestand
 Grayscale	TypeEditors		Grijstinten
 32 bit	TypeEditors		32-bit
-Native: %Ld (0x%0*Lx)	ProbeView		Native: %Ld (0x%0*Lx)
 Device	ProbeView		Apparaat
 Close	AttributeWindow		Sluiten
 Type editor	AttributeWindow		Type-editor

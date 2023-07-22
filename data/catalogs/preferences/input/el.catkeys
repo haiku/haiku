@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Input	4063065788
+1	greek, modern (1453-)	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Κύλιση
 Defaults	InputMouse		Προεπιλογές
 Long	KeyboardView		Μικρή
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Αποδοχή πρώτου κλικ
 OK	TouchpadPrefView		Εντάξει
 Horizontal scrolling	TouchpadPrefView		Οριζόντια κύλιση
 Delay until key repeat	KeyboardView		Καθυστέρηση μέχρι την επανάληψη πλήκτρου
+Keyboard lock delay	TouchpadPrefView		Καθυστέρηση κλειδώματος πληκτρολογίου
 Two finger scrolling	TouchpadPrefView		Κύλιση δύο δαχτύλων
 Input	System name		Εισαγωγή
 Mouse acceleration	SettingsView		Επιτάχυνση δείκτη

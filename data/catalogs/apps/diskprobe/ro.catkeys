@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskProbe	2944605311
+1	romanian	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Editor brut
 Remove	AttributeWindow		Elimină
 Close	ProbeView		Închide
@@ -37,11 +37,9 @@ Attribute	ProbeView		Atribut
 Don't save	ProbeView		Nu salva
 Undo	ProbeView		Refă
 Flattened bitmap	TypeEditors		Bitmap aplatizat
-Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
 Cancel	OpenWindow		Anulează
 Unknown format	TypeEditors		Format necunoscut
 File: 	ProbeView		Fișier: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Interschimbat: %Ld (0x%0*Lx)
 Stop	ProbeView		Oprește
 Cancel	ProbeView		Anulează
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nu s-a putut deschide \„%s\”:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Editor de tip
 File	FileWindow		Fișier
 Grayscale	TypeEditors		Scală de gri
 32 bit	TypeEditors		32 de biți
-Native: %Ld (0x%0*Lx)	ProbeView		Nativ: %Ld (0x%0*Lx)
 Device	ProbeView		Dispozitiv
 Close	AttributeWindow		Închide
 Type editor	AttributeWindow		Editor de tip

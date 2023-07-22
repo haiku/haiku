@@ -1,197 +1,118 @@
-1	indonesian	x-vnd.haiku-icon_o_matic	4159219060
-Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Indeks Jalur Putar
+1	indonesian	x-vnd.haiku-icon_o_matic	157002309
+None	Icon-O-Matic-Properties		Tidak ada
 Add empty	Icon-O-Matic-ShapesList		Tambah kosong
 Opening the icon failed!	Icon-O-Matic-Main		Membuka ikon gagal!
 Add with path	Icon-O-Matic-ShapesList		Tambah dengan jalur
+Copy	Icon-O-Matic-Properties		Salin
+Color	Icon-O-Matic-PropertyNames		Warna
 Format	Icon-O-Matic-SavePanel		Format
-Select	Icon-O-Matic-Properties		Pilih
 Color	Icon-O-Matic-StyleTypes		Warna
+Select	Icon-O-Matic-Properties		Pilih
 Reset transformation	Icon-O-Matic-ShapesList		Setel ulang transformasi
+Duplicate	Icon-O-Matic-StylesList		Duplikasikan
+Rotate	Icon-O-Matic-TransformationBoxStates		Rotasi
 Shorten	Icon-O-Matic-PropertyNames		Persingkat
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Teks yang anda coba impor cukup panjang, apakah anda yakin?
 Paste	Icon-O-Matic-Properties		Tempel
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Lucuti Jalur
+Close	Icon-O-Matic-Menu-File		Tutup
 Add rect	Icon-O-Matic-PathsList		Tambah kotak
-Bleep!	Exporter - Continue in error dialog		Bleep!
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:Atribut IKON
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Hapus Transformer
+Rotation	Icon-O-Matic-PropertyNames		Rotasi
 Transform	Icon-O-Matic-PathManipulator		Transformasi
-Assign Style	Icon-O-Matic-AssignStyleCmd		Tetapkan Gaya
-Split Control Point	Icon-O-Matic-SplitPointsCmd		BelahTitik Kontrol
-Height	Icon-O-Matic-PropertyNames		Tinggi
+Add shape with style	Icon-O-Matic-Menu-Shape		Tambah bentuk dengan gaya
+Remove	Icon-O-Matic-StylesList		Hapus
+Cancel	Icon-O-Matic-Menu-Settings		Batal
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformasi
+Closed	Icon-O-Matic-PropertyNames		Tutup
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nothing to redo>
-Add Shape	Icon-O-Matic-AddShapesCmd		Tambah Bentuk
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Bersihkan Path
-Move Style	Icon-O-Matic-MoveStylesCmd		Pindahkan Gaya
+Height	Icon-O-Matic-PropertyNames		Tinggi
+warning	Icon-O-Matic-SVGExport		peringatan
+File	Icon-O-Matic-Menus		Berkas
 Properties	Icon-O-Matic-Menus		Properti
 Path	Icon-O-Matic-PropertyNames		Jalur
-Add Control Point	Icon-O-Matic-AddPointCmd		Tambahkan Titik Kontrol
+Path	Icon-O-Matic-Menus		Jalur
 Stroke	Transformation		Ketukan
 Flip	Icon-O-Matic-PathManipulator		Balik
 Opacity	Icon-O-Matic-PropertyNames		Kegelapan
 OK	Icon-O-Matic-ColorPicker		OKE
+Error: 	Icon-O-Matic-Main		Kesalahan: 
+Saving your document failed!	Icon-O-Matic-Exporter		Proses simpan dokumen anda gagal!
+Snap to grid	Icon-O-Matic-Menu-Settings		Tempelkan ke kisi
 Opening the document failed!	Icon-O-Matic-Main		Membuka dokumen gagal!
+Add with path & style	Icon-O-Matic-ShapesList		Tambah dengan jalur & gaya
 Shape	Icon-O-Matic-Menus		Bentuk
 <unavailable>	Icon-O-Matic-StyleTypes		<tak bisa digunakan>
 Min LOD	Icon-O-Matic-PropertyNames		LOD Min
-Reverse Path	Icon-O-Matic-ReversePathCmd		Jalur Balik
-Paste Properties	Icon-O-Matic-Properties		Properti Tempel
 Add	Icon-O-Matic-TransformersList		Tambah
-Add	Icon-O-Matic-PathsList		Tambah
 Settings	Icon-O-Matic-Menus		Pengaturan
+Scale X	Icon-O-Matic-PropertyNames		Skala X
+Add	Icon-O-Matic-PathsList		Tambah
+Remove	Icon-O-Matic-PathManipulator		Hapus
+Duplicate	Icon-O-Matic-ShapesList		Duplikat
 Contour	Transformation		Kontur
-Save icon	Dialog title		Simpan ikon
 Rounding	Icon-O-Matic-PropertyNames		Pembulatan
+Joins	Icon-O-Matic-PropertyNames		Gabung
 Cancel	Icon-O-Matic-ColorPicker		Batal
+Duplicate	Icon-O-Matic-PathsList		Duplikat
+Save	Icon-O-Matic-Menu-Settings		Simpan
 Export as…	Icon-O-Matic-Menu-File		Ekspor sebagai…
 Error: 	Icon-O-Matic-Exporter		Galat: 
-Move Path	Icon-O-Matic-MovePathsCmd		Pindahkan Path
-Add shape with path	Icon-O-Matic-Menu-Shape		Tambahkan bentuk dengan jalur
-Don't save	Icon-O-Matic-Menu-Settings		Jangan simpan
-Move Styles	Icon-O-Matic-MoveStylesCmd		Pindahkan Gaya
-Translation X	Icon-O-Matic-PropertyNames		Terjemahan X
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Tambah Transformator
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:Atribut ICON
-Rotate indices backwards	Icon-O-Matic-PathsList		Putar indeks ke belakang
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic mungkin tidak menafsirkan semua data dari SVG ketika dimuat. Dengan menimpa file asli, informasi ini sekarang akan hilang.
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Modifikasi Titik Kontrol
-Cancel	Icon-O-Matic-SVGExport		Batal
-Redo	Icon-O-Matic-Main		Jadi lagi
-Change Color	Icon-O-Matic-SetColorCmd		Ganti warna
-Linear	Icon-O-Matic-StyleTypes		Linear
-any of the other lists to	Empty property list - 2nd line		ke salah satu dari daftar lainnya
-Color (#%02x%02x%02x)	Style name after dropping a color		Warna (#%02x%02x%02x)
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Titik Kontrol Balik
-Move	Icon-O-Matic-TransformationBoxStates		Pindah
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Belah Titik Kontrol
-Name	Icon-O-Matic-PropertyNames		Nama
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Tambah Transformator
-Reverse	Icon-O-Matic-PathsList		Balik
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Pindahkan Pivot
-Remove	Icon-O-Matic-PathsList		Hapus
-bad news	Title of error alert		kabar buruk
-Gradient	Icon-O-Matic-StyleTypes		Gradien
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Buang Gaya
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Sisipkan titik kontrol
-OK	Icon-O-Matic-SVGImport		OK
-Append…	Icon-O-Matic-Menu-File		Tambah…
-Set 	Set (property name)		Set 
-Save	Icon-O-Matic-Menu-File		Simpan
-Freeze transformation	Icon-O-Matic-ShapesList		Transformasi beku
-Miter Limit	Icon-O-Matic-PropertyNames		Batas Miter
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Bentuk Bekukan
-Max LOD	Icon-O-Matic-PropertyNames		LOD Maks
-Untitled	Icon-O-Matic-Main		Tanpa judul
-Add Path	Icon-O-Matic-AddPathsCmd		Tambah Jalur
-load error	Icon-O-Matic-SVGImport		kesalahan memuat
-Swatches	Icon-O-Matic-Menus		Carikan
-HVIF Source Code	Icon-O-Matic-SavePanel		Kode Sumber HVIF
-<modify path>	Icon-O-Matic-PathCmd		<modify path>
-Translation Y	Icon-O-Matic-PropertyNames		Translasi Y
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Bekukan Bentuk
-Scale	Icon-O-Matic-TransformationBoxStates		Skala
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Hapus Bentuk
-Transformer	Icon-O-Matic-Menus		Transformator
-Multi Set 	Multi Set (property name)		Multi Set 
-Pick a color	Icon-O-Matic-ColorPicker		Pilih warna
-New	Icon-O-Matic-Menu-File		Baru
-Yes	Icon-O-Matic-StyledTextImport		Ya
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Pindahkan Transformer
-Export	Icon-O-Matic-Menu-File		Ekspor
-Width	Icon-O-Matic-PropertyNames		Lebar
-Bummer	Cancel button - error alert		Kecewa
-Style	Icon-O-Matic-Menus		Gaya
-Off	Icon-O-Matic-Menu-Settings		Mati
-None	Icon-O-Matic-Properties		Tidak ada
-Color	Icon-O-Matic-PropertyNames		Warna
-Copy	Icon-O-Matic-Properties		Salin
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Pindahkan Bentuk
-Duplicate	Icon-O-Matic-StylesList		Duplikasikan
-Rotate	Icon-O-Matic-TransformationBoxStates		Rotasi
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Hapus Titik Kontrol
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Teks yang anda coba impor cukup panjang, apakah anda yakin?
-Detect Orient.	Icon-O-Matic-PropertyNames		Deteksi Orient.
-Click on a shape above	Empty transformers list - 1st line		Klik pada bentuk di atas
-Close	Icon-O-Matic-Menu-File		Tutup
-Rotation	Icon-O-Matic-PropertyNames		Rotasi
-Multi Paste Properties	Icon-O-Matic-Properties		Properti Multi Tempel
-Add shape with style	Icon-O-Matic-Menu-Shape		Tambah bentuk dengan gaya
-Assign Path	Icon-O-Matic-AddPathsCmd		Tetapkan Jalur
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Reset Transformasi
-Remove	Icon-O-Matic-StylesList		Hapus
-Cancel	Icon-O-Matic-Menu-Settings		Batal
-Closed	Icon-O-Matic-PropertyNames		Tutup
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformasi
-File	Icon-O-Matic-Menus		Berkas
-warning	Icon-O-Matic-SVGExport		peringatan
-Path	Icon-O-Matic-Menus		Jalur
-Select All	Icon-O-Matic-PathManipulator		Pilih Semua
-Error: 	Icon-O-Matic-Main		Kesalahan: 
-Saving your document failed!	Icon-O-Matic-Exporter		Proses simpan dokumen anda gagal!
-bad news	Icon-O-Matic-Exporter		kabar buruk
-Snap to grid	Icon-O-Matic-Menu-Settings		Tempelkan ke kisi
-Add with path & style	Icon-O-Matic-ShapesList		Tambah dengan jalur & gaya
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Pindah Transformer
-Undo	Icon-O-Matic-Main		Batalkan
-Scale X	Icon-O-Matic-PropertyNames		Skala X
-Add Styles	Icon-O-Matic-AddStylesCmd		Tambah Gaya
-Duplicate	Icon-O-Matic-ShapesList		Duplikat
-Remove	Icon-O-Matic-PathManipulator		Hapus
-Move Paths	Icon-O-Matic-MovePathsCmd		Pindahkan jalur
-Joins	Icon-O-Matic-PropertyNames		Gabung
-Duplicate	Icon-O-Matic-PathsList		Duplikat
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Hapus Bentuk
-Save	Icon-O-Matic-Menu-Settings		Simpan
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Hapus Jalur
 Diamond	Icon-O-Matic-StyleTypes		Wajik
-Assign Paths	Icon-O-Matic-AddPathsCmd		Tetapkan Jalur
-Add Style	Icon-O-Matic-AddStylesCmd		Tambahkan Gaya
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Titik Kontrol Sentuhan
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Balik Titik Kontrol
+Don't save	Icon-O-Matic-Menu-Settings		Jangan simpan
+Add shape with path	Icon-O-Matic-Menu-Shape		Tambahkan bentuk dengan jalur
+Translation X	Icon-O-Matic-PropertyNames		Terjemahan X
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic mungkin tidak menafsirkan semua data dari SVG ketika dimuat. Dengan menimpa file asli, informasi ini sekarang akan hilang.
+Rotate indices backwards	Icon-O-Matic-PathsList		Putar indeks ke belakang
 Overwrite	Icon-O-Matic-SVGExport		Tindih
+Cancel	Icon-O-Matic-SVGExport		Batal
 Open…	Icon-O-Matic-Menu-File		Buka…
 Remove	Icon-O-Matic-ShapesList		Menghapus
 Drop shapes	Icon-O-Matic-ShapesList		Buang bentuk
-PNG Set	Icon-O-Matic-SavePanel		Set PNG
-to attach transformers.	Empty transformers list - 2nd line		untuk melampirkan transformer.
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Titik Kontrol Singgungan
-Add Paths	Icon-O-Matic-AddPathsCmd		Tambah Jalur
+Linear	Icon-O-Matic-StyleTypes		Linear
 Clean up	Icon-O-Matic-PathsList		Bersihkan
 Split	Icon-O-Matic-PathManipulator		Bagi
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Hapus Gaya
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Atur ulang transformasi
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Hapus Titik Kontrol
+Move	Icon-O-Matic-TransformationBoxStates		Pindah
 Conic	Icon-O-Matic-StyleTypes		Kerucut
-Multi paste	Icon-O-Matic-Properties		Multi tempel
+Name	Icon-O-Matic-PropertyNames		Nama
 Reset transformation	Icon-O-Matic-StylesList		Atur ulang transformasi
-Add Shapes	Icon-O-Matic-AddShapesCmd		Tambah Bentuk
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Hapus Transformer
-Quit	Icon-O-Matic-Menu-File		Keluar
+Reverse	Icon-O-Matic-PathsList		Balik
+Remove	Icon-O-Matic-PathsList		Hapus
 Style type	Icon-O-Matic-StyleTypes		Tipe gaya
+Quit	Icon-O-Matic-Menu-File		Keluar
+Gradient	Icon-O-Matic-StyleTypes		Gradien
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Tambah bentuk dengan jalur & gaya
-Move Shape	Icon-O-Matic-MoveShapesCommand		Pindahkan Bentuk
 Radial	Icon-O-Matic-StyleTypes		Radial
-Caps	Icon-O-Matic-PropertyNames		Tutup
 Text too long	Icon-O-Matic-StyledTextImport		Teks terlalu panjang
+Caps	Icon-O-Matic-PropertyNames		Tutup
+OK	Icon-O-Matic-SVGImport		OK
+Append…	Icon-O-Matic-Menu-File		Tambah…
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
-Export icon	Dialog title		Ekspor ikon
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Warna (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Edit Gradient
 Rotate indices forwards	Icon-O-Matic-PathsList		Putar indeks ke depan
-Click on an object in	Empty property list - 1st line		Klik pada objek di
-No	Icon-O-Matic-StyledTextImport		Tidak
+Save	Icon-O-Matic-Menu-File		Simpan
 Add circle	Icon-O-Matic-PathsList		Tambah lingkaran
+Freeze transformation	Icon-O-Matic-ShapesList		Transformasi beku
+Untitled	Icon-O-Matic-Main		Tanpa judul
+Max LOD	Icon-O-Matic-PropertyNames		LOD Maks
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Simpan perubahan ikon sekarang sebelum menutup?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Gagal membuka berkas '%s' sebagai dokumen SVG.\n\n
 Save as…	Icon-O-Matic-Menu-File		Simpan sebagai…
+Swatches	Icon-O-Matic-Menus		Carikan
+<modify path>	Icon-O-Matic-PathCmd		<modify path>
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nothing to undo>
 Add	Icon-O-Matic-StylesList		Menambahkan
+Translation Y	Icon-O-Matic-PropertyNames		Translasi Y
+Scale	Icon-O-Matic-TransformationBoxStates		Skala
 All	Icon-O-Matic-Properties		Semua
+Transformer	Icon-O-Matic-Menus		Transformator
 Invert selection	Icon-O-Matic-Properties		Pilihan sebaliknya
 <unkown property>	Icon-O-Matic-PropertyNames		<unkown property>
+Pick a color	Icon-O-Matic-ColorPicker		Pilih warna
 Settings…	Icon-O-Matic-SavePanel		Pengaturan…
 Add with style	Icon-O-Matic-ShapesList		Tambah dengan gaya
-Remove Path	Icon-O-Matic-RemovePathsCmd		Hapus Jalur
+New	Icon-O-Matic-Menu-File		Baru
 Gradient type	Icon-O-Matic-StyleTypes		Jenis gradien
-edit it's properties here.	Empty property list - 3rd line		edit propertinya di sini.
+Export	Icon-O-Matic-Menu-File		Ekspor
+Width	Icon-O-Matic-PropertyNames		Lebar
+Style	Icon-O-Matic-Menus		Gaya
+Off	Icon-O-Matic-Menu-Settings		Mati
 Edit	Icon-O-Matic-Menus		Edit

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	557015480
+1	russian	x-vnd.Haiku-libtracker	78025905
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -119,7 +119,6 @@ Enable type-ahead filtering	SettingsView		Включить фильтрацию 
 copy	FSUtils	filename copy	копия
 New folder%ld	FSUtils		Новая папка%ld
 Location	OpenWithWindow		Путь
-%Ld B	WidgetAttributeText		%Ld байт
 Resize to fit	QueryContainerWindow		Подогнать размер окна
 List folders first	SettingsView		Отображать папки в начале списка
 Find	FSUtils		Найти

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	765355649
+1	english	x-vnd.Haiku-libtracker	286366074
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -122,7 +122,6 @@ Enable type-ahead filtering	SettingsView		启用输入提示过滤
 copy	FSUtils	filename copy	复制
 New folder%ld	FSUtils		新建目录 %ld
 Location	OpenWithWindow		位置
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		适应大小
 List folders first	SettingsView		首先列出目录
 Find	FSUtils		搜索

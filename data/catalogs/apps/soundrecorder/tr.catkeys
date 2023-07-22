@@ -23,7 +23,7 @@ Cannot open the temporary file created to hold the new recording	RecorderWindow	
 Input:	RecorderWindow		Girdi:
 Forward	RecorderWindow		İleri sar
 Play	RecorderWindow		Oynat
-SoundRecorder	System name		Ses Kaydedici
+SoundRecorder	System name		Ses Kaydedicisi
 Channels:	RecorderWindow		Kanallar:
  bits	RecorderWindow		 bit
 None	RecorderWindow		Yok

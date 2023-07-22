@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1637138669
+1	slovak	x-vnd.Haiku-libtracker	1158149094
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -100,7 +100,6 @@ Enable type-ahead filtering	SettingsView		Zapnúť filtrovanie počas písania
 copy	FSUtils	filename copy	kopírovať
 New folder%ld	FSUtils		Nový priečinok%ld
 Location	OpenWithWindow		Umiestnenie
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Prispôsobiť veľkosť
 List folders first	SettingsView		Uviesť priečinky na začiatku
 Find	FSUtils		Nájsť

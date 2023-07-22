@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	765355649
+1	dutch; flemish	x-vnd.Haiku-libtracker	286366074
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -122,7 +122,6 @@ Enable type-ahead filtering	SettingsView		Zoeken-tijdens-typen toepassen
 copy	FSUtils	filename copy	kopie
 New folder%ld	FSUtils		Nieuwe map%ld
 Location	OpenWithWindow		Locatie
-%Ld B	WidgetAttributeText		%Ld B
 Resize to fit	QueryContainerWindow		Grootte passend maken
 List folders first	SettingsView		Toon mappen eerst
 Find	FSUtils		Zoeken

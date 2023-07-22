@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DiskProbe	2944605311
+1	slovak	x-vnd.Haiku-DiskProbe	4193379066
 Raw editor	AttributeWindow		Editor nespracovaných hodnôt
 Remove	AttributeWindow		Odstrániť
 Close	ProbeView		Zatvoriť
@@ -37,11 +37,9 @@ Attribute	ProbeView		Atribút
 Don't save	ProbeView		Neukladať
 Undo	ProbeView		Vrátiť
 Flattened bitmap	TypeEditors		Sploštená bitová mapa
-Block %Ld (0x%Lx)	ProbeView		Blok %Ld (0x%Lx)
 Cancel	OpenWindow		Zrušiť
 Unknown format	TypeEditors		Neznámy formát
 File: 	ProbeView		Súbor: 
-Swapped: %Ld (0x%0*Lx)	ProbeView		Vymenené: %Ld (0x%0*Lx)
 Stop	ProbeView		Zastaviť
 Cancel	ProbeView		Zrušiť
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nepodarilo sa otvoriť „%s“:\n%s
@@ -91,7 +89,6 @@ Type editor	ProbeView		Editor typov
 File	FileWindow		Súbor
 Grayscale	TypeEditors		Odtiene šedej
 32 bit	TypeEditors		32-bitový
-Native: %Ld (0x%0*Lx)	ProbeView		Natívne: %Ld (0x%0*Lx)
 Device	ProbeView		Zariadenie
 Close	AttributeWindow		Zatvoriť
 Type editor	AttributeWindow		Editor typov
