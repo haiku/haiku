@@ -76,6 +76,7 @@ static	void				_NotifyCallback(void *cookie, int32 status,
 		int32				fStatusWrite;
 		sem_id				fNotifyReadSem;
 		sem_id				fNotifyWriteSem;
+		sem_id				fLockWriteSem;
 		sem_id				fNotifyControlSem;
 
 		uint8				fNotifyBuffer[8];
