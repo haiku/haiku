@@ -30,6 +30,7 @@ VirtioQueue::VirtioQueue(VirtioDevice *dev, int32 id)
 	:
 	fDev(dev),
 	fId(id),
+	fAllocatedDescs(0),
 	fQueueHandler(NULL),
 	fQueueHandlerCookie(NULL)
 {
@@ -47,21 +48,19 @@ VirtioQueue::Init()
 	fDev->fRegs->queueSel = fId;
 	TRACE("queueNumMax: %d\n", fDev->fRegs->queueNumMax);
 	fQueueLen = fDev->fRegs->queueNumMax;
+	fDescCount = fQueueLen;
 	fDev->fRegs->queueNum = fQueueLen;
 	fLastUsed = 0;
 
 	size_t queueMemSize = 0;
-	fDescs = (VirtioDesc*)queueMemSize;
-	queueMemSize += ROUNDUP(sizeof(VirtioDesc)
-		* fQueueLen, B_PAGE_SIZE);
+	size_t descsOffset = queueMemSize;
+	queueMemSize += ROUNDUP(sizeof(VirtioDesc) * fDescCount, B_PAGE_SIZE);
 
-	fAvail = (VirtioAvail*)queueMemSize;
-	queueMemSize += ROUNDUP(sizeof(VirtioAvail)
-		+ sizeof(uint16) * fQueueLen, B_PAGE_SIZE);
+	size_t availOffset = queueMemSize;
+	queueMemSize += ROUNDUP(sizeof(VirtioAvail) + sizeof(uint16) * fQueueLen, B_PAGE_SIZE);
 
-	fUsed  = (VirtioUsed*)queueMemSize;
-	queueMemSize += ROUNDUP(sizeof(VirtioUsed)
-		+ sizeof(VirtioUsedItem)*fQueueLen, B_PAGE_SIZE);
+	size_t usedOffset = queueMemSize;
+	queueMemSize += ROUNDUP(sizeof(VirtioUsed) + sizeof(VirtioUsedItem) * fQueueLen, B_PAGE_SIZE);
 
 	uint8* queueMem = NULL;
 	fArea.SetTo(create_area("VirtIO Queue", (void**)&queueMem,
@@ -74,7 +73,8 @@ VirtioQueue::Init()
 	}
 
 	physical_entry pe;
-	if (status_t res = get_memory_map(queueMem, queueMemSize, &pe, 1) < B_OK) {
+	status_t res = get_memory_map(queueMem, queueMemSize, &pe, 1);
+	if (res < B_OK) {
 		ERROR("get_memory_map failed");
 		return res;
 	}
@@ -83,31 +83,30 @@ VirtioQueue::Init()
 
 	memset(queueMem, 0, queueMemSize);
 
-	fDescs = (VirtioDesc*)((uint8*)fDescs + (addr_t)queueMem);
-	fAvail = (VirtioAvail*)((uint8*)fAvail + (addr_t)queueMem);
-	fUsed  = (VirtioUsed*)((uint8*)fUsed  + (addr_t)queueMem);
+	fDescs = (VirtioDesc*) (queueMem + descsOffset);
+	fAvail = (VirtioAvail*)(queueMem + availOffset);
+	fUsed  = (VirtioUsed*) (queueMem + usedOffset);
 
-	phys_addr_t descsPhys = (addr_t)fDescs - (addr_t)queueMem + pe.address;
-	phys_addr_t availPhys = (addr_t)fAvail - (addr_t)queueMem + pe.address;
-	phys_addr_t usedPhys  = (addr_t)fUsed  - (addr_t)queueMem + pe.address;
+	if (fDev->fRegs->version >= 2) {
+		phys_addr_t descsPhys = (addr_t)fDescs - (addr_t)queueMem + pe.address;
+		phys_addr_t availPhys = (addr_t)fAvail - (addr_t)queueMem + pe.address;
+		phys_addr_t usedPhys  = (addr_t)fUsed  - (addr_t)queueMem + pe.address;
 
-	if (fDev->fRegs->version != 1) {
 		SetLowHi(fDev->fRegs->queueDescLow,  fDev->fRegs->queueDescHi,  descsPhys);
 		SetLowHi(fDev->fRegs->queueAvailLow, fDev->fRegs->queueAvailHi, availPhys);
 		SetLowHi(fDev->fRegs->queueUsedLow,  fDev->fRegs->queueUsedHi,  usedPhys);
 	}
 
-	fFreeDescs.SetTo(new(std::nothrow) uint32[(fQueueLen + 31) / 32]);
-	if (!fFreeDescs.IsSet())
-		return B_NO_MEMORY;
+	res = fAllocatedDescs.Resize(fDescCount);
+	if (res < B_OK)
+		return res;
 
-	memset(fFreeDescs.Get(), 0xff, sizeof(uint32) * ((fQueueLen + 31) / 32));
-	fCookies.SetTo(new(std::nothrow) void*[fQueueLen]);
+	fCookies.SetTo(new(std::nothrow) void*[fDescCount]);
 	if (!fCookies.IsSet())
 		return B_NO_MEMORY;
 
 	if (fDev->fRegs->version == 1) {
-		uint32_t pfn = descsPhys / B_PAGE_SIZE;
+		uint32_t pfn = pe.address / B_PAGE_SIZE;
 		fDev->fRegs->queueAlign = B_PAGE_SIZE;
 		fDev->fRegs->queuePfn = pfn;
 	} else {
@@ -121,20 +120,19 @@ VirtioQueue::Init()
 int32
 VirtioQueue::AllocDesc()
 {
-	for (size_t i = 0; i < fQueueLen; i++) {
-		if ((fFreeDescs[i / 32] & (1 << (i % 32))) != 0) {
-			fFreeDescs[i / 32] &= ~((uint32)1 << (i % 32));
-			return i;
-		}
-	}
-	return -1;
+	int32 idx = fAllocatedDescs.GetLowestClear();
+	if (idx < 0)
+		return -1;
+
+	fAllocatedDescs.Set(idx);
+	return idx;
 }
 
 
 void
 VirtioQueue::FreeDesc(int32 idx)
 {
-	fFreeDescs[idx / 32] |= (uint32)1 << (idx % 32);
+	fAllocatedDescs.Clear(idx);
 }
 
 
@@ -184,8 +182,8 @@ VirtioQueue::Enqueue(const physical_entry* vector,
 		lastDesc = desc;
 	}
 
-	int32_t idx = fAvail->idx % fQueueLen;
-	fCookies[idx] = cookie;
+	int32_t idx = fAvail->idx & (fQueueLen - 1);
+	fCookies[firstDesc] = cookie;
 	fAvail->ring[idx] = firstDesc;
 	fAvail->idx++;
 	fDev->fRegs->queueNotify = fId;
@@ -202,14 +200,15 @@ VirtioQueue::Dequeue(void** _cookie, uint32* _usedLength)
 	if (fUsed->idx == fLastUsed)
 		return false;
 
+	int32_t desc = fUsed->ring[fLastUsed & (fQueueLen - 1)].id;
+
 	if (_cookie != NULL)
-		*_cookie = fCookies[fLastUsed % fQueueLen];
-	fCookies[fLastUsed % fQueueLen] = NULL;
+		*_cookie = fCookies[desc];
+	fCookies[desc] = NULL;
 
 	if (_usedLength != NULL)
-		*_usedLength = fUsed->ring[fLastUsed % fQueueLen].len;
+		*_usedLength = fUsed->ring[fLastUsed & (fQueueLen - 1)].len;
 
-	int32_t desc = fUsed->ring[fLastUsed % fQueueLen].id;
 	while (kVringDescFlagsNext & fDescs[desc].flags) {
 		int32_t nextDesc = fDescs[desc].next;
 		FreeDesc(desc);

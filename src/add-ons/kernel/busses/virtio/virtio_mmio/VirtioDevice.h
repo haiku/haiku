@@ -12,6 +12,7 @@
 #include <AutoDeleterOS.h>
 #include <Referenceable.h>
 #include <util/AutoLock.h>
+#include <util/Bitmap.h>
 
 
 //#define TRACE_VIRTIO
@@ -32,11 +33,12 @@ struct VirtioQueue {
 	VirtioDevice *fDev;
 	int32 fId;
 	size_t fQueueLen;
+	size_t fDescCount;
 	AreaDeleter fArea;
 	volatile VirtioDesc  *fDescs;
 	volatile VirtioAvail *fAvail;
 	volatile VirtioUsed  *fUsed;
-	ArrayDeleter<uint32> fFreeDescs;
+	Bitmap fAllocatedDescs;
 	uint16 fLastUsed;
 	ArrayDeleter<void*> fCookies;
 
