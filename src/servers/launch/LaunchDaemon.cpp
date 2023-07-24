@@ -51,8 +51,10 @@
 
 #ifdef DEBUG
 #	define TRACE(x, ...) debug_printf(x, __VA_ARGS__)
+#	define TRACE_ONLY
 #else
 #	define TRACE(x, ...) ;
+#	define TRACE_ONLY __attribute__((unused))
 #endif
 
 
@@ -441,7 +443,7 @@ status_t
 LaunchDaemon::RegisterExternalEvent(Event* event, const char* name,
 	const BStringList& arguments)
 {
-	status_t status = B_NAME_NOT_FOUND;
+	status_t status TRACE_ONLY = B_NAME_NOT_FOUND;
 	for (EventMap::iterator iterator = fEvents.begin();
 			iterator != fEvents.end(); iterator++) {
 		ExternalEventSource* eventSource = iterator->second;
