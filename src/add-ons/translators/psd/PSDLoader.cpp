@@ -524,7 +524,7 @@ PSDLoader::_ParseImageResources(void)
 	if (!fLoaded && fImageResourceSectionSize == 0)
 		return B_ERROR;
 
-	size_t currentPos = fStream->Position();
+	off_t currentPos = fStream->Position();
 	fStream->Seek(fImageResourceSectionPos, SEEK_SET);
 	
 	while (fStream->Position() < currentPos + fImageResourceSectionSize) {

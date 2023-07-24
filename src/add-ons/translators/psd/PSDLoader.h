@@ -97,8 +97,8 @@ private:
 	size_t			fColorModeDataSize;
 	size_t			fColorModeDataPos;
 	
-	size_t			fImageResourceSectionSize;
-	size_t			fImageResourceSectionPos;
+	off_t			fImageResourceSectionSize;
+	off_t			fImageResourceSectionPos;
 	
 	int32 			fSignature;
 	int16 			fVersion;
