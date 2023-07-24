@@ -21,8 +21,10 @@
 //#define TRACE_PS2_COMMON
 #ifdef TRACE_PS2_COMMON
 #	define TRACE(x...) dprintf(x)
+#	define TRACE_ONLY
 #else
 #	define TRACE(x...)
+#	define TRACE_ONLY __attribute__((unused))
 #endif
 
 
@@ -105,7 +107,7 @@ ps2_flush(void)
 
 	for (i = 0; i < 64; i++) {
 		uint8 ctrl;
-		uint8 data;
+		uint8 data TRACE_ONLY;
 		ctrl = ps2_read_ctrl();
 		if (!(ctrl & PS2_STATUS_OUTPUT_BUFFER_FULL))
 			break;
