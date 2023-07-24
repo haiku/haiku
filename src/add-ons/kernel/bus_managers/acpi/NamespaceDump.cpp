@@ -84,7 +84,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 	char output[320];
 	char tabs[255] = "";
 	int i;
-	size_t written = 0;
 	for (i = 0; i < indenting; i++)
 		strlcat(tabs, "|    ", sizeof(tabs));
 
@@ -153,7 +152,6 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 			default:
 				break;
 		}
-		written = 0;
 		RingBuffer &ringBuffer = *device->buffer;
 		size_t toWrite = strlen(output);
 
@@ -169,7 +167,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 			!make_space(device, toWrite))
 			break;
 
-		written = ringBuffer.Write(output, toWrite);
+		ringBuffer.Write(output, toWrite);
 		ringBuffer.Unlock();
 		dump_acpi_namespace(device, result, indenting + 1);
 	}
