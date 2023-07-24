@@ -737,7 +737,6 @@ BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
 		return B_BAD_VALUE;
 
 	uint32 group = inode->ID() / fVolume->InodesPerGroup();
-	uint32 preferred = 0;
 
 	if (inode->Size() > 0) {
 		// Try to allocate near it's last blocks
@@ -797,7 +796,6 @@ BlockAllocator::Allocate(Transaction& transaction, Inode* inode,
 		}
 
 		group = (lastBlock - fFirstBlock) / fBlocksPerGroup;
-		preferred = (lastBlock - fFirstBlock) % fBlocksPerGroup + 1;
 	}
 
 	// TODO: Apply some more policies
