@@ -59,8 +59,11 @@ SourceHdrs $(muslSources) :
 	[ FDirName $(posixSources) musl arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 KernelMergeObject kernel_lib_posix.o :
-	# main
 	kernel_errno.cpp
+	kernel_vsprintf.cpp
+	stack_protector.cpp
+
+	# main
 	dirent.cpp
 	fcntl.cpp
 	poll.cpp
@@ -71,8 +74,6 @@ KernelMergeObject kernel_lib_posix.o :
 	ctype.cpp
 	localeconv.cpp
 	LocaleData.cpp
-	# stdio (this subdir)
-	kernel_vsprintf.cpp
 	# stdlib
 	abs.c
 	atoi.c

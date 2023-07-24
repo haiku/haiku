@@ -10,6 +10,7 @@ SubDir HAIKU_TOP src system kernel ;
 	SubDirC++Flags $(defines) ;
 }
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) events ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) locks ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) scheduler ] ;
 
@@ -41,13 +42,11 @@ KernelMergeObject kernel_core.o :
 	low_resource_manager.cpp
 	main.cpp
 	module.cpp
-	Notifications.cpp
 	port.cpp
 	real_time_clock.cpp
 	sem.cpp
 	shutdown.cpp
 	signal.cpp
-	stack_protector.cpp
 	system_info.cpp
 	smp.cpp
 	syscalls.cpp
@@ -57,7 +56,10 @@ KernelMergeObject kernel_core.o :
 	UserEvent.cpp
 	usergroup.cpp
 	UserTimer.cpp
+
+	# events
 	wait_for_objects.cpp
+	Notifications.cpp
 
 	# locks
 	lock.cpp
