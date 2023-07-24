@@ -49,6 +49,10 @@ BEGIN {
 	vendor = substr($0, 7)
 	gsub( /\"/, "&&", vendor )
 
+	# Remove double interrogation points that may be interpreted as trigraphs
+	gsub( /\?\?\?/, "xxx", vendor )
+	gsub( /\?\?/, "xx", vendor )
+
 	printf formatting "\t{ 0x" vendorid ", \"" vendor "\", \"\" }" > ofile
 }
 
@@ -58,6 +62,10 @@ BEGIN {
 	device = substr($0, 8)
 	gsub( /\\/, "&&", device )
 	gsub( /\"/, "&&", device )
+
+	# Remove double interrogation points that may be interpreted as trigraphs
+	gsub( /\?\?\?/, "xxx", device )
+	gsub( /\?\?/, "xx", device )
 
 	# store device ID for possible devices afterwards
 	deviceid = $1
