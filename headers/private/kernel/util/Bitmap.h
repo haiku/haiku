@@ -22,7 +22,7 @@ namespace BKernel {
 
 class Bitmap {
 public:
-						Bitmap(size_t bitCount);
+						Bitmap(size_t bitCount = 0);
 						~Bitmap();
 
 			status_t	InitCheck();
@@ -34,6 +34,11 @@ public:
 	inline	void		Set(size_t index);
 	inline	void		Clear(size_t index);
 
+			void		SetRange(size_t index, size_t count);
+			void		ClearRange(size_t index, size_t count);
+
+			ssize_t		GetLowestClear(size_t fromIndex = 0) const;
+			ssize_t		GetLowestContiguousClear(size_t count, size_t fromIndex = 0) const;
 			ssize_t		GetHighestSet() const;
 
 private:

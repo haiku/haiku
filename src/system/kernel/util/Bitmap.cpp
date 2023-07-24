@@ -70,6 +70,67 @@ Bitmap::Shift(ssize_t bitCount)
 }
 
 
+void
+Bitmap::SetRange(size_t index, size_t count)
+{
+	// TODO: optimize
+	for (; count > 0; count--)
+		Set(index++);
+}
+
+
+void
+Bitmap::ClearRange(size_t index, size_t count)
+{
+	// TODO: optimize
+	for (; count > 0; count--)
+		Clear(index++);
+}
+
+
+ssize_t
+Bitmap::GetLowestClear(size_t fromIndex) const
+{
+	// TODO: optimize
+
+	for (size_t i = fromIndex; i < fSize; i++) {
+		if (!Get(i))
+			return i;
+	}
+	return -1;
+}
+
+
+ssize_t
+Bitmap::GetLowestContiguousClear(size_t count, size_t fromIndex) const
+{
+	// TODO: optimize
+
+	// nothing to find
+	if (count == 0)
+		return fromIndex;
+
+	for (;;) {
+		ssize_t index = GetLowestClear(fromIndex);
+		if (index < 0)
+			return index;
+
+		// overflow check
+		if ((size_t)index + count - 1 < (size_t)index)
+			return -1;
+
+		size_t curCount = 1;
+		while (curCount < count && Get(index + curCount))
+			curCount++;
+
+		if (curCount == count)
+			return index;
+
+		fromIndex = index + curCount;
+	}
+}
+
+
 ssize_t
 Bitmap::GetHighestSet() const
 {
