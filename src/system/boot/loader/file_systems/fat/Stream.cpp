@@ -126,10 +126,7 @@ Stream::_FindCluster(off_t pos, uint32& _cluster)
 	}
 	if (!found) {
 #if 1
-		uint32 count = (fSize + fVolume.ClusterSize() - 1) / fVolume.ClusterSize();
 		cluster = fFirstCluster;
-		if (fSize == UINT32_MAX) // it's a directory, try a large enough value
-			count = 10;
 		for (i = 0; i < index && fVolume.IsValidCluster(cluster); i++) {
 			if (fVolume.IsLastCluster(cluster))
 				break;
@@ -308,8 +305,6 @@ Stream::ReadAt(off_t pos, void *_buffer, size_t *_length, off_t *diskOffset)
 	// read the following complete blocks using cached_read(),
 	// the last partial block is read using the generic Cache class
 
-	bool partial = false;
-
 	while (length > 0) {
 		// offset is the offset to the current pos in the block_run
 
@@ -321,7 +316,6 @@ Stream::ReadAt(off_t pos, void *_buffer, size_t *_length, off_t *diskOffset)
 			}
 			memcpy(buffer + bytesRead, block, length);
 			bytesRead += length;
-			partial = true;
 			break;
 		}
 

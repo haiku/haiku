@@ -554,7 +554,6 @@ Directory::GetNextEntry(void *cookie, uint8 mask, uint8 match)
 	TRACE(("FASFS::Directory::%s(, %02x, %02x)\n", __FUNCTION__, mask, match));
 	struct dir_cookie *c = (struct dir_cookie *)cookie;
 
-	bool hasLongName = false;
 	bool longNameValid = false;
 
 	do {
@@ -574,7 +573,6 @@ Directory::GetNextEntry(void *cookie, uint8 mask, uint8 match)
 			uint8* nameEntry = (uint8*)&c->entry;
 			if ((*nameEntry & 0x40) != 0) {
 				c->ResetName();
-				hasLongName = true;
 				longNameValid = true;
 			}
 
