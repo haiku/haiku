@@ -14,6 +14,7 @@
 #include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_info.h>
+#include <vfs.h>
 #include <NodeMonitor.h>
 #include <file_systems/DeviceOpener.h>
 #include <file_systems/fs_ops_support.h>
@@ -190,6 +191,24 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 		return B_ERROR;
 	}
 
+	// Fetch mount path, used when reading NTFS symlinks.
+	dev_t deviceID;
+	ino_t nodeID;
+	status_t status = vfs_get_mount_point(_volume->id, &deviceID, &nodeID);
+	char* mountpoint;
+	if (status == B_OK) {
+		mountpoint = (char*)malloc(PATH_MAX);
+		status = vfs_entry_ref_to_path(deviceID, nodeID, NULL, true,
+			mountpoint, PATH_MAX);
+		if (status == B_OK) {
+			char* reallocated = (char*)realloc(mountpoint, strlen(mountpoint) + 1);
+			if (reallocated != NULL)
+				mountpoint = reallocated;
+		}
+	}
+	if (status != B_OK)
+		mountpoint = strdup("");
+
 	// TODO: uid/gid mapping and real permissions
 
 	// construct lowntfs_context
@@ -197,7 +216,7 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	volume->lowntfs.current_close_state_vnode = NULL;
 
 	volume->lowntfs.vol = volume->ntfs;
-	volume->ntfs->abs_mnt_point = volume->lowntfs.abs_mnt_point = strdup("");
+	volume->ntfs->abs_mnt_point = volume->lowntfs.abs_mnt_point = mountpoint;
 	volume->lowntfs.dmask = 0;
 	volume->lowntfs.fmask = S_IXUSR | S_IXGRP | S_IXOTH;
 	volume->lowntfs.dmtime = 0;
@@ -213,7 +232,7 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	root->uid = root->gid = 0;
 	root->size = 0;
 
-	status_t status = publish_vnode(_volume, root->inode, root, &gNtfsVnodeOps, S_IFDIR, 0);
+	status = publish_vnode(_volume, root->inode, root, &gNtfsVnodeOps, S_IFDIR, 0);
 	if (status != B_OK) {
 		ntfs_umount(volume->ntfs, true);
 		return status;
