@@ -1065,7 +1065,7 @@ void TransportView::_updateTimeSource() {
 //		}
 //	}
 	if(n < 0)
-		menu->Superitem()->SetLabel(B_TRANSLATE("(???)"));
+		menu->Superitem()->SetLabel(B_TRANSLATE("(\?\?\?)"));
 
 }
 void TransportView::_updateRunMode() {

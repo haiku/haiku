@@ -336,12 +336,10 @@ bigtime_t NodeRef::recordingDelay() const {
 bigtime_t NodeRef::calculateRecordingModeDelay() {
 	PRINT((
 		"NodeRef::calculateRecordingModeDelay()\n"));
-	status_t err;
-				
 	bigtime_t maxBufferDur = 0LL;
 	
 	vector<Connection> outputConnections;
-	err = getOutputConnections(outputConnections);
+	getOutputConnections(outputConnections);
 	for(
 		vector<Connection>::iterator it = outputConnections.begin();
 		it != outputConnections.end(); ++it) {
@@ -352,8 +350,7 @@ bigtime_t NodeRef::calculateRecordingModeDelay() {
 	}
 
 	bigtime_t latency = 0LL;
-	err = m_manager->roster->GetLatencyFor(
-		node(), &latency);
+	m_manager->roster->GetLatencyFor(node(), &latency);
 
 	PRINT((
 		"  %" B_PRIdBIGTIME "\n", latency));

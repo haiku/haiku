@@ -142,7 +142,7 @@ void _do_for_each_connected(
 
 	ASSERT(origin);
 	ASSERT(state);
-	status_t err;
+	status_t err __attribute__((unused));
 
 	if(state->visited.find(origin->id()) != state->visited.end()) {
 //		PRINT(("### already visited\n"));
@@ -605,7 +605,7 @@ bool NodeManager::_find_route_recurse(
 	ASSERT(IsLocked());
 	ASSERT(origin);
 	ASSERT(state);
-	status_t err;
+	status_t err __attribute__((unused));
 
 	// node already visited?
 	if(state->visited.find(origin->id()) != state->visited.end()) {
@@ -857,8 +857,6 @@ status_t NodeManager::mergeGroups(
 	D_METHOD((
 		"NodeManager::mergeGroups(name)\n"));
 
-	status_t err;
-
 	// [5feb00 c.lenz] already merged
 	if(sourceGroup->id() == destinationGroup->id())
 		return B_OK;
@@ -869,7 +867,7 @@ status_t NodeManager::mergeGroups(
 	for(uint32 n = sourceGroup->countNodes(); n; --n) {
 		NodeRef* node = sourceGroup->nodeAt(n-1);
 		ASSERT(node);
-		err = sourceGroup->removeNode(n-1);
+		status_t err __attribute__((unused)) = sourceGroup->removeNode(n-1);
 		ASSERT(err == B_OK);
 		err = destinationGroup->addNode(node);
 		ASSERT(err == B_OK);
@@ -913,7 +911,7 @@ public:
 		PRINT((
 			"_changeNodeGroupFn(): '%s'\n", node->name()));
 
-		status_t err;
+		status_t err __attribute__((unused));
 		NodeGroup* oldGroup = node->group();
 		if(oldGroup) {
 			err = oldGroup->removeNode(node);

@@ -445,20 +445,19 @@ NumericValControl::updateParameter(double value)
 //	bigtime_t tpNow = system_time();
 
 	// store value
-	status_t err;
 	switch (fParam->ValueType()) {
 		case B_FLOAT_TYPE:
 		{	// +++++ left-channel hack
 			float fValue[2];
 			fValue[0] = value;
 			fValue[1] = value;
-			err = fParam->SetValue((void*)&fValue, sizeof(float)*2, 0LL);
+			fParam->SetValue((void*)&fValue, sizeof(float)*2, 0LL);
 			break;
 		}
 		
 		case B_DOUBLE_TYPE: {
 			double fValue = value;
-			err = fParam->SetValue((void*)&fValue, sizeof(double), 0LL);
+			fParam->SetValue((void*)&fValue, sizeof(double), 0LL);
 			break;
 		}
 	}			

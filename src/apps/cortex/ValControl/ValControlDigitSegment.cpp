@@ -367,7 +367,7 @@ ValControlDigitSegment::ValControlDigitSegment(BMessage* pArchive) :
 	m_digitPadding(0.0) {
 
 	// #/digits
-	status_t err = pArchive->FindInt16("digits", (int16*)&m_digitCount);
+	status_t err __attribute__((unused)) = pArchive->FindInt16("digits", (int16*)&m_digitCount);
 	ASSERT(err == B_OK);
 
 	// current value

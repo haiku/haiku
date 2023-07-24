@@ -245,7 +245,6 @@ void RouteApp::xmlExportAttributes(
 void RouteApp::xmlExportContent(
 	ExportContext&						context) const {
 
-	status_t err;
 	context.beginContent();
 
 	// export app settings
@@ -253,7 +252,7 @@ void RouteApp::xmlExportContent(
 		BMessage m;
 		exportState(&m);
 		MessageIO io(&m);
-		err = context.writeObject(&io);
+		status_t err __attribute__((unused)) = context.writeObject(&io);
 		ASSERT(err == B_OK);
 	}
 	
