@@ -125,6 +125,7 @@ spawn_device(usb_device usb_dev)
 		BLUETOOTH_DEVICE_DEVFS_NAME "cmd_complete");
 	if (new_bt_dev->cmd_complete < 0) {
 		err = new_bt_dev->cmd_complete;
+		ERROR("%s: Unable to create bt device command semaphore: %" B_PRId32 "\n", __func__, err);
 		goto bail0;
 	}
 
@@ -132,6 +133,7 @@ spawn_device(usb_device usb_dev)
 	new_bt_dev->lock = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "lock");
 	if (new_bt_dev->lock < 0) {
 		err = new_bt_dev->lock;
+		ERROR("%s: Unable to create bt device lock semaphore: %" B_PRId32 "\n", __func__, err);
 		goto bail1;
 	}
 
