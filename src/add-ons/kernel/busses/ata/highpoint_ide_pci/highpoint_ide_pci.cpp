@@ -17,8 +17,10 @@
 //#define TRACE_HIGHPOINT
 #ifdef TRACE_HIGHPOINT
 #define TRACE(a...)		dprintf("Highpoint-IDE: " a)
+#define TRACE_ONLY
 #else
 #define TRACE(a...)
+#define TRACE_ONLY __attribute__((unused))
 #endif
 
 
@@ -161,7 +163,7 @@ init_channel(device_node *node, void **channel_cookie)
 		(ata_adapter_channel_info **)channel_cookie,
 		sizeof(ata_adapter_channel_info), sATAAdapter->inthand);
 	// from here we have valid channel...
-	ata_adapter_channel_info *channel=NULL;
+	ata_adapter_channel_info *channel TRACE_ONLY = NULL;
 	channel = (ata_adapter_channel_info *)*channel_cookie;
 
 	if (sDeviceManager->get_attr_uint8(node, ATA_ADAPTER_CHANNEL_INDEX,
@@ -170,8 +172,12 @@ init_channel(device_node *node, void **channel_cookie)
 		return B_ERROR;
 	}
 
-	TRACE("init_channel(): channel command %x, control %x, result: %d \n", channel->command_block_base,channel->control_block_base, (int)result);
-	TRACE("init_channel(): index #%d done. HPT_info deviceID: %04x, config option %x, revision %2d, function %2d \n", channel_index, HPT_info->deviceID, HPT_info->configOption, HPT_info->revisionID, HPT_info->function);
+	TRACE("init_channel(): channel command %x, control %x, result: %d \n",
+		channel->command_block_base,
+		channel->control_block_base, (int)result);
+	TRACE("init_channel(): index #%d done. HPT_info deviceID: %04x, config option %x, "
+		"revision %2d, function %2d \n", channel_index, HPT_info->deviceID,
+		HPT_info->configOption, HPT_info->revisionID, HPT_info->function);
 	return result;
 }
 
