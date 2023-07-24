@@ -57,7 +57,7 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 
 SEARCH on [ FGristFiles
 		Notifications.cpp
-	] = [ FDirName $(HAIKU_TOP) src system kernel ] ;
+	] = [ FDirName $(HAIKU_TOP) src system kernel events ] ;
 
 SEARCH on [ FGristFiles
 		block_cache.cpp
