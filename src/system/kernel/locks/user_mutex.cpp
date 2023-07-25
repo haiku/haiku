@@ -435,7 +435,8 @@ user_mutex_sem_acquire_locked(UserMutexEntry* entry, int32* sem,
 static void
 user_mutex_sem_release(UserMutexEntry* entry, int32* sem, bool isWired)
 {
-	if (entry == NULL) {
+	WriteLocker entryLocker(entry->lock);
+	if (entry->condition.EntriesCount() == 0) {
 		// no waiters - mark as uncontended and release
 		int32 oldValue = user_atomic_get(sem, isWired);
 		while (true) {
@@ -447,7 +448,6 @@ user_mutex_sem_release(UserMutexEntry* entry, int32* sem, bool isWired)
 		}
 	}
 
-	WriteLocker entryLocker(entry->lock);
 	entry->condition.NotifyOne(B_OK);
 	if (entry->condition.EntriesCount() == 0) {
 		// mark the semaphore uncontended
@@ -706,7 +706,7 @@ _user_mutex_sem_release(int32* sem)
 		return error;
 
 	UserMutexEntry* entry = get_user_mutex_entry(context,
-		wiringInfo.physicalAddress, true);
+		wiringInfo.physicalAddress);
 	{
 		user_mutex_sem_release(entry, sem, true);
 	}
