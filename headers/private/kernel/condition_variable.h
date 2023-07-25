@@ -58,11 +58,11 @@ public:
 									const char* objectType);
 			void				Unpublish();
 
-	inline	void				NotifyOne(status_t result = B_OK);
-	inline	void				NotifyAll(status_t result = B_OK);
+	inline	int32				NotifyOne(status_t result = B_OK);
+	inline	int32				NotifyAll(status_t result = B_OK);
 
-	static	void				NotifyOne(const void* object, status_t result);
-	static	void				NotifyAll(const void* object, status_t result);
+	static	int32				NotifyOne(const void* object, status_t result);
+	static	int32				NotifyAll(const void* object, status_t result);
 
 			void				Add(ConditionVariableEntry* entry);
 			int32				EntriesCount()		{ return atomic_get(&fEntriesCount); }
@@ -79,9 +79,9 @@ public:
 			void				Dump() const;
 
 private:
-	static 	void				_Notify(const void* object, bool all, status_t result);
-			void				_Notify(bool all, status_t result);
-			void				_NotifyLocked(bool all, status_t result);
+	static 	int32				_Notify(const void* object, bool all, status_t result);
+			int32				_Notify(bool all, status_t result);
+			int32				_NotifyLocked(bool all, status_t result);
 
 protected:
 			typedef DoublyLinkedList<ConditionVariableEntry> EntryList;
@@ -102,17 +102,17 @@ protected:
 };
 
 
-inline void
+inline int32
 ConditionVariable::NotifyOne(status_t result)
 {
-	_Notify(false, result);
+	return _Notify(false, result);
 }
 
 
-inline void
+inline int32
 ConditionVariable::NotifyAll(status_t result)
 {
-	_Notify(true, result);
+	return _Notify(true, result);
 }
 
 

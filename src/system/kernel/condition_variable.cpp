@@ -324,56 +324,58 @@ ConditionVariable::Wait(recursive_lock* lock, uint32 flags, bigtime_t timeout)
 }
 
 
-/*static*/ void
+/*static*/ int32
 ConditionVariable::NotifyOne(const void* object, status_t result)
 {
-	_Notify(object, false, result);
+	return _Notify(object, false, result);
 }
 
 
-/*static*/ void
+/*static*/ int32
 ConditionVariable::NotifyAll(const void* object, status_t result)
 {
-	_Notify(object, true, result);
+	return _Notify(object, true, result);
 }
 
 
-/*static*/ void
+/*static*/ int32
 ConditionVariable::_Notify(const void* object, bool all, status_t result)
 {
 	InterruptsLocker ints;
 	ReadSpinLocker hashLocker(sConditionVariableHashLock);
 	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
 	if (variable == NULL)
-		return;
+		return 0;
 	SpinLocker variableLocker(variable->fLock);
 	hashLocker.Unlock();
 
-	variable->_NotifyLocked(all, result);
+	return variable->_NotifyLocked(all, result);
 }
 
 
-void
+int32
 ConditionVariable::_Notify(bool all, status_t result)
 {
 	InterruptsSpinLocker _(fLock);
-
 	if (!fEntries.IsEmpty()) {
 		if (result > B_OK) {
 			panic("tried to notify with invalid result %" B_PRId32 "\n", result);
 			result = B_ERROR;
 		}
 
-		_NotifyLocked(all, result);
+		return _NotifyLocked(all, result);
 	}
+	return 0;
 }
 
 
 /*! Called with interrupts disabled and the condition variable's spinlock held.
  */
-void
+int32
 ConditionVariable::_NotifyLocked(bool all, status_t result)
 {
+	int32 notified = 0;
+
 	// Dequeue and wake up the blocked threads.
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		Thread* thread = atomic_pointer_get_and_set(&entry->fThread, (Thread*)NULL);
@@ -417,9 +419,12 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 				thread_unblock_locked(thread, result);
 		}
 
+		notified++;
 		if (!all)
 			break;
 	}
+
+	return notified;
 }
 
 
