@@ -402,10 +402,11 @@ user_mutex_unblock(UserMutexEntry* entry, int32* mutex, uint32 flags, bool isWir
 
 	if ((flags & B_USER_MUTEX_UNBLOCK_ALL) != 0
 			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
-		// unblock and dequeue all the waiting threads
+		// unblock all waiting threads
 		entry->condition.NotifyAll(B_OK);
 	} else {
-		entry->condition.NotifyOne(B_OK);
+		if (!entry->condition.NotifyOne(B_OK))
+			user_atomic_or(mutex, ~(int32)B_USER_MUTEX_LOCKED, isWired);
 	}
 
 	if (entry->condition.EntriesCount() == 0)
@@ -436,7 +437,7 @@ static void
 user_mutex_sem_release(UserMutexEntry* entry, int32* sem, bool isWired)
 {
 	WriteLocker entryLocker(entry->lock);
-	if (entry->condition.EntriesCount() == 0) {
+	if (entry->condition.NotifyOne(B_OK) == 0) {
 		// no waiters - mark as uncontended and release
 		int32 oldValue = user_atomic_get(sem, isWired);
 		while (true) {
@@ -448,7 +449,6 @@ user_mutex_sem_release(UserMutexEntry* entry, int32* sem, bool isWired)
 		}
 	}
 
-	entry->condition.NotifyOne(B_OK);
 	if (entry->condition.EntriesCount() == 0) {
 		// mark the semaphore uncontended
 		user_atomic_test_and_set(sem, 0, -1, isWired);
