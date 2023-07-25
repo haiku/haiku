@@ -24,6 +24,7 @@
 
 #define SEM_TYPE_NAMED		1
 #define SEM_TYPE_UNNAMED	2
+#define SEM_TYPE_UNNAMED_SHARED 3
 
 
 static int32
@@ -114,7 +115,7 @@ sem_unlink(const char* name)
 int
 sem_init(sem_t* semaphore, int shared, unsigned value)
 {
-	semaphore->type = SEM_TYPE_UNNAMED;
+	semaphore->type = shared ? SEM_TYPE_UNNAMED_SHARED : SEM_TYPE_UNNAMED;
 	semaphore->u.unnamed_sem = value;
 	return 0;
 }
@@ -123,7 +124,7 @@ sem_init(sem_t* semaphore, int shared, unsigned value)
 int
 sem_destroy(sem_t* semaphore)
 {
-	if (semaphore->type != SEM_TYPE_UNNAMED)
+	if (semaphore->type != SEM_TYPE_UNNAMED && semaphore->type != SEM_TYPE_UNNAMED_SHARED)
 		RETURN_AND_SET_ERRNO(EINVAL);
 
 	return 0;
@@ -138,7 +139,11 @@ unnamed_sem_post(sem_t* semaphore)
 	if (oldValue > -1)
 		return 0;
 
-	return _kern_mutex_sem_release(sem);
+	uint32 flags = 0;
+	if (semaphore->type == SEM_TYPE_UNNAMED_SHARED)
+		flags |= B_USER_MUTEX_SHARED;
+
+	return _kern_mutex_sem_release(sem, flags);
 }
 
 
@@ -162,6 +167,8 @@ unnamed_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 
 	bigtime_t timeoutMicros = B_INFINITE_TIMEOUT;
 	uint32 flags = 0;
+	if (semaphore->type == SEM_TYPE_UNNAMED_SHARED)
+		flags |= B_USER_MUTEX_SHARED;
 	if (timeout != NULL) {
 		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
 			+ timeout->tv_nsec / 1000;

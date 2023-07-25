@@ -83,7 +83,7 @@ extern status_t		_kern_mutex_switch_lock(int32* fromMutex, uint32 fromFlags,
 						bigtime_t timeout);
 extern status_t		_kern_mutex_sem_acquire(int32* sem, const char* name,
 						uint32 flags, bigtime_t timeout);
-extern status_t		_kern_mutex_sem_release(int32* sem);
+extern status_t		_kern_mutex_sem_release(int32* sem, uint32 flags);
 
 /* sem functions */
 extern sem_id		_kern_create_sem(int count, const char *name);
