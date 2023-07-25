@@ -208,7 +208,7 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 }
 
 
-void
+int32
 ConditionVariable::_Notify(bool all, status_t result)
 {
 	MutexLocker locker(sConditionVariablesLock);
@@ -220,17 +220,20 @@ ConditionVariable::_Notify(bool all, status_t result)
 			result = B_ERROR;
 		}
 
-		_NotifyLocked(all, result);
+		return _NotifyLocked(all, result);
 	}
+	return 0;
 }
 
 
 /*! Called with interrupts disabled and the condition variable spinlock and
 	thread lock held.
 */
-void
+int32
 ConditionVariable::_NotifyLocked(bool all, status_t result)
 {
+	int32 notified = 0;
+
 	// dequeue and wake up the blocked threads
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		entry->fVariable = NULL;
@@ -243,9 +246,12 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 
 		entry->fWaitStatus = result;
 
+		notified++;
 		if (!all)
 			break;
 	}
+
+	return notified;
 }
 
 
