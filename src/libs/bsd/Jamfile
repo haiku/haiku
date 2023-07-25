@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src libs bsd ;
 
+UsePrivateHeaders system ;
+UsePrivateHeaders [ FDirName system arch $(TARGET_ARCH) ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 local architectureObject ;
@@ -17,6 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			fts.c
 			getpass.c
 			issetugid.c
+			kqueue.cpp
 			lutimes.c
 			progname.c
 			pty.cpp
