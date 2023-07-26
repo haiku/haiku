@@ -636,7 +636,7 @@ enum {
 
 	B_EVENT_ACQUIRE_SEMAPHORE	= 0x0001,	/* semaphore can be acquired */
 
-	B_EVENT_INVALID				= 0x1000	/* FD/port/sem/thread ID not or
+	B_EVENT_INVALID				= 0x1000,	/* FD/port/sem/thread ID not or
 											   no longer valid (e.g. has been
 											   close/deleted) */
 };

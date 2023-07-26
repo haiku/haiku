@@ -23,6 +23,7 @@
 #include <debug.h>
 #include <disk_device_manager/ddm_userland_interface.h>
 #include <elf.h>
+#include <event_queue.h>
 #include <frame_buffer_console.h>
 #include <fs/fd.h>
 #include <fs/node_monitor.h>

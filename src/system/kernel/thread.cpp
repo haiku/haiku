@@ -2619,7 +2619,7 @@ select_thread(int32 id, struct select_info* info, bool kernel)
 		thread->select_infos = info;
 
 		// we need a sync reference
-		atomic_add(&info->sync->ref_count, 1);
+		acquire_select_sync(info->sync);
 	}
 
 	return B_OK;

@@ -15,6 +15,7 @@
 extern "C" {
 #endif
 
+struct event_queue;
 struct file_descriptor;
 struct io_context;
 struct net_socket;
@@ -54,6 +55,7 @@ struct file_descriptor {
 		struct vnode *vnode;
 		struct fs_mount *mount;
 		struct net_socket *socket;
+		struct event_queue *queue;
 	} u;
 	void	*cookie;
 	int32	open_mode;
@@ -71,7 +73,8 @@ enum fd_types {
 	FDTYPE_INDEX,
 	FDTYPE_INDEX_DIR,
 	FDTYPE_QUERY,
-	FDTYPE_SOCKET
+	FDTYPE_SOCKET,
+	FDTYPE_EVENT_QUEUE
 };
 
 // additional open mode - kernel special

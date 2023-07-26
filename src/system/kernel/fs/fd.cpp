@@ -633,7 +633,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 
 	// As long as the info is in the list, we keep a reference to the sync
 	// object.
-	atomic_add(&info->sync->ref_count, 1);
+	acquire_select_sync(info->sync);
 
 	// Finally release our open reference. It is safe just to decrement,
 	// since as long as the descriptor is associated with the slot,
