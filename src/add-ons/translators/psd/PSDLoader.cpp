@@ -1,7 +1,7 @@
 /*
  * Copyright 2013, Gerasim Troeglazov, 3dEyes@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
- */ 
+ */
 
 
 #include "PSDLoader.h"
@@ -33,14 +33,14 @@ PSDLoader::PSDLoader(BPositionIO *src)
 		return;
 
 	fVersion = _GetInt16FromStream(fStream);
-	
+
 	// Skip reserved data
 	_SkipStreamBlock(fStream, 6);
 
 	fChannels = _GetInt16FromStream(fStream);
 	fHeight = _GetInt32FromStream(fStream);
 	fWidth = _GetInt32FromStream(fStream);
-	fDepth = _GetInt16FromStream(fStream);	
+	fDepth = _GetInt16FromStream(fStream);
 	fColorFormat = _GetInt16FromStream(fStream);
 
 	fColorModeDataSize = _GetInt32FromStream(fStream);
@@ -85,10 +85,8 @@ PSDLoader::IsSupported(void)
 	if (!fLoaded)
 		return false;
 
-	if (fVersion != PSD_FILE
-		&& fVersion != PSB_FILE) {
+	if (fVersion != PSD_FILE && fVersion != PSB_FILE)
 		return false;
-	}
 
 	if (fChannels < 0 || fChannels > PSD_MAX_CHANNELS)
 		return false;
@@ -99,10 +97,8 @@ PSDLoader::IsSupported(void)
 	if (_ColorFormat() == PSD_COLOR_FORMAT_UNSUPPORTED)
 		return false;
 
-	if (fCompression != PSD_COMPRESSED_RAW
-		&& fCompression != PSD_COMPRESSED_RLE) {
+	if (fCompression != PSD_COMPRESSED_RAW && fCompression != PSD_COMPRESSED_RLE)
 		return false;
-	}
 
 	return true;
 }
@@ -155,7 +151,7 @@ PSDLoader::_ColorFormat(void)
 				format = PSD_COLOR_FORMAT_GRAY;
 			else if (fChannels == 2)
 				format = PSD_COLOR_FORMAT_GRAY_A;
-			break;		
+			break;
 		case PSD_COLOR_MODE_MULTICHANNEL:
 			if (fChannels == 3)
 				format = PSD_COLOR_FORMAT_MULTICHANNEL;
@@ -203,12 +199,11 @@ PSDLoader::Decode(BPositionIO *target)
 	int32 depthBytes = fDepth / 8;
 	int32 rowBytes = (fWidth * fDepth) / 8;
 	int32 channelBytes = rowBytes * fHeight;
-	
+
 	uint8 *imageData[PSD_MAX_CHANNELS];
 	for (int i = 0; i < fChannels; i++)
 		imageData[i] = new uint8[channelBytes];
 
-	
 	switch (fCompression) {
 		case PSD_COMPRESSED_RAW:
 		{
@@ -289,12 +284,12 @@ PSDLoader::Decode(BPositionIO *target)
 	}
 
 	target->Write(&bitsHeader, sizeof(TranslatorBitmap));
-	
+
 	uint8 *lineData = new uint8[fWidth * sizeof(uint32)];
-		
+
 	switch (colorFormat) {
 		case PSD_COLOR_FORMAT_BITMAP:
-		{			
+		{
 			int32 rowBytes = (fWidth / 8 ) * fHeight;
 			for (int32 i = 0; i < rowBytes; i++)
 				imageData[0][i]^=255;
@@ -303,12 +298,12 @@ PSDLoader::Decode(BPositionIO *target)
 		}
 		case PSD_COLOR_FORMAT_INDEXED:
 		{
-			int32 paletteSize = fColorModeDataSize / 3;		
+			int32 paletteSize = fColorModeDataSize / 3;
 
 			uint8 *colorData = new uint8[fColorModeDataSize];
 			fStream->Seek(fColorModeDataPos, SEEK_SET);
 			fStream->Read(colorData, fColorModeDataSize);
-			
+
 			if (_ParseImageResources() != B_OK)
 				fTransparentIndex = 256;
 
@@ -391,7 +386,7 @@ PSDLoader::Decode(BPositionIO *target)
 					ptr[1] = (uint8)((1.0 - (m * (1.0 - k) + k)) * 255.0);
 					ptr[2] = (uint8)((1.0 - (c * (1.0 - k) + k)) * 255.0);
 					ptr[3] = isAlpha ?  imageData[4][index] : 255;
-					
+
 					ptr += sizeof(uint32);
 					index += depthBytes;
 				}
@@ -513,7 +508,7 @@ PSDLoader::_GetUInt8FromStream(BPositionIO *in)
 
 void
 PSDLoader::_SkipStreamBlock(BPositionIO *in, size_t count)
-{	
+{
 	in->Seek(count, SEEK_CUR);
 }
 
@@ -526,15 +521,15 @@ PSDLoader::_ParseImageResources(void)
 
 	off_t currentPos = fStream->Position();
 	fStream->Seek(fImageResourceSectionPos, SEEK_SET);
-	
+
 	while (fStream->Position() < currentPos + fImageResourceSectionSize) {
-		int32 resBlockSignature = _GetInt32FromStream(fStream);		
+		int32 resBlockSignature = _GetInt32FromStream(fStream);
 		if (resBlockSignature != 0x3842494D) // 8BIM
 			return B_ERROR;
-	
-		uint16 resID = _GetInt16FromStream(fStream);	
-			
-		BString resName, name;		
+
+		uint16 resID = _GetInt16FromStream(fStream);
+
+		BString resName, name;
 		int nameLength = 0;
 		while (true) {
 			int charData = _GetUInt8FromStream(fStream);
@@ -565,6 +560,6 @@ PSDLoader::_ParseImageResources(void)
 	}
 
 	fStream->Seek(currentPos, SEEK_SET);
-	
+
 	return B_OK;
 }
