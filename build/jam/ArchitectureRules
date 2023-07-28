@@ -128,7 +128,7 @@ rule ArchitectureSetup architecture
 		# TODO: Remove all these.
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable
 			-Wno-error=deprecated -Wno-error=deprecated-declarations
-			-Wno-error=cpp -Wno-error=trigraphs -Wno-error=register ;
+			-Wno-error=cpp -Wno-error=register ;
 		# These currently generate too many "false positives."
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=address-of-packed-member
 			-Wno-error=stringop-overread -Wno-error=array-bounds ;
