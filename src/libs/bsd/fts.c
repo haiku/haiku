@@ -672,8 +672,11 @@ fts_build(FTS *sp, int type)
 	DIR *dirp;
 	void *oldaddr;
 	char *cp;
-	int cderrno, descend, saved_errno, nostat, doadjust,
+	int cderrno, descend, saved_errno, doadjust,
 		readdir_errno;
+#ifdef DT_DIR
+	int nostat;
+#endif
 #ifdef FTS_WHITEOUT
 	int oflag;
 #endif
@@ -711,17 +714,23 @@ fts_build(FTS *sp, int type)
 	 */
 	if (type == BNAMES) {
 		nlinks = 0;
+#ifdef DT_DIR
 		/* Be quiet about nostat, GCC. */
 		nostat = 0;
+#endif
 	} else if (ISSET(FTS_NOSTAT) && ISSET(FTS_PHYSICAL)) {
 		if (fts_ufslinks(sp, cur))
 			nlinks = cur->fts_nlink - (ISSET(FTS_SEEDOT) ? 0 : 2);
 		else
 			nlinks = -1;
+#ifdef DT_DIR
 		nostat = 1;
+#endif
 	} else {
 		nlinks = -1;
+#ifdef DT_DIR
 		nostat = 0;
+#endif
 	}
 
 #ifdef notdef
