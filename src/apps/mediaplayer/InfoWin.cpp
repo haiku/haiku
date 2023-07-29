@@ -414,8 +414,9 @@ InfoWin::_UpdateVideo()
 
 		fVideoFormatInfo->SetText(info.String());
 
-		info.SetToFormat("%" B_PRIu32 " x %" B_PRIu32, format.Width(),
-			format.Height());
+		info.SetToFormat(B_TRANSLATE_COMMENT("%" B_PRIu32 " × %" B_PRIu32,
+			"The '×' is the Unicode multiplication sign U+00D7"),
+			format.Width(), format.Height());
 
 		// encoded has output as 1st field...
 		char fpsString[20];

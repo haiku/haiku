@@ -230,14 +230,17 @@ MainWin::CreateMenu()
 	str4 << " 1.41176:1";
 	fDebugMenu->AddItem(new BMenuItem(str4.String(),
 		new BMessage(M_ASPECT_141176_1)));
-	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 720 x 576, display aspect 4:3"),
+	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT(
+		"force 720 × 576, display aspect 4:3",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		new BMessage(M_ASPECT_720_576)));
-	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 704 x 576, display aspect 4:3"),
+	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT(
+		"force 704 × 576, display aspect 4:3",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		new BMessage(M_ASPECT_704_576)));
-	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 544 x 576, display aspect 4:3"),
+	fDebugMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT(
+		"force 544 × 576, display aspect 4:3",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		new BMessage(M_ASPECT_544_576)));
 
 	fSettingsMenu->ItemAt(1)->SetMarked(fIsFullscreen);
@@ -586,14 +589,17 @@ MainWin::ShowContextMenu(const BPoint &screen_point)
 	str4 << " 1.41176:1";
 	menu->AddItem(new BMenuItem(str4.String(),
 		new BMessage(M_ASPECT_141176_1)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 720 x 576, display aspect 4:3"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT(
+		"force 720 × 576, display aspect 4:3",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		new BMessage(M_ASPECT_720_576)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 704 x 576, display aspect 4:3"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT(
+		"force 704 × 576, display aspect 4:3",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		new BMessage(M_ASPECT_704_576)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE(
-		"force 544 x 576, display aspect 4:3"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT(
+		"force 544 × 576, display aspect 4:3",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		new BMessage(M_ASPECT_544_576)));
 
 	menu->SetTargetForItems(this);
@@ -698,7 +704,8 @@ void
 MainWin::UpdateWindowTitle()
 {
 	BString title;
-	title.SetToFormat("%s - %d x %d, %.3f:%.3f => %.0f x %.0f",
+	title.SetToFormat(B_TRANSLATE_COMMENT("%s - %d × %d, %.3f:%.3f => %.0f × %.0f",
+		"The '×' is the Unicode multiplication sign U+00D7"),
 		B_TRANSLATE_SYSTEM_NAME(NAME),
 		fSourceWidth, fSourceHeight, fWidthScale, fHeightScale,
 		fVideoView->Bounds().Width() + 1, fVideoView->Bounds().Height() + 1);

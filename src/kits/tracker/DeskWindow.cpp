@@ -448,48 +448,24 @@ BDeskWindow::AddWindowContextMenus(BMenu* menu)
 	menu->AddSeparatorItem();
 
 	BMenu* iconSizeMenu = new BMenu(B_TRANSLATE("Icon view"));
+	BMenuItem* item;
 
-	BMessage* message = new BMessage(kIconMode);
-	message->AddInt32("size", 32);
-	BMenuItem* item = new BMenuItem(B_TRANSLATE("32 x 32"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 32);
-	item->SetTarget(PoseView());
-	iconSizeMenu->AddItem(item);
+	static const uint32 kIconSizes[] = { 32, 40, 48, 64, 96, 128 };
+	BMessage* message;
 
-	message = new BMessage(kIconMode);
-	message->AddInt32("size", 40);
-	item = new BMenuItem(B_TRANSLATE("40 x 40"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 40);
-	item->SetTarget(PoseView());
-	iconSizeMenu->AddItem(item);
-
-	message = new BMessage(kIconMode);
-	message->AddInt32("size", 48);
-	item = new BMenuItem(B_TRANSLATE("48 x 48"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 48);
-	item->SetTarget(PoseView());
-	iconSizeMenu->AddItem(item);
-
-	message = new BMessage(kIconMode);
-	message->AddInt32("size", 64);
-	item = new BMenuItem(B_TRANSLATE("64 x 64"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 64);
-	item->SetTarget(PoseView());
-	iconSizeMenu->AddItem(item);
-
-	message = new BMessage(kIconMode);
-	message->AddInt32("size", 96);
-	item = new BMenuItem(B_TRANSLATE("96 x 96"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 96);
-	item->SetTarget(PoseView());
-	iconSizeMenu->AddItem(item);
-
-	message = new BMessage(kIconMode);
-	message->AddInt32("size", 128);
-	item = new BMenuItem(B_TRANSLATE("128 x 128"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 128);
-	item->SetTarget(PoseView());
-	iconSizeMenu->AddItem(item);
+	for (uint32 i = 0; i < sizeof(kIconSizes) / sizeof(uint32); ++i) {
+		uint32 iconSize = kIconSizes[i];
+		message = new BMessage(kIconMode);
+		message->AddInt32("size", iconSize);
+		BString label;
+		label.SetToFormat(B_TRANSLATE_COMMENT("%" B_PRId32" × %" B_PRId32,
+			"The '×' is the Unicode multiplication sign U+00D7"),
+			iconSize, iconSize);
+		item = new BMenuItem(label, message);
+		item->SetMarked(PoseView()->IconSizeInt() == iconSize);
+		item->SetTarget(PoseView());
+		iconSizeMenu->AddItem(item);
+	}
 
 	iconSizeMenu->AddSeparatorItem();
 

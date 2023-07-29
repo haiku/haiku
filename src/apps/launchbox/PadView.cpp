@@ -382,8 +382,10 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		message = new BMessage(MSG_SET_ICON_SIZE);
 		message->AddInt32("size", iconSize);
 		BString label;
-		label << iconSize << " x " << iconSize;
-		item = new BMenuItem(label.String(), message);
+		label.SetToFormat(B_TRANSLATE_COMMENT("%" B_PRId32" × %" B_PRId32,
+			"The '×' is the Unicode multiplication sign U+00D7"),
+			iconSize, iconSize);
+		item = new BMenuItem(label, message);
 		item->SetTarget(this);
 		item->SetMarked(IconSize() == iconSize);
 		iconSizeM->AddItem(item);

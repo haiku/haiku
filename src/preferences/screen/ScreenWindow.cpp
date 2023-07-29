@@ -134,7 +134,9 @@ tv_standard_to_string(uint32 mode)
 static void
 resolution_to_string(screen_mode& mode, BString &string)
 {
-	string << mode.width << " x " << mode.height;
+	string.SetToFormat(B_TRANSLATE_COMMENT("%" B_PRId32" × %" B_PRId32,
+			"The '×' is the Unicode multiplication sign U+00D7"),
+			mode.width, mode.height);
 }
 
 
@@ -367,7 +369,9 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		message->AddInt32("height", mode.height);
 
 		BString name;
-		name << mode.width << " x " << mode.height;
+		name.SetToFormat(B_TRANSLATE_COMMENT("%" B_PRId32" × %" B_PRId32,
+			"The '×' is the Unicode multiplication sign U+00D7"),
+			mode.width, mode.height);
 
 		if (layout == B_ITEMS_IN_COLUMN)
 			fResolutionMenu->AddItem(new BMenuItem(name.String(), message));
@@ -667,7 +671,9 @@ ScreenWindow::_CheckResolutionMenu()
 			continue;
 
 		BString name;
-		name << mode.width << " x " << mode.height;
+		name.SetToFormat(B_TRANSLATE_COMMENT("%" B_PRId32" × %" B_PRId32,
+			"The '×' is the Unicode multiplication sign U+00D7"),
+			mode.width, mode.height);
 
 		BMenuItem *item = fResolutionMenu->FindItem(name.String());
 		if (item != NULL)

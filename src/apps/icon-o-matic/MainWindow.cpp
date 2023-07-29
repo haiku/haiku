@@ -1273,17 +1273,20 @@ MainWindow::_CreateMenuBar()
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_64);
-	fMouseFilter64MI = new BMenuItem("64 x 64", message, '3');
+	fMouseFilter64MI = new BMenuItem(B_TRANSLATE_COMMENT("64 × 64",
+		"The '×' is the Unicode multiplication sign U+00D7"), message, '3');
 	filterModeMenu->AddItem(fMouseFilter64MI);
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_32);
-	fMouseFilter32MI = new BMenuItem("32 x 32", message, '2');
+	fMouseFilter32MI = new BMenuItem(B_TRANSLATE_COMMENT("32 × 32",
+		"The '×' is the Unicode multiplication sign U+00D7"), message, '2');
 	filterModeMenu->AddItem(fMouseFilter32MI);
 
 	message = new BMessage(MSG_MOUSE_FILTER_MODE);
 	message->AddInt32("mode", SNAPPING_16);
-	fMouseFilter16MI = new BMenuItem("16 x 16", message, '1');
+	fMouseFilter16MI = new BMenuItem(B_TRANSLATE_COMMENT("16 × 16",
+		"The '×' is the Unicode multiplication sign U+00D7"), message, '1');
 	filterModeMenu->AddItem(fMouseFilter16MI);
 
 	filterModeMenu->SetRadioMode(true);

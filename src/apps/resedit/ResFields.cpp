@@ -49,26 +49,26 @@ BitmapPreviewField::DrawField(BRect rect, BView *parent)
 		BRect drawrect(fBitmap->Bounds().OffsetToCopy(rect.LeftTop()));
 		if (drawrect.Height() > rect.Height()) {
 			drawrect = rect;
-			drawrect.right = drawrect.left + 
-							(fBitmap->Bounds().Width() * 
+			drawrect.right = drawrect.left +
+							(fBitmap->Bounds().Width() *
 							(rect.Height() / fBitmap->Bounds().Height()));
 		}
-		
+
 		parent->SetDrawingMode(B_OP_ALPHA);
 		parent->DrawBitmap(fBitmap, fBitmap->Bounds(), drawrect);
 		parent->SetDrawingMode(B_OP_COPY);
-		
+
 		BString out;
-		out << fBitmap->Bounds().IntegerWidth() << " x " 
-			<< fBitmap->Bounds().IntegerHeight()	<< " x " 
-			<< (int32(fBitmap->BytesPerRow() / fBitmap->Bounds().Width()) * 8);
-		
+		out.SetToFormat("%" B_PRId32" × %" B_PRId32" × %" B_PRId32,
+			fBitmap->Bounds().IntegerWidth(), fBitmap->Bounds().IntegerHeight(),
+			(int32(fBitmap->BytesPerRow() / fBitmap->Bounds().Width()) * 8));
+
 		BRect stringrect = rect;
 		stringrect.right -= 10;
 		stringrect.left = stringrect.right - parent->StringWidth(out.String());
 		if (stringrect.left < drawrect.right + 5)
 			stringrect.left = drawrect.right + 5;
-		
+
 		parent->TruncateString(&out, B_TRUNCATE_END, stringrect.Width());
 		parent->DrawString(out.String(), stringrect.LeftTop());
 	}

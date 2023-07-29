@@ -76,7 +76,8 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 
 			BString details;
 			details.SetToFormat(
-				B_TRANSLATE_COMMENT("%u x %u, %.2ffps", "Width x Height, fps"),
+				B_TRANSLATE_COMMENT("%u × %u, %.2ffps", "Width × Height, fps;"
+				"The '×' is the Unicode multiplication sign U+00D7"),
 				format.Width(), format.Height(),
 				rvf->field_rate / rvf->interlace);
 
