@@ -23,7 +23,7 @@ Settings…	ActivityWindow		Einstellungen …
 Block cache	DataSource		Block-Cache
 Memory	DataSource		Speicher
 CPU usage	DataSource		CPU-Auslastung
-CPU speed	DataSource		CPU Takt
+CPU speed	DataSource		CPU-Takt
 Quit	ActivityWindow		Beenden
 Raw clipboard	DataSource		Raw-Ablage
 Settings	ActivityWindow		Einstellungen

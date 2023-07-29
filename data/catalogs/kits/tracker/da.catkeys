@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	1384182
+1	danish	x-vnd.Haiku-libtracker	1609247133
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -344,6 +344,7 @@ To: %dir	StatusWindow		Til: %dir
 Paste layout	ContainerWindow		Indsæt layout
 Cancel	Tracker		Afbryd
 yes	AttributesView		ja
+%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		Gør til aktiv printer
 Copy to	ContainerWindow		Kopiér til
 Name	SelectionWindow		Navn

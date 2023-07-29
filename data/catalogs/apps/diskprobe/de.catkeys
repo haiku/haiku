@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskProbe	647092682
+1	german	x-vnd.Haiku-DiskProbe	1243187511
 Raw editor	AttributeWindow		Raw-Editor
 Remove	AttributeWindow		Entfernen
 Close	ProbeView		Schließen
@@ -28,7 +28,9 @@ Open file…	FileWindow		Datei öffnen …
 32 bit unsigned pointer:	TypeEditors		Vorzeichenloser 32-Bit-Zeiger:
 DiskProbe request	DiskProbe		DiskProbe-Anfrage
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadezimal
+Block %lld (0x%Lx)	ProbeView		Block %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Die Datei konnte nicht geschrieben werden:\n%s\n\nAlle Änderungen werden beim Beenden verloren gehen.
+Native: %lld (0x%0*Lx)	ProbeView		Nativ: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Gerät untersuchen:
 Number editor	TypeEditors		Zahleneditor
 Icon	TypeEditors		Symbol
@@ -114,6 +116,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		DiskProbe-Anfrage
 Double precision floating-point value:	TypeEditors		Gleitkomma-Wert doppelter Genauigkeit:
 Image	TypeEditors	This is the type of view	Bild
+Swapped: %lld (0x%0*Lx)	ProbeView		Getauscht: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Änderungen vor dem Beenden speichern?
 PNG format	TypeEditors		PNG-Format
 Number	TypeEditors	This is the type of editor	Zahl

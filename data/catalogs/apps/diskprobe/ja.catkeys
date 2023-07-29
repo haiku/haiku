@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	4193379066
+1	japanese	x-vnd.Haiku-DiskProbe	494506599
 Raw editor	AttributeWindow		Raw エディター
 Remove	AttributeWindow		削除
 Close	ProbeView		閉じる
@@ -29,7 +29,9 @@ Open file…	FileWindow		ファイルを開く...
 32 bit unsigned pointer:	TypeEditors		符号無し 32 ビットポインタ:
 DiskProbe request	DiskProbe		DiskProbe リクエスト
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16 進
+Block %lld (0x%Lx)	ProbeView		ブロック %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		ファイルへの書き込みに失敗しました:\n%s\n\nすべての変更は終了時に失われます。
+Native: %lld (0x%0*Lx)	ProbeView		ネイティブ: %lld (0x%0*Lx)
 Examine device:	OpenWindow		デバイスを調べる:
 Number editor	TypeEditors		数値エディター
 Icon	TypeEditors		アイコン
@@ -115,6 +117,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		DiskProbe リクエスト
 Double precision floating-point value:	TypeEditors		倍精度浮動小数点値:
 Image	TypeEditors	This is the type of view	イメージ
+Swapped: %lld (0x%0*Lx)	ProbeView		スワップ後: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		閉じる前に変更を保存しますか?
 PNG format	TypeEditors		PNG フォーマット
 Number	TypeEditors	This is the type of editor	数値

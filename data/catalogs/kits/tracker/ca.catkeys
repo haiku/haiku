@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1384182
+1	catalan; valencian	x-vnd.Haiku-libtracker	1609247133
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -344,6 +344,7 @@ To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
 Cancel	Tracker		Cancel·la
 yes	AttributesView		sí
+%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom

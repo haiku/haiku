@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DiskProbe	4193379066
+1	hungarian	x-vnd.Haiku-DiskProbe	494506599
 Raw editor	AttributeWindow		Nyers szerkesztő
 Remove	AttributeWindow		Eltávolítás
 Close	ProbeView		Bezárás
@@ -29,7 +29,9 @@ Open file…	FileWindow		Fájl megnyitása…
 32 bit unsigned pointer:	TypeEditors		32-bites aláíratlan mutató:
 DiskProbe request	DiskProbe		Lemezfürkész kérés
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimális
+Block %lld (0x%Lx)	ProbeView		%lld (0x%Lx) blokk
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Nem sikerült a fájlba írni:\n%s\n\nKilépéskor minden változtatás el fog veszni.
+Native: %lld (0x%0*Lx)	ProbeView		Natív: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Eszköz vizsgálata:
 Number editor	TypeEditors		Számszerkesztő
 Icon	TypeEditors		Ikon
@@ -115,6 +117,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Lemezfürkész kérés
 Double precision floating-point value:	TypeEditors		Duplapontosságú lebegőpontos érték:
 Image	TypeEditors	This is the type of view	Kép
+Swapped: %lld (0x%0*Lx)	ProbeView		Cserélt: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Elmentsük a változtatásokat bezárás előtt?
 PNG format	TypeEditors		PNG formátum
 Number	TypeEditors	This is the type of editor	Szám

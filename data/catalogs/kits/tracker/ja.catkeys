@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1384182
+1	japanese	x-vnd.Haiku-libtracker	1609247133
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -344,6 +344,7 @@ To: %dir	StatusWindow		%dir
 Paste layout	ContainerWindow		レイアウトを貼り付け
 Cancel	Tracker		中止
 yes	AttributesView		はい
+%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		プリンターを有効にする
 Copy to	ContainerWindow		次へコピー
 Name	SelectionWindow		名前

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Be-MAIL	4110010385
+1	danish	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Indstil til gemt
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din hovedtekst indeholder %ld ukodelige tegn. Måske et andet tegnsæt vil virke bedre? Tryk på Send for at sende den alligevel (der bruges et erstatningstegn i stedet for de ukodelige), eller vælg Afbryd for at gå tilbage, og prøve at rette det igen.
 Text wrapping:	Mail		Tekstombrydning:
@@ -38,7 +38,9 @@ Previous message	Mail		Forrige meddelelse
 (Address unavailable)	Mail		(adresse utilgængelig)
 Mail	System name		Post
 Copy link location	Mail		Kopiér lænkeplacering
+Add attachment…	Mail		Tilføj vedhæftning…
 Next	Mail		Næste
+Attachments:	Mail		Vedhæftninger:
 Show icons only	Mail		Vis kun ikoner
 Subject:	Mail		Emne:
 OK	Mail		O.k.
@@ -55,6 +57,7 @@ Reply to sender	Mail		Svar til afsender
 \\n - Newline	Mail		\\n - Linjeskift
 Copy	Mail		Kopiér
 Add signature	Mail		Tilføj signatur
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Vedhæftning: %name% (Type: %type%)
 %n - Full name	Mail		%n - Fuldt navn
 Signature	Mail		Signatur
 Use default account	Mail		Brug forvalgt konto

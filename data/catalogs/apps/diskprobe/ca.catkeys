@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DiskProbe	4193379066
+1	catalan; valencian	x-vnd.Haiku-DiskProbe	494506599
 Raw editor	AttributeWindow		Editor de dades en brut
 Remove	AttributeWindow		Suprimeix
 Close	ProbeView		Tanca
@@ -29,7 +29,9 @@ Open file…	FileWindow		Obre un fitxer...
 32 bit unsigned pointer:	TypeEditors		Punter de 32 bits sense signe:
 DiskProbe request	DiskProbe		Sol·licitud del Sondeig de discs
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimal
+Block %lld (0x%Lx)	ProbeView		Bloc %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No s'ha pogut escriure al disc:\n%s\n\nSi sortiu es perdran tots els canvis.
+Native: %lld (0x%0*Lx)	ProbeView		Nadiu: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Navega pel dispositiu:
 Number editor	TypeEditors		Editor de números
 Icon	TypeEditors		Icona
@@ -115,6 +117,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Sol·licitud del Sondeig de discs
 Double precision floating-point value:	TypeEditors		Valor de coma flotant de doble precisió:
 Image	TypeEditors	This is the type of view	Imatge
+Swapped: %lld (0x%0*Lx)	ProbeView		Intercanviat: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Voleu desar els canvis abans de tancar?
 PNG format	TypeEditors		Format PNG
 Number	TypeEditors	This is the type of editor	Número

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DiskProbe	4193379066
+1	danish	x-vnd.Haiku-DiskProbe	494506599
 Raw editor	AttributeWindow		Rå redigering
 Remove	AttributeWindow		Fjern
 Close	ProbeView		Luk
@@ -29,7 +29,9 @@ Open file…	FileWindow		Åbn fil…
 32 bit unsigned pointer:	TypeEditors		32-bit pointer uden fortegn:
 DiskProbe request	DiskProbe		Disksonderingsanmodning
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Block %lld (0x%Lx)	ProbeView		Blok %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skrivning til filen mislykkedes:\n%s\n\nAlle ændringer går tabt, når du afslutter.
+Native: %lld (0x%0*Lx)	ProbeView		Indfødt: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Undersøg enhed:
 Number editor	TypeEditors		Talredigering
 Icon	TypeEditors		Ikon
@@ -115,6 +117,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Disksonderingsanmodning
 Double precision floating-point value:	TypeEditors		Flydende kommatalværdi med dobbelt præcision:
 Image	TypeEditors	This is the type of view	Billede
+Swapped: %lld (0x%0*Lx)	ProbeView		Ombyttet: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Gem ændringer inden lukning?
 PNG format	TypeEditors		PNG-format
 Number	TypeEditors	This is the type of editor	Nummer
