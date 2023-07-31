@@ -204,6 +204,9 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 			char* reallocated = (char*)realloc(mountpoint, strlen(mountpoint) + 1);
 			if (reallocated != NULL)
 				mountpoint = reallocated;
+		} else {
+			free(mountpoint);
+			mountpoint = NULL;
 		}
 	}
 	if (status != B_OK)
