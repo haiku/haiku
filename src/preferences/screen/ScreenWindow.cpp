@@ -375,8 +375,6 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			int y = index % rows;
 			int x = index / rows;
 			itemRect.OffsetTo(x * itemRect.Width(), y * itemRect.Height());
-			printf("i %d x %d y %d\n", index, x, y);
-			itemRect.PrintToStream();
 			fResolutionMenu->AddItem(new BMenuItem(name.String(), message), itemRect);
 		}
 
