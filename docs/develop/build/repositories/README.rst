@@ -3,10 +3,24 @@ HaikuPorts build-packages repository
 
 The ``build/jam/repositories/HaikuPorts`` directory contains
 RemotePackageRepository files which detail packages and repositories
-leveraged during Haiku’s build process.
+leveraged during Haiku’s build process. While in the standard Haiku/HaikuPorts
+package repositories, older package builds are purged at intervals, the build
+package repositories have a stable set of packages required during the building
+and running of Haiku. This makes sure that non-recent source trees can be
+continued to build and run.
 
    Warning: The URL packages are obtained from are determined by the
-   sha256sum of the repository file.
+   sha256sum of the repository file. This means that when the
+   `hardlink_packages.py` script is used to generate a new
+   RemotePackageRepository jam file, it must not be modified in any way when
+   committing it to the Haiku repository.
+
+Prerequisites
+-------------
+
+The actions require server access to Haiku's kubernetes environment by a Haiku
+system administrator. Please contact the Haiku system administrators when it is
+necessary to create a new set of build packages.
 
 Updating
 --------
@@ -29,36 +43,76 @@ Container Process
 -----------------
 
 Here is the fastest way to update this as of today. Improvements are
-needed. Replace (ARCH) with architecture, (USER) with your non-root
-user.
+needed. Replace (BUILDMASTER) and (ARCH) with the architecture you are creating
+the build-packages packages for.
+
+(BUILDMASTER) is one of:
+
+* x86-64
+* x86
+
+(ARCH) corresponds with the architectures. Note that where an ARCH like x86_64
+might use an underscore, the BUILDMASTER will use dashes.
+
 
 Prepare the build-packages repository
 -------------------------------------
 
-as root on limerick.ams3.haiku-os.org…
+Run the following steps from the shell.
 
-1) wget
-   https://git.haiku-os.org/haiku/plain/build/jam/repositories/HaikuPorts/(ARCH)
-   -O /var/lib/docker/volumes/ci_data_master_(ARCH)/_data/(ARCH)
-2) Enter the buildmaster container: docker exec -it $(docker ps \| grep
-   ci_buildmaster_master_(ARCH) \| awk ‘{ print $1 }’) /bin/bash -l
-3) apt update; apt install -y vim python3 python3-pkg-resources
-4) edit the repository define, add the needed packages, \_devel
-   packages, and add base package to source section.
-5) ln -s /var/buildmaster/package_tools/package_repo
-   /usr/bin/package_repo
-6) export
-   LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/var/buildmaster/package_tools
-7) ./package_tools/hardlink_packages.py (ARCH) ./(ARCH)
-   /var/packages/repository/master/(ARCH)/current/packages/
-   /var/packages/build-packages/master/
-8) exit; cp /var/lib/docker/volumes/ci_data_master_(ARCH)/_data/(ARCH)
-   /home/(USER)/(ARCH); chown (USER) /home/(USER)/(ARCH);
+#. Log into the remote haikuporter buildmaster for the target architecture.
+
+   .. code-block:: bash
+
+     kubectl exec -it deployment/haikuporter -c buildmaster-(BUILDMASTER) -- sh
+
+#. Get the current repository jam file for the platform that you want to update
+
+   .. code-block:: bash
+
+     wget https://git.haiku-os.org/haiku/plain/build/jam/repositories/HaikuPorts/(ARCH)
+
+#. If it is necessary to add or remove packages, then make changes to the
+   downloaded package file.
+#. Make sure that all the scripts and tools can find the libraries.
+
+   .. code-block:: bash
+
+     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+
+#. Run the `hardlink_packages.py` script to create a new build-packages
+   repository and to update the package file.
+
+   .. code-block:: bash
+
+      /var/sources/haiku/src/tools/hardlink_packages.py \
+          (ARCH) \
+          /var/packages/repository/master/(ARCH)/current/packages/ \
+          /var/packages/build-packages/master/
+
+#. Exit the container and return to your local machine.
+
+   .. code-block:: bash
+
+      exit
+
 
 Pull the repostory file and commit it
 -------------------------------------
 
-From your local system…
+When the build-packages repository is created, and the RemotePackageRepository
+file is updated, it can be pulled to the local machine and be committed to the
+Haiku repository.
 
-1) scp -P2222 (USER)@limerick.ams3.haiku-os.org:./(ARCH) ./(ARCH)
-2) commit the updated repostory define *without modifying it* in any way
+Run the following steps from the shell.
+
+#. Fetch the remote file generated in the previous stage and copy it to the
+   local machine.
+
+   .. code-block:: bash
+
+     kubectl cp -c buildmaster-(BUILDMASTER) \
+         $(kubectl get pods | grep haikuporter | awk ‘{ print $1 }’):./(ARCH) \
+         (ARCH)
+
+#. Commit the updated repostory define *without modifying it* in any way.
