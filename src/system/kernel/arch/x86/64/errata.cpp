@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,28 @@
 
 #include <cpu.h>
 #include <arch_cpu.h>
+
+
+static bool
+needs_zenbleed_patch(const uint32 family, const uint32 model, const uint64 microcode)
+{
+	if (family != 0x17)
+		return false;
+
+	// https://github.com/torvalds/linux/blob/522b1d6921/arch/x86/kernel/cpu/amd.c#L986
+	if (model >= 0x30 && model <= 0x3f)
+		return (microcode < 0x0830107a);
+	if (model >= 0x60 && model <= 0x67)
+		return (microcode < 0x0860010b);
+	if (model >= 0x68 && model <= 0x6f)
+		return (microcode < 0x08608105);
+	if (model >= 0x70 && model <= 0x7f)
+		return (microcode < 0x08701032);
+	if (model >= 0xa0 && model <= 0xaf)
+		return (microcode < 0x08a00008);
+
+	return false;
+}
 
 
 static status_t
@@ -20,6 +42,7 @@ patch_errata_percpu_amd(int currentCPU, const cpu_ent* cpu)
 
 	const uint32 family = cpu->arch.family + cpu->arch.extended_family,
 		model = (cpu->arch.extended_model << 4) | cpu->arch.model;
+	const uint64 microcode = x86_read_msr(IA32_MSR_UCODE_REV);
 
 	// Family 10h and 12h, Erratum 721:
 	//
@@ -89,6 +112,13 @@ patch_errata_percpu_amd(int currentCPU, const cpu_ent* cpu)
 		// This may result in the load operations on both threads incorrectly
 		// receiving pre-lock data."
 		x86_write_msr(0xc0011020, x86_read_msr(0xc0011020) | ((uint64)1 << 57));
+	}
+
+	// Family 17h ("Zen")
+	// Cross-Process Information Leak (aka. "Zenbleed")
+	// https://www.amd.com/en/resources/product-security/bulletin/amd-sb-7008.html
+	if (needs_zenbleed_patch(family, model, microcode)) {
+		x86_write_msr(MSR_F10H_DE_CFG, x86_read_msr(MSR_F10H_DE_CFG) | (1 << 9));
 	}
 
 	return B_OK;
