@@ -127,8 +127,11 @@ SerialWindow::SerialWindow()
 
 	// Items for the edit menu
 	BMenuItem* clearScreen = new BMenuItem(B_TRANSLATE("Clear history"),
-		new BMessage(kMsgClear));
+		new BMessage(kMsgClear), 'L');
 	editMenu->AddItem(clearScreen);
+
+	BMenuItem* paste = new BMenuItem(B_TRANSLATE("Paste"), new BMessage(B_PASTE), 'V');
+	editMenu->AddItem(paste);
 
 	// TODO copy (when we have selection), paste
 
@@ -467,6 +470,10 @@ void SerialWindow::MessageReceived(BMessage* message)
 		{
 			fTermView->Clear();
 			return;
+		}
+		case B_PASTE:
+		{
+			fTermView->PasteFromClipboard();
 		}
 		case kMsgProgress:
 		{

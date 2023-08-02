@@ -24,11 +24,13 @@ class TermView: public BView
 				void		FrameResized(float width, float height);
 				void		GetPreferredSize(float* width, float* height);
 				void		KeyDown(const char* bytes, int32 numBytes);
+				void		MouseDown(BPoint where);
 				void		MessageReceived(BMessage* message);
 				void		SetLineTerminator(BString bytes);
 
 				void		PushBytes(const char* bytes, const size_t length);
 				void		Clear();
+				void		PasteFromClipboard();
 
 	private:
 				void		_Init();

@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 
+#include <Clipboard.h>
 #include <Entry.h>
 #include <File.h>
 #include <Font.h>
@@ -236,6 +237,21 @@ TermView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
+TermView::MouseDown(BPoint where)
+{
+	int32 buttons = B_PRIMARY_MOUSE_BUTTON;
+	int32 clicks = 1;
+	if (Looper() != NULL && Looper()->CurrentMessage() != NULL) {
+		Looper()->CurrentMessage()->FindInt32("buttons", &buttons);
+		Looper()->CurrentMessage()->FindInt32("clicks", &clicks);
+	}
+
+	if (buttons == B_TERTIARY_MOUSE_BUTTON && clicks == 1)
+		PasteFromClipboard();
+}
+
+
+void
 TermView::MessageReceived(BMessage* message)
 {
 	switch (message->what)
@@ -281,6 +297,26 @@ TermView::Clear()
 	vterm_screen_reset(fTermScreen, 1);
 
 	_UpdateScrollbar();
+}
+
+
+void
+TermView::PasteFromClipboard()
+{
+	if (!be_clipboard->Lock())
+		return;
+
+	BMessage* message = be_clipboard->Data();
+
+	const void *data;
+	ssize_t size;
+	if (message->FindData("text/plain", B_MIME_TYPE, &data, &size) == B_OK) {
+		BMessage* keyEvent = new BMessage(kMsgDataWrite);
+		keyEvent->AddData("data", B_RAW_TYPE, data, size);
+		be_app_messenger.SendMessage(keyEvent);
+	}
+
+	be_clipboard->Unlock();
 }
 
 
