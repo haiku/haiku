@@ -338,8 +338,6 @@ public:
 	inline void Add(Element* element, bool back = true);
 	inline void Remove(Element* element);
 
-	inline void RemoveAllBefore(Element* element);
-
 	inline void Swap(Element* a, Element* b);
 
 	inline void MoveFrom(DOUBLY_LINKED_LIST_CLASS_NAME* fromList);
@@ -502,7 +500,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Add(Element* element, bool back)
 	Insert(element, back);
 }
 
-
 // Remove
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
@@ -531,19 +528,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 	}
 }
 
-
-// RemoveAllBefore
-DOUBLY_LINKED_LIST_TEMPLATE_LIST
-void
-DOUBLY_LINKED_LIST_CLASS_NAME::RemoveAllBefore(Element* element)
-{
-	if (element != NULL) {
-		fFirst = element;
-		sGetLink(element)->previous = NULL;
-	}
-}
-
-
 // Swap
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
@@ -567,7 +551,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Swap(Element* a, Element* b)
 	}
 }
 
-
 // MoveFrom
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
@@ -587,7 +570,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::MoveFrom(DOUBLY_LINKED_LIST_CLASS_NAME* fromList)
 	}
 }
 
-
 // RemoveAll
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
@@ -596,7 +578,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveAll()
 	fFirst = NULL;
 	fLast = NULL;
 }
-
 
 // RemoveHead
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
