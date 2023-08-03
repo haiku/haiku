@@ -20,9 +20,9 @@
 
 
 void
-PrintFlag(uint32 deviceFlags, uint32 testFlag, const char *yes, const char *no)
+PrintFlag(uint32 deviceFlags, uint32 testFlag, char yes, char no)
 {
-	printf("%s", deviceFlags & testFlag ? yes : no);
+	printf("%c", deviceFlags & testFlag ? yes : no);
 }
 
 
@@ -117,13 +117,13 @@ PrintVerbose(dev_t device)
 	printf("       Device: %s\n", info.device_name);
 
 	printf("        Flags: ");
-	PrintFlag(info.flags, B_FS_HAS_QUERY, "Q", "-");
-	PrintFlag(info.flags, B_FS_HAS_ATTR, "A", "-");
-	PrintFlag(info.flags, B_FS_HAS_MIME, "M", "-");
-	PrintFlag(info.flags, B_FS_IS_SHARED, "S", "-");
-	PrintFlag(info.flags, B_FS_IS_PERSISTENT, "P", "-");
-	PrintFlag(info.flags, B_FS_IS_REMOVABLE, "R", "-");
-	PrintFlag(info.flags, B_FS_IS_READONLY, "-", "W");
+	PrintFlag(info.flags, B_FS_HAS_QUERY, 'Q', '-');
+	PrintFlag(info.flags, B_FS_HAS_ATTR, 'A', '-');
+	PrintFlag(info.flags, B_FS_HAS_MIME, 'M', '-');
+	PrintFlag(info.flags, B_FS_IS_SHARED, 'S', '-');
+	PrintFlag(info.flags, B_FS_IS_PERSISTENT, 'P', '-');
+	PrintFlag(info.flags, B_FS_IS_REMOVABLE, 'R', '-');
+	PrintFlag(info.flags, B_FS_IS_READONLY, '-', 'W');
 
 	printf("\n     I/O Size: %10s (%" B_PRIdOFF " byte)\n",
 		ByteString(info.io_size, 1), info.io_size);
@@ -149,21 +149,22 @@ PrintCompact(dev_t device, bool showBlocks, bool all)
 	if (!all && (info.flags & B_FS_IS_PERSISTENT) == 0)
 		return;
 
-	PrintMountPoint(info.dev, false);
 	PrintType(info.fsh_name);
 	PrintBlocks(info.total_blocks, info.block_size, showBlocks);
 	PrintBlocks(info.free_blocks, info.block_size, showBlocks);
 
 	printf(" ");
-	PrintFlag(info.flags, B_FS_HAS_QUERY, "Q", "-");
-	PrintFlag(info.flags, B_FS_HAS_ATTR, "A", "-");
-	PrintFlag(info.flags, B_FS_HAS_MIME, "M", "-");
-	PrintFlag(info.flags, B_FS_IS_SHARED, "S", "-");
-	PrintFlag(info.flags, B_FS_IS_PERSISTENT, "P", "-");
-	PrintFlag(info.flags, B_FS_IS_REMOVABLE, "R", "-");
-	PrintFlag(info.flags, B_FS_IS_READONLY, "-", "W");
+	PrintFlag(info.flags, B_FS_HAS_QUERY, 'Q', '-');
+	PrintFlag(info.flags, B_FS_HAS_ATTR, 'A', '-');
+	PrintFlag(info.flags, B_FS_HAS_MIME, 'M', '-');
+	PrintFlag(info.flags, B_FS_IS_SHARED, 'S', '-');
+	PrintFlag(info.flags, B_FS_IS_PERSISTENT, 'P', '-');
+	PrintFlag(info.flags, B_FS_IS_REMOVABLE, 'R', '-');
+	PrintFlag(info.flags, B_FS_IS_READONLY, '-', 'W');
 
-	printf(" %s\n", info.device_name);
+	printf(" %24s ", info.device_name);
+	PrintMountPoint(info.dev, false);
+	printf("\n");
 }
 
 
@@ -237,8 +238,8 @@ main(int argc, char **argv)
 
 	// If not, then just iterate over all devices and give a compact summary
 
-	printf(" Mount             Type      Total     Free      Flags   Device\n"
-		   "----------------- --------- --------- --------- ------- ------------------------\n");
+	printf(" Type      Total     Free      Flags   Device                   Mounted on\n"
+		   "--------- --------- --------- ------- ------------------------ -----------------\n");
 
 	int32 cookie = 0;
 	while ((device = next_dev(&cookie)) >= B_OK) {
