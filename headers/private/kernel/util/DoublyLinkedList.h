@@ -505,27 +505,28 @@ DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
 DOUBLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 {
-	if (element) {
-#if DEBUG_DOUBLY_LINKED_LIST
-		ASSERT_PRINT(fFirst != NULL && fLast != NULL
-			&& (fFirst != fLast || element == fFirst),
-			"list: %p, element: %p\n", this, element);
-#endif
-
-		Link* elLink = sGetLink(element);
-		if (elLink->previous)
-			sGetLink(elLink->previous)->next = elLink->next;
-		else
-			fFirst = elLink->next;
-		if (elLink->next)
-			sGetLink(elLink->next)->previous = elLink->previous;
-		else
-			fLast = elLink->previous;
+	if (element == NULL)
+		return;
 
 #if DEBUG_DOUBLY_LINKED_LIST
-		elLink->next = elLink->previous = NULL;
+	ASSERT_PRINT(fFirst != NULL && fLast != NULL
+		&& (fFirst != fLast || element == fFirst),
+		"list: %p, element: %p\n", this, element);
 #endif
-	}
+
+	Link* elLink = sGetLink(element);
+
+	if (element == fFirst)
+		fFirst = elLink->next;
+	else
+		sGetLink(elLink->previous)->next = elLink->next;
+
+	if (element == fLast)
+		fLast = elLink->previous;
+	else
+		sGetLink(elLink->next)->previous = elLink->previous;
+
+	elLink->next = elLink->previous = NULL;
 }
 
 // Swap
