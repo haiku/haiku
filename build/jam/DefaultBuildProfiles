@@ -192,14 +192,13 @@ rule DefineDefaultBuildProfiles
 				less
 				libedit
 				make
-				mawk
 				ncurses6
 				noto
 				python
 				sed
 				texinfo
-				!gcc2 @{ grep }@
-				gcc2 @{ grep_x86@secondary_x86 }@
+				!gcc2 @{ gawk grep }@
+				gcc2 @{ grep_x86@secondary_x86 mawk }@
 				;
 
 			AddHaikuImageDisabledPackages

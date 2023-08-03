@@ -25,15 +25,19 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 	!gcc2 @{ coreutils icu66 }@
 	gcc2 @{ coreutils_x86 icu icu66_x86@secondary_x86 }@
 	regular_image @{
-		bzip2 diffutils expat ffmpeg findutils glu gutenprint8 gzip
+		bzip2 expat ffmpeg glu gutenprint8 gzip
 		lame less libedit libicns
-		mawk mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
+		mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
 		netcat
 		sed sharutils
-		tcpdump unzip wget which zip
+		unzip wget which zip
 
-		!gcc2 @{ grep tar zstd }@
-		gcc2 @{ grep_x86@secondary_x86 tar_x86@secondary_x86 }@
+		!gcc2 @{ diffutils findutils gawk grep tar tcpdump zstd }@
+		gcc2 @{
+			diffutils_x86@secondary_x86 findutils_x86@secondary_x86
+			mawk grep_x86@secondary_x86 tar_x86@secondary_x86
+			tcpdump_x86@secondary_x86
+		}@
 	}@
 ] ;
 AddHaikuImageSourcePackages [ FFilterByBuildFeatures
@@ -44,9 +48,11 @@ AddHaikuImageSourcePackages [ FFilterByBuildFeatures
 
 	regular_image @{
 		expat ffmpeg findutils grep gutenprint8 gzip
-		lame less libicns mawk
+		lame less libicns
 		sed sharutils
 		tar wget which
+		!gcc2 @{ gawk }@
+		gcc2 @{ mawk }@
 	}@
 ] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {

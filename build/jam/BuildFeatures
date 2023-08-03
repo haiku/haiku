@@ -259,7 +259,7 @@ if [ IsPackageAvailable ffmpeg_devel ] {
 if [ IsPackageAvailable fluidlite_devel ] && [ IsPackageAvailable libvorbis_devel ] {
 	ExtractBuildFeatureArchives fluidlite :
 		file: devel fluidlite_devel
-			library: $(developLibDir)/libfluidlite.a
+			library: $(developLibDir)/libfluidlite-static.a
 			headers: $(developHeadersDir)
 		;
 
