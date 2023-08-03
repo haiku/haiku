@@ -82,8 +82,13 @@ UnixDatagramEndpoint::Close()
 
 	UnixDatagramEndpointLocker endpointLocker(this);
 
-	if (IsBound())
-		RETURN_ERROR(UnixEndpoint::_Unbind());
+	fShutdownRead = fShutdownWrite = true;
+
+	if (IsBound()) {
+		status_t status = UnixEndpoint::_Unbind();
+		if (status != B_OK)
+			RETURN_ERROR(status);
+	}
 
 	_UnsetReceiveFifo();
 
@@ -99,9 +104,10 @@ UnixDatagramEndpoint::Free()
 
 	UnixDatagramEndpointLocker endpointLocker(this);
 
-	_UnsetReceiveFifo();
+	ASSERT(fReceiveFifo == NULL);
+	ASSERT(fTargetEndpoint == NULL);
 
-	RETURN_ERROR(_Disconnect());
+	return B_OK;
 }
 
 
