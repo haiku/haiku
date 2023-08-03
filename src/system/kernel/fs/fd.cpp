@@ -374,10 +374,10 @@ remove_fd(struct io_context* context, int fd)
 		disconnected = (descriptor->open_mode & O_DISCONNECTED);
 	}
 
-	mutex_unlock(&context->io_mutex);
-
 	if (selectInfos != NULL)
 		deselect_select_infos(descriptor, selectInfos, true);
+
+	mutex_unlock(&context->io_mutex);
 
 	return disconnected ? NULL : descriptor;
 }
@@ -446,13 +446,12 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	// Check for identity, note that it cannot be made above
 	// because we always want to return an error on invalid
 	// handles
-	select_info* selectInfos = NULL;
 	if (oldfd != newfd) {
 		// Now do the work
 		TFD(Dup2FD(context, oldfd, newfd));
 
 		evicted = context->fds[newfd];
-		selectInfos = context->select_infos[newfd];
+		select_info* selectInfos = context->select_infos[newfd];
 		context->select_infos[newfd] = NULL;
 		atomic_add(&context->fds[oldfd]->ref_count, 1);
 		atomic_add(&context->fds[oldfd]->open_count, 1);
@@ -460,6 +459,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 		if (evicted == NULL)
 			context->num_used_fds++;
+
+		deselect_select_infos(evicted, selectInfos, true);
 	}
 
 	fd_set_close_on_exec(context, newfd, false);
@@ -468,7 +469,6 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 
 	// Say bye bye to the evicted fd
 	if (evicted) {
-		deselect_select_infos(evicted, selectInfos, true);
 		close_fd(context, evicted);
 		put_fd(evicted);
 	}
