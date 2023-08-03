@@ -185,6 +185,7 @@ UnixDatagramEndpoint::Connect(const struct sockaddr* _address)
 
 	// Required by the socket layer.
 	PeerAddress().SetTo(&fTargetEndpoint->socket->address);
+	gSocketModule->set_connected(Socket());
 
 	RETURN_ERROR(B_OK);
 }

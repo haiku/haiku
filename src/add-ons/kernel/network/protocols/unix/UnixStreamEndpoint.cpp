@@ -323,7 +323,7 @@ UnixStreamEndpoint::Connect(const struct sockaddr* _address)
 	fState = unix_stream_endpoint_state::Connected;
 	fWasConnected = true;
 
-	gSocketModule->set_connected(newSocket);
+	gSocketModule->set_connected(Socket());
 
 	release_sem(listeningEndpoint->fAcceptSemaphore);
 
@@ -709,6 +709,8 @@ UnixStreamEndpoint::_Spawn(UnixStreamEndpoint* connectingEndpoint,
 	fCredentials = listeningEndpoint->fCredentials;
 
 	fState = unix_stream_endpoint_state::Connected;
+
+	gSocketModule->set_connected(Socket());
 }
 
 
