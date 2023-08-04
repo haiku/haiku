@@ -226,18 +226,24 @@ DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
 DOUBLY_LINKED_QUEUE_CLASS_NAME::Remove(Element *element)
 {
-	if (element) {
-		Link *elLink = sGetLink(element);
-		if (elLink->previous)
-			sGetLink(elLink->previous)->next = elLink->next;
-		else
-			fFirst = elLink->next;
-		if (elLink->next)
-			sGetLink(elLink->next)->previous = elLink->previous;
+	if (element == NULL)
+		return;
 
-		elLink->previous = NULL;
-		elLink->next = NULL;
-	}
+#if DEBUG_DOUBLY_LINKED_LIST
+	ASSERT_PRINT(fFirst != NULL,
+		"queue: %p, element: %p\n", this, element);
+#endif
+
+	Link *elLink = sGetLink(element);
+	if (element == fFirst)
+		fFirst = elLink->next;
+	else
+		sGetLink(elLink->previous)->next = elLink->next;
+
+	if (elLink->next)
+		sGetLink(elLink->next)->previous = elLink->previous;
+
+	elLink->next = elLink->previous = NULL;
 }
 
 // Swap
