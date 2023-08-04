@@ -556,8 +556,9 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos,
 			}
 		}
 
+		select_info* next = info->next;
 		notify_select_events(info, B_EVENT_INVALID);
-		info = info->next;
+		info = next;
 
 		if (putSyncObjects)
 			put_select_sync(sync);

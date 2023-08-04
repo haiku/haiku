@@ -745,8 +745,9 @@ notify_select_events_list(select_info* list, uint16 events)
 {
 	struct select_info* info = list;
 	while (info != NULL) {
+		select_info* next = info->next;
 		notify_select_events(info, events);
-		info = info->next;
+		info = next;
 	}
 }
 

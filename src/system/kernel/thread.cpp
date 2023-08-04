@@ -2242,9 +2242,10 @@ thread_exit(void)
 	while (info != NULL) {
 		select_sync* sync = info->sync;
 
+		select_info* next = info->next;
 		notify_select_events(info, B_EVENT_INVALID);
-		info = info->next;
 		put_select_sync(sync);
+		info = next;
 	}
 
 	// notify listeners
