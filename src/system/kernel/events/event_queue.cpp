@@ -341,7 +341,7 @@ EventQueue::_Notify(select_event* event, uint16 events)
 	if ((events & event->selected_events) == 0)
 		return;
 
-	const int32 previousEvents = atomic_or(&event->events, events);
+	const int32 previousEvents = atomic_or(&event->events, (events & ~B_EVENT_INVALID));
 
 	// If the event is already being deleted, we should ignore this notification.
 	if ((previousEvents & B_EVENT_DELETING) != 0)
@@ -362,8 +362,10 @@ EventQueue::_Notify(select_event* event, uint16 events)
 		// If we get B_EVENT_INVALID it means the object we were monitoring was
 		// deleted. The object's ID may now be reused, so we must remove it
 		// from the event tree.
-		if ((events & B_EVENT_INVALID) != 0)
+		if ((events & B_EVENT_INVALID) != 0) {
+			atomic_or(&event->events, B_EVENT_INVALID);
 			fEventTree.Remove(event);
+		}
 
 		// If it's not already queued, it's our responsibility to queue it.
 		if ((atomic_or(&event->events, B_EVENT_QUEUED) & B_EVENT_QUEUED) == 0) {
