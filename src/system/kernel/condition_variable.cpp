@@ -1,6 +1,6 @@
 /*
  * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -198,6 +198,11 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 		error = thread_block();
 
 	_RemoveFromVariable();
+
+	// We need to always return the actual wait status, if we received one.
+	if (fWaitStatus <= 0)
+		return fWaitStatus;
+
 	return error;
 }
 
@@ -417,9 +422,10 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 			// and spin while waiting for us to do so.
 			if (lastWaitStatus == STATUS_WAITING)
 				thread_unblock_locked(thread, result);
+
+			notified++;
 		}
 
-		notified++;
 		if (!all)
 			break;
 	}
