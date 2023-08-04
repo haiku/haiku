@@ -288,14 +288,16 @@ UnixDatagramEndpoint::Send(const iovec* vecs, size_t vecCount,
 	fifoLocker.Unlock();
 	targetLocker.Lock();
 
-	if (notifyRead)
+	// We must recheck fShutdownRead after reacquiring the lock, as it may have changed.
+	if (notifyRead && !targetEndpoint->fShutdownRead)
 		gSocketModule->notify(targetEndpoint->socket, B_SELECT_READ, readable);
 
 	targetLocker.Unlock();
 
 	if (notifyWrite) {
 		endpointLocker.Lock();
-		gSocketModule->notify(socket, B_SELECT_WRITE, writable);
+		if (!fShutdownWrite)
+			gSocketModule->notify(socket, B_SELECT_WRITE, writable);
 	}
 
 	switch (result) {
