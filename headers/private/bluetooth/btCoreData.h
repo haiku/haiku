@@ -9,7 +9,6 @@
 #include <module.h>
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
-#include <util/DoublyLinkedQueue.h>
 
 #include <net_buffer.h>
 #include <net_device.h>
