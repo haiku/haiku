@@ -406,7 +406,7 @@ user_mutex_unblock(UserMutexEntry* entry, int32* mutex, uint32 flags, bool isWir
 		entry->condition.NotifyAll(B_OK);
 	} else {
 		if (!entry->condition.NotifyOne(B_OK))
-			user_atomic_or(mutex, ~(int32)B_USER_MUTEX_LOCKED, isWired);
+			user_atomic_and(mutex, ~(int32)B_USER_MUTEX_LOCKED, isWired);
 	}
 
 	if (entry->condition.EntriesCount() == 0)
