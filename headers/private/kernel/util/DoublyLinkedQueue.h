@@ -26,148 +26,148 @@
 template<typename Element,
 	typename GetLink = DoublyLinkedListStandardGetLink<Element> >
 class DoublyLinkedQueue {
-	private:
-		typedef DoublyLinkedQueue<Element, GetLink>	Queue;
-		typedef DoublyLinkedListLink<Element>		Link;
+private:
+	typedef DoublyLinkedQueue<Element, GetLink>	Queue;
+	typedef DoublyLinkedListLink<Element>		Link;
 
-	public:
-		class Iterator {
-			public:
-				Iterator(Queue *queue)
-					:
-					fQueue(queue)
-				{
-					Rewind();
-				}
+public:
+	class Iterator {
+		public:
+			Iterator(Queue *queue)
+				:
+				fQueue(queue)
+			{
+				Rewind();
+			}
 
-				Iterator(const Iterator &other)
-				{
-					*this = other;
-				}
+			Iterator(const Iterator &other)
+			{
+				*this = other;
+			}
 
-				bool HasNext() const
-				{
-					return fNext;
-				}
+			bool HasNext() const
+			{
+				return fNext;
+			}
 
-				Element *Next()
-				{
-					fCurrent = fNext;
-					if (fNext)
-						fNext = fQueue->GetNext(fNext);
-					return fCurrent;
-				}
+			Element *Next()
+			{
+				fCurrent = fNext;
+				if (fNext)
+					fNext = fQueue->GetNext(fNext);
+				return fCurrent;
+			}
 
-				Element *Remove()
-				{
-					Element *element = fCurrent;
-					if (fCurrent) {
-						fQueue->Remove(fCurrent);
-						fCurrent = NULL;
-					}
-					return element;
-				}
-
-				Iterator &operator=(const Iterator &other)
-				{
-					fQueue = other.fQueue;
-					fCurrent = other.fCurrent;
-					fNext = other.fNext;
-					return *this;
-				}
-
-				void Rewind()
-				{
+			Element *Remove()
+			{
+				Element *element = fCurrent;
+				if (fCurrent) {
+					fQueue->Remove(fCurrent);
 					fCurrent = NULL;
-					fNext = fQueue->First();
 				}
+				return element;
+			}
 
-			private:
-				Queue	*fQueue;
-				Element	*fCurrent;
-				Element	*fNext;
-		};
+			Iterator &operator=(const Iterator &other)
+			{
+				fQueue = other.fQueue;
+				fCurrent = other.fCurrent;
+				fNext = other.fNext;
+				return *this;
+			}
 
-		class ConstIterator {
-			public:
-				ConstIterator(const Queue *queue)
-					:
-					fQueue(queue)
-				{
-					Rewind();
-				}
+			void Rewind()
+			{
+				fCurrent = NULL;
+				fNext = fQueue->First();
+			}
 
-				ConstIterator(const ConstIterator &other)
-				{
-					*this = other;
-				}
+		private:
+			Queue	*fQueue;
+			Element	*fCurrent;
+			Element	*fNext;
+	};
 
-				bool HasNext() const
-				{
-					return fNext;
-				}
+	class ConstIterator {
+		public:
+			ConstIterator(const Queue *queue)
+				:
+				fQueue(queue)
+			{
+				Rewind();
+			}
 
-				Element *Next()
-				{
-					Element *element = fNext;
-					if (fNext)
-						fNext = fQueue->GetNext(fNext);
-					return element;
-				}
+			ConstIterator(const ConstIterator &other)
+			{
+				*this = other;
+			}
 
-				ConstIterator &operator=(const ConstIterator &other)
-				{
-					fQueue = other.fQueue;
-					fNext = other.fNext;
-					return *this;
-				}
+			bool HasNext() const
+			{
+				return fNext;
+			}
 
-				void Rewind()
-				{
-					fNext = fQueue->First();
-				}
+			Element *Next()
+			{
+				Element *element = fNext;
+				if (fNext)
+					fNext = fQueue->GetNext(fNext);
+				return element;
+			}
 
-			private:
-				const Queue	*fQueue;
-				Element		*fNext;
-		};
+			ConstIterator &operator=(const ConstIterator &other)
+			{
+				fQueue = other.fQueue;
+				fNext = other.fNext;
+				return *this;
+			}
 
-	public:
-		DoublyLinkedQueue() : fFirst(NULL) {}
-		~DoublyLinkedQueue() {}
+			void Rewind()
+			{
+				fNext = fQueue->First();
+			}
 
-		inline bool IsEmpty() const		{ return (fFirst == NULL); }
+		private:
+			const Queue	*fQueue;
+			Element		*fNext;
+	};
 
-		inline void Insert(Element *element);
-		inline void Insert(Element *before, Element *element);
-		inline void Add(Element *element);
-		inline void Remove(Element *element);
+public:
+	DoublyLinkedQueue() : fFirst(NULL) {}
+	~DoublyLinkedQueue() {}
 
-		inline void Swap(Element *a, Element *b);
+	inline bool IsEmpty() const		{ return (fFirst == NULL); }
 
-		inline void MoveFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromList);
+	inline void Insert(Element *element);
+	inline void Insert(Element *before, Element *element);
+	inline void Add(Element *element);
+	inline void Remove(Element *element);
 
-		inline void RemoveAll();
-		inline void MakeEmpty()			{ RemoveAll(); }
+	inline void Swap(Element *a, Element *b);
 
-		inline Element *First() const	{ return fFirst; }
-		inline Element *Head() const	{ return fFirst; }
+	inline void MoveFrom(DOUBLY_LINKED_QUEUE_CLASS_NAME *fromList);
 
-		inline Element *RemoveHead();
+	inline void RemoveAll();
+	inline void MakeEmpty()			{ RemoveAll(); }
 
-		inline Element *GetPrevious(Element *element) const;
-		inline Element *GetNext(Element *element) const;
+	inline Element *First() const	{ return fFirst; }
+	inline Element *Head() const	{ return fFirst; }
 
-		inline int32 Size() const;
-			// O(n)!
+	inline Element *RemoveHead();
 
-		inline Iterator GetIterator()				{ return Iterator(this); }
-		inline ConstIterator GetIterator() const	{ return ConstIterator(this); }
+	inline Element *GetPrevious(Element *element) const;
+	inline Element *GetNext(Element *element) const;
 
-	private:
-		Element	*fFirst;
-	
-		static GetLink	sGetLink;
+	inline int32 Size() const;
+		// O(n)!
+
+	inline Iterator GetIterator()				{ return Iterator(this); }
+	inline ConstIterator GetIterator() const	{ return ConstIterator(this); }
+
+private:
+	Element	*fFirst;
+
+	static GetLink	sGetLink;
 };
 
 
