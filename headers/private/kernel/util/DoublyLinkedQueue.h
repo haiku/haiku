@@ -139,7 +139,7 @@ public:
 	inline bool IsEmpty() const		{ return (fFirst == NULL); }
 
 	inline void Insert(Element *element);
-	inline void Insert(Element *before, Element *element);
+	inline void InsertBefore(Element *before, Element *element);
 	inline void Add(Element *element);
 	inline void Remove(Element *element);
 
@@ -191,7 +191,7 @@ DOUBLY_LINKED_QUEUE_CLASS_NAME::Insert(Element *element)
 // Insert
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
-DOUBLY_LINKED_QUEUE_CLASS_NAME::Insert(Element *before, Element *element)
+DOUBLY_LINKED_QUEUE_CLASS_NAME::InsertBefore(Element *before, Element *element)
 {
 	if (before == NULL) {
 		Insert(element);
