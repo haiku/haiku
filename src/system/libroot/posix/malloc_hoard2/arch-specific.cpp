@@ -79,8 +79,6 @@ __init_after_fork(void)
 			sHeapBase);
 		exit(1);
 	}
-
-	hoardLockInit(sHeapLock, "heap");
 }
 
 

@@ -262,6 +262,8 @@ __heap_before_fork(void)
 	static processHeap *pHeap = getAllocator();
 	for (int i = 0; i < pHeap->getMaxThreadHeaps(); i++)
 		pHeap->getHeap(i).lock();
+
+	static_cast<hoardHeap*>(pHeap)->lock();
 }
 
 void __init_after_fork(void);
@@ -273,6 +275,8 @@ __heap_after_fork_child(void)
 	static processHeap *pHeap = getAllocator();
 	for (int i = 0; i < pHeap->getMaxThreadHeaps(); i++)
 		pHeap->getHeap(i).initLock();
+
+	pHeap->initLock();
 }
 
 
@@ -282,6 +286,8 @@ __heap_after_fork_parent(void)
 	static processHeap *pHeap = getAllocator();
 	for (int i = 0; i < pHeap->getMaxThreadHeaps(); i++)
 		pHeap->getHeap(i).unlock();
+
+	static_cast<hoardHeap*>(pHeap)->unlock();
 }
 
 
