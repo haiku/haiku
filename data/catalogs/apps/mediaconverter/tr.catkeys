@@ -1,6 +1,5 @@
-1	turkish	x-vnd.Haiku-MediaConverter	1833571229
+1	turkish	x-vnd.Haiku-MediaConverter	517958556
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Kaynak dosyaları
 Error writing video frame %lld	MediaConverter		Video çerçevesi %lld yazılırken hata
 Audio quality: %s	MediaConverter		Ses kalitesi: %s

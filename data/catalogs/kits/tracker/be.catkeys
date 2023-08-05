@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3294685125
+1	belarusian	x-vnd.Haiku-libtracker	1112827569
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -15,7 +15,6 @@ Location:	InfoWindow		Месцазнаходжанне:
 Name	PoseView		Імя
 Kind:	InfoWindow		Род:
 contains	FindPanel		месціць
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Адкрыць
 You can't replace a folder with one of its sub-folders.	FSUtils		Вы не можаце замяніць каталог адным з яго падкаталогаў.
 Name	Default Query Columns		Імя
@@ -25,11 +24,9 @@ Searching for disks to mount…	StatusWindow		Пошук дыскаў для м�
 Error emptying Trash	FSUtils		Памылка пры ачыстцы Сметніцы
 Opens with:	InfoWindow		Адкрыць з:
 Size	QueryPoseView		Памер
-128 x 128	ContainerWindow		128 x 128
 Prompt	FSUtils		Падказка
 Error in regular expression:\n\n'%errstring'	PoseView		Памылка ў рэгулярным выразе:\n\n'%errstring'
 Would you like to find a suitable application to open the file?	FSUtils		Ці жадаеце пашукаць падыходзячую парграму для гэтага файла?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Вы не можаце замяніць каталог або спасылку рэальным файлам.
 Handles any file	OpenWithWindow		Працуе з любым файлам
 save text	FilePanelPriv		захаваць тэкст
@@ -39,7 +36,6 @@ Select…	ContainerWindow		Выбраць…
 Show shared volumes on Desktop	SettingsView		Паказаць на Дэсктопе тамы з агульным доступам
 Size	PoseView		Памер
 matches wildcard expression	SelectionWindow		супадае з падстановачнымі выразамі
-96 x 96	ContainerWindow		96 x 96
 Identify	ContainerWindow		Ідэнтыфікаваць
 Create link	ContainerWindow		Стварыць спасылку
 starts with	FindPanel		пачынаецца з
@@ -156,7 +152,6 @@ Cancel	FSUtils		Адмена
 Original name	ContainerWindow		Першапачатковае імя
 Unknown	WidgetAttributeText		Невядомы
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Пазначанае імя ужо выкарыстана як імя каталога. Калі ласка, выберыце іншае.
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Зменены
 Mini icon view	ContainerWindow		Від міні-іконак
 File	FilePanelPriv		Файл
@@ -184,7 +179,6 @@ Select all	DeskWindow		Выбраць усё
 Decrease size	ContainerWindow		Паменшыць памер
 Recent queries	FindPanel		Папярэднія запыты
 Mount all	MountMenu		Мантаваць усё
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Памер
 Favorites	FavoritesMenu		Выбранае
 Delete	FilePanelPriv		Выдаліць
@@ -211,8 +205,8 @@ Empty Trash	ContainerWindow		Ачысціць Сметніцу
 no supporting apps	OpenWithWindow		няма падыходзячых праграм
 Preparing to empty Trash…	StatusWindow		Падрыхтоўка да ачысткі Сметніцы…
 Deleting: 	StatusWindow		Выдаляецца: 
-label too long	PoseView		метка занадта доўгая
 You can't move or copy the trash.	FSUtils		Вы не можаце перамяшчаць ці капіяваць у Сметніцу.
+label too long	PoseView		метка занадта доўгая
 Error creating link to \"%name\".	FSUtils		Памылка пры стварэнні спасылкі на \"%name\".
 Unknown	FilePermissionsView		Невядома
 Paste links	ContainerWindow		Устаўляць спасылкі
@@ -251,8 +245,8 @@ of %items	StatusWindow		з %items
 less than	FindPanel		менш за
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Памылка пры капіяванні файла \"%name\":\n\t%error\n\nЖадаеце працягваць?
 Creating links: 	StatusWindow		Стварэнне спасылак: 
-Create %s clipping	PoseView		Стварыць %s выразку
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць \"%document\" праграмай \"%app\" (%error). 
+Create %s clipping	PoseView		Стварыць %s выразку
 Error moving \"%name\"	FSUtils		Памылка пры перамяшчэнні \"%name\"
 To: %dir	StatusWindow		Да: %dir
 Paste layout	ContainerWindow		Уставіць макет
@@ -286,7 +280,6 @@ Automatic disk mounting	AutoMounterSettings		Аўтаматычнае манта
 parent folder	NavMenu		бацькоўскі каталог
 Create link here	ContainerWindow		Стварыць спасылку тут
 Force identify	ContainerWindow		Ідэнтыфікаваць прымусова
-48 x 48	DeskWindow		48 x 48
 no items	CountView		няма элементаў
 Disks	DirMenu		Дыскі
 Query name:	FindPanel		Імя Запыту:
@@ -324,7 +317,6 @@ KiB	WidgetAttributeText		КіБ
 Revert	TrackerSettingsWindow		Вярнуць
 trash	B_TRASH_DIRECTORY		сметнік
 Close all in workspace	ContainerWindow		Закрыць усё на гэтым стале
-32 x 32	DeskWindow		32 x 32
 Finish: %time - %finishtime left	StatusWindow		Завяршэнне: %time - засталося %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Не ўдалося адкрыць \"%document\" (Не хапае бібліятэк: %library). \n
 Create relative link here	ContainerWindow		Стварыць адносную ссылку сюды
@@ -349,10 +341,7 @@ Outline selection rectangle only	SettingsView		Непразрыстае выдз
 by formula	FindPanel		па формуле
 Move to Trash	FilePanelPriv		Адправіць у Сметніцу
 is	FindPanel		-
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 New folder %ld	FSUtils		Новы каталог %ld
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" есць праграмай старога тыпу. Калі ласка набудзце ці збярыце яе новую версію.
 Only the boot disk	AutoMounterSettings		Толькі загрузачны дыск
 Modified	Default Query Columns		Зменены
@@ -380,11 +369,10 @@ Empty folder	NavMenu		Пусты каталог
 Defaults	TrackerSettingsWindow		Прадвызначаныя
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Прабачце, не хапае месца на томе прызначэння для капіявання выбранага.
 Add-ons	FilePanelPriv		Дапаўненні
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Пусты каталог
 Move to Trash	FSUtils		Адправіць у Сметніцу
-Cancel	PoseView		Адмена
 Handles %type	OpenWithWindow		Працуе з %type
+Cancel	PoseView		Адмена
 Delete	PoseView		Выдаліць
 Sorry, you can't copy items to the Trash.	PoseView		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 New folder	FilePanelPriv		Новы каталог

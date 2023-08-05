@@ -1,9 +1,7 @@
-1	czech	x-vnd.Haiku.TV	1995288111
+1	czech	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Bez menu
 No border	MainWin		Bez okraje
-force 704 x 576, display aspect 4:3	MainWin		vynutit 704 x 576, poměr stran 4:3
 Error, connecting to interface failed:\n\n	MainWin		Chyba, připojení k rozhraní selhalo:\n\n
-force 544 x 576, display aspect 4:3	MainWin		vynutit 544 x 576, poměr stran 4:3
 Full screen	MainWin		Celá obrazovka
 Scale to native size	MainWin		Změnit velikost na původní
 unknown	MainWin		neznámý
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Always on top	MainWin		Vždy navrchu
 Debug	MainWin		Debugovat
 Interface	MainWin		Rozhraní
-force 720 x 576, display aspect 4:3	MainWin		vynutit 720 x 576, poměr stran 4:3
 Quit	MainWin		Ukončit
 Channel	MainWin		Kanál
 Previous channel	MainWin		Předchozí kanál

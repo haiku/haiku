@@ -1,11 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-Magnify	1248284405
+1	catalan; valencian	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  cal que sigui > 4 i un múltiple de 4
 Decrease pixel size	Magnify-Main		Redueix la mida del píxel
 no clip msg	In console, when clipboard is empty after clicking Copy image		res al porta-retalls
 Increase pixel size	Magnify-Main		Augmenta la mida del píxel
 magnify: size must be a multiple of 4	Console		magnify: la mida ha de ser un múltiple de 4
 Stick coordinates	Magnify-Main		Fixa les coordenades
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# píxel / píxel} other{# píxels / píxel}}
 Copy image	Magnify-Main		Copia la imatge
 Decrease window size	Magnify-Main		Redueix la mida de la finestra
 Remove a crosshair	Magnify-Main		Suprimeix un reticle

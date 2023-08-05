@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1609247133
+1	japanese	x-vnd.Haiku-libtracker	3722356873
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -18,7 +18,6 @@ Name	PoseView		名前
 Kind:	InfoWindow		種類:
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# バイト} other{# バイト}}
 contains	FindPanel		含む
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		開く
 Bitmap icon	AttributesView		ビットマップアイコン
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
@@ -32,14 +31,12 @@ Information	InfoWindow		情報
 Error emptying Trash	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:
 Size	QueryPoseView		サイズ
-128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		ディスクのマウント
 Type	AttributesView		型
 Prompt	FSUtils		プロンプト
 Error in regular expression:\n\n'%errstring'	PoseView		正規表現にエラーがあります:\n\n'%errstring'
 Small bitmap icon	AttributesView		小ビットマップアイコン
 Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
 (unknown)	InfoWindow		(不明)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# 日>}}
@@ -54,7 +51,6 @@ Select…	ContainerWindow		選択...
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示
 Size	PoseView		サイズ
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		タイトル
 Identify	ContainerWindow		ファイル形式を判別
 Create link	ContainerWindow		リンクの作成
@@ -217,7 +213,6 @@ Original name	ContainerWindow		元の名前
 Unknown	WidgetAttributeText		不明
 32-bit integer	AttributesView		32 ビット整数
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定された名前はすでにフォルダー名として使用されています。別の名前を指定してください。
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		更新日時
 Mini icon view	ContainerWindow		ミニアイコン表示
 File	FilePanelPriv		ファイル
@@ -251,7 +246,6 @@ Double-precision floating point number	AttributesView		倍精度浮動小数点�
 Decrease size	ContainerWindow		縮小
 Recent queries	FindPanel		最近使ったクエリ
 Mount all	MountMenu		すべてマウント
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		サイズ
 Favorites	FavoritesMenu		お気に入り
 Delete	FilePanelPriv		削除
@@ -286,9 +280,9 @@ no supporting apps	OpenWithWindow		対応するアプリケーションはあり
 32-bit unsigned integer	AttributesView		32 ビット符号無し整数
 Preparing to empty Trash…	StatusWindow		ごみ箱を空にする準備をしています...
 Deleting: 	StatusWindow		削除中:
-label too long	PoseView		ラベルが長すぎます
 the MIME settings	FSUtils		MIME 設定
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。
+label too long	PoseView		ラベルが長すぎます
 Error creating link to \"%name\".	FSUtils		\"%name\"へのリンク作成時にエラーが発生しました。
 Unknown	FilePermissionsView		不明
 Paste links	ContainerWindow		リンクを貼り付ける
@@ -337,8 +331,8 @@ MIME Path	AttributesView		MIME パス
 less than	FindPanel		より小さい
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました:\n\t%error\n\nそれでも続けますか?
 Creating links: 	StatusWindow		作成中リンク:
-Create %s clipping	PoseView		%s クリップの作成
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		アプリケーション \"%app\" を使って \"%document\" を開けません (%error)。
+Create %s clipping	PoseView		%s クリップの作成
 Error moving \"%name\"	FSUtils		\"%name\" の移動中にエラーが発生
 To: %dir	StatusWindow		%dir
 Paste layout	ContainerWindow		レイアウトを貼り付け
@@ -383,7 +377,6 @@ Automatic disk mounting	AutoMounterSettings		ディスクの自動マウント
 parent folder	NavMenu		親フォルダー
 Create link here	ContainerWindow		ここにリンクを作成
 Force identify	ContainerWindow		ファイル形式の判別
-48 x 48	DeskWindow		48 x 48
 no items	CountView		0 項目
 Time	AttributesView		時間
 Disks	DirMenu		ディスク
@@ -429,7 +422,6 @@ trash	B_TRASH_DIRECTORY		ごみ箱
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		システムフォルダーやその内容を移動すると、%osName が起動しなくなります!\n\n移動しますか?\n\nそれでもシステムフォルダーやその内容を移動するなら、シフトキーを押しながら \"移動\" をクリックしてください。
 Close all in workspace	ContainerWindow		ワークスペース内のすべてを閉じる
 Corrupted expression.	libtracker		式が間違っています。
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		ネットワークアドレス
 Finish: %time - %finishtime left	StatusWindow		終了: %time - 残り %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		\"%document\" を開けません (%library ライブラリが見つからない)。\n
@@ -466,11 +458,8 @@ Resize to fit	VirtualDirectoryWindow		最適な表示サイズに変更
 Move to Trash	FilePanelPriv		ごみ箱に捨てる
 is	FindPanel		と等しい
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		システムフォルダーやその内容の名前を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容の名前を変更するなら、シフトキーを押しながら \"名前の変更\" をクリックしてください。
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		アクセス権
 New folder %ld	FSUtils		新規フォルダー %ld 
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションを再コンパイルしてください。
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
 Message	AttributesView		Message
@@ -507,12 +496,11 @@ Defaults	TrackerSettingsWindow		デフォルト
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
 True-color picture	AttributesView		トゥルーカラー画像
 Add-ons	FilePanelPriv		アドオン
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		空フォルダー
 Alignment	AttributesView		配置
 Move to Trash	FSUtils		ごみ箱に捨てる
-Cancel	PoseView		中止
 Handles %type	OpenWithWindow		%type に対応
+Cancel	PoseView		中止
 Delete	PoseView		削除
 Media parameter	AttributesView		メディアパラメーター
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		ホームフォルダーの内容を変更すると、%osName は正しく動作しないかもしれません!\n\n内容を変更しますか?\n\nそれでもホームフォルダーの内容を変更するなら、シフトキーを押しながら \"私はなにをするか理解しています\" をクリックしてください。

@@ -1,6 +1,5 @@
-1	esperanto	x-vnd.Haiku-MediaConverter	2116725671
+1	esperanto	x-vnd.Haiku-MediaConverter	801112998
 Input file not recognized as Audio or Video	MediaConverter		Eniga dosiero ne estas rekonita kiel aŭdaĵo aŭ video
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u * %u, %.2f kadrojn sekunde
 Source files	MediaConverter		Fontaj dosieroj
 Error converting '%filename'	MediaConverter		Eraro de konvertado de '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Elektita dosierujo ne estis trovita. Defaŭltigita al /boot/home

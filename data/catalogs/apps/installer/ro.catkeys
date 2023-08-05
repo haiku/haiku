@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	1928805340
+1	romanian	x-vnd.Haiku-Installer	954345363
 Performing installation.	InstallProgress		Se execută instalarea.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Închideți fereastra DriveSetup înainte de a închide fereastra Installer.
 No optional packages available.	PackagesView		Nu sunt disponibile pachete opționale.
@@ -14,6 +14,7 @@ README	InstallerApp		README
 Quit	InstallerWindow		Ieșire
 Write boot sector to '%s'	InstallerWindow		Scrie sectorul de boot pe „%s”
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.
+Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Se rulează BootManager și DriveSetup…\n\nÎnchideți ambele aplicații pentru a continua instalarea.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Installer Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplicația pentru configurarea partițiilor de disc, nu a putut fi lansată.
@@ -33,6 +34,7 @@ Hide optional packages	InstallerWindow		Ascunde pachetele opționale
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Distracție plăcută și mulțumim că ați încercat Haiku!
 Quit	InstallerApp		Ieșire
+Quit BootManager and DriveSetup	InstallerWindow		Ieșire BootManager și DriveSetup
 Error writing boot sector.	InstallProgress		Eroare la scrierea sectorului de boot.
 OK	InstallerWindow		OK
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Când porniți cu succes Haiku pentru prima dată, asigurați-vă că citiți \„Ghidul utilizatorului\” și efectuați \„Turul rapid\”. Există legături pe desktop și în marcajele WebPositive.\n\n
@@ -41,12 +43,14 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAȚII IMPO
 Additional disk space required: %s	InstallerWindow		Spațiu pe disc suplimentar necesar: %s
 Stop	InstallerWindow	In alert after pressing Stop	Oprește
 Boot sector successfully written.	InstallProgress		Sectorul de boot scris cu succes.
+Failed to launch BootManager	InstallerWindow		Nu s-a putut lansa BootManager
 Writing bootsector.	InstallProgress		Se scrie sectorul boot.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		A apărut o eroare și instalarea nu a fost finalizată:\n\nEroare:  %s
 Restart	InstallerWindow		Repornire
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Discul nu poate fi montat. Alegeți un alt disc.
 Begin	InstallerWindow		Începe
 Collecting copy information.	InstallProgress		Se colectează informațiile de copiere.
+Set up boot menu…	InstallerWindow		Configurează meniul de boot…
 Show optional packages	InstallerWindow		Arată pachetele opționale
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Nu s-au găsit partiții adecvate pentru instalare. Configurați partițiile și formatați cel puțin o partiție cu sistemul de fișiere Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Este posibil ca discul de destinație să nu aibă suficient spațiu. Încercați să alegeți un alt disc sau alegeți să nu instalați elemente opționale.
@@ -57,11 +61,13 @@ Continue	InstallerWindow	In alert after pressing Stop	Continuă
 Scanning for disks…	InstallerWindow		Se scanează după discuri…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Se rulează DriveSetup...\n\nÎnchideți DriveSetup pentru a continua cu instalarea.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Instalarea nu este încă finalizată!\nSigur doriți să o opriți?
+Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		Se rulează BootManager…\n\nÎnchideți BootManager pentru a continua instalarea.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Partiția nu poate fi montată. Alegeți o altă partiție.
 Set up partitions…	InstallerWindow		Configurare partiții…
 Install progress:  	InstallerWindow		Progresul instalării:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nu puteți instala conținutul unui disc pe el însuși. Alegeți un alt disc.
 OK	InstallProgress		OK
+Quit BootManager	InstallerWindow		Ieșire BootManager
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sigur doriți să instalați pe discul de boot curent? Installer va trebui să repornească mașina dacă veți continua.
 Onto:	InstallerWindow		Pe:
 Tools	InstallerWindow		Unelte

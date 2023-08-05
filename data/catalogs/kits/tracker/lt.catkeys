@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1178336514
+1	lithuanian	x-vnd.Haiku-libtracker	3291446254
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -15,7 +15,6 @@ Location:	InfoWindow		Vieta:
 Name	PoseView		Vardas
 Kind:	InfoWindow		Tipas:
 contains	FindPanel		savyje turi
-32 x 32	ContainerWindow		32×32
 Open	FilePanelPriv		Atverti
 You can't replace a folder with one of its sub-folders.	FSUtils		Aplanko pakeisti vienu jo poaplankių negalima.
 Name	Default Query Columns		Pavadinimas
@@ -25,11 +24,9 @@ Searching for disks to mount…	StatusWindow		Ieškoma prijungtinų diskų…
 Error emptying Trash	FSUtils		Klaida tuštinant Šiukšlinę
 Opens with:	InfoWindow		Atveriamas naudojant:
 Size	QueryPoseView		Dydis
-128 x 128	ContainerWindow		128×128
 Prompt	FSUtils		Klausti
 Error in regular expression:\n\n'%errstring'	PoseView		Klaida reguliariąjame reiškinyje:\n\n„%errstring“
 Would you like to find a suitable application to open the file?	FSUtils		Ar norite paieškoti tinkamos programos šiam failui atverti?
-64 x 64	ContainerWindow		64×64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Aplanko arba simbolinės nuorodos pakeisti failu negalima.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ties %func \nnepavyko įvykdyti find_directory(). \nPriežastis: %error
 Handles any file	OpenWithWindow		Palaiko visus failus
@@ -40,7 +37,6 @@ Select…	ContainerWindow		Pažymėti…
 Show shared volumes on Desktop	SettingsView		Darbalaukyje rodyti bendrintus tomus
 Size	PoseView		Dydis
 matches wildcard expression	SelectionWindow		atitinka šabloną
-96 x 96	ContainerWindow		96×96
 Identify	ContainerWindow		Atpažinti
 Create link	ContainerWindow		Kurti nuorodą
 starts with	FindPanel		prasideda
@@ -158,7 +154,6 @@ Cancel	FSUtils		Atsisakyti
 Original name	ContainerWindow		Tikras vardas
 Unknown	WidgetAttributeText		Nežinomas
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Nurodytu vardu jau yra pavadintas aplankas. Įveskite kitą vardą.
-48 x 48	ContainerWindow		48×48
 Modified	ContainerWindow		Modifikavimo data
 Mini icon view	ContainerWindow		Rodyti mažas piktogramas
 File	FilePanelPriv		Failas
@@ -186,7 +181,6 @@ Select all	DeskWindow		Pažymėti viską
 Decrease size	ContainerWindow		Sumažinti
 Recent queries	FindPanel		Paskiausios užklausos
 Mount all	MountMenu		Prijungti visus
-128 x 128	DeskWindow		128×128
 Size	Default Query Columns		Dydis
 Favorites	FavoritesMenu		Parankiniai
 Delete	FilePanelPriv		Šalinti
@@ -213,8 +207,8 @@ Empty Trash	ContainerWindow		Ištuštinti šiukšlinę
 no supporting apps	OpenWithWindow		palaikančių programų nėra
 Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
 Deleting: 	StatusWindow		Šalinama:
-label too long	PoseView		vardas per ilgas
 You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
+label too long	PoseView		vardas per ilgas
 Error creating link to \"%name\".	FSUtils		Klaida kuriant nuorodą į „%name“.
 Unknown	FilePermissionsView		Nežinomas
 Paste links	ContainerWindow		Įdėti nuorodas
@@ -253,8 +247,8 @@ of %items	StatusWindow		iš %items
 less than	FindPanel		mažesnis nei
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant failą „%name“:\n\t%error\n\nAr norite tęsti?
 Creating links: 	StatusWindow		Kuriamos nuorodos:
-Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error).
+Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
 Error moving \"%name\"	FSUtils		Klaida perkeliant „%name“
 To: %dir	StatusWindow		Į: %dir
 Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
@@ -288,7 +282,6 @@ Automatic disk mounting	AutoMounterSettings		Automatiškai prijungti tomus:
 parent folder	NavMenu		Viršaplankis
 Create link here	ContainerWindow		Sukurti nuorodą čia
 Force identify	ContainerWindow		Priverstinai atpažinti
-48 x 48	DeskWindow		48×48
 no items	CountView		Objektų nėra
 Disks	DirMenu		Tomai
 Query name:	FindPanel		Užklausos vardas:
@@ -326,7 +319,6 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Atšaukti pakeitimus
 trash	B_TRASH_DIRECTORY		Šiukšlinė
 Close all in workspace	ContainerWindow		Užverti visus šiame darbalaukyje
-32 x 32	DeskWindow		32×32
 Finish: %time - %finishtime left	StatusWindow		Pabaiga: %time – liko dar %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Failo „%document“ nepavyko atverti (trūksta bibliotekų: %library).\n
 Create relative link here	ContainerWindow		Sukurti santykinę nuorodą čia
@@ -352,10 +344,7 @@ Outline selection rectangle only	SettingsView		Žymint, rodyti tik kontūrą
 by formula	FindPanel		pagal formulę
 Move to Trash	FilePanelPriv		Išmesti Šiukšlinėn
 is	FindPanel		lygus
-40 x 40	DeskWindow		40×40
-40 x 40	ContainerWindow		40×40
 New folder %ld	FSUtils		Naujas aplankas %ld
-64 x 64	DeskWindow		64×64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name%“ yra pasenusio tipo vykdomasis failas. Įsigykite naujesnę programos versiją arba ją perkompiliuokite.
 Only the boot disk	AutoMounterSettings		Tik paleidimo tomą
 Modified	Default Query Columns		Modifikavimo data
@@ -383,11 +372,10 @@ Empty folder	NavMenu		Aplankas tuščias
 Defaults	TrackerSettingsWindow		Numatytai
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Deja, paskirties tome nepakanka laisvos vietos pažymėtiems objektams nukopijuoti.
 Add-ons	FilePanelPriv		Priedai
-96 x 96	DeskWindow		96×96
 Empty folder	SlowContextPopup		Tuščias aplankas
 Move to Trash	FSUtils		Išmesti Šiukšlinėn
-Cancel	PoseView		Atsisakyti
 Handles %type	OpenWithWindow		Palaiko %type
+Cancel	PoseView		Atsisakyti
 Delete	PoseView		Šalinti
 Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 New folder	FilePanelPriv		Naujas aplankas

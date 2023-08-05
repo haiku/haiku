@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1384182
+1	swedish	x-vnd.Haiku-libtracker	2114493922
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -18,7 +18,6 @@ Name	PoseView		Namn
 Kind:	InfoWindow		Typ:
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		innehåller
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Öppna
 Bitmap icon	AttributesView		Bitmappsikon
 You can't replace a folder with one of its sub-folders.	FSUtils		Du kan inte ersätta en katalog med en av dess underkataloger.
@@ -32,14 +31,12 @@ Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Ett fel uppstod när Papperskorgen skulle tömmas
 Opens with:	InfoWindow		Öppnas med:
 Size	QueryPoseView		Storlek
-128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		Diskmontering
 Type	AttributesView		Typ
 Prompt	FSUtils		Prompt
 Error in regular expression:\n\n'%errstring'	PoseView		Fel i reguljärt uttryck:\n\n'%errstring'
 Small bitmap icon	AttributesView		Liten bitmappsikon
 Would you like to find a suitable application to open the file?	FSUtils		Vill du hitta ett passande program att öppna filen med?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan inte ersätta en mapp eller en mjuk länk med en fil.
 (unknown)	InfoWindow		(okänd)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datum>}}
@@ -54,7 +51,6 @@ Select…	ContainerWindow		Markera...
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
 Size	PoseView		Storlek
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identifiera
 Create link	ContainerWindow		Skapa länk
@@ -217,7 +213,6 @@ Original name	ContainerWindow		Originalnamn
 Unknown	WidgetAttributeText		Okänd
 32-bit integer	AttributesView		32-bitars integer
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Det valda namnet används redan som namnet på katalogen. Var god välj ett annat namn.
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Ändrad
 Mini icon view	ContainerWindow		Mini ikonvy
 File	FilePanelPriv		Arkiv
@@ -251,7 +246,6 @@ Double-precision floating point number	AttributesView		Dubbelreella flyttal
 Decrease size	ContainerWindow		Minska storleken
 Recent queries	FindPanel		Senaste frågor
 Mount all	MountMenu		Montera alla
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Storlek
 Favorites	FavoritesMenu		Favoriter
 Delete	FilePanelPriv		Ta bort
@@ -286,9 +280,9 @@ no supporting apps	OpenWithWindow		program saknas
 32-bit unsigned integer	AttributesView		32-bitars osignerad integer
 Preparing to empty Trash…	StatusWindow		Förbereder inför tömning av Papperskorgen...
 Deleting: 	StatusWindow		Tar bort:
-label too long	PoseView		etiketten är för lång
 the MIME settings	FSUtils		MIME-inställningarna
 You can't move or copy the trash.	FSUtils		Du kan inte flytta eller kopiera Papperskorgen.
+label too long	PoseView		etiketten är för lång
 Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till \"%name\".
 Unknown	FilePermissionsView		Okänd
 Paste links	ContainerWindow		Klistra in länkar
@@ -337,8 +331,8 @@ MIME Path	AttributesView		MIME-sökväg
 less than	FindPanel		mindre än
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen \"%name\":\n\t%error\n\nVill du fortsätta?
 Creating links: 	StatusWindow		Skapar länkar:
-Create %s clipping	PoseView		Skapa %s förkortning
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (%error). 
+Create %s clipping	PoseView		Skapa %s förkortning
 Error moving \"%name\"	FSUtils		Fel vid flyttande av \"%name\"
 To: %dir	StatusWindow		Till: %dir
 Paste layout	ContainerWindow		Klistra in layout
@@ -382,7 +376,6 @@ Automatic disk mounting	AutoMounterSettings		Montera volymer automatiskt
 parent folder	NavMenu		föräldrakatalog
 Create link here	ContainerWindow		Skapa länk här
 Force identify	ContainerWindow		Tvinga identifiering
-48 x 48	DeskWindow		48 x 48
 no items	CountView		inga objekt
 Time	AttributesView		Tid
 Disks	DirMenu		Diskar
@@ -428,7 +421,6 @@ trash	B_TRASH_DIRECTORY		papperskorg
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Om du flyttar systemmappen kommer du kanske inte kunna starta %osName!\n\nÄr du säker på att du vill göra detta?\n\nFör att flytta systemmappen ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Flytta\".
 Close all in workspace	ContainerWindow		Stäng allt i arbetsytan
 Corrupted expression.	libtracker		Korrupt uttryck.
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Nätverksadress
 Finish: %time - %finishtime left	StatusWindow		Klar: %time - %finishtime kvar
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Kunde inte öppna \"%document\" (Saknar bibliotek: %library). \n
@@ -465,11 +457,8 @@ Resize to fit	VirtualDirectoryWindow		Ändra storlek för att passa
 Move to Trash	FilePanelPriv		Flytta till papperskorg
 is	FindPanel		är
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Om du byter namn på systemmappen eller dess innehåll kommer du kanske inte kunna starta %osName!\n\nÄr du säker på att du vill göra detta?\n\nFör att byta namn ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Byt namn\".
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		Behörigheter
 New folder %ld	FSUtils		Ny mapp %ld
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" Den körbara filen är från ett gammalt system. Var vänlig uppdatera din fil eller bygg om programmet.
 Only the boot disk	AutoMounterSettings		Bara uppstartsdisken
 Message	AttributesView		Meddelande
@@ -506,12 +495,11 @@ Defaults	TrackerSettingsWindow		Förval
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Det finns inte tillräckligt ledig minne på destinationsdisken för att kopiera markeringen.
 True-color picture	AttributesView		Bild i miljontals färger
 Add-ons	FilePanelPriv		Tillägg
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Tom mapp
 Alignment	AttributesView		Orientation
 Move to Trash	FSUtils		Flytta till Papperskorgen
-Cancel	PoseView		Avbryt
 Handles %type	OpenWithWindow		Hanterar %type
+Cancel	PoseView		Avbryt
 Delete	PoseView		Ta bort
 Media parameter	AttributesView		Mediaparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Om du gör ändringar i hemmappen kommer kanske inte %osName fungera som det ska!\n\nÄr du säker på att du vill göra detta?\n\nFör att göra ändringar ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Jag vet vad jag håller på med\".

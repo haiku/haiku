@@ -1,9 +1,7 @@
-1	friulian	x-vnd.Haiku.TV	1995288111
+1	friulian	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Nissun menù
 No border	MainWin		Nissun ôr
-force 704 x 576, display aspect 4:3	MainWin		sfuarce 704 x 576, aspiet dal visôr 4:3
 Error, connecting to interface failed:\n\n	MainWin		Erôr, la conession ae interface e je falide:\n\n
-force 544 x 576, display aspect 4:3	MainWin		sfuarce 544 x 576, aspiet dal visôr 4:3
 Full screen	MainWin		A plen visôr
 Scale to native size	MainWin		Dimensions origjinâls
 unknown	MainWin		no cognossût
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Trasmission TV Video Digjitâ
 Always on top	MainWin		Simpri denant
 Debug	MainWin		Debug
 Interface	MainWin		Interface
-force 720 x 576, display aspect 4:3	MainWin		sfuarce 720 x 576, aspiet dal visôr 4:3
 Quit	MainWin		Jes
 Channel	MainWin		Canâl
 Previous channel	MainWin		Canâl precedent

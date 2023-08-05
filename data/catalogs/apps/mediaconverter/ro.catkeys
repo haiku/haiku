@@ -1,7 +1,8 @@
-1	romanian	x-vnd.Haiku-MediaConverter	2116725671
+1	romanian	x-vnd.Haiku-MediaConverter	4224111830
 Input file not recognized as Audio or Video	MediaConverter		Fișierul de intrare nu este recunoscut ca audio sau video
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Fișiere sursă
+Error writing video frame %lld	MediaConverter		Eroare la scrierea cadrului video %lld
+Audio quality: %s	MediaConverter		Calitate audio: %s
 Error converting '%filename'	MediaConverter		Eroare la convertirea „%filename”
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Directorul selectat nu a fost găsit. Se întoarce la implicitul /boot/home
 Conversion completed	MediaConverter		Conversie finalizată
@@ -36,6 +37,7 @@ Conversion cancelled	MediaConverter		Conversia a fost anulată
 Low	MediaConverter		Scăzut
 Error loading files	MediaConverter		Eroare la încărcarea fișierelor
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		Calitate video: %s
 End   [ms]: 	MediaConverter		Final   [ms]: 
 Cancel	MediaConverter		Anulează
 OK	MediaConverter-FileInfo		OK
@@ -46,21 +48,27 @@ File details	MediaConverter		Detalii despre fișier
 No audio	Audio codecs list		Fără audio
 Drop media files onto this window	MediaConverter		Plasați fișiere media în această fereastră
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Error read audio frame %lld	MediaConverter		Eroare la citirea cadrului audio %lld
 Quit	Menu		Ieșire
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Writing audio track: %s complete	MediaConverter		Scrierea pistei audio: %s complet
 Duration:	MediaConverter-FileInfo		Durată:
 MediaConverter	System name		MediaConverter
+Writing video track: %s complete	MediaConverter		Scrierea pistei video: %s complet
 Error launching: %strError%	MediaConverter		Eroare la lansarea: %strError%
+Error writing audio frame %lld	MediaConverter		Eroare la scrierea cadrului audio %lld
 File format:	MediaConverter		Formatul fișierului:
 File	Menu		Fișier
 Video quality not supported	MediaConverter		Calitatea video nu este suportată
 Select this folder	MediaConverter		Selectează acest dosar
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz canal %ld
+Understood	MediaConverter		Am înțeles
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Fără video
 Continue	MediaConverter		Continuă
 Convert	MediaConverter		Convertire
 Audio quality not supported	MediaConverter		Calitatea audio nu este suportată
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eroare la scrierea în locația: %strPath%. Se întoarce la locația implicită: /boot/home
+Error read video frame %lld	MediaConverter		Eroare la citirea cadrului video %lld
 Preview	MediaConverter		Previzualizare
 Start [ms]: 	MediaConverter		Start [ms]: 

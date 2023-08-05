@@ -1,11 +1,10 @@
-1	swedish	x-vnd.Haiku-Magnify	1248284405
+1	swedish	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  storlek måste vara > 4 och en multipel av 4
 Decrease pixel size	Magnify-Main		Minska pixelstorlek
 no clip msg	In console, when clipboard is empty after clicking Copy image		inget urklipp finns
 Increase pixel size	Magnify-Main		Öka pixelstorlek
 magnify: size must be a multiple of 4	Console		magnify: storlek måste vara en multipel av 4
 Stick coordinates	Magnify-Main		Lås koordinater
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixlar/pixel}}
 Copy image	Magnify-Main		Kopiera bild
 Decrease window size	Magnify-Main		Minska fönsterstorlek
 Remove a crosshair	Magnify-Main		Ta bort korshår

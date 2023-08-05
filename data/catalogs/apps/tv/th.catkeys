@@ -1,9 +1,7 @@
-1	thai	x-vnd.Haiku.TV	1995288111
+1	thai	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		ไม่มีเมนู
 No border	MainWin		ไม่มีเส้นขอบ
-force 704 x 576, display aspect 4:3	MainWin		force 704 x 576, display aspect 4:3
 Error, connecting to interface failed:\n\n	MainWin		ข้อผิดพลาดการเชื่อมต่อกับอินเตอร์เฟสล้มเหลว:\n\n
-force 544 x 576, display aspect 4:3	MainWin		force 544 x 576, การแสดงผล 4:3
 Full screen	MainWin		เต็มจอ
 Scale to native size	MainWin		ปรับเป็นขนาดมาตรฐาน
 unknown	MainWin		ไม่ทราบ
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Always on top	MainWin		อยู่ด้านบนเสมอ
 Debug	MainWin		แก้ไข
 Interface	MainWin		อินเตอร์เฟส
-force 720 x 576, display aspect 4:3	MainWin		force 720 x 576,การแสดงผล 4:3
 Quit	MainWin		ออก
 Channel	MainWin		ช่อง
 Previous channel	MainWin		ช่องก่อนหน้านี้

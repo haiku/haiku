@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1384182
+1	ukrainian	x-vnd.Haiku-libtracker	2114493922
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -18,7 +18,6 @@ Name	PoseView		Назва
 Kind:	InfoWindow		Тип:
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# байт} few{# байти} other{# байтів}}
 contains	FindPanel		містить
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Відкрити
 Bitmap icon	AttributesView		Растровий значок
 You can't replace a folder with one of its sub-folders.	FSUtils		Ви не можете замінити папку однією з її ж підпапок.
@@ -32,14 +31,12 @@ Information	InfoWindow		Інформація
 Error emptying Trash	FSUtils		Помилка спустошення смітника!
 Opens with:	InfoWindow		Відкрити за допомогою:
 Size	QueryPoseView		Розмір
-128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		Підключення дисків
 Type	AttributesView		Тип
 Prompt	FSUtils		Підказка
 Error in regular expression:\n\n'%errstring'	PoseView		Помилка у регулярному виразі:\n\n'%errstring'
 Small bitmap icon	AttributesView		Малий растровий значок
 Would you like to find a suitable application to open the file?	FSUtils		Бажаєте знайти програму, яка зможе відкрити файл?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ви не можете замінити папку або символічне посилання файлом.
 (unknown)	InfoWindow		(невідомо)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# дати>}}
@@ -54,7 +51,6 @@ Select…	ContainerWindow		Вибрати…
 Show shared volumes on Desktop	SettingsView		Показати спільні томи на робочому столі
 Size	PoseView		Розмір
 matches wildcard expression	SelectionWindow		відповідає шаблону виразу
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Заголовок
 Identify	ContainerWindow		Визначити
 Create link	ContainerWindow		Створити посилання
@@ -217,7 +213,6 @@ Original name	ContainerWindow		Оригінальна назва
 Unknown	WidgetAttributeText		Невідомий
 32-bit integer	AttributesView		32-бітове ціле
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Зазначена назва вже використовується як назва папки. Виберіть іншу.
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Змінений
 Mini icon view	ContainerWindow		У вигляді міні-значків
 File	FilePanelPriv		Файл
@@ -251,7 +246,6 @@ Double-precision floating point number	AttributesView		Число з рухом�
 Decrease size	ContainerWindow		Зменшити розмір
 Recent queries	FindPanel		Недавні запити
 Mount all	MountMenu		Підключити все
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Розмір
 Favorites	FavoritesMenu		Вибрані папки
 Delete	FilePanelPriv		Видалити
@@ -286,9 +280,9 @@ no supporting apps	OpenWithWindow		програми не підтримують�
 32-bit unsigned integer	AttributesView		32-бітове ціле беззнакове
 Preparing to empty Trash…	StatusWindow		Підготовка смітника до спорожнення …
 Deleting: 	StatusWindow		Видалення: 
-label too long	PoseView		мітка задовга
 the MIME settings	FSUtils		настройки MIME
 You can't move or copy the trash.	FSUtils		Ви не можете копіювати або переміщати смітник.
+label too long	PoseView		мітка задовга
 Error creating link to \"%name\".	FSUtils		Помилка створення посилання на \«%name\».
 Unknown	FilePermissionsView		Невідомий
 Paste links	ContainerWindow		Вставити посилання
@@ -337,8 +331,8 @@ MIME Path	AttributesView		MIME Шлях
 less than	FindPanel		менше ніж
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання файлу \«%name\»:\n\t%error\n\nБажаєте продовжити?
 Creating links: 	StatusWindow		Створення посилань: 
-Create %s clipping	PoseView		Створити %s вирізку
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не вдалося відкрити \«%document\» програмою \«%app\» (%error). 
+Create %s clipping	PoseView		Створити %s вирізку
 Error moving \"%name\"	FSUtils		Помилка переміщення \«%name\»
 To: %dir	StatusWindow		До: %dir
 Paste layout	ContainerWindow		Вставити макет
@@ -382,7 +376,6 @@ Automatic disk mounting	AutoMounterSettings		Підключати автомат
 parent folder	NavMenu		батьківський каталог
 Create link here	ContainerWindow		Створити посилання
 Force identify	ContainerWindow		Ідентифікувати примусово
-48 x 48	DeskWindow		48 x 48
 no items	CountView		немає елементів
 Time	AttributesView		Час
 Disks	DirMenu		Диски
@@ -428,7 +421,6 @@ trash	B_TRASH_DIRECTORY		смітник
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		При переміщенні папки system або її вмісту, Ви не зможете завантажити %osName!\n\nВи впевнені що бажаєте цього?\n\nЩоб все рівно перемістити папку system або її вміст, затисніть кнопку Shift та натисніть \«Перемістити\».
 Close all in workspace	ContainerWindow		Закрити все у робочій області
 Corrupted expression.	libtracker		Пошкоджений вираз.
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Мережева адреса
 Finish: %time - %finishtime left	StatusWindow		Закінчення: %time – залишилось %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Не вдалося відкрити\«%document\» (Відсутня бібліотека: %library). \n
@@ -465,11 +457,8 @@ Resize to fit	VirtualDirectoryWindow		Вписати у розмір
 Move to Trash	FilePanelPriv		До смітника
 is	FindPanel		є
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		При зміні назви каталога system або його вмісту може стати неможливим завантаження %osName!\n\nВи впевнені що бажаєте цього? \n\nЩоб все рівно змінити назву каталога system або його вміст, утримуйте клавішу Shift та натисніть \«Перейменувати\».
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		Дозволи
 New folder %ld	FSUtils		Нова папка %ld
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\«%name\» програма застарілого типу. Будь-ласка отримайте оновлену версію.
 Only the boot disk	AutoMounterSettings		Тільки загрузочний диск
 Message	AttributesView		Повідомлення
@@ -506,12 +495,11 @@ Defaults	TrackerSettingsWindow		Типові настройки
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Вибачте, недостатньо вільного місця в томі призначення, щоб скопіювати виділене.
 True-color picture	AttributesView		TrueColor зображення
 Add-ons	FilePanelPriv		Доповнення
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Порожня папка
 Alignment	AttributesView		Вирівнювання
 Move to Trash	FSUtils		До смітника
-Cancel	PoseView		Скасувати
 Handles %type	OpenWithWindow		Підтримує %type
+Cancel	PoseView		Скасувати
 Delete	PoseView		Видалити
 Media parameter	AttributesView		Параметри медіа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		При зміні папки home %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього? \n\nЩоб все рівно змінити папку home, затисніть кнопку Shift та натисніть \«Я знаю що роблю\».

@@ -1,9 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku.TV	1995288111
+1	dutch; flemish	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Geen menu
 No border	MainWin		Randloos
-force 704 x 576, display aspect 4:3	MainWin		Forceer 704 x 576, beeldverhouding 4:3
 Error, connecting to interface failed:\n\n	MainWin		Fout, verbinden naar interface is mislukt:\n\n
-force 544 x 576, display aspect 4:3	MainWin		Forceer 544 x 576, beeldverhouding 4:3
 Full screen	MainWin		Volledig scherm
 Scale to native size	MainWin		Schalen tot oorspronkelijke grootte
 unknown	MainWin		onbekend
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting tv
 Always on top	MainWin		Altijd op de voorgrond
 Debug	MainWin		Debuggen
 Interface	MainWin		Interface
-force 720 x 576, display aspect 4:3	MainWin		forceer 704 x 576, beeldverhouding 4:3
 Quit	MainWin		Sluiten
 Channel	MainWin		Kanaal
 Previous channel	MainWin		Vorig kanaal

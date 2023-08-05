@@ -1,8 +1,10 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	1308365995
+1	ukrainian	x-vnd.haiku-icon_o_matic	478420397
 None	Icon-O-Matic-Properties		Пусто
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистити контур
 Add empty	Icon-O-Matic-ShapesList		Додати порожню
 Opening the icon failed!	Icon-O-Matic-Main		Збій відкриття значка!
 Add with path	Icon-O-Matic-ShapesList		Додати з контуром
+Paste properties	Icon-O-Matic-Properties		Вставити властивість
 Copy	Icon-O-Matic-Properties		Копіювати
 Color	Icon-O-Matic-PropertyNames		Колір
 Format	Icon-O-Matic-SavePanel		Формат
@@ -17,10 +19,14 @@ Paste	Icon-O-Matic-Properties		Вставити
 Close	Icon-O-Matic-Menu-File		Закрити
 Add rect	Icon-O-Matic-PathsList		Додати прямокутник
 Rotation	Icon-O-Matic-PropertyNames		Поворот
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Колір (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		атрибут BEOS:ICON
 Transform	Icon-O-Matic-PathManipulator		Трансформація
 Add shape with style	Icon-O-Matic-Menu-Shape		Додати форму зі стилем
+Change color	Icon-O-Matic-SetColorCmd		Змінити колір
 Remove	Icon-O-Matic-StylesList		Прибрати
 Cancel	Icon-O-Matic-Menu-Settings		Скасувати
+PNG set	Icon-O-Matic-SavePanel		PNG у наборі
 Transformation	Icon-O-Matic-TransformationBoxStates		Трансформація
 Closed	Icon-O-Matic-PropertyNames		Замкнений
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<нічого повторювати>
@@ -35,21 +41,26 @@ Flip	Icon-O-Matic-PathManipulator		Віддзеркалити
 Opacity	Icon-O-Matic-PropertyNames		Прозорість
 OK	Icon-O-Matic-ColorPicker		ОК
 Error: 	Icon-O-Matic-Main		Помилка: 
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Скинути {0, plural, one{трансформацію} other{трансформації}}
 Saving your document failed!	Icon-O-Matic-Exporter		Збій при збереженні документу!
 Snap to grid	Icon-O-Matic-Menu-Settings		Припасувати до сітки
 Opening the document failed!	Icon-O-Matic-Main		Збій при відкритті документу!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Прибрати {0, plural, one{стиль} other{стилі}}
 Add with path & style	Icon-O-Matic-ShapesList		Додати з контуром & стилем
 Shape	Icon-O-Matic-Menus		Форма
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступно>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Редагувати градієнт
 Min LOD	Icon-O-Matic-PropertyNames		Miн. LOD
 Add	Icon-O-Matic-TransformersList		Додати
 Settings	Icon-O-Matic-Menus		Налаштування
 Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
 Add	Icon-O-Matic-PathsList		Додати
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Додати {0, plural, one{стиль} other{стилі}}
 Remove	Icon-O-Matic-PathManipulator		Прибрати
 Duplicate	Icon-O-Matic-ShapesList		Дублікат
 Alpha	Icon-O-Matic-PropertyNames		Альфа
 Contour	Transformation		Обрис
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Додати {0, plural, one{трансформатор} other{трансформатори}}
 Rounding	Icon-O-Matic-PropertyNames		Округлення
 Joins	Icon-O-Matic-PropertyNames		З'єднання
 Cancel	Icon-O-Matic-ColorPicker		Скасувати
@@ -57,6 +68,7 @@ Duplicate	Icon-O-Matic-PathsList		Дублікат
 Save	Icon-O-Matic-Menu-Settings		Зберегти
 Export as…	Icon-O-Matic-Menu-File		Експортувати як…
 Error: 	Icon-O-Matic-Exporter		Помилка: 
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Прибрати {0, plural, one{форму} other{форми}}
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидний
 Don't save	Icon-O-Matic-Menu-Settings		Не зберігати
 Add shape with path	Icon-O-Matic-Menu-Shape		Додати форму з контуром
@@ -64,10 +76,14 @@ Translation X	Icon-O-Matic-PropertyNames		Перенести по X
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG при завантаженні файлу. Якщо перезаписати оригінальний файл, ця інформація буде втрачена.
 Rotate indices backwards	Icon-O-Matic-PathsList		Обійти точки проти годинника
 Overwrite	Icon-O-Matic-SVGExport		Перезаписати
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Додати {0, plural, one{форму} other{форми}}
 Cancel	Icon-O-Matic-SVGExport		Скасувати
 Open…	Icon-O-Matic-Menu-File		Відкрити…
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Прибрати {0, plural, one{трансформатор} other{трансформатори}}
 Remove	Icon-O-Matic-ShapesList		Прибрати
+HVIF source code	Icon-O-Matic-SavePanel		HVIF вихідний код
 Drop shapes	Icon-O-Matic-ShapesList		Скинути форми
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Зберегти значок
 Linear	Icon-O-Matic-StyleTypes		Лінійний
 Clean up	Icon-O-Matic-PathsList		Очистити
 Split	Icon-O-Matic-PathManipulator		Розділити
@@ -80,17 +96,22 @@ Remove	Icon-O-Matic-PathsList		Прибрати
 Style type	Icon-O-Matic-StyleTypes		Тип стилю
 Quit	Icon-O-Matic-Menu-File		Вийти
 Gradient	Icon-O-Matic-StyleTypes		Градієнт
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Колір (#%02x%02x%02x)
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Додати {0, plural, one{контур} other{контури}}
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Додати форму з контуром & стилем
 Radial	Icon-O-Matic-StyleTypes		Радіальний
 Text too long	Icon-O-Matic-StyledTextImport		Текст дуже довгий
 Caps	Icon-O-Matic-PropertyNames		Кінці ліній
 OK	Icon-O-Matic-SVGImport		ОК
+Import text	Icon-O-Matic-StyledTextImport		Імпорт тексту
 Append…	Icon-O-Matic-Menu-File		Додати…
 Scale Y	Icon-O-Matic-PropertyNames		Масштаб по Y
 Rotate indices forwards	Icon-O-Matic-PathsList		Обійти точки за годинником
 Save	Icon-O-Matic-Menu-File		Зберегти
+Cancel	Icon-O-Matic-StyledTextImport		Скасувати
 Add circle	Icon-O-Matic-PathsList		Додати коло
 Freeze transformation	Icon-O-Matic-ShapesList		Зафіксувати трансформацію
+META:ICON attribute	Icon-O-Matic-SavePanel		атрибут META:ICON
 Untitled	Icon-O-Matic-Main		Неназваний
 Max LOD	Icon-O-Matic-PropertyNames		Mакс. LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Зберегти зміни поточного значка перед закриттям?
@@ -100,6 +121,7 @@ Swatches	Icon-O-Matic-Menus		Палітри
 <modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого відмінити>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Прибрати {0, plural, one{контур} other{контури}}
 Add	Icon-O-Matic-StylesList		Додати
 Translation Y	Icon-O-Matic-PropertyNames		Перенести по Y
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб

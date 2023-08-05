@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	1439068036
+1	romanian	x-vnd.Haiku-HaikuDepot	127533869
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -48,6 +48,7 @@ Send	RatePackageWindow		Trimite
 Start package daemon	App		Pornește serviciul de pachete
 There are problems in the supplied data:	UserLoginWindow		Există probleme în datele furnizate:
 Usage conditions download problem	UserLoginWindow		Problemă de descărcare a condițiilor de utilizare
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalează pachetul %s din depozitul %s\n
 Package daemon problem	App		Problemă cu serviciul de pachete
 No	MainWindow		Nu
 Repository	PackageListView		Depozit
@@ -60,6 +61,7 @@ An error has arisen downloading the usage conditions required to create a new us
 Size	PackageListView		Dimensiune
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
+ignore problem for now	PackageProblem		ignoră problema pentru moment
 n/a	PackageInfoView		n/a
 Checking user details	UserDetailVerifierProcess		Se verifică detaliile utilizatorului
 Cancel	MainWindow		Anulează
@@ -127,7 +129,9 @@ Settings…	MainWindow		Configurări…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Această aplicație scrie și citește câteva fișiere de lucru de pe calculator pentru a funcționa. Se pare că există probleme la scrierea unui fișier test la [%TestFilePath%]. Verificați dacă nu există probleme cu discul local sau cu permisiunile care ar putea împiedica această aplicație să scrie fișiere în locația respectivă a directorului. Puteți alege să recunoașteți această problemă și să continuați, dar unele funcționalități pot fi dezactivate.
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
 Ratings	PackageInfoView		Evaluări
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Au apărut următoarele probleme. Selectați o soluție pentru fiecare:
 Local	LocalPkgDataLoadProcess		Local
+Package changes	PackageResult	Window title	Modificări pachet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ar fi acceptabil să trimiteți date de utilizare anonime la sistemul HaikuDepotServer de pe acest calculator? Puteți să modifica preferința în fereastra \„Configurări\” mai târziu.
 User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate

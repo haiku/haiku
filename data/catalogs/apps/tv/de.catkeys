@@ -1,9 +1,7 @@
-1	german	x-vnd.Haiku.TV	1995288111
+1	german	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Kein Menü
 No border	MainWin		Kein Fensterrahmen
-force 704 x 576, display aspect 4:3	MainWin		Erzwinge 704 x 576, Seitenverhältnis 4:3
 Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
-force 544 x 576, display aspect 4:3	MainWin		Erzwinge 544 x 576, Seitenverhältnis 4:3
 Full screen	MainWin		Vollbild
 Scale to native size	MainWin		Originalgröße
 unknown	MainWin		unbekannt
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Always on top	MainWin		Immer im Vordergrund
 Debug	MainWin		Debug
 Interface	MainWin		Hardware
-force 720 x 576, display aspect 4:3	MainWin		Erzwinge 720 x 576, Seitenverhältnis 4:3
 Quit	MainWin		Beenden
 Channel	MainWin		Kanal
 Previous channel	MainWin		Vorheriger Kanal

@@ -1,9 +1,7 @@
-1	esperanto	x-vnd.Haiku.TV	1995288111
+1	esperanto	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Sen menuo
 No border	MainWin		Sen bordero
-force 704 x 576, display aspect 4:3	MainWin		devigi 704 x 576, ekrana proporcio 4:3
 Error, connecting to interface failed:\n\n	MainWin		Eraro, malsukcesa konektado al interfaco:\n\n
-force 544 x 576, display aspect 4:3	MainWin		devigi 544 x 576, ekrana proporcio 4:3
 Full screen	MainWin		Plena ekrano
 Scale to native size	MainWin		Skali al origina grando
 unknown	MainWin		nekonata
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Cifereca Video Dissendado TV
 Always on top	MainWin		Ĉiam supre
 Debug	MainWin		Sencimigi
 Interface	MainWin		Interfaco
-force 720 x 576, display aspect 4:3	MainWin		devigi 720 x 576, ekrana proporcio 4:3
 Quit	MainWin		Ĉesi
 Channel	MainWin		Kanalo
 Previous channel	MainWin		Antaŭa kanalo

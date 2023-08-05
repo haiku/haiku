@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	2551922798
+1	thai	x-vnd.Haiku-libtracker	370065242
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -17,7 +17,6 @@ Name	PoseView		ชื่อ
 Kind:	InfoWindow		ชนิด:
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} อื่นๆ{# bytes}}
 contains	FindPanel		มี
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		เปิด
 Bitmap icon	AttributesView		ไอคอน Bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		คุณไม่สามารถแทนที่โฟลเดอร์ด้วยหนึ่งในโฟลเดอร์ย่อย
@@ -31,14 +30,12 @@ Information	InfoWindow		ข้อมูล
 Error emptying Trash	FSUtils		เกิดข้อผิดพลาดในการล้างถังขยะ
 Opens with:	InfoWindow		เปิดด้วย:
 Size	QueryPoseView		ขนาด
-128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		เชื่อมต่อ
 Type	AttributesView		ชนิด
 Prompt	FSUtils		โดยทันที
 Error in regular expression:\n\n'%errstring'	PoseView		ข้อผิดพลาดในการแสดงออกปกติ::\n\n'%errstring'
 Small bitmap icon	AttributesView		ไอคอน bitmap ขนาดเล็ก
 Would you like to find a suitable application to open the file?	FSUtils		คุณต้องการค้นหาแอปพลิเคชั่นที่เหมาะสมในการเปิดไฟล์หรือไม่?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		คุณไม่สามารถแทนที่โฟลเดอร์หรือลิงก์สัญลักษณ์ด้วยไฟล์
 Trailing \\.	libtracker		กำลังลากตามรอย \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		ที่ %func \nfind_directory() ล้มเหลว\nเหตุผล: %error
@@ -51,7 +48,6 @@ Select…	ContainerWindow		เลือก
 Show shared volumes on Desktop	SettingsView		แสดงปริมาณที่แชร์บนเดสก์ท็อป
 Size	PoseView		ขนาด
 matches wildcard expression	SelectionWindow		จับคู่แสดงสัญลักษณ์
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		ชื่อเรื่อง
 Identify	ContainerWindow		แสดง
 Create link	ContainerWindow		สร้างลิงค์
@@ -207,7 +203,6 @@ Original name	ContainerWindow		ชื่อเดิม
 Unknown	WidgetAttributeText		ไม่ทราบ
 32-bit integer	AttributesView		32-bit integer
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		ชื่อที่ระบุนั้นถูกใช้เป็นชื่อของโฟลเดอร์แล้ว กรุณาเลือกชื่ออื่น
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		แก้ไข
 Mini icon view	ContainerWindow		ดูไอคอนขนาดเล็ก
 File	FilePanelPriv		ไฟล์
@@ -241,7 +236,6 @@ Double-precision floating point number	AttributesView		ขยายตัวเ�
 Decrease size	ContainerWindow		ลดขนาด
 Recent queries	FindPanel		queries ล่าสุด
 Mount all	MountMenu		เชื่อมต่อทั้งหมด
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		ขนาด
 Favorites	FavoritesMenu		รายการโปรด
 Delete	FilePanelPriv		ลบ
@@ -274,9 +268,9 @@ no supporting apps	OpenWithWindow		ไม่มีแอพที่รองร
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		กำลังเตรียมที่จะล้างถังขยะ
 Deleting: 	StatusWindow		กำลังลบ:
-label too long	PoseView		ป้ายกำกับยาวเกินไป
 the MIME settings	FSUtils		ตั้งค่า MIME
 You can't move or copy the trash.	FSUtils		คุณไม่สามารถย้ายหรือคัดลอกถังขยะ
+label too long	PoseView		ป้ายกำกับยาวเกินไป
 Error creating link to \"%name\".	FSUtils		เกิดข้อผิดพลาดในการสร้างลิงก์ไปยัง \"%name\"
 Unknown	FilePermissionsView		ไม่รู้จัก
 Paste links	ContainerWindow		วางลิงค์
@@ -324,8 +318,8 @@ of %items	StatusWindow		ของ %items
 less than	FindPanel		น้อยกว่า
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		เกิดข้อผิดพลาดในการคัดลอกไฟล์ \"%name\":\n\t%error\n\nคุณต้องการที่จะดำเนินการต่อไป?
 Creating links: 	StatusWindow		สร้างลิงค์:
-Create %s clipping	PoseView		สร้าง %s การตัด
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ไม่สามารถเปิด \"%document\" ด้วยแอปพลิเคชัน \"%app\" (%error)
+Create %s clipping	PoseView		สร้าง %s การตัด
 Error moving \"%name\"	FSUtils		เกิดข้อผิดพลาดในการย้าย \"%name\"
 To: %dir	StatusWindow		ไปที่: %dir
 Paste layout	ContainerWindow		วางเลย์เอาต์
@@ -367,7 +361,6 @@ Automatic disk mounting	AutoMounterSettings		การติดตั้งด�
 parent folder	NavMenu		โฟลเดอร์หลัก
 Create link here	ContainerWindow		สร้างลิงค์ที่นี้
 Force identify	ContainerWindow		บังคับแสดง
-48 x 48	DeskWindow		48 x 48
 no items	CountView		ไม่มีรายการ
 Time	AttributesView		เวลา
 Disks	DirMenu		ดิสก์
@@ -413,7 +406,6 @@ trash	B_TRASH_DIRECTORY		ถังขยะ
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		หากคุณย้ายโฟลเดอร์ระบบหรือเนื้อหาคุณจะไม่สามารถบูต %osName!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้ \n\nหากต้องการย้ายโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดปุ่ม Shift ค้างไว้แล้วคลิก \"ย้าย\"
 Close all in workspace	ContainerWindow		ปิดทั้งหมดในพื้นที่ทำงาน
 Corrupted expression.	libtracker		การแสดงเสียหาย
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		ที่อยู่เครือข่าย
 Finish: %time - %finishtime left	StatusWindow		เสร็จ: : %time - %finishtime คงเหลือ
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		ไม่สามารถเปิด \"%document\"ได้ (ไลบารี่หาย: %library)\n
@@ -449,11 +441,8 @@ Resize to fit	VirtualDirectoryWindow		ปรับขนาดให้พอด
 Move to Trash	FilePanelPriv		ย้ายไปถังขยะ
 is	FindPanel		เป็น
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		หากคุณเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบคุณจะไม่สามารถบูต %osName! \n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดปุ่ม Shift ค้างไว้แล้วคลิก \"เปลี่ยนชื่อ\"
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		อนุญาต
 New folder %ld	FSUtils		โฟลเดอร์ใหม่ %ld
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" เป็นไฟล์ปฏิบัติการแบบเก่า โปรดรับรุ่นที่ปรับปรุงแล้วหรือคอมไพล์แอปพลิเคชันใหม่
 Only the boot disk	AutoMounterSettings		เฉพาะดิสก์สำหรับบูต
 Message	AttributesView		ข้อความ
@@ -489,12 +478,11 @@ Defaults	TrackerSettingsWindow		ค่าเริ่มต้น
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		ขออภัยมีพื้นที่ว่างไม่เพียงพอในปริมาณปลายทางที่จะคัดลอกส่วนที่เลือก
 True-color picture	AttributesView		ภาพสีจริง
 Add-ons	FilePanelPriv		เพิ่มเติม
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		โฟลเดอร์ว่างเปล่า
 Alignment	AttributesView		การวางแนว
 Move to Trash	FSUtils		ย้ายไปที่ถังขยะ
-Cancel	PoseView		ยกเลิก
 Handles %type	OpenWithWindow		จัดการ %type
+Cancel	PoseView		ยกเลิก
 Delete	PoseView		ลบ
 Media parameter	AttributesView		พารามิเตอร์สื่อ
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		หากคุณเปลี่ยนโฟลเดอร์หลัก %osName อาจทำงานไม่ถูกต้อง!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้\n\nหากต้องการแก้ไขโฟลเดอร์หลักให้กดแป้น Shift ค้างไว้แล้วคลิก \"ฉันรู้ว่าฉันกำลังทำอะไร\"

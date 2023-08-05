@@ -1,9 +1,7 @@
-1	swedish	x-vnd.Haiku.TV	1995288111
+1	swedish	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Ingen meny
 No border	MainWin		Ingen kant
-force 704 x 576, display aspect 4:3	MainWin		påtvinga 704 x 576, bildförhållande 4:3
 Error, connecting to interface failed:\n\n	MainWin		Fel, misslyckades att ansluta till gränssnittet:\n\n
-force 544 x 576, display aspect 4:3	MainWin		tvinga 544 x 573, bildförhållande 4:3
 Full screen	MainWin		Hela skärmen
 Scale to native size	MainWin		Skala till ursprungsstorlek
 unknown	MainWin		okänd
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Always on top	MainWin		Alltid överst
 Debug	MainWin		Felsök
 Interface	MainWin		Gränssnitt
-force 720 x 576, display aspect 4:3	MainWin		tvinga 720 x 576, bildförhållande 4:3
 Quit	MainWin		Avsluta
 Channel	MainWin		Kanal
 Previous channel	MainWin		Föregående kanal

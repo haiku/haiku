@@ -1,6 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-MediaConverter	1883936613
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	568323940
 Input file not recognized as Audio or Video	MediaConverter		Invoerbestand niet herkend als audio of video
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Bronbestanden
 Error writing video frame %lld	MediaConverter		Fout bij schrijven video frame %lld
 Error converting '%filename'	MediaConverter		Fout bij het omzetten van '%filename'

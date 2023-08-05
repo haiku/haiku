@@ -1,11 +1,10 @@
-1	indonesian	x-vnd.Haiku-Magnify	1248284405
+1	indonesian	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  ukuran harus> 4 dan kelipatan 4
 Decrease pixel size	Magnify-Main		Turunkan ukuran piksel
 no clip msg	In console, when clipboard is empty after clicking Copy image		tidak ada pesan klip
 Increase pixel size	Magnify-Main		Tingkatkan ukuran piksel
 magnify: size must be a multiple of 4	Console		memperbesar: ukuran harus kelipatan 4
 Stick coordinates	Magnify-Main		Lekatkan koordinat
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Copy image	Magnify-Main		Salin gambar
 Decrease window size	Magnify-Main		Kurangi ukuran jendela
 Remove a crosshair	Magnify-Main		Hapus crosshair

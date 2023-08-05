@@ -105,8 +105,8 @@ Remove	Icon-O-Matic-ShapesList		Entfernen
 Multi-paste	Icon-O-Matic-Properties		Mehrfach-Einfügen
 Bad news	Title of error alert		Schlechte Nachricht
 HVIF source code	Icon-O-Matic-SavePanel		HVIF-Quellcode
-Save icon	Icon-O-Matic-SavePanel	Dialog title	Icon speichern
 Drop shapes	Icon-O-Matic-ShapesList		Formen ablegen
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Icon speichern
 Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{Pfad} other{Pfade}} zuweisen
 Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		{0, plural, one{Objekt} other{Objekte}} entfernen
 Linear	Icon-O-Matic-StyleTypes		Linear

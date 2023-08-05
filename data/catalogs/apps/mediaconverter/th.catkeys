@@ -1,6 +1,5 @@
-1	thai	x-vnd.Haiku-MediaConverter	2116725671
+1	thai	x-vnd.Haiku-MediaConverter	801112998
 Input file not recognized as Audio or Video	MediaConverter		ไฟล์อินพุตไม่รู้จักว่าเป็นเสียงหรือวิดีโอ
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		ไฟล์ต้นฉบับ
 Error converting '%filename'	MediaConverter		ข้อผิดพลาดในการแปลง '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		ไม่พบไดเรกทอรีที่เลือก เริ่มต้นที่ /boot/home

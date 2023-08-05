@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-MediaConverter	1883936613
+1	french	x-vnd.Haiku-MediaConverter	568323940
 Input file not recognized as Audio or Video	MediaConverter		Le fichier d’entrée n’est pas reconnu comme un fichier audio ou vidéo
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
 Source files	MediaConverter		Fichiers sources
 Error writing video frame %lld	MediaConverter		Erreur d’écriture de l’image vidéo %lld
 Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »

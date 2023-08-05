@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2566548867
+1	french	x-vnd.Haiku-libtracker	384691311
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -18,7 +18,6 @@ Name	PoseView		Nom
 Kind:	InfoWindow		Nature :
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# octet} other{# octets}}
 contains	FindPanel		contient
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Ouvrir
 Bitmap icon	AttributesView		Icône bitmap
 You can't replace a folder with one of its sub-folders.	FSUtils		Vous ne pouvez pas remplacer un dossier par l’un de ses sous-dossiers.
@@ -32,14 +31,12 @@ Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Impossible de vider la corbeille
 Opens with:	InfoWindow		Ouvrir avec :
 Size	QueryPoseView		Taille
-128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		Montage des disques
 Type	AttributesView		Type
 Prompt	FSUtils		Invite
 Error in regular expression:\n\n'%errstring'	PoseView		Erreur dans l’expression régulière :\n\n« %errstring »
 Small bitmap icon	AttributesView		Petite icône bitmap
 Would you like to find a suitable application to open the file?	FSUtils		Souhaitez-vous rechercher une application appropriée pour ouvrir le fichier ?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Vous ne pouvez pas remplacer un dossier ou un lien symbolique par un fichier.
 (unknown)	InfoWindow		(inconnu)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, one{<# date>} other{<# dates>}}
@@ -54,7 +51,6 @@ Select…	ContainerWindow		Sélectionner…
 Show shared volumes on Desktop	SettingsView		Afficher les volumes partagés sur le Bureau
 Size	PoseView		Taille
 matches wildcard expression	SelectionWindow		correspond à l’expression générique
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Titre
 Identify	ContainerWindow		Identifier
 Create link	ContainerWindow		Créer un lien
@@ -215,7 +211,6 @@ Original name	ContainerWindow		Nom d’origine
 Unknown	WidgetAttributeText		Inconnu
 32-bit integer	AttributesView		Entier 32-bits
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Le nom indiqué est déjà utilisé comme nom de dossier. Veuillez en choisir un autre.
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Modifié
 Mini icon view	ContainerWindow		Vue en petites icônes
 File	FilePanelPriv		Fichier
@@ -249,7 +244,6 @@ Double-precision floating point number	AttributesView		Nombre à virgule flottan
 Decrease size	ContainerWindow		Diminuer la taille
 Recent queries	FindPanel		Requêtes récentes
 Mount all	MountMenu		Monter tout
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Taille
 Favorites	FavoritesMenu		Favoris
 Delete	FilePanelPriv		Supprimer
@@ -284,9 +278,9 @@ no supporting apps	OpenWithWindow		aucune application apte
 32-bit unsigned integer	AttributesView		Entier non-signé 32-bits
 Preparing to empty Trash…	StatusWindow		Préparation au vidage de la Corbeille…
 Deleting: 	StatusWindow		Suppression : 
-label too long	PoseView		label trop long
 the MIME settings	FSUtils		les réglages MIME
 You can't move or copy the trash.	FSUtils		Vous ne pouvez ni déplacer, ni copier la Corbeille.
+label too long	PoseView		label trop long
 Error creating link to \"%name\".	FSUtils		Erreur à la création du lien vers « %name ».
 Unknown	FilePermissionsView		Inconnu
 Paste links	ContainerWindow		Coller les liens
@@ -335,8 +329,8 @@ MIME Path	AttributesView		Chemin MIME
 less than	FindPanel		inférieur à
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du fichier « %name » :\n\t%error\n\nVoulez-vous continuer ?
 Creating links: 	StatusWindow		Création des liens : 
-Create %s clipping	PoseView		Créer un extrait de %s
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (%error). 
+Create %s clipping	PoseView		Créer un extrait de %s
 Error moving \"%name\"	FSUtils		Erreur lors du déplacement de « %name »
 To: %dir	StatusWindow		Vers : %dir
 Paste layout	ContainerWindow		Coller la disposition
@@ -379,7 +373,6 @@ Automatic disk mounting	AutoMounterSettings		Montage automatique des disques
 parent folder	NavMenu		dossier parent
 Create link here	ContainerWindow		Créer un lien ici
 Force identify	ContainerWindow		Forcer l’identification
-48 x 48	DeskWindow		48 x 48
 no items	CountView		aucun élément
 Time	AttributesView		Heure
 Disks	DirMenu		Disques
@@ -425,7 +418,6 @@ trash	B_TRASH_DIRECTORY		corbeille
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour déplacez quand-même le dossier système ou son contenu, maintenez la touche Majuscule enfoncée et cliquez sur « Déplacer ».
 Close all in workspace	ContainerWindow		Fermer tout dans l’espace de travail
 Corrupted expression.	libtracker		Expression corrompu.
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Adresse réseau
 Finish: %time - %finishtime left	StatusWindow		Fin : %time - il reste %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque la bibliothèque : %library).\n
@@ -462,11 +454,8 @@ Resize to fit	VirtualDirectoryWindow		Retailler pour ajuster
 Move to Trash	FilePanelPriv		Envoyer à la corbeille
 is	FindPanel		est
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si vous renommez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour renommer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « renommer ».
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		Autorisations
 New folder %ld	FSUtils		Nouveau dossier %ld
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		« %name » est un exécutable ancien. Veuillez vous procurer une version mise à jour, ou recompiler l’application.
 Only the boot disk	AutoMounterSettings		Seulement le disque de démarrage
 Message	AttributesView		Message
@@ -503,12 +492,11 @@ Defaults	TrackerSettingsWindow		Par défaut
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Désolé, il n’y a pas assez d’espace libre dans le volume cible pour copier la sélection.
 True-color picture	AttributesView		Image Vraies-couleurs
 Add-ons	FilePanelPriv		Extensions
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Dossier vide
 Alignment	AttributesView		Alignement
 Move to Trash	FSUtils		Envoyer à la corbeille
-Cancel	PoseView		Annuler
 Handles %type	OpenWithWindow		Support de « %type »
+Cancel	PoseView		Annuler
 Delete	PoseView		Supprimer
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérer votre dossier d’accueil, %osName pourrait ne plus se comporter correctement!\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même d’accueil, maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.

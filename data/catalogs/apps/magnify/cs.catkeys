@@ -1,11 +1,10 @@
-1	czech	x-vnd.Haiku-Magnify	1248284405
+1	czech	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  velikost musí být > 4 a násobkem 4
 Decrease pixel size	Magnify-Main		Snížit velikost pixelu
 no clip msg	In console, when clipboard is empty after clicking Copy image		žádná zpráva schránky
 Increase pixel size	Magnify-Main		Zvětšit velikost pixelu
 magnify: size must be a multiple of 4	Console		zvětšení: velikost musí být násobkem 4
 Stick coordinates	Magnify-Main		Souřadnice hůlky
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} few{# pixely/pixel} other{# pixelů/pixel}}
 Copy image	Magnify-Main		Kopírovat obrázek
 Decrease window size	Magnify-Main		Zmenšít velikost okna
 Remove a crosshair	Magnify-Main		Skrýt kříž

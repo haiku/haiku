@@ -1,8 +1,12 @@
-1	finnish	x-vnd.haiku-icon_o_matic	1308365995
+1	finnish	x-vnd.haiku-icon_o_matic	1958984579
 None	Icon-O-Matic-Properties		Ei mitään
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
 Add empty	Icon-O-Matic-ShapesList		Lisää tyhjä
 Opening the icon failed!	Icon-O-Matic-Main		Kuvakkeen avaaminen epäonnistui!
+Reverse path	Icon-O-Matic-ReversePathCmd		Käänteinen polku
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Piippaa!
 Add with path	Icon-O-Matic-ShapesList		Lisää polulla
+Paste properties	Icon-O-Matic-Properties		Liitä ominaisuudet
 Copy	Icon-O-Matic-Properties		Kopioi
 Color	Icon-O-Matic-PropertyNames		Väri
 Format	Icon-O-Matic-SavePanel		Muoto
@@ -12,63 +16,103 @@ Reset transformation	Icon-O-Matic-ShapesList		Nollaa muunnokset
 Duplicate	Icon-O-Matic-StylesList		Kaksoiskappale
 Rotate	Icon-O-Matic-TransformationBoxStates		Pyöritä
 Shorten	Icon-O-Matic-PropertyNames		Lyhennä
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Siirrä {0, plural, one{muuttuja} other{muuttujaa}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Teksti, jota yrität tuoda, on aika pitkä. Oletko varma?
 Paste	Icon-O-Matic-Properties		Liitä
 Close	Icon-O-Matic-Menu-File		Sulje
 Add rect	Icon-O-Matic-PathsList		Lisää nelikulmio
 Rotation	Icon-O-Matic-PropertyNames		Kierto
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Väri (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON -attribuutti
 Transform	Icon-O-Matic-PathManipulator		Muunna
 Add shape with style	Icon-O-Matic-Menu-Shape		Lisää hahmo tyylillä
+Change color	Icon-O-Matic-SetColorCmd		Vaihda väriä
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Poista {0, plural, one{kärki} other{kärkeä}}
+Unassign path	Icon-O-Matic-UnassignPathCmd		Irrota polku
 Remove	Icon-O-Matic-StylesList		Poista
 Cancel	Icon-O-Matic-Menu-Settings		Peru
+PNG set	Icon-O-Matic-SavePanel		PNG-asetus
 Transformation	Icon-O-Matic-TransformationBoxStates		Muunnokset
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Siirrä {0, plural, one{polku} other{polkua}}
 Closed	Icon-O-Matic-PropertyNames		Suljettu
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<ei tehdä mitään uudelleen>
 Height	Icon-O-Matic-PropertyNames		Korkeus
 warning	Icon-O-Matic-SVGExport		varoitus
 File	Icon-O-Matic-Menus		Tiedosto
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	mikä tahansa muista luetteloista kohteeseen
 Properties	Icon-O-Matic-Menus		Ominaisuudet
 Path	Icon-O-Matic-PropertyNames		Polku
 Path	Icon-O-Matic-Menus		Polku
 Stroke	Transformation		Piirto
 Flip	Icon-O-Matic-PathManipulator		Käännä ympäri
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	muokkaa sen ominaisuuksia tässä.
+Move pivot	Icon-O-Matic-TransformationBoxStates		Siirrä tappi
 Opacity	Icon-O-Matic-PropertyNames		Läpinäkymättömyys
 OK	Icon-O-Matic-ColorPicker		Valmis
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Moniasetettava %property%
 Error: 	Icon-O-Matic-Main		Virhe:
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Nollaa {0, plural, one{muutos} other{muutosta}}
+Assign style	Icon-O-Matic-AssignStyleCmd		Liitä tyyli
 Saving your document failed!	Icon-O-Matic-Exporter		Asiakirjan tallentaminen epäonnistui!
 Snap to grid	Icon-O-Matic-Menu-Settings		Kiinnity rasteriin
 Opening the document failed!	Icon-O-Matic-Main		Asiakirjan avaaminen epäonnistui!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Poista {0, plural, one{tyyli} other{tyylit}}
 Add with path & style	Icon-O-Matic-ShapesList		Lisää polulla ja tyylillä
 Shape	Icon-O-Matic-Menus		Hahmo
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Halkaise {0, plural, one{huippu} other{huiput}}
 <unavailable>	Icon-O-Matic-StyleTypes		<ei ole käytettävissä>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Muokkaa gradienttia
 Min LOD	Icon-O-Matic-PropertyNames		Minimi LOD
+Redo: %action%	Icon-O-Matic-Main		Tee uudelleen: %action%
 Add	Icon-O-Matic-TransformersList		Lisää
 Settings	Icon-O-Matic-Menus		Asetukset
 Scale X	Icon-O-Matic-PropertyNames		Skaalaa X
 Add	Icon-O-Matic-PathsList		Lisää
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Lisää {0, plural, one{tyyli} other{tyyliä}}
 Remove	Icon-O-Matic-PathManipulator		Poista
 Duplicate	Icon-O-Matic-ShapesList		Kaksoiskappale
 Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Ääriviiva
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Lisää {0, plural, one{muuttuja} other{muuttujaa}}
+Miter limit	Icon-O-Matic-PropertyNames		Kärkiraja
+Insert vertex	Icon-O-Matic-InsertPointCmd		Lisää kärki
 Rounding	Icon-O-Matic-PropertyNames		Pyöristetään
 Joins	Icon-O-Matic-PropertyNames		Liitokset
 Cancel	Icon-O-Matic-ColorPicker		Peru
 Duplicate	Icon-O-Matic-PathsList		Kaksoiskappele
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Siirrä {0, plural, one{muoto} other{muotoa}}
 Save	Icon-O-Matic-Menu-Settings		Tallenna
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	Napsauta objekti kohteeseen
 Export as…	Icon-O-Matic-Menu-File		Vie nimellä...
 Error: 	Icon-O-Matic-Exporter		Virhe: 
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		Jäädytä {0, plural, one{muoto} other{muotoa}}
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Poista {0, plural, one{muoto} other{muotoa}}
+Undo: %action%	Icon-O-Matic-Main		Peru: %action%
 Diamond	Icon-O-Matic-StyleTypes		Vinoneliö
 Don't save	Icon-O-Matic-Menu-Settings		Älä tallenna
 Add shape with path	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	Kurja juttu
 Translation X	Icon-O-Matic-PropertyNames		Muunnos X
+Multi-paste properties	Icon-O-Matic-Properties		Moniliitettävät ominaisuudet
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Kuvakemaatti ei ehkä tulkitse kaikkia tietoja SVG:stä ohjelmaa ladattaessa. Jos alkuperäinen tiedosto korvataan, nämä tiedot menetetään.
 Rotate indices backwards	Icon-O-Matic-PathsList		Pyöritä osoittimia taaksepäin
 Overwrite	Icon-O-Matic-SVGExport		Korvaa
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Lisää {0, plural, one{muoto} other{muotoa}}
 Cancel	Icon-O-Matic-SVGExport		Peru
 Open…	Icon-O-Matic-Menu-File		Avaa...
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Poista {0, plural, one{muuttuja} other{muuttujaa}}
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Napsauta muotoa yläpuolella
 Remove	Icon-O-Matic-ShapesList		Poista
+Multi-paste	Icon-O-Matic-Properties		Moniliitännäinen
+Bad news	Title of error alert		Huonoja uutisia
+HVIF source code	Icon-O-Matic-SavePanel		HVIF -lähdekoodi
 Drop shapes	Icon-O-Matic-ShapesList		Pudota hahmot
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Tallenna kuvake
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Liitä {0, plural, one{polku} other{polkua}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Poista {0, plural, one{alkio} other{alkiota}}
 Linear	Icon-O-Matic-StyleTypes		Lineaarinen
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Siirrä {0, plural, one{alkio} other{alkiota}}
+Add vertex	Icon-O-Matic-AddPointCmd		Lisää kärki
 Clean up	Icon-O-Matic-PathsList		Puhdista
 Split	Icon-O-Matic-PathManipulator		Halkaise
 Move	Icon-O-Matic-TransformationBoxStates		Siirrä
@@ -77,20 +121,30 @@ Name	Icon-O-Matic-PropertyNames		Nimi
 Reset transformation	Icon-O-Matic-StylesList		Nolla muunnokset
 Reverse	Icon-O-Matic-PathsList		Käänteinen
 Remove	Icon-O-Matic-PathsList		Poista
+Load error	Icon-O-Matic-SVGImport		Latausvirhe
 Style type	Icon-O-Matic-StyleTypes		Tyylityyppi
 Quit	Icon-O-Matic-Menu-File		Poistu
 Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Väri (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		Havaitse suuntaus.
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Lisää {0, plural, one{polku} other{polkua}}
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla ja tyylillä
 Radial	Icon-O-Matic-StyleTypes		Säteettäinen
 Text too long	Icon-O-Matic-StyledTextImport		Teksti on liian pitkä
 Caps	Icon-O-Matic-PropertyNames		Isot kirjaimet
 OK	Icon-O-Matic-SVGImport		Valmis
+Import text	Icon-O-Matic-StyledTextImport		Tuo teksti
 Append…	Icon-O-Matic-Menu-File		Liitä...
 Scale Y	Icon-O-Matic-PropertyNames		Skaalaa Y
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Vie kuvake
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Kierrä polkuindeksejä
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Lisää {0, plural, one{alkio} other{alkiota}}
 Rotate indices forwards	Icon-O-Matic-PathsList		Pyöritä osoittimia eteenpäin
 Save	Icon-O-Matic-Menu-File		Tallenna
+Cancel	Icon-O-Matic-StyledTextImport		Peru
 Add circle	Icon-O-Matic-PathsList		Lisää ympyrä
 Freeze transformation	Icon-O-Matic-ShapesList		Jähmetä muunnos
+META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON -attribuutti
 Untitled	Icon-O-Matic-Main		Otsikoton
 Max LOD	Icon-O-Matic-PropertyNames		Maksimi LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Tallennetaanko muutokset nykyiseen kuvakkeeseen ennen sulkemista?
@@ -98,19 +152,27 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Tie
 Save as…	Icon-O-Matic-Menu-File		Tallenna nimellä...
 Swatches	Icon-O-Matic-Menus		Palaset
 <modify path>	Icon-O-Matic-PathCmd		<muokkaa polkua>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Aseta %property%
 Icon-O-Matic	System name		Kuvakemaatti
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ei mitään tehtävää>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Poista {0, plural, one{polku} other{polkua}}
 Add	Icon-O-Matic-StylesList		Lisää
 Translation Y	Icon-O-Matic-PropertyNames		Muunnos Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Muokkaa kärkeä
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		Siirrä {0, plural, one{tyyli} other{tyyliä}}
 Scale	Icon-O-Matic-TransformationBoxStates		Skaalaa
 All	Icon-O-Matic-Properties		Kaikki
 Transformer	Icon-O-Matic-Menus		Muunnin
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Käännä {0, plural, one{kärki} other{kärkeä}}
 Invert selection	Icon-O-Matic-Properties		Käännä valinta
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	liitetään muuttujiin.
 <unkown property>	Icon-O-Matic-PropertyNames		<tuntematon ominaisuus>
 Pick a color	Icon-O-Matic-ColorPicker		Poimi väri
 Settings…	Icon-O-Matic-SavePanel		Asetukset...
+Select all	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add with style	Icon-O-Matic-ShapesList		Lisää tyylillä
 New	Icon-O-Matic-Menu-File		Uusi
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Työnnä {0, plural, one{kärki} other{kärkeä}}
 Gradient type	Icon-O-Matic-StyleTypes		Kaltevuustyyppi
 Export	Icon-O-Matic-Menu-File		Vie
 Width	Icon-O-Matic-PropertyNames		Leveys

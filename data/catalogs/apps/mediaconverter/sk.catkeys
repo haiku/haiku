@@ -1,6 +1,5 @@
-1	slovak	x-vnd.Haiku-MediaConverter	2116725671
+1	slovak	x-vnd.Haiku-MediaConverter	801112998
 Input file not recognized as Audio or Video	MediaConverter		Vstupný súbor nebol rozpoznaný ako zvuk alebo video
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Zdrojové súbory
 Error converting '%filename'	MediaConverter		Chyba pri konverzii „%filename“
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Zvolený adresár nebol nájdený. Používa sa predvolený adresár /boot/home

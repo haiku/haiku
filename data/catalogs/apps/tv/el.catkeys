@@ -1,9 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku.TV	1995288111
+1	greek, modern (1453-)	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Χωρίς μενού
 No border	MainWin		Χωρίς περίγραμμα
-force 704 x 576, display aspect 4:3	MainWin		Εξαναγκασμός 704 x 576, λόγος οθόνης 4:3
 Error, connecting to interface failed:\n\n	MainWin		Σφάλμα, η διασύνδεση με τη διεπαφή απέτυχε:\n\n
-force 544 x 576, display aspect 4:3	MainWin		Εξαναγκασμός 544 x 576, λόγος οθόνης 4:3
 Full screen	MainWin		Πλήρης οθόνη
 Scale to native size	MainWin		Κλιμάκωση στο φυσικό μέγεθος
 unknown	MainWin		άγνωστο
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Ψηφιακή μετάδοσ
 Always on top	MainWin		Πάντα στην κορυφή
 Debug	MainWin		Αποσφαλμάτωση
 Interface	MainWin		Διεπαφή
-force 720 x 576, display aspect 4:3	MainWin		Εξαναγκασμός 720 x 576, λόγος οθόνης 4:3
 Quit	MainWin		Έξοδος
 Channel	MainWin		Κανάλι
 Previous channel	MainWin		Προηγούμενο κανάλι

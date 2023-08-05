@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-MAIL	4073987023
+1	romanian	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Stabilește la salvat
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Textul principal conține caractere necodificabile %ld. Poate că un alt set de caractere ar funcționa mai bine? Apăsați pe Trimite pentru a îl trimite oricum (un caracter substitut va fi utilizat în locul celor necodificabile) sau alegeți Anulează pentru a reveni și a încerca să îl remediați.
 Text wrapping:	Mail		Încadrare text:
@@ -38,7 +38,9 @@ Previous message	Mail		Mesajul anterior
 (Address unavailable)	Mail		(Adresă indisponibilă)
 Mail	System name		Mail
 Copy link location	Mail		Copiază locația legăturii
+Add attachment…	Mail		Adaugă atașament…
 Next	Mail		Înainte
+Attachments:	Mail		Atașamente:
 Show icons only	Mail		Arată doar pictogramele
 Subject:	Mail		Subiect:
 OK	Mail		OK
@@ -55,6 +57,7 @@ Reply to sender	Mail		Răspunde la expeditor
 \\n - Newline	Mail		\\n - linie nouă
 Copy	Mail		Copiază
 Add signature	Mail		Adaugă o semnătură
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Atașament: %name% (Tip: %type%)
 %n - Full name	Mail		%n - numele complet
 Signature	Mail		Semnătură
 Use default account	Mail		Utilizează contul implicit
@@ -104,8 +107,10 @@ Start now	Mail		Începe acum
 (Name unavailable)	Mail		(Nume indisponibil)
 Move to trash	Mail		Mută la gunoi
 <none>	Mail		<none>
+Mail settings	Mail		Configurări Mail
 %d - Date	Mail		%d - dată
 Check spelling	Mail		Verifică ortografia
+Status:	Mail		Stare:
 Redo	Mail		Repetă
 Leave as '%s'	Mail		Lasă ca „%s”
 Print…	Mail		Tipărire…

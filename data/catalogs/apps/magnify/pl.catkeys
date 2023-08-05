@@ -1,11 +1,10 @@
-1	polish	x-vnd.Haiku-Magnify	1248284405
+1	polish	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  rozmiar musi być większy od 4 oraz wielokrotnością 4
 Decrease pixel size	Magnify-Main		Zmniejsz rozmiar piksela
 no clip msg	In console, when clipboard is empty after clicking Copy image		brak wiadomości z wycinkiem
 Increase pixel size	Magnify-Main		Zwiększ rozmiar piksela
 magnify: size must be a multiple of 4	Console		magnify: rozmiar musi być wielokrotnością 4
 Stick coordinates	Magnify-Main		Zablokuj współrzędne
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# piksel/piksel} few{# piksele/piksel} many{# pikseli/piksel} other{# piksela/piksel}}
 Copy image	Magnify-Main		Kopiuj obraz
 Decrease window size	Magnify-Main		Zmniejsz rozmiar okna
 Remove a crosshair	Magnify-Main		Usuń znacznik

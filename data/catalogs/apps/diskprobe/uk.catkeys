@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DiskProbe	4193379066
+1	ukrainian	x-vnd.Haiku-DiskProbe	494506599
 Raw editor	AttributeWindow		Raw редактор
 Remove	AttributeWindow		Вилучити
 Close	ProbeView		Закрити
@@ -29,7 +29,9 @@ Open file…	FileWindow		Відкрити файл…
 32 bit unsigned pointer:	TypeEditors		32-бітовий беззнаковий вказівник:
 DiskProbe request	DiskProbe		Запит DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шістнадцяткова
+Block %lld (0x%Lx)	ProbeView		Блок %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Збій запису до файлу:\n%s\n\nВсі зміни будуть втрачені при виході.
+Native: %lld (0x%0*Lx)	ProbeView		Нативний: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Дослідити пристрій:
 Number editor	TypeEditors		Числовий редактор
 Icon	TypeEditors		Значок
@@ -115,6 +117,7 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Запит DiskProbe
 Double precision floating-point value:	TypeEditors		Значення з рухомою комою подвійної точності
 Image	TypeEditors	This is the type of view	Зображення
+Swapped: %lld (0x%0*Lx)	ProbeView		Обмінний: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Зберегти зміни перед закриттям?
 PNG format	TypeEditors		PNG формат
 Number	TypeEditors	This is the type of editor	Число

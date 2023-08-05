@@ -1,11 +1,10 @@
-1	english	x-vnd.Haiku-Magnify	1248284405
+1	english	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  大小必须 > 4 或者是 4 的倍数
 Decrease pixel size	Magnify-Main		缩小像素尺寸
 no clip msg	In console, when clipboard is empty after clicking Copy image		无剪切消息
 Increase pixel size	Magnify-Main		增大像素尺寸
 magnify: size must be a multiple of 4	Console		放大镜：大小必须是4的倍数
 Stick coordinates	Magnify-Main		插入坐标
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 Copy image	Magnify-Main		复制图像
 Decrease window size	Magnify-Main		缩小窗口尺寸
 Remove a crosshair	Magnify-Main		删除十字光标

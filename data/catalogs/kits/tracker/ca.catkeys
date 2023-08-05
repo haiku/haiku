@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1609247133
+1	catalan; valencian	x-vnd.Haiku-libtracker	3722356873
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -18,7 +18,6 @@ Name	PoseView		Nom
 Kind:	InfoWindow		Tipus:
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		conté
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Obre
 Bitmap icon	AttributesView		Icona de mapa de bits
 You can't replace a folder with one of its sub-folders.	FSUtils		No podeu reemplaçar una carpeta per alguna de les subcarpetes.
@@ -32,14 +31,12 @@ Information	InfoWindow		Informació
 Error emptying Trash	FSUtils		Error en buidar la paperera
 Opens with:	InfoWindow		S'obre amb:
 Size	QueryPoseView		Mida
-128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		Muntatge de discs
 Type	AttributesView		Tipus
 Prompt	FSUtils		Indicador
 Error in regular expression:\n\n'%errstring'	PoseView		Error a l'expressió regular:\n\n%errstring
 Small bitmap icon	AttributesView		Icona petita de mapa de bits
 Would you like to find a suitable application to open the file?	FSUtils		Voleu trobar una aplicació adequada per obrir el fitxer?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		No podeu reemplaçar una carpeta o un enllaç simbòlic per un fitxer.
 (unknown)	InfoWindow		(desconegut)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
@@ -54,7 +51,6 @@ Select…	ContainerWindow		Seleccioneu...
 Show shared volumes on Desktop	SettingsView		Mostra els volums compartits a l'escriptori
 Size	PoseView		Mida
 matches wildcard expression	SelectionWindow		es correspon amb l'expressió regular
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Títol
 Identify	ContainerWindow		Identifica com a
 Create link	ContainerWindow		Crea un enllaç
@@ -217,7 +213,6 @@ Original name	ContainerWindow		Nom original
 Unknown	WidgetAttributeText		Desconegut
 32-bit integer	AttributesView		Enter de 32 bits
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		El nom especificat ja s’usa com a nom d’una carpeta. Si us plau, trieu-ne un altre.
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Modificat
 Mini icon view	ContainerWindow		Mostra les icones petites
 File	FilePanelPriv		Fitxer
@@ -251,7 +246,6 @@ Double-precision floating point number	AttributesView		Número de punt flotant d
 Decrease size	ContainerWindow		Redueix-ne la mida
 Recent queries	FindPanel		Consultes recents
 Mount all	MountMenu		Munta-ho tot
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Mida
 Favorites	FavoritesMenu		Preferits
 Delete	FilePanelPriv		Suprimeix
@@ -286,9 +280,9 @@ no supporting apps	OpenWithWindow		aplicacions no compatibles
 32-bit unsigned integer	AttributesView		Enter de 32 bits no signat
 Preparing to empty Trash…	StatusWindow		Es prepara el buidatge de la paperera...
 Deleting: 	StatusWindow		Se suprimeix: 
-label too long	PoseView		l'etiqueta és massa llarga
 the MIME settings	FSUtils		els paràmetres de MIME
 You can't move or copy the trash.	FSUtils		No podeu moure o copiar la paperera.
+label too long	PoseView		l'etiqueta és massa llarga
 Error creating link to \"%name\".	FSUtils		Hi ha hagut un error en enllaçar amb \"%name\".
 Unknown	FilePermissionsView		Desconegut
 Paste links	ContainerWindow		Enganxa els enllaços
@@ -337,8 +331,8 @@ MIME Path	AttributesView		Camí de MIME
 less than	FindPanel		menys que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
 Creating links: 	StatusWindow		Es creen els enllaços: 
-Create %s clipping	PoseView		Crea un retall de %s
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (%error). 
+Create %s clipping	PoseView		Crea un retall de %s
 Error moving \"%name\"	FSUtils		Error en moure \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
@@ -383,7 +377,6 @@ Automatic disk mounting	AutoMounterSettings		Muntatge automàtic de discs
 parent folder	NavMenu		carpeta pare
 Create link here	ContainerWindow		Crea un enllaç aquí
 Force identify	ContainerWindow		Força la identificació
-48 x 48	DeskWindow		48 x 48
 no items	CountView		no hi ha cap element
 Time	AttributesView		Hora
 Disks	DirMenu		Discs
@@ -429,7 +422,6 @@ trash	B_TRASH_DIRECTORY		paperera
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a Mou.
 Close all in workspace	ContainerWindow		Tanca-ho tot de l'espai de treball
 Corrupted expression.	libtracker		Expressió corrupta.
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Adreça de xarxa
 Finish: %time - %finishtime left	StatusWindow		Acabarà: %time - falten %finishtime
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		No s'ha pogut obrir \"%document\" (Falten biblioteques: %library). \n
@@ -466,11 +458,8 @@ Resize to fit	VirtualDirectoryWindow		Ajusta a l'espai
 Move to Trash	FilePanelPriv		Mou a la paperera
 is	FindPanel		és
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si canvieu de nom la carpeta de sistema, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, manteniu premuda la tecla Maj. i cliqueu a \"Canvia'n el nom\".
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		Permisos
 New folder %ld	FSUtils		Carpeta nova %ld
-64 x 64	DeskWindow		64 x 64
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" és un executable de llegat. Si us plau, obteniu-ne una versió actualitzada o recompileu l'aplicació.
 Only the boot disk	AutoMounterSettings		Només el disc de l'arrencada
 Message	AttributesView		Missatge
@@ -507,12 +496,11 @@ Defaults	TrackerSettingsWindow		Valors predeterminats
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Disculpeu, al volum de destinació no hi ha prou espai per copiar-hi la selecció.
 True-color picture	AttributesView		Imatge de colors veritables
 Add-ons	FilePanelPriv		Complements
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Carpeta buida
 Alignment	AttributesView		Alineament
 Move to Trash	FSUtils		Mou a la paperera
-Cancel	PoseView		Cancel·la
 Handles %type	OpenWithWindow		Gestiona el tipus %type
+Cancel	PoseView		Cancel·la
 Delete	PoseView		Suprimeix
 Media parameter	AttributesView		Paràmetre multimèdia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si altereu la capeta personal, el sistema %osName pot no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix la voleu alterar, mantingueu premuda la tecla Maj. i cliqueu a \"Sé el que faig\".

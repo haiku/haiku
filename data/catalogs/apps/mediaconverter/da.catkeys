@@ -1,6 +1,5 @@
-1	danish	x-vnd.Haiku-MediaConverter	1833571229
+1	danish	x-vnd.Haiku-MediaConverter	517958556
 Input file not recognized as Audio or Video	MediaConverter		Inddatafil ikke genkendt som lyd eller video
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
 Source files	MediaConverter		Kildefiler
 Error writing video frame %lld	MediaConverter		Fejl ved skrivning af videoframe %lld
 Audio quality: %s	MediaConverter		Lydkvalitet: %s

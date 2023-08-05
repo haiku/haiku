@@ -1,6 +1,5 @@
-1	german	x-vnd.Haiku-MediaConverter	2019737152
+1	german	x-vnd.Haiku-MediaConverter	704124479
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
 Source files	MediaConverter		Quelldateien
 Error writing video frame %lld	MediaConverter		Fehler beim Schreiben von Video-Frame %lld
 Audio quality: %s	MediaConverter		Audioqualität: %s

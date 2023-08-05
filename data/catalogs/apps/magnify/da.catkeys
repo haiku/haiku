@@ -1,11 +1,10 @@
-1	danish	x-vnd.Haiku-Magnify	1248284405
+1	danish	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  størrelse skal være > 4 og deleligt med 4
 Decrease pixel size	Magnify-Main		Formindsk billedpunktsstørrelse
 no clip msg	In console, when clipboard is empty after clicking Copy image		ingen klipmeddelelse
 Increase pixel size	Magnify-Main		Forøg billedpunktsstørrelse
 magnify: size must be a multiple of 4	Console		magnify: størrelse skal være deleligt med 4
 Stick coordinates	Magnify-Main		Lås koordinater
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# billedpunkt/billedpunkt} other{# billedpunkter/billedpunkt}}
 Copy image	Magnify-Main		Kopiér billede
 Decrease window size	Magnify-Main		Formindsk vinduesstørrelse
 Remove a crosshair	Magnify-Main		Fjern et sigtekorn

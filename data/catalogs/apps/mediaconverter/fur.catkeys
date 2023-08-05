@@ -1,6 +1,5 @@
-1	friulian	x-vnd.Haiku-MediaConverter	1833571229
+1	friulian	x-vnd.Haiku-MediaConverter	517958556
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		File sorzints
 Error writing video frame %lld	MediaConverter		Erôr tal scrivi il fotogram video %lld
 Audio quality: %s	MediaConverter		Cualitât audio: %s

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	969849650
+1	croatian	x-vnd.Haiku-libtracker	3082959390
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -14,7 +14,6 @@ Location:	InfoWindow		Lokacija:
 Name	PoseView		Ime
 Kind:	InfoWindow		Vrsta:
 contains	FindPanel		sadrži
-32 x 32	ContainerWindow		32 x 32
 Open	FilePanelPriv		Otvori
 Bitmap icon	AttributesView		Bitmap ikona
 You can't replace a folder with one of its sub-folders.	FSUtils		Ne možte zamijeniti mapu sa njenim podmapama.
@@ -28,11 +27,9 @@ Information	InfoWindow		Informacija
 Error emptying Trash	FSUtils		Greška pri pražnjenju Smeća
 Opens with:	InfoWindow		Otvori pomoću:
 Size	QueryPoseView		Veličina
-128 x 128	ContainerWindow		128 x 128
 Type	AttributesView		Vrsta
 Small bitmap icon	AttributesView		Mala bitmap ikona
 Would you like to find a suitable application to open the file?	FSUtils		Želite li naći prikladni program za otvaranje datoteke?
-64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ne možete zamjeniti mapu ili simboličku poveznicu sa datotekom.
 save text	FilePanelPriv		spremi tekst
 Raw data	AttributesView		Sirovi podaci
@@ -40,7 +37,6 @@ Preparing to move items…	StatusWindow		Priprema za premještanje stavki...
 Size	ContainerWindow		Veličina
 Select…	ContainerWindow		Odaberi...
 Size	PoseView		Veličina
-96 x 96	ContainerWindow		96 x 96
 Title	Bookmark Query Columns		Naslov
 Identify	ContainerWindow		Identificiraj
 Create link	ContainerWindow		Napravi poveznicu
@@ -156,7 +152,6 @@ Cancel	FSUtils		Odustani
 Original name	ContainerWindow		Izvorno ime
 Unknown	WidgetAttributeText		Nepoznato
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Specificirano ime je već zauzeto kao ime mape. Molim izaberite drugo ime.
-48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Izmjenjeno
 Mini icon view	ContainerWindow		Prikaz mini ikona
 File	FilePanelPriv		Datoteka
@@ -182,7 +177,6 @@ Show navigator	SettingsView		Prikaži navigator
 Select all	DeskWindow		Odaberi sve
 Decrease size	ContainerWindow		Smanji veličinu
 Mount all	MountMenu		Montiraj sve
-128 x 128	DeskWindow		128 x 128
 Size	Default Query Columns		Veličina
 Favorites	FavoritesMenu		Favoriti
 Delete	FilePanelPriv		Obriši
@@ -204,8 +198,8 @@ Empty Trash	ContainerWindow		Isprazni smeće
 no supporting apps	OpenWithWindow		nema podržanih programa
 Preparing to empty Trash…	StatusWindow		Priprema za pražnjenje smeća...
 Deleting: 	StatusWindow		Brisanje: 
-label too long	PoseView		naljepnica je preduga
 You can't move or copy the trash.	FSUtils		Ne možeš pomicati ili kopirati smeće.
+label too long	PoseView		naljepnica je preduga
 Error creating link to \"%name\".	FSUtils		Greška pri stvaranju poveznice ka \"%name\".
 Unknown	FilePermissionsView		Nepoznato
 Paste links	ContainerWindow		Zalijepi poveznice
@@ -273,7 +267,6 @@ Other	FilePermissionsView		Drugo
 Automatic disk mounting	AutoMounterSettings		Automatsko montiranje diska
 Create link here	ContainerWindow		Napravi poveznicu ovdje
 Force identify	ContainerWindow		Forsiraj identificiranje
-48 x 48	DeskWindow		48 x 48
 no items	CountView		nema stavki
 Time	AttributesView		Vrijeme
 Disks	DirMenu		Diskovi
@@ -305,7 +298,6 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Obrni
 trash	B_TRASH_DIRECTORY		smeće
 Close all in workspace	ContainerWindow		Zatvori sve radne prostore
-32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Adresa mreže
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Ne može se otvoriti \"%document\" (nedostaju biblioteke: %library). \n
 Create relative link here	ContainerWindow		Stvori relativnu poveznicu ovdje
@@ -332,11 +324,8 @@ Show Disks icon	SettingsView		Prikaži Disks ikonu
 by formula	FindPanel		po formuli
 Move to Trash	FilePanelPriv		Premjesti u smeće
 is	FindPanel		je
-40 x 40	DeskWindow		40 x 40
-40 x 40	ContainerWindow		40 x 40
 Permissions	FilePermissionsView		Dozvole
 New folder %ld	FSUtils		Nova mapa %ld
-64 x 64	DeskWindow		64 x 64
 Message	AttributesView		Poruka
 Modified	Default Query Columns		Izmjenjeno
 Default application	InfoWindow		Zadani program
@@ -363,7 +352,6 @@ Find	FindPanel		Nađi
 Empty folder	NavMenu		Isprazni mapu
 Defaults	TrackerSettingsWindow		Zadano
 Add-ons	FilePanelPriv		Dodaci
-96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Prazna mapa
 Alignment	AttributesView		Poravnanje
 Move to Trash	FSUtils		Premjesti u smeće

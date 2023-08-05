@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	1477961135
+1	romanian	x-vnd.Haiku-WebPositive	2829475355
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiază
@@ -58,6 +58,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - termen de căutare
 Reload	WebPositive Window		Reîncarcă
 Expiration	Cookie Manager		Expirare
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Procesorul este prea vechi și nu suportă extensiile SSE2, fără de care WebPositive nu poate să ruleze. Recomandăm să instalați în schimb NetSurf.
 Download finished	Download Window		Descărcare finalizată
 Cookie manager	WebPositive Window		Manager de cookie
 OK	Authentication Panel		OK

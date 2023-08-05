@@ -1,6 +1,5 @@
-1	japanese	x-vnd.Haiku-MediaConverter	1833571229
+1	japanese	x-vnd.Haiku-MediaConverter	517958556
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		ソースファイル
 Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込みに失敗しました
 Audio quality: %s	MediaConverter		オーディオ品質: %s

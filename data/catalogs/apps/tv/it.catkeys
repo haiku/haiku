@@ -1,9 +1,7 @@
-1	italian	x-vnd.Haiku.TV	1995288111
+1	italian	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Nessun menu
 No border	MainWin		Nessun bordo
-force 704 x 576, display aspect 4:3	MainWin		forza a 704 × 576, mostra aspetto in 4:3
 Error, connecting to interface failed:\n\n	MainWin		Errore, connessione all'interfaccia fallita:\n\n
-force 544 x 576, display aspect 4:3	MainWin		forza a 544 x 576, mostra aspetto in 4:3
 Full screen	MainWin		Schermo intero
 Scale to native size	MainWin		Dimensioni originali
 unknown	MainWin		sconosciuto
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Trasmissione TV Video Digital
 Always on top	MainWin		Sempre in primo piano
 Debug	MainWin		Debug
 Interface	MainWin		Interfaccia
-force 720 x 576, display aspect 4:3	MainWin		forza a 720 x 576, mostra aspetto in 4:3
 Quit	MainWin		Esci
 Channel	MainWin		Canale
 Previous channel	MainWin		Canale precedente

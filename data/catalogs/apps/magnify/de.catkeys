@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-Magnify	1026320385
+1	german	x-vnd.Haiku-Magnify	3508070139
   size must be > 4 and a multiple of 4	Console		  Größe muss > 4 und durch 4 teilbar sein
 Decrease pixel size	Magnify-Main		Pixel verkleinern
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
 Increase pixel size	Magnify-Main		Pixel vergrößern
 magnify: size must be a multiple of 4	Console		Magnify: die Größe muss durch 4 teilbar sein
 Stick coordinates	Magnify-Main		Koordinaten einfrieren
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# Pixel/Pixel} other{# Pixel/Pixel}}
 Copy image	Magnify-Main		Bild kopieren
 Decrease window size	Magnify-Main		Fenster verkleinern
 Remove a crosshair	Magnify-Main		Fadenkreuz entfernen

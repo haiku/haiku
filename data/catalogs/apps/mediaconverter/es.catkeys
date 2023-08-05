@@ -1,6 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-MediaConverter	3374737269
+1	spanish; castilian	x-vnd.Haiku-MediaConverter	2059124596
 Input file not recognized as Audio or Video	MediaConverter		El archivo de entrada no se ha podido reconocer como un archivo de audio o video.
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Archivos de entrada
 Error writing video frame %lld	MediaConverter		Error al escribir el fotograma %lld del video
 Error converting '%filename'	MediaConverter		Error al convertir '%filename'

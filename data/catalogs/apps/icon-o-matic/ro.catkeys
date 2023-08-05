@@ -1,8 +1,10 @@
-1	romanian	x-vnd.haiku-icon_o_matic	157002309
+1	romanian	x-vnd.haiku-icon_o_matic	1973458641
 None	Icon-O-Matic-Properties		Nespecificat
 Add empty	Icon-O-Matic-ShapesList		Adaugă gol
 Opening the icon failed!	Icon-O-Matic-Main		Deschiderea pictogramei a eșuat!
+Reverse path	Icon-O-Matic-ReversePathCmd		Inversează calea
 Add with path	Icon-O-Matic-ShapesList		Adaugă cu cale
+Paste properties	Icon-O-Matic-Properties		Proprietăți de lipire
 Copy	Icon-O-Matic-Properties		Copiază
 Color	Icon-O-Matic-PropertyNames		Culoare
 Format	Icon-O-Matic-SavePanel		Format
@@ -17,8 +19,10 @@ Paste	Icon-O-Matic-Properties		Lipește
 Close	Icon-O-Matic-Menu-File		Închide
 Add rect	Icon-O-Matic-PathsList		Adaugă un dreptunghi
 Rotation	Icon-O-Matic-PropertyNames		Rotație
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Culoare (#%02x%02x%02x)
 Transform	Icon-O-Matic-PathManipulator		Transformă
 Add shape with style	Icon-O-Matic-Menu-Shape		Adaugă o formă cu stil
+Change color	Icon-O-Matic-SetColorCmd		Modifică culoarea
 Remove	Icon-O-Matic-StylesList		Elimină
 Cancel	Icon-O-Matic-Menu-Settings		Anulează
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformare
@@ -32,6 +36,7 @@ Path	Icon-O-Matic-PropertyNames		Cale
 Path	Icon-O-Matic-Menus		Cale
 Stroke	Transformation		Trăsătură
 Flip	Icon-O-Matic-PathManipulator		Inversează
+Move pivot	Icon-O-Matic-TransformationBoxStates		Mută pivotul
 Opacity	Icon-O-Matic-PropertyNames		Opacitate
 OK	Icon-O-Matic-ColorPicker		OK
 Error: 	Icon-O-Matic-Main		Eroare: 
@@ -41,13 +46,16 @@ Opening the document failed!	Icon-O-Matic-Main		Deschiderea documentului a eșua
 Add with path & style	Icon-O-Matic-ShapesList		Adaugă cu cale și stil
 Shape	Icon-O-Matic-Menus		Formă
 <unavailable>	Icon-O-Matic-StyleTypes		<unavailable>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Editează gradientul
 Min LOD	Icon-O-Matic-PropertyNames		LOD minim
+Redo: %action%	Icon-O-Matic-Main		Repetă: %action%
 Add	Icon-O-Matic-TransformersList		Adaugă
 Settings	Icon-O-Matic-Menus		Configurări
 Scale X	Icon-O-Matic-PropertyNames		Scala X
 Add	Icon-O-Matic-PathsList		Adaugă
 Remove	Icon-O-Matic-PathManipulator		Elimină
 Duplicate	Icon-O-Matic-ShapesList		Duplică
+Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Contur
 Rounding	Icon-O-Matic-PropertyNames		Rotunjire
 Joins	Icon-O-Matic-PropertyNames		Legături
@@ -66,7 +74,9 @@ Overwrite	Icon-O-Matic-SVGExport		Suprascrie
 Cancel	Icon-O-Matic-SVGExport		Anulează
 Open…	Icon-O-Matic-Menu-File		Deschide…
 Remove	Icon-O-Matic-ShapesList		Elimină
+HVIF source code	Icon-O-Matic-SavePanel		Cod sursă HVIF
 Drop shapes	Icon-O-Matic-ShapesList		Aruncă formele
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Salvează iconița
 Linear	Icon-O-Matic-StyleTypes		Liniar
 Clean up	Icon-O-Matic-PathsList		Curăță
 Split	Icon-O-Matic-PathManipulator		Separă
@@ -76,18 +86,23 @@ Name	Icon-O-Matic-PropertyNames		Nume
 Reset transformation	Icon-O-Matic-StylesList		Restabilește transformarea
 Reverse	Icon-O-Matic-PathsList		Inversează
 Remove	Icon-O-Matic-PathsList		Elimină
+Load error	Icon-O-Matic-SVGImport		Eroare de încărcare
 Style type	Icon-O-Matic-StyleTypes		Tip de stil
 Quit	Icon-O-Matic-Menu-File		Ieșire
 Gradient	Icon-O-Matic-StyleTypes		Gradient
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Culoare (#%02x%02x%02x)
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Adaugă o formă cu cale și stil
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Text prea lung
 Caps	Icon-O-Matic-PropertyNames		Caps
 OK	Icon-O-Matic-SVGImport		OK
+Import text	Icon-O-Matic-StyledTextImport		Importă textul
 Append…	Icon-O-Matic-Menu-File		Adăugare…
 Scale Y	Icon-O-Matic-PropertyNames		Scala Y
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Exportă iconița
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotește indicii înainte
 Save	Icon-O-Matic-Menu-File		Salvează
+Cancel	Icon-O-Matic-StyledTextImport		Anulează
 Add circle	Icon-O-Matic-PathsList		Adaugă un cerc
 Freeze transformation	Icon-O-Matic-ShapesList		Îngheață transformarea
 Untitled	Icon-O-Matic-Main		Fără titlu
@@ -105,9 +120,11 @@ Scale	Icon-O-Matic-TransformationBoxStates		Scală
 All	Icon-O-Matic-Properties		Toate
 Transformer	Icon-O-Matic-Menus		Transformator
 Invert selection	Icon-O-Matic-Properties		Inversează selecția
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	pentru a atașa transformatorii.
 <unkown property>	Icon-O-Matic-PropertyNames		<unkown property>
 Pick a color	Icon-O-Matic-ColorPicker		Alegeți o culoare
 Settings…	Icon-O-Matic-SavePanel		Configurări…
+Select all	Icon-O-Matic-PathManipulator		Selectează toate
 Add with style	Icon-O-Matic-ShapesList		Adaugă cu stil
 New	Icon-O-Matic-Menu-File		Nou
 Gradient type	Icon-O-Matic-StyleTypes		Tip de gradient

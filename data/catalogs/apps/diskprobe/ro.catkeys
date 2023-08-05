@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskProbe	4193379066
+1	romanian	x-vnd.Haiku-DiskProbe	3780485250
 Raw editor	AttributeWindow		Editor brut
 Remove	AttributeWindow		Elimină
 Close	ProbeView		Închide
@@ -29,7 +29,9 @@ Open file…	FileWindow		Deschide fișier…
 32 bit unsigned pointer:	TypeEditors		Indicator fără semn pe 32 de biți:
 DiskProbe request	DiskProbe		Cerere DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Block %lld (0x%Lx)	ProbeView		Blocul %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Scrierea în fișier a eșuat:\n%s\n\nToate modificările vor fi pierdute când ieșiți.
+Native: %lld (0x%0*Lx)	ProbeView		Nativ: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Examinează dispozitivul:
 Number editor	TypeEditors		Editor de numere
 Icon	TypeEditors		Pictogramă

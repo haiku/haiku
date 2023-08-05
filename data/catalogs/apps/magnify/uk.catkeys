@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Magnify	1248284405
+1	ukrainian	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  розмір має бути > 4 та кратним 4
 Decrease pixel size	Magnify-Main		Зменшити розмір пікселя
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
 Increase pixel size	Magnify-Main		Збільшити розмір пікселя
 magnify: size must be a multiple of 4	Console		збільшення: розмір має бути кратним 4
 Stick coordinates	Magnify-Main		Закріпити координати
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# піксель/піксель} few{# пікселя/піксель} other{# пікселів/піксель}}
 Copy image	Magnify-Main		Копіювати зображення
 Decrease window size	Magnify-Main		Зменшити розмір вікна
 Remove a crosshair	Magnify-Main		Прибрати перехрестя

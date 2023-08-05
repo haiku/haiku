@@ -1,6 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	2116725671
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	801112998
 Input file not recognized as Audio or Video	MediaConverter		Arquivo de entrada não reconhecido como Áudio ou Vídeo
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Arquivos fonte
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Diretório selecionado não encontrado. Padronizando em /boot/home

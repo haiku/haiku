@@ -1,11 +1,10 @@
-1	hungarian	x-vnd.Haiku-Magnify	1248284405
+1	hungarian	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		a méretnek 4 többszörösének kell lennie
 Decrease pixel size	Magnify-Main		Képpontméret csökkentése
 no clip msg	In console, when clipboard is empty after clicking Copy image		a vágólap üres
 Increase pixel size	Magnify-Main		Képpont méretének növelése
 magnify: size must be a multiple of 4	Console		magnify: a méretnek a 4 többszörösének kell lennie
 Stick coordinates	Magnify-Main		Koordináták rögzítése
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# képpont/képpont} other{# képpont/képpont}}
 Copy image	Magnify-Main		Kép másolása
 Decrease window size	Magnify-Main		Ablak méretének csökkentése
 Remove a crosshair	Magnify-Main		Célkereszt eltávolítása

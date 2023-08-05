@@ -1,9 +1,7 @@
-1	russian	x-vnd.Haiku.TV	1995288111
+1	russian	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Без меню
 No border	MainWin		Без рамки
-force 704 x 576, display aspect 4:3	MainWin		Форсировать 704 x 576, соотношение 4:3
 Error, connecting to interface failed:\n\n	MainWin		Ошибка, не удалось подключиться к интерфейсу:\n\n
-force 544 x 576, display aspect 4:3	MainWin		Форсировать 544 x 576, соотношение 4:3
 Full screen	MainWin		На весь экран
 Scale to native size	MainWin		Оригинальный размер
 unknown	MainWin		неизвестно
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Цифровое Видео �
 Always on top	MainWin		Всегда сверху
 Debug	MainWin		Отладка
 Interface	MainWin		Интерфейс
-force 720 x 576, display aspect 4:3	MainWin		Форсировать 720 x 576, соотношение 4:3
 Quit	MainWin		Выход
 Channel	MainWin		Канал
 Previous channel	MainWin		Предыдущий канал

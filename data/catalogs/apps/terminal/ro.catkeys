@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	1694640256
+1	romanian	x-vnd.Haiku-Terminal	1133414730
 Close other tabs	Terminal TermWindow		Închide alte file
 Insert path	Terminal TermView		Inserează calea
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nu a putut porni shell. Scuze.
@@ -14,6 +14,7 @@ Edit tab title…	Terminal TermWindow		Editează titlul filei…
 Print	Terminal TermWindow		Tipărește
 Settings	Terminal TermWindow		Configurări
 %app% settings	Terminal PrefWindow	window title	Configurări %app%
+ANSI bright black color	Terminal ThemeView		Culoare negru deschis ANSI
 Use default	Terminal SetTitleWindow		Utilizează implicit
 Close tab	Terminal TermWindow		Închide fila
 Error!	Terminal getString		Eroare!
@@ -50,6 +51,7 @@ Custom	Terminal colors scheme		Personalizată
 Really close?	Terminal TermWindow		Sigur închideți?
 Font size	Terminal TermWindow		Dimensiunea fontului
 OK	Terminal TermApp		OK
+ANSI bright blue color	Terminal ThemeView		Culoare albastru deschis ANSI
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesul \„%1\” încă rulează.\nDacă închideți Terminalul, procesul va fi terminat.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune nerecunoscută \„%s\”\n
 Tab title:	Terminal AppearancePrefView		Titlul filei:
@@ -76,6 +78,7 @@ Shell 	Terminal TermWindow		Shell
 Revert	Terminal ThemeWindow		Revenire
 ANSI green color	Terminal ThemeView		culoarea verde ANSI
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tCaracterul „%”.\n\t%<\t-\tÎncepe o secțiune care va fi arătată doar dacă după aceea\n\t\t\tun substituent nu este liber.\n\t%>\t-\tÎncepe o secțiune care va fi arătată doar dacă un substituent\n\t\t\tîntre o %< section anterioară și aceasta nu este liber.\n\t%-\t-\tÎncheie o secțiune %< sau %>.\n\nOrice caracter non-alfanumeric între „%” și litera de format va insera un spațiu doar\ndacă valoarea substituentului nu este liberă. Va adăuga la secțiunea %<.
+ANSI bright cyan color	Terminal ThemeView		Culoare cyan deschis ANSI
 Tab title:	Terminal TermWindow		Titlul filei:
 Window title:	Terminal TermWindow		Titlul ferestrei:
 ANSI white color	Terminal ThemeView		culoarea albă ANSI
@@ -91,28 +94,37 @@ The pattern specifying the window title. The following placeholders\ncan be used
 Selected background	Terminal ThemeView		Fundal selectat
 Save as default	Terminal TermWindow		Salvează ca implicit
 Nothing is selected.	Terminal TermWindow		Nu este selectat nimic.
+ANSI bright red color	Terminal ThemeView		Culoare roșu deschis ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Utilizează opțiunea stângă ca tastă meta
 Find	Terminal FindWindow		Găsește
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Modelul care specifică titlul filei curente. Următorii substituenți\npot fi utilizați:\n
+Save to file…	Terminal ThemeWindow		Salvează în fișier…
 Font:	Terminal AppearancePrefView		Font:
 Paste	Terminal TermWindow		Lipește
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Modelul care specifică titlurile ferestrelor. Următorii substituenți\npot fi utilizați:
+ANSI bright magenta color	Terminal ThemeView		Culoare magenta deschis ANSI
 Copy here	Terminal TermView		Copiază aici
 Use default shell	Terminal Shell		Utilizează shell implicit
 red	Terminal ThemeView		roșu
 white	Terminal ThemeView		alb
 Open link	Terminal TermView		Deschide legătura
 Text	Terminal ThemeView		Text
+ANSI bright yellow color	Terminal ThemeView		Culoare galben deschis ANSI
 Not found.	Terminal TermWindow		Nu a fost găsit.
+ANSI black color	Terminal ThemeView		Culoare neagră ANSI
 Find…	Terminal TermWindow		Găsește…
 No search string was entered.	Terminal TermWindow		Nu a fost introdus niciun șir de căutare.
 Move here	Terminal TermView		Mută aici
 Abort	Terminal Shell		Întrerupe
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Următoarele procese încă rulează:\n\n\t%1\n\nDacă închideți Terminal, procesele vor fi terminate.
 Set window title	Terminal TermWindow		Stabilește titlul ferestrei
+ANSI red color	Terminal ThemeView		Culoare roșie ANSI
 Increase	Terminal TermWindow		Mărește
 green	Terminal ThemeView		verde
+ANSI bright green color	Terminal ThemeView		Culoare verde deschis ANSI
 OK	Terminal TermWindow		OK
+Text under cursor	Terminal ThemeView		Text sub cursor
+ANSI bright white color	Terminal ThemeView		Culoare alb deschis ANSI
 Close window	Terminal TermWindow		Închide fereastra
 ANSI magenta color	Terminal ThemeView		culoarea magenta ANSI
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nDrepturi de autor 2001-2019 Haiku, Inc.\nDrepturi de autor(C) 1999 Kazuho Okui și Takashi Murai.\n\nUtilizare: %s [OPȚIUNE] [SHELL]\n

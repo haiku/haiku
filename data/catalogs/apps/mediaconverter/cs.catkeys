@@ -1,6 +1,5 @@
-1	czech	x-vnd.Haiku-MediaConverter	1833571229
+1	czech	x-vnd.Haiku-MediaConverter	517958556
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
-%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Zdrojový soubor
 Error writing video frame %lld	MediaConverter		Chyba zápisu snímku videa %lld
 Audio quality: %s	MediaConverter		Kvalita zvuku: %s

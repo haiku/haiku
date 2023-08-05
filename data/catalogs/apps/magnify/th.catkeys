@@ -1,11 +1,10 @@
-1	thai	x-vnd.Haiku-Magnify	1248284405
+1	thai	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		ขนาดจะต้อง> 4 และจำนวนทวีคูณของ 4
 Decrease pixel size	Magnify-Main		ลดขนาดพิกเซล
 no clip msg	In console, when clipboard is empty after clicking Copy image		ไม่มีข้อความเกี่ยวกับคลิป
 Increase pixel size	Magnify-Main		เพิ่มขนาดพิกเซล
 magnify: size must be a multiple of 4	Console		ขยาย: ขนาดต้องเป็นทวีคูณของ 4
 Stick coordinates	Magnify-Main		คงพิกัด
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# pixel/pixel} อื่นๆ{# pixels/pixel}}
 Copy image	Magnify-Main		สำเนาภาพ
 Decrease window size	Magnify-Main		ลดขนาดหน้าต่าง
 Remove a crosshair	Magnify-Main		ลบเส้นกากบาท

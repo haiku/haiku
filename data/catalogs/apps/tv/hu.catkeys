@@ -1,9 +1,7 @@
-1	hungarian	x-vnd.Haiku.TV	1995288111
+1	hungarian	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Nincs menü
 No border	MainWin		Keret kikapcsolása
-force 704 x 576, display aspect 4:3	MainWin		704 x 576 kikényszerítése, 4:3-as képaránnyal
 Error, connecting to interface failed:\n\n	MainWin		Hiba, nem sikerült csatlakozni a felülethez:\n\n
-force 544 x 576, display aspect 4:3	MainWin		544 x 576 kényszerítése, 4:3-as képaránnyal
 Full screen	MainWin		Teljes képernyő
 Scale to native size	MainWin		Méretezés az eredeti méretre
 unknown	MainWin		ismeretlen
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digitális videóközvetíté
 Always on top	MainWin		Mindig legyen felül az ablak
 Debug	MainWin		Hibakeresés
 Interface	MainWin		Felület
-force 720 x 576, display aspect 4:3	MainWin		720 x 576 kényszerítése, 4:3-as képaránnyal
 Quit	MainWin		Kilépés
 Channel	MainWin		Csatorna
 Previous channel	MainWin		Előző csatorna

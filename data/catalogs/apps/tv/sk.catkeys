@@ -1,9 +1,7 @@
-1	slovak	x-vnd.Haiku.TV	1995288111
+1	slovak	x-vnd.Haiku.TV	3120244932
 No menu	MainWin		Bez menu
 No border	MainWin		Bez okraja
-force 704 x 576, display aspect 4:3	MainWin		vynútiť 704 x 576, pomer strán 4:3
 Error, connecting to interface failed:\n\n	MainWin		Chyba, pripojenie na rozhranie zlyhalo:\n\n
-force 544 x 576, display aspect 4:3	MainWin		vynútiť 544 x 576, pomer strán 4:3
 Full screen	MainWin		Celoobrazovkový režim
 Scale to native size	MainWin		Zmeniť mierku na natívnu veľkosť
 unknown	MainWin		neznáme
@@ -13,7 +11,6 @@ DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
 Always on top	MainWin		Vždy na vrchu
 Debug	MainWin		Ladenie
 Interface	MainWin		Rozhranie
-force 720 x 576, display aspect 4:3	MainWin		vynútiť 720 x 576, pomer strán 4:3
 Quit	MainWin		Ukončiť
 Channel	MainWin		Kanál
 Previous channel	MainWin		Predošlý kanál

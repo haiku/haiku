@@ -1,11 +1,10 @@
-1	esperanto	x-vnd.Haiku-Magnify	1248284405
+1	esperanto	x-vnd.Haiku-Magnify	3730034159
   size must be > 4 and a multiple of 4	Console		  grando devas esti > 4 kaj la plurobla de 4
 Decrease pixel size	Magnify-Main		Malpliigi bilderan grandecon
 no clip msg	In console, when clipboard is empty after clicking Copy image		bildo ne kopiita
 Increase pixel size	Magnify-Main		Pliigi bilderan grandecon
 magnify: size must be a multiple of 4	Console		pligrandilo: grando devas esti obla al 4
 Stick coordinates	Magnify-Main		Alglui koordinatojn
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# bildero/bildero} other{# bilderoj/bildero}}
 Copy image	Magnify-Main		Kopii bildon
 Decrease window size	Magnify-Main		Malpligrandigi fenestron
 Remove a crosshair	Magnify-Main		Forigi krucon
