@@ -52,6 +52,7 @@ All rights reserved.
 #include <NodeInfo.h>
 #include <Path.h>
 #include <StringFormat.h>
+#include <StringForSize.h>
 #include <SupportDefs.h>
 #include <TextView.h>
 #include <Volume.h>
@@ -74,14 +75,6 @@ All rights reserved.
 
 const int32 kGenericReadBufferSize = 1024;
 
-const char* kSizeFormats[] = {
-	"%.2f %s",
-	"%.1f %s",
-	"%.f %s",
-	"%.f%s",
-	0
-};
-
 
 bool NameAttributeText::sSortFolderNamesFirst = false;
 bool RealNameAttributeText::sSortFolderNamesFirst = false;
@@ -92,65 +85,37 @@ float
 TruncFileSizeBase(BString* outString, int64 value, const View* view,
 	float width)
 {
-	// ToDo: If slow, replace float divisions with shifts
-	//       if fast enough, try fitting more decimal places.
-
-	// ToDo: Update string_for_size() in libshared to be able to
-	//       handle this case.
-
-	BString buffer;
-
 	// format file size value
 	if (value == kUnknownSize) {
 		*outString = "-";
 		return view->StringWidth("-");
-	} else if (value < kKBSize) {
-		static BStringFormat format(B_TRANSLATE(
-			"{0, plural, one{# byte} other{# bytes}}"));
-		format.Format(buffer, value);
-		if (view->StringWidth(buffer.String()) > width)
-			buffer.SetToFormat(B_TRANSLATE("%lld B"), value);
-	} else {
-		const char* suffix;
-		float doubleValue;
-		if (value >= kTBSize) {
-			suffix = B_TRANSLATE("TiB");
-			doubleValue = (double)value / kTBSize;
-		} else if (value >= kGBSize) {
-			suffix = B_TRANSLATE("GiB");
-			doubleValue = (double)value / kGBSize;
-		} else if (value >= kMBSize) {
-			suffix = B_TRANSLATE("MiB");
-			doubleValue = (double)value / kMBSize;
-		} else {
-			ASSERT(value >= kKBSize);
-			suffix = B_TRANSLATE("KiB");
-			doubleValue = (double)value / kKBSize;
+	}
+
+	char sizeBuffer[128];
+	BString buffer = string_for_size(value, sizeBuffer, sizeof(sizeBuffer));
+
+	if (value < kKBSize) {
+		if (view->StringWidth(buffer.String()) > width) {
+			buffer.SetToFormat(B_TRANSLATE_COMMENT("%lld B",
+				"The filesize symbol for byte"), value);
 		}
-
-		for (int32 index = 0; ; index++) {
-			if (kSizeFormats[index] == 0)
-				break;
-
-			buffer.SetToFormat(kSizeFormats[index], doubleValue, suffix);
-			// strip off an insignificant zero so we don't get readings
-			// such as 1.00
-			char* period = 0;
-			for (char* tmp = const_cast<char*>(buffer.String()); *tmp != '\0';
-					tmp++) {
-				if (*tmp == '.')
-					period = tmp;
-			}
-			if (period && period[1] && period[2] == '0')
-				// move the rest of the string over the insignificant zero
-				for (char* tmp = &period[2]; *tmp; tmp++)
-					*tmp = tmp[1];
-
-			float resultWidth = view->StringWidth(buffer);
-			if (resultWidth <= width) {
-				*outString = buffer.String();
-				return resultWidth;
-			}
+	} else {
+		// strip off an insignificant zero so we don't get readings
+		// such as 1.00
+		char* period = 0;
+		for (char* tmp = const_cast<char*>(buffer.String()); *tmp != '\0'; tmp++) {
+			if (*tmp == '.')
+				period = tmp;
+		}
+		if (period && period[1] && period[2] == '0') {
+			// move the rest of the string over the insignificant zero
+			for (char* tmp = &period[2]; *tmp; tmp++)
+				*tmp = tmp[1];
+		}
+		float resultWidth = view->StringWidth(buffer);
+		if (resultWidth <= width) {
+			*outString = buffer.String();
+			return resultWidth;
 		}
 	}
 
