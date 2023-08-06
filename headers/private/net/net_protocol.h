@@ -108,7 +108,8 @@ struct net_protocol_module_info {
 
 	ssize_t		(*send_data_no_buffer)(net_protocol* self, const iovec* vecs,
 					size_t vecCount, ancillary_data_container* ancillaryData,
-					const struct sockaddr* address, socklen_t addressLength);
+					const struct sockaddr* address, socklen_t addressLength,
+					int flags);
 	ssize_t		(*read_data_no_buffer)(net_protocol* self, const iovec* vecs,
 					size_t vecCount, ancillary_data_container** _ancillaryData,
 					struct sockaddr* _address, socklen_t* _addressLength);

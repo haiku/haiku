@@ -408,10 +408,10 @@ unix_process_ancillary_data(net_protocol *self,
 ssize_t
 unix_send_data_no_buffer(net_protocol *_protocol, const iovec *vecs,
 	size_t vecCount, ancillary_data_container *ancillaryData,
-	const struct sockaddr *address, socklen_t addressLength)
+	const struct sockaddr *address, socklen_t addressLength, int flags)
 {
 	return ((UnixEndpoint*)_protocol)->Send(vecs, vecCount, ancillaryData,
-		address, addressLength);
+		address, addressLength, flags);
 }
 
 

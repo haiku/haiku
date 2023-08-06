@@ -56,7 +56,7 @@ public:
 	virtual	ssize_t				Send(const iovec* vecs, size_t vecCount,
 									ancillary_data_container* ancillaryData,
 									const struct sockaddr* address,
-									socklen_t addressLength) = 0;
+									socklen_t addressLength, int flags) = 0;
 	virtual	ssize_t				Receive(const iovec* vecs, size_t vecCount,
 									ancillary_data_container** _ancillaryData,
 									struct sockaddr* _address, socklen_t* _addressLength) = 0;
