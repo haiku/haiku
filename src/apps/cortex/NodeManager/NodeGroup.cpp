@@ -632,10 +632,14 @@ status_t NodeGroup::setTimeSource(
 	for_each(
 		m_nodes.begin(),
 		m_nodes.end(),
+#if __GNUC__ <= 2
 		bind2nd(
 			mem_fun(&NodeRef::_setTimeSource),
 			m_timeSource.node
 		)
+#else
+		[this](NodeRef* nodeRef) { nodeRef->_setTimeSource(m_timeSource.node); }
+#endif
 	);
 	
 //	// try to set as sync node
@@ -680,10 +684,14 @@ status_t NodeGroup::setRunMode(BMediaNode::run_mode mode) {
 	for_each(
 		m_nodes.begin(),
 		m_nodes.end(),
+#if __GNUC__ <= 2
 		bind2nd(
 			mem_fun(&NodeRef::_setRunModeAuto),
 			m_runMode
 		)
+#else
+		[this](NodeRef* ref) { ref->_setRunModeAuto(this->m_runMode); }
+#endif
 //		bound_method(
 //			*this,
 //			&NodeGroup::setRunModeFor)
@@ -1260,7 +1268,11 @@ status_t NodeGroup::_stop() {
 	for_each(
 		m_nodes.begin(),
 		m_nodes.end(),
+#if __GNUC__ <= 2
 		mem_fun(&NodeRef::_stop)
+#else
+		[](NodeRef* ref) { ref->_stop(); }
+#endif
 	);
 
 	// update transport state

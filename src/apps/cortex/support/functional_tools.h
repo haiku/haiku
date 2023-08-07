@@ -59,7 +59,7 @@ __BEGIN_CORTEX_NAMESPACE
 
 // 27jul99: functor adaptor "call a given method of a given object with argument"
 template<class _retT, class _subjectT, class _objectT>
-class bound_method_t : public std::unary_function<_objectT*, _retT> {
+class bound_method_t {
 public:
 	explicit bound_method_t(
 		// the bound instance on which the method will be called
@@ -78,7 +78,7 @@ private:
 
 // 27jul99: functor adaptor "call a given method of a given object with argument"
 template<class _retT, class _subjectT, class _objectT>
-class bound_const_method_t : public std::unary_function<const _objectT*, _retT> {
+class bound_const_method_t {
 public:
 	explicit bound_const_method_t(
 		// the bound instance on which the method will be called
@@ -96,7 +96,7 @@ private:
 };
 
 template<class _retT, class _subjectT, class _objectT>
-class bound_method_ref_t : public std::unary_function<_objectT&, _retT> {
+class bound_method_ref_t {
 public:
 	explicit bound_method_ref_t(
 		// the bound instance on which the method will be called
@@ -114,7 +114,7 @@ private:
 };
 
 template<class _retT, class _subjectT, class _objectT>
-class bound_const_method_ref_t : public std::unary_function<const _objectT&, _retT> {
+class bound_const_method_ref_t {
 public:
 	explicit bound_const_method_ref_t(
 		// the bound instance on which the method will be called
@@ -136,7 +136,7 @@ private:
 // 27jul99: functor adaptor "call a given method of a given object with argument"
 //          + an additional argument
 template<class _retT, class _subjectT, class _objectT, class _arg1T>
-class bound_method1_t : public std::binary_function<_objectT*,_arg1T,_retT> {
+class bound_method1_t {
 public:
 	explicit bound_method1_t(
 		// the bound instance on which the method will be called
@@ -156,7 +156,7 @@ private:
 
 // 27jul99: functor adaptor "call a given method of a given object with argument"
 template<class _retT, class _subjectT, class _objectT, class _arg1T>
-class bound_const_method1_t : public std::binary_function<const _objectT*,_arg1T,_retT> {
+class bound_const_method1_t {
 public:
 	explicit bound_const_method1_t(
 		// the bound instance on which the method will be called
@@ -174,7 +174,7 @@ private:
 };
 
 template<class _retT, class _subjectT, class _objectT, class _arg1T>
-class bound_method_ref1_t : public std::binary_function<_objectT&,_arg1T,_retT> {
+class bound_method_ref1_t {
 public:
 	explicit bound_method_ref1_t(
 		// the bound instance on which the method will be called
@@ -192,7 +192,7 @@ private:
 };
 
 template<class _retT, class _subjectT, class _objectT, class _arg1T>
-class bound_const_method_ref1_t : public std::binary_function<const _objectT&,_arg1T,_retT> {
+class bound_const_method_ref1_t {
 public:
 	explicit bound_const_method_ref1_t(
 		// the bound instance on which the method will be called

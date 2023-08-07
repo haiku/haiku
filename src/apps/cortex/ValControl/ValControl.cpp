@@ -263,7 +263,12 @@ ValControl::AllAttached()
 	pWnd->BeginViewTransaction();
 	
 	for_each(fLayoutSet.begin(), fLayoutSet.end(),
-		ptr_fun(&ValCtrlLayoutEntry::InitChildFrame)); // +++++?
+#if __GNUC__ <= 2
+		ptr_fun(&ValCtrlLayoutEntry::InitChildFrame)
+#else
+		[](ValCtrlLayoutEntry& entry) { ValCtrlLayoutEntry::InitChildFrame(entry); }
+#endif
+	);
 	
 	pWnd->EndViewTransaction();
 }
