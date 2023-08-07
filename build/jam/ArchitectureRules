@@ -127,7 +127,7 @@ rule ArchitectureSetup architecture
 	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
 		# TODO: Remove all these.
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=unused-but-set-variable
-			-Wno-error=deprecated -Wno-error=deprecated-declarations
+			-Wno-error=deprecated-declarations
 			-Wno-error=cpp -Wno-error=register ;
 		# These currently generate too many "false positives."
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=address-of-packed-member
