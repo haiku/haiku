@@ -251,6 +251,9 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 			case PT_ARM_UNWIND:
 				// known but unused type
 				continue;
+			case PT_EH_FRAME:
+				// not implemented yet, but can be ignored
+				continue;
 			default:
 				dprintf("unhandled pheader type 0x%" B_PRIx32 "\n", header.p_type);
 				continue;
