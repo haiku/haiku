@@ -103,6 +103,14 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 {
 	DBGMSG(("> nextBand\n"));
 
+#if __GNUC__ <= 2
+	typedef auto_ptr<Rasterizer> RasterizerPointer;
+	typedef auto_ptr<DeltaRowCompressor> DeltaRowCompressorPointer;
+#else
+	typedef shared_ptr<Rasterizer> RasterizerPointer;
+	typedef shared_ptr<DeltaRowCompressor> DeltaRowCompressorPointer;
+#endif
+
 	try {
 		int y = (int)offset->y;
 
@@ -118,7 +126,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 		} else
 			rasterizer = new MonochromeRasterizer(fHalftone);
 
-		auto_ptr<Rasterizer> _rasterizer(rasterizer);
+		RasterizerPointer _rasterizer(rasterizer);
 		bool valid = rasterizer->SetBitmap((int)offset->x, (int)offset->y,
 			bitmap, GetPageHeight());
 
@@ -135,7 +143,7 @@ PCL6Driver::NextBand(BBitmap* bitmap, BPoint* offset)
 					return false;
 				}
 			}
-			auto_ptr<DeltaRowCompressor>_deltaRowCompressor(deltaRowCompressor);
+			DeltaRowCompressorPointer _deltaRowCompressor(deltaRowCompressor);
 			int deltaRowSize = 0;
 
 			// remember position

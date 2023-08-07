@@ -269,7 +269,12 @@ FavoritesMenu::AddNextItem()
 
 			// don't add folders that are already in the GoTo section
 			if (find_if(fUniqueRefCheck.begin(), fUniqueRefCheck.end(),
-				bind2nd(std::equal_to<entry_ref>(), ref))
+#if __GNUC__ <= 2
+				bind2nd(std::equal_to<entry_ref>(), ref)
+#else
+				[ref](entry_ref compared) { return ref == compared; }
+#endif
+			)
 					!= fUniqueRefCheck.end()) {
 				continue;
 			}

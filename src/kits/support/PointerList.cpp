@@ -84,7 +84,7 @@ private:
 	int virtual Compare(const void *key, const void* item) = 0;
 };
 
-struct comparator : public binary_function<const void*, const void*, bool>
+struct comparator
 {
 	comparator(AbstractPointerListHelper* helper) : helper(helper) {}
 	

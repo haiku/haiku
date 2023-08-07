@@ -9548,8 +9548,7 @@ PoseCompareAddWidgetBinder(const BPose* p1, const BPose* p2,
 }
 
 
-struct PoseComparator : public std::binary_function<const BPose*,
-	const BPose*, bool>
+struct PoseComparator
 {
 	PoseComparator(BPoseView* poseView): fPoseView(poseView) { }
 
