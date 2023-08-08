@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006, 2023, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "FlatIconImporter.h"
@@ -435,7 +436,7 @@ FlatIconImporter::_ParsePaths(LittleEndianBuffer& buffer,
 
 // _ReadTransformer
 static Transformer*
-_ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
+_ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source, Shape* shape)
 {
 	uint8 transformerType;
 	if (!buffer.Read(transformerType))
@@ -479,9 +480,19 @@ _ReadTransformer(LittleEndianBuffer& buffer, VertexSource& source)
 		}
 		case TRANSFORMER_TYPE_PERSPECTIVE: {
 			PerspectiveTransformer* perspective
-				= new (nothrow) PerspectiveTransformer(source);
-			// TODO: upgrade AGG to be able to support storage of
-			// trans_perspective
+				= new (nothrow) PerspectiveTransformer(source, shape);
+			if (!perspective)
+				return NULL;
+			double matrix[9];
+			for (int32 i = 0; i < 9; i++) {
+				float value;
+				if (!read_float_24(buffer, value)) {
+					delete perspective;
+					return NULL;
+				}
+				matrix[i] = value;
+			}
+			perspective->load_from(matrix);
 			return perspective;
 		}
 		case TRANSFORMER_TYPE_STROKE: {
@@ -601,7 +612,7 @@ FlatIconImporter::_ReadPathSourceShape(LittleEndianBuffer& buffer,
 			return NULL;
 		for (uint32 i = 0; i < transformerCount; i++) {
 			Transformer* transformer
-				= _ReadTransformer(buffer, shape->VertexSource());
+				= _ReadTransformer(buffer, shape->VertexSource(), shape);
 			if (transformer && !shape->Transformers()->AddItem(transformer)) {
 				delete transformer;
 				return NULL;
@@ -651,7 +662,3 @@ FlatIconImporter::_ParseShapes(LittleEndianBuffer& buffer,
 
 	return B_OK;
 }
-
-
-
-

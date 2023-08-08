@@ -43,6 +43,9 @@ class IconObject : public Observable,
 			const char*			Name() const
 									{ return fName.String(); }
 
+	// TODO: let IconObject control its own manipulators?
+	// This would allow VectorPaths to control their own PathManipulator,
+	// Styles to control their own TransformGradientBox, etc.
  private:
 			BString				fName;
 };

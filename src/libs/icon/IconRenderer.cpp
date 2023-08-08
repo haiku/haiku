@@ -20,106 +20,140 @@
 #include <agg_span_image_filter_rgba.h>
 #include <agg_span_gradient.h>
 #include <agg_span_interpolator_linear.h>
+#include <agg_span_interpolator_trans.h>
 
+#include "CompoundStyleTransformer.h"
 #include "GradientTransformable.h"
 #include "Icon.h"
 #include "Shape.h"
 #include "Style.h"
+#include "StyleTransformer.h"
 #include "VectorPath.h"
 
 using std::nothrow;
 
 class IconRenderer::StyleHandler {
 	struct StyleItem {
-		Style*			style;
-		Transformation	transformation;
+		const Style*			style;
+		StyleTransformer*		transformer;
 	};
 
  public:
 #ifdef ICON_O_MATIC
-	StyleHandler(::GammaTable& gammaTable, bool showReferences)
-		: fStyles(20),
-		  fGammaTable(gammaTable),
-		  fShowReferences(showReferences),
-		  fTransparent(0, 0, 0, 0),
-		  fColor(0, 0, 0, 0)
-	{}
+								StyleHandler(::GammaTable& gammaTable,
+									bool showReferences);
 #else
-	StyleHandler(::GammaTable& gammaTable)
-		: fStyles(20),
-		  fGammaTable(gammaTable),
-		  fTransparent(0, 0, 0, 0),
-		  fColor(0, 0, 0, 0)
-	{}
-#endif // ICON_O_MATIC
-
-	~StyleHandler()
-	{
-		int32 count = fStyles.CountItems();
-		for (int32 i = 0; i < count; i++)
-			delete (StyleItem*)fStyles.ItemAtFast(i);
-	}
-
-	bool is_solid(unsigned styleIndex) const
-	{
-		StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
-		if (!styleItem)
-			return true;
-
-		if (styleItem->style->Gradient())
-			return false;
-
-#ifdef ICON_O_MATIC
-		if (styleItem->style->Bitmap() && fShowReferences)
-			return false;
-#endif // ICON_O_MATIC
-
-		return true;
-	}
-
-	const agg::rgba8& color(unsigned styleIndex);
-
-	void generate_span(agg::rgba8* span, int x, int y,
-					   unsigned len, unsigned styleIndex);
-
-	bool AddStyle(Style* style, const Transformation& transformation)
-	{
-		if (!style)
-			return false;
-		StyleItem* item = new (nothrow) StyleItem;
-		if (!item)
-			return false;
-		item->style = style;
-		// if the style uses a gradient, the transformation
-		// is based on the gradient transformation
-		if (Gradient* gradient = style->Gradient()) {
-			item->transformation = *gradient;
-			item->transformation.multiply(transformation);
-		} else {
-			item->transformation = transformation;
-		}
-		item->transformation.invert();
-		return fStyles.AddItem((void*)item);
-	}
-
-private:
-	template<class GradientFunction>
-	void _GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
-		GradientFunction function, int32 start, int32 end,
-		const agg::rgba8* gradientColors, Transformation& gradientTransform);
-#ifdef ICON_O_MATIC
-	void _GenerateImage(agg::rgba8* span, int x, int y,
-	   unsigned len, Style* style, Transformation& transform);
+								StyleHandler(::GammaTable& gammaTable);
 #endif
 
-	BList				fStyles;
-	::GammaTable&		fGammaTable;
+								~StyleHandler();
+
+			bool				AddStyle(const Style* style,
+									const Transformable& transformation,
+									const Container<Transformer>* transformers);
+
+			bool				is_solid(unsigned styleIndex) const;
+			const agg::rgba8&	color(unsigned styleIndex);
+			void				generate_span(agg::rgba8* span, int x, int y,
+									unsigned len, unsigned styleIndex);
+ private:
+			StyleTransformer*	_MergeTransformers(
+									const Transformable* styleTransformation,
+									const Container<Transformer>* transformers,
+									const Transformable* shapeTransformation);
+
+			template<class GradientFunction>
+			void				_GenerateGradient(agg::rgba8* span,
+									int x, int y, unsigned len,
+									GradientFunction function,
+									int32 start, int32 end,
+									const agg::rgba8* gradientColors,
+									StyleTransformer* transformer);
 #ifdef ICON_O_MATIC
-	bool				fShowReferences;
+			void				_GenerateImage(agg::rgba8* span,
+									int x, int y, unsigned len,
+									const Style* style,
+									StyleTransformer* transformer);
 #endif
-	agg::rgba8			fTransparent;
-	agg::rgba8			fColor;
+
+ private:
+			BList					fStyles;
+			::GammaTable&			fGammaTable;
+#ifdef ICON_O_MATIC
+			bool					fShowReferences;
+#endif
+			agg::rgba8				fTransparent;
+			agg::rgba8				fColor;
 };
+
+
+
+#ifdef ICON_O_MATIC
+IconRenderer::StyleHandler::StyleHandler(::GammaTable& gammaTable, bool showReferences)
+	: fStyles(20),
+	  fGammaTable(gammaTable),
+	  fShowReferences(showReferences),
+	  fTransparent(0, 0, 0, 0),
+	  fColor(0, 0, 0, 0)
+{}
+#else
+IconRenderer::StyleHandler::StyleHandler(::GammaTable& gammaTable)
+	: fStyles(20),
+	  fGammaTable(gammaTable),
+	  fTransparent(0, 0, 0, 0),
+	  fColor(0, 0, 0, 0)
+{}
+#endif
+
+
+IconRenderer::StyleHandler::~StyleHandler()
+{
+	int32 count = fStyles.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		StyleItem* item = (StyleItem*)fStyles.ItemAtFast(i);
+		delete item->transformer;
+		delete item;
+	}
+}
+
+
+bool
+IconRenderer::StyleHandler::AddStyle(const Style* style,
+	const Transformable& transformation, const Container<Transformer>* transformers)
+{
+	if (!style)
+		return false;
+
+	StyleItem* item = new (nothrow) StyleItem;
+	if (!item)
+		return false;
+
+	item->style = style;
+
+	item->transformer = _MergeTransformers(style->Gradient(), transformers, &transformation);
+	item->transformer->Invert();
+
+	return fStyles.AddItem((void*)item);
+}
+
+
+bool
+IconRenderer::StyleHandler::is_solid(unsigned styleIndex) const
+{
+	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
+	if (!styleItem)
+		return true;
+
+	if (styleItem->style->Gradient())
+		return false;
+
+#ifdef ICON_O_MATIC
+	if (styleItem->style->Bitmap() && fShowReferences)
+		return false;
+#endif // ICON_O_MATIC
+
+	return true;
+}
 
 
 const agg::rgba8&
@@ -164,12 +198,12 @@ IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 
 #ifdef ICON_O_MATIC
 	if (styleItem->style->Bitmap()) {
-		_GenerateImage(span, x, y, len, styleItem->style, styleItem->transformation);
+		_GenerateImage(span, x, y, len, styleItem->style, styleItem->transformer);
 		return;
 	}
 #endif // ICON_O_MATIC
 
-	Style* style = styleItem->style;
+	const Style* style = styleItem->style;
 	Gradient* gradient = style->Gradient();
 	const agg::rgba8* colors = style->GammaCorrectedColors(fGammaTable);
 
@@ -177,40 +211,82 @@ IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 		case GRADIENT_LINEAR: {
 		    agg::gradient_x function;
 			_GenerateGradient(span, x, y, len, function, -64, 64, colors,
-				styleItem->transformation);
+				styleItem->transformer);
 			break;
 		}
 		case GRADIENT_CIRCULAR: {
 		    agg::gradient_radial function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-				styleItem->transformation);
+				styleItem->transformer);
 			break;
 		}
 		case GRADIENT_DIAMOND: {
 		    agg::gradient_diamond function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-				styleItem->transformation);
+				styleItem->transformer);
 			break;
 		}
 		case GRADIENT_CONIC: {
 		    agg::gradient_conic function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-				styleItem->transformation);
+				styleItem->transformer);
 			break;
 		}
 		case GRADIENT_XY: {
 		    agg::gradient_xy function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-				styleItem->transformation);
+				styleItem->transformer);
 			break;
 		}
 		case GRADIENT_SQRT_XY: {
 		    agg::gradient_sqrt_xy function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-				styleItem->transformation);
+				styleItem->transformer);
 			break;
 		}
 	}
+}
+
+
+StyleTransformer*
+IconRenderer::StyleHandler::_MergeTransformers(const Transformable* styleTransformation,
+	const Container<Transformer>* transformers, const Transformable* shapeTransformation)
+{
+	// Figure out how large to make the array
+	int32 count = 0;
+	if (styleTransformation != NULL)
+		count++;
+	for (int i = 0; i < transformers->CountItems(); i++) {
+		if (dynamic_cast<StyleTransformer*>(transformers->ItemAtFast(i)))
+			count++;
+	}
+	count++;
+
+	// Populate the array
+	StyleTransformer** styleTransformers = new (nothrow) StyleTransformer*[count];
+	if (styleTransformers == NULL)
+		return NULL;
+
+	int i = 0;
+	if (styleTransformation != NULL)
+		styleTransformers[i++] = new (nothrow) Transformable(*styleTransformation);
+	for (int j = 0; j < transformers->CountItems(); j++) {
+		Transformer* transformer = transformers->ItemAtFast(j);
+		if (dynamic_cast<StyleTransformer*>(transformer) != NULL) {
+			styleTransformers[i++]
+				= dynamic_cast<StyleTransformer*>(transformer->Clone());
+		}
+	}
+	styleTransformers[i++] = new (nothrow) Transformable(*shapeTransformation);
+
+	CompoundStyleTransformer* styleTransformer
+		= new (nothrow) CompoundStyleTransformer(styleTransformers, count);
+	if (styleTransformer == NULL) {
+		delete[] styleTransformers;
+		return NULL;
+	}
+
+	return styleTransformer;
 }
 
 
@@ -218,29 +294,49 @@ template<class GradientFunction>
 void
 IconRenderer::StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y,
 	unsigned len, GradientFunction function, int32 start, int32 end,
-	const agg::rgba8* gradientColors, Transformation& gradientTransform)
+	const agg::rgba8* gradientColors, StyleTransformer* transformer)
 {
+	// TODO: performance could potentially be improved by avoiding recreating
+	// these objects on every span
 	typedef agg::pod_auto_array<agg::rgba8, 256>	ColorArray;
-	typedef agg::span_interpolator_linear<>			Interpolator;
-	typedef agg::span_gradient<agg::rgba8,
-							   Interpolator,
-							   GradientFunction,
-							   ColorArray>			GradientGenerator;
-
-	Interpolator interpolator(gradientTransform);
-
 	ColorArray array(gradientColors);
-	GradientGenerator gradientGenerator(interpolator, function, array,
-		start, end);
 
-	gradientGenerator.generate(span, x, y, len);
+	if (transformer->IsLinear()) {
+		typedef agg::span_interpolator_linear
+			<StyleTransformer>						Interpolator;
+		typedef agg::span_gradient<agg::rgba8,
+								Interpolator,
+								GradientFunction,
+								ColorArray>			GradientGenerator;
+
+		Interpolator interpolator(*transformer);
+
+		GradientGenerator gradientGenerator(interpolator, function, array,
+			start, end);
+
+		gradientGenerator.generate(span, x, y, len);
+	} else {
+		typedef agg::span_interpolator_trans
+			<StyleTransformer>						Interpolator;
+		typedef agg::span_gradient<agg::rgba8,
+								Interpolator,
+								GradientFunction,
+								ColorArray>			GradientGenerator;
+
+		Interpolator interpolator(*transformer);
+
+		GradientGenerator gradientGenerator(interpolator, function, array,
+			start, end);
+
+		gradientGenerator.generate(span, x, y, len);
+	}
 }
 
 
 #ifdef ICON_O_MATIC
 void
 IconRenderer::StyleHandler::_GenerateImage(agg::rgba8* span, int x, int y,
-	unsigned len, Style* style, Transformation& transform)
+	unsigned len, const Style* style, StyleTransformer* transformer)
 {
 	// bitmap
 	BBitmap* bbitmap = style->Bitmap();
@@ -252,13 +348,16 @@ IconRenderer::StyleHandler::_GenerateImage(agg::rgba8* span, int x, int y,
 	PixelFormat pixf_img(bitmap);
 
 	// image interpolator
-	typedef agg::span_interpolator_linear<> interpolator_type;
-	interpolator_type interpolator(transform);
+	// TODO: performance could be improved by using agg_interpolator_linear
+	//       where possible, similar to what _GenerateGradient does.
+	typedef agg::span_interpolator_trans<StyleTransformer>
+		interpolator_type;
+	interpolator_type interpolator(*transformer);
 
 	// image accessor attached to pixel format of bitmap
-	typedef agg::image_accessor_wrap<PixelFormat,
-		agg::wrap_mode_repeat, agg::wrap_mode_repeat> source_type;
-	source_type source(pixf_img);
+	typedef agg::image_accessor_clip<PixelFormat> source_type;
+	agg::rgba8 background(0, 0, 0, 0);
+	source_type source(pixf_img, background);
 
 	// image filter (nearest neighbor)
 	typedef agg::span_image_filter_rgba_nn<
@@ -424,7 +523,7 @@ IconRenderer::Demultiply()
 // #pragma mark -
 
 
-typedef agg::conv_transform<VertexSource, Transformation> ScaledPath;
+typedef agg::conv_transform<VertexSource, Transformable> ScaledPath;
 typedef agg::conv_transform<ScaledPath, HintingTransformer> HintedPath;
 
 
@@ -467,11 +566,8 @@ IconRenderer::_Render(const BRect& r)
 			continue;
 		}
 
-		Transformation transform(*shape);
+		Transformable transform(*shape);
 		transform.multiply(fGlobalTransform);
-			// NOTE: this works only because "agg::trans_affine",
-			// "Transformable" and "Transformation" are all the
-			// same thing
 
 		Style* style = shape->Style();
 		if (!style)
@@ -483,9 +579,11 @@ IconRenderer::_Render(const BRect& r)
 		Gradient* gradient = style->Gradient();
 		bool styleAdded = false;
 		if (gradient && !gradient->InheritTransformation()) {
-			styleAdded = styleHandler.AddStyle(style, fGlobalTransform);
+			styleAdded = styleHandler.AddStyle(
+				style, fGlobalTransform, NULL);
 		} else {
-			styleAdded = styleHandler.AddStyle(style, transform);
+			styleAdded = styleHandler.AddStyle(
+				style, transform, shape->Transformers());
 		}
 
 		if (!styleAdded) {

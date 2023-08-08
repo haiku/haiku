@@ -10,6 +10,7 @@
 
 
 #include "IconBuild.h"
+#include "PathTransformer.h"
 #include "Transformer.h"
 
 #include <agg_conv_stroke.h>
@@ -21,6 +22,7 @@ _BEGIN_ICON_NAMESPACE
 typedef agg::conv_stroke<VertexSource> Stroke;
 
 class StrokeTransformer : public Transformer,
+						  public PathTransformer,
 						  public Stroke {
  public:
 	enum {
@@ -36,8 +38,9 @@ class StrokeTransformer : public Transformer,
 	virtual						~StrokeTransformer();
 
 	// Transformer interface
-	virtual	Transformer*		Clone(VertexSource& source) const;
+	virtual	Transformer*		Clone() const;
 
+	// PathTransformer interface
 	virtual	void				rewind(unsigned path_id);
 	virtual	unsigned			vertex(double* x, double* y);
 

@@ -5,7 +5,6 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-
 #ifndef TRANSFORM_BOX_H
 #define TRANSFORM_BOX_H
 
@@ -14,16 +13,21 @@
 #include "ChannelTransform.h"
 #include "Manipulator.h"
 
+
+namespace TransformBoxStates {
+	class DragState;
+}
+
 class Command;
 class StateView;
-class DragState;
 class TransformBox;
 class TransformCommand;
 
+
 class TransformBoxListener {
- public:
-								TransformBoxListener();
-	virtual						~TransformBoxListener();
+public:
+								TransformBoxListener() {}
+	virtual						~TransformBoxListener() {}
 
 	virtual	void				TransformBoxDeleted(
 									const TransformBox* box) = 0;
@@ -31,9 +35,8 @@ class TransformBoxListener {
 
 class TransformBox : public ChannelTransform,
 					 public Manipulator {
- public:
-								TransformBox(StateView* view,
-											 BRect box);
+public:
+								TransformBox(StateView* view, BRect box);
 	virtual						~TransformBox();
 
 	// Manipulator interface
@@ -49,10 +52,10 @@ class TransformBox : public ChannelTransform,
 	virtual	BRect				TrackingBounds(BView* withinView);
 
 	virtual	void				ModifiersChanged(uint32 modifiers);
-	virtual	bool				HandleKeyDown(uint32 key, uint32 modifiers,
-											  Command** _command);
-	virtual	bool				HandleKeyUp(uint32 key, uint32 modifiers,
-											Command** _command);
+	virtual	bool				HandleKeyDown(uint32 key,
+									uint32 modifiers, Command** _command);
+	virtual	bool				HandleKeyUp(uint32 key,
+									uint32 modifiers, Command** _command);
 
 	virtual	bool				UpdateCursor();
 
@@ -90,15 +93,15 @@ class TransformBox : public ChannelTransform,
 			bool				AddListener(TransformBoxListener* listener);
 			bool				RemoveListener(TransformBoxListener* listener);
 
- private:
-			DragState*			_DragStateFor(BPoint canvasWhere,
-											  float canvasZoom);
+private:
+			TransformBoxStates::DragState* _DragStateFor(
+									BPoint canvasWhere, float canvasZoom);
 			void				_StrokeBWLine(BView* into,
-											  BPoint from, BPoint to) const;
+									BPoint from, BPoint to) const;
 			void				_StrokeBWPoint(BView* into,
-											   BPoint point,
-											   double angle) const;
+									BPoint point, double angle) const;
 
+private:
 			BRect				fOriginalBox;
 
 			BPoint				fLeftTop;
@@ -110,7 +113,7 @@ class TransformBox : public ChannelTransform,
 			BPoint				fPivotOffset;
 
 			TransformCommand*	fCurrentCommand;
-			DragState*			fCurrentState;
+			TransformBoxStates::DragState* fCurrentState;
 
 			bool				fDragging;
 			BPoint				fMousePos;
@@ -120,25 +123,25 @@ class TransformBox : public ChannelTransform,
 
 			BList				fListeners;
 
- protected:
+protected:
 			void				_NotifyDeleted() const;
 
 			// "static" state objects
 			StateView*			fView;
 
-			DragState*			fDragLTState;
-			DragState*			fDragRTState;
-			DragState*			fDragLBState;
-			DragState*			fDragRBState;
+			TransformBoxStates::DragState* fDragLTState;
+			TransformBoxStates::DragState* fDragRTState;
+			TransformBoxStates::DragState* fDragLBState;
+			TransformBoxStates::DragState* fDragRBState;
 
-			DragState*			fDragLState;
-			DragState*			fDragRState;
-			DragState*			fDragTState;
-			DragState*			fDragBState;
+			TransformBoxStates::DragState* fDragLState;
+			TransformBoxStates::DragState* fDragRState;
+			TransformBoxStates::DragState* fDragTState;
+			TransformBoxStates::DragState* fDragBState;
 
-			DragState*			fRotateState;
-			DragState*			fTranslateState;
-			DragState*			fOffsetCenterState;
+			TransformBoxStates::DragState* fRotateState;
+			TransformBoxStates::DragState* fTranslateState;
+			TransformBoxStates::DragState* fOffsetCenterState;
 };
 
 #endif // TRANSFORM_BOX_H

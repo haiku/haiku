@@ -59,11 +59,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			# transformer
 			AffineTransformer.cpp
+			CompoundStyleTransformer.cpp
 			ContourTransformer.cpp
 			PathSource.cpp
 			PerspectiveTransformer.cpp
 			StrokeTransformer.cpp
-			Transformer.cpp
+			StyleTransformer.cpp
 			TransformerFactory.cpp
 
 			Icon.cpp

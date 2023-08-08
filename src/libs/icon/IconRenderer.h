@@ -21,6 +21,7 @@
 #include <agg_trans_affine.h>
 
 #include "IconBuild.h"
+#include "Transformable.h"
 
 
 class BBitmap;
@@ -46,8 +47,6 @@ typedef agg::scanline_bin					BinaryScanline;
 typedef agg::span_allocator<agg::rgba8>		SpanAllocator;
 typedef agg::rasterizer_compound_aa
 			<agg::rasterizer_sl_clip_dbl>	CompoundRasterizer;
-
-typedef agg::trans_affine					Transformation;
 
 class IconRenderer {
  public:
@@ -110,7 +109,7 @@ class IconRenderer {
 
 			CompoundRasterizer	fRasterizer;
 
-			Transformation		fGlobalTransform;
+			Transformable		fGlobalTransform;
 };
 
 

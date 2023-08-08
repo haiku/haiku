@@ -86,7 +86,7 @@ class Style {
 		// alpha only applies to bitmaps
 			void				SetAlpha(uint8 alpha)
 									{ fAlpha = alpha; Notify(); }
-			uint8				Alpha()
+			uint8				Alpha() const
 									{ return fAlpha; }
 #endif // ICON_O_MATIC
 

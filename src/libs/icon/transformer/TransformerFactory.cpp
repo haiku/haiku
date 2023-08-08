@@ -11,6 +11,7 @@
 #include "AffineTransformer.h"
 #include "ContourTransformer.h"
 #include "PerspectiveTransformer.h"
+#include "Shape.h"
 #include "StrokeTransformer.h"
 
 #ifdef ICON_O_MATIC
@@ -24,13 +25,13 @@ _USING_ICON_NAMESPACE
 
 // TransformerFor
 Transformer*
-TransformerFactory::TransformerFor(uint32 type, VertexSource& source)
+TransformerFactory::TransformerFor(uint32 type, VertexSource& source, Shape* shape)
 {
 	switch (type) {
 		case AFFINE_TRANSFORMER:
 			return new AffineTransformer(source);
 		case PERSPECTIVE_TRANSFORMER:
-			return new PerspectiveTransformer(source);
+			return new PerspectiveTransformer(source, shape);
 		case CONTOUR_TRANSFORMER:
 			return new ContourTransformer(source);
 		case STROKE_TRANSFORMER:
@@ -42,14 +43,13 @@ TransformerFactory::TransformerFor(uint32 type, VertexSource& source)
 
 // TransformerFor
 Transformer*
-TransformerFactory::TransformerFor(BMessage* message,
-								   VertexSource& source)
+TransformerFactory::TransformerFor(BMessage* message, VertexSource& source, Shape* shape)
 {
 	switch (message->what) {
 		case AffineTransformer::archive_code:
 			return new AffineTransformer(source, message);
 		case PerspectiveTransformer::archive_code:
-			return new PerspectiveTransformer(source, message);
+			return new PerspectiveTransformer(source, shape, message);
 		case ContourTransformer::archive_code:
 			return new ContourTransformer(source, message);
 		case StrokeTransformer::archive_code:

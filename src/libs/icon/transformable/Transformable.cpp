@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009, Haiku.
+ * Copyright 2006-2009, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "Transformable.h"
@@ -11,31 +12,78 @@
 #include <stdio.h>
 #include <string.h>
 
-// constructor
+
 Transformable::Transformable()
 	: agg::trans_affine()
 {
 }
 
-// copy constructor
+
 Transformable::Transformable(const Transformable& other)
 	: agg::trans_affine(other)
 {
 }
 
-// destructor
+
 Transformable::~Transformable()
 {
 }
 
-// StoreTo
+
+// #pragma mark -
+
+
+void
+Transformable::Invert()
+{
+	if (!IsIdentity()) {
+		invert();
+		TransformationChanged();
+	}
+}
+
+
+// #pragma mark -
+
+
+void
+Transformable::InverseTransform(double* x, double* y) const
+{
+	inverse_transform(x, y);
+}
+
+
+void
+Transformable::InverseTransform(BPoint* point) const
+{
+	if (point) {
+		double x = point->x;
+		double y = point->y;
+
+		inverse_transform(&x, &y);
+
+		point->x = x;
+		point->y = y;
+	}
+}
+
+
+BPoint
+Transformable::InverseTransform(const BPoint& point) const
+{
+	BPoint p(point);
+	InverseTransform(&p);
+	return p;
+}
+
+
 void
 Transformable::StoreTo(double matrix[matrix_size]) const
 {
 	store_to(matrix);
 }
 
-// LoadFrom
+
 void
 Transformable::LoadFrom(const double matrix[matrix_size])
 {
@@ -50,7 +98,7 @@ Transformable::LoadFrom(const double matrix[matrix_size])
 	}
 }
 
-// SetTransform
+
 void
 Transformable::SetTransform(const Transformable& other)
 {
@@ -60,7 +108,7 @@ Transformable::SetTransform(const Transformable& other)
 	}
 }
 
-// operator=
+
 Transformable&
 Transformable::operator=(const Transformable& other)
 {
@@ -72,7 +120,7 @@ Transformable::operator=(const Transformable& other)
 	return *this;
 }
 
-// Multiply
+
 Transformable&
 Transformable::Multiply(const Transformable& other)
 {
@@ -83,7 +131,7 @@ Transformable::Multiply(const Transformable& other)
 	return *this;
 }
 
-// Reset
+
 void
 Transformable::Reset()
 {
@@ -93,17 +141,7 @@ Transformable::Reset()
 	}
 }
 
-// Invert
-void
-Transformable::Invert()
-{
-	if (!IsIdentity()) {
-		invert();
-		TransformationChanged();
-	}
-}
 
-// IsIdentity
 bool
 Transformable::IsIdentity() const
 {
@@ -119,7 +157,7 @@ Transformable::IsIdentity() const
 	return false;
 }
 
-// IsTranslationOnly
+
 bool
 Transformable::IsTranslationOnly() const
 {
@@ -133,7 +171,7 @@ Transformable::IsTranslationOnly() const
 	return false;
 }
 
-// IsNotDistorted
+
 bool
 Transformable::IsNotDistorted() const
 {
@@ -142,7 +180,7 @@ Transformable::IsNotDistorted() const
 	return (m[0] == m[3]);
 }
 
-// IsValid
+
 bool
 Transformable::IsValid() const
 {
@@ -151,7 +189,7 @@ Transformable::IsValid() const
 	return ((m[0] * m[3] - m[1] * m[2]) != 0.0);
 }
 
-// operator==
+
 bool
 Transformable::operator==(const Transformable& other) const
 {
@@ -162,74 +200,13 @@ Transformable::operator==(const Transformable& other) const
 	return memcmp(m1, m2, sizeof(m1)) == 0;
 }
 
-// operator!=
+
 bool
 Transformable::operator!=(const Transformable& other) const
 {
 	return !(*this == other);
 }
 
-// Transform
-void
-Transformable::Transform(double* x, double* y) const
-{
-	transform(x, y);
-}
-
-// Transform
-void
-Transformable::Transform(BPoint* point) const
-{
-	if (point) {
-		double x = point->x;
-		double y = point->y;
-
-		transform(&x, &y);
-
-		point->x = x;
-		point->y = y;
-	}
-}
-
-// Transform
-BPoint
-Transformable::Transform(const BPoint& point) const
-{
-	BPoint p(point);
-	Transform(&p);
-	return p;
-}
-
-// InverseTransform
-void
-Transformable::InverseTransform(double* x, double* y) const
-{
-	inverse_transform(x, y);
-}
-
-// InverseTransform
-void
-Transformable::InverseTransform(BPoint* point) const
-{
-	if (point) {
-		double x = point->x;
-		double y = point->y;
-
-		inverse_transform(&x, &y);
-
-		point->x = x;
-		point->y = y;
-	}
-}
-
-// InverseTransform
-BPoint
-Transformable::InverseTransform(const BPoint& point) const
-{
-	BPoint p(point);
-	InverseTransform(&p);
-	return p;
-}
 
 inline float
 min4(float a, float b, float c, float d)
@@ -237,13 +214,14 @@ min4(float a, float b, float c, float d)
 	return min_c(a, min_c(b, min_c(c, d)));
 }
 
+
 inline float
 max4(float a, float b, float c, float d)
 {
 	return max_c(a, max_c(b, max_c(c, d)));
 }
 
-// TransformBounds
+
 BRect
 Transformable::TransformBounds(BRect bounds) const
 {
@@ -253,10 +231,10 @@ Transformable::TransformBounds(BRect bounds) const
 		BPoint lb(bounds.left, bounds.bottom);
 		BPoint rb(bounds.right, bounds.bottom);
 
-		Transform(&lt);
-		Transform(&rt);
-		Transform(&lb);
-		Transform(&rb);
+		StyleTransformer::Transform(&lt);
+		StyleTransformer::Transform(&rt);
+		StyleTransformer::Transform(&lb);
+		StyleTransformer::Transform(&rb);
 
 		return BRect(floorf(min4(lt.x, rt.x, lb.x, rb.x)),
 					 floorf(min4(lt.y, rt.y, lb.y, rb.y)),
@@ -266,7 +244,7 @@ Transformable::TransformBounds(BRect bounds) const
 	return bounds;
 }
 
-// TranslateBy
+
 void
 Transformable::TranslateBy(BPoint offset)
 {
@@ -276,7 +254,7 @@ Transformable::TranslateBy(BPoint offset)
 	}
 }
 
-// RotateBy
+
 void
 Transformable::RotateBy(BPoint origin, double degrees)
 {
@@ -288,7 +266,7 @@ Transformable::RotateBy(BPoint origin, double degrees)
 	}
 }
 
-// ScaleBy
+
 void
 Transformable::ScaleBy(BPoint origin, double xScale, double yScale)
 {
@@ -300,7 +278,7 @@ Transformable::ScaleBy(BPoint origin, double xScale, double yScale)
 	}
 }
 
-// ShearBy
+
 void
 Transformable::ShearBy(BPoint origin, double xShear, double yShear)
 {
@@ -312,7 +290,7 @@ Transformable::ShearBy(BPoint origin, double xShear, double yShear)
 	}
 }
 
-// TransformationChanged
+
 void
 Transformable::TransformationChanged()
 {

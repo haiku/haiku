@@ -14,8 +14,12 @@
 
 #include <agg_trans_affine.h>
 
+
 class BView;
 class TransformBox;
+
+
+namespace TransformBoxStates {
 
 // base class
 class DragState {
@@ -23,7 +27,8 @@ class DragState {
 								DragState(TransformBox* parent);
 	virtual						~DragState() {}
 
-	virtual	void				SetOrigin(BPoint origin);
+	virtual	void				SetOrigin(BPoint origin)
+									{ fOrigin = origin; }
 	virtual	void				DragTo(BPoint current, uint32 modifiers) = 0;
 	virtual	void				UpdateViewCursor(BView* view, BPoint current) const = 0;
 
@@ -141,5 +146,7 @@ class OffsetCenterState : public DragState {
 
 	virtual	const char*			ActionName() const;
 };
+
+} // TransformBoxStates namespace
 
 #endif // TRANSFORM_BOX_STATES_H

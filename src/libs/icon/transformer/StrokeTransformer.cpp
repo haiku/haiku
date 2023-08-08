@@ -27,7 +27,8 @@ using std::nothrow;
 
 // constructor
 StrokeTransformer::StrokeTransformer(VertexSource& source)
-	: Transformer(source, "Stroke"),
+	: Transformer("Stroke"),
+	  PathTransformer(source),
 	  Stroke(source)
 {
 }
@@ -35,7 +36,8 @@ StrokeTransformer::StrokeTransformer(VertexSource& source)
 // constructor
 StrokeTransformer::StrokeTransformer(VertexSource& source,
 									 BMessage* archive)
-	: Transformer(source, archive),
+	: Transformer(archive),
+	  PathTransformer(source),
 	  Stroke(source)
 {
 	if (!archive)
@@ -72,9 +74,9 @@ StrokeTransformer::~StrokeTransformer()
 
 // Clone
 Transformer*
-StrokeTransformer::Clone(VertexSource& source) const
+StrokeTransformer::Clone() const
 {
-	StrokeTransformer* clone = new (nothrow) StrokeTransformer(source);
+	StrokeTransformer* clone = new (nothrow) StrokeTransformer(fSource);
 	if (clone) {
 		clone->line_cap(line_cap());
 		clone->line_join(line_join());
@@ -105,7 +107,7 @@ StrokeTransformer::vertex(double* x, double* y)
 void
 StrokeTransformer::SetSource(VertexSource& source)
 {
-	Transformer::SetSource(source);
+	PathTransformer::SetSource(source);
 	Stroke::attach(source);
 }
 

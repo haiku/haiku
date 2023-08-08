@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #ifndef TRANSFORMABLE_H
@@ -14,12 +15,17 @@
 #include <agg_trans_affine.h>
 
 #include "IconBuild.h"
+#include "StyleTransformer.h"
+#include "Transformer.h"
 
 
 _BEGIN_ICON_NAMESPACE
 
 
-class Transformable : public agg::trans_affine {
+/*! The standard affine transformation. */
+// TODO: combine with AffineTransformer
+class Transformable : public StyleTransformer,
+					  public agg::trans_affine {
  public:
 	enum {
 		matrix_size = 6,
@@ -28,6 +34,18 @@ class Transformable : public agg::trans_affine {
 								Transformable();
 								Transformable(const Transformable& other);
 	virtual						~Transformable();
+
+	// StyleTransformer interface
+	virtual	void				transform(double* x, double* y) const
+									{ return agg::trans_affine::transform(x, y); }
+	virtual	void				Invert();
+	virtual bool				IsLinear()
+									{ return true; }
+
+	// Transformable
+			void				InverseTransform(double* x, double* y) const;
+			void				InverseTransform(BPoint* point) const;
+			BPoint				InverseTransform(const BPoint& point) const;
 
 			void				StoreTo(double matrix[matrix_size]) const;
 			void				LoadFrom(const double matrix[matrix_size]);
@@ -38,8 +56,6 @@ class Transformable : public agg::trans_affine {
 			Transformable&		Multiply(const Transformable& other);
 	virtual	void				Reset();
 
-			void				Invert();
-
 			bool				IsIdentity() const;
 			bool				IsTranslationOnly() const;
 			bool				IsNotDistorted() const;
@@ -47,15 +63,6 @@ class Transformable : public agg::trans_affine {
 
 			bool				operator==(const Transformable& other) const;
 			bool				operator!=(const Transformable& other) const;
-
-								// transforms coordiantes
-			void				Transform(double* x, double* y) const;
-			void				Transform(BPoint* point) const;
-			BPoint				Transform(const BPoint& point) const;
-
-			void				InverseTransform(double* x, double* y) const;
-			void				InverseTransform(BPoint* point) const;
-			BPoint				InverseTransform(const BPoint& point) const;
 
 								// transforms the rectangle "bounds" and
 								// returns the *bounding box* of that
@@ -70,7 +77,7 @@ class Transformable : public agg::trans_affine {
 	virtual	void				TransformationChanged();
 		// hook function that is called when the transformation
 		// is changed for some reason
-	
+
 	virtual void				PrintToStream() const;
 };
 
@@ -82,4 +89,3 @@ _USING_ICON_NAMESPACE
 
 
 #endif // TRANSFORMABLE_H
-

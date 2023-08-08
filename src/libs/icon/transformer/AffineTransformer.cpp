@@ -26,7 +26,8 @@ using std::nothrow;
 
 // constructor
 AffineTransformer::AffineTransformer(VertexSource& source)
-	: Transformer(source, "Transformation"),
+	: Transformer("Transformation"),
+	  PathTransformer(source),
 	  Affine(source, *this)
 {
 }
@@ -34,7 +35,8 @@ AffineTransformer::AffineTransformer(VertexSource& source)
 // constructor
 AffineTransformer::AffineTransformer(VertexSource& source,
 									 BMessage* archive)
-	: Transformer(source, archive),
+	: Transformer(archive),
+	  PathTransformer(source),
 	  Affine(source, *this)
 {
 	if (!archive)
@@ -57,9 +59,9 @@ AffineTransformer::~AffineTransformer()
 
 // Clone
 Transformer*
-AffineTransformer::Clone(VertexSource& source) const
+AffineTransformer::Clone() const
 {
-	AffineTransformer* clone = new (nothrow) AffineTransformer(source);
+	AffineTransformer* clone = new (nothrow) AffineTransformer(fSource);
 	if (clone)
 		clone->multiply(*this);
 	return clone;
@@ -83,7 +85,7 @@ AffineTransformer::vertex(double* x, double* y)
 void
 AffineTransformer::SetSource(VertexSource& source)
 {
-	Transformer::SetSource(source);
+	PathTransformer::SetSource(source);
 	Affine::attach(source);
 }
 

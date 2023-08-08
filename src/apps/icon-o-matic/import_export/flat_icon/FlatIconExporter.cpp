@@ -483,11 +483,17 @@ _WriteTransformer(LittleEndianBuffer& buffer, Transformer* t)
 			|| !buffer.Write(miterLimit))
 			return false;
 
-	} else if (dynamic_cast<PerspectiveTransformer*>(t)) {
+	} else if (PerspectiveTransformer* perspective
+		= dynamic_cast<PerspectiveTransformer*>(t)) {
 		// perspective
 		if (!buffer.Write((uint8)TRANSFORMER_TYPE_PERSPECTIVE))
 			return false;
-		// TODO: ... (upgrade AGG for storage support of trans_perspective)
+		double matrix[9];
+		perspective->store_to(matrix);
+		for (int32 i = 0; i < 9; i++) {
+			if (!write_float_24(buffer, (float)matrix[i]))
+				return false;
+		}
 
 	} else if (StrokeTransformer* stroke
 		= dynamic_cast<StrokeTransformer*>(t)) {

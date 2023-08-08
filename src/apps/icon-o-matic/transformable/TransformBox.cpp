@@ -25,17 +25,7 @@
 #define INSET 8.0
 
 
-TransformBoxListener::TransformBoxListener()
-{
-}
-
-
-TransformBoxListener::~TransformBoxListener()
-{
-}
-
-
-// #pragma mark -
+using namespace TransformBoxStates;
 
 
 // constructor
@@ -152,7 +142,6 @@ bool
 TransformBox::MouseDown(BPoint where)
 {
 	fView->FilterMouse(&where);
-		// NOTE: filter mouse here and in MouseMoved only
 	TransformToCanvas(where);
 
 	fDragging = true;
@@ -172,7 +161,6 @@ void
 TransformBox::MouseMoved(BPoint where)
 {
 	fView->FilterMouse(&where);
-		// NOTE: filter mouse here and in MouseDown only
 	TransformToCanvas(where);
 
 	if (fMousePos != where) {
@@ -236,12 +224,12 @@ TransformBox::Bounds()
 	TransformFromCanvas(rb);
 	TransformFromCanvas(c);
 
-	BRect r;
-	r.left = min5(lt.x, rt.x, lb.x, rb.x, c.x);
-	r.top = min5(lt.y, rt.y, lb.y, rb.y, c.y);
-	r.right = max5(lt.x, rt.x, lb.x, rb.x, c.x);
-	r.bottom = max5(lt.y, rt.y, lb.y, rb.y, c.y);
-	return r;
+	BRect bounds;
+	bounds.left = min5(lt.x, rt.x, lb.x, rb.x, c.x);
+	bounds.top = min5(lt.y, rt.y, lb.y, rb.y, c.y);
+	bounds.right = max5(lt.x, rt.x, lb.x, rb.x, c.x);
+	bounds.bottom = max5(lt.y, rt.y, lb.y, rb.y, c.y);
+	return bounds;
 }
 
 

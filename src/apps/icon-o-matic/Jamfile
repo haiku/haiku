@@ -95,11 +95,12 @@ Application Icon-O-Matic :
 
 	# icon/transformer
 	AffineTransformer.cpp
+	CompoundStyleTransformer.cpp
 	ContourTransformer.cpp
 	PathSource.cpp
 	PerspectiveTransformer.cpp
 	StrokeTransformer.cpp
-	Transformer.cpp
+	StyleTransformer.cpp
 	TransformerFactory.cpp
 
 	# icon
@@ -275,6 +276,9 @@ Application Icon-O-Matic :
 	# transformable
 	CanvasTransformBox.cpp
 	ChannelTransform.cpp
+	PerspectiveBox.cpp
+	PerspectiveBoxStates.cpp
+	PerspectiveCommand.cpp
 	ResetTransformationCommand.cpp
 	TransformBox.cpp
 	TransformBoxStates.cpp
@@ -349,6 +353,7 @@ DoCatalogs Icon-O-Matic :
 	RemoveStylesCommand.cpp
 	SetColorCommand.cpp
 	SetGradientCommand.cpp
+	PerspectiveCommand.cpp
 	ResetTransformationCommand.cpp
 	TransformBoxStates.cpp
 	TransformerFactory.cpp

@@ -24,6 +24,7 @@
 # include "PropertyObject.h"
 #endif // ICON_O_MATIC
 #include "Container.h"
+#include "PathTransformer.h"
 #include "Style.h"
 #include "TransformerFactory.h"
 #include "VectorPath.h"
@@ -130,7 +131,7 @@ Shape::Shape(const Shape& other)
 	int32 count = other.Transformers()->CountItems();
 	for (int32 i = 0; i < count; i++) {
 		Transformer* original = other.Transformers()->ItemAtFast(i);
-		Transformer* cloned = original->Clone(fPathSource);
+		Transformer* cloned = original->Clone();
 		if (!fTransformers.AddItem(cloned)) {
 			delete cloned;
 			break;
@@ -181,7 +182,7 @@ Shape::Unarchive(BMessage* archive)
 		 i++) {
 		Transformer* transformer
 			= TransformerFactory::TransformerFor(
-				&transformerArchive, VertexSource());
+				&transformerArchive, VertexSource(), this);
 		if (!transformer || !fTransformers.AddItem(transformer)) {
 			delete transformer;
 		}
@@ -452,9 +453,11 @@ Shape::VertexSource()
 
 	int32 count = fTransformers.CountItems();
 	for (int32 i = 0; i < count; i++) {
-		Transformer* t = (Transformer*)fTransformers.ItemAtFast(i);
-		t->SetSource(*source);
-		source = t;
+		PathTransformer* t = dynamic_cast<PathTransformer*>(fTransformers.ItemAtFast(i));
+		if (t != NULL) {
+			t->SetSource(*source);
+			source = t;
+		}
 	}
 
 	if (fNeedsUpdate) {

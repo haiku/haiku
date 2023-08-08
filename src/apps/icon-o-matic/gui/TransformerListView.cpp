@@ -201,8 +201,7 @@ TransformerListView::MessageReceived(BMessage* message)
 				break;
 
 			Transformer* transformer
-				= TransformerFactory::TransformerFor(type,
-													 fShape->VertexSource());
+				= TransformerFactory::TransformerFor(type, fShape->VertexSource(), fShape);
 			if (!transformer)
 				break;
 
@@ -396,9 +395,9 @@ TransformerListView::SetMenu(BMenu* menu)
 	message->AddInt32("type", STROKE_TRANSFORMER);
 	fStrokeMI = new BMenuItem(B_TRANSLATE("Stroke"), message);
 
-	// message = new BMessage(MSG_ADD_TRANSFORMER);
-	// message->AddInt32("type", PERSPECTIVE_TRANSFORMER);
-	// fPerspectiveMI = new BMenuItem(B_TRANSLATE("Perspective"), message);
+	message = new BMessage(MSG_ADD_TRANSFORMER);
+	message->AddInt32("type", PERSPECTIVE_TRANSFORMER);
+	fPerspectiveMI = new BMenuItem(B_TRANSLATE("Perspective"), message);
 
 	// message = new BMessage(MSG_ADD_TRANSFORMER);
 	// message->AddInt32("type", AFFINE_TRANSFORMER);
@@ -408,6 +407,7 @@ TransformerListView::SetMenu(BMenu* menu)
 
 	addMenu->AddItem(fContourMI);
 	addMenu->AddItem(fStrokeMI);
+	addMenu->AddItem(fPerspectiveMI);
 
 	addMenu->SetTargetForItems(this);
 	fMenu->AddItem(addMenu);

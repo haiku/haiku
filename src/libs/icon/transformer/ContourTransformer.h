@@ -10,6 +10,7 @@
 
 
 #include "IconBuild.h"
+#include "PathTransformer.h"
 #include "Transformer.h"
 
 #include <agg_conv_contour.h>
@@ -21,6 +22,7 @@ _BEGIN_ICON_NAMESPACE
 typedef agg::conv_contour<VertexSource>		Contour;
 
 class ContourTransformer : public Transformer,
+						   public PathTransformer,
 						   public Contour {
  public:
 	enum {
@@ -35,10 +37,12 @@ class ContourTransformer : public Transformer,
 
 	virtual						~ContourTransformer();
 
-	virtual	Transformer*		Clone(VertexSource& source) const;
+	// Transformer interface
+	virtual	Transformer*		Clone() const;
 
+	// PathTransformer interface
 	virtual	void				rewind(unsigned path_id);
-    virtual	unsigned			vertex(double* x, double* y);
+	virtual	unsigned			vertex(double* x, double* y);
 
 	virtual	void				SetSource(VertexSource& source);
 

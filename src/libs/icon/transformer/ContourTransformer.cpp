@@ -27,7 +27,8 @@ using std::nothrow;
 
 // constructor
 ContourTransformer::ContourTransformer(VertexSource& source)
-	: Transformer(source, "Contour"),
+	: Transformer("Contour"),
+	  PathTransformer(source),
 	  Contour(source)
 {
 	auto_detect_orientation(true);
@@ -36,7 +37,8 @@ ContourTransformer::ContourTransformer(VertexSource& source)
 // constructor
 ContourTransformer::ContourTransformer(VertexSource& source,
 									   BMessage* archive)
-	: Transformer(source, archive),
+	: Transformer(archive),
+	  PathTransformer(source),
 	  Contour(source)
 {
 	auto_detect_orientation(true);
@@ -69,9 +71,9 @@ ContourTransformer::~ContourTransformer()
 
 // Clone
 Transformer*
-ContourTransformer::Clone(VertexSource& source) const
+ContourTransformer::Clone() const
 {
-	ContourTransformer* clone = new (nothrow) ContourTransformer(source);
+	ContourTransformer* clone = new (nothrow) ContourTransformer(fSource);
 	if (clone) {
 		clone->line_join(line_join());
 		clone->inner_join(inner_join());
@@ -101,7 +103,7 @@ ContourTransformer::vertex(double* x, double* y)
 void
 ContourTransformer::SetSource(VertexSource& source)
 {
-	Transformer::SetSource(source);
+	PathTransformer::SetSource(source);
 	Contour::attach(source);
 }
 

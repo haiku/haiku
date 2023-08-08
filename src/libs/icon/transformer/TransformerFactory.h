@@ -20,6 +20,7 @@ class BMessage;
 _BEGIN_ICON_NAMESPACE
 
 
+class Shape;
 class Transformer;
 class VertexSource;
 
@@ -35,10 +36,12 @@ class TransformerFactory {
  public:
 
 	static	Transformer*		TransformerFor(uint32 type,
-											   VertexSource& source);
+											   VertexSource& source,
+											   Shape* shape);
 
 	static	Transformer*		TransformerFor(BMessage* archive,
-											   VertexSource& source);
+											   VertexSource& source,
+											   Shape* shape);
 };
 
 

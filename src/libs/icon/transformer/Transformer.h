@@ -17,52 +17,35 @@
 #endif
 
 #include "IconBuild.h"
+#include "VertexSource.h"
 
 
 _BEGIN_ICON_NAMESPACE
 
 
-class VertexSource {
- public:
-								VertexSource();
-	virtual						~VertexSource();
-
-    virtual	void				rewind(unsigned path_id) = 0;
-    virtual	unsigned			vertex(double* x, double* y) = 0;
-
-	/*! Determines whether open paths should be closed or left open. */
-	virtual	bool				WantsOpenPaths() const = 0;
-	virtual	double				ApproximationScale() const = 0;
-};
-
-
+/*! Base class for all transformers.
+	All child classes should inherit either PathTransformer, StyleTransformer,
+	or both.
+*/
 #ifdef ICON_O_MATIC
-class Transformer : public VertexSource,
-					public IconObject {
+class Transformer : public IconObject {
 #else
-class Transformer : public VertexSource {
+	class Transformer {
 #endif
- public:
-								Transformer(VertexSource& source,
-											const char* name);
-								Transformer(VertexSource& source,
-											BMessage* archive);
+public:
+#ifdef ICON_O_MATIC
+								Transformer(const char* name)
+									: IconObject(name) {}
+								Transformer(BMessage* archive)
+									: IconObject(archive) {}
+#else
+								Transformer(const char* name) {}
+								Transformer(BMessage* archive) {}
+#endif
 
-	virtual						~Transformer();
+	virtual						~Transformer() {}
 
-	// Transformer
-	virtual	Transformer*		Clone(VertexSource& source) const = 0;
-
-	virtual	void				rewind(unsigned path_id);
-    virtual	unsigned			vertex(double* x, double* y);
-
-	virtual	void				SetSource(VertexSource& source);
-
-	virtual	bool				WantsOpenPaths() const;
-	virtual	double				ApproximationScale() const;
-
- protected:
-			VertexSource&		fSource;
+	virtual	Transformer*		Clone() const = 0;
 };
 
 

@@ -10,17 +10,14 @@
 #include "TransformBoxStates.h"
 
 #include <math.h>
-#include <stdio.h>
 
 #include <Catalog.h>
 #include <Cursor.h>
-#include <InterfaceDefs.h>
 #include <Locale.h>
 #include <View.h>
 
 #include "cursors.h"
 #include "support.h"
-
 #include "TransformBox.h"
 
 
@@ -28,18 +25,14 @@
 #define B_TRANSLATION_CONTEXT "Icon-O-Matic-TransformationBoxStates"
 
 
+using namespace TransformBoxStates;
+
+
 DragState::DragState(TransformBox* parent)
 	:
 	fOrigin(0.0, 0.0),
 	fParent(parent)
 {
-}
-
-
-void
-DragState::SetOrigin(BPoint origin)
-{
-	fOrigin = origin;
 }
 
 

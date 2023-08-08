@@ -59,6 +59,8 @@
 #include "MessengerSaver.h"
 #include "NativeSaver.h"
 #include "PathListView.h"
+#include "PerspectiveBox.h"
+#include "PerspectiveTransformer.h"
 #include "RDefExporter.h"
 #include "ScrollView.h"
 #include "SimpleFileSaver.h"
@@ -105,6 +107,7 @@ enum {
 	MSG_PATH_SELECTED				= 'vpsl',
 	MSG_STYLE_SELECTED				= 'stsl',
 	MSG_SHAPE_SELECTED				= 'spsl',
+	MSG_TRANSFORMER_SELECTED		= 'trsl',
 
 	MSG_SHAPE_RESET_TRANSFORMATION	= 'rtsh',
 	MSG_STYLE_RESET_TRANSFORMATION	= 'rtst',
@@ -562,6 +565,20 @@ case MSG_SHAPE_SELECTED: {
 		fState->AddManipulator(transformBox);
 	}
 	break;
+}
+case MSG_TRANSFORMER_SELECTED: {
+	Transformer* transformer;
+	if (message->FindPointer("transformer", (void**)&transformer) < B_OK)
+		transformer = NULL;
+
+	fState->DeleteManipulators();
+	PerspectiveTransformer* perspectiveTransformer =
+		dynamic_cast<PerspectiveTransformer*>(transformer);
+	if (perspectiveTransformer != NULL) {
+		PerspectiveBox* transformBox = new (nothrow) PerspectiveBox(
+			fCanvasView, perspectiveTransformer);
+		fState->AddManipulator(transformBox);
+	}
 }
 		case MSG_RENAME_OBJECT:
 			fPropertyListView->FocusNameProperty();
@@ -1087,7 +1104,7 @@ MainWindow::_CreateGUI()
 	fShapeListView = new ShapeListView(BRect(0, 0, splitWidth, 100),
 		"shape list view", new BMessage(MSG_SHAPE_SELECTED), this);
 	fTransformerListView = new TransformerListView(BRect(0, 0, splitWidth, 100),
-		"transformer list view");
+		"transformer list view", new BMessage(MSG_TRANSFORMER_SELECTED), this);
 	fPropertyListView = new IconObjectListView();
 
 	BLayoutBuilder::Split<>(leftSideView)

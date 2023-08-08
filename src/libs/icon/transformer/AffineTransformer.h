@@ -10,6 +10,7 @@
 
 
 #include "IconBuild.h"
+#include "PathTransformer.h"
 #include "Transformer.h"
 
 #include <agg_conv_transform.h>
@@ -23,6 +24,7 @@ typedef agg::conv_transform<VertexSource,
 							agg::trans_affine>	Affine;
 
 class AffineTransformer : public Transformer,
+						  public PathTransformer,
 						  public Affine,
 						  public agg::trans_affine {
  public:
@@ -38,8 +40,10 @@ class AffineTransformer : public Transformer,
 
 	virtual						~AffineTransformer();
 
-	virtual	Transformer*		Clone(VertexSource& source) const;
+	// Transformer interface
+	virtual	Transformer*		Clone() const;
 
+	// PathTransformer interface
 	virtual	void				rewind(unsigned path_id);
     virtual	unsigned			vertex(double* x, double* y);
 
