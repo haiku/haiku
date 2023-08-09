@@ -320,16 +320,19 @@ UnixDatagramEndpoint::Send(const iovec* vecs, size_t vecCount,
 ssize_t
 UnixDatagramEndpoint::Receive(const iovec* vecs, size_t vecCount,
 	ancillary_data_container** _ancillaryData, struct sockaddr* _address,
-	socklen_t* _addressLength)
+	socklen_t* _addressLength, int flags)
 {
 	TRACE("[%" B_PRId32 "] %p->UnixDatagramEndpoint::Receive()\n",
 		find_thread(NULL), this);
 
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
-	if (gStackModule->is_restarted_syscall())
-		timeout = gStackModule->restore_syscall_restart_timeout();
-	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+	bigtime_t timeout = 0;
+	if ((flags & MSG_DONTWAIT) == 0) {
+		timeout = absolute_timeout(socket->receive.timeout);
+		if (gStackModule->is_restarted_syscall())
+			timeout = gStackModule->restore_syscall_restart_timeout();
+		else
+			gStackModule->store_syscall_restart_timeout(timeout);
+	}
 
 	UnixDatagramEndpointLocker endpointLocker(this);
 

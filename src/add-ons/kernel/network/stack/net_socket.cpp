@@ -302,7 +302,7 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	ancillary_data_container* ancillaryData = NULL;
 	ssize_t bytesRead = socket->first_info->read_data_no_buffer(
 		socket->first_protocol, vecs, vecCount, &ancillaryData, address,
-		addressLen);
+		addressLen, flags);
 	if (bytesRead < 0)
 		return bytesRead;
 
