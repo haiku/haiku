@@ -757,7 +757,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 
 	Note: This function must be called before the AVCodec is opened via
 	avcodec_open2(). Otherwise the behaviour of FFMPEG's audio decoding
-	function avcodec_decode_audio4() is undefined.
+	function avcodec_receive_frame() is undefined.
 
 	Essential properties applied from fInputFormat.u.encoded_audio:
 		- bit_rate copied to fCodecContext->bit_rate
@@ -1097,7 +1097,7 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 		1. fDecodedDataBufferSize is greater than zero in the common case.
 		   Also see "Note" below.
 		2. fTempPacket was updated to exclude the data chunk that was consumed
-		   by avcodec_decode_audio4().
+		   by avcodec_send_packet().
 		3. fDecodedDataBufferOffset is set to zero.
 
 	When this function failed to decode at least one audio frame due to a
@@ -1113,7 +1113,7 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 
 	\returns B_OK Decoding successful. fDecodedDataBuffer contains decoded
 		audio frames only when fDecodedDataBufferSize is greater than zero.
-		fDecodedDataBuffer is empty, when avcodec_decode_audio4() didn't return
+		fDecodedDataBuffer is empty, when avcodec_receive_frame() didn't return
 		audio frames due to delayed decoding or incomplete audio frames.
 	\returns B_ERROR Decoding failed thus fDecodedDataBuffer contains no audio
 		frames.
@@ -1126,29 +1126,30 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 	memset(fDecodedDataBuffer, 0, sizeof(AVFrame));
     av_frame_unref(fDecodedDataBuffer);
 	fDecodedDataBufferOffset = 0;
-	int gotAudioFrame = 0;
 
-	int encodedDataSizeInBytes = avcodec_decode_audio4(fCodecContext,
-		fDecodedDataBuffer, &gotAudioFrame, &fTempPacket);
-	if (encodedDataSizeInBytes <= 0) {
-		// Error or failure to produce decompressed output.
-		// Skip the temp packet data entirely.
+	int error = avcodec_receive_frame(fCodecContext, fDecodedDataBuffer);
+	if (error == AVERROR_EOF)
+		return B_LAST_BUFFER_ERROR;
+
+	if (error == AVERROR(EAGAIN)) {
+		// We need to feed more data into the decoder
+		avcodec_send_packet(fCodecContext, &fTempPacket);
+
+		// All the data is always consumed by avcodec_send_packet
 		fTempPacket.size = 0;
-		return B_ERROR;
+
+		// Try again to see if we can get some decoded audio out now
+		error = avcodec_receive_frame(fCodecContext, fDecodedDataBuffer);
 	}
-
-	fTempPacket.data += encodedDataSizeInBytes;
-	fTempPacket.size -= encodedDataSizeInBytes;
-
-	bool gotNoAudioFrame = gotAudioFrame == 0;
-	if (gotNoAudioFrame)
-		return B_OK;
 
 	fDecodedDataBufferSize = fDecodedDataBuffer->nb_samples;
 	if (fDecodedDataBufferSize < 0)
 		fDecodedDataBufferSize = 0;
 
-	return B_OK;
+	if (error == 0)
+		return B_OK;
+	else
+		return B_ERROR;
 }
 
 
