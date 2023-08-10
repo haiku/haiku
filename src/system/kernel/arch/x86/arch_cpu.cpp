@@ -1095,7 +1095,9 @@ load_microcode_intel(int currentCPU, cpu_ent* cpu)
 		update = find_microcode_intel((addr_t)sUcodeData, sUcodeDataSize,
 			revision);
 	}
-	if (update != NULL) {
+	if (update == NULL) {
+		dprintf("CPU %d: no update found\n", currentCPU);
+	} else if (update->update_revision != revision) {
 		addr_t data = (addr_t)update + sizeof(struct intel_microcode_header);
 		wbinvd();
 		x86_write_msr(IA32_MSR_UCODE_WRITE, data);
@@ -1105,11 +1107,9 @@ load_microcode_intel(int currentCPU, cpu_ent* cpu)
 		} else {
 			if (sLoadedUcodeUpdate == NULL)
 				sLoadedUcodeUpdate = update;
-			dprintf("CPU %d: updated from revision %" B_PRIu32 " to %" B_PRIu32
+			dprintf("CPU %d: updated from revision 0x%" B_PRIx32 " to 0x%" B_PRIx32
 				"\n", currentCPU, revision, cpu->arch.patch_level);
 		}
-	} else {
-		dprintf("CPU %d: no update found\n", currentCPU);
 	}
 	if (currentCPU != 0)
 		release_spinlock(&sUcodeUpdateLock);
@@ -1451,7 +1451,7 @@ detect_cpu(int currentCPU, bool full = true)
 	dump_feature_string(currentCPU, cpu);
 #endif
 #if DUMP_CPU_PATCHLEVEL_TYPE
-	dprintf("CPU %d: patch_level %" B_PRIx32 "%s%s\n", currentCPU,
+	dprintf("CPU %d: patch_level 0x%" B_PRIx32 "%s%s\n", currentCPU,
 		cpu->arch.patch_level,
 		cpu->arch.hybrid_type != 0 ? ", hybrid type ": "",
 		get_hybrid_cpu_type_string(cpu->arch.hybrid_type));
