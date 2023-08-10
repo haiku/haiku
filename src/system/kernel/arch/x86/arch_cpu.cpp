@@ -1693,9 +1693,11 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_MCE);
 
 #ifdef __x86_64__
-	// if RDTSCP is available write cpu number in TSC_AUX
-	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD))
+	// if RDTSCP or RDPID are available write cpu number in TSC_AUX
+	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD)
+		|| x86_check_feature(IA32_FEATURE_RDPID, FEATURE_7_ECX)) {
 		x86_write_msr(IA32_MSR_TSC_AUX, cpu);
+	}
 
 	// make LFENCE a dispatch serializing instruction on AMD 64bit
 	cpu_ent* cpuEnt = get_cpu_struct();
