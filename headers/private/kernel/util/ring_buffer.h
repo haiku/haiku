@@ -44,6 +44,7 @@ ssize_t ring_buffer_user_write(struct ring_buffer *buffer, const uint8 *data, ss
 size_t ring_buffer_peek(struct ring_buffer *buffer, size_t offset, void *data,
 			size_t length);
 int32 ring_buffer_get_vecs(struct ring_buffer *buffer, struct iovec *vecs);
+size_t ring_buffer_move(struct ring_buffer *to, ssize_t length, struct ring_buffer *from);
 
 #ifdef __cplusplus
 }

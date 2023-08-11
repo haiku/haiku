@@ -316,8 +316,20 @@ UnixBufferQueue::Write(UnixRequest& request)
 status_t
 UnixBufferQueue::SetCapacity(size_t capacity)
 {
-// TODO:...
-return B_ERROR;
+	if (capacity <= fCapacity)
+		return B_OK;
+
+	ring_buffer* newBuffer = create_ring_buffer(capacity);
+	if (newBuffer == NULL)
+		return B_NO_MEMORY;
+
+	ring_buffer_move(newBuffer, ring_buffer_readable(fBuffer), fBuffer);
+	delete_ring_buffer(fBuffer);
+
+	fBuffer = newBuffer;
+	fCapacity = capacity;
+
+	return B_OK;
 }
 
 

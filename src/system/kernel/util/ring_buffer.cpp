@@ -302,6 +302,47 @@ ring_buffer_get_vecs(struct ring_buffer* buffer, struct iovec* vecs)
 }
 
 
+/*! Moves data from one ring buffer to another.
+
+	\param to The destination ring buffer.
+	\param length The maximum number of bytes to move.
+	\param from The source ring buffer.
+	\return The number of bytes actually moved.
+*/
+size_t
+ring_buffer_move(struct ring_buffer *to, ssize_t length,
+	struct ring_buffer *from)
+{
+	if (length > from->in)
+		length = from->in;
+
+	if (length > (to->size - to->in))
+		length = to->size - to->in;
+
+	size_t bytesMoved = 0;
+
+	if ((from->first + length) <= from->size) {
+		// simple move
+		bytesMoved = ring_buffer_write(to, from->buffer + from->first, length);
+	} else {
+		// need to move both ends
+		size_t upper = from->size - from->first;
+		size_t lower = length - upper;
+
+		bytesMoved = ring_buffer_write(to, from->buffer + from->first, upper);
+		if (bytesMoved == upper) {
+			// only continue writing if the first part was completely written
+			bytesMoved += ring_buffer_write(to, from->buffer, lower);
+		}
+	}
+
+	from->first = (from->first + bytesMoved) % from->size;
+	from->in -= bytesMoved;
+
+	return bytesMoved;
+}
+
+
 #if 0
 /**	Sends the contents of the ring buffer to a port.
  *	The buffer will be empty afterwards only if sending the data actually works.
