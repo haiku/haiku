@@ -1,0 +1,10 @@
+1	lithuanian	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS nuostatos
+Move down	DNSSettingsView		Nuleisti
+DNS settings	DNSSettingsView		DNS nuostatos
+Remove	DNSSettingsView		Pašalinti
+Domain:	DNSSettingsView		Domenas:
+Add	DNSSettingsView		Pridėti
+Server:	DNSSettingsView		Serveris:
+Move up	DNSSettingsView		Pakelti
+Apply	DNSSettingsView		Pritaikyti

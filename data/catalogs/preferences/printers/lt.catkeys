@@ -1,4 +1,5 @@
-1	lithuanian	x-vnd.Be-PRNT	823985976
+1	lithuanian	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Bandomasis puslapis
 Remove	PrintersWindow		Pašalinti
 Red	TestPageView		Raudona
 Default Printer	PrinterListView		Numatytasis spausdintuvas
@@ -7,6 +8,7 @@ Connected to:	AddPrinterDialog		Prijungtas prie:
 Make default	PrintersWindow		Skirti numatytuoju
 Cyan	TestPageView		Žydra
 Completed	JobListView		Užbaigta
+Test page	PrintersWindow		Bandomasis puslapis
 Transport: %transport% %transport_address%	PrinterListView		Transportas: %transport% %transport_address%
 Failed	JobListView		Nepavyko
 Blue	TestPageView		Mėlyna
@@ -14,9 +16,12 @@ Waiting	JobListView		Laukia
 Processing	JobListView		Apdorojama
 Cancel	AddPrinterDialog		Atsisakyti
 Unknown status	JobListView		Būsena nežinoma
+Print jobs for %printer_name%	PrintersWindow		„%printer_name%“ spausdinimo užduotys
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? psl.} one{# puslapis} few{# puslapiai} other{# puslapių}}
 Add printer	AddPrinterDialog		Spausdintuvo pridėjimas
 Printers	PrintersWindow		Spausdintuvai
 No printer found!	TransportMenu		Jokių spausdintuvų nerasta!
+Add…	PrintersWindow		Pridėti…
 Magenta	TestPageView		Purpurinė
 Transport: %transport% %transport_address%	TestPageView		Transportas: %transport% %transport_address%
 Add	AddPrinterDialog		Pridėti
@@ -26,6 +31,7 @@ Yellow	TestPageView		Geltona
 Black	TestPageView		Juoda
 Printer type:	AddPrinterDialog		Spausdintuvo tipas:
 Printers	System name		Spausdintuvai
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Laukiančių užduočių nėra} one{# laukianti užduotis} few{# laukiančios užduotys} other{# laukiančių užduočių}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Spausdintuvas: %printer_name%\nTvarkyklė: %driver%\n
 Green	TestPageView		Žalia
 Print test page	PrintersWindow		Spausdinti bandomąjį puslapį

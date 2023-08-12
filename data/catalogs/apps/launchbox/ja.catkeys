@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-LaunchBox	1530497419
+1	japanese	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		説明の作成...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		このパッドを閉じてよろしいですか?\n(パッドは記憶されません。)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		ウィンドウ枠の表示
 Failed to launch 'something', error in Pad data.	LaunchBox		'something' の起動に失敗しました。パッドデータにエラーがあります。
 LaunchBox	System name		ランチャー
 Auto-raise	LaunchBox		自動的に前面へ
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		アイコンサイズ
 Open containing folder	LaunchBox		フォルダーを開く
 Add button here	LaunchBox		ここにボタンを追加

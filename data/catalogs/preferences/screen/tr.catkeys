@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Screen	133788249
+1	turkish	x-vnd.Haiku-Screen	2318349707
 no	Screen		hayır
 bits/pixel	Screen		bit/piksel
 15 bits/pixel, 32768 colors	Screen		15 bit/piksel, 32768 renk
@@ -13,6 +13,7 @@ Video format:	Screen		Video biçimi:
 Undo	Screen		Geri al
 OK	Screen		Tamam
 Current workspace	Screen		Geçerli çalışma alanı
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		dikey olarak
 All workspaces	Screen		Tüm çalışma alanları
 Use laptop panel:	Screen		Dizüstü panelini kullan:

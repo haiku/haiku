@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2114493922
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	96054702
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Προσάρτηση όλων των δ
 Location:	InfoWindow		Τοποθεσία:
 Name	PoseView		Όνομα
 Kind:	InfoWindow		Είδος:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		περιέχει
 Open	FilePanelPriv		Άνοιγμα
 Bitmap icon	AttributesView		Εικονίδιο Bitmap
@@ -77,7 +76,6 @@ Select	SelectionWindow		Επιλογή
 Select	InfoWindow		Επιλογή
 OK	OpenWithWindow		Εντάξει
 Include trash	FindPanel		Συμπερίληψη Κάδου
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Καθαρισμός
 Modified	FindPanel		Τροποποιήθηκε
  (block size: 	InfoWindow		 (μέγεθος block: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Δυαδική τιμή
 Invert selection	FilePanelPriv		Αντιστροφή επιλογής
 Memory size	AttributesView		Μέγεθος μνήμης
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Νέος φάκελος
  (broken)	InfoWindow		 (χαλασμένο)
 Replace all	FSUtils		Αντικατάσταση όλων
@@ -303,7 +300,6 @@ Desktop	Model		Επιφάνεια εργασίας
 Select all	ContainerWindow		Επιλογή όλων
 apps	B_APPS_DIRECTORY		εφαρμογές
 Error calculating folder size.	InfoWindow		Προέκυψε σφάλμα κατά τον υπολογισμό του μεγέθους του φακέλου.
-MiB	WidgetAttributeText		MB
 Delete	FSUtils		Διαγραφή
 Edit name	ContainerWindow		Επεξεργασία ονόματος
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Αδυναμία ανοίγματος του \"%document\" (Λείπει το σύμβολο: %symbol). \n
@@ -415,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Αδυναμία
 Decrease size	DeskWindow		Μείωση μεγέθους
 Emptying Trash… 	StatusWindow		Άδειασμα Κάδου Απορριμάτων… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{για # αρχείο} other{για # αρχεία}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Επαναφορά
 trash	B_TRASH_DIRECTORY		κάδος
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Αν μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε το πλήκτρο Shift πατημένο και κάντε κλικ στο κουμπί \"Μετακίνηση\".

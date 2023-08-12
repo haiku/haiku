@@ -34,7 +34,7 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Failą „%file%“ pašalino kita programa. Ar atkurti?
 Lines:	Statistics		Eilučių:
 Replace in all windows	FindandReplaceWindow		Keisti visuose languose
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Yra neįrašytų „%s“ pakeitimų.\nAr grąžinti paskiausiai įrašytą versiją? 
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		Faile „%s“ yra neįrašytų pakeitimų.\nAr grąžinti paskiausiai įrašytą versiją? 
 Save	SaveAlert		Įrašyti
 Default	Open_and_SaveAsPanel		Numatytai
 Cancel	RevertToSavedAlert		Atsisakyti

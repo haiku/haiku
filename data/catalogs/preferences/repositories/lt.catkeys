@@ -1,0 +1,42 @@
+1	lithuanian	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Tai nėra galiojantis URL adresas
+Repository URL:	AddRepoWindow	Text box label	Saugyklos URL adresas:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Atnaujinant saugyklos „%name%“ podėlį, įvyko klaida
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Išjungiant saugyklą „%name%“, įvyko klaida
+Unknown	Constants	Unknown repository name	Nežinomas
+Remove all	RepositoriesView	Button label	Pašalinti visas
+Enable repositories to use with package management:	RepositoriesView	Label text	Saugyklos, naudojamos parsisiųsti ir atnaujinti paketams:
+Disable	RepositoriesView	Button label	Išjungti
+Cancel task	TaskTimer	Button label	Nutraukti užduotį
+Changes completed	RepositoriesView	Status view text	Pakeitimai atlikti
+Details	TaskLooper	Job log details header	Išsamiau
+Enabled	RepoRow	Tag in the Status column	Įjungta
+Remove	Constants	Button label	Pašalinti
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Įgalinant saugyklą „%url%“, įvyko klaida
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Pašalinti šią saugyklą?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Su saugykla „%name%“ susieta užduotis trunka neįprastai ilgai.
+Completed	TaskLooper	Completed task status message	Atlikta
+OK	Constants	Button label	Gerai
+Status	RepositoriesView	Column title	Būsena
+Name	RepositoriesView	Column title	Pavadinimas
+Add	AddRepoWindow	Button label	Pridėti
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Nepavyko gauti šiuo metu įgalintų saugyklų pavadinimų.
+Enable all	RepositoriesView	Button label	Įgalinti visas
+Aborted	TaskLooper	Aborted task status message	Nutraukta
+URL	RepositoriesView	Column title	URL adresas
+Enable	RepositoriesView	Button label	Įjungti
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Klaida gaunant saugyklos „%name%“ konfigūraciją.
+Description	TaskLooper	Failed task error description	Aprašas
+Failed	TaskLooper	Failed task status message	Nepavyko
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Džiugios naujienos! Su saugykla „%name%“ susieta užduotis atlikta.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Kai kurios užduotys dar vykdomos. Ar nutraukti šias užduotis ir baigti darbą?
+This repository URL already exists.	RepositoriesView	Error message	Ši saugykla jau pridėta.
+Repositories	System name		Saugyklos
+Changes pending:	RepositoriesView	Status view text	Pakeitimų eilė:
+Remove	RepositoriesView	Button label	Pašalinti
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Pašalinti šias saugyklas?
+Keep trying	TaskTimer	Button label	Kartoti bandymą
+Cancel	Constants	Button label	Atsisakyti
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Kiekvienai saugyklai gali būti pridėtas tik vienas URL adresas. Pakoreguokite savo parinktis.
+Stop and quit	RepositoriesWindow	Button label	Nutraukti ir baigti darbą
+Disable all	RepositoriesView	Button label	Išjungti visas

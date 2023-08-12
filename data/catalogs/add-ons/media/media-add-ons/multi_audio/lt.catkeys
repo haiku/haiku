@@ -1,7 +1,9 @@
-1	lithuanian	x-vnd.Haiku-hmulti_audio.media_addon	2140726745
+1	lithuanian	x-vnd.Haiku-hmulti_audio.media_addon	2941593629
 Master	MultiAudio		Pagrindinis
 SPDIF	MultiAudio		SPDIF
+Gain	MultiAudio		Stiprinimas
 Output 3D center	MultiAudio		3D išvesties centras
+Extended Setup	MultiAudio		Papildomos nuostatos
 CD	MultiAudio		CD
 Tone control	MultiAudio		Tonų valdymas
 Phone	MultiAudio		Telefonas
@@ -10,6 +12,7 @@ Headphones	MultiAudio		Ausinės
 Input	MultiAudio		Įvestis
 General	MultiAudio		Bendros
 Input & Output	MultiAudio		Įvestis ir išvestis
+Enhanced Setup	MultiAudio		Papildomos nuostatos
 Volume	MultiAudio		Garsis
 Output	MultiAudio		Išvestis
 Video	MultiAudio		Video

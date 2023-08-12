@@ -1,2 +1,16 @@
-1	lithuanian	x-vnd.Haiku-TIFFTranslator	2591143631
+1	lithuanian	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF biblioteka:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: netinkamas dokumento indeksas\n
+Use compression:	TIFFView		Naudoti glaudinimą:
+TIFF image translator	TIFFView		TIFF paveikslų keitiklis
+TIFF image	TIFFTranslator		TIFF paveikslas
 TIFF Settings	TIFFMain		TIFF nuostatos
+TIFF image translator	TIFFTranslator		TIFF paveikslų keitiklis
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nepavyko nustatyti aplanko\n
+Version %d.%d.%d, %s	TIFFView		Versija %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFF paveikslų keitiklio nuostatos
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF paveikslai
+None	TIFFView		jokio

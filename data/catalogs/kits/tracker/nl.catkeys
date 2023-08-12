@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2399475814
+1	dutch; flemish	x-vnd.Haiku-libtracker	381036594
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Betrek alle schijven nu
 Location:	InfoWindow		Locatie:
 Name	PoseView		Naam
 Kind:	InfoWindow		Soort:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		bevat
 Open	FilePanelPriv		Openen
 Bitmap icon	AttributesView		Afbeeldingsicoon
@@ -77,7 +76,6 @@ Select	SelectionWindow		Selecteren
 Select	InfoWindow		Selecteren
 OK	OpenWithWindow		Oké
 Include trash	FindPanel		Prullenbak erbij opnemen
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Opruimen
 Modified	FindPanel		Gewijzigd
  (block size: 	InfoWindow		 (blokgrootte: 
@@ -232,7 +230,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Selectie omkeren
 Memory size	AttributesView		Geheugengrootte
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nieuwe map
  (broken)	InfoWindow		 (defect)
 Replace all	FSUtils		Alles vervangen
@@ -301,7 +298,6 @@ Desktop	Model		Bureaublad
 Select all	ContainerWindow		Alles selecteren
 apps	B_APPS_DIRECTORY		apps
 Error calculating folder size.	InfoWindow		Fout bij het berekenen van de mapgrootte
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Verwijderen
 Edit name	ContainerWindow		Naam wijzigen
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" kon niet geopend worden (Ontbrekend symbool %symbol).\n
@@ -412,7 +408,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		De machtigingen 
 Decrease size	DeskWindow		Grootte verminderen
 Emptying Trash… 	StatusWindow		Leegmaken van de prullenbak…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{voor # bestand} other{voor # bestanden}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Herstellen
 trash	B_TRASH_DIRECTORY		prullenbak
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Als de systeemmap of diens inhoud verplaatst wordt, dan start %osName niet meer!\n\nWeet u zeker dat u wilt doorgaan?\n\nOm de systeemmap of diens inhoud toch te verplaatsen, houd de Shift-knop ingedrukt en klik op \"Verplaatsen\".

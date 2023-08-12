@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2114493922
+1	friulian	x-vnd.Haiku-libtracker	96054702
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Monte ducj i discs cumò
 Location:	InfoWindow		Posizion:
 Name	PoseView		Non
 Kind:	InfoWindow		Gjenar:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# byte}}
 contains	FindPanel		al conten
 Open	FilePanelPriv		Vierç
 Bitmap icon	AttributesView		Icone Bitmap
@@ -77,7 +76,6 @@ Select	SelectionWindow		Selezione
 Select	InfoWindow		Selezione
 OK	OpenWithWindow		Va ben
 Include trash	FindPanel		Inclût scovacere
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Met a puest
 Modified	FindPanel		Modificât
  (block size: 	InfoWindow		 (dimension bloc: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Invertìs selezion
 Memory size	AttributesView		Dimension memorie
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Gnove cartele
  (broken)	InfoWindow		 (rot)
 Replace all	FSUtils		Sostituìs ducj
@@ -303,7 +300,6 @@ Desktop	Model		Scritori
 Select all	ContainerWindow		Selezione ducj
 apps	B_APPS_DIRECTORY		aplicazions
 Error calculating folder size.	InfoWindow		Erôr tal calcolâ la dimension de cartele.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Elimine
 Edit name	ContainerWindow		Modifiche non
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nol è stât pussibil vierzi \"%document\" (Al mancje il simbul: %symbol). \n
@@ -415,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Nol è stât pus
 Decrease size	DeskWindow		Diminuìs dimensions
 Emptying Trash… 	StatusWindow		Daûr a disvuedâ la scovacere… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # file}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Ripristine
 trash	B_TRASH_DIRECTORY		scovacere
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele di sisteme o il so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele di sisteme o il so contingût, ten fracât il tast Maiusc e fâs clic su \"Sposte\".

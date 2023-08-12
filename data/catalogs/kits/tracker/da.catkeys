@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	3722356873
+1	danish	x-vnd.Haiku-libtracker	3124217250
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Montér alle diske nu
 Location:	InfoWindow		Placering:
 Name	PoseView		Navn
 Kind:	InfoWindow		Slags:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# byte}}
 contains	FindPanel		indeholder
 Open	FilePanelPriv		Åbn
 Bitmap icon	AttributesView		Bitmapikon
@@ -77,7 +76,6 @@ Select	SelectionWindow		Vælg
 Select	InfoWindow		Vælg
 OK	OpenWithWindow		O.k.
 Include trash	FindPanel		Medtag papirkurv
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Ryd op
 Modified	FindPanel		Ændret
  (block size: 	InfoWindow		(blokstørrelse:)
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolesk
 Invert selection	FilePanelPriv		Vend markering om
 Memory size	AttributesView		Hukommelsesstørrelse
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Ny mappe
  (broken)	InfoWindow		 (ødelagt)
 Replace all	FSUtils		Erstat alle
@@ -303,7 +300,6 @@ Desktop	Model		Skrivebord
 Select all	ContainerWindow		Vælg alle
 apps	B_APPS_DIRECTORY		programmer
 Error calculating folder size.	InfoWindow		Fejl ved beregning af mappestørrelse.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Slet
 Edit name	ContainerWindow		Redigér navn
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunne ikke åbne \"%document\" (Manglende symbol: %symbol). \n
@@ -338,7 +334,6 @@ To: %dir	StatusWindow		Til: %dir
 Paste layout	ContainerWindow		Indsæt layout
 Cancel	Tracker		Afbryd
 yes	AttributesView		ja
-%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		Gør til aktiv printer
 Copy to	ContainerWindow		Kopiér til
 Name	SelectionWindow		Navn
@@ -416,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Kunne ikke opdat
 Decrease size	DeskWindow		Formindsk størrelse
 Emptying Trash… 	StatusWindow		Tømmer papirkurven… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # fil} other{for # filer}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Tilbagefør
 trash	B_TRASH_DIRECTORY		papirkurv
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Hvis du flytter systemmappen eller dens indhold, vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, du vil gøre det?\n\nFor alligevel at flytte systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Flyt\".
@@ -516,6 +510,7 @@ Create a Query	FindPanel		Opret en forespørgsel
 Close	QueryContainerWindow		Luk
 I know what I'm doing	FSUtils	button label	Jeg ved, hvad jeg gør
 Preparing to copy items…	StatusWindow		Forbereder kopiering af elementer…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Postreference
 Icon view	ContainerWindow		Ikonvisning
 The entered folder name is too long.	FSUtils		Det indtastede foldernavn er for langt.

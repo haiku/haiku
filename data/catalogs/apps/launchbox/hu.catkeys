@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-LaunchBox	1530497419
+1	hungarian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Leírás…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Biztos bezárod ezt a tálcát?\n(A tálca nem lesz rögzítve sehol.)
 OK	LaunchBox		Rendben
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Ablak keretének mutatása
 Failed to launch 'something', error in Pad data.	LaunchBox		Nem sikerült elindítani valamit, hiba van a tálca adataiban.
 LaunchBox	System name		Indítósáv
 Auto-raise	LaunchBox		Automatikus előrehozás
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Ikonméret
 Open containing folder	LaunchBox		Tartalmazó mappa megnyitása
 Add button here	LaunchBox		Új gomb

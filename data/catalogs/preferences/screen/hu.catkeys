@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Screen	133788249
+1	hungarian	x-vnd.Haiku-Screen	2318349707
 no	Screen		nem
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
@@ -13,6 +13,7 @@ Video format:	Screen		Videóformátum:
 Undo	Screen		Visszavonás
 OK	Screen		Rendben
 Current workspace	Screen		Jelenlegi munkaasztal
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		függőlegesen
 All workspaces	Screen		Minden munkaasztal
 Use laptop panel:	Screen		Használt laptopképernyő:

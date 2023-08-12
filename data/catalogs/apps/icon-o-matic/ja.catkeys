@@ -1,6 +1,7 @@
-1	japanese	x-vnd.haiku-icon_o_matic	1958984579
+1	japanese	x-vnd.haiku-icon_o_matic	2195648579
 None	Icon-O-Matic-Properties		解除
 Clean up path	Icon-O-Matic-CleanUpPathCmd		パスのクリーンアップ
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		空のシェイプの追加
 Opening the icon failed!	Icon-O-Matic-Main		アイコンを開けません!
 Reverse path	Icon-O-Matic-ReversePathCmd		パスの反転
@@ -14,6 +15,7 @@ Color	Icon-O-Matic-StyleTypes		カラー
 Select	Icon-O-Matic-Properties		選択
 Reset transformation	Icon-O-Matic-ShapesList		変形のリセット
 Duplicate	Icon-O-Matic-StylesList		複製
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		回転
 Shorten	Icon-O-Matic-PropertyNames		縮める
 Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{個のトランスフォーマー} other{個のトランスフォーマー}}の移動
@@ -121,6 +123,7 @@ Name	Icon-O-Matic-PropertyNames		名前
 Reset transformation	Icon-O-Matic-StylesList		変形のリセット
 Reverse	Icon-O-Matic-PathsList		反転
 Remove	Icon-O-Matic-PathsList		削除
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Load error	Icon-O-Matic-SVGImport		読み込みエラー
 Style type	Icon-O-Matic-StyleTypes		スタイルの形式
 Quit	Icon-O-Matic-Menu-File		終了

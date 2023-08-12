@@ -1,6 +1,7 @@
-1	lithuanian	x-vnd.Haiku-SpamFilter	160316705
+1	lithuanian	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		arba tuščias laiškas
 Genuine below and uncertain above:	SpamFilterConfig		Ne brukalas, kai žemesnis, o neaišku, kai viršija:
 Spam above:	SpamFilterConfig		Brukalas, kai įvertis viršija:
 Add spam rating to start of subject	SpamFilterConfig		Pridėti brukalo įvertį į temos pradžią
+Bayesian Spam Filter	SpamFilter		Bajeso brukalo filtras
 Learn from all incoming e-mail	SpamFilterConfig		Apsimokyti iš visų gaunamų laiškų

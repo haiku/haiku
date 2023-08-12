@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3722356873
+1	japanese	x-vnd.Haiku-libtracker	1155113004
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		すべてのディスクをただちに
 Location:	InfoWindow		場所:
 Name	PoseView		名前
 Kind:	InfoWindow		種類:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# バイト} other{# バイト}}
 contains	FindPanel		含む
 Open	FilePanelPriv		開く
 Bitmap icon	AttributesView		ビットマップアイコン
@@ -77,7 +76,6 @@ Select	SelectionWindow		選択
 Select	InfoWindow		選択
 OK	OpenWithWindow		OK
 Include trash	FindPanel		ごみ箱を含む
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		アイコンの整列
 Modified	FindPanel		更新日時
  (block size: 	InfoWindow		 (ブロックサイズ: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		ブール値
 Invert selection	FilePanelPriv		選択範囲の反転
 Memory size	AttributesView		メモリサイズ
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		フォルダー
  (broken)	InfoWindow		 (破損)
 Replace all	FSUtils		すべて置換
@@ -303,7 +300,6 @@ Desktop	Model		デスクトップ
 Select all	ContainerWindow		すべて選択
 apps	B_APPS_DIRECTORY		アプリケーション
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		削除
 Edit name	ContainerWindow		名前の変更
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けません (シンボル %symbol  が見つかりません)。\n
@@ -338,7 +334,6 @@ To: %dir	StatusWindow		%dir
 Paste layout	ContainerWindow		レイアウトを貼り付け
 Cancel	Tracker		中止
 yes	AttributesView		はい
-%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		プリンターを有効にする
 Copy to	ContainerWindow		次へコピー
 Name	SelectionWindow		名前
@@ -416,9 +411,9 @@ Could not update permissions of file \"%name\". %error	FSUtils		\"%name\" の�
 Decrease size	DeskWindow		縮小
 Emptying Trash… 	StatusWindow		ごみ箱を空にしています...
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# 個のファイル} other{# 個のファイル}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		戻す
 trash	B_TRASH_DIRECTORY		ごみ箱
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		システムフォルダーやその内容を移動すると、%osName が起動しなくなります!\n\n移動しますか?\n\nそれでもシステムフォルダーやその内容を移動するなら、シフトキーを押しながら \"移動\" をクリックしてください。
 Close all in workspace	ContainerWindow		ワークスペース内のすべてを閉じる
 Corrupted expression.	libtracker		式が間違っています。
@@ -443,6 +438,7 @@ the config folder	FSUtils		config フォルダー
 Sorry, could not create a new folder.	FSUtils		新しいフォルダーを作成できません。
 MIME Signature	AttributesView		MIME 署名
 Select all	VirtualDirectoryWindow		すべて選択
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	名前の変更
 Clean up all	ContainerWindow		すべてを整列
 Add current folder	FilePanelPriv		このフォルダーを追加
@@ -516,6 +512,7 @@ Create a Query	FindPanel		クエリの作成
 Close	QueryContainerWindow		閉じる
 I know what I'm doing	FSUtils	button label	私はなにをするか理解しています
 Preparing to copy items…	StatusWindow		コピーの準備をしています...
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		アイコン表示
 The entered folder name is too long.	FSUtils		入力されたフォルダー名が長すぎます。

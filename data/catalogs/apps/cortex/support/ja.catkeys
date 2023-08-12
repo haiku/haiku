@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Cortex.support	2097798758
+1	japanese	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		ヘッダーにフラグ有り
 32 bit HLS	MediaString		32 ビット HLS
 Recording	MediaString		レコーディング
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		右
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32 ビット RGB
 System mixer	MediaString		System mixer
 Physical output	MediaString		物理出力

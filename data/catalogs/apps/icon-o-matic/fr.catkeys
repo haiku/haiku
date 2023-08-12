@@ -1,5 +1,6 @@
-1	french	x-vnd.haiku-icon_o_matic	1308365995
+1	french	x-vnd.haiku-icon_o_matic	1545029995
 None	Icon-O-Matic-Properties		Aucun
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
 Opening the icon failed!	Icon-O-Matic-Main		L’ouverture de l’icône a échoué !
 Add with path	Icon-O-Matic-ShapesList		Ajouter avec un chemin
@@ -10,6 +11,7 @@ Color	Icon-O-Matic-StyleTypes		Couleur
 Select	Icon-O-Matic-Properties		Sélectionner
 Reset transformation	Icon-O-Matic-ShapesList		Réinitialiser la transformation
 Duplicate	Icon-O-Matic-StylesList		Dupliquer
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Pivoter
 Shorten	Icon-O-Matic-PropertyNames		Raccourcir
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Vous essayez d’importer un texte plutôt long, êtes-vous sûr de vous ?
@@ -77,6 +79,7 @@ Name	Icon-O-Matic-PropertyNames		Nom
 Reset transformation	Icon-O-Matic-StylesList		Réinitialiser la transformation
 Reverse	Icon-O-Matic-PathsList		Inverser
 Remove	Icon-O-Matic-PathsList		Enlever
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Style type	Icon-O-Matic-StyleTypes		Type de style
 Quit	Icon-O-Matic-Menu-File		Quitter
 Gradient	Icon-O-Matic-StyleTypes		Dégradé

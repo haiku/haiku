@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DiskProbe	1243187511
+1	german	x-vnd.Haiku-DiskProbe	1878971683
 Raw editor	AttributeWindow		Raw-Editor
 Remove	AttributeWindow		Entfernen
 Close	ProbeView		Schließen
@@ -118,6 +118,7 @@ Double precision floating-point value:	TypeEditors		Gleitkomma-Wert doppelter Ge
 Image	TypeEditors	This is the type of view	Bild
 Swapped: %lld (0x%0*Lx)	ProbeView		Getauscht: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Änderungen vor dem Beenden speichern?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG-Format
 Number	TypeEditors	This is the type of editor	Zahl
 Edit	ProbeView		Bearbeiten

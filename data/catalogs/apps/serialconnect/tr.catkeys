@@ -1,8 +1,9 @@
-1	turkish	x-vnd.haiku.SerialConnect	354154115
+1	turkish	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Donanım
 Connection	SerialWindow		Bağlantı
 Raw send…	SerialWindow		Ham gönder…
 Baud rate	SerialWindow		Baud hızı
+Paste	SerialWindow		Yapıştır
 Stop bits	SerialWindow		Durak bitleri
 None	SerialWindow	Flowcontrol	Hiçbiri
 Cancel	Custom baudrate window		Vazgeç

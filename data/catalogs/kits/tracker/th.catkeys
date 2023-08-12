@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	370065242
+1	thai	x-vnd.Haiku-libtracker	2646593318
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -15,7 +15,6 @@ Mount all disks now	AutoMounterSettings		เมาท์ดิสก์ทั้
 Location:	InfoWindow		สถานที่:
 Name	PoseView		ชื่อ
 Kind:	InfoWindow		ชนิด:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} อื่นๆ{# bytes}}
 contains	FindPanel		มี
 Open	FilePanelPriv		เปิด
 Bitmap icon	AttributesView		ไอคอน Bitmap
@@ -74,7 +73,6 @@ Select	SelectionWindow		เลือก
 Select	InfoWindow		เลือก
 OK	OpenWithWindow		ตกลง
 Include trash	FindPanel		รวมขยะ
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		ลบ
 Modified	FindPanel		แก้ไข
 Select all	QueryContainerWindow		เลือกทั้งหมด
@@ -223,7 +221,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		สลับการเลือก
 Memory size	AttributesView		ขนาดหน่วยความจำ
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		โฟลเดอร์
  (broken)	InfoWindow		(เสียหาย)
 Replace all	FSUtils		แทนที่ทั้งหมด
@@ -291,7 +288,6 @@ Desktop	Model		เดสก์ทอป
 Select all	ContainerWindow		เลือกทั้งหมด
 apps	B_APPS_DIRECTORY		แอปพลิเคชัน
 Error calculating folder size.	InfoWindow		เกิดข้อผิดพลาดในการคำนวณขนาดโฟลเดอร์
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		ลบ
 Edit name	ContainerWindow		แก้ไขชื่อ
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		ไม่สามารถเปิด \"%document\" (สัญลักษณ์ที่หายไป: %symbol)\n
@@ -400,7 +396,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		ไม่สา�
 Decrease size	DeskWindow		ลดขนาด
 Emptying Trash… 	StatusWindow		กำลังล้างถังขยะ
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} อื่นๆ{for # files}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		เปลี่ยนกลับ
 trash	B_TRASH_DIRECTORY		ถังขยะ
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		หากคุณย้ายโฟลเดอร์ระบบหรือเนื้อหาคุณจะไม่สามารถบูต %osName!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้ \n\nหากต้องการย้ายโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดปุ่ม Shift ค้างไว้แล้วคลิก \"ย้าย\"

@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.haiku.SerialConnect	354154115
+1	hungarian	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Eszköz
 Connection	SerialWindow		Kapcsolat
 Raw send…	SerialWindow		Nyers küldés…
 Baud rate	SerialWindow		Jelarány mértéke
+Paste	SerialWindow		Beilleszt
 Stop bits	SerialWindow		Stop bit
 None	SerialWindow	Flowcontrol	Nincs
 Cancel	Custom baudrate window		Mégse

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3788365418
+1	turkish	x-vnd.Haiku-libtracker	2828984500
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
 Location:	InfoWindow		Konum:
 Name	PoseView		Ad
 Kind:	InfoWindow		Tür:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, other{# bayt}}
 contains	FindPanel		içerir:
 Open	FilePanelPriv		Aç
 Bitmap icon	AttributesView		Biteşlem simge
@@ -77,7 +76,6 @@ Select	SelectionWindow		Seç
 Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
 Include trash	FindPanel		Çöpe de bak
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
  (block size: 	InfoWindow		 (blok boyutu: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Seçimi tersine çevir
 Memory size	AttributesView		Bellek boyutu
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Yeni klasör
  (broken)	InfoWindow		 (çalışmıyor)
 Replace all	FSUtils		Tümünü değiştir
@@ -303,7 +300,6 @@ Desktop	Model		Masaüstü
 Select all	ContainerWindow		Tümünü seç
 apps	B_APPS_DIRECTORY		uygulamalar
 Error calculating folder size.	InfoWindow		Klasör boyutu hesaplanırken hata.
-MiB	WidgetAttributeText		MB
 Delete	FSUtils		Sil
 Edit name	ContainerWindow		Yeniden adlandır
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" açılamıyor (Eksik sembol: %symbol).\n
@@ -415,9 +411,9 @@ Could not update permissions of file \"%name\". %error	FSUtils		\"%name\" dosyas
 Decrease size	DeskWindow		Küçült
 Emptying Trash… 	StatusWindow		Çöp boşaltılıyor… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, other{, # dosya}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Eski haline döndür
 trash	B_TRASH_DIRECTORY		çöp
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Sistem klasörünü veya içindekileri taşırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Taşı\"ya basın.
 Close all in workspace	ContainerWindow		Bu çalışma alanındakileri kapat
 Corrupted expression.	libtracker		Hasar görmüş ifade.
@@ -442,6 +438,7 @@ the config folder	FSUtils		yapılandırma klasörü
 Sorry, could not create a new folder.	FSUtils		Üzgünüm, yeni bir klasör oluşturulamadı.
 MIME Signature	AttributesView		MIME İmzası
 Select all	VirtualDirectoryWindow		Tümünü seç
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Yeniden adlandır
 Clean up all	ContainerWindow		Hepsini toparla
 Add current folder	FilePanelPriv		Geçerli klasörü ekle
@@ -514,6 +511,7 @@ Create a Query	FindPanel		Sorgu oluştur
 Close	QueryContainerWindow		Kapat
 I know what I'm doing	FSUtils	button label	Ne yaptığımı biliyorum
 Preparing to copy items…	StatusWindow		Ögeleri kopyalamaya hazırlanıyor…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Girdi başvurusu
 Icon view	ContainerWindow		Simge görünümü
 The entered folder name is too long.	FSUtils		Girilen klasör adı pek uzun.

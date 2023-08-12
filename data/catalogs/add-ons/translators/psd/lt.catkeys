@@ -1,0 +1,19 @@
+1	lithuanian	x-vnd.Haiku-PSDTranslator	721828708
+Lab	PSDLoader		Laboratorija
+Uncompressed	PSDConfig		neglaudinti
+Indexed	PSDLoader		indeksuota
+Grayscale	PSDLoader		pilkumo tonai
+Photoshop image translator	PSDConfig		„Photoshop“ paveikslų keitiklis
+Photoshop image translator	PSDTranslator		„Photoshop“ paveikslų keitiklis
+Version %d.%d.%d, %s	PSDConfig		Versija %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		„Photoshop“ dokumentas (PSD failas)
+Photoshop image	PSDTranslator		„Photoshop“ paveikslas
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		„Photoshop“ didelis dokumentas (PSB failas)
+RGBA	PSDLoader		RŽMA
+Photoshop image (%s)	PSDTranslator		„Photoshop“ paveikslas (%s)
+PSDTranslator Settings	PSDConfig		PSD keitiklio nuostatos
+RGB	PSDLoader		RŽM
+CMYK	PSDLoader		ŽPGJ
+Compression: 	PSDConfig		Glaudinimas: 
+Format: 	PSDConfig		Formatas: 

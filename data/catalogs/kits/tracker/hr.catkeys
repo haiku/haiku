@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	3082959390
+1	croatian	x-vnd.Haiku-libtracker	917224975
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -58,7 +58,6 @@ Select	SelectionWindow		Odaberi
 Select	InfoWindow		Odaberi
 OK	OpenWithWindow		U redu
 Include trash	FindPanel		Uključi smeće
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Očisti
 Modified	FindPanel		Izmjenjeno
 Select all	QueryContainerWindow		Odaberi sve
@@ -168,7 +167,6 @@ Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Poveznica \"%na
 Mount server error	AutoMounterSettings		Greška montiranja poslužitelja
 Invert selection	FilePanelPriv		Obrnuti odabir
 Memory size	AttributesView		Veličina memorije
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nova mapa
 Replace all	FSUtils		Zamjeni sve
 Reverse order	ContainerWindow		Preokreni red
@@ -217,7 +215,6 @@ Desktop	Model		Radna površina
 Select all	ContainerWindow		Odaberi sve
 apps	B_APPS_DIRECTORY		programi
 Error calculating folder size.	InfoWindow		Greška pri izračunavanju veličine mape.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Izbriši
 Edit name	ContainerWindow		Uredi ime
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nije moguće otvoriti \"%document\" (Nedostaje simbol: %symbol). \n
@@ -294,7 +291,6 @@ Windows	TrackerSettingsWindow		Prozori
 Could not update permissions of file \"%name\". %error	FSUtils		Nije moguće dopuniti dozvole datoteke \"%name\". %error
 Decrease size	DeskWindow		Smanji veličinu
 Emptying Trash… 	StatusWindow		Praznim smeće... 
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Obrni
 trash	B_TRASH_DIRECTORY		smeće
 Close all in workspace	ContainerWindow		Zatvori sve radne prostore

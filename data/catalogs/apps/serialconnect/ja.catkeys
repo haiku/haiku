@@ -1,8 +1,9 @@
-1	japanese	x-vnd.haiku.SerialConnect	354154115
+1	japanese	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	ハードウェア
 Connection	SerialWindow		接続
 Raw send…	SerialWindow		Raw 送信...
 Baud rate	SerialWindow		ボーレート
+Paste	SerialWindow		貼り付け
 Stop bits	SerialWindow		ストップビット
 None	SerialWindow	Flowcontrol	無し
 Cancel	Custom baudrate window		キャンセル

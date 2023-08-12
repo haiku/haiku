@@ -1,5 +1,6 @@
-1	lithuanian	x-vnd.Haiku-BFSAddOn	3514982252
+1	lithuanian	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		Leisti užklausas
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Uždraudus užklausas, kai kurios failų sistemos operacijos gali veikti sparčiau,\ntačiau tai turėtumėte daryti tik būdami visiškai tikri, jog užklausų nereikės.\nBet koks tomas, naudojamas „Haiku“ sistemos įkėlimui, turi leisti užklausas.
 Name:	BFS_Initialize_Parameter		Pavadinimas:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (daugiausia dideli failai)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (rekomenduojamas)

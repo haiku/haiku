@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	1019982249
+1	esperanto	x-vnd.Haiku-libtracker	3296510325
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Surmeti ĉiujn diskojn nun
 Location:	InfoWindow		Loko:
 Name	PoseView		Nomo
 Kind:	InfoWindow		Speco:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# bitoko} other{# bitokoj}}
 contains	FindPanel		enhavas
 Open	FilePanelPriv		Uzi
 Bitmap icon	AttributesView		Bitmapa piktogramo
@@ -76,7 +75,6 @@ Select	SelectionWindow		Elekti
 Select	InfoWindow		Elekti
 OK	OpenWithWindow		Bone
 Include trash	FindPanel		Inkludante rubujon
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Alkradigi
 Modified	FindPanel		Redaktita
 Select all	QueryContainerWindow		Elekti ĉion
@@ -228,7 +226,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Bulea
 Invert selection	FilePanelPriv		Renversi elekton
 Memory size	AttributesView		Memora grando
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nova dosierujo
  (broken)	InfoWindow		 (rompita)
 Replace all	FSUtils		Anstataŭigi ĉion
@@ -297,7 +294,6 @@ Desktop	Model		Labortablo
 Select all	ContainerWindow		Elekti ĉion
 apps	B_APPS_DIRECTORY		programoj
 Error calculating folder size.	InfoWindow		Eraris kalkulante la grandon de la dosierujo.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Forigi
 Edit name	ContainerWindow		Redakti nomon
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Malsukcesis uzi \"%document\"-on (Mankas simbolo: %symbol). \n
@@ -408,7 +404,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Ne povas ĝisdat
 Decrease size	DeskWindow		Malgrandigi
 Emptying Trash… 	StatusWindow		Malplenigo de la Rubujo… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # dosierujo} other{por # dosierujoj}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Malfari
 trash	B_TRASH_DIRECTORY		rubujo
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se vi movos la sisteman dosierujon aŭ ĝian enhavon, vi ne kapablos praŝarĝi %osName!\n\nĈu vi certas, ke vi volas fari tion?\n\nPor movi la sisteman dosierujon aŭ ĝian enhavon senkondiĉe, premu la majuskligklavon kaj klaku \"Movi\".

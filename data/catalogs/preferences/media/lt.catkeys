@@ -1,20 +1,29 @@
-1	lithuanian	x-vnd.Haiku-Media	2605101563
+1	lithuanian	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio patalpinti pranešimų srityje: %s\n
 Restart media services	Media views		Perleisti įvairialypės terpės tarnybas
 Quit	Media Window		Baigti darbą
+<none>	VideoInputMenu	Used when no video input is available	<nėra>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pašalinti iš pranešimų srities: %s\n
 Video output:	Media views		Vaizdo išvestis:
 Video input:	Media views		Vaizdo įvestis:
 Audio output:	Media views		Garso išvestis:
+Please select a SoundFont.	Midi View		Pasirinkite „SoundFont“ failą.
+There are no SoundFonts installed.	Midi View		Įdiegtų „SoundFont“ failų nėra.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Dabar užvėrus įvairialypės terpės nuostatų langą, bus nutrauktas įvairialypės terpės tarnybų perleidimas. Tikėtinas to rezultatas – nestabilus arba neprieinamas įvairialypės terpės funkcionalumas.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepavyko prisijungti prie įvairialypės terpės tarnybos.\nAr norite, kad ji būtų paleista?
 Video settings	Media Window		Vaizdo nuostatos
 Audio mixer	Media Window		Garsų maišiklis
 Show volume control on Deskbar	Media views		Patalpinti garso valdiklį pranešimų srityje
 Start media server	Media Window		Paleisti įvairialypės terpės tarnybą
 Audio settings	Media Window		Garso nuostatos
+Quit anyway	Media Window		Vis tiek baigti darbą
 Media	System name		Įvairialypė terpė
+Warning!	Media Window		Dėmesio!
+MIDI Settings	Media Window		MIDI nuostatos
+SoundFonts	Midi View		Instrumentų ėminių („SoundFont“) failai
 Audio input:	Media views		Garso įvestis:
 <none>	Media views		<nėra>
 Channel:	Media views		Kanalas:
 This hardware has no controls.	Media Window		Ši aparatūra nederinama.
 Defaults	Media views		Numatytosios reikšmės
+<none>	VideoOutputMenu	Used when no video output is available	<nėra>

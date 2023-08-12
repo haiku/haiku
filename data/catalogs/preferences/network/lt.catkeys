@@ -1,3 +1,52 @@
-1	lithuanian	x-vnd.Haiku-Network	3363740538
+1	lithuanian	x-vnd.Haiku-Network	2392604972
+Ethernet device	InterfaceListItem		Laidinio tinklo įrenginys
+Link speed:	IntefaceView		Ryšio sparta:
+disconnected	IntefaceView		atjungtas
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Tinklas:
+Received:	IntefaceView		Gauta:
+New…	NetworkWindow		Naujas…
+no link	InterfaceListItem		ryšio nėra
+Sent:	IntefaceView		Išsiųsta:
+Gateway:	IntefaceAddressView		Tinklų sietuvas:
+The netmask defines your local network	IntefaceAddressView		Tinklo kaukė apibrėžia jūsų lokalų tinklą
+Your IP address	IntefaceAddressView		Jūsų IP adresas
+DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP adresas:
+Netmask:	IntefaceAddressView		Tinklo kaukė:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Tarnybos
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Nepavyko „NetworkStatus“ patalpinti pranešimų srityje: %s
 Revert	NetworkWindow		Atšaukti pakeitimus
+off	ServiceListItem		išjungtas
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<belaidžių tinklų nerasta>
+Enable	IntefaceView		Įjungti
+connected	IntefaceView		prijungtas
 Apply	IntefaceAddressView		Taikyti
+Disable	ServiceView		Išjungti
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Indikuoti tinklo būseną pranešimų srityje
+Mode:	IntefaceAddressView		Veiksena:
+connected	InterfaceListItem		prijungtas
+OK	NetworkWindow		Gerai
+Static	IntefaceAddressView		Statiniai parametrai
+launch error	NetworkWindow		paleidimo klaida
+MAC address:	IntefaceView		MAC adresas:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		išjungtas
+Dial-up connection	InterfaceListItem		Telefoninis ryšys
+on	ServiceListItem		įjungtas
+The method for obtaining an IP address	IntefaceAddressView		IP parametrų gavimo būdas
+disconnected	InterfaceListItem		atjungtas
+Automatic	IntefaceAddressView		Automatiniai parametrai
+Choose automatically	IntefaceView		Parinkti automatiškai
+Status:	IntefaceView		Būsena:
+Disable	IntefaceView		Išjungti
+open	Open network		atviras
+Network	System name		Tinklas
+Your gateway to the internet	IntefaceAddressView		Tinklų sietuvas, jums teikiantis ryšį su internetu
+Enable	ServiceView		Įjungti
+Wireless device	InterfaceListItem		Belaidis įrenginys
+Disabled	IntefaceAddressView		Išjungtas
+VPN connection	InterfaceListItem		VPN ryšys

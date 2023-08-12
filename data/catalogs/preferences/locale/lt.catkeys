@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Locale	288870027
+1	lithuanian	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Vidutinis formatas:
 Negative:	TimeFormatSettings		Neigiami:
 Language	Locale Preflet Window		Kalba
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Pageidautinos kalbos
 Full format:	TimeFormatSettings		Pilnasis formatas:
 Cancel	Locale Preflet Window		Atsisakyti
 Revert	Locale Preflet Window		Atšaukti pakeitimus
+Translate application and folder names	TimeFormatSettings		Versti programų ir aplankų pavadinimus
 12 hour	TimeFormatSettings		12 valandų
 Positive:	TimeFormatSettings		Teigiami:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Kad šis pakeitimas įsigaliotų, reikia perleisti užduočių juostą ir Pėdsekį. Ar norite juos perleisti dabar?

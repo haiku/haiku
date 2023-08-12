@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	384691311
+1	french	x-vnd.Haiku-libtracker	3720277689
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Monter tous les disques maintenant
 Location:	InfoWindow		Emplacement :
 Name	PoseView		Nom
 Kind:	InfoWindow		Nature :
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# octet} other{# octets}}
 contains	FindPanel		contient
 Open	FilePanelPriv		Ouvrir
 Bitmap icon	AttributesView		Icône bitmap
@@ -77,7 +76,6 @@ Select	SelectionWindow		Sélectionner
 Select	InfoWindow		Sélectionner
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Inclure la corbeille
-GiB	WidgetAttributeText		Gio
 Clean up	ContainerWindow		Nettoyer
 Modified	FindPanel		Modifié
  (block size: 	InfoWindow		 (taille de bloc : 
@@ -231,7 +229,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Booléen
 Invert selection	FilePanelPriv		Inverser la sélection
 Memory size	AttributesView		Taille mémoire
-TiB	WidgetAttributeText		Tio
 New folder	TemplatesMenu		Nouveau dossier
  (broken)	InfoWindow		 (rompu)
 Replace all	FSUtils		Remplacer tout
@@ -301,7 +298,6 @@ Desktop	Model		Bureau
 Select all	ContainerWindow		Sélectionner tout
 apps	B_APPS_DIRECTORY		applications
 Error calculating folder size.	InfoWindow		Erreur de calcul de la taille du dossier.
-MiB	WidgetAttributeText		Mio
 Delete	FSUtils		Supprimer
 Edit name	ContainerWindow		Éditer le nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque le symbole : %symbol).\n
@@ -412,9 +408,9 @@ Could not update permissions of file \"%name\". %error	FSUtils		Impossible de mo
 Decrease size	DeskWindow		Diminuer la taille
 Emptying Trash… 	StatusWindow		Vidage de la Corbeille…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{pour # fichier} other{pour # fichiers}}
-KiB	WidgetAttributeText		Kio
 Revert	TrackerSettingsWindow		Rétablir
 trash	B_TRASH_DIRECTORY		corbeille
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour déplacez quand-même le dossier système ou son contenu, maintenez la touche Majuscule enfoncée et cliquez sur « Déplacer ».
 Close all in workspace	ContainerWindow		Fermer tout dans l’espace de travail
 Corrupted expression.	libtracker		Expression corrompu.
@@ -439,6 +435,7 @@ the config folder	FSUtils		le dossier de configuration
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
 MIME Signature	AttributesView		Signature MIME
 Select all	VirtualDirectoryWindow		Sélectionner tout
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Renommer
 Clean up all	ContainerWindow		Nettoyer tout
 Add current folder	FilePanelPriv		Ajouter le dossier courant
@@ -511,6 +508,7 @@ Create a Query	FindPanel		Créer une requête
 Close	QueryContainerWindow		Fermer
 I know what I'm doing	FSUtils	button label	Je sais ce que je fais
 Preparing to copy items…	StatusWindow		Copie des éléments en préparation…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld o
 Entry ref	AttributesView		Référence de l'entrée
 Icon view	ContainerWindow		Vue en icônes
 The entered folder name is too long.	FSUtils		Le nom de dossier saisi est trop long.

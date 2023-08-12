@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-SGITranslator	4153400005
+1	lithuanian	x-vnd.Haiku-SGITranslator	129108011
 SGI images	SGITranslator		SGI paveikslai
 Use compression:	SGIView		Naudoti glaudinimą:
 SGI image translator	SGIView		SGI paveikslų keitiklis
@@ -7,5 +7,7 @@ SGITranslator Settings	SGITranslator		SGI keitiklio nuostatos
 SGI Settings	SGIMain		SGI nuostatos
 SGI image translator	SGITranslator		SGI paveikslų keitiklis
 None	SGIView		jokio
+Version %d.%d.%d, %s	SGIView		Versija %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nsukurtas „GIMP“ SGI įskiepio 1.5 versijos pagrindu:\n
 RLE	SGIView		RLE
 written by:\n	SGIView		Autorius:\n

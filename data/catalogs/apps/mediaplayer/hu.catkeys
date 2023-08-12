@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	716811487
+1	hungarian	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzés Szemetesbe helyezése
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		Teljes hangerő
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Úgy tűnik a médiakiszolgáló nem fut.\nEl kívánod indítani?
 Location	MediaPlayer-InfoWin		Útvonal
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		%s megnyitása.
 Medium	MediaPlayer-SettingsWindow		Közepes
 Play mode	MediaPlayer-SettingsWindow		Lejátszás módja

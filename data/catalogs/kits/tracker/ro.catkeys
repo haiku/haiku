@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	4224698817
+1	romanian	x-vnd.Haiku-libtracker	3626559194
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Montează toate discurile acum
 Location:	InfoWindow		Locație:
 Name	PoseView		Nume
 Kind:	InfoWindow		Fel:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		conține
 Open	FilePanelPriv		Deschide
 Bitmap icon	AttributesView		Pictogramă bitmap
@@ -77,7 +76,6 @@ Select	SelectionWindow		Selectează
 Select	InfoWindow		Selectează
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Include gunoiul
-GiB	WidgetAttributeText		GiO
 Clean up	ContainerWindow		Curăță
 Modified	FindPanel		Modificat
  (block size: 	InfoWindow		 (dimensiune bloc: 
@@ -232,7 +230,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Inversează selecția
 Memory size	AttributesView		Dimensiune memorie
-TiB	WidgetAttributeText		TiO
 New folder	TemplatesMenu		Dosar nou
  (broken)	InfoWindow		 (deteriorat)
 Replace all	FSUtils		Înlocuiește toate
@@ -301,7 +298,6 @@ Desktop	Model		Desktop
 Select all	ContainerWindow		Selectează toate
 apps	B_APPS_DIRECTORY		apps
 Error calculating folder size.	InfoWindow		Eroare la calcularea dimensiunii dosarului.
-MiB	WidgetAttributeText		MiO
 Delete	FSUtils		Șterge
 Edit name	ContainerWindow		Editează numele
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \„%document\” (Simbol lipsă: %symbol). \n
@@ -336,7 +332,6 @@ To: %dir	StatusWindow		La: %dir
 Paste layout	ContainerWindow		Lipește aranjamentul
 Cancel	Tracker		Anulează
 yes	AttributesView		da
-%lld B	WidgetAttributeText		%lld O
 Make active printer	ContainerWindow		Stabilește ca imprimantă activă
 Copy to	ContainerWindow		Copiază la
 Name	SelectionWindow		Nume
@@ -414,7 +409,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Nu s-au putut ac
 Decrease size	DeskWindow		Micșorează dimensiunea
 Emptying Trash… 	StatusWindow		Se eliberează gunoiul… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
-KiB	WidgetAttributeText		KiO
 Revert	TrackerSettingsWindow		Revenire
 trash	B_TRASH_DIRECTORY		gunoi
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Dacă mutați dosarul de sistem sau conținutul acestuia, nu veți putea boota %osName!\n\nSigur doriți să faceți asta?\n\nPentru a muta dosarul de sistem sau conținutul acestuia oricum, țineți apăsată tasta Shift și dați clic pe \„Mută\”.
@@ -514,6 +508,7 @@ Create a Query	FindPanel		Creează o interogare
 Close	QueryContainerWindow		Închide
 I know what I'm doing	FSUtils	button label	Știu ce fac
 Preparing to copy items…	StatusWindow		Se pregătește copierea elementelor…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld O
 Entry ref	AttributesView		Referință de intrare
 Icon view	ContainerWindow		Vizualizare pictogramă
 The entered folder name is too long.	FSUtils		Numele de dosar introdus este prea lung.

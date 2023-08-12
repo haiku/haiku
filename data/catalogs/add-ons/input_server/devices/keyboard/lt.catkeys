@@ -1,6 +1,8 @@
-1	lithuanian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	lithuanian	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Jeigu programa neužbaigs darbo pati, Jums gali tekti jį nutraukti priverstinai.
 Quit application	Team monitor		Užbaigti darbą
+Open Terminal	Team monitor		Atverti terminalą
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		Kompiuteriui perleisti, palaikykite nuspaustus klavišus VALDYMAS+KOMANDA+ŠALINTI {0, plural, one {# sekundę} few {# sekundes} other{# sekundžių}}.
 Restart the desktop	Team monitor		Perleisti darbalaukį
 Force reboot	Team monitor		Perleisti kompiuterį priverstinai
 Team monitor	Team monitor		Užduočių tvarkytuvas

@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.support	2097798758
+1	hungarian	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		A fejlécnek vannak zászlói
 32 bit HLS	MediaString		32 bites HLS
 Recording	MediaString		Felvétel
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Jobb
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32 bites RGB
 System mixer	MediaString		Rendszer keverő
 Physical output	MediaString		Fizikai kimenet

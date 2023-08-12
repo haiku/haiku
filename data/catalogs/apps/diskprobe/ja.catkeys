@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DiskProbe	494506599
+1	japanese	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw エディター
 Remove	AttributeWindow		削除
 Close	ProbeView		閉じる
@@ -119,6 +119,7 @@ Double precision floating-point value:	TypeEditors		倍精度浮動小数点値:
 Image	TypeEditors	This is the type of view	イメージ
 Swapped: %lld (0x%0*Lx)	ProbeView		スワップ後: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		閉じる前に変更を保存しますか?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG フォーマット
 Number	TypeEditors	This is the type of editor	数値
 Edit	ProbeView		編集

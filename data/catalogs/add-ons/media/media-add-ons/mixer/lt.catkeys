@@ -1,5 +1,6 @@
-1	lithuanian	x-vnd.Haiku-mixer.media_addon	3463574286
+1	lithuanian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Įvesties susiejimas
+High quality (linear interpolation)	AudioMixer		aukštesnė kokybė (linijinė interpoliacija)
 To output	AudioMixer		Į išvestį
 Gain	AudioMixer		Stiprinimas
 To master	AudioMixer		Į pagrindinį
@@ -7,13 +8,17 @@ not connected	AudioMixer		neprijungta
 Master output	AudioMixer		Pagrindinė išvestis
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Stiprinimo valdikliai
+Low quality (drop/repeat samples)	AudioMixer		prastesnė kokybė (prarasti / kartoti ėminius)
 Output channel sources	AudioMixer		Išvesties kanalo šaltiniai
 Allow input channel remapping	AudioMixer		Leisti įvesties kanalų persiejimą
 Display balance control for stereo connections	AudioMixer		Rodyti balanso valdiklius stereofoninėms jungtims
 Setup	AudioMixer		Nuostatos
 Physical input channels	AudioMixer		fizinius įvesties kanalus
 Input channel destinations	AudioMixer		Įvesties kanalų paskirtys
+Resampling algorithm:	AudioMixer		Pakartotinio skaitmeninimo taktika:
 Mute	AudioMixer		Nutildyti
 Output mapping	AudioMixer		Išvesties susiejimas
 Virtual output channels	AudioMixer		virtualius išvesties kanalus
 Allow output channel remapping	AudioMixer		Leisti išvesties kanalų persiejimą
+Input gain controls represent:	AudioMixer		Įvesties stiprinimo valdikliai žymi:
+Attenuate mixer output by 3 dB	AudioMixer		Susilpninti maišiklio išvestį 3 dB

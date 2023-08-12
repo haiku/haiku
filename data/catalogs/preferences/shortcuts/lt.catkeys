@@ -1,29 +1,47 @@
-1	lithuanian	x-vnd.Haiku-Shortcuts	4120254175
+1	lithuanian	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseUp
 Application	ShortcutsWindow		Programa
+Option	ShortcutsSpec	Name for modifier on keyboard	Alternatyva
 Save changes before closing?	ShortcutsWindow		Ar įrašyti pakeitimus prieš užveriant?
 Revert to saved	ShortcutsWindow		Grįžti prie įrašyto
 Don't save	ShortcutsWindow		Neįrašyti
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko.
 Save	ShortcutsWindow		Įrašyti
+Either	ShortcutsSpec		Bet kuris
 Oh no	ShortcutsWindow		O, ne!
 Key	ShortcutsWindow		Klavišas
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Pažymėti
 Shortcuts	System name		Spartieji klavišai
 Quit	ShortcutsWindow		Baigti darbą
 (Choose application with file requester)	ShortcutsWindow		(Atverti programos parinkimo langą)
 Cancel	ShortcutsWindow		Atsisakyti
-Control	ShortcutsSpec	Name for modifier on keyboard	Vald
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Valdymas
+Left	ShortcutsSpec		Kairysis
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio išanalizuoti nepavyko!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio įrašyti nepavyko!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Jūsų tekstas čia\"
 Remove selected shortcut	ShortcutsWindow		Pašalinti pažymėtąjį klavišų derinį
+Error, NULL state description?	ShortcutsSpec		Klaida: NULL būsenos aprašas?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Komanda
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Sparčiųjų klavišų rinkinio atverti nepavyko!
 Save & apply	ShortcutsWindow		Įrašyti ir taikyti
 Open	ShortcutsWindow		Atverti
 Append	ShortcutsWindow		Įterpti
+Both	ShortcutsSpec		Abu
 Save KeySet as…	ShortcutsWindow		Įrašyti sparčiųjų klavišų rinkinį kaip…
 Append KeySet…	ShortcutsWindow		Įterpti sparčiųjų klavišų rinkinį…
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		Dešinysis
 OK	ShortcutsWindow		Gerai
 Add new shortcut	ShortcutsWindow		Pridėti naują klavišų derinį
+(None)	ShortcutsSpec		(Nė vieno)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Lyg2
 Open KeySet…	ShortcutsWindow		Atverti sparčiųjų klavišų rinkinį…
 File	ShortcutsWindow		Failas
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

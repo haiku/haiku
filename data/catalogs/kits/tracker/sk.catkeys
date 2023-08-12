@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3271258834
+1	slovak	x-vnd.Haiku-libtracker	1252819614
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -14,7 +14,6 @@ Mount all disks now	AutoMounterSettings		Pripojiť všetky disky teraz
 Location:	InfoWindow		Umiestnenie:
 Name	PoseView		Názov
 Kind:	InfoWindow		Druh:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
 contains	FindPanel		obsahuje
 Open	FilePanelPriv		Otvoriť
 You can't replace a folder with one of its sub-folders.	FSUtils		Nemôžete nahradiť priečinok jedným z jeho podpriečinkov.
@@ -64,7 +63,6 @@ Select	SelectionWindow		Vybrať
 Select	InfoWindow		Vybrať
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Vrátane Koša
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Vyčistiť
 Modified	FindPanel		Zmenené
 Select all	QueryContainerWindow		Vybrať všetky
@@ -196,7 +194,6 @@ Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Vytvoriť odkaz
 Mount server error	AutoMounterSettings		Chyba pripájacieho servera
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ak premenujete domovský priečinok, %osName sa zrejme nebude správať správne!\n\nSte si istý, že to chcete urobiť?\n\nAk chcete napriek tomu premenovať domovský priečinok, podržte kláves Shift a kliknite na „Premenovať“.
 Invert selection	FilePanelPriv		Invertovať výber
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nový priečinok
  (broken)	InfoWindow		 (pokazený)
 Replace all	FSUtils		Nahradiť všetky
@@ -256,7 +253,6 @@ Desktop	Model		Plocha
 Select all	ContainerWindow		Vybrať všetky
 apps	B_APPS_DIRECTORY		aplikácie
 Error calculating folder size.	InfoWindow		Chyba pri výpočte veľkosti priečinka.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Zmazať
 Edit name	ContainerWindow		Upraviť názov
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nebolo možné otvoriť „%document“ (Chýbajúci symbol: %symbol). \n
@@ -350,7 +346,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Nepodarilo sa ak
 Decrease size	DeskWindow		Zmenšiť veľkosť
 Emptying Trash… 	StatusWindow		Vyprázdňuje sa Kôš… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# súbor} few{# súbory} other{# súborov}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Vrátiť
 trash	B_TRASH_DIRECTORY		kôš
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Ak presuniete systémový priečinok alebo jeho obsah, nebude možné spustiť %osName!\n\nSte si istý, že to chcete urobiť?\n\nAk chcete napriek tomu presunúť systémový priečinok alebo jeho obsah, podržte kláves Shift a kliknite na „Presunúť“.

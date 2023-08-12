@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3722356873
+1	hungarian	x-vnd.Haiku-libtracker	1155113004
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Összes lemez csatolása most
 Location:	InfoWindow		Útvonal:
 Name	PoseView		Név
 Kind:	InfoWindow		Típus:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# bájt} other{# bájt}}
 contains	FindPanel		tartalmazza
 Open	FilePanelPriv		Megnyitás
 Bitmap icon	AttributesView		Bittérkép ikon
@@ -77,7 +76,6 @@ Select	SelectionWindow		Kijelölés
 Select	InfoWindow		Kijelölés
 OK	OpenWithWindow		Rendben
 Include trash	FindPanel		A Szemetesben is
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Rendrakás
 Modified	FindPanel		Módosítva
  (block size: 	InfoWindow		 (blokk-méret: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Logikai
 Invert selection	FilePanelPriv		Kijelölés megfordítása
 Memory size	AttributesView		Memória méret
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Új mappa
  (broken)	InfoWindow		 (sérült)
 Replace all	FSUtils		Összes cseréje
@@ -303,7 +300,6 @@ Desktop	Model		Asztal
 Select all	ContainerWindow		Mind kijelölése
 apps	B_APPS_DIRECTORY		Programok
 Error calculating folder size.	InfoWindow		Hiba történt a mappa méretének számítása közben.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Törlés
 Edit name	ContainerWindow		Név szerkesztése
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\"): hiányzik egy szimbólum: %symbol\n
@@ -338,7 +334,6 @@ To: %dir	StatusWindow		Ide: %dir
 Paste layout	ContainerWindow		Elrendezés beillesztése
 Cancel	Tracker		Mégse
 yes	AttributesView		igen
-%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Copy to	ContainerWindow		Másolás
 Name	SelectionWindow		A név
@@ -416,9 +411,9 @@ Could not update permissions of file \"%name\". %error	FSUtils		Nem sikerült m�
 Decrease size	DeskWindow		Méret csökkentése
 Emptying Trash… 	StatusWindow		Szemetes ürítése…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# fájl} other{# fájl}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Visszaállít
 trash	B_TRASH_DIRECTORY		Szemetes
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Ha áthelyezed a rendszermappát vagy annak tartalmát, akkor a %osName nem induln!\n\nBiztosan ezt akarod tenni?\n\nA rendszermappa vagy annak tartalmának bármilyen módon történő mozgatásához tartsd lenyomva a Shift billentyűt, és kattints az \"Áthelyezés\" gombra.
 Close all in workspace	ContainerWindow		Bezárás minden munkaasztalon
 Corrupted expression.	libtracker		Sérült kifejezés.
@@ -443,6 +438,7 @@ the config folder	FSUtils		a konfigurációs mappa
 Sorry, could not create a new folder.	FSUtils		Nem sikerült az új mappát létrehozni.
 MIME Signature	AttributesView		MIME azonosítója
 Select all	VirtualDirectoryWindow		Összes kijelölése
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Átnevezés
 Clean up all	ContainerWindow		Összes rendezése
 Add current folder	FilePanelPriv		Jelenlegi mappa hozzáadása
@@ -516,6 +512,7 @@ Create a Query	FindPanel		Keresési sablon létrehozása
 Close	QueryContainerWindow		Bezárás
 I know what I'm doing	FSUtils	button label	Tudom, mit csinálok
 Preparing to copy items…	StatusWindow		Felkészülés az elemek másolására…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		Ikon nézet
 The entered folder name is too long.	FSUtils		A megadott mappanév túl hosszú.

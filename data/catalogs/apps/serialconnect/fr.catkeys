@@ -1,8 +1,9 @@
-1	french	x-vnd.haiku.SerialConnect	354154115
+1	french	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Matériel
 Connection	SerialWindow		Connexion
 Raw send…	SerialWindow		Envoi brut…
 Baud rate	SerialWindow		Vitesse de transmission
+Paste	SerialWindow		Coller
 Stop bits	SerialWindow		Bits d’arrêts
 None	SerialWindow	Flowcontrol	Aucun
 Cancel	Custom baudrate window		Annuler

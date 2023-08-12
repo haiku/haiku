@@ -1,8 +1,13 @@
-1	turkish	x-vnd.haiku-icon_o_matic	1308365995
+1	turkish	x-vnd.haiku-icon_o_matic	2195648579
 None	Icon-O-Matic-Properties		Yok
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Boş ekle
 Opening the icon failed!	Icon-O-Matic-Main		Simge açılamadı!
+Reverse path	Icon-O-Matic-ReversePathCmd		Yolu ters çevir
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Bip bip!
 Add with path	Icon-O-Matic-ShapesList		Yol ile ekle
+Paste properties	Icon-O-Matic-Properties		Özellikleri yapıştır
 Copy	Icon-O-Matic-Properties		Kopyala
 Color	Icon-O-Matic-PropertyNames		Renk
 Format	Icon-O-Matic-SavePanel		Biçim
@@ -10,65 +15,106 @@ Color	Icon-O-Matic-StyleTypes		Renk
 Select	Icon-O-Matic-Properties		Seç
 Reset transformation	Icon-O-Matic-ShapesList		Dönüşümü sıfırla
 Duplicate	Icon-O-Matic-StylesList		Çoğalt
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Döndür
 Shorten	Icon-O-Matic-PropertyNames		Kısalt
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{Dönüştürücüyü} other{Dönüştürücüleri}} taşı
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		İçe aktarmaya çalıştığınız metin pek uzun, emin misiniz?
 Paste	Icon-O-Matic-Properties		Yapıştır
 Close	Icon-O-Matic-Menu-File		Kapat
 Add rect	Icon-O-Matic-PathsList		Dikdörtgen ekle
 Rotation	Icon-O-Matic-PropertyNames		Döndürme
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Renk (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON özniteliği
 Transform	Icon-O-Matic-PathManipulator		Dönüştür
 Add shape with style	Icon-O-Matic-Menu-Shape		Biçemli şekil ekle
+Change color	Icon-O-Matic-SetColorCmd		Rengi değiştir
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		{0, plural, one{Tepeciği} other{Tepecikleri}} kaldır
+Unassign path	Icon-O-Matic-UnassignPathCmd		Yol atamasını kaldır
 Remove	Icon-O-Matic-StylesList		Kaldır
 Cancel	Icon-O-Matic-Menu-Settings		Vazgeç
+PNG set	Icon-O-Matic-SavePanel		PNG ayarlı
 Transformation	Icon-O-Matic-TransformationBoxStates		Dönüşüm
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		{0, plural, one{Yolu} other{Yolları}} taşı
 Closed	Icon-O-Matic-PropertyNames		Kapalı
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<yinelenecek bir şey yok>
 Height	Icon-O-Matic-PropertyNames		Yükseklik
 warning	Icon-O-Matic-SVGExport		uyarı
 File	Icon-O-Matic-Menus		Dosya
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	burada özelliklerini düzenlemek
 Properties	Icon-O-Matic-Menus		Özellikler
 Path	Icon-O-Matic-PropertyNames		Yol
 Path	Icon-O-Matic-Menus		Yol
 Stroke	Transformation		Vuruş
 Flip	Icon-O-Matic-PathManipulator		Ters çevir
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	için herhangi bir listeye
+Move pivot	Icon-O-Matic-TransformationBoxStates		Ekseni taşı
 Opacity	Icon-O-Matic-PropertyNames		Opaklık
 OK	Icon-O-Matic-ColorPicker		Tamam
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	%property% özelliğini çoklu ayarla
 Error: 	Icon-O-Matic-Main		Hata: 
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{Dönüşümü} other{Dönüşümleri}} sıfırla
+Assign style	Icon-O-Matic-AssignStyleCmd		Biçem ata
 Saving your document failed!	Icon-O-Matic-Exporter		Belge kaydedilemedi!
 Snap to grid	Icon-O-Matic-Menu-Settings		Izgaraya hizala
 Opening the document failed!	Icon-O-Matic-Main		Belge açılamadı!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{Biçemi} other{Biçemleri}} kaldır
 Add with path & style	Icon-O-Matic-ShapesList		Yol ve biçem ile ekle
 Shape	Icon-O-Matic-Menus		Şekil
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		{0, plural, one{Tepeciği} other{Tepecikleri}} böl
 <unavailable>	Icon-O-Matic-StyleTypes		<yok>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Gradyanı düzenle
 Min LOD	Icon-O-Matic-PropertyNames		En düşük ayrıntı düzeyi
+Redo: %action%	Icon-O-Matic-Main		Yinele: %action%
 Add	Icon-O-Matic-TransformersList		Ekle
 Settings	Icon-O-Matic-Menus		Ayarlar
 Scale X	Icon-O-Matic-PropertyNames		X ölçeği
 Add	Icon-O-Matic-PathsList		Ekle
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		{0, plural, one{Biçem} other{Biçemler}} ekle
 Remove	Icon-O-Matic-PathManipulator		Kaldır
 Duplicate	Icon-O-Matic-ShapesList		Çoğalt
 Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Kontur
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{Dönüşümcü} other{Dönüşümcüler}} ekle
+Miter limit	Icon-O-Matic-PropertyNames		Gönye sınırı
+Insert vertex	Icon-O-Matic-InsertPointCmd		Tepecik ekle
 Rounding	Icon-O-Matic-PropertyNames		Yuvarlatma
 Joins	Icon-O-Matic-PropertyNames		Ek yerleri
 Cancel	Icon-O-Matic-ColorPicker		Vazgeç
 Duplicate	Icon-O-Matic-PathsList		Çoğalt
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		{0, plural, one{Şekli} other{Şekilleri}} taşı
 Save	Icon-O-Matic-Menu-Settings		Kaydet
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	Şuradaki bir nesneye tıkla:
 Export as…	Icon-O-Matic-Menu-File		Dışa aktar…
 Error: 	Icon-O-Matic-Exporter		Hata: 
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		{0, plural, one{Şekli} other{Şekilleri}} dondur
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		{0, plural, one{Şekli} other{Şekilleri}} kaldır
+Undo: %action%	Icon-O-Matic-Main		Geri al: %action%
 Diamond	Icon-O-Matic-StyleTypes		Elmas
 Don't save	Icon-O-Matic-Menu-Settings		Kaydetme
 Add shape with path	Icon-O-Matic-Menu-Shape		Yol içeren şekil ekle
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	Tüh
 Translation X	Icon-O-Matic-PropertyNames		X çevirisi
+Multi-paste properties	Icon-O-Matic-Properties		Çoklu yapıştır özellikleri
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic, SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Özgün dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
 Rotate indices backwards	Icon-O-Matic-PathsList		Belirticileri geriye doğru döndür
 Overwrite	Icon-O-Matic-SVGExport		Üzerine yaz
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		{0, plural, one{Şekil} other{Şekiller}} ekle
 Cancel	Icon-O-Matic-SVGExport		Vazgeç
 Open…	Icon-O-Matic-Menu-File		Aç…
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		{0, plural, one{Dönüşümcüyü} other{Dönüşümcüleri}} kaldır
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Yukarıdaki bir şekle tıkla
 Remove	Icon-O-Matic-ShapesList		Kaldır
+Multi-paste	Icon-O-Matic-Properties		Çoklu yapıştır
+Bad news	Title of error alert		Kötü haber
+HVIF source code	Icon-O-Matic-SavePanel		HVIF kaynak kodu
 Drop shapes	Icon-O-Matic-ShapesList		Şekilleri bırak
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Simgeyi kaydet
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{Yol} other{Yollar}} ata
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		{0, plural, one{Ögeyi} other{Ögeleri}} kaldır
 Linear	Icon-O-Matic-StyleTypes		Doğrusal
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		{0, plural, one{Ögeyi} other{Ögeleri}} taşı
+Add vertex	Icon-O-Matic-AddPointCmd		Tepecik ekle
 Clean up	Icon-O-Matic-PathsList		Temizle
 Split	Icon-O-Matic-PathManipulator		Ortadan böl
 Move	Icon-O-Matic-TransformationBoxStates		Taşı
@@ -77,20 +123,31 @@ Name	Icon-O-Matic-PropertyNames		Ad
 Reset transformation	Icon-O-Matic-StylesList		Dönüşümü sıfırla
 Reverse	Icon-O-Matic-PathsList		Geri
 Remove	Icon-O-Matic-PathsList		Kaldır
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
+Load error	Icon-O-Matic-SVGImport		Yükleme hatası
 Style type	Icon-O-Matic-StyleTypes		Biçem türü
 Quit	Icon-O-Matic-Menu-File		Çık
 Gradient	Icon-O-Matic-StyleTypes		Gradyan
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Renk (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		Yönü belirleyin.
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{Yol} other{Yollar}} ekle
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Yol ve biçem içeren şekil ekle
 Radial	Icon-O-Matic-StyleTypes		Radyal
 Text too long	Icon-O-Matic-StyledTextImport		Metin çok uzun
 Caps	Icon-O-Matic-PropertyNames		Bykh
 OK	Icon-O-Matic-SVGImport		Tamam
+Import text	Icon-O-Matic-StyledTextImport		Metin içe aktar
 Append…	Icon-O-Matic-Menu-File		İliştir…
 Scale Y	Icon-O-Matic-PropertyNames		Y ölçeği
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Simgeyi dışa aktar
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Yol indislerini döndür
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		{0, plural, one{Öge} other{Ögeler}} ekle
 Rotate indices forwards	Icon-O-Matic-PathsList		Belirticileri ileri doğru döndür
 Save	Icon-O-Matic-Menu-File		Kaydet
+Cancel	Icon-O-Matic-StyledTextImport		Vazgeç
 Add circle	Icon-O-Matic-PathsList		Daire ekle
 Freeze transformation	Icon-O-Matic-ShapesList		Dönüşümü dondur
+META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON özniteliği
 Untitled	Icon-O-Matic-Main		Adsız
 Max LOD	Icon-O-Matic-PropertyNames		En yüksek ayrıntı düzeyi
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Kapatmadan önce değişiklikler kaydedilsin mi?
@@ -98,19 +155,27 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		'%s
 Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…
 Swatches	Icon-O-Matic-Menus		Örnekler
 <modify path>	Icon-O-Matic-PathCmd		<yol düzenle>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Ayarla: %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<geri alınacak bir şey yok>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		{0, plural, one{Yolu} other{Yolları}} kaldır
 Add	Icon-O-Matic-StylesList		Ekle
 Translation Y	Icon-O-Matic-PropertyNames		Y çevirisi
+Modify vertex	Icon-O-Matic-ChangePointCmd		Tepeciği düzenle
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		{0, plural, one{Biçemi} other{Biçemleri}} taşı
 Scale	Icon-O-Matic-TransformationBoxStates		Ölçek
 All	Icon-O-Matic-Properties		Tümü
 Transformer	Icon-O-Matic-Menus		Dönüştürücü
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		{0, plural, one{Tepeciği} other{Tepecikleri}} ters döndür
 Invert selection	Icon-O-Matic-Properties		Seçimi ters çevir
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	dönüşümcüleri iliştirmek için.
 <unkown property>	Icon-O-Matic-PropertyNames		<bilinmeyen özellik>
 Pick a color	Icon-O-Matic-ColorPicker		Renk seçin
 Settings…	Icon-O-Matic-SavePanel		Ayarlar…
+Select all	Icon-O-Matic-PathManipulator		Tümünü seç
 Add with style	Icon-O-Matic-ShapesList		Biçem ile ekle
 New	Icon-O-Matic-Menu-File		Yeni
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		{0, plural, one{Tepeciği} other{Tepecikleri}} yokla
 Gradient type	Icon-O-Matic-StyleTypes		Gradyan türü
 Export	Icon-O-Matic-Menu-File		Dışa aktar
 Width	Icon-O-Matic-PropertyNames		Genişlik

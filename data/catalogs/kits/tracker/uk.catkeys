@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2114493922
+1	ukrainian	x-vnd.Haiku-libtracker	96054702
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Підключити усі диски 
 Location:	InfoWindow		Розташування:
 Name	PoseView		Назва
 Kind:	InfoWindow		Тип:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# байт} few{# байти} other{# байтів}}
 contains	FindPanel		містить
 Open	FilePanelPriv		Відкрити
 Bitmap icon	AttributesView		Растровий значок
@@ -77,7 +76,6 @@ Select	SelectionWindow		Вибрати
 Select	InfoWindow		Вибрати
 OK	OpenWithWindow		ОК
 Include trash	FindPanel		Включаючи смітник
-GiB	WidgetAttributeText		ГБ
 Clean up	ContainerWindow		Очистити
 Modified	FindPanel		Змінений
  (block size: 	InfoWindow		 (розмір блоку: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Булевий
 Invert selection	FilePanelPriv		Інвертувати виділення
 Memory size	AttributesView		Розмір пам'яті
-TiB	WidgetAttributeText		ТБ
 New folder	TemplatesMenu		Каталог або Папка
  (broken)	InfoWindow		 (поламаний)
 Replace all	FSUtils		Замінити все
@@ -303,7 +300,6 @@ Desktop	Model		Робочий стіл
 Select all	ContainerWindow		Вибрати все
 apps	B_APPS_DIRECTORY		Програми
 Error calculating folder size.	InfoWindow		Помилка при обчисленні розміру папки.
-MiB	WidgetAttributeText		МБ
 Delete	FSUtils		Видалити
 Edit name	ContainerWindow		Редагувати назву
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \«%document\» (Очікується символ: %symbol). \n
@@ -415,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Не вдало�
 Decrease size	DeskWindow		Зменшити розмір
 Emptying Trash… 	StatusWindow		Спорожнення смітника… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # файл} few{# файли} other{for # файлів}}
-KiB	WidgetAttributeText		КБ
 Revert	TrackerSettingsWindow		Відкат змін
 trash	B_TRASH_DIRECTORY		смітник
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		При переміщенні папки system або її вмісту, Ви не зможете завантажити %osName!\n\nВи впевнені що бажаєте цього?\n\nЩоб все рівно перемістити папку system або її вміст, затисніть кнопку Shift та натисніть \«Перемістити\».

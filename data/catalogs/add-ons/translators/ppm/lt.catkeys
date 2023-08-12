@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PPMTranslator	3151796093
+1	lithuanian	x-vnd.Haiku-PPMTranslator	292474603
 None	PPMTranslator		jokia
 PPM Settings	PPMMain		PPM nuostatos
 System palette 8 bits	PPMTranslator		sisteminė 8 bitų paletė
@@ -15,12 +15,14 @@ CMY 8:8:8 32 bits	PPMTranslator		ŽPG 8:8:8 32 bitų
 OK	PPMMain		Gerai
 CMYA 8:8:8:8 32 bits	PPMTranslator		ŽPGA 8:8:8:8 32 bitų
 PPM image	PPMTranslator		PPM paveikslas
+Input color space:	PPMTranslator		Įvesties spalvų erdvė:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RŽM 5:5:5 16 bitų, mažėjantys baitai
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RŽMA 5:5:5:1 16 bitų, mažėjantys baitai
 Write ASCII	PPMTranslator		Rašyti ASCII baitais
 RGB 5:6:5 16 bits	PPMTranslator		RŽM 5:6:5, 16 bitų
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RŽMA 8:8:8:8 32 bitų, mažėjantys baitai
 RGBA 8:8:8:8 32 bits	PPMTranslator		RŽMA 8:8:8:8 32 bitų
+Version %d.%d.%d, %s	PPMTranslator		Versija %d.%d.%d, %s
 CMYK 8:8:8:8 32 bits	PPMTranslator		ŽPGJ 8:8:8:8 32 bitų
 RGB 8:8:8 32 bits	PPMTranslator		RŽM 8:8:8 32 bitų
 RGB 5:5:5 16 bits	PPMTranslator		RŽM 5:5:5 16 bitų

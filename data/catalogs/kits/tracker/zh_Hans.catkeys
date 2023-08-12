@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2399475814
+1	english	x-vnd.Haiku-libtracker	381036594
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		挂载所有磁盘
 Location:	InfoWindow		位置：
 Name	PoseView		名称
 Kind:	InfoWindow		种类:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		包含
 Open	FilePanelPriv		打开
 Bitmap icon	AttributesView		位图图标
@@ -77,7 +76,6 @@ Select	SelectionWindow		选择
 Select	InfoWindow		选择
 OK	OpenWithWindow		确定
 Include trash	FindPanel		包括垃圾箱
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		刷新
 Modified	FindPanel		修改
  (block size: 	InfoWindow		 (块大小: 
@@ -232,7 +230,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		布尔变量
 Invert selection	FilePanelPriv		反向选择
 Memory size	AttributesView		内存大小
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		新建目录
  (broken)	InfoWindow		 (已损坏)
 Replace all	FSUtils		替换所有
@@ -301,7 +298,6 @@ Desktop	Model		桌面
 Select all	ContainerWindow		全选
 apps	B_APPS_DIRECTORY		应用
 Error calculating folder size.	InfoWindow		文件夹大小计算错误。
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		删除
 Edit name	ContainerWindow		编辑名称
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
@@ -412,7 +408,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		无法更新 \"%
 Decrease size	DeskWindow		缩小尺寸
 Emptying Trash… 	StatusWindow		清空垃圾箱...
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		恢复
 trash	B_TRASH_DIRECTORY		垃圾箱
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		如果移动系统文件夹或其内容，将不能够启动 %osName！\n\n您确定要这么做吗？\n\n如果仍要移动系统文件夹或其内容，按住 Shift 键并点击 \"移动\"。

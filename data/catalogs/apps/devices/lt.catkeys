@@ -5,7 +5,7 @@ Devices	System name		Įrenginiai
 Graphics Peripheral	DeviceSCSI		Periferinis grafikos įrenginys
 Processor	Device		Procesorius
 Generate system information	DevicesView		Generuoti informaciją apie sistemą
-Class info	DevicePCI		Informacija apie klasę
+Class info	DevicePCI		Klasės savybės
 Computer	DevicesView		Kompiuteris
 Communications	DeviceSCSI		Ryšio įrenginiai
 Mass storage controller	Device		Kaupiklių valdiklis

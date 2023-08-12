@@ -1,7 +1,11 @@
-1	lithuanian	x-vnd.Haiku-MatchHeader	1349121828
+1	lithuanian	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		pašalinti laišką
+Match \"%attribute\" against \"%regex\"	RuleFilter		Antraštė „%attribute“ atitinka šabloną „%regex“
+Match header	RuleFilter		Antraštės atitikimas
 Set flags to	ConfigView		nustatyti požymius į
+Header field (e.g. Subject, From, …)	ConfigView		Antraštės pavadinimas (pvz., „Subject“, „From“ ar pan. (be kabučių)
 <Choose account>	ConfigView		<parinkite paskyrą>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Šablono reikšmė, pavyzdžiui, „*spam*“ (be kabučių).\nJeigu norite panaudoti reguliarųjį reiškinį, prieš jį įrašykite prefiksą „REGEX:“ (be kabučių).
 Then	ConfigView		tuomet
 If	ConfigView		Kai
 Set as read	ConfigView		pažymėti kaip skaitytą
@@ -9,4 +13,5 @@ Reply with	ConfigView		atsakyti naudojant
 <Choose action>	ConfigView		<parinkite veiksmą>
 Move to	ConfigView		perkelti į
 this field is based on the action	ConfigView		šio lauko galimos reikšmės priklauso nuo veiksmo
+Account	ConfigView		Paskyra
 has	ConfigView		turi

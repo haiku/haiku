@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	555230817
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2831758893
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Montar todos os discos agora
 Location:	InfoWindow		Local:
 Name	PoseView		Nome
 Kind:	InfoWindow		Tipo:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		contém
 Open	FilePanelPriv		Abrir
 Bitmap icon	AttributesView		Ícone de bitmap
@@ -76,7 +75,6 @@ Select	SelectionWindow		Selecionar
 Select	InfoWindow		Selecionar
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Incluir lixeira
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Organizar
 Modified	FindPanel		Modificado
 Select all	QueryContainerWindow		Selecionar tudo
@@ -229,7 +227,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Booleano
 Invert selection	FilePanelPriv		Inverter seleção
 Memory size	AttributesView		Tamanho da memória
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nova pasta
  (broken)	InfoWindow		 (quebrado)
 Replace all	FSUtils		Substituir tudo
@@ -298,7 +295,6 @@ Desktop	Model		Desktop
 Select all	ContainerWindow		Selecionar tudo
 apps	B_APPS_DIRECTORY		aplicativos
 Error calculating folder size.	InfoWindow		Erro calculando o tamanho da pasta.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Excluir
 Edit name	ContainerWindow		Editar nome
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" (Símbolo faltando: %symbol). \n
@@ -409,7 +405,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Não foi possív
 Decrease size	DeskWindow		Diminuir tamanho
 Emptying Trash… 	StatusWindow		Limpando Lixeira… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{para # arquivo} other{para # arquivos}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Reverter
 trash	B_TRASH_DIRECTORY		lixeira
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se mover a pasta de sistema ou o seu conteúdo, não conseguirá iniciar o %osName!\n\nTem certeza de que quer fazer isso?\n\nPara mover de qualquer modo a pasta de sistema ou o seu conteúdo, mantenha premida a tecla Shift e clique \"Mover\".

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	2114493922
+1	czech	x-vnd.Haiku-libtracker	96054702
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Připojit teď všechny disky
 Location:	InfoWindow		Umístnění:
 Name	PoseView		Jméno
 Kind:	InfoWindow		Druh:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# bajt} few{# bajty} other{# bajtů}}
 contains	FindPanel		obsahuje
 Open	FilePanelPriv		Otevřít
 Bitmap icon	AttributesView		Rastrová ikona
@@ -77,7 +76,6 @@ Select	SelectionWindow		Vybrat
 Select	InfoWindow		Vybrat
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Začlenit koš
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Vyčistit
 Modified	FindPanel		Upravené
  (block size: 	InfoWindow		 (velikost bloku: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Booleovský
 Invert selection	FilePanelPriv		Invertovat výběr
 Memory size	AttributesView		Velikost paměti
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nový adresář
  (broken)	InfoWindow		 (rozbité)
 Replace all	FSUtils		Nehradit vše
@@ -303,7 +300,6 @@ Desktop	Model		Plocha
 Select all	ContainerWindow		Vybrat vše
 apps	B_APPS_DIRECTORY		aplikace
 Error calculating folder size.	InfoWindow		Chyba výpočtu velikosti složky.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Odstranit
 Edit name	ContainerWindow		Upravit jméno
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" nelze otevřít (Chybí symbol: %symbol). \n
@@ -415,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Oprávnění sou
 Decrease size	DeskWindow		Zmenšit velikost
 Emptying Trash… 	StatusWindow		Vyprazdňuji koš... 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # soubor} few{for # soubory} other{for # souborů}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Vrátit zpět
 trash	B_TRASH_DIRECTORY		koš
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Pokud přesunete systémový adresář nebo jeho obsah, nepůjde nastartovat %osName!\n\nOpravdu to chcete?\n\nPokud i tak chcete přesunout systémový adresář nebo jeho obsah, držte Shift a klikněte na \"Přesunout\".

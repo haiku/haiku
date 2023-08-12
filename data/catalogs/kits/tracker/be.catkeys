@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1112827569
+1	belarusian	x-vnd.Haiku-libtracker	3242060450
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -56,7 +56,6 @@ Select	SelectionWindow		Выбраць
 Select	InfoWindow		Выбраць
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Уключыць файлы са Сметніцы
-GiB	WidgetAttributeText		ГіБ
 Clean up	ContainerWindow		Прыбрацца
 Modified	FindPanel		Зменены
 Select all	QueryContainerWindow		Выбраць усё
@@ -168,7 +167,6 @@ Resize to fit	ContainerWindow		Расцягнуць каб умясціць
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Спасылка \"%name\" на:
 Mount server error	AutoMounterSettings		Памылка сервера мантавання
 Invert selection	FilePanelPriv		Інвертаваць выдзяленне
-TiB	WidgetAttributeText		ЦіБ
 New folder	TemplatesMenu		Новы каталог
 Replace all	FSUtils		Замяніць усё
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Праграма \"%appname\" не падтрымлівае тып дакументу які вы жадаеце адкрыць.\n\nСапраўды жадаеце пряцягваць?\n\nКалі вы упэўнены, што праграма сумяшчальна з гэтым тыпам файлаў, паведаміце пра гэта аўтарам праграмы і папрасіце дакументаваць гэта ў новай версіі.
@@ -224,7 +222,6 @@ Desktop	Model		Дэсктоп
 Select all	ContainerWindow		Выбраць усё
 apps	B_APPS_DIRECTORY		праграмы
 Error calculating folder size.	InfoWindow		Памылка пры падліку памеру каталога.
-MiB	WidgetAttributeText		МіБ
 Delete	FSUtils		Выдаліць
 Edit name	ContainerWindow		Правіць імя
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не ўдалося адкрыць \"%document\" (Не хапае сімвала: %symbol). \n
@@ -313,7 +310,6 @@ Show space bars on volumes	SettingsView		Паказваць дыяграммы �
 Could not update permissions of file \"%name\". %error	FSUtils		Не ўдалося абнавіць правы файла \"%name\". %error
 Decrease size	DeskWindow		Паменшыць памер
 Emptying Trash… 	StatusWindow		Ачыстка Сметніцы… 
-KiB	WidgetAttributeText		КіБ
 Revert	TrackerSettingsWindow		Вярнуць
 trash	B_TRASH_DIRECTORY		сметнік
 Close all in workspace	ContainerWindow		Закрыць усё на гэтым стале

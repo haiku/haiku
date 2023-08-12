@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaConverter	568323940
+1	french	x-vnd.Haiku-MediaConverter	1300279639
 Input file not recognized as Audio or Video	MediaConverter		Le fichier d’entrée n’est pas reconnu comme un fichier audio ou vidéo
 Source files	MediaConverter		Fichiers sources
 Error writing video frame %lld	MediaConverter		Erreur d’écriture de l’image vidéo %lld
@@ -58,6 +58,7 @@ File	Menu		Fichier
 Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
 Select this folder	MediaConverter		Sélectionner ce dossier
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canaux
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bits 
 No video	Video codecs list		Pas de vidéo
 Continue	MediaConverter		Continuer

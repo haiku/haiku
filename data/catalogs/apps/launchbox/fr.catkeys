@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-LaunchBox	1530497419
+1	french	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Ajouter une description…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Voulez-vous vraiment fermer ce pavé ?\n(Le pavé ne sera pas enregistré.)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Afficher la bordure de la fenêtre
 Failed to launch 'something', error in Pad data.	LaunchBox		Impossible de lancer « quelque chose » : erreur dans les données du Pad.
 LaunchBox	System name		Lanceur rapide
 Auto-raise	LaunchBox		Faire apparaître automatiquement
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Taille d’icône
 Open containing folder	LaunchBox		Ouvrir le dossier hôte
 Add button here	LaunchBox		Ajouter un bouton ici

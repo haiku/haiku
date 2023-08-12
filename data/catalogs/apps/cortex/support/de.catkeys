@@ -1,4 +1,4 @@
-1	german	application/x-vnd.Cortex.support	168903602
+1	german	application/x-vnd.Cortex.support	3127282947
 Header has flags	MediaString		Kopfdaten mit Flags
 32 bit HLS	MediaString		HLS 32-bit
 Recording	MediaString		Aufnehmen
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Rechts
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		RGB 32-bit
 System mixer	MediaString		Systemmixer
 Physical output	MediaString		Physischer Ausgang

@@ -1,57 +1,175 @@
-1	lithuanian	x-vnd.Haiku-Keymap	2963866147
+1	lithuanian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Klavišas
-Right control	Keyboard Layout View		Dešinysis Vald
+Japanese	KeymapNames		Japonų
+US	KeymapNames		JAV
+PG ↑	Keyboard Layout View	Very short for 'page up'	PSL↑
+Brazilian	KeymapNames		Brazilų
+ThinkPad (US)	KeyboardLayoutNames		„ThinkPad“ (JAV)
+Right control	Keyboard Layout View		Dešinysis Valdymas
+X-Bows Nature	KeyboardLayoutNames		„X-Bows Nature“
+Dvorak	KeymapNames		„Dvorak“
 Option:	Modifier keys window	Option key role name	Alternatyva:
 Cancel	Modifier keys window		Atsisakyti
 Sample and clipboard:	Keymap window		Vieta pabandymui:
+Polish	KeymapNames		Lenkų
+Latin-American	KeymapNames		Lotynų Amerikos
+Ukrainian	KeymapNames		Ukrainiečių
+PAGE ↓	Keyboard Layout View		PSL↓
+DEL	Keyboard Layout View		ŠAL
+United-Kingdom	KeymapNames		Jungtinės Karalystės
+Turkish (Type-F)	KeymapNames		Turkų (F tipo)
+Serbian (Cyrillic)	KeymapNames		Serbų (kirilica)
+Belgian (point)	KeymapNames		Belgų (su dešimtainiu tašku)
+Finnish	KeymapNames		Suomių
 Num lock	Keyboard Layout View		Skaitmenys
 Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
+Spanish (Dvorak)	KeymapNames		Ispanų (Dvorako)
 Option	Keyboard Layout View	Option key	Alternatyva
 Scroll lock	Keyboard Layout View		Slinkti
-Right option	Keyboard Layout View		Dešinysis Alt
+US-International	KeymapNames		JAV tarptautinis
+Right option	Keyboard Layout View		Dešinysis Alternatyva
+Turkish (Type-Q)	KeymapNames		Turkų (Q tipo)
 Revert	Modifier keys window		Atšaukti pakeitimus
+Slovak	KeymapNames		Slovakų
+CAPS LOCK	Keyboard Layout View		DIDŽ
+Colemak	KeymapNames		„Colemak“
+Dvorak (programmer's)	KeymapNames		„Dvorak“ (programuotojų)
+PRINT	Keyboard Layout View		SP
+German (Mac)	KeymapNames		Vokiečių („Mac“)
+Arabic (102)	KeymapNames		Arabų (102 klavišų)
+ThinkPad	KeyboardLayoutNames		„ThinkPad“
+Belarusian (Mac)	KeymapNames		Baltarusių („Mac“)
+Croatian	KeymapNames		Kroatų
+PAGE ↑	Keyboard Layout View		PSL↑
 Set modifier keys	Modifier keys window		Nustatyti valdymo klavišus
+Apple Aluminium International	KeyboardLayoutNames		„Apple Aluminium“ tarptautinė
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd klavišas
+PG ↓	Keyboard Layout View	Very short for 'page down'	PSL↓
+ThinkPad X1 (US)	KeyboardLayoutNames		„ThinkPad X1“ (JAV)
+Spanish	KeymapNames		Ispanų
+Apple Aluminum	KeyboardLayoutNames		„Apple Aluminium“
+HOME	Keyboard Layout View		PRAD
+COMMAND	Keyboard Layout View		KOMANDA
+Ukrainian (Mac)	KeymapNames		Ukrainiečių („Mac“)
 Command:	Modifier keys window	Command key role name	Komanda:
+French (Bépo)	KeymapNames		Prancūzų („Bépo“)
+Russian (Typewriter)	KeymapNames		Rusų (rašomosios mašinėlės)
 Acute trigger	Keymap window		Dešininis kirtis (akūtas)
+ThinkPad T400s International	KeyboardLayoutNames		„ThinkPad T400s“ tarptautinė
+Italian	KeymapNames		Italų
+Kinesis Ergo Elan International	KeyboardLayoutNames		„Kinesis Ergo Elan“ tarptautinė
+Apple Aluminum (US)	KeyboardLayoutNames		„Apple Aluminum“ (JAV)
+French (NF Z71-300)	KeymapNames		Prancūzų (NF Z71-300)
 Modifier keys	Modifier keys window		Valdymo klavišai
+ThinkPad X1 International	KeyboardLayoutNames		„ThinkPad X1“ tarptautinė
+Kazakh	KeymapNames		Kazachų
 Save as…	Keymap window		Įrašyti kaip…
+Lithuanian (Standard)	KeymapNames		Lietuvių (standartinis)
 Error: duplicate keys	Modifier keys window		Klaida: klavišai dubliuojasi
+NUM	Keyboard Layout View	Very short for 'num lock'	SKAITM
+Bulgarian (Phonetic)	KeymapNames		Bulgarų (fonetinis)
+Kinesis Advantage	KeyboardLayoutNames		„Kinesis Advantage“
+Canadian-French	KeymapNames		Kanados prancūzų
+Hungarian	KeymapNames		Vengrų
 Control	Keyboard Layout View	Control key	Valdymas
+Irish	KeymapNames		Airių
+Remove	Keyboard Layout View		Pašalinti
 Tilde trigger	Keymap window		Riestinis kirtis (tildė)
 Shift	Keyboard Layout View	Shift key	Lyg2
-Left command	Keyboard Layout View		Kairysis Kom
+CONTROL	Keyboard Layout View		VALDYMAS
+Macedonian	KeymapNames		Makedoniečių
+Czech (Mac)	KeymapNames		Čekų („Mac“)
+Left command	Keyboard Layout View		Kairysis Komanda
+Albanian	KeymapNames		Albanų
 (Current)	Keymap window		(Esamas)
-Left option	Keyboard Layout View		Kairysis Alt
+OPT	Keyboard Layout View	Very short for 'option'	ALT
+Friulian	KeymapNames		Friulų
+Left option	Keyboard Layout View		Kairysis Alternatyva
+END	Keyboard Layout View		PAB
+Esperanto	KeymapNames		Esperanto
+Belarusian	KeymapNames		Baltarusių
 Warning: left and right key roles do not match	Modifier keys window		Dėmesio! Dešinės ir kairės pusės valdymo klavišų funkcijos nesutampa
 Circumflex trigger	Keymap window		Stogelis
+Fizzbook NL2	KeyboardLayoutNames		„Fizzbook NL2“
 Caps lock	Keyboard Layout View		Didž
-Left shift	Keyboard Layout View		Kairysis Lyg2
-Left control	Keyboard Layout View		Kairysis Vald
+Left shift	Keyboard Layout View		Kairysis Antrasis lygis
+Russian (Yawert)	KeymapNames		Rusų (fonetinis)
+ThinkPad X100e International	KeyboardLayoutNames		„ThinkPad X100e“ tarptautinė
+Bulgarian (Cyrillic)	KeymapNames		Bulgarų
+Swedish	KeymapNames		Švedų
+Left control	Keyboard Layout View		Kairysis Valdymas
+CAPS	Keyboard Layout View	Very short for 'caps lock'	DIDŽ
 Role	Modifier keys window	As in the role of a modifier key	Funkcija
-Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Vald klavišas
+Svorak	KeymapNames		„Svorak“
+ThinkPad X100e (US)	KeyboardLayoutNames		„ThinkPad X100e“ (JAV)
+German	KeymapNames		Vokiečių
+Swiss-German	KeymapNames		Šveicarų vokiškas
+Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Vald/Ctrl klavišas
+Czech	KeymapNames		Čekų
+Russian (Udmurt, Komi, Mari)	KeymapNames		Rusų (urmurtų, komių, marių)
+Thai (TIS-820.2538)	KeymapNames		Tajų (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Valdymas:
+Generic 105-key International	KeyboardLayoutNames		Įprastinė 105 klavišų (ISO)
 Disabled	Modifier keys window	Do nothing	Joks
 Select dead keys	Keymap window		Kombinaciniai klavišai
-Right shift	Keyboard Layout View		Dešinysis Lyg2
+Russian (Mac)	KeymapNames		Rusų („Mac“)
+Right shift	Keyboard Layout View		Dešinysis Antrasis lygis
+ESC	Keyboard Layout View		⎋GR
+Belarusian (Latin)	KeymapNames		Baltarusių (lotyniški rašmenys)
+Hebrew	KeymapNames		Hebrajų
 Layout	Keymap window		Klaviatūra
+Greek	KeymapNames		Graikų
 Revert	Keymap window		Atšaukti pakeitimus
+CTRL	Keyboard Layout View	Very short for 'control'	VALD
 Grave trigger	Keymap window		Kairinis kirtis (gravis)
 Menu	Keyboard Layout View	Menu key	Meniu
+Faeroese	KeymapNames		Fareriečių
 Quit	Keymap window		Baigti darbą
+Polish (Typewriter)	KeymapNames		Lenkų (rašomosios mašinėlės)
+French (Mac)	KeymapNames		Prancūzų („Mac“)
 User:	Keymap window		Naudotojo išdėstymai:
+Apple Aluminium Extended International	KeyboardLayoutNames		„Apple Aluminium“ viso dydžio tarptautinė
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt klavišas
+SHIFT	Keyboard Layout View		LYG2
+Estonian	KeymapNames		Estų
+Serbian (Latin)	KeymapNames		Serbų (lotyniški rašmenys)
+French	KeymapNames		Prancūzų
+Portuguese	KeymapNames		Portugalų
+Swiss-French	KeymapNames		Šveicarų prancūziškas
 Shift:	Modifier keys window	Shift key role name	Antrasis lygis:
 Keymap	System name		Klavišų išdėstymas
+Slovene	KeymapNames		Slovėnų
+Lithuanian	KeymapNames		Lietuvių
 Set modifier keys…	Keymap window		Nustatyti valdymo klavišus…
 Switch shortcut keys to Haiku mode	Keymap window		Naudoti „Haiku“ valdymo klavišus
 Defaults	Keymap window		Numatytai
+ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistemos išdėstymai:
+ThinkPad International	KeyboardLayoutNames		„ThinkPad“ tarptautinė
+Apple Aluminum Extended (US)	KeyboardLayoutNames		„Apple Aluminum“ viso dydžio (JAV)
 Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
-Right command	Keyboard Layout View		Dešinysis Kom
+Right command	Keyboard Layout View		Dešinysis Komanda
+NUM LOCK	Keyboard Layout View		SKAITM
+MENU	Keyboard Layout View		MENIU
+Belgian (comma)	KeymapNames		Belgų (su dešimtainiu kableliu)
+Norwegian	KeymapNames		Norvegų
 Font	Keymap window		Šriftas
-Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Lyg2 klavišas
+Danish	KeymapNames		Danų
+Generic 104-key	KeyboardLayoutNames		Įprastinė 104 klavišų
+Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Lyg2/Shift klavišas
+Russian	KeymapNames		Rusų
+PAUSE	Keyboard Layout View		PAUZĖ
+TypeMatrix 2030	KeyboardLayoutNames		„TypeMatrix 2030“
+Romanian	KeymapNames		Rumunų
+CMD	Keyboard Layout View	Very short for 'command'	KMD
 Command	Keyboard Layout View	Command key	Komanda
+SCROLL	Keyboard Layout View		SLINKTI
 File	Keymap window		Failas
+Brazilian (ABNT2)	KeymapNames		Brazilų (ABNT2)
+INS	Keyboard Layout View		ĮTERPTI
+OPTION	Keyboard Layout View		ALTERNATYVA
+Dutch	KeymapNames		Olandų
 Diaeresis trigger	Keymap window		Du taškai viršuje (umliautas)
+Icelandic	KeymapNames		Islandų
 Open…	Keymap window		Atverti…
+ThinkPad T400s (US)	KeyboardLayoutNames		„ThinkPad T400s“ (JAV)

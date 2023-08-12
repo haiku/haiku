@@ -1,7 +1,8 @@
-1	german	x-vnd.Haiku.TV	3120244932
+1	german	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Kein Menü
 No border	MainWin		Kein Fensterrahmen
 Error, connecting to interface failed:\n\n	MainWin		Fehler, Verbindung zur Hardware fehlgeschlagen:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	Erzwinge 720 × 576, Seitenverhältnis 4:3
 Full screen	MainWin		Vollbild
 Scale to native size	MainWin		Originalgröße
 unknown	MainWin		unbekannt
@@ -16,7 +17,10 @@ Channel	MainWin		Kanal
 Previous channel	MainWin		Vorheriger Kanal
 OK	MainWin		OK
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	Erzwinge 544 × 576, Seitenverhältnis 4:3
 Settings	MainWin		Einstellungen
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	Erzwinge 704 × 576, Seitenverhältnis 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Einstellungen ...
 None	MainWin		Kein

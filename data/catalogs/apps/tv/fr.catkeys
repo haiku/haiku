@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku.TV	3120244932
+1	french	x-vnd.Haiku.TV	181363067
 No menu	MainWin		Pas de menu
 No border	MainWin		Pas de bordure
 Error, connecting to interface failed:\n\n	MainWin		Erreur, impossible de se connecter à l’interface :\n\n
@@ -17,6 +17,7 @@ Previous channel	MainWin		Chaîne précédente
 OK	MainWin		OK
 TV	MainWin		TV
 Settings	MainWin		Réglages
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Réglages…
 None	MainWin		Aucun

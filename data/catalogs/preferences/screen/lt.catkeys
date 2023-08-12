@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Screen	1388881963
+1	lithuanian	x-vnd.Haiku-Screen	2318349707
 no	Screen		ne
 bits/pixel	Screen		bitų
 15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
@@ -13,24 +13,29 @@ Video format:	Screen		Vaizdo formatas:
 Undo	Screen		Atšaukti
 OK	Screen		Gerai
 Current workspace	Screen		Šis darbalaukis
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		vertikaliai
 All workspaces	Screen		Visi darbalaukiai
 Use laptop panel:	Screen		Naudoti skreitinuko ekraną:
 Could not write VESA mode settings file:\n\t	Screen		Nepavyko įrašyti VESA veiksenos nuostatų failo:\n\t
+Display info	Screen		Ekrano savybės
+Settings will revert in %seconds.	Screen		Ankstesnės nuostatos bus grąžintos už %seconds.
 Cancel	Screen		Atsisakyti
 Other…	Screen		Kitas…
 Screen	Screen		Ekranas
 Colors:	Screen		Spalvos:
 yes	Screen		taip
 Swap displays:	Screen		Sukeisti ekranus:
-%sSerial no.: %s	Screen		%sSerijinis numeris: %s
+%sSerial no.: %s	Screen		%sSerijos numeris: %s
 8 bits/pixel, 256 colors	Screen		8 bitų, iš viso 256
 Revert	Screen		Atšaukti pakeitimus
 always	Screen		visuomet
+Confirm changes	Screen		Patvirtinti pakeitimus
 Warning	Screen		Įspėjimas
 24 bits/pixel, 16 Million colors	Screen		24 bitų spalvos, iš viso virš 16 milijonų
 Hz	Screen		Hz
 Workspaces	Screen		Darbalaukiai
+Brightness:	Screen		Skaistis:
 32 bits/pixel, 16 Million colors	Screen		32 bitų spalvos, iš viso virš 16 milijonų
 Done	Screen		Atlikta
 16 bits/pixel, 65536 colors	Screen		16 bitų spalvos, iš viso 65536

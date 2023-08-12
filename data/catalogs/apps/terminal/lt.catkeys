@@ -11,7 +11,7 @@ Copy	Terminal TermWindow		Kopijuoti
 Edit tab title…	Terminal TermWindow		Keisti kortelės antraštę…
 Print	Terminal TermWindow		Spausdinti
 Settings	Terminal TermWindow		Nuostatos
-%app% settings	Terminal PrefWindow	window title	Terminalo nuostatos
+%app% settings	Terminal PrefWindow	window title	%app% – nuostatos
 Use default	Terminal SetTitleWindow		Grąžinti numatytąją
 Close tab	Terminal TermWindow		Užverti kortelę
 Error!	Terminal getString		Klaida!
@@ -36,7 +36,7 @@ Custom	Terminal colors scheme		Pasirinktinė
 Really close?	Terminal TermWindow		Ar tikrai užverti?
 Font size	Terminal TermWindow		Šrifto dydis
 OK	Terminal TermApp		Gerai
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus langą, jos darbas bus nutrauktas.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Procesas „%1“ dar vykdomas.\nUžvėrus terminalo langą, jo darbas bus nutrauktas.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nežinomas argumentas: „%s“\n
 Tab title:	Terminal AppearancePrefView		Kortelės antraštė:
 Text not found.	Terminal TermWindow		Ieškotas tekstas nerastas.
@@ -51,7 +51,7 @@ Save to file…	Terminal PrefWindow		Įrašyti į failą…
 Copy path	Terminal TermView		Kopijuoti kelią
 Copy absolute path	Terminal TermView		Kopijuoti absoliutųjį kelią
 Cancel	Terminal TermWindow		Atsisakyti
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus kortelę, jos darbas bus nutrauktas.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Procesas „%1“ dar vykdomas.\nUžvėrus kortelę, jo darbas bus nutrauktas.
 Full screen	Terminal TermWindow		Visame ekrane
 Shell 	Terminal TermWindow		Apvalkalas
 Tab title:	Terminal TermWindow		Kortelės antraštė:

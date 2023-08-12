@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3722356873
+1	finnish	x-vnd.Haiku-libtracker	3124217250
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
 Location:	InfoWindow		Sijainti:
 Name	PoseView		Nimi
 Kind:	InfoWindow		Tyyppi:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# tavu} other{# tavua}}
 contains	FindPanel		sisältää
 Open	FilePanelPriv		Avaa
 Bitmap icon	AttributesView		Bittikarttakuvake
@@ -77,7 +76,6 @@ Select	SelectionWindow		Valitse
 Select	InfoWindow		Valitse
 OK	OpenWithWindow		Valmis
 Include trash	FindPanel		Sisällytä roskakori
-GiB	WidgetAttributeText		gibitavua
 Clean up	ContainerWindow		Tyhjennä
 Modified	FindPanel		Muokattu
  (block size: 	InfoWindow		 (lohkokoko: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Käänteinen valinta
 Memory size	AttributesView		Muistikoko
-TiB	WidgetAttributeText		tebitavua
 New folder	TemplatesMenu		Uusi kansio
  (broken)	InfoWindow		 (rikkinäinen)
 Replace all	FSUtils		Korvaa kaikki
@@ -303,7 +300,6 @@ Desktop	Model		Työpöytä
 Select all	ContainerWindow		Valitse kaikki
 apps	B_APPS_DIRECTORY		sovellukset
 Error calculating folder size.	InfoWindow		Virhe laskettaessa kansiokokoa.
-MiB	WidgetAttributeText		mebitavua
 Delete	FSUtils		Poista
 Edit name	ContainerWindow		Muokkaa nimeä
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus epäonnistui (Symboli puuttuu: %symbol).\n
@@ -338,7 +334,6 @@ To: %dir	StatusWindow		Vastaanottaja: %dir
 Paste layout	ContainerWindow		Liitä sijoittelu
 Cancel	Tracker		Peru
 yes	AttributesView		kyllä
-%lld B	WidgetAttributeText		%lld Tavua
 Make active printer	ContainerWindow		Aseta aktiivinen tulostin
 Copy to	ContainerWindow		Kopioi kohteeseen
 Name	SelectionWindow		Nimi
@@ -416,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Tiedoston ”%na
 Decrease size	DeskWindow		Pienennä kokoa
 Emptying Trash… 	StatusWindow		Tyhjennetään roskakoria... 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# tiedostolle} other{# tiedostoille}}
-KiB	WidgetAttributeText		kibitavua
 Revert	TrackerSettingsWindow		Palauta
 trash	B_TRASH_DIRECTORY		roskakori
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät järjestelmäkansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Siirrä”.
@@ -516,6 +510,7 @@ Create a Query	FindPanel		Luo kysely
 Close	QueryContainerWindow		Sulje
 I know what I'm doing	FSUtils	button label	Tiedän, mitä olen tekemässä
 Preparing to copy items…	StatusWindow		Valmistaudutaan kopioimaan kohteita...
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld Tavua
 Entry ref	AttributesView		Aloitusviite
 Icon view	ContainerWindow		Kuvakenäkymä
 The entered folder name is too long.	FSUtils		Kirjoittamasi kansionimi on liian pitkä.

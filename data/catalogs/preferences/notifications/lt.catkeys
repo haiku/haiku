@@ -1,12 +1,34 @@
-1	lithuanian	x-vnd.Haiku-Notifications	2426115127
+1	lithuanian	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		Apačioje kairėje
+Application does not have a valid signature	NotificationView	Alert message	Programa neturi galiojančio parašo
+Status	NotificationView		Būsena
+Add…	NotificationView		Pridėti…
+Lower right	GeneralView		Apačioje dešinėje
+Muted	NotificationView		Nutildyta
+ is already listed	NotificationView	Alert message	 jau yra sąraše
 OK	PrefletWin		Gerai
 Notifications	PrefletWin		Pranešimai
+Notifications preflet sample	PrefletWin		Pranešimo pavyzdys
+Mute notifications from this application	NotificationView		Nutildyti šios programos pranešimus
+wide	GeneralView	Window width: Slider high text	platus
+narrow	GeneralView	Window width: Slider low text	siauras
 Revert	PrefletWin		Atšaukti pakeitimus
 Applications	PrefletView		Programos
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, one{Galiojimo laikas: # sekundė} few{Galiojimo laikas: # sekundės} other{Galiojimo laikas: # sekundžių}}
+Upper right	GeneralView		Viršuje dešinėje
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Klaida įrašant nuostatas.\nGali būti, kad baigiasi vieta diske.
+Defaults	PrefletWin		Numatytai
+Upper left	GeneralView		Viršuje kairėje
+Window width	GeneralView		Lango plotis
 Applications	NotificationView		Programos
 General	PrefletView		Bendrosios
 OK	NotificationView		Gerai
+Follow Deskbar	GeneralView		Prie pranešimų srities
 Notifications	System name		Pranešimai
 Allowed	NotificationView		Leidžiama
+Duration:	GeneralView		Trukmė:
 Application	NotificationView		Programa
 Enable notifications	GeneralView		Įjungti pranešimus
+This is a test notification message	PrefletWin		Čia matote pavyzdinio pranešimo tekstą
+Remove	NotificationView		Pašalinti
+Position:	GeneralView		Pozicija:

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	716811487
+1	japanese	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に捨てる
 Close	MediaPlayer-PlaylistWindow		閉じる
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		最大音量
 Start media server	MediaPlayer-Main		メディアサーバーを起動
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		メディアサーバーが動いていないようです。\n起動してもよろしいですか ?
 Location	MediaPlayer-InfoWin		場所
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		'%s'を開いています。
 Medium	MediaPlayer-SettingsWindow		中
 Play mode	MediaPlayer-SettingsWindow		再生モード

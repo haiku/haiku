@@ -1,12 +1,14 @@
-1	lithuanian	x-vnd.Be-POST	825141276
+1	lithuanian	x-vnd.Be-POST	3997262161
 No new messages	MailDaemon		Naujų laiškų nėra
 No new messages	DeskbarView		Naujų laiškų nėra
 Shutdown mail services	DeskbarView		Išjungti el. pašto tarnybą
 Mail status	MailDaemon		Pašto būsena
 Fetching mail for %name	Notifier		Gaunami %name laiškai
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# naujas laiškas} few{# nauji laiškai} other{# naujų laiškų}}
 Create new message…	DeskbarView		Rašyti laišką…
 Send pending mails	DeskbarView		Išsiųsti eilėje esančius laiškus
 Settings…	DeskbarView		Nuostatos…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{# naujas laiškas} few{# nauji laiškai} other{# naujų laiškų}}
 New Messages	MailDaemon		Nauji laiškai
 <no accounts>	DeskbarView		<nėra paskyrų>
 Mail status	Notifier		Pašto būsena

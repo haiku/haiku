@@ -1,3 +1,7 @@
-1	lithuanian	x-vnd.Haiku-ICNSTranslator	2092257590
+1	lithuanian	x-vnd.Haiku-ICNSTranslator	660278989
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Leistini dydžiai: 16, 32, 48, 128, 256, 512, 1024
+Valid colors: RGB32, RGBA32	ICNSConfig		Leistinos spalvų paletės: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Versija %d.%d.%d, %s
 Apple icon translator	ICNSConfig		„Apple“ piktogramų keitiklis
+Apple icons	ICNSTranslator		„Apple“ piktogramos
+Apple icon translator	ICNSTranslator		„Apple“ piktogramų keitiklis

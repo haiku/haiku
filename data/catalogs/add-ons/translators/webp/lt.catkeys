@@ -1,2 +1,25 @@
-1	lithuanian	x-vnd.Haiku-WebPTranslator	1475550615
+1	lithuanian	x-vnd.Haiku-WebPTranslator	828165164
+High	ConfigView		Aukšta
+WebPTranslator Settings	ConfigView		WebP keitiklio nuostatos
+Low	ConfigView		Žema
+WebP image translator	ConfigView		WebP keitiklio nuostatos
+Photo	ConfigView		nuotrauka
+WebP image translator	WebPTranslator		WebP paveikslų keitiklis
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		paveikslas
+Default	ConfigView		numatytasis
+Text	ConfigView		tekstas
+Preprocessing filter	ConfigView		parengiamojo dorojimo filtras
+Compression method:	ConfigView		Glaudinimo taktika:
+Preset	ConfigView		Ruošinys
+Drawing	ConfigView		piešinys
+Output preset:	ConfigView		Išvesties parametrų ruošinys:
 WebP Settings	main		WebP nuostatos
+Icon	ConfigView		piktograma
+WebP image	WebPTranslator		WebP paveikslas
+Output quality:	ConfigView		Išvesties kokybė:
+Slower but better	ConfigView		Lėtesnis, bet geresnis
+Based on libwebp %version%	ConfigView		Veikia „libwebp %version%“ pagrindu
+Fast	ConfigView		Spartus
+WebP images	WebPTranslator		WebP paveikslai

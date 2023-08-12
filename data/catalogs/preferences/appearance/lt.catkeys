@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Appearance	1992724537
+1	lithuanian	x-vnd.Haiku-Appearance	3844378316
 Control border	Colors tab		Valdiklių rėmeliai
 Off	AntialiasingSettingsView		išjungta
 Window border	Colors tab		Veikiamojo lango rėmelis
@@ -7,10 +7,12 @@ Defaults	APRWindow		Numatytosios reikšmės
 Shadow	Colors tab		Šešėliai
 Document background	Colors tab		Dokumento fonas
 List background	Colors tab		Sąrašo fonas
+No effect on running applications	DecorSettingsView		Nedaro įtakos jau vykdomoms programoms
 Fixed font:	Font view		Lygiaplotis šriftas:
 Appearance	System name		Išvaizda
 Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro intensyvumas:
 Glyph hinting:	AntialiasingSettingsView		Rašmenų taškinė korekcija:
+Default Haiku ControlLook	DecorSettingsView		Numatytasis „Haiku“ valdiklių apipavidalinimas
 Menu item text	Colors tab		Meniu elementų tekstas
 About decorator	DecorSettingsView		Apie dekoruoklį
 Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
@@ -27,6 +29,7 @@ OK	DecorSettingsView		Gerai
 Control text	Colors tab		Valdiklių tekstas
 Look and feel	APRWindow		Išvaizda ir jausena
 Selected menu item background	Colors tab		Veikiamojo meniu elemento fonas
+Link active	Colors tab		Saitas (veikiamasis)
 Antialiasing	APRWindow		Glodinimas
 Menu font:	Font view		Meniu šriftas:
 Bold font:	Font view		Pastorintas šriftas:
@@ -43,8 +46,12 @@ Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
 Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
 LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
 Window tab	Colors tab		Veikiamojo lango antraštė
+Link text	Colors tab		Saitai
 Tooltip background	Colors tab		Iškylančiųjų paaiškinimų fonas
+ControlLook:	DecorSettingsView		Valdiklių apipavidalinimas:
 Scroll bar thumb	Colors tab		Slankiklis
+Default	DecorSettingsView		numatytasis
+Link visited	Colors tab		Saitai (aplankyti)
 Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
 Tooltip text	Colors tab		Iškylančiųjų paaiškinimų tekstas
 Control background	Colors tab		Valdiklių fonas
@@ -59,9 +66,13 @@ Antialiasing type:	AntialiasingSettingsView		Glodinimo būdas:
 Panel text	Colors tab		Skydelių tekstas
 Hinting menu	AntialiasingSettingsView		Taškinės korekcijos meniu
 Scroll bar:	DecorSettingsView		Slankjuostės:
+Choose ControlLook	DecorSettingsView		Pasirinkite valdiklių apipavidalinimą
 Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
 Document text	Colors tab		Dokumento tekstas
 Inactive window border	Colors tab		Foninių langų rėmeliai
 Colors	APRWindow		Spalvos
+About control look	DecorSettingsView		Apie valdiklių apipavidalinimą
 Control highlight	Colors tab		Valdiklių paryškinimas
+Status bar	Colors tab		Būsenos juosta
+Link hover	Colors tab		Saitai (užvedus žymeklį)
 Single:	DecorSettingsView		Viengubas:

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DiskProbe	4193379066
+1	turkish	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw düzenleyicisi
 Remove	AttributeWindow		Kaldır
 Close	ProbeView		Kapat
@@ -29,7 +29,9 @@ Open file…	FileWindow		Dosya aç…
 32 bit unsigned pointer:	TypeEditors		32 bit imzalanmamış işaretleyici:
 DiskProbe request	DiskProbe		Disk Sondası isteği
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Onaltılık
+Block %lld (0x%Lx)	ProbeView		Blok %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Dosyaya yazma başarısız oldu:\n%s\n\nÇıktığınız zaman tüm değişiklikler kaybolacaktır.
+Native: %lld (0x%0*Lx)	ProbeView		Yerel: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Aygıtı incele:
 Number editor	TypeEditors		Sayı düzenleyicisi
 Icon	TypeEditors		Simge
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Disk Sondası isteği
 Double precision floating-point value:	TypeEditors		Çifte kesinlikli kayan noktalı değer:
 Image	TypeEditors	This is the type of view	Görsel
+Swapped: %lld (0x%0*Lx)	ProbeView		Takas edilen: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Kapatmadan önce değişiklikler kaydedilsin mi?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG biçimi
 Number	TypeEditors	This is the type of editor	Sayı
 Edit	ProbeView		Düzen

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-LaunchBox	1530497419
+1	turkish	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Açıklama koy…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Bu rampa kaldırılsın mı?\n(Rampa hatırlanmayacaktır.)
 OK	LaunchBox		Tamam
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Pencere kenarlığını göster
 Failed to launch 'something', error in Pad data.	LaunchBox		'Bir şey' başlatılamadı, Rampa verisinde hata.
 LaunchBox	System name		Başlatma Rampası
 Auto-raise	LaunchBox		Kendiliğinden öne getir
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Simge boyutu
 Open containing folder	LaunchBox		İçeren klasörü aç
 Add button here	LaunchBox		Buraya düğme ekle

@@ -8,7 +8,7 @@ Log to file	PoorMan		Rašyti žurnalą į failą
 Shutting down.	PoorMan		Išjungiama.
 Error Dir	PoorMan		Aplanko klaida
 Web folder:	PoorMan		Svetainės aplankas:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Pasirinkite aplanką, kurį norite viešinti saityne.\n\nJeigu norite, programa gali sukurti numatytąjį „public_html“ poaplankį Jūsų namų aplanke.\nArba galite pasirinkti vieną iš jau sukurtų aplankų.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Pasirinkite aplanką, kurį norite viešinti saityne.\n\nJeigu norite, programa gali sukurti numatytąjį „public_html“ poaplankį jūsų pradžios aplanke.\nArba galite pasirinkti vieną iš jau sukurtų aplankų.
 Log To Console	PoorMan		Rodyti žurnalą pulte
 File Name	PoorMan		Failo vardas
 Starting up... 	PoorMan		Paleidžiama… 

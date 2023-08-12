@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku.zip-o-matic	1573273374
+1	lithuanian	x-vnd.haiku.zip-o-matic	2032806096
 Drop files here.	file:ZipOMaticWindow.cpp		Archyvuotinus failus meskite čia.
 Filename: %s	file:ZipOMaticWindow.cpp		Failo vardas: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Nutraukti kūrimą?
@@ -9,7 +9,9 @@ Preparing to archive	file:ZipperThread.cpp		Ruošiamasi archyvuoti
 Let them continue	file:ZipOMatic.cpp		Pratęsti
 Continue	file:ZipOMaticWindow.cpp		Tęsti
 Archive created OK	file:ZipOMaticWindow.cpp		Archyvas sėkmingai sukurtas.
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Pridėtas # failas.} few{Pridėti # failai.} other{Pridėta # failų.}}
 Stop	file:ZipOMaticWindow.cpp		Stabdyti
 Stopped	file:ZipOMaticWindow.cpp		Sustabdyta
 Archive	file:ZipperThread.cpp		Archyvas
 Creating archive: %s	file:ZipOMaticWindow.cpp		Archyvo kūrimas: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Šiuo metu {0, plural, one{paleista # „Zip-O-Matic“ kopija.} few{paleistos # „Zip-O-Matic“ kopijos.} other{paleista # „Zip-O-Matic“ kopijų.}}\n\n

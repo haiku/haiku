@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	2769580762
+1	french	application/x-vnd.Cortex.support	1432992811
 Header has flags	MediaString		L’en-tête comporte des drapeaux
 Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
@@ -34,6 +34,7 @@ Drop data	MediaString		Rejeter les données
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Droite
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32 bits RVB
 System mixer	MediaString		Mixeur système
 Physical output	MediaString		Sortie matérielle

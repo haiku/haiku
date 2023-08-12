@@ -1,11 +1,13 @@
-1	lithuanian	x-vnd.Haiku-desklink	1299174281
+1	lithuanian	x-vnd.Haiku-desklink	2223625451
 desklink	MediaReplicant	Title of an alert box	desklink
 Muted	MediaReplicant		Nutildyta
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		Gerai
+Sounds preferences…	MediaReplicant		Garsų nuostatos…
 Couldn't launch 	MediaReplicant		Nepavyko paleisti 
 Volume	VolumeControl		Garsis
 Open MediaPlayer	MediaReplicant		Atverti Medijos leistuvę
+%ld dB	VolumeControl		%ld dB
 Media preferences…	MediaReplicant		Įvairialypės terpės nuostatos…
 Options	MediaReplicant		Parinktys
 Beep	MediaReplicant		Pyptelėti

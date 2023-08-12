@@ -53,7 +53,7 @@ Cancel	AbstractParametersPanel		Atsisakyti
 Format	MainWindow		Ženklinti
 OK	MainWindow		Gerai
 Could not delete the selected partition.	MainWindow		Pasirinkto skaidinio pašalinti nepavyko.
-Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ar tikrai norite suženklinti pasirinktąjį diską? Visi duomenys bus prarasti. Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ar tikrai norite suženklinti pasirinktąjį diską? Visi duomenys bus prarasti. Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.\n
 There was an error preparing the disk for modifications.	MainWindow		Parengiant diską pakeitimams, įvyko klaida.
 The disk has been successfully initialized.\n	MainWindow		Diskas sėkmingai suženklintas.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ar atjungti skaidinį priverstinai?\n\nPastaba: jeigu į skaidinį šiuo metu rašoma, jo atjungimas gali įtakoti duomenų praradimą.\n

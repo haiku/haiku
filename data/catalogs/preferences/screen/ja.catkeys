@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Screen	133788249
+1	japanese	x-vnd.Haiku-Screen	2318349707
 no	Screen		いいえ
 bits/pixel	Screen		ビット/ピクセル
 15 bits/pixel, 32768 colors	Screen		15 ビット/ピクセル, 32768 色
@@ -13,6 +13,7 @@ Video format:	Screen		ビデオフォーマット:
 Undo	Screen		元に戻す
 OK	Screen		OK
 Current workspace	Screen		現在のワークスペース
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		垂直に
 All workspaces	Screen		すべてのワークスペース
 Use laptop panel:	Screen		ラップトップパネルを使用:

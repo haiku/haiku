@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Magnify	3730034159
+1	japanese	x-vnd.Haiku-Magnify	1465621918
   size must be > 4 and a multiple of 4	Console		  size must be > 4 and a multiple of 4
 Decrease pixel size	Magnify-Main		ピクセルの縮小
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
@@ -10,6 +10,7 @@ Decrease window size	Magnify-Main		ウィンドウの縮小
 Remove a crosshair	Magnify-Main		十字カーソルの削除
 Add a crosshair	Magnify-Main		十字カーソルの追加
 Freeze image	Magnify-Main		画像の固定
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# ピクセル/ピクセル} other{# ピクセル/ピクセル}}
 usage: magnify [size] (magnify size * size pixels)	Console		usage: magnify [size] (magnify size * size pixels)
 Increase window size	Magnify-Main		ウィンドウの拡大
 Save image	Magnify-Main		イメージの保存

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DiskProbe	494506599
+1	hungarian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Nyers szerkesztő
 Remove	AttributeWindow		Eltávolítás
 Close	ProbeView		Bezárás
@@ -119,6 +119,7 @@ Double precision floating-point value:	TypeEditors		Duplapontosságú lebegőpon
 Image	TypeEditors	This is the type of view	Kép
 Swapped: %lld (0x%0*Lx)	ProbeView		Cserélt: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Elmentsük a változtatásokat bezárás előtt?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG formátum
 Number	TypeEditors	This is the type of editor	Szám
 Edit	ProbeView		Szerkesztés

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-NewMailNotification	2338542986
+1	lithuanian	x-vnd.Haiku-NewMailNotification	1375000288
 Log window	NotifierConfigView		žurnalo lange
 none	NotifierConfigView		niekaip
 New mails notification	NotifierFilter		Pranešimas apie naujus laiškus
@@ -7,6 +7,8 @@ OK	NotifierFilter		Gerai
 Central alert	NotifierConfigView		centriniu pranešimu
 Beep	NotifierConfigView		pyptelėjimu
 Central beep	NotifierConfigView		centriniu pyptelėjimu
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{# naujas laiškas} few{# nauji laiškai} other{# naujų laiškų}}
 New messages	NotifierFilter		Nauji laiškai
 Method:	NotifierConfigView		Pranešti:
 Keyboard LEDs	NotifierConfigView		klaviatūros diodais
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Paskyroje „%account“ turite {0, plural, one{# naują laišką} few{# naujus laiškus} other{# naujų laiškų}}.

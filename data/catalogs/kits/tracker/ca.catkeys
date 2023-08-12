@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3722356873
+1	catalan; valencian	x-vnd.Haiku-libtracker	3124217250
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Munta tots els discs ara
 Location:	InfoWindow		Ubicació:
 Name	PoseView		Nom
 Kind:	InfoWindow		Tipus:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		conté
 Open	FilePanelPriv		Obre
 Bitmap icon	AttributesView		Icona de mapa de bits
@@ -77,7 +76,6 @@ Select	SelectionWindow		Selecciona
 Select	InfoWindow		Selecciona
 OK	OpenWithWindow		D'acord
 Include trash	FindPanel		Inclou la paperera
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Neteja
 Modified	FindPanel		Modificat
  (block size: 	InfoWindow		 (mida de bloc: 
@@ -233,7 +231,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Booleà
 Invert selection	FilePanelPriv		Selecció inversa
 Memory size	AttributesView		Mida de la memòria
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Carpeta nova
  (broken)	InfoWindow		 (trencat)
 Replace all	FSUtils		Reemplaça'ls tots
@@ -303,7 +300,6 @@ Desktop	Model		Escriptori
 Select all	ContainerWindow		Selecciona-ho tot
 apps	B_APPS_DIRECTORY		aplicacions
 Error calculating folder size.	InfoWindow		Error en calcular la mida de la carpeta.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Suprimeix
 Edit name	ContainerWindow		Edita el nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No s'ha pogut obrir \"%document\" (Falta el símbol %symbol). \n
@@ -338,7 +334,6 @@ To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
 Cancel	Tracker		Cancel·la
 yes	AttributesView		sí
-%lld B	WidgetAttributeText		%lld B
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom
@@ -416,7 +411,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		No s'han pogut a
 Decrease size	DeskWindow		Redueix-ne la mida
 Emptying Trash… 	StatusWindow		Es buida la paperera... 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{per a # fitxer} other{per a # fitxers}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Torna a l'estat anterior
 trash	B_TRASH_DIRECTORY		paperera
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a Mou.
@@ -516,6 +510,7 @@ Create a Query	FindPanel		Consulta nova
 Close	QueryContainerWindow		Tanca
 I know what I'm doing	FSUtils	button label	Sé el que faig
 Preparing to copy items…	StatusWindow		Es prepara la còpia d'elements...
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Ref. de l'entrada
 Icon view	ContainerWindow		Mostra les icones
 The entered folder name is too long.	FSUtils		El nom de carpeta introduït és massa llarg.

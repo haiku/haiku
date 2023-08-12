@@ -2,7 +2,7 @@
 Error saving file	ProcessController		Klaida įrašant failą
 Display priority	ProcessController		Rodymo prioritetas
 That's no Fun!	ProcessController		Visai nejuokinga!
-What do you want to do with the team \"%s\"?	ProcessController		Ką norite daryti su „%s“ procesų grupe?
+What do you want to do with the team \"%s\"?	ProcessController		Ką norite daryti su procesų grupe „%s“?
 Your setting file could not be saved!\n(%s)	ProcessController		Nepavyko įrašyti Jūsų nuostatų failo!\n(%s)
 Processor %d	ProcessController		%d–asis procesorius
 Live in the Deskbar	ProcessController		Patalpinti pranešimų srityje
@@ -22,7 +22,7 @@ About ProcessController…	ProcessController		Apie Procesų valdiklį…
 Usage: %s [-deskbar]\n	ProcessController		Naudojimas: %s [-deskbar]\n
 Please confirm	ProcessController		Prašome patvirtinti
 Urgent priority	ProcessController		Aukštas prioritetas
-What do you want to do with the thread \"%s\"?	ProcessController		Ką norite daryti su „%s“ gija?
+What do you want to do with the thread \"%s\"?	ProcessController		Ką norite daryti su gija „%s“?
 Idle priority	ProcessController		Nulinis prioritetas
 Real-time display priority	ProcessController		Tikralaikio rodymo prioritetas
 Threads and CPU usage	ProcessController		Gijos ir procesoriaus naudojimas

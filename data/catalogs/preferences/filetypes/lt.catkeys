@@ -1,5 +1,6 @@
-1	lithuanian	x-vnd.Haiku-FileTypes	3116280330
+1	lithuanian	x-vnd.Haiku-FileTypes	3626787086
 Left	Attribute Window	Attribute column alignment in Tracker	kairinė
+Float	Attribute ListView		Slankaus kablelio skaičius (float)
 Final	Application Types Window		Galutinė
 FileTypes request	FileTypes Window		Failų tipų užklausa
 This file type already exists	New File Type Window		Toks failų tipas jau yra
@@ -17,7 +18,7 @@ Attribute name:	Attribute Window		Požymio pavadinimas:
 Long description:	Application Type Window		Ilgasis aprašas:
 Cancel	Preferred App Menu		Atsisakyti
 Remove	FileTypes Window		Pašalinti
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programa „%s“ šio failų tipo nepailaiko.\nAr tikrai norite ją skirti pageidautina?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programa „%s“ šio failų tipo nepalaiko.\nAr tikrai norite ją skirti pageidautina?
 Remove	Application Type Window		Pašalinti
 Gamma	Application Type Window		Gama
 Cancel	Application Type Window		Atsisakyti
@@ -30,6 +31,7 @@ Signature:	Application Types Window		Identifikatorius:
 None	FileTypes Window		Neparinkta
 Exclusive launch	Application Type Window		Išskirtinė paleistis
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Failų tipo pašalinimas yra negrįžtamas.\nAr tikrai norite jį pašalinti?
+Integer 64 bit	Attribute ListView		Sveikas skaičius (64 bitų)
 Cancel	New File Type Window		Atsisakyti
 Select same preferred application as	FileType Window		Nurašyti pageidautiną programą nuo
 Cancel	Type List Window		Atsisakyti
@@ -42,14 +44,16 @@ Abort	Application Types Window		Nutraukti
 Save	Application Type Window		Įrašyti
 %1 application type	Application Type Window		Programos „%1“ tipas
 Icon	Application Type Window		Piktograma
+Duration	Attribute ListView		Trukmė
 Version:	Application Type Window		Versija:
 Default application	FileType Window		Numatytoji programa
 Internal name:	New File Type Window		Vidinis pavadinimas:
+Integer 8 bit	Attribute ListView		Sveikas skaičius (8 bitų)
 Extension:	Extension Window		Prievardis:
+Time	Attribute ListView		Laikas
 Extensions:	FileTypes Window		Prievardžiai:
 Select preferred application	FileType Window		Parinkite pageidautiną programą
 Description:	FileTypes Window		Aprašas:
-Multiple files from \"%s\" file type	FileType Window		Keleto aplanke „%s“ esančių failų tipas
 Add new group	New File Type Window		Pridėti naują grupę
 Remove uninstalled	Application Types Window		Pašalinti išdiegtas
 File	Application Type Window		Failas
@@ -65,6 +69,8 @@ Version:	Application Types Window		Versija:
 Application types	Application Types Window		Programų tipai
 Description:	Application Types Window		Aprašas:
 Name:	Application Types Window		Pavadinimas:
+Rating	Attribute ListView		Įvertinimas
+duration	Attribute ListView		trukmė
 File could not be opened	Preferred App Menu		Failo atverti nepavyko
 Args only	Application Type Window		Tik argumentai
 Could not open \"%s\":\n%s	FileTypes		Nepavyko atverti „%s“:\n%s
@@ -82,16 +88,21 @@ Type name:	FileTypes Window		Tipo pavadinimas:
 Visible	Attribute Window		Matomas
 Select preferred application	FileTypes Window		Parinkite pageidautiną programą
 Path:	Application Types Window		Kelias:
+rating	Attribute ListView		įvertinimas
 Could not install file type	New File Type Window		Failų tipo įdiegti nepavyko
 Same as…	FileTypes Window		Ta pati, kaip…
 Golden master	Application Type Window		Galutinės ruošinys
+Checkbox	Attribute ListView		Žymimasis langelis
 FileTypes request	Preferred App Menu		Failų tipų užklausa
 no icon	FileTypes Window		be piktogramos
 Single launch	Application Type Window		Vieninė paleistis
 %s file type	FileType Window		Failo „%s“ tipas
+Default	Attribute ListView		Numatytasis
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Supertipo pašalinimas yra negrįžtamas.\nKartu su juo bus pašalinti ir visi jam priklausantys failų tipai!\n\nAr tikrai norite jį pašalinti? Jeigu vis tiek norite pašalinti visą grupę, spustelėkite mygtuką „Pašalinti“, laikydami nuspaustą Lyg2 klavišą.
+String	Attribute ListView		Teksto eilutė
 Add type	New File Type Window		Pridėti tipą
 Remove icon	Icon View		Pašalinti piktogramą
+Boolean	Attribute ListView		Loginis
 Cancel	Extension Window		Atsisakyti
 Alignment:	Attribute Window		Lygiuotė:
 Icon	FileType Window		Piktograma
@@ -100,6 +111,7 @@ Development	Application Type Window		Kuriama
 Golden master	Application Types Window		Galutinės ruošinys
 Add	Extension Window		Pridėti
 Open…	FileTypes Window		Atverti…
+checkbox	Attribute ListView		žymimasis langelis
 Could not change file extensions	Extension Window		Failo prievardžio pakeisti nepavyko
 Could not open file	FileType Window		Nepavyko atverti failo
 Choose type	Type List Window		Parinkti tipą
@@ -117,6 +129,7 @@ Add group	New File Type Window		Pridėti grupę
 Cancel	Attribute Window		Atsisakyti
 Gamma	Application Types Window		Gama
 Supported types	Application Type Window		Palaikomi tipai
+Integer 32 bit	Attribute ListView		Sveikas skaičius (32 bitų)
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Pageidautina programa šiam failui nerasta
 Application flags	Application Type Window		Programos žymos
@@ -141,6 +154,7 @@ Extra attributes	FileTypes Window		Papildomi požymiai
 Group:	New File Type Window		Grupė:
 Alpha	Application Types Window		Alfa
 Close	Application Type Window		Užverti
+Integer 16 bit	Attribute ListView		Sveikas skaičius (16 bitų)
 Extension	Extension Window		Prievardis
 Rule:	FileTypes Window		Taisyklė:
 FileTypes	System name		Failų tipai
@@ -152,5 +166,6 @@ Add…	FileTypes Window		Pridėti…
 Edit icon…	Icon View		Taisyti piktogramą…
 Internal name:	Attribute Window		Vidinis pavadinimas:
 Show recognition rule	FileTypes Window		Rodyti atpažinimo taisyklę
+Double	Attribute ListView		Slankaus kablelio skaičius (double)
 Move down	FileTypes Window		Nuleisti
 Alpha	Application Type Window		Alfa

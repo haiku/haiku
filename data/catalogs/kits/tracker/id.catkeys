@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	1931886435
+1	indonesian	x-vnd.Haiku-libtracker	4208414511
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Memasang semua disk sekarang
 Location:	InfoWindow		Lokasi:
 Name	PoseView		Nama
 Kind:	InfoWindow		Jenis:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# byte} other{# bytes}}
 contains	FindPanel		berisi
 Open	FilePanelPriv		Buka
 Bitmap icon	AttributesView		Ikon bitmap
@@ -75,7 +74,6 @@ Select	SelectionWindow		Memilih
 Select	InfoWindow		Memilih
 OK	OpenWithWindow		OKE
 Include trash	FindPanel		Termasuk sampah
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Pembersihan
 Modified	FindPanel		Diubah
 Select all	QueryContainerWindow		Pilih semua
@@ -224,7 +222,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Pilihan sebaliknya
 Memory size	AttributesView		Ukuran memori
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Folder baru
  (broken)	InfoWindow		 (rusak)
 Replace all	FSUtils		Ganti semua
@@ -292,7 +289,6 @@ Desktop	Model		Desktop
 Select all	ContainerWindow		Pilih semua
 apps	B_APPS_DIRECTORY		aplikasi-aplikasi
 Error calculating folder size.	InfoWindow		Ada kesalahan menghitung ukuran folder.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Hapus
 Edit name	ContainerWindow		Sunting nama
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Tidak bisa buka \"%document\" (Ada simbol hilang: %symbol). \n
@@ -401,7 +397,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Tidak dapat memp
 Decrease size	DeskWindow		Kurangi besaran
 Emptying Trash… 	StatusWindow		Mengosongkan Tempat Sampah… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Kembali ke asal
 trash	B_TRASH_DIRECTORY		tempat sampah
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jika Anda memindahkan folder sistem atau isinya, Anda tidak akan bisa boot %osName!\n\nApakah Anda yakin ingin melakukan ini?\n\nUntuk memindahkan folder sistem atau isinya pula, tahan tombol Shift dan klik \"Pindah\".

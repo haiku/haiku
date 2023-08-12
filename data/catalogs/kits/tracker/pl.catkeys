@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	2399475814
+1	polish	x-vnd.Haiku-libtracker	381036594
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -16,7 +16,6 @@ Mount all disks now	AutoMounterSettings		Zamontuj wszystkie dyski
 Location:	InfoWindow		Położenie:
 Name	PoseView		Nazwa
 Kind:	InfoWindow		Typ:
-{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# bajt} few{# bajty} many{# bajtów} other{# bajta}}
 contains	FindPanel		zawiera
 Open	FilePanelPriv		Otwórz
 Bitmap icon	AttributesView		Ikona bitmapowa
@@ -77,7 +76,6 @@ Select	SelectionWindow		Wybierz
 Select	InfoWindow		Wybierz
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Uwzględnij kosz
-GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Wyczyść
 Modified	FindPanel		Zmodyfikowano
  (block size: 	InfoWindow		 (rozmiar bloku: 
@@ -232,7 +230,6 @@ If you rename the home folder, %osName may not behave properly!\n\nAre you sure 
 Boolean	AttributesView		Wartość logiczna
 Invert selection	FilePanelPriv		Odwróć zaznaczenie
 Memory size	AttributesView		Rozmiar pamięci
-TiB	WidgetAttributeText		TiB
 New folder	TemplatesMenu		Nowy folder
  (broken)	InfoWindow		 (nieprawidłowy)
 Replace all	FSUtils		Zastąp wszystko
@@ -301,7 +298,6 @@ Desktop	Model		Pulpit
 Select all	ContainerWindow		Zaznacz wszystko
 apps	B_APPS_DIRECTORY		apps
 Error calculating folder size.	InfoWindow		Błąd przy obliczaniu rozmiaru folderu.
-MiB	WidgetAttributeText		MiB
 Delete	FSUtils		Usuń
 Edit name	ContainerWindow		Zmień nazwę
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nie można otworzyć „%document” (Brakujący symbol: %symbol). \n
@@ -412,7 +408,6 @@ Could not update permissions of file \"%name\". %error	FSUtils		Nie można zaktu
 Decrease size	DeskWindow		Zmniejsz rozmiar
 Emptying Trash… 	StatusWindow		Opróżnianie kosza… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{dla # pliku} few{dla # plików} many{dla # plików} other{dla # pliku}}
-KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Cofnij
 trash	B_TRASH_DIRECTORY		trash
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jeżeli przeniesiesz katalog „system”, %osName może nie działać poprawnie!\n\nJesteś pewien, że chcesz to zrobić?\n\nJeżeli nadal chcesz przeniesiesz katalog „system”, naciśnij klawisz Shift i kliknij „Przenieś”.

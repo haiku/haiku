@@ -1,0 +1,16 @@
+1	lithuanian	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	Paketų pakeitimai
+uninstall package %s\n	PackageResult	Don't change '%s' variable	pašalinti paketą „%s“\n
+ignore problem for now	PackageProblem		kol kas problemos nepaisyti
+solution %d:	PackageProblem	Don't change the %d variable	%d-asis sprendimas:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Aptiktos sekančios problemos. Pasirinkite sprendimą kiekvienai jų:
+Apply changes	PackageResult		Pritaikyti pakeitimus
+Package daemon	PackageManager		Paketų tarnyba
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	įdiegti paketą „%s“ iš saugyklos „%s“\n
+The following additional package changes have to be made:	PackageResult		Reikia atlikti sekančius papildomus paketų pakeitimus:
+Warning	PackageManager		Įspėjimas
+Cancel	PackageProblem		Atsisakyti
+don't activate package %source%	PackageProblem	don't change '%source%	neaktyvinti paketo „%source%“
+Cancel	PackageResult		Atsisakyti
+Retry	PackageProblem		Kartoti bandymą
+Package problems	PackageProblem	Window title	Paketų problemos

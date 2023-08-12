@@ -1,9 +1,11 @@
-1	lithuanian	x-vnd.Haiku-Mail	688530788
+1	lithuanian	x-vnd.Haiku-Mail	2750130554
 Account settings	AutoConfigWindow		Paskyros nuostatos
 \t\t· Outgoing	Config Window		\t\t· Siuntimas
+An error occurred while creating the config view: %error.	Config Views		Klaida bandant sukurti konfigūracijos rodinį: %error.
 E-mail address:	E-Mail		El. pašto adresas:
 Create new account	AutoConfigWindow		Naujos paskyros kūrimas
 While sending and receiving	Config Window		siunčiant ir gaunant
+Error!	Config Views		Klaida!
 Apply	Config Window		Taikyti
 Incoming mail filters	Config Views		Gaunamų laiškų filtrai
 Outgoing mail filters	Config Views		Siunčiamų laiškų filtrai
@@ -17,6 +19,7 @@ Outgoing	E-Mail		Pašto siuntimas
 Accounts	Config Window		Paskyros
 Outgoing	Config Window		Pašto siuntimas
 Remove	Config Views		Pašalinti
+Show notifications:	Config Window		Rodyti pranešimus:
 Settings	Config Window		Nuostatos
 Never	Config Window	show status window	niekada
 Account name:	Config Views		Paskyros pavadinimas:
@@ -38,6 +41,7 @@ Account settings	Config Views		Paskyros nuostatos
 minutes	Config Window		min.
 E-mail	System name		El. paštas
 Check every	Config Window		Tikrinti kas
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Pridėti naują paskyrą galite spustelėję mygtuką „Pridėti“.\n\nPašalinti esamą paskyrą galite, ją pasirinkę ir spustelėję „Pašalinti“.\n\nPeržiūrėti ir keisti paskyros nuostatas galite, ją pasirinkdami sąraše.
 Account name:	E-Mail		Paskyros pavadinimas:
 Edit mailbox menu…	Config Window		Keisti pašto dėžutės meniu…
 Server Name:	E-Mail		Serverio vardas:

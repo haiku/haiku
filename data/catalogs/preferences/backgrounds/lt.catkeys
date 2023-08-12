@@ -1,11 +1,14 @@
-1	lithuanian	x-vnd.Haiku-Backgrounds	5390252
+1	lithuanian	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Fonas
 X:	Main View		X:
+Setting the background image failed:	Main View		Nustatyti fono paveikslo nepavyko:
 Resolution: 	Image Filepanel		Raiška: 
 pick one	Main View		pasirinkite
 Default	Main View		numatytasis
 Center	Main View		centruoti
+Folder: %path	Main View		Aplankas: %path
 Manual	Main View		tinkinta
+Set background image error	Main View		Klaida nustatant fono paveikslą
 Default folder	Main View		Numatytasis aplankas
 Revert	Main View		Atšaukti pakeitimus
 None	Main View		jokio
@@ -19,6 +22,7 @@ Y:	Main View		Y:
 Tile	Main View		iškloti
 Select	Main View		Rinktis
 Scale to fit	Main View		įtalpinti
+OK	Main View		Gerai
 Placement:	Main View		Padėtis:
 Preview	Main View		Peržiūra
 Image:	Main View		Paveikslas:

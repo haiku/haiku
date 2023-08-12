@@ -1,0 +1,46 @@
+1	lithuanian	x-vnd.Haiku-Input	775486717
+Scrolling	TouchpadPrefView		Slinktis
+Defaults	InputMouse		Numatytai
+Long	KeyboardView		Ilga
+Cancel	TouchpadPrefView		Atsisakyti
+4-Button	SettingsView		4 klavišų
+Tapping sensitivity	TouchpadPrefView		Jautrumas bakstelėjimui
+Device List	InputWindow		Įrenginių sąrašas
+Double-click speed	SettingsView		Dvigubo spustelėjimo greitis
+5-Button	SettingsView		5 klavišų
+Typing test area	KeyboardView		Vieta rašymui išbandyti
+Mouse type:	SettingsView		Pelės tipas:
+Revert	InputKeyboard		Atšaukti pakeitimus
+Fast	KeyboardView		Aukšta
+Never	TouchpadPrefView		Niekada
+6-Button	SettingsView		6 klavišų
+Please confirm	TouchpadPrefView		Patvirtinkite
+Click to focus	SettingsView		Fokusavimas spustelint
+Acceleration	TouchpadPrefView		Akceleracija
+Mouse speed	SettingsView		Pelės greitis
+Accept first click	SettingsView		Priimti pirmąjį spustelėjimą
+OK	TouchpadPrefView		Gerai
+Horizontal scrolling	TouchpadPrefView		Horizontalioji slinktis
+Delay until key repeat	KeyboardView		Delsa prieš kartojant klavišą
+Keyboard lock delay	TouchpadPrefView		Klaviatūros užrakinimo delsa
+Two finger scrolling	TouchpadPrefView		Slinktis dviem pirštais
+Input	System name		Įvestis
+Mouse acceleration	SettingsView		Pelės akceleracija
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Pasirinktoji slinkties zona yra neįprastai didelė ir gali kliudyti įprastam darbui su jutikliniu kilimėliu. Ar tikrai norite ją pakeisti?
+High	TouchpadPrefView		Aukštas
+Defaults	TouchpadPrefView		Numatytai
+1-Button	SettingsView		1 klavišo
+Defaults	InputKeyboard		Numatytai
+Short	KeyboardView		Trumpa
+Slow	KeyboardView		Žema
+Revert	InputMouse		Atšaukti pakeitimus
+Key repeat rate	KeyboardView		Klavišo kartojimo sparta
+2-Button	SettingsView		2 klavišų
+Click to focus and raise	SettingsView		Fokusavimas ir iškėlimas spustelint
+Vertical	TouchpadPrefView		Vertikalioji
+Horizontal	TouchpadPrefView		Horizontalioji
+Focus follows mouse	SettingsView		Fokusavimas seka pelės žymeklį
+Focus mode:	SettingsView		Fokusavimo veiksena:
+Double-click test area	SettingsView		Vieta dvigubam spustelėjimui išbandyti
+3-Button	SettingsView		3 klavišų
+Revert	TouchpadPrefView		Atšaukti pakeitimus

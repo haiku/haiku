@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaConverter	704124479
+1	german	x-vnd.Haiku-MediaConverter	1436080178
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
 Source files	MediaConverter		Quelldateien
 Error writing video frame %lld	MediaConverter		Fehler beim Schreiben von Video-Frame %lld
@@ -64,6 +64,7 @@ Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
 Select this folder	MediaConverter		Diesen Ordner wählen
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
 Understood	MediaConverter		Verstanden
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2f Bilder/s
 %d bit 	MediaFileInfo		%d Bit
 No video	Video codecs list		Keine Videospur
 Continue	MediaConverter		Fortsetzen
