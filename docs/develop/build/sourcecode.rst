@@ -41,8 +41,8 @@ conflict resolution to make sure our patches are correctly ported from one versi
 It also makes it easy to compare the current state of our sourcecode with the upstream code, for
 example to extract patches that could be upstreamed.
 
-How to import upstream changes
-..............................
+How to import upstream binutils changes
+.......................................
 
 Here is an example of the process used to update to a new version of binutils:
 
@@ -55,6 +55,42 @@ Here is an example of the process used to update to a new version of binutils:
     mv binutils-2.36 binutils             # Move the extracted files to the right place
     git add -f binutils                   # Add the new files to git
     git commit -m "import binutils 2.36"  # Commit the files in the vendor branch
+    git push origin vendor-binutils       # You can push this directly to the branch
+
+Now this can easily be merged into the master branch:
+
+.. code-block:: bash
+
+    git checkout master
+    git merge vendor-binutils
+
+Review and fix the conflicts, if any, then push the changes for review on Gerrit.
+
+How to import upstream gcc changes
+..................................
+
+Here is an example of the process used to update to a new version of binutils:
+
+.. code-block:: bash
+
+    git checkout vendor-gcc               # Move to the branch containing binutils
+    git rm -rf gcc ; rm -rf gcc           # Delete the existing version of binutils
+    wget http://.../gcc-13.2.0.tar.xz     # Download the latest version
+    tar xf gcc-13.2.0.tar.xz              # Extract the new binutils version
+    mv gcc-13.2.0 gcc                     # Move the extracted files to the right place
+    pushd gcc
+    ./contrib/download_prerequisites      # Download the required gmp, isl, mpfr and mpc dependencies
+    rm gmp gmp-6.2.1.tar.bz2              # Remove gmp download and symbolic link
+    mv gmp-6.2.1 gmp                      # Move the downloaded gmp dependency in place
+    rm isl isl-0.24.tar.bz2
+    mv isl-0.24 isl
+    rm mpc mpc-1.2.1.tar.gz
+    mv mpc-1.2.1 mpc
+    rm mpfr mpfr-4.1.0.tar.bz2
+    mv mpfr-4.1.0 mpfr
+    popd
+    git add -f gcc                        # Add the new files to git
+    git commit -m "import gcc 13.2.0"     # Commit the files in the vendor branch
     git push origin vendor-binutils       # You can push this directly to the branch
 
 Now this can easily be merged into the master branch:
