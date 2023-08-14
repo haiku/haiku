@@ -1077,8 +1077,8 @@ MainWindow::_CreateGUI()
 
 	leftTopView->AddChild(iconPreviews);
 
-	
-	BGroupView* leftSideView = new BGroupView(B_VERTICAL, 0);
+
+	BSplitView* leftSideView = new BSplitView(B_VERTICAL, 0);
 	layout->AddView(leftSideView, 0, 1);
 	leftSideView->SetExplicitMaxSize(BSize(splitWidth, B_SIZE_UNSET));
 
@@ -1090,33 +1090,41 @@ MainWindow::_CreateGUI()
 		"transformer list view");
 	fPropertyListView = new IconObjectListView();
 
-	BLayoutBuilder::Group<>(leftSideView)
+	BLayoutBuilder::Split<>(leftSideView)
 		.AddGroup(B_VERTICAL, 0)
-			.SetInsets(-2, -1, -1, -1)
-			.Add(new BMenuField(NULL, fPathMenu))
+			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(-2, -1, -1, -1)
+				.Add(new BMenuField(NULL, fPathMenu))
+			.End()
+			.Add(new BScrollView("path scroll view", fPathListView,
+				B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
 		.End()
-		.Add(new BScrollView("path scroll view", fPathListView,
-			B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
 		.AddGroup(B_VERTICAL, 0)
-			.SetInsets(-2, -2, -1, -1)
-			.Add(new BMenuField(NULL, fShapeMenu))
+			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(-2, -2, -1, -1)
+				.Add(new BMenuField(NULL, fShapeMenu))
+			.End()
+			.Add(new BScrollView("shape scroll view", fShapeListView,
+				B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
 		.End()
-		.Add(new BScrollView("shape scroll view", fShapeListView,
-			B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
 		.AddGroup(B_VERTICAL, 0)
-			.SetInsets(-2, -2, -1, -1)
-			.Add(new BMenuField(NULL, fTransformerMenu))
+			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(-2, -2, -1, -1)
+				.Add(new BMenuField(NULL, fTransformerMenu))
+			.End()
+			.Add(new BScrollView("transformer scroll view",
+				fTransformerListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
 		.End()
-		.Add(new BScrollView("transformer scroll view",
-			fTransformerListView, B_FOLLOW_NONE, 0, false, true, B_NO_BORDER))
 		.AddGroup(B_VERTICAL, 0)
-			.SetInsets(-2, -2, -1, -1)
-			.Add(new BMenuField(NULL, fPropertyMenu))
+			.AddGroup(B_VERTICAL, 0)
+				.SetInsets(-2, -2, -1, -1)
+				.Add(new BMenuField(NULL, fPropertyMenu))
+			.End()
+			.Add(new ScrollView(fPropertyListView, SCROLL_VERTICAL,
+				BRect(0, 0, splitWidth, 100), "property scroll view",
+				B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER,
+				BORDER_RIGHT))
 		.End()
-		.Add(new ScrollView(fPropertyListView, SCROLL_VERTICAL,
-			BRect(0, 0, splitWidth, 100), "property scroll view",
-			B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER,
-			BORDER_RIGHT))
 	.End();
 
 	BGroupLayout* topSide = new BGroupLayout(B_HORIZONTAL);
