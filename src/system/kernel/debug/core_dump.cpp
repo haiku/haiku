@@ -777,6 +777,11 @@ struct CoreDumper {
 
 	status_t Dump(const char* path, bool killTeam)
 	{
+		// gcc thinks fTeam may be null in atomic_or
+        // and warn which causes error on some configs
+		if (fTeam == NULL)
+			return B_ERROR;
+
 		// the path must be absolute
 		if (path[0] != '/')
 			return B_BAD_VALUE;
