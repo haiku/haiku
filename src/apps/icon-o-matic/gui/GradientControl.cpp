@@ -24,7 +24,7 @@
 
 
 GradientControl::GradientControl(BMessage* message, BHandler* target)
-	: BView(BRect(0, 0, 259, 19), "gradient control", B_FOLLOW_NONE,
+	: BView(BRect(0, 0, 100, 19), "gradient control", B_FOLLOW_NONE,
 			B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE),
 	  fGradient(new ::Gradient()),
 	  fGradientBitmap(NULL),
@@ -455,7 +455,7 @@ void
 GradientControl::GetPreferredSize(float* width, float* height)
 {
 	if (width != NULL)
-		*width = 259;
+		*width = 100;
 
 	if (height != NULL)
 		*height = 19;
