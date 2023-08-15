@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2023, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -26,6 +26,14 @@ extern "C" ssize_t
 user_strlcpy(char *to, const char *from, size_t size)
 {
 	return strlcpy(to, from, size);
+}
+
+
+extern "C" status_t
+user_memset(void* target, char data, size_t length)
+{
+	memset(target, data, length);
+	return B_OK;
 }
 
 
