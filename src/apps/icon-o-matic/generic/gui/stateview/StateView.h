@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #ifndef STATE_VIEW_H
@@ -40,6 +41,8 @@ class StateView : public BView {
 
 	virtual	status_t			Perform(perform_code code, void* data);
 		// Avoids warning about hiding BView::Perform().
+
+	virtual	void				GetPreferredSize(float* width, float* height);
 
 	// StateView interface
 			void				SetState(ViewState* state);
@@ -83,6 +86,8 @@ class StateView : public BView {
 			void				_RemoveEventFilter();
 
 			void				_TriggerUpdate();
+
+			BRect				fStartingRect;
 
 			ViewState*			fCurrentState;
 			ViewState*			fDropAnticipatingState;

@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "GradientControl.h"
@@ -21,7 +22,7 @@
 
 #include "GradientTransformable.h"
 
-// constructor
+
 GradientControl::GradientControl(BMessage* message, BHandler* target)
 	: BView(BRect(0, 0, 259, 19), "gradient control", B_FOLLOW_NONE,
 			B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE),
@@ -40,7 +41,7 @@ GradientControl::GradientControl(BMessage* message, BHandler* target)
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
-// destructor
+
 GradientControl::~GradientControl()
 {
 	delete fGradient;
@@ -48,8 +49,9 @@ GradientControl::~GradientControl()
 	delete fMessage;
 }
 
+
 #if LIB_LAYOUT
-// layoutprefs
+
 minimax
 GradientControl::layoutprefs()
 {
@@ -63,7 +65,7 @@ GradientControl::layoutprefs()
 	return mpm;
 }
 
-// layout
+
 BRect
 GradientControl::layout(BRect frame)
 {
@@ -71,9 +73,10 @@ GradientControl::layout(BRect frame)
 	ResizeTo(frame.Width(), frame.Height());
 	return Frame();
 }
+
 #endif // LIB_LAYOUT
 
-// WindowActivated
+
 void
 GradientControl::WindowActivated(bool active)
 {
@@ -81,7 +84,7 @@ GradientControl::WindowActivated(bool active)
 		Invalidate();
 }
 
-// MakeFocus
+
 void
 GradientControl::MakeFocus(bool focus)
 {
@@ -96,7 +99,7 @@ GradientControl::MakeFocus(bool focus)
 	BView::MakeFocus(focus);
 }
 
-// MouseDown
+
 void
 GradientControl::MouseDown(BPoint where)
 {
@@ -148,14 +151,14 @@ GradientControl::MouseDown(BPoint where)
 	}
 }
 
-// MouseUp
+
 void
 GradientControl::MouseUp(BPoint where)
 {
 	fDraggingStepIndex = -1;
 }
 
-// MouseMoved
+
 void
 GradientControl::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
@@ -191,7 +194,7 @@ GradientControl::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMe
 	}
 }
 
-// MessageReceived
+
 void
 GradientControl::MessageReceived(BMessage* message)
 {
@@ -232,7 +235,7 @@ GradientControl::MessageReceived(BMessage* message)
 	}
 }
 
-// KeyDown
+
 void
 GradientControl::KeyDown(const char* bytes, int32 numBytes)
 {
@@ -316,7 +319,7 @@ GradientControl::KeyDown(const char* bytes, int32 numBytes)
 	}
 }
 
-// Draw
+
 void
 GradientControl::Draw(BRect updateRect)
 {
@@ -436,7 +439,7 @@ GradientControl::Draw(BRect updateRect)
 	}
 }
 
-// FrameResized
+
 void
 GradientControl::FrameResized(float width, float height)
 {
@@ -447,7 +450,18 @@ GradientControl::FrameResized(float width, float height)
 
 }
 
-// SetGradient
+
+void
+GradientControl::GetPreferredSize(float* width, float* height)
+{
+	if (width != NULL)
+		*width = 259;
+
+	if (height != NULL)
+		*height = 19;
+}
+
+
 void
 GradientControl::SetGradient(const ::Gradient* gradient)
 {
@@ -466,7 +480,7 @@ GradientControl::SetGradient(const ::Gradient* gradient)
 	Invalidate();
 }
 
-// SetCurrentStop
+
 void
 GradientControl::SetCurrentStop(const rgb_color& color)
 {
@@ -477,7 +491,7 @@ GradientControl::SetCurrentStop(const rgb_color& color)
 	}
 }
 
-// GetCurrentStop
+
 bool
 GradientControl::GetCurrentStop(rgb_color* color) const
 {
@@ -490,7 +504,7 @@ GradientControl::GetCurrentStop(rgb_color* color) const
 	return false;
 }
 
-// SetEnabled
+
 void
 GradientControl::SetEnabled(bool enabled)
 {
@@ -506,7 +520,7 @@ GradientControl::SetEnabled(bool enabled)
 	Invalidate();
 }
 
-// blend_colors
+
 inline void
 blend_colors(uint8* d, uint8 alpha, uint8 c1, uint8 c2, uint8 c3)
 {
@@ -523,7 +537,7 @@ blend_colors(uint8* d, uint8 alpha, uint8 c1, uint8 c2, uint8 c3)
 	}
 }
 
-// _UpdateColors
+
 void
 GradientControl::_UpdateColors()
 {
@@ -605,7 +619,7 @@ GradientControl::_UpdateColors()
 	}
 }
 
-// _AllocBitmap
+
 void
 GradientControl::_AllocBitmap(int32 width, int32 height)
 {
@@ -616,7 +630,7 @@ GradientControl::_AllocBitmap(int32 width, int32 height)
 	fGradientBitmap = new BBitmap(BRect(0, 0, width - 1, height - 1), 0, B_RGB32);
 }
 
-// _GradientBitmapRect
+
 BRect
 GradientControl::_GradientBitmapRect() const
 {
@@ -628,7 +642,7 @@ GradientControl::_GradientBitmapRect() const
 	return r;
 }
 
-// _StepIndexFor
+
 int32
 GradientControl::_StepIndexFor(BPoint where) const
 {
@@ -648,7 +662,7 @@ GradientControl::_StepIndexFor(BPoint where) const
 	return index;
 }
 
-// _OffsetFor
+
 float
 GradientControl::_OffsetFor(BPoint where) const
 {
@@ -659,7 +673,7 @@ GradientControl::_OffsetFor(BPoint where) const
 	return offset;
 }
 
-// _UpdateCurrentColor
+
 void
 GradientControl::_UpdateCurrentColor() const
 {

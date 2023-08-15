@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku.
+ * Copyright 2006-2007, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "StateView.h"
@@ -95,12 +96,15 @@ if (dynamic_cast<GradientControl*>(*target))
  	StateView*		fTarget;
 };
 
+
 // #pragma mark -
 
-// constructor
+
 StateView::StateView(BRect frame, const char* name,
 					 uint32 resizingMode, uint32 flags)
 	: BView(frame, name, resizingMode, flags),
+	  fStartingRect(frame),
+
 	  fCurrentState(NULL),
 	  fDropAnticipatingState(NULL),
 
@@ -117,15 +121,16 @@ StateView::StateView(BRect frame, const char* name,
 {
 }
 
-// destructor
+
 StateView::~StateView()
 {
 	delete fEventFilter;
 }
 
+
 // #pragma mark -
 
-// AttachedToWindow
+
 void
 StateView::AttachedToWindow()
 {
@@ -134,7 +139,7 @@ StateView::AttachedToWindow()
 	BView::AttachedToWindow();
 }
 
-// DetachedFromWindow
+
 void
 StateView::DetachedFromWindow()
 {
@@ -143,14 +148,14 @@ StateView::DetachedFromWindow()
 	BView::DetachedFromWindow();
 }
 
-// Draw
+
 void
 StateView::Draw(BRect updateRect)
 {
 	Draw(this, updateRect);
 }
 
-// MessageReceived
+
 void
 StateView::MessageReceived(BMessage* message)
 {
@@ -183,9 +188,10 @@ StateView::MessageReceived(BMessage* message)
 	}
 }
 
+
 // #pragma mark -
 
-// MouseDown
+
 void
 StateView::MouseDown(BPoint where)
 {
@@ -212,7 +218,7 @@ StateView::MouseDown(BPoint where)
 		fLocker->WriteUnlock();
 }
 
-// MouseMoved
+
 void
 StateView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
@@ -250,7 +256,7 @@ StateView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 		fLocker->WriteUnlock();
 }
 
-// MouseUp
+
 void
 StateView::MouseUp(BPoint where)
 {
@@ -280,9 +286,10 @@ StateView::MouseUp(BPoint where)
 		fLocker->WriteUnlock();
 }
 
+
 // #pragma mark -
 
-// KeyDown
+
 void
 StateView::KeyDown(const char* bytes, int32 numBytes)
 {
@@ -298,7 +305,7 @@ StateView::KeyDown(const char* bytes, int32 numBytes)
 	BView::KeyDown(bytes, numBytes);
 }
 
-// KeyUp
+
 void
 StateView::KeyUp(const char* bytes, int32 numBytes)
 {
@@ -327,7 +334,21 @@ StateView::Perform(perform_code code, void* data)
 
 // #pragma mark -
 
-// SetState
+
+void
+StateView::GetPreferredSize(float* width, float* height)
+{
+	if (width != NULL)
+		*width = fStartingRect.Width();
+
+	if (height != NULL)
+		*height = fStartingRect.Height();
+}
+
+
+// #pragma mark -
+
+
 void
 StateView::SetState(ViewState* state)
 {
@@ -344,7 +365,7 @@ StateView::SetState(ViewState* state)
 		fCurrentState->Init();
 }
 
-// UpdateStateCursor
+
 void
 StateView::UpdateStateCursor()
 {
@@ -353,7 +374,7 @@ StateView::UpdateStateCursor()
 	}
 }
 
-// Draw
+
 void
 StateView::Draw(BView* into, BRect updateRect)
 {
@@ -371,14 +392,14 @@ StateView::Draw(BView* into, BRect updateRect)
 		fLocker->ReadUnlock();
 }
 
-// MouseWheelChanged
+
 bool
 StateView::MouseWheelChanged(BPoint where, float x, float y)
 {
 	return false;
 }
 
-// HandleKeyDown
+
 bool
 StateView::HandleKeyDown(uint32 key, uint32 modifiers)
 {
@@ -404,7 +425,7 @@ StateView::HandleKeyDown(uint32 key, uint32 modifiers)
 	return false;
 }
 
-// HandleKeyUp
+
 bool
 StateView::HandleKeyUp(uint32 key, uint32 modifiers)
 {
@@ -430,34 +451,34 @@ StateView::HandleKeyUp(uint32 key, uint32 modifiers)
 	return false;
 }
 
-// FilterMouse
+
 void
 StateView::FilterMouse(BPoint* where) const
 {
 }
 
-// StateForDragMessage
+
 ViewState*
 StateView::StateForDragMessage(const BMessage* message)
 {
 	return NULL;
 }
 
-// SetCommandStack
+
 void
 StateView::SetCommandStack(::CommandStack* stack)
 {
 	fCommandStack = stack;
 }
 
-// SetLocker
+
 void
 StateView::SetLocker(RWLocker* locker)
 {
 	fLocker = locker;
 }
 
-// SetUpdateTarget
+
 void
 StateView::SetUpdateTarget(BHandler* target, uint32 command)
 {
@@ -465,7 +486,7 @@ StateView::SetUpdateTarget(BHandler* target, uint32 command)
 	fUpdateCommand = command;
 }
 
-// SetCatchAllEvents
+
 void
 StateView::SetCatchAllEvents(bool catchAll)
 {
@@ -480,7 +501,7 @@ StateView::SetCatchAllEvents(bool catchAll)
 		_RemoveEventFilter();
 }
 
-// Perform
+
 status_t
 StateView::Perform(Command* command)
 {
@@ -494,23 +515,24 @@ StateView::Perform(Command* command)
 	return B_NO_INIT;
 }
 
+
 // #pragma mark -
 
-// _HandleKeyDown
+
 bool
 StateView::_HandleKeyDown(uint32 key, uint32 modifiers)
 {
 	return false;
 }
 
-// _HandleKeyUp
+
 bool
 StateView::_HandleKeyUp(uint32 key, uint32 modifiers)
 {
 	return false;
 }
 
-// _InstallEventFilter
+
 void
 StateView::_InstallEventFilter()
 {
@@ -525,6 +547,7 @@ StateView::_InstallEventFilter()
 
 	Window()->AddCommonFilter(fEventFilter);
 }
+
 
 void
 StateView::_RemoveEventFilter()
