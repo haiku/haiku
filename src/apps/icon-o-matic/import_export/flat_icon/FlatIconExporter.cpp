@@ -13,7 +13,9 @@
 #include <stdio.h>
 
 #include <Archivable.h>
+#include <Catalog.h>
 #include <DataIO.h>
+#include <Locale.h>
 #include <Message.h>
 #include <Node.h>
 
@@ -32,6 +34,9 @@
 #include "StrokeTransformer.h"
 #include "Style.h"
 #include "VectorPath.h"
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Icon-O-Matic-FlatIconExporter"
 
 using std::nothrow;
 
@@ -90,6 +95,37 @@ FlatIconExporter::Export(const Icon* icon, BPositionIO* stream)
 
 	return B_OK;
 }
+
+
+const char*
+FlatIconExporter::ErrorCodeToString(status_t code)
+{
+	switch (code) {
+		case E_TOO_MANY_PATHS:
+			return B_TRANSLATE("There are too many paths. "
+				"The HVIF format supports a maximum of 255.");
+		case E_PATH_TOO_MANY_POINTS:
+			return B_TRANSLATE("One or more of the paths have too many vertices. "
+				"The HVIF format supports a maximum of 255 vertices per path.");
+		case E_TOO_MANY_SHAPES:
+			return B_TRANSLATE("There are too many shapes. "
+				"The HVIF format supports a maximum of 255.");
+		case E_SHAPE_TOO_MANY_PATHS:
+			return B_TRANSLATE("One or more of the shapes has too many paths. "
+				"The HVIF format supports a maximum of 255 paths per shape.");
+		case E_SHAPE_TOO_MANY_TRANSFORMERS:
+			return B_TRANSLATE("One or more of the shapes have too many transformers. "
+				"The HVIF format supports a maximum of 255 transformers per shape.");
+		case E_TOO_MANY_STYLES:
+			return B_TRANSLATE("There are too many styles. "
+				"The HVIF format supports a maximum of 255.");
+		default:
+			return Exporter::ErrorCodeToString(code);
+	}
+}
+
+
+// #pragma mark -
 
 
 status_t
@@ -206,7 +242,7 @@ status_t
 FlatIconExporter::_WriteStyles(LittleEndianBuffer& buffer, const Container<Style>* styles)
 {
 	if (styles->CountItems() > 255)
-		return B_RESULT_NOT_REPRESENTABLE;
+		return E_TOO_MANY_STYLES;
 	uint8 styleCount = min_c(255, styles->CountItems());
 	if (!buffer.Write(styleCount))
 		return B_NO_MEMORY;
@@ -362,7 +398,7 @@ status_t
 FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, const Container<VectorPath>* paths)
 {
 	if (paths->CountItems() > 255)
-		return B_RESULT_NOT_REPRESENTABLE;
+		return E_TOO_MANY_PATHS;
 	uint8 pathCount = min_c(255, paths->CountItems());
 	if (!buffer.Write(pathCount))
 		return B_NO_MEMORY;
@@ -374,7 +410,7 @@ FlatIconExporter::_WritePaths(LittleEndianBuffer& buffer, const Container<Vector
 			pathFlags |= PATH_FLAG_CLOSED;
 
 		if (path->CountPoints() > 255)
-			return B_RESULT_NOT_REPRESENTABLE;
+			return E_PATH_TOO_MANY_POINTS;
 		uint8 pointCount = min_c(255, path->CountPoints());
 
 		// see if writing segments with commands is more efficient
@@ -487,7 +523,7 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 		return false;
 
 	if (shape->Paths()->CountItems() > 255)
-		return B_RESULT_NOT_REPRESENTABLE;
+		return E_SHAPE_TOO_MANY_PATHS;
 	uint8 pathCount = min_c(255, shape->Paths()->CountItems());
 
 	// write shape type and style index
@@ -508,7 +544,7 @@ _WritePathSourceShape(LittleEndianBuffer& buffer, PathSourceShape* shape,
 	}
 
 	if (shape->Transformers()->CountItems() > 255)
-		return B_RESULT_NOT_REPRESENTABLE;
+		return E_SHAPE_TOO_MANY_TRANSFORMERS;
 	uint8 transformerCount = min_c(255, shape->Transformers()->CountItems());
 
 	// shape flags
@@ -582,7 +618,7 @@ FlatIconExporter::_WriteShapes(LittleEndianBuffer& buffer, const Container<Style
 
 	// Write number of exportable shapes
 	if (pathShapeCount > 255)
-		return B_RESULT_NOT_REPRESENTABLE;
+		return E_TOO_MANY_SHAPES;
 	if (!buffer.Write((uint8) pathShapeCount))
 		return B_NO_MEMORY;
 

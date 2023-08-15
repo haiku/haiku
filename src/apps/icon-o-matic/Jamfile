@@ -319,6 +319,7 @@ DoCatalogs Icon-O-Matic :
 	SVGExporter.cpp
 	SVGImporter.cpp
 	Exporter.cpp
+	FlatIconExporter.cpp
 	AddPathsCommand.cpp
 	AddPointCommand.cpp
 	AddShapesCommand.cpp

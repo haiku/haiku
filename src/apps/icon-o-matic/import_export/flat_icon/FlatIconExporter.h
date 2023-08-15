@@ -26,6 +26,15 @@ _BEGIN_ICON_NAMESPACE
 _END_ICON_NAMESPACE
 
 
+#define HVIF_EXPORTER_ERRORS_BASE		(B_ERRORS_END + 1)
+#define E_TOO_MANY_PATHS				(HVIF_EXPORTER_ERRORS_BASE + 0)
+#define E_PATH_TOO_MANY_POINTS			(HVIF_EXPORTER_ERRORS_BASE + 1)
+#define E_TOO_MANY_SHAPES				(HVIF_EXPORTER_ERRORS_BASE + 2)
+#define E_SHAPE_TOO_MANY_PATHS			(HVIF_EXPORTER_ERRORS_BASE + 3)
+#define E_SHAPE_TOO_MANY_TRANSFORMERS	(HVIF_EXPORTER_ERRORS_BASE + 4)
+#define E_TOO_MANY_STYLES				(HVIF_EXPORTER_ERRORS_BASE + 5)
+
+
 #define PRINT_STATISTICS 0
 
 #if PRINT_STATISTICS
@@ -56,9 +65,10 @@ class FlatIconExporter : public Exporter {
 	// Exporter interface
 	virtual	status_t			Export(const Icon* icon,
 									   BPositionIO* stream);
-
+	virtual const char*			ErrorCodeToString(status_t code);
 	virtual	const char*			MIMEType() { return NULL; }
 
+	// FlatIconExporter
 	/*! Export to file attribute */
 	status_t					Export(const Icon* icon, BNode* node,
 									   const char* attrName);

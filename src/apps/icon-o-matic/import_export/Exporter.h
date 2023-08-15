@@ -6,6 +6,8 @@
 #define EXPORTER_H
 
 
+#include <string.h>
+
 #include <Entry.h>
 #include <OS.h>
 
@@ -38,7 +40,9 @@ class Exporter {
 
 	virtual	status_t			Export(const Icon* icon,
 									   BPositionIO* stream) = 0;
-
+	/*! Turns the status_t error code returned by \c Export into a string. */
+	virtual const char*			ErrorCodeToString(status_t code)
+									{ return strerror(code); }
 	virtual	const char*			MIMEType() = 0;
 
 	/*! If \a selfDestroy is true, class deletes itself when export thread is
