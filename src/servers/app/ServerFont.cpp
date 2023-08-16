@@ -74,8 +74,8 @@ ConicToFunc(const FT_Vector *control, const FT_Vector *to, void *user)
 	BPoint controls[3];
 
 	controls[0] = VectorToPoint(control);
-	controls[1] = VectorToPoint(to);
-	controls[2] = controls[1];
+	controls[1] = controls[0];
+	controls[2] = VectorToPoint(to);
 
 	((BShape *)user)->BezierTo(controls);
 	return 0;

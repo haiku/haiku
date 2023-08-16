@@ -1,9 +1,10 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2009, 2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		François Revol <revol@free.fr>
+ *		Zardshard
  */
 
 #include "StyledTextImporter.h"
@@ -112,16 +113,33 @@ ShapeIterator::IterateBezierTo(int32 bezierCount, BPoint *bezierPts)
 	CALLED();
 	if (!CurrentPath())
 		return B_ERROR;
-	BPoint start(bezierPts[0]);
-	if (fHasLastPoint)
-		start = fLastPoint;
-	while (bezierCount--) {
-		fPath->AddPoint(fOffset + bezierPts[0],
-			fLastPoint, fOffset + bezierPts[1], true);
-		fLastPoint = fOffset + bezierPts[2];
-		bezierPts += 3;
+
+	BPoint firstPoint(fLastPoint);
+	fLastPoint = fOffset + bezierPts[bezierCount * 3 - 1];
+
+	// first point
+	if (firstPoint == fLastPoint) {
+		// combine the first and the last point
+		fPath->AddPoint(firstPoint,
+			fOffset + bezierPts[bezierCount * 3 - 2], fOffset + bezierPts[0], false);
+			// Mark the points as disconnected for now. CleanUp will change this if necessary.
+		fPath->SetClosed(true);
+	} else {
+		fPath->AddPoint(firstPoint, firstPoint, fOffset + bezierPts[0], false);
 	}
-	fPath->AddPoint(fLastPoint);
+
+	// middle points
+	for (int i = 1; i + 2 < bezierCount * 3; i += 3) {
+		fPath->AddPoint(fOffset + bezierPts[i + 1],
+			fOffset + bezierPts[i + 0], fOffset + bezierPts[i + 2], false);
+	}
+
+	// last point
+	if (firstPoint != fLastPoint) {
+		fPath->AddPoint(fLastPoint,
+			fOffset + bezierPts[bezierCount * 3 - 2], fLastPoint, false);
+	}
+
 	fHasLastPoint = true;
 	return B_OK;
 }
@@ -154,6 +172,7 @@ ShapeIterator::NextPath()
 {
 	CALLED();
 	if (fPath) {
+		fPath->CleanUp();
 		fIcon->Paths()->AddItem(fPath);
 		fShape->Paths()->AddItem(fPath);
 	}
