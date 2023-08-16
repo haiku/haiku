@@ -1,9 +1,10 @@
 /*
- * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
+ *		Jorge Acereda, jacereda@gmail.com
  */
 #ifndef MODIFIER_KEYS_WINDOW_H
 #define MODIFIER_KEYS_WINDOW_H
@@ -45,25 +46,28 @@ public:
 	virtual	void					MessageReceived(BMessage* message);
 
 private:
-			BMenuField*				_CreateShiftMenuField();
-			BMenuField*				_CreateControlMenuField();
-			BMenuField*				_CreateOptionMenuField();
-			BMenuField*				_CreateCommandMenuField();
+			void					_CreateMenuField(
+										BPopUpMenu** outMenu, BMenuField** outField,
+										uint32 inKey, const char* comment);
 
 			void					_MarkMenuItems();
+			void					_MarkMenuItem(BPopUpMenu* menu, ConflictView* conflictView,
+										uint32 leftKey, uint32 rightKey);
 			const char*				_KeyToString(int32 key);
 			uint32					_KeyToKeyCode(int32 key,
 										bool right = false);
 			int32					_LastKey();
 			void					_ValidateDuplicateKeys();
+			void					_ValidateDuplicateKey(ConflictView* view, uint32 mask);
 			uint32					_DuplicateKeys();
-			void					_HideShowIcons();
 
+			BPopUpMenu*				fCapsMenu;
 			BPopUpMenu*				fShiftMenu;
 			BPopUpMenu*				fControlMenu;
 			BPopUpMenu*				fOptionMenu;
 			BPopUpMenu*				fCommandMenu;
 
+			ConflictView*			fCapsConflictView;
 			ConflictView*			fShiftConflictView;
 			ConflictView*			fControlConflictView;
 			ConflictView*			fOptionConflictView;
