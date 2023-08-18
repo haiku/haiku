@@ -1181,7 +1181,7 @@ evaluate_debug_expression(const char* expression, uint64* _result, bool silent)
 				kprintf_unfiltered("%s, at position: %d, in expression: %s\n",
 					sExceptionMessage, sExceptionPosition, expression);
 			} else
-				kprintf_unfiltered("%s", sExceptionMessage);
+				kprintf_unfiltered("%s\n", sExceptionMessage);
 		}
 	}
 
@@ -1214,7 +1214,7 @@ evaluate_debug_command(const char* commandLine)
 			kprintf_unfiltered("%s, at position: %d, in command line: %s\n",
 				sExceptionMessage, sExceptionPosition, commandLine);
 		} else
-			kprintf_unfiltered("%s", sExceptionMessage);
+			kprintf_unfiltered("%s\n", sExceptionMessage);
 	}
 
 	sNextJumpBufferIndex--;
@@ -1245,7 +1245,7 @@ parse_next_debug_command_argument(const char** expressionString, char* buffer,
 			kprintf_unfiltered("%s, at position: %d, in command line: %s\n",
 				sExceptionMessage, sExceptionPosition, *expressionString);
 		} else
-			kprintf_unfiltered("%s", sExceptionMessage);
+			kprintf_unfiltered("%s\n", sExceptionMessage);
 		error = B_BAD_VALUE;
 	}
 
