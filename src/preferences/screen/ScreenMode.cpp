@@ -35,7 +35,7 @@
 
 
 
-// Vendors.h is generated using this commands:
+// Vendors.h is generated using these commands (plus a bit of manual editing):
 /*
  * wget https://uefi.org/uefi-pnp-export -O Vendors.h.tmp
  * if [ $? -eq 0 ]; then
