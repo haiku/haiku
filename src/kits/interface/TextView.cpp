@@ -2714,9 +2714,26 @@ BTextView::GetHeightForWidth(float width, float* min, float* max,
 		return;
 	}
 
-	// TODO: don't change the actual text rect!
+	BRect saveTextRect = fTextRect;
+
 	fTextRect.right = fTextRect.left + width;
-	_Refresh(0, fText->Length());
+
+	// If specific insets were set, reduce the width accordingly (this may result in more
+	// linebreaks being inserted)
+	if (fLayoutData->overridden) {
+		fTextRect.left += fLayoutData->leftInset;
+		fTextRect.right -= fLayoutData->rightInset;
+	}
+
+	int32 fromLine = _LineAt(0);
+	int32 toLine = _LineAt(fText->Length());
+	_RecalculateLineBreaks(&fromLine, &toLine);
+
+	// If specific insets were set, add the top and bottom margins to the returned preferred height
+	if (fLayoutData->overridden) {
+		fTextRect.top -= fLayoutData->topInset;
+		fTextRect.bottom += fLayoutData->bottomInset;
+	}
 
 	if (min != NULL)
 		*min = fTextRect.Height();
@@ -2724,6 +2741,12 @@ BTextView::GetHeightForWidth(float width, float* min, float* max,
 		*max = B_SIZE_UNLIMITED;
 	if (preferred != NULL)
 		*preferred = fTextRect.Height();
+
+	// Restore the text rect since we were not supposed to change it in this method.
+	// Unfortunately, we did change a few other things by calling _RecalculateLineBreaks, that are
+	// not so easily undone. However, we are likely to soon get resized to the new width and height
+	// computed here, and that will recompute the linebreaks and do a full _Refresh if needed.
+	fTextRect = saveTextRect;
 }
 
 
