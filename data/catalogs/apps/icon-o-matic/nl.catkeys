@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.haiku-icon_o_matic	157002309
+1	dutch; flemish	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		Geen
 Add empty	Icon-O-Matic-ShapesList		Lege toevoegen
 Opening the icon failed!	Icon-O-Matic-Main		Openen van het icoon is mislukt!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		Annuleren
 Duplicate	Icon-O-Matic-PathsList		Dupliceren
 Save	Icon-O-Matic-Menu-Settings		Opslaan
 Export as…	Icon-O-Matic-Menu-File		Exporteren als...
-Error: 	Icon-O-Matic-Exporter		Fout:
 Diamond	Icon-O-Matic-StyleTypes		Diamantvormig
 Don't save	Icon-O-Matic-Menu-Settings		Niet opslaan
 Add shape with path	Icon-O-Matic-Menu-Shape		Pad met vorm toevoegen

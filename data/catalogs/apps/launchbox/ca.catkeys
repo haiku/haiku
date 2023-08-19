@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-LaunchBox	1530497419
+1	catalan; valencian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Estableix la descripció...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Segur que voleu tancar aquesta barra?\n(No es recordarà.)
 OK	LaunchBox		D'acord
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Mostra la vora de la finestra
 Failed to launch 'something', error in Pad data.	LaunchBox		Ha fallat executar alguna cosa, hi ha hagut un error a les dades de la barra.
 LaunchBox	System name		Executa
 Auto-raise	LaunchBox		Alçament automàtic
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Mida de la icona
 Open containing folder	LaunchBox		Obre la carpeta que el conté
 Add button here	LaunchBox		Afegeix un botó aquí

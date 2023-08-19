@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	157002309
+1	english	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		无
 Add empty	Icon-O-Matic-ShapesList		添加空白
 Opening the icon failed!	Icon-O-Matic-Main		打开图标失败！
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		取消
 Duplicate	Icon-O-Matic-PathsList		副本
 Save	Icon-O-Matic-Menu-Settings		保存
 Export as…	Icon-O-Matic-Menu-File		导出为...
-Error: 	Icon-O-Matic-Exporter		错误：
 Diamond	Icon-O-Matic-StyleTypes		菱形
 Don't save	Icon-O-Matic-Menu-Settings		不保存
 Add shape with path	Icon-O-Matic-Menu-Shape		添加模型（包含路径）

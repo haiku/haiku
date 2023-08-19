@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaConverter	517958556
+1	catalan; valencian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		No es reconeix el fitxer d’entrada com a àudio ni vídeo.
 Source files	MediaConverter		Fitxers d'origen
 Error writing video frame %lld	MediaConverter		Error en escriure el fotograma de vídeo %lld
@@ -65,6 +65,7 @@ Video quality not supported	MediaConverter		No s'admet la qualitat del vídeo.
 Select this folder	MediaConverter		Selecciona aquesta carpeta
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz, canal %ld
 Understood	MediaConverter		Entès
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Sense vídeo
 Continue	MediaConverter		Continua

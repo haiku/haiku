@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DiskProbe	494506599
+1	catalan; valencian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Editor de dades en brut
 Remove	AttributeWindow		Suprimeix
 Close	ProbeView		Tanca
@@ -119,6 +119,7 @@ Double precision floating-point value:	TypeEditors		Valor de coma flotant de dob
 Image	TypeEditors	This is the type of view	Imatge
 Swapped: %lld (0x%0*Lx)	ProbeView		Intercanviat: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Voleu desar els canvis abans de tancar?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Format PNG
 Number	TypeEditors	This is the type of editor	Número
 Edit	ProbeView		Edita

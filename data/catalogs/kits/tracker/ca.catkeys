@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3124217250
+1	catalan; valencian	x-vnd.Haiku-libtracker	1155113004
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -413,6 +413,7 @@ Emptying Trash… 	StatusWindow		Es buida la paperera...
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{per a # fitxer} other{per a # fitxers}}
 Revert	TrackerSettingsWindow		Torna a l'estat anterior
 trash	B_TRASH_DIRECTORY		paperera
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si moveu la carpeta de sistema o el que hi ha, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, mantingueu premuda la tecla Maj. i cliqueu a Mou.
 Close all in workspace	ContainerWindow		Tanca-ho tot de l'espai de treball
 Corrupted expression.	libtracker		Expressió corrupta.
@@ -437,6 +438,7 @@ the config folder	FSUtils		la carpeta de configuració
 Sorry, could not create a new folder.	FSUtils		Disculpeu, no s'ha pogut preparar una carpeta nova.
 MIME Signature	AttributesView		Signatura de MIME
 Select all	VirtualDirectoryWindow		Selecciona-ho tot
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Canvia'n el nom
 Clean up all	ContainerWindow		Neteja-ho tot
 Add current folder	FilePanelPriv		Afegeix la carpeta actual

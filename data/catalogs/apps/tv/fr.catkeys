@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku.TV	181363067
+1	french	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Pas de menu
 No border	MainWin		Pas de bordure
 Error, connecting to interface failed:\n\n	MainWin		Erreur, impossible de se connecter à l’interface :\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forcer 720 × 576, aux proportions 4:3
 Full screen	MainWin		Plein écran
 Scale to native size	MainWin		Redimensionner à la taille native
 unknown	MainWin		inconnu
@@ -16,7 +17,9 @@ Channel	MainWin		Chaîne
 Previous channel	MainWin		Chaîne précédente
 OK	MainWin		OK
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forcer 544 × 576, aux proportions 4:3
 Settings	MainWin		Réglages
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forcer 704 × 576, aux proportions 4:3
 %s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Réglages…

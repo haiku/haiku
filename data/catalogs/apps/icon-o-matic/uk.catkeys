@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	478420397
+1	ukrainian	x-vnd.haiku-icon_o_matic	1565752116
 None	Icon-O-Matic-Properties		Пусто
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистити контур
 Add empty	Icon-O-Matic-ShapesList		Додати порожню
@@ -67,7 +67,6 @@ Cancel	Icon-O-Matic-ColorPicker		Скасувати
 Duplicate	Icon-O-Matic-PathsList		Дублікат
 Save	Icon-O-Matic-Menu-Settings		Зберегти
 Export as…	Icon-O-Matic-Menu-File		Експортувати як…
-Error: 	Icon-O-Matic-Exporter		Помилка: 
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Прибрати {0, plural, one{форму} other{форми}}
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидний
 Don't save	Icon-O-Matic-Menu-Settings		Не зберігати

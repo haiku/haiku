@@ -1,4 +1,4 @@
-1	thai	x-vnd.haiku-icon_o_matic	157002309
+1	thai	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		ไม่มี
 Add empty	Icon-O-Matic-ShapesList		การเพิ่มว่างเปล่า
 Opening the icon failed!	Icon-O-Matic-Main		การเปิดไอคอนล้มเหลว!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		ยกเลิก
 Duplicate	Icon-O-Matic-PathsList		ทำซ้ำ
 Save	Icon-O-Matic-Menu-Settings		บันทึก
 Export as…	Icon-O-Matic-Menu-File		ส่งออกเป็น
-Error: 	Icon-O-Matic-Exporter		ผิดพลาด
 Diamond	Icon-O-Matic-StyleTypes		รูปเพชร
 Don't save	Icon-O-Matic-Menu-Settings		ไม่บันทึก
 Add shape with path	Icon-O-Matic-Menu-Shape		เพิ่มรูปร่างด้วยเส้นทาง

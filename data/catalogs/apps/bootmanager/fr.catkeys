@@ -46,7 +46,7 @@ About to write the boot menu to disk. Are you sure you want to continue?	BootMan
 Partitions	DefaultPartitionPage	Pop up menu title	Partitions
 Default Partition:	DefaultPartitionPage	Menu field label	Partition par défaut :
 Next	WizardView	Button	Suivant
-Previous	WizardView	Button	Précédant
+Previous	WizardView	Button	Précédent
 Uninstallation of boot menu failed	BootManagerController	Title	La désinstallation du menu d’amorçage a échoué
 Incompatible format!	DrivesPage	Cannot install	Format incompatible !
 Old Master Boot Record saved	BootManagerController	Title	Le Master Boot Record d’origine a été sauvegardé

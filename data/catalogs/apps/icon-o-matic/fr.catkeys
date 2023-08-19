@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	1545029995
+1	french	x-vnd.haiku-icon_o_matic	3491926068
 None	Icon-O-Matic-Properties		Aucun
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
@@ -58,7 +58,6 @@ Cancel	Icon-O-Matic-ColorPicker		Annuler
 Duplicate	Icon-O-Matic-PathsList		Dupliquer
 Save	Icon-O-Matic-Menu-Settings		Sauvegarder
 Export as…	Icon-O-Matic-Menu-File		Exporter sous…
-Error: 	Icon-O-Matic-Exporter		Erreur : 
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Don't save	Icon-O-Matic-Menu-Settings		Ne pas sauvegarder
 Add shape with path	Icon-O-Matic-Menu-Shape		Ajouter une forme avec un chemin
@@ -83,6 +82,7 @@ Remove	Icon-O-Matic-PathsList		Enlever
 Style type	Icon-O-Matic-StyleTypes		Type de style
 Quit	Icon-O-Matic-Menu-File		Quitter
 Gradient	Icon-O-Matic-StyleTypes		Dégradé
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Couleur (#%02x%02x%02x)
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Ajoute une forme avec le chemin & le style
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Texte trop long
@@ -92,6 +92,7 @@ Append…	Icon-O-Matic-Menu-File		Ajouter…
 Scale Y	Icon-O-Matic-PropertyNames		Échelle en Y
 Rotate indices forwards	Icon-O-Matic-PathsList		Permuter les indices vers l’avant
 Save	Icon-O-Matic-Menu-File		Enregistrer
+Cancel	Icon-O-Matic-StyledTextImport		Annuler
 Add circle	Icon-O-Matic-PathsList		Ajouter un cercle
 Freeze transformation	Icon-O-Matic-ShapesList		Figer la transformation
 Untitled	Icon-O-Matic-Main		Sans nom
@@ -101,6 +102,7 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Imp
 Save as…	Icon-O-Matic-Menu-File		Enregistrer sous…
 Swatches	Icon-O-Matic-Menus		Nuancier
 <modify path>	Icon-O-Matic-PathCmd		<modifier le chemin>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Définir %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<rien à annuler>
 Add	Icon-O-Matic-StylesList		Ajouter
@@ -112,6 +114,7 @@ Invert selection	Icon-O-Matic-Properties		Inverser la sélection
 <unkown property>	Icon-O-Matic-PropertyNames		<propriétés inconnue>
 Pick a color	Icon-O-Matic-ColorPicker		Choisissez une couleur
 Settings…	Icon-O-Matic-SavePanel		Réglages…
+Select all	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add with style	Icon-O-Matic-ShapesList		Ajouter avec le style
 New	Icon-O-Matic-Menu-File		Nouveau
 Gradient type	Icon-O-Matic-StyleTypes		Type de dégradé

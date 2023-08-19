@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	775662197
+1	slovak	x-vnd.haiku-icon_o_matic	1862993916
 None	Icon-O-Matic-Properties		Žiadne
 Add empty	Icon-O-Matic-ShapesList		Pridať prázdne
 Opening the icon failed!	Icon-O-Matic-Main		Otvorenie ikony zlyhalo!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		Zrušiť
 Duplicate	Icon-O-Matic-PathsList		Duplikovať
 Save	Icon-O-Matic-Menu-Settings		Uložiť
 Export as…	Icon-O-Matic-Menu-File		Exportovať ako…
-Error: 	Icon-O-Matic-Exporter		Chyba: 
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Don't save	Icon-O-Matic-Menu-Settings		Neukladať
 Add shape with path	Icon-O-Matic-Menu-Shape		Pridať tvar s cestou

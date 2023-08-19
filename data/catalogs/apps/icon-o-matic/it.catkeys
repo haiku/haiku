@@ -1,4 +1,4 @@
-1	italian	x-vnd.haiku-icon_o_matic	157002309
+1	italian	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		Nessuno
 Add empty	Icon-O-Matic-ShapesList		Aggiungi vuoto
 Opening the icon failed!	Icon-O-Matic-Main		Fallita l'apertura dell'icona!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		Cancella
 Duplicate	Icon-O-Matic-PathsList		Duplica
 Save	Icon-O-Matic-Menu-Settings		Salva
 Export as…	Icon-O-Matic-Menu-File		Esporta come...
-Error: 	Icon-O-Matic-Exporter		Errore: 
 Diamond	Icon-O-Matic-StyleTypes		Diamante
 Don't save	Icon-O-Matic-Menu-Settings		Non salvare
 Add shape with path	Icon-O-Matic-Menu-Shape		Aggiungi sagoma con percorso

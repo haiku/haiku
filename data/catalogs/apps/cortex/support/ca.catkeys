@@ -1,4 +1,4 @@
-1	catalan; valencian	application/x-vnd.Cortex.support	2097798758
+1	catalan; valencian	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		La capçalera té banderes.
 32 bit HLS	MediaString		HLS de 32 bits
 Recording	MediaString		Gravació
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Dreta
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		RGB de 32 bits
 System mixer	MediaString		Mesclador del sistema
 Physical output	MediaString		Sortida física

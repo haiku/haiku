@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	1432992811
+1	french	application/x-vnd.Cortex.support	3667963625
 Header has flags	MediaString		L’en-tête comporte des drapeaux
 Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
@@ -89,6 +89,7 @@ Big endian	MediaString		Gros-boutiste
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# octet (max)}other{# octets (max)}}
 YUV411	MediaString		YUV411
 Encoded audio	MediaString		Audio compressé
+Decrease precision	MediaString		Réduire la précision
 File interface	MediaString		Interface fichier
 (unknown byte order)	MediaString		(boutisme inconnu)
  (PAL)	MediaString		 (PAL)

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Screen	133788249
+1	catalan; valencian	x-vnd.Haiku-Screen	2318349707
 no	Screen		no
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colors
@@ -13,6 +13,7 @@ Video format:	Screen		Format del vídeo:
 Undo	Screen		Desfés
 OK	Screen		D'acord
 Current workspace	Screen		Espai de treball actual
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		verticalment
 All workspaces	Screen		Tots els espais de treball
 Use laptop panel:	Screen		Usa la pantalla del portàtil:

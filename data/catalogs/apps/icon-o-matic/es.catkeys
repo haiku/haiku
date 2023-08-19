@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	157002309
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		Ninguno
 Add empty	Icon-O-Matic-ShapesList		Agregar vacío
 Opening the icon failed!	Icon-O-Matic-Main		¡Error al abrir el icono!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		Cancelar
 Duplicate	Icon-O-Matic-PathsList		Duplicar
 Save	Icon-O-Matic-Menu-Settings		Guardar
 Export as…	Icon-O-Matic-Menu-File		Exportar como...
-Error: 	Icon-O-Matic-Exporter		Error:
 Diamond	Icon-O-Matic-StyleTypes		Diamante
 Don't save	Icon-O-Matic-Menu-Settings		No guardar
 Add shape with path	Icon-O-Matic-Menu-Shape		Agregar forma con ruta

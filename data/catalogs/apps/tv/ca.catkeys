@@ -1,7 +1,8 @@
-1	catalan; valencian	x-vnd.Haiku.TV	3120244932
+1	catalan; valencian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Sense menú
 No border	MainWin		Sense vora
 Error, connecting to interface failed:\n\n	MainWin		Ha fallat la connexió a la interfície:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	força 720 × 576, aspecte de pantalla 4:3
 Full screen	MainWin		Pantalla completa
 Scale to native size	MainWin		Escala a la mida nativa
 unknown	MainWin		desconegut
@@ -16,7 +17,10 @@ Channel	MainWin		Canal
 Previous channel	MainWin		Canal anterior
 OK	MainWin		D'acord
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	força 544 × 576, aspecte de pantalla 4:3
 Settings	MainWin		Paràmetres
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	força 704 × 576, aspecte de pantalla 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Paràmetres…
 None	MainWin		Cap

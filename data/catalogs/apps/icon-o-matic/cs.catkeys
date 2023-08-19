@@ -1,4 +1,4 @@
-1	czech	x-vnd.haiku-icon_o_matic	1308365995
+1	czech	x-vnd.haiku-icon_o_matic	2395697714
 None	Icon-O-Matic-Properties		Žádný
 Add empty	Icon-O-Matic-ShapesList		Přidat prázdný
 Opening the icon failed!	Icon-O-Matic-Main		Otevření ikony selhalo!
@@ -56,7 +56,6 @@ Cancel	Icon-O-Matic-ColorPicker		Zrušit
 Duplicate	Icon-O-Matic-PathsList		Duplikovat
 Save	Icon-O-Matic-Menu-Settings		Uložit
 Export as…	Icon-O-Matic-Menu-File		Exportovat jako...
-Error: 	Icon-O-Matic-Exporter		Chyba:
 Diamond	Icon-O-Matic-StyleTypes		Kosočtverec
 Don't save	Icon-O-Matic-Menu-Settings		Neukládat
 Add shape with path	Icon-O-Matic-Menu-Shape		Přidat tvar s cestou

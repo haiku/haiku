@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.haiku-icon_o_matic	3445526951
+1	lithuanian	x-vnd.haiku-icon_o_matic	237891374
 None	Icon-O-Matic-Properties		Nieko
 Add empty	Icon-O-Matic-ShapesList		Pridėti tuščią
 Opening the icon failed!	Icon-O-Matic-Main		Piktogramos atverti nepavyko!
@@ -54,7 +54,6 @@ Cancel	Icon-O-Matic-ColorPicker		Atsisakyti
 Duplicate	Icon-O-Matic-PathsList		Dubliuoti
 Save	Icon-O-Matic-Menu-Settings		Įrašyti
 Export as…	Icon-O-Matic-Menu-File		Eksportuoti kaip…
-Error: 	Icon-O-Matic-Exporter		Klaida: 
 Diamond	Icon-O-Matic-StyleTypes		Rombinis
 Don't save	Icon-O-Matic-Menu-Settings		Neįrašyti
 Add shape with path	Icon-O-Matic-Menu-Shape		Pridėti figūrą su kreive

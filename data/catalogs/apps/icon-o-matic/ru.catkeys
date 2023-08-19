@@ -1,4 +1,4 @@
-1	russian	x-vnd.haiku-icon_o_matic	157002309
+1	russian	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		Ничего
 Add empty	Icon-O-Matic-ShapesList		Добавить пустую
 Opening the icon failed!	Icon-O-Matic-Main		Не удалось открыть значок!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		Отмена
 Duplicate	Icon-O-Matic-PathsList		Дублировать
 Save	Icon-O-Matic-Menu-Settings		Сохранить
 Export as…	Icon-O-Matic-Menu-File		Экспортировать как…
-Error: 	Icon-O-Matic-Exporter		Ошибка: 
 Diamond	Icon-O-Matic-StyleTypes		Ромбовидный
 Don't save	Icon-O-Matic-Menu-Settings		Не сохранять
 Add shape with path	Icon-O-Matic-Menu-Shape		Добавить форму с контуром

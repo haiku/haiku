@@ -1,8 +1,9 @@
-1	catalan; valencian	x-vnd.haiku.SerialConnect	354154115
+1	catalan; valencian	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Maquinari
 Connection	SerialWindow		Connexió
 Raw send…	SerialWindow		Enviament en cru...
 Baud rate	SerialWindow		Velocitat de transmissió
+Paste	SerialWindow		Enganxa
 Stop bits	SerialWindow		Bits d'aturada
 None	SerialWindow	Flowcontrol	Cap
 Cancel	Custom baudrate window		Cancel·la

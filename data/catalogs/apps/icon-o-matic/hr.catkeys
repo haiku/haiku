@@ -1,4 +1,4 @@
-1	croatian	x-vnd.haiku-icon_o_matic	2251728879
+1	croatian	x-vnd.haiku-icon_o_matic	3339060598
 None	Icon-O-Matic-Properties		Nijedan
 Add empty	Icon-O-Matic-ShapesList		Dodaj prazno
 Opening the icon failed!	Icon-O-Matic-Main		Neuspjelo otvaranje ikone!
@@ -42,7 +42,6 @@ Cancel	Icon-O-Matic-ColorPicker		Odustani
 Duplicate	Icon-O-Matic-PathsList		Udvostruči
 Save	Icon-O-Matic-Menu-Settings		Spremi
 Export as…	Icon-O-Matic-Menu-File		Izvezi kao...
-Error: 	Icon-O-Matic-Exporter		Greška: 
 Diamond	Icon-O-Matic-StyleTypes		Dijamant
 Don't save	Icon-O-Matic-Menu-Settings		Ne spremaj
 Overwrite	Icon-O-Matic-SVGExport		Prebriši

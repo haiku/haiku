@@ -1,4 +1,4 @@
-1	polish	x-vnd.haiku-icon_o_matic	157002309
+1	polish	x-vnd.haiku-icon_o_matic	1244334028
 None	Icon-O-Matic-Properties		Nic
 Add empty	Icon-O-Matic-ShapesList		Dodaj pusty
 Opening the icon failed!	Icon-O-Matic-Main		Otwieranie ikony nie powiodło się!
@@ -55,7 +55,6 @@ Cancel	Icon-O-Matic-ColorPicker		Anuluj
 Duplicate	Icon-O-Matic-PathsList		Duplikuj
 Save	Icon-O-Matic-Menu-Settings		Zapisz
 Export as…	Icon-O-Matic-Menu-File		Eksportuj jako…
-Error: 	Icon-O-Matic-Exporter		Błąd: 
 Diamond	Icon-O-Matic-StyleTypes		Diament
 Don't save	Icon-O-Matic-Menu-Settings		Nie zapisuj
 Add shape with path	Icon-O-Matic-Menu-Shape		Dodaj kształt ze ścieżką
