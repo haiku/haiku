@@ -6,9 +6,9 @@ BootstrapPackageRepository HaikuPortsCross
 	noto-20170202-7
 	:
 	# repository architecture packages (stage 0)
-	gcc_bootstrap-13.1.0_2023_06_20-1
-	gcc_bootstrap_syslibs-13.1.0_2023_06_20-1
-	gcc_bootstrap_syslibs_devel-13.1.0_2023_06_20-1
+	gcc_bootstrap-13.2.0_2023_08_10-1
+	gcc_bootstrap_syslibs-13.2.0_2023_08_10-1
+	gcc_bootstrap_syslibs_devel-13.2.0_2023_08_10-1
 	:
 	# repository architecture packages (stage 1)
 	bash_bootstrap-4.4.023-1
