@@ -413,7 +413,8 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 static status_t
 ufs2_rewind_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	DirectoryIterator *iterator = (DirectoryIterator *)_cookie;
+	return iterator->Rewind();
 }
 
 

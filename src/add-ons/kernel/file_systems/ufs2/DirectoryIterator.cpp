@@ -90,3 +90,10 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 	return B_ERROR;
 }
 
+
+status_t
+DirectoryIterator::Rewind()
+{
+	fOffset = 0;
+	return B_OK;
+}
