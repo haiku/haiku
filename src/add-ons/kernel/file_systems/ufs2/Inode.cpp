@@ -104,7 +104,7 @@ Inode::ReadAt(off_t file_offset, uint8* buffer, size_t* _length)
 	off_t endBlockNumber = (file_offset + *_length) / blockSize;
 	off_t blockOffset = file_offset % blockSize;
 	ssize_t length = 0;
-	if (size <= file_offset) {
+	if (size <= file_offset || size < 0 || file_offset < 0) {
 		*_length = 0;
 		return B_OK;
 	}
