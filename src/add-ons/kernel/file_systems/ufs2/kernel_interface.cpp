@@ -214,8 +214,7 @@ ufs2_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
 
-	status_t status = DirectoryIterator(directory).Lookup(name, strlen(name),
-		(ino_t*)_vnodeID);
+	status_t status = DirectoryIterator(directory).Lookup(name, _vnodeID);
 
 	if (status != B_OK)
 		return status;

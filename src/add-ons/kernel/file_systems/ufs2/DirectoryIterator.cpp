@@ -42,18 +42,19 @@ DirectoryIterator::InitCheck()
 
 
 status_t
-DirectoryIterator::Lookup(const char* name, size_t length, ino_t* _id)
+DirectoryIterator::Lookup(const char* name, ino_t* _id)
 {
 	if (strcmp(name, ".") == 0) {
 		*_id = fInode->ID();
 		return B_OK;
 	}
 
-	char getname[B_FILE_NAME_LENGTH];
+	char getname[B_FILE_NAME_LENGTH + 1];
 
 	status_t status;
 	while(true) {
-		status = GetNext(getname, &length, _id);
+		size_t len = sizeof (getname) - 1;
+		status = GetNext(getname, &len, _id);
 		if (status != B_OK)
 			return status;
 		if (strcmp(getname, name) == 0)

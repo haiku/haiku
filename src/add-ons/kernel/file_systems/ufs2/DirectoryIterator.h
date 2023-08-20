@@ -42,8 +42,7 @@ public:
 								~DirectoryIterator();
 
 			status_t			InitCheck();
-			status_t			Lookup(const char* name, size_t length,
-										ino_t* id);
+			status_t			Lookup(const char* name, ino_t* id);
 			status_t			GetNext(char* name, size_t* _nameLength,
 										ino_t* _id);
 			status_t			_GetNext(const char* name, size_t* _nameLength,
