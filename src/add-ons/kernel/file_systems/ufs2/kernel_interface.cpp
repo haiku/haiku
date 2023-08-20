@@ -184,7 +184,7 @@ ufs2_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 static bool
 ufs2_can_page(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	return false;
 }
 
 
