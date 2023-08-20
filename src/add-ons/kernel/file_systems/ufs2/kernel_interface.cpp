@@ -271,7 +271,10 @@ ufs2_open(fs_volume * _volume, fs_vnode *_node, int openMode,
 {
 	//Volume* volume = (Volume*)_volume->private_volume;
 	Inode* inode = (Inode*)_node->private_node;
-	if (inode->IsDirectory())
+
+	// opening a directory read-only is allowed, although you can't read
+	// any data from it.
+	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
 
 	file_cookie* cookie = new(std::nothrow) file_cookie;
