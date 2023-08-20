@@ -137,8 +137,10 @@ ufs2_read_fs_info(fs_volume *_volume, struct fs_info *info)
 	info->io_size = 65536;
 	info->block_size = volume->SuperBlock().fs_sbsize;
 	info->total_blocks = volume->SuperBlock().fs_size;
+	info->free_blocks = volume->SuperBlock().fs_cstotal.cs_nbfree;
 
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
+	strlcpy(info->fsh_name, "UFS2", sizeof(info->fsh_name));
 
 	return B_OK;
 }
