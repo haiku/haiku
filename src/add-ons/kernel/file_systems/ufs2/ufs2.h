@@ -73,17 +73,6 @@ typedef uint64_t ufs2_daddr_t;
  */
 
 /*
- * MINBSIZE is the smallest allowable block size.
- * In order to insure that it is possible to create files of size
- * 2^32 with only two levels of indirection, MINBSIZE is set to 4096.
- * MINBSIZE must be big enough to hold a cylinder group block,
- * thus changes to (struct cg) must keep its size within MINBSIZE.
- * Note that super blocks are always of size SBLOCKSIZE,
- * and that both SBLOCKSIZE and MAXBSIZE must be >= MINBSIZE.
- */
-#define	MINBSIZE			4096
-
-/*
  * The path name on which the filesystem is mounted is maintained
  * in fs_fsmnt. MAXMNTLEN defines the amount of space allocated in
  * the super block for this name.

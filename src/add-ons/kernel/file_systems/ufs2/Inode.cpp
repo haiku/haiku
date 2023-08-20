@@ -26,23 +26,25 @@ Inode::Inode(Volume* volume, ino_t id)
 {
 	rw_lock_init(&fLock, "ufs2 inode");
 
-	fInitStatus = B_OK;//UpdateNodeFromDisk();
+	int fd = fVolume->Device();
+	ufs2_super_block* superblock = (ufs2_super_block* )&fVolume->SuperBlock();
+	int64_t fs_block = ino_to_fsba(superblock, id);
+	int64_t offset_in_block = ino_to_fsbo(superblock, id);
+	int64_t offset = fs_block * superblock->fs_fsize + offset_in_block * sizeof(fNode);
+
+	if (read_pos(fd, offset, (void*)&fNode, sizeof(fNode)) != sizeof(fNode)) {
+		ERROR("Inode::Inode(): IO Error\n");
+		fInitStatus = B_IO_ERROR;
+		return;
+	}
+	fInitStatus = B_OK;
+
 	if (fInitStatus == B_OK) {
 		if (!IsDirectory() && !IsSymLink()) {
 			fCache = file_cache_create(fVolume->ID(), ID(), Size());
 			fMap = file_map_create(fVolume->ID(), ID(), Size());
 		}
 	}
-	int fd = fVolume->Device();
-	ufs2_super_block* superblock = (ufs2_super_block* )&fVolume->SuperBlock();
-	int64_t fs_block = ino_to_fsba(superblock, id);
-	int64_t offset_in_block = ino_to_fsbo(superblock, id);
-	int64_t offset = fs_block * MINBSIZE + offset_in_block * sizeof(fNode);
-
-	if (read_pos(fd, offset, (void*)&fNode, sizeof(fNode)) != sizeof(fNode))
-		ERROR("Inode::Inode(): IO Error\n");
-
-
 }
 
 
