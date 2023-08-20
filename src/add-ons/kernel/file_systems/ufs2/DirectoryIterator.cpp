@@ -7,6 +7,7 @@
 #include "DirectoryIterator.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "Inode.h"
 
