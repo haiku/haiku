@@ -26,7 +26,7 @@ struct ufs2_inode {
 	int32_t		groupId;
 	int32_t		inodeBlockSize;
 	int64_t		size;
-	int64_t		byteHeld;
+	int64_t		inodeBlocks;
 	struct		timeval32	accessTime;
 	struct		timeval32	modifiedTime;
 	struct		timeval32	changeTime;
@@ -101,6 +101,9 @@ class Inode {
 			off_t		Size() const { return fNode.size; }
 			uid_t		UserID() const { return fNode.userId; }
 			gid_t		GroupID() const { return fNode.groupId; }
+			int16_t		LinkCount() const { return fNode.linkCount; }
+			uint64_t	NumBlocks() const
+							{ return fNode.inodeBlocks * (fNode.inodeBlockSize >> 9); }
 			void		GetChangeTime(struct timespec& timespec) const
 							{ fNode.GetChangeTime(timespec); }
 			void		GetModificationTime(struct timespec& timespec) const

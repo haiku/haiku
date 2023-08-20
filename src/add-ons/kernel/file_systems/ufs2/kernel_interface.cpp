@@ -243,9 +243,7 @@ ufs2_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	Inode* inode = (Inode*)_node->private_node;
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
-//	TODO handle hardlinks which will have nlink > 1. Maybe linkCount in inode
-//	structure may help?
-	stat->st_nlink = 1;
+	stat->st_nlink = inode->LinkCount();
 	stat->st_blksize = 65536;
 
 	stat->st_uid = inode->UserID();
@@ -259,7 +257,7 @@ ufs2_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	inode->GetCreationTime(stat->st_crtim);
 
 	stat->st_size = inode->Size();
-	stat->st_blocks = (inode->Size() + 511) / 512;
+	stat->st_blocks = inode->NumBlocks();
 
 	return B_OK;
 }
