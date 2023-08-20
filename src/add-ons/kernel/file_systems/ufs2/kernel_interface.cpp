@@ -320,7 +320,8 @@ ufs2_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 static status_t
 ufs2_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 {
-	return B_OK;
+	Inode* inode = (Inode*)_node->private_node;
+	return inode->CheckPermissions(accessMode);
 }
 
 

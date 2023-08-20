@@ -232,3 +232,15 @@ Inode::ReadLink(char* buffer, size_t *_bufferSize)
 	strlcpy(buffer, fNode.symlinkpath, *_bufferSize);
 	return B_OK;
 }
+
+
+status_t
+Inode::CheckPermissions(int accessMode) const
+{
+	// you never have write access to a read-only volume
+	if ((accessMode & W_OK) != 0/* && fVolume->IsReadOnly()*/)
+		return B_READ_ONLY_DEVICE;
+
+	return check_access_permissions(accessMode, Mode(), (gid_t)GroupID(),
+		(uid_t)UserID());
+}

@@ -109,6 +109,7 @@ class Inode {
 							{ fNode.GetCreationTime(timespec); }
 			void		GetAccessTime(struct timespec& timespec) const
 							{ fNode.GetAccessTime(timespec); }
+			status_t	CheckPermissions(int accessMode) const;
 
 			Volume*		GetVolume() const { return fVolume; }
 
