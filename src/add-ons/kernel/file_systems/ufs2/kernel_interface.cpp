@@ -307,14 +307,17 @@ ufs2_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 static status_t
 ufs2_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
 ufs2_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	file_cookie* cookie = (file_cookie*)_cookie;
+
+	delete cookie;
+	return B_OK;
 }
 
 static status_t
@@ -428,14 +431,15 @@ static status_t
 ufs2_close_dir(fs_volume * /*_volume*/, fs_vnode * /*node*/,
 			  void * /*_cookie*/)
 {
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
 ufs2_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	delete (DirectoryIterator*)_cookie;
+	return B_OK;
 }
 
 
