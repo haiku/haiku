@@ -30,10 +30,8 @@ ufs2_super_block::IsValid()
 const char*
 Volume::Name() const
 {
-	if (fSuperBlock.fs_volname[0])
-		return fSuperBlock.fs_volname;
-
-	return fName;
+	// The name may be empty, in that case, userspace will generate one.
+	return fSuperBlock.fs_volname;
 }
 
 

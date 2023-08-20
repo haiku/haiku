@@ -46,7 +46,6 @@ static	status_t				Identify(int fd, ufs2_super_block* superBlock);
 		mutex				fLock;
 		uint32				fFlags;
 		Inode*				fRootNode;
-		char				fName[32];
 };
 
 #endif	// VOLUME_H
