@@ -117,7 +117,12 @@ ufs2_mount(fs_volume *_volume, const char *device, uint32 flags,
 static status_t
 ufs2_unmount(fs_volume *_volume)
 {
-	return B_NOT_SUPPORTED;
+	Volume* volume = (Volume *)_volume->private_volume;
+
+	status_t status = volume->Unmount();
+	delete volume;
+
+	return status;
 }
 
 
