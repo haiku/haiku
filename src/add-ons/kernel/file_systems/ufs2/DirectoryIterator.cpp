@@ -70,16 +70,10 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 	dir direct;
 	size_t size = sizeof(dir);
 	status_t status = fInode->ReadAt(fOffset, (uint8_t*)&direct, &size);
+	if (size < 8 || direct.reclen < 8)
+		return B_ENTRY_NOT_FOUND;
 	if (status == B_OK) {
-		int remainder = direct.namlen % 4;
-		if(remainder != 0) {
-			remainder = 4 - remainder;
-			remainder = direct.namlen + remainder;
-		} else {
-			remainder = direct.namlen + 4;
-		}
-
-		fOffset = fOffset + 8 + remainder;
+		fOffset += direct.reclen;
 
 		if (direct.next_ino > 0) {
 			if ((direct.namlen + 1) > *_nameLength)
