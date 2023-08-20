@@ -29,26 +29,6 @@ struct identify_cookie
 };
 
 
-#if 0
-//!	ufs2_io() callback hook
-static status_t
-iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
-						size_t size, struct file_io_vec *vecs, size_t *_count)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-//!	ufs2_io() callback hook
-static status_t
-iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
-{
-	return B_NOT_SUPPORTED;
-}
-#endif
-
-
 //	#pragma mark - Scanning
 static float
 ufs2_identify_partition(int fd, partition_data *partition, void **_cookie)
@@ -578,29 +558,6 @@ ufs2_remove_attr(fs_volume *_volume, fs_vnode *vnode,
 }
 
 
-static uint32
-ufs2_get_supported_operations(partition_data *partition, uint32 mask)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-static status_t
-ufs2_initialize(int fd, partition_id partitionID, const char *name,
-			const char *parameterString, off_t partitionSize, disk_job_id job)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-static status_t
-ufs2_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
-				 uint32 blockSize, disk_job_id job)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
 //	#pragma mark -
 
 static status_t
@@ -719,7 +676,7 @@ static file_system_module_info sufs2FileSystem = {
 	"Unix Filesystem 2", // pretty_name
 
 	// DDM flags
-	0| B_DISK_SYSTEM_SUPPORTS_INITIALIZING |B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+	B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
 	//	| B_DISK_SYSTEM_SUPPORTS_WRITING
 	,
 
@@ -730,28 +687,7 @@ static file_system_module_info sufs2FileSystem = {
 	NULL, // free_partition_content_cookie()
 
 	&ufs2_mount,
-
-	/* capability querying operations */
-	&ufs2_get_supported_operations,
-
-	NULL, // validate_resize
-	NULL, // validate_move
-	NULL, // validate_set_content_name
-	NULL, // validate_set_content_parameters
-	NULL, // validate_initialize,
-
-	/* shadow partition modification */
-	NULL, // shadow_changed
-
-	/* writing */
-	NULL, // defragment
-	NULL, // repair
-	NULL, // resize
-	NULL, // move
-	NULL, // set_content_name
-	NULL, // set_content_parameters
-	ufs2_initialize,
-	ufs2_uninitialize};
+};
 
 module_info *modules[] = {
 	(module_info *)&sufs2FileSystem,
