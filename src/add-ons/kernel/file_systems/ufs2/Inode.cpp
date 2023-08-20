@@ -108,14 +108,14 @@ Inode::ReadAt(off_t file_offset, uint8* buffer, size_t* _length)
 		*_length = 0;
 		return B_OK;
 	}
-	if (*_length > size - file_offset)
+	if ((int64_t) *_length > size - file_offset)
 		*_length = size - file_offset;
 	if (startBlockNumber != endBlockNumber) {
 		ssize_t remainingLength = blockSize - blockOffset;
 		for (; startBlockNumber <= endBlockNumber; startBlockNumber++) {
 			//code for reading multiple blocks
 			pos = FindBlock(startBlockNumber, blockOffset);
-			if (remainingLength > *_length - length)
+			if (remainingLength > (int64_t) *_length - length)
 				remainingLength = *_length - length;
 			length += read_pos(fd, pos, buffer + length, remainingLength);
 			blockOffset = 0;

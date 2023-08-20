@@ -76,7 +76,7 @@ DirectoryIterator::GetNext(char* name, size_t* _nameLength, ino_t* _id)
 		fOffset += direct.reclen;
 
 		if (direct.next_ino > 0) {
-			if ((direct.namlen + 1) > *_nameLength)
+			if ((size_t) (direct.namlen + 1) > *_nameLength)
 				return B_BUFFER_OVERFLOW;
 			strlcpy(name, direct.name, direct.namlen + 1);
 			*_id = direct.next_ino;
