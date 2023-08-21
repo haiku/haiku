@@ -207,7 +207,7 @@ pch_thermal_support(device_node *parent)
 		return 0.0;
 
 	const uint16 devices[] = { 0x9c24, 0x8c24, 0x9ca4, 0x9d31, 0xa131, 0x9df9,
-		0xa379, 0x06f9, 0x02f9, 0 };
+		0xa379, 0x06f9, 0x02f9, 0xa1b1, 0x8d24, 0 };
 	for (const uint16* device = devices; *device != 0; device++) {
 		if (*device == deviceID)
 			return 0.6;
