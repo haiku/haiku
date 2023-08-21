@@ -10,10 +10,16 @@ SubDirC++Flags [ FDefines _GNU_SOURCE=1 ] ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		UsePrivateSystemHeaders ;
+		if $(TARGET_ARCH) = x86_64 {
+			SubDirC++Flags -mrdpid ;
+		}
+
 		SharedLibrary [ MultiArchDefaultGristFiles libgnu.so ] :
 			crypt.cpp
 			memmem.c
 			qsort.c
+			sched_getcpu.cpp
 			xattr.cpp
 			;
 	}

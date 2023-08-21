@@ -3915,3 +3915,11 @@ _user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 
 	return common_setrlimit(resource, &resourceLimit);
 }
+
+
+int
+_user_get_cpu()
+{
+	Thread* thread = thread_get_current_thread();
+	return thread->cpu->cpu_num;
+}
