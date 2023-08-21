@@ -5,6 +5,8 @@
 
 #include <string.h>
 
+#include <file_systems/fs_ops_support.h>
+
 #include "DirectoryIterator.h"
 #include "Inode.h"
 #include "system_dependencies.h"
@@ -221,8 +223,12 @@ ufs2_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
 
-	status_t status = DirectoryIterator(directory).Lookup(name, _vnodeID);
+	// check access permissions
+	status_t status = directory->CheckPermissions(X_OK);
+	if (status < B_OK)
+		return status;
 
+	status = DirectoryIterator(directory).Lookup(name, _vnodeID);
 	if (status != B_OK)
 		return status;
 
@@ -276,6 +282,11 @@ ufs2_open(fs_volume * _volume, fs_vnode *_node, int openMode,
 	// any data from it.
 	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
+
+	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode)
+		| (openMode & O_TRUNC ? W_OK : 0));
+	if (status != B_OK)
+		return status;
 
 	file_cookie* cookie = new(std::nothrow) file_cookie;
 	if (cookie == NULL)
@@ -369,6 +380,10 @@ static status_t
 ufs2_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 {
 	Inode* inode = (Inode*)_node->private_node;
+
+	status_t status = inode->CheckPermissions(R_OK);
+	if (status < B_OK)
+		return status;
 
 	if (!inode->IsDirectory())
 		return B_NOT_A_DIRECTORY;
