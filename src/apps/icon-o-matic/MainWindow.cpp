@@ -255,48 +255,49 @@ MainWindow::MessageReceived(BMessage* message)
 		}
 
 		case B_PASTE:
-		case B_MIME_DATA:
 		{
-			BMessage* clip = message;
-			status_t err;
-
 			if (discard)
 				break;
 
-			if (message->what == B_PASTE) {
-				if (!be_clipboard->Lock())
-					break;
-				clip = be_clipboard->Data();
-			}
+			if (!be_clipboard->Lock())
+				break;
 
-			if (!clip || !clip->HasData("text/plain", B_MIME_TYPE)) {
-				if (message->what == B_PASTE)
-					be_clipboard->Unlock();
+			BMessage* clip = be_clipboard->Data();
+
+			if (!clip) {
+				be_clipboard->Unlock();
 				break;
 			}
 
-			Icon* icon = new (std::nothrow) Icon(*fDocument->Icon());
-			if (icon != NULL) {
-				StyledTextImporter importer;
-				err = importer.Import(icon, clip);
-				if (err >= B_OK) {
-					AutoWriteLocker locker(fDocument);
+			if (clip->HasData("text/plain", B_MIME_TYPE)) {
+				AddStyledText(clip);
+			} else if (clip->HasData(
+					"application/x-vnd.icon_o_matic-listview-message", B_MIME_TYPE)) {
+				ssize_t length;
+				const char* data = NULL;
+				if (clip->FindData("application/x-vnd.icon_o_matic-listview-message",
+						B_MIME_TYPE, (const void**)&data, &length) != B_OK)
+					break;
 
-					SetIcon(NULL);
+				BMessage archive;
+				archive.Unflatten(data);
 
-					// incorporate the loaded icon into the document
-					// (either replace it or append to it)
-					fDocument->MakeEmpty(false);
-						// if append, the document savers are preserved
-					fDocument->SetIcon(icon);
-					SetIcon(icon);
-				}
+				if (archive.what == PathListView::kSelectionArchiveCode)
+					fPathListView->HandlePaste(&archive);
+				if (archive.what == ShapeListView::kSelectionArchiveCode)
+					fShapeListView->HandlePaste(&archive);
+				if (archive.what == StyleListView::kSelectionArchiveCode)
+					fStyleListView->HandlePaste(&archive);
+				if (archive.what == TransformerListView::kSelectionArchiveCode)
+					fTransformerListView->HandlePaste(&archive);
 			}
 
-			if (message->what == B_PASTE)
-				be_clipboard->Unlock();
+			be_clipboard->Unlock();
 			break;
 		}
+		case B_MIME_DATA:
+			AddStyledText(message);
+			break;
 
 		case MSG_OPEN:
 		{
@@ -893,6 +894,29 @@ MainWindow::AddReferenceImage(const entry_ref& ref)
 	}
 
 	fDocument->CommandStack()->Perform(shapeCommand);
+}
+
+
+void
+MainWindow::AddStyledText(BMessage* message)
+{
+	Icon* icon = new (std::nothrow) Icon(*fDocument->Icon());
+	if (icon != NULL) {
+		StyledTextImporter importer;
+		status_t err = importer.Import(icon, message);
+		if (err >= B_OK) {
+			AutoWriteLocker locker(fDocument);
+
+			SetIcon(NULL);
+
+			// incorporate the loaded icon into the document
+			// (either replace it or append to it)
+			fDocument->MakeEmpty(false);
+				// if append, the document savers are preserved
+			fDocument->SetIcon(icon);
+			SetIcon(icon);
+		}
+	}
 }
 
 

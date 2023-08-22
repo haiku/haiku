@@ -223,19 +223,72 @@ TransformerListView::MessageReceived(BMessage* message)
 }
 
 
-void
-TransformerListView::MakeDragMessage(BMessage* message) const
+status_t
+TransformerListView::ArchiveSelection(BMessage* into, bool deep) const
 {
-	SimpleListView::MakeDragMessage(message);
-	message->AddPointer("container", fShape);
-	int32 count = CountItems();
+	into->what = TransformerListView::kSelectionArchiveCode;
+
+	int32 count = CountSelectedItems();
 	for (int32 i = 0; i < count; i++) {
-		TransformerItem* item = dynamic_cast<TransformerItem*>(ItemAt(CurrentSelection(i)));
-		if (item) {
-			message->AddPointer("transformer", (void*)item->transformer);
+		TransformerItem* item = dynamic_cast<TransformerItem*>(
+			ItemAt(CurrentSelection(i)));
+		if (item != NULL) {
+			BMessage archive;
+			if (item->transformer->Archive(&archive, deep) == B_OK)
+				into->AddMessage("transformer", &archive);
 		} else
-			break;
+			return B_ERROR;
 	}
+
+	return B_OK;
+}
+
+
+bool
+TransformerListView::InstantiateSelection(const BMessage* archive, int32 dropIndex)
+{
+	if (archive->what != TransformerListView::kSelectionArchiveCode
+		|| fCommandStack == NULL || fShape == NULL)
+		return false;
+
+	// Drag may have come from another instance, like in another window.
+	// Reconstruct the Styles from the archive and add them at the drop
+	// index.
+	int index = 0;
+	BList transformers;
+	while (true) {
+		BMessage transformerArchive;
+		if (archive->FindMessage("transformer", index, &transformerArchive) != B_OK)
+			break;
+
+		Transformer* transformer = TransformerFactory::TransformerFor(
+			&transformerArchive, fShape->VertexSource(), fShape);
+		if (transformer == NULL)
+			break;
+
+		if (!transformers.AddItem(transformer)) {
+			delete transformer;
+			break;
+		}
+
+		index++;
+	}
+
+	int32 count = transformers.CountItems();
+	if (count == 0)
+		return false;
+
+	AddTransformersCommand* command = new(nothrow) AddTransformersCommand(
+		fShape->Transformers(), (Transformer**)transformers.Items(), count, dropIndex);
+	if (command == NULL) {
+		for (int32 i = 0; i < count; i++)
+			delete (Transformer*)transformers.ItemAtFast(i);
+		return false;
+	}
+
+	fCommandStack->Perform(command);
+
+	return true;
 }
 
 

@@ -242,11 +242,11 @@ ShapeListView::MessageReceived(BMessage* message)
 }
 
 
-void
-ShapeListView::MakeDragMessage(BMessage* message) const
+status_t
+ShapeListView::ArchiveSelection(BMessage* into, bool deep) const
 {
-	SimpleListView::MakeDragMessage(message);
-	message->AddPointer("container", fShapeContainer);
+	into->what = ShapeListView::kSelectionArchiveCode;
+
 	int32 count = CountSelectedItems();
 	for (int32 i = 0; i < count; i++) {
 		ShapeListItem* item = dynamic_cast<ShapeListItem*>(
@@ -254,13 +254,10 @@ ShapeListView::MakeDragMessage(BMessage* message) const
 		if (item != NULL && item->shape != NULL) {
 			PathSourceShape* pathSourceShape = dynamic_cast<PathSourceShape*>(item->shape);
 			if (pathSourceShape != NULL) {
-				message->AddInt32("type", PathSourceShape::archive_code);
-
 				PathSourceShape* shape = pathSourceShape;
-				message->AddPointer("shape", (void*)shape);
 
-				// Add archives of everything this Shape uses
 				BMessage archive;
+				archive.what = PathSourceShape::archive_code;
 
 				BMessage styleArchive;
 				shape->Style()->Archive(&styleArchive, true);
@@ -277,54 +274,35 @@ ShapeListView::MakeDragMessage(BMessage* message) const
 				shape->Archive(&shapeArchive, true);
 				archive.AddMessage("shape", &shapeArchive);
 
-				message->AddMessage("shape archive", &archive);
+				into->AddMessage("shape archive", &archive);
 				continue;
 			}
 
 			ReferenceImage* referenceImage = dynamic_cast<ReferenceImage*>(item->shape);
 			if (referenceImage != NULL) {
-				message->AddInt32("type", ReferenceImage::archive_code);
-
-				message->AddPointer("shape", (void*)referenceImage);
-
-				// Add archives of everything this Shape uses
 				BMessage archive;
+				archive.what = ReferenceImage::archive_code;
 
 				BMessage shapeArchive;
 				referenceImage->Archive(&shapeArchive, true);
 				archive.AddMessage("shape", &shapeArchive);
 
-				message->AddMessage("shape archive", &archive);
+				into->AddMessage("shape archive", &archive);
 				continue;
 			}
 		} else
-			break;
+			return B_ERROR;
 	}
+
+	return B_OK;
 }
 
 
 bool
-ShapeListView::AcceptDragMessage(const BMessage* message) const
+ShapeListView::InstantiateSelection(const BMessage* archive, int32 dropIndex)
 {
-	return SimpleListView::AcceptDragMessage(message);
-}
-
-
-void
-ShapeListView::SetDropTargetRect(const BMessage* message, BPoint where)
-{
-	SimpleListView::SetDropTargetRect(message, where);
-}
-
-
-bool
-ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
-{
-	// Let SimpleListView handle drag-sorting (when drag came from ourself)
-	if (SimpleListView::HandleDropMessage(message, dropIndex))
-		return true;
-
-	if (fCommandStack == NULL || fShapeContainer == NULL
+	if (archive->what != ShapeListView::kSelectionArchiveCode
+		|| fCommandStack == NULL || fShapeContainer == NULL
 		|| fStyleContainer == NULL || fPathContainer == NULL) {
 		return false;
 	}
@@ -337,23 +315,14 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 	BList paths;
 	BList shapes;
 	while (true) {
-		int32 type;
-		if (message->FindInt32("type", index, &type) != B_OK)
+		BMessage shapeArchive;
+		if (archive->FindMessage("shape archive", index, &shapeArchive) != B_OK)
 			break;
 
-		if (type == PathSourceShape::archive_code) {
-			BMessage archive;
-			if (message->FindMessage("shape archive", index, &archive) != B_OK)
-				break;
-
-			// Extract the shape archive
-			BMessage shapeArchive;
-			if (archive.FindMessage("shape", &shapeArchive) != B_OK)
-				break;
-
+		if (shapeArchive.what == PathSourceShape::archive_code) {
 			// Extract the style
 			BMessage styleArchive;
-			if (archive.FindMessage("style", &styleArchive) != B_OK)
+			if (shapeArchive.FindMessage("style", &styleArchive) != B_OK)
 				break;
 
 			Style* style = new Style(&styleArchive);
@@ -383,7 +352,11 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 			if (shape == NULL)
 				break;
 
-			if (shape->Unarchive(&shapeArchive) != B_OK
+			// Extract the shape archive
+			BMessage shapeMessage;
+			if (shapeArchive.FindMessage("shape", &shapeMessage) != B_OK)
+				break;
+			if (shape->Unarchive(&shapeMessage) != B_OK
 				|| !shapes.AddItem(shape)) {
 				delete shape;
 				if (style != NULL) {
@@ -397,7 +370,7 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 			int pathIndex = 0;
 			while (true) {
 				BMessage pathArchive;
-				if (archive.FindMessage("path", pathIndex, &pathArchive) != B_OK)
+				if (shapeArchive.FindMessage("path", pathIndex, &pathArchive) != B_OK)
 					break;
 
 				VectorPath* path = new(nothrow) VectorPath(&pathArchive);
@@ -424,16 +397,12 @@ ShapeListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 
 				pathIndex++;
 			}
-		} else if (type == ReferenceImage::archive_code) {
-			BMessage archive;
-			if (message->FindMessage("shape archive", index, &archive) != B_OK)
+		} else if (shapeArchive.what == ReferenceImage::archive_code) {
+			BMessage shapeMessage;
+			if (shapeArchive.FindMessage("shape", &shapeMessage) != B_OK)
 				break;
 
-			BMessage shapeArchive;
-			if (archive.FindMessage("shape", &shapeArchive) != B_OK)
-				break;
-
-			ReferenceImage* shape = new (std::nothrow) ReferenceImage(&shapeArchive);
+			ReferenceImage* shape = new (std::nothrow) ReferenceImage(&shapeMessage);
 			if (shape == NULL)
 				break;
 

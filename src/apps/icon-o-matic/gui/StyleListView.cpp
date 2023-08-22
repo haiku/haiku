@@ -1,6 +1,10 @@
 /*
  * Copyright 2006-2012, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2023, Haiku.
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Zardshard
  */
 
 
@@ -432,48 +436,31 @@ StyleListView::MouseDown(BPoint where)
 }
 
 
-void
-StyleListView::MakeDragMessage(BMessage* message) const
+status_t
+StyleListView::ArchiveSelection(BMessage* into, bool deep) const
 {
-	SimpleListView::MakeDragMessage(message);
-	message->AddPointer("container", fStyleContainer);
+	into->what = StyleListView::kSelectionArchiveCode;
+
 	int32 count = CountSelectedItems();
 	for (int32 i = 0; i < count; i++) {
 		StyleListItem* item = dynamic_cast<StyleListItem*>(
 			ItemAt(CurrentSelection(i)));
 		if (item != NULL) {
-			message->AddPointer("style", (void*)item->style);
 			BMessage archive;
 			if (item->style->Archive(&archive, true) == B_OK)
-				message->AddMessage("style archive", &archive);
+				into->AddMessage("style", &archive);
 		} else
-			break;
+			return B_ERROR;
 	}
+	return B_OK;
 }
 
 
 bool
-StyleListView::AcceptDragMessage(const BMessage* message) const
+StyleListView::InstantiateSelection(const BMessage* archive, int32 dropIndex)
 {
-	return SimpleListView::AcceptDragMessage(message);
-}
-
-
-void
-StyleListView::SetDropTargetRect(const BMessage* message, BPoint where)
-{
-	SimpleListView::SetDropTargetRect(message, where);
-}
-
-
-bool
-StyleListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
-{
-	// Let SimpleListView handle drag-sorting (when drag came from ourself)
-	if (SimpleListView::HandleDropMessage(message, dropIndex))
-		return true;
-
-	if (fCommandStack == NULL || fStyleContainer == NULL)
+	if (archive->what != StyleListView::kSelectionArchiveCode
+		|| fCommandStack == NULL || fStyleContainer == NULL)
 		return false;
 
 	// Drag may have come from another instance, like in another window.
@@ -482,13 +469,13 @@ StyleListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 	int index = 0;
 	BList styles;
 	while (true) {
-		BMessage archive;
-		if (message->FindMessage("style archive", index, &archive) != B_OK)
+		BMessage styleArchive;
+		if (archive->FindMessage("style", index, &styleArchive) != B_OK)
 			break;
-		Style* style = new(std::nothrow) Style(&archive);
+		Style* style = new(std::nothrow) Style(&styleArchive);
 		if (style == NULL)
 			break;
-		
+
 		if (!styles.AddItem(style)) {
 			delete style;
 			break;

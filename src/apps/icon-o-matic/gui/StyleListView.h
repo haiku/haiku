@@ -1,6 +1,10 @@
 /*
  * Copyright 2006-2007, 2011, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2023, Haiku.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Zardshard
  */
 #ifndef STYLE_LIST_VIEW_H
 #define STYLE_LIST_VIEW_H
@@ -29,6 +33,9 @@ _USING_ICON_NAMESPACE
 
 class StyleListView : public SimpleListView, public ContainerListener<Style> {
 public:
+	enum {
+		kSelectionArchiveCode	= 'sstl',
+	};
 								StyleListView(BRect frame, const char* name,
 									BMessage* selectionMessage = NULL,
 									BHandler* target = NULL);
@@ -41,14 +48,8 @@ public:
 
 	virtual	void				MouseDown(BPoint where);
 
-	virtual	void				MakeDragMessage(BMessage* message) const;
-
-	virtual	bool				AcceptDragMessage(
-									const BMessage* message) const;
-	virtual	void				SetDropTargetRect(const BMessage* message,
-									BPoint where);
-	virtual	bool				HandleDropMessage(const BMessage* message,
-									int32 dropIndex);
+	virtual	status_t			ArchiveSelection(BMessage* into, bool deep = true) const;
+	virtual	bool				InstantiateSelection(const BMessage* archive, int32 dropIndex);
 
 	virtual	void				MoveItems(BList& items, int32 toIndex);
 	virtual	void				CopyItems(BList& items, int32 toIndex);

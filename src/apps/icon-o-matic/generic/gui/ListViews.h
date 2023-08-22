@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #ifndef LIST_VIEWS_H
@@ -204,7 +205,22 @@ class SimpleListView :
 	virtual	BListItem*		CloneItem(int32 atIndex) const;
 	virtual	void			DrawListItem(BView* owner, int32 index,
 										 BRect itemFrame) const;
+
+	/*! Archive the selected items.
+		The information should be sufficient for \c InstantiateSelection to
+		create a new copy of the objects without relying on the original object.
+	*/
+	virtual	status_t		ArchiveSelection(BMessage* into, bool deep = true) const = 0;
+	/*! Put a copy of the items archived by \c ArchiveSelection into the list.
+		This method should ensure whether the item is truly meant for the list
+		view.
+	*/
+	virtual	bool			InstantiateSelection(const BMessage* archive, int32 dropIndex) = 0;
+
 	virtual	void			MakeDragMessage(BMessage* message) const;
+	virtual	bool			HandleDropMessage(const BMessage* message,
+								int32 dropIndex);
+			bool			HandlePaste(const BMessage* archive);
 
  protected:
 			void			_MakeEmpty();

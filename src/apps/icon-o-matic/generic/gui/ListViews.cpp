@@ -1,9 +1,10 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006, 2023, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "ListViews.h"
@@ -13,12 +14,14 @@
 #include <typeinfo>
 
 #include <Bitmap.h>
+#include <Clipboard.h>
 #include <Cursor.h>
 #include <Entry.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <StackOrHeapArray.h>
 #include <String.h>
 #include <Window.h>
 
@@ -34,17 +37,21 @@ enum {
 	MSG_TICK	= 'tick',
 };
 
-// SimpleItem class
+
+// #pragma mark - SimpleItem
+
+
 SimpleItem::SimpleItem(const char *name)
 	: BStringItem(name)
 {
 }
 
+
 SimpleItem::~SimpleItem()
 {
 }
 
-// SimpleItem::DrawItem
+
 void
 SimpleItem::Draw(BView *owner, BRect frame, uint32 flags)
 {
@@ -70,7 +77,7 @@ SimpleItem::Draw(BView *owner, BRect frame, uint32 flags)
 	owner->DrawString(truncatedString.String(), textPoint);
 }
 
-// SimpleItem::DrawBackground
+
 void
 SimpleItem::DrawBackground(BView *owner, BRect frame, uint32 flags)
 {
@@ -93,7 +100,10 @@ SimpleItem::DrawBackground(BView *owner, BRect frame, uint32 flags)
 	owner->FillRect(frame, B_SOLID_LOW);
 }
 
-// DragSortableListView class
+
+// #pragma mark - DragSortableListView
+
+
 DragSortableListView::DragSortableListView(BRect frame, const char* name,
 										   list_view_type type, uint32 resizingMode,
 										   uint32 flags)
@@ -114,6 +124,7 @@ DragSortableListView::DragSortableListView(BRect frame, const char* name,
 	SetViewColor(B_TRANSPARENT_32_BIT);
 }
 
+
 DragSortableListView::~DragSortableListView()
 {
 	delete fMouseWheelFilter;
@@ -122,7 +133,7 @@ DragSortableListView::~DragSortableListView()
 	SetSelection(NULL);
 }
 
-// AttachedToWindow
+
 void
 DragSortableListView::AttachedToWindow()
 {
@@ -137,22 +148,22 @@ DragSortableListView::AttachedToWindow()
 	BListView::FrameResized(bounds.Width(), bounds.Height());
 }
 
-// DetachedFromWindow
+
 void
 DragSortableListView::DetachedFromWindow()
 {
 	Window()->RemoveCommonFilter(fMouseWheelFilter);
 }
 
-// FrameResized
+
 void
 DragSortableListView::FrameResized(float width, float height)
 {
 	BListView::FrameResized(width, height);
 }
 
+
 /*
-// MakeFocus
 void
 DragSortableListView::MakeFocus(bool focused)
 {
@@ -162,7 +173,8 @@ DragSortableListView::MakeFocus(bool focused)
 	}
 }
 */
-// Draw
+
+
 void
 DragSortableListView::Draw(BRect updateRect)
 {
@@ -198,7 +210,7 @@ DragSortableListView::Draw(BRect updateRect)
 	}*/
 }
 
-// ScrollTo
+
 void
 DragSortableListView::ScrollTo(BPoint where)
 {
@@ -210,7 +222,7 @@ DragSortableListView::ScrollTo(BPoint where)
 	BListView::ScrollTo(where);
 }
 
-// TargetedByScrollView
+
 void
 DragSortableListView::TargetedByScrollView(BScrollView* scrollView)
 {
@@ -218,7 +230,7 @@ DragSortableListView::TargetedByScrollView(BScrollView* scrollView)
 	BListView::TargetedByScrollView(scrollView);
 }
 
-// InitiateDrag
+
 bool
 DragSortableListView::InitiateDrag(BPoint point, int32 index, bool)
 {
@@ -315,7 +327,7 @@ DragSortableListView::InitiateDrag(BPoint point, int32 index, bool)
 	return success;
 }
 
-// WindowActivated
+
 void
 DragSortableListView::WindowActivated(bool active)
 {
@@ -324,7 +336,7 @@ DragSortableListView::WindowActivated(bool active)
 		view->Invalidate();
 }
 
-// MessageReceived
+
 void
 DragSortableListView::MessageReceived(BMessage* message)
 {
@@ -386,7 +398,7 @@ DragSortableListView::MessageReceived(BMessage* message)
 	}
 }
 
-// KeyDown
+
 void
 DragSortableListView::KeyDown(const char* bytes, int32 numBytes)
 {
@@ -399,7 +411,7 @@ DragSortableListView::KeyDown(const char* bytes, int32 numBytes)
 	BListView::KeyDown(bytes, numBytes);
 }
 
-// MouseDown
+
 void
 DragSortableListView::MouseDown(BPoint where)
 {
@@ -437,7 +449,7 @@ DragSortableListView::MouseDown(BPoint where)
 	}
 }
 
-// MouseMoved
+
 void
 DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *msg)
 {
@@ -477,7 +489,7 @@ DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *m
 	fLastMousePos = where;
 }
 
-// MouseUp
+
 void
 DragSortableListView::MouseUp(BPoint where)
 {
@@ -492,7 +504,7 @@ DragSortableListView::MouseUp(BPoint where)
 	SetViewCursor(&cursor, true);
 }
 
-// DrawItem
+
 void
 DragSortableListView::DrawItem(BListItem *item, BRect itemFrame, bool complete)
 {
@@ -503,9 +515,7 @@ DragSortableListView::DrawItem(BListItem *item, BRect itemFrame, bool complete)
 	}*/
 }
 
-// #pragma mark -
 
-// MouseWheelChanged
 bool
 DragSortableListView::MouseWheelChanged(float x, float y)
 {
@@ -518,9 +528,10 @@ DragSortableListView::MouseWheelChanged(float x, float y)
 		return false;
 }
 
+
 // #pragma mark -
 
-// ObjectChanged
+
 void
 DragSortableListView::ObjectChanged(const Observable* object)
 {
@@ -562,23 +573,24 @@ DragSortableListView::ObjectChanged(const Observable* object)
 //printf("%s - done\n", Name());
 }
 
+
 // #pragma mark -
 
-// SetDragCommand
+
 void
 DragSortableListView::SetDragCommand(uint32 command)
 {
 	fDragCommand = command;
 }
 
-// ModifiersChaned
+
 void
 DragSortableListView::ModifiersChanged()
 {
 	SetDropTargetRect(&fDragMessageCopy, fLastMousePos);
 }
 
-// SetItemFocused
+
 void
 DragSortableListView::SetItemFocused(int32 index)
 {
@@ -587,14 +599,14 @@ DragSortableListView::SetItemFocused(int32 index)
 	fFocusedIndex = index;
 }
 
-// AcceptDragMessage
+
 bool
 DragSortableListView::AcceptDragMessage(const BMessage* message) const
 {
 	return message->what == fDragCommand;
 }
 
-// SetDropTargetRect
+
 void
 DragSortableListView::SetDropTargetRect(const BMessage* message, BPoint where)
 
@@ -611,7 +623,7 @@ DragSortableListView::SetDropTargetRect(const BMessage* message, BPoint where)
 			// offset where by half of item height
 			r = ItemFrame(0);
 			where.y += r.Height() / 2.0;
-	
+
 			int32 index = IndexOf(where);
 			if (index < 0)
 				index = CountItems();
@@ -652,7 +664,7 @@ DragSortableListView::HandleDropMessage(const BMessage* message,
 	return true;
 }
 
-// SetAutoScrolling
+
 void
 DragSortableListView::SetAutoScrolling(bool enable)
 {
@@ -668,14 +680,14 @@ DragSortableListView::SetAutoScrolling(bool enable)
 	}
 }
 
-// DoesAutoScrolling
+
 bool
 DragSortableListView::DoesAutoScrolling() const
 {
 	return fScrollPulse;
 }
 
-// ScrollTo
+
 void
 DragSortableListView::ScrollTo(int32 index)
 {
@@ -695,7 +707,7 @@ DragSortableListView::ScrollTo(int32 index)
 	}
 }
 
-// MoveItems
+
 void
 DragSortableListView::MoveItems(BList& items, int32 index)
 {
@@ -726,7 +738,7 @@ DragSortableListView::MoveItems(BList& items, int32 index)
 	}
 }
 
-// CopyItems
+
 void
 DragSortableListView::CopyItems(BList& items, int32 index)
 {
@@ -754,7 +766,7 @@ DragSortableListView::CopyItems(BList& items, int32 index)
 	}
 }
 
-// RemoveItemList
+
 void
 DragSortableListView::RemoveItemList(BList& items)
 {
@@ -766,7 +778,7 @@ DragSortableListView::RemoveItemList(BList& items)
 	}
 }
 
-// RemoveSelected
+
 void
 DragSortableListView::RemoveSelected()
 {
@@ -779,9 +791,10 @@ DragSortableListView::RemoveSelected()
 	RemoveItemList(items);
 }
 
+
 // #pragma mark -
 
-// SetSelection
+
 void
 DragSortableListView::SetSelection(Selection* selection)
 {
@@ -797,28 +810,28 @@ DragSortableListView::SetSelection(Selection* selection)
 		fSelection->AddObserver(this);
 }
 
-// IndexOfSelectable
+
 int32
 DragSortableListView::IndexOfSelectable(Selectable* selectable) const
 {
 	return -1;
 }
 
-// SelectableFor
+
 Selectable*
 DragSortableListView::SelectableFor(BListItem* item) const
 {
 	return NULL;
 }
 
-// SelectAll
+
 void
 DragSortableListView::SelectAll()
 {
 	Select(0, CountItems() - 1);
 }
 
-// CountSelectedItems
+
 int32
 DragSortableListView::CountSelectedItems() const
 {
@@ -828,7 +841,7 @@ DragSortableListView::CountSelectedItems() const
 	return count;
 }
 
-// SelectionChanged
+
 void
 DragSortableListView::SelectionChanged()
 {
@@ -864,9 +877,10 @@ DragSortableListView::SelectionChanged()
 	fModifyingSelection = false;
 }
 
+
 // #pragma mark -
 
-// DeleteItem
+
 bool
 DragSortableListView::DeleteItem(int32 index)
 {
@@ -878,7 +892,7 @@ DragSortableListView::DeleteItem(int32 index)
 	return false;
 }
 
-// _SetDropAnticipationRect
+
 void
 DragSortableListView::_SetDropAnticipationRect(BRect r)
 {
@@ -891,7 +905,7 @@ DragSortableListView::_SetDropAnticipationRect(BRect r)
 	}
 }
 
-// _SetDropIndex
+
 void
 DragSortableListView::_SetDropIndex(int32 index)
 {
@@ -920,7 +934,7 @@ DragSortableListView::_SetDropIndex(int32 index)
 	}
 }
 
-// _RemoveDropAnticipationRect
+
 void
 DragSortableListView::_RemoveDropAnticipationRect()
 {
@@ -928,7 +942,7 @@ DragSortableListView::_RemoveDropAnticipationRect()
 //	_SetDropIndex(-1);
 }
 
-// _SetDragMessage
+
 void
 DragSortableListView::_SetDragMessage(const BMessage* message)
 {
@@ -938,9 +952,10 @@ DragSortableListView::_SetDragMessage(const BMessage* message)
 		fDragMessageCopy.what = 0;
 }
 
+
 // #pragma mark - SimpleListView
 
-// SimpleListView class
+
 SimpleListView::SimpleListView(BRect frame, BMessage* selectionChangeMessage)
 	: DragSortableListView(frame, "playlist listview",
 						   B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL,
@@ -950,7 +965,7 @@ SimpleListView::SimpleListView(BRect frame, BMessage* selectionChangeMessage)
 {
 }
 
-// SimpleListView class
+
 SimpleListView::SimpleListView(BRect frame, const char* name,
 							   BMessage* selectionChangeMessage,
 							   list_view_type type,
@@ -960,14 +975,15 @@ SimpleListView::SimpleListView(BRect frame, const char* name,
 {
 }
 
-// destructor
+
 SimpleListView::~SimpleListView()
 {
 	delete fSelectionChangeMessage;
 }
 
+
 #ifdef LIB_LAYOUT
-// layoutprefs
+
 minimax
 SimpleListView::layoutprefs()
 {
@@ -979,7 +995,7 @@ SimpleListView::layoutprefs()
 	return mpm;
 }
 
-// layout
+
 BRect
 SimpleListView::layout(BRect frame)
 {
@@ -987,9 +1003,10 @@ SimpleListView::layout(BRect frame)
 	ResizeTo(frame.Width(), frame.Height());
 	return Frame();
 }
+
 #endif // LIB_LAYOUT
 
-// DetachedFromWindow
+
 void
 SimpleListView::DetachedFromWindow()
 {
@@ -997,18 +1014,49 @@ SimpleListView::DetachedFromWindow()
 	_MakeEmpty();
 }
 
-// MessageReceived
+
 void
 SimpleListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		// NOTE: pasting is handled in MainWindow::MessageReceived
+		case B_COPY:
+		{
+			int count = CountSelectedItems();
+			if (count == 0)
+				return;
+
+			if (!be_clipboard->Lock())
+				break;
+			be_clipboard->Clear();
+
+			BMessage data;
+			ArchiveSelection(&data);
+
+			ssize_t size = data.FlattenedSize();
+			BStackOrHeapArray<char, 1024> archive(size);
+			if (!archive) {
+				be_clipboard->Unlock();
+				break;
+			}
+			data.Flatten(archive, size);
+
+			be_clipboard->Data()->AddData(
+				"application/x-vnd.icon_o_matic-listview-message", B_MIME_TYPE, archive, size);
+
+			be_clipboard->Commit();
+			be_clipboard->Unlock();
+
+			break;
+		}
+
 		default:
 			DragSortableListView::MessageReceived(message);
 			break;
 	}
 }
 
-// CloneItem
+
 BListItem*
 SimpleListView::CloneItem(int32 atIndex) const
 {
@@ -1018,7 +1066,7 @@ SimpleListView::CloneItem(int32 atIndex) const
 	return clone;
 }
 
-// DrawListItem
+
 void
 SimpleListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 {
@@ -1032,7 +1080,7 @@ SimpleListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 	}
 }
 
-// MakeDragMessage
+
 void
 SimpleListView::MakeDragMessage(BMessage* message) const
 {
@@ -1043,9 +1091,35 @@ SimpleListView::MakeDragMessage(BMessage* message) const
 		for (int32 i = 0; (index = CurrentSelection(i)) >= 0; i++)
 			message->AddInt32("index", index);
 	}
+
+	BMessage items;
+	ArchiveSelection(&items);
+	message->AddMessage("items", &items);
 }
 
-// _MakeEmpty
+
+bool
+SimpleListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
+{
+	// Let DragSortableListView handle drag-sorting (when drag came from ourself)
+	if (DragSortableListView::HandleDropMessage(message, dropIndex))
+		return true;
+
+	BMessage items;
+	if (message->FindMessage("items", &items) != B_OK)
+		return false;
+
+	return InstantiateSelection(&items, dropIndex);
+}
+
+
+bool
+SimpleListView::HandlePaste(const BMessage* archive)
+{
+	return InstantiateSelection(archive, CountItems());
+}
+
+
 void
 SimpleListView::_MakeEmpty()
 {

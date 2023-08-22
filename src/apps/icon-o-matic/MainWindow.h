@@ -77,7 +77,9 @@ public:
 									bool append = false);
 			void				Open(const BMessenger& externalObserver,
 									const uint8* data, size_t size);
+
 			void				AddReferenceImage(const entry_ref& ref);
+			void				AddStyledText(BMessage* pasteData);
 
 			void				StoreSettings(BMessage* archive);
 			void				RestoreSettings(const BMessage* archive);

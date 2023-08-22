@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2012, 2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Zardshard
  */
 
 #include "PathListView.h"
@@ -512,48 +513,32 @@ PathListView::MessageReceived(BMessage* message)
 }
 
 
-void
-PathListView::MakeDragMessage(BMessage* message) const
+status_t
+PathListView::ArchiveSelection(BMessage* into, bool deep) const
 {
-	SimpleListView::MakeDragMessage(message);
-	message->AddPointer("container", fPathContainer);
+	into->what = PathListView::kSelectionArchiveCode;
+
 	int32 count = CountSelectedItems();
 	for (int32 i = 0; i < count; i++) {
 		PathListItem* item = dynamic_cast<PathListItem*>(
 			ItemAt(CurrentSelection(i)));
 		if (item != NULL) {
-			message->AddPointer("path", (void*)item->path);
 			BMessage archive;
-			if (item->path->Archive(&archive, true) == B_OK)
-				message->AddMessage("path archive", &archive);
+			if (item->path->Archive(&archive, deep) == B_OK)
+				into->AddMessage("path", &archive);
 		} else
-			break;
+			return B_ERROR;
 	}
+
+	return B_OK;
 }
 
 
 bool
-PathListView::AcceptDragMessage(const BMessage* message) const
+PathListView::InstantiateSelection(const BMessage* archive, int32 dropIndex)
 {
-	return SimpleListView::AcceptDragMessage(message);
-}
-
-
-void
-PathListView::SetDropTargetRect(const BMessage* message, BPoint where)
-{
-	SimpleListView::SetDropTargetRect(message, where);
-}
-
-
-bool
-PathListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
-{
-	// Let SimpleListView handle drag-sorting (when drag came from ourself)
-	if (SimpleListView::HandleDropMessage(message, dropIndex))
-		return true;
-
-	if (fCommandStack == NULL || fPathContainer == NULL)
+	if (archive->what != PathListView::kSelectionArchiveCode
+		|| fCommandStack == NULL || fPathContainer == NULL)
 		return false;
 
 	// Drag may have come from another instance, like in another window.
@@ -562,14 +547,14 @@ PathListView::HandleDropMessage(const BMessage* message, int32 dropIndex)
 	int index = 0;
 	BList paths;
 	while (true) {
-		BMessage archive;
-		if (message->FindMessage("path archive", index, &archive) != B_OK)
+		BMessage pathArchive;
+		if (archive->FindMessage("path", index, &pathArchive) != B_OK)
 			break;
 
-		VectorPath* path = new(std::nothrow) VectorPath(&archive);
+		VectorPath* path = new(std::nothrow) VectorPath(&pathArchive);
 		if (path == NULL)
 			break;
-		
+
 		if (!paths.AddItem(path)) {
 			delete path;
 			break;

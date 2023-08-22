@@ -30,6 +30,9 @@ _END_ICON_NAMESPACE
 class TransformerListView : public SimpleListView,
 							public ContainerListener<Transformer> {
  public:
+	enum {
+		kSelectionArchiveCode		= 'strn',
+	};
 								TransformerListView(BRect frame,
 											  const char* name,
 											  BMessage* selectionMessage = NULL,
@@ -43,7 +46,8 @@ class TransformerListView : public SimpleListView,
 
 	virtual	void				MessageReceived(BMessage* message);
 
-	virtual	void				MakeDragMessage(BMessage* message) const;
+	virtual	status_t			ArchiveSelection(BMessage* into, bool deep = true) const;
+	virtual	bool				InstantiateSelection(const BMessage* archive, int32 dropIndex);
 
 	virtual	void				MoveItems(BList& items, int32 toIndex);
 	virtual	void				CopyItems(BList& items, int32 toIndex);
