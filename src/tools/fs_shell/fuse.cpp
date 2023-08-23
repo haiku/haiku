@@ -341,6 +341,20 @@ fuse_write(const char* path, const char* buf, size_t size, off_t offset,
 }
 
 
+static int
+fuse_truncate(const char *path, off_t off)
+{
+	PRINTD("##truncate\n");
+
+	struct fssh_stat st;
+	st.fssh_st_size = off;
+	fssh_status_t res = _kern_write_stat(-1, path, true, &st, sizeof(st), FSSH_B_STAT_SIZE);
+	if (res < FSSH_B_OK)
+		return _ERR(res);
+	return 0;
+}
+
+
 static void
 fuse_destroy(void* priv_data)
 {
@@ -402,7 +416,7 @@ initialiseFuseOps(struct fuse_operations* fuseOps)
 	fuseOps->link		= fuse_link;
 	fuseOps->chmod		= fuse_chmod;
 	fuseOps->chown		= fuse_chown;
-	fuseOps->truncate	= NULL;
+	fuseOps->truncate	= fuse_truncate;
 	fuseOps->utimens	= NULL;
 	fuseOps->open		= fuse_open;
 	fuseOps->read		= fuse_read;
