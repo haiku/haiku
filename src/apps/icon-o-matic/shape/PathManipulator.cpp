@@ -1,12 +1,18 @@
 /*
  * Copyright 2006-2009, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2023, Haiku, Inc.
  * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *             Zardshard
  */
 
 #include "PathManipulator.h"
 
+#include <algorithm>
 #include <float.h>
 #include <stdio.h>
+#include <vector>
 
 #include <Catalog.h>
 #include <Cursor.h>
@@ -126,84 +132,68 @@ string_for_mode(uint32 mode)
 	return "<unknown mode>";
 }
 
-class PathManipulator::Selection : protected BList
+// NOTE: this class extends std::vector<int32> since neither BList or
+// BObjectList would suffice. The backing array of BList and BObjectList is a
+// void* array. The Items function should return an int32 array. This is a
+// problem since sizeof(void*) is not necessarily equal to sizeof(int32).
+class PathManipulator::Selection : protected std::vector<int32>
 {
 public:
 	inline Selection(int32 count = 20)
-		: BList(count) {}
+		: _inherited() { reserve(count); }
 	inline ~Selection() {}
 
 	inline void Add(int32 value)
-		{
-			if (value >= 0) {
-				// keep the list sorted
-				int32 count = CountItems();
-				int32 index = 0;
-				for (; index < count; index++) {
-					if (IndexAt(index) > value) {
-						break;
-					}
-				}
-				BList::AddItem((void*)(long)value, index);
-			}
+	{
+		if (value >= 0) {
+			// keep the list sorted
+			insert(std::upper_bound(begin(), end(), value), value);
 		}
+	}
 
 	inline bool Remove(int32 value)
-		{ return BList::RemoveItem((void*)(long)value); }
+	{
+		if (!Contains(value))
+			return false;
+		erase(std::lower_bound(begin(), end(), value));
+		return true;
+	}
 
 	inline bool Contains(int32 value) const
-		{ return BList::HasItem((void*)(long)value); }
+		{ return std::binary_search(begin(), end(), value); }
 
 	inline bool IsEmpty() const
-		{ return BList::IsEmpty(); }
+		{ return size() == 0; }
 
 	inline int32 IndexAt(int32 index) const
-		{ return (int32)(long)BList::ItemAt(index); }
+		{ return at(index); }
 
 	inline void MakeEmpty()
-		{ BList::MakeEmpty(); }
+		{ clear(); }
 
-	inline int32* Items() const
-		{ return (int32*)BList::Items(); }
+	inline const int32* Items() const
+		{ return &(*this)[0]; }
 
 	inline const int32 CountItems() const
-		{ return BList::CountItems(); }
+		{ return size(); }
 
 	inline Selection& operator =(const Selection& other)
-		{
-			MakeEmpty();
-			int32 count = other.CountItems();
-			int32* items = other.Items();
-			for (int32 i = 0; i < count; i++) {
-				Add(items[i]);
-			}
-			return *this;
-		}
+	{
+		_inherited::operator=(other);
+		return *this;
+	}
 
 	inline bool operator ==(const Selection& other)
-		{
-			if (other.CountItems() == CountItems()) {
-				int32* items = Items();
-				int32* otherItems = other.Items();
-				for (int32 i = 0; i < CountItems(); i++) {
-					if (items[i] != otherItems[i])
-						return false;
-					items++;
-					otherItems++;
-				}
-				return true;
-			} else
-				return false;
-		}
+		{ return (_inherited)*this == (_inherited)other; }
 
 	inline bool operator !=(const Selection& other)
-	{
-		return !(*this == other);
-	}
+		{ return (_inherited)*this != (_inherited)other; }
+
+private:
+	typedef std::vector<int32> _inherited;
 };
 
 
-// constructor
 PathManipulator::PathManipulator(VectorPath* path)
 	: Manipulator(NULL),
 	  fCanvasView(NULL),
@@ -240,7 +230,7 @@ PathManipulator::PathManipulator(VectorPath* path)
 	fPath->AddObserver(this);
 }
 
-// destructor
+
 PathManipulator::~PathManipulator()
 {
 	delete fChangePointCommand;
@@ -260,6 +250,7 @@ PathManipulator::~PathManipulator()
 
 
 // #pragma mark -
+
 
 class StrokePathIterator : public VectorPath::Iterator {
  public:
@@ -292,7 +283,7 @@ class StrokePathIterator : public VectorPath::Iterator {
 							else
 								fDrawingView->SetHighColor(0, 0, 0, 255);
 							fBlack = !fBlack;
-	
+
 							fDrawingView->StrokeLine(point);
 						} else {
 							fDrawingView->MovePenTo(point);
@@ -307,7 +298,7 @@ class StrokePathIterator : public VectorPath::Iterator {
 	bool			fSkip;
 };
 
-// Draw
+
 void
 PathManipulator::Draw(BView* into, BRect updateRect)
 {
@@ -405,9 +396,10 @@ PathManipulator::Draw(BView* into, BRect updateRect)
 	}
 }
 
+
 // #pragma mark -
 
-// MouseDown
+
 bool
 PathManipulator::MouseDown(BPoint where)
 {
@@ -556,7 +548,7 @@ PathManipulator::MouseDown(BPoint where)
 	return true;
 }
 
-// MouseMoved
+
 void
 PathManipulator::MouseMoved(BPoint where)
 {
@@ -615,7 +607,7 @@ PathManipulator::MouseMoved(BPoint where)
 			// drag out control point
 			fPath->SetPointOut(fCurrentPathPoint, canvasWhere);
 			break;
-		
+
 		case SELECT_POINTS: {
 			// change the selection
 			BRect r;
@@ -636,7 +628,7 @@ PathManipulator::MouseMoved(BPoint where)
 	}
 }
 
-// MouseUp
+
 Command*
 PathManipulator::MouseUp()
 {
@@ -715,7 +707,7 @@ PathManipulator::MouseUp()
 	return command;
 }
 
-// MouseOver
+
 bool
 PathManipulator::MouseOver(BPoint where)
 {
@@ -746,14 +738,14 @@ PathManipulator::MouseOver(BPoint where)
 	return true;
 }
 
-// DoubleClicked
+
 bool
 PathManipulator::DoubleClicked(BPoint where)
 {
 	return false;
 }
 
-// ShowContextMenu
+
 bool
 PathManipulator::ShowContextMenu(BPoint where)
 {
@@ -777,7 +769,7 @@ PathManipulator::ShowContextMenu(BPoint where)
 		message = new BMessage(B_SELECT_ALL);
 		item = new BMenuItem(B_TRANSLATE("Select all"), message, 'A');
 		menu->AddItem(item);
-	
+
 		menu->AddSeparatorItem();
 	}
 
@@ -814,9 +806,10 @@ PathManipulator::ShowContextMenu(BPoint where)
 	return true;
 }
 
+
 // #pragma mark -
 
-// Bounds
+
 BRect
 PathManipulator::Bounds()
 {
@@ -825,16 +818,17 @@ PathManipulator::Bounds()
 	return r;
 }
 
-// TrackingBounds
+
 BRect
 PathManipulator::TrackingBounds(BView* withinView)
 {
 	return withinView->Bounds();
 }
 
+
 // #pragma mark -
 
-// MessageReceived
+
 bool
 PathManipulator::MessageReceived(BMessage* message, Command** _command)
 {
@@ -858,22 +852,13 @@ PathManipulator::MessageReceived(BMessage* message, Command** _command)
 											  fSelection->CountItems());
 			break;
 		case B_SELECT_ALL: {
-			*fOldSelection = *fSelection;
-			fSelection->MakeEmpty();
 			int32 count = fPath->CountPoints();
+			int32 indices[count];
+
 			for (int32 i = 0; i < count; i++)
-				fSelection->Add(i);
-			if (*fOldSelection != *fSelection) {
-//				*_command = new SelectPointsCommand(this, fPath,
-//												   fOldSelection->Items(),
-//												   fOldSelection->CountItems(),
-//												   fSelection->Items(),
-//												   fSelection->CountItems()));
-				count = fSelection->CountItems();
-				int32 indices[count];
-				memcpy(indices, fSelection->Items(), count * sizeof(int32));
-				_Select(indices, count);
-			}
+				indices[i] = i;
+
+			_Select(indices, count);
 			break;
 		}
 		default:
@@ -884,7 +869,6 @@ PathManipulator::MessageReceived(BMessage* message, Command** _command)
 }
 
 
-// ModifiersChanged
 void
 PathManipulator::ModifiersChanged(uint32 modifiers)
 {
@@ -902,7 +886,7 @@ PathManipulator::ModifiersChanged(uint32 modifiers)
 		_SetModeForMousePos(fLastCanvasPos);
 }
 
-// HandleKeyDown
+
 bool
 PathManipulator::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 {
@@ -965,7 +949,7 @@ PathManipulator::HandleKeyDown(uint32 key, uint32 modifiers, Command** _command)
 	return result;
 }
 
-// HandleKeyUp
+
 bool
 PathManipulator::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 {
@@ -985,7 +969,7 @@ PathManipulator::HandleKeyUp(uint32 key, uint32 modifiers, Command** _command)
 	return handled;
 }
 
-// UpdateCursor
+
 bool
 PathManipulator::UpdateCursor()
 {
@@ -1039,23 +1023,24 @@ PathManipulator::UpdateCursor()
 	return true;
 }
 
-// AttachedToView
+
 void
 PathManipulator::AttachedToView(BView* view)
 {
 	fCanvasView = dynamic_cast<CanvasView*>(view);
 }
 
-// DetachedFromView
+
 void
 PathManipulator::DetachedFromView(BView* view)
 {
 	fCanvasView = NULL;
 }
 
+
 // #pragma mark -
 
-// ObjectChanged
+
 void
 PathManipulator::ObjectChanged(const Observable* object)
 {
@@ -1070,16 +1055,17 @@ PathManipulator::ObjectChanged(const Observable* object)
 		_SetModeForMousePos(fLastCanvasPos);
 }
 
+
 // #pragma mark -
 
-// PointAdded
+
 void
 PathManipulator::PointAdded(int32 index)
 {
 	ObjectChanged(fPath);
 }
 
-// PointRemoved
+
 void
 PathManipulator::PointRemoved(int32 index)
 {
@@ -1087,28 +1073,28 @@ PathManipulator::PointRemoved(int32 index)
 	ObjectChanged(fPath);
 }
 
-// PointChanged
+
 void
 PathManipulator::PointChanged(int32 index)
 {
 	ObjectChanged(fPath);
 }
 
-// PathChanged
+
 void
 PathManipulator::PathChanged()
 {
 	ObjectChanged(fPath);
 }
 
-// PathClosedChanged
+
 void
 PathManipulator::PathClosedChanged()
 {
 	ObjectChanged(fPath);
 }
 
-// PathReversed
+
 void
 PathManipulator::PathReversed()
 {
@@ -1126,9 +1112,10 @@ PathManipulator::PathReversed()
 	ObjectChanged(fPath);
 }
 
+
 // #pragma mark -
 
-// ControlFlags
+
 uint32
 PathManipulator::ControlFlags() const
 {
@@ -1148,7 +1135,7 @@ PathManipulator::ControlFlags() const
 	return flags;
 }
 
-// ReversePath
+
 void
 PathManipulator::ReversePath()
 {
@@ -1164,9 +1151,10 @@ PathManipulator::ReversePath()
 	fPath->Reverse();
 }
 
+
 // #pragma mark -
 
-// _SetMode
+
 void
 PathManipulator::_SetMode(uint32 mode)
 {
@@ -1196,7 +1184,6 @@ PathManipulator::_SetMode(uint32 mode)
 }
 
 
-// _SetTransformBox
 void
 PathManipulator::_SetTransformBox(TransformPointsBox* transformBox)
 {
@@ -1234,7 +1221,7 @@ PathManipulator::_SetTransformBox(TransformPointsBox* transformBox)
 	}
 }
 
-// _AddPoint
+
 void
 PathManipulator::_AddPoint(BPoint where)
 {
@@ -1250,7 +1237,7 @@ PathManipulator::_AddPoint(BPoint where)
 	}
 }
 
-// scale_point
+
 BPoint
 scale_point(BPoint a, BPoint b, float scale)
 {
@@ -1258,7 +1245,7 @@ scale_point(BPoint a, BPoint b, float scale)
 				  a.y + (b.y - a.y) * scale);
 }
 
-// _InsertPoint
+
 void
 PathManipulator::_InsertPoint(BPoint where, int32 index)
 {
@@ -1309,14 +1296,14 @@ PathManipulator::_InsertPoint(BPoint where, int32 index)
 	}
 }
 
-// _SetInOutConnected
+
 void
 PathManipulator::_SetInOutConnected(int32 index, bool connected)
 {
 	fPath->SetInOutConnected(index, connected);
 }
 
-// _SetSharp
+
 void
 PathManipulator::_SetSharp(int32 index)
 {
@@ -1325,7 +1312,7 @@ PathManipulator::_SetSharp(int32 index)
 	fPath->SetPoint(index, p, p, p, true);
 }
 
-// _RemoveSelection
+
 void
 PathManipulator::_RemoveSelection()
 {
@@ -1345,7 +1332,6 @@ PathManipulator::_RemoveSelection()
 }
 
 
-// _RemovePoint
 void
 PathManipulator::_RemovePoint(int32 index)
 {
@@ -1355,7 +1341,7 @@ PathManipulator::_RemovePoint(int32 index)
 	}
 }
 
-// _RemovePointIn
+
 void
 PathManipulator::_RemovePointIn(int32 index)
 {
@@ -1366,7 +1352,7 @@ PathManipulator::_RemovePointIn(int32 index)
 	}
 }
 
-// _RemovePointOut
+
 void
 PathManipulator::_RemovePointOut(int32 index)
 {
@@ -1377,7 +1363,7 @@ PathManipulator::_RemovePointOut(int32 index)
 	}
 }
 
-// _Delete
+
 Command*
 PathManipulator::_Delete()
 {
@@ -1403,9 +1389,10 @@ PathManipulator::_Delete()
 	return command;
 }
 
+
 // #pragma mark -
 
-// _Select
+
 void
 PathManipulator::_Select(BRect r)
 {
@@ -1434,7 +1421,7 @@ PathManipulator::_Select(BRect r)
 	}
 }
 
-// _Select
+
 void
 PathManipulator::_Select(int32 index, bool extend)
 {
@@ -1448,7 +1435,7 @@ PathManipulator::_Select(int32 index, bool extend)
 	_UpdateSelection();
 }
 
-// _Select
+
 void
 PathManipulator::_Select(const int32* indices, int32 count, bool extend)
 {
@@ -1466,7 +1453,7 @@ PathManipulator::_Select(const int32* indices, int32 count, bool extend)
 	_UpdateSelection();
 }
 
-// _Deselect
+
 void
 PathManipulator::_Deselect(int32 index)
 {
@@ -1476,32 +1463,34 @@ PathManipulator::_Deselect(int32 index)
 	}
 }
 
-// _ShiftSelection
+
 void
 PathManipulator::_ShiftSelection(int32 startIndex, int32 direction)
 {
 	int32 count = fSelection->CountItems();
 	if (count > 0) {
-		int32* selection = fSelection->Items();
 		for (int32 i = 0; i < count; i++) {
-			if (selection[i] >= startIndex) {
-				selection[i] += direction;
+			int32 index = fSelection->IndexAt(i);
+			if (index >= startIndex) {
+				fSelection->Remove(index);
+				fSelection->Add(index + direction);
 			}
 		}
 	}
 	_UpdateSelection();
 }
 
-// _IsSelected
+
 bool
 PathManipulator::_IsSelected(int32 index) const
 {
 	return fSelection->Contains(index);
 }
 
+
 // #pragma mark -
 
-// _InvalidateCanvas
+
 void
 PathManipulator::_InvalidateCanvas(BRect rect) const
 {
@@ -1510,7 +1499,7 @@ PathManipulator::_InvalidateCanvas(BRect rect) const
 	fCanvasView->Invalidate(rect);
 }
 
-// _InvalidateHighlightPoints
+
 void
 PathManipulator::_InvalidateHighlightPoints(int32 newIndex, uint32 newMode)
 {
@@ -1522,7 +1511,7 @@ PathManipulator::_InvalidateHighlightPoints(int32 newIndex, uint32 newMode)
 		_InvalidateCanvas(newRect);
 }
 
-// _UpdateSelection
+
 void
 PathManipulator::_UpdateSelection() const
 {
@@ -1532,7 +1521,7 @@ PathManipulator::_UpdateSelection() const
 	}
 }
 
-// _ControlPointRect
+
 BRect
 PathManipulator::_ControlPointRect() const
 {
@@ -1541,7 +1530,7 @@ PathManipulator::_ControlPointRect() const
 	return r; 
 }
 
-// _ControlPointRect
+
 BRect
 PathManipulator::_ControlPointRect(int32 index, uint32 mode) const
 {
@@ -1581,9 +1570,10 @@ PathManipulator::_ControlPointRect(int32 index, uint32 mode) const
 	return rect;
 }
 
+
 // #pragma mark -
 
-// _SetModeForMousePos
+
 void
 PathManipulator::_SetModeForMousePos(BPoint where)
 {
@@ -1679,9 +1669,10 @@ PathManipulator::_SetModeForMousePos(BPoint where)
 	}
 }
 
+
 // #pragma mark -
 
-// _Nudge
+
 void
 PathManipulator::_Nudge(BPoint direction)
 {
@@ -1730,7 +1721,7 @@ PathManipulator::_Nudge(BPoint direction)
 		_SetModeForMousePos(fLastCanvasPos);
 }
 
-// _FinishNudging
+
 Command*
 PathManipulator::_FinishNudging()
 {
@@ -1747,5 +1738,3 @@ PathManipulator::_FinishNudging()
 
 	return command;
 }
-
-
