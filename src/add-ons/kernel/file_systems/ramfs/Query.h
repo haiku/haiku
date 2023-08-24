@@ -15,115 +15,51 @@
 #include <util/DoublyLinkedList.h>
 
 #include "Index.h"
-#include "Stack.h"
 #include "ramfs.h"
 
-class Entry;
-class Equation;
-class IndexIterator;
+
+namespace QueryParser {
+	template<typename QueryPolicy> class Query;
+};
+
 class Node;
-class Query;
-class Term;
 class Volume;
 
 
 #define B_QUERY_NON_INDEXED	0x00000002
 
 
-// Wraps the RAM FS Index to provide the interface required by the Query
-// implementation. At least most of it.
-//
-// IndexWrapper
-class IndexWrapper {
-public:
-	IndexWrapper(Volume *volume);
-
-	status_t SetTo(const char *name);
-	void Unset();
-
-	uint32 Type() const;
-	off_t GetSize() const;
-	int32 KeySize() const;
-
-private:
-	friend class IndexIterator;
-
-	Volume	*fVolume;
-	Index	*fIndex;
-};
-
-// IndexIterator
-class IndexIterator {
-public:
-	IndexIterator(IndexWrapper *indexWrapper);
-
-	status_t Find(const uint8 *const key, size_t keyLength);
-	status_t Rewind();
-	status_t GetNextEntry(uint8 *buffer, uint16 *keyLength, size_t bufferSize,
-						  Entry **entry);
-
-private:
-	IndexWrapper		*fIndexWrapper;
-	IndexEntryIterator	fIterator;
-	bool				fInitialized;
-};
-
-
-class Expression {
-	public:
-		Expression(char *expr);
-		~Expression();
-
-		status_t InitCheck();
-		const char *Position() const { return fPosition; }
-		Term *Root() const { return fTerm; }
-
-	protected:
-		Term *ParseOr(char **expr);
-		Term *ParseAnd(char **expr);
-		Term *ParseEquation(char **expr);
-
-		bool IsOperator(char **expr,char op);
-
-	private:
-		Expression(const Expression &);
-		Expression &operator=(const Expression &);
-			// no implementation
-
-		char *fPosition;
-		Term *fTerm;
-};
-
 class Query : public DoublyLinkedListLinkImpl<Query> {
-	public:
-		Query(Volume *volume, Expression *expression, uint32 flags);
-		~Query();
+public:
+							~Query();
 
-		status_t Rewind();
-		status_t GetNextEntry(struct dirent *, size_t size);
+	static	status_t		Create(Volume* volume, const char* queryString,
+								uint32 flags, port_id port, uint32 token,
+								Query*& _query);
 
-		void SetLiveMode(port_id port, int32 token);
-		void LiveUpdate(Entry *entry, Node* node, const char *attribute,
-			int32 type, const uint8 *oldKey, size_t oldLength,
-			const uint8 *newKey, size_t newLength);
+			status_t		Rewind();
+			status_t		GetNextEntry(struct dirent* entry, size_t size);
 
-		Expression *GetExpression() const { return fExpression; }
+			void			LiveUpdate(Entry* entry, Node* node,
+								const char* attribute, int32 type,
+								const void* oldKey, size_t oldLength,
+								const void* newKey, size_t newLength);
 
-	private:
-//		void SendNotification(Entry* entry)
+private:
+			struct QueryPolicy;
+			friend struct QueryPolicy;
+			typedef QueryParser::Query<QueryPolicy> QueryImpl;
 
-	private:
-		Volume			*fVolume;
-		Expression		*fExpression;
-		Equation		*fCurrent;
-		IndexIterator	*fIterator;
-		IndexWrapper	fIndex;
-		Stack<Equation *> fStack;
+private:
+							Query(Volume* volume);
 
-		uint32			fFlags;
-		port_id			fPort;
-		int32			fToken;
-		bool			fNeedsEntry;
+			status_t		_Init(const char* queryString, uint32 flags,
+								port_id port, uint32 token);
+
+private:
+			Volume*			fVolume;
+			QueryImpl*		fImpl;
 };
+
 
 #endif	/* QUERY_H */

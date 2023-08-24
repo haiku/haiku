@@ -2039,32 +2039,16 @@ ramfs_open_query(fs_volume* _volume, const char *queryString, uint32 flags,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	// lock the volume
-	VolumeReadLocker locker(volume);
+	VolumeWriteLocker locker(volume);
 	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
-	// parse the query expression
-	Expression *expression = new Expression((char *)queryString);
-	if (expression == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-	ObjectDeleter<Expression> expressionDeleter(expression);
-
-	if (expression->InitCheck() < B_OK) {
-		WARN("Could not parse query, stopped at: \"%s\"\n",
-			expression->Position());
-		RETURN_ERROR(B_BAD_VALUE);
-	}
-
-	// create the query
-	Query *query = new Query(volume, expression, flags);
-	if (query == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-	expressionDeleter.Detach();
+	Query* query;
+	status_t error = Query::Create(volume, queryString, flags, port, token, query);
+	if (error != B_OK)
+		return error;
 	// TODO: The Query references an Index, but nothing prevents the Index
 	// from being deleted, while the Query is in existence.
-
-	if (flags & B_LIVE_QUERY)
-		query->SetLiveMode(port, token);
 
 	*_cookie = (void *)query;
 
@@ -2090,14 +2074,12 @@ ramfs_free_query_cookie(fs_volume* _volume, void* _cookie)
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	// lock the volume
-	VolumeReadLocker locker(volume);
+	VolumeWriteLocker locker(volume);
 	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
 	Query *query = (Query *)_cookie;
-	Expression *expression = query->GetExpression();
 	delete query;
-	delete expression;
 
 	return B_OK;
 }

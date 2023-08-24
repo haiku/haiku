@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems ramfs ;
 
 UsePrivateKernelHeaders ;
-UsePrivateHeaders file_systems ;
+UsePrivateHeaders file_systems storage ;
 
 DEFINES += DEBUG_APP="\\\"ramfs\\\"" ;
 
@@ -13,7 +13,6 @@ KernelAddon ramfs
 	AttributeIndexImpl.cpp
 	AttributeIterator.cpp
 	DataContainer.cpp
-	DebugSupport.cpp
 	Directory.cpp
 	Entry.cpp
 	EntryIterator.cpp
@@ -31,7 +30,10 @@ KernelAddon ramfs
 	SizeIndex.cpp
 	SymLink.cpp
 	Volume.cpp
+
+	DebugSupport.cpp
+	QueryParserUtils.cpp
 ;
 
-SEARCH on [ FGristFiles DebugSupport.cpp ]
+SEARCH on [ FGristFiles DebugSupport.cpp QueryParserUtils.cpp ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
