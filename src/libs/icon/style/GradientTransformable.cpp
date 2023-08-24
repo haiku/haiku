@@ -17,6 +17,9 @@
 #  include "support.h"
 #endif
 
+_USING_ICON_NAMESPACE
+
+
 // constructor
 Gradient::Gradient(bool empty)
 #ifdef ICON_O_MATIC

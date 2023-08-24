@@ -13,6 +13,9 @@
 #include <string.h>
 
 
+_USING_ICON_NAMESPACE
+
+
 Transformable::Transformable()
 	: agg::trans_affine()
 {

@@ -23,6 +23,8 @@
 
 using std::nothrow;
 
+_USING_ICON_NAMESPACE
+
 
 PathSourceShape::PathSourceShape(::Style* style)
 	: Shape(style),

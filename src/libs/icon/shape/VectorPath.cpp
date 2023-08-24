@@ -38,12 +38,13 @@
 
 #include "Transformable.h"
 
-
 #define obj_new(type, n)		((type *)malloc ((n) * sizeof(type)))
 #define obj_renew(p, type, n)	((type *)realloc ((void *)p, (n) * sizeof(type)))
 #define obj_free				free
 
 #define ALLOC_CHUNKS 20
+
+_USING_ICON_NAMESPACE
 
 
 bool

@@ -40,8 +40,8 @@ class ShapeListener {
 	virtual						~ShapeListener();
 
 	// TODO: this is not useful for all subclasses of Shape (e.g. ReferenceImage)
-	virtual	void				StyleChanged(::Style* oldStyle,
-											 ::Style* newStyle) = 0;
+	virtual	void				StyleChanged(Style* oldStyle,
+											 Style* newStyle) = 0;
 };
 #endif // ICON_O_MATIC
 
@@ -58,7 +58,7 @@ class Shape : public _ICON_NAMESPACE Transformable,
 #endif
 
  public:
-									Shape(::Style* style);
+									Shape(_ICON_NAMESPACE Style* style);
 									Shape(const Shape& other);
 	virtual							~Shape();
 
@@ -109,14 +109,14 @@ class Shape : public _ICON_NAMESPACE Transformable,
 									{ return &fTransformers; }
 
       public:
-	inline	::Style*				Style() const
+	inline	_ICON_NAMESPACE Style*	Style() const
 										{ return fStyle; }
 
 	inline	BRect					LastBounds() const
 										{ return fLastBounds; }
 			BRect					Bounds(bool updateLast = false) const;
 
-			::VertexSource&			VertexSource();
+			_ICON_NAMESPACE VertexSource&	VertexSource();
 			void					SetGlobalScale(double scale);
 
 			void					SetHinting(bool hinting);
@@ -130,18 +130,18 @@ class Shape : public _ICON_NAMESPACE Transformable,
 			bool					RemoveListener(ShapeListener* listener);
 
  private:
-			void					_NotifyStyleChanged(::Style* oldStyle,
-														::Style* newStyle) const;
+			void					_NotifyStyleChanged(_ICON_NAMESPACE Style* oldStyle,
+														_ICON_NAMESPACE Style* newStyle) const;
 
 			void					_NotifyRerender() const;
 #endif // ICON_O_MATIC
 
  protected:
-			void					SetStyle(::Style* style);
+			void					SetStyle(_ICON_NAMESPACE Style* style);
 
  private:
 			Container<VectorPath>*	fPaths;
-			::Style*				fStyle;
+			_ICON_NAMESPACE Style*	fStyle;
 
 			PathSource				fPathSource;
 			Container<Transformer>	fTransformers;

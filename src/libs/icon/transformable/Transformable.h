@@ -85,7 +85,4 @@ class Transformable : public StyleTransformer,
 _END_ICON_NAMESPACE
 
 
-_USING_ICON_NAMESPACE
-
-
 #endif // TRANSFORMABLE_H

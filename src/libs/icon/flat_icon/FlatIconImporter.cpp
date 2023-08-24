@@ -33,6 +33,9 @@
 
 using std::nothrow;
 
+_USING_ICON_NAMESPACE
+
+
 // constructor
 FlatIconImporter::FlatIconImporter()
 #ifdef ICON_O_MATIC

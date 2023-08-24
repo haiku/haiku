@@ -11,6 +11,9 @@
 #include "Container.h"
 #include "VectorPath.h"
 
+_USING_ICON_NAMESPACE
+
+
 // constructor
 PathSource::PathSource(Container<VectorPath>* paths)
 	: VertexSource()

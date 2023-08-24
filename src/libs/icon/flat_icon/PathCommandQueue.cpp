@@ -15,6 +15,9 @@
 #include "FlatIconFormat.h"
 #include "VectorPath.h"
 
+_USING_ICON_NAMESPACE;
+
+
 // constructor
 PathCommandQueue::PathCommandQueue()
 	: fCommandBuffer(),
