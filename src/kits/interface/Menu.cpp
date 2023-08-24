@@ -726,11 +726,19 @@ BMenu::AddItem(BMenuItem* item, int32 index)
 			"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 	}
 
-	if (item == NULL || !_AddItem(item, index))
+	if (item == NULL)
 		return false;
 
+	const bool locked = LockLooper();
+
+	if (!_AddItem(item, index)) {
+		if (locked)
+			UnlockLooper();
+		return false;
+	}
+
 	InvalidateLayout();
-	if (LockLooper()) {
+	if (locked) {
 		if (!Window()->IsHidden()) {
 			_LayoutItems(index);
 			_UpdateWindowViewSize(false);
@@ -754,13 +762,18 @@ BMenu::AddItem(BMenuItem* item, BRect frame)
 	if (item == NULL)
 		return false;
 
+	const bool locked = LockLooper();
+
 	item->fBounds = frame;
 
 	int32 index = CountItems();
-	if (!_AddItem(item, index))
+	if (!_AddItem(item, index)) {
+		if (locked)
+			UnlockLooper();
 		return false;
+	}
 
-	if (LockLooper()) {
+	if (locked) {
 		if (!Window()->IsHidden()) {
 			_LayoutItems(index);
 			Invalidate();
