@@ -2838,7 +2838,7 @@ DwarfFile::_LocateDebugInfo(BString& _requiredExternalFileName,
 	fDebugInfoSection = debugInfoFile->GetSection(".debug_info");
 	fDebugAbbrevSection = debugInfoFile->GetSection(".debug_abbrev");
 	if (fDebugInfoSection == NULL || fDebugAbbrevSection == NULL) {
-		WARNING("DwarfManager::File::Load(\"%s\"): no "
+		TRACE_DIE("DwarfManager::File::Load(\"%s\"): no "
 			".debug_info or .debug_abbrev.\n", fName);
 
 		// if we at least have an EH frame, use that for stack unwinding
