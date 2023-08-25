@@ -26,7 +26,7 @@ enum {
 
 class ShowImageStatusView : public BView {
 public:
-								ShowImageStatusView(BScrollView* scrollView);
+								ShowImageStatusView();
 
 	virtual	void				AttachedToWindow();
 	virtual void				GetPreferredSize(float* _width, float* _height);
@@ -44,7 +44,6 @@ public:
 			void				_SetPagesText(const BString& pages);
 			void				_SetImageTypeText(const BString& imageType);
 			void				_ValidatePreferredSize();
-			BScrollView*		fScrollView;
 			BSize				fPreferredSize;
 			BString				fCellText[kStatusCellCount];
 			float				fCellWidth[kStatusCellCount];

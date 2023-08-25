@@ -29,10 +29,9 @@
 const float kHorzSpacing = 5.f;
 
 
-ShowImageStatusView::ShowImageStatusView(BScrollView* scrollView)
+ShowImageStatusView::ShowImageStatusView()
 	:
-	BView(BRect(), "statusview", B_FOLLOW_BOTTOM | B_FOLLOW_LEFT, B_WILL_DRAW),
-	fScrollView(scrollView),
+	BView("statusview", B_WILL_DRAW),
 	fPreferredSize(0.0, 0.0)
 {
 	memset(fCellWidth, 0, sizeof(fCellWidth));
@@ -44,9 +43,6 @@ ShowImageStatusView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
 	BPrivate::AdoptScrollBarFontSize(this);
-
-	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
-	MoveTo(0.0, scrollBar->Frame().top);
 
 	AdoptParentColors();
 
@@ -206,7 +202,6 @@ ShowImageStatusView::_SetImageTypeText(const BString& imageType)
 void
 ShowImageStatusView::_ValidatePreferredSize()
 {
-	float orgWidth = fPreferredSize.width;
 	// width
 	fPreferredSize.width = 0.f;
 	for (size_t i = 0; i < kStatusCellCount; i++) {
@@ -232,9 +227,6 @@ ShowImageStatusView::_ValidatePreferredSize()
 	if (fPreferredSize.height < scrollBarSize)
 		fPreferredSize.height = scrollBarSize;
 
-	float delta = fPreferredSize.width - orgWidth;
-	ResizeBy(delta, 0);
-	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
-	scrollBar->ResizeBy(-delta, 0);
-	scrollBar->MoveBy(delta, 0);
+	SetExplicitMinSize(fPreferredSize);
+	SetExplicitMaxSize(fPreferredSize);
 }

@@ -33,6 +33,7 @@
 #include <Entry.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <GridLayout.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -132,7 +133,7 @@ bs_printf(BString* string, const char* format, ...)
 ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	const BMessenger& trackerMessenger)
 	:
-	BWindow(frame, "", B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
+	BWindow(frame, "", B_DOCUMENT_WINDOW, 0),
 	fNavigator(ref, trackerMessenger),
 	fSavePanel(NULL),
 	fBar(NULL),
@@ -171,7 +172,6 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 
 	// Create the tool bar
 	BRect viewFrame = contentView->Bounds();
-	viewFrame.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	fToolBar = new BToolBar(viewFrame);
 
 	// Add the tool icons.
@@ -222,24 +222,51 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	fToolBarVisible = fShowToolBar;
 
 	viewFrame.bottom = contentView->Bounds().bottom;
-	viewFrame.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
+
+	// create the scroll area
+	fScrollArea = new BScrollView("image_scroller", NULL, 0,
+		false, false, B_PLAIN_BORDER);
+	BGridLayout* gridLayout = new BGridLayout(0, 0);
+	fScrollArea->SetLayout(gridLayout);
+	gridLayout->SetInsets(1, 1, -1, -1);
+
+	fScrollArea->MoveTo(viewFrame.LeftTop());
+	fScrollArea->ResizeTo(viewFrame.Size());
+	fScrollArea->SetResizingMode(B_FOLLOW_ALL);
+	contentView->AddChild(fScrollArea);
 
 	// create the image view
-	fImageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL,
+	fImageView = new ShowImageView("image_view",
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED
 			| B_FRAME_EVENTS);
-	// wrap a scroll view around the view
-	fScrollView = new BScrollView("image_scroller", fImageView,
-		B_FOLLOW_ALL, 0, true, true, B_PLAIN_BORDER);
-	contentView->AddChild(fScrollView);
+	fImageView->SetExplicitMinSize(BSize(0, 0));
+	gridLayout->AddView(fImageView, 0, 0, 2, 1);
 
-	fStatusView = new ShowImageStatusView(fScrollView);
-	fScrollView->AddChild(fStatusView);
+	// create the scroll bars (wrapped to avoid double borders)
+	fVScrollBar = new BScrollBar(NULL, NULL, 0, 0, B_VERTICAL); {
+		BGroupView* vScrollBarContainer = new BGroupView(B_VERTICAL, 0);
+		vScrollBarContainer->GroupLayout()->AddView(fVScrollBar);
+		vScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, -1);
+		gridLayout->AddView(vScrollBarContainer, 2, 0);
+	}
+
+	fHScrollBar = new BScrollBar(NULL, NULL, 0, 0, B_HORIZONTAL); {
+		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
+		hScrollBarContainer->GroupLayout()->AddView(fHScrollBar);
+		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, -1, -1);
+		gridLayout->AddView(hScrollBarContainer, 1, 1);
+	}
+
+	fVScrollBar->SetTarget(fImageView);
+	fHScrollBar->SetTarget(fImageView);
+
+	fStatusView = new ShowImageStatusView;
+	gridLayout->AddView(fStatusView, 0, 1);
 
 	// Update minimum window size
 	float toolBarMinWidth = fToolBar->MinSize().width;
-	SetSizeLimits(std::max(menuBarMinWidth, toolBarMinWidth), 100000, 100,
-		100000);
+	SetSizeLimits(std::max(menuBarMinWidth, toolBarMinWidth), 100000,
+		fBar->MinSize().height + gridLayout->MinSize().height, 100000);
 
 	// finish creating the window
 	if (_LoadImage() != B_OK) {
@@ -1040,8 +1067,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			float offset;
 			if (message->FindFloat("offset", &offset) == B_OK) {
 				fToolBar->MoveBy(0, offset);
-				fScrollView->ResizeBy(0, -offset);
-				fScrollView->MoveBy(0, offset);
+				fScrollArea->ResizeBy(0, -offset);
+				fScrollArea->MoveBy(0, offset);
 				UpdateIfNeeded();
 				snooze(15000);
 			}
@@ -1059,8 +1086,8 @@ ShowImageWindow::MessageReceived(BMessage* message)
 					fToolBar->Hide();
 				BRect frame = fToolBar->Parent()->Bounds();
 				frame.top = fToolBar->Frame().bottom + 1;
-				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
-				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
+				fScrollArea->MoveTo(fScrollArea->Frame().left, frame.top);
+				fScrollArea->ResizeTo(fScrollArea->Bounds().Width(),
 					frame.Height() + 1);
 			}
 			break;
@@ -1608,8 +1635,8 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 		finalMessage.AddBool("show", visible);
 		PostMessage(&finalMessage, this);
 	} else {
-		fScrollView->ResizeBy(0, -diff);
-		fScrollView->MoveBy(0, diff);
+		fScrollArea->ResizeBy(0, -diff);
+		fScrollArea->MoveBy(0, diff);
 		fToolBar->MoveBy(0, diff);
 		if (!visible)
 			fToolBar->Hide();

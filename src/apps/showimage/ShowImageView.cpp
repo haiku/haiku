@@ -172,10 +172,9 @@ PopUpMenu::~PopUpMenu()
 //	#pragma mark -
 
 
-ShowImageView::ShowImageView(BRect rect, const char* name, uint32 resizingMode,
-		uint32 flags)
+ShowImageView::ShowImageView(const char* name, uint32 flags)
 	:
-	BView(rect, name, resizingMode, flags),
+	BView(name, flags),
 	fBitmapOwner(NULL),
 	fBitmap(NULL),
 	fDisplayBitmap(NULL),

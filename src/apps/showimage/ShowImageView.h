@@ -31,8 +31,7 @@ class BitmapOwner;
 
 class ShowImageView : public BView {
 public:
-								ShowImageView(BRect rect, const char* name,
-									uint32 resizingMode, uint32 flags);
+								ShowImageView(const char* name, uint32 flags);
 	virtual						~ShowImageView();
 
 	virtual	void				AttachedToWindow();

@@ -24,7 +24,6 @@ class BMenuBar;
 class BMenuItem;
 class BMessageRunner;
 class BScrollBar;
-class BScrollView;
 class ProgressWindow;
 class ShowImageView;
 class ShowImageStatusView;
@@ -123,7 +122,8 @@ private:
 			BMenu*				fRatingMenu;
 			BToolBar*			fToolBar;
 			bool				fToolBarVisible;
-			BScrollView*		fScrollView;
+			BView*				fScrollArea;
+			BScrollBar			*fVScrollBar, *fHScrollBar;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
 			ProgressWindow*		fProgressWindow;
