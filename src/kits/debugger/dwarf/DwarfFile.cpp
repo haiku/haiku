@@ -1779,6 +1779,12 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 	// version (uhalf)
 	uint16 version = dataReader.Read<uint16>(0);
 
+	if (version != 2 && version != 3) {
+		WARNING("DwarfFile::_ParseLineInfo(\"%s\"): unsupported "
+			"version %d\n", fName, version);
+		return B_UNSUPPORTED;
+	}
+
 	// header_length (4/8)
 	uint64 headerLength = dwarf64
 		? dataReader.Read<uint64>(0) : (uint64)dataReader.Read<uint32>(0);
@@ -1808,9 +1814,6 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 
 	if (dataReader.HasOverflow())
 		return B_BAD_DATA;
-
-	if (version != 2 && version != 3)
-		return B_UNSUPPORTED;
 
 	TRACE_LINES("  unitLength:           %" B_PRIu64 "\n", unitLength);
 	TRACE_LINES("  version:              %u\n", version);
