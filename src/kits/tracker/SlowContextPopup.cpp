@@ -126,6 +126,7 @@ BSlowContextMenu::DetachedFromWindow()
 {
 	// see note above in AttachedToWindow
 	fIsShowing = false;
+
 	// does this need to set this to null?
 	// the parent, handling dnd should set this
 	// appropriately
@@ -236,11 +237,12 @@ BSlowContextMenu::StartBuildingItemList()
 		return false;
 	}
 
+	fItemList = new BObjectList<BMenuItem>(50);
+
 	fIteratingDesktop = false;
 
 	BDirectory parent;
 	status_t err = entry.GetParent(&parent);
-	fItemList = new BObjectList<BMenuItem>(50);
 
 	// if ref is the root item then build list of volume root dirs
 	fVolsOnly = (err == B_ENTRY_NOT_FOUND);
@@ -249,35 +251,33 @@ BSlowContextMenu::StartBuildingItemList()
 		return true;
 
 	Model startModel(&entry, true);
-	if (startModel.InitCheck() == B_OK) {
-		if (!startModel.IsContainer())
-			return false;
+	if (startModel.InitCheck() != B_OK || !startModel.IsContainer())
+		return false;
 
-		if (startModel.IsQuery())
-			fContainer = new QueryEntryListCollection(&startModel);
-		else if (startModel.IsVirtualDirectory())
-			fContainer = new VirtualDirectoryEntryList(&startModel);
-		else if (startModel.IsDesktop()) {
-			fIteratingDesktop = true;
-			fContainer = DesktopPoseView::InitDesktopDirentIterator(0,
-				startModel.EntryRef());
-			AddRootItemsIfNeeded();
-			AddTrashItem();
-		} else {
-			BDirectory* directory = dynamic_cast<BDirectory*>(
-				startModel.Node());
+	if (startModel.IsQuery()) {
+		fContainer = new QueryEntryListCollection(&startModel);
+	} else if (startModel.IsVirtualDirectory()) {
+		fContainer = new VirtualDirectoryEntryList(&startModel);
+	} else if (startModel.IsDesktop()) {
+		fIteratingDesktop = true;
+		fContainer = DesktopPoseView::InitDesktopDirentIterator(0,
+			startModel.EntryRef());
+		AddRootItemsIfNeeded();
+		AddTrashItem();
+	} else {
+		BDirectory* directory = dynamic_cast<BDirectory*>(
+			startModel.Node());
 
-			ASSERT(directory != NULL);
+		ASSERT(directory != NULL);
 
-			if (directory != NULL)
-				fContainer = new DirectoryEntryList(*directory);
-		}
-
-		if (fContainer->InitCheck() != B_OK)
-			return false;
-
-		fContainer->Rewind();
+		if (directory != NULL)
+			fContainer = new DirectoryEntryList(*directory);
 	}
+
+	if (fContainer->InitCheck() != B_OK)
+		return false;
+
+	fContainer->Rewind();
 
 	return true;
 }
@@ -290,13 +290,13 @@ BSlowContextMenu::AddRootItemsIfNeeded()
 	roster.Rewind();
 	BVolume volume;
 	while (roster.GetNextVolume(&volume) == B_OK) {
-
 		BDirectory root;
 		BEntry entry;
 		if (!volume.IsPersistent()
 			|| volume.GetRootDirectory(&root) != B_OK
-			|| root.GetEntry(&entry) != B_OK)
+			|| root.GetEntry(&entry) != B_OK) {
 			continue;
+		}
 
 		Model model(&entry);
 		AddOneItem(&model);

@@ -392,9 +392,7 @@ BNavMenu::ClearMenuBuildingState()
 	// item list is non-owning, need to delete the items because
 	// they didn't get added to the menu
 	if (fItemList != NULL) {
-		int32 count = fItemList->CountItems();
-		for (int32 index = count - 1; index >= 0; index--)
-			delete RemoveItem(index);
+		RemoveItems(0, fItemList->CountItems(), true);
 
 		delete fItemList;
 		fItemList = NULL;
@@ -429,14 +427,14 @@ BNavMenu::StartBuildingItemList()
 	if (startModel.InitCheck() != B_OK || !startModel.IsContainer())
 		return false;
 
-	if (startModel.IsQuery())
+	if (startModel.IsQuery()) {
 		fContainer = new QueryEntryListCollection(&startModel);
-	else if (startModel.IsVirtualDirectory())
+	} else if (startModel.IsVirtualDirectory()) {
 		fContainer = new VirtualDirectoryEntryList(&startModel);
-	else if (startModel.IsDesktop()) {
+	} else if (startModel.IsDesktop()) {
 		fIteratingDesktop = true;
-		fContainer = DesktopPoseView::InitDesktopDirentIterator(
-			0, 	startModel.EntryRef());
+		fContainer = DesktopPoseView::InitDesktopDirentIterator(0,
+			startModel.EntryRef());
 		AddRootItemsIfNeeded();
 		AddTrashItem();
 	} else if (startModel.IsTrash()) {
