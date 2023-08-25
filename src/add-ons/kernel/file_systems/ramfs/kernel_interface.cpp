@@ -138,8 +138,8 @@ ramfs_read_fs_info(fs_volume* _volume, struct fs_info *info)
 	Volume* volume = (Volume*)_volume->private_volume;
 	status_t error = B_OK;
 	if (VolumeReadLocker locker = volume) {
-		info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
-			| B_FS_HAS_QUERY | B_FS_IS_REMOVABLE;
+		info->flags =  B_FS_HAS_ATTR | B_FS_HAS_MIME | B_FS_HAS_QUERY
+			| B_FS_IS_REMOVABLE;
 		info->block_size = B_PAGE_SIZE;
 		info->io_size = kOptimalIOSize;
 		info->total_blocks = volume->CountBlocks();
