@@ -123,7 +123,8 @@ PowerStatusView::_Init()
 
 	fHasNotifiedLowBattery = false;
 
-	add_system_beep_event("Low battery");
+	add_system_beep_event("Battery critical");
+	add_system_beep_event("Battery low");
 	add_system_beep_event("Battery charged");
 }
 
@@ -609,13 +610,13 @@ PowerStatusView::_NotifyLowBattery()
 	BNotification notification(
 		fHasBattery ? B_INFORMATION_NOTIFICATION : B_ERROR_NOTIFICATION);
 
-	system_beep("Low battery");
-
 	if (fHasBattery) {
+		system_beep("Battery low");
 		notification.SetTitle(B_TRANSLATE("Battery low"));
 		notification.SetContent(B_TRANSLATE(
 			"The battery level is getting low, please plug in the device."));
 	} else {
+		system_beep("Battery critical");
 		notification.SetTitle(B_TRANSLATE("Battery critical"));
 		notification.SetContent(B_TRANSLATE(
 			"The battery level is critical, please plug in the device "
