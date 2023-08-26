@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Magnify	3730034159
+1	ukrainian	x-vnd.Haiku-Magnify	1465621918
   size must be > 4 and a multiple of 4	Console		  розмір має бути > 4 та кратним 4
 Decrease pixel size	Magnify-Main		Зменшити розмір пікселя
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
@@ -10,6 +10,7 @@ Decrease window size	Magnify-Main		Зменшити розмір вікна
 Remove a crosshair	Magnify-Main		Прибрати перехрестя
 Add a crosshair	Magnify-Main		Додати перехрестя
 Freeze image	Magnify-Main		Стоп-кадр
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# піксель/піксель} few{# пікселя/піксель} other{# пікселів/піксель}}
 usage: magnify [size] (magnify size * size pixels)	Console		використання: збільшення [розмір] (розмір збільшення * розмір пікселя)
 Increase window size	Magnify-Main		Збільшити розмір вікна
 Save image	Magnify-Main		Зберегти зображення

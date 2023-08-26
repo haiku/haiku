@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.haiku.SerialConnect	354154115
+1	ukrainian	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Апаратно
 Connection	SerialWindow		З'єднання
 Raw send…	SerialWindow		Передати як RAW…
 Baud rate	SerialWindow		Швидкість передачі
+Paste	SerialWindow		Вставити
 Stop bits	SerialWindow		Стопові біти
 None	SerialWindow	Flowcontrol	Без управління
 Cancel	Custom baudrate window		Скасувати

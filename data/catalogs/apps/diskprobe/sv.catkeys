@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DiskProbe	4193379066
+1	swedish	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw editor
 Remove	AttributeWindow		Ta bort
 Close	ProbeView		Stäng
@@ -29,7 +29,9 @@ Open file…	FileWindow		Öppna fil...
 32 bit unsigned pointer:	TypeEditors		32 bitars osignerad pointer:
 DiskProbe request	DiskProbe		DiskInspekteraren
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Block %lld (0x%Lx)	ProbeView		Block %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Skrivning till filen gick inte:\n %s\n \nAlla ändringar förloras när du avslutar programmet.
+Native: %lld (0x%0*Lx)	ProbeView		Native: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Undersök enheten:
 Number editor	TypeEditors		Nummereditor
 Icon	TypeEditors		Ikon
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		DiskInspekteraren
 Double precision floating-point value:	TypeEditors		Dubbelprecisions flyttals-värde:
 Image	TypeEditors	This is the type of view	Bild
+Swapped: %lld (0x%0*Lx)	ProbeView		Bytt: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Spara ändringar före stängning?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG-format
 Number	TypeEditors	This is the type of editor	Nummer
 Edit	ProbeView		Redigera

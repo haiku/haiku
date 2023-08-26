@@ -1,7 +1,8 @@
-1	ukrainian	x-vnd.Haiku.TV	3120244932
+1	ukrainian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Без меню
 No border	MainWin		Без рамки
 Error, connecting to interface failed:\n\n	MainWin		Помилка, збій підключення до інтерфейсу:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	примусово 720 × 576, формат 4:3
 Full screen	MainWin		Повний екран
 Scale to native size	MainWin		Оригінальний розмір
 unknown	MainWin		невідомий
@@ -16,7 +17,10 @@ Channel	MainWin		Канал
 Previous channel	MainWin		Попередній канал
 OK	MainWin		ОК
 TV	MainWin		Телебачення
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	примусово 544 × 576, формат 4:3
 Settings	MainWin		Налаштування
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	примусово 704 × 576, формат 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Налаштування…
 None	MainWin		Пусто

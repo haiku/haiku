@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	3282980298
+1	turkish	x-vnd.haiku-icon_o_matic	2572445882
 None	Icon-O-Matic-Properties		Yok
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -21,6 +21,7 @@ Shorten	Icon-O-Matic-PropertyNames		Kısalt
 Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{Dönüştürücüyü} other{Dönüştürücüleri}} taşı
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		İçe aktarmaya çalıştığınız metin pek uzun, emin misiniz?
 Paste	Icon-O-Matic-Properties		Yapıştır
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Pek çok biçem var. HVIF biçimi en çok 255 biçemi destekler.
 Close	Icon-O-Matic-Menu-File		Kapat
 Add rect	Icon-O-Matic-PathsList		Dikdörtgen ekle
 Rotation	Icon-O-Matic-PropertyNames		Döndürme
@@ -59,6 +60,7 @@ Saving your document failed!	Icon-O-Matic-Exporter		Belge kaydedilemedi!
 Snap to grid	Icon-O-Matic-Menu-Settings		Izgaraya hizala
 Opening the document failed!	Icon-O-Matic-Main		Belge açılamadı!
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{Biçemi} other{Biçemleri}} kaldır
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Bir veya daha çok yolun pek çok tepeciği var. HVIF biçimi yol başına en çok 255 tepecik destekler.
 Add with path & style	Icon-O-Matic-ShapesList		Yol ve biçem ile ekle
 Shape	Icon-O-Matic-Menus		Şekil
 Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		{0, plural, one{Tepeciği} other{Tepecikleri}} böl
@@ -80,6 +82,7 @@ Miter limit	Icon-O-Matic-PropertyNames		Gönye sınırı
 Insert vertex	Icon-O-Matic-InsertPointCmd		Tepecik ekle
 Rounding	Icon-O-Matic-PropertyNames		Yuvarlatma
 Joins	Icon-O-Matic-PropertyNames		Ek yerleri
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Pek çok şekil var. HVIF biçimi en çok 255 şekli destekler.
 Cancel	Icon-O-Matic-ColorPicker		Vazgeç
 Duplicate	Icon-O-Matic-PathsList		Çoğalt
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		{0, plural, one{Şekli} other{Şekilleri}} taşı
@@ -117,6 +120,7 @@ Add vertex	Icon-O-Matic-AddPointCmd		Tepecik ekle
 Clean up	Icon-O-Matic-PathsList		Temizle
 Split	Icon-O-Matic-PathManipulator		Ortadan böl
 Move	Icon-O-Matic-TransformationBoxStates		Taşı
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Pek çok yol var. HVIF biçimi en çok 255 yolu destekler.
 Conic	Icon-O-Matic-StyleTypes		Konik
 Name	Icon-O-Matic-PropertyNames		Ad
 Reset transformation	Icon-O-Matic-StylesList		Dönüşümü sıfırla
@@ -126,10 +130,12 @@ Remove	Icon-O-Matic-PathsList		Kaldır
 Load error	Icon-O-Matic-SVGImport		Yükleme hatası
 Style type	Icon-O-Matic-StyleTypes		Biçem türü
 Quit	Icon-O-Matic-Menu-File		Çık
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		Bir veya daha çok şeklin pek çok dönüştürücüsü var. HVIF biçimi şekil başına en çok 255 dönüştürücüyü destekler.
 Gradient	Icon-O-Matic-StyleTypes		Gradyan
 Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Renk (#%02x%02x%02x)
 Detect orient.	Icon-O-Matic-PropertyNames		Yönü belirleyin.
 Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{Yol} other{Yollar}} ekle
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Bir veya daha çok şeklin pek çok yolu var. HVIF biçimi şekil başına en çok 255 yolu destekler.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Yol ve biçem içeren şekil ekle
 Radial	Icon-O-Matic-StyleTypes		Radyal
 Text too long	Icon-O-Matic-StyledTextImport		Metin çok uzun

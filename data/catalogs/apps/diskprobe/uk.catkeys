@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DiskProbe	494506599
+1	ukrainian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw редактор
 Remove	AttributeWindow		Вилучити
 Close	ProbeView		Закрити
@@ -119,6 +119,7 @@ Double precision floating-point value:	TypeEditors		Значення з рухо
 Image	TypeEditors	This is the type of view	Зображення
 Swapped: %lld (0x%0*Lx)	ProbeView		Обмінний: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Зберегти зміни перед закриттям?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG формат
 Number	TypeEditors	This is the type of editor	Число
 Edit	ProbeView		Редагувати

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	716811487
+1	ukrainian	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		Повна гучність
 Start media server	MediaPlayer-Main		Запустити Медіасервер
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже, медіасервер не працює.\nБажаєте запустити його?
 Location	MediaPlayer-InfoWin		Шлях
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Відкриття '%s'.
 Medium	MediaPlayer-SettingsWindow		Середній
 Play mode	MediaPlayer-SettingsWindow		Режим відтворення

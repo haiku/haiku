@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.support	2097798758
+1	ukrainian	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Заголовок з позначками
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Гц
 Right	MediaString		Правий
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32-бітовий RGB
 System mixer	MediaString		Системний мікшер
 Physical output	MediaString		Фізичний вихід

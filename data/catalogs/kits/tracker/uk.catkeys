@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	96054702
+1	ukrainian	x-vnd.Haiku-libtracker	1155113004
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -413,6 +413,7 @@ Emptying Trash… 	StatusWindow		Спорожнення смітника…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # файл} few{# файли} other{for # файлів}}
 Revert	TrackerSettingsWindow		Відкат змін
 trash	B_TRASH_DIRECTORY		смітник
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		При переміщенні папки system або її вмісту, Ви не зможете завантажити %osName!\n\nВи впевнені що бажаєте цього?\n\nЩоб все рівно перемістити папку system або її вміст, затисніть кнопку Shift та натисніть \«Перемістити\».
 Close all in workspace	ContainerWindow		Закрити все у робочій області
 Corrupted expression.	libtracker		Пошкоджений вираз.
@@ -437,6 +438,7 @@ the config folder	FSUtils		папка конфігурації
 Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку.
 MIME Signature	AttributesView		MIME Сигнатура
 Select all	VirtualDirectoryWindow		Вибрати все
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Перейменувати
 Clean up all	ContainerWindow		Очистити все
 Add current folder	FilePanelPriv		Додати поточну папку
@@ -510,6 +512,7 @@ Create a Query	FindPanel		Створити запит
 Close	QueryContainerWindow		Закрити
 I know what I'm doing	FSUtils	button label	Я знаю що роблю
 Preparing to copy items…	StatusWindow		Підготовка до копіювання елементів…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld Б
 Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		У вигляді значків
 The entered folder name is too long.	FSUtils		Введена назва папки занадто довга.

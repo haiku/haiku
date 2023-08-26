@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Cortex.support	2097798758
+1	swedish	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Rubrik har flaggor
 32 bit HLS	MediaString		32-bitars HLS
 Recording	MediaString		Inspelning
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Höger
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32-bitars RGB
 System mixer	MediaString		Systemblandare
 Physical output	MediaString		Fysisk produktion

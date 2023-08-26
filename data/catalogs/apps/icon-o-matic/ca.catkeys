@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-icon_o_matic	3282980298
+1	catalan; valencian	x-vnd.haiku-icon_o_matic	2572445882
 None	Icon-O-Matic-Properties		Cap
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Neteja el camí
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -21,6 +21,7 @@ Shorten	Icon-O-Matic-PropertyNames		Escurça
 Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Mou {0, plural, one{transformador} other{transformadors}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		El text que intenteu importar és força llarg. N'esteu segur?
 Paste	Icon-O-Matic-Properties		Enganxa
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Hi ha massa estils. El format HVIF n'admet un màxim de 255.
 Close	Icon-O-Matic-Menu-File		Tanca
 Add rect	Icon-O-Matic-PathsList		Afegeix-hi un rectangle
 Rotation	Icon-O-Matic-PropertyNames		Rotació
@@ -59,6 +60,7 @@ Saving your document failed!	Icon-O-Matic-Exporter		Ha fallat desar el document!
 Snap to grid	Icon-O-Matic-Menu-Settings		Canvia a la graella
 Opening the document failed!	Icon-O-Matic-Main		No s'ha pogut obrir el document
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Suprimeix {0, plural, one{estil} other{estils}}
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Un o més dels camins tenen massa vèrtexs. El format HVIF admet un màxim de 255 vèrtexs per camí.
 Add with path & style	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb camí i estil
 Shape	Icon-O-Matic-Menus		Forma
 Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Divideix {0, plural, one{vèrtex} other{vèrtexs}}
@@ -80,6 +82,7 @@ Miter limit	Icon-O-Matic-PropertyNames		Límit de biaix
 Insert vertex	Icon-O-Matic-InsertPointCmd		Insereix un vèrtex
 Rounding	Icon-O-Matic-PropertyNames		Arrodoniment
 Joins	Icon-O-Matic-PropertyNames		Uneix
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Hi ha massa formes. El format HVIF n'admet un màxim de 255.
 Cancel	Icon-O-Matic-ColorPicker		Cancel·la
 Duplicate	Icon-O-Matic-PathsList		Duplica
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Mou {0, plural, one{forma} other{formes}}
@@ -117,6 +120,7 @@ Add vertex	Icon-O-Matic-AddPointCmd		Afegeix un vèrtex
 Clean up	Icon-O-Matic-PathsList		Neteja
 Split	Icon-O-Matic-PathManipulator		Divideix
 Move	Icon-O-Matic-TransformationBoxStates		Mou
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Hi ha massa camins. El format HVIF n'admet un màxim de 255.
 Conic	Icon-O-Matic-StyleTypes		Cònic
 Name	Icon-O-Matic-PropertyNames		Nom
 Reset transformation	Icon-O-Matic-StylesList		Restableix la transformació
@@ -126,10 +130,12 @@ Remove	Icon-O-Matic-PathsList		Suprimeix
 Load error	Icon-O-Matic-SVGImport		Error de càrrega
 Style type	Icon-O-Matic-StyleTypes		Tipus d'estil
 Quit	Icon-O-Matic-Menu-File		Surt
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		Una o més de les formes tenen massa transformadors. El format HVIF admet un màxim de 255 transformadors per forma.
 Gradient	Icon-O-Matic-StyleTypes		Gradient
 Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Color (#%02x%02x%02x)
 Detect orient.	Icon-O-Matic-PropertyNames		Detecta'n l'orientació
 Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Afegeix {0, plural, one{camí} other{camins}}
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Una o més de les formes tenen massa camins. El format HVIF admet un màxim de 255 camins per forma.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Afegeix-n'hi una amb camí i estil
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Text massa llarg

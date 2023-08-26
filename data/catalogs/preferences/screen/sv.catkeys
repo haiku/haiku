@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Screen	133788249
+1	swedish	x-vnd.Haiku-Screen	2318349707
 no	Screen		nej
 bits/pixel	Screen		bitar/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
@@ -13,6 +13,7 @@ Video format:	Screen		Videoformat:
 Undo	Screen		Ångra
 OK	Screen		OK
 Current workspace	Screen		Nuvarande arbetsyta
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		vertikalt
 All workspaces	Screen		Alla arbetsytor
 Use laptop panel:	Screen		Använd bärbar panel:

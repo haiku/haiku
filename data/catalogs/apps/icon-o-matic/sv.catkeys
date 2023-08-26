@@ -1,8 +1,13 @@
-1	swedish	x-vnd.haiku-icon_o_matic	2395697714
+1	swedish	x-vnd.haiku-icon_o_matic	2591122443
 None	Icon-O-Matic-Properties		Ingen
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Rensa vägen
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Lägg till tom
 Opening the icon failed!	Icon-O-Matic-Main		Öppning av ikonen misslyckades!
+Reverse path	Icon-O-Matic-ReversePathCmd		Omvänd väg
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Pip!
 Add with path	Icon-O-Matic-ShapesList		Lägg till med bana
+Paste properties	Icon-O-Matic-Properties		Klistra in egenskaper
 Copy	Icon-O-Matic-Properties		Kopiera
 Color	Icon-O-Matic-PropertyNames		Färg
 Format	Icon-O-Matic-SavePanel		Format
@@ -10,23 +15,34 @@ Color	Icon-O-Matic-StyleTypes		Färg
 Select	Icon-O-Matic-Properties		Markera
 Reset transformation	Icon-O-Matic-ShapesList		Återställ förändring
 Duplicate	Icon-O-Matic-StylesList		Duplicera
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Rotera
 Shorten	Icon-O-Matic-PropertyNames		Förkorta
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Flytta {0, plural, one{transformer} other{transformers}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Texten som du försöker importera är ganska lång, är du säker att du vill importera den?
 Paste	Icon-O-Matic-Properties		Klistra in
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Det finns för många stilar. HVIF-formatet stöder maximalt 255.
 Close	Icon-O-Matic-Menu-File		Stäng
 Add rect	Icon-O-Matic-PathsList		Lägg till rektangel
 Rotation	Icon-O-Matic-PropertyNames		Rotation
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Färg (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribut
 Transform	Icon-O-Matic-PathManipulator		Omvandla
 Add shape with style	Icon-O-Matic-Menu-Shape		Lägg till figur med stil
+Change color	Icon-O-Matic-SetColorCmd		Ändra färg
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Ta bort {0, plural, one{vertex} other{vertices}}
+Unassign path	Icon-O-Matic-UnassignPathCmd		Ta bort tilldelning av sökväg
 Remove	Icon-O-Matic-StylesList		Ta bort
 Cancel	Icon-O-Matic-Menu-Settings		Avbryt
+PNG set	Icon-O-Matic-SavePanel		PNG-uppsättning
 Transformation	Icon-O-Matic-TransformationBoxStates		Omvandling
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Flytta {0, plural, one{path} other{paths}}
 Closed	Icon-O-Matic-PropertyNames		Stängd
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<inget att göra om>
 Height	Icon-O-Matic-PropertyNames		Höjd
 warning	Icon-O-Matic-SVGExport		varning
 File	Icon-O-Matic-Menus		Arkiv
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	någon av de andra listorna till
 Properties	Icon-O-Matic-Menus		Egenskaper
 Path	Icon-O-Matic-PropertyNames		Bana
 Path	Icon-O-Matic-Menus		Bana

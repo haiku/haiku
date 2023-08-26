@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Screen	133788249
+1	ukrainian	x-vnd.Haiku-Screen	2318349707
 no	Screen		ні
 bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
@@ -13,6 +13,7 @@ Video format:	Screen		Відео формат:
 Undo	Screen		Відмінити
 OK	Screen		ОК
 Current workspace	Screen		Поточна робоча область
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		вертикально
 All workspaces	Screen		Всі робочі області
 Use laptop panel:	Screen		Використовувати панель ноутбука:

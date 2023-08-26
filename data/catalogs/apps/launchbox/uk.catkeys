@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-LaunchBox	1530497419
+1	ukrainian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Додати опис…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Дійсно закрити цю панель?\n(Вона не збережеться.)
 OK	LaunchBox		ОК
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Показувати рамку вікна
 Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'дещо'. Помилка в даних панелі.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Випливати автоматично
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Розмір значка
 Open containing folder	LaunchBox		Відкрити папку програми
 Add button here	LaunchBox		Додати сюди кнопку

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	517958556
+1	ukrainian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 Source files	MediaConverter		Початкові файли
 Error writing video frame %lld	MediaConverter		Помилка запису відеофрейму %lld
@@ -65,6 +65,7 @@ Video quality not supported	MediaConverter		Якість відео не під�
 Select this folder	MediaConverter		Вибрати цю папку
 %.1f kHz %ld channel	MediaFileInfo		%.1f кГц %ld канал
 Understood	MediaConverter		Зрозуміло
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2f к/с
 %d bit 	MediaFileInfo		%d біт 
 No video	Video codecs list		Без відео
 Continue	MediaConverter		Продовжити
