@@ -36,7 +36,7 @@ const uint32 MSG_REVERT_PRESSED = 'revt';
 
 ThemeWindow::ThemeWindow(const BMessenger& messenger)
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_SYSTEM_NAME("Colors"), B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE("Colors"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 		fPreviousPref(new PrefHandler(PrefHandler::Default())),
 		fSavePanel(NULL),
