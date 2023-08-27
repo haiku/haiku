@@ -338,6 +338,9 @@ DateFormatTest::TestDayNames()
 }
 
 
+namespace BPrivate {
+
+
 std::ostream& operator<<(std::ostream& stream, const BDate& date)
 {
 	stream << date.Year();
@@ -360,6 +363,9 @@ std::ostream& operator<<(std::ostream& stream, const BTime& date)
 
 	return stream;
 }
+
+
+} // namespace BPrivate
 
 
 void
