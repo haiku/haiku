@@ -61,7 +61,7 @@ typedef struct __siginfo_t {
 typedef void (*__sighandler_t)(int);
 typedef void  (*__siginfo_handler_t)(int, siginfo_t*, void*);
 
-#ifdef __USE_GNU
+#if defined(_DEFAULT_SOURCE)
 typedef __sighandler_t	sighandler_t;
 	/* GNU-like signal handler typedef */
 #endif
