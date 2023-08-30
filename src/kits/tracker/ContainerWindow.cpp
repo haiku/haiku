@@ -865,7 +865,7 @@ BContainerWindow::AddContextMenus()
 	fDropContextMenu = new BPopUpMenu("DropContext", false, false);
 	AddDropContextMenus(fDropContextMenu);
 
-	fDragContextMenu = new BSlowContextMenu("DragContext");
+	fDragContextMenu = new BPopUpNavMenu("DragContext");
 		// will get added and built dynamically in ShowContextMenu
 
 	fTrashContextMenu = new BPopUpMenu("TrashContext", false, false);
@@ -2849,7 +2849,7 @@ BContainerWindow::ShowContextMenu(BPoint where, const entry_ref* ref)
 
 					// this is now asynchronous so that we don't
 					// deadlock in Window::Quit,
-					fDragContextMenu->Go(global, true, false, true);
+					fDragContextMenu->Go(global);
 				}
 
 				return;

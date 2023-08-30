@@ -148,6 +148,30 @@ protected:
 	TrackingHookData fTrackingHook;
 };
 
+
+class BPopUpNavMenu : public BNavMenu {
+public:
+	BPopUpNavMenu(const char* title);
+	~BPopUpNavMenu();
+
+	void ClearMenu();
+
+	void Go(BPoint where);
+	bool IsShowing() const;
+
+protected:
+	BPoint ScreenLocation();
+
+private:
+	void _WaitForTrackThread();
+	static int32 _TrackThread(void* menu);
+
+private:
+	BPoint fWhere;
+	thread_id fTrackThread;
+};
+
+
 //	Spring Loaded Folder convenience routines
 //		used in both Tracker and Deskbar
 #ifndef _IMPEXP_TRACKER

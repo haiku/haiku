@@ -41,7 +41,7 @@ All rights reserved.
 
 #include "LockingList.h"
 #include "Model.h"
-#include "SlowContextPopup.h"
+#include "NavMenu.h"
 #include "TaskLoop.h"
 
 
@@ -294,7 +294,7 @@ protected:
 	BPopUpMenu* fDropContextMenu;
 	BPopUpMenu* fVolumeContextMenu;
 	BPopUpMenu* fTrashContextMenu;
-	BSlowContextMenu* fDragContextMenu;
+	BPopUpNavMenu* fDragContextMenu;
 	BMenuItem* fMoveToItem;
 	BMenuItem* fCopyToItem;
 	BMenuItem* fCreateLinkItem;

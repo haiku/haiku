@@ -900,3 +900,82 @@ BNavMenu::SetTrackingHookDeep(BMenu* menu, bool (*func)(BMenu*, void*),
 			SetTrackingHookDeep(submenu, func, state);
 	}
 }
+
+
+//	#pragma mark - BPopUpNavMenu
+
+
+BPopUpNavMenu::BPopUpNavMenu(const char* title)
+	:
+	BNavMenu(title, B_REFS_RECEIVED, BMessenger(), NULL, NULL),
+	fTrackThread(-1)
+{
+}
+
+
+BPopUpNavMenu::~BPopUpNavMenu()
+{
+	_WaitForTrackThread();
+}
+
+
+void
+BPopUpNavMenu::_WaitForTrackThread()
+{
+	if (fTrackThread >= 0) {
+		status_t status;
+		while (wait_for_thread(fTrackThread, &status) == B_INTERRUPTED)
+			;
+	}
+}
+
+
+void
+BPopUpNavMenu::ClearMenu()
+{
+	RemoveItems(0, CountItems(), true);
+
+	fMenuBuilt = false;
+}
+
+
+void
+BPopUpNavMenu::Go(BPoint where)
+{
+	_WaitForTrackThread();
+
+	fWhere = where;
+
+	fTrackThread = spawn_thread(_TrackThread, "popup", B_DISPLAY_PRIORITY, this);
+}
+
+
+bool
+BPopUpNavMenu::IsShowing() const
+{
+	return Window() != NULL && !Window()->IsHidden();
+}
+
+
+BPoint
+BPopUpNavMenu::ScreenLocation()
+{
+	return fWhere;
+}
+
+
+int32
+BPopUpNavMenu::_TrackThread(void* _menu)
+{
+	BPopUpNavMenu* menu = static_cast<BPopUpNavMenu*>(_menu);
+
+	menu->Show();
+
+	BMenuItem* result = menu->Track();
+	if (result != NULL)
+		static_cast<BInvoker*>(result)->Invoke();
+
+	menu->Hide();
+
+	return 0;
+}
