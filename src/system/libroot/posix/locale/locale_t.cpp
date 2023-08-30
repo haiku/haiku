@@ -27,77 +27,77 @@ using BPrivate::Libroot::LocaleDataBridge;
 extern "C" locale_t
 duplocale(locale_t l)
 {
-    LocaleBackendData* locObj = (LocaleBackendData*)l;
+	LocaleBackendData* locObj = (LocaleBackendData*)l;
 
-    LocaleBackendData* newObj = new (std::nothrow) LocaleBackendData;
-    if (newObj == NULL) {
-        errno = ENOMEM;
-        return (locale_t)0;
-    }
+	LocaleBackendData* newObj = new (std::nothrow) LocaleBackendData;
+	if (newObj == NULL) {
+		errno = ENOMEM;
+		return (locale_t)0;
+	}
 
-    LocaleBackend* backend = (l == LC_GLOBAL_LOCALE) ?
-        gGlobalLocaleBackend : (LocaleBackend*)locObj->backend;
+	LocaleBackend* backend = (l == LC_GLOBAL_LOCALE) ?
+		gGlobalLocaleBackend : (LocaleBackend*)locObj->backend;
 
-    if (backend == NULL) {
-        newObj->backend = NULL;
-        return (locale_t)newObj;
-    }
+	if (backend == NULL) {
+		newObj->backend = NULL;
+		return (locale_t)newObj;
+	}
 
-    // Check if everything is set to "C" or "POSIX",
-    // and avoid making a backend.
-    const char* localeDescription = backend->SetLocale(LC_ALL, NULL);
+	// Check if everything is set to "C" or "POSIX",
+	// and avoid making a backend.
+	const char* localeDescription = backend->SetLocale(LC_ALL, NULL);
 
-    if ((strcasecmp(localeDescription, "POSIX") == 0)
-        || (strcasecmp(localeDescription, "C") == 0)) {
-        newObj->backend = NULL;
-        return (locale_t)newObj;
-    }
+	if ((strcasecmp(localeDescription, "POSIX") == 0)
+			|| (strcasecmp(localeDescription, "C") == 0)) {
+		newObj->backend = NULL;
+		return (locale_t)newObj;
+	}
 
-    LocaleBackend*& newBackend = newObj->backend;
-    LocaleDataBridge*& newDataBridge = newObj->databridge;
+	LocaleBackend*& newBackend = newObj->backend;
+	LocaleDataBridge*& newDataBridge = newObj->databridge;
 
-    status_t status = LocaleBackend::CreateBackend(newBackend);
+	status_t status = LocaleBackend::CreateBackend(newBackend);
 
-    if (newBackend == NULL) {
+	if (newBackend == NULL) {
 		errno = status;
-        delete newObj;
-        return (locale_t)0;
-    }
+		delete newObj;
+		return (locale_t)0;
+	}
 
-    newDataBridge = new (std::nothrow) LocaleDataBridge(false);
+	newDataBridge = new (std::nothrow) LocaleDataBridge(false);
 
-    if (newDataBridge == NULL) {
-        errno = ENOMEM;
-        LocaleBackend::DestroyBackend(newBackend);
-        delete newObj;
-        return (locale_t)0;
-    }
+	if (newDataBridge == NULL) {
+		errno = ENOMEM;
+		LocaleBackend::DestroyBackend(newBackend);
+		delete newObj;
+		return (locale_t)0;
+	}
 
-    newBackend->Initialize(newDataBridge);
+	newBackend->Initialize(newDataBridge);
 
-    // Skipping LC_ALL. Asking for LC_ALL would force the backend
-    // to query each other value once, anyway.
-    for (int lc = 1; lc <= LC_LAST; ++lc) {
-        newBackend->SetLocale(lc, backend->SetLocale(lc, NULL));
-    }
+	// Skipping LC_ALL. Asking for LC_ALL would force the backend
+	// to query each other value once, anyway.
+	for (int lc = 1; lc <= LC_LAST; ++lc) {
+		newBackend->SetLocale(lc, backend->SetLocale(lc, NULL));
+	}
 
-    newObj->magic = LOCALE_T_MAGIC;
+	newObj->magic = LOCALE_T_MAGIC;
 
-    return (locale_t)newObj;
+	return (locale_t)newObj;
 }
 
 
 extern "C" void
 freelocale(locale_t l)
 {
-    LocaleBackendData* locobj = (LocaleBackendData*)l;
+	LocaleBackendData* locobj = (LocaleBackendData*)l;
 
-    if (locobj->backend) {
-        LocaleBackend::DestroyBackend(locobj->backend);
-        LocaleDataBridge* databridge = locobj->databridge;
-        delete databridge;
-    }
-    delete locobj;
+	if (locobj->backend) {
+		LocaleBackend::DestroyBackend(locobj->backend);
+		LocaleDataBridge* databridge = locobj->databridge;
+		delete databridge;
+	}
+	delete locobj;
 }
 
 
@@ -137,9 +137,8 @@ newlocale(int category_mask, const char* locale, locale_t base)
 			GetLocalesFromEnvironment(LC_ALL, locales);
 		} else {
 			for (int lc = 1; lc <= LC_LAST; ++lc) {
-				if (category_mask & (1 << (lc - 1))) {
+				if (category_mask & (1 << (lc - 1)))
 					GetLocalesFromEnvironment(lc, locales);
-				}
 			}
 		}
 	} else {
@@ -147,9 +146,8 @@ newlocale(int category_mask, const char* locale, locale_t base)
 			locales[LC_ALL] = locale;
 		}
 		for (int lc = 1; lc <= LC_LAST; ++lc) {
-			if (category_mask & (1 << (lc - 1))) {
+			if (category_mask & (1 << (lc - 1)))
 				locales[lc] = locale;
-			}
 		}
 	}
 
@@ -207,28 +205,28 @@ newlocale(int category_mask, const char* locale, locale_t base)
 extern "C" locale_t
 uselocale(locale_t newLoc)
 {
-    locale_t oldLoc = (locale_t)GetCurrentLocaleInfo();
-    if (oldLoc == NULL) {
-        oldLoc = LC_GLOBAL_LOCALE;
-    }
+	locale_t oldLoc = (locale_t)GetCurrentLocaleInfo();
+	if (oldLoc == NULL) {
+		oldLoc = LC_GLOBAL_LOCALE;
+	}
 
-    if (newLoc != (locale_t)0) {
-        // Avoid expensive TLS reads with a local variable.
-        locale_t appliedLoc = oldLoc;
+	if (newLoc != (locale_t)0) {
+		// Avoid expensive TLS reads with a local variable.
+		locale_t appliedLoc = oldLoc;
 
-        if (newLoc == LC_GLOBAL_LOCALE) {
-            appliedLoc = NULL;
-        } else {
-            if (((LocaleBackendData*)newLoc)->magic != LOCALE_T_MAGIC) {
-                errno = EINVAL;
-                return (locale_t)0;
-            }
-            appliedLoc = newLoc;
-        }
+		if (newLoc == LC_GLOBAL_LOCALE) {
+			appliedLoc = NULL;
+		} else {
+			if (((LocaleBackendData*)newLoc)->magic != LOCALE_T_MAGIC) {
+				errno = EINVAL;
+				return (locale_t)0;
+			}
+			appliedLoc = newLoc;
+		}
 
-        SetCurrentLocaleInfo((LocaleBackendData*)appliedLoc);
+		SetCurrentLocaleInfo((LocaleBackendData*)appliedLoc);
 
-        if (appliedLoc != NULL) {
+		if (appliedLoc != NULL) {
 			LocaleDataBridge*& databridge = ((LocaleBackendData*)appliedLoc)->databridge;
 			// Happens when appliedLoc represents the C locale.
 			if (databridge == NULL) {
@@ -255,12 +253,12 @@ uselocale(locale_t newLoc)
 				backend->Initialize(databridge);
 			}
 			databridge->ApplyToCurrentThread();
-        } else {
-            gGlobalLocaleDataBridge.ApplyToCurrentThread();
-        }
-    }
+		} else {
+			gGlobalLocaleDataBridge.ApplyToCurrentThread();
+		}
+	}
 
-    return oldLoc;
+	return oldLoc;
 }
 
 
