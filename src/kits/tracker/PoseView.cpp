@@ -64,6 +64,7 @@ All rights reserved.
 #include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <StopWatch.h>
 #include <String.h>
 #include <SymLink.h>

@@ -46,6 +46,7 @@ All rights reserved.
 #include <MenuField.h>
 #include <NodeMonitor.h>
 #include <Point.h>
+#include <PopUpMenu.h>
 #include <RadioButton.h>
 #include <StringView.h>
 

@@ -40,6 +40,7 @@ All rights reserved.
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
+#include <PopUpMenu.h>
 #include <WindowPrivate.h>
 
 #include "AutoLock.h"
