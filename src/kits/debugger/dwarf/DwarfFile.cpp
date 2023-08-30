@@ -1779,7 +1779,7 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 	// version (uhalf)
 	uint16 version = dataReader.Read<uint16>(0);
 
-	if (version != 2 && version != 3) {
+	if (version < 2 || version > 4) {
 		WARNING("DwarfFile::_ParseLineInfo(\"%s\"): unsupported "
 			"version %d\n", fName, version);
 		return B_UNSUPPORTED;
@@ -1795,6 +1795,18 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 
 	// minimum instruction length
 	uint8 minInstructionLength = dataReader.Read<uint8>(0);
+
+	uint8 maxOpsPerInstruction;
+	if (version >= 4)
+		maxOpsPerInstruction = dataReader.Read<uint8>(0);
+	else
+		maxOpsPerInstruction = 1;
+
+	if (maxOpsPerInstruction != 1) {
+		WARNING("DwarfFile::_ParseLineInfo(\"%s\"): unsupported "
+			"maxOpsPerInstruction %u\n", fName, maxOpsPerInstruction);
+		return B_UNSUPPORTED;
+	}
 
 	// default is statement
 	bool defaultIsStatement = dataReader.Read<uint8>(0) != 0;
@@ -1819,6 +1831,8 @@ DwarfFile::_ParseLineInfo(CompilationUnit* unit)
 	TRACE_LINES("  version:              %u\n", version);
 	TRACE_LINES("  headerLength:         %" B_PRIu64 "\n", headerLength);
 	TRACE_LINES("  minInstructionLength: %u\n", minInstructionLength);
+	if (version >= 4)
+		TRACE_LINES("  maxOpsPerInstruction: %u\n", maxOpsPerInstruction);
 	TRACE_LINES("  defaultIsStatement:   %d\n", defaultIsStatement);
 	TRACE_LINES("  lineBase:             %d\n", lineBase);
 	TRACE_LINES("  lineRange:            %u\n", lineRange);
