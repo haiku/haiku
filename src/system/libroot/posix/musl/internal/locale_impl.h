@@ -10,6 +10,8 @@
 #define __nl_langinfo_l nl_langinfo_l
 
 locale_t __current_locale_t();
+locale_t __posix_locale_t();
 #define CURRENT_LOCALE (__current_locale_t())
+#define C_LOCALE (__posix_locale_t())
 
 #endif

@@ -34,14 +34,15 @@ duplocale(locale_t l)
 		errno = ENOMEM;
 		return (locale_t)0;
 	}
+	newObj->magic = LOCALE_T_MAGIC;
+	newObj->backend = NULL;
+	newObj->databridge = NULL;
 
 	LocaleBackend* backend = (l == LC_GLOBAL_LOCALE) ?
 		gGlobalLocaleBackend : (LocaleBackend*)locObj->backend;
 
-	if (backend == NULL) {
-		newObj->backend = NULL;
+	if (backend == NULL)
 		return (locale_t)newObj;
-	}
 
 	// Check if everything is set to "C" or "POSIX",
 	// and avoid making a backend.
@@ -49,7 +50,6 @@ duplocale(locale_t l)
 
 	if ((strcasecmp(localeDescription, "POSIX") == 0)
 			|| (strcasecmp(localeDescription, "C") == 0)) {
-		newObj->backend = NULL;
 		return (locale_t)newObj;
 	}
 
@@ -80,8 +80,6 @@ duplocale(locale_t l)
 	for (int lc = 1; lc <= LC_LAST; ++lc) {
 		newBackend->SetLocale(lc, backend->SetLocale(lc, NULL));
 	}
-
-	newObj->magic = LOCALE_T_MAGIC;
 
 	return (locale_t)newObj;
 }
@@ -274,4 +272,14 @@ __current_locale_t()
 	}
 
 	return locale;
+}
+
+
+extern "C" locale_t
+__posix_locale_t()
+{
+	static LocaleBackendData posix_locale_t;
+	posix_locale_t.backend = NULL;
+	posix_locale_t.databridge = NULL;
+	return &posix_locale_t;
 }
