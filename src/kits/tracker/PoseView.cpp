@@ -7190,13 +7190,8 @@ BPoseView::_UpdateSelectionRect(const BPoint& point)
 		fIsDrawingSelectionRect = true;
 
 		// use current selection rectangle to scan poses
-		if (ViewMode() == kListMode) {
-			SelectPosesListMode(fSelectionRectInfo.rect,
-				&fSelectionRectInfo.selection);
-		} else {
-			SelectPosesIconMode(fSelectionRectInfo.rect,
-				&fSelectionRectInfo.selection);
-		}
+		SelectPoses(fSelectionRectInfo.rect,
+			&fSelectionRectInfo.selection);
 
 		Window()->UpdateIfNeeded();
 
@@ -7832,31 +7827,44 @@ BPoseView::GetDragRect(int32 clickedPoseIndex)
 }
 
 
-// TODO: SelectPosesListMode and SelectPosesIconMode are terrible and share
-// most code
 void
-BPoseView::SelectPosesListMode(BRect selectionRect, BList** oldList)
+BPoseView::SelectPoses(BRect selectionRect, BList** oldList)
 {
-	ASSERT(ViewMode() == kListMode);
+	// TODO: This is a mess due to pose rect calculation and list management
+	// being different for list vs. icon modes. Refactoring needed.
+
+	const bool inListMode = (ViewMode() == kListMode);
 
 	// collect all the poses which are enclosed inside the selection rect
 	BList* newList = new BList;
 	BRect bounds(Bounds());
-	SetDrawingMode(B_OP_COPY);
-		// TODO: I _think_ there is no more synchronous drawing here,
-		// so this should be save to remove
 
-	int32 startIndex = (int32)(selectionRect.top / fListElemHeight);
+	int32 startIndex;
+	if (inListMode) {
+		startIndex = (int32)(selectionRect.top / fListElemHeight);
+	} else {
+		startIndex = FirstIndexAtOrBelow(
+			(int32)(selectionRect.top - IconPoseHeight()), true);
+	}
 	if (startIndex < 0)
 		startIndex = 0;
 
-	BPoint loc(0, startIndex * fListElemHeight);
+	BPoint listLoc;
+	if (inListMode)
+		listLoc.Set(0, startIndex * fListElemHeight);
 
-	PoseList* poseList = CurrentPoseList();
-	int32 poseCount = poseList->CountItems();
+	PoseList* poseList = inListMode ? CurrentPoseList() : fVSPoseList;
+	const int32 poseCount = inListMode ? poseList->CountItems() : fPoseList->CountItems();
 	for (int32 index = startIndex; index < poseCount; index++) {
 		BPose* pose = poseList->ItemAt(index);
-		BRect poseRect(pose->CalcRect(loc, this));
+		if (pose == NULL)
+			continue;
+
+		BRect poseRect;
+		if (inListMode)
+			poseRect = pose->CalcRect(listLoc, this);
+		else
+			poseRect = pose->CalcRect(this);
 
 		if (selectionRect.Intersects(poseRect)) {
 			bool selected = pose->IsSelected();
@@ -7870,74 +7878,16 @@ BPoseView::SelectPosesListMode(BRect selectionRect, BList** oldList)
 				Invalidate(poseRect);
 			}
 
-			// First Pose selected gets to be the pivot.
+			// first Pose selected gets to be the pivot.
 			if ((fSelectionPivotPose == NULL) && (selected == false))
 				fSelectionPivotPose = pose;
 		}
 
-		loc.y += fListElemHeight;
-		if (loc.y > selectionRect.bottom)
-			break;
-	}
-
-	// take the old set of enclosed poses and invert selection state
-	// on those which are no longer enclosed
-	int32 count = (*oldList)->CountItems();
-	for (int32 index = 0; index < count; index++) {
-		int32 oldIndex = (addr_t)(*oldList)->ItemAt(index);
-
-		if (!newList->HasItem((void*)(addr_t)oldIndex)) {
-			BPose* pose = poseList->ItemAt(oldIndex);
-			pose->Select(!pose->IsSelected());
-			loc.Set(0, oldIndex * fListElemHeight);
-			BRect poseRect(pose->CalcRect(loc, this));
-
-			if (poseRect.Intersects(bounds))
-				Invalidate(poseRect);
-		}
-	}
-
-	delete* oldList;
-	*oldList = newList;
-}
-
-
-void
-BPoseView::SelectPosesIconMode(BRect selectionRect, BList** oldList)
-{
-	ASSERT(ViewMode() != kListMode);
-
-	// collect all the poses which are enclosed inside the selection rect
-	BList* newList = new BList;
-	BRect bounds(Bounds());
-	SetDrawingMode(B_OP_COPY);
-
-	int32 startIndex = FirstIndexAtOrBelow(
-		(int32)(selectionRect.top - IconPoseHeight()), true);
-	if (startIndex < 0)
-		startIndex = 0;
-
-	int32 poseCount = fPoseList->CountItems();
-	for (int32 index = startIndex; index < poseCount; index++) {
-		BPose* pose = fVSPoseList->ItemAt(index);
-		if (pose != NULL) {
-			BRect poseRect(pose->CalcRect(this));
-
-			if (selectionRect.Intersects(poseRect)) {
-				bool selected = pose->IsSelected();
-				pose->Select(!fSelectionList->HasItem(pose));
-				newList->AddItem((void*)(addr_t)index);
-
-				if ((selected != pose->IsSelected())
-					&& poseRect.Intersects(bounds)) {
-					Invalidate(poseRect);
-				}
-
-				// first Pose selected gets to be the pivot
-				if ((fSelectionPivotPose == NULL) && (selected == false))
-					fSelectionPivotPose = pose;
-			}
-
+		if (inListMode) {
+			listLoc.y += fListElemHeight;
+			if (listLoc.y > selectionRect.bottom)
+				break;
+		} else {
 			if (pose->Location(this).y > selectionRect.bottom)
 				break;
 		}
@@ -7950,16 +7900,23 @@ BPoseView::SelectPosesIconMode(BRect selectionRect, BList** oldList)
 		int32 oldIndex = (addr_t)(*oldList)->ItemAt(index);
 
 		if (!newList->HasItem((void*)(addr_t)oldIndex)) {
-			BPose* pose = fVSPoseList->ItemAt(oldIndex);
+			BPose* pose = poseList->ItemAt(oldIndex);
 			pose->Select(!pose->IsSelected());
-			BRect poseRect(pose->CalcRect(this));
+
+			BRect poseRect;
+			if (inListMode) {
+				listLoc.Set(0, oldIndex * fListElemHeight);
+				poseRect = pose->CalcRect(listLoc, this);
+			} else {
+				poseRect = pose->CalcRect(this);
+			}
 
 			if (poseRect.Intersects(bounds))
 				Invalidate(poseRect);
 		}
 	}
 
-	delete* oldList;
+	delete *oldList;
 	*oldList = newList;
 }
 

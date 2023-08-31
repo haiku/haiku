@@ -608,8 +608,7 @@ protected:
 		BPoint mouseLocation) const;
 
 	// selection
-	void SelectPosesListMode(BRect, BList**);
-	void SelectPosesIconMode(BRect, BList**);
+	void SelectPoses(BRect, BList**);
 	void AddRemoveSelectionRange(BPoint where, bool extendSelection,
 		BPose* pose);
 
