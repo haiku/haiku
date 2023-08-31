@@ -10,9 +10,13 @@ long long __year_to_secs(long long year, int *is_leap)
 		return 31536000*(y-70) + 86400*leaps;
 	}
 
+	{
 	int cycles, centuries, leaps, rem;
 
-	if (!is_leap) is_leap = &(int){0};
+	if (!is_leap) {
+		static int isleap = 0;
+		is_leap = &isleap;
+	}
 	cycles = (year-100) / 400;
 	rem = (year-100) % 400;
 	if (rem < 0) {
@@ -44,4 +48,5 @@ long long __year_to_secs(long long year, int *is_leap)
 	leaps += 97*cycles + 24*centuries - *is_leap;
 
 	return (year-100) * 31536000LL + leaps * 86400LL + 946684800 + 86400;
+	}
 }
