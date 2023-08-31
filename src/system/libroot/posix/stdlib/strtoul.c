@@ -1,6 +1,13 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1990, 1993
  *	The Regents of the University of California.  All rights reserved.
+ *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ *
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -10,11 +17,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -36,9 +39,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-
-#include <errno_private.h>
-
 
 /*
  * Convert a string to an unsigned long integer.
@@ -72,10 +72,20 @@ strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
 			c = *s++;
 	}
 	if ((base == 0 || base == 16) &&
-	    c == '0' && (*s == 'x' || *s == 'X')) {
+		c == '0' && (*s == 'x' || *s == 'X') &&
+		((s[1] >= '0' && s[1] <= '9') ||
+		(s[1] >= 'A' && s[1] <= 'F') ||
+		(s[1] >= 'a' && s[1] <= 'f'))) {
 		c = s[1];
 		s += 2;
 		base = 16;
+	}
+	if ((base == 0 || base == 2) &&
+		c == '0' && (*s == 'b' || *s == 'B') &&
+		(s[1] >= '0' && s[1] <= '1')) {
+		c = s[1];
+		s += 2;
+		base = 2;
 	}
 	if (base == 0)
 		base = c == '0' ? 8 : 10;
@@ -106,10 +116,10 @@ strtoul(const char * __restrict nptr, char ** __restrict endptr, int base)
 	}
 	if (any < 0) {
 		acc = ULONG_MAX;
-		__set_errno(ERANGE);
+		errno = ERANGE;
 	} else if (!any) {
 noconv:
-		__set_errno(EINVAL);
+		errno = EINVAL;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != NULL)
@@ -118,6 +128,7 @@ noconv:
 }
 
 
+#ifdef __HAIKU__
 unsigned long __strtoul_internal(const char *number, char **_end, int base, int group);
 
 unsigned long
@@ -128,4 +139,4 @@ __strtoul_internal(const char *number, char **_end, int base, int group)
 
 	return strtoul(number, _end, base);
 }
-
+#endif

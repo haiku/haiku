@@ -1,6 +1,13 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1987, 1993
  *	The Regents of the University of California.  All rights reserved.
+ *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ *
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -10,11 +17,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -30,7 +33,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
 
 #include <ctype.h>
 #include <strings.h>
@@ -72,15 +74,14 @@ strncasecmp(const char *s1, const char *s2, size_t n)
 int
 strcasecmp_l(const char *s1, const char *s2, locale_t locale)
 {
-	const u_char *us1 = (const u_char *)s1;
-	const u_char *us2 = (const u_char *)s2;
+	const u_char
+			*us1 = (const u_char *)s1,
+			*us2 = (const u_char *)s2;
 
-	while (tolower_l(*us1, locale) == tolower_l(*us2++, locale)) {
+	while (tolower_l(*us1, locale) == tolower_l(*us2++, locale))
 		if (*us1++ == '\0')
-			return 0;
-	}
-
-	return tolower_l(*us1, locale) - tolower_l(*--us2, locale);
+			return (0);
+	return (tolower_l(*us1, locale) - tolower_l(*--us2, locale));
 }
 
 
@@ -88,15 +89,16 @@ int
 strncasecmp_l(const char *s1, const char *s2, size_t n, locale_t locale)
 {
 	if (n != 0) {
-		const u_char *us1 = (const u_char *)s1;
-		const u_char *us2 = (const u_char *)s2;
+		const u_char
+				*us1 = (const u_char *)s1,
+				*us2 = (const u_char *)s2;
 
 		do {
 			if (tolower_l(*us1, locale) != tolower_l(*us2++, locale))
-				return tolower_l(*us1, locale) - tolower_l(*--us2, locale);
+				return (tolower_l(*us1, locale) - tolower_l(*--us2, locale));
 			if (*us1++ == '\0')
 				break;
 		} while (--n != 0);
 	}
-	return 0;
+	return (0);
 }

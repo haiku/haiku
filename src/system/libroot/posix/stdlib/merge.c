@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -13,11 +15,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -53,15 +51,17 @@ static char sccsid[] = "@(#)merge.c	8.2 (Berkeley) 2/14/94";
  */
 
 #include <sys/types.h>
+#include <stdint.h>
 
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <errno_private.h>
+typedef int (*cmp_t)(const void *, const void *);
+#define	CMP(x, y)	cmp(x, y)
 
-static void setup(u_char *, u_char *, size_t, size_t, int (*)());
-static void insertionsort(u_char *, size_t, size_t, int (*)());
+static void setup(u_char *, u_char *, size_t, size_t, cmp_t);
+static void insertionsort(u_char *, size_t, size_t, cmp_t);
 
 #define ISIZE sizeof(int)
 #define PSIZE sizeof(u_char *)
@@ -89,47 +89,29 @@ static void insertionsort(u_char *, size_t, size_t, int (*)());
  * boundaries.
  */
 /* Assumption: PSIZE is a power of 2. */
-#define EVAL(p) (u_char **)						\
-	((u_char *)0 +							\
-	    (((u_char *)p + PSIZE - 1 - (u_char *) 0) & ~(PSIZE - 1)))
+#define roundup2(x, y)	(((x) + ((y) - 1)) & (~((y) - 1)))
+#define EVAL(p) (u_char **)roundup2((uintptr_t)p, PSIZE)
 
 /*
  * Arguments are as for qsort.
  */
 int
-mergesort(void *base, size_t nmemb, size_t size, int (*cmp)(void const *, void const *))
+mergesort(void *base, size_t nmemb, size_t size, cmp_t cmp)
 {
 	size_t i;
 	int sense;
 	int big, iflag;
-	u_char *f1;
-	u_char *f2;
-	u_char *t;
-	u_char *b;
-	u_char *tp2;
-	u_char *q;
-	u_char *l1;
-	u_char *l2;
-	u_char *list2;
-	u_char *list1;
-	u_char *p2;
-	u_char *p;
-	u_char *last;
-	u_char **p1;
+	u_char *f1, *f2, *t, *b, *tp2, *q, *l1, *l2;
+	u_char *list2, *list1, *p2, *p, *last, **p1;
 
 	if (size < PSIZE / 2) {		/* Pointers must fit into 2 * size. */
-//		__set_errno(EINVAL);
+		errno = EINVAL;
 		return (-1);
 	}
 
-	if (nmemb == 0) {
+	if (nmemb == 0)
 		return (0);
-	}
 
-	/*
-	 * XXX
-	 * Stupid subtraction for the Cray.
-	 */
 	iflag = 0;
 	if (!(size % ISIZE) && !(((char *)base - (char *)0) % ISIZE))
 		iflag = 1;
@@ -142,99 +124,99 @@ mergesort(void *base, size_t nmemb, size_t size, int (*cmp)(void const *, void c
 	last = list2 + nmemb * size;
 	i = big = 0;
 	while (*EVAL(list2) != last) {
-	    l2 = list1;
-	    p1 = EVAL(list1);
-	    for (tp2 = p2 = list2; p2 != last; p1 = EVAL(l2)) {
-	    	p2 = *EVAL(p2);
-	    	f1 = l2;
-	    	f2 = l1 = list1 + (p2 - list2);
-	    	if (p2 != last)
-	    		p2 = *EVAL(p2);
-	    	l2 = list1 + (p2 - list2);
-	    	while (f1 < l1 && f2 < l2) {
-	    		if ((*cmp)(f1, f2) <= 0) {
-	    			q = f2;
-	    			b = f1, t = l1;
-	    			sense = -1;
-	    		} else {
-	    			q = f1;
-	    			b = f2, t = l2;
-	    			sense = 0;
-	    		}
-	    		if (!big) {	/* here i = 0 */
-				while ((b += size) < t && cmp(q, b) >sense)
-	    				if (++i == 6) {
-	    					big = 1;
-	    					goto EXPONENTIAL;
-	    				}
-	    		} else {
+		l2 = list1;
+		p1 = EVAL(list1);
+		for (tp2 = p2 = list2; p2 != last; p1 = EVAL(l2)) {
+			p2 = *EVAL(p2);
+			f1 = l2;
+			f2 = l1 = list1 + (p2 - list2);
+			if (p2 != last)
+				p2 = *EVAL(p2);
+			l2 = list1 + (p2 - list2);
+			while (f1 < l1 && f2 < l2) {
+				if (CMP(f1, f2) <= 0) {
+					q = f2;
+					b = f1, t = l1;
+					sense = -1;
+				} else {
+					q = f1;
+					b = f2, t = l2;
+					sense = 0;
+				}
+				if (!big) {	/* here i = 0 */
+				while ((b += size) < t && CMP(q, b) >sense)
+						if (++i == 6) {
+							big = 1;
+							goto EXPONENTIAL;
+						}
+				} else {
 EXPONENTIAL:	    		for (i = size; ; i <<= 1)
-	    				if ((p = (b + i)) >= t) {
-	    					if ((p = t - size) > b &&
-						    (*cmp)(q, p) <= sense)
-	    						t = p;
-	    					else
-	    						b = p;
-	    					break;
-	    				} else if ((*cmp)(q, p) <= sense) {
-	    					t = p;
-	    					if (i == size)
-	    						big = 0;
-	    					goto FASTCASE;
-	    				} else
-	    					b = p;
+						if ((p = (b + i)) >= t) {
+							if ((p = t - size) > b &&
+							CMP(q, p) <= sense)
+								t = p;
+							else
+								b = p;
+							break;
+						} else if (CMP(q, p) <= sense) {
+							t = p;
+							if (i == size)
+								big = 0;
+							goto FASTCASE;
+						} else
+							b = p;
 				while (t > b+size) {
-	    				i = (((t - b) / size) >> 1) * size;
-	    				if ((*cmp)(q, p = b + i) <= sense)
-	    					t = p;
-	    				else
-	    					b = p;
-	    			}
-	    			goto COPY;
+						i = (((t - b) / size) >> 1) * size;
+						if (CMP(q, p = b + i) <= sense)
+							t = p;
+						else
+							b = p;
+					}
+					goto COPY;
 FASTCASE:	    		while (i > size)
-	    				if ((*cmp)(q,
-	    					p = b + (i >>= 1)) <= sense)
-	    					t = p;
-	    				else
-	    					b = p;
+						if (CMP(q,
+							p = b + (i >>= 1)) <= sense)
+							t = p;
+						else
+							b = p;
 COPY:	    			b = t;
-	    		}
-	    		i = size;
-	    		if (q == f1) {
-	    			if (iflag) {
-	    				ICOPY_LIST(f2, tp2, b);
-	    				ICOPY_ELT(f1, tp2, i);
-	    			} else {
-	    				CCOPY_LIST(f2, tp2, b);
-	    				CCOPY_ELT(f1, tp2, i);
-	    			}
-	    		} else {
-	    			if (iflag) {
-	    				ICOPY_LIST(f1, tp2, b);
-	    				ICOPY_ELT(f2, tp2, i);
-	    			} else {
-	    				CCOPY_LIST(f1, tp2, b);
-	    				CCOPY_ELT(f2, tp2, i);
-	    			}
-	    		}
-	    	}
-	    	if (f2 < l2) {
-	    		if (iflag)
-	    			ICOPY_LIST(f2, tp2, l2);
-	    		else
-	    			CCOPY_LIST(f2, tp2, l2);
-	    	} else if (f1 < l1) {
-	    		if (iflag)
-	    			ICOPY_LIST(f1, tp2, l1);
-	    		else
-	    			CCOPY_LIST(f1, tp2, l1);
-	    	}
-	    	*p1 = l2;
-	    }
-	    tp2 = list1;	/* swap list1, list2 */
-	    list1 = list2;
-	    list2 = tp2;
-	    last = list2 + nmemb*size;
+				}
+				i = size;
+				if (q == f1) {
+					if (iflag) {
+						ICOPY_LIST(f2, tp2, b);
+						ICOPY_ELT(f1, tp2, i);
+					} else {
+						CCOPY_LIST(f2, tp2, b);
+						CCOPY_ELT(f1, tp2, i);
+					}
+				} else {
+					if (iflag) {
+						ICOPY_LIST(f1, tp2, b);
+						ICOPY_ELT(f2, tp2, i);
+					} else {
+						CCOPY_LIST(f1, tp2, b);
+						CCOPY_ELT(f2, tp2, i);
+					}
+				}
+			}
+			if (f2 < l2) {
+				if (iflag)
+					ICOPY_LIST(f2, tp2, l2);
+				else
+					CCOPY_LIST(f2, tp2, l2);
+			} else if (f1 < l1) {
+				if (iflag)
+					ICOPY_LIST(f1, tp2, l1);
+				else
+					CCOPY_LIST(f1, tp2, l1);
+			}
+			*p1 = l2;
+		}
+		tp2 = list1;	/* swap list1, list2 */
+		list1 = list2;
+		list2 = tp2;
+		last = list2 + nmemb*size;
 	}
 	if (base == list2) {
 		memmove(list2, list1, nmemb*size);
@@ -271,7 +253,7 @@ COPY:	    			b = t;
  */
 static
 void
-setup(u_char *list1, u_char *list2, size_t n, size_t size, int (*cmp)(void const *, void const *))
+setup(u_char *list1, u_char *list2, size_t n, size_t size, cmp_t cmp)
 {
 	int i, length, size2, tmp, sense;
 	u_char *f1, *f2, *s, *l2, *last, *p2;
@@ -294,12 +276,12 @@ setup(u_char *list1, u_char *list2, size_t n, size_t size, int (*cmp)(void const
 #ifdef NATURAL
 	p2 = list2;
 	f1 = list1;
-	sense = (cmp(f1, f1 + size) > 0);
+	sense = (CMP(f1, f1 + size) > 0);
 	for (; f1 < last; sense = !sense) {
 		length = 2;
 					/* Find pairs with same sense. */
 		for (f2 = f1 + size2; f2 < last; f2 += size2) {
-			if ((cmp(f2, f2+ size) > 0) != sense)
+			if ((CMP(f2, f2+ size) > 0) != sense)
 				break;
 			length += 2;
 		}
@@ -312,7 +294,7 @@ setup(u_char *list1, u_char *list2, size_t n, size_t size, int (*cmp)(void const
 		} else {				/* Natural merge */
 			l2 = f2;
 			for (f2 = f1 + size2; f2 < l2; f2 += size2) {
-				if ((cmp(f2-size, f2) > 0) != sense) {
+				if ((CMP(f2-size, f2) > 0) != sense) {
 					p2 = *EVAL(p2) = f2 - list1 + list2;
 					if (sense > 0)
 						reverse(f1, f2-size);
@@ -322,7 +304,7 @@ setup(u_char *list1, u_char *list2, size_t n, size_t size, int (*cmp)(void const
 			if (sense > 0)
 				reverse (f1, f2-size);
 			f1 = f2;
-			if (f2 < last || cmp(f2 - size, f2) > 0)
+			if (f2 < last || CMP(f2 - size, f2) > 0)
 				p2 = *EVAL(p2) = f2 - list1 + list2;
 			else
 				p2 = *EVAL(p2) = list2 + n*size;
@@ -331,7 +313,7 @@ setup(u_char *list1, u_char *list2, size_t n, size_t size, int (*cmp)(void const
 #else		/* pairwise merge only. */
 	for (f1 = list1, p2 = list2; f1 < last; f1 += size2) {
 		p2 = *EVAL(p2) = p2 + size2;
-		if (cmp (f1, f1 + size) > 0)
+		if (CMP (f1, f1 + size) > 0)
 			swap(f1, f1 + size);
 	}
 #endif /* NATURAL */
@@ -341,23 +323,17 @@ setup(u_char *list1, u_char *list2, size_t n, size_t size, int (*cmp)(void const
  * This is to avoid out-of-bounds addresses in sorting the
  * last 4 elements.
  */
-static
-void
-insertionsort(u_char *a, size_t n,size_t  size, int (*cmp)(const void *, const void *))
+static void
+insertionsort(u_char *a, size_t n, size_t size, cmp_t cmp)
 {
-	u_char *ai;
-	u_char *s;
-	u_char *t;
-	u_char *u;
-	u_char tmp;
+	u_char *ai, *s, *t, *u, tmp;
 	int i;
 
-	for (ai = a+size; --n >= 1; ai += size) {
+	for (ai = a+size; --n >= 1; ai += size)
 		for (t = ai; t > a; t -= size) {
 			u = t - size;
-			if (cmp(u, t) <= 0)
+			if (CMP(u, t) <= 0)
 				break;
 			swap(u, t);
 		}
-	}
 }

@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1990, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -13,11 +15,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -53,18 +51,19 @@ static char sccsid[] = "@(#)radixsort.c	8.2 (Berkeley) 4/28/95";
 
 #include <sys/types.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include <errno.h>
-
-#include <errno_private.h>
 
 typedef struct {
 	const u_char **sa;
 	int sn, si;
 } stack;
 
-static inline void simplesort(u_char const **, int, int, u_char const *, u_int);
-static void r_sort_a(u_char const **, int, int, u_char const *, u_int);
-static void r_sort_b(u_char const **, u_char const **, int, int, u_char const *, u_int);
+static inline void simplesort
+(const u_char **, int, int, const u_char *, u_int);
+static void r_sort_a(const u_char **, int, int, const u_char *, u_int);
+static void r_sort_b(const u_char **, const u_char **, int, int,
+	const u_char *, u_int);
 
 #define	THRESHOLD	20		/* Divert to simplesort(). */
 #define	SIZE		512		/* Default stack size. */
@@ -82,17 +81,17 @@ static void r_sort_b(u_char const **, u_char const **, int, int, u_char const *,
 		endch = tab[endch];					\
 		tr = tab;						\
 		if (endch != 0 && endch != 255) {			\
-			/* __set_errno(EINVAL); */				\
+			errno = EINVAL;					\
 			return (-1);					\
 		}							\
 	}								\
 }
 
 int
-radixsort(u_char const **a, int n, u_char const *tab, u_int endch)
+radixsort(const u_char **a, int n, const u_char *tab, u_int endch)
 {
-	u_char const *tr;
-	u_int c;
+	const u_char *tr;
+	int c;
 	u_char tr0[256];
 
 	SETUP;
@@ -101,11 +100,10 @@ radixsort(u_char const **a, int n, u_char const *tab, u_int endch)
 }
 
 int
-sradixsort(u_char const **a, int n, u_char const *tab, u_int endch)
+sradixsort(const u_char **a, int n, const u_char *tab, u_int endch)
 {
-	u_char const *tr;
-	u_char const **ta;
-	u_int c;
+	const u_char *tr, **ta;
+	int c;
 	u_char tr0[256];
 
 	SETUP;
@@ -127,25 +125,14 @@ sradixsort(u_char const **a, int n, u_char const *tab, u_int endch)
 
 /* Unstable, in-place sort. */
 static void
-r_sort_a(u_char const **a, int n, int i, u_char const *tr, u_int endch)
+r_sort_a(const u_char **a, int n, int i, const u_char *tr, u_int endch)
 {
-	static u_int count[256];
-	static int  nc;
-	static u_int  bmin;
-	u_int c;
-	u_char const **ak;
-	u_char const *r;
-	stack s[SIZE];
-	stack *sp;
-	stack *sp0;
-	stack *sp1;
-	stack temp;
-	u_int *cp;
-	u_int bigc;
-	u_char const **an;
-	u_char const *t;
-	u_char const **aj;
-	u_char const **top[256];
+	static int count[256], nc, bmin;
+	int c;
+	const u_char **ak, *r;
+	stack s[SIZE], *sp, *sp0, *sp1, temp;
+	int *cp, bigc;
+	const u_char **an, *t, **aj, **top[256];
 
 	/* Set up stack. */
 	sp = s;
@@ -173,6 +160,17 @@ r_sort_a(u_char const **a, int n, int i, u_char const *tr, u_int endch)
 				r_sort_a(a, n, i, tr, endch);
 				continue;
 			}
+		}
+
+		/*
+		 * Special case: if all strings have the same
+		 * character at position i, move on to the next
+		 * character.
+		 */
+		if (nc == 1 && count[bmin] == n) {
+			push(a, n, i+1);
+			nc = count[bmin] = 0;
+			continue;
 		}
 
 		/*
@@ -224,19 +222,16 @@ r_sort_a(u_char const **a, int n, int i, u_char const *tr, u_int endch)
 }
 
 /* Stable sort, requiring additional memory. */
-static
-void
-r_sort_b(u_char const **a, u_char const **ta, int n, int i, u_char const *tr, u_int endch)
+static void
+r_sort_b(const u_char **a, const u_char **ta, int n, int i, const u_char *tr,
+	u_int endch)
 {
-	static int count[256];
-	static u_int  nc;
-	static u_int  bmin;
-	u_int c;
-	u_char const **ak, **ai;
+	static int count[256], nc, bmin;
+	int c;
+	const u_char **ak, **ai;
 	stack s[512], *sp, *sp0, *sp1, temp;
-	u_char const **top[256];
-	int *cp;
-	u_int bigc;
+	const u_char **top[256];
+	int *cp, bigc;
 
 	sp = s;
 	push(a, n, i);
@@ -296,25 +291,21 @@ r_sort_b(u_char const **a, u_char const **ta, int n, int i, u_char const *tr, u_
 	}
 }
 
-static inline
-void
-simplesort(u_char const **a, int n, int b, u_char const *tr, u_int endch)	/* insertion sort */
+/* insertion sort */
+static inline void
+simplesort(const u_char **a, int n, int b, const u_char *tr, u_int endch)
 {
 	u_char ch;
-	u_char const **ak;
-	u_char const **ai;
-	u_char const  *s;
-	u_char const  *t;
+	const u_char  **ak, **ai, *s, *t;
 
-	for (ak = a+1; --n >= 1; ak++) {
+	for (ak = a+1; --n >= 1; ak++)
 		for (ai = ak; ai > a; ai--) {
 			for (s = ai[0] + b, t = ai[-1] + b;
-			    (ch = tr[*s]) != endch; s++, t++)
+				(ch = tr[*s]) != endch; s++, t++)
 				if (ch != tr[*t])
 					break;
 			if (ch >= tr[*t])
 				break;
 			swap(ai[0], ai[-1], s);
 		}
-	}
 }

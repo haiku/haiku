@@ -1,6 +1,10 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
+ * Copyright (c) 2014 David T. Chisnall
+ * All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Ronnie Kon at Mindcraft Inc., Kevin Lew and Elmer Yglesias.
@@ -13,11 +17,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -39,9 +39,10 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 
 #include <errno.h>
+#include <stddef.h>
 #include <stdlib.h>
 
-#include <errno_private.h>
+#define COMPAR(x, y) compar(x, y)
 
 /*
  * Swap two areas of size number of bytes.  Although qsort(3) permits random
@@ -78,14 +79,14 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
  */
 #define CREATE(initval, nmemb, par_i, child_i, par, child, size, count, tmp) { \
 	for (par_i = initval; (child_i = par_i * 2) <= nmemb; \
-	    par_i = child_i) { \
+		par_i = child_i) { \
 		child = base + child_i * size; \
-		if (child_i < nmemb && compar(child, child + size) < 0) { \
+		if (child_i < nmemb && COMPAR(child, child + size) < 0) { \
 			child += size; \
 			++child_i; \
 		} \
 		par = base + par_i * size; \
-		if (compar(child, par) <= 0) \
+		if (COMPAR(child, par) <= 0) \
 			break; \
 		SWAP(par, child, count, size, tmp); \
 	} \
@@ -95,7 +96,7 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
  * Select the top of the heap and 'heapify'.  Since by far the most expensive
  * action is the call to the compar function, a considerable optimization
  * in the average case can be achieved due to the fact that k, the displaced
- * elememt, is ususally quite small, so it would be preferable to first
+ * elememt, is usually quite small, so it would be preferable to first
  * heapify, always maintaining the invariant that the larger child is copied
  * over its parent's record.
  *
@@ -111,7 +112,7 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
 #define SELECT(par_i, child_i, nmemb, par, child, size, k, count, tmp1, tmp2) { \
 	for (par_i = 1; (child_i = par_i * 2) <= nmemb; par_i = child_i) { \
 		child = base + child_i * size; \
-		if (child_i < nmemb && compar(child, child + size) < 0) { \
+		if (child_i < nmemb && COMPAR(child, child + size) < 0) { \
 			child += size; \
 			++child_i; \
 		} \
@@ -123,7 +124,7 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
 		par_i = child_i / 2; \
 		child = base + child_i * size; \
 		par = base + par_i * size; \
-		if (child_i == 1 || compar(k, par) < 0) { \
+		if (child_i == 1 || COMPAR(k, par) < 0) { \
 			COPY(child, k, count, size, tmp1, tmp2); \
 			break; \
 		} \
@@ -139,32 +140,23 @@ static char sccsid[] = "@(#)heapsort.c	8.1 (Berkeley) 6/4/93";
  * only advantage over quicksort is that it requires little additional memory.
  */
 int
-heapsort(void *vbase, size_t nmemb, size_t size, int (*compar)(void const *, void const *))
+heapsort(void *vbase, size_t nmemb, size_t size,
+	int (*compar)(const void *, const void *))
 {
-	size_t cnt;
-	size_t i;
-	size_t j;
-	size_t l;
-	char tmp;
-	char *tmp1;
-	char *tmp2;
-	char *base;
-	char *k;
-	char *p;
-	char *t;
+	size_t cnt, i, j, l;
+	char tmp, *tmp1, *tmp2;
+	char *base, *k, *p, *t;
 
-	if (nmemb <= 1) {
+	if (nmemb <= 1)
 		return (0);
-	}
 
 	if (!size) {
-//		__set_errno(EINVAL);
+		errno = EINVAL;
 		return (-1);
 	}
 
-	if ((k = malloc(size)) == NULL) {
+	if ((k = malloc(size)) == NULL)
 		return (-1);
-	}
 
 	/*
 	 * Items are numbered from 1 to nmemb, so offset from size bytes
