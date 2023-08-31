@@ -1,3 +1,5 @@
+/*	$NetBSD: list.h,v 1.5 2009/04/12 17:07:16 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1997,1999 by Internet Software Consortium.
@@ -21,14 +23,14 @@
 
 #define LIST(type) struct { type *head, *tail; }
 #define INIT_LIST(list) \
-	do { (list).head = NULL; (list).tail = NULL; } while (0)
+	do { (list).head = NULL; (list).tail = NULL; } while (/*CONSTCOND*/0)
 
 #define LINK(type) struct { type *prev, *next; }
 #define INIT_LINK_TYPE(elt, link, type) \
 	do { \
 		(elt)->link.prev = (type *)(-1); \
 		(elt)->link.next = (type *)(-1); \
-	} while (0)
+	} while (/*CONSTCOND*/0)
 #define INIT_LINK(elt, link) \
 	INIT_LINK_TYPE(elt, link, void)
 #define LINKED(elt, link) ((void *)((elt)->link.prev) != (void *)(-1) && \
@@ -48,7 +50,7 @@
 		(elt)->link.prev = NULL; \
 		(elt)->link.next = (list).head; \
 		(list).head = (elt); \
-	} while (0)
+	} while (/*CONSTCOND*/0)
 
 #define APPEND(list, elt, link) \
 	do { \
@@ -60,7 +62,7 @@
 		(elt)->link.prev = (list).tail; \
 		(elt)->link.next = NULL; \
 		(list).tail = (elt); \
-	} while (0)
+	} while (/*CONSTCOND*/0)
 
 #define UNLINK_TYPE(list, elt, link, type) \
 	do { \
@@ -78,7 +80,7 @@
 			(list).head = (elt)->link.next; \
 		} \
 		INIT_LINK_TYPE(elt, link, type); \
-	} while (0)
+	} while (/*CONSTCOND*/0)
 #define UNLINK(list, elt, link) \
 	UNLINK_TYPE(list, elt, link, void)
 
@@ -96,7 +98,7 @@
 			(elt)->link.prev->link.next = (elt); \
 			(elt)->link.next = (before); \
 		} \
-	} while (0)
+	} while (/*CONSTCOND*/0)
 
 #define INSERT_AFTER(list, after, elt, link) \
 	do { \
@@ -109,7 +111,7 @@
 			(elt)->link.next->link.prev = (elt); \
 			(elt)->link.prev = (after); \
 		} \
-	} while (0)
+	} while (/*CONSTCOND*/0)
 
 #define ENQUEUE(list, elt, link) APPEND(list, elt, link)
 #define DEQUEUE(list, elt, link) UNLINK(list, elt, link)

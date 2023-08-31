@@ -32,7 +32,7 @@
 #include <stdio.h>
 
 struct protoent_data {
-	FILE *fp;
+        FILE *fp;
 	struct protoent proto;
 	char **aliases;
 	size_t maxaliases;
@@ -43,8 +43,8 @@ struct protoent_data {
 
 struct protoent	*getprotoent_r(struct protoent *, struct protoent_data *);
 struct protoent	*getprotobyname_r(const char *,
-struct protoent *, struct protoent_data *);
+    struct protoent *, struct protoent_data *);
 struct protoent	*getprotobynumber_r(int,
-struct protoent *, struct protoent_data *);
+    struct protoent *, struct protoent_data *);
 void setprotoent_r(int, struct protoent_data *);
 void endprotoent_r(struct protoent_data *);

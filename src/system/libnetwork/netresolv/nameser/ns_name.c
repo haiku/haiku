@@ -1,4 +1,4 @@
-/*	$NetBSD: ns_name.c,v 1.9 2012/03/13 21:13:39 christos Exp $	*/
+/*	$NetBSD: ns_name.c,v 1.11.28.1 2019/09/06 19:51:54 martin Exp $	*/
 
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
@@ -468,11 +468,12 @@ ns_name_unpack2(const u_char *msg, const u_char *eom, const u_char *src,
 				assert(INT_MIN <= (srcp - src + 1) && (srcp - src + 1) <= INT_MAX);
 				len = (int)(srcp - src + 1);
 			}
-			srcp = msg + (((n & 0x3f) << 8) | (*srcp & 0xff));
-			if (srcp < msg || srcp >= eom) {  /*%< Out of range. */
+			n = ((n & 0x3f) << 8) | (*srcp & 0xff);
+			if (n >= eom - msg) {  /*%< Out of range. */
 				errno = EMSGSIZE;
 				return (-1);
 			}
+			srcp = msg + n;
 			checked += 2;
 			/*
 			 * Check for loops in the compressed name;
@@ -597,7 +598,7 @@ ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 		if (dstp + 1 + n >= eob) {
 			goto cleanup;
 		}
-		memcpy(dstp, srcp, (size_t)n + 1);
+		memcpy(dstp, srcp, (size_t)(n + 1));
 		srcp += n + 1;
 		dstp += n + 1;
 	} while (n != 0);
@@ -690,7 +691,7 @@ ns_name_skip(const u_char **ptrptr, const u_char *eom)
 {
 	const u_char *cp;
 	u_int n;
-	int l;
+	int l = 0;
 
 	cp = *ptrptr;
 	while (cp < eom && (n = *cp++) != 0) {
@@ -700,7 +701,7 @@ ns_name_skip(const u_char **ptrptr, const u_char *eom)
 			cp += n;
 			continue;
 		case NS_TYPE_ELT: /*%< EDNS0 extended label */
-			if ((l = labellen(cp - 1)) < 0) {
+			if (cp < eom && (l = labellen(cp - 1)) < 0) {
 				errno = EMSGSIZE; /*%< XXX */
 				return (-1);
 			}

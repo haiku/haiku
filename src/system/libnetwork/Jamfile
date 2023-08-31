@@ -14,7 +14,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary $(libnetwork) :
 			init.cpp
 			interfaces.cpp
-			gethostbyname.c
 			getifaddrs.cpp
 			socket.cpp
 			r5_compatibility.cpp

@@ -1,3 +1,5 @@
+/*	$NetBSD: dst_internal.h,v 1.2 2012/11/16 02:11:05 joerg Exp $	*/
+
 #ifndef DST_INTERNAL_H
 #define DST_INTERNAL_H
 
@@ -62,18 +64,26 @@ typedef struct dst_key {
 #define PUBLIC_KEY		"key"
 
 /* error handling */
-#ifdef REPORT_ERRORS
+#ifdef DEBUG
 #define EREPORT(str)		printf str
 #else
-#define EREPORT(str)		(void)0
+#define EREPORT(str)		do {} while (/*CONSTCOND*/0)
 #endif
 
 /* use our own special macro to FRRE memory */
 
+#ifndef SAFE_FREE2
+#define SAFE_FREE2(a, s) do { \
+	if ((a) != NULL) { \
+		memset((a), 0, (s)); \
+		free((a)); \
+		(a) = NULL; \
+	} \
+} while (/*CONSTCOND*/0)
+#endif
+
 #ifndef SAFE_FREE
-#define SAFE_FREE(a) \
-do{if(a != NULL){explicit_bzero(a, sizeof(*a)); free(a); a=NULL;}} while (0)
-#define SAFE_FREE2(a,s) if (a != NULL && (long)s > 0){explicit_bzero(a, s);free(a); a=NULL;}
+#define SAFE_FREE(a) SAFE_FREE2((a), sizeof(*(a)))
 #endif
 
 typedef struct dst_func {
@@ -149,6 +159,7 @@ void
 dst_s_dump(const int mode, const u_char *data, const int size,
             const char *msg);
 
+#define  KEY_FILE_FMT_STR "Private-key-format: v%s\nAlgorithm: %d (%s)\n"
 
 
 #endif /* DST_INTERNAL_H */

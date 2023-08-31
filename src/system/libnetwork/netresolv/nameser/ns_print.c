@@ -154,7 +154,7 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 	addlen((size_t)x, &buf, &buflen);
 	len = SPRINTF((tmp, " %s %s", p_class(class), p_type(type)));
 	T(addstr(tmp, (size_t)len, &buf, &buflen));
-	T(spaced = addtab((size_t)x + len, (size_t)16, spaced, &buf, &buflen));
+	T(spaced = addtab((size_t)(x + len), (size_t)16, spaced, &buf, &buflen));
 
 	/*
 	 * RData.
@@ -909,6 +909,8 @@ ns_sprintrrf(const u_char *msg, size_t msglen,
 			for (n = 0; n < len; n += 48) {
 				T(addstr(leader, strlen(leader),
 					 &buf, &buflen));
+				T(addstr(base64_dhcid + n,
+				    (size_t)MIN(len - n, 48), &buf, &buflen));
 			}
 			if (len > 15)
 				T(addstr(" )", 2, &buf, &buflen));

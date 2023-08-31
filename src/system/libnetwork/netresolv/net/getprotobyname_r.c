@@ -1,9 +1,9 @@
-/*	$NetBSD: vars6.c,v 1.7 2005/08/07 16:00:01 christos Exp $	*/
+/*	$NetBSD: getprotobyname_r.c,v 1.3 2005/04/18 19:39:45 kleink Exp $	*/
 
 /*
- * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
- * All rights reserved.
- * 
+ * Copyright (c) 1983, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -12,14 +12,14 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the project nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -31,26 +31,47 @@
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: vars6.c,v 1.7 2005/08/07 16:00:01 christos Exp $");
+#if 0
+static char sccsid[] = "@(#)getprotoname.c	8.1 (Berkeley) 6/4/93";
+#else
+__RCSID("$NetBSD: getprotobyname_r.c,v 1.3 2005/04/18 19:39:45 kleink Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
-#include <netinet/in.h>
+#include "namespace.h"
+
+#include <assert.h>
+#include <netdb.h>
+#include <string.h>
+
+#include "protoent.h"
 
 #ifdef __weak_alias
-__weak_alias(in6addr_any, _in6addr_any)
-__weak_alias(in6addr_loopback, _in6addr_loopback)
-__weak_alias(in6addr_nodelocal_allnodes, _in6addr_nodelocal_allnodes)
-__weak_alias(in6addr_linklocal_allnodes, _in6addr_linklocal_allnodes)
-__weak_alias(in6addr_linklocal_allrouters, _in6addr_linklocal_allrouters)
+__weak_alias(getprotobyname_r,_getprotobyname_r)
 #endif
 
-/*
- * Definitions of some constant IPv6 addresses.
- */
-const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
-const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
-const struct in6_addr in6addr_nodelocal_allnodes = IN6ADDR_NODELOCAL_ALLNODES_INIT;
-const struct in6_addr in6addr_linklocal_allnodes = IN6ADDR_LINKLOCAL_ALLNODES_INIT;
-const struct in6_addr in6addr_linklocal_allrouters = IN6ADDR_LINKLOCAL_ALLROUTERS_INIT;
+struct protoent *
+getprotobyname_r(const char *name, struct protoent *pr,
+    struct protoent_data *pd)
+{
+	struct protoent *p;
+	char **cp;
 
+	_DIAGASSERT(name != NULL);
+
+	setprotoent_r(pd->stayopen, pd);
+	while ((p = getprotoent_r(pr, pd)) != NULL) {
+		if (strcmp(p->p_name, name) == 0)
+			break;
+		for (cp = p->p_aliases; *cp != NULL; cp++)
+			if (strcmp(*cp, name) == 0)
+				goto found;
+	}
+found:
+	if (!pd->stayopen)
+		if (pd->fp != NULL) {
+			(void)fclose(pd->fp);
+			pd->fp = NULL;
+		}
+	return p;
+}

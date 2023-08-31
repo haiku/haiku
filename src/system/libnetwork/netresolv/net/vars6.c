@@ -1,9 +1,9 @@
-/*	$NetBSD: sethostent.c,v 1.17 2012/03/20 17:44:18 matt Exp $	*/
+/*	$NetBSD: vars6.c,v 1.7 2005/08/07 16:00:01 christos Exp $	*/
 
 /*
- * Copyright (c) 1985, 1993
- *	The Regents of the University of California.  All rights reserved.
- *
+ * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
+ * All rights reserved.
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -12,14 +12,14 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the project nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -31,50 +31,27 @@
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-#if 0
-static char sccsid[] = "@(#)sethostent.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "Id: sethostent.c,v 8.5 1996/09/28 06:51:07 vixie Exp ";
-#else
-__RCSID("$NetBSD: sethostent.c,v 1.17 2012/03/20 17:44:18 matt Exp $");
-#endif
+__RCSID("$NetBSD: vars6.c,v 1.7 2005/08/07 16:00:01 christos Exp $");
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/param.h>
+#include "namespace.h"
+#include <sys/types.h>
 #include <netinet/in.h>
-#include <arpa/nameser.h>
-#include <netdb.h>
-#include <resolv.h>
 
 #ifdef __weak_alias
-__weak_alias(sethostent,_sethostent)
-__weak_alias(endhostent,_endhostent)
+__weak_alias(in6addr_any, _in6addr_any)
+__weak_alias(in6addr_loopback, _in6addr_loopback)
+__weak_alias(in6addr_nodelocal_allnodes, _in6addr_nodelocal_allnodes)
+__weak_alias(in6addr_linklocal_allnodes, _in6addr_linklocal_allnodes)
+__weak_alias(in6addr_linklocal_allrouters, _in6addr_linklocal_allrouters)
 #endif
 
-void	_endhtent(void);
-#ifndef _REENTRANT
-void	res_close(void);
-#endif
-void	_sethtent(int);
+/*
+ * Definitions of some constant IPv6 addresses.
+ */
+const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
+const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
+const struct in6_addr in6addr_nodelocal_allnodes = IN6ADDR_NODELOCAL_ALLNODES_INIT;
+const struct in6_addr in6addr_linklocal_allnodes = IN6ADDR_LINKLOCAL_ALLNODES_INIT;
+const struct in6_addr in6addr_linklocal_allrouters = IN6ADDR_LINKLOCAL_ALLROUTERS_INIT;
 
-void
-/*ARGSUSED*/
-sethostent(int stayopen)
-{
-#ifndef _REENTRANT
-	if ((_res.options & RES_INIT) == 0 && res_init() == -1)
-		return;
-	if (stayopen)
-		_res.options |= RES_STAYOPEN | RES_USEVC;
-#endif
-	_sethtent(stayopen);
-}
-
-void
-endhostent(void)
-{
-#ifndef _REENTRANT
-	_res.options &= ~(RES_STAYOPEN | RES_USEVC);
-	res_close();
-#endif
-	_endhtent();
-}

@@ -1,4 +1,4 @@
-/*	$NetBSD: gethnamaddr.c,v 1.79 2012/09/09 16:42:23 christos Exp $	*/
+/*	$NetBSD: gethnamaddr.c,v 1.95 2023/08/10 20:38:00 mrg Exp $	*/
 
 /*
  * ++Copyright++ 1985, 1988, 1993
@@ -57,7 +57,7 @@
 static char sccsid[] = "@(#)gethostnamadr.c	8.1 (Berkeley) 6/4/93";
 static char rcsid[] = "Id: gethnamaddr.c,v 8.21 1997/06/01 20:34:37 vixie Exp ";
 #else
-__RCSID("$NetBSD: gethnamaddr.c,v 1.79 2012/09/09 16:42:23 christos Exp $");
+__RCSID("$NetBSD: gethnamaddr.c,v 1.95 2023/08/10 20:38:00 mrg Exp $");
 #endif
 #endif /* LIBC_SCCS and not lint */
 
@@ -79,9 +79,6 @@ __RCSID("$NetBSD: gethnamaddr.c,v 1.79 2012/09/09 16:42:23 christos Exp $");
 #include <stdio.h>
 #include <syslog.h>
 
-#include <libutil.h>
-#include <FindDirectory.h>
-
 #ifndef LOG_AUTH
 # define LOG_AUTH 0
 #endif
@@ -91,12 +88,15 @@ __RCSID("$NetBSD: gethnamaddr.c,v 1.79 2012/09/09 16:42:23 christos Exp $");
 #include <nsswitch.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libutil.h>
 
 #ifdef YP
 #include <rpc/rpc.h>
 #include <rpcsvc/yp_prot.h>
 #include <rpcsvc/ypclnt.h>
 #endif
+
+#include "hostent.h"
 
 #if defined(_LIBC) && defined(__weak_alias)
 __weak_alias(gethostbyaddr,_gethostbyaddr)
@@ -109,36 +109,44 @@ __weak_alias(gethostent,_gethostent)
 #define maybe_hnok(res, hn) maybe_ok((res), (hn), res_hnok)
 #define maybe_dnok(res, dn) maybe_ok((res), (dn), res_dnok)
 
+#define addalias(d, s, arr, siz) do {			\
+	if (d >= &arr[siz]) {				\
+		ptrdiff_t _off = d - arr;		\
+		char **xptr = realloc(arr, (siz + 10) * sizeof(*arr)); \
+		if (xptr == NULL)			\
+			goto nospc;			\
+		d = xptr + _off;			\
+		arr = xptr;				\
+		siz += 10;				\
+	}						\
+	*d++ = s;					\
+} while (0)
 
-#define	MAXALIASES	35
-#define	MAXADDRS	35
+#define setup(arr, siz) do {				\
+	arr = malloc((siz = 10) * sizeof(*arr)); 	\
+	if (arr == NULL)				\
+		goto nospc;				\
+} while (0)
+
 
 static const char AskedForGot[] =
-			  "gethostby*.getanswer: asked for \"%s\", got \"%s\"";
+    "gethostby*.getanswer: asked for \"%s\", got \"%s\"";
 
-static char *h_addr_ptrs[MAXADDRS + 1];
 
 #ifdef YP
 static char *__ypdomain;
 #endif
 
-static struct hostent host;
-static char *host_aliases[MAXALIASES];
-static char hostbuf[8*1024];
-static u_int32_t host_addr[16 / sizeof(u_int32_t)];	/* IPv4 or IPv6 */
-static FILE *hostf = NULL;
-static int stayopen = 0;
-
 #define	MAXPACKET	(64*1024)
 
 typedef union {
-    HEADER hdr;
-    u_char buf[MAXPACKET];
+	HEADER hdr;
+	u_char buf[MAXPACKET];
 } querybuf;
 
 typedef union {
-    int32_t al;
-    char ac;
+	int32_t al;
+	char ac;
 } align;
 
 #ifdef DEBUG
@@ -146,33 +154,21 @@ static void debugprintf(const char *, res_state, ...)
 	__attribute__((__format__(__printf__, 1, 3)));
 #endif
 static struct hostent *getanswer(const querybuf *, int, const char *, int,
-    res_state);
+    res_state, struct hostent *, char *, size_t, int *);
 static void map_v4v6_address(const char *, char *);
 static void map_v4v6_hostent(struct hostent *, char **, char *);
 static void addrsort(char **, int, res_state);
 
-void _sethtent(int);
-void _endhtent(void);
-struct hostent *_gethtent(void);
-void ht_sethostent(int);
-void ht_endhostent(void);
-struct hostent *ht_gethostbyname(char *);
-struct hostent *ht_gethostbyaddr(const char *, int, int);
 void dns_service(void);
 #undef dn_skipname
 int dn_skipname(const u_char *, const u_char *);
-int _gethtbyaddr(void *, void *, va_list);
-int _gethtbyname(void *, void *, va_list);
-struct hostent *_gethtbyname2(const char *, int);
-int _dns_gethtbyaddr(void *, void *, va_list);
-int _dns_gethtbyname(void *, void *, va_list);
+
 #ifdef YP
-struct hostent *_yphostent(char *, int);
-int _yp_gethtbyaddr(void *, void *, va_list);
-int _yp_gethtbyname(void *, void *, va_list);
+static struct hostent *_yp_hostent(char *, int, struct getnamaddr *);
 #endif
 
-static struct hostent *gethostbyname_internal(const char *, int, res_state);
+static struct hostent *gethostbyname_internal(const char *, int, res_state,
+    struct hostent *, char *, size_t, int *);
 
 static const ns_src default_dns_files[] = {
 	{ NSSRC_FILES, 	NS_SUCCESS },
@@ -185,7 +181,7 @@ static const ns_src default_dns_files[] = {
 static void
 debugprintf(const char *msg, res_state res, ...)
 {
-	assert(msg != NULL);
+	_DIAGASSERT(msg != NULL);
 
 	if (res->options & RES_DEBUG) {
 		int save = errno;
@@ -205,41 +201,41 @@ debugprintf(const char *msg, res_state res, ...)
 #define BOUNDED_INCR(x) \
 	do { \
 		cp += (x); \
-		if (cp > eom) { \
-			h_errno = NO_RECOVERY; \
-			return NULL; \
-		} \
-	} while (/*CONSTCOND*/0)
+		if (cp > eom) \
+			goto no_recovery; \
+	} while (0)
 
 #define BOUNDS_CHECK(ptr, count) \
 	do { \
-		if ((ptr) + (count) > eom) { \
-			h_errno = NO_RECOVERY; \
-			return NULL; \
-		} \
-	} while (/*CONSTCOND*/0)
+		if ((ptr) + (count) > eom) \
+			goto no_recovery; \
+	} while (0)
 
 static struct hostent *
 getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
-    res_state res)
+    res_state res, struct hostent *hent, char *buf, size_t buflen, int *he)
 {
 	const HEADER *hp;
 	const u_char *cp;
 	int n;
+	size_t qlen;
 	const u_char *eom, *erdata;
 	char *bp, **ap, **hap, *ep;
 	int type, class, ancount, qdcount;
 	int haveanswer, had_error;
 	int toobig = 0;
 	char tbuf[MAXDNAME];
+	char **aliases;
+	size_t maxaliases;
+	char *addr_ptrs[MAXADDRS];
 	const char *tname;
 	int (*name_ok)(const char *);
 
-	assert(answer != NULL);
-	assert(qname != NULL);
+	_DIAGASSERT(answer != NULL);
+	_DIAGASSERT(qname != NULL);
 
 	tname = qname;
-	host.h_name = NULL;
+	hent->h_name = NULL;
 	eom = answer->buf + anslen;
 	switch (qtype) {
 	case T_A:
@@ -250,27 +246,28 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 		name_ok = res_dnok;
 		break;
 	default:
+		*he = NO_RECOVERY;
 		return NULL;	/* XXX should be abort(); */
 	}
+
+	setup(aliases, maxaliases);
 	/*
 	 * find first satisfactory answer
 	 */
 	hp = &answer->hdr;
 	ancount = ntohs(hp->ancount);
 	qdcount = ntohs(hp->qdcount);
-	bp = hostbuf;
-	ep = hostbuf + sizeof hostbuf;
+	bp = buf;
+	ep = buf + buflen;
 	cp = answer->buf;
 	BOUNDED_INCR(HFIXEDSZ);
-	if (qdcount != 1) {
-		h_errno = NO_RECOVERY;
-		return NULL;
-	}
+	if (qdcount != 1)
+		goto no_recovery;
+
 	n = dn_expand(answer->buf, eom, cp, bp, (int)(ep - bp));
-	if ((n < 0) || !maybe_ok(res, bp, name_ok)) {
-		h_errno = NO_RECOVERY;
-		return NULL;
-	}
+	if ((n < 0) || !maybe_ok(res, bp, name_ok))
+		goto no_recovery;
+
 	BOUNDED_INCR(n + QFIXEDSZ);
 	if (qtype == T_A || qtype == T_AAAA) {
 		/* res_send() has already verified that the query name is the
@@ -278,21 +275,17 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 		 * (i.e., with the succeeding search-domain tacked on).
 		 */
 		n = (int)strlen(bp) + 1;		/* for the \0 */
-		if (n >= MAXHOSTNAMELEN) {
-			h_errno = NO_RECOVERY;
-			return NULL;
-		}
-		host.h_name = bp;
+		if (n >= MAXHOSTNAMELEN)
+			goto no_recovery;
+		hent->h_name = bp;
 		bp += n;
 		/* The qname can be abbreviated, but h_name is now absolute. */
-		qname = host.h_name;
+		qname = hent->h_name;
 	}
-	ap = host_aliases;
+	hent->h_aliases = ap = aliases;
+	hent->h_addr_list = hap = addr_ptrs;
 	*ap = NULL;
-	host.h_aliases = host_aliases;
-	hap = h_addr_ptrs;
 	*hap = NULL;
-	host.h_addr_list = h_addr_ptrs;
 	haveanswer = 0;
 	had_error = 0;
 	while (ancount-- > 0 && cp < eom && !had_error) {
@@ -317,20 +310,17 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			continue;		/* XXX - had_error++ ? */
 		}
 		if ((qtype == T_A || qtype == T_AAAA) && type == T_CNAME) {
-			if (ap >= &host_aliases[MAXALIASES-1])
-				continue;
-			n = dn_expand(answer->buf, eom, cp, tbuf, (int)sizeof tbuf);
+			n = dn_expand(answer->buf, eom, cp, tbuf,
+			    (int)sizeof tbuf);
 			if ((n < 0) || !maybe_ok(res, tbuf, name_ok)) {
 				had_error++;
 				continue;
 			}
 			cp += n;
-			if (cp != erdata) {
-				h_errno = NO_RECOVERY;
-				return NULL;
-			}
+			if (cp != erdata)
+				goto no_recovery;
 			/* Store alias. */
-			*ap++ = bp;
+			addalias(ap, bp, aliases, maxaliases);
 			n = (int)strlen(bp) + 1;	/* for the \0 */
 			if (n >= MAXHOSTNAMELEN) {
 				had_error++;
@@ -344,21 +334,20 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 				continue;
 			}
 			strlcpy(bp, tbuf, (size_t)(ep - bp));
-			host.h_name = bp;
+			hent->h_name = bp;
 			bp += n;
 			continue;
 		}
 		if (qtype == T_PTR && type == T_CNAME) {
-			n = dn_expand(answer->buf, eom, cp, tbuf, (int)sizeof tbuf);
+			n = dn_expand(answer->buf, eom, cp, tbuf,
+			    (int)sizeof tbuf);
 			if (n < 0 || !maybe_dnok(res, tbuf)) {
 				had_error++;
 				continue;
 			}
 			cp += n;
-			if (cp != erdata) {
-				h_errno = NO_RECOVERY;
-				return NULL;
-			}
+			if (cp != erdata)
+				goto no_recovery;
 			/* Get canonical name. */
 			n = (int)strlen(tbuf) + 1;	/* for the \0 */
 			if (n > ep - bp || n >= MAXHOSTNAMELEN) {
@@ -371,7 +360,7 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			continue;
 		}
 		if (type != qtype) {
-			if (type != T_KEY && type != T_SIG)
+			if (type != T_KEY && type != T_SIG && type != T_DNAME)
 				syslog(LOG_NOTICE|LOG_AUTH,
 	       "gethostby*.getanswer: asked for \"%s %s %s\", got type \"%s\"",
 				       qname, p_class(C_IN), p_type(qtype),
@@ -394,16 +383,12 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			}
 #if MULTI_PTRS_ARE_ALIASES
 			cp += n;
-			if (cp != erdata) {
-				h_errno = NO_RECOVERY;
-				return NULL;
-			}
+			if (cp != erdata)
+				goto no_recovery;
 			if (!haveanswer)
-				host.h_name = bp;
-			else if (ap < &host_aliases[MAXALIASES-1])
-				*ap++ = bp;
+				hent->h_name = bp;
 			else
-				n = -1;
+				addalias(ap, bp, aliases, maxaliases);
 			if (n != -1) {
 				n = (int)strlen(bp) + 1;	/* for the \0 */
 				if (n >= MAXHOSTNAMELEN) {
@@ -414,7 +399,7 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			}
 			break;
 #else
-			host.h_name = bp;
+			hent->h_name = bp;
 			if (res->options & RES_USE_INET6) {
 				n = strlen(bp) + 1;	/* for the \0 */
 				if (n >= MAXHOSTNAMELEN) {
@@ -422,26 +407,25 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 					break;
 				}
 				bp += n;
-				map_v4v6_hostent(&host, &bp, ep);
+				map_v4v6_hostent(hent, &bp, ep);
 			}
-			h_errno = NETDB_SUCCESS;
-			return &host;
+			goto success;
 #endif
 		case T_A:
 		case T_AAAA:
-			if (strcasecmp(host.h_name, bp) != 0) {
+			if (strcasecmp(hent->h_name, bp) != 0) {
 				syslog(LOG_NOTICE|LOG_AUTH,
-				       AskedForGot, host.h_name, bp);
+				       AskedForGot, hent->h_name, bp);
 				cp += n;
 				continue;	/* XXX - had_error++ ? */
 			}
-			if (n != host.h_length) {
+			if (n != hent->h_length) {
 				cp += n;
 				continue;
 			}
 			if (type == T_AAAA) {
 				struct in6_addr in6;
-				memcpy(&in6, cp, IN6ADDRSZ);
+				memcpy(&in6, cp, NS_IN6ADDRSZ);
 				if (IN6_IS_ADDR_V4MAPPED(&in6)) {
 					cp += n;
 					continue;
@@ -450,7 +434,7 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			if (!haveanswer) {
 				int nn;
 
-				host.h_name = bp;
+				hent->h_name = bp;
 				nn = (int)strlen(bp) + 1;	/* for the \0 */
 				bp += nn;
 			}
@@ -458,12 +442,12 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			bp += sizeof(align) -
 			    (size_t)((u_long)bp % sizeof(align));
 
-			if (bp + n >= &hostbuf[sizeof hostbuf]) {
+			if (bp + n >= ep) {
 				debugprintf("size (%d) too big\n", res, n);
 				had_error++;
 				continue;
 			}
-			if (hap >= &h_addr_ptrs[MAXADDRS-1]) {
+			if (hap >= &addr_ptrs[MAXADDRS - 1]) {
 				if (!toobig++) {
 					debugprintf("Too many addresses (%d)\n",
 						res, MAXADDRS);
@@ -474,10 +458,8 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 			(void)memcpy(*hap++ = bp, cp, (size_t)n);
 			bp += n;
 			cp += n;
-			if (cp != erdata) {
-				h_errno = NO_RECOVERY;
-				return NULL;
-			}
+			if (cp != erdata)
+				goto no_recovery;
 			break;
 		default:
 			abort();
@@ -494,99 +476,133 @@ getanswer(const querybuf *answer, int anslen, const char *qname, int qtype,
 		 * address in that case, not some random one
 		 */
 		if (res->nsort && haveanswer > 1 && qtype == T_A)
-			addrsort(h_addr_ptrs, haveanswer, res);
-		if (!host.h_name) {
+			addrsort(addr_ptrs, haveanswer, res);
+		if (!hent->h_name) {
 			n = (int)strlen(qname) + 1;	/* for the \0 */
 			if (n > ep - bp || n >= MAXHOSTNAMELEN)
 				goto no_recovery;
 			strlcpy(bp, qname, (size_t)(ep - bp));
-			host.h_name = bp;
+			hent->h_name = bp;
 			bp += n;
 		}
 		if (res->options & RES_USE_INET6)
-			map_v4v6_hostent(&host, &bp, ep);
-		h_errno = NETDB_SUCCESS;
-		return &host;
+			map_v4v6_hostent(hent, &bp, ep);
+	    	goto success;
 	}
- no_recovery:
-	h_errno = NO_RECOVERY;
+no_recovery:
+	free(aliases);
+	*he = NO_RECOVERY;
+	return NULL;
+success:
+	bp = (char *)ALIGN(bp);
+	n = (int)(ap - aliases);
+	qlen = (n + 1) * sizeof(*hent->h_aliases);
+	if ((size_t)(ep - bp) < qlen)
+		goto nospc;
+	hent->h_aliases = (void *)bp;
+	memcpy(bp, aliases, qlen);
+	free(aliases);
+	aliases = NULL;
+
+	bp += qlen;
+	n = (int)(hap - addr_ptrs);
+	qlen = (n + 1) * sizeof(*hent->h_addr_list);
+	if ((size_t)(ep - bp) < qlen)
+		goto nospc;
+	hent->h_addr_list = (void *)bp;
+	memcpy(bp, addr_ptrs, qlen);
+	*he = NETDB_SUCCESS;
+	return hent;
+nospc:
+	free(aliases);
+	errno = ENOSPC;
+	*he = NETDB_INTERNAL;
 	return NULL;
 }
 
 struct hostent *
-gethostbyname(const char *name)
+gethostbyname_r(const char *name, struct hostent *hp, char *buf, int buflen,
+    int *he)
 {
-	struct hostent *hp;
 	res_state res = __res_get_state();
 
-	if (res == NULL)
+	if (res == NULL) {
+		*he = NETDB_INTERNAL;
 		return NULL;
+	}
 
-	assert(name != NULL);
+	_DIAGASSERT(name != NULL);
 
 	if (res->options & RES_USE_INET6) {
-		hp = gethostbyname_internal(name, AF_INET6, res);
-		if (hp) {
+		struct hostent *nhp = gethostbyname_internal(name, AF_INET6,
+		    res, hp, buf, buflen, he);
+		if (nhp) {
 			__res_put_state(res);
-			return hp;
+			return nhp;
 		}
 	}
-	hp = gethostbyname_internal(name, AF_INET, res);
+	hp = gethostbyname_internal(name, AF_INET, res, hp, buf, buflen, he);
 	__res_put_state(res);
 	return hp;
 }
 
 struct hostent *
-gethostbyname2(const char *name, int af)
+gethostbyname2_r(const char *name, int af, struct hostent *hp, char *buf,
+    size_t buflen, int *he)
 {
-	struct hostent *hp;
 	res_state res = __res_get_state();
 
-	if (res == NULL)
+	if (res == NULL) {
+		*he = NETDB_INTERNAL;
 		return NULL;
-	hp = gethostbyname_internal(name, af, res);
+	}
+	hp = gethostbyname_internal(name, af, res, hp, buf, buflen, he);
 	__res_put_state(res);
 	return hp;
 }
 
 static struct hostent *
-gethostbyname_internal(const char *name, int af, res_state res)
+gethostbyname_internal(const char *name, int af, res_state res,
+    struct hostent *hp, char *buf, size_t buflen, int *he)
 {
 	const char *cp;
-	char *bp, *ep;
-	int size;
-	struct hostent *hp;
+	struct getnamaddr info;
+	char hbuf[MAXHOSTNAMELEN];
+	size_t size;
 	static const ns_dtab dtab[] = {
-		NS_FILES_CB(_gethtbyname, NULL)
+		NS_FILES_CB(_hf_gethtbyname, NULL)
 		{ NSSRC_DNS, _dns_gethtbyname, NULL },	/* force -DHESIOD */
 		NS_NIS_CB(_yp_gethtbyname, NULL)
-		{ 0, 0, 0 }
+		NS_NULL_CB
 	};
 
-	assert(name != NULL);
+	_DIAGASSERT(name != NULL);
 
 	switch (af) {
 	case AF_INET:
-		size = INADDRSZ;
+		size = NS_INADDRSZ;
 		break;
 	case AF_INET6:
-		size = IN6ADDRSZ;
+		size = NS_IN6ADDRSZ;
 		break;
 	default:
-		h_errno = NETDB_INTERNAL;
+		*he = NETDB_INTERNAL;
 		errno = EAFNOSUPPORT;
 		return NULL;
 	}
+	if (buflen < size)
+		goto nospc;
 
-	host.h_addrtype = af;
-	host.h_length = size;
+	hp->h_addrtype = af;
+	hp->h_length = (int)size;
 
 	/*
 	 * if there aren't any dots, it could be a user-level alias.
 	 * this is also done in res_nquery() since we are not the only
 	 * function that looks up host names.
 	 */
-	if (!strchr(name, '.') && (cp = __hostalias(name)))
+	if (!strchr(name, '.') && (cp = res_hostalias(res, name,
+	    hbuf, sizeof(hbuf))))
 		name = cp;
 
 	/*
@@ -603,25 +619,7 @@ gethostbyname_internal(const char *name, int af, res_state res)
 				 * Fake up a hostent as if we'd actually
 				 * done a lookup.
 				 */
-				if (inet_pton(af, name,
-				    (char *)(void *)host_addr) <= 0) {
-					h_errno = HOST_NOT_FOUND;
-					return NULL;
-				}
-				strncpy(hostbuf, name, MAXDNAME);
-				hostbuf[MAXDNAME] = '\0';
-				bp = hostbuf + MAXDNAME;
-				ep = hostbuf + sizeof hostbuf;
-				host.h_name = hostbuf;
-				host.h_aliases = host_aliases;
-				host_aliases[0] = NULL;
-				h_addr_ptrs[0] = (char *)(void *)host_addr;
-				h_addr_ptrs[1] = NULL;
-				host.h_addr_list = h_addr_ptrs;
-				if (res->options & RES_USE_INET6)
-					map_v4v6_hostent(&host, &bp, ep);
-				h_errno = NETDB_SUCCESS;
-				return &host;
+				goto fake;
 			}
 			if (!isdigit((u_char) *cp) && *cp != '.') 
 				break;
@@ -637,369 +635,231 @@ gethostbyname_internal(const char *name, int af, res_state res)
 				 * Fake up a hostent as if we'd actually
 				 * done a lookup.
 				 */
-				if (inet_pton(af, name,
-				    (char *)(void *)host_addr) <= 0) {
-					h_errno = HOST_NOT_FOUND;
-					return NULL;
-				}
-				strncpy(hostbuf, name, MAXDNAME);
-				hostbuf[MAXDNAME] = '\0';
-				bp = hostbuf + MAXDNAME;
-				ep = hostbuf + sizeof hostbuf;
-				host.h_name = hostbuf;
-				host.h_aliases = host_aliases;
-				host_aliases[0] = NULL;
-				h_addr_ptrs[0] = (char *)(void *)host_addr;
-				h_addr_ptrs[1] = NULL;
-				host.h_addr_list = h_addr_ptrs;
-				h_errno = NETDB_SUCCESS;
-				return &host;
+				goto fake;
 			}
 			if (!isxdigit((u_char) *cp) && *cp != ':' && *cp != '.')
 				break;
 		}
 
-	hp = NULL;
-	h_errno = NETDB_INTERNAL;
-	if (nsdispatch(&hp, dtab, NSDB_HOSTS, "gethostbyname",
+	*he = NETDB_INTERNAL;
+	info.hp = hp;
+	info.buf = buf;
+	info.buflen = buflen;
+	info.he = he;
+	if (nsdispatch(&info, dtab, NSDB_HOSTS, "gethostbyname",
 	    default_dns_files, name, strlen(name), af) != NS_SUCCESS)
 		return NULL;
-	h_errno = NETDB_SUCCESS;
+	*he = NETDB_SUCCESS;
+	return hp;
+nospc:
+	*he = NETDB_INTERNAL;
+	errno = ENOSPC;
+	return NULL;
+fake:
+	HENT_ARRAY(hp->h_addr_list, 1, buf, buflen);
+	HENT_ARRAY(hp->h_aliases, 0, buf, buflen);
+
+	hp->h_aliases[0] = NULL;
+	if (size > buflen)
+		goto nospc;
+
+	if (inet_pton(af, name, buf) <= 0) {
+		*he = HOST_NOT_FOUND;
+		return NULL;
+	}
+	hp->h_addr_list[0] = buf;
+	hp->h_addr_list[1] = NULL;
+	buf += size;
+	buflen -= size;
+	HENT_SCOPY(hp->h_name, name, buf, buflen);
+	if (res->options & RES_USE_INET6)
+		map_v4v6_hostent(hp, &buf, buf + buflen);
+	*he = NETDB_SUCCESS;
 	return hp;
 }
 
 struct hostent *
-gethostbyaddr(const void *addr,
-    socklen_t len, int af)
+gethostbyaddr_r(const void *addr, int len, int af,
+	struct hostent *hp, char *buf, int buflen, int *he)
 {
 	const u_char *uaddr = (const u_char *)addr;
 	socklen_t size;
-	struct hostent *hp;
+	struct getnamaddr info;
 	static const ns_dtab dtab[] = {
-		NS_FILES_CB(_gethtbyaddr, NULL)
+		NS_FILES_CB(_hf_gethtbyaddr, NULL)
 		{ NSSRC_DNS, _dns_gethtbyaddr, NULL },	/* force -DHESIOD */
 		NS_NIS_CB(_yp_gethtbyaddr, NULL)
-		{ 0, 0, 0 }
+		NS_NULL_CB
 	};
 	
-	assert(addr != NULL);
+	_DIAGASSERT(addr != NULL);
 
-	if (af == AF_INET6 && len == IN6ADDRSZ &&
-	    (IN6_IS_ADDR_LINKLOCAL((const struct in6_addr *)(const void *)uaddr) ||
-	     IN6_IS_ADDR_SITELOCAL((const struct in6_addr *)(const void *)uaddr))) {
-		h_errno = HOST_NOT_FOUND;
+	if (af == AF_INET6 && len == NS_IN6ADDRSZ &&
+	    (IN6_IS_ADDR_LINKLOCAL((const struct in6_addr *)addr) ||
+	     IN6_IS_ADDR_SITELOCAL((const struct in6_addr *)addr))) {
+		*he = HOST_NOT_FOUND;
 		return NULL;
 	}
-	if (af == AF_INET6 && len == IN6ADDRSZ &&
-	    (IN6_IS_ADDR_V4MAPPED((const struct in6_addr *)(const void *)uaddr) ||
-	     IN6_IS_ADDR_V4COMPAT((const struct in6_addr *)(const void *)uaddr))) {
+	if (af == AF_INET6 && len == NS_IN6ADDRSZ &&
+	    (IN6_IS_ADDR_V4MAPPED((const struct in6_addr *)addr) ||
+	     IN6_IS_ADDR_V4COMPAT((const struct in6_addr *)addr))) {
 		/* Unmap. */
-		uaddr += IN6ADDRSZ - INADDRSZ;
+		uaddr += NS_IN6ADDRSZ - NS_INADDRSZ;
+		addr = uaddr;
 		af = AF_INET;
-		len = INADDRSZ;
+		len = NS_INADDRSZ;
 	}
 	switch (af) {
 	case AF_INET:
-		size = INADDRSZ;
+		size = NS_INADDRSZ;
 		break;
 	case AF_INET6:
-		size = IN6ADDRSZ;
+		size = NS_IN6ADDRSZ;
 		break;
 	default:
 		errno = EAFNOSUPPORT;
-		h_errno = NETDB_INTERNAL;
+		*he = NETDB_INTERNAL;
 		return NULL;
 	}
 	if (size != len) {
 		errno = EINVAL;
-		h_errno = NETDB_INTERNAL;
+		*he = NETDB_INTERNAL;
 		return NULL;
 	}
-	hp = NULL;
-	h_errno = NETDB_INTERNAL;
-	if (nsdispatch(&hp, dtab, NSDB_HOSTS, "gethostbyaddr",
+	info.hp = hp;
+	info.buf = buf;
+	info.buflen = buflen;
+	info.he = he;
+	*he = NETDB_INTERNAL;
+	if (nsdispatch(&info, dtab, NSDB_HOSTS, "gethostbyaddr",
 	    default_dns_files, uaddr, len, af) != NS_SUCCESS)
 		return NULL;
-	h_errno = NETDB_SUCCESS;
+	*he = NETDB_SUCCESS;
 	return hp;
 }
 
-void
-_sethtent(int f)
-{
-	if (!hostf) {
-		char buffer[256];
-		find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false,
-			buffer, sizeof(buffer));
-		strlcat(buffer, "/network/hosts", sizeof(buffer));
-		hostf = fopen(buffer, "re");
-	} else
-		rewind(hostf);
-	stayopen = f;
-}
-
-void
-_endhtent(void)
-{
-	if (hostf && !stayopen) {
-		(void) fclose(hostf);
-		hostf = NULL;
-	}
-}
-
 struct hostent *
-_gethtent(void)
+gethostent_r(FILE *hf, struct hostent *hent, char *buf, size_t buflen, int *he)
 {
-	char *p;
+	char *p, *name;
 	char *cp, **q;
 	int af, len;
+	size_t anum;
+	char **aliases;
+	size_t maxaliases;
+	struct in6_addr host_addr;
 
-	if (!hostf)
-		_sethtent(stayopen);
-	if (!hostf) {
-		h_errno = NETDB_INTERNAL;
+	if (hf == NULL) {
+		*he = NETDB_INTERNAL;
+		errno = EINVAL;
 		return NULL;
 	}
- again:
-	if (!(p = fgets(hostbuf, (int)sizeof hostbuf, hostf))) {
-		h_errno = HOST_NOT_FOUND;
-		return NULL;
-	}
-	if (*p == '#')
-		goto again;
-	if (!(cp = strpbrk(p, "#\n")))
-		goto again;
-	*cp = '\0';
-	if (!(cp = strpbrk(p, " \t")))
-		goto again;
-	*cp++ = '\0';
-	if (inet_pton(AF_INET6, p, (char *)(void *)host_addr) > 0) {
-		af = AF_INET6;
-		len = IN6ADDRSZ;
-	} else if (inet_pton(AF_INET, p, (char *)(void *)host_addr) > 0) {
-		res_state res = __res_get_state();
-		if (res == NULL)
+	p = NULL;
+	setup(aliases, maxaliases);
+	for (;;) {
+		free(p);
+		p = fparseln(hf, NULL, NULL, NULL, FPARSELN_UNESCALL);
+		if (p == NULL) {
+			free(aliases);
+			*he = HOST_NOT_FOUND;
 			return NULL;
-		if (res->options & RES_USE_INET6) {
-			map_v4v6_address((char *)(void *)host_addr,
-			    (char *)(void *)host_addr);
-			af = AF_INET6;
-			len = IN6ADDRSZ;
-		} else {
-			af = AF_INET;
-			len = INADDRSZ;
 		}
-		__res_put_state(res);
-	} else {
-		goto again;
-	}
-	/* if this is not something we're looking for, skip it. */
-	if (host.h_addrtype != 0 && host.h_addrtype != af)
-		goto again;
-	if (host.h_length != 0 && host.h_length != len)
-		goto again;
-	h_addr_ptrs[0] = (char *)(void *)host_addr;
-	h_addr_ptrs[1] = NULL;
-	host.h_addr_list = h_addr_ptrs;
-	host.h_length = len;
-	host.h_addrtype = af;
-	while (*cp == ' ' || *cp == '\t')
-		cp++;
-	host.h_name = cp;
-	q = host.h_aliases = host_aliases;
-	if ((cp = strpbrk(cp, " \t")) != NULL)
+		if (!(cp = strpbrk(p, " \t")))
+			continue;
 		*cp++ = '\0';
-	while (cp && *cp) {
-		if (*cp == ' ' || *cp == '\t') {
+		if (inet_pton(AF_INET6, p, &host_addr) > 0) {
+			af = AF_INET6;
+			len = NS_IN6ADDRSZ;
+		} else {
+			if (inet_pton(AF_INET, p, &host_addr) <= 0)
+				continue;
+
+			{
+			res_state res = __res_get_state();
+			if (res == NULL)
+				goto nospc;
+			if (res->options & RES_USE_INET6) {
+				map_v4v6_address(buf, buf);
+				af = AF_INET6;
+				len = NS_IN6ADDRSZ;
+			} else {
+				af = AF_INET;
+				len = NS_INADDRSZ;
+			}
+			__res_put_state(res);
+			}
+		}
+
+		/* if this is not something we're looking for, skip it. */
+		if (hent->h_addrtype != 0 && hent->h_addrtype != af)
+			continue;
+		if (hent->h_length != 0 && hent->h_length != len)
+			continue;
+
+		while (*cp == ' ' || *cp == '\t')
 			cp++;
-			continue;
-		}
-		if (q < &host_aliases[MAXALIASES - 1])
-			*q++ = cp;
-		if ((cp = strpbrk(cp, " \t")) != NULL)
+		if ((cp = strpbrk(name = cp, " \t")) != NULL)
 			*cp++ = '\0';
+		q = aliases;
+		while (cp && *cp) {
+			if (*cp == ' ' || *cp == '\t') {
+				cp++;
+				continue;
+			}
+			addalias(q, cp, aliases, maxaliases);
+			if ((cp = strpbrk(cp, " \t")) != NULL)
+				*cp++ = '\0';
+		}
+		break;
 	}
-	*q = NULL;
-	h_errno = NETDB_SUCCESS;
-	return &host;
-}
+	hent->h_length = len;
+	hent->h_addrtype = af;
+	HENT_ARRAY(hent->h_addr_list, 1, buf, buflen);
+	anum = (size_t)(q - aliases);
+	HENT_ARRAY(hent->h_aliases, anum, buf, buflen);
+	HENT_COPY(hent->h_addr_list[0], &host_addr, hent->h_length, buf,
+	    buflen);
+	hent->h_addr_list[1] = NULL;
 
-/*ARGSUSED*/
-int
-_gethtbyname(void *rv, void *cb_data, va_list ap)
-{
-	struct hostent *hp;
-	const char *name;
-	int af;
-
-	assert(rv != NULL);
-
-	name = va_arg(ap, char *);
-	/* NOSTRICT skip len */(void)va_arg(ap, int);
-	af = va_arg(ap, int);
-
-	hp = NULL;
-#if 0
+	HENT_SCOPY(hent->h_name, name, buf, buflen);
 	{
-		res_state res = __res_get_state();
-		if (res == NULL)
-			return NS_NOTFOUND;
-		if (res->options & RES_USE_INET6)
-			hp = _gethtbyname2(name, AF_INET6);
-		if (hp==NULL)
-			hp = _gethtbyname2(name, AF_INET);
-		__res_put_state(res);
+	size_t i;
+	for (i = 0; i < anum; i++)
+		HENT_SCOPY(hent->h_aliases[i], aliases[i], buf, buflen);
 	}
-#else
-	hp = _gethtbyname2(name, af);
-#endif
-	*((struct hostent **)rv) = hp;
-	if (hp == NULL) {
-		h_errno = HOST_NOT_FOUND;
-		return NS_NOTFOUND;
-	}
-	return NS_SUCCESS;
-}
+	hent->h_aliases[anum] = NULL;
 
-struct hostent *
-_gethtbyname2(const char *name, int af)
-{
-	struct hostent *p;
-	char *tmpbuf, *ptr, **cp;
-	int num;
-	size_t len;
-
-	assert(name != NULL);
-
-	_sethtent(stayopen);
-	ptr = tmpbuf = NULL;
-	num = 0;
-	while ((p = _gethtent()) != NULL && num < MAXADDRS) {
-		if (p->h_addrtype != af)
-			continue;
-		if (strcasecmp(p->h_name, name) != 0) {
-			for (cp = p->h_aliases; *cp != NULL; cp++)
-				if (strcasecmp(*cp, name) == 0)
-					break;
-			if (*cp == NULL) continue;
-		}
-
-		if (num == 0) {
-			size_t bufsize;
-			char *src;
-
-			bufsize = strlen(p->h_name) + 2 +
-				  MAXADDRS * p->h_length +
-				  _ALIGNBYTES;
-			for (cp = p->h_aliases; *cp != NULL; cp++)
-				bufsize += strlen(*cp) + 1;
-
-			if ((tmpbuf = malloc(bufsize)) == NULL) {
-				h_errno = NETDB_INTERNAL;
-				return NULL;
-			}
-
-			ptr = tmpbuf;
-			src = p->h_name;
-			while ((*ptr++ = *src++) != '\0');
-			for (cp = p->h_aliases; *cp != NULL; cp++) {
-				src = *cp;
-				while ((*ptr++ = *src++) != '\0');
-			}
-			*ptr++ = '\0';
-
-			ptr = (char *)(void *)_ALIGN(ptr);
-		}
-
-		(void)memcpy(ptr, p->h_addr_list[0], (size_t)p->h_length);
-		ptr += p->h_length;
-		num++;
-	}
-	_endhtent();
-	if (num == 0) return NULL;
-
-	len = ptr - tmpbuf;
-	if (len > (sizeof(hostbuf) - _ALIGNBYTES)) {
-		free(tmpbuf);
-		errno = ENOSPC;
-		h_errno = NETDB_INTERNAL;
-		return NULL;
-	}
-	ptr = memcpy((void *)_ALIGN(hostbuf), tmpbuf, len);
-	free(tmpbuf);
-
-	host.h_name = ptr;
-	while (*ptr++);
-
-	cp = host_aliases;
-	while (*ptr) {
-		*cp++ = ptr;
-		while (*ptr++);
-	}
-	ptr++;
-	*cp = NULL;
-
-	ptr = (char *)(void *)_ALIGN(ptr);
-	cp = h_addr_ptrs;
-	while (num--) {
-		*cp++ = ptr;
-		ptr += host.h_length;
-	}
-	*cp = NULL;
-
-	return &host;
-}
-
-/*ARGSUSED*/
-int
-_gethtbyaddr(void *rv, void *cb_data, va_list ap)
-{
-	struct hostent *p;
-	const unsigned char *addr;
-	int len, af;
-
-	assert(rv != NULL);
-
-	addr = va_arg(ap, unsigned char *);
-	len = va_arg(ap, int);
-	af = va_arg(ap, int);
-	
-	host.h_length = len;
-	host.h_addrtype = af;
-
-	_sethtent(stayopen);
-	while ((p = _gethtent()) != NULL)
-		if (p->h_addrtype == af && !memcmp(p->h_addr, addr,
-		    (size_t)len))
-			break;
-	_endhtent();
-	*((struct hostent **)rv) = p;
-	if (p==NULL) {
-		h_errno = HOST_NOT_FOUND;
-		return NS_NOTFOUND;
-	}
-	return NS_SUCCESS;
+	*he = NETDB_SUCCESS;
+	free(p);
+	free(aliases);
+	return hent;
+nospc:
+	free(p);
+	free(aliases);
+	errno = ENOSPC;
+	*he = NETDB_INTERNAL;
+	return NULL;
 }
 
 static void
 map_v4v6_address(const char *src, char *dst)
 {
 	u_char *p = (u_char *)dst;
-	char tmp[INADDRSZ];
+	char tmp[NS_INADDRSZ];
 	int i;
 
-	assert(src != NULL);
-	assert(dst != NULL);
+	_DIAGASSERT(src != NULL);
+	_DIAGASSERT(dst != NULL);
 
 	/* Stash a temporary copy so our caller can update in place. */
-	(void)memcpy(tmp, src, INADDRSZ);
+	(void)memcpy(tmp, src, NS_INADDRSZ);
 	/* Mark this ipv6 addr as a mapped ipv4. */
 	for (i = 0; i < 10; i++)
 		*p++ = 0x00;
 	*p++ = 0xff;
 	*p++ = 0xff;
 	/* Retrieve the saved copy and we're done. */
-	(void)memcpy((void *)p, tmp, INADDRSZ);
+	(void)memcpy(p, tmp, NS_INADDRSZ);
 }
 
 static void
@@ -1007,19 +867,19 @@ map_v4v6_hostent(struct hostent *hp, char **bpp, char *ep)
 {
 	char **ap;
 
-	assert(hp != NULL);
-	assert(bpp != NULL);
-	assert(ep != NULL);
+	_DIAGASSERT(hp != NULL);
+	_DIAGASSERT(bpp != NULL);
+	_DIAGASSERT(ep != NULL);
 
-	if (hp->h_addrtype != AF_INET || hp->h_length != INADDRSZ)
+	if (hp->h_addrtype != AF_INET || hp->h_length != NS_INADDRSZ)
 		return;
 	hp->h_addrtype = AF_INET6;
-	hp->h_length = IN6ADDRSZ;
+	hp->h_length = NS_IN6ADDRSZ;
 	for (ap = hp->h_addr_list; *ap; ap++) {
 		int i = (int)(sizeof(align) -
 		    (size_t)((u_long)*bpp % sizeof(align)));
 
-		if (ep - *bpp < (i + IN6ADDRSZ)) {
+		if (ep - *bpp < (i + NS_IN6ADDRSZ)) {
 			/* Out of memory.  Truncate address list here.  XXX */
 			*ap = NULL;
 			return;
@@ -1027,7 +887,7 @@ map_v4v6_hostent(struct hostent *hp, char **bpp, char *ep)
 		*bpp += i;
 		map_v4v6_address(*ap, *bpp);
 		*ap = *bpp;
-		*bpp += IN6ADDRSZ;
+		*bpp += NS_IN6ADDRSZ;
 	}
 }
 
@@ -1039,7 +899,7 @@ addrsort(char **ap, int num, res_state res)
 	short aval[MAXADDRS];
 	int needsort = 0;
 
-	assert(ap != NULL);
+	_DIAGASSERT(ap != NULL);
 
 	p = ap;
 	for (i = 0; i < num; i++, p++) {
@@ -1074,13 +934,6 @@ addrsort(char **ap, int num, res_state res)
 	}
 }
 
-struct hostent *
-gethostent(void)
-{
-	host.h_addrtype = 0;
-	host.h_length = 0;
-	return _gethtent();
-}
 
 /*ARGSUSED*/
 int
@@ -1090,20 +943,22 @@ _dns_gethtbyname(void *rv, void *cb_data, va_list ap)
 	int n, type;
 	struct hostent *hp;
 	const char *name;
-	int af;
 	res_state res;
+	struct getnamaddr *info = rv;
 
-	assert(rv != NULL);
+	_DIAGASSERT(rv != NULL);
 
 	name = va_arg(ap, char *);
-	/* NOSTRICT skip len */(void)va_arg(ap, int);
-	af = va_arg(ap, int);
+	/* NOSTRICT skip string len */(void)va_arg(ap, int);
+	info->hp->h_addrtype = va_arg(ap, int);
 
-	switch (af) {
+	switch (info->hp->h_addrtype) {
 	case AF_INET:
+		info->hp->h_length = NS_INADDRSZ;
 		type = T_A;
 		break;
 	case AF_INET6:
+		info->hp->h_length = NS_IN6ADDRSZ;
 		type = T_AAAA;
 		break;
 	default:
@@ -1111,12 +966,13 @@ _dns_gethtbyname(void *rv, void *cb_data, va_list ap)
 	}
 	buf = malloc(sizeof(*buf));
 	if (buf == NULL) {
-		h_errno = NETDB_INTERNAL;
+		*info->he = NETDB_INTERNAL;
 		return NS_NOTFOUND;
 	}
 	res = __res_get_state();
 	if (res == NULL) {
 		free(buf);
+		*info->he = NETDB_INTERNAL;
 		return NS_NOTFOUND;
 	}
 	n = res_nsearch(res, name, C_IN, type, buf->buf, (int)sizeof(buf->buf));
@@ -1126,11 +982,12 @@ _dns_gethtbyname(void *rv, void *cb_data, va_list ap)
 		__res_put_state(res);
 		return NS_NOTFOUND;
 	}
-	hp = getanswer(buf, n, name, type, res);
+	hp = getanswer(buf, n, name, type, res, info->hp, info->buf,
+	    info->buflen, info->he);
 	free(buf);
 	__res_put_state(res);
 	if (hp == NULL)
-		switch (h_errno) {
+		switch (*info->he) {
 		case HOST_NOT_FOUND:
 			return NS_NOTFOUND;
 		case TRY_AGAIN:
@@ -1138,7 +995,6 @@ _dns_gethtbyname(void *rv, void *cb_data, va_list ap)
 		default:
 			return NS_UNAVAIL;
 		}
-	*((struct hostent **)rv) = hp;
 	return NS_SUCCESS;
 }
 
@@ -1151,16 +1007,19 @@ _dns_gethtbyaddr(void *rv, void	*cb_data, va_list ap)
 	querybuf *buf;
 	struct hostent *hp;
 	const unsigned char *uaddr;
-	int len, af, advance;
+	int advance;
 	res_state res;
+	char *bf;
+	size_t blen;
+	struct getnamaddr *info = rv;
 
-	assert(rv != NULL);
+	_DIAGASSERT(rv != NULL);
 
 	uaddr = va_arg(ap, unsigned char *);
-	len = va_arg(ap, int);
-	af = va_arg(ap, int);
+	info->hp->h_length = va_arg(ap, int);
+	info->hp->h_addrtype = va_arg(ap, int);
 
-	switch (af) {
+	switch (info->hp->h_addrtype) {
 	case AF_INET:
 		(void)snprintf(qbuf, sizeof(qbuf), "%u.%u.%u.%u.in-addr.arpa",
 		    (uaddr[3] & 0xff), (uaddr[2] & 0xff),
@@ -1170,48 +1029,45 @@ _dns_gethtbyaddr(void *rv, void	*cb_data, va_list ap)
 	case AF_INET6:
 		qp = qbuf;
 		ep = qbuf + sizeof(qbuf) - 1;
-		for (n = IN6ADDRSZ - 1; n >= 0; n--) {
+		for (n = NS_IN6ADDRSZ - 1; n >= 0; n--) {
 			advance = snprintf(qp, (size_t)(ep - qp), "%x.%x.",
 			    uaddr[n] & 0xf,
 			    ((unsigned int)uaddr[n] >> 4) & 0xf);
 			if (advance > 0 && qp + advance < ep)
 				qp += advance;
-			else {
-				h_errno = NETDB_INTERNAL;
-				return NS_NOTFOUND;
-			}
+			else
+				goto norecovery;
 		}
-		if (strlcat(qbuf, "ip6.arpa", sizeof(qbuf)) >= sizeof(qbuf)) {
-			h_errno = NETDB_INTERNAL;
-			return NS_NOTFOUND;
-		}
+		if (strlcat(qbuf, "ip6.arpa", sizeof(qbuf)) >= sizeof(qbuf))
+			goto norecovery;
 		break;
 	default:
-		abort();
+		goto norecovery;
 	}
 
 	buf = malloc(sizeof(*buf));
 	if (buf == NULL) {
-		h_errno = NETDB_INTERNAL;
-		return NS_NOTFOUND;
+		goto nospc;
 	}
 	res = __res_get_state();
 	if (res == NULL) {
 		free(buf);
-		return NS_NOTFOUND;
+		goto nospc;
 	}
 	n = res_nquery(res, qbuf, C_IN, T_PTR, buf->buf, (int)sizeof(buf->buf));
 	if (n < 0) {
 		free(buf);
 		debugprintf("res_nquery failed (%d)\n", res, n);
 		__res_put_state(res);
+		*info->he = HOST_NOT_FOUND;
 		return NS_NOTFOUND;
 	}
-	hp = getanswer(buf, n, qbuf, T_PTR, res);
+	hp = getanswer(buf, n, qbuf, T_PTR, res, info->hp, info->buf,
+	    info->buflen, info->he);
 	free(buf);
 	if (hp == NULL) {
 		__res_put_state(res);
-		switch (h_errno) {
+		switch (*info->he) {
 		case HOST_NOT_FOUND:
 			return NS_NOTFOUND;
 		case TRY_AGAIN:
@@ -1220,62 +1076,72 @@ _dns_gethtbyaddr(void *rv, void	*cb_data, va_list ap)
 			return NS_UNAVAIL;
 		}
 	}
-	hp->h_addrtype = af;
-	hp->h_length = len;
-	(void)memcpy(host_addr, uaddr, (size_t)len);
-	h_addr_ptrs[0] = (char *)(void *)host_addr;
-	h_addr_ptrs[1] = NULL;
-	if (af == AF_INET && (res->options & RES_USE_INET6)) {
-		map_v4v6_address((char *)(void *)host_addr,
-		    (char *)(void *)host_addr);
+
+	bf = (void *)(hp->h_addr_list + 2);
+	blen = (size_t)(bf - info->buf);
+	if (blen + info->hp->h_length > info->buflen)
+		goto nospc;
+	hp->h_addr_list[0] = bf;
+	hp->h_addr_list[1] = NULL;
+	(void)memcpy(bf, uaddr, (size_t)info->hp->h_length);
+	if (info->hp->h_addrtype == AF_INET && (res->options & RES_USE_INET6)) {
+		if (blen + NS_IN6ADDRSZ > info->buflen) {
+			__res_put_state(res);
+			goto nospc;
+		}
+		map_v4v6_address(bf, bf);
 		hp->h_addrtype = AF_INET6;
-		hp->h_length = IN6ADDRSZ;
+		hp->h_length = NS_IN6ADDRSZ;
 	}
 
 	__res_put_state(res);
-	*((struct hostent **)rv) = hp;
-	h_errno = NETDB_SUCCESS;
+	*info->he = NETDB_SUCCESS;
 	return NS_SUCCESS;
+nospc:
+	*info->he = NETDB_INTERNAL;
+	return NS_UNAVAIL;
+norecovery:
+	*info->he = NO_RECOVERY;
+	return NS_UNAVAIL;
 }
 
 #ifdef YP
 /*ARGSUSED*/
-struct hostent *
-_yphostent(char *line, int af)
+static struct hostent *
+_yp_hostent(char *line, int af, struct getnamaddr *info)
 {
-	static struct in_addr host_addrs[MAXADDRS];
-	static struct in6_addr host6_addrs[MAXADDRS];
+	struct in6_addr host_addrs[MAXADDRS];
+	char **aliases;
+	size_t maxaliases;
 	char *p = line;
-	char *cp, **q;
-	char **hap;
+	char *cp, **q, *ptr;
+	size_t len, anum, i;
 	int addrok;
 	int more;
 	size_t naddrs;
+	struct hostent *hp = info->hp;
 
-	assert(line != NULL);
+	_DIAGASSERT(line != NULL);
 
-	host.h_name = NULL;
-	host.h_addr_list = h_addr_ptrs;
-	host.h_addrtype = af;
+	hp->h_name = NULL;
+	hp->h_addrtype = af;
 	switch (af) {
 	case AF_INET:
-		host.h_length = INADDRSZ;
+		hp->h_length = NS_INADDRSZ;
 		break;
 	case AF_INET6:
-		host.h_length = IN6ADDRSZ;
+		hp->h_length = NS_IN6ADDRSZ;
 		break;
 	default:
 		return NULL;
 	}
-	hap = h_addr_ptrs;
-	q = host.h_aliases = host_aliases;
+	setup(aliases, maxaliases);
 	naddrs = 0;
+	q = aliases;
 
 nextline:
 	/* check for host_addrs overflow */
-	if (naddrs >= sizeof(host_addrs) / sizeof(host_addrs[0]))
-		goto done;
-	if (naddrs >= sizeof(host6_addrs) / sizeof(host6_addrs[0]))
+	if (naddrs >= __arraycount(host_addrs))
 		goto done;
 
 	more = 0;
@@ -1285,15 +1151,7 @@ nextline:
 	*cp++ = '\0';
 
 	/* p has should have an address */
-	addrok = 0;
-	switch (af) {
-	case AF_INET:
-		addrok = inet_aton(p, &host_addrs[naddrs]);
-		break;
-	case AF_INET6:
-		addrok = inet_pton(af, p, &host6_addrs[naddrs]);
-		break;
-	}
+	addrok = inet_pton(af, p, &host_addrs[naddrs]);
 	if (addrok != 1) {
 		/* skip to the next line */
 		while (cp && *cp) {
@@ -1303,18 +1161,9 @@ nextline:
 			}
 			cp++;
 		}
-
 		goto done;
 	}
-
-	switch (af) {
-	case AF_INET:
-		*hap++ = (char *)(void *)&host_addrs[naddrs++];
-		break;
-	case AF_INET6:
-		*hap++ = (char *)(void *)&host6_addrs[naddrs++];
-		break;
-	}
+	naddrs++;
 
 	while (*cp == ' ' || *cp == '\t')
 		cp++;
@@ -1325,12 +1174,12 @@ nextline:
 			more = 1;
 		*cp++ = '\0';
 	}
-	if (!host.h_name)
-		host.h_name = p;
-	else if (strcmp(host.h_name, p)==0)
+	if (!hp->h_name)
+		hp->h_name = p;
+	else if (strcmp(hp->h_name, p) == 0)
 		;
-	else if (q < &host_aliases[MAXALIASES - 1])
-		*q++ = p;
+	else
+		addalias(q, p, aliases, maxaliases);
 	p = cp;
 	if (more)
 		goto nextline;
@@ -1344,19 +1193,43 @@ nextline:
 			cp++;
 			goto nextline;
 		}
-		if (q < &host_aliases[MAXALIASES - 1])
-			*q++ = cp;
+		addalias(q, cp, aliases, maxaliases);
 		cp = strpbrk(cp, " \t");
 		if (cp != NULL)
 			*cp++ = '\0';
 	}
 
 done:
-	if (host.h_name == NULL)
+	if (hp->h_name == NULL) {
+		free(aliases);
 		return NULL;
-	*q = NULL;
-	*hap = NULL;
-	return &host;
+	}
+
+	ptr = info->buf;
+	len = info->buflen;
+
+	anum = (size_t)(q - aliases);
+	HENT_ARRAY(hp->h_addr_list, naddrs, ptr, len);
+	HENT_ARRAY(hp->h_aliases, anum, ptr, len);
+
+	for (i = 0; i < naddrs; i++)
+		HENT_COPY(hp->h_addr_list[i], &host_addrs[i], hp->h_length,
+		    ptr, len);
+	hp->h_addr_list[naddrs] = NULL;
+
+	HENT_SCOPY(hp->h_name, hp->h_name, ptr, len);
+
+	for (i = 0; i < anum; i++)
+		HENT_SCOPY(hp->h_aliases[i], aliases[i], ptr, len);
+	hp->h_aliases[anum] = NULL;
+	free(aliases);
+
+	return hp;
+nospc:
+	free(aliases);
+	*info->he = NETDB_INTERNAL;
+	errno = ENOSPC;
+	return NULL;
 }
 
 /*ARGSUSED*/
@@ -1364,14 +1237,15 @@ int
 _yp_gethtbyaddr(void *rv, void *cb_data, va_list ap)
 {
 	struct hostent *hp = NULL;
-	static char *__ypcurrent;
-	int __ypcurrentlen, r;
+	char *ypcurrent;
+	int ypcurrentlen, r;
 	char name[INET6_ADDRSTRLEN];	/* XXX enough? */
 	const unsigned char *uaddr;
 	int af;
 	const char *map;
+	struct getnamaddr *info = rv;
 
-	assert(rv != NULL);
+	_DIAGASSERT(rv != NULL);
 
 	uaddr = va_arg(ap, unsigned char *);
 	/* NOSTRICT skip len */(void)va_arg(ap, int);
@@ -1387,9 +1261,6 @@ _yp_gethtbyaddr(void *rv, void *cb_data, va_list ap)
 	 */
 	if (inet_ntop(af, uaddr, name, (socklen_t)sizeof(name)) == NULL)
 		return NS_UNAVAIL;
-	if (__ypcurrent)
-		free(__ypcurrent);
-	__ypcurrent = NULL;
 	switch (af) {
 	case AF_INET:
 		map = "hosts.byaddr";
@@ -1398,15 +1269,18 @@ _yp_gethtbyaddr(void *rv, void *cb_data, va_list ap)
 		map = "ipnodes.byaddr";
 		break;
 	}
+	ypcurrent = NULL;
 	r = yp_match(__ypdomain, map, name,
-		(int)strlen(name), &__ypcurrent, &__ypcurrentlen);
+		(int)strlen(name), &ypcurrent, &ypcurrentlen);
 	if (r == 0)
-		hp = _yphostent(__ypcurrent, af);
+		hp = _yp_hostent(ypcurrent, af, info);
+	else
+		hp = NULL;
+	free(ypcurrent);
 	if (hp == NULL) {
-		h_errno = HOST_NOT_FOUND;
+		*info->he = HOST_NOT_FOUND;
 		return NS_NOTFOUND;
 	}
-	*((struct hostent **)rv) = hp;
 	return NS_SUCCESS;
 }
 
@@ -1414,26 +1288,24 @@ _yp_gethtbyaddr(void *rv, void *cb_data, va_list ap)
 int
 _yp_gethtbyname(void *rv, void *cb_data, va_list ap)
 {
-	struct hostent *hp = NULL;
-	static char *__ypcurrent;
-	int __ypcurrentlen, r;
+	struct hostent *hp;
+	char *ypcurrent;
+	int ypcurrentlen, r;
 	const char *name;
 	int af;
 	const char *map;
+	struct getnamaddr *info = rv;
 
-	assert(rv != NULL);
+	_DIAGASSERT(rv != NULL);
 
 	name = va_arg(ap, char *);
-	/* NOSTRICT skip len */(void)va_arg(ap, int);
+	/* NOSTRICT skip string len */(void)va_arg(ap, int);
 	af = va_arg(ap, int);
 
 	if (!__ypdomain) {
 		if (_yp_check(&__ypdomain) == 0)
 			return NS_UNAVAIL;
 	}
-	if (__ypcurrent)
-		free(__ypcurrent);
-	__ypcurrent = NULL;
 	switch (af) {
 	case AF_INET:
 		map = "hosts.byname";
@@ -1442,15 +1314,57 @@ _yp_gethtbyname(void *rv, void *cb_data, va_list ap)
 		map = "ipnodes.byname";
 		break;
 	}
+	ypcurrent = NULL;
 	r = yp_match(__ypdomain, map, name,
-		(int)strlen(name), &__ypcurrent, &__ypcurrentlen);
+		(int)strlen(name), &ypcurrent, &ypcurrentlen);
 	if (r == 0)
-		hp = _yphostent(__ypcurrent, af);
+		hp = _yp_hostent(ypcurrent, af, info);
+	else
+		hp = NULL;
+	free(ypcurrent);
 	if (hp == NULL) {
-		h_errno = HOST_NOT_FOUND;
+		*info->he = HOST_NOT_FOUND;
 		return NS_NOTFOUND;
 	}
-	*((struct hostent **)rv) = hp;
 	return NS_SUCCESS;
 }
 #endif
+
+/*
+ * Non-reentrant versions.
+ */
+FILE *_h_file;
+static struct hostent h_ent;
+static char h_buf[16384];
+
+struct hostent *
+gethostbyaddr(const void *addr, socklen_t len, int af) {
+	return gethostbyaddr_r(addr, len, af, &h_ent, h_buf, sizeof(h_buf),
+	    &h_errno);
+}
+
+struct hostent *
+gethostbyname(const char *name) {
+	return gethostbyname_r(name, &h_ent, h_buf, sizeof(h_buf), &h_errno);
+}
+
+struct hostent *
+gethostbyname2(const char *name, int af) {
+	return gethostbyname2_r(name, af, &h_ent, h_buf, sizeof(h_buf),
+	    &h_errno);
+}
+
+struct hostent *
+gethostent(void)
+{
+	if (_h_file == NULL) {
+		sethostent_r(&_h_file);
+		if (_h_file == NULL) {
+			h_errno = NETDB_INTERNAL;
+			return NULL;
+		}
+	}
+	memset(&h_ent, 0, sizeof(h_ent));
+	return gethostent_r(_h_file, &h_ent, h_buf, sizeof(h_buf), &h_errno);
+}
+

@@ -14,7 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# NetResolv sources
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) dst ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) inet ] ;
-		SEARCH_SOURCE += [ FDirName $(SUBDIR) irs ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) net ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) isc ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) nameser ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) resolv ] ;
@@ -23,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# we want to have the xxx_r functions, IPv6, and md5 implementation
 			# we also need to use our BSD compatibility functions
 			# and enable "lint" to remove the RCSID from all the files.
-			local defines = _REENTRANT=1 USE_MD5=1 INET6 lint LINT ;
+			local defines = _LIBC _REENTRANT=1 USE_MD5=1 INET6 lint LINT ;
 			defines = [ FDefines $(defines) ] ;
 			SubDirCcFlags $(defines) -Wno-sign-compare ;
 			SubDirC++Flags $(defines) -Wno-sign-compare ;
@@ -72,22 +72,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			# isc
 			assertions.c
-			bitncmp.c
-			ctl_clnt.c
-			ctl_p.c
-			ctl_srvr.c
-			ev_connects.c
-			ev_files.c
 			ev_streams.c
 			ev_timers.c
-			ev_waits.c
-			eventlib.c
-			heap.c
-			hex.c
-			logging.c
-			memcluster.c
-			movefile.c
-			tree.c
 
 			# nameser
 			ns_name.c

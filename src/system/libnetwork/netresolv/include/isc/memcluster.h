@@ -1,3 +1,5 @@
+/*	$NetBSD: memcluster.h,v 1.1.1.4 2009/04/12 16:35:44 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1997,1999 by Internet Software Consortium.

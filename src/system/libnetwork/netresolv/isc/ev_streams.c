@@ -1,3 +1,5 @@
+/*	$NetBSD: ev_streams.c,v 1.6 2009/04/12 17:07:17 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996-1999 by Internet Software Consortium
@@ -19,8 +21,13 @@
  * vix 04mar96 [initial]
  */
 
-#if !defined(LINT) && !defined(CODECENTER)
-static const char rcsid[] = "$Id: ev_streams.c,v 1.5 2005/04/27 04:56:36 sra Exp $";
+#include <sys/cdefs.h>
+#if !defined(LINT) && !defined(CODECENTER) && !defined(lint)
+#ifdef notdef
+static const char rcsid[] = "Id: ev_streams.c,v 1.5 2005/04/27 04:56:36 sra Exp";
+#else
+__RCSID("$NetBSD: ev_streams.c,v 1.6 2009/04/12 17:07:17 christos Exp $");
+#endif
 #endif
 
 #include "port_before.h"
@@ -37,11 +44,13 @@ static const char rcsid[] = "$Id: ev_streams.c,v 1.5 2005/04/27 04:56:36 sra Exp
 
 #include "port_after.h"
 
+#ifndef _LIBC
 static int	copyvec(evStream *str, const struct iovec *iov, int iocnt);
 static void	consume(evStream *str, size_t bytes);
 static void	done(evContext opaqueCtx, evStream *str);
 static void	writable(evContext opaqueCtx, void *uap, int fd, int evmask);
 static void	readable(evContext opaqueCtx, void *uap, int fd, int evmask);
+#endif
 
 struct iovec
 evConsIovec(void *buf, size_t cnt) {
@@ -53,6 +62,7 @@ evConsIovec(void *buf, size_t cnt) {
 	return (ret);
 }
 
+#ifndef _LIBC
 int
 evWrite(evContext opaqueCtx, int fd, const struct iovec *iov, int iocnt,
 	evStreamFunc func, void *uap, evStreamID *id)
@@ -304,5 +314,6 @@ readable(evContext opaqueCtx, void *uap, int fd, int evmask) {
 	if (str->ioDone <= 0 || str->ioDone == str->ioTotal)
 		done(opaqueCtx, str);
 }
+#endif
 
 /*! \file */

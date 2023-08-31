@@ -1,4 +1,4 @@
-/*	$NetBSD: getnameinfo.c,v 1.53 2012/09/26 23:13:00 christos Exp $	*/
+/*	$NetBSD: getnameinfo.c,v 1.59 2015/09/22 16:15:08 christos Exp $	*/
 /*	$KAME: getnameinfo.c,v 1.45 2000/09/25 22:43:56 itojun Exp $	*/
 
 /*
@@ -14,11 +14,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *    This product includes software developed by WIDE Project and
- *    its contributors.
- * 4. Neither the name of the project nor the names of its contributors
+ * 3. Neither the name of the project nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -51,9 +47,12 @@
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: getnameinfo.c,v 1.53 2012/09/26 23:13:00 christos Exp $");
+__RCSID("$NetBSD: getnameinfo.c,v 1.59 2015/09/22 16:15:08 christos Exp $");
 #endif /* LIBC_SCCS and not lint */
 
+#ifndef RUMP_ACTION
+#include "namespace.h"
+#endif
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -70,8 +69,14 @@ __RCSID("$NetBSD: getnameinfo.c,v 1.53 2012/09/26 23:13:00 christos Exp $");
 #include <stddef.h>
 #include <string.h>
 
-#include "nsswitch.h"
 #include "servent.h"
+#include "hostent.h"
+
+#ifndef RUMP_ACTION
+#ifdef __weak_alias
+__weak_alias(getnameinfo,_getnameinfo)
+#endif
+#endif
 
 static const struct afd {
 	int		a_af;
@@ -111,9 +116,9 @@ static int getnameinfo_link(const struct sockaddr *, socklen_t, char *,
 static int hexname(const uint8_t *, size_t, char *, socklen_t);
 
 /*
-+  * Top-level getnameinfo() code.  Look at the address family, and pick an
-+  * appropriate function to call.
-+  */
+ * Top-level getnameinfo() code.  Look at the address family, and pick an
+ * appropriate function to call.
+ */
 int
 getnameinfo(const struct sockaddr *sa, socklen_t salen,
 	char *host, socklen_t hostlen,
@@ -252,7 +257,6 @@ getnameinfo_inet(const struct sockaddr *sa, socklen_t salen,
 	if (sa == NULL)
 		return EAI_FAIL;
 
-
 	family = sa->sa_family;
 	for (i = 0; afdl[i].a_af; i++)
 		if (afdl[i].a_af == family) {
@@ -275,7 +279,7 @@ getnameinfo_inet(const struct sockaddr *sa, socklen_t salen,
 		 * in case you are wondering if "&&" is more correct than
 		 * "||" here: rfc2553bis-03 says that serv == NULL OR
 		 * servlen == 0 means that the caller does not want the result.
-		*/
+		 */
 	} else {
 		struct servent_data svd;
 		struct servent sv;
@@ -376,7 +380,11 @@ getnameinfo_inet(const struct sockaddr *sa, socklen_t salen,
 			break;
 		}
 	} else {
-		hp = gethostbyaddr(addr, afd->a_addrlen, afd->a_af);
+		struct hostent hent;
+		char hbuf[4096];
+		int he;
+		hp = gethostbyaddr_r(addr, afd->a_addrlen, afd->a_af, &hent,
+		    hbuf, sizeof(hbuf), &he);
 
 		if (hp) {
 #if 0
@@ -396,8 +404,21 @@ getnameinfo_inet(const struct sockaddr *sa, socklen_t salen,
 			}
 			strlcpy(host, hp->h_name, hostlen);
 		} else {
-			if (flags & NI_NAMEREQD)
-				return EAI_NONAME;
+			switch (he) {
+			case NO_DATA:
+			case HOST_NOT_FOUND:
+				if (flags & NI_NAMEREQD)
+					return EAI_NONAME;
+				break;
+			case TRY_AGAIN:
+				return EAI_AGAIN;
+			case NETDB_SUCCESS:
+			case NETDB_INTERNAL:
+			case NO_RECOVERY:
+				/*FALLTHROUGH*/
+			default:
+				return EAI_SYSTEM;
+			}
 			switch(afd->a_af) {
 #ifdef INET6
 			case AF_INET6:
@@ -430,9 +451,9 @@ ip6_parsenumeric(const struct sockaddr *sa, const char *addr, char *host,
 	size_t numaddrlen;
 	char numaddr[512];
 
-	assert(sa != NULL);
-	assert(addr != NULL);
-	assert(host != NULL);
+	_DIAGASSERT(sa != NULL);
+	_DIAGASSERT(addr != NULL);
+	_DIAGASSERT(host != NULL);
 
 	if (inet_ntop(AF_INET6, addr, numaddr, (socklen_t)sizeof(numaddr))
 	    == NULL)
@@ -472,8 +493,8 @@ ip6_sa2str(const struct sockaddr_in6 *sa6, char *buf, size_t bufsiz, int flags)
 	const struct in6_addr *a6;
 	int n;
 
-	assert(sa6 != NULL);
-	assert(buf != NULL);
+	_DIAGASSERT(sa6 != NULL);
+	_DIAGASSERT(buf != NULL);
 
 	ifindex = (unsigned int)sa6->sin6_scope_id;
 	a6 = &sa6->sin6_addr;
@@ -527,11 +548,7 @@ getnameinfo_link(const struct sockaddr *sa, socklen_t salen,
 
 	if (sdl->sdl_nlen == 0 && sdl->sdl_alen == 0 && sdl->sdl_slen == 0) {
 		n = snprintf(host, hostlen, "link#%u", sdl->sdl_index);
-		if (n < 0 || (socklen_t) n > hostlen) {
-			*host = '\0';
-			return EAI_MEMORY;
-		}
-		return 0;
+		goto out;
 	}
 
 	switch (sdl->sdl_type) {
@@ -539,16 +556,12 @@ getnameinfo_link(const struct sockaddr *sa, socklen_t salen,
 	case IFT_ECONET:
 		if (sdl->sdl_alen < 2)
 			return EAI_FAMILY;
-		if (LLADDR(sdl)[1] == 0)
-			n = snprintf(host, hostlen, "%u", LLADDR(sdl)[0]);
+		if (CLLADDR(sdl)[1] == 0)
+			n = snprintf(host, hostlen, "%u", CLLADDR(sdl)[0]);
 		else
 			n = snprintf(host, hostlen, "%u.%u",
-			    LLADDR(sdl)[1], LLADDR(sdl)[0]);
-		if (n < 0 || (socklen_t) n >= hostlen) {
-			*host = '\0';
-			return EAI_MEMORY;
-		} else
-			return 0;
+			    CLLADDR(sdl)[1], CLLADDR(sdl)[0]);
+		goto out;
 #endif
 #ifdef IFT_IEEE1394
 	case IFT_IEEE1394:
@@ -557,7 +570,7 @@ getnameinfo_link(const struct sockaddr *sa, socklen_t salen,
 		if (sdl->sdl_alen < sizeof(iha->iha_uid))
 			return EAI_FAMILY;
 		iha =
-		    (const struct ieee1394_hwaddr *)(const void *)LLADDR(sdl);
+		    (const struct ieee1394_hwaddr *)(const void *)CLLADDR(sdl);
 		return hexname(iha->iha_uid, sizeof(iha->iha_uid),
 		    host, hostlen);
 	}
@@ -592,9 +605,15 @@ getnameinfo_link(const struct sockaddr *sa, socklen_t salen,
 	case IFT_ISO88025:
 #endif
 	default:
-		return hexname((const uint8_t *)LLADDR(sdl),
+		return hexname((const uint8_t *)CLLADDR(sdl),
 		    (size_t)sdl->sdl_alen, host, hostlen);
 	}
+out:
+	if (n < 0 || (socklen_t) n >= hostlen) {
+		*host = '\0';
+		return EAI_MEMORY;
+	}
+	return 0;
 }
 
 static int

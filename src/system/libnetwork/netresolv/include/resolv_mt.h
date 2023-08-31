@@ -1,3 +1,5 @@
+/*	$NetBSD: resolv_mt.h,v 1.1.1.3 2009/04/12 16:35:44 christos Exp $	*/
+
 #ifndef _RESOLV_MT_H
 #define _RESOLV_MT_H
 

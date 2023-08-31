@@ -128,15 +128,15 @@ again:
 #endif
 
 	n = res_nmkquery(statp, QUERY, name, class, type, NULL, 0, NULL,
-			 buf, sizeof(buf));
+			 buf, (int)sizeof(buf));
 #ifdef RES_USE_EDNS0
 	if (n > 0 && (statp->_flags & RES_F_EDNS0ERR) == 0 &&
-	    (statp->options & (RES_USE_EDNS0|RES_USE_DNSSEC|RES_NSID))) {
-		n = res_nopt(statp, n, buf, sizeof(buf), anslen);
+	    (statp->options & (RES_USE_EDNS0|RES_USE_DNSSEC|RES_NSID)) != 0U) {
+		n = res_nopt(statp, n, buf, (int)sizeof(buf), anslen);
+		rdata = &buf[n];
 		if (n > 0 && (statp->options & RES_NSID) != 0U) {
-			rdata = &buf[n];
-			n = res_nopt_rdata(statp, n, buf, sizeof(buf), rdata,
-					   NS_OPT_NSID, 0, NULL);
+			n = res_nopt_rdata(statp, n, buf, (int)sizeof(buf),
+			    rdata, NS_OPT_NSID, 0, NULL);
 		}
 	}
 #endif

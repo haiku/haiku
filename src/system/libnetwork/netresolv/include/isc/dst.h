@@ -1,3 +1,5 @@
+/*	$NetBSD: dst.h,v 1.2 2014/08/03 19:14:24 wiz Exp $	*/
+
 #ifndef DST_H
 #define DST_H
 
@@ -53,7 +55,7 @@ typedef struct dst_key {
 #define	dst_write_key		__dst_write_key
 
 /* 
- * DST Crypto API defintions 
+ * DST Crypto API definitions 
  */
 void     dst_init(void);
 int      dst_check_algorithm(const int);

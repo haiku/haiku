@@ -459,7 +459,7 @@ res_nsend(res_state statp,
 			do {
 				res_sendhookact act;
 
-				act = (*statp->qhook)(&nsap, &buf, &buflen,
+				act = (*(res_send_qhook)statp->qhook)(&nsap, &buf, &buflen,
 						      ans, anssiz, &resplen);
 				switch (act) {
 				case res_goahead:
@@ -545,7 +545,7 @@ res_nsend(res_state statp,
 			do {
 				res_sendhookact act;
 
-				act = (*statp->rhook)(nsap, buf, buflen,
+				act = (*(res_send_rhook)statp->rhook)(nsap, buf, buflen,
 						      ans, anssiz, &resplen);
 				switch (act) {
 				case res_goahead:

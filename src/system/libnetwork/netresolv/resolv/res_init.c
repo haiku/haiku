@@ -1,4 +1,4 @@
-/*	$NetBSD: res_init.c,v 1.31 2017/04/19 22:21:07 christos Exp $	*/
+/*	$NetBSD: res_init.c,v 1.31.14.1 2021/10/05 11:06:58 martin Exp $	*/
 
 /*
  * Copyright (c) 1985, 1989, 1993
@@ -12,11 +12,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- * 	This product includes software developed by the University of
- * 	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -102,6 +98,20 @@
 
 #include "port_after.h"
 
+#if 0
+#ifdef __weak_alias
+__weak_alias(res_ninit,_res_ninit)
+__weak_alias(res_randomid,__res_randomid)
+__weak_alias(res_nclose,_res_nclose)
+__weak_alias(res_ndestroy,_res_ndestroy)
+__weak_alias(res_get_nibblesuffix,__res_get_nibblesuffix)
+__weak_alias(res_get_nibblesuffix2,__res_get_nibblesuffix2)
+__weak_alias(res_getservers,__res_getservers)
+__weak_alias(res_setservers,__res_setservers)
+#endif
+#endif
+
+
 /* ensure that sockaddr_in6 and IN6ADDR_ANY_INIT are declared / defined */
 #include <resolv.h>
 
@@ -110,7 +120,7 @@
 #include "res_private.h"
 
 #define RESOLVSORT
-/*% Options. Should all be left alone. */
+/*% Options.  Should all be left alone. */
 #ifndef DEBUG
 //#define DEBUG
 #endif
@@ -124,7 +134,7 @@ static void res_setoptions(res_state, const char *, const char *);
 #ifdef RESOLVSORT
 static const char sort_mask[] = "/&";
 #define ISSORTMASK(ch) (strchr(sort_mask, ch) != NULL)
-static uint32_t net_mask __P((struct in_addr));
+static uint32_t net_mask(struct in_addr);
 #endif
 
 #if !defined(isascii)	/*%< XXX - could be a function */
@@ -467,7 +477,11 @@ __res_vinit(res_state statp, int preinit) {
 #ifdef RESOLVSORT
 	    statp->nsort = nsort;
 #endif
+	    statp->_u._ext.ext->resfd = fcntl(fileno(fp), F_DUPFD_CLOEXEC, 0);
 	    (void) fclose(fp);
+	} else {
+	    statp->_u._ext.ext->kq = -1;
+	    statp->_u._ext.ext->resfd = -1;
 	}
 /*
  * Last chance to get a nameserver.  This should not normally
@@ -598,13 +612,18 @@ res_setoptions(res_state statp, const char *options, const char *source)
 			statp->options |= RES_NOTLDQUERY;
 		} else if (!strncmp(cp, "inet6", sizeof("inet6") - 1)) {
 			statp->options |= RES_USE_INET6;
+#ifdef RES_USE_INET4
 		} else if (!strncmp(cp, "inet4", sizeof("inet4") - 1)) {
 			statp->options |= RES_USE_INET4;
+#endif
 		} else if (!strncmp(cp, "rotate", sizeof("rotate") - 1)) {
 			statp->options |= RES_ROTATE;
 		} else if (!strncmp(cp, "no-check-names",
 				    sizeof("no-check-names") - 1)) {
 			statp->options |= RES_NOCHECKNAME;
+		} else if (!strncmp(cp, "check-names",
+				    sizeof("check-names") - 1)) {
+			statp->options &= ~RES_NOCHECKNAME;
 		}
 #ifdef RES_USE_EDNS0
 		else if (!strncmp(cp, "edns0", sizeof("edns0") - 1)) {
@@ -665,13 +684,15 @@ net_mask(struct in_addr in) /*!< XXX - should really use system's version of thi
 }
 #endif
 
+static u_char srnd[16];
+
 void
 res_rndinit(res_state statp)
 {
 	struct timeval now;
 	uint32_t u32;
 	uint16_t u16;
-	u_char *rnd = statp->_rnd;
+	u_char *rnd = statp->_rnd == NULL ? srnd : statp->_rnd;
 
 	gettimeofday(&now, NULL);
 	u32 = (uint32_t)now.tv_sec;
@@ -690,7 +711,7 @@ res_nrandomid(res_state statp)
 	struct timeval now;
 	uint16_t u16;
 	MD5_CTX ctx;
-	u_char *rnd = statp->_rnd;
+	u_char *rnd = statp->_rnd == NULL ? srnd : statp->_rnd;
 
 	gettimeofday(&now, NULL);
 	u16 = (uint16_t) (now.tv_sec ^ now.tv_usec);
@@ -736,13 +757,14 @@ res_nclose(res_state statp)
 void
 res_ndestroy(res_state statp)
 {
+	struct __res_state_ext *ext = statp->_u._ext.ext;
 	res_nclose(statp);
-	if (statp->_u._ext.ext != NULL) {
-		if (statp->_u._ext.ext->kq != -1)
-			(void)close(statp->_u._ext.ext->kq);
-		if (statp->_u._ext.ext->resfd != -1)
-			(void)close(statp->_u._ext.ext->resfd);
-		free(statp->_u._ext.ext);
+	if (ext != NULL) {
+		if (ext->kq != -1)
+			(void)close(ext->kq);
+		if (ext->resfd != -1)
+			(void)close(ext->resfd);
+		free(ext);
 		statp->_u._ext.ext = NULL;
 	}
 	statp->options &= ~RES_INIT;

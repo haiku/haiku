@@ -1,3 +1,5 @@
+/*	$NetBSD: support.c,v 1.2 2014/10/18 08:33:23 snj Exp $	*/
+
 /*
  * Portions Copyright (c) 1995-1998 by Trusted Information Systems, Inc.
  *
@@ -14,6 +16,10 @@
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
  * WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  */
+#include <sys/cdefs.h>
+#if 0
+static const char rcsid[] = "Header: /proj/cvs/prod/libbind/dst/support.c,v 1.6 2005/10/11 00:10:13 marka Exp ";
+#endif
 
 #include "port_before.h"
 
@@ -48,7 +54,7 @@
 int
 dst_s_verify_str(const char **buf, const char *str)
 {
-	int b, s;
+	size_t b, s;
 	if (*buf == NULL)	/*%< error checks */
 		return (0);
 	if (str == NULL || *str == '\0')
@@ -191,7 +197,7 @@ dst_s_get_int32(const u_char *buf)
 void
 dst_s_put_int16(u_int8_t *buf, const u_int16_t val)
 {
-	buf[0] = (u_int8_t)(val >> 8);
+	buf[0] = (u_int8_t)((uint32_t)val >> 8);
 	buf[1] = (u_int8_t)(val);
 }
 
@@ -248,7 +254,7 @@ dst_s_filename_length(const char *name, const char *suffix)
 
 /*%
  *  dst_s_build_filename ()
- *	Builds a key filename from the key name, it's id, and a
+ *	Builds a key filename from the key name, its id, and a
  *	suffix.  '\', '/' and ':' are not allowed. fA filename is of the
  *	form:  K&lt;keyname&gt;&lt;id&gt;.&lt;suffix&gt;
  *	form: K&lt;keyname&gt;+&lt;alg&gt;+&lt;id&gt;.&lt;suffix&gt;
@@ -314,7 +320,7 @@ dst_s_fopen(const char *filename, const char *mode, int perm)
 	
 	fp = fopen(pathname, mode);
 	if (perm)
-		chmod(pathname, perm);
+		chmod(pathname, (mode_t)perm);
 	return (fp);
 }
 

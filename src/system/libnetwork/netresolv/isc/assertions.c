@@ -1,3 +1,5 @@
+/*	$NetBSD: assertions.c,v 1.7 2011/09/16 16:05:58 joerg Exp $	*/
+
 /*
  * Copyright (C) 2004, 2005, 2008  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1997, 1999, 2001  Internet Software Consortium.
@@ -15,8 +17,13 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(LINT) && !defined(CODECENTER)
-static const char rcsid[] = "$Id: assertions.c,v 1.5 2008/11/14 02:36:51 marka Exp $";
+#include <sys/cdefs.h>
+#if !defined(LINT) && !defined(CODECENTER) && !defined(lint)
+#ifdef notdef
+static const char rcsid[] = "Id: assertions.c,v 1.5 2008/11/14 02:36:51 marka Exp";
+#else
+__RCSID("$NetBSD: assertions.c,v 1.7 2011/09/16 16:05:58 joerg Exp $");
+#endif
 #endif
 
 #include "port_before.h"
@@ -34,7 +41,7 @@ static const char rcsid[] = "$Id: assertions.c,v 1.5 2008/11/14 02:36:51 marka E
  * Forward.
  */
 
-static void default_assertion_failed(const char *, int, assertion_type,
+__dead static void default_assertion_failed(const char *, int, assertion_type,
 				     const char *, int);
 
 /*

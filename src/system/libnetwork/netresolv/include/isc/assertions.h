@@ -1,3 +1,5 @@
+/*	$NetBSD: assertions.h,v 1.5 2009/04/12 17:07:16 christos Exp $	*/
+
 /*
  * Copyright (C) 2004, 2005, 2008  Internet Systems Consortium, Inc. ("ISC")
  * Copyright (C) 1997-2001  Internet Software Consortium.
@@ -16,7 +18,7 @@
  */
 
 /*
- * $Id: assertions.h,v 1.5 2008/11/14 02:36:51 marka Exp $
+ * Id: assertions.h,v 1.5 2008/11/14 02:36:51 marka Exp
  */
 
 #ifndef ASSERTIONS_H
@@ -48,6 +50,7 @@ const char *assertion_type_to_text(assertion_type type);
 #define CHECK_INVARIANT		0
 #endif
 
+#ifdef _DIAGNOSTIC
 #ifndef CHECK_REQUIRE
 #define CHECK_REQUIRE		1
 #endif
@@ -63,6 +66,7 @@ const char *assertion_type_to_text(assertion_type type);
 #ifndef CHECK_INVARIANT
 #define CHECK_INVARIANT		1
 #endif
+#endif	/* _DIAGNOSTIC */
 
 #if CHECK_REQUIRE != 0
 #define REQUIRE(cond) \
@@ -102,8 +106,13 @@ const char *assertion_type_to_text(assertion_type type);
 		 ((__assertion_failed)(__FILE__, __LINE__, assert_insist, \
 				       #cond, 1), 0)))
 #else
+#if !defined(__lint__)
 #define INSIST(cond)		((void) (cond))
 #define INSIST_ERR(cond)	((void) (cond))
+#else /* !__lint__ */
+#define INSIST(cond)
+#define INSIST_ERR(cond)
+#endif /* !__lint__ */
 #endif /* CHECK_INSIST */
 
 #if CHECK_INVARIANT != 0

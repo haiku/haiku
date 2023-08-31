@@ -66,6 +66,7 @@ __weak_alias(p_query,__p_query)
 __weak_alias(fp_query,__fp_query)
 __weak_alias(fp_nquery,__fp_nquery)
 __weak_alias(res_isourserver,__res_isourserver)
+__weak_alias(res_opt,_res_opt)
 __weak_alias(hostalias,__hostalias)
 #endif
 #endif
@@ -314,6 +315,12 @@ res_querydomain(const char *name,
 	return (res_nquerydomain(&_nres, name, domain,
 				 class, type,
 				 answer, anslen));
+}
+
+int
+res_opt(int a, u_char *b, int c, int d)
+{
+	return res_nopt(&_nres, a, b, c, d);
 }
 
 u_int
