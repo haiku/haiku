@@ -10,6 +10,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <$(architecture)>posix_musl_time.o :
+			__month_to_secs.c
+			__secs_to_tm.c
+			__tm_to_secs.c
+			__year_to_secs.c
 			asctime.c
 			asctime_r.c
 			difftime.c

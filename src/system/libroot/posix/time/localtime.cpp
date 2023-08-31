@@ -34,7 +34,7 @@ int daylight = 0;
 
 
 // These three functions are used as a fallback when the locale backend could not
-// be loaded. They are implemented in localtime_fading_out.c.
+// be loaded, or for the POSIX locale. They are implemented in localtime_fallback.c.
 extern "C" struct tm* __gmtime_r_fallback(const time_t* timep, struct tm* tmp);
 extern "C" time_t __mktime_fallback(struct tm* tmp);
 extern "C" time_t __timegm_fallback(struct tm* tmp);

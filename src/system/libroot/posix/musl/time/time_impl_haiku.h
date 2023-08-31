@@ -1,12 +1,3 @@
-time_t	timegm(struct tm *tm);
-
-static inline time_t
-__tm_to_secs(const struct tm *tm)
-{
-	struct tm tmp = *tm;
-	return timegm(&tmp);
-}
-
 static inline const char*
 __tm_to_tzname(const struct tm *tm)
 {
