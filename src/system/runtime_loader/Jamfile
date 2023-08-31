@@ -54,6 +54,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<src!system!libroot!posix!locale!$(architecture)>ctype_loc.o
 			<src!system!libroot!posix!locale!$(architecture)>LocaleData.o
 
+			<src!system!libroot!posix!musl!string!$(architecture)>strchrnul.o
+			<src!system!libroot!posix!musl!string!$(architecture)>strcspn.o
+
 			<src!system!libroot!posix!string!$(architecture)>memchr.o
 			<src!system!libroot!posix!string!$(architecture)>memcmp.o
 			<src!system!libroot!posix!string!$(architecture)>memmove.o
@@ -62,7 +65,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<src!system!libroot!posix!string!$(architecture)>strchr.o
 			<src!system!libroot!posix!string!$(architecture)>strcmp.o
 			<src!system!libroot!posix!string!$(architecture)>strcpy.o
-			<src!system!libroot!posix!string!$(architecture)>strcspn.o
 			<src!system!libroot!posix!string!$(architecture)>strdup.o
 			<src!system!libroot!posix!string!$(architecture)>strerror.o
 			<src!system!libroot!posix!string!$(architecture)>strlcat.o

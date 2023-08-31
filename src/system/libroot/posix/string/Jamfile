@@ -29,11 +29,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			strcasestr.c
 			strcat.c
 			strchr.c
-			strchrnul.c
 			strcmp.c
 			strcoll.cpp
 			strcpy.c
-			strcspn.c
 			strdup.cpp
 			strerror.c
 			strlcat.c

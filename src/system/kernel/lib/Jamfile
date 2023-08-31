@@ -51,6 +51,9 @@ local muslSources =
 	ffs.c
 	rand.c
 	rand_r.c
+
+	strchrnul.c
+	strcspn.c
 	;
 
 SourceHdrs $(muslSources) :
@@ -122,7 +125,6 @@ KernelMergeObject kernel_lib_posix.o :
 	strchr.c
 	strcmp.c
 	strcpy.c
-	strcspn.c
 	strdup.cpp
 	strerror.c
 	strlcat.c
@@ -147,6 +149,7 @@ KernelMergeObject kernel_lib_posix.o :
 
 SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl misc ] ;
 SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl prng ] ;
+SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl string ] ;
 
 # misc
 

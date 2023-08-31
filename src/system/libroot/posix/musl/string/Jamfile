@@ -10,6 +10,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_musl_string.o :
 			memrchr.c
+			strchrnul.c
+			strcspn.c
 			swab.c
 			;
 	}
