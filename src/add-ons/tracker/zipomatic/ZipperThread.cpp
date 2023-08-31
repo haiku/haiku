@@ -23,6 +23,8 @@
 #include <Path.h>
 #include <Volume.h>
 
+#include <private/tracker/tracker_private.h>
+
 #include "ZipOMaticMisc.h"
 #include "ZipOMaticWindow.h"
 
@@ -211,7 +213,7 @@ ZipperThread::ThreadShutdown()
 	close(fStdOut);
 	close(fStdErr);
 
-	// _SelectInTracker();
+	_SelectInTracker();
 
 	return B_OK;
 }
@@ -410,10 +412,8 @@ ZipperThread::WaitOnExternalZip()
 
 
 status_t
-ZipperThread::_SelectInTracker(int32 tryNumber)
+ZipperThread::_SelectInTracker()
 {
-	// work in progress - unreliable - not ready to be used
-
 	entry_ref parentRef;
 	BEntry entry(&fOutputEntryRef);
 
@@ -423,108 +423,24 @@ ZipperThread::_SelectInTracker(int32 tryNumber)
 	entry.GetParent(&entry);
 	entry.GetRef(&parentRef);
 
-	BMessenger trackerMessenger("application/x-vnd.Be-TRAK");
+	BMessenger trackerMessenger(kTrackerSignature);
 	if (!trackerMessenger.IsValid())
 		return B_ERROR;
 
-	BMessage request;
-	BMessage reply;
-	status_t status;
-
-	if (tryNumber == 0) {
-		request.MakeEmpty();
-		request.what = B_REFS_RECEIVED;
-		request.AddRef("refs", &parentRef);
-		trackerMessenger.SendMessage(&request, &reply);
-	}
-
-	if (tryNumber > 20)
-		return B_ERROR;
-
-	snooze(200000);
-
-	// find out the number of Tracker windows
-	request.MakeEmpty();
-	request.what = B_COUNT_PROPERTIES;
-	request.AddSpecifier("Window");
-	reply.MakeEmpty();
-
-	status = trackerMessenger.SendMessage(&request, &reply);
+	BMessage request, reply;
+	request.what = B_REFS_RECEIVED;
+	request.AddRef("refs", &parentRef);
+	status_t status = trackerMessenger.SendMessage(&request, &reply);
 	if (status != B_OK)
 		return status;
 
-	int32 windowCount;
-	status = reply.FindInt32("result", &windowCount);
-	if (status != B_OK)
-		return status;
+	// Wait 0.3 seconds to give Tracker time to populate.
+	snooze(300000);
 
-	// find a likely parent window
-	bool foundWindow = false;
-	int32 index = 0;
-	for (; index < windowCount; index++) {
-		request.MakeEmpty();
-		request.what = B_GET_PROPERTY;
-		request.AddSpecifier("Path");
-		request.AddSpecifier("Poses");
-		request.AddSpecifier("Window", index);
-		reply.MakeEmpty();
-
-		status = trackerMessenger.SendMessage(&request, &reply);
-		if (status != B_OK)
-			continue;
-
-		entry_ref windowRef;
-		status = reply.FindRef("result", &windowRef);
-		if (status != B_OK)
-			continue;
-
-		if (windowRef == parentRef) {
-			foundWindow = true;
-			break;
-		}
-	}
-
-	if (!foundWindow)
-		return _SelectInTracker(tryNumber + 1);
-
-	// find entry_ref in window - a newly opened window might
-	// be filling and the entry_ref perhaps not there yet?
 	request.MakeEmpty();
-	request.what = B_GET_PROPERTY;
-	request.AddSpecifier("Entry");
-	request.AddSpecifier("Poses");
-	request.AddSpecifier("Window", index);
+	request.what = BPrivate::kSelect;
+	request.AddRef("refs", &fOutputEntryRef);
+
 	reply.MakeEmpty();
-
-	status = trackerMessenger.SendMessage(&request, &reply);
-	if (status != B_OK)
-		return _SelectInTracker(tryNumber + 1);
-
-	bool foundRef = false;
-	entry_ref ref;
-	for (int32 m = 0;; m++) {
-		status = reply.FindRef("result", m, &ref);
-		if (status != B_OK)
-			break;
-		if (ref == fOutputEntryRef)
-			foundRef = true;
-	}
-
-	// if entry_ref not found in window, start over
-	if (!foundRef)
-		return _SelectInTracker(tryNumber + 1);
-
-	// select archive file in Tracker window
-	request.MakeEmpty();
-	request.what = B_SET_PROPERTY;
-	request.AddRef("data", &fOutputEntryRef);
-	request.AddSpecifier("Selection");
-	request.AddSpecifier("Poses");
-	request.AddSpecifier("Window", index);
-	reply.MakeEmpty();
-
-	status = trackerMessenger.SendMessage(&request, &reply);
-
-	return status;
+	return trackerMessenger.SendMessage(&request, &reply);
 }
-

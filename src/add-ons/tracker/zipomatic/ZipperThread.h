@@ -52,7 +52,7 @@ private:
 								const char* name = NULL,
 								const char* value = NULL);
 
-			status_t		_SelectInTracker(int32 tryNumber = 0);
+			status_t		_SelectInTracker();
 
 			BMessenger		fWindowMessenger;
 			thread_id		fZipProcess;
