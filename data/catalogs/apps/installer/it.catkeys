@@ -1,22 +1,32 @@
-1	italian	x-vnd.Haiku-Installer	1928805340
+1	italian	x-vnd.Haiku-Installer	2288760834
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra di Gestione Disco prima di chiudere quella del programma di installazione.
 No optional packages available.	PackagesView		Nessun pacchetto opzionale disponibile.
+This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Questo sistema operativo deve essere installato su una partizione che utilizza il Be File System, ma al momento non ci sono tali partizioni disponibili sul tuo sistema.
 The mount point could not be retrieved.	InstallProgress		Impossibile recuperare il punto di montaggio.
 <none>	InstallerWindow	No partition available	<nessuna>
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completata. Il settore di avvio è stato scritto in '%s'. Premi 'Riavvia' per riavviare il computer o scegli un nuovo volume di destinazione per eseguire un'altra installazione.
+Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku deve essere installato su una partizione che utilizza il Be File System, ma al momento non ci sono tali partizioni disponibili sul tuo sistema.
 Please choose target	InstallerWindow		Scegli destinazione
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Impossibile avviare BootManager, l'applicazione per configurare il menu di avvio di Haiku.
 Cancel	InstallProgress		Annulla
 Are you sure you want to to stop the installation?	InstallerWindow		Sei sicuro di voler interrompere l'installazione?
 Installer	System name		Installazione di Haiku
 Unknown Type	InstallProgress	Partition content type	Tipo Sconosciuto
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Premi il pulsante 'Inizia' per installare da '%1s' a '%2s'.
 Are you sure you want to stop the installation?	InstallerWindow		Sei sicuro di voler interrompere l'installazione?
 README	InstallerApp		LEGGIMI
 Quit	InstallerWindow		Esci
+Please close the BootManager window before closing the Installer window.	InstallerWindow		Chiudere la finestra di BootManager prima di chiudere la finestra dell'Installer.
 Write boot sector to '%s'	InstallerWindow		Scrittura settore d'avvio su '%s'
 Boot sector not written because of an internal error.	InstallProgress		Settore d'avvio non scritto a causa di un errore interno.
+Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Scegli il disco di origine e di destinazione dai menu a comparsa. Quindi fare clic su 'Inizia'.
+Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Esecuzione di BootManager e DriveSetup...\n\nChiudere entrambe le applicazioni per continuare con l'installazione.
+Click on 'Set up partitions…' to create one.	InstallerWindow		Fare clic su 'Imposta partizioni...' per crearne una.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Benvenuto nel programma di installazione di Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? di ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Impossibile lanciare Gestione Disco, l'applicazione per configurare le partizioni dei dischi.
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Installazione completata. Il settore di avvio è stato scritto in '%s'. Premere 'Esci' per uscire dal programma di installazione o scegliere un nuovo volume di destinazione per eseguire un'altra installazione.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Il volume di destinazione non è vuoto. Se contiene un'installazione precedente di Haiku questa verrà sovrascritta. Ciò ne rimuoverà tutto il software installato.\n\nSe vuoi aggiornare le il tuo sistema senza rimuoverne il software installato, consulta la Guida Utente Haiku sulla sezione dell'applicazione \"Aggiornamento Software\" per le istruzioni sull'aggiornamento.\n\nSei sicuro di voler proseguire con l'installazione?
 Quit DriveSetup	InstallerWindow		Esci da Gestione Disco
 Write boot sector	InstallerWindow		Scrivi settore d'avvio
@@ -33,6 +43,7 @@ Hide optional packages	InstallerWindow		Nascondi pacchetti opzionali
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Buon divertimento e grazie per il tuo interesse per Haiku!
 Quit	InstallerApp		Esci
+Quit BootManager and DriveSetup	InstallerWindow		Esci da BootManager e DriveSetup
 Error writing boot sector.	InstallProgress		Errore nella scrittura del settore di avvio.
 OK	InstallerWindow		OK
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quando avrai avviato con successo Haiku per la prima volta, assicurai di leggere la nostra \"Guida Utente\" e fare il \"Giro Rapido\". Trovi i collegamenti sul Desktop e fra i segnalibri di WebPositive.\n\n
@@ -41,12 +52,14 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMAZIONI DA 
 Additional disk space required: %s	InstallerWindow		Spazio addizionale richiesto sul disco: %s
 Stop	InstallerWindow	In alert after pressing Stop	Interrompi
 Boot sector successfully written.	InstallProgress		Settore d'avvio scritto con successo.
+Failed to launch BootManager	InstallerWindow		Impossibile avviare BootManager
 Writing bootsector.	InstallProgress		Scrittura del settore di avvio.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		È stato riscontrato un errore e l'installazione non è stata completata:\n\nErrore:  %s
 Restart	InstallerWindow		Riavvia
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Il disco non può essere montato. Scegli un disco differente.
 Begin	InstallerWindow		Inizia
 Collecting copy information.	InstallProgress		Raccolta informazioni di copia.
+Set up boot menu…	InstallerWindow		Imposta menu di avvio...
 Show optional packages	InstallerWindow		Mostra pacchetti opzionali
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Non è stata trovata alcuna partizione adatta per l'installazione. Per favore, crea e formatta almeno una partizione con il formato Be File System.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Il disco di destinazione potrebbe non avere abbastanza spazio. Prova a scegliere un disco differente oppure non installare elementi opzionali.
@@ -57,13 +70,18 @@ Continue	InstallerWindow	In alert after pressing Stop	Continua
 Scanning for disks…	InstallerWindow		Scansione dei dischi…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Avvio Gestione Disco…\n\nChiudi Gestione Disco per continuare con l'installazione.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		L'installazione non è ancora completa!\nSei sicuro di volerla interrompere ora?
+Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		Esecuzione di BootManager...\n\nChiudere BootManager per continuare con l'installazione.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		La partizione non può essere montata. Scegli una partizione differente.
 Set up partitions…	InstallerWindow		Imposta partizioni…
 Install progress:  	InstallerWindow		Avanzamento dell'installazione:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Non puoi installare i contenuti di un disco su se stesso. Scegli un disco differente.
+Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Chiudere le finestre di BootManager e di DriveSetup prima di chiudere la finestra dell'Installer.
+Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Scegliere il disco di origine dal menu a comparsa. Quindi fare clic su 'Inizia'.
 OK	InstallProgress		OK
+Quit BootManager	InstallerWindow		Uscire da BootManager
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sei sicuro di voler installare sul disco d'avvio corrente? Se procedi il programma di installazione riavvierà la tua macchina.
 Onto:	InstallerWindow		Su:
 Tools	InstallerWindow		Strumenti
 scanning…	InstallerWindow		scansione…
+Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Scegliere il disco su cui desideri installare dal menu a comparsa. Quindi fare clic su 'Inizia'.
 Continue	InstallerApp		Continua

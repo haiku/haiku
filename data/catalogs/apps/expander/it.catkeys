@@ -1,10 +1,11 @@
-1	italian	x-vnd.Haiku-Expander	3300517306
+1	italian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destinazione
 Other	ExpanderPreferences		Altro
 Automatically show contents listing	ExpanderPreferences		Mostra automaticamente listato contenuti
 Expander	System name		Estrazione Archivi
 Expander: Choose destination	DirectoryFilePanel		Estrazione Archivi: Scegli la destinazione
 Set source…	ExpanderMenu		Imposta l'origine…
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		La destinazione non è una cartella.
 The folder was either moved, renamed or not supported.	ExpanderWindow		La cartella è stata spostata, rinominata o non è supportata.
 Close window when done expanding	ExpanderPreferences		Chiudi la finestra quando la decompressione è completata

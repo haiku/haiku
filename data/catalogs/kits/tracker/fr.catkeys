@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3720277689
+1	french	x-vnd.Haiku-libtracker	3311885033
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -489,7 +489,6 @@ Defaults	TrackerSettingsWindow		Par défaut
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Désolé, il n’y a pas assez d’espace libre dans le volume cible pour copier la sélection.
 True-color picture	AttributesView		Image Vraies-couleurs
 Add-ons	FilePanelPriv		Extensions
-Empty folder	SlowContextPopup		Dossier vide
 Alignment	AttributesView		Alignement
 Move to Trash	FSUtils		Envoyer à la corbeille
 Handles %type	OpenWithWindow		Support de « %type »

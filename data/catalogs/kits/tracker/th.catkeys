@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	2646593318
+1	thai	x-vnd.Haiku-libtracker	2238200662
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -473,7 +473,6 @@ Defaults	TrackerSettingsWindow		ค่าเริ่มต้น
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		ขออภัยมีพื้นที่ว่างไม่เพียงพอในปริมาณปลายทางที่จะคัดลอกส่วนที่เลือก
 True-color picture	AttributesView		ภาพสีจริง
 Add-ons	FilePanelPriv		เพิ่มเติม
-Empty folder	SlowContextPopup		โฟลเดอร์ว่างเปล่า
 Alignment	AttributesView		การวางแนว
 Move to Trash	FSUtils		ย้ายไปที่ถังขยะ
 Handles %type	OpenWithWindow		จัดการ %type

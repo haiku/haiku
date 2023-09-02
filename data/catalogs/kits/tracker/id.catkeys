@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	4208414511
+1	indonesian	x-vnd.Haiku-libtracker	3800021855
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -474,7 +474,6 @@ Defaults	TrackerSettingsWindow		Bawaan
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Maaf, tidak ada cukup ruang bebas pada volume tujuan untuk menyalin yang diseleksi.
 True-color picture	AttributesView		Gambar warna-nyata
 Add-ons	FilePanelPriv		Pengaya
-Empty folder	SlowContextPopup		Folder kosong
 Alignment	AttributesView		Perataan
 Move to Trash	FSUtils		Buang ke Tong Sampah
 Handles %type	OpenWithWindow		Menangani %type

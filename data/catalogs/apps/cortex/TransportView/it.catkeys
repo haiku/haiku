@@ -1,5 +1,7 @@
-1	italian	application/x-vnd.Cortex.TransportView	258714237
+1	italian	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Avvolgi
 (none)	TransportView		(nessuno)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# nodo} other{# nodi}}
 Start	TransportView		Avvio
 No errors.	TransportView		Nessun errore.
 to	TransportView		a

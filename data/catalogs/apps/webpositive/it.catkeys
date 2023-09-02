@@ -1,12 +1,14 @@
-1	italian	x-vnd.Haiku-WebPositive	1510673556
+1	italian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
+Copy	Console Window		Copia
 (Finish: %date)	Download Window		(Terminato: %date)
 Open bookmarks confirmation	WebPositive Window		Conferma apertura segnalibri
 Download folder:	Settings Window		Cartella dei file scaricati:
 Close window	WebPositive Window		Chiudi finestra
 Find:	WebPositive Window		Trova:
 Script console	WebPositive Window		Console
+There was an error setting up the bookmark.	WebPositive Window		Si è verificato un errore durante l'impostazione del segnalibro.
 Fonts	Settings Window		Tipi di caratteri
 Path	Cookie Manager		Percorso:
 Bookmarks	WebPositive Window		Segnalibri
@@ -19,6 +21,7 @@ Delete	Cookie Manager		Elimina
 Open containing folder	Download Window		Mostra nella cartella
 Find previous	WebPositive Window		Trova precedente
 Full screen	WebPositive Window		Schermo intero
+Bookmark bar	WebPositive Window		Barra dei segnalibri
 Downloads in progress	WebPositive		Download in corso
 Copy URL to clipboard	Download Window		Copia URL negli appunti
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sei sicuro di voler aprire %addedCount segnalibri contemporaneamente?
@@ -44,6 +47,7 @@ New tabs:	Settings Window		Nuove tab:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fallito
 Open downloads folder	Download Window		Apri cartella dei file scaricati
 Proxy server	Settings Window		Server proxy
+Darn!	WebPositive		Accidenti!
 Decrease size	WebPositive Window		Diminuisci dimensioni
 Default fixed font size:	Settings Window		Dimensione predefinita caratteri a spaziatura fissa:
 Sans serif font:	Settings Window		Tipo di carattere senza grazie:
@@ -55,6 +59,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Termine di ricerca
 Reload	WebPositive Window		Ricarica
 Expiration	Cookie Manager		Scadenza
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tua CPU è troppo vecchia e non supporta le estensioni SSE2, senza le quali WebPositive non può funzionare. Ti consigliamo, invece, di installare NetSurf.
 Download finished	Download Window		Download completato
 Cookie manager	WebPositive Window		Gestore dei cookie
 OK	Authentication Panel		OK
@@ -99,6 +104,7 @@ Apply	Settings Window		Applica
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	C'è stato un errore nel tentativo di mostrare la cartella dei segnalibri.\n\nErrore: %error
 Revert	Settings Window		Ripristina
 Copy	WebPositive Window		Copia
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Ultima riga ripetuta # volta.}other{Ultima riga ripetuta # volte.}}
 Default standard font size:	Settings Window		Dimensione predefinita caratteri:
 Custom	Settings Window		Personalizzato
 Bookmark this page	WebPositive Window		Aggiungi questa pagina ai segnalibri
@@ -148,6 +154,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Avvio:
 Confirmation	WebPositive Window		Conferma
 Session cookie	Cookie Manager		Cookie di sessione
+No SSE2 support	WebPositive		Nessun supporto SSE2
 Open all	WebPositive Window		Apri tutti
 Cut	WebPositive Window		Taglia
 Downloads	Download Window		File scaricati

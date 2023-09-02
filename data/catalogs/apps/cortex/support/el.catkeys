@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.support	2097798758
+1	greek, modern (1453-)	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Η κεφαλίδα έχει παραμέτρους
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Εγγραφή σε εξέλιξη
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Δεξιά
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32 bit RGB
 System mixer	MediaString		Μίκτης συστήματος
 Physical output	MediaString		Φυσική έξοδος

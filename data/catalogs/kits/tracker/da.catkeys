@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	3124217250
+1	danish	x-vnd.Haiku-libtracker	2715824594
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -490,7 +490,6 @@ Defaults	TrackerSettingsWindow		Forvalgte indstillinger
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Beklager, der er ikke nok ledig plads på måldiskområdet til at kopiere markeringen.
 True-color picture	AttributesView		Truecolor-billede
 Add-ons	FilePanelPriv		Tilføjelser
-Empty folder	SlowContextPopup		Tom mappe
 Alignment	AttributesView		Justering
 Move to Trash	FSUtils		Flyt til papirkurven
 Handles %type	OpenWithWindow		Håndterer %type

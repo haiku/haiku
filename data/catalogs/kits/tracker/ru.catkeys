@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	172696425
+1	russian	x-vnd.Haiku-libtracker	4059271065
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -481,7 +481,6 @@ Defaults	TrackerSettingsWindow		По умолчанию
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Извините, но на принимающем разделе недостаточно свободного места для копирования выделенных файлов.
 True-color picture	AttributesView		Полноцветная картинка
 Add-ons	FilePanelPriv		Дополнения
-Empty folder	SlowContextPopup		Пустая папка
 Alignment	AttributesView		Выравнивание
 Move to Trash	FSUtils		В корзину
 Handles %type	OpenWithWindow		Поддерживает %type

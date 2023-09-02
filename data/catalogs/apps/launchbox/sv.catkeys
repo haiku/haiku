@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-LaunchBox	1530497419
+1	swedish	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Ange beskrivning...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vill du verkligen stänga blocket?\n(Blocket kommer inte att kommas ihåg.)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Visa fönsterkant
 Failed to launch 'something', error in Pad data.	LaunchBox		Kunde inte köra 'something', error i Pad data.
 LaunchBox	System name		StartBlock
 Auto-raise	LaunchBox		Upphöj automatiskt
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Ikonstorlek
 Open containing folder	LaunchBox		Öppna innehållande mapp
 Add button here	LaunchBox		Lägg till knapp

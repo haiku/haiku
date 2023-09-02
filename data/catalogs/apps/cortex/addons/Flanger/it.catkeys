@@ -1,7 +1,8 @@
-1	italian	application/x-vnd.moon-Flanger.media_addon	2443618242
+1	italian	application/x-vnd.moon-Flanger.media_addon	278353351
 MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: non posso ottenere le informazioni sul nodo (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Una versione add-on di FlangerNode.\nda Eric Moon (16 giugno 1999)
 Delay	CortexAddOnsFlanger		Ritardo
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: impossibile trovare nodo (%ld):\n%s\n
 Depth	CortexAddOnsFlanger		Profondità
 Feedback	CortexAddOnsFlanger		Feedback
 Sweep rate	CortexAddOnsFlanger		Velocità di scansione
@@ -11,4 +12,5 @@ OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		controlli
 Mix output	CortexAddOnsFlanger		Uscita mix
 Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nessun parametro per il nodo (%ld):\n%s\n
 Audio input	CortexAddOnsFlanger		Ingresso audio

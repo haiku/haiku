@@ -1,7 +1,8 @@
-1	swedish	x-vnd.Haiku.TV	3120244932
+1	swedish	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Ingen meny
 No border	MainWin		Ingen kant
 Error, connecting to interface failed:\n\n	MainWin		Fel, misslyckades att ansluta till gränssnittet:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	tvinga 720 × 576, bildförhållande 4:3
 Full screen	MainWin		Hela skärmen
 Scale to native size	MainWin		Skala till ursprungsstorlek
 unknown	MainWin		okänd
@@ -16,7 +17,10 @@ Channel	MainWin		Kanal
 Previous channel	MainWin		Föregående kanal
 OK	MainWin		OK
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	tvinga 544 × 576, bildförhållande 4:3
 Settings	MainWin		Inställningar
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	tvinga 704 × 576, bildförhållande 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Inställningar...
 None	MainWin		Ingen

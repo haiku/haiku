@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	917224975
+1	croatian	x-vnd.Haiku-libtracker	508832319
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -348,7 +348,6 @@ Find	FindPanel		Nađi
 Empty folder	NavMenu		Isprazni mapu
 Defaults	TrackerSettingsWindow		Zadano
 Add-ons	FilePanelPriv		Dodaci
-Empty folder	SlowContextPopup		Prazna mapa
 Alignment	AttributesView		Poravnanje
 Move to Trash	FSUtils		Premjesti u smeće
 Cancel	PoseView		Odustani

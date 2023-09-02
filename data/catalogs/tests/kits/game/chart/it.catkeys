@@ -32,7 +32,7 @@ Space color	ChartWindow		Colore sfondo
 White	ChartWindow		Bianco
 Chart	System name		Chart
 Animation:	ChartWindow		Animazione:
-Frames/s	ChartWindow		Fotogrammi
+Frames/s	ChartWindow		Fotogrammi/s
 Auto demo	ChartWindow		Auto demo
 CPU load	ChartWindow		Carico del processore
 DrawBitmap	ChartWindow		DrawBitmap

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Input	4063065788
+1	italian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Scorrimento
 Defaults	InputMouse		Predefiniti
 Long	KeyboardView		Lungo
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Accetta al primo click
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Scrolling orizzontale
 Delay until key repeat	KeyboardView		Ritardo dopo ripetizione tasto
+Keyboard lock delay	TouchpadPrefView		Ritardo blocco tastiera
 Two finger scrolling	TouchpadPrefView		Scorrimento con due dita
 Input	System name		Periferiche di Input
 Mouse acceleration	SettingsView		Accelerazione del mouse

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1155113004
+1	japanese	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -492,7 +492,6 @@ Defaults	TrackerSettingsWindow		デフォルト
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		コピー先ディスクの空き容量が不足しています。コピーができません。
 True-color picture	AttributesView		トゥルーカラー画像
 Add-ons	FilePanelPriv		アドオン
-Empty folder	SlowContextPopup		空フォルダー
 Alignment	AttributesView		配置
 Move to Trash	FSUtils		ごみ箱に捨てる
 Handles %type	OpenWithWindow		%type に対応

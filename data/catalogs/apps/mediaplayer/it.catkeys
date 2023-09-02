@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	716811487
+1	italian	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		Volume massimo
 Start media server	MediaPlayer-Main		Avvia il media server
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Sembra che il media server non sia in esecuzione.\nAvviarlo?
 Location	MediaPlayer-InfoWin		Luogo
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Apertura di '%s' in corso.
 Medium	MediaPlayer-SettingsWindow		Medi
 Play mode	MediaPlayer-SettingsWindow		Modalità di riproduzione

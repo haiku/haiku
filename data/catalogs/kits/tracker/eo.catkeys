@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3296510325
+1	esperanto	x-vnd.Haiku-libtracker	2888117669
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -482,7 +482,6 @@ Defaults	TrackerSettingsWindow		Defaŭltoj
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Bedaŭron, mankas sufiĉe da libera spaco en la portilo cela por kopii la elekton.
 True-color picture	AttributesView		Vere-kolora bildo
 Add-ons	FilePanelPriv		Aldonaĵoj
-Empty folder	SlowContextPopup		Malplena dosierujo
 Alignment	AttributesView		Vicigo
 Move to Trash	FSUtils		Movi al la Rubujo
 Handles %type	OpenWithWindow		Traktas %type

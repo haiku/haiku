@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	96054702
+1	friulian	x-vnd.Haiku-libtracker	3982629342
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -490,7 +490,6 @@ Defaults	TrackerSettingsWindow		Predefinîts
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Mi displâs, ma nol è vonde spazi libar sul volum di destinazion par copiâ i elements selezionâts.
 True-color picture	AttributesView		Imagjin a colôrs reâi
 Add-ons	FilePanelPriv		Components adizionâi
-Empty folder	SlowContextPopup		Cartele vueide
 Alignment	AttributesView		Inliniament
 Move to Trash	FSUtils		Sposte te Scovacere
 Handles %type	OpenWithWindow		Al gjestìs %type

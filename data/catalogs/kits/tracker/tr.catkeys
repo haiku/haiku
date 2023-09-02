@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2828984500
+1	turkish	x-vnd.Haiku-libtracker	2420591844
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -491,7 +491,6 @@ Defaults	TrackerSettingsWindow		Saptanmışlar
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Üzgünüm, hedef disk bölümünde seçimi kopyalayabilecek kadar boş alan yok.
 True-color picture	AttributesView		Gerçek renkli resim
 Add-ons	FilePanelPriv		Eklentiler
-Empty folder	SlowContextPopup		Boş klasör
 Alignment	AttributesView		Hizalama
 Move to Trash	FSUtils		Çöpe at
 Handles %type	OpenWithWindow		%type işler

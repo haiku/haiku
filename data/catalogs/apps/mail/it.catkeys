@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-MAIL	4073987023
+1	italian	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Imposta come Salvato
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il testo contiene %ld caratteri non codificabili. Se premi 'Invio' questi caratteri saranno sostituiti. Premi 'Annulla' per tornare indietro e verificare il set di caratteri utilizzato.
 Text wrapping:	Mail		A capo automatico
@@ -38,7 +38,9 @@ Previous message	Mail		Messaggio precedente
 (Address unavailable)	Mail		(Indirizzo non disponibile)
 Mail	System name		Mail
 Copy link location	Mail		Copia collegamento
+Add attachment…	Mail		Aggiungi allegato…
 Next	Mail		Successivo
+Attachments:	Mail		Allegati:
 Show icons only	Mail		Mostra solo le icone
 Subject:	Mail		Oggetto:
 OK	Mail		OK
@@ -55,6 +57,7 @@ Reply to sender	Mail		Rispondi al mittente
 \\n - Newline	Mail		\\n- Nuova linea (LF)
 Copy	Mail		Copia
 Add signature	Mail		Aggiungi firma
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Allegato: %name% (Tipo: %type%)
 %n - Full name	Mail		%n - Nome completo
 Signature	Mail		Firma
 Use default account	Mail		Usa l'account predefinito
@@ -104,8 +107,10 @@ Start now	Mail		Inizia adesso
 (Name unavailable)	Mail		(Nome non disponibile)
 Move to trash	Mail		Sposta nel cestino
 <none>	Mail		<vuoto>
+Mail settings	Mail		Impostazioni Mail
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Controllo ortografico
+Status:	Mail		Stato:
 Redo	Mail		Ripeti
 Leave as '%s'	Mail		Lascia come '%s'
 Print…	Mail		Stampa…

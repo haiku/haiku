@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaConverter	517958556
+1	swedish	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Indatafilen är inte igenkänd som ljud eller video
 Source files	MediaConverter		Källfiler
 Error writing video frame %lld	MediaConverter		Fel vid skrivning av videoframe %lld
@@ -65,6 +65,7 @@ Video quality not supported	MediaConverter		Videokvalitén stöds ej
 Select this folder	MediaConverter		Välj denna mapp
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanaler
 Understood	MediaConverter		Förstått
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bitar
 No video	Video codecs list		Inga filmer
 Continue	MediaConverter		Fortsätt

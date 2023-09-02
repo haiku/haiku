@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3626559194
+1	romanian	x-vnd.Haiku-libtracker	3218166538
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -488,7 +488,6 @@ Defaults	TrackerSettingsWindow		Implicite
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Nu există destul spațiu liber pe volumul de destinație pentru a copia selecția.
 True-color picture	AttributesView		Poză cu culori reale
 Add-ons	FilePanelPriv		Suplimente
-Empty folder	SlowContextPopup		Dosar gol
 Alignment	AttributesView		Aliniere
 Move to Trash	FSUtils		Mută la gunoi
 Handles %type	OpenWithWindow		Gestionează %type

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.haiku-icon_o_matic	3282980298
+1	japanese	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		解除
 Clean up path	Icon-O-Matic-CleanUpPathCmd		パスのクリーンアップ
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -21,6 +21,7 @@ Shorten	Icon-O-Matic-PropertyNames		縮める
 Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{個のトランスフォーマー} other{個のトランスフォーマー}}の移動
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストはとても長いですがよろしいですか?
 Paste	Icon-O-Matic-Properties		貼り付け
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		スタイルが多すぎます。HVIF フォーマットは最大 255 個までのスタイルをサポートします。
 Close	Icon-O-Matic-Menu-File		閉じる
 Add rect	Icon-O-Matic-PathsList		四角形の追加
 Rotation	Icon-O-Matic-PropertyNames		回転
@@ -59,6 +60,7 @@ Saving your document failed!	Icon-O-Matic-Exporter		ドキュメントの保存�
 Snap to grid	Icon-O-Matic-Menu-Settings		グリッドに沿う
 Opening the document failed!	Icon-O-Matic-Main		ドキュメントの読み込みに失敗しました。
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{個のスタイル} other{個のスタイル}}の削除
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		1 つ以上のパスで頂点が多すぎます。HVIF フォーマットはパス毎に最大 255 個までの頂点をサポートします。
 Add with path & style	Icon-O-Matic-ShapesList		パスとスタイル付きで追加
 Shape	Icon-O-Matic-Menus		シェイプ
 Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		{0, plural, one{個の頂点} other{個の頂点}}の分割
@@ -80,6 +82,7 @@ Miter limit	Icon-O-Matic-PropertyNames		マイターリミット
 Insert vertex	Icon-O-Matic-InsertPointCmd		頂点の挿入
 Rounding	Icon-O-Matic-PropertyNames		丸め
 Joins	Icon-O-Matic-PropertyNames		結合
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		シェイプが多すぎます。HVIF フォーマットは最大 255 個までのシェイプをサポートします。.
 Cancel	Icon-O-Matic-ColorPicker		中止
 Duplicate	Icon-O-Matic-PathsList		複製
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		{0, plural, one{個のシェイプ} other{個のシェイプ}}の移動
@@ -117,6 +120,7 @@ Add vertex	Icon-O-Matic-AddPointCmd		頂点の追加
 Clean up	Icon-O-Matic-PathsList		クリーンアップ
 Split	Icon-O-Matic-PathManipulator		分割
 Move	Icon-O-Matic-TransformationBoxStates		移動
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		パスが多すぎます。HVIF フォーマットは最大 255 個までのパスをサポートします。
 Conic	Icon-O-Matic-StyleTypes		コニカル
 Name	Icon-O-Matic-PropertyNames		名前
 Reset transformation	Icon-O-Matic-StylesList		変形のリセット
@@ -126,10 +130,12 @@ Remove	Icon-O-Matic-PathsList		削除
 Load error	Icon-O-Matic-SVGImport		読み込みエラー
 Style type	Icon-O-Matic-StyleTypes		スタイルの形式
 Quit	Icon-O-Matic-Menu-File		終了
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		1 つ以上のシェイプでトランスフォーマーが多すぎます。HVIF フォーマットはシェイプ毎に最大 255 個までのトランスフォーマーをサポートします。
 Gradient	Icon-O-Matic-StyleTypes		グラデーション
 Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	カラー (#%02x%02x%02x)
 Detect orient.	Icon-O-Matic-PropertyNames		向きの検出。
 Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{個のパス} other{個のパス}}の追加
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		1 つ以上のシェイプでパスが多すぎます。HVIF フォーマットはシェイプ毎に最大 255 個までのパスをサポートします。
 Add shape with path & style	Icon-O-Matic-Menu-Shape		パスとスタイル付きのシェイプの追加
 Radial	Icon-O-Matic-StyleTypes		ラジアル
 Text too long	Icon-O-Matic-StyledTextImport		テキストが長過ぎます
@@ -174,8 +180,10 @@ Settings…	Icon-O-Matic-SavePanel		設定...
 Select all	Icon-O-Matic-PathManipulator		すべて選択
 Add with style	Icon-O-Matic-ShapesList		スタイル付きで追加
 New	Icon-O-Matic-Menu-File		新規
+Change perspective	Icon-O-Matic-PerspectiveCommand		奥行きの変更
 Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		{0, plural, one{個の頂点} other{個の頂点}}のナッジ移動
 Gradient type	Icon-O-Matic-StyleTypes		グラデーションのタイプ
+Perspective	Transformation		奥行き
 Export	Icon-O-Matic-Menu-File		エクスポート
 Width	Icon-O-Matic-PropertyNames		幅
 Add reference image	Icon-O-Matic-ShapesList		参考画像の追加

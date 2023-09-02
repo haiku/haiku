@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1155113004
+1	catalan; valencian	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -492,7 +492,6 @@ Defaults	TrackerSettingsWindow		Valors predeterminats
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Disculpeu, al volum de destinació no hi ha prou espai per copiar-hi la selecció.
 True-color picture	AttributesView		Imatge de colors veritables
 Add-ons	FilePanelPriv		Complements
-Empty folder	SlowContextPopup		Carpeta buida
 Alignment	AttributesView		Alineament
 Move to Trash	FSUtils		Mou a la paperera
 Handles %type	OpenWithWindow		Gestiona el tipus %type

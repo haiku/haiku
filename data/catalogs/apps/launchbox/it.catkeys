@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-LaunchBox	1530497419
+1	italian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Imposta descrizione…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sei certo di voler chiudere questo pad?\n(Il pad non sarà conservato.)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Mostra il bordo della finestra
 Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzione di '????' fallita, errore nei dati del Pad.
 LaunchBox	System name		Launchbox
 Auto-raise	LaunchBox		Automaticamente in primo piano
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Dimensione icone
 Open containing folder	LaunchBox		Apri cartella
 Add button here	LaunchBox		Aggiungi un pulsante in questa posizione

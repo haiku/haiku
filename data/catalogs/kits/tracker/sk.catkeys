@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1252819614
+1	slovak	x-vnd.Haiku-libtracker	844426958
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -410,7 +410,6 @@ Empty folder	NavMenu		Prázdny priečinok
 Defaults	TrackerSettingsWindow		Predvolené
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Ľutujeme, na cieľovom zväzku nie je dostatok voľného miesta na skopírovanie výberu.
 Add-ons	FilePanelPriv		Doplnky
-Empty folder	SlowContextPopup		Prázdny priečinok
 Move to Trash	FSUtils		Presunúť do Koša
 Handles %type	OpenWithWindow		Pracuje s %type
 Cancel	PoseView		Zrušiť

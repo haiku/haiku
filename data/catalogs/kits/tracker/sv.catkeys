@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1155113004
+1	swedish	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -492,7 +492,6 @@ Defaults	TrackerSettingsWindow		Förval
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Det finns inte tillräckligt ledig minne på destinationsdisken för att kopiera markeringen.
 True-color picture	AttributesView		Bild i miljontals färger
 Add-ons	FilePanelPriv		Tillägg
-Empty folder	SlowContextPopup		Tom mapp
 Alignment	AttributesView		Orientation
 Move to Trash	FSUtils		Flytta till Papperskorgen
 Handles %type	OpenWithWindow		Hanterar %type

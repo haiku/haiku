@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-FirstBootPrompt	3953804477
+1	italian	x-vnd.Haiku-FirstBootPrompt	189132197
 Japanese	KeymapNames		Giapponese
 US	KeymapNames		Inglese (Stati Uniti)
 Cancel	BootPromptWindow		Annulla
@@ -73,6 +73,7 @@ Canadian-French	KeymapNames		Francese (Canada)
 Welcome to Haiku!	BootPromptWindow		Benvenuto in Haiku!
 Russian	KeymapNames		Russo
 Hungarian	KeymapNames		Ungherese
+Install	BootPromptWindow		Installa
 Irish	KeymapNames		Irlandese
 Romanian	KeymapNames		Rumeno
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Sei sicuro di voler chiudere questa finestra? Così riavvierai il sistema!

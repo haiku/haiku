@@ -1,22 +1,22 @@
 1	italian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Lettura
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato bitmap Be (Trasduttore JPEG)
-Show warning messages	JPEGTranslator		Mostra messaggi di avviso
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usa codice CMYK con 0 per 100% di ink coverage
-JPEG Library Error: %s\n	be_jerror		Errore Libreria JPEG: %s\n
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasato su IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\naggiornamenti correttivi al supporto della codifica \"lossless\" di Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nalcune routine di conversione colorspace sono di Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato di Bitmap della Be (Traduttore JPEG)
+Show warning messages	JPEGTranslator		Mostra i messaggi di avviso
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usa il codice CMYK con 0 per una copertura d'inchiostro al 100%
+JPEG Library Error: %s\n	be_jerror		Errore Libreria JPEG : %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasato sulla libreria IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncon patch per il supporto alla codifica \"lossless\" di Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nCon alcune routine di conversione dello spazio colore di Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 None	JPEGTranslator		Nessuno
-About	JPEGTranslator		Informazioni
+About	JPEGTranslator		Informazioni su
 Version %d.%d.%d	JPEGTranslator		Versione %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Scrivi immagini bianco e nero come RGB24
-Output smoothing strength	JPEGTranslator		Intensità dello smoothing in uscita
+Output smoothing strength	JPEGTranslator		Intensità della perequazione (smoothing) in uscita
 Use progressive compression	JPEGTranslator		Usa compressione progressiva
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Rendi i file più piccoli (qualità leggermente inferiore)
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Crea file più piccoli (qualità leggermente peggiore)
 High	JPEGTranslator		Alto
-Read greyscale images as RGB32	JPEGTranslator		Leggi immagini in scala di grigio come RGB32
-Output quality	JPEGTranslator		Qualità dell'uscita
+Read greyscale images as RGB32	JPEGTranslator		Leggi immagini in scala di grigi come RGB32
+Output quality	JPEGTranslator		Qualità in uscita
 Low	JPEGTranslator		Basso
 Write	JPEGTranslator		Scrittura
-Prevent colors 'washing out'	JPEGTranslator		Previeni il 'dilavamento' dei colori
-JPEG Library Warning: %s\n	be_jerror		Avviso Libreria JPEG: %s\n
+Prevent colors 'washing out'	JPEGTranslator		Previeni lo 'sbiadire' dei colori
+JPEG Library Warning: %s\n	be_jerror		Avviso dalla Libreria JPEG: %s\n
 JPEG images	JPEGTranslator		Immagini JPEG

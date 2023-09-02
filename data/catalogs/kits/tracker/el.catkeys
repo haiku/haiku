@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	96054702
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3982629342
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -490,7 +490,6 @@ Defaults	TrackerSettingsWindow		Προεπιλεγμένα
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Δεν υπάρχει ο απαιτούμενος ελευθερος χώρος στον τόμο για την αποθήκευση.
 True-color picture	AttributesView		Φωτογραφία ρεαλιστικών χρωμάτων
 Add-ons	FilePanelPriv		Πρόσθετα
-Empty folder	SlowContextPopup		Άδειος φάκελος
 Alignment	AttributesView		Στοίχιση
 Move to Trash	FSUtils		Μετακίνηση στον Κάδο
 Handles %type	OpenWithWindow		Χειρίζεται %type

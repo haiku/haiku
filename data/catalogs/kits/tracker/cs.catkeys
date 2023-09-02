@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	96054702
+1	czech	x-vnd.Haiku-libtracker	3982629342
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -490,7 +490,6 @@ Defaults	TrackerSettingsWindow		Výchozí
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Bohužel, není dostatek volného místa v cílovém svazku pro kopírování vyběru.
 True-color picture	AttributesView		24 bitový obrázek
 Add-ons	FilePanelPriv		Doplňky
-Empty folder	SlowContextPopup		Prázdný adresář
 Alignment	AttributesView		Zarovnání
 Move to Trash	FSUtils		Přesunout do Koše
 Handles %type	OpenWithWindow		Obstarává %type

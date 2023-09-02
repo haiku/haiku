@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ProcessController	3123774187
+1	italian	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Errore nel salvataggio del file
 Display priority	ProcessController		Priorità visualizzazione
 That's no Fun!	ProcessController		Non è divertente!
@@ -21,6 +21,7 @@ Restart Deskbar	ProcessController		Riavvia la Deskbar
 About ProcessController…	ProcessController		Informazioni su Gestione Processi…
 Usage: %s [-deskbar]\n	ProcessController		Utilizzo: %s [-deskbar]\n
 Please confirm	ProcessController		Conferma
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		Priorità urgente
 What do you want to do with the thread \"%s\"?	ProcessController		Cosa si vuole fare con il thread \"%s\"?
 Idle priority	ProcessController		Priorità inattivo

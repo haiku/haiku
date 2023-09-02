@@ -1,6 +1,8 @@
-1	italian	x-vnd.Haiku-MediaConverter	801112998
+1	italian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		File sorgente non riconosciuto come Audio o Video
 Source files	MediaConverter		File sorgenti
+Error writing video frame %lld	MediaConverter		Errore durante la scrittura del fotogramma video %lld
+Audio quality: %s	MediaConverter		Qualità audio: %s
 Error converting '%filename'	MediaConverter		Errore convertendo '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		La cartella selezionata non è stata trovata. Impostata come predefinita su /boot/home
 Conversion completed	MediaConverter		Conversione completa
@@ -9,6 +11,7 @@ MediaConverter+:SaveDirectory	MediaConverter		Convertitore Media+:Salva cartella
 Error creating video.	MediaConverter		Errore nella creazione del video.
 Cancelling	MediaConverter		Cancellando
 None available	Audio codecs		Nessuno disponibile
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Il file ha più tracce audio o video, solo la prima di ciascuna verrà convertita.
 No file selected	MediaConverter-FileInfo		Nessun file selezionato
 High	MediaConverter		Alto
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Il file non è stato riconosciuto tra i file media supportati:} other{# file non sono stati riconosciuti tra i file media supportati:}}
@@ -23,6 +26,7 @@ Error loading a file	MediaConverter		Errore caricando un file
 Encoder parameters	MediaConverter-EncoderWindow		Encoder parametri
 Open…	Menu		Apri...
 Audio encoding:	MediaConverter		Codifica Audio:
+Multi-track file detected	MediaConverter		Riconosciuto file multi traccia
 Cancelling…	MediaConverter		Annullamento di...
 Output file '%filename' created	MediaConverter		File di uscita '%filename' creato
 Output folder	MediaConverter		Cartella di destinazione
@@ -35,6 +39,7 @@ Conversion cancelled	MediaConverter		Conversione annullata
 Low	MediaConverter		Basso
 Error loading files	MediaConverter		Errore nel caricamento dei file
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
+Video quality: %s	MediaConverter		Qualità video: %s
 End   [ms]: 	MediaConverter		Fine [ms]: 
 Cancel	MediaConverter		Cancella
 OK	MediaConverter-FileInfo		OK
@@ -44,22 +49,29 @@ Error	MediaConverter		Errore
 File details	MediaConverter		File dettagli
 No audio	Audio codecs list		Nessun audio
 Drop media files onto this window	MediaConverter		Trascina il media file su questa finestra
-{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frame}}
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# fotogramma} other{# fotogrammi}}
+Error read audio frame %lld	MediaConverter		Errore durante la lettura del fotogramma audio %lld
 Quit	Menu		Esci
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# byte}}
+Writing audio track: %s complete	MediaConverter		Scrittura della traccia audio: %s completata
 Duration:	MediaConverter-FileInfo		Durata:
 MediaConverter	System name		Convertitore Media
+Writing video track: %s complete	MediaConverter		Scrittura traccia video: %s completata
 Error launching: %strError%	MediaConverter		Errore di lancio: %strError%
+Error writing audio frame %lld	MediaConverter		Errore durante la scrittura del frame audio %lld
 File format:	MediaConverter		Formato file:
 File	Menu		File
 Video quality not supported	MediaConverter		Qualità video non supportata
 Select this folder	MediaConverter		Seleziona questa cartella
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canale
+Understood	MediaConverter		Inteso
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Nessun video
 Continue	MediaConverter		Continua
 Convert	MediaConverter		Conversione
 Audio quality not supported	MediaConverter		Qualità audio non supportata
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Errore nella scrittura sul percorso: %strPath%. Impostato come predefinito su: /boot/home
+Error read video frame %lld	MediaConverter		Errore durante la lettura del fotogramma video %lld
 Preview	MediaConverter		Anteprima
 Start [ms]: 	MediaConverter		Avvio [ms]: 

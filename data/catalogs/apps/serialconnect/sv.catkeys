@@ -1,8 +1,9 @@
-1	swedish	x-vnd.haiku.SerialConnect	354154115
+1	swedish	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Hårdvara
 Connection	SerialWindow		Förbindelse
 Raw send…	SerialWindow		Skicka rådata...
 Baud rate	SerialWindow		Överföringshastighet
+Paste	SerialWindow		Klistra
 Stop bits	SerialWindow		Stoppa bitar
 None	SerialWindow	Flowcontrol	Ingen
 Cancel	Custom baudrate window		Avbryt

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DiskProbe	4193379066
+1	italian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Editor dati grezzi
 Remove	AttributeWindow		Rimuovi
 Close	ProbeView		Chiudi
@@ -29,7 +29,9 @@ Open file…	FileWindow		Apri file…
 32 bit unsigned pointer:	TypeEditors		Puntatore a 32 bit senza segno:
 DiskProbe request	DiskProbe		Richiesta Analizza Disco
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimale
+Block %lld (0x%Lx)	ProbeView		Blocco%lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Errore nella scrittura sul file:\n%s\n\nTutte le modifiche saranno perse all'uscita dall'applicazione.
+Native: %lld (0x%0*Lx)	ProbeView		Nativo: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Esamina il dispositivo:
 Number editor	TypeEditors		Editor Numerico
 Icon	TypeEditors		Icona
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Richiesta Analizza Disco
 Double precision floating-point value:	TypeEditors		Valore in virgola mobile a doppia precisione:
 Image	TypeEditors	This is the type of view	Immagine
+Swapped: %lld (0x%0*Lx)	ProbeView		Swap: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Salvare le modifiche prima di chiudere?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Formato PNG
 Number	TypeEditors	This is the type of editor	Numero
 Edit	ProbeView		Modifica

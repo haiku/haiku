@@ -1,7 +1,9 @@
-1	italian	x-vnd.haiku.SerialConnect	3182251952
+1	italian	x-vnd.haiku.SerialConnect	4294067463
+Hardware	SerialWindow	Flowcontrol	Hardware
 Connection	SerialWindow		Connessione
 Raw send…	SerialWindow		Invio dati grezzi…
 Baud rate	SerialWindow		Baud rate
+Paste	SerialWindow		Incolla
 Stop bits	SerialWindow		Bit di stop
 None	SerialWindow	Flowcontrol	Nessuno
 Cancel	Custom baudrate window		Annulla
@@ -9,6 +11,8 @@ Sending…	XModemStatus		Invio…
 <no serial port available>	SerialWindow		<nessuna porta seriale disponibile>
 Log to file…	SerialWindow		Registra su file…
 Custom baudrate	Custom baudrate window		Baud rate personalizzato
+File	SerialWindow		File
+SerialConnect	System name		Connessione Seriale
 custom…	SerialWindow	Baudrate	personalizzato…
 Parity	SerialWindow		Parità
 None	SerialWindow	Parity	Nessuna
@@ -23,10 +27,12 @@ Both	SerialWindow	Flowcontrol	Entrambi
 Edit	SerialWindow		Modifica
 XModem send…	SerialWindow		Invio XModem…
 Baudrate:	Custom baudrate window		Baudrate:
+OK	Custom baudrate window		OK
 Waiting for receiver…	XModemStatus		In attesa del ricevente…
 Clear history	SerialWindow		Pulisci cronologia
 Checksum error, re-send block	XModemStatus		Errore checksum, reinvio blocco
 Settings	SerialWindow		Impostazioni
 Even	SerialWindow	Parity	Pari
+Software	SerialWindow	Flowcontrol	Software
 Line terminator	SerialWindow		Terminatore di linea
 Remote cancelled transfer	XModemStatus		Trasferimento annullato da remoto

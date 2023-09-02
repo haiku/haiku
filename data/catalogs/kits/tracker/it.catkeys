@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	381036594
+1	italian	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -82,6 +82,7 @@ Modified	FindPanel		Modificato
 Select all	QueryContainerWindow		Seleziona tutte
 Generate image thumbnails	SettingsView		Genera miniatura immagini
 Select…	FilePanelPriv		Seleziona…
+An item named '%filename%' already exists.	FSUtils		Esiste già un elemento denominato '%filename%'.
 preferences	B_PREFERENCES_DIRECTORY		preferenze
 Name	Person Query Columns		Nome
 Skip all	FSUtils		Salta tutti
@@ -259,6 +260,7 @@ Cut	FilePanelPriv		Taglia
 Finish: after several years	StatusWindow		Completato: dopo diversi anni
 Favorites	FilePanelPriv		Preferiti
 Point	AttributesView		Punto
+You can't move or copy items to read-only volumes.	PoseView		Non puoi spostare o copiare elementi in volumi di sola lettura.
 home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nuovi Modelli Tracker
 Disk mounting during boot	AutoMounterSettings		Montaggio dischi durante l'avvio
@@ -346,6 +348,7 @@ after	FindPanel		dopo
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte di dati>} other{<# byte di dati>}}
 Version	OpenWithWindow		Versione
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alcuni degli elementi selezionati non possono essere spostati nel Cestino. Si desidera eliminarli definitivamente? (Gli elementi non potranno essere recuperati.)
+The entered file name is too long.	FSUtils		Il nome del file inserito è troppo lungo.
 Add printer…	ContainerWindow		Aggiungi stampante…
 On	FindPanel		Su
 Permissions	ContainerWindow		Permessi
@@ -410,6 +413,7 @@ Emptying Trash… 	StatusWindow		Pulitura Cestino in corso…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # file}}
 Revert	TrackerSettingsWindow		Ripristina
 trash	B_TRASH_DIRECTORY		cestino
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se sposti la cartella di sistema o il suo contenuto, non sarai più in grado di avviare %osName!\n\nSei sicuro di voler procedere?\n\nPer spostare la cartella di sistema o il suo contenuto, tieni premuto il tasto Maiusc e clicca su \"Sposta\".
 Close all in workspace	ContainerWindow		Chiudi tutto nello spazio di lavoro
 Corrupted expression.	libtracker		Espressione non valida.
@@ -434,6 +438,7 @@ the config folder	FSUtils		la cartella di configurazione
 Sorry, could not create a new folder.	FSUtils		Non è stato possible creare la nuova cartella.
 MIME Signature	AttributesView		Firma MIME
 Select all	VirtualDirectoryWindow		Seleziona tutto
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Rinomina
 Clean up all	ContainerWindow		Ordina tutte le icone
 Add current folder	FilePanelPriv		Aggiungi cartella corrente
@@ -487,7 +492,6 @@ Defaults	TrackerSettingsWindow		Predefiniti
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Spiacenti, non c'è abbastanza spazio libero sul volume di destinazione per copiare gli elementi selezionati.
 True-color picture	AttributesView		Immagine True-color
 Add-ons	FilePanelPriv		Componenti Aggiuntivi
-Empty folder	SlowContextPopup		Cartella vuota
 Alignment	AttributesView		Allineamento
 Move to Trash	FSUtils		Sposta nel Cestino
 Handles %type	OpenWithWindow		Gestisce %type
@@ -507,8 +511,10 @@ Create a Query	FindPanel		Crea una Interrogazione
 Close	QueryContainerWindow		Chiudi
 I know what I'm doing	FSUtils	button label	So cosa faccio
 Preparing to copy items…	StatusWindow		Preparazione alla copia degli elementi…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Riferimento inserimento
 Icon view	ContainerWindow		Icone
+The entered folder name is too long.	FSUtils		Il nome della cartella inserito è troppo lungo.
 Name	ContainerWindow		Nome
 Preferred for %type	OpenWithWindow		Preferito per %type
 Free space color	SettingsView		Colore spazio libero

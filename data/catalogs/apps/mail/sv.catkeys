@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	2421147507
+1	swedish	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -38,7 +38,9 @@ Previous message	Mail		Föregående meddelande
 (Address unavailable)	Mail		(Adresser kunde inte nås)
 Mail	System name		E-post
 Copy link location	Mail		Kopiera länkplats
+Add attachment…	Mail		Bifoga fil…
 Next	Mail		Nästa
+Attachments:	Mail		Bilagor:
 Show icons only	Mail		Visa iconer bara
 Subject:	Mail		Ämne:
 OK	Mail		OK
@@ -55,6 +57,7 @@ Reply to sender	Mail		Svara avsändare
 \\n - Newline	Mail		\\n - Ny rad
 Copy	Mail		Kopiera
 Add signature	Mail		Lägg till signatur
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Bilaga: %name% (Typ: %type%)
 %n - Full name	Mail		%n - Hela namnet
 Signature	Mail		Signatur
 Use default account	Mail		Använd standardkonto
@@ -104,6 +107,7 @@ Start now	Mail		Starta nu
 (Name unavailable)	Mail		(Namnet kunde inte nås)
 Move to trash	Mail		Flytta till papperskorg
 <none>	Mail		<ingen>
+Mail settings	Mail		E-postinställningar
 %d - Date	Mail		%d - Datum
 Check spelling	Mail		Kontrollera stavning
 Status:	Mail		Status:

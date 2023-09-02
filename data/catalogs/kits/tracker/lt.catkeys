@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1777870116
+1	lithuanian	x-vnd.Haiku-libtracker	1369477460
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -366,7 +366,6 @@ Empty folder	NavMenu		Aplankas tuščias
 Defaults	TrackerSettingsWindow		Numatytai
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Deja, paskirties tome nepakanka laisvos vietos pažymėtiems objektams nukopijuoti.
 Add-ons	FilePanelPriv		Priedai
-Empty folder	SlowContextPopup		Tuščias aplankas
 Move to Trash	FSUtils		Išmesti Šiukšlinėn
 Handles %type	OpenWithWindow		Palaiko %type
 Cancel	PoseView		Atsisakyti

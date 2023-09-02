@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Screen	133788249
+1	italian	x-vnd.Haiku-Screen	2318349707
 no	Screen		no
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colori
@@ -13,6 +13,7 @@ Video format:	Screen		Formato video:
 Undo	Screen		Annulla
 OK	Screen		OK
 Current workspace	Screen		Spazio di lavoro attuale
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		verticalmente
 All workspaces	Screen		Tutti gli spazi di lavoro
 Use laptop panel:	Screen		Usa pannello del portatile:

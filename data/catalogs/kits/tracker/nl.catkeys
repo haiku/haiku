@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	381036594
+1	dutch; flemish	x-vnd.Haiku-libtracker	4267611234
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -487,7 +487,6 @@ Defaults	TrackerSettingsWindow		Standaardwaarden
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Sorry, er is niet genoeg vrije ruimte op het bestemmingsvolume om de selectie te kopiëren.
 True-color picture	AttributesView		Afbeelding in ware kleuren
 Add-ons	FilePanelPriv		Invoegtoepassingen
-Empty folder	SlowContextPopup		Lege map
 Alignment	AttributesView		Uitlijning
 Move to Trash	FSUtils		Verplaats naar Prullenbak
 Handles %type	OpenWithWindow		Behandelt %type

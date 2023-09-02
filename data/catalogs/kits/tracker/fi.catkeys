@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3124217250
+1	finnish	x-vnd.Haiku-libtracker	2715824594
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -490,7 +490,6 @@ Defaults	TrackerSettingsWindow		Oletukset
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Kohdetaltiolla ei ole tarpeeksi tilaa valinnan kopioimiseksi.
 True-color picture	AttributesView		Tosivärikuva
 Add-ons	FilePanelPriv		Lisäosat
-Empty folder	SlowContextPopup		Tyhjä kansio
 Alignment	AttributesView		Tasaus
 Move to Trash	FSUtils		Siirrä roskakoriin
 Handles %type	OpenWithWindow		Käsittelee tyyppiä %type

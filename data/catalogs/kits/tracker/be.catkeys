@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	3242060450
+1	belarusian	x-vnd.Haiku-libtracker	2833667794
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -365,7 +365,6 @@ Empty folder	NavMenu		Пусты каталог
 Defaults	TrackerSettingsWindow		Прадвызначаныя
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Прабачце, не хапае месца на томе прызначэння для капіявання выбранага.
 Add-ons	FilePanelPriv		Дапаўненні
-Empty folder	SlowContextPopup		Пусты каталог
 Move to Trash	FSUtils		Адправіць у Сметніцу
 Handles %type	OpenWithWindow		Працуе з %type
 Cancel	PoseView		Адмена

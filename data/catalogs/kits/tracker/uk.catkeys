@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1155113004
+1	ukrainian	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -492,7 +492,6 @@ Defaults	TrackerSettingsWindow		Типові настройки
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Вибачте, недостатньо вільного місця в томі призначення, щоб скопіювати виділене.
 True-color picture	AttributesView		TrueColor зображення
 Add-ons	FilePanelPriv		Доповнення
-Empty folder	SlowContextPopup		Порожня папка
 Alignment	AttributesView		Вирівнювання
 Move to Trash	FSUtils		До смітника
 Handles %type	OpenWithWindow		Підтримує %type

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-About	1000064751
+1	italian	x-vnd.Haiku-About	677050232
 Revision	AboutView		Revisione
 The Haikuware team and their bounty program\n	AboutView		Il gruppo di Haikuware e il loro programma di bounty\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tutti i diritti riservati.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Questo software è basato in parte sul lavoro del Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondatore del progetto)\n\n
+Remove replicant	AboutView		Rimuovi replicante
 BSD (3-clause)	AboutWindow		BSD (3 clausole)
 About this system	AboutWindow		Informazioni su questo sistema
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Tutti i diritti riservati.
@@ -60,6 +61,7 @@ Current maintainers:\n	AboutView		Team di sviluppo attuale:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Tutti i diritti riservati.
 Intel WiFi Firmware	AboutWindow		Firmware WiFi della Intel
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Tutti i diritti riservati.
+%d MiB used (%s)	AboutView		%d MiB utilizzati (%s)
 Version:	AboutView		Versione:
 The BeGeistert team\n	AboutView		Il gruppo che organizza i BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v.21
@@ -69,7 +71,7 @@ GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		L'Università di Auckland e Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totali, %inaccessible MiB inaccessibili
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 team Google Internationalization.
-Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld Progetto Haiku.
+Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld del progetto Haiku.
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Tutti i diritti riservati.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly e Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 manutentori di Expat.
