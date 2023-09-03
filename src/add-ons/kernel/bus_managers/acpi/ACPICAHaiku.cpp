@@ -410,9 +410,35 @@ AcpiOsVprintf(const char *fmt, va_list args)
 		vfprintf(AcpiGbl_OutputFile, fmt, args);
     }
 #else
+	// Buffer the output until we have a complete line to send to syslog, this avoids added
+	// "KERN:" entries in the middle of the line, and mixing up of the ACPI output with other
+	// messages from other CPUs
 	static char outputBuffer[1024];
-	vsnprintf(outputBuffer, 1024, fmt, args);
-	dprintf("%s", outputBuffer);
+	
+	// Append the new text to the buffer
+	size_t len = strlen(outputBuffer);
+	size_t printed = vsnprintf(outputBuffer + len, 1024 - len, fmt, args);
+	if (printed >= 1024 - len) {
+		// There was no space to fit the printed string in the outputBuffer. Remove what we added
+		// there, fush the buffer, and print the long string directly
+		outputBuffer[len] = '\0';
+		dprintf("%s\n", outputBuffer);
+		outputBuffer[0] = '\0';
+		dvprintf(fmt, args);
+		return;
+	}
+
+	// See if we have a complete line
+	char* eol = strchr(outputBuffer + len, '\n');
+	while (eol != nullptr) {
+		// Print the completed line, then remove it from the buffer
+		*eol = 0;
+		dprintf("%s\n", outputBuffer);
+		memmove(outputBuffer, eol + 1, strlen(eol + 1) + 1);
+		// See if there is another line to print still in the buffer (in case ACPICA would call
+		// this function with a single string containing multiple newlines)
+		eol = strchr(outputBuffer, '\n');
+	}
 #endif
 }
 
