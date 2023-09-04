@@ -51,3 +51,7 @@ extern void __assert_perror_fail(int error, const char *file,
 #else	/* NDEBUG */
 #	define assert(condition) ((void)0)
 #endif
+
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(static_assert)
+#	define static_assert _Static_assert
+#endif
