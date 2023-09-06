@@ -166,6 +166,9 @@ DPCQueue::Add(DPCCallback* callback)
 	if (_IsClosed())
 		return B_NOT_INITIALIZED;
 
+	if (callback->fInQueue != NULL)
+		return EALREADY;
+
 	bool wasEmpty = fCallbacks.IsEmpty();
 	fCallbacks.Add(callback);
 	callback->fInQueue = this;
