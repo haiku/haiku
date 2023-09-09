@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaConverter	517958556
+1	finnish	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Syötetiedostoa ei tunnistettu audioksi tai videoksi
 Source files	MediaConverter		Lähdetiedostot
 Error writing video frame %lld	MediaConverter		Virhekirjoitusvideokehys %lld
@@ -65,6 +65,7 @@ Video quality not supported	MediaConverter		Videolaatua ei tueta
 Select this folder	MediaConverter		Valitse tämä kansio
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanava
 Understood	MediaConverter		Ymmärretty
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bitti 
 No video	Video codecs list		Ei videota
 Continue	MediaConverter		Jatka

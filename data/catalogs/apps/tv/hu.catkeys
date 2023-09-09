@@ -1,7 +1,8 @@
-1	hungarian	x-vnd.Haiku.TV	3120244932
+1	hungarian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Nincs menü
 No border	MainWin		Keret kikapcsolása
 Error, connecting to interface failed:\n\n	MainWin		Hiba, nem sikerült csatlakozni a felülethez:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	kényszerített 720 × 576, képarány: 4:3
 Full screen	MainWin		Teljes képernyő
 Scale to native size	MainWin		Méretezés az eredeti méretre
 unknown	MainWin		ismeretlen
@@ -16,7 +17,10 @@ Channel	MainWin		Csatorna
 Previous channel	MainWin		Előző csatorna
 OK	MainWin		Rendben
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	kényszerített 544 × 576, képarány: 4:3
 Settings	MainWin		Beállítások
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	kényszerített 704 × 576, képarány: 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Beállítások…
 None	MainWin		Nincs

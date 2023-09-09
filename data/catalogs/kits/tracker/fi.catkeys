@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2715824594
+1	finnish	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -413,6 +413,7 @@ Emptying Trash… 	StatusWindow		Tyhjennetään roskakoria...
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# tiedostolle} other{# tiedostoille}}
 Revert	TrackerSettingsWindow		Palauta
 trash	B_TRASH_DIRECTORY		roskakori
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät järjestelmäkansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Siirrä”.
 Close all in workspace	ContainerWindow		Sulje kaikki työtilassa
 Corrupted expression.	libtracker		Vaurioitunut lauseke.
@@ -437,6 +438,7 @@ the config folder	FSUtils		config-kansio
 Sorry, could not create a new folder.	FSUtils		Uuden kansion luominen epäonnistui.
 MIME Signature	AttributesView		MIME-allekirjoitus
 Select all	VirtualDirectoryWindow		Valitse kaikki
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Nimeä uudelleen
 Clean up all	ContainerWindow		Tyhjennä kaikki
 Add current folder	FilePanelPriv		Lisää nykyinen kansio

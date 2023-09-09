@@ -1,4 +1,4 @@
-1	finnish	application/x-vnd.Cortex.support	2097798758
+1	finnish	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Otsakkeella on lippuja
 32 bit HLS	MediaString		32-bittinen HLS
 Recording	MediaString		Tallennetaan
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Oikea
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32-bittinen RGB
 System mixer	MediaString		Järjestelmäsekoitin
 Physical output	MediaString		Fyysinen lähtö

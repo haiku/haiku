@@ -1,4 +1,4 @@
-1	swedish	x-vnd.haiku-icon_o_matic	1288004501
+1	swedish	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Ingen
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Rensa vägen
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -18,7 +18,7 @@ Duplicate	Icon-O-Matic-StylesList		Duplicera
 32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Rotera
 Shorten	Icon-O-Matic-PropertyNames		Förkorta
-Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Flytta {0, plural, one{transformer} other{transformers}}
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Flytta {0, plural, one{transformator} other{transformatorer}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Texten som du försöker importera är ganska lång, är du säker att du vill importera den?
 Paste	Icon-O-Matic-Properties		Klistra in
 There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Det finns för många stilar. HVIF-formatet stöder maximalt 255.
@@ -30,13 +30,13 @@ BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribut
 Transform	Icon-O-Matic-PathManipulator		Omvandla
 Add shape with style	Icon-O-Matic-Menu-Shape		Lägg till figur med stil
 Change color	Icon-O-Matic-SetColorCmd		Ändra färg
-Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Ta bort {0, plural, one{vertex} other{vertices}}
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Ta bort {0, plural, one{vertex} other{hörn}}
 Unassign path	Icon-O-Matic-UnassignPathCmd		Ta bort tilldelning av sökväg
 Remove	Icon-O-Matic-StylesList		Ta bort
 Cancel	Icon-O-Matic-Menu-Settings		Avbryt
 PNG set	Icon-O-Matic-SavePanel		PNG-uppsättning
 Transformation	Icon-O-Matic-TransformationBoxStates		Omvandling
-Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Flytta {0, plural, one{path} other{paths}}
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Flytta {0, plural, one{sökväg} other{sökvägar}}
 Closed	Icon-O-Matic-PropertyNames		Stängd
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<inget att göra om>
 Height	Icon-O-Matic-PropertyNames		Höjd
@@ -54,7 +54,7 @@ Opacity	Icon-O-Matic-PropertyNames		Opacitet
 OK	Icon-O-Matic-ColorPicker		OK
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Multi-set %property%
 Error: 	Icon-O-Matic-Main		Fel:
-Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Återställ {0, plural, one{transformation} other{transformations}}
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Återställ {0, plural, one{omvandling} other{transformationer}}
 Assign style	Icon-O-Matic-AssignStyleCmd		Tilldela stil
 Saving your document failed!	Icon-O-Matic-Exporter		Misslyckades att spara dokumentet!
 Snap to grid	Icon-O-Matic-Menu-Settings		Fäst i rutnät
@@ -63,7 +63,7 @@ Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Ta bo
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		En eller flera av banorna har för många hörn. HVIF-formatet stöder maximalt 255 hörn per sökväg.
 Add with path & style	Icon-O-Matic-ShapesList		Lägg till med bana & stil
 Shape	Icon-O-Matic-Menus		Figur
-Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Dela {0, plural, one{vertex} other{vertices}}
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Dela {0, plural, one{vertex} other{hörn}}
 <unavailable>	Icon-O-Matic-StyleTypes		<ej tillgänglig>
 Edit gradient	Icon-O-Matic-SetGradientCmd		Redigera övertoning
 Min LOD	Icon-O-Matic-PropertyNames		Minsta LOD
@@ -77,7 +77,7 @@ Remove	Icon-O-Matic-PathManipulator		Ta bort
 Duplicate	Icon-O-Matic-ShapesList		Duplicera
 Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Kontur
-Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Lägg till {0, plural, one{transformer} other{transformers}}
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Lägg till {0, plural, one{transformator} other{transformatorer}}
 Miter limit	Icon-O-Matic-PropertyNames		Gringsgräns
 Insert vertex	Icon-O-Matic-InsertPointCmd		Sätt in vertex
 Rounding	Icon-O-Matic-PropertyNames		Avrunda
@@ -85,12 +85,12 @@ Joins	Icon-O-Matic-PropertyNames		Sammanfogningar
 There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Det finns för många former. HVIF-formatet stöder maximalt 255.
 Cancel	Icon-O-Matic-ColorPicker		Avbryt
 Duplicate	Icon-O-Matic-PathsList		Duplicera
-Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Flytta {0, plural, one{shape} other{shapes}}
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Flytta {0, plural, one{form} other{former}}
 Save	Icon-O-Matic-Menu-Settings		Spara
 Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	Klicka på ett objekt i
 Export as…	Icon-O-Matic-Menu-File		Exportera som...
-Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		Frys {0, plural, one{shape} other{shapes}}
-Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Ta bort {0, plural, one{shape} other{shapes}}
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		Frys {0, plural, one{form} other{former}}
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Ta bort {0, plural, one{form} other{former}}
 Undo: %action%	Icon-O-Matic-Main		Ångra: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Don't save	Icon-O-Matic-Menu-Settings		Spara inte
@@ -101,10 +101,10 @@ Multi-paste properties	Icon-O-Matic-Properties		Multipaste egenskaper
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		IkonRedigeraren har kanske inte tolkat all data från SVGn när den laddades. Genom att skriva över originalfilen förloras denna information.
 Rotate indices backwards	Icon-O-Matic-PathsList		Rotera indexpunkter moturs
 Overwrite	Icon-O-Matic-SVGExport		Skriv över
-Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Lägg till {0, plural, one{shape} other{shapes}}
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Lägg till {0, plural, one{form} other{former}}
 Cancel	Icon-O-Matic-SVGExport		Avbryt
 Open…	Icon-O-Matic-Menu-File		Öppna...
-Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Ta bort {0, plural, one{transformer} other{transformers}}
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Ta bort {0, plural, one{transformator} other{transformatorer}}
 Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Klicka på en form ovan
 Remove	Icon-O-Matic-ShapesList		Ta bort
 Multi-paste	Icon-O-Matic-Properties		Klistrain fler
@@ -112,10 +112,10 @@ Bad news	Title of error alert		Dåliga nyheter
 HVIF source code	Icon-O-Matic-SavePanel		HVIF-källkod
 Drop shapes	Icon-O-Matic-ShapesList		Överge form
 Save icon	Icon-O-Matic-SavePanel	Dialog title	Spara ikon
-Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Tilldela {0, plural, one{path} other{paths}}
-Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Avlägsna {0, plural, one{item} other{items}}
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Tilldela {0, plural, one{sökväg} other{sökvägar}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Avlägsna {0, plural, one{föremål} other{föremål}}
 Linear	Icon-O-Matic-StyleTypes		Linjär
-Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Flytta {0, plural, one{item} other{items}}
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Flytta {0, plural, one{föremål} other{föremål}}
 Add vertex	Icon-O-Matic-AddPointCmd		Lägg till vertex
 Clean up	Icon-O-Matic-PathsList		Rensa upp
 Split	Icon-O-Matic-PathManipulator		Klyv
@@ -133,18 +133,26 @@ Quit	Icon-O-Matic-Menu-File		Avsluta
 One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		En eller flera av formerna har för många transformatorer. HVIF-formatet stöder maximalt 255 transformatorer per form.
 Gradient	Icon-O-Matic-StyleTypes		Övergång
 Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Färg (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		Upptäck orientering.
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Lägg till {0, plural, one{sökväg} other{sökvägar}}
 One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		En eller flera av formerna har för många banor. HVIF-formatet stöder maximalt 255 banor per form.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Lägg till figur med bana & stil
 Radial	Icon-O-Matic-StyleTypes		Radiell
 Text too long	Icon-O-Matic-StyledTextImport		Texten är för långt
 Caps	Icon-O-Matic-PropertyNames		Versaler
 OK	Icon-O-Matic-SVGImport		OK
+Import text	Icon-O-Matic-StyledTextImport		Importera text
 Append…	Icon-O-Matic-Menu-File		Bifoga...
 Scale Y	Icon-O-Matic-PropertyNames		Skala Y
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Exportikon
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Rotera sökvägsindex
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Lägg till {0, plural, one{föremål} other{föremål}}
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotera indexpunkter medurs
 Save	Icon-O-Matic-Menu-File		Spara
+Cancel	Icon-O-Matic-StyledTextImport		Annullera
 Add circle	Icon-O-Matic-PathsList		Lägg till cirkel
 Freeze transformation	Icon-O-Matic-ShapesList		Frys omvandling
+META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON-attribut
 Untitled	Icon-O-Matic-Main		Namnlös
 Max LOD	Icon-O-Matic-PropertyNames		Max LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Spara ändringarna till ikonen innan stängning?
@@ -152,20 +160,30 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Det
 Save as…	Icon-O-Matic-Menu-File		Spara som...
 Swatches	Icon-O-Matic-Menus		Penslar
 <modify path>	Icon-O-Matic-PathCmd		<modifiera bana>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Ange %property%
 Icon-O-Matic	System name		IkonRedigerare
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<inget att ångra>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Ta bort {0, plural, one{sökväg} other{sökvägar}}
 Add	Icon-O-Matic-StylesList		Lägg till
 Translation Y	Icon-O-Matic-PropertyNames		Förflyttning Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Ändra vertex
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		Flytta {0, plural, one{stil} other{stilar}}
 Scale	Icon-O-Matic-TransformationBoxStates		Skala
 All	Icon-O-Matic-Properties		Alla
 Transformer	Icon-O-Matic-Menus		Omvandlare
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Vänd {0, plural, one{vertex} other{hörn}}
 Invert selection	Icon-O-Matic-Properties		Invertera markering
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	för att fästa transformatorer.
 <unkown property>	Icon-O-Matic-PropertyNames		<okänt attribut>
 Pick a color	Icon-O-Matic-ColorPicker		Välj en färg
 Settings…	Icon-O-Matic-SavePanel		Inställningar...
+Select all	Icon-O-Matic-PathManipulator		Välj alla
 Add with style	Icon-O-Matic-ShapesList		Lägg till med stil
 New	Icon-O-Matic-Menu-File		Ny
+Change perspective	Icon-O-Matic-PerspectiveCommand		Byt perspektiv
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Puffa till {0, plural, one{vertex} other{hörn}}
 Gradient type	Icon-O-Matic-StyleTypes		Övergångstyp
+Perspective	Transformation		Perspektiv
 Export	Icon-O-Matic-Menu-File		Exportera
 Width	Icon-O-Matic-PropertyNames		Bredd
 Add reference image	Icon-O-Matic-ShapesList		Lägg till referensbild

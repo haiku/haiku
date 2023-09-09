@@ -1,6 +1,7 @@
-1	finnish	x-vnd.haiku-icon_o_matic	3046316298
+1	finnish	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Ei mitään
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Nollaa polku
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Lisää tyhjä
 Opening the icon failed!	Icon-O-Matic-Main		Kuvakkeen avaaminen epäonnistui!
 Reverse path	Icon-O-Matic-ReversePathCmd		Käänteinen polku
@@ -14,11 +15,13 @@ Color	Icon-O-Matic-StyleTypes		Väri
 Select	Icon-O-Matic-Properties		Valitse
 Reset transformation	Icon-O-Matic-ShapesList		Nollaa muunnokset
 Duplicate	Icon-O-Matic-StylesList		Kaksoiskappale
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Pyöritä
 Shorten	Icon-O-Matic-PropertyNames		Lyhennä
 Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Siirrä {0, plural, one{muuttuja} other{muuttujaa}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Teksti, jota yrität tuoda, on aika pitkä. Oletko varma?
 Paste	Icon-O-Matic-Properties		Liitä
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Liian monta tyyliä. HVIF-muoto tukee enintään 255 tyyliä.
 Close	Icon-O-Matic-Menu-File		Sulje
 Add rect	Icon-O-Matic-PathsList		Lisää nelikulmio
 Rotation	Icon-O-Matic-PropertyNames		Kierto
@@ -57,6 +60,7 @@ Saving your document failed!	Icon-O-Matic-Exporter		Asiakirjan tallentaminen ep�
 Snap to grid	Icon-O-Matic-Menu-Settings		Kiinnity rasteriin
 Opening the document failed!	Icon-O-Matic-Main		Asiakirjan avaaminen epäonnistui!
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Poista {0, plural, one{tyyli} other{tyylit}}
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Yhdellä tai usealla polulla on liian monta solmua. HVIF-muoto tukee enintään 255 solmua per polku.
 Add with path & style	Icon-O-Matic-ShapesList		Lisää polulla ja tyylillä
 Shape	Icon-O-Matic-Menus		Hahmo
 Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Halkaise {0, plural, one{huippu} other{huiput}}
@@ -78,6 +82,7 @@ Miter limit	Icon-O-Matic-PropertyNames		Kärkiraja
 Insert vertex	Icon-O-Matic-InsertPointCmd		Lisää kärki
 Rounding	Icon-O-Matic-PropertyNames		Pyöristetään
 Joins	Icon-O-Matic-PropertyNames		Liitokset
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Liian monta muotoa. HVIF-muoto tukee enintään 255 muotoa.
 Cancel	Icon-O-Matic-ColorPicker		Peru
 Duplicate	Icon-O-Matic-PathsList		Kaksoiskappele
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Siirrä {0, plural, one{muoto} other{muotoa}}
@@ -115,18 +120,22 @@ Add vertex	Icon-O-Matic-AddPointCmd		Lisää kärki
 Clean up	Icon-O-Matic-PathsList		Puhdista
 Split	Icon-O-Matic-PathManipulator		Halkaise
 Move	Icon-O-Matic-TransformationBoxStates		Siirrä
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Liian monta polkua. HVIF-muoto tukee enintään 255 polkua.
 Conic	Icon-O-Matic-StyleTypes		Kartiomainen
 Name	Icon-O-Matic-PropertyNames		Nimi
 Reset transformation	Icon-O-Matic-StylesList		Nolla muunnokset
 Reverse	Icon-O-Matic-PathsList		Käänteinen
 Remove	Icon-O-Matic-PathsList		Poista
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Load error	Icon-O-Matic-SVGImport		Latausvirhe
 Style type	Icon-O-Matic-StyleTypes		Tyylityyppi
 Quit	Icon-O-Matic-Menu-File		Poistu
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		Yhdellä tai useammalla muodolla on liian monta muunninta. HVIF-muoto tukee enintään 255 muunninta per muoto.
 Gradient	Icon-O-Matic-StyleTypes		Kaltevuus
 Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Väri (#%02x%02x%02x)
 Detect orient.	Icon-O-Matic-PropertyNames		Havaitse suuntaus.
 Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Lisää {0, plural, one{polku} other{polkua}}
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Yhdellä tai usealla muodolla on liian monta polkua. HVIF-muoto tukee enintään 255 polkua per muoto.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Lisää hahmo polulla ja tyylillä
 Radial	Icon-O-Matic-StyleTypes		Säteettäinen
 Text too long	Icon-O-Matic-StyledTextImport		Teksti on liian pitkä
@@ -171,8 +180,10 @@ Settings…	Icon-O-Matic-SavePanel		Asetukset...
 Select all	Icon-O-Matic-PathManipulator		Valitse kaikki
 Add with style	Icon-O-Matic-ShapesList		Lisää tyylillä
 New	Icon-O-Matic-Menu-File		Uusi
+Change perspective	Icon-O-Matic-PerspectiveCommand		Vaihda perspektiiviä
 Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Työnnä {0, plural, one{kärki} other{kärkeä}}
 Gradient type	Icon-O-Matic-StyleTypes		Kaltevuustyyppi
+Perspective	Transformation		Perspektiivi
 Export	Icon-O-Matic-Menu-File		Vie
 Width	Icon-O-Matic-PropertyNames		Leveys
 Add reference image	Icon-O-Matic-ShapesList		Lisää viitekuva

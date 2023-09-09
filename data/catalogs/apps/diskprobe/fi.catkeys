@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DiskProbe	494506599
+1	finnish	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raakamuokkain
 Remove	AttributeWindow		Poista
 Close	ProbeView		Sulje
@@ -119,6 +119,7 @@ Double precision floating-point value:	TypeEditors		Kaksoistarkkuuden liukulukua
 Image	TypeEditors	This is the type of view	Kuva
 Swapped: %lld (0x%0*Lx)	ProbeView		Vaihdettu: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Tallennatko muutokset ennen sulkemista?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG-muoto
 Number	TypeEditors	This is the type of editor	Numero
 Edit	ProbeView		Muokkaa

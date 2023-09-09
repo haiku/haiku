@@ -1,8 +1,9 @@
-1	finnish	x-vnd.haiku.SerialConnect	354154115
+1	finnish	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Laitteisto
 Connection	SerialWindow		Yhteys
 Raw send…	SerialWindow		Raakalähetys…
 Baud rate	SerialWindow		Baudinopeus
+Paste	SerialWindow		Liitä
 Stop bits	SerialWindow		Pysäytysbitit
 None	SerialWindow	Flowcontrol	Ei mitään
 Cancel	Custom baudrate window		Peru

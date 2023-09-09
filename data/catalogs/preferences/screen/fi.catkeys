@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Screen	133788249
+1	finnish	x-vnd.Haiku-Screen	2318349707
 no	Screen		ei
 bits/pixel	Screen		bittiä/pikseli
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
@@ -13,6 +13,7 @@ Video format:	Screen		Videomuoto:
 Undo	Screen		Peru
 OK	Screen		Valmis
 Current workspace	Screen		Nykyinen työtila
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		pystysuoraan
 All workspaces	Screen		Kaikki työtilat
 Use laptop panel:	Screen		Käytä sylimikropaneelia

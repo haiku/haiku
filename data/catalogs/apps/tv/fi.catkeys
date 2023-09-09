@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Haiku.TV	3120244932
+1	finnish	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Ei valikkoa
 No border	MainWin		Ei rajoja
 Error, connecting to interface failed:\n\n	MainWin		Virhe, yhdistäminen käyttöliittymään epäonnistui:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	pakota 720 × 576, näyttösuhde 4:3
 Full screen	MainWin		Kokoruutunäyttö
 Scale to native size	MainWin		Skaalaa alkuperäiseen kokoon
 unknown	MainWin		tuntematon
@@ -16,7 +17,10 @@ Channel	MainWin		Kanava
 Previous channel	MainWin		Edellinen kanava
 OK	MainWin		Valmis
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	pakota 544 × 576, näyttösuhde 4:3
 Settings	MainWin		Asetukset
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	pakota 704 × 576, näyttösuhde 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Asetukset...
 None	MainWin		Ei mitään

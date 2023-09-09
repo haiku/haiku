@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-LaunchBox	1530497419
+1	finnish	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Aseta kuvaus...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Haluatko todella sulkea alustan?\n(Alustaa ei muisteta.)
 OK	LaunchBox		Valmis
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Näytä ikkunaraja
 Failed to launch 'something', error in Pad data.	LaunchBox		’Jonkin’ käynnistäminen epäonnistui, virhe alustatiedoissa.
 LaunchBox	System name		Käynnistysikkuna
 Auto-raise	LaunchBox		Automaattisesti päällimmäinen
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Kuvakekoko
 Open containing folder	LaunchBox		Avaa sisältyvä kansio
 Add button here	LaunchBox		Lisää painike tänne
