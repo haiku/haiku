@@ -34,7 +34,6 @@ public:
 	
 	virtual status_t GetNextRef(entry_ref *ref);
 	virtual status_t GetNextEntry(BEntry *entry, bool traverse = false);
-	virtual int32 GetNextDirents(dirent *buf, size_t length, int32 count = INT_MAX);
 	
 	status_t Clear();	
 	

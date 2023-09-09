@@ -126,14 +126,6 @@ TFilteredQuery::GetNextEntry(BEntry *entry, bool traverse)
 }
 
 
-int32
-TFilteredQuery::GetNextDirents(dirent *buf, size_t length, int32 count)
-{
-	// TODO: Implement ?
-	return 0;
-}
-
-
 status_t
 TFilteredQuery::Clear()
 {

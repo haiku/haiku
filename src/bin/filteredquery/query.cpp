@@ -63,10 +63,10 @@ bool o_subfolders = false;
 void
 usage(void)
 {
-	printf("usage: %s [ -e ] [ -a || -v <path-to-volume> ] expression\n"
+	printf("usage: %s [ -e ] [ -p <path-to-search> ] [ -s ] [ -a || -v <path-to-volume> ] expression\n"
 		"  -e\t\tdon't escape meta-characters\n"
-		"  -p <path>\tsearch only in the given path\n"
-		"  -s\t\tinclude subfolders (valid only if -p is used)\n"
+		"  -p <path>\tsearch only in the given path. Defaults to the current directory.\n"
+		"  -s\t\tinclude subfolders\n"
 		"  -a\t\tperform the query on all volumes\n"
 		"  -v <file>\tperform the query on just one volume; <file> can be any\n"
 		"\t\tfile on that volume. Defaults to the current volume.\n"
@@ -84,8 +84,8 @@ perform_query(BVolume &volume, const char *predicate, const char *filterpath)
 	// Set up the volume and predicate for the query.
 	query.SetVolume(&volume);
 	query.SetPredicate(predicate);
+	folder_params options;
 	if (filterpath != NULL) {
-		folder_params options;
 		options.path = filterpath;
 		options.includeSubFolders = o_subfolders;
 		query.AddFilter(FilterByFolder, &options);
@@ -137,7 +137,7 @@ main(int32 argc, const char **argv)
 	
 	// Parse command-line arguments.
 	int opt;
-	while ((opt = getopt(argc, (char **)argv, "eavsd:")) != -1) {
+	while ((opt = getopt(argc, (char **)argv, "easv:p:")) != -1) {
 		switch(opt) {
 		case 'a':
 			o_all_volumes = true;
