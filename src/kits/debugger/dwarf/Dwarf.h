@@ -68,6 +68,14 @@ enum {
 	DW_TAG_type_unit				= 0x41,
 	DW_TAG_rvalue_reference_type	= 0x42,
 	DW_TAG_template_alias			= 0x43,
+	DW_TAG_coarray_type				= 0x44,
+	DW_TAG_generic_subrange			= 0x45,
+	DW_TAG_dynamic_type				= 0x46,
+	DW_TAG_atomic_type				= 0x47,
+	DW_TAG_call_size				= 0x48,
+	DW_TAG_call_site_parameter		= 0x49,
+	DW_TAG_skeleton_unit			= 0x4a,
+	DW_TAG_immutable_type			= 0x4b,
 	DW_TAG_lo_user					= 0x4080,
 	DW_TAG_GNU_template_template_param
 									= 0x4106,
@@ -180,17 +188,37 @@ enum {
 	DW_AT_const_expr			= 0x6c,		// flag
 	DW_AT_enum_class			= 0x6d,		// flag
 	DW_AT_linkage_name			= 0x6e,		// string
-	// TODO: proposed DWARF5 final values
-/*	DW_AT_call_site_value		= 0x6f,		// exprloc
-	DW_AT_call_site_data_value	= 0x70,		// exprloc
-	DW_AT_call_site_target		= 0x71,		// exprloc
-	DW_AT_call_site_target_clobbered
-								= 0x72,		// exprloc
-	DW_AT_tail_call				= 0x73,		// flag
-	DW_AT_all_tail_call_sites	= 0x74,		// flag
-	DW_AT_all_call_sites		= 0x75,		// flag
-	DW_AT_all_source_call_sites	= 0x76,		// flag
-*/
+	DW_AT_string_length_bit_size
+								= 0x6f,		// constant
+	DW_AT_string_length_byte_size
+								= 0x70,		// constant
+	DW_AT_rank					= 0x71,		// constant, exprloc
+	DW_AT_str_offsets_base		= 0x72,		// stroffsetsptr
+	DW_AT_addr_base				= 0x73,		// addrptr
+	DW_AT_rnglists_base			= 0x74,		// rnglistsptr
+	DW_AT_dwo_name				= 0x76,		// string
+	DW_AT_reference				= 0x77,		// flag
+	DW_AT_rvalue_reference		= 0x78,		// flag
+	DW_AT_macros				= 0x79,		// macptr
+	DW_AT_call_all_calls		= 0x7a,		// flag
+	DW_AT_call_all_source_calls	= 0x7b,		// flag
+	DW_AT_call_all_tail_calls	= 0x7c,		// flag
+	DW_AT_call_return_pc		= 0x7d,		// address
+	DW_AT_call_value			= 0x7e,		// exprloc
+	DW_AT_call_origin			= 0x7f,		// exprloc
+	DW_AT_call_parameter		= 0x80,		// reference
+	DW_AT_call_pc				= 0x81,		// address
+	DW_AT_call_tail_call		= 0x82,		// flag
+	DW_AT_call_target			= 0x83,		// exprloc
+	DW_AT_call_target_clobbered	= 0x84,		// exprloc
+	DW_AT_call_data_location	= 0x85,		// exprloc
+	DW_AT_call_data_value		= 0x86,		// exprloc
+	DW_AT_noreturn				= 0x87,		// flag
+	DW_AT_alignment				= 0x88,		// constant
+	DW_AT_export_symbols		= 0x89,		// flag
+	DW_AT_deleted				= 0x8a,		// flag
+	DW_AT_defaulted				= 0x8b,		// constant
+	DW_AT_loclists_base			= 0x8c,		// loclistsptr
 	DW_AT_lo_user				= 0x2000,
 	DW_AT_call_site_value		= 0x2111,	// exprloc
 	DW_AT_call_site_data_value
@@ -237,7 +265,26 @@ enum {
 	DW_FORM_exprloc		= 0x18,	// dwarf expression
 	DW_FORM_flag_present
 						= 0x19,	// flag
-	DW_FORM_ref_sig8	= 0x20	// reference
+	DW_FORM_strx		= 0x1a, // string
+	DW_FORM_addrx		= 0x1b, // address
+	DW_FORM_ref_sup4	= 0x1c, // reference
+	DW_FORM_strp_sup	= 0x1d, // string
+	DW_FORM_data16		= 0x1e, // constant
+	DW_FORM_line_strp	= 0x1f, // string
+	DW_FORM_ref_sig8	= 0x20,	// reference
+	DW_FORM_implicit_const
+						= 0x21, // constant
+	DW_FORM_loclistx	= 0x22, // loclist
+	DW_FORM_rnglistx	= 0x23, // rnglist
+	DW_FORM_ref_sup8	= 0x24, // reference
+	DW_FORM_strx1		= 0x25, // string
+	DW_FORM_strx2		= 0x26, // string
+	DW_FORM_strx3		= 0x27, // string
+	DW_FORM_strx4		= 0x28, // string
+	DW_FORM_addrx1		= 0x29, // address
+	DW_FORM_addrx2		= 0x2a, // address
+	DW_FORM_addrx3		= 0x2b, // address
+	DW_FORM_addrx4		= 0x2c, // address
 
 };
 
@@ -310,6 +357,16 @@ enum {
 	DW_OP_bit_piece				= 0x9d,
 	DW_OP_implicit_value		= 0x9e,
 	DW_OP_stack_value			= 0x9f,
+	DW_OP_implicit_pointer		= 0xa0,
+	DW_OP_addrx					= 0xa1,
+	DW_OP_constx				= 0xa2,
+	DW_OP_entry_value			= 0xa3,
+	DW_OP_const_type			= 0xa4,
+	DW_OP_regval_type			= 0xa5,
+	DW_OP_deref_type			= 0xa6,
+	DW_OP_xderef_type			= 0xa7,
+	DW_OP_convert				= 0xa8,
+	DW_OP_reinterpret			= 0xa9,
 	DW_OP_lo_user				= 0xe0,
 	DW_OP_hi_user				= 0xff
 };
@@ -331,6 +388,9 @@ enum {
 	DW_ATE_signed_fixed		= 0x0d,
 	DW_ATE_unsigned_fixed	= 0x0e,
 	DW_ATE_decimal_float	= 0x0f,
+	DW_ATE_UTF				= 0x10,
+	DW_ATE_UCS				= 0x11,
+	DW_ATE_ASCII			= 0x12,
 	DW_ATE_lo_user			= 0x80,
 	DW_ATE_hi_user			= 0xff
 };
@@ -395,6 +455,24 @@ enum {
 	DW_LANG_ObjC_plus_plus	= 0x0011,
 	DW_LANG_UPC				= 0x0012,
 	DW_LANG_D				= 0x0013,
+	DW_LANG_Python			= 0x0014,
+	DW_LANG_OpenCL			= 0x0015,
+	DW_LANG_Go				= 0x0016,
+	DW_LANG_Modula3			= 0x0017,
+	DW_LANG_Haskell			= 0x0018,
+	DW_LANG_C_plus_plus_03	= 0x0019,
+	DW_LANG_C_plus_plus_11	= 0x001a,
+	DW_LANG_OCaml			= 0x001b,
+	DW_LANG_Rust			= 0x001c,
+	DW_LANG_C11				= 0x001d,
+	DW_LANG_Swift			= 0x001e,
+	DW_LANG_Julia			= 0x001f,
+	DW_LANG_Dylan			= 0x0020,
+	DW_LANG_C_plus_plus_14	= 0x0021,
+	DW_LANG_Fortran03		= 0x0022,
+	DW_LANG_Fortran08		= 0x0023,
+	DW_LANG_RenderScript	= 0x0024,
+	DW_LANG_BLISS			= 0x0025,
 	DW_LANG_lo_user			= 0x8000,
 	DW_LANG_hi_user			= 0xffff
 };
@@ -409,11 +487,13 @@ enum {
 
 // calling convention
 enum {
-	DW_CC_normal	= 0x01,
-	DW_CC_program	= 0x02,
-	DW_CC_nocall	= 0x03,
-	DW_CC_lo_user	= 0x40,
-	DW_CC_hi_user	= 0xff
+	DW_CC_normal			= 0x01,
+	DW_CC_program			= 0x02,
+	DW_CC_nocall			= 0x03,
+	DW_CC_pass_by_reference	= 0x04,
+	DW_CC_pass_by_value		= 0x05,
+	DW_CC_lo_user			= 0x40,
+	DW_CC_hi_user			= 0xff
 };
 
 // inlining
@@ -462,6 +542,17 @@ enum {
 	DW_LNE_hi_user				= 0xff
 };
 
+// line number header entry format
+enum {
+	DW_LNCT_path				= 0x0001,
+	DW_LNCT_directory_index		= 0x0002,
+	DW_LNCT_timestamp			= 0x0003,
+	DW_LNCT_size				= 0x0004,
+	DW_LNCT_MD5					= 0x0005,
+	DW_LNCT_lo_user				= 0x2000,
+	DW_LNCT_hi_user				= 0x3fff
+};
+
 // macro information type
 enum {
 	DW_MACINFO_define		= 0x01,
@@ -508,6 +599,18 @@ enum {
     DW_CFA_GNU_window_save		= 0x2d,
     DW_CFA_GNU_args_size		= 0x2e,
     DW_CFA_GNU_negative_offset_extended	= 0x2f
+};
+
+// unit type
+enum {
+	DW_UT_compile				= 0x01,
+	DW_UT_type					= 0x02,
+	DW_UT_partial				= 0x03,
+	DW_UT_skeleton				= 0x04,
+	DW_UT_split_compile			= 0x05,
+	DW_UT_split_type			= 0x06,
+	DW_UT_lo_user				= 0x80,
+	DW_UT_hi_user				= 0xff
 };
 
 
