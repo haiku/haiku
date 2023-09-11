@@ -5,6 +5,14 @@
 
 #include "atomic_arch.h"
 
+#ifndef a_crash
+#define a_crash a_crash
+static inline void a_crash()
+{
+	*(volatile char *)0=0;
+}
+#endif
+
 #ifndef a_ctz_32
 #define a_ctz_32 a_ctz_32
 static inline int a_ctz_32(uint32_t x)
