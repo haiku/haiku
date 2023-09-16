@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.haiku-icon_o_matic	2572445882
+1	catalan; valencian	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Cap
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Neteja el camí
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -180,8 +180,10 @@ Settings…	Icon-O-Matic-SavePanel		Paràmetres…
 Select all	Icon-O-Matic-PathManipulator		Selecciona-ho tot
 Add with style	Icon-O-Matic-ShapesList		Afegeix-n'hi una amb estil
 New	Icon-O-Matic-Menu-File		Nou
+Change perspective	Icon-O-Matic-PerspectiveCommand		Canvia la perspectiva
 Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Empeny {0, plural, one{vèrtex} other{vèrtexs}}
 Gradient type	Icon-O-Matic-StyleTypes		Tipus de gradient
+Perspective	Transformation		Perspectiva
 Export	Icon-O-Matic-Menu-File		Exporta
 Width	Icon-O-Matic-PropertyNames		Amplada
 Add reference image	Icon-O-Matic-ShapesList		Afegiu-hi una imatge de referència
