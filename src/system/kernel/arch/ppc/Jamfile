@@ -55,6 +55,8 @@ KernelMergeObject kernel_arch_ppc.o :
 	arch_vm_translation_map.cpp
 	arch_asm.S
 
+	generic_msi.cpp
+
 	# serial uart
 	debug_uart.cpp
 	debug_uart_8250.cpp
