@@ -42,7 +42,7 @@ local libFDTSources =
 	fdt_overlay.c
 	;
 
-SubDirCcFlags -Wno-error=missing-prototypes ;
+SubDirCcFlags -Wno-error=missing-prototypes -Wno-error=sign-compare -Wno-error=missing-braces ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {
