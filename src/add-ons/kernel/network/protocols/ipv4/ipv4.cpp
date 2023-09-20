@@ -1550,10 +1550,13 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	}
 
 	if ((buffer->flags & MSG_MCAST) != 0
-		&& protocol->multicast_loopback) {
+		&& (protocol != NULL && protocol->multicast_loopback)) {
 		// copy an IP multicast packet to the input queue of the loopback
 		// interface
 		net_buffer *loopbackBuffer = gBufferModule->duplicate(buffer);
+		if (loopbackBuffer == NULL)
+			return B_NO_MEMORY;
+		status_t status = B_ERROR;
 
 		// get the IPv4 loopback address
 		struct sockaddr loopbackAddress;
@@ -1568,8 +1571,11 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 			sDatalinkModule->put_interface_address(
 				loopbackBuffer->interface_address);
 			loopbackBuffer->interface_address = address;
-			ipv4_receive_data(loopbackBuffer);
+			status = ipv4_receive_data(loopbackBuffer);
 		}
+
+		if (status != B_OK)
+			gBufferModule->free(loopbackBuffer);
 	}
 
 	TRACE_SK(protocol, "  SendRoutedData(): header chksum: %" B_PRIu32
