@@ -3,10 +3,10 @@ RemotePackageRepository HaikuPorts
 	: https://eu.hpkg.haiku-os.org/haikuports/master/build-packages
 	:
 	# architecture "any" packages
-	be_book-2008_10_26-3
-	ca_root_certificates-2021_07_05-1
+	be_book-2008_10_26-7
+	ca_root_certificates-2022_10_11-1
 	gnu_efi_kernel-3.0.10-1
-	haikuporter-1.2.5-1
+	haikuporter-1.2.7-1
 	noto-20200106-1
 	timgmsoundfont-fixed-5
 	wqy_microhei-0.2.0~beta-4
@@ -14,20 +14,20 @@ RemotePackageRepository HaikuPorts
 	# repository architecture packages
 	# primary architecture (arm)
 	bash-4.4.023-1
-	binutils-2.36.1_2021_09_21-2
+	binutils-2.41_2023_08_05-1
 	bison-3.0.5-1
 	coreutils-8.22-1
 	curl-7.40.0-1
 	curl_devel-7.40.0-1
-	expat-2.4.1-1
-	expat_devel-2.4.1-1
+	expat-2.5.0-1
+	expat_devel-2.5.0-1
 	findutils-4.6.0-1
 	flex-2.5.35-1
 	freetype-2.6.3-1
 	freetype_devel-2.6.3-1
 	gawk-3.1.8-2
-	gcc_syslibs_devel-11.2.0_2021_07_28-5
-	gcc_syslibs-11.2.0_2021_07_28-5
+	gcc_syslibs_devel-13.2.0_2023_08_10-1
+	gcc_syslibs-13.2.0_2023_08_10-1
 	grep-2.14-1
 	icu-57.2-1
 	icu_devel-57.2-1
@@ -42,10 +42,10 @@ RemotePackageRepository HaikuPorts
 	python-3.9.1-1
 	sed-4.2.1-1
 	texinfo-4.13a-1
-	zlib-1.2.11-1
-	zlib_devel-1.2.11-1
-	zstd-1.5.0-2
-	zstd_devel-1.5.0-2
+	zlib-1.2.13-1
+	zlib_devel-1.2.13-1
+	zstd-1.5.5-1
+	zstd_devel-1.5.5-1
 	:
 	# source packages
 	bash
