@@ -12,7 +12,7 @@
 
 #ifdef __cplusplus
 
-class Handle : public ConsoleNode {
+class Handle : public Node {
 	public:
 		Handle(int handle);
 		Handle();
