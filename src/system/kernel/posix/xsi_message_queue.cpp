@@ -123,7 +123,7 @@ public:
 		fMessageQueue.msg_ctime = (time_t)real_time_clock();
 	}
 
-	void Dequeue(ConditionVariableEntry *queueEntry, bool waitForMessage)
+	void Dequeue(ConditionVariableEntry *queueEntry)
 	{
 		queueEntry->Wait(B_RELATIVE_TIMEOUT, 0);
 	}
@@ -733,7 +733,7 @@ _user_xsi_msgrcv(int messageQueueID, void *messagePointer,
 				TRACE(("xsi_msgrcv: thread %d got interrupted while "
 					"waiting on message queue %d\n", (int)thread_get_current_thread_id(),
 					messageQueueID));
-				messageQueue->Dequeue(&queueEntry, /* waitForMessage */ true);
+				messageQueue->Dequeue(&queueEntry);
 				return EINTR;
 			} else {
 				messageQueueLocker.Lock();
@@ -841,7 +841,7 @@ _user_xsi_msgsnd(int messageQueueID, const void *messagePointer,
 				TRACE(("xsi_msgsnd: thread %d got interrupted while "
 					"waiting on message queue %d\n", (int)thread_get_current_thread_id(),
 					messageQueueID));
-				messageQueue->Dequeue(&queueEntry, /* waitForMessage */ false);
+				messageQueue->Dequeue(&queueEntry);
 				delete message;
 				notSent = false;
 				result = EINTR;
