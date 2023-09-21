@@ -1032,7 +1032,7 @@ Volume::_RemovePackageContent(Package* package, PackageNode* endNode,
 		node = nextNode;
 	}
 
-	fPackageFSRoot->RemovePackage(package);;
+	fPackageFSRoot->RemovePackage(package);
 }
 
 
@@ -1046,6 +1046,8 @@ status_t
 Volume::_AddPackageContentRootNode(Package* package,
 	PackageNode* rootPackageNode, bool notify)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	PackageNode* packageNode = rootPackageNode;
 	Directory* directory = fRootDirectory;
 	directory->WriteLock();
@@ -1099,6 +1101,8 @@ Volume::_AddPackageContentRootNode(Package* package,
 		} while (packageNode != NULL);
 	} while (packageNode != NULL);
 
+	ASSERT(directory == NULL);
+
 	return B_OK;
 }
 
@@ -1113,13 +1117,21 @@ void
 Volume::_RemovePackageContentRootNode(Package* package,
 	PackageNode* rootPackageNode, PackageNode* endPackageNode, bool notify)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	PackageNode* packageNode = rootPackageNode;
 	Directory* directory = fRootDirectory;
 	directory->WriteLock();
 
 	do {
-		if (packageNode == endPackageNode)
+		if (packageNode == endPackageNode) {
+			// unlock all directories
+			while (directory != NULL) {
+				directory->WriteUnlock();
+				directory = directory->Parent();
+			}
 			break;
+		}
 
 		// recurse into directory
 		if (PackageDirectory* packageDirectory
@@ -1157,6 +1169,8 @@ Volume::_RemovePackageContentRootNode(Package* package,
 				// the parent is still locked, so this is safe
 		} while (packageNode != NULL/* && packageNode != rootPackageNode*/);
 	} while (packageNode != NULL/* && packageNode != rootPackageNode*/);
+
+	ASSERT(directory == NULL);
 }
 
 
