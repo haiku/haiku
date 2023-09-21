@@ -11,7 +11,7 @@
 
 #ifdef __cplusplus
 
-class Handle : public ConsoleNode {
+class Handle : public Node {
 	public:
 		Handle(int handle);
 		Handle();
@@ -44,7 +44,7 @@ class CharHandle : public Handle {
 /* block devices */
 /* cf. devices.cpp */
 
-class ExecDevice : public ConsoleNode {
+class ExecDevice : public Node {
 	public:
 		ExecDevice(struct IORequest *ioRequest);
 		ExecDevice(size_t requestSize);
