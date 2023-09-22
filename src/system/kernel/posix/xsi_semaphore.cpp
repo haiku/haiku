@@ -227,7 +227,7 @@ public:
 		delete[] fSemaphores;
 	}
 
-	void ClearUndo(unsigned short semaphoreNumber)
+	void ClearUndo(ushort semaphoreNumber)
 	{
 		Team *team = thread_get_current_thread()->team;
 		UndoList::Iterator iterator = fUndoList.GetIterator();
@@ -337,7 +337,7 @@ public:
 	// Record the sem_undo operation into our private fUndoList and
 	// the team undo_list. The only limit here is the memory needed
 	// for creating a new sem_undo structure.
-	int RecordUndo(short semaphoreNumber, short value)
+	int RecordUndo(ushort semaphoreNumber, short value)
 	{
 		// Look if there is already a record from the team caller
 		// for the same semaphore set
@@ -411,7 +411,7 @@ public:
 		return B_OK;
 	}
 
-	void RevertUndo(short semaphoreNumber, short value)
+	void RevertUndo(ushort semaphoreNumber, short value)
 	{
 		// This can be called only when RecordUndo fails.
 		Team *team = thread_get_current_thread()->team;
@@ -1064,12 +1064,12 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 	status_t result = 0;
 	while (notDone) {
 		XsiSemaphore *semaphore = NULL;
-		const short numberOfSemaphores = semaphoreSet->NumberOfSemaphores();
+		const ushort numberOfSemaphores = semaphoreSet->NumberOfSemaphores();
 		bool goToSleep = false;
 
 		uint32 i = 0;
 		for (; i < numOps; i++) {
-			short semaphoreNumber = operations[i].sem_num;
+			ushort semaphoreNumber = operations[i].sem_num;
 			if (semaphoreNumber >= numberOfSemaphores) {
 				TRACE(("xsi_semop: %" B_PRIu32 " invalid semaphore number"
 					"\n", i));
@@ -1110,7 +1110,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 		if (goToSleep || result != 0) {
 			// Undo all previously done operations
 			for (uint32 j = 0; j < i; j++) {
-				short semaphoreNumber = operations[j].sem_num;
+				ushort semaphoreNumber = operations[j].sem_num;
 				semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 				short operation = operations[j].sem_op;
 				if (operation != 0)
@@ -1170,7 +1170,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 				if ((operations[i].sem_flg & SEM_UNDO) == 0)
 					continue;
 
-				short semaphoreNumber = operations[i].sem_num;
+				ushort semaphoreNumber = operations[i].sem_num;
 				XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 				short operation = operations[i].sem_op;
 
@@ -1179,7 +1179,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 					// Undo everything!
 					// Start with semaphore operations
 					for (uint32 j = 0; j < numOps; j++) {
-						short semaphoreNumber = operations[j].sem_num;
+						ushort semaphoreNumber = operations[j].sem_num;
 						semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 						short operation = operations[j].sem_op;
 						if (operation != 0)
@@ -1201,7 +1201,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 	// We did it. Set the pid of all semaphores used
 	if (result == 0) {
 		for (uint32 i = 0; i < numOps; i++) {
-			short semaphoreNumber = operations[i].sem_num;
+			ushort semaphoreNumber = operations[i].sem_num;
 			XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 			semaphore->SetPid(getpid());
 		}
