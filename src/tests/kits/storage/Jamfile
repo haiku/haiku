@@ -8,6 +8,7 @@ UnitTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp
 		AppFileInfoTest.cpp
 		BasicTest.cpp
+		DataIOTest.cpp
 		DirectoryTest.cpp
 		EntryTest.cpp
 		FindDirectoryTest.cpp

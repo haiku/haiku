@@ -95,10 +95,10 @@ BBufferedDataIO::Flush()
 	} else if (bytesWritten >= 0) {
 		fSize -= bytesWritten;
 		fPosition += bytesWritten;
-		return B_ERROR;
+		return B_PARTIAL_WRITE;
 	}
 
-	return bytesWritten;
+	return B_OK;
 }
 
 
@@ -172,6 +172,15 @@ BBufferedDataIO::Write(const void* buffer, size_t size)
 
 	TRACE("%p::Write(size %lu)\n", this, size);
 
+	if (size > fBufferSize || fBuffer == NULL) {
+		// request is larger than our buffer, just fill it directly
+		status_t status = Flush();
+		if (status != B_OK)
+			return status;
+
+		return fStream.Write(buffer, size);
+	}
+
 	if (!fDirty) {
 		// Throw away a read-only buffer if necessary
 		TRACE("%p: throw away previous buffer.\n", this);
@@ -180,39 +189,21 @@ BBufferedDataIO::Write(const void* buffer, size_t size)
 	}
 
 	size_t bytesWritten = 0;
-
-	if (size > fBufferSize || fBuffer == NULL) {
-		// request is larger than our buffer, just fill it directly
-		bytesWritten = fSize;
-
-		status_t status = Flush();
-		if (status != B_OK)
-			return status;
-
-		ssize_t streamWritten = fStream.Write(buffer, size);
-		if (streamWritten >= 0)
-			return bytesWritten + streamWritten;
-
-		return streamWritten;
-	}
-
-	bytesWritten = min_c(size, fBufferSize - fSize - fPosition);
-	TRACE("%p: write %" B_PRIuSIZE " bytes to the buffer.\n", this,
-		bytesWritten);
-	memcpy(fBuffer + fPosition + fSize, buffer, bytesWritten);
-	fSize += bytesWritten;
-	size -= bytesWritten;
-
-	if (size > 0) {
-		status_t status = Flush();
-		if (status != B_OK)
-			return status;
-
-		memcpy(fBuffer, (uint8*)buffer + bytesWritten, size);
-		fPosition = 0;
-		fSize = size;
+	while (size > 0) {
+		size_t toCopy = min_c(size, fBufferSize - (fPosition + fSize));
+		TRACE("%p: write %" B_PRIuSIZE " bytes to the buffer.\n", this,
+			toCopy);
+		memcpy(fBuffer + (fPosition + fSize), buffer, toCopy);
+		fSize += toCopy;
+		bytesWritten += toCopy;
+		size -= toCopy;
 		fDirty = true;
-		bytesWritten += size;
+
+		if ((fPosition + fSize) == fBufferSize) {
+			status_t status = Flush();
+			if (status != B_OK)
+				return bytesWritten;
+		}
 	}
 
 	return bytesWritten;
