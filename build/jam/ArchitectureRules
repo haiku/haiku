@@ -358,6 +358,11 @@ rule KernelArchitectureSetup architecture
 		}
 
 		ccBaseFlags += -ffreestanding ;
+
+		# Since GCC 13, autovectorization generates code which causes problems
+		# in various virtual machines (bare metal is apparently unaffected.)
+		# Until this can be resolved, disable for the kernel. (See #18593.)
+		ccBaseFlags += -fno-tree-vectorize ;
 	}
 
 	local c++BaseFlags = $(ccBaseFlags) -fno-exceptions ;
