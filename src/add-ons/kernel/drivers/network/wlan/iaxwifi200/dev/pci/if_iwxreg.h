@@ -1,4 +1,4 @@
-/*	$OpenBSD: if_iwxreg.h,v 1.41 2023/02/14 12:14:07 stsp Exp $	*/
+/*	$OpenBSD: if_iwxreg.h,v 1.51 2023/03/06 11:18:37 stsp Exp $	*/
 
 /*-
  * Based on BSD-licensed source modules in the Linux iwlwifi driver,
@@ -1387,6 +1387,7 @@ enum msix_ivar_for_cause {
 #define IWX_UCODE_TLV_CAPA_PROTECTED_TWT		56
 #define IWX_UCODE_TLV_CAPA_FW_RESET_HANDSHAKE		57
 #define IWX_UCODE_TLV_CAPA_PASSIVE_6GHZ_SCAN		58
+#define IWX_UCODE_TLV_CAPA_BAID_ML_SUPPORT		63
 #define IWX_UCODE_TLV_CAPA_EXTENDED_DTS_MEASURE		64
 #define IWX_UCODE_TLV_CAPA_SHORT_PM_TIMEOUTS		65
 #define IWX_UCODE_TLV_CAPA_BT_MPLUT_SUPPORT		67
@@ -1574,8 +1575,13 @@ struct iwx_ucode_header {
 #define IWX_UCODE_TLV_PNVM_VERSION		62
 #define IWX_UCODE_TLV_PNVM_SKU			64
 
+#define IWX_UCODE_TLV_SEC_TABLE_ADDR		66
+#define IWX_UCODE_TLV_D3_KEK_KCK_ADDR		67
+#define IWX_UCODE_TLV_CURRENT_PC		68
+
 #define IWX_UCODE_TLV_CONST_BASE		0x100
 #define IWX_UCODE_TLV_FW_NUM_STATIONS		(IWX_UCODE_TLV_CONST_BASE + 0)
+#define IWX_UCODE_TLV_FW_NUM_BEACONS		(IWX_UCODE_TLV_CONST_BASE + 2)
 
 #define IWX_UCODE_TLV_DEBUG_BASE	0x1000005
 #define IWX_UCODE_TLV_TYPE_DEBUG_INFO		(IWX_UCODE_TLV_DEBUG_BASE + 0)
@@ -1999,7 +2005,10 @@ struct iwx_tx_queue_cfg_rsp {
 
 /* DATA_PATH group subcommand IDs */
 #define IWX_DQA_ENABLE_CMD	0x00
+#define IWX_RLC_CONFIG_CMD	0x08
 #define IWX_TLC_MNG_CONFIG_CMD	0x0f
+#define IWX_RX_BAID_ALLOCATION_CONFIG_CMD	0x16
+#define IWX_SCD_QUEUE_CONFIG_CMD	0x17
 #define IWX_RX_NO_DATA_NOTIF	0xf5
 #define IWX_TLC_MNG_UPDATE_NOTIF 0xf7
 
@@ -2327,6 +2336,21 @@ struct iwx_alive_resp_v5 {
 	struct iwx_umac_alive umac_data;
 	struct iwx_sku_id sku_id;
 } __packed; /* UCODE_ALIVE_NTFY_API_S_VER_5 */
+
+struct iwx_imr_alive_info {
+	uint64_t base_addr;
+	uint32_t size;
+	uint32_t enabled;
+} __packed; /* IMR_ALIVE_INFO_API_S_VER_1 */
+
+struct iwx_alive_resp_v6 {
+	uint16_t status;
+	uint16_t flags;
+	struct iwx_lmac_alive lmac_data[2];
+	struct iwx_umac_alive umac_data;
+	struct iwx_sku_id sku_id;
+	struct iwx_imr_alive_info imr;
+} __packed; /* UCODE_ALIVE_NTFY_API_S_VER_6 */
 
 
 #define IWX_SOC_CONFIG_CMD_FLAGS_DISCRETE	(1 << 0)
@@ -3374,13 +3398,13 @@ struct iwx_phy_context_cmd {
 	/* COMMON_INDEX_HDR_API_S_VER_1 */
 	uint32_t id_and_color;
 	uint32_t action;
-	/* PHY_CONTEXT_DATA_API_S_VER_3 */
+	/* PHY_CONTEXT_DATA_API_S_VER_3, PHY_CONTEXT_DATA_API_S_VER_4 */
 	struct iwx_fw_channel_info_v1 ci;
 	uint32_t lmac_id;
-	uint32_t rxchain_info;
+	uint32_t rxchain_info; /* reserved in _VER_4 */
 	uint32_t dsp_cfg_flags;
 	uint32_t reserved;
-} __packed; /* PHY_CONTEXT_CMD_API_VER_3 */
+} __packed; /* PHY_CONTEXT_CMD_API_VER_3, PHY_CONTEXT_CMD_API_VER_4 */
 
 /* TODO: complete missing documentation */
 /**
@@ -4284,14 +4308,32 @@ struct iwx_mac_data_ibss {
 } __packed; /* IBSS_MAC_DATA_API_S_VER_1 */
 
 /**
+ * enum iwx_mac_data_policy - policy of the data path for this MAC
+ * @TWT_SUPPORTED: twt is supported
+ * @MORE_DATA_ACK_SUPPORTED: AP supports More Data Ack according to
+ *	paragraph 9.4.1.17 in P802.11ax_D4 specification. Used for TWT
+ *	early termination detection.
+ * @FLEXIBLE_TWT_SUPPORTED: AP supports flexible TWT schedule
+ * @PROTECTED_TWT_SUPPORTED: AP supports protected TWT frames (with 11w)
+ * @BROADCAST_TWT_SUPPORTED: AP and STA support broadcast TWT
+ * @COEX_HIGH_PRIORITY_ENABLE: high priority mode for BT coex, to be used
+ *	during 802.1X negotiation (and allowed during 4-way-HS)
+ */
+#define IWX_TWT_SUPPORTED BIT		(1 << 0)
+#define IWX_MORE_DATA_ACK_SUPPORTED	(1 << 1)
+#define	IWX_FLEXIBLE_TWT_SUPPORTED	(1 << 2)
+#define IWX_PROTECTED_TWT_SUPPORTED	(1 << 3)
+#define IWX_BROADCAST_TWT_SUPPORTED	(1 << 4)
+#define IWX_COEX_HIGH_PRIORITY_ENABLE	(1 << 5)
+
+/**
  * struct iwx_mac_data_sta - configuration data for station MAC context
  * @is_assoc: 1 for associated state, 0 otherwise
  * @dtim_time: DTIM arrival time in system time
  * @dtim_tsf: DTIM arrival time in TSF
  * @bi: beacon interval in TU, applicable only when associated
- * @bi_reciprocal: 2^32 / bi , applicable only when associated
+ * @data_policy: see &enum iwl_mac_data_policy
  * @dtim_interval: DTIM interval in TU, applicable only when associated
- * @dtim_reciprocal: 2^32 / dtim_interval , applicable only when associated
  * @listen_interval: in beacon intervals, applicable only when associated
  * @assoc_id: unique ID assigned by the AP during association
  */
@@ -4300,13 +4342,13 @@ struct iwx_mac_data_sta {
 	uint32_t dtim_time;
 	uint64_t dtim_tsf;
 	uint32_t bi;
-	uint32_t bi_reciprocal;
+	uint32_t reserved1;
 	uint32_t dtim_interval;
-	uint32_t dtim_reciprocal;
+	uint32_t data_policy;
 	uint32_t listen_interval;
 	uint32_t assoc_id;
 	uint32_t assoc_beacon_arrive_time;
-} __packed; /* IWX_STA_MAC_DATA_API_S_VER_1 */
+} __packed; /* IWX_STA_MAC_DATA_API_S_VER_2 */
 
 /**
  * struct iwx_mac_data_go - configuration data for P2P GO MAC context
@@ -4882,7 +4924,7 @@ enum {
 #define IWX_RATE_INVM_PLCP	0xff
 
 /*
- * rate_n_flags bit fields
+ * rate_n_flags bit fields version 1
  *
  * The 32-bit value has different layouts in the low 8 bites depending on the
  * format. There are three formats, HT, VHT and legacy (11abg, with subformats
@@ -4900,15 +4942,15 @@ enum {
 
 /* Bit 8: (1) HT format, (0) legacy or VHT format */
 #define IWX_RATE_MCS_HT_POS 8
-#define IWX_RATE_MCS_HT_MSK (1 << IWX_RATE_MCS_HT_POS)
+#define IWX_RATE_MCS_HT_MSK_V1 (1 << IWX_RATE_MCS_HT_POS)
 
 /* Bit 9: (1) CCK, (0) OFDM.  HT (bit 8) must be "0" for this bit to be valid */
-#define IWX_RATE_MCS_CCK_POS 9
-#define IWX_RATE_MCS_CCK_MSK (1 << IWX_RATE_MCS_CCK_POS)
+#define IWX_RATE_MCS_CCK_POS_V1 9
+#define IWX_RATE_MCS_CCK_MSK_V1 (1 << IWX_RATE_MCS_CCK_POS_V1)
 
 /* Bit 26: (1) VHT format, (0) legacy format in bits 8:0 */
-#define IWX_RATE_MCS_VHT_POS 26
-#define IWX_RATE_MCS_VHT_MSK (1 << IWX_RATE_MCS_VHT_POS)
+#define IWX_RATE_MCS_VHT_POS_V1 26
+#define IWX_RATE_MCS_VHT_MSK_V1 (1 << IWX_RATE_MCS_VHT_POS_V1)
 
 
 /*
@@ -4934,15 +4976,16 @@ enum {
  * streams and 16-23 have three streams. We could also support MCS 32
  * which is the duplicate 20 MHz MCS (bit 5 set, all others zero.)
  */
-#define IWX_RATE_HT_MCS_RATE_CODE_MSK	0x7
-#define IWX_RATE_HT_MCS_NSS_POS             3
-#define IWX_RATE_HT_MCS_NSS_MSK             (3 << IWX_RATE_HT_MCS_NSS_POS)
+#define IWX_RATE_HT_MCS_RATE_CODE_MSK_V1	0x7
+#define IWX_RATE_HT_MCS_NSS_POS_V1             3
+#define IWX_RATE_HT_MCS_NSS_MSK_V1             (3 << IWX_RATE_HT_MCS_NSS_POS_V1)
+#define IWX_RATE_HT_MCS_MIMO2_MSK_V1           (1 << IWX_RATE_HT_MCS_NSS_POS_V1)
 
 /* Bit 10: (1) Use Green Field preamble */
 #define IWX_RATE_HT_MCS_GF_POS		10
 #define IWX_RATE_HT_MCS_GF_MSK		(1 << IWX_RATE_HT_MCS_GF_POS)
 
-#define IWX_RATE_HT_MCS_INDEX_MSK		0x3f
+#define IWX_RATE_HT_MCS_INDEX_MSK_V1		0x3f
 
 /*
  * Very High-throughput (VHT) rate format for bits 7:0
@@ -4958,6 +5001,7 @@ enum {
 #define IWX_RATE_VHT_MCS_RATE_CODE_MSK	0xf
 #define IWX_RATE_VHT_MCS_NSS_POS		4
 #define IWX_RATE_VHT_MCS_NSS_MSK		(3 << IWX_RATE_VHT_MCS_NSS_POS)
+#define IWX_RATE_VHT_MCS_MIMO2_MSK		(1 << IWX_RATE_VHT_MCS_NSS_POS)
 
 /*
  * Legacy OFDM rate format for bits 7:0
@@ -4981,55 +5025,242 @@ enum {
  *        110)  11 Mbps
  * (bit 7 is 0)
  */
-#define IWX_RATE_LEGACY_RATE_MSK 0xff
+#define IWX_RATE_LEGACY_RATE_MSK_V1 0xff
 
+/* Bit 10 - OFDM HE */
+#define IWX_RATE_MCS_HE_POS_V1	10
+#define IWX_RATE_MCS_HE_MSK_V1	(1 << RATE_MCS_HE_POS_V1)
 
 /*
  * Bit 11-12: (0) 20MHz, (1) 40MHz, (2) 80MHz, (3) 160MHz
  * 0 and 1 are valid for HT and VHT, 2 and 3 only for VHT
  */
 #define IWX_RATE_MCS_CHAN_WIDTH_POS		11
-#define IWX_RATE_MCS_CHAN_WIDTH_MSK		(3 << IWX_RATE_MCS_CHAN_WIDTH_POS)
-#define IWX_RATE_MCS_CHAN_WIDTH_20		(0 << IWX_RATE_MCS_CHAN_WIDTH_POS)
-#define IWX_RATE_MCS_CHAN_WIDTH_40		(1 << IWX_RATE_MCS_CHAN_WIDTH_POS)
-#define IWX_RATE_MCS_CHAN_WIDTH_80		(2 << IWX_RATE_MCS_CHAN_WIDTH_POS)
-#define IWX_RATE_MCS_CHAN_WIDTH_160		(3 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_MSK_V1		(3 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_20_V1		(0 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_40_V1		(1 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_80_V1		(2 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_160_V1		(3 << IWX_RATE_MCS_CHAN_WIDTH_POS)
 
 /* Bit 13: (1) Short guard interval (0.4 usec), (0) normal GI (0.8 usec) */
-#define IWX_RATE_MCS_SGI_POS		13
-#define IWX_RATE_MCS_SGI_MSK		(1 << IWX_RATE_MCS_SGI_POS)
+#define IWX_RATE_MCS_SGI_POS_V1		13
+#define IWX_RATE_MCS_SGI_MSK_V1		(1 << IWX_RATE_MCS_SGI_POS_V1)
 
-/* Bit 14-16: Antenna selection (1) Ant A, (2) Ant B, (4) Ant C */
+/* Bit 14-16: Antenna selection (1) Ant A, (2) Ant B, (4) Ant C (unused) */
 #define IWX_RATE_MCS_ANT_POS		14
 #define IWX_RATE_MCS_ANT_A_MSK		(1 << IWX_RATE_MCS_ANT_POS)
 #define IWX_RATE_MCS_ANT_B_MSK		(2 << IWX_RATE_MCS_ANT_POS)
-#define IWX_RATE_MCS_ANT_C_MSK		(4 << IWX_RATE_MCS_ANT_POS)
 #define IWX_RATE_MCS_ANT_AB_MSK		(IWX_RATE_MCS_ANT_A_MSK | \
 					 IWX_RATE_MCS_ANT_B_MSK)
-#define IWX_RATE_MCS_ANT_ABC_MSK		(IWX_RATE_MCS_ANT_AB_MSK | \
-					 IWX_RATE_MCS_ANT_C_MSK)
 #define IWX_RATE_MCS_ANT_MSK		IWX_RATE_MCS_ANT_ABC_MSK
-#define IWX_RATE_MCS_ANT_NUM 3
+#define IWX_RATE_MCS_ANT_NUM 2
 
-/* Bit 17-18: (0) SS, (1) SS*2 */
+/* Bit 17: (0) SS, (1) SS*2 */
 #define IWX_RATE_MCS_STBC_POS		17
 #define IWX_RATE_MCS_STBC_MSK		(1 << IWX_RATE_MCS_STBC_POS)
+
+/* Bit 18: OFDM-HE dual carrier mode */
+#define IWX_RATE_HE_DUAL_CARRIER_MODE	18
+#define IWX_RATE_HE_DUAL_CARRIER_MODE_MSK (1 << IWX_RATE_HE_DUAL_CARRIER_MODE)
 
 /* Bit 19: (0) Beamforming is off, (1) Beamforming is on */
 #define IWX_RATE_MCS_BF_POS			19
 #define IWX_RATE_MCS_BF_MSK			(1 << IWX_RATE_MCS_BF_POS)
 
-/* Bit 20: (0) ZLF is off, (1) ZLF is on */
-#define IWX_RATE_MCS_ZLF_POS		20
-#define IWX_RATE_MCS_ZLF_MSK		(1 << IWX_RATE_MCS_ZLF_POS)
+/*
+ * Bit 20-21: HE LTF type and guard interval
+ * HE (ext) SU:
+ *	0			1xLTF+0.8us
+ *	1			2xLTF+0.8us
+ *	2			2xLTF+1.6us
+ *	3 & SGI (bit 13) clear	4xLTF+3.2us
+ *	3 & SGI (bit 13) set	4xLTF+0.8us
+ * HE MU:
+ *	0			4xLTF+0.8us
+ *	1			2xLTF+0.8us
+ *	2			2xLTF+1.6us
+ *	3			4xLTF+3.2us
+ * HE TRIG:
+ *	0			1xLTF+1.6us
+ *	1			2xLTF+1.6us
+ *	2			4xLTF+3.2us
+ *	3			(does not occur)
+ */
+#define IWX_RATE_MCS_HE_GI_LTF_POS	20
+#define IWX_RATE_MCS_HE_GI_LTF_MSK_V1	(3 << IWX_RATE_MCS_HE_GI_LTF_POS)
+
+/* Bit 22-23: HE type. (0) SU, (1) SU_EXT, (2) MU, (3) trigger based */
+#define IWX_RATE_MCS_HE_TYPE_POS_V1	22
+#define IWX_RATE_MCS_HE_TYPE_SU_V1	(0 << IWX_RATE_MCS_HE_TYPE_POS_V1)
+#define IWX_RATE_MCS_HE_TYPE_EXT_SU_V1	(1 << IWX_RATE_MCS_HE_TYPE_POS_V1)
+#define IWX_RATE_MCS_HE_TYPE_MU_V1	(2 << IWX_RATE_MCS_HE_TYPE_POS_V1)
+#define IWX_RATE_MCS_HE_TYPE_TRIG_V1	(3 << IWX_RATE_MCS_HE_TYPE_POS_V1)
+#define IWX_RATE_MCS_HE_TYPE_MSK_V1	(3 << IWX_RATE_MCS_HE_TYPE_POS_V1)
 
 /* Bit 24-25: (0) 20MHz (no dup), (1) 2x20MHz, (2) 4x20MHz, 3 8x20MHz */
-#define IWX_RATE_MCS_DUP_POS		24
-#define IWX_RATE_MCS_DUP_MSK		(3 << IWX_RATE_MCS_DUP_POS)
+#define IWX_RATE_MCS_DUP_POS_V1		24
+#define IWX_RATE_MCS_DUP_MSK_V1		(3 << IWX_RATE_MCS_DUP_POS_V1)
 
 /* Bit 27: (1) LDPC enabled, (0) LDPC disabled */
-#define IWX_RATE_MCS_LDPC_POS		27
-#define IWX_RATE_MCS_LDPC_MSK		(1 << IWX_RATE_MCS_LDPC_POS)
+#define IWX_RATE_MCS_LDPC_POS_V1	27
+#define IWX_RATE_MCS_LDPC_MSK_V1	(1 << IWX_RATE_MCS_LDPC_POS_V1)
+
+/* Bit 28: (1) 106-tone RX (8 MHz RU), (0) normal bandwidth */
+#define IWX_RATE_MCS_HE_106T_POS_V1	28
+#define IWX_RATE_MCS_HE_106T_MSK_V1	(1 << IWX_RATE_MCS_HE_106T_POS_V1)
+
+/* Bit 30-31: (1) RTS, (2) CTS */
+#define IWX_RATE_MCS_RTS_REQUIRED_POS  (30)
+#define IWX_RATE_MCS_RTS_REQUIRED_MSK  (1 << IWX_RATE_MCS_RTS_REQUIRED_POS)
+#define IWX_RATE_MCS_CTS_REQUIRED_POS  (31)
+#define IWX_RATE_MCS_CTS_REQUIRED_MSK  (1 << IWX_RATE_MCS_CTS_REQUIRED_POS)
+
+
+/* rate_n_flags bit field version 2
+ *
+ * The 32-bit value has different layouts in the low 8 bits depending on the
+ * format. There are three formats, HT, VHT and legacy (11abg, with subformats
+ * for CCK and OFDM).
+ *
+ */
+
+/* Bits 10-8: rate format
+ * (0) Legacy CCK (1) Legacy OFDM (2) High-throughput (HT)
+ * (3) Very High-throughput (VHT) (4) High-efficiency (HE)
+ * (5) Extremely High-throughput (EHT)
+ */
+#define IWX_RATE_MCS_MOD_TYPE_POS	8
+#define IWX_RATE_MCS_MOD_TYPE_MSK	(0x7 << IWX_RATE_MCS_MOD_TYPE_POS)
+#define IWX_RATE_MCS_CCK_MSK		(0 << IWX_RATE_MCS_MOD_TYPE_POS)
+#define IWX_RATE_MCS_LEGACY_OFDM_MSK	(1 << IWX_RATE_MCS_MOD_TYPE_POS)
+#define IWX_RATE_MCS_HT_MSK		(2 << IWX_RATE_MCS_MOD_TYPE_POS)
+#define IWX_RATE_MCS_VHT_MSK		(3 << IWX_RATE_MCS_MOD_TYPE_POS)
+#define IWX_RATE_MCS_HE_MSK		(4 << IWX_RATE_MCS_MOD_TYPE_POS)
+#define IWX_RATE_MCS_EHT_MSK		(5 << IWX_RATE_MCS_MOD_TYPE_POS)
+
+/*
+ * Legacy CCK rate format for bits 0:3:
+ *
+ * (0) 0xa - 1 Mbps
+ * (1) 0x14 - 2 Mbps
+ * (2) 0x37 - 5.5 Mbps
+ * (3) 0x6e - 11 nbps
+ *
+ * Legacy OFDM rate format for bits 0:3:
+ *
+ * (0) 6 Mbps
+ * (1) 9 Mbps
+ * (2) 12 Mbps
+ * (3) 18 Mbps
+ * (4) 24 Mbps
+ * (5) 36 Mbps
+ * (6) 48 Mbps
+ * (7) 54 Mbps
+ *
+ */
+#define IWX_RATE_LEGACY_RATE_MSK	0x7
+
+/*
+ * HT, VHT, HE, EHT rate format for bits 3:0
+ * 3-0: MCS
+ *
+ */
+#define IWX_RATE_HT_MCS_CODE_MSK	0x7
+#define IWX_RATE_MCS_NSS_POS		4
+#define IWX_RATE_MCS_NSS_MSK		(1 << IWX_RATE_MCS_NSS_POS)
+#define IWX_RATE_MCS_CODE_MSK		0xf
+#define IWX_RATE_HT_MCS_INDEX(r)	((((r) & IWX_RATE_MCS_NSS_MSK) >> 1) | \
+					 ((r) & IWX_RATE_HT_MCS_CODE_MSK))
+
+/* Bits 7-5: reserved */
+
+/*
+ * Bits 13-11: (0) 20MHz, (1) 40MHz, (2) 80MHz, (3) 160MHz, (4) 320MHz
+ */
+#define IWX_RATE_MCS_CHAN_WIDTH_MSK	(0x7 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_20	(0 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_40	(1 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_80	(2 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_160	(3 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+#define IWX_RATE_MCS_CHAN_WIDTH_320	(4 << IWX_RATE_MCS_CHAN_WIDTH_POS)
+
+/* Bit 15-14: Antenna selection:
+ * Bit 14: Ant A active
+ * Bit 15: Ant B active
+ *
+ * All relevant definitions are same as in v1
+ */
+
+/* Bit 16 (1) LDPC enables, (0) LDPC disabled */
+#define IWX_RATE_MCS_LDPC_POS	16
+#define IWX_RATE_MCS_LDPC_MSK	(1 << IWX_RATE_MCS_LDPC_POS)
+
+/* Bit 17: (0) SS, (1) SS*2 (same as v1) */
+
+/* Bit 18: OFDM-HE dual carrier mode (same as v1) */
+
+/* Bit 19: (0) Beamforming is off, (1) Beamforming is on (same as v1) */
+
+/*
+ * Bit 22-20: HE LTF type and guard interval
+ * CCK:
+ *	0			long preamble
+ *	1			short preamble
+ * HT/VHT:
+ *	0			0.8us
+ *	1			0.4us
+ * HE (ext) SU:
+ *	0			1xLTF+0.8us
+ *	1			2xLTF+0.8us
+ *	2			2xLTF+1.6us
+ *	3			4xLTF+3.2us
+ *	4			4xLTF+0.8us
+ * HE MU:
+ *	0			4xLTF+0.8us
+ *	1			2xLTF+0.8us
+ *	2			2xLTF+1.6us
+ *	3			4xLTF+3.2us
+ * HE TRIG:
+ *	0			1xLTF+1.6us
+ *	1			2xLTF+1.6us
+ *	2			4xLTF+3.2us
+ * */
+#define IWX_RATE_MCS_HE_GI_LTF_MSK	(0x7 << IWX_RATE_MCS_HE_GI_LTF_POS)
+#define IWX_RATE_MCS_SGI_POS		IWX_RATE_MCS_HE_GI_LTF_POS
+#define IWX_RATE_MCS_SGI_MSK		(1 << IWX_RATE_MCS_SGI_POS)
+#define IWX_RATE_MCS_HE_SU_4_LTF	3
+#define IWX_RATE_MCS_HE_SU_4_LTF_08_GI	4
+
+/* Bit 24-23: HE type. (0) SU, (1) SU_EXT, (2) MU, (3) trigger based */
+#define IWX_RATE_MCS_HE_TYPE_POS	23
+#define IWX_RATE_MCS_HE_TYPE_SU		(0 << IWX_RATE_MCS_HE_TYPE_POS)
+#define IWX_RATE_MCS_HE_TYPE_EXT_SU	(1 << IWX_RATE_MCS_HE_TYPE_POS)
+#define IWX_RATE_MCS_HE_TYPE_MU		(2 << IWX_RATE_MCS_HE_TYPE_POS)
+#define IWX_RATE_MCS_HE_TYPE_TRIG	(3 << IWX_RATE_MCS_HE_TYPE_POS)
+#define IWX_RATE_MCS_HE_TYPE_MSK	(3 << IWX_RATE_MCS_HE_TYPE_POS)
+
+/* Bit 25: duplicate channel enabled
+ *
+ * if this bit is set, duplicate is according to BW (bits 11-13):
+ *
+ * CCK:  2x 20MHz
+ * OFDM Legacy: N x 20Mhz, (N = BW \ 2 , either 2, 4, 8, 16)
+ * EHT: 2 x BW/2, (80 - 2x40, 160 - 2x80, 320 - 2x160)
+ * */
+#define IWX_RATE_MCS_DUP_POS		25
+#define IWX_RATE_MCS_DUP_MSK		(1 << IWX_RATE_MCS_DUP_POS)
+
+/* Bit 26: (1) 106-tone RX (8 MHz RU), (0) normal bandwidth */
+#define IWX_RATE_MCS_HE_106T_POS	26
+#define IWX_RATE_MCS_HE_106T_MSK	(1 << IWX_RATE_MCS_HE_106T_POS)
+
+/* Bit 27: EHT extra LTF:
+ * instead of 1 LTF for SISO use 2 LTFs,
+ * instead of 2 LTFs for NSTS=2 use 4 LTFs*/
+#define IWX_RATE_MCS_EHT_EXTRA_LTF_POS	27
+#define IWX_RATE_MCS_EHT_EXTRA_LTF_MSK	(1 << IWX_RATE_MCS_EHT_EXTRA_LTF_POS)
+
+/* Bit 31-28: reserved */
 
 
 /* Link Quality definitions */
@@ -5063,6 +5294,192 @@ enum {
 #define IWX_LQ_FLAG_DYNAMIC_BW_POS          6
 #define IWX_LQ_FLAG_DYNAMIC_BW_MSK          (1 << IWX_LQ_FLAG_DYNAMIC_BW_POS)
 
+#define IWX_RLC_CHAIN_INFO_DRIVER_FORCE		(1 << 0)
+#define IWL_RLC_CHAIN_INFO_VALID		0x000e
+#define IWL_RLC_CHAIN_INFO_FORCE		0x0070
+#define IWL_RLC_CHAIN_INFO_FORCE_MIMO		0x0380
+#define IWL_RLC_CHAIN_INFO_COUNT		0x0c00
+#define IWL_RLC_CHAIN_INFO_MIMO_COUNT		0x3000
+
+/**
+ * struct iwx_rlc_properties - RLC properties
+ * @rx_chain_info: RX chain info, IWX_RLC_CHAIN_INFO_*
+ * @reserved: reserved
+ */
+struct iwx_rlc_properties {
+	uint32_t rx_chain_info;
+	uint32_t reserved;
+} __packed; /* RLC_PROPERTIES_S_VER_1 */
+
+#define IWX_SAD_MODE_ENABLED		(1 << 0)
+#define IWX_SAD_MODE_DEFAULT_ANT_MSK	0x6
+#define IWX_SAD_MODE_DEFAULT_ANT_FW	0x0
+#define IWX_SAD_MODE_DEFAULT_ANT_A	0x2
+#define IWX_SAD_MODE_DEFAULT_ANT_B	0x4
+
+/**
+ * struct iwx_sad_properties - SAD properties
+ * @chain_a_sad_mode: chain A SAD mode, IWX_SAD_MODE_*
+ * @chain_b_sad_mode: chain B SAD mode, IWX_SAD_MODE_*
+ * @mac_id: MAC index
+ * @reserved: reserved
+ */
+struct iwx_sad_properties {
+	uint32_t chain_a_sad_mode;
+	uint32_t chain_b_sad_mode;
+	uint32_t mac_id;
+	uint32_t reserved;
+} __packed;
+
+/**
+ * struct iwx_rlc_config_cmd - RLC configuration
+ * @phy_id: PHY index
+ * @rlc: RLC properties, &struct iwx_rlc_properties
+ * @sad: SAD (single antenna diversity) options, &struct iwx_sad_properties
+ * @flags: flags, IWX_RLC_FLAGS_*
+ * @reserved: reserved
+ */
+struct iwx_rlc_config_cmd {
+	uint32_t phy_id;
+	struct iwx_rlc_properties rlc;
+	struct iwx_sad_properties sad;
+	uint8_t flags;
+	uint8_t reserved[3];
+} __packed; /* RLC_CONFIG_CMD_API_S_VER_2 */
+
+#define IWX_MAX_BAID_OLD	16 /* MAX_IMMEDIATE_BA_API_D_VER_2 */
+#define IWX_MAX_BAID		32 /* MAX_IMMEDIATE_BA_API_D_VER_3 */
+
+/**
+ * BAID allocation/config action
+ * @IWX_RX_BAID_ACTION_ADD: add a new BAID session
+ * @IWX_RX_BAID_ACTION_MODIFY: modify the BAID session
+ * @IWX_RX_BAID_ACTION_REMOVE: remove the BAID session
+ */
+#define IWX_RX_BAID_ACTION_ADD		0
+#define IWX_RX_BAID_ACTION_MODIFY	1
+#define IWX_RX_BAID_ACTION_REMOVE	2
+/*  RX_BAID_ALLOCATION_ACTION_E_VER_1 */
+
+/**
+ * struct iwx_rx_baid_cfg_cmd_alloc - BAID allocation data
+ * @sta_id_mask: station ID mask
+ * @tid: the TID for this session
+ * @reserved: reserved
+ * @ssn: the starting sequence number
+ * @win_size: RX BA session window size
+ */
+struct iwx_rx_baid_cfg_cmd_alloc {
+	uint32_t sta_id_mask;
+	uint8_t tid;
+	uint8_t reserved[3];
+	uint16_t ssn;
+	uint16_t win_size;
+} __packed; /* RX_BAID_ALLOCATION_ADD_CMD_API_S_VER_1 */
+
+/**
+ * struct iwx_rx_baid_cfg_cmd_modify - BAID modification data
+ * @old_sta_id_mask: old station ID mask
+ * @new_sta_id_mask: new station ID mask
+ * @tid: TID of the BAID
+ */
+struct iwx_rx_baid_cfg_cmd_modify {
+	uint32_t old_sta_id_mask;
+	uint32_t new_sta_id_mask;
+	uint32_t tid;
+} __packed; /* RX_BAID_ALLOCATION_MODIFY_CMD_API_S_VER_2 */
+
+/**
+ * struct iwx_rx_baid_cfg_cmd_remove_v1 - BAID removal data
+ * @baid: the BAID to remove
+ */
+struct iwx_rx_baid_cfg_cmd_remove_v1 {
+	uint32_t baid;
+} __packed; /* RX_BAID_ALLOCATION_REMOVE_CMD_API_S_VER_1 */
+
+/**
+ * struct iwx_rx_baid_cfg_cmd_remove - BAID removal data
+ * @sta_id_mask: the station mask of the BAID to remove
+ * @tid: the TID of the BAID to remove
+ */
+struct iwx_rx_baid_cfg_cmd_remove {
+	uint32_t sta_id_mask;
+	uint32_t tid;
+} __packed; /* RX_BAID_ALLOCATION_REMOVE_CMD_API_S_VER_2 */
+
+/**
+ * struct iwx_rx_baid_cfg_cmd - BAID allocation/config command
+ * @action: the action, from &enum iwx_rx_baid_action
+ */
+struct iwx_rx_baid_cfg_cmd {
+	uint32_t action;
+	union {
+		struct iwx_rx_baid_cfg_cmd_alloc alloc;
+		struct iwx_rx_baid_cfg_cmd_modify modify;
+		struct iwx_rx_baid_cfg_cmd_remove_v1 remove_v1;
+		struct iwx_rx_baid_cfg_cmd_remove remove;
+	}; /* RX_BAID_ALLOCATION_OPERATION_API_U_VER_2 */
+} __packed; /* RX_BAID_ALLOCATION_CONFIG_CMD_API_S_VER_2 */
+
+/**
+ * struct iwx_rx_baid_cfg_resp - BAID allocation response
+ * @baid: the allocated BAID
+ */
+struct iwx_rx_baid_cfg_resp {
+	uint32_t baid;
+}; /* RX_BAID_ALLOCATION_RESPONSE_API_S_VER_1 */
+
+/**
+ * scheduler queue operation
+ * @IWX_SCD_QUEUE_ADD: allocate a new queue
+ * @IWX_SCD_QUEUE_REMOVE: remove a queue
+ * @IWX_SCD_QUEUE_MODIFY: modify a queue
+ */
+#define IWX_SCD_QUEUE_ADD	0
+#define IWX_SCD_QUEUE_REMOVE	1
+#define IWX_SCD_QUEUE_MODIFY	2
+
+/**
+ * struct iwx_scd_queue_cfg_cmd - scheduler queue allocation command
+ * @operation: the operation, see &enum iwl_scd_queue_cfg_operation
+ * @u.add.sta_mask: station mask
+ * @u.add.tid: TID
+ * @u.add.reserved: reserved
+ * @u.add.flags: flags from &enum iwl_tx_queue_cfg_actions, except
+ *	%TX_QUEUE_CFG_ENABLE_QUEUE is not valid
+ * @u.add.cb_size: size code
+ * @u.add.bc_dram_addr: byte-count table IOVA
+ * @u.add.tfdq_dram_addr: TFD queue IOVA
+ * @u.remove.sta_mask: station mask of queue to remove
+ * @u.remove.tid: TID of queue to remove
+ * @u.modify.old_sta_mask: old station mask for modify
+ * @u.modify.tid: TID of queue to modify
+ * @u.modify.new_sta_mask: new station mask for modify
+ */
+struct iwx_scd_queue_cfg_cmd {
+	uint32_t operation;
+	union {
+		struct {
+			uint32_t sta_mask;
+			uint8_t tid;
+			uint8_t reserved[3];
+			uint32_t flags;
+			uint32_t cb_size;
+			uint64_t bc_dram_addr;
+			uint64_t tfdq_dram_addr;
+		} __packed add; /* TX_QUEUE_CFG_CMD_ADD_API_S_VER_1 */
+		struct {
+			uint32_t sta_mask;
+			uint32_t tid;
+		} __packed remove; /* TX_QUEUE_CFG_CMD_REMOVE_API_S_VER_1 */
+		struct {
+			uint32_t old_sta_mask;
+			uint32_t tid;
+			uint32_t new_sta_mask;
+		} __packed modify; /* TX_QUEUE_CFG_CMD_MODIFY_API_S_VER_1 */
+	} __packed u; /* TX_QUEUE_CFG_CMD_OPERATION_API_U_VER_1 */
+} __packed; /* TX_QUEUE_CFG_CMD_API_S_VER_3 */
+
 /**
  * Options for TLC config flags
  * @IWX_TLC_MNG_CFG_FLAGS_STBC_MSK: enable STBC. For HE this enables STBC for
@@ -5089,14 +5506,14 @@ enum {
  * @IWX_TLC_MNG_CH_WIDTH_40MHZ: 40MHZ channel
  * @IWX_TLC_MNG_CH_WIDTH_80MHZ: 80MHZ channel
  * @IWX_TLC_MNG_CH_WIDTH_160MHZ: 160MHZ channel
- * @IWX_TLC_MNG_CH_WIDTH_LAST: maximum value
+ * @IWX_TLC_MNG_CH_WIDTH_320MHZ: 320MHZ channel
  */
 enum iwx_tlc_mng_cfg_cw {
 	IWX_TLC_MNG_CH_WIDTH_20MHZ,
 	IWX_TLC_MNG_CH_WIDTH_40MHZ,
 	IWX_TLC_MNG_CH_WIDTH_80MHZ,
 	IWX_TLC_MNG_CH_WIDTH_160MHZ,
-	IWX_TLC_MNG_CH_WIDTH_LAST = IWX_TLC_MNG_CH_WIDTH_160MHZ,
+	IWX_TLC_MNG_CH_WIDTH_320MHZ,
 };
 
 /**
@@ -5114,8 +5531,7 @@ enum iwx_tlc_mng_cfg_cw {
  * @IWX_TLC_MNG_MODE_HT: enable HT
  * @IWX_TLC_MNG_MODE_VHT: enable VHT
  * @IWX_TLC_MNG_MODE_HE: enable HE
- * @IWX_TLC_MNG_MODE_INVALID: invalid value
- * @IWX_TLC_MNG_MODE_NUM: a count of possible modes
+ * @IWX_TLC_MNG_MODE_EHT: enable EHT
  */
 enum iwx_tlc_mng_cfg_mode {
 	IWX_TLC_MNG_MODE_CCK = 0,
@@ -5124,8 +5540,7 @@ enum iwx_tlc_mng_cfg_mode {
 	IWX_TLC_MNG_MODE_HT,
 	IWX_TLC_MNG_MODE_VHT,
 	IWX_TLC_MNG_MODE_HE,
-	IWX_TLC_MNG_MODE_INVALID,
-	IWX_TLC_MNG_MODE_NUM = IWX_TLC_MNG_MODE_INVALID,
+	IWX_TLC_MNG_MODE_EHT,
 };
 
 /**
@@ -5163,11 +5578,23 @@ enum iwx_tlc_mng_ht_rates {
 #define IWX_TLC_NSS_2	1
 #define IWX_TLC_NSS_MAX	2
 
-#define IWX_TLC_HT_BW_NONE_160	0
-#define IWX_TLC_HT_BW_160	1
 
 /**
- * struct iwx_tlc_config_cmd - TLC configuration
+ * IWX_TLC_MCS_PER_BW - mcs index per BW
+ * @IWX_TLC_MCS_PER_BW_80: mcs for bw - 20Hhz, 40Hhz, 80Hhz
+ * @IWX_TLC_MCS_PER_BW_160: mcs for bw - 160Mhz
+ * @IWX_TLC_MCS_PER_BW_320: mcs for bw - 320Mhz
+ * @IWX_TLC_MCS_PER_BW_NUM_V3: number of entries up to version 3
+ * @IWX_TLC_MCS_PER_BW_NUM_V4: number of entries from version 4
+ */
+#define IWX_TLC_MCS_PER_BW_80	0
+#define IWX_TLC_MCS_PER_BW_160	1
+#define IWX_TLC_MCS_PER_BW_320  2
+#define IWX_TLC_MCS_PER_BW_NUM_V3	(IWX_TLC_MCS_PER_BW_160 + 1)
+#define IWX_TLC_MCS_PER_BW_NUM_V4	(IWX_TLC_MCS_PER_BW_320 + 1)
+
+/**
+ * struct iwx_tlc_config_cmd_v3 - TLC configuration version 3
  * @sta_id: station id
  * @reserved1: reserved
  * @max_ch_width: max supported channel width from @enum iwx_tlc_mng_cfg_cw
@@ -5176,16 +5603,16 @@ enum iwx_tlc_mng_ht_rates {
  * @amsdu: 1 = TX amsdu is supported, 0 = not supported
  * @flags: bitmask of IWX_TLC_MNG_CFG_*
  * @non_ht_rates: bitmap of supported legacy rates
- * @ht_rates: bitmap of &enum iwx_tlc_mng_ht_rates, per <nss, channel-width>
+ * @ht_rates: MCS index 0 - 11, per <nss, channel-width>
  *	      pair (0 - 80mhz width and below, 1 - 160mhz).
  * @max_mpdu_len: max MPDU length, in bytes
  * @sgi_ch_width_supp: bitmap of SGI support per channel width
- *		       use (1 << @enum iwx_tlc_mng_cfg_cw)
+ *		       use (1 << IWX_TLC_MNG_CFG_CW_*)
  * @reserved2: reserved
  * @max_tx_op: max TXOP in uSecs for all AC (BK, BE, VO, VI),
  *	       set zero for no limit.
  */
-struct iwx_tlc_config_cmd {
+struct iwx_tlc_config_cmd_v3 {
 	uint8_t sta_id;
 	uint8_t reserved1[3];
 	uint8_t max_ch_width;
@@ -5194,12 +5621,43 @@ struct iwx_tlc_config_cmd {
 	uint8_t amsdu;
 	uint16_t flags;
 	uint16_t non_ht_rates;
-	uint16_t ht_rates[IWX_TLC_NSS_MAX][2];
+	uint16_t ht_rates[IWX_TLC_NSS_MAX][IWX_TLC_MCS_PER_BW_NUM_V3];
 	uint16_t max_mpdu_len;
 	uint8_t sgi_ch_width_supp;
 	uint8_t reserved2;
 	uint32_t max_tx_op;
 } __packed; /* TLC_MNG_CONFIG_CMD_API_S_VER_3 */
+
+/**
+ * struct iwx_tlc_config_cmd_v4 - TLC configuration
+ * @sta_id: station id
+ * @reserved1: reserved
+ * @max_ch_width: max supported channel width from @enum iwx_tlc_mng_cfg_cw
+ * @mode: &enum iwx_tlc_mng_cfg_mode
+ * @chains: bitmask of IWX_TLC_MNG_CHAIN_*_MSK
+ * @sgi_ch_width_supp: bitmap of SGI support per channel width
+ *		       use (1 << IWX_TLC_MNG_CFG_CW_*)
+ * @flags: bitmask of IWX_TLC_MNG_CFG_*
+ * @non_ht_rates: bitmap of supported legacy rates
+ * @ht_rates: MCS index 0 - 11, per <nss, channel-width>
+ *	      pair (0 - 80mhz width and below, 1 - 160mhz, 2 - 320mhz).
+ * @max_mpdu_len: max MPDU length, in bytes
+ * @max_tx_op: max TXOP in uSecs for all AC (BK, BE, VO, VI),
+ *	       set zero for no limit.
+ */
+struct iwx_tlc_config_cmd_v4 {
+	uint8_t sta_id;
+	uint8_t reserved1[3];
+	uint8_t max_ch_width;
+	uint8_t mode;
+	uint8_t chains;
+	uint8_t sgi_ch_width_supp;
+	uint16_t flags;
+	uint16_t non_ht_rates;
+	uint16_t ht_rates[IWX_TLC_NSS_MAX][IWX_TLC_MCS_PER_BW_NUM_V4];
+	uint16_t max_mpdu_len;
+	uint16_t max_tx_op;
+} __packed; /* TLC_MNG_CONFIG_CMD_API_S_VER_4 */
 
 /**
  * @IWX_TLC_NOTIF_FLAG_RATE: last initial rate update
@@ -5213,7 +5671,8 @@ struct iwx_tlc_config_cmd {
  * @sta_id: station id
  * @reserved: reserved
  * @flags: bitmap of notifications reported
- * @rate: current initial rate
+ * @rate: current initial rate; using rate_n_flags version 1 if notification
+ *  version is < 3 at run-time, else rate_n_flags version 2
  * @amsdu_size: Max AMSDU size, in bytes
  * @amsdu_enabled: bitmap for per-TID AMSDU enablement
  */
@@ -5344,10 +5803,14 @@ struct iwx_dram_sec_info {
  * @IWX_TX_FLAGS_HIGH_PRI: high priority frame (like EAPOL) - can affect rate
  *	selection, retry limits and BT kill
  */
+/* Valid for TX_FLAGS_BITS_API_S_VER_3: */
 #define IWX_TX_FLAGS_CMD_RATE		(1 << 0)
 #define IWX_TX_FLAGS_ENCRYPT_DIS	(1 << 1)
 #define IWX_TX_FLAGS_HIGH_PRI		(1 << 2)
-/* TX_FLAGS_BITS_API_S_VER_3 */
+/* Valid for TX_FLAGS_BITS_API_S_VER_4 and above: */
+#define IWX_TX_FLAGS_RTS		(1 << 3)
+#define IWX_TX_FLAGS_CTS		(1 << 4)
+/* TX_FLAGS_BITS_API_S_VER_4 */
 
 /**
  * struct iwx_tx_cmd_gen2 - TX command struct to FW for 22000 devices

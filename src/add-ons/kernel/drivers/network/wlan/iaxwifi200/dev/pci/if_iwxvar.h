@@ -1,4 +1,4 @@
-/*	$OpenBSD: if_iwxvar.h,v 1.37 2022/05/14 05:48:44 stsp Exp $	*/
+/*	$OpenBSD: if_iwxvar.h,v 1.41 2023/03/06 11:53:24 stsp Exp $	*/
 
 /*
  * Copyright (c) 2014 genua mbh <info@genua.de>
@@ -123,7 +123,7 @@ struct iwx_tx_radiotap_header {
 	 (1 << IEEE80211_RADIOTAP_RATE) |				\
 	 (1 << IEEE80211_RADIOTAP_CHANNEL))
 
-#define IWX_UCODE_SECT_MAX 54
+#define IWX_UCODE_SECT_MAX 57
 
 /*
  * fw_status is used to determine if we've already parsed the firmware file
@@ -471,21 +471,21 @@ struct iwx_device_cfg {
 };
 
 /* Firmware listed here must be available in fw_update(8). */
-#define IWX_CC_A_FW	    	"iwx-cc-a0-67"
-#define IWX_TY_A_GF_A_FW	"iwx-ty-a0-gf-a0-67"
+#define IWX_CC_A_FW	    	"iwx-cc-a0-77"
+#define IWX_TY_A_GF_A_FW	"iwx-ty-a0-gf-a0-77"
 #define IWX_TY_A_GF_A_PNVM	"iwx-ty-a0-gf-a0.pnvm"
-#define IWX_QU_B_HR_B_FW	"iwx-Qu-b0-hr-b0-63"
-#define IWX_QU_B_JF_B_FW	"iwx-Qu-b0-jf-b0-63"
-#define IWX_QU_C_HR_B_FW	"iwx-Qu-c0-hr-b0-63"
-#define IWX_QU_C_JF_B_FW	"iwx-Qu-c0-jf-b0-63"
-#define IWX_QUZ_A_HR_B_FW	"iwx-QuZ-a0-hr-b0-67"
-#define IWX_QUZ_A_JF_B_FW	"iwx-QuZ-a0-jf-b0-63"
-#define IWX_SO_A_GF_A_FW	"iwx-so-a0-gf-a0-67"
+#define IWX_QU_B_HR_B_FW	"iwx-Qu-b0-hr-b0-77"
+#define IWX_QU_B_JF_B_FW	"iwx-Qu-b0-jf-b0-77"
+#define IWX_QU_C_HR_B_FW	"iwx-Qu-c0-hr-b0-77"
+#define IWX_QU_C_JF_B_FW	"iwx-Qu-c0-jf-b0-77"
+#define IWX_QUZ_A_HR_B_FW	"iwx-QuZ-a0-hr-b0-77"
+#define IWX_QUZ_A_JF_B_FW	"iwx-QuZ-a0-jf-b0-77"
+#define IWX_SO_A_GF_A_FW	"iwx-so-a0-gf-a0-77"
 #define IWX_SO_A_GF_A_PNVM	"iwx-so-a0-gf-a0.pnvm"
-#define IWX_SO_A_GF4_A_FW	"iwx-so-a0-gf4-a0-67"
+#define IWX_SO_A_GF4_A_FW	"iwx-so-a0-gf4-a0-77"
 #define IWX_SO_A_GF4_A_PNVM	"iwx-so-a0-gf4-a0.pnvm"
-#define IWX_SO_A_HR_B_FW	"iwx-so-a0-hr-b0-64"
-#define IWX_SO_A_JF_B_FW	"iwx-so-a0-jf-b0-64"
+#define IWX_SO_A_HR_B_FW	"iwx-so-a0-hr-b0-77"
+#define IWX_SO_A_JF_B_FW	"iwx-so-a0-jf-b0-77"
 
 const struct iwx_device_cfg iwx_9560_quz_a0_jf_b0_cfg = {
 	.fw_name = IWX_QUZ_A_JF_B_FW,
@@ -718,6 +718,7 @@ struct iwx_softc {
 #define IWX_MAX_FW_CMD_VERSIONS	704
 	struct iwx_fw_cmd_version cmd_versions[IWX_MAX_FW_CMD_VERSIONS];
 	int n_cmd_versions;
+	int sc_rate_n_flags_version;
 
 	int sc_intmask;
 	int sc_flags;
@@ -752,8 +753,6 @@ struct iwx_softc {
 
 	int sc_scan_last_antenna;
 
-	int sc_fixed_ridx;
-
 	int sc_staid;
 	int sc_nodecolor;
 
@@ -765,7 +764,6 @@ struct iwx_softc {
 
 	struct iwx_rx_phy_info sc_last_phy_info;
 	int sc_ampdu_ref;
-#define IWX_MAX_BAID	32
 	struct iwx_rxba_data sc_rxba_data[IWX_MAX_BAID];
 
 	uint32_t sc_time_event_uid;
