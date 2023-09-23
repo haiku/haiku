@@ -13,8 +13,7 @@
 
 
 typedef struct spinlock_contention_info {
-	uint64	thread_spinlock_counter;
-	uint64	team_spinlock_counter;
+	bigtime_t	thread_creation_spinlock;
 } spinlock_contention_info;
 
 

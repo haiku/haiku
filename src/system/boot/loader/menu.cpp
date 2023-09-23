@@ -1428,16 +1428,6 @@ add_debug_menu()
 	Menu* menu = new(std::nothrow) Menu(STANDARD_MENU, "Debug Options");
 	MenuItem* item;
 
-#if DEBUG_SPINLOCK_LATENCIES
-	item = new(std::nothrow) MenuItem("Disable latency checks");
-	if (item != NULL) {
-		item->SetType(MENU_ITEM_MARKABLE);
-		item->SetData(B_SAFEMODE_DISABLE_LATENCY_CHECK);
-		item->SetHelpText("Disables latency check panics.");
-		menu->AddItem(item);
-	}
-#endif
-
 	menu->AddItem(item
 		= new(nothrow) MenuItem("Enable serial debug output"));
 	item->SetData("serial_debug_output");

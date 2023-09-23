@@ -249,10 +249,9 @@ main(int argc, char** argv)
 		time_string(tickTime, buffer));
 
 	// print results
-	static const char* const kLockNames[] = { "thread", "team", NULL };
-	uint64 lockCounts[] = {
-		endInfo.thread_spinlock_counter - startInfo.thread_spinlock_counter,
-		endInfo.team_spinlock_counter - startInfo.team_spinlock_counter
+	static const char* const kLockNames[] = { "thread creation", NULL };
+	bigtime_t lockCounts[] = {
+		endInfo.thread_creation_spinlock - startInfo.thread_creation_spinlock,
 	};
 
 	printf("\nlock             counter            time   wasted %% CPU\n");

@@ -21,15 +21,19 @@ typedef ulong cpu_status;
 #if B_DEBUG_SPINLOCK_CONTENTION
 	typedef struct {
 		int32	lock;
-		int32	count_low;
-		int32	count_high;
+		int32		failed_try_acquire;
+		bigtime_t	total_wait;
+		bigtime_t	total_held;
+		bigtime_t	last_acquired;
 	} spinlock;
 
-#	define B_SPINLOCK_INITIALIZER { 0, 0, 0 }
+#	define B_SPINLOCK_INITIALIZER { 0, 0, 0, 0, 0 }
 #	define B_INITIALIZE_SPINLOCK(spinlock)	do {	\
 			(spinlock)->lock = 0;					\
-			(spinlock)->count_low = 0;				\
-			(spinlock)->count_high = 0;				\
+			(spinlock)->failed_try_acquire = 0;		\
+			(spinlock)->total_wait = 0;				\
+			(spinlock)->total_held = 0;				\
+			(spinlock)->last_acquired = 0;			\
 		} while (false)
 #else
 	typedef struct {
