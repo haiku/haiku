@@ -203,7 +203,7 @@ extern "C" {
 		move.l	%1,-(%%sp) \n			\
 		move.w	%[calln],-(%%sp)\n		\
 		trap	%[trapn]\n			\
-		add.l	#18,%%sp \n "			\
+		add.l	#20,%%sp \n "			\
 	: "=r"(retvalue)	/* output */		\
 	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3), "r"(_p4),				\
