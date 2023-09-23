@@ -280,14 +280,6 @@ arch_debug_contains_call(Thread *thread, const char *symbol,
 }
 
 
-void *
-arch_debug_get_caller(void)
-{
-	struct stack_frame *frame = get_current_stack_frame()->previous;
-	return (void *)frame->previous->return_address;
-}
-
-
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	int32 skipIframes, int32 skipFrames, uint32 flags)

@@ -1117,14 +1117,6 @@ arch_debug_contains_call(Thread* thread, const char* symbol, addr_t start,
 }
 
 
-void*
-arch_debug_get_caller(void)
-{
-	stack_frame* frame = (stack_frame*)x86_get_stack_frame();
-	return (void*)frame->previous->return_address;
-}
-
-
 /*!	Captures a stack trace (the return addresses) of the current thread.
 	\param returnAddresses The array the return address shall be written to.
 	\param maxCount The maximum number of return addresses to be captured.

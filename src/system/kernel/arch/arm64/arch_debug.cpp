@@ -449,13 +449,6 @@ arch_debug_stack_trace(void)
 }
 
 
-void *
-arch_debug_get_caller(void)
-{
-	return NULL;
-}
-
-
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	int32 skipIframes, int32 skipFrames, uint32 flags)

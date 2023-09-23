@@ -467,15 +467,6 @@ arch_debug_stack_trace(void)
 }
 
 
-void *
-arch_debug_get_caller(void)
-{
-	/* Return the thread id as the kernel (for example the lock code) actually
-	   gets a somewhat valid indication of the caller back. */
-	return (void*) thread_get_current_thread_id();
-}
-
-
 int32
 arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	int32 skipIframes, int32 skipFrames, uint32 flags)
