@@ -1811,6 +1811,8 @@ debug_trap_cpu_in_kdl(int32 cpu, bool returnIfHandedOver)
 	sCPUTrapped[cpu] = true;
 
 	while (sInDebugger != 0) {
+		cpu_pause();
+
 		if (sHandOverKDL && sHandOverKDLToCPU == cpu) {
 			if (returnIfHandedOver)
 				break;
