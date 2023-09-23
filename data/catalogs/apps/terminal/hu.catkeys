@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	4000370057
+1	hungarian	x-vnd.Haiku-Terminal	185459086
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
@@ -131,7 +131,6 @@ Close window	Terminal TermWindow		Ablak bezárása
 ANSI magenta color	Terminal ThemeView		ANSI magenta
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\n© 2001-2019 Haiku, Inc.\n© 1999 Kazuho Okui és Takashi Murai.\n\nHasználat: %s [OPCIÓ] [RENDSZERHÉJ]\n
 cyan	Terminal ThemeView		cián
-Colors	System name		Színek
 Clear all	Terminal TermWindow		Összes törlése
 Cursor	Terminal ThemeView		Kurzor
 Search forward	Terminal FindWindow		Keresés előre

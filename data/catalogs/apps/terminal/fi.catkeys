@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	4000370057
+1	finnish	x-vnd.Haiku-Terminal	185459086
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Komentotulkin käynnistäminen Pääteikkunassa epäonnistui.
@@ -131,7 +131,6 @@ Close window	Terminal TermWindow		Sulje ikkuna
 ANSI magenta color	Terminal ThemeView		ANSI-violetti väri
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku-pääteikkuna\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KUORI]\n
 cyan	Terminal ThemeView		sinivihreä
-Colors	System name		Värit
 Clear all	Terminal TermWindow		Tyhjennä kaikki
 Cursor	Terminal ThemeView		Kohdistin
 Search forward	Terminal FindWindow		Etsintä eteenpäin

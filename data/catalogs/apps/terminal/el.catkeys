@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4000370057
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	185459086
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Το Τερματικό δε μπορεί να ξεκινήσει το κέλυφος. Λυπούμαστε.
@@ -131,7 +131,6 @@ Close window	Terminal TermWindow		Κλείσιμο παραθύρου
 ANSI magenta color	Terminal ThemeView		ματζέντα (ANSI)
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Τερματικό Haiku\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai.\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
 cyan	Terminal ThemeView		γαλάζιο
-Colors	System name		Χρώματα
 Clear all	Terminal TermWindow		Καθαρισμός όλων
 Cursor	Terminal ThemeView		Κέρσορας
 Search forward	Terminal FindWindow		Αναζήτηση μπροστά

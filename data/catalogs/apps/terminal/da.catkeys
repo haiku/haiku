@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Terminal	4000370057
+1	danish	x-vnd.Haiku-Terminal	185459086
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke køre skallen. Beklager.
@@ -131,7 +131,6 @@ Close window	Terminal TermWindow		Luk vindue
 ANSI magenta color	Terminal ThemeView		ANSI magenta farve
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nOphavsret 2001-2019 Haiku, Inc.\nOphavsret(C) 1999 Kazuho Okui og Takashi Murai.\n\nBrug: %s [TILVALG] [SKAL]\n
 cyan	Terminal ThemeView		cyan
-Colors	System name		Farver
 Clear all	Terminal TermWindow		Slet alt
 Cursor	Terminal ThemeView		Markør
 Search forward	Terminal FindWindow		Søg fremad

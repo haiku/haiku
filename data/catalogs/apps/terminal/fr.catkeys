@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	4000370057
+1	french	x-vnd.Haiku-Terminal	185459086
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
@@ -131,7 +131,6 @@ Close window	Terminal TermWindow		Fermer la fenêtre
 ANSI magenta color	Terminal ThemeView		Magenta ANSI
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright ©1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
 cyan	Terminal ThemeView		cyan
-Colors	System name		Couleurs
 Clear all	Terminal TermWindow		Effacer tout
 Cursor	Terminal ThemeView		Curseur
 Search forward	Terminal FindWindow		Rechercher en avant
