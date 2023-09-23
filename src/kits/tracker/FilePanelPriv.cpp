@@ -1261,7 +1261,7 @@ TFilePanel::MessageReceived(BMessage* message)
 						// all we have to do is see if the button is enabled.
 						BButton* button = dynamic_cast<BButton*>(
 							FindView("default button"));
-						if (button == NULL)
+						if (button == NULL || !button->IsEnabled())
 							break;
 
 						if (IsSavePanel()) {
