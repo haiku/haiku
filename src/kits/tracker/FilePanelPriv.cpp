@@ -581,13 +581,6 @@ TFilePanel::SetClientObject(BFilePanel* panel)
 }
 
 
-bool
-TFilePanel::IsOpenButtonAlwaysEnabled() const
-{
-	return !fIsSavePanel && (fNodeFlavors & B_DIRECTORY_NODE) != 0;
-}
-
-
 void
 TFilePanel::AdjustButton()
 {
@@ -645,11 +638,14 @@ TFilePanel::AdjustButton()
 					break;
 				}
 			}
+		} else if ((fNodeFlavors & B_DIRECTORY_NODE) != 0) {
+			// No selection, but the current directory could be opened.
+			enabled = true;
 		}
 	}
 
 	button->SetLabel(buttonText.String());
-	button->SetEnabled(IsOpenButtonAlwaysEnabled() || enabled);
+	button->SetEnabled(enabled);
 }
 
 
@@ -1725,7 +1721,8 @@ TFilePanel::HandleOpenButton()
 		}
 
 		OpenSelectionCommon(&message);
-	} else if (IsOpenButtonAlwaysEnabled()) {
+	} else if ((fNodeFlavors & B_DIRECTORY_NODE) != 0) {
+		// Open the current directory.
 		BMessage message(*fMessage);
 		message.AddRef("refs", TargetModel()->EntryRef());
 		OpenSelectionCommon(&message);
