@@ -8,7 +8,7 @@ SECTIONS
 	. = 0x00080000;
 
 	/* text/read-only data */
-	.text :	{ *(.text .gnu.linkonce.t.*) }
+	.text :	{ *(.text .text.* .gnu.linkonce.t.*) }
 
 	. = ALIGN(0x4);
 	__ctor_list = .;
@@ -16,6 +16,7 @@ SECTIONS
 	__ctor_end = .;
 
 	.rodata : { *(.rodata .rodata.*) }
+	_haiku_revision : { *(_haiku_revision) }
 
 	/* writable data  */
 	. = ALIGN(0x1000);

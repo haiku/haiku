@@ -46,6 +46,8 @@ SECTIONS
 	/*	*(.rel.rodata) *(.rel.gnu.linkonce.r*)
 		*(.rela.rodata) *(.rela.gnu.linkonce.r*) */
 	}
+	_haiku_revision : { *(_haiku_revision) }
+
 	/* writable data  */
 	/* NO! . = ALIGN(0x1000); */
 	. = ALIGN(0x1000);
