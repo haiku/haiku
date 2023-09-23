@@ -29,19 +29,6 @@ class Handle : public Node {
 		int16		fHandle;
 };
 
-/* character devices */
-class CharHandle : public Handle {
-	public:
-		CharHandle(int handle);
-		CharHandle();
-		virtual ~CharHandle();
-
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
-
-	protected:
-};
-
 /* block devices */
 /* cf. devices.cpp */
 

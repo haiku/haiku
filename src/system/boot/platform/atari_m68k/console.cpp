@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2023, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -11,7 +11,6 @@
 #include "toscalls.h"
 #include <util/kernel_cpp.h>
 
-#include "Handle.h"
 #include "console.h"
 #include "keyboard.h"
 
@@ -21,49 +20,39 @@ static bool sForceBW = false;	// force black & white for Milan
 
 // TOS emulates a VT52
 
-class ConsoleHandle : public CharHandle {
+class Console : public ConsoleNode {
 	public:
-		ConsoleHandle();
+		Console();
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
 			size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
-};
 
-class InputConsoleHandle : public ConsoleHandle {
-	public:
-		InputConsoleHandle();
-
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
-			size_t bufferSize);
-
-		void PutChar(char c);
-		void PutChars(const char *buffer, int count);
-		char GetChar();
-
+		void ClearScreen();
+		int32 Width();
+		int32 Height();
+		void SetCursor(int32 x, int32 y);
+		void SetCursorVisible(bool visible);
+		void SetColors(int32 foreground, int32 background);
 	private:
-		enum { BUFFER_SIZE = 32 };
-
-		char	fBuffer[BUFFER_SIZE];
-		int		fStart;
-		int		fCount;
+		int16 fHandle;
 };
 
 
-static InputConsoleHandle sInput;
-static ConsoleHandle sOutput;
+extern ConsoleNode* gConsoleNode;
+static Console sConsole;
 FILE *stdin, *stdout, *stderr;
 
 
-ConsoleHandle::ConsoleHandle()
-	: CharHandle()
+Console::Console()
+	: ConsoleNode(), fHandle(DEV_CONSOLE)
 {
 }
 
 
 ssize_t
-ConsoleHandle::ReadAt(void */*cookie*/, off_t /*pos*/, void *buffer,
+Console::ReadAt(void */*cookie*/, off_t /*pos*/, void *buffer,
 	size_t bufferSize)
 {
 	// don't seek in character devices
@@ -73,7 +62,7 @@ ConsoleHandle::ReadAt(void */*cookie*/, off_t /*pos*/, void *buffer,
 
 
 ssize_t
-ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
+Console::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
@@ -93,168 +82,44 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 }
 
 
-//	#pragma mark -
-
-
-InputConsoleHandle::InputConsoleHandle()
-	: ConsoleHandle()
-	, fStart(0)
-	, fCount(0)
-{
-}
-
-
-ssize_t
-InputConsoleHandle::ReadAt(void */*cookie*/, off_t /*pos*/, void *_buffer,
-	size_t bufferSize)
-{
-	char *buffer = (char*)_buffer;
-
-	// copy buffered bytes first
-	int bytesTotal = 0;
-	while (bufferSize > 0 && fCount > 0) {
-		*buffer++ = GetChar();
-		bytesTotal++;
-		bufferSize--;
-	}
-
-	// read from console
-	if (bufferSize > 0) {
-		ssize_t bytesRead = ConsoleHandle::ReadAt(NULL, 0, buffer, bufferSize);
-		if (bytesRead < 0)
-			return bytesRead;
-		bytesTotal += bytesRead;
-	}
-
-	return bytesTotal;
-}
-
-
 void
-InputConsoleHandle::PutChar(char c)
+Console::ClearScreen()
 {
-	if (fCount >= BUFFER_SIZE)
-		return;
-
-	int pos = (fStart + fCount) % BUFFER_SIZE;
-	fBuffer[pos] = c;
-	fCount++;
-}
-
-
-void
-InputConsoleHandle::PutChars(const char *buffer, int count)
-{
-	for (int i = 0; i < count; i++)
-		PutChar(buffer[i]);
-}
-
-
-char
-InputConsoleHandle::GetChar()
-{
-	if (fCount == 0)
-		return 0;
-
-	fCount--;
-	char c = fBuffer[fStart];
-	fStart = (fStart + 1) % BUFFER_SIZE;
-	return c;
-}
-
-
-//	#pragma mark -
-
-
-static void
-dump_colors()
-{
-	int bg, fg;
-	dprintf("colors:\n");
-	for (bg = 0; bg < 16; bg++) {
-		for (fg = 0; fg < 16; fg++) {
-			console_set_color(fg, bg);
-			dprintf("#");
-		}
-		console_set_color(0, 15);
-		dprintf("\n");
-	}
-}
-
-
-static int32
-dump_milan_modes(SCREENINFO *info, uint32 flags)
-{
-	dprintf("mode: %d '%s':\n flags %08lx @%08lx %dx%d (%dx%d)\n%d planes %d colors fmt %08lx\n",
-		info->devID, info->name, info->scrFlags, info->frameadr,
-		info->scrWidth, info->scrHeight,
-		info->virtWidth, info->virtHeight,
-		info->scrPlanes, info->scrColors, info->scrFormat);
-	return ENUMMODE_CONT;
-}
-
-status_t
-console_init(void)
-{
-	sInput.SetHandle(DEV_CONSOLE);
-	sOutput.SetHandle(DEV_CONSOLE);
-
-	// now that we're initialized, enable stdio functionality
-	stdin = (FILE *)&sInput;
-	stdout = stderr = (FILE *)&sOutput;
-
-	if (tos_find_cookie('_MIL')) {
-		dprintf("Milan detected... forcing black & white\n");
-		/*
-		dprintf("Getrez() = %d\n", Getrez());
-		Setscreen(-1, &dump_milan_modes, MI_MAGIC, CMD_ENUMMODES);
-		Setscreen((void*)-1, (void*)-1, 0, 0);
-		*/
-		sForceBW = true;
-	}
-	//dump_colors();
-
-	return B_OK;
-}
-
-
-// #pragma mark -
-
-
-void
-console_clear_screen(void)
-{
-	sInput.WriteAt(NULL, 0LL, "\033E", 2);
+	Write("\033E", 2);
 }
 
 
 int32
-console_width(void)
+Console::Width()
 {
-	int columnCount = 80; //XXX: check video mode
-	return columnCount;
+	return 80;
 }
 
 
 int32
-console_height(void)
+Console::Height()
 {
-	int lineCount = 25; //XXX: check video mode
-	return lineCount;
+	return 25;
 }
 
 
 void
-console_set_cursor(int32 x, int32 y)
+Console::SetCursor(int32 x, int32 y)
 {
 	char buff[] = "\033Y  ";
 	x = MIN(79,MAX(0,x));
 	y = MIN(24,MAX(0,y));
 	buff[3] += (char)x;
 	buff[2] += (char)y;
-	sInput.WriteAt(NULL, 0LL, buff, 4);
+	Write(buff, 4);
 }
 
+
+void
+Console::SetCursorVisible(bool visible)
+{
+	// TODO
+}
 
 static int
 translate_color(int32 color)
@@ -286,12 +151,11 @@ translate_color(int32 color)
 	if (color < 0 || color >= 16)
 		return 0;
 	return cmap[color];
-	//return color;
 }
 
 
 void
-console_set_color(int32 foreground, int32 background)
+Console::SetColors(int32 foreground, int32 background)
 {
 	char buff[] = "\033b \033c ";
 	if (sForceBW) {
@@ -305,20 +169,72 @@ console_set_color(int32 foreground, int32 background)
 	}
 	buff[2] += (char)translate_color(foreground);
 	buff[5] += (char)translate_color(background);
-	sInput.WriteAt(NULL, 0LL, buff, 6);
+	Write(buff, 6);
 }
 
 
-void
-console_show_cursor(void)
+//	#pragma mark -
+
+
+constexpr bool kDumpColors = false;
+constexpr bool kDumpMilanModes = false;
+
+static void
+dump_colors()
 {
+	int bg, fg;
+	dprintf("colors:\n");
+	for (bg = 0; bg < 16; bg++) {
+		for (fg = 0; fg < 16; fg++) {
+			console_set_color(fg, bg);
+			dprintf("#");
+		}
+		console_set_color(0, 15);
+		dprintf("\n");
+	}
 }
 
 
-void
-console_hide_cursor(void)
+static int32
+dump_milan_modes(SCREENINFO *info, uint32 flags)
 {
+	dprintf("mode: %d '%s':\n flags %08" B_PRIx32 " @%08" B_PRIx32 " %dx%d (%dx%d)\n%d planes %d colors fmt %08" B_PRIx32 "\n",
+		info->devID, info->name, info->scrFlags, info->frameadr,
+		info->scrWidth, info->scrHeight,
+		info->virtWidth, info->virtHeight,
+		info->scrPlanes, info->scrColors, info->scrFormat);
+	return ENUMMODE_CONT;
 }
+
+status_t
+console_init(void)
+{
+	gConsoleNode = &sConsole;
+
+	console_clear_screen();
+
+	// enable stdio functionality
+	stdin = (FILE *)&sConsole;
+	stdout = stderr = (FILE *)&sConsole;
+
+	if (tos_find_cookie('_MIL')) {
+		dprintf("Milan detected... forcing black & white\n");
+		if (kDumpMilanModes) {
+			dprintf("Getrez() = %d\n", Getrez());
+			Setscreen(-1, &dump_milan_modes, MI_MAGIC, CMD_ENUMMODES);
+			Setscreen((void*)-1, (void*)-1, 0, 0);
+		}
+		sForceBW = true;
+	}
+
+	if (kDumpColors)
+		dump_colors();
+
+	return B_OK;
+}
+
+
+// #pragma mark -
 
 
 int
