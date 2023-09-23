@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "IncrementViewCounterProcess.h"
@@ -81,13 +81,11 @@ IncrementViewCounterProcess::RunInternal()
 
 	while (attempts > 0 && !WasStopped()) {
 		BMessage resultEnvelope;
-		WebAppInterface& webAppInterface = fModel->GetWebAppInterface();
-		result = webAppInterface.IncrementViewCounter(fPackage, depot,
-			resultEnvelope);
+		WebAppInterface* webAppInterface = fModel->GetWebAppInterface();
+		result = webAppInterface->IncrementViewCounter(fPackage, depot, resultEnvelope);
 
 		if (result == B_OK) {
-			int32 errorCode = webAppInterface.ErrorCodeFromResponse(
-				resultEnvelope);
+			int32 errorCode = WebAppInterface::ErrorCodeFromResponse(resultEnvelope);
 			switch (errorCode) {
 				case ERROR_CODE_NONE:
 					HDINFO("did increment the view counter for [%s]",

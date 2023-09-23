@@ -293,9 +293,9 @@ void
 ToLatestUserUsageConditionsWindow::_FetchDataPerform()
 {
 	UserUsageConditions conditions;
-	WebAppInterface interface = fModel.GetWebAppInterface();
+	WebAppInterface* interface = fModel.GetWebAppInterface();
 
-	if (interface.RetrieveUserUsageConditions("", conditions) == B_OK) {
+	if (interface->RetrieveUserUsageConditions("", conditions) == B_OK) {
 		BMessage userUsageConditionsMessage;
 		conditions.Archive(&userUsageConditionsMessage, true);
 		BMessage dataMessage(MSG_USER_USAGE_CONDITIONS_DATA);
@@ -362,16 +362,15 @@ ToLatestUserUsageConditionsWindow::_AgreePerform()
 {
 	BMessenger messenger(this);
 	BMessage responsePayload;
-	WebAppInterface webApp = fModel.GetWebAppInterface();
-	status_t result = webApp.AgreeUserUsageConditions(
+	WebAppInterface* webApp = fModel.GetWebAppInterface();
+	status_t result = webApp->AgreeUserUsageConditions(
 		fUserUsageConditions.Code(), responsePayload);
 
 	if (result != B_OK) {
 		ServerHelper::NotifyTransportError(result);
 		messenger.SendMessage(MSG_AGREE_FAILED);
 	} else {
-		int32 errorCode = WebAppInterface::ErrorCodeFromResponse(
-			responsePayload);
+		int32 errorCode = WebAppInterface::ErrorCodeFromResponse(responsePayload);
 		if (errorCode == ERROR_CODE_NONE) {
 			AppUtils::NotifySimpleError(
 				B_TRANSLATE("Usage conditions agreed"),

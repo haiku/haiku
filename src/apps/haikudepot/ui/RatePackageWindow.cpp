@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -544,7 +544,8 @@ RatePackageWindow::_QueryRatingThread()
 		return;
 	}
 
-	WebAppInterface interface;
+	WebAppInterface* interface = fModel.GetWebAppInterface();
+
 	BMessage info;
 	const DepotInfo* depot = fModel.DepotForName(package->DepotName());
 	BString webAppRepositoryCode;
@@ -561,16 +562,15 @@ RatePackageWindow::_QueryRatingThread()
 			"code for depot; %s", package->DepotName().String());
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
-		status_t status = interface
-			.RetreiveUserRatingForPackageAndVersionByUser(package->Name(),
-				package->Version(), package->Architecture(),
+		status_t status = interface->RetrieveUserRatingForPackageAndVersionByUser(
+				package->Name(), package->Version(), package->Architecture(),
 				webAppRepositoryCode, webAppRepositorySourceCode,
 				nickname, info);
 
 		if (status == B_OK) {
 				// could be an error or could be a valid response envelope
 				// containing data.
-			switch (interface.ErrorCodeFromResponse(info)) {
+			switch (WebAppInterface::ErrorCodeFromResponse(info)) {
 				case ERROR_CODE_NONE:
 				{
 					//info.PrintToStream();
@@ -647,7 +647,7 @@ RatePackageWindow::_SendRatingThread()
 		webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
 	}
 
-	WebAppInterface interface = fModel.GetWebAppInterface();
+	WebAppInterface* interface = fModel.GetWebAppInterface();
 
 	Unlock();
 
@@ -672,11 +672,11 @@ RatePackageWindow::_SendRatingThread()
 	BMessage info;
 	if (ratingID.Length() > 0) {
 		HDINFO("will update the existing user rating [%s]", ratingID.String());
-		status = interface.UpdateUserRating(ratingID,
+		status = interface->UpdateUserRating(ratingID,
 			languageCode, comment, stability, rating, active, info);
 	} else {
 		HDINFO("will create a new user rating for pkg [%s]", package.String());
-		status = interface.CreateUserRating(package, fPackage->Version(),
+		status = interface->CreateUserRating(package, fPackage->Version(),
 			architecture, webAppRepositoryCode, webAppRepositorySourceCode,
 			languageCode, comment, stability, rating, info);
 	}
@@ -684,7 +684,7 @@ RatePackageWindow::_SendRatingThread()
 	if (status == B_OK) {
 			// could be an error or could be a valid response envelope
 			// containing data.
-		switch (interface.ErrorCodeFromResponse(info)) {
+		switch (WebAppInterface::ErrorCodeFromResponse(info)) {
 			case ERROR_CODE_NONE:
 			{
 				if (ratingID.Length() > 0)

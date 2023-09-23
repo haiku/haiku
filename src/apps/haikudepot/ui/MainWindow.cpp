@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -653,7 +653,7 @@ main_window_str_to_package_list_view_mode(const BString& str)
 
 
 void
-MainWindow::StoreSettings(BMessage& settings) const
+MainWindow::StoreSettings(BMessage& settings)
 {
 	settings.AddRect(_WindowFrameName(), Frame());
 	if (!fSinglePackageMode) {

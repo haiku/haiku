@@ -55,6 +55,31 @@ UserCredentials::~UserCredentials()
 }
 
 
+UserCredentials&
+UserCredentials::operator=(const UserCredentials& other)
+{
+	fNickname = other.fNickname;
+	fPasswordClear = other.fPasswordClear;
+	fIsSuccessful = other.fIsSuccessful;
+	return *this;
+}
+
+
+bool
+UserCredentials::operator==(const UserCredentials& other) const
+{
+	return fNickname == other.fNickname && fPasswordClear == other.fPasswordClear
+		&& fIsSuccessful == other.fIsSuccessful;
+}
+
+
+bool
+UserCredentials::operator!=(const UserCredentials& other) const
+{
+	return !(*this == other);
+}
+
+
 const BString&
 UserCredentials::Nickname() const
 {
@@ -101,16 +126,6 @@ void
 UserCredentials::SetIsSuccessful(bool value)
 {
 	fIsSuccessful = value;
-}
-
-
-UserCredentials&
-UserCredentials::operator=(const UserCredentials& other)
-{
-	fNickname = other.fNickname;
-	fPasswordClear = other.fPasswordClear;
-	fIsSuccessful = other.fIsSuccessful;
-	return *this;
 }
 
 

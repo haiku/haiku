@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay, apl@lindesay.co.nz
+ * Copyright 2017-2023, Andrew Lindesay, apl@lindesay.co.nz
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,7 +8,9 @@
 #include <TestSuiteAddon.h>
 
 #include "StandardMetaDataJsonEventListenerTest.h"
+#include "DataIOUtilsTest.h"
 #include "DumpExportRepositoryJsonListenerTest.h"
+#include "JwtTokenHelperTest.h"
 #include "ValidationFailureTest.h"
 #include "ValidationUtilsTest.h"
 #include "StorageUtilsTest.h"
@@ -21,7 +23,10 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("HaikuDepot");
 
 	StandardMetaDataJsonEventListenerTest::AddTests(*suite);
+	DataIOUtilsTest::AddTests(*suite);
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
+	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
+	JwtTokenHelperTest::AddTests(*suite);
 	ValidationFailureTest::AddTests(*suite);
 	ValidationUtilsTest::AddTests(*suite);
 	StorageUtilsTest::AddTests(*suite);

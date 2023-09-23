@@ -270,7 +270,7 @@ UserUsageConditionsWindow::_FetchDataPerform()
 {
 	UserDetail userDetail;
 	UserUsageConditions conditions;
-	WebAppInterface interface = fModel.GetWebAppInterface();
+	WebAppInterface* interface = fModel.GetWebAppInterface();
 	BString code;
 	status_t status = _FetchUserUsageConditionsCodePerform(userDetail, code);
 
@@ -291,7 +291,7 @@ UserUsageConditionsWindow::_FetchDataPerform()
 	}
 
 	if (status == B_OK) {
-		if (interface.RetrieveUserUsageConditions(code, conditions) == B_OK) {
+		if (interface->RetrieveUserUsageConditions(code, conditions) == B_OK) {
 			BMessage userUsageConditionsMessage;
 			BMessage userDetailMessage;
 			conditions.Archive(&userUsageConditionsMessage, true);
@@ -334,20 +334,19 @@ status_t
 UserUsageConditionsWindow::_FetchUserUsageConditionsCodeForUserPerform(
 	UserDetail& userDetail, BString& code)
 {
-	WebAppInterface interface = fModel.GetWebAppInterface();
+	WebAppInterface* interface = fModel.GetWebAppInterface();
 
-	if (interface.Nickname().IsEmpty())
+	if (interface->Nickname().IsEmpty())
 		debugger("attempt to get user details for the current user, but"
 			" there is no current user");
 
 	BMessage responseEnvelopeMessage;
-	status_t result = interface.RetrieveCurrentUserDetail(
-		responseEnvelopeMessage);
+	status_t result = interface->RetrieveCurrentUserDetail(responseEnvelopeMessage);
 
 	if (result == B_OK) {
 		// could be an error or could be a valid response envelope
 		// containing data.
-		switch (interface.ErrorCodeFromResponse(responseEnvelopeMessage)) {
+		switch (WebAppInterface::ErrorCodeFromResponse(responseEnvelopeMessage)) {
 			case ERROR_CODE_NONE:
 				result = WebAppInterface::UnpackUserDetail(
 					responseEnvelopeMessage, userDetail);
@@ -368,12 +367,12 @@ UserUsageConditionsWindow::_FetchUserUsageConditionsCodeForUserPerform(
 	if (result == B_OK) {
 		BString userUsageConditionsCode = userDetail.Agreement().Code();
 		HDDEBUG("the user [%s] has agreed to uuc [%s]",
-			interface.Nickname().String(),
+			interface->Nickname().String(),
 			userUsageConditionsCode.String());
 		code.SetTo(userUsageConditionsCode);
 	} else {
 		HDDEBUG("unable to get details of the user [%s]",
-			interface.Nickname().String());
+			interface->Nickname().String());
 	}
 
 	return result;

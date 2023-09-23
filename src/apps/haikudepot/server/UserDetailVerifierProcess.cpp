@@ -99,18 +99,18 @@ UserDetailVerifierProcess::_ShouldVerify()
 status_t
 UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 {
-	WebAppInterface interface = fModel->GetWebAppInterface();
+	WebAppInterface* interface = fModel->GetWebAppInterface();
 	BMessage userDetailResponse;
 	status_t result;
 
-	result = interface.RetrieveCurrentUserDetail(userDetailResponse);
+	result = interface->RetrieveCurrentUserDetail(userDetailResponse);
 	if (result != B_OK) {
 		HDERROR("a problem has arisen retrieving the current user detail: %s",
 			strerror(result));
 	}
 
 	if (result == B_OK) {
-		int32 errorCode = interface.ErrorCodeFromResponse(userDetailResponse);
+		int32 errorCode = WebAppInterface::ErrorCodeFromResponse(userDetailResponse);
 		switch (errorCode) {
 			case ERROR_CODE_NONE:
 				break;
@@ -132,7 +132,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 		// worked, it is now necessary to check to see that the user has agreed
 		// to the most recent user-usage conditions.
 
-		result = interface.UnpackUserDetail(userDetailResponse, userDetail);
+		result = interface->UnpackUserDetail(userDetailResponse, userDetail);
 		if (result != B_OK)
 			HDERROR("it was not possible to unpack the user details.");
 	}

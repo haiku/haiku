@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef DATA_IO_UTILS_H
@@ -37,6 +37,31 @@ public:
 private:
 			BDataIO*			fDelegate;
 			size_t				fLimit;
+};
+
+
+class Base64DecodingDataIO : public BDataIO {
+public:
+								Base64DecodingDataIO(BDataIO* delegate,
+									char char62 = '+', char char63 = '/');
+	virtual						~Base64DecodingDataIO();
+
+	virtual	ssize_t				Read(void* buffer, size_t size);
+	virtual	ssize_t				Write(const void* buffer, size_t size);
+
+	virtual	status_t			Flush();
+
+private:
+			status_t			_ReadSingleByte(void* buffer);
+			status_t			_CharToInt(uint8 ch, uint8* value);
+
+private:
+			BDataIO*			fDelegate;
+			char				fChar62;
+			char				fChar63;
+
+			uint8				fNextByteAssembly;
+			uint8				fNextByteAssemblyBits;
 };
 
 

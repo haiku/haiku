@@ -6,21 +6,24 @@
 
 #include "WebAppInterface.h"
 
-#include <AutoDeleter.h>
 #include <Application.h>
+#include <Message.h>
+#include <Url.h>
+
+#include <AutoDeleter.h>
+#include <AutoLocker.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
 #include <Json.h>
 #include <JsonTextWriter.h>
 #include <JsonMessageWriter.h>
-#include <Message.h>
-#include <Url.h>
 #include <UrlContext.h>
 #include <UrlProtocolListener.h>
 #include <UrlProtocolRoster.h>
 
 #include "DataIOUtils.h"
 #include "HaikuDepotConstants.h"
+#include "JwtTokenHelper.h"
 #include "Logger.h"
 #include "ServerSettings.h"
 #include "ServerHelper.h"
@@ -103,10 +106,6 @@ make_http_request(const BUrl& url, BDataIO* output,
 }
 
 
-int
-WebAppInterface::fRequestIndex = 0;
-
-
 enum {
 	NEEDS_AUTHORIZATION = 1 << 0,
 };
@@ -117,38 +116,26 @@ WebAppInterface::WebAppInterface()
 }
 
 
-WebAppInterface::WebAppInterface(const WebAppInterface& other)
-	:
-	fCredentials(other.fCredentials)
-{
-}
-
-
 WebAppInterface::~WebAppInterface()
 {
 }
 
 
-WebAppInterface&
-WebAppInterface::operator=(const WebAppInterface& other)
-{
-	if (this == &other)
-		return *this;
-	fCredentials = other.fCredentials;
-	return *this;
-}
-
-
 void
-WebAppInterface::SetAuthorization(const UserCredentials& value)
+WebAppInterface::SetCredentials(const UserCredentials& value)
 {
-	fCredentials = value;
+	AutoLocker<BLocker> lock(&fLock);
+	if (fCredentials != value) {
+		fCredentials = value;
+		fAccessToken.Clear();
+	}
 }
 
 
 const BString&
-WebAppInterface::Nickname() const
+WebAppInterface::Nickname()
 {
+	AutoLocker<BLocker> lock(&fLock);
 	return fCredentials.Nickname();
 }
 
@@ -172,7 +159,7 @@ WebAppInterface::GetChangelog(const BString& packageName, BMessage& message)
 
 
 status_t
-WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
+WebAppInterface::RetrieveUserRatingsForPackageForDisplay(
 	const BString& packageName,
 	const BString& webAppRepositoryCode,
 	const BString& webAppRepositorySourceCode,
@@ -209,7 +196,7 @@ WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
 
 
 status_t
-WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
+WebAppInterface::RetrieveUserRatingForPackageAndVersionByUser(
 	const BString& packageName, const BPackageVersion& version,
 	const BString& architecture,
 	const BString& webAppRepositoryCode,
@@ -283,19 +270,40 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 			"to obtain the user detail");
 	}
 
-		// BHttpRequest later takes ownership of this.
-	BMallocIO* requestEnvelopeData = new BMallocIO();
-	BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+	status_t result = B_OK;
 
-	requestEnvelopeWriter.WriteObjectStart();
-	requestEnvelopeWriter.WriteObjectName("nickname");
-	requestEnvelopeWriter.WriteString(credentials.Nickname().String());
-	requestEnvelopeWriter.WriteObjectEnd();
+	// authenticate the user and obtain a token to use with the latter
+	// request.
 
-	status_t result = _SendJsonRequest("user/get-user", credentials,
-		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
-		NEEDS_AUTHORIZATION, message);
-		// note that the credentials used here are passed in as args.
+	BMessage authenticateResponseEnvelopeMessage;
+
+	if (result == B_OK) {
+		result = AuthenticateUser(
+			credentials.Nickname(),
+			credentials.PasswordClear(),
+			authenticateResponseEnvelopeMessage);
+	}
+
+	AccessToken accessToken;
+
+	if (result == B_OK)
+		result = UnpackAccessToken(authenticateResponseEnvelopeMessage, accessToken);
+
+	if (result == B_OK) {
+			// BHttpRequest later takes ownership of this.
+		BMallocIO* requestEnvelopeData = new BMallocIO();
+		BJsonTextWriter requestEnvelopeWriter(requestEnvelopeData);
+
+		requestEnvelopeWriter.WriteObjectStart();
+		requestEnvelopeWriter.WriteObjectName("nickname");
+		requestEnvelopeWriter.WriteString(credentials.Nickname().String());
+		requestEnvelopeWriter.WriteObjectEnd();
+
+		result = _SendJsonRequest("user/get-user", accessToken,
+			requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
+			NEEDS_AUTHORIZATION, message);
+			// note that the credentials used here are passed in as args.
+	}
 
 	return result;
 }
@@ -308,7 +316,8 @@ WebAppInterface::RetrieveUserDetailForCredentials(
 status_t
 WebAppInterface::RetrieveCurrentUserDetail(BMessage& message)
 {
-	return RetrieveUserDetailForCredentials(fCredentials, message);
+	UserCredentials credentials = _Credentials();
+	return RetrieveUserDetailForCredentials(credentials, message);
 }
 
 
@@ -360,6 +369,66 @@ WebAppInterface::UnpackUserDetail(BMessage& responseEnvelopeMessage,
 		}
 
 		userDetail.SetAgreement(agreement);
+	}
+
+	return result;
+}
+
+
+/*! When an authentication API call is made, the response (if successful) will
+    return an access token in the response. This method will take the response
+    from the server and will parse out the access token data into the supplied
+    object.
+*/
+
+/*static*/ status_t
+WebAppInterface::UnpackAccessToken(BMessage& responseEnvelopeMessage,
+	AccessToken& accessToken)
+{
+	status_t result;
+
+	BMessage resultMessage;
+	result = responseEnvelopeMessage.FindMessage(
+		"result", &resultMessage);
+
+	if (result != B_OK) {
+		HDERROR("bad response envelope missing 'result' entry");
+		return result;
+	}
+
+	BString token;
+	result = resultMessage.FindString("token", &token);
+
+	if (result != B_OK || token.IsEmpty()) {
+		HDINFO("failure to authenticate");
+		return HD_AUTHENTICATION_FAILED;
+	}
+
+	// The token should be present in three parts; the header, the claims and
+	// then a digital signature. The logic here wants to extract some data
+	// from the claims part.
+
+	BMessage claimsMessage;
+	result = JwtTokenHelper::ParseClaims(token, claimsMessage);
+
+	if (Logger::IsTraceEnabled()) {
+		HDTRACE("start; token claims...");
+		claimsMessage.PrintToStream();
+		HDTRACE("...end; token claims");
+	}
+
+	if (B_OK == result) {
+		accessToken.SetToken(token);
+		accessToken.SetExpiryTimestamp(0);
+
+		double expiryTimestampDouble;
+
+		// The claims should have parsed but it could transpire that there is
+		// no expiry. This should not be the case, but it is theoretically
+		// possible.
+
+		if (claimsMessage.FindDouble("exp", &expiryTimestampDouble) == B_OK)
+			accessToken.SetExpiryTimestamp(1000 * static_cast<uint64>(expiryTimestampDouble));
 	}
 
 	return result;
@@ -432,7 +501,7 @@ WebAppInterface::AgreeUserUsageConditions(const BString& code,
 	requestEnvelopeWriter.WriteObjectName("userUsageConditionsCode");
 	requestEnvelopeWriter.WriteString(code.String());
 	requestEnvelopeWriter.WriteObjectName("nickname");
-	requestEnvelopeWriter.WriteString(fCredentials.Nickname());
+	requestEnvelopeWriter.WriteString(Nickname());
 	requestEnvelopeWriter.WriteObjectEnd();
 
 	// now fetch this information into an object.
@@ -504,7 +573,7 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	requestEnvelopeWriter.WriteObjectName("pkgVersionType");
 	requestEnvelopeWriter.WriteString("SPECIFIC");
 	requestEnvelopeWriter.WriteObjectName("userNickname");
-	requestEnvelopeWriter.WriteString(fCredentials.Nickname());
+	requestEnvelopeWriter.WriteString(Nickname());
 
 	if (!version.Major().IsEmpty()) {
 		requestEnvelopeWriter.WriteObjectName("pkgVersionMajor");
@@ -668,6 +737,47 @@ WebAppInterface::CreateUser(const BString& nickName,
 }
 
 
+/*! This method will authenticate the user set in the credentials and will
+    retain the resultant access token for authenticating any latter API calls.
+*/
+
+status_t
+WebAppInterface::AuthenticateUserRetainingAccessToken()
+{
+	UserCredentials userCredentials = _Credentials();
+
+	if (!userCredentials.IsValid()) {
+		HDINFO("unable to get a new access token as there are no credentials");
+		return B_NOT_INITIALIZED;
+	}
+
+	return _AuthenticateUserRetainingAccessToken(userCredentials.Nickname(),
+		userCredentials.PasswordClear());
+}
+
+
+status_t
+WebAppInterface::_AuthenticateUserRetainingAccessToken(const BString& nickName,
+	const BString& passwordClear) {
+	AutoLocker<BLocker> lock(&fLock);
+
+	fAccessToken.Clear();
+
+	BMessage responseEnvelopeMessage;
+	status_t result = AuthenticateUser(nickName, passwordClear, responseEnvelopeMessage);
+
+	AccessToken accessToken;
+
+	if (result == B_OK)
+		result = UnpackAccessToken(responseEnvelopeMessage, accessToken);
+
+	if (result == B_OK)
+		fAccessToken = accessToken;
+
+	return result;
+}
+
+
 status_t
 WebAppInterface::AuthenticateUser(const BString& nickName,
 	const BString& passwordClear, BMessage& message)
@@ -800,7 +910,7 @@ WebAppInterface::_RetrievePasswordRequirementsMeta(BMessage& message)
 	not look like an error.
 */
 
-int32
+/*static*/ int32
 WebAppInterface::ErrorCodeFromResponse(BMessage& responseEnvelopeMessage)
 {
 	BMessage error;
@@ -821,17 +931,23 @@ WebAppInterface::ErrorCodeFromResponse(BMessage& responseEnvelopeMessage)
 status_t
 WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	BPositionIO* requestData, size_t requestDataSize, uint32 flags,
-	BMessage& reply) const
+	BMessage& reply)
 {
-	return _SendJsonRequest(urlPathComponents, fCredentials, requestData,
+	bool needsAuthorization = (flags & NEEDS_AUTHORIZATION) != 0;
+	AccessToken accessToken;
+
+	if (needsAuthorization)
+		accessToken = _ObtainValidAccessToken();
+
+	return _SendJsonRequest(urlPathComponents, accessToken, requestData,
 		requestDataSize, flags, reply);
 }
 
 
-status_t
+/*static*/ status_t
 WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
-	UserCredentials credentials, BPositionIO* requestData,
-	size_t requestDataSize, uint32 flags, BMessage& reply) const
+	const AccessToken& accessToken, BPositionIO* requestData,
+	size_t requestDataSize, uint32 flags, BMessage& reply)
 {
 	if (requestDataSize == 0) {
 		HDINFO("%s; empty request payload", PROTOCOL_NAME);
@@ -850,6 +966,15 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 			PROTOCOL_NAME, urlPathComponents);
 		delete requestData;
 		return HD_CLIENT_TOO_OLD;
+	}
+
+	bool needsAuthorization = (flags & NEEDS_AUTHORIZATION) != 0;
+
+	if (needsAuthorization && !accessToken.IsValid()) {
+		HDDEBUG("%s; dropping request to ...[%s] as access token is not valid",
+			PROTOCOL_NAME, urlPathComponents);
+		delete requestData;
+		return B_NOT_ALLOWED;
 	}
 
 	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v2/")
@@ -883,13 +1008,10 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 	request->SetMethod(B_HTTP_POST);
 	request->SetHeaders(headers);
 
-	// Authentication via Basic Authentication
-	// The other way would be to obtain a token and then use the Token Bearer
-	// header.
-	if (((flags & NEEDS_AUTHORIZATION) != 0) && credentials.IsValid()) {
-		BHttpAuthentication authentication(credentials.Nickname(),
-			credentials.PasswordClear());
-		authentication.SetMethod(B_HTTP_AUTHENTICATION_BASIC);
+	if (needsAuthorization) {
+		BHttpAuthentication authentication;
+		authentication.SetMethod(B_HTTP_AUTHENTICATION_BEARER);
+		authentication.SetToken(accessToken.Token());
 		context.AddAuthentication(url, authentication);
 	}
 
@@ -948,7 +1070,7 @@ WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
 
 status_t
 WebAppInterface::_SendJsonRequest(const char* urlPathComponents,
-	const BString& jsonString, uint32 flags, BMessage& reply) const
+	const BString& jsonString, uint32 flags, BMessage& reply)
 {
 	// gets 'adopted' by the subsequent http request.
 	BMemoryIO* data = new BMemoryIO(jsonString.String(),
@@ -1041,4 +1163,33 @@ WebAppInterface::_LengthAndSeekToZero(BPositionIO* data)
 	off_t dataSize = data->Position();
     data->Seek(0, SEEK_SET);
     return dataSize;
+}
+
+
+UserCredentials
+WebAppInterface::_Credentials()
+{
+	AutoLocker<BLocker> lock(&fLock);
+	return fCredentials;
+}
+
+
+AccessToken
+WebAppInterface::_ObtainValidAccessToken()
+{
+	AutoLocker<BLocker> lock(&fLock);
+
+	uint64 now = static_cast<uint64>(time(NULL)) * 1000;
+
+	if (!fAccessToken.IsValid(now)) {
+		HDINFO("clearing cached access token as it is no longer valid");
+		fAccessToken.Clear();
+	}
+
+	if (!fAccessToken.IsValid()) {
+		HDINFO("no cached access token present; will obtain a new one");
+		AuthenticateUserRetainingAccessToken();
+	}
+
+	return fAccessToken;
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -567,7 +567,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		}
 
 		status_t status = fWebAppInterface
-			.RetreiveUserRatingsForPackageForDisplay(packageName,
+			.RetrieveUserRatingsForPackageForDisplay(packageName,
 				webAppRepositoryCode, webAppRepositorySourceCode, 0,
 				PACKAGE_INFO_MAX_USER_RATINGS, info);
 		if (status == B_OK) {
@@ -780,19 +780,19 @@ Model::SetNickname(BString nickname)
 			nickname = "";
 	}
 
-	SetAuthorization(nickname, password, false);
+	SetCredentials(nickname, password, false);
 }
 
 
 const BString&
-Model::Nickname() const
+Model::Nickname()
 {
 	return fWebAppInterface.Nickname();
 }
 
 
 void
-Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
+Model::SetCredentials(const BString& nickname, const BString& passwordClear,
 	bool storePassword)
 {
 	BString existingNickname = Nickname();
@@ -820,7 +820,7 @@ Model::SetAuthorization(const BString& nickname, const BString& passwordClear,
 	}
 
 	BAutolock locker(&fLock);
-	fWebAppInterface.SetAuthorization(UserCredentials(nickname, passwordClear));
+	fWebAppInterface.SetCredentials(UserCredentials(nickname, passwordClear));
 
 	if (nickname != existingNickname)
 		_NotifyAuthorizationChanged();

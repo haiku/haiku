@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2010-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,6 +60,7 @@ BHttpAuthentication::BHttpAuthentication(const BHttpAuthentication& other)
 	fAuthenticationMethod(other.fAuthenticationMethod),
 	fUserName(other.fUserName),
 	fPassword(other.fPassword),
+	fToken(other.fToken),
 	fRealm(other.fRealm),
 	fDigestNonce(other.fDigestNonce),
 	fDigestCnonce(other.fDigestCnonce),
@@ -79,6 +80,7 @@ BHttpAuthentication& BHttpAuthentication::operator=(
 	fAuthenticationMethod = other.fAuthenticationMethod;
 	fUserName = other.fUserName;
 	fPassword = other.fPassword;
+	fToken = other.fToken;
 	fRealm = other.fRealm;
 	fDigestNonce = other.fDigestNonce;
 	fDigestCnonce = other.fDigestCnonce;
@@ -109,6 +111,15 @@ BHttpAuthentication::SetPassword(const BString& password)
 {
 	fLock.Lock();
 	fPassword = password;
+	fLock.Unlock();
+}
+
+
+void
+BHttpAuthentication::SetToken(const BString& token)
+{
+	fLock.Lock();
+	fToken = token;
 	fLock.Unlock();
 }
 
@@ -151,7 +162,9 @@ BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 	else if (authRequired == "digest") {
 		fAuthenticationMethod = B_HTTP_AUTHENTICATION_DIGEST;
 		fDigestAlgorithm = B_HTTP_AUTHENTICATION_ALGORITHM_MD5;
-	} else
+	} else if (authRequired == "bearer")
+		fAuthenticationMethod = B_HTTP_AUTHENTICATION_BEARER;
+	else
 		return B_ERROR;
 
 
@@ -206,6 +219,8 @@ BHttpAuthentication::Initialize(const BString& wwwAuthenticate)
 
 	if (fAuthenticationMethod == B_HTTP_AUTHENTICATION_BASIC)
 		return B_OK;
+	else if (fAuthenticationMethod == B_HTTP_AUTHENTICATION_BEARER)
+		return B_OK;
 	else if (fAuthenticationMethod == B_HTTP_AUTHENTICATION_DIGEST
 			&& fDigestNonce.Length() > 0
 			&& fDigestAlgorithm != B_HTTP_AUTHENTICATION_ALGORITHM_NONE) {
@@ -259,6 +274,10 @@ BHttpAuthentication::Authorization(const BUrl& url, const BString& method) const
 			authorizationString << "Basic " << Base64Encode(basicEncode);
 			break;
 		}
+
+		case B_HTTP_AUTHENTICATION_BEARER:
+			authorizationString << "Bearer " << fToken;
+			break;
 
 		case B_HTTP_AUTHENTICATION_DIGEST:
 		case B_HTTP_AUTHENTICATION_IE_DIGEST:
@@ -384,6 +403,7 @@ BHttpAuthentication::_DigestResponse(const BString& uri, const BString& method) 
 	PRINT(("HttpAuth: Computing digest response: \n"));
 	PRINT(("HttpAuth: > username  = %s\n", fUserName.String()));
 	PRINT(("HttpAuth: > password  = %s\n", fPassword.String()));
+	PRINT(("HttpAuth: > token     = %s\n", fToken.String()));
 	PRINT(("HttpAuth: > realm     = %s\n", fRealm.String()));
 	PRINT(("HttpAuth: > nonce     = %s\n", fDigestNonce.String()));
 	PRINT(("HttpAuth: > cnonce    = %s\n", fDigestCnonce.String()));

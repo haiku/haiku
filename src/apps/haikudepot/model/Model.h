@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -148,14 +148,13 @@ public:
 									uint32 flags);
 
 			void				SetNickname(BString nickname);
-			const BString&		Nickname() const;
-			void				SetAuthorization(const BString& nickname,
+			const BString&		Nickname();
+			void				SetCredentials(const BString& nickname,
 									const BString& passwordClear,
 									bool storePassword);
 
-			WebAppInterface&
-								GetWebAppInterface()
-									{ return fWebAppInterface; }
+			WebAppInterface*    GetWebAppInterface()
+									{ return &fWebAppInterface; }
 
 			status_t			IconTarPath(BPath& path) const;
 			status_t			DumpExportReferenceDataPath(BPath& path);

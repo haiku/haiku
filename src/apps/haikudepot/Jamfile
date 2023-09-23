@@ -113,6 +113,7 @@ local textDocumentSources =
 
 local applicationSources =
 	App.cpp
+	AccessToken.cpp
 	BitmapView.cpp
 	Captcha.cpp
 	CreateUserDetail.cpp
@@ -124,6 +125,7 @@ local applicationSources =
 	IconTarPtr.cpp
 	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
+	JwtTokenHelper.cpp
 	LanguageModel.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp

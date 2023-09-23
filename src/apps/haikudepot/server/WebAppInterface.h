@@ -9,9 +9,11 @@
 
 #include <Application.h>
 #include <JsonWriter.h>
+#include <Locker.h>
 #include <String.h>
 #include <package/PackageVersion.h>
 
+#include "AccessToken.h"
 #include "PackageInfo.h"
 #include "PasswordRequirements.h"
 #include "UserCredentials.h"
@@ -43,26 +45,23 @@ using BPackageKit::BPackageVersion;
 class WebAppInterface {
 public:
 								WebAppInterface();
-								WebAppInterface(const WebAppInterface& other);
 	virtual						~WebAppInterface();
 
-			WebAppInterface&	operator=(const WebAppInterface& other);
-
-			void				SetAuthorization(const UserCredentials& value);
-			const BString&		Nickname() const;
+			void				SetCredentials(const UserCredentials& value);
+			const BString&		Nickname();
 
 			status_t			GetChangelog(
 									const BString& packageName,
 									BMessage& message);
 
-			status_t			RetreiveUserRatingsForPackageForDisplay(
+			status_t			RetrieveUserRatingsForPackageForDisplay(
 									const BString& packageName,
 									const BString& webAppRepositoryCode,
 									const BString& webAppRepositorySourceCode,
 									int resultOffset, int maxResults,
 									BMessage& message);
 
-			status_t			RetreiveUserRatingForPackageAndVersionByUser(
+			status_t			RetrieveUserRatingForPackageAndVersionByUser(
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,
@@ -121,6 +120,8 @@ public:
 									const BString& userUsageConditionsCode,
 									BMessage& message);
 
+			status_t			AuthenticateUserRetainingAccessToken();
+
 			status_t			AuthenticateUser(const BString& nickName,
 									const BString& passwordClear,
 									BMessage& message);
@@ -139,7 +140,17 @@ public:
 	static	status_t			UnpackUserDetail(
 									BMessage& responseEnvelopeMessage,
 									UserDetail& userDetail);
+
+	static	status_t			UnpackAccessToken(
+									BMessage& responseEnvelopeMessage,
+									AccessToken& accessToken);
 private:
+			UserCredentials		_Credentials();
+
+			AccessToken			_ObtainValidAccessToken();
+
+			status_t			_AuthenticateUserRetainingAccessToken(const BString& nickName,
+									const BString& passwordClear);
 
 			status_t			_RetrievePasswordRequirementsMeta(
 									BMessage& message);
@@ -151,16 +162,16 @@ private:
 
 			status_t			_SendJsonRequest(const char* urlPathComponents,
 									const BString& jsonString, uint32 flags,
-									BMessage& reply) const;
-			status_t			_SendJsonRequest(const char* urlPathComponents,
-									UserCredentials credentials,
-									BPositionIO* requestData,
-									size_t requestDataSize, uint32 flags,
-									BMessage& reply) const;
+									BMessage& reply);
 			status_t			_SendJsonRequest(const char* urlPathComponents,
 									BPositionIO* requestData,
 									size_t requestDataSize, uint32 flags,
-									BMessage& reply) const;
+									BMessage& reply);
+	static	status_t			_SendJsonRequest(const char* urlPathComponents,
+									const AccessToken& accessToken,
+									BPositionIO* requestData,
+									size_t requestDataSize, uint32 flags,
+									BMessage& reply);
 
 			status_t			_SendRawGetRequest(
 									const BString urlPathComponents,
@@ -171,7 +182,8 @@ private:
 
 private:
 			UserCredentials		fCredentials;
-	static	int					fRequestIndex;
+			AccessToken			fAccessToken;
+			BLocker				fLock;
 };
 
 

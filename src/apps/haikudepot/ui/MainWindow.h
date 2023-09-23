@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -48,7 +48,7 @@ public:
 	virtual	bool				QuitRequested();
 	virtual	void				MessageReceived(BMessage* message);
 
-			void				StoreSettings(BMessage& message) const;
+			void				StoreSettings(BMessage& message);
 
 	// ProcessCoordinatorConsumer
 	virtual	void				Consume(ProcessCoordinator *item);

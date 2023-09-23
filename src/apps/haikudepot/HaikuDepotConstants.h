@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -66,6 +66,7 @@ enum BitmapSize {
 #define HD_CLIENT_TOO_OLD					(HD_ERROR_BASE + 2)
 #define HD_ERR_NOT_MODIFIED					(HD_ERROR_BASE + 3)
 #define HD_ERR_NO_DATA						(HD_ERROR_BASE + 4)
+#define HD_AUTHENTICATION_FAILED			(HD_ERROR_BASE + 5)
 
 
 #define REPOSITORY_NAME_SYSTEM				"system"

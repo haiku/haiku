@@ -33,12 +33,16 @@ UnitTestLib haikudepottest.so :
 	HaikuDepotTestAddon.cpp
 
 	DataIOUtils.cpp
+	DataIOUtilsTest.cpp
 
 	DumpExportRepositorySource.cpp
 	DumpExportRepositorySourceMirror.cpp
 	DumpExportRepository.cpp
 	DumpExportRepositoryJsonListener.cpp
 	DumpExportRepositoryJsonListenerTest.cpp
+
+	JwtTokenHelper.cpp
+	JwtTokenHelperTest.cpp
 
 	Logger.cpp
 
