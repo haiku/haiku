@@ -243,7 +243,7 @@ PreallocKernelRange()
 		Pte* pte = &root[i];
 		uint64 ppn = mmu_allocate_page() / B_PAGE_SIZE;
 		if (ppn == 0) panic("can't alloc early physical page");
-		memset(VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
+		memset(VirtFromPhys(B_PAGE_SIZE * ppn), 0, B_PAGE_SIZE);
 		Pte newPte {
 			.isValid = true,
 			.isGlobal = true,
