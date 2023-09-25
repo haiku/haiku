@@ -958,14 +958,20 @@
 
 /*!
 	\fn bool BMenu::AddDynamicItem(add_state state)
-	\brief Implemented by subclasses to Add a dynamic item to the menu.
+	\brief Implemented by subclasses to add their own items to the menu.
+
+	This function is called when the menu is shown and will be continuously
+	called until it returns \c false. On the first call, \a state is
+	\c B_INITIAL_ADD. On subsequent calls \a state is \c B_PROCESSING. If the
+	function should stop adding items, such as if the user clicks off of it,
+	the function will be called with \a state set to \c B_ABORT.
 
 	\param state Possibilities include:
 	       - \c B_INITIAL_ADD,
 	       - \c B_PROCESSING,
 	       - \c B_ABORT
 
-	\return \c true if the dynamic item was added, \c false otherwise.
+	\return \c true if there is more to do, \c false otherwise.
 
 	\since Haiku R1
 */
