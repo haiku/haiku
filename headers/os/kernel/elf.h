@@ -350,6 +350,7 @@ typedef struct {
 
 #define PT_LOPROC		0x70000000
 #define PT_ARM_UNWIND	0x70000001
+#define PT_RISCV_ATTRIBUTES	0x70000003
 #define PT_HIPROC		0x7fffffff
 
 /* program header segment flags */

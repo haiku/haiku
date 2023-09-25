@@ -2279,6 +2279,9 @@ load_kernel_add_on(const char *path)
 				continue;
 			case PT_ARM_UNWIND:
 				continue;
+			case PT_RISCV_ATTRIBUTES:
+				// TODO: check ABI compatibility attributes
+				continue;
 			default:
 				dprintf("%s: unhandled pheader type %#" B_PRIx32 "\n", fileName,
 					programHeaders[i].p_type);
