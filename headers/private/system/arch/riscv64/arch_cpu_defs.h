@@ -124,23 +124,20 @@ enum {
 	pteIdxBits = 9,
 };
 
-enum {
-	pteValid    = 0,
-	pteRead     = 1,
-	pteWrite    = 2,
-	pteExec     = 3,
-	pteUser     = 4,
-	pteGlobal   = 5,
-	pteAccessed = 6,
-	pteDirty    = 7,
-};
-
 union Pte {
 	struct {
-		uint64 flags:     8;
-		uint64 rsw:       2;
-		uint64 ppn:      44;
-		uint64 reserved: 10;
+		uint64 isValid:    1;
+		uint64 isRead:     1;
+		uint64 isWrite:    1;
+		uint64 isExec:     1;
+		uint64 isUser:     1;
+		uint64 isGlobal:   1;
+		uint64 isAccessed: 1;
+		uint64 isDirty:    1;
+
+		uint64 rsw:        2;
+		uint64 ppn:       44;
+		uint64 reserved:  10;
 	};
 	uint64 val;
 };

@@ -54,15 +54,15 @@ WritePteFlags(uint32 flags)
 		if ((1 << i) & flags) {
 			if (first) first = false; else dprintf(", ");
 			switch (i) {
-			case pteValid:    dprintf("valid"); break;
-			case pteRead:     dprintf("read"); break;
-			case pteWrite:    dprintf("write"); break;
-			case pteExec:     dprintf("exec"); break;
-			case pteUser:     dprintf("user"); break;
-			case pteGlobal:   dprintf("global"); break;
-			case pteAccessed: dprintf("accessed"); break;
-			case pteDirty:    dprintf("dirty"); break;
-			default:          dprintf("%" B_PRIu32, i);
+			case 0:  dprintf("valid"); break;
+			case 1:  dprintf("read"); break;
+			case 2:  dprintf("write"); break;
+			case 3:  dprintf("exec"); break;
+			case 4:  dprintf("user"); break;
+			case 5:  dprintf("global"); break;
+			case 6:  dprintf("accessed"); break;
+			case 7:  dprintf("dirty"); break;
+			default: dprintf("%" B_PRIu32, i);
 			}
 		}
 	}
@@ -139,14 +139,19 @@ LookupPte(addr_t virtAdr, bool alloc)
 	Pte *pte = (Pte*)VirtFromPhys(sPageTable);
 	for (int level = 2; level > 0; level--) {
 		pte += VirtAdrPte(virtAdr, level);
-		if (!((1 << pteValid) & pte->flags)) {
+		if (!pte->isValid) {
 			if (!alloc)
 				return NULL;
-			pte->ppn = AllocPhysPage() / B_PAGE_SIZE;
-			if (pte->ppn == 0)
+			uint64 ppn = AllocPhysPage() / B_PAGE_SIZE;
+			if (ppn == 0)
 				return NULL;
-			memset((Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
-			pte->flags |= (1 << pteValid) | (IS_KERNEL_ADDRESS(virtAdr) ? (1 << pteGlobal) : 0);
+			memset((Pte*)VirtFromPhys(B_PAGE_SIZE * ppn), 0, B_PAGE_SIZE);
+			Pte newPte {
+				.isValid = true,
+				.isGlobal = IS_KERNEL_ADDRESS(virtAdr),
+				.ppn = ppn
+			};
+			pte->val = newPte.val;
 		}
 		pte = (Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn);
 	}
@@ -163,10 +168,16 @@ Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags)
 	if (pte == NULL)
 		panic("can't allocate page table");
 
-	pte->ppn = physAdr / B_PAGE_SIZE;
-	pte->flags = (1 << pteValid) | (1 << pteAccessed) | (1 << pteDirty)
-		| (IS_KERNEL_ADDRESS(virtAdr) ? (1 << pteGlobal) : 0)
-		| flags;
+	Pte newPte {
+		.isValid = true,
+		.isGlobal = IS_KERNEL_ADDRESS(virtAdr),
+		.isAccessed = true,
+		.isDirty = true,
+		.ppn = physAdr / B_PAGE_SIZE
+	};
+	newPte.val |= flags;
+
+	pte->val = newPte.val;
 }
 
 
@@ -215,10 +226,15 @@ PreallocKernelRange()
 	for (uint64 i = VirtAdrPte(KERNEL_BASE, 2); i <= VirtAdrPte(KERNEL_TOP, 2);
 		i++) {
 		Pte* pte = &root[i];
-		pte->ppn = AllocPhysPage() / B_PAGE_SIZE;
-		if (pte->ppn == 0) panic("can't alloc early physical page");
+		uint64 ppn = AllocPhysPage() / B_PAGE_SIZE;
+		if (ppn == 0) panic("can't alloc early physical page");
 		memset(VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
-		pte->flags |= (1 << pteValid) | (1 << pteGlobal);
+		Pte newPte {
+			.isValid = true,
+			.isGlobal = true,
+			.ppn = ppn
+		};
+		pte->val = newPte.val;
 	}
 }
 
@@ -239,32 +255,30 @@ SetupPageTable()
 	MapRange(gKernelArgs.arch_args.physMap.start,
 		gKernelArgs.physical_memory_range[0].start,
 		gKernelArgs.arch_args.physMap.size,
-		(1 << pteRead) | (1 << pteWrite));
+		Pte {.isRead = true, .isWrite = true}.val);
 
 	// Boot loader
 	MapRangeIdentity((addr_t)gMemBase, &gStackEnd - gMemBase,
-		(1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
+		Pte {.isRead = true, .isWrite = true, .isExec = true}.val);
 
 	// Memory regions
 	MemoryRegion* region;
 	for (region = sRegions; region != NULL; region = region->next) {
-		uint64 flags = 0;
-		if ((region->protection & B_READ_AREA) != 0)
-			flags |= (1 << pteRead);
-		if ((region->protection & B_WRITE_AREA) != 0)
-			flags |= (1 << pteWrite);
-		if ((region->protection & B_EXECUTE_AREA) != 0)
-			flags |= (1 << pteExec);
-		MapRange(region->virtAdr, region->physAdr, region->size, flags);
+		Pte flags {
+			.isRead  = (region->protection & B_READ_AREA)    != 0,
+			.isWrite = (region->protection & B_WRITE_AREA)   != 0,
+			.isExec  = (region->protection & B_EXECUTE_AREA) != 0
+		};
+		MapRange(region->virtAdr, region->physAdr, region->size, flags.val);
 	}
 
 	// Devices
-	MapAddrRange(gKernelArgs.arch_args.clint, (1 << pteRead) | (1 << pteWrite));
-	MapAddrRange(gKernelArgs.arch_args.htif, (1 << pteRead) | (1 << pteWrite));
-	MapAddrRange(gKernelArgs.arch_args.plic, (1 << pteRead) | (1 << pteWrite));
+	MapAddrRange(gKernelArgs.arch_args.clint, Pte {.isRead = true, .isWrite = true}.val);
+	MapAddrRange(gKernelArgs.arch_args.htif, Pte {.isRead = true, .isWrite = true}.val);
+	MapAddrRange(gKernelArgs.arch_args.plic, Pte {.isRead = true, .isWrite = true}.val);
 	if (strcmp(gKernelArgs.arch_args.uart.kind, "") != 0) {
 		MapAddrRange(gKernelArgs.arch_args.uart.regs,
-			(1 << pteRead) | (1 << pteWrite));
+			Pte {.isRead = true, .isWrite = true}.val);
 	}
 }
 

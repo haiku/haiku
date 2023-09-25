@@ -122,7 +122,7 @@ FreePageTable(page_num_t ppn, bool isKernel, uint32 level = 2)
 			end = VirtAdrPte(USER_TOP, 2);
 		}
 		for (uint64 i = beg; i <= end; i++) {
-			if ((1 << pteValid) & pte[i].flags)
+			if (pte[i].isValid)
 				FreePageTable(pte[i].ppn, isKernel, level - 1);
 		}
 	}
@@ -150,7 +150,7 @@ GetPageTableSize(page_num_t ppn, bool isKernel, uint32 level = 2)
 		end = VirtAdrPte(USER_TOP, 2);
 	}
 	for (uint64 i = beg; i <= end; i++) {
-		if ((1 << pteValid) & pte[i].flags)
+		if (pte[i].isValid)
 			size += GetPageTableSize(pte[i].ppn, isKernel, level - 1);
 	}
 	return size;
@@ -160,7 +160,7 @@ GetPageTableSize(page_num_t ppn, bool isKernel, uint32 level = 2)
 //#pragma mark RISCV64VMTranslationMap
 
 
-Pte*
+std::atomic<Pte>*
 RISCV64VMTranslationMap::LookupPte(addr_t virtAdr, bool alloc,
 	vm_page_reservation* reservation)
 {
@@ -185,26 +185,31 @@ RISCV64VMTranslationMap::LookupPte(addr_t virtAdr, bool alloc,
 				i <= VirtAdrPte(KERNEL_TOP, 2); i++) {
 				Pte *pte = &userPageTable[i];
 				pte->ppn = kernelPageTable[i].ppn;
-				pte->flags |= (1 << pteValid);
+				pte->isValid = true;
 			}
 		}
 	}
-	Pte *pte = (Pte*)VirtFromPhys(fPageTable);
+	auto pte = (std::atomic<Pte>*)VirtFromPhys(fPageTable);
 	for (int level = 2; level > 0; level--) {
 		pte += VirtAdrPte(virtAdr, level);
-		if (!((1 << pteValid) & pte->flags)) {
+		if (!pte->load().isValid) {
 			if (!alloc)
 				return NULL;
 			vm_page* page = vm_page_allocate_page(reservation,
 				PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
-			pte->ppn = page->physical_page_number;
-			if (pte->ppn == 0)
+			page_num_t ppn = page->physical_page_number;
+			if (ppn == 0)
 				return NULL;
 			DEBUG_PAGE_ACCESS_END(page);
 			fPageTableSize++;
-			pte->flags |= (1 << pteValid) | (fIsKernel ? (1 << pteGlobal) : 0);
+			Pte newPte {
+				.isValid = true,
+				.isGlobal = fIsKernel,
+				.ppn = ppn
+			};
+			pte->store(newPte);
 		}
-		pte = (Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn);
+		pte = (std::atomic<Pte>*)VirtFromPhys(B_PAGE_SIZE * pte->load().ppn);
 	}
 	pte += VirtAdrPte(virtAdr, 0);
 	return pte;
@@ -214,12 +219,15 @@ RISCV64VMTranslationMap::LookupPte(addr_t virtAdr, bool alloc,
 phys_addr_t
 RISCV64VMTranslationMap::LookupAddr(addr_t virtAdr)
 {
-	Pte* pte = LookupPte(virtAdr, false, NULL);
-	if (pte == NULL || !((1 << pteValid) & pte->flags))
+	std::atomic<Pte>* pte = LookupPte(virtAdr, false, NULL);
+	if (pte == NULL)
 		return 0;
-	if (fIsKernel != (((1 << pteUser) & pte->flags) == 0))
+	Pte pteVal = pte->load();
+	if (!pteVal.isValid)
 		return 0;
-	return pte->ppn * B_PAGE_SIZE;
+	if (fIsKernel != !pteVal.isUser)
+		return 0;
+	return pteVal.ppn * B_PAGE_SIZE;
 }
 
 
@@ -313,36 +321,38 @@ RISCV64VMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	Pte* pte = LookupPte(virtualAddress, true, reservation);
+	std::atomic<Pte>* pte = LookupPte(virtualAddress, true, reservation);
 	if (pte == NULL)
 		panic("can't allocate page table");
 
-	Pte newPte;
-	newPte.ppn = physicalAddress / B_PAGE_SIZE;
-	newPte.flags = (1 << pteValid) | (fIsKernel ? (1 << pteGlobal) : 0);
+	Pte newPte {
+		.isValid = true,
+		.isGlobal = fIsKernel,
+		.ppn = physicalAddress / B_PAGE_SIZE
+	};
 
 	if ((attributes & B_USER_PROTECTION) != 0) {
-		newPte.flags |= (1 << pteUser);
+		newPte.isUser = true;
 		if ((attributes & B_READ_AREA) != 0)
-			newPte.flags |= (1 << pteRead);
+			newPte.isRead = true;
 		if ((attributes & B_WRITE_AREA) != 0)
-			newPte.flags |= (1 << pteWrite);
+			newPte.isWrite = true;
 		if ((attributes & B_EXECUTE_AREA) != 0) {
-			newPte.flags |= (1 << pteExec);
+			newPte.isExec = true;
 			fInvalidCode = true;
 		}
 	} else {
 		if ((attributes & B_KERNEL_READ_AREA) != 0)
-			newPte.flags |= (1 << pteRead);
+			newPte.isRead = true;
 		if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-			newPte.flags |= (1 << pteWrite);
+			newPte.isWrite = true;
 		if ((attributes & B_KERNEL_EXECUTE_AREA) != 0) {
-			newPte.flags |= (1 << pteExec);
+			newPte.isExec = true;
 			fInvalidCode = true;
 		}
 	}
 
-	*pte = newPte;
+	pte->store(newPte);
 
 	// Note: We don't need to invalidate the TLB for this address, as previously
 	// the entry was not present and the TLB doesn't cache those entries.
@@ -362,11 +372,11 @@ RISCV64VMTranslationMap::Unmap(addr_t start, addr_t end)
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	for (addr_t page = start; page < end; page += B_PAGE_SIZE) {
-		Pte* pte = LookupPte(page, false, NULL);
+		std::atomic<Pte>* pte = LookupPte(page, false, NULL);
 		if (pte != NULL) {
 			fMapCount--;
-			Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
-			if ((oldPte.flags & (1 << pteAccessed)) != 0)
+			Pte oldPte = pte->exchange({});
+			if (oldPte.isAccessed)
 				InvalidatePage(page);
 		}
 	}
@@ -406,24 +416,23 @@ RISCV64VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	Pte* pte = LookupPte(address, false, NULL);
-	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
+	std::atomic<Pte>* pte = LookupPte(address, false, NULL);
+	if (pte == NULL || !pte->load().isValid)
 		return B_ENTRY_NOT_FOUND;
 
 	RecursiveLocker locker(fLock);
 
-	Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
+	Pte oldPte = pte->exchange({});
 	fMapCount--;
 	pinner.Unlock();
 
-	if ((oldPte.flags & (1 << pteAccessed)) != 0)
+	if (oldPte.isAccessed)
 		InvalidatePage(address);
 
 	Flush();
 
 	locker.Detach(); // PageUnmapped takes ownership
-	PageUnmapped(area, oldPte.ppn, ((1 << pteAccessed) & oldPte.flags) != 0,
-		((1 << pteDirty) & oldPte.flags) != 0, updatePageQueue);
+	PageUnmapped(area, oldPte.ppn, oldPte.isAccessed, oldPte.isDirty, updatePageQueue);
 	return B_OK;
 }
 
@@ -446,17 +455,17 @@ RISCV64VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	for (addr_t start = base; start < end; start += B_PAGE_SIZE) {
-		Pte* pte = LookupPte(start, false, NULL);
+		std::atomic<Pte>* pte = LookupPte(start, false, NULL);
 		if (pte == NULL)
 			continue;
 
-		Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
-		if ((oldPte.flags & (1 << pteValid)) == 0)
+		Pte oldPte = pte->exchange({});
+		if (!oldPte.isValid)
 			continue;
 
 		fMapCount--;
 
-		if ((oldPte.flags & (1 << pteAccessed)) != 0)
+		if (oldPte.isAccessed)
 			InvalidatePage(start);
 
 		if (area->cache_type != CACHE_TYPE_DEVICE) {
@@ -470,10 +479,8 @@ RISCV64VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 			DEBUG_PAGE_ACCESS_START(page);
 
 			// transfer the accessed/dirty flags to the page
-			if ((oldPte.flags & (1 << pteAccessed)) != 0)
-				page->accessed = true;
-			if ((oldPte.flags & (1 << pteDirty)) != 0)
-				page->modified = true;
+			page->accessed = oldPte.isAccessed;
+			page->modified = oldPte.isDirty;
 
 			// remove the mapping object/decrement the wired_count of the
 			// page
@@ -572,27 +579,26 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				+ ((page->cache_offset * B_PAGE_SIZE)
 				- area->cache_offset);
 
-			Pte* pte = LookupPte(address, false, NULL);
-			if (pte == NULL
-				|| ((1 << pteValid) & pte->flags) == 0) {
+			std::atomic<Pte>* pte = LookupPte(address, false, NULL);
+			if (pte == NULL || !pte->load().isValid) {
 				panic("page %p has mapping for area %p "
 					"(%#" B_PRIxADDR "), but has no "
 					"page table", page, area, address);
 				continue;
 			}
 
-			Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
+			Pte oldPte = pte->exchange({});
 
 			// transfer the accessed/dirty flags to the page and
 			// invalidate the mapping, if necessary
-			if (((1 << pteAccessed) & oldPte.flags) != 0) {
+			if (oldPte.isAccessed) {
 				page->accessed = true;
 
 				if (!deletingAddressSpace)
 					InvalidatePage(address);
 			}
 
-			if (((1 << pteDirty) & oldPte.flags) != 0)
+			if (oldPte.isDirty)
 				page->modified = true;
 
 			if (pageFullyUnmapped) {
@@ -642,32 +648,32 @@ RISCV64VMTranslationMap::Query(addr_t virtualAddress,
 	if (fPageTable == 0)
 		return B_OK;
 
-	Pte* pte = LookupPte(virtualAddress, false, NULL);
-	if (pte == 0)
+	std::atomic<Pte>* pte = LookupPte(virtualAddress, false, NULL);
+	if (pte == NULL)
 		return B_OK;
 
-	Pte pteVal = *pte;
+	Pte pteVal = pte->load();
 	*_physicalAddress = pteVal.ppn * B_PAGE_SIZE;
 
-	if (((1 << pteValid)    & pteVal.flags) != 0)
+	if (pteVal.isValid)
 		*_flags |= PAGE_PRESENT;
-	if (((1 << pteDirty)    & pteVal.flags) != 0)
+	if (pteVal.isDirty)
 		*_flags |= PAGE_MODIFIED;
-	if (((1 << pteAccessed) & pteVal.flags) != 0)
+	if (pteVal.isAccessed)
 		*_flags |= PAGE_ACCESSED;
-	if (((1 << pteUser) & pteVal.flags) != 0) {
-		if (((1 << pteRead)  & pteVal.flags) != 0)
+	if (pteVal.isUser) {
+		if (pteVal.isRead)
 			*_flags |= B_READ_AREA;
-		if (((1 << pteWrite) & pteVal.flags) != 0)
+		if (pteVal.isWrite)
 			*_flags |= B_WRITE_AREA;
-		if (((1 << pteExec)  & pteVal.flags) != 0)
+		if (pteVal.isExec)
 			*_flags |= B_EXECUTE_AREA;
 	} else {
-		if (((1 << pteRead)  & pteVal.flags) != 0)
+		if (pteVal.isRead)
 			*_flags |= B_KERNEL_READ_AREA;
-		if (((1 << pteWrite) & pteVal.flags) != 0)
+		if (pteVal.isWrite)
 			*_flags |= B_KERNEL_WRITE_AREA;
-		if (((1 << pteExec)  & pteVal.flags) != 0)
+		if (pteVal.isExec)
 			*_flags |= B_KERNEL_EXECUTE_AREA;
 	}
 
@@ -693,41 +699,38 @@ status_t RISCV64VMTranslationMap::Protect(addr_t base, addr_t top,
 
 	for (addr_t page = base; page < top; page += B_PAGE_SIZE) {
 
-		Pte* pte = LookupPte(page, false, NULL);
-		if (pte == NULL || ((1 << pteValid) & pte->flags) == 0) {
+		std::atomic<Pte>* pte = LookupPte(page, false, NULL);
+		if (pte == NULL || !pte->load().isValid) {
 			TRACE("attempt to protect not mapped page: 0x%"
 				B_PRIxADDR "\n", page);
 			continue;
 		}
 
-		Pte oldPte = *pte;
-		Pte newPte = oldPte;
-		newPte.flags &= (1 << pteValid) | (1 << pteGlobal)
-			| (1 << pteAccessed) | (1 << pteDirty);
+		Pte oldPte {};
+		Pte newPte {};
+		while (true) {
+			oldPte = pte->load();
 
-		if ((attributes & B_USER_PROTECTION) != 0) {
-			newPte.flags |= (1 << pteUser);
-			if ((attributes & B_READ_AREA)    != 0)
-				newPte.flags |= (1 << pteRead);
-			if ((attributes & B_WRITE_AREA)   != 0)
-				newPte.flags |= (1 << pteWrite);
-			if ((attributes & B_EXECUTE_AREA) != 0) {
-				newPte.flags |= (1 << pteExec);
-				fInvalidCode = true;
+			newPte = oldPte;
+			if ((attributes & B_USER_PROTECTION) != 0) {
+				newPte.isUser = true;
+				newPte.isRead  = (attributes & B_READ_AREA)    != 0;
+				newPte.isWrite = (attributes & B_WRITE_AREA)   != 0;
+				newPte.isExec  = (attributes & B_EXECUTE_AREA) != 0;
+			} else {
+				newPte.isUser = false;
+				newPte.isRead  = (attributes & B_KERNEL_READ_AREA)    != 0;
+				newPte.isWrite = (attributes & B_KERNEL_WRITE_AREA)   != 0;
+				newPte.isExec  = (attributes & B_KERNEL_EXECUTE_AREA) != 0;
 			}
-		} else {
-			if ((attributes & B_KERNEL_READ_AREA)    != 0)
-				newPte.flags |= (1 << pteRead);
-			if ((attributes & B_KERNEL_WRITE_AREA)   != 0)
-				newPte.flags |= (1 << pteWrite);
-			if ((attributes & B_KERNEL_EXECUTE_AREA) != 0) {
-				newPte.flags |= (1 << pteExec);
-				fInvalidCode = true;
-			}
+
+			if (pte->compare_exchange_strong(oldPte, newPte))
+				break;
 		}
-		*pte = newPte;
 
-		if ((oldPte.flags & (1 << pteAccessed)) != 0)
+		fInvalidCode = newPte.isExec;
+
+		if (oldPte.isAccessed)
 			InvalidatePage(page);
 	}
 
@@ -752,11 +755,14 @@ RISCV64VMTranslationMap::ProtectArea(VMArea* area, uint32 attributes)
 }
 
 
-static inline uint32
+static inline uint64
 ConvertAccessedFlags(uint32 flags)
 {
-	return ((flags & PAGE_MODIFIED) ? (1 << pteDirty   ) : 0)
-		| ((flags & PAGE_ACCESSED) ? (1 << pteAccessed) : 0);
+	Pte pteFlags {
+		.isAccessed = (flags & PAGE_ACCESSED) != 0,
+		.isDirty = (flags & PAGE_MODIFIED) != 0
+	};
+	return pteFlags.val;
 }
 
 
@@ -766,11 +772,11 @@ RISCV64VMTranslationMap::SetFlags(addr_t address, uint32 flags)
 	// Only called from interrupt handler with interrupts disabled for CPUs that don't support
 	// setting accessed/modified flags by hardware.
 
-	Pte* pte = LookupPte(address, false, NULL);
-	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
+	std::atomic<Pte>* pte = LookupPte(address, false, NULL);
+	if (pte == NULL || !pte->load().isValid)
 		return;
 
-	pte->flags |= ConvertAccessedFlags(flags);
+	*(std::atomic<uint64>*)pte |= ConvertAccessedFlags(flags);
 
 	if (IS_KERNEL_ADDRESS(address))
 		FlushTlbPage(address);
@@ -786,11 +792,11 @@ RISCV64VMTranslationMap::ClearFlags(addr_t address, uint32 flags)
 {
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	Pte* pte = LookupPte(address, false, NULL);
-	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
+	std::atomic<Pte>* pte = LookupPte(address, false, NULL);
+	if (pte == NULL || !pte->load().isValid)
 		return B_OK;
 
-	pte->flags &= ~ConvertAccessedFlags(flags);
+	*(std::atomic<uint64>*)pte &= ~ConvertAccessedFlags(flags);
 	InvalidatePage(address);
 	return B_OK;
 }
@@ -807,35 +813,33 @@ RISCV64VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 	RecursiveLocker locker(fLock);
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	Pte* pte = LookupPte(address, false, NULL);
-	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
+	std::atomic<Pte>* pte = LookupPte(address, false, NULL);
+	if (pte == NULL || !pte->load().isValid)
 		return false;
 
-	Pte oldPte;
+	Pte oldPte {};
 	if (unmapIfUnaccessed) {
 		for (;;) {
-			oldPte = *pte;
-			if (((1 << pteValid) & oldPte.flags) == 0)
+			oldPte = pte->load();
+			if (!oldPte.isValid)
 				return false;
 
-			if (((1 << pteAccessed) & oldPte.flags) != 0) {
-				oldPte.val = atomic_and64((int64*)&pte->val,
-					~((1 << pteAccessed) | (1 << pteDirty)));
+			if (oldPte.isAccessed) {
+				oldPte.val = ((std::atomic<uint64>*)pte)->fetch_and(
+					~Pte {.isAccessed = true, .isDirty = true}.val);
 				break;
 			}
-			if (atomic_test_and_set64((int64*)&pte->val, 0, oldPte.val)
-					== (int64)oldPte.val) {
+			if (pte->compare_exchange_strong(oldPte, {}))
 				break;
-			}
 		}
 	} else {
-		oldPte.val = atomic_and64((int64*)&pte->val,
-			~((1 << pteAccessed) | (1 << pteDirty)));
+		oldPte.val = ((std::atomic<uint64>*)pte)->fetch_and(
+			~Pte {.isAccessed = true, .isDirty = true}.val);
 	}
 
 	pinner.Unlock();
-	_modified = ((1 << pteDirty) & oldPte.flags) != 0;
-	if (((1 << pteAccessed) & oldPte.flags) != 0) {
+	_modified = oldPte.isDirty;
+	if (oldPte.isAccessed) {
 		InvalidatePage(address);
 		Flush();
 		return true;

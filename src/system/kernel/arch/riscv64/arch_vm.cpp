@@ -36,7 +36,7 @@ LookupPte(phys_addr_t pageTable, addr_t virtAdr)
 	Pte *pte = (Pte*)VirtFromPhys(pageTable);
 	for (int level = 2; level > 0; level --) {
 		pte += VirtAdrPte(virtAdr, level);
-		if (!((1 << pteValid) & pte->flags)) {
+		if (!pte->isValid) {
 			return NULL;
 		}
 		// TODO: Handle superpages (RWX=0 when not at lowest level)
@@ -61,28 +61,28 @@ WritePteFlags(uint32 flags)
 				dprintf(", ");
 
 			switch (i) {
-				case pteValid:
+				case 0:
 					dprintf("valid");
 					break;
-				case pteRead:
+				case 1:
 					dprintf("read");
 					break;
-				case pteWrite:
+				case 2:
 					dprintf("write");
 					break;
-				case pteExec:
+				case 3:
 					dprintf("exec");
 					break;
-				case pteUser:
+				case 4:
 					dprintf("user");
 					break;
-				case pteGlobal:
+				case 5:
 					dprintf("global");
 					break;
-				case pteAccessed:
+				case 6:
 					dprintf("accessed");
 					break;
-				case pteDirty:
+				case 7:
 					dprintf("dirty");
 					break;
 				default:
@@ -140,9 +140,8 @@ static void
 DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, PageTableDumper& dumper)
 {
 	for (uint32 i = 0; i < pteCount; i++) {
-		if (((1 << pteValid) & pte[i].flags) != 0) {
-			if ((((1 << pteRead) | (1 << pteWrite)
-					| (1 << pteExec)) & pte[i].flags) == 0) {
+		if (pte[i].isValid) {
+			if (!pte[i].isRead && !pte[i].isWrite && !pte[i].isExec) {
 
 				if (level == 0)
 					kprintf("  internal page table on level 0\n");
@@ -154,7 +153,7 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, PageTableDumper& du
 				dumper.Write(SignExtendVirtAdr(virtAdr
 						+ ((uint64_t)i << (pageBits + pteIdxBits*level))),
 					pte[i].ppn * B_PAGE_SIZE, 1 << (pageBits + pteIdxBits * level),
-					pte[i].flags);
+					pte[i].val & 0xff);
 			}
 		}
 	}
@@ -215,10 +214,10 @@ DumpPageTable(int argc, char** argv)
 	} else {
 		for (; size > 0; base += B_PAGE_SIZE, size -= B_PAGE_SIZE) {
 			Pte* pte = LookupPte(satp.ppn * B_PAGE_SIZE, base);
-			if (pte == NULL || (pte->flags & (1 << pteValid)) == 0)
+			if (pte == NULL || !pte->isValid)
 				continue;
 
-			dumper.Write(base, pte->ppn * B_PAGE_SIZE, B_PAGE_SIZE, pte->flags);
+			dumper.Write(base, pte->ppn * B_PAGE_SIZE, B_PAGE_SIZE, pte->val & 0xff);
 		}
 	}
 
@@ -265,7 +264,7 @@ DumpVirtPage(int argc, char** argv)
 	}
 
 	PageTableDumper dumper;
-	dumper.Write(virt, pte->ppn * B_PAGE_SIZE, B_PAGE_SIZE, pte->flags);
+	dumper.Write(virt, pte->ppn * B_PAGE_SIZE, B_PAGE_SIZE, pte->val & 0xff);
 
 	return 0;
 }

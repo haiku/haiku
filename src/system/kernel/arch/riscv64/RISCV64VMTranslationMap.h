@@ -9,6 +9,8 @@
 #define _RISCV64VMTRANSLATIONMAP_H_
 
 
+#include <atomic>
+
 #include <vm/VMTranslationMap.h>
 #include <arch_cpu_defs.h>
 #include <kernel/smp.h>
@@ -97,7 +99,7 @@ struct RISCV64VMTranslationMap: public VMTranslationMap {
 	inline	void				InvalidatePage(addr_t address);
 
 private:
-			Pte*				LookupPte(addr_t virtAdr, bool alloc,
+			std::atomic<Pte>*	LookupPte(addr_t virtAdr, bool alloc,
 									vm_page_reservation* reservation);
 			phys_addr_t			LookupAddr(addr_t virtAdr);
 

@@ -63,15 +63,15 @@ WritePteFlags(uint32 flags)
 		if ((1 << i) & flags) {
 			if (first) first = false; else dprintf(", ");
 			switch (i) {
-			case pteValid:    dprintf("valid"); break;
-			case pteRead:     dprintf("read"); break;
-			case pteWrite:    dprintf("write"); break;
-			case pteExec:     dprintf("exec"); break;
-			case pteUser:     dprintf("user"); break;
-			case pteGlobal:   dprintf("global"); break;
-			case pteAccessed: dprintf("accessed"); break;
-			case pteDirty:    dprintf("dirty"); break;
-			default:          dprintf("%" B_PRIu32, i);
+			case 0:  dprintf("valid"); break;
+			case 1:  dprintf("read"); break;
+			case 2:  dprintf("write"); break;
+			case 3:  dprintf("exec"); break;
+			case 4:  dprintf("user"); break;
+			case 5:  dprintf("global"); break;
+			case 6:  dprintf("accessed"); break;
+			case 7:  dprintf("dirty"); break;
+			default: dprintf("%" B_PRIu32, i);
 			}
 		}
 	}
@@ -106,8 +106,8 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt, 
 	uint64& firstFlags, uint64& len)
 {
 	for (uint32 i = 0; i < pteCount; i++) {
-		if (((1 << pteValid) & pte[i].flags) != 0) {
-			if ((((1 << pteRead) | (1 << pteWrite) | (1 << pteExec)) & pte[i].flags) == 0) {
+		if (pte[i].isValid) {
+			if (!pte[i].isRead && !pte[i].isWrite && !pte[i].isExec) {
 				if (level == 0)
 					panic("internal page table on level 0");
 
@@ -119,7 +119,7 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt, 
 					SignExtendVirtAdr(virtAdr + ((uint64_t)i << (pageBits + pteIdxBits*level))),
 					pte[i].ppn * B_PAGE_SIZE,
 					1 << (pageBits + pteIdxBits*level),
-					pte[i].flags,
+					pte[i].val & 0xff,
 					firstVirt, firstPhys, firstFlags, len);
 			}
 		}
@@ -151,14 +151,19 @@ LookupPte(addr_t virtAdr, bool alloc)
 	Pte *pte = (Pte*)VirtFromPhys(sPageTable);
 	for (int level = 2; level > 0; level --) {
 		pte += VirtAdrPte(virtAdr, level);
-		if (((1 << pteValid) & pte->flags) == 0) {
+		if (!pte->isValid) {
 			if (!alloc)
 				return NULL;
-			pte->ppn = mmu_allocate_page() / B_PAGE_SIZE;
-			if (pte->ppn == 0)
+			uint64 ppn = mmu_allocate_page() / B_PAGE_SIZE;
+			if (ppn == 0)
 				return NULL;
-			memset((Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
-			pte->flags |= (1 << pteValid) | (IS_KERNEL_ADDRESS(virtAdr) ? (1 << pteGlobal) : 0);
+			memset((Pte*)VirtFromPhys(B_PAGE_SIZE * ppn), 0, B_PAGE_SIZE);
+			Pte newPte {
+				.isValid = true,
+				.isGlobal = IS_KERNEL_ADDRESS(virtAdr),
+				.ppn = ppn
+			};
+			pte->val = newPte.val;
 		}
 		pte = (Pte*)VirtFromPhys(B_PAGE_SIZE * pte->ppn);
 	}
@@ -174,10 +179,15 @@ Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags)
 	Pte* pte = LookupPte(virtAdr, true);
 	if (pte == NULL) panic("can't allocate page table");
 
-	pte->ppn = physAdr / B_PAGE_SIZE;
-	pte->flags = (1 << pteValid) | (1 << pteAccessed) | (1 << pteDirty)
-		| (IS_KERNEL_ADDRESS(virtAdr) ? (1 << pteGlobal) : 0)
-		| flags;
+	Pte newPte {
+		.isValid = true,
+		.isGlobal = IS_KERNEL_ADDRESS(virtAdr),
+		.isAccessed = true,
+		.isDirty = true,
+	};
+	newPte.val |= flags;
+
+	pte->val = newPte.val;
 }
 
 
@@ -230,11 +240,16 @@ PreallocKernelRange()
 	Pte* root = (Pte*)VirtFromPhys(sPageTable);
 	for (uint64 i = VirtAdrPte(KERNEL_BASE, 2); i <= VirtAdrPte(KERNEL_TOP, 2);
 		i++) {
-		Pte *pte = &root[i];
-		pte->ppn = mmu_allocate_page() / B_PAGE_SIZE;
-		if (pte->ppn == 0) panic("can't alloc early physical page");
+		Pte* pte = &root[i];
+		uint64 ppn = mmu_allocate_page() / B_PAGE_SIZE;
+		if (ppn == 0) panic("can't alloc early physical page");
 		memset(VirtFromPhys(B_PAGE_SIZE * pte->ppn), 0, B_PAGE_SIZE);
-		pte->flags |= (1 << pteValid) | (1 << pteGlobal);
+		Pte newPte {
+			.isValid = true,
+			.isGlobal = true,
+			.ppn = ppn
+		};
+		pte->val = newPte.val;
 	}
 }
 
@@ -366,7 +381,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descript
 	gKernelArgs.arch_args.physMap.start = KERNEL_TOP + 1 - physMemRange.size;
 	gKernelArgs.arch_args.physMap.size = physMemRange.size;
 	MapRange(gKernelArgs.arch_args.physMap.start, physMemRange.start, physMemRange.size,
-		(1 << pteRead) | (1 << pteWrite));
+		Pte {.isRead = true, .isWrite = true}.val);
 
 	// Boot loader
 	TRACE("Boot loader:\n");
@@ -376,7 +391,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descript
 		case EfiLoaderCode:
 		case EfiLoaderData:
 			MapRange(entry->VirtualStart, entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE,
-				(1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
+				Pte {.isRead = true, .isWrite = true, .isExec = true}.val);
 			break;
 		default:
 			;
@@ -393,7 +408,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descript
 		efi_memory_descriptor* entry = &memoryMap[i];
 		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
 			MapRange(entry->VirtualStart, entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE,
-				(1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
+				Pte {.isRead = true, .isWrite = true, .isExec = true}.val);
 	}
 
 	// Memory regions
@@ -403,22 +418,22 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descript
 	phys_addr_t physAdr;
 	size_t size;
 	while (mmu_next_region(&cookie, &virtAdr, &physAdr, &size)) {
-		MapRange(virtAdr, physAdr, size, (1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
+		MapRange(virtAdr, physAdr, size, Pte {.isRead = true, .isWrite = true, .isExec = true}.val);
 	}
 
 	// Devices
 	TRACE("Devices:\n");
-	MapAddrRange(gKernelArgs.arch_args.clint, (1 << pteRead) | (1 << pteWrite));
-	MapAddrRange(gKernelArgs.arch_args.htif, (1 << pteRead) | (1 << pteWrite));
-	MapAddrRange(gKernelArgs.arch_args.plic, (1 << pteRead) | (1 << pteWrite));
+	MapAddrRange(gKernelArgs.arch_args.clint, Pte {.isRead = true, .isWrite = true}.val);
+	MapAddrRange(gKernelArgs.arch_args.htif, Pte {.isRead = true, .isWrite = true}.val);
+	MapAddrRange(gKernelArgs.arch_args.plic, Pte {.isRead = true, .isWrite = true}.val);
 
 	if (strcmp(gKernelArgs.arch_args.uart.kind, "") != 0) {
 		MapRange(gKernelArgs.arch_args.uart.regs.start,
 			gKernelArgs.arch_args.uart.regs.start,
 			gKernelArgs.arch_args.uart.regs.size,
-			(1 << pteRead) | (1 << pteWrite));
+			Pte {.isRead = true, .isWrite = true}.val);
 		MapAddrRange(gKernelArgs.arch_args.uart.regs,
-			(1 << pteRead) | (1 << pteWrite));
+			Pte {.isRead = true, .isWrite = true}.val);
 	}
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
