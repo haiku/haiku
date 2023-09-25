@@ -2029,7 +2029,7 @@ TIconView::Update(int32 previous, int32 current,
 
 	// animate expanding currently centered icon
 	TTeamGroup* currentGroup = (TTeamGroup*)groupList->ItemAt(current);
-	ASSERT(group);
+	ASSERT(currentGroup != NULL);
 	AnimateIcon(currentGroup->SmallIcon(), currentGroup->LargeIcon());
 }
 
