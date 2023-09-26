@@ -126,7 +126,8 @@ simonThread(void* cookie)
 			noPause = 0;
 			waitEvent(objectView->drawEvent);
 		}
-		screen.WaitForRetrace();
+		if (objectView->LimitFps())
+			screen.WaitForRetrace();
 	}
 	return 0;
 }
@@ -138,6 +139,7 @@ ObjectView::ObjectView(BRect rect, const char *name, ulong resizingMode,
 	fHistEntries(0),
 	fOldestEntry(0),
 	fFps(true),
+	fLimitFps(true),
 	fLastGouraud(true),
 	fGouraud(true),
 	fLastZbuf(true),
@@ -389,6 +391,10 @@ ObjectView::MessageReceived(BMessage* msg)
 			break;
 		case kMsgFog:
 			fFog = !fFog;
+			toggleItem = true;
+			break;
+		case kMsgLimitFps:
+			fLimitFps = !fLimitFps;
 			toggleItem = true;
 			break;
 	}

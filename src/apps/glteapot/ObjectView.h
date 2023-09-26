@@ -16,6 +16,7 @@
 #include <GLView.h>
 
 #define kMsgFPS			'fps '
+#define kMsgLimitFps	'lfps'
 #define kMsgAddModel	'addm'
 #define kMsgGouraud		'gour'
 #define kMsgZBuffer		'zbuf'
@@ -66,6 +67,7 @@ class ObjectView : public BGLView {
 		virtual	void	DetachedFromWindow();
 		virtual	void	FrameResized(float width, float height);
 				bool	SpinIt();
+				bool	LimitFps() { return fLimitFps; };
 				int		ObjectAtPoint(const BPoint &point);
 		virtual	void	DrawFrame(bool noPause);
 		virtual	void	Pulse();
@@ -82,7 +84,7 @@ class ObjectView : public BGLView {
 		BLocker			fObjListLock;
 		uint64			fLastFrame;
 		int32			fHistEntries,fOldestEntry;
-		bool			fFps, fLastGouraud, fGouraud;
+		bool			fFps, fLimitFps, fLastGouraud, fGouraud;
 		bool			fLastZbuf, fZbuf, fLastCulling, fCulling;
 		bool			fLastLighting, fLighting, fLastFilled, fFilled;
 		bool			fLastPersp, fPersp, fLastTextured, fTextured;

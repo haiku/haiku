@@ -31,7 +31,7 @@ TeapotWindow::TeapotWindow(BRect rect, const char* name, window_type wt,
 	BMenu* menu;
 	BMessage msg(kMsgAddModel);
 
-	menuBar->AddItem(menu = new BMenu(B_TRANSLATE("File")));
+	menuBar->AddItem(menu = new BMenu(B_TRANSLATE_SYSTEM_NAME("GLTeapot")));
 	AddChild(menuBar);
 
 	menuBar->ResizeToPreferred();
@@ -90,6 +90,11 @@ TeapotWindow::TeapotWindow(BRect rect, const char* name, window_type wt,
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Fog"),
 		new BMessage(kMsgFog)));
 	item->SetTarget(fObjectView);
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Limit FPS to refresh rate"),
+		new BMessage(kMsgLimitFps)));
+	item->SetTarget(fObjectView);
+	item->SetMarked(true);
 
 	BMenu *subMenu;
 	menuBar->AddItem(menu = new BMenu(B_TRANSLATE("Lights")));
