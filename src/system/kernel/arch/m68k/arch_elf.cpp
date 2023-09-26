@@ -286,7 +286,7 @@ dprintf("R_68K_GOT8 overflow\n");
 				return B_BAD_DATA;
 
 			case R_68K_JMP_SLOT:
-				write_32(P, (G + A));
+				write_32(P, S + A);
 				break;
 
 			case R_68K_RELATIVE:
