@@ -381,8 +381,12 @@ reschedule(int32 nextState)
 	ThreadData* nextThreadData;
 	if (gCPU[thisCPU].disabled) {
 		if (!oldThreadData->IsIdle()) {
-			putOldThreadAtBack = oldThread->pinned_to_cpu == 0;
-			oldThreadData->UnassignCore(true);
+			if (oldThread->pinned_to_cpu == 0) {
+				putOldThreadAtBack = true;
+				oldThreadData->UnassignCore(true);
+			} else {
+				putOldThreadAtBack = false;
+			}
 
 			CPURunQueueLocker cpuLocker(cpu);
 			nextThreadData = cpu->PeekIdleThread();
