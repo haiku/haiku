@@ -1,4 +1,5 @@
 /*
+ * Copyright 2023, Puck Meerburg, puck@puckipedia.com.
  * Copyright 2013, Paweł Dziepak, pdziepak@quarnos.org.
  * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
@@ -132,42 +133,14 @@ arch_smp_per_cpu_init(kernel_args *args, int32 cpu)
 }
 
 
-void
-arch_smp_send_multicast_ici(CPUSet& cpuSet)
+static void
+send_multicast_ici_physical(CPUSet& cpuSet)
 {
-#if KDEBUG
-	if (are_interrupts_enabled())
-		panic("arch_smp_send_multicast_ici: called with interrupts enabled");
-#endif
-
-	memory_write_barrier();
-
-	int32 i = 0;
 	int32 cpuCount = smp_get_num_cpus();
+	int32 currentCpu = smp_get_current_cpu();
 
-	int32 logicalModeCPUs;
-	if (x2apic_available())
-		logicalModeCPUs = cpuCount;
-	else
-		logicalModeCPUs = std::min(cpuCount, int32(8));
-
-	uint32 destination = 0;
-	for (; i < logicalModeCPUs; i++) {
-		if (cpuSet.GetBit(i) && i != smp_get_current_cpu())
-			destination |= gCPU[i].arch.logical_apic_id;
-	}
-
-	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
-			| APIC_INTR_COMMAND_1_ASSERT
-			| APIC_INTR_COMMAND_1_DEST_MODE_LOGICAL
-			| APIC_INTR_COMMAND_1_DEST_FIELD;
-
-	while (!apic_interrupt_delivered())
-		cpu_pause();
-	apic_set_interrupt_command(destination, mode);
-
-	for (; i < cpuCount; i++) {
-		if (cpuSet.GetBit(i)) {
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (cpuSet.GetBit(i) && i != currentCpu) {
 			uint32 destination = sCPUAPICIds[i];
 			uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
 					| APIC_INTR_COMMAND_1_ASSERT
@@ -178,6 +151,44 @@ arch_smp_send_multicast_ici(CPUSet& cpuSet)
 				cpu_pause();
 			apic_set_interrupt_command(destination, mode);
 		}
+	}
+}
+
+
+void
+arch_smp_send_multicast_ici(CPUSet& cpuSet)
+{
+#if KDEBUG
+	if (are_interrupts_enabled())
+		panic("arch_smp_send_multicast_ici: called with interrupts enabled");
+#endif
+
+	memory_write_barrier();
+
+	if (!x2apic_available()) {
+		send_multicast_ici_physical(cpuSet);
+		return;
+	}
+
+	// WRMSR on the x2APIC MSRs is neither serializing, nor a load-store
+	// operation, requiring both memory serialization *and* a load fence, which is
+	// the only way to ensure the MSR doesn't get executed before the write
+	// barrier.
+	memory_read_barrier();
+
+	int32 cpuCount = smp_get_num_cpus();
+	int32 currentCpu = smp_get_current_cpu();
+
+	uint32 mode = ICI_VECTOR | APIC_DELIVERY_MODE_FIXED
+			| APIC_INTR_COMMAND_1_ASSERT
+			| APIC_INTR_COMMAND_1_DEST_MODE_LOGICAL
+			| APIC_INTR_COMMAND_1_DEST_FIELD;
+
+	for (int32 i = 0; i < cpuCount; i++) {
+		if (!cpuSet.GetBit(i) || i == currentCpu)
+			continue;
+
+		apic_set_interrupt_command(gCPU[i].arch.logical_apic_id, mode);
 	}
 }
 
