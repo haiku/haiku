@@ -1056,6 +1056,11 @@ SetViewColor(Parent()->ViewColor());
 	\param where The point on the screen where to mouse pointer is when
 	       the mouse button is released.
 
+	\note Calling GetMouse() in MouseUp() will return the new state of the mouse buttons
+	      (after the mouse button was released). If you want to know which button was released,
+	      you have to compare that with the previous state of the buttons, that you can memorize
+	      for example by calling GetMouse() in MouseDown().
+
 	\since BeOS R3
 */
 
