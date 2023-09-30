@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-Terminal	185459086
+1	hungarian	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
 Text encoding	Terminal TermWindow		Szöveg kódolása
+Colors	Terminal ThemeWindow		Színek
 OK	Terminal SetTitleWindow		Rendben
 Edit	Terminal TermWindow		Szerkesztés
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		-h, --helpez a súgó\n-t, --titleablak címének megadása\n-f, --fullscreenindítás teljesképernyős módban\n-w, --working-directoryindítási mappa megadása\n

@@ -1,8 +1,9 @@
-1	german	x-vnd.Haiku-Terminal	185459086
+1	german	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Insert path	Terminal TermView		Pfad einfügen
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Das Terminal konnte die Konsole leider nicht starten.
 Text encoding	Terminal TermWindow		Kodierung
+Colors	Terminal ThemeWindow		Farben
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Bearbeiten
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               Diese Hilfe ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         Im Vollbild-Modus starten\n  -w,     --working-directory  Setzt das anfängliche Arbeitsverzeichnis\n

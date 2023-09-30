@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-Terminal	185459086
+1	swedish	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
 Text encoding	Terminal TermWindow		Teckenuppsättning
+Colors	Terminal ThemeWindow		Färger
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Redigera
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,  --help, skriva ut denna hjälp\n  -t,  --title, ange fönstertitel\n  -f,  --fullscreen, starta helskärm\n  -w,  --working-directory, ställ in initial arbetskatalog\n

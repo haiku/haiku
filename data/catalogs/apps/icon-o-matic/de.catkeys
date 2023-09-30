@@ -1,4 +1,4 @@
-1	german	x-vnd.haiku-icon_o_matic	2572445882
+1	german	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Keine
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Pfad optimieren
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -180,8 +180,10 @@ Settings…	Icon-O-Matic-SavePanel		Einstellungen …
 Select all	Icon-O-Matic-PathManipulator		Alles auswählen
 Add with style	Icon-O-Matic-ShapesList		Mit Stil hinzufügen
 New	Icon-O-Matic-Menu-File		Neu
+Change perspective	Icon-O-Matic-PerspectiveCommand		Perspektive ändern
 Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		{0, plural, one{Eckpunkt} other{Eckpunkte}} anstoßen
 Gradient type	Icon-O-Matic-StyleTypes		Verlaufstyp:
+Perspective	Transformation		Perspektive
 Export	Icon-O-Matic-Menu-File		Exportieren
 Width	Icon-O-Matic-PropertyNames		Strichstärke
 Add reference image	Icon-O-Matic-ShapesList		Referenzbild hinzufügen

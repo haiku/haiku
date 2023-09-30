@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	2850776429
+1	catalan; valencian	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
@@ -30,6 +30,7 @@ US-International	KeymapNames		US-Internacional
 Right option	Keyboard Layout View		Opció dreta
 Turkish (Type-Q)	KeymapNames		Turc (Tipus-Q)
 Revert	Modifier keys window		Reverteix
+Caps:	Modifier keys window	Caps key role name	Maj.:
 Slovak	KeymapNames		Eslovac
 CAPS LOCK	Keyboard Layout View		BLOCATGE DE MAJÚSCULES
 Colemak	KeymapNames		Colemak
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Belga (coma)
 Norwegian	KeymapNames		Noruec
 Font	Keymap window		Tipus de lletra
 Danish	KeymapNames		Danès
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tecla de majúscules
 Generic 104-key	KeyboardLayoutNames		Genèric de 104 tecles
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla de majúscules
 Russian	KeymapNames		Rus
