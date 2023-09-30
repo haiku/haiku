@@ -457,7 +457,14 @@ write_io(int argc, char **argv)
 static int
 pcistatus(int argc, char **argv)
 {
-	gPCI->ClearDeviceStatus(NULL, true);
+	for (uint32 domain = 0; ; domain++) {
+		domain_data *data = gPCI->_GetDomainData(domain);
+		if (data == NULL)
+			break;
+
+		gPCI->ClearDeviceStatus(data->bus, true);
+	}
+
 	return 0;
 }
 
@@ -473,16 +480,11 @@ pcirefresh(int argc, char **argv)
 
 // #pragma mark bus manager init/uninit
 
-static bool sInitDone;
-
 
 status_t
-pci_init_deferred(void)
+pci_init(void)
 {
-	dprintf("pci_init_deferred()\n");
-
-	if (sInitDone)
-		return B_OK;
+	gPCI = new PCI;
 
 	add_debugger_command("inw", &display_io, "dump io words (32-bit)");
 	add_debugger_command("in32", &display_io, "dump io words (32-bit)");
@@ -498,28 +500,9 @@ pci_init_deferred(void)
 	add_debugger_command("outb", &write_io, "write io bytes (8-bit)");
 	add_debugger_command("out8", &write_io, "write io bytes (8-bit)");
 
-	gPCI->InitDomainData();
-	gPCI->InitBus();
-
 	add_debugger_command("pcistatus", &pcistatus, "dump and clear pci device status registers");
 	add_debugger_command("pcirefresh", &pcirefresh, "refresh and print all pci_info");
 
-	if (gPCI->Finalize() != B_OK) {
-		TRACE(("PCI: pci_controller_finalize failed\n"));
-		return B_ERROR;
-	}
-
-	pci_print_info();
-
-	sInitDone = true;
-	return B_OK;
-}
-
-
-status_t
-pci_init(void)
-{
-	gPCI = new PCI;
 	return B_OK;
 }
 
@@ -528,11 +511,6 @@ void
 pci_uninit(void)
 {
 	delete gPCI;
-
-	if (!sInitDone)
-		return;
-
-	sInitDone = false;
 
 	remove_debugger_command("outw", &write_io);
 	remove_debugger_command("out32", &write_io);
@@ -558,7 +536,6 @@ pci_uninit(void)
 
 PCI::PCI()
 	:
-	fRootBus(0),
 	fDomainCount(0),
 	fBusEnumeration(false),
 	fVirtualBusMap(),
@@ -571,57 +548,20 @@ PCI::PCI()
 
 
 void
-PCI::InitBus()
+PCI::InitBus(PCIBus *bus)
 {
-	PCIBus **nextBus = &fRootBus;
-	for (uint8 i = 0; i < fDomainCount; i++) {
-		PCIBus *bus = new PCIBus;
-		bus->next = NULL;
-		bus->parent = NULL;
-		bus->child = NULL;
-		bus->domain = i;
-		bus->bus = 0;
-		*nextBus = bus;
-		nextBus = &bus->next;
-	}
-
 	if (fBusEnumeration) {
-		for (uint8 i = 0; i < fDomainCount; i++) {
-			_EnumerateBus(i, 0);
-		}
+		_EnumerateBus(bus->domain, 0);
 	}
 
 	if (1) {
-		for (uint8 i = 0; i < fDomainCount; i++) {
-			_FixupDevices(i, 0);
-		}
+		_FixupDevices(bus->domain, 0);
 	}
 
-	if (fRootBus) {
-		_DiscoverBus(fRootBus);
-		_ConfigureBridges(fRootBus);
-		ClearDeviceStatus(fRootBus, false);
-		_RefreshDeviceInfo(fRootBus);
-	}
-}
-
-
-status_t
-PCI::Finalize()
-{
-	// TODO: Properly handle multiple domains. Currently finalize fill be called twice for first
-	// domain is second domain is added, but should be called only once.
-
-	for (uint8 i = 0; i < fDomainCount; i++) {
-		pci_controller_module_info* controller = fDomainData[i].controller;
-		if (controller->finalize != NULL) {
-			status_t res = controller->finalize(fDomainData[i].controller_cookie);
-			if (res < B_OK)
-				return res;
-		}
-	}
-
-	return B_OK;
+	_DiscoverBus(bus);
+	_ConfigureBridges(bus);
+	ClearDeviceStatus(bus, false);
+	_RefreshDeviceInfo(bus);
 }
 
 
@@ -694,20 +634,37 @@ PCI::ResolveVirtualBus(uint8 virtualBus, uint8 *domain, uint8 *bus)
 
 
 status_t
-PCI::AddController(pci_controller_module_info *controller, void *controller_cookie,
-	device_node *root_node)
+PCI::AddController(pci_controller_module_info *controller,
+	void *controllerCookie, device_node *rootNode, domain_data **domainData)
 {
 	if (fDomainCount == MAX_PCI_DOMAINS)
 		return B_ERROR;
 
-	fDomainData[fDomainCount].controller = controller;
-	fDomainData[fDomainCount].controller_cookie = controller_cookie;
-	fDomainData[fDomainCount].root_node = root_node;
+	uint8 domain = fDomainCount;
+	domain_data& data = fDomainData[domain];
+
+	data.controller = controller;
+	data.controller_cookie = controllerCookie;
+	data.root_node = rootNode;
+
+	data.bus = new(std::nothrow) PCIBus {.domain = domain};
+	if (data.bus == NULL)
+		return B_NO_MEMORY;
 
 	// initialized later to avoid call back into controller at this point
-	fDomainData[fDomainCount].max_bus_devices = -1;
+	data.max_bus_devices = -1;
 
 	fDomainCount++;
+
+	InitDomainData(data);
+	InitBus(data.bus);
+	if (data.controller->finalize != NULL)
+		data.controller->finalize(data.controller_cookie);
+	_RefreshDeviceInfo(data.bus);
+
+	pci_print_info();
+
+	*domainData = &data;
 	return B_OK;
 }
 
@@ -748,38 +705,36 @@ PCI::LookupRange(uint32 type, phys_addr_t pciAddr,
 
 
 void
-PCI::InitDomainData()
+PCI::InitDomainData(domain_data &data)
 {
-	for (uint8 i = 0; i < fDomainCount; i++) {
-		int32 count;
-		status_t status;
+	int32 count;
+	status_t status;
 
-		pci_controller_module_info *ctrlModule = fDomainData[i].controller;
-		void *ctrl = fDomainData[i].controller_cookie;
+	pci_controller_module_info *ctrl = data.controller;
+	void *ctrlCookie = data.controller_cookie;
 
-		status = ctrlModule->get_max_bus_devices(ctrl, &count);
-		fDomainData[i].max_bus_devices = (status == B_OK) ? count : 0;
+	status = ctrl->get_max_bus_devices(ctrlCookie, &count);
+	data.max_bus_devices = (status == B_OK) ? count : 0;
 
-		memset(fDomainData[i].ranges, 0, sizeof(fDomainData[i].ranges));
-		pci_resource_range range;
-		for (uint32 j = 0; ctrlModule->get_range(ctrl, j, &range) >= B_OK; j++) {
-			if (range.type < kPciRangeEnd && range.size > 0)
-				fDomainData[i].ranges[range.type] = range;
-		}
+	memset(data.ranges, 0, sizeof(data.ranges));
+	pci_resource_range range;
+	for (uint32 j = 0; ctrl->get_range(ctrlCookie, j, &range) >= B_OK; j++) {
+		if (range.type < kPciRangeEnd && range.size > 0)
+			data.ranges[range.type] = range;
+	}
 
 #if !(defined(__i386__) || defined(__x86_64__))
-		// TODO: free resources when domain is detached
-		pci_resource_range &ioPortRange = fDomainData[i].ranges[kPciRangeIoPort];
-		if (ioPortRange.size > 0) {
-			fDomainData[i].io_port_area = map_physical_memory("PCI IO Ports",
-				ioPortRange.host_addr, ioPortRange.size, B_ANY_KERNEL_ADDRESS,
-				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&fDomainData[i].io_port_adr);
+	// TODO: free resources when domain is detached
+	pci_resource_range &ioPortRange = data.ranges[kPciRangeIoPort];
+	if (ioPortRange.size > 0) {
+		data.io_port_area = map_physical_memory("PCI IO Ports",
+			ioPortRange.host_addr, ioPortRange.size, B_ANY_KERNEL_ADDRESS,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&data.io_port_adr);
 
-			if (fDomainData[i].io_port_area < B_OK)
-				fDomainData[i].io_port_adr = NULL;
-		}
-#endif
+		if (data.io_port_area < B_OK)
+			data.io_port_adr = NULL;
 	}
+#endif
 }
 
 
@@ -806,10 +761,13 @@ status_t
 PCI::GetNthInfo(long index, pci_info *outInfo)
 {
 	long currentIndex = 0;
-	if (!fRootBus)
-		return B_ERROR;
 
-	return _GetNthInfo(fRootBus, &currentIndex, index, outInfo);
+	for (uint32 domain = 0; domain < fDomainCount; domain++) {
+		if (_GetNthInfo(fDomainData[domain].bus, &currentIndex, index, outInfo) >= B_OK)
+			return B_OK;
+	}
+
+	return B_ERROR;
 }
 
 
@@ -830,9 +788,6 @@ PCI::_GetNthInfo(PCIBus *bus, long *currentIndex, long wantIndex,
 			return B_OK;
 		dev = dev->next;
 	}
-
-	if (bus->next)
-		return _GetNthInfo(bus->next, currentIndex, wantIndex, outInfo);
 
 	return B_ERROR;
 }
@@ -1073,21 +1028,12 @@ PCI::_ConfigureBridges(PCIBus *bus)
 		if (dev->child)
 			_ConfigureBridges(dev->child);
 	}
-
-	if (bus->next)
-		_ConfigureBridges(bus->next);
 }
 
 
 void
 PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 {
-	if (!bus) {
-		if (!fRootBus)
-			return;
-		bus = fRootBus;
-	}
-
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		// Clear and dump PCI device status
 		uint16 status = ReadConfig(dev->domain, dev->bus, dev->device,
@@ -1155,9 +1101,6 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 		if (dev->child)
 			ClearDeviceStatus(dev->child, dumpStatus);
 	}
-
-	if (bus->next)
-		ClearDeviceStatus(bus->next, dumpStatus);
 }
 
 
@@ -1188,8 +1131,6 @@ PCI::_DiscoverBus(PCIBus *bus)
 			_DiscoverDevice(bus, dev, function);
 	}
 
-	if (bus->next)
-		_DiscoverBus(bus->next);
 	recursed--;
 }
 
@@ -1229,7 +1170,6 @@ PCI::_CreateBus(PCIDev *parent, uint8 domain, uint8 bus)
 	if (newBus == NULL)
 		return NULL;
 
-	newBus->next = NULL;
 	newBus->parent = parent;
 	newBus->child = NULL;
 	newBus->domain = domain;
@@ -1595,10 +1535,8 @@ PCI::_ReadHeaderInfo(PCIDev *dev)
 void
 PCI::RefreshDeviceInfo()
 {
-	if (fRootBus == NULL)
-		return;
-
-	_RefreshDeviceInfo(fRootBus);
+	for (uint32 domain = 0; domain < fDomainCount; domain++)
+		_RefreshDeviceInfo(fDomainData[domain].bus);
 }
 
 
@@ -1614,9 +1552,6 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 		if (dev->child)
 			_RefreshDeviceInfo(dev->child);
 	}
-
-	if (bus->next)
-		_RefreshDeviceInfo(bus->next);
 }
 
 
@@ -1866,7 +1801,10 @@ PCI::FindHTCapability(PCIDev *device, uint16 capID, uint8 *offset)
 PCIDev *
 PCI::FindDevice(uint8 domain, uint8 bus, uint8 device, uint8 function)
 {
-	return _FindDevice(fRootBus, domain, bus, device, function);
+	if (domain >= fDomainCount)
+		return NULL;
+
+	return _FindDevice(fDomainData[domain].bus, domain, bus, device, function);
 }
 
 
@@ -1892,10 +1830,6 @@ PCI::_FindDevice(PCIBus *current, uint8 domain, uint8 bus, uint8 device,
 			}
 		}
 	}
-
-	// search other busses
-	if (current->next != NULL)
-		return _FindDevice(current->next, domain, bus, device, function);
 
 	return NULL;
 }

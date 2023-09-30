@@ -7,11 +7,10 @@
 #ifndef __PCI_H__
 #define __PCI_H__
 
-#include <PCI.h>
+#include <bus/PCI.h>
 
 #include <VectorMap.h>
 
-#include "pci_controller.h"
 #include "pci_msi.h"
 
 
@@ -25,7 +24,6 @@
 struct PCIDev;
 
 struct PCIBus {
-	PCIBus *			next;
 	PCIDev *			parent;
 	PCIDev *			child;
 	uint8				domain;
@@ -53,6 +51,7 @@ struct domain_data {
 	pci_controller_module_info *controller;
 	void *				controller_cookie;
 	device_node *		root_node;
+	PCIBus *			bus;
 
 	// All the rest is set in PCI::InitDomainData
 	int					max_bus_devices;
@@ -70,12 +69,12 @@ public:
 							PCI();
 							~PCI();
 
-			void			InitDomainData();
-			void			InitBus();
-			status_t	Finalize();
+			void			InitDomainData(domain_data &data);
+			void			InitBus(PCIBus *bus);
 
 			status_t		AddController(pci_controller_module_info *controller,
-								void *controller_cookie, device_node *root_node);
+								void *controllerCookie, device_node *rootNode,
+								domain_data **domainData);
 
 			status_t		LookupRange(uint32 type, phys_addr_t pciAddr,
 								uint8 &domain, pci_resource_range &range, uint8 **mappedAdr = NULL);
@@ -196,8 +195,6 @@ private:
 			status_t		_DisableMSIX(PCIDev *device);
 
 private:
-	PCIBus *				fRootBus;
-
 	enum { MAX_PCI_DOMAINS = 8 };
 
 	domain_data				fDomainData[MAX_PCI_DOMAINS];

@@ -47,27 +47,19 @@ pci_root_register_device(device_node* parent)
 }
 
 
-static status_t
-pci_root_register_child_devices(void* cookie)
+static void
+pci_root_traverse(device_node* node, PCIBus* bus)
 {
-	device_node* node = (device_node*)cookie;
-
-	pci_info info;
-	for (int32 i = 0; pci_get_nth_pci_info(i, &info) == B_OK; i++) {
-		uint8 domain;
-		uint8 bus;
-		if (gPCI->ResolveVirtualBus(info.bus, &domain, &bus) != B_OK) {
-			dprintf("ResolveVirtualBus(%u) failed\n", info.bus);
-			continue;
-		}
+	for (PCIDev* dev = bus->child; dev != NULL; dev = dev->next) {
+		const pci_info& info = dev->info;
 
 		device_attr attrs[] = {
 			// info about device
 			{B_DEVICE_BUS, B_STRING_TYPE, {.string = "pci"}},
 
 			// location on PCI bus
-			{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {.ui8 = domain}},
-			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {.ui8 = bus}},
+			{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {.ui8 = dev->domain}},
+			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {.ui8 = dev->bus}},
 			{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {.ui8 = info.device}},
 			{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {.ui8 = info.function}},
 
@@ -83,9 +75,20 @@ pci_root_register_child_devices(void* cookie)
 			{}
 		};
 
-		gDeviceManager->register_node(node, PCI_DEVICE_MODULE_NAME, attrs,
-			NULL, NULL);
+		gDeviceManager->register_node(node, PCI_DEVICE_MODULE_NAME, attrs, NULL, NULL);
+
+		if (dev->child != NULL)
+			pci_root_traverse(node, dev->child);
 	}
+}
+
+
+static status_t
+pci_root_register_child_devices(void* cookie)
+{
+	domain_data* domainData = (domain_data*)cookie;
+
+	pci_root_traverse(domainData->root_node, domainData->bus);
 
 	return B_OK;
 }
@@ -94,8 +97,6 @@ pci_root_register_child_devices(void* cookie)
 static status_t
 pci_root_init(device_node* node, void** _cookie)
 {
-	*_cookie = node;
-
 	DeviceNodePutter<&gDeviceManager> pciHostNode(gDeviceManager->get_parent_node(node));
 
 	pci_controller_module_info* pciHostModule;
@@ -107,8 +108,10 @@ pci_root_init(device_node* node, void** _cookie)
 	if (res < B_OK)
 		return res;
 
-	CHECK_RET(gPCI->AddController(pciHostModule, pciHostDev, node));
-	CHECK_RET(pci_init_deferred());
+	domain_data* domainData = NULL;
+	CHECK_RET(gPCI->AddController(pciHostModule, pciHostDev, node, &domainData));
+
+	*_cookie = domainData;
 
 	return B_OK;
 }
