@@ -35,7 +35,6 @@
 
 typedef enum {
 	VIRTIO_IRQ_LEGACY,
-	VIRTIO_IRQ_MSI,
 	VIRTIO_IRQ_MSI_X_SHARED,
 	VIRTIO_IRQ_MSI_X,
 } virtio_irq_type;
@@ -152,6 +151,16 @@ virtio_pci_queue_interrupt(void *data)
 }
 
 
+static int32
+virtio_pci_queues_interrupt(void *data)
+{
+	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)data;
+	gVirtio->queue_interrupt_handler(bus->sim, INT16_MAX);
+
+	return B_HANDLED_INTERRUPT;
+}
+
+
 static status_t
 virtio_pci_setup_msix_interrupts(virtio_pci_sim_info* bus)
 {
@@ -170,7 +179,7 @@ virtio_pci_setup_msix_interrupts(virtio_pci_sim_info* bus)
 			return B_BAD_VALUE;
 		}
 	}
-	if (bus->irq_type == VIRTIO_IRQ_MSI_X)
+	if (bus->irq_type == VIRTIO_IRQ_MSI_X || bus->irq_type == VIRTIO_IRQ_MSI_X_SHARED)
 		irq++;
 
 	for (uint16 queue = 0; queue < bus->queue_count; queue++) {
@@ -452,7 +461,7 @@ setup_interrupt(void* cookie, uint16 queueCount)
 
 	// try MSI-X
 	uint8 msixCount = bus->pci->get_msix_count(bus->device);
-	if (msixCount >= 1) {
+	if (msixCount >= 2) {
 		if (msixCount >= (queueCount + 1)) {
 			uint8 vector;
 			bus->cookies = new(std::nothrow)
@@ -470,25 +479,14 @@ setup_interrupt(void* cookie, uint16 queueCount)
 			}
 		} else {
 			uint8 vector;
-			if (bus->pci->configure_msix(bus->device, 1, &vector) == B_OK
+			if (bus->pci->configure_msix(bus->device, 2, &vector) == B_OK
 				&& bus->pci->enable_msix(bus->device) == B_OK) {
-				TRACE_ALWAYS("using MSI-X vector shared %u\n", 1);
+				TRACE_ALWAYS("using MSI-X vector shared %u\n", vector);
 				bus->irq = vector;
 				bus->irq_type = VIRTIO_IRQ_MSI_X_SHARED;
 			} else {
 				ERROR("couldn't use MSI-X SHARED\n");
 			}
-		}
-	} else if (bus->pci->get_msi_count(bus->device) >= 1) {
-		// try MSI
-		uint8 vector;
-		if (bus->pci->configure_msi(bus->device, 1, &vector) == B_OK
-			&& bus->pci->enable_msi(bus->device) == B_OK) {
-			TRACE_ALWAYS("using MSI vector %u\n", vector);
-			bus->irq = vector;
-			bus->irq_type = VIRTIO_IRQ_MSI;
-		} else {
-			ERROR("couldn't use MSI\n");
 		}
 	}
 
@@ -502,7 +500,7 @@ setup_interrupt(void* cookie, uint16 queueCount)
 		return B_ERROR;
 	}
 
-	if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
+	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
 		status_t status = install_io_interrupt_handler(bus->irq,
 			virtio_pci_config_interrupt, bus, 0);
 		if (status != B_OK) {
@@ -510,11 +508,20 @@ setup_interrupt(void* cookie, uint16 queueCount)
 			return status;
 		}
 		int32 irq = bus->irq + 1;
-		for (int32 queue = 0; queue < queueCount; queue++, irq++) {
-			bus->cookies[queue].sim = bus->sim;
-			bus->cookies[queue].queue = queue;
+		if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
+			for (int32 queue = 0; queue < queueCount; queue++, irq++) {
+				bus->cookies[queue].sim = bus->sim;
+				bus->cookies[queue].queue = queue;
+				status_t status = install_io_interrupt_handler(irq,
+					virtio_pci_queue_interrupt, &bus->cookies[queue], 0);
+				if (status != B_OK) {
+					ERROR("can't install interrupt handler\n");
+					return status;
+				}
+			}
+		} else {
 			status_t status = install_io_interrupt_handler(irq,
-				virtio_pci_queue_interrupt, &bus->cookies[queue], 0);
+				virtio_pci_queues_interrupt, bus, 0);
 			if (status != B_OK) {
 				ERROR("can't install interrupt handler\n");
 				return status;
@@ -543,23 +550,22 @@ free_interrupt(void* cookie)
 	CALLED();
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
 
-	if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
-		remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
-			bus);
+	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
+		remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt, bus);
 		int32 irq = bus->irq + 1;
-		for (int32 queue = 0; queue < bus->queue_count; queue++, irq++) {
-			remove_io_interrupt_handler(irq, virtio_pci_queue_interrupt,
-				&bus->cookies[queue]);
+		if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
+			for (int32 queue = 0; queue < bus->queue_count; queue++, irq++)
+				remove_io_interrupt_handler(irq, virtio_pci_queue_interrupt, &bus->cookies[queue]);
+			delete[] bus->cookies;
+			bus->cookies = NULL;
+		} else {
+			remove_io_interrupt_handler(irq, virtio_pci_queues_interrupt, bus);
 		}
-		delete[] bus->cookies;
-
+		bus->pci->disable_msi(bus->device);
+		bus->pci->unconfigure_msi(bus->device);
 	} else
 		remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
 
-	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
-		bus->pci->disable_msi(bus->device);
-		bus->pci->unconfigure_msi(bus->device);
-	}
 	return B_OK;
 }
 
@@ -715,17 +721,16 @@ uninit_bus(void* bus_cookie)
 {
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)bus_cookie;
 	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
-		if (bus->irq_type == VIRTIO_IRQ_MSI) {
-			remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
+		int32 irq = bus->irq + 1;
+		if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
+			for (int32 queue = 0; queue < bus->queue_count; queue++, irq++)
+				remove_io_interrupt_handler(irq, virtio_pci_queue_interrupt, &bus->cookies[queue]);
+			delete[] bus->cookies;
 		} else {
-			int32 irq = bus->irq + 1;
-			for (uint16 queue = 0; queue < bus->queue_count; queue++, irq++) {
-				remove_io_interrupt_handler(irq, virtio_pci_queue_interrupt,
-					&bus->cookies[queue]);
-			}
-			remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
-					bus);
+			remove_io_interrupt_handler(irq, virtio_pci_queues_interrupt, bus);
 		}
+		remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
+				bus);
 
 		bus->pci->disable_msi(bus->device);
 		bus->pci->unconfigure_msi(bus->device);
@@ -739,10 +744,9 @@ uninit_bus(void* bus_cookie)
 			else
 				break;
 		}
+		delete[] bus->notifyOffsets;
 	}
 
-	delete[] bus->notifyOffsets;
-	delete[] bus->cookies;
 	delete bus;
 }
 
