@@ -81,7 +81,7 @@ private:
 
 			status_t			fStatus;
 			struct virtio_scsi_config	fConfig;
-			uint32				fFeatures;
+			uint64				fFeatures;
 			::virtio_queue		fControlVirtioQueue;
 			::virtio_queue		fEventVirtioQueue;
 			::virtio_queue		fRequestVirtioQueue;

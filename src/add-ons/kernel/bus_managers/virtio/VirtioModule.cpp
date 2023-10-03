@@ -54,8 +54,8 @@ virtio_device_removed(void *_device)
 
 
 status_t
-virtio_negotiate_features(void* _device, uint32 supported,
-		uint32* negotiated, const char* (*get_feature_name)(uint32))
+virtio_negotiate_features(void* _device, uint64 supported,
+		uint64* negotiated, const char* (*get_feature_name)(uint64))
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)_device;
@@ -65,7 +65,7 @@ virtio_negotiate_features(void* _device, uint32 supported,
 
 
 status_t
-virtio_clear_feature(void* _device, uint32 feature)
+virtio_clear_feature(void* _device, uint64 feature)
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)_device;

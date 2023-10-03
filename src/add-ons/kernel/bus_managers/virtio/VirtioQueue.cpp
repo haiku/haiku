@@ -182,7 +182,9 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 
 	DisableInterrupt();
 
-	device->SetupQueue(fQueueNumber, physAddr);
+	device->SetupQueue(fQueueNumber, physAddr,
+		physAddr + ((addr_t)fRing.avail - (addr_t)fRing.desc),
+		physAddr + ((addr_t)fRing.used - (addr_t)fRing.desc));
 }
 
 

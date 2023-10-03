@@ -54,8 +54,10 @@
 #define VIRTIO_NET_F_GUEST_ANNOUNCE 0x200000 /* Announce device on network */
 #define VIRTIO_NET_F_MQ		0x400000 /* Device supports RFS */
 #define VIRTIO_NET_F_CTRL_MAC_ADDR 0x800000 /* Set MAC address */
+#define VIRTIO_NET_F_SPEED_DUPLEX	 (1ULL << 63) /* Device set linkspeed and duplex */
 
 #define VIRTIO_NET_S_LINK_UP	1	/* Link is up */
+#define VIRTIO_NET_S_ANNOUNCE	2	/* Announcement is needed */
 
 struct virtio_net_config {
 	/* The config defining mac address (if VIRTIO_NET_F_MAC) */
@@ -68,6 +70,8 @@ struct virtio_net_config {
 	 */
 	uint16_t	max_virtqueue_pairs;
 	uint16_t	mtu;
+	uint32_t	speed;
+	uint8_t		duplex;
 } _PACKED;
 
 /*

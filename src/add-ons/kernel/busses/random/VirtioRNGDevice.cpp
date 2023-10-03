@@ -14,7 +14,7 @@
 
 
 const char *
-get_feature_name(uint32 feature)
+get_feature_name(uint64 feature)
 {
 	switch (feature) {
 	}

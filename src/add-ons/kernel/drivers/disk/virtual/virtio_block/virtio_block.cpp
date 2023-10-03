@@ -55,7 +55,7 @@ typedef struct {
 
 	struct virtio_blk_config	config;
 
-	uint32 					features;
+	uint64 					features;
 	uint64					capacity;
 	uint32					block_size;
 	uint32					physical_block_size;
@@ -98,7 +98,7 @@ bool virtio_block_set_capacity(virtio_block_driver_info* info);
 
 
 const char *
-get_feature_name(uint32 feature)
+get_feature_name(uint64 feature)
 {
 	switch (feature) {
 		case VIRTIO_BLK_F_BARRIER:

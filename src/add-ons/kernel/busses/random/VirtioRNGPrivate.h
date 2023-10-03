@@ -49,7 +49,7 @@ private:
 			virtio_device*		fVirtioDevice;
 
 			status_t			fStatus;
-			uint32				fFeatures;
+			uint64				fFeatures;
 			::virtio_queue		fVirtioQueue;
 
 			spinlock			fInterruptLock;

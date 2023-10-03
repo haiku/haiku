@@ -57,7 +57,7 @@ typedef struct {
 	::virtio_device			virtio_device;
 	virtio_device_interface*	virtio;
 
-	uint32 					features;
+	uint64 					features;
 
 	uint32					pairsCount;
 
@@ -123,7 +123,7 @@ static void virtio_net_txDone(void* driverCookie, void* cookie);
 
 
 const char*
-get_feature_name(uint32 feature)
+get_feature_name(uint64 feature)
 {
 	switch (feature) {
 		case VIRTIO_NET_F_CSUM:
@@ -195,6 +195,7 @@ virtio_net_drain_queues(virtio_net_driver_info* info)
 static status_t
 virtio_net_rx_enqueue_buf(virtio_net_driver_info* info, BufInfo* buf)
 {
+	CALLED();
 	physical_entry entries[2];
 	entries[0] = buf->hdrEntry;
 	entries[1] = buf->entry;

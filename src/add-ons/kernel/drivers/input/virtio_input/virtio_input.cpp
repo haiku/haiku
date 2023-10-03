@@ -51,7 +51,7 @@ struct VirtioInputDevice {
 	virtio_device_interface* virtio;
 	::virtio_queue virtio_queue;
 
-	uint32 features;
+	uint64 features;
 
 	uint32 packetCnt;
 	int32 freePackets;

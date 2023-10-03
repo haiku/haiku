@@ -33,7 +33,7 @@ device_manager_info* gDeviceManager;
 
 
 static const char *
-virtio_get_feature_name(uint32 feature)
+virtio_get_feature_name(uint64 feature)
 {
 	switch (feature) {
 		case VIRTIO_FEATURE_NOTIFY_ON_EMPTY:
@@ -52,12 +52,12 @@ virtio_get_feature_name(uint32 feature)
 
 
 static void
-virtio_dump_features(const char* title, uint32 features,
-	const char* (*get_feature_name)(uint32))
+virtio_dump_features(const char* title, uint64 features,
+	const char* (*get_feature_name)(uint64))
 {
 	char features_string[512] = "";
-	for (uint32 i = 0; i < 32; i++) {
-		uint32 feature = features & (1 << i);
+	for (uint64 i = 0; i < 32; i++) {
+		uint64 feature = features & (1 << i);
 		if (feature == 0)
 			continue;
 		const char* name = virtio_get_feature_name(feature);
@@ -365,8 +365,8 @@ virtio_device_register_child_devices(void* cookie)
 
 
 static status_t
-virtio_device_negotiate_features(virtio_device cookie, uint32 supported,
-	uint32* negotiated, const char* (*get_feature_name)(uint32))
+virtio_device_negotiate_features(virtio_device cookie, uint64 supported,
+	uint64* negotiated, const char* (*get_feature_name)(uint64))
 {
 	TRACE("virtio_device_negotiate_features(%p)\n", cookie);
 	VirtioDevice* dev = (VirtioDevice*)cookie;
@@ -374,7 +374,7 @@ virtio_device_negotiate_features(virtio_device cookie, uint32 supported,
 	dev->fRegs->status |= kVirtioConfigSAcknowledge;
 	dev->fRegs->status |= kVirtioConfigSDriver;
 
-	uint32 features = dev->fRegs->deviceFeatures;
+	uint64 features = dev->fRegs->deviceFeatures;
 	virtio_dump_features("read features", features, get_feature_name);
 	features &= supported;
 
@@ -395,7 +395,7 @@ virtio_device_negotiate_features(virtio_device cookie, uint32 supported,
 
 
 static status_t
-virtio_device_clear_feature(virtio_device cookie, uint32 feature)
+virtio_device_clear_feature(virtio_device cookie, uint64 feature)
 {
 	panic("not implemented");
 	return B_ERROR;

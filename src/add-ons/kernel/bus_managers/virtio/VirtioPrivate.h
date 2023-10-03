@@ -45,10 +45,10 @@ public:
 			status_t			InitCheck();
 			uint32				ID() const { return fID; }
 
-			status_t 			NegotiateFeatures(uint32 supported,
-									uint32* negotiated,
-									const char* (*get_feature_name)(uint32));
-			status_t 			ClearFeature(uint32 feature);
+			status_t 			NegotiateFeatures(uint64 supported,
+									uint64* negotiated,
+									const char* (*get_feature_name)(uint64));
+			status_t 			ClearFeature(uint64 feature);
 
 			status_t			ReadDeviceConfig(uint8 offset, void* buffer,
 									size_t bufferSize);
@@ -63,12 +63,13 @@ public:
 			status_t			FreeInterrupts();
 
 			uint16				Alignment() const { return fAlignment; }
-			uint32				Features() const { return fFeatures; }
+			uint64				Features() const { return fFeatures; }
 
 			void*				DriverCookie() { return fDriverCookie; }
 
 			status_t			SetupQueue(uint16 queueNumber,
-									phys_addr_t physAddr);
+									phys_addr_t physAddr, phys_addr_t phyAvail,
+									phys_addr_t phyUsed);
 			void				NotifyQueue(uint16 queueNumber);
 
 			status_t			QueueInterrupt(uint16 queueNumber);
@@ -76,8 +77,8 @@ public:
 
 private:
 			void				_DumpFeatures(const char* title,
-									uint32 features,
-									const char* (*get_feature_name)(uint32));
+									uint64 features,
+									const char* (*get_feature_name)(uint64));
 			void				_DestroyQueues(size_t count);
 
 
@@ -89,8 +90,9 @@ private:
 			status_t			fStatus;
 			VirtioQueue**		fQueues;
 			size_t				fQueueCount;
-			uint32				fFeatures;
+			uint64				fFeatures;
 			uint16				fAlignment;
+			bool				fVirtio1;
 
 			virtio_intr_func	fConfigHandler;
 			void* 				fDriverCookie;

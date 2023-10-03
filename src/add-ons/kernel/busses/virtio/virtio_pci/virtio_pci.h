@@ -39,10 +39,9 @@
 /* VirtIO PCI vendor/device ID. */
 #define VIRTIO_PCI_VENDORID	0x1AF4
 #define VIRTIO_PCI_DEVICEID_MIN	0x1000
-#define VIRTIO_PCI_DEVICEID_MAX	0x103F
-
-/* VirtIO ABI version, this must match exactly. */
-#define VIRTIO_PCI_ABI_VERSION	0
+#define VIRTIO_PCI_DEVICEID_LEGACY_MAX	0x103F
+#define VIRTIO_PCI_DEVICEID_MODERN_MIN	0x1040
+#define VIRTIO_PCI_DEVICEID_MODERN_MAX	0x107F
 
 /*
  * VirtIO Header, located in BAR 0.
@@ -83,5 +82,64 @@
 
 /* The alignment to use between consumer and producer parts of vring. */
 #define VIRTIO_PCI_VRING_ALIGN	4096
+
+
+/*
+ * Virtio 1.0 specific
+ */
+
+struct virtio_pci_cap {
+	uint8_t cap_vndr;	/* Generic PCI field: PCI_CAP_ID_VNDR */
+	uint8_t cap_next;	/* Generic PCI field: next ptr. */
+	uint8_t cap_len;	/* Generic PCI field: capability length */
+	uint8_t cfg_type;	/* Identifies the structure. */
+	uint8_t bar;		/* Where to find it. */
+	uint8_t padding[3];	/* Pad to full dword. */
+	uint32_t offset;	/* Offset within bar. */
+	uint32_t length;	/* Length of the structure, in bytes. */
+} _PACKED;
+
+/* Common configuration */
+#define VIRTIO_PCI_CAP_COMMON_CFG	1
+/* Notifications */
+#define VIRTIO_PCI_CAP_NOTIFY_CFG	2
+/* ISR Status */
+#define VIRTIO_PCI_CAP_ISR_CFG		3
+/* Device specific configuration */
+#define VIRTIO_PCI_CAP_DEVICE_CFG	4
+/* PCI configuration access */
+#define VIRTIO_PCI_CAP_PCI_CFG		5
+
+struct virtio_pci_notify_cap {
+	struct virtio_pci_cap cap;
+	uint32_t notify_off_multiplier;	/* Multiplier for queue_notify_off. */
+} _PACKED;
+
+struct virtio_pci_cfg_cap {
+	struct virtio_pci_cap cap;
+	uint8_t pci_cfg_data[4];	/* Data for BAR access. */
+} _PACKED;
+
+struct virtio_pci_common_cfg {
+	/* About the whole device. */
+	uint32_t device_feature_select;	/* read-write */
+	uint32_t device_feature;	/* read-only for driver */
+	uint32_t driver_feature_select;	/* read-write */
+	uint32_t driver_feature;	/* read-write */
+	uint16_t config_msix_vector;	/* read-write */
+	uint16_t num_queues;		/* read-only for driver */
+	uint8_t device_status;		/* read-write */
+	uint8_t config_generation;	/* read-only for driver */
+
+	/* About a specific virtqueue. */
+	uint16_t queue_select;		/* read-write */
+	uint16_t queue_size;		/* read-write, power of 2, or 0. */
+	uint16_t queue_msix_vector;	/* read-write */
+	uint16_t queue_enable;		/* read-write */
+	uint16_t queue_notify_off;	/* read-only for driver */
+	uint64_t queue_desc;		/* read-write */
+	uint64_t queue_avail;		/* read-write */
+	uint64_t queue_used;		/* read-write */
+} _PACKED;
 
 #endif /* _VIRTIO_PCI_H */
