@@ -33,75 +33,6 @@ alias m="more"
 
 test -n "$BASH_VERSION" && shopt -s checkwinsize
 
-#
-# and now we include a few useful things...
-#
-
-#
-# An almost-ksh compatible `whence' command.  This is as hairy as it is
-# because of the desire to exactly mimic ksh.
-#
-# This depends somewhat on knowing the format of the output of the bash
-# `builtin type' command.
-#
-# Chet Ramey
-# chet@ins.CWRU.Edu
-#
-test -n "$KSH_VERSION" || whence()
-{
-	local vflag= path=
-
-	if [ "$#" = "0" ] ; then
-		echo "whence: argument expected"
-		return 1
-	fi
-	case "$1" in
-		-v) vflag=1
-		    shift 1
-		    ;;
-		-*) echo "whence: bad option: $1"
-		    return 1
-		    ;;
-		 *) ;;
-	esac
-
-	if [ "$#" = "0" ] ; then
-		echo "whence: bad argument count"
-		return 1
-	fi
-
-	returnValue=0
-
-	for cmd
-	do
-		if [ "$vflag" ]	 ; then
-			echo $(builtin type $cmd | sed 1q)
-		else
-			path=$(builtin type -path $cmd)
-			if [ "$path" ] ; then
-				echo $path
-			else
-				case "$cmd" in
-					*/*) if [ -x "$cmd" ]; then
-							echo "$cmd"
-						else
-							returnValue=1
-					    fi
-					    ;;
-					 *) case "$(builtin type -type $cmd)" in
-						"") returnValue=1
-							;;
-						 *) echo "$cmd"
-						    ;;
-					    esac
-					    ;;
-				esac
-			fi
-		fi
-	done
-	return $returnValue
-}
-
 if test -n "$KSH_VERSION"; then
 	ps1_pwd() {
 		local e=$? d=${PWD:-?}/ p=~
@@ -110,11 +41,9 @@ if test -n "$KSH_VERSION"; then
 		return $e
 	}
 	PS1=${PS1/'\w'/'$(ps1_pwd)'}
-	alias which='whence -p'
 else
 	test -n "$BASH_VERSION" || PS1=$(printf '%s' "$PS1" | \
 	    sed 's/\\w/$PWD/')
-	alias which='whence'
 fi
 
 function dir {
