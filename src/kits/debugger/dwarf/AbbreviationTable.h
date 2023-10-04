@@ -53,10 +53,12 @@ struct AbbreviationEntry {
 	uint32	Tag() const			{ return fTag; }
 	bool	HasChildren() const	{ return fHasChildren == DW_CHILDREN_yes; }
 
-	bool GetNextAttribute(uint32& name, uint32& form)
+	bool GetNextAttribute(uint32& name, uint32& form, int32& implicitConst)
 	{
 		name = fAttributesReader.ReadUnsignedLEB128(0);
 		form = fAttributesReader.ReadUnsignedLEB128(0);
+		if (form == DW_FORM_implicit_const)
+			implicitConst = fAttributesReader.ReadSignedLEB128(0);
 		return !fAttributesReader.HasOverflow() && (name != 0 || form != 0);
 	}
 

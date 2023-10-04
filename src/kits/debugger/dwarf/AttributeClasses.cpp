@@ -183,10 +183,12 @@ static const attribute_info_entry kAttributeFormInfos[] = {
 	{ ENTRY(exprloc),		AC_BLOCK },
 	{ ENTRY(flag_present),	AC_FLAG },
 	{ ENTRY(ref_sig8),		AC_REFERENCE },
+	{ ENTRY(implicit_const),
+							AC_CONSTANT },
 	{}
 };
 
-static const uint32 kAttributeFormInfoCount = DW_FORM_ref_sig8 + 1;
+static const uint32 kAttributeFormInfoCount = DW_FORM_implicit_const + 1;
 static attribute_info_entry sAttributeFormInfos[kAttributeFormInfoCount];
 
 static struct InitAttributeInfos {

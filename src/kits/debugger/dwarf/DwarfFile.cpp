@@ -1530,8 +1530,9 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 {
 	uint32 attributeName;
 	uint32 attributeForm;
+	int32 attributeImplicitConst = 0;
 	while (abbreviationEntry.GetNextAttribute(attributeName,
-			attributeForm)) {
+			attributeForm, attributeImplicitConst)) {
 		// resolve attribute form indirection
 		if (attributeForm == DW_FORM_indirect)
 			attributeForm = dataReader.ReadUnsignedLEB128(0);
@@ -1639,6 +1640,9 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 				fTypesSectionRequired = true;
 				value = dataReader.Read<uint64>(0);
 				refType = dwarf_reference_type_signature;
+				break;
+			case DW_FORM_implicit_const:
+				value = attributeImplicitConst;
 				break;
 			case DW_FORM_sec_offset:
 				value = unit->IsDwarf64()
