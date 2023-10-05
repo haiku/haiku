@@ -419,6 +419,7 @@ GlyphLayoutEngine::PopulateFallbacks(
 		"Noto Sans Display",
 		"Noto Sans Thai",
 		"Noto Sans CJK JP",
+		"Noto Sans Cherokee",
 		"Noto Sans Symbols",
 		"Noto Sans Symbols2",
 		"Noto Emoji",
