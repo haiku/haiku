@@ -1693,6 +1693,9 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case ATTRIBUTE_CLASS_ADDRESS:
 				attributeValue.SetToAddress(value);
 				break;
+			case ATTRIBUTE_CLASS_ADDRPTR:
+				attributeValue.SetToAddrPtr(value);
+				break;
 			case ATTRIBUTE_CLASS_BLOCK:
 				attributeValue.SetToBlock(dataReader.Data(), blockLength);
 				dataReader.Skip(blockLength);
@@ -1703,11 +1706,17 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case ATTRIBUTE_CLASS_LINEPTR:
 				attributeValue.SetToLinePointer(value);
 				break;
+			case ATTRIBUTE_CLASS_LOCLIST:
+				attributeValue.SetToLocationList(value);
+				break;
 			case ATTRIBUTE_CLASS_LOCLISTPTR:
 				attributeValue.SetToLocationListPointer(value);
 				break;
 			case ATTRIBUTE_CLASS_MACPTR:
 				attributeValue.SetToMacroPointer(value);
+				break;
+			case ATTRIBUTE_CLASS_RANGELIST:
+				attributeValue.SetToRangeList(value);
 				break;
 			case ATTRIBUTE_CLASS_RANGELISTPTR:
 				attributeValue.SetToRangeListPointer(value);
@@ -1739,6 +1748,9 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case ATTRIBUTE_CLASS_FLAG:
 			case ATTRIBUTE_CLASS_STRING:
 				// already set
+				break;
+			case ATTRIBUTE_CLASS_STROFFSETSPTR:
+				attributeValue.SetToStrOffsetsPtr(value);
 				break;
 		}
 

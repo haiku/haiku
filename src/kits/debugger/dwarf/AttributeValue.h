@@ -48,6 +48,13 @@ struct AttributeValue {
 		this->address = address;
 	}
 
+	void SetToAddrPtr(off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_ADDRPTR;
+		this->pointer = value;
+	}
+
 	void SetToBlock(const void* data, off_t length)
 	{
 		Unset();
@@ -78,6 +85,13 @@ struct AttributeValue {
 		this->pointer = value;
 	}
 
+	void SetToLocationList(off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_LOCLIST;
+		this->pointer = value;
+	}
+
 	void SetToLocationListPointer(off_t value)
 	{
 		Unset();
@@ -89,6 +103,13 @@ struct AttributeValue {
 	{
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_MACPTR;
+		this->pointer = value;
+	}
+
+	void SetToRangeList(off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_RANGELIST;
 		this->pointer = value;
 	}
 
@@ -111,6 +132,13 @@ struct AttributeValue {
 		Unset();
 		attributeClass = ATTRIBUTE_CLASS_STRING;
 		this->string = string;
+	}
+
+	void SetToStrOffsetsPtr(off_t value)
+	{
+		Unset();
+		attributeClass = ATTRIBUTE_CLASS_STROFFSETSPTR;
+		this->pointer = value;
 	}
 
 	void Unset()
@@ -244,7 +272,7 @@ struct MemberLocation {
 
 	bool IsLocationList() const
 	{
-		return attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR;
+		return attributeClass == ATTRIBUTE_CLASS_LOCLIST;
 	}
 
 	void SetToConstant(uint64 constant)
@@ -263,7 +291,7 @@ struct MemberLocation {
 	void SetToLocationList(off_t listOffset)
 	{
 		this->listOffset = listOffset;
-		attributeClass = ATTRIBUTE_CLASS_LOCLISTPTR;
+		attributeClass = ATTRIBUTE_CLASS_LOCLIST;
 	}
 };
 
@@ -294,7 +322,7 @@ struct LocationDescription {
 
 	bool IsLocationList() const
 	{
-		return attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR;
+		return attributeClass == ATTRIBUTE_CLASS_LOCLIST;
 	}
 
 	bool IsValid() const
@@ -305,7 +333,7 @@ struct LocationDescription {
 	void SetToLocationList(off_t offset)
 	{
 		listOffset = offset;
-		attributeClass = ATTRIBUTE_CLASS_LOCLISTPTR;
+		attributeClass = ATTRIBUTE_CLASS_LOCLIST;
 	}
 
 	void SetToExpression(const void* data, off_t length)

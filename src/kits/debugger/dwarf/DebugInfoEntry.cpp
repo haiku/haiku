@@ -200,7 +200,7 @@ DebugInfoEntry::AddAttribute_location(uint16 attributeName,
 	const AttributeValue& value)
 {
 	if (LocationDescription* location = GetLocationDescription()) {
-		if (value.attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR) {
+		if (value.attributeClass == ATTRIBUTE_CLASS_LOCLIST) {
 			location->SetToLocationList(value.pointer);
 			return B_OK;
 		}
@@ -313,6 +313,35 @@ DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(data_bit_offset)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(const_expr)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(enum_class)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(linkage_name)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(string_length_bit_size)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(string_length_byte_size)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(rank)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(str_offsets_base)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(addr_base)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(rnglists_base)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(dwo_name)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(reference)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(rvalue_reference)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(macros)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_all_calls)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_all_source_calls)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_all_tail_calls)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_return_pc)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_value)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_origin)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_parameter)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_pc)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_tail_call)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_target)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_target_clobbered)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_data_location)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_data_value)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(noreturn)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(alignment)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(export_symbols)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(deleted)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(defaulted)
+DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(loclists_base)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_value)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_data_value)
 DEFINE_DEBUG_INFO_ENTRY_ATTR_SETTER(call_site_target)
@@ -381,7 +410,7 @@ DebugInfoEntry::SetMemberLocation(MemberLocation& toSet,
 		case ATTRIBUTE_CLASS_BLOCK:
 			toSet.SetToExpression(value.block.data, value.block.length);
 			return B_OK;
-		case ATTRIBUTE_CLASS_LOCLISTPTR:
+		case ATTRIBUTE_CLASS_LOCLIST:
 			toSet.SetToLocationList(value.pointer);
 			return B_OK;
 		default:

@@ -27,10 +27,14 @@ AttributeValue::ToString(char* buffer, size_t size)
 		case ATTRIBUTE_CLASS_FLAG:
 			snprintf(buffer, size, "%s", flag ? "true" : "false");
 			return buffer;
+		case ATTRIBUTE_CLASS_ADDRPTR:
 		case ATTRIBUTE_CLASS_LINEPTR:
+		case ATTRIBUTE_CLASS_LOCLIST:
 		case ATTRIBUTE_CLASS_LOCLISTPTR:
 		case ATTRIBUTE_CLASS_MACPTR:
+		case ATTRIBUTE_CLASS_RANGELIST:
 		case ATTRIBUTE_CLASS_RANGELISTPTR:
+		case ATTRIBUTE_CLASS_STROFFSETSPTR:
 			snprintf(buffer, size, "%#" B_PRIx64, pointer);
 			return buffer;
 		case ATTRIBUTE_CLASS_REFERENCE:

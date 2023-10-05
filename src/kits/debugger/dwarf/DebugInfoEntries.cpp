@@ -1486,7 +1486,7 @@ status_t
 DIEPointerToMemberType::AddAttribute_use_location(uint16 attributeName,
 	const AttributeValue& value)
 {
-	if (value.attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR) {
+	if (value.attributeClass == ATTRIBUTE_CLASS_LOCLIST) {
 		fUseLocation.SetToLocationList(value.pointer);
 		return B_OK;
 	}
@@ -2078,7 +2078,7 @@ status_t
 DIESubprogram::AddAttribute_frame_base(uint16 attributeName,
 	const AttributeValue& value)
 {
-	if (value.attributeClass == ATTRIBUTE_CLASS_LOCLISTPTR) {
+	if (value.attributeClass == ATTRIBUTE_CLASS_LOCLIST) {
 		fFrameBase.SetToLocationList(value.pointer);
 		return B_OK;
 	}
