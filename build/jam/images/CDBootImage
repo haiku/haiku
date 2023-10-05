@@ -24,6 +24,8 @@ if $(TARGET_ARCH) = ppc {
 	local chrpscript = ofboot.chrp ;
 	# HFS creator and application type mapping for mkisofs
 	local hfsmaps = hfs.map ;
+	SEARCH on $(chrpscript) = [ FDirName $(HAIKU_TOP) data boot openfirmware ] ;
+	SEARCH on $(hfsmaps) = [ FDirName $(HAIKU_TOP) data boot openfirmware ] ;
 
 	BuildCDBootPPCImage $(HAIKU_CD_BOOT_IMAGE) : $(hfsmaps)
 		: $(elfloader) : $(coffloader) : $(chrpscript) : $(extras) ;

@@ -493,6 +493,42 @@ of_seek(intptr_t handle, off_t pos)
 }
 
 
+intptr_t
+of_blocks(intptr_t handle)
+{
+	struct {
+		const char      *name;
+		intptr_t        num_args;
+		intptr_t        num_returns;
+		intptr_t        handle;
+		intptr_t        result;
+		intptr_t        blocks;
+	} args = {"#blocks", 2, 1, handle, 0, 0};
+
+	if (gCallOpenFirmware(&args) == OF_FAILED)
+		return OF_FAILED;
+	return args.blocks;
+}
+
+
+intptr_t
+of_block_size(intptr_t handle)
+{
+	struct {
+		const char      *name;
+		intptr_t        num_args;
+		intptr_t        num_returns;
+		intptr_t        handle;
+		intptr_t        result;
+		intptr_t        size;
+	} args = {"block-size", 2, 1, handle, 0, 0};
+
+	if (gCallOpenFirmware(&args) == OF_FAILED)
+		return OF_FAILED;
+	return args.size;
+}
+
+
 // memory functions
 
 

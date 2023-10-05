@@ -66,6 +66,8 @@ extern void of_close(intptr_t handle);
 extern intptr_t of_read(intptr_t handle, void *buffer, intptr_t bufferSize);
 extern intptr_t of_write(intptr_t handle, const void *buffer, intptr_t bufferSize);
 extern intptr_t of_seek(intptr_t handle, off_t pos);
+extern intptr_t of_blocks(intptr_t handle);
+extern intptr_t of_block_size(intptr_t handle);
 
 /* memory functions */
 extern intptr_t of_release(void *virtualAddress, intptr_t size);
