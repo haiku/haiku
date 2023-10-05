@@ -988,10 +988,29 @@ DwarfFile::_ParseDebugInfoSection()
 		}
 
 		int version = dataReader.Read<uint16>(0);
-		off_t abbrevOffset = dwarf64
-			? dataReader.Read<uint64>(0)
-			: dataReader.Read<uint32>(0);
-		uint8 addressSize = dataReader.Read<uint8>(0);
+		if (version >= 5) {
+			uint8 unitType = dataReader.Read<uint8>(0);
+			if (unitType != DW_UT_compile) {
+				WARNING("\"%s\": Unsupported unit type %d\n",
+					fName, unitType);
+				return B_UNSUPPORTED;
+			}
+		}
+
+		off_t abbrevOffset;
+		uint8 addressSize;
+
+		if (version >= 5) {
+			addressSize = dataReader.Read<uint8>(0);
+			abbrevOffset = dwarf64
+				? dataReader.Read<uint64>(0)
+				: dataReader.Read<uint32>(0);
+		} else {
+			abbrevOffset = dwarf64
+				? dataReader.Read<uint64>(0)
+				: dataReader.Read<uint32>(0);
+			addressSize = dataReader.Read<uint8>(0);
+		}
 
 		if (dataReader.HasOverflow()) {
 			WARNING("\"%s\": Unexpected end of data in compilation unit "
