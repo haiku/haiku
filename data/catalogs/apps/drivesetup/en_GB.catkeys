@@ -15,5 +15,5 @@ The disk has been successfully initialized.\n	MainWindow		The disk has been succ
 Change parameters	MainWindow		Change parametres
 Failed to initialize the disk %s!\n	MainWindow		Failed to initialise the disc %s!\n
 Parameters	PartitionList		Parametres
-Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Are you sure you want to change parametres of the selected partition?\n\nThe partition may no longer be recognised by other operating systems any more!
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognised by other operating systems anymore!
 OK	AbstractParametersPanel		Alright

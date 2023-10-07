@@ -1,24 +1,23 @@
-1	russian	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Сверху на центр
-Lighting	TeapotWindow		Освещение
-Off	TeapotWindow		Выключить
-Lower left	TeapotWindow		Нижний левый угол
-White	TeapotWindow		Белый
-Yellow	TeapotWindow		Желтый
-Blue	TeapotWindow		Голубой
-Gouraud shading	TeapotWindow		Метод тонирования Гуро
-Quit	TeapotWindow		Выход
-Filled polygons	TeapotWindow		Заполненные многоугольники
-Settings	TeapotWindow		Настройки
-Fog	TeapotWindow		Туман
-Backface culling	TeapotWindow		Заднее отбрасывание
-Z-buffered	TeapotWindow		Z-буферизация
-File	TeapotWindow		Файл
-Perspective	TeapotWindow		Перспектива
-GLTeapot	System name		Чайник
-Green	TeapotWindow		Зеленый
+1	russian	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Справа
-FPS display	TeapotWindow		Показывать частоту кадров
+Backface culling	TeapotWindow		Заднее отбрасывание
 Add a teapot	TeapotWindow		Добавить чайник
+Yellow	TeapotWindow		Желтый
+Perspective	TeapotWindow		Перспектива
+Off	TeapotWindow		Выключить
+Quit	TeapotWindow		Выход
+Green	TeapotWindow		Зеленый
+Blue	TeapotWindow		Голубой
+White	TeapotWindow		Белый
+Upper center	TeapotWindow		Сверху на центр
+Filled polygons	TeapotWindow		Заполненные многоугольники
+Lower left	TeapotWindow		Нижний левый угол
+Fog	TeapotWindow		Туман
+FPS display	TeapotWindow		Показывать частоту кадров
+GLTeapot	System name		Чайник
+Settings	TeapotWindow		Настройки
+Gouraud shading	TeapotWindow		Метод тонирования Гуро
+Lighting	TeapotWindow		Освещение
+Z-buffered	TeapotWindow		Z-буферизация
 Red	TeapotWindow		Красный
 Lights	TeapotWindow		Свет

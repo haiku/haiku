@@ -19,10 +19,10 @@ Copy	SudokuWindow		Копіювати
 Solve	SudokuWindow		Розв'язати
 HTML	SudokuWindow		HTML
 Advanced	SudokuWindow		Підвищений
-Set all hints	SudokuWindow		Встановити всі підказки
+Set all hints	SudokuWindow		Показати всі підказки
 Searching for removable values	SudokuGenerator		Пошук значень для вилучення
 Abort	ProgressWindow		Перервати
-Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
+Could not set Sudoku:\n%s\n	SudokuWindow		Не вдалося встановити Судоку: \n%s\n
 Help	SudokuWindow		Довідка
 OK	SudokuWindow		ОК
 Sudoku	System name		Sudoku

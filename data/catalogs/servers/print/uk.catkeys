@@ -51,5 +51,5 @@ Get name of transport	Transport Scripting		Отримати ім'я трансп
 A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Бажаєте зробити @ принтером за замовчуванням?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	ANSI B (tabloid)
-Page setup	ConfigWindow		Налаштування друку
+Page setup	ConfigWindow		Налаштування сторінки
 Paper setup:	ConfigWindow		Налаштування паперу:

@@ -1,24 +1,23 @@
-1	slovak	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Hore v strede
-Lighting	TeapotWindow		Osvetlenie
-Off	TeapotWindow		Vypnuté
-Lower left	TeapotWindow		Vľavo dolu
-White	TeapotWindow		Biela
-Yellow	TeapotWindow		Žltá
-Blue	TeapotWindow		Modrá
-Gouraud shading	TeapotWindow		Goraudovo tieňovanie
-Quit	TeapotWindow		Ukončiť
-Filled polygons	TeapotWindow		Vyplnené polygóny
-Settings	TeapotWindow		Nastavenia
-Fog	TeapotWindow		Dym
-Backface culling	TeapotWindow		Orezávanie zadnej strany
-Z-buffered	TeapotWindow		Z-buffering
-File	TeapotWindow		Súbor
-Perspective	TeapotWindow		Perspektíva
-GLTeapot	System name		GLKonvica
-Green	TeapotWindow		Zelená
+1	slovak	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Vpravo
-FPS display	TeapotWindow		Zobrazenie snímok za sekundu
+Backface culling	TeapotWindow		Orezávanie zadnej strany
 Add a teapot	TeapotWindow		Pridať konvicu
+Yellow	TeapotWindow		Žltá
+Perspective	TeapotWindow		Perspektíva
+Off	TeapotWindow		Vypnuté
+Quit	TeapotWindow		Ukončiť
+Green	TeapotWindow		Zelená
+Blue	TeapotWindow		Modrá
+White	TeapotWindow		Biela
+Upper center	TeapotWindow		Hore v strede
+Filled polygons	TeapotWindow		Vyplnené polygóny
+Lower left	TeapotWindow		Vľavo dolu
+Fog	TeapotWindow		Dym
+FPS display	TeapotWindow		Zobrazenie snímok za sekundu
+GLTeapot	System name		GLKonvica
+Settings	TeapotWindow		Nastavenia
+Gouraud shading	TeapotWindow		Goraudovo tieňovanie
+Lighting	TeapotWindow		Osvetlenie
+Z-buffered	TeapotWindow		Z-buffering
 Red	TeapotWindow		Červená
 Lights	TeapotWindow		Svetlá

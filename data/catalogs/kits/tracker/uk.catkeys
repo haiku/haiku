@@ -234,7 +234,7 @@ Memory size	AttributesView		Розмір пам'яті
 New folder	TemplatesMenu		Каталог або Папка
  (broken)	InfoWindow		 (поламаний)
 Replace all	FSUtils		Замінити все
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Програма \«%appname\» не підтримує відкриття документу даного типу.\nВи дійсно бажаєте відкрити документ у ній?\n\nЯкщо ви знаєте, що програма підтримує цей тип документів, то рекомендуємо зв'язатися с розробниками програми і попросити їх оновити список типів, які підтримуються нею.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Програма \«%appname\» не підтримує документи даного типу.\nВи дійсно бажаєте відкрити документ з її допомогою?\n\nЯкщо Ви знаєте, що програма підтримує цей тип документів, то рекомендуємо зв'язатися с розробниками програми і попросити їх оновити список типів, які підтримуються нею.
 Reverse order	ContainerWindow		Зворотній порядок
 Copying: 	StatusWindow		Копіювання: 
 Show navigator	SettingsView		Показати навігатор

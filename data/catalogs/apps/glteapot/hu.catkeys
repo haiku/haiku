@@ -1,24 +1,23 @@
-1	hungarian	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Felső közép
-Lighting	TeapotWindow		Megvilágítás
-Off	TeapotWindow		Ki
-Lower left	TeapotWindow		Bal alsó
-White	TeapotWindow		Fehér
-Yellow	TeapotWindow		Sárga
-Blue	TeapotWindow		Kék
-Gouraud shading	TeapotWindow		Elmosott árnyékolás
-Quit	TeapotWindow		Kilépés
-Filled polygons	TeapotWindow		Kitöltött poligonszám
-Settings	TeapotWindow		Beállítások
-Fog	TeapotWindow		Köd
-Backface culling	TeapotWindow		Háttérszűrés
-Z-buffered	TeapotWindow		Z-pufferelt
-File	TeapotWindow		Fájl
-Perspective	TeapotWindow		Perspektíva
-GLTeapot	System name		Teáskanna
-Green	TeapotWindow		Zöld
+1	hungarian	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Jobb
-FPS display	TeapotWindow		FPS megjelenítése
+Backface culling	TeapotWindow		Háttérszűrés
 Add a teapot	TeapotWindow		Teáskanna hozzáadása
+Yellow	TeapotWindow		Sárga
+Perspective	TeapotWindow		Perspektíva
+Off	TeapotWindow		Ki
+Quit	TeapotWindow		Kilépés
+Green	TeapotWindow		Zöld
+Blue	TeapotWindow		Kék
+White	TeapotWindow		Fehér
+Upper center	TeapotWindow		Felső közép
+Filled polygons	TeapotWindow		Kitöltött poligonszám
+Lower left	TeapotWindow		Bal alsó
+Fog	TeapotWindow		Köd
+FPS display	TeapotWindow		FPS megjelenítése
+GLTeapot	System name		Teáskanna
+Settings	TeapotWindow		Beállítások
+Gouraud shading	TeapotWindow		Elmosott árnyékolás
+Lighting	TeapotWindow		Megvilágítás
+Z-buffered	TeapotWindow		Z-pufferelt
 Red	TeapotWindow		Vörös
 Lights	TeapotWindow		Fények

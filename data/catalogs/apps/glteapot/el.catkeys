@@ -1,24 +1,23 @@
-1	greek, modern (1453-)	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Πάνω κέντρο
-Lighting	TeapotWindow		Φωτισμός
-Off	TeapotWindow		Κλειστό
-Lower left	TeapotWindow		Κάτω αριστερά
-White	TeapotWindow		Άσπρο
-Yellow	TeapotWindow		Κίτρινο
-Blue	TeapotWindow		Μπλε
-Gouraud shading	TeapotWindow		Σκίαση Gouraud
-Quit	TeapotWindow		Κλείσιμο
-Filled polygons	TeapotWindow		Γεμισμένα πολύγωνα
-Settings	TeapotWindow		Ρυθμίσεις
-Fog	TeapotWindow		Ομίχλη
-Backface culling	TeapotWindow		Κλείσιμο οπίσθιας όψης
-Z-buffered	TeapotWindow		Z-buffered
-File	TeapotWindow		Αρχείο
-Perspective	TeapotWindow		Προοπτική
-GLTeapot	System name		GL-Τσαγιέρα
-Green	TeapotWindow		Πράσινο
+1	greek, modern (1453-)	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Δεξιά
-FPS display	TeapotWindow		Προβολή FPS
+Backface culling	TeapotWindow		Κλείσιμο οπίσθιας όψης
 Add a teapot	TeapotWindow		Προσθήκη τσαγιέρας
+Yellow	TeapotWindow		Κίτρινο
+Perspective	TeapotWindow		Προοπτική
+Off	TeapotWindow		Κλειστό
+Quit	TeapotWindow		Κλείσιμο
+Green	TeapotWindow		Πράσινο
+Blue	TeapotWindow		Μπλε
+White	TeapotWindow		Άσπρο
+Upper center	TeapotWindow		Πάνω κέντρο
+Filled polygons	TeapotWindow		Γεμισμένα πολύγωνα
+Lower left	TeapotWindow		Κάτω αριστερά
+Fog	TeapotWindow		Ομίχλη
+FPS display	TeapotWindow		Προβολή FPS
+GLTeapot	System name		GL-Τσαγιέρα
+Settings	TeapotWindow		Ρυθμίσεις
+Gouraud shading	TeapotWindow		Σκίαση Gouraud
+Lighting	TeapotWindow		Φωτισμός
+Z-buffered	TeapotWindow		Z-buffered
 Red	TeapotWindow		Κόκκινο
 Lights	TeapotWindow		Φώτα

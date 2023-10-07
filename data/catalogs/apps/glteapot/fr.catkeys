@@ -1,24 +1,23 @@
-1	french	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		En haut au centre
-Lighting	TeapotWindow		Éclairage
-Off	TeapotWindow		Arrêt
-Lower left	TeapotWindow		En bas à gauche
-White	TeapotWindow		Blanc
-Yellow	TeapotWindow		Jaune
-Blue	TeapotWindow		Bleu
-Gouraud shading	TeapotWindow		Ombrages de Gouraud
-Quit	TeapotWindow		Quitter
-Filled polygons	TeapotWindow		Polygones pleins
-Settings	TeapotWindow		Réglages
-Fog	TeapotWindow		Brouillard
-Backface culling	TeapotWindow		Abattage des faces arrières
-Z-buffered	TeapotWindow		Tampon de profondeur
-File	TeapotWindow		Fichier
-Perspective	TeapotWindow		Perspective
-GLTeapot	System name		GLTeapot
-Green	TeapotWindow		Vert
+1	french	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		À droite
-FPS display	TeapotWindow		Afficher la vitesse d’animation
+Backface culling	TeapotWindow		Abattage des faces arrières
 Add a teapot	TeapotWindow		Ajouter une théière
+Yellow	TeapotWindow		Jaune
+Perspective	TeapotWindow		Perspective
+Off	TeapotWindow		Arrêt
+Quit	TeapotWindow		Quitter
+Green	TeapotWindow		Vert
+Blue	TeapotWindow		Bleu
+White	TeapotWindow		Blanc
+Upper center	TeapotWindow		En haut au centre
+Filled polygons	TeapotWindow		Polygones pleins
+Lower left	TeapotWindow		En bas à gauche
+Fog	TeapotWindow		Brouillard
+FPS display	TeapotWindow		Afficher la vitesse d’animation
+GLTeapot	System name		GLTeapot
+Settings	TeapotWindow		Réglages
+Gouraud shading	TeapotWindow		Ombrages de Gouraud
+Lighting	TeapotWindow		Éclairage
+Z-buffered	TeapotWindow		Tampon de profondeur
 Red	TeapotWindow		Rouge
 Lights	TeapotWindow		Lumières

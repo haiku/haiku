@@ -1,24 +1,23 @@
-1	swedish	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Övre mitten
-Lighting	TeapotWindow		Ljussättning
-Off	TeapotWindow		Av
-Lower left	TeapotWindow		Nedre vänstra
-White	TeapotWindow		Vit
-Yellow	TeapotWindow		Gul
-Blue	TeapotWindow		Blå
-Gouraud shading	TeapotWindow		Gouraud skuggning
-Quit	TeapotWindow		Avsluta
-Filled polygons	TeapotWindow		Fyllda polygoner
-Settings	TeapotWindow		Inställningar
-Fog	TeapotWindow		Dimma
-Backface culling	TeapotWindow		Filtrera bort bakåtvända polygoner
-Z-buffered	TeapotWindow		Z-buffrad
-File	TeapotWindow		Arkiv
-Perspective	TeapotWindow		Perspektiv
-GLTeapot	System name		GLTekanna
-Green	TeapotWindow		Grön
+1	swedish	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Höger
-FPS display	TeapotWindow		Visa bildrutor per sekund
+Backface culling	TeapotWindow		Filtrera bort bakåtvända polygoner
 Add a teapot	TeapotWindow		Lägg till en tekanna
+Yellow	TeapotWindow		Gul
+Perspective	TeapotWindow		Perspektiv
+Off	TeapotWindow		Av
+Quit	TeapotWindow		Avsluta
+Green	TeapotWindow		Grön
+Blue	TeapotWindow		Blå
+White	TeapotWindow		Vit
+Upper center	TeapotWindow		Övre mitten
+Filled polygons	TeapotWindow		Fyllda polygoner
+Lower left	TeapotWindow		Nedre vänstra
+Fog	TeapotWindow		Dimma
+FPS display	TeapotWindow		Visa bildrutor per sekund
+GLTeapot	System name		GLTekanna
+Settings	TeapotWindow		Inställningar
+Gouraud shading	TeapotWindow		Gouraud skuggning
+Lighting	TeapotWindow		Ljussättning
+Z-buffered	TeapotWindow		Z-buffrad
 Red	TeapotWindow		Röd
 Lights	TeapotWindow		Ljuskällor

@@ -1,24 +1,23 @@
-1	romanian	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Centru sus
-Lighting	TeapotWindow		Iluminare
-Off	TeapotWindow		Oprit
-Lower left	TeapotWindow		Stânga jos
-White	TeapotWindow		Alb
-Yellow	TeapotWindow		Galben
-Blue	TeapotWindow		Albastru
-Gouraud shading	TeapotWindow		Nuanțare Gouraud
-Quit	TeapotWindow		Ieșire
-Filled polygons	TeapotWindow		Poligoane umplute
-Settings	TeapotWindow		Configurări
-Fog	TeapotWindow		Ceață
-Backface culling	TeapotWindow		Eliminarea feței din spate
-Z-buffered	TeapotWindow		Preîncărcat-Z
-File	TeapotWindow		Fișier
-Perspective	TeapotWindow		Perspectivă
-GLTeapot	System name		GLTeapot
-Green	TeapotWindow		Verde
+1	romanian	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Dreapta
-FPS display	TeapotWindow		Afișaj FPS
+Backface culling	TeapotWindow		Eliminarea feței din spate
 Add a teapot	TeapotWindow		Adaugă un ceainic
+Yellow	TeapotWindow		Galben
+Perspective	TeapotWindow		Perspectivă
+Off	TeapotWindow		Oprit
+Quit	TeapotWindow		Ieșire
+Green	TeapotWindow		Verde
+Blue	TeapotWindow		Albastru
+White	TeapotWindow		Alb
+Upper center	TeapotWindow		Centru sus
+Filled polygons	TeapotWindow		Poligoane umplute
+Lower left	TeapotWindow		Stânga jos
+Fog	TeapotWindow		Ceață
+FPS display	TeapotWindow		Afișaj FPS
+GLTeapot	System name		GLTeapot
+Settings	TeapotWindow		Configurări
+Gouraud shading	TeapotWindow		Nuanțare Gouraud
+Lighting	TeapotWindow		Iluminare
+Z-buffered	TeapotWindow		Preîncărcat-Z
 Red	TeapotWindow		Roșu
 Lights	TeapotWindow		Lumini

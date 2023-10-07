@@ -1,24 +1,23 @@
-1	catalan; valencian	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		A dalt al centre
-Lighting	TeapotWindow		Il·luminació
-Off	TeapotWindow		Desactivat
-Lower left	TeapotWindow		Inferior esquerre
-White	TeapotWindow		Blanc
-Yellow	TeapotWindow		Groc
-Blue	TeapotWindow		Blau
-Gouraud shading	TeapotWindow		Ombrejat Gourad
-Quit	TeapotWindow		Surt
-Filled polygons	TeapotWindow		Polígons plens
-Settings	TeapotWindow		Paràmetres
-Fog	TeapotWindow		Boira
-Backface culling	TeapotWindow		Supressió de cares posteriors
-Z-buffered	TeapotWindow		Z-memòria intermèdia
-File	TeapotWindow		Fitxer
-Perspective	TeapotWindow		Perspectiva
-GLTeapot	System name		GLTeapot
-Green	TeapotWindow		Verd
+1	catalan; valencian	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		A la dreta
-FPS display	TeapotWindow		Mostra la velocitat de l'animació
+Backface culling	TeapotWindow		Supressió de cares posteriors
 Add a teapot	TeapotWindow		Afegeix-hi una tetera
+Yellow	TeapotWindow		Groc
+Perspective	TeapotWindow		Perspectiva
+Off	TeapotWindow		Desactivat
+Quit	TeapotWindow		Surt
+Green	TeapotWindow		Verd
+Blue	TeapotWindow		Blau
+White	TeapotWindow		Blanc
+Upper center	TeapotWindow		A dalt al centre
+Filled polygons	TeapotWindow		Polígons plens
+Lower left	TeapotWindow		Inferior esquerre
+Fog	TeapotWindow		Boira
+FPS display	TeapotWindow		Mostra la velocitat de l'animació
+GLTeapot	System name		GLTeapot
+Settings	TeapotWindow		Paràmetres
+Gouraud shading	TeapotWindow		Ombrejat Gourad
+Lighting	TeapotWindow		Il·luminació
+Z-buffered	TeapotWindow		Z-memòria intermèdia
 Red	TeapotWindow		Vermell
 Lights	TeapotWindow		Llums

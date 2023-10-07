@@ -1,2 +1,15 @@
-1	english (united kingdom)	x-vnd.Haiku-IMAP	3078708458
+1	english (united kingdom)	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Could not connect to server \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Updating subscriptions to IMAP folders, please be patient…
+Failed to fetch available storage.	IMAPFolderConfig		Failed to fetch available storage.
+Cancel	IMAPFolderConfig		Cancel
 OK	IMAPFolderConfig		Alright
+Server storage: %s / %s used.	IMAPFolderConfig		Server storage: %s / %s used.
+No encryption	imap_config		No encryption
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Fetching IMAP folders, please be patient…
+Configure IMAP Folders	imap_config		Configure IMAP Folders
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Apply
+status	IMAPFolderConfig		status
+IMAP Folders	IMAPFolderConfig		IMAP Folders
+Destination:	imap_config		Destination:

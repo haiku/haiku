@@ -6,7 +6,7 @@ Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Використов�
 JPEG Library Error: %s\n	be_jerror		Помилка бібліотеки JPEG: %s\n
 ©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nНа основі бібліотеки IJG ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nз патчем підтримки кодування \"lossless\" від Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nЗ деякими процедурами перетворення простору кольорів від Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 None	JPEGTranslator		Немає
-About	JPEGTranslator		Про це
+About	JPEGTranslator		Інфо…
 Version %d.%d.%d	JPEGTranslator		Версія %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		Записати чорно-біле зображення як RGB24
 Output smoothing strength	JPEGTranslator		Cтупінь стиснення виводу

@@ -1,0 +1,7 @@
+1	english (united kingdom)	x-vnd.Haiku-SpamFilter	468104950
+or empty e-mail	SpamFilterConfig		or empty e-mail
+Genuine below and uncertain above:	SpamFilterConfig		Genuine below and uncertain above:
+Spam above:	SpamFilterConfig		Spam above:
+Add spam rating to start of subject	SpamFilterConfig		Add spam rating to start of subject
+Bayesian Spam Filter	SpamFilter		Bayesian Spam Filter
+Learn from all incoming e-mail	SpamFilterConfig		Learn from all incoming e-mail

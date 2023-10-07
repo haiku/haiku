@@ -1,2 +1,13 @@
-1	english (united kingdom)	x-vnd.Haiku-NewMailNotification	2819869035
+1	english (united kingdom)	x-vnd.Haiku-NewMailNotification	2220310168
+Log window	NotifierConfigView		Log window
+none	NotifierConfigView		none
+Alert	NotifierConfigView		Alert
 OK	NotifierFilter		Alright
+Central alert	NotifierConfigView		Central alert
+Beep	NotifierConfigView		Beep
+Central beep	NotifierConfigView		Central beep
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+New messages	NotifierFilter		New messages
+Method:	NotifierConfigView		Method:
+Keyboard LEDs	NotifierConfigView		Keyboard LEDs
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		You have {0, plural, one{one new message} other{# new messages}} for %account.

@@ -1,24 +1,23 @@
-1	portuguese (brazil)	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Acima centralizado
-Lighting	TeapotWindow		Iluminação
-Off	TeapotWindow		Desligado
-Lower left	TeapotWindow		Esquerda inferior
-White	TeapotWindow		Branco
-Yellow	TeapotWindow		Amarelo
-Blue	TeapotWindow		Azul
-Gouraud shading	TeapotWindow		Sombreamento Gouraud
-Quit	TeapotWindow		Sair
-Filled polygons	TeapotWindow		Polígonos preenchidos
-Settings	TeapotWindow		Configurações
-Fog	TeapotWindow		Neblina
-Backface culling	TeapotWindow		Remoção de faces posteriores
-Z-buffered	TeapotWindow		Z-buffered
-File	TeapotWindow		Arquivo
-Perspective	TeapotWindow		Perspectiva
-GLTeapot	System name		Bule GL
-Green	TeapotWindow		Verde
+1	portuguese (brazil)	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Direito
-FPS display	TeapotWindow		Exibição de FPS
+Backface culling	TeapotWindow		Remoção de faces posteriores
 Add a teapot	TeapotWindow		Adicionar uma chaleira
+Yellow	TeapotWindow		Amarelo
+Perspective	TeapotWindow		Perspectiva
+Off	TeapotWindow		Desligado
+Quit	TeapotWindow		Sair
+Green	TeapotWindow		Verde
+Blue	TeapotWindow		Azul
+White	TeapotWindow		Branco
+Upper center	TeapotWindow		Acima centralizado
+Filled polygons	TeapotWindow		Polígonos preenchidos
+Lower left	TeapotWindow		Esquerda inferior
+Fog	TeapotWindow		Neblina
+FPS display	TeapotWindow		Exibição de FPS
+GLTeapot	System name		Bule GL
+Settings	TeapotWindow		Configurações
+Gouraud shading	TeapotWindow		Sombreamento Gouraud
+Lighting	TeapotWindow		Iluminação
+Z-buffered	TeapotWindow		Z-buffered
 Red	TeapotWindow		Vermelho
 Lights	TeapotWindow		Luzes

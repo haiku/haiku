@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-Terminal	185459086
+1	french	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal ne peut pas démarrer l’interpréteur de commande.
 Text encoding	Terminal TermWindow		Encodage texte
+Colors	Terminal ThemeWindow		Couleurs
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Éditer
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial\n

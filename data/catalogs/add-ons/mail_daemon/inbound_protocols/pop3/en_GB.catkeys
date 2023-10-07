@@ -1,4 +1,12 @@
-1	english (united kingdom)	x-vnd.Haiku-POP3	1165050188
+1	english (united kingdom)	x-vnd.Haiku-POP3	3740496702
+Sending username…	pop3		Sending username…
+Connect to server…	pop3		Connect to server…
+APOP	ConfigView		APOP
+Connecting to POP3 server…	pop3		Connecting to POP3 server…
+: The server does not support APOP.	pop3		: The server does not support APOP.
 Error while authenticating user %user	pop3		Error whilst authenticating user %user
+Destination:	ConfigView		Destination:
+. The server said:\n	pop3		. The server said:\n
+Plain text	ConfigView		Plain text
 Getting mailbox size…	pop3		Getting postbox size…
 Error while connecting to server %serv	pop3		Error whilst connecting to server %serv

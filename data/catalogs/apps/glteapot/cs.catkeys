@@ -1,24 +1,23 @@
-1	czech	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Nahoře uprostřed
-Lighting	TeapotWindow		Osvětlení
-Off	TeapotWindow		Vypnuto
-Lower left	TeapotWindow		Vlevo dole
-White	TeapotWindow		Bílá
-Yellow	TeapotWindow		Žlutá
-Blue	TeapotWindow		Modrá
-Gouraud shading	TeapotWindow		Goraudovo stínování
-Quit	TeapotWindow		Ukončit
-Filled polygons	TeapotWindow		Vyplněné polygony
-Settings	TeapotWindow		Nastavení
-Fog	TeapotWindow		Mlha
-Backface culling	TeapotWindow		Ořezávání zadní strany
-Z-buffered	TeapotWindow		Z-buffering
-File	TeapotWindow		Soubor
-Perspective	TeapotWindow		Perspektiva
-GLTeapot	System name		GLKonvice
-Green	TeapotWindow		Zelená
+1	czech	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Vpravo
-FPS display	TeapotWindow		Zobrazit snímovou frekvenci
+Backface culling	TeapotWindow		Ořezávání zadní strany
 Add a teapot	TeapotWindow		Přidat konvici
+Yellow	TeapotWindow		Žlutá
+Perspective	TeapotWindow		Perspektiva
+Off	TeapotWindow		Vypnuto
+Quit	TeapotWindow		Ukončit
+Green	TeapotWindow		Zelená
+Blue	TeapotWindow		Modrá
+White	TeapotWindow		Bílá
+Upper center	TeapotWindow		Nahoře uprostřed
+Filled polygons	TeapotWindow		Vyplněné polygony
+Lower left	TeapotWindow		Vlevo dole
+Fog	TeapotWindow		Mlha
+FPS display	TeapotWindow		Zobrazit snímovou frekvenci
+GLTeapot	System name		GLKonvice
+Settings	TeapotWindow		Nastavení
+Gouraud shading	TeapotWindow		Goraudovo stínování
+Lighting	TeapotWindow		Osvětlení
+Z-buffered	TeapotWindow		Z-buffering
 Red	TeapotWindow		Červená
 Lights	TeapotWindow		Osvětlení

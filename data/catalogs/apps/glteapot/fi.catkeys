@@ -1,24 +1,23 @@
-1	finnish	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		Ylempi keskikohta
-Lighting	TeapotWindow		Valaistus
-Off	TeapotWindow		Valot pois
-Lower left	TeapotWindow		Alempi vasen
-White	TeapotWindow		Valkoinen
-Yellow	TeapotWindow		Keltainen
-Blue	TeapotWindow		Sininen
-Gouraud shading	TeapotWindow		Gouraud-varjostus
-Quit	TeapotWindow		Lopeta
-Filled polygons	TeapotWindow		Täytetyt monikulmiot
-Settings	TeapotWindow		Asetukset
-Fog	TeapotWindow		Sumu
-Backface culling	TeapotWindow		Taustakulman häivytys
-Z-buffered	TeapotWindow		Z-puskuroitu
-File	TeapotWindow		Tiedosto
-Perspective	TeapotWindow		Perspektiivi
-GLTeapot	System name		GL-teekannu
-Green	TeapotWindow		Vihreä
+1	finnish	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		Oikea
-FPS display	TeapotWindow		FPS-näyttö
+Backface culling	TeapotWindow		Taustakulman häivytys
 Add a teapot	TeapotWindow		Lisää teekannu
+Yellow	TeapotWindow		Keltainen
+Perspective	TeapotWindow		Perspektiivi
+Off	TeapotWindow		Valot pois
+Quit	TeapotWindow		Lopeta
+Green	TeapotWindow		Vihreä
+Blue	TeapotWindow		Sininen
+White	TeapotWindow		Valkoinen
+Upper center	TeapotWindow		Ylempi keskikohta
+Filled polygons	TeapotWindow		Täytetyt monikulmiot
+Lower left	TeapotWindow		Alempi vasen
+Fog	TeapotWindow		Sumu
+FPS display	TeapotWindow		FPS-näyttö
+GLTeapot	System name		GL-teekannu
+Settings	TeapotWindow		Asetukset
+Gouraud shading	TeapotWindow		Gouraud-varjostus
+Lighting	TeapotWindow		Valaistus
+Z-buffered	TeapotWindow		Z-puskuroitu
 Red	TeapotWindow		Punainen
 Lights	TeapotWindow		Valot

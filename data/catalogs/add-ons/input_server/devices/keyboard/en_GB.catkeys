@@ -1,0 +1,11 @@
+1	english (united kingdom)	x-vnd.Haiku-KeyboardInputServerDevice	131044710
+If the application will not quit you may have to kill it.	Team monitor		If the application will not quit you may have to kill it.
+Quit application	Team monitor		Quit application
+Open Terminal	Team monitor		Open Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}
+Restart the desktop	Team monitor		Restart the desktop
+Force reboot	Team monitor		Force reboot
+Team monitor	Team monitor		Team monitor
+Kill application	Team monitor		Kill application
+Cancel	Team monitor		Cancel
+(This team is a system component)	Team monitor		(This team is a system component)

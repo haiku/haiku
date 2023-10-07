@@ -180,10 +180,10 @@ Settings…	Icon-O-Matic-SavePanel		設定...
 Select all	Icon-O-Matic-PathManipulator		すべて選択
 Add with style	Icon-O-Matic-ShapesList		スタイル付きで追加
 New	Icon-O-Matic-Menu-File		新規
-Change perspective	Icon-O-Matic-PerspectiveCommand		奥行きの変更
+Change perspective	Icon-O-Matic-PerspectiveCommand		パースペクティブの変更
 Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		{0, plural, one{個の頂点} other{個の頂点}}のナッジ移動
 Gradient type	Icon-O-Matic-StyleTypes		グラデーションのタイプ
-Perspective	Transformation		奥行き
+Perspective	Transformation		パースペクティブ
 Export	Icon-O-Matic-Menu-File		エクスポート
 Width	Icon-O-Matic-PropertyNames		幅
 Add reference image	Icon-O-Matic-ShapesList		参考画像の追加

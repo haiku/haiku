@@ -12,9 +12,9 @@ Full screen	MandelbrotWindow		Повний екран
 Midnight	MandelbrotWindow		Північ
 Burning Ship	MandelbrotWindow		Палаючий корабель
 Lightning	MandelbrotWindow		Свічення
-About	MandelbrotWindow		Про це
+About	MandelbrotWindow		Про програму
 Palette	MandelbrotWindow		Палітра
-Set	MandelbrotWindow		Встановити
+Set	MandelbrotWindow		Фрактал
 Royal	MandelbrotWindow		Королівський
 Subsampling	MandelbrotWindow		Підгрупування
 File	MandelbrotWindow		Файл

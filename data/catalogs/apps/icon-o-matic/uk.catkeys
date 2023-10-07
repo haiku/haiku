@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	4218125219
+1	ukrainian	x-vnd.haiku-icon_o_matic	525412496
 None	Icon-O-Matic-Properties		Пусто
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Очистити контур
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -161,7 +161,9 @@ Settings…	Icon-O-Matic-SavePanel		Налаштування…
 Select all	Icon-O-Matic-PathManipulator		Вибрати все
 Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
 New	Icon-O-Matic-Menu-File		Новий
+Change perspective	Icon-O-Matic-PerspectiveCommand		Змінити перспективу
 Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
+Perspective	Transformation		Перспектива
 Export	Icon-O-Matic-Menu-File		Експорт
 Width	Icon-O-Matic-PropertyNames		Ширина
 Add reference image	Icon-O-Matic-ShapesList		Додати референсне зображення

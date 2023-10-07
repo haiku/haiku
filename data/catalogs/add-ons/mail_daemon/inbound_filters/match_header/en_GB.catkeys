@@ -1,0 +1,17 @@
+1	english (united kingdom)	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		Delete message
+Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" against \"%regex\"
+Match header	RuleFilter		Match header
+Set flags to	ConfigView		Set flags to
+Header field (e.g. Subject, From, …)	ConfigView		Header field (e.g. Subject, From, …)
+<Choose account>	ConfigView		<Choose account>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.
+Then	ConfigView		Then
+If	ConfigView		If
+Set as read	ConfigView		Set as read
+Reply with	ConfigView		Reply with
+<Choose action>	ConfigView		<Choose action>
+Move to	ConfigView		Move to
+this field is based on the action	ConfigView		this field is based on the action
+Account	ConfigView		Account
+has	ConfigView		has

@@ -1,24 +1,23 @@
-1	thai	x-vnd.Haiku-GLTeapot	1569683445
-Upper center	TeapotWindow		ด้านบนตรงกลาง
-Lighting	TeapotWindow		ความสว่าง
-Off	TeapotWindow		ปิด
-Lower left	TeapotWindow		ล่างซ้าย
-White	TeapotWindow		ขาว
-Yellow	TeapotWindow		เหลือง
-Blue	TeapotWindow		น้ำเงิน
-Gouraud shading	TeapotWindow		การระบายวัตถุ 3 มิติ
-Quit	TeapotWindow		ออก
-Filled polygons	TeapotWindow		รูปหลายเลี่ยม
-Settings	TeapotWindow		ตั้งค่า
-Fog	TeapotWindow		มัว
-Backface culling	TeapotWindow		Backface culling
-Z-buffered	TeapotWindow		Z-buffered
-File	TeapotWindow		ไฟล์
-Perspective	TeapotWindow		มุมมอง
-GLTeapot	System name		GLTeapot
-Green	TeapotWindow		เขียว
+1	thai	x-vnd.Haiku-GLTeapot	400822745
 Right	TeapotWindow		ถูกต้อง
-FPS display	TeapotWindow		การแสดงผล FPS
+Backface culling	TeapotWindow		Backface culling
 Add a teapot	TeapotWindow		เพิ่มกาน้ำชา
+Yellow	TeapotWindow		เหลือง
+Perspective	TeapotWindow		มุมมอง
+Off	TeapotWindow		ปิด
+Quit	TeapotWindow		ออก
+Green	TeapotWindow		เขียว
+Blue	TeapotWindow		น้ำเงิน
+White	TeapotWindow		ขาว
+Upper center	TeapotWindow		ด้านบนตรงกลาง
+Filled polygons	TeapotWindow		รูปหลายเลี่ยม
+Lower left	TeapotWindow		ล่างซ้าย
+Fog	TeapotWindow		มัว
+FPS display	TeapotWindow		การแสดงผล FPS
+GLTeapot	System name		GLTeapot
+Settings	TeapotWindow		ตั้งค่า
+Gouraud shading	TeapotWindow		การระบายวัตถุ 3 มิติ
+Lighting	TeapotWindow		ความสว่าง
+Z-buffered	TeapotWindow		Z-buffered
 Red	TeapotWindow		แดง
 Lights	TeapotWindow		สว่าง

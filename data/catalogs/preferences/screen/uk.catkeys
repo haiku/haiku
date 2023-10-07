@@ -4,7 +4,7 @@ bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
 Rows:	Screen		Рядки:
 %.1f Hz	Screen		%.1f Гц
-The screen mode could not be set:\n\t%s\n	Screen		Режим екрану не може бути встановлений:\n\t%s\n
+The screen mode could not be set:\n\t%s\n	Screen		Не вдалося встановити режим екрану:\n\t%s\n
 Keep	Screen		Зберегти
 /other…	Screen		/інше…
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu кГц\nВертикальна частота:\t%lu - %lu Гц\n\nМаксимально пікселів:\t%g МГц
@@ -44,7 +44,7 @@ Refresh rate	Screen		Частота оновлення
 if needed	Screen		якщо потрібно
 Combine displays:	Screen		Обє'днати дисплеї:
 Unknown mode	Screen		Невідомий режим
-About	Screen		Про це
+About	Screen		Про програму
 Columns:	Screen		Стовпці:
 Resolution:	Screen		Роздільна здатність:
 Apply	Screen		Застосувати
