@@ -72,7 +72,7 @@ enum {
 	DW_TAG_generic_subrange			= 0x45,
 	DW_TAG_dynamic_type				= 0x46,
 	DW_TAG_atomic_type				= 0x47,
-	DW_TAG_call_size				= 0x48,
+	DW_TAG_call_site				= 0x48,
 	DW_TAG_call_site_parameter		= 0x49,
 	DW_TAG_skeleton_unit			= 0x4a,
 	DW_TAG_immutable_type			= 0x4b,
