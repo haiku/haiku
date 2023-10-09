@@ -277,7 +277,7 @@ rule CreateAsmStructOffsetsHeader header : source : architecture
 				sysHeaders += $(HOST_BE_API_HEADERS) ;
 			}
 		} else {
-			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
+			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) : C++ ]
 				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;

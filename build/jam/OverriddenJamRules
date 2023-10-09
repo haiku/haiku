@@ -95,9 +95,12 @@ rule Object
 			if $(USES_BE_API) {
 				sysHeaders += $(HOST_BE_API_HEADERS) ;
 			}
-
 		} else {
-			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
+			local language ;
+			if $(>:S) = .cpp || [ on $(2) return $(GENERATE_C++) ] {
+				language = C++ ;
+			}
+			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) : $(language) ]
 				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;

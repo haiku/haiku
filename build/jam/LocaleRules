@@ -32,7 +32,8 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
 			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
 		} else {
-			sysHeaders += [ FStandardHeaders $(TARGET_PACKAGING_ARCH) ]
+			sysHeaders +=
+				[ FStandardHeaders $(TARGET_PACKAGING_ARCH) : C++ ]
 				$(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ;
 			defines += $(TARGET_DEFINES_$(TARGET_PACKAGING_ARCH))
 				$(TARGET_DEFINES) ;
