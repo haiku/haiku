@@ -107,6 +107,8 @@ protected:
 
 private:
 			int					_OpenGraphicsDevice(int deviceNumber);
+			bool				_RecursiveScan(const char* directory, int deviceNumber,
+									int& count, char* _path);
 			status_t			_OpenAccelerant(int device);
 			status_t			_SetupDefaultHooks();
 			void				_UpdateHooksAfterModeChange();

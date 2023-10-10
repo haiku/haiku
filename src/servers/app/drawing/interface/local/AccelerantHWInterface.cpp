@@ -34,7 +34,9 @@
 
 #include <Accelerant.h>
 #include <Cursor.h>
+#include <Directory.h>
 #include <FindDirectory.h>
+#include <Path.h>
 #include <PathFinder.h>
 #include <String.h>
 #include <StringList.h>
@@ -164,8 +166,8 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fBlitParams(new (nothrow) blit_params[kDefaultParamsCount]),
 	fBlitParamsCount(kDefaultParamsCount)
 {
-	fDisplayMode.virtual_width = 640;
-	fDisplayMode.virtual_height = 480;
+	fDisplayMode.virtual_width = 0;
+	fDisplayMode.virtual_height = 0;
 	fDisplayMode.space = B_RGB32;
 
 	// NOTE: I have no clue what I'm doing here.
@@ -217,6 +219,42 @@ AccelerantHWInterface::Initialize()
 }
 
 
+/*!	Proceeds with a recursive scan, avoiding vesa and framebuffer devices.
+
+
+	\return Whether a device path matching the \a deviceNumber is found.
+*/
+bool
+AccelerantHWInterface::_RecursiveScan(const char* directory, int deviceNumber, int &count,
+	char *_path)
+{
+	ATRACE(("_RecursiveScan directory: %s\n", directory));
+
+	BEntry entry;
+	BDirectory dir(directory);
+	while (dir.GetNextEntry(&entry) == B_OK) {
+		BPath path;
+		entry.GetPath(&path);
+		if (!strcmp(path.Path(), "/dev/graphics/vesa")
+			|| !strcmp(path.Path(), "/dev/graphics/framebuffer")) {
+			continue;
+		}
+
+		if (entry.IsDirectory()) {
+			if (_RecursiveScan(path.Path(), deviceNumber, count, _path))
+				return true;
+		} else {
+			if (count == deviceNumber) {
+				strlcpy(_path, path.Path(), PATH_MAX);
+				return true;
+			}
+			count++;
+		}
+	}
+	return false;
+}
+
+
 /*!	Opens a graphics device for read-write access.
 
 	The \a deviceNumber is relative to the number of graphics devices that can
@@ -237,31 +275,13 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	int device = -1;
 	int count = 0;
 	if (!use_fail_safe_video_mode()) {
-		DIR *directory = opendir("/dev/graphics");
-		if (!directory)
-			return B_ENTRY_NOT_FOUND;
-
-		struct dirent *entry;
 		char path[PATH_MAX];
-		while ((entry = readdir(directory)) != NULL) {
-			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")
-				|| !strcmp(entry->d_name, "vesa") || !strcmp(entry->d_name, "framebuffer"))
-				continue;
-
-			if (count == deviceNumber) {
-				sprintf(path, "/dev/graphics/%s", entry->d_name);
-				device = open(path, B_READ_WRITE);
-				break;
-			}
-
-			count++;
-		}
-
-		closedir(directory);
+		if (_RecursiveScan("/dev/graphics/", deviceNumber, count, path))
+			device = open(path, B_READ_WRITE);
 	}
 
 	// Open VESA or Framebuffer driver if we were not able to get a better one.
-	if (count < deviceNumber) {
+	if (device == -1 && count < deviceNumber) {
 		device = open("/dev/graphics/vesa", B_READ_WRITE);
 		if (device > 0) {
 			// store the device, so that we can access the planar blitter
