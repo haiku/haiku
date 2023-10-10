@@ -7,10 +7,6 @@ UseHeaders [ FDirName $(SUBDIR) ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-# Enabling C++ structures in C only code
-Includes [ FGristFiles kernel_c++_structs.h ]
-	: <src!system!kernel>kernel_c++_struct_sizes.h ;
-
 # FIXME: Something in here is broken at even -O1! Slow WiFi is better than no WiFi...
 CCFLAGS on [ FGristFiles ieee80211_scan_sw.o ] = -O0 ;
 
