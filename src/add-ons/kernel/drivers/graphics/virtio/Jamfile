@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel drivers graphics virtio ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders [ FDirName graphics virtio ] ;
+UsePrivateHeaders drivers graphics virtio ;
+
+KernelAddon virtio_gpu :
+	virtio_gpu.cpp
+;

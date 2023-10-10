@@ -16,3 +16,5 @@ SubInclude HAIKU_TOP src add-ons kernel drivers graphics s3 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics skeleton ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 SubInclude HAIKU_TOP src add-ons kernel drivers graphics via ;
+SubInclude HAIKU_TOP src add-ons kernel drivers graphics virtio ;
+

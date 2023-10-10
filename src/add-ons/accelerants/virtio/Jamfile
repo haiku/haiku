@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src add-ons accelerants virtio ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics virtio ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders shared ;
+
+Addon virtio_gpu.accelerant :
+	accelerant.cpp
+	hooks.cpp
+	mode.cpp
+	: libaccelerantscommon.a
+;
