@@ -86,14 +86,14 @@ private:
 protected:
 			typedef DoublyLinkedList<ConditionVariableEntry> EntryList;
 
+			ConditionVariable*	fNext;
+
 			const void*			fObject;
 			const char*			fObjectType;
 
 			spinlock			fLock;
-			EntryList			fEntries;
 			int32				fEntriesCount;
-
-			ConditionVariable*	fNext;
+			EntryList			fEntries;
 
 			friend struct ConditionVariableEntry;
 			friend struct ConditionVariableHashDefinition;
