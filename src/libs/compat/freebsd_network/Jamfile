@@ -6,10 +6,6 @@ UsePrivateHeaders net ;
 UsePrivateKernelHeaders ;
 UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
 
-# Enabling C++ structures in C only code
-Includes [ FGristFiles kernel_c++_structs.h ]
-	: <src!system!kernel>kernel_c++_struct_sizes.h ;
-
 SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 SubDirC++Flags [ FDefines _KERNEL=1 ] ;
 

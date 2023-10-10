@@ -1,19 +1,27 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de.
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2023, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _FBSD_COMPAT_SYS_CONDVAR_H_
 #define _FBSD_COMPAT_SYS_CONDVAR_H_
 
 
-#include <kernel_c++_structs.h>
+#include <sys/param.h>
+#include <KernelExport.h>
+
 
 __BEGIN_DECLS
 
 
 struct cv {
-	struct ConditionVariable condition;
+	// We cannot include <condition_variable.h> here as it is C++-only.
+	char condition[roundup((sizeof(void*) * 5) + sizeof(spinlock) + sizeof(int32), sizeof(void*))];
 };
+
+#ifdef __cplusplus
+#	define __cv_ConditionVariable(CV) reinterpret_cast<ConditionVariable*>(&(CV)->condition)
+#endif
+
 
 void cv_init(struct cv*, const char*);
 void cv_destroy(struct cv*);
@@ -23,5 +31,6 @@ void cv_signal(struct cv*);
 
 
 __END_DECLS
+
 
 #endif /* _FBSD_COMPAT_SYS_CONDVAR_H_ */
