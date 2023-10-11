@@ -1978,6 +1978,7 @@ DIESubprogram::AddChild(DebugInfoEntry* child)
 		case DW_TAG_template_value_parameter:
 			fTemplateValueParameters.Add(child);
 			return B_OK;
+		case DW_TAG_call_site:
 		case DW_TAG_GNU_call_site:
 			fCallSites.Add(child);
 			return B_OK;
@@ -2783,7 +2784,8 @@ DIECallSite::AddAttribute_name(uint16 attributeName,
 status_t
 DIECallSite::AddChild(DebugInfoEntry* child)
 {
-	if (child->Tag() == DW_TAG_GNU_call_site_parameter) {
+	if (child->Tag() == DW_TAG_GNU_call_site_parameter
+		|| child->Tag() == DW_TAG_call_site_parameter) {
 		fChildren.Add(child);
 		return B_OK;
 	}
@@ -3032,9 +3034,11 @@ DebugInfoEntryFactory::CreateDebugInfoEntry(uint16 tag, DebugInfoEntry*& _entry)
 		case DW_TAG_GNU_formal_parameter_pack:
 			entry = new(std::nothrow) DIETemplateValueParameterPack;
 			break;
+		case DW_TAG_call_site:
 		case DW_TAG_GNU_call_site:
 			entry = new(std::nothrow) DIECallSite;
 			break;
+		case DW_TAG_call_site_parameter:
 		case DW_TAG_GNU_call_site_parameter:
 			entry = new(std::nothrow) DIECallSiteParameter;
 			break;
