@@ -95,7 +95,7 @@ static const tag_name_info kTagNameInfos[] = {
 };
 
 
-static const uint32 kTagNameInfoCount = DW_TAG_template_alias + 5;
+static const uint32 kTagNameInfoCount = DW_TAG_immutable_type + 5;
 static const char* sTagNames[kTagNameInfoCount];
 
 static struct InitTagNames {
@@ -103,10 +103,10 @@ static struct InitTagNames {
 	{
 		for (uint32 i = 0; kTagNameInfos[i].name != NULL; i++) {
 			const tag_name_info& info = kTagNameInfos[i];
-			if (info.tag <= DW_TAG_template_alias)
+			if (info.tag <= DW_TAG_immutable_type)
 				sTagNames[info.tag] = info.name;
 			else {
-				sTagNames[DW_TAG_template_alias + 1 + (info.tag
+				sTagNames[DW_TAG_immutable_type + 1 + (info.tag
 						- DW_TAG_GNU_template_parameter_pack)] = info.name;
 			}
 		}
@@ -117,11 +117,11 @@ static struct InitTagNames {
 const char*
 get_entry_tag_name(uint16 tag)
 {
-	if (tag <= DW_TAG_template_alias)
+	if (tag <= DW_TAG_immutable_type)
 		return sTagNames[tag];
 	else if (tag >= DW_TAG_GNU_template_parameter_pack
 		&& tag <= DW_TAG_GNU_call_site_parameter) {
-		return sTagNames[DW_TAG_template_alias + 1 + (tag
+		return sTagNames[DW_TAG_immutable_type + 1 + (tag
 				- DW_TAG_GNU_template_parameter_pack)];
 	}
 
