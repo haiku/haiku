@@ -63,7 +63,6 @@ TTeamMenu::TTeamMenu(TBarView* barView)
 	fBarView(barView)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
-	SetFont(be_plain_font);
 }
 
 

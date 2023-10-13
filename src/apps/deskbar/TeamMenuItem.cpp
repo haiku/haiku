@@ -512,7 +512,12 @@ TTeamMenuItem::_Init(BList* team, BBitmap* icon, char* name, char* signature,
 
 	fBarView = static_cast<TBarApp*>(be_app)->BarView();
 
-	BFont font(be_plain_font);
+	// use menu font (parent font not available yet)
+	menu_info info;
+	get_menu_info(&info);
+	BFont font;
+	font.SetFamilyAndStyle(info.f_family, info.f_style);
+	font.SetSize(info.font_size);
 	fLabelWidth = ceilf(font.StringWidth(name));
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);

@@ -432,7 +432,6 @@ void
 TReplicantTray::ShowReplicantMenu(BPoint point)
 {
 	BPopUpMenu* menu = new BPopUpMenu("", false, false);
-	menu->SetFont(be_plain_font);
 
 	// If clock is visible show the extended menu, otherwise show "Show clock"
 

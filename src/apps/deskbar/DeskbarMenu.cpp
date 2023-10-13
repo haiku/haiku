@@ -315,7 +315,6 @@ B_TRANSLATE_MARK_VOID("About this system")
 	}
 #endif
 
-	shutdownMenu->SetFont(be_plain_font);
 	shutdownMenu->SetTargetForItems(be_app);
 
 	BMessage* message = new BMessage(kShutdownSystem);
@@ -655,7 +654,6 @@ TRecentsMenu::ResetTargets()
 DeskbarMountMenu::DeskbarMountMenu(const char* name)
 	: BPrivate::MountMenu(name)
 {
-	SetFont(be_plain_font);
 }
 
 

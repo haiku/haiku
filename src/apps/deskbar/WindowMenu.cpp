@@ -82,7 +82,6 @@ TWindowMenu::TWindowMenu(const BList* team, const char* signature)
 void
 TWindowMenu::AttachedToWindow()
 {
-	SetFont(be_plain_font);
 	RemoveItems(0, CountItems(), true);
 	int32 miniCount = 0;
 
