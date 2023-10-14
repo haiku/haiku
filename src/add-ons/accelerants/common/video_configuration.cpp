@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2023, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,8 @@ get_connector_name(uint32 connector)
 			return "HDMI B";
 		case VIDEO_CONNECTOR_TV:
 			return "TV";
+		case VIDEO_CONNECTOR_USBC:
+			return "USB C";
 		case VIDEO_CONNECTOR_UNKNOWN:
 			return "Unknown";
 	}

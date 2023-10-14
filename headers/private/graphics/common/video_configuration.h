@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2023, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,6 +28,7 @@
 #define VIDEO_CONNECTOR_HDMIA		0x0C
 #define VIDEO_CONNECTOR_HDMIB		0x0D
 #define VIDEO_CONNECTOR_TV			0x0E
+#define VIDEO_CONNECTOR_USBC		0x0F
 
 
 // Video encoder types

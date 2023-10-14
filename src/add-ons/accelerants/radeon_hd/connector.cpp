@@ -990,9 +990,10 @@ connector_is_dp(uint32 connectorIndex)
 {
 	connector_info* connector = gConnector[connectorIndex];
 
-	// Traditional DisplayPort connector
+	// Traditional DisplayPort connector, or DP over USBC
 	if (connector->type == VIDEO_CONNECTOR_DP
-		|| connector->type == VIDEO_CONNECTOR_EDP) {
+		|| connector->type == VIDEO_CONNECTOR_EDP
+		|| connector->type == VIDEO_CONNECTOR_USBC) {
 		return true;
 	}
 
