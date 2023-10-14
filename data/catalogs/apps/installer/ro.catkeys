@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	954345363
+1	romanian	x-vnd.Haiku-Installer	2377300654
 Performing installation.	InstallProgress		Se execută instalarea.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Închideți fereastra DriveSetup înainte de a închide fereastra Installer.
 No optional packages available.	PackagesView		Nu sunt disponibile pachete opționale.
@@ -15,6 +15,7 @@ Quit	InstallerWindow		Ieșire
 Write boot sector to '%s'	InstallerWindow		Scrie sectorul de boot pe „%s”
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.
 Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Se rulează BootManager și DriveSetup…\n\nÎnchideți ambele aplicații pentru a continua instalarea.
+Click on 'Set up partitions…' to create one.	InstallerWindow		Clic pe „Stabilește partițiile…” pentru a crea una.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Installer Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplicația pentru configurarea partițiilor de disc, nu a putut fi lansată.

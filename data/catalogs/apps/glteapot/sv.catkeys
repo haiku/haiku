@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-GLTeapot	400822745
+1	swedish	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Höger
 Backface culling	TeapotWindow		Filtrera bort bakåtvända polygoner
 Add a teapot	TeapotWindow		Lägg till en tekanna
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Nedre vänstra
 Fog	TeapotWindow		Dimma
 FPS display	TeapotWindow		Visa bildrutor per sekund
 GLTeapot	System name		GLTekanna
+Limit FPS to refresh rate	TeapotWindow		Begränsa FPS till uppdateringsfrekvens
 Settings	TeapotWindow		Inställningar
 Gouraud shading	TeapotWindow		Gouraud skuggning
 Lighting	TeapotWindow		Ljussättning

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-GLTeapot	400822745
+1	catalan; valencian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		A la dreta
 Backface culling	TeapotWindow		Supressió de cares posteriors
 Add a teapot	TeapotWindow		Afegeix-hi una tetera
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Inferior esquerre
 Fog	TeapotWindow		Boira
 FPS display	TeapotWindow		Mostra la velocitat de l'animació
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Limita els FPS a la freqüència d'actualització
 Settings	TeapotWindow		Paràmetres
 Gouraud shading	TeapotWindow		Ombrejat Gourad
 Lighting	TeapotWindow		Il·luminació

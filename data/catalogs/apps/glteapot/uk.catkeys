@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-GLTeapot	400822745
+1	ukrainian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Вправо
 Backface culling	TeapotWindow		Відсікти фон
 Add a teapot	TeapotWindow		Додати чайник
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Нижній лівий
 Fog	TeapotWindow		Туман
 FPS display	TeapotWindow		Показати FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Обмежити FPS до частоти оновлення
 Settings	TeapotWindow		Налаштування
 Gouraud shading	TeapotWindow		Затінення Гуро
 Lighting	TeapotWindow		Освітлення

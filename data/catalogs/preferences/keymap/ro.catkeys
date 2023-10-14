@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Keymap	2850776429
+1	romanian	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Tastă
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
@@ -30,6 +30,7 @@ US-International	KeymapNames		US-internațional
 Right option	Keyboard Layout View		Opțiune dreapta
 Turkish (Type-Q)	KeymapNames		Turcă (tip-Q)
 Revert	Modifier keys window		Revenire
+Caps:	Modifier keys window	Caps key role name	Caps:
 Slovak	KeymapNames		Slovacă
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Belgiană (virgulă)
 Norwegian	KeymapNames		Norvegiană
 Font	Keymap window		Font
 Danish	KeymapNames		Daneză
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tasta Caps
 Generic 104-key	KeyboardLayoutNames		Generic 104-key
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasta Shift
 Russian	KeymapNames		Rusă

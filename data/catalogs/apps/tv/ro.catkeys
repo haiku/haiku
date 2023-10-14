@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku.TV	3120244932
+1	romanian	x-vnd.Haiku.TV	181363067
 No menu	MainWin		Fără meniu
 No border	MainWin		Fără margine
 Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
@@ -17,6 +17,7 @@ Previous channel	MainWin		Canalul anterior
 OK	MainWin		OK
 TV	MainWin		TV
 Settings	MainWin		Configurări
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Configurări…
 None	MainWin		Nespecificat

@@ -95,7 +95,7 @@ Use text:	Terminal FindWindow		Використати текст:
 Close active tab	Terminal TermWindow		Закрити активну вкладку
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна.\nМожна використовувати наступні заповнювачі:\n\n
 Selected background	Terminal ThemeView		Фон виділення
-Save as default	Terminal TermWindow		Зберегти за замовчуванням
+Save as default	Terminal TermWindow		Зберегти як типові
 Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
 ANSI bright red color	Terminal ThemeView		ANSI яскравий червоний
 Use left Option as Meta key	Terminal AppearancePrefView		Використовувати лівий Option як клавішу Meta 

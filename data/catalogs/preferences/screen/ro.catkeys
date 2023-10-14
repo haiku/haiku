@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Screen	133788249
+1	romanian	x-vnd.Haiku-Screen	2318349707
 no	Screen		nu
 bits/pixel	Screen		biți/pixel
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 de culori
@@ -13,6 +13,7 @@ Video format:	Screen		Format video:
 Undo	Screen		Refă
 OK	Screen		OK
 Current workspace	Screen		Spațiul de lucru curent
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		vertical
 All workspaces	Screen		Toate spațiile de lucru
 Use laptop panel:	Screen		Utilizează panoul de laptop:

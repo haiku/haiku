@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3218166538
+1	romanian	x-vnd.Haiku-libtracker	1249062292
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -411,6 +411,7 @@ Emptying Trash… 	StatusWindow		Se eliberează gunoiul…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
 Revert	TrackerSettingsWindow		Revenire
 trash	B_TRASH_DIRECTORY		gunoi
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Dacă mutați dosarul de sistem sau conținutul acestuia, nu veți putea boota %osName!\n\nSigur doriți să faceți asta?\n\nPentru a muta dosarul de sistem sau conținutul acestuia oricum, țineți apăsată tasta Shift și dați clic pe \„Mută\”.
 Close all in workspace	ContainerWindow		Închide toate din spațiul de lucru
 Corrupted expression.	libtracker		Expresie coruptă.
@@ -435,6 +436,7 @@ the config folder	FSUtils		dosarul config
 Sorry, could not create a new folder.	FSUtils		Nu s-a putut crea un dosar nou.
 MIME Signature	AttributesView		Semnătură MIME
 Select all	VirtualDirectoryWindow		Selectează toate
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Redenumește
 Clean up all	ContainerWindow		Curăță toate
 Add current folder	FilePanelPriv		Adaugă dosarul curent
