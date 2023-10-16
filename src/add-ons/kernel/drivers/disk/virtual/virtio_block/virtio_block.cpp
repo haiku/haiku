@@ -4,6 +4,9 @@
  */
 
 
+#include <condition_variable.h>
+#include <lock.h>
+#include <StackOrHeapArray.h>
 #include <virtio.h>
 
 #include "virtio_blk.h"
@@ -55,13 +58,20 @@ typedef struct {
 
 	struct virtio_blk_config	config;
 
+	area_id					bufferArea;
+	addr_t					bufferAddr;
+	phys_addr_t				bufferPhysAddr;
+
 	uint64 					features;
 	uint64					capacity;
 	uint32					block_size;
 	uint32					physical_block_size;
 	status_t				media_status;
 
-	sem_id 	sem_cb;
+	mutex					lock;
+	int32					currentRequest;
+	ConditionVariable		interruptCondition;
+	ConditionVariableEntry 	interruptConditionEntry;
 } virtio_block_driver_info;
 
 
@@ -165,15 +175,15 @@ virtio_block_config_callback(void* driverCookie)
 
 
 static void
-virtio_block_callback(void* driverCookie, void* cookie)
+virtio_block_callback(void* driverCookie, void* _cookie)
 {
-	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
+	virtio_block_driver_info* info = (virtio_block_driver_info*)_cookie;
 
-	// consume all queued elements
-	while (info->virtio->queue_dequeue(info->virtio_queue, NULL, NULL))
-		;
-
-	release_sem_etc(info->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+	void* cookie = NULL;
+	while (info->virtio->queue_dequeue(info->virtio_queue, &cookie, NULL)) {
+		if ((int32)(addr_t)cookie == atomic_get(&info->currentRequest))
+			info->interruptCondition.NotifyAll();
+	}
 }
 
 
@@ -182,53 +192,61 @@ do_io(void* cookie, IOOperation* operation)
 {
 	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
 
-	size_t bytesTransferred = 0;
-	status_t status = B_OK;
+	if (mutex_trylock(&info->lock) != B_OK)
+		return B_BUSY;
 
-	physical_entry entries[operation->VecCount() + 2];
+	BStackOrHeapArray<physical_entry, 16> entries(operation->VecCount() + 2);
 
-	void *buffer = malloc(sizeof(struct virtio_blk_outhdr) + sizeof(uint8));
-	struct virtio_blk_outhdr *header = (struct virtio_blk_outhdr*)buffer;
+	struct virtio_blk_outhdr *header = (struct virtio_blk_outhdr*)info->bufferAddr;
 	header->type = operation->IsWrite() ? VIRTIO_BLK_T_OUT : VIRTIO_BLK_T_IN;
 	header->sector = operation->Offset() / 512;
 	header->ioprio = 1;
 
-	uint8* ack = (uint8*)buffer + sizeof(struct virtio_blk_outhdr);
+	uint8* ack = (uint8*)info->bufferAddr + sizeof(struct virtio_blk_outhdr);
 	*ack = 0xff;
 
-	get_memory_map(buffer, sizeof(struct virtio_blk_outhdr) + sizeof(uint8),
-		&entries[0], 1);
+	entries[0].address = info->bufferPhysAddr;
+	entries[0].size = sizeof(struct virtio_blk_outhdr);
 	entries[operation->VecCount() + 1].address = entries[0].address
 		+ sizeof(struct virtio_blk_outhdr);
 	entries[operation->VecCount() + 1].size = sizeof(uint8);
-	entries[0].size = sizeof(struct virtio_blk_outhdr);
 
 	memcpy(entries + 1, operation->Vecs(), operation->VecCount()
 		* sizeof(physical_entry));
 
+	atomic_add(&info->currentRequest, 1);
+	info->interruptCondition.Add(&info->interruptConditionEntry);
+
 	info->virtio->queue_request_v(info->virtio_queue, entries,
 		1 + (operation->IsWrite() ? operation->VecCount() : 0 ),
 		1 + (operation->IsWrite() ? 0 : operation->VecCount()),
-		info);
+		(void *)(addr_t)info->currentRequest);
 
-	acquire_sem(info->sem_cb);
+	status_t result = info->interruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
+		10 * 1000 * 1000);
 
-	switch (*ack) {
-		case VIRTIO_BLK_S_OK:
-			status = B_OK;
-			bytesTransferred = operation->Length();
-			break;
-		case VIRTIO_BLK_S_UNSUPP:
-			status = ENOTSUP;
-			break;
-		default:
-			status = EIO;
-			break;
+	size_t bytesTransferred = 0;
+	status_t status = B_OK;
+	if (result != B_OK) {
+		status = EIO;
+	} else {
+		switch (*ack) {
+			case VIRTIO_BLK_S_OK:
+				status = B_OK;
+				bytesTransferred = operation->Length();
+				break;
+			case VIRTIO_BLK_S_UNSUPP:
+				status = ENOTSUP;
+				break;
+			default:
+				status = EIO;
+				break;
+		}
 	}
-	free(buffer);
 
 	info->io_scheduler->OperationCompleted(operation, status,
 		bytesTransferred);
+	mutex_unlock(&info->lock);
 	return status;
 }
 
@@ -357,11 +375,10 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
 		{
-			*(status_t *)buffer = info->media_status;
+			user_memcpy(buffer, &info->media_status, sizeof(info->media_status));
+			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n", info->media_status);
 			info->media_status = B_OK;
-			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n", *(status_t *)buffer);
 			return B_OK;
-			break;
 		}
 
 		case B_GET_DEVICE_SIZE:
@@ -536,13 +553,30 @@ virtio_block_init_driver(device_node *node, void **cookie)
 		return B_NO_MEMORY;
 	}
 
-	info->sem_cb = create_sem(0, "virtio_block_cb");
-	if (info->sem_cb < 0) {
+	// create command buffer area
+	info->bufferArea = create_area("virtio_block command buffer", (void**)&info->bufferAddr,
+		B_ANY_KERNEL_BLOCK_ADDRESS, B_PAGE_SIZE,
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (info->bufferArea < B_OK) {
 		delete info->dma_resource;
-		status_t status = info->sem_cb;
+		free(info);
+		return info->bufferArea;
+	}
+
+	physical_entry entry;
+	status_t status = get_memory_map((void*)info->bufferAddr, B_PAGE_SIZE, &entry, 1);
+	if (status != B_OK) {
+		delete_area(info->bufferArea);
+		delete info->dma_resource;
 		free(info);
 		return status;
 	}
+
+	info->bufferPhysAddr = entry.address;
+	info->interruptCondition.Init(info, "virtio block transfer");
+	info->currentRequest = 0;
+	mutex_init(&info->lock, "virtio block request");
+
 	info->node = node;
 
 	*cookie = info;
@@ -555,7 +589,8 @@ virtio_block_uninit_driver(void *_cookie)
 {
 	CALLED();
 	virtio_block_driver_info* info = (virtio_block_driver_info*)_cookie;
-	delete_sem(info->sem_cb);
+	mutex_destroy(&info->lock);
+	delete_area(info->bufferArea);
 	free(info);
 }
 
