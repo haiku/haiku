@@ -61,7 +61,7 @@ AffineTransformer::~AffineTransformer()
 Transformer*
 AffineTransformer::Clone() const
 {
-	AffineTransformer* clone = new (nothrow) AffineTransformer(fSource);
+	AffineTransformer* clone = new (nothrow) AffineTransformer(*fSource);
 	if (clone)
 		clone->multiply(*this);
 	return clone;
@@ -93,7 +93,7 @@ AffineTransformer::SetSource(VertexSource& source)
 double
 AffineTransformer::ApproximationScale() const
 {
-	return fabs(fSource.ApproximationScale() * scale());
+	return fabs(fSource->ApproximationScale() * scale());
 }
 
 // #pragma mark -

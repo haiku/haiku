@@ -73,7 +73,7 @@ ContourTransformer::~ContourTransformer()
 Transformer*
 ContourTransformer::Clone() const
 {
-	ContourTransformer* clone = new (nothrow) ContourTransformer(fSource);
+	ContourTransformer* clone = new (nothrow) ContourTransformer(*fSource);
 	if (clone) {
 		clone->line_join(line_join());
 		clone->inner_join(inner_join());
@@ -111,7 +111,7 @@ ContourTransformer::SetSource(VertexSource& source)
 double
 ContourTransformer::ApproximationScale() const
 {
-	double scale = fSource.ApproximationScale();
+	double scale = fSource->ApproximationScale();
 	double factor = fabs(width());
 	if (factor > 1.0)
 		scale *= factor;

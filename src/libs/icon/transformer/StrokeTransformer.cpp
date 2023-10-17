@@ -76,7 +76,7 @@ StrokeTransformer::~StrokeTransformer()
 Transformer*
 StrokeTransformer::Clone() const
 {
-	StrokeTransformer* clone = new (nothrow) StrokeTransformer(fSource);
+	StrokeTransformer* clone = new (nothrow) StrokeTransformer(*fSource);
 	if (clone) {
 		clone->line_cap(line_cap());
 		clone->line_join(line_join());
@@ -122,7 +122,7 @@ StrokeTransformer::WantsOpenPaths() const
 double
 StrokeTransformer::ApproximationScale() const
 {
-	double scale = fSource.ApproximationScale();
+	double scale = fSource->ApproximationScale();
 	double factor = fabs(width());
 	if (factor > 1.0)
 		scale *= factor;
