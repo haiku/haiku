@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # docker build --no-cache --tag docker.io/haiku/cross-compiler:x86_64 .
 # docker push docker.io/haiku/cross-compiler:x86_64
