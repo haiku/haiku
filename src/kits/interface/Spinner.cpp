@@ -199,6 +199,8 @@ BSpinner::SetMinValue(int32 min)
 	fMinValue = min;
 	if (fValue < fMinValue)
 		SetValue(fMinValue);
+	else
+		SetDecrementEnabled(IsEnabled() && fValue > fMinValue);
 }
 
 
@@ -208,6 +210,8 @@ BSpinner::SetMaxValue(int32 max)
 	fMaxValue = max;
 	if (fValue > fMaxValue)
 		SetValue(fMaxValue);
+	else
+		SetIncrementEnabled(IsEnabled() && fValue < fMaxValue);
 }
 
 
