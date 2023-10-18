@@ -249,10 +249,7 @@ void
 BDecimalSpinner::SetMinValue(double min)
 {
 	fMinValue = min;
-	if (fValue < fMinValue)
-		SetValue(fMinValue);
-	else
-		SetDecrementEnabled(IsEnabled() && fValue > fMinValue);
+	SetValue(Value());
 }
 
 
@@ -260,10 +257,7 @@ void
 BDecimalSpinner::SetMaxValue(double max)
 {
 	fMaxValue = max;
-	if (fValue > fMaxValue)
-		SetValue(fMaxValue);
-	else
-		SetIncrementEnabled(IsEnabled() && fValue < fMaxValue);
+	SetValue(Value());
 }
 
 
