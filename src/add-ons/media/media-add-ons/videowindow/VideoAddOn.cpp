@@ -65,8 +65,6 @@ VideoWindowAddOn::GetFlavorAt(int32 cookie, const flavor_info **flavorInfo)
 	CALLED();
 	if (cookie != 0)
 		return B_BAD_INDEX;
-	if (!flavorInfo || !*flavorInfo)
-		return B_ERROR;
 
 	*flavorInfo = &fInfo;
 	return B_OK;
