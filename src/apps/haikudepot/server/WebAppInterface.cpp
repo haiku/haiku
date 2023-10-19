@@ -401,7 +401,7 @@ WebAppInterface::UnpackAccessToken(BMessage& responseEnvelopeMessage,
 
 	if (result != B_OK || token.IsEmpty()) {
 		HDINFO("failure to authenticate");
-		return HD_AUTHENTICATION_FAILED;
+		return B_PERMISSION_DENIED;
 	}
 
 	// The token should be present in three parts; the header, the claims and

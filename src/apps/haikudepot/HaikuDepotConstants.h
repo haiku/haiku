@@ -66,7 +66,6 @@ enum BitmapSize {
 #define HD_CLIENT_TOO_OLD					(HD_ERROR_BASE + 2)
 #define HD_ERR_NOT_MODIFIED					(HD_ERROR_BASE + 3)
 #define HD_ERR_NO_DATA						(HD_ERROR_BASE + 4)
-#define HD_AUTHENTICATION_FAILED			(HD_ERROR_BASE + 5)
 
 
 #define REPOSITORY_NAME_SYSTEM				"system"

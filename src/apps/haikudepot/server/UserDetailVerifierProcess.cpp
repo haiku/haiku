@@ -104,6 +104,7 @@ UserDetailVerifierProcess::_TryFetchUserDetail(UserDetail& userDetail)
 	status_t result;
 
 	result = interface->RetrieveCurrentUserDetail(userDetailResponse);
+
 	if (result != B_OK) {
 		HDERROR("a problem has arisen retrieving the current user detail: %s",
 			strerror(result));
