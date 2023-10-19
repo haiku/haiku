@@ -389,21 +389,15 @@ LocalPkgDataLoadProcess::_DeriveSize(const PackageInfoRef package) const
 	BPath path;
 	if (PackageUtils::DeriveLocalFilePath(package.Get(), path) == B_OK) {
 		BEntry entry(path.Path());
-		if (entry.Exists()) {
-			off_t size;
-			if (entry.GetSize(&size) == B_OK)
-				return size;
-			else {
-				HDDEBUG("unable to get the size of local file [%s]",
-					path.Path());
-			}
+		struct stat s = {};
+		if (entry.GetStat(&s) == B_OK)
+			return s.st_size;
+		else {
+			HDDEBUG("unable to get the size of local file [%s]", path.Path());
 		}
-		else
-			HDDEBUG("the local file [%s] does not exist", path.Path());
 	}
 	else {
-		HDDEBUG("unable to get the local file of package [%s]",
-			package->Name().String());
+		HDDEBUG("unable to get the local file of package [%s]", package->Name().String());
 	}
 	return 0;
 }
