@@ -154,7 +154,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		), true));
 	}
 
-	HDDEBUG("did populate data for [%s] (%s)", pkg->Name()->String(),
+	HDTRACE("did populate data for [%s] (%s)", pkg->Name()->String(),
 			fDepotName.String());
 
 	fCount++;

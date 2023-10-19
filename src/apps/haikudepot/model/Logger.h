@@ -16,6 +16,12 @@
 
 #define MILLIS_IN_DAY (1000 * 60 * 60 * 24)
 
+#define HDLOGLEVELCHAR(L) ( \
+	L == LOG_LEVEL_INFO ? 'I' \
+	: L == LOG_LEVEL_DEBUG ? 'D' \
+	: L == LOG_LEVEL_TRACE ? 'T' \
+	: L == LOG_LEVEL_ERROR ? 'E' \
+	: '?')
 
 // These macros allow for standardized logging to be output.
 // The use of macros in this way means that the use of the log is concise where
@@ -28,7 +34,7 @@
 
 #define HDLOGPREFIX(L) printf("@%08" B_PRId64 " {%c} <t:%" B_PRId32 "> ", \
 	((system_time() / 1000) % MILLIS_IN_DAY), \
-	toupper(Logger::NameForLevel(L)[0]), \
+	HDLOGLEVELCHAR(L), \
 	abs(find_thread(NULL) % 1000) \
 );
 
