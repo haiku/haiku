@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	127533869
+1	romanian	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -20,6 +20,7 @@ Switch account…	MainWindow		Comutare cont…
 Preferred language:	UserLoginWindow		Limbă preferată:
 Name	PackageListView		Nume
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemă de autorizare sau securitate. Deautentificați-vă și autentificați-vă din nou pentru a verifica dacă parola este corectă și, de asemenea, dacă ați fost de acord cu cele mai recente condiții de utilizare.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot comunică cu o componentă de server numită HaikuDepotServer. Acestea sunt condițiile de utilizare cu care utilizatorul „%Nickname%” a fost de acord la %AgreedToTimestamp% în legătură cu utilizarea serviciului HaikuDepotServer.
 don't activate package %source%	PackageProblem	don't change '%source%	nu activa pachetul %source%
 Rate %Package%	RatePackageWindow		Evaluează %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		A apărut o eroare la inițializarea managerului de pachete: %message%
@@ -30,7 +31,9 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un obiect cerut sau un obiect implicat în cerere nu a fost găsit pe server.
 Logout	ToLatestUserUsageConditionsWindow		Deconectare
 Password requirements	UserLoginWindow		Cerințe de parolă
+The following additional package changes have to be made:	PackageResult		Următoarele modificări suplimentare ale pachetului trebuie făcute:
 No changelog available.	PackageInfoView		Nu există istoric de modificări disponibil.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Condițiile actuale de utilizare au fost agreate.
 Cancel	PackageProblem		Anulează
 Version	PackageListView		Versiune
 No, quit HaikuDepot	App		Nu, ieși din HaikuDepot
@@ -47,6 +50,7 @@ All packages	PackageListView		Toate pachetele
 Send	RatePackageWindow		Trimite
 Start package daemon	App		Pornește serviciul de pachete
 There are problems in the supplied data:	UserLoginWindow		Există probleme în datele furnizate:
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Utilizatorul „%Nickname%” nu a fost de acord cu nicio condiție de utilizare.
 Usage conditions download problem	UserLoginWindow		Problemă de descărcare a condițiilor de utilizare
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instalează pachetul %s din depozitul %s\n
 Package daemon problem	App		Problemă cu serviciul de pachete
@@ -58,6 +62,7 @@ The email is malformed.	UserLoginWindow		Emailul este deformat.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Vizualizați condițiile de utilizare
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea condițiilor de utilizare necesare pentru a crea unui nou utilizator. Verificați istoricul pentru detalii și încercați din nou. \nInformații despre modul de vizualizare a istoricului sunt disponibile în secțiunea HaikuDepot a Ghidului utilizatorului Haiku.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condiții de utilizare agreate
 Size	PackageListView		Dimensiune
 Your rating was updated.	RatePackageWindow		Evaluarea a fost actualizată.
 All categories	FilterView		Toate categoriile
@@ -115,12 +120,14 @@ Uninstalled	PackageListView		Dezinstalat
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Sunt de acord cu condițiile de utilizare
 Installing \"%PackageName%\"	InstallPackageProcess		Se instalează \„%PackageName%\”
 OK	App		OK
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot comunică cu o componentă de server numită HaikuDepotServer. Acestea sunt cele mai recente condiții de utilizare pentru utilizarea serviciului HaikuDepotServer.
 Fatal error	UninstallPackageAction		Eroare fatală
 Develop packages	MainWindow		Pachete de dezvoltare
 Starting the package daemon failed:\n\n%Error%	App		Pornirea serviciului de pachete a eșuat:\n\n%Error%
 No user ratings available.	PackageInfoView		Nu sunt disponibile evaluări ale utilizatorilor.
 <no info>	PackageInfoView		<no info>
 Usage conditions download problem	UserUsageConditions		Problemă la descărcarea condițiilor de utilizare
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea cerințelor de parolă necesare pentru a crea un utilizator nou. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		A apărut o eroare de transport în rețea la comunicarea cu sistemul de server: %s
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează pictogramele
@@ -136,7 +143,9 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Evaluarea utilizatorului
 Installed packages	MainWindow		Pachete instalate
 Date	PackageListView		Data
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Parola trebuie să aibă minimum %MinPasswordLength% caractere. %MinPasswordUppercaseChar% caractere trebuie să fie majuscule, iar %MinPasswordDigitsChar% caractere trebuie să fie cifre.
 Error	App		Eroare
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		A apărut o eroare la descărcarea condițiilor de utilizare. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		A existat un răspuns nedumerit din partea serviciului web.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Se deschide \„%DeskbarLink%\”
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Evaluarea a fost încărcată cu succes. Puteți să o actualizați sau să o eliminați pe pagina web Server HaikuDepot.
@@ -161,6 +170,7 @@ Inactive	PackageListView		Inactive
 Nickname:	UserLoginWindow		Pseudonim:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Se sincronizează metadate despre depozite
 OK	MainWindow		OK
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Utilizatorii trebuie să aibă {0, plural, one{# year of age} other{# years of age}} sau mai mult.
 Version %Code%	UserUsageConditions		Versiunea %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Se dezinstalează \„%PackageName%\”
@@ -172,14 +182,18 @@ Success	UserLoginWindow		Succes
 Settings	SettingsWindow		Configurări
 Login issue	MainWindow		Problemă de autentificare
 Your rating:	RatePackageWindow		Evaluare:
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot oprește sau finalizează operațiunile care rulează înainte de a ieși.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Utilizatorul %Nickname% a fost creat cu succes în sistemul HaikuDepotServer. Puteți administra detaliile utilizatorului utilizând interfața web. Acum sunteți conectat ca nou utilizator.
 Repositories	MainWindow		Depozite
 This rating is visible to other users	RatePackageWindow		Această evaluare este vizibilă pentru alți utilizatori
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		În timp ce actualizați datele pachetelor, a apărut o problemă care poate determina depășirea sau lipsa datelor de pe afișajul aplicației. Detalii suplimentare referitoare la această problemă pot fi obținute din istoricul aplicației.\nInformații despre modul de vizualizare a istoricului sunt disponibile în secțiunea HaikuDepot a Ghidului utilizatorului Haiku.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		A apărut o eroare la descărcarea condițiilor de utilizare. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
 View agreed usage conditions…	MainWindow		Vizualizați condițiile de utilizare convenite…
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Utilizatorul [%Nickname%] s-a autentificat,, dar înainte de a continua, trebuie să fiți de acord cu cele mai recente condiții de utilizare.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Acest pachet nu pare să fie pe Server HaikuDepot, deci nu este posibil să creați o nouă evaluare sau să editați o evaluare existentă.
 Apply	SettingsWindow		Aplică
 View the password requirements	UserLoginWindow		Vizualizează cerințele de parolă
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Utilizatorul \„%Nickname%\” a fost de acord anterior cu condițiile de utilizare, dar condițiile de utilizare au fost actualizate de atunci. Trebuie să fie de acord acum cu condițiile de utilizare actualizate.
 Log out	MainWindow		Deconectare
 Comment language:	RatePackageWindow		Limba comentariilor:
 The password has been incorrectly repeated.	UserLoginWindow		Parola nu a fost repetată corect.
@@ -194,6 +208,7 @@ The nickname is required.	UserLoginWindow		Pseudonimul este necesar.
 Apply changes	PackageResult		Aplică modificările
 Rate package	RatePackageWindow		Evaluați pachetul
 Server error	ServerHelper		Eroare de server
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Se înregistrează vizualizarea lui \„%PackageName%\”
 Sending anonymous usage data	MainWindow		Se trimit datele de utilizare anonime
 Log in	UserLoginWindow		Autentificare
 Usage conditions	UserUsageConditions		Condiții de utilizare

@@ -1,7 +1,8 @@
-1	romanian	x-vnd.Haiku.TV	181363067
+1	romanian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Fără meniu
 No border	MainWin		Fără margine
 Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forțează 720 × 576, aspect de afișaj 4:3
 Full screen	MainWin		Ecran complet
 Scale to native size	MainWin		Scalează la dimensiunea nativă
 unknown	MainWin		necunoscut
@@ -16,7 +17,9 @@ Channel	MainWin		Canal
 Previous channel	MainWin		Canalul anterior
 OK	MainWin		OK
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forțează 544 × 576, aspect de afișaj 4:3
 Settings	MainWin		Configurări
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forțează 704 × 576, aspect de afișaj 4:3
 %s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Configurări…

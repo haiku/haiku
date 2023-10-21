@@ -1,5 +1,5 @@
 1	romanian	x-vnd.Haiku-GLInfo	1282327690
-Maximum clipping planes	Capabilities		Planuri maxime de tăiere
+Maximum clipping planes	Capabilities		Planuri de tăiere maxime
 Maximum evaluators equation order	Capabilities		Ordinul maxim al ecuației evaluatorilor
 Texture stack size	Capabilities		Dimensiunea stivei texturii
 GL Info	System name		Informații GL
@@ -8,11 +8,11 @@ Attributes stack size	Capabilities		Dimensiunea stivei atributelor
 Maximum lights	Capabilities		Lumini maxime
 Extensions	Extensions		Extensii
 Available extensions	Extensions		Extensii disponibile
-Maximum recommended vertex elements	Capabilities		Elemente de vertex maxime recomandate
+Maximum recommended vertex elements	Capabilities		Elemente de vârf maxime recomandate
 Value	Capabilities		Valoare
-Name stack size	Capabilities		Dimensiune de stivă de nume
+Name stack size	Capabilities		Dimensiunea stivei de nume
 Capabilities	Capabilities		Capacități
-Maximum texture units	Capabilities		Unități de textură maximă
+Maximum texture units	Capabilities		Unități de textură maxime
 Unknown or missing OpenGL renderer.	InfoView		Randor OpenGL necunoscut sau care lipsește.
 Capability	Capabilities		Capacitate
 Maximum 2D texture size	Capabilities		Dimensiunea maximă a texturii 2D
@@ -22,6 +22,6 @@ Maximum convolution	Capabilities		Convoluție maximă
 Maximum 3D texture size	Capabilities		Dimensiunea maximă a texturii 3D
 Maximum recommended index elements	Capabilities		Elemente de index maxime recomandate
 Unknown version	InfoView		Versiune necunoscută
-List stack size	Capabilities		Dimensiune de stivă de listă
-Model stack size	Capabilities		Dimensiune de stivă de model
-Projection stack size	Capabilities		Dimensiune de stivă de proiecție
+List stack size	Capabilities		Dimensiunea stivei de listă
+Model stack size	Capabilities		Dimensiunea stivei de model
+Projection stack size	Capabilities		Dimensiunea stivei de proiecție

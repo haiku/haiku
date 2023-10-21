@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-GLTeapot	400822745
+1	french	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		À droite
 Backface culling	TeapotWindow		Abattage des faces arrières
 Add a teapot	TeapotWindow		Ajouter une théière
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		En bas à gauche
 Fog	TeapotWindow		Brouillard
 FPS display	TeapotWindow		Afficher la vitesse d’animation
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Limiter les IPS à la fréquence de rafraîchissement
 Settings	TeapotWindow		Réglages
 Gouraud shading	TeapotWindow		Ombrages de Gouraud
 Lighting	TeapotWindow		Éclairage

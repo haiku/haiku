@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-mixer.media_addon	4284602042
+1	romanian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Maparea intrării
 High quality (linear interpolation)	AudioMixer		Calitate înaltă (interpolare liniară)
 To output	AudioMixer		Spre ieșire
@@ -20,3 +20,5 @@ Mute	AudioMixer		Mut
 Output mapping	AudioMixer		Maparea ieșirilor
 Virtual output channels	AudioMixer		Canale de ieșire virtuale
 Allow output channel remapping	AudioMixer		Permite remaparea canalului de ieșire
+Input gain controls represent:	AudioMixer		Controalele de câștig de intrare reprezintă:
+Attenuate mixer output by 3 dB	AudioMixer		Atenuează ieșirea mixer-ului cu 3 dB

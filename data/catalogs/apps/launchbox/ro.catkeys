@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-LaunchBox	1530497419
+1	romanian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Stabilire descriere…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sigur închideți acest bloc?\n(Blocul nu va fi reținut.)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Arată marginea ferestrei
 Failed to launch 'something', error in Pad data.	LaunchBox		Nu s-a putut lansa „ceva”, eroare în datele blocului.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Lansare automată
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Dimensiune pictogramă
 Open containing folder	LaunchBox		Deschide dosarul conținător
 Add button here	LaunchBox		Adaugă un buton aici

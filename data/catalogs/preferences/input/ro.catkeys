@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Input	4063065788
+1	romanian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Derulare
 Defaults	InputMouse		Implicite
 Long	KeyboardView		Lung
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Acceptă primul clic
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Derulare orizontală
 Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
+Keyboard lock delay	TouchpadPrefView		Amânare blocare tastatură
 Two finger scrolling	TouchpadPrefView		Derulare cu două degete
 Input	System name		Intrare
 Mouse acceleration	SettingsView		Accelerare de maus

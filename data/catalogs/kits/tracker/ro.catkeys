@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1249062292
+1	romanian	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -82,6 +82,7 @@ Modified	FindPanel		Modificat
 Select all	QueryContainerWindow		Selectează toate
 Generate image thumbnails	SettingsView		Generează miniaturile imaginii
 Select…	FilePanelPriv		Selectare…
+An item named '%filename%' already exists.	FSUtils		Un element cu numele „%filename%” există deja.
 preferences	B_PREFERENCES_DIRECTORY		preferințe
 Name	Person Query Columns		Nume
 Skip all	FSUtils		Omite toate
@@ -259,6 +260,7 @@ Cut	FilePanelPriv		Taie
 Finish: after several years	StatusWindow		Finalizare: după câțiva ani
 Favorites	FilePanelPriv		Favorite
 Point	AttributesView		Punct
+You can't move or copy items to read-only volumes.	PoseView		Nu puteți muta sau copia elemente în volume doar pentru citire.
 home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Șabloane noi Tracker
 Disk mounting during boot	AutoMounterSettings		Montare de discuri în timpul bootării

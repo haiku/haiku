@@ -1,4 +1,4 @@
-1	romanian	application/x-vnd.Cortex.support	2097798758
+1	romanian	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Antetul are fanioane
 32 bit HLS	MediaString		HLS pe 32 biți
 Recording	MediaString		Înregistare
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Dreapta
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		RGB pe 32 biți
 System mixer	MediaString		Mixer de sistem
 Physical output	MediaString		Ieșire fizică

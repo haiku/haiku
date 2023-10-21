@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-GLTeapot	400822745
+1	romanian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Dreapta
 Backface culling	TeapotWindow		Eliminarea feței din spate
 Add a teapot	TeapotWindow		Adaugă un ceainic
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Stânga jos
 Fog	TeapotWindow		Ceață
 FPS display	TeapotWindow		Afișaj FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Limitează FPS-ul la rata de reîmprospătare
 Settings	TeapotWindow		Configurări
 Gouraud shading	TeapotWindow		Nuanțare Gouraud
 Lighting	TeapotWindow		Iluminare

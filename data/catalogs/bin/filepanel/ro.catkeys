@@ -1,5 +1,5 @@
 1	romanian	x-vnd.mmu_man.filepanel	1996091223
-display a load/save file panel\n	FilePanelApp		afișează un panou pentru încărcarea/salvarea fișierelor\n
+display a load/save file panel\n	FilePanelApp		afișează un panou pentru încărcarea/salvarea fișierului\n
 short\tlong\tdescription\n	FilePanelApp		descriere\tscurtă\tlungă\n
 %s not a valid option\n	FilePanelApp		%s nu este o opțiune validă\n
 -s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tutilizează un FilePanel de salvare\n
@@ -7,7 +7,7 @@ short\tlong\tdescription\n	FilePanelApp		descriere\tscurtă\tlungă\n
 -h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tafișează utilizarea\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tutilizează un FilePanel de încărcare (implicit)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tstabilește numele implicit pentru salvare\n
--k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipurile de intrări care pot fi deschise (savoare): orice combinație de f, d, s (fișier (implicit), director, legătură simbolică)\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipurile de intrări care pot fi deschise (versiune): orice combinație de f, d, s (fișier (implicit), director, legătură simbolică)\n
 usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		utilizare: %s [-h]     [-d dosar]              [-l|-s]     [-t ttl]      [-1]       [-m]
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		utilizare: %s [--help] [--directory dosar] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tstabilește titlul ferestrei FilePanel\n

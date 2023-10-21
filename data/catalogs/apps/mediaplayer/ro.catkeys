@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	716811487
+1	romanian	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrarea la gunoi
 Close	MediaPlayer-PlaylistWindow		Închide
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor de fundal
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		Volum complet
 Start media server	MediaPlayer-Main		Pornește serverul media
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Se pare că serverul media nu rulează.\nDoriți să îl porniți?
 Location	MediaPlayer-InfoWin		Locaţie
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Se deschide „%s”.
 Medium	MediaPlayer-SettingsWindow		Mediu
 Play mode	MediaPlayer-SettingsWindow		Mod de redare

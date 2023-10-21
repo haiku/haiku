@@ -1,8 +1,8 @@
 1	romanian	x-vnd.Haiku-debug_server	3188340596
 The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Aplicația:\n\n      %app\n\na întâmpinat o eroare care o împiedică să continue. Haiku va termina aplicația și va curăța.
-Oh yeah!	DebugServer		Oh da!
+Oh yeah!	DebugServer		O da!
 Debug	DebugServer		Depanare
 Terminate	DebugServer		Termină
 Save report	DebugServer		Salvează raportul
-Write core file	DebugServer		Scrie fișierul de depanare
-Oh no!	DebugServer		Oh nu!
+Write core file	DebugServer		Scrie fișierul de bază
+Oh no!	DebugServer		O nu!

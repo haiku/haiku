@@ -1,5 +1,8 @@
-1	romanian	x-vnd.Haiku-TIFFTranslator	4004730938
+1	romanian	x-vnd.Haiku-TIFFTranslator	2234713102
 TIFF Library:	TIFFView		Bibliotecă TIFF:
+RLE (Packbits)	TIFFView		RLE (Biți de pachet)
+ZIP (Deflate)	TIFFView		ZIP (Dezumflare)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: index de document nevalid\n
 Use compression:	TIFFView		Utilizare compresie:
 TIFF image translator	TIFFView		Traducător imagine TIFF
 TIFF image	TIFFTranslator		Imagine TIFF

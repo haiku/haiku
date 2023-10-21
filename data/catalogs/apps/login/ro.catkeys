@@ -1,9 +1,10 @@
-1	romanian	x-vnd.Haiku-Login	1584886353
+1	romanian	x-vnd.Haiku-Login	2920451831
 Invalid login!	Login View		Autentificare nevalidă!
 Error	Login App		Eroare
 Login application for Haiku\nUsage:	Login App		Aplicație de autentificare pentru Haiku\nUtilizare:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tNu face fereastra modală
 Welcome to Haiku	Login Window		Bine ați venit la Haiku
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tLansează în modul editare raft pentru a permite personalizarea desktop-ului.
 Halt	Login View		Oprire
 Desktop	Desktop Window		Desktop
 Hide password	Login View		Ascunde parola

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	2829475355
+1	romanian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiază
@@ -47,6 +47,7 @@ New tabs:	Settings Window		File noi:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a eșuat
 Open downloads folder	Download Window		Deschide dosarul de descărcări
 Proxy server	Settings Window		Serverul proxy
+Darn!	WebPositive		Blesteme!
 Decrease size	WebPositive Window		Micșorează dimensiunea
 Default fixed font size:	Settings Window		Dimensiune fixă implicită a fontului
 Sans serif font:	Settings Window		Fontul sans serif:
@@ -103,6 +104,7 @@ Apply	Settings Window		Aplică
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	A apărut o eroare la încercarea de a afișa dosajul de marcaje.\n\nEroare: %error
 Revert	Settings Window		Revenire
 Copy	WebPositive Window		Copiază
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}
 Default standard font size:	Settings Window		Dimensiunea standard implicită a fontului:
 Custom	Settings Window		Personalizat
 Bookmark this page	WebPositive Window		Marchează această pagină

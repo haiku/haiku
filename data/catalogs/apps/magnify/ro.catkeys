@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Magnify	3730034159
+1	romanian	x-vnd.Haiku-Magnify	1465621918
   size must be > 4 and a multiple of 4	Console		  dimensiunea trebuie să fie > 4 și un multiplu de 4
 Decrease pixel size	Magnify-Main		Micșorează dimensiunea pixelului
 no clip msg	In console, when clipboard is empty after clicking Copy image		niciun mesaj de clipboard
@@ -10,6 +10,7 @@ Decrease window size	Magnify-Main		Micșorează dimensiunea ferestrei
 Remove a crosshair	Magnify-Main		Elimină un reticul
 Add a crosshair	Magnify-Main		Adaugă un reticul
 Freeze image	Magnify-Main		Îngheață imaginea
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 usage: magnify [size] (magnify size * size pixels)	Console		utilizare: magnify [dimensiune] (dimensiune de amplificare * dimensiune pixeli)
 Increase window size	Magnify-Main		Mărește dimensiunea ferestrei
 Save image	Magnify-Main		Salvează imaginea

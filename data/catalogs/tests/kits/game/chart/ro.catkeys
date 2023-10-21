@@ -14,7 +14,7 @@ Free motion	ChartWindow		Mişcare liberă
 (high) 100% 	ChartWindow		(ridicat) 100% 
 Green	ChartWindow		Verde
 Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 thread-uri
+2 threads	ChartWindow		2 fire de execuție
 Yellow	ChartWindow		Galben
 Off	ChartWindow		Oprit
 Chaos	ChartWindow		Haos
@@ -33,10 +33,10 @@ White	ChartWindow		Alb
 Chart	System name		Chart
 Animation:	ChartWindow		Animație:
 Frames/s	ChartWindow		Cadre/s
-Auto demo	ChartWindow		Demo auto
+Auto demo	ChartWindow		Demo automat
 CPU load	ChartWindow		Încărcare CPU
 DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Roșu
-None	ChartWindow		Nespecificat
+None	ChartWindow		Nimic
 Battle	ChartWindow		Luptă
 Space:	ChartWindow		Spațiu:

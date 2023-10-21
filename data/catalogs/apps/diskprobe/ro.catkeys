@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DiskProbe	3780485250
+1	romanian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Editor brut
 Remove	AttributeWindow		Elimină
 Close	ProbeView		Închide
@@ -117,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Cerere DiskProbe
 Double precision floating-point value:	TypeEditors		Valoare în virgulă mobilă de dublă precizie:
 Image	TypeEditors	This is the type of view	Imagine
+Swapped: %lld (0x%0*Lx)	ProbeView		Schimbat: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Salvați modificările înainte de a închide?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Format PNG
 Number	TypeEditors	This is the type of editor	Număr
 Edit	ProbeView		Editare

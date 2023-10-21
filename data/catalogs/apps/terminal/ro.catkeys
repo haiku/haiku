@@ -1,10 +1,12 @@
-1	romanian	x-vnd.Haiku-Terminal	1613471055
+1	romanian	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Închide alte file
 Insert path	Terminal TermView		Inserează calea
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nu a putut porni shell. Scuze.
 Text encoding	Terminal TermWindow		Codare de text
+Colors	Terminal ThemeWindow		Culori
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Editare
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               tipărește acest ajutor\n  -t,     --title              stabilește titlul ferestrei\n  -f,     --fullscreen         pornește ecranul complet\n  -w,     --working-directory  stabilește directorul de lucru inițial\n
 Select all	Terminal TermWindow		Selectează toate
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ieșirea dacă există programe active
 Color scheme:	Terminal ThemeView		Schemă de culori:
@@ -15,6 +17,7 @@ Print	Terminal TermWindow		Tipărește
 Settings	Terminal TermWindow		Configurări
 %app% settings	Terminal PrefWindow	window title	Configurări %app%
 ANSI bright black color	Terminal ThemeView		Culoare negru deschis ANSI
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tDirectorul de lucru curent al procesului activ.\n\t\t\tOpțional, numărul maxim de componente ale căii poate fi\n\t\t\tspecificat. De exemplu, „%2d” pentru cel mult două componente.\n\t%i\t-\tIndexul filei.\n\t%e\t-\tCodarea filei curente. Nu este arătat pentru UTF-8.\n\t%p\t-\tNumele procesului activ.
 Use default	Terminal SetTitleWindow		Utilizează implicit
 Close tab	Terminal TermWindow		Închide fila
 Error!	Terminal getString		Eroare!

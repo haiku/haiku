@@ -1,24 +1,32 @@
-1	romanian	x-vnd.Haiku-Installer	2377300654
+1	romanian	x-vnd.Haiku-Installer	2288760834
 Performing installation.	InstallProgress		Se execută instalarea.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Închideți fereastra DriveSetup înainte de a închide fereastra Installer.
 No optional packages available.	PackagesView		Nu sunt disponibile pachete opționale.
+This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Acest sistem de operare trebuie instalat pe o partiție care utilizează sistemul de fișiere Be, dar în prezent nu există astfel de partiții disponibile pe sistem.
 The mount point could not be retrieved.	InstallProgress		Punctul de montare nu a putut fi obținut.
 <none>	InstallerWindow	No partition available	<none>
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalare completă. Sectorul de boot a fost scris la „%s”. Apăsați „Repornire” pentru a reporni calculatorul sau alegeți un nou volum țintă pentru a efectua o altă instalare.
+Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku trebuie instalat pe o partiție care utilizează sistemul de fișiere Be, dar în prezent nu există astfel de partiții disponibile pe sistem.
 Please choose target	InstallerWindow		Alegeți ținta
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		BootManager, aplicația pentru configurarea meniului de boot Haiku, nu a putut fi lansată.
 Cancel	InstallProgress		Anulează
 Are you sure you want to to stop the installation?	InstallerWindow		Sigur doriți să opriți instalarea?
 Installer	System name		Installer
 Unknown Type	InstallProgress	Partition content type	Tip necunoscut
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Apăsați butonul „Începe” pentru a instala de la „%1s” pe „%2s”.
 Are you sure you want to stop the installation?	InstallerWindow		Sigur doriți să opriți instalarea?
 README	InstallerApp		README
 Quit	InstallerWindow		Ieșire
+Please close the BootManager window before closing the Installer window.	InstallerWindow		Închideți fereastra BootManager înainte de a închide fereastra Installer.
 Write boot sector to '%s'	InstallerWindow		Scrie sectorul de boot pe „%s”
 Boot sector not written because of an internal error.	InstallProgress		Sectorul de boot nu a fost scris din cauza unei erori interne.
+Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Alegeți discurile sursă și destinație din meniurile contextuale. Apoi dați clic pe „Începe”.
 Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Se rulează BootManager și DriveSetup…\n\nÎnchideți ambele aplicații pentru a continua instalarea.
 Click on 'Set up partitions…' to create one.	InstallerWindow		Clic pe „Stabilește partițiile…” pentru a crea una.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Installer Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? din ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplicația pentru configurarea partițiilor de disc, nu a putut fi lansată.
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalare completă. Sectorul de boot a fost scris la „%s”. Apăsați „Ieșire” pentru a părăsi Installer sau alegeți un nou volum țintă pentru a efectua o altă instalare.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Volumul țintă nu este gol. Dacă acesta conține deja o instalare Haiku, aceasta va fi suprascrisă. Această acțiune va elimina toate programele instalate.\n\nDacă doriți să actualizați sistemul fără a elimina programele instalate, consultați subiectul Ghidului utilizatorului Haiku despre aplicația \„SoftwareUpdater\” pentru instrucțiuni de actualizare.\n\nSigur doriți să continuați instalarea?
 Quit DriveSetup	InstallerWindow		Ieșire din DriveSetup
 Write boot sector	InstallerWindow		Scrie sectorul de boot
@@ -67,10 +75,13 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Configurare partiții…
 Install progress:  	InstallerWindow		Progresul instalării:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nu puteți instala conținutul unui disc pe el însuși. Alegeți un alt disc.
+Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Închideți ferestrele BootManager și DriveSetup înainte de a închide fereastra Installer.
+Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Alegeți discul sursă din meniul contextual. Apoi dați clic pe „Începe”.
 OK	InstallProgress		OK
 Quit BootManager	InstallerWindow		Ieșire BootManager
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sigur doriți să instalați pe discul de boot curent? Installer va trebui să repornească mașina dacă veți continua.
 Onto:	InstallerWindow		Pe:
 Tools	InstallerWindow		Unelte
 scanning…	InstallerWindow		se scanează…
+Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Alegeți discul pe care doriți să instalați din meniul contextual. Apoi dați clic pe „Începe”.
 Continue	InstallerApp		Continuă

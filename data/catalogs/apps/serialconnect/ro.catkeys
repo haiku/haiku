@@ -1,8 +1,9 @@
-1	romanian	x-vnd.haiku.SerialConnect	354154115
+1	romanian	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Hardware
 Connection	SerialWindow		Conexiune
 Raw send…	SerialWindow		Trimitere brută…
 Baud rate	SerialWindow		Rată de baud
+Paste	SerialWindow		Lipește
 Stop bits	SerialWindow		Oprește biții
 None	SerialWindow	Flowcontrol	Nespecificat
 Cancel	Custom baudrate window		Anulează

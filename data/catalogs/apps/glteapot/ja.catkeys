@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-GLTeapot	400822745
+1	japanese	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		右
 Backface culling	TeapotWindow		ポリゴンの裏面を非表示
 Add a teapot	TeapotWindow		ティーポットの追加
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		左隅
 Fog	TeapotWindow		フォグ
 FPS display	TeapotWindow		FPSの表示
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		FPSをリフレッシュレートに制限
 Settings	TeapotWindow		設定
 Gouraud shading	TeapotWindow		グローシェーディング
 Lighting	TeapotWindow		ライティング
