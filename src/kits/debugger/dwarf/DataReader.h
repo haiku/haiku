@@ -157,6 +157,21 @@ public:
 		return fOverflow ? defaultValue : result;
 	}
 
+	uint32 ReadU24(uint32 defaultValue)
+	{
+		uint8 res1 = Read<uint8>(0);
+		uint8 res2 = Read<uint8>(0);
+		uint8 res3 = Read<uint8>(0);
+#if defined(__HAIKU_LITTLE_ENDIAN)
+		uint32 result = res1 | (res2 << 8) | (res3 << 16);
+#elif defined(__HAIKU_BIG_ENDIAN)
+		uint32 result = res3 | (res2 << 8) | (res1 << 16);
+#else
+#error endiannes not defined
+#endif
+		return fOverflow ? defaultValue : result;
+	}
+
 	const char* ReadString()
 	{
 		const char* string = (const char*)fData;
