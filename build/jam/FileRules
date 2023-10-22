@@ -461,7 +461,7 @@ if $(HAIKU_NO_DOWNLOADS) = 1 {
 	actions DownloadLocatedFile1
 	{
 		source="$(2)"
-		wget --retry-connrefused --timeout 30 -O "$(1)" $(URL) || exit 1
+		wget --retry-connrefused --retry-on-host-error --timeout 30 -O "$(1)" $(URL) || exit 1
 		touch "$(1)"
 	}
 }
