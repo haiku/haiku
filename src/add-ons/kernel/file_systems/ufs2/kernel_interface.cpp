@@ -5,6 +5,9 @@
 
 #include <string.h>
 
+#ifdef FS_SHELL
+#include "fssh_api_wrapper.h"
+#endif
 #include <file_systems/fs_ops_support.h>
 
 #include "DirectoryIterator.h"
