@@ -54,7 +54,7 @@ ufs2_scan_partition(int fd, partition_data *partition, void *_cookie)
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_FILE_SYSTEM | B_PARTITION_READ_ONLY;
 	partition->block_size = cookie->super_block.fs_bsize;
-	partition->content_size = partition->block_size
+	partition->content_size = cookie->super_block.fs_fsize
 		* cookie->super_block.fs_size;
 	partition->content_name = strdup(cookie->super_block.fs_volname);
 	if (partition->content_name == NULL)
@@ -117,7 +117,7 @@ ufs2_read_fs_info(fs_volume *_volume, struct fs_info *info)
 	info->flags = B_FS_IS_PERSISTENT
 		| (volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
 	info->io_size = 65536;
-	info->block_size = volume->SuperBlock().fs_sbsize;
+	info->block_size = volume->SuperBlock().fs_fsize;
 	info->total_blocks = volume->SuperBlock().fs_size;
 	info->free_blocks = volume->SuperBlock().fs_cstotal.cs_nbfree;
 
