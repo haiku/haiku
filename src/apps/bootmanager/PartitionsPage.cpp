@@ -110,7 +110,7 @@ PartitionsPage::_BuildUI()
 
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
 		.Add(fDescription)
-		.Add(scrollView);
+		.Add(scrollView, 10.0);
 }
 
 

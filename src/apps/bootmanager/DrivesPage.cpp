@@ -277,8 +277,8 @@ DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
-		.Add(description, 0.5)
-		.Add(scrollView, 1);
+		.Add(description)
+		.Add(scrollView, 10.0);
 
 	_UpdateWizardButtons(NULL);
 	_FillDrivesView(menus);

@@ -41,5 +41,6 @@ DescriptionPage::_BuildUI(const char* description, bool hasHeading)
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
-		.Add(fDescription);
+		.Add(fDescription)
+		.AddGlue();
 }

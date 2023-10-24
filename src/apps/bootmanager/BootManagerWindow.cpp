@@ -36,7 +36,7 @@ BootManagerWindow::BootManagerWindow()
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
 	minWidth = be_control_look->DefaultLabelSpacing() * 67.0f;
-	minHeight = be_control_look->DefaultLabelSpacing() * 42.0f;
+	minHeight = be_control_look->DefaultLabelSpacing() * 52.0f;
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	fWizardView = new WizardView("wizard");
@@ -44,7 +44,6 @@ BootManagerWindow::BootManagerWindow()
 		.Add(fWizardView);
 
 	fController.Initialize(fWizardView);
-
 	CenterOnScreen();
 
 	// Prevent minimizing this window if the user would have no way to

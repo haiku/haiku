@@ -55,6 +55,7 @@ WizardView::SetPage(WizardPageView* page)
 		return;
 
 	fPageContainer->AddChild(page);
+	Window()->ResizeToPreferred();
 }
 
 
