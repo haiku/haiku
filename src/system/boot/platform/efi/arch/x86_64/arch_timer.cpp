@@ -19,6 +19,6 @@
 void
 arch_timer_init(void)
 {
-	calculate_cpu_conversion_factor(2);
+	determine_cpu_conversion_factor(2);
 	hpet_init();
 }

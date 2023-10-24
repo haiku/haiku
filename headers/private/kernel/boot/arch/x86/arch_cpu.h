@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-void calculate_cpu_conversion_factor(uint8 channel);
+void determine_cpu_conversion_factor(uint8 channel);
 status_t boot_arch_cpu_init(void);
 void arch_ucode_load(BootVolume& volume);
 

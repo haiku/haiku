@@ -23,19 +23,6 @@
 
 #include <string.h>
 
-#if __GNUC__ > 2
-#include <x86intrin.h>
-#else
-static inline uint64_t __rdtsc()
-{
-	uint64 tsc;
-
-	asm volatile ("rdtsc\n" : "=A"(tsc));
-
-	return tsc;
-}
-#endif
-
 
 uint32 gTimeConversionFactor;
 
@@ -184,6 +171,22 @@ private:
 #endif
 
 
+static inline uint64_t
+rdtsc_fenced()
+{
+	uint64 tsc;
+
+	// RDTSC is not serializing, nor does it drain the instruction stream.
+	// RDTSCP does, but is not available everywhere. Other OSes seem to use
+	// "CPUID" rather than MFENCE/LFENCE for serializing here during boot.
+	asm volatile ("cpuid" : : : "eax", "ebx", "ecx", "edx");
+
+	asm volatile ("rdtsc" : "=A"(tsc));
+
+	return tsc;
+}
+
+
 static inline void
 calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	double& conversionFactor, uint16& expired)
@@ -214,7 +217,7 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	} while (startHigh != 255);
 
 	// Read in the first TSC value
-	uint64 startTSC = __rdtsc();
+	uint64 startTSC = rdtsc_fenced();
 
 	// Wait for the PIT to count down to our desired value
 	uint8 endLow;
@@ -226,7 +229,7 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 	} while (endHigh > desiredHighByte);
 
 	// And read the second TSC value
-	uint64 endTSC = __rdtsc();
+	uint64 endTSC = rdtsc_fenced();
 
 	tscDelta = endTSC - startTSC;
 	expired = ((startHigh << 8) | startLow) - ((endHigh << 8) | endLow);
@@ -234,7 +237,7 @@ calibration_loop(uint8 desiredHighByte, uint8 channel, uint64& tscDelta,
 }
 
 
-void
+static void
 calculate_cpu_conversion_factor(uint8 channel)
 {
 	// When using channel 2, enable the input and disable the speaker.
@@ -318,6 +321,33 @@ slower_sample:
 
 
 void
+determine_cpu_conversion_factor(uint8 channel)
+{
+	// Before using the calibration loop, check if we are on a hypervisor.
+	cpuid_info info;
+	if (get_current_cpuid(&info, 1, 0) == B_OK
+			&& (info.regs.ecx & IA32_FEATURE_EXT_HYPERVISOR) != 0) {
+		get_current_cpuid(&info, 0x40000000, 0);
+		const uint32 maxVMM = info.regs.eax;
+		if (maxVMM >= 0x40000010) {
+			get_current_cpuid(&info, 0x40000010, 0);
+
+			uint64 clockSpeed = uint64(info.regs.eax) * 1000;
+			gTimeConversionFactor = (uint64(1000) << 32) / info.regs.eax;
+
+			gKernelArgs.arch_args.system_time_cv_factor = gTimeConversionFactor;
+			gKernelArgs.arch_args.cpu_clock_speed = clockSpeed;
+
+			dprintf("TSC frequency read from hypervisor CPUID leaf\n");
+			return;
+		}
+	}
+
+	calculate_cpu_conversion_factor(channel);
+}
+
+
+void
 ucode_load(BootVolume& volume)
 {
 	cpuid_info info;
@@ -386,7 +416,7 @@ ucode_load(BootVolume& volume)
 extern "C" bigtime_t
 system_time()
 {
-	uint64 tsc = __rdtsc();
+	uint64 tsc = rdtsc_fenced();
 	uint64 lo = (uint32)tsc;
 	uint64 hi = tsc >> 32;
 	return ((lo * gTimeConversionFactor) >> 32) + hi * gTimeConversionFactor;

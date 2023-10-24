@@ -21,7 +21,7 @@ arch_timer_init(void)
 {
 	// use PIT channel 2 for the calibration loop
 	// as channel 0 is reserved for the UEFI firmware
-	calculate_cpu_conversion_factor(2);
+	determine_cpu_conversion_factor(2);
 
 	hpet_init();
 }

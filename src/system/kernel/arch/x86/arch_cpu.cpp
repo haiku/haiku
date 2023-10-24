@@ -1648,8 +1648,10 @@ init_tsc(kernel_args* args)
 
 	// try to find the TSC frequency with CPUID
 	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
-	init_tsc_with_cpuid(args, &conversionFactor);
-	init_tsc_with_msr(args, &conversionFactor);
+	if (!x86_check_feature(IA32_FEATURE_EXT_HYPERVISOR, FEATURE_EXT)) {
+		init_tsc_with_cpuid(args, &conversionFactor);
+		init_tsc_with_msr(args, &conversionFactor);
+	}
 	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
 
 
