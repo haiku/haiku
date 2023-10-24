@@ -167,12 +167,6 @@ PersonWindow::MenusBeginning()
 void
 PersonWindow::MessageReceived(BMessage* msg)
 {
-	char			str[256];
-	BDirectory		directory;
-	BEntry			entry;
-	BFile			file;
-	BNodeInfo		*node;
-
 	switch (msg->what) {
 		case M_SAVE:
 			if (!fRef) {
@@ -206,23 +200,27 @@ PersonWindow::MessageReceived(BMessage* msg)
 			if (msg->FindRef("directory", &dir) == B_OK) {
 				const char* name = NULL;
 				msg->FindString("name", &name);
+
+				BDirectory directory;
 				directory.SetTo(&dir);
 				if (directory.InitCheck() == B_NO_ERROR) {
+					BFile file;
 					directory.CreateFile(name, &file);
 					if (file.InitCheck() == B_NO_ERROR) {
-						node = new BNodeInfo(&file);
+						BNodeInfo* node = new BNodeInfo(&file);
 						node->SetType("application/x-person");
 						delete node;
 
+						BEntry entry;
 						directory.FindEntry(name, &entry);
 						entry.GetRef(&dir);
 						_SetToRef(new entry_ref(dir));
 						SetTitle(fRef->name);
 						fView->CreateFile(fRef);
-					}
-					else {
-						sprintf(str, B_TRANSLATE("Could not create %s."), name);
-						BAlert* alert = new BAlert("", str, B_TRANSLATE("Sorry"));
+					} else {
+						BString str;
+						str.SetToFormat(B_TRANSLATE("Could not create %s."), name);
+						BAlert* alert = new BAlert("", str.String(), B_TRANSLATE("Sorry"));
 						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 						alert->Go();
 					}
