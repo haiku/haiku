@@ -222,13 +222,11 @@ ThemeView::_UpdateStyle()
 
 	BString previewText;
 	previewText << '\n';
-	for (int ix = 0; ix < 8; ++ix)
-	{
+	for (int ix = 0; ix < 8; ++ix) {
 		previewText << ' ' << colours[ix];
 	}
 	previewText << '\n';
-	for (int ix = 0; ix < 8; ++ix)
-	{
+	for (int ix = 0; ix < 8; ++ix) {
 		previewText << ' ' << colours[ix];
 	}
 	previewText << '\n';
@@ -336,13 +334,11 @@ ThemeView::MessageReceived(BMessage *msg)
 		case MSG_COLOR_ATTRIBUTE_CHOSEN:
 		{
 			// Received when the user chooses a GUI fAttribute from the list
-			ColorItem* item = (ColorItem*)
-				fAttrList->ItemAt(fAttrList->CurrentSelection());
-			if (item == NULL)
+			const int32 currentIndex = fAttrList->CurrentSelection();
+			if (currentIndex < 0)
 				break;
 
-			const char* label = item->Text();
-			rgb_color color = PrefHandler::Default()->getRGB(label);
+			rgb_color color = PrefHandler::Default()->getRGB(kColorTable[currentIndex]);
 			_SetCurrentColor(color);
 			break;
 		}
@@ -375,7 +371,7 @@ ThemeView::SetDefaults()
 	int32 count = fAttrList->CountItems();
 	for (int32 index = 0; index < count; ++index) {
 		ColorItem* item = (ColorItem*)fAttrList->ItemAt(index);
-		item->SetColor(prefHandler->getRGB(item->Text()));
+		item->SetColor(prefHandler->getRGB(kColorTable[index]));
 		fAttrList->InvalidateItem(index);
 	}
 
@@ -433,10 +429,9 @@ ThemeView::_ChangeColorScheme(color_scheme* scheme)
 	pref->setRGB(PREF_ANSI_WHITE_HCOLOR, scheme->ansi_colors_h.white);
 
 	int32 count = fAttrList->CountItems();
-	for (int32 index = 0; index < count; ++index)
-	{
+	for (int32 index = 0; index < count; ++index) {
 		ColorItem* item = static_cast<ColorItem*>(fAttrList->ItemAt(index));
-		rgb_color color = pref->getRGB(item->Text());
+		rgb_color color = pref->getRGB(kColorTable[index]);
 		item->SetColor(color);
 
 		if (item->IsSelected()) {
@@ -536,7 +531,7 @@ ThemeView::_SetCurrentColor(rgb_color color)
 		item->SetColor(color);
 		fAttrList->InvalidateItem(currentIndex);
 
-		PrefHandler::Default()->setRGB(item->Text(), color);
+		PrefHandler::Default()->setRGB(kColorTable[currentIndex], color);
 	}
 
 	fPicker->SetValue(color);
