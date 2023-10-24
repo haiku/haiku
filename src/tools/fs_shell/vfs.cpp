@@ -3678,7 +3678,7 @@ common_unlock_node(int fd, bool kernel)
 
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
-#ifdef __x86_64__
+#if LONG_MAX == INT_MAX
 	if (fssh_atomic_test_and_set64((int64_t *)&vnode->mandatory_locked_by,
 			0, (fssh_addr_t)descriptor) != (int64_t)descriptor)
 #else
