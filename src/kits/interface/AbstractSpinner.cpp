@@ -968,7 +968,7 @@ BAbstractSpinner::GetSupportedSuites(BMessage* message)
 	BPropertyInfo prop_info(sProperties);
 	message->AddFlat("messages", &prop_info);
 
-	return BView::GetSupportedSuites(message);
+	return BControl::GetSupportedSuites(message);
 }
 
 
@@ -976,7 +976,7 @@ BHandler*
 BAbstractSpinner::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
 	int32 form, const char* property)
 {
-	return BView::ResolveSpecifier(message, index, specifier, form,
+	return BControl::ResolveSpecifier(message, index, specifier, form,
 		property);
 }
 
@@ -993,7 +993,7 @@ BAbstractSpinner::AttachedToWindow()
 	_UpdateTextViewColors(IsEnabled());
 	fTextView->MakeEditable(IsEnabled());
 
-	BView::AttachedToWindow();
+	BControl::AttachedToWindow();
 }
 
 
@@ -1010,7 +1010,7 @@ BAbstractSpinner::Draw(BRect updateRect)
 void
 BAbstractSpinner::FrameResized(float width, float height)
 {
-	BView::FrameResized(width, height);
+	BControl::FrameResized(width, height);
 
 	// TODO: this causes flickering still...
 
@@ -1086,7 +1086,7 @@ BAbstractSpinner::MakeFocus(bool focus)
 void
 BAbstractSpinner::ResizeToPreferred()
 {
-	BView::ResizeToPreferred();
+	BControl::ResizeToPreferred();
 
 	const char* label = Label();
 	if (label != NULL) {
@@ -1115,7 +1115,7 @@ BAbstractSpinner::SetFlags(uint32 flags)
 	// Don't make this one navigable
 	flags &= ~B_NAVIGABLE;
 
-	BView::SetFlags(flags);
+	BControl::SetFlags(flags);
 }
 
 
