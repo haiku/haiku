@@ -14,6 +14,7 @@
 #include "ValidationFailureTest.h"
 #include "ValidationUtilsTest.h"
 #include "StorageUtilsTest.h"
+#include "StringUtilsTest.h"
 #include "TarArchiveServiceTest.h"
 
 
@@ -30,6 +31,7 @@ getTestSuite()
 	ValidationFailureTest::AddTests(*suite);
 	ValidationUtilsTest::AddTests(*suite);
 	StorageUtilsTest::AddTests(*suite);
+	StringUtilsTest::AddTests(*suite);
 	TarArchiveServiceTest::AddTests(*suite);
 
 	return suite;

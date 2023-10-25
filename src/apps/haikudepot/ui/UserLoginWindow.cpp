@@ -32,6 +32,7 @@
 #include "Logger.h"
 #include "Model.h"
 #include "ServerHelper.h"
+#include "StringUtils.h"
 #include "TabView.h"
 #include "UserUsageConditions.h"
 #include "UserUsageConditionsWindow.h"
@@ -138,6 +139,9 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	fNicknameField = new BTextControl(B_TRANSLATE("Nickname:"), "", NULL);
 	fPasswordField = new BTextControl(B_TRANSLATE("Password:"), "", NULL);
 	fPasswordField->TextView()->HideTyping(true);
+
+	for (uint32 i = 0; i <= ' '; i++)
+		fNicknameField->TextView()->DisallowChar(i);
 
 	fNewNicknameField = new BTextControl(B_TRANSLATE("Nickname:"), "",
 		NULL);
@@ -475,8 +479,9 @@ UserLoginWindow::_SetWorkerThread(thread_id thread)
 void
 UserLoginWindow::_Authenticate()
 {
-	_Authenticate(UserCredentials(
-		fNicknameField->Text(), fPasswordField->Text()));
+	BString username = fNicknameField->Text();
+	StringUtils::InSituTrimSpaceAndControl(username);
+	_Authenticate(UserCredentials(username, fPasswordField->Text()));
 }
 
 

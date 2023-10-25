@@ -53,6 +53,9 @@ UnitTestLib haikudepottest.so :
 	StorageUtils.cpp
 	StorageUtilsTest.cpp
 
+	StringUtils.cpp
+	StringUtilsTest.cpp
+
 	TarArchiveHeader.cpp
 	TarArchiveService.cpp
 	TarArchiveServiceTest.cpp

@@ -203,6 +203,7 @@ local applicationSources =
 	PackageUtils.cpp
 	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
+	StringUtils.cpp
 	LoggingUrlProtocolListener.cpp
 
 	# package_daemon
