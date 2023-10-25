@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+# For "official" images on https://www.haiku-os.org/guides/virtualizing/google
+#
 # Making a new Google Compute Engine image
 #   * Create a raw disk 4GiB image dd if=/dev/zero of=disk.raw bs=1M count=4096
 #   * Boot VM (qemu-system-x86_64 -cdrom (haiku-release.iso) -hda disk.raw -boot d --enable-kvm -m 4G
@@ -14,13 +16,15 @@
 #       * unmount "haiku esp", unmount "ESP"
 #     * Mount new Haiku install.  (should mount to /Haiku1)
 #     * Run this script (sysprep-gce.sh /Haiku1)
-#     * Manually copy over latest r1beta4 haiku, haiku_devel, haiku_data_translations, haiku_loader
-#       * Needed on r1b4 due to / permissions fix needed by sshd
+#     * If r1beta4
+#       * Manually copy over latest r1beta4 haiku, haiku_devel, haiku_data_translations, haiku_loader
+#         * Needed on r1b4 due to / permissions fix needed by sshd
 #     * Shutdown VM.  DO NOT BOOT FROM NEW DISK!
 #       * Booting from new disk will cause SSH host keys to generate! (#18186)
 #   * Compress tar cvzf haiku-r1beta4-v20221222.tar.gz disk.raw
 #   * Upload to google cloud storage bucket for haiku.inc (ex: haiku-images/r1beta4/xxx)
-#   * Import image
+#     ex: gcloud storage cp ./haiku-master-x64-v20231024.tar.gz  gs://haiku-images/master/haiku-master-x64-v20231024.tar.gz
+#   * Import image (be sure to update version information below)
 #     * compute engine -> images
 #     * create image
 #     * source: Cloud storage file -> haiku-images/r1beta4/xxx
@@ -31,7 +35,7 @@
 if [ $# -ne 1 ]; then
 		echo "usage: $0 <HAIKU ROOTFS>"
 		echo "  example: $0 /Haiku1"
-		return 1;
+		exit 1;
 fi
 
 SMOL_RELEASE="0.1.1-1"
