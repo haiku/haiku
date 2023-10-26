@@ -106,7 +106,7 @@ speed_t
 cfgetispeed(const struct termios *termios)
 {
 	if ((termios->c_cflag & CBAUD) == CBAUD)
-		return termios->c_ispeed;
+		return termios->c_ispeed + ((uint32_t)termios->c_ispeed_high << 16);
 
 	return termios->c_cflag & CBAUD;
 }
@@ -121,7 +121,8 @@ cfsetispeed(struct termios *termios, speed_t speed)
 	detected only when the tcsetattr() function is called */
 	if (speed > B31250) {
 		termios->c_cflag |= CBAUD;
-		termios->c_ispeed = speed;
+		termios->c_ispeed = speed & 0xFFFF;
+		termios->c_ispeed_high = speed >> 16;
 		return 0;
 	}
 
@@ -135,7 +136,7 @@ speed_t
 cfgetospeed(const struct termios *termios)
 {
 	if ((termios->c_cflag & CBAUD) == CBAUD)
-		return termios->c_ospeed;
+		return termios->c_ospeed + ((uint32_t)termios->c_ospeed_high << 16);
 
 	return termios->c_cflag & CBAUD;
 }
@@ -147,7 +148,8 @@ cfsetospeed(struct termios *termios, speed_t speed)
 	/* Check for custom speed values (see above) */
 	if (speed > B31250) {
 		termios->c_cflag |= CBAUD;
-		termios->c_ospeed = speed;
+		termios->c_ospeed = speed & 0xFFFF;
+		termios->c_ospeed_high = speed >> 16;
 		return 0;
 	}
 

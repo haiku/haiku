@@ -9,21 +9,25 @@
 #include <sys/types.h>
 
 
-typedef __haiku_uint32 tcflag_t;
-typedef unsigned char speed_t;
+typedef __haiku_uint16 tcflag_t;
+typedef __haiku_uint32 speed_t;
 typedef unsigned char cc_t;
 
 #define NCCS	11		/* number of control characters */
 
 struct termios {
-	tcflag_t	c_iflag;	/* input modes */
-	tcflag_t	c_oflag;	/* output modes */
-	tcflag_t	c_cflag;	/* control modes */
-	tcflag_t	c_lflag;	/* local modes */
-	char		c_line;		/* line discipline */
-	speed_t		c_ispeed;	/* custom input baudrate */
-	speed_t		c_ospeed;	/* custom output baudrate */
-	cc_t		c_cc[NCCS];	/* control characters */
+	tcflag_t		c_iflag;			/* input modes */
+	tcflag_t		c_ispeed;			/* input baudrate */
+	tcflag_t		c_oflag;			/* output modes */
+	tcflag_t		c_ospeed;			/* output baudrate */
+	tcflag_t		c_cflag;			/* control modes */
+	tcflag_t		c_ispeed_high;		/* high word of input baudrate */
+	tcflag_t		c_lflag;			/* local modes */
+	tcflag_t		c_ospeed_high;		/* high word of output baudrate */
+	char			c_line;				/* line discipline */
+	unsigned char	_padding;		/* unused */
+	unsigned char	_padding2;		/* unused */
+	cc_t			c_cc[NCCS];			/* control characters */
 };
 
 /* control characters */

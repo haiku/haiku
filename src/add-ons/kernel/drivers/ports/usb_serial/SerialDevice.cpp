@@ -160,10 +160,11 @@ SerialDevice::SetModes(struct termios *tios)
 	TRACE_FUNCRES(trace_termios, tios);
 
 	uint8 baud = tios->c_cflag & CBAUD;
-	int32 speed = baud_index_to_speed(baud);
-	if (speed < 0) {
-		baud = CBAUD;
-		speed = tios->c_ospeed;
+	int32 speed;
+	if (baud == CBAUD) {
+		speed = tios->c_ospeed + (tios->c_ospeed_high << 16);
+	} else {
+		speed = baud_index_to_speed(baud);
 	}
 
 	// update our master config in full
