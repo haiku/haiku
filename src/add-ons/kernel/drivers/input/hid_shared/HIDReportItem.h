@@ -23,6 +23,7 @@ public:
 		bool					Relative() { return fRelative; };
 		bool					Array() { return fArray; };
 		bool					Signed() { return fMinimum > fMaximum; };
+		uint32					Minimum() { return fMinimum; }
 
 		uint16					UsagePage();
 		uint16					UsageID();

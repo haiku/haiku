@@ -549,7 +549,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		if (key->Extract() == B_OK && key->Valid()) {
 			// handle both array and bitmap based keyboard reports
 			if (key->Array()) {
-				fCurrentKeys[i] = key->Data();
+				fCurrentKeys[i] = key->Data() - key->Minimum();
 			} else {
 				if (key->Data() == 1)
 					fCurrentKeys[i] = key->UsageID();
