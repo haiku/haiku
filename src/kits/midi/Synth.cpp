@@ -215,12 +215,9 @@ BSynth::SampleVolume(void) const
 }
 
 
-status_t 
+status_t
 BSynth::GetAudio(int16* pLeft, int16* pRight, int32 max_samples) const
 {
-	// We don't print a "not supported" message here. That would cause
-	// significant slowdowns because applications ask for this many times.
-
 	if (fSynth->fMonitorSize <= 0) {
 		memset(pLeft, 0, max_samples * sizeof(int16));
 		memset(pRight, 0, max_samples * sizeof(int16));
