@@ -78,6 +78,35 @@ StringUtilsTest::TestNoTrimInSituTrimSpaceAndControl()
 }
 
 
+void
+StringUtilsTest::TestInSituStripSpaceAndControl()
+{
+	BString string = "\x01 To\tnic Wa\nter  ";
+
+// ----------------------
+	StringUtils::InSituTrimSpaceAndControl(string);
+// ----------------------
+
+	const BString expected = "TonicWater";
+		// note intervening space also removed
+	CPPUNIT_ASSERT_EQUAL(expected, string);
+}
+
+
+void
+StringUtilsTest::TestNoInSituStripSpaceAndControl()
+{
+	BString string = "Tonic Water";
+
+// ----------------------
+	StringUtils::InSituStripSpaceAndControl(string);
+// ----------------------
+
+	const BString expected = "Tonic Water";
+	CPPUNIT_ASSERT_EQUAL(expected, string);
+}
+
+
 /*static*/ void
 StringUtilsTest::AddTests(BTestSuite& parent)
 {
@@ -99,6 +128,15 @@ StringUtilsTest::AddTests(BTestSuite& parent)
 		new CppUnit::TestCaller<StringUtilsTest>(
 			"StringUtilsTest::TestNoTrimInSituTrimSpaceAndControl",
 			&StringUtilsTest::TestNoTrimInSituTrimSpaceAndControl));
+
+	suite.addTest(
+		new CppUnit::TestCaller<StringUtilsTest>(
+			"StringUtilsTest::TestNoInSituStripSpaceAndControl",
+			&StringUtilsTest::TestNoInSituStripSpaceAndControl));
+	suite.addTest(
+		new CppUnit::TestCaller<StringUtilsTest>(
+			"StringUtilsTest::TestInSituStripSpaceAndControl",
+			&StringUtilsTest::TestInSituStripSpaceAndControl));
 
 	parent.addTest("StringUtilsTest", &suite);
 }

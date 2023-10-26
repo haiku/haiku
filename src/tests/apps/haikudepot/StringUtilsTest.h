@@ -19,6 +19,9 @@ public:
 			void				TestStartAndEndInSituTrimSpaceAndControl();
 			void				TestNoTrimInSituTrimSpaceAndControl();
 
+			void				TestInSituStripSpaceAndControl();
+			void				TestNoInSituStripSpaceAndControl();
+
 	static	void				AddTests(BTestSuite& suite);
 };
 

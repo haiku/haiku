@@ -480,7 +480,7 @@ void
 UserLoginWindow::_Authenticate()
 {
 	BString username = fNicknameField->Text();
-	StringUtils::InSituTrimSpaceAndControl(username);
+	StringUtils::InSituStripSpaceAndControl(username);
 	_Authenticate(UserCredentials(username, fPasswordField->Text()));
 }
 

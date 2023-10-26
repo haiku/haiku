@@ -13,6 +13,7 @@ class StringUtils {
 
 public:
 	static void				InSituTrimSpaceAndControl(BString& value);
+	static void				InSituStripSpaceAndControl(BString& value);
 
 private:
 	static bool				_IsSpaceOrControl(char ch);

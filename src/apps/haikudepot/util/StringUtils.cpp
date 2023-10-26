@@ -29,6 +29,16 @@ StringUtils::InSituTrimSpaceAndControl(BString& value)
 }
 
 
+/*static*/ void
+StringUtils::InSituStripSpaceAndControl(BString& value)
+{
+	for (int i = value.Length() - 1; i >= 0; i--) {
+		if (_IsSpaceOrControl(value.ByteAt(i)))
+			value.Remove(i, 1);
+	}
+}
+
+
 /*static*/ bool
 StringUtils::_IsSpaceOrControl(char ch)
 {

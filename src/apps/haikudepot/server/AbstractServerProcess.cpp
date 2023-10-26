@@ -383,11 +383,11 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 	fRequest = NULL;
 
 	if (BHttpRequest::IsSuccessStatusCode(statusCode)) {
-		HDINFO("[%s] did complete streaming data [%"
-			B_PRIdSSIZE " bytes]", Name(), listener.ContentLength());
+		HDINFO("[%s] did complete streaming data [%" B_PRIdSSIZE " bytes]", Name(),
+			listener.ContentLength());
 		return B_OK;
 	} else if (statusCode == B_HTTP_STATUS_NOT_MODIFIED) {
-		HDINFO("[%s] remote data has not changed since [%s]", Name(),
+		HDINFO("[%s] remote data has not changed since [%s] so was not downloaded", Name(),
 			ifModifiedSinceHeader.String());
 		return HD_ERR_NOT_MODIFIED;
 	} else if (statusCode == B_HTTP_STATUS_PRECONDITION_FAILED) {
@@ -396,20 +396,16 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 	} else if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
 		if (location.Length() != 0) {
 			BUrl redirectUrl(result.Url(), location);
-			HDINFO("[%s] will redirect to; %s",
-				Name(), redirectUrl.UrlString().String());
-			return DownloadToLocalFile(targetFilePath, redirectUrl,
-				redirects + 1, 0);
+			HDINFO("[%s] will redirect to; %s", Name(), redirectUrl.UrlString().String());
+			return DownloadToLocalFile(targetFilePath, redirectUrl, redirects + 1, 0);
 		}
 
 		HDERROR("[%s] unable to find 'Location' header for redirect", Name());
 		return B_IO_ERROR;
 	} else {
 		if (statusCode == 0 || (statusCode / 100) == 5) {
-			HDERROR("error response from server [%" B_PRId32 "] --> retry...",
-				statusCode);
-			return DownloadToLocalFile(targetFilePath, url, redirects,
-				failures + 1);
+			HDERROR("error response from server [%" B_PRId32 "] --> retry...", statusCode);
+			return DownloadToLocalFile(targetFilePath, url, redirects, failures + 1);
 		}
 
 		HDERROR("[%s] unexpected response from server [%" B_PRId32 "]",
