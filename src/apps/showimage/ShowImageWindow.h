@@ -23,6 +23,8 @@ class BMenu;
 class BMenuBar;
 class BMenuItem;
 class BMessageRunner;
+class BMessageRunner;
+class BMimeType;
 class BScrollBar;
 class ProgressWindow;
 class ShowImageView;
@@ -36,6 +38,7 @@ enum {
 	MSG_UPDATE_STATUS_TEXT		= 'mUPT',
 	MSG_UPDATE_STATUS_ZOOM		= 'mUPZ',
 	MSG_SELECTION				= 'mSEL',
+	MSG_OPEN_WITH				= 'mOPW',
 	MSG_FILE_NEXT				= 'mFLN',
 	MSG_FILE_PREV				= 'mFLP',
 	kMsgDeleteCurrentFile		= 'mDcF',
@@ -66,6 +69,8 @@ private:
 			void				_AddMenus(BMenuBar* bar);
 			void				_ResizeWindowToImage();
 			void				_BuildViewMenu(BMenu* menu, bool popupMenu);
+			void				_UpdateOpenWithMenu(BMenu* menu);
+
 			BMenu*				_BuildRatingMenu();
 			BMenuItem*			_AddItemMenu(BMenu* menu, const char* label,
 									uint32 what, char shortcut, uint32 modifier,
@@ -120,6 +125,7 @@ private:
 			BMenu*				fGoToPageMenu;
 			BMenu*				fSlideShowDelayMenu;
 			BMenu*				fRatingMenu;
+			BMenu*	 			fOpenWithMenu;
 			BToolBar*			fToolBar;
 			bool				fToolBarVisible;
 			BView*				fScrollArea;
@@ -136,6 +142,7 @@ private:
 			PrintOptions		fPrintOptions;
 
 			BString				fImageType;
+			BMimeType*			fMimeType;
 
 			BMessageRunner*		fSlideShowRunner;
 			bigtime_t			fSlideShowDelay;

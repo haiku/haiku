@@ -57,6 +57,7 @@
 #include "ShowImageConstants.h"
 #include "ShowImageStatusView.h"
 #include "ShowImageView.h"
+#include "SupportingAppsMenu.h"
 #include "ToolBarIcons.h"
 
 
@@ -377,7 +378,19 @@ ShowImageWindow::_BuildViewMenu(BMenu* menu, bool popupMenu)
 		menu->AddSeparatorItem();
 		_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
 			MSG_DESKTOP_BACKGROUND, 0, 0, this);
+
+		BMenu* openWithMenu = new BMenu(B_TRANSLATE("Open with" B_UTF8_ELLIPSIS));
+		_UpdateOpenWithMenu(openWithMenu);
+		BMenuItem* item = new BMenuItem(openWithMenu, NULL);
+		menu->AddItem(item);
 	}
+}
+
+
+void
+ShowImageWindow::_UpdateOpenWithMenu(BMenu* menu)
+{
+	update_supporting_apps_menu(menu, fMimeType, MSG_OPEN_WITH, this);
 }
 
 
@@ -410,7 +423,12 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	item->SetShortcut('O', 0);
 	item->SetTarget(be_app);
 	menu->AddItem(item);
+
 	menu->AddSeparatorItem();
+
+	fOpenWithMenu = new BMenu(B_TRANSLATE("Open with" B_UTF8_ELLIPSIS));
+	item = new BMenuItem(fOpenWithMenu, NULL);
+	menu->AddItem(item);
 
 	BMenu* menuSaveAs = new BMenu(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
 		B_ITEMS_IN_COLUMN);
@@ -675,6 +693,9 @@ ShowImageWindow::MessageReceived(BMessage* message)
 					// to receive key messages
 				Show();
 			}
+
+			fMimeType = new BMimeType(message->FindString("mime"));
+			_UpdateOpenWithMenu(fOpenWithMenu);
 			_UpdateRatingMenu();
 			// Set width and height attributes of the currently showed file.
 			// This should only be a temporary solution.
@@ -774,6 +795,17 @@ ShowImageWindow::MessageReceived(BMessage* message)
 		case MSG_UPDATE_STATUS_TEXT:
 		{
 			_UpdateStatusText(message);
+			break;
+		}
+
+		case MSG_OPEN_WITH:
+		{
+			BString appSig = "";
+			message->FindString("signature", &appSig);
+			entry_ref ref = fNavigator.CurrentRef();
+			BMessage openMsg(B_REFS_RECEIVED);
+			openMsg.AddRef("refs", &ref);
+			be_roster->Launch(appSig.String(), &openMsg);
 			break;
 		}
 
