@@ -102,12 +102,14 @@ struct LocaleTimeDataBridge {
 
 
 struct TimeConversionDataBridge {
+	static const int32 		kTZNameLength = 64;
+
 private:
 	int						localDaylight;
 	long					localTimezone;
 	char*					localTZName[2];
-	char					localTZName0[64];
-	char					localTZName1[64];
+	char					localTZName0[kTZNameLength];
+	char					localTZName1[kTZNameLength];
 
 public:
 	int*					addrOfDaylight;

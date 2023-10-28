@@ -113,6 +113,10 @@ done:
 	if (fTimeZone == NULL)
 		return B_NO_MEMORY;
 
+	UnicodeString temp;
+	if (fTimeZone->getID(temp) == UCAL_UNKNOWN_ZONE_ID)
+		goto error;
+
 	if (offsetHasBeenSet) {
 		fTimeZone->setRawOffset(*fDataBridge->addrOfTimezone * -1 * 1000);
 	} else {
@@ -121,14 +125,8 @@ done:
 		UDate nowMillis = 1000 * (UDate)time(NULL);
 		UErrorCode icuStatus = U_ZERO_ERROR;
 		fTimeZone->getOffset(nowMillis, FALSE, rawOffset, dstOffset, icuStatus);
-		if (!U_SUCCESS(icuStatus)) {
-			*fDataBridge->addrOfTimezone = 0;
-			*fDataBridge->addrOfDaylight = false;
-			strcpy(fDataBridge->addrOfTZName[0], "GMT");
-			strcpy(fDataBridge->addrOfTZName[1], "GMT");
-
-			return B_ERROR;
-		}
+		if (!U_SUCCESS(icuStatus))
+			goto error;
 		*fDataBridge->addrOfTimezone = -1 * (rawOffset + dstOffset) / 1000;
 			// we want seconds, not the ms that ICU gives us
 	}
@@ -137,14 +135,18 @@ done:
 
 	for (int i = 0; i < 2; ++i) {
 		if (tz != NULL && *tz != ':' && i == 0) {
-			strcpy(fDataBridge->addrOfTZName[0], fTimeZoneID);
+			strlcpy(fDataBridge->addrOfTZName[0], fTimeZoneID,
+				fDataBridge->kTZNameLength);
 		} else {
 			UnicodeString icuString;
 			fTimeZone->getDisplayName(i == 1, TimeZone::SHORT,
 				fTimeData.ICULocaleForStrings(), icuString);
 			CheckedArrayByteSink byteSink(fDataBridge->addrOfTZName[i],
-				sizeof(fTimeZoneID));
+				fDataBridge->kTZNameLength);
 			icuString.toUTF8(byteSink);
+
+			if (byteSink.Overflowed())
+				goto error;
 
 			// make sure to canonicalize "GMT+00:00" to just "GMT"
 			if (strcmp(fDataBridge->addrOfTZName[i], "GMT+00:00") == 0)
@@ -153,6 +155,14 @@ done:
 	}
 
 	return B_OK;
+
+error:
+	*fDataBridge->addrOfTimezone = 0;
+	*fDataBridge->addrOfDaylight = false;
+	strcpy(fDataBridge->addrOfTZName[0], "GMT");
+	strcpy(fDataBridge->addrOfTZName[1], "GMT");
+
+	return B_ERROR;
 }
 
 
