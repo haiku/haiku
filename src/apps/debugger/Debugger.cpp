@@ -409,10 +409,20 @@ Debugger::MessageReceived(BMessage* message)
 			if (message->FindInt32("team", &teamID) != B_OK)
 				break;
 
-			TargetHostInterface* interface;
+			TargetHostInterface* interface = NULL;
 			if (message->FindPointer("interface", reinterpret_cast<void**>(
 					&interface)) != B_OK) {
-				break;
+				// No interface specified: presume local.
+				TargetHostInterfaceRoster* roster = TargetHostInterfaceRoster::Default();
+				for (int32 i = 0; i < roster->CountActiveInterfaces(); i++) {
+					TargetHostInterface* iface = roster->ActiveInterfaceAt(i);
+					if (iface->IsLocal()) {
+						interface = iface;
+						break;
+					}
+				}
+				if (interface == NULL)
+					break;
 			}
 
 			TeamDebuggerOptions options;
@@ -422,12 +432,14 @@ Debugger::MessageReceived(BMessage* message)
 			options.userInterface = new(std::nothrow) GraphicalUserInterface;
 			if (options.userInterface == NULL) {
 				// TODO: notify user.
+				fprintf(stderr, "Error: Failed to create GUI\n");
 				break;
 			}
 			BReference<UserInterface> uiReference(options.userInterface, true);
 			status_t error = interface->StartTeamDebugger(options);
 			if (error != B_OK) {
 				// TODO: notify user.
+				fprintf(stderr, "Error: Failed to start team debugger\n");
 			}
 			break;
 		}
