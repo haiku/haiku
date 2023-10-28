@@ -67,9 +67,8 @@ SyslogDaemon::AboutRequested()
 	BString name(B_TRANSLATE("Syslog Daemon"));
 	BString message;
 	snprintf(message.LockBuffer(512), 512,
-		B_TRANSLATE("%s\n\nThis daemon is responsible for collecting "
-			"all system messages and write them to the system-wide log "
-			"at \"%s\".\n\n"), name.String(), path.Path());
+		B_TRANSLATE("%s\n\nThis daemon collects all system messages and writes them to the "
+			"system-wide log at \"%s\".\n\n"), name.String(), path.Path());
 	message.UnlockBuffer();
 
 	BAlert* alert = new BAlert(name.String(), message.String(),

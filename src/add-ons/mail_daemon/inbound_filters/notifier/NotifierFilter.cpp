@@ -126,7 +126,7 @@ BString
 filter_name(const BMailAccountSettings& accountSettings,
 	const BMailAddOnSettings* addOnSettings)
 {
-	return B_TRANSLATE("New mails notification");
+	return B_TRANSLATE("New mail notification");
 }
 
 

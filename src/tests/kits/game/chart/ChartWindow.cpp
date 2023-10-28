@@ -1283,7 +1283,7 @@ ChartWindow::OpenRefresh(BPoint here)
 		slider->SetValue((int32)(1000 * log(fCurrentSettings.refresh_rate / REFRESH_RATE_MIN) /
 						log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)));
 		slider->SetModificationMessage(new BMessage(REFRESH_RATE_MSG));
-		slider->SetLimitLabels(B_TRANSLATE(" 0.6 f/s  (logarythmic scale)"),
+		slider->SetLimitLabels(B_TRANSLATE(" 0.6 f/s  (logarithmic scale)"),
 			B_TRANSLATE("600.0 f/s"));
 		slider->ResizeToPreferred();
 		window->ResizeTo(slider->Bounds().Width(), slider->Bounds().Height());
