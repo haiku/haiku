@@ -1,0 +1,56 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Screen	2318349707
+no	Screen		nei
+bits/pixel	Screen		bits/piksel
+15 bits/pixel, 32768 colors	Screen		15-bits/piksel, 32768 farger
+Rows:	Screen		Rader:
+%.1f Hz	Screen		%.1f Hz
+The screen mode could not be set:\n\t%s\n	Screen		Skjermmoduset kunne ikke bli satt:\n\t%s\n
+Keep	Screen		Behold
+/other…	Screen		/andre…
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horisontal frekvens:\t%lu - %lu kHz\nVertikal frekvens:\t%lu - %lu Hz\n\nMaksimum pikselklokke:\t%g MHz
+Refresh rate:	Screen		Oppfriskningsratie:
+Video format:	Screen		Videoformat:
+Undo	Screen		Angre
+OK	Screen		OK
+Current workspace	Screen		Nåværende arbeidsområde
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+vertically	Screen		vertikalt
+All workspaces	Screen		Alle arbeidsområder
+Use laptop panel:	Screen		Bruk panel på bærbar
+Could not write VESA mode settings file:\n\t	Screen		Kunne ikke skrive innstillingsfil for VESA-modus:\n\t
+Display info	Screen		Vis info
+Settings will revert in %seconds.	Screen		Innstillingene tilbakestilles om %seconds.
+Cancel	Screen		Avbryt
+Other…	Screen		Andre...
+Screen	Screen		Skjerm
+Colors:	Screen		Farger:
+yes	Screen		ja
+Swap displays:	Screen		Bytt skjerm:
+%sSerial no.: %s	Screen		%sSerienummer: %s
+8 bits/pixel, 256 colors	Screen		8-bits/piksel, 256 farger
+Revert	Screen		Tilbakestill
+always	Screen		alltid
+Confirm changes	Screen		Bekreft endringene
+Warning	Screen		Advarsel
+24 bits/pixel, 16 Million colors	Screen		24-bits/piksel, 16 Millioner farger
+Hz	Screen		Hz
+Workspaces	Screen		Arbeidsområder
+Brightness:	Screen		Lysstyrke:
+32 bits/pixel, 16 Million colors	Screen		32-bits/piksel, 16 Millioner farger
+Done	Screen		Ferdig
+16 bits/pixel, 65536 colors	Screen		16-bits/piksel, 65536 farger
+Screen preferences by the Haiku team	Screen		Skjerminnstillinger av Haiku-teamet
+Refresh rate	Screen		oppfriskningsrate
+if needed	Screen		hvis nødvendig
+Combine displays:	Screen		Kombiner skjerm:
+Unknown mode	Screen		Ukjent modus
+About	Screen		Om
+Columns:	Screen		Kolonner:
+Resolution:	Screen		Oppløsning:
+Apply	Screen		Bruk
+horizontally	Screen		horisontalt
+disable	Screen		deaktiver
+Set background…	Screen		Sett bakgrunn...
+Type or use the left and right arrow keys.	Screen		Skriv eller bruk høyre og venstre piltaster
+Screen	System name		Skjerm
+Do you wish to keep these settings?	Screen		Ønsker du å beholde disse innstillingene?

@@ -1,0 +1,137 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Terminal	686383766
+Close other tabs	Terminal TermWindow		Lukk andre faner
+Insert path	Terminal TermView		Sett inn sti
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kunne ikke starte skallet. Beklager.
+Text encoding	Terminal TermWindow		Tekstkoding
+Colors	Terminal ThemeWindow		Farger
+OK	Terminal SetTitleWindow		OK
+Edit	Terminal TermWindow		Rediger
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               vis denne hjelpen\n  -t,     --title              angi vindustittel\n  -f,     --fullscreen         start i fullskjerm\n  -w,     --working-directory  angi første arbeidsmappe\n
+Select all	Terminal TermWindow		Merk alt
+Confirm exit if active programs exist	Terminal AppearancePrefView		Bekreft avslutning hvis det finnes aktive programmer
+Color scheme:	Terminal ThemeView		Fargevalg:
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen gjeldende arbeidsmappen til den aktive prosessen i den\n\t\t\tgjeldende fanen. Valgfritt maksimalt antall sti-komponenter kan\n\t\t\tspesifiseres. F.eks. '%2d' for maksimalt to komponenter.\n\t%T\t-\tTerminalnavnet for gjeldende lokalitet.\n\t%e\t-\tKodingen for gjeldende fane. Ikke vist for UTF-8.\n\t%i\t-\tVinduets index.\n\t%p\t-\tNavnet på den aktive prosessen i gjeldende fane.\n\t%t\t-\tTittelen på gjeldende fane.
+Copy	Terminal TermWindow		Kopier
+Edit tab title…	Terminal TermWindow		Rediger fanetittel...
+Print	Terminal TermWindow		Skriv ut
+Settings	Terminal TermWindow		Innstillinger
+%app% settings	Terminal PrefWindow	window title	%app% innstillinger
+ANSI bright black color	Terminal ThemeView		ANSI lys svart farge
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tDen gjeldende arbeidsmappen til den aktive prosessen.\n\t\t\tMaksimalt antall sti-komponenter kan valgfritt være\n\t\t\tspesifisert. F.eks. '%2d' for maksimalt to komponenter.\n\t%i\t-\tFanens index.\n\t%e\t-\tKodingen til gjeldende fane. Ikke vist for UTF-8.\n\t%p\t-\tNavnet på den aktive prosessen.
+Use default	Terminal SetTitleWindow		Bruk standard
+Close tab	Terminal TermWindow		Lukk fane
+Error!	Terminal getString		Feil!
+Colors…	Terminal TermWindow		Farger…
+Appearance	Terminal PrefWindow		Utseende
+Set tab title	Terminal TermWindow		Sett fanetittel
+Create link here	Terminal TermView		Opprett lenke her
+Encoding:	Terminal AppearancePrefView		Koding:
+yellow	Terminal ThemeView		gul
+Change directory	Terminal TermView		Bytt mappe
+Custom	Terminal AppearancePrefView	Window size	Tilpasset
+Page setup…	Terminal TermWindow		Sideoppsett...
+ANSI yellow color	Terminal ThemeView		ANSI gul farge
+Cancel	Terminal TermView		Avbryt
+Defaults	Terminal PrefWindow		Standarder
+black	Terminal ThemeView		svart
+Revert	Terminal PrefWindow		Tilbakestill
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
+Use selection	Terminal FindWindow		Bruk valgte
+Find next	Terminal TermWindow		Finn neste
+Copy link location	Terminal TermView		Kopier lenkeplassering
+Background	Terminal ThemeView		Bakgrunn
+Window title:	Terminal AppearancePrefView		Vindustittel:
+New tab	Terminal TermWindow		Ny fane
+magenta	Terminal ThemeView		magenta
+Allow bold text	Terminal AppearancePrefView		Tillat fet tekst
+Window title…	Terminal TermWindow		Vindustittel...
+ANSI blue color	Terminal ThemeView		ANSI blå farge
+blue	Terminal ThemeView		blå
+Open path	Terminal TermView		Åpne sti
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Kunne ikke utføre "\%command\":\n\t%error
+Terminal	System name		Terminal
+Custom	Terminal colors scheme		Tilpasset
+Really close?	Terminal TermWindow		Virkelig lukke?
+Font size	Terminal TermWindow		Fontstørrelse
+OK	Terminal TermApp		OK
+ANSI bright blue color	Terminal ThemeView		ANSI lys blå farge
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli drept.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Ukjent valg \"%s\"\n
+Tab title:	Terminal AppearancePrefView		Fanetittel:
+Text not found.	Terminal TermWindow		Tekst ikke funnet.
+Match word	Terminal FindWindow		Sammenlign ord
+New Terminal	Terminal TermWindow		Ny Terminal
+Find failed	Terminal TermWindow		Søk feilet
+Quit	Terminal TermWindow		Avslutt
+Match case	Terminal FindWindow		Skille store og små bokstaver
+Find previous	Terminal TermWindow		Søk bakover
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mønsteret som spesifiserer fanetitlene. Følgende plassholdere\nkan brukes:
+Close	Terminal TermWindow		Lukk
+Save to file…	Terminal PrefWindow		Lagre som fil...
+Defaults	Terminal ThemeWindow		Standarder
+Copy path	Terminal TermView		Kopier sti
+Window size	Terminal TermWindow		Vindustørrelse
+Selected text	Terminal ThemeView		Valgt tekst
+Copy absolute path	Terminal TermView		Kopier absolutt sti
+Cancel	Terminal TermWindow		Avbryt
+ANSI cyan color	Terminal ThemeView		ANSI cyan farge
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker fanen vil prosessen bli drept.
+Full screen	Terminal TermWindow		Fullskjerm
+Shell 	Terminal TermWindow		Skall
+Revert	Terminal ThemeWindow		Tilbakestill
+ANSI green color	Terminal ThemeView		ANSI grønn farge
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tTegnet '%'.\n\t%<\t-\tBegynner en seksjon som bare vises hvis en påfølgende\n\t\t\tplassholder ikke er tom.\n\t%>\t-\tBegynner en seksjon som bare vises hvis en påfølgende\n\t\t\tplassholder mellom tidligere %< seksjon og denne ikke er tom.\n\t%-\t-\tAvslutter en %< eller %> seksjon.\n\nEthvert ikke-alfanumerisk tegn mellom '%' og formatbokstaven vil bare sette inn et mellomrom\nhvis plassholderverdien ikke er tom. Det vil legge til %<-delen.
+ANSI bright cyan color	Terminal ThemeView		ANSI lys cyan farge
+Tab title:	Terminal TermWindow		Fanetittel:
+Window title:	Terminal TermWindow		Vindustittel:
+ANSI white color	Terminal ThemeView		ANSI hvit farge
+Window size:	Terminal AppearancePrefView		Vindusstørrelse:
+Switch Terminals	Terminal TermWindow		Bytt terminaler
+Decrease	Terminal TermWindow		Forminsk
+Settings…	Terminal TermWindow		Innstillinger...
+Cancel	Terminal SetTitleWindow		Avbryt
+Blinking cursor	Terminal AppearancePrefView		Blinkende markør
+Use text:	Terminal FindWindow		Bruk tekst:
+Close active tab	Terminal TermWindow		Lukk aktiv fane
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir vindustittelen. Følgende plassholdere\nkan brukes:\n
+Selected background	Terminal ThemeView		Valgt bakgrunn
+Save as default	Terminal TermWindow		Lagre som standard
+Nothing is selected.	Terminal TermWindow		Ingenting er valgt.
+ANSI bright red color	Terminal ThemeView		ANSI lys rød farge
+Use left Option as Meta key	Terminal AppearancePrefView		Bruk venstre Option som Meta-tast
+Find	Terminal FindWindow		Finn
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir nåværende fanetittel. Følgende plassholdere\nkan brukes:\n
+Save to file…	Terminal ThemeWindow		Lagre til fil…
+Font:	Terminal AppearancePrefView		Font:
+Paste	Terminal TermWindow		Lim inn
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mønsteret som spesifiserer vindustitlene. Følgende plassholdere\nkan brukes:
+ANSI bright magenta color	Terminal ThemeView		ANSI lys magenta farge
+Copy here	Terminal TermView		Kopier her
+Use default shell	Terminal Shell		Bruk standard skall
+red	Terminal ThemeView		rød
+white	Terminal ThemeView		hvit
+Open link	Terminal TermView		Åpne lenke
+Text	Terminal ThemeView		Tekst
+ANSI bright yellow color	Terminal ThemeView		ANSI lys gul farge
+Not found.	Terminal TermWindow		Ikke funnet
+ANSI black color	Terminal ThemeView		ANSI svart farge
+Find…	Terminal TermWindow		Finn...
+No search string was entered.	Terminal TermWindow		Ingen søkestreng ble angitt.
+Move here	Terminal TermView		Flytt hit
+Abort	Terminal Shell		Avbryt
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende prosesser kjører fremdeles:\n\n\t%1\n\nHvis du lukker Termina il prosessene bli drept.
+Set window title	Terminal TermWindow		Sett vindustittel
+ANSI red color	Terminal ThemeView		ANSI rød farge
+Increase	Terminal TermWindow		Øk
+green	Terminal ThemeView		grønn
+ANSI bright green color	Terminal ThemeView		ANSI lys grønn farge
+OK	Terminal TermWindow		OK
+Text under cursor	Terminal ThemeView		Tekst under markør
+ANSI bright white color	Terminal ThemeView		ANSI lys hvit farge
+Close window	Terminal TermWindow		Lukk vindu
+ANSI magenta color	Terminal ThemeView		ANSI magenta farge
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui og Takashi Murai.\n\nBruk: %s [VALG] [SHELL]\n
+cyan	Terminal ThemeView		cyan
+Clear all	Terminal TermWindow		Fjern alt
+Cursor	Terminal ThemeView		Markør
+Search forward	Terminal FindWindow		Søk fremover

@@ -1,8 +1,9 @@
-1	friulian	x-vnd.Haiku-Terminal	185459086
+1	friulian	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Scuse, ma Terminâl nol à podût inviâ la shell.
 Text encoding	Terminal TermWindow		Codifiche dal test
+Colors	Terminal ThemeWindow		Colôrs
 OK	Terminal SetTitleWindow		Va ben
 Edit	Terminal TermWindow		Modifiche
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               stampe chest jutori\n  -t,     --title              stabilìs il titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs la cartele di lavôr iniziâl\n

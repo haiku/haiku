@@ -1,7 +1,8 @@
-1	friulian	x-vnd.Haiku.TV	3120244932
+1	friulian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Nissun menù
 No border	MainWin		Nissun ôr
 Error, connecting to interface failed:\n\n	MainWin		Erôr, la conession ae interface e je falide:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	sfuarce 720 × 576, proporzions 4:3
 Full screen	MainWin		A plen visôr
 Scale to native size	MainWin		Dimensions origjinâls
 unknown	MainWin		no cognossût
@@ -16,7 +17,10 @@ Channel	MainWin		Canâl
 Previous channel	MainWin		Canâl precedent
 OK	MainWin		Va ben
 TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	sfuarce 544 × 576, proporzions 4:3
 Settings	MainWin		Impostazions
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	sfuarce 704 × 576, proporzions 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Impostazions…
 None	MainWin		Nissun

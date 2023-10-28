@@ -1,0 +1,14 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-mount_server	599204450
+Mount read-only	AutoMounter		Monter som skrivebeskyttet
+Error mounting volume:\n\n%s	AutoMounter		Feil ved montering av volum:\n\n%s
+Cancel	AutoMounter		Avbryt
+OK	AutoMounter		OK
+Unmount error	AutoMounter		Avmonteringsfeil
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Filsystemet på dette volumet er ikke Be-filsystemet. Det anbefales å montere det i skrivebeskyttet modus for å forhindre utilsiktet tap av data på grunn av feil i Haiku.
+Mount read/write	AutoMounter		Monter uten skrivebeskyttelse
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		Kunne ikke avmontere disken \"%s\":\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		Monterer volumet '%s'\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Kunne ikke avmontere disken \"%s\":\n\t%s\n\nVil du fremtvinge avmontering?\n\nMerk: Hvis et programm er i ferd med å skrive til volumet kan det føre til tap av data å avmontere det nå.\n
+Force unmount	AutoMounter		Fremtving avmontering
+Mount error	AutoMounter		Monteringsfeil
+Mount warning	AutoMounter		Monteringsadvarsel

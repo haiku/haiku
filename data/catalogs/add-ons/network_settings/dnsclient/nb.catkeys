@@ -1,0 +1,10 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS-innstillinger
+Move down	DNSSettingsView		Flytt ned
+DNS settings	DNSSettingsView		DNS-innstillinger
+Remove	DNSSettingsView		Fjern
+Domain:	DNSSettingsView		Domene:
+Add	DNSSettingsView		Legg til
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Flytt opp
+Apply	DNSSettingsView		Bruk

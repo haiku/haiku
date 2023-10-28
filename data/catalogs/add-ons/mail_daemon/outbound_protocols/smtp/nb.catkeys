@@ -1,0 +1,14 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		POP3 autentifisering feilet. Serveren sa:\n
+Destination:	ConfigView		Destinasjon:
+Error while logging in to %serv	smtp		Feil ved innlogging til %serv
+Connecting to server…	smtp		Kobler til tjener …
+Unencrypted	ConfigView		Ukryptert
+. The server says:\n	smtp		. Serveren sier:\n
+Error while opening connection to %serv	smtp		Feil ved åpning av forbindelsen til %serv
+. The server said:\n	smtp		. Serveren sa:\n
+None	ConfigView		Ingen
+SMTP server:	ConfigView		SMTP-tjener:
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		POP3 før SMTP
+SSL	ConfigView		SSL

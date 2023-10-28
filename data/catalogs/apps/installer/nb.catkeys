@@ -1,0 +1,40 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Installer	1643224576
+Performing installation.	InstallProgress		Utfører installasjon.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Vennligst lukk Diskoppsett-vinduet før du lukker Installer-vinduet.
+<none>	InstallerWindow	No partition available	<ingen>
+Installer	System name		Installer
+Unknown Type	InstallProgress	Partition content type	Ukjent type
+README	InstallerApp		LESMEG
+Quit	InstallerWindow		Avslutt
+Write boot sector to '%s'	InstallerWindow		Skriv oppstartsektor til '%s'
+Welcome to the Haiku Installer!\n\n	InstallerApp		Velkommen til Haikus installasjonsprogram!\n\n
+?? of ??	InstallerWindow	Unknown progress	?? av ??
+Quit DriveSetup	InstallerWindow		Avslutt Diskoppsett
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld av %2ld
+Install from:	InstallerWindow		Installer fra:
+Additional disk space required: 0.0 KiB	InstallerWindow		Ekstra diskplass påkrevd: 0.0 KiB
+???	InstallerWindow	Unknown currently copied item	???
+Hide optional packages	InstallerWindow		Skjul valgfrie pakker
+???	InstallerWindow	Unknown partition name	???
+Quit	InstallerApp		Avslutt
+OK	InstallerWindow		OK
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		VIKTIG INFORMASJON FØR DU INSTALLERER HAIKU\n\n
+Stop	InstallerWindow	In alert after pressing Stop	Avbryt
+Boot sector successfully written.	InstallProgress		Skriving av oppstartsektor var vellykket.
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Disken kan ikke monteres. Velg en annen disk i stedet.
+Collecting copy information.	InstallProgress		Samler kopieringsinformasjon.
+Show optional packages	InstallerWindow		Vis valgfrie pakker
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Det er kankje ikke nok plass på måldisken. Forsøk å velge en annen disk, eller velg å ikke installere valgfrie komponenter.
+Installation canceled.	InstallProgress		Installasjon avbrutt.
+Stop	InstallerWindow		Stopp
+Continue	InstallerWindow	In alert after pressing Stop	Fortsett
+Scanning for disks…	InstallerWindow		Søker etter disker…
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Installasjonen er ikke fullført ennå!\nEr du sikker på at du vil stoppe den?
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Partisjonen kan ikke monteres. Vennligst velg en annen partisjon.
+Set up partitions…	InstallerWindow		Sett opp partisjoner…
+Install progress:  	InstallerWindow		Fremgang:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Du kan ikke installere innholdet av en disk på seg selv. Vennligst velg en annen disk.
+OK	InstallProgress		OK
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Er du sikker på at du vil installere til den nåværende oppstartsdisken? Installasjonsprogrammet må starte datamaskinen på nytt hvis du fortsetter.
+scanning…	InstallerWindow		skanner…
+Continue	InstallerApp		Fortsett

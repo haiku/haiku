@@ -1,0 +1,173 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-FileTypes	436017301
+Left	Attribute Window	Attribute column alignment in Tracker	Venstrestill
+Float	Attribute ListView		Float
+Final	Application Types Window		Siste
+FileTypes request	FileTypes Window		Filtyper-forespørsel
+This file type already exists	New File Type Window		Denne filtypen finnes fra før
+Preferred application	FileTypes Window		Foretrukket program
+Launch	Application Types Window		Kjør
+Removing uninstalled application types	Application Types Window		Fjerner avinstallerte programtyper
+Width:	Attribute Window	Default column width in Tracker for this attribute.	Bredde
+Same as…	FileType Window	The same TYPE as ...	Samme som...
+(from super type)	FileTypes Window		(fra supertype)
+Select same preferred application as	FileTypes Window		Velg samme foretrukne program som
+Could not change attributes	Attribute Window		Kunne ikke endre attributter
+Icon	FileTypes Window		Ikon
+Add…	Application Type Window		Legg til...
+Attribute name:	Attribute Window		Attributtnavn:
+Long description:	Application Type Window		Lang beskrivelse:
+Cancel	Preferred App Menu		Avbryt
+Remove	FileTypes Window		Fjern
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Programmet \"%s\" støtter ikke denne filtypen.\nEr du sikker på at du vil bruke det uansett?
+Remove	Application Type Window		Fjern
+Gamma	Application Type Window		Gamma
+Cancel	Application Type Window		Avbryt
+Attribute	Attribute Window		Attributt
+Multiple launch	Application Type Window		Flere instanser
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Applikasjonstype kunne fjernes} other{# Applikasjonstyper kunne fjernes}}
+Edit…	Application Types Window		Rediger...
+Could not set preferred application	FileTypes Window		Kunne ikke sette foretrukket program
+Description	FileTypes Window		Beskrivelse
+Signature:	Application Types Window		Signatur:
+None	FileTypes Window		Ingen
+Exclusive launch	Application Type Window		Tillat én programinstans
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Sletting av filtype kan ikke angres.\nEr du sikker på at du ønsker å fjerne den?
+Integer 64 bit	Attribute ListView		Integer 64 bit
+Cancel	New File Type Window		Avbryt
+Select same preferred application as	FileType Window		Velg samme foretrukne program som
+Cancel	Type List Window		Avbryt
+Don't save	Application Type Window		Ikke lagre
+Center	Attribute Window	Attribute column alignment in Tracker	Midstill
+Done	Extension Window		Ferdig
+Development	Application Types Window		Utvikling
+Same as…	FileType Window	The same APPLICATION as ...	Samme som...
+Abort	Application Types Window		Avbryt
+Save	Application Type Window		Lagre
+%1 application type	Application Type Window		%1 programtype
+Icon	Application Type Window		Ikon
+Duration	Attribute ListView		Varighet
+Version:	Application Type Window		Versjon:
+Default application	FileType Window		Forvalgt program
+Internal name:	New File Type Window		Internt navn
+Integer 8 bit	Attribute ListView		Integer 8 bit
+Extension:	Extension Window		Utvidelse:
+Time	Attribute ListView		Tid
+Extensions:	FileTypes Window		Utvidelser
+Select preferred application	FileType Window		Velg foretrukket program
+Description:	FileTypes Window		Beskrivelse:
+Multiple files from \"%s\" file type	FileType Window		Flere filer fra filtypen \"%s\"
+Add new group	New File Type Window		Legg til ny gruppe
+Remove uninstalled	Application Types Window		Fjern avinstallerte
+File	Application Type Window		Fil
+Progress	Application Types Window		Fremdrift
+Select…	FileType Window		Velg...
+Information	Application Types Window		Informasjon
+Settings	FileTypes Window		Innstillinger
+Done	Attribute Window		Ferdig
+FileTypes request	FileTypes		Filtypeforespørsel
+Select same type as	FileType Window		Bruk samme type som
+Version:	Application Types Window		Versjon:
+(from application)	FileTypes Window		(fra applikasjon)
+Application types	Application Types Window		Programtyper
+Description:	Application Types Window		Beskrivelse
+Name:	Application Types Window		Navn:
+Rating	Attribute ListView		Vurdering
+duration	Attribute ListView		varighet
+File could not be opened	Preferred App Menu		Filen kunne ikke åpnes
+Args only	Application Type Window		Kun argumenter
+Could not open \"%s\":\n%s	FileTypes		Kunne ikke åpne \"%s\":\n%s
+Right	Attribute Window	Attribute column alignment in Tracker	Høyrestill
+Save changes before closing?	Application Type Window		Lagre endringer før du avslutter?
+Background app	Application Type Window		Bakgrunnsprogram
+Recognition rule is not valid:\n\n	FileTypes Window		Gjennkjenningsregel er ugyldig:\n\n
+Show icons in list	FileTypes Window		Vis ikoner i liste
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Kan redigeres
+New resource file…	FileTypes Window		Ny ressursfil...
+[Multiple files] file types	FileType Window		filtyper
+Application type	Application Type Window		Programtype
+Show in Tracker…	Application Types Window		Vis i Tracker
+Type name:	FileTypes Window		Typenavn:
+Visible	Attribute Window		Synlig
+Select preferred application	FileTypes Window		Velg foretrukket program
+Path:	Application Types Window		Sti:
+rating	Attribute ListView		vurdering
+Could not install file type	New File Type Window		Kunne ikke installere filtype
+Same as…	FileTypes Window		Samme som...
+Golden master	Application Type Window		Original
+Checkbox	Attribute ListView		Avmerkingsboks
+FileTypes request	Preferred App Menu		Filtyper-forespørsel
+no icon	FileTypes Window		Ingen ikon
+Single launch	Application Type Window		Kun én instans
+%s file type	FileType Window		%s filtype
+Default	Attribute ListView		Standard
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Sletting av en supertype kan ikke angres.\nAlle filtyper som tilhører denne supertypen vil gå tapt!\n\nEr du sikker på at du vil gjøre dette? For å slette hele gruppen, hold nede Shift-tasten og trykk \"Slett\".
+String	Attribute ListView		String
+Add type	New File Type Window		Legg til type
+Remove icon	Icon View		Fjern ikon
+Boolean	Attribute ListView		Boolean
+Cancel	Extension Window		Avbryt
+Alignment:	Attribute Window		Justering:
+Icon	FileType Window		Ikon
+Signature:	Application Type Window		Signatur
+Development	Application Type Window		Utvikling
+Golden master	Application Types Window		Original
+Add	Extension Window		Legg til
+Open…	FileTypes Window		Åpne
+checkbox	Attribute ListView		avmerkingsboks
+Could not change file extensions	Extension Window		Kunne ikke endre filetternavn
+Could not open file	FileType Window		Kunne ikke åpne fil
+Choose type	Type List Window		Velg type
+Select…	FileTypes Window		Velg...
+File recognition	FileTypes Window		Filgjenkjenning
+Application types…	FileTypes Window		Programtyper...
+Add icon…	Icon View		Legg til ikon...
+Cancel	FileTypes Window		Avbryt
+Save into resource file…	Application Type Window		Lagre i ressursfil...
+Special:	Attribute Window		Spesiell:
+Type:	Attribute Window		Type:
+Could not retrieve application signature	Preferred App Menu		Gjenkjente ikke programsignatur
+Beta	Application Types Window		Beta
+Add group	New File Type Window		Legg til gruppe
+Cancel	Attribute Window		Avbryt
+Gamma	Application Types Window		Gamma
+Supported types	Application Type Window		Støttede filtyper
+Integer 32 bit	Attribute ListView		Integer 32 bit
+Beta	Application Type Window		Beta
+Could not retrieve preferred application of this file	Preferred App Menu		Fant ikke noe fortrukket program for denne filen
+Application flags	Application Type Window		Applikasjonsflagg
+OK	FileTypes		OK
+Group name:	New File Type Window		Gruppenavn:
+Move up	FileTypes Window		Flytt opp
+File	FileTypes Window		Fil
+Add	Attribute Window		Legg til
+Open file	FileTypes		Åpne fil
+Version info	Application Type Window		Versjonsinformasjon
+Final	Application Type Window		Endelig
+Preferred application	FileType Window		Foretrukket program
+FileTypes	FileTypes		Filtyper
+Set preferred application	Preferred App Menu		Angi foretrukket applikasjon
+New file type	New File Type Window		Ny filtype
+Short description:	Application Type Window		Kort beskrivelse
+Save request	Application Type Window		Lagre forespørsel
+Could not remove file type: %s\n	FileTypes Window		Kunne ikke fjerne filtypen: %s\n
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Vis som:
+Done	Type List Window		Ferdig
+Extra attributes	FileTypes Window		Tilleggsattributter
+Group:	New File Type Window		Gruppe:
+Alpha	Application Types Window		Alfa
+Close	Application Type Window		Lukk
+Integer 16 bit	Attribute ListView		Integer 16 bit
+Extension	Extension Window		Utvidelse
+Rule:	FileTypes Window		Regel:
+FileTypes	System name		Filtyper
+Version	Application Types Window		Versjon
+Quit	FileTypes Window		Avslutt
+File type	FileType Window		Filtype
+Internal name:	FileTypes Window		Internt navn:
+Add…	FileTypes Window		Legg til...
+Edit icon…	Icon View		Rediger ikon...
+Internal name:	Attribute Window		Internt navn:
+Show recognition rule	FileTypes Window		Vis gjenkjenningsregel
+Double	Attribute ListView		Double
+Move down	FileTypes Window		Flytt ned
+Alpha	Application Type Window		Alfa

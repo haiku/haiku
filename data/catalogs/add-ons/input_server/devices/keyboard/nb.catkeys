@@ -1,0 +1,11 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-KeyboardInputServerDevice	131044710
+If the application will not quit you may have to kill it.	Team monitor		Hvis programmet ikke vil avslutte, må du kanskje avbryte det.
+Quit application	Team monitor		Avslutt program
+Open Terminal	Team monitor		Åpne Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Hold CONTROL+ALT+DELETE i # sekund for å starte på nytt.}other{Hold CONTROL+ALT+DELETE i # sekunder for å starte på nytt.}}
+Restart the desktop	Team monitor		Start skrivebordet på nytt
+Force reboot	Team monitor		Tving omstart
+Team monitor	Team monitor		Team-monitor
+Kill application	Team monitor		Avbryt program
+Cancel	Team monitor		Avbryt
+(This team is a system component)	Team monitor		(Dette teamet er en systemkomponent)

@@ -1,0 +1,49 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-TSKB	316181764
+Auto-hide	PreferencesWindow		Skjul automatisk
+Show all	WindowMenu		Vis alle
+Edit in Tracker…	PreferencesWindow		Rediger i Tracker…
+Menu	PreferencesWindow		Meny
+Tracker always first	PreferencesWindow		Tracker alltid først
+Hide clock	TimeView		Skjul klokke
+Large	PreferencesWindow		Stor
+<Deskbar folder is empty>	DeskbarMenu		<Skrivebord-mappen er tom>
+Recent documents	DeskbarMenu		Nylig brukte dokumenter
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
+Always on top	PreferencesWindow		Alltid øverst
+Restart system	DeskbarMenu		Omstart
+Recent documents:	PreferencesWindow		Nylig brukte dokumenter
+Auto-raise	PreferencesWindow		Fremhev automatisk
+Mount	DeskbarMenu		Monter
+Icon size	PreferencesWindow		Ikonstørrelse
+About Haiku	DeskbarMenu		Om Haiku
+Small	PreferencesWindow		Liten
+Show calendar…	TimeView		Vis kalender…
+Find…	DeskbarMenu		Finn…
+Power off	DeskbarMenu		Slå av
+Defaults	PreferencesWindow		Standarder
+Show replicants	DeskbarMenu		Vis replikanter
+No windows	WindowMenu		Ingen vinduer
+Show clock	Tray		Vis klokke
+Close all	WindowMenu		Lukk alle
+Deskbar preferences	PreferencesWindow		Innstillinger for Deskbar
+About this system	DeskbarMenu		Om dette systemet
+Quit application	WindowMenu		Avslutt program
+Hide application names	PreferencesWindow		Skjul programnavn
+Applications	PreferencesWindow		Programmer
+Show application expander	PreferencesWindow		Vis Arkivåpner-programmet
+Deskbar preferences…	DeskbarMenu		Innstillinger for Deskbar
+Suspend	DeskbarMenu		Hvilemodus
+Shutdown…	DeskbarMenu		Avslutt…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
+Expand new applications	PreferencesWindow		Pakk ut nye programmer
+Recent applications:	PreferencesWindow		Nylig brukte programmer:
+Recent folders:	PreferencesWindow		Nylig brukte mapper:
+Recent folders	DeskbarMenu		Nylig brukte mapper:
+Recent applications	DeskbarMenu		Nylig brukte programmer
+Hide all	WindowMenu		Skjul alle
+Sort applications by name	PreferencesWindow		Sorter applikasjonene etter navn
+Revert	PreferencesWindow		Tilbakestill
+Window	PreferencesWindow		Vindu
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Innstillinger
+Time preferences…	TimeView		Tidsinnstillinger…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivebordsverktøy

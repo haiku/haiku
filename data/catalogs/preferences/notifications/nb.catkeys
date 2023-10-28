@@ -1,0 +1,34 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		Nede til venstre
+Application does not have a valid signature	NotificationView	Alert message	Applikasjonen har ikke en gyldig signatur
+Status	NotificationView		Status
+Add…	NotificationView		Legg til…
+Lower right	GeneralView		Nede til høyre
+Muted	NotificationView		Dempet
+ is already listed	NotificationView	Alert message	 er allerede oppført
+OK	PrefletWin		OK
+Notifications	PrefletWin		Varsler
+Notifications preflet sample	PrefletWin		Eksempel på varslingsvindu
+Mute notifications from this application	NotificationView		Demp varsler fra denne applikasjonen
+wide	GeneralView	Window width: Slider high text	bred
+narrow	GeneralView	Window width: Slider low text	smal
+Revert	PrefletWin		Tilbakestill
+Applications	PrefletView		Applikasjoner
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Tidsavbrudd: # sekund}other{Tidsavbrudd: # sekunder}}
+Upper right	GeneralView		Oppe til høyre
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Det oppstod en feil ved lagring av innstillingene.\nDet er mulig du går tom for diskplass.
+Defaults	PrefletWin		Standarder
+Upper left	GeneralView		Oppe til venstre
+Window width	GeneralView		Vindusbredde
+Applications	NotificationView		Programmer
+General	PrefletView		Generelt
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Følg Deskbar
+Notifications	System name		Meldinger
+Allowed	NotificationView		Tillatt
+Duration:	GeneralView		Varighet:
+Application	NotificationView		Program
+Enable notifications	GeneralView		Aktiver meldinger
+This is a test notification message	PrefletWin		Dette er et testvarsel
+Remove	NotificationView		Fjern
+Position:	GeneralView		Posisjon:

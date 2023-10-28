@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DiskProbe	4193379066
+1	friulian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Editôr dâts grês
 Remove	AttributeWindow		Gjave
 Close	ProbeView		Siere
@@ -29,7 +29,9 @@ Open file…	FileWindow		Vierç file…
 32 bit unsigned pointer:	TypeEditors		Pontadôr cence segn a 32 bit:
 DiskProbe request	DiskProbe		Richieste Scandai dal disc
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Esadecimâl
+Block %lld (0x%Lx)	ProbeView		Bloc %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		No si è rivâts a scrivi sul file:\n%s\n\nDutis lis modifichis a laran pierdudis cuant che si jessarà.
+Native: %lld (0x%0*Lx)	ProbeView		Natîf: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Esamine il dispositîf:
 Number editor	TypeEditors		Editôr numeric
 Icon	TypeEditors		Icone
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Richieste Scandai dal disc
 Double precision floating-point value:	TypeEditors		Valôr in virgule mobile a dople precision:
 Image	TypeEditors	This is the type of view	Imagjin
+Swapped: %lld (0x%0*Lx)	ProbeView		Scambiât: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Salvâ lis modifichis prime di sierâ?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Formât PNG
 Number	TypeEditors	This is the type of editor	Numar
 Edit	ProbeView		Modifiche

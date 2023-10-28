@@ -1,0 +1,12 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Rydder opp.
+Starting media_services.	MediaDefs		Starter media_services.
+Stopping media_addon_server.	MediaDefs		Stopper media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Venter på at media_addon_server skal avslutte.
+Telling media_addon_server to quit.	MediaDefs		Ber media_addon_server om å avslutte.
+Ready for use.	MediaDefs		Klar til bruk.
+Stopping media server…	MediaDefs		Stopper medieserveren…
+Waiting for media_server to quit.	MediaDefs		Venter på at media_server skal avslutte.
+Done shutting down.	MediaDefs		Ferdig med å slå av.
+Error occurred starting media services.	MediaDefs		Det oppsto en feil ved start av medietjenester.
+Media Service	MediaDefs		Medietjeneste

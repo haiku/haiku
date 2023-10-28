@@ -1,0 +1,7 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		Kunne ikke stoppe Bluetooth-serveren.
+Bluetooth error	BluetoothReplicant		Bluetooth-feil
+Settings…	BluetoothReplicant		Innstillinger…
+OK	BluetoothReplicant		OK
+Error: %status%	BluetoothReplicant		Feil: %status%
+Quit	BluetoothReplicant		Avslutt

@@ -1,0 +1,14 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ICOTranslator	3916328565
+Cursor	ICOTranslator		Markør
+Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
+Windows %s %ld bit image	ICOTranslator		Windows %s %ld bit bilde
+Valid icon sizes are 16, 32, or 48	ConfigView		Gyldige ikonstørrelser er 16, 32, eller 48
+Windows icons	ICOTranslator		Windows-ikoner
+Enforce valid icon sizes	ConfigView		Håndhev gyldige ikonstørrelser
+ICO Settings	main		ICO-innstillinger
+Windows icon translator	ICOTranslator		Windows-ikonoversetter
+pixels in either direction.	ConfigView		bildepunkter i hver retning
+Write 32 bit images on true color input	ConfigView		Skriv 32-biters bilder på ekte fargeinndata
+Icon	ICOTranslator		Ikon
+ICOTranslator Settings	ConfigView		ICO-oversetterinnstillinger
+Windows icon translator	ConfigView		Oversetter for Windows-ikoner

@@ -1,0 +1,41 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Testside
+Remove	PrintersWindow		Fjern
+Red	TestPageView		Rød
+Default Printer	PrinterListView		Standardskriver
+<pick one>	AddPrinterDialog		<velg én>
+Connected to:	AddPrinterDialog		Forbindelse opprettet med:
+Make default	PrintersWindow		Sett som standard
+Cyan	TestPageView		Cyan
+Completed	JobListView		Fullført
+Test page	PrintersWindow		Testside
+Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
+Failed	JobListView		Feilet
+Blue	TestPageView		Blå
+Waiting	JobListView		Venter
+Processing	JobListView		Behandler
+Cancel	AddPrinterDialog		Avbryt
+Unknown status	JobListView		Ukjent status
+Print jobs for %printer_name%	PrintersWindow		Utskriftsjobber for %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sider}=1{# side}other{# sider}}
+Add printer	AddPrinterDialog		Legg til skriver
+Printers	PrintersWindow		Skrivere
+No printer found!	TransportMenu		Ingen skriver ble funnet!
+Add…	PrintersWindow		Legg til…
+Magenta	TestPageView		Magenta
+Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
+Add	AddPrinterDialog		Legg til
+Print jobs: No printer selected	PrintersWindow		Utskriftsjobber: Ingen skriver er valgt
+Printer name:	AddPrinterDialog		Printernavn:
+Yellow	TestPageView		Gul
+Black	TestPageView		Svart
+Printer type:	AddPrinterDialog		Skrivertype:
+Printers	System name		Skrivere
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Ingen ventende jobber}=1{1 ventende jobb}other{# ventende jobber}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skriver: %printer_name%\nDriver:    %driver%\n
+Green	TestPageView		Grønn
+Print test page	PrintersWindow		Skriv ut testside
+Restart job	PrintersWindow		Start utskrift på nytt
+Driver: %driver%	PrinterListView		Driver: %driver%
+Cancel job	PrintersWindow		Avbryt jobb
+%.2f KB	JobListView		%.2f KB

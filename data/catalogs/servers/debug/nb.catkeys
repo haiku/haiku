@@ -1,0 +1,8 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		Programmet:\n\n      %app\n\nhar støtt på en feil som hindrer det i å fortsette. Haiku vil avslutte programmet og rydde opp.
+Oh yeah!	DebugServer		Å ja!
+Debug	DebugServer		Debug
+Terminate	DebugServer		Avslutt
+Save report	DebugServer		Lagre rapport
+Write core file	DebugServer		Skriv kjernefil
+Oh no!	DebugServer		Å nei!

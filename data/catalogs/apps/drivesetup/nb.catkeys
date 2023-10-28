@@ -1,0 +1,68 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	1673465607
+Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
+Mount all	MainWindow		Monter alle
+Disk	MainWindow		Disk
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte partisjonen vil gå tapt for godt hvis du gjør det!
+Device	PartitionList		Enhet
+Initialize	MainWindow		Initialiser
+Delete partition	MainWindow		Slett partisjon
+Error: 	MainWindow	in any error alert	Feil: 
+Device	DiskView		Enhet
+Unmount	MainWindow		Avmonter
+Failed to format the partition %s!\n	MainWindow		Klarte ikke å formatere partisjonen %s!\n
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du ønsker å formatere partisjonen \"%s\"? Du vil bli spurt igjen før  endringer blir skrevet til disken.
+DriveSetup	System name		Diskoppsett
+Mounted at	PartitionList		Monteringspunkt
+Create…	MainWindow		Opprett…
+Write changes	MainWindow		Skriv endringer
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
+Validation of the given creation parameters failed.	MainWindow		Mislykket validering av de oppgitte opprettingsparametrene.
+Eject	MainWindow		Løs ut
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken %s vil gå tapt for godt hvis du gjør det!
+Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
+Partition %ld	DiskView		Partisjon %ld
+There's no space on the partition where a child partition could be created.	MainWindow		Det er ingen plass på partisjonen der en underpartisjon kan opprettes.
+No disk devices have been recognized.	DiskView		Ingen disker ble gjenkjent.
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Klarte ikke å slette partisjonen. Ingen endringer er skrevet til disken.
+File system	PartitionList		Filsystem
+The selected partition does not contain a partitioning system.	MainWindow		Den valgte partisjonen inneholder ikke et partisjoneringssystem.
+Unable to find the selected partition by ID.	MainWindow		Kan ikke finne den valgte partisjonen ved hjelp av ID.
+The currently selected partition is not empty.	MainWindow		Den valgte partisjonen er ikke tom.
+Wipe (not implemented)	MainWindow		Slett data (ikke implementert)
+The currently selected partition does not have a parent partition.	MainWindow		Den valgte partisjonen har ingen forelderpartisjon.
+Validation of the given initialization parameters failed.	MainWindow		Mislykket validering av de oppgitte initialiseringsparametrene.
+Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke opprette partisjonen. Ingen endringer er skrevet til disken.
+You need to select a partition entry from the list.	MainWindow		Du må velge en partisjon fra listen.
+Volume name	PartitionList		Volumnavn
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disk nå?\n\nAlle data på partisjonen %s vil gå tapt for godt hvis du gjør det!
+Format	MainWindow		Formater
+OK	MainWindow		OK
+Could not delete the selected partition.	MainWindow		Kunne ikke slette valgt partisjon.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Er du sikker på at du ønsker å initialisere den valgte disken? Alle data vil bli slettet. Du vil bli spurt igjen før endringer blir skrevet til disken.\n
+There was an error preparing the disk for modifications.	MainWindow		Det oppsto en feil da disken skulle forberedes for endringer.
+The disk has been successfully initialized.\n	MainWindow		Initialiseringen av disken var vellykket.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Skal avmontering tvinges gjennom?\n\nMerk: Hvis et program for øyeblikket skriver til volumet, kan det føre til tap av data å avmontere volumet nå.\n
+Cancel	MainWindow		Avbryt
+Force unmount	MainWindow		Tving avmontering
+Partition	MainWindow		Partisjon
+Rescan	MainWindow		Skann på nytt
+There was an error acquiring the partition row.	MainWindow		Det var en feil ved tilegning av partisjonsrad.
+Failed to initialize the disk %s!\n	MainWindow		Klarte ikke å initialisere disken %s!\n
+Delete	MainWindow		Slett
+Parameters	PartitionList		Parametre
+Cannot delete the selected partition.	MainWindow		Kan ikke slette den valgte partisjonen.
+Continue	MainWindow		Fortsett
+Could not mount partition %s.	MainWindow		Kunne ikke montere partisjonen %s
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du ønsker å formatere partisjonen? Du vil bli spurt igjen før endringer blir skrevet til disken.
+The selected disk is read-only.	MainWindow		Den valgte disken er skrivebeskyttet.
+The partition %s is already unmounted.	MainWindow		Partisjonen %s er allerede avmontert.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte disken vil gå tapt for godt hvis du gjør det!
+Select a partition from the list below.	DiskView		Velg en partisjon fra listen nedenfor.
+Active	PartitionList		Aktiv
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil slette den valgte partisjonen?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
+The partition %s has been successfully formatted.\n	MainWindow		Formateringen av partisjonen %s var vellykket.\n
+The partition %s is already mounted.	MainWindow		Partisjonen %s er allerede montert.
+Size	PartitionList		Størrelse
+Creation of the partition has failed.	MainWindow		Opprettelse av partisjonen feilet.
+Mount	MainWindow		Monter

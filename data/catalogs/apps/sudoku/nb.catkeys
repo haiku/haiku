@@ -1,0 +1,35 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Sudoku	3382377306
+Restore snapshot	SudokuWindow		Gjenopprette øyeblikksbilde
+File	SudokuWindow		Fil
+Mark invalid values	SudokuWindow		Marker ugyldig verdier
+Solve single field	SudokuWindow		Løs enkelte felt
+Hard	SudokuWindow		Vanskelig
+Start again	SudokuWindow		Start på nytt
+New	SudokuWindow		Ny
+Easy	SudokuWindow		Lett
+Undo	SudokuWindow		Tilbakestill
+Export as…	SudokuWindow		Eksporter som...
+Quit	SudokuWindow		Avslutt
+Redo	SudokuWindow		Gjennomfør på nytt
+Could not open \"%s\":\n%s\n	SudokuWindow		Kunne ikke åpne \"%s\":\n%s\n
+Blank	SudokuWindow		Blank
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku løst - gratulere!\n
+Text	SudokuWindow		Tekst
+Copy	SudokuWindow		Kopier
+Solve	SudokuWindow		Løs
+HTML	SudokuWindow		HTML
+Advanced	SudokuWindow		Avansert
+Set all hints	SudokuWindow		Aktiver alle hint
+Searching for removable values	SudokuGenerator		Søker etter fjernbare verdier
+Abort	ProgressWindow		Avbryt
+Could not set Sudoku:\n%s\n	SudokuWindow		Kunne ikke sette Suduku:\n%s\n
+Help	SudokuWindow		Hjelp
+OK	SudokuWindow		OK
+Sudoku	System name		Sudoku
+Progress monitor	ProgressWindow		Fremgang oversikt
+Creating solvable field	SudokuGenerator		Lager løselig felt
+View	SudokuWindow		Vis
+Snapshot current	SudokuWindow		Øyeblikksbilde nåværende
+Mark valid hints	SudokuWindow		Marker gyldig tips
+Sudoku request	SudokuWindow		Sudoku forespørsel
+Open file…	SudokuWindow		Åpne fil...

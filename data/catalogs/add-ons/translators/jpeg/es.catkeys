@@ -1,6 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-JPEGTranslator	1259224612
+1	spanish; castilian	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		Leer
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato de Imagen de bits Be (JPEGTranslator)
 Show warning messages	JPEGTranslator		Mostrar avisos de alerta
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usar el código CMYK con 0 para una cobertura total de tinta
 JPEG Library Error: %s\n	be_jerror		Error de la biblioteca JPEG: %s\n
 ©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasado en la biblioteca IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncon codificación «sin pérdidas» añadida por Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nCon algunas rutinas de conversión del espacio de colores contribuidas por Magnus Hellman\n\thttp://www.bebits.com/app/802\n
 None	JPEGTranslator		Nada

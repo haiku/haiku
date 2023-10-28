@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-GLifeScreensaver	2189777521
+1	spanish; castilian	x-vnd.Haiku-GLifeScreensaver	358758987
 by Aaron Hill	GLife ScreenSaver		por Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Demora de la cuadrícula: ninguna
 None	GLife ScreenSaver		Ninguno
@@ -10,4 +10,5 @@ OpenGL \"Game of Life\"	GLife ScreenSaver		«El juego de la vida» en OpenGL
 Grid height: 	GLife ScreenSaver		Altura de la cuadrícula: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4×
 Grid width: %li	GLife ScreenSaver		Anchura de la cuadrícula: %li
+Grid life delay: %ldx	This is a factor: the x represents 'times', don't translate '%ld'		Retardo de la cuadrícula: %ld veces
 Grid life delay: 	GLife ScreenSaver		Demora de activación de la cuadrícula: 

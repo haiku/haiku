@@ -1,7 +1,9 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3241193769
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3870731252
 None	Icon-O-Matic-Properties		Κανένα
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
 Opening the icon failed!	Icon-O-Matic-Main		Το άνοιγμα του εικονιδίου απέτυχε!
+Reverse path	Icon-O-Matic-ReversePathCmd		Αντιστροφή διαδρομής
 Add with path	Icon-O-Matic-ShapesList		Προσθήκη με μονοπάτι
 Paste properties	Icon-O-Matic-Properties		Ρυθμίσεις επικόλλησης
 Copy	Icon-O-Matic-Properties		Αντιγραφή
@@ -11,11 +13,13 @@ Color	Icon-O-Matic-StyleTypes		Χρώμα
 Select	Icon-O-Matic-Properties		Επιλογή
 Reset transformation	Icon-O-Matic-ShapesList		Επαναφορά πληροφοριών
 Duplicate	Icon-O-Matic-StylesList		Διπλότυπο
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Περιστροφή
 Shorten	Icon-O-Matic-PropertyNames		Σμίκρινση
 Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Μετακίνηση {0, plural, one{μετασχηματιστή} other{μετασχηματιστών}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Το κείμενο που προσπαθείτε να εισάγετε είναι αρκετά μεγάλο, είστε σίγουρος;
 Paste	Icon-O-Matic-Properties		Επικόλληση
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Τα στιλ που υπάρχουν είναι πάρα πολλά. Η μορφή HVIF υποστηρίζει το πολύ 255 στιλ.
 Close	Icon-O-Matic-Menu-File		Κλείσιμο
 Add rect	Icon-O-Matic-PathsList		Προσθήκη rect
 Rotation	Icon-O-Matic-PropertyNames		Περιστροφή
@@ -63,6 +67,7 @@ Contour	Transformation		Περίγραμμα
 Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Προσθήκη {0, plural, one{μετασχηματιστή} other{μετασχηματιστών}}
 Rounding	Icon-O-Matic-PropertyNames		Στρογγυλοποίηση
 Joins	Icon-O-Matic-PropertyNames		Ενώσεις
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Τα σχήματα που υπάρχουν είναι πάρα πολλά. Η μορφή HVIF υποστηρίζει το πολύ 255 σχήματα.
 Cancel	Icon-O-Matic-ColorPicker		Άκυρο
 Duplicate	Icon-O-Matic-PathsList		Διπλότυπο
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Μετακίνηση {0, plural, one{σχήματος} other{σχημάτων}}
@@ -81,6 +86,7 @@ Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Προσθ�
 Cancel	Icon-O-Matic-SVGExport		Άκυρο
 Open…	Icon-O-Matic-Menu-File		Άνοιγμα…
 Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Αφαίρεση {0, plural, one{μετασψηματιστή} other{μετασχηματιστών}}
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Κάτε κλικ πάνω σε ένα σχήμα από πάνω
 Remove	Icon-O-Matic-ShapesList		Αφαίρεση
 Multi-paste	Icon-O-Matic-Properties		Πολλαπλή επικόλληση
 Bad news	Title of error alert		Άσχημα νέα
@@ -96,6 +102,7 @@ Name	Icon-O-Matic-PropertyNames		Όνομα
 Reset transformation	Icon-O-Matic-StylesList		Επαναφορά μεταμόρφωσης
 Reverse	Icon-O-Matic-PathsList		Αντιστροφή
 Remove	Icon-O-Matic-PathsList		Αφαίρεση
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Load error	Icon-O-Matic-SVGImport		Σφάλμα φόρτωσης
 Style type	Icon-O-Matic-StyleTypes		Τύπος στύλ
 Quit	Icon-O-Matic-Menu-File		Έξοδος
@@ -138,7 +145,9 @@ Settings…	Icon-O-Matic-SavePanel		Ρυθμίσεις…
 Select all	Icon-O-Matic-PathManipulator		Επιλογή όλων
 Add with style	Icon-O-Matic-ShapesList		Προσθήκη με στυλ
 New	Icon-O-Matic-Menu-File		Νέο
+Change perspective	Icon-O-Matic-PerspectiveCommand		Αλλαγή προοπτικής
 Gradient type	Icon-O-Matic-StyleTypes		Τύπος Gradient
+Perspective	Transformation		Προοπτική
 Export	Icon-O-Matic-Menu-File		Εξαγωγή
 Width	Icon-O-Matic-PropertyNames		Πλάτος
 Add reference image	Icon-O-Matic-ShapesList		Προσθήκη εικόνας αναφοράς

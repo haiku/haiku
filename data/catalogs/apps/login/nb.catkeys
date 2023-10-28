@@ -1,0 +1,20 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Login	2920451831
+Invalid login!	Login View		Ugyldig pålogging!
+Error	Login App		Feil
+Login application for Haiku\nUsage:	Login App		Påloggingsapplikasjon for Haiku\nBruk:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tIkke gjør vinduet modalt
+Welcome to Haiku	Login Window		Velkommen til Haiku
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tStart i redigeringsmodus for å tillate tilpasning av skrivebordet.
+Halt	Login View		Stopp
+Desktop	Desktop Window		Skrivebord
+Hide password	Login View		Skjul passord
+Reboot	Login View		Omstart
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Du kan tilpasse skrivebordet som vises bak påloggingsprogrammet ved å slippe replikanter på det.\n\nNår du er ferdig, avslutter du bare applikasjonen (Cmd-Q).
+OK	Login View		OK
+Info	Login App		Informasjon
+Login:	Login View		Login:
+Password:	Login View		Passord:
+Unimplemented	Login App		Ikke implementert
+OK	Login App		OK
+Error: %1	Login App		Feil: %1
+error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	feil %s\n

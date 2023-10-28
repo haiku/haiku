@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	4267611234
+1	spanish; castilian	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -82,6 +82,7 @@ Modified	FindPanel		Modificado
 Select all	QueryContainerWindow		Seleccionar todo
 Generate image thumbnails	SettingsView		Generar miniaturas de imagen
 Select…	FilePanelPriv		Seleccionar...
+An item named '%filename%' already exists.	FSUtils		Ya existe un elemento denominado "%filename%".
 preferences	B_PREFERENCES_DIRECTORY		preferences
 Name	Person Query Columns		Nombre
 Skip all	FSUtils		Omitir todo
@@ -259,6 +260,7 @@ Cut	FilePanelPriv		Cortar
 Finish: after several years	StatusWindow		Finalización: después de algunos años
 Favorites	FilePanelPriv		Favoritos
 Point	AttributesView		Puntero
+You can't move or copy items to read-only volumes.	PoseView		No se puede mover o copiar elementos a volúmenes de sólo lectura.
 home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nuevas plantillas de Tracker
 Disk mounting during boot	AutoMounterSettings		Disco montado durante el arranque
@@ -346,6 +348,7 @@ after	FindPanel		Después
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte de datos>} other{<# bytes de datos>}}
 Version	OpenWithWindow		Versión
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Algunos de los elementos seleccionados no pueden ser movidos a la papelera. ¿Quieres eliminarlos de forma definitiva? (esta operación es irrevertible)
+The entered file name is too long.	FSUtils		El nombre de archivo ingresado es demasiado largo.
 Add printer…	ContainerWindow		Añadir impresora...
 On	FindPanel		En
 Permissions	ContainerWindow		Permisos
@@ -410,6 +413,7 @@ Emptying Trash… 	StatusWindow		Vaciando la papelera…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
 Revert	TrackerSettingsWindow		Revertir
 trash	B_TRASH_DIRECTORY		trash
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si mueve la carpeta de sistema o sus contenidos, es posible que no pueda iniciar %osName!\n\n¿Está seguro de que desea hacer esto?\n\nPara modificar la carpeta de sistema o sus contenidos, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Mover\".
 Close all in workspace	ContainerWindow		Cerrar todo en el área de trabajo
 Corrupted expression.	libtracker		Expresión dañada.
@@ -434,6 +438,7 @@ the config folder	FSUtils		la carpeta config
 Sorry, could not create a new folder.	FSUtils		Lo sentimos, no puedes crear una nueva carpeta
 MIME Signature	AttributesView		Firma MIME
 Select all	VirtualDirectoryWindow		Seleccionar todo
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Renombrar
 Clean up all	ContainerWindow		Limpiar todo
 Add current folder	FilePanelPriv		Añadir carpeta actual
@@ -506,8 +511,10 @@ Create a Query	FindPanel		Crear consulta
 Close	QueryContainerWindow		Cerrar
 I know what I'm doing	FSUtils	button label	Sé lo que estoy haciendo
 Preparing to copy items…	StatusWindow		Preparándose para copiar elementos..
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Entrada ref
 Icon view	ContainerWindow		Vista de icono
+The entered folder name is too long.	FSUtils		El nombre de carpeta ingresado es demasiado largo.
 Name	ContainerWindow		Nombre
 Preferred for %type	OpenWithWindow		recomendador por %type
 Free space color	SettingsView		Espacio de color libre

@@ -1,0 +1,5 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Behold denne tiden
+Manually adjust time…	dstcheck		Still klokken manuelt...
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Merk!\n\nPå grunn av byttet fra sommertid, kan datamaskinens klokke være en time feil.\nDatamaskinen din tror klokka er %current time%.\n\nEr dette riktig tidspunkt?
+Ask me later	dstcheck		Spør meg senere

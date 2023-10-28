@@ -1,0 +1,88 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Bluetooth	3550394259
+Positioning	DeviceClass		Plassering
+Controller	DeviceClass		Kontroller
+Common ISDN access	DeviceClass		Vanlig ISDN-tilgang
+Unknown (reserved) minor device class	DeviceClass		Ukjent (reservert) liten enhetstype
+Uncategorized	DeviceClass		Ukategorisert
+Keyboard	DeviceClass		Tastatur
+Smart phone	DeviceClass		Smarttelefon
+VCR	DeviceClass		Videospiller
+Cellular	DeviceClass		Mobil
+Audio	DeviceClass		Audio
+Audio/Video	DeviceClass		Audio/Video
+Car audio	DeviceClass		Bilstereo
+Major class: 	DeviceClass		Større klasse:
+HiFi audio device	DeviceClass		HiFi lydenhet
+Microphone	DeviceClass		Mikrofon
+Capturing	DeviceClass		Tar opp
+Jacket	DeviceClass		Omslag
+50-67% utilized	DeviceClass		50-67% i bruk
+Headphones	DeviceClass		Øretelefoner
+Imaging	DeviceClass		Bildebehandling
+Device conforms to the headset profile	DeviceClass		Enhet er kompatibel med hodetelefon-profilen
+Remote control	DeviceClass		Fjernkontroll
+Fully available	DeviceClass		Fullt tilgjengelig
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#Ugyldig navn
+Server	DeviceClass		Tjener
+No service available	DeviceClass		Ingen tjeneste tilgjengelig
+Printer	DeviceClass		Skriver
+Card reader	DeviceClass		Kortleser
+Wired modem or voice gateway	DeviceClass		Kablet modem eller lydport
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Ugyldig navn
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#Ikke gyldig navn
+Camcorder	DeviceClass		Videokamera
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Ikke gyldig navn
+17-33% utilized	DeviceClass		17-33% i bruk
+Desktop workstation	DeviceClass		Arbeidsstasjon
+Unspecified	DeviceClass		Uspesifisert
+Miscellaneous	DeviceClass		Diverse
+Robot	DeviceClass		Robot
+Vehicle	DeviceClass		Kjøretøy
+LAN access	DeviceClass		LAN-tilgang
+Glasses	DeviceClass		Briller
+Phone	DeviceClass		Telefon
+Laptop	DeviceClass		Bærbar datamaskin
+67-83% utilized	DeviceClass		67-83% i bruk
+Cordless	DeviceClass		Trådløs
+Invalid device class!\n	DeviceClass		Ugyldig enhetstype!\n
+Minor class: 	DeviceClass		Mindre klasse:
+Doll/Action figure	DeviceClass		Dukke/Actionfigur
+Not implemented	RemoteDevice		Ikke implementert
+33-50% utilized	DeviceClass		33-50% i bruk
+Gaming/Toy	DeviceClass		Spill/Leke
+Video camera	DeviceClass		Videokamera
+Handheld	DeviceClass		Håndholdt
+Service classes: 	DeviceClass		Service-klasser:
+Loudspeaker	DeviceClass		Høyttaler
+83-99% utilized	DeviceClass		83-99% i bruk
+SIM card reader	DeviceClass		SIM-kortleser
+Computer	DeviceClass		Datamaskin
+Scanner	DeviceClass		Skanner
+Wearable	DeviceClass	A wearable computer	Datamaskin til å ha på kroppen
+Display	DeviceClass		Skjerm
+Gamepad	DeviceClass		Spillkontroll
+Video monitor	DeviceClass		Videomonitor
+Palm	DeviceClass	A palm-held device	Palm
+Joystick	DeviceClass		Joystick
+Networking	DeviceClass		Nettverk
+Telephony	DeviceClass		Telefoni
+Game	DeviceClass		Spill
+Video display and loudspeaker	DeviceClass		Videofremviser og høyttaler
+Wrist watch	DeviceClass		Armbåndsur
+Sensing device	DeviceClass		Sensor
+Pointing device	DeviceClass		Pekeenhet
+(reserved)	DeviceClass		(reservert)
+Rendering	DeviceClass		Gjengivelse
+Information	DeviceClass		Informasjon
+Helmet	DeviceClass		Hjelm
+Pager	DeviceClass	A small radio device to receive short text messages	Personsøker
+Hands-free	DeviceClass		Hands-free
+Digitizer tablet	DeviceClass		Grafisk tablet
+Portable audio	DeviceClass		Bærbar audio
+Camera	DeviceClass		Kamera
+1-17% utilized	DeviceClass		1-17% i bruk
+Combo keyboard/pointing device	DeviceClass		Kombinert tastatur/pekeenhet
+Video conferencing	DeviceClass		Videokonferanse
+Peripheral	DeviceClass		Tilkoblet enhet
+Object transfer	DeviceClass		Objektoverføring
+Set-top box	DeviceClass		TV-mottaker

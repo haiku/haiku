@@ -1,0 +1,52 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Expander	3239308358
+Destination	ExpanderWindow		Mål
+Other	ExpanderPreferences		Annen
+Automatically show contents listing	ExpanderPreferences		Vis innholdsliste automatisk
+Expander	System name		Expander
+Expander: Choose destination	DirectoryFilePanel		Arkivåpner: Velg mål
+Set source…	ExpanderMenu		Sett kilde…
+OK	ExpanderWindow		OK
+The destination is not a folder.	ExpanderWindow		Målet er ikke en mappe.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen ble enten flyttet, skiftet navn eller er ikke støttet.
+Close window when done expanding	ExpanderPreferences		Lukk vinduet når utpakkingen er ferdig
+Close	ExpanderMenu		Lukk
+Create	ExpanderWindow		Opprett
+Creating listing for '%s'…	ExpanderWindow		Oppretter oppføring for '%s'…
+Show contents	ExpanderMenu		Vis innhold
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Er du sikker på at du vil avbryte utpakkingen av dette arkivet? De utpakkede elementene er kanskje ikke komplette.
+Settings	ExpanderMenu		Innstillinger
+Expand	ExpanderWindow		Pakk ut
+Open destination folder after extraction	ExpanderPreferences		Åpne målmappe etter utpakking
+Same directory as source (archive) file	ExpanderPreferences		Samme mappe som kildefilen (arkivet)
+Stop	ExpanderWindow		Stopp
+Cancel	ExpanderWindow		Avbryt
+Expander settings	ExpanderPreferences		Innstillinger for Arkivåpner
+Error when expanding archive	ExpanderWindow		Feil ved utpakking av arkiv
+Expand	ExpanderMenu		Pakk ut
+Failed to create the destination folder.	ExpanderWindow		Kunne ikke opprette destinasjonsmappen.
+Settings…	ExpanderMenu		Innstillinger…
+Select current	DirectoryFilePanel		Velg gjeldende
+Expanding '%s'…	ExpanderWindow		Pakker ut '%s'…
+OK	ExpanderPreferences		OK
+File expanded	ExpanderWindow		Fil pakket ut
+Automatically expand files	ExpanderPreferences		Pakk ut automatisk
+Select	DirectoryFilePanel		Velg
+Show contents	ExpanderWindow		Vis innhold
+Stop	ExpanderMenu		Stopp
+Select '%s'…	DirectoryFilePanel		Velg '%s'…
+Expansion	ExpanderPreferences		Utvidelse
+Set destination…	ExpanderMenu		Velg mål…
+Continue	ExpanderWindow		Fortsett
+ is not supported	ExpanderWindow		 er ikke støttet
+Cancel	ExpanderPreferences		Avbryt
+Use:	ExpanderPreferences		Bruk:
+Destination folder	ExpanderPreferences		Målmappe
+Expander: Open	ExpanderWindow		Arkivåpner: Åpne
+Leave destination folder path empty	ExpanderPreferences		La sti til målmappe være tom
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Destinasjonsmappen finnes ikke. Vil du opprette den?
+The file doesn't exist	ExpanderWindow		Filen finnes ikke
+Hide contents	ExpanderWindow		Skjul innhold
+Source	ExpanderWindow		Kilde
+The destination is read only.	ExpanderWindow		Målet er skrivebeskyttet
+Select	ExpanderPreferences		Velg
+File	ExpanderMenu		Fil

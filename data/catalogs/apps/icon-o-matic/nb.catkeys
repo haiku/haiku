@@ -1,0 +1,111 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	3413851465
+None	Icon-O-Matic-Properties		Ingen
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
+Add empty	Icon-O-Matic-ShapesList		Legg til tom
+Opening the icon failed!	Icon-O-Matic-Main		Åpning av ikonet mislyktes!
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Pip!
+Add with path	Icon-O-Matic-ShapesList		Legg til med sti
+Paste properties	Icon-O-Matic-Properties		Lim inn egenskaper
+Copy	Icon-O-Matic-Properties		Kopier
+Color	Icon-O-Matic-PropertyNames		Farge
+Format	Icon-O-Matic-SavePanel		Format
+Color	Icon-O-Matic-StyleTypes		Farge
+Select	Icon-O-Matic-Properties		Velg
+Reset transformation	Icon-O-Matic-ShapesList		Tilbakestill omforming
+Duplicate	Icon-O-Matic-StylesList		Dupliser
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
+Rotate	Icon-O-Matic-TransformationBoxStates		Roter
+Shorten	Icon-O-Matic-PropertyNames		Forkort
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Teksten du prøver å importere er ganske lang, er du sikker?
+Paste	Icon-O-Matic-Properties		Lim inn
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Det er for mange stiler. HVIF-formatet støtter maksimalt 255.
+Close	Icon-O-Matic-Menu-File		Lukk
+Add rect	Icon-O-Matic-PathsList		Legg til rektangel
+Rotation	Icon-O-Matic-PropertyNames		Rotasjon
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Farge (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON attributt
+Transform	Icon-O-Matic-PathManipulator		Omform
+Add shape with style	Icon-O-Matic-Menu-Shape		Legg til form med stil
+Change color	Icon-O-Matic-SetColorCmd		Bytt farge
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Fjern {0, plural, one{toppunkt} other{toppunkter}}
+Unassign path	Icon-O-Matic-UnassignPathCmd		Fjern tilordningen av sti
+Remove	Icon-O-Matic-StylesList		Fjern
+Cancel	Icon-O-Matic-Menu-Settings		Avbryt
+PNG set	Icon-O-Matic-SavePanel		PNG-sett
+Transformation	Icon-O-Matic-TransformationBoxStates		Omforming
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Flytt {0, plural, one{sti} other{stier}}
+Closed	Icon-O-Matic-PropertyNames		Lukket
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<ingenting å omgjøre>
+Height	Icon-O-Matic-PropertyNames		Høyde
+warning	Icon-O-Matic-SVGExport		advarsel
+File	Icon-O-Matic-Menus		Fil
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	noen av de andre listene også
+Properties	Icon-O-Matic-Menus		Egenskaper
+Path	Icon-O-Matic-PropertyNames		Sti
+Path	Icon-O-Matic-Menus		Sti
+Stroke	Transformation		Linje
+Flip	Icon-O-Matic-PathManipulator		Flipp
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	rediger egenskapene her.
+Opacity	Icon-O-Matic-PropertyNames		Gjennomsiktighet
+OK	Icon-O-Matic-ColorPicker		OK
+Error: 	Icon-O-Matic-Main		Feil:
+Saving your document failed!	Icon-O-Matic-Exporter		Lagring av dokumentet mislyktes!
+Opening the document failed!	Icon-O-Matic-Main		Åpning av dokument mislyktes!
+Add with path & style	Icon-O-Matic-ShapesList		Legg til med sti & stil
+Shape	Icon-O-Matic-Menus		Form
+<unavailable>	Icon-O-Matic-StyleTypes		<utilgjengelig>
+Add	Icon-O-Matic-TransformersList		Legg til
+Scale X	Icon-O-Matic-PropertyNames		Skaler X
+Add	Icon-O-Matic-PathsList		Legg til
+Remove	Icon-O-Matic-PathManipulator		Fjern
+Duplicate	Icon-O-Matic-ShapesList		Dupliser
+Contour	Transformation		Kontur
+Rounding	Icon-O-Matic-PropertyNames		Runding
+Cancel	Icon-O-Matic-ColorPicker		Avbryt
+Duplicate	Icon-O-Matic-PathsList		Dupliser
+Save	Icon-O-Matic-Menu-Settings		Lagre
+Export as…	Icon-O-Matic-Menu-File		Eksporter som…
+Diamond	Icon-O-Matic-StyleTypes		Diamant
+Add shape with path	Icon-O-Matic-Menu-Shape		Legg til form med sti
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Det kan være Icon-O-Matic ikke fikk tolket alle data fra SVG når den ble lastet. Ved å overskrive den orginale filen, vil denne informasjonen bli tapt.
+Overwrite	Icon-O-Matic-SVGExport		Overskriv
+Cancel	Icon-O-Matic-SVGExport		Avbryt
+Open…	Icon-O-Matic-Menu-File		Åpne…
+Remove	Icon-O-Matic-ShapesList		Fjern
+Linear	Icon-O-Matic-StyleTypes		Linær
+Clean up	Icon-O-Matic-PathsList		Rydd opp
+Split	Icon-O-Matic-PathManipulator		Splitt
+Move	Icon-O-Matic-TransformationBoxStates		Flytt
+Conic	Icon-O-Matic-StyleTypes		Kjeglesnitt
+Name	Icon-O-Matic-PropertyNames		Navn
+Reset transformation	Icon-O-Matic-StylesList		Tilbakestill omforminger
+Reverse	Icon-O-Matic-PathsList		Reverser
+Remove	Icon-O-Matic-PathsList		Fjern
+Style type	Icon-O-Matic-StyleTypes		Stiltype
+Quit	Icon-O-Matic-Menu-File		Avslutt
+Gradient	Icon-O-Matic-StyleTypes		Gradient
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Legg til form med sti & stil
+Radial	Icon-O-Matic-StyleTypes		Radial
+OK	Icon-O-Matic-SVGImport		OK
+Append…	Icon-O-Matic-Menu-File		Bruk…
+Scale Y	Icon-O-Matic-PropertyNames		Skaler Y
+Save	Icon-O-Matic-Menu-File		Lagre
+Add circle	Icon-O-Matic-PathsList		Legg til sirkel
+Save as…	Icon-O-Matic-Menu-File		Lagre som…
+<modify path>	Icon-O-Matic-PathCmd		<endre sti>
+Icon-O-Matic	System name		Icon-O-Matic
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<ingenting å angre på>
+Add	Icon-O-Matic-StylesList		Legg til
+Scale	Icon-O-Matic-TransformationBoxStates		Skaler
+All	Icon-O-Matic-Properties		Alle
+Transformer	Icon-O-Matic-Menus		Omformer
+<unkown property>	Icon-O-Matic-PropertyNames		<ukjent egenskap>
+Pick a color	Icon-O-Matic-ColorPicker		Velg en farge
+Settings…	Icon-O-Matic-SavePanel		Innstillinger…
+Add with style	Icon-O-Matic-ShapesList		Legg til med stil
+New	Icon-O-Matic-Menu-File		Ny
+Gradient type	Icon-O-Matic-StyleTypes		Gradient-type
+Export	Icon-O-Matic-Menu-File		Eksporter
+Width	Icon-O-Matic-PropertyNames		Bredde
+Style	Icon-O-Matic-Menus		Stil
+Edit	Icon-O-Matic-Menus		Rediger

@@ -1,0 +1,9 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-RAWTranslator	2975919330
+RAWTranslator Settings	ConfigView		RAW-oversetterinnstillinger
+Version %d.%d.%d, %s	ConfigView		Versjon %d.%d.%d, %s
+RAW image translator	RAWTranslator		RAW-bildeoversetter
+RAW Settings	RAWTranslator main		RAW-innstillinger
+RAW images	RAWTranslator		RAW-bilder
+RAW image translator	ConfigView		RAW bilde-oversetter
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s RAW-bilde
+Based on Dave Coffin's dcraw 8.63	ConfigView		Basert på Dave Coffins dcraw 8.63

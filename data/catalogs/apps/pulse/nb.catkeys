@@ -1,0 +1,48 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Pulse	559379362
+Normal mode	DeskbarPulseView		Normal modus
+Info	CPUButton		Info
+Quit	DeskbarPulseView		Avslutt
+Info	DeskbarPulseView		Info
+Normal mode	MiniPulseView		Normalmodus
+Frame color	ConfigView		Kantfarge
+Error	PulseApp		Feil
+Bar colors	ConfigView		Linjefarger
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Standardinnstillinger
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Minimodus
+CPU progress bar	NormalPulseView		CPU-fremgangsmåler
+Fade colors	ConfigView		Ton ut farger
+About Pulse…	PulseView		Om Puls...
+Pulse	NormalPulseView		Puls
+Deskbar mode	NormalPulseView		Deskbarmodus
+Pulse settings	PulseApp		Pulse-innstillinger
+Remove replicant	CPUButton		Fjern replikant
+You can't disable the last active CPU.	PulseView		Du kan ikke slå av den siste aktive prosessoren.
+Width of icon:	ConfigView		Ikonbredde:
+Deskbar mode	MiniPulseView		Deskbarmodus
+OK	PulseView		OK
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nAv David Ramsey og Arve Hjønnevåg\nRevidert av Daniel Switkin\n
+OK	PrefsWindow		OK
+Pulse	PulseApp		Puls
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Klarte ikke fjerne fra Deskbar.\n%s
+OK	PulseApp		OK
+About Pulse…	CPUButton		Om Puls...
+Deskbar mode	PrefsWindow		Deskbarmodus
+Mini mode	DeskbarPulseView		Minimodus
+You can't disable the last active CPU.	CPUButton		Du kan ikke slå av den siste aktive prosessoren.
+OK	CPUButton		OK
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Innstillinger...
+Deskbar menu	CPUButton		Deskbarmeny
+Mini mode	NormalPulseView		Minimodus
+Quit	MiniPulseView		Avslutt
+Info	PulseView		Info
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Bruk: Pulse [--mini] [-w bredde] [--width=bredde]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
+OK	DeskbarPulseView		OK
+Info	PulseApp		Info
+Pulse	System name		Puls
+Active color	ConfigView		Aktiv farge
+Installing in Deskbar failed\n%s	PulseApp		Klarte ikke installere i Deskbar\n%s
+Idle color	ConfigView		Inaktiv farge
+Normal mode	PrefsWindow		Normalmodus

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Keymap	2850776429
+1	greek, modern (1453-)	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Πλήκτρο
 Japanese	KeymapNames		Ιαπωνέζικο
 US	KeymapNames		ΗΠΑ
@@ -30,6 +30,7 @@ US-International	KeymapNames		Διεθνές ΗΠΑ
 Right option	Keyboard Layout View		Δεξιό option
 Turkish (Type-Q)	KeymapNames		Τούρκικο (Τύπου-Q)
 Revert	Modifier keys window		Επαναφορά
+Caps:	Modifier keys window	Caps key role name	Caps:
 Slovak	KeymapNames		Σλοβακικό
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Βελγικό (κόμμα)
 Norwegian	KeymapNames		Νορβηγικό
 Font	Keymap window		Γραμματοσειρά
 Danish	KeymapNames		Δανικό
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Πλήκτρο Caps
 Generic 104-key	KeyboardLayoutNames		Γενικό 104-πλήκτρων
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Πλήκτρο Shift
 Russian	KeymapNames		Ρώσικο

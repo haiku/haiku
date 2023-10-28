@@ -1,0 +1,16 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		TIFF Bibliotek:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: ugyldig dokumentindex\n
+Use compression:	TIFFView		Bruk kompresjon:
+TIFF image translator	TIFFView		TIFF bildeoversetter
+TIFF image	TIFFTranslator		TIFF-bilde
+TIFF Settings	TIFFMain		TIFF-innstillinger
+TIFF image translator	TIFFTranslator		TIFF bildeoversetter
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunne ikke velge mappe\n
+Version %d.%d.%d, %s	TIFFView		Versjon %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator Innstillinger
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		TIFF-bilder
+None	TIFFView		Ingen

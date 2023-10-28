@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Input	4063065788
+1	spanish; castilian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Desplazamiento
 Defaults	InputMouse		Por defecto
 Long	KeyboardView		Largo
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Aceptar primer clic
 OK	TouchpadPrefView		Aceptar
 Horizontal scrolling	TouchpadPrefView		Desplazamiento horizontal
 Delay until key repeat	KeyboardView		Demora hasta que se repita la tecla
+Keyboard lock delay	TouchpadPrefView		Retraso del bloqueo de teclado
 Two finger scrolling	TouchpadPrefView		Desplazamiento con dos dedos
 Input	System name		Entrada
 Mouse acceleration	SettingsView		Aceleración del ratón

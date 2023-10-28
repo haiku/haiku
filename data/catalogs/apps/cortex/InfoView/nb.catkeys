@@ -1,0 +1,19 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.InfoView	911310461
+Offset	InfoView		Offset
+Description	DormantNodeInfoView		Beskrivelse
+Byte order	InfoView		Byte-rekkefølge
+Connection	InfoView		Tilkobling
+Output formats	DormantNodeInfoView		Ut-formater
+History	InfoView		Historikk
+Input formats	DormantNodeInfoView		Inn-formater
+Signature	AppNodeInfoView		Signatur
+Video data between	InfoView		Videodata mellom
+Any number	DormantNodeInfoView	For 'Max. instances' field	Et hvilket som helst tall
+Flags	InfoView		Flagg
+Media output	InfoView		Medieutgang
+Active lines	InfoView		Aktive linjer
+Buffer size	InfoView		Bufferstørrelse
+\n- Quality:	FileNodeInfoView		\n- Kvalitet:
+Kinds	LiveNodeInfoView		Typer
+Application	AppNodeInfoView		Applikasjon
+\n- Duration:	FileNodeInfoView		\n- Varighet:

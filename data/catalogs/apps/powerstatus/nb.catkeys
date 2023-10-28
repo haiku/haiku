@@ -1,0 +1,48 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	1085070685
+Run in window	PowerStatus		Kjør i vindu
+Extended battery info	PowerStatus		Utvidet batteriinformasjon
+Show status icon	PowerStatus		Vis statusikon
+Battery charging	PowerStatus		Batteri lader
+Design capacity low warning: 	PowerStatus		Designkapasitet lav advarsel: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Batterinivået er kritisk, vennligst koble til enheten umiddelbart.
+non-rechargeable	PowerStatus		ikke ladbar
+Last full charge: 	PowerStatus		Siste fullstendige lading:
+ mV	PowerStatus		 mV
+Current rate: 	PowerStatus		Gjeldende rate:
+Show text label	PowerStatus		Vis tekst
+Quit	PowerStatus		Avslutt
+Battery low	PowerStatus		Lavt batterinivå
+Model number: 	PowerStatus		Modellnummer:
+Battery unused	PowerStatus		Batteri ikke i bruk
+Type: 	PowerStatus		Type:
+Damaged battery	PowerStatus		Skadet batteri
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan kjøre Strøm i et vindu eller installere det i Deskbar
+ mAh	PowerStatus		 mAh
+Battery discharging	PowerStatus		Batteri utlader
+Design voltage: 	PowerStatus		Designspenning: 
+discharging	PowerStatus		lader ut
+rechargeable	PowerStatus		oppladbar
+Battery info…	PowerStatus		Batteriinformasjon...
+Show time	PowerStatus		Vis tid
+ mA	PowerStatus		 mA
+About…	PowerStatus		Om...
+Serial number: 	PowerStatus		Serienummer:
+Battery critical	PowerStatus		Kritisk batterinivå
+Capacity: 	PowerStatus		Kapasitet:
+ mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Ingen støttet batteri oppdaget. PowerStatus kan ikke brukes på systemet ditt.
+Show percent	PowerStatus		Vis prosent
+Capacity granularity 1: 	PowerStatus		Kapasitetsgranularitet 1: 
+The battery level is getting low, please plug in the device.	PowerStatus		Batterinivået begynner å bli lavt, vennligst koble til enheten.
+Design capacity warning: 	PowerStatus		Advarsel om designkapasitet: 
+Capacity granularity 2: 	PowerStatus		Kapasitetsgranularitet 2: 
+Too bad!	PowerStatus		Synd!
+Technology: 	PowerStatus		Teknologi:
+ mWh	PowerStatus		 mWh
+PowerStatus	System name		Strøm
+Design capacity: 	PowerStatus		Designkapasitet: 
+OEM info: 	PowerStatus		OEM-informasjon:
+no battery	PowerStatus		ingen batteri
+Empty battery slot	PowerStatus		Batteri ikke til stede
+Install in Deskbar	PowerStatus		Installer i Deskbar
+charging	PowerStatus		lader

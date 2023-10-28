@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	716811487
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		Μέγιστη ένταση
 Start media server	MediaPlayer-Main		Εκκίνηση διακομιστή πολυμέσων
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Φαίνεται ότι ο διακομιστής πολυμέσων δεν εκτελείται.\nΘέλετε να τον ξεκινήσετε;
 Location	MediaPlayer-InfoWin		Τοποθεσία
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Άνοιγμα του '%s'.
 Medium	MediaPlayer-SettingsWindow		Μέτριο
 Play mode	MediaPlayer-SettingsWindow		Λειτουργία αναπαραγωγής

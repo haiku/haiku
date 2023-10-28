@@ -1,0 +1,15 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Kunne ikke koble til serveren \"%server%\":\n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		Oppdaterer abonnementer på IMAP-mapper, vær tålmodig…
+Failed to fetch available storage.	IMAPFolderConfig		Kunne ikke innhente tilgjengelig lagringsplass.
+Cancel	IMAPFolderConfig		Avbryt
+OK	IMAPFolderConfig		OK
+Server storage: %s / %s used.	IMAPFolderConfig		Lagringsplass på server: %s / %s brukt.
+No encryption	imap_config		Ingen kryptering
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		Henter IMAP-mapper, vennligst vent…
+Configure IMAP Folders	imap_config		Konfigurer IMAP-mapper
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		Bruk
+status	IMAPFolderConfig		status
+IMAP Folders	IMAPFolderConfig		IMAP-mapper
+Destination:	imap_config		Mål:

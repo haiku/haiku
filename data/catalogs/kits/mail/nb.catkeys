@@ -1,0 +1,10 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libmail	161731481
+Partially download messages larger than	ProtocolConfigView		Delvis nedlasting av meldinger større enn
+Password:	ProtocolConfigView		Passord:
+Remove mail from server when deleted	ProtocolConfigView		Fjern e-post fra serveren når den slettes
+Mail server:	ProtocolConfigView		E-postserver:
+Select…	MailKit		Velg…
+Connection type:	ProtocolConfigView		Tilkoblingstype:
+Leave mail on server	ProtocolConfigView		La e-posten ligge på serveren
+Username:	ProtocolConfigView		Brukernavn:
+Login type:	ProtocolConfigView		Påloggingstype:

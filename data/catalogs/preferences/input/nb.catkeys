@@ -1,0 +1,50 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Input	130668644
+Scrolling	TouchpadPrefView		Rulling
+Defaults	InputMouse		Standarder
+Long	KeyboardView		Lang
+Cancel	TouchpadPrefView		Avbryt
+4-Button	SettingsView		4-Knapper
+Slow	TouchpadPrefView		Sakte
+Tapping sensitivity	TouchpadPrefView		Tappefølsomhet
+Device List	InputWindow		Enhetsliste
+Double-click speed	SettingsView		Hastighet på dobbelt-klikk
+5-Button	SettingsView		5-Knapper
+Typing test area	KeyboardView		Felt for skrivetesting
+Mouse type:	SettingsView		Type mus:
+Revert	InputKeyboard		Tilbakestill
+Fast	KeyboardView		Rask
+Off	TouchpadPrefView		Av
+Never	TouchpadPrefView		Aldri
+Fast	TouchpadPrefView		Fort
+6-Button	SettingsView		6-Knapper
+Please confirm	TouchpadPrefView		Vennligst bekreft
+Click to focus	SettingsView		Klikk for fokus
+Acceleration	TouchpadPrefView		Akselerasjon
+Mouse speed	SettingsView		Musens hastighet
+Accept first click	SettingsView		Godta første klikk
+OK	TouchpadPrefView		OK
+Horizontal scrolling	TouchpadPrefView		Horisontal rulling
+Delay until key repeat	KeyboardView		Utsett til tasten gjentas
+Keyboard lock delay	TouchpadPrefView		Tastaturlåsforsinkelse
+Two finger scrolling	TouchpadPrefView		Rulling med to fingre
+Input	System name		Inndata
+Mouse acceleration	SettingsView		Museakselerasjon
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Det nye rulleområdet er veldig stort og kan hindre normal bruk av mus. Vil du virkelig endre det?
+High	TouchpadPrefView		Høy
+Defaults	TouchpadPrefView		Standardinnstillinger
+1-Button	SettingsView		1-knapp
+Defaults	InputKeyboard		Standardinnstillinger
+Quick	TouchpadPrefView		Rask
+Short	KeyboardView		Kort
+Slow	KeyboardView		Sakte
+Revert	InputMouse		Tilbakestill
+Key repeat rate	KeyboardView		Repetisjonshastighet for taster
+2-Button	SettingsView		2-Knapper
+Click to focus and raise	SettingsView		Klikk for å fokusere og heve
+Vertical	TouchpadPrefView		Vertikal
+Horizontal	TouchpadPrefView		Horisontal
+Focus follows mouse	SettingsView		Fokus følger mus
+Focus mode:	SettingsView		Fokus-modus:
+Double-click test area	SettingsView		Testområde for dobbeltklikk
+3-Button	SettingsView		3-knapper
+Revert	TouchpadPrefView		Tilbakestill

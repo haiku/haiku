@@ -1,0 +1,28 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku.TV	337483365
+No menu	MainWin		Ingen meny
+No border	MainWin		Ingen vinduskant
+Error, connecting to interface failed:\n\n	MainWin		Feil, tilkobling til grensesnittet feilet:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	tving 720 × 576, visningsforhold 4:3
+Full screen	MainWin		Fullskjerm
+Scale to native size	MainWin		Skaler til normal størrelse
+unknown	MainWin		ukjent
+Next channel	MainWin		Neste kanal
+Keep aspect ratio	MainWin		Behold høyde/bredde-forhold
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Digital Video Broadcasting TV
+Always on top	MainWin		Alltid øverst
+Debug	MainWin		Debug
+Interface	MainWin		Grensesnitt
+Quit	MainWin		Avslutt
+Channel	MainWin		Kanal
+Previous channel	MainWin		Forrige kanal
+OK	MainWin		OK
+TV	MainWin		TV
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	tving 544 × 576, visningsforhold 4:3
+Settings	MainWin		Innstillinger
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	tving 704 × 576, visningsforhold 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
+TV	System name		TV
+Settings…	MainWin		Innstillinger
+None	MainWin		Ingen
+Error, interface is busy:\n\n	MainWin		Feil, grensesnitt er opptatt:\n\n
+pixel aspect ratio	MainWin		piksel-aspekt ratioet

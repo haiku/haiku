@@ -1,0 +1,37 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-LaunchBox	1878360293
+Set description…	LaunchBox		Sett beskrivelse
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Vil du virkelig lukke denne padden?\n
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignorer dobbelklikk
+Show on all workspaces	LaunchBox		Vis på alle arbeidsområder
+Name Panel	LaunchBox		Navnepanel
+Autostart	LaunchBox		Autostart
+Clone	LaunchBox		Klon
+Description for '%3'	LaunchBox		Beskrivelse for '%3'
+Show window border	LaunchBox		Vis vinduskant
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nKunne ikke starte applikasjonen med signatur '%2'.\n\nFeil:
+Failed to launch 'something', error in Pad data.	LaunchBox		Kunne ikke starte "noe", feil i Pad-data.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Automatisk heving
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+Icon size	LaunchBox		Ikonstørrelse
+Open containing folder	LaunchBox		Åpne overordnet mappe
+Add button here	LaunchBox		Legg til knapp her
+Cancel	LaunchBox		Avbryt
+launch popup	LaunchBox		start popup
+Clear button	LaunchBox		Tøm knapp
+Bummer	LaunchBox		Synd
+last chance	LaunchBox		siste sjanse
+You can drag an icon here.	LaunchBox		Du kan dra et ikon hit.
+Pad 1	LaunchBox		Pad 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Kunne ikke starte '%1'.\n\nFeil:
+Settings	LaunchBox		Innstillinger
+Vertical layout	LaunchBox		Vertikal utforming
+Pad	LaunchBox		Pad
+Close	LaunchBox		Lukk
+Remove button	LaunchBox		Fjern knapp
+Quit	LaunchBox		Avslutt
+Horizontal layout	LaunchBox		Horisontal utforming
+New	LaunchBox		Ny
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Fei ved sending av 'open folder'-kommando til Tracker.\n\nFeil:
+Pad %1	LaunchBox		Pad %1

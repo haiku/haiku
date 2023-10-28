@@ -1,0 +1,91 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-StyledEdit	3760185556
+Document statistics	Statistics		Dokumentstatistikk
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbakestille, filen \"%s\" ble ikke funnet.
+Cut	Menus		Klipp ut
+Center	Menus		Sentrer
+Increase size	Menus		Øk størrelsen
+Page setup…	Menus		Sideoppsett...
+Wrap-around search	FindandReplaceWindow		Wrap-around søk
+Untitled 	StyledEditWindow		Uten navn
+OK	Statistics		OK
+Find	FindandReplaceWindow		Finn
+New	Menus		Ny
+Document	Menus		Dokument
+Search backwards	FindandReplaceWindow		Søk bakover
+Find again	Menus		Finn igjen
+Read-only	StatusView		Kun lesetilgang
+Save	Menus		Lagre
+Cancel	QuitAlert		Avbryt
+Copy	Menus		Kopier
+Reload	NodeMonitorAlerts		Last inn på nytt
+line %d, column %d	StatusView		rad %d, kolonne %d
+Words:	Statistics		Ord:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		Gjenopprett
+Error saving \"%s\":\n%s	SaveAlert		Feil ved lagring av \"%s\":\n%s
+OK	RevertToSavedAlert		OK
+Unlock file	StatusView		Lås opp fil
+Italic	Menus		Kursiv
+Can't undo	Menus		Kan ikke angre
+Replace…	Menus		Erstatt...
+File	Menus		Fil
+Paste	Menus		Lim inn
+Bold	Menus		Fet
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" ble endret av en annen applikasjon, vil du laste den inn på nytt?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" ble fjernet av en annen applikasjon, vil du gjenopprette den?
+Lines:	Statistics		Linjer:
+Replace in all windows	FindandReplaceWindow		Erstatt i alle vinduer
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" har endringer som ikke er lagret.\nVil du gå tilbake til den sist lagrede versjonen?
+Save	SaveAlert		Lagre
+Default	Open_and_SaveAsPanel		Standard
+Cancel	RevertToSavedAlert		Avbryt
+Cancel	FindandReplaceWindow		Avbryt
+Statistics…	Menus		Statistikk...
+Encoding	Open_and_SaveAsPanel		Koding
+Replace all	FindandReplaceWindow		Erstatt alle
+Close	Menus		Lukk
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		Feil ved lasting av \"%s\":\n\tFormatet støttes ikke
+Left	Menus		Venstre
+Default	Menus		Standard
+OK	SaveAlert		OK
+Color	Menus		Farge
+Save changes to the document \"%s\"? 	QuitAlert		Lagre endringer i dokumentet \"%s\"?
+StyledEdit	System name		StyledEdit
+Underline	Menus		Understrek
+Find:	FindandReplaceWindow		Finn:
+Undo typing	QuitAlert		Angre skriving
+Error loading \"%s\":\n\t%s	LoadAlert		Feil ved lasting av \"%s\":\n\t%s
+Don't save	SaveAlert		Ikke lagre
+Reload…	Menus		Last inn på nytt…
+Print…	Menus		Skriv ut...
+Quit	Menus		Avslutt
+Redo typing	QuitAlert		Tilbakestill skriving
+Ignore	NodeMonitorAlerts		Ignorer
+Wrap lines	Menus		Bryt tekst
+Text encoding	Menus		Tekstkoding
+Unable to unlock file\n\t%s	QuitAlert		Kunne ikke låse opp filen\n\t%s
+Modified	StatusView		Endret
+OK	LoadAlert		OK
+Save	QuitAlert		Lagre
+Case-sensitive	FindandReplaceWindow		Skiller mellom store og små bokstaver
+Find selection	Menus		Finn valgt tekst
+Find…	Menus		Finn…
+Cancel	SaveAlert		Avbryt
+Revert	RevertToSavedAlert		Tilbakestill
+Size	Menus		Størrelse
+Decrease size	Menus		Reduser størrelsen
+Autodetect	Menus		Automatisk gjenkjenning
+Replace next	Menus		Erstatt neste
+OK	QuitAlert		OK
+Edit	Menus		Rediger
+Replace with:	FindandReplaceWindow		Erstatt med:
+Open…	Menus		Åpne...
+Save as…	Menus		Lagre som...
+Replace	FindandReplaceWindow		Erstatt
+Characters:	Statistics		Bokstaver:
+Don't save	QuitAlert		Ikke lagre
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denne filen er merket som skrivebeskyttet. Vil du lagre endringer i dokumentet \"%s\"? 
+Font	Menus		Font
+Align	Menus		Juster
+Select all	Menus		Merk alle
+Right	Menus		Høyre

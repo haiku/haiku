@@ -1,0 +1,13 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SGITranslator	129108011
+SGI images	SGITranslator		SGI-bilder
+Use compression:	SGIView		Bruk komprimering
+SGI image translator	SGIView		SGI-bildeoversetter
+SGI image	SGITranslator		SGI-bilde
+SGITranslator Settings	SGITranslator		SGI-oversetterinnstillinger
+SGI Settings	SGIMain		SGI-innstillinger
+SGI image translator	SGITranslator		SGI-bildeoversetter
+None	SGIView		Ingen
+Version %d.%d.%d, %s	SGIView		Versjon %d.%d.%d, %s
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\nbasert på GIMP SGI plugin v1.5:\n
+RLE	SGIView		RLE
+written by:\n	SGIView		skrevet av:\n

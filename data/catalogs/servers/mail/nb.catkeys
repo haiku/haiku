@@ -1,0 +1,19 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-POST	2949558073
+No new messages	MailDaemon		Ingen nye meldinger
+No new messages	DeskbarView		Ingen nye meldinger
+Shutdown mail services	DeskbarView		Slå av e-posttjenester
+Mail status	MailDaemon		E-post-status
+Fetching mail for %name	Notifier		Henter epost for %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# ny melding} other{# nye meldinger}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# ny melding} other{# nye meldinger}} til %name\n
+Create new message…	DeskbarView		Opprett ny melding…
+Send pending mails	DeskbarView		Send ventende e-poster
+Settings…	DeskbarView		Innstillinger…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{En ny melding} other{# nye meldinger}}
+New Messages	MailDaemon		Nye Meldinger
+<no accounts>	DeskbarView		<ingen kontoer>
+Mail status	Notifier		E-post-status
+Check for mails only	DeskbarView		Se kun etter e-post
+Check for mail now	DeskbarView		Se etter e-post nå
+Sending mail for %name	Notifier		Sender e-post for %name
+Mail daemon status log	MailDaemon		Mail daemon statuslogg

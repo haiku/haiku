@@ -1,0 +1,24 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		Tilordning av input
+High quality (linear interpolation)	AudioMixer		Høy kvalitet (lineær interpolasjon)
+To output	AudioMixer		Til utgang
+Gain	AudioMixer		Gain
+To master	AudioMixer		Til master
+not connected	AudioMixer		ikke tilkoblet
+Master output	AudioMixer		Masterutgang
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Gain-kontroll
+Low quality (drop/repeat samples)	AudioMixer		Lav kvalitet (slett/gjenta samplinger)
+Output channel sources	AudioMixer		Kilder for utgangskanal
+Allow input channel remapping	AudioMixer		Tillat ny tilordning av inngangskanal
+Display balance control for stereo connections	AudioMixer		Vis balansekontroll for stereotilkoblinger
+Setup	AudioMixer		Oppsett
+Physical input channels	AudioMixer		Fysiske inngangskanaler
+Input channel destinations	AudioMixer		Destinasjoner for inngangskanal
+Resampling algorithm:	AudioMixer		Resampling-algoritme:
+Mute	AudioMixer		Demp
+Output mapping	AudioMixer		Utgangskartlegging
+Virtual output channels	AudioMixer		Virtuelle utgangskanaler
+Allow output channel remapping	AudioMixer		Tillat ommapping av utgangskanaler
+Input gain controls represent:	AudioMixer		Inngangsnivåkontroller representerer:
+Attenuate mixer output by 3 dB	AudioMixer		Demp mikserutgang med 3dB

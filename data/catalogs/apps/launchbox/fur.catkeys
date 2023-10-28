@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-LaunchBox	1530497419
+1	friulian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Stabilìs descrizion…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sierâ pardabon chest pad?\n(Il pad nol vignarà ricuardât.)
 OK	LaunchBox		Va ben
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Mostre l'ôr dal barcon
 Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzion di 'alc' falide, erôr tai dâts dal Pad.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Tire sù in automatic
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Dimension iconis
 Open containing folder	LaunchBox		Mostre te cartele
 Add button here	LaunchBox		Zonte boton achì

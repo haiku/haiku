@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaConverter	517958556
+1	friulian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
 Source files	MediaConverter		File sorzints
 Error writing video frame %lld	MediaConverter		Erôr tal scrivi il fotogram video %lld
@@ -65,6 +65,7 @@ Video quality not supported	MediaConverter		Cualitât video no supuartade
 Select this folder	MediaConverter		Selezione cheste cartele
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canâl
 Understood	MediaConverter		Capît
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Nissun video
 Continue	MediaConverter		Continue

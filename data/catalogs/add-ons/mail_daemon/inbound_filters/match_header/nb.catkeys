@@ -1,0 +1,17 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		Slett melding
+Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" mot \"%regex\"
+Match header	RuleFilter		Match header
+Set flags to	ConfigView		Sett flagg til
+Header field (e.g. Subject, From, …)	ConfigView		Felt for overskrift (f.eks. Emne, fra, …)
+<Choose account>	ConfigView		<Velg konto>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Wildcardverdi som \"*spam*\".\nPrefiks med \"REGEX:\" for å bruke regulære uttrykk.
+Then	ConfigView		Så
+If	ConfigView		Hvis
+Set as read	ConfigView		Merk som lest
+Reply with	ConfigView		Svar med
+<Choose action>	ConfigView		<Velg handling>
+Move to	ConfigView		Flytt til
+this field is based on the action	ConfigView		dette feltet er basert på handlingen
+Account	ConfigView		Konto
+has	ConfigView		har

@@ -1,0 +1,47 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaConverter	3962148459
+Source files	MediaConverter		Kildefiler
+Conversion completed	MediaConverter		Konvertering fullført
+Audio:	MediaConverter-FileInfo		Lyd:
+Cancelling	MediaConverter		Avbryter
+None available	Audio codecs		Ingen tilgjengelig
+No file selected	MediaConverter-FileInfo		Ingen fil er valgt
+High	MediaConverter		Høy
+File Error	MediaConverter-FileInfo		Feil på fil
+None available	Video codecs		Ingen tilgjengelig
+Output format	MediaConverter		Utdataformat
+OK	MediaConverter		OK
+Error creating '%filename'	MediaConverter		Feil ved oppretting av '%filename'
+Error loading a file	MediaConverter		Feil ved lasting av fil
+Open…	Menu		Åpne…
+Audio encoding:	MediaConverter		Lydformat
+Cancelling…	MediaConverter		Avbryter…
+Output file '%filename' created	MediaConverter		Utdatafil '%filename' opprettet
+Output folder	MediaConverter		Utdatamappe
+Video using parameters form settings	MediaConverter		Video bruker parametre fra innstillingene
+Video:	MediaConverter-FileInfo		Video:
+Select	MediaConverter		Merk
+Conversion cancelled	MediaConverter		Konvertering avbrutt
+Low	MediaConverter		Lav
+Error loading files	MediaConverter		Feil ved lasting av filer
+End   [ms]: 	MediaConverter		Slutt   [ms]:
+Cancel	MediaConverter		Avbryt
+OK	MediaConverter-FileInfo		OK
+Video encoding:	MediaConverter		Videoformat
+Error	MediaConverter		Feil
+File details	MediaConverter		Filopplysninger
+No audio	Audio codecs list		Ingen lyd
+Drop media files onto this window	MediaConverter		Slipp mediafiler i dette vinduet
+Quit	Menu		Avslutt
+Duration:	MediaConverter-FileInfo		Varighet:
+MediaConverter	System name		Mediaomformer
+File format:	MediaConverter		Filformat:
+File	Menu		Fil
+Video quality not supported	MediaConverter		Videokvaliteten støttes ikke
+Select this folder	MediaConverter		Velg denne mappen
+%d bit 	MediaFileInfo		%d bit
+No video	Video codecs list		Ingen video
+Continue	MediaConverter		Fortsett
+Convert	MediaConverter		Konverter
+Audio quality not supported	MediaConverter		Lydkvaliteten støttes ikke
+Preview	MediaConverter		Forhåndsvisning
+Start [ms]: 	MediaConverter		Start [ms]: 

@@ -1,0 +1,30 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PPMTranslator	292474603
+None	PPMTranslator		Ingen
+PPM Settings	PPMMain		PPM-innstillinger
+System palette 8 bits	PPMTranslator		8 bit systempalett
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Eksempelkode-opphavsrett 1999, Be Incorporated
+Something is wrong with the PPMTranslator!	PPMMain		Noe er galt med PPM-oversetteren!
+Grayscale 8 bits	PPMTranslator		8-bit gråtoner
+Based on PPMTranslator sample code	PPMTranslator		Basert på PPMTranslator eksempelkode
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
+PPM image translator	PPMTranslator		PPM bilde-oversetter
+Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
+RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
+PPMTranslator Settings	PPMTranslator		PPM-oversetterinnstillinger
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 bit
+OK	PPMMain		OK
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bit
+PPM image	PPMTranslator		PPM-bilde
+Input color space:	PPMTranslator		Inngangsfargerom:
+RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
+RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
+Write ASCII	PPMTranslator		Skriv ASCII
+RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bit
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 bit
+Version %d.%d.%d, %s	PPMTranslator		Versjon %d.%d.%d, %s
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bit
+RGB 8:8:8 32 bits	PPMTranslator		RGBA 8:8:8 32 bit
+RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bit
+RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bit
+Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmap Format (PPMTranslator)

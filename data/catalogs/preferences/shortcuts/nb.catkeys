@@ -1,0 +1,47 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MusOpp
+Application	ShortcutsWindow		Program
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
+Save changes before closing?	ShortcutsWindow		Lagre endringer før du lukker?
+Revert to saved	ShortcutsWindow		Tilbakestill til lagret
+Don't save	ShortcutsWindow		Ikke lagre
+*MouseDown	ShortcutsWindow		*MusNed
+*Beep	ShortcutsWindow		*Bip
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Hurtigtaster klarte ikke å lagre ditt sett med hurtigtaster
+Save	ShortcutsWindow		Lagre
+Either	ShortcutsSpec		Vilkårlig
+Oh no	ShortcutsWindow		Å, nei
+Key	ShortcutsWindow		Tast
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMelding application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		Velg
+Shortcuts	System name		Hurtigtaster
+Quit	ShortcutsWindow		Avslutt
+(Choose application with file requester)	ShortcutsWindow		(Velg program med fil-etterspørsel)
+Cancel	ShortcutsWindow		Avbryt
+*MoveMouse +20 +0	ShortcutsWindow		*FlyttMus +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		Venstre
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke tolke filen din med hurtigtaster!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Hurtigtaster klarte ikke å lagre filen din med hurtigtaster!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*SettInnStreng \"Din Tekst Her\"
+Remove selected shortcut	ShortcutsWindow		Fjern merket hurtigtast
+Error, NULL state description?	ShortcutsSpec		Feil, NULL-tilstand beskrivelse?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Hurtigtaster kunne ikke åpne ditt sett med hurtigtaster!
+Save & apply	ShortcutsWindow		Lagre & bruk
+Open	ShortcutsWindow		Åpne
+Append	ShortcutsWindow		Bruk
+Both	ShortcutsSpec		Begge
+Save KeySet as…	ShortcutsWindow		Lagre sett med hurtigtaster som...
+Append KeySet…	ShortcutsWindow		Bruk sett med hurtigtaster
+*MouseButton 1	ShortcutsWindow		*MuseKnapp 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"FlyttMusTil 100% 0\" \"*MuseKnapp 1\"
+Right	ShortcutsSpec		Høyre
+OK	ShortcutsWindow		OK
+Add new shortcut	ShortcutsWindow		Legg til ny snarvei
+(None)	ShortcutsSpec		(Ingen)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		Åpne sett med hurtigtaster
+File	ShortcutsWindow		Fil
+*LaunchHandler text/html	ShortcutsWindow		*OppstartsHåndterer text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*FlyttMusTil 50% 50%

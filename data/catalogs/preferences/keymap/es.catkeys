@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	2850776429
+1	spanish; castilian	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonés
 US	KeymapNames		Estados Unidos
@@ -30,6 +30,7 @@ US-International	KeymapNames		Estados Unidos - Internacional
 Right option	Keyboard Layout View		Opción derecha
 Turkish (Type-Q)	KeymapNames		Turco (Tipo-Q)
 Revert	Modifier keys window		Revertir
+Caps:	Modifier keys window	Caps key role name	Mayús:
 Slovak	KeymapNames		Eslovaco
 CAPS LOCK	Keyboard Layout View		BLOQ MAYUS
 Colemak	KeymapNames		Colemak
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Belga (coma)
 Norwegian	KeymapNames		Noruego
 Font	Keymap window		Tipo de letra
 Danish	KeymapNames		Danés
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Bloq Mayús
 Generic 104-key	KeyboardLayoutNames		Genérico 104-teclas
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tecla mayúsculas
 Russian	KeymapNames		Ruso

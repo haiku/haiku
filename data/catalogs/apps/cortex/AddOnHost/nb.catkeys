@@ -1,0 +1,4 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.AddOnHost	826663209
+Continue	CortexAddOnHost		Fortsett
+Quit	CortexAddOnHost		Avslutt
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Dette programmet kjøres i bakgrunnen, og startes automatisk av Cortex ved behov. Du ønsker sannsynligvis ikke å starte det manuelt.

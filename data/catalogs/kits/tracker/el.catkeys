@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	3982629342
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -413,6 +413,7 @@ Emptying Trash… 	StatusWindow		Άδειασμα Κάδου Απορριμάτ�
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{για # αρχείο} other{για # αρχεία}}
 Revert	TrackerSettingsWindow		Επαναφορά
 trash	B_TRASH_DIRECTORY		κάδος
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Αν μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος ότι θέλετε να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον φάκελο συστήματος ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε το πλήκτρο Shift πατημένο και κάντε κλικ στο κουμπί \"Μετακίνηση\".
 Close all in workspace	ContainerWindow		Κλείσιμο όλων
 Corrupted expression.	libtracker		Κατεστραμμένη έκφραση.
@@ -437,6 +438,7 @@ the config folder	FSUtils		ο φάκελος παραμέτρων
 Sorry, could not create a new folder.	FSUtils		Λυπούμαστε, αδυναμία δημιουργίας ενός νέου φακέλου.
 MIME Signature	AttributesView		Υπογραφή MIME
 Select all	VirtualDirectoryWindow		Επιλογή όλων
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Μετονομασία
 Clean up all	ContainerWindow		Καθαρισμός όλων
 Add current folder	FilePanelPriv		Προσθήκη τρέχοντος φακέλου
@@ -509,6 +511,7 @@ Create a Query	FindPanel		Δημιούργησε ένα ερώτημα
 Close	QueryContainerWindow		Κλείσιμο
 I know what I'm doing	FSUtils	button label	Ξέρω τι κάνω
 Preparing to copy items…	StatusWindow		Προετοιμασία για αντιγραφή στοιχείων…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Αναφορά καταχώρησης
 Icon view	ContainerWindow		Προβολή εικονιδίου
 The entered folder name is too long.	FSUtils		Το όνομα καταλόγου είναι υπερβολικά μεγάλο.

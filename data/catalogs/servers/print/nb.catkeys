@@ -1,0 +1,54 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-PSRV	1761631281
+Undefined	ConfigWindow		Udefinert
+Return the number of available transports	PrintServerApp Scripting		Returner antall tilgjengelige transporter
+Return the number of available printers	PrintServerApp Scripting		Returner antall tilgjengelige skrivere
+Get currently available ports/devices	Transport Scripting		Hent tilgjengelige porter/enheter
+Retrieve or select the active printer	PrintServerApp Scripting		Hent eller velg den aktive skriveren
+Cancel	PrintServerApp		Avbryt
+Retrieve a specific printer	PrintServerApp Scripting		Hent en bestemt skriver
+Page %1 to %2	ConfigWindow		Side %1 til %2
+Get name of the printer add-on used for this printer	Printer Scripting		Hent navnet på skrivertillegget som brukes for denne skriveren
+Page setup:	ConfigWindow		Sideoppsett
+OK	ConfigWindow		OK
+Cancel	ConfigWindow		Avbryt
+Printer server	ConfigWindow		Skriverserver
+Page %1 to %2, %3 copies	ConfigWindow		Side %1 til %2, %3 kopier
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		En skriver med det navnet finnes allerede, men driveren ble ikke funnet! Erstatte?
+Yes	PrintServerApp		Ja
+Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
+Would you like to set one up now?	PrintServerApp		Ønsker du å installere en nå?
+A6	ConfigWindow	ISO 216 paper size	A6
+Portrait	ConfigWindow		Stående
+All pages	ConfigWindow		Alle sider
+There is no default printer set up.	PrintServerApp		Ingen standardskriver er satt opp.
+B5	ConfigWindow	ISO 216 paper size	B5
+A0	ConfigWindow	ISO 216 paper size	A0
+Letter	ConfigWindow	ANSI A (letter), a North American paper size	Letter
+Printer:	ConfigWindow		Skriver:
+A2	ConfigWindow	ISO 216 paper size	A2
+Select a printer	ConfigWindow		Velg en skriver
+Show configuration window	PrintServerApp Scripting		Vis konfigurasjonsvindu
+A4	ConfigWindow	ISO 216 paper size	A4
+Get comments about this printer	Printer Scripting		Hent kommentarer om denne skriveren
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		En skriver med det navnet finnes allerede, men den er ikke brukbar i det hele tatt! Erstatte?
+No	PrintServerApp		Nei
+Get the transport configuration for this printer	Printer Scripting		Få transportkonfigurasjonen for denne skriveren
+Landscape	ConfigWindow		Liggende
+Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
+There are no printers set up.	PrintServerApp		Ingen skriver er installert.
+Get name of the transport add-on used for this printer	Printer Scripting		Hent navnet på transporttillegget som brukes for denne skriveren
+All pages, %1 copies	ConfigWindow		Alle sider, %1 kopier
+Delete a specific printer	PrintServerApp Scripting		Slett en bestemt skriver
+Create a new printer	PrintServerApp Scripting		Opprett en ny skriver
+OK	PrintServerApp		OK
+Print setup	ConfigWindow		Skriverinnstillinger
+A1	ConfigWindow	ISO 216 paper size	A1
+Retrieve a specific transport	PrintServerApp Scripting		Hent en bestemt transport
+Get name of printer	Printer Scripting		Hent navnet på en skriver
+A3	ConfigWindow	ISO 216 paper size	A3
+Get name of transport	Transport Scripting		Hent transportnavn
+A5	ConfigWindow	ISO 216 paper size	A5
+Would you like to make @ the default printer?	PrintServerApp		Ønsker du å sette @ som standardskriver?
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
+Page setup	ConfigWindow		Sideinnstillinger
+Paper setup:	ConfigWindow		Papirinnstillinger

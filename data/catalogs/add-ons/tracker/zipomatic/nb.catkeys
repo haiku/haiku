@@ -1,0 +1,17 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Drop filer her.
+Filename: %s	file:ZipOMaticWindow.cpp		Filnavn: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Ønsker du å avbryte dem?
+Error creating archive	file:ZipOMaticWindow.cpp		Noe gikk galt under arkiveringen.
+Stop them	file:ZipOMatic.cpp		Avbryt dem
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Er du sikker på at du ønsker å avbryte arkiveringen?
+Preparing to archive	file:ZipperThread.cpp		Forbereder arkivering
+Let them continue	file:ZipOMatic.cpp		La dem fortsette
+Continue	file:ZipOMaticWindow.cpp		Fortsett
+Archive created OK	file:ZipOMaticWindow.cpp		Arkivet ble opprettet
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# fil lagt til.} other{# filer lagt til.}}
+Stop	file:ZipOMaticWindow.cpp		Avbryt
+Stopped	file:ZipOMaticWindow.cpp		Avbrutt
+Archive	file:ZipperThread.cpp		Arkiv
+Creating archive: %s	file:ZipOMaticWindow.cpp		Oppretter arkiv: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Du har {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} kjørende.\n\n

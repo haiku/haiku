@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-GLTeapot	400822745
+1	friulian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Diestre
 Backface culling	TeapotWindow		Scuint muse posteriôr
 Add a teapot	TeapotWindow		Zonte une teiere
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		In bas a çampe
 Fog	TeapotWindow		Fumate
 FPS display	TeapotWindow		Indicadôr FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Limite i FPS ae frecuence di inzornament
 Settings	TeapotWindow		Impostazions
 Gouraud shading	TeapotWindow		Ombrenadure Gouraud
 Lighting	TeapotWindow		Iluminazion

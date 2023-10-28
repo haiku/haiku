@@ -1,0 +1,22 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-JPEGTranslator	3788699631
+Read	JPEGTranslator		Les
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be Bitmap-format (JPEGTranslator)
+Show warning messages	JPEGTranslator		Vis advarsler
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Bruk CMYK-kode med 0 for 100% blekkdekning
+JPEG Library Error: %s\n	be_jerror		JPEG-bibliotekfeil: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasert på IJG-biblioteket ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nmed \"lossless\" kodingsstøtteoppdatering av Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nMed noen rutiner for konvertering av fargerom av Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Ingen
+About	JPEGTranslator		Om
+Version %d.%d.%d	JPEGTranslator		Versjon %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Skriv svart-hvitt-bilder som RGB24
+Output smoothing strength	JPEGTranslator		Utgjevningsstyrke
+Use progressive compression	JPEGTranslator		Bruk progressiv komprimering
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Gjør filen mindre (litt dårligere kvalitet)
+High	JPEGTranslator		Høy
+Read greyscale images as RGB32	JPEGTranslator		Les gråtonebilder som RGB32
+Output quality	JPEGTranslator		Lagringskvalitet
+Low	JPEGTranslator		Lav
+Write	JPEGTranslator		Skriv
+Prevent colors 'washing out'	JPEGTranslator		Forhindre at farger "vaskes ut"
+JPEG Library Warning: %s\n	be_jerror		JPEG-bibliotekadvarsel: %s\n
+JPEG images	JPEGTranslator		JPEG-bilder

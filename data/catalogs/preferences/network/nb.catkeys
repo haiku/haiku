@@ -1,0 +1,55 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Network	543099905
+Ethernet device	InterfaceListItem		Ethernet-enhet
+Link speed:	IntefaceView		Koblingshastighet:
+disconnected	IntefaceView		frakoblet
+WPA	WPA protected network		WPA
+Network:	IntefaceView		Nettverk:
+Received:	IntefaceView		Mottatt:
+New…	NetworkWindow		Ny…
+no link	InterfaceListItem		ingen kobling
+Other	NetworkWindow		Annen
+Sent:	IntefaceView		Sendt:
+Gateway:	IntefaceAddressView		Gateway:
+The netmask defines your local network	IntefaceAddressView		Nettmasken definerer ditt lokale nettverk
+Your IP address	IntefaceAddressView		Din IP-adresse
+DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP-adresse:
+Netmask:	IntefaceAddressView		Nettmaske:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Tjenester
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installering av NetworkStatus i Deskbar mislyktes: %s
+Revert	NetworkWindow		Tilbakestill
+off	ServiceListItem		av
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<ingen trådløse nettverk funnet>
+Enable	IntefaceView		Aktiver
+connected	IntefaceView		tilkoblet
+Apply	IntefaceAddressView		Bruk
+Disable	ServiceView		Deaktiver
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Vis nettverksstatus i Deskbar
+Mode:	IntefaceAddressView		Modus:
+connected	InterfaceListItem		tilkoblet
+OK	NetworkWindow		OK
+Static	IntefaceAddressView		Statisk
+launch error	NetworkWindow		startfeil
+Renegotiate	IntefaceView		Forhandle på nytt
+MAC address:	IntefaceView		MAC-adresse:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		deaktivert
+Dial-up connection	InterfaceListItem		Oppringt tilkobling
+on	ServiceListItem		på
+The method for obtaining an IP address	IntefaceAddressView		Metoden for å få en IP-adresse
+disconnected	InterfaceListItem		frakoblet
+Automatic	IntefaceAddressView		Automatisk
+Choose automatically	IntefaceView		Velg automatisk
+Status:	IntefaceView		Status:
+Disable	IntefaceView		Deaktiver
+Manage…	NetworkWindow		Administrer…
+open	Open network		åpne
+Network	System name		Nettverk
+Your gateway to the internet	IntefaceAddressView		Din inngangsport til internett
+Enable	ServiceView		Aktiver
+Wireless device	InterfaceListItem		Trådløs enhet
+Disabled	IntefaceAddressView		Deaktivert
+VPN connection	InterfaceListItem		VPN-tilkobling

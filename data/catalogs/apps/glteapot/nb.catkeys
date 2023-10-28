@@ -1,0 +1,24 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GLTeapot	1263334963
+Right	TeapotWindow		Høyre
+Backface culling	TeapotWindow		Baksidefrastøtning
+Add a teapot	TeapotWindow		Legg til en tekanne
+Yellow	TeapotWindow		Gul
+Perspective	TeapotWindow		Perspektiv
+Off	TeapotWindow		Av
+Quit	TeapotWindow		Avslutt
+Green	TeapotWindow		Grønn
+Blue	TeapotWindow		Blå
+White	TeapotWindow		Hvit
+Upper center	TeapotWindow		Øvre sentrum
+Filled polygons	TeapotWindow		Fylte polygoner
+Lower left	TeapotWindow		Nedre venstre
+Fog	TeapotWindow		Tåke
+FPS display	TeapotWindow		FPS-visning
+GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Begrens FPS til oppdateringsfrekvens
+Settings	TeapotWindow		Innstillinger
+Gouraud shading	TeapotWindow		Gouraud skyggelegging
+Lighting	TeapotWindow		Lys
+Z-buffered	TeapotWindow		Z-bufret
+Red	TeapotWindow		Rød
+Lights	TeapotWindow		Lys

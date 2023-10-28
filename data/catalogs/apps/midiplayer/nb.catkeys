@@ -1,0 +1,20 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MidiPlayer	1046133011
+This tiny program\nKnows how to play thousands of\nCheesy sounding songs	Main Application	This is a haiku. First line has five syllables, second has seven and last has five again. Create your own.	Lite program nå,\nSpiller tusen låter glatt,\nKlissete, dog bra.
+Dungeon	Main Window		Fangehull
+Could not load song	Main Window		Kunne ikke laste sang
+Igor's lab	Main Window		Igors labb
+Off	Main Window		Av
+Loading instruments…	Scope View		Laster instrumenter…
+Volume:	Main Window		Volum:
+Closet	Main Window		Skap
+Scope	Main Window		Rekkevidde
+Drop MIDI file here	Scope View		Slipp MIDI-fil her
+None	Main Window		Ingen
+Reverb:	Main Window		Klang:
+MidiPlayer	System name		MIDI-spiller
+OK	Main Window		OK
+Stop	Main Window		Stopp
+Live input:	Main Window		Live-inndata:
+Garage	Main Window		Garasje
+Play	Main Window		Spill
+Cavern	Main Window		Hule

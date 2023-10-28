@@ -1,0 +1,13 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-WORK	3927737357
+Quit	Workspaces		Avslutt
+Invalid argument: %s\n	Workspaces		Ugyldig argument: %s\n
+Change workspace count…	Workspaces		Endre antall arbeidsområder...
+Always on top	Workspaces		Alltid øverst
+Show window border	Workspaces		Vis vinduskant
+Show window tab	Workspaces		Vis vindu fane
+Auto-raise	Workspaces		Bring til forgrunnen automatisk
+Remove replicant	Workspaces		Fjern replikant
+Live in the Deskbar	Workspaces		Live i Deskbar
+Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Bruk: %s [alternativer] [arbeidsområde]\nhvor \"alternativer\" er:\n--notitle\t\ttittellinjen fjernet, kantlinje og størrelsesendring beholdt\n--noborder\t\ttittel, kantlinje og størrelsesendring fjernet\n--avoidfocus\t\tforhindrer vinduet fra å bli mål for tastaturhendelser\n--alwaysontop\t\tholder vinduet øverst\n--notmovable\t\tvinduet kan ikke flyttes rundt\n--autoraise\t\thev automatisk arbeidsområdevinduet når det er på skjermkanten\n--help\t\tvis denne hjelpeteksten og avslutter\nog \"arbeidsområde\" er nummeret på arbeidsområdet det skal byttes til (0-31)\n
+Switch on mouse wheel	Workspaces		Bytt med musehjulet
+Workspaces	System name		Arbeidsområder

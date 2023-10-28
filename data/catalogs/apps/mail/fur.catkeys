@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Be-MAIL	4073987023
+1	friulian	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Met come Salvât
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Il to test principâl al conten %ld caratars che no si puedin codificâ. Podaressie lâ ben forsit une cumbinazion di caratars diferente? Frache Invie par inviâlu distès (un caratar sostitutîf al vignarà doprât al puest di chei no codificabii), o sielç Anule par tornâ indaûr e justâ il test.
 Text wrapping:	Mail		Rie gnove automatiche:
@@ -38,7 +38,9 @@ Previous message	Mail		Messaç precedent
 (Address unavailable)	Mail		(Direzion no disponibile)
 Mail	System name		Mail
 Copy link location	Mail		Copie posizion colegament
+Add attachment…	Mail		Zonte zonte…
 Next	Mail		Sucessîf
+Attachments:	Mail		Zontis:
 Show icons only	Mail		Mostre dome lis iconis
 Subject:	Mail		Ogjet:
 OK	Mail		Va ben
@@ -55,6 +57,7 @@ Reply to sender	Mail		Rispuint al mitent
 \\n - Newline	Mail		\\n - Gnove rie (LF)
 Copy	Mail		Copie
 Add signature	Mail		Zonte firme
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Zonte: %name% (Gjenar: %type%)
 %n - Full name	Mail		%n - Non complet
 Signature	Mail		Firme
 Use default account	Mail		Dopre l'account predefinît
@@ -104,8 +107,10 @@ Start now	Mail		Scomence cumò
 (Name unavailable)	Mail		(Non no disponibil)
 Move to trash	Mail		Sposte te scovacere
 <none>	Mail		<vueit>
+Mail settings	Mail		Impostazions Mail
 %d - Date	Mail		%d - Date
 Check spelling	Mail		Control ortografic
+Status:	Mail		Stât:
 Redo	Mail		Torne fâs
 Leave as '%s'	Mail		Lasse come '%s'
 Print…	Mail		Stampe…

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	3982629342
+1	friulian	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -413,6 +413,7 @@ Emptying Trash… 	StatusWindow		Daûr a disvuedâ la scovacere…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # file}}
 Revert	TrackerSettingsWindow		Ripristine
 trash	B_TRASH_DIRECTORY		scovacere
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele di sisteme o il so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele di sisteme o il so contingût, ten fracât il tast Maiusc e fâs clic su \"Sposte\".
 Close all in workspace	ContainerWindow		Siere dut tal spazi di lavôr
 Corrupted expression.	libtracker		Espression corote.
@@ -437,6 +438,7 @@ the config folder	FSUtils		la cartele di configurazion
 Sorry, could not create a new folder.	FSUtils		Nol è stât pussibil creâ une gnove cartele
 MIME Signature	AttributesView		Firme MIME
 Select all	VirtualDirectoryWindow		Selezione dut
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Cambie non
 Clean up all	ContainerWindow		Met a puest dut
 Add current folder	FilePanelPriv		Zonte cartele atuâl
@@ -509,6 +511,7 @@ Create a Query	FindPanel		Cree une interogazion
 Close	QueryContainerWindow		Siere
 I know what I'm doing	FSUtils	button label	O sai ce che o fâs
 Preparing to copy items…	StatusWindow		Daûr a prontâ la copie dai elements…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Rif vôs
 Icon view	ContainerWindow		Viodude a iconis
 The entered folder name is too long.	FSUtils		Il non de cartele inserît al è masse lunc.

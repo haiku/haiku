@@ -1,0 +1,22 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		Ukomprimert
+Indexed	PSDLoader		Indeksert
+Grayscale	PSDLoader		Gråtone
+Photoshop image translator	PSDConfig		Photoshop bilde-oversetter
+Photoshop image translator	PSDTranslator		Photoshop bilde-oversetter
+Version %d.%d.%d, %s	PSDConfig		Versjon %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop-dokument (PSD-fil)
+Photoshop image	PSDTranslator		Photoshop-bilde
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big Document (PSB-fil)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Photoshop-bilde (%s)
+PSDTranslator Settings	PSDConfig		Innstillinger for PSDTranslator
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitmap
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Komprimering: 
+Format: 	PSDConfig		Format: 
+Multichannel	PSDLoader		Multikanal
+Duotone	PSDLoader		Duotone

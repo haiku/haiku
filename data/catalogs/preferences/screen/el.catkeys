@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Screen	133788249
+1	greek, modern (1453-)	x-vnd.Haiku-Screen	2318349707
 no	Screen		όχι
 bits/pixel	Screen		bits/εικονοστοιχείο
 15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
@@ -13,6 +13,7 @@ Video format:	Screen		Μορφή βίντεο:
 Undo	Screen		Αναίρεση
 OK	Screen		Εντάξει
 Current workspace	Screen		Τρέχων χώρος εργασίας
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		κάθετα
 All workspaces	Screen		Όλοι οι χώροι εργασίας
 Use laptop panel:	Screen		Χρήση πάνελ φορητού υπολογιστή:

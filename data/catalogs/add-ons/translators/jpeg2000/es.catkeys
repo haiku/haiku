@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-JPEG2000Translator	2331342812
+1	spanish; castilian	x-vnd.Haiku-JPEG2000Translator	2600689257
 High	JPEG2000Translator		Alta
 Low	JPEG2000Translator		Baja
 Output quality	JPEG2000Translator		Calidad de salida
@@ -6,6 +6,7 @@ JPEG2000 images	JPEG2000Translator		imágenes JPEG2000
 About	JPEG2000Translator		Acerca de
 Write black-and-white images as RGB24	JPEG2000Translator		Grabar las imágenes blanco y negro como RGB24
 Version %d.%d.%d	JPEG2000Translator		Versión %d.%d.%d
+Read	JPEG2000Translator		Lectura
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBasado en la biblioteca JasPer:\n© 1999-2000, Image Power, Inc. y\nla Universidad de la Columbia Británica, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nEl códec de ImageMagick's jp2 se usa como «tutorial».\n\thttp://www.imagemagick.org/\n
 Write	JPEG2000Translator		Escribir
 Output only codestream (.jpc)	JPEG2000Translator		Flujo de solo salida (.jpc)

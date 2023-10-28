@@ -1,0 +1,27 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GLInfo	1282327690
+Maximum clipping planes	Capabilities		Maks antall klippeplan
+Maximum evaluators equation order	Capabilities		Maksimal evaluator ligningsrekkefølge
+Texture stack size	Capabilities		Stack-størrelse for tekstur
+GL Info	System name		GL Info
+Information	InfoView		Informasjon
+Attributes stack size	Capabilities		Stack-størrelse for attributter
+Maximum lights	Capabilities		Maks antall lys
+Extensions	Extensions		Utvidelser
+Available extensions	Extensions		Tilgjengelige utvidelser
+Maximum recommended vertex elements	Capabilities		Maks antall anbefalte vertex-elementer
+Value	Capabilities		Verdi
+Name stack size	Capabilities		Stack-størrelse for navn
+Capabilities	Capabilities		Evner
+Maximum texture units	Capabilities		Maks antall tekstur-enheter
+Unknown or missing OpenGL renderer.	InfoView		Ukjent eller manglende OpenGL-renderer.
+Capability	Capabilities		Evne
+Maximum 2D texture size	Capabilities		Maks størrelse på 2D-teksturer
+Auxiliary buffer(s)	Capabilities		Hjelpebuffer(e)
+Unknown vendor	InfoView		Ukjent leverandør
+Maximum convolution	Capabilities		Maksimal konvolusjon
+Maximum 3D texture size	Capabilities		Maks størrelse på 3D-teksturer
+Maximum recommended index elements	Capabilities		Maks anbefalte indekselementer
+Unknown version	InfoView		Ukjent versjon
+List stack size	Capabilities		Stack-størrelse for lister
+Model stack size	Capabilities		Stack-størrelse for model
+Projection stack size	Capabilities		Stack-størrelse for projeksjon

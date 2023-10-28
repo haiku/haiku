@@ -1,0 +1,17 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		Sti:
+Name:	DataTranslations		Navn:
+DataTranslations - Note	DataTranslations		Formatoversetter - Notiser
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Elementet '%name' ser ikke ut til å være en oversetter og vil ikke bli installert.
+Could not install %s:\n%s	DataTranslations		Kunne ikke installere %s:\n%s
+OK	DataTranslations		OK
+Cancel	DataTranslations		Avbryt
+Info:	DataTranslations		Info:
+DataTranslations - Error	DataTranslations		Formatoverstter - Feil
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Bruk dete kontrollpanelet for å sette standardvalg for oversettere som skal brukes når et program ikke spseifiserer andre innstillinger.
+The new translator has been installed successfully.	DataTranslations		Installasjonen av den nye oversetteren var vellykket.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et element kalt '%name' finnes allerede i oversettermappen! Skal den eksisterende oversetteren overskrives?
+DataTranslations	System name		Formatoversetter
+Info	DataTranslations		info
+Overwrite	DataTranslations		Overskriv
+Version:	DataTranslations		Versjon:

@@ -1,0 +1,51 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Start blåtanntjenester...
+From all devices	Settings view		Fra alle enheter
+Defaults	Window		Standardinnstillinger
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Sjekk at blåtannfunksjonen i dine fjernenheter er aktivert. Trykk "Oppslag" for å begynne å skanne. Den nødvendige tiden for å motta navnene er ukjent, men det burde ikke ta mer enn 3 sekunder per enhet. Etterpå kan du legge dem til din hovedliste, hvor du kan pare dem sammen.
+Laptop	Settings view		Bærbar
+Scanning progress	Inquiry panel		Skannefremgang
+Only from trusted devices	Settings view		Kun fra betrodde enheter
+Launch now	main		Start nå
+Bluetooth	System name		Blåtann
+Remove	Remote devices		Fjern
+Pick device…	Settings view		Velg enhet…
+Always ask	Settings view		Spør alltid
+Quit	main		Avslutt
+15 secs	Settings view		15 sekunder
+Help	Window		Hjelp
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Med støtte fra:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nTakk til alle som har hjulpet til…\n\nSende/donere maskinvare:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nØkonomisk:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nMed patcher:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nSom ga meg all kunnskapen:\n - the yellowTAB team
+Manufacturer: 	Device View		Produsent:
+Pair…	Remote devices		Par...
+Desktop	Settings view		Skrivebord
+Server	Window		Tjener
+Retrieving name of %1	Inquiry panel		Henter navn på %1
+Identify host as:	Settings view		Identifiser verten som:
+Inquiry	Inquiry panel		Oppslag
+Local devices found on system:	Settings view		Lokale enheter funnet på systemet:
+Service classes: 	Device View		Service-klasser:
+Incoming connections policy:	Settings view		Retningslinjer for inkommende tilkoblinger:
+Remote devices	Window		Fjernenheter
+Retrieving names…	Inquiry panel		Henter navn…
+Add device to list	Inquiry panel		Legg enhet til i listen
+Show name	Extended local device view		Vis navn
+Settings	Window		Innstillinger
+Remaining %1 seconds	Inquiry panel		Gjenstår %1 sekunder
+Stop bluetooth services…	Window		Stopp blåtanntjenester…
+61 secs	Settings view		61 sekunder
+Authenticate	Extended local device view		Autentiser
+Discoverable	Extended local device view		Synlig
+The Bluetooth services are not currently running on this system.	main		Bluetooth-tjenestene kjører for øyeblikket ikke på dette systemet.
+Add…	Remote devices		Legg til…
+Scanning completed.	Inquiry panel		Søk fullført.
+Smart phone	Settings view		Smarttelefon
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Det er ingen lokal blåtannenhet registrert på systemet.
+Default inquiry time:	Settings view		Standard forespørselstid:
+Revert	Window		Tilbakestill
+Refresh local devices…	Window		Oppdater lokale enheter…
+Server	Settings view		Tjener
+ packets: 	Device View		 pakker: 
+Handheld	Settings view		Håndholdt
+Disconnect	Remote devices		Koble fra
+About Bluetooth…	Window		Om Blåtann…
+Starting scan…	Inquiry panel		Starter skanning…

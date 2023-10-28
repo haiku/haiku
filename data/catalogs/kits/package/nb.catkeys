@@ -1,0 +1,10 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		Henter programarkiv-cache fra %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Validerer sjekksum for %repositoryName
+Failed to remove transaction directory	PackageManagerKit		Kunne ikke fjerne transaksjonsmappen
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente konfigurasjon for programarkivet \"%s\". Hopper over.
+Refreshing repository \"%s\" failed	PackageManagerKit		Oppdatering av programarkivet \"%s\" mislyktes
+Fetching repository checksum from %url	RefreshRepositoryRequest		Henter sjekksum for programarkiv fra %url
+Failed to get repository names	PackageManagerKit		Kunne ikke hente programarkivnavn
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Kunne ikke hente hurtigbuffer for programarkivet \"%s\". Hopper over.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Pakken %s-%s har ikke samsvarende krav for sin grunnpakke \"%s\"

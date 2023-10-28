@@ -1,0 +1,17 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		for å utføre følgende handling:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		Denne applikasjonen har ennå ikke de nødvendige rettighetene.
+Keyring:	KeyRequestWindow		Nøkkelring:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		ber om tilgang til nøkkelring:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		Applikasjonstilgang til nøkkelring
+Disallow	AppAccessRequestWindow		Ikke tillat
+Allow once	AppAccessRequestWindow		Tillat en gang
+Unlock keyring	KeyRequestWindow		Lås opp nøkkelring
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		En applikasjon vil ha tilgang til nøkkelringen nedenfor, men den er låst med et passord. Vennligst skriv inn passordet for å låse opp nøkkelringen.\nHvis du låser opp nøkkelringen, forblir den ulåst til systemet slås av eller nøkkelringen låses manuelt igjen.\nHvis du avbryter denne dialogen, forblir nøkkelringen låst.
+Password:	KeyRequestWindow		Passord:
+Cancel	KeyRequestWindow		Avbryt
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Denne applikasjonen har blitt oppdatert siden den sist ble gitt tilgang.
+Allow always	AppAccessRequestWindow		Tillat alltid
+Unlock	KeyRequestWindow		Lås opp
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Applikasjonen:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		Denne applikasjonen har ikke fått tilgang før.

@@ -1,0 +1,17 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.mmu_man.filepanel	1996091223
+display a load/save file panel\n	FilePanelApp		vis panel for åpning/lagring av filer\n
+short\tlong\tdescription\n	FilePanelApp		kort\tlang\tbeskrivelse\n
+%s not a valid option\n	FilePanelApp		%s ugyldig valg\n
+-s\t--save\tuse a save FilePanel\n	FilePanelApp		-s\t--save\tbruk et lagre-filpanel\n
+%s: this option requires a parameter\n	FilePanelApp		%s: dette valget krever et parameter\n
+-h\t--help\tdisplay usage\n	FilePanelApp		-h\t--help\tvis bruk\n
+-l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tbruk et last-Filpanel (standard)\n
+-n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tsett standardnavn for lagring\n
+-k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttype oppføringer som kan åpnes (smak): enhver kombinasjon av f, d, s (fil (standard), mappe, symlink)\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		bruk: %s [-h]     [-d mappe]              [-l|-s]     [-t ttl]      [-1]       [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		bruk: %s [--help] [--mappe] [--load|--save] [--title ttl] [--single] [--modal]\n
+-t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tsett Filpanel-vindustittel\n
+-1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\ttillat kun én fil å bli valgt\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tgjør Filpanel modalt\n
+options:\n	FilePanelApp		valgmuligheter:\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tåpne i <folder>\n

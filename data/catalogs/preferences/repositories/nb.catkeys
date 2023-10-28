@@ -1,0 +1,42 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Dette er ikke en gyldig URL.
+Repository URL:	AddRepoWindow	Text box label	Programarkiv-URL:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Det oppsto en feil under oppdatering av programarkivbufferen for %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Det oppstod en feil under deaktivering av programarkivet %name%
+Unknown	Constants	Unknown repository name	Ukjent
+Remove all	RepositoriesView	Button label	Fjern alle
+Enable repositories to use with package management:	RepositoriesView	Label text	Aktiver programarkiver for bruk med pakkeadministrasjon:
+Disable	RepositoriesView	Button label	Deaktiver
+Cancel task	TaskTimer	Button label	Avbryt oppgave
+Changes completed	RepositoriesView	Status view text	Endringer fullført
+Details	TaskLooper	Job log details header	Detaljer
+Enabled	RepoRow	Tag in the Status column	Aktivert
+Remove	Constants	Button label	Fjern
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Det oppstod en feil ved aktivering av programarkivet %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Fjerne dette programarkivet?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	Oppgaven for programarkivet %name% ser ut til å ta lang tid å fullføre.
+Completed	TaskLooper	Completed task status message	Fullført
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	Status
+Name	RepositoriesView	Column title	Navn
+Add	AddRepoWindow	Button label	Legg til
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Programarkivet kunne ikke hente navn på aktive programarkiver.
+Enable all	RepositoriesView	Button label	Aktiver alle
+Aborted	TaskLooper	Aborted task status message	Avbrutt
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Aktiver
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Feil ved henting av programarkivkonfigurasjonen for %name%.
+Description	TaskLooper	Failed task error description	Beskrivelse
+Failed	TaskLooper	Failed task status message	Mislyktes
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Gode ​​nyheter! Oppgaven for programarkivet %name% fullført.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Noen oppgaver kjører fortsatt. Vil du stoppe disse og avslutte?
+This repository URL already exists.	RepositoriesView	Error message	Denne programarkiv-URLen eksisterer allerede.
+Repositories	System name		Programarkiv
+Changes pending:	RepositoriesView	Status view text	Ventende endringer:
+Remove	RepositoriesView	Button label	Fjern
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Fjerne disse programarkivene?
+Keep trying	TaskTimer	Button label	Fortsett å prøve
+Cancel	Constants	Button label	Avbryt
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Bare én URL for hvert programarkiv kan aktiveres. Vennligst endre valgene dine.
+Stop and quit	RepositoriesWindow	Button label	Stopp og avslutt
+Disable all	RepositoriesView	Button label	Deaktiver alle

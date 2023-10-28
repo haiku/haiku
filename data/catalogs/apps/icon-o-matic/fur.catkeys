@@ -1,8 +1,13 @@
-1	friulian	x-vnd.haiku-icon_o_matic	1244334028
+1	friulian	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Nissun
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Nete il segn
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Zonte vueit
 Opening the icon failed!	Icon-O-Matic-Main		No si è rivâts a vierzi la icone!
-Add with path	Icon-O-Matic-ShapesList		Zonte cun percors
+Reverse path	Icon-O-Matic-ReversePathCmd		Invertìs segn
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Bip!
+Add with path	Icon-O-Matic-ShapesList		Zonte cun segn
+Paste properties	Icon-O-Matic-Properties		Proprietâts di tache
 Copy	Icon-O-Matic-Properties		Copie
 Color	Icon-O-Matic-PropertyNames		Colôr
 Format	Icon-O-Matic-SavePanel		Formât
@@ -10,85 +15,144 @@ Color	Icon-O-Matic-StyleTypes		Colôr
 Select	Icon-O-Matic-Properties		Selezione
 Reset transformation	Icon-O-Matic-ShapesList		Azere trasformazion
 Duplicate	Icon-O-Matic-StylesList		Dupliche
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Volte
 Shorten	Icon-O-Matic-PropertyNames		Scurte
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Sposte {0, plural, one{trasformadôr} other{trasformadôrs}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Il test che si sta cirint di impuartâ al è une vore lunc, sino sigûrs?
 Paste	Icon-O-Matic-Properties		Tache
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		A son masse stîi. Il formât HVIF a'nt supuarte al massim 255.
 Close	Icon-O-Matic-Menu-File		Siere
 Add rect	Icon-O-Matic-PathsList		Zonte retangul
 Rotation	Icon-O-Matic-PropertyNames		Rotazion
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Colôr (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		Atribût BEOS:ICON
 Transform	Icon-O-Matic-PathManipulator		Trasforme
 Add shape with style	Icon-O-Matic-Menu-Shape		Zonte sagome cun stîl
+Change color	Icon-O-Matic-SetColorCmd		Cambie colôr
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Gjave {0, plural, one{vertiç} other{vertiçs}}
+Unassign path	Icon-O-Matic-UnassignPathCmd		Gjave assegnazion segn
 Remove	Icon-O-Matic-StylesList		Gjave
 Cancel	Icon-O-Matic-Menu-Settings		Anule
+PNG set	Icon-O-Matic-SavePanel		Stabilìs PNG
 Transformation	Icon-O-Matic-TransformationBoxStates		Trasformazion
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Sposte {0, plural, one{segn} other{segns}}
 Closed	Icon-O-Matic-PropertyNames		Sierât
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nie di tornâ a fâ>
 Height	Icon-O-Matic-PropertyNames		Altece
 warning	Icon-O-Matic-SVGExport		avertiment
 File	Icon-O-Matic-Menus		File
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	une cualsisei des altris listis in
 Properties	Icon-O-Matic-Menus		Proprietâts
-Path	Icon-O-Matic-PropertyNames		Percors
-Path	Icon-O-Matic-Menus		Percors
+Path	Icon-O-Matic-PropertyNames		Segn
+Path	Icon-O-Matic-Menus		Segn
 Stroke	Transformation		Tresse
 Flip	Icon-O-Matic-PathManipulator		Ribalte
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	modifiche lis sôs proprietâts achì.
+Move pivot	Icon-O-Matic-TransformationBoxStates		Sposte pivot
 Opacity	Icon-O-Matic-PropertyNames		Opacitât
 OK	Icon-O-Matic-ColorPicker		Va ben
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Impostazion multiple %property%
 Error: 	Icon-O-Matic-Main		Erôr: 
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Ristabilìs {0, plural, one{trasformazion} other{trasformazions}}
+Assign style	Icon-O-Matic-AssignStyleCmd		Assegne stîl
 Saving your document failed!	Icon-O-Matic-Exporter		No si è rivâts a salvâ il document!
 Snap to grid	Icon-O-Matic-Menu-Settings		Vincole ae gridele
 Opening the document failed!	Icon-O-Matic-Main		No si è rivâts a vierzi il document!
-Add with path & style	Icon-O-Matic-ShapesList		Zonte cun percors e stîl
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Gjave {0, plural, one{stîl} other{stîi}}
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Un o plui segns a àn masse vertiçs. Il formât HVIF a'nt supuarte un massim di 255 par grafic.
+Add with path & style	Icon-O-Matic-ShapesList		Zonte cun segn e stîl
 Shape	Icon-O-Matic-Menus		Sagome
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Divît {0, plural, one{vertiç} other{vertiçs}}
 <unavailable>	Icon-O-Matic-StyleTypes		<no disponibil>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Modifiche gradient
 Min LOD	Icon-O-Matic-PropertyNames		LOD minim
+Redo: %action%	Icon-O-Matic-Main		Torne fâs: %action%
 Add	Icon-O-Matic-TransformersList		Zonte
 Settings	Icon-O-Matic-Menus		Impostazions
 Scale X	Icon-O-Matic-PropertyNames		Scjale X
 Add	Icon-O-Matic-PathsList		Zonte
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Zonte {0, plural, one{stîl} other{stîi}}
 Remove	Icon-O-Matic-PathManipulator		Gjave
 Duplicate	Icon-O-Matic-ShapesList		Dupliche
+Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Contor
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Zonte {0, plural, one{trasformadôr} other{trasformadôrs}}
+Miter limit	Icon-O-Matic-PropertyNames		Limit di comissure
+Insert vertex	Icon-O-Matic-InsertPointCmd		Inserìs vertiç
 Rounding	Icon-O-Matic-PropertyNames		Staronzament
 Joins	Icon-O-Matic-PropertyNames		Al unìs
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		A son masse formis. Il formât HVIF a'nt supuarte al massim 255.
 Cancel	Icon-O-Matic-ColorPicker		Cancele
 Duplicate	Icon-O-Matic-PathsList		Dupliche
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Sposte {0, plural, one{forme} other{formis}}
 Save	Icon-O-Matic-Menu-Settings		Salve
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	Fâs clic suntun ogjet in
 Export as…	Icon-O-Matic-Menu-File		Espuarte come…
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		Bloche {0, plural, one{forme} other{formis}}
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Gjave {0, plural, one{forme} other{formis}}
+Undo: %action%	Icon-O-Matic-Main		Disfe: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Don't save	Icon-O-Matic-Menu-Settings		No sta salvâ
-Add shape with path	Icon-O-Matic-Menu-Shape		Zonte sagome cun percors
+Add shape with path	Icon-O-Matic-Menu-Shape		Zonte forme cun segn
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	Pecjât
 Translation X	Icon-O-Matic-PropertyNames		Traslazion X
+Multi-paste properties	Icon-O-Matic-Properties		Proprietâts tache-multipli
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic al podarès no vê interpretât ducj i dâts dal SVG cuant che al è stât cjariât. Sorescrivint il file origjinâl, cheste informazion e larès pierdude.
 Rotate indices backwards	Icon-O-Matic-PathsList		Volte i indiçs indaûr
 Overwrite	Icon-O-Matic-SVGExport		Sorescrîf
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Zonte {0, plural, one{forme} other{formis}}
 Cancel	Icon-O-Matic-SVGExport		Cancele
 Open…	Icon-O-Matic-Menu-File		Vierç…
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Gjave {0, plural, one{trasformadôr} other{trasformadôrs}}
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Fâs clic suntune forme parsore
 Remove	Icon-O-Matic-ShapesList		Gjave
+Multi-paste	Icon-O-Matic-Properties		Tache-multipli
+Bad news	Title of error alert		Brutis gnovis
+HVIF source code	Icon-O-Matic-SavePanel		Codiç sorzint HVIF
 Drop shapes	Icon-O-Matic-ShapesList		Scarte lis formis
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Salve icone
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Assegne {0, plural, one{segn} other{segns}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Gjave {0, plural, one{ogjet} other{ogjets}}
 Linear	Icon-O-Matic-StyleTypes		Lineâr
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Sposte {0, plural, one{ogjet} other{ogjet}}
+Add vertex	Icon-O-Matic-AddPointCmd		Zonte vertiç
 Clean up	Icon-O-Matic-PathsList		Nete
 Split	Icon-O-Matic-PathManipulator		Divît
 Move	Icon-O-Matic-TransformationBoxStates		Sposte
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		A son masse segns. Il formât HVIF a'nt supuarte al massim 255.
 Conic	Icon-O-Matic-StyleTypes		Conic
 Name	Icon-O-Matic-PropertyNames		Non
 Reset transformation	Icon-O-Matic-StylesList		Azere trasformazion
 Reverse	Icon-O-Matic-PathsList		Invertìs
 Remove	Icon-O-Matic-PathsList		Gjave
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
+Load error	Icon-O-Matic-SVGImport		Erôr di cjariament
 Style type	Icon-O-Matic-StyleTypes		Gjenar di stîl
 Quit	Icon-O-Matic-Menu-File		Jes
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		Une o plui formis a àn masse trasformadôrs. Il formât HVIF a'nt supuarte un massim di 255 par forme.
 Gradient	Icon-O-Matic-StyleTypes		Gradient
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Colôr (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		Rileve orient.
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Zonte {0, plural, one{segn} other{segns}}
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Un o plui formis a àn masse segns. Il formât HVIF a'nt supuarte un massim di 255 par forme.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Zonte sagome cun percors e stîl
 Radial	Icon-O-Matic-StyleTypes		Radiâl
 Text too long	Icon-O-Matic-StyledTextImport		Test masse lunc
 Caps	Icon-O-Matic-PropertyNames		Cjâfs
 OK	Icon-O-Matic-SVGImport		Va ben
+Import text	Icon-O-Matic-StyledTextImport		Impuarte test
 Append…	Icon-O-Matic-Menu-File		Zonte…
 Scale Y	Icon-O-Matic-PropertyNames		Scjale Y
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Espuarte icone
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Volte indiçs segn
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Zonte {0, plural, one{ogjet} other{ogjets}}
 Rotate indices forwards	Icon-O-Matic-PathsList		Volte i indiçs indenant
 Save	Icon-O-Matic-Menu-File		Salve
+Cancel	Icon-O-Matic-StyledTextImport		Anule
 Add circle	Icon-O-Matic-PathsList		Zonte cercli
 Freeze transformation	Icon-O-Matic-ShapesList		Inglace trasformazion
+META:ICON attribute	Icon-O-Matic-SavePanel		Atribût META:ICON
 Untitled	Icon-O-Matic-Main		Cence non
 Max LOD	Icon-O-Matic-PropertyNames		LOD massim
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvâ lis modifichis ae icone prime di sierâ?
@@ -96,22 +160,33 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No 
 Save as…	Icon-O-Matic-Menu-File		Salve come…
 Swatches	Icon-O-Matic-Menus		Campions
 <modify path>	Icon-O-Matic-PathCmd		<modifiche percors>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Stabilìs %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nuie di disfâ>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Gjave {0, plural, one{segn} other{segns}}
 Add	Icon-O-Matic-StylesList		Zonte
 Translation Y	Icon-O-Matic-PropertyNames		Traslazion Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Modifiche vertiç
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		Sposte {0, plural, one{stîl} other{stîi}}
 Scale	Icon-O-Matic-TransformationBoxStates		Scjale
 All	Icon-O-Matic-Properties		Dut
 Transformer	Icon-O-Matic-Menus		Trasformadôr
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Ribalte {0, plural, one{vertiç} other{vertiçs}}
 Invert selection	Icon-O-Matic-Properties		Invertìs selezion
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	par colegâ i trasformadôrs.
 <unkown property>	Icon-O-Matic-PropertyNames		<proprietât no cognossude>
 Pick a color	Icon-O-Matic-ColorPicker		Sielç un colôr
 Settings…	Icon-O-Matic-SavePanel		Impostazions…
+Select all	Icon-O-Matic-PathManipulator		Selezione dut
 Add with style	Icon-O-Matic-ShapesList		Zonte cun stîl
 New	Icon-O-Matic-Menu-File		Gnûf
+Change perspective	Icon-O-Matic-PerspectiveCommand		Cambie prospetive
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Sburte un pôc {0, plural, one{vertiç} other{vertiçs}}
 Gradient type	Icon-O-Matic-StyleTypes		Gjenar di gradient
+Perspective	Transformation		Prospetive
 Export	Icon-O-Matic-Menu-File		Espuarte
 Width	Icon-O-Matic-PropertyNames		Largjece
+Add reference image	Icon-O-Matic-ShapesList		Zonte imagjin di riferiment
 Style	Icon-O-Matic-Menus		Stîl
 Off	Icon-O-Matic-Menu-Settings		Off
 Edit	Icon-O-Matic-Menus		Modifiche

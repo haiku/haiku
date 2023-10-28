@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-LaunchBox	1530497419
+1	greek, modern (1453-)	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Ορισμός περιγραφή…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Είστε σίγουρος ότι θέλετε να κλείσετε αυτό το σημειωματάριο;\n(Το σημειωματάριο δε θα αποθηκευτεί)
 OK	LaunchBox		ΟΚ
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Εμφάνιση συνόρων παραθύρου
 Failed to launch 'something', error in Pad data.	LaunchBox		Η εκκίνηση του 'κάποιου' απέτυχε, σφάλμα στα δεδομένα της σημείωσης.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Αυτόματη ανύψωση
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Μέγεθος εικονιδίου
 Open containing folder	LaunchBox		Άνοιγμα εμπεριεχόμενου φακέλου
 Add button here	LaunchBox		Προσθέστε κουμπί εδώ

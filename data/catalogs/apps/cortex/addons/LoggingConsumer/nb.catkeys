@@ -1,0 +1,9 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Be.LoggingConsumerApp	2097919131
+Priority	CortexAddOnsLoggingConsumer		Prioritet
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
+Thread priority	CortexAddOnsLoggingConsumer		Trådprioritet
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stopp
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Kontroller
+controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
+percent	CortexAddOnsLoggingConsumer		prosent

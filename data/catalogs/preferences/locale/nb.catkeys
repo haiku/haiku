@@ -1,0 +1,30 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Locale	1081217032
+Medium format:	TimeFormatSettings		Medium format:
+Negative:	TimeFormatSettings		Negativ:
+Language	Locale Preflet Window		Språk
+Short format:	TimeFormatSettings		Kortformat:
+24 hour	TimeFormatSettings		24 timer
+Locale	Locale Preflet Window		Lokalitet
+Time	TimeFormatSettings		Tid
+Defaults	Locale Preflet Window		Standardinnstillinger
+Locale	System name		Språk
+Date	TimeFormatSettings		Dato
+OK	Locale Preflet Window		OK
+Long format:	TimeFormatSettings		Langformat:
+Numbers	TimeFormatSettings		Tall
+Available languages	Locale Preflet Window		Tilgjengelige språk
+Locale	Locale Preflet		Lokalitet
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kan ikke finne tilgjengelige språk! Disse innstillingene kan ikke benyttes!
+Formatting	Locale Preflet Window		Format
+Use month/day-names from preferred language	TimeFormatSettings		Bruk måned- og dagsnavn fra foretrukket språk
+already chosen	LanguageListView		allerede valgt
+Preferred languages	Locale Preflet Window		Foretrukne språk
+Full format:	TimeFormatSettings		Fullt format:
+Cancel	Locale Preflet Window		Avbryt
+Revert	Locale Preflet Window		Tilbakestill
+Translate application and folder names	TimeFormatSettings		Oversett applikasjons- og mappenavn
+12 hour	TimeFormatSettings		12 timer
+Positive:	TimeFormatSettings		Positiv:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Deskbar og Tracker må startes på nytt for at denne endringen skal bli gjeldende. Vil du starte dem på nytt nå?
+Restart	Locale Preflet Window		Start på nytt
+Currency	TimeFormatSettings		Valuta

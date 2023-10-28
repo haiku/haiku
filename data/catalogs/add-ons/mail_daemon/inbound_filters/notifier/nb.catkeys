@@ -1,0 +1,14 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NewMailNotification	1375000288
+Log window	NotifierConfigView		Loggvindu
+none	NotifierConfigView		ingen
+New mails notification	NotifierFilter		Varsel om ny e-post
+Alert	NotifierConfigView		Varsel
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Sentral varsling
+Beep	NotifierConfigView		Pip
+Central beep	NotifierConfigView		Sentralt pip
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{En ny melding} other{# nye meldinger}}
+New messages	NotifierFilter		Nye meldinger
+Method:	NotifierConfigView		Metode:
+Keyboard LEDs	NotifierConfigView		Tastatur LED
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Du har {0, plural, one{en ny melding} other{# nye meldinger}} for %account.

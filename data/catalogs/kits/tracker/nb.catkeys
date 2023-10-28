@@ -1,0 +1,521 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	746720348
+Created	ContainerWindow		Opprettet
+Icon	AttributesView		Ikon
+Open and make preferred	OpenWithWindow		Åpne og gjør til standard
+Kind	ContainerWindow		Type
+Open with…	ContainerWindow		Åpne med...
+Error moving \"%name\" to Trash. (%error)	FSUtils		Feil ved flytting av \"%name\" til søppelkurv. (%error)
+Or	FindPanel		Eller
+MIME Description	AttributesView		MIME-beskrivelse
+before	FindPanel		før
+Volume icons	TrackerSettingsWindow		Volumikoner
+Ignore case	SelectionWindow		Ikke skill mellom stor og liten bokstav
+Current folder	ContainerWindow		Nåværende mappe
+Finish: %time - Over %finishtime left	StatusWindow		Ferdig: %time - Mer enn %finishtime left
+Mount all disks now	AutoMounterSettings		Monter alle disker nå
+Location:	InfoWindow		Sted:
+Name	PoseView		Navn
+Kind:	InfoWindow		Type:
+contains	FindPanel		inneholder
+Open	FilePanelPriv		Åpne
+Bitmap icon	AttributesView		Bitmap-ikon
+You can't replace a folder with one of its sub-folders.	FSUtils		Du kan ikke erstatte en mappe med en av sine undermapper.
+Select…	VirtualDirectoryWindow		Velg…
+Name	Default Query Columns		Navn
+Unmount	ContainerWindow		Avmonter
+Eject when unmounting	AutoMounterSettings		Løs ut ved avmontering
+Searching for disks to mount…	StatusWindow		Søker etter disker å montere...
+Value	AttributesView		Verdi
+Information	InfoWindow		Informasjon
+Error emptying Trash	FSUtils		Feil ved tømming av papirkurven
+Opens with:	InfoWindow		Åpnes med:
+Size	QueryPoseView		Størrelse
+Disk mount	TrackerSettingsWindow		Diskmontering
+Type	AttributesView		Type
+Prompt	FSUtils		Ledetekst
+Error in regular expression:\n\n'%errstring'	PoseView		Feil i regulært uttrykk:\n\n'%errstring'
+Small bitmap icon	AttributesView		Lite bitmap-ikon
+Would you like to find a suitable application to open the file?	FSUtils		Ønsker du å finne et passende program for å åpne denne filen?
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan ikke erstatte en mappe eller symbolsk lenke med en fil.
+(unknown)	InfoWindow		(ukjent)
+{0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datoer>}}
+Trailing \\.	libtracker		Etterfølgende \.
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ved %func \nfind_directory() mislyktes. \nGrunn: %error
+Handles any file	OpenWithWindow		Håndterer alle filer
+save text	FilePanelPriv		lagre tekst
+Raw data	AttributesView		Rå data
+Preparing to move items…	StatusWindow		Forbereder flytting av oppføringer...
+Size	ContainerWindow		Størrelse
+Select…	ContainerWindow		Velg...
+Show shared volumes on Desktop	SettingsView		Vis delte volumer på skrivebordet
+Size	PoseView		Størrelse
+matches wildcard expression	SelectionWindow		treffer wildcard uttrykk
+Title	Bookmark Query Columns		Tittel
+Identify	ContainerWindow		Identifiser
+Create link	ContainerWindow		Lag lenke
+starts with	FindPanel		begynner med
+Replace	FSUtils		Erstatt
+?+* follows nothing.	libtracker		?+* følger ikke noenting.
+Rectangle	AttributesView		Rektangel
+Move to	ContainerWindow		Flytt til
+Status	Email Query Columns		Status
+New folder	FSUtils		Ny mappe
+Junk on end.	libtracker		Søppel på enden.
+New Query	FindPanel		Nytt Søk
+system	B_SYSTEM_DIRECTORY		system
+Preparing to delete items…	StatusWindow		Forbereder på å slette elementer...
+Open %name with:	OpenWithWindow		Åpne %name med:
+\"%name\" is an unsupported executable.	FSUtils		\"%name\" er en kjørbar fil som ikke støttes.
+You cannot copy or move the root directory.	FSUtils		Du kan ikke kopiere eller flytte rotkatalogen.
+Plain text	AttributesView		Ren tekst
+Capacity:	InfoWindow		Kapasitet:
+File	ContainerWindow		Fil
+Relation	OpenWithWindow		Relasjon
+Moving: 	StatusWindow		Flytter:
+Select	SelectionWindow		Velg
+Select	InfoWindow		Velg
+OK	OpenWithWindow		OK
+Include trash	FindPanel		Inkluder søppelkurv
+Clean up	ContainerWindow		Rydd opp
+Modified	FindPanel		Endret
+ (block size: 	InfoWindow		 (blokkstørrelse: 
+Select all	QueryContainerWindow		Merk alle
+Generate image thumbnails	SettingsView		Generer miniatyrbilder
+Select…	FilePanelPriv		Velg...
+An item named '%filename%' already exists.	FSUtils		Et element kalt '%filename%' finnes allerede.
+preferences	B_PREFERENCES_DIRECTORY		preferanser
+Name	Person Query Columns		Navn
+Skip all	FSUtils		Dropp alle
+Corrupted opcode.	libtracker		Korrupt opcode.
+Atom	AttributesView		Atom
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed av %TotalSize, %BytesPerSecond/s
+Preparing to restore items…	StatusWindow		Forbereder gjenoppretting av oppføringer...
+Mount	ContainerWindow		Monter
+{0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# rektangler>}}
+Desktop	B_DESKTOP_DIRECTORY		Skrivebord
+Corrupted pointers.	libtracker		Korrupte pekere.
+Link to:	InfoWindow		Lenke til:
+Copy here	ContainerWindow		Kopier hit
+Character	AttributesView		Tegn
+All disks	FindPanel		Alle disker
+Affine transform	AttributesView		Affin transformasjon
+Window	ContainerWindow		Vindu
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+Remove	FindPanel		Fjern
+Company	Person Query Columns		Selskap
+Recent documents	FavoritesMenu		Siste dokumenter
+Save as Query template:	FindPanel		Lagre som mal for Søk
+Edit templates…	TemplatesMenu		Rediger maler
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
+8-bit integer	AttributesView		8-bit integer
+8-bit unsigned integer	AttributesView		8-bit unsigned integer
+%s info	InfoWindow	window title	%s info
+%capacity (%used used -- %free free)	InfoWindow		%capacity (%used brukt -- %free ledig)
+Hide dotfiles	SettingsView		Skjul punktfiler
+Trash	Model		Søppelkurv
+Enable type-ahead filtering	SettingsView		Aktiver forhåndsfiltrering
+copy	FSUtils	filename copy	kopi
+New folder%ld	FSUtils		Ny mappe%ld
+Location	OpenWithWindow		Sted
+Resize to fit	QueryContainerWindow		Tilpass størrelse
+List folders first	SettingsView		List mapper først
+Find	FSUtils		Finn
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		En oppføring kalt \"%name\" finnes fra før i denne mappen. Vil du erstatte den med den symbolske lenken du lager nå?
+List view	ContainerWindow		Listevisning
+Temporary	FindPanel		Midlertidig
+Modified	QueryPoseView		Endret
+Create relative link	ContainerWindow		Lag relativ lenke
+Owner	FilePermissionsView		Eier
+Cancel	FSClipBoard		Avbryt
+Modified	PoseView		Endret
+Move to Trash	ContainerWindow		Flytt til søppelkurven
+All files and folders	FindPanel		Alle filer og mapper
+Add-ons	ContainerWindow		Tillegg
+Too many parenthesis.	libtracker		For mange parenteser.
+Increase size	ContainerWindow		Øk størrelse
+\nShould this be fixed?	FSUtils		\nSkal dette repareres?
+URL	Bookmark Query Columns		URL
+Move	PoseView		Flytt
+Floating point number	AttributesView		Floating point-nummer
+Cancel	ContainerWindow		Avbryt
+Attributes	ContainerWindow		Attributter
+Error deleting items	FSUtils		Feil ved sletting av elementer
+Cut	ContainerWindow		Klipp ut
+Disks	Model		Disker
+Create a Query template	FindPanel		Lag en mal for spørringer
+Size	FindPanel		Størrelse
+Window	FilePanelPriv		Vindu
+OK	Email Query Columns		OK
+Location	QueryPoseView		Sted
+Edit query	ContainerWindow		Rediger spørring
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
+Previously mounted disks	AutoMounterSettings		Tidligere monterte disker
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Du kan ikke erstatte en fil med en mappe eller symbolsk lenke.
+The target disk does not support creating links.	FSUtils		Måldisken støtter ikke oppretting av lenker.
+develop	B_SYSTEM_DEVELOP_DIRECTORY		utvikle
+64-bit integer	AttributesView		64-bit integer
+Cut more	ContainerWindow		Klipp mer
+The Tracker must be running to see Info windows.	PoseView		Tracker må kjøre for å vise info-vinduer.
+Tracker preferences	TrackerSettingsWindow		Tracker-innstillinger
+Read	FilePermissionsView		Lese
+There was an error writing the attribute.	WidgetAttributeText		Det oppsto en feil da attributten skulle skrives.
+Path	Default Query Columns		Sti
+If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Hvis du endrer navn på %target er det mulig %osName ikke oppfører seg som forventet!\n\nEr du sikker på at du vil gjøre dette?
+Filesystem:	InfoWindow		Filsystem:
+Could not open \"%name\" (%error). 	FSUtils		Kunne ikke åpne \"%name\" (%error).
+Media parameter group	AttributesView		Medieparametergruppe
+%name info	InfoWindow	InfoWindow Title	%name info
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Hvis du flytter hjemmemappen, kan det hende at %osName ikke oppfører seg ordentlig!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å flytte hjemmemappen uansett, hold nede Shift-tasten og klikk på \"Flytt\".
+Property info	AttributesView		Eiendomsinformasjon
+Sorry, you can't create links in the Trash.	PoseView		Beklager, du kan ikke opprette lenker i søppelkurven.
+From	Email Query Columns		Fra
+Invert selection	QueryContainerWindow		Inverter utvalg
+Open selection with:	OpenWithWindow		Åpne valgte med:
+Preferences…	ContainerWindow		Innstillinger…
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Kunne ikke åpne \"%document\" fordi programmet \"%app\" befinner seg i søppelkurven. 
+Work Phone	Person Query Columns		Jobbtelefon
+Close	ContainerWindow		Lukk
+Get info	ContainerWindow		Få info
+MIME Type	AttributesView		MIME-type
+Show folder location in title tab	SettingsView		Vis mappeplassering i tittelfanen
+There was an error resolving the link.	Tracker		Det oppsto en feil da koblingen skulle løses.
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Det oppsto et problem under lagring i mappen du valgte. Vennligst prøv en annen.
+{0, plural, other{<# values>}}	AttributesView		{0, plural, other{<# verdier>}}
+Desktop	TrackerSettingsWindow		Skrivebord
+Nested *?+.	libtracker		Nestet *?+.
+Move	FSUtils	button label	flytt
+Clean up	DeskWindow		Rydd opp
+Group	FilePermissionsView		Gruppe
+Could not find an application to open \"%name\" (%error). 	FSUtils		Kunne ikke finne et program til å åpne \"%name\" (%error)
+Internal error.	libtracker		Intern feil.
+Mini icon view	DeskWindow		Mini-ikonvisning
+Geometric size	AttributesView		Geometrisk størrelse
+contains	SelectionWindow		inneholder
+Replace	FilePanelPriv		Erstatt
+is not	FindPanel		er ikke
+Icon view	DeskWindow		Ikonvisning
+Mount settings…	ContainerWindow		Monteringsinnstillinger…
+Keywords	Bookmark Query Columns		Nøkkelord
+Media parameter web	AttributesView		Medieparameter web
+Copy more	ContainerWindow		Kopier flere
+by name	FindPanel		etter navn
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Beklager, du kan ikke lagre noe i systemets rotkatalog.
+Restore	ContainerWindow		Gjenopprett
+Location	ContainerWindow		Sted
+Warning space color	SettingsView		Farge på advarselområde
+Skip	FSUtils		Hopp over
+Text list	AttributesView		Tekstliste
+Used space color	SettingsView		Farge på plassindikator
+Cancel	FSUtils		Avbryt
+Original name	ContainerWindow		Opprinnelig navn
+Unknown	WidgetAttributeText		Ukjent
+32-bit integer	AttributesView		32-bit integer
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Det spesifiserte navnet er allerede brukt som navn på en mappe. Vennligst velg et annet navn.
+Modified	ContainerWindow		Endret
+Mini icon view	ContainerWindow		Mini-ikonvisning
+File	FilePanelPriv		Fil
+Search	FindPanel		Søk
+Modified:	InfoWindow		Endret:
+Cancel	FilePanelPriv		Avbryt
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Beklager, du kan ikke redigere den attributten
+Memory pointer	AttributesView		Minnepeker
+Cancel	OpenWithWindow		Avbryt
+Select…	DeskWindow		Velg...
+Files cannot be moved or deleted from a read-only volume.	PoseView		Filer kan ikke bli flyttet eller slettet fra et skrivebeskyttet volum.
+Edit name	FilePanelPriv		Rediger navn
+There was an error deleting \"%name\":\n\t%error	FSUtils		Det oppsto en feil ved sletting av \"%name\":\n\t%error
+Resize to fit	ContainerWindow		Tilpass størrelse
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Lenke \"%name\" til:
+Mount server error	AutoMounterSettings		Mount server-feil
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Hvis du gir nytt navn til hjemmemappen, kan det hende at %osName ikke oppfører seg ordentlig!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å gi nytt navn til hjemmemappen uansett, hold nede Shift-tasten og klikk på \"Gi nytt navn\".
+Boolean	AttributesView		Boolean
+Invert selection	FilePanelPriv		Inverter utvalg
+Memory size	AttributesView		Minnestørrelse
+New folder	TemplatesMenu		Ny mappe
+ (broken)	InfoWindow		 (ødelagt)
+Replace all	FSUtils		Erstatt alle
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Applikasjonen \"%appname\" støtter ikke dokumenttypen du er i ferd med å åpne.\nEr du sikker på at du vil fortsette?\n\nHvis du vet at applikasjonen støtter dokumenttypen, bør du kontakte utgiveren av applikasjonen og be dem om å oppdatere applikasjonen for å vise at dokumenttypen støttes.
+Reverse order	ContainerWindow		Reverse ordre
+Copying: 	StatusWindow		Kopierer:
+Show navigator	SettingsView		Vis navigator
+Select all	DeskWindow		Merk alle
+Double-precision floating point number	AttributesView		Dobbeltpresisjon flyttallnummer
+Decrease size	ContainerWindow		Forminsk
+Recent queries	FindPanel		Nylige forespørsler
+Mount all	MountMenu		Monter alle
+Size	Default Query Columns		Størrelse
+Favorites	FavoritesMenu		Favoritter
+Delete	FilePanelPriv		Slett
+<No recent items>	FavoritesMenu		<Ingen nylige elementer>
+Formula %formula	FindPanel	FindResultTitle	Formel %formula
+Preparing to create links…	StatusWindow		Forbereder opprettelse av lenker...
+Tracker status	StatusWindow		Tracker status
+Handles any %type	OpenWithWindow		Håndterer alle %type
+The mount server could not be contacted.	AutoMounterSettings		Monteringsserver kunne ikke kontaktes
+Query template	FindPanel		Mal for spørringer
+ends with	SelectionWindow		slutter med
+Open	OpenWithWindow		Åpne
+You must have at least one attribute showing.	PoseView		Du må vise minst én attributt.
+Cut	FilePanelPriv		Klipp ut
+Finish: after several years	StatusWindow		Fullført: etter flere år
+Favorites	FilePanelPriv		Favoritter
+Point	AttributesView		Prikk
+You can't move or copy items to read-only volumes.	PoseView		Du kan ikke flytte eller kopiere elementer til skrivebeskyttede volumer.
+home	B_USER_DIRECTORY		hjem
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker New Templates
+Disk mounting during boot	AutoMounterSettings		Montering av disker ved oppstart
+Don't automount	AutoMounterSettings		Ikke automonter
+Node ref	AttributesView		Node ref
+Could not find application \"%appname\"	OpenWithWindow		Kunne ikke finne programmet \"%appname\"
+Unmatched parenthesis.	libtracker		Umatched parentes.
+Extended attribute	AttributesView		Utvidet attributt
+Unmatched brackets.	libtracker		Umatched klammeparentes.
+Error %error loading Add-On %name.	ContainerWindow		Feil %error ved lasting av tillegg %name.
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Du prøver å erstatte objektet:\n\t%name%dest\nmed:\n\t%name%src\n\nØnsker du å erstatte det med det du er %movemode?
+Empty Trash	ContainerWindow		Tøm søppelkurven
+no supporting apps	OpenWithWindow		ingen støttende programmer
+32-bit unsigned integer	AttributesView		32-bit unsigned integer
+Preparing to empty Trash…	StatusWindow		Forbereder tømming av søppelkurv...
+Deleting: 	StatusWindow		Sletter:
+the MIME settings	FSUtils		MIME-innstillingene
+You can't move or copy the trash.	FSUtils		Du kan ikke flytte eller kopiere søppelkurven.
+label too long	PoseView		for lang merkelapp
+Error creating link to \"%name\".	FSUtils		Feil ved oppretting av lenke til \"%name\".
+Unknown	FilePermissionsView		Ukjent
+Paste links	ContainerWindow		Lim inn lenker
+Restoring: 	StatusWindow		Gjenoppretter:
+The Tracker must be running to set the default printer.	PoseView		Trackeren må kjøre for å angi standardskriver.
+calculating…	InfoWindow		kalkulerer...
+Preferred for file	OpenWithWindow		Foretrukket for fil
+OK	AutoMounterSettings		OK
+copying	FSUtils		kopierer
+Get info	FilePanelPriv		Hent info
+MIME String	AttributesView		MIME-string
+Delete	ContainerWindow		Slett
+Execute	FilePermissionsView		Utfør
+Show volumes on Desktop	SettingsView		Vis volumer på skrivebordet
+no	AttributesView		nei
+Recent folders	ContainerWindow		Nylige mapper
+Desktop	Model		Skrivebord
+Select all	ContainerWindow		Merk alle
+apps	B_APPS_DIRECTORY		apps
+Error calculating folder size.	InfoWindow		Feil ved beregning av mappestørrelse
+Delete	FSUtils		Slett
+Edit name	ContainerWindow		Rediger navn
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunne ikke åpne \"%document\" (Manglende symbol: %symbol). \n
+ASCII Text	AttributesView		ASCII-tekst
+Atom reference	AttributesView		Atom-referanse
+config	B_USER_CONFIG_DIRECTORY		config
+Error moving \"%name\".	FSUtils		Feil ved flytting \"%name\".
+Select…	QueryContainerWindow		Velg...
+Open	ContainerWindow		Åpne
+Settings…	MountMenu		Innstillinger...
+You cannot put the selected item(s) into the trash.	FSUtils		Du kan ikke legge de(t) valgte elementet/elementene i papirkurven.
+Increase size	DeskWindow		Forstørr
+starts with	SelectionWindow		starter med
+Any	AttributesView		Hvilken som helst
+New	DeskWindow		Ny
+Invert	SelectionWindow		Inverter
+Would you like to find some other suitable application?	FSUtils		Vil du finne et annet passende program?
+*+? operand may be empty.	libtracker		*+? operand kan være tom.
+(unknown)	AttributesView		(ukjent)
+Recent folders	FavoritesMenu		Nylige mapper
+Signed memory size	AttributesView		Signert minnestørrelse
+The specified name is illegal. Please choose another name.	FilePanelPriv		Det oppgitte navnet er ulovlig. Vennligst velg et annet navn.
+of %items	StatusWindow		av %items
+MIME Path	AttributesView		MIME-sti
+less than	FindPanel		mindre enn
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Feil ved kopiering av \"%name\":\n\t%error\n\nØnsker du å fortsette?
+Creating links: 	StatusWindow		Oppretter lenker:
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne ikke åpne \"%document\" med programmet \"%app\" (%error).
+Create %s clipping	PoseView		Lag %s utklipp
+Error moving \"%name\"	FSUtils		Feil ved flytting av \"%name\"
+To: %dir	StatusWindow		Til %dir
+Paste layout	ContainerWindow		Lim inn layout
+Cancel	Tracker		Avbryt
+yes	AttributesView		ja
+Make active printer	ContainerWindow		Sett som aktiv skriver
+Copy to	ContainerWindow		Kopier til
+Name	SelectionWindow		Navn
+by attribute	FindPanel		etter attributt
+Write	FilePermissionsView		Skriv
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du endrer systemmappen eller dens innhold, vil du ikke kunne starte %osName!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å endre systemmappen eller dens innhold uansett, hold nede Shift-tasten og klikk på \"Jeg vet hva jeg gjør\".
+Save	FilePanelPriv		Lagre
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Kunne ikke åpne \"%document\" med programmet \"%app\" (Manglende biblioteker: %library). \n
+Finish: %time	StatusWindow		Ferdig: %time
+Messenger	AttributesView		Messenger
+after	FindPanel		etter
+{0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes med data>}}
+Version	OpenWithWindow		Versjon
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Noen av de valgte oppføringene kan ikke flyttes til søppelkurven. Ønsker du å slette dem i stedet? (Denne operasjonen kan ikke angres.)
+The entered file name is too long.	FSUtils		Det angitte filnavnet er for langt.
+Add printer…	ContainerWindow		Legg til skriver...
+On	FindPanel		På
+Permissions	ContainerWindow		Rettigheter
+Size:	InfoWindow		Størrelse:
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Den valgte oppføringen kan ikke flyttes til søppelkurven. Ønsker du å slette den i stedet? (Denne operasjonen kan ikke angres.)
+Copy	ContainerWindow		Kopier
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Beklager, 'Character' attributten kan ikke lagre multi-byte glyff.
+Open parent	VirtualDirectoryWindow		Åpne overliggende
+And	FindPanel		Og
+Palette-indexed picture	AttributesView		Palett-indeksert bilde
+multiple disks	FindPanel		flere disker
+Drawing pattern	AttributesView		Tegnemønster
+File offset	AttributesView		Filforskyvning
+Name = %name	FindPanel	FindResultTitle	Navn = %name
+Subject	Email Query Columns		Emne
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Feil ved kopiering av mappen \"%name\":\n\t%error\n\nØnsker du å fortsette?
+You cannot create a link to the root directory.	FSUtils		Du kan ikke lage en lenke til rotkatalogen.
+Select all	FilePanelPriv		Merk alle
+Other	FilePermissionsView		Andre
+Automatic disk mounting	AutoMounterSettings		Automatisk diskmontering
+parent folder	NavMenu		overmappe
+Create link here	ContainerWindow		Opprett lenke her
+Force identify	ContainerWindow		Tving identifisering
+no items	CountView		Ingen oppføringer
+Time	AttributesView		Tid
+Disks	DirMenu		Disker
+Query name:	FindPanel		Spørringsnavn:
+Open parent	ContainerWindow		Åpne overmappe
+Find…	ContainerWindow		Finn...
+moving	FSUtils		flytter
+Single window navigation	SettingsView		Navigering i ett vindu
+greater than	FindPanel		større enn
+Add	FindPanel		Legg til
+Created:	InfoWindow		Opprettet:
+Edit Query template	FindPanel		Rediger mal for spørringer
+Save query as template…	FindPanel		Lagre søket som mal…
+All disks	AutoMounterSettings		Alle disker
+link	FSUtils	filename link	lenke
+16-bit unsigned integer	AttributesView		16-bit unsigned integer
+Proceed	FSUtils		Fortsett
+Edit favorites…	FilePanelPriv		Rediger favoritter
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Du kan ikke flytte en mappe inn i seg selv eller sine undermapper.
+New	ContainerWindow		Ny
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Du må slippe elementer på et av diskikonene i \"Disks\"-vinduet
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Hvis du endrer %target, kan det hende at %osName ikke oppfører seg ordentlig!\n\nEr du sikker på at du vil gjøre det?
+Sorry, you can't copy items to the Trash.	FSClipBoard		Beklager, du kan ikke kopiere oppføringer til søppelkurven.
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Det finnes elementer i denne mappen som har samme navn som elementene du skal til å %verb.\n\nØnsker du å erstatte dem med de du %verb eller ønsker du å bli spurt om hver av dem?
+When	Email Query Columns		Når
+Object	AttributesView		Objekt
+Paste	ContainerWindow		Lim inn
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		En oppføring kalt \"%name\" finnes allerede i den mappen, og kan inneholde\noppføringer med de samme navnene. Ønsker du å erstatte dem med dem som finnes i mappen du %verb?
+Cannot unmount the boot volume \"%name\".	FSUtils		Kan ikke avmontere oppstartsvolumet \"%name\".
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Kunne ikke åpne \"%document\" med programmet \"%app\" (Manglende symbol: %symbol). \n
+New folder	ContainerWindow		Ny mappe
+Name	OpenWithWindow		Navn
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Det oppstoproblem ved erstatting av \"%name\". Elementet kan være åpent eller opptatt.
+Windows	TrackerSettingsWindow		Vinduer
+Show space bars on volumes	SettingsView		Vis kapasitetsindikator på volumer
+Could not update permissions of file \"%name\". %error	FSUtils		Kunne ikke oppdatere rettigheter for filen \"%name\". %error
+Decrease size	DeskWindow		Forminsk
+Emptying Trash… 	StatusWindow		Tømmer søppelkurven...
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # fil} other{for # filer}}
+Revert	TrackerSettingsWindow		Tilbakestill
+trash	B_TRASH_DIRECTORY		søppel
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Hvis du flytter systemmappen eller dens innhold, vil du ikke kunne starte %osName!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å flytte systemmappen eller innholdet uansett, hold nede Shift-tasten og klikk på \"Flytt\".
+Close all in workspace	ContainerWindow		Lukk alt på arbeidsområde
+Corrupted expression.	libtracker		Ugyldig uttrykk.
+Network address	AttributesView		Nettverksadresse 
+Finish: %time - %finishtime left	StatusWindow		Ferdig: %time - %finishtime igjen
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Kunne ikke åpne \"%document\" (Mangler biblioteker: %library). \n
+Create relative link here	ContainerWindow		Opprett relativ lenke her
+Copy	FilePanelPriv		Kopier
+All Haiku disks	AutoMounterSettings		Alle Haiku-disker
+Close all	ContainerWindow		Lukk alle
+Paused: click to resume or stop	StatusWindow		Pauset: klikk for å fortsette eller stoppe
+Name	QueryPoseView		Navn
+Error %error loading add-On %name.	ContainerWindow		Feil %error ved lasting av add-On %name.
+Does not handle file	OpenWithWindow		Kan ikke behandle ikke filen
+E-mail	Person Query Columns		E-post
+Arrange by	ContainerWindow		Ordne etter
+Attributes	AttributesView		Attributter
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Beklager, lagring av mer enn én oppføring er ikke tillatt.
+64-bit unsigned integer	AttributesView		64-bit unsigned integer
+Move here	ContainerWindow		Flytt hit
+the config folder	FSUtils		konfigurasjonsmappen
+Sorry, could not create a new folder.	FSUtils		Beklager, kunne ikke opprette ny mappe.
+MIME Signature	AttributesView		MIME-signatur
+Select all	VirtualDirectoryWindow		Velg alle
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+Rename	FSUtils	button label	Gi nytt navn
+Clean up all	ContainerWindow		Rydd opp alt
+Add current folder	FilePanelPriv		Legg til nåværende mappe
+Description:	InfoWindow		Beskrivelse:
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Er du sikker på at du vil slette valgte element(er)? Du kan ikke angre på denne handlingen.
+Grayscale picture	AttributesView		Gråtonebilde
+Mount	DeskWindow		Monter
+ends with	FindPanel		slutter med
+Show Disks icon	SettingsView		Vis Disker-ikon
+Outline selection rectangle only	SettingsView		Kun omriss av valgrektangel
+by formula	FindPanel		etter formel
+Resize to fit	VirtualDirectoryWindow		Endre størrelsen for å passe
+Move to Trash	FilePanelPriv		Flytt til søppelkurv
+is	FindPanel		er
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Hvis du gir nytt navn til systemmappen eller dens innhold, vil du ikke kunne starte %osName!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å gi nytt navn til systemmappen eller innholdet uansett, hold nede Shift-tasten og klikk på \"Gi nytt navn\".
+Permissions	FilePermissionsView		Tillatelser
+New folder %ld	FSUtils		Ny mappe %ld
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" er en eldre kjørbar fil. Skaff deg en oppdatert versjon eller kompiler applikasjonen på nytt.
+Only the boot disk	AutoMounterSettings		Kun oppstartsdisken
+Message	AttributesView		Melding
+Modified	Default Query Columns		Endret
+Default application	InfoWindow		Forvalgt program
+Untitled bitmap	PoseView		Ikke navngitt bitmap
+matches regular expression	SelectionWindow		passer regulært uttrykk
+Invert selection	ContainerWindow		Inverter utvalg
+Close	VirtualDirectoryWindow		Lukk
+Monochrome picture	AttributesView		Monokromt bilde
+Real name	ContainerWindow		Ekte navn
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Kunne ikke åpne \"%name\". Filen er feilaktig merket som kjørbar.
+Go to parent	FilePanelPriv		Gå til overmappe
+Save	FindPanel		Lagre
+Name	FindPanel		Navn
+Cancel	WidgetAttributeText		Avbryt
+Memory corruption.	libtracker		Minne-korrupsjon.
+Expression too long.	libtracker		Uttrykket for langt.
+Color	AttributesView		Farge
+Copy layout	ContainerWindow		Kopier layout
+Duplicate	ContainerWindow		Dupliser
+16-bit integer	AttributesView		16-bit integer
+Untitled clipping	PoseView		Utklipp uten navn
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen \"%name\" eksisterer allerede i den spesifiserte mappen. Ønsker du å erstatte den?
+, indexed	InfoWindow		, indeksert
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du må slippe elementer på et av diskikonene i \"Disks\"-vinduet
+Version:	InfoWindow		Versjon:
+OK	PoseView		OK
+Add-ons	DeskWindow		Tillegg
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Er du sikker på at du vil flytte eller kopiere de(n) valgt(e) oppføringen(e) til denne mappen?
+Find	FindPanel		Finn
+Empty folder	NavMenu		Tom mappe
+Defaults	TrackerSettingsWindow		Standardinnstillinger
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Beklager, det er ikke nok ledig plass på målvolumet til å kopiere utvalget.
+True-color picture	AttributesView		Ekte fargebilde
+Add-ons	FilePanelPriv		Tillegg
+Alignment	AttributesView		Justering
+Move to Trash	FSUtils		Flytt til søppelkurven
+Handles %type	OpenWithWindow		Håndterer %type
+Cancel	PoseView		Avbryt
+Delete	PoseView		Slett
+Media parameter	AttributesView		Medieparameter
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du endrer hjemmemappen, kan det hende at %osName ikke oppfører seg ordentlig!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å endre hjemmemappen uansett, hold nede Shift-tasten og klikk på \"Jeg vet hva jeg gjør\".
+Sorry, you can't copy items to the Trash.	PoseView		Beklager, du kan ikke kopiere oppføringer til søppelkurven
+Invert selection	VirtualDirectoryWindow		Inverter utvalg
+New folder	FilePanelPriv		Ny mappe
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# element} other{# elementer}}
+Name	AttributesView		Navn
+Invalid bracket range.	libtracker		Ugyldig parentesområde.
+the settings folder	FSUtils		innstillingsmappen
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Hvis du flytter %target, kan det hende at %osName ikke oppfører seg ordentlig!\n\nEr du sikker på at du vil gjøre dette?
+Create a Query	FindPanel		Opprett en spørring
+Close	QueryContainerWindow		Lukk
+I know what I'm doing	FSUtils	button label	Jeg vet hva jeg gjør
+Preparing to copy items…	StatusWindow		Forbereder kopiering av oppføringer...
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
+Entry ref	AttributesView		Entry ref
+Icon view	ContainerWindow		Ikonvisning
+The entered folder name is too long.	FSUtils		Det angitte mappenavnet er for langt.
+Name	ContainerWindow		Navn
+Preferred for %type	OpenWithWindow		Foretrukket for %type
+Free space color	SettingsView		Farge for ledig plass
+OK	FSUtils		OK

@@ -1,0 +1,166 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-WebPositive	2390126114
+Authentication required	Authentication Panel		Autentisering kreves
+Previous	WebPositive Window		Forrige
+Copy	Console Window		Kopier
+(Finish: %date)	Download Window		(Fullført: %date)
+Open bookmarks confirmation	WebPositive Window		Åpne bokmerkebekreftelse
+Download folder:	Settings Window		Nedlastingsmappe:
+Close window	WebPositive Window		Lukk vindu
+Find:	WebPositive Window		Finn:
+Script console	WebPositive Window		Skriptkonsoll
+There was an error setting up the bookmark.	WebPositive Window		Det oppsto en feil under oppsett av bokmerket.
+Fonts	Settings Window		Skrifttyper
+Path	Cookie Manager		Sti
+Bookmarks	WebPositive Window		Bokmerker
+Use proxy server to connect to the internet	Settings Window		Bruk proxy-server for å koble til internett
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url fullført
+Auto-hide interface in full screen mode	Settings Window		Skjul grensesnitt automatisk i fullskjermmodus
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Det oppsto en feil ved henting av bokmerkemappen.\n\nFeil: %error
+Delete	Cookie Manager		Slett
+(Finish: %date - Over %duration left)	Download Window		(Ferdig: %date - Over %duration igjen)
+Open containing folder	Download Window		Åpne overordnet mappe
+Find previous	WebPositive Window		Finn forrige
+Full screen	WebPositive Window		Fullskjerm
+Bookmark bar	WebPositive Window		Bokmerkerad
+Downloads in progress	WebPositive		Pågående nedlastinger
+Copy URL to clipboard	Download Window		Kopier URL til utklippstavlen
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vil du åpne %addedCount bokmerker på en gang?
+Clone current page	Settings Window		Klon gjeldende side
+Start page:	Settings Window		Startside:
+Cancel	Download Window		Avbryt
+Settings	Settings Window		Innstillinger
+Downloads	WebPositive Window		Nedlastinger
+Browse…	Settings Window		Bla gjennom…
+Resume prior session	Settings Window		Gjenoppta forrige økt
+Match case	WebPositive Window		Skill mellom store og små bokstaver
+Proxy password:	Settings Window		Proxy-passord:
+Size:	Font Selection view		Størrelse:
+Page source	WebPositive Window		Kildekode
+Proxy server port:	Settings Window		Proxy-serverport:
+Error opening downloads folder	Download Window		Feil ved åpning av nedlastingsmappe
+Show bookmark bar	WebPositive Window		Vis bokmerkerad
+Find	WebPositive Window		Finn
+Standard font:	Settings Window		Standardfont:
+Open download error	Download Window		Feil ved åpning av nedlasting
+General	Settings Window		Generelt
+New tabs:	Settings Window		Nye faner:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url feilet
+Open downloads folder	Download Window		Åpne nedlastingsmappe
+Proxy server	Settings Window		Proxyserver
+Darn!	WebPositive		Fillern!
+Decrease size	WebPositive Window		Reduser størrelse
+Default fixed font size:	Settings Window		Standard fast skriftstørrelse:
+Sans serif font:	Settings Window		Sans serif skrifttype:
+Clear	WebPositive Window		Tøm
+The download could not be opened.	Download Window		Nedlastingen kunne ikke åpnes.
+Cookies for %s	Cookie Manager		Informasjonskapsler for %s
+Close	Download Window		Lukk
+WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Søkeord
+Reload	WebPositive Window		Last inn på nytt
+Expiration	Cookie Manager		Utløper
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU-en din er for gammel og støtter ikke SSE2-utvidelsene, uten disse kan ikke WebPositive kjøre. Vi anbefaler å installere NetSurf i stedet.
+Download finished	Download Window		Nedlasting fullført
+Cookie manager	WebPositive Window		Informasjonskapselbehandler
+OK	Authentication Panel		OK
+Hide password text	Authentication Panel		Skjul passordtekst
+Username:	Authentication Panel		Brukernavn:
+Name	Cookie Manager		Navn
+Remove finished	Download Window		Fjern fullførte
+Earlier	WebPositive Window		Tidligere
+Edit	WebPositive Window		Rediger
+Back	WebPositive Window		Tilbake
+Yesterday	WebPositive Window		I går
+Quit	WebPositive		Avslutt
+Download aborted	Download Window		Nedlaststing avbrutt
+Number of days to keep links in History menu:	Settings Window		Antall dager å beholde koblinger i Historikk-menyen:
+Password:	Authentication Panel		Passord:
+Forward	WebPositive Window		Fremover
+Clear	Console Window		Tøm
+Cut	URL Bar		Klipp ut
+View	WebPositive Window		Vis
+Paste	URL Bar		Lim inn
+Find next	WebPositive Window		Finn neste
+Open search page	Settings Window		Åpne søkesiden
+Increase size	WebPositive Window		Øk størrelsen
+New tab	WebPositive Window		Ny fane
+Today	WebPositive Window		I dag
+Open location	WebPositive Window		Åpne plassering
+New browser window	Download Window		Nytt nettleservindu
+Open	Download Window		Åpne
+New window	WebPositive Window		Nytt vindu
+New windows:	Settings Window		Nye vinduer:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Nedlastingsmappen kunne ikke åpnes.\n\nFeil: %error
+Cancel	Authentication Panel		Avbryt
+Style:	Font Selection view		Stil:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Det oppsto en feil ved oppretting av bokmerkefilen.\n\nFeil: %error
+OK	Download Window		OK
+Proxy username:	Settings Window		Proxy-brukernavn:
+Manage bookmarks	WebPositive Window		Behandle bokmerker
+/s)	Download Window	...as in 'per second'	/s)
+Restart	Download Window		Start på nytt
+Serif font:	Settings Window		Serif font:
+Apply	Settings Window		Bruk
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Det oppsto en feil under forsøk på å vise bokmerkemappen.\n\nFeil: %error
+Revert	Settings Window		Tilbakestill
+Copy	WebPositive Window		Kopier
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Siste linje gjentatt # gang.}other{siste linje gjentatt # ganger.}}
+Default standard font size:	Settings Window		Standard skriftstørrelse:
+Custom	Settings Window		Tilpasset
+Bookmark this page	WebPositive Window		Bokmerk denne siden
+Show tabs if only one page is open	Settings Window		Vis faner når bare en side er åpen
+Remove	Download Window		Fjern
+Close tab	WebPositive Window		Lukk fane
+About	WebPositive Window		Om
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Det er fortsatt aktive nedlastinger, vil du virkelig avslutte WebPositive nå?
+Continue downloads	WebPositive		Fortsett nedlastinger
+Proxy server requires authentication	Settings Window		Proxy-server krever autentisering
+Cancel	Settings Window		Avbryt
+Reset size	WebPositive Window		Tilbakestill størrelse
+History	WebPositive Window		Historikk
+Do you really want to clear the browsing history?	WebPositive Window		Vil du virkelig slette nettleserloggen?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Finn neste forekomst av søkeord
+Fixed font:	Settings Window		Fast skrifttype:
+Quit	WebPositive Window		Avslutt
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Finn forrige forekomst av søkeord
+Remember username and password for this site	Authentication Panel		Husk brukernavn og passord for denne siden
+(Finish: %date - %duration left)	Download Window		(Ferdig: %date - %duration igjen)
+Cookie manager	Cookie Manager		Informasjonskapselbehandler
+Show home button	Settings Window		Vis hjem-knappen
+Start new session	Settings Window		Start ny økt
+The cookie jar is empty!	Cookie Manager		Ingen informasjonskapsler!
+Value	Cookie Manager		Verdi
+Remove missing	Download Window		Fjern manglende
+Paste	WebPositive Window		Lim inn
+Double-click or middle-click to open new tab.	Tab Manager		Dobbeltklikk eller midtklikk for å åpne ny fane.
+Next	WebPositive Window		Neste
+Bookmark error	WebPositive Window		Feil med bokmerke
+OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% av %expectedSize%, %rate%/s)
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		Zoom kun tekst
+Save page as…	WebPositive Window		Lagre siden som…
+Page source error	WebPositive Window		Sidekildefeil
+Auto-hide mouse pointer	Settings Window		Skjul musepekeren automatisk
+Requesting %url	WebPositive Window		Ber om %url
+Flags	Cookie Manager		Flagg
+Window	WebPositive Window		Vindu
+Proxy server address:	Settings Window		Proxy-serveradresse:
+Search page:	Settings Window		Søkeside:
+Settings	WebPositive Window		Innstillinger
+Clear	URL Bar		Tøm
+Loading %url	WebPositive Window		Laster %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Start up:	Settings Window		Oppstart:
+Confirmation	WebPositive Window		Bekreftelse
+Session cookie	Cookie Manager		Økt-informasjonskapsel
+No SSE2 support	WebPositive		Ingen SSE2-støtte
+Open all	WebPositive Window		Åpne alle
+Cut	WebPositive Window		Klipp ut
+Downloads	Download Window		Nedlastinger
+Open blank page	Settings Window		Åpne tom side
+Clear history	WebPositive Window		Tøm historikk
+Cancel	WebPositive Window		Avbryt
+Script console	Console Window		Skriptkonsoll
+Copy	URL Bar		Kopier
+Open start page	Settings Window		Åpne startsiden

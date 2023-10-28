@@ -1,0 +1,84 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	2322690158
+ACPI bus	DevicesView		ACPI-buss
+Encryption controller	Device		Krypteringskontroller
+Devices	System name		Maskinvare
+USB bus	DevicesView		USB bus
+Graphics Peripheral	DeviceSCSI		Ekstern grafikkenhet
+Processor	Device		Prosessor
+Generate system information	DevicesView		Generer systeminformasjon
+Unknown	DeviceACPI		Ukjent
+Class info	DevicePCI		Klasseinformasjon
+<No device selected>	DevicesView		<Ingen enhet valgt>
+USB bus	Device		USB bus
+Computer	DevicesView		Datamaskin
+Communications	DeviceSCSI		Kommunikasjon
+Mass storage controller	Device		Masselagringskontroller
+Connection	DevicesView		Tilkobling
+Printer	DeviceSCSI		Skriver
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI-prosessor-navnerom '%2'
+Manufacturer	Device		Produsent
+Scanner	DeviceSCSI		Scanner
+Memory controller	Device		Minnekontroller
+Unknown device	DevicesView		Ukjent enhet
+Unknown	DevicePCI		Ukjent
+ACPI node '%1'	DeviceACPI		ACPI-node '%1'
+Optical Drive	DeviceSCSI		Optisk stasjon
+Name	PropertyList		Navn
+Manufacturer	DeviceSCSI		Produsent
+Device name	Device		Enhetsnavn
+Satellite communications controller	Device		Satellittkommunikasjonskontroller
+Device class	DeviceSCSI		Enhetsklasse
+Device	Device		Enhet
+Input device controller	Device		Input-enhetskontroller
+PCI bus	DevicesView		PCI-buss
+ACPI System Indicator	DeviceACPI		ACPI-systemindikator
+ACPI System Bus	DeviceACPI		ACPI-systembuss
+Tape Drive	DeviceSCSI		Båndstasjon
+Changer	DeviceSCSI		Skifter
+Serial bus controller	Device		Seriebusskontroller
+Refresh devices	DevicesView		Oppdater enheter
+Category	DevicesView		Kategori
+RBC	DeviceSCSI		RBC
+Device paths	Device		Enhetsti
+Unknown device	Device		Ukjent enhet
+Wireless controller	Device		Trådløs-kontroller
+Generic system peripheral	Device		Generisk ekstern enhet
+Value	PropertyList		Verdi
+Devices	DevicesView		Maskinvare
+Device name	DeviceACPI		Enhetsnavn
+Card Reader	DeviceSCSI		Kortleser
+Display controller	Device		Skjermkontroller
+ACPI Button '%1'	DeviceACPI		ACPI knapp '%1'
+ACPI <unknown>	DeviceACPI		ACPI <ukjent>
+Device name	DevicePCI		Enhetsnavn
+Disk Drive	DeviceSCSI		Diskstasjon
+Report compatibility	DevicesView		Rapporter kompatibilitet
+Other	DeviceSCSI		Annet
+Computer	Device		Datamaskin
+PCI bus	Device		PCI-buss
+Enclosure	DeviceSCSI		Vedlegg
+ACPI Thermal Zone	DeviceACPI		ACPI-temperaturområde
+Order by:	DevicesView		Sorter etter:
+Intelligent controller	Device		Intelligent kontroller
+Multimedia controller	Device		Multimediakontroller
+Quit	DevicesView		Avslutt
+ISA bus	Device		ISA-buss
+ISA bus	DevicesView		ISA-buss
+Processor	DeviceSCSI		Prosessor
+Bridge	Device		Bro
+Worm	DeviceSCSI		Worm
+CD-ROM	DeviceSCSI		CD-ROM
+Manufacturer	DevicePCI		Produsent
+Bridge	DeviceSCSI		Bro
+Signal processing controller	Device		Signalbehandlingskontroller
+Device name	DeviceSCSI		Enhetsnavn
+Docking station	Device		Dokkingstasjon
+Array	DeviceSCSI		Array
+Unclassified device	Device		Uklassifisert enhet
+Manufacturer	DeviceACPI		Produsent
+ACPI controller	Device		ACPI-kontroller
+Network controller	Device		Nettverkskontroller
+Driver used	Device		Driver brukt
+Communication controller	Device		Kommunikasjonskontroller
+ACPI bus	Device		ACPI-buss
+unknown	Device		ukjent

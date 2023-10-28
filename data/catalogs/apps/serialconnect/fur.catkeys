@@ -1,8 +1,9 @@
-1	friulian	x-vnd.haiku.SerialConnect	354154115
+1	friulian	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Hardware
 Connection	SerialWindow		Conession
 Raw send…	SerialWindow		Inviament grês…
 Baud rate	SerialWindow		Frecuence di simbul
+Paste	SerialWindow		Tache
 Stop bits	SerialWindow		Bits di stop
 None	SerialWindow	Flowcontrol	Nissun
 Cancel	Custom baudrate window		Anule

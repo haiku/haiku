@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Screen	133788249
+1	friulian	x-vnd.Haiku-Screen	2318349707
 no	Screen		no
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colôrs
@@ -13,6 +13,7 @@ Video format:	Screen		Formât video:
 Undo	Screen		Disfe
 OK	Screen		Va ben
 Current workspace	Screen		Spazi di lavôr atuâl
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		in verticâl
 All workspaces	Screen		Ducj i spazis di lavôr
 Use laptop panel:	Screen		Dopre panel dal portatil:

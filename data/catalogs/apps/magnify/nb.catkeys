@@ -1,0 +1,21 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Magnify	1465621918
+  size must be > 4 and a multiple of 4	Console		  størrelsen må være > 4 og et multiplum av 4
+Decrease pixel size	Magnify-Main		Reduser pikselstørrelse
+no clip msg	In console, when clipboard is empty after clicking Copy image		ingen klippmelding
+Increase pixel size	Magnify-Main		Øk pikselstørrelse
+magnify: size must be a multiple of 4	Console		magnify: størrelsen må være et multiplum av 4
+Stick coordinates	Magnify-Main		Lås koordinater
+Copy image	Magnify-Main		Kopier bilde
+Decrease window size	Magnify-Main		Forminsk vindu
+Remove a crosshair	Magnify-Main		Fjern et trådkors
+Add a crosshair	Magnify-Main		Legg til et trådkors
+Freeze image	Magnify-Main		Frys bilde
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height @   {0, plural, one{# piksel/piksel} other{# piksler/piksel}}
+usage: magnify [size] (magnify size * size pixels)	Console		bruk: magnify [størrelse] (forstørr størrelse * størrelse piksler)
+Increase window size	Magnify-Main		Forstørr vindu
+Save image	Magnify-Main		Lagre bilde
+Show grid	Magnify-Main		Vis rutenett
+Magnify	System name		Forstørr
+Info	Magnify-Main		Info
+Show info	Magnify-Main		Vis info
+Make square	Magnify-Main		Lag firkant

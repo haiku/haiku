@@ -1,8 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	185459086
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Το Τερματικό δε μπορεί να ξεκινήσει το κέλυφος. Λυπούμαστε.
 Text encoding	Terminal TermWindow		Κωδικοποίηση κειμένου
+Colors	Terminal ThemeWindow		Χρώματα
 OK	Terminal SetTitleWindow		Εντάξει
 Edit	Terminal TermWindow		Επεξεργασία
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               αυτό το μήνυμα βοήθειας\n  -t,     --title              ορισμός  τίτλου  παραθύρου\n  -f,     --fullscreen         έναρξη σε λειτουργία πλήρους οθόνης\n  -w,     --working-directory  ορισμός αρχικού καταλόγου εργασίας\n

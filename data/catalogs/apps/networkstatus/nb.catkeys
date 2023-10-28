@@ -1,0 +1,24 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		IPv6-adresse:
+Quit	NetworkStatusView		Avslutt
+Unknown	NetworkStatusView		Ukjent
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Åpning av Nettverksinnstillinger mislyktes.\n\nFeilmelding:
+Install in Deskbar	NetworkStatus		Installer i Deskbar
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Alternativer for NetworkStatus:\n\t--deskbar\tlegg en replikant automatisk til Deskbar\n\t--help\t\tvis denne informasjonen og avslutt
+Open network preferences…	NetworkStatusView		Åpne Nettverksinnstillinger
+NetworkStatus	System name		Nettverkstatus
+Broadcast:	NetworkStatusView		Kringkast:
+OK	NetworkStatusView		OK
+No link	NetworkStatusView		Ingen lenke
+Could not join wireless network:\n	NetworkStatusView		Kunne ikke koble på trådløst nettverk:\n
+Ready	NetworkStatusView		Klar
+Network Status	NetworkStatusView		Nettverksstatus
+Deskbar is not running, giving up.	NetworkStatus		Deskbar kjører ikke, gir opp.
+Netmask:	NetworkStatusView		Nettmaske:
+No stateful configuration	NetworkStatusView		Ingen stateful konfigurasjon
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Du kan kjøre Nettverkstatus i et vindu eller installere det i Deskbar.
+IPv4 address:	NetworkStatusView		IPv4-adresse:
+%ifaceName information:\n	NetworkStatusView		%ifaceName informasjon:\n
+Run in window	NetworkStatus		Kjør i vindu
+<no wireless networks found>	NetworkStatusView		<ingen trådløse nettverk funnet>
+Configuring	NetworkStatusView		Konfigurerer
