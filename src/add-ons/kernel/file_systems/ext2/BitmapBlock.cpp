@@ -336,12 +336,14 @@ BitmapBlock::FindPreviousMarked(uint32& pos)
 		B_PRIu32 " bits: %" B_PRIx32 "\n", index, bit, bits);
 
 	if (bits == 0) {
-		// Find an block of 32 bits that has a marked bit
-		do {
-			index--;
-		} while (data[index] == 0 && index > 0);
+		// Find a block of 32 bits that has a marked bit
+		if (index > 0) {
+			do {
+				index--;
+			} while (data[index] == 0 && index > 0);
 
-		bits = B_LENDIAN_TO_HOST_INT32(data[index]);
+			bits = B_LENDIAN_TO_HOST_INT32(data[index]);
+		}
 		if (bits == 0) {
 			// Not found
 			pos = 0;
