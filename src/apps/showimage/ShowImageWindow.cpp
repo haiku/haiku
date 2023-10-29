@@ -436,8 +436,9 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 		// Fill Save As submenu with all types that can be converted
 		// to from the Be bitmap image format
 	menu->AddItem(menuSaveAs);
-	_AddItemMenu(menu, B_TRANSLATE("Close"), B_QUIT_REQUESTED, 'W', 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Move to Trash"), kMsgDeleteCurrentFile, 'T', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
+		MSG_DESKTOP_BACKGROUND, 0, 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Get info" B_UTF8_ELLIPSIS),
 		MSG_GET_INFO, 'I', 0, this);
 	menu->AddSeparatorItem();
@@ -446,6 +447,7 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	_AddItemMenu(menu, B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
 		MSG_PREPARE_PRINT, 'P', 0, this);
 	menu->AddSeparatorItem();
+	_AddItemMenu(menu, B_TRANSLATE("Close"), B_QUIT_REQUESTED, 'W', 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q', 0, be_app);
 	bar->AddItem(menu);
 
@@ -489,9 +491,6 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 		MSG_FLIP_LEFT_TO_RIGHT, 0, 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Flip top to bottom"),
 		MSG_FLIP_TOP_TO_BOTTOM, 0, 0, this);
-	menu->AddSeparatorItem();
-	_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
-		MSG_DESKTOP_BACKGROUND, 0, 0, this);
 
 	bar->AddItem(menu);
 }
