@@ -377,23 +377,29 @@ actions CopySetHaikuRevision1
 
 rule DetermineHaikuRevision
 {
-	# If existing, make the target depend on the .git/index file in the
-	# root directory, so it gets updated when the revision changes due to
-	# commits or merges.
-	local gitIndex = <haiku-rootdir-git>index ;
+	# If existing, make the target depend on the $GIT_DIR/index file,
+	# so it gets updated when the revision changes due to commits or merges.
+	# If GIT_DIR is not set, fall back to .git/index.
+	local dotGit = <haiku-rootdir>.git ;
 	local revisionFile = <haiku-rootdir>haiku-revision ;
-	if ! [ on $(gitIndex) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
-		HAIKU_GIT_REVISION_DETERMINED on $(gitIndex) = 1 ;
+	if ! [ on $(dotGit) return $(HAIKU_GIT_REVISION_DETERMINED) ] {
+		HAIKU_GIT_REVISION_DETERMINED on $(dotGit) = 1 ;
 		MakeLocate $(revisionFile) : $(HAIKU_BUILD_OUTPUT_DIR) ;
 		LocalClean clean : $(revisionFile) ;
 		if $(HAIKU_REVISION) {
 			DetermineHaikuRevision2 $(revisionFile) ;
+		} else if $(GIT_DIR) && $(GIT_DIR) != ".git" {
+			local gitIndex = <$(GIT_DIR)>index ;
+			SEARCH on $(gitIndex) = [ FDirName $(GIT_DIR) ] ;
+			Depends $(revisionFile) : $(gitIndex) ;
+			DetermineHaikuRevision1 $(revisionFile) : $(gitIndex) ;
 		} else if [ Glob [ FDirName $(HAIKU_TOP) .git ] : index ] {
+			local gitIndex = <haiku-rootdir-git>index ;
 			SEARCH on $(gitIndex) = [ FDirName $(HAIKU_TOP) .git ] ;
 			Depends $(revisionFile) : $(gitIndex) ;
 			DetermineHaikuRevision1 $(revisionFile) : $(gitIndex) ;
 		} else {
-			revisionFile = ;
+			Exit "ERROR: Haiku revision could not be determined." ;
 		}
 	}
 

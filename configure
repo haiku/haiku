@@ -565,6 +565,7 @@ fi
 # backup the passed arguments
 configureArgs="$@"
 configurePath=$0
+configureDir=`dirname $configurePath`
 
 # backup relevant environs
 configureEnvirons=
@@ -635,6 +636,7 @@ fi
 
 # exported (BuildSetup) default parameter values
 #
+GIT_DIR=`git -C "$configureDir" rev-parse --git-dir | sed 's/^gitdir: //'`
 HOST_GCC_RAW_VERSION=`$CC -dumpversion`
 HOST_CC_IS_LEGACY_GCC=`is_legacy_gcc $HOST_GCC_RAW_VERSION`
 HOST_GCC_MACHINE=`$CC -dumpmachine`
@@ -1101,6 +1103,8 @@ cat << EOF > "$buildConfigFile"
 #c ${configurePath}
 #e ${configureEnvirons}
 #a ${configureArgs}
+
+GIT_DIR						?= "${GIT_DIR}" ;
 
 HOST_PLATFORM				?= "${HOST_PLATFORM}" ;
 TARGET_PLATFORM 			?= "${TARGET_PLATFORM}" ;
