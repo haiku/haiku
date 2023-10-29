@@ -39,12 +39,16 @@ public:
 			bool				WasStopped();
 			process_state		ProcessState();
 
+	virtual	BString				LogReport();
+
 			void				SetListener(ProcessListener* listener);
 
 protected:
 	virtual	status_t			RunInternal() = 0;
 	virtual	status_t			StopInternal();
 			void				_NotifyChanged();
+
+	static	char				_ProcessStateIdentifier(process_state value);
 
 protected:
 			BLocker				fLock;
@@ -54,6 +58,7 @@ private:
 			bool				fWasStopped;
 			process_state		fProcessState;
 			status_t			fErrorStatus;
+			double				fDurationSeconds;
 };
 
 #endif // ABSTRACT_PROCESS_H

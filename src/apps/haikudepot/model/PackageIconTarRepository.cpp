@@ -9,7 +9,7 @@
 #include <Autolock.h>
 #include <AutoDeleter.h>
 #include <File.h>
-#include <support/StopWatch.h>
+#include <StopWatch.h>
 
 #include "Logger.h"
 #include "TarArchiveService.h"

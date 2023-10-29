@@ -16,6 +16,8 @@ public:
 								AbstractSingleFileServerProcess(uint32 options);
 	virtual						~AbstractSingleFileServerProcess();
 
+	virtual	BString				LogReport();
+
 protected:
 	virtual status_t			RunInternal();
 
@@ -26,6 +28,10 @@ protected:
 	virtual	status_t			GetLocalPath(BPath& path) const = 0;
 
 	virtual	status_t			GetStandardMetaDataPath(BPath& path) const;
+
+protected:
+			double				fDownloadDurationSeconds;
+			double				fProcessLocalDataDurationSeconds;
 };
 
 #endif // ABSTRACT_SINGLE_FILE_SERVER_PROCESS_H

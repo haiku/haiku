@@ -1608,6 +1608,9 @@ MainWindow::_HandleProcessCoordinatorChanged(ProcessCoordinatorState& coordinato
 				messenger.SendMessage(message);
 			}
 
+			HDDEBUG("process coordinator report;\n---\n%s\n----",
+				fCoordinator->LogReport().String());
+
 			delete fCoordinator;
 			fCoordinator = NULL;
 

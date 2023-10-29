@@ -11,6 +11,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 #include <Locker.h>
+#include <StopWatch.h>
 
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
@@ -23,7 +24,8 @@ AbstractProcess::AbstractProcess()
 	fListener(NULL),
 	fWasStopped(false),
 	fProcessState(PROCESS_INITIAL),
-	fErrorStatus(B_OK)
+	fErrorStatus(B_OK),
+	fDurationSeconds(0.0)
 {
 }
 
@@ -68,7 +70,9 @@ AbstractProcess::Run()
 	if (listener != NULL)
 		listener->ProcessChanged();
 
+	BStopWatch stopWatch("process", true);
 	status_t runResult = RunInternal();
+	fDurationSeconds = ((double) stopWatch.ElapsedTime() / 1000000.0);
 
 	if (runResult != B_OK)
 		HDERROR("[%s] an error has arisen; %s", Name(), strerror(runResult));
@@ -178,4 +182,31 @@ AbstractProcess::_NotifyChanged()
 	}
 	if (listener != NULL)
 		listener->ProcessChanged();
+}
+
+
+BString
+AbstractProcess::LogReport()
+{
+	BString result;
+	AutoLocker<BLocker> locker(&fLock);
+	result.SetToFormat("%s [%c] %6.3f", Name(), _ProcessStateIdentifier(ProcessState()),
+		fDurationSeconds);
+	return result;
+}
+
+
+/*static*/ char
+AbstractProcess::_ProcessStateIdentifier(process_state value)
+{
+	switch (value) {
+		case PROCESS_INITIAL:
+			return 'I';
+		case PROCESS_RUNNING:
+			return 'R';
+		case PROCESS_COMPLETE:
+			return 'C';
+		default:
+			return '?';
+	}
 }

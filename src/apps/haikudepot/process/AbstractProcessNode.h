@@ -10,6 +10,7 @@
 #include <Locker.h>
 #include <ObjectList.h>
 #include <OS.h>
+#include <String.h>
 
 
 class AbstractProcess;
@@ -42,6 +43,8 @@ public:
 								SuccessorAt(int32 index) const;
 
 	virtual	void				SetListener(ProcessListener* listener);
+
+			BString				LogReport();
 
 protected:
 			status_t			_SpinUntilProcessState(

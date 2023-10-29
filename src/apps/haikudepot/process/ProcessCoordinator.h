@@ -109,6 +109,8 @@ public:
 
 			float				Progress();
 
+			BString				LogReport();
+
 	const	BString&			Name() const;
 			BMessage*			Message() const;
 

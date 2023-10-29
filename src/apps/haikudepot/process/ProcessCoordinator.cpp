@@ -459,3 +459,20 @@ ProcessCoordinator::_CountNodesCompleted()
 	}
 	return nodesCompleted;
 }
+
+
+BString
+ProcessCoordinator::LogReport()
+{
+	BString result;
+	AutoLocker<BLocker> locker(&fLock);
+
+	for (int32 i = 0; i < fNodes.CountItems(); i++) {
+		if (0 != result.Length())
+			result.Append("\n");
+		AbstractProcessNode* node = fNodes.ItemAt(i);
+		result.Append(node->LogReport());
+	}
+
+	return result;
+}

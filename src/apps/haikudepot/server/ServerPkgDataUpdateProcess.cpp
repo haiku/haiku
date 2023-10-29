@@ -14,7 +14,7 @@
 #include <AutoLocker.h>
 #include <Catalog.h>
 #include <FileIO.h>
-#include <support/StopWatch.h>
+#include <StopWatch.h>
 #include <Url.h>
 
 #include "Logger.h"

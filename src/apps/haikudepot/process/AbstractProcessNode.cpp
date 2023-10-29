@@ -139,3 +139,9 @@ AbstractProcessNode::SuccessorAt(int32 index) const
 	return fSuccessorNodes.ItemAt(index);
 }
 
+
+BString
+AbstractProcessNode::LogReport()
+{
+	return Process()->LogReport();
+}

@@ -6,6 +6,9 @@
 
 #include "AbstractSingleFileServerProcess.h"
 
+#include <AutoLocker.h>
+#include <StopWatch.h>
+
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "ServerHelper.h"
@@ -16,7 +19,9 @@
 AbstractSingleFileServerProcess::AbstractSingleFileServerProcess(
 	uint32 options)
 	:
-	AbstractServerProcess(options)
+	AbstractServerProcess(options),
+	fDownloadDurationSeconds(0.0),
+    fProcessLocalDataDurationSeconds(0.0)
 {
 }
 
@@ -50,9 +55,11 @@ AbstractSingleFileServerProcess::RunInternal()
 	hasData = hasData && size > 0;
 
 	if (IsSuccess(result) && ShouldAttemptNetworkDownload(hasData)) {
+		BStopWatch stopWatch("download", true);
 		result = DownloadToLocalFileAtomically(
 			localPath,
 			ServerSettings::CreateFullUrl(urlPathComponent));
+		fDownloadDurationSeconds = ((double) stopWatch.ElapsedTime() / 1000000.0);
 
 		if (!IsSuccess(result)) {
 			if (hasData) {
@@ -77,7 +84,10 @@ AbstractSingleFileServerProcess::RunInternal()
 
 	if (IsSuccess(result)) {
 		HDINFO("[%s] will process data", Name());
+
+		BStopWatch stopWatch("process local data", true);
 		result = ProcessLocalData();
+		fProcessLocalDataDurationSeconds = ((double) stopWatch.ElapsedTime() / 1000000.0);
 
 		switch (result) {
 			case B_OK:
@@ -98,4 +108,27 @@ status_t
 AbstractSingleFileServerProcess::GetStandardMetaDataPath(BPath& path) const
 {
 	return GetLocalPath(path);
+}
+
+
+BString
+AbstractSingleFileServerProcess::LogReport()
+{
+	BString result;
+	result.Append(AbstractProcess::LogReport());
+
+	AutoLocker<BLocker> locker(&fLock);
+
+	if (ProcessState() == PROCESS_COMPLETE) {
+		BString downloadLogLine;
+		BString localDataLogLine;
+		downloadLogLine.SetToFormat("\n - download %6.3f",
+			fDownloadDurationSeconds);
+		localDataLogLine.SetToFormat("\n - process local data %6.3f",
+			fProcessLocalDataDurationSeconds);
+		result.Append(downloadLogLine);
+		result.Append(localDataLogLine);
+	}
+
+	return result;
 }
