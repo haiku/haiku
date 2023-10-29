@@ -1040,6 +1040,12 @@ ext2_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 		if (status != B_OK)
 			return status;
 
+		status = existent->Unlink(transaction);
+		if (status != B_OK)
+			ERROR("Error while unlinking existing destination\n");
+
+		entry_cache_remove(volume->ID(), newDirectory->ID(), newName);
+
 		notify_entry_removed(volume->ID(), newDirectory->ID(), newName,
 			existentID);
 	} else if (status == B_ENTRY_NOT_FOUND) {
