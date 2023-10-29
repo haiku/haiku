@@ -213,6 +213,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				}
 				stream->extent_entries[stream->extent_header.NumEntries() - 1]
 					.SetLength(last.Length() + allocated);
+				fInode->SetExtentChecksum(stream);
 				fNumBlocks += allocated;
 				allocated = 0;
 				TRACE("Enlarge() entry extended\n");
@@ -266,6 +267,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				fStream->extent_index[0].SetPhysicalBlock(newBlock);
 				stream->extent_header.SetMaxEntries((fVolume->BlockSize()
 					- sizeof(ext2_extent_header)) / sizeof(ext2_extent_index));
+				fInode->SetExtentChecksum(stream);
 				ASSERT(stream->extent_header.IsValid());
 
 				ASSERT(Check());
@@ -292,6 +294,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				stream->extent_index[index].SetLogicalBlock(fNumBlocks);
 				stream->extent_index[index].SetPhysicalBlock(newBlock);
 				stream->extent_header.SetNumEntries(index + 1);
+				fInode->SetExtentChecksum(stream);
 				path[level++] = newBlock;
 
 				depth = stream->extent_header.Depth() - 1;
@@ -307,6 +310,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 					- sizeof(ext2_extent_header)) / sizeof(ext2_extent_index));
 				stream->extent_header.SetDepth(depth);
 				stream->extent_header.SetGeneration(0);
+				fInode->SetExtentChecksum(stream);
 
 				ASSERT(Check());
 			}
@@ -336,6 +340,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 				stream->extent_index[index].SetLogicalBlock(fNumBlocks);
 				stream->extent_index[index].SetPhysicalBlock(newBlock);
 				stream->extent_header.SetNumEntries(index + 1);
+				fInode->SetExtentChecksum(stream);
 
 				TRACE("Enlarge() init entry block %" B_PRIu64
 					" at depth %d\n", newBlock, depth);
@@ -349,6 +354,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 					- sizeof(ext2_extent_header)) / sizeof(ext2_extent_entry));
 				stream->extent_header.SetDepth(0);
 				stream->extent_header.SetGeneration(0);
+				fInode->SetExtentChecksum(stream);
 				ASSERT(Check());
 			}
 		}
@@ -366,6 +372,7 @@ ExtentStream::Enlarge(Transaction& transaction, off_t& numBlocks)
 		stream->extent_entries[index].SetLength(allocated);
 		stream->extent_entries[index].SetPhysicalBlock(fAllocatedPos);
 		stream->extent_header.SetNumEntries(index + 1);
+		fInode->SetExtentChecksum(stream);
 		TRACE("Enlarge() entry added at index %" B_PRId32 "\n", index);
 		ASSERT(stream->extent_header.IsValid());
 
@@ -434,6 +441,7 @@ ExtentStream::Shrink(Transaction& transaction, off_t& numBlocks)
 		}
 		TRACE("Shrink() new entry count: %" B_PRId32 "\n", index + 1);
 		stream->extent_header.SetNumEntries(index + 1);
+		fInode->SetExtentChecksum(stream);
 		ASSERT(Check());
 		
 		if (status != B_OK)
@@ -461,6 +469,7 @@ ExtentStream::Shrink(Transaction& transaction, off_t& numBlocks)
 				return status;
 			numBlocks++;
 			stream->extent_header.SetNumEntries(index);
+			fInode->SetExtentChecksum(stream);
 			TRACE("Shrink() new entry count: %d\n", index);
 		}
 		if (stream == fStream && stream->extent_header.NumEntries() == 0)
@@ -481,6 +490,7 @@ ExtentStream::Init()
 	fStream->extent_header.SetMaxEntries(4);
 	fStream->extent_header.SetDepth(0);
 	fStream->extent_header.SetGeneration(0);
+	fInode->SetExtentChecksum(fStream);
 }
 
 
