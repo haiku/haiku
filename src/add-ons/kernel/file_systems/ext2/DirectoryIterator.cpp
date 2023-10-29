@@ -609,7 +609,7 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 		root = (HTreeRoot*)secondBlock;
 
 		HTreeFakeDirEntry* dotdot = &root->dotdot;
-		dotdot->SetEntryLength(maxSize);
+		dotdot->SetEntryLength(maxSize - (sizeof(HTreeFakeDirEntry) + 4));
 
 		root->hash_version = fVolume->DefaultHashVersion();
 		root->root_info_length = 8;
@@ -882,7 +882,7 @@ DirectoryIterator::_HTreeEntryTail(uint8* block, uint16 offset) const
 	uint16 firstEntry = offset % fBlockSize / sizeof(HTreeEntry);
 	HTreeCountLimit* countLimit = (HTreeCountLimit*)&entries[firstEntry];
 	uint16 limit = countLimit->Limit();
-	TRACE("HTreeEntryIterator::_HTreeEntryTail() %p %p\n", block, &entries[firstEntry + limit]);
+	TRACE("DirectoryIterator::_HTreeEntryTail() %p %p\n", block, &entries[firstEntry + limit]);
 	return (ext2_htree_tail*)(&entries[firstEntry + limit]);
 }
 
@@ -897,7 +897,7 @@ DirectoryIterator::_HTreeRootChecksum(uint8* block, uint16 offset, uint16 count)
 	checksum = calculate_crc32c(checksum, (uint8*)&gen, sizeof(gen));
 	checksum = calculate_crc32c(checksum, block,
 		offset + count * sizeof(HTreeEntry));
-	TRACE("HTreeEntryIterator::_HTreeRootChecksum() size %" B_PRIu64 "\n",
+	TRACE("DirectoryIterator::_HTreeRootChecksum() size %" B_PRIu64 "\n",
 		offset + count * sizeof(HTreeEntry));
 	ext2_htree_tail dummy;
 	dummy.reserved = 0;
