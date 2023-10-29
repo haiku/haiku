@@ -1815,7 +1815,7 @@ page_scrubber(void *unused)
 		if (reserved == 0)
 			continue;
 
-		// get some pages from the free queue
+		// get some pages from the free queue, mostly sorted
 		ReadLocker locker(sFreePageQueuesLock);
 
 		vm_page *page[SCRUB_SIZE];
@@ -1848,7 +1848,8 @@ page_scrubber(void *unused)
 		locker.Lock();
 
 		// and put them into the clear queue
-		for (int32 i = 0; i < scrubCount; i++) {
+		// process the array reversed when prepending to preserve sequential order
+		for (int32 i = scrubCount - 1; i >= 0; i--) {
 			page[i]->SetState(PAGE_STATE_CLEAR);
 			page[i]->busy = false;
 			DEBUG_PAGE_ACCESS_END(page[i]);
@@ -3654,14 +3655,16 @@ static void
 allocate_page_run_cleanup(VMPageQueue::PageList& freePages,
 	VMPageQueue::PageList& clearPages)
 {
-	while (vm_page* page = freePages.RemoveHead()) {
+	// Page lists are sorted, so remove tails before prepending to the respective queue.
+
+	while (vm_page* page = freePages.RemoveTail()) {
 		page->busy = false;
 		page->SetState(PAGE_STATE_FREE);
 		DEBUG_PAGE_ACCESS_END(page);
 		sFreePageQueue.PrependUnlocked(page);
 	}
 
-	while (vm_page* page = clearPages.RemoveHead()) {
+	while (vm_page* page = clearPages.RemoveTail()) {
 		page->busy = false;
 		page->SetState(PAGE_STATE_CLEAR);
 		DEBUG_PAGE_ACCESS_END(page);
