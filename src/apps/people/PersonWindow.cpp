@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -348,6 +348,21 @@ void
 PersonWindow::AddAttribute(const char* label, const char* attribute)
 {
 	fView->AddAttribute(label, attribute);
+}
+
+
+void
+PersonWindow::SetInitialValues(BMessage* message)
+{
+	char* attribute;
+	uint32 type;
+	int32 count;
+
+	for (int32 i = 0; message->GetInfo(B_STRING_TYPE, i, &attribute, &type, &count) == B_OK; i++) {
+		BString text = "";
+		if (message->FindString(attribute, &text) == B_OK)
+			fView->SetAttribute(attribute, text.String(), true);
+	}
 }
 
 

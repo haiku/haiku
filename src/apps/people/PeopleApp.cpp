@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -223,7 +223,7 @@ TPeopleApp::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case M_NEW:
 		case B_SILENT_RELAUNCH:
-			_NewWindow();
+			_NewWindow(NULL, message);
 			break;
 
 		case M_WINDOW_QUITS:
@@ -274,7 +274,7 @@ TPeopleApp::RefsReceived(BMessage* message)
 		else {
 			BFile file(&ref, B_READ_ONLY);
 			if (file.InitCheck() == B_OK)
-				_NewWindow(&ref);
+				_NewWindow(&ref, NULL);
 		}
 	}
 }
@@ -292,13 +292,15 @@ TPeopleApp::ReadyToRun()
 
 
 PersonWindow*
-TPeopleApp::_NewWindow(entry_ref* ref)
+TPeopleApp::_NewWindow(entry_ref* ref, BMessage* message)
 {
 	PersonWindow* window = new PersonWindow(fPosition,
 		B_TRANSLATE("New person"), kNameAttribute,
 		kCategoryAttribute, ref);
 
 	_AddAttributes(window);
+	if (message != NULL)
+		window->SetInitialValues(message);
 
 	window->Show();
 

@@ -386,8 +386,10 @@ PersonView::SetAttribute(const char* attribute, const char* value,
 		}
 	}
 
-	if (control == NULL)
+	if (control == NULL) {
+		UnlockLooper();
 		return;
+	}
 
 	if (update) {
 		control->SetText(value);

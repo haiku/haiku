@@ -28,7 +28,7 @@ enum {
 	M_NEW					= 'newp',
 	M_SAVE_AS				= 'svas',
 	M_WINDOW_QUITS			= 'wndq',
-	M_CONFIGURE_ATTRIBUTES	= 'catr'
+	M_CONFIGURE_ATTRIBUTES	= 'catr',
 };
 
 class PersonWindow;
@@ -45,7 +45,7 @@ public:
 
 private:
 				PersonWindow*	_FindWindow(const entry_ref&) const;
-				PersonWindow*	_NewWindow(entry_ref* = NULL);
+				PersonWindow*	_NewWindow(entry_ref* = NULL, BMessage* = NULL);
 				void			_AddAttributes(PersonWindow* window) const;
 				void			_SavePreferences(BMessage* message) const;
 

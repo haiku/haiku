@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc. All rights reserved.
+ * Copyright 2010-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -42,6 +42,7 @@ public:
 
 			void				AddAttribute(const char* label,
 									const char* attribute);
+			void				SetInitialValues(BMessage* message);
 
 			void				SaveAs();
 
