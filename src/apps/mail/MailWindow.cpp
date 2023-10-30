@@ -66,6 +66,7 @@ of their respective holders. All rights reserved.
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
+#include <StringList.h>
 #include <StringView.h>
 #include <TextView.h>
 #include <UTF8.h>
@@ -1376,7 +1377,10 @@ TMailWindow::MessageReceived(BMessage* msg)
 		case M_SAVE:
 		{
 			const char* address;
+			const char* name;
 			if (msg->FindString("address", (const char**)&address) != B_OK)
+				break;
+			if (msg->FindString("name", (const char**)&name) != B_OK)
 				break;
 
 			BVolumeRoster volumeRoster;
@@ -1417,19 +1421,8 @@ TMailWindow::MessageReceived(BMessage* msg)
 
 			if (!foundEntry) {
 				// None found.
-				// Ask to open a new Person file with this address pre-filled
-
-				status_t result = be_roster->Launch("application/x-person",
-					1, &arg);
-
-				if (result != B_NO_ERROR) {
-					BAlert* alert = new BAlert("", B_TRANSLATE(
-						"Sorry, could not find an application that "
-						"supports the 'Person' data type."),
-						B_TRANSLATE("OK"));
-					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-					alert->Go();
-				}
+				// Ask to open a new Person file with this address + name pre-filled
+				_CreateNewPerson(address, name);
 			}
 			free(arg);
 			break;
@@ -2987,7 +2980,7 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 		while ((item = fSaveAddrMenu->RemoveItem((int32)0)) != NULL)
 			delete item;
 
-		// create the list of addresses
+		// create the list of addresses + names
 
 		BList addressList;
 		get_address_list(addressList, fMail->To(), extract_address);
@@ -2995,10 +2988,17 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 		get_address_list(addressList, fMail->From(), extract_address);
 		get_address_list(addressList, fMail->ReplyTo(), extract_address);
 
+		BList nameList;
+		get_address_list(nameList, fMail->To(), extract_address_name);
+		get_address_list(nameList, fMail->CC(), extract_address_name);
+		get_address_list(nameList, fMail->From(), extract_address_name);
+		get_address_list(nameList, fMail->ReplyTo(), extract_address_name);
+
 		BMessage* msg;
 
 		for (int32 i = addressList.CountItems(); i-- > 0;) {
 			char* address = (char*)addressList.RemoveItem((int32)0);
+			char* name = (char*)nameList.RemoveItem((int32)0);
 
 			// insert the new address in alphabetical order
 			int32 index = 0;
@@ -3016,10 +3016,12 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 
 			msg = new BMessage(M_SAVE);
 			msg->AddString("address", address);
+			msg->AddString("name", name);
 			fSaveAddrMenu->AddItem(new BMenuItem(address, msg), index);
 
 		skip:
 			free(address);
+			free(name);
 		}
 
 		// Clear out existing contents of text view.
@@ -3277,6 +3279,26 @@ TMailWindow::_LaunchQuery(const char* title, const char* attribute,
 	entry_ref ref;
 	if (entry.GetRef(&ref) == B_OK)
 		be_roster->Launch(&ref);
+}
+
+
+void
+TMailWindow::_CreateNewPerson(BString address, BString name)
+{
+	BMessage message(M_LAUNCH_PEOPLE);
+	message.AddString("META:name", name);
+	message.AddString("META:email", address);
+
+	status_t result = be_roster->Launch("application/x-person", &message);
+
+	if ((result != B_OK) && (result != B_ALREADY_RUNNING)) {
+		BAlert* alert = new BAlert("", B_TRANSLATE(
+			"Sorry, could not find an application that "
+			"supports the 'Person' data type."),
+			B_TRANSLATE("OK"));
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
+	}
 }
 
 

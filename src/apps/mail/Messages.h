@@ -34,6 +34,10 @@ All rights reserved.
 #ifndef _MESSAGES_H
 #define _MESSAGES_H
 
+
+// as defined by the People app
+#define M_LAUNCH_PEOPLE	'newp'
+
 enum MESSAGES {
 	REFS_RECEIVED = 64,
 	LIST_INVOKED,
@@ -129,6 +133,7 @@ enum MENUS {
 
 	M_REDO
 };
+
 
 #endif // _MESSAGES_H
 

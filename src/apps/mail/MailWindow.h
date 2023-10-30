@@ -130,6 +130,7 @@ private:
 			void				_LaunchQuery(const char* title,
 									const char* attribute, BString text);
 
+			void				_CreateNewPerson(BString address, BString name);
 			void				_AddReadButton();
 			void				_UpdateReadButton();
 			void				_UpdateLabel(uint32 command, const char* label,
