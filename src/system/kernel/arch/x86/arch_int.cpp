@@ -161,6 +161,9 @@ x86_unexpected_exception(iframe* frame)
 				// TODO: Determine the correct cause via the FPU status
 				// register!
 			signalAddress = frame->ip;
+			// clear any pending exceptions, otherwise loading a new control word
+			// could raise exceptions.
+			asm volatile("fnclex");
 			break;
 
 		case 17: 	// Alignment Check Exception (#AC)

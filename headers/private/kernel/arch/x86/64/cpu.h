@@ -48,6 +48,8 @@ x86_context_switch(arch_thread* oldState, arch_thread* newState)
 			"r14", "r15", "xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5",
 			"xmm6", "xmm7", "xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13",
 			"xmm14", "xmm15", "memory");
+	// so that x87 FPU floating-point instructions can be executed
+	asm volatile("emms");
 	asm volatile("ldmxcsr %0" : : "m" (sseControl));
 	asm volatile("fldcw %0" : : "m" (fpuControl));
 }
