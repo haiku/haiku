@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2023, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Philippe St-Pierre, stpere@gmail.com
  * Distributed under the terms of the MIT License.
  */
@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <Application.h>
 #include <Autolock.h>
 #include <AutoLocker.h>
@@ -19,6 +21,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <Clipboard.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -40,8 +43,7 @@ static const uint32 kMsgStartFind = 'SFnd';
 
 class FindTextView : public BTextView {
 public:
-							FindTextView(BRect frame, const char* name,
-								BRect textRect, uint32 resizeMask);
+							FindTextView(const char* name);
 
 	virtual void			MakeFocus(bool state);
 	virtual void			TargetedByScrollView(BScrollView* view);
@@ -75,9 +77,9 @@ private:
 };
 
 
-FindTextView::FindTextView(BRect frame, const char* name, BRect textRect,
-		uint32 resizeMask)
-	: BTextView(frame, name, textRect, resizeMask),
+FindTextView::FindTextView(const char* name)
+	:
+	BTextView(name),
 	fScrollView(NULL),
 	fMode(kAsciiMode)
 {
@@ -487,19 +489,14 @@ FindTextView::GetData(BMessage& message)
 
 FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 		const BMessage* settings)
-	: BWindow(_rect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE),
+	:
+	BWindow(_rect, B_TRANSLATE("Find"), B_TITLED_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target)
 {
-	BView* view = new BView(Bounds(), "main", B_FOLLOW_ALL, 0);
-	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	AddChild(view);
-
 	int8 mode = kAsciiMode;
 	if (previous.FindInt8("find_mode", &mode) != B_OK && settings != NULL)
 		settings->FindInt8("find_mode", &mode);
-
-	// add the top widgets
 
 	fMenu = new BPopUpMenu("mode");
 	BMessage* message;
@@ -516,55 +513,44 @@ FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 	if (mode == kHexMode)
 		item->SetMarked(true);
 
-	BRect rect = Bounds().InsetByCopy(5, 5);
-	BMenuField* menuField = new BMenuField(rect, B_EMPTY_STRING,
-		B_TRANSLATE("Mode:"), fMenu, B_FOLLOW_LEFT | B_FOLLOW_TOP);
-	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 8);
-	menuField->ResizeToPreferred();
-	view->AddChild(menuField);
+	BMenuField* menuField = new BMenuField(B_TRANSLATE("Mode:"), fMenu);
 
-	// add the bottom widgets
-
-	BButton* button = new BButton(rect, B_EMPTY_STRING, B_TRANSLATE("Find"),
-		new BMessage(kMsgStartFind), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->MakeDefault(true);
-	button->ResizeToPreferred();
-	button->MoveTo(rect.right - button->Bounds().Width(),
-		rect.bottom - button->Bounds().Height());
-	view->AddChild(button);
-
-	fCaseCheckBox = new BCheckBox(rect, B_EMPTY_STRING, B_TRANSLATE("Case sensitive"),
-		NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-	fCaseCheckBox->ResizeToPreferred();
-	fCaseCheckBox->MoveTo(5, button->Frame().top);
-	bool caseSensitive;
-	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK) {
-		if (settings == NULL
-			|| settings->FindBool("case_sensitive", &caseSensitive) != B_OK)
-			caseSensitive = true;
-	}
-	fCaseCheckBox->SetValue(caseSensitive);
-	view->AddChild(fCaseCheckBox);
-
-	// and now those inbetween
-
-	rect.top = menuField->Frame().bottom + 5;
-	rect.bottom = fCaseCheckBox->Frame().top - 8;
-	rect.InsetBy(2, 2);
-	fTextView = new FindTextView(rect, B_EMPTY_STRING,
-		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(3, 3), B_FOLLOW_ALL);
+	fTextView = new FindTextView(B_EMPTY_STRING);
 	fTextView->SetWordWrap(true);
 	fTextView->SetMode((find_mode)mode);
 	fTextView->SetData(previous);
 
 	BScrollView* scrollView = new BScrollView("scroller", fTextView,
-		B_FOLLOW_ALL, B_WILL_DRAW, false, false);
-	view->AddChild(scrollView);
+		B_WILL_DRAW | B_FRAME_EVENTS, false, false);
 
-	ResizeTo(290, button->Frame().Height() * 3 + 30);
+	BButton* button = new BButton(B_TRANSLATE("Find"),
+		new BMessage(kMsgStartFind));
+	button->MakeDefault(true);
 
-	SetSizeLimits(fCaseCheckBox->Bounds().Width() + button->Bounds().Width()
-			+ 20, 32768, button->Frame().Height() * 3 + 10, 32768);
+	fCaseCheckBox = new BCheckBox(B_TRANSLATE("Case sensitive"), NULL);
+	bool caseSensitive;
+	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK
+		&& (settings == NULL
+			|| settings->FindBool("case_sensitive", &caseSensitive) != B_OK)) {
+		caseSensitive = true;
+	}
+	fCaseCheckBox->SetValue(caseSensitive);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.AddGroup(B_HORIZONTAL)
+			.Add(menuField->CreateLabelLayoutItem())
+			.Add(menuField->CreateMenuBarLayoutItem())
+			.AddGlue()
+			.End()
+		.Add(scrollView)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fCaseCheckBox)
+			.AddGlue()
+			.Add(button);
+
+	ResizeTo(std::max(Bounds().Width() / 2, 300.f),
+		button->Frame().Height() * 3 + 30);
 }
 
 
