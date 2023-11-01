@@ -1963,8 +1963,10 @@ RatingAttributeText::FitValue(BString* ratingString, const BPoseView* view)
 
 	for (int32 i = 0; i < fCount; i++) {
 		int64 n = i * steps;
-		if (rating > n)
+		if (rating > n + steps / 2)
 			fFullValueText += "★";
+		else if (rating > n)
+			fFullValueText += "⯪";
 		else
 			fFullValueText += "☆";
 	}
