@@ -11,12 +11,9 @@ long long __year_to_secs(long long year, int *is_leap)
 	}
 
 	{
-	int cycles, centuries, leaps, rem;
+	int cycles, centuries, leaps, rem, dummy;
 
-	if (!is_leap) {
-		static int isleap = 0;
-		is_leap = &isleap;
-	}
+	if (!is_leap) is_leap = &dummy;
 	cycles = (year-100) / 400;
 	rem = (year-100) % 400;
 	if (rem < 0) {
