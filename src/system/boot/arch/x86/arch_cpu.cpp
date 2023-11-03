@@ -23,6 +23,8 @@
 
 #include <string.h>
 
+#include <x86intrin.h>
+
 
 uint32 gTimeConversionFactor;
 
@@ -174,16 +176,12 @@ private:
 static inline uint64_t
 rdtsc_fenced()
 {
-	uint64 tsc;
-
 	// RDTSC is not serializing, nor does it drain the instruction stream.
 	// RDTSCP does, but is not available everywhere. Other OSes seem to use
 	// "CPUID" rather than MFENCE/LFENCE for serializing here during boot.
 	asm volatile ("cpuid" : : : "eax", "ebx", "ecx", "edx");
 
-	asm volatile ("rdtsc" : "=A"(tsc));
-
-	return tsc;
+	return __rdtsc();
 }
 
 
