@@ -1836,6 +1836,11 @@ MainWin::_CreateMenu()
 		setRatingMsg->AddInt32("rating", i);
 		fRatingMenu->AddItem(new BMenuItem(label, setRatingMsg));
 	}
+
+	BMessage* message = new BMessage(M_SET_RATING);
+	message->AddInt32("rating", 0);
+	fResetRatingItem = new BMenuItem(B_TRANSLATE("Reset rating"), message);
+	fAttributesMenu->AddItem(fResetRatingItem);
 }
 
 
@@ -2821,6 +2826,8 @@ MainWin::_UpdateAttributesMenu(const BNode& node)
 
 	for (int32 i = 0; BMenuItem* item = fRatingMenu->ItemAt(i); i++)
 		item->SetMarked(i + 1 == rating);
+
+	fResetRatingItem->SetEnabled(rating > 0);
 }
 
 

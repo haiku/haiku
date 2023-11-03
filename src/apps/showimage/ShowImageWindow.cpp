@@ -281,7 +281,13 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	_BuildViewMenu(menu, false);
 	fBar->AddItem(menu);
 
-	fBar->AddItem(_BuildRatingMenu());
+	menu = new BMenu(B_TRANSLATE_CONTEXT("Attributes", "Menus"));
+	menu->AddItem(_BuildRatingMenu());
+	BMessage* message = new BMessage(MSG_SET_RATING);
+	message->AddInt32("rating", 0);
+	fResetRatingItem = new BMenuItem(B_TRANSLATE("Reset rating"), message);
+	menu->AddItem(fResetRatingItem);
+	fBar->AddItem(menu);
 
 	SetPulseRate(100000);
 		// every 1/10 second; ShowImageView needs it for marching ants
@@ -399,14 +405,13 @@ ShowImageWindow::_BuildRatingMenu()
 {
 	fRatingMenu = new BMenu(B_TRANSLATE("Rating"));
 	for (int32 i = 1; i <= 10; i++) {
+		BMessage* message = new BMessage(MSG_SET_RATING);
 		BString label;
 		label << i;
-		BMessage* message = new BMessage(MSG_SET_RATING);
 		message->AddInt32("rating", i);
 		fRatingMenu->AddItem(new BMenuItem(label.String(), message));
 	}
-	// NOTE: We may want to encapsulate the Rating menu within a more
-	// general "Attributes" menu.
+
 	return fRatingMenu;
 }
 
@@ -1601,6 +1606,7 @@ ShowImageWindow::_UpdateRatingMenu()
 			break;
 		item->SetMarked(i == rating);
 	}
+	fResetRatingItem->SetEnabled(rating > 0);
 }
 
 

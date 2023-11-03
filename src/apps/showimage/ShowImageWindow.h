@@ -126,6 +126,7 @@ private:
 			BMenu*				fSlideShowDelayMenu;
 			BMenu*				fRatingMenu;
 			BMenu*	 			fOpenWithMenu;
+			BMenuItem*			fResetRatingItem;
 			BToolBar*			fToolBar;
 			bool				fToolBarVisible;
 			BView*				fScrollArea;
