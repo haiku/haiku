@@ -561,6 +561,20 @@ ext2_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 }
 
 
+/*!	Sets the open-mode flags for the open file cookie - only
+	supports O_APPEND currently, but that should be sufficient
+	for a file system.
+*/
+static status_t
+ext2_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie, int flags)
+{
+	file_cookie* cookie = (file_cookie*)_cookie;
+	cookie->open_mode = (cookie->open_mode & ~O_APPEND) | (flags & O_APPEND);
+
+	return B_OK;
+}
+
+
 static status_t
 ext2_fsync(fs_volume* _volume, fs_vnode* _node)
 {
@@ -1680,7 +1694,7 @@ fs_vnode_ops gExt2VnodeOps = {
 	&ext2_get_file_map,
 
 	&ext2_ioctl,
-	NULL,
+	&ext2_set_flags,
 	NULL,	// fs_select
 	NULL,	// fs_deselect
 	&ext2_fsync,
