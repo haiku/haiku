@@ -38,7 +38,7 @@ Updates have been successfully installed.	UpdateManager		I inzornaments a son st
 Exception occurred while updating packages : %s\n	UpdateAction		Ecezion capitade intant che si inzornave i pachets: %s\n
 A reboot is necessary to complete the update process.	UpdateManager		Al è necessari tornâ a inviâ il sisteme par completâ il procès di inzornament.
 Exception occurred while checking for updates: %s\n	CheckAction		Ecezion capitade intant che si verificave la presince di inzornaments: %s\n
-Packages are being updated	UpdateManager		I pachets a son daûr a jessi inzornâ
+Packages are being updated	UpdateManager		I pachets a son daûr a jessi inzornâts
 Cancel	SoftwareUpdaterWindow		Anule
 Don't quit	SoftwareUpdaterWindow		No sta sierâ
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Fâs clic chi par eseguî SoftwareUpdater. Cualchi inzornament al domandarà di risolvi un probleme e si varà di selezionâ la soluzion.

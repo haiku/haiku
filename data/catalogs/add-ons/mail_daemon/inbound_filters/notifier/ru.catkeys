@@ -1,7 +1,6 @@
-1	russian	x-vnd.Haiku-NewMailNotification	1375000288
+1	russian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Окно журнала
 none	NotifierConfigView		нет
-New mails notification	NotifierFilter		Уведомление о новой почте
 Alert	NotifierConfigView		Оповещение
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Центральное оповещение

@@ -1,7 +1,6 @@
-1	portuguese	x-vnd.Haiku-NewMailNotification	1375000288
+1	portuguese	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Janela de registo
 none	NotifierConfigView		nenhum
-New mails notification	NotifierFilter		Notificação de novo correio
 Alert	NotifierConfigView		Alerta
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Alerta central

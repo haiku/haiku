@@ -1,7 +1,6 @@
-1	friulian	x-vnd.Haiku-NewMailNotification	1375000288
+1	friulian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Barcon dal regjistri
 none	NotifierConfigView		nissun
-New mails notification	NotifierFilter		Notifiche gnove pueste
 Alert	NotifierConfigView		Alarme
 OK	NotifierFilter		Va ben
 Central alert	NotifierConfigView		Alarme centrâl

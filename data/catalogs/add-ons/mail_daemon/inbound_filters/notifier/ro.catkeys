@@ -1,7 +1,6 @@
-1	romanian	x-vnd.Haiku-NewMailNotification	1375000288
+1	romanian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Fereastră de jurnal
 none	NotifierConfigView		nespecificat
-New mails notification	NotifierFilter		Notificare emailuri noi
 Alert	NotifierConfigView		Alertă
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Alertă centrală

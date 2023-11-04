@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-NewMailNotification	1375000288
+1	ukrainian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Вікно журналу
 none	NotifierConfigView		пусто
-New mails notification	NotifierFilter		Сповіщення про нову пошту
 Alert	NotifierConfigView		Оповіщення
 OK	NotifierFilter		ОК
 Central alert	NotifierConfigView		Головне оповіщення

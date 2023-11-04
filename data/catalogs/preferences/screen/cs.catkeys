@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Screen	133788249
+1	czech	x-vnd.Haiku-Screen	2318349707
 no	Screen		ne
 bits/pixel	Screen		bitů/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitů/pixel, 32768 barev
@@ -13,6 +13,7 @@ Video format:	Screen		Formát videa:
 Undo	Screen		Zpět
 OK	Screen		OK
 Current workspace	Screen		Aktuální pracovní plocha
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		svisle
 All workspaces	Screen		Všechny pracovní plochy
 Use laptop panel:	Screen		Použít panel notebooku:

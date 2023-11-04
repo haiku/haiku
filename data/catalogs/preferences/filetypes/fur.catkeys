@@ -24,7 +24,7 @@ Gamma	Application Type Window		Schirie
 Cancel	Application Type Window		Anule
 Attribute	Attribute Window		Atribût
 Multiple launch	Application Type Window		Inviament multipli
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Gjenar di aplicazion al pues jessi gjavât} other{# Gjenars di aplicazion a puedin jessi gjavâts}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{Al è pussibil gjavâ # gjenar di aplicazion} other{Al è pussibil gjavâ # gjenars di aplicazion}}
 Edit…	Application Types Window		Modifiche…
 Could not set preferred application	FileTypes Window		Impussibil stabilî la aplicazion preferide
 Description	FileTypes Window		Descrizion
@@ -55,7 +55,7 @@ Time	Attribute ListView		Timp
 Extensions:	FileTypes Window		Estensions:
 Select preferred application	FileType Window		Selezione aplicazion preferide
 Description:	FileTypes Window		Descrizion:
-Multiple files from \"%s\" file type	FileType Window		Multiplis file dal gjenar di file \"%s\"
+Multiple files from \"%s\" file type	FileType Window		Multiplis files dal gjenar di file \"%s\"
 Add new group	New File Type Window		Zonte gnûf grup
 Remove uninstalled	Application Types Window		Gjave disinstalâts
 File	Application Type Window		File
@@ -83,7 +83,7 @@ Recognition rule is not valid:\n\n	FileTypes Window		Regule pal ricognossiment n
 Show icons in list	FileTypes Window		Mostre lis iconis te liste
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificabil
 New resource file…	FileTypes Window		Gnûf file risorse…
-[Multiple files] file types	FileType Window		[File multiplis] gjenars di file
+[Multiple files] file types	FileType Window		[Files multiplis] gjenars di file
 Application type	Application Type Window		Gjenar di aplicazion
 Show in Tracker…	Application Types Window		Mostre tal Tracker…
 Type name:	FileTypes Window		Non dal gjenar:
@@ -100,7 +100,7 @@ no icon	FileTypes Window		nissune icone
 Single launch	Application Type Window		Inviament singul
 %s file type	FileType Window		Gjenar di file %s
 Default	Attribute ListView		Predefinît
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		La rimozion di un super-gjenar no pues jessi anulade.\nDucj i gjenars di file che a fasin part di chest super-gjenar a laran pierdûts!\n\nContinuâ pardabon? Par gjavâ il grup intîr, ten fracât il tast Maiusc e frache \"Gjave\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Nol è pussibil tornâ indaûr e anulâ la rimozion di un super-gjenar.\nDucj i gjenars di file che a fasin part di chest super-gjenar a laran pierdûts!\n\nContinuâ pardabon? Par gjavâ il grup intîr, ten fracât il tast Maiusc e frache \"Gjave\".
 String	Attribute ListView		Stringhe
 Add type	New File Type Window		Zonte gjenar
 Remove icon	Icon View		Gjave icone

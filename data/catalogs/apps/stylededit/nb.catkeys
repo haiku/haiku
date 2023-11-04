@@ -4,7 +4,7 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbakestill
 Cut	Menus		Klipp ut
 Center	Menus		Sentrer
 Increase size	Menus		Øk størrelsen
-Page setup…	Menus		Sideoppsett...
+Page setup…	Menus		Sideoppsett…
 Wrap-around search	FindandReplaceWindow		Wrap-around søk
 Untitled 	StyledEditWindow		Uten navn
 OK	Statistics		OK
@@ -27,7 +27,7 @@ OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Lås opp fil
 Italic	Menus		Kursiv
 Can't undo	Menus		Kan ikke angre
-Replace…	Menus		Erstatt...
+Replace…	Menus		Erstatt…
 File	Menus		Fil
 Paste	Menus		Lim inn
 Bold	Menus		Fet
@@ -40,7 +40,7 @@ Save	SaveAlert		Lagre
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Avbryt
 Cancel	FindandReplaceWindow		Avbryt
-Statistics…	Menus		Statistikk...
+Statistics…	Menus		Statistikk…
 Encoding	Open_and_SaveAsPanel		Koding
 Replace all	FindandReplaceWindow		Erstatt alle
 Close	Menus		Lukk
@@ -57,7 +57,7 @@ Undo typing	QuitAlert		Angre skriving
 Error loading \"%s\":\n\t%s	LoadAlert		Feil ved lasting av \"%s\":\n\t%s
 Don't save	SaveAlert		Ikke lagre
 Reload…	Menus		Last inn på nytt…
-Print…	Menus		Skriv ut...
+Print…	Menus		Skriv ut…
 Quit	Menus		Avslutt
 Redo typing	QuitAlert		Tilbakestill skriving
 Ignore	NodeMonitorAlerts		Ignorer
@@ -79,8 +79,8 @@ Replace next	Menus		Erstatt neste
 OK	QuitAlert		OK
 Edit	Menus		Rediger
 Replace with:	FindandReplaceWindow		Erstatt med:
-Open…	Menus		Åpne...
-Save as…	Menus		Lagre som...
+Open…	Menus		Åpne…
+Save as…	Menus		Lagre som…
 Replace	FindandReplaceWindow		Erstatt
 Characters:	Statistics		Bokstaver:
 Don't save	QuitAlert		Ikke lagre

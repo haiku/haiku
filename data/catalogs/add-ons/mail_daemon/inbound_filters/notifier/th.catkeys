@@ -1,7 +1,6 @@
-1	thai	x-vnd.Haiku-NewMailNotification	1375000288
+1	thai	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		หน้าต่างบันทึกข้อความ
 none	NotifierConfigView		ไม่มี
-New mails notification	NotifierFilter		แจ้งเตือนอีเมล์ใหม่
 Alert	NotifierConfigView		เตือน
 OK	NotifierFilter		ตกลง
 Central alert	NotifierConfigView		เตือนจากส่วนกลาง

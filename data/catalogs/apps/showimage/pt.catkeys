@@ -1,62 +1,62 @@
 1	portuguese	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Usar como papel de parede…
-File	Menus		Ficheiro
-Slide delay	Menus		Tempo de transição
-Selection mode	Menus		Modo de seleção
-Zoom in	Menus		Aumentar zoom
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
-Page setup…	Menus		Configuração de página…
-Print…	Menus		Imprimir…
-Get info…	Menus		Obter informações…
-OK	SaveToFile		OK
-Previous page	Menus		Página anterior
-View	Menus		Ver
-Full screen	Menus		Ecrã inteiro
-Go to page	Menus		Ir para a página
-Zoom out	Menus		Diminuir zoom
-Quit	Menus		Sair
-Rotate counterclockwise	Menus		Rodar para a esquerda
-High-quality zooming	Menus		Zoom de alta qualidade
-Browse	Menus		Navegar
-Edit	Menus		Editar
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou não existe o ficheiro, ou um tradutor de imagens para esse formato.
-First page	Menus		Primeira página
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
-Leave full screen	Menus		Sair do ecrã completo
-Close	Menus		Fechar
-Close	ClosePrompt		Fechar
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
-Rating	Menus		Classificação
-Flip left to right	Menus		Inverter horizontalmente
-Show caption in full screen mode	Menus		Mostrar legenda no modo de ecrã inteiro
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Abrir…
-Next file	Menus		Próximo ficheiro
-Clear selection	Menus		Limpar seleção
-Close document	ClosePrompt		Fechar documento
-Height: 	PrintOptionsWindow		Altura: 
-The file '%s' could not be written.	SaveToFile		Não foi possível escrever o ficheiro '%s'.
-Cancel	ClosePrompt		Cancelar
-Show tool bar	Menus		Mostrar barra de ferramentas
-Fit to window	Menus		Ajustar à janela
-Print options	PrintOptionsWindow		Opções de impressão
-Copy	Menus		Copiar
-Progress monitor	ProgressWindow		Monitor de progresso
-Last page	Menus		Última página
-Stretch to window	Menus		Esticar à medida da janela
-Previous file	Menus		Ficheiro anterior
 ShowImage	System name		ShowImage
+Page setup…	Menus		Configuração de página…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
+Previous file	Menus		Ficheiro anterior
+View	Menus		Ver
+Leave full screen	Menus		Sair do ecrã completo
+Show caption in full screen mode	Menus		Mostrar legenda no modo de ecrã inteiro
+Flip left to right	Menus		Inverter horizontalmente
+Full screen	Menus		Ecrã inteiro
+Copy	Menus		Copiar
+Height: 	PrintOptionsWindow		Altura: 
+Next file	Menus		Próximo ficheiro
 Slide show	Menus		Apresentação de Diapositivos
-Fit image to page	PrintOptionsWindow		Ajustar imagem à página
-Flip top to bottom	Menus		Inverter verticalmente
-Select all	Menus		Mostrar tudo
-Zoom factor in %:	PrintOptionsWindow		Zoom em %:
-Width:	PrintOptionsWindow		Largura:
-Image	Menus		Imagem
-Move to Trash	Menus		Mover para o Lixo
-OK	Alerts		OK
-Rotate clockwise	Menus		Rodar para a direita
-Job setup	PrintOptionsWindow		Configurar trabalho de impressão
 Original size	Menus		Tamanho original
-Next page	Menus		Próxima página
+Width:	PrintOptionsWindow		Largura:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
+Zoom factor in %:	PrintOptionsWindow		Zoom em %:
+Get info…	Menus		Obter informações…
+Zoom out	Menus		Diminuir zoom
+OK	Alerts		OK
+File	Menus		Ficheiro
+Close	ClosePrompt		Fechar
+Image	Menus		Imagem
+Flip top to bottom	Menus		Inverter verticalmente
+Zoom in	Menus		Aumentar zoom
+Last page	Menus		Última página
+Cancel	ClosePrompt		Cancelar
+High-quality zooming	Menus		Zoom de alta qualidade
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Você deseja fechar o documento?
+Close	Menus		Fechar
+Selection mode	Menus		Modo de seleção
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Ajustar imagem à página
+Show tool bar	Menus		Mostrar barra de ferramentas
+First page	Menus		Primeira página
+OK	SaveToFile		OK
+Print…	Menus		Imprimir…
+The file '%s' could not be written.	SaveToFile		Não foi possível escrever o ficheiro '%s'.
+Quit	Menus		Sair
+Rating	Menus		Classificação
+Close document	ClosePrompt		Fechar documento
+Stretch to window	Menus		Esticar à medida da janela
+Job setup	PrintOptionsWindow		Configurar trabalho de impressão
+Clear selection	Menus		Limpar seleção
+Rotate clockwise	Menus		Rodar para a direita
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Não foi possível abrir a imagem! Ou não existe o ficheiro, ou um tradutor de imagens para esse formato.
+Rotate counterclockwise	Menus		Rodar para a esquerda
+Previous page	Menus		Página anterior
+Fit to window	Menus		Ajustar à janela
+Browse	Menus		Navegar
+Go to page	Menus		Ir para a página
+Progress monitor	ProgressWindow		Monitor de progresso
+Edit	Menus		Editar
+Move to Trash	Menus		Mover para o Lixo
+Use as background…	Menus		Usar como papel de parede…
+Open…	Menus		Abrir…
 Save as…	Menus		Guardar como…
+Next page	Menus		Próxima página
+Print options	PrintOptionsWindow		Opções de impressão
+Slide delay	Menus		Tempo de transição
+Select all	Menus		Mostrar tudo

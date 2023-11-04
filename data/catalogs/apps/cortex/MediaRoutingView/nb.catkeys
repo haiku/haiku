@@ -1,0 +1,11 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.MediaRoutingView	2301341410
+%refname% (no file)	MediaNodePanel		%refname% (ingen fil)
+Icon view	MediaRoutingView		Ikonvisning
+OK	MediaRoutingView		OK
+Advanced	MediaNodePanel		Avansert
+Audio input	MediaRoutingView		Lydkilde
+Disconnect	MediaRoutingView		Koble fra
+Could not disconnect	MediaRoutingView		Kunne ikke koble fra
+Mini icon view	MediaRoutingView		Miniikonvisning
+Select all	MediaRoutingView		Velg alle
+Get info	MediaJack		Hent info

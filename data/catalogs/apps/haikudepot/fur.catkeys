@@ -84,10 +84,10 @@ Language	UserLoginWindow		Lenghe
 OK	UserLoginWindow		Va ben
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizazion dâts di riferiment dal servidôr
 Stability:	RatePackageWindow		Stabilitât:
-The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		L'acuardi di utilizazion al scugne jessi acetât e si scugne confermâ che la persone che e cree l'utent e vedi i recuisîts minims pe etât.
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Al è necessari acetâ l'acuardi di utilizazion e confermâ che la persone che e cree l'utent e vedi i recuisîts minims di etât.
 solution %d:	PackageProblem	Don't change the %d variable	soluzion %d:
 Source packages	MainWindow		Pachets sorzint
-Problem with working files	App		Probleme cui file di lavôr de aplicazion
+Problem with working files	App		Probleme cui files di lavôr de aplicazion
 Try again	App		Torne prove
 Unknown	PackageListView		No cognossût
 I agree to the usage conditions	UserLoginWindow		O aceti lis condizions di ûs
@@ -98,11 +98,11 @@ Yes	MainWindow		Sì
 Pending…	PackageListView		In spiete…
 Search terms:	FilterView		Tiermins di ricercje:
 Quit	App		Siere
-The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Il sorenon al è malformât. Il sorenon al pues contignî dome numar e caratars latins minuscui. Il sorenon al scugne jessi lunc tra cuatri e sedis caratars.
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Il sorenon al è malformât. Il sorenon al pues contignî dome numars e caratars latins minuscui. Il sorenon al scugne jessi lunc tra cuatri e sedis caratars.
 Authentication failed	UserLoginWindow		Autenticazion falide
 Captcha error	UserLoginWindow		Erôr captcha
 Manage repositories…	MainWindow		Gjestìs dipuesits…
-The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il sorenon al scugne jessi unic, ma il sorenon indicât al è za doprât. Sielç un sorenon diviers.
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il sorenon al scugne jessi unic, ma il sorenon indicât al è za doprât. Sielç un altri sorenon.
 OK	UserUsageConditions		Va ben
 Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 Input validation	UserLoginWindow		Convalide input
@@ -133,7 +133,7 @@ Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
 Show	MainWindow		Mostre
 Settings…	MainWindow		Impostazions…
-This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al semee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi file in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma cualchi funzionalitât e podarès jessi disabilitade.
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al somee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi files in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma al è pussibil che cualchi funzionalitât e vegni disabilitade.
 <Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets esternis>
 Ratings	PackageInfoView		Valutazions
 The following problems have been encountered. Please select a solution for each:	PackageProblem		A son vignûts fûr chescj problemis. Par plasê selezione une soluzion par ognun di lôr:
@@ -143,7 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 Date	PackageListView		Date
-The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La password e scugne jessi di almancul %MinPasswordLength% caratars. %MinPasswordUppercaseChar% caratars a scugnin jessi maiusculis e %MinPasswordDigitsChar% caratars a scugnin jessi numars.
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		La password e scugne vê almancul %MinPasswordLength% caratars. %MinPasswordUppercaseChar% caratars a scugnin jessi maiuscui e %MinPasswordDigitsChar% caratars a scugnin jessi numars.
 Error	App		Erôr
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Al è vignût fûr un erôr tal discjamâ lis condizions di utilizazion. Controle il regjistri pai detais e torne prove.\nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
@@ -152,8 +152,8 @@ Your rating was uploaded successfully. You can update or remove it at the HaikuD
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nol è stât pussibil comunicâ cul servidôr par otignî une imagjin captcha necessarie par creâ un gnûf utent.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La rispueste dade al captcha no je juste. Al vignarà gjenerât un gnûf captcha; torne prove.
 -	no package publish		-
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot al à bisugne dal demoni dai pachets par funzionâ, ma pal moment al semee che nol sedi in esecuzion.\nInviâlu cumò?
-The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La peraule d'ordin e scugne jessi di almancul vot caratars e e à di vê almancul doi numars e un caratar maiuscul.
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot al à bisugne dal demoni dai pachets par funzionâ, ma pal moment al somee che nol sedi in esecuzion.\nInviâlu cumò?
+The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La peraule d'ordin e scugne vê almancul vot caratars e e à di vê almancul doi numars e un caratar maiuscul.
 Contents	PackageInfoView		Contignût
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Condivît dâts anonims sul ûs cun HaikuDepotServer
 Close	PackageManager		Siere
@@ -190,7 +190,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Al è vignût fûr un erôr tal discjamâ lis condizions di utilizazion. Controle il regjistri pai detais e torne prove. \nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
 View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'utent [%Nickname%] si è autenticât, ma prime di podê continuâ, al è necessari che tu acetis lis plui resintis condizions di utilizazion.
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol semee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol somee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.
 Apply	SettingsWindow		Apliche
 View the password requirements	UserLoginWindow		Viôt i recuisîts de password
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		L'utent \"%Nickname%\" al à acetât in precedence lis condizions di utilizazion, ma di chê volte chestis a son stadis inzornadis. Si scugne cumò acetâ lis condizions di utilizazion inzornadis.
@@ -221,6 +221,6 @@ uninstall package %s\n	PackageResult	Don't change '%s' variable	disinstale pache
 Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ i dâts dal dipuesit lontan
 Description	PackageListView		Descrizion
 User creation error	UserLoginWindow		Erôr di creazion dal utent
-You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.
+You need to be logged into an account before you can rate packages.	MainWindow		Tu âs di acedi a un account prime di podê valutâ i pachets.
 Cleaning up…	ShuttingDownWindow		Netisie…
 Repeat password:	UserLoginWindow		Ripet peraule d'ordin:

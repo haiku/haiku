@@ -1,7 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-NewMailNotification	1375000288
+1	dutch; flemish	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Logvenster
 none	NotifierConfigView		geen
-New mails notification	NotifierFilter		Nieuwe e-mails notificatie
 Alert	NotifierConfigView		Signaal
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Centraal signaal

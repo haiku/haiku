@@ -1,62 +1,62 @@
 1	indonesian	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Gunakan sebagai latar belakang…
-File	Menus		Berkas
-Slide delay	Menus		Penundaan slide
-Selection mode	Menus		Mode seleksi
-Zoom in	Menus		Perbesar
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumen '%s' telah diubah. Apakah Anda ingin menutup dokumen?
-Page setup…	Menus		Atur Halaman…
-Print…	Menus		Cetak…
-Get info…	Menus		Dapatkan Info…
-OK	SaveToFile		Oke
-Previous page	Menus		Halaman sebelumnya
-View	Menus		Tampilan
-Full screen	Menus		Layar penuh
-Go to page	Menus		Menuju halaman
-Zoom out	Menus		Perkecil
-Quit	Menus		Keluar
-Rotate counterclockwise	Menus		Putar berlawanan jarum jam
-High-quality zooming	Menus		Pembesaran kualitas tinggi
-Browse	Menus		Ramban
-Edit	Menus		Sunting
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Tidak dapat memuat gambar! Entah file atau penerjemah gambar untuk itu tidak ada.
-First page	Menus		Halaman pertama
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumen '%s' (halaman %d) telah diubah. Apakah Anda ingin menutup dokumen?
-Leave full screen	Menus		Tinggalkan layar penuh
-Close	Menus		Tutup
-Close	ClosePrompt		Tutup
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ubah ukuran menjadi(dalam 1/72 inci):
-Rating	Menus		Penilaian
-Flip left to right	Menus		Balikan kiri ke kanan
-Show caption in full screen mode	Menus		Tampilkan teks dalam mode layar penuh
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Buka…
-Next file	Menus		File selanjutnya
-Clear selection	Menus		Bersihkan pilihan
-Close document	ClosePrompt		Tutup dokumen
-Height: 	PrintOptionsWindow		Tinggi: 
-The file '%s' could not be written.	SaveToFile		Berkas '%s' tidak dapat ditulis.
-Cancel	ClosePrompt		Batalkan
-Show tool bar	Menus		Tampilkan bilah alat
-Fit to window	Menus		Paskan ke jendela
-Print options	PrintOptionsWindow		Opsi cetak
-Copy	Menus		Salin
-Progress monitor	ProgressWindow		Monitor kemajuan
-Last page	Menus		Halaman terakhir
-Stretch to window	Menus		Regangkan ke jendela
-Previous file	Menus		File sebelumnya
 ShowImage	System name		ShowImage
+Page setup…	Menus		Atur Halaman…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumen '%s' (halaman %d) telah diubah. Apakah Anda ingin menutup dokumen?
+Previous file	Menus		File sebelumnya
+View	Menus		Tampilan
+Leave full screen	Menus		Tinggalkan layar penuh
+Show caption in full screen mode	Menus		Tampilkan teks dalam mode layar penuh
+Flip left to right	Menus		Balikan kiri ke kanan
+Full screen	Menus		Layar penuh
+Copy	Menus		Salin
+Height: 	PrintOptionsWindow		Tinggi: 
+Next file	Menus		File selanjutnya
 Slide show	Menus		Pertunjukan Slide
-Fit image to page	PrintOptionsWindow		Fit gambar ke halaman
-Flip top to bottom	Menus		Balik atas ke bawah
-Select all	Menus		Pilih semua
-Zoom factor in %:	PrintOptionsWindow		Faktor zoom dalam %:
-Width:	PrintOptionsWindow		Lebar:
-Image	Menus		Citra
-Move to Trash	Menus		Buang ke Tong Sampah
-OK	Alerts		Oke
-Rotate clockwise	Menus		Putar searah jarum jam
-Job setup	PrintOptionsWindow		Pengaturan pekerjaan
 Original size	Menus		Ukuran asli
-Next page	Menus		Halaman berikutnya
+Width:	PrintOptionsWindow		Lebar:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ubah ukuran menjadi(dalam 1/72 inci):
+Zoom factor in %:	PrintOptionsWindow		Faktor zoom dalam %:
+Get info…	Menus		Dapatkan Info…
+Zoom out	Menus		Perkecil
+OK	Alerts		Oke
+File	Menus		Berkas
+Close	ClosePrompt		Tutup
+Image	Menus		Citra
+Flip top to bottom	Menus		Balik atas ke bawah
+Zoom in	Menus		Perbesar
+Last page	Menus		Halaman terakhir
+Cancel	ClosePrompt		Batalkan
+High-quality zooming	Menus		Pembesaran kualitas tinggi
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumen '%s' telah diubah. Apakah Anda ingin menutup dokumen?
+Close	Menus		Tutup
+Selection mode	Menus		Mode seleksi
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Fit gambar ke halaman
+Show tool bar	Menus		Tampilkan bilah alat
+First page	Menus		Halaman pertama
+OK	SaveToFile		Oke
+Print…	Menus		Cetak…
+The file '%s' could not be written.	SaveToFile		Berkas '%s' tidak dapat ditulis.
+Quit	Menus		Keluar
+Rating	Menus		Penilaian
+Close document	ClosePrompt		Tutup dokumen
+Stretch to window	Menus		Regangkan ke jendela
+Job setup	PrintOptionsWindow		Pengaturan pekerjaan
+Clear selection	Menus		Bersihkan pilihan
+Rotate clockwise	Menus		Putar searah jarum jam
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Tidak dapat memuat gambar! Entah file atau penerjemah gambar untuk itu tidak ada.
+Rotate counterclockwise	Menus		Putar berlawanan jarum jam
+Previous page	Menus		Halaman sebelumnya
+Fit to window	Menus		Paskan ke jendela
+Browse	Menus		Ramban
+Go to page	Menus		Menuju halaman
+Progress monitor	ProgressWindow		Monitor kemajuan
+Edit	Menus		Sunting
+Move to Trash	Menus		Buang ke Tong Sampah
+Use as background…	Menus		Gunakan sebagai latar belakang…
+Open…	Menus		Buka…
 Save as…	Menus		Simpan sebagai…
+Next page	Menus		Halaman berikutnya
+Print options	PrintOptionsWindow		Opsi cetak
+Slide delay	Menus		Penundaan slide
+Select all	Menus		Pilih semua

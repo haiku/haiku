@@ -4,20 +4,20 @@ OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Sigur doriți să opriți sistemul?
 Shutdown status	ShutdownProcess		Starea opririi
 Shut down	ShutdownProcess		Oprire
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplicația \„%appName%\” poate fi blocată pe un panou modal.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplicația \„%appName%\” ar putea fi blocată pe un panou modal.
 System is shut down	ShutdownProcess		Sistemul este oprit
-Restart system	ShutdownProcess		Repornire sistem
+Restart system	ShutdownProcess		Repornește sistemul
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplicația \„%appName%\” a întrerupt procesul de oprire.
-Asking background applications to quit.	ShutdownProcess		Se solicită aplicațiilor de plan secund să termine.
+Asking background applications to quit.	ShutdownProcess		Se solicită aplicațiilor de fundal să se închidă.
 Do you really want to restart the system?	ShutdownProcess		Sigur doriți să reporniți sistemul?
-Restart	ShutdownProcess		Repornire
-It's now safe to turn off the computer.	ShutdownProcess		Acum este sigur să închideți calculatorul.
-Asking other processes to quit.	ShutdownProcess		Se solicită celorlaltor procese să termine.
+Restart	ShutdownProcess		Repornește
+It's now safe to turn off the computer.	ShutdownProcess		Acum este sigur să opriți calculatorul.
+Asking other processes to quit.	ShutdownProcess		Se solicită altor procese să se închidă.
 Cancel shutdown	ShutdownProcess		Anulează oprirea
 Restarting…	ShutdownProcess		Se repornește…
 %action%?	ShutdownProcess		%action%?
-Tidying things up a bit.	ShutdownProcess		Se aranjează lucrurile puțin.
+Tidying things up a bit.	ShutdownProcess		Se face un pic de ordine.
 Kill application	ShutdownProcess		Termină aplicația
 Shutdown aborted	ShutdownProcess		Oprire întreruptă
 Shutting down…	ShutdownProcess		Se oprește…
-Asking \"%appName%\" to quit.	ShutdownProcess		Se solicită \„%appName%\” să termine.
+Asking \"%appName%\" to quit.	ShutdownProcess		Se solicită \„%appName%\” să se închidă.

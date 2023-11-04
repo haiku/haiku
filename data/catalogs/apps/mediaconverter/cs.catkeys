@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaConverter	517958556
+1	czech	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
 Source files	MediaConverter		Zdrojový soubor
 Error writing video frame %lld	MediaConverter		Chyba zápisu snímku videa %lld
@@ -36,7 +36,7 @@ Video using parameters form settings	MediaConverter		Video používá parametry 
 Video:	MediaConverter-FileInfo		Video:
 Select	MediaConverter		Zvolit
 Conversion cancelled	MediaConverter		Převod zrušen
-Low	MediaConverter		Nízký
+Low	MediaConverter		Nízká
 Error loading files	MediaConverter		Chyba otevírání souborů
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} other{# bitů}}
 Video quality: %s	MediaConverter		Kvalita videa: %s
@@ -65,6 +65,7 @@ Video quality not supported	MediaConverter		Nepodporovaná videokvalita
 Select this folder	MediaConverter		Zvolit tento adresář
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
 Understood	MediaConverter		Rozuměno
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2f snímků/s
 %d bit 	MediaFileInfo		%d bitový
 No video	Video codecs list		Bez videa
 Continue	MediaConverter		Pokračovat

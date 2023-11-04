@@ -19,7 +19,7 @@ Quit	GrepWindow		Avslutt
 Show files in Tracker	GrepWindow		Vis filer i Tracker
 Please select the files you wish to keep searching.	GrepWindow		Vennligst velg filene du ønsker å fortsette å søke gjennom.
 Trim to selection	GrepWindow		beskjær til utvalg
-Set target…	GrepWindow		Sett mål...
+Set target…	GrepWindow		Sett mål…
 Failed to open input pipe!	Grepper		Kunne ikke åpne inngangsrøret!
 Search	GrepWindow		Søk
 Copy text to clipboard	GrepWindow		Kopier tekst til utklippstavle

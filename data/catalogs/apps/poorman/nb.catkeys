@@ -11,10 +11,10 @@ Web folder:	PoorMan		Mappe for nettsiden:
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vennligst velg mappen du ønsker å publisere på nettet.\n\nDu kan la PoorMan opprette en standard \"public_html\" i din hjemmemappe.\nEller du kan velge én av dine egne mapper i stedet.
 Log To Console	PoorMan		Logg til konsoll
 File Name	PoorMan		Filnavn
-Starting up... 	PoorMan		Starter opp...
+Starting up... 	PoorMan		Starter opp… 
 Select	PoorMan		Velg
 Logging view	PoorMan		Loggvisning
-Save console as…	PoorMan		Lagre konsoll som...
+Save console as…	PoorMan		Lagre konsoll som…
 Edit	PoorMan		Rediger
 Cancel	PoorMan		Avbryt
 Directory: 	PoorMan		Mappe:
@@ -34,7 +34,7 @@ Create public_html	PoorMan		Opprett public_html
 Clear hit counter	PoorMan		Nullstill treffteller
 Status: Stopped	PoorMan		Status: Stoppet
 File	PoorMan		Fil
-Settings…	PoorMan		Innstillinger...
+Settings…	PoorMan		Innstillinger…
 Log To File	PoorMan		Logg til fil
 Connections	PoorMan		Tilkoblinger
 Controls	PoorMan		Kontroller
@@ -58,7 +58,7 @@ Status: Running	PoorMan		Status: Kjører
 Directory: (none)	PoorMan		Mappe: (ingen)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		En standard nettsidemappe har blitt opprettet ved \"/boot/home/public_html.\"\nForviss deg om at det er en HTML-fil kalt \"index.html\" i den mappen.
 Dir Created	PoorMan		Mappe opprettet
-Save console selections as…	PoorMan		Lagre konsollvalg som...
+Save console selections as…	PoorMan		Lagre konsollvalg som…
 Quit	PoorMan		Avslutt
 Save log console	PoorMan		Lagre konsoll-loggen
 Start page:	PoorMan		Startside:

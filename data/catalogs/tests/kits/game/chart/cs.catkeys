@@ -1,42 +1,41 @@
-1	czech	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Pomalá rotace
-Pink	ChartWindow		Růžová
-Comet	ChartWindow		Kometa
-DirectWindow	ChartWindow		PříméOkno
-Orange	ChartWindow		Oranžová
-Refresh rate	ChartWindow		Obnovovací frekvence
-Blue	ChartWindow		Modrá
-Colors	ChartWindow		Barvy
-Novas	ChartWindow		Nový
-LineArray	ChartWindow		PoleČar
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0,6 f/s  (logaritmické měřítko)
-Free motion	ChartWindow		Volný pohyb
+1	czech	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(výška) 100% 
-Green	ChartWindow		Zelená
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 vlákna
-Yellow	ChartWindow		Žlutá
-Off	ChartWindow		Vypnuté
-Chaos	ChartWindow		Chaos
-Full screen	ChartWindow		Celá obrazovka
 Spiral	ChartWindow		Spirála
-Slow motion	ChartWindow		Pomalý pohyb
- 5% (low)	ChartWindow		 5% (nízké)
-Fast motion	ChartWindow		Rychlý pohyb
-Special	ChartWindow		Speciální
-Status	ChartWindow		Stav
-Star density	ChartWindow		Hustota hvězd
-600.0 f/s	ChartWindow		600,0 snímků/s
+Orange	ChartWindow		Oranžová
 Display:	ChartWindow		Zobrazit:
-Space color	ChartWindow		Barva prostoru
-White	ChartWindow		Bílá
-Chart	System name		Graf
+Pink	ChartWindow		Růžová
 Animation:	ChartWindow		Animace:
-Frames/s	ChartWindow		Snímků/s
 Auto demo	ChartWindow		Automatické demo
-CPU load	ChartWindow		Zatížení CPU
-DrawBitmap	ChartWindow		Kreslení rastru
 Red	ChartWindow		Červená
 None	ChartWindow		Žádné
+600.0 f/s	ChartWindow		600,0 snímků/s
+Fast motion	ChartWindow		Rychlý pohyb
+Special	ChartWindow		Speciální
+White	ChartWindow		Bílá
+Star density	ChartWindow		Hustota hvězd
+Chaos	ChartWindow		Chaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Žlutá
+Frames/s	ChartWindow		Snímků/s
+CPU load	ChartWindow		Zatížení CPU
+Green	ChartWindow		Zelená
+Colors	ChartWindow		Barvy
+Refresh rate	ChartWindow		Obnovovací frekvence
+Full screen	ChartWindow		Celá obrazovka
+Status	ChartWindow		Stav
+Off	ChartWindow		Vypnuté
 Battle	ChartWindow		Bitka
+Blue	ChartWindow		Modrá
+Slow rotation	ChartWindow		Pomalá rotace
+Novas	ChartWindow		Nový
+Slow motion	ChartWindow		Pomalý pohyb
+Comet	ChartWindow		Kometa
+2 threads	ChartWindow		2 vlákna
+DrawBitmap	ChartWindow		Kreslení rastru
+LineArray	ChartWindow		PoleČar
+ 5% (low)	ChartWindow		 5% (nízké)
+DirectWindow	ChartWindow		PříméOkno
+Free motion	ChartWindow		Volný pohyb
+Space color	ChartWindow		Barva prostoru
+Chart	System name		Graf
 Space:	ChartWindow		Prostor:

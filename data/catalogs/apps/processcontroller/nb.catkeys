@@ -5,7 +5,7 @@ That's no Fun!	ProcessController		Ikke morsomt!
 What do you want to do with the team \"%s\"?	ProcessController		Hva vil du gjøre med teamet \"%s\"?
 Your setting file could not be saved!\n(%s)	ProcessController		Innstillingsfilen kunne ikke lagres!\n(%s)
 Processor %d	ProcessController		Prosessor %d
-Live in the Deskbar	ProcessController		Lev i Deskbar
+Live in the Deskbar	ProcessController		Vis i Deskbar
 Kill this team!	ProcessController		Drep dette teamet!
 OK	ProcessController		OK
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Du kan kjøre Prosessbehandler i et vindu eller installere det på Deskbar.
@@ -18,7 +18,7 @@ Memory usage	ProcessController		Minnebruk
 Ok!	ProcessController		Ok!
 Normal priority	ProcessController		Normal prioritet
 Restart Deskbar	ProcessController		Start Deskbar på nytt
-About ProcessController…	ProcessController		Om Prosessbehandler...
+About ProcessController…	ProcessController		Om Prosessbehandler…
 Usage: %s [-deskbar]\n	ProcessController		Bruksmåte: %s [-deskbar]\n
 Please confirm	ProcessController		Vennligst bekreft
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
@@ -30,7 +30,7 @@ Threads and CPU usage	ProcessController		Tråder og CPU-bruk
 Quit application	ProcessController		Avslutt program
 Info	ProcessController		Info
 Kill this thread!	ProcessController		Drep denne tråden!
-This team is already gone…	ProcessController		Laget er allerede borte...
+This team is already gone…	ProcessController		Laget er allerede borte…
 Gone teams…	ProcessController		Forsvunnet lag
 Quit an application	ProcessController		Avslutt en applikasjon
 Cancel	ProcessController		Avbryt
@@ -45,5 +45,5 @@ New Terminal	ProcessController		Ny Terminal
 Power saving	ProcessController		Strømsparing
 ProcessController is already installed in Deskbar.	ProcessController		Prosessbehandler er allerede installert i Deskbar
 This is the last active processor…\nYou can't turn it off!	ProcessController		Dette er den siste aktive prosessoren…\nDu kan ikke skru den av!
-This thread is already gone…	ProcessController		Tråden er allerede borte...
+This thread is already gone…	ProcessController		Tråden er allerede borte…
 Run in window	ProcessController		Kjør i vindu

@@ -34,7 +34,7 @@ Eject Device	MediaPlayer-Main		Pare fûr il dispositîf
 Full volume	MediaPlayer-SettingsWindow		Volum massim
 <untitled>	PlaylistItem-title		<cence titul>
 Start media server	MediaPlayer-Main		Invie servidôr multimediâl
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Al semee che il servidôr multimediâl nol sedi in esecuzion.\nInviâlu?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Al somee che il servidôr multimediâl nol sedi in esecuzion.\nInviâlu?
 Location	MediaPlayer-InfoWin		Lûc
 %lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Daûr a vierzi '%s'.
@@ -81,12 +81,12 @@ Large	MediaPlayer-SettingsWindow		Grancj
 Import Entry	MediaPlayer-ImportPLItemsCmd		Impuarte vôs
 unknown format	MediaPlayer-InfoWin		formât no cognossût
 Track %d	MediaPlayer-Main		Linie %d
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nol è stât pussibil spostâ ducj i file te Scovacere.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nol è stât pussibil spostâ ducj i files te Scovacere.
 Total duration: %s	MediaPlayer-PlaylistWindow		Durade totâl: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Erôr dal spostament te scovacere
 50% scale	MediaPlayer-Main		Scjale 50%
-Drop files to play	MediaPlayer-Main		Strissine achì i file di riprodusi
+Drop files to play	MediaPlayer-Main		Strissine achì i files di riprodusi
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copie vôs
 Close window after playing audio	MediaPlayer-SettingsWindow		Siere barcon ae fin de riproduzion audio
 Edit	MediaPlayer-PlaylistWindow		Modifiche
@@ -132,8 +132,8 @@ Save	MediaPlayer-Main		Salve
 Close window after playing video	MediaPlayer-SettingsWindow		Siere barcon ae fin de riproduzion video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scjale i filmâts in mût fluit (modalitât no soreposizion)
 200% scale	MediaPlayer-Main		Scjale 200%
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Il file '%filename' nol pues jessi viert.\n\n
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nissun dai file che si voleve riprodusi al semee jessi un file multimediâl.
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Nol è pussibil vierzi il file '%filename'.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Nissun dai files che si voleve riprodusi al somee jessi un file multimediâl.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Gjave vôs
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Gjave vôs te Scovacere
 Subtitle size:	MediaPlayer-SettingsWindow		Dimension dai sottitui:
@@ -142,7 +142,7 @@ raw video	MediaPlayer-InfoWin		video grês
 Container	MediaPlayer-InfoWin		Contignidôr
 none	MediaPlayer-Main		nissun
 Open clips	MediaPlayer-Main		Vierç videoclips
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Cualchi file nol pues jessi spostât te Scovacere.
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nol è stât pussibil spostâ te Scovacere cualchi file.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nie di disfâ>
 Save as…	MediaPlayer-PlaylistWindow		Salve come…
 Error: 	MediaPlayer-RemovePLItemsCmd		Erôr: 

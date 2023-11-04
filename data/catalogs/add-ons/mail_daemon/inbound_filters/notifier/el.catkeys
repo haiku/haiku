@@ -1,7 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NewMailNotification	1375000288
+1	greek, modern (1453-)	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Παράθυρο καταγραφής
 none	NotifierConfigView		κανένα
-New mails notification	NotifierFilter		Ειδοποίηση νέων mail
 Alert	NotifierConfigView		Ειδοποίηση
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Κεντρική ειδοποίηση

@@ -1,62 +1,62 @@
 1	romanian	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Utilizare ca fundal…
-File	Menus		Fișier
-Slide delay	Menus		Întârziere de diapozitiv
-Selection mode	Menus		Modul de selecție
-Zoom in	Menus		Mărește
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” a fost modificat. Doriți să închideți documentul?
-Page setup…	Menus		Configurare pagină…
-Print…	Menus		Tipărire…
-Get info…	Menus		Obține informații…
-OK	SaveToFile		OK
-Previous page	Menus		Pagina anterioară
-View	Menus		Vizualizare
-Full screen	Menus		Ecran complet
-Go to page	Menus		Mergi la pagina
-Zoom out	Menus		Micșorează
-Quit	Menus		Ieșire
-Rotate counterclockwise	Menus		Rotește în sens anti-orar
-High-quality zooming	Menus		Focalizare de înaltă calitate
-Browse	Menus		Navigare
-Edit	Menus		Editare
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fie fișierul, fie un traducător de imagine pentru acesta nu există.
-First page	Menus		Prima pagină
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
-Leave full screen	Menus		Părăsește ecranul complet
-Close	Menus		Închide
-Close	ClosePrompt		Închide
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionare la (în 1/72 țoli):
-Rating	Menus		Evaluare
-Flip left to right	Menus		Inversează de la stânga la dreapta
-Show caption in full screen mode	Menus		Arată legenda în modul ecran complet
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Deschide…
-Next file	Menus		Fișierul următor
-Clear selection	Menus		Eliberează selecția
-Close document	ClosePrompt		Închide documentul
-Height: 	PrintOptionsWindow		Înălțime: 
-The file '%s' could not be written.	SaveToFile		Fișierul „%s” nu a putut fi scris.
-Cancel	ClosePrompt		Anulează
-Show tool bar	Menus		Arată bara de unelte
-Fit to window	Menus		Potrivește la fereastră
-Print options	PrintOptionsWindow		Opțiuni de tipărire
-Copy	Menus		Copiază
-Progress monitor	ProgressWindow		Monitor de progres
-Last page	Menus		Ultima pagină
-Stretch to window	Menus		Întinde la fereastră
-Previous file	Menus		Fișier anterior
 ShowImage	System name		ShowImage
+Page setup…	Menus		Configurare pagină…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
+Previous file	Menus		Fișier anterior
+View	Menus		Vizualizare
+Leave full screen	Menus		Părăsește ecranul complet
+Show caption in full screen mode	Menus		Arată legenda în modul ecran complet
+Flip left to right	Menus		Inversează de la stânga la dreapta
+Full screen	Menus		Ecran complet
+Copy	Menus		Copiază
+Height: 	PrintOptionsWindow		Înălțime: 
+Next file	Menus		Fișierul următor
 Slide show	Menus		Prezentare de diapozitive
-Fit image to page	PrintOptionsWindow		Potrivește imaginea la pagină
-Flip top to bottom	Menus		Inversează de sus în jos
-Select all	Menus		Selectează toate
-Zoom factor in %:	PrintOptionsWindow		Factor de focalizare în %:
-Width:	PrintOptionsWindow		Lățime:
-Image	Menus		Imagine
-Move to Trash	Menus		Mută la gunoi
-OK	Alerts		OK
-Rotate clockwise	Menus		Rotește în sens orar
-Job setup	PrintOptionsWindow		Configurare sarcină
 Original size	Menus		Dimensiune originală
-Next page	Menus		Pagina următoare
+Width:	PrintOptionsWindow		Lățime:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionare la (în 1/72 țoli):
+Zoom factor in %:	PrintOptionsWindow		Factor de focalizare în %:
+Get info…	Menus		Obține informații…
+Zoom out	Menus		Micșorează
+OK	Alerts		OK
+File	Menus		Fișier
+Close	ClosePrompt		Închide
+Image	Menus		Imagine
+Flip top to bottom	Menus		Inversează de sus în jos
+Zoom in	Menus		Mărește
+Last page	Menus		Ultima pagină
+Cancel	ClosePrompt		Anulează
+High-quality zooming	Menus		Focalizare de înaltă calitate
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” a fost modificat. Doriți să închideți documentul?
+Close	Menus		Închide
+Selection mode	Menus		Modul de selecție
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Potrivește imaginea la pagină
+Show tool bar	Menus		Arată bara de unelte
+First page	Menus		Prima pagină
+OK	SaveToFile		OK
+Print…	Menus		Tipărire…
+The file '%s' could not be written.	SaveToFile		Fișierul „%s” nu a putut fi scris.
+Quit	Menus		Ieșire
+Rating	Menus		Evaluare
+Close document	ClosePrompt		Închide documentul
+Stretch to window	Menus		Întinde la fereastră
+Job setup	PrintOptionsWindow		Configurare sarcină
+Clear selection	Menus		Eliberează selecția
+Rotate clockwise	Menus		Rotește în sens orar
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fie fișierul, fie un traducător de imagine pentru acesta nu există.
+Rotate counterclockwise	Menus		Rotește în sens anti-orar
+Previous page	Menus		Pagina anterioară
+Fit to window	Menus		Potrivește la fereastră
+Browse	Menus		Navigare
+Go to page	Menus		Mergi la pagina
+Progress monitor	ProgressWindow		Monitor de progres
+Edit	Menus		Editare
+Move to Trash	Menus		Mută la gunoi
+Use as background…	Menus		Utilizare ca fundal…
+Open…	Menus		Deschide…
 Save as…	Menus		Salvează ca…
+Next page	Menus		Pagina următoare
+Print options	PrintOptionsWindow		Opțiuni de tipărire
+Slide delay	Menus		Întârziere de diapozitiv
+Select all	Menus		Selectează toate

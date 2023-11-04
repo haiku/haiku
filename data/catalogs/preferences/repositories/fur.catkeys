@@ -37,6 +37,6 @@ Remove	RepositoriesView	Button label	Gjave
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Gjavâ chescj dipuesits?
 Keep trying	TaskTimer	Button label	Continue a provâ
 Cancel	Constants	Button label	Anule
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Dome un URL par ogni dipuesit al pues jessi abilitât. Par plasê modifiche lis tôs selezions.
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Al è pussibil abilitâ dome un URL par ogni dipuesit. Par plasê modifiche lis tôs selezions.
 Stop and quit	RepositoriesWindow	Button label	Ferme e jes
 Disable all	RepositoriesView	Button label	Disabilite dut

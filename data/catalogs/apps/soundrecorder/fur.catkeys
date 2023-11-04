@@ -4,19 +4,19 @@ Cannot find default audio hardware	RecorderWindow		Impussibil cjatâ l'hardware 
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Impussibil cjatâ il file temporani creât par conservâ la gnove regjistrazion
 Sample size:	RecorderWindow		Dimension di campionament:
 Nothing to play	RecorderWindow		Nie di riprodusi
-None of the files appear to be audio files.	RecorderWindow		Nissun dai file al semee jessi un file audio.
+None of the files appear to be audio files.	RecorderWindow		Nissun dai files al somee jessi un file audio.
 Duration: 	RecorderWindow		Durade: 
 File info	RecorderWindow		Informazions sui file
-Drop files here	SoundListView		Strissine chi i file
+Drop files here	SoundListView		Strissine chi i files
 Input	RecorderWindow		Jentrade
-Some of the files don't appear to be audio files.	RecorderWindow		Cualchi file nol semee jessi un file audio.
+Some of the files don't appear to be audio files.	RecorderWindow		Cualchi file nol somee jessi un file audio.
 Stop	RecorderWindow		Ferme
 Format:	RecorderWindow		Formât:
 Sound List	RecorderWindow		Liste sonore
 Compression: 	RecorderWindow		Compression: 
 Rewind	RecorderWindow		Torne fâs sù
 Sample rate:	RecorderWindow		Frecuence di campionament:
-Invalid audio files	RecorderWindow		File audio no valits
+Invalid audio files	RecorderWindow		Files audio no valits
  seconds	RecorderWindow		 seconts
 OK	RecorderWindow		Va ben
 Cannot open the temporary file created to hold the new recording	RecorderWindow		Impussibil vierzi il file temporani creât par conservâ la gnove regjistrazion
@@ -42,5 +42,5 @@ Channels: 	RecorderWindow		Canâi:
 Save	RecorderWindow		Salve
 Sample rate: 	RecorderWindow		Frecuence di campionament:
 Cannot connect to media server	RecorderWindow		Impussibil conetisi al servidôr multimediâl
-The file doesn't appear to be an audio file.	RecorderWindow		Il file nol semee jessi un file audio.
+The file doesn't appear to be an audio file.	RecorderWindow		Il file nol somee jessi un file audio.
 File name:	RecorderWindow		Non file:

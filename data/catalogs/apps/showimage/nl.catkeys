@@ -1,62 +1,62 @@
 1	dutch; flemish	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Gebruik als achtergrond…
-File	Menus		Bestand
-Slide delay	Menus		Dia-vertraging
-Selection mode	Menus		Selectie-modus
-Zoom in	Menus		Inzoomen
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' werd gewijzigd. Wilt u het document sluiten?
-Page setup…	Menus		Paginaconfiguratie...
-Print…	Menus		Afdrukken...
-Get info…	Menus		Informatie ophalen…
-OK	SaveToFile		Oké
-Previous page	Menus		Vorige pagina
-View	Menus		Beeld
-Full screen	Menus		Volledig scherm
-Go to page	Menus		Ga naar pagina
-Zoom out	Menus		Uitzoomen
-Quit	Menus		Afsluiten
-Rotate counterclockwise	Menus		Roteer linksom
-High-quality zooming	Menus		Inzoomen met hoge kwaliteit
-Browse	Menus		Doorzoeken
-Edit	Menus		Aanpassen
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		De afbeelding kon niet geladen worden! Het bestand bestaat mogelijk niet, of er bestaat geen afbeeldings-omzetter voor.
-First page	Menus		Eerste pagina
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
-Leave full screen	Menus		Volledig scherm verlaten
-Close	Menus		Sluiten
-Close	ClosePrompt		Sluit
-Resize to (in 1/72 inches):	PrintOptionsWindow		Omvormen naar (in eenheden van 1/72 inch):
-Rating	Menus		Waardering
-Flip left to right	Menus		Omklappen van links naar rechts
-Show caption in full screen mode	Menus		Toon opschrift in volledig-scherm-modus
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Openen...
-Next file	Menus		Volgend bestand
-Clear selection	Menus		Selectie wissen
-Close document	ClosePrompt		Sluit document
-Height: 	PrintOptionsWindow		Hoogte:
-The file '%s' could not be written.	SaveToFile		Bestand '%s' kon niet geschreven worden.
-Cancel	ClosePrompt		Annuleren
-Show tool bar	Menus		Werkbalk tonen
-Fit to window	Menus		Tot venster passend maken
-Print options	PrintOptionsWindow		Afdrukopties
-Copy	Menus		Kopiëren
-Progress monitor	ProgressWindow		Voortgangsmonitor
-Last page	Menus		Laatste pagina
-Stretch to window	Menus		Uitrekken tot venster
-Previous file	Menus		Vorige bestand
 ShowImage	System name		ShowImage
+Page setup…	Menus		Paginaconfiguratie...
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
+Previous file	Menus		Vorige bestand
+View	Menus		Beeld
+Leave full screen	Menus		Volledig scherm verlaten
+Show caption in full screen mode	Menus		Toon opschrift in volledig-scherm-modus
+Flip left to right	Menus		Omklappen van links naar rechts
+Full screen	Menus		Volledig scherm
+Copy	Menus		Kopiëren
+Height: 	PrintOptionsWindow		Hoogte:
+Next file	Menus		Volgend bestand
 Slide show	Menus		Diashow
-Fit image to page	PrintOptionsWindow		Afbeelding inpassen tot pagina
-Flip top to bottom	Menus		Omklappen van boven naar beneden
-Select all	Menus		Alles selecteren
-Zoom factor in %:	PrintOptionsWindow		Zoomfactor in %:
-Width:	PrintOptionsWindow		Breedte:
-Image	Menus		Afbeelding
-Move to Trash	Menus		Naar Prullenbak verplaatsen
-OK	Alerts		Oké
-Rotate clockwise	Menus		Roteer rechtsom
-Job setup	PrintOptionsWindow		Taakconfiguratie
 Original size	Menus		Oorspronkelijke maat
-Next page	Menus		Volgende pagina
+Width:	PrintOptionsWindow		Breedte:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Omvormen naar (in eenheden van 1/72 inch):
+Zoom factor in %:	PrintOptionsWindow		Zoomfactor in %:
+Get info…	Menus		Informatie ophalen…
+Zoom out	Menus		Uitzoomen
+OK	Alerts		Oké
+File	Menus		Bestand
+Close	ClosePrompt		Sluit
+Image	Menus		Afbeelding
+Flip top to bottom	Menus		Omklappen van boven naar beneden
+Zoom in	Menus		Inzoomen
+Last page	Menus		Laatste pagina
+Cancel	ClosePrompt		Annuleren
+High-quality zooming	Menus		Inzoomen met hoge kwaliteit
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' werd gewijzigd. Wilt u het document sluiten?
+Close	Menus		Sluiten
+Selection mode	Menus		Selectie-modus
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Afbeelding inpassen tot pagina
+Show tool bar	Menus		Werkbalk tonen
+First page	Menus		Eerste pagina
+OK	SaveToFile		Oké
+Print…	Menus		Afdrukken...
+The file '%s' could not be written.	SaveToFile		Bestand '%s' kon niet geschreven worden.
+Quit	Menus		Afsluiten
+Rating	Menus		Waardering
+Close document	ClosePrompt		Sluit document
+Stretch to window	Menus		Uitrekken tot venster
+Job setup	PrintOptionsWindow		Taakconfiguratie
+Clear selection	Menus		Selectie wissen
+Rotate clockwise	Menus		Roteer rechtsom
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		De afbeelding kon niet geladen worden! Het bestand bestaat mogelijk niet, of er bestaat geen afbeeldings-omzetter voor.
+Rotate counterclockwise	Menus		Roteer linksom
+Previous page	Menus		Vorige pagina
+Fit to window	Menus		Tot venster passend maken
+Browse	Menus		Doorzoeken
+Go to page	Menus		Ga naar pagina
+Progress monitor	ProgressWindow		Voortgangsmonitor
+Edit	Menus		Aanpassen
+Move to Trash	Menus		Naar Prullenbak verplaatsen
+Use as background…	Menus		Gebruik als achtergrond…
+Open…	Menus		Openen...
 Save as…	Menus		Opslaan als...
+Next page	Menus		Volgende pagina
+Print options	PrintOptionsWindow		Afdrukopties
+Slide delay	Menus		Dia-vertraging
+Select all	Menus		Alles selecteren

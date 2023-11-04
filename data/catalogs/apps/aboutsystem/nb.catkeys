@@ -1,18 +1,18 @@
 1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-About	677050232
 Revision	AboutView		Revisjon
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet og deres dusørprogram\n
-Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Opphavsrett © 1999-2007 Michael C. Ring. Alle rettigheter reservert.
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Opphavsrett © 1999-2007 Michael C. Ring. Alle rettigheter forbeholdt.
 %.2f GHz	AboutView		%.2f GHz
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Opphavsrett © 2002-2004 Vivek Mohan. Alle rettigheter forbeholdt.
 \n\nSpecial thanks to:\n	AboutView		\n\nEn spesiell takk til:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS-kjerne)\n
-Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Opphavsrett © 1999-2000 Y.Takagi. Alle rettigheter reservert.
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Opphavsrett © 1999-2000 Y.Takagi. Alle rettigheter forbeholdt.
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google og deres 'Google Summer of Code'- og 'Google Code In'-programmer\n
 Contributors:\n	AboutView		Bidragsytere:\n
 Kernel:	AboutView		Kjerne:
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Opphavsrett © 2006-2012 Kentaro Fukuchi
-Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Opphavsrett © 1991-2000 Silicon Graphics, Inc. Alle rettigheter reservert.
-Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Opphavsrett © 1990-2002 Info-ZIP. Alle rettigheter reservert.
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Opphavsrett © 1991-2000 Silicon Graphics, Inc. Alle rettigheter forbeholdt.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Opphavsrett © 1990-2002 Info-ZIP. Alle rettigheter forbeholdt.
 Past website & marketing:\n	AboutView		Tidligere nettside og markedsføring:\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Opphavsrett © 2007 Ralink Technology Corporation. Alle rettigheter forbeholdt.
 Copyright © 2003 Peter Hanappe and others.	AboutView		Opphavsrett © 2003 Peter Hanappe m.fl.
@@ -21,10 +21,10 @@ Testing and bug triaging:\n	AboutView		Testing og feilsøking av programvare:\n
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi Firmware
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Koden som er unik for Haiku, særlig kjernen og all kode som programmer kan lenkes til, distribueres under <MIT-lisensen>. Noen systembiblioteker inneholder kode fra tredjepart som distribueres under <LGPL-lisensen>. Du finner opphavsretten til tredjeparts kode nedenfor.\n\n
 %d MiB total	AboutView		%d MiB totalt
-Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Opphavsrett © 1996-1997 Jeff Prosise. Alle rettigheter reservert.
-Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Opphavsrett © 1999-2006 Brian Paul. Mesa3D Project. Alle rettigheter reservert.
-Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Opphavsrett © 2010-2011 Google Inc. Alle rettigheter reservert.
-Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Opphavsrett © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle retigheter reservert.
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Opphavsrett © 1996-1997 Jeff Prosise. Alle rettigheter forbeholdt.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Opphavsrett © 1999-2006 Brian Paul. Mesa3D Project. Alle rettigheter forbeholdt.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Opphavsrett © 2010-2011 Google Inc. Alle rettigheter forbeholdt.
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Opphavsrett © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAlle rettigheter forbeholdt.
 Past maintainers:\n	AboutView		Forhenværende vedlikeholdere:\n
 Unknown	AboutView		Ukjent
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. og deres utviklerteam for å ha skapt BeOS!\n\n
@@ -34,7 +34,7 @@ The copyright to the Haiku code is property of Haiku, Inc. or of the respective 
 Copyright © 2009 Colin Percival	AboutView		Opphavsrett © 2009 Colin Percival
 Time running:	AboutView		Oppetid:
 %ld MHz	AboutView		%ld MHz
-Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Opphavsrett © 1996-2005 Julian R Seward. Alle rettigheter reservert.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Opphavsrett © 1996-2005 Julian R Seward. Alle rettigheter forbeholdt.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Opphavsrett © 1994-2009, Thomas G. Lane, Guido Vollbeding. Denne programvaren er delvis basert på arbeidet til the Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (prosjektstifter)\n\n
@@ -42,11 +42,11 @@ Remove replicant	AboutView		Fjern replikant
 BSD (3-clause)	AboutWindow		BSD (3 klausuler)
 About this system	AboutWindow		Om dette systemet
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Opphavsrett © 2003-2006 Intel Corporation. Alle rettigheter forbeholdt.
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Opphavsrett © 1999-2010 av forfatterne av Gutenprint. Alle rettigheter reservert.
-Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Opphavsrett © 1994-1997 Mark Kilgard. Alle rettigheter reservert.
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Opphavsrett © 1999-2010 av forfatterne av Gutenprint. Alle rettigheter forbeholdt.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Opphavsrett © 1994-1997 Mark Kilgard. Alle rettigheter forbeholdt.
 AboutSystem	System name		Om dette systemet
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Opphavsrett © 2019 Joe Drago. Alle rettigheter forbeholdt.
-Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Opphavsrett © 1995-2001 Lars Düning. Alle rettigheter reservert.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Opphavsrett © 1995-2001 Lars Düning. Alle rettigheter forbeholdt.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Opphavsrett © 1998-2000 Thai Open Source Software Center Ltd og Clark Cooper.
 Source Code: 	AboutView		Kildekode: 
 \nCopyrights\n\n	AboutView		\nOpphavsrettigheter\n\n
@@ -55,10 +55,10 @@ Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	Ab
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Inneholder programvare fra "The GNU Project", utgitt under GPL, og LGPL lisensene:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nOpphavsrett © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		HaikuPorts-teamet\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Inneholder programvare fra "The FreeBSD Project", utgitt under BSD lisensen:\nftpd, ping, telnet, telnetd, traceroute\nOpphavsrett © 1994-2008 The FreeBSD Project. Alle rettigheter forbeholdt.
-Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Opphavsrett © 2002-2003 Steve Lhomme. Alle rettigheter reservert.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Opphavsrett © 2002-2003 Steve Lhomme. Alle rettigheter forbeholdt.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Opphavsrett © 2000-2019 Fabrice Bellard, m. fl.
 Current maintainers:\n	AboutView		Nåværende vedlikeholdere:\n
-Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Opphavsrett © 1995, 1998-2001 Jef Poskanzer. Alle rettigheter reservert.
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Opphavsrett © 1995, 1998-2001 Jef Poskanzer. Alle rettigheter forbeholdt.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Opphavsrett © 2007-2009 Marvell Semiconductor, Inc. Alle rettigheter forbeholdt.
 %d MiB used (%s)	AboutView		%d MiB brukt (%s)
@@ -72,7 +72,7 @@ The University of Auckland and Christof Lutteroth\n\n	AboutView		University of A
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB utilgjengelig
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Opphavsrett © 2012-2016 Google Internationalization team.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Opphavsrett © 2001-%ld Haiku-prosjektet. 
-Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Opphavsrett © 1994-2008 Xiph.Org. Alle rettigheter reservert.
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Opphavsrett © 1994-2008 Xiph.Org. Alle rettigheter forbeholdt.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Opphavsrett © 1995-2004 Jean-loup Gailly og Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Opphavsrett © 2001-2003 Expat-vedlikeholdere.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Opphavsrett © 2002-2006 Maxim Shemanarev (McSeem).

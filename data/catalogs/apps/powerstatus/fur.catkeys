@@ -30,7 +30,7 @@ Serial number: 	PowerStatus		Numar seriâl:
 Battery critical	PowerStatus		Nivel critic de batarie
 Capacity: 	PowerStatus		Capacitât: 
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		No je stade rilevade nissune batarie supuartade. Stât de Batarie nol pues jessi doprât sul to computer.
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		No je stade rilevade nissune batarie supuartade. Nol è pussibil doprâ Stât de Batarie sul to computer.
 Show percent	PowerStatus		Mostre percentuâl
 Capacity granularity 1: 	PowerStatus		Granularitât de capacitât 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Il nivel de batarie al sta lant jù, par plasê tache il dispositîf ae prese.

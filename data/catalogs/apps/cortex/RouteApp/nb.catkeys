@@ -1,0 +1,25 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.Route	2011521004
+Node '%name%' released	CortexRouteApp		Node '%name%' frigitt
+OK	CortexRouteApp		OK
+About Cortex/Route…	CortexRouteApp		Om Cortex/Route…
+File	CortexRouteApp		Fil
+Connection '%name%' made	CortexRouteApp		Tilkobling '%name%' opprettet
+Save nodes…	CortexRouteApp		Lagre noder…
+%producer% and %consumer%	CortexRouteApp		%producer% og %consumer%
+Node '%name%' created	CortexRouteApp		Node '%name%' opprettet
+Negotiated format:	CortexRouteApp		Forhandlet format:
+Window	CortexRouteApp		Vindu
+Transport	CortexRouteApp		Transport
+Connection broken	CortexRouteApp		Tilkobling brutt
+Untitled group	CortexRouteApp		Gruppe uten navn
+Connection failed	CortexRouteApp		Tilkobling mislyktes
+Connection '%name%' broken	CortexRouteApp		Tilkobling '%name%' brutt
+Between:	CortexRouteApp		Mellom:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Åpne…
+Connection made	CortexRouteApp		Tilkobling opprettet
+Show transport	CortexRouteApp		Vis transport
+Show add-ons	CortexRouteApp		Vis tillegg
+Quit	CortexRouteApp		Avslutt
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nOpphavsrett1999-2000 Eric Moon\nAlle rettigheter forbeholdt.\n\nCortex-teamet:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nTakk til:\nJohn Ashmun\nJon Watte\nDoug Wright\n\nEnkelte ikoner som brukes her eies av\nBe, Inc. og brukes med tillatelse.
+Tried format:	CortexRouteApp		Forsøkt format:

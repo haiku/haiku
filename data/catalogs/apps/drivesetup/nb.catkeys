@@ -1,15 +1,24 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	1673465607
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte partisjonen vil gå tapt for godt hvis du gjør det!
 Device	PartitionList		Enhet
 Initialize	MainWindow		Initialiser
+Could not change the parameters of the selected partition.	MainWindow		Kunne ikke endre parametrene for den valgte partisjonen.
+PGP encrypted	Encryption utils		PGP-kryptert
 Delete partition	MainWindow		Slett partisjon
 Error: 	MainWindow	in any error alert	Feil: 
+Removable	PartitionList		Fjernbar
+Block size	PartitionList		Blokkstørrelse
+The panel experienced a problem!	MainWindow		Panelet opplevde et problem!
 Device	DiskView		Enhet
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil formatere Intel Extended Partition? Eventuelle underpartisjoner den inneholder vil bli overskrevet hvis du fortsetter. Du vil bli spurt på nytt før endringer skrives til disken.
+Physical block size	PartitionList		Fysisk blokkstørrelse
 Unmount	MainWindow		Avmonter
 Failed to format the partition %s!\n	MainWindow		Klarte ikke å formatere partisjonen %s!\n
+Partition size	CreateParametersPanel		Partisjonsstørrelse
+Validation of the given parameters failed.	MainWindow		Validering av parameterne mislyktes.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du ønsker å formatere partisjonen \"%s\"? Du vil bli spurt igjen før  endringer blir skrevet til disken.
 DriveSetup	System name		Diskoppsett
 Mounted at	PartitionList		Monteringspunkt
@@ -20,43 +29,79 @@ Validation of the given creation parameters failed.	MainWindow		Mislykket valide
 Eject	MainWindow		Løs ut
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken %s vil gå tapt for godt hvis du gjør det!
 Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
+Read only	PartitionList		Kun lesetilgang
+The panel could not return successfully.	MainWindow		Panelet kunne ikke returnere.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunne ikke endre parametrene til partisjonen. Ingen endringer er skrevet til disken.
 Partition %ld	DiskView		Partisjon %ld
 There's no space on the partition where a child partition could be created.	MainWindow		Det er ingen plass på partisjonen der en underpartisjon kan opprettes.
 No disk devices have been recognized.	DiskView		Ingen disker ble gjenkjent.
+Attributes	PartitionList		Attributter
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Klarte ikke å slette partisjonen. Ingen endringer er skrevet til disken.
+Change parameters…	MainWindow		Endre parametere…
+Format	InitializeParametersPanel		Formater
+Could not unmount partition	MainWindow		Kunne ikke avmontere partisjonen
+Create	CreateParametersPanel		Opprett
 File system	PartitionList		Filsystem
 The selected partition does not contain a partitioning system.	MainWindow		Den valgte partisjonen inneholder ikke et partisjoneringssystem.
+End: %s	Support		Slutt: %s
+Partition type	PartitionList		Partisjonstype
 Unable to find the selected partition by ID.	MainWindow		Kan ikke finne den valgte partisjonen ved hjelp av ID.
 The currently selected partition is not empty.	MainWindow		Den valgte partisjonen er ikke tom.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du vil formatere en rådisk? (De fleste initialiserer disken med et partisjoneringssystem først). Du vil bli spurt på nytt før endringer skrives til disken.
 Wipe (not implemented)	MainWindow		Slett data (ikke implementert)
 The currently selected partition does not have a parent partition.	MainWindow		Den valgte partisjonen har ingen forelderpartisjon.
 Validation of the given initialization parameters failed.	MainWindow		Mislykket validering av de oppgitte initialiseringsparametrene.
+Not formatted (%s)	PartitionList		Ikke formatert (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke opprette partisjonen. Ingen endringer er skrevet til disken.
+Shared	PartitionList		Delt
+MIMEs	PartitionList		MIMEr
+BitLocker encrypted	Encryption utils		BitLocker-kryptert
 You need to select a partition entry from the list.	MainWindow		Du må velge en partisjon fra listen.
+Offset: %s	Support		Offset: %s
+SafeBoot encrypted	Encryption utils		SafeBoot-kryptert
 Volume name	PartitionList		Volumnavn
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på partisjonen vil gå tapt for godt hvis du gjør det!
+Change	ChangeParametersPanel		Endre
+Partition name:	ChangeParametersPanel		Partisjonsnavn:
+LUKS encrypted	Encryption utils		LUKS-kryptert
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disk nå?\n\nAlle data på partisjonen %s vil gå tapt for godt hvis du gjør det!
+Empty space	PartitionList		Tom plass
+Cancel	AbstractParametersPanel		Avbryt
 Format	MainWindow		Formater
 OK	MainWindow		OK
+Empty space	DiskView		Tom plass
+Open with DiskProbe	MainWindow		Åpne med DiskProbe
 Could not delete the selected partition.	MainWindow		Kunne ikke slette valgt partisjon.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Er du sikker på at du ønsker å initialisere den valgte disken? Alle data vil bli slettet. Du vil bli spurt igjen før endringer blir skrevet til disken.\n
 There was an error preparing the disk for modifications.	MainWindow		Det oppsto en feil da disken skulle forberedes for endringer.
 The disk has been successfully initialized.\n	MainWindow		Initialiseringen av disken var vellykket.\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Skal avmontering tvinges gjennom?\n\nMerk: Hvis et program for øyeblikket skriver til volumet, kan det føre til tap av data å avmontere volumet nå.\n
 Cancel	MainWindow		Avbryt
+Free space	PartitionList		Ledig plass
+Queries	PartitionList		Spørringer
 Force unmount	MainWindow		Tving avmontering
 Partition	MainWindow		Partisjon
+Change parameters	MainWindow		Endre parametere
 Rescan	MainWindow		Skann på nytt
 There was an error acquiring the partition row.	MainWindow		Det var en feil ved tilegning av partisjonsrad.
 Failed to initialize the disk %s!\n	MainWindow		Klarte ikke å initialisere disken %s!\n
+Disk system \"%s\" not found!	MainWindow		Disksystem \"%s\" ikke funnet!
+The partition cannot be unmounted.	MainWindow		Partisjonen kunne ikke avmonteres.
 Delete	MainWindow		Slett
+Partition type:	ChangeParametersPanel		Partisjonstype:
 Parameters	PartitionList		Parametre
+Could not acquire partitioning information.	MainWindow		Kunne ikke hente informasjon om partisjonering.
 Cannot delete the selected partition.	MainWindow		Kan ikke slette den valgte partisjonen.
 Continue	MainWindow		Fortsett
 Could not mount partition %s.	MainWindow		Kunne ikke montere partisjonen %s
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på at du ønsker å formatere partisjonen? Du vil bli spurt igjen før endringer blir skrevet til disken.
 The selected disk is read-only.	MainWindow		Den valgte disken er skrivebeskyttet.
 The partition %s is already unmounted.	MainWindow		Partisjonen %s er allerede avmontert.
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Er du sikker på at du vil endre parametere for den valgte partisjonen?\n\nPartisjonen vil kanskje ikke lenger gjenkjennes av andre operativsystemer!
+Boot	PartitionList		Boot
+OK	AbstractParametersPanel		OK
+Virtual	PartitionList		Virtuell
+Virtual	DiskView		Virtuell
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på den valgte disken vil gå tapt for godt hvis du gjør det!
 Select a partition from the list below.	DiskView		Velg en partisjon fra listen nedenfor.
 Active	PartitionList		Aktiv

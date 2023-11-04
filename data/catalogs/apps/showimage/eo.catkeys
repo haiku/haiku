@@ -1,62 +1,62 @@
 1	esperanto	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Uzi kiel fono...
-File	Menus		Dosiero
-Slide delay	Menus		Prokrasto de foliumado
-Selection mode	Menus		Reĝimo de elekto
-Zoom in	Menus		Zomi
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' estas ŝanĝita. Ĉu vi volas malfermi ĝin?
-Page setup…	Menus		Agordo de paĝo…
-Print…	Menus		Presi…
-Get info…	Menus		Preni informon…
-OK	SaveToFile		Bone
-Previous page	Menus		Antaŭa paĝo
-View	Menus		Rigardi
-Full screen	Menus		Plenekrane
-Go to page	Menus		Al paĝo
-Zoom out	Menus		Malzomi
-Quit	Menus		Ĉesi
-Rotate counterclockwise	Menus		Turni kontraŭhorloĝe
-High-quality zooming	Menus		Bonkvalita zomado
-Browse	Menus		Rigardi
-Edit	Menus		Redakti
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ne povas alŝuti bildon! La dosiero aŭ formatpelilo forestas.
-First page	Menus		Unua paĝo
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' (paĝo %d) estas ŝanĝita. Ĉu vi volas fermi ĝin?
-Leave full screen	Menus		Malplenekrane
-Close	Menus		Fermi
-Close	ClosePrompt		Fermi
-Resize to (in 1/72 inches):	PrintOptionsWindow		Adapti al (per 1/72 da coloj):
-Rating	Menus		Takso
-Flip left to right	Menus		Inversigi horizontale
-Show caption in full screen mode	Menus		Montri apudskribon dum plenekrana reĝimo
-DPI:	PrintOptionsWindow		Punktoj cole:
-Open…	Menus		Uzi…
-Next file	Menus		Sekva dosiero
-Clear selection	Menus		Rezigni elekton
-Close document	ClosePrompt		Fermi dokumenton
-Height: 	PrintOptionsWindow		Alto: 
-The file '%s' could not be written.	SaveToFile		Ne povas konservi la dosieron '%s'.
-Cancel	ClosePrompt		Nuligi
-Show tool bar	Menus		Montri ilbreton
-Fit to window	Menus		Adapti al fenestro
-Print options	PrintOptionsWindow		Agordo de presado
-Copy	Menus		Kopii
-Progress monitor	ProgressWindow		Indikilo de progreso
-Last page	Menus		Lasta paĝo
-Stretch to window	Menus		Streĉi al fenestro
-Previous file	Menus		Antaŭa dosiero
 ShowImage	System name		La Bildmontrilo
+Page setup…	Menus		Agordo de paĝo…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' (paĝo %d) estas ŝanĝita. Ĉu vi volas fermi ĝin?
+Previous file	Menus		Antaŭa dosiero
+View	Menus		Rigardi
+Leave full screen	Menus		Malplenekrane
+Show caption in full screen mode	Menus		Montri apudskribon dum plenekrana reĝimo
+Flip left to right	Menus		Inversigi horizontale
+Full screen	Menus		Plenekrane
+Copy	Menus		Kopii
+Height: 	PrintOptionsWindow		Alto: 
+Next file	Menus		Sekva dosiero
 Slide show	Menus		Montri foliumante
-Fit image to page	PrintOptionsWindow		Adapti bildon al paĝo
-Flip top to bottom	Menus		Inversigi vertikale
-Select all	Menus		Elekti ĉion
-Zoom factor in %:	PrintOptionsWindow		Zoma koeficiento per %:
-Width:	PrintOptionsWindow		Larĝo:
-Image	Menus		Bildo
-Move to Trash	Menus		Movi en Rubujon
-OK	Alerts		Bone
-Rotate clockwise	Menus		Turni laŭhorloĝe
-Job setup	PrintOptionsWindow		Agordo de tasko
 Original size	Menus		Origina grando
-Next page	Menus		Sekva paĝo
+Width:	PrintOptionsWindow		Larĝo:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Adapti al (per 1/72 da coloj):
+Zoom factor in %:	PrintOptionsWindow		Zoma koeficiento per %:
+Get info…	Menus		Preni informon…
+Zoom out	Menus		Malzomi
+OK	Alerts		Bone
+File	Menus		Dosiero
+Close	ClosePrompt		Fermi
+Image	Menus		Bildo
+Flip top to bottom	Menus		Inversigi vertikale
+Zoom in	Menus		Zomi
+Last page	Menus		Lasta paĝo
+Cancel	ClosePrompt		Nuligi
+High-quality zooming	Menus		Bonkvalita zomado
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' estas ŝanĝita. Ĉu vi volas malfermi ĝin?
+Close	Menus		Fermi
+Selection mode	Menus		Reĝimo de elekto
+DPI:	PrintOptionsWindow		Punktoj cole:
+Fit image to page	PrintOptionsWindow		Adapti bildon al paĝo
+Show tool bar	Menus		Montri ilbreton
+First page	Menus		Unua paĝo
+OK	SaveToFile		Bone
+Print…	Menus		Presi…
+The file '%s' could not be written.	SaveToFile		Ne povas konservi la dosieron '%s'.
+Quit	Menus		Ĉesi
+Rating	Menus		Takso
+Close document	ClosePrompt		Fermi dokumenton
+Stretch to window	Menus		Streĉi al fenestro
+Job setup	PrintOptionsWindow		Agordo de tasko
+Clear selection	Menus		Rezigni elekton
+Rotate clockwise	Menus		Turni laŭhorloĝe
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Ne povas alŝuti bildon! La dosiero aŭ formatpelilo forestas.
+Rotate counterclockwise	Menus		Turni kontraŭhorloĝe
+Previous page	Menus		Antaŭa paĝo
+Fit to window	Menus		Adapti al fenestro
+Browse	Menus		Rigardi
+Go to page	Menus		Al paĝo
+Progress monitor	ProgressWindow		Indikilo de progreso
+Edit	Menus		Redakti
+Move to Trash	Menus		Movi en Rubujon
+Use as background…	Menus		Uzi kiel fono...
+Open…	Menus		Uzi…
 Save as…	Menus		Konservi kiel…
+Next page	Menus		Sekva paĝo
+Print options	PrintOptionsWindow		Agordo de presado
+Slide delay	Menus		Prokrasto de foliumado
+Select all	Menus		Elekti ĉion

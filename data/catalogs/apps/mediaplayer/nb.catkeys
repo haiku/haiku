@@ -1,7 +1,78 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	1057677801
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	2712688152
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
+Close	MediaPlayer-PlaylistWindow		Lukk
+Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Bruk maskinvare-videooverlegg hvis tilgjengelig
+Audio	MediaPlayer-InfoWin		Lyd
+Subtitle placement:	MediaPlayer-SettingsWindow		Plassering av undertekster:
+MediaPlayer	System name		MedieSpiller
+Audio track	MediaPlayer-Main		Lydspor
+Muted	MediaPlayer-SettingsWindow		Dempet
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		Åpne Spilleliste
+Subtitles	MediaPlayer-Main		Undertekster
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% støtte på en intern feil. Filen kunne ikke åpnes.
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		Filinfo
+raw audio	MediaPlayer-InfoWin		rå audio
+Select all	MediaPlayer-PlaylistWindow		Velg alle
+New player…	MediaPlayer-Main		Ny spiller…
+Move Entries	MediaPlayer-MovePLItemsCmd		Flytt oppføringer
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		Fjern
+<unknown>	MediaPlayer-InfoWin		<ukjent>
+Resume:	MediaPlayer-SettingsWindow		Fortsett:
+Duration	MediaPlayer-InfoWin		Varighet
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importer Oppføringer
+Open network stream	MediaPlayer-Main		Åpne nettverksstrøm
+Move file to Trash	MediaPlayer-PlaylistWindow		Flytt filen til søppelkurven
+Open file…	MediaPlayer-Main		Åpne fil…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaler kontroller i fullskjerm-modus
+View options	MediaPlayer-SettingsWindow		Visningsalternativer
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Løs ut enhet
+Full volume	MediaPlayer-SettingsWindow		Fullt volum
+<untitled>	PlaylistItem-title		<uten navn>
+Start media server	MediaPlayer-Main		Start medieserver
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Det ser ut til at medieserveren ikke kjører.\nVil du starte den?
+Location	MediaPlayer-InfoWin		Sted
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
+Opening '%s'.	MediaPlayer-Main		Åpner '%s'.
+Medium	MediaPlayer-SettingsWindow		Middels
+Play mode	MediaPlayer-SettingsWindow		Avspillingsmodus
+Playlist	MediaPlayer-PlaylistWindow		Spilleliste
+%d Bit	MediaPlayer-InfoWin		%d Bit
 Track	Audio Track Menu		Spor
+Close	MediaPlayer-Main		Lukk
+Save error	MediaPlayer-PlaylistWindow		Feil ved lagring
+Attributes	MediaPlayer-Main		Attributter
+Bottom of screen	MediaPlayer-SettingsWindow		Nederst på skjermen
+MediaPlayer settings	MediaPlayer-SettingsWindow		MedieSpiller innstillinger
+Copyright	MediaPlayer-InfoWin		Opphavsrett
+Invalid URL inserted!	MediaPlayer-NetworkStream		Ugyldig URL satt inn!
 Aspect ratio	MediaPlayer-Main		Størrelsesforhold
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Feil ved lagring av spillelisten.\n\nFeil: 
+<no media>	MediaPlayer-InfoWin		<ingen medier>
+Hide interface	MediaPlayer-Main		Skjul grensesnitt
 Error: 	MediaPlayer-Main		Feil: 
+Video track	MediaPlayer-Main		Videospor
+Playlist…	MediaPlayer-Main		Spilleliste…
+<unnamed media>	MediaPlayer-InfoWin		<medie uten navn>
+Save	MediaPlayer-PlaylistWindow		Lagre
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Randomiser oppføringer
+Cancel	MediaPlayer-NetworkStream		Avbryt
+Nothing to Play	MediaPlayer-Main		Ingenting å spille
+OK	MediaPlayer-SettingsWindow		OK
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Fjern oppføringer
+never	MediaPlayer-SettingsWindow		aldri
+Loop audio	MediaPlayer-SettingsWindow		Gjenta lyd
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern feil (feil utformet melding) Lagring av spillelisten mislyktes.
+Open…	MediaPlayer-PlaylistWindow		Åpne…
+Revert	MediaPlayer-SettingsWindow		Tilbakestill
+Low volume	MediaPlayer-SettingsWindow		Lavt volum
+Audio	MediaPlayer-Main		Lyd
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
+Quit	MediaPlayer-Main		Avslutt
 Large	MediaPlayer-SettingsWindow		Stor
 unknown format	MediaPlayer-InfoWin		ukjent format
 200% scale	MediaPlayer-Main		200% forstørrelse

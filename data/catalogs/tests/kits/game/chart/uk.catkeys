@@ -1,42 +1,41 @@
-1	ukrainian	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Повільне обертання
-Pink	ChartWindow		Рожевий
-Comet	ChartWindow		Комета
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Оранжевий
-Refresh rate	ChartWindow		Частота оновлення
-Blue	ChartWindow		Блакитний
-Colors	ChartWindow		Кольори
-Novas	ChartWindow		Нові зорі
-LineArray	ChartWindow		Масив ліній
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s   (логарифмічна шкала)
-Free motion	ChartWindow		Вільний рух
+1	ukrainian	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(високий) 100% 
-Green	ChartWindow		Зелений
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 потоки
-Yellow	ChartWindow		Жовтий
-Off	ChartWindow		Вимкнути
-Chaos	ChartWindow		Хаос
-Full screen	ChartWindow		На весь екран
 Spiral	ChartWindow		Спіраль
-Slow motion	ChartWindow		Повільний рух
- 5% (low)	ChartWindow		 5% (низька)
-Fast motion	ChartWindow		Швидкий рух
-Special	ChartWindow		Особливий
-Status	ChartWindow		Статус
-Star density	ChartWindow		Щільність зірок
-600.0 f/s	ChartWindow		600.0 f/s
+Orange	ChartWindow		Оранжевий
 Display:	ChartWindow		Показати:
-Space color	ChartWindow		Колір космосу
-White	ChartWindow		Білий
-Chart	System name		Chart
+Pink	ChartWindow		Рожевий
 Animation:	ChartWindow		Анімація:
-Frames/s	ChartWindow		Кадрів/с
 Auto demo	ChartWindow		АвтоДемо
-CPU load	ChartWindow		Завантаження процесора
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Червоний
 None	ChartWindow		Пусто
+600.0 f/s	ChartWindow		600.0 f/s
+Fast motion	ChartWindow		Швидкий рух
+Special	ChartWindow		Особливий
+White	ChartWindow		Білий
+Star density	ChartWindow		Щільність зірок
+Chaos	ChartWindow		Хаос
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Жовтий
+Frames/s	ChartWindow		Кадрів/с
+CPU load	ChartWindow		Завантаження процесора
+Green	ChartWindow		Зелений
+Colors	ChartWindow		Кольори
+Refresh rate	ChartWindow		Частота оновлення
+Full screen	ChartWindow		На весь екран
+Status	ChartWindow		Статус
+Off	ChartWindow		Вимкнути
 Battle	ChartWindow		Битва
+Blue	ChartWindow		Блакитний
+Slow rotation	ChartWindow		Повільне обертання
+Novas	ChartWindow		Нові зорі
+Slow motion	ChartWindow		Повільний рух
+Comet	ChartWindow		Комета
+2 threads	ChartWindow		2 потоки
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		Масив ліній
+ 5% (low)	ChartWindow		 5% (низька)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Вільний рух
+Space color	ChartWindow		Колір космосу
+Chart	System name		Chart
 Space:	ChartWindow		Космос:

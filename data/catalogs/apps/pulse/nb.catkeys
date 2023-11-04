@@ -13,7 +13,7 @@ Defaults	PrefsWindow		Standardinnstillinger
 Mini mode	PrefsWindow		Minimodus
 CPU progress bar	NormalPulseView		CPU-fremgangsmåler
 Fade colors	ConfigView		Ton ut farger
-About Pulse…	PulseView		Om Puls...
+About Pulse…	PulseView		Om Puls…
 Pulse	NormalPulseView		Puls
 Deskbar mode	NormalPulseView		Deskbarmodus
 Pulse settings	PulseApp		Pulse-innstillinger
@@ -27,13 +27,13 @@ OK	PrefsWindow		OK
 Pulse	PulseApp		Puls
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Klarte ikke fjerne fra Deskbar.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Om Puls...
+About Pulse…	CPUButton		Om Puls…
 Deskbar mode	PrefsWindow		Deskbarmodus
 Mini mode	DeskbarPulseView		Minimodus
 You can't disable the last active CPU.	CPUButton		Du kan ikke slå av den siste aktive prosessoren.
 OK	CPUButton		OK
 Deskbar	CPUButton		Deskbar
-Settings…	PulseView		Innstillinger...
+Settings…	PulseView		Innstillinger…
 Deskbar menu	CPUButton		Deskbarmeny
 Mini mode	NormalPulseView		Minimodus
 Quit	MiniPulseView		Avslutt

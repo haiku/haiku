@@ -1,42 +1,41 @@
-1	danish	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Langsom omdrejning
-Pink	ChartWindow		Lyserød
-Comet	ChartWindow		Komet
-DirectWindow	ChartWindow		Direkte vindue
-Orange	ChartWindow		Orange
-Refresh rate	ChartWindow		Opdateringsfrekvens
-Blue	ChartWindow		Blå
-Colors	ChartWindow		Farver
-Novas	ChartWindow		Novas
-LineArray	ChartWindow		Linjetabel
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (logaritmisk skala)
-Free motion	ChartWindow		Fri bevægelse
+1	danish	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(høj) 100% 
-Green	ChartWindow		Grøn
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 tråde
-Yellow	ChartWindow		Gul
-Off	ChartWindow		Slukket
-Chaos	ChartWindow		Kaos
-Full screen	ChartWindow		Fuldskærm
 Spiral	ChartWindow		Spiral
-Slow motion	ChartWindow		Langsom bevægelse
- 5% (low)	ChartWindow		 5% (lav)
-Fast motion	ChartWindow		Hurtig bevægelse
-Special	ChartWindow		Speciel
-Status	ChartWindow		Status
-Star density	ChartWindow		Stjernetæthed
-600.0 f/s	ChartWindow		600,0 f/s
+Orange	ChartWindow		Orange
 Display:	ChartWindow		Skærm:
-Space color	ChartWindow		Rumfarve
-White	ChartWindow		Hvid
-Chart	System name		Kort
+Pink	ChartWindow		Lyserød
 Animation:	ChartWindow		Animation:
-Frames/s	ChartWindow		Billeder/s
 Auto demo	ChartWindow		Auto-demo
-CPU load	ChartWindow		CPU-belastning
-DrawBitmap	ChartWindow		Tegn billede
 Red	ChartWindow		Rød
 None	ChartWindow		Ingen
+600.0 f/s	ChartWindow		600,0 f/s
+Fast motion	ChartWindow		Hurtig bevægelse
+Special	ChartWindow		Speciel
+White	ChartWindow		Hvid
+Star density	ChartWindow		Stjernetæthed
+Chaos	ChartWindow		Kaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Gul
+Frames/s	ChartWindow		Billeder/s
+CPU load	ChartWindow		CPU-belastning
+Green	ChartWindow		Grøn
+Colors	ChartWindow		Farver
+Refresh rate	ChartWindow		Opdateringsfrekvens
+Full screen	ChartWindow		Fuldskærm
+Status	ChartWindow		Status
+Off	ChartWindow		Slukket
 Battle	ChartWindow		Kamp
+Blue	ChartWindow		Blå
+Slow rotation	ChartWindow		Langsom omdrejning
+Novas	ChartWindow		Novas
+Slow motion	ChartWindow		Langsom bevægelse
+Comet	ChartWindow		Komet
+2 threads	ChartWindow		2 tråde
+DrawBitmap	ChartWindow		Tegn billede
+LineArray	ChartWindow		Linjetabel
+ 5% (low)	ChartWindow		 5% (lav)
+DirectWindow	ChartWindow		Direkte vindue
+Free motion	ChartWindow		Fri bevægelse
+Space color	ChartWindow		Rumfarve
+Chart	System name		Kort
 Space:	ChartWindow		Rum:

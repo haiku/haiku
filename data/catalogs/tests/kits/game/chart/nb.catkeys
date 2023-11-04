@@ -1,42 +1,41 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be.ChartDemo	986636897
-Slow rotation	ChartWindow		Langsom rotasjon
-Pink	ChartWindow		Rosa
-Comet	ChartWindow		Komet
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Oransje
-Refresh rate	ChartWindow		Oppdateringsfrekvens
-Blue	ChartWindow		Blå
-Colors	ChartWindow		Farger
-Novas	ChartWindow		Novaer
-LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (logaritmisk skala)
-Free motion	ChartWindow		Fri bevegelse
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be.ChartDemo	3491540808
 (high) 100% 	ChartWindow		(høy) 100% 
-Green	ChartWindow		Grønn
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 tråder
-Yellow	ChartWindow		Gul
-Off	ChartWindow		Av
-Chaos	ChartWindow		Kaos
-Full screen	ChartWindow		Fullskjerm
 Spiral	ChartWindow		Spiral
-Slow motion	ChartWindow		Sakte bevegelse
- 5% (low)	ChartWindow		 5% (lav)
-Fast motion	ChartWindow		Rask bevegelse
-Special	ChartWindow		Spesiell
-Status	ChartWindow		Status
-Star density	ChartWindow		Stjernetetthet
-600.0 f/s	ChartWindow		600,0 f/s
+Orange	ChartWindow		Oransje
 Display:	ChartWindow		Skjerm:
-Space color	ChartWindow		Rom-farge
-White	ChartWindow		Hvit
-Chart	System name		Diagram
+Pink	ChartWindow		Rosa
 Animation:	ChartWindow		Animasjon:
-Frames/s	ChartWindow		Bilder/s
 Auto demo	ChartWindow		Auto demo
-CPU load	ChartWindow		CPU-belastning
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Rød
 None	ChartWindow		Ingen
+600.0 f/s	ChartWindow		600,0 f/s
+Fast motion	ChartWindow		Rask bevegelse
+Special	ChartWindow		Spesiell
+White	ChartWindow		Hvit
+Star density	ChartWindow		Stjernetetthet
+Chaos	ChartWindow		Kaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Gul
+Frames/s	ChartWindow		Bilder/s
+CPU load	ChartWindow		CPU-belastning
+Green	ChartWindow		Grønn
+Colors	ChartWindow		Farger
+Refresh rate	ChartWindow		Oppdateringsfrekvens
+Full screen	ChartWindow		Fullskjerm
+Status	ChartWindow		Status
+Off	ChartWindow		Av
 Battle	ChartWindow		Slag
+Blue	ChartWindow		Blå
+Slow rotation	ChartWindow		Langsom rotasjon
+Novas	ChartWindow		Novaer
+Slow motion	ChartWindow		Sakte bevegelse
+Comet	ChartWindow		Komet
+2 threads	ChartWindow		2 tråder
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		LineArray
+ 5% (low)	ChartWindow		 5% (lav)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Fri bevegelse
+Space color	ChartWindow		Rom-farge
+Chart	System name		Diagram
 Space:	ChartWindow		Rom:

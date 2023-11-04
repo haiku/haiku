@@ -1,4 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PackageInstaller	3070777989
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PackageInstaller	2766413193
 Package description	UninstallView		Pakkebeskrivelse
 none	PackageView		ingen
 Continue	PackageInstall		Fortsett
+Running post-installation scripts	PackageInstall		Kjøre skript etter installasjon

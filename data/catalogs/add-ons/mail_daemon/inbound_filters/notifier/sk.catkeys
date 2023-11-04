@@ -1,7 +1,6 @@
-1	slovak	x-vnd.Haiku-NewMailNotification	2111731137
+1	slovak	x-vnd.Haiku-NewMailNotification	2957041017
 Log window	NotifierConfigView		Okno záznamu
 none	NotifierConfigView		žiadne
-New mails notification	NotifierFilter		Upozornenie na nové správy
 Alert	NotifierConfigView		Upozornenie
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Centrálne upozornenie

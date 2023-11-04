@@ -1,62 +1,62 @@
 1	friulian	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Dopre come fonts…
-File	Menus		File
-Slide delay	Menus		Ritart diapositive
-Selection mode	Menus		Modalitât selezion
-Zoom in	Menus		Ingrandìs
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' al è stât modificât. Sierâ il document?
-Page setup…	Menus		Impostazions pagjine…
-Print…	Menus		Stampe…
-Get info…	Menus		Oten informazions…
-OK	SaveToFile		Va ben
-Previous page	Menus		Pagjine precedente
-View	Menus		Visualize
-Full screen	Menus		Plen visôr
-Go to page	Menus		Va ae pagjine
-Zoom out	Menus		Impiçulìs
-Quit	Menus		Jes
-Rotate counterclockwise	Menus		Volte in sens antiorari
-High-quality zooming	Menus		Ingrandiment alte-cualitât
-Browse	Menus		Sgarfe
-Edit	Menus		Modifiche
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impussibil cjariâ la imagjin! O nol esist il file o nol esist un tradutôr di imagjin par chel file.
-First page	Menus		Prime pagjine
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' (pagjine %d) al è stât modificât. Sierâ il document?
-Leave full screen	Menus		Lasse mût plen visôr
-Close	Menus		Siere
-Close	ClosePrompt		Siere
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensione a (in 1/72 oncis):
-Rating	Menus		Valutazion
-Flip left to right	Menus		Ribalte in orizontâl
-Show caption in full screen mode	Menus		Mostre didascalie in modalitât plen visôr
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Vierç…
-Next file	Menus		Prossim file
-Clear selection	Menus		Nete selezion
-Close document	ClosePrompt		Siere document
-Height: 	PrintOptionsWindow		Altece: 
-The file '%s' could not be written.	SaveToFile		Impussibil scrivi il file '%s'.
-Cancel	ClosePrompt		Anule
-Show tool bar	Menus		Mostre sbare dai struments
-Fit to window	Menus		Adate al barcon
-Print options	PrintOptionsWindow		Opzions di stampe
-Copy	Menus		Copie
-Progress monitor	ProgressWindow		Control di avanzament
-Last page	Menus		Ultime pagjine
-Stretch to window	Menus		Slungje al barcon
-Previous file	Menus		File precedent
 ShowImage	System name		MostreImagjin
+Page setup…	Menus		Impostazions pagjine…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' (pagjine %d) al è stât modificât. Sierâ il document?
+Previous file	Menus		File precedent
+View	Menus		Visualize
+Leave full screen	Menus		Lasse mût plen visôr
+Show caption in full screen mode	Menus		Mostre didascalie in modalitât plen visôr
+Flip left to right	Menus		Ribalte in orizontâl
+Full screen	Menus		Plen visôr
+Copy	Menus		Copie
+Height: 	PrintOptionsWindow		Altece: 
+Next file	Menus		Prossim file
 Slide show	Menus		Proiezion diapositivis
-Fit image to page	PrintOptionsWindow		Adate imagjin ae pagjine
-Flip top to bottom	Menus		Ribalte in verticâl
-Select all	Menus		Selezione dut
-Zoom factor in %:	PrintOptionsWindow		Fatôr di ingrandiment in %:
-Width:	PrintOptionsWindow		Largjece:
-Image	Menus		Imagjin
-Move to Trash	Menus		Sposte te Scovacere
-OK	Alerts		Va ben
-Rotate clockwise	Menus		Volte in sens orari
-Job setup	PrintOptionsWindow		Configure lavôr
 Original size	Menus		Dimension origjinâl
-Next page	Menus		Prossime pagjine
+Width:	PrintOptionsWindow		Largjece:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensione a (in 1/72 oncis):
+Zoom factor in %:	PrintOptionsWindow		Fatôr di ingrandiment in %:
+Get info…	Menus		Oten informazions…
+Zoom out	Menus		Impiçulìs
+OK	Alerts		Va ben
+File	Menus		File
+Close	ClosePrompt		Siere
+Image	Menus		Imagjin
+Flip top to bottom	Menus		Ribalte in verticâl
+Zoom in	Menus		Ingrandìs
+Last page	Menus		Ultime pagjine
+Cancel	ClosePrompt		Anule
+High-quality zooming	Menus		Ingrandiment alte-cualitât
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' al è stât modificât. Sierâ il document?
+Close	Menus		Siere
+Selection mode	Menus		Modalitât selezion
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Adate imagjin ae pagjine
+Show tool bar	Menus		Mostre sbare dai struments
+First page	Menus		Prime pagjine
+OK	SaveToFile		Va ben
+Print…	Menus		Stampe…
+The file '%s' could not be written.	SaveToFile		Impussibil scrivi il file '%s'.
+Quit	Menus		Jes
+Rating	Menus		Valutazion
+Close document	ClosePrompt		Siere document
+Stretch to window	Menus		Slungje al barcon
+Job setup	PrintOptionsWindow		Configure lavôr
+Clear selection	Menus		Nete selezion
+Rotate clockwise	Menus		Volte in sens orari
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impussibil cjariâ la imagjin! O nol esist il file o nol esist un tradutôr di imagjin par chel file.
+Rotate counterclockwise	Menus		Volte in sens antiorari
+Previous page	Menus		Pagjine precedente
+Fit to window	Menus		Adate al barcon
+Browse	Menus		Sgarfe
+Go to page	Menus		Va ae pagjine
+Progress monitor	ProgressWindow		Control di avanzament
+Edit	Menus		Modifiche
+Move to Trash	Menus		Sposte te Scovacere
+Use as background…	Menus		Dopre come fonts…
+Open…	Menus		Vierç…
 Save as…	Menus		Salve come…
+Next page	Menus		Prossime pagjine
+Print options	PrintOptionsWindow		Opzions di stampe
+Slide delay	Menus		Ritart diapositive
+Select all	Menus		Selezione dut

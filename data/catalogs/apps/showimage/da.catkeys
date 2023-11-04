@@ -1,62 +1,62 @@
 1	danish	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Brug som baggrund…
-File	Menus		Fil
-Slide delay	Menus		Lysbilledeforsinkelse
-Selection mode	Menus		Markeringstilstand
-Zoom in	Menus		Zoom ind
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' er blevet ændret. Vil du lukke dokumentet?
-Page setup…	Menus		Sideopsætning…
-Print…	Menus		Udskriv…
-Get info…	Menus		Hent oplysninger…
-OK	SaveToFile		O.k.
-Previous page	Menus		Forrige side
-View	Menus		Vis
-Full screen	Menus		Fuldskærm
-Go to page	Menus		Gå til side
-Zoom out	Menus		Zoom ud
-Quit	Menus		Afslut
-Rotate counterclockwise	Menus		Rotér mod uret
-High-quality zooming	Menus		Højkvalitetszoom
-Browse	Menus		Gennemse
-Edit	Menus		Redigér
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke indlæse billede! Enten eksisterer filen eller en billedeoversætter for den, ikke.
-First page	Menus		Første side
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er blevet ændret. Vil du lukke dokumentet?
-Leave full screen	Menus		Forlad fuldskærm
-Close	Menus		Luk
-Close	ClosePrompt		Luk
-Resize to (in 1/72 inches):	PrintOptionsWindow		Sæt størrelse til (i 1/72 tommer):
-Rating	Menus		Vurdering
-Flip left to right	Menus		Spejlvend
-Show caption in full screen mode	Menus		Vis billedetekst i fuldskærm
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Åbn…
-Next file	Menus		Næste fil
-Clear selection	Menus		Ryd markering
-Close document	ClosePrompt		Luk dokument
-Height: 	PrintOptionsWindow		Højde: 
-The file '%s' could not be written.	SaveToFile		Filen '%s' kunne ikke skrives.
-Cancel	ClosePrompt		Afbryd
-Show tool bar	Menus		Vis værktøjslinje
-Fit to window	Menus		Tilpas til vindue
-Print options	PrintOptionsWindow		Udskriftsindstillinger
-Copy	Menus		Kopiér
-Progress monitor	ProgressWindow		Fremgangsoversigt
-Last page	Menus		Sidste side
-Stretch to window	Menus		Udstræk til vindue
-Previous file	Menus		Forrige fil
 ShowImage	System name		Billedviser
+Page setup…	Menus		Sideopsætning…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er blevet ændret. Vil du lukke dokumentet?
+Previous file	Menus		Forrige fil
+View	Menus		Vis
+Leave full screen	Menus		Forlad fuldskærm
+Show caption in full screen mode	Menus		Vis billedetekst i fuldskærm
+Flip left to right	Menus		Spejlvend
+Full screen	Menus		Fuldskærm
+Copy	Menus		Kopiér
+Height: 	PrintOptionsWindow		Højde: 
+Next file	Menus		Næste fil
 Slide show	Menus		Lysbilledviser
-Fit image to page	PrintOptionsWindow		Tilpas billedet til siden
-Flip top to bottom	Menus		Vend billedet på hovedet
-Select all	Menus		Vælg alt
-Zoom factor in %:	PrintOptionsWindow		Zoom-faktor i %:
-Width:	PrintOptionsWindow		Bredde:
-Image	Menus		Billede
-Move to Trash	Menus		Flyt til papirkurven
-OK	Alerts		O.k.
-Rotate clockwise	Menus		Rotér med uret
-Job setup	PrintOptionsWindow		Jobopsætning
 Original size	Menus		Oprindelig størrelse
-Next page	Menus		Næste side
+Width:	PrintOptionsWindow		Bredde:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Sæt størrelse til (i 1/72 tommer):
+Zoom factor in %:	PrintOptionsWindow		Zoom-faktor i %:
+Get info…	Menus		Hent oplysninger…
+Zoom out	Menus		Zoom ud
+OK	Alerts		O.k.
+File	Menus		Fil
+Close	ClosePrompt		Luk
+Image	Menus		Billede
+Flip top to bottom	Menus		Vend billedet på hovedet
+Zoom in	Menus		Zoom ind
+Last page	Menus		Sidste side
+Cancel	ClosePrompt		Afbryd
+High-quality zooming	Menus		Højkvalitetszoom
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' er blevet ændret. Vil du lukke dokumentet?
+Close	Menus		Luk
+Selection mode	Menus		Markeringstilstand
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Tilpas billedet til siden
+Show tool bar	Menus		Vis værktøjslinje
+First page	Menus		Første side
+OK	SaveToFile		O.k.
+Print…	Menus		Udskriv…
+The file '%s' could not be written.	SaveToFile		Filen '%s' kunne ikke skrives.
+Quit	Menus		Afslut
+Rating	Menus		Vurdering
+Close document	ClosePrompt		Luk dokument
+Stretch to window	Menus		Udstræk til vindue
+Job setup	PrintOptionsWindow		Jobopsætning
+Clear selection	Menus		Ryd markering
+Rotate clockwise	Menus		Rotér med uret
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke indlæse billede! Enten eksisterer filen eller en billedeoversætter for den, ikke.
+Rotate counterclockwise	Menus		Rotér mod uret
+Previous page	Menus		Forrige side
+Fit to window	Menus		Tilpas til vindue
+Browse	Menus		Gennemse
+Go to page	Menus		Gå til side
+Progress monitor	ProgressWindow		Fremgangsoversigt
+Edit	Menus		Redigér
+Move to Trash	Menus		Flyt til papirkurven
+Use as background…	Menus		Brug som baggrund…
+Open…	Menus		Åbn…
 Save as…	Menus		Gem som…
+Next page	Menus		Næste side
+Print options	PrintOptionsWindow		Udskriftsindstillinger
+Slide delay	Menus		Lysbilledeforsinkelse
+Select all	Menus		Vælg alt

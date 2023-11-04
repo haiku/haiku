@@ -1,62 +1,62 @@
 1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Ορισμός ως φόντο επιφάνειας εργασίας…
-File	Menus		Αρχείο
-Slide delay	Menus		Καθυστέρηση παρουσίασης
-Selection mode	Menus		Λειτουργία επιλογής
-Zoom in	Menus		Μεγέθυνση
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
-Page setup…	Menus		Διαμόρφωση σελίδας…
-Print…	Menus		Εκτύπωση…
-Get info…	Menus		Πληροφορίες…
-OK	SaveToFile		Εντάξει
-Previous page	Menus		Προηγούμενη σελίδα
-View	Menus		Προβολή
-Full screen	Menus		Πλήρης οθόνη
-Go to page	Menus		Πήγαινε στη σελίδα
-Zoom out	Menus		Σμίκρυνση
-Quit	Menus		Έξοδος
-Rotate counterclockwise	Menus		Περιστροφή προς τα αριστερά
-High-quality zooming	Menus		Υψηλής-ποιότητας μεγένθυση
-Browse	Menus		Περιήγηση
-Edit	Menus		Επεξεργασία
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Δεν ήταν δυνατή η φόρτωση της εικόνας! Το αρχείο ή ο μετατροπέας εικόνας δεν υπάρχει.
-First page	Menus		Πρώτη σελίδα
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
-Leave full screen	Menus		Εγκατάλειψη πλήρους οθόνης
-Close	Menus		Κλείσιμο
-Close	ClosePrompt		Κλείσιμο
-Resize to (in 1/72 inches):	PrintOptionsWindow		Αλλαγή μεγέθους σε (στο 1/72 ίντσες):
-Rating	Menus		Βαθμολογία
-Flip left to right	Menus		Οριζόντια αναστροφή
-Show caption in full screen mode	Menus		Εμφάνιση λεζάντας στην πλήρη οθόνη
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Άνοιγμα…
-Next file	Menus		Επόμενο αρχείο
-Clear selection	Menus		Εκκαθάριση επιλογής
-Close document	ClosePrompt		Κλείσιμο εγγράφου
-Height: 	PrintOptionsWindow		Ύψος: 
-The file '%s' could not be written.	SaveToFile		Το αρχείο '%s' δεν μπορεί να γραφτεί.
-Cancel	ClosePrompt		Άκυρο
-Show tool bar	Menus		Εμφάνιση εργαλειοθήκης
-Fit to window	Menus		Προσαρμογή σε παράθυρο
-Print options	PrintOptionsWindow		Επιλογές εκτύπωσης
-Copy	Menus		Αντιγραφή
-Progress monitor	ProgressWindow		Ένδειξη προόδου
-Last page	Menus		Τελευταία σελίδα
-Stretch to window	Menus		Επιμήκυνση σε παράθυρο
-Previous file	Menus		Προηγούμενο αρχείο
 ShowImage	System name		ShowImage
+Page setup…	Menus		Διαμόρφωση σελίδας…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
+Previous file	Menus		Προηγούμενο αρχείο
+View	Menus		Προβολή
+Leave full screen	Menus		Εγκατάλειψη πλήρους οθόνης
+Show caption in full screen mode	Menus		Εμφάνιση λεζάντας στην πλήρη οθόνη
+Flip left to right	Menus		Οριζόντια αναστροφή
+Full screen	Menus		Πλήρης οθόνη
+Copy	Menus		Αντιγραφή
+Height: 	PrintOptionsWindow		Ύψος: 
+Next file	Menus		Επόμενο αρχείο
 Slide show	Menus		Παρουσίαση
-Fit image to page	PrintOptionsWindow		Προσαρμογή εικόνας στη σελίδα
-Flip top to bottom	Menus		Κατακόρυφη αναστροφή
-Select all	Menus		Επιλογή όλων
-Zoom factor in %:	PrintOptionsWindow		Συντελεστής κλίμακας σε %:
-Width:	PrintOptionsWindow		Πλάτος:
-Image	Menus		Εικόνα
-Move to Trash	Menus		Μετακίνηση στον Κάδο
-OK	Alerts		Εντάξει
-Rotate clockwise	Menus		Περιστροφή προς τα δεξιά
-Job setup	PrintOptionsWindow		Διαμόρφωση εργασίας
 Original size	Menus		Αρχικό μέγεθος
-Next page	Menus		Επόμενη σελίδα
+Width:	PrintOptionsWindow		Πλάτος:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Αλλαγή μεγέθους σε (στο 1/72 ίντσες):
+Zoom factor in %:	PrintOptionsWindow		Συντελεστής κλίμακας σε %:
+Get info…	Menus		Πληροφορίες…
+Zoom out	Menus		Σμίκρυνση
+OK	Alerts		Εντάξει
+File	Menus		Αρχείο
+Close	ClosePrompt		Κλείσιμο
+Image	Menus		Εικόνα
+Flip top to bottom	Menus		Κατακόρυφη αναστροφή
+Zoom in	Menus		Μεγέθυνση
+Last page	Menus		Τελευταία σελίδα
+Cancel	ClosePrompt		Άκυρο
+High-quality zooming	Menus		Υψηλής-ποιότητας μεγένθυση
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
+Close	Menus		Κλείσιμο
+Selection mode	Menus		Λειτουργία επιλογής
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Προσαρμογή εικόνας στη σελίδα
+Show tool bar	Menus		Εμφάνιση εργαλειοθήκης
+First page	Menus		Πρώτη σελίδα
+OK	SaveToFile		Εντάξει
+Print…	Menus		Εκτύπωση…
+The file '%s' could not be written.	SaveToFile		Το αρχείο '%s' δεν μπορεί να γραφτεί.
+Quit	Menus		Έξοδος
+Rating	Menus		Βαθμολογία
+Close document	ClosePrompt		Κλείσιμο εγγράφου
+Stretch to window	Menus		Επιμήκυνση σε παράθυρο
+Job setup	PrintOptionsWindow		Διαμόρφωση εργασίας
+Clear selection	Menus		Εκκαθάριση επιλογής
+Rotate clockwise	Menus		Περιστροφή προς τα δεξιά
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Δεν ήταν δυνατή η φόρτωση της εικόνας! Το αρχείο ή ο μετατροπέας εικόνας δεν υπάρχει.
+Rotate counterclockwise	Menus		Περιστροφή προς τα αριστερά
+Previous page	Menus		Προηγούμενη σελίδα
+Fit to window	Menus		Προσαρμογή σε παράθυρο
+Browse	Menus		Περιήγηση
+Go to page	Menus		Πήγαινε στη σελίδα
+Progress monitor	ProgressWindow		Ένδειξη προόδου
+Edit	Menus		Επεξεργασία
+Move to Trash	Menus		Μετακίνηση στον Κάδο
+Use as background…	Menus		Ορισμός ως φόντο επιφάνειας εργασίας…
+Open…	Menus		Άνοιγμα…
 Save as…	Menus		Αποθήκευση ως…
+Next page	Menus		Επόμενη σελίδα
+Print options	PrintOptionsWindow		Επιλογές εκτύπωσης
+Slide delay	Menus		Καθυστέρηση παρουσίασης
+Select all	Menus		Επιλογή όλων

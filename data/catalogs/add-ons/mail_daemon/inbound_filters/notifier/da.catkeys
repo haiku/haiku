@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-NewMailNotification	1375000288
+1	danish	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Logvindue
 none	NotifierConfigView		ingen
-New mails notification	NotifierFilter		Underretning om ny post
 Alert	NotifierConfigView		Besked
 OK	NotifierFilter		O.k.
 Central alert	NotifierConfigView		Central besked

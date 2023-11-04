@@ -14,7 +14,7 @@ The old Master Boot Record was successfully saved to %s.	BootManagerController		
 Quit	WizardView	Button	Jes
 Never	DefaultPartitionPage		Mai
 Summary	BootManagerController	Title	Somari
-An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Si è verificât un erôr tal scrivi il menù di inviament. Il Master Boot Record al podarès jessi ruvinât, si varès di rispristinâlu daurman!
+An error occurred writing the boot menu. The Master Boot Record might be destroyed, you should restore the MBR now!	BootManagerController		Al è capitât un erôr tal scrivi il menù di inviament. Al è pussibil che il Master Boot Record al sedi ruvinât, al è il câs di rispristinâlu daurman!
 After three seconds	DefaultPartitionPage		Dopo trê seconts
 Read only!	DrivesPage	Cannot install	Dome leture!
 Write boot menu	BootManagerController	Button	Scrivi il menù di inviament

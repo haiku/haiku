@@ -8,7 +8,7 @@ Start again	SudokuWindow		Start på nytt
 New	SudokuWindow		Ny
 Easy	SudokuWindow		Lett
 Undo	SudokuWindow		Tilbakestill
-Export as…	SudokuWindow		Eksporter som...
+Export as…	SudokuWindow		Eksporter som…
 Quit	SudokuWindow		Avslutt
 Redo	SudokuWindow		Gjennomfør på nytt
 Could not open \"%s\":\n%s\n	SudokuWindow		Kunne ikke åpne \"%s\":\n%s\n
@@ -32,4 +32,4 @@ View	SudokuWindow		Vis
 Snapshot current	SudokuWindow		Øyeblikksbilde nåværende
 Mark valid hints	SudokuWindow		Marker gyldig tips
 Sudoku request	SudokuWindow		Sudoku forespørsel
-Open file…	SudokuWindow		Åpne fil...
+Open file…	SudokuWindow		Åpne fil…

@@ -1,7 +1,7 @@
 1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libbe	2914417806
 {0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 %.2f TiB/s	StringForRate		%.2f TiB/s
-All Rights Reserved.	AboutWindow		Alle rettigheter reservert.
+All Rights Reserved.	AboutWindow		Alle rettigheter forbeholdt.
 gold master	AboutWindow		gold master
 Undo	TextView		Tilbakestill
 OK	PrintJob		OK

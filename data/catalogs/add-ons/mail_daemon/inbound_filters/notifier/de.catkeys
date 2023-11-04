@@ -1,7 +1,6 @@
-1	german	x-vnd.Haiku-NewMailNotification	1375000288
+1	german	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Statusfenster
 none	NotifierConfigView		keine
-New mails notification	NotifierFilter		Ankündigung neuer E-Mails
 Alert	NotifierConfigView		Hinweisfenster
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Hinweisfenster (alle Konten)

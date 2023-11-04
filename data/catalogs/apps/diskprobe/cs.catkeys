@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DiskProbe	4193379066
+1	czech	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw editor
 Remove	AttributeWindow		Odebrat
 Close	ProbeView		Zavřít
@@ -9,7 +9,7 @@ MIME type editor	TypeEditors		Editor typu MIME
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadecimální
 16 bit unsigned value:	TypeEditors		Hodnota 16 bitového přirozeného čísla:
 8 bit signed value:	TypeEditors		Hodnota 8 bitového celého čísla:
- (native)	ProbeView		 (nativní)
+ (native)	ProbeView		 (běžná)
 Attribute offset: 	ProbeView		Ofset atributu: 
 Text	TypeEditors	This is the type of editor	Text
 File offset: 	ProbeView		Ofset souboru: 
@@ -24,12 +24,14 @@ OK	DiskProbe		OK
 DiskProbe	System name		Disková sonda
 Back	ProbeView		Zpět
 Device: 	ProbeView		Zařízení: 
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Soustava
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Číselná soustava
 Open file…	FileWindow		Otevřít soubor...
 32 bit unsigned pointer:	TypeEditors		32 bitový ukazatel bez znaménka:
 DiskProbe request	DiskProbe		Požadavek diskové sondy
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Šestnáctková
+Block %lld (0x%Lx)	ProbeView		Blok %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Zápis do souboru selhal:\n%s\n\nVšechny změny se po ukončení zahodí.
+Native: %lld (0x%0*Lx)	ProbeView		Původní: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Prozkoumat zařízení:
 Number editor	TypeEditors		Editor čísla
 Icon	TypeEditors		Ikona
@@ -45,7 +47,7 @@ Cancel	ProbeView		Zrušit
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nelze otevřít \"%s\":\n%s
 Font size	ProbeView		Velikost písma
 Type editor not supported	ProbeView		Editor typu není podporován
-Native: 0x%0*Lx	ProbeView		Nativní: 0x%0*Lx
+Native: 0x%0*Lx	ProbeView		Původní: 0x%0*Lx
 Copy	ProbeView		Kopírovat
 Redo	ProbeView		Znovu
 Floating-point value:	TypeEditors		Reálné číslo:
@@ -106,7 +108,7 @@ Previous	ProbeView		Předchozí
 Selection	ProbeView		Výběr
 Find	FindWindow		Vyhledat
 8 bit unsigned value:	TypeEditors		Hodnota 8 bitového přirozeného čísla:
-%ld (native)	ProbeView		%ld (nativní)
+%ld (native)	ProbeView		%ld (původní)
 Attribute: 	ProbeView		Atribut: 
 Block	ProbeView		Blok
 Find again	ProbeView		Najít znovu
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Požadavek diskové sondy
 Double precision floating-point value:	TypeEditors		Hodnota reálného čísla s dvojitou přesností:
 Image	TypeEditors	This is the type of view	Obrázek
+Swapped: %lld (0x%0*Lx)	ProbeView		Odloženo: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Uložit změny před uzavřením?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Formát PNG
 Number	TypeEditors	This is the type of editor	Číslo
 Edit	ProbeView		Upravit

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-LaunchBox	1530497419
+1	czech	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Nastavit popis...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Určitě chcete tento blok zavřít?\n(Nebude zapamatován.)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Zobrazit okraj okna
 Failed to launch 'something', error in Pad data.	LaunchBox		Nepodařilo se spustit 'something', chyba v datové oblasti.
 LaunchBox	System name		Spouštěč
 Auto-raise	LaunchBox		Automaticky vyvolat
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Velikost ikony
 Open containing folder	LaunchBox		Otevřít obsahující adresář
 Add button here	LaunchBox		Přidat sem tlačítko

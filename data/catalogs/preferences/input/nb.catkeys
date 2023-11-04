@@ -3,12 +3,12 @@ Scrolling	TouchpadPrefView		Rulling
 Defaults	InputMouse		Standarder
 Long	KeyboardView		Lang
 Cancel	TouchpadPrefView		Avbryt
-4-Button	SettingsView		4-Knapper
-Slow	TouchpadPrefView		Sakte
+4-Button	SettingsView		4-knapper
+Slow	TouchpadPrefView		Treg
 Tapping sensitivity	TouchpadPrefView		Tappefølsomhet
 Device List	InputWindow		Enhetsliste
 Double-click speed	SettingsView		Hastighet på dobbelt-klikk
-5-Button	SettingsView		5-Knapper
+5-Button	SettingsView		5-knapper
 Typing test area	KeyboardView		Felt for skrivetesting
 Mouse type:	SettingsView		Type mus:
 Revert	InputKeyboard		Tilbakestill
@@ -16,7 +16,7 @@ Fast	KeyboardView		Rask
 Off	TouchpadPrefView		Av
 Never	TouchpadPrefView		Aldri
 Fast	TouchpadPrefView		Fort
-6-Button	SettingsView		6-Knapper
+6-Button	SettingsView		6-knapper
 Please confirm	TouchpadPrefView		Vennligst bekreft
 Click to focus	SettingsView		Klikk for fokus
 Acceleration	TouchpadPrefView		Akselerasjon
@@ -24,7 +24,7 @@ Mouse speed	SettingsView		Musens hastighet
 Accept first click	SettingsView		Godta første klikk
 OK	TouchpadPrefView		OK
 Horizontal scrolling	TouchpadPrefView		Horisontal rulling
-Delay until key repeat	KeyboardView		Utsett til tasten gjentas
+Delay until key repeat	KeyboardView		Forsinkelse før tasten gjentas
 Keyboard lock delay	TouchpadPrefView		Tastaturlåsforsinkelse
 Two finger scrolling	TouchpadPrefView		Rulling med to fingre
 Input	System name		Inndata
@@ -36,10 +36,10 @@ Defaults	TouchpadPrefView		Standardinnstillinger
 Defaults	InputKeyboard		Standardinnstillinger
 Quick	TouchpadPrefView		Rask
 Short	KeyboardView		Kort
-Slow	KeyboardView		Sakte
+Slow	KeyboardView		Treg
 Revert	InputMouse		Tilbakestill
 Key repeat rate	KeyboardView		Repetisjonshastighet for taster
-2-Button	SettingsView		2-Knapper
+2-Button	SettingsView		2-knapper
 Click to focus and raise	SettingsView		Klikk for å fokusere og heve
 Vertical	TouchpadPrefView		Vertikal
 Horizontal	TouchpadPrefView		Horisontal

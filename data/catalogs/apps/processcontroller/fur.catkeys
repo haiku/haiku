@@ -3,7 +3,7 @@ Error saving file	ProcessController		Erôr tal salvâ il file
 Display priority	ProcessController		Prioritât di visualizazion
 That's no Fun!	ProcessController		Nol fâs ridi!
 What do you want to do with the team \"%s\"?	ProcessController		Ce vûstu fâ cul team \"%s\"?
-Your setting file could not be saved!\n(%s)	ProcessController		Il to file des impostazions nol pues jessi salvât!\n(%s)
+Your setting file could not be saved!\n(%s)	ProcessController		Nol è stât pussibil salvâ il to file des impostazions!\n(%s)
 Processor %d	ProcessController		Processôr %d
 Live in the Deskbar	ProcessController		Vîf tal Deskbar
 Kill this team!	ProcessController		Cope chest team!

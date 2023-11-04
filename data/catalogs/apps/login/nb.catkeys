@@ -8,7 +8,7 @@ Welcome to Haiku	Login Window		Velkommen til Haiku
 Halt	Login View		Stopp
 Desktop	Desktop Window		Skrivebord
 Hide password	Login View		Skjul passord
-Reboot	Login View		Omstart
+Reboot	Login View		Start på nytt
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Du kan tilpasse skrivebordet som vises bak påloggingsprogrammet ved å slippe replikanter på det.\n\nNår du er ferdig, avslutter du bare applikasjonen (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informasjon

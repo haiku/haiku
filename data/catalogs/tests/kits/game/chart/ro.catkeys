@@ -1,42 +1,41 @@
-1	romanian	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Rotație lentă
-Pink	ChartWindow		Roz
-Comet	ChartWindow		Cometă
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Portocaliu
-Refresh rate	ChartWindow		Rata de reîmprospătare
-Blue	ChartWindow		Albastru
-Colors	ChartWindow		Culori
-Novas	ChartWindow		Nove
-LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (scară logaritmică)
-Free motion	ChartWindow		Mişcare liberă
+1	romanian	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(ridicat) 100% 
-Green	ChartWindow		Verde
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 fire de execuție
-Yellow	ChartWindow		Galben
-Off	ChartWindow		Oprit
-Chaos	ChartWindow		Haos
-Full screen	ChartWindow		Ecran complet
 Spiral	ChartWindow		Spirală
-Slow motion	ChartWindow		Mişcare lentă
- 5% (low)	ChartWindow		 5% (scăzut)
-Fast motion	ChartWindow		Mişcare rapidă
-Special	ChartWindow		Special
-Status	ChartWindow		Stare
-Star density	ChartWindow		Densitate stelară
-600.0 f/s	ChartWindow		600.0 f/s
+Orange	ChartWindow		Portocaliu
 Display:	ChartWindow		Afișaj:
-Space color	ChartWindow		Culoare spațiu
-White	ChartWindow		Alb
-Chart	System name		Chart
+Pink	ChartWindow		Roz
 Animation:	ChartWindow		Animație:
-Frames/s	ChartWindow		Cadre/s
 Auto demo	ChartWindow		Demo automat
-CPU load	ChartWindow		Încărcare CPU
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Roșu
 None	ChartWindow		Nimic
+600.0 f/s	ChartWindow		600.0 f/s
+Fast motion	ChartWindow		Mişcare rapidă
+Special	ChartWindow		Special
+White	ChartWindow		Alb
+Star density	ChartWindow		Densitate stelară
+Chaos	ChartWindow		Haos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Galben
+Frames/s	ChartWindow		Cadre/s
+CPU load	ChartWindow		Încărcare CPU
+Green	ChartWindow		Verde
+Colors	ChartWindow		Culori
+Refresh rate	ChartWindow		Rata de reîmprospătare
+Full screen	ChartWindow		Ecran complet
+Status	ChartWindow		Stare
+Off	ChartWindow		Oprit
 Battle	ChartWindow		Luptă
+Blue	ChartWindow		Albastru
+Slow rotation	ChartWindow		Rotație lentă
+Novas	ChartWindow		Nove
+Slow motion	ChartWindow		Mişcare lentă
+Comet	ChartWindow		Cometă
+2 threads	ChartWindow		2 fire de execuție
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		LineArray
+ 5% (low)	ChartWindow		 5% (scăzut)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Mişcare liberă
+Space color	ChartWindow		Culoare spațiu
+Chart	System name		Chart
 Space:	ChartWindow		Spațiu:

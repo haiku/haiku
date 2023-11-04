@@ -1,62 +1,62 @@
 1	swedish	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Använd som bakgrund…
-File	Menus		Arkiv
-Slide delay	Menus		Bildspelsfördröjning
-Selection mode	Menus		Markeringsläge
-Zoom in	Menus		Zooma in
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
-Page setup…	Menus		Sidinställningar...
-Print…	Menus		Skriv ut...
-Get info…	Menus		Hämta info...
-OK	SaveToFile		Okej
-Previous page	Menus		Tidigare sida
-View	Menus		Visa
-Full screen	Menus		Fullskärm
-Go to page	Menus		Gå till sida
-Zoom out	Menus		Zooma ut
-Quit	Menus		Avsluta
-Rotate counterclockwise	Menus		Rotera moturs
-High-quality zooming	Menus		Högkvalitets inzomning
-Browse	Menus		Bläddra
-Edit	Menus		Redigera
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunde inte ladda bilden! Endera finns inte filen eller så saknas en bildöversättare för bildformatet.
-First page	Menus		Första sidan
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (sida %d) har ändrats. Vill du verkligen stänga dokumentet?
-Leave full screen	Menus		Lämna fullskärmsläge
-Close	Menus		Stäng
-Close	ClosePrompt		Stäng
-Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
-Rating	Menus		Betyg
-Flip left to right	Menus		Vänd åt sidan
-Show caption in full screen mode	Menus		Visa rubrik i helskärmsläge
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Öppna...
-Next file	Menus		Nästa fil
-Clear selection	Menus		Rensa markering
-Close document	ClosePrompt		Stäng dokument
-Height: 	PrintOptionsWindow		Höjd: 
-The file '%s' could not be written.	SaveToFile		Filen '%s' kunde inte skrivas.
-Cancel	ClosePrompt		Avbryt
-Show tool bar	Menus		Visa verktygsfält
-Fit to window	Menus		Anpassa till fönster
-Print options	PrintOptionsWindow		Utskriftsalternativ
-Copy	Menus		Kopiera
-Progress monitor	ProgressWindow		Förloppsmonitor
-Last page	Menus		Sista sidan
-Stretch to window	Menus		Sträck ut i fönster
-Previous file	Menus		Föregående fil
 ShowImage	System name		BildVisning
+Page setup…	Menus		Sidinställningar...
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (sida %d) har ändrats. Vill du verkligen stänga dokumentet?
+Previous file	Menus		Föregående fil
+View	Menus		Visa
+Leave full screen	Menus		Lämna fullskärmsläge
+Show caption in full screen mode	Menus		Visa rubrik i helskärmsläge
+Flip left to right	Menus		Vänd åt sidan
+Full screen	Menus		Fullskärm
+Copy	Menus		Kopiera
+Height: 	PrintOptionsWindow		Höjd: 
+Next file	Menus		Nästa fil
 Slide show	Menus		Bildspel
-Fit image to page	PrintOptionsWindow		Anpassa bild till sida
-Flip top to bottom	Menus		Vänd upp och ner
-Select all	Menus		Markera allt
-Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
-Width:	PrintOptionsWindow		Bredd:
-Image	Menus		Bild
-Move to Trash	Menus		Flytta till papperskorgen
-OK	Alerts		OK
-Rotate clockwise	Menus		Rotera medurs
-Job setup	PrintOptionsWindow		Utskriftsinställningar
 Original size	Menus		Originalstorlek
-Next page	Menus		Nästa sida
+Width:	PrintOptionsWindow		Bredd:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
+Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
+Get info…	Menus		Hämta info...
+Zoom out	Menus		Zooma ut
+OK	Alerts		OK
+File	Menus		Arkiv
+Close	ClosePrompt		Stäng
+Image	Menus		Bild
+Flip top to bottom	Menus		Vänd upp och ner
+Zoom in	Menus		Zooma in
+Last page	Menus		Sista sidan
+Cancel	ClosePrompt		Avbryt
+High-quality zooming	Menus		Högkvalitets inzomning
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
+Close	Menus		Stäng
+Selection mode	Menus		Markeringsläge
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Anpassa bild till sida
+Show tool bar	Menus		Visa verktygsfält
+First page	Menus		Första sidan
+OK	SaveToFile		Okej
+Print…	Menus		Skriv ut...
+The file '%s' could not be written.	SaveToFile		Filen '%s' kunde inte skrivas.
+Quit	Menus		Avsluta
+Rating	Menus		Betyg
+Close document	ClosePrompt		Stäng dokument
+Stretch to window	Menus		Sträck ut i fönster
+Job setup	PrintOptionsWindow		Utskriftsinställningar
+Clear selection	Menus		Rensa markering
+Rotate clockwise	Menus		Rotera medurs
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunde inte ladda bilden! Endera finns inte filen eller så saknas en bildöversättare för bildformatet.
+Rotate counterclockwise	Menus		Rotera moturs
+Previous page	Menus		Tidigare sida
+Fit to window	Menus		Anpassa till fönster
+Browse	Menus		Bläddra
+Go to page	Menus		Gå till sida
+Progress monitor	ProgressWindow		Förloppsmonitor
+Edit	Menus		Redigera
+Move to Trash	Menus		Flytta till papperskorgen
+Use as background…	Menus		Använd som bakgrund…
+Open…	Menus		Öppna...
 Save as…	Menus		Spara som...
+Next page	Menus		Nästa sida
+Print options	PrintOptionsWindow		Utskriftsalternativ
+Slide delay	Menus		Bildspelsfördröjning
+Select all	Menus		Markera allt

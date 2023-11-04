@@ -1,8 +1,13 @@
-1	czech	x-vnd.haiku-icon_o_matic	2395697714
+1	czech	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Žádný
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Vyčistit cestu
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Přidat prázdný
 Opening the icon failed!	Icon-O-Matic-Main		Otevření ikony selhalo!
+Reverse path	Icon-O-Matic-ReversePathCmd		Opačná cesta
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Píp!
 Add with path	Icon-O-Matic-ShapesList		Přidat s cestou
+Paste properties	Icon-O-Matic-Properties		Vložit vlastnosti
 Copy	Icon-O-Matic-Properties		Kopírovat
 Color	Icon-O-Matic-PropertyNames		Barva
 Format	Icon-O-Matic-SavePanel		Formát
@@ -10,86 +15,144 @@ Color	Icon-O-Matic-StyleTypes		Barva
 Select	Icon-O-Matic-Properties		Vybrat
 Reset transformation	Icon-O-Matic-ShapesList		Resetovat transformaci
 Duplicate	Icon-O-Matic-StylesList		Duplikovat
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Otočit
 Shorten	Icon-O-Matic-PropertyNames		Zkrátit
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Posunout {0, plural, one{transformátor} few{# transformátory} other{# transformátorů}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Text, který se snažíte importovat je dosti dlouhý, jste si jistý?
 Paste	Icon-O-Matic-Properties		Vložit
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Je tu mnoho stylů. Formát HVIF jich podporuje maximálně 255.
 Close	Icon-O-Matic-Menu-File		Zavřít
 Add rect	Icon-O-Matic-PathsList		Přidat obdélník
 Rotation	Icon-O-Matic-PropertyNames		Otočení
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Barva (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON atribut
 Transform	Icon-O-Matic-PathManipulator		Transformovat
 Add shape with style	Icon-O-Matic-Menu-Shape		Přidat tvar se stylem
+Change color	Icon-O-Matic-SetColorCmd		Změnit barvu
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Odstranit {0, plural, one{vrchol} few{# vrcholy} other{# vrcholů}}
+Unassign path	Icon-O-Matic-UnassignPathCmd		Oddělit cestu
 Remove	Icon-O-Matic-StylesList		Odstranit
 Cancel	Icon-O-Matic-Menu-Settings		Zrušit
+PNG set	Icon-O-Matic-SavePanel		výběr PNG
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformace
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Posunout {0, plural, one{cestu} few{# cesty} other{# cest}}
 Closed	Icon-O-Matic-PropertyNames		Zavřeno
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<není co udělat znovu>
 Height	Icon-O-Matic-PropertyNames		Výška
 warning	Icon-O-Matic-SVGExport		varování
 File	Icon-O-Matic-Menus		Soubor
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	kterémkoli z ostatních seznamů
 Properties	Icon-O-Matic-Menus		Vlastnosti
 Path	Icon-O-Matic-PropertyNames		Cesta
 Path	Icon-O-Matic-Menus		Cesta
 Stroke	Transformation		Tah
 Flip	Icon-O-Matic-PathManipulator		Překlopit
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	pro jeho změnu vlastností zde.
+Move pivot	Icon-O-Matic-TransformationBoxStates		Posunout ústřední bod
 Opacity	Icon-O-Matic-PropertyNames		Neprůhlednost
 OK	Icon-O-Matic-ColorPicker		OK
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Více možností %property%
 Error: 	Icon-O-Matic-Main		Chyba:
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Vynulovat {0, plural, one{přeměnu} few{# přeměny} other{# přeměn}}
+Assign style	Icon-O-Matic-AssignStyleCmd		Přiřadit styl
 Saving your document failed!	Icon-O-Matic-Exporter		Uložení vašeho dokumentu selhalo!
 Snap to grid	Icon-O-Matic-Menu-Settings		Přichytit k mřížce
 Opening the document failed!	Icon-O-Matic-Main		Otevření dokumentu selhalo!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Odebrat {0, plural, one{styl} few{# styly} other{# stylů}}
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Jedna či více cest má moc vrcholů. Formát HVIF podporuje jen 255 vrcholů na cestu.
 Add with path & style	Icon-O-Matic-ShapesList		Přidat s cestou a stylem
 Shape	Icon-O-Matic-Menus		Tvar
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Rozdělit {0, plural, one{vrchol} few{# vrcholy} other{# vrcholů}}
 <unavailable>	Icon-O-Matic-StyleTypes		<nepřístupné>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Upravit barevný přechod
 Min LOD	Icon-O-Matic-PropertyNames		Minimální úroveň detailů
+Redo: %action%	Icon-O-Matic-Main		Znovu: %action%
 Add	Icon-O-Matic-TransformersList		Přidat
 Settings	Icon-O-Matic-Menus		Nastavení
 Scale X	Icon-O-Matic-PropertyNames		Změnit šířku
 Add	Icon-O-Matic-PathsList		Přidat
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Přidat {0, plural, one{styl} few{# styly} other{# stylů}}
 Remove	Icon-O-Matic-PathManipulator		Odstranit
 Duplicate	Icon-O-Matic-ShapesList		Duplikovat
 Alpha	Icon-O-Matic-PropertyNames		Neprůhlednost
 Contour	Transformation		Obrys
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Přidat {0, plural, one{transformátor} few{# transformátory} other{# transformátorů}}
+Miter limit	Icon-O-Matic-PropertyNames		Limit ostrosti
+Insert vertex	Icon-O-Matic-InsertPointCmd		Vložit vrchol
 Rounding	Icon-O-Matic-PropertyNames		Zaokrouhlování
 Joins	Icon-O-Matic-PropertyNames		Spoje
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Je tu moc tvarů. Formát HVIF jich podporuje jen 255.
 Cancel	Icon-O-Matic-ColorPicker		Zrušit
 Duplicate	Icon-O-Matic-PathsList		Duplikovat
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Posunout {0, plural, one{tvar} few{# tvary} other{# tvarů}}
 Save	Icon-O-Matic-Menu-Settings		Uložit
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	Klikněte na objekt ve
 Export as…	Icon-O-Matic-Menu-File		Exportovat jako...
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		Zmrazit {0, plural, one{tvar} few{# tvary} other{# tvarů}}
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Odebrat {0, plural, one{tvar} few{# tvary} other{# tvarů}}
+Undo: %action%	Icon-O-Matic-Main		Zpět: %action%
 Diamond	Icon-O-Matic-StyleTypes		Kosočtverec
 Don't save	Icon-O-Matic-Menu-Settings		Neukládat
 Add shape with path	Icon-O-Matic-Menu-Shape		Přidat tvar s cestou
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	Průšvih
 Translation X	Icon-O-Matic-PropertyNames		Posun ve směru X
+Multi-paste properties	Icon-O-Matic-Properties		Vložit vlastnosti
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic nemusel všechna data ze SVG při jeho načtení zpracovat. Přepsáním původního souboru mohou být tyto informace ztraceny.
 Rotate indices backwards	Icon-O-Matic-PathsList		Otočit ukazatele zpět
 Overwrite	Icon-O-Matic-SVGExport		Přepsat
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Přidat {0, plural, one{tvar} few{# tvary} other{# tvarů}}
 Cancel	Icon-O-Matic-SVGExport		Zrušit
 Open…	Icon-O-Matic-Menu-File		Otevřít...
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Odebrat {0, plural, one{transformátor} few{# transformátory} other{# transformátorů}}
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Klikněte na tvar nahoře
 Remove	Icon-O-Matic-ShapesList		Odstranit
+Multi-paste	Icon-O-Matic-Properties		Vícenásobné vložení
+Bad news	Title of error alert		Špatné zprávy
+HVIF source code	Icon-O-Matic-SavePanel		HVIF zdrojový kód
 Drop shapes	Icon-O-Matic-ShapesList		Tvary stínů
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Uložit ikonu
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Přiřadit {0, plural, one{cestu} few{# cesty} other{# cest}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Odebrat {0, plural, one{položku} few{# položky} other{# položek}}
 Linear	Icon-O-Matic-StyleTypes		Čárový
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Posunout {0, plural, one{položku} few{# položky} other{# položek}}
+Add vertex	Icon-O-Matic-AddPointCmd		Přidat vrchol
 Clean up	Icon-O-Matic-PathsList		Vyčistit
 Split	Icon-O-Matic-PathManipulator		Rozdělit
 Move	Icon-O-Matic-TransformationBoxStates		Přesunout
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Je tu mnoho cest. Formát HVIF jich podporuje jen 255.
 Conic	Icon-O-Matic-StyleTypes		Kónický
 Name	Icon-O-Matic-PropertyNames		Jméno
 Reset transformation	Icon-O-Matic-StylesList		Resetovat transformaci
 Reverse	Icon-O-Matic-PathsList		Obrátit
 Remove	Icon-O-Matic-PathsList		Odstranit
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
+Load error	Icon-O-Matic-SVGImport		Chyba nahrání
 Style type	Icon-O-Matic-StyleTypes		Typ Stylu
 Quit	Icon-O-Matic-Menu-File		Ukončit
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		Jeden nebo více tvarů má hodně transformátorů. Formát HVIF jich podporuje jen 255 na každý tvar.
 Gradient	Icon-O-Matic-StyleTypes		Gradient
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Barva (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		Detekovat orientaci
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Přidat {0, plural, one{cestu} few{# cesty} other{# cest}}
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Jeden nebo více tvarů má hodně cest. Formát HVIF jich podporuje jen 255.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Přidat tvar s cestou a stylem
 Radial	Icon-O-Matic-StyleTypes		Radiální
 Text too long	Icon-O-Matic-StyledTextImport		Text je příliš dlouhý
 Caps	Icon-O-Matic-PropertyNames		Verzálky
 OK	Icon-O-Matic-SVGImport		OK
+Import text	Icon-O-Matic-StyledTextImport		Nahrát text
 Append…	Icon-O-Matic-Menu-File		Připojit...
 Scale Y	Icon-O-Matic-PropertyNames		Změnit výšku
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Exportovat ikonu
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Otočit body cesty
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Přidat {0, plural, one{položku} few{# položky} other{# položek}}
 Rotate indices forwards	Icon-O-Matic-PathsList		Otočit ukazatele dopředu
 Save	Icon-O-Matic-Menu-File		Uložit
+Cancel	Icon-O-Matic-StyledTextImport		Zrušit
 Add circle	Icon-O-Matic-PathsList		Přidat kruh
 Freeze transformation	Icon-O-Matic-ShapesList		Zmrazit transformaci
+META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON atribut
 Untitled	Icon-O-Matic-Main		Bezejmenný
 Max LOD	Icon-O-Matic-PropertyNames		Maximální úroveň detailů
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Uložit před zavřením změny v aktualní ikoně?
@@ -97,20 +160,30 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nep
 Save as…	Icon-O-Matic-Menu-File		Uložit jako...
 Swatches	Icon-O-Matic-Menus		Vzorky
 <modify path>	Icon-O-Matic-PathCmd		<změnit cestu>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Nastavit %property%
 Icon-O-Matic	System name		Malování ikon
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nic, co by šlo vrátit>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Odebrat {0, plural, one{cestu} few{# cesty} other{# cest}}
 Add	Icon-O-Matic-StylesList		Přidat
 Translation Y	Icon-O-Matic-PropertyNames		Posunutí ve směru Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Upravit vrchol
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		Posunout {0, plural, one{styl} few{# styly} other{# stylů}}
 Scale	Icon-O-Matic-TransformationBoxStates		Změnit velikost
 All	Icon-O-Matic-Properties		Vše
 Transformer	Icon-O-Matic-Menus		Transformátor
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Překlopit {0, plural, one{vrchol} few{# vrcholy} other{# vrcholů}}
 Invert selection	Icon-O-Matic-Properties		Invertovat výběr
+to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	pro připojení transformátorů.
 <unkown property>	Icon-O-Matic-PropertyNames		<neznámé vlastnictví>
 Pick a color	Icon-O-Matic-ColorPicker		Vybrat barvu
 Settings…	Icon-O-Matic-SavePanel		Nastavení...
+Select all	Icon-O-Matic-PathManipulator		Vybrat vše
 Add with style	Icon-O-Matic-ShapesList		Přidat se stylem
 New	Icon-O-Matic-Menu-File		Nový
+Change perspective	Icon-O-Matic-PerspectiveCommand		Změnit pohled
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Šťouchnout {0, plural, one{vrchol} few{# vrcholy} other{# vrcholů}}
 Gradient type	Icon-O-Matic-StyleTypes		Typ gradientu
+Perspective	Transformation		Pohled
 Export	Icon-O-Matic-Menu-File		Exportovat
 Width	Icon-O-Matic-PropertyNames		Šířka
 Add reference image	Icon-O-Matic-ShapesList		Přidat referenční obrázek

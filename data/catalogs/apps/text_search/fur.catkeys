@@ -1,5 +1,5 @@
 1	friulian	x-vnd.Haiku.TextSearch	1757850908
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Sielç i file che tu desideris che a vignedin selezionâts par te tal Tracker.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Sielç i files che tu desideris che a vegnin selezionâts par te tal Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		No si è rivâts a inviâ il program xargs!
 Open selection	GrepWindow		Vierç selezion
@@ -14,10 +14,10 @@ Look in sub-folders	GrepWindow		Cîr tes sot-cartelis
 %s: Not enough room to escape the filename.	Grepper		%s: No'nd è vonde spazi par evitâ il non dal file.
 Follow symbolic links	GrepWindow		Seguìs i colegaments simbolics
 Regular expression	GrepWindow		Espression regolâr
-Text files only	GrepWindow		Dome file di test
+Text files only	GrepWindow		Dome files di test
 Quit	GrepWindow		Jes
-Show files in Tracker	GrepWindow		Mostre i file tal Tracker
-Please select the files you wish to keep searching.	GrepWindow		Selezione i file che su chei tu desideris continuâ la ricercje. 
+Show files in Tracker	GrepWindow		Mostre i files tal Tracker
+Please select the files you wish to keep searching.	GrepWindow		Selezione i files là che tu desideris continuâ la ricercje. 
 Trim to selection	GrepWindow		Ridûs ae selezion
 Set target…	GrepWindow		Stabilìs destinazion…
 Failed to open input pipe!	Grepper		No si è rivâts a vierzi il condot/pipe di input!
@@ -25,8 +25,8 @@ Search	GrepWindow		Cîr
 Copy text to clipboard	GrepWindow		Copie il test tes notis
 Show lines	GrepWindow		Mostre riis
 Failed to open errors pipe!	Grepper		No si è rivâts a vierzi il condot/pipe dai erôrs!
-The unselected files will be removed from the list.	GrepWindow		I file no selezionâts a vignaran gjavâts de liste.
-Open files in code editor	GrepWindow		Vierç i file tal editôr di codiç
+The unselected files will be removed from the list.	GrepWindow		I files no selezionâts a vignaran gjavâts de liste.
+Open files in code editor	GrepWindow		Vierç i files tal editôr di codiç
 Skip folders starting with a dot	GrepWindow		Salte lis cartelis che a tachin cuntun pont
 Failed to open output pipe!	Grepper		No si è rivâts a vierzi il condot/pipe di jessude!
 Cancel	GrepWindow		Anule

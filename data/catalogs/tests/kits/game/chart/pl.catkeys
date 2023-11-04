@@ -1,42 +1,41 @@
-1	polish	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Powolny obrót
-Pink	ChartWindow		Różowy
-Comet	ChartWindow		Kometa
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Pomarańczowy
-Refresh rate	ChartWindow		Częstotliwość odświeżania
-Blue	ChartWindow		Niebieski
-Colors	ChartWindow		Kolory
-Novas	ChartWindow		Novas
-LineArray	ChartWindow		TablicaLinii
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (skala logarytmiczna)
-Free motion	ChartWindow		Swobodne poruszanie
+1	polish	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(wysoki) 100% 
-Green	ChartWindow		Zielony
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 wątki
-Yellow	ChartWindow		Żółty
-Off	ChartWindow		Wyłączony
-Chaos	ChartWindow		Chaos
-Full screen	ChartWindow		Pełny ekran
 Spiral	ChartWindow		Spirala
-Slow motion	ChartWindow		Zwolnione tempo
- 5% (low)	ChartWindow		 5% (niski)
-Fast motion	ChartWindow		Szybkie poruszanie
-Special	ChartWindow		Specjalne
-Status	ChartWindow		Stan
-Star density	ChartWindow		Gęstość gwiazd
-600.0 f/s	ChartWindow		600.0 kl/s
+Orange	ChartWindow		Pomarańczowy
 Display:	ChartWindow		Wyświetl:
-Space color	ChartWindow		Przestrzeń kolorów
-White	ChartWindow		Biały
-Chart	System name		Wykres
+Pink	ChartWindow		Różowy
 Animation:	ChartWindow		Animacja:
-Frames/s	ChartWindow		Klatek/s
 Auto demo	ChartWindow		Auto demo
-CPU load	ChartWindow		Obciążenie procesora
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Czerwony
 None	ChartWindow		Brak
+600.0 f/s	ChartWindow		600.0 kl/s
+Fast motion	ChartWindow		Szybkie poruszanie
+Special	ChartWindow		Specjalne
+White	ChartWindow		Biały
+Star density	ChartWindow		Gęstość gwiazd
+Chaos	ChartWindow		Chaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Żółty
+Frames/s	ChartWindow		Klatek/s
+CPU load	ChartWindow		Obciążenie procesora
+Green	ChartWindow		Zielony
+Colors	ChartWindow		Kolory
+Refresh rate	ChartWindow		Częstotliwość odświeżania
+Full screen	ChartWindow		Pełny ekran
+Status	ChartWindow		Stan
+Off	ChartWindow		Wyłączony
 Battle	ChartWindow		Bitwa
+Blue	ChartWindow		Niebieski
+Slow rotation	ChartWindow		Powolny obrót
+Novas	ChartWindow		Novas
+Slow motion	ChartWindow		Zwolnione tempo
+Comet	ChartWindow		Kometa
+2 threads	ChartWindow		2 wątki
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		TablicaLinii
+ 5% (low)	ChartWindow		 5% (niski)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Swobodne poruszanie
+Space color	ChartWindow		Przestrzeń kolorów
+Chart	System name		Wykres
 Space:	ChartWindow		Przestrzeń:

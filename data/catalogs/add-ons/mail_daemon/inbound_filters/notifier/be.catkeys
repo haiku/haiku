@@ -1,7 +1,6 @@
-1	belarusian	x-vnd.Haiku-NewMailNotification	2111731137
+1	belarusian	x-vnd.Haiku-NewMailNotification	2957041017
 Log window	NotifierConfigView		Акно гісторыі
 none	NotifierConfigView		не
-New mails notification	NotifierFilter		Паведамленне пра новую пошту
 Alert	NotifierConfigView		Паведамленне
 OK	NotifierFilter		Добра
 Central alert	NotifierConfigView		Цэнтральнае паведамленне

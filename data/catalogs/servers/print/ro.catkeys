@@ -2,7 +2,7 @@
 Undefined	ConfigWindow		Nedefinit
 Return the number of available transports	PrintServerApp Scripting		Întoarce numărul de transporturi disponibile
 Return the number of available printers	PrintServerApp Scripting		Întoarce numărul de imprimante disponibile
-Get currently available ports/devices	Transport Scripting		Obține porturile/dispozitivele disponibile în prezent
+Get currently available ports/devices	Transport Scripting		Obține porturile/dispozitivele disponibile în acest moment
 Retrieve or select the active printer	PrintServerApp Scripting		Obține sau selectează imprimanta activă
 Cancel	PrintServerApp		Anulează
 Retrieve a specific printer	PrintServerApp Scripting		Obține o imprimantă specifică
@@ -13,7 +13,7 @@ OK	ConfigWindow		OK
 Cancel	ConfigWindow		Anulează
 Printer server	ConfigWindow		Server de imprimantă
 Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 la %2, %3 copii
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Există deja o imprimantă cu acel nume, dar driverul ei nu a fost găsit! Înlocuiți?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Există deja o imprimantă cu acel nume, dar driverul acesteia nu a putut fi găsit! Înlocuiți?
 Yes	PrintServerApp		Da
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Registru
 Would you like to set one up now?	PrintServerApp		Doriți să configurați una acum?
@@ -27,7 +27,7 @@ A0	ConfigWindow	ISO 216 paper size	A0
 Letter	ConfigWindow	ANSI A (letter), a North American paper size	Scrisoare
 Printer:	ConfigWindow		Imprimantă:
 A2	ConfigWindow	ISO 216 paper size	A2
-Select a printer	ConfigWindow		Alegeți o imprimantă
+Select a printer	ConfigWindow		Selectați o imprimantă
 Show configuration window	PrintServerApp Scripting		Arată fereastra de configurare
 A4	ConfigWindow	ISO 216 paper size	A4
 Get comments about this printer	Printer Scripting		Obține comentariile despre această imprimantă
@@ -36,7 +36,7 @@ No	PrintServerApp		Nu
 Get the transport configuration for this printer	Printer Scripting		Obține configurația de transport pentru această imprimantă
 Landscape	ConfigWindow		Peisaj
 Legal	ConfigWindow	A North American paper size (216 x 356 mm, or 8.5 x 14 in)	Legal
-There are no printers set up.	PrintServerApp		Nu sunt configurate imprimante.
+There are no printers set up.	PrintServerApp		Nu există imprimante configurate.
 Get name of the transport add-on used for this printer	Printer Scripting		Obține numele suplimentului de transport utilizat pentru această imprimantă
 All pages, %1 copies	ConfigWindow		Toate paginile, %1 copii
 Delete a specific printer	PrintServerApp Scripting		Șterge o imprimantă specifică
@@ -44,7 +44,7 @@ Create a new printer	PrintServerApp Scripting		Creează o imprimantă nouă
 OK	PrintServerApp		OK
 Print setup	ConfigWindow		Configurare tipărire
 A1	ConfigWindow	ISO 216 paper size	A1
-Retrieve a specific transport	PrintServerApp Scripting		Obține un transport specific
+Retrieve a specific transport	PrintServerApp Scripting		Preia un transport specific
 Get name of printer	Printer Scripting		Obține numele imprimantei
 A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Obține numele transportului
@@ -52,4 +52,4 @@ A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Doriți să stabiliți @ ca imprimantă implicită?
 Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
 Page setup	ConfigWindow		Configurare pagină
-Paper setup:	ConfigWindow		Configurare hărtie:
+Paper setup:	ConfigWindow		Configurare hârtie:

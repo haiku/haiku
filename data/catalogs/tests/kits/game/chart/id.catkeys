@@ -1,42 +1,41 @@
-1	indonesian	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Rotasi pelan
-Pink	ChartWindow		Merah muda
-Comet	ChartWindow		Komet
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Oranye
-Refresh rate	ChartWindow		Rasio penyegaran
-Blue	ChartWindow		Biru
-Colors	ChartWindow		Warna
-Novas	ChartWindow		Novas
-LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s   (skala logaritmik)
-Free motion	ChartWindow		Gerak bebas
+1	indonesian	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(tinggi) 100% 
-Green	ChartWindow		Hijau
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 utas
-Yellow	ChartWindow		Kuning
-Off	ChartWindow		Mati
-Chaos	ChartWindow		Kisruh
-Full screen	ChartWindow		Layar penuh
 Spiral	ChartWindow		Spiral
-Slow motion	ChartWindow		Gerak lambat
- 5% (low)	ChartWindow		 5% (rendah)
-Fast motion	ChartWindow		Gerak cepat
-Special	ChartWindow		Spesial
-Status	ChartWindow		Status
-Star density	ChartWindow		Kepadatan bintang
-600.0 f/s	ChartWindow		600.0 f/d
+Orange	ChartWindow		Oranye
 Display:	ChartWindow		Tampilan:
-Space color	ChartWindow		Warna ruang
-White	ChartWindow		Putih
-Chart	System name		Bagan
+Pink	ChartWindow		Merah muda
 Animation:	ChartWindow		Animasi:
-Frames/s	ChartWindow		Bingkai/dt
 Auto demo	ChartWindow		Demo otomatis
-CPU load	ChartWindow		Beban CPU
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Merah
 None	ChartWindow		Tak satupun
+600.0 f/s	ChartWindow		600.0 f/d
+Fast motion	ChartWindow		Gerak cepat
+Special	ChartWindow		Spesial
+White	ChartWindow		Putih
+Star density	ChartWindow		Kepadatan bintang
+Chaos	ChartWindow		Kisruh
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Kuning
+Frames/s	ChartWindow		Bingkai/dt
+CPU load	ChartWindow		Beban CPU
+Green	ChartWindow		Hijau
+Colors	ChartWindow		Warna
+Refresh rate	ChartWindow		Rasio penyegaran
+Full screen	ChartWindow		Layar penuh
+Status	ChartWindow		Status
+Off	ChartWindow		Mati
 Battle	ChartWindow		Pertempuran
+Blue	ChartWindow		Biru
+Slow rotation	ChartWindow		Rotasi pelan
+Novas	ChartWindow		Novas
+Slow motion	ChartWindow		Gerak lambat
+Comet	ChartWindow		Komet
+2 threads	ChartWindow		2 utas
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		LineArray
+ 5% (low)	ChartWindow		 5% (rendah)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Gerak bebas
+Space color	ChartWindow		Warna ruang
+Chart	System name		Bagan
 Space:	ChartWindow		Ruang:

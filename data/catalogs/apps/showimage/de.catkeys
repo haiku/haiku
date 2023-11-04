@@ -1,61 +1,61 @@
 1	german	x-vnd.Haiku-ShowImage	601442731
-Use as background…	Menus		Als Hintergrund verwenden …
-File	Menus		Datei
-Slide delay	Menus		Verzögerung
-Selection mode	Menus		Auswahlmodus
-Zoom in	Menus		Vergrößern
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Das Bild '%s' wurde verändert. Trotzdem schließen?
 Page setup…	Menus		Seite einrichten …
-Print…	Menus		Drucken …
-Get info…	Menus		Datei-Info …
-OK	SaveToFile		OK
-Previous page	Menus		Vorherige Seite
-View	Menus		Ansicht
-Full screen	Menus		Vollbild
-Go to page	Menus		Gehe zu Seite
-Zoom out	Menus		Verkleinern
-Quit	Menus		Beenden
-Rotate counterclockwise	Menus		Gegen Uhrzeigersinn rotieren
-High-quality zooming	Menus		Zoomen mit hoher Qualität
-Browse	Menus		Blättern
-Edit	Menus		Bearbeiten
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Das Bild konnte nicht geladen werden! Entweder die Datei selbst oder ein passender Translator existiert nicht.
-First page	Menus		Erste Seite
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
-Leave full screen	Menus		Vollbild verlassen
-Close	Menus		Schließen
-Close	ClosePrompt		Schließen
-Resize to (in 1/72 inches):	PrintOptionsWindow		Größe ändern zu (in 1/72 Zoll):
-Rating	Menus		Bewertung
-Flip left to right	Menus		Horizontal spiegeln
-Show caption in full screen mode	Menus		Im Vollbildmodus Dateiname zeigen
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Öffnen …
-Next file	Menus		Nächste Datei
-Clear selection	Menus		Auswahl aufheben
-Close document	ClosePrompt		Dokument schließen
-Height: 	PrintOptionsWindow		Höhe: 
-The file '%s' could not be written.	SaveToFile		Die Datei '%s' konnte nicht gespeichert werden.
-Cancel	ClosePrompt		Abbrechen
-Show tool bar	Menus		Werkzeugleiste zeigen
-Fit to window	Menus		An Fenstergröße anpassen
-Print options	PrintOptionsWindow		Druckeinstellungen
-Copy	Menus		Kopieren
-Progress monitor	ProgressWindow		Fortschrittsanzeige
-Last page	Menus		Letzte Seite
-Stretch to window	Menus		Auf Fenstergröße vergrößern
 Previous file	Menus		Vorherige Datei
+View	Menus		Ansicht
+Leave full screen	Menus		Vollbild verlassen
+Show caption in full screen mode	Menus		Im Vollbildmodus Dateiname zeigen
+Flip left to right	Menus		Horizontal spiegeln
+Full screen	Menus		Vollbild
+Copy	Menus		Kopieren
+Height: 	PrintOptionsWindow		Höhe: 
+Next file	Menus		Nächste Datei
 Slide show	Menus		Diashow
-Fit image to page	PrintOptionsWindow		Bild in Seite einpassen
-Flip top to bottom	Menus		Vertikal spiegeln
-Select all	Menus		Alles auswählen
-Zoom factor in %:	PrintOptionsWindow		Vergrößerungsfaktor in %:
-Width:	PrintOptionsWindow		Breite:
-Image	Menus		Bild
-Move to Trash	Menus		In Papierkorb verschieben
-OK	Alerts		OK
-Rotate clockwise	Menus		Im Uhrzeigersinn rotieren
-Job setup	PrintOptionsWindow		Druckauftrag bearbeiten
 Original size	Menus		Originalgröße
-Next page	Menus		Nächste Seite
+Width:	PrintOptionsWindow		Breite:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Größe ändern zu (in 1/72 Zoll):
+Zoom factor in %:	PrintOptionsWindow		Vergrößerungsfaktor in %:
+Get info…	Menus		Datei-Info …
+Zoom out	Menus		Verkleinern
+OK	Alerts		OK
+File	Menus		Datei
+Close	ClosePrompt		Schließen
+Image	Menus		Bild
+Flip top to bottom	Menus		Vertikal spiegeln
+Zoom in	Menus		Vergrößern
+Last page	Menus		Letzte Seite
+Cancel	ClosePrompt		Abbrechen
+High-quality zooming	Menus		Zoomen mit hoher Qualität
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Das Bild '%s' wurde verändert. Trotzdem schließen?
+Close	Menus		Schließen
+Selection mode	Menus		Auswahlmodus
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Bild in Seite einpassen
+Show tool bar	Menus		Werkzeugleiste zeigen
+First page	Menus		Erste Seite
+OK	SaveToFile		OK
+Print…	Menus		Drucken …
+The file '%s' could not be written.	SaveToFile		Die Datei '%s' konnte nicht gespeichert werden.
+Quit	Menus		Beenden
+Rating	Menus		Bewertung
+Close document	ClosePrompt		Dokument schließen
+Stretch to window	Menus		Auf Fenstergröße vergrößern
+Job setup	PrintOptionsWindow		Druckauftrag bearbeiten
+Clear selection	Menus		Auswahl aufheben
+Rotate clockwise	Menus		Im Uhrzeigersinn rotieren
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Das Bild konnte nicht geladen werden! Entweder die Datei selbst oder ein passender Translator existiert nicht.
+Rotate counterclockwise	Menus		Gegen Uhrzeigersinn rotieren
+Previous page	Menus		Vorherige Seite
+Fit to window	Menus		An Fenstergröße anpassen
+Browse	Menus		Blättern
+Go to page	Menus		Gehe zu Seite
+Progress monitor	ProgressWindow		Fortschrittsanzeige
+Edit	Menus		Bearbeiten
+Move to Trash	Menus		In Papierkorb verschieben
+Use as background…	Menus		Als Hintergrund verwenden …
+Open…	Menus		Öffnen …
 Save as…	Menus		Speichern unter …
+Next page	Menus		Nächste Seite
+Print options	PrintOptionsWindow		Druckeinstellungen
+Slide delay	Menus		Verzögerung
+Select all	Menus		Alles auswählen

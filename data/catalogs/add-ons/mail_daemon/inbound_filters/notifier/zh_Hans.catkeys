@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-NewMailNotification	1375000288
+1	english	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		日志窗口
 none	NotifierConfigView		无
-New mails notification	NotifierFilter		新邮件通知
 Alert	NotifierConfigView		警告
 OK	NotifierFilter		确定
 Central alert	NotifierConfigView		中部警告

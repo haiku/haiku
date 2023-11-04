@@ -1,7 +1,6 @@
-1	hungarian	x-vnd.Haiku-NewMailNotification	1375000288
+1	hungarian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		naplóablak
 none	NotifierConfigView		nincs
-New mails notification	NotifierFilter		Új üzenet értesítés
 Alert	NotifierConfigView		jelzés
 OK	NotifierFilter		Rendben
 Central alert	NotifierConfigView		központi jelzés

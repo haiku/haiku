@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	716811487
+1	czech	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
@@ -36,6 +36,7 @@ Full volume	MediaPlayer-SettingsWindow		Plná hlasitost
 Start media server	MediaPlayer-Main		Spustit media server
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Vypadá to, že media server neběží.\nChcete jej spustit?
 Location	MediaPlayer-InfoWin		Umístění
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Otevírám '%s'.
 Medium	MediaPlayer-SettingsWindow		Střední
 Play mode	MediaPlayer-SettingsWindow		Režim přehrávání

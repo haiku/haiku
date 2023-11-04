@@ -1,62 +1,62 @@
 1	hungarian	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Beállítás háttérnek…
-File	Menus		Fájl
-Slide delay	Menus		Képváltás közti szünet
-Selection mode	Menus		Kijelölés mód
-Zoom in	Menus		Nagyítás
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum megváltozott. Biztosan be szeretnéd zárni?
-Page setup…	Menus		Oldalbeállítás…
-Print…	Menus		Nyomtatás…
-Get info…	Menus		Információ lekérése…
-OK	SaveToFile		Rendben
-Previous page	Menus		Előző oldal
-View	Menus		Nézet
-Full screen	Menus		Teljes képernyő
-Go to page	Menus		Oldalra ugrás
-Zoom out	Menus		Kicsinyítés
-Quit	Menus		Kilépés
-Rotate counterclockwise	Menus		Óramutató járásával ellentétes irányú forgatás
-High-quality zooming	Menus		Magas minőségű nagyítás
-Browse	Menus		Tallózás
-Edit	Menus		Szerkesztés
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nem sikerült betölteni a képet! Vagy a fájl, vagy annak egy értelmezője nincs meg.
-First page	Menus		Első oldal
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
-Leave full screen	Menus		Kilépés a teljes képernyős módból
-Close	Menus		Bezárás
-Close	ClosePrompt		Bezárás
-Resize to (in 1/72 inches):	PrintOptionsWindow		Átméretezés (1/72 colban):
-Rating	Menus		Értékelés
-Flip left to right	Menus		Balról jobbra tükrözés
-Show caption in full screen mode	Menus		Felirat mutatása teljes képernyős módban
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Megnyitás…
-Next file	Menus		Következő fájl
-Clear selection	Menus		Kijelölés törlése
-Close document	ClosePrompt		Dokumentum bezárása
-Height: 	PrintOptionsWindow		Magasság: 
-The file '%s' could not be written.	SaveToFile		A '%s' nevű fájl írása sikertelen.
-Cancel	ClosePrompt		Mégse
-Show tool bar	Menus		Eszköztár megjelenítése
-Fit to window	Menus		Illesztés az ablakhoz
-Print options	PrintOptionsWindow		Nyomtatási beállítások
-Copy	Menus		Másolás
-Progress monitor	ProgressWindow		Folyamatjelző
-Last page	Menus		Utolsó oldal
-Stretch to window	Menus		Nyújtás az ablakhoz
-Previous file	Menus		Előző fájl
 ShowImage	System name		Képmegjelenítő
+Page setup…	Menus		Oldalbeállítás…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
+Previous file	Menus		Előző fájl
+View	Menus		Nézet
+Leave full screen	Menus		Kilépés a teljes képernyős módból
+Show caption in full screen mode	Menus		Felirat mutatása teljes képernyős módban
+Flip left to right	Menus		Balról jobbra tükrözés
+Full screen	Menus		Teljes képernyő
+Copy	Menus		Másolás
+Height: 	PrintOptionsWindow		Magasság: 
+Next file	Menus		Következő fájl
 Slide show	Menus		Bemutató
-Fit image to page	PrintOptionsWindow		Kép oldalhoz illesztése
-Flip top to bottom	Menus		Fentről lefelé tükrözés
-Select all	Menus		Összes kiválasztása
-Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
-Width:	PrintOptionsWindow		Szélesség:
-Image	Menus		Kép
-Move to Trash	Menus		Szemetesbe
-OK	Alerts		Rendben
-Rotate clockwise	Menus		Forgatás az óramutató irányába
-Job setup	PrintOptionsWindow		Feladatbeállítás
 Original size	Menus		Eredeti méret
-Next page	Menus		Következő oldal
+Width:	PrintOptionsWindow		Szélesség:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Átméretezés (1/72 colban):
+Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
+Get info…	Menus		Információ lekérése…
+Zoom out	Menus		Kicsinyítés
+OK	Alerts		Rendben
+File	Menus		Fájl
+Close	ClosePrompt		Bezárás
+Image	Menus		Kép
+Flip top to bottom	Menus		Fentről lefelé tükrözés
+Zoom in	Menus		Nagyítás
+Last page	Menus		Utolsó oldal
+Cancel	ClosePrompt		Mégse
+High-quality zooming	Menus		Magas minőségű nagyítás
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum megváltozott. Biztosan be szeretnéd zárni?
+Close	Menus		Bezárás
+Selection mode	Menus		Kijelölés mód
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Kép oldalhoz illesztése
+Show tool bar	Menus		Eszköztár megjelenítése
+First page	Menus		Első oldal
+OK	SaveToFile		Rendben
+Print…	Menus		Nyomtatás…
+The file '%s' could not be written.	SaveToFile		A '%s' nevű fájl írása sikertelen.
+Quit	Menus		Kilépés
+Rating	Menus		Értékelés
+Close document	ClosePrompt		Dokumentum bezárása
+Stretch to window	Menus		Nyújtás az ablakhoz
+Job setup	PrintOptionsWindow		Feladatbeállítás
+Clear selection	Menus		Kijelölés törlése
+Rotate clockwise	Menus		Forgatás az óramutató irányába
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nem sikerült betölteni a képet! Vagy a fájl, vagy annak egy értelmezője nincs meg.
+Rotate counterclockwise	Menus		Óramutató járásával ellentétes irányú forgatás
+Previous page	Menus		Előző oldal
+Fit to window	Menus		Illesztés az ablakhoz
+Browse	Menus		Tallózás
+Go to page	Menus		Oldalra ugrás
+Progress monitor	ProgressWindow		Folyamatjelző
+Edit	Menus		Szerkesztés
+Move to Trash	Menus		Szemetesbe
+Use as background…	Menus		Beállítás háttérnek…
+Open…	Menus		Megnyitás…
 Save as…	Menus		Mentés másként…
+Next page	Menus		Következő oldal
+Print options	PrintOptionsWindow		Nyomtatási beállítások
+Slide delay	Menus		Képváltás közti szünet
+Select all	Menus		Összes kiválasztása

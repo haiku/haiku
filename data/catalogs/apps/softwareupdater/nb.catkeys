@@ -1,0 +1,63 @@
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-softwareupdater	3959432004
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klikk her for å installere {0, plural, one{# oppdatert pakke} other{# oppdaterte pakker}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakker som skal avinstalleres
+No active network connection was found	UpdateManager	Error message	Ingen aktiv nettverkstilkobling ble funnet
+Quit	SoftwareUpdaterWindow	Alert button label	Avslutt
+There were no updates found.	CheckManager		Ingen oppdateringer ble funnet.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Oppdateringene er ikke fullført, er du sikker på at du vil avslutte?
+Updates found	SoftwareUpdaterWindow		Oppdateringer funnet
+Update now	SoftwareUpdaterWindow		Oppdater nå
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Av en eller annen grunn kunne vi ikke starte datamaskinen på nytt.
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Ukjent argument
+There were no updates found.	CheckAction		Ingen oppdateringer funnet.
+No updates available	UpdateAction		Ingen oppdateringer tilgjengelig
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Nye pakker som skal installeres
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakker som skal oppdateres
+to	SoftwareUpdaterWindow	List item text	til
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Forsøker å avbryte oppdateringene…
+Contacting software repositories to check for package updates.	CheckManager		Kontakter programvarelager for å se etter oppdateringer.
+Available updates found	CheckManager		Oppdateringer tilgjengelig
+from repository	SoftwareUpdaterWindow	List item text	fra programarkivet
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Kontakter programvarelager for å se etter oppdateringer.
+Cancelling updates	SoftwareUpdaterWindow		Avbryter oppdateringer
+Cancel	SoftwareUpdaterWindow	Alert button label	Avbryt
+There were no updates found.	UpdateAction		Ingen oppdateringer funnet.
+OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Velg blant disse alternativene:\n\nOppdater:\n\tOppdaterer alle installerte pakker.\nSynkroniser:\n\tSynkroniserer de installerte pakkene med programarkivene.
+The following changes will be made:	SoftwareUpdaterWindow		Følgende endringer vil bli gjort:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentvariabler godtas ikke lenger\n
+Fatal error while checking for updates: %s\n	CheckAction		Fatal feil under søk etter oppdateringer: %s\n
+SoftwareUpdater	System name		ProgramOppgradering
+No active network connection was found.\n	CheckManager		Ingen aktiv nettverkstilkobling ble funnet.\n
+Applying changes	UpdateManager		Tar i bruk endringer
+Full sync	SoftwareUpdaterWindow	Alert button label	Synkroniser
+Quit	SoftwareUpdaterWindow	Button label	Avslutt
+Updates have been successfully installed.	UpdateManager		Oppdateringer har blitt installert.
+Exception occurred while updating packages : %s\n	UpdateAction		Et unntak oppstod under oppdatering av pakker: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		En omstart er nødvendig for å fullføre oppdateringen.
+Exception occurred while checking for updates: %s\n	CheckAction		Et unntak oppstod under søk etter oppdateringer: %s\n
+Packages are being updated	UpdateManager		Pakkene oppdateres
+Cancel	SoftwareUpdaterWindow		Avbryt
+Don't quit	SoftwareUpdaterWindow		Ikke avslutt
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Klikk her for å kjøre ProgramOppdatering. Noen oppdateringer krever at en problemløsning velges.
+Checking for updates	SoftwareUpdaterWindow		Ser etter oppdateringer
+Updates completed	UpdateManager		Oppdateringer fullført
+Reboot	SoftwareUpdaterWindow		Start på nytt
+Show more details	SoftwareUpdaterWindow		Vis detaljer
+Installing version	SoftwareUpdaterWindow	List item text	Installerer versjon
+Checking for updates	CheckManager		Ser etter oppdateringer
+No remote repositories are available	UpdateManager	Error message	Ingen eksterne programarkiver er tilgjengelige
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Programoppdatering} other{Programoppdateringer}} tilgjengelig
+Reboot	SoftwareUpdaterWindow	Button label	Start på nytt
+Update	SoftwareUpdaterWindow	Alert button label	Oppdater
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Åpne Programarkiver
+Updates did not complete	UpdateAction		Oppdateringer ble ikke fullført
+Invalid update type, cannot continue with updates	UpdateAction		Ugyldig oppdateringstype, kan ikke fortsette med oppdateringer
+Uninstalling version	SoftwareUpdaterWindow	List item text	Avinstallerer versjon
+%i of %i	UpdateManager	Do not translate %i	%i av %i
+Quit	SoftwareUpdaterWindow		Avslutt
+No updates available	CheckManager		Ingen oppdateringer er tilgjengelige
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Bruk:  SoftwareUpdater <kommando> [ <tilvalg> ]\nOppdater installerte pakker.\n\nKommandoer:\n  update     - Søk i programarkiver etter oppdateringer til alle pakker.\n  check      - Søk etter tilgjengelige oppdateringer men vis bare et varsel med resultater.\n  full-sync  - Synkroniser installerte pakker med programarkivene.\n\nTilvalg:\n  -h eller --help       Vis denne hjelpeteksten\n  -v eller --verbose    Skriv ut detaljert informasjon\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Ingen eksterne programarkiver er tilgjengelige. Vennligst sjekk om noen programarkiver er aktivert ved hjelp av Programarkiv-innstillingene eller 'pkgman'-kommandoen.
+Downloading packages	UpdateManager		Laster ned pakker

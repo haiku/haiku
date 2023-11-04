@@ -56,7 +56,7 @@ Failed to launch BootManager	InstallerWindow		Impussibil inviâ Gjestôr di invi
 Writing bootsector.	InstallProgress		Scriture dal setôr di inviament.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Al è vignût fûr un erôr e la instalazion no je stade completade:\n\nErôr:   %s
 Restart	InstallerWindow		Torne invie
-The disk can't be mounted. Please choose a different disk.	InstallProgress		Il disc nol pues jessi montât. Sielç un disc diferent.
+The disk can't be mounted. Please choose a different disk.	InstallProgress		Nol è pussibil montâ il disc. Sielç un altri disc.
 Begin	InstallerWindow		Scomence
 Collecting copy information.	InstallProgress		Daûr a dâ dongje lis informazions de copie.
 Set up boot menu…	InstallerWindow		Configure menù di inviament…
@@ -71,7 +71,7 @@ Scanning for disks…	InstallerWindow		Scansion dai discs…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Esecuzion di Gjestion disc…\n\nSiere Gjestion disc par continuâ cu la instalazion.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		La instalazion no je ancjemò complete!\nSino sigûrs di fermâle?
 Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		In esecuzion Gjestôr di inviament…\n\nSiere Gjestôr di inviament par continuâ cu la instalazion.
-The partition can't be mounted. Please choose a different partition.	InstallProgress		La partizion no pues jessi montade. Sielç une partizion diferente.
+The partition can't be mounted. Please choose a different partition.	InstallProgress		Nol è pussibil montâ la partizion. Sielç une altre partizion.
 Set up partitions…	InstallerWindow		Configure partizions…
 Install progress:  	InstallerWindow		Avanzament de instalazion:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No si pues instalâ i contignûts di un disc su se stes. Sielç un disc diferent.

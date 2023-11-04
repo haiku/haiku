@@ -1,7 +1,6 @@
-1	indonesian	x-vnd.Haiku-NewMailNotification	1375000288
+1	indonesian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Jendela log
 none	NotifierConfigView		tak satupun
-New mails notification	NotifierFilter		Permberitahuan surel baru
 Alert	NotifierConfigView		Peringatan
 OK	NotifierFilter		OKE
 Central alert	NotifierConfigView		Pusat peringatan

@@ -1,42 +1,41 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Αργή περιστροφή
-Pink	ChartWindow		Ρόζ
-Comet	ChartWindow		Κομήτης
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Πορτοκαλί
-Refresh rate	ChartWindow		Ρυθμός ανανέωσης
-Blue	ChartWindow		Μπλέ
-Colors	ChartWindow		Χρώματα
-Novas	ChartWindow		Novas
-LineArray	ChartWindow		Γραμμή Array
- 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (λογαριθμική κλίμακα)
-Free motion	ChartWindow		Ελεύθερη κίνηση
+1	greek, modern (1453-)	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(ψηλά) 100% 
-Green	ChartWindow		Πράσινο
-Amas	ChartWindow		Σωρός
-2 threads	ChartWindow		2 νήματα
-Yellow	ChartWindow		Κίτρινο
-Off	ChartWindow		Εκτός
-Chaos	ChartWindow		Χάος
-Full screen	ChartWindow		Πλήρης οθόνη
 Spiral	ChartWindow		Σπιράλ
-Slow motion	ChartWindow		Αργή κίνηση
- 5% (low)	ChartWindow		 5% (χαμηλό)
-Fast motion	ChartWindow		Γρήγορη κίνηση
-Special	ChartWindow		Ειδικό
-Status	ChartWindow		Κατάσταση
-Star density	ChartWindow		Πυκνότητα αστέρων
-600.0 f/s	ChartWindow		600.0 f/s
+Orange	ChartWindow		Πορτοκαλί
 Display:	ChartWindow		Οθόνη:
-Space color	ChartWindow		Χρώμα διαστήματος
-White	ChartWindow		Λευκό
-Chart	System name		Διάγραμμα
+Pink	ChartWindow		Ρόζ
 Animation:	ChartWindow		Ζωηρότητα:
-Frames/s	ChartWindow		Καρέ/δ
 Auto demo	ChartWindow		Αυτόματη επίδειξη
-CPU load	ChartWindow		Φόρτος ΚΜΕ
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Κόκκινο
 None	ChartWindow		Κανένα
+600.0 f/s	ChartWindow		600.0 f/s
+Fast motion	ChartWindow		Γρήγορη κίνηση
+Special	ChartWindow		Ειδικό
+White	ChartWindow		Λευκό
+Star density	ChartWindow		Πυκνότητα αστέρων
+Chaos	ChartWindow		Χάος
+Amas	ChartWindow		Σωρός
+Yellow	ChartWindow		Κίτρινο
+Frames/s	ChartWindow		Καρέ/δ
+CPU load	ChartWindow		Φόρτος ΚΜΕ
+Green	ChartWindow		Πράσινο
+Colors	ChartWindow		Χρώματα
+Refresh rate	ChartWindow		Ρυθμός ανανέωσης
+Full screen	ChartWindow		Πλήρης οθόνη
+Status	ChartWindow		Κατάσταση
+Off	ChartWindow		Εκτός
 Battle	ChartWindow		Μάχη
+Blue	ChartWindow		Μπλέ
+Slow rotation	ChartWindow		Αργή περιστροφή
+Novas	ChartWindow		Novas
+Slow motion	ChartWindow		Αργή κίνηση
+Comet	ChartWindow		Κομήτης
+2 threads	ChartWindow		2 νήματα
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		Γραμμή Array
+ 5% (low)	ChartWindow		 5% (χαμηλό)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Ελεύθερη κίνηση
+Space color	ChartWindow		Χρώμα διαστήματος
+Chart	System name		Διάγραμμα
 Space:	ChartWindow		Διάστημα:

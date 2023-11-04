@@ -1,7 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-NewMailNotification	1375000288
+1	catalan; valencian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Finestra d'entrada
 none	NotifierConfigView		cap
-New mails notification	NotifierFilter		Notificació de correu nou
 Alert	NotifierConfigView		Alerta
 OK	NotifierFilter		D'acord
 Central alert	NotifierConfigView		Alerta central

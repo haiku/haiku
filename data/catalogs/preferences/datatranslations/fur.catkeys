@@ -2,7 +2,7 @@
 Path:	DataTranslations		Percors:
 Name:	DataTranslations		Non:
 DataTranslations - Note	DataTranslations		DataTranslations - Note
-The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'element '%name' nol semee jessi un Tradutôr e nol vignarà instalât.
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		L'element '%name' nol somee jessi un Tradutôr e nol vignarà instalât.
 Could not install %s:\n%s	DataTranslations		Impussibil instalâ %s:\n%s
 OK	DataTranslations		Va ben
 Cancel	DataTranslations		Cancele

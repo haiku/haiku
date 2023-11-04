@@ -1,0 +1,7 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		System lydmikser
+System video output	NodeManager		System videoutgang
+System video input	NodeManager		System videoinngang
+No name	NodeManager		Uten navn
+System audio input	NodeManager		System lydinngang
+Time sources	NodeManager		Tidskilder

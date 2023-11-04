@@ -129,7 +129,7 @@ Owner	FilePermissionsView		Proprietari
 Cancel	FSClipBoard		Anule
 Modified	PoseView		Modificât
 Move to Trash	ContainerWindow		Sposte te Scovacere
-All files and folders	FindPanel		Ducj i file e lis cartelis
+All files and folders	FindPanel		Ducj i files e lis cartelis
 Add-ons	ContainerWindow		Components adizionâi
 Too many parenthesis.	libtracker		Masse parentesis.
 Increase size	ContainerWindow		Aumente dimensions
@@ -155,7 +155,7 @@ The target disk does not support creating links.	FSUtils		Il disc di destinazion
 develop	B_SYSTEM_DEVELOP_DIRECTORY		disvilup
 64-bit integer	AttributesView		Intîr a 64 bit
 Cut more	ContainerWindow		Taie di plui
-The Tracker must be running to see Info windows.	PoseView		Il Tracker al scugne jessi viert par viodi i barcons des informazions.
+The Tracker must be running to see Info windows.	PoseView		Al è necessari che il Tracker al sedi viert par viodi i barcons des informazions.
 Tracker preferences	TrackerSettingsWindow		Preferencis dal Tracker
 Read	FilePermissionsView		Leture
 There was an error writing the attribute.	WidgetAttributeText		Si è presentât un erôr tal scrivi l'atribût.
@@ -221,7 +221,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		No si pues modificâ
 Memory pointer	AttributesView		Pontadôr di memorie
 Cancel	OpenWithWindow		Anule
 Select…	DeskWindow		Selezione…
-Files cannot be moved or deleted from a read-only volume.	PoseView		No si pues spostâ o eliminâ i file di un volum in dome-leture.
+Files cannot be moved or deleted from a read-only volume.	PoseView		Nol è pussibil spostâ o eliminâ i files di un volum in dome-leture.
 Edit name	FilePanelPriv		Modifiche non
 There was an error deleting \"%name\":\n\t%error	FSUtils		Si è presentât un erôr tal eliminâ \"%name\":\n\t%error
 Resize to fit	ContainerWindow		Adate
@@ -284,7 +284,7 @@ Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%na
 Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
 Restoring: 	StatusWindow		Ripristinament: 
-The Tracker must be running to set the default printer.	PoseView		Il Tracker al scugne jessi in esecuzion par stabilî la stampadore predefinide.
+The Tracker must be running to set the default printer.	PoseView		Al è necessari che il Tracker al sedi in esecuzion par stabilî la stampadore predefinide.
 calculating…	InfoWindow		daûr a calcolâ…
 Preferred for file	OpenWithWindow		Preferît par file
 OK	AutoMounterSettings		Va ben
@@ -347,13 +347,13 @@ Messenger	AttributesView		Messazîr
 after	FindPanel		dopo
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# byte di dâts>} other{<# byte di dâts>}}
 Version	OpenWithWindow		Version
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Cualchidun dai elements selezionâts nol pues jessi spostât te Scovacere. Eliminâju dal dut? (Cheste operazion e sarà permanente.)
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Nol è pussibil spostâ te Scovacere cualchidun dai elements selezionâts. Eliminâju dal dut? (Cheste operazion e sarà permanente.)
 The entered file name is too long.	FSUtils		Il non dal file inserît al è masse lunc.
 Add printer…	ContainerWindow		Zonte stampadore…
 On	FindPanel		Su
 Permissions	ContainerWindow		Permès
 Size:	InfoWindow		Dimension:
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element selezionât nol pues jessi spostât te Scovacere. Eliminâlu dal dut? (Cheste operazion e sarà permanente.)
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Nol è pussibil spostâ te Scovacere l'element selezionât. Eliminâlu dal dut? (Cheste operazion e sarà permanente.)
 Copy	ContainerWindow		Copie
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Mi displâs, l'atribût 'Character' nol pues contignî un glif a plui byte.
 Open parent	VirtualDirectoryWindow		Vierç nivel superiôr
@@ -404,13 +404,13 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Impussibil dismontâ il volum
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nol è stât pussibil \"%document\" cu la aplicazion \"%app\" (Al mancje il simbul: %symbol). \n
 New folder	ContainerWindow		Gnove cartele
 Name	OpenWithWindow		Non
-There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Si è presentât un probleme cirint di sostituî \"%name\". L'element al podarès jessi viert o ocupât.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Al è vignût fûr un probleme cirint di sostituî \"%name\". Al è pussibil che l'element al sedi viert o ocupât.
 Windows	TrackerSettingsWindow		Barcons
 Show space bars on volumes	SettingsView		Mostre sbaris dal spazi sui volums
 Could not update permissions of file \"%name\". %error	FSUtils		Nol è stât pussibil inzornâ i permès dal file \"%name\". %error
 Decrease size	DeskWindow		Diminuìs dimensions
 Emptying Trash… 	StatusWindow		Daûr a disvuedâ la scovacere… 
-{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # file}}
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{par # file} other{par # files}}
 Revert	TrackerSettingsWindow		Ripristine
 trash	B_TRASH_DIRECTORY		scovacere
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld

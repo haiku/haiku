@@ -1,42 +1,41 @@
-1	english	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		慢速旋转
-Pink	ChartWindow		粉红色
-Comet	ChartWindow		彗星
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		橘黄色
-Refresh rate	ChartWindow		刷新率
-Blue	ChartWindow		蓝色
-Colors	ChartWindow		颜色
-Novas	ChartWindow		新星
-LineArray	ChartWindow		线型数组
- 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s （对数坐标）
-Free motion	ChartWindow		自由运动
+1	english	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		（高）100%
-Green	ChartWindow		绿色
-Amas	ChartWindow		Ams
-2 threads	ChartWindow		2 线程
-Yellow	ChartWindow		黄色
-Off	ChartWindow		关闭
-Chaos	ChartWindow		混沌
-Full screen	ChartWindow		全屏幕
 Spiral	ChartWindow		漩涡
-Slow motion	ChartWindow		慢镜头
- 5% (low)	ChartWindow		5%（低）
-Fast motion	ChartWindow		快镜头
-Special	ChartWindow		特殊
-Status	ChartWindow		状态
-Star density	ChartWindow		星体密度
-600.0 f/s	ChartWindow		600.0 f/s
+Orange	ChartWindow		橘黄色
 Display:	ChartWindow		显示：
-Space color	ChartWindow		空间颜色
-White	ChartWindow		白色
-Chart	System name		Chart
+Pink	ChartWindow		粉红色
 Animation:	ChartWindow		动画效果：
-Frames/s	ChartWindow		帧/秒
 Auto demo	ChartWindow		自动演示
-CPU load	ChartWindow		处理器使用率
-DrawBitmap	ChartWindow		绘制位图
 Red	ChartWindow		红色
 None	ChartWindow		无
+600.0 f/s	ChartWindow		600.0 f/s
+Fast motion	ChartWindow		快镜头
+Special	ChartWindow		特殊
+White	ChartWindow		白色
+Star density	ChartWindow		星体密度
+Chaos	ChartWindow		混沌
+Amas	ChartWindow		Ams
+Yellow	ChartWindow		黄色
+Frames/s	ChartWindow		帧/秒
+CPU load	ChartWindow		处理器使用率
+Green	ChartWindow		绿色
+Colors	ChartWindow		颜色
+Refresh rate	ChartWindow		刷新率
+Full screen	ChartWindow		全屏幕
+Status	ChartWindow		状态
+Off	ChartWindow		关闭
 Battle	ChartWindow		激战
+Blue	ChartWindow		蓝色
+Slow rotation	ChartWindow		慢速旋转
+Novas	ChartWindow		新星
+Slow motion	ChartWindow		慢镜头
+Comet	ChartWindow		彗星
+2 threads	ChartWindow		2 线程
+DrawBitmap	ChartWindow		绘制位图
+LineArray	ChartWindow		线型数组
+ 5% (low)	ChartWindow		5%（低）
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		自由运动
+Space color	ChartWindow		空间颜色
+Chart	System name		Chart
 Space:	ChartWindow		空间：

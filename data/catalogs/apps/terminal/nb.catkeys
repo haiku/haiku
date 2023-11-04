@@ -12,7 +12,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Bekreft avslu
 Color scheme:	Terminal ThemeView		Fargevalg:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen gjeldende arbeidsmappen til den aktive prosessen i den\n\t\t\tgjeldende fanen. Valgfritt maksimalt antall sti-komponenter kan\n\t\t\tspesifiseres. F.eks. '%2d' for maksimalt to komponenter.\n\t%T\t-\tTerminalnavnet for gjeldende lokalitet.\n\t%e\t-\tKodingen for gjeldende fane. Ikke vist for UTF-8.\n\t%i\t-\tVinduets index.\n\t%p\t-\tNavnet på den aktive prosessen i gjeldende fane.\n\t%t\t-\tTittelen på gjeldende fane.
 Copy	Terminal TermWindow		Kopier
-Edit tab title…	Terminal TermWindow		Rediger fanetittel...
+Edit tab title…	Terminal TermWindow		Rediger fanetittel…
 Print	Terminal TermWindow		Skriv ut
 Settings	Terminal TermWindow		Innstillinger
 %app% settings	Terminal PrefWindow	window title	%app% innstillinger
@@ -29,7 +29,7 @@ Encoding:	Terminal AppearancePrefView		Koding:
 yellow	Terminal ThemeView		gul
 Change directory	Terminal TermView		Bytt mappe
 Custom	Terminal AppearancePrefView	Window size	Tilpasset
-Page setup…	Terminal TermWindow		Sideoppsett...
+Page setup…	Terminal TermWindow		Sideoppsett…
 ANSI yellow color	Terminal ThemeView		ANSI gul farge
 Cancel	Terminal TermView		Avbryt
 Defaults	Terminal PrefWindow		Standarder
@@ -44,7 +44,7 @@ Window title:	Terminal AppearancePrefView		Vindustittel:
 New tab	Terminal TermWindow		Ny fane
 magenta	Terminal ThemeView		magenta
 Allow bold text	Terminal AppearancePrefView		Tillat fet tekst
-Window title…	Terminal TermWindow		Vindustittel...
+Window title…	Terminal TermWindow		Vindustittel…
 ANSI blue color	Terminal ThemeView		ANSI blå farge
 blue	Terminal ThemeView		blå
 Open path	Terminal TermView		Åpne sti
@@ -67,7 +67,7 @@ Match case	Terminal FindWindow		Skille store og små bokstaver
 Find previous	Terminal TermWindow		Søk bakover
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mønsteret som spesifiserer fanetitlene. Følgende plassholdere\nkan brukes:
 Close	Terminal TermWindow		Lukk
-Save to file…	Terminal PrefWindow		Lagre som fil...
+Save to file…	Terminal PrefWindow		Lagre som fil…
 Defaults	Terminal ThemeWindow		Standarder
 Copy path	Terminal TermView		Kopier sti
 Window size	Terminal TermWindow		Vindustørrelse
@@ -88,7 +88,7 @@ ANSI white color	Terminal ThemeView		ANSI hvit farge
 Window size:	Terminal AppearancePrefView		Vindusstørrelse:
 Switch Terminals	Terminal TermWindow		Bytt terminaler
 Decrease	Terminal TermWindow		Forminsk
-Settings…	Terminal TermWindow		Innstillinger...
+Settings…	Terminal TermWindow		Innstillinger…
 Cancel	Terminal SetTitleWindow		Avbryt
 Blinking cursor	Terminal AppearancePrefView		Blinkende markør
 Use text:	Terminal FindWindow		Bruk tekst:
@@ -115,7 +115,7 @@ Text	Terminal ThemeView		Tekst
 ANSI bright yellow color	Terminal ThemeView		ANSI lys gul farge
 Not found.	Terminal TermWindow		Ikke funnet
 ANSI black color	Terminal ThemeView		ANSI svart farge
-Find…	Terminal TermWindow		Finn...
+Find…	Terminal TermWindow		Finn…
 No search string was entered.	Terminal TermWindow		Ingen søkestreng ble angitt.
 Move here	Terminal TermView		Flytt hit
 Abort	Terminal Shell		Avbryt

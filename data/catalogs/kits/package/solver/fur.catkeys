@@ -2,7 +2,7 @@
 allow architecture change of %source% to %target%	SolverProblemSolution		permet il cambi di architeture di %source% a %target%
 install %source% from excluded repository	SolverProblemSolution		instale %source% dal dipuesit escludût
 unspecified problem	SolverProblem		probleme no specificât
-package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		Il pachet %source% al domande la dipendence %dependency%, ma nissun dai pachets che la furnissin al pues jessi instalât 
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		Il pachet %source% al domande la dipendence %dependency%, ma nol è pussibil instalâ nissun dai pachets che le furnissin 
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		il pachet %source% al rint sorpassât %dependency% che al è furnît di %target%
 nothing provides requested %dependency%	SolverProblem		nissun al furnìs la dipendence domandade %dependency%
 do not keep %source% installed	SolverProblemSolution		no sta tignî instalât %source%

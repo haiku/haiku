@@ -1,62 +1,62 @@
 1	french	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Utiliser comme fond d’écran…
-File	Menus		Fichier
-Slide delay	Menus		Délai de diaporama
-Selection mode	Menus		Mode de sélection
-Zoom in	Menus		Zoom avant
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » a été modifié. Êtes-vous sûr de vouloir le fermer ?
-Page setup…	Menus		Mise en page…
-Print…	Menus		Imprimer…
-Get info…	Menus		Obtenir les informations…
-OK	SaveToFile		OK
-Previous page	Menus		Page précédente
-View	Menus		Vue
-Full screen	Menus		Plein écran
-Go to page	Menus		Aller à la page
-Zoom out	Menus		Zoom arrière
-Quit	Menus		Quitter
-Rotate counterclockwise	Menus		Rotation antihoraire
-High-quality zooming	Menus		Zoom haute qualité
-Browse	Menus		Parcourir
-Edit	Menus		Editer
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L’image n’a pas pu être lue ! Le fichier ou son traducteur n’existe pas.
-First page	Menus		Première page
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
-Leave full screen	Menus		Sortie du plein écran
-Close	Menus		Fermer
-Close	ClosePrompt		Fermer
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
-Rating	Menus		Évaluation
-Flip left to right	Menus		Mirroir vertical
-Show caption in full screen mode	Menus		Afficher la légende en mode plein écran
-DPI:	PrintOptionsWindow		PPP :
-Open…	Menus		Ouvrir…
-Next file	Menus		Fichier suivant
-Clear selection	Menus		Effacer la sélection
-Close document	ClosePrompt		Fermer le document
-Height: 	PrintOptionsWindow		Hauteur : 
-The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
-Cancel	ClosePrompt		Annuler
-Show tool bar	Menus		Afficher la barre d’outils
-Fit to window	Menus		Ajuster à la fenêtre
-Print options	PrintOptionsWindow		Options d’impression
-Copy	Menus		Copier
-Progress monitor	ProgressWindow		Moniteur de progression
-Last page	Menus		Dernière page
-Stretch to window	Menus		Étirer à la fenêtre
-Previous file	Menus		Fichier précédent
 ShowImage	System name		Visionneuse
+Page setup…	Menus		Mise en page…
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
+Previous file	Menus		Fichier précédent
+View	Menus		Vue
+Leave full screen	Menus		Sortie du plein écran
+Show caption in full screen mode	Menus		Afficher la légende en mode plein écran
+Flip left to right	Menus		Mirroir vertical
+Full screen	Menus		Plein écran
+Copy	Menus		Copier
+Height: 	PrintOptionsWindow		Hauteur : 
+Next file	Menus		Fichier suivant
 Slide show	Menus		Diaporama
-Fit image to page	PrintOptionsWindow		Adapter l’image à la page
-Flip top to bottom	Menus		Mirroir horizontal
-Select all	Menus		Selectionner tout
-Zoom factor in %:	PrintOptionsWindow		Facteur de zoom en % :
-Width:	PrintOptionsWindow		Largeur :
-Image	Menus		Image
-Move to Trash	Menus		Mettre à la corbeille
-OK	Alerts		OK
-Rotate clockwise	Menus		Rotation horaire
-Job setup	PrintOptionsWindow		Définir la tâche
 Original size	Menus		Taille originale
-Next page	Menus		Page suivante
+Width:	PrintOptionsWindow		Largeur :
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
+Zoom factor in %:	PrintOptionsWindow		Facteur de zoom en % :
+Get info…	Menus		Obtenir les informations…
+Zoom out	Menus		Zoom arrière
+OK	Alerts		OK
+File	Menus		Fichier
+Close	ClosePrompt		Fermer
+Image	Menus		Image
+Flip top to bottom	Menus		Mirroir horizontal
+Zoom in	Menus		Zoom avant
+Last page	Menus		Dernière page
+Cancel	ClosePrompt		Annuler
+High-quality zooming	Menus		Zoom haute qualité
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » a été modifié. Êtes-vous sûr de vouloir le fermer ?
+Close	Menus		Fermer
+Selection mode	Menus		Mode de sélection
+DPI:	PrintOptionsWindow		PPP :
+Fit image to page	PrintOptionsWindow		Adapter l’image à la page
+Show tool bar	Menus		Afficher la barre d’outils
+First page	Menus		Première page
+OK	SaveToFile		OK
+Print…	Menus		Imprimer…
+The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
+Quit	Menus		Quitter
+Rating	Menus		Évaluation
+Close document	ClosePrompt		Fermer le document
+Stretch to window	Menus		Étirer à la fenêtre
+Job setup	PrintOptionsWindow		Définir la tâche
+Clear selection	Menus		Effacer la sélection
+Rotate clockwise	Menus		Rotation horaire
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L’image n’a pas pu être lue ! Le fichier ou son traducteur n’existe pas.
+Rotate counterclockwise	Menus		Rotation antihoraire
+Previous page	Menus		Page précédente
+Fit to window	Menus		Ajuster à la fenêtre
+Browse	Menus		Parcourir
+Go to page	Menus		Aller à la page
+Progress monitor	ProgressWindow		Moniteur de progression
+Edit	Menus		Editer
+Move to Trash	Menus		Mettre à la corbeille
+Use as background…	Menus		Utiliser comme fond d’écran…
+Open…	Menus		Ouvrir…
 Save as…	Menus		Enregistrer sous…
+Next page	Menus		Page suivante
+Print options	PrintOptionsWindow		Options d’impression
+Slide delay	Menus		Délai de diaporama
+Select all	Menus		Selectionner tout

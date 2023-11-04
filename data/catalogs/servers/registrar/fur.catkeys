@@ -4,7 +4,7 @@ OK	ShutdownProcess		Va ben
 Do you really want to shut down the system?	ShutdownProcess		Distudâ pardabon il computer?
 Shutdown status	ShutdownProcess		Stât dal distudament
 Shut down	ShutdownProcess		Distude
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		La aplicazion \"%appName%\" e podarès jessi blocade di un panel modâl.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Al è pussibil che un panel modâl al podedi blocâ la aplicazion \"%appName%\".
 System is shut down	ShutdownProcess		Il sisteme si sta distudant
 Restart system	ShutdownProcess		Torne invie il sisteme
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La aplicazion \"%appName%\" e à interot il procès di distudament.

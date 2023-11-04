@@ -29,7 +29,7 @@ Clone current page	Settings Window		Clone la pagjine atuâl
 Start page:	Settings Window		Pagjine di inizi:
 Cancel	Download Window		Anule
 Settings	Settings Window		Impostazions
-Downloads	WebPositive Window		File discjariâts
+Downloads	WebPositive Window		Files discjariâts
 Browse…	Settings Window		Esplore…
 Resume prior session	Settings Window		Ripie la session precedente
 Match case	WebPositive Window		Corispondence maiusc./minusc.
@@ -37,7 +37,7 @@ Proxy password:	Settings Window		Peraule di ordin dal proxy:
 Size:	Font Selection view		Dimension:
 Page source	WebPositive Window		Sorzint de pagjine
 Proxy server port:	Settings Window		Puarte servidôr proxy:
-Error opening downloads folder	Download Window		Erôr tal vierzi la cartele dai file discjariâts
+Error opening downloads folder	Download Window		Erôr tal vierzi la cartele dai files discjariâts
 Show bookmark bar	WebPositive Window		Mostre sbare dai segnelibris
 Find	WebPositive Window		Cjate
 Standard font:	Settings Window		Caratar standard:
@@ -45,7 +45,7 @@ Open download error	Download Window		Erôr tal vierzi il file discjariât
 General	Settings Window		Gjenerâls
 New tabs:	Settings Window		Gnovis schedis:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falît
-Open downloads folder	Download Window		Vierç cartele dai file discjariâts
+Open downloads folder	Download Window		Vierç cartele dai files discjariâts
 Proxy server	Settings Window		Servidôr proxy
 Darn!	WebPositive		Maledizion!
 Decrease size	WebPositive Window		Diminuìs dimension
@@ -90,7 +90,7 @@ New browser window	Download Window		Gnûf barcon dal navigadôr
 Open	Download Window		Vierç
 New window	WebPositive Window		Gnûf barcon
 New windows:	Settings Window		Gnûfs barcons:
-The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Nol è stât pussibil vierzi la cartele dai file discjariâts.\n\nErôr: %error
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Nol è stât pussibil vierzi la cartele dai files discjariâts.\n\nErôr: %error
 Cancel	Authentication Panel		Anule
 Style:	Font Selection view		Stîl:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Al è vignût fûr un erôr tal creâ il file dal segnelibri.\n\nErôr: %error
@@ -157,7 +157,7 @@ Session cookie	Cookie Manager		Cookie di session
 No SSE2 support	WebPositive		Nissun supuart aes SSE2
 Open all	WebPositive Window		Vierç ducj
 Cut	WebPositive Window		Taie
-Downloads	Download Window		File discjariâts
+Downloads	Download Window		Files discjariâts
 Open blank page	Settings Window		Vierç pagjine vueide
 Clear history	WebPositive Window		Nete cronologjie
 Cancel	WebPositive Window		Anule

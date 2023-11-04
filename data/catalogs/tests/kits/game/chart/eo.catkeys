@@ -1,42 +1,41 @@
-1	esperanto	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Malrapida rotacio
-Pink	ChartWindow		Rozkolora
-Comet	ChartWindow		Kometo
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Oranĝkolora
-Refresh rate	ChartWindow		Ofteco de aktualigo
-Blue	ChartWindow		Blua
-Colors	ChartWindow		Koloroj
-Novas	ChartWindow		Novaoj
-LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 k/s  (logaritma skalo)
-Free motion	ChartWindow		Libera movado
+1	esperanto	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(multe) 100% 
-Green	ChartWindow		Verda
-Amas	ChartWindow		Amaso
-2 threads	ChartWindow		2 fadenoj
-Yellow	ChartWindow		Flava
-Off	ChartWindow		Malŝaltita
-Chaos	ChartWindow		Ĥaoso
-Full screen	ChartWindow		Plenekrane
 Spiral	ChartWindow		Spiralo
-Slow motion	ChartWindow		Malrapida movado
- 5% (low)	ChartWindow		 5% (malmulte)
-Fast motion	ChartWindow		Rapida movado
-Special	ChartWindow		Speciala
-Status	ChartWindow		Stato
-Star density	ChartWindow		Stela denseco
-600.0 f/s	ChartWindow		600.0 k/s
+Orange	ChartWindow		Oranĝkolora
 Display:	ChartWindow		Ekrano:
-Space color	ChartWindow		Spaca koloro
-White	ChartWindow		Blanka
-Chart	System name		Diagramo
+Pink	ChartWindow		Rozkolora
 Animation:	ChartWindow		Movbildo:
-Frames/s	ChartWindow		Kadroj/s
 Auto demo	ChartWindow		Aŭtomata ekspono
-CPU load	ChartWindow		Ĉefprocesora ŝarĝo
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Ruĝa
 None	ChartWindow		Neniu
+600.0 f/s	ChartWindow		600.0 k/s
+Fast motion	ChartWindow		Rapida movado
+Special	ChartWindow		Speciala
+White	ChartWindow		Blanka
+Star density	ChartWindow		Stela denseco
+Chaos	ChartWindow		Ĥaoso
+Amas	ChartWindow		Amaso
+Yellow	ChartWindow		Flava
+Frames/s	ChartWindow		Kadroj/s
+CPU load	ChartWindow		Ĉefprocesora ŝarĝo
+Green	ChartWindow		Verda
+Colors	ChartWindow		Koloroj
+Refresh rate	ChartWindow		Ofteco de aktualigo
+Full screen	ChartWindow		Plenekrane
+Status	ChartWindow		Stato
+Off	ChartWindow		Malŝaltita
 Battle	ChartWindow		Batalo
+Blue	ChartWindow		Blua
+Slow rotation	ChartWindow		Malrapida rotacio
+Novas	ChartWindow		Novaoj
+Slow motion	ChartWindow		Malrapida movado
+Comet	ChartWindow		Kometo
+2 threads	ChartWindow		2 fadenoj
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		LineArray
+ 5% (low)	ChartWindow		 5% (malmulte)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Libera movado
+Space color	ChartWindow		Spaca koloro
+Chart	System name		Diagramo
 Space:	ChartWindow		Spaco:

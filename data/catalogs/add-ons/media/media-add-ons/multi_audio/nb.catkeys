@@ -13,7 +13,7 @@ Headphones	MultiAudio		Hodetelefoner
 Beep	MultiAudio		Pip
 Output mono mix	MultiAudio		Utgang mono-miks
 Output stereo mix	MultiAudio		Bruk stereo-miks som utdata
-Input	MultiAudio		Input
+Input	MultiAudio		Inngang
 Output treble	MultiAudio		Utgang diskant
 Mono mix	MultiAudio		Mono miks
 General	MultiAudio		Generell

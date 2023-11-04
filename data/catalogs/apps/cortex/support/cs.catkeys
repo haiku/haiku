@@ -1,4 +1,4 @@
-1	czech	application/x-vnd.Cortex.support	2097798758
+1	czech	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Hlavička má příznaky
 32 bit HLS	MediaString		32 bitů HLS
 Recording	MediaString		Nahrávám
@@ -42,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Pravý
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32 bitů RGB
 System mixer	MediaString		Systémový směšovač
 Physical output	MediaString		Fyzický výstup

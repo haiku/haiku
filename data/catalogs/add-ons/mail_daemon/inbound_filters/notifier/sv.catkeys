@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-NewMailNotification	1375000288
+1	swedish	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Loggfönster
 none	NotifierConfigView		inga
-New mails notification	NotifierFilter		Notifikationer för e-post
 Alert	NotifierConfigView		Avisering
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Central avisering

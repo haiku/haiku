@@ -1,4 +1,3 @@
-1	spanish; castilian	x-vnd.Haiku-SystemLogger	57960782
+1	spanish; castilian	x-vnd.Haiku-SystemLogger	239668711
 Syslog Daemon	SyslogDaemon		Demonio Syslog
 OK	SyslogDaemon		Aceptar
-%s\n\nThis daemon is responsible for collecting all system messages and write them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nEste demonio es responsable de recolectar todos los mensajes del sistema y escribirlos en un gran registro de sistema en «%s».\n\n

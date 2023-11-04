@@ -38,9 +38,9 @@ Incoming	Config Window		Innkommende
 Finish	AutoConfigWindow		Fullfør
 Add filter	Config Views		Legg til filter
 Account settings	Config Views		Kontoinnstillinger
-minutes	Config Window		minutter
+minutes	Config Window		minutt
 E-mail	System name		E-post
-Check every	Config Window		Sjekk hver
+Check every	Config Window		Sjekk hvert
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Opprett en ny konto med Legg til-knappen.\n\nFjern en konto med Fjern-knappen på det valgte elementet.\n\nVelg et element i listen for å endre innstillingene.
 Account name:	E-Mail		Kontonavn
 Edit mailbox menu…	Config Window		Rediger postboksmeny...

@@ -1,0 +1,8 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Temaer
+Start control panel	ParameterWindow		Start kontrollpanel
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% parametere
+OK	ParameterWindow		OK
+Window	ParameterWindow		Vindu
+Could not start control panel (%error%)	ParameterWindow		Kunne ikke starte kontrollpanelet (%error%)
+Close	ParameterWindow		Lukk

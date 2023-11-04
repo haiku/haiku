@@ -1,8 +1,9 @@
-1	czech	x-vnd.Haiku-Terminal	185459086
+1	czech	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Zavřít ostatní panely
 Insert path	Terminal TermView		Vložit cestu
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminál nemůže spustit shell. Lituji.
 Text encoding	Terminal TermWindow		Kódování textu
+Colors	Terminal ThemeWindow		Barvy
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Úpravy
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               vypíše tuto nápovědu\n  -t,     --title              nastaví název okna\n  -f,     --fullscreen         spustí přes celou obrazovku\n  -w,     --working-directory  zvolí počáteční pracovní adresář\n

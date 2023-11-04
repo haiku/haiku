@@ -7,11 +7,11 @@ Application keyring access	AppAccessRequestWindow		Acces la inelul de chei al ap
 Disallow	AppAccessRequestWindow		Nu permite
 Allow once	AppAccessRequestWindow		Permite o dată
 Unlock keyring	KeyRequestWindow		Deblochează inelul de chei
-An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		O aplicație dorește să acceseze inelul de chei de mai jos, dar este încuiat cu o parolă de tip frază. Introduceți parola de tip frază pentru a debloca inelul de chei.\nDacă deblocați inelul de chei, acesta va rămâne deblocat până când sistemul este oprit sau inelul de chei este blocat manual din nou.\nDacă anulați acest dialog, inelul de chei va ramâne blocat.
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		O aplicație dorește să acceseze inelul de chei de mai jos, dar este blocat cu o parolă de tip frază. Introduceți parola de tip frază pentru a debloca inelul de chei.\nDacă deblocați inelul de chei, acesta va rămâne deblocat până când sistemul este oprit sau inelul de chei este blocat manual din nou.\nDacă anulați acest dialog, inelul de chei va ramâne blocat.
 Password:	KeyRequestWindow		Parolă:
 Cancel	KeyRequestWindow		Anulează
-This application has been updated since it was last granted access.	AppAccessRequestWindow		Această aplicație a fost actualizată de când i s-a permis accesul ultima dată.
+This application has been updated since it was last granted access.	AppAccessRequestWindow		Această aplicație a fost actualizată de când i s-a acordat ultima dată acces.
 Allow always	AppAccessRequestWindow		Permite întotdeauna
 Unlock	KeyRequestWindow		Deblochează
 The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Aplicația:\n%signature% (%path%)\n\n
-This application hasn't been granted access before.	AppAccessRequestWindow		Acestei aplicații nu i s-a permis accesul înainte.
+This application hasn't been granted access before.	AppAccessRequestWindow		Această aplicație nu a primit acces înainte.

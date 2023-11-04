@@ -1,29 +1,168 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	3533018367
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be-MAIL	262401742
+Set to Saved	Mail		Sett som Lagret
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Hovedteksten din inneholder %ld tegn som ikke kan kodifiseres. Kanskje et annet tegnsett ville fungere bedre? Trykk Send for å sende den likevel (et erstatningstegn vil bli brukt i stedet for tegn som ikke kan kodifiseres), eller velg Avbryt for å gå tilbake og prøve å løse problemet.
+Text wrapping:	Mail		Tekstbryting:
 Show icons & labels	Mail		Vis ikoner og tekst
+(Date unavailable)	Mail		(Dato ikke tilgjengelig)
+Reply	Mail		Svar
+Next message	Mail		Neste melding
+Mailing	Mail		Mailer
+Unread	Mail		Ulest
+Same sender	Mail		Samme sender
 Copy to new	Mail		Kopier til ny
+Save as draft	Mail		Lagre som kladd
+Encoding:	Mail		Kodifisering:
 Print	Mail		Skriv ut
+Decrease quote level	Mail		Reduser innrykk på sitat
+Encoding	Mail		Kodifisering
+Default account:	Mail		Standardkonto:
 Message	Mail		Melding
+Bcc:	Mail		Bcc:
+New	Mail		Ny
+Save	Mail		Lagre
+Undo	Mail		Angre
 Button bar:	Mail		Verktøylinje:
+%e wrote:\\n	Mail		%e skrev:\\n
+Save changes to this signature?	Mail		Vil du lagre endringer i denne signaturen?
+Save attachment…	Mail		Lagre vedlegg…
+Paste	Mail		Lim inn
+E-mail draft could not be saved!	Mail		E-postutkast kunne ikke lagres!
+Don't send	Mail		Ikke send
+sent	B_USER_DIRECTORY/mail/sent		sendt
+Only files can be added as attachments.	Mail		Bare filer kan legges til som vedlegg.
+Close	Mail		Lukk
+Untitled	Mail		Uten navn
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Fjerning av vedlegg fra en videresendt e-post er ennå ikke implementert!\nDet vil ikke fungere riktig ennå.
+Same recipient	Mail		Samme mottaker
+Previous message	Mail		Forrige melding
+(Address unavailable)	Mail		(Adresse utilgjengelig)
+Mail	System name		Mail
+Copy link location	Mail		Kopier lenkeplassering
+Add attachment…	Mail		Legg til vedlegg…
+Next	Mail		Neste
+Attachments:	Mail		Vedlegg:
+Show icons only	Mail		Vis kun ikoner
 Subject:	Mail		Emne:
+OK	Mail		OK
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Avslutt
+Title:	Mail		Tittel:
+Account from mail	Mail		Konto fra epost
+%e - E-mail address	Mail		%e - E-postadresse
+Cc:	Mail		Cc:
+No matches	Mail		Ingen treff
+Queries	Mail		Søk
+Cut	Mail		Klipp ut
 Reply to sender	Mail		Svar til avsender
+\\n - Newline	Mail		\\n - Linjeskift
+Copy	Mail		Kopier
+Add signature	Mail		Legg til signatur
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Vedlegg: %name% (Type: %type%)
+%n - Full name	Mail		%n - Fullt navn
 Signature	Mail		Signatur
+Use default account	Mail		Bruk standardkonto
+draft	B_USER_DIRECTORY/mail/draft		utkast
+Really delete this signature? This cannot be undone.	Mail		Vil du virkelig slette denne signaturen? Dette kan ikke angres.
+spam	B_USER_DIRECTORY/mail/spam		søppelpost
 Reply to all	Mail		Svar til alle
+Cancel	Mail		Avbryt
+Off	Mail		Av
+Set to %s	Mail		Sett til %s
+Signature:	Mail		Underskrift:
+Forward without attachments	Mail		Videresend uten vedlegg
+queries	B_USER_DIRECTORY/mail/queries		søk
 View	Mail		Vis
+Signatures	Mail		Underskrifter
+On	Mail		På
+Find	Mail		Finn
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Beklager, kunne ikke finne en applikasjon som støtter datatypen "Person".
+Date:	Mail		Dato:
 Expert	Mail		Ekspert
 Automatically mark mail as read:	Mail		Marker e-post som lest automatisk:
+Close and 	Mail		Lukk og 
 Colored quotes:	Mail		Fargede sitater:
 Automatic	Mail		Automatisk
+Open this link	Mail		Åpne denne lenken
+Auto signature:	Mail		Automatisk underskrift:
+Same subject	Mail		Samme emne
+Send	Mail		Send
+Open draft	Mail		Åpne utkast
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Behold som 'New'
+Random	Mail		Tilfeldig
 Attach attributes:	Mail		Legg ved attributter:
 Find again	Mail		Finn igjen
+Size:	Mail		Størrelse:
+To:	Mail		Til:
+Need Tracker to move items to trash	Mail		Trenger Tracker for å flytte elementer til papirkurven
+The mail_daemon could not be started:\n\t	Mail		Mail-daemonen kunne ikke startes:\n\t
+<no account found>	Mail		<ingen konto funnet>
+Mail couldn't find its dictionary.	Mail		Mail kunne ikke finne ordboken.
 helpful message	Mail		nyttig melding
+ Read 	Mail		 Les 
+Font:	Mail		Skrifttype:
+Accounts…	Mail		Kontoer…
+Previous	Mail		Forrige
+Include file attributes in attachments	Mail		Inkluder filattributter i vedlegg
+Start now	Mail		Begynn nå
+(Name unavailable)	Mail		(Navn utilgjengelig)
+Move to trash	Mail		Flytt til søppelkurven
+<none>	Mail		<ingen>
+Mail settings	Mail		E-postinnstillinger
 %d - Date	Mail		%d - Dato
+Check spelling	Mail		Stavekontroll
+Status:	Mail		Status:
+Redo	Mail		Gjenta
+Leave as '%s'	Mail		Behold som '%s'
 Print…	Mail		Skriv ut…
+Settings…	Mail		Innstillinger…
+Warn unencodable:	Mail		Advarsel om ukodifiserbare:
+Trash	Mail		Søppelkurv
+Show raw message	Mail		Vis rå melding
+Find…	Mail		Finn…
+Select all	Mail		Velg alle
+Show header	Mail		Vis header
 Reply account:	Mail		Konto for svar
+Sorry	Mail		Beklager
+Forward	Mail		Videresend
+Open attachment	Mail		Åpne vedlegg
+mail	B_USER_DIRECTORY/mail		mail
+Save this message as a draft before closing?	Mail		Vil du lagre denne meldingen som et utkast før du lukker?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon kjører ikke. Meldingen blir stående i kø og vil bli sendt når mail_daemon startes.
+None	Mail		Ingen
+Resend	Mail		Send igjen
+Hide	Mail		Skjul
+From:	Mail		Fra:
+No file attributes, just plain data	Mail		Ingen filattributter, bare ren data
+Add	Mail		Legg til
+out	B_USER_DIRECTORY/mail/out		ut
+Send this message before closing?	Mail		Vil du sende denne meldingen før du lukker?
+in	B_USER_DIRECTORY/mail/in		inn
+Open	Mail		Åpne
 Don't save	Mail		Ikke lagre
+Leave same	Mail		Behold som før
 An error occurred trying to save the attachment.	Mail		En feil oppsto da vedlegget skulle lagres.
+Save address	Mail		Samme adresse
+Initial spell check mode:	Mail		Opprinnelig stavekontrollmodus:
+Edit queries…	Mail		Endre søk…
 There is no installed handler for URL links.	Mail		Det er ikke installert noen behandler for URL-lenker.
+File	Mail		Fil
+Reply preamble:	Mail		Innledning på svar:
 New mail message	Mail		Ny melding
+An error occurred trying to open this signature.	Mail		Det oppstod en feil under forsøk på å åpne denne signaturen.
+Edit signatures…	Mail		Rediger underskrifter…
+User interface	Mail		Brukergrensesnitt
 Inconsistency occurred in the undo/redo buffer.	Mail		Inkonsistens oppsto i angre/gjenopprett-bufferen.
 Remove attachment	Mail		Fjern vedlegg
+Set to…	Mail		Sett til…
 Edit	Mail		Rediger
+Page setup…	Mail		Sideoppsett…
+An error occurred trying to save this signature.	Mail		Det oppstod en feil ved forsøk på å lagre denne signaturen.
 Beginner	Mail		Nybegynner
+Send message	Mail		Send melding
+Delete	Mail		Slett
+Put your favorite e-mail queries and query templates in this folder.	Mail		Legg dine favoritt e-postforespørsler og spørringsmaler i denne mappen.
+Spam	Mail		Spam
+Couldn't open this signature. Sorry.	Mail		Kunne ikke åpne denne signaturen. Beklager.
+Revert	Mail		Gå tilbake
+Unknown	Mail		Ukjent
+Increase quote level	Mail		Øk innrykk på sitat

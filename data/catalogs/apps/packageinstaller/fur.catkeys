@@ -4,22 +4,22 @@ none	PackageView		nissun
 Continue	PackageInstall		Continue
 Running post-installation scripts	PackageInstall		Esecuzion script post-instalazion
 Package installer	PackageView		Instaladôr pachets
-All existing files will be skipped?	PackageView		Saltâ/Ignorâ ducj i file za esistents?
+All existing files will be skipped?	PackageView		Saltâ/Ignorâ ducj i files za esistents?
 Replace	PackageView		Sostituìs
-All existing files will be replaced?	PackageView		Sostituî ducj i file za esistents?
+All existing files will be replaced?	PackageView		Sostituî ducj i files za esistents?
 Other…	PackageView		Altri…
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Il colegament simbolic clamât '%s' al esist za tal percors indicât.\nSostituî il colegament cun chel di chest pachet o saltâ?
 Stop	PackageStatus		Ferme
 Install to:	PackageView		Instale su:
-The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Il pachet indicât al semee jessi za instalât sul sisteme. Disinstalâ chel esistent e continuâ la instalazion?
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Il pachet indicât al somee jessi za instalât sul sisteme. Disinstalâ chel esistent e continuâ la instalazion?
 Skip all	PackageView		Salte ducj
 The installation of the package has been aborted.	PackageView		La instalazion dal pachet e je stade anulade.
 No installation type selected	PackageView		Nol è stât selezionât nissun gjenar di instalazion
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Visâsi di cheste decision e aplicâle pal rest di cheste instalazion?\n
-The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Il pachet selezionât nol è stât gjavât dal sisteme. Il file des informazions dal pachet instalât indicât al podarès jessi ruvinât.
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Il pachet selezionât nol è stât gjavât dal sisteme. Al è pussibil che il file des informazions dal pachet instalât indicât al sedi ruvinât.
 Install…	UninstallView		Instalazion…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L'element clamât '%s' al esist za tal percors furnît.\nSostituî l'element cun chel che al sta in chest pachet o saltâ?
-Installing files and folders	PackageInstall		Instalazion file e cartelis
+Installing files and folders	PackageInstall		Instalazion files e cartelis
 Installed packages	UninstallWindow		Pachets instalâts
 Remove	UninstallView		Gjave
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		La instalazion dal pachet domandât e je falide. La cause e podarès stâ tal file dal pachet di destinazion. Par plasê, viôt di chest probleme cul distributôr dal pachet. 
@@ -43,7 +43,7 @@ No package available.	PackageInfo		Nissun pachet disponibil.
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Il script clamât '%s' al esist za tal percors indicât.\nSostituîlu cun chel di chest pachet o saltâ?
 Installation type:	PackageView		Gjenar di instalazion:
 The package you selected has been successfully removed from your system.	UninstallView		Il pachet selezionât al è stât gjavât dal sisteme cun sucès.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Al semee che no sedi corispondence te dimension dal file dal pachet. Il pachet al podarès jessi ruvinât o vê vût modifichis daspò la sô creazion. Continuâ distès?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Al somee che no sedi corispondence te dimension dal file dal pachet. Al è pussibil che il pachet al sedi ruvinât o che al vedi vût modifichis daspò la sô creazion. Continuâ distès?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Anule
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Il file clamât '%s' al esist za tal percors indicât.\nSostituîlu cun chel di chest pachet o saltâ?

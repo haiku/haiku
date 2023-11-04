@@ -1,6 +1,6 @@
 1	friulian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
-Source files	MediaConverter		File sorzints
+Source files	MediaConverter		Files sorzint
 Error writing video frame %lld	MediaConverter		Erôr tal scrivi il fotogram video %lld
 Audio quality: %s	MediaConverter		Cualitât audio: %s
 Error converting '%filename'	MediaConverter		Erôr tal convertî '%filename'
@@ -14,7 +14,7 @@ None available	Audio codecs		Nissun disponibil
 The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Il file al à plui liniis audio o video, a vignaran convertidis dome la prime dal audio e dal video.
 No file selected	MediaConverter-FileInfo		Nissun file selezionât
 High	MediaConverter		Alt
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Il file nol è stât ricognossût tra chei multimediâi supuartâts:} other{# file no son stâts ricognossûts tra chei multimediâi supuartâts:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Il file nol è stât ricognossût tra chei multimediâi supuartâts:} other{# files no son stâts ricognossûts tra chei multimediâi supuartâts:}}
 File Error	MediaConverter-FileInfo		Erôr di file
 None available	Video codecs		Nissun disponibil
 Output format	MediaConverter		Formât di jessude
@@ -37,7 +37,7 @@ Video:	MediaConverter-FileInfo		Video:
 Select	MediaConverter		Selezione
 Conversion cancelled	MediaConverter		Conversion anulade
 Low	MediaConverter		Bas
-Error loading files	MediaConverter		Erôr tal cjariâ i file
+Error loading files	MediaConverter		Erôr tal cjariâ i files
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bit}}
 Video quality: %s	MediaConverter		Cualitât video: %s
 End   [ms]: 	MediaConverter		Fin    [ms]: 
@@ -48,7 +48,7 @@ An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo
 Error	MediaConverter		Erôr
 File details	MediaConverter		Detais dai file
 No audio	Audio codecs list		Nissun audio
-Drop media files onto this window	MediaConverter		Strissine i file multimediâi su chest barcon
+Drop media files onto this window	MediaConverter		Strissine i files multimediâi su chest barcon
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# fotogram/campion} other{# fotograms/campions}}
 Error read audio frame %lld	MediaConverter		Erôr tal lei il pacut audio %lld
 Quit	Menu		Jes

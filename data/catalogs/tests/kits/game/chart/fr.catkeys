@@ -1,42 +1,41 @@
-1	french	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Rotation lente
-Pink	ChartWindow		Rose
-Comet	ChartWindow		Comète
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Orange
-Refresh rate	ChartWindow		Fréquence de rafraîchissement
-Blue	ChartWindow		Bleu
-Colors	ChartWindow		Couleurs
-Novas	ChartWindow		Novas
-LineArray	ChartWindow		TableauDeLigne
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s (échelle logarythmique )
-Free motion	ChartWindow		Mouvement libre
+1	french	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(haute) 100% 
-Green	ChartWindow		Vert
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 tâches
-Yellow	ChartWindow		Jaune
-Off	ChartWindow		Arrêt
-Chaos	ChartWindow		Chaos
-Full screen	ChartWindow		Plein écran
 Spiral	ChartWindow		Spirale
-Slow motion	ChartWindow		Mouvement lent
- 5% (low)	ChartWindow		 5% (lent)
-Fast motion	ChartWindow		Mouvement rapide
-Special	ChartWindow		Spécial
-Status	ChartWindow		État
-Star density	ChartWindow		Densité d’étoiles
-600.0 f/s	ChartWindow		600.0 f/s
+Orange	ChartWindow		Orange
 Display:	ChartWindow		Affichage :
-Space color	ChartWindow		Espace de couleur
-White	ChartWindow		Blanc
-Chart	System name		Graphique
+Pink	ChartWindow		Rose
 Animation:	ChartWindow		Animation :
-Frames/s	ChartWindow		Images/s
 Auto demo	ChartWindow		Démo automatique
-CPU load	ChartWindow		Charge CPU
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Rouge
 None	ChartWindow		Aucun
+600.0 f/s	ChartWindow		600.0 f/s
+Fast motion	ChartWindow		Mouvement rapide
+Special	ChartWindow		Spécial
+White	ChartWindow		Blanc
+Star density	ChartWindow		Densité d’étoiles
+Chaos	ChartWindow		Chaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Jaune
+Frames/s	ChartWindow		Images/s
+CPU load	ChartWindow		Charge CPU
+Green	ChartWindow		Vert
+Colors	ChartWindow		Couleurs
+Refresh rate	ChartWindow		Fréquence de rafraîchissement
+Full screen	ChartWindow		Plein écran
+Status	ChartWindow		État
+Off	ChartWindow		Arrêt
 Battle	ChartWindow		Bataille
+Blue	ChartWindow		Bleu
+Slow rotation	ChartWindow		Rotation lente
+Novas	ChartWindow		Novas
+Slow motion	ChartWindow		Mouvement lent
+Comet	ChartWindow		Comète
+2 threads	ChartWindow		2 tâches
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		TableauDeLigne
+ 5% (low)	ChartWindow		 5% (lent)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Mouvement libre
+Space color	ChartWindow		Espace de couleur
+Chart	System name		Graphique
 Space:	ChartWindow		Espace :

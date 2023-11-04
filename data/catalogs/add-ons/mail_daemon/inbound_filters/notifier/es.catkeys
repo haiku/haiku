@@ -1,7 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-NewMailNotification	1375000288
+1	spanish; castilian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Ventana de registro
 none	NotifierConfigView		ninguno
-New mails notification	NotifierFilter		Nuevas notificaciones de correo
 Alert	NotifierConfigView		Alerta
 OK	NotifierFilter		Aceptar
 Central alert	NotifierConfigView		Alerta central 

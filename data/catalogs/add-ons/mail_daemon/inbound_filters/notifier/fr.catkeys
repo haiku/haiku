@@ -1,7 +1,6 @@
-1	french	x-vnd.Haiku-NewMailNotification	1375000288
+1	french	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Fenêtre de connexion
 none	NotifierConfigView		aucune
-New mails notification	NotifierFilter		Notification de nouveaux courriers
 Alert	NotifierConfigView		Alerte
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Alerte générale

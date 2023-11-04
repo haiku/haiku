@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskProbe	4171815771
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Rå editor
 Remove	AttributeWindow		Fjern
 Close	ProbeView		Lukk
@@ -38,6 +38,7 @@ Icon	TypeEditors		Ikon
 Attribute	ProbeView		Attributt
 Don't save	ProbeView		Ikke lagre
 Undo	ProbeView		Angre
+Flattened bitmap	TypeEditors		Avflatet punktgrafikk
 Cancel	OpenWindow		Avbryt
 Unknown format	TypeEditors		Ukjent format
 File: 	ProbeView		Fil: 
@@ -54,6 +55,8 @@ Cancel	AttributeWindow		Avbryt
 16 bit signed value:	TypeEditors		16-bit verdi med fortegn:
 DiskProbe request	AttributeWindow		DiskProbe forespørsel
 Next	ProbeView		Neste
+64 bit signed offset:	TypeEditors		64 bits signert offset:
+32 bit signed value:	TypeEditors		32 bits signert verdi:
 Could not find search string.	ProbeView		Fant ikke søkeordet.
 Close	FileWindow		Lukk
 Unknown type	TypeEditors		Ukjent type
@@ -81,30 +84,51 @@ Attributes	ProbeView		Attributter
 Message	TypeEditors	This is the type of view	Melding
 Message View	TypeEditors		Meldingsvisning
 Offset: 	ProbeView		Offset: 
+Swapped: 0x%0*Lx	ProbeView		Byttet om: 0x%0*Lx
 MIME type:	TypeEditors		MIME-type:
 Fit	ProbeView	Size of fonts, fits to available room	Juster
+Type editor	ProbeView		Type-editor
 File	FileWindow		Fil
+Grayscale	TypeEditors		Gråtone
+32 bit	TypeEditors		32-bit
 Device	ProbeView		Enhet
 Close	AttributeWindow		Lukk
+Type editor	AttributeWindow		Type-editor
 Save	ProbeView		Lagre
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	av 0x0
 Attribute type: 	ProbeView		Attributtype
+15 bit	TypeEditors		15-bit
 Page setup…	ProbeView		Sideoppsett…
 Boolean	TypeEditors	This is the type of editor	Boolsk
+Icon view	TypeEditors		Ikonvisning
+Select all	ProbeView		Velg alle
 64 bit unsigned value:	TypeEditors		64-bit verdi uten fortegn:
 OK	ProbeView		OK
 Previous	ProbeView		Forrige
 Selection	ProbeView		Utvalg
 Find	FindWindow		Finn
 8 bit unsigned value:	TypeEditors		8-bit verdi uten fortegn
+%ld (native)	ProbeView		%ld (nativ)
+Attribute: 	ProbeView		Egenskap: 
 Block	ProbeView		Blokk
 Find again	ProbeView		Finn påny
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Vis
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Kunne ikke lese bilde
+DiskProbe request	ProbeView		DiskProbe-forespørsel
+Double precision floating-point value:	TypeEditors		Dobbel presisjon flytepunktverdi:
+Image	TypeEditors	This is the type of view	Bilde
+Swapped: %lld (0x%0*Lx)	ProbeView		Byttet om: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Lagre endringer før lukking?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG-format
 Number	TypeEditors	This is the type of editor	Tall
+Edit	ProbeView		Rediger
 String editor	TypeEditors		Streng-editor
 Boolean editor	TypeEditors		Boolsk editor
+Device offset: 	ProbeView		Enhets-offset: 
 Find…	ProbeView		Finn…
 8 bit palette	TypeEditors		8-bit palett
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Desimal
+Image view	TypeEditors	Image means here a picture file, not a disk image.	Bildevisning
 Paste	ProbeView		Lim inn
+32 bit unsigned size:	TypeEditors		32 bit usignert størrelse:

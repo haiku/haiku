@@ -1,42 +1,41 @@
-1	finnish	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Hidas kierto
-Pink	ChartWindow		Vaaleanpunainen
-Comet	ChartWindow		Komeetta
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Oranssi
-Refresh rate	ChartWindow		Virkistystaajuus
-Blue	ChartWindow		Sininen
-Colors	ChartWindow		Värit
-Novas	ChartWindow		Novat
-LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		0,6 f/s (logaritminen skaala)
-Free motion	ChartWindow		Vapaa liike
+1	finnish	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(korkea) 100 % 
-Green	ChartWindow		Vihreä
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 säiettä
-Yellow	ChartWindow		Keltainen
-Off	ChartWindow		Pois käytöstä
-Chaos	ChartWindow		Kaaos
-Full screen	ChartWindow		Kokoruutu
 Spiral	ChartWindow		Spiraali
-Slow motion	ChartWindow		Hidas liike
- 5% (low)	ChartWindow		 5 % (alhainen)
-Fast motion	ChartWindow		Nopea liike
-Special	ChartWindow		Erityinen
-Status	ChartWindow		Tila
-Star density	ChartWindow		Tähtitiheys
-600.0 f/s	ChartWindow		600,0 kehystä/s
+Orange	ChartWindow		Oranssi
 Display:	ChartWindow		Näyttö:
-Space color	ChartWindow		Tilaväri
-White	ChartWindow		Valkoinen
-Chart	System name		Taulukko
+Pink	ChartWindow		Vaaleanpunainen
 Animation:	ChartWindow		Animaatio:
-Frames/s	ChartWindow		Kehyksiä/s
 Auto demo	ChartWindow		Automaattinen esittely
-CPU load	ChartWindow		Prosessorikuorma
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Punainen
 None	ChartWindow		Ei mikään
+600.0 f/s	ChartWindow		600,0 kehystä/s
+Fast motion	ChartWindow		Nopea liike
+Special	ChartWindow		Erityinen
+White	ChartWindow		Valkoinen
+Star density	ChartWindow		Tähtitiheys
+Chaos	ChartWindow		Kaaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Keltainen
+Frames/s	ChartWindow		Kehyksiä/s
+CPU load	ChartWindow		Prosessorikuorma
+Green	ChartWindow		Vihreä
+Colors	ChartWindow		Värit
+Refresh rate	ChartWindow		Virkistystaajuus
+Full screen	ChartWindow		Kokoruutu
+Status	ChartWindow		Tila
+Off	ChartWindow		Pois käytöstä
 Battle	ChartWindow		Taistelu
+Blue	ChartWindow		Sininen
+Slow rotation	ChartWindow		Hidas kierto
+Novas	ChartWindow		Novat
+Slow motion	ChartWindow		Hidas liike
+Comet	ChartWindow		Komeetta
+2 threads	ChartWindow		2 säiettä
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		LineArray
+ 5% (low)	ChartWindow		 5 % (alhainen)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Vapaa liike
+Space color	ChartWindow		Tilaväri
+Chart	System name		Taulukko
 Space:	ChartWindow		Avaruus:

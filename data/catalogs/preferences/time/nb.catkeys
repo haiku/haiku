@@ -20,15 +20,15 @@ The following error occured while synchronizing:\n%s: %s	Time		Følgende feil op
 Europe	Time		Europa
 Show day of week	Time		Vis ukedag
 Local time (Windows compatible)	Time		Lokal tid (Windows kompatible)
-Hardware clock set to:	Time		Hardware klokke set til:
+Hardware clock set to:	Time		Maskinvareklokke satt til:
 Arctic	Time		Arktis
 Antarctica	Time		Antarktika
-GMT (UNIX compatible)	Time		GMT (UNIX kompatible)
+GMT (UNIX compatible)	Time		GMT (UNIX-kompatibel)
 Africa	Time		Afrika
 Stop	Time		Stopp
 Time zone	Time		Tidssone
 Clock	Time		Klokke
-Network time	Time		Netwerk tid
+Network time	Time		Nettverkstid
 Sending request failed	Time		Sending forespørsel feilet
 Preview time:	Time		Forhåndsvis tid:
 \nNow: 	Time		\nNå:

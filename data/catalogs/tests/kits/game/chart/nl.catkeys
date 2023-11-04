@@ -1,42 +1,41 @@
-1	dutch; flemish	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Trage rotatie
-Pink	ChartWindow		Roze
-Comet	ChartWindow		Komeet
-DirectWindow	ChartWindow		DirectWindow
-Orange	ChartWindow		Oranje
-Refresh rate	ChartWindow		Vernieuwingsfrequentie
-Blue	ChartWindow		Blauw
-Colors	ChartWindow		Kleuren
-Novas	ChartWindow		Nova's
-LineArray	ChartWindow		Lijnenlijst
- 0.6 f/s  (logarythmic scale)	ChartWindow		0.6 f/s (logaritmische schaal)
-Free motion	ChartWindow		Vrije beweging
+1	dutch; flemish	x-vnd.Haiku-ChartDemo	3491540808
 (high) 100% 	ChartWindow		(hoog) 100%
-Green	ChartWindow		Groen
-Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 threads
-Yellow	ChartWindow		Geel
-Off	ChartWindow		Uit
-Chaos	ChartWindow		Chaos
-Full screen	ChartWindow		Volledig scherm
 Spiral	ChartWindow		Spiraal
-Slow motion	ChartWindow		Trage beweging
- 5% (low)	ChartWindow		5% (laag)
-Fast motion	ChartWindow		Snelle beweging
-Special	ChartWindow		Speciaal
-Status	ChartWindow		Status
-Star density	ChartWindow		Sterrendichtheid
-600.0 f/s	ChartWindow		600.0 f/s
+Orange	ChartWindow		Oranje
 Display:	ChartWindow		Weergave:
-Space color	ChartWindow		Ruimtekleur
-White	ChartWindow		Wit
-Chart	System name		Chart
+Pink	ChartWindow		Roze
 Animation:	ChartWindow		Animatie:
-Frames/s	ChartWindow		Beelden/s
 Auto demo	ChartWindow		Automatische demo
-CPU load	ChartWindow		Processorbelasting
-DrawBitmap	ChartWindow		DrawBitmap
 Red	ChartWindow		Rood
 None	ChartWindow		Geen
+600.0 f/s	ChartWindow		600.0 f/s
+Fast motion	ChartWindow		Snelle beweging
+Special	ChartWindow		Speciaal
+White	ChartWindow		Wit
+Star density	ChartWindow		Sterrendichtheid
+Chaos	ChartWindow		Chaos
+Amas	ChartWindow		Amas
+Yellow	ChartWindow		Geel
+Frames/s	ChartWindow		Beelden/s
+CPU load	ChartWindow		Processorbelasting
+Green	ChartWindow		Groen
+Colors	ChartWindow		Kleuren
+Refresh rate	ChartWindow		Vernieuwingsfrequentie
+Full screen	ChartWindow		Volledig scherm
+Status	ChartWindow		Status
+Off	ChartWindow		Uit
 Battle	ChartWindow		Gevecht
+Blue	ChartWindow		Blauw
+Slow rotation	ChartWindow		Trage rotatie
+Novas	ChartWindow		Nova's
+Slow motion	ChartWindow		Trage beweging
+Comet	ChartWindow		Komeet
+2 threads	ChartWindow		2 threads
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		Lijnenlijst
+ 5% (low)	ChartWindow		5% (laag)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		Vrije beweging
+Space color	ChartWindow		Ruimtekleur
+Chart	System name		Chart
 Space:	ChartWindow		Ruimte:

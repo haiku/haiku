@@ -1,5 +1,5 @@
 1	romanian	x-vnd.Haiku-notification_server	2022780929
 Warning	NotificationWindow		Avertisment
-Notification	NotificationWindow		Notificare
+Notification	NotificationWindow		Înștiințare
 OK	NotificationWindow		OK
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nu s-a putut porni programul de monitorizare al configurărilor generale.\nModificările live ale filtrului sunt dezactivate.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nu s-a putut porni monitorul configurărilor generale.\nModificările filtrului în timp real au fost dezactivate.

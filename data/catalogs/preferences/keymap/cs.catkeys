@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Keymap	2850776429
+1	czech	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Klávesa
 Japanese	KeymapNames		Japonské
 US	KeymapNames		Anglické (USA)
@@ -30,6 +30,7 @@ US-International	KeymapNames		Mezinárodní (USA)
 Right option	Keyboard Layout View		Pravý alt
 Turkish (Type-Q)	KeymapNames		Turecké (typ Q)
 Revert	Modifier keys window		Vzít zpět
+Caps:	Modifier keys window	Caps key role name	Velká písmena:
 Slovak	KeymapNames		Slovenské
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -137,7 +138,7 @@ French	KeymapNames		Francouzské
 Portuguese	KeymapNames		Portugalské
 Swiss-French	KeymapNames		Švýcarsko-francouzské
 Shift:	Modifier keys window	Shift key role name	Shift:
-Keymap	System name		Rozložení klávesnice:
+Keymap	System name		Rozložení klávesnice
 Slovene	KeymapNames		Slovinské
 Lithuanian	KeymapNames		Litevské
 Set modifier keys…	Keymap window		Nastavit modifikační klávesy...
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Belgické (čárka)
 Norwegian	KeymapNames		Norské
 Font	Keymap window		Font
 Danish	KeymapNames		Dánské
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps Lock
 Generic 104-key	KeyboardLayoutNames		Obecná 104 kláves
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Klávesa Shift
 Russian	KeymapNames		Ruské

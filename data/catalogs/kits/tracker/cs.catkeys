@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	3982629342
+1	czech	x-vnd.Haiku-libtracker	746720348
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -413,6 +413,7 @@ Emptying Trash… 	StatusWindow		Vyprazdňuji koš...
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # soubor} few{for # soubory} other{for # souborů}}
 Revert	TrackerSettingsWindow		Vrátit zpět
 trash	B_TRASH_DIRECTORY		koš
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Pokud přesunete systémový adresář nebo jeho obsah, nepůjde nastartovat %osName!\n\nOpravdu to chcete?\n\nPokud i tak chcete přesunout systémový adresář nebo jeho obsah, držte Shift a klikněte na \"Přesunout\".
 Close all in workspace	ContainerWindow		Zavřít na všech plochách
 Corrupted expression.	libtracker		Poškozený výraz.
@@ -437,6 +438,7 @@ the config folder	FSUtils		konfigurační adresář
 Sorry, could not create a new folder.	FSUtils		Bohužel, novou složku nelze vytvořit.
 MIME Signature	AttributesView		Podpis MIME
 Select all	VirtualDirectoryWindow		Vybrat vše
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Přejmenovat
 Clean up all	ContainerWindow		Vyčistit vše
 Add current folder	FilePanelPriv		Přidat aktuální adresář
@@ -509,6 +511,7 @@ Create a Query	FindPanel		Vytvořit Dotaz
 Close	QueryContainerWindow		Zavřít
 I know what I'm doing	FSUtils	button label	Vím co dělám
 Preparing to copy items…	StatusWindow		Příprava kopírování položek...
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		Reference položky
 Icon view	ContainerWindow		Zobrazení ikon
 The entered folder name is too long.	FSUtils		Zvolené jméno adresáře je příliš dlouhé.

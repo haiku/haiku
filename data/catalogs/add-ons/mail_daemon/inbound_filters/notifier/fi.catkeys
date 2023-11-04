@@ -1,7 +1,6 @@
-1	finnish	x-vnd.Haiku-NewMailNotification	1375000288
+1	finnish	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Loki-ikkuna
 none	NotifierConfigView		ei mitään
-New mails notification	NotifierFilter		Uusien sähköpostiviestien ilmoitus
 Alert	NotifierConfigView		Hälytys
 OK	NotifierFilter		Valmis
 Central alert	NotifierConfigView		Keskeinen hälytys

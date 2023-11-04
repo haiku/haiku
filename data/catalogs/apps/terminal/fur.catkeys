@@ -10,7 +10,7 @@ Edit	Terminal TermWindow		Modifiche
 Select all	Terminal TermWindow		Selezione dut
 Confirm exit if active programs exist	Terminal AppearancePrefView		Domande conferme pe jessude se a esistin programs atîfs
 Color scheme:	Terminal ThemeView		Scheme colôrs:
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf te\n\t\t\tschede atuâl. In mût opzionâl, il massim numar di components di percors\n\t\t\tal pues jessi specificât. P.e. '%2d' par massim doi components.\n\t%T\t-\tIl non de aplicazion Terminal te localizazion atuâl.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât se UTF-8.\n\t%i\t-\tL'indicadôr dal barcon.\n\t%p\t-\tIl non dal procès atîf te schede atuâl .\n\t%t\t-\tIl titul de schede atuâl.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf te\n\t\t\tschede atuâl. In mût opzionâl, al è pussibil specificâ il massim numar\n\t\t\tdi components di percors. P.e. '%2d' par massim doi components.\n\t%T\t-\tIl non de aplicazion Terminal te localizazion atuâl.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât se UTF-8.\n\t%i\t-\tL'indicadôr dal barcon.\n\t%p\t-\tIl non dal procès atîf te schede atuâl .\n\t%t\t-\tIl titul de schede atuâl.
 Copy	Terminal TermWindow		Copie
 Edit tab title…	Terminal TermWindow		Modifiche titul schede…
 Print	Terminal TermWindow		Stampe
@@ -65,7 +65,7 @@ Find failed	Terminal TermWindow		No si è rivâts a cjatâ
 Quit	Terminal TermWindow		Jes
 Match case	Terminal FindWindow		Coincît maiusculis/minusculis
 Find previous	Terminal TermWindow		Cjate precedent
-The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui des schedis. A puedin jessi doprâts\nchescj segnepuest:
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui des schedis. A puedin vignî doprâts\nchescj segnepuest:
 Close	Terminal TermWindow		Siere
 Save to file…	Terminal PrefWindow		Salve su file…
 Defaults	Terminal ThemeWindow		Predefinîts
@@ -93,18 +93,18 @@ Cancel	Terminal SetTitleWindow		Cancele
 Blinking cursor	Terminal AppearancePrefView		Cursôr che al cimie
 Use text:	Terminal FindWindow		Dopre test:
 Close active tab	Terminal TermWindow		Siere schede ative
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul dal barcon. A puedin jessi doprâts\nchescj segnepuest:\n
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul dal barcon. A puedin vignî doprâts\nchescj segnepuest:\n
 Selected background	Terminal ThemeView		Fonts selezionât
 Save as default	Terminal TermWindow		Salve come predefinît
 Nothing is selected.	Terminal TermWindow		Nol è selezionât nie.
 ANSI bright red color	Terminal ThemeView		Colôr ros slusint ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Dopre Opzion a çampe come tast Meta
 Find	Terminal FindWindow		Cjate
-The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul de schede atuâl. A puedin jessi doprâts\nchescj segnepuest:\n
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul de schede atuâl. A puedin vignî doprâts\nchescj segnepuest:\n
 Save to file…	Terminal ThemeWindow		Salve su file…
 Font:	Terminal AppearancePrefView		Caratar:
 Paste	Terminal TermWindow		Tache
-The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui dai barcons. A puedin jessi doprâts\nchescj segnepuest:
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui dai barcons. A puedin vignî doprâts\nchescj segnepuest:
 ANSI bright magenta color	Terminal ThemeView		Colôr magenta slusint ANSI
 Copy here	Terminal TermView		Copie achì
 Use default shell	Terminal Shell		Dopre shell predefinide

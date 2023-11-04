@@ -1,62 +1,62 @@
 1	czech	x-vnd.Haiku-ShowImage	3998703664
-Use as background…	Menus		Použít jako pozadí...
-File	Menus		Soubor
-Slide delay	Menus		Prodleva mezi snímky
-Selection mode	Menus		Režim výběru
-Zoom in	Menus		Přiblížit
-The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' byl změněn. Chcete jej zavřít?
-Page setup…	Menus		Nastavení stránky...
-Print…	Menus		Tisk...
-Get info…	Menus		Získat informace...
-OK	SaveToFile		OK
-Previous page	Menus		Předchozí stránka
-View	Menus		Zobrazit
-Full screen	Menus		Celá obrazovka
-Go to page	Menus		Jít na stránku
-Zoom out	Menus		Oddálit
-Quit	Menus		Ukončit
-Rotate counterclockwise	Menus		Otočit proti směru hodinových ručiček
-High-quality zooming	Menus		Vysoce kvalitní přiblížení
-Browse	Menus		Prohlížet
-Edit	Menus		Editovat
-Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nemohu nahrát obrázek! Soubor nebo překladač pro něj neexistuje.
-First page	Menus		První stránka
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stránka %d) byl změněn. Chcete jej zavřít?
-Leave full screen	Menus		Opustit celou obrazovku
-Close	Menus		Zavřít
-Close	ClosePrompt		Zavřít
-Resize to (in 1/72 inches):	PrintOptionsWindow		Změnit velikost na (v 1/72 palce):
-Rating	Menus		Hodnocení
-Flip left to right	Menus		Převrátit zleva doprava
-Show caption in full screen mode	Menus		Zobrazit popisek v režimu celé obrazovky
-DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Otevřít...
-Next file	Menus		Další soubor
-Clear selection	Menus		Zrušit výběr
-Close document	ClosePrompt		Zavřít dokument
-Height: 	PrintOptionsWindow		Výška:
-The file '%s' could not be written.	SaveToFile		Soubor '%s' nemohl být zapsán.
-Cancel	ClosePrompt		Zrušit
-Show tool bar	Menus		Zobrazit panel nástrojů
-Fit to window	Menus		Přizpůsobit oknu
-Print options	PrintOptionsWindow		Volby tisku
-Copy	Menus		Kopírovat
-Progress monitor	ProgressWindow		Sledování pokroku
-Last page	Menus		Poslední stránka
-Stretch to window	Menus		Roztáhnout do velikosti okna
-Previous file	Menus		Předchozí soubor
 ShowImage	System name		Prohlížeč obrázků
+Page setup…	Menus		Nastavení stránky...
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stránka %d) byl změněn. Chcete jej zavřít?
+Previous file	Menus		Předchozí soubor
+View	Menus		Zobrazit
+Leave full screen	Menus		Opustit celou obrazovku
+Show caption in full screen mode	Menus		Zobrazit popisek v režimu celé obrazovky
+Flip left to right	Menus		Převrátit zleva doprava
+Full screen	Menus		Celá obrazovka
+Copy	Menus		Kopírovat
+Height: 	PrintOptionsWindow		Výška:
+Next file	Menus		Další soubor
 Slide show	Menus		Slideshow
-Fit image to page	PrintOptionsWindow		Přizpůsobit velikost obrázku stránce
-Flip top to bottom	Menus		Převrátit shora dolů
-Select all	Menus		Vybrat vše
-Zoom factor in %:	PrintOptionsWindow		Přiblížení v %:
-Width:	PrintOptionsWindow		Šířka:
-Image	Menus		Obrázek
-Move to Trash	Menus		Přesunout do koše
-OK	Alerts		OK
-Rotate clockwise	Menus		Otočit po směru hodinových ručiček
-Job setup	PrintOptionsWindow		Nastavení úlohy
 Original size	Menus		Původní velikost
-Next page	Menus		Další stránka
+Width:	PrintOptionsWindow		Šířka:
+Resize to (in 1/72 inches):	PrintOptionsWindow		Změnit velikost na (v 1/72 palce):
+Zoom factor in %:	PrintOptionsWindow		Přiblížení v %:
+Get info…	Menus		Získat informace...
+Zoom out	Menus		Oddálit
+OK	Alerts		OK
+File	Menus		Soubor
+Close	ClosePrompt		Zavřít
+Image	Menus		Obrázek
+Flip top to bottom	Menus		Převrátit shora dolů
+Zoom in	Menus		Přiblížit
+Last page	Menus		Poslední stránka
+Cancel	ClosePrompt		Zrušit
+High-quality zooming	Menus		Vysoce kvalitní přiblížení
+The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' byl změněn. Chcete jej zavřít?
+Close	Menus		Zavřít
+Selection mode	Menus		Režim výběru
+DPI:	PrintOptionsWindow		DPI:
+Fit image to page	PrintOptionsWindow		Přizpůsobit velikost obrázku stránce
+Show tool bar	Menus		Zobrazit panel nástrojů
+First page	Menus		První stránka
+OK	SaveToFile		OK
+Print…	Menus		Tisk...
+The file '%s' could not be written.	SaveToFile		Soubor '%s' nemohl být zapsán.
+Quit	Menus		Ukončit
+Rating	Menus		Hodnocení
+Close document	ClosePrompt		Zavřít dokument
+Stretch to window	Menus		Roztáhnout do velikosti okna
+Job setup	PrintOptionsWindow		Nastavení úlohy
+Clear selection	Menus		Zrušit výběr
+Rotate clockwise	Menus		Otočit po směru hodinových ručiček
+Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nemohu nahrát obrázek! Soubor nebo překladač pro něj neexistuje.
+Rotate counterclockwise	Menus		Otočit proti směru hodinových ručiček
+Previous page	Menus		Předchozí stránka
+Fit to window	Menus		Přizpůsobit oknu
+Browse	Menus		Prohlížet
+Go to page	Menus		Jít na stránku
+Progress monitor	ProgressWindow		Sledování pokroku
+Edit	Menus		Editovat
+Move to Trash	Menus		Přesunout do koše
+Use as background…	Menus		Použít jako pozadí...
+Open…	Menus		Otevřít...
 Save as…	Menus		Uložit jako...
+Next page	Menus		Další stránka
+Print options	PrintOptionsWindow		Volby tisku
+Slide delay	Menus		Prodleva mezi snímky
+Select all	Menus		Vybrat vše

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.InfoView	911310461
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.InfoView	839147430
 Offset	InfoView		Offset
 Description	DormantNodeInfoView		Beskrivelse
 Byte order	InfoView		Byte-rekkefølge
@@ -8,7 +8,7 @@ History	InfoView		Historikk
 Input formats	DormantNodeInfoView		Inn-formater
 Signature	AppNodeInfoView		Signatur
 Video data between	InfoView		Videodata mellom
-Any number	DormantNodeInfoView	For 'Max. instances' field	Et hvilket som helst tall
+Any number	DormantNodeInfoView	For 'Max. instances' field	Ubegrenset
 Flags	InfoView		Flagg
 Media output	InfoView		Medieutgang
 Active lines	InfoView		Aktive linjer
@@ -16,4 +16,31 @@ Buffer size	InfoView		Bufferstørrelse
 \n- Quality:	FileNodeInfoView		\n- Kvalitet:
 Kinds	LiveNodeInfoView		Typer
 Application	AppNodeInfoView		Applikasjon
+Max. instances	DormantNodeInfoView		Maks. forekomster
 \n- Duration:	FileNodeInfoView		\n- Varighet:
+Dormant media node	DormantNodeInfoView		Inaktiv medianode
+Latency	LiveNodeInfoView		Forsinkelse
+Media type	InfoView		Medietype
+Kinds	DormantNodeInfoView		Typer
+%title% info	InfoView		%title% info
+Node ID	LiveNodeInfoView		Node-ID
+Resolution	InfoView		Oppløsning
+File format	AppNodeInfoView		Filformat
+Channels	InfoView		Kanaler
+File format	FileNodeInfoView		Filformat
+(no file)	FileNodeInfoView		(ingen fil)
+Bit rate	InfoView		Bitrate
+Input format	DormantNodeInfoView		Inndataformat
+Format	InfoView		Format
+Version	AppNodeInfoView		Versjon
+AddOn ID	DormantNodeInfoView		AddOn-ID
+Frame size	InfoView		Billedstørrelse
+\n- Codec:	FileNodeInfoView		\n- Kodek:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Utdataformat
+Aspect ratio	InfoView		Sideforhold
+Tracks	FileNodeInfoView		Spor
+Source	InfoView		Kilde
+Destination	InfoView		Mål
+Copyright	FileNodeInfoView		Opphavsrett
+ID:	FileNodeInfoView		ID:

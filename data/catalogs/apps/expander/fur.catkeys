@@ -13,7 +13,7 @@ Close	ExpanderMenu		Siere
 Create	ExpanderWindow		Cree
 Creating listing for '%s'…	ExpanderWindow		Creazion de liste par '%s'…
 Show contents	ExpanderMenu		Mostre contignût
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Fermâ pardabon la espansion di chest archivi? I elements espandûts a podaressin jessi incomplets.
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Fermâ pardabon la espansion di chest archivi? Al è pussibil che i elements espandûts a sedin incomplets.
 Settings	ExpanderMenu		Impostazions
 Expand	ExpanderWindow		Espant
 Open destination folder after extraction	ExpanderPreferences		Vierç la cartele di destinazion daspò la estrazion
@@ -29,7 +29,7 @@ Select current	DirectoryFilePanel		Selezione atuâl
 Expanding '%s'…	ExpanderWindow		Espansion di '%s'…
 OK	ExpanderPreferences		Va ben
 File expanded	ExpanderWindow		File espandût
-Automatically expand files	ExpanderPreferences		Espant in automatic i file
+Automatically expand files	ExpanderPreferences		Espant in automatic i files
 Select	DirectoryFilePanel		Selezione
 Show contents	ExpanderWindow		Mostre contignût
 Stop	ExpanderMenu		Ferme

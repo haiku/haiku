@@ -10,7 +10,7 @@ Large	PreferencesWindow		Stor
 Recent documents	DeskbarMenu		Nylig brukte dokumenter
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programmer
 Always on top	PreferencesWindow		Alltid øverst
-Restart system	DeskbarMenu		Omstart
+Restart system	DeskbarMenu		Start på nytt
 Recent documents:	PreferencesWindow		Nylig brukte dokumenter
 Auto-raise	PreferencesWindow		Fremhev automatisk
 Mount	DeskbarMenu		Monter
@@ -38,7 +38,7 @@ Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demoer
 Expand new applications	PreferencesWindow		Pakk ut nye programmer
 Recent applications:	PreferencesWindow		Nylig brukte programmer:
 Recent folders:	PreferencesWindow		Nylig brukte mapper:
-Recent folders	DeskbarMenu		Nylig brukte mapper:
+Recent folders	DeskbarMenu		Nylig brukte mapper
 Recent applications	DeskbarMenu		Nylig brukte programmer
 Hide all	WindowMenu		Skjul alle
 Sort applications by name	PreferencesWindow		Sorter applikasjonene etter navn

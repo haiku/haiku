@@ -1,7 +1,6 @@
-1	polish	x-vnd.Haiku-NewMailNotification	1375000288
+1	polish	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Okno dziennika
 none	NotifierConfigView		brak
-New mails notification	NotifierFilter		Powiadomienie o nowych wiadomościach
 Alert	NotifierConfigView		Powiadomienie
 OK	NotifierFilter		OK
 Central alert	NotifierConfigView		Centralne powiadomienie

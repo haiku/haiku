@@ -1,14 +1,14 @@
 1	romanian	x-vnd.Haiku-mount_server	599204450
-Mount read-only	AutoMounter		Montează doar citire
+Mount read-only	AutoMounter		Montează doar pentru citire
 Error mounting volume:\n\n%s	AutoMounter		Eroare la montarea volumului:\n\n%s
 Cancel	AutoMounter		Anulează
 OK	AutoMounter		OK
 Unmount error	AutoMounter		Eroare de demontare
-The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Sistemul de fișiere de pe acest volum nu este sistemul de fișiere Be. Este recomandat să îl montați în modul doar citire, pentru a preveni pierderea neintenționată de date din cauza defecțiunilor din Haiku.
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Sistemul de fișiere de pe acest volum nu este sistemul de fișiere Be. Este recomandat să îl montați în modul doar pentru citire, pentru a preveni pierderea neintenționată de date din cauza defecțiunilor din Haiku.
 Mount read/write	AutoMounter		Montează citire/scriere
 Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nu s-a putut demonta discul \„%s\”:\n\t%s
 Mounting volume '%s'\n\n	AutoMounter		Se montează volumul „%s”\n\n
-Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nu s-a putut demonta discul \„%s\”:\n\t%s\n\nAr trebui fortață demontarea?\n\nNotă: Dacă o aplicație scrie în prezent la volum, demontarea acestuia ar putea duce la pierderi de date.\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nu s-a putut demonta discul \„%s\”:\n\t%s\n\nAr trebui fortață demontarea?\n\nNotă: Dacă o aplicație scrie în acest moment pe volum, demontarea acestuia ar putea duce la pierderi de date.\n
 Force unmount	AutoMounter		Forțează demontarea
 Mount error	AutoMounter		Eroare de montare
 Mount warning	AutoMounter		Avertisment de montare

@@ -1,8 +1,9 @@
-1	czech	x-vnd.haiku.SerialConnect	354154115
+1	czech	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Hardwarový
 Connection	SerialWindow		Připojení
 Raw send…	SerialWindow		Odeslat syrová data…
 Baud rate	SerialWindow		Přenosová rychlost
+Paste	SerialWindow		Vložit
 Stop bits	SerialWindow		Stop bitů
 None	SerialWindow	Flowcontrol	Žádné
 Cancel	Custom baudrate window		Zrušit

@@ -1,7 +1,6 @@
-1	esperanto	x-vnd.Haiku-NewMailNotification	1375000288
+1	esperanto	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		Protokola fenestro
 none	NotifierConfigView		neniu
-New mails notification	NotifierFilter		Novmesaĝa sciigo
 Alert	NotifierConfigView		Averto
 OK	NotifierFilter		Bone
 Central alert	NotifierConfigView		Centra averto

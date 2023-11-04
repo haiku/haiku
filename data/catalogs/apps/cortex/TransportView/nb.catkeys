@@ -1,0 +1,19 @@
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.TransportView	3166856429
+(none)	TransportView		(ingen)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# node} other{# noder}}
+Start	TransportView		Start
+No errors.	TransportView		Ingen feil.
+to	TransportView		til
+Offline	TransportView		Offline
+(???)	TransportView		(???)
+Stop	TransportView		Stopp
+(no group)	TransportView		(ingen gruppe)
+Drop data	TransportView		Dropp data
+To:	TransportView		Til:
+Recording	TransportView		Opptak
+Time source:	TransportView		Tidskilde:
+DAC time source	TransportView		DAC tidskilde
+Decrease precision	TransportView		Reduser presisjonen
+System clock	TransportView		Systemklokke
+From:	TransportView		Fra:
+Run mode:	TransportView		Kjøremodus:

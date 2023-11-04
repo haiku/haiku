@@ -1,7 +1,6 @@
-1	lithuanian	x-vnd.Haiku-NewMailNotification	1375000288
+1	lithuanian	x-vnd.Haiku-NewMailNotification	2220310168
 Log window	NotifierConfigView		žurnalo lange
 none	NotifierConfigView		niekaip
-New mails notification	NotifierFilter		Pranešimas apie naujus laiškus
 Alert	NotifierConfigView		pranešimu
 OK	NotifierFilter		Gerai
 Central alert	NotifierConfigView		centriniu pranešimu
