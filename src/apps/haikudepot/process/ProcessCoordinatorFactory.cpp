@@ -23,6 +23,7 @@
 #include "Model.h"
 #include "OpenPackageProcess.h"
 #include "PackageInfoListener.h"
+#include "PopulatePkgSizesProcess.h"
 #include "ProcessCoordinator.h"
 #include "ServerHelper.h"
 #include "ServerIconExportUpdateProcess.h"
@@ -106,6 +107,14 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 				serverProcessOptions));
 		processCoordinator->AddNode(serverReferenceDataUpdate);
 
+		// This one has to run after the server data is taken up because it
+		// will fill in the gaps based on local data that was not able to be
+		// sourced from the server. It has all of the
+		// `ServerPkgDataUpdateProcess` nodes configured as its predecessors.
+
+		AbstractProcessNode* populatePkgSizes =
+			new ThreadedProcessNode(new PopulatePkgSizesProcess(model));
+
 		// create a process for each of the repositories that are configured on
 		// the local system.  Later, only those that have a web-app repository
 		// server code will be actually processed, but this means that the
@@ -127,9 +136,13 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 				processNode->AddPredecessor(serverRepositoryDataUpdate);
 				processNode->AddPredecessor(serverReferenceDataUpdate);
 				processCoordinator->AddNode(processNode);
+
+				populatePkgSizes->AddPredecessor(processNode);
 			}
 		} else
 			HDERROR("a problem has arisen getting the repository names.");
+
+		processCoordinator->AddNode(populatePkgSizes);
 	}
 
 	return processCoordinator;

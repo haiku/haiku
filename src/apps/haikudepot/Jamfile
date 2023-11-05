@@ -177,6 +177,7 @@ local applicationSources =
 	AbstractSingleFileServerProcess.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
+	PopulatePkgSizesProcess.cpp
 	ProcessCoordinator.cpp
 	ProcessCoordinatorFactory.cpp
 	ServerHelper.cpp

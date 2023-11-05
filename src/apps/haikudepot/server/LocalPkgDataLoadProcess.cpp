@@ -28,7 +28,6 @@
 #include "Logger.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
-#include "PackageUtils.h"
 #include "RepositoryUrlUtils.h"
 
 #include <package/Context.h>
@@ -199,8 +198,6 @@ LocalPkgDataLoadProcess::RunInternal()
 
 			if (!modelInfo.IsSet())
 				return B_ERROR;
-
-			modelInfo->SetSize(_DeriveSize(modelInfo));
 
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
@@ -380,26 +377,6 @@ LocalPkgDataLoadProcess::RunInternal()
 	HDDEBUG("did refresh the package list");
 
 	return B_OK;
-}
-
-
-off_t
-LocalPkgDataLoadProcess::_DeriveSize(const PackageInfoRef package) const
-{
-	BPath path;
-	if (PackageUtils::DeriveLocalFilePath(package.Get(), path) == B_OK) {
-		BEntry entry(path.Path());
-		struct stat s = {};
-		if (entry.GetStat(&s) == B_OK)
-			return s.st_size;
-		else {
-			HDDEBUG("unable to get the size of local file [%s]", path.Path());
-		}
-	}
-	else {
-		HDDEBUG("unable to get the local file of package [%s]", package->Name().String());
-	}
-	return 0;
 }
 
 
