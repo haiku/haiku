@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <string.h>
 
+#include <BufferedDataIO.h>
 #include <AutoDeleter.h>
 #include <File.h>
 #include <FileIO.h>
@@ -37,6 +38,9 @@ using namespace BPrivate::Network;
 
 // 30 seconds
 #define TIMEOUT_MICROSECONDS 3e+7
+
+
+const size_t kFileBufferSize = 10 * 1024;
 
 
 AbstractServerProcess::AbstractServerProcess(uint32 options)
@@ -198,6 +202,9 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 
 	BFileIO rawInput(file, true); // takes ownership
 
+	BDataIO* bufferedRawInput = new BBufferedDataIO(rawInput, kFileBufferSize, false, true);
+	ObjectDeleter<BDataIO> bufferedRawInputDeleter(bufferedRawInput);
+
 		// if the file extension ends with '.gz' then the data will be
 		// compressed and the algorithm needs to decompress the data as
 		// it is parsed.
@@ -208,7 +215,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 			= new BZlibDecompressionParameters();
 
 		status_t result = BZlibCompressionAlgorithm()
-			.CreateDecompressingInputStream(&rawInput,
+			.CreateDecompressingInputStream(bufferedRawInput,
 				zlibDecompressionParameters, gzDecompressedInput);
 
 		if (B_OK != result)
@@ -217,7 +224,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 		ObjectDeleter<BDataIO> gzDecompressedInputDeleter(gzDecompressedInput);
 		BPrivate::BJson::Parse(gzDecompressedInput, listener);
 	} else {
-		BPrivate::BJson::Parse(&rawInput, listener);
+		BPrivate::BJson::Parse(bufferedRawInput, listener);
 	}
 
 	return B_OK;

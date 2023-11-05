@@ -17,7 +17,7 @@ public:
 
 			void				TestReadBase64JwtClaims_1();
 			void				TestReadBase64JwtClaims_2();
-			void				TestCorrupt();
+			void				TestReadBase64Corrupt();
 
 	static	void				AddTests(BTestSuite& suite);
 };

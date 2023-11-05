@@ -85,7 +85,7 @@ DataIOUtilsTest::TestReadBase64JwtClaims_2()
 
 
 void
-DataIOUtilsTest::TestCorrupt()
+DataIOUtilsTest::TestReadBase64Corrupt()
 {
 	const char* jwtToken = "QW5k$mV3";
 		// note that '$' is not a valid base64 character
@@ -121,8 +121,8 @@ DataIOUtilsTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(
 		new CppUnit::TestCaller<DataIOUtilsTest>(
-			"DataIOUtilsTest::TestCorrupt",
-			&DataIOUtilsTest::TestCorrupt));
+			"DataIOUtilsTest::TestReadBase64Corrupt",
+			&DataIOUtilsTest::TestReadBase64Corrupt));
 
 	parent.addTest("DataIOUtilsTest", &suite);
 }
