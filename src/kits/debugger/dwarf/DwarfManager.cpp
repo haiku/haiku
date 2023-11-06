@@ -15,9 +15,9 @@
 #include "DwarfFileLoadingState.h"
 
 
-DwarfManager::DwarfManager(uint8 addressSize)
+DwarfManager::DwarfManager(uint8 addressSize, bool isBigEndian)
 	:
-	fAddressSize(addressSize),
+	fAddressSize(addressSize), fIsBigEndian(isBigEndian),
 	fLock("dwarf manager")
 {
 }
@@ -68,7 +68,7 @@ DwarfManager::LoadFile(const char* fileName, DwarfFileLoadingState& _state)
 		}
 	}
 
-	error = file->Load(fAddressSize, _state.locatedExternalInfoPath);
+	error = file->Load(fAddressSize, fIsBigEndian, _state.locatedExternalInfoPath);
 	if (error != B_OK) {
 		_state.state = DWARF_FILE_LOADING_STATE_FAILED;
 		return error;
@@ -92,7 +92,7 @@ DwarfManager::FinishLoading()
 
 	for (FileList::Iterator it = fFiles.GetIterator();
 			DwarfFile* file = it.Next();) {
-		status_t error = file->FinishLoading();
+		status_t error = file->FinishLoading(fAddressSize, fIsBigEndian);
 		if (error != B_OK)
 			return error;
 	}

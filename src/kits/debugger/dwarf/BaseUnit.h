@@ -31,7 +31,8 @@ public:
 									off_t contentOffset,
 									off_t totalSize,
 									off_t abbreviationOffset,
-									uint8 addressSize, bool isDwarf64);
+									uint8 addressSize, bool isBigEndian,
+									bool isDwarf64);
 	virtual						~BaseUnit();
 
 			off_t				HeaderOffset() const { return fHeaderOffset; }
@@ -48,6 +49,7 @@ public:
 			bool				ContainsAbsoluteOffset(off_t offset) const;
 
 			uint8				AddressSize() const	{ return fAddressSize; }
+			bool				IsBigEndian() const { return fIsBigEndian; }
 			bool				IsDwarf64() const	{ return fIsDwarf64; }
 
 			AbbreviationTable*	GetAbbreviationTable() const
@@ -79,6 +81,7 @@ private:
 			Array<DebugInfoEntry*> fEntries;
 			Array<off_t>		fEntryOffsets;
 			uint8				fAddressSize;
+			bool				fIsBigEndian;
 			bool				fIsDwarf64;
 };
 

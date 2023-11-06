@@ -14,7 +14,7 @@ public:
 	struct State;
 
 public:
-								LineNumberProgram(uint8 addressSize);
+								LineNumberProgram(uint8 addressSize, bool isBigEndian);
 								~LineNumberProgram();
 
 			status_t			Init(const void* program, size_t programSize,
@@ -39,6 +39,7 @@ private:
 			uint8				fLineRange;
 			uint8				fOpcodeBase;
 			uint8				fAddressSize;
+			bool				fIsBigEndian;
 			const uint8*		fStandardOpcodeLengths;
 };
 

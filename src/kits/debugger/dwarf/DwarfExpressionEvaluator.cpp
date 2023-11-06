@@ -38,10 +38,11 @@ static const uint32 kMaxOperationCount			= 10000;
 
 DwarfExpressionEvaluationContext::DwarfExpressionEvaluationContext(
 	const DwarfTargetInterface* targetInterface, uint8 addressSize,
-	target_addr_t relocationDelta)
+	bool isBigEndian, target_addr_t relocationDelta)
 	:
 	fTargetInterface(targetInterface),
 	fAddressSize(addressSize),
+	fIsBigEndian(isBigEndian),
 	fRelocationDelta(relocationDelta)
 {
 }
@@ -142,7 +143,7 @@ status_t
 DwarfExpressionEvaluator::Evaluate(const void* expression, size_t size,
 	target_addr_t& _result)
 {
-	fDataReader.SetTo(expression, size, fContext->AddressSize());
+	fDataReader.SetTo(expression, size, fContext->AddressSize(), fContext->IsBigEndian());
 
 	try {
 		status_t error = _Evaluate(NULL);
@@ -174,7 +175,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 		return _location.AddPiece(piece) ? B_OK : B_NO_MEMORY;
 	}
 
-	fDataReader.SetTo(expression, size, fContext->AddressSize());
+	fDataReader.SetTo(expression, size, fContext->AddressSize(), fContext->IsBigEndian());
 
 	// parse the first (and maybe only) expression
 	try {
@@ -223,7 +224,7 @@ DwarfExpressionEvaluator::EvaluateLocation(const void* expression, size_t size,
 		// Restrict the data reader to the remaining bytes to prevent jumping
 		// back.
 		fDataReader.SetTo(fDataReader.Data(), fDataReader.BytesRemaining(),
-			fDataReader.AddressSize());
+			fDataReader.AddressSize(), fDataReader.IsBigEndian());
 
 		try {
 			// push the object address, if any
@@ -803,7 +804,7 @@ DwarfExpressionEvaluator::_Call(uint64 offset, uint8 refType)
 	DataReader savedReader = fDataReader;
 
 	// set the reader to the target expression
-	fDataReader.SetTo(block, size, savedReader.AddressSize());
+	fDataReader.SetTo(block, size, savedReader.AddressSize(), savedReader.IsBigEndian());
 
 	// and evaluate it
 	try {

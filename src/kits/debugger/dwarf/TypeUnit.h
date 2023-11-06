@@ -23,6 +23,7 @@ public:
 									off_t abbreviationOffset,
 									off_t typeOffset,
 									uint8 addressSize,
+									bool isBigEndian,
 									uint64 typeSignature,
 									bool isDwarf64);
 								~TypeUnit();

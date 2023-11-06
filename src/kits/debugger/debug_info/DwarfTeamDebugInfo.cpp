@@ -50,7 +50,7 @@ DwarfTeamDebugInfo::~DwarfTeamDebugInfo()
 status_t
 DwarfTeamDebugInfo::Init()
 {
-	fManager = new(std::nothrow) DwarfManager(fArchitecture->AddressSize());
+	fManager = new(std::nothrow) DwarfManager(fArchitecture->AddressSize(), fArchitecture->IsBigEndian());
 	if (fManager == NULL)
 		return B_NO_MEMORY;
 

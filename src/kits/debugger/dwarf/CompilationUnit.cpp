@@ -29,15 +29,15 @@ struct CompilationUnit::File {
 
 CompilationUnit::CompilationUnit(off_t headerOffset, off_t contentOffset,
 	off_t totalSize, off_t abbreviationOffset, uint8 addressSize,
-	bool isDwarf64)
+	bool isBigEndian, bool isDwarf64)
 	:
 	BaseUnit(headerOffset, contentOffset, totalSize, abbreviationOffset,
-		addressSize, isDwarf64),
+		addressSize, isBigEndian, isDwarf64),
 	fUnitEntry(NULL),
 	fAddressRanges(NULL),
 	fDirectories(10, true),
 	fFiles(10, true),
-	fLineNumberProgram(addressSize)
+	fLineNumberProgram(addressSize, isBigEndian)
 {
 }
 

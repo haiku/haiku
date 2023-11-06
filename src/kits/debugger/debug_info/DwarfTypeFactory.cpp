@@ -626,7 +626,8 @@ DwarfTypeFactory::_CreatePrimitiveType(const BString& name,
 	if (byteSizeValue->IsValid()) {
 		BVariant value;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->GetCompilationUnit(),
+			fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
 			fTypeContext->SubprogramEntry(), byteSizeValue,
 			fTypeContext->TargetInterface(),
 			fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
@@ -636,7 +637,8 @@ DwarfTypeFactory::_CreatePrimitiveType(const BString& name,
 	} else if (bitSizeValue->IsValid()) {
 		BVariant value;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->GetCompilationUnit(),
+			fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
 			fTypeContext->SubprogramEntry(), bitSizeValue,
 			fTypeContext->TargetInterface(),
 			fTypeContext->InstructionPointer(), fTypeContext->FramePointer(),
@@ -989,7 +991,7 @@ DwarfTypeFactory::_CreateEnumerationType(const BString& name,
 			BVariant value;
 			status_t error = fTypeContext->File()->EvaluateConstantValue(
 				fTypeContext->GetCompilationUnit(),
-				fTypeContext->AddressSize(),
+				fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
 				fTypeContext->SubprogramEntry(), enumeratorEntry->ConstValue(),
 				fTypeContext->TargetInterface(),
 				fTypeContext->InstructionPointer(),
@@ -1036,7 +1038,8 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 		// evaluate it
 		DIEType* valueType;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->GetCompilationUnit(),
+			fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
 			fTypeContext->SubprogramEntry(),
 			lowerBoundOwnerEntry->LowerBound(),
 			fTypeContext->TargetInterface(),
@@ -1065,7 +1068,8 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 		// evaluate it
 		DIEType* valueType;
 		status_t error = fTypeContext->File()->EvaluateDynamicValue(
-			fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+			fTypeContext->GetCompilationUnit(),
+			fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
 			fTypeContext->SubprogramEntry(),
 			upperBoundOwnerEntry->UpperBound(),
 			fTypeContext->TargetInterface(),
@@ -1090,7 +1094,8 @@ DwarfTypeFactory::_CreateSubrangeType(const BString& name,
 			DIEType* valueType;
 			status_t error = fTypeContext->File()->EvaluateDynamicValue(
 				fTypeContext->GetCompilationUnit(),
-				fTypeContext->AddressSize(), fTypeContext->SubprogramEntry(),
+				fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
+				fTypeContext->SubprogramEntry(),
 				countOwnerEntry->Count(), fTypeContext->TargetInterface(),
 				fTypeContext->InstructionPointer(),
 				fTypeContext->FramePointer(), count, &valueType);
@@ -1396,7 +1401,8 @@ DwarfTypeFactory::_ResolveTypeByteSize(DIEType* typeEntry,
 	// get the actual value
 	BVariant size;
 	status_t error = fTypeContext->File()->EvaluateDynamicValue(
-		fTypeContext->GetCompilationUnit(), fTypeContext->AddressSize(),
+		fTypeContext->GetCompilationUnit(),
+		fTypeContext->AddressSize(), fTypeContext->IsBigEndian(),
 		fTypeContext->SubprogramEntry(), sizeValue,
 		fTypeContext->TargetInterface(), fTypeContext->InstructionPointer(),
 		fTypeContext->FramePointer(), size);

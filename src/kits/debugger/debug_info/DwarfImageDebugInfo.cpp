@@ -648,8 +648,10 @@ DwarfImageDebugInfo::CreateFrame(Image* image,
 	target_addr_t framePointer;
 	CompilationUnit* unit = function != NULL ? function->GetCompilationUnit()
 			: NULL;
-	error = fFile->UnwindCallFrame(unit, fArchitecture->AddressSize(), entry,
-		instructionPointer, inputInterface, outputInterface, framePointer);
+	error = fFile->UnwindCallFrame(unit,
+		fArchitecture->AddressSize(), fArchitecture->IsBigEndian(),
+		entry, instructionPointer, inputInterface, outputInterface,
+		framePointer);
 
 	if (error != B_OK) {
 		TRACE_CFI("Failed to unwind call frame: %s\n", strerror(error));

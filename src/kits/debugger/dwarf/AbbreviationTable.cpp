@@ -44,8 +44,8 @@ AbbreviationTable::Init(const void* section, off_t sectionSize)
 	if (error != B_OK)
 		return error;
 
-	DataReader abbrevReader(fData, fSize, 4);
-		// address size doesn't matter here
+	DataReader abbrevReader(fData, fSize, 4, false);
+		// address size and endianness don't matter here
 
 	while (true) {
 		bool nullEntry;

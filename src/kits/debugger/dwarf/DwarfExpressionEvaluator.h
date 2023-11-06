@@ -20,12 +20,14 @@ public:
 								DwarfExpressionEvaluationContext(
 									const DwarfTargetInterface* targetInterface,
 									uint8 addressSize,
+									bool isBigEndian,
 									target_addr_t relocationDelta);
 	virtual						~DwarfExpressionEvaluationContext();
 
 			const DwarfTargetInterface* TargetInterface() const
 									{ return fTargetInterface; }
 			uint8				AddressSize() const	{ return fAddressSize; }
+			bool				IsBigEndian() const { return fIsBigEndian; }
 
 			target_addr_t			RelocationDelta() const
 									{ return fRelocationDelta; }
@@ -48,6 +50,7 @@ public:
 protected:
 			const DwarfTargetInterface* fTargetInterface;
 			uint8				fAddressSize;
+			bool				fIsBigEndian;
 			target_addr_t		fRelocationDelta;
 };
 

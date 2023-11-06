@@ -17,7 +17,7 @@ struct DwarfFileLoadingState;
 
 class DwarfManager {
 public:
-								DwarfManager(uint8 addressSize);
+								DwarfManager(uint8 addressSize, bool isBigEndian);
 								~DwarfManager();
 
 			status_t			Init();
@@ -37,6 +37,7 @@ private:
 
 private:
 			uint8				fAddressSize;
+			bool				fIsBigEndian;
 			BLocker				fLock;
 			FileList			fFiles;
 };

@@ -14,7 +14,7 @@
 
 BaseUnit::BaseUnit(off_t headerOffset, off_t contentOffset,
 	off_t totalSize, off_t abbreviationOffset, uint8 addressSize,
-	bool isDwarf64)
+	bool isBigEndian, bool isDwarf64)
 	:
 	fHeaderOffset(headerOffset),
 	fContentOffset(contentOffset),
@@ -22,6 +22,7 @@ BaseUnit::BaseUnit(off_t headerOffset, off_t contentOffset,
 	fAbbreviationOffset(abbreviationOffset),
 	fAbbreviationTable(NULL),
 	fAddressSize(addressSize),
+	fIsBigEndian(isBigEndian),
 	fIsDwarf64(isDwarf64)
 {
 }

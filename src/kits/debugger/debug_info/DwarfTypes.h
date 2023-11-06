@@ -82,6 +82,7 @@ public:
 			RegisterMap*		FromDwarfRegisterMap() const
 									{ return fFromDwarfRegisterMap; }
 			uint8			AddressSize() const;
+			bool			IsBigEndian() const;
 
 private:
 			Architecture*		fArchitecture;

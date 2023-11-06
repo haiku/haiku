@@ -19,7 +19,7 @@ static const uint8 kLineNumberStandardOpcodeOperands[]
 static const uint32 kLineNumberStandardOpcodeCount = 12;
 
 
-LineNumberProgram::LineNumberProgram(uint8 addressSize)
+LineNumberProgram::LineNumberProgram(uint8 addressSize, bool isBigEndian)
 	:
 	fProgram(NULL),
 	fProgramSize(0),
@@ -29,6 +29,7 @@ LineNumberProgram::LineNumberProgram(uint8 addressSize)
 	fLineRange(0),
 	fOpcodeBase(0),
 	fAddressSize(addressSize),
+	fIsBigEndian(isBigEndian),
 	fStandardOpcodeLengths(NULL)
 {
 }
@@ -75,7 +76,7 @@ LineNumberProgram::GetInitialState(State& state) const
 		return;
 
 	_SetToInitial(state);
-	state.dataReader.SetTo(fProgram, fProgramSize, fAddressSize);
+	state.dataReader.SetTo(fProgram, fProgramSize, fAddressSize, fIsBigEndian);
 }
 
 

@@ -11,10 +11,10 @@
 
 TypeUnit::TypeUnit(off_t headerOffset, off_t contentOffset,
 	off_t totalSize, off_t abbreviationOffset, off_t typeOffset,
-	uint8 addressSize, uint64 signature, bool isDwarf64)
+	uint8 addressSize, bool isBigEndian, uint64 signature, bool isDwarf64)
 	:
 	BaseUnit(headerOffset, contentOffset, totalSize, abbreviationOffset,
-		addressSize, isDwarf64),
+		addressSize, isBigEndian, isDwarf64),
 	fUnitEntry(NULL),
 	fTypeEntry(NULL),
 	fSignature(signature),

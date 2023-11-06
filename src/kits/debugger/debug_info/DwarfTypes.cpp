@@ -174,6 +174,14 @@ DwarfTypeContext::AddressSize() const
 }
 
 
+bool
+DwarfTypeContext::IsBigEndian() const
+{
+	return fCompilationUnit != NULL ? fCompilationUnit->IsBigEndian()
+		: fArchitecture->IsBigEndian();
+}
+
+
 // #pragma mark - DwarfType
 
 
@@ -374,7 +382,8 @@ DwarfType::ResolveLocation(DwarfTypeContext* typeContext,
 	bool hasObjectAddress, ValueLocation& _location)
 {
 	status_t error = typeContext->File()->ResolveLocation(
-		typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+		typeContext->GetCompilationUnit(),
+		typeContext->AddressSize(), typeContext->IsBigEndian(),
 		typeContext->SubprogramEntry(), description,
 		typeContext->TargetInterface(), typeContext->InstructionPointer(),
 		objectAddress, hasObjectAddress, typeContext->FramePointer(),
@@ -785,7 +794,8 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	if (memberEntry->ByteSize()->IsValid()) {
 		BVariant value;
 		error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->GetCompilationUnit(),
+			typeContext->AddressSize(), typeContext->IsBigEndian(),
 			typeContext->SubprogramEntry(), memberEntry->ByteSize(),
 			typeContext->TargetInterface(), typeContext->InstructionPointer(),
 			typeContext->FramePointer(), value);
@@ -800,7 +810,8 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	if (memberEntry->BitOffset()->IsValid()) {
 		BVariant value;
 		error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->GetCompilationUnit(),
+			typeContext->AddressSize(), typeContext->IsBigEndian(),
 			typeContext->SubprogramEntry(), memberEntry->BitOffset(),
 			typeContext->TargetInterface(), typeContext->InstructionPointer(),
 			typeContext->FramePointer(), value);
@@ -814,7 +825,8 @@ DwarfCompoundType::ResolveDataMemberLocation(DataMember* _member,
 	if (memberEntry->BitSize()->IsValid()) {
 		BVariant value;
 		error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->GetCompilationUnit(),
+			typeContext->AddressSize(), typeContext->IsBigEndian(),
 			typeContext->SubprogramEntry(), memberEntry->BitSize(),
 			typeContext->TargetInterface(), typeContext->InstructionPointer(),
 			typeContext->FramePointer(), value);
@@ -1037,7 +1049,8 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 			fEntry, HasBitStridePredicate<DIEArrayType>()))) {
 		BVariant value;
 		status_t error = typeContext->File()->EvaluateDynamicValue(
-			typeContext->GetCompilationUnit(), typeContext->AddressSize(),
+			typeContext->GetCompilationUnit(),
+			typeContext->AddressSize(), typeContext->IsBigEndian(),
 			typeContext->SubprogramEntry(), bitStrideOwnerEntry->BitStride(),
 			typeContext->TargetInterface(), typeContext->InstructionPointer(),
 			typeContext->FramePointer(), value);
@@ -1073,7 +1086,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 				BVariant value;
 				status_t error = typeContext->File()->EvaluateDynamicValue(
 					typeContext->GetCompilationUnit(),
-					typeContext->AddressSize(),
+					typeContext->AddressSize(), typeContext->IsBigEndian(),
 					typeContext->SubprogramEntry(),
 					bitStrideOwnerEntry->BitStride(),
 					typeContext->TargetInterface(),
@@ -1092,7 +1105,7 @@ DwarfArrayType::ResolveElementLocation(const ArrayIndexPath& indexPath,
 					BVariant value;
 					status_t error = typeContext->File()->EvaluateDynamicValue(
 						typeContext->GetCompilationUnit(),
-						typeContext->AddressSize(),
+						typeContext->AddressSize(), typeContext->IsBigEndian(),
 						typeContext->SubprogramEntry(),
 						byteStrideOwnerEntry->ByteStride(),
 						typeContext->TargetInterface(),
