@@ -45,6 +45,7 @@ void *VirtFromPhys(uint64_t physAdr)
 }
 
 
+#ifdef TRACE_MEMORY_MAP
 static uint64_t
 SignExtendVirtAdr(uint64_t virtAdr)
 {
@@ -143,6 +144,7 @@ DumpPageTable(uint64 satp)
 
 	return 0;
 }
+#endif /* TRACE_MEMORY_MAP */
 
 
 static Pte*
@@ -399,7 +401,6 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descript
 	}
 	TRACE("Boot loader stack\n");
 	addr_t sp = Sp();
-	addr_t stackTop = ROUNDDOWN(sp - 1024*64, B_PAGE_SIZE);
 	TRACE("  SP: %#" B_PRIxADDR "\n", sp);
 
 	// EFI runtime services
@@ -439,7 +440,9 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descript
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
 
+	#ifdef TRACE_MEMORY_MAP
 	DumpPageTable(GetSatp());
+	#endif
 
 	return GetSatp();
 }
