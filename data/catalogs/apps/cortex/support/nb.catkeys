@@ -1,2 +1,7 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	2112384259
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	799446957
 Recording	MediaString		Opptak
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+YUV444	MediaString		YUV444
+QuickTime	MediaString		QuickTime
+(unknown video format)	MediaString		(ukjent videoformat)

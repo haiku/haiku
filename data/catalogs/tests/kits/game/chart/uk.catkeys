@@ -1,23 +1,24 @@
-1	ukrainian	x-vnd.Haiku-ChartDemo	3491540808
-(high) 100% 	ChartWindow		(високий) 100% 
+1	ukrainian	x-vnd.Haiku-ChartDemo	446404305
+(high) 100% 	ChartWindow		(висока) 100% 
 Spiral	ChartWindow		Спіраль
 Orange	ChartWindow		Оранжевий
-Display:	ChartWindow		Показати:
+Display:	ChartWindow		Рендеринг:
 Pink	ChartWindow		Рожевий
 Animation:	ChartWindow		Анімація:
 Auto demo	ChartWindow		АвтоДемо
+ 0.6 f/s  (logarithmic scale)	ChartWindow		 0.6 к/с  (логарифмічна шкала)
 Red	ChartWindow		Червоний
-None	ChartWindow		Пусто
-600.0 f/s	ChartWindow		600.0 f/s
+None	ChartWindow		Відсутні
+600.0 f/s	ChartWindow		600.0 к/с
 Fast motion	ChartWindow		Швидкий рух
-Special	ChartWindow		Особливий
+Special	ChartWindow		Ефекти
 White	ChartWindow		Білий
 Star density	ChartWindow		Щільність зірок
 Chaos	ChartWindow		Хаос
 Amas	ChartWindow		Amas
 Yellow	ChartWindow		Жовтий
 Frames/s	ChartWindow		Кадрів/с
-CPU load	ChartWindow		Завантаження процесора
+CPU load	ChartWindow		Навантаження ЦП
 Green	ChartWindow		Зелений
 Colors	ChartWindow		Кольори
 Refresh rate	ChartWindow		Частота оновлення
@@ -27,12 +28,12 @@ Off	ChartWindow		Вимкнути
 Battle	ChartWindow		Битва
 Blue	ChartWindow		Блакитний
 Slow rotation	ChartWindow		Повільне обертання
-Novas	ChartWindow		Нові зорі
+Novas	ChartWindow		Наднова́
 Slow motion	ChartWindow		Повільний рух
 Comet	ChartWindow		Комета
 2 threads	ChartWindow		2 потоки
 DrawBitmap	ChartWindow		DrawBitmap
-LineArray	ChartWindow		Масив ліній
+LineArray	ChartWindow		LineArray
  5% (low)	ChartWindow		 5% (низька)
 DirectWindow	ChartWindow		DirectWindow
 Free motion	ChartWindow		Вільний рух

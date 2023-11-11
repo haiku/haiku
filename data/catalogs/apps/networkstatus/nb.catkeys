@@ -9,7 +9,7 @@ Open network preferences…	NetworkStatusView		Åpne Nettverksinnstillinger
 NetworkStatus	System name		Nettverkstatus
 Broadcast:	NetworkStatusView		Kringkast:
 OK	NetworkStatusView		OK
-No link	NetworkStatusView		Ingen lenke
+No link	NetworkStatusView		Ingen forbindelse
 Could not join wireless network:\n	NetworkStatusView		Kunne ikke koble på trådløst nettverk:\n
 Ready	NetworkStatusView		Klar
 Network Status	NetworkStatusView		Nettverksstatus

@@ -31,7 +31,7 @@ Description	FileTypes Window		Descrizion
 Signature:	Application Types Window		Firme:
 None	FileTypes Window		Nissun
 Exclusive launch	Application Type Window		Inviament esclusîf
-Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Gjavâ un gjenar di file e je une azion che no si pues anulâ.\nGjavâle pardabon?
+Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		La rimozion di un gjenar di file e je une azion definitive, che nol è pussibil anulâ.\nGjavâle pardabon?
 Integer 64 bit	Attribute ListView		Intîr a 64 bit
 Cancel	New File Type Window		Anule
 Select same preferred application as	FileType Window		Selezione la stesse aplicazion preferide di

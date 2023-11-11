@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-NewMailNotification	2220310168
+1	ukrainian	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Вікно журналу
 none	NotifierConfigView		пусто
 Alert	NotifierConfigView		Оповіщення
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Головне оповіщення
 Beep	NotifierConfigView		Сигнал
 Central beep	NotifierConfigView		Головний сигнал
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Одне нове повідомлення} few{# нових повідомлення} other{# нових повідомлень}}
+New mail notification	NotifierFilter		Сповіщення про нову пошту
 New messages	NotifierFilter		Нові повідомлення
 Method:	NotifierConfigView		Метод:
 Keyboard LEDs	NotifierConfigView		Індикатори клавіатури

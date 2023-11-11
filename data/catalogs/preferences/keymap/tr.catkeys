@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	2850776429
+1	turkish	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
@@ -30,6 +30,7 @@ US-International	KeymapNames		Birleşik Devletler-Uluslararası
 Right option	Keyboard Layout View		Sağ Seçenek
 Turkish (Type-Q)	KeymapNames		Türkçe (Q)
 Revert	Modifier keys window		Eski haline döndür
+Caps:	Modifier keys window	Caps key role name	Büyük harf:
 Slovak	KeymapNames		Slovakça
 CAPS LOCK	Keyboard Layout View		BÜYÜK HARF
 Colemak	KeymapNames		Colemak
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Flamanca (virgül)
 Norwegian	KeymapNames		Norveççe
 Font	Keymap window		Yazıtipi
 Danish	KeymapNames		Danca
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Büyük harf düğmesi
 Generic 104-key	KeyboardLayoutNames		Standart 104 düğmeli
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Üst Karakter düğmesi
 Russian	KeymapNames		Rusça

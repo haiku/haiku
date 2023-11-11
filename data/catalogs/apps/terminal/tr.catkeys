@@ -1,8 +1,9 @@
-1	turkish	x-vnd.Haiku-Terminal	185459086
+1	turkish	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Uçbirim kabuğu başlatamadı. Üzgünüz.
 Text encoding	Terminal TermWindow		Metin kodlaması
+Colors	Terminal ThemeWindow		Renkler
 OK	Terminal SetTitleWindow		Tamam
 Edit	Terminal TermWindow		Düzen
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h, --help              bu yardımı yazdır\n  -t, --title             pencere başlığını ayarla\n  -f, --fullscreen        tam ekranı başlat\n  -w, --working-directory başlangıç çalışma dizinini ayarla\n

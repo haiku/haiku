@@ -24,7 +24,7 @@ package %source% conflicts with %dependency% provided by %target%	SolverProblem	
 do something	SolverProblemSolution		fâs alc
 install %selection% despite its old version	SolverProblemSolution		instale %selection% ancje se e je une version vecje
 cannot install both %source% and %target%	SolverProblem		impussibil instalâ sedi %source% che %target%
-package %source% is not installable	SolverProblem		il pachet %source% no si pues instalâ
+package %source% is not installable	SolverProblem		il pachet %source% nol è un di chei che si pues instalâ
 problem with installed package %source%	SolverProblem		probleme cul pachet instalât %source%
 allow deinstallation of %source%	SolverProblemSolution		permet la disinstalazion di %source%
 keep %source% from excluded repository	SolverProblemSolution		ten %source% dal dipuesit escludût

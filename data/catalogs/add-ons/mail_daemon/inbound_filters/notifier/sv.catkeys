@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-NewMailNotification	2220310168
+1	swedish	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Loggfönster
 none	NotifierConfigView		inga
 Alert	NotifierConfigView		Avisering
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Central avisering
 Beep	NotifierConfigView		Pip
 Central beep	NotifierConfigView		Centralt pip
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Ett nytt meddelande} other{# nya meddelanden}}
+New mail notification	NotifierFilter		Nytt e-postmeddelande
 New messages	NotifierFilter		Nya meddelanden
 Method:	NotifierConfigView		Metod:
 Keyboard LEDs	NotifierConfigView		Tangentbords LEDs

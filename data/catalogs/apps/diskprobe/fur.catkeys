@@ -15,7 +15,7 @@ Text	TypeEditors	This is the type of editor	Test
 File offset: 	ProbeView		Spostament file: 
 Add	ProbeView		Zonte
 64 bit signed value:	TypeEditors		Valôr cun segn a 64 bit:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Gjavâ par dabon l'atribût \"%s\" dal file \"%s\"?\n\nNo si pues tornâ indaûr di cheste azion.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Gjavâ par dabon l'atribût \"%s\" dal file \"%s\"?\n\nNol sarà pussibil tornâ indaûr di cheste azion.
 No type editor available	AttributeWindow		Nissun editôr di gjenars disponibii
 Print…	ProbeView		Stampe…
 New…	FileWindow		Gnûf…

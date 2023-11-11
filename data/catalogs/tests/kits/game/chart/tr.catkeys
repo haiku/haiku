@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ChartDemo	3491540808
+1	turkish	x-vnd.Haiku-ChartDemo	446404305
 (high) 100% 	ChartWindow		(yüksek) %100 
 Spiral	ChartWindow		Sarmal
 Orange	ChartWindow		Turuncu
@@ -6,6 +6,7 @@ Display:	ChartWindow		Ekran
 Pink	ChartWindow		Pembe
 Animation:	ChartWindow		Canlandırma:
 Auto demo	ChartWindow		Otomatik demo
+ 0.6 f/s  (logarithmic scale)	ChartWindow		 0,6 k/sn  (logaritmik ölçek)
 Red	ChartWindow		Kırmızı
 None	ChartWindow		Yok
 600.0 f/s	ChartWindow		600.0 k/sn

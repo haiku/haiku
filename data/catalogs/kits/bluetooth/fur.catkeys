@@ -58,7 +58,7 @@ Loudspeaker	DeviceClass		Casse
 SIM card reader	DeviceClass		Letôr schedis SIM
 Computer	DeviceClass		Computer
 Scanner	DeviceClass		Scansionadôr
-Wearable	DeviceClass	A wearable computer	Si pues meti intôr
+Wearable	DeviceClass	A wearable computer	Si pues meti intor
 Display	DeviceClass		Visôr
 Gamepad	DeviceClass		Gamepad
 Video monitor	DeviceClass		Visôr

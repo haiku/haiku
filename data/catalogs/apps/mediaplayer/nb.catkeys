@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	2712688152
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	2220232089
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -73,6 +73,7 @@ Low volume	MediaPlayer-SettingsWindow		Lavt volum
 Audio	MediaPlayer-Main		Lyd
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
 Quit	MediaPlayer-Main		Avslutt
+Redo	MediaPlayer-PlaylistWindow		Gjenta
 Large	MediaPlayer-SettingsWindow		Stor
 unknown format	MediaPlayer-InfoWin		ukjent format
 200% scale	MediaPlayer-Main		200% forstørrelse

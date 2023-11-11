@@ -27,7 +27,7 @@ Help	SudokuWindow		Jutori
 OK	SudokuWindow		Va ben
 Sudoku	System name		Sudoku
 Progress monitor	ProgressWindow		Control di avanzament
-Creating solvable field	SudokuGenerator		Daûr a creâ il cjamp che si pues risolvi
+Creating solvable field	SudokuGenerator		Creazion di un cjamp che si pues risolvi
 View	SudokuWindow		Visualize
 Snapshot current	SudokuWindow		Istantanie atuâl
 Mark valid hints	SudokuWindow		Segne sugjeriments valits

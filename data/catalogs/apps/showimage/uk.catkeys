@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	3998703664
+1	ukrainian	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		ShowImage
 Page setup…	Menus		Налаштування сторінки…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) був змінений. Закрити його?
@@ -45,6 +45,7 @@ Job setup	PrintOptionsWindow		Завдання для друку
 Clear selection	Menus		Зняти виділення
 Rotate clockwise	Menus		Повернути за годинником
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Неможливо завантажити зображення! Або файл або транслятор зображень для нього не існує.
+Open with…	Menus		Відкрити з…
 Rotate counterclockwise	Menus		Повернути проти годинника
 Previous page	Menus		Попередня сторінка
 Fit to window	Menus		Припасувати до вікна

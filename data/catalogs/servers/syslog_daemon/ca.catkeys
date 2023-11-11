@@ -1,3 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-SystemLogger	239668711
+1	catalan; valencian	x-vnd.Haiku-SystemLogger	2600925901
 Syslog Daemon	SyslogDaemon		Dimoni del registre del sistema (Syslog)
 OK	SyslogDaemon		D'acord
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nAquest dimoni recull tots els missatges del sistema i els escriu al registre de tot el sistema a \"%s\".\n\n

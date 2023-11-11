@@ -1,6 +1,6 @@
 1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet-enhet
-Link speed:	IntefaceView		Koblingshastighet:
+Link speed:	IntefaceView		Tilkoblingshastighet
 disconnected	IntefaceView		frakoblet
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Nettverk:

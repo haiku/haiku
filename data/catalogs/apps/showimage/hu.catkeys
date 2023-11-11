@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	3998703664
+1	hungarian	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		Képmegjelenítő
 Page setup…	Menus		Oldalbeállítás…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
@@ -45,6 +45,7 @@ Job setup	PrintOptionsWindow		Feladatbeállítás
 Clear selection	Menus		Kijelölés törlése
 Rotate clockwise	Menus		Forgatás az óramutató irányába
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nem sikerült betölteni a képet! Vagy a fájl, vagy annak egy értelmezője nincs meg.
+Open with…	Menus		Megnyitás ezzel…
 Rotate counterclockwise	Menus		Óramutató járásával ellentétes irányú forgatás
 Previous page	Menus		Előző oldal
 Fit to window	Menus		Illesztés az ablakhoz

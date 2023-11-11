@@ -111,7 +111,7 @@ none	Audio track menu		пусто
 Open network stream	MediaPlayer-NetworkStream		Відкрити мережевий потік
 Automatically start playing	MediaPlayer-SettingsWindow		Почати відтворення автоматично
 Undo	MediaPlayer-PlaylistWindow		Відкат дії
-Display mode	MediaPlayer-InfoWin		Режим показу
+Display mode	MediaPlayer-InfoWin		Метод виводу
 Bottom of video	MediaPlayer-SettingsWindow		Нижня частина відео
 Small	MediaPlayer-SettingsWindow		Малий
 Settings…	MediaPlayer-Main		Налаштування…

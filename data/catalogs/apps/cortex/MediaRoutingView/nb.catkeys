@@ -1,9 +1,18 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.MediaRoutingView	2301341410
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.MediaRoutingView	3116660484
+Lock group	MediaNodePanel		Lås gruppe
 %refname% (no file)	MediaNodePanel		%refname% (ingen fil)
+Video output	MediaRoutingView		Videoutgang
 Icon view	MediaRoutingView		Ikonvisning
 OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		Syklus
 Advanced	MediaNodePanel		Avansert
 Audio input	MediaRoutingView		Lydkilde
+Run mode	MediaNodePanel		Kjøremodus
+Could not load '%filename%'	MediaRoutingView		Kunne ikke laste '%filename%'
+Stop time source	MediaNodePanel		Stop tidskilde
+Be Audio Mixer	MediaRoutingView		Be LydMikser
+Video input	MediaRoutingView		Videoinngang
+Release	MediaNodePanel		Løs ut
 Disconnect	MediaRoutingView		Koble fra
 Could not disconnect	MediaRoutingView		Kunne ikke koble fra
 Mini icon view	MediaRoutingView		Miniikonvisning

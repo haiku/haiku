@@ -14,7 +14,7 @@ Long format:	TimeFormatSettings		Formât lunc:
 Numbers	TimeFormatSettings		Numars
 Available languages	Locale Preflet Window		Lenghis disponibilis
 Locale	Locale Preflet		Localizazion
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Impussibil cjatâ la liste des lenghis disponibilis! No si pues doprâ chest preflet!
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Impussibil cjatâ la liste des lenghis disponibilis! No tu puedis doprâ chest preflet!
 Formatting	Locale Preflet Window		Formatazion
 Use month/day-names from preferred language	TimeFormatSettings		Dopre nons mês/dîs de lenghe preferide
 already chosen	LanguageListView		za sielt

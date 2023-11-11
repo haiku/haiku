@@ -19,7 +19,7 @@ Kind:	InfoWindow		Gjenar:
 contains	FindPanel		al conten
 Open	FilePanelPriv		Vierç
 Bitmap icon	AttributesView		Icone Bitmap
-You can't replace a folder with one of its sub-folders.	FSUtils		No si pues sostituî une cartele cuntune des sôs sot-cartelis.
+You can't replace a folder with one of its sub-folders.	FSUtils		No tu puedis sostituî une cartele cun une des sôs sot-cartelis.
 Select…	VirtualDirectoryWindow		Selezione…
 Name	Default Query Columns		Non
 Unmount	ContainerWindow		Dismonte
@@ -36,7 +36,7 @@ Prompt	FSUtils		Domande
 Error in regular expression:\n\n'%errstring'	PoseView		Erôr te espression regolâr:\n\n'%errstring'
 Small bitmap icon	AttributesView		Icone bitmap piçule
 Would you like to find a suitable application to open the file?	FSUtils		Cjatâ une aplicazion adate par vierzi il file?
-You cannot replace a folder or a symbolic link with a file.	FSUtils		No si pues sostituî une cartele o un colegament simbolic cuntun file.
+You cannot replace a folder or a symbolic link with a file.	FSUtils		No tu puedis sostituî une cartele o un colegament simbolic cuntun file.
 (unknown)	InfoWindow		(no cognossût)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datis>}}
 Trailing \\.	libtracker		\\ ae fin.
@@ -66,7 +66,7 @@ system	B_SYSTEM_DIRECTORY		sisteme
 Preparing to delete items…	StatusWindow		Daûr a prontâ la eliminazion dai elements…
 Open %name with:	OpenWithWindow		Vierç %name cun:
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" nol è un eseguibil supuartât.
-You cannot copy or move the root directory.	FSUtils		No si pues copiâ o spostâ la cartele lidrîs.
+You cannot copy or move the root directory.	FSUtils		No tu puedis copiâ o spostâ la cartele lidrîs.
 Plain text	AttributesView		Test sempliç
 Capacity:	InfoWindow		Capacitât:
 File	ContainerWindow		File
@@ -150,7 +150,7 @@ Location	QueryPoseView		Posizion
 Edit query	ContainerWindow		Modifiche interogazion
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# byte)}}
 Previously mounted disks	AutoMounterSettings		Discs montâts in precedence
-You cannot replace a file with a folder or a symbolic link.	FSUtils		No si pues sostituî un file cuntune cartele o un colegament simbolic.
+You cannot replace a file with a folder or a symbolic link.	FSUtils		No tu puedis sostituî un file cuntune cartele o un colegament simbolic.
 The target disk does not support creating links.	FSUtils		Il disc di destinazion nol supuarte la creazion di colegaments.
 develop	B_SYSTEM_DEVELOP_DIRECTORY		disvilup
 64-bit integer	AttributesView		Intîr a 64 bit
@@ -167,7 +167,7 @@ Media parameter group	AttributesView		Grup di parametris multimediâi
 %name info	InfoWindow	InfoWindow Title	Informazions su %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele home (chê personâl), %osName al podarès funzionâ mâl!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"Sposte\".
 Property info	AttributesView		Informazions de proprietât
-Sorry, you can't create links in the Trash.	PoseView		No si pues creâ un colegament te Scovacere.
+Sorry, you can't create links in the Trash.	PoseView		No tu puedis creâ un colegament te Scovacere.
 From	Email Query Columns		Di
 Invert selection	QueryContainerWindow		Invertìs selezion
 Open selection with:	OpenWithWindow		Vierç selezion cun:
@@ -199,7 +199,7 @@ Keywords	Bookmark Query Columns		Peraulis clâf
 Media parameter web	AttributesView		Parametri multimediâl web
 Copy more	ContainerWindow		Copie ancjemò
 by name	FindPanel		par non
-Sorry, you can't save things at the root of your system.	FilePanelPriv		Mi displâs, ma no si pues salvâ robis te lidrîs dal sisteme.
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Mi displâs, ma no tu puedis salvâ robis te lidrîs dal sisteme.
 Restore	ContainerWindow		Ripristine
 Location	ContainerWindow		Posizion
 Warning space color	SettingsView		Colôr aree di avertiment
@@ -217,7 +217,7 @@ File	FilePanelPriv		File
 Search	FindPanel		Cîr
 Modified:	InfoWindow		Modificât ai:
 Cancel	FilePanelPriv		Anule
-Sorry, you cannot edit that attribute.	WidgetAttributeText		No si pues modificâ chest atribût.
+Sorry, you cannot edit that attribute.	WidgetAttributeText		No tu puedis modificâ chest atribût.
 Memory pointer	AttributesView		Pontadôr di memorie
 Cancel	OpenWithWindow		Anule
 Select…	DeskWindow		Selezione…
@@ -278,7 +278,7 @@ no supporting apps	OpenWithWindow		nissune aplicazion supuartade
 Preparing to empty Trash…	StatusWindow		Preparazions par disvuedâ la Scovacere…
 Deleting: 	StatusWindow		Eliminazion: 
 the MIME settings	FSUtils		lis impostazions MIME
-You can't move or copy the trash.	FSUtils		No si pues spostâ o copiâ la Scovacere.
+You can't move or copy the trash.	FSUtils		No tu puedis spostâ o copiâ la Scovacere.
 label too long	PoseView		etichete masse lungje
 Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%name\".
 Unknown	FilePermissionsView		No cognossût
@@ -310,7 +310,7 @@ Error moving \"%name\".	FSUtils		Erôr tal spostâ \"%name\".
 Select…	QueryContainerWindow		Selezione…
 Open	ContainerWindow		Vierç
 Settings…	MountMenu		Impostazions…
-You cannot put the selected item(s) into the trash.	FSUtils		No si pues butâ l'element(s) selezionât(s) te scovacere.
+You cannot put the selected item(s) into the trash.	FSUtils		No tu puedis butâ l'element(s) selezionât(s) te scovacere.
 Increase size	DeskWindow		Aumente dimensions
 starts with	SelectionWindow		al tache cun
 Any	AttributesView		Cualsisei
@@ -365,7 +365,7 @@ File offset	AttributesView		Deviazion file
 Name = %name	FindPanel	FindResultTitle	Non = %name
 Subject	Email Query Columns		Ogjet
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ la cartele \"%name\":\n\t%error\n\nContinuâ?
-You cannot create a link to the root directory.	FSUtils		No si pues creâ un colegament ae cartele lidrîs.
+You cannot create a link to the root directory.	FSUtils		No tu puedis creâ un colegament ae cartele lidrîs.
 Select all	FilePanelPriv		Selezione dut
 Other	FilePermissionsView		Altri
 Automatic disk mounting	AutoMounterSettings		Montaç automatic dai discs
@@ -390,11 +390,11 @@ link	FSUtils	filename link	colegament
 16-bit unsigned integer	AttributesView		Intîr cence segn a 16 bit
 Proceed	FSUtils		Procêt
 Edit favorites…	FilePanelPriv		Modifiche preferîts…
-You can't move a folder into itself or any of its own sub-folders.	FSUtils		No si pues spostâ une cartele dentri se stesse o cualsisei des sôs sot-cartelis. 
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		No tu puedis spostâ une cartele dentri se stesse o cualsisei altre des sôs sot-cartelis. 
 New	ContainerWindow		Gnûf
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Si scugne strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si modifiche %target, %osName al funzionarà mâl!\n\nContinuâ pardabon?
-Sorry, you can't copy items to the Trash.	FSClipBoard		No si pues copiâ i elements te Scovacere.
+Sorry, you can't copy items to the Trash.	FSClipBoard		No tu puedis copiâ i elements te Scovacere.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Cualchi element al esist za in cheste cartele cui stes non di chei che si sta %verb.\n \nSostituîju cun chei che si sta %verb o domandâ par ogniun di lôr?
 When	Email Query Columns		Cuant
 Object	AttributesView		Ogjet
@@ -499,7 +499,7 @@ Cancel	PoseView		Anule
 Delete	PoseView		Elimine
 Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".
-Sorry, you can't copy items to the Trash.	PoseView		Nol è pussibil copiâ i elements te Scovacere.
+Sorry, you can't copy items to the Trash.	PoseView		No tu puedis copiâ i elements inte Scovacere.
 Invert selection	VirtualDirectoryWindow		Invertìs selezion
 New folder	FilePanelPriv		Gnove cartele
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# element} other{# elements}}

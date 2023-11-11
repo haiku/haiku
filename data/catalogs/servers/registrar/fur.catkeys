@@ -11,7 +11,7 @@ Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		La 
 Asking background applications to quit.	ShutdownProcess		Al ven domandât aes aplicazions in sotfont di sierâsi.
 Do you really want to restart the system?	ShutdownProcess		Tornâ a inviâ pardabon il sisteme?
 Restart	ShutdownProcess		Torne invie
-It's now safe to turn off the computer.	ShutdownProcess		Cumò si pues distudâ il computer.
+It's now safe to turn off the computer.	ShutdownProcess		Cumò tu puedis distudâ il computer.
 Asking other processes to quit.	ShutdownProcess		In spiete che si sierin chei altris procès.
 Cancel shutdown	ShutdownProcess		Anule arest
 Restarting…	ShutdownProcess		Daûr a tornâ a inviâ…
@@ -20,4 +20,4 @@ Tidying things up a bit.	ShutdownProcess		Si met un pôc in ordin lis robis.
 Kill application	ShutdownProcess		Cope la aplicazion
 Shutdown aborted	ShutdownProcess		Distudament interot
 Shutting down…	ShutdownProcess		Daûr a distudâ…
-Asking \"%appName%\" to quit.	ShutdownProcess		Al ven domandât a \"%appName%\" di jessî.
+Asking \"%appName%\" to quit.	ShutdownProcess		Daûr a domandâ a \"%appName%\" di jessî.

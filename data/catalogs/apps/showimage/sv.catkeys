@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	3998703664
+1	swedish	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		BildVisning
 Page setup…	Menus		Sidinställningar...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (sida %d) har ändrats. Vill du verkligen stänga dokumentet?
@@ -45,6 +45,7 @@ Job setup	PrintOptionsWindow		Utskriftsinställningar
 Clear selection	Menus		Rensa markering
 Rotate clockwise	Menus		Rotera medurs
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunde inte ladda bilden! Endera finns inte filen eller så saknas en bildöversättare för bildformatet.
+Open with…	Menus		Öppna med...
 Rotate counterclockwise	Menus		Rotera moturs
 Previous page	Menus		Tidigare sida
 Fit to window	Menus		Anpassa till fönster

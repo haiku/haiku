@@ -7,9 +7,9 @@ Turn off	SettingsWindow		Disative
 Changes will take effect upon reboot.	SettingsWindow		Lis modifichis a varan efiet cuant che si tornarà a inviâ il sisteme.
 Revert	SettingsWindow		Ripristine
 Keep enabled	SettingsWindow		Ten abilitât
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Lis impostazions specificadis tal file des impostazions no son validis. Si pues cjariâ i predefinîts o jessî.
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Lis impostazions specificadis tal file des impostazions no son validis. Al è pussibil cjariâ i valôrs predefinîts o jessî.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		VirtualMemory\n\tscrit di Axel Dörfler\n\tCopyright 2005, Haiku.\n
-The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Nol è stât pussibil cjatâ il volum specificât tal file des impostazions. Si pues doprâ il volum di inviament opûr jessî.
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Nol è stât pussibil cjatâ il volum specificât tal file des impostazions. Al è pussibil doprâ il volum di inviament opûr jessî.
 Current Swap:	SettingsWindow		Mem. di scambi autâl:
 Load defaults	SettingsWindow		Cjarie valôrs predefinîts
 Use boot volume	SettingsWindow		Dopre volum di inviament

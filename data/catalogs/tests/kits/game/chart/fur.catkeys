@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ChartDemo	3491540808
+1	friulian	x-vnd.Haiku-ChartDemo	446404305
 (high) 100% 	ChartWindow		(alt) 100% 
 Spiral	ChartWindow		Spirâl
 Orange	ChartWindow		Naranç
@@ -6,6 +6,7 @@ Display:	ChartWindow		Visôr:
 Pink	ChartWindow		Rose
 Animation:	ChartWindow		Animazion:
 Auto demo	ChartWindow		Dimostrazion automatiche
+ 0.6 f/s  (logarithmic scale)	ChartWindow		 0.6 f/s  (scjale logaritmiche)
 Red	ChartWindow		Ros
 None	ChartWindow		Nissun
 600.0 f/s	ChartWindow		600.0 f/s

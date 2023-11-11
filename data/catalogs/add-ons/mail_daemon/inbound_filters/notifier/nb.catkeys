@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NewMailNotification	2220310168
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Loggvindu
 none	NotifierConfigView		ingen
 Alert	NotifierConfigView		Varsel
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Sentral varsling
 Beep	NotifierConfigView		Pip
 Central beep	NotifierConfigView		Sentralt pip
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{En ny melding} other{# nye meldinger}}
+New mail notification	NotifierFilter		Varsel om ny e-post
 New messages	NotifierFilter		Nye meldinger
 Method:	NotifierConfigView		Metode:
 Keyboard LEDs	NotifierConfigView		Tastatur LED

@@ -31,7 +31,7 @@ Select a printer	ConfigWindow		Selezione une stampadore
 Show configuration window	PrintServerApp Scripting		Mostre il barcon di configurazion
 A4	ConfigWindow	ISO 216 paper size	A4
 Get comments about this printer	Printer Scripting		Coments su cheste stampadore
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		E esist za une stampadore cun chest non, ma no si pues doprâ. Sostituî?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		E esist za une stampadore cun chest non, ma nol è pussibil doprâle. Sostituî?
 No	PrintServerApp		No
 Get the transport configuration for this printer	Printer Scripting		Oten la configurazion dal colegament (traspuart) par cheste stampadore
 Landscape	ConfigWindow		Orizontâl

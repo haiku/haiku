@@ -18,7 +18,7 @@ Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Modalitât Deskbar
 Pulse settings	PulseApp		Impostazions di Pulse
 Remove replicant	CPUButton		Gjave replicant
-You can't disable the last active CPU.	PulseView		No si pues disabilitâ l'ultime CPU ative.
+You can't disable the last active CPU.	PulseView		No tu puedis disabilitâ la ultime CPU ative.
 Width of icon:	ConfigView		Largjece de icone:
 Deskbar mode	MiniPulseView		Modalitât Deskbar
 OK	PulseView		Va ben
@@ -30,7 +30,7 @@ OK	PulseApp		Va ben
 About Pulse…	CPUButton		Informazions su Pulse…
 Deskbar mode	PrefsWindow		Modalitât Deskbar
 Mini mode	DeskbarPulseView		Modalitât mini
-You can't disable the last active CPU.	CPUButton		No si pues disabilitâ l'ultime CPU ative.
+You can't disable the last active CPU.	CPUButton		No tu puedis disabilitâ la ultime CPU ative.
 OK	CPUButton		Va ben
 Deskbar	CPUButton		Deskbar
 Settings…	PulseView		Impostazions…

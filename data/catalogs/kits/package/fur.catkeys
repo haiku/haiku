@@ -2,9 +2,9 @@
 Fetching repository-cache from %url	RefreshRepositoryRequest		Daûr a recuperâ di %url la cache dal dipuesit
 Validating checksum for %repositoryName	RefreshRepositoryRequest		Convalide de sume di control par %repositoryName
 Failed to remove transaction directory	PackageManagerKit		No si è rivâts a gjavâ la cartele des transazions
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		No si è rivâts a otignî la configurazion pal dipuesit \"%s\". Si salte.
-Refreshing repository \"%s\" failed	PackageManagerKit		No si è rivâts a inzornâ il dipuesit \"%s\"
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Nol è stât pussibil otignî la configurazion pal dipuesit \"%s\". Si salte.
+Refreshing repository \"%s\" failed	PackageManagerKit		Nol è stât pussibil inzornâ il dipuesit \"%s\"
 Fetching repository checksum from %url	RefreshRepositoryRequest		Daûr a recuperâ di %url la sume di control dal dipuesit
 Failed to get repository names	PackageManagerKit		Impussibil otignî i nons dai dipuesits
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		No si è rivâts a otignî la cache pal dipuesit \"%s\". Si salte.
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Nol è stât pussibil otignî la cache pal dipuesit \"%s\". Si salte.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Il pachet %s-%s nol à un recuisît corispondent pal so pachet base \"%s\"

@@ -16,7 +16,7 @@ Network Status	NetworkStatusView		Stât de rêt
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nol è in esecuzion, nuie ce fâ.
 Netmask:	NetworkStatusView		Mascare di rêt:
 No stateful configuration	NetworkStatusView		Nissun configurazion di stât
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		“Stât de Rêt” si pues eseguî intun barcon o instalâlu tal Deskbar.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Tu puedis eseguî “Stât de Rêt” intun barcon o instalâlu tal Deskbar.
 IPv4 address:	NetworkStatusView		Direzion IPv4:
 %ifaceName information:\n	NetworkStatusView		Informazions %ifaceName:\n
 Run in window	NetworkStatus		Invie tal barcon

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.haiku-icon_o_matic	2572445882
+1	turkish	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Yok
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Yolu temizle
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -180,8 +180,10 @@ Settings…	Icon-O-Matic-SavePanel		Ayarlar…
 Select all	Icon-O-Matic-PathManipulator		Tümünü seç
 Add with style	Icon-O-Matic-ShapesList		Biçem ile ekle
 New	Icon-O-Matic-Menu-File		Yeni
+Change perspective	Icon-O-Matic-PerspectiveCommand		Perspektifi değiştir
 Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		{0, plural, one{Tepeciği} other{Tepecikleri}} yokla
 Gradient type	Icon-O-Matic-StyleTypes		Gradyan türü
+Perspective	Transformation		Perspektif
 Export	Icon-O-Matic-Menu-File		Dışa aktar
 Width	Icon-O-Matic-PropertyNames		Genişlik
 Add reference image	Icon-O-Matic-ShapesList		Başvuru görsel ekle

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-NewMailNotification	2220310168
+1	hungarian	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		naplóablak
 none	NotifierConfigView		nincs
 Alert	NotifierConfigView		jelzés
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		központi jelzés
 Beep	NotifierConfigView		hangjelzés
 Central beep	NotifierConfigView		központi hangjelzés
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Egy új üzenet} other{# új üzenet}}
+New mail notification	NotifierFilter		Új levél értesítés
 New messages	NotifierFilter		Új üzenetek
 Method:	NotifierConfigView		Művelet:
 Keyboard LEDs	NotifierConfigView		billentyűzet-villogás

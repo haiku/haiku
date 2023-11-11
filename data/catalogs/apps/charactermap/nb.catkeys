@@ -60,7 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK unified ideographs utvidel
 Ancient Greek musical notation	UnicodeBlocks		Gammelgresk musikknotasjon
 Thai	UnicodeBlocks		Thailandsk
 Ethiopic supplement	UnicodeBlocks		Etiopisk, tillegg
-Only show blocks contained in font	CharacterWindow		Vis bare blokker i fonten
+Only show blocks contained in font	CharacterWindow		Vis bare blokker i skrifttypen
 Chess symbols	UnicodeBlocks		Sjakksymboler
 Yijing hexagram symbols	UnicodeBlocks		Yijing heksagram-symboler
 Ottoman Siyaq numbers	UnicodeBlocks		Osmanske Siyaq-tall

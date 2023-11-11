@@ -118,7 +118,7 @@ DiskProbe request	ProbeView		DiskProbe-forespørsel
 Double precision floating-point value:	TypeEditors		Dobbel presisjon flytepunktverdi:
 Image	TypeEditors	This is the type of view	Bilde
 Swapped: %lld (0x%0*Lx)	ProbeView		Byttet om: %lld (0x%0*Lx)
-Save changes before closing?	ProbeView		Lagre endringer før lukking?
+Save changes before closing?	ProbeView		Vil du lagre endringer før du avslutter?
 %s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG-format
 Number	TypeEditors	This is the type of editor	Tall

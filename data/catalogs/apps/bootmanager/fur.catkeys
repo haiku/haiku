@@ -33,7 +33,7 @@ USB Drive	DrivesPage	Default disk name	Unitât USB
 Restore MBR	BootManagerController	Button	Ripristine MBR
 Hard Drive	DrivesPage	Default disk name	Disc fis
 Drives	DrivesPage	Title	Unitâts
-The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		A son stadis rilevadis chestis partizions. Par plasê, segne la casele in bande aes partizions di inserî tal menù di inviament. Si pues ancje stabilî i nons des partizions di visualizâ tal menù di inviament.
+The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		A son stadis rilevadis chestis partizions. Par plasê, segne la casele in bande des partizions par inserîlis tal menù di inviament. Al è pussibil ancje stabilî i nons des partizions di visualizâ tal menù di inviament.
 After five seconds	DefaultPartitionPage		Dopo cinc seconts
 Timeout: %s	DefaultPartitionPage		Timp di spiete: %s
 The Master Boot Record could not be restored!	BootManagerController		Nol è stât pussibil ripristinâ il Master Boot Record!
@@ -50,7 +50,7 @@ Previous	WizardView	Button	Precedent
 Uninstallation of boot menu failed	BootManagerController	Title	Disinstalazion dal menù di inviament falide
 Incompatible format!	DrivesPage	Cannot install	Formât incompatibil!
 Old Master Boot Record saved	BootManagerController	Title	Master Boot Record vieli salvât
-Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Par plasê, specifiche une partizion predefinide e un timp di spiete.\nIl menù di inviament al cjariarà la partizion predefinide daspò il timp di spiete a mancul che no si selezioni une altre partizion. Si pues ancje fâ in mût che il menù di inviament al spieti par simpri la selezion di une partizion.\nTen fracât il tast 'ALT' par disabilitâ il timp di spiete dilunc l'inviament.
+Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Par plasê, specifiche une partizion predefinide e un timp di spiete.\nIl menù di inviament al cjariarà la partizion predefinide daspò il timp di spiete, gjavant che no si selezioni une altre partizion. Al è pussibil ancje fâ in mût che il menù di inviament al spieti par simpri la selezion di une partizion.\nTen fracât il tast 'ALT' par disativâ il timp di spiete dilunc l'inviament.
 Partitions	PartitionsPage	Title	Partizions
 Uninstallation of boot menu completed	BootManagerController	Title	Disinstalazion dal menù di inviament completade
 After two seconds	DefaultPartitionPage		Dopo doi seconts
@@ -66,4 +66,4 @@ File:	FileSelectionPage	Text control label	File:
 Error reading partition table	BootManagerController	Title	Erôr tal lei la tabele des partizions
 Back	BootManagerController	Button	Indaûr
 The boot manager has been successfully installed on your system.	BootManagerController		Il gjestôr di inviament al è stât instalât cun sucès sul vuestri sisteme.
-The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Nol è stât pussibil salvâ il Master Boot Record vieli su %s. Si pues continuâ la instalazion, ma nol sarà pussibil disinstalâ il menù di inviament.
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Nol è stât pussibil salvâ il Master Boot Record vieri su %s. Tu puedis continuâ la instalazion, ma nol sarà pussibil disinstalâ il menù di inviament.

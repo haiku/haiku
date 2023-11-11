@@ -75,7 +75,7 @@ Could not open file \"%s\": %s\n	DiskProbe		\"%s\" dosyası açılamadı: %s\n
 Probe file…	OpenWindow		Dosya araştır…
 Block: 	ProbeView		Blok: 
 Bookmarks	ProbeView		Yer imleri
-Probe device	OpenWindow		Aygıt araştır
+Probe device	OpenWindow		Aygıtı araştır
 none	ProbeView	No attributes	yok
 Case sensitive	FindWindow		BÜYÜK/küçük harf duyarlı
 32 bit unsigned value:	TypeEditors		32 bit imzalanmamış değer:

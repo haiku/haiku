@@ -52,7 +52,7 @@ Cannot execute \"%command\":\n\t%error	Terminal Shell		Kunne ikke utføre "\%com
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Tilpasset
 Really close?	Terminal TermWindow		Virkelig lukke?
-Font size	Terminal TermWindow		Fontstørrelse
+Font size	Terminal TermWindow		Skriftstørrelse
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		ANSI lys blå farge
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli drept.
@@ -102,7 +102,7 @@ Use left Option as Meta key	Terminal AppearancePrefView		Bruk venstre Option som
 Find	Terminal FindWindow		Finn
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mønsteret som angir nåværende fanetittel. Følgende plassholdere\nkan brukes:\n
 Save to file…	Terminal ThemeWindow		Lagre til fil…
-Font:	Terminal AppearancePrefView		Font:
+Font:	Terminal AppearancePrefView		Skrifttype:
 Paste	Terminal TermWindow		Lim inn
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mønsteret som spesifiserer vindustitlene. Følgende plassholdere\nkan brukes:
 ANSI bright magenta color	Terminal ThemeView		ANSI lys magenta farge

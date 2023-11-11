@@ -1,3 +1,4 @@
-1	turkish	x-vnd.Haiku-SystemLogger	239668711
+1	turkish	x-vnd.Haiku-SystemLogger	2600925901
 Syslog Daemon	SyslogDaemon		Syslog hizmeti
 OK	SyslogDaemon		Tamam
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nBu ardalan süreci, tüm sistem iletilerini toplar ve onları \"%s"\" konumundaki sistem geneli günlüğe yazar.\n\n

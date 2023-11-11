@@ -17,7 +17,7 @@ Print	Terminal TermWindow		Stampe
 Settings	Terminal TermWindow		Impostazions
 %app% settings	Terminal PrefWindow	window title	Impostazions %app%
 ANSI bright black color	Terminal ThemeView		Colôr neri slusint ANSI
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf.\n\t\t\tIn mût opzionâl il numar massim di components di percors che si pues\n\t\t\tspecificâ. P.e. '%2d' par un massim di doi components.\n\t%i\t-\tThe indiç de schede.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât par UTF-8.\n\t%p\t-\tIl non dal procès atîf.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf.\n\t\t\tIn mût opzionâl il numar massim di components di percors che si puedin\n\t\t\tspecificâ. P.e. '%2d' par un massim di doi components.\n\t%i\t-\tThe indiç de schede.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât par UTF-8.\n\t%p\t-\tIl non dal procès atîf.
 Use default	Terminal SetTitleWindow		Dopre predefinît
 Close tab	Terminal TermWindow		Siere schede
 Error!	Terminal getString		Erôr!
