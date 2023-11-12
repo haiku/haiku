@@ -1,25 +1,22 @@
 /*
  * Copyright 2005, Oscar Lesta. All rights reserved.
- * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Copyright 2018-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
+#include "poke.h"
 
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <ISA.h>
 #include <PCI.h>
 
+#include <team.h>
+#include <vm/vm.h>
+
 #if defined(__i386__) || defined(__x86_64__)
 #include <thread.h>
 #endif
 
-#include "poke.h"
-
-/*
- TODO: maintain a list of mapped areas in the cookie
- and only allow unmapping them, and clean them up on free.
- */
 
 static status_t poke_open(const char*, uint32, void**);
 static status_t poke_close(void*);
@@ -304,9 +301,9 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 			if (user_strlcpy(name, ioctl.name, B_OS_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 
-			ioctl.area = map_physical_memory(name,
-				(addr_t)ioctl.physical_address, ioctl.size, ioctl.flags,
-				ioctl.protection, (void**)&ioctl.address);
+			ioctl.area = vm_map_physical_memory(team_get_current_team_id(), name,
+				(void**)&ioctl.address, ioctl.flags, ioctl.size, ioctl.protection,
+				ioctl.physical_address, false);
 
 			if (user_memcpy(arg, &ioctl, sizeof(mem_map_args)) != B_OK)
 				return B_BAD_ADDRESS;
@@ -321,7 +318,7 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 			if (ioctl.signature != POKE_SIGNATURE)
 				return B_BAD_VALUE;
 
-			return delete_area(ioctl.area);
+			return _user_delete_area(ioctl.area);
 		}
 	}
 
