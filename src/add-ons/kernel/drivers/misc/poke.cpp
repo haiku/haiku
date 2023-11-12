@@ -301,7 +301,7 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_VALUE;
 
 			char name[B_OS_NAME_LENGTH];
-			if (user_strlcpy(name, ioctl.name, B_OS_NAME_LENGTH) != B_OK)
+			if (user_strlcpy(name, ioctl.name, B_OS_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
 
 			ioctl.area = map_physical_memory(name,
