@@ -131,6 +131,10 @@ private:
 									DebugInfoEntry*& _entry,
 									bool& _endOfEntryList, int level = 0);
 			status_t			_FinishUnit(BaseUnit* unit);
+			status_t			_ReadStringIndirect(BaseUnit* unit,
+									uint64 index, const char*& value) const;
+			status_t			_ReadAddressIndirect(BaseUnit* unit,
+									uint64 index, uint64& value) const;
 			status_t			_ParseEntryAttributes(DataReader& dataReader,
 									BaseUnit* unit,
 									DebugInfoEntry* entry,
@@ -215,7 +219,9 @@ private:
 			ElfFile*			fAlternateElfFile;
 			ElfSection*			fDebugInfoSection;
 			ElfSection*			fDebugAbbrevSection;
+			ElfSection*			fDebugAddressSection;
 			ElfSection*			fDebugStringSection;
+			ElfSection*			fDebugStrOffsetsSection;
 			ElfSection*			fDebugRangesSection;
 			ElfSection*			fDebugLineSection;
 			ElfSection*			fDebugLineStrSection;

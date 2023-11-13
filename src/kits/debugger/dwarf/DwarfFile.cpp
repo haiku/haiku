@@ -492,7 +492,9 @@ DwarfFile::DwarfFile()
 	fAlternateElfFile(NULL),
 	fDebugInfoSection(NULL),
 	fDebugAbbrevSection(NULL),
+	fDebugAddressSection(NULL),
 	fDebugStringSection(NULL),
+	fDebugStrOffsetsSection(NULL),
 	fDebugRangesSection(NULL),
 	fDebugLineSection(NULL),
 	fDebugLineStrSection(NULL),
@@ -524,7 +526,9 @@ DwarfFile::~DwarfFile()
 
 		debugInfoFile->PutSection(fDebugInfoSection);
 		debugInfoFile->PutSection(fDebugAbbrevSection);
+		debugInfoFile->PutSection(fDebugAddressSection);
 		debugInfoFile->PutSection(fDebugStringSection);
+		debugInfoFile->PutSection(fDebugStrOffsetsSection);
 		debugInfoFile->PutSection(fDebugRangesSection);
 		debugInfoFile->PutSection(fDebugLineSection);
 		debugInfoFile->PutSection(fDebugLineStrSection);
@@ -588,7 +592,9 @@ DwarfFile::Load(uint8 addressSize, bool isBigEndian, const BString& externalInfo
 		? fAlternateElfFile : fElfFile;
 
 	// non mandatory sections
+	fDebugAddressSection = debugInfoFile->GetSection(".debug_addr");
 	fDebugStringSection = debugInfoFile->GetSection(".debug_str");
+	fDebugStrOffsetsSection = debugInfoFile->GetSection(".debug_str_offsets");
 	fDebugRangesSection = debugInfoFile->GetSection(".debug_ranges");
 	fDebugLineSection = debugInfoFile->GetSection(".debug_line");
 	fDebugLineStrSection = debugInfoFile->GetSection(".debug_line_str");
@@ -1548,6 +1554,64 @@ DwarfFile::_FinishUnit(BaseUnit* unit)
 
 
 status_t
+DwarfFile::_ReadStringIndirect(BaseUnit* unit, uint64 index, const char*& value) const
+{
+	if (fDebugStrOffsetsSection == NULL) {
+		WARNING("Invalid DW_FORM_strx*: no debug_str_offsets section!\n");
+		return B_BAD_DATA;
+	}
+
+	uint64 strOffsetsBase = unit->IsDwarf64() ? 16 : 8;
+	uint64 offsetSize = unit->IsDwarf64() ? 8 : 4;
+
+	if (strOffsetsBase + index * offsetSize >= fDebugStrOffsetsSection->Size()) {
+		WARNING("Invalid DW_FORM_strx* index: %" B_PRIu64 "\n", index);
+		return B_BAD_DATA;
+	}
+
+	const char *strOffsets = (const char*)fDebugStrOffsetsSection->Data() + strOffsetsBase;
+	uint64 offset = unit->IsDwarf64()
+		? ((uint64*)strOffsets)[index]
+		: ((uint32*)strOffsets)[index];
+
+	if (offset >= fDebugStringSection->Size()) {
+		WARNING("Invalid DW_FORM_strx* offset: %" B_PRIu64 "\n", offset);
+		return B_BAD_DATA;
+	}
+
+	value = (const char*)fDebugStringSection->Data() + offset;
+	return B_OK;
+}
+
+
+status_t
+DwarfFile::_ReadAddressIndirect(BaseUnit* unit, uint64 index, uint64& value) const
+{
+	if (fDebugAddressSection == NULL) {
+		WARNING("Invalid DW_FORM_addrx*: no debug_addr section!\n");
+		return B_BAD_DATA;
+	}
+
+	uint64 addrBase = unit->IsDwarf64() ? 16 : 8;
+
+	if (addrBase + index * unit->AddressSize() >= fDebugAddressSection->Size()) {
+		WARNING("Invalid DW_FORM_addrx* index: %" B_PRIu64 "\n", index);
+		return B_BAD_DATA;
+	}
+
+	const char *addrPtr = (const char*)fDebugAddressSection->Data()
+		+ addrBase + index * unit->AddressSize();
+
+	if (unit->AddressSize() == 8)
+		value = *(uint64*)addrPtr;
+	else
+		value = *(uint32*)addrPtr;
+
+	return B_OK;
+}
+
+
+status_t
 DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 	BaseUnit* unit, DebugInfoEntry* entry, AbbreviationEntry& abbreviationEntry)
 {
@@ -1659,6 +1723,43 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_flag_present:
 				attributeValue.SetToFlag(true);
 				break;
+			case DW_FORM_strx:
+			{
+				uint64 index = dataReader.ReadUnsignedLEB128(0);
+				const char* strValue;
+				status_t res = _ReadStringIndirect(unit, index, strValue);
+				if (res != B_OK)
+					return res;
+				attributeValue.SetToString(strValue);
+				break;
+			}
+			case DW_FORM_addrx:
+			{
+				uint64 index = dataReader.ReadUnsignedLEB128(0);
+				status_t res = _ReadAddressIndirect(unit, index, value);
+				if (res != B_OK)
+					return res;
+				break;
+			}
+			case DW_FORM_line_strp:
+			{
+				if (fDebugLineStrSection != NULL) {
+					uint64 offset = unit->IsDwarf64()
+						? dataReader.Read<uint64>(0)
+						: dataReader.Read<uint32>(0);
+					if (offset >= fDebugLineStrSection->Size()) {
+						WARNING("Invalid DW_FORM_line_strp offset: %" B_PRIu64 "\n",
+							offset);
+						return B_BAD_DATA;
+					}
+					attributeValue.SetToString(
+						(const char*)fDebugLineStrSection->Data() + offset);
+				} else {
+					WARNING("Invalid DW_FORM_line_strp: no debug_line_str section!\n");
+					return B_BAD_DATA;
+				}
+				break;
+			}
 			case DW_FORM_ref_sig8:
 				fTypesSectionRequired = true;
 				value = dataReader.Read<uint64>(0);
@@ -1672,6 +1773,32 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 					? dataReader.Read<uint64>(0)
 					: (uint64)dataReader.Read<uint32>(0);
 				break;
+			case DW_FORM_strx1:
+			case DW_FORM_strx2:
+			case DW_FORM_strx3:
+			case DW_FORM_strx4:
+			{
+				size_t numBytes = attributeForm - DW_FORM_strx1 + 1;
+				uint64 index = dataReader.ReadUInt(numBytes, 0);
+				const char* strValue;
+				status_t res = _ReadStringIndirect(unit, index, strValue);
+				if (res != B_OK)
+					return res;
+				attributeValue.SetToString(strValue);
+				break;
+			}
+			case DW_FORM_addrx1:
+			case DW_FORM_addrx2:
+			case DW_FORM_addrx3:
+			case DW_FORM_addrx4:
+			{
+				size_t numBytes = attributeForm - DW_FORM_addrx1 + 1;
+				uint64 index = dataReader.ReadUInt(numBytes, 0);
+				status_t res = _ReadAddressIndirect(unit, index, value);
+				if (res != B_OK)
+					return res;
+				break;
+			}
 			case DW_FORM_indirect:
 			default:
 				WARNING("Unsupported attribute form: %" B_PRIu32 "\n",
