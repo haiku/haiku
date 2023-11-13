@@ -71,6 +71,8 @@ extern "C" void x86_64_thread_entry();
 
 // Initial thread saved state.
 static arch_thread sInitialState _ALIGNED(64);
+uint16 gFPUControlDefault;
+uint32 gFPUMXCSRDefault;
 extern uint64 gFPUSaveLength;
 extern bool gHasXsave;
 extern bool gHasXsavec;
@@ -201,6 +203,8 @@ arch_thread_init(kernel_args* args)
 			"fxsaveq %0"
 			:: "m" (sInitialState.fpu_state));
 	}
+	gFPUControlDefault = ((savefpu*)&sInitialState.fpu_state)->fp_fxsave.control;
+	gFPUMXCSRDefault = ((savefpu*)&sInitialState.fpu_state)->fp_fxsave.mxcsr;
 
 	register_generic_syscall(THREAD_SYSCALLS, arch_thread_control, 1, 0);
 
