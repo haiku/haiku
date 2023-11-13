@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 #include "JsonEndToEndTest.h"
@@ -12,10 +12,16 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 
+#include "ChecksumJsonEventListener.h"
+#include "FakeJsonDataGenerator.h"
 #include "JsonSamples.h"
 
 
 using namespace BPrivate;
+
+
+static const size_t kHighVolumeItemCount = 10000;
+static const uint32 kChecksumLimit = 100000;
 
 
 JsonEndToEndTest::JsonEndToEndTest()
@@ -25,6 +31,70 @@ JsonEndToEndTest::JsonEndToEndTest()
 
 JsonEndToEndTest::~JsonEndToEndTest()
 {
+}
+
+
+/*! Just here so it is possible to extract timings for the data generation cost.
+*/
+
+void
+JsonEndToEndTest::TestHighVolumeStringSampleGenerationOnly()
+{
+	FakeJsonStreamDataIO* inputData = new FakeJsonStringStreamDataIO(kHighVolumeItemCount,
+		kChecksumLimit);
+	char c;
+
+	while (inputData->Read(&c, 1) == 1) {
+		// do nothing
+	}
+}
+
+
+/*! Just here so it is possible to extract timings for the data generation cost.
+*/
+
+void
+JsonEndToEndTest::TestHighVolumeNumberSampleGenerationOnly()
+{
+	FakeJsonStreamDataIO* inputData = new FakeJsonNumberStreamDataIO(kHighVolumeItemCount,
+		kChecksumLimit);
+	char c;
+
+	while (inputData->Read(&c, 1) == 1) {
+		// do nothing
+	}
+}
+
+
+void
+JsonEndToEndTest::TestHighVolumeStringParsing()
+{
+	FakeJsonStreamDataIO* inputData = new FakeJsonStringStreamDataIO(kHighVolumeItemCount,
+		kChecksumLimit);
+	ChecksumJsonEventListener* listener = new ChecksumJsonEventListener(kChecksumLimit);
+
+	// ----------------------
+    BPrivate::BJson::Parse(inputData, listener);
+    // ----------------------
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, listener->Error());
+	CPPUNIT_ASSERT_EQUAL(inputData->Checksum(), listener->Checksum());
+}
+
+
+void
+JsonEndToEndTest::TestHighVolumeNumberParsing()
+{
+	FakeJsonStreamDataIO* inputData = new FakeJsonNumberStreamDataIO(kHighVolumeItemCount,
+		kChecksumLimit);
+	ChecksumJsonEventListener* listener = new ChecksumJsonEventListener(kChecksumLimit);
+
+	// ----------------------
+    BPrivate::BJson::Parse(inputData, listener);
+    // ----------------------
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, listener->Error());
+	CPPUNIT_ASSERT_EQUAL(inputData->Checksum(), listener->Checksum());
 }
 
 
@@ -208,8 +278,17 @@ JsonEndToEndTest::AddTests(BTestSuite& parent)
 		"JsonEndToEndTest::TestArrayUnterminated",
 		&JsonEndToEndTest::TestArrayUnterminated));
 	suite.addTest(new CppUnit::TestCaller<JsonEndToEndTest>(
-		"JsonEndToEndTest::TestObjectUnterminated",
-		&JsonEndToEndTest::TestObjectUnterminated));
+		"JsonEndToEndTest::TestHighVolumeStringParsing",
+		&JsonEndToEndTest::TestHighVolumeStringParsing));
+	suite.addTest(new CppUnit::TestCaller<JsonEndToEndTest>(
+		"JsonEndToEndTest::TestHighVolumeNumberParsing",
+		&JsonEndToEndTest::TestHighVolumeNumberParsing));
+	suite.addTest(new CppUnit::TestCaller<JsonEndToEndTest>(
+		"JsonEndToEndTest::TestHighVolumeStringSampleGenerationOnly",
+		&JsonEndToEndTest::TestHighVolumeStringSampleGenerationOnly));
+	suite.addTest(new CppUnit::TestCaller<JsonEndToEndTest>(
+		"JsonEndToEndTest::TestHighVolumeNumberSampleGenerationOnly",
+		&JsonEndToEndTest::TestHighVolumeNumberSampleGenerationOnly));
 
 	parent.addTest("JsonEndToEndTest", &suite);
 }

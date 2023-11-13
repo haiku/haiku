@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>
  * Copyright 2014, Augustin Cavalier (waddlesplash)
  * Distributed under the terms of the MIT License.
  */
@@ -39,14 +39,12 @@ private:
 									JsonParseContext& jsonParseContext);
 	static	bool				ParseObject(JsonParseContext& jsonParseContext);
 	static	bool				ParseArray(JsonParseContext& jsonParseContext);
-	static	bool				ParseEscapeUnicodeSequence(
-									JsonParseContext& jsonParseContext,
-									BString& stringResult);
-	static	bool				ParseStringEscapeSequence(
-									JsonParseContext& jsonParseContext,
-									BString& stringResult);
+
+	static	bool				ParseEscapeUnicodeSequence(JsonParseContext& jsonParseContext);
+	static	bool				ParseStringEscapeSequence(JsonParseContext& jsonParseContext);
 	static	bool				ParseString(JsonParseContext& jsonParseContext,
 									json_event_type eventType);
+
 	static	bool				ParseExpectedVerbatimStringAndRaiseEvent(
 									JsonParseContext& jsonParseContext,
 									const char* expectedString,
@@ -59,7 +57,7 @@ private:
 									size_t expectedStringLength,
 									char leadingChar);
 
-	static bool					IsValidNumber(BString& number);
+	static bool					IsValidNumber(const char* value);
 	static bool					ParseNumber(JsonParseContext& jsonParseContext);
 };
 

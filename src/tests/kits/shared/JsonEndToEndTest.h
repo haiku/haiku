@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 #ifndef JSON_END_TO_END_TEST_H
@@ -17,6 +17,11 @@ class JsonEndToEndTest : public CppUnit::TestCase {
 public:
 								JsonEndToEndTest();
 	virtual						~JsonEndToEndTest();
+
+			void				TestHighVolumeStringParsing();
+			void				TestHighVolumeNumberParsing();
+			void				TestHighVolumeStringSampleGenerationOnly();
+			void				TestHighVolumeNumberSampleGenerationOnly();
 
 			void				TestNullA();
 			void				TestTrueA();

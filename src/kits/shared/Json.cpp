@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>
  * Copyright 2014-2017, Augustin Cavalier (waddlesplash)
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
@@ -25,26 +25,151 @@
 
 namespace BPrivate {
 
+/*!	A buffer is used to assemble strings into. This will be the initial size
+	of this buffer.
+*/
 
-static bool
-b_jsonparse_is_hex(char c)
-{
-	return isdigit(c)
-		|| (c > 0x41 && c <= 0x46)
-		|| (c > 0x61 && c <= 0x66);
-}
+static const size_t kInitialAssemblyBufferSize = 64;
+
+/*!	A buffer is used to assemble strings into. This buffer starts off small
+	but is able to grow as the string it needs to process as encountered. To
+	avoid frequent reallocation of the buffer, the buffer will be retained
+	between strings. This is the maximum size of buffer that will be retained.
+*/
+
+static const size_t kRetainedAssemblyBufferSize = 32 * 1024;
+
+static const size_t kAssemblyBufferSizeIncrement = 256;
+
+static const size_t kMaximumUtf8SequenceLength = 7;
 
 
-static bool
-b_jsonparse_all_hex(const char* c)
-{
-	for (int i = 0; i < 4; i++) {
-		if (!b_jsonparse_is_hex(c[i]))
-			return false;
+class JsonParseAssemblyBuffer {
+public:
+	JsonParseAssemblyBuffer()
+		:
+		fAssemblyBuffer(NULL),
+		fAssemblyBufferAllocatedSize(0),
+		fAssemblyBufferUsedSize(0)
+	{
+		fAssemblyBuffer = (char*) malloc(kInitialAssemblyBufferSize);
+		if (fAssemblyBuffer != NULL)
+			fAssemblyBufferAllocatedSize = kInitialAssemblyBufferSize;
 	}
 
-	return true;
-}
+	~JsonParseAssemblyBuffer()
+	{
+		if (fAssemblyBuffer != NULL)
+			free(fAssemblyBuffer);
+	}
+
+	const char* Buffer() const
+	{
+		return fAssemblyBuffer;
+	}
+
+	/*! This method should be used each time that the assembly buffer has
+		been finished with by some section of logic.
+	*/
+
+	status_t Reset()
+	{
+		fAssemblyBufferUsedSize = 0;
+
+		if (fAssemblyBufferAllocatedSize > kRetainedAssemblyBufferSize) {
+			fAssemblyBuffer = (char*) realloc(fAssemblyBuffer, kRetainedAssemblyBufferSize);
+			if (fAssemblyBuffer == NULL) {
+				fAssemblyBufferAllocatedSize = 0;
+				return B_NO_MEMORY;
+			}
+			fAssemblyBufferAllocatedSize = kRetainedAssemblyBufferSize;
+		}
+
+		return B_OK;
+	}
+
+	status_t AppendCharacter(char c)
+	{
+		status_t result = _EnsureAssemblyBufferAllocatedSize(fAssemblyBufferUsedSize + 1);
+
+		if (result == B_OK) {
+			fAssemblyBuffer[fAssemblyBufferUsedSize] = c;
+			fAssemblyBufferUsedSize++;
+		}
+
+		return result;
+	}
+
+	status_t AppendCharacters(char* str, size_t len)
+	{
+		status_t result = _EnsureAssemblyBufferAllocatedSize(fAssemblyBufferUsedSize + len);
+
+		if (result == B_OK) {
+			memcpy(&fAssemblyBuffer[fAssemblyBufferUsedSize], str, len);
+			fAssemblyBufferUsedSize += len;
+		}
+
+		return result;
+	}
+
+	status_t AppendUnicodeCharacter(uint32 c)
+	{
+		status_t result = _EnsureAssemblyBufferAllocatedSize(
+			fAssemblyBufferUsedSize + kMaximumUtf8SequenceLength);
+		if (result == B_OK) {
+			char* insertPtr = &fAssemblyBuffer[fAssemblyBufferUsedSize];
+			char* ptr = insertPtr;
+			BUnicodeChar::ToUTF8(c, &ptr);
+			size_t sequenceLength = static_cast<uint32>(ptr - insertPtr);
+			fAssemblyBufferUsedSize += sequenceLength;
+		}
+
+		return result;
+	}
+
+private:
+
+	/*!	This method will return the assembly buffer ensuring that it has at
+		least `minimumSize` bytes available.
+	*/
+
+	status_t _EnsureAssemblyBufferAllocatedSize(size_t minimumSize)
+	{
+		if (fAssemblyBufferAllocatedSize < minimumSize) {
+			fAssemblyBuffer = (char*) realloc(fAssemblyBuffer, minimumSize);
+			if (fAssemblyBuffer == NULL) {
+				fAssemblyBufferAllocatedSize = 0;
+				return B_NO_MEMORY;
+			}
+			fAssemblyBufferAllocatedSize = minimumSize;
+		}
+		return B_OK;
+	}
+
+private:
+	char*					fAssemblyBuffer;
+	size_t					fAssemblyBufferAllocatedSize;
+	size_t					fAssemblyBufferUsedSize;
+};
+
+
+class JsonParseAssemblyBufferResetter {
+public:
+	JsonParseAssemblyBufferResetter(JsonParseAssemblyBuffer* assemblyBuffer)
+		:
+		fAssemblyBuffer(assemblyBuffer)
+	{
+	}
+
+	~JsonParseAssemblyBufferResetter()
+	{
+		fAssemblyBuffer->Reset();
+	}
+
+private:
+	JsonParseAssemblyBuffer*
+							fAssemblyBuffer;
+};
 
 
 /*! This class carries state around the parsing process. */
@@ -57,8 +182,15 @@ public:
 		fData(data),
 		fLineNumber(1), // 1 is the first line
 		fPushbackChar(0),
-		fHasPushbackChar(false)
+		fHasPushbackChar(false),
+		fAssemblyBuffer(new JsonParseAssemblyBuffer())
 	{
+	}
+
+
+	~JsonParseContext()
+	{
+		delete fAssemblyBuffer;
 	}
 
 
@@ -85,14 +217,8 @@ public:
 		fLineNumber++;
 	}
 
-
-		// TODO; there is considerable opportunity for performance improvements
-		// here by buffering the input and then feeding it into the parse
-		// algorithm character by character.
-
 	status_t NextChar(char* buffer)
 	{
-
 		if (fHasPushbackChar) {
 			buffer[0] = fPushbackChar;
 			fHasPushbackChar = false;
@@ -102,12 +228,18 @@ public:
 		return Data()->ReadExactly(buffer, 1);
 	}
 
-
 	void PushbackChar(char c)
 	{
 		fPushbackChar = c;
 		fHasPushbackChar = true;
 	}
+
+
+	JsonParseAssemblyBuffer* AssemblyBuffer()
+	{
+		return fAssemblyBuffer;
+	}
+
 
 private:
 	BJsonEventListener*		fListener;
@@ -115,6 +247,8 @@ private:
 	uint32					fLineNumber;
 	char					fPushbackChar;
 	bool					fHasPushbackChar;
+	JsonParseAssemblyBuffer*
+							fAssemblyBuffer;
 };
 
 
@@ -464,90 +598,86 @@ BJson::ParseArray(JsonParseContext& jsonParseContext)
 
 
 bool
-BJson::ParseEscapeUnicodeSequence(JsonParseContext& jsonParseContext,
-	BString& stringResult)
+BJson::ParseEscapeUnicodeSequence(JsonParseContext& jsonParseContext)
 {
-	char buffer[5];
-	buffer[4] = 0;
+	char ch;
+	uint32 unicodeCh = 0;
 
-	if (!NextChar(jsonParseContext, &buffer[0])
-		|| !NextChar(jsonParseContext, &buffer[1])
-		|| !NextChar(jsonParseContext, &buffer[2])
-		|| !NextChar(jsonParseContext, &buffer[3])) {
-		return false;
+	for (int i = 3; i >= 0; i--) {
+		if (!NextChar(jsonParseContext, &ch)) {
+			jsonParseContext.Listener()->HandleError(B_ERROR, jsonParseContext.LineNumber(),
+				"unable to read unicode sequence");
+			return false;
+		}
+
+		if (ch >= '0' && ch <= '9')
+			unicodeCh |= static_cast<uint32>(ch - '0') << (i * 4);
+		else if (ch >= 'a' && ch <= 'f')
+			unicodeCh |= (10 + static_cast<uint32>(ch - 'a')) << (i * 4);
+		else if (ch >= 'A' && ch <= 'F')
+			unicodeCh |= (10 + static_cast<uint32>(ch - 'A')) << (i * 4);
+		else {
+			BString errorMessage;
+			errorMessage.SetToFormat(
+				"malformed hex character [%c] in unicode sequence in string parsing", ch);
+			jsonParseContext.Listener()->HandleError(B_BAD_DATA, jsonParseContext.LineNumber(),
+				errorMessage.String());
+			return false;
+		}
 	}
 
-	if (!b_jsonparse_all_hex(buffer)) {
-		BString errorMessage;
-		errorMessage.SetToFormat(
-			"malformed unicode sequence [%s] in string parsing",
-			buffer);
-		jsonParseContext.Listener()->HandleError(B_BAD_DATA,
-			jsonParseContext.LineNumber(), errorMessage.String());
+	JsonParseAssemblyBuffer* assemblyBuffer = jsonParseContext.AssemblyBuffer();
+	status_t result = assemblyBuffer->AppendUnicodeCharacter(unicodeCh);
+
+	if (result != B_OK) {
+		jsonParseContext.Listener()->HandleError(result, jsonParseContext.LineNumber(),
+			"unable to store unicode char as utf-8");
 		return false;
 	}
-
-	uint intValue;
-
-	if (sscanf(buffer, "%4x", &intValue) != 1) {
-		BString errorMessage;
-		errorMessage.SetToFormat(
-			"unable to process unicode sequence [%s] in string "
-			" parsing", buffer);
-		jsonParseContext.Listener()->HandleError(B_BAD_DATA,
-			jsonParseContext.LineNumber(), errorMessage.String());
-		return false;
-	}
-
-	char character[7];
-	char* ptr = character;
-	BUnicodeChar::ToUTF8(intValue, &ptr);
-	int32 sequenceLength = ptr - character;
-	stringResult.Append(character, sequenceLength);
 
 	return true;
 }
 
 
 bool
-BJson::ParseStringEscapeSequence(JsonParseContext& jsonParseContext,
-	BString& stringResult)
+BJson::ParseStringEscapeSequence(JsonParseContext& jsonParseContext)
 {
 	char c;
 
 	if (!NextChar(jsonParseContext, &c))
 		return false;
 
+	JsonParseAssemblyBuffer* assemblyBuffer = jsonParseContext.AssemblyBuffer();
+
 	switch (c) {
 		case 'n':
-			stringResult += "\n";
+			assemblyBuffer->AppendCharacter('\n');
 			break;
 		case 'r':
-			stringResult += "\r";
+			assemblyBuffer->AppendCharacter('\r');
 			break;
 		case 'b':
-			stringResult += "\b";
+			assemblyBuffer->AppendCharacter('\b');
 			break;
 		case 'f':
-			stringResult += "\f";
+			assemblyBuffer->AppendCharacter('\f');
 			break;
 		case '\\':
-			stringResult += "\\";
+			assemblyBuffer->AppendCharacter('\\');
 			break;
 		case '/':
-			stringResult += "/";
+			assemblyBuffer->AppendCharacter('/');
 			break;
 		case 't':
-			stringResult += "\t";
+			assemblyBuffer->AppendCharacter('\t');
 			break;
 		case '"':
-			stringResult += "\"";
+			assemblyBuffer->AppendCharacter('"');
 			break;
 		case 'u':
 		{
 				// unicode escape sequence.
-			if (!ParseEscapeUnicodeSequence(jsonParseContext,
-					stringResult)) {
+			if (!ParseEscapeUnicodeSequence(jsonParseContext)) {
 				return false;
 			}
 			break;
@@ -555,9 +685,7 @@ BJson::ParseStringEscapeSequence(JsonParseContext& jsonParseContext,
 		default:
 		{
 			BString errorMessage;
-			errorMessage.SetToFormat(
-				"unexpected escaped character [%c] in string parsing",
-				c);
+			errorMessage.SetToFormat("unexpected escaped character [%c] in string parsing", c);
 			jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 				jsonParseContext.LineNumber(), errorMessage.String());
 			return false;
@@ -573,7 +701,8 @@ BJson::ParseString(JsonParseContext& jsonParseContext,
 	json_event_type eventType)
 {
 	char c;
-	BString stringResult;
+	JsonParseAssemblyBuffer* assemblyBuffer = jsonParseContext.AssemblyBuffer();
+	JsonParseAssemblyBufferResetter assembleBufferResetter(assemblyBuffer);
 
 	while(true) {
 		if (!NextChar(jsonParseContext, &c))
@@ -583,17 +712,16 @@ BJson::ParseString(JsonParseContext& jsonParseContext,
 			case '"':
 			{
 					// terminates the string assembled so far.
+				assemblyBuffer->AppendCharacter(0);
 				jsonParseContext.Listener()->Handle(
-					BJsonEvent(eventType, stringResult.String()));
+					BJsonEvent(eventType, assemblyBuffer->Buffer()));
 				return true;
 			}
 
 			case '\\':
 			{
-				if (!ParseStringEscapeSequence(jsonParseContext,
-					stringResult)) {
+				if (!ParseStringEscapeSequence(jsonParseContext))
 					return false;
-				}
 				break;
 			}
 
@@ -611,7 +739,7 @@ BJson::ParseString(JsonParseContext& jsonParseContext,
 					return false;
 				}
 
-				stringResult.Append(&c, 1);
+				assemblyBuffer->AppendCharacter(c);
 				break;
 			}
 		}
@@ -671,47 +799,47 @@ BJson::ParseExpectedVerbatimString(JsonParseContext& jsonParseContext,
 */
 
 bool
-BJson::IsValidNumber(BString& number)
+BJson::IsValidNumber(const char* value)
 {
 	int32 offset = 0;
-	int32 len = number.Length();
+	int32 len = strlen(value);
 
-	if (offset < len && number[offset] == '-')
+	if (offset < len && value[offset] == '-')
 		offset++;
 
 	if (offset >= len)
 		return false;
 
-	if (isdigit(number[offset]) && number[offset] != '0') {
-		while (offset < len && isdigit(number[offset]))
+	if (isdigit(value[offset]) && value[offset] != '0') {
+		while (offset < len && isdigit(value[offset]))
 			offset++;
 	} else {
-		if (number[offset] == '0')
+		if (value[offset] == '0')
 			offset++;
 		else
 			return false;
 	}
 
-	if (offset < len && number[offset] == '.') {
+	if (offset < len && value[offset] == '.') {
 		offset++;
 
 		if (offset >= len)
 			return false;
 
-		while (offset < len && isdigit(number[offset]))
+		while (offset < len && isdigit(value[offset]))
 			offset++;
 	}
 
-	if (offset < len && (number[offset] == 'E' || number[offset] == 'e')) {
+	if (offset < len && (value[offset] == 'E' || value[offset] == 'e')) {
 		offset++;
 
-		if(offset < len && (number[offset] == '+' || number[offset] == '-'))
+		if(offset < len && (value[offset] == '+' || value[offset] == '-'))
 		 	offset++;
 
 		if (offset >= len)
 			return false;
 
-		while (offset < len && isdigit(number[offset]))
+		while (offset < len && isdigit(value[offset]))
 			offset++;
 	}
 
@@ -728,7 +856,8 @@ BJson::IsValidNumber(BString& number)
 bool
 BJson::ParseNumber(JsonParseContext& jsonParseContext)
 {
-	BString value;
+	JsonParseAssemblyBuffer* assemblyBuffer = jsonParseContext.AssemblyBuffer();
+	JsonParseAssemblyBufferResetter assembleBufferResetter(assemblyBuffer);
 
 	while (true) {
 		char c;
@@ -737,13 +866,8 @@ BJson::ParseNumber(JsonParseContext& jsonParseContext)
 		switch (result) {
 			case B_OK:
 			{
-				if (isdigit(c)) {
-					value += c;
-					break;
-				}
-
-				if (NULL != strchr("+-eE.", c)) {
-					value += c;
+				if (isdigit(c) || c == '.' || c == '-' || c == 'e' || c == 'E' || c == '+') {
+					assemblyBuffer->AppendCharacter(c);
 					break;
 				}
 
@@ -753,15 +877,16 @@ BJson::ParseNumber(JsonParseContext& jsonParseContext)
 			case B_PARTIAL_READ:
 			{
 				errno = 0;
+				assemblyBuffer->AppendCharacter(0);
 
-				if (!IsValidNumber(value)) {
+				if (!IsValidNumber(assemblyBuffer->Buffer())) {
 					jsonParseContext.Listener()->HandleError(B_BAD_DATA,
 						jsonParseContext.LineNumber(), "malformed number");
 					return false;
 				}
 
 				jsonParseContext.Listener()->Handle(BJsonEvent(B_JSON_NUMBER,
-					value.String()));
+					assemblyBuffer->Buffer()));
 
 				return true;
 			}
