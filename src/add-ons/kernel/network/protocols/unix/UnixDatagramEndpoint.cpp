@@ -215,6 +215,9 @@ UnixDatagramEndpoint::Send(const iovec* vecs, size_t vecCount,
 	TRACE("[%" B_PRId32 "] %p->UnixDatagramEndpoint::Send()\n",
 		find_thread(NULL), this);
 
+	if ((flags & ~(MSG_DONTWAIT)) != 0)
+		return EOPNOTSUPP;
+
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
 		timeout = absolute_timeout(socket->send.timeout);
@@ -324,6 +327,9 @@ UnixDatagramEndpoint::Receive(const iovec* vecs, size_t vecCount,
 {
 	TRACE("[%" B_PRId32 "] %p->UnixDatagramEndpoint::Receive()\n",
 		find_thread(NULL), this);
+
+	if ((flags & ~(MSG_DONTWAIT)) != 0)
+		return EOPNOTSUPP;
 
 	bigtime_t timeout = 0;
 	if ((flags & MSG_DONTWAIT) == 0) {
