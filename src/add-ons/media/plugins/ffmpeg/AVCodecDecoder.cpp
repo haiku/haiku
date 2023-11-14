@@ -154,12 +154,12 @@ AVCodecDecoder::~AVCodecDecoder()
 	free(fChunkBuffer);
 	free(fDecodedData);
 
-	av_free(fPostProcessedDecodedPicture);
-	av_free(fRawDecodedPicture);
+	av_frame_free(&fPostProcessedDecodedPicture);
+	av_frame_free(&fRawDecodedPicture);
 	av_free(fRawDecodedAudio->opaque);
-	av_free(fRawDecodedAudio);
-	av_free(fCodecContext);
-	av_free(fDecodedDataBuffer);
+	av_frame_free(&fRawDecodedAudio);
+	avcodec_free_context(&fCodecContext);
+	av_frame_free(&fDecodedDataBuffer);
 
 	av_frame_free(&fFilterFrame);
 	avfilter_graph_free(&fFilterGraph);
@@ -1123,8 +1123,7 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 {
 	assert(fDecodedDataBufferSize == 0);
 
-	memset(fDecodedDataBuffer, 0, sizeof(AVFrame));
-    av_frame_unref(fDecodedDataBuffer);
+	av_frame_unref(fDecodedDataBuffer);
 	fDecodedDataBufferOffset = 0;
 
 	int error = avcodec_receive_frame(fCodecContext, fDecodedDataBuffer);
