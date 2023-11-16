@@ -43,7 +43,7 @@ ps2_reset_mouse(ps2_dev* dev)
 
 	TRACE("ps2: ps2_reset_mouse\n");
 
-	status = ps2_dev_command(dev, PS2_CMD_RESET, NULL, 0, data, 2);
+	status = ps2_dev_command_timeout(dev, PS2_CMD_RESET, NULL, 0, data, 2, 500000);
 
 	if (status == B_OK && data[0] == 0xFE && data[1] == 0xAA) {
 		// workaround for HP/Compaq KBCs timeout condition. #2867 #3594 #4315
