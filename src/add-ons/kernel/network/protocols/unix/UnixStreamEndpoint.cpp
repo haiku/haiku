@@ -379,7 +379,7 @@ UnixStreamEndpoint::Send(const iovec* vecs, size_t vecCount,
 	TRACE("[%" B_PRId32 "] %p->UnixStreamEndpoint::Send(%p, %ld, %p)\n",
 		find_thread(NULL), this, vecs, vecCount, ancillaryData);
 
-	if ((flags & ~(MSG_DONTWAIT)) != 0)
+	if ((flags & ~(MSG_DONTWAIT | MSG_NOSIGNAL)) != 0)
 		return EOPNOTSUPP;
 
 	bigtime_t timeout = 0;
@@ -454,7 +454,7 @@ UnixStreamEndpoint::Send(const iovec* vecs, size_t vecCount,
 		case EPIPE:
 			// The peer closed connection or shutdown its read side. Reward
 			// the caller with a SIGPIPE.
-			if (gStackModule->is_syscall())
+			if (gStackModule->is_syscall() && (flags & MSG_NOSIGNAL) == 0)
 				send_signal(find_thread(NULL), SIGPIPE);
 			break;
 		case B_TIMED_OUT:
