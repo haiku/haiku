@@ -37,6 +37,7 @@ nightly builds.
  * `[un]zip`
  * `xorriso`
  * `mtools` (<https://gnu.org/software/mtools/intro.html>)
+ * `python3`
  * case-sensitive file system
 
 Whether they are installed can be tested by running them in a shell with
@@ -44,6 +45,7 @@ the `--version` parameter.
 
 The following libraries (and their respective headers) are required:
  * `zlib`
+ * `zstd`
 
 ### Haiku for ARM
 If you want to compile Haiku for ARM, you will also need:
