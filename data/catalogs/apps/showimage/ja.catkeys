@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	3998703664
+1	japanese	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		画像ビューワ
 Page setup…	Menus		ページ設定...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' の %d ページが変更されました。それでもファイルを閉じますか?
@@ -45,11 +45,12 @@ Job setup	PrintOptionsWindow		ジョブ設定
 Clear selection	Menus		選択解除
 Rotate clockwise	Menus		右 90度回転
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		画像ファイルを読み込めません!ファイルまたは画像トランスレーターが存在しません。
+Open with…	Menus		次のアプリケーションで開く…
 Rotate counterclockwise	Menus		左 90度回転
 Previous page	Menus		前のページ
 Fit to window	Menus		ウィンドウに合わせる
-Browse	Menus		閲覧
 Go to page	Menus		指定ページへ
+Browse	Menus		閲覧
 Progress monitor	ProgressWindow		進捗状況モニター
 Edit	Menus		編集
 Move to Trash	Menus		ごみ箱に捨てる

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.InfoView	1588222672
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Offset
 Description	DormantNodeInfoView		Beskrivelse
 Byte order	InfoView		Byte-rekkefølge
@@ -16,30 +16,42 @@ Buffer size	InfoView		Bufferstørrelse
 \n- Quality:	FileNodeInfoView		\n- Kvalitet:
 Kinds	LiveNodeInfoView		Typer
 Application	AppNodeInfoView		Applikasjon
+Flavor flags	DormantNodeInfoView		Smaksflagg
 Max. instances	DormantNodeInfoView		Maks. forekomster
 \n- Duration:	FileNodeInfoView		\n- Varighet:
 Dormant media node	DormantNodeInfoView		Inaktiv medianode
 Latency	LiveNodeInfoView		Forsinkelse
 Media type	InfoView		Medietype
 Live media node	LiveNodeInfoView		Direkte medianode
+Field rate	InfoView		Feltrate
 Kinds	DormantNodeInfoView		Typer
 %title% info	InfoView		%title% info
 Node ID	LiveNodeInfoView		Node-ID
 Resolution	InfoView		Oppløsning
+Chunk size	InfoView		Fragmentstørrelse
 File format	AppNodeInfoView		Filformat
+Matrix mask	InfoView		Matrisemaske
+Channel mask	InfoView		Kanalmaske
+Orientation	InfoView		Orientering
+Live file-interface node	FileNodeInfoView		Live fil-grensesnittnode
 Channels	InfoView		Kanaler
+Sample rate	InfoView		Samplingsfrekvens
 File format	FileNodeInfoView		Filformat
 (no file)	FileNodeInfoView		(ingen fil)
+Media input	InfoView		Medieinngang
 Bit rate	InfoView		Bitrate
 Input format	DormantNodeInfoView		Inndataformat
 Format	InfoView		Format
 Version	AppNodeInfoView		Versjon
 AddOn ID	DormantNodeInfoView		AddOn-ID
 Frame size	InfoView		Billedstørrelse
+Flavor ID	DormantNodeInfoView		Smaks-ID
+Run mode	LiveNodeInfoView		Kjøremodus
 \n- Codec:	FileNodeInfoView		\n- Kodek:
 Port	LiveNodeInfoView		Port
 Output format	DormantNodeInfoView		Utdataformat
 Aspect ratio	InfoView		Sideforhold
+Application-owned node	AppNodeInfoView		Applikasjons-eid node
 Tracks	FileNodeInfoView		Spor
 Source	InfoView		Kilde
 Destination	InfoView		Mål

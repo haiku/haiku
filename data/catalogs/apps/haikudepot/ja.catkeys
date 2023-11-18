@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		検証エラーが発生しまし�
 The nickname is required.	UserLoginWindow		ニックネームが必要です。
 -	no package size		-
 Apply changes	PackageResult		変更を適用
-Rate package	RatePackageWindow		パッケージを評価
 Server error	ServerHelper		サーバーエラー
+Rate package	RatePackageWindow		パッケージを評価
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%\" のビューを記録中
 Sending anonymous usage data	MainWindow		匿名の使用状況データーを送信する
 Log in	UserLoginWindow		ログイン

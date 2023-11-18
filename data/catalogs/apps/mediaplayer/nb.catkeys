@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	2220232089
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	834755355
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -74,6 +74,85 @@ Audio	MediaPlayer-Main		Lyd
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
 Quit	MediaPlayer-Main		Avslutt
 Redo	MediaPlayer-PlaylistWindow		Gjenta
+Move Entry	MediaPlayer-MovePLItemsCmd		Flytt Oppføring
+<unknown>	PlaylistItem-author		<ukjent>
+Cancel	MediaPlayer-SettingsWindow		Avbryt
 Large	MediaPlayer-SettingsWindow		Stor
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importer oppføring
 unknown format	MediaPlayer-InfoWin		ukjent format
+Track %d	MediaPlayer-Main		Spor %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Kunne ikke flytte alle filene til Søppelkurven.
+Total duration: %s	MediaPlayer-PlaylistWindow		Varighet: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Feil ved sletting
+50% scale	MediaPlayer-Main		50% skalering
+Drop files to play	MediaPlayer-Main		Slipp filer for å spille
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopier Oppføring
+Close window after playing audio	MediaPlayer-SettingsWindow		Lukk vindu etter lyden er spilt av
+Edit	MediaPlayer-PlaylistWindow		Rediger
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopier Oppføringer
+Always on top	MediaPlayer-Main		Alltid øverst
+Open	MediaPlayer-PlaylistWindow		Åpne
+always	MediaPlayer-SettingsWindow		alltid
+Loop video	MediaPlayer-SettingsWindow		Gjenta video
+Stream URL:	MediaPlayer-NetworkStream		Strømme-URL:
+<unknown>	PlaylistItem-album		<ukjent>
+Stream settings	MediaPlayer-Main		Strømmeinnstillinger
+none	Subtitles menu		ingen
+Save Playlist	MediaPlayer-PlaylistWindow		Lagre Spilleliste
+Overlay	MediaPlayer-InfoWin		Overlegg
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		Vurdering
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern feil (ikke nok minne). Lagring av spillelisten mislyktes.
+Video	MediaPlayer-Main		Video
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Det er ingen dekoder installert for å håndtere filformatet, eller dekoderen har problemer med den spesifikke versjonen av formatet.
+Lock Peaks	MediaPlayer-PeakView		Lås Topper
+none	Audio track menu		ingen
+Open network stream	MediaPlayer-NetworkStream		Åpne nettverksstrøm
+Automatically start playing	MediaPlayer-SettingsWindow		Start avspilling automatisk
+Undo	MediaPlayer-PlaylistWindow		Angre
+Display mode	MediaPlayer-InfoWin		Visningsmodus
+Bottom of video	MediaPlayer-SettingsWindow		Bunnen av videoen
+Small	MediaPlayer-SettingsWindow		Liten
+Settings…	MediaPlayer-Main		Innstillinger…
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Feil ved lagring av spilleliste:\n\nFeil: 
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Filinfo…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikansk)
+<unnamed>	PlaylistItem-name		<uten navn>
+Track	Video Track Menu		Spor
+Full screen	MediaPlayer-Main		Fullskjerm
+OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern feil (kunne ikke låse). Lagring av spillelisten mislyktes.
+100% scale	MediaPlayer-Main		100% skalering
+<nothing to redo>	MediaPlayer-PlaylistWindow		<ingenting å gjenta>
+Bad URL	MediaPlayer-NetworkStream		Ugyldig URL
+Save	MediaPlayer-Main		Lagre
+Close window after playing video	MediaPlayer-SettingsWindow		Lukk vindu etter videoavspilling
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Jevn skalering av video (ikke-overleggsmodus)
 200% scale	MediaPlayer-Main		200% forstørrelse
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Filen '%filename' kunne ikke åpnes.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ingen av filene du ønsket å spille ser ut til å være mediefiler.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Fjern Oppføring
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Fjern Oppføringer til Søppelkurven
+Subtitle size:	MediaPlayer-SettingsWindow		Størrelse på undertekst:
+No aspect correction	MediaPlayer-Main		Ingen aspektkorreksjon
+raw video	MediaPlayer-InfoWin		rå video
+Container	MediaPlayer-InfoWin		Beholder
+none	MediaPlayer-Main		ingen
+Open clips	MediaPlayer-Main		Åpne klipp
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Noen filer kunne ikke flyttes til Søppelkurven.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<ingenting å angre>
+Save as…	MediaPlayer-PlaylistWindow		Lagre som…
+Error: 	MediaPlayer-RemovePLItemsCmd		Feil: 
+300% scale	MediaPlayer-Main		300% skalering
+Open	MediaPlayer-Main		Åpne
+ask every time	MediaPlayer-SettingsWindow		spør hver gang
+(not supported)	MediaPlayer-InfoWin		(ikke støttet)
+Randomize	MediaPlayer-PlaylistWindow		Randomiser
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Av
+400% scale	MediaPlayer-Main		400% skalering
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		OK

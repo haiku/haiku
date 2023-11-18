@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	3998703664
+1	romanian	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configurare pagină…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
@@ -45,11 +45,12 @@ Job setup	PrintOptionsWindow		Configurare sarcină
 Clear selection	Menus		Eliberează selecția
 Rotate clockwise	Menus		Rotește în sens orar
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fie fișierul, fie un traducător de imagine pentru acesta nu există.
+Open with…	Menus		Deschide cu…
 Rotate counterclockwise	Menus		Rotește în sens anti-orar
 Previous page	Menus		Pagina anterioară
 Fit to window	Menus		Potrivește la fereastră
-Browse	Menus		Navigare
 Go to page	Menus		Mergi la pagina
+Browse	Menus		Navigare
 Progress monitor	ProgressWindow		Monitor de progres
 Edit	Menus		Editare
 Move to Trash	Menus		Mută la gunoi

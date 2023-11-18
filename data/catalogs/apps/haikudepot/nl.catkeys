@@ -200,8 +200,8 @@ A validation error has occurred	ServerHelper		Een validatie fout is opgetreden
 The nickname is required.	UserLoginWindow		De gebruikersnaam is vereist.
 -	no package size		-
 Apply changes	PackageResult		Aanpassingen toepassen
-Rate package	RatePackageWindow		Beoordeel pakket
 Server error	ServerHelper		Server fout
+Rate package	RatePackageWindow		Beoordeel pakket
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Bekijken van \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Bezig met het verzenden van anonieme gebruiksgegevens
 Log in	UserLoginWindow		Inloggen

@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Hitelesítési hiba
 The nickname is required.	UserLoginWindow		Felhasználói név szükséges.
 -	no package size		-
 Apply changes	PackageResult		Változtatások alkalmazása
-Rate package	RatePackageWindow		Csomag értékelése
 Server error	ServerHelper		Mentési hiba
+Rate package	RatePackageWindow		Csomag értékelése
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%\" felvételi nézete
 Sending anonymous usage data	MainWindow		Névtelen felhasználási adatok küldése
 Log in	UserLoginWindow		Bejelentkezés

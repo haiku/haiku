@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Hi ha hagut un error de validació
 The nickname is required.	UserLoginWindow		Cal el sobrenom.
 -	no package size		-
 Apply changes	PackageResult		Aplica els canvis
-Rate package	RatePackageWindow		Puntueu el paquet
 Server error	ServerHelper		Error de servidor
+Rate package	RatePackageWindow		Puntueu el paquet
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Es registra la vista de paquet \"%PackageName%\"
 Sending anonymous usage data	MainWindow		S'envien dades d'ús anònimes
 Log in	UserLoginWindow		Entreu

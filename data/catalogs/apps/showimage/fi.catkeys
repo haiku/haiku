@@ -48,8 +48,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 Previous page	Menus		Edellinen sivu
 Fit to window	Menus		Sovita ikkunaan
-Browse	Menus		Selaa
 Go to page	Menus		Siirry sivulle
+Browse	Menus		Selaa
 Progress monitor	ProgressWindow		Edistymisvalvonta
 Edit	Menus		Muokkaa
 Move to Trash	Menus		Siirrä roskakoriin

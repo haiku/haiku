@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Προέκυψε σφάλμα επ
 The nickname is required.	UserLoginWindow		Απαιτείται ψευδώνυμο.
 -	no package size		-
 Apply changes	PackageResult		Εφαρμογή αλλαγών
-Rate package	RatePackageWindow		Αξιολόγηση πακέτου
 Server error	ServerHelper		Σφάλμα εξυπηρετητή
+Rate package	RatePackageWindow		Αξιολόγηση πακέτου
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Εγγραφή προβολής του πακέτου \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Αποστολή ανώνυμων στατιστικών χρήσης
 Log in	UserLoginWindow		Είσοδος

@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Bir doğrulama hatası oluştu
 The nickname is required.	UserLoginWindow		Takma ad gerekli.
 -	no package size		-
 Apply changes	PackageResult		Değişiklikleri uygula
-Rate package	RatePackageWindow		Paketi derecelendir
 Server error	ServerHelper		Sunucu hatası
+Rate package	RatePackageWindow		Paketi derecelendir
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%\" görüntülemesinin kaydı yazılıyor
 Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Log in	UserLoginWindow		Giriş yap

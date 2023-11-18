@@ -1,4 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-softwareupdater	3959432004
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Oppdaterer versjon
 Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Klikk her for å installere {0, plural, one{# oppdatert pakke} other{# oppdaterte pakker}}.
 Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pakker som skal avinstalleres
 No active network connection was found	UpdateManager	Error message	Ingen aktiv nettverkstilkobling ble funnet

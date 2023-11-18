@@ -1,3 +1,16 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.moon-Flanger.media_addon	3488282674
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke hente nodeinfo (%ld):\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		En tilleggsversjon av FlangerNode.\nav Eric Moon (16 juni, 1999)
+Delay	CortexAddOnsFlanger		Forsinkelse
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke finne noden (%ld):\n%s\n
+Depth	CortexAddOnsFlanger		Dypde
+Feedback	CortexAddOnsFlanger		Feedback
+Sweep rate	CortexAddOnsFlanger		Sweeprate
+Mix ratio	CortexAddOnsFlanger		Blandingsforhold
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode-parametere
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
+Mix output	CortexAddOnsFlanger		Bland utgang
+Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ingen parametere for noden (%ld):\n%s\n
+Audio input	CortexAddOnsFlanger		Lydinngang

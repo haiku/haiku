@@ -47,8 +47,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		Pasukti prieš laikrodžio rodyklę
 Previous page	Menus		Ankstesnis puslapis
 Fit to window	Menus		Sutalpinti lange
-Browse	Menus		Naršymas
 Go to page	Menus		Pereiti puslapin
+Browse	Menus		Naršymas
 Progress monitor	ProgressWindow		Eigos indikatorius
 Edit	Menus		Taisa
 Move to Trash	Menus		Išmesti Šiukšlinėn

@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Сталася помилка пе
 The nickname is required.	UserLoginWindow		Псевдонім обов'язковий.
 -	no package size		-
 Apply changes	PackageResult		Застосувати
-Rate package	RatePackageWindow		Оцінка пакета
 Server error	ServerHelper		Помилка серверу
+Rate package	RatePackageWindow		Оцінка пакета
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Перегляд запису \«%PackageName%\»
 Sending anonymous usage data	MainWindow		Відправка анонімних даних про використання
 Log in	UserLoginWindow		Авторизація

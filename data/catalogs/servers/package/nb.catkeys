@@ -4,7 +4,7 @@ uninstall package %s\n	PackageResult	Don't change '%s' variable	avinstaller pakk
 ignore problem for now	PackageProblem		ignorer problemet foreløpig
 solution %d:	PackageProblem	Don't change the %d variable	løsning %d:
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Følgende problemer har blitt funnet. Velg en løsning for hver:
-Apply changes	PackageResult		Bruk endringer
+Apply changes	PackageResult		Foreta endringer
 Package daemon	PackageManager		Pakke-daemon
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installer pakken %s fra depotet %s\n
 The following additional package changes have to be made:	PackageResult		Følgende ekstra pakkeendringer må gjøres:

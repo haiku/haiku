@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Ett valideringsfel har inträffat
 The nickname is required.	UserLoginWindow		Ett användarnamn krävs.
 -	no package size		-
 Apply changes	PackageResult		Applicera förändringar
-Rate package	RatePackageWindow		Betygsatt paket
 Server error	ServerHelper		Serverfel
+Rate package	RatePackageWindow		Betygsatt paket
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Inspelningsvy av \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Skickar anonym användningsinformation
 Log in	UserLoginWindow		Logga in

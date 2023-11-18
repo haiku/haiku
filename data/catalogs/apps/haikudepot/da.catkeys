@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Der opstod en fejl ved validering
 The nickname is required.	UserLoginWindow		Brugernavnet er påkrævet.
 -	no package size		-
 Apply changes	PackageResult		Anvend ændringer
-Rate package	RatePackageWindow		Bedøm pakke
 Server error	ServerHelper		Serverfejl
+Rate package	RatePackageWindow		Bedøm pakke
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Indspilningsvisning af \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Sender anonyme brugsdata
 Log in	UserLoginWindow		Log ind

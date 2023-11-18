@@ -157,8 +157,8 @@ Reading repository data	LocalPkgDataLoadProcess		Чтение данных ре�
 A validation error has occurred	ServerHelper		Произошла ошибка валидации
 The nickname is required.	UserLoginWindow		Имя пользователя обязательно.
 -	no package size		-
-Rate package	RatePackageWindow		Оценить пакет
 Server error	ServerHelper		Ошибка сервера
+Rate package	RatePackageWindow		Оценить пакет
 Sending anonymous usage data	MainWindow		Отправка анонимных данных об использовании приложения
 Log in	UserLoginWindow		Войти
 HaikuDepot	System name		HaikuDepot

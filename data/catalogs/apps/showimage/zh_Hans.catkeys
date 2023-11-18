@@ -48,8 +48,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		逆时针旋转
 Previous page	Menus		上一页
 Fit to window	Menus		适合窗口
-Browse	Menus		浏览
 Go to page	Menus		转到
+Browse	Menus		浏览
 Progress monitor	ProgressWindow		任务管理器
 Edit	Menus		编辑
 Move to Trash	Menus		移动到垃圾箱

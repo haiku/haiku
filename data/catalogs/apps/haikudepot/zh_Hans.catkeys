@@ -177,8 +177,8 @@ A validation error has occurred	ServerHelper		检验发生问题
 The nickname is required.	UserLoginWindow		请填写昵称。
 -	no package size		-
 Apply changes	PackageResult		应用修改
-Rate package	RatePackageWindow		软件包评分
 Server error	ServerHelper		服务器错误
+Rate package	RatePackageWindow		软件包评分
 Sending anonymous usage data	MainWindow		发送匿名使用数据
 Log in	UserLoginWindow		登陆
 Usage conditions	UserUsageConditions		使用条款

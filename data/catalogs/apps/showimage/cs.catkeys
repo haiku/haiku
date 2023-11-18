@@ -48,8 +48,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		Otočit proti směru hodinových ručiček
 Previous page	Menus		Předchozí stránka
 Fit to window	Menus		Přizpůsobit oknu
-Browse	Menus		Prohlížet
 Go to page	Menus		Jít na stránku
+Browse	Menus		Prohlížet
 Progress monitor	ProgressWindow		Sledování pokroku
 Edit	Menus		Editovat
 Move to Trash	Menus		Přesunout do koše

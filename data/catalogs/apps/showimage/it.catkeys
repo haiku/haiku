@@ -48,8 +48,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		Ruota in senso antiorario
 Previous page	Menus		Pagina precedente
 Fit to window	Menus		Adatta alla finestra
-Browse	Menus		Sfoglia
 Go to page	Menus		Vai alla pagina
+Browse	Menus		Sfoglia
 Progress monitor	ProgressWindow		Controllo avanzamento
 Edit	Menus		Modifica
 Move to Trash	Menus		Sposta nel Cestino

@@ -48,8 +48,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		หมุนทวนเข็มนาฬิกา
 Previous page	Menus		หน้าก่อนหน้า
 Fit to window	Menus		พอดีกับหน้าต่าง
-Browse	Menus		เบราวส์
 Go to page	Menus		ไปที่หน้า
+Browse	Menus		เบราวส์
 Progress monitor	ProgressWindow		ตรวจสอบกระบวนการ
 Edit	Menus		แก้ไข
 Move to Trash	Menus		ย้ายไปถังขยะ

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.Route	2011521004
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.Route	25925955
 Node '%name%' released	CortexRouteApp		Node '%name%' frigitt
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Om Cortex/Route…
@@ -17,6 +17,7 @@ Connection '%name%' broken	CortexRouteApp		Tilkobling '%name%' brutt
 Between:	CortexRouteApp		Mellom:
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Åpne…
+Pull palettes	CortexRouteApp		Trekk paletter
 Connection made	CortexRouteApp		Tilkobling opprettet
 Show transport	CortexRouteApp		Vis transport
 Show add-ons	CortexRouteApp		Vis tillegg

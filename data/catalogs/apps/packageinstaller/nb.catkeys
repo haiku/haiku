@@ -1,8 +1,9 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PackageInstaller	3906371222
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PackageInstaller	2472572058
 Package description	UninstallView		Pakkebeskrivelse
 none	PackageView		ingen
 Continue	PackageInstall		Fortsett
 Running post-installation scripts	PackageInstall		Kjøre skript etter installasjon
+Package installer	PackageView		Pakkeinstallerer
 All existing files will be skipped?	PackageView		Alle eksisterende filer vil bli hoppet over?
 Replace	PackageView		Erstatt
 All existing files will be replaced?	PackageView		Alle eksisterende filer vil bli erstattet?

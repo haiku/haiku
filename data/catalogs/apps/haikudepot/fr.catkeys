@@ -199,8 +199,8 @@ A validation error has occurred	ServerHelper		Une erreur de validation est surve
 The nickname is required.	UserLoginWindow		Le surnom est requis.
 -	no package size		-
 Apply changes	PackageResult		Appliquer les modifications
-Rate package	RatePackageWindow		Évaluer le paquet
 Server error	ServerHelper		Erreur du serveur
+Rate package	RatePackageWindow		Évaluer le paquet
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Enregistrement de la vue de « %PackageName% »
 Sending anonymous usage data	MainWindow		Envoi de données d’utilisation anonymes
 Log in	UserLoginWindow		Connexion

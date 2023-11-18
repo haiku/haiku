@@ -4,7 +4,7 @@ Account settings	AutoConfigWindow		Impostazions account
 An error occurred while creating the config view: %error.	Config Views		Si è verificât un erôr intant che si creave la viodude de configurazion: %error.
 E-mail address:	E-Mail		Direzion e-mail:
 Create new account	AutoConfigWindow		Cree un gnûf account
-While sending and receiving	Config Window		Dilunc l'inviament e la ricezion
+While sending and receiving	Config Window		Dilunc la spedizion e la ricezion
 Error!	Config Views		Erôr!
 Apply	Config Window		Apliche
 Incoming mail filters	Config Views		Filtris de pueste in jentrade
@@ -47,7 +47,7 @@ Edit mailbox menu…	Config Window		Modifiche menù de casele de pueste…
 Server Name:	E-Mail		Non servidôr:
 Remove	Config Window		Gjave
 Login name:	E-Mail		Non di acès:
-While sending	Config Window		Dilunc l'inviament
+While sending	Config Window		Dilunc la spedizion
 OK	Config Window		Va ben
 OK	AutoConfigWindow		Va ben
 Next	AutoConfigWindow		Sucessîf

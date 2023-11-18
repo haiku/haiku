@@ -1,3 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SystemLogger	239668711
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-SystemLogger	2600925901
 Syslog Daemon	SyslogDaemon		Syslog Daemon
 OK	SyslogDaemon		OK
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nDenne daemonen samler alle systemmeldinger og skriver dem til den systemomfattende loggen \"%s\".\n\n

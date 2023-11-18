@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Si è verificât un erôr di conva
 The nickname is required.	UserLoginWindow		Il sorenon al è necessari.
 -	no package size		-
 Apply changes	PackageResult		Apliche modifichis
-Rate package	RatePackageWindow		Valute pachet
 Server error	ServerHelper		Erôr dal servidôr
+Rate package	RatePackageWindow		Valute pachet
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Viodude di regjistrazion di \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Daûr a inviâ dâts anonim sul ûs
 Log in	UserLoginWindow		Jentre

@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
 The nickname is required.	UserLoginWindow		Vaaditaan käyttäjätunnus.
 -	no package size		-
 Apply changes	PackageResult		Toteuta muutokset
-Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Server error	ServerHelper		Palvelinvirhe
+Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Tallentava \"%PackageName%\" -näkymä
 Sending anonymous usage data	MainWindow		Nimettömien käyttötietojen lähettäminen
 Log in	UserLoginWindow		Kirjaudu

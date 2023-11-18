@@ -1,4 +1,5 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.TransportView	3166856429
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Rull
 (none)	TransportView		(ingen)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# node} other{# noder}}
 Start	TransportView		Start
@@ -11,9 +12,12 @@ Stop	TransportView		Stopp
 Drop data	TransportView		Dropp data
 To:	TransportView		Til:
 Recording	TransportView		Opptak
+Increase latency	TransportView		Øk forsinkelse
 Time source:	TransportView		Tidskilde:
 DAC time source	TransportView		DAC tidskilde
 Decrease precision	TransportView		Reduser presisjonen
 System clock	TransportView		Systemklokke
 From:	TransportView		Fra:
+Roll from	TransportView		Rull fra
+Preroll	TransportView		Forhåndsrull
 Run mode:	TransportView		Kjøremodus:

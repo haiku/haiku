@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	466377502
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		ShowImage
 Page setup…	Menus		Sideoppsett…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
@@ -16,6 +16,7 @@ Original size	Menus		Originalstørrelse
 Width:	PrintOptionsWindow		Bredde:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Endre størrelse til (i 1/72 tommer):
 Zoom factor in %:	PrintOptionsWindow		zoomfaktor i %:
+Get info…	Menus		Hent info…
 Zoom out	Menus		Zoom ut
 OK	Alerts		OK
 File	Menus		Fil
@@ -44,13 +45,15 @@ Job setup	PrintOptionsWindow		Jobboppsett
 Clear selection	Menus		Fjern utvalg
 Rotate clockwise	Menus		Roter med klokken
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kunne ikke laste bildet! Enten filen eller en bildeoversetter for den finnes ikke.
+Open with…	Menus		Åpne med…
 Rotate counterclockwise	Menus		Roter mot klokken
 Previous page	Menus		Forrige side
 Fit to window	Menus		Tilpass til vindu
-Browse	Menus		Bla gjennom
 Go to page	Menus		Gå til side
+Browse	Menus		Bla gjennom
 Progress monitor	ProgressWindow		Fremdriftsoversikt
 Edit	Menus		Rediger
+Move to Trash	Menus		Flytt til Søppelkurven
 Use as background…	Menus		Bruk som bakgrunn…
 Open…	Menus		Åpne…
 Save as…	Menus		Lagre som…

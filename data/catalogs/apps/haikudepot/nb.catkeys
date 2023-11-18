@@ -20,7 +20,7 @@ Switch account…	MainWindow		Bytt konto…
 Preferred language:	UserLoginWindow		Foretrukket språk:
 Name	PackageListView		Navn:
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Autorisasjons- eller sikkerhetsproblem. Logg ut og logg på igjen for å sjekke at passordet ditt er riktig, og sjekk også at du har godtatt de siste bruksbetingelsene.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommuniserer med en serverkomponent kalt HaikuDepotServer. Dette er bruksbetingelsene som brukeren '%Nickname%' godtok på %AgreedToTimestamp% i forhold til bruken av HaikuDepotServer-tjenesten.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommuniserer med en serverkomponent kalt HaikuDepotServer. Dette er bruksbetingelsene som brukeren '%Nickname%' godtok den %AgreedToTimestamp% angående bruken av HaikuDepotServer-tjenesten.
 don't activate package %source%	PackageProblem	don't change '%source%	ikke aktiver pakken %source%
 Rate %Package%	RatePackageWindow		Vurder %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Det oppstod en feil under initialisering av pakkebehandlingen: %message%
@@ -122,7 +122,7 @@ Installing \"%PackageName%\"	InstallPackageProcess		Installerer \"%PackageName%\
 OK	App		OK
 HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot kommuniserer med en serverkomponent kalt HaikuDepotServer. Dette er de siste bruksbetingelsene for bruk av HaikuDepotServer-tjenesten.
 Fatal error	UninstallPackageAction		Fatal feil
-Develop packages	MainWindow		Utvikle pakker
+Develop packages	MainWindow		Utviklerpakker
 Starting the package daemon failed:\n\n%Error%	App		Kunne ikke starte pakke-daemonen:\n\n%Error%
 No user ratings available.	PackageInfoView		Ingen brukervurderinger tilgjengelig.
 <no info>	PackageInfoView		<ingen info>
@@ -205,9 +205,9 @@ Fatal error	InstallPackageProcess		Fatal feil
 A validation error has occurred	ServerHelper		Det har oppstått en valideringsfeil
 The nickname is required.	UserLoginWindow		Brukernavn er påkrevet.
 -	no package size		-
-Apply changes	PackageResult		Bruk endringer
-Rate package	RatePackageWindow		Vurder pakken
+Apply changes	PackageResult		Foreta endringer
 Server error	ServerHelper		Serverfeil
+Rate package	RatePackageWindow		Vurder pakken
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Opptaksvisning av \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Sender anonyme bruksdata
 Log in	UserLoginWindow		Logg inn

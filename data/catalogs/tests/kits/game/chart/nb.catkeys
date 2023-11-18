@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Be.ChartDemo	3491540808
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Be.ChartDemo	446404305
 (high) 100% 	ChartWindow		(høy) 100% 
 Spiral	ChartWindow		Spiral
 Orange	ChartWindow		Oransje
@@ -6,6 +6,7 @@ Display:	ChartWindow		Skjerm:
 Pink	ChartWindow		Rosa
 Animation:	ChartWindow		Animasjon:
 Auto demo	ChartWindow		Auto demo
+ 0.6 f/s  (logarithmic scale)	ChartWindow		 0.6 f/s  (logaritmisk skala)
 Red	ChartWindow		Rød
 None	ChartWindow		Ingen
 600.0 f/s	ChartWindow		600,0 f/s

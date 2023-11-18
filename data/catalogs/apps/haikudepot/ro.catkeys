@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		A apărut o eroare de validare
 The nickname is required.	UserLoginWindow		Pseudonimul este necesar.
 -	no package size		-
 Apply changes	PackageResult		Aplică modificările
-Rate package	RatePackageWindow		Evaluați pachetul
 Server error	ServerHelper		Eroare de server
+Rate package	RatePackageWindow		Evaluați pachetul
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Se înregistrează vizualizarea lui \„%PackageName%\”
 Sending anonymous usage data	MainWindow		Se trimit datele de utilizare anonime
 Log in	UserLoginWindow		Autentificare

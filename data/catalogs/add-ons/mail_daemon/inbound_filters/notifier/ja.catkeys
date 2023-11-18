@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-NewMailNotification	2220310168
+1	japanese	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		ログウィンドウ
 none	NotifierConfigView		無し
 Alert	NotifierConfigView		警告ウィンドウ
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		警告ウィンドウ (すべてのアカウ�
 Beep	NotifierConfigView		ビープ音
 Central beep	NotifierConfigView		ビープ音 (すべてのアカウント)
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{1 件の新着メッセージ} other{# 件の新着メッセージ}}
+New mail notification	NotifierFilter		新規メールの通知
 New messages	NotifierFilter		新着メッセージ
 Method:	NotifierConfigView		方法:
 Keyboard LEDs	NotifierConfigView		キーボードLED

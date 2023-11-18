@@ -155,8 +155,8 @@ Reading repository data	LocalPkgDataLoadProcess		Legado de deponeja datumo
 A validation error has occurred	ServerHelper		Valideca eraro okazis
 The nickname is required.	UserLoginWindow		La kromnomo estas deviga.
 -	no package size		-
-Rate package	RatePackageWindow		Taksi pakaĵon
 Server error	ServerHelper		Eraro de servilo
+Rate package	RatePackageWindow		Taksi pakaĵon
 Sending anonymous usage data	MainWindow		Sendi anoniman informon pri uzado
 Log in	UserLoginWindow		Ensaluti
 HaikuDepot	System name		HaikuTenejo

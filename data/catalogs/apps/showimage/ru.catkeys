@@ -48,8 +48,8 @@ Could not load image! Either the file or an image translator for it does not exi
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 Previous page	Menus		Предыдущая страница
 Fit to window	Menus		Подогнать под размер окна
-Browse	Menus		Просмотр
 Go to page	Menus		Перейти к странице
+Browse	Menus		Просмотр
 Progress monitor	ProgressWindow		Монитор состояния
 Edit	Menus		Изменить
 Move to Trash	Menus		Переместить в корзину

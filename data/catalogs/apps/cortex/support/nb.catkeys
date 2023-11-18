@@ -1,7 +1,147 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	799446957
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.support	761210807
+Header has flags	MediaString		Header har flagg
+32 bit HLS	MediaString		32-biters HLS
 Recording	MediaString		Opptak
+(unknown format)	MediaString		(ukjent format)
+Clean buffers	MediaString		Tøm buffere
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# ramme fremover}other{# rammer fremover}}
+Rear-right	MediaString		Bak til høyre
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# piksel} other{# piksler}}
 Mono	MediaString		Mono
 MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF-formatfamilie
+Encoded video	MediaString		Kodet video
 YUV444	MediaString		YUV444
+Port	MediaString		Port
+Top-Front-left	MediaString		Topp-front-venstre
+24 bit LAB	MediaString		24-biters LAB
+16 bit integer	MediaString		16-biters heltall
+32 bit HSVA	MediaString		32-biters HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Offline
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(Ukjent videoorientering)
 QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32-biters HLSA
+Top-Front-center	MediaString		Topp-front-senter
+BeOS format family	MediaString		BeOS-formatfamilie
+24 bit HSV	MediaString		24-biters HSV
+Back-center	MediaString		Bak i midten
+32 bit CMY	MediaString		32-biters CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# biters heltall}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(ukjent videoformat)
+Video data between line %lu and %lu	MediaString		Videodata mellom linjen %lu og %lu
+AVI format family	MediaString		AVI-formatfamilie
+Homogenous buffers	MediaString		Homogene buffere
+Interlaced 	MediaString		Interlaced 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanal}other{# kanaler}}
+15 bit RGBA	MediaString		15-biters RGBA
+Drop data	MediaString		Dropp data
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Høyre
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
+32 bit RGB	MediaString		32-biters RGB
+System mixer	MediaString		Systemmikser
+Physical output	MediaString		Fysisk utgang
+Top-Back-center	MediaString		Topp-Bak-senter
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Topp til bunn, fra venstre til høyre
+(unknown run mode)	MediaString		(ukjent kjøremodus)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24-biters HSI
+User-defined media type	MediaString		Brukerdefinert medietype
+32 bit CMYA	MediaString		32-biters CMYA
+Rear-left	MediaString		Bakre venstre
+QuickTime format family	MediaString		QuickTime-formatfamilie
+Any format family	MediaString		Hvilken som helst formatfamilie
+Timecode	MediaString		Tidskode
+Top-Front-right	MediaString		Topp-Front-høyre
+32 bit float	MediaString		32-biters float
+Controllable	MediaString		Kontrollerbar
+32 bit integer	MediaString		32-biters heltall
+Front-right-center	MediaString		Front-høyre-senter
+Side-right	MediaString		Side-høyre
+ kHz	MediaString		 kHz
+Little endian	MediaString		Little endian
+(unknown matrix mask)	MediaString		(ukjent matrisemaske)
+32 bit LAB	MediaString		32-biters LAB
+Side-left	MediaString		Side-venstre
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte per buffer} other{# bytes per buffer}}
+32 bit CMYK	MediaString		32-biters CMYK
+(unknown multistream format)	MediaString		(ukjent multistrøm-format)
+8 bit integer	MediaString		8-biters heltall
+8 bit grayscale-index	MediaString		8-biters gråtone-indeks
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Bufferprodusent
+Buffer consumer	MediaString		Bufferforbruker
+Increase latency	MediaString		Øk forsinkelse
+Front-left-center	MediaString		Front-venstre-senter
+MPEG format family	MediaString		MPEG-formatfamilie
+(none)	MediaString		(ingen)
+Center	MediaString		Senter
+ kb/s (max)	MediaString		 kb/s (maks)
+Monochrome	MediaString		Monokrom
+Private Be media type	MediaString		Privat Be-medietype
+24 bit UVL	MediaString		24-biters UVL
+32 bit HSV	MediaString		32-biters HSV
+ID	MediaString		ID
+AIFF format family	MediaString		AIFF-formatfamilie
+Top-Back-left	MediaString		Topp-bak-venstre
+16 bit RGB	MediaString		16-biters RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Rå lyd
+32 bit LABA	MediaString		32-biters LABA
+24 bit HLS	MediaString		24-biters HLS
+Non-interlaced 	MediaString		Ikke-interlaced 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (gjennomsnitt)}other{# bytes (gjennomsnitt)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		WAV-formatfamilie
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Fysisk inngang
+Big endian	MediaString		Big endian
+Sub	MediaString		Sub
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (maks)}other{# bytes (maks)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Multistrøm-media
+Encoded audio	MediaString		Kodet lyd
+Decrease precision	MediaString		Reduser presisjon
+File interface	MediaString		Filgrensesnitt
+(unknown byte order)	MediaString		(ukjent byte-rekkefølge)
+32 bit HSI	MediaString		32-biters HSI
+Typeless media	MediaString		Typeløse medier
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32-biters RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (gjennomsnitt)
+HTML	MediaString		HTML
+Time source	MediaString		Tidskilde
+15 bit RGB	MediaString		15-biters RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte per ramme}other{# bytes per ramme}}
+Parameters	MediaString		Parametere
+Raw data from VBL area	MediaString		Rå data fra VBL-området
+Top-Back-right	MediaString		Topp-Bak-høyre
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# byte per rad}other{# bytes per rad}}
+Left	MediaString		Venstre
+BeOS video	MediaString		BeOS-video
+24 bit CMY	MediaString		24-biters CMY
+32 bit UVLA	MediaString		32-biters UVLA
+Top-center	MediaString		Topp-senter
+Entity interface	MediaString		Enhetsgrensesnitt
+Stereo	MediaString		Stereo
+8 bit color-index	MediaString		8-biters fargeindeks
+Bottom to top, left to right	MediaString		Bunn til topp, venstre til høyre
+32 bit UVL	MediaString		32-biters UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# linje} other{# linjer}}
+Text	MediaString		Tekst
+Unknown media type	MediaString		Ukjent medietype
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Diverse formatfamilie
+24 bit RGB	MediaString		24-biters RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# ramme tilbake}other{# rammer tilbake}}
+32 bit HSIA	MediaString		32-biters HSIA
+Raw video	MediaString		Rå video

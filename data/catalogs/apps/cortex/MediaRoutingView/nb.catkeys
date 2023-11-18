@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.MediaRoutingView	3116660484
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Cortex.MediaRoutingView	3442339205
 Lock group	MediaNodePanel		Lås gruppe
 %refname% (no file)	MediaNodePanel		%refname% (ingen fil)
 Video output	MediaRoutingView		Videoutgang
@@ -15,6 +15,20 @@ Video input	MediaRoutingView		Videoinngang
 Release	MediaNodePanel		Løs ut
 Disconnect	MediaRoutingView		Koble fra
 Could not disconnect	MediaRoutingView		Kunne ikke koble fra
+Could not instantiate '%infoname%'	MediaRoutingView		Kunne ikke starte '%infoname%'
 Mini icon view	MediaRoutingView		Miniikonvisning
 Select all	MediaRoutingView		Velg alle
+(same as group)	MediaNodePanel		(samme som gruppen)
+Input	MediaJack		Inngang
 Get info	MediaJack		Hent info
+Start time source	MediaNodePanel		Starttidskilde
+Error	MediaRoutingView		Feil
+Could not release '%refname%'	MediaRoutingView		Kunne ikke løse ut '%refname%'
+Output	MediaJack		Utgang
+Get info	MediaNodePanel		Få info
+Get info	MediaRoutingView		Få info
+Clean up	MediaRoutingView		Rydd opp
+Start control panel	MediaNodePanel		Start kontrollpanel
+Tweak parameters	MediaNodePanel		Juster parametere
+Could not connect	MediaRoutingView		Kunne ikke koble til
+Unlock group	MediaNodePanel		Lås opp gruppe

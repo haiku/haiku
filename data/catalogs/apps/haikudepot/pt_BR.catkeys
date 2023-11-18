@@ -157,8 +157,8 @@ Reading repository data	LocalPkgDataLoadProcess		Lendo dados do repositório
 A validation error has occurred	ServerHelper		Ocorreu um erro de validação
 The nickname is required.	UserLoginWindow		O apelido é obrigatório.
 -	no package size		-
-Rate package	RatePackageWindow		Avaliar pacote…
 Server error	ServerHelper		Erro de servidor
+Rate package	RatePackageWindow		Avaliar pacote…
 Sending anonymous usage data	MainWindow		Enviando de dados anônimos de uso
 Log in	UserLoginWindow		Entrar
 HaikuDepot	System name		Depósito Haiku

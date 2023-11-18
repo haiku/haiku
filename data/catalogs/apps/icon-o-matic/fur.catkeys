@@ -28,7 +28,7 @@ Rotation	Icon-O-Matic-PropertyNames		Rotazion
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Colôr (#%02x%02x%02x)
 BEOS:ICON attribute	Icon-O-Matic-SavePanel		Atribût BEOS:ICON
 Transform	Icon-O-Matic-PathManipulator		Trasforme
-Add shape with style	Icon-O-Matic-Menu-Shape		Zonte sagome cun stîl
+Add shape with style	Icon-O-Matic-Menu-Shape		Zonte sacume cun stîl
 Change color	Icon-O-Matic-SetColorCmd		Cambie colôr
 Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Gjave {0, plural, one{vertiç} other{vertiçs}}
 Unassign path	Icon-O-Matic-UnassignPathCmd		Gjave assegnazion segn
@@ -62,7 +62,7 @@ Opening the document failed!	Icon-O-Matic-Main		No si è rivâts a vierzi il doc
 Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Gjave {0, plural, one{stîl} other{stîi}}
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Un o plui segns a àn masse vertiçs. Il formât HVIF a'nt supuarte un massim di 255 par grafic.
 Add with path & style	Icon-O-Matic-ShapesList		Zonte cun segn e stîl
-Shape	Icon-O-Matic-Menus		Sagome
+Shape	Icon-O-Matic-Menus		Sacume
 Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Divît {0, plural, one{vertiç} other{vertiçs}}
 <unavailable>	Icon-O-Matic-StyleTypes		<no disponibil>
 Edit gradient	Icon-O-Matic-SetGradientCmd		Modifiche gradient
@@ -136,7 +136,7 @@ Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Colôr
 Detect orient.	Icon-O-Matic-PropertyNames		Rileve orient.
 Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Zonte {0, plural, one{segn} other{segns}}
 One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Un o plui formis a àn masse segns. Il formât HVIF a'nt supuarte un massim di 255 par forme.
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Zonte sagome cun percors e stîl
+Add shape with path & style	Icon-O-Matic-Menu-Shape		Zonte sacume cun percors e stîl
 Radial	Icon-O-Matic-StyleTypes		Radiâl
 Text too long	Icon-O-Matic-StyledTextImport		Test masse lunc
 Caps	Icon-O-Matic-PropertyNames		Cjâfs

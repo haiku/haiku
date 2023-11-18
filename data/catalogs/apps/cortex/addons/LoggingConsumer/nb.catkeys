@@ -1,9 +1,22 @@
-1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Be.LoggingConsumerApp	2097919131
+1	bokmål, norwegian; norwegian bokmål	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke hente info for noden (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioritet
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunne ikke finne noden (%ld):\n%s\n
+Latency	CortexAddOnsLoggingConsumer		Forsinkelse
+Logged input	CortexAddOnsLoggingConsumer		Logget inngang
+CPU spin percentage	CortexAddOnsLoggingConsumer		CPU spinnprosent
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
 Thread priority	CortexAddOnsLoggingConsumer		Trådprioritet
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer-parametere
+Latency control	CortexAddOnsLoggingConsumer		Forsinkelseskontroll
+CPU percentage	CortexAddOnsLoggingConsumer		CPU-prosent
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stopp
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		En tilleggsversjon av LoggingConsumer-noden.\nSe Be Developer Newsletter III.18: 5. mai 1999\ntilpasset av Eric Moon (4. juni 1999)
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Kontroller
 controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Koble til
 percent	CortexAddOnsLoggingConsumer		prosent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ingen parametere for noden (%ld):\n%s\n

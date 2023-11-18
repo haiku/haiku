@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Došlo k chybě ověření
 The nickname is required.	UserLoginWindow		Přezdívka je vyžadována.
 -	no package size		-
 Apply changes	PackageResult		Použít změny
-Rate package	RatePackageWindow		Hodnocení balíčku
 Server error	ServerHelper		Chyba na serveru
+Rate package	RatePackageWindow		Hodnocení balíčku
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Záznamy balíčku \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Odesílám anonymní data o užívání
 Log in	UserLoginWindow		Přihlásit

@@ -206,8 +206,8 @@ A validation error has occurred	ServerHelper		Si è verificato un errore nella v
 The nickname is required.	UserLoginWindow		Il nickname è necessario.
 -	no package size		-
 Apply changes	PackageResult		Applica le modifiche
-Rate package	RatePackageWindow		Valuta pacchetto
 Server error	ServerHelper		Errore del server
+Rate package	RatePackageWindow		Valuta pacchetto
 Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Visualizzazione della registrazione di \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Invio dati anonimi sull'utilizzo
 Log in	UserLoginWindow		Accesso

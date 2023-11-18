@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	1657222195
+1	bokmål, norwegian; norwegian bokmål	x-vnd.haiku-icon_o_matic	3174700455
 None	Icon-O-Matic-Properties		Ingen
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Rydd opp sti
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -81,6 +81,7 @@ Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransforme
 Miter limit	Icon-O-Matic-PropertyNames		Mitergrense
 Insert vertex	Icon-O-Matic-InsertPointCmd		Legg til punkt
 Rounding	Icon-O-Matic-PropertyNames		Runding
+Joins	Icon-O-Matic-PropertyNames		Forbindelser
 There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Det er for mange former. HVIF-formatet støtter maksimalt 255.
 Cancel	Icon-O-Matic-ColorPicker		Avbryt
 Duplicate	Icon-O-Matic-PathsList		Dupliser
@@ -98,6 +99,7 @@ Bummer	Icon-O-Matic-Main	Cancel button - error alert	Synd
 Translation X	Icon-O-Matic-PropertyNames		Flytting X
 Multi-paste properties	Icon-O-Matic-Properties		Lim inn flere egenskaper
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Det kan være Icon-O-Matic ikke fikk tolket alle data fra SVG når den ble lastet. Ved å overskrive den orginale filen, vil denne informasjonen bli tapt.
+Rotate indices backwards	Icon-O-Matic-PathsList		Roter indeksene bakover
 Overwrite	Icon-O-Matic-SVGExport		Overskriv
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Legg til {0, plural, one{form} other{former}}
 Cancel	Icon-O-Matic-SVGExport		Avbryt
@@ -114,6 +116,7 @@ Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Tildel {0, 
 Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Fjern {0, plural, one{element} other{elementer}}
 Linear	Icon-O-Matic-StyleTypes		Linær
 Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Flytt {0, plural, one{element} other{elementer}}
+Add vertex	Icon-O-Matic-AddPointCmd		Legg til vertex
 Clean up	Icon-O-Matic-PathsList		Rydd opp
 Split	Icon-O-Matic-PathManipulator		Splitt
 Move	Icon-O-Matic-TransformationBoxStates		Flytt
@@ -136,12 +139,15 @@ One or more of the shapes has too many paths. The HVIF format supports a maximum
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Legg til form med sti & stil
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		For lang tekst
+Caps	Icon-O-Matic-PropertyNames		Store bokstaver
 OK	Icon-O-Matic-SVGImport		OK
 Import text	Icon-O-Matic-StyledTextImport		Importer tekst
 Append…	Icon-O-Matic-Menu-File		Bruk…
 Scale Y	Icon-O-Matic-PropertyNames		Skaler Y
 Export icon	Icon-O-Matic-SavePanel	Dialog title	Eksporter ikon
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Roter sti-indeksene
 Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Legg til {0, plural, one{element} other{elementer}}
+Rotate indices forwards	Icon-O-Matic-PathsList		Roter indeksene fremover
 Save	Icon-O-Matic-Menu-File		Lagre
 Cancel	Icon-O-Matic-StyledTextImport		Avbryt
 Add circle	Icon-O-Matic-PathsList		Legg til sirkel
@@ -159,10 +165,13 @@ Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<ingenting å angre på>
 Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Fjern {0, plural, one{sti} other{stier}}
 Add	Icon-O-Matic-StylesList		Legg til
+Translation Y	Icon-O-Matic-PropertyNames		Flytt Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Endre vertex
 Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		Flytt {0, plural, one{stil} other{stiler}}
 Scale	Icon-O-Matic-TransformationBoxStates		Skaler
 All	Icon-O-Matic-Properties		Alle
 Transformer	Icon-O-Matic-Menus		Omformer
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Vend {0, plural, one{vertex} other{vertices}}
 Invert selection	Icon-O-Matic-Properties		Inverter utvalg
 to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	for å feste transformatorer.
 <unkown property>	Icon-O-Matic-PropertyNames		<ukjent egenskap>
