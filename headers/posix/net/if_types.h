@@ -15,7 +15,7 @@
 #define IFT_SLIP		0x1c
 #define IFT_LOCALTALK	0x2a
 #define IFT_MODEM		0x30
-#define IFT_TUN			0x83
+#define IFT_TUNNEL		0x83
 #define IFT_L2VLAN		0x87
 #define IFT_BRIDGE		0xd1
 

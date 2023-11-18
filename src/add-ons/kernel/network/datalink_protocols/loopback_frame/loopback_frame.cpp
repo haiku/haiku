@@ -50,7 +50,7 @@ status_t
 loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	net_datalink_protocol** _protocol)
 {
-	if (interface->device->type != IFT_LOOP && interface->device->type != IFT_TUN)
+	if (interface->device->type != IFT_LOOP && interface->device->type != IFT_TUNNEL)
 		return B_BAD_TYPE;
 
 	loopback_frame_protocol* protocol;
@@ -67,7 +67,7 @@ loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	if (interface->device->type == IFT_LOOP) {
 		// Locally received buffers don't need a domain device handler, as the
 		// buffer reception is handled internally.
-	} else if (interface->device->type == IFT_TUN) {
+	} else if (interface->device->type == IFT_TUNNEL) {
 		status = stack->register_domain_device_handler(
 			interface->device, B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_IP), domain);
 		if (status != B_OK)

@@ -833,7 +833,7 @@ init_stack()
 	// TODO: for now!
 	register_domain_datalink_protocols(AF_INET, IFT_LOOP,
 		"network/datalink_protocols/loopback_frame/v1", NULL);
-	register_domain_datalink_protocols(AF_INET, IFT_TUN,
+	register_domain_datalink_protocols(AF_INET, IFT_TUNNEL,
 		"network/datalink_protocols/loopback_frame/v1", NULL);
 #if 0 // PPP is not (currently) included in the build
 	register_domain_datalink_protocols(AF_INET, IFT_PPP,

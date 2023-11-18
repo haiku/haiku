@@ -362,7 +362,7 @@ tunnel_init(const char* name, net_device** _device)
 		device->address.length = ETHER_ADDRESS_LENGTH;
 	} else {
 		device->flags = IFF_POINTOPOINT | IFF_LINK;
-		device->type = IFT_TUN;
+		device->type = IFT_TUNNEL;
 	}
 
 	status_t status = gStackModule->init_fifo(&device->send_queue,
