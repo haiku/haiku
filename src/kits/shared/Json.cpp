@@ -136,12 +136,23 @@ private:
 	status_t _EnsureAssemblyBufferAllocatedSize(size_t minimumSize)
 	{
 		if (fAssemblyBufferAllocatedSize < minimumSize) {
-			fAssemblyBuffer = (char*) realloc(fAssemblyBuffer, minimumSize);
+			size_t requestedSize = minimumSize;
+
+			// if the requested quantity of memory is less than the retained buffer size then
+			// it makes sense to request a wee bit more in order to reduce the number of small
+			// requests to increment the buffer over time.
+
+			if (requestedSize < kRetainedAssemblyBufferSize - kAssemblyBufferSizeIncrement) {
+				requestedSize = ((requestedSize / kAssemblyBufferSizeIncrement) + 1)
+					* kAssemblyBufferSizeIncrement;
+			}
+
+			fAssemblyBuffer = (char*) realloc(fAssemblyBuffer, requestedSize);
 			if (fAssemblyBuffer == NULL) {
 				fAssemblyBufferAllocatedSize = 0;
 				return B_NO_MEMORY;
 			}
-			fAssemblyBufferAllocatedSize = minimumSize;
+			fAssemblyBufferAllocatedSize = requestedSize;
 		}
 		return B_OK;
 	}
@@ -230,6 +241,8 @@ public:
 
 	void PushbackChar(char c)
 	{
+		if (fHasPushbackChar)
+			debugger("illegal state - more than one character pushed back");
 		fPushbackChar = c;
 		fHasPushbackChar = true;
 	}
