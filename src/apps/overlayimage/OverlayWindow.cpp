@@ -11,8 +11,8 @@
  *			Humdinger		<humdingerb@gmail.com>
  */
 
-#include "OverlayView.h"
 #include "OverlayWindow.h"
+#include "OverlayView.h"
 
 #include <Application.h>
 #include <Catalog.h>
@@ -23,15 +23,15 @@
 #define B_TRANSLATION_CONTEXT "Main window"
 
 
-OverlayWindow::OverlayWindow() 
+OverlayWindow::OverlayWindow()
 	:
-	BWindow(BRect(50, 50, 500, 200), B_TRANSLATE_SYSTEM_NAME("OverlayImage"),
-		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
+	BWindow(BRect(50, 50, 500, 200), B_TRANSLATE_SYSTEM_NAME("OverlayImage"), B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
-	OverlayView *replView = new OverlayView(Bounds());
+	OverlayView* replView = new OverlayView(Bounds());
 	AddChild(replView);
 
-	BView *bgView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* bgView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
 	bgView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(bgView);
 }

@@ -16,9 +16,10 @@
 
 
 OverlayApp::OverlayApp()
-	: BApplication(kAppSignature)
+	:
+	BApplication(kAppSignature)
 {
-	OverlayWindow *theWindow = new OverlayWindow();
+	OverlayWindow* theWindow = new OverlayWindow();
 	theWindow->Show();
 }
 
@@ -28,5 +29,5 @@ main()
 {
 	OverlayApp theApp;
 	theApp.Run();
-	return (0);
+	return 0;
 }

@@ -36,7 +36,7 @@ OverlayView::OverlayView(BRect frame)
 
 	frame.left = frame.right - kDraggerSize;
 	frame.top = frame.bottom - kDraggerSize;
-	BDragger *dragger = new BDragger(frame, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	BDragger* dragger = new BDragger(frame, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(dragger);
 
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -59,7 +59,7 @@ OverlayView::OverlayView(BRect frame)
 }
 
 
-OverlayView::OverlayView(BMessage *archive)
+OverlayView::OverlayView(BMessage* archive)
 	:
 	BView(archive)
 {
@@ -86,7 +86,7 @@ OverlayView::Draw(BRect)
 
 
 void
-OverlayView::MessageReceived(BMessage *msg)
+OverlayView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case B_SIMPLE_DATA:
@@ -126,8 +126,7 @@ OverlayView::MessageReceived(BMessage *msg)
 		case B_COLORS_UPDATED:
 		{
 			rgb_color color;
-			if (msg->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color)
-					== B_OK)
+			if (msg->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color) == B_OK)
 				fText->SetFontAndColor(be_plain_font, B_FONT_ALL, &color);
 			break;
 		}
@@ -138,14 +137,15 @@ OverlayView::MessageReceived(BMessage *msg)
 }
 
 
-BArchivable *OverlayView::Instantiate(BMessage *data)
+BArchivable*
+OverlayView::Instantiate(BMessage* data)
 {
 	return new OverlayView(data);
 }
 
 
 status_t
-OverlayView::Archive(BMessage *archive, bool deep) const
+OverlayView::Archive(BMessage* archive, bool deep) const
 {
 	BView::Archive(archive, deep);
 
@@ -157,7 +157,6 @@ OverlayView::Archive(BMessage *archive, bool deep) const
 		fBitmap->Archive(archive);
 		fBitmap->Unlock();
 	}
-	//archive->PrintToStream();
 
 	return B_OK;
 }
