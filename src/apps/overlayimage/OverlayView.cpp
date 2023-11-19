@@ -13,6 +13,7 @@
 
 #include "OverlayView.h"
 
+#include <AboutWindow.h>
 #include <Catalog.h>
 #include <InterfaceDefs.h>
 #include <Locale.h>
@@ -148,7 +149,7 @@ OverlayView::Archive(BMessage *archive, bool deep) const
 {
 	BView::Archive(archive, deep);
 
-	archive->AddString("add_on", "application/x-vnd.Haiku-OverlayImage");
+	archive->AddString("add_on", kAppSignature);
 	archive->AddString("class", "OverlayImage");
 
 	if (fBitmap) {
@@ -165,20 +166,18 @@ OverlayView::Archive(BMessage *archive, bool deep) const
 void
 OverlayView::OverlayAboutRequested()
 {
-	BAlert *alert = new BAlert("about",
-		B_TRANSLATE("OverlayImage\n"
-		"Copyright 1999-2010\n\n\t"
-		"originally by Seth Flaxman\n\t"
-		"modified by Hartmuth Reh\n\t"
-		"further modified by Humdinger\n"),
-		"OK");
-	BTextView *view = alert->TextView();
-	BFont font;
-	view->SetStylable(true);
-	view->GetFont(&font);
-	font.SetSize(font.Size() + 7.0f);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 12, &font);
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+	BAboutWindow* aboutwindow
+		= new BAboutWindow(B_TRANSLATE_SYSTEM_NAME("OverlayImage"), kAppSignature);
+
+	const char* authors[] = {
+		"Seth Flaxman",
+		"Hartmuth Reh",
+		"Humdinger",
+		NULL
+	};
+
+	aboutwindow->AddCopyright(1999, "Seth Flaxman");
+	aboutwindow->AddCopyright(2010, "Haiku, Inc.");
+	aboutwindow->AddAuthors(authors);
+	aboutwindow->Show();
 }

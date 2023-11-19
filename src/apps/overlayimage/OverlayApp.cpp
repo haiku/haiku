@@ -16,7 +16,7 @@
 
 
 OverlayApp::OverlayApp()
-	: BApplication("application/x-vnd.Haiku-OverlayImage")
+	: BApplication(kAppSignature)
 {
 	OverlayWindow *theWindow = new OverlayWindow();
 	theWindow->Show();

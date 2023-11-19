@@ -16,7 +16,6 @@
 
 #include <stdio.h>
 
-#include <Alert.h>
 #include <Bitmap.h>
 #include <Dragger.h>
 #include <Entry.h>
@@ -24,6 +23,8 @@
 #include <TranslationUtils.h>
 #include <View.h>
 #include <Window.h>
+
+extern const char *kAppSignature;
 
 
 class _EXPORT OverlayView;

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src apps overlayimage ;
 
+UsePrivateHeaders interface shared ;
+
 Application OverlayImage :
 	OverlayApp.cpp
 	OverlayView.cpp
