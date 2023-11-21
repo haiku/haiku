@@ -19,3 +19,6 @@ build/user_config_headers
 # Mac OS X directory attributes (created by Mac OS X when opening files or
 # directories)
 .DS_Store
+
+# Project settings of the Genio IDE
+.genio
