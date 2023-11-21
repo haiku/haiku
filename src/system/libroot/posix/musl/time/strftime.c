@@ -3,6 +3,7 @@
 #include <string.h>
 #include <langinfo.h>
 #include <locale.h>
+#include <ctype.h>
 #include <time.h>
 #include <limits.h>
 #include "locale_impl.h"
@@ -235,7 +236,7 @@ size_t __strftime_l(char *restrict s, size_t n, const char *restrict f, const st
 		pad = 0;
 		if (*f == '-' || *f == '_' || *f == '0') pad = *f++;
 		if ((plus = (*f == '+'))) f++;
-		width = strtoul(f, &p, 10);
+		width = isdigit(*f) ? strtoul(f, &p, 10) : 0;
 		if (*p == 'C' || *p == 'F' || *p == 'G' || *p == 'Y') {
 			if (!width && p!=f) width = 1;
 		} else {
