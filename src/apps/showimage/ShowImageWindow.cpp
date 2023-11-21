@@ -229,7 +229,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		false, false, B_PLAIN_BORDER);
 	BGridLayout* gridLayout = new BGridLayout(0, 0);
 	fScrollArea->SetLayout(gridLayout);
-	gridLayout->SetInsets(1, 1, -1, -1);
+	gridLayout->SetInsets(0, 1, -1, -1);
 
 	fScrollArea->MoveTo(viewFrame.LeftTop());
 	fScrollArea->ResizeTo(viewFrame.Size());
