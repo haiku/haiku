@@ -367,13 +367,13 @@ DECL_DATAGRAM_SOCKET(inline void)::_NotifyOneReader(bool notifySocket)
 
 DECL_DATAGRAM_SOCKET(inline bigtime_t)::_SocketTimeout(uint32 flags) const
 {
+	if ((flags & MSG_DONTWAIT) != 0)
+		return 0;
 	if (ModuleBundle::Stack()->is_restarted_syscall())
 		return ModuleBundle::Stack()->restore_syscall_restart_timeout();
 
 	bigtime_t timeout = fSocket->receive.timeout;
-	if ((flags & MSG_DONTWAIT) != 0)
-		timeout = 0;
-	else if (timeout != 0 && timeout != B_INFINITE_TIMEOUT)
+	if (timeout != 0 && timeout != B_INFINITE_TIMEOUT)
 		timeout += system_time();
 
 	ModuleBundle::Stack()->store_syscall_restart_timeout(timeout);
