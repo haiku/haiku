@@ -363,7 +363,7 @@ fifo_enqueue_buffer(net_fifo* fifo, net_buffer* buffer)
 
 /*!	Gets the first buffer from the FIFO. If there is no buffer, it
 	will wait depending on the \a flags and \a timeout.
-	The following flags are supported (the rest is ignored):
+	The following flags are supported:
 		MSG_DONTWAIT - ignores the timeout and never wait for a buffer; if your
 			socket is O_NONBLOCK, you should specify this flag. A \a timeout of
 			zero is equivalent to this flag, though.
@@ -374,8 +374,11 @@ ssize_t
 fifo_dequeue_buffer(net_fifo* fifo, uint32 flags, bigtime_t timeout,
 	net_buffer** _buffer)
 {
+	if ((flags & ~(MSG_DONTWAIT | MSG_PEEK)) != 0)
+		return EOPNOTSUPP;
+
 	MutexLocker locker(fifo->lock);
-	bool dontWait = (flags & MSG_DONTWAIT) != 0 || timeout == 0;
+	const bool dontWait = (flags & MSG_DONTWAIT) != 0 || timeout == 0;
 	status_t status;
 
 	while (true) {
