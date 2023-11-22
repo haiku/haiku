@@ -213,6 +213,9 @@ DECL_DATAGRAM_SOCKET(inline status_t)::EnqueueClone(net_buffer* _buffer)
 DECL_DATAGRAM_SOCKET(inline status_t)::Dequeue(uint32 flags,
 	net_buffer** _buffer)
 {
+	 if ((flags & ~(MSG_DONTWAIT | MSG_PEEK)) != 0)
+		return EOPNOTSUPP;
+
 	return BlockingDequeue((flags & MSG_PEEK) != 0, _SocketTimeout(flags),
 		_buffer);
 }
