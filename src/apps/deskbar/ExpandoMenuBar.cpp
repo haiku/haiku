@@ -356,57 +356,22 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 			}
 		}
 
-		switch (code) {
-			case B_INSIDE_VIEW:
-			{
-				BMenuItem* menuItem;
-				TTeamMenuItem* item = TeamItemAtPoint(where, &menuItem);
+		if (code == B_INSIDE_VIEW) {
+			TTruncatableMenuItem* item;
+			TTeamMenuItem* teamItem = TeamItemAtPoint(where, (BMenuItem**)&item);
 
-				if (item == NULL || menuItem == NULL) {
-					// item is NULL, remove the tooltip and break out
-					fLastMousedOverItem = NULL;
+			if (item == NULL) {
+				fLastMousedOverItem = NULL;
+				SetToolTip((const char*)NULL);
+			} else if (item != fLastMousedOverItem) {
+				if ((static_cast<TBarApp*>(be_app)->Settings()->hideLabels
+						&& teamItem != NULL)
+					|| strcasecmp(item->TruncatedLabel(), item->Label()) > 0) {
+					SetToolTip(item->Label());
+				} else
 					SetToolTip((const char*)NULL);
-					break;
-				}
 
-				if (menuItem == fLastMousedOverItem) {
-					// already set the tooltip for this item, break out
-					break;
-				}
-
-				TWindowMenuItem* windowMenuItem
-					= dynamic_cast<TWindowMenuItem*>(menuItem);
-				if (windowMenuItem != NULL && fBarView != NULL && Vertical()
-					&& fBarView->ExpandoState() && item->IsExpanded()) {
-					// expando mode window menu item
-					fLastMousedOverItem = menuItem;
-					if (strcasecmp(windowMenuItem->TruncatedLabel(),
-							windowMenuItem->Label()) > 0) {
-						// label is truncated, set tooltip
-						SetToolTip(windowMenuItem->Label());
-					} else
-						SetToolTip((const char*)NULL);
-
-					break;
-				}
-
-				if (!dynamic_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
-					// item has a visible label, set tool tip if truncated
-					fLastMousedOverItem = menuItem;
-					if (strcasecmp(item->TruncatedLabel(), item->Label()) > 0) {
-						// label is truncated, set tooltip
-						SetToolTip(item->Label());
-					} else
-						SetToolTip((const char*)NULL);
-
-					break;
-				}
-
-				SetToolTip(item->Label());
-					// new item, set the tooltip to the item label
-				fLastMousedOverItem = menuItem;
-					// save the current menuitem for the next MouseMoved() call
-				break;
+				fLastMousedOverItem = item;
 			}
 		}
 
