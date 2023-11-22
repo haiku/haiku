@@ -165,19 +165,30 @@ public:
 		return fOverflow ? defaultValue : result;
 	}
 
-	uint32 ReadU24(uint32 defaultValue)
+	uint64 ReadUInt(size_t numBytes, uint64 defaultValue)
 	{
-		uint8 res1 = Read<uint8>(0);
-		uint8 res2 = Read<uint8>(0);
-		uint8 res3 = Read<uint8>(0);
-
-		uint32 result;
-		if (fIsBigEndian)
-			result = res3 | (res2 << 8) | (res1 << 16);
-		else
-			result = res1 | (res2 << 8) | (res3 << 16);
+		uint64 result = 0;
+		if (fIsBigEndian) {
+			for (size_t i = 0; i < numBytes; i++) {
+				uint8 byte = Read<uint8>(0);
+				result <<= 8;
+				result |= (uint64)byte;
+			}
+		} else {
+			int shift = 0;
+			for (size_t i = 0; i < numBytes; i++) {
+				uint8 byte = Read<uint8>(0);
+				result |= (uint64)byte << shift;
+				shift += 8;
+			}
+		}
 
 		return fOverflow ? defaultValue : result;
+	}
+
+	uint32 ReadU24(uint32 defaultValue)
+	{
+		return ReadUInt(3, defaultValue);
 	}
 
 	const char* ReadString()
