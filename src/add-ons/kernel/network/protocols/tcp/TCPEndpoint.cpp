@@ -813,7 +813,9 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		buffer->size, buffer->flags, fSendQueue.Size(), fSendQueue.Free());
 	T(APICall(this, "senddata"));
 
-	uint32 flags = buffer->flags;
+	const uint32 flags = buffer->flags;
+	if ((flags & ~(MSG_NOSIGNAL | MSG_DONTWAIT | MSG_OOB | MSG_EOF)) != 0)
+		return EOPNOTSUPP;
 
 	if (fState == CLOSED)
 		return ENOTCONN;
@@ -935,6 +937,9 @@ TCPEndpoint::FillStat(net_stat *stat)
 status_t
 TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
+	if ((flags & ~(MSG_DONTWAIT | MSG_WAITALL | MSG_PEEK)) != 0)
+		return EOPNOTSUPP;
+
 	MutexLocker locker(fLock);
 
 	TRACE("ReadData(%" B_PRIuSIZE " bytes, flags %#" B_PRIx32 ")", numBytes,
