@@ -828,11 +828,14 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	size_t left = buffer->size;
 
-	bigtime_t timeout = absolute_timeout(socket->send.timeout);
-	if (gStackModule->is_restarted_syscall())
-		timeout = gStackModule->restore_syscall_restart_timeout();
-	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+	bigtime_t timeout = 0;
+	if ((flags & MSG_DONTWAIT) == 0) {
+		timeout = absolute_timeout(socket->send.timeout);
+		if (gStackModule->is_restarted_syscall())
+			timeout = gStackModule->restore_syscall_restart_timeout();
+		else
+			gStackModule->store_syscall_restart_timeout(timeout);
+	}
 
 	while (left > 0) {
 		while (fSendQueue.Free() < socket->send.low_water_mark) {
@@ -946,11 +949,14 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		return ENOTCONN;
 	}
 
-	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
-	if (gStackModule->is_restarted_syscall())
-		timeout = gStackModule->restore_syscall_restart_timeout();
-	else
-		gStackModule->store_syscall_restart_timeout(timeout);
+	bigtime_t timeout = 0;
+	if ((flags & MSG_DONTWAIT) == 0) {
+		timeout = absolute_timeout(socket->receive.timeout);
+		if (gStackModule->is_restarted_syscall())
+			timeout = gStackModule->restore_syscall_restart_timeout();
+		else
+			gStackModule->store_syscall_restart_timeout(timeout);
+	}
 
 	if (fState == SYNCHRONIZE_SENT || fState == SYNCHRONIZE_RECEIVED) {
 		if (flags & MSG_DONTWAIT)
@@ -990,7 +996,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 			return B_OK;
 		}
 
-		if ((flags & MSG_DONTWAIT) != 0 || socket->receive.timeout == 0)
+		if (timeout == 0)
 			return B_WOULD_BLOCK;
 
 		if ((fFlags & FLAG_NO_RECEIVE) != 0)
