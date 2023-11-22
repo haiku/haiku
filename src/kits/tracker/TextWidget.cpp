@@ -456,7 +456,7 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewKeyDownFilter));
 
-	if (view->TargetVolumeIsReadOnly()) {
+	if (view->SelectedVolumeIsReadOnly()) {
 		textView->MakeEditable(false);
 		textView->MakeSelectable(true);
 	} else

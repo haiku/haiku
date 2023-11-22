@@ -1864,7 +1864,7 @@ BContainerWindow::SetCutItem(BMenu* menu)
 			item->SetEnabled(false);
 		} else {
 			item->SetEnabled(PoseView()->CountSelected() > 0
-				&& !PoseView()->TargetVolumeIsReadOnly());
+				&& !PoseView()->SelectedVolumeIsReadOnly());
 		}
 	}
 
@@ -2710,7 +2710,7 @@ BContainerWindow::SetupMoveCopyMenus(const entry_ref* item_ref, BMenu* parent)
 	}
 
 	fMoveToItem->SetEnabled(PoseView()->CountSelected() > 0
-		&& !PoseView()->TargetVolumeIsReadOnly());
+		&& !PoseView()->SelectedVolumeIsReadOnly());
 	fCopyToItem->SetEnabled(PoseView()->CountSelected() > 0);
 	fCreateLinkItem->SetEnabled(PoseView()->CountSelected() > 0);
 
@@ -2758,7 +2758,7 @@ BContainerWindow::ShowDropContextMenu(BPoint where, BPoseView* source)
 			break;
 
 		if (item->Command() == kMoveSelectionTo && source != NULL) {
-			item->SetEnabled(!source->TargetVolumeIsReadOnly()
+			item->SetEnabled(!source->SelectedVolumeIsReadOnly()
 				&& !PoseView()->TargetVolumeIsReadOnly());
 		} else
 			item->SetEnabled(!PoseView()->TargetVolumeIsReadOnly());
