@@ -37,60 +37,6 @@ static thread_id sTimerThread;
 static bigtime_t sTimerTimeout;
 
 
-static inline void
-fifo_notify_one_reader(int32& waiting, sem_id sem)
-{
-	if (waiting > 0) {
-		waiting--;
-		release_sem_etc(sem, 1, B_DO_NOT_RESCHEDULE);
-	}
-}
-
-
-template<typename FifoType> static inline status_t
-base_fifo_init(FifoType* fifo, const char* name, size_t maxBytes)
-{
-	fifo->notify = create_sem(0, name);
-	fifo->max_bytes = maxBytes;
-	fifo->current_bytes = 0;
-	fifo->waiting = 0;
-	list_init(&fifo->buffers);
-
-	return fifo->notify;
-}
-
-
-template<typename FifoType> static inline status_t
-base_fifo_enqueue_buffer(FifoType* fifo, net_buffer* buffer)
-{
-	if (fifo->max_bytes > 0
-		&& fifo->current_bytes + buffer->size > fifo->max_bytes)
-		return ENOBUFS;
-
-	list_add_item(&fifo->buffers, buffer);
-	fifo->current_bytes += buffer->size;
-	fifo_notify_one_reader(fifo->waiting, fifo->notify);
-
-	return B_OK;
-}
-
-
-template<typename FifoType> static inline status_t
-base_fifo_clear(FifoType* fifo)
-{
-	while (true) {
-		net_buffer* buffer = (net_buffer*)list_remove_head_item(&fifo->buffers);
-		if (buffer == NULL)
-			break;
-
-		gNetBufferModule.free(buffer);
-	}
-
-	fifo->current_bytes = 0;
-	return B_OK;
-}
-
-
 // #pragma mark - UserBuffer
 
 
@@ -202,16 +148,32 @@ notify_socket(net_socket* socket, uint8 event, int32 value)
 }
 
 
+static inline void
+fifo_notify_one_reader(int32& waiting, sem_id sem)
+{
+	if (waiting > 0) {
+		waiting--;
+		release_sem_etc(sem, 1, B_DO_NOT_RESCHEDULE);
+	}
+}
+
+
 status_t
 init_fifo(net_fifo* fifo, const char* name, size_t maxBytes)
 {
 	mutex_init_etc(&fifo->lock, name, MUTEX_FLAG_CLONE_NAME);
-
-	status_t status = base_fifo_init(fifo, name, maxBytes);
-	if (status < B_OK)
+	fifo->notify = create_sem(0, name);
+	if (fifo->notify < B_OK) {
 		mutex_destroy(&fifo->lock);
+		return fifo->notify;
+	}
 
-	return status;
+	fifo->max_bytes = maxBytes;
+	fifo->current_bytes = 0;
+	fifo->waiting = 0;
+	list_init(&fifo->buffers);
+
+	return B_OK;
 }
 
 
@@ -222,6 +184,21 @@ uninit_fifo(net_fifo* fifo)
 
 	mutex_destroy(&fifo->lock);
 	delete_sem(fifo->notify);
+}
+
+
+static inline status_t
+base_fifo_enqueue_buffer(net_fifo* fifo, net_buffer* buffer)
+{
+	if (fifo->max_bytes > 0
+		&& fifo->current_bytes + buffer->size > fifo->max_bytes)
+		return ENOBUFS;
+
+	list_add_item(&fifo->buffers, buffer);
+	fifo->current_bytes += buffer->size;
+	fifo_notify_one_reader(fifo->waiting, fifo->notify);
+
+	return B_OK;
 }
 
 
@@ -304,7 +281,17 @@ status_t
 clear_fifo(net_fifo* fifo)
 {
 	MutexLocker locker(fifo->lock);
-	return base_fifo_clear(fifo);
+
+	while (true) {
+		net_buffer* buffer = (net_buffer*)list_remove_head_item(&fifo->buffers);
+		if (buffer == NULL)
+			break;
+
+		gNetBufferModule.free(buffer);
+	}
+
+	fifo->current_bytes = 0;
+	return B_OK;
 }
 
 
