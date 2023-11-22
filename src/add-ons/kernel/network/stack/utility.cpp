@@ -158,6 +158,9 @@ fifo_notify_one_reader(int32& waiting, sem_id sem)
 }
 
 
+//	#pragma mark - fifo
+
+
 status_t
 init_fifo(net_fifo* fifo, const char* name, size_t maxBytes)
 {
