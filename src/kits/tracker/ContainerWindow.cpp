@@ -2077,15 +2077,13 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 	} else {
 		item = new BMenuItem(B_TRANSLATE("Duplicate"),
 			new BMessage(kDuplicateSelection), 'D');
-		item->SetEnabled(PoseView()->CountSelected() > 0
-			&& !PoseView()->SelectedVolumeIsReadOnly());
+		item->SetEnabled(PoseView()->CanMoveToTrashOrDuplicate());
 		menu->AddItem(item);
 
 		item = new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
 			? B_TRANSLATE("Delete") : B_TRANSLATE("Move to Trash"),
 			new BMessage(kMoveToTrash), 'T');
-		item->SetEnabled(PoseView()->CountSelected() > 0
-			&& !PoseView()->SelectedVolumeIsReadOnly());
+		item->SetEnabled(PoseView()->CanMoveToTrashOrDuplicate());
 		menu->AddItem(item);
 
 		menu->AddSeparatorItem();
@@ -2873,8 +2871,7 @@ BContainerWindow::ShowContextMenu(BPoint where, const entry_ref* ref)
 				fCreateLinkItem->Message()->what, ref, false);
 			} else if (showAsVolume) {
 				// non-volume enable/disable copy, move, identify
-				EnableNamedMenuItem(fContextMenu, kDuplicateSelection,
-					false);
+				EnableNamedMenuItem(fContextMenu, kDuplicateSelection, false);
 				EnableNamedMenuItem(fContextMenu, kMoveToTrash, false);
 				EnableNamedMenuItem(fContextMenu, kIdentifyEntry, false);
 
@@ -3294,16 +3291,11 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 	if (context == kMenuBarContext || context == kPosePopUpContext) {
 		SetUpEditQueryItem(menu);
 
-		Model* selected = selectCount <= 0 ? NULL
-			: PoseView()->SelectionList()->FirstItem()->TargetModel();
-		EnableNamedMenuItem(menu, kEditItem, !PoseView()->ActivePose()
-			&& selectCount == 1 && selected != NULL && !selected->IsDesktop()
-			&& !selected->IsRoot() && !selected->IsTrash());
-
-		EnableNamedMenuItem(menu, kMoveToTrash, selectCount > 0
-			&& !PoseView()->SelectedVolumeIsReadOnly());
-		EnableNamedMenuItem(menu, kDuplicateSelection, selectCount > 0
-			&& !PoseView()->SelectedVolumeIsReadOnly());
+		EnableNamedMenuItem(menu, kEditItem, PoseView()->CanEditName());
+		EnableNamedMenuItem(menu, kMoveToTrash,
+			PoseView()->CanMoveToTrashOrDuplicate());
+		EnableNamedMenuItem(menu, kDuplicateSelection,
+			PoseView()->CanMoveToTrashOrDuplicate());
 
 		SetCutItem(menu);
 		SetCopyItem(menu);

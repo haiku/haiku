@@ -8331,21 +8331,10 @@ BPoseView::DrawOpenAnimation(BRect rect)
 void
 BPoseView::ApplyBackgroundColor()
 {
-	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, BackTint());
-	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, BackTint());
-}
-
-
-float
-BPoseView::BackTint() const
-{
-	// darken background if read-only (or lighten if background is dark)
-	rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	int viewBrightness = BPrivate::perceptual_brightness(background);
-	float roTint = viewBrightness > 127 ? B_DARKEN_1_TINT : 0.85;
-	float tint = TargetVolumeIsReadOnly() ? roTint : B_NO_TINT;
-
-	return tint;
+	float bgTint = TargetVolumeIsReadOnly()
+		? ReadOnlyTint(ui_color(B_DOCUMENT_BACKGROUND_COLOR)) : B_NO_TINT;
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, bgTint);
+	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, bgTint);
 }
 
 
@@ -8914,6 +8903,44 @@ BPoseView::TargetVolumeIsReadOnly() const
 }
 
 
+bool
+BPoseView::CanEditName() const
+{
+	const int32 selectCount = CountSelected();
+	Model* selected = fSelectionList->FirstItem()->TargetModel();
+
+	return !ActivePose() && selectCount == 1
+		&& !selected->IsDesktop() && !selected->IsRoot()
+		&& !selected->IsTrash();
+}
+
+
+bool
+BPoseView::CanMoveToTrashOrDuplicate() const
+{
+	const int32 selectCount = CountSelected();
+	if (selectCount < 1)
+		return false;
+
+	if (SelectedVolumeIsReadOnly())
+		return false;
+
+	BPose* pose;
+	Model* selected;
+	for (int32 i = 0; i < selectCount; i++) {
+		pose = fSelectionList->ItemAt(i);
+		selected = pose->TargetModel();
+		if (pose == NULL || selected == NULL)
+			continue;
+
+		if (selected->IsDesktop() || selected->IsRoot() || selected->IsTrash())
+			return false;
+	}
+
+	return true;
+}
+
+
 void
 BPoseView::RemoveFromExtent(const BRect &rect)
 {
@@ -9108,7 +9135,9 @@ BPoseView::BackColor(bool selected) const
 		if (IsDesktopWindow())
 			return BView::ViewColor();
 
-		return tint_color(ui_color(B_DOCUMENT_BACKGROUND_COLOR), BackTint());
+		rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+		return tint_color(background,
+			TargetVolumeIsReadOnly() ? ReadOnlyTint(background) : B_NO_TINT);
 	}
 }
 

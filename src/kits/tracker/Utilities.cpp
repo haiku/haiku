@@ -87,6 +87,15 @@ const float kExactMatchScore = INFINITY;
 bool gLocalizedNamePreferred;
 
 
+float
+ReadOnlyTint(rgb_color base)
+{
+	// darken tint if read-only (or lighten if dark)
+	int viewBrightness = BPrivate::perceptual_brightness(base);
+	return viewBrightness > 127 ? B_DARKEN_1_TINT : 0.85;
+}
+
+
 bool
 SecondaryMouseButtonDown(int32 modifiers, int32 buttons)
 {

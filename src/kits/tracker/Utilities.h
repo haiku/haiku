@@ -179,9 +179,9 @@ public:
 void DisallowMetaKeys(BTextView*);
 void DisallowFilenameKeys(BTextView*);
 
-
 bool ValidateStream(BMallocIO*, uint32, int32 version);
 
+float ReadOnlyTint(rgb_color base);
 
 bool SecondaryMouseButtonDown(int32 modifiers, int32 buttons);
 uint32 HashString(const char* string, uint32 seed);

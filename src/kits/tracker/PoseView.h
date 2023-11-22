@@ -308,6 +308,8 @@ public:
 	int32 CountSelected() const;
 	bool SelectedVolumeIsReadOnly() const;
 	bool TargetVolumeIsReadOnly() const;
+	bool CanEditName() const;
+	bool CanMoveToTrashOrDuplicate() const;
 
 	void SetSelectionHandler(BLooper* looper);
 
@@ -678,7 +680,6 @@ protected:
 private:
 	void DrawOpenAnimation(BRect);
 	void ApplyBackgroundColor();
-	float BackTint() const;
 	rgb_color InvertedBackColor() const;
 
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);

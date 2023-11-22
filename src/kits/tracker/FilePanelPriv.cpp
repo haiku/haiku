@@ -838,10 +838,6 @@ TFilePanel::Init(const BMessage*)
 			if (item && menu->RemoveItem(item))
 				delete item;
 
-			item = menu->FindItem(kDuplicateSelection);
-			if (item && menu->RemoveItem(item))
-				delete item;
-
 			// remove add-ons menu, identifier menu, separator
 			item = menu->FindItem(B_TRANSLATE("Add-ons"));
 			if (item) {
@@ -972,7 +968,8 @@ TFilePanel::AddFileContextMenus(BMenu* menu)
 		new BMessage(kGetInfo), 'I'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
 		new BMessage(kEditItem), 'E'));
-
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
+		new BMessage(kDuplicateSelection), 'D'));
 	menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
 		? B_TRANSLATE("Delete")
 		: B_TRANSLATE("Move to Trash"),
@@ -1083,10 +1080,12 @@ TFilePanel::MenusBeginning()
 
 	EnableNamedMenuItem(fMenuBar, kNewFolder, !TargetModel()->IsRoot()
 		&& !PoseView()->TargetVolumeIsReadOnly());
-	EnableNamedMenuItem(fMenuBar, kMoveToTrash, !TargetModel()->IsRoot()
-		&& selectCount > 0 && !PoseView()->SelectedVolumeIsReadOnly());
+	EnableNamedMenuItem(fMenuBar, kDuplicateSelection,
+		PoseView()->CanMoveToTrashOrDuplicate());
+	EnableNamedMenuItem(fMenuBar, kMoveToTrash,
+		PoseView()->CanMoveToTrashOrDuplicate());
 	EnableNamedMenuItem(fMenuBar, kGetInfo, selectCount > 0);
-	EnableNamedMenuItem(fMenuBar, kEditItem, selectCount == 1);
+	EnableNamedMenuItem(fMenuBar, kEditItem, PoseView()->CanEditName());
 
 	SetCutItem(fMenuBar);
 	SetCopyItem(fMenuBar);
@@ -1122,18 +1121,20 @@ TFilePanel::ShowContextMenu(BPoint where, const entry_ref* ref)
 			fContextMenu = fVolumeContextMenu;
 			EnableNamedMenuItem(fContextMenu, kOpenSelection, true);
 			EnableNamedMenuItem(fContextMenu, kGetInfo, true);
-			EnableNamedMenuItem(fContextMenu, kEditItem, !(model.IsDesktop()
-				|| model.IsRoot() || model.IsTrash()));
+			EnableNamedMenuItem(fContextMenu, kEditItem,
+				PoseView()->CanEditName());
 
 			SetPasteItem(fContextMenu);
 		} else {
 			// File context menu
 			fContextMenu = fFileContextMenu;
 			EnableNamedMenuItem(fContextMenu, kGetInfo, true);
-			EnableNamedMenuItem(fContextMenu, kEditItem, !(model.IsDesktop()
-				|| model.IsRoot() || model.IsTrash()));
+			EnableNamedMenuItem(fContextMenu, kEditItem,
+				PoseView()->CanEditName());
+			EnableNamedMenuItem(fContextMenu, kDuplicateSelection,
+				PoseView()->CanMoveToTrashOrDuplicate());
 			EnableNamedMenuItem(fContextMenu, kMoveToTrash,
-				!PoseView()->SelectedVolumeIsReadOnly());
+				PoseView()->CanMoveToTrashOrDuplicate());
 
 			SetCutItem(fContextMenu);
 			SetCopyItem(fContextMenu);
@@ -1147,9 +1148,6 @@ TFilePanel::ShowContextMenu(BPoint where, const entry_ref* ref)
 				&& !PoseView()->TargetVolumeIsReadOnly());
 		EnableNamedMenuItem(fContextMenu, kOpenParentDir,
 			!TargetModel()->IsRoot());
-		EnableNamedMenuItem(fContextMenu, kMoveToTrash,
-			!TargetModel()->IsRoot() && PoseView()->CountSelected() > 0
-				&& !PoseView()->SelectedVolumeIsReadOnly());
 
 		SetPasteItem(fContextMenu);
 	}
