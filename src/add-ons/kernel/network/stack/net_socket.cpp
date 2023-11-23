@@ -1333,6 +1333,9 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 	socklen_t addressLength = 0;
 	size_t bytesLeft = length;
 
+	const bool nosignal = ((flags & MSG_NOSIGNAL) != 0);
+	flags &= ~MSG_NOSIGNAL;
+
 	if (length > SSIZE_MAX)
 		return B_BAD_VALUE;
 
@@ -1398,6 +1401,11 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		ssize_t written = socket->first_info->send_data_no_buffer(
 			socket->first_protocol, vecs, vecCount, ancillaryData, address,
 			addressLength, flags);
+
+		// we only send signals when called from userland
+		if (written == EPIPE && is_syscall() && !nosignal)
+			send_signal(find_thread(NULL), SIGPIPE);
+
 		if (written > 0)
 			ancillaryDataDeleter.Detach();
 		return written;
@@ -1473,6 +1481,10 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 
 		status = socket->first_info->send_data(socket->first_protocol, buffer);
 		if (status != B_OK) {
+			// we only send signals when called from userland
+			if (status == EPIPE && is_syscall() && !nosignal)
+				send_signal(find_thread(NULL), SIGPIPE);
+
 			size_t sizeAfterSend = buffer->size;
 			gNetBufferModule.free(buffer);
 

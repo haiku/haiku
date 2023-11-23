@@ -814,19 +814,15 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	T(APICall(this, "senddata"));
 
 	const uint32 flags = buffer->flags;
-	if ((flags & ~(MSG_NOSIGNAL | MSG_DONTWAIT | MSG_OOB | MSG_EOF)) != 0)
+	if ((flags & ~(MSG_DONTWAIT | MSG_OOB | MSG_EOF)) != 0)
 		return EOPNOTSUPP;
 
 	if (fState == CLOSED)
 		return ENOTCONN;
 	if (fState == LISTEN)
 		return EDESTADDRREQ;
-	if (!is_writable(fState) && !is_establishing(fState)) {
-		// we only send signals when called from userland
-		if (gStackModule->is_syscall() && (flags & MSG_NOSIGNAL) == 0)
-			send_signal(find_thread(NULL), SIGPIPE);
+	if (!is_writable(fState) && !is_establishing(fState))
 		return EPIPE;
-	}
 
 	size_t left = buffer->size;
 
@@ -849,12 +845,8 @@ TCPEndpoint::SendData(net_buffer *buffer)
 				return posix_error(status);
 			}
 
-			if (!is_writable(fState) && !is_establishing(fState)) {
-				// we only send signals when called from userland
-				if (gStackModule->is_syscall() && (flags & MSG_NOSIGNAL) == 0)
-					send_signal(find_thread(NULL), SIGPIPE);
+			if (!is_writable(fState) && !is_establishing(fState))
 				return EPIPE;
-			}
 		}
 
 		size_t size = fSendQueue.Free();
