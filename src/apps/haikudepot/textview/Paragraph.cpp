@@ -116,7 +116,7 @@ Paragraph::Append(const TextSpan& span)
 		if (lastSpan.Style() == span.Style()) {
 			BString text(lastSpan.Text());
 			text.Append(span.Text());
-			fTextSpans.clear();
+			fTextSpans.pop_back();
 			fTextSpans.push_back(TextSpan(text, span.Style()));
 			return true;
 		}
