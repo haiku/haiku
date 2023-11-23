@@ -1756,8 +1756,8 @@ static file_system_module_info sExt2FileSystem = {
 		NULL,
 	},
 
-	"ext2",						// short_name
-	"Ext2 File System",			// pretty_name
+	"extfs",						// short_name
+	"Extended File System",			// pretty_name
 	B_DISK_SYSTEM_SUPPORTS_WRITING
 		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME,	// DDM flags
 
