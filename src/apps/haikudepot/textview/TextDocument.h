@@ -55,6 +55,8 @@ public:
 			// Style access
 			const CharacterStyle& CharacterStyleAt(int32 textOffset) const;
 			const ParagraphStyle& ParagraphStyleAt(int32 textOffset) const;
+			BCursor				CursorAt(int32 textOffset) const;
+			const BMessage*		ClickMessageAt(int32 textOffset) const;
 
 			int32				CountParagraphs() const;
 			const Paragraph&	ParagraphAtIndex(int32 index) const;

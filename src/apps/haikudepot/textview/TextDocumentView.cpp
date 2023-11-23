@@ -137,14 +137,28 @@ TextDocumentView::MakeFocus(bool focus)
 void
 TextDocumentView::MouseDown(BPoint where)
 {
+	BMessage* currentMessage = NULL;
+	if (Window() != NULL)
+		currentMessage = Window()->CurrentMessage();
+
+	// First of all, check for links and other clickable things
+	bool unused;
+	int32 offset = fTextDocumentLayout.TextOffsetAt(where.x, where.y, unused);
+	const BMessage* message = fTextDocument->ClickMessageAt(offset);
+	if (message != NULL) {
+		BMessage clickMessage(*message);
+		clickMessage.Append(*currentMessage);
+		Invoke(&clickMessage);
+	}
+
 	if (!fSelectionEnabled)
 		return;
 
 	MakeFocus();
 
 	int32 modifiers = 0;
-	if (Window() != NULL && Window()->CurrentMessage() != NULL)
-		Window()->CurrentMessage()->FindInt32("modifiers", &modifiers);
+	if (currentMessage != NULL)
+		currentMessage->FindInt32("modifiers", &modifiers);
 
 	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
@@ -165,11 +179,22 @@ void
 TextDocumentView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {
+	BCursor cursor(B_CURSOR_ID_I_BEAM);
+
+	if (transit != B_EXITED_VIEW) {
+		bool unused;
+		int32 offset = fTextDocumentLayout.TextOffsetAt(where.x, where.y, unused);
+		const BCursor& newCursor = fTextDocument->CursorAt(offset);
+		if (newCursor.InitCheck() == B_OK) {
+			cursor = newCursor;
+			SetViewCursor(&cursor);
+		}
+	}
+
 	if (!fSelectionEnabled)
 		return;
 
-	BCursor iBeamCursor(B_CURSOR_ID_I_BEAM);
-	SetViewCursor(&iBeamCursor);
+	SetViewCursor(&cursor);
 
 	if (fMouseDown)
 		SetCaret(where, true);

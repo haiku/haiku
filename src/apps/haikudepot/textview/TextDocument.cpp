@@ -180,6 +180,48 @@ TextDocument::CharacterStyleAt(int32 textOffset) const
 }
 
 
+const BMessage*
+TextDocument::ClickMessageAt(int32 textOffset) const
+{
+	int32 paragraphOffset;
+	const Paragraph& paragraph = ParagraphAt(textOffset, paragraphOffset);
+
+	textOffset -= paragraphOffset;
+	int32 index;
+	int32 count = paragraph.CountTextSpans();
+
+	for (index = 0; index < count; index++) {
+		const TextSpan& span = paragraph.TextSpanAtIndex(index);
+		if (textOffset - span.CountChars() < 0)
+			return span.ClickMessage();
+		textOffset -= span.CountChars();
+	}
+
+	return NULL;
+}
+
+
+BCursor
+TextDocument::CursorAt(int32 textOffset) const
+{
+	int32 paragraphOffset;
+	const Paragraph& paragraph = ParagraphAt(textOffset, paragraphOffset);
+
+	textOffset -= paragraphOffset;
+	int32 index;
+	int32 count = paragraph.CountTextSpans();
+
+	for (index = 0; index < count; index++) {
+		const TextSpan& span = paragraph.TextSpanAtIndex(index);
+		if (textOffset - span.CountChars() < 0)
+			return span.Cursor();
+		textOffset -= span.CountChars();
+	}
+
+	return BCursor((BMessage*)NULL);
+}
+
+
 const ParagraphStyle&
 TextDocument::ParagraphStyleAt(int32 textOffset) const
 {
