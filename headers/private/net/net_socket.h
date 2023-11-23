@@ -52,10 +52,6 @@ struct net_socket_module_info {
 	status_t	(*close)(net_socket* socket);
 	void		(*free)(net_socket* socket);
 
-	status_t	(*readv)(net_socket* socket, const iovec* vecs,
-					size_t vecCount, size_t* _length);
-	status_t	(*writev)(net_socket* socket, const iovec* vecs,
-					size_t vecCount, size_t* _length);
 	status_t	(*control)(net_socket* socket, uint32 op, void* data,
 					size_t length);
 

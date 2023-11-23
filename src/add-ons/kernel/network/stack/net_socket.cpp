@@ -460,63 +460,6 @@ socket_free(net_socket* _socket)
 
 
 status_t
-socket_readv(net_socket* socket, const iovec* vecs, size_t vecCount,
-	size_t* _length)
-{
-	return -1;
-}
-
-
-status_t
-socket_writev(net_socket* socket, const iovec* vecs, size_t vecCount,
-	size_t* _length)
-{
-	if (socket->peer.ss_len == 0)
-		return ECONNRESET;
-
-	if (socket->address.ss_len == 0) {
-		// try to bind first
-		status_t status = socket_bind(socket, NULL, 0);
-		if (status != B_OK)
-			return status;
-	}
-
-	// TODO: useful, maybe even computed header space!
-	net_buffer* buffer = gNetBufferModule.create(256);
-	if (buffer == NULL)
-		return ENOBUFS;
-
-	// copy data into buffer
-
-	for (uint32 i = 0; i < vecCount; i++) {
-		if (gNetBufferModule.append(buffer, vecs[i].iov_base,
-				vecs[i].iov_len) < B_OK) {
-			gNetBufferModule.free(buffer);
-			return ENOBUFS;
-		}
-	}
-
-	memcpy(buffer->source, &socket->address, socket->address.ss_len);
-	memcpy(buffer->destination, &socket->peer, socket->peer.ss_len);
-	size_t size = buffer->size;
-
-	ssize_t bytesWritten = socket->first_info->send_data(socket->first_protocol,
-		buffer);
-	if (bytesWritten < B_OK) {
-		if (buffer->size != size) {
-			// this appears to be a partial write
-			*_length = size - buffer->size;
-		}
-		gNetBufferModule.free(buffer);
-		return bytesWritten;
-	}
-
-	*_length = bytesWritten;
-	return B_OK;
-}
-
-
-status_t
 socket_control(net_socket* socket, uint32 op, void* data, size_t length)
 {
 	switch (op) {
@@ -1747,8 +1690,6 @@ net_socket_module_info gNetSocketModule = {
 	socket_close,
 	socket_free,
 
-	socket_readv,
-	socket_writev,
 	socket_control,
 
 	socket_read_avail,
