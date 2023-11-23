@@ -447,6 +447,14 @@ TextDocumentView::Copy(BClipboard* clipboard)
 }
 
 
+void
+TextDocumentView::Relayout()
+{
+	fTextDocumentLayout.Invalidate();
+	_UpdateScrollBars();
+}
+
+
 // #pragma mark - private
 
 

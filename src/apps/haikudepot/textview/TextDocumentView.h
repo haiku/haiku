@@ -49,6 +49,8 @@ public:
 	virtual	void				GetHeightForWidth(float width, float* min,
 									float* max, float* preferred);
 
+	virtual void				Relayout();
+
 	// TextDocumentView interface
 			void				SetTextDocument(
 									const TextDocumentRef& document);
