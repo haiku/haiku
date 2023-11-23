@@ -110,7 +110,14 @@ loopback_control(net_device *device, int32 op, void *argument,
 status_t
 loopback_send_data(net_device *device, net_buffer *buffer)
 {
-	return sStackModule->device_enqueue_buffer(device, buffer);
+	status_t status = sStackModule->device_enqueue_buffer(device, buffer);
+	if (status == B_OK) {
+		atomic_add64((int64*)&device->stats.send.bytes, buffer->size);
+		atomic_add((int32*)&device->stats.send.packets, 1);
+	} else {
+		atomic_add((int32*)&device->stats.send.errors, 1);
+	}
+	return status;
 }
 
 
