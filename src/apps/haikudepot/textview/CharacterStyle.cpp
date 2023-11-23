@@ -100,15 +100,12 @@ CharacterStyle::SetBold(bool bold)
 
 	uint16 neededFace = face;
 	if (bold) {
-		if ((face & B_ITALIC_FACE) != 0)
-			neededFace = B_BOLD_FACE | B_ITALIC_FACE;
-		else
-			neededFace = B_BOLD_FACE;
+		neededFace |= B_BOLD_FACE;
+		neededFace &= ~B_REGULAR_FACE;
 	} else {
-		if ((face & B_ITALIC_FACE) != 0)
-			neededFace = B_ITALIC_FACE;
-		else
-			neededFace = B_REGULAR_FACE;
+		neededFace &= ~B_BOLD_FACE;
+		if (neededFace == 0)
+			neededFace |= B_REGULAR_FACE;
 	}
 
 	return SetFont(_FindFontForFace(neededFace));
@@ -133,15 +130,12 @@ CharacterStyle::SetItalic(bool italic)
 
 	uint16 neededFace = face;
 	if (italic) {
-		if ((face & B_BOLD_FACE) != 0)
-			neededFace = B_BOLD_FACE | B_ITALIC_FACE;
-		else
-			neededFace = B_ITALIC_FACE;
+		neededFace |= B_ITALIC_FACE;
+		neededFace &= ~B_REGULAR_FACE;
 	} else {
-		if ((face & B_BOLD_FACE) != 0)
-			neededFace = B_BOLD_FACE;
-		else
-			neededFace = B_REGULAR_FACE;
+		neededFace &= ~B_ITALIC_FACE;
+		if (neededFace == 0)
+			neededFace |= B_REGULAR_FACE;
 	}
 
 	return SetFont(_FindFontForFace(neededFace));
@@ -419,12 +413,35 @@ CharacterStyle::StrikeOut() const
 bool
 CharacterStyle::SetUnderline(uint8 underline)
 {
+#if 1
+	uint16 face = Font().Face();
+	if ((underline && (face & B_UNDERSCORE_FACE) != 0)
+		|| (!underline && (face & B_UNDERSCORE_FACE) == 0)) {
+		return true;
+	}
+
+	uint16 neededFace = face;
+	if (underline) {
+		neededFace |= B_UNDERSCORE_FACE;
+		neededFace &= ~B_REGULAR_FACE;
+	} else {
+		neededFace &= ~B_UNDERSCORE_FACE;
+		if (neededFace == 0)
+			neededFace |= B_REGULAR_FACE;
+	}
+
+	return SetFont(_FindFontForFace(neededFace));
+#else
+	// TODO: re-enable this instead of using B_UNDERSCORE_FACE when TextDocumentView actually
+	// implements drawing the fancy underline styles. Until then, we can at least get simple
+	// underlines.
 	CharacterStyleDataRef data = fStyleData->SetUnderline(underline);
 	if (data == fStyleData)
 		return data->Underline() == underline;
 
 	fStyleData = data;
 	return true;
+#endif
 }
 
 
@@ -442,21 +459,7 @@ BFont
 CharacterStyle::_FindFontForFace(uint16 face) const
 {
 	BFont font(Font());
-
-	font_family family;
-	font_style style;
-	font.GetFamilyAndStyle(&family, &style);
-
-	int32 styleCount = count_font_styles(family);
-	for (int32 i = 0; i < styleCount; i++) {
-		uint16 styleFace;
-		if (get_font_style(family, i, &style, &styleFace) == B_OK) {
-			if (styleFace == face) {
-				font.SetFamilyAndStyle(family, style);
-				return font;
-			}
-		}
-	}
+	font.SetFamilyAndFace(NULL, face);
 
 	return font;
 }
