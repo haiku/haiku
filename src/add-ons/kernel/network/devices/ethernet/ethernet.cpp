@@ -328,14 +328,14 @@ ethernet_send_data(net_device *_device, net_buffer *buffer)
 //dprintf("sent: %ld\n", bytesWritten);
 
 	if (bytesWritten < 0) {
-		device->stats.send.errors++;
+		atomic_add((int32*)&device->stats.send.errors, 1);
 		if (allocated)
 			gBufferModule->free(allocated);
 		return errno;
 	}
 
-	device->stats.send.packets++;
-	device->stats.send.bytes += bytesWritten;
+	atomic_add((int32*)&device->stats.send.packets, 1);
+	atomic_add64((int64*)&device->stats.send.bytes, bytesWritten);
 
 	gBufferModule->free(original);
 	if (allocated)
@@ -382,7 +382,7 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 
 	bytesRead = read(device->fd, iovec.iov_base, iovec.iov_len);
 	if (bytesRead < 0) {
-		device->stats.receive.errors++;
+		atomic_add((int32*)&device->stats.receive.errors, 1);
 		status = errno;
 		goto err;
 	}
@@ -393,12 +393,12 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	else
 		status = gBufferModule->trim(buffer, bytesRead);
 	if (status < B_OK) {
-		device->stats.receive.dropped++;
+		atomic_add((int32*)&device->stats.receive.dropped, 1);
 		goto err;
 	}
 
-	device->stats.receive.bytes += bytesRead;
-	device->stats.receive.packets++;
+	atomic_add((int32*)&device->stats.receive.packets, 1);
+	atomic_add64((int64*)&device->stats.receive.bytes, bytesRead);
 
 	*_buffer = buffer;
 	return B_OK;
