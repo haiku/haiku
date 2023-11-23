@@ -1219,6 +1219,10 @@ ssize_t
 socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	int flags)
 {
+	// MSG_NOSIGNAL is only meaningful for send(), not receive(), but it is
+	// sometimes specified anyway. Mask it off to avoid unnecessary errors.
+	flags &= ~MSG_NOSIGNAL;
+
 	// If the protocol sports read_data_no_buffer() we use it.
 	if (socket->first_info->read_data_no_buffer != NULL)
 		return socket_receive_no_buffer(socket, header, data, length, flags);
