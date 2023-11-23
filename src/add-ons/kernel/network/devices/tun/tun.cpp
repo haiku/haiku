@@ -57,13 +57,6 @@ static struct net_stack_module_info* sStackModule;
 //	#pragma mark -
 
 
-/**
- * @brief Prepends an ethernet frame to the given net buffer packet.
- *
- * @param buffer pointer to the net buffer to prepend the ethernet frame to
- *
- * @return the status of the operation
- */
 static status_t
 prepend_ethernet_frame(net_buffer* buffer)
 {
@@ -79,13 +72,6 @@ prepend_ethernet_frame(net_buffer* buffer)
 }
 
 
-/**
- * @brief Removes the ethernet header from the given network buffer.
- *
- * @param buffer Pointer to the network buffer.
- *
- * @return The status of the operation.
- */
 static status_t
 ethernet_header_deframe(net_buffer* buffer)
 {
@@ -97,14 +83,6 @@ ethernet_header_deframe(net_buffer* buffer)
 }
 
 
-/**
- * @brief Initializes a TUN/TAP interface with the given name.
- *
- * @param name The name of the TUN/TAP interface.
- * @param _device A pointer to a net_device pointer for the newly created interface.
- *
- * @return The status of the initialization. Returns B_OK if successful, or an error code otherwise.
- */
 status_t
 tun_init(const char* name, net_device** _device)
 {
@@ -150,13 +128,6 @@ tun_init(const char* name, net_device** _device)
 }
 
 
-/**
- * @brief Uninitializes a TUN/TAP interface.
- *
- * @param _device the net_device to uninitialize
- *
- * @return the status of the uninitialization process
- */
 status_t
 tun_uninit(net_device* _device)
 {
@@ -170,13 +141,6 @@ tun_uninit(net_device* _device)
 }
 
 
-/**
- * @brief Sets up the TUN/TAP network interface to be used.
- *
- * @param _device the network device to set up
- *
- * @return the status of the setup process
- */
 status_t
 tun_up(net_device* _device)
 {
@@ -189,14 +153,8 @@ tun_up(net_device* _device)
 }
 
 
-/**
- * @brief Closes the TUN/TAP network interface to not be used.
- *
- * @param _device A pointer to the net_device structure representing the tun_device.
- *
- * @return void
- */
-void tun_down(net_device* _device)
+void
+tun_down(net_device* _device)
 {
 	tun_device* device = (tun_device*)_device;
 	close(device->fd);
@@ -205,23 +163,12 @@ void tun_down(net_device* _device)
 
 
 status_t
-tun_control(net_device* device, int32 op, void* argument,
-			size_t length)
+tun_control(net_device* device, int32 op, void* argument, size_t length)
 {
 	return B_BAD_VALUE;
 }
 
 
-/**
- * @brief Writes data to the TUN/TAP network driver.
- *
- * @param _device the network device to get data from network stack
- * @param buffer the buffer containing the data to write
- *
- * @return the status of the operation
- *
- * @throws ErrorType if an error occurs during the operation
- */
 status_t
 tun_send_data(net_device* _device, net_buffer* buffer)
 {
@@ -291,20 +238,9 @@ tun_send_data(net_device* _device, net_buffer* buffer)
 }
 
 
-/**
- * @brief Reads data from the TUN/TAP network driver.
- *
- * @param _device the network device to put the data into the network stack
- * @param buffer the packet to be filled and sent to the network stack
- *
- * @return the status of the operation
- *
- * @throws ErrorType if an error occurs during the operation
- */
 status_t
 tun_receive_data(net_device* _device, net_buffer** _buffer)
 {
-	/* Recieve Data */
 	tun_device* device = (tun_device*)_device;
 	if (device->fd == -1)
 		return B_FILE_ERROR;
@@ -371,15 +307,6 @@ tun_receive_data(net_device* _device, net_buffer** _buffer)
 }
 
 
-/**
- * @brief Sets the maximum transmission unit (MTU) for a network interface.
- *
- * @param device a pointer to the network interface
- * @param mtu the desired MTU value
- *
- * @return the status of the operation (B_OK if successful, B_BAD_VALUE if the
- *         provided MTU is out of range)
- */
 status_t
 tun_set_mtu(net_device* device, size_t mtu)
 {
@@ -388,6 +315,7 @@ tun_set_mtu(net_device* device, size_t mtu)
 	device->mtu = mtu;
 	return B_OK;
 }
+
 
 status_t
 tun_set_promiscuous(net_device* device, bool promiscuous)
@@ -406,7 +334,7 @@ tun_set_media(net_device* device, uint32 media)
 status_t
 tun_add_multicast(net_device* device, const sockaddr* address)
 {
-	/* Nothing to do for multicast filters as we always accept all frames. */
+	// Nothing to do for multicast filters as we always accept all frames.
 	return B_OK;
 }
 
@@ -418,14 +346,6 @@ tun_remove_multicast(net_device* device, const sockaddr* address)
 }
 
 
-/**
- * @brief Performs various operations on the TUN/TAP network interface.
- *
- * @param op The operation to be performed.
- * @param ... Additional arguments based on the operation.
- *
- * @return The status of the operation.
- */
 static status_t
 tun_std_ops(int32 op, ...)
 {
@@ -472,7 +392,7 @@ net_device_module_info sTunModule = {
 	tun_remove_multicast,
 };
 
-
 module_info* modules[] = {
 	(module_info*)&sTunModule,
-	NULL};
+	NULL
+};

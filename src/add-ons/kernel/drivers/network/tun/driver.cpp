@@ -54,14 +54,6 @@ static select_sync_pool* gSelectPool = NULL;
 struct net_buffer_module_info* gBufferModule;
 
 
-/**
- * @brief Creates a filled net_buffer based on the given data and size.
- *
- * @param data the pointer to the data that will be copied to the net_buffer
- * @param bytes the size of the data in bytes
- *
- * @return a net_buffer pointer containing the copied data, or NULL if creation fails
- */
 static net_buffer*
 create_filled_buffer(uint8* data, size_t bytes)
 {
@@ -79,15 +71,6 @@ create_filled_buffer(uint8* data, size_t bytes)
 }
 
 
-/**
- * @brief Retrieves a packet from the given buffer queue.
- *
- * @param queueToUse The buffer queue to retrieve the packet from.
- * @param data A pointer to the memory location where the packet data will be copied.
- * @param numbytes A pointer to the variable that will store the size of the retrieved packet.
- *
- * @return The status of the retrieval operation or B_OK if successful.
- */
 static status_t
 retrieve_packet(BufferQueue* queueToUse, void* data, size_t* numbytes)
 {
@@ -106,35 +89,17 @@ retrieve_packet(BufferQueue* queueToUse, void* data, size_t* numbytes)
 }
 
 
-/**
- * A helper function to notify events based on the readability and writability
- * of a file descriptor.
- *
- * @param readable A boolean indicating if the file descriptor is readable.
- * @param writable A boolean indicating if the file descriptor is writable.
- *
- * @return void
- *
- * @throws None
- */
 static void
 notify_select_helper(bool readable, bool writable)
 {
-	if (readable) {
+	if (readable)
 		notify_select_event_pool(gSelectPool, B_SELECT_READ);
-	}
 
-	if (writable) {
+	if (writable)
 		notify_select_event_pool(gSelectPool, B_SELECT_WRITE);
-	}
 }
 
 
-/**
- * @brief Notifies the select event pool if the tun device is readable or writable.
- *
- * @param tun The tun_struct object representing the tun device.
- */
 static void
 tun_notify(tun_struct* tun)
 {
@@ -151,11 +116,6 @@ tun_notify(tun_struct* tun)
 }
 
 
-/**
- * @brief First initialization step for the driver.
- *
- * @return the status of the initialization process.
- */
 status_t
 init_hardware(void)
 {
@@ -165,11 +125,6 @@ init_hardware(void)
 }
 
 
-/**
- * @brief Initializes the driver and the net buffer module for packet operations.
- *
- * @return the status of the initialization.
- */
 status_t
 init_driver(void)
 {
@@ -182,11 +137,6 @@ init_driver(void)
 }
 
 
-/**
- * @brief Uninitializes the driver.
- *
- * @return void
- */
 void
 uninit_driver(void)
 {
@@ -195,15 +145,6 @@ uninit_driver(void)
 }
 
 
-/**
- * @brief Sets the tun_struct for this session of open.
- *
- * @param name the name of the interface
- * @param flags the flags for the interface
- * @param cookie a pointer to store the cookie
- *
- * @return the status of the function
- */
 status_t
 tun_open(const char* name, uint32 flags, void** cookie)
 {
@@ -221,13 +162,6 @@ tun_open(const char* name, uint32 flags, void** cookie)
 }
 
 
-/**
- * @brief Close the open instance.
- *
- * @param cookie a pointer to the tun_struct object to be used
- *
- * @return The status of the function
- */
 status_t
 tun_close(void* cookie)
 {
@@ -241,13 +175,6 @@ tun_close(void* cookie)
 }
 
 
-/**
- * @brief Frees the memory allocated for a tun_struct object.
- *
- * @param cookie a pointer to the tun_struct object to be freed
- *
- * @return a status_t indicating the result of the operation
- */
 status_t
 tun_free(void* cookie)
 {
@@ -260,16 +187,6 @@ tun_free(void* cookie)
 }
 
 
-/**
- * @brief Updates the tun interface based on the given IOCTL operation and data.
- *
- * @param cookie a pointer to the tun_struct object
- * @param op the IOCTL operation to perform
- * @param data a pointer to the data to be used in the IOCTL operation
- * @param len the size of the data in bytes
- *
- * @return the status of the IOCTL operation
- */
 status_t
 tun_ioctl(void* cookie, uint32 op, void* data, size_t len)
 {
@@ -294,16 +211,6 @@ tun_ioctl(void* cookie, uint32 op, void* data, size_t len)
 }
 
 
-/**
- * @brief Reads data from the TUN/TAP device.
- *
- * @param cookie a pointer to the tun_struct
- * @param position the position in the data stream to read from
- * @param data a pointer to the buffer where the read data will be copied
- * @param numbytes a pointer to the size to read, updated with the number of bytes read
- *
- * @return the status of the read operation
- */
 status_t
 tun_read(void* cookie, off_t position, void* data, size_t* numbytes)
 {
@@ -324,16 +231,6 @@ tun_read(void* cookie, off_t position, void* data, size_t* numbytes)
 }
 
 
-/**
- * @brief Writes data to the specified sending queue.
- *
- * @param cookie a pointer to the tun_struct
- * @param position the position in the file to write to (NOT USED)
- * @param data a pointer to the data to write
- * @param numbytes a pointer to the number of bytes to write
- *
- * @return a status code indicating the result of the write operation
- */
 status_t
 tun_write(void* cookie, off_t position, const void* data, size_t* numbytes)
 {
@@ -353,16 +250,6 @@ tun_write(void* cookie, off_t position, const void* data, size_t* numbytes)
 }
 
 
-/**
- * @brief Handles the selection of read and write events on a TUN/TAP device.
- *
- * @param cookie a pointer to the tun_struct object
- * @param event the event type (B_SELECT_READ or B_SELECT_WRITE are accepted)
- * @param ref the reference number
- * @param sync a pointer to the selectsync object
- *
- * @return the status of the select operation
- */
 status_t
 tun_select(void* cookie, uint8 event, uint32 ref, selectsync* sync)
 {
@@ -388,15 +275,6 @@ tun_select(void* cookie, uint8 event, uint32 ref, selectsync* sync)
 }
 
 
-/**
- * @brief Deselects a event in the select pool.
- *
- * @param cookie a pointer to the tun_struct object representing the tun device
- * @param event the event type to be deselected (B_SELECT_READ or B_SELECT_WRITE)
- * @param sync a pointer to the selectsync object to be removed from the select pool
- *
- * @return the status code indicating the result of the deselect operation
- */
 status_t
 tun_deselect(void* cookie, uint8 event, selectsync* sync)
 {
@@ -408,11 +286,6 @@ tun_deselect(void* cookie, uint8 event, selectsync* sync)
 }
 
 
-/**
- * @brief Publishes the driver names to devfs.
- *
- * @return A pointer to a constant character pointer representing the device names.
- */
 const char**
 publish_devices()
 {
@@ -431,14 +304,8 @@ device_hooks tun_hooks = {
 	tun_deselect,
 	NULL,
 	NULL
-	};
-/**
- * @brief Finds hooks for driver functions.
- *
- * @param name the name of the device.
- *
- * @return a pointer to the device hooks (all devices return the same hooks)
- */
+};
+
 device_hooks*
 find_device(const char* name)
 {
