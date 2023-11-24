@@ -1,7 +1,6 @@
 /******************************************************************************
  *
- * Module Name: evxfregn - External Interfaces, ACPI Operation Regions and
- *                         Address Spaces.
+ * Module Name: utcksum - Support generating table checksums
  *
  *****************************************************************************/
 
@@ -150,329 +149,187 @@
  *
  *****************************************************************************/
 
-#define EXPORT_ACPI_INTERFACES
-
 #include "acpi.h"
 #include "accommon.h"
-#include "acnamesp.h"
-#include "acevents.h"
-
-#define _COMPONENT          ACPI_EVENTS
-        ACPI_MODULE_NAME    ("evxfregn")
+#include "acdisasm.h"
+#include "acutils.h"
 
 
-/*******************************************************************************
- *
- * FUNCTION:    AcpiInstallAddressSpaceHandlerInternal
- *
- * PARAMETERS:  Device          - Handle for the device
- *              SpaceId         - The address space ID
- *              Handler         - Address of the handler
- *              Setup           - Address of the setup function
- *              Context         - Value passed to the handler on each access
- *              Run_Reg         - Run _REG methods for this address space?
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Install a handler for all OpRegions of a given SpaceId.
- *
- * NOTE: This function should only be called after AcpiEnableSubsystem has
- * been called. This is because any _REG methods associated with the Space ID
- * are executed here, and these methods can only be safely executed after
- * the default handlers have been installed and the hardware has been
- * initialized (via AcpiEnableSubsystem.)
- * To avoid this problem pass FALSE for Run_Reg and later on call
- * AcpiExecuteRegMethods() to execute _REG.
- *
- ******************************************************************************/
+/* This module used for application-level code only */
 
-static ACPI_STATUS
-AcpiInstallAddressSpaceHandlerInternal (
-    ACPI_HANDLE             Device,
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    ACPI_ADR_SPACE_HANDLER  Handler,
-    ACPI_ADR_SPACE_SETUP    Setup,
-    void                    *Context,
-    BOOLEAN                 Run_Reg)
-{
-    ACPI_NAMESPACE_NODE     *Node;
-    ACPI_STATUS             Status;
-
-
-    ACPI_FUNCTION_TRACE (AcpiInstallAddressSpaceHandler);
-
-
-    /* Parameter validation */
-
-    if (!Device)
-    {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Convert and validate the device handle */
-
-    Node = AcpiNsValidateHandle (Device);
-    if (!Node)
-    {
-        Status = AE_BAD_PARAMETER;
-        goto UnlockAndExit;
-    }
-
-    /* Install the handler for all Regions for this Space ID */
-
-    Status = AcpiEvInstallSpaceHandler (
-        Node, SpaceId, Handler, Setup, Context);
-    if (ACPI_FAILURE (Status))
-    {
-        goto UnlockAndExit;
-    }
-
-    /* Run all _REG methods for this address space */
-
-    if (Run_Reg)
-    {
-        AcpiEvExecuteRegMethods (Node, SpaceId, ACPI_REG_CONNECT);
-    }
-
-UnlockAndExit:
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-    return_ACPI_STATUS (Status);
-}
-
-ACPI_STATUS
-AcpiInstallAddressSpaceHandler (
-    ACPI_HANDLE             Device,
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    ACPI_ADR_SPACE_HANDLER  Handler,
-    ACPI_ADR_SPACE_SETUP    Setup,
-    void                    *Context)
-{
-    return AcpiInstallAddressSpaceHandlerInternal (Device, SpaceId, Handler, Setup, Context, TRUE);
-}
-
-ACPI_EXPORT_SYMBOL (AcpiInstallAddressSpaceHandler)
-
-ACPI_STATUS
-AcpiInstallAddressSpaceHandlerNo_Reg (
-    ACPI_HANDLE             Device,
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    ACPI_ADR_SPACE_HANDLER  Handler,
-    ACPI_ADR_SPACE_SETUP    Setup,
-    void                    *Context)
-{
-    return AcpiInstallAddressSpaceHandlerInternal (Device, SpaceId, Handler, Setup, Context, FALSE);
-}
-
-ACPI_EXPORT_SYMBOL (AcpiInstallAddressSpaceHandlerNo_Reg)
+#define _COMPONENT          ACPI_CA_DISASSEMBLER
+        ACPI_MODULE_NAME    ("utcksum")
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiRemoveAddressSpaceHandler
+ * FUNCTION:    AcpiUtVerifyChecksum
  *
- * PARAMETERS:  Device          - Handle for the device
- *              SpaceId         - The address space ID
- *              Handler         - Address of the handler
+ * PARAMETERS:  Table               - ACPI table to verify
+ *              Length              - Length of entire table
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Remove a previously installed handler.
+ * DESCRIPTION: Verifies that the table checksums to zero. Optionally returns
+ *              exception on bad checksum.
+ *              Note: We don't have to check for a CDAT here, since CDAT is
+ *              not in the RSDT/XSDT, and the CDAT table is never installed
+ *              via ACPICA.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiRemoveAddressSpaceHandler (
-    ACPI_HANDLE             Device,
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    ACPI_ADR_SPACE_HANDLER  Handler)
+AcpiUtVerifyChecksum (
+    ACPI_TABLE_HEADER       *Table,
+    UINT32                  Length)
 {
-    ACPI_OPERAND_OBJECT     *ObjDesc;
-    ACPI_OPERAND_OBJECT     *HandlerObj;
-    ACPI_OPERAND_OBJECT     *RegionObj;
-    ACPI_OPERAND_OBJECT     **LastObjPtr;
-    ACPI_NAMESPACE_NODE     *Node;
-    ACPI_STATUS             Status;
+    UINT8                   Checksum;
 
 
-    ACPI_FUNCTION_TRACE (AcpiRemoveAddressSpaceHandler);
-
-
-    /* Parameter validation */
-
-    if (!Device)
+    /*
+     * FACS/S3PT:
+     * They are the odd tables, have no standard ACPI header and no checksum
+     */
+    if (ACPI_COMPARE_NAMESEG (Table->Signature, ACPI_SIG_S3PT) ||
+        ACPI_COMPARE_NAMESEG (Table->Signature, ACPI_SIG_FACS))
     {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
+        return (AE_OK);
     }
 
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
+    /* Compute the checksum on the table */
+
+    Length = Table->Length;
+    Checksum = AcpiUtGenerateChecksum (ACPI_CAST_PTR (UINT8, Table), Length, Table->Checksum);
+
+    /* Computed checksum matches table? */
+
+    if (Checksum != Table->Checksum)
     {
-        return_ACPI_STATUS (Status);
+        ACPI_BIOS_WARNING ((AE_INFO,
+            "Incorrect checksum in table [%4.4s] - 0x%2.2X, "
+            "should be 0x%2.2X",
+            Table->Signature, Table->Checksum,
+            Table->Checksum - Checksum));
+
+#if (ACPI_CHECKSUM_ABORT)
+        return (AE_BAD_CHECKSUM);
+#endif
     }
 
-    /* Convert and validate the device handle */
-
-    Node = AcpiNsValidateHandle (Device);
-    if (!Node ||
-        ((Node->Type != ACPI_TYPE_DEVICE)    &&
-         (Node->Type != ACPI_TYPE_PROCESSOR) &&
-         (Node->Type != ACPI_TYPE_THERMAL)   &&
-         (Node != AcpiGbl_RootNode)))
-    {
-        Status = AE_BAD_PARAMETER;
-        goto UnlockAndExit;
-    }
-
-    /* Make sure the internal object exists */
-
-    ObjDesc = AcpiNsGetAttachedObject (Node);
-    if (!ObjDesc)
-    {
-        Status = AE_NOT_EXIST;
-        goto UnlockAndExit;
-    }
-
-    /* Find the address handler the user requested */
-
-    HandlerObj = ObjDesc->CommonNotify.Handler;
-    LastObjPtr = &ObjDesc->CommonNotify.Handler;
-    while (HandlerObj)
-    {
-        /* We have a handler, see if user requested this one */
-
-        if (HandlerObj->AddressSpace.SpaceId == SpaceId)
-        {
-            /* Handler must be the same as the installed handler */
-
-            if (HandlerObj->AddressSpace.Handler != Handler)
-            {
-                Status = AE_BAD_PARAMETER;
-                goto UnlockAndExit;
-            }
-
-            /* Matched SpaceId, first dereference this in the Regions */
-
-            ACPI_DEBUG_PRINT ((ACPI_DB_OPREGION,
-                "Removing address handler %p(%p) for region %s "
-                "on Device %p(%p)\n",
-                HandlerObj, Handler, AcpiUtGetRegionName (SpaceId),
-                Node, ObjDesc));
-
-            RegionObj = HandlerObj->AddressSpace.RegionList;
-
-            /* Walk the handler's region list */
-
-            while (RegionObj)
-            {
-                /*
-                 * First disassociate the handler from the region.
-                 *
-                 * NOTE: this doesn't mean that the region goes away
-                 * The region is just inaccessible as indicated to
-                 * the _REG method
-                 */
-                AcpiEvDetachRegion (RegionObj, TRUE);
-
-                /*
-                 * Walk the list: Just grab the head because the
-                 * DetachRegion removed the previous head.
-                 */
-                RegionObj = HandlerObj->AddressSpace.RegionList;
-            }
-
-            /* Remove this Handler object from the list */
-
-            *LastObjPtr = HandlerObj->AddressSpace.Next;
-
-            /* Now we can delete the handler object */
-
-            AcpiOsReleaseMutex (HandlerObj->AddressSpace.ContextMutex);
-            AcpiUtRemoveReference (HandlerObj);
-            goto UnlockAndExit;
-        }
-
-        /* Walk the linked list of handlers */
-
-        LastObjPtr = &HandlerObj->AddressSpace.Next;
-        HandlerObj = HandlerObj->AddressSpace.Next;
-    }
-
-    /* The handler does not exist */
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_OPREGION,
-        "Unable to remove address handler %p for %s(%X), DevNode %p, obj %p\n",
-        Handler, AcpiUtGetRegionName (SpaceId), SpaceId, Node, ObjDesc));
-
-    Status = AE_NOT_EXIST;
-
-UnlockAndExit:
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-    return_ACPI_STATUS (Status);
+    return (AE_OK);
 }
-
-ACPI_EXPORT_SYMBOL (AcpiRemoveAddressSpaceHandler)
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiExecuteRegMethods
+ * FUNCTION:    AcpiUtVerifyCdatChecksum
  *
- * PARAMETERS:  Device          - Handle for the device
- *              SpaceId         - The address space ID
+ * PARAMETERS:  Table               - CDAT ACPI table to verify
+ *              Length              - Length of entire table
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Execute _REG for all OpRegions of a given SpaceId.
+ * DESCRIPTION: Verifies that the CDAT table checksums to zero. Optionally
+ *              returns an exception on bad checksum.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiExecuteRegMethods (
-    ACPI_HANDLE             Device,
-    ACPI_ADR_SPACE_TYPE     SpaceId)
+AcpiUtVerifyCdatChecksum (
+    ACPI_TABLE_CDAT         *CdatTable,
+    UINT32                  Length)
 {
-    ACPI_NAMESPACE_NODE     *Node;
-    ACPI_STATUS             Status;
+    UINT8                   Checksum;
 
 
-    ACPI_FUNCTION_TRACE (AcpiExecuteRegMethods);
+    /* Compute the checksum on the table */
 
+    Checksum = AcpiUtGenerateChecksum (ACPI_CAST_PTR (UINT8, CdatTable),
+                    CdatTable->Length, CdatTable->Checksum);
 
-    /* Parameter validation */
+    /* Computed checksum matches table? */
 
-    if (!Device)
+    if (Checksum != CdatTable->Checksum)
     {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
+        ACPI_BIOS_WARNING ((AE_INFO,
+            "Incorrect checksum in table [%4.4s] - 0x%2.2X, "
+            "should be 0x%2.2X",
+            AcpiGbl_CDAT, CdatTable->Checksum, Checksum));
+
+#if (ACPI_CHECKSUM_ABORT)
+        return (AE_BAD_CHECKSUM);
+#endif
     }
 
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Convert and validate the device handle */
-
-    Node = AcpiNsValidateHandle (Device);
-    if (Node)
-    {
-        /* Run all _REG methods for this address space */
-
-        AcpiEvExecuteRegMethods (Node, SpaceId, ACPI_REG_CONNECT);
-    }
-    else
-    {
-        Status = AE_BAD_PARAMETER;
-    }
-
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-    return_ACPI_STATUS (Status);
+    CdatTable->Checksum = Checksum;
+    return (AE_OK);
 }
 
-ACPI_EXPORT_SYMBOL (AcpiExecuteRegMethods)
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtGenerateChecksum
+ *
+ * PARAMETERS:  Table               - Pointer to table to be checksummed
+ *              Length              - Length of the table
+ *              OriginalChecksum    - Value of the checksum field
+ *
+ * RETURN:      8 bit checksum of buffer
+ *
+ * DESCRIPTION: Computes an 8 bit checksum of the table.
+ *
+ ******************************************************************************/
+
+UINT8
+AcpiUtGenerateChecksum (
+    void                    *Table,
+    UINT32                  Length,
+    UINT8                   OriginalChecksum)
+{
+    UINT8                   Checksum;
+
+
+    /* Sum the entire table as-is */
+
+    Checksum = AcpiUtChecksum ((UINT8 *) Table, Length);
+
+    /* Subtract off the existing checksum value in the table */
+
+    Checksum = (UINT8) (Checksum - OriginalChecksum);
+
+    /* Compute and return the final checksum */
+
+    Checksum = (UINT8) (0 - Checksum);
+    return (Checksum);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtChecksum
+ *
+ * PARAMETERS:  Buffer          - Pointer to memory region to be checked
+ *              Length          - Length of this memory region
+ *
+ * RETURN:      Checksum (UINT8)
+ *
+ * DESCRIPTION: Calculates circular checksum of memory region.
+ *
+ ******************************************************************************/
+
+UINT8
+AcpiUtChecksum (
+    UINT8                   *Buffer,
+    UINT32                  Length)
+{
+    UINT8                   Sum = 0;
+    UINT8                   *End = Buffer + Length;
+
+
+    while (Buffer < End)
+    {
+        Sum = (UINT8) (Sum + *(Buffer++));
+    }
+
+    return (Sum);
+}

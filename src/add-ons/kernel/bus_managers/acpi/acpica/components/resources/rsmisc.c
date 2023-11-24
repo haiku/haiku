@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2023, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -225,6 +225,8 @@ AcpiRsConvertAmlToResource (
     Count = INIT_TABLE_LENGTH (Info);
     while (Count)
     {
+        Target = NULL;
+
         /*
          * Source is the external AML byte stream buffer,
          * destination is the internal resource descriptor
@@ -273,6 +275,14 @@ AcpiRsConvertAmlToResource (
              */
             ACPI_SET8 (Destination,
                 ((ACPI_GET8 (Source) >> Info->Value) & 0x07));
+            break;
+
+        case ACPI_RSC_6BITFLAG:
+            /*
+             * Mask and shift the flag bits
+             */
+            ACPI_SET8 (Destination,
+                ((ACPI_GET8 (Source) >> Info->Value) & 0x3F));
             break;
 
         case ACPI_RSC_COUNT:
@@ -339,7 +349,8 @@ AcpiRsConvertAmlToResource (
 
         case ACPI_RSC_COUNT_SERIAL_VEN:
 
-            ItemCount = ACPI_GET16 (Source) - Info->Value;
+            ACPI_MOVE_16_TO_16(&Temp16, Source);
+            ItemCount = Temp16 - Info->Value;
 
             Resource->Length = Resource->Length + ItemCount;
             ACPI_SET16 (Destination, ItemCount);
@@ -347,9 +358,10 @@ AcpiRsConvertAmlToResource (
 
         case ACPI_RSC_COUNT_SERIAL_RES:
 
+            ACPI_MOVE_16_TO_16(&Temp16, Source);
             ItemCount = (AmlResourceLength +
                 sizeof (AML_RESOURCE_LARGE_HEADER)) -
-                ACPI_GET16 (Source) - Info->Value;
+                Temp16 - Info->Value;
 
             Resource->Length = Resource->Length + ItemCount;
             ACPI_SET16 (Destination, ItemCount);
@@ -427,8 +439,9 @@ AcpiRsConvertAmlToResource (
 
             /* Copy the ResourceSource string */
 
+            ACPI_MOVE_16_TO_16 (&Temp16, Source);
             Source = ACPI_ADD_PTR (
-                void, Aml, (ACPI_GET16 (Source) + Info->Value));
+                void, Aml, (Temp16 + Info->Value));
             AcpiRsMoveData (Target, Source, ItemCount, Info->Opcode);
             break;
 
@@ -652,6 +665,14 @@ AcpiRsConvertResourceToAml (
              */
             ACPI_SET_BIT (*ACPI_CAST8 (Destination), (UINT8)
                 ((ACPI_GET8 (Source) & 0x07) << Info->Value));
+            break;
+
+        case ACPI_RSC_6BITFLAG:
+            /*
+             * Mask and shift the flag bits
+             */
+            ACPI_SET_BIT (*ACPI_CAST8 (Destination), (UINT8)
+                ((ACPI_GET8 (Source) & 0x3F) << Info->Value));
             break;
 
         case ACPI_RSC_COUNT:

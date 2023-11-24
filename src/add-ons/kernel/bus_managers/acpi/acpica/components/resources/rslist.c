@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2023, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -209,17 +209,22 @@ AcpiRsConvertAmlToResources (
     if (AcpiUtGetResourceType (Aml) ==
         ACPI_RESOURCE_NAME_SERIAL_BUS)
     {
-        if (AmlResource->CommonSerialBus.Type >
+        /* Avoid undefined behavior: member access within misaligned address */
+
+        AML_RESOURCE_COMMON_SERIALBUS CommonSerialBus;
+        memcpy(&CommonSerialBus, AmlResource, sizeof(CommonSerialBus));
+
+        if (CommonSerialBus.Type >
             AML_RESOURCE_MAX_SERIALBUSTYPE)
         {
             ConversionTable = NULL;
         }
         else
         {
-            /* This is an I2C, SPI, or UART SerialBus descriptor */
+            /* This is an I2C, SPI, UART, or CSI2 SerialBus descriptor */
 
             ConversionTable = AcpiGbl_ConvertResourceSerialBusDispatch [
-                AmlResource->CommonSerialBus.Type];
+                CommonSerialBus.Type];
         }
     }
     else
@@ -244,6 +249,12 @@ AcpiRsConvertAmlToResources (
         ACPI_EXCEPTION ((AE_INFO, Status,
             "Could not convert AML resource (Type 0x%X)", *Aml));
         return_ACPI_STATUS (Status);
+    }
+
+    if (!Resource->Length)
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Zero-length resource returned from RsConvertAmlToResource"));
     }
 
     ACPI_DEBUG_PRINT ((ACPI_DB_RESOURCES,
@@ -326,7 +337,7 @@ AcpiRsConvertResourcesToAml (
             }
             else
             {
-                /* This is an I2C, SPI, or UART SerialBus descriptor */
+                /* This is an I2C, SPI, UART or CSI2 SerialBus descriptor */
 
                 ConversionTable = AcpiGbl_ConvertResourceSerialBusDispatch[
                     Resource->Data.CommonSerialBus.Type];

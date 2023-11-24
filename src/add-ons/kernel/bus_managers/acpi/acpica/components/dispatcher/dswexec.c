@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2023, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -173,7 +173,7 @@ static ACPI_EXECUTE_OP      AcpiGbl_OpTypeDispatch [] =
     AcpiExOpcode_0A_0T_1R,
     AcpiExOpcode_1A_0T_0R,
     AcpiExOpcode_1A_0T_1R,
-    AcpiExOpcode_1A_1T_0R,
+    NULL,   /* Was: AcpiExOpcode_1A_0T_0R (Was for Load operator) */
     AcpiExOpcode_1A_1T_1R,
     AcpiExOpcode_2A_0T_0R,
     AcpiExOpcode_2A_0T_1R,
@@ -569,9 +569,11 @@ AcpiDsExecEndOp (
 
         /*
          * All opcodes require operand resolution, with the only exceptions
-         * being the ObjectType and SizeOf operators.
+         * being the ObjectType and SizeOf operators as well as opcodes that
+         * take no arguments.
          */
-        if (!(WalkState->OpInfo->Flags & AML_NO_OPERAND_RESOLVE))
+        if (!(WalkState->OpInfo->Flags & AML_NO_OPERAND_RESOLVE) &&
+            (WalkState->OpInfo->Flags & AML_HAS_ARGS))
         {
             /* Resolve all operands */
 
@@ -737,7 +739,7 @@ AcpiDsExecEndOp (
             if (ACPI_SUCCESS (Status))
             {
                 Status = AcpiExWriteDataToField (ObjDesc, Op->Common.Node->Object, NULL);
-                if ACPI_FAILURE (Status)
+                if (ACPI_FAILURE (Status))
                 {
                     ACPI_EXCEPTION ((AE_INFO, Status, "While writing to buffer field"));
                 }
