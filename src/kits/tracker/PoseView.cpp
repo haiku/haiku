@@ -8907,12 +8907,12 @@ BPoseView::TargetVolumeIsReadOnly() const
 bool
 BPoseView::CanEditName() const
 {
-	const int32 selectCount = CountSelected();
-	Model* selected = fSelectionList->FirstItem()->TargetModel();
+	if (CountSelected() != 1)
+		return false;
 
-	return !ActivePose() && selectCount == 1
-		&& !selected->IsDesktop() && !selected->IsRoot()
-		&& !selected->IsTrash();
+	Model* selected = fSelectionList->FirstItem()->TargetModel();
+	return !ActivePose() && selected != NULL && !selected->IsDesktop()
+		&& !selected->IsRoot() && !selected->IsTrash();
 }
 
 
