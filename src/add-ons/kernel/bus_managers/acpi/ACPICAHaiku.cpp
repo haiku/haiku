@@ -158,9 +158,9 @@ ACPI_MODULE_NAME("Haiku ACPI Module")
 #	define DEBUG_FUNCTION_VF(x, y...)
 #else
 #	define DEBUG_FUNCTION() \
-		dprintf("acpi[%ld]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
+		dprintf("acpi[%" B_PRId32 "]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
 #	define DEBUG_FUNCTION_F(x, y...) \
-		dprintf("acpi[%ld]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
+		dprintf("acpi[%" B_PRId32 "]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
 #	if DEBUG_OSHAIKU == 1
 // No verbose debugging, do nothing
 #		define DEBUG_FUNCTION_V()
@@ -168,9 +168,9 @@ ACPI_MODULE_NAME("Haiku ACPI Module")
 #	else
 // Full debugging
 #		define DEBUG_FUNCTION_V() \
-			dprintf("acpi[%ld]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
+			dprintf("acpi[%" B_PRId32 "]: %s\n", find_thread(NULL), __PRETTY_FUNCTION__);
 #		define DEBUG_FUNCTION_VF(x, y...) \
-			dprintf("acpi[%ld]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
+			dprintf("acpi[%" B_PRId32 "]: %s(" x ")\n", find_thread(NULL), __PRETTY_FUNCTION__, y);
 #	endif
 #endif
 
@@ -447,7 +447,7 @@ AcpiOsGetLine(char *buffer)
 #endif
 
 	buffer[i] = 0;
-	DEBUG_FUNCTION_F("buffer: \"%s\"; result: %lu", buffer, i);
+	DEBUG_FUNCTION_F("buffer: \"%s\"; result: %" B_PRIu32, buffer, i);
 	return i;
 }
 
@@ -473,7 +473,7 @@ AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS where, ACPI_SIZE length)
 		(phys_addr_t)where, length, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &there);
 
-	DEBUG_FUNCTION_F("addr: 0x%08lx; length: %lu; mapped: %p; area: %ld",
+	DEBUG_FUNCTION_F("addr: 0x%08lx; length: %lu; mapped: %p; area: %" B_PRId32,
 		(addr_t)where, (size_t)length, there, area);
 	if (area < 0) {
 		dprintf("ACPI: cannot map memory at 0x%" B_PRIu64 ", length %"
@@ -569,7 +569,7 @@ AcpiOsCreateSemaphore(UINT32 maxUnits, UINT32 initialUnits,
     	return AE_BAD_PARAMETER;
 
 	*outHandle = create_sem(initialUnits, "acpi_sem");
-	DEBUG_FUNCTION_F("max: %lu; count: %lu; result: %ld",
+	DEBUG_FUNCTION_F("max: %" B_PRIu32 "; count: %" B_PRIu32 "; result: %" PRId32,
 		(uint32)maxUnits, (uint32)initialUnits, *outHandle);
 
 	if (*outHandle >= B_OK)
@@ -593,7 +593,7 @@ AcpiOsCreateSemaphore(UINT32 maxUnits, UINT32 initialUnits,
 ACPI_STATUS
 AcpiOsDeleteSemaphore(ACPI_SEMAPHORE handle)
 {
-	DEBUG_FUNCTION_F("sem: %ld", handle);
+	DEBUG_FUNCTION_F("sem: %" B_PRId32, handle);
 	return delete_sem(handle) == B_OK ? AE_OK : AE_BAD_PARAMETER;
 }
 
@@ -734,7 +734,7 @@ AcpiOsInstallInterruptHandler(UINT32 interruptNumber,
 		ACPI_OSD_HANDLER serviceRoutine, void *context)
 {
 	status_t result;
-	DEBUG_FUNCTION_F("vector: %lu; handler: %p context %p",
+	DEBUG_FUNCTION_F("vector: %" B_PRIu32 "; handler: %p context %p",
 		(uint32)interruptNumber, serviceRoutine, context);
 
 #ifdef _KERNEL_MODE
@@ -744,7 +744,7 @@ AcpiOsInstallInterruptHandler(UINT32 interruptNumber,
 	result = install_io_interrupt_handler(interruptNumber,
 		(interrupt_handler)serviceRoutine, context, 0);
 
-	DEBUG_FUNCTION_F("vector: %lu; handler: %p context %p returned %lu",
+	DEBUG_FUNCTION_F("vector: %" B_PRIu32 "; handler: %p context %p returned %" B_PRId32,
 		(uint32)interruptNumber, serviceRoutine, context, (uint32)result);
 
 	return result == B_OK ? AE_OK : AE_BAD_PARAMETER;
@@ -769,7 +769,7 @@ ACPI_STATUS
 AcpiOsRemoveInterruptHandler(UINT32 interruptNumber,
 		ACPI_OSD_HANDLER serviceRoutine)
 {
-	DEBUG_FUNCTION_F("vector: %lu; handler: %p", (uint32)interruptNumber,
+	DEBUG_FUNCTION_F("vector: %" B_PRIu32 "; handler: %p", (uint32)interruptNumber,
 		serviceRoutine);
 #ifdef _KERNEL_MODE
 	return remove_io_interrupt_handler(interruptNumber,
@@ -834,7 +834,7 @@ AcpiOsExecute(ACPI_EXECUTE_TYPE type, ACPI_OSD_EXEC_CALLBACK  function,
 void
 AcpiOsStall(UINT32 microseconds)
 {
-	DEBUG_FUNCTION_F("microseconds: %lu", (uint32)microseconds);
+	DEBUG_FUNCTION_F("microseconds: %" B_PRIu32, (uint32)microseconds);
 	if (microseconds)
 		spin(microseconds);
 }
@@ -854,7 +854,7 @@ AcpiOsStall(UINT32 microseconds)
 void
 AcpiOsSleep(ACPI_INTEGER milliseconds)
 {
-	DEBUG_FUNCTION_F("milliseconds: %lu", (uint32)milliseconds);
+	DEBUG_FUNCTION_F("milliseconds: %" B_PRIu32, (uint32)milliseconds);
 	if (gKernelStartup)
 		spin(milliseconds * 1000);
 	else
@@ -965,7 +965,7 @@ ACPI_STATUS
 AcpiOsReadPort(ACPI_IO_ADDRESS address, UINT32 *value, UINT32 width)
 {
 #ifdef _KERNEL_MODE
-	DEBUG_FUNCTION_F("addr: 0x%08lx; width: %lu", (addr_t)address, (uint32)width);
+	DEBUG_FUNCTION_F("addr: 0x%08lx; width: %" B_PRIu32, (addr_t)address, (uint32)width);
 	switch (width) {
 		case 8:
 			*value = gPCIManager->read_io_8(address);
@@ -1007,7 +1007,7 @@ ACPI_STATUS
 AcpiOsWritePort(ACPI_IO_ADDRESS address, UINT32 value, UINT32 width)
 {
 #ifdef _KERNEL_MODE
-	DEBUG_FUNCTION_F("addr: 0x%08lx; value: %lu; width: %lu",
+	DEBUG_FUNCTION_F("addr: 0x%08lx; value: %" B_PRIu32 "; width: %" B_PRIu32,
 		(addr_t)address, (uint32)value, (uint32)width);
 	switch (width) {
 		case 8:
