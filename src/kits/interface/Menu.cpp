@@ -493,10 +493,6 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 	// TODO: Test how it works on BeOS R5 and implement this correctly
 	switch (bytes[0]) {
 		case B_UP_ARROW:
-			if (fLayout == B_ITEMS_IN_COLUMN)
-				_SelectNextItem(fSelected, false);
-			break;
-
 		case B_DOWN_ARROW:
 		{
 			BMenuBar* bar = dynamic_cast<BMenuBar*>(Supermenu());
@@ -505,7 +501,7 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 				bar->fState = MENU_STATE_KEY_TO_SUBMENU;
 			}
 			if (fLayout == B_ITEMS_IN_COLUMN)
-				_SelectNextItem(fSelected, true);
+				_SelectNextItem(fSelected, bytes[0] == B_DOWN_ARROW);
 			break;
 		}
 
