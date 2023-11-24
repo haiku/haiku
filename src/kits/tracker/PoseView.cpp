@@ -5108,7 +5108,8 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 	}
 
 	// can't copy to read-only volume
-	if (destWindow->PoseView()->TargetVolumeIsReadOnly()) {
+	BVolume destVolume(destFolder->NodeRef()->device);
+	if (destVolume.InitCheck() == B_OK && destVolume.IsReadOnly()) {
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("You can't move or copy items to read-only volumes."),
 			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
