@@ -3282,10 +3282,9 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 		EnableNamedMenuItem(menu, kOpenSelection, selectCount > 0);
 		EnableNamedMenuItem(menu, kGetInfo, selectCount > 0);
 		EnableNamedMenuItem(menu, kIdentifyEntry, selectCount > 0);
-		EnableNamedMenuItem(menu, kRestoreFromTrash,
-			!PoseView()->TargetVolumeIsReadOnly());
-		EnableNamedMenuItem(menu, kDelete, selectCount > 0
-			&& !PoseView()->SelectedVolumeIsReadOnly());
+		EnableNamedMenuItem(menu, kRestoreFromTrash, selectCount > 0);
+		EnableNamedMenuItem(menu, kDelete,
+			PoseView()->CanMoveToTrashOrDuplicate());
 	}
 
 	if (context == kMenuBarContext || context == kPosePopUpContext) {
