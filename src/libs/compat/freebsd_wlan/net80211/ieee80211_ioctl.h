@@ -785,7 +785,11 @@ struct ieee80211_haiku_join_req {
 	uint32 i_key_mode;
 
 	uint32 i_key_len;
+#if __GNUC__ == 2
+	uint8 i_key[0];
+#else
 	uint8 i_key[];
+#endif
 };
 #endif /* __HAIKU__ */
 
