@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	601442731
+1	german	x-vnd.Haiku-ShowImage	1174293009
 Page setup…	Menus		Seite einrichten …
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
 Previous file	Menus		Vorherige Datei
@@ -25,10 +25,12 @@ Flip top to bottom	Menus		Vertikal spiegeln
 Zoom in	Menus		Vergrößern
 Last page	Menus		Letzte Seite
 Cancel	ClosePrompt		Abbrechen
+Attributes	Menus		Attribute
 High-quality zooming	Menus		Zoomen mit hoher Qualität
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Das Bild '%s' wurde verändert. Trotzdem schließen?
 Close	Menus		Schließen
 Selection mode	Menus		Auswahlmodus
+Reset rating	Menus		Bewertung zurücksetzen
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Bild in Seite einpassen
 Show tool bar	Menus		Werkzeugleiste zeigen
@@ -44,6 +46,7 @@ Job setup	PrintOptionsWindow		Druckauftrag bearbeiten
 Clear selection	Menus		Auswahl aufheben
 Rotate clockwise	Menus		Im Uhrzeigersinn rotieren
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Das Bild konnte nicht geladen werden! Entweder die Datei selbst oder ein passender Translator existiert nicht.
+Open with…	Menus		Öffnen mit…
 Rotate counterclockwise	Menus		Gegen Uhrzeigersinn rotieren
 Previous page	Menus		Vorherige Seite
 Fit to window	Menus		An Fenstergröße anpassen

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	2347376405
+1	romanian	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configurare pagină…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Inversează de sus în jos
 Zoom in	Menus		Mărește
 Last page	Menus		Ultima pagină
 Cancel	ClosePrompt		Anulează
+Attributes	Menus		Atribute
 High-quality zooming	Menus		Focalizare de înaltă calitate
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” a fost modificat. Doriți să închideți documentul?
 Close	Menus		Închide
 Selection mode	Menus		Modul de selecție
+Reset rating	Menus		Restabilește evaluarea
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Potrivește imaginea la pagină
 Show tool bar	Menus		Arată bara de unelte

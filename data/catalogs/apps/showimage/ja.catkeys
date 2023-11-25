@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	2347376405
+1	japanese	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		画像ビューワ
 Page setup…	Menus		ページ設定...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' の %d ページが変更されました。それでもファイルを閉じますか?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		上下反転
 Zoom in	Menus		拡大
 Last page	Menus		最後のページ
 Cancel	ClosePrompt		中止
+Attributes	Menus		属性
 High-quality zooming	Menus		高画質拡大縮小
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		ファイル '%s' が変更されています。保存せずに閉じますか?
 Close	Menus		閉じる
 Selection mode	Menus		選択モード
+Reset rating	Menus		評価をリセット
 DPI:	PrintOptionsWindow		解像度 (DPI):
 Fit image to page	PrintOptionsWindow		画像を用紙サイズに合わせる
 Show tool bar	Menus		ツールバーの表示

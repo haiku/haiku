@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	834755355
+1	japanese	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に捨てる
 Close	MediaPlayer-PlaylistWindow		閉じる
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		オーディオ
 Quit	MediaPlayer-Main		終了
 Redo	MediaPlayer-PlaylistWindow		やり直し
 Move Entry	MediaPlayer-MovePLItemsCmd		項目の移動
+Reset rating	MediaPlayer-Main		評価をリセット
 <unknown>	PlaylistItem-author		<不明>
 Cancel	MediaPlayer-SettingsWindow		中止
 Large	MediaPlayer-SettingsWindow		大

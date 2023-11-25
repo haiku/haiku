@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	2347376405
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		ShowImage
 Page setup…	Menus		Sideoppsett…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Vend opp/ned
 Zoom in	Menus		Zoom inn
 Last page	Menus		Siste side
 Cancel	ClosePrompt		Avbryt
+Attributes	Menus		Attributter
 High-quality zooming	Menus		Høykvalitets zoom
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har blitt endret. Ønsker du å lukke dokumentet?
 Close	Menus		Lukk
 Selection mode	Menus		Utvalgsmodus
+Reset rating	Menus		Tilbakestill vurdering
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Tilpass bilde til siden
 Show tool bar	Menus		Vis verktøylinje

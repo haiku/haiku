@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2837468702
+1	swedish	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Inspelningsvy a
 Sending anonymous usage data	MainWindow		Skickar anonym användningsinformation
 Log in	UserLoginWindow		Logga in
 Usage conditions	UserUsageConditions		Användningsvillkor
+Populating package sizes	PopulatePkgSizesProcess		Fyller på paketstorlekar
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Skärmdump
 Email address:	UserLoginWindow		E-postadress:

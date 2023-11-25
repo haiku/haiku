@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	834755355
+1	finnish	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Close	MediaPlayer-PlaylistWindow		Sulje
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Ääni
 Quit	MediaPlayer-Main		Lopeta
 Redo	MediaPlayer-PlaylistWindow		Tee uudelleen
 Move Entry	MediaPlayer-MovePLItemsCmd		Siirrä kappale
+Reset rating	MediaPlayer-Main		Nollaa arvosanat
 <unknown>	PlaylistItem-author		<tuntematon>
 Cancel	MediaPlayer-SettingsWindow		Peru
 Large	MediaPlayer-SettingsWindow		Suuri

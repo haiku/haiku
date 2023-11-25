@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-GLTeapot	400822745
+1	finnish	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Oikea
 Backface culling	TeapotWindow		Taustakulman häivytys
 Add a teapot	TeapotWindow		Lisää teekannu
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Alempi vasen
 Fog	TeapotWindow		Sumu
 FPS display	TeapotWindow		FPS-näyttö
 GLTeapot	System name		GL-teekannu
+Limit FPS to refresh rate	TeapotWindow		Rajoita FPS-virkistystaajuutta
 Settings	TeapotWindow		Asetukset
 Gouraud shading	TeapotWindow		Gouraud-varjostus
 Lighting	TeapotWindow		Valaistus

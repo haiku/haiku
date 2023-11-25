@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	834755355
+1	swedish	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Ljud
 Quit	MediaPlayer-Main		Avsluta
 Redo	MediaPlayer-PlaylistWindow		Gör om
 Move Entry	MediaPlayer-MovePLItemsCmd		Flytta post
+Reset rating	MediaPlayer-Main		Återställ betyg
 <unknown>	PlaylistItem-author		<okänd>
 Cancel	MediaPlayer-SettingsWindow		Avbryt
 Large	MediaPlayer-SettingsWindow		Stor

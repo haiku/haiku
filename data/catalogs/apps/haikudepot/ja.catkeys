@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2837468702
+1	japanese	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%
 Sending anonymous usage data	MainWindow		匿名の使用状況データーを送信する
 Log in	UserLoginWindow		ログイン
 Usage conditions	UserUsageConditions		使用条件
+Populating package sizes	PopulatePkgSizesProcess		パッケージのサイズを追加中
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		スクリーンショット
 Email address:	UserLoginWindow		メールアドレス:

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	834755355
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Lyd
 Quit	MediaPlayer-Main		Avslutt
 Redo	MediaPlayer-PlaylistWindow		Gjenta
 Move Entry	MediaPlayer-MovePLItemsCmd		Flytt Oppføring
+Reset rating	MediaPlayer-Main		Tilbakestill vurdering
 <unknown>	PlaylistItem-author		<ukjent>
 Cancel	MediaPlayer-SettingsWindow		Avbryt
 Large	MediaPlayer-SettingsWindow		Stor

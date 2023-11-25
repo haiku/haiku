@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2837468702
+1	romanian	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Se înregistrea
 Sending anonymous usage data	MainWindow		Se trimit datele de utilizare anonime
 Log in	UserLoginWindow		Autentificare
 Usage conditions	UserUsageConditions		Condiții de utilizare
+Populating package sizes	PopulatePkgSizesProcess		Se populează dimensiunile pachetelor
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Captură de ecran
 Email address:	UserLoginWindow		Adresă de email:

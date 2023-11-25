@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ShowImage	2347376405
+1	catalan; valencian	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		Mostra la imatge
 Page setup…	Menus		Configuració de la pàgina...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El document %s (pàgina %d) ha canviat. Voleu tancar-lo?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Capgira de dalt a baix
 Zoom in	Menus		Amplia
 Last page	Menus		Darrera pàgina
 Cancel	ClosePrompt		Cancel·la
+Attributes	Menus		Atributs
 High-quality zooming	Menus		Ampliació d'alta qualitat
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		El document %s ha canviat. Voleu tancar-lo?
 Close	Menus		Tanca
 Selection mode	Menus		Mode de selecció
+Reset rating	Menus		Restableix la puntuació
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Ajusta la imatge a la pàgina
 Show tool bar	Menus		Mostra la barra d'eines

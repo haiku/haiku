@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-NewMailNotification	2220310168
+1	german	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Statusfenster
 none	NotifierConfigView		keine
 Alert	NotifierConfigView		Hinweisfenster
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Hinweisfenster (alle Konten)
 Beep	NotifierConfigView		Tonsignal
 Central beep	NotifierConfigView		Tonsignal (alle Konten)
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{eine neue Nachricht} other{# neue Nachrichten}}
+New mail notification	NotifierFilter		Ankündigung neuer E-Mails
 New messages	NotifierFilter		Neue Nachrichten
 Method:	NotifierConfigView		Methode:
 Keyboard LEDs	NotifierConfigView		Tastatur-LEDs

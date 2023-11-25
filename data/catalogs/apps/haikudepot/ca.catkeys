@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2837468702
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Es registra la 
 Sending anonymous usage data	MainWindow		S'envien dades d'ús anònimes
 Log in	UserLoginWindow		Entreu
 Usage conditions	UserUsageConditions		Condicions d'ús
+Populating package sizes	PopulatePkgSizesProcess		Omplint les mides dels paquets
 HaikuDepot	System name		Dipòsit del Haiku
 Screenshot	ScreenshotWindow		Captura de pantalla
 Email address:	UserLoginWindow		Adreça electrònica:

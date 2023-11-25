@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	834755355
+1	friulian	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
 Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Jes
 Redo	MediaPlayer-PlaylistWindow		Torne fâs
 Move Entry	MediaPlayer-MovePLItemsCmd		Sposte vôs
+Reset rating	MediaPlayer-Main		Azere valutazion
 <unknown>	PlaylistItem-author		<no cognossût>
 Cancel	MediaPlayer-SettingsWindow		Anule
 Large	MediaPlayer-SettingsWindow		Grancj

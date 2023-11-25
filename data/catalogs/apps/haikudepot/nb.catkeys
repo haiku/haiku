@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HaikuDepot	2837468702
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med nedlasting av bruksbetingelser
 Available packages	MainWindow		Tilgjengelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke mulig å opprette brukeren.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Opptaksvisning 
 Sending anonymous usage data	MainWindow		Sender anonyme bruksdata
 Log in	UserLoginWindow		Logg inn
 Usage conditions	UserUsageConditions		Bruksvilkår
+Populating package sizes	PopulatePkgSizesProcess		Henter pakkestørrelser
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Skjermbilde
 Email address:	UserLoginWindow		E-postadresse:

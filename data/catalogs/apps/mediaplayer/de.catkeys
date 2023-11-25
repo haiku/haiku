@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	771993105
+1	german	x-vnd.Haiku-MediaPlayer	725133719
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -74,6 +74,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Beenden
 Redo	MediaPlayer-PlaylistWindow		Wiederholen
 Move Entry	MediaPlayer-MovePLItemsCmd		Eintrag verschieben
+Reset rating	MediaPlayer-Main		Bewertung zurücksetzen
 <unknown>	PlaylistItem-author		<unbekannt>
 Cancel	MediaPlayer-SettingsWindow		Abbrechen
 Large	MediaPlayer-SettingsWindow		Groß

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	3998703664
+1	finnish	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		Kuvakatselin
 Page setup…	Menus		Sivuasetus...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Käännä ympäri ylhäältä alas
 Zoom in	Menus		Lähennä
 Last page	Menus		Viimeinen sivu
 Cancel	ClosePrompt		Peru
+Attributes	Menus		Attribuutit
 High-quality zooming	Menus		Korkealaatuinen rajaus
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ on muuttunut. Haluatko sulkea asiakirjan?
 Close	Menus		Sulje
 Selection mode	Menus		Valintatila
+Reset rating	Menus		Nollaa arvosanat
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Sovita kuva sivulle
 Show tool bar	Menus		Näytä työkalupalkki
@@ -45,6 +47,7 @@ Job setup	PrintOptionsWindow		Työasetukset
 Clear selection	Menus		Tyhjennä valinta
 Rotate clockwise	Menus		Pyöritä myötäpäivään
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Kuvan lataus epäonnistui! Puuttuu joko tiedosto tai kuvamuunnin sitä varten.
+Open with…	Menus		Avaa sovelluksella…
 Rotate counterclockwise	Menus		Pyöritä vastapäivään
 Previous page	Menus		Edellinen sivu
 Fit to window	Menus		Sovita ikkunaan

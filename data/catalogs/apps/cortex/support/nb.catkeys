@@ -59,7 +59,7 @@ QuickTime format family	MediaString		QuickTime-formatfamilie
 Any format family	MediaString		Hvilken som helst formatfamilie
 Timecode	MediaString		Tidskode
 Top-Front-right	MediaString		Topp-Front-høyre
-32 bit float	MediaString		32-biters float
+32 bit float	MediaString		32-biters flyttall
 Controllable	MediaString		Kontrollerbar
 32 bit integer	MediaString		32-biters heltall
 Front-right-center	MediaString		Front-høyre-senter

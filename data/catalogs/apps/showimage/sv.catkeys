@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	2347376405
+1	swedish	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		BildVisning
 Page setup…	Menus		Sidinställningar...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (sida %d) har ändrats. Vill du verkligen stänga dokumentet?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Vänd upp och ner
 Zoom in	Menus		Zooma in
 Last page	Menus		Sista sidan
 Cancel	ClosePrompt		Avbryt
+Attributes	Menus		Attribut
 High-quality zooming	Menus		Högkvalitets inzomning
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' har ändrats. Vill du verkligen stänga dokumentet?
 Close	Menus		Stäng
 Selection mode	Menus		Markeringsläge
+Reset rating	Menus		Återställ betyg
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Anpassa bild till sida
 Show tool bar	Menus		Visa verktygsfält

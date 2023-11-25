@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	834755355
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Àudio
 Quit	MediaPlayer-Main		Surt
 Redo	MediaPlayer-PlaylistWindow		Refés
 Move Entry	MediaPlayer-MovePLItemsCmd		Mou l'entrada
+Reset rating	MediaPlayer-Main		Restableix la puntuació
 <unknown>	PlaylistItem-author		<desconegut>
 Cancel	MediaPlayer-SettingsWindow		Cancel·la
 Large	MediaPlayer-SettingsWindow		Grossa

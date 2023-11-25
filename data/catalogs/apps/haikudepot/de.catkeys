@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2837468702
+1	german	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Seitenaufruf vo
 Sending anonymous usage data	MainWindow		Sende anonyme Nutzungsdaten
 Log in	UserLoginWindow		Anmelden
 Usage conditions	UserUsageConditions		Nutzungsbedingungen
+Populating package sizes	PopulatePkgSizesProcess		Eintragen der Paketgrößen
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Bildschirmfoto
 Email address:	UserLoginWindow		E-Mail-Adresse:

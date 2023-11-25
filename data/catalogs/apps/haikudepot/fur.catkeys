@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2837468702
+1	friulian	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis condizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Viodude di regj
 Sending anonymous usage data	MainWindow		Daûr a inviâ dâts anonim sul ûs
 Log in	UserLoginWindow		Jentre
 Usage conditions	UserUsageConditions		Condizions di utilizazion
+Populating package sizes	PopulatePkgSizesProcess		Popolament dimensions pachets
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Istantanie
 Email address:	UserLoginWindow		Direzion email:
