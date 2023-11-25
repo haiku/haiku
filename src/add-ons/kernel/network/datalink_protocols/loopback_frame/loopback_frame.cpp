@@ -50,8 +50,7 @@ status_t
 loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	net_datalink_protocol** _protocol)
 {
-	// We only support a single type!
-	if (interface->device->type != IFT_LOOP)
+	if (interface->device->type != IFT_LOOP && interface->device->type != IFT_TUN)
 		return B_BAD_TYPE;
 
 	loopback_frame_protocol* protocol;
@@ -65,8 +64,15 @@ loopback_frame_init(struct net_interface*interface, net_domain* domain,
 	if (status != B_OK)
 		goto err1;
 
-	// Locally received buffers don't need a domain device handler, as the
-	// buffer reception is handled internally.
+	if (interface->device->type == IFT_LOOP) {
+		// Locally received buffers don't need a domain device handler, as the
+		// buffer reception is handled internally.
+	} else if (interface->device->type == IFT_TUN) {
+		status = stack->register_domain_device_handler(
+			interface->device, B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_IP), domain);
+		if (status != B_OK)
+			return status;
+	}
 
 	protocol = new(std::nothrow) loopback_frame_protocol;
 	if (protocol == NULL) {
@@ -105,6 +111,9 @@ loopback_frame_uninit(net_datalink_protocol* protocol)
 status_t
 loopback_frame_send_data(net_datalink_protocol* protocol, net_buffer* buffer)
 {
+	// Packet capture expects ethernet frames, so we apply framing
+	// (and deframing) even for loopback packets.
+
 	NetBufferPrepend<ether_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
 		return bufferHeader.Status();

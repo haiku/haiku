@@ -717,7 +717,6 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers network ether virtio ;
 #	EnableWerror src add-ons kernel drivers network ether vt612x ;
 	EnableWerror src add-ons kernel drivers network ether wb840 ;
-	EnableWerror src add-ons kernel drivers network tun ;
 #	EnableWerror src add-ons kernel drivers network wlan ;
 	EnableWerror src add-ons kernel drivers network wwan ;
 	EnableWerror src add-ons kernel drivers ports ;

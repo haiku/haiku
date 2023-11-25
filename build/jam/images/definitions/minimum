@@ -125,7 +125,7 @@ SYSTEM_SERVERS = [ FFilterByBuildFeatures
 SYSTEM_NETWORK_DEVICES =
 	ethernet
 	loopback
-	tun
+	tunnel
 ;
 
 SYSTEM_NETWORK_DATALINK_PROTOCOLS =
@@ -206,7 +206,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		rtl8125 rtl8139 rtl81xx
 		sis19x sis900 syskonnect
 		via_rhine vt612x
-		tun_driver
 	}@ # x86,x86_64,riscv64
 
 	etherpci
