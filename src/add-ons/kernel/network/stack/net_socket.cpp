@@ -1170,6 +1170,8 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	if (socket->first_info->read_data_no_buffer != NULL)
 		return socket_receive_no_buffer(socket, header, data, length, flags);
 
+	const int originalFlags = flags;
+	flags &= ~MSG_TRUNC;
 	size_t totalLength = length;
 	net_buffer* buffer;
 	int i;
@@ -1260,7 +1262,7 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 		if (header)
 			header->msg_flags = MSG_TRUNC;
 
-		if (flags & MSG_TRUNC)
+		if ((originalFlags & MSG_TRUNC) != 0)
 			return bytesReceived;
 	}
 
