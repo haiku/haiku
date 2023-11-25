@@ -1162,6 +1162,8 @@ ssize_t
 socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	int flags)
 {
+	const int originalFlags = flags;
+
 	// MSG_NOSIGNAL is only meaningful for send(), not receive(), but it is
 	// sometimes specified anyway. Mask it off to avoid unnecessary errors.
 	flags &= ~MSG_NOSIGNAL;
@@ -1170,22 +1172,19 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	if (socket->first_info->read_data_no_buffer != NULL)
 		return socket_receive_no_buffer(socket, header, data, length, flags);
 
-	const int originalFlags = flags;
-	flags &= ~MSG_TRUNC;
+	// Mask off flags handled in this function.
+	flags &= ~(MSG_TRUNC);
+
 	size_t totalLength = length;
-	net_buffer* buffer;
-	int i;
+	if (header != NULL) {
+		ASSERT(data == header->msg_iov[0].iov_base);
 
-	// the convention to this function is that have header been
-	// present, { data, length } would have been iovec[0] and is
-	// always considered like that
-
-	if (header) {
 		// calculate the length considering all of the extra buffers
-		for (i = 1; i < header->msg_iovlen; i++)
+		for (int i = 1; i < header->msg_iovlen; i++)
 			totalLength += header->msg_iov[i].iov_len;
 	}
 
+	net_buffer* buffer;
 	status_t status = socket->first_info->read_data(
 		socket->first_protocol, totalLength, flags, &buffer);
 	if (status != B_OK)
@@ -1210,11 +1209,9 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 
 	// TODO: - returning a NULL buffer when received 0 bytes
 	//         may not make much sense as we still need the address
-	//       - gNetBufferModule.read() uses memcpy() instead of user_memcpy
 
 	size_t nameLen = 0;
-
-	if (header) {
+	if (header != NULL) {
 		// TODO: - consider the control buffer options
 		nameLen = header->msg_namelen;
 		header->msg_namelen = 0;
@@ -1224,24 +1221,27 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	if (buffer == NULL)
 		return 0;
 
-	size_t bytesReceived = buffer->size, bytesCopied = 0;
+	const size_t bytesReceived = buffer->size;
+	size_t bytesCopied = 0;
 
-	length = min_c(bytesReceived, length);
-	if (gNetBufferModule.read(buffer, 0, data, length) < B_OK) {
+	size_t toRead = min_c(bytesReceived, length);
+	status = gNetBufferModule.read(buffer, 0, data, toRead);
+	if (status != B_OK) {
 		gNetBufferModule.free(buffer);
+
+		if (status == B_BAD_ADDRESS)
+			return status;
 		return ENOBUFS;
 	}
 
-	// if first copy was a success, proceed to following
-	// copies as required
-	bytesCopied += length;
+	// if first copy was a success, proceed to following copies as required
+	bytesCopied += toRead;
 
-	if (header) {
-		// we only start considering at iovec[1]
-		// as { data, length } is iovec[0]
-		for (i = 1; i < header->msg_iovlen && bytesCopied < bytesReceived; i++) {
+	if (header != NULL) {
+		// We start at iovec[1] as { data, length } is iovec[0].
+		for (int i = 1; i < header->msg_iovlen && bytesCopied < bytesReceived; i++) {
 			iovec& vec = header->msg_iov[i];
-			size_t toRead = min_c(bytesReceived - bytesCopied, vec.iov_len);
+			toRead = min_c(bytesReceived - bytesCopied, vec.iov_len);
 			if (gNetBufferModule.read(buffer, bytesCopied, vec.iov_base,
 					toRead) < B_OK) {
 				break;
@@ -1259,7 +1259,7 @@ socket_receive(net_socket* socket, msghdr* header, void* data, size_t length,
 	gNetBufferModule.free(buffer);
 
 	if (bytesCopied < bytesReceived) {
-		if (header)
+		if (header != NULL)
 			header->msg_flags = MSG_TRUNC;
 
 		if ((originalFlags & MSG_TRUNC) != 0)
@@ -1274,13 +1274,10 @@ ssize_t
 socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 	int flags)
 {
-	const sockaddr* address = NULL;
-	socklen_t addressLength = 0;
-	size_t bytesLeft = length;
-
 	const bool nosignal = ((flags & MSG_NOSIGNAL) != 0);
 	flags &= ~MSG_NOSIGNAL;
 
+	size_t bytesLeft = length;
 	if (length > SSIZE_MAX)
 		return B_BAD_VALUE;
 
@@ -1289,6 +1286,8 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		ancillary_data_container, void, delete_ancillary_data_container>
 		ancillaryDataDeleter;
 
+	const sockaddr* address = NULL;
+	socklen_t addressLength = 0;
 	if (header != NULL) {
 		address = (const sockaddr*)header->msg_name;
 		addressLength = header->msg_namelen;
