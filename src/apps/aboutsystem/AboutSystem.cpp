@@ -252,6 +252,7 @@ private:
 			float			_BaseHeight();
 
 			BString			_GetOSVersion();
+			BString			_GetABIVersion();
 			BString			_GetCPUCount(system_info*);
 			BString			_GetCPUInfo();
 			BString			_GetCPUFrequency();
@@ -265,10 +266,10 @@ private:
 private:
 			rgb_color		fDesktopTextColor;
 
-			BStringView*	fOSVersionView;
+			BStringView*	fVersionLabelView;
+			BStringView*	fVersionInfoView;
 			BStringView*	fCPULabelView;
 			BStringView*	fCPUInfoView;
-			BStringView*	fCPUFreqView;
 			BStringView*	fMemSizeView;
 			BStringView*	fMemUsageView;
 			BStringView*	fKernelDateTimeView;
@@ -286,7 +287,7 @@ private:
 			bool			fIsReplicant : 1;
 
 	static const uint8		kLabelCount = 5;
-	static const uint8		kSubtextCount = 7;
+	static const uint8		kSubtextCount = 5;
 };
 
 
@@ -532,10 +533,10 @@ CropView::DoLayout()
 SysInfoView::SysInfoView()
 	:
 	BView("AboutSystem", B_WILL_DRAW | B_PULSE_NEEDED),
-	fOSVersionView(NULL),
+	fVersionLabelView(NULL),
+	fVersionInfoView(NULL),
 	fCPULabelView(NULL),
 	fCPUInfoView(NULL),
-	fCPUFreqView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
 	fKernelDateTimeView(NULL),
@@ -554,18 +555,15 @@ SysInfoView::SysInfoView()
 	// Create all the various labels for system infomation.
 
 	// OS Version / ABI
-	BStringView* osLabel = _CreateLabel("oslabel", B_TRANSLATE("Version:"));
-	fOSVersionView = _CreateSubtext("ostext", _GetOSVersion());
-	BStringView* abiText = _CreateSubtext("abitext", B_HAIKU_ABI_NAME);
+	fVersionLabelView = _CreateLabel("oslabel", _GetOSVersion());
+	fVersionInfoView = _CreateSubtext("ostext", _GetABIVersion());
 
 	// CPU count, type and clock speed
 	fCPULabelView = _CreateLabel("cpulabel", _GetCPUCount(&sysInfo));
 	fCPUInfoView = _CreateSubtext("cputext", _GetCPUInfo());
-	fCPUFreqView = _CreateSubtext("frequencytext", _GetCPUFrequency());
 
 	// Memory size and usage
-	BStringView* memoryLabel = _CreateLabel("memlabel", B_TRANSLATE("Memory:"));
-	fMemSizeView = _CreateSubtext("ramsizetext", _GetRamSize(&sysInfo));
+	fMemSizeView = _CreateLabel("memlabel", _GetRamSize(&sysInfo));
 	fMemUsageView = _CreateSubtext("ramusagetext", _GetRamUsage(&sysInfo));
 
 	// Kernel build time/date
@@ -586,17 +584,14 @@ SysInfoView::SysInfoView()
 	SetLayout(new BGroupLayout(B_VERTICAL, 0));
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
 		// Version:
-		.Add(osLabel)
-		.Add(fOSVersionView)
-		.Add(abiText)
+		.Add(fVersionLabelView)
+		.Add(fVersionInfoView)
 		.AddStrut(offset)
 		// Processors:
 		.Add(fCPULabelView)
 		.Add(fCPUInfoView)
-		.Add(fCPUFreqView)
 		.AddStrut(offset)
 		// Memory:
-		.Add(memoryLabel)
 		.Add(fMemSizeView)
 		.Add(fMemUsageView)
 		.AddStrut(offset)
@@ -618,10 +613,10 @@ SysInfoView::SysInfoView()
 SysInfoView::SysInfoView(BMessage* archive)
 	:
 	BView(archive),
-	fOSVersionView(NULL),
+	fVersionLabelView(NULL),
+	fVersionInfoView(NULL),
 	fCPULabelView(NULL),
 	fCPUInfoView(NULL),
-	fCPUFreqView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
 	fKernelDateTimeView(NULL),
@@ -652,29 +647,30 @@ SysInfoView::SysInfoView(BMessage* archive)
 		} else if (name.IEndsWith("text")) {
 			_UpdateSubtext(dynamic_cast<BStringView*>(view));
 			if (name == "ostext")
-				fOSVersionView = dynamic_cast<BStringView*>(view);
+				fVersionInfoView = dynamic_cast<BStringView*>(view);
 			else if (name == "cputext")
 				fCPUInfoView = dynamic_cast<BStringView*>(view);
-			else if (name == "frequencytext")
-				fCPUFreqView = dynamic_cast<BStringView*>(view);
-			else if (name == "ramsizetext")
-				fMemSizeView = dynamic_cast<BStringView*>(view);
 			else if (name == "ramusagetext")
 				fMemUsageView = dynamic_cast<BStringView*>(view);
 			else if (name == "kerneltext")
 				fKernelDateTimeView = dynamic_cast<BStringView*>(view);
 		} else if (name.IEndsWith("label")) {
 			_UpdateLabel(dynamic_cast<BStringView*>(view));
-			if (name == "cpulabel")
+			if (name == "oslabel")
+				fVersionLabelView  = dynamic_cast<BStringView*>(view);
+			else if (name == "cpulabel")
 				fCPULabelView = dynamic_cast<BStringView*>(view);
+			else if (name == "memlabel")
+				fMemSizeView = dynamic_cast<BStringView*>(view);
 		}
 	}
 
 	// These might have changed since the replicant instance was created;
-	fOSVersionView->SetText(_GetOSVersion());
+	fVersionLabelView->SetText(_GetOSVersion());
+	fVersionInfoView->SetText(_GetABIVersion());
 	fCPULabelView->SetText(_GetCPUCount(&sysInfo));
 	fCPUInfoView->SetText(_GetCPUInfo());
-	fCPUFreqView->SetText(_GetCPUFrequency());
+	fMemUsageView->SetText(_GetRamUsage(&sysInfo));
 	fKernelDateTimeView->SetText(_GetKernelDateTime(&sysInfo));
 
 	fDragger = dynamic_cast<BDragger*>(ChildAt(0));
@@ -1051,7 +1047,7 @@ SysInfoView::_BaseHeight()
 	be_bold_font->GetHeight(&boldFH);
 
 	return ceilf(((boldFH.ascent + boldFH.descent) * kLabelCount
-		+ (plainFH.ascent + plainFH.descent) * (kSubtextCount + 1) // extra for fUptimeView
+		+ (plainFH.ascent + plainFH.descent) * kSubtextCount
 		+ be_control_look->DefaultLabelSpacing() * kLabelCount));
 }
 
@@ -1059,7 +1055,23 @@ SysInfoView::_BaseHeight()
 BString
 SysInfoView::_GetOSVersion()
 {
-	BString osVersion;
+	BString revision;
+	// add system revision to os version
+	const char* hrev = __get_haiku_revision();
+	if (hrev != NULL)
+		revision.SetToFormat(B_TRANSLATE_COMMENT("Version: %s",
+			"Version: R1 or hrev99999"), hrev);
+	else
+		revision = B_TRANSLATE("Version:");
+
+	return revision;
+}
+
+
+BString
+SysInfoView::_GetABIVersion()
+{
+	BString abiVersion;
 
 	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
 	BPath path;
@@ -1074,18 +1086,15 @@ SysInfoView::_GetOSVersion()
 			&& appFileInfo.GetVersionInfo(&versionInfo,
 				B_APP_VERSION_KIND) == B_OK
 			&& versionInfo.short_info[0] != '\0')
-			osVersion = versionInfo.short_info;
+			abiVersion = versionInfo.short_info;
 	}
 
-	if (osVersion.IsEmpty())
-		osVersion = B_TRANSLATE("Unknown");
+	if (abiVersion.IsEmpty())
+		abiVersion = B_TRANSLATE("Unknown");
 
-	// add system revision to os version
-	const char* hrev = __get_haiku_revision();
-	if (hrev != NULL)
-		osVersion << " (" << B_TRANSLATE("Revision") << " " << hrev << ")";
+	abiVersion << " (" << B_HAIKU_ABI_NAME << ")";
 
-	return osVersion;
+	return abiVersion;
 }
 
 
@@ -1140,7 +1149,8 @@ SysInfoView::_GetCPUInfo()
 
 	BString cpuType;
 	cpuType << get_cpu_vendor_string(cpuVendor) << " "
-		<< get_cpu_model_string(platform, cpuVendor, cpuModel);
+		<< get_cpu_model_string(platform, cpuVendor, cpuModel)
+		<< " @ " << _GetCPUFrequency();
 
 	return cpuType;
 }
@@ -1152,10 +1162,14 @@ SysInfoView::_GetCPUFrequency()
 	BString clockSpeed;
 
 	int32 frequency = get_rounded_cpu_speed();
-	if (frequency < 1000)
-		clockSpeed.SetToFormat(B_TRANSLATE("%ld MHz"), frequency);
-	else
-		clockSpeed.SetToFormat(B_TRANSLATE("%.2f GHz"), frequency / 1000.0f);
+	if (frequency < 1000) {
+		clockSpeed.SetToFormat(B_TRANSLATE_COMMENT("%ld MHz",
+			"750 Mhz (CPU clock speed)"), frequency);
+	}
+	else {
+		clockSpeed.SetToFormat(B_TRANSLATE_COMMENT("%.2f GHz",
+			"3.49 Ghz (CPU clock speed)"), frequency / 1000.0f);
+	}
 
 	return clockSpeed;
 }
@@ -1165,19 +1179,8 @@ BString
 SysInfoView::_GetRamSize(system_info* sysInfo)
 {
 	BString ramSize;
-	int inaccessibleMemory = ignored_pages(sysInfo);
-
-	if (inaccessibleMemory <= 0)
-		ramSize.SetToFormat(B_TRANSLATE("%d MiB total"), max_pages(sysInfo));
-	else {
-		BString temp;
-		ramSize = B_TRANSLATE("%total MiB total, %inaccessible MiB inaccessible");
-		temp << max_and_ignored_pages(sysInfo);
-		ramSize.ReplaceFirst("%total", temp);
-		temp.SetTo("");
-		temp << inaccessibleMemory;
-		ramSize.ReplaceFirst("%inaccessible", temp);
-	}
+	ramSize.SetToFormat(B_TRANSLATE_COMMENT("%d MiB Memory:",
+		"2048 MiB Memory:"), max_and_ignored_pages(sysInfo));
 
 	return ramSize;
 }
@@ -1193,7 +1196,8 @@ SysInfoView::_GetRamUsage(system_info* sysInfo)
 	if (fNumberFormat.FormatPercent(data, usedMemoryPercent) != B_OK)
 		data.SetToFormat("%d%%", (int)(100 * usedMemoryPercent));
 
-	ramUsage.SetToFormat(B_TRANSLATE("%d MiB used (%s)"), used_pages(sysInfo), data.String());
+	ramUsage.SetToFormat(B_TRANSLATE_COMMENT("%d MiB used (%s)",
+		"326 MiB used (16%)"), used_pages(sysInfo), data.String());
 
 	return ramUsage;
 }
@@ -2263,8 +2267,7 @@ max_pages(system_info* sysInfo)
 static int
 max_and_ignored_pages(system_info* sysInfo)
 {
-	return (int)round((sysInfo->max_pages + sysInfo->ignored_pages)
-		* B_PAGE_SIZE / 1048576.0);
+	return max_pages(sysInfo) + ignored_pages(sysInfo);
 }
 
 
