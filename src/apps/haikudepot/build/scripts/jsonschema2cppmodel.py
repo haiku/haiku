@@ -18,7 +18,7 @@ import ustache
 
 HEADER_TEMPLATE = """
 /*
- * Generated Model Object
+ * Generated Model Object for {{cppname}}
  */
  
 #ifndef GEN_JSON_SCHEMA_MODEL__{{cppnameupper}}_H
@@ -62,7 +62,7 @@ private:
 
 IMPLEMENTATION_TEMPLATE = """
 /*
- * Generated Model Object
+ * Generated Model Object for {{cppname}}
  */
  
 #include "{{cppname}}.h"
@@ -217,20 +217,8 @@ def write_models_for_schema(schema: dict[str, any], output_directory: str) -> No
                 obj,
                 escape= lambda x: x))
 
-    def write_models_for_object_transitively(obj: dict[str, any]) -> None:
+    for obj in hdsjsonschemacommon.collect_all_objects(schema):
         write_model_object(obj)
-
-        for prop_name, prop in obj['properties'].items():
-            if hdsjsonschemacommon.JSON_TYPE_ARRAY == prop["type"]:
-                array_items = prop['items']
-
-                if array_items["type"] == hdsjsonschemacommon.JSON_TYPE_OBJECT:
-                    write_models_for_object_transitively(array_items)
-
-            if hdsjsonschemacommon.JSON_TYPE_OBJECT == prop["type"]:
-                write_models_for_object_transitively(prop)
-
-    write_models_for_object_transitively(schema)
 
 
 def main():

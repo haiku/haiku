@@ -1,5 +1,5 @@
 # =====================================
-# Copyright 2019, Andrew Lindesay
+# Copyright 2019-2023, Andrew Lindesay
 # Distributed under the terms of the MIT License.
 # =====================================
 
@@ -68,7 +68,7 @@ rule HdsSchemaGenBulkParser
 
 actions HdsSchemaGenBulkParser1
 {
-	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3]) --supportbulkcontainer
+	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
 	touch $(1)
 }
 

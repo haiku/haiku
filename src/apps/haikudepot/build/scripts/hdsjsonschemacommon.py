@@ -121,6 +121,29 @@ def writetopcomment(f, inputfilename, variant):
                 ' */\n'
             ) % (variant, inputfilename, datetime.datetime.now().isoformat()))
 
+def collect_all_objects(schema: dict[str, any]) -> list[dict[str, any]]:
+    assembly = dict[str, dict[str, any]]()
+
+    def accumulate_all_objects(obj: dict[str, any]) -> None:
+        assembly[obj["cppname"]] = obj
+
+        for prop_name, prop in obj['properties'].items():
+            if JSON_TYPE_ARRAY == prop["type"]:
+                array_items = prop['items']
+
+                if JSON_TYPE_OBJECT == array_items["type"] and not array_items["cppname"] in assembly:
+                    accumulate_all_objects(array_items)
+
+            if JSON_TYPE_OBJECT == prop["type"] and not prop["cppname"] in assembly:
+                accumulate_all_objects(prop)
+
+    accumulate_all_objects(schema)
+    result = list(assembly.values())
+    result.sort(key= lambda v: v["cppname"])
+
+    return result
+
+
 def augment_schema(schema: dict[str, any]) -> None:
     """This function will take the data from the JSON schema and will overlay any
     specific information required for rendering the templates.
@@ -146,7 +169,13 @@ def augment_schema(schema: dict[str, any]) -> None:
 
         prop["iscppscalartype"] = is_scalar_type
         prop["isarray"] = is_array_type
+        prop["isstring"] = JSON_TYPE_STRING == prop_type
+        prop["isboolean"] = JSON_TYPE_BOOLEAN == prop_type
+        prop["isnumber"] = JSON_TYPE_NUMBER == prop_type
+        prop["isinteger"] = JSON_TYPE_INTEGER == prop_type
+        prop["isobject"] = JSON_TYPE_OBJECT == prop_type
         prop["iscppnonscalarnoncollectiontype"] = not is_scalar_type and not is_array_type
+        prop["toplevelcppname"] = top_level_cpp_name
 
         if prop_type != "array":
             prop["cppdefaultvalue"] = propmetadatatocppdefaultvalue(prop)
@@ -195,6 +224,9 @@ def augment_schema(schema: dict[str, any]) -> None:
         obj["cpptype"] = obj_cpp_classname
         obj["hasanylistproperties"] = has_any_list_properties()
 
+        # allows the object to know the top level object that contains it
+        obj["toplevelcppname"] = top_level_cpp_name
+
         properties = obj['properties'].items()
 
         for prop_name, prop in properties:
@@ -210,6 +242,7 @@ def augment_schema(schema: dict[str, any]) -> None:
                 "name": k,
                 "property": v,
                 "cppobjectname": obj_cpp_classname
+                    # ^ this is the name of the containing object
             } for k,v in properties],
             key= lambda item: item["name"]
         )
@@ -221,4 +254,5 @@ def augment_schema(schema: dict[str, any]) -> None:
         obj["propertyarray"] = property_array
         obj["referencedclasscpptypes"] = collect_referenced_class_names()
 
+    top_level_cpp_name = derive_cpp_classname(schema)
     augment_object(schema)
