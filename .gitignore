@@ -22,3 +22,6 @@ build/user_config_headers
 
 # Project settings of the Genio IDE
 .genio
+
+# clangd related tooling for IDE code completion
+compile_commands.json

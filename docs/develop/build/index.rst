@@ -7,4 +7,5 @@ The build system
    /build/jam
    /build/sourcecode
    /build/compilers
+   /build/ide
    /build/repositories/README
