@@ -418,6 +418,14 @@ private:
 
 			void				_UpdateInsets(const BRect& rect);
 
+			float				_ViewWidth();
+			float				_ViewHeight();
+			BRect				_ViewRect();
+
+			float				_TextWidth();
+			float				_TextHeight();
+			BRect				_TextRect();
+
 private:
 			BPrivate::TextGapBuffer*	fText;
 			LineBuffer*			fLines;
