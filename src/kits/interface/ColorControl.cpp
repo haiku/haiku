@@ -177,6 +177,11 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		AddChild(fBlueText);
 	}
 
+	// right align rgb values so that they line up
+	fRedText->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fGreenText->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fBlueText->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+
 	ResizeToPreferred();
 
 	if (useOffscreen) {
