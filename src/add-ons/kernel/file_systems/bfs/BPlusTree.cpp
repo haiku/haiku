@@ -1524,7 +1524,7 @@ BPlusTree::_SplitNode(bplustree_node* node, off_t nodeOffset,
 	// these variables are for the key that will be returned
 	// to the parent node
 	uint8* newKey = NULL;
-	uint16 newLength;
+	uint16 newLength = 0;
 	bool newAllocated = false;
 
 	// If we have split an index node, we have to drop the first key
@@ -2048,7 +2048,7 @@ BPlusTree::_RemoveKey(bplustree_node* node, uint16 index)
 	if (!node->IsLeaf() && index == node->NumKeys())
 		node->overflow_link = values[--index];
 
-	uint16 length;
+	uint16 length = 0;
 	uint8* key = node->KeyAt(index, &length);
 	if (key + length + sizeof(off_t) + sizeof(uint16) > (uint8*)node + fNodeSize
 		|| length > BPLUSTREE_MAX_KEY_LENGTH) {
@@ -2825,7 +2825,7 @@ TreeIterator::Find(const uint8* key, uint16 keyLength)
 	const bplustree_node* node;
 	while ((node = cached.SetTo(nodeOffset)) != NULL) {
 		uint16 keyIndex = 0;
-		off_t nextOffset;
+		off_t nextOffset = 0;
 		status_t status = fTree->_FindKey(node, key, keyLength, &keyIndex,
 			&nextOffset);
 

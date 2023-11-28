@@ -582,7 +582,7 @@ Inode::_MakeSpaceForSmallData(Transaction& transaction, bfs_inode* node,
 				break;
 		}
 
-		if (item->IsLast(node) || (int32)item->Size() < bytes)
+		if (item->IsLast(node) || (int32)item->Size() < bytes || max == NULL)
 			return B_ERROR;
 
 		bytes -= max->Size();
