@@ -44,7 +44,7 @@ BSocket::~BSocket()
 status_t
 BSocket::Bind(const BNetworkAddress& local, bool reuseAddr)
 {
-	return BAbstractSocket::Bind(local, SOCK_STREAM, reuseAddr);
+	return BAbstractSocket::Bind(local, reuseAddr, SOCK_STREAM);
 }
 
 
