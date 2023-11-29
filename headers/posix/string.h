@@ -62,6 +62,7 @@ extern char		*strcasestr(const char *string, const char *searchString);
 extern char		*strdup(const char *string);
 extern char		*strndup(const char* string, size_t size);
 extern char		*stpcpy(char *dest, const char *source);
+extern char		*stpncpy(char *dest, const char *source, size_t size);
 
 extern size_t	strlcat(char *dest, const char *source, size_t length);
 extern size_t	strlcpy(char *dest, const char *source, size_t length);
