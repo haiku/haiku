@@ -107,7 +107,7 @@ packagefs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 		| B_FS_HAS_ATTR | B_FS_HAS_QUERY | B_FS_SUPPORTS_NODE_MONITORING;
 	info->block_size = 4096;
 	info->io_size = kOptimalIOSize;
-	info->total_blocks = info->free_blocks = 1;
+	info->total_blocks = info->free_blocks = 0;
 	strlcpy(info->volume_name, volume->RootDirectory()->Name(),
 		sizeof(info->volume_name));
 	return B_OK;

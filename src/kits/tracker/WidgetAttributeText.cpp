@@ -995,13 +995,14 @@ SizeAttributeText::ReadValue()
 
 	if (fModel->IsVolume()) {
 		BVolume volume(fModel->NodeRef()->device);
-
+		fValueIsDefined = volume.Capacity() != 0;
 		return volume.Capacity();
 	}
 
 	if (fModel->IsDirectory() || fModel->IsQuery()
 		|| fModel->IsQueryTemplate() || fModel->IsSymLink()
 		|| fModel->IsVirtualDirectory()) {
+		fValueIsDefined = false;
 		return kUnknownSize;
 	}
 
@@ -1012,27 +1013,31 @@ SizeAttributeText::ReadValue()
 
 
 void
-SizeAttributeText::FitValue(BString* outString, const BPoseView* view)
+SizeAttributeText::FitValue(BString* outString, const BPoseView* poseView)
 {
 	if (fValueDirty)
 		fValue = ReadValue();
 
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncFileSize(outString, fValue, view, fOldWidth);
+	if (!fValueIsDefined) {
+		*outString = "-";
+		fTruncatedWidth = poseView->StringWidth("-");
+	} else
+		fTruncatedWidth = TruncFileSize(outString, fValue, poseView, fOldWidth);
 	fDirty = false;
 }
 
 
 float
-SizeAttributeText::PreferredWidth(const BPoseView* pose) const
+SizeAttributeText::PreferredWidth(const BPoseView* poseView) const
 {
-	if (fValueIsDefined) {
-		BString widthString;
-		TruncFileSize(&widthString, fValue, pose, 100000);
-		return pose->StringWidth(widthString.String());
-	}
+	if (!fValueIsDefined)
+		return poseView->StringWidth("-");
 
-	return pose->StringWidth("-");
+	BString widthString;
+	TruncFileSize(&widthString, fValue, poseView, 100000);
+
+	return poseView->StringWidth(widthString.String());
 }
 
 

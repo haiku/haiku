@@ -705,18 +705,22 @@ GeneralInfoView::CheckAndSetSize()
 	if (fModel->IsVolume() || fModel->IsRoot()) {
 		off_t freeBytes = 0;
 		off_t capacity = 0;
+		bool volumeHasNoCapacity = false;
 
 		if (fModel->IsVolume()) {
 			BVolume volume(fModel->NodeRef()->device);
 			freeBytes = volume.FreeBytes();
 			capacity = volume.Capacity();
+			volumeHasNoCapacity = capacity == 0;
 		} else {
 			// iterate over all volumes
 			BVolumeRoster volumeRoster;
 			BVolume volume;
 			while (volumeRoster.GetNextVolume(&volume) == B_OK) {
-				freeBytes += volume.FreeBytes();
-				capacity += volume.Capacity();
+				if (volume.FreeBytes() > 0)
+					freeBytes += volume.FreeBytes();
+				if (volume.Capacity() > 0)
+					capacity += volume.Capacity();
 			}
 		}
 
@@ -724,6 +728,13 @@ GeneralInfoView::CheckAndSetSize()
 			return;
 
 		fFreeBytes = freeBytes;
+
+		if (volumeHasNoCapacity) {
+			// set to "-" if capacity is 0
+			fSizeString.SetTo("-");
+			SetSizeString(fSizeString);
+			return;
+		}
 
 		fSizeString.SetTo(B_TRANSLATE("%capacity (%used used -- %free free)"));
 
@@ -734,7 +745,6 @@ GeneralInfoView::CheckAndSetSize()
 		fSizeString.ReplaceFirst("%used", sizeStr);
 		string_for_size(fFreeBytes, sizeStr, sizeof(sizeStr));
 		fSizeString.ReplaceFirst("%free", sizeStr);
-
 	} else if (fModel->IsFile()) {
 		// poll for size changes because they do not get node monitored
 		// until a file gets closed (with the old BFS)
