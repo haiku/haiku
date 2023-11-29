@@ -30,10 +30,13 @@ HEADER_TEMPLATE = """
 {{#referencedclasscpptypes}}#include "{{.}}.h"
 {{/referencedclasscpptypes}}
 
+
 class {{cppname}} {
 public:
     {{cppname}}();
     virtual ~{{cppname}}();
+
+    void Reset();
 {{#propertyarray}}{{#property.iscppscalartype}}
     {{property.cpptype}} {{property.cppname}}();
     void Set{{property.cppname}}({{property.cpptype}} value);
@@ -52,8 +55,14 @@ public:
     bool {{property.cppname}}IsNull();
 {{/property.iscppnonscalarnoncollectiontype}}
 {{/propertyarray}}
+
+public:
+{{#propertyarray}}    static const uint16 k{{property.cppname}}Bitmask;
+{{/propertyarray}}
+
 private:
-{{#propertyarray}}    {{property.cpptype}}* {{property.cppmembername}};
+    uint16 fHasValueBitmask;
+{{#propertyarray}}    {{property.cpptype}}{{^property.iscppscalartype}}*{{/property.iscppscalartype}} {{property.cppmembername}};
 {{/propertyarray}}
 };
 
@@ -68,58 +77,67 @@ IMPLEMENTATION_TEMPLATE = """
 #include "{{cppname}}.h"
 
 
+{{#propertyarray}}/*static*/ const uint16 {{cppname}}::k{{property.cppname}}Bitmask = {{cppbitmaskexpression}};
+{{/propertyarray}}
+
+
 {{cppname}}::{{cppname}}()
     :
-{{#propertyarray}}    {{property.cppmembername}}(NULL){{^islast}},{{/islast}}
+    fHasValueBitmask(0),
+{{#propertyarray}}    {{property.cppmembername}}({{property.cppdefaultvalue}}){{^islast}},{{/islast}}
 {{/propertyarray}}{
 }
 
 
 {{cppname}}::~{{cppname}}()
 {
-{{#propertyarray}}{{^property.isarray}}    delete {{property.cppmembername}};
-{{/property.isarray}}{{#property.isarray}}    if ({{property.cppmembername}} != NULL) {
+    Reset();
+}
+
+
+void
+{{cppname}}::Reset()
+{
+{{#propertyarray}}{{#property.isstring}}    delete {{property.cppmembername}};
+{{/property.isstring}}{{#property.isobject}}    delete {{property.cppmembername}};
+{{/property.isobject}}{{#property.isarray}}
+    if ({{property.cppmembername}} != NULL) {
         for (int i = {{property.cppmembername}}->CountItems() - 1; i >= 0; i--)
             delete {{property.cppmembername}}->ItemAt(i);
         delete {{property.cppmembername}};
     }
-{{/property.isarray}}
-{{/propertyarray}}}
-
+{{/property.isarray}}    {{property.cppmembername}} = {{property.cppdefaultvalue}};
+{{/propertyarray}}
+    fHasValueBitmask = 0;
+}
 
 {{#propertyarray}}{{#property.iscppscalartype}}{{property.cpptype}}
 {{cppobjectname}}::{{property.cppname}}()
 {
-    if ({{property.cppname}}IsNull())
-        return {{property.cppdefaultvalue}};
-    return *{{property.cppmembername}};
+    return {{property.cppmembername}};
 }
 
 
 void
 {{cppobjectname}}::Set{{property.cppname}}({{property.cpptype}} value)
 {
-    if ({{property.cppname}}IsNull()) {
-        {{property.cppmembername}} = new {{property.cpptype}}[0];
-    }
-    {{property.cppmembername}}[0] = value;
+    fHasValueBitmask |= k{{property.cppname}}Bitmask;
+    {{property.cppmembername}} = value;
 }
 
 
 void
 {{cppobjectname}}::Set{{property.cppname}}Null()
 {
-    if ({{property.cppname}}IsNull()) {
-        delete {{property.cppmembername}};
-        {{property.cppmembername}} = NULL;
-    }
+    fHasValueBitmask &= ~k{{property.cppname}}Bitmask;
+    {{property.cppmembername}} = {{property.cppdefaultvalue}};
 }
 
 
 bool
 {{cppobjectname}}::{{property.cppname}}IsNull()
 {
-    return {{property.cppmembername}} == NULL;
+    return 0 == (fHasValueBitmask & k{{property.cppname}}Bitmask);
 }
 
 {{/property.iscppscalartype}}{{#property.isarray}}void

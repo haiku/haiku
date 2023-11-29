@@ -29,6 +29,7 @@ CPP_TYPE_NUMBER = "double"
 # The possible C++ default values
 CPP_DEFAULT_STRING = "NULL"
 CPP_DEFAULT_OBJECT = "NULL"
+CPP_DEFAULT_ARRAY = "NULL"
 CPP_DEFAULT_BOOLEAN = "false"
 CPP_DEFAULT_INTEGER = "0"
 CPP_DEFAULT_NUMBER = "0.0"
@@ -64,6 +65,8 @@ def propmetadatatocppdefaultvalue(propmetadata):
         return CPP_DEFAULT_NUMBER
     if type == JSON_TYPE_OBJECT:
         return CPP_DEFAULT_OBJECT
+    if type == JSON_TYPE_ARRAY:
+        return CPP_DEFAULT_ARRAY
 
     raise Exception('unknown json-schema type [' + type + ']')
 
@@ -176,9 +179,7 @@ def augment_schema(schema: dict[str, any]) -> None:
         prop["isobject"] = JSON_TYPE_OBJECT == prop_type
         prop["iscppnonscalarnoncollectiontype"] = not is_scalar_type and not is_array_type
         prop["toplevelcppname"] = top_level_cpp_name
-
-        if prop_type != "array":
-            prop["cppdefaultvalue"] = propmetadatatocppdefaultvalue(prop)
+        prop["cppdefaultvalue"] = propmetadatatocppdefaultvalue(prop)
 
         if not prop_type or 0 == len(prop_type):
             raise Exception('missing "type" field')
@@ -199,6 +200,11 @@ def augment_schema(schema: dict[str, any]) -> None:
 
         def collect_referenced_class_names() -> list[str]:
             result = set()
+            properties = obj['properties'].items()
+
+            if len(properties) > 15:
+                raise RuntimeError("an object has more than 15 properties"
+                                   " which is not allowed")
 
             for _, prop in obj['properties'].items():
                 if prop['type'] == JSON_TYPE_ARRAY:
@@ -246,6 +252,9 @@ def augment_schema(schema: dict[str, any]) -> None:
             } for k,v in properties],
             key= lambda item: item["name"]
         )
+
+        for i in range(len(property_array)):
+            property_array[i]["cppbitmaskexpression"] = "(1 << %d)" % i
 
         if 0 != len(property_array):
             property_array[0]["isfirst"] = True

@@ -200,7 +200,7 @@ public:
 
 protected:
     {{cppname}}* fTarget;
-    BString fNextItemName;
+    uint16 fNextItemBitmask;
 };
 
 class {{cppname}}_List_Stacked{{toplevelcppname}}JsonListener : public AbstractStacked{{toplevelcppname}}JsonListener {
@@ -247,7 +247,7 @@ public:
     bool Handle(const BJsonEvent& event);
 
 private:
-    BString fNextItemName;
+    uint16 fNextItemIsItems;
     {{toplevel.cppname}}Listener* fItemListener;
 };
 
@@ -491,7 +491,10 @@ bool
             HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
             break;
         case B_JSON_OBJECT_NAME:
-            fNextItemName = event.Content();
+            fNextItemBitmask = 0;
+{{#propertyarray}}            if (0 == strcmp(event.Content(), "{{name}}"))
+                fNextItemBitmask = {{cppobjectname}}::k{{property.cppname}}Bitmask;  
+{{/propertyarray}}
             break;
         case B_JSON_OBJECT_END:
         {
@@ -501,53 +504,52 @@ bool
         }
         case B_JSON_STRING:
         {
-{{#propertyarray}} {{#property.isstring}}
-            if (fNextItemName == "{{name}}")
+{{#propertyarray}} {{#property.isstring}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}(new BString(event.Content()));
 {{/property.isstring}}{{/propertyarray}}
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
         }
         case B_JSON_TRUE:
-{{#propertyarray}}{{#property.isboolean}}            if (fNextItemName == "{{name}}")
+{{#propertyarray}}{{#property.isboolean}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}(true);
 {{/property.isboolean}}{{/propertyarray}}
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
         case B_JSON_FALSE:
-{{#propertyarray}}{{#property.isboolean}}            if (fNextItemName == "{{name}}")
+{{#propertyarray}}{{#property.isboolean}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}(false);
 {{/property.isboolean}}
 {{/propertyarray}}
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
         case B_JSON_NULL:
         {
-{{#propertyarray}}{{^property.isarray}}            if (fNextItemName == "{{name}}")
+{{#propertyarray}}{{^property.isarray}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}Null();
 {{/property.isarray}}{{/propertyarray}}
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
-        }     
+        }
         case B_JSON_NUMBER:
         {
-{{#propertyarray}}{{#property.isinteger}}            if (fNextItemName == "{{name}}")
+{{#propertyarray}}{{#property.isinteger}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}(event.ContentInteger());
 {{/property.isinteger}}
-{{#property.isnumber}}            if (fNextItemName == "{{name}}")
+{{#property.isnumber}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}(event.ContentDouble());
 {{/property.isnumber}}
 {{/propertyarray}}
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
         }
         case B_JSON_OBJECT_START:
         {
-{{#propertyarray}}{{#property.isobject}}            if (fNextItemName == "{{name}}") {
+{{#propertyarray}}{{#property.isobject}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask) {
                 GeneralObjectStacked{{toplevelcppname}}JsonListener* nextListener
                     = new GeneralObjectStacked{{toplevelcppname}}JsonListener(fMainListener, this);
                 Push(nextListener);
-                fNextItemName.SetTo("");
+                fNextItemBitmask = 0;
                 break;
             }
 {{/property.isobject}}{{/propertyarray}}
@@ -556,22 +558,22 @@ bool
             GeneralObjectStacked{{toplevelcppname}}JsonListener* nextListener
                 = new GeneralObjectStacked{{toplevelcppname}}JsonListener(fMainListener, this);
             Push(nextListener);
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
         }
         case B_JSON_ARRAY_START:
         {
-{{#propertyarray}}{{#property.isarray}}            if (fNextItemName == "{{name}}") {
+{{#propertyarray}}{{#property.isarray}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask) {
                 {{#property.items.isstring}}
                 StringList{{toplevelcppname}}JsonListener* nextListener = new StringList{{toplevelcppname}}JsonListener(fMainListener, this);
                 fTarget->Set{{property.cppname}}(nextListener->Target());
                 {{/property.items.isstring}}{{^property.items.isstring}}
                 {{property.items.cppname}}_List_Stacked{{toplevelcppname}}JsonListener* nextListener =
                     new {{property.items.cppname}}_List_Stacked{{toplevelcppname}}JsonListener(fMainListener, this);
-                fTarget->Set{{property.cppname}}(nextListener->Target());                
+                fTarget->Set{{property.cppname}}(nextListener->Target());
                 {{/property.items.isstring}}
                 Push(nextListener);
-                fNextItemName.SetTo("");
+                fNextItemBitmask = 0;
                 break;
             }
 {{/property.isarray}}{{/propertyarray}}
@@ -580,7 +582,7 @@ bool
             AbstractStacked{{toplevelcppname}}JsonListener* nextListener
                 = new GeneralArrayStacked{{toplevelcppname}}JsonListener(fMainListener, this);
             Push(nextListener);
-            fNextItemName.SetTo("");
+            fNextItemBitmask = 0;
             break;
         }
     }
@@ -684,16 +686,17 @@ BulkContainerStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& e
 {
     switch (event.EventType()) {
         case B_JSON_ARRAY_END:
-            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected start of array");
+            HandleError(B_NOT_ALLOWED, JSON_EVENT_LISTENER_ANY_LINE, "illegal state - unexpected end of array");
             break;
         case B_JSON_OBJECT_NAME:
-            fNextItemName = event.Content();
+            fNextItemIsItems = (0 == strcmp(event.Content(), "items"));
             break;
         case B_JSON_OBJECT_START:
             Push(new GeneralObjectStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
+            fNextItemIsItems = false;
             break;
         case B_JSON_ARRAY_START:
-            if (fNextItemName == "items")
+            if (fNextItemIsItems)
                 Push(new BulkContainerItemsStacked{{toplevel.cppname}}JsonListener(fMainListener, this, fItemListener));
             else
                 Push(new GeneralArrayStacked{{toplevel.cppname}}JsonListener(fMainListener, this));
@@ -705,7 +708,8 @@ BulkContainerStacked{{toplevel.cppname}}JsonListener::Handle(const BJsonEvent& e
             return status;
         }
         default:
-                // ignore
+                // ignore any other fields
+            fNextItemIsItems = false;
             break;
     }
 
