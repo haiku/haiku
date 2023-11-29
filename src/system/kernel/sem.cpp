@@ -914,7 +914,11 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	sSems[slot].u.used.last_release_count = count;
 #endif
 
-	if (flags & B_RELEASE_ALL) {
+	status_t unblockStatus = B_OK;
+	if ((flags & B_RELEASE_ALL) != 0) {
+		if (count < 0)
+			unblockStatus = count;
+
 		count = sSems[slot].u.used.net_count - sSems[slot].u.used.count;
 
 		// is there anything to do for us at all?
@@ -942,13 +946,13 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		if (thread_is_blocked(entry->thread)) {
 			// The thread is still waiting. If its count is satisfied,
 			// unblock it. Otherwise we can't unblock any other thread.
-			if (entry->count > sSems[slot].u.used.net_count + count) {
+			if (entry->count > (sSems[slot].u.used.net_count + count)) {
 				sSems[slot].u.used.count += count;
 				sSems[slot].u.used.net_count += count;
 				break;
 			}
 
-			thread_unblock_locked(entry->thread, B_OK);
+			thread_unblock_locked(entry->thread, unblockStatus);
 
 			int delta = min_c(count, entry->count);
 			sSems[slot].u.used.count += delta;
