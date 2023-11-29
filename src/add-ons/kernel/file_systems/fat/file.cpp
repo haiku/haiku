@@ -687,7 +687,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	}
 	dummy.end_cluster = dummy.cluster;
 	dummy.mode = FAT_SUBDIR;
-	if (!(perms & (S_IWUSR | S_IWGRP | S_IWGRP))) {
+	if (!(perms & (S_IWUSR | S_IWGRP | S_IWOTH))) {
 		dummy.mode |= FAT_READ_ONLY;
 	}
 	dummy.st_size = vol->bytes_per_sector*vol->sectors_per_cluster;
