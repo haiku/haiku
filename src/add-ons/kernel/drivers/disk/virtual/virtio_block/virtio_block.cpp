@@ -558,9 +558,10 @@ virtio_block_init_driver(device_node *node, void **cookie)
 		B_ANY_KERNEL_BLOCK_ADDRESS, B_PAGE_SIZE,
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (info->bufferArea < B_OK) {
+		status_t status = info->bufferArea;
 		delete info->dma_resource;
 		free(info);
-		return info->bufferArea;
+		return status;
 	}
 
 	physical_entry entry;
