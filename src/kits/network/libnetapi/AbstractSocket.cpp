@@ -223,9 +223,10 @@ BAbstractSocket::Connect(const BNetworkAddress& peer, int type,
 		fInitStatus = SetTimeout(timeout);
 
 	if (fInitStatus == B_OK && !IsBound()) {
+		// Bind to ADDR_ANY, if the address family supports it
 		BNetworkAddress local;
-		local.SetToWildcard(peer.Family());
-		fInitStatus = Bind(local, true);
+		if (local.SetToWildcard(peer.Family()) == B_OK)
+			fInitStatus = Bind(local, true);
 	}
 	if (fInitStatus != B_OK)
 		return fInitStatus;
