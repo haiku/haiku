@@ -224,9 +224,9 @@ GenerateThumbnailJob::Execute()
 			thumbnailWritten = (status == B_OK);
 
 			// write thumbnail creation time into an attribute
-			bigtime_t created = real_time_clock_usecs();
+			int64_t created = real_time_clock();
 			fFile->WriteAttr(kAttrThumbnailCreationTime, B_TIME_TYPE,
-				0, &created, sizeof(bigtime_t));
+				0, &created, sizeof(int64_t));
 		}
 	}
 
@@ -347,11 +347,11 @@ GetThumbnailFromAttr(Model* model, BBitmap* icon, BSize size)
 
 	// look for a thumbnail in an attribute
 	time_t modtime;
-	bigtime_t created;
+	int64_t thumbnailCreated;
 	if (node->GetModificationTime(&modtime) == B_OK
 		&& node->ReadAttr(kAttrThumbnailCreationTime, B_TIME_TYPE, 0,
-			&created, sizeof(bigtime_t)) == sizeof(bigtime_t)) {
-		if (created > (bigtime_t)modtime) {
+			&thumbnailCreated, sizeof(int64_t)) == sizeof(int64_t)) {
+		if (thumbnailCreated > modtime) {
 			// file has not changed, try to return an existing thumbnail
 			attr_info attrInfo;
 			if (node->GetAttrInfo(kAttrThumbnail, &attrInfo) == B_OK) {
