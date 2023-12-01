@@ -116,7 +116,7 @@ public:
 					break;
 			}
 		}
-	
+
 		return 0;
 	}
 
@@ -182,7 +182,7 @@ private:
 		remote_disk_header reply;
 		reply.offset = htonll(fImageSize);
 
-		reply.command = REMOTE_DISK_HELLO_REPLY;	
+		reply.command = REMOTE_DISK_HELLO_REPLY;
 		_SendReply(&reply, sizeof(remote_disk_header));
 	}
 
