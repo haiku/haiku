@@ -1006,9 +1006,9 @@ TFilePanel::AddVolumeContextMenus(BMenu* menu)
 		new BMessage(kGetInfo), 'I'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Edit name"),
 		new BMessage(kEditItem), 'E'));
-	menu->AddSeparatorItem();
 
 #if CUT_COPY_PASTE_IN_CONTEXT_MENU
+	menu->AddSeparatorItem();
 	BMenuItem* pasteItem = new BMenuItem(B_TRANSLATE("Paste"),
 		new BMessage(B_PASTE), 'V');
 #endif
