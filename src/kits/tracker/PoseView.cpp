@@ -8600,8 +8600,15 @@ BPoseView::OpenInfoWindows()
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 		return;
- 	}
-	SendSelectionAsRefs(kGetInfo);
+	}
+
+	if (fSelectionList != NULL && fSelectionList->CountItems() > 0)
+		SendSelectionAsRefs(kGetInfo);
+	else if (TargetModel()->EntryRef() != NULL) {
+		BMessage message(kGetInfo);
+		message.AddRef("refs", TargetModel()->EntryRef());
+		BMessenger(kTrackerSignature).SendMessage(&message);
+	}
 }
 
 

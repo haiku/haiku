@@ -3277,7 +3277,6 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 
 	if (context == kMenuBarContext) {
 		EnableNamedMenuItem(menu, kOpenSelection, selectCount > 0);
-		EnableNamedMenuItem(menu, kGetInfo, selectCount > 0);
 		EnableNamedMenuItem(menu, kIdentifyEntry, selectCount > 0);
 		EnableNamedMenuItem(menu, kRestoreFromTrash, selectCount > 0);
 		EnableNamedMenuItem(menu, kDelete,

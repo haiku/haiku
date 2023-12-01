@@ -1076,15 +1076,12 @@ TFilePanel::MenusBeginning()
 		PoseView()->CommitActivePose();
 	}
 
-	int32 selectCount = PoseView()->CountSelected();
-
 	EnableNamedMenuItem(fMenuBar, kNewFolder, !TargetModel()->IsRoot()
 		&& !PoseView()->TargetVolumeIsReadOnly());
 	EnableNamedMenuItem(fMenuBar, kDuplicateSelection,
 		PoseView()->CanMoveToTrashOrDuplicate());
 	EnableNamedMenuItem(fMenuBar, kMoveToTrash,
 		PoseView()->CanMoveToTrashOrDuplicate());
-	EnableNamedMenuItem(fMenuBar, kGetInfo, selectCount > 0);
 	EnableNamedMenuItem(fMenuBar, kEditItem, PoseView()->CanEditName());
 
 	SetCutItem(fMenuBar);
@@ -1120,7 +1117,6 @@ TFilePanel::ShowContextMenu(BPoint where, const entry_ref* ref)
 			// Volume context menu
 			fContextMenu = fVolumeContextMenu;
 			EnableNamedMenuItem(fContextMenu, kOpenSelection, true);
-			EnableNamedMenuItem(fContextMenu, kGetInfo, true);
 			EnableNamedMenuItem(fContextMenu, kEditItem,
 				PoseView()->CanEditName());
 
@@ -1128,7 +1124,6 @@ TFilePanel::ShowContextMenu(BPoint where, const entry_ref* ref)
 		} else {
 			// File context menu
 			fContextMenu = fFileContextMenu;
-			EnableNamedMenuItem(fContextMenu, kGetInfo, true);
 			EnableNamedMenuItem(fContextMenu, kEditItem,
 				PoseView()->CanEditName());
 			EnableNamedMenuItem(fContextMenu, kDuplicateSelection,
