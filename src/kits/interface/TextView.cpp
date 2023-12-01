@@ -3343,7 +3343,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 	switch (arrowKey) {
 		case B_LEFT_ARROW:
 			if (!fEditable && !fSelectable)
-				_ScrollBy(-1 * kHorizontalScrollBarStep, 0);
+				_ScrollBy(-kHorizontalScrollBarStep, 0);
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
 			else {
@@ -3398,7 +3398,7 @@ BTextView::_HandleArrowKey(uint32 arrowKey, int32 modifiers)
 		case B_UP_ARROW:
 		{
 			if (!fEditable && !fSelectable)
-				_ScrollBy(0, -1 * kVerticalScrollBarStep);
+				_ScrollBy(0, -kVerticalScrollBarStep);
 			else if (fSelStart != fSelEnd && !shiftKeyDown)
 				fCaretOffset = fSelStart;
 			else {
