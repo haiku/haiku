@@ -196,7 +196,7 @@ private:
 		int16_t size = ntohs(fRequest->size);
 		int16_t result = 0;
 
-		printf("READ request: offset: %llu, %hd bytes\n", offset, size);
+		printf("READ request: offset: %" PRIu64 ", %hd bytes\n", offset, size);
 
 		if (offset < (uint64_t)fImageSize && size > 0) {
 			// always read 1024 bytes
@@ -212,12 +212,12 @@ private:
 				if (bytesRead >= 0) {
 					result = bytesRead;
 				} else {
-					fprintf(stderr, "Error: Failed to read at position %llu: "
+					fprintf(stderr, "Error: Failed to read at position %" PRIu64 ": "
 						"%s.", offset, strerror(errno));
 					result = REMOTE_DISK_IO_ERROR;
 				}
 			} else {
-				fprintf(stderr, "Error: Failed to seek to position %llu: %s.",
+				fprintf(stderr, "Error: Failed to seek to position %" PRIu64 ": %s.",
 					offset, strerror(errno));
 				result = REMOTE_DISK_IO_ERROR;
 			}
@@ -239,7 +239,7 @@ private:
 		int16_t size = ntohs(fRequest->size);
 		int16_t result = 0;
 
-		printf("WRITE request: offset: %llu, %hd bytes\n", offset, size);
+		printf("WRITE request: offset: %" PRIu64 ", %hd bytes\n", offset, size);
 
 		if (size < 0
 			|| (uint32_t)size > fRequestSize - sizeof(remote_disk_header)
@@ -257,12 +257,12 @@ private:
 				if (bytesWritten >= 0) {
 					result = bytesWritten;
 				} else {
-					fprintf(stderr, "Error: Failed to write at position %llu: "
+					fprintf(stderr, "Error: Failed to write at position %" PRIu64 ": "
 						"%s.", offset, strerror(errno));
 					result = REMOTE_DISK_IO_ERROR;
 				}
 			} else {
-				fprintf(stderr, "Error: Failed to seek to position %llu: %s.",
+				fprintf(stderr, "Error: Failed to seek to position %" PRIu64 ": %s.",
 					offset, strerror(errno));
 				result = REMOTE_DISK_IO_ERROR;
 			}
