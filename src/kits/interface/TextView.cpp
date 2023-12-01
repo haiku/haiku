@@ -5004,15 +5004,9 @@ BTextView::_PerformAutoScrolling()
 	else if (fWhere.x < bounds.left)
 		scrollBy.x = fWhere.x - bounds.left; // negative value
 
-	// prevent from scrolling out of view
-	if (scrollBy.x != 0.0) {
-		float rightMax = fTextRect.right + fLayoutData->rightInset;
-		if (bounds.right + scrollBy.x > rightMax)
-			scrollBy.x = rightMax - bounds.right;
-		float leftMin = fTextRect.left - fLayoutData->leftInset;
-		if (bounds.left + scrollBy.x < leftMin)
-			scrollBy.x = leftMin - bounds.left;
-	}
+	// prevent horizontal scrolling if text rect is inside view rect
+	if (fTextRect.left > bounds.left && fTextRect.right < bounds.right)
+		scrollBy.x = 0;
 
 	if (CountLines() > 1) {
 		// scroll in Y only if multiple lines!
@@ -5020,20 +5014,14 @@ BTextView::_PerformAutoScrolling()
 			scrollBy.y = fWhere.y - bounds.bottom;
 		else if (fWhere.y < bounds.top)
 			scrollBy.y = fWhere.y - bounds.top; // negative value
-
-		// prevent from scrolling out of view
-		if (scrollBy.y != 0.0) {
-			float bottomMax = fTextRect.bottom + fLayoutData->bottomInset;
-			if (bounds.bottom + scrollBy.y > bottomMax)
-				scrollBy.y = bottomMax - bounds.bottom;
-			float topMin = fTextRect.top - fLayoutData->topInset;
-			if (bounds.top + scrollBy.y < topMin)
-				scrollBy.y = topMin - bounds.top;
-		}
 	}
 
+	// prevent vertical scrolling if text rect is inside view rect
+	if (fTextRect.top > bounds.top && fTextRect.bottom < bounds.bottom)
+		scrollBy.y = 0;
+
 	if (scrollBy != B_ORIGIN)
-		ScrollBy(scrollBy.x, scrollBy.y);
+		_ScrollBy(scrollBy.x, scrollBy.y);
 }
 
 
@@ -5094,15 +5082,22 @@ BTextView::_ScrollTo(float x, float y)
 	long viewWidth = bounds.IntegerWidth();
 	long viewHeight = bounds.IntegerHeight();
 
-	if (x > fTextRect.right - viewWidth)
-		x = fTextRect.right - viewWidth;
-	if (x < 0.0)
-		x = 0.0;
+	float minWidth = fTextRect.left - fLayoutData->leftInset;
+	float maxWidth = fTextRect.right + fLayoutData->rightInset - viewWidth;
+	float minHeight = fTextRect.top - fLayoutData->topInset;
+	float maxHeight = fTextRect.bottom + fLayoutData->bottomInset - viewHeight;
 
-	if (y > fTextRect.bottom + fLayoutData->bottomInset - viewHeight)
-		y = fTextRect.bottom + fLayoutData->bottomInset - viewHeight;
-	if (y < 0.0)
-		y = 0.0;
+	// set horizontal scroll limits
+	if (x > maxWidth)
+		x = maxWidth;
+	if (x < minWidth)
+		x = minWidth;
+
+	// set vertical scroll limits
+	if (y > maxHeight)
+		y = maxHeight;
+	if (y < minHeight)
+		y = minHeight;
 
 	ScrollTo(x, y);
 }
