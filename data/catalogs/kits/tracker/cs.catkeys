@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	746720348
+1	czech	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Pro zobrazení inform
 Tracker preferences	TrackerSettingsWindow		Nastavení Trackeru
 Read	FilePermissionsView		Čtení
 There was an error writing the attribute.	WidgetAttributeText		Došlo k chybě během zápisu atributu.
-Path	Default Query Columns		Cesta
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Pokud přejmenujete %target, %osName se nemusí chovat správně!\n\nOpravdu to chcete udělat?
 Filesystem:	InfoWindow		Systém souborů:
 Could not open \"%name\" (%error). 	FSUtils		Nelze otevřít \"%name\" (%error). 

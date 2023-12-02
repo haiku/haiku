@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-GLTeapot	400822745
+1	hungarian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Jobb
 Backface culling	TeapotWindow		Háttérszűrés
 Add a teapot	TeapotWindow		Teáskanna hozzáadása
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Bal alsó
 Fog	TeapotWindow		Köd
 FPS display	TeapotWindow		FPS megjelenítése
 GLTeapot	System name		Teáskanna
+Limit FPS to refresh rate	TeapotWindow		Az FPS korlátozása a frissítési gyakoriságra
 Settings	TeapotWindow		Beállítások
 Gouraud shading	TeapotWindow		Elmosott árnyékolás
 Lighting	TeapotWindow		Megvilágítás

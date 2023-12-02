@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4059271065
+1	russian	x-vnd.Haiku-libtracker	458490441
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -155,7 +155,6 @@ The Tracker must be running to see Info windows.	PoseView		Для просмот
 Tracker preferences	TrackerSettingsWindow		Настройки Tracker
 Read	FilePermissionsView		Чтение
 There was an error writing the attribute.	WidgetAttributeText		Произошла ошибка при записи атрибута.
-Path	Default Query Columns		Путь
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы переименуете %target, то это может привести\n к неправильной работоспособности %osName!\nВы действительно хотите сделать это?
 Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \"%name\" (%error). 
 Media parameter group	AttributesView		Группа параметров медиа

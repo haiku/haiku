@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	746720348
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Tracker må kjøre fo
 Tracker preferences	TrackerSettingsWindow		Tracker-innstillinger
 Read	FilePermissionsView		Lese
 There was an error writing the attribute.	WidgetAttributeText		Det oppsto en feil da attributten skulle skrives.
-Path	Default Query Columns		Sti
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Hvis du endrer navn på %target er det mulig %osName ikke oppfører seg som forventet!\n\nEr du sikker på at du vil gjøre dette?
 Filesystem:	InfoWindow		Filsystem:
 Could not open \"%name\" (%error). 	FSUtils		Kunne ikke åpne \"%name\" (%error).

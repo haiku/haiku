@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	844426958
+1	slovak	x-vnd.Haiku-libtracker	1538613630
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -134,7 +134,6 @@ The Tracker must be running to see Info windows.	PoseView		Tracker musí bežať
 Tracker preferences	TrackerSettingsWindow		Nastavenia Trackera
 Read	FilePermissionsView		Čítať
 There was an error writing the attribute.	WidgetAttributeText		Vyskytla sa chyba pri zapisovaní atribútu.
-Path	Default Query Columns		Cesta
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak premenujete %target, %osName sa nemusí správať správne!\n\nSte si istý, že to chcete urobiť?
 Could not open \"%name\" (%error). 	FSUtils		Nebolo možné otvoriť „%name“ (%error). 
 %name info	InfoWindow	InfoWindow Title	Info o %name

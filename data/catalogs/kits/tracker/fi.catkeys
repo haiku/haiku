@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	746720348
+1	finnish	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Seuraajan on oltava k
 Tracker preferences	TrackerSettingsWindow		Seuraaja-asetukset
 Read	FilePermissionsView		Lue
 There was an error writing the attribute.	WidgetAttributeText		Attribuutin kirjoittamisessa tapahtui virhe.
-Path	Default Query Columns		Polku
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos nimeät uudelleen kohteen %target, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
 Filesystem:	InfoWindow		Tiedostojärjestelmä:
 Could not open \"%name\" (%error). 	FSUtils		Kohteen ”%name” avaus epäonnistui (%error)

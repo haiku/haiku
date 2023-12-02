@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	746720348
+1	catalan; valencian	x-vnd.Haiku-libtracker	3955111295
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Cal que el Rastrejado
 Tracker preferences	TrackerSettingsWindow		Preferències del Rastrejador
 Read	FilePermissionsView		Lectura
 There was an error writing the attribute.	WidgetAttributeText		Hi ha hagut un error en escriure l'atribut.
-Path	Default Query Columns		Camí
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si canvieu de nom %target, el sistema %osName potser no es comportarà correctament!\n\nSegur que ho voleu fer?
 Filesystem:	InfoWindow		Sistema de fitxers:
 Could not open \"%name\" (%error). 	FSUtils		No s'ha pogut muntar \"%name\" (%error). 
@@ -301,6 +300,7 @@ Select all	ContainerWindow		Selecciona-ho tot
 apps	B_APPS_DIRECTORY		aplicacions
 Error calculating folder size.	InfoWindow		Error en calcular la mida de la carpeta.
 Delete	FSUtils		Suprimeix
+Duplicate	FilePanelPriv		Duplica
 Edit name	ContainerWindow		Edita el nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No s'ha pogut obrir \"%document\" (Falta el símbol %symbol). \n
 ASCII Text	AttributesView		Text ASCII

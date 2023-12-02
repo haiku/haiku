@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	2238200662
+1	thai	x-vnd.Haiku-libtracker	2932387334
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -151,7 +151,6 @@ The Tracker must be running to see Info windows.	PoseView		ตัวติดต
 Tracker preferences	TrackerSettingsWindow		การตั้งค่าติดตาม
 Read	FilePermissionsView		อ่าน
 There was an error writing the attribute.	WidgetAttributeText		มีข้อผิดพลาดในการเขียนคุณลักษณะ
-Path	Default Query Columns		พาธ
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		หากคุณเปลี่ยนชื่อ %target%osName อาจทำงานไม่ถูกต้อง! \n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?
 Could not open \"%name\" (%error). 	FSUtils		ไม่สามารถเปิด\"%name\" (%error)
 Media parameter group	AttributesView		กลุ่มพารามิเตอร์สื่อ

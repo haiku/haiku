@@ -3,9 +3,9 @@ Cancel	ShutdownProcess		Avbryt
 OK	ShutdownProcess		OK
 Do you really want to shut down the system?	ShutdownProcess		Vil du virkelig slå av maskinen?
 Shutdown status	ShutdownProcess		Nedstengningsstatus
-Shut down	ShutdownProcess		Steng ned
+Shut down	ShutdownProcess		Slå av
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Applikasjonen \"%appName%\" kan være blokkert på et modalpanel.
-System is shut down	ShutdownProcess		Systemet er stengt ned
+System is shut down	ShutdownProcess		Systemet er slått av
 Restart system	ShutdownProcess		Start systemet på nytt
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Programmet \"%appName%\" har avbrutt nedstengningen.
 Asking background applications to quit.	ShutdownProcess		Ber bakgrunnsprogrammer om å avslutte.
@@ -19,5 +19,5 @@ Restarting…	ShutdownProcess		Starter på nytt...
 Tidying things up a bit.	ShutdownProcess		Rydder opp litt.
 Kill application	ShutdownProcess		Drep program
 Shutdown aborted	ShutdownProcess		Nedstengning avbrutt
-Shutting down…	ShutdownProcess		Stenger ned...
+Shutting down…	ShutdownProcess		Avslutter…
 Asking \"%appName%\" to quit.	ShutdownProcess		Ber \"%appName%\" om å avslutte

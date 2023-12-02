@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2837468702
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Перегля�
 Sending anonymous usage data	MainWindow		Відправка анонімних даних про використання
 Log in	UserLoginWindow		Авторизація
 Usage conditions	UserUsageConditions		Умови користування
+Populating package sizes	PopulatePkgSizesProcess		Отримую розміри пакетів
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Знімок екрана
 Email address:	UserLoginWindow		Адреса E-mail:

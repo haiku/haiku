@@ -1,8 +1,9 @@
-1	italian	x-vnd.Haiku-Terminal	185459086
+1	italian	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Chiudi altri pannelli
 Insert path	Terminal TermView		Inserisci percorso
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Spiacente, Terminale non ha potuto avviare l'interprete di riga di comando.
 Text encoding	Terminal TermWindow		Codifica del testo
+Colors	Terminal ThemeWindow		Colori
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Modifica
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               mostra questp messaggio\n  -t,     --title              imposta titolo della finestra\n  -f,     --fullscreen         avvia a tutto schermo\n  -w,     --working-directory  imposta directory iniziale di lavoro\n

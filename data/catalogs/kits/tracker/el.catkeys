@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	746720348
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Ο Ιχνηλάτης
 Tracker preferences	TrackerSettingsWindow		Προτιμήσεις Ιχνηλάτη
 Read	FilePermissionsView		Ανάγνωση
 There was an error writing the attribute.	WidgetAttributeText		Υπήρξε ένα σφάλμα κατά την εγγραφή της ιδιότητας.
-Path	Default Query Columns		Τοποθεσία
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν μετονομάσετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος;
 Filesystem:	InfoWindow		Σύστημα αρχείων:
 Could not open \"%name\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%name\" (%error). 

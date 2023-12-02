@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	834755355
+1	ukrainian	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Аудіо
 Quit	MediaPlayer-Main		Вийти
 Redo	MediaPlayer-PlaylistWindow		Повтор дії
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
+Reset rating	MediaPlayer-Main		Скинути рейтинг
 <unknown>	PlaylistItem-author		<невідомий>
 Cancel	MediaPlayer-SettingsWindow		Скасувати
 Large	MediaPlayer-SettingsWindow		Великий

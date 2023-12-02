@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	3800021855
+1	indonesian	x-vnd.Haiku-libtracker	199241231
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -152,7 +152,6 @@ The Tracker must be running to see Info windows.	PoseView		Tracker harus berjala
 Tracker preferences	TrackerSettingsWindow		Preferensi tracker
 Read	FilePermissionsView		Baca
 There was an error writing the attribute.	WidgetAttributeText		Ada kesalahan penulisan atribut.
-Path	Default Query Columns		Lokasi
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jika Anda mengubah nama %target, %osName mungkin tidak bekerja semestinya!\n\nApakah Anda yakin ingin melakukan ini?
 Could not open \"%name\" (%error). 	FSUtils		Tidak bisa membuka \"%name\" (%error). 
 Media parameter group	AttributesView		Grup parameter media

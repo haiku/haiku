@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	2347376405
+1	ukrainian	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		ShowImage
 Page setup…	Menus		Налаштування сторінки…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) був змінений. Закрити його?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Перевернути зверху вниз
 Zoom in	Menus		Збільшити
 Last page	Menus		Остання сторінка
 Cancel	ClosePrompt		Скасувати
+Attributes	Menus		Атрибути
 High-quality zooming	Menus		Високоякісна зміна розміру
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' було змінено. Ви хочете закрити його?
 Close	Menus		Закрити
 Selection mode	Menus		Режим виділення
+Reset rating	Menus		Скинути рейтинг
 DPI:	PrintOptionsWindow		Роздільна здатність (DPI):
 Fit image to page	PrintOptionsWindow		Підігнати зображення під сторінку
 Show tool bar	Menus		Показати панель інструментів

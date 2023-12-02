@@ -112,7 +112,7 @@ Bad news	Title of error alert		Brutte notizie
 HVIF source code	Icon-O-Matic-SavePanel		Sorgente HVIF
 Drop shapes	Icon-O-Matic-ShapesList		Scarta le forme
 Save icon	Icon-O-Matic-SavePanel	Dialog title	Salva icona
-Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Assegna {0, plural, one{tracciato} other{tracciato}}
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Assegna {0, plural, one{tracciato} other{tracciati}}
 Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Rimuovi {0, plural, one{oggetto} other{oggetti}}
 Linear	Icon-O-Matic-StyleTypes		Lineare
 Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Sposta {0, plural, one{oggetto} other{oggetti}}

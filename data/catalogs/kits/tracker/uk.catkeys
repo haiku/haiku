@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	746720348
+1	ukrainian	x-vnd.Haiku-libtracker	3955111295
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Для перегля
 Tracker preferences	TrackerSettingsWindow		Налаштування Tracker
 Read	FilePermissionsView		Читати
 There was an error writing the attribute.	WidgetAttributeText		Сталася помилка при записі атрибуту.
-Path	Default Query Columns		Шлях
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Якщо %target буде перейменовано, %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього?
 Filesystem:	InfoWindow		Файлова система:
 Could not open \"%name\" (%error). 	FSUtils		Не вдалося відкрити \«%name\» (%error). 
@@ -301,6 +300,7 @@ Select all	ContainerWindow		Вибрати все
 apps	B_APPS_DIRECTORY		Програми
 Error calculating folder size.	InfoWindow		Помилка при обчисленні розміру папки.
 Delete	FSUtils		Видалити
+Duplicate	FilePanelPriv		Дублікат
 Edit name	ContainerWindow		Редагувати назву
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \«%document\» (Очікується символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
@@ -476,7 +476,7 @@ Memory corruption.	libtracker		Пошкодження пам'яті.
 Expression too long.	libtracker		Вираз задовгий.
 Color	AttributesView		Колір
 Copy layout	ContainerWindow		Копіювати макет
-Duplicate	ContainerWindow		Дублювати
+Duplicate	ContainerWindow		Дублікат
 16-bit integer	AttributesView		16-бітове ціле
 Untitled clipping	PoseView		Неназвана вирізка
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \«%name\» вже існує у цій папці. Замінити його?

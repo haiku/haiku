@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	746720348
+1	romanian	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Trackerul trebuie să
 Tracker preferences	TrackerSettingsWindow		Preferințe Tracker
 Read	FilePermissionsView		Citit
 There was an error writing the attribute.	WidgetAttributeText		A apărut o eroare la scrierea atributului.
-Path	Default Query Columns		Cale
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Dacă redenumiți %target, este posibil ca %osName să nu funcționeze corespunzător!\n\nSigur doriți să faceți asta?
 Filesystem:	InfoWindow		Sistem de fișiere:
 Could not open \"%name\" (%error). 	FSUtils		Nu s-a putut deschide \„%name\” (%error). 

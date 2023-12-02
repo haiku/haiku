@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2837468702
+1	hungarian	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%
 Sending anonymous usage data	MainWindow		Névtelen felhasználási adatok küldése
 Log in	UserLoginWindow		Bejelentkezés
 Usage conditions	UserUsageConditions		Felhasználási feltételek
+Populating package sizes	PopulatePkgSizesProcess		Csomagméretek közzététele
 HaikuDepot	System name		Raktár
 Screenshot	ScreenshotWindow		Képernyőkép
 Email address:	UserLoginWindow		E-mail cím:

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	746720348
+1	japanese	x-vnd.Haiku-libtracker	3955111295
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		情報ウィンドウ
 Tracker preferences	TrackerSettingsWindow		Tracker の設定
 Read	FilePermissionsView		読み取り
 There was an error writing the attribute.	WidgetAttributeText		属性の書き込み中にエラーが発生しました。
-Path	Default Query Columns		パス
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target の名前を変更すると、%osName は正しく動作しないかもしれません!\n\n名称を変更しますか?
 Filesystem:	InfoWindow		ファイルシステム:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" を開けません (%error)。
@@ -301,6 +300,7 @@ Select all	ContainerWindow		すべて選択
 apps	B_APPS_DIRECTORY		アプリケーション
 Error calculating folder size.	InfoWindow		フォルダーサイズの計算中にエラー発生。
 Delete	FSUtils		削除
+Duplicate	FilePanelPriv		複製
 Edit name	ContainerWindow		名前の変更
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けません (シンボル %symbol  が見つかりません)。\n
 ASCII Text	AttributesView		ASCIIテキスト

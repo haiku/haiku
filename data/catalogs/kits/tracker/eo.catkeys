@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	2888117669
+1	esperanto	x-vnd.Haiku-libtracker	3582304341
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -155,7 +155,6 @@ The Tracker must be running to see Info windows.	PoseView		La Spurilo devas esti
 Tracker preferences	TrackerSettingsWindow		Agordoj de Spurilo
 Read	FilePermissionsView		Legi
 There was an error writing the attribute.	WidgetAttributeText		Eraris skribante la atributon.
-Path	Default Query Columns		Itinero
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se vi renomos %target, %osName eble ne kondutos dece!\n\nĈu vi certas, ke vi deziras fari ĉi tion?
 Could not open \"%name\" (%error). 	FSUtils		Malsukcesis uzi \"%name\"-on (%error). 
 Media parameter group	AttributesView		Grupo de mediaj parametroj

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-GLTeapot	400822745
+1	italian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Destra
 Backface culling	TeapotWindow		Backface culling
 Add a teapot	TeapotWindow		Aggiungi una teiera
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		In basso a sinistra
 Fog	TeapotWindow		Nebbia
 FPS display	TeapotWindow		Indicatore FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Limite dei FPS per la frequenza di refresh
 Settings	TeapotWindow		Impostazioni
 Gouraud shading	TeapotWindow		Gouraud shading
 Lighting	TeapotWindow		Illuminazione

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	4267611234
+1	english	x-vnd.Haiku-libtracker	666830610
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -158,7 +158,6 @@ The Tracker must be running to see Info windows.	PoseView		文件浏览器必须
 Tracker preferences	TrackerSettingsWindow		文件浏览器首选项
 Read	FilePermissionsView		读取
 There was an error writing the attribute.	WidgetAttributeText		该属性写入出错。
-Path	Default Query Columns		路径
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果重命名 %target， %osName 可能无法正常工作！\n\n您确定要这样做吗？
 Filesystem:	InfoWindow		文件系统：
 Could not open \"%name\" (%error). 	FSUtils		无法打开 \"%name\"（%error）。

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3311885033
+1	french	x-vnd.Haiku-libtracker	4006071705
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Le Tracker doit être
 Tracker preferences	TrackerSettingsWindow		Préférences du Tracker
 Read	FilePermissionsView		Lire
 There was an error writing the attribute.	WidgetAttributeText		Il y a eu une erreur à l’écriture de l’attribut.
-Path	Default Query Columns		Chemin
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si vous renommez %target, %osName pourrait ne plus se comporter correctement !\n\nÊtes vous sûr de vouloir le faire ?
 Filesystem:	InfoWindow		Système de fichiers :
 Could not open \"%name\" (%error). 	FSUtils		Impossible d’ouvrir « %name » (%error). 

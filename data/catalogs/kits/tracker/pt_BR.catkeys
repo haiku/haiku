@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	2423366237
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	3117552909
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -156,7 +156,6 @@ The Tracker must be running to see Info windows.	PoseView		O Tracker deve estar 
 Tracker preferences	TrackerSettingsWindow		Preferências do Tracker
 Read	FilePermissionsView		Ler
 There was an error writing the attribute.	WidgetAttributeText		Ocorreu um erro ao gravar o atributo.
-Path	Default Query Columns		Caminho
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se alterar o nome de %target, %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isto?
 Could not open \"%name\" (%error). 	FSUtils		Não foi possível abrir \"%name\" (%error). 
 Media parameter group	AttributesView		Grupo de parâmetros de mídia

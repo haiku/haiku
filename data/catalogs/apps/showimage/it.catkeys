@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	3998703664
+1	italian	x-vnd.Haiku-ShowImage	2347376405
 ShowImage	System name		ShowImage
 Page setup…	Menus		Imposta pagina…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
@@ -45,6 +45,7 @@ Job setup	PrintOptionsWindow		Imposta attività
 Clear selection	Menus		Pulisci selezione
 Rotate clockwise	Menus		Ruota in senso orario
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Impossibile caricare l'immagine! Il file, il suo traduttore dati o entrambi non esistono.
+Open with…	Menus		Apri con...
 Rotate counterclockwise	Menus		Ruota in senso antiorario
 Previous page	Menus		Pagina precedente
 Fit to window	Menus		Adatta alla finestra

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2420591844
+1	turkish	x-vnd.Haiku-libtracker	3114778516
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Bilgi pencerelerini g
 Tracker preferences	TrackerSettingsWindow		İzleyici tercihleri
 Read	FilePermissionsView		Okuma
 There was an error writing the attribute.	WidgetAttributeText		Öznitelik yazılırken bir hata oluştu.
-Path	Default Query Columns		Yol
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target% ögesini yeniden adlandırırsanız %osName düzgün çalışmayabilir.\n\nBunu yapmak istediğinizden emin misiniz?
 Filesystem:	InfoWindow		Dosya sistemi:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" açılamadı (%error). 

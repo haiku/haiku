@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	3370106820
+1	french	x-vnd.Haiku-HaikuDepot	1545161534
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d'utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
@@ -177,9 +177,10 @@ Success	UserLoginWindow		Opération réussie
 Settings	SettingsWindow		Réglages
 Login issue	MainWindow		Problème d’authentification
 Your rating:	RatePackageWindow		Votre évaluation :
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		DépôtHaiku s'arrête ou achève les opérations en cours avant de quitter.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L’utilisateur %Nickname% a été créé avec succès dans le système du Serveur de dépôt Haiku. Vous pouvez gérer votre profil utilisateur en utilisant l’interface web. Vous êtes maintenant connecté sous ce nouveau profil utilisateur.
 Repositories	MainWindow		Dépôts
-This rating is visible to other users	RatePackageWindow		Cette note est visible par les autres utilisateurs
+This rating is visible to other users	RatePackageWindow		Cette évaluation est visible par les autres utilisateurs
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Lors de la mise à jour des données du paquet, un problème est apparu qui peut entraîner l’affichage de données obsolètes ou manquantes dans l’application. Des détails supplémentaires concernant ce problème peuvent être obtenus à partir des journaux d’application.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View agreed usage conditions…	MainWindow		Voir les conditions d’utilisation acceptées…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'utilisateur « %Nickname% » s'est authentifié, mais avant de poursuivre, il vous est demandé d'accepter les conditions d'utilisation les plus récentes. 
@@ -205,6 +206,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Enregistrement 
 Sending anonymous usage data	MainWindow		Envoi de données d’utilisation anonymes
 Log in	UserLoginWindow		Connexion
 Usage conditions	UserUsageConditions		Conditions d'usage
+Populating package sizes	PopulatePkgSizesProcess		Récupération de la taille des paquets
 HaikuDepot	System name		DépôtHaiku
 Screenshot	ScreenshotWindow		Capture d’écran
 Email address:	UserLoginWindow		Adresse e-mail :

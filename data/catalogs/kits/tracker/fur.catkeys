@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	746720348
+1	friulian	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Al è necessari che i
 Tracker preferences	TrackerSettingsWindow		Preferencis dal Tracker
 Read	FilePermissionsView		Leture
 There was an error writing the attribute.	WidgetAttributeText		Si è presentât un erôr tal scrivi l'atribût.
-Path	Default Query Columns		Percors
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si cambie non a %target, %osName al podaès funzionâ mâl!\n\nContinuâ pardabon?
 Filesystem:	InfoWindow		Filesystem:
 Could not open \"%name\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%name\" (%error). 

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	746720348
+1	spanish; castilian	x-vnd.Haiku-libtracker	1440907020
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		El Trazador se debe e
 Tracker preferences	TrackerSettingsWindow		Preferencias del rastreador
 Read	FilePermissionsView		Leer
 There was an error writing the attribute.	WidgetAttributeText		Ha habido un error escribiendo el atributo
-Path	Default Query Columns		Ruta
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si renombras %target, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?
 Filesystem:	InfoWindow		Sistema de archivos:
 Could not open \"%name\" (%error). 	FSUtils		No se pudo abrir \"%name\" (%error).

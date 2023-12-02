@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Keymap	2850776429
+1	italian	x-vnd.Haiku-Keymap	2618211193
 Key	Modifier keys window	As in a computer keyboard key	Tasto
 Japanese	KeymapNames		Giapponese
 US	KeymapNames		Inglese (Stati Uniti)
@@ -30,6 +30,7 @@ US-International	KeymapNames		Inglese Americano (Internazionale)
 Right option	Keyboard Layout View		Option destro
 Turkish (Type-Q)	KeymapNames		Turco (Type-Q)
 Revert	Modifier keys window		Ripristina
+Caps:	Modifier keys window	Caps key role name	Maiuscolo:
 Slovak	KeymapNames		Slovacco
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -155,6 +156,7 @@ Belgian (comma)	KeymapNames		Belga (virgola)
 Norwegian	KeymapNames		Norvegese
 Font	Keymap window		Tipo di Carattere
 Danish	KeymapNames		Danese
+Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tasto per tutto maiuscolo
 Generic 104-key	KeyboardLayoutNames		Tastiera generica a 104 tasti
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasto shift
 Russian	KeymapNames		Russo

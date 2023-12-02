@@ -33,7 +33,7 @@ Used memory	DataSource		Memoria utilizzata
 Show legend	ActivityView		Mostra legenda
 Cached memory	DataSource		Memoria cache
 CPU %d usage	DataSource		Utilizzo CPU %d
-CPU %d speed	DataSource		Velocità %d della CPU
+CPU %d speed	DataSource		Velocità della CPU %d
 File	ActivityWindow		File
 Ports	DataSource		Porte
 Page faults	DataSource		Page fault

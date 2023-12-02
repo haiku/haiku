@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	746720348
+1	hungarian	x-vnd.Haiku-libtracker	3955111295
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -159,7 +159,6 @@ The Tracker must be running to see Info windows.	PoseView		Az információs abla
 Tracker preferences	TrackerSettingsWindow		Nyomkövető beállítása
 Read	FilePermissionsView		Olvasás
 There was an error writing the attribute.	WidgetAttributeText		Hiba történt a jellemző írása közben.
-Path	Default Query Columns		Útvonal
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target átnevezésekor nem biztos, hogy megfelelően működik a %osName!\n\nBiztosan ezt akarod tenni?
 Filesystem:	InfoWindow		Fájlrendszer:
 Could not open \"%name\" (%error). 	FSUtils		Nem sikerült megnyitni: \"%name\" (%error).
@@ -301,6 +300,7 @@ Select all	ContainerWindow		Mind kijelölése
 apps	B_APPS_DIRECTORY		Programok
 Error calculating folder size.	InfoWindow		Hiba történt a mappa méretének számítása közben.
 Delete	FSUtils		Törlés
+Duplicate	FilePanelPriv		Ismétlődő
 Edit name	ContainerWindow		Név szerkesztése
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\"): hiányzik egy szimbólum: %symbol\n
 ASCII Text	AttributesView		ASCII Szöveg

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	508832319
+1	croatian	x-vnd.Haiku-libtracker	1203018991
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -115,7 +115,6 @@ The Tracker must be running to see Info windows.	PoseView		Tracker mora biti pok
 Tracker preferences	TrackerSettingsWindow		Osobitosti Tracker-a
 Read	FilePermissionsView		Čitaj
 There was an error writing the attribute.	WidgetAttributeText		Dogodila se greška pri pisanju atributa.
-Path	Default Query Columns		Putanja
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ako preimenujete %target, %osName se možda neće propisno ponašati!\n\nJeste li sigurni da ovo želite učiniti?
 Could not open \"%name\" (%error). 	FSUtils		Nije moguće otvoriti \"%name\" (%error). 
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ako premjestite osobnu mapu, %osName sw možda neće propisno ponašati!\n\njeste li sigurni da želite ovo učiniti?\n\nZa micanje osobne mape, držite Shift tipku i kliknite \"Move\".

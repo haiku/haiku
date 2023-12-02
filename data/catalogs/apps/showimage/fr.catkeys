@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	3998703664
+1	french	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		Visionneuse
 Page setup…	Menus		Mise en page…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Mirroir horizontal
 Zoom in	Menus		Zoom avant
 Last page	Menus		Dernière page
 Cancel	ClosePrompt		Annuler
+Attributes	Menus		Attributs
 High-quality zooming	Menus		Zoom haute qualité
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » a été modifié. Êtes-vous sûr de vouloir le fermer ?
 Close	Menus		Fermer
 Selection mode	Menus		Mode de sélection
+Reset rating	Menus		Effacer l'évaluation
 DPI:	PrintOptionsWindow		PPP :
 Fit image to page	PrintOptionsWindow		Adapter l’image à la page
 Show tool bar	Menus		Afficher la barre d’outils
@@ -45,6 +47,7 @@ Job setup	PrintOptionsWindow		Définir la tâche
 Clear selection	Menus		Effacer la sélection
 Rotate clockwise	Menus		Rotation horaire
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		L’image n’a pas pu être lue ! Le fichier ou son traducteur n’existe pas.
+Open with…	Menus		Ouvrir avec…
 Rotate counterclockwise	Menus		Rotation antihoraire
 Previous page	Menus		Page précédente
 Fit to window	Menus		Ajuster à la fenêtre
