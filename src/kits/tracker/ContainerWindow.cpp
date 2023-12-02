@@ -2334,10 +2334,8 @@ BContainerWindow::MenusBeginning()
 
 	AddMimeTypesToMenu(fAttrMenu);
 
-	if (IsPrintersDir()) {
-		EnableNamedMenuItem(fFileMenu, B_TRANSLATE("Make active printer"),
-			selectCount == 1);
-	}
+	if (IsPrintersDir())
+		EnableNamedMenuItem(fFileMenu, kMakeActivePrinter, selectCount == 1);
 }
 
 
