@@ -605,16 +605,6 @@ FSMoveToTrash(BObjectList<entry_ref>* srcList, BList* pointList, bool async)
 }
 
 
-static bool
-IsDisksWindowIcon(BEntry* entry)
-{
-	BPath path;
-	if (entry->InitCheck() != B_OK || entry->GetPath(&path) != B_OK)
-		return false;
-
-	return strcmp(path.Path(), "/") == 0;
-}
-
 enum {
 	kNotConfirmed,
 	kConfirmedHomeMove,
@@ -899,7 +889,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 		// we could check for this while iterating through items in each of
 		// the copy loops, except it takes forever to call CalcItemsAndSize
 		BEntry entry((entry_ref*)srcList->ItemAt(index));
-		if (IsDisksWindowIcon(&entry)) {
+		if (FSIsRootDir(&entry)) {
 			BString errorStr;
 			if (moveMode == kCreateLink) {
 				errorStr.SetTo(
@@ -2838,8 +2828,11 @@ FSIsHomeDir(const BEntry* entry)
 bool
 FSIsRootDir(const BEntry* entry)
 {
-	BPath path(entry);
-	return path == "/";
+	BPath path;
+	if (entry->InitCheck() != B_OK || entry->GetPath(&path) != B_OK)
+		return false;
+
+	return strcmp(path.Path(), "/") == 0;
 }
 
 

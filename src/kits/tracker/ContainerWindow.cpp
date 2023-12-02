@@ -1165,10 +1165,8 @@ BContainerWindow::UpdateTitle()
 		SetTitle(TargetModel()->Name());
 	}
 
-	if (Navigator() != NULL) {
-		Navigator()->UpdateLocation(PoseView()->TargetModel(),
-			kActionUpdatePath);
-	}
+	if (Navigator() != NULL)
+		Navigator()->UpdateLocation(TargetModel(), kActionUpdatePath);
 }
 
 
@@ -1654,7 +1652,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 				SaveState(false);
 
 			bool wasInTrash = IsTrash() || InTrash();
-			bool isRoot = PoseView()->TargetModel()->IsRoot();
+			bool isRoot = TargetModel()->IsRoot();
 
 			// Switch dir and apply new state
 			WindowStateNodeOpener opener(this, false);
@@ -1667,7 +1665,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 			fInTrash = FSInTrashDir(&ref);
 
 			if (wasInTrash ^ (IsTrash() || InTrash())
-				|| isRoot != PoseView()->TargetModel()->IsRoot()) {
+				|| isRoot != TargetModel()->IsRoot()) {
 				RepopulateMenus();
 			}
 
@@ -1679,8 +1677,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 					// 'action' at all if he can't find it??
 					action = kActionSet;
 				}
-				Navigator()->UpdateLocation(PoseView()->TargetModel(),
-					action);
+				Navigator()->UpdateLocation(TargetModel(), action);
 			}
 
 			TrackerSettings settings;
@@ -3341,13 +3338,9 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 
 		BEntry entry(TargetModel()->EntryRef());
 		BDirectory parent;
-		entry_ref ref;
-		BEntry root("/");
-
 		bool parentIsRoot = (entry.GetParent(&parent) == B_OK
 			&& parent.GetEntry(&entry) == B_OK
-			&& entry.GetRef(&ref) == B_OK
-			&& entry == root);
+			&& FSIsRootDir(&entry));
 
 		EnableNamedMenuItem(menu, kOpenParentDir, !TargetModel()->IsDesktop()
 			&& !TargetModel()->IsRoot()
