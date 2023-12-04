@@ -670,6 +670,7 @@ SysInfoView::SysInfoView(BMessage* archive)
 	fVersionInfoView->SetText(_GetABIVersion());
 	fCPULabelView->SetText(_GetCPUCount(&sysInfo));
 	fCPUInfoView->SetText(_GetCPUInfo());
+	fMemSizeView->SetText(_GetRamSize(&sysInfo));
 	fMemUsageView->SetText(_GetRamUsage(&sysInfo));
 	fKernelDateTimeView->SetText(_GetKernelDateTime(&sysInfo));
 
