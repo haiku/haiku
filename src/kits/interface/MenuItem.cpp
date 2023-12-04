@@ -40,7 +40,7 @@ const char* kUTF8ControlMap[] = {
 	NULL, /* B_END */
 	NULL, /* B_INSERT */
 	NULL, NULL,
-	NULL, /* B_BACKSPACE */
+	"\xe2\x8c\xab", /* B_BACKSPACE U+232B */
 	"\xe2\x86\xb9", /* B_TAB U+21B9 */
 	"\xe2\x8f\x8e", /* B_ENTER, U+23CE */
 	NULL, /* B_PAGE_UP */
@@ -52,8 +52,10 @@ const char* kUTF8ControlMap[] = {
 	"\xe2\x86\x92", /* B_RIGHT_ARROW */
 	"\xe2\x86\x91", /* B_UP_ARROW */
 	"\xe2\x86\x93", /* B_DOWN_ARROW */
-	"\xe2\x90\xA3"  /* B_SPACE */
+	"\xe2\x90\xa3"  /* B_SPACE */
 };
+
+static const char* kDeleteShortcutUTF8 = "\xe2\x8c\xa6"; /* B_DELETE U+2326 */
 
 
 using BPrivate::MenuPrivate;
@@ -760,9 +762,10 @@ BMenuItem::_DrawShortcutSymbol(bool submenus)
 		where.x -= fBounds.Height() / 2;
 
 	const float ascent = MenuPrivate(fSuper).Ascent();
-	if (fShortcutChar <= B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
+	if ((fShortcutChar <= B_SPACE && kUTF8ControlMap[(int)fShortcutChar])
+		|| fShortcutChar == B_DELETE) {
 		_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
-	else
+	} else
 		fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
 
 	where.y += (fBounds.Height() - 11) / 2 - 1;
@@ -828,7 +831,9 @@ BMenuItem::_DrawControlChar(char shortcut, BPoint where)
 	// TODO: If needed, take another font for the control characters
 	//	(or have font overlays in the app_server!)
 	const char* symbol = " ";
-	if (kUTF8ControlMap[(int)fShortcutChar])
+	if (shortcut == B_DELETE)
+		symbol = kDeleteShortcutUTF8;
+	else if (kUTF8ControlMap[(int)fShortcutChar])
 		symbol = kUTF8ControlMap[(int)fShortcutChar];
 
 	fSuper->DrawString(symbol, where);
