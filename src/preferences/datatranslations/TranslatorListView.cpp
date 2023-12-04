@@ -122,6 +122,8 @@ TranslatorListView::MouseMoved(BPoint point, uint32 transit,
 		SetHighColor(0, 0, 0);
 	} else if (dragMessage != NULL && transit == B_EXITED_VIEW)
 		Invalidate();
+
+	BListView::MouseMoved(point, transit, dragMessage);
 }
 
 
