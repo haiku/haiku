@@ -66,9 +66,13 @@ enum {
 };
 
 
+static const uint32 kMsgUpdateStatus = 'stat';
 static const uint32 kMsgUpdateModifier = 'upmd';
 static const uint32 kMsgApplyModifiers = 'apmd';
 static const uint32 kMsgRevertModifiers = 'rvmd';
+
+static const int32 kUnset = 0;
+static const int32 kDisabled = -1;
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -156,7 +160,7 @@ ConflictView::_FillIcons()
 	if (fStopIcon == NULL) {
 		// Allocate the fStopIcon bitmap
 		fStopIcon = new (std::nothrow) BBitmap(Bounds(), 0, B_RGBA32);
-		if (fStopIcon->InitCheck() != B_OK) {
+		if (fStopIcon == NULL || fStopIcon->InitCheck() != B_OK) {
 			FTRACE((stderr, "_FillIcons() - No memory for stop bitmap\n"));
 			delete fStopIcon;
 			fStopIcon = NULL;
@@ -174,7 +178,7 @@ ConflictView::_FillIcons()
 	if (fWarnIcon == NULL) {
 		// Allocate the fWarnIcon bitmap
 		fWarnIcon = new (std::nothrow) BBitmap(Bounds(), 0, B_RGBA32);
-		if (fWarnIcon->InitCheck() != B_OK) {
+		if (fWarnIcon == NULL || fWarnIcon->InitCheck() != B_OK) {
 			FTRACE((stderr, "_FillIcons() - No memory for warn bitmap\n"));
 			delete fWarnIcon;
 			fWarnIcon = NULL;
@@ -214,7 +218,7 @@ ModifierKeysWindow::ModifierKeysWindow()
 
 	BMenuField* capsMenuField;
 	_CreateMenuField(&fCapsMenu, &capsMenuField, MENU_ITEM_CAPS,
-		B_TRANSLATE_COMMENT("Caps:", "Caps key role name"));
+		B_TRANSLATE_COMMENT("Caps Lock:", "Caps Lock key role name"));
 
 	BMenuField* shiftMenuField;
 	_CreateMenuField(&fShiftMenu, &shiftMenuField, MENU_ITEM_SHIFT,
@@ -296,16 +300,16 @@ ModifierKeysWindow::ModifierKeysWindow()
 			.End()
 		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
-			.Add(fCancelButton)
-			.AddGlue()
 			.Add(fRevertButton)
+			.AddGlue()
+			.Add(fCancelButton)
 			.Add(fOkButton)
 			.End()
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.End();
 
-	_MarkMenuItems();
-	_ValidateDuplicateKeys();
+	// mark menu items and update status icons
+	_UpdateStatus();
 }
 
 
@@ -322,14 +326,14 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 		case kMsgUpdateModifier:
 		{
 			int32 menuitem = MENU_ITEM_FIRST;
-			int32 key = -1;
+			int32 key = kDisabled;
 
 			for (; menuitem <= MENU_ITEM_LAST; menuitem++) {
 				if (message->FindInt32(_KeyToString(menuitem), &key) == B_OK)
 					break;
 			}
 
-			if (key == -1)
+			if (key == kDisabled)
 				return;
 
 			// menuitem contains the item we want to set
@@ -364,8 +368,7 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 					break;
 			}
 
-			_MarkMenuItems();
-			_ValidateDuplicateKeys();
+			_UpdateStatus();
 
 			// enable/disable revert button
 			fRevertButton->SetEnabled(memcmp(fCurrentMap, fSavedMap, sizeof(key_map)));
@@ -420,8 +423,7 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 		case kMsgRevertModifiers:
 			memcpy(fCurrentMap, fSavedMap, sizeof(key_map));
 
-			_MarkMenuItems();
-			_ValidateDuplicateKeys();
+			_UpdateStatus();
 
 			fRevertButton->SetEnabled(false);
 			break;
@@ -434,13 +436,14 @@ ModifierKeysWindow::MessageReceived(BMessage* message)
 
 //	#pragma mark - ModifierKeysWindow private methods
 
+
 void
-ModifierKeysWindow::_CreateMenuField(
-	BPopUpMenu** outMenu, BMenuField** outField, uint32 inKey, const char* comment)
+ModifierKeysWindow::_CreateMenuField(BPopUpMenu** _menu, BMenuField** _menuField, uint32 key,
+	const char* label)
 {
-	const char* sKey = _KeyToString(inKey);
-	const char* tKey = B_TRANSLATE_NOCOLLECT(sKey);
-	BPopUpMenu* menu = new BPopUpMenu(tKey, true, true);
+	const char* keyName = _KeyToString(key);
+	const char* name = B_TRANSLATE_NOCOLLECT(keyName);
+	BPopUpMenu* menu = new BPopUpMenu(name, true, true);
 
 	for (int32 key = MENU_ITEM_FIRST; key <= MENU_ITEM_LAST; key++) {
 		if (key == MENU_ITEM_SEPARATOR) {
@@ -451,24 +454,26 @@ ModifierKeysWindow::_CreateMenuField(
 		}
 
 		BMessage* message = new BMessage(kMsgUpdateModifier);
-		message->AddInt32(sKey, key);
+		message->AddInt32(keyName, key);
 		BMenuItem* item = new BMenuItem(B_TRANSLATE_NOCOLLECT(_KeyToString(key)), message);
 		menu->AddItem(item, key);
 	}
 
 	menu->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_VERTICAL_UNSET));
 
-	BMenuField* menuField = new BMenuField(comment, menu);
+	BMenuField* menuField = new BMenuField(label, menu);
 	menuField->SetAlignment(B_ALIGN_RIGHT);
 
-	*outMenu = menu;
-	*outField = menuField;
+	*_menu = menu;
+	*_menuField = menuField;
 }
 
 
 void
 ModifierKeysWindow::_MarkMenuItems()
 {
+	_MarkMenuItem(fCapsMenu, fCapsConflictView,
+		fCurrentMap->caps_key, fCurrentMap->caps_key);
 	_MarkMenuItem(fShiftMenu, fShiftConflictView,
 		fCurrentMap->left_shift_key, fCurrentMap->right_shift_key);
 	_MarkMenuItem(fControlMenu, fControlConflictView,
@@ -477,8 +482,6 @@ ModifierKeysWindow::_MarkMenuItems()
 		fCurrentMap->left_option_key, fCurrentMap->right_option_key);
 	_MarkMenuItem(fCommandMenu, fCommandConflictView,
 		fCurrentMap->left_command_key, fCurrentMap->right_command_key);
-	_MarkMenuItem(fCapsMenu, fCapsConflictView,
-		fCurrentMap->caps_key, fCurrentMap->caps_key);
 }
 
 
@@ -494,10 +497,13 @@ ModifierKeysWindow::_MarkMenuItem(BPopUpMenu* menu, ConflictView* conflictView,
 			menu->ItemAt(key)->SetMarked(true);
 	}
 
-	// Set the warning icon if not marked
-	BBitmap* icon = conflictView->Icon();
+	// no conflict
+	if (menu->FindMarked() != NULL)
+		return;
 
-	conflictView->SetWarnIcon(menu->FindMarked() == NULL);
+	// set the warning icon
+	BBitmap* icon = conflictView->Icon();
+	conflictView->SetWarnIcon(icon == NULL);
 
 	// if there was a change invalidate the view
 	if (icon != conflictView->Icon())
@@ -511,7 +517,7 @@ ModifierKeysWindow::_KeyToString(int32 key)
 {
 	switch (key) {
 		case MENU_ITEM_CAPS:
-			return B_TRANSLATE_COMMENT("Caps key",
+			return B_TRANSLATE_COMMENT("Caps Lock key",
 				"Label of key above Shift, usually Caps Lock");
 
 		case MENU_ITEM_SHIFT:
@@ -568,10 +574,10 @@ ModifierKeysWindow::_KeyToKeyCode(int32 key, bool right)
 			return 0x5d;
 
 		case MENU_ITEM_DISABLED:
-			return 0;
+			return kDisabled;
 	}
 
-	return 0;
+	return kUnset;
 }
 
 
@@ -607,13 +613,15 @@ ModifierKeysWindow::_DuplicateKeys()
 {
 	uint32 duplicateMask = 0;
 
-	for (int32 testKey = MENU_ITEM_FIRST; testKey <= MENU_ITEM_LAST; testKey++) {
-		uint32 testLeft = 0;
-		uint32 testRight = 0;
+	int32 testLeft, testRight, left, right;
+	for (int32 testKey = MENU_ITEM_FIRST; testKey < MENU_ITEM_SEPARATOR; testKey++) {
+		testLeft = kUnset;
+		testRight = kUnset;
 
 		switch (testKey) {
 			case MENU_ITEM_CAPS:
 				testLeft = fCurrentMap->caps_key;
+				testRight = kDisabled;
 				break;
 
 			case MENU_ITEM_SHIFT:
@@ -637,21 +645,22 @@ ModifierKeysWindow::_DuplicateKeys()
 				break;
 		}
 
-		if (testLeft == 0 && testRight == 0)
+		if (testLeft == kUnset && (testRight == kUnset || testRight == kDisabled))
 			continue;
 
-		for (int32 key = MENU_ITEM_FIRST; key <= MENU_ITEM_LAST; key++) {
+		for (int32 key = MENU_ITEM_FIRST; key < MENU_ITEM_SEPARATOR; key++) {
 			if (key == testKey) {
 				// skip over yourself
 				continue;
 			}
 
-			uint32 left = 0;
-			uint32 right = 0;
+			left = kUnset;
+			right = kUnset;
 
 			switch (key) {
 				case MENU_ITEM_CAPS:
 					left = fCurrentMap->caps_key;
+					right = kDisabled;
 					break;
 
 				case MENU_ITEM_SHIFT:
@@ -675,7 +684,7 @@ ModifierKeysWindow::_DuplicateKeys()
 					break;
 			}
 
-			if (left == 0 && right == 0)
+			if (left == kUnset && (right == kUnset || right == kDisabled))
 				continue;
 
 			if (left == testLeft || right == testRight) {
@@ -686,4 +695,37 @@ ModifierKeysWindow::_DuplicateKeys()
 	}
 
 	return duplicateMask;
+}
+
+
+void
+ModifierKeysWindow::_HideShowStatusIcons()
+{
+	_ToggleStatusIcon(fCapsConflictView);
+	_ToggleStatusIcon(fShiftConflictView);
+	_ToggleStatusIcon(fControlConflictView);
+	_ToggleStatusIcon(fOptionConflictView);
+	_ToggleStatusIcon(fCommandConflictView);
+}
+
+
+void
+ModifierKeysWindow::_ToggleStatusIcon(ConflictView* view)
+{
+	if (view->Icon() == NULL) {
+		if (!view->IsHidden())
+			view->Hide();
+	} else {
+		if (view->IsHidden())
+			view->Show();
+	}
+}
+
+
+void
+ModifierKeysWindow::_UpdateStatus()
+{
+	_ValidateDuplicateKeys();
+	_MarkMenuItems();
+	_HideShowStatusIcons();
 }

@@ -46,10 +46,8 @@ public:
 	virtual	void					MessageReceived(BMessage* message);
 
 private:
-			void					_CreateMenuField(
-										BPopUpMenu** outMenu, BMenuField** outField,
-										uint32 inKey, const char* comment);
-
+			void					_CreateMenuField(BPopUpMenu** _menu, BMenuField** _field,
+										uint32 key, const char* label);
 			void					_MarkMenuItems();
 			void					_MarkMenuItem(BPopUpMenu* menu, ConflictView* conflictView,
 										uint32 leftKey, uint32 rightKey);
@@ -60,6 +58,9 @@ private:
 			void					_ValidateDuplicateKeys();
 			void					_ValidateDuplicateKey(ConflictView* view, uint32 mask);
 			uint32					_DuplicateKeys();
+			void					_HideShowStatusIcons();
+			void					_ToggleStatusIcon(ConflictView* view);
+			void					_UpdateStatus();
 
 			BPopUpMenu*				fCapsMenu;
 			BPopUpMenu*				fShiftMenu;
