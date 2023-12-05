@@ -18,6 +18,7 @@ Preference Keymap :
 	KeymapListItem.cpp
 	KeymapWindow.cpp
 	ModifierKeysWindow.cpp
+	StatusMenuField.cpp
 
 	: be tracker localestub shared [ TargetLibstdc++ ]
 	: Keymap.rdef
@@ -29,4 +30,5 @@ DoCatalogs Keymap :
 	KeyboardLayoutView.cpp
 	KeymapWindow.cpp
 	ModifierKeysWindow.cpp
+	StatusMenuField.cpp
 ;
