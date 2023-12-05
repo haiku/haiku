@@ -36,8 +36,5 @@ static const rgb_color kDefaultUsedSpaceColor = { 0, 203, 0, kDefaultSpaceBarAlp
 static const rgb_color kDefaultFreeSpaceColor = { 255, 255, 255, kDefaultSpaceBarAlpha };
 static const rgb_color kDefaultWarningSpaceColor = { 203, 0, 0, kDefaultSpaceBarAlpha };
 
-static const bool kDefaultDontMoveFilesToTrash = false;
-static const bool kDefaultAskBeforeDeleteFile = true;
-
 
 #endif	// _TRACKER_DEFAULTS_H

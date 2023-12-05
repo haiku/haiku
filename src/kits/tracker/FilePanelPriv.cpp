@@ -970,9 +970,7 @@ TFilePanel::AddFileContextMenus(BMenu* menu)
 		new BMessage(kEditItem), 'E'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
 		new BMessage(kDuplicateSelection), 'D'));
-	menu->AddItem(new BMenuItem(TrackerSettings().DontMoveFilesToTrash()
-		? B_TRANSLATE("Delete")
-		: B_TRANSLATE("Move to Trash"),
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Move to Trash"),
 		new BMessage(kMoveToTrash), 'T'));
 	menu->AddSeparatorItem();
 

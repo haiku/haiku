@@ -451,15 +451,9 @@ BPoseView::DeleteProperty(BMessage* specifier, int32 form,
 			return false;
 		}
 
-		if (result == B_OK) {
-			TrackerSettings settings;
-			if (!settings.DontMoveFilesToTrash()) {
-				// move the list we build into trash, don't make the
-				// trashing task select the next item
-				MoveListToTrash(entryList, false, false);
-			} else
-				Delete(entryList, false, settings.AskBeforeDeleteFile());
-		} else {
+		if (result == B_OK)
+			MoveListToTrash(entryList, false, false);
+		else {
 			for (int i = entryList->CountItems() - 1; i >= 0; i--)
 				delete entryList->ItemAt(i);
 			delete entryList;

@@ -2403,27 +2403,12 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kDelete:
-			ExcludeTrashFromSelection();
-			if (ContainerWindow()->IsTrash())
-				// if trash delete instantly
-				DeleteSelection(true, false);
-			else
-				DeleteSelection();
+			DoDelete();
 			break;
 
 		case kMoveToTrash:
-		{
-			ExcludeTrashFromSelection();
-			TrackerSettings settings;
-
-			if ((modifiers() & B_SHIFT_KEY) != 0
-				|| settings.DontMoveFilesToTrash()) {
-				DeleteSelection(true, settings.AskBeforeDeleteFile());
-			} else
-				MoveSelectionToTrash();
-
+			DoMoveToTrash();
 			break;
-		}
 
 		case kCleanupAll:
 			Cleanup(true);
@@ -6293,7 +6278,7 @@ BPoseView::MoveEntryToTrash(const entry_ref* ref, bool selectNext)
 
 
 void
-BPoseView::DeleteSelection(bool selectNext, bool askUser)
+BPoseView::DeleteSelection(bool selectNext, bool confirm)
 {
 	int32 selectCount = CountSelected();
 	if (selectCount <= 0)
@@ -6312,7 +6297,7 @@ BPoseView::DeleteSelection(bool selectNext, bool askUser)
 			*fSelectionList->ItemAt(index)->TargetModel()->EntryRef()));
 	}
 
-	Delete(entriesToDelete, selectNext, askUser);
+	Delete(entriesToDelete, selectNext, confirm);
 }
 
 
@@ -6336,18 +6321,18 @@ BPoseView::RestoreSelectionFromTrash(bool selectNext)
 
 
 void
-BPoseView::Delete(const entry_ref &ref, bool selectNext, bool askUser)
+BPoseView::Delete(const entry_ref &ref, bool selectNext, bool confirm)
 {
 	BObjectList<entry_ref>* entriesToDelete
 		= new BObjectList<entry_ref>(1, true);
 	entriesToDelete->AddItem(new entry_ref(ref));
 
-	Delete(entriesToDelete, selectNext, askUser);
+	Delete(entriesToDelete, selectNext, confirm);
 }
 
 
 void
-BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool askUser)
+BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool confirm)
 {
 	if (list->CountItems() == 0) {
 		delete list;
@@ -6358,7 +6343,7 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool askUser)
 		new BObjectList<FunctionObject>(2, true);
 
 	// first move selection to trash,
-	taskList->AddItem(NewFunctionObject(FSDeleteRefList, list, false, askUser));
+	taskList->AddItem(NewFunctionObject(FSDeleteRefList, list, false, confirm));
 
 	if (selectNext && ViewMode() == kListMode) {
 		// next, if in list view mode try selecting the next item after
@@ -6429,6 +6414,41 @@ BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
 
 	// execute the two tasks in order
 	ThreadSequence::Launch(taskList, true);
+}
+
+
+void
+BPoseView::DoDelete()
+{
+	ExcludeTrashFromSelection();
+
+	// Trash deletes instantly without checking for confirmation
+	if (TargetModel()->IsTrash())
+		return DeleteSelection(true, false);
+
+	DeleteSelection();
+}
+
+
+void
+BPoseView::DoMoveToTrash()
+{
+	ExcludeTrashFromSelection();
+
+	// happens when called from within Open with... for example
+	if (TargetModel() == NULL)
+		return;
+
+	// Trash deletes instantly without checking for confirmation
+	if (TargetModel()->IsTrash())
+		return DeleteSelection(true, false);
+
+	bool shiftDown = (Window()->CurrentMessage()->FindInt32("modifiers")
+		& B_SHIFT_KEY) != 0;
+	if (shiftDown)
+		DeleteSelection();
+	else
+		MoveSelectionToTrash();
 }
 
 
@@ -6735,24 +6755,7 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 
 		case B_DELETE:
 		{
-			ExcludeTrashFromSelection();
-			if (TargetModel() == NULL) {
-				// Happens if called from within OpenWith window, for example
-				break;
-			}
-			// Make sure user can't trash something already in the trash.
-			if (TargetModel()->IsTrash()) {
-				// Delete without asking from the trash
-				DeleteSelection(true, false);
-			} else {
-				TrackerSettings settings;
-
-				if ((modifiers() & B_SHIFT_KEY) != 0
-					|| settings.DontMoveFilesToTrash()) {
-					DeleteSelection(true, settings.AskBeforeDeleteFile());
-				} else
-					MoveSelectionToTrash();
-			}
+			DoMoveToTrash();
 			break;
 		}
 
