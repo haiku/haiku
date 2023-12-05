@@ -677,7 +677,7 @@ WindowsSettingsView::IsDefaultable() const
 		|| settings.TransparentSelection() != true
 		|| settings.SortFolderNamesFirst() != true
 		|| settings.TypeAheadFiltering() != false
-		|| settings.GenerateImageThumbnails() != false;
+		|| settings.GenerateImageThumbnails() != true;
 }
 
 
