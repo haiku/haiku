@@ -197,7 +197,7 @@ local utilities_src =
 	utxfmutex.c
 	;
 
-StaticLibrary libacpi_ca.a :
+KernelStaticLibrary libacpi_ca.a :
 	$(dispatcher_src)
 	$(events_src)
 	$(executer_src)
