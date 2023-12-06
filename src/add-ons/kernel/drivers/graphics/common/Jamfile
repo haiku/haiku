@@ -6,6 +6,6 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 
-StaticLibrary libgraphicscommon.a :
+KernelStaticLibrary libgraphicscommon.a :
 	memory_manager.c
 ;
