@@ -1356,39 +1356,39 @@ const char*
 KeyboardLayoutView::_NameForModifier(uint32 modifier, bool pretty)
 {
 	if (modifier == B_CAPS_LOCK)
-		return pretty ? B_TRANSLATE("Caps lock") : "caps_key";
+		return pretty ? B_TRANSLATE("Caps Lock") : "caps_key";
 	else if (modifier == B_NUM_LOCK)
-		return pretty ? B_TRANSLATE("Num lock") : "num_key";
+		return pretty ? B_TRANSLATE("Num Lock") : "num_key";
 	else if (modifier == B_SCROLL_LOCK)
-		return pretty ? B_TRANSLATE("Scroll lock") : "scroll_key";
+		return pretty ? B_TRANSLATE("Scroll Lock") : "scroll_key";
 	else if (modifier == B_SHIFT_KEY) {
 		return pretty ? B_TRANSLATE_COMMENT("Shift", "Shift key")
 			: "shift_key";
 	} else if (modifier == B_LEFT_SHIFT_KEY)
-		return pretty ? B_TRANSLATE("Left shift") : "left_shift_key";
+		return pretty ? B_TRANSLATE("Left Shift") : "left_shift_key";
 	else if (modifier == B_RIGHT_SHIFT_KEY)
-		return pretty ? B_TRANSLATE("Right shift") : "right_shift_key";
+		return pretty ? B_TRANSLATE("Right Shift") : "right_shift_key";
 	else if (modifier == B_COMMAND_KEY) {
 		return pretty ? B_TRANSLATE_COMMENT("Command", "Command key")
 			: "command_key";
 	} else if (modifier == B_LEFT_COMMAND_KEY)
-		return pretty ? B_TRANSLATE("Left command") : "left_command_key";
+		return pretty ? B_TRANSLATE("Left Command") : "left_command_key";
 	else if (modifier == B_RIGHT_COMMAND_KEY)
-		return pretty ? B_TRANSLATE("Right command") : "right_command_key";
+		return pretty ? B_TRANSLATE("Right Command") : "right_command_key";
 	else if (modifier == B_CONTROL_KEY) {
 		return pretty ? B_TRANSLATE_COMMENT("Control", "Control key")
 			: "control_key";
 	} else if (modifier == B_LEFT_CONTROL_KEY)
-		return pretty ? B_TRANSLATE("Left control") : "left_control_key";
+		return pretty ? B_TRANSLATE("Left Control") : "left_control_key";
 	else if (modifier == B_RIGHT_CONTROL_KEY)
-		return pretty ? B_TRANSLATE("Right control") : "right_control_key";
+		return pretty ? B_TRANSLATE("Right Control") : "right_control_key";
 	else if (modifier == B_OPTION_KEY) {
 		return pretty ? B_TRANSLATE_COMMENT("Option", "Option key")
 			: "option_key";
 	} else if (modifier == B_LEFT_OPTION_KEY)
-		return pretty ? B_TRANSLATE("Left option") : "left_option_key";
+		return pretty ? B_TRANSLATE("Left Option") : "left_option_key";
 	else if (modifier == B_RIGHT_OPTION_KEY)
-		return pretty ? B_TRANSLATE("Right option") : "right_option_key";
+		return pretty ? B_TRANSLATE("Right Option") : "right_option_key";
 	else if (modifier == B_MENU_KEY)
 		return pretty ? B_TRANSLATE_COMMENT("Menu", "Menu key") : "menu_key";
 
