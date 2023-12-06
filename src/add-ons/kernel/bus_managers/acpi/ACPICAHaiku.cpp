@@ -1218,12 +1218,6 @@ AcpiOsSignal(UINT32 function, void *info)
  * Adapted from FreeBSD since the documentation of its intended impl
  * is lacking.
  *  Section 5.2.10.1: global lock acquire/release functions */
-#define GL_ACQUIRED     (-1)
-#define GL_BUSY         0
-#define GL_BIT_PENDING  0x01
-#define GL_BIT_OWNED    0x02
-#define GL_BIT_MASK     (GL_BIT_PENDING | GL_BIT_OWNED)
-
 
 /*
  * Adapted from FreeBSD since the documentation of its intended impl
@@ -1233,18 +1227,18 @@ AcpiOsSignal(UINT32 function, void *info)
  * and then attempt to acquire it again.
  */
 int
-AcpiOsAcquireGlobalLock(uint32 *lock)
+AcpiOsAcquireGlobalLock(volatile uint32_t *lock)
 {
-	uint32 newValue;
-	uint32 oldValue;
+	uint32_t newValue;
+	uint32_t oldValue;
 
 	do {
 		oldValue = *lock;
-		newValue = ((oldValue & ~GL_BIT_MASK) | GL_BIT_OWNED) |
-				((oldValue >> 1) & GL_BIT_PENDING);
-		atomic_test_and_set((int32*)lock, newValue, oldValue);
-	} while (*lock == oldValue);
-	return ((newValue < GL_BIT_MASK) ? GL_ACQUIRED : GL_BUSY);
+		newValue = ((oldValue & ~ACPI_GLOCK_PENDING) | ACPI_GLOCK_OWNED);
+		if ((oldValue & ACPI_GLOCK_OWNED) != 0)
+			newValue |= ACPI_GLOCK_PENDING;
+	} while (atomic_test_and_set((int32*)lock, newValue, oldValue) != (int32)oldValue);
+	return (newValue & ACPI_GLOCK_PENDING) != 0;
 }
 
 
@@ -1256,17 +1250,16 @@ AcpiOsAcquireGlobalLock(uint32 *lock)
  * releases the lock.
  */
 int
-AcpiOsReleaseGlobalLock(uint32 *lock)
+AcpiOsReleaseGlobalLock(volatile uint32_t *lock)
 {
 	uint32 newValue;
 	uint32 oldValue;
 
 	do {
 		oldValue = *lock;
-		newValue = oldValue & ~GL_BIT_MASK;
-		atomic_test_and_set((int32*)lock, newValue, oldValue);
-	} while (*lock == oldValue);
-	return (oldValue & GL_BIT_PENDING);
+		newValue = oldValue & ~(ACPI_GLOCK_PENDING | ACPI_GLOCK_OWNED);
+	} while (atomic_test_and_set((int32*)lock, newValue, oldValue) != (int32)oldValue);
+	return (oldValue & ACPI_GLOCK_PENDING) != 0;
 }
 
 
