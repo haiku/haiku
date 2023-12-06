@@ -193,7 +193,7 @@ AcpiPsDeleteParseTree (
         if (Op != Parent)
         {
             /* This is the descending case */
-#if 0 //gcc2.95.3 warns about printf format in code we do not use
+
             if (ACPI_IS_DEBUG_ENABLED (ACPI_LV_PARSE_TREES, _COMPONENT))
             {
                 /* This debug option will print the entire parse tree */
@@ -211,7 +211,7 @@ AcpiPsDeleteParseTree (
                 }
                 AcpiOsPrintf ("\n");
             }
-#endif
+
             /* Look for an argument or child of the current op */
 
             Next = AcpiPsGetArg (Op, 0);
