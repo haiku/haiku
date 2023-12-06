@@ -628,8 +628,6 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	if (!packageRef.IsSet())
 		return;
 
-	PackageInfo& package = *packageRef.Get();
-
 	// Package icon and title
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	UpdateIconAndTitle();
@@ -642,7 +640,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	UpdateVersion();
 	UpdateVersionCreateTimestamp();
 
-	package.AddListener(fPackageListener);
+	packageRef->AddListener(fPackageListener);
 }
 
 

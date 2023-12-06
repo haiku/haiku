@@ -11,6 +11,7 @@
 #include <Locker.h>
 
 #include "AbstractProcess.h"
+#include "DepotInfo.h"
 #include "PackageIconTarRepository.h"
 #include "LanguageModel.h"
 #include "PackageInfo.h"

@@ -14,6 +14,7 @@
 #include <package/PackageVersion.h>
 
 #include "AccessToken.h"
+#include "DepotInfo.h"
 #include "PackageInfo.h"
 #include "PasswordRequirements.h"
 #include "UserCredentials.h"

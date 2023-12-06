@@ -59,6 +59,7 @@ local sourceDirs =
 	edits_generic
 	model
 	packagemanagement
+	packagemodel
 	process
 	textview
 	ui
@@ -137,7 +138,6 @@ local applicationSources =
 	Model.cpp
 	PackageContentsView.cpp
 	PackageIconTarRepository.cpp
-	PackageInfo.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
@@ -169,6 +169,17 @@ local applicationSources =
 	PackageAction.cpp
 	PackageManager.cpp
 	UninstallPackageProcess.cpp
+
+	#packagemodel
+	DepotInfo.cpp
+	Language.cpp
+	PackageCategory.cpp
+	PackageInfo.cpp
+	PublisherInfo.cpp
+	RatingSummary.cpp
+	ScreenshotInfo.cpp
+	UserInfo.cpp
+	UserRating.cpp
 
 	# network + server / local processes
 	AbstractProcess.cpp

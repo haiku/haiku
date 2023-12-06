@@ -14,7 +14,7 @@
 #include <stdlib.h>
 
 
-#define MILLIS_IN_DAY (1000 * 60 * 60 * 24)
+#define MILLIS_IN_DAY 86400000L
 
 #define HDLOGLEVELCHAR(L) ( \
 	L == LOG_LEVEL_INFO ? 'I' \
@@ -33,7 +33,7 @@
 // cumbersome.
 
 #define HDLOGPREFIX(L) printf("@%08" B_PRId64 " {%c} <t:%" B_PRId32 "> ", \
-	((system_time() / 1000) % MILLIS_IN_DAY), \
+	((system_time() / 1000L) % MILLIS_IN_DAY), \
 	HDLOGLEVELCHAR(L), \
 	abs(find_thread(NULL) % 1000) \
 );
