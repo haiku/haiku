@@ -201,11 +201,11 @@ extern int AcpiOsAcquireGlobalLock(uint32 *lock);
 extern int AcpiOsReleaseGlobalLock(uint32 *lock);
 
 #define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq)    do {                \
-        (Acq) = AcpiOsAcquireGlobalLock((uint32 *)&((GLptr)->GlobalLock));    \
+        (Acq) = AcpiOsAcquireGlobalLock(&((GLptr)->GlobalLock));    \
 } while (0)
 
 #define ACPI_RELEASE_GLOBAL_LOCK(GLptr, Acq)    do {                \
-        (Acq) = AcpiOsReleaseGlobalLock((uint32 *)&((GLptr)->GlobalLock));    \
+        (Acq) = AcpiOsReleaseGlobalLock(&((GLptr)->GlobalLock));    \
 } while (0)
 
 #else /* _KERNEL_MODE */
