@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ServerRepositoryDataUpdateProcess.h"
@@ -92,7 +92,7 @@ DepotMatchingRepositoryListener::_SetupRepositoryData(DepotInfoRef& depot,
 		HDDEBUG("[DepotMatchingRepositoryListener] associated depot [%s] (%s) "
 			"with server repository source [%s] (%s)",
 			depot->Name().String(),
-			depot->URL().String(),
+			depot->Identifier().String(),
 			repositorySourceCode->String(),
 			repositorySource->Identifier()->String());
 	} else {
@@ -113,8 +113,7 @@ DepotMatchingRepositoryListener::Handle(const BString& identifier,
 		AutoLocker<BLocker> locker(fModel->Lock());
 		for (int32 i = 0; i < fModel->CountDepots(); i++) {
 			DepotInfoRef depot = fModel->DepotAtIndex(i);
-			BString depotUrl = depot->URL();
-			if (identifier == depotUrl)
+			if (identifier == depot->Identifier())
 				_SetupRepositoryData(depot, repository, repositorySource);
 		}
 	}

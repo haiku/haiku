@@ -40,6 +40,7 @@ _IsPackageBefore(const PackageInfoRef& p1, const PackageInfoRef& p2)
 DepotInfo::DepotInfo()
 	:
 	fName(),
+	fIdentifier(),
 	fWebAppRepositoryCode()
 {
 }
@@ -48,6 +49,7 @@ DepotInfo::DepotInfo()
 DepotInfo::DepotInfo(const BString& name)
 	:
 	fName(name),
+	fIdentifier(),
 	fWebAppRepositoryCode(),
 	fWebAppRepositorySourceCode()
 {
@@ -57,10 +59,10 @@ DepotInfo::DepotInfo(const BString& name)
 DepotInfo::DepotInfo(const DepotInfo& other)
 	:
 	fName(other.fName),
+	fIdentifier(other.fIdentifier),
 	fPackages(other.fPackages),
 	fWebAppRepositoryCode(other.fWebAppRepositoryCode),
-	fWebAppRepositorySourceCode(other.fWebAppRepositorySourceCode),
-	fURL(other.fURL)
+	fWebAppRepositorySourceCode(other.fWebAppRepositorySourceCode)
 {
 }
 
@@ -69,8 +71,8 @@ DepotInfo&
 DepotInfo::operator=(const DepotInfo& other)
 {
 	fName = other.fName;
+	fIdentifier = other.fIdentifier;
 	fPackages = other.fPackages;
-	fURL = other.fURL;
 	fWebAppRepositoryCode = other.fWebAppRepositoryCode;
 	fWebAppRepositorySourceCode = other.fWebAppRepositorySourceCode;
 	return *this;
@@ -81,6 +83,7 @@ bool
 DepotInfo::operator==(const DepotInfo& other) const
 {
 	return fName == other.fName
+		&& fIdentifier == fIdentifier
 		&& fPackages == other.fPackages;
 }
 
@@ -204,9 +207,9 @@ DepotInfo::HasAnyProminentPackages() const
 
 
 void
-DepotInfo::SetURL(const BString& URL)
+DepotInfo::SetIdentifier(const BString& value)
 {
-	fURL = URL;
+	fIdentifier = value;
 }
 
 

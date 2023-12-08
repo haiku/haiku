@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
@@ -28,7 +28,6 @@
 #include "Logger.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
-#include "RepositoryUrlUtils.h"
 
 #include <package/Context.h>
 #include <package/manager/Exceptions.h>
@@ -119,7 +118,7 @@ LocalPkgDataLoadProcess::RunInternal()
 			repoName, &repoConfig);
 
 		if (getRepositoryConfigStatus == B_OK) {
-			depotInfoRef->SetURL(repoConfig.Identifier());
+			depotInfoRef->SetIdentifier(repoConfig.Identifier());
 			HDDEBUG("[%s] local repository [%s] identifier; [%s]",
 				Name(), repoName.String(), repoConfig.Identifier().String());
 		} else {
@@ -224,8 +223,7 @@ LocalPkgDataLoadProcess::RunInternal()
 			std::vector<DepotInfoRef>::iterator it;
 
 			for (it = depots.begin(); it != depots.end(); it++) {
-				if (RepositoryUrlUtils::EqualsNormalized(
-					(*it)->URL(), remoteRepository->Config().Identifier())) {
+				if ((*it)->Identifier() == remoteRepository->Config().Identifier()) {
 					break;
 				}
 			}

@@ -29,7 +29,6 @@
 #include "Logger.h"
 #include "LocaleUtils.h"
 #include "StorageUtils.h"
-#include "RepositoryUrlUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT

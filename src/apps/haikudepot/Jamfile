@@ -213,7 +213,6 @@ local applicationSources =
 	LanguageMenuUtils.cpp
 	LocaleUtils.cpp
 	PackageUtils.cpp
-	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
 	StringUtils.cpp
 	LoggingUrlProtocolListener.cpp

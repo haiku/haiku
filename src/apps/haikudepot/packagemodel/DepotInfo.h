@@ -27,6 +27,10 @@ public:
 			const BString&		Name() const
 									{ return fName; }
 
+			void				SetIdentifier(const BString& value);
+			const BString&		Identifier() const
+									{ return fIdentifier; }
+
 			int32				CountPackages() const;
 			PackageInfoRef		PackageAtIndex(int32 index);
 			void				AddPackage(PackageInfoRef& package);
@@ -37,10 +41,6 @@ public:
 									const BReference<DepotInfo>& other);
 
 			bool				HasAnyProminentPackages() const;
-
-			void				SetURL(const BString& URL);
-			const BString&		URL() const
-									{ return fURL; }
 
 			void				SetWebAppRepositoryCode(const BString& code);
 			const BString&		WebAppRepositoryCode() const
@@ -53,12 +53,11 @@ public:
 
 private:
 			BString				fName;
+			BString				fIdentifier;
 			std::vector<PackageInfoRef>
 								fPackages;
 			BString				fWebAppRepositoryCode;
 			BString				fWebAppRepositorySourceCode;
-			BString				fURL;
-				// this is actually a unique identifier for the repository.
 };
 
 
