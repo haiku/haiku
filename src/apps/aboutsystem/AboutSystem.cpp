@@ -21,6 +21,7 @@
 #include <string>
 
 #include <AboutWindow.h>
+#include <AppDefs.h>
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -214,6 +215,17 @@ private:
 			int32			fCropTop;
 			int32			fCropRight;
 			int32			fCropBottom;
+};
+
+
+class SysInfoDragger : public BDragger {
+public:
+							SysInfoDragger(BView* target);
+
+	virtual	void			MessageReceived(BMessage* message);
+
+private:
+			BView*			fTarget;
 };
 
 
@@ -528,6 +540,33 @@ CropView::DoLayout()
 }
 
 
+//	#pragma mark - SysInfoDragger
+
+
+SysInfoDragger::SysInfoDragger(BView* target)
+	:
+	BDragger(BRect(0, 0, 7, 7), target, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM),
+	fTarget(target)
+{
+}
+
+
+void
+SysInfoDragger::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case _SHOW_DRAG_HANDLES_:
+			if (fTarget != NULL)
+				fTarget->Invalidate();
+			break;
+
+		default:
+			BDragger::MessageReceived(message);
+			break;
+	}
+}
+
+
 //	#pragma mark - SysInfoView
 
 
@@ -712,7 +751,7 @@ SysInfoView::Draw(BRect updateRect)
 	BView::Draw(updateRect);
 
 	// stroke a line around the view
-	if (_OnDesktop())
+	if (_OnDesktop() && fDragger != NULL && fDragger->AreDraggersDrawn())
 		StrokeRect(Bounds());
 }
 
@@ -969,8 +1008,7 @@ void
 SysInfoView::_CreateDragger()
 {
 	// create replicant dragger and add it as the new child 0
-	fDragger = new BDragger(BRect(0, 0, 7, 7), this,
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fDragger = new SysInfoDragger(this);
 	BPopUpMenu* popUp = new BPopUpMenu("Shelf", false, false, B_ITEMS_IN_COLUMN);
 	popUp->AddItem(new BMenuItem(B_TRANSLATE("Remove replicant"),
 		new BMessage(kDeleteReplicant)));
