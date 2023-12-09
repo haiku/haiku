@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3114778516
+1	turkish	x-vnd.Haiku-libtracker	1773232307
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -300,6 +300,7 @@ Select all	ContainerWindow		Tümünü seç
 apps	B_APPS_DIRECTORY		uygulamalar
 Error calculating folder size.	InfoWindow		Klasör boyutu hesaplanırken hata.
 Delete	FSUtils		Sil
+Duplicate	FilePanelPriv		Çoğalt
 Edit name	ContainerWindow		Yeniden adlandır
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" açılamıyor (Eksik sembol: %symbol).\n
 ASCII Text	AttributesView		ASCII metin
@@ -336,6 +337,7 @@ yes	AttributesView		evet
 Make active printer	ContainerWindow		Etkin yazıcı kıl
 Copy to	ContainerWindow		Kopyala
 Name	SelectionWindow		Ad
+Location	Default Query Columns		Konum
 by attribute	FindPanel		öznitelik ile
 Write	FilePermissionsView		Yazma
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.

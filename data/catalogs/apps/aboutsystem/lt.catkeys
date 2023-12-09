@@ -1,8 +1,6 @@
-1	lithuanian	x-vnd.Haiku-About	1735122154
-Revision	AboutView		modifikacija
+1	lithuanian	x-vnd.Haiku-About	1943116186
 The Haikuware team and their bounty program\n	AboutView		„Haikuware“ komandai už premijavimo programą bei šios programos dalyviams\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		© 1999-2007 Michael C. Ring. Visos teisės saugomos.
-%.2f GHz	AboutView		%.2f GHz
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		© 2002-2004 Vivek Mohan. Visos teisės saugomos.
 \n\nSpecial thanks to:\n	AboutView		\n\nYpatingos padėkos:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis'ui Geiselbrecht'ui (už „NewOS“ branduolį)\n
@@ -20,7 +18,6 @@ Testing and bug triaging:\n	AboutView		Testavimas ir riktų patikra:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesorius:} few{# procesoriai:} other{# procesorių:}}
 Ralink WiFi Firmware	AboutWindow		„Ralink“ WiFi aparatinė programinė įranga
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Pirminiai tekstai, kurti specialiai „Haiku“ projektui, ypač branduolys ir bet koks programinis kodas, su kuriuo programos gali būti saistomos, yra platinamas pagal <MIT licenciją>. Kai kuriose sisteminėse bibliotekose gali būti trečiųjų šalių kurto programinio kodo, platinamo pagal <LGPL licenciją>. Trečiųjų šalių kurto programinio kodo autorių teisės išvardintos žemiau.\n\n
-%d MiB total	AboutView		%d MiB iš viso
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		© 1996-1997 Jeff Prosise. Visos teisės saugomos.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		© 1999-2006 Brian Paul. Mesa3D Project. Visos teisės saugomos.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		© 2010-2011 Google Inc. Visos teisės saugomos.
@@ -30,10 +27,10 @@ Unknown	AboutView		Nežinoma
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ir jos programuotojų komandai, už tai, kad sukūrė BeOS!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		© 2002-2014 „Industrial Light & Magic“, „Lucas Digital Ltd. LLC“ padalinys.
 Licenses: 	AboutView		Licencijos: 
+%ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Visos autorių teisės į „Haiku“ pirminius tekstus priklauso „Haiku, Inc.“ arba konkretiems tuose tekstuose paminėtiems autoriams. „Haiku“® ir „HAIKU“® logotipas yra registruoti „Haiku, Inc.“ prekės ženklai.\n\n
 Copyright © 2009 Colin Percival	AboutView		© 2009 Colin Percival
 Time running:	AboutView		Veikimo laikas:
-%ld MHz	AboutView		%ld MHz
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		© 1996-2005 Julian R Seward. Visos teisės saugomos.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		© 1994-2009, Thomas G. Lane, Guido Vollbeding. Ši programinė įranga iš dalies pagrįsta „Independent JPEG Group“ darbu.
@@ -59,7 +56,6 @@ Current maintainers:\n	AboutView		Dabartiniai vystytojai:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		© 1995, 1998-2001 Jef Poskanzer. Visos teisės saugomos.
 Intel WiFi Firmware	AboutWindow		„Intel“ WiFi aparatinė programinė įranga
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		© 2007-2009 Marvell Semiconductor, Inc. Visos teisės saugomos.
-%d MiB used (%s)	AboutView		%d MiB naudojama (%s)
 Version:	AboutView		Versija:
 The BeGeistert team\n	AboutView		„BeGeistert“ komandai\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
@@ -67,7 +63,6 @@ Intel (2xxx firmware)	AboutWindow		„Intel“ (2xxx aparatinė programinė įra
 License: 	AboutView		Licencija: 
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Oklando universitetui ir Kristofui Luterotui\n\n
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB iš viso, %inaccessible MiB nepasiekiama
 Copyright © 2012-2016 Google Internationalization team.	AboutView		© 2012-2016 „Google“ internacionalizacijos komanda.
 Copyright © 2001-%ld The Haiku project. 	AboutView		© 2001-%ld „Haiku“ projektas. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		© 1994-2008 Xiph.Org. Visos teisės saugomos.
@@ -75,11 +70,12 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		© 1995-2004 
 Copyright © 2001-2003 Expat maintainers.	AboutView		© 2001-2003 Expat maintainers.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		© 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Vertimai:\n
-Memory:	AboutView		Atmintis:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…ir galbūt dar kažkas, ką pamiršome paminėti (atleiskite!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		© 2006-2015 Intel Corporation. Visos teisės saugomos.
 BSD (2-clause)	AboutWindow		BSD (2 punktų)
 Website & marketing:\n	AboutView		Svetainė ir rinkodara:\n
+%d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB naudojama (%s)
+%.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f GHz
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 m. parašė Andy Ritger, remdamasis „Generalized Timing Formula“ standartu.
 …and the many people making donations!\n\n	AboutView		…taip pat daugybei pinigus aukojusių žmonių!\n\n
 Marvell (firmware)	AboutWindow		„Marvell“ (aparatinė programinė įranga)

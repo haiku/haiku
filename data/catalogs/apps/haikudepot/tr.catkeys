@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2837468702
+1	turkish	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%
 Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Log in	UserLoginWindow		Giriş yap
 Usage conditions	UserUsageConditions		Kullanım koşulları
+Populating package sizes	PopulatePkgSizesProcess		Paket boyutları dolduruluyor
 HaikuDepot	System name		Haiku Depo
 Screenshot	ScreenshotWindow		Ekran görüntüsü
 Email address:	UserLoginWindow		E-posta adresi:

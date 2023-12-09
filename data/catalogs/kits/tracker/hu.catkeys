@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3955111295
+1	hungarian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -337,6 +337,7 @@ yes	AttributesView		igen
 Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Copy to	ContainerWindow		Másolás
 Name	SelectionWindow		A név
+Location	Default Query Columns		Hely
 by attribute	FindPanel		jellemző szerint
 Write	FilePermissionsView		Írás
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ha megváltoztatos a rendszermappát vagy annak tartalmát, akkor a %osName nem fog elindulni!\n\nBiztosan ezt akarod tenni?\n\nA rendszermappa vagy annak tartalmának bármilyen módosításához tartsd lenyomva a Shift billentyűt, és kattints a \"Tudom, mit csinálok\" gombra.

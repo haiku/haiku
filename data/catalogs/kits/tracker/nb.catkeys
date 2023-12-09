@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1440907020
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -300,6 +300,7 @@ Select all	ContainerWindow		Merk alle
 apps	B_APPS_DIRECTORY		apps
 Error calculating folder size.	InfoWindow		Feil ved beregning av mappestørrelse
 Delete	FSUtils		Slett
+Duplicate	FilePanelPriv		Dupliser
 Edit name	ContainerWindow		Rediger navn
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunne ikke åpne \"%document\" (Manglende symbol: %symbol). \n
 ASCII Text	AttributesView		ASCII-tekst
@@ -336,6 +337,7 @@ yes	AttributesView		ja
 Make active printer	ContainerWindow		Sett som aktiv skriver
 Copy to	ContainerWindow		Kopier til
 Name	SelectionWindow		Navn
+Location	Default Query Columns		Plassering
 by attribute	FindPanel		etter attributt
 Write	FilePermissionsView		Skriv
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du endrer systemmappen eller dens innhold, vil du ikke kunne starte %osName!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å endre systemmappen eller dens innhold uansett, hold nede Shift-tasten og klikk på \"Jeg vet hva jeg gjør\".

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	834755355
+1	turkish	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Ses
 Quit	MediaPlayer-Main		Çık
 Redo	MediaPlayer-PlaylistWindow		Yinele
 Move Entry	MediaPlayer-MovePLItemsCmd		Girdiyi taşı
+Reset rating	MediaPlayer-Main		Derecelendirmeyi sıfırla
 <unknown>	PlaylistItem-author		<bilinmeyen>
 Cancel	MediaPlayer-SettingsWindow		Vazgeç
 Large	MediaPlayer-SettingsWindow		Geniş

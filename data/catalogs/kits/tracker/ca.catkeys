@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3955111295
+1	catalan; valencian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -337,6 +337,7 @@ yes	AttributesView		sí
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom
+Location	Default Query Columns		Ubicació
 by attribute	FindPanel		per l'atribut
 Write	FilePermissionsView		Escriu
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si altereu la carpeta de sistema o el que hi ha, no podreu fer arrencar %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu alterar-ho, mantingueu premuda la tecla Maj. i cliqueu a \"Sé el que faig\".

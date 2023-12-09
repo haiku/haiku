@@ -1,8 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	677050232
-Revision	AboutView		Αναθεώρηση
+1	greek, modern (1453-)	x-vnd.Haiku-About	885044264
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
-%.2f GHz	AboutView		%.2f GHz
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Με επιφύλαξη παντός δικαιώματος.
 \n\nSpecial thanks to:\n	AboutView		\n\nΙδιαίτερες ευχαριστίες στους:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (και ο πυρήνας του, NewOS)\n
@@ -20,7 +18,6 @@ Testing and bug triaging:\n	AboutView		Δοκιμές και αποσφαλμά�
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Επεξεργαστής:} other{# Επεξεργαστές:}}
 Ralink WiFi Firmware	AboutWindow		Υλισμικό WiFi για Ralink
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Ο κώδικας που είναι μοναδικός στο Haiku, και ειδικά ο πυρήνας και όλος ο κώδικας των εφαρμογών που συνδέονται, διανέμονται υπό τους όρους της <Άδειας Χρήσης MIT>. Μερικές βιβλιοθήκες του συστήματος περιέχουν ένα μέρος κώδικα τρίτων, ο οποίος διανέμεται κάτω από την <Άδεια Χρήσης LGPL>. Μπορείτε να βρείτε τα δικαιώματα πνευματικής ιδιοκτησίας παρακάτω.\n\n
-%d MiB total	AboutView		%d MiB συνολικά
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1996-1997 Jeff Prosise. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2006 Brian Paul. Mesa3D Project. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 2010-2011 Google Inc. Με επιφύλαξη παντός δικαιώματος.
@@ -30,10 +27,10 @@ Unknown	AboutView		Άγνωστο
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. και η ομάδα προγραμματιστών, για να έχουν δημιουργήσει το BeOs!\n\n
 Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Πνευματική ιδιοκτησία © 2002-2014 Industrial Light & Magic, τμήμα της Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Άδειες χρήσης: 
+%ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα του Haiku είναι ιδιοκτησία της Haiku, Inc. ή των αντίστοιχων δημιουργών που έχουν αναφερθεί ρητά στον πηγαίο κώδικα. Το Haiku® και το HAIKU logo® είναι εγγεγραμμένα σήματα κατατεθέν της Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Πνευματική ιδιοκτησία © 2009 Colin Percival
 Time running:	AboutView		Χρόνος λειτουργίας:
-%ld MHz	AboutView		%ld MHz
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1996-2005 Julian R Seward. Με επιφύλαξη παντός δικαιώματος.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Πνευματική ιδιοκτησία © 1994-2009, Thomas G. Lane, Guido Vollbeding. Αυτό το λογισμικό βασίζεται εν μέρει σε έργο της Independent JPEG Group.
@@ -52,8 +49,8 @@ Source Code: 	AboutView		Πηγαίος Κώδικας:
 \nCopyrights\n\n	AboutView		\nΠνευματικά δικαιώματα\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Πνευματική ιδιοκτησία © 1996-2002, 2006 David Turner, Robert Wilhelm και Werner Lemberg.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Εμπεριέχει λογισμικό από το GNU Project, το οποίο έχει δημοσιευτεί με τις άδειες χρήσεις GPL και GPL:\nΒιβλιοθήκη GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nΠνευματική ιδιοκτησία © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		Η ομάδα HaikuPorts\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Εμπεριέχει λογισμικό από το GNU Project, το οποίο έχει δημοσιευτεί με τις άδειες χρήσεις GPL και GPL:\nΒιβλιοθήκη GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nΠνευματική ιδιοκτησία © The Free Software Foundation.
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Εμπεριέχει λογισμικό από το FreeBSD Project, το οποίο έχει δημοσιευτεί με την άδεια χρήσης BSD:\nftpd, ping, telnet, telnetd, traceroute\nΠνευματική ιδιοκτησία © 1994-2008 The FreeBSD Project. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 2002-2003 Steve Lhomme. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Πνευματική ιδιοκτησία © 2000-2019 Fabrice Bellard, κλπ.
@@ -61,7 +58,6 @@ Current maintainers:\n	AboutView		Εν ενεργεία συντηρητές:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1995, 1998-2001 Jef Poskanzer. Με επιφύλαξη παντός δικαιώματος.
 Intel WiFi Firmware	AboutWindow		Υλισμικό WiFi για Intel
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Με επιφύλαξη παντός δικαιώματος.
-%d MiB used (%s)	AboutView		%d MiB σε χρήση (%s)
 Version:	AboutView		Έκδοση:
 The BeGeistert team\n	AboutView		Η ομάδα BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
@@ -69,7 +65,6 @@ Intel (2xxx firmware)	AboutWindow		Υλισμικό WiFi για Intel (2xxx)
 License: 	AboutView		Άδεια Χρήσης: 
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Το πανεπιστήμιο του Auckland και ο Christof Lutteroth\n\n
-%total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB συνολικά, %inaccessible MiB μη χρησιμοποιούμενα
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Πνευματική ιδιοκτησία © 2012-2016 Ομάδα διεθνοποίησης Google.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld Εγχείρημα Haiku. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1994-2008 Xiph.Org. Με επιφύλαξη παντός δικαιώματος.
@@ -77,11 +72,12 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Πνευμα�
 Copyright © 2001-2003 Expat maintainers.	AboutView		Πνευματική ιδιοκτησία © 2001-2003 Expat maintainers.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Πνευματική ιδιοκτησία © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Μεταφράσεις:\n
-Memory:	AboutView		Μνήμη:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…και μάλλον αρκετά άλλα άτομα που ξεχάσαμε να αναφέρουμε (συγγνώμη!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Με επιφύλαξη παντός δικαιώματος.
 BSD (2-clause)	AboutWindow		BSD (2-όρων)
 Website & marketing:\n	AboutView		Ιστοσελίδα & μάρκετινγκ:\n
+%d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB σε χρήση (%s)
+%.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f GHz
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 απο τον Andy Ritger βασισμένο στο Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		...και τους πολλούς δωρητές μας!\n\n
 Marvell (firmware)	AboutWindow		Υλισμικό Marvell
