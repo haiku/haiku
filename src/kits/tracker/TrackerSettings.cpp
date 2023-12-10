@@ -38,7 +38,11 @@ All rights reserved.
 #include <Debug.h>
 
 #include "Tracker.h"
+#include "TrackerDefaults.h"
 #include "WidgetAttributeText.h"
+
+
+#define RGBTOHEX(c) ((c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue))
 
 
 class TTrackerState : public Settings {
@@ -210,54 +214,55 @@ TTrackerState::LoadSettingsIfNeeded()
 
 	// Set default settings before reading from disk
 
-	Add(fShowDisksIcon = new BooleanValueSetting("ShowDisksIcon", false));
+	Add(fShowDisksIcon = new BooleanValueSetting("ShowDisksIcon", kDefaultShowDisksIcon));
 	Add(fMountVolumesOntoDesktop
-		= new BooleanValueSetting("MountVolumesOntoDesktop", true));
-	Add(fMountSharedVolumesOntoDesktop =
-		new BooleanValueSetting("MountSharedVolumesOntoDesktop", true));
+		= new BooleanValueSetting("MountVolumesOntoDesktop", kDefaultMountVolumesOntoDesktop));
+	Add(fMountSharedVolumesOntoDesktop = new BooleanValueSetting(
+		"MountSharedVolumesOntoDesktop", kDefaultMountSharedVolumesOntoDesktop));
 	Add(fEjectWhenUnmounting
-		= new BooleanValueSetting("EjectWhenUnmounting", true));
+		= new BooleanValueSetting("EjectWhenUnmounting", kDefaultEjectWhenUnmounting));
 
-	Add(fDesktopFilePanelRoot
-		= new BooleanValueSetting("DesktopFilePanelRoot", true));
+	Add(fDesktopFilePanelRoot // deprecated
+		= new BooleanValueSetting("DesktopFilePanelRoot", kDefaultDesktopFilePanelRoot));
+	Add(fShowSelectionWhenInactive // deprecated
+		= new BooleanValueSetting("ShowSelectionWhenInactive", kDefaultShowSelectionWhenInactive));
+
 	Add(fShowFullPathInTitleBar
-		= new BooleanValueSetting("ShowFullPathInTitleBar", false));
-	Add(fShowSelectionWhenInactive
-		= new BooleanValueSetting("ShowSelectionWhenInactive", true));
-	Add(fTransparentSelection
-		= new BooleanValueSetting("TransparentSelection", true));
-	Add(fSortFolderNamesFirst
-		= new BooleanValueSetting("SortFolderNamesFirst", true));
-	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", false));
-	Add(fTypeAheadFiltering
-		= new BooleanValueSetting("TypeAheadFiltering", false));
-	Add(fGenerateImageThumbnails
-		= new BooleanValueSetting("GenerateImageThumbnails", true));
+		= new BooleanValueSetting("ShowFullPathInTitleBar", kDefaultShowFullPathInTitleBar));
 	Add(fSingleWindowBrowse
-		= new BooleanValueSetting("SingleWindowBrowse", false));
-	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));
+		= new BooleanValueSetting("SingleWindowBrowse", kDefaultSingleWindowBrowse));
+	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", kDefaultShowNavigator));
+	Add(fTransparentSelection
+		= new BooleanValueSetting("TransparentSelection", kDefaultTransparentSelection));
+	Add(fSortFolderNamesFirst
+		= new BooleanValueSetting("SortFolderNamesFirst", kDefaultSortFolderNamesFirst));
+	Add(fHideDotFiles = new BooleanValueSetting("HideDotFiles", kDefaultHideDotFiles));
+	Add(fTypeAheadFiltering
+		= new BooleanValueSetting("TypeAheadFiltering", kDefaultTypeAheadFiltering));
+	Add(fGenerateImageThumbnails
+		= new BooleanValueSetting("GenerateImageThumbnails", kDefaultGenerateImageThumbnails));
 
 	Add(fRecentApplicationsCount
-		= new ScalarValueSetting("RecentApplications", 10, "", ""));
+		= new ScalarValueSetting("RecentApplications", kDefaultRecentApplications, "", ""));
 	Add(fRecentDocumentsCount
-		= new ScalarValueSetting("RecentDocuments", 10, "", ""));
+		= new ScalarValueSetting("RecentDocuments", kDefaultRecentDocuments, "", ""));
 	Add(fRecentFoldersCount
-		= new ScalarValueSetting("RecentFolders", 10, "", ""));
+		= new ScalarValueSetting("RecentFolders", kDefaultRecentFolders, "", ""));
 
 	Add(fShowVolumeSpaceBar
-		= new BooleanValueSetting("ShowVolumeSpaceBar", true));
-
+		= new BooleanValueSetting("ShowVolumeSpaceBar", kDefaultShowVolumeSpaceBar));
 	Add(fUsedSpaceColor
-		= new HexScalarValueSetting("UsedSpaceColor", 0xc000cb00, "", ""));
+		= new HexScalarValueSetting("UsedSpaceColor", RGBTOHEX(kDefaultUsedSpaceColor), "", ""));
 	Add(fFreeSpaceColor
-		= new HexScalarValueSetting("FreeSpaceColor", 0xc0ffffff, "", ""));
+		= new HexScalarValueSetting("FreeSpaceColor", RGBTOHEX(kDefaultFreeSpaceColor), "", ""));
 	Add(fWarningSpaceColor
-		= new HexScalarValueSetting("WarningSpaceColor", 0xc0cb0000, "", ""));
+		= new HexScalarValueSetting("WarningSpaceColor", RGBTOHEX(kDefaultWarningSpaceColor),
+			"", ""));
 
 	Add(fDontMoveFilesToTrash
-		= new BooleanValueSetting("DontMoveFilesToTrash", false));
+		= new BooleanValueSetting("DontMoveFilesToTrash", kDefaultDontMoveFilesToTrash));
 	Add(fAskBeforeDeleteFile
-		= new BooleanValueSetting("AskBeforeDeleteFile", true));
+		= new BooleanValueSetting("AskBeforeDeleteFile", kDefaultAskBeforeDeleteFile));
 
 	TryReadingSettings();
 
