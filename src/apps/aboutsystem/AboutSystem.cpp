@@ -558,8 +558,6 @@ SysInfoDragger::MessageReceived(BMessage* message)
 		case _SHOW_DRAG_HANDLES_:
 			if (fTarget != NULL)
 				fTarget->Invalidate();
-			break;
-
 		default:
 			BDragger::MessageReceived(message);
 			break;
