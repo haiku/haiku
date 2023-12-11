@@ -146,7 +146,7 @@ static const char* kHandledProtocols[] = {
 	"gopher"
 };
 
-static const char* kBookmarkBarSubdir = B_TRANSLATE("Bookmark bar");
+static const char* kBookmarkBarSubdir = "Bookmark bar";
 
 static BLayoutItem*
 layoutItemFor(BView* view)
