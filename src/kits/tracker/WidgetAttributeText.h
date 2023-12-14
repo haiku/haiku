@@ -89,7 +89,7 @@ public:
 	float CurrentWidth() const;
 		// return the item width we got during our last fitting attempt
 
-	virtual void SetUpEditing(BTextView*);
+	virtual void SetupEditing(BTextView*);
 		// set up the passed textView for the specifics of a given
 		// attribute editing
 	virtual bool CommitEditedText(BTextView*) = 0;
@@ -220,7 +220,7 @@ public:
 
 	virtual int Compare(WidgetAttributeText& other, BPoseView* view);
 
-	virtual void SetUpEditing(BTextView* view);
+	virtual void SetupEditing(BTextView* view);
 	virtual bool CommitEditedText(BTextView* view);
 
 	virtual const char* ValueAsText(const BPoseView* view);
@@ -253,7 +253,7 @@ class CheckboxAttributeText : public GenericAttributeText {
 public:
 	CheckboxAttributeText(const Model* model, const BColumn* column);
 
-	virtual void SetUpEditing(BTextView* view);
+	virtual void SetupEditing(BTextView* view);
 
 private:
 	virtual void FitValue(BString* result, const BPoseView* view);
@@ -269,7 +269,7 @@ class RatingAttributeText : public GenericAttributeText {
 public:
 	RatingAttributeText(const Model* model, const BColumn* column);
 
-	virtual void SetUpEditing(BTextView* view);
+	virtual void SetupEditing(BTextView* view);
 
 private:
 	virtual void FitValue(BString* result, const BPoseView* view);
@@ -326,7 +326,7 @@ protected:
 class NameAttributeText : public StringAttributeText {
 public:
 	NameAttributeText(const Model*, const BColumn*);
-	virtual void SetUpEditing(BTextView*);
+	virtual void SetupEditing(BTextView*);
 	virtual void FitValue(BString* result, const BPoseView*);
 	virtual bool IsEditable() const;
 
@@ -345,7 +345,7 @@ class RealNameAttributeText : public NameAttributeText {
 public:
 	RealNameAttributeText(const Model*, const BColumn*);
 
-	virtual void SetUpEditing(BTextView*);
+	virtual void SetupEditing(BTextView*);
 	virtual void FitValue(BString* result, const BPoseView*);
 
 	static void SetSortFolderNamesFirst(bool);

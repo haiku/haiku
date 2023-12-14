@@ -48,7 +48,7 @@ namespace BPrivate {
 
 class BDeskWindow : public BContainerWindow {
 public:
-	BDeskWindow(LockingList<BWindow>* windowList);
+	BDeskWindow(LockingList<BWindow>* windowList, uint32 openFlags = 0);
 	virtual ~BDeskWindow();
 
 	virtual void Init(const BMessage* message = NULL);
@@ -78,7 +78,7 @@ protected:
 	virtual void MessageReceived(BMessage*);
 
 private:
-	void InitAddonsList(bool);
+	void InitAddOnsList(bool);
 	void ApplyShortcutPreferences(bool);
 
 	BShelf* fDeskShelf;

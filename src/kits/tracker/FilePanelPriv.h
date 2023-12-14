@@ -57,14 +57,13 @@ class BFilePanelPoseView;
 
 class TFilePanel : public BContainerWindow {
 public:
-	TFilePanel(file_panel_mode = B_OPEN_PANEL,
-		BMessenger* target = NULL, const BEntry* startDirectory = NULL,
+	TFilePanel(file_panel_mode mode = B_OPEN_PANEL,
+		BMessenger* target = NULL, const BEntry* startDir = NULL,
 		uint32 nodeFlavors = B_FILE_NODE | B_SYMLINK_NODE,
 		bool multipleSelection = true, BMessage* = NULL, BRefFilter* = NULL,
-		uint32 containerWindowFlags = 0,
-		window_look look = B_DOCUMENT_WINDOW_LOOK,
-		window_feel feel = B_NORMAL_WINDOW_FEEL,
-		bool hideWhenDone = true);
+		uint32 openFlags = 0, window_look look = B_DOCUMENT_WINDOW_LOOK,
+		window_feel feel = B_NORMAL_WINDOW_FEEL, uint32 windowFlags = 0,
+		uint32 workspace = B_CURRENT_WORKSPACE, bool hideWhenDone = true);
 
 	virtual ~TFilePanel();
 

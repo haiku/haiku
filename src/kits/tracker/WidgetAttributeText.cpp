@@ -372,7 +372,7 @@ WidgetAttributeText::Width(const BPoseView* pose)
 
 
 void
-WidgetAttributeText::SetUpEditing(BTextView*)
+WidgetAttributeText::SetupEditing(BTextView*)
 {
 	ASSERT(fColumn->Editable());
 }
@@ -765,7 +765,7 @@ NameAttributeText::FitValue(BString* outString, const BPoseView* view)
 
 
 void
-NameAttributeText::SetUpEditing(BTextView* textView)
+NameAttributeText::SetupEditing(BTextView* textView)
 {
 	DisallowFilenameKeys(textView);
 
@@ -858,7 +858,7 @@ RealNameAttributeText::FitValue(BString* outString, const BPoseView* view)
 
 
 void
-RealNameAttributeText::SetUpEditing(BTextView* textView)
+RealNameAttributeText::SetupEditing(BTextView* textView)
 {
 	DisallowFilenameKeys(textView);
 
@@ -1548,7 +1548,7 @@ GenericAttributeText::CommitEditedText(BTextView* textView)
 
 
 void
-GenericAttributeText::SetUpEditing(BTextView* textView)
+GenericAttributeText::SetupEditing(BTextView* textView)
 {
 	textView->SetMaxBytes(kGenericReadBufferSize - 1);
 	textView->SetText(fFullValueText.String(), fFullValueText.Length());
@@ -1847,12 +1847,12 @@ CheckboxAttributeText::CheckboxAttributeText(const Model* model,
 
 
 void
-CheckboxAttributeText::SetUpEditing(BTextView* view)
+CheckboxAttributeText::SetupEditing(BTextView* view)
 {
 	// TODO: support editing for real!
 	BString outString;
 	GenericAttributeText::FitValue(&outString, NULL);
-	GenericAttributeText::SetUpEditing(view);
+	GenericAttributeText::SetupEditing(view);
 }
 
 
@@ -1917,12 +1917,12 @@ RatingAttributeText::RatingAttributeText(const Model* model,
 
 
 void
-RatingAttributeText::SetUpEditing(BTextView* view)
+RatingAttributeText::SetupEditing(BTextView* view)
 {
 	// TODO: support editing for real!
 	BString outString;
 	GenericAttributeText::FitValue(&outString, NULL);
-	GenericAttributeText::SetUpEditing(view);
+	GenericAttributeText::SetupEditing(view);
 }
 
 

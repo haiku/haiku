@@ -73,8 +73,8 @@ BFilePanel::BFilePanel(file_panel_mode mode, BMessenger* target,
 	BEntry startDir(ref);
 	fWindow = new TFilePanel(mode, target, &startDir, nodeFlavors,
 		multipleSelection, message, filter, 0, B_DOCUMENT_WINDOW_LOOK,
-		modal ? B_MODAL_APP_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL,
-		hideWhenDone);
+		(modal ? B_MODAL_APP_WINDOW_FEEL : B_NORMAL_WINDOW_FEEL),
+		B_CURRENT_WORKSPACE, 0, hideWhenDone);
 
 	static_cast<TFilePanel*>(fWindow)->SetClientObject(this);
 

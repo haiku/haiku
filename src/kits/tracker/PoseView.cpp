@@ -444,7 +444,7 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 		}
 	}
 
-	SetUpDefaultColumnsIfNeeded();
+	SetupDefaultColumnsIfNeeded();
 	if (!ColumnFor(PrimarySort())) {
 		fViewState->SetPrimarySort(FirstColumn()->AttrHash());
 		fViewState->SetPrimarySortType(FirstColumn()->AttrType());
@@ -473,7 +473,7 @@ BPoseView::RestoreColumnState(const BMessage &message)
 
 	AddColumnList(&tempSortedList);
 
-	SetUpDefaultColumnsIfNeeded();
+	SetupDefaultColumnsIfNeeded();
 	if (!ColumnFor(PrimarySort())) {
 		fViewState->SetPrimarySort(FirstColumn()->AttrHash());
 		fViewState->SetPrimarySortType(FirstColumn()->AttrType());
@@ -619,7 +619,7 @@ ClearViewOriginOne(const char* DEBUG_ONLY(name), uint32 type, off_t size,
 
 
 void
-BPoseView::SetUpDefaultColumnsIfNeeded()
+BPoseView::SetupDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
 	if (CountColumns() != 0)
@@ -1665,9 +1665,9 @@ BPoseView::AddTrashPoses()
 void
 BPoseView::AddPosesCompleted()
 {
-	BContainerWindow* containerWindow = ContainerWindow();
-	if (containerWindow != NULL)
-		containerWindow->AddMimeTypesToMenu();
+	BContainerWindow* window = ContainerWindow();
+	if (window != NULL)
+		window->AddMimeTypesToMenu();
 
 	// if we're not in icon mode then we need to check for poses that
 	// were "auto" placed to see if they overlap with other icons
@@ -2759,7 +2759,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 	rect.left = offset;
 	Invalidate(rect);
 
-	ContainerWindow()->MarkAttributeMenu();
+	ContainerWindow()->MarkAttributesMenu();
 
 	if (IsWatchingDateFormatChange()) {
 		int32 columnCount = CountColumns();
@@ -2848,7 +2848,7 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 
 	rect.left = offset;
 	Invalidate(rect);
-	ContainerWindow()->MarkAttributeMenu();
+	ContainerWindow()->MarkAttributesMenu();
 
 	// Check if this is a time attribute and if so,
 	// start watching for changed in time/date format:
@@ -3106,12 +3106,12 @@ BPoseView::SetViewMode(uint32 newMode)
 			ClearFilter();
 
 		if (window != NULL)
-			window->HideAttributeMenu();
+			window->HideAttributesMenu();
 
 		fTitleView->Hide();
 	} else if (newMode == kListMode) {
 		if (window != NULL)
-			window->ShowAttributeMenu();
+			window->ShowAttributesMenu();
 
 		fTitleView->Show();
 	}
@@ -4497,10 +4497,10 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 {
 	uint32 buttons = (uint32)message->FindInt32("buttons");
 
-	BContainerWindow* containerWindow = NULL;
+	BContainerWindow* window = NULL;
 	BPoseView* poseView = dynamic_cast<BPoseView*>(view);
 	if (poseView != NULL)
-		containerWindow = poseView->ContainerWindow();
+		window = poseView->ContainerWindow();
 
 	// look for srcWindow to determine whether drag was initiated in tracker
 	BContainerWindow* srcWindow = NULL;
@@ -4662,9 +4662,9 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 			}
 
 			bool canRelativeLink = false;
-			if (!canCopy && !canMove && !canLink && containerWindow) {
+			if (!canCopy && !canMove && !canLink && window) {
 				if (SecondaryMouseButtonDown(modifiers(), buttons)) {
-					switch (containerWindow->ShowDropContextMenu(dropPoint,
+					switch (window->ShowDropContextMenu(dropPoint,
 							srcWindow != NULL ? srcWindow->PoseView() : NULL)) {
 						case kCreateRelativeLink:
 							canRelativeLink = true;
@@ -4872,10 +4872,10 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 
 	ASSERT(srcWindow != NULL);
 
-	if (srcWindow == containerWindow) {
+	if (srcWindow == window) {
 		// drag started in this window
-		containerWindow->Activate();
-		containerWindow->UpdateIfNeeded();
+		window->Activate();
+		window->UpdateIfNeeded();
 		poseView->ResetPosePlacementHint();
 
 		if (DragSelectionContains(targetPose, message)) {
@@ -4887,11 +4887,11 @@ BPoseView::HandleDropCommon(BMessage* message, Model* targetModel,
 	bool wasHandled = false;
 	bool ignoreTypes = (modifiers() & B_CONTROL_KEY) != 0;
 
-	if (targetModel != NULL && containerWindow != NULL) {
+	if (targetModel != NULL && window != NULL) {
 		// TODO: pick files to drop/launch on a case by case basis
 		if (targetModel->IsDirectory() || targetModel->IsVirtualDirectory()) {
-			MoveSelectionInto(targetModel, srcWindow, containerWindow,
-				buttons, dropPoint, false);
+			MoveSelectionInto(targetModel, srcWindow, window, buttons,
+				dropPoint, false);
 			wasHandled = true;
 		} else if (CanHandleDragSelection(targetModel, message, ignoreTypes)) {
 			LaunchAppWithSelection(targetModel, message, !ignoreTypes);
@@ -8449,14 +8449,14 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	if (viewStateRestored) {
 		if (ViewMode() == kListMode && oldMode != kListMode) {
 			if (ContainerWindow() != NULL)
-				ContainerWindow()->ShowAttributeMenu();
+				ContainerWindow()->ShowAttributesMenu();
 
 			fTitleView->Show();
 		} else if (ViewMode() != kListMode && oldMode == kListMode) {
 			fTitleView->Hide();
 
 			if (ContainerWindow() != NULL)
-				ContainerWindow()->HideAttributeMenu();
+				ContainerWindow()->HideAttributesMenu();
 		} else if (ViewMode() == kListMode && oldMode == kListMode)
 			fTitleView->Invalidate();
 

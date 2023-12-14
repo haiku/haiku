@@ -244,7 +244,7 @@ inline void
 BPose::Draw(BRect poseRect, const BRect& updateRect, BPoseView* view,
 	bool fullDraw)
 {
-	Draw(poseRect, updateRect, view, (BView*)view, fullDraw, BPoint(0, 0),
+	Draw(poseRect, updateRect, view, (BView*)view, fullDraw, B_ORIGIN,
 		IsSelected());
 }
 

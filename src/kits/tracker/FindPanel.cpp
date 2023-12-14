@@ -2070,7 +2070,7 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 
 
 void
-FindPanel::SetUpAddRemoveButtons()
+FindPanel::SetupAddRemoveButtons()
 {
 	BBox* box = dynamic_cast<BBox*>(FindView("Box"));
 
@@ -2145,7 +2145,7 @@ FindPanel::AddAttrRow()
 	if (removeButton != NULL)
 		removeButton->SetEnabled(fAttrGrid->CountRows() > 1);
 	else
-		SetUpAddRemoveButtons();
+		SetupAddRemoveButtons();
 }
 
 

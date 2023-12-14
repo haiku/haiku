@@ -31,47 +31,32 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-#ifndef _QUERY_CONTAINER_WINDOW_H
-#define _QUERY_CONTAINER_WINDOW_H
+#ifndef _DRAGGABLE_CONTAINER_ICON_H
+#define _DRAGGABLE_CONTAINER_ICON_H
 
 
-// Container window specificaly used for displaying BQueryPoseViews
-// Adds query window specific menus
-
-
-#include "ContainerWindow.h"
+#include <View.h>
 
 
 namespace BPrivate {
 
-#define kQueryTemplates "DefaultQueryTemplates"
+class DraggableContainerIcon : public BView {
+	public:
+		DraggableContainerIcon(BSize iconSize);
 
-class BQueryPoseView;
+		virtual void MouseDown(BPoint where);
+		virtual void MouseUp(BPoint);
+		virtual void MouseMoved(BPoint where, uint32, const BMessage*);
+		virtual void Draw(BRect updateRect);
 
-class BQueryContainerWindow : public BContainerWindow {
-public:
-								BQueryContainerWindow(
-									LockingList<BWindow>* windowList,
-									uint32 openFlags);
-
-			BQueryPoseView*		PoseView() const;
-			bool				ActiveOnDevice(dev_t) const;
-
-protected:
-	virtual	void				CreatePoseView(Model*);
-	virtual	BPoseView*			NewPoseView(Model* model, uint32 viewMode);
-	virtual	void				AddWindowMenu(BMenu* menu);
-	virtual	void				AddWindowContextMenus(BMenu* menu);
-
-	virtual	void				SetupDefaultState();
-
-private:
-	typedef BContainerWindow	_inherited;
+	private:
+		BSize	fIconSize;
+		uint32	fDragButton;
+		BPoint	fClickPoint;
+		bool	fDragStarted;
 };
 
-} // namespace BPrivate
-
-using namespace BPrivate;
+}	// namespace BPrivate
 
 
-#endif	// _QUERY_CONTAINER_WINDOW_H
+#endif	// _DRAGGABLE_CONTAINER_ICON_H

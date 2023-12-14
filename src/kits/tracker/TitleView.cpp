@@ -308,9 +308,9 @@ BTitleView::MouseDown(BPoint where)
 	if (SecondaryMouseButtonDown(modifiers(), buttons)) {
 		BPopUpMenu* menu = new BPopUpMenu("Attributes", false, false);
 		menu->SetFont(be_plain_font);
-		window->NewAttributeMenu(menu);
+		window->NewAttributesMenu(menu);
 		window->AddMimeTypesToMenu(menu);
-		window->MarkAttributeMenu(menu);
+		window->MarkAttributesMenu(menu);
 		menu->SetTargetForItems(window->PoseView());
 		menu->Go(ConvertToScreen(where), true, false);
 		return;

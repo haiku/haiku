@@ -1360,6 +1360,13 @@ HexDump(const void* buf, int32 length)
 }
 
 
+int
+CompareLabels(const BMenuItem* item1, const BMenuItem* item2)
+{
+	return strcasecmp(item1->Label(), item2->Label());
+}
+
+
 void
 EnableNamedMenuItem(BMenu* menu, const char* itemName, bool on)
 {

@@ -36,11 +36,11 @@ All rights reserved.
 
 
 #include <GroupView.h>
+#include <MimeType.h>
 #include <StringList.h>
 #include <Window.h>
 
 #include "LockingList.h"
-#include "Model.h"
 #include "NavMenu.h"
 #include "TaskLoop.h"
 
@@ -80,7 +80,7 @@ enum {
 };
 
 
-struct AddonShortcut {
+struct AddOnShortcut {
 	Model*	model;
 	char	key;
 	char	defaultKey;
@@ -90,13 +90,12 @@ struct AddonShortcut {
 
 class BContainerWindow : public BWindow {
 public:
-	BContainerWindow(LockingList<BWindow>* windowList,
-		uint32 containerWindowFlags,
+	BContainerWindow(LockingList<BWindow>* windowList, uint32 openFlags,
 		window_look look = B_DOCUMENT_WINDOW_LOOK,
 		window_feel feel = B_NORMAL_WINDOW_FEEL,
-		uint32 flags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
-		uint32 workspace = B_CURRENT_WORKSPACE, bool useLayouts = true,
-		bool isDeskWindow = false);
+		uint32 windowFlags = B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION,
+		uint32 workspace = B_CURRENT_WORKSPACE,
+		bool useLayout = true, bool isDeskWindow = false);
 
 	virtual ~BContainerWindow();
 
@@ -165,8 +164,8 @@ public:
 
 	virtual void AddMimeTypesToMenu(BMenu*);
 	void AddMimeTypesToMenu();
-	virtual void MarkAttributeMenu(BMenu*);
-	void MarkAttributeMenu();
+	virtual void MarkAttributesMenu(BMenu*);
+	void MarkAttributesMenu();
 	void MarkArrangeByMenu(BMenu*);
 	BMenuItem* NewAttributeMenuItem(const char* label, const char* name,
 		int32 type, float width, int32 align, bool editable,
@@ -174,10 +173,10 @@ public:
 	BMenuItem* NewAttributeMenuItem(const char* label, const char* name,
 		int32 type, const char* displayAs, float width, int32 align,
 		bool editable, bool statField);
-	virtual void NewAttributeMenu(BMenu*);
+	virtual void NewAttributesMenu(BMenu*);
 
-	void HideAttributeMenu();
-	void ShowAttributeMenu();
+	void HideAttributesMenu();
+	void ShowAttributesMenu();
 	PiggybackTaskLoop* DelayedTaskLoop();
 		// use for RunLater queueing
 	void PulseTaskLoop();
@@ -188,7 +187,7 @@ public:
 		bool createNew = false, bool createFolder = true);
 
 	// add-on iteration
-	void EachAddon(bool (*)(const Model*, const char*, uint32 shortcut,
+	void EachAddOn(bool (*)(const Model*, const char*, uint32 shortcut,
 			uint32 modifiers, bool primary, void*, BContainerWindow*, BMenu*),
 		void*, BStringList&, BMenu*);
 
@@ -222,7 +221,7 @@ protected:
 	virtual void SaveWindowState(BMessage&) const;
 
 	virtual bool NeedsDefaultStateSetup();
-	virtual void SetUpDefaultState();
+	virtual void SetupDefaultState();
 		// these two virtuals control setting up a new folder that
 		// does not have any state settings yet with the default
 
@@ -255,10 +254,10 @@ protected:
 		const entry_ref*, bool);
 
 	virtual void SetupOpenWithMenu(BMenu*);
-	virtual void SetUpEditQueryItem(BMenu*);
-	virtual void SetUpDiskMenu(BMenu*);
+	virtual void SetupEditQueryItem(BMenu*);
+	virtual void SetupDiskMenu(BMenu*);
 
-	virtual void BuildAddOnMenu(BMenu*);
+	virtual void BuildAddOnsMenu(BMenu*);
 	void BuildMimeTypeList(BStringList& mimeTypes);
 
 	enum UpdateMenuContext {
@@ -275,12 +274,15 @@ protected:
 	BHandler* ResolveSpecifier(BMessage*, int32, BMessage*, int32,
 		const char*);
 
-	bool EachAddon(BPath &path,
+	bool EachAddOn(BPath &path,
 		bool (*)(const Model*, const char*, uint32, bool, void*),
 		BObjectList<Model>*, void*, BStringList&);
 	void LoadAddOn(BMessage*);
 
-	bool fUseLayouts;
+	LockingList<BWindow>* fWindowList;
+	uint32 fOpenFlags;
+	bool fUsesLayout;
+
 	BGroupLayout* fRootLayout;
 	BGroupView* fMenuContainer;
 	BGridView* fPoseContainer;
@@ -304,7 +306,6 @@ protected:
 	DraggableContainerIcon* fDraggableIcon;
 	BNavigator* fNavigator;
 	BPoseView* fPoseView;
-	LockingList<BWindow>* fWindowList;
 	BMenu* fAttrMenu;
 	BMenu* fWindowMenu;
 	BMenu* fFileMenu;
@@ -321,10 +322,9 @@ protected:
 	bool fIsPrinters;
 	bool fIsDesktop;
 
-	uint32 fContainerWindowFlags;
 	BackgroundImage* fBackgroundImage;
 
-	static LockingList<struct AddonShortcut>* fAddonsList;
+	static LockingList<struct AddOnShortcut>* fAddOnsList;
 
 private:
 	BRect fSavedZoomRect;
@@ -394,9 +394,6 @@ private:
 };
 
 
-int CompareLabels(const BMenuItem*, const BMenuItem*);
-
-
 // inlines ---------
 
 inline BNavigator*
@@ -435,7 +432,7 @@ BContainerWindow::IsPrintersDir() const
 
 
 inline void
-BContainerWindow::SetUpDiskMenu(BMenu*)
+BContainerWindow::SetupDiskMenu(BMenu*)
 {
 	// nothing at this level
 }

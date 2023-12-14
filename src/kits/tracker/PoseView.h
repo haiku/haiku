@@ -423,7 +423,7 @@ public:
 
 protected:
 	// view setup
-	virtual void SetUpDefaultColumnsIfNeeded();
+	virtual void SetupDefaultColumnsIfNeeded();
 
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 		// sets up an entry iterator for _add_poses_

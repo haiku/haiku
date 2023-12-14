@@ -33,6 +33,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CountView.cpp
 			DeskWindow.cpp
 			DesktopPoseView.cpp
+			DraggableContainerIcon.cpp
 			DialogPane.cpp
 			DirMenu.cpp
 			EntryIterator.cpp
@@ -117,6 +118,7 @@ DoCatalogs libtracker.so :
 	CountView.cpp
 	DeskWindow.cpp
 	DirMenu.cpp
+	DraggableContainerIcon.cpp
 	FavoritesMenu.cpp
 	FilePanelPriv.cpp
 	FilePermissionsView.cpp

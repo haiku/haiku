@@ -365,9 +365,9 @@ OpenWithContainerWindow::AddShortcuts()
 
 
 void
-OpenWithContainerWindow::NewAttributeMenu(BMenu* menu)
+OpenWithContainerWindow::NewAttributesMenu(BMenu* menu)
 {
-	_inherited::NewAttributeMenu(menu);
+	_inherited::NewAttributesMenu(menu);
 
 	BMessage* message = new BMessage(kAttributeItem);
 	message->AddString("attr_name", kAttrOpenWithRelation);
@@ -499,7 +499,7 @@ OpenWithContainerWindow::NeedsDefaultStateSetup()
 
 
 void
-OpenWithContainerWindow::SetUpDefaultState()
+OpenWithContainerWindow::SetupDefaultState()
 {
 }
 
@@ -803,7 +803,7 @@ OpenWithPoseView::Pulse()
 
 
 void
-OpenWithPoseView::SetUpDefaultColumnsIfNeeded()
+OpenWithPoseView::SetupDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
 	if (CountColumns() != 0)

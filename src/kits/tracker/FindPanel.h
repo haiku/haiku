@@ -244,7 +244,7 @@ private:
 	static 	int32 				InitialAttrCount(const BNode*);
 			void 				FillCurrentQueryName(BTextControl*, FindWindow*);
 			void 				AddByNameOrFormulaItems();
-			void 				SetUpAddRemoveButtons();
+			void 				SetupAddRemoveButtons();
 
 			// go from search by name to search by attribute, etc.
 			void 				SwitchMode(uint32);

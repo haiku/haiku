@@ -160,7 +160,7 @@ protected:
 	virtual bool ShouldAddMenus() const;
 	virtual void ShowContextMenu(BPoint, const entry_ref*);
 	virtual void AddShortcuts();
-	virtual void NewAttributeMenu(BMenu*);
+	virtual void NewAttributesMenu(BMenu*);
 
 	virtual void RestoreState();
 	virtual void RestoreState(const BMessage&);
@@ -169,7 +169,7 @@ protected:
 	virtual bool NeedsDefaultStateSetup();
 	virtual void SaveState(bool hide = true);
 	virtual void SaveState(BMessage&) const;
-	virtual void SetUpDefaultState();
+	virtual void SetupDefaultState();
 
 	virtual bool IsShowing(const node_ref*) const;
 	virtual bool IsShowing(const entry_ref*) const;
@@ -226,7 +226,7 @@ protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref* ref);
 	virtual void ReturnDirentIterator(EntryListBase* iterator);
 
-	virtual void SetUpDefaultColumnsIfNeeded();
+	virtual void SetupDefaultColumnsIfNeeded();
 		// show launch window specific columns
 
 	// empty overrides for functions that depend on having an fModel

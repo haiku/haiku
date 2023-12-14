@@ -122,7 +122,7 @@ BQueryPoseView::EditQueries()
 
 
 void
-BQueryPoseView::SetUpDefaultColumnsIfNeeded()
+BQueryPoseView::SetupDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
 	if (CountColumns() != 0)

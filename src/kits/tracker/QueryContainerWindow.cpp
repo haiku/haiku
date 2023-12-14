@@ -56,9 +56,9 @@ All rights reserved.
 
 
 BQueryContainerWindow::BQueryContainerWindow(LockingList<BWindow>* windowList,
-	uint32 containerWindowFlags)
+	uint32 openFlags)
 	:
-	BContainerWindow(windowList, containerWindowFlags)
+	BContainerWindow(windowList, openFlags)
 {
 }
 
@@ -142,7 +142,7 @@ BQueryContainerWindow::AddWindowContextMenus(BMenu* menu)
 
 
 void
-BQueryContainerWindow::SetUpDefaultState()
+BQueryContainerWindow::SetupDefaultState()
 {
 	BNode defaultingNode;
 

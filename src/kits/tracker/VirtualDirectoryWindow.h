@@ -21,10 +21,10 @@ class VirtualDirectoryWindow : public BContainerWindow {
 public:
 								VirtualDirectoryWindow(
 									LockingList<BWindow>* windowList,
-									uint32 containerWindowFlags,
+									uint32 openFlags,
 									window_look look = B_DOCUMENT_WINDOW_LOOK,
 									window_feel feel = B_NORMAL_WINDOW_FEEL,
-									uint32 flags = B_WILL_ACCEPT_FIRST_CLICK
+									uint32 windowFlags = B_WILL_ACCEPT_FIRST_CLICK
 										| B_NO_WORKSPACE_ACTIVATION,
 									uint32 workspace = B_CURRENT_WORKSPACE);
 

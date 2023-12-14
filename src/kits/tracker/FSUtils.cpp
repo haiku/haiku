@@ -517,7 +517,7 @@ FSGetPoseLocation(const BNode* node, BPoint* point)
 
 
 static void
-SetUpPoseLocation(ino_t sourceParentIno, ino_t destParentIno,
+SetupPoseLocation(ino_t sourceParentIno, ino_t destParentIno,
 	const BNode* sourceNode, BNode* destNode, BPoint* loc)
 {
 	BPoint point;
@@ -1384,7 +1384,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 		node_ref destNodeRef;
 		destDir->GetNodeRef(&destNodeRef);
 		// copy or write new pose location as a first thing
-		SetUpPoseLocation(ref.directory, destNodeRef.node, &srcLink,
+		SetupPoseLocation(ref.directory, destNodeRef.node, &srcLink,
 			&newLink, loc);
 
 		BNodeInfo nodeInfo(&newLink);
@@ -1439,7 +1439,7 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 	node_ref destNodeRef;
 	destDir->GetNodeRef(&destNodeRef);
 	// copy or write new pose location as a first thing
-	SetUpPoseLocation(ref.directory, destNodeRef.node, &srcFile,
+	SetupPoseLocation(ref.directory, destNodeRef.node, &srcFile,
 		&destFile, loc);
 
 	char* buffer = new char[bufsize];
@@ -1673,7 +1673,7 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 	// copy or write new pose location
 	node_ref destNodeRef;
 	destDir->GetNodeRef(&destNodeRef);
-	SetUpPoseLocation(ref.directory, destNodeRef.node, &srcDir,
+	SetupPoseLocation(ref.directory, destNodeRef.node, &srcDir,
 		&newDir, loc);
 
 	while (srcDir.GetNextEntry(&entry) == B_OK) {
