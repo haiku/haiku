@@ -147,9 +147,6 @@ AVCodecDecoder::~AVCodecDecoder()
 	}
 #endif
 
-	if (fCodecInitDone)
-		avcodec_close(fCodecContext);
-
 	swr_free(&fResampleContext);
 	free(fChunkBuffer);
 	free(fDecodedData);
@@ -158,6 +155,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_frame_free(&fRawDecodedPicture);
 	av_free(fRawDecodedAudio->opaque);
 	av_frame_free(&fRawDecodedAudio);
+	fCodecContext->extradata = NULL;
 	avcodec_free_context(&fCodecContext);
 	av_frame_free(&fDecodedDataBuffer);
 
@@ -301,6 +299,12 @@ AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 	TRACE("  [%c]  requested format = %s\n", fIsAudio?('a'):('v'), buffer);
 #endif
 
+	// close any previous instance
+	fCodecContext->extradata = NULL;
+	avcodec_free_context(&fCodecContext);
+	fCodecContext = avcodec_alloc_context3(fCodec);
+	fCodecInitDone = false;
+
 	if (fIsAudio)
 		return _NegotiateAudioOutputFormat(inOutFormat);
 	else
@@ -350,18 +354,11 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		// to _DecodeNextAudioFrameChunk() will update the essential audio
 		// format properties accordingly regardless of the settings here.
 
-	// close any previous instance
-	if (fCodecInitDone) {
-		fCodecInitDone = false;
-		avcodec_close(fCodecContext);
-	}
-
-	if (avcodec_open2(fCodecContext, fCodec, NULL) >= 0)
-		fCodecInitDone = true;
-	else {
+	if (avcodec_open2(fCodecContext, fCodec, NULL) < 0) {
 		TRACE("avcodec_open() failed to init codec!\n");
 		return B_ERROR;
 	}
+	fCodecInitDone = true;
 
 	free(fChunkBuffer);
 	fChunkBuffer = NULL;
@@ -464,18 +461,11 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		fCodecContext->flags |= AV_CODEC_FLAG_TRUNCATED;
 	}
 
-	// close any previous instance
-	if (fCodecInitDone) {
-		fCodecInitDone = false;
-		avcodec_close(fCodecContext);
-	}
-
-	if (avcodec_open2(fCodecContext, fCodec, NULL) >= 0)
-		fCodecInitDone = true;
-	else {
+	if (avcodec_open2(fCodecContext, fCodec, NULL) < 0) {
 		TRACE("avcodec_open() failed to init codec!\n");
 		return B_ERROR;
 	}
+	fCodecInitDone = true;
 
 #if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 	fOutputColorSpace = B_RGB32;
