@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	2390126114
+1	romanian	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiază
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Șterge
 Open containing folder	Download Window		Deschide dosarul conținător
 Find previous	WebPositive Window		Găsește anteriorul
 Full screen	WebPositive Window		Ecran complet
-Bookmark bar	WebPositive Window		Bară de marcaje
 Downloads in progress	WebPositive		Descărcări în progres
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Doriți să deschideți %addedCount marcaje în același timp?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Dimensiunea standard implicită a f
 Custom	Settings Window		Personalizat
 Bookmark this page	WebPositive Window		Marchează această pagină
 Show tabs if only one page is open	Settings Window		Arată filele dacă este deschisă o singură pagină
-Remove	Download Window		Elimină
 Close tab	WebPositive Window		Închide fila
+Remove	Download Window		Elimină
 About	WebPositive Window		Despre
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Există încă descărcări în desfășurare, chiar doriți să ieșiți din WebPositive acum?
 Continue downloads	WebPositive		Continuă descărcările

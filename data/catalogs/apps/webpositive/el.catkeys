@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2390126114
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 Copy	Console Window		Αντιγραφή
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Διαγραφή
 Open containing folder	Download Window		Άνοιγμα εμπεριεχόμενου φακέλου
 Find previous	WebPositive Window		Εύρεση προηγούμενου
 Full screen	WebPositive Window		Πλήρης οθόνη
-Bookmark bar	WebPositive Window		Γραμμή σελιδοδεικτών
 Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
 Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Προεπιλεγμένο μέγε
 Custom	Settings Window		Προσαρμογή
 Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες
 Show tabs if only one page is open	Settings Window		Να εμφανίζονται οι καρτέλες όταν μόνο μία σελίδα είναι ανοιχτή
-Remove	Download Window		Αφαίρεση
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
+Remove	Download Window		Αφαίρεση
 About	WebPositive Window		Σχετικά
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Υπάρχουν ακόμα λήψεις που βρίσκονται σε εξέλιξη, είστε σίγουρος ότι θέλετε να κλείσετε τον Περιηγητή Ιστού τώρα;
 Continue downloads	WebPositive		Συνέχιση λήψεων

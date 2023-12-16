@@ -1,11 +1,10 @@
-1	indonesian	x-vnd.Haiku-Keymap	2850776429
+1	indonesian	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Tombol
 Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazil
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (AS)
-Right control	Keyboard Layout View		Control kanan
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Pilihan:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turki (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbia (Cyrillic)
 Belgian (point)	KeymapNames		Belgia (point)
 Finnish	KeymapNames		Finlandia
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Beralih tombol pintas untuk modus Windows/Linux
 Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Option	Keyboard Layout View	Option key	Pilihan
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		AS-Internasional
-Right option	Keyboard Layout View		Pilihan kanan
 Turkish (Type-Q)	KeymapNames		Turki (Type-Q)
 Revert	Modifier keys window		Pulihkan
 Slovak	KeymapNames		Slovakia
@@ -79,25 +75,20 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Makedonia
 Czech (Mac)	KeymapNames		Ceko (Mac)
-Left command	Keyboard Layout View		Perintah kiri
 Albanian	KeymapNames		Albania
 (Current)	Keymap window		(Saat ini)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friulian
-Left option	Keyboard Layout View		Pilihan kiri
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusia
 Warning: left and right key roles do not match	Modifier keys window		Peringatan: key-role kiri dan kanan tidak cocok
 Circumflex trigger	Keymap window		Pemicu sirkomfleks
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Shift kiri
 Russian (Yawert)	KeymapNames		Russia (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internasional
 Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Cyrillic)
 Swedish	KeymapNames		Swedia
-Left control	Keyboard Layout View		Tombol kontrol kiri
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Peran
 Svorak	KeymapNames		Shorak
@@ -113,7 +104,6 @@ Generic 105-key International	KeyboardLayoutNames		Generik 105-key Internasional
 Disabled	Modifier keys window	Do nothing	Dinonaktifkan
 Select dead keys	Keymap window		Pilih tombol mati
 Russian (Mac)	KeymapNames		Rusia (Mac)
-Right shift	Keyboard Layout View		Shift kanan
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Belarusia (Latin)
 Hebrew	KeymapNames		Ibrani
@@ -148,7 +138,6 @@ System:	Keymap window		Sistem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad International
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (AS)
 Switch shortcut keys	Keymap window		Tukar tombol pintas
-Right command	Keyboard Layout View		Perintah kanan
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belgia (koma)

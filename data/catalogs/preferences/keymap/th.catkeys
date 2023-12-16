@@ -1,11 +1,10 @@
-1	thai	x-vnd.Haiku-Keymap	1075970008
+1	thai	x-vnd.Haiku-Keymap	4232645682
 Key	Modifier keys window	As in a computer keyboard key	คีย์
 Japanese	KeymapNames		ญี่ปุ่น
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		บราซิล
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Right control
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	ตัวเลือก:
 Cancel	Modifier keys window		ยกเลิก
@@ -20,13 +19,10 @@ Turkish (Type-F)	KeymapNames		ตุรกี (Type-F)
 Serbian (Cyrillic)	KeymapNames		เซอร์เบีย (Cyrillic)
 Belgian (point)	KeymapNames		เบลเยี่ยม (point)
 Finnish	KeymapNames		ฟินแลนด์
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		สลับปุ่มลัดไปที่โหมด Windows/Linux
 Spanish (Dvorak)	KeymapNames		สเปน (Dvorak)
 Option	Keyboard Layout View	Option key	ตัวเลือก
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-International
-Right option	Keyboard Layout View		Right option
 Turkish (Type-Q)	KeymapNames		ตุรกี (Type-Q)
 Revert	Modifier keys window		เปลี่ยนกลับ
 Slovak	KeymapNames		สโลวัค
@@ -78,24 +74,19 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		มาเซโดเนีย
 Czech (Mac)	KeymapNames		เชค (Mac)
-Left command	Keyboard Layout View		Left command
 Albanian	KeymapNames		อัลแบเนีย
 (Current)	Keymap window		(ปัจจุบัน)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friulian
-Left option	Keyboard Layout View		Left option
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		เอสเพอรันโต
 Belarusian	KeymapNames		เบรารุส
 Warning: left and right key roles do not match	Modifier keys window		เตือน: หน้าที่คีย์ซ้ายและขวาไม่ตรงกัน
 Circumflex trigger	Keymap window		Circumflex trigger
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Left shift
 Russian (Yawert)	KeymapNames		รัสเซีย (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
 Bulgarian (Cyrillic)	KeymapNames		บัลแกเรีย (Cyrillic)
 Swedish	KeymapNames		สวีเดน
-Left control	Keyboard Layout View		Left control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Role
 Svorak	KeymapNames		สโลวัค
@@ -111,7 +102,6 @@ Generic 105-key International	KeyboardLayoutNames		Generic 105-key International
 Disabled	Modifier keys window	Do nothing	ปิดการใช้งาน
 Select dead keys	Keymap window		เลือกคีย์ที่ไม่ทำงาน
 Russian (Mac)	KeymapNames		รัสเซีย (Mac)
-Right shift	Keyboard Layout View		Right shift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		เบรารุส (ละติน)
 Hebrew	KeymapNames		ฮิบบรู
@@ -146,7 +136,6 @@ System:	Keymap window		ระบบ:
 ThinkPad International	KeyboardLayoutNames		ThinkPad International
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		สลับปุ่มลัด
-Right command	Keyboard Layout View		Right command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		เบลเยี่ยม (comma)

@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Keymap	2618211193
+1	ukrainian	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Клавіша
 Japanese	KeymapNames		Японська
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Бразильська
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (США)
-Right control	Keyboard Layout View		Права Control
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Турецька (Type-F)
 Serbian (Cyrillic)	KeymapNames		Сербська (Кирилиця)
 Belgian (point)	KeymapNames		Бельгійська (point)
 Finnish	KeymapNames		Фінська
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Переключити комбінації клавіш у режим Linux/Windows
 Spanish (Dvorak)	KeymapNames		Іспанська (Dvorak)
 Option	Keyboard Layout View	Option key	Option
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-міжнародна
-Right option	Keyboard Layout View		Права Option
 Turkish (Type-Q)	KeymapNames		Турецька (Тип-Q)
 Revert	Modifier keys window		Відкат змін
 Caps:	Modifier keys window	Caps key role name	Caps:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Македонська
 Czech (Mac)	KeymapNames		Чешська (Mac)
-Left command	Keyboard Layout View		Ліва Сommand
 Albanian	KeymapNames		Албанська
 (Current)	Keymap window		(Поточна)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Фріульська
-Left option	Keyboard Layout View		Ліва Option
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Есперанто
 Belarusian	KeymapNames		Білоруська
 Warning: left and right key roles do not match	Modifier keys window		Увага: функції лівої і правої клавіш не співпадають
 Circumflex trigger	Keymap window		Ціркумфлекс
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Лівий Shift
 Russian (Yawert)	KeymapNames		Російська (фонетична)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e міжнародна
 Bulgarian (Cyrillic)	KeymapNames		Болгарська (Кирилиця)
 Swedish	KeymapNames		Шведська
-Left control	Keyboard Layout View		Ліва Control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Роль
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Стандартна 105-кл
 Disabled	Modifier keys window	Do nothing	Вимкнути
 Select dead keys	Keymap window		Вибрати мертві клавіші
 Russian (Mac)	KeymapNames		Російська (Mac)
-Right shift	Keyboard Layout View		Правий Shift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Білоруська (Латина)
 Hebrew	KeymapNames		Іврит
@@ -149,7 +139,6 @@ System:	Keymap window		Системні:
 ThinkPad International	KeyboardLayoutNames		ThinkPad міжнародна
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (США)
 Switch shortcut keys	Keymap window		Перемкнути швидкі кнопки
-Right command	Keyboard Layout View		Права Command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Бельгійська (comma)

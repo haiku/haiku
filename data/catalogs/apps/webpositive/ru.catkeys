@@ -103,8 +103,8 @@ Default standard font size:	Settings Window		Размер стандартног
 Custom	Settings Window		Вручную
 Bookmark this page	WebPositive Window		Добавить в закладки
 Show tabs if only one page is open	Settings Window		Всегда показывать панель вкладок, даже если открыта только одна вкладка.
-Remove	Download Window		Удалить
 Close tab	WebPositive Window		Закрыть вкладку
+Remove	Download Window		Удалить
 About	WebPositive Window		О программе
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		WebPositive все еще загружает файлы, вы уверены, что хотите закрыть его сейчас?
 Continue downloads	WebPositive		Продолжить загрузку

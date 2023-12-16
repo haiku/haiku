@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-Keymap	2618211193
+1	romanian	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Tastă
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazilian
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Control dreapta
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opțiune:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turcă (tip-F)
 Serbian (Cyrillic)	KeymapNames		Sârbă (chirilică)
 Belgian (point)	KeymapNames		Belgiană (punct)
 Finnish	KeymapNames		Finlandeză
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Comută scurtăturile de tastatură la modul Windows/Linux
 Spanish (Dvorak)	KeymapNames		Spaniolă (Dvorak)
 Option	Keyboard Layout View	Option key	Opțiune
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-internațional
-Right option	Keyboard Layout View		Opțiune dreapta
 Turkish (Type-Q)	KeymapNames		Turcă (tip-Q)
 Revert	Modifier keys window		Revenire
 Caps:	Modifier keys window	Caps key role name	Caps:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedoneană
 Czech (Mac)	KeymapNames		Cehă (Mac)
-Left command	Keyboard Layout View		Comanda stângă
 Albanian	KeymapNames		Albaneză
 (Current)	Keymap window		(Curentă)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friuliană
-Left option	Keyboard Layout View		Opțiune stânga
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusă
 Warning: left and right key roles do not match	Modifier keys window		Avertisment: rolurile pentru tastele stânga și dreapta nu se potrivesc
 Circumflex trigger	Keymap window		Declanșator circumflex
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Shift stânga
 Russian (Yawert)	KeymapNames		Rusă (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e internațional
 Bulgarian (Cyrillic)	KeymapNames		Bulgară (chirilică)
 Swedish	KeymapNames		Suedeză
-Left control	Keyboard Layout View		Control stânga
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Generic 105-key internaționa
 Disabled	Modifier keys window	Do nothing	Dezactivat
 Select dead keys	Keymap window		Selectează tastele moarte
 Russian (Mac)	KeymapNames		Rusă (Mac)
-Right shift	Keyboard Layout View		Shift dreapta
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Belarusă (latină)
 Hebrew	KeymapNames		Ebraică
@@ -149,7 +139,6 @@ System:	Keymap window		Sistem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad internațional
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum extins (US)
 Switch shortcut keys	Keymap window		Comută scurtăturile de tastatură
-Right command	Keyboard Layout View		Comanda dreaptă
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belgiană (virgulă)

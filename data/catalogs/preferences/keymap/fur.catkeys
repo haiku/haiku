@@ -1,11 +1,10 @@
-1	friulian	x-vnd.Haiku-Keymap	2618211193
+1	friulian	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
 PG ↑	Keyboard Layout View	Very short for 'page up'	PAGJ
 Brazilian	KeymapNames		Brasilian
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Control a diestre
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opzion:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turc (Gjenar-F)
 Serbian (Cyrillic)	KeymapNames		Serp (Cirilic)
 Belgian (point)	KeymapNames		Belgjic (pont)
 Finnish	KeymapNames		Finlandês
-Num lock	Keyboard Layout View		Bloc Num
 Switch shortcut keys to Windows/Linux mode	Keymap window		Passe ai tascj des scurtis de modalitât Windows/Linux
 Spanish (Dvorak)	KeymapNames		Spagnûl (Dvorak)
 Option	Keyboard Layout View	Option key	Opzion
-Scroll lock	Keyboard Layout View		Bloche scoriment
 US-International	KeymapNames		US-Internazionâl
-Right option	Keyboard Layout View		Opzion a diestre
 Turkish (Type-Q)	KeymapNames		Turc (Gjenar-Q)
 Revert	Modifier keys window		Ripristine
 Caps:	Modifier keys window	Caps key role name	Maiusc:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Maiusc
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedon
 Czech (Mac)	KeymapNames		Cec (Mac)
-Left command	Keyboard Layout View		Comant a çampe
 Albanian	KeymapNames		Albanês
 (Current)	Keymap window		(Atuâl)
 OPT	Keyboard Layout View	Very short for 'option'	OPZ
 Friulian	KeymapNames		Furlan
-Left option	Keyboard Layout View		Opzion a çampe
 END	Keyboard Layout View		FIN
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorùs
 Warning: left and right key roles do not match	Modifier keys window		Atenzion: i rûi dai tascj çampe e drete no corispuindin
 Circumflex trigger	Keymap window		Acent circonflès (^)
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Bloc Maiusc
-Left shift	Keyboard Layout View		Maiusc a çampe
 Russian (Yawert)	KeymapNames		Rus (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internazionâl
 Bulgarian (Cyrillic)	KeymapNames		Bulgar (Cirilic)
 Swedish	KeymapNames		Svedês
-Left control	Keyboard Layout View		Control a çampe
 CAPS	Keyboard Layout View	Very short for 'caps lock'	⇪
 Role	Modifier keys window	As in the role of a modifier key	Rûl
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Gjeneriche 105-tascj Internaz
 Disabled	Modifier keys window	Do nothing	Disabilitât
 Select dead keys	Keymap window		Selezione tascj muarts
 Russian (Mac)	KeymapNames		Rus (Mac)
-Right shift	Keyboard Layout View		Maiusc a diestre
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bielorùs (Latin)
 Hebrew	KeymapNames		Ebraic
@@ -149,7 +139,6 @@ System:	Keymap window		Sisteme:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Internazionâl
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Estese (US)
 Switch shortcut keys	Keymap window		Scambie tascj di scurte
-Right command	Keyboard Layout View		Comant di diestre
 NUM LOCK	Keyboard Layout View		BLOC NUM
 MENU	Keyboard Layout View		MENÙ
 Belgian (comma)	KeymapNames		Belgjic (virgule)

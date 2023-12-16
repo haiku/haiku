@@ -1,11 +1,10 @@
-1	english	x-vnd.Haiku-Keymap	3076887274
+1	english	x-vnd.Haiku-Keymap	1938595652
 Key	Modifier keys window	As in a computer keyboard key	按键
 Japanese	KeymapNames		日语
 US	KeymapNames		美国
 PG ↑	Keyboard Layout View	Very short for 'page up'	上翻 ↑
 Brazilian	KeymapNames		巴西
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (美国)
-Right control	Keyboard Layout View		右 Ctrl 键
 Dvorak	KeymapNames		德沃夏克
 Option:	Modifier keys window	Option key role name	选项：
 Cancel	Modifier keys window		取消
@@ -20,13 +19,10 @@ Turkish (Type-F)	KeymapNames		土耳其(F型)
 Serbian (Cyrillic)	KeymapNames		塞尔维亚 (西里尔)
 Belgian (point)	KeymapNames		比利时 (point)
 Finnish	KeymapNames		芬兰
-Num lock	Keyboard Layout View		Mum 锁
 Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
 Spanish (Dvorak)	KeymapNames		西班牙(德沃夏克)
 Option	Keyboard Layout View	Option key	选项
-Scroll lock	Keyboard Layout View		滚动锁定
 US-International	KeymapNames		美国-国际
-Right option	Keyboard Layout View		右侧选项
 Turkish (Type-Q)	KeymapNames		土耳其 (Q型)
 Revert	Modifier keys window		取消
 Slovak	KeymapNames		斯洛伐克
@@ -61,14 +57,9 @@ Control	Keyboard Layout View	Control key	Control
 Remove	Keyboard Layout View		删除
 Tilde trigger	Keymap window		触发颚化字符
 Shift	Keyboard Layout View	Shift key	Shift
-Left command	Keyboard Layout View		左侧 Command
 (Current)	Keymap window		（当前）
-Left option	Keyboard Layout View		左侧 option
 Warning: left and right key roles do not match	Modifier keys window		警告：左右键规则不匹配
 Circumflex trigger	Keymap window		触发音调符号
-Caps lock	Keyboard Layout View		大小写锁定
-Left shift	Keyboard Layout View		左侧 shift 键
-Left control	Keyboard Layout View		左侧 Ctrl
 Role	Modifier keys window	As in the role of a modifier key	作用
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
 Czech	KeymapNames		捷克语
@@ -76,7 +67,6 @@ Control:	Modifier keys window	Control key role name	控制：
 Generic 105-key International	KeyboardLayoutNames		国际通用105键
 Disabled	Modifier keys window	Do nothing	禁用
 Select dead keys	Keymap window		选择废键：
-Right shift	Keyboard Layout View		右侧 shift 键
 Layout	Keymap window		布局
 Revert	Keymap window		取消
 Grave trigger	Keymap window		触发雕刻字符
@@ -91,7 +81,6 @@ Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
 Defaults	Keymap window		默认
 System:	Keymap window		系统：
 Switch shortcut keys	Keymap window		切换快捷键
-Right command	Keyboard Layout View		右 Command 键
 Belgian (comma)	KeymapNames		比利时语（comma）
 Font	Keymap window		字体
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键

@@ -1,11 +1,10 @@
-1	lithuanian	x-vnd.Haiku-Keymap	2850776429
+1	lithuanian	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Klavišas
 Japanese	KeymapNames		Japonų
 US	KeymapNames		JAV
 PG ↑	Keyboard Layout View	Very short for 'page up'	PSL↑
 Brazilian	KeymapNames		Brazilų
 ThinkPad (US)	KeyboardLayoutNames		„ThinkPad“ (JAV)
-Right control	Keyboard Layout View		Dešinysis Valdymas
 X-Bows Nature	KeyboardLayoutNames		„X-Bows Nature“
 Dvorak	KeymapNames		„Dvorak“
 Option:	Modifier keys window	Option key role name	Alternatyva:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turkų (F tipo)
 Serbian (Cyrillic)	KeymapNames		Serbų (kirilica)
 Belgian (point)	KeymapNames		Belgų (su dešimtainiu tašku)
 Finnish	KeymapNames		Suomių
-Num lock	Keyboard Layout View		Skaitmenys
 Switch shortcut keys to Windows/Linux mode	Keymap window		Naudoti „Windows“ ir „Linux“ valdymo klavišus
 Spanish (Dvorak)	KeymapNames		Ispanų (Dvorako)
 Option	Keyboard Layout View	Option key	Alternatyva
-Scroll lock	Keyboard Layout View		Slinkti
 US-International	KeymapNames		JAV tarptautinis
-Right option	Keyboard Layout View		Dešinysis Alternatyva
 Turkish (Type-Q)	KeymapNames		Turkų (Q tipo)
 Revert	Modifier keys window		Atšaukti pakeitimus
 Slovak	KeymapNames		Slovakų
@@ -79,25 +75,20 @@ Shift	Keyboard Layout View	Shift key	Lyg2
 CONTROL	Keyboard Layout View		VALDYMAS
 Macedonian	KeymapNames		Makedoniečių
 Czech (Mac)	KeymapNames		Čekų („Mac“)
-Left command	Keyboard Layout View		Kairysis Komanda
 Albanian	KeymapNames		Albanų
 (Current)	Keymap window		(Esamas)
 OPT	Keyboard Layout View	Very short for 'option'	ALT
 Friulian	KeymapNames		Friulų
-Left option	Keyboard Layout View		Kairysis Alternatyva
 END	Keyboard Layout View		PAB
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Baltarusių
 Warning: left and right key roles do not match	Modifier keys window		Dėmesio! Dešinės ir kairės pusės valdymo klavišų funkcijos nesutampa
 Circumflex trigger	Keymap window		Stogelis
 Fizzbook NL2	KeyboardLayoutNames		„Fizzbook NL2“
-Caps lock	Keyboard Layout View		Didž
-Left shift	Keyboard Layout View		Kairysis Antrasis lygis
 Russian (Yawert)	KeymapNames		Rusų (fonetinis)
 ThinkPad X100e International	KeyboardLayoutNames		„ThinkPad X100e“ tarptautinė
 Bulgarian (Cyrillic)	KeymapNames		Bulgarų
 Swedish	KeymapNames		Švedų
-Left control	Keyboard Layout View		Kairysis Valdymas
 CAPS	Keyboard Layout View	Very short for 'caps lock'	DIDŽ
 Role	Modifier keys window	As in the role of a modifier key	Funkcija
 Svorak	KeymapNames		„Svorak“
@@ -113,7 +104,6 @@ Generic 105-key International	KeyboardLayoutNames		Įprastinė 105 klavišų (IS
 Disabled	Modifier keys window	Do nothing	Joks
 Select dead keys	Keymap window		Kombinaciniai klavišai
 Russian (Mac)	KeymapNames		Rusų („Mac“)
-Right shift	Keyboard Layout View		Dešinysis Antrasis lygis
 ESC	Keyboard Layout View		⎋GR
 Belarusian (Latin)	KeymapNames		Baltarusių (lotyniški rašmenys)
 Hebrew	KeymapNames		Hebrajų
@@ -148,7 +138,6 @@ System:	Keymap window		Sistemos išdėstymai:
 ThinkPad International	KeyboardLayoutNames		„ThinkPad“ tarptautinė
 Apple Aluminum Extended (US)	KeyboardLayoutNames		„Apple Aluminum“ viso dydžio (JAV)
 Switch shortcut keys	Keymap window		Sukeisti Valdymo ir Komandos klavišus
-Right command	Keyboard Layout View		Dešinysis Komanda
 NUM LOCK	Keyboard Layout View		SKAITM
 MENU	Keyboard Layout View		MENIU
 Belgian (comma)	KeymapNames		Belgų (su dešimtainiu kableliu)

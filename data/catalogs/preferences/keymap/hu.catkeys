@@ -1,11 +1,10 @@
-1	hungarian	x-vnd.Haiku-Keymap	2850776429
+1	hungarian	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazil
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Egyesült Államok)
-Right control	Keyboard Layout View		Jobb Ctrl
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opció billentyű
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Török (F-típus)
 Serbian (Cyrillic)	KeymapNames		Szerc (cirill)
 Belgian (point)	KeymapNames		Belga (pont)
 Finnish	KeymapNames		Finn
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Billentyűkombináció váltása Windows/Linux módra
 Spanish (Dvorak)	KeymapNames		Spanyol (Dvorak)
 Option	Keyboard Layout View	Option key	Opció billentyű
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		Egyesült Államok (nemzetközi)
-Right option	Keyboard Layout View		Jobb opció billentyű
 Turkish (Type-Q)	KeymapNames		Török (Q-típus)
 Revert	Modifier keys window		Visszaállít
 Slovak	KeymapNames		Szlovák
@@ -79,25 +75,20 @@ Shift	Keyboard Layout View	Shift key	Váltógomb
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedón
 Czech (Mac)	KeymapNames		Cseh (Mac)
-Left command	Keyboard Layout View		Bal parancs billentyű
 Albanian	KeymapNames		Albán
 (Current)	Keymap window		(jelenlegi)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friuli
-Left option	Keyboard Layout View		Bal opció billentyű
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Eszperantó
 Belarusian	KeymapNames		Belorusz
 Warning: left and right key roles do not match	Modifier keys window		Figyelem: a bal és a jobb szabály nem egyezik
 Circumflex trigger	Keymap window		Kalap kapcsoló
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Bal Shift
 Russian (Yawert)	KeymapNames		Orosz (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e (nemzetközi)
 Bulgarian (Cyrillic)	KeymapNames		Bolgár (cirill)
 Swedish	KeymapNames		Svéd
-Left control	Keyboard Layout View		Bal Ctrl
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Szerep
 Svorak	KeymapNames		Svorak
@@ -113,7 +104,6 @@ Generic 105-key International	KeyboardLayoutNames		Hagyományos 105 billentyűs 
 Disabled	Modifier keys window	Do nothing	Letiltva
 Select dead keys	Keymap window		Beragadó gombok kiválasztása
 Russian (Mac)	KeymapNames		Orosz (Mac)
-Right shift	Keyboard Layout View		Jobb Shift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Belorusz (latin)
 Hebrew	KeymapNames		Héber
@@ -148,7 +138,6 @@ System:	Keymap window		Nyelv:
 ThinkPad International	KeyboardLayoutNames		ThinkPad (nemzetközi)
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (Egyesült Államok)
 Switch shortcut keys	Keymap window		Billentyűzetkombináció-váltás
-Right command	Keyboard Layout View		Jobb parancs billentyű
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belga (vessző)

@@ -1,11 +1,10 @@
-1	danish	x-vnd.Haiku-Keymap	2850776429
+1	danish	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Japansk
 US	KeymapNames		USA
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasiliansk
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (USA)
-Right control	Keyboard Layout View		Højre ctrl
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Tyrkisk (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbisk (kyrillisk)
 Belgian (point)	KeymapNames		Belgisk (point)
 Finnish	KeymapNames		Finsk
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Skift genvejstaster til Windows-/Linux-tilstand
 Spanish (Dvorak)	KeymapNames		Spansk (Dvorak)
 Option	Keyboard Layout View	Option key	Option
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		USA-internationalt
-Right option	Keyboard Layout View		Højre option
 Turkish (Type-Q)	KeymapNames		Tyrkisk (type-Q)
 Revert	Modifier keys window		Tilbagefør
 Slovak	KeymapNames		Slovakisk
@@ -79,25 +75,20 @@ Shift	Keyboard Layout View	Shift key	Skift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Makedonsk
 Czech (Mac)	KeymapNames		Tjekkisk (Mac)
-Left command	Keyboard Layout View		Venstre command
 Albanian	KeymapNames		Albansk
 (Current)	Keymap window		(Nuværende)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friulisk
-Left option	Keyboard Layout View		Venstre option
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Hviderussisk
 Warning: left and right key roles do not match	Modifier keys window		Advarsel: venstre og højre tasteroller matcher ikke
 Circumflex trigger	Keymap window		Circumflex udløser
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Venstre skift
 Russian (Yawert)	KeymapNames		Russisk (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
 Bulgarian (Cyrillic)	KeymapNames		Bulgarsk (kyrillisk)
 Swedish	KeymapNames		Svensk
-Left control	Keyboard Layout View		Venstre control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rolle
 Svorak	KeymapNames		Svorak
@@ -113,7 +104,6 @@ Generic 105-key International	KeyboardLayoutNames		Generic 105-key International
 Disabled	Modifier keys window	Do nothing	Deaktiveret
 Select dead keys	Keymap window		Vælg døde taster
 Russian (Mac)	KeymapNames		Russisk (Mac)
-Right shift	Keyboard Layout View		Højre skift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Hviderussisk (Latin)
 Hebrew	KeymapNames		Hebraisk
@@ -148,7 +138,6 @@ System:	Keymap window		System:
 ThinkPad International	KeyboardLayoutNames		ThinkPad International
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (USA)
 Switch shortcut keys	Keymap window		Skift genvejstaster
-Right command	Keyboard Layout View		Højre command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belgisk (komma)

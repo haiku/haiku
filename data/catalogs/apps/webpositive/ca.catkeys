@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	2390126114
+1	catalan; valencian	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copia
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Suprimeix
 Open containing folder	Download Window		Obre la carpeta que ho conté
 Find previous	WebPositive Window		Troba'n l'anterior
 Full screen	WebPositive Window		Pantalla completa
-Bookmark bar	WebPositive Window		Barra d'adreces d'interès
 Downloads in progress	WebPositive		Baixada en progrés
 Copy URL to clipboard	Download Window		Copia l'URL al porta-retalls
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voleu obrir %addedCount adreces d'interès alhora?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Mida de la lletra estàndard per de
 Custom	Settings Window		Personalitzat
 Bookmark this page	WebPositive Window		Afegeix aquesta pàgina a les adreces d'interès
 Show tabs if only one page is open	Settings Window		Mostra les pestanyes si només s’obre una pàgina.
-Remove	Download Window		Suprimeix
 Close tab	WebPositive Window		Tanca la pestanya
+Remove	Download Window		Suprimeix
 About	WebPositive Window		Quant a
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Encara hi ha baixades en curs, realment voleu sortir del WebPositive ara?
 Continue downloads	WebPositive		Continua les baixades

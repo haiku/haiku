@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-WebPositive	2390126114
+1	italian	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
 Copy	Console Window		Copia
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Elimina
 Open containing folder	Download Window		Mostra nella cartella
 Find previous	WebPositive Window		Trova precedente
 Full screen	WebPositive Window		Schermo intero
-Bookmark bar	WebPositive Window		Barra dei segnalibri
 Downloads in progress	WebPositive		Download in corso
 Copy URL to clipboard	Download Window		Copia URL negli appunti
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sei sicuro di voler aprire %addedCount segnalibri contemporaneamente?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Dimensione predefinita caratteri:
 Custom	Settings Window		Personalizzato
 Bookmark this page	WebPositive Window		Aggiungi questa pagina ai segnalibri
 Show tabs if only one page is open	Settings Window		Mostra tab anche se solo una pagina è aperta
-Remove	Download Window		Rimuovi
 Close tab	WebPositive Window		Chiudi tab
+Remove	Download Window		Rimuovi
 About	WebPositive Window		Informazioni
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ci sono ancora dei download in corso, sei sicuro di voler uscire da WebPositive adesso?
 Continue downloads	WebPositive		Riprendi i download

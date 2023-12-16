@@ -1,11 +1,10 @@
-1	german	x-vnd.Haiku-Keymap	2618211193
+1	german	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Taste
 Japanese	KeymapNames		Japanisch
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	Bld ↑
 Brazilian	KeymapNames		Brasilianisch
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Steuerung rechts
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Türkisch (Typ-F)
 Serbian (Cyrillic)	KeymapNames		Serbisch (Kyrillisch)
 Belgian (point)	KeymapNames		Belgisch (Point)
 Finnish	KeymapNames		Finnisch
-Num lock	Keyboard Layout View		Num-Feststelltaste
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
 Spanish (Dvorak)	KeymapNames		Spanisch (Dvorak)
 Option	Keyboard Layout View	Option key	Option
-Scroll lock	Keyboard Layout View		Rollen-Feststelltaste
 US-International	KeymapNames		US (international)
-Right option	Keyboard Layout View		Option rechts
 Turkish (Type-Q)	KeymapNames		Türkisch (Typ-Q)
 Revert	Modifier keys window		Anfangswerte
 Caps:	Modifier keys window	Caps key role name	Feststell:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		STEUERUNG
 Macedonian	KeymapNames		Mazedonisch
 Czech (Mac)	KeymapNames		Tschechisch (Mac)
-Left command	Keyboard Layout View		Befehl links
 Albanian	KeymapNames		Albanisch
 (Current)	Keymap window		(Aktiv)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friaulisch
-Left option	Keyboard Layout View		Option links
 END	Keyboard Layout View		ENDE
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Weißrussisch
 Warning: left and right key roles do not match	Modifier keys window		Achtung: linke und rechte Tasten-Funktion passen nicht zusammen
 Circumflex trigger	Keymap window		^ Zirkumflex
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Feststelltaste
-Left shift	Keyboard Layout View		Shift links
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e (international)
 Bulgarian (Cyrillic)	KeymapNames		Bulgarisch (Kyrillisch)
 Swedish	KeymapNames		Schwedisch
-Left control	Keyboard Layout View		Steuerung links
 CAPS	Keyboard Layout View	Very short for 'caps lock'	FEST
 Role	Modifier keys window	As in the role of a modifier key	Funktion
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Allgemeine 105-Tasten (intern
 Disabled	Modifier keys window	Do nothing	Deaktiviert
 Select dead keys	Keymap window		Tottasten wählen
 Russian (Mac)	KeymapNames		Russisch (Mac)
-Right shift	Keyboard Layout View		Shift rechts
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Weißrussisch (lat. Alphabet)
 Hebrew	KeymapNames		Hebräisch
@@ -149,7 +139,6 @@ System:	Keymap window		System:
 ThinkPad International	KeyboardLayoutNames		ThinkPad (international)
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
-Right command	Keyboard Layout View		Befehl rechts
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENÜ
 Belgian (comma)	KeymapNames		Belgisch (Komma)

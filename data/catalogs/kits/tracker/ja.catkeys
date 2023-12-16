@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3955111295
+1	japanese	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -337,6 +337,7 @@ yes	AttributesView		はい
 Make active printer	ContainerWindow		プリンターを有効にする
 Copy to	ContainerWindow		次へコピー
 Name	SelectionWindow		名前
+Location	Default Query Columns		場所
 by attribute	FindPanel		属性で検索
 Write	FilePermissionsView		書き込み
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		システムフォルダーやその内容を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容を変更するなら、シフトキーを押したまま \"私はなにをするか理解しています\" をクリックします。

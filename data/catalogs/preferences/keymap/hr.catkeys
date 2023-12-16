@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Keymap	1468284351
+1	croatian	x-vnd.Haiku-Keymap	1652389281
 Key	Modifier keys window	As in a computer keyboard key	Tipka
 Japanese	KeymapNames		Japanski
 Brazilian	KeymapNames		Brazilski
@@ -15,7 +15,6 @@ United-Kingdom	KeymapNames		Ujedinjena kraljevina
 Turkish (Type-F)	KeymapNames		Turski (tip-F)
 Serbian (Cyrillic)	KeymapNames		Srpski (ćirilica)
 Finnish	KeymapNames		Finski
-Num lock	Keyboard Layout View		Num Lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Prebaci tipke prečaca u Windows/Linux način rada
 Spanish (Dvorak)	KeymapNames		Španjolski (Dvorak)
 Option	Keyboard Layout View	Option key	Opcija

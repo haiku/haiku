@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	2390126114
+1	hungarian	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 Copy	Console Window		Másolás
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Töröl
 Open containing folder	Download Window		Tartalmazó mappa megnyitása
 Find previous	WebPositive Window		Előző találat
 Full screen	WebPositive Window		Teljes képernyő
-Bookmark bar	WebPositive Window		Könyvjelző sáv
 Downloads in progress	WebPositive		Folyamatban lévő letöltések
 Copy URL to clipboard	Download Window		URL vágólapra másolása
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg szeretnél nyitni %addedCount könyvjelzőt?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Alapértelmezett betűméret:
 Custom	Settings Window		Egyéni
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
 Show tabs if only one page is open	Settings Window		Fülek megjelenítése egy oldal esetén is
-Remove	Download Window		Eltávolít
 Close tab	WebPositive Window		Fül bezárása
+Remove	Download Window		Eltávolít
 About	WebPositive Window		Névjegy
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Letöltések vannak folyamatban, biztosan bezárjuk a WebPositive-ot?
 Continue downloads	WebPositive		Letöltések folytatása

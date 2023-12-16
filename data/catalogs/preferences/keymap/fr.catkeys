@@ -1,11 +1,10 @@
-1	french	x-vnd.Haiku-Keymap	2618211193
+1	french	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brésilien
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Contrôle droit
 X-Bows Nature	KeyboardLayoutNames		X-Bows Ergonomique
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option :
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turc (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbe (cyrillique)
 Belgian (point)	KeymapNames		Belge (point)
 Finnish	KeymapNames		Finnois
-Num lock	Keyboard Layout View		Verr. Num.
 Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
 Spanish (Dvorak)	KeymapNames		Espagnol (Dvorak)
 Option	Keyboard Layout View	Option key	Option
-Scroll lock	Keyboard Layout View		Arrêt défilement
 US-International	KeymapNames		US-International
-Right option	Keyboard Layout View		Option droite
 Turkish (Type-Q)	KeymapNames		Turc (Type-Q)
 Revert	Modifier keys window		Rétablir
 Caps:	Modifier keys window	Caps key role name	Maj :
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Majuscule
 CONTROL	Keyboard Layout View		Contrôle
 Macedonian	KeymapNames		Macédonien
 Czech (Mac)	KeymapNames		Tchèque (Mac)
-Left command	Keyboard Layout View		Commande gauche
 Albanian	KeymapNames		Albanais
 (Current)	Keymap window		(Actif)
 OPT	Keyboard Layout View	Very short for 'option'	Opt
 Friulian	KeymapNames		Frioulan
-Left option	Keyboard Layout View		Option gauche
 END	Keyboard Layout View		Fin
 Esperanto	KeymapNames		Espéranto
 Belarusian	KeymapNames		Biélorusse
 Warning: left and right key roles do not match	Modifier keys window		Attention : les rôles des touches gauche et droite ne correspondent pas
 Circumflex trigger	Keymap window		Accent circonflexe
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Verr. Maj.
-Left shift	Keyboard Layout View		Majuscule gauche
 Russian (Yawert)	KeymapNames		Russe (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
 Bulgarian (Cyrillic)	KeymapNames		Bulgare (cyrillique)
 Swedish	KeymapNames		Suédois
-Left control	Keyboard Layout View		Contrôle gauche
 CAPS	Keyboard Layout View	Very short for 'caps lock'	Maj.
 Role	Modifier keys window	As in the role of a modifier key	Rôle
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Générique 105 touches Inter
 Disabled	Modifier keys window	Do nothing	Désactivé
 Select dead keys	Keymap window		Sélection des touches mortes
 Russian (Mac)	KeymapNames		Russe (Mac)
-Right shift	Keyboard Layout View		Majuscule droite
 ESC	Keyboard Layout View		Esc
 Belarusian (Latin)	KeymapNames		Biélorusse (Latin)
 Hebrew	KeymapNames		Hébreu
@@ -149,7 +139,6 @@ System:	Keymap window		Système :
 ThinkPad International	KeyboardLayoutNames		ThinkPad International
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminium Étendu (US)
 Switch shortcut keys	Keymap window		Basculer les touches de raccourcis
-Right command	Keyboard Layout View		Commande droite
 NUM LOCK	Keyboard Layout View		Verr. Num.
 MENU	Keyboard Layout View		Menu
 Belgian (comma)	KeymapNames		Belge (virgule)

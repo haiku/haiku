@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	2390126114
+1	swedish	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 Copy	Console Window		Kopiera
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Ta bort
 Open containing folder	Download Window		Öppna innehållande mapp
 Find previous	WebPositive Window		Hitta tidigare
 Full screen	WebPositive Window		Fullskärm
-Bookmark bar	WebPositive Window		Bokmärkesfältet
 Downloads in progress	WebPositive		Nedladdningar pågår
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på samma gång?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Förinställd storlek för standard
 Custom	Settings Window		Egen inställning
 Bookmark this page	WebPositive Window		Bokmärk den här sidan
 Show tabs if only one page is open	Settings Window		Visa flikar om endast en sida är öppen
-Remove	Download Window		Ta bort
 Close tab	WebPositive Window		Stäng flik
+Remove	Download Window		Ta bort
 About	WebPositive Window		Om
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Nedladdningar pågår fortfarande. Vill du verkligen stänga WebPositive nu?
 Continue downloads	WebPositive		Återuppta nedladdningar

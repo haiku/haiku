@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-WebPositive	2390126114
+1	czech	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 Copy	Console Window		Kopírovat
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Smazat
 Open containing folder	Download Window		Otevřít nahrazenou složku
 Find previous	WebPositive Window		Najít předchozí
 Full screen	WebPositive Window		Celá obrazovka
-Bookmark bar	WebPositive Window		Lišta záložek
 Downloads in progress	WebPositive		Stahování probíhá
 Copy URL to clipboard	Download Window		Zkopírovat adresu URL do schránky
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otevřít %addedCount záložek naráz?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Výchozí velikost standardního p�
 Custom	Settings Window		Vlastní
 Bookmark this page	WebPositive Window		Přidat tuto stránku do záložek
 Show tabs if only one page is open	Settings Window		Zobrazit karty, je-li otevřena pouze jedna karta
-Remove	Download Window		Odebrat
 Close tab	WebPositive Window		Zavřít kartu
+Remove	Download Window		Odebrat
 About	WebPositive Window		O aplikaci
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Stále probíhá stahování, opravdu ukončit WebPositive?
 Continue downloads	WebPositive		Pokračovat ve stahování

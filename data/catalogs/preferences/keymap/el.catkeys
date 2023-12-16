@@ -1,11 +1,10 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Keymap	2618211193
+1	greek, modern (1453-)	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Πλήκτρο
 Japanese	KeymapNames		Ιαπωνέζικο
 US	KeymapNames		ΗΠΑ
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Βραζιλιάνικο
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (ΗΠΑ)
-Right control	Keyboard Layout View		Δεξιό control
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Τούρκικο (Τύπου-F)
 Serbian (Cyrillic)	KeymapNames		Σέρβικο (Κυριλλικό)
 Belgian (point)	KeymapNames		Βελγικό (point)
 Finnish	KeymapNames		Φινλανδικό
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Αλλαγή πλήκτρων συντόμευσης σε λειτουργία Windows/Linux
 Spanish (Dvorak)	KeymapNames		Ισπανικό (Dvorak)
 Option	Keyboard Layout View	Option key	Option
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		Διεθνές ΗΠΑ
-Right option	Keyboard Layout View		Δεξιό option
 Turkish (Type-Q)	KeymapNames		Τούρκικο (Τύπου-Q)
 Revert	Modifier keys window		Επαναφορά
 Caps:	Modifier keys window	Caps key role name	Caps:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Βόρειο Μακεδονικό
 Czech (Mac)	KeymapNames		Τσέχικο (Mac)
-Left command	Keyboard Layout View		Αριστερό command
 Albanian	KeymapNames		Αλβανικό
 (Current)	Keymap window		(Τρέχων)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Φριουλιανό
-Left option	Keyboard Layout View		Αριστερό option
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Εσπεράντο
 Belarusian	KeymapNames		Λευκορώσικο
 Warning: left and right key roles do not match	Modifier keys window		Προσοχή: Οι ρόλοι του αριστερού και του δεξιού πλήκτρου δεν αντιστοιχούν
 Circumflex trigger	Keymap window		Περισπωμένη
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Αριστερό shift
 Russian (Yawert)	KeymapNames		Ρώσικο (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e (Παγκόσμιο)
 Bulgarian (Cyrillic)	KeymapNames		Βουλγαρικό (Κυριλλικό)
 Swedish	KeymapNames		Σουηδικό
-Left control	Keyboard Layout View		Αριστερό control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Ρόλος
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Γενικό 105-πλήκτρ
 Disabled	Modifier keys window	Do nothing	Απενεργοποιημένο
 Select dead keys	Keymap window		Επιλογή νεκρών πλήκτρων
 Russian (Mac)	KeymapNames		Ρώσικο (Mac)
-Right shift	Keyboard Layout View		Δεξιό shift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Λευκορώσικο (Λατινικό)
 Hebrew	KeymapNames		Εβραϊκό
@@ -149,7 +139,6 @@ System:	Keymap window		Σύστημα:
 ThinkPad International	KeyboardLayoutNames		ThinkPad (Παγκόσμιο)
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Εκτεταμένο Apple Aluminum (ΗΠΑ)
 Switch shortcut keys	Keymap window		Αλλαγή πλήκτρων συντόμευσης
-Right command	Keyboard Layout View		Δεξιό command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Βελγικό (κόμμα)

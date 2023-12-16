@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	885044264
+1	swedish	x-vnd.Haiku-About	4264836225
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Alla rättigheter förbehållna.
@@ -31,6 +31,8 @@ Licenses: 	AboutView		Licenser:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten till Haiku's källkod en egendom tillhörande Haiku, Inc. eller respektive upphovsman, där det uttryckligen är angivet i källkoden. Haiku® och Haiku's logo® är registrerade varumärken tillhörande Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Upphovsrätt © 2009 Colin Percival
 Time running:	AboutView		Tid sedan uppstart:
+Version: %s	AboutView	Version: R1 or hrev99999	Version: %s
+%d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB Minne:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Upphovsrätt © 1996-2005 Julian R Seward. Med ensamrätt.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Upphovsrätt © 1994-2009 Thomas G. Lane och Guido Vollbeding. Denna programvara är baserat på delar av arbetet av Independent JPEG Group.

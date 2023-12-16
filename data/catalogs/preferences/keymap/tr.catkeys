@@ -1,11 +1,10 @@
-1	turkish	x-vnd.Haiku-Keymap	2618211193
+1	turkish	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
 PG ↑	Keyboard Layout View	Very short for 'page up'	SF↑
 Brazilian	KeymapNames		Brezilya
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Sağ Kontrol
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Seçenek:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Türkçe (F)
 Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
 Belgian (point)	KeymapNames		Flamanca (nokta)
 Finnish	KeymapNames		Fince
-Num lock	Keyboard Layout View		Sayı kilidi
 Switch shortcut keys to Windows/Linux mode	Keymap window		Kestirmeleri Windows/Linux kipine geçir
 Spanish (Dvorak)	KeymapNames		İspanyolca (Dvorak)
 Option	Keyboard Layout View	Option key	Seçenek
-Scroll lock	Keyboard Layout View		Sarma kilidi
 US-International	KeymapNames		Birleşik Devletler-Uluslararası
-Right option	Keyboard Layout View		Sağ Seçenek
 Turkish (Type-Q)	KeymapNames		Türkçe (Q)
 Revert	Modifier keys window		Eski haline döndür
 Caps:	Modifier keys window	Caps key role name	Büyük harf:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Üst Karakter
 CONTROL	Keyboard Layout View		KONTROL
 Macedonian	KeymapNames		Makedonca
 Czech (Mac)	KeymapNames		Çekçe (Mac)
-Left command	Keyboard Layout View		Sol Komut
 Albanian	KeymapNames		Arnavutça
 (Current)	Keymap window		(Geçerli)
 OPT	Keyboard Layout View	Very short for 'option'	SEÇENEK
 Friulian	KeymapNames		Furlanca
-Left option	Keyboard Layout View		Sol Seçenek
 END	Keyboard Layout View		SON
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Beyaz Rusça
 Warning: left and right key roles do not match	Modifier keys window		Uyarı: Sol ve sağ düğme rolleri eşleşmiyor
 Circumflex trigger	Keymap window		Düzeltme imi tetikleyicisi
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Büyük Harf
-Left shift	Keyboard Layout View		Sol Üst Karakter
 Russian (Yawert)	KeymapNames		Rusça (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Uluslararası
 Bulgarian (Cyrillic)	KeymapNames		Bulgarca (Kiril)
 Swedish	KeymapNames		İsveççe
-Left control	Keyboard Layout View		Sol Kontrol
 CAPS	Keyboard Layout View	Very short for 'caps lock'	BÜYÜK
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Standart 105 düğmeli ulusla
 Disabled	Modifier keys window	Do nothing	Devre dışı
 Select dead keys	Keymap window		Ölü düğmeleri seç
 Russian (Mac)	KeymapNames		Rusça (Mac)
-Right shift	Keyboard Layout View		Sağ Üst Karakter
 ESC	Keyboard Layout View		VGÇ
 Belarusian (Latin)	KeymapNames		Beyaz Rusça (Latin)
 Hebrew	KeymapNames		İbranca
@@ -149,7 +139,6 @@ System:	Keymap window		Sistem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Uluslararası
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Alüminyum Genişletilmiş (US)
 Switch shortcut keys	Keymap window		Kestirme düğmelerini değiştir
-Right command	Keyboard Layout View		Sağ Komut
 NUM LOCK	Keyboard Layout View		SAYI KİLİDİ
 MENU	Keyboard Layout View		MENÜ
 Belgian (comma)	KeymapNames		Flamanca (virgül)

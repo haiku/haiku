@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	2390126114
+1	friulian	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 Copy	Console Window		Copie
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Elimine
 Open containing folder	Download Window		Mostre te cartele
 Find previous	WebPositive Window		Cjate precedent
 Full screen	WebPositive Window		Plen visôr
-Bookmark bar	WebPositive Window		Sbare dai segnelibris
 Downloads in progress	WebPositive		Discjariaments in pîts
 Copy URL to clipboard	Download Window		Copie URL tes notis
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Dimension dal caratar standard pred
 Custom	Settings Window		Personalizât
 Bookmark this page	WebPositive Window		Zonte cheste pagjine ai segnelibris
 Show tabs if only one page is open	Settings Window		Mostre schedis ancje se e je vierte dome une pagjine
-Remove	Download Window		Gjave
 Close tab	WebPositive Window		Siere schede
+Remove	Download Window		Gjave
 About	WebPositive Window		Informazions
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Al è ancjemò in pîts cualchi discjariament, vûstu pardabon lâ fûr di WebPositive cumò?
 Continue downloads	WebPositive		Ripie i discjariaments

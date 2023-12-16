@@ -1,11 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-Keymap	2850776429
+1	dutch; flemish	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Toets
 Japanese	KeymapNames		Japans
 US	KeymapNames		VS
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Braziliaans
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (VS)
-Right control	Keyboard Layout View		Rechter control
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Optie:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turks (F-indeling)
 Serbian (Cyrillic)	KeymapNames		Servisch (Cyrillisch)
 Belgian (point)	KeymapNames		Belgisch (punt)
 Finnish	KeymapNames		Fins
-Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Snelkoppelingstoetsen omschakelen naar Windows/Linux-modus
 Spanish (Dvorak)	KeymapNames		Spaans (Dvorak)
 Option	Keyboard Layout View	Option key	Optie
-Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		VS-Internationaal
-Right option	Keyboard Layout View		Rechter optie
 Turkish (Type-Q)	KeymapNames		Turks (Q-indeling)
 Revert	Modifier keys window		Herstellen
 Slovak	KeymapNames		Slowaaks
@@ -79,25 +75,20 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedonisch
 Czech (Mac)	KeymapNames		Tsjechisch (Mac)
-Left command	Keyboard Layout View		Linker command
 Albanian	KeymapNames		Albanees
 (Current)	Keymap window		(Huidig)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friuliaans
-Left option	Keyboard Layout View		Linker option
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Wit-Russisch
 Warning: left and right key roles do not match	Modifier keys window		Waarschuwing: rol van de linker- en rechtertoetsen komen niet overeen
 Circumflex trigger	Keymap window		Circumflex-activeerder
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Caps lock
-Left shift	Keyboard Layout View		Linker shift
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internationaal
 Bulgarian (Cyrillic)	KeymapNames		Bulgaars (Cyrillisch)
 Swedish	KeymapNames		Zweeds
-Left control	Keyboard Layout View		Linker control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
@@ -113,7 +104,6 @@ Generic 105-key International	KeyboardLayoutNames		Generiek 105-toetsen Internat
 Disabled	Modifier keys window	Do nothing	Uitgeschakeld
 Select dead keys	Keymap window		Selecteer dode toetsen
 Russian (Mac)	KeymapNames		Russisch (Mac)
-Right shift	Keyboard Layout View		Rechter shift
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Wit-Russisch (Latijns)
 Hebrew	KeymapNames		Hebreeuws
@@ -148,7 +138,6 @@ System:	Keymap window		Systeem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Internationaal
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Uitgebreid (VS)
 Switch shortcut keys	Keymap window		Snelkoppelingstoetsen omschakelen
-Right command	Keyboard Layout View		Rechter command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
 Belgian (comma)	KeymapNames		Belgisch (komma)

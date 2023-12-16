@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	2390126114
+1	japanese	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 Copy	Console Window		コピー
@@ -21,7 +21,6 @@ Delete	Cookie Manager		削除
 Open containing folder	Download Window		フォルダーを開く
 Find previous	WebPositive Window		前を検索
 Full screen	WebPositive Window		全画面表示
-Bookmark bar	WebPositive Window		ブックマークバー
 Downloads in progress	WebPositive		ダウンロードが進行中です
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount 個のブックマークを同時に開きますか?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		標準フォントサイズ:
 Custom	Settings Window		ユーザー設定
 Bookmark this page	WebPositive Window		このページをブックマーク
 Show tabs if only one page is open	Settings Window		ページがひとつだけでもタブを表示
-Remove	Download Window		除去
 Close tab	WebPositive Window		タブを閉じる
+Remove	Download Window		除去
 About	WebPositive Window		このソフトウェアについて
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		まだダウンロードが進行中です。本当に WebPositive をすぐに終了しますか?
 Continue downloads	WebPositive		ダウンロードを続ける

@@ -1,11 +1,10 @@
-1	finnish	x-vnd.Haiku-Keymap	2618211193
+1	finnish	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasilialainen
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Oikea control-näppäin
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Valitsin:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turkkilainen (Type-F)
 Serbian (Cyrillic)	KeymapNames		Serbialainen (kyrillinen)
 Belgian (point)	KeymapNames		Belgialainen (piste)
 Finnish	KeymapNames		Suomalainen
-Num lock	Keyboard Layout View		Numerolukko
 Switch shortcut keys to Windows/Linux mode	Keymap window		Vaihda pikanäppäimet Windows/Linux -tilaan
 Spanish (Dvorak)	KeymapNames		Espanjalainen (Dvorak)
 Option	Keyboard Layout View	Option key	Valitsin
-Scroll lock	Keyboard Layout View		Vierityslukko
 US-International	KeymapNames		US-kansainvälinen
-Right option	Keyboard Layout View		Alt Gr-näppäin
 Turkish (Type-Q)	KeymapNames		Turkkilainen (Type-Q)
 Revert	Modifier keys window		Palauta
 Caps:	Modifier keys window	Caps key role name	Kirjainkokonäppäimet:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Vaihtonäppäin
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Makedonialainen
 Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
-Left command	Keyboard Layout View		Alt-näppäin
 Albanian	KeymapNames		Albanialainen
 (Current)	Keymap window		(Nykyinen)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friulian
-Left option	Keyboard Layout View		Vasen valitsin
 END	Keyboard Layout View		END
 Esperanto	KeymapNames		Esperantolainen
 Belarusian	KeymapNames		Valkovenäläinen
 Warning: left and right key roles do not match	Modifier keys window		Varoitus: vasemman ja oikean näppäimen roolit eivät täsmää
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Vaihtolukko
-Left shift	Keyboard Layout View		Vasen vaihtonäppäin
 Russian (Yawert)	KeymapNames		Venäläinen (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
 Bulgarian (Cyrillic)	KeymapNames		Bulgarialainen (kyrillinen)
 Swedish	KeymapNames		Ruotsalainen
-Left control	Keyboard Layout View		Vasen control-näppäin
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rooli
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Generic 105-key International
 Disabled	Modifier keys window	Do nothing	Poissa käytöstä
 Select dead keys	Keymap window		Valitse kuolleet näppäimet
 Russian (Mac)	KeymapNames		Venäläinen (Mac)
-Right shift	Keyboard Layout View		Oikea vaihtonäppäin
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Valkovenäläinen (latinalainen)
 Hebrew	KeymapNames		Heprealainen
@@ -149,7 +139,6 @@ System:	Keymap window		Järjestelmä:
 ThinkPad International	KeyboardLayoutNames		ThinkPad International
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		Vaihda pikanäppäimiä
-Right command	Keyboard Layout View		Oikea komentonäppäin
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		VALIKKO
 Belgian (comma)	KeymapNames		Belgialaienn (pilkku)

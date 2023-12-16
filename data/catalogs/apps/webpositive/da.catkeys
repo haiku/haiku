@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	2390126114
+1	danish	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Godkendelse er påkrævet
 Previous	WebPositive Window		Forrige
 Copy	Console Window		Kopiér
@@ -21,7 +21,6 @@ Delete	Cookie Manager		Slet
 Open containing folder	Download Window		Åbn indeholdende mappe
 Find previous	WebPositive Window		Find forrige
 Full screen	WebPositive Window		Fuldskærm
-Bookmark bar	WebPositive Window		Bogmærkelinje
 Downloads in progress	WebPositive		Igangværende overførsler
 Copy URL to clipboard	Download Window		Kopiér URL til udklipsholder
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vil du åbne %addedCount bogmærker samtidigt?
@@ -109,8 +108,8 @@ Default standard font size:	Settings Window		Forvalgt størrelse for forvalgt sk
 Custom	Settings Window		Tilpasset
 Bookmark this page	WebPositive Window		Bogmærk denne side
 Show tabs if only one page is open	Settings Window		Vis faneblade, hvis der kun er én side åben
-Remove	Download Window		Fjern
 Close tab	WebPositive Window		Luk faneblad
+Remove	Download Window		Fjern
 About	WebPositive Window		Om
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Der er stadig igangværende overførsler, vil du virkelig afslutte WebPositive nu?
 Continue downloads	WebPositive		Fortsæt hentninger

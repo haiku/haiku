@@ -1,11 +1,10 @@
-1	esperanto	x-vnd.Haiku-Keymap	1075970008
+1	esperanto	x-vnd.Haiku-Keymap	4232645682
 Key	Modifier keys window	As in a computer keyboard key	Klavo
 Japanese	KeymapNames		Japana
 US	KeymapNames		Usona
 PG ↑	Keyboard Layout View	Very short for 'page up'	PAĜO ↑
 Brazilian	KeymapNames		Brazila
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (Usona)
-Right control	Keyboard Layout View		Dekstra striklavo
 Dvorak	KeymapNames		Dvoraka
 Option:	Modifier keys window	Option key role name	Opciklavo:
 Cancel	Modifier keys window		Nuligi
@@ -20,13 +19,10 @@ Turkish (Type-F)	KeymapNames		Turka (Speco-F)
 Serbian (Cyrillic)	KeymapNames		Serba (Cirila)
 Belgian (point)	KeymapNames		Belgia (punkto)
 Finnish	KeymapNames		Finna
-Num lock	Keyboard Layout View		Nombra baskulo
 Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
 Spanish (Dvorak)	KeymapNames		Hispana (Dvoraka)
 Option	Keyboard Layout View	Option key	Opciklavo
-Scroll lock	Keyboard Layout View		Ruluma baskulo
 US-International	KeymapNames		Usona internacia
-Right option	Keyboard Layout View		Dekstra opciklavo
 Turkish (Type-Q)	KeymapNames		Turka (Speco-Q)
 Revert	Modifier keys window		Malfari
 Slovak	KeymapNames		Slovaka
@@ -78,24 +74,19 @@ Shift	Keyboard Layout View	Shift key	Ŝovklavo
 CONTROL	Keyboard Layout View		STIRKLAVO
 Macedonian	KeymapNames		Makedona
 Czech (Mac)	KeymapNames		Ĉeĥa (por Mac)
-Left command	Keyboard Layout View		Maldekstra komandklavo
 Albanian	KeymapNames		Albana
 (Current)	Keymap window		(Kuranta)
 OPT	Keyboard Layout View	Very short for 'option'	OPCIKLAVO (OPT)
 Friulian	KeymapNames		Friula
-Left option	Keyboard Layout View		Maldekstra opciklavo
 END	Keyboard Layout View		FINO (END)
 Esperanto	KeymapNames		Esperanta
 Belarusian	KeymapNames		Belarusa
 Warning: left and right key roles do not match	Modifier keys window		Averto: roloj de maldekstra kaj dekstra klavoj ne koincidas
 Circumflex trigger	Keymap window		Cirkumflekso
-Caps lock	Keyboard Layout View		Majuskla baskulo
-Left shift	Keyboard Layout View		Maldekstra majuskla klavo
 Russian (Yawert)	KeymapNames		Rusa (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		Internacia por ThinkPad X100e
 Bulgarian (Cyrillic)	KeymapNames		Bulgara (Cirila)
 Swedish	KeymapNames		Sveda
-Left control	Keyboard Layout View		Maldekstra strisklavo
 CAPS	Keyboard Layout View	Very short for 'caps lock'	MAJUSKLBASKULO
 Role	Modifier keys window	As in the role of a modifier key	Rolo
 Svorak	KeymapNames		Sveda (de Dvorak, alinome Svorak)
@@ -111,7 +102,6 @@ Generic 105-key International	KeyboardLayoutNames		Komuna 105-klava Internacia
 Disabled	Modifier keys window	Do nothing	Malŝaltita
 Select dead keys	Keymap window		Elektu senpaŝajn klavojn
 Russian (Mac)	KeymapNames		Rusa (por Mac)
-Right shift	Keyboard Layout View		Dekstra majuskliga klavo
 ESC	Keyboard Layout View		ESKAPKLAVO (ESC)
 Belarusian (Latin)	KeymapNames		Belarusa (Latina)
 Hebrew	KeymapNames		Hebrea
@@ -146,7 +136,6 @@ System:	Keymap window		Sistemaj:
 ThinkPad International	KeyboardLayoutNames		Internacia por ThinkPad
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Etendita por Apple Aluminum (US)
 Switch shortcut keys	Keymap window		Ŝparvojklavoj
-Right command	Keyboard Layout View		Dekstra komandklavo
 NUM LOCK	Keyboard Layout View		NOMBRA BASKULO
 MENU	Keyboard Layout View		MENUO
 Belgian (comma)	KeymapNames		Belgio (komo)

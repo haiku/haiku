@@ -1,11 +1,10 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	2618211193
+1	spanish; castilian	x-vnd.Haiku-Keymap	1479919571
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonés
 US	KeymapNames		Estados Unidos
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasileño
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
-Right control	Keyboard Layout View		Control derecha
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opción:
@@ -21,13 +20,10 @@ Turkish (Type-F)	KeymapNames		Turco (Tipo F)
 Serbian (Cyrillic)	KeymapNames		Serbio (Cirílico)
 Belgian (point)	KeymapNames		Belga (punto)
 Finnish	KeymapNames		Finés
-Num lock	Keyboard Layout View		Bloqueo numérico
 Switch shortcut keys to Windows/Linux mode	Keymap window		Cambiar atajos de teclado a modo Windows/Linux
 Spanish (Dvorak)	KeymapNames		Español (Dvorak)
 Option	Keyboard Layout View	Option key	Opción
-Scroll lock	Keyboard Layout View		Bloq Despl
 US-International	KeymapNames		Estados Unidos - Internacional
-Right option	Keyboard Layout View		Opción derecha
 Turkish (Type-Q)	KeymapNames		Turco (Tipo-Q)
 Revert	Modifier keys window		Revertir
 Caps:	Modifier keys window	Caps key role name	Mayús:
@@ -80,25 +76,20 @@ Shift	Keyboard Layout View	Shift key	Mayúsculas
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedonio
 Czech (Mac)	KeymapNames		Checo (Mac)
-Left command	Keyboard Layout View		Command izquierda
 Albanian	KeymapNames		Albano
 (Current)	Keymap window		(Actual)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
 Friulian	KeymapNames		Friulian
-Left option	Keyboard Layout View		Option izquierda
 END	Keyboard Layout View		FIN
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorruso
 Warning: left and right key roles do not match	Modifier keys window		Advertencia: los roles de tecla izquierda y derecha no concuerdan
 Circumflex trigger	Keymap window		Desencadenador de acento circunflejo (^)
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Bloqueo de mayúsculas
-Left shift	Keyboard Layout View		Mayús izquierda
 Russian (Yawert)	KeymapNames		Ruso (Yawert)
 ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e Internacional
 Bulgarian (Cyrillic)	KeymapNames		Búlgaro (Cirílico)
 Swedish	KeymapNames		Sueco
-Left control	Keyboard Layout View		Control izquierdo
 CAPS	Keyboard Layout View	Very short for 'caps lock'	MAYUS
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
@@ -114,7 +105,6 @@ Generic 105-key International	KeyboardLayoutNames		Genérico 105-teclas Internac
 Disabled	Modifier keys window	Do nothing	Deshabilitado
 Select dead keys	Keymap window		Seleccionar teclas muertas
 Russian (Mac)	KeymapNames		Ruso (Mac)
-Right shift	Keyboard Layout View		Mayúsculas derecha
 ESC	Keyboard Layout View		ESC
 Belarusian (Latin)	KeymapNames		Bielorruso (Latín)
 Hebrew	KeymapNames		Hebreo
@@ -149,7 +139,6 @@ System:	Keymap window		Sistema:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Internacional
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extendido (US)
 Switch shortcut keys	Keymap window		Cambiar atajos de teclado
-Right command	Keyboard Layout View		Comando derecho
 NUM LOCK	Keyboard Layout View		BLOQ NUM
 MENU	Keyboard Layout View		MENÚ
 Belgian (comma)	KeymapNames		Belga (coma)
