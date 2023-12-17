@@ -998,9 +998,7 @@ TFilePanel::AddPoseContextMenu(BMenu* menu)
 
 	menu->AddItem(Shortcuts()->CutItem());
 	menu->AddItem(Shortcuts()->CopyItem());
-#ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	menu->AddItem(Shortcuts()->PasteItem());
-#endif
 }
 
 
@@ -1011,10 +1009,8 @@ TFilePanel::AddVolumeContextMenu(BMenu* menu)
 	menu->AddItem(Shortcuts()->GetInfoItem());
 	menu->AddItem(Shortcuts()->EditNameItem());
 
-#ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	menu->AddSeparatorItem();
 	menu->AddItem(Shortcuts()->PasteItem());
-#endif
 }
 
 
@@ -1024,10 +1020,8 @@ TFilePanel::AddWindowContextMenu(BMenu* menu)
 	menu->AddItem(Shortcuts()->NewFolderItem());
 	menu->AddItem(new BSeparatorItem());
 
-#ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
 	menu->AddItem(Shortcuts()->PasteItem());
 	menu->AddSeparatorItem();
-#endif
 
 	menu->AddItem(Shortcuts()->SelectItem());
 	menu->AddItem(Shortcuts()->SelectAllItem());
