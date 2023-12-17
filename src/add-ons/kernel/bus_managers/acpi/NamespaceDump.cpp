@@ -114,7 +114,7 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 			case ACPI_TYPE_DEVICE:
 			{
 				char* hid = NULL;
-				device->acpi->get_device_info(result, &hid, NULL, 0, NULL);
+				device->acpi->get_device_info(result, &hid, NULL, 0, NULL, NULL);
 				strlcat(output, "     DEVICE (", sizeof(output));
 				if (hid != NULL) {
 					strlcat(output, hid, sizeof(output));

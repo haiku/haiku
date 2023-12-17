@@ -253,7 +253,7 @@ struct acpi_module_info {
 					size_t resultLength);
 
 	status_t	(*get_device_info)(const char *path, char** hid,
-					char** cidList, size_t cidListLength, char** uid);
+					char** cidList, size_t cidListLength, char** uid, char** cls);
 	uint32		(*get_object_type)(const char *path);
 	status_t	(*get_object)(const char *path,
 					acpi_object_type **_returnValue);

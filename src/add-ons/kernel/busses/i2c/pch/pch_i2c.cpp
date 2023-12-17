@@ -338,7 +338,7 @@ pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 	char* hid = NULL;
 	char* cidList[8] = { NULL };
 	status = gACPI->get_device_info((const char*)buffer.pointer, &hid,
-		(char**)&cidList, 8, NULL);
+		(char**)&cidList, 8, NULL, NULL);
 	if (status != B_OK) {
 		ERROR("pch_i2c_scan_bus_callback get_device_info failed\n");
 		return status;

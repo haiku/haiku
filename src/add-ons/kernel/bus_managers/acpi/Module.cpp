@@ -101,11 +101,12 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 
 				uint32 attrCount = 4;
 				char* hid = NULL;
-				char* cidList[8] = { NULL };
+				char* cidList[11] = { NULL };
 				char* uid = NULL;
+				char* cls = NULL;
 				if (type == ACPI_TYPE_DEVICE) {
 					if (get_device_info(result, &hid, (char**)&cidList, 8,
-						&uid) == B_OK) {
+						&uid, &cls) == B_OK) {
 						if (hid != NULL) {
 							attrs[attrCount].name = ACPI_DEVICE_HID_ITEM;
 							attrs[attrCount].type = B_STRING_TYPE;
@@ -124,6 +125,21 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 							attrs[attrCount].value.string = uid;
 							attrCount++;
 						}
+						if (cls != NULL) {
+							uint32 clsClass = strtoul(cls, NULL, 16);
+							attrs[attrCount].name = B_DEVICE_TYPE;
+							attrs[attrCount].type = B_UINT16_TYPE;
+							attrs[attrCount].value.ui16 = (clsClass >> 16) & 0xff ;
+							attrCount++;
+							attrs[attrCount].name = B_DEVICE_SUB_TYPE;
+							attrs[attrCount].type = B_UINT16_TYPE;
+							attrs[attrCount].value.ui16 = (clsClass >> 8) & 0xff ;
+							attrCount++;
+							attrs[attrCount].name = B_DEVICE_INTERFACE;
+							attrs[attrCount].type = B_UINT16_TYPE;
+							attrs[attrCount].value.ui16 = (clsClass >> 0) & 0xff ;
+							attrCount++;
+						}
 					}
 					uint32 addr;
 					if (get_device_addr(result, &addr) == B_OK) {
@@ -138,6 +154,7 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 						ACPI_DEVICE_MODULE_NAME, attrs, NULL, &deviceNode);
 				free(hid);
 				free(uid);
+				free(cls);
 				for (int i = 0; cidList[i] != NULL; i++)
 					free(cidList[i]);
 				if (status != B_OK)

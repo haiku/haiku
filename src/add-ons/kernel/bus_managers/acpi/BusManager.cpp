@@ -525,7 +525,7 @@ get_device(const char* hid, uint32 index, char* result, size_t resultLength)
 
 status_t
 get_device_info(const char *path, char** hid, char** cidList,
-	size_t cidListCount, char** uid)
+	size_t cidListCount, char** uid, char** cls)
 {
 	ACPI_HANDLE handle;
 	ACPI_DEVICE_INFO *info;
@@ -551,6 +551,11 @@ get_device_info(const char *path, char** hid, char** cidList,
 
 	if ((info->Valid & ACPI_VALID_UID) != 0 && uid != NULL)
 		*uid = strndup(info->UniqueId.String, info->UniqueId.Length);
+
+	if ((info->Valid & ACPI_VALID_CLS) != 0 && cls != NULL
+		&& info->ClassCode.Length >= ACPI_PCICLS_STRING_SIZE) {
+		*cls = strndup(info->ClassCode.String, info->ClassCode.Length);
+	}
 
 	AcpiOsFree(info);
 	return B_OK;
