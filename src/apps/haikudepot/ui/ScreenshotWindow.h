@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SCREENSHOT_WINDOW_H
@@ -17,6 +17,7 @@
 class BarberPole;
 class BitmapView;
 class BStringView;
+class Model;
 
 
 enum {
@@ -29,7 +30,7 @@ enum {
 
 class ScreenshotWindow : public BWindow {
 public:
-								ScreenshotWindow(BWindow* parent, BRect frame);
+								ScreenshotWindow(BWindow* parent, BRect frame, Model* model);
 	virtual						~ScreenshotWindow();
 
 	virtual bool				QuitRequested();
@@ -80,6 +81,8 @@ private:
 
 			BLocker				fLock;
 			thread_id			fWorkerThread;
+
+			Model*				fModel;
 };
 
 

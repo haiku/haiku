@@ -33,7 +33,6 @@ PackageInfo::PackageInfo()
 	fCachedRatingSummary(),
 	fProminence(0),
 	fScreenshotInfos(),
-	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(0),
@@ -65,7 +64,6 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fCachedRatingSummary(),
 	fProminence(0),
 	fScreenshotInfos(),
-	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(info.Flags()),
@@ -113,7 +111,6 @@ PackageInfo::PackageInfo(const BString& name,
 	fCachedRatingSummary(),
 	fProminence(0),
 	fScreenshotInfos(),
-	fScreenshots(),
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(flags),
@@ -146,7 +143,6 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fCachedRatingSummary(other.fCachedRatingSummary),
 	fProminence(other.fProminence),
 	fScreenshotInfos(other.fScreenshotInfos),
-	fScreenshots(other.fScreenshots),
 	fState(other.fState),
 	fInstallationLocations(other.fInstallationLocations),
 	fDownloadProgress(other.fDownloadProgress),
@@ -181,7 +177,6 @@ PackageInfo::operator=(const PackageInfo& other)
 	fCachedRatingSummary = other.fCachedRatingSummary;
 	fProminence = other.fProminence;
 	fScreenshotInfos = other.fScreenshotInfos;
-	fScreenshots = other.fScreenshots;
 	fState = other.fState;
 	fInstallationLocations = other.fInstallationLocations;
 	fDownloadProgress = other.fDownloadProgress;
@@ -215,7 +210,6 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fCachedRatingSummary == other.fCachedRatingSummary
 		&& fProminence == other.fProminence
 		&& fScreenshotInfos == other.fScreenshotInfos
-		&& fScreenshots == other.fScreenshots
 		&& fState == other.fState
 		&& fFlags == other.fFlags
 		&& fDownloadProgress == other.fDownloadProgress
@@ -515,7 +509,10 @@ PackageInfo::IsProminent() const
 void
 PackageInfo::ClearScreenshotInfos()
 {
-	fScreenshotInfos.clear();
+	if (!fScreenshotInfos.empty()) {
+		fScreenshotInfos.clear();
+		_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
+	}
 }
 
 
@@ -537,52 +534,7 @@ void
 PackageInfo::AddScreenshotInfo(const ScreenshotInfoRef& info)
 {
 	fScreenshotInfos.push_back(info);
-}
-
-
-void
-PackageInfo::ClearScreenshots()
-{
-	if (!fScreenshots.empty()) {
-		fScreenshots.clear();
-		_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
-	}
-}
-
-
-bool
-PackageInfo::_HasScreenshot(const BitmapRef& screenshot)
-{
-	std::vector<BitmapRef>::iterator it = std::find(
-		fScreenshots.begin(), fScreenshots.end(), screenshot);
-	return it != fScreenshots.end();
-}
-
-
-bool
-PackageInfo::AddScreenshot(const BitmapRef& screenshot)
-{
-	if (_HasScreenshot(screenshot))
-		return false;
-
-	fScreenshots.push_back(screenshot);
 	_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
-
-	return true;
-}
-
-
-int32
-PackageInfo::CountScreenshots() const
-{
-	return fScreenshots.size();
-}
-
-
-const BitmapRef
-PackageInfo::ScreenshotAtIndex(int32 index) const
-{
-	return fScreenshots[index];
 }
 
 

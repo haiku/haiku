@@ -32,6 +32,8 @@
 // conditional clauses in the code to prevent this otherwise would be
 // cumbersome.
 
+// The time element @<time> is presented in milliseconds on the current day.
+
 #define HDLOGPREFIX(L) printf("@%08" B_PRId64 " {%c} <t:%" B_PRIu32 "> ", \
 	((system_time() / 1000L) % MILLIS_IN_DAY), \
 	HDLOGLEVELCHAR(L), \

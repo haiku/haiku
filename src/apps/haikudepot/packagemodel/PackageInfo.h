@@ -142,11 +142,6 @@ public:
 			int32				CountScreenshotInfos() const;
 			ScreenshotInfoRef	ScreenshotInfoAtIndex(int32 index) const;
 
-			void				ClearScreenshots();
-			bool				AddScreenshot(const BitmapRef& screenshot);
-			int32				CountScreenshots() const;
-			const BitmapRef		ScreenshotAtIndex(int32 index) const;
-
 			void				SetSize(off_t size);
 			off_t				Size() const
 									{ return fSize; }
@@ -195,8 +190,7 @@ private:
 			int64				fProminence;
 			std::vector<ScreenshotInfoRef>
 								fScreenshotInfos;
-			std::vector<BitmapRef>
-								fScreenshots;
+
 			PackageState		fState;
 			PackageInstallationLocationSet
 								fInstallationLocations;

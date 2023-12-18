@@ -144,6 +144,8 @@ private:
 			void				_HandleUserUsageConditionsNotLatest(
 									const UserDetail& userDetail);
 
+			void				_HandleScreenshotCached(const BMessage* message);
+
 private:
 			FilterView*			fFilterView;
 			TabView*			fListTabs;

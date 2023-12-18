@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2023, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_VIEW_H
@@ -42,6 +42,15 @@ public:
 									{ return fPackage; }
 			void				Clear();
 
+			void				HandleScreenshotCached(const ScreenshotCoordinate& coordinate);
+
+private:
+	static const ScreenshotCoordinate
+								_ScreenshotThumbCoordinate(const PackageInfoRef& package);
+			void				_SetPackageScreenshotThumb(const PackageInfoRef& package);
+			void				_HandleScreenshotCached(const PackageInfoRef& package,
+									const ScreenshotCoordinate& coordinate);
+
 private:
 			Model*				fModel;
 
@@ -51,7 +60,10 @@ private:
 			PagesView*			fPagesView;
 
 			PackageInfoRef		fPackage;
-			OnePackageMessagePackageListener* fPackageListener;
+			OnePackageMessagePackageListener*
+								fPackageListener;
+			ProcessCoordinatorConsumer*
+								fProcessCoordinatorConsumer;
 };
 
 #endif // PACKAGE_INFO_VIEW_H

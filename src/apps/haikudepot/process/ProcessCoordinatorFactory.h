@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PROCESS_COORDINATOR_FACTORY_H
@@ -8,6 +8,7 @@
 #include <SupportDefs.h>
 
 #include "PackageInfo.h"
+#include "PackageScreenshotRepository.h"
 
 class Model;
 class PackageInfoListener;
@@ -35,6 +36,9 @@ public:
 
 	static	ProcessCoordinator*	CreatePackageActionCoordinator(
 									Model* model, BMessage* message);
+
+	static	ProcessCoordinator*	CacheScreenshotCoordinator(
+									Model* model, ScreenshotCoordinate& screenshotCoordinate);
 
 private:
 	static	uint32				_CalculateServerProcessOptions();

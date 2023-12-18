@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PATH_UTILS_H
@@ -28,6 +28,9 @@ public:
 
 	static status_t			RemoveWorkingDirectoryContents();
 	static status_t			RemoveDirectoryContents(BPath& path);
+	static status_t			RemoveDirectoryContentsRetainingLatestFiles(BPath& path,
+								uint32 countLatestRetained);
+
 	static status_t			ExistsObject(const BPath& path,
 								bool* exists,
 								bool* isDirectory,

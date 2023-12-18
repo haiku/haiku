@@ -2,8 +2,6 @@
  * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #ifndef LOCAL_PKG_DATA_LOAD_PROCESS__H
 #define LOCAL_PKG_DATA_LOAD_PROCESS__H
 

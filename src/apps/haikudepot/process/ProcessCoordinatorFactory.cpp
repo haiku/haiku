@@ -1,9 +1,7 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #include "ProcessCoordinatorFactory.h"
 
 #include <Autolock.h>
@@ -13,6 +11,7 @@
 #include <package/PackageRoster.h>
 
 #include "AbstractServerProcess.h"
+#include "CacheScreenshotProcess.h"
 #include "DeskbarLink.h"
 #include "HaikuDepotConstants.h"
 #include "IncrementViewCounterProcess.h"
@@ -163,6 +162,18 @@ ProcessCoordinatorFactory::CreatePackageActionCoordinator(
 		default:
 			HDFATAL("unexpected package action message what");
 	}
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::CacheScreenshotCoordinator(Model* model,
+	ScreenshotCoordinate& screenshotCoordinate)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator("CacheScreenshot");
+	AbstractProcessNode* cacheScreenshotNode = new ThreadedProcessNode(
+		new CacheScreenshotProcess(model, screenshotCoordinate));
+	processCoordinator->AddNode(cacheScreenshotNode);
+	return processCoordinator;
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -19,6 +19,7 @@
 #include "BitmapView.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
+#include "Model.h"
 #include "WebAppInterface.h"
 
 
@@ -36,14 +37,15 @@ static BitmapRef sPreviousButtonIcon(
 	new(std::nothrow) SharedBitmap(RSRC_ARROW_RIGHT), true);
 
 
-ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
+ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame, Model* model)
 	:
 	BWindow(frame, B_TRANSLATE("Screenshot"),
 		B_FLOATING_WINDOW_LOOK, B_FLOATING_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fBarberPoleShown(false),
 	fDownloadPending(false),
-	fWorkerThread(-1)
+	fWorkerThread(-1),
+	fModel(model)
 {
 	AddToSubset(parent);
 
@@ -282,25 +284,25 @@ ScreenshotWindow::_DownloadThread()
 		return;
 	}
 
-	BMallocIO buffer;
-	WebAppInterface interface;
-
 	// Only indicate being busy with the download if it takes a little while
 	BMessenger messenger(this);
 	BMessageRunner delayedMessenger(messenger,
 		new BMessage(MSG_DOWNLOAD_START),
 		kProgressIndicatorDelay, 1);
 
+	BitmapRef screenshot;
+
 	// Retrieve screenshot from web-app
-	status_t status = interface.RetrieveScreenshot(info->Code(),
-		info->Width(), info->Height(), &buffer);
+	status_t status = fModel->GetPackageScreenshotRepository()->LoadScreenshot(
+		ScreenshotCoordinate(info->Code(), info->Width(), info->Height()),
+		&screenshot);
 
 	delayedMessenger.SetCount(0);
 	messenger.SendMessage(MSG_DOWNLOAD_STOP);
 
 	if (status == B_OK && Lock()) {
 		HDINFO("got screenshot");
-		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
+		fScreenshot = screenshot;
 		fScreenshotView->SetBitmap(fScreenshot);
 		_ResizeToFitAndCenter();
 		Unlock();

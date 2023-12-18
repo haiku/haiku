@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,8 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <vector>
+#include <algorithm>
 
 #include <Directory.h>
 #include <File.h>
@@ -21,6 +23,48 @@
 
 
 static bool sAreWorkingFilesAvailable = true;
+
+
+class PathWithLastAccessTimestamp {
+public:
+	PathWithLastAccessTimestamp(const BPath path, uint64 lastAccessMillisSinceEpoch)
+		:
+		fPath(path),
+		fLastAccessMillisSinceEpoch(lastAccessMillisSinceEpoch)
+	{
+	}
+
+	~PathWithLastAccessTimestamp()
+	{
+	}
+
+	const BPath& Path() const
+	{
+		return fPath;
+	}
+
+	int64 LastAccessMillisSinceEpoch() const
+	{
+		return fLastAccessMillisSinceEpoch;
+	}
+
+	BString String() const
+	{
+		BString result;
+		result.SetToFormat("%s; @ %" B_PRIu64, fPath.Leaf(), fLastAccessMillisSinceEpoch);
+		return result;
+	}
+
+	bool operator<(const PathWithLastAccessTimestamp& other) const
+    {
+    	return fLastAccessMillisSinceEpoch < other.fLastAccessMillisSinceEpoch &&
+    		strcmp(fPath.Path(), other.fPath.Path()) < 0;
+    }
+
+private:
+	BPath fPath;
+	uint64 fLastAccessMillisSinceEpoch;
+};
 
 
 /*static*/ bool
@@ -134,6 +178,67 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
 			}
 		}
 
+	}
+
+	return result;
+}
+
+
+/*! This function will delete all of the files in a directory except for the most
+	recent `countLatestRetained` files.
+*/
+
+/*static*/ status_t
+StorageUtils::RemoveDirectoryContentsRetainingLatestFiles(BPath& path, uint32 countLatestRetained)
+{
+	std::vector<PathWithLastAccessTimestamp> pathAndTimestampses;
+	BDirectory directory(path.Path());
+	BEntry directoryEntry;
+	status_t result = B_OK;
+	struct stat s;
+
+	while (result == B_OK &&
+		directory.GetNextEntry(&directoryEntry) != B_ENTRY_NOT_FOUND) {
+		BPath directoryEntryPath;
+		result = directoryEntry.GetPath(&directoryEntryPath);
+
+		if (result == B_OK) {
+			if (-1 == stat(directoryEntryPath.Path(), &s))
+				result = B_ERROR;
+		}
+
+		if (result == B_OK) {
+			pathAndTimestampses.push_back(PathWithLastAccessTimestamp(
+				directoryEntryPath,
+				(static_cast<uint64>(s.st_atim.tv_sec) * 1000) + (static_cast<uint64>(s.st_atim.tv_nsec) / 1000)));
+		}
+	}
+
+	if (pathAndTimestampses.size() > countLatestRetained) {
+
+		// sort the list with the oldest files first (smallest fLastAccessMillisSinceEpoch)
+		std::sort(pathAndTimestampses.begin(), pathAndTimestampses.end());
+
+		std::vector<PathWithLastAccessTimestamp>::iterator it;
+
+		if (Logger::IsTraceEnabled()) {
+			for (it = pathAndTimestampses.begin(); it != pathAndTimestampses.end(); it++) {
+				PathWithLastAccessTimestamp pathAndTimestamp = *it;
+				HDTRACE("delete candidate [%s]", pathAndTimestamp.String().String());
+			}
+		}
+
+		for (it = pathAndTimestampses.begin(); it != pathAndTimestampses.end() - countLatestRetained; it++) {
+			PathWithLastAccessTimestamp pathAndTimestamp = *it;
+			const char* pathStr = pathAndTimestamp.Path().Path();
+
+			if (remove(pathStr) == 0)
+				HDDEBUG("did delete [%s]", pathStr);
+			else {
+				HDERROR("unable to delete [%s]", pathStr);
+				result = B_ERROR;
+			}
+		}
 	}
 
 	return result;

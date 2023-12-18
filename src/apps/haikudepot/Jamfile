@@ -141,6 +141,7 @@ local applicationSources =
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
+	PackageScreenshotRepository.cpp
 	PasswordRequirements.cpp
 	RatePackageWindow.cpp
 	RatingView.cpp
@@ -148,6 +149,7 @@ local applicationSources =
 	RatingUtils.cpp
 	support.cpp
 	ScreenshotWindow.cpp
+	ScreenshotCoordinate.cpp
 	ScrollableGroupView.cpp
 	SettingsWindow.cpp
 	SharedBitmap.cpp
@@ -186,6 +188,7 @@ local applicationSources =
 	AbstractProcessNode.cpp
 	AbstractServerProcess.cpp
 	AbstractSingleFileServerProcess.cpp
+	CacheScreenshotProcess.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
 	PopulatePkgSizesProcess.cpp

@@ -3,12 +3,10 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
-
 #include "MainWindow.h"
 
 #include <map>
@@ -73,6 +71,7 @@ enum {
 	MSG_WORK_STATUS_CHANGE					= 'wsch',
 	MSG_WORK_STATUS_CLEAR					= 'wscl',
 	MSG_INCREMENT_VIEW_COUNTER				= 'icrv',
+	MSG_SCREENSHOT_CACHED					= 'ssca',
 
 	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE		= 'cplm',
 	MSG_SHOW_AVAILABLE_PACKAGES				= 'savl',
@@ -126,6 +125,16 @@ public:
 	{
 		if (fMessenger.IsValid())
 			fMessenger.SendMessage(MSG_CATEGORIES_LIST_CHANGED);
+	}
+
+	virtual void ScreenshotCached(const ScreenshotCoordinate& coordinate)
+	{
+		if (fMessenger.IsValid()) {
+			BMessage message(MSG_SCREENSHOT_CACHED);
+			if (coordinate.Archive(&message) != B_OK)
+				debugger("unable to serialize a screenshot coordinate");
+			fMessenger.SendMessage(&message);
+		}
 	}
 
 private:
@@ -446,6 +455,10 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_AUTHORIZATION_CHANGED:
 			_StartUserVerify();
 			_UpdateAuthorization();
+			break;
+
+		case MSG_SCREENSHOT_CACHED:
+			_HandleScreenshotCached(message);
 			break;
 
 		case MSG_CATEGORIES_LIST_CHANGED:
@@ -1235,7 +1248,6 @@ MainWindow::_PopulatePackageWorker(void* arg)
 
 		if (package.IsSet()) {
 			uint32 populateFlags = Model::POPULATE_USER_RATINGS
-				| Model::POPULATE_SCREEN_SHOTS
 				| Model::POPULATE_CHANGELOG;
 
 			if (force)
@@ -1428,7 +1440,7 @@ MainWindow::_ShowScreenshot()
 {
 	// TODO: Mechanism for remembering the window frame
 	if (fScreenshotWindow == NULL)
-		fScreenshotWindow = new ScreenshotWindow(this, BRect(0, 0, 500, 400));
+		fScreenshotWindow = new ScreenshotWindow(this, BRect(0, 0, 500, 400), &fModel);
 
 	if (fScreenshotWindow->LockWithTimeout(1000) != B_OK)
 		return;
@@ -1677,4 +1689,18 @@ MainWindow::_CreateSnapshotOfDepots()
 	for(int32 i = 0; i < countDepots; i++)
 		result.push_back(fModel.DepotAtIndex(i));
 	return result;
+}
+
+
+/*! This will get invoked in the case that a screenshot has been cached
+    and so could now be loaded by some UI element. This method will then
+    signal to other UI elements that they could load a screenshot should
+    they have been waiting for it.
+*/
+
+void
+MainWindow::_HandleScreenshotCached(const BMessage* message)
+{
+	ScreenshotCoordinate coordinate(message);
+	fPackageInfoView->HandleScreenshotCached(coordinate);
 }

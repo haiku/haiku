@@ -1,9 +1,8 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #include "PackageInfoView.h"
 
 #include <algorithm>
@@ -64,6 +63,7 @@ enum {
 
 
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
+static const uint16 kScreenshotSize = 320;
 
 
 class RatingsScrollView : public GeneralContentScrollView {
@@ -762,36 +762,24 @@ public:
 		}
 	}
 
+	void SetScreenshotThumbnail(const BitmapRef& bitmapRef)
+	{
+		if (bitmapRef.IsSet()) {
+			fScreenshotView->SetBitmap(bitmapRef);
+			fScreenshotView->SetEnabled(true);
+		} else {
+			fScreenshotView->UnsetBitmap();
+			fScreenshotView->SetEnabled(false);
+		}
+	}
+
 	void SetPackage(const PackageInfoRef package)
 	{
-		fDescriptionView->SetText(package->ShortDescription(),
-			package->FullDescription());
-
+		fDescriptionView->SetText(package->ShortDescription(), package->FullDescription());
 		fEmailIconView->SetBitmap(&fEmailIcon, BITMAP_SIZE_16);
 		_SetContactInfo(fEmailLinkView, package->Publisher().Email());
 		fWebsiteIconView->SetBitmap(&fWebsiteIcon, BITMAP_SIZE_16);
 		_SetContactInfo(fWebsiteLinkView, package->Publisher().Website());
-
-		int32 countScreenshots = package->CountScreenshots();
-		bool hasScreenshot = false;
-		if (countScreenshots > 0) {
-			const BitmapRef& bitmapRef = package->ScreenshotAtIndex(0);
-			if (bitmapRef.IsSet()) {
-				HDDEBUG("did find screenshot for package [%s]",
-					package->Name().String());
-				hasScreenshot = true;
-				fScreenshotView->SetBitmap(bitmapRef);
-			}
-		}
-		else {
-			HDTRACE("did not find screenshots for package [%s]",
-				package->Name().String());
-		}
-
-		if (!hasScreenshot)
-			fScreenshotView->UnsetBitmap();
-
-		fScreenshotView->SetEnabled(hasScreenshot);
 	}
 
 	void Clear()
@@ -801,7 +789,6 @@ public:
 		fEmailLinkView->SetText("");
 		fWebsiteIconView->UnsetBitmap();
 		fWebsiteLinkView->SetText("");
-
 		fScreenshotView->UnsetBitmap();
 		fScreenshotView->SetEnabled(false);
 	}
@@ -1202,6 +1189,11 @@ public:
 		Clear();
 	}
 
+	void SetScreenshotThumbnail(const BitmapRef& bitmap)
+	{
+		fAboutView->SetScreenshotThumbnail(bitmap);
+	}
+
 	void SetPackage(const PackageInfoRef package, bool switchToDefaultTab)
 	{
 		if (switchToDefaultTab)
@@ -1245,7 +1237,8 @@ PackageInfoView::PackageInfoView(Model* model,
 	:
 	BView("package info view", 0),
 	fModel(model),
-	fPackageListener(new(std::nothrow) OnePackageMessagePackageListener(this))
+	fPackageListener(new(std::nothrow) OnePackageMessagePackageListener(this)),
+	fProcessCoordinatorConsumer(processCoordinatorConsumer)
 {
 	fCardLayout = new BCardLayout();
 	SetLayout(fCardLayout);
@@ -1382,6 +1375,8 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 	fPackageActionView->SetPackage(packageRef);
 	fPagesView->SetPackage(packageRef, switchToDefaultTab);
 
+	_SetPackageScreenshotThumb(packageRef);
+
 	fCardLayout->SetVisibleItem(1);
 
 	fPackageListener->SetPackage(packageRef);
@@ -1393,6 +1388,93 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 	// example, keeps references to stuff from the previous package and
 	// access it while switching to the new package.
 	fPackage = packageRef;
+}
+
+
+/*! See if the screenshot is already cached; if it is then load it
+	immediately. If it is not then trigger a process to start it in
+	the background. A message will come through later once it is
+	cached and ready to load.
+*/
+
+void
+PackageInfoView::_SetPackageScreenshotThumb(const PackageInfoRef& package)
+{
+	ScreenshotCoordinate desiredCoordinate = _ScreenshotThumbCoordinate(package);
+	bool hasCachedBitmap = false;
+
+	if (desiredCoordinate.IsValid()) {
+		bool present = false;
+		if (fModel->GetPackageScreenshotRepository()->HasCachedScreenshot(
+				desiredCoordinate, &present) != B_OK) {
+			HDERROR("unable to ascertain if screenshot is present for pkg [%s]", package->Name().String());
+		} else {
+			if (present) {
+				HDDEBUG("screenshot is already cached for [%s] -- will load it", package->Name().String());
+				_HandleScreenshotCached(package, desiredCoordinate);
+				hasCachedBitmap = true;
+			} else {
+				HDDEBUG("screenshot is not cached [%s] -- will cache it", package->Name().String());
+				ProcessCoordinator *processCoordinator =
+					ProcessCoordinatorFactory::CacheScreenshotCoordinator(
+						fModel, desiredCoordinate);
+				fProcessCoordinatorConsumer->Consume(processCoordinator);
+			}
+		}
+	} else
+		HDDEBUG("no screenshot for pkg [%s]", package->Name().String());
+
+	if (!hasCachedBitmap)
+		fPagesView->SetScreenshotThumbnail(BitmapRef());
+}
+
+
+/*static*/ const ScreenshotCoordinate
+PackageInfoView::_ScreenshotThumbCoordinate(const PackageInfoRef& package)
+{
+	if (!package.IsSet())
+		return ScreenshotCoordinate();
+	if (package->CountScreenshotInfos() == 0)
+		return ScreenshotCoordinate();
+	return ScreenshotCoordinate(package->ScreenshotInfoAtIndex(0)->Code(), kScreenshotSize, kScreenshotSize);
+}
+
+
+/*! This message will arrive when the data in the screenshot cache
+	contains a new screenshot. This logic can check to see if the
+	screenshot arriving is the one that is being waited for and
+	would then load the screenshot from the cache and display it.
+*/
+
+void
+PackageInfoView::HandleScreenshotCached(const ScreenshotCoordinate& coordinate)
+{
+	_HandleScreenshotCached(fPackage, coordinate);
+}
+
+
+void
+PackageInfoView::_HandleScreenshotCached(const PackageInfoRef& package,
+	const ScreenshotCoordinate& coordinate)
+{
+	ScreenshotCoordinate desiredCoordinate = _ScreenshotThumbCoordinate(package);
+	bool hasBitmap = false;
+
+	if (desiredCoordinate.IsValid() && desiredCoordinate == coordinate) {
+		HDDEBUG("screenshot [%s] has been cached and matched; will load",
+			coordinate.Code().String());
+		BitmapRef bitmapRef;
+		if (fModel->GetPackageScreenshotRepository()->CacheAndLoadScreenshot(
+				coordinate, &bitmapRef) != B_OK) {
+			HDERROR("unable to load the screenshot [%s]", coordinate.Code().String());
+		} else {
+			fPagesView->SetScreenshotThumbnail(bitmapRef);
+			hasBitmap = true;
+		}
+	}
+
+	if (!hasBitmap)
+		fPagesView->SetScreenshotThumbnail(BitmapRef());
 }
 
 

@@ -3,7 +3,6 @@
  * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #include "WebAppInterface.h"
 
 #include <Application.h>
@@ -670,6 +669,10 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 		NEEDS_AUTHORIZATION, message);
 }
 
+
+/*! This method will call to the server to get a screenshot that will fit into
+    the specified width and height.
+*/
 
 status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
