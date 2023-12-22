@@ -110,6 +110,7 @@ public:
 									void* arg), void* arg);
 			const BListItem**	Items() const;
 			void				InvalidateItem(int32 index);
+			void				ScrollTo(int32 index);
 			void				ScrollToSelection();
 
 			void				Select(int32 index, bool extend = false);

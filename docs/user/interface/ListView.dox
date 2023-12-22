@@ -462,6 +462,14 @@
 
 
 /*!
+	\name Scrolling
+*/
+
+
+//! @{
+
+
+/*!
 	\fn void BListView::ScrollTo(BPoint point)
 	\brief Scroll the view to the specified \a point.
 
@@ -471,6 +479,30 @@
 
 	\since BeOS R3
 */
+
+
+/*!
+	\fn void BListView::ScrollTo(int32 index)
+	\brief Scrolls to list item at \a index.
+
+	If above top scroll to first item, if below bottom
+	scroll to last item otherwise scroll to item at \a index.
+
+	\see IndexOf(), MouseMoved(), ScrollToSelection()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BListView::ScrollToSelection()
+	\brief Scrolls to selected list item.
+
+	\since BeOS R3
+*/
+
+
+//! @}
 
 
 /*!
@@ -842,14 +874,6 @@
 
 
 //! @{
-
-
-/*!
-	\fn void BListView::ScrollToSelection()
-	\brief Scrolls to selected list item.
-
-	\since BeOS R3
-*/
 
 
 /*!

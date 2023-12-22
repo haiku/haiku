@@ -726,21 +726,26 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 			currentMessage->FindInt32("buttons", &buttons);
 	}
 
-	// only update selection if mouse button pressed and not dragging
 	int32 index = IndexOf(where);
-	if (buttons == 0 || fTrack->is_dragging)
-		return BView::MouseMoved(where, code, dragMessage);
+	if (index == -1) {
+		// If where is above top, scroll to the first item,
+		// else if where is below bottom scroll to the last item.
+		if (where.y < Bounds().top)
+			index = 0;
+		else if (where.y > Bounds().bottom)
+			index = CountItems() - 1;
+	}
 
-	// scroll to selection while button is pressed
-	ScrollToSelection();
-
-	// selection updating on drag is for single selection lists only
-	if (fListType == B_MULTIPLE_SELECTION_LIST || index == -1)
-		return BView::MouseMoved(where, code, dragMessage);
-
+	// don't scroll if button not pressed, no selection or same item
 	int32 lastIndex = fFirstSelected;
-	if (lastIndex != -1 && index != lastIndex) {
-		// mouse moved over unselected, fake selection until mouse up
+	if (buttons == 0 || index == -1 || lastIndex == -1 || index == lastIndex)
+		return BView::MouseMoved(where, code, dragMessage);
+
+	// scroll to item under mouse while button is pressed
+	ScrollTo(index);
+
+	if (!fTrack->is_dragging && fListType != B_MULTIPLE_SELECTION_LIST) {
+		// mouse moved over unselected item, fake selection until mouse up
 		ItemAt(lastIndex)->Deselect();
 		ItemAt(index)->Select();
 
@@ -749,7 +754,8 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 		// redraw items whose selection has changed
 		Invalidate(ItemFrame(lastIndex) | ItemFrame(index));
-	}
+	} else
+		Invalidate();
 
 	BView::MouseMoved(where, code, dragMessage);
 }
@@ -1196,6 +1202,23 @@ void
 BListView::InvalidateItem(int32 index)
 {
 	Invalidate(ItemFrame(index));
+}
+
+
+void
+BListView::ScrollTo(int32 index)
+{
+	if (index < 0)
+		index = 0;
+	if (index > CountItems() - 1)
+		index = CountItems() - 1;
+
+	BRect itemFrame = ItemFrame(index);
+	BRect bounds = Bounds();
+	if (itemFrame.top < bounds.top)
+		ScrollTo(itemFrame.LeftTop());
+	else if (itemFrame.bottom > bounds.bottom)
+		ScrollTo(BPoint(0, itemFrame.bottom - bounds.Height()));
 }
 
 
