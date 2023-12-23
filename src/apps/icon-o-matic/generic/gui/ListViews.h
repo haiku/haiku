@@ -14,10 +14,6 @@
 #include <ListView.h>
 #include <Message.h>
 
-#ifdef LIB_LAYOUT
-#  include <layout.h>
-#endif
-
 #include "MouseWheelFilter.h"
 #include "Observer.h"
 
@@ -49,33 +45,19 @@ class SimpleItem : public BStringItem
 								 uint32 flags);
 		virtual	void		DrawBackground(BView* owner, BRect frame,
 								  uint32 flags);
-
-							// let the item know what's going on
-/*		virtual	void		AttachedToListView(SimpleListView* owner);
-		virtual	void		DetachedFromListView(SimpleListView* owner);
-
-		virtual	void		SetItemFrame(BRect frame);*/
-
- private:
-
 };
 
-// DragSortableListView
-class DragSortableListView : public MouseWheelTarget,
-							 public BListView,
-							 public Observer {
+
+class DragSortableListView : public BListView,
+	public MouseWheelTarget, public Observer {
  public:
 							DragSortableListView(BRect frame,
-												 const char* name,
-												 list_view_type type
-														= B_SINGLE_SELECTION_LIST,
-												 uint32 resizingMode
-														= B_FOLLOW_LEFT
-														  | B_FOLLOW_TOP,
-												 uint32 flags
-														= B_WILL_DRAW
-														  | B_NAVIGABLE
-														  | B_FRAME_EVENTS);
+								const char* name,
+								list_view_type type = B_SINGLE_SELECTION_LIST,
+								uint32 resizingMode
+									= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE
+									| B_FRAME_EVENTS);
 	virtual					~DragSortableListView();
 
 	// BListView interface
@@ -147,9 +129,9 @@ class DragSortableListView : public MouseWheelTarget,
 										 BRect itemFrame) const = 0;
 	virtual	void			MakeDragMessage(BMessage* message) const = 0;
 
- private:
-			void			_RemoveDropAnticipationRect();
-			void			_SetDragMessage(const BMessage* message);
+ protected:
+			void			InvalidateDropRect();
+			void			SetDragMessage(const BMessage* message);
 
 	BRect					fDropRect;
 	BMessage				fDragMessageCopy;
@@ -158,8 +140,8 @@ class DragSortableListView : public MouseWheelTarget,
 	BPoint					fLastMousePos;
 
  protected:
-			void			_SetDropAnticipationRect(BRect r);
-			void			_SetDropIndex(int32 index);
+			void			SetDropRect(BRect rect);
+			void			SetDropIndex(int32 index);
 
 	int32					fDropIndex;
 	BListItem*				fLastClickedItem;
@@ -173,31 +155,19 @@ class DragSortableListView : public MouseWheelTarget,
 };
 
 // SimpleListView
-class SimpleListView : 
-					   #ifdef LIB_LAYOUT
-					   public MView,
-					   #endif
-					   public DragSortableListView {
+class SimpleListView : public DragSortableListView {
  public:
 							SimpleListView(BRect frame,
-										   BMessage* selectionChangeMessage = NULL);
-							SimpleListView(BRect frame,
-										   const char* name,
-										   BMessage* selectionChangeMessage = NULL,
-										   list_view_type type
-												= B_MULTIPLE_SELECTION_LIST,
-										   uint32 resizingMode
-												= B_FOLLOW_ALL_SIDES,
-										   uint32 flags
-												= B_WILL_DRAW | B_NAVIGABLE
-												  | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
+								BMessage* selectionChanged = NULL);
+							SimpleListView(BRect frame, const char* name,
+								BMessage* selectionChanged = NULL,
+								list_view_type type
+									= B_MULTIPLE_SELECTION_LIST,
+								uint32 resizingMode = B_FOLLOW_ALL_SIDES,
+								uint32 flags = B_WILL_DRAW | B_NAVIGABLE
+									| B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
 							~SimpleListView();
 
-	#ifdef LIB_LAYOUT
-							// MView
-	virtual	minimax			layoutprefs();
-	virtual	BRect			layout(BRect frame);
-	#endif
 							// BListView
 	virtual	void			DetachedFromWindow();
 	virtual void			MessageReceived(BMessage* message);
@@ -210,12 +180,12 @@ class SimpleListView :
 		The information should be sufficient for \c InstantiateSelection to
 		create a new copy of the objects without relying on the original object.
 	*/
-	virtual	status_t		ArchiveSelection(BMessage* into, bool deep = true) const = 0;
+	virtual	status_t		ArchiveSelection(BMessage*, bool = true) const = 0;
 	/*! Put a copy of the items archived by \c ArchiveSelection into the list.
 		This method should ensure whether the item is truly meant for the list
 		view.
 	*/
-	virtual	bool			InstantiateSelection(const BMessage* archive, int32 dropIndex) = 0;
+	virtual	bool			InstantiateSelection(const BMessage*, int32) = 0;
 
 	virtual	void			MakeDragMessage(BMessage* message) const;
 	virtual	bool			HandleDropMessage(const BMessage* message,

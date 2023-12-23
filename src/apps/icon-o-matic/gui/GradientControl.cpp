@@ -50,33 +50,6 @@ GradientControl::~GradientControl()
 }
 
 
-#if LIB_LAYOUT
-
-minimax
-GradientControl::layoutprefs()
-{
-	mpm.mini.x = 256 + 4;
-	mpm.maxi.x = mpm.mini.x + 10000;
-	mpm.mini.y = 20;
-	mpm.maxi.y = mpm.mini.y + 10;
-
-	mpm.weight = 2.0;
-
-	return mpm;
-}
-
-
-BRect
-GradientControl::layout(BRect frame)
-{
-	MoveTo(frame.LeftTop());
-	ResizeTo(frame.Width(), frame.Height());
-	return Frame();
-}
-
-#endif // LIB_LAYOUT
-
-
 void
 GradientControl::WindowActivated(bool active)
 {

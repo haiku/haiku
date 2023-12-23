@@ -12,10 +12,6 @@
 
 #include <View.h>
 
-#if LIB_LAYOUT
-#	include <layout.h>
-#endif
-
 #include "IconBuild.h"
 
 
@@ -28,12 +24,7 @@ enum {
 	MSG_GRADIENT_CONTROL_FOCUS_CHANGED	= 'gcfc',
 };
 
-class GradientControl :
-						#if LIB_LAYOUT
-						public MView,
-						#endif
-						public BView {
-
+class GradientControl : public BView {
  public:
 								GradientControl(BMessage* message = NULL,
 												BHandler* target = NULL);

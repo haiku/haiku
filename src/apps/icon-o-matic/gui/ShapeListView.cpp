@@ -251,47 +251,51 @@ ShapeListView::ArchiveSelection(BMessage* into, bool deep) const
 	for (int32 i = 0; i < count; i++) {
 		ShapeListItem* item = dynamic_cast<ShapeListItem*>(
 			ItemAt(CurrentSelection(i)));
-		if (item != NULL && item->shape != NULL) {
-			PathSourceShape* pathSourceShape = dynamic_cast<PathSourceShape*>(item->shape);
-			if (pathSourceShape != NULL) {
-				PathSourceShape* shape = pathSourceShape;
+		if (item == NULL)
+			return B_ERROR;
 
-				BMessage archive;
-				archive.what = PathSourceShape::archive_code;
+		PathSourceShape* shape = dynamic_cast<PathSourceShape*>(item->shape);
+		if (shape != NULL) {
+			BMessage archive;
+			archive.what = PathSourceShape::archive_code;
 
-				BMessage styleArchive;
+			BMessage styleArchive;
+			if (shape->Style() != NULL) {
 				shape->Style()->Archive(&styleArchive, true);
 				archive.AddMessage("style", &styleArchive);
+			}
 
-				Container<VectorPath>* paths = shape->Paths();
-				for (int32 j = 0; j < paths->CountItems(); j++) {
+			if (shape->Paths() != NULL) {
+				int32 pathsCount = shape->Paths()->CountItems();
+				for (int32 j = 0; j < pathsCount; j++) {
 					BMessage pathArchive;
-					paths->ItemAt(j)->Archive(&pathArchive, true);
-					archive.AddMessage("path", &pathArchive);
+					if (shape->Paths()->ItemAt(j) != NULL) {
+						shape->Paths()->ItemAt(j)->Archive(&pathArchive, true);
+						archive.AddMessage("path", &pathArchive);
+					}
 				}
-
-				BMessage shapeArchive;
-				shape->Archive(&shapeArchive, true);
-				archive.AddMessage("shape", &shapeArchive);
-
-				into->AddMessage("shape archive", &archive);
-				continue;
 			}
 
-			ReferenceImage* referenceImage = dynamic_cast<ReferenceImage*>(item->shape);
-			if (referenceImage != NULL) {
-				BMessage archive;
-				archive.what = ReferenceImage::archive_code;
+			BMessage shapeArchive;
+			shape->Archive(&shapeArchive, true);
+			archive.AddMessage("shape", &shapeArchive);
 
-				BMessage shapeArchive;
-				referenceImage->Archive(&shapeArchive, true);
-				archive.AddMessage("shape", &shapeArchive);
+			into->AddMessage("shape archive", &archive);
+			continue;
+		}
 
-				into->AddMessage("shape archive", &archive);
-				continue;
-			}
-		} else
-			return B_ERROR;
+		ReferenceImage* referenceImage = dynamic_cast<ReferenceImage*>(item->shape);
+		if (referenceImage != NULL) {
+			BMessage archive;
+			archive.what = ReferenceImage::archive_code;
+
+			BMessage shapeArchive;
+			referenceImage->Archive(&shapeArchive, true);
+			archive.AddMessage("shape", &shapeArchive);
+
+			into->AddMessage("shape archive", &archive);
+			continue;
+		}
 	}
 
 	return B_OK;
