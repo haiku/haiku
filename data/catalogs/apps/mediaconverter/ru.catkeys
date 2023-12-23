@@ -1,6 +1,8 @@
-1	russian	x-vnd.Haiku-MediaConverter	801112998
+1	russian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Входной файл не распознан как аудио или видео
 Source files	MediaConverter		Исходные файлы
+Error writing video frame %lld	MediaConverter		Ошибка записи видеокадра %lld
+Audio quality: %s	MediaConverter		Качество аудио: %s
 Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранная папка не найдена. Выбираем по умолчанию /boot/home
 Conversion completed	MediaConverter		Конвертация завершена
@@ -9,6 +11,7 @@ MediaConverter+:SaveDirectory	MediaConverter		Медиаконвертер: вы
 Error creating video.	MediaConverter		Ошибка создания видео.
 Cancelling	MediaConverter		Отменяется
 None available	Audio codecs		Недоступно
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Если файл содержит несколько аудио- или видеодорожек, конвертируется только первая из них.
 No file selected	MediaConverter-FileInfo		Файл не выбран
 High	MediaConverter		Высокое
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не был распознан как поддерживаемый медиафайл:} few{# файла не были распознаны как поддерживаемые медиафайлы:} other{# файлов не было распознано как поддерживаемые медиафайлы:}}
@@ -23,6 +26,7 @@ Error loading a file	MediaConverter		Ошибка при загрузке фай
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
 Open…	Menu		Открыть…
 Audio encoding:	MediaConverter		Кодирование звука:
+Multi-track file detected	MediaConverter		Файл распознан как многоканальный
 Cancelling…	MediaConverter		Отменяется…
 Output file '%filename' created	MediaConverter		Выходящий файл '%filename' создан
 Output folder	MediaConverter		Сохранять в папку
@@ -35,6 +39,7 @@ Conversion cancelled	MediaConverter		Конвертация отменена
 Low	MediaConverter		Низкое
 Error loading files	MediaConverter		Ошибка при загрузке файлов
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# бит} few{# бита} other{# битов}}
+Video quality: %s	MediaConverter		Качество видео: %s
 End   [ms]: 	MediaConverter		Конец [мс]: 
 Cancel	MediaConverter		Отмена
 OK	MediaConverter-FileInfo		ОК
@@ -45,21 +50,28 @@ File details	MediaConverter		Параметры файла
 No audio	Audio codecs list		Без аудио
 Drop media files onto this window	MediaConverter		Перетащите медиа файлы в это окно
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} few{# кадра} other{# кадров}}
+Error read audio frame %lld	MediaConverter		Ошибка чтения аудиофрейма %lld
 Quit	Menu		Выход
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# байт} few{# байта} other{# байтов}}
+Writing audio track: %s complete	MediaConverter		Запись аудиодорожки: %s выполнено
 Duration:	MediaConverter-FileInfo		Длительность:
 MediaConverter	System name		Медиаконвертер
+Writing video track: %s complete	MediaConverter		Запись видеодорожки: %s выполнено
 Error launching: %strError%	MediaConverter		Ошибка запуска: %strError%
+Error writing audio frame %lld	MediaConverter		Ошибка записи аудиофрейма %lld
 File format:	MediaConverter		Формат файла:
 File	Menu		Файл
 Video quality not supported	MediaConverter		Качество видео не поддерживается
 Select this folder	MediaConverter		Выбрать эту папку
 %.1f kHz %ld channel	MediaFileInfo		%.1f кГц %ld канал
+Understood	MediaConverter		Понятно
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2f к/с
 %d bit 	MediaFileInfo		%d бит 
 No video	Video codecs list		Без видео
 Continue	MediaConverter		Продолжить
 Convert	MediaConverter		Конвертировать
 Audio quality not supported	MediaConverter		Качество звука не поддерживается
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ошибка записи в папку %strPath%. Записываем в папку по умолчанию: /boot/home
+Error read video frame %lld	MediaConverter		Ошибка чтения видеокадра %lld
 Preview	MediaConverter		Предпросмотр
 Start [ms]: 	MediaConverter		Начало [мс]: 

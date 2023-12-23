@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CharacterMap	2142098242
+1	russian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Тирхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Разнообразные математические символы B
 Latin extended E	UnicodeBlocks		Расширенная латиница E
@@ -166,9 +166,11 @@ Wancho	UnicodeBlocks		Ванчо
 Box drawing	UnicodeBlocks		Символы рисования рамок
 Egyptian hieroglyphs	UnicodeBlocks		Египетские иероглифы
 Vai	UnicodeBlocks		Ваи
+Meetei Mayek extensions	UnicodeBlocks		Расширения манипури
 Ethiopic extended	UnicodeBlocks		Расширенный эфиопский
 CJK compatibility	UnicodeBlocks		Символы совместимости CJK
 Tai Le	UnicodeBlocks		Тай Лы
+Old Sogdian	UnicodeBlocks		Древнесогдийское письмо
 Devanagari extended	UnicodeBlocks		Расширенное деванагари
 Lao	UnicodeBlocks		Лаосский
 Chorasmian	UnicodeBlocks		Хорезмийское письмо

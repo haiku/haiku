@@ -1,8 +1,9 @@
-1	friulian	x-vnd.Haiku-Keymap	1479919571
+1	friulian	x-vnd.Haiku-Keymap	3696803769
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
 PG ↑	Keyboard Layout View	Very short for 'page up'	PAGJ
+Scroll Lock	Keyboard Layout View		Bloc Scor
 Brazilian	KeymapNames		Brasilian
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
@@ -11,6 +12,7 @@ Option:	Modifier keys window	Option key role name	Opzion:
 Cancel	Modifier keys window		Anule
 Sample and clipboard:	Keymap window		Aree di prove:
 Polish	KeymapNames		Polac
+Right Shift	Keyboard Layout View		Maiusc diestri
 Latin-American	KeymapNames		Latin-American
 Ukrainian	KeymapNames		Ucrain
 PAGE ↓	Keyboard Layout View		PAGJINE ↓
@@ -68,10 +70,12 @@ Bulgarian (Phonetic)	KeymapNames		Bulgar (Fonetic)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Francês-canadês
 Hungarian	KeymapNames		Ongjarês
+Right Control	Keyboard Layout View		Control diestri
 Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		Irlandês
 Remove	Keyboard Layout View		Gjave
 Tilde trigger	Keymap window		Tilde (~)
+Caps Lock	Keyboard Layout View		Bloc Maiusc
 Shift	Keyboard Layout View	Shift key	Maiusc
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedon
@@ -163,4 +167,6 @@ Dutch	KeymapNames		Olandês
 Diaeresis trigger	Keymap window		Dieresi (¨)
 Icelandic	KeymapNames		Islandês
 Open…	Keymap window		Vierç…
+Left Control	Keyboard Layout View		Control di çampe
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Bloc Num

@@ -1,6 +1,22 @@
-1	russian	x-vnd.Haiku-JPEGTranslator	2123465144
-Write black-and-white images as RGB24	JPEGTranslator		Сохранять чёрно-белые изображения как RGB24
+1	russian	x-vnd.Haiku-JPEGTranslator	3788699631
+Read	JPEGTranslator		Чтение
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Формат Be Bitmap (JPEGTranslator)
+Show warning messages	JPEGTranslator		Показывать предупреждения
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Использовать CMYK=0 для 100% покрытия чернилами
+JPEG Library Error: %s\n	be_jerror		Ошибка библиотеки JPEG: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nНа основе библиотеки IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nс поддержной кодирования \«lossless\» от Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nС некоторыми процедурами преобразования цветового пространства от Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Нет
+About	JPEGTranslator		Инфо…
+Version %d.%d.%d	JPEGTranslator		Версия %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		Записывать ч/б изображения как RGB24
+Output smoothing strength	JPEGTranslator		Степень сглаживания вывода
+Use progressive compression	JPEGTranslator		Использовать прогрессивное сжатие
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Сделать файл меньше (качество немного хуже)
+High	JPEGTranslator		Высокое
+Read greyscale images as RGB32	JPEGTranslator		Читать изображения в оттенках серого как RGB32
 Output quality	JPEGTranslator		Качество вывода
 Low	JPEGTranslator		Низкое
 Write	JPEGTranslator		Запись
-Prevent colors 'washing out'	JPEGTranslator		Предотвращать "выцветание"
+Prevent colors 'washing out'	JPEGTranslator		Предотвращать «выцветание»
+JPEG Library Warning: %s\n	be_jerror		Предупреждение библиотеки JPEG: %s\n
+JPEG images	JPEGTranslator		Изображение JPEG

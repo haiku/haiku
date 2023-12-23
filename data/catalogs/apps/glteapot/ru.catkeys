@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-GLTeapot	400822745
+1	russian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Справа
 Backface culling	TeapotWindow		Заднее отбрасывание
 Add a teapot	TeapotWindow		Добавить чайник
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Нижний левый угол
 Fog	TeapotWindow		Туман
 FPS display	TeapotWindow		Показывать частоту кадров
 GLTeapot	System name		Чайник
+Limit FPS to refresh rate	TeapotWindow		Ограничить FPS до частоты обновления
 Settings	TeapotWindow		Настройки
 Gouraud shading	TeapotWindow		Метод тонирования Гуро
 Lighting	TeapotWindow		Освещение

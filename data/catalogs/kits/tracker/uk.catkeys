@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3955111295
+1	ukrainian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -28,7 +28,7 @@ Searching for disks to mount…	StatusWindow		Пошук дисків для п�
 Value	AttributesView		Значення
 Information	InfoWindow		Інформація
 Error emptying Trash	FSUtils		Помилка спустошення смітника!
-Opens with:	InfoWindow		Відкрити за допомогою:
+Opens with:	InfoWindow		Відкривати у програмі:
 Size	QueryPoseView		Розмір
 Disk mount	TrackerSettingsWindow		Підключення дисків
 Type	AttributesView		Тип
@@ -337,6 +337,7 @@ yes	AttributesView		так
 Make active printer	ContainerWindow		Зробити принтер активним
 Copy to	ContainerWindow		Копіювати до
 Name	SelectionWindow		Назва
+Location	Default Query Columns		Розташування
 by attribute	FindPanel		за атрибутом
 Write	FilePermissionsView		Записати
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Якщо ви зміните папку system або її вміст, то не зможете завантажити %osName!\n\nВи впевнені що бажаєте цього?\n\nЩоб все рівно змінити папку system або її вміст, затисніть кнопку Shift та натисніть \«Я знаю що роблю\».

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-About	885044264
+1	french	x-vnd.Haiku-About	4264836225
 The Haikuware team and their bounty program\n	AboutView		L’équipe Haikuware et son programme de récompenses\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Tous droits réservés.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Tous droits réservés.
@@ -31,6 +31,8 @@ Licenses: 	AboutView		Licences :
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Le code source d’Haiku et les droits d’auteurs afférents sont la propriété de Haiku, Inc. ou de ses auteurs respectifs lorsque cela est expressément indiqué dans les sources. Haiku® et le logo® de HAIKU sont des marques déposées de Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Time running:	AboutView		Temps depuis le démarrage :
+Version: %s	AboutView	Version: R1 or hrev99999	Version : %s
+%d MiB Memory:	AboutView	2048 MiB Memory:	%d Mio de mémoire :
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Tous droits réservés.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ce logiciel est basé en partie sur le travail de l’Independent JPEG Group.

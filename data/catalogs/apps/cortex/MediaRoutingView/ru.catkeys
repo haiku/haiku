@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.MediaRoutingView	1481422791
+1	russian	application/x-vnd.Cortex.MediaRoutingView	3442339205
 Lock group	MediaNodePanel		Заблокировать группу
 %refname% (no file)	MediaNodePanel		%refname% (нет файла)
 Video output	MediaRoutingView		Видеовыход
@@ -8,19 +8,22 @@ Cycle	MediaNodePanel		Цикл
 Advanced	MediaNodePanel		Дополнительно
 Audio input	MediaRoutingView		Аудиовход
 Run mode	MediaNodePanel		Режим работы
-Could not load '%filename%'	MediaRoutingView		Не удалось загрузить '%filename%'
+Could not load '%filename%'	MediaRoutingView		Не удалось загрузить «%filename%»
 Stop time source	MediaNodePanel		Остановить источник времени
 Be Audio Mixer	MediaRoutingView		Ве аудиомикшер
 Video input	MediaRoutingView		Видеовход
+Release	MediaNodePanel		Отключить
 Disconnect	MediaRoutingView		Разъединить
 Could not disconnect	MediaRoutingView		Не удалось разъединить
-Could not instantiate '%infoname%'	MediaRoutingView		Не удалось создать '%infoname%'
+Could not instantiate '%infoname%'	MediaRoutingView		Не удалось создать «%infoname%»
 Mini icon view	MediaRoutingView		Маленькие значки
 Select all	MediaRoutingView		Выбрать все
 (same as group)	MediaNodePanel		(такое же, как у группы)
 Input	MediaJack		Вход
 Get info	MediaJack		Информация
+Start time source	MediaNodePanel		Запустить отсчёт времени
 Error	MediaRoutingView		Ошибка
+Could not release '%refname%'	MediaRoutingView		Не удалось отключить «%refname%»
 Output	MediaJack		Вывод
 Get info	MediaNodePanel		Информация
 Get info	MediaRoutingView		Информация

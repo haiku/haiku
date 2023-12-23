@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	4073987023
+1	russian	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Послать в сохраненные
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
 Text wrapping:	Mail		Перенос строк:
@@ -38,7 +38,9 @@ Previous message	Mail		Предыдущее письмо
 (Address unavailable)	Mail		(Адрес недоступен)
 Mail	System name		Почта
 Copy link location	Mail		Копировать адрес ссылки
+Add attachment…	Mail		Добавить вложение…
 Next	Mail		Следущее
+Attachments:	Mail		Вложения:
 Show icons only	Mail		Отображать только иконки
 Subject:	Mail		Тема:
 OK	Mail		ОК
@@ -55,6 +57,7 @@ Reply to sender	Mail		Ответить отправителю
 \\n - Newline	Mail		\\n - Новая строка
 Copy	Mail		Копия
 Add signature	Mail		Добавить подпись
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вложение: %name% (Тип: %type%)
 %n - Full name	Mail		%n - Полное имя
 Signature	Mail		Подпись
 Use default account	Mail		Использовать аккаунт по умолчанию
@@ -104,8 +107,10 @@ Start now	Mail		Запустить сейчас
 (Name unavailable)	Mail		(Имя недоступно)
 Move to trash	Mail		Переместить в корзину
 <none>	Mail		<пусто>
+Mail settings	Mail		Настройки Почты
 %d - Date	Mail		%d - Дата
 Check spelling	Mail		Проверять орфографию
+Status:	Mail		Статус:
 Redo	Mail		Повторить
 Leave as '%s'	Mail		Оставить как '%s'
 Print…	Mail		Печать…

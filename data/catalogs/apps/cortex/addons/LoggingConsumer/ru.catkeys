@@ -1,14 +1,22 @@
-1	russian	application/x-vnd.Be.LoggingConsumerApp	3041020332
+1	russian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не удалось получить инфо об узле (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Приоритет
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не найден узел (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Задержка
+Logged input	CortexAddOnsLoggingConsumer		Вход регистратора
 CPU spin percentage	CortexAddOnsLoggingConsumer		Процент спин-блокировок ЦПУ
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
 Thread priority	CortexAddOnsLoggingConsumer		Приоритет потока
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Параметры LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Управление задержкой
 CPU percentage	CortexAddOnsLoggingConsumer		Нагрузка на CPU
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Узел LoggingConsumer в версии дополнения.\nСм. Информационный бюллетень Be Developer III.18: 5 мая 1999 г.\nадаптировал Eric Moon (4 июня 1999 г.)
 OK	CortexAddOnsCommonMediaNodeControlApp		ОК
 Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Элементы управления
 controls	CortexAddOnsCommonMediaNodeControlApp		управление
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Подключить
 percent	CortexAddOnsLoggingConsumer		процент
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: отсутствуют параметры для узла (%ld):\n%s\n

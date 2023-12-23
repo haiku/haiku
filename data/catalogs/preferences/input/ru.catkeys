@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Input	4063065788
+1	russian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Прокрутка
 Defaults	InputMouse		По умолчанию
 Long	KeyboardView		Длинная
@@ -25,6 +25,7 @@ Accept first click	SettingsView		Принимать первый клик
 OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальная прокрутка
 Delay until key repeat	KeyboardView		Задержка перед повтором клавиши
+Keyboard lock delay	TouchpadPrefView		Задержка блокировки клавиатуры
 Two finger scrolling	TouchpadPrefView		Прокрутка двумя пальцами
 Input	System name		Ввод
 Mouse acceleration	SettingsView		Ускорение мыши

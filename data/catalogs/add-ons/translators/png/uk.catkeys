@@ -4,7 +4,7 @@ None	PNGTranslator		Немає
 PNG image	PNGTranslator		Зображення PNG
 PNG images	PNGTranslator		Зображення PNG
 Interlacing type:	PNGTranslator		Алгоритм чередування:
-PNGTranslator Settings	PNGTranslator		Налаштування транслятора PNG
+PNGTranslator Settings	PNGTranslator		Налаштування PNGTranslator
 Version %d.%d.%d, %s	PNGTranslator		Версія %d.%d.%d, %s
 PNG image translator	PNGTranslator		Транслятор зображень PNG
 Interlace Option	PNGTranslator		Параметри чередування

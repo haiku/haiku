@@ -30,7 +30,7 @@ BEOS:ICON attribute	Icon-O-Matic-SavePanel		атрибут BEOS:ICON
 Transform	Icon-O-Matic-PathManipulator		Трансформація
 Add shape with style	Icon-O-Matic-Menu-Shape		Додати форму зі стилем
 Change color	Icon-O-Matic-SetColorCmd		Змінити колір
-Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Прибрати {0, plural, one{точку} other{точки}}
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Прибрати {0, plural, one{точку} few{точки} other{точок}}
 Unassign path	Icon-O-Matic-UnassignPathCmd		Відкріпити контур
 Remove	Icon-O-Matic-StylesList		Прибрати
 Cancel	Icon-O-Matic-Menu-Settings		Скасувати
@@ -63,7 +63,7 @@ Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Пр�
 One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Один або декілька контурів мають забагато точок. HVIF підтримує максимум 255 точок у контурі.
 Add with path & style	Icon-O-Matic-ShapesList		Додати з контуром & стилем
 Shape	Icon-O-Matic-Menus		Форма
-Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Розділити {0, plural, one{точку} other{точки}}
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Розділити {0, plural, one{точку} few{точки} other{точок}}
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступно>
 Edit gradient	Icon-O-Matic-SetGradientCmd		Редагувати градієнт
 Min LOD	Icon-O-Matic-PropertyNames		Miн. LOD
@@ -97,7 +97,7 @@ Don't save	Icon-O-Matic-Menu-Settings		Не зберігати
 Add shape with path	Icon-O-Matic-Menu-Shape		Додати форму з контуром
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Досадно
 Translation X	Icon-O-Matic-PropertyNames		Перенести по X
-Multi-paste properties	Icon-O-Matic-Properties		Параметри МультиВставки
+Multi-paste properties	Icon-O-Matic-Properties		МультиВставка властивостей
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG при завантаженні файлу. Якщо перезаписати оригінальний файл, ця інформація буде втрачена.
 Rotate indices backwards	Icon-O-Matic-PathsList		Обійти точки проти годинника
 Overwrite	Icon-O-Matic-SVGExport		Перезаписати
@@ -113,9 +113,9 @@ HVIF source code	Icon-O-Matic-SavePanel		HVIF вихідний код
 Drop shapes	Icon-O-Matic-ShapesList		Скинути форми
 Save icon	Icon-O-Matic-SavePanel	Dialog title	Зберегти значок
 Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Прикріпити {0, plural, one{контур} other{контури}}
-Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Прибрати {0, plural, one{елемент} other{елементи}}
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		Прибрати {0, plural, one{елемент} few{елементи} other{елементів}}
 Linear	Icon-O-Matic-StyleTypes		Лінійний
-Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Перемістити {0, plural, one{елемент} other{елементи}}
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		Перемістити {0, plural, one{елемент} few{елементи} other{елементів}}
 Add vertex	Icon-O-Matic-AddPointCmd		Додавання точки
 Clean up	Icon-O-Matic-PathsList		Очистити
 Split	Icon-O-Matic-PathManipulator		Розділити
@@ -146,7 +146,7 @@ Append…	Icon-O-Matic-Menu-File		Додати…
 Scale Y	Icon-O-Matic-PropertyNames		Масштаб по Y
 Export icon	Icon-O-Matic-SavePanel	Dialog title	Експорт значка
 Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Обійти точки контуру
-Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Додати {0, plural, one{елемент} other{елементи}}
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		Додати {0, plural, one{елемент} few{елементи} other{елементів}}
 Rotate indices forwards	Icon-O-Matic-PathsList		Обійти точки за годинником
 Save	Icon-O-Matic-Menu-File		Зберегти
 Cancel	Icon-O-Matic-StyledTextImport		Скасувати
@@ -156,11 +156,11 @@ META:ICON attribute	Icon-O-Matic-SavePanel		атрибут META:ICON
 Untitled	Icon-O-Matic-Main		Неназваний
 Max LOD	Icon-O-Matic-PropertyNames		Mакс. LOD
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Зберегти зміни поточного значка перед закриттям?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' як документ SVG.\n\n
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Не вдалося відкрити файл «%s» як документ SVG.\n\n
 Save as…	Icon-O-Matic-Menu-File		Зберегти як…
 Swatches	Icon-O-Matic-Menus		Палітри
-<modify path>	Icon-O-Matic-PathCmd		<змінити шлях>
-Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Зміна властивості %property%
+<modify path>	Icon-O-Matic-PathCmd		<змінити контур>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Встановити %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого відмінити>
 Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		Прибрати {0, plural, one{контур} few{контури} other{контурів}}
@@ -171,7 +171,7 @@ Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		Пере�
 Scale	Icon-O-Matic-TransformationBoxStates		Масштаб
 All	Icon-O-Matic-Properties		Всі
 Transformer	Icon-O-Matic-Menus		Трансформатор
-Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Віддзеркалити {0, plural, one{точку} other{точки}}
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		Віддзеркалити {0, plural, one{точку} few{точки} other{точок}}
 Invert selection	Icon-O-Matic-Properties		Інвертувати виділення
 to attach transformers.	Icon-O-Matic-TransformersList	Empty transformers list - 2nd line	щоб прикріпити трансформатори.
 <unkown property>	Icon-O-Matic-PropertyNames		<невідома властивість>
@@ -181,7 +181,7 @@ Select all	Icon-O-Matic-PathManipulator		Вибрати все
 Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
 New	Icon-O-Matic-Menu-File		Новий
 Change perspective	Icon-O-Matic-PerspectiveCommand		Змінити перспективу
-Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Змістити {0, plural, one{точку} other{точки}}
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		Змістити {0, plural, one{точку} few{точки} other{точок}}
 Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 Perspective	Transformation		Перспектива
 Export	Icon-O-Matic-Menu-File		Експорт

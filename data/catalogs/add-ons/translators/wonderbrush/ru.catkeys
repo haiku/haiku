@@ -1,5 +1,9 @@
-1	russian	x-vnd.Haiku-WonderBrushTranslator	2764474812
+1	russian	x-vnd.Haiku-WonderBrushTranslator	1289038178
+WonderBrush image translator	WonderBrushTranslator		Транслятор изображений WonderBrush
 WBI Settings	WonderBrushMain		Настройки WBI
 Version %d.%d.%d, %s	WonderBrushView		Версия %d.%d.%d, %s
 written by:	WonderBrushView		разработан:
+WonderBrush images	WonderBrushTranslator		Изображения WonderBrush
 WonderBrush image translator	WonderBrushView		Транслятор WonderBrush изображений
+WonderBrush image	WonderBrushTranslator		Изображение WonderBrush
+WBI Settings	WonderBrushTranslator		Настройки WBI

@@ -1,10 +1,11 @@
-1	russian	x-vnd.Haiku-Time	2069485065
+1	russian	x-vnd.Haiku-Time	3691539601
 OK	Time		ОК
 Message receiving failed	Time		Не удалось получить данные
 Australia	Time		Австралия
 America	Time		Америка
 Reset to default server list	Time		Восстановить список серверов по умолчанию
 Could not resolve server address	Time		Невозможно определить доменное имя сервера
+Time & Date	System name		Время & Дата
 Set time zone	Time		Установить часовой пояс
 Waiting for answer failed	Time		Истекло время ожидания
 <Other>	Time		<Другой>

@@ -1,19 +1,19 @@
 1	ukrainian	application/x-vnd.Cortex.Route	25925955
-Node '%name%' released	CortexRouteApp		Нода '%name%' відключена
+Node '%name%' released	CortexRouteApp		Нода «%name%» відключена
 OK	CortexRouteApp		ОК
 About Cortex/Route…	CortexRouteApp		Про Cortex/Route…
 File	CortexRouteApp		Файл
-Connection '%name%' made	CortexRouteApp		З’єднання '%name%' здійснено
+Connection '%name%' made	CortexRouteApp		З’єднання «%name%» здійснено
 Save nodes…	CortexRouteApp		Зберегти ноди…
 %producer% and %consumer%	CortexRouteApp		%producer% та %consumer%
-Node '%name%' created	CortexRouteApp		Нода '%name%' створена
+Node '%name%' created	CortexRouteApp		Нода «%name%» створена
 Negotiated format:	CortexRouteApp		Узгоджений формат:
 Window	CortexRouteApp		Вікно
 Transport	CortexRouteApp		Транспорт
 Connection broken	CortexRouteApp		З’єднання розірвано
 Untitled group	CortexRouteApp		Група без назви
 Connection failed	CortexRouteApp		З’єднатися не вдалося
-Connection '%name%' broken	CortexRouteApp		З’єднання '%name%' розірвано
+Connection '%name%' broken	CortexRouteApp		З’єднання «%name%» розірвано
 Between:	CortexRouteApp		Поміж:
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Відкрити…

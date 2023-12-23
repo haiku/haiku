@@ -1,18 +1,21 @@
-1	russian	application/x-vnd.Cortex.support	2272802441
+1	russian	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		Заголовок имеет флаги
 32 bit HLS	MediaString		32-битный HLS
 Recording	MediaString		Запись
 (unknown format)	MediaString		(неизвестный формат)
 Clean buffers	MediaString		Очистить данные буфера
-{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural, one{# кадр вперед} few{# кадра вперед} other{# кадров вперед}}
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural, one{# кадр вперёд} few{# кадра вперёд} other{# кадров вперёд}}
 Rear-right	MediaString		Задний правый
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# пиксель} few{# пикселя} other{# пикселей}}
 Mono	MediaString		Моно
 MPEG1	MediaString		MPEG1
 ASF format family	MediaString		Семейство файловых форматов ASF
 Encoded video	MediaString		Кодированное видео
 YUV444	MediaString		YUV444
 Port	MediaString		Порт
+Top-Front-left	MediaString		Верхний-Фронт-левый
 24 bit LAB	MediaString		24-битный LAB
+16 bit integer	MediaString		16-битное целое
 32 bit HSVA	MediaString		32-битный HSVA
 YCbCr411	MediaString		YCbCr411
 Offline	MediaString		Офлайн
@@ -20,54 +23,90 @@ YUV422	MediaString		YUV422
 (unkown video orientation)	MediaString		неизвестная ориентация видео
 QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32-битный HLSA
+Top-Front-center	MediaString		Верхний-Фронт-центр
 BeOS format family	MediaString		Семейство файловых форматов BeOS
 24 bit HSV	MediaString		24-битный HSV
+Back-center	MediaString		Тыл-центр
 32 bit CMY	MediaString		32-битный CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{#-битное целое}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(неизвестный формат видео)
+Video data between line %lu and %lu	MediaString		Видеоданные между строками %lu и %lu
 AVI format family	MediaString		Семейство файловых форматов AVI
+Homogenous buffers	MediaString		Однородные буфера
+Interlaced 	MediaString		Чрезстрочная 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# канал} few{# канала} other{# каналов}}
 15 bit RGBA	MediaString		15-битный RGBA
 Drop data	MediaString		Сбросить данные
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Гц
 Right	MediaString		Правый
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		32-битный RGB
 System mixer	MediaString		Системный микшер
 Physical output	MediaString		Физический выход
+Top-Back-center	MediaString		Верхний-Тыл-центр
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Сверху вниз, слева направо
+(unknown run mode)	MediaString		(неустановленный режим работы)
  kb/s	MediaString		 кбит/с
 24 bit HSI	MediaString		24-битный HSI
 User-defined media type	MediaString		Медиа-формат определённый пользователем
 32 bit CMYA	MediaString		32-битный CMYA
+Rear-left	MediaString		Задний-левый
 QuickTime format family	MediaString		Семейство формата QuickTime
 Any format family	MediaString		Семейство любого формата
 Timecode	MediaString		Временной код
+Top-Front-right	MediaString		Верхний-Фронт-правый
+32 bit float	MediaString		32-битное плавающее
+Controllable	MediaString		Управляемый
+32 bit integer	MediaString		32-битное целое
+Front-right-center	MediaString		Фронт-правый-центр
+Side-right	MediaString		Боковой-правый
  kHz	MediaString		 кГц
+Little endian	MediaString		От младшего к старшему
 (unknown matrix mask)	MediaString		(неизвестная маска матрицы)
 32 bit LAB	MediaString		32-битный LAB
+Side-left	MediaString		Боковой-левый
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# байт на буфер} few{# байта на буфер} other{# байтов на буфер}}
 32 bit CMYK	MediaString		32-битный CMYK
 (unknown multistream format)	MediaString		(неизвестный формат мультистрима)
+8 bit integer	MediaString		8-битное целое
+8 bit grayscale-index	MediaString		8-битный индекс серого
 YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Буфер передатчика
+Buffer consumer	MediaString		Буфер приёмника
 Increase latency	MediaString		Увеличить задержку
+Front-left-center	MediaString		Фронт-левый-центр
 MPEG format family	MediaString		Семейство файловых форматов MPEG
 (none)	MediaString		(нет)
+Center	MediaString		Центр
  kb/s (max)	MediaString		 кб/с (макс.)
+Monochrome	MediaString		Монохром
+Private Be media type	MediaString		Медиаформат Private Be
 24 bit UVL	MediaString		24-битный UVL
 32 bit HSV	MediaString		32-битный HSV
 ID	MediaString		ID
 AIFF format family	MediaString		Семейство файловых форматов AIFF
+Top-Back-left	MediaString		Верхний-Тыл-левый
 16 bit RGB	MediaString		16-битный RGB
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Raw-аудио
 32 bit LABA	MediaString		32-битный LABA
 24 bit HLS	MediaString		24-битный HLS
+Non-interlaced 	MediaString		Прогрессивная 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural, one{# байт (средн.)} few{# байта (средн.)} other{# байтов (средн.)}}
 MIDI	MediaString		MIDI
 YUV12	MediaString		YUV12
 WAV format family	MediaString		Семейство файловых форматов WAV
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Физический ввод
+Big endian	MediaString		От старшего к младшему
+Sub	MediaString		Сабвуфер
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural, one{# байт (макс.)} few{# байта (макс.)} other{# байтов (макс.)}}
 YUV411	MediaString		YUV411
+Multistream media	MediaString		Многопоточное медиа
 Encoded audio	MediaString		Аудиокодек
 Decrease precision	MediaString		Уменьшить точность
 File interface	MediaString		Файловый интерфейс
@@ -79,19 +118,30 @@ Typeless media	MediaString		Безтиповое медиа
 YCbCr420	MediaString		YCbCr420
  kb/s (avg)	MediaString		 кб/с (среднее)
 HTML	MediaString		HTML
+Time source	MediaString		Счётчик времени
 15 bit RGB	MediaString		15-битный RGB
 ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural, one{# байт на кадр} few{# байта на кадр} other{# байтов на кадр}}
 Parameters	MediaString		Параметры
 Raw data from VBL area	MediaString		Raw значения из VBL
+Top-Back-right	MediaString		Верхний-Тыл-правый
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# байт на ряд} few{# байта на ряд} other{# байтов на ряд}}
+Left	MediaString		Левый
 BeOS video	MediaString		BeOS видео
 24 bit CMY	MediaString		24-битный CMY
 32 bit UVLA	MediaString		32-битный UVLA
+Top-center	MediaString		Верхний-центр
+Entity interface	MediaString		Интерфейс объекта
 Stereo	MediaString		Стерео
 8 bit color-index	MediaString		8-битное индексированное изображение
+Bottom to top, left to right	MediaString		Снизу вверх, слева направо
 32 bit UVL	MediaString		32-битный UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# ряд} few{# ряда} other{# рядов}}
 Text	MediaString		Текст
 Unknown media type	MediaString		Неизвестный медиаформат
 MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Смешанное семейство форматов
 24 bit RGB	MediaString		24-битный RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural, one{# кадр назад} few{# кадра назад} other{# кадров назад}}
 32 bit HSIA	MediaString		32-битный HSIA
 Raw video	MediaString		Raw-видео

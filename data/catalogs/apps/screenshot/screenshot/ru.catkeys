@@ -25,7 +25,7 @@ Failed to save screenshot	ScreenshotWindow		Не удалось сохранит
 Cancel	ScreenshotWindow		Отмена
 Delay:	ScreenshotWindow		Задержка:
 Copy to clipboard	ScreenshotWindow		Скопировать в буфер
-screenshot	Screenshot	Base filename of screenshot files	screenshot
+screenshot	Screenshot	Base filename of screenshot files	снимок экрана
 Home folder	ScreenshotWindow		Домашнюю папку
 Save	ScreenshotWindow		Сохранить
 Capture active window	ScreenshotWindow		Захватить активное окно

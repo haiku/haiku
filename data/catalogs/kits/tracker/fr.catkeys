@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	4006071705
+1	french	x-vnd.Haiku-libtracker	237713385
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -162,6 +162,7 @@ There was an error writing the attribute.	WidgetAttributeText		Il y a eu une err
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si vous renommez %target, %osName pourrait ne plus se comporter correctement !\n\nÊtes vous sûr de vouloir le faire ?
 Filesystem:	InfoWindow		Système de fichiers :
 Could not open \"%name\" (%error). 	FSUtils		Impossible d’ouvrir « %name » (%error). 
+Media parameter group	AttributesView		Groupe de paramètres média
 %name info	InfoWindow	InfoWindow Title	Informations sur %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier d’accueil, %osName pourrait ne plus fonctionner normalement !\n\nÊtes-vous sûr de vouloir le faire ?\n\nPour déplacer quand même le dossier d’accueil, maintenez la touche « Maj » enfoncée et cliquez sur « Déplacer ».
 Property info	AttributesView		Information sur la propriété
@@ -298,6 +299,7 @@ Select all	ContainerWindow		Sélectionner tout
 apps	B_APPS_DIRECTORY		applications
 Error calculating folder size.	InfoWindow		Erreur de calcul de la taille du dossier.
 Delete	FSUtils		Supprimer
+Duplicate	FilePanelPriv		Dupliquer
 Edit name	ContainerWindow		Éditer le nom
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque le symbole : %symbol).\n
 ASCII Text	AttributesView		Texte ASCII
@@ -334,6 +336,7 @@ yes	AttributesView		oui
 Make active printer	ContainerWindow		Activer l’imprimante
 Copy to	ContainerWindow		Copier vers
 Name	SelectionWindow		Nom
+Location	Default Query Columns		Emplacement
 by attribute	FindPanel		par attribut
 Write	FilePermissionsView		Écrire
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
@@ -493,6 +496,7 @@ Move to Trash	FSUtils		Envoyer à la corbeille
 Handles %type	OpenWithWindow		Support de « %type »
 Cancel	PoseView		Annuler
 Delete	PoseView		Supprimer
+Media parameter	AttributesView		Paramètre média
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérer votre dossier d’accueil, %osName pourrait ne plus se comporter correctement!\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même d’accueil, maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.
 Invert selection	VirtualDirectoryWindow		Inverser la sélection

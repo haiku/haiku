@@ -1,16 +1,19 @@
-1	japanese	x-vnd.Haiku-Keymap	1479919571
+1	japanese	x-vnd.Haiku-Keymap	4201668633
 Key	Modifier keys window	As in a computer keyboard key	キー
 Japanese	KeymapNames		日本語
 US	KeymapNames		英語 (US)
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
+Scroll Lock	Keyboard Layout View		Scroll Lock キー
 Brazilian	KeymapNames		ブラジル語
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		右 Option キー
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		中止
 Sample and clipboard:	Keymap window		サンプル＆クリップボード
 Polish	KeymapNames		ポーランド語
+Right Shift	Keyboard Layout View		右 Shift キー
 Latin-American	KeymapNames		ラテンアメリカ言語
 Ukrainian	KeymapNames		ウクライナ語
 PAGE ↓	Keyboard Layout View		PAGE ↓
@@ -40,6 +43,7 @@ Croatian	KeymapNames		クロアチア語
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		修飾キーの設定
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
+Right Command	Keyboard Layout View		右 Command キー
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd キー
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -60,6 +64,7 @@ French (NF Z71-300)	KeymapNames		フランス語 (NF Z71-300)
 Modifier keys	Modifier keys window		修飾キー
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		カザフ語
+Left Option	Keyboard Layout View		左 Option キー
 Save as…	Keymap window		名前を付けて保存...
 Lithuanian (Standard)	KeymapNames		リトアニア語 (標準)
 Error: duplicate keys	Modifier keys window		エラー: 重複したキー
@@ -68,10 +73,12 @@ Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		フランス語 (カナダ)
 Hungarian	KeymapNames		ハンガリー語
+Right Control	Keyboard Layout View		右 Control キー
 Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		アイルランド語
 Remove	Keyboard Layout View		削除
 Tilde trigger	Keymap window		チルダのトリガー
+Caps Lock	Keyboard Layout View		Caps Lock キー
 Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		マケドニア語
@@ -131,6 +138,7 @@ Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		キーマップ
 Slovene	KeymapNames		スロベニア語
 Lithuanian	KeymapNames		リトアニア語
+Left Command	Keyboard Layout View		左 Command キー
 Set modifier keys…	Keymap window		修飾キーの設定...
 Switch shortcut keys to Haiku mode	Keymap window		ショートカットキーを Haiku モードに切り替え
 Defaults	Keymap window		デフォルト
@@ -154,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		ルーマニア語
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Command
+Left Shift	Keyboard Layout View		左 Shift キー
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		ファイル
 Brazilian (ABNT2)	KeymapNames		ブラジル語 (ABNT2)
@@ -163,4 +172,6 @@ Dutch	KeymapNames		オランダ語
 Diaeresis trigger	Keymap window		ウムラウトのトリガー
 Icelandic	KeymapNames		アイスランド語
 Open…	Keymap window		開く...
+Left Control	Keyboard Layout View		左 Control キー
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Num Lock キー

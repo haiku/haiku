@@ -17,7 +17,7 @@ Print	Terminal TermWindow		Друк
 Settings	Terminal TermWindow		Налаштування
 %app% settings	Terminal PrefWindow	window title	%app% налаштування
 ANSI bright black color	Terminal ThemeView		ANSI яскравий чорний
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tПоточна робоча директорія  активного процесу.\n\t\t\tМаксимальна кількість компонентів які можуть бути\n\t\t\tзазначені. E.g. '%2d' для більш ніж двох компонентів.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Не відображається для UTF-8.\n\t%p\t-\tІм'я  активного процесу.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tПоточний робочий каталог активного процесу.\n\t\t\tМаксимальна кількість компонентів шляху які можуть бути\n\t\t\tзазначені. Наприклад, '%2d' - не більш ніж два компоненти.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Не відображається для UTF-8.\n\t%p\t-\tНазва активного процесу.
 Use default	Terminal SetTitleWindow		За замовчуванням
 Close tab	Terminal TermWindow		Закрити вкладку
 Error!	Terminal getString		Помилка!
@@ -48,7 +48,7 @@ Window title…	Terminal TermWindow		Заголовок вікна…
 ANSI blue color	Terminal ThemeView		ANSI синій
 blue	Terminal ThemeView		синій
 Open path	Terminal TermView		Відкрити шлях
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \«%command\»:\n\t%error
 Terminal	System name		Terminal
 Custom	Terminal colors scheme		Вибір користувача
 Really close?	Terminal TermWindow		Дійсно закрити?

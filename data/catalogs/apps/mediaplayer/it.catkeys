@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	834755355
+1	italian	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Esci
 Redo	MediaPlayer-PlaylistWindow		Ripeti
 Move Entry	MediaPlayer-MovePLItemsCmd		Sposta elemento
+Reset rating	MediaPlayer-Main		Reimposta valutazione
 <unknown>	PlaylistItem-author		<sconosciuto>
 Cancel	MediaPlayer-SettingsWindow		Annulla
 Large	MediaPlayer-SettingsWindow		Grandi
@@ -102,7 +103,7 @@ none	Subtitles menu		nessuno
 Save Playlist	MediaPlayer-PlaylistWindow		Salva elenco di riproduzione
 Overlay	MediaPlayer-InfoWin		Overlay
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
-Rating	MediaPlayer-Main		Giudizio
+Rating	MediaPlayer-Main		Valutazione
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (memoria piena). Salvataggio dell'elenco di riproduzione non riuscito.
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Non sono stati installati decoder specifici per questo formato, oppure il decoder ha un problema con questa versione del formato.

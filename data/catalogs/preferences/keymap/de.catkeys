@@ -1,16 +1,19 @@
-1	german	x-vnd.Haiku-Keymap	1479919571
+1	german	x-vnd.Haiku-Keymap	4201668633
 Key	Modifier keys window	As in a computer keyboard key	Taste
 Japanese	KeymapNames		Japanisch
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	Bld ↑
+Scroll Lock	Keyboard Layout View		Rollen-Feststelltaste
 Brazilian	KeymapNames		Brasilianisch
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		Option rechts
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Abbrechen
 Sample and clipboard:	Keymap window		Testfeld:
 Polish	KeymapNames		Polnisch
+Right Shift	Keyboard Layout View		Shift rechts
 Latin-American	KeymapNames		Lateinamerikanisch
 Ukrainian	KeymapNames		Ukrainisch
 PAGE ↓	Keyboard Layout View		BILD ↓
@@ -40,6 +43,7 @@ Croatian	KeymapNames		Kroatisch
 PAGE ↑	Keyboard Layout View		BILD ↑
 Set modifier keys	Modifier keys window		Hilfstasten zuordnen
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium (international)
+Right Command	Keyboard Layout View		Befehl rechts
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-Taste
 PG ↓	Keyboard Layout View	Very short for 'page down'	Bld ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -60,6 +64,7 @@ French (NF Z71-300)	KeymapNames		Französisch (NF Z71-300)
 Modifier keys	Modifier keys window		Hilfstasten
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 (international)
 Kazakh	KeymapNames		Kasachisch
+Left Option	Keyboard Layout View		Option links
 Save as…	Keymap window		Speichern unter …
 Lithuanian (Standard)	KeymapNames		Litauisch (Standard)
 Error: duplicate keys	Modifier keys window		Fehler: doppelte Tasten
@@ -68,10 +73,12 @@ Bulgarian (Phonetic)	KeymapNames		Bulgarisch (phonetisch)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanadisches Französisch
 Hungarian	KeymapNames		Ungarisch
+Right Control	Keyboard Layout View		Steuerung rechts
 Control	Keyboard Layout View	Control key	Steuerung
 Irish	KeymapNames		Irisch
 Remove	Keyboard Layout View		Entfernen
 Tilde trigger	Keymap window		~ Tilde
+Caps Lock	Keyboard Layout View		Feststelltaste
 Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		STEUERUNG
 Macedonian	KeymapNames		Mazedonisch
@@ -131,6 +138,7 @@ Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Tastaturlayout
 Slovene	KeymapNames		Slowenisch
 Lithuanian	KeymapNames		Litauisch
+Left Command	Keyboard Layout View		Befehl links
 Set modifier keys…	Keymap window		Hilfstasten zuordnen …
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Defaults	Keymap window		Standardwerte
@@ -154,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumänisch
 CMD	Keyboard Layout View	Very short for 'command'	BEF
 Command	Keyboard Layout View	Command key	Befehl
+Left Shift	Keyboard Layout View		Shift links
 SCROLL	Keyboard Layout View		ROLLEN
 File	Keymap window		Datei
 Brazilian (ABNT2)	KeymapNames		Brasilianisch (ABNT-2)
@@ -163,4 +172,6 @@ Dutch	KeymapNames		Niederländisch
 Diaeresis trigger	Keymap window		¨ Trema/Diärese
 Icelandic	KeymapNames		Isländisch
 Open…	Keymap window		Öffnen …
+Left Control	Keyboard Layout View		Steuerung links
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Num-Feststelltaste

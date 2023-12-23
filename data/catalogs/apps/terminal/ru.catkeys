@@ -1,48 +1,62 @@
-1	russian	x-vnd.Haiku-Terminal	3964119708
+1	russian	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
 Insert path	Terminal TermView		Вставить путь
-Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Извините.
 Text encoding	Terminal TermWindow		Кодировка
+Colors	Terminal ThemeWindow		Раскраска
 OK	Terminal SetTitleWindow		ОК
 Edit	Terminal TermWindow		Изменить
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               показать эту справку\n  -t,     --title              задать заголовок окна\n  -f,     --fullscreen         запустить в полноэкранном режиме\n  -w,     --working-directory  задать начальный рабочий каталог\n
 Select all	Terminal TermWindow		Выделить всё
-Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если процессы еще запущены
+Confirm exit if active programs exist	Terminal AppearancePrefView		Подтверждать выход если процессы ещё запущены
+Color scheme:	Terminal ThemeView		Цветовая схема:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n
 Copy	Terminal TermWindow		Копировать
 Edit tab title…	Terminal TermWindow		Переименовать вкладку…
 Print	Terminal TermWindow		Печать
 Settings	Terminal TermWindow		Настройки
 %app% settings	Terminal PrefWindow	window title	Настройки терминала
+ANSI bright black color	Terminal ThemeView		ANSI яркий чёрный
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tТекущий рабочий каталог активного процесса.\n\t\t\tКак опция; указывает максимальное количество компонентов\n\t\t\tпути. Например, '%2d' - не более двух компонентов.\n\t%i\t-\tИндекс вкладки.\n\t%e\t-\tКодировка текущей вкладки. Не отображается для UTF-8.\n\t%p\t-\tНазвание активного процесса.
 Use default	Terminal SetTitleWindow		По умолчанию
 Close tab	Terminal TermWindow		Закрыть вкладку
 Error!	Terminal getString		Ошибка!
+Colors…	Terminal TermWindow		Цвета…
 Appearance	Terminal PrefWindow		Внешний вид
 Set tab title	Terminal TermWindow		Переименовать вкладку
 Create link here	Terminal TermView		Создать ссылку здесь
 Encoding:	Terminal AppearancePrefView		Кодировка:
+yellow	Terminal ThemeView		жёлтый
 Change directory	Terminal TermView		Сменить каталог
-Custom	Terminal AppearancePrefView	Window size	Настроен вручную
+Custom	Terminal AppearancePrefView	Window size	Выбор пользователя
 Page setup…	Terminal TermWindow		Настройка печати…
+ANSI yellow color	Terminal ThemeView		ANSI жёлтый
 Cancel	Terminal TermView		Отмена
 Defaults	Terminal PrefWindow		По умолчанию
+black	Terminal ThemeView		чёрный
 Revert	Terminal PrefWindow		Вернуть
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Терминал
 Use selection	Terminal FindWindow		Использовать выделенный текст
 Find next	Terminal TermWindow		Найти далее
 Copy link location	Terminal TermView		Скопировать ссылку
+Background	Terminal ThemeView		Фон
 Window title:	Terminal AppearancePrefView		Заголовок окна:
 New tab	Terminal TermWindow		Новая вкладка
+magenta	Terminal ThemeView		пурпурный
 Allow bold text	Terminal AppearancePrefView		Разрешить полужирный текст
 Window title…	Terminal TermWindow		Заголовок окна…
+ANSI blue color	Terminal ThemeView		ANSI синий
+blue	Terminal ThemeView		синий
 Open path	Terminal TermView		Открыть путь
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \"%command\":\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Невозможно выполнить \«%command\»:\n\t%error
 Terminal	System name		Терминал
 Custom	Terminal colors scheme		Настроена вручную
 Really close?	Terminal TermWindow		Действительно закрыть?
 Font size	Terminal TermWindow		Размер шрифта
 OK	Terminal TermApp		ОК
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете Терминал, то этот процесс будет уничтожен.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \"%s\"\n
+ANSI bright blue color	Terminal ThemeView		ANSI яркий синий
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Процесс \«%1\» всё ещё работает.\nЕсли Вы закроете Терминал, то этот процесс будет уничтожен.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Нераспознанная опция \«%s\»\n
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не найден
 Match word	Terminal FindWindow		Только слово целиком
@@ -54,16 +68,23 @@ Find previous	Terminal TermWindow		Найти ранее
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:
 Close	Terminal TermWindow		Закрыть
 Save to file…	Terminal PrefWindow		Сохранить в файл…
+Defaults	Terminal ThemeWindow		По умолчанию
 Copy path	Terminal TermView		Скопировать путь
 Window size	Terminal TermWindow		Размер окна
+Selected text	Terminal ThemeView		Выделенный текст
 Copy absolute path	Terminal TermView		Скопировать абсолютный адрес
 Cancel	Terminal TermWindow		Отмена
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \"%1\" все еще работает.\nЕсли вы закроете вкладку, то этот процесс будет уничтожен.
+ANSI cyan color	Terminal ThemeView		ANSI бирюзовый
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процесс \«%1\» всё ещё работает.\nЕсли Вы закроете вкладку, то этот процесс будет уничтожен.
 Full screen	Terminal TermWindow		На весь экран
 Shell 	Terminal TermWindow		Консоль 
+Revert	Terminal ThemeWindow		Вернуть
+ANSI green color	Terminal ThemeView		ANSI зелёный
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tпосле начала не пустой.\n\t%>\t-\tНачало секции, которая будет отображена если заполнитель\n\t\t\tмежду предыдущей секцией %< и этой не пустой.\n\t%-\t-\tКонец секции %< или %>.\n\nЛюбой не буквенно-цифровой символ между '%' и буквой формата вставит пробел\nесли значение заполнителя не пустое. Он будет добавлен в секцию %<.
+ANSI bright cyan color	Terminal ThemeView		ANSI яркий бирюзовый
 Tab title:	Terminal TermWindow		Заголовок вкладки:
 Window title:	Terminal TermWindow		Заголовок окна:
+ANSI white color	Terminal ThemeView		ANSI белый
 Window size:	Terminal AppearancePrefView		Размер окна:
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Decrease	Terminal TermWindow		Уменьшить
@@ -73,27 +94,44 @@ Blinking cursor	Terminal AppearancePrefView		Мигающий курсор
 Use text:	Terminal FindWindow		Использовать текст:
 Close active tab	Terminal TermWindow		Закрыть текущую вкладку
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок окна.\nВозможно использовать следующие переменные:\n
+Selected background	Terminal ThemeView		Фон в выделении
 Save as default	Terminal TermWindow		Сохранить по умолчанию
 Nothing is selected.	Terminal TermWindow		Ничего не выделено
+ANSI bright red color	Terminal ThemeView		ANSI яркий красный
 Use left Option as Meta key	Terminal AppearancePrefView		Использовать левый Option как клавишу Meta
 Find	Terminal FindWindow		Найти
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Этот шаблон описывает заголовок текущей вкладки.\nВозможно использовать следующие переменные:\n
+Save to file…	Terminal ThemeWindow		Сохранить в файл…
 Font:	Terminal AppearancePrefView		Шрифт:
 Paste	Terminal TermWindow		Вставить
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
+ANSI bright magenta color	Terminal ThemeView		ANSI яркий пурпурный
 Copy here	Terminal TermView		Копировать сюда
 Use default shell	Terminal Shell		Использовать оболочку по умолчанию
+red	Terminal ThemeView		красный
+white	Terminal ThemeView		белый
 Open link	Terminal TermView		Открыть ссылку
+Text	Terminal ThemeView		Текст
+ANSI bright yellow color	Terminal ThemeView		ANSI яркий жёлтый
 Not found.	Terminal TermWindow		Текст не найден
+ANSI black color	Terminal ThemeView		ANSI чёрный
 Find…	Terminal TermWindow		Найти…
 No search string was entered.	Terminal TermWindow		Не введена строка поиска
 Move here	Terminal TermView		Переместить сюда
 Abort	Terminal Shell		Отменить
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы всё ещё работают:\n\n\t%1\n\nЕсли Вы закроете Терминал, то эти процессы будут уничтожены.
 Set window title	Terminal TermWindow		Установить заголовок окна
+ANSI red color	Terminal ThemeView		ANSI красный
 Increase	Terminal TermWindow		Увеличить
+green	Terminal ThemeView		зелёный
+ANSI bright green color	Terminal ThemeView		ANSI яркий зелёный
 OK	Terminal TermWindow		ОК
+Text under cursor	Terminal ThemeView		Текст в курсоре
+ANSI bright white color	Terminal ThemeView		ANSI яркий белый
 Close window	Terminal TermWindow		Закрыть окно
-Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nВсе права защищены © 2001-2019 Haiku, Inc.\nВсе права защищены © 1999 Kazuho Okui и Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
+ANSI magenta color	Terminal ThemeView		ANSI пурпурный
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nИспользование: %s [OPTION] [SHELL]\n
+cyan	Terminal ThemeView		бирюзовый
 Clear all	Terminal TermWindow		Очистить всё
+Cursor	Terminal ThemeView		Курсор
 Search forward	Terminal FindWindow		Искать сверху вниз

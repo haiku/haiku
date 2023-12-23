@@ -13,12 +13,12 @@ Cancel	InstallProgress		Скасувати
 Are you sure you want to to stop the installation?	InstallerWindow		Ви впевнені, що бажаєте зупинити інсталяцію?
 Installer	System name		Installer
 Unknown Type	InstallProgress	Partition content type	Невідомий тип
-Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Натисніть кнопку «Почати» для інсталяції з '%1s' на '%2s'.
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Натисніть кнопку «Почати» для інсталяції з «%1s» на «%2s».
 Are you sure you want to stop the installation?	InstallerWindow		Ви впевнені, що хочете зупинити інсталяцію?
 README	InstallerApp		ПРОЧИТАЙ
 Quit	InstallerWindow		Вийти
 Please close the BootManager window before closing the Installer window.	InstallerWindow		Закрийте вікно BootManager перед тим, як закрити вікно Installer.
-Write boot sector to '%s'	InstallerWindow		Записати сектор загрузки до '%s'
+Write boot sector to '%s'	InstallerWindow		Записати сектор загрузки до «%s»
 Boot sector not written because of an internal error.	InstallProgress		Сектор загрузки не записано через внутрішню помилку.
 Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Зі списків, які розкриваються, виберіть вихідний і цільовий диск. Потім натисніть «Почати».
 Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Виконуються BootManager і DriveSetup…\n\nЗакрийте обидві програми, щоб продовжити інсталяцію.
@@ -27,7 +27,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Вітаємо у програ
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Неможливо запустити утиліту DriveSetup для зміни конфігурації розділів.
 Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Інсталяція завершена. Сектор загрузки записано в «%s». Натисніть «Вийти», щоб закрити Installer, або виберіть новий цільовий том і зробіть іншу інсталяцію.
-The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Цільовий том не порожній. Якщо на ньому вже знаходиться система Haiku, вона буде перезаписана. Це призведе до видалення всього встановленого програмного забезпечення.\n\nЯкщо Ви хочете обновити систему без видалення встановленого програмного забезпечення, зверніться до розділу програми  \"SoftwareUpdater\" в посібнику користувача Haiku, щоб отримати відповідну інструкцію.\n\nВи впевнені, що хочете продовжити інсталяцію?
+The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Цільовий том не порожній. Якщо на ньому вже знаходиться система Haiku, вона буде перезаписана. Це призведе до видалення всього встановленого програмного забезпечення.\n\nЯкщо Ви хочете обновити систему без видалення встановленого програмного забезпечення, зверніться до розділу програми  \«SoftwareUpdater\» в посібнику користувача Haiku, щоб отримати відповідну інструкцію.\n\nВи впевнені, що хочете продовжити інсталяцію?
 Quit DriveSetup	InstallerWindow		Вийти з DriveSetup
 Write boot sector	InstallerWindow		Записати сектор загрузки
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld

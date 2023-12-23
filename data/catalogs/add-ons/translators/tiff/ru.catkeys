@@ -1,2 +1,16 @@
-1	russian	x-vnd.Haiku-TIFFTranslator	2591143631
+1	russian	x-vnd.Haiku-TIFFTranslator	2234713102
+TIFF Library:	TIFFView		Библиотека TIFF:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: неправильный индекс документа\n
+Use compression:	TIFFView		Использовать сжатие:
+TIFF image translator	TIFFView		Транслятор изображений TIFF
+TIFF image	TIFFTranslator		Изображение TIFF
 TIFF Settings	TIFFMain		Настройки TIFF транслятора
+TIFF image translator	TIFFTranslator		Транслятор изображений TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: не удалось установить каталог\n
+Version %d.%d.%d, %s	TIFFView		Версия %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		Настройки TIFFTranslator
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		Изображения TIFF
+None	TIFFView		Нет

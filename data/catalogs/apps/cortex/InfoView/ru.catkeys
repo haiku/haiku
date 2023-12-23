@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.InfoView	3415143429
+1	russian	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Смещение
 Description	DormantNodeInfoView		Описание
 Byte order	InfoView		Порядок байтов
@@ -7,20 +7,33 @@ Output formats	DormantNodeInfoView		Формат выхода
 History	InfoView		История
 Input formats	DormantNodeInfoView		Форматы входа
 Signature	AppNodeInfoView		Сигнатура
+Video data between	InfoView		Видеоданные между
 Any number	DormantNodeInfoView	For 'Max. instances' field	Любое число
+Flags	InfoView		Флаги
+Media output	InfoView		Медиавыход
+Active lines	InfoView		Активные линии
 Buffer size	InfoView		Размер буфера
 \n- Quality:	FileNodeInfoView		\n- Качество:
+Kinds	LiveNodeInfoView		Категории
 Application	AppNodeInfoView		Приложение
+Flavor flags	DormantNodeInfoView		Флаги семейства
 Max. instances	DormantNodeInfoView		Макс. инстансов
 \n- Duration:	FileNodeInfoView		\n- Длительность:
+Dormant media node	DormantNodeInfoView		Пассивный медиаузел
 Latency	LiveNodeInfoView		Задержка
 Media type	InfoView		Медиаформат
+Live media node	LiveNodeInfoView		Активный медиаузел
+Field rate	InfoView		Частота полукадров
+Kinds	DormantNodeInfoView		Категории
 %title% info	InfoView		Информация о %title%
 Node ID	LiveNodeInfoView		ID узла
 Resolution	InfoView		Разрешение
 Chunk size	InfoView		Размер куска
 File format	AppNodeInfoView		Формат файла
+Matrix mask	InfoView		Матричная маска
+Channel mask	InfoView		Маска канала
 Orientation	InfoView		Ориентация
+Live file-interface node	FileNodeInfoView		Активный узел файлового интерфейса
 Channels	InfoView		Каналы
 Sample rate	InfoView		Частота дискретизации
 File format	FileNodeInfoView		Формат файла
@@ -32,10 +45,13 @@ Format	InfoView		Формат
 Version	AppNodeInfoView		Версия
 AddOn ID	DormantNodeInfoView		ID дополнения
 Frame size	InfoView		Размер кадра
+Flavor ID	DormantNodeInfoView		ID в семействе
+Run mode	LiveNodeInfoView		Режим работы
 \n- Codec:	FileNodeInfoView		\n- Кодек:
 Port	LiveNodeInfoView		Порт
 Output format	DormantNodeInfoView		Выходной формат
 Aspect ratio	InfoView		Соотношение сторон
+Application-owned node	AppNodeInfoView		Узел приложения
 Tracks	FileNodeInfoView		Дорожки
 Source	InfoView		Источник
 Destination	InfoView		Назначение

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1961774506
+1	russian	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Переместить запись в корзину
 Close	MediaPlayer-PlaylistWindow		Закрыть
 Volume of background clips	MediaPlayer-SettingsWindow		Проигрывать фоновые клипы
@@ -30,11 +30,13 @@ Open file…	MediaPlayer-Main		Открыть файл…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабировать кнопки управления в полноэкранном режиме
 View options	MediaPlayer-SettingsWindow		Настройки вида
 %d kHz	MediaPlayer-InfoWin		%d кГц
+Eject Device	MediaPlayer-Main		Извлечь устройство
 Full volume	MediaPlayer-SettingsWindow		На полной громкости
 <untitled>	PlaylistItem-title		<безымянный>
 Start media server	MediaPlayer-Main		Запустить медиа сервер
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Похоже, что медиа сервер не запущен\nВы хотите его запустить?
 Location	MediaPlayer-InfoWin		Путь
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Открытие '%s'.
 Medium	MediaPlayer-SettingsWindow		cредний
 Play mode	MediaPlayer-SettingsWindow		Режим проигрывания
@@ -73,6 +75,7 @@ Audio	MediaPlayer-Main		Аудио
 Quit	MediaPlayer-Main		Выход
 Redo	MediaPlayer-PlaylistWindow		Повторить
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
+Reset rating	MediaPlayer-Main		Сбросить рейтинг
 <unknown>	PlaylistItem-author		<неизвестно>
 Cancel	MediaPlayer-SettingsWindow		Отмена
 Large	MediaPlayer-SettingsWindow		крупный

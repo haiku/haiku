@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	458490441
+1	russian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -37,6 +37,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Ошибка в регу�
 Small bitmap icon	AttributesView		Малый растровый значок
 Would you like to find a suitable application to open the file?	FSUtils		Хотите найти подходящее приложение для открытия файла?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Невозможно заменить папку или символическую ссылку файлом.
+(unknown)	InfoWindow		(неизвестно)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# даты>}}
 Trailing \\.	libtracker		Конечный \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Не удалось выполнить %func в find_directory(). \nПричина: %error
@@ -77,8 +78,11 @@ OK	OpenWithWindow		ОК
 Include trash	FindPanel		Включая корзину
 Clean up	ContainerWindow		Выстроить
 Modified	FindPanel		Изменён
+ (block size: 	InfoWindow		 (размер блока: 
 Select all	QueryContainerWindow		Выделить все
+Generate image thumbnails	SettingsView		Генерировать миниатюры
 Select…	FilePanelPriv		Выделить…
+An item named '%filename%' already exists.	FSUtils		Файл '%filename%' уже существует.
 preferences	B_PREFERENCES_DIRECTORY		Настройки
 Name	Person Query Columns		Имя
 Skip all	FSUtils		Пропустить все
@@ -156,6 +160,7 @@ Tracker preferences	TrackerSettingsWindow		Настройки Tracker
 Read	FilePermissionsView		Чтение
 There was an error writing the attribute.	WidgetAttributeText		Произошла ошибка при записи атрибута.
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы переименуете %target, то это может привести\n к неправильной работоспособности %osName!\nВы действительно хотите сделать это?
+Filesystem:	InfoWindow		Файловая система:
 Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \"%name\" (%error). 
 Media parameter group	AttributesView		Группа параметров медиа
 %name info	InfoWindow	InfoWindow Title	Информация о %name
@@ -254,10 +259,12 @@ Cut	FilePanelPriv		Вырезать
 Finish: after several years	StatusWindow		Окончание: через несколько лет
 Favorites	FilePanelPriv		Закладки
 Point	AttributesView		Указатель
+You can't move or copy items to read-only volumes.	PoseView		Вы не можете перемещать или копировать на тома, доступные только для чтения.
 home	B_USER_DIRECTORY		Домашняя
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Шаблоны
 Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
 Don't automount	AutoMounterSettings		Не подключать автоматически
+Node ref	AttributesView		Ссылка на узел
 Could not find application \"%appname\"	OpenWithWindow		Невозможно найти приложение \"%appname\"
 Unmatched parenthesis.	libtracker		Непарные скобки
 Extended attribute	AttributesView		Расширенные атрибуты
@@ -293,6 +300,7 @@ Select all	ContainerWindow		Выделить все
 apps	B_APPS_DIRECTORY		Приложения
 Error calculating folder size.	InfoWindow		Ошибка при подсчете размера папки.
 Delete	FSUtils		Удалить
+Duplicate	FilePanelPriv		Дубликат
 Edit name	ContainerWindow		Переименовать
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" (Отсутствует символ: %symbol). \n
 ASCII Text	AttributesView		Текст ASCII
@@ -329,6 +337,7 @@ yes	AttributesView		да
 Make active printer	ContainerWindow		Сделать принтер основным
 Copy to	ContainerWindow		Копировать в
 Name	SelectionWindow		Имя
+Location	Default Query Columns		Путь
 by attribute	FindPanel		по атрибуту
 Write	FilePermissionsView		Запись
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что изменить ее?\n\nЧтобы изменить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Я знаю, что я делаю\".
@@ -340,6 +349,7 @@ after	FindPanel		после
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# байт данных>} few{<# байта данных>} other{<# байтов данных>}}
 Version	OpenWithWindow		Версия
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Некоторые из выбранных объектов не могут быть перемещены в корзину. Хотите ли вы вместо этого удалить эти объекты? (Эту операцию будет невозможно отменить)
+The entered file name is too long.	FSUtils		Введённое имя файла слишком длинное.
 Add printer…	ContainerWindow		Добавить принтер…
 On	FindPanel		На
 Permissions	ContainerWindow		Права
@@ -404,6 +414,7 @@ Emptying Trash… 	StatusWindow		Очищение корзины…
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# файл} few{# файла} other{# файлов}}
 Revert	TrackerSettingsWindow		Вернуть
 trash	B_TRASH_DIRECTORY		Корзина
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
 Close all in workspace	ContainerWindow		Закрыть все на этом столе
 Corrupted expression.	libtracker		Поврежденное выражение.
@@ -428,6 +439,7 @@ the config folder	FSUtils		папку настроек
 Sorry, could not create a new folder.	FSUtils		Извините, невозможно создать новую папку.
 MIME Signature	AttributesView		MIME Сигнатура
 Select all	VirtualDirectoryWindow		Выбрать всё
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	Переименовать
 Clean up all	ContainerWindow		Выстроить все
 Add current folder	FilePanelPriv		Добавить текущую папку
@@ -469,6 +481,7 @@ Duplicate	ContainerWindow		Дублировать
 16-bit integer	AttributesView		16-битное целое
 Untitled clipping	PoseView		Безымянная выборка
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" уже существует в указанной папке. Вы хотите заменить его?
+, indexed	InfoWindow		, индексировано
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам нужно перетащить объект(ы) на один из значков диска в окне \"Диски\".
 Version:	InfoWindow		Версия:
 OK	PoseView		ОК
@@ -499,7 +512,10 @@ Create a Query	FindPanel		Создать запрос
 Close	QueryContainerWindow		Закрыть
 I know what I'm doing	FSUtils	button label	Я знаю, что я делаю
 Preparing to copy items…	StatusWindow		Подготовка к копированию файлов…
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld Б
+Entry ref	AttributesView		Ссылка на запись
 Icon view	ContainerWindow		Большие значки
+The entered folder name is too long.	FSUtils		Введённое название папки слишком длинное.
 Name	ContainerWindow		Имя
 Preferred for %type	OpenWithWindow		Предпочтительный для %type
 Free space color	SettingsView		Цвет свободного места

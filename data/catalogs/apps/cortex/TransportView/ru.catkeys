@@ -1,10 +1,16 @@
-1	russian	application/x-vnd.Cortex.TransportView	189541902
+1	russian	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Прокрутить
 (none)	TransportView		(нет)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# узел} few{# узла} other{# узлов}}
 Start	TransportView		Старт
 No errors.	TransportView		Нет ошибок.
+to	TransportView		в
 Offline	TransportView		Офлайн
+(???)	TransportView		(???)
 Stop	TransportView		Стоп
 (no group)	TransportView		(нет группы)
+Drop data	TransportView		Сбросить данные
+To:	TransportView		В:
 Recording	TransportView		Запись
 Increase latency	TransportView		Увеличить задержку
 Time source:	TransportView		Источник времени:
@@ -12,3 +18,6 @@ DAC time source	TransportView		Источник времени ЦАП
 Decrease precision	TransportView		Уменьшить точность
 System clock	TransportView		Системное время
 From:	TransportView		От:
+Roll from	TransportView		Прокрутить с
+Preroll	TransportView		Проба
+Run mode:	TransportView		Режим работы:

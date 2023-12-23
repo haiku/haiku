@@ -1,6 +1,8 @@
-1	russian	application/x-vnd.moon-Flanger.media_addon	455620896
+1	russian	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не удалось получить инфо об узле (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Версия дополнения FlangerNode.\nАвтор Eric Moon (16 июня 1999)
 Delay	CortexAddOnsFlanger		Задержка
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не найден узел (%ld):\n%s\n
 Depth	CortexAddOnsFlanger		Глубина
 Feedback	CortexAddOnsFlanger		Обратная связь
 Sweep rate	CortexAddOnsFlanger		Скорость
@@ -10,4 +12,5 @@ OK	CortexAddOnsCommonMediaNodeControlApp		ОК
 controls	CortexAddOnsCommonMediaNodeControlApp		элементы управления
 Mix output	CortexAddOnsFlanger		Выходной микшер
 Flanger	CortexAddOnsFlanger		Фленджер
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: отсутствуют параметры для узла (%ld):\n%s\n
 Audio input	CortexAddOnsFlanger		Аудиовход

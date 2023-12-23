@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1440907020
+1	romanian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -300,6 +300,7 @@ Select all	ContainerWindow		Selectează toate
 apps	B_APPS_DIRECTORY		apps
 Error calculating folder size.	InfoWindow		Eroare la calcularea dimensiunii dosarului.
 Delete	FSUtils		Șterge
+Duplicate	FilePanelPriv		Duplică
 Edit name	ContainerWindow		Editează numele
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \„%document\” (Simbol lipsă: %symbol). \n
 ASCII Text	AttributesView		Text ASCII
@@ -336,6 +337,7 @@ yes	AttributesView		da
 Make active printer	ContainerWindow		Stabilește ca imprimantă activă
 Copy to	ContainerWindow		Copiază la
 Name	SelectionWindow		Nume
+Location	Default Query Columns		Locație
 by attribute	FindPanel		după atribut
 Write	FilePermissionsView		Scrie
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Dacă alterați dosarul de sistem sau conținutul acestuia, nu veți putea boota %osName!\n\nSigur doriți să faceți asta?\n\nPentru a altera dosarul de sistem sau conținutul acestuia oricum, țineți apăsată tasta Shift și dați clic pe \„Știu ce fac\”.

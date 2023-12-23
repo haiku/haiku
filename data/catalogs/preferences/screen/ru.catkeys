@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Screen	133788249
+1	russian	x-vnd.Haiku-Screen	2318349707
 no	Screen		нет
 bits/pixel	Screen		бита на пиксель
 15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
@@ -13,6 +13,7 @@ Video format:	Screen		Видео формат:
 Undo	Screen		Отменить
 OK	Screen		ОК
 Current workspace	Screen		Текущий рабочий стол
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		вертикально
 All workspaces	Screen		Все рабочие столы
 Use laptop panel:	Screen		Использовать экран ноутбука:

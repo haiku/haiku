@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-StyledEdit	2796309255
+1	russian	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Статистика документа
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Невозможно вернуть, файл не найден: \"%s\".
 Cut	Menus		Вырезать
@@ -51,6 +51,7 @@ OK	SaveAlert		ОК
 Color	Menus		Цвет
 Save changes to the document \"%s\"? 	QuitAlert		Сохранить изменения в файле \"%s\"? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Подчёркнутый
 Find:	FindandReplaceWindow		Найти:
 Undo typing	QuitAlert		Отменить ввод
 Error loading \"%s\":\n\t%s	LoadAlert		Ошибка загрузки \"%s\":\n\t%s

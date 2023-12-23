@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	3482985713
+1	russian	x-vnd.Haiku-Devices	2322690158
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрования
 Devices	System name		Устройства
@@ -6,6 +6,7 @@ USB bus	DevicesView		Шина USB
 Graphics Peripheral	DeviceSCSI		Переферийная графика
 Processor	Device		Процессор
 Generate system information	DevicesView		Сгенерировать информацию о системе
+Unknown	DeviceACPI		Неизвестно
 Class info	DevicePCI		Информация о классе
 <No device selected>	DevicesView		<Устройство не выбрано>
 USB bus	Device		Шина USB
@@ -74,6 +75,7 @@ Device name	DeviceSCSI		Имя устройства
 Docking station	Device		Кредл
 Array	DeviceSCSI		Массив
 Unclassified device	Device		Неклассифицированные устройства
+Manufacturer	DeviceACPI		Производитель
 ACPI controller	Device		Контроллер ACPI
 Network controller	Device		Сетевой контроллер
 Driver used	Device		Используемый драйвер

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	2347376405
+1	italian	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		ShowImage
 Page setup…	Menus		Imposta pagina…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Ribalta verticalmente
 Zoom in	Menus		Zoom avanti
 Last page	Menus		Ultima pagina
 Cancel	ClosePrompt		Annulla
+Attributes	Menus		Attributi
 High-quality zooming	Menus		Zoom di alta qualità
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' è stato modificato. Vuoi chiudere il documento?
 Close	Menus		Chiudi
 Selection mode	Menus		Modalità selezione
+Reset rating	Menus		Reimposta valutazione
 DPI:	PrintOptionsWindow		Punti per pollice:
 Fit image to page	PrintOptionsWindow		Adatta alla pagina
 Show tool bar	Menus		Mostra strumenti
@@ -38,7 +40,7 @@ OK	SaveToFile		OK
 Print…	Menus		Stampa…
 The file '%s' could not be written.	SaveToFile		Impossibile scrivere il file '%s'.
 Quit	Menus		Esci
-Rating	Menus		Voto
+Rating	Menus		Valutazione
 Close document	ClosePrompt		Chiudi documento
 Stretch to window	Menus		Estendi alla finestra
 Job setup	PrintOptionsWindow		Imposta attività

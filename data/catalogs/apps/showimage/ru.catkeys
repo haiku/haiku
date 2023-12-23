@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	3998703664
+1	russian	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		Просмотр изображений
 Page setup…	Menus		Настройка печати…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Повернуть сверху вниз
 Zoom in	Menus		Увеличить
 Last page	Menus		Последняя страница
 Cancel	ClosePrompt		Отмена
+Attributes	Menus		Атрибуты
 High-quality zooming	Menus		Высококачественное масштабирование
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Изображение '%s' было изменено. Вы хотите закрыть его без сохранения?
 Close	Menus		Закрыть
 Selection mode	Menus		Режим выделения
+Reset rating	Menus		Сбросить рейтинг
 DPI:	PrintOptionsWindow		Разрешение (DPI):
 Fit image to page	PrintOptionsWindow		Подогнать размер изображения под страницу
 Show tool bar	Menus		Показать панель иструментов
@@ -45,6 +47,7 @@ Job setup	PrintOptionsWindow		Печать
 Clear selection	Menus		Очистить выделение
 Rotate clockwise	Menus		Повернуть по часовой стрелке
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Не удалось открыть изображение. Либо файл, либо транслятор этого изображения отсутствует.
+Open with…	Menus		Открыть с…
 Rotate counterclockwise	Menus		Повернуть против часовой стрелки
 Previous page	Menus		Предыдущая страница
 Fit to window	Menus		Подогнать под размер окна

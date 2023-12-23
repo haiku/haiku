@@ -1,16 +1,19 @@
-1	swedish	x-vnd.Haiku-Keymap	1479919571
+1	swedish	x-vnd.Haiku-Keymap	4201668633
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Japanese	KeymapNames		Japanska
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	SU
+Scroll Lock	Keyboard Layout View		Rullningslås
 Brazilian	KeymapNames		Brasilianska
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		Höger Alternativ
 X-Bows Nature	KeyboardLayoutNames		X-Bows Natur
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Alternativ:
 Cancel	Modifier keys window		Avbryt
 Sample and clipboard:	Keymap window		Exempel:
 Polish	KeymapNames		Polska
+Right Shift	Keyboard Layout View		Högerväxling
 Latin-American	KeymapNames		Latinamerikansk
 Ukrainian	KeymapNames		Ukrainska
 PAGE ↓	Keyboard Layout View		SIDA
@@ -40,6 +43,7 @@ Croatian	KeymapNames		Kroatiska
 PAGE ↑	Keyboard Layout View		SIDA
 Set modifier keys	Modifier keys window		Set modifierings tangent
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium Internationellt
+Right Command	Keyboard Layout View		Höger kommando
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd tangent
 PG ↓	Keyboard Layout View	Very short for 'page down'	SN
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -60,6 +64,7 @@ French (NF Z71-300)	KeymapNames		Fransk (NF Z71-300)
 Modifier keys	Modifier keys window		Modifierings tangenter
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internationellt
 Kazakh	KeymapNames		Kazakiska
+Left Option	Keyboard Layout View		Vänster Alternativ
 Save as…	Keymap window		Spara som…
 Lithuanian (Standard)	KeymapNames		Litauiska (Standard)
 Error: duplicate keys	Modifier keys window		Fel: Upprepad tangenter
@@ -68,10 +73,12 @@ Bulgarian (Phonetic)	KeymapNames		Bulgariska (Fonetisk)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanadensisk franska
 Hungarian	KeymapNames		Ungerska
+Right Control	Keyboard Layout View		Höger kontroll
 Control	Keyboard Layout View	Control key	Kontroll
 Irish	KeymapNames		Irländska
 Remove	Keyboard Layout View		Ta bort
 Tilde trigger	Keymap window		Tilde trigger
+Caps Lock	Keyboard Layout View		Skiftlås
 Shift	Keyboard Layout View	Shift key	Skift
 CONTROL	Keyboard Layout View		KONTROLL
 Macedonian	KeymapNames		Makedonska
@@ -131,6 +138,7 @@ Shift:	Modifier keys window	Shift key role name	Skift:
 Keymap	System name		TangentUppsättning
 Slovene	KeymapNames		Slovenska
 Lithuanian	KeymapNames		Litauiska
+Left Command	Keyboard Layout View		Vänster kommando
 Set modifier keys…	Keymap window		Sätt modifierings tangent...
 Switch shortcut keys to Haiku mode	Keymap window		Byt snabbtangentsknapp till Haikustandard
 Defaults	Keymap window		Standardvärde
@@ -154,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumänska
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Kommando
+Left Shift	Keyboard Layout View		Vänsterväxling
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Arkiv
 Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
@@ -163,4 +172,6 @@ Dutch	KeymapNames		Holländska
 Diaeresis trigger	Keymap window		Diaeresis trigger
 Icelandic	KeymapNames		Isländska
 Open…	Keymap window		Öppna…
+Left Control	Keyboard Layout View		Väsnter kontroll
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Numeriskt lås

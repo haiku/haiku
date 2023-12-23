@@ -20,7 +20,7 @@ Switch account…	MainWindow		Змінити обліковий запис…
 Preferred language:	UserLoginWindow		Мова за вподобанням:
 Name	PackageListView		Назва
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Проблема авторизації або служби безпеки. Вийдіть з системи і увійдіть знову, щоб перевірити правильність Вашого пароля, а також переконатися, що Ви погодилися та прийняли останні умови використання.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot взаємодіє з серверним компонентом, який називається HaikuDepotServer. Це Умови користування, з якими користувач '%Nickname%' погодився в %AgreedToTimestamp% щодо використання сервісу HaikuDepotServer service.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot взаємодіє з серверним компонентом, який називається HaikuDepotServer. Це Умови користування, з якими користувач «%Nickname%» погодився в %AgreedToTimestamp% щодо використання сервісу HaikuDepotServer.
 don't activate package %source%	PackageProblem	don't change '%source%	не активувати пакет %source%
 Rate %Package%	RatePackageWindow		Оцінити %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Під час запуску диспетчера пакетів сталася помилка: %message%
@@ -61,7 +61,7 @@ Close	UserLoginWindow		Закрити
 The email is malformed.	UserLoginWindow		Неправильний формат адреси e-пошти.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		При завантаженні Умов користування, необхідних для створення нового користувача, виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		При завантаженні Умов користування, необхідних для створення нового користувача, виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна у розділі програми HaikuDepot посібника користувача Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Умови користування узгоджені
 Size	PackageListView		Розмір
 Your rating was updated.	RatePackageWindow		Ваша оцінка оновлена.
@@ -127,7 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		Запуск демона п
 No user ratings available.	PackageInfoView		Оцінювання користувачем недоступно.
 <no info>	PackageInfoView		<немає інформації>
 Usage conditions download problem	UserUsageConditions		Проблеми при завантаженні Умов користування
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Під час завантаження вимог до пароля, необхідних для створення нового користувача, виникла помилка. Перегляньте подробиці в журналі та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі HaikuDepot Посібника користувача Haiku.
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Під час завантаження вимог до пароля, необхідних для створення нового користувача, виникла помилка. Перегляньте подробиці в журналі та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot Посібника користувача Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм

@@ -5,7 +5,7 @@ Match header	RuleFilter		Совпадающий заголовок
 Set flags to	ConfigView		Установить флаги в
 Header field (e.g. Subject, From, …)	ConfigView		Поле заголовка (например: Тема, От, …)
 <Choose account>	ConfigView		<Выбрать учётную запись>
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Подставить значение как \"*spam*\".\nПрефикс \"REGEX:\" используется для регулярных выражений.
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Шаблон, например \"*spam*\".\nПрефикс \"REGEX:\" используется для регулярных выражений.
 Then	ConfigView		Тогда
 If	ConfigView		Если
 Set as read	ConfigView		Отметить как прочитанное

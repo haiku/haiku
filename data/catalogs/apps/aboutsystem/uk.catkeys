@@ -31,8 +31,8 @@ Licenses: 	AboutView		Ліцензії:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Авторські права коду Haiku є власністю Haiku, Inc. або конкретних авторів, про що згадується в коді. Haiku® і лого HAIKU ® є зареєстрованою торговою маркою Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Time running:	AboutView		Час роботи:
-Version: %s	AboutView	Version: R1 or hrev99999	Версія: %s
-%d MiB Memory:	AboutView	2048 MiB Memory:	Пам'ять: %d МБ
+Version: %s	AboutView	Version: R1 or hrev99999	Версія:  %s
+%d MiB Memory:	AboutView	2048 MiB Memory:	Пам'ять:  %d МБ
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Всі права захищені.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Це програмне забезпечення частково базується на роботі Independent JPEG Group.
@@ -60,7 +60,7 @@ Current maintainers:\n	AboutView		Поточні розробники:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Всі права захищені.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Всі права захищені.
-Version:	AboutView		Версія:
+Version:	AboutView		Версія: 
 The BeGeistert team\n	AboutView		Команді BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
@@ -78,7 +78,7 @@ Translations:\n	AboutView		Перекладачі:\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Всі права захищені.
 BSD (2-clause)	AboutWindow		BSD (2-х пунктна)
 Website & marketing:\n	AboutView		Вебсайт & маркетинг:\n
-%d MiB used (%s)	AboutView	326 MiB used (16%)	використано %d МБ (%s)
+%d MiB used (%s)	AboutView	326 MiB used (16%)	використано %d МБ  (%s)
 %.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f ГГц
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		Розробив Andy Ritger в 2001, на основі Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…і багатьом тим, хто зробив пожертви!\n\n

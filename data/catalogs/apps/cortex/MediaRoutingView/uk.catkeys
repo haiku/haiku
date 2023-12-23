@@ -2,33 +2,33 @@
 Lock group	MediaNodePanel		Заблокувати групу
 %refname% (no file)	MediaNodePanel		%refname% (немає файлу)
 Video output	MediaRoutingView		Відеовихід
-Icon view	MediaRoutingView		Вид "Значки"
+Icon view	MediaRoutingView		Вид «Значки»
 OK	MediaRoutingView		ОК
 Cycle	MediaNodePanel		Цикл
 Advanced	MediaNodePanel		Додатково…
 Audio input	MediaRoutingView		Аудіовхід
 Run mode	MediaNodePanel		Режим роботи
-Could not load '%filename%'	MediaRoutingView		Не вдалося завантажити '%filename%'
+Could not load '%filename%'	MediaRoutingView		Не вдалося завантажити «%filename%»
 Stop time source	MediaNodePanel		Зупинити відлік часу
 Be Audio Mixer	MediaRoutingView		Be Аудіо Мікшер
 Video input	MediaRoutingView		Відеовхід
 Release	MediaNodePanel		Відключити
 Disconnect	MediaRoutingView		Роз'єднати
 Could not disconnect	MediaRoutingView		Не вдалося роз’єднати
-Could not instantiate '%infoname%'	MediaRoutingView		Не вдалося створити екземпляр '%infoname%'
-Mini icon view	MediaRoutingView		Вид "Міні-значки"
+Could not instantiate '%infoname%'	MediaRoutingView		Не вдалося створити екземпляр «%infoname%»
+Mini icon view	MediaRoutingView		Вид «Міні-значки»
 Select all	MediaRoutingView		Вибрати все
 (same as group)	MediaNodePanel		(як для групи)
 Input	MediaJack		Вхід
 Get info	MediaJack		Дивитись Інфо
 Start time source	MediaNodePanel		Запустити відлік часу
 Error	MediaRoutingView		Помилка
-Could not release '%refname%'	MediaRoutingView		Не вдалося відключити '%refname%'
+Could not release '%refname%'	MediaRoutingView		Не вдалося відключити «%refname%»
 Output	MediaJack		Вихід
 Get info	MediaNodePanel		Дивитись Інфо
 Get info	MediaRoutingView		Дивитись Інфо
 Clean up	MediaRoutingView		Упорядкувати
 Start control panel	MediaNodePanel		Запустити панель управління
-Tweak parameters	MediaNodePanel		Параметри налаштування
+Tweak parameters	MediaNodePanel		Настройка параметрів
 Could not connect	MediaRoutingView		Не вдалося з’єднати
 Unlock group	MediaNodePanel		Розблокувати групу

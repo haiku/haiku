@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	1440907020
+1	friulian	x-vnd.Haiku-libtracker	1880123832
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -133,7 +133,7 @@ All files and folders	FindPanel		Ducj i files e lis cartelis
 Add-ons	ContainerWindow		Components adizionâi
 Too many parenthesis.	libtracker		Masse parentesis.
 Increase size	ContainerWindow		Aumente dimensions
-\nShould this be fixed?	FSUtils		\nNo varessial di jessi justât chest?
+\nShould this be fixed?	FSUtils		\nIsal il câs di justâlu?
 URL	Bookmark Query Columns		URL
 Move	PoseView		Sposte
 Floating point number	AttributesView		Numar in virgule mobile
@@ -336,6 +336,7 @@ yes	AttributesView		sì
 Make active printer	ContainerWindow		Rint ative la stampadore
 Copy to	ContainerWindow		Copie su
 Name	SelectionWindow		Non
+Location	Default Query Columns		Posizion
 by attribute	FindPanel		par atribût
 Write	FilePermissionsView		Scriture
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele di sisteme o i siei contignûts, no si rivarà plui inviâ %osName!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele di sisteme o i siei contignûts, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".

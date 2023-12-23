@@ -9,7 +9,7 @@ Fetching mail for %name	Notifier		Получение почты для %name
 Create new message…	DeskbarView		Создать сообщение…
 Send pending mails	DeskbarView		Отправить почту в ожидании
 Settings…	DeskbarView		Настройки…
-{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Одно новое сообщение} few{# новых сообщения} other{# новых сообщений}}
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Новое сообщение} few{# новых сообщения} other{# новых сообщений}}
 New Messages	MailDaemon		Новые сообщения
 <no accounts>	DeskbarView		<нет аккаунтов>
 Mail status	Notifier		Статус почты

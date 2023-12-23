@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2837468702
+1	italian	x-vnd.Haiku-HaikuDepot	2231325175
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema di download delle condizioni di utilizzo
 Available packages	MainWindow		Pacchetti disponibili
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
@@ -212,6 +212,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Visualizzazione
 Sending anonymous usage data	MainWindow		Invio dati anonimi sull'utilizzo
 Log in	UserLoginWindow		Accesso
 Usage conditions	UserUsageConditions		Condizioni d'uso
+Populating package sizes	PopulatePkgSizesProcess		Calcolo dimensioni dei pacchetti
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Istantanea
 Email address:	UserLoginWindow		Indirizzo e-mail:

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	1440907020
+1	italian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -300,6 +300,7 @@ Select all	ContainerWindow		Seleziona tutti
 apps	B_APPS_DIRECTORY		programmi
 Error calculating folder size.	InfoWindow		Errore durante il calcolo della dimenzione della cartella.
 Delete	FSUtils		Elimina
+Duplicate	FilePanelPriv		Duplica
 Edit name	ContainerWindow		Modifica nome
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Non è stato possibile aprire \"%document\" (Simbolo mancante: %symbol). \n
 ASCII Text	AttributesView		Testo ASCII
@@ -336,6 +337,7 @@ yes	AttributesView		si
 Make active printer	ContainerWindow		Rendi la stampante attiva
 Copy to	ContainerWindow		Copia in
 Name	SelectionWindow		Nome
+Location	Default Query Columns		Posizione
 by attribute	FindPanel		per attributo
 Write	FilePermissionsView		Scrittura
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se modifichi la cartella di sistema o il suo contenuto, non sarai più in grado di avviare %osName!\n\nSei sicuro di voler procedere?\n\nPer modificare la cartella di sistema o il suo contenuto, tieni premuto il tasto Maiusc e clicca su \"So quello che faccio\".

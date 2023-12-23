@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DiskProbe	4193379066
+1	russian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Raw редактор
 Remove	AttributeWindow		Удалить
 Close	ProbeView		Закрыть
@@ -9,13 +9,13 @@ MIME type editor	TypeEditors		Редактор MIME типа
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричный
 16 bit unsigned value:	TypeEditors		16-ти битное беззнаковое значение:
 8 bit signed value:	TypeEditors		8-ми битное знаковое значение:
- (native)	ProbeView		 (родной)
+ (native)	ProbeView		 (нативный)
 Attribute offset: 	ProbeView		Смещение атрибута: 
 Text	TypeEditors	This is the type of editor	Текст
 File offset: 	ProbeView		Смещение файла: 
 Add	ProbeView		Добавить
 64 bit signed value:	TypeEditors		64-х битное знаковое значение:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Вы действительно хотите удалить атрибут \"%s\" из файла \"%s\"?\n\nЭту операцию будет невозможно отменить.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Вы действительно хотите удалить атрибут \«%s\» из файла \«%s\»?\n\nЭту операцию будет невозможно отменить.
 No type editor available	AttributeWindow		Нет доступного редактора для данного типа
 Print…	ProbeView		Печать…
 New…	FileWindow		Новый…
@@ -29,7 +29,9 @@ Open file…	FileWindow		Открыть файл…
 32 bit unsigned pointer:	TypeEditors		32-х битный беззнаковый указатель:
 DiskProbe request	DiskProbe		Запрос DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шестнадцатеричная
+Block %lld (0x%Lx)	ProbeView		Блок %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Не удалось записать в файл:\n%s\n\nВсе изменения будут потеряны при выходе.
+Native: %lld (0x%0*Lx)	ProbeView		Нативный: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Исследовать устройство:
 Number editor	TypeEditors		Редактор чисел
 Icon	TypeEditors		Значок
@@ -42,7 +44,7 @@ Unknown format	TypeEditors		Неизвестный формат
 File: 	ProbeView		Файл: 
 Stop	ProbeView		Остановить
 Cancel	ProbeView		Отмена
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Невозможно открыть \"%s\":\n%s
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Невозможно открыть \«%s\»:\n%s
 Font size	ProbeView		Размер шрифта
 Type editor not supported	ProbeView		Редактор типа не поддерживается
 Native: 0x%0*Lx	ProbeView		Нативное: 0x%0*Lx
@@ -52,7 +54,7 @@ Floating-point value:	TypeEditors		Значение с плавающей точ
 Cancel	AttributeWindow		Отмена
 16 bit signed value:	TypeEditors		16-ти битное знаковое значение:
 DiskProbe request	AttributeWindow		Запрос DiskProbe
-Next	ProbeView		Вперед
+Next	ProbeView		Вперёд
 64 bit signed offset:	TypeEditors		64-х битный знаковый сдвиг:
 32 bit signed value:	TypeEditors		32-х битное знаковое значение:
 Could not find search string.	ProbeView		Невозможно найти искомую строку.
@@ -69,7 +71,7 @@ Mode:	FindWindow		Режим:
 32 bit size or status:	TypeEditors		32-х битный размер или статус:
 of 	ProbeView		из 
 Contents:	TypeEditors		Содержимое:
-Could not open file \"%s\": %s\n	DiskProbe		Невозможно открыть файл \"%s\": %s\n
+Could not open file \"%s\": %s\n	DiskProbe		Невозможно открыть файл \«%s\»: %s\n
 Probe file…	OpenWindow		Исследовать файл…
 Block: 	ProbeView		Блок: 
 Bookmarks	ProbeView		Закладки
@@ -82,7 +84,7 @@ Attributes	ProbeView		Атрибуты
 Message	TypeEditors	This is the type of view	Сообщение
 Message View	TypeEditors		Вид сообщения
 Offset: 	ProbeView		Смещение: 
-Swapped: 0x%0*Lx	ProbeView		Перевернутое: 0x%0*Lx
+Swapped: 0x%0*Lx	ProbeView		Перевёрнутое: 0x%0*Lx
 MIME type:	TypeEditors		MIME тип:
 Fit	ProbeView	Size of fonts, fits to available room	Подгонять
 Type editor	ProbeView		Редактор типа
@@ -106,7 +108,7 @@ Previous	ProbeView		Предыдущий
 Selection	ProbeView		Выделение
 Find	FindWindow		Найти
 8 bit unsigned value:	TypeEditors		8-ми битное беззнаковое значение:
-%ld (native)	ProbeView		%ld (родной)
+%ld (native)	ProbeView		%ld (нативный)
 Attribute: 	ProbeView		Атрибут: 
 Block	ProbeView		Блок
 Find again	ProbeView		Найти далее
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Запрос DiskProbe
 Double precision floating-point value:	TypeEditors		Значение плавающей запятой двойной точности:
 Image	TypeEditors	This is the type of view	Изображение
+Swapped: %lld (0x%0*Lx)	ProbeView		Обменный: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Сохранить изменения перед закрытием?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG формат
 Number	TypeEditors	This is the type of editor	Число
 Edit	ProbeView		Изменить
