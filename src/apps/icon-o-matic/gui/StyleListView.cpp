@@ -76,27 +76,12 @@ public:
 	}
 
 	// SimpleItem interface
-	virtual	void Draw(BView* owner, BRect itemFrame, uint32 flags)
+	virtual	void DrawItem(BView* owner, BRect itemFrame, bool even)
 	{
-		SimpleItem::DrawBackground(owner, itemFrame, flags);
+		SimpleItem::DrawBackground(owner, itemFrame, even);
 
-		// text
-		if (IsSelected())
-			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
-		else
-			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
-		font_height fh;
-		owner->GetFontHeight(&fh);
-		BString truncatedString(Text());
-		owner->TruncateString(&truncatedString, B_TRUNCATE_MIDDLE,
-			itemFrame.Width() - kBorderOffset - kMarkWidth - kTextOffset
-			- kBorderOffset);
-		float height = itemFrame.Height();
-		float textHeight = fh.ascent + fh.descent;
-		BPoint pos;
-		pos.x = itemFrame.left + kBorderOffset + kMarkWidth + kTextOffset;
-		pos.y = itemFrame.top + ceilf((height - textHeight) / 2.0 + fh.ascent);
-		owner->DrawString(truncatedString.String(), pos);
+		float offset = kBorderOffset + kMarkWidth + kTextOffset;
+		SimpleItem::DrawItem(owner, itemFrame.OffsetByCopy(offset, 0), even);
 
 		if (!fMarkEnabled)
 			return;

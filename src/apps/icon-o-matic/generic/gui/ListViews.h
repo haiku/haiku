@@ -17,13 +17,6 @@
 #include "MouseWheelFilter.h"
 #include "Observer.h"
 
-enum
-{
-	FLAGS_NONE			= 0x00,
-	FLAGS_TINTED_LINE	= 0x01,
-	FLAGS_FOCUSED		= 0x02,
-};
-
 // portion of the listviews height that triggers autoscrolling
 // when the mouse is over it with a dragmessage
 #define SCROLL_AREA			0.1
@@ -41,10 +34,8 @@ class SimpleItem : public BStringItem
 							SimpleItem(const char* name);
 		virtual				~SimpleItem();
 
-		virtual	void		Draw(BView* owner, BRect frame,
-								 uint32 flags);
-		virtual	void		DrawBackground(BView* owner, BRect frame,
-								  uint32 flags);
+		virtual	void		DrawItem(BView*, BRect, bool even = false);
+		virtual	void		DrawBackground(BView*, BRect, bool even);
 };
 
 
@@ -65,20 +56,13 @@ class DragSortableListView : public BListView,
 	virtual	void			DetachedFromWindow();
 	virtual	void			FrameResized(float width, float height);
 //	virtual	void			MakeFocus(bool focused);
-	virtual	void			Draw(BRect updateRect);
-	virtual	void			ScrollTo(BPoint where);
-	virtual	void			TargetedByScrollView(BScrollView* scrollView);
-	virtual	bool			InitiateDrag(BPoint point, int32 index,
-										 bool wasSelected);
+	virtual	void			TargetedByScrollView(BScrollView*);
 	virtual void			MessageReceived(BMessage* message);
 	virtual	void			KeyDown(const char* bytes, int32 numBytes);
 	virtual	void			MouseDown(BPoint where);
-	virtual void			MouseMoved(BPoint where, uint32 transit,
-									   const BMessage* dragMessage);
+	virtual void			MouseMoved(BPoint where, uint32, const BMessage*);
 	virtual void			MouseUp(BPoint where);
 	virtual	void			WindowActivated(bool active);
-	virtual void			DrawItem(BListItem *item, BRect itemFrame,
-									 bool complete = false);
 
 	// MouseWheelTarget interface
 	virtual	bool			MouseWheelChanged(float x, float y);
@@ -99,12 +83,9 @@ class DragSortableListView : public BListView,
 	virtual	void			SetDropTargetRect(const BMessage* message,
 								BPoint where);
 
-							// autoscrolling
-			void			SetAutoScrolling(bool enable);
 			bool			DoesAutoScrolling() const;
 			BScrollView*	ScrollView() const
 								{ return fScrollView; }
-			void			ScrollTo(int32 index);
 
 	virtual	void			MoveItems(BList& items, int32 toIndex);
 	virtual	void			CopyItems(BList& items, int32 toIndex);
@@ -125,8 +106,6 @@ class DragSortableListView : public BListView,
 	virtual	void			SelectionChanged();
 
 	virtual	BListItem*		CloneItem(int32 atIndex) const = 0;
-	virtual	void			DrawListItem(BView* owner, int32 index,
-										 BRect itemFrame) const = 0;
 	virtual	void			MakeDragMessage(BMessage* message) const = 0;
 
  protected:
@@ -170,11 +149,11 @@ class SimpleListView : public DragSortableListView {
 
 							// BListView
 	virtual	void			DetachedFromWindow();
+	virtual	void			Draw(BRect updateRect);
+	virtual	bool			InitiateDrag(BPoint, int32, bool);
 	virtual void			MessageReceived(BMessage* message);
 
 	virtual	BListItem*		CloneItem(int32 atIndex) const;
-	virtual	void			DrawListItem(BView* owner, int32 index,
-										 BRect itemFrame) const;
 
 	/*! Archive the selected items.
 		The information should be sufficient for \c InstantiateSelection to
