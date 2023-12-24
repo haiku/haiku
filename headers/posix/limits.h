@@ -92,7 +92,7 @@
 #define MQ_OPEN_MAX				(0) /* MSG */
 #define MQ_PRIO_MAX				(0) /* MSG */
 
-#define	RE_DUP_MAX				(255) /* for conformance, redefined in regex.h */
+#define	RE_DUP_MAX				(0x7fff)
 
 #ifdef _XOPEN_SOURCE
 /* The XSI name for PAGESIZE, with extra underscore included. Only define if
