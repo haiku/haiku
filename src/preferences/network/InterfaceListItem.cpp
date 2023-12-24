@@ -171,8 +171,7 @@ InterfaceListItem::ConfigurationUpdated(const BMessage& message)
 void
 InterfaceListItem::_Init()
 {
-	switch(fType) {
-		default:
+	switch (fType) {
 		case B_NETWORK_INTERFACE_TYPE_WIFI:
 			_PopulateBitmaps("wifi");
 			break;
@@ -184,6 +183,9 @@ InterfaceListItem::_Init()
 			break;
 		case B_NETWORK_INTERFACE_TYPE_DIAL_UP:
 			_PopulateBitmaps("dialup");
+			break;
+		default:
+			_PopulateBitmaps(NULL);
 			break;
 	}
 }
