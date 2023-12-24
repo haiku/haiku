@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <set>
 
+#include <Locale.h>
+
 #include <package/solver/SolverPackage.h>
 #include <TextTable.h>
 
@@ -91,11 +93,13 @@ struct PackageComparator {
 		fSystemRepository(systemRepository),
 		fHomeRepository(homeRepository)
 	{
+		BLocale::Default()->GetCollator(&fCollator);
+		fCollator.SetNumericSorting(true);
 	}
 
 	int operator()(const BSolverPackage* a, const BSolverPackage* b) const
 	{
-		int cmp = a->Name().Compare(b->Name());
+		int cmp = fCollator.Compare(a->Name().String(), b->Name().String());
 		if (cmp != 0)
 			return cmp;
 
@@ -119,6 +123,8 @@ struct PackageComparator {
 private:
 	const BSolverRepository*	fSystemRepository;
 	const BSolverRepository*	fHomeRepository;
+
+	BCollator					fCollator;
 };
 
 
