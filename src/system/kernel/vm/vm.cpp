@@ -2918,15 +2918,15 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			return B_NOT_ALLOWED;
 		}
 
-		if (area->protection == newProtection)
-			return B_OK;
-
 		if (team != VMAddressSpace::KernelID()
 			&& area->address_space->ID() != team) {
 			// unless you're the kernel, you are only allowed to set
 			// the protection of your own areas
 			return B_NOT_ALLOWED;
 		}
+
+		if (area->protection == newProtection)
+			return B_OK;
 
 		isWritable
 			= (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
