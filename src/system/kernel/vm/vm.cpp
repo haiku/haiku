@@ -6551,7 +6551,7 @@ _user_get_next_area_info(team_id team, ssize_t* userCookie, area_info* userInfo)
 status_t
 _user_set_area_protection(area_id area, uint32 newProtection)
 {
-	if ((newProtection & ~B_USER_PROTECTION) != 0)
+	if ((newProtection & ~(B_USER_PROTECTION | B_CLONEABLE_AREA)) != 0)
 		return B_BAD_VALUE;
 
 	return vm_set_area_protection(VMAddressSpace::CurrentID(), area,
