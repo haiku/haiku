@@ -742,6 +742,10 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 	if (buttons == 0 || index == -1)
 		return BView::MouseMoved(where, code, dragMessage);
 
+	// don't scroll if mouse is left or right of the view
+	if (where.x < Bounds().left || where.x > Bounds().right)
+		return BView::MouseMoved(where, code, dragMessage);
+
 	// scroll to item under mouse while button is pressed
 	ScrollTo(index);
 
