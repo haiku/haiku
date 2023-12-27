@@ -690,15 +690,16 @@ BListView::MouseUp(BPoint where)
 	if (index == -1)
 		index = fTrack->item_index;
 
-	// if mouse down selection also invalid deselect all
-	if (index == -1) {
-		DeselectAll();
+	// bail out if mouse down selection invalid
+	if (index == -1)
 		return BView::MouseUp(where);
-	}
 
 	// undo fake selection and select item
-	ItemAt(index)->Deselect();
-	_DoSelection(index);
+	BListItem* item = ItemAt(index);
+	if (item != NULL) {
+		item->Deselect();
+		_DoSelection(index);
+	}
 
 	BView::MouseUp(where);
 }
@@ -736,24 +737,29 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 			index = CountItems() - 1;
 	}
 
-	// don't scroll if button not pressed, no selection or same item
+	// don't scroll if button not pressed or index is invalid
 	int32 lastIndex = fFirstSelected;
-	if (buttons == 0 || index == -1 || lastIndex == -1 || index == lastIndex)
+	if (buttons == 0 || index == -1)
 		return BView::MouseMoved(where, code, dragMessage);
 
 	// scroll to item under mouse while button is pressed
 	ScrollTo(index);
 
-	if (!fTrack->is_dragging && fListType != B_MULTIPLE_SELECTION_LIST) {
+	if (!fTrack->is_dragging && fListType != B_MULTIPLE_SELECTION_LIST
+		&& lastIndex != -1 && index != lastIndex) {
 		// mouse moved over unselected item, fake selection until mouse up
-		ItemAt(lastIndex)->Deselect();
-		ItemAt(index)->Select();
+		BListItem* last = ItemAt(lastIndex);
+		BListItem* item = ItemAt(index);
+		if (last != NULL && item != NULL) {
+			last->Deselect();
+			item->Select();
 
-		// update selection index
-		fFirstSelected = fLastSelected = index;
+			// update selection index
+			fFirstSelected = fLastSelected = index;
 
-		// redraw items whose selection has changed
-		Invalidate(ItemFrame(lastIndex) | ItemFrame(index));
+			// redraw items whose selection has changed
+			Invalidate(ItemFrame(lastIndex) | ItemFrame(index));
+		}
 	} else
 		Invalidate();
 
