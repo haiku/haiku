@@ -930,6 +930,7 @@ INPUT                  = . \
                          ../../headers/private/app/LaunchRoster.h \
                          ../../headers/os/device/Joystick.h \
                          ../../headers/os/drivers/fs_interface.h \
+                         ../../headers/os/drivers/KernelExport.h \
                          ../../headers/os/drivers/USB3.h \
                          ../../headers/os/drivers/USB_isochronous.h \
                          ../../headers/os/drivers/USB_spec.h \

@@ -1,0 +1,84 @@
+/*
+ * Copyright 2023 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *   Adrien Destugues
+ */
+
+ /*!
+	\page synchrnization_primitives Synchronization primitives
+
+	In userspace code, there are many way to synchronize threads with each other. Pthreads provide
+	mutexes and condition variables. The Be API provides BLocker. There are also atomic functions
+	and a few other options, on which many solutions can be built.
+
+	The kernel side is a bit more restricted, in particular when it comes to synchronizing between
+	interrupt handlers and other parts of the code. This is because of two reasons: first of all,
+	interrupt are a low level mechanism of the CPU, and while interrupt handling code is running,
+	the normal operations of the kernel are interrupted (as the name implies). So, normal
+	scheduling will not take place. Secondly, interrupts are not allowed to be blocked to wait on
+	anything. This rules out the use of critical sections in the traditional sense, where the
+	interrupt code may want to wait for an userspace thread to complete.
+
+	As a result, the way synchronization is handled in the kernel is a bit different. The basic
+	primitives available are: spinlocks, atomic operations, semaphores, and condition variables.
+
+	\section spinlocks Spinlocks
+
+	A spinlock is a busy wait: it will run a loop, testing over and over for a condition to become
+	true. On a single task system, that would not work, the CPU would be busy forever, and the
+	condition would never change. But, Haiku is a multitask system, and so the condition can be
+	changed, either because of code running on another CPU core, or code running in an interrupt
+	handler (which can interrupt the thread that's running the spinlock).
+
+	The downside of spinlocks is that they keep the CPU busy. Not only this increases power usage,
+	it also prevents using the CPU for something else (maybe another thread would like to run
+	while this one is waiting). As a result, they are used only for very short waits, and always
+	with a timeout to make sure they don't lock up a CPU core forever or even for an unreasonably
+	long time (that will result in a panic and a trip to the kernel debugger).
+
+	\section atomic_ops Atomic operations
+
+	Atomic operations are defined in the \ref support. However, they are actually implemented
+	using only CPU instructions, and no operating system support. This means they are available
+	for use in Kernel code as well.
+
+	They are used as a building block for higher level primitives, but are also occasionally useful
+	for simple synchronization needs or things like event counters. Since they are implemented
+	at the CPU level, they are quite fast.
+
+	Atomic operations are not blocking, but they guarantee that an operation will complete before
+	an interrupt happens or another CPU core accesses the same memory.
+
+	\section semaphores Semaphores
+
+	Semaphores are the historical way to signal events in BeOS and Haiku. A semaphore has a counter
+	that can be incremented (release_sem) and decremented (acquire_sem). The counter is not allowed
+	to go below 0, if a thread attempts to acquire an empty semaphore, it will be blocked until
+	someone else releases it.
+
+	Seaphores can be used to implement mutexes: by creating a semaphore with a count of 1, threads
+	can enter the critical section by acquiring, and exit it by releasing the semaphore. Additional
+	checks can be added to make sure that only threads in the critical section can release the
+	semaphore in this case.
+
+	But semaphores are also useful in other cases. For example, they can be used for an interupt
+	handler to wake up a thread. In that case, the interrupt handler always releases the semaphore
+	(when an interrupt happens) and the thread always acquires it. Releasing a semaphore is never
+	a blocking operation, so there is no risk of blocking an interrupt handler. This setup makes
+	sure the thread is waken up exactly one time per event the interrupt needs to handle.
+
+	Finally, semaphores are identified by an unique number, which can be shared between kernel
+	and userspace. As a result, they can be used to sycnhronize directly between userspace and
+	kernelspace threads, or even directly from interrupt handlers to userspace threads. The
+	downside of this is that there is a limited number of semaphores, and if too much code uses
+	them, or if there is a leak in some code creating and never destroing semaphores, this may
+	end up blocking the system completely.
+
+	\section condition_variables Condition Variables
+
+	A more recent addition to Haiku synchronization primitives is condition variables. They allow
+	a thread to wait for a specific condition, which is notified by another thread. This is
+	similar to the use of semaphores outlined above, but provides an easier way to handle race
+	conditions, spurious wakeups, and so on.

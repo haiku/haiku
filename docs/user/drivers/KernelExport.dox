@@ -1,0 +1,422 @@
+/*
+ * Copyright 2023 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ *
+ * Corresponds to:
+ *		headers/os/drivers/KernelExport;h rev 57477
+ */
+
+/*!
+	\file KernelExport.h
+	\ingroup drivers
+	\ingroup kernel
+	\brief Interfaces for drivers code running in kernel space.
+*/
+
+/*!
+	\fn cpu_status disable_interrupts(void)
+	\ingroup interrupts
+	\brief Disable interruptions.
+
+	Drivers can disable interrupts in order to set up the interrupt handler for a device without
+	being interrupted, or as a simple way to implement critical sections.
+
+	Interruptions should be kept disabled for as short as possible, and re-enabled using
+	\ref restore_interrupts.
+
+	\return The previous state of interrupts, which should be passed to \ref restore_interrupts
+*/
+
+/*!
+	\fn void restore_interrupts(cpu_status status)
+	\ingroup interrupts
+	\brief Restore interrupts to the previous state.
+
+	If interrupts were already disabled before the matching call to \ref disable_interrupts, do
+	nothing. Otherwise, enable interrupts again.
+*/
+
+/*!
+	\fn void acquire_spinlock(spinlock* lock)
+	\ingroup spinlocks
+	\brief Busy wait until the lock is acquired.
+
+	Wait until the lock is acquired. Note that this keeps the thread running on the CPU, and does
+	not release the CPU for other threads to run.
+
+	If the spinlock does not become available quickly enough, calls panic().
+*/
+
+/*!
+	\fn void release_spinlock(spinlock* lock)
+	\ingroup spinlocks
+	\brief Release a previously acquired spinlock.
+
+	This will unblock any thread that is waiting on the spinlock.
+*/
+
+/*!
+	\fn bool try_acquire_write_spinlock(rw_spinlock* lock)
+	\ingroup rw_spinlocks
+	\brief Acquire a rw_spinlock for writing, if available.
+
+	Check if no other thread is holding the lock, and in that case, acquires it
+	immediately. Otherwise, return false. There is no wait for the rw_spinlock to become available.
+
+	Interrupts must be disabled, and recursive locking is not allowed.
+*/
+
+/*!
+	\fn void acquire_write_spinlock(rw_spinlock* lock)
+	\ingroup rw_spinlocks
+	\brief Wait for and acquire a write lock on an rw_spinlock
+
+	Repeatedly try to acquire a write lock until it works.
+	If this fails for too long, call panic().
+*/
+
+/*!
+	\fn void release_write_spinlock(rw_spinlock* lock)
+	\ingroup rw_spinlocks
+	\brief Release a previously acquired write lock on an rw_spinlock.
+*/
+
+/*!
+	\fn bool try_acquire_read_spinlock(rw_spinlock* lock)
+	\ingroup rw_spinlocks
+	\brief Acquire a rw_spinlock for reading, if available.
+
+	If the rw_spinlock is not currently write locked, add a read lock on it and return true.
+	Otherwise, return false.
+
+	There can be multiple readers at the same time on an rw_spinlock, but there can be only one
+	writer.
+*/
+
+/*!
+	\fn void acquire_read_spinlock(rw_spinlock* lock)
+	\ingroup rw_spinlocks
+	\brief Busy wait until a rw_spinlock can be read locked.
+
+	Loop until there are no writers holding te lock, then acquire a read lock.
+*/
+
+/*!
+	\fn void release_read_spinlock(rw_spinlock* lock)
+	\ingroup rw_spinlocks
+	\brief Release a read lock on a rw_spinlock
+*/
+
+/*!
+	\fn bool try_acquire_write_seqlock(seqlock* lock)
+	\ingroup seqlocks
+	\brief Acquire a seqlock for writing, without waiting.
+
+	A seqlock is similar to an rw_spinlock in that it can be locked separately for reading and
+	writing. However, it avoids writer starvation problems (when there are always reads being
+	done and a writer can never acquire the write lock).
+
+	To achieve this, the readers are not actually locked. Instead, they are allowed to read the
+	protected resource even while it is being written. The writer increments a counter whenever
+	it acquires and releases the lock. When releasing a read lock, a reader can use this counter
+	to compare against the value when it acquired its read lock. If the counter changed, that
+	means there was a concurrent write access, and the read data is invalid. The reader can
+	try to acquire a read lock again and read the updated value of the data.
+*/
+
+/*!
+	\fn void acquire_write_seqlock(seqlock* lock)
+	\ingroup seqlocks
+	\brief Busy wait for a seqlock and acquire it for writing.
+
+	Wait for all other writers to release the lock, then acquire it.
+
+	This increments the counter after acquiring the lock.
+*/
+
+/*!
+	\fn void release_write_seqlock(seqlock* lock)
+	\ingroup seqlocks
+	\brief Release a write lock on a seqlock.
+
+	This increments the counter before releasing the lock.
+*/
+
+/*!
+	\fn uint32 acquire_read_seqlock(seqlock* lock)
+	\ingroup seqlocks
+	\brief Prepare for read access to data protected by a seqlock
+
+	\return The counter value of the seqlock, at the time of locking, to be passed to
+		\ref release_read_seqlock.
+*/
+
+/*!
+	\fn bool release_read_seqlock(seqlock* lock, uint32 count)
+	\ingroup seqlocks
+	\brief Release a read lock and check if the read operation was successful.
+
+	\param count The lock count value returned by the correspondin \ref acquire_read_seqlock
+	\return true if there were no write access while the lock was read-locked, false otherwise.
+*/
+
+/*!
+	\fn status_t install_io_interrupt_handler(long interrupt_number, interrupt_handler handler, void *data, ulong flags)
+	\ingroup interrupts
+	\param flags a bit combination of:
+		- B_NO_LOCK_VECTOR to allow multiple interrupt handlers to run in parallel on different CPUs
+		- B_NO_HANDLED_INFO to disable tracking of wether the handler has handled the interrupt or not
+		- B_NO_ENABLE_COUNTER do not enable or disable interrupts for this handler
+	\brief Install an interrupt handler for legacy interrupts
+
+	For hardware that is hardwired to a specific interrupt pin on the interrupt controller.
+	The interrupt handler will be called when the interrupt is triggered, and the \ref data passed
+	as a parameter.
+
+	If flags does not contain B_NO_ENABLE_COUNTER, the interrupt will be activated when the first
+	handler is registered and deactivated when the last handler is removed. Handlers with
+	B_NO_ENABLE_COUNTER will not affect interrupt enabling or disabling: registering one never
+	enables the interrupt, and the interrupt can be disabled even if B_NO_ENABLE_COUNTER handlers
+	are still registered.
+*/
+
+/*!
+	\fn status_t remove_io_interrupt_handler(long interrupt_number, interrupt_handler handler, void	*data)
+	\ingroup interrupts
+	\brief Remove a previously registered interrupt handler
+*/
+
+/*!
+	\fn status_t add_timer(timer *t, timer_hook hook, bigtime_t period, int32 flags)
+	\ingroup timers
+	\brief Schedule a timer to call the \ref hook function periodically or at a specified time.
+
+	\param flags If B_ONE_SHOT_ABSOLUTE_TIMER, use the period as a date when the hook should be
+		called. Otherwise, use it as a period to call the hook repeatedly.
+	\param flags If B_TIMER_USE_TIMER_STRUCT_TIMES, use the period defined by \ref t instead of
+		\ref period.
+*/
+
+/*!
+	\fn bool cancel_timer(timer *t)
+	\ingroup timers
+	\brief Stop a timer scheduled by \ref add_timer.
+*/
+
+/*!
+	\fn thread_id spawn_kernel_thread(thread_func function, const char *name, int32 priority, void *arg)
+	\ingroup threads
+	\brief Start a kernel thread.
+
+	Similar to \ref spawn_thread, but the thread will run in the kernel team.
+*/
+
+/*!
+	\fn int send_signal_etc(pid_t thread, uint signal, uint32 flags)
+	\ingroup threads
+	\brief Send a signal to a thread.
+*/
+
+/*!
+	\fn status_t lock_memory_etc(team_id team, void *buffer, size_t numBytes, uint32 flags)
+	\ingroup memory
+	\brief Lock memory pages into RAM.
+
+	Lock a memory area and prevent accesses from other parts of the system.
+	This establishes the following:
+	- The memory is mapped into physical RAM (moved out of swap or committed if needed)
+	- No other thread can lock an overlapping memory range
+
+	This is used for example during DMA transfers, to make sure the DMA can operate on memory
+	that will not be accessed by the CPU or other devices.
+*/
+
+/*!
+	\fn status_t lock_memory(void *buffer, size_t numBytes, uint32 flags)
+	\ingroup memory
+	\brief Lock memory from the current team into RAM.
+*/
+
+/*!
+	\fn status_t unlock_memory_etc(team_id team, void *address, size_t numBytes, uint32 flags)
+	\ingroup memory
+	\brief Unlock memory previously locked by \ref lock_memory_etc
+*/
+
+/*!
+	\fn status_t unlock_memory(void *buffer, size_t numBytes, uint32 flags)
+	\ingroup memory
+	\brief Unlock memory previously locked by \ref lock_memory.
+*/
+
+/*!
+	\fn status_t get_memory_map_etc(team_id team, const void *address, size_t numBytes, physical_entry *table, uint32* _numEntries)
+	\ingroup memory
+	\brief Determine the physical addresses corresponding to a virtual memory range.
+*/
+
+/*!
+	\fn int32 get_memory_map(const void *buffer, size_t size, physical_entry *table, int32 numEntries)
+	\brief Get memory map for the current team.
+*/
+
+/*!
+	\fn area_id map_physical_memory(const char *areaName, phys_addr_t physicalAddress, size_t size, uint32 flags, uint32 protection, void **_mappedAddress)
+	\brief Create an area that allows access to a specific range of physical memory.
+
+	This can be used to map memory-mapped hardware to allow accessing it. The area can then be
+	used by a driver, or its id sent to userspace for direct hardware access from userspace.
+*/
+
+/*!
+	\fn void dprintf(const char *format, ...)
+	\ingroup debugging
+	\brief Print a message to the kernel log if dprintf is enabled.
+*/
+
+/*!
+	\fn void dvprintf(const char *format, va_list args)
+	\ingroup debugging
+	\brief Print a message to the kernel log if dprintf is enabled.
+*/
+
+/*!
+	\fn void kprintf(const char *fmt, ...)
+	\ingroup debugging
+	\brief Print a message to the kernel log unconditionally.
+*/
+
+/*!
+	\fn void dump_block(const char *buffer, int size, const char *prefix)
+	\brief Dump a memory buffer as hexadecimal values to the kernel log.
+*/
+
+/*!
+	\fn bool set_dprintf_enabled(bool new_state)
+	\ingroup debugging
+	\brief Enable dprintf log messages.
+
+	dprintf is used for debugging. It can be disabled to reduce the amount of logs from the kernel
+	and drivers, which will also speed up the system in some cases. However, this makes debugging
+	hardware and driver problems a lot more difficult.
+*/
+
+/*!
+	\fn void panic(const char *format, ...)
+	\ingroup debugging
+	\brief Enter the kernel debugger with the passed (formatted) message.
+*/
+
+/*!
+	\fn void kernel_debugger(const char *message)
+	\ingroup debugging
+	\brief Enter the kernel debugger with the passed message.
+*/
+
+/*!
+	\fn uint64 parse_expression(const char *string)
+	\ingroup debugging
+	\brief Parse an expression and return its value.
+
+	Expressions can contain numbers in various bases and simple arithmetic operations, as well as
+	kernel debugger variables. This function is used to parse kernel debugger command arguments.
+*/
+
+/*!
+	\fn int add_debugger_command(const char *name, debugger_command_hook hook, const char *help)
+	\ingroup debugging
+	\brief Add a command to the krnel debugger.
+
+	Drivers can add extra commands to the kernel debugger to ease investigation and debugging of
+	the driver and hardware. The commands accept a typical argc/argv command line.
+*/
+
+/*!
+	\fn int remove_debugger_command(const char *name, debugger_command_hook hook)
+	\ingroup debugging
+	\brief Remove a debugger command previously installed by \ref add_debugger_command.
+
+	It is important to remove the commands from a driver or module before it is unloaded, to avoid
+	having commands that point to code that doesn't exist anymore.
+*/
+
+/*!
+	\fn void spin(bigtime_t microseconds)
+	\brief Busy loop for the given time
+
+	Some I/O operations may take a short while to complete. When the expected delay is less than
+	a few hundred micrseconds, it is not worth locking the thread and calling the scheduler. In
+	these situation, a busy loop is a better compromise, and the driver can continue its IO
+	accesses in a reasonable time and without too many reschedulings.
+*/
+
+/*!
+	\fn status_t register_kernel_daemon(daemon_hook hook, void *arg, int frequency)
+	\brief Register a function to be called periodically.
+*/
+
+/*!
+	\fn status_t unregister_kernel_daemon(daemon_hook hook, void *arg)
+	\brief Stop calling a daemon function.
+*/
+
+/*!
+	\fn void call_all_cpus(void (*func)(void *, int), void *cookie)
+	\brief Execute a function on all CPUs.
+*/
+
+/*!
+	\fn void call_all_cpus_sync(void (*func)(void *, int), void *cookie)
+	\brief Execute a function on all CPUs, and wait for all of them to complete it before
+		returning.
+*/
+
+/*!
+	\fn void memory_read_barrier(void)
+	\brief Execute a memory read barrier.
+
+	Some CPU and cache architectures do not automatically ensure consistency between the CPU cache,
+	the instruction ordering, and the memory. A barrier makes sure every read that should be
+	executed before the barrier will be complete before any more memory access operations can be
+	done.
+*/
+
+/*!
+	\fn void memory_write_barrier(void)
+	\brief Execute a memory write barrier.
+
+	Some CPU and cache architectures do not automatically ensure consistency between the CPU cache,
+	the instruction ordering, and the memory. A barrier makes sure every read that should be
+	executed before the barrier will be complete before any more memory access operations can be
+	done.
+*/
+
+/*!
+	\fn status_t user_memcpy(void *to, const void *from, size_t size)
+	\ingroup memory
+	\brief Copy memory between userspace and kernelspace.
+
+	There are protections in place to avoid the kernel accidentally reading or writing to userspace
+	memory. As a result, every access to userspace memory must be done with user_memcpy,
+	user_strlcpy or user_memset.
+
+	For example, the buffers for a read, write or ioctl operation are handled in this way.
+*/
+
+/*!
+	\fn ssize_t user_strlcpy(char *to, const char *from, size_t size)
+	\brief Copy a string between userspace and kernel space.
+
+	Similar to strlcpy, but one of the source and destination must be in kernel space, and the
+	other must be in userspace.
+*/
+
+/*!
+	\fn status_t user_memset(void *start, char c, size_t count)
+	\brief Set userspace memory
+
+	Set memory to a specific byte value in the current userspace team.
+*/
