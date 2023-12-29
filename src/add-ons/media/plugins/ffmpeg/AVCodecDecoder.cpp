@@ -1601,7 +1601,11 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	AVFrame deinterlacedPicture;
 	bool useDeinterlacedPicture = false;
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	if (fRawDecodedPicture->flags & AV_FRAME_FLAG_INTERLACED) {
+#else
 	if (fRawDecodedPicture->interlaced_frame) {
+#endif
 		AVFrame rawPicture;
 		rawPicture.data[0] = fRawDecodedPicture->data[0];
 		rawPicture.data[1] = fRawDecodedPicture->data[1];
@@ -1694,7 +1698,11 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		}
 	}
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	if (fRawDecodedPicture->flags & AV_FRAME_FLAG_INTERLACED)
+#else
 	if (fRawDecodedPicture->interlaced_frame)
+#endif
 		av_freep(&deinterlacedPicture.data[0]);
 
 	return B_OK;
