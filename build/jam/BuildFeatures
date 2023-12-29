@@ -235,14 +235,14 @@ if [ IsPackageAvailable mesa_devel ] {
 
 
 # FFmpeg
-if [ IsPackageAvailable ffmpeg_devel ] {
+if [ IsPackageAvailable ffmpeg6_devel ] {
 	local ffmpegLibs = libavformat.so libavcodec.so libavfilter.so libswscale.so
 		libavutil.so libswresample.so ;
 
 	ExtractBuildFeatureArchives ffmpeg :
-		file: base ffmpeg
+		file: base ffmpeg6
 			runtime: lib
-		file: devel ffmpeg_devel
+		file: devel ffmpeg6_devel
 			depends: base
 			libraries: $(developLibDir)/$(ffmpegLibs)
 			headers: $(developHeadersDir)

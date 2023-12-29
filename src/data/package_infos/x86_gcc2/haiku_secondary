@@ -39,11 +39,11 @@ requires {
 	lib:libilmimf_2_4_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libilmimfutil_2_4_%HAIKU_SECONDARY_PACKAGING_ARCH%
 
-	lib:libavcodec_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 58
-	lib:libavfilter_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 7
-	lib:libavformat_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 58
-	lib:libavutil_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 56
-	lib:libswresample_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 3
+	lib:libavcodec_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 60
+	lib:libavfilter_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 9
+	lib:libavformat_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 60
+	lib:libavutil_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 58
+	lib:libswresample_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 4
 	lib:libzstd_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 1
 #endif
 	lib:libsolv_%HAIKU_SECONDARY_PACKAGING_ARCH%

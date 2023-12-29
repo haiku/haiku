@@ -19,11 +19,11 @@ requires {
 
 #ifdef HAIKU_REGULAR_BUILD
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ffmpeg_ENABLED
-	lib:libavcodec >= 58
-	lib:libavfilter >= 7
-	lib:libavformat >= 58
-	lib:libavutil >= 56
-	lib:libswresample >= 3
+	lib:libavcodec >= 60
+	lib:libavfilter >= 9
+	lib:libavformat >= 60
+	lib:libavutil >= 58
+	lib:libswresample >= 4
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libicns_ENABLED
 	lib:libicns
