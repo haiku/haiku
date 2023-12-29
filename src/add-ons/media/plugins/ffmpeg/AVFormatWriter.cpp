@@ -190,7 +190,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 		// Now negociate the actual format with the encoder
 		// First check if the requested format is acceptable
-		AVCodec* codec = avcodec_find_encoder(fStream->codecpar->codec_id);
+		const AVCodec* codec = avcodec_find_encoder(fStream->codecpar->codec_id);
 
 		if (codec == NULL)
 			return B_MEDIA_BAD_FORMAT;

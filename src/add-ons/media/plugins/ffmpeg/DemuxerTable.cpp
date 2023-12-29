@@ -16,7 +16,7 @@ extern "C" {
 
 
 const media_file_format*
-demuxer_format_for(AVInputFormat* format)
+demuxer_format_for(const AVInputFormat* format)
 {
 	for (uint32 i = 0; i < gMuxerCount; i++) {
 		const media_file_format* demuxerFormat = &gMuxerTable[i];

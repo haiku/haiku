@@ -11,7 +11,7 @@
 
 struct AVInputFormat;
 
-const media_file_format* demuxer_format_for(AVInputFormat* format);
+const media_file_format* demuxer_format_for(const AVInputFormat* format);
 
 
 #endif // DEMUXER_TABLE_H
