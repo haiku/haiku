@@ -194,6 +194,21 @@ fill_address(const sockaddr* from, sockaddr* to, size_t maxLength)
 }
 
 
+static void
+update_device_send_stats(struct net_device* device, status_t status, size_t packetSize)
+{
+	if (status == B_OK) {
+		atomic_add((int32*)&device->stats.send.packets, 1);
+		atomic_add64((int64*)&device->stats.send.bytes, packetSize);
+	} else {
+		if (status == ENOBUFS || status == EMSGSIZE)
+			atomic_add((int32*)&device->stats.send.dropped, 1);
+		else
+			atomic_add((int32*)&device->stats.send.errors, 1);
+	}
+}
+
+
 //	#pragma mark - datalink module
 
 
@@ -411,8 +426,12 @@ datalink_send_routed_data(struct net_route* route, net_buffer* buffer)
 		}
 
 		// this one goes back to the domain directly
-		return fifo_enqueue_buffer(
+		const size_t packetSize = buffer->size;
+		status_t status = fifo_enqueue_buffer(
 			&interface->DeviceInterface()->receive_queue, buffer);
+		update_device_send_stats(interface->DeviceInterface()->device,
+			status, packetSize);
+		return status;
 	}
 
 	if ((route->flags & RTF_GATEWAY) != 0) {
@@ -721,7 +740,10 @@ interface_protocol_send_data(net_datalink_protocol* _protocol,
 	if (atomic_get(&interface->DeviceInterface()->monitor_count) > 0)
 		device_interface_monitor_receive(interface->DeviceInterface(), buffer);
 
-	return protocol->device_module->send_data(protocol->device, buffer);
+	const size_t packetSize = buffer->size;
+	status_t status = protocol->device_module->send_data(protocol->device, buffer);
+	update_device_send_stats(protocol->device, status, packetSize);
+	return status;
 }
 
 

@@ -64,14 +64,25 @@ device_reader_thread(void* _interface)
 
 			if (interface->deframe_func(interface->device, buffer) != B_OK) {
 				gNetBufferModule.free(buffer);
+				atomic_add((int32*)&device->stats.receive.dropped, 1);
 				continue;
 			}
 
-			fifo_enqueue_buffer(&interface->receive_queue, buffer);
+			const size_t packetSize = buffer->size;
+			status = fifo_enqueue_buffer(&interface->receive_queue, buffer);
+			if (status == B_OK) {
+				atomic_add((int32*)&device->stats.receive.packets, 1);
+				atomic_add64((int64*)&device->stats.receive.bytes, packetSize);
+			} else {
+				gNetBufferModule.free(buffer);
+				atomic_add((int32*)&device->stats.receive.dropped, 1);
+			}
 		} else if (status == B_DEVICE_NOT_FOUND) {
 			device_removed(device);
 			return status;
 		} else {
+			atomic_add((int32*)&device->stats.receive.errors, 1);
+
 			// In case of error, give the other threads some
 			// time to run since this is a high priority time thread.
 			snooze(10000);

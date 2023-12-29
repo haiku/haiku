@@ -247,13 +247,6 @@ tunnel_write(void* _cookie, off_t position, const void* data, size_t* _length)
 	if (status != B_OK)
 		gBufferModule->free(buffer);
 
-	if (status == B_OK) {
-		atomic_add((int32*)&cookie->device->stats.receive.packets, 1);
-		atomic_add64((int64*)&cookie->device->stats.receive.bytes, buffer->size);
-	} else {
-		atomic_add((int32*)&cookie->device->stats.receive.errors, 1);
-	}
-
 	return status;
 }
 
@@ -468,14 +461,10 @@ tunnel_send_data(net_device* _device, net_buffer* buffer)
 	status = gStackModule->fifo_enqueue_buffer(
 		&device->send_queue, buffer);
 	if (status == B_OK) {
-		atomic_add((int32*)&device->stats.send.packets, 1);
-		atomic_add64((int64*)&device->stats.send.bytes, buffer->size);
-	} else {
-		atomic_add((int32*)&device->stats.send.errors, 1);
+		MutexLocker selectLocker(device->select_lock);
+		notify_select_event_pool(device->select_pool, B_SELECT_READ);
 	}
 
-	MutexLocker selectLocker(device->select_lock);
-	notify_select_event_pool(device->select_pool, B_SELECT_READ);
 	return status;
 }
 

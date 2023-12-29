@@ -193,13 +193,11 @@ ppp_send_data(net_device *_device, net_buffer *buffer)
 	ppp_device *device = (ppp_device *)_device;
 
 	if (buffer->size > device->frame_size || buffer->size < device->header_length) {
-		device->stats.send.errors++;
 		dprintf("sorry! fail send ppp packet, size wrong!\n");
-		return B_BAD_VALUE;
+		return EMSGSIZE;
 	}
 
 	if (device->KPPP_Interface == NULL) {
-		device->stats.send.errors++;
 		dprintf("Fail send ppp packet, no eth for ppp!\n");
 		return B_BAD_VALUE;
 	}
@@ -209,13 +207,9 @@ ppp_send_data(net_device *_device, net_buffer *buffer)
 	status_t status = device->KPPP_Interface->Send(buffer, 0x0021); // IP_PROTOCOL 0x0021
 
 	if (status != B_OK) {
-		device->stats.send.errors++;
 		dprintf("KPPP_Interface->Send(buffer, 0x0021 IP) fail\n");
 		return B_BAD_VALUE;
 	}
-
-	device->stats.send.packets++;
-	device->stats.send.bytes += net_buffer_size;
 
 	return B_OK;
 }
@@ -239,8 +233,6 @@ ppp_receive_data(net_device *_device, net_buffer **_buffer)
 	}
 
 	// (*_buffer)->interface_address = NULL; // strange need to put here
-	device->stats.receive.bytes += (*_buffer)->size;
-	device->stats.receive.packets++;
 
 	return B_OK;
 }

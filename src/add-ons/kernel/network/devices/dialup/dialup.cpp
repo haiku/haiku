@@ -448,14 +448,10 @@ dialup_send_data(net_device* _device, net_buffer* buffer)
 	}
 	device->last_closing_flag_sequence_time = system_time();
 
-	device->stats.send.packets++;
-	device->stats.send.bytes += bytesWritten;
 	status = B_OK;
 	goto done;
 
 err:
-	device->stats.send.errors++;
-
 done:
 	free(ioVectors);
 	free(packet);
@@ -502,12 +498,9 @@ dialup_receive_data(net_device* _device, net_buffer** _buffer)
 
 	status = gBufferModule->trim(buffer, bytesRead);
 	if (status < B_OK) {
-		device->stats.receive.dropped++;
+		atomic_add((int32*)&device->stats.receive.dropped, 1);
 		goto err;
 	}
-
-	device->stats.receive.bytes += bytesRead;
-	device->stats.receive.packets++;
 
 	*_buffer = buffer;
 	status = B_OK;
@@ -515,7 +508,6 @@ dialup_receive_data(net_device* _device, net_buffer** _buffer)
 
 err:
 	gBufferModule->free(buffer);
-	device->stats.receive.errors++;
 
 done:
 	free(packet);
