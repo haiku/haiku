@@ -457,14 +457,6 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// to _DecodeNextVideoFrame() will update the essential video format
 		// properties accordingly regardless of the settings here.
 
-	bool codecCanHandleIncompleteFrames
-		= (fCodec->capabilities & AV_CODEC_CAP_TRUNCATED) != 0;
-	if (codecCanHandleIncompleteFrames) {
-		// Expect and handle video frames to be splitted across consecutive
-		// data chunks.
-		fCodecContext->flags |= AV_CODEC_FLAG_TRUNCATED;
-	}
-
 	if (avcodec_open2(fCodecContext, fCodec, NULL) < 0) {
 		TRACE("avcodec_open() failed to init codec!\n");
 		return B_ERROR;
