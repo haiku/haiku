@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src tests add-ons kernel kernelland_emu ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 
+DEFINES += _KERNEL_MODE ;
+
 SharedLibrary libkernelland_emu.so :
 	condition_variable.cpp
 	debug.cpp

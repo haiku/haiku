@@ -7,9 +7,6 @@
  */
 
 
-#define _KERNEL_DEBUG_H
-	// avoid including the private kernel debug.h header
-
 #include "argv.h"
 #include "tcp.h"
 #include "utility.h"
@@ -22,6 +19,7 @@
 #include <net_stack.h>
 #include <slab/Slab.h>
 #include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 
 #include <KernelExport.h>
 #include <Select.h>
@@ -47,18 +45,24 @@ struct context {
 };
 
 struct cmd_entry {
-	char*	name;
+	const char*	name;
 	void	(*func)(int argc, char **argv);
-	char*	help;
+	const char*	help;
 };
 
-struct net_socket_private : net_socket {
-	struct list_link		link;
+
+struct net_socket_private;
+typedef DoublyLinkedList<net_socket_private> SocketList;
+
+struct net_socket_private : net_socket,
+		DoublyLinkedListLinkImpl<net_socket_private> {
+	struct net_socket		*parent;
+
 	team_id					owner;
 	uint32					max_backlog;
 	uint32					child_count;
-	struct list				pending_children;
-	struct list				connected_children;
+	SocketList				pending_children;
+	SocketList				connected_children;
 
 	struct select_sync_pool	*select_pool;
 	mutex					lock;
@@ -79,22 +83,22 @@ extern module_info *modules[];
 
 
 extern struct net_protocol_module_info gDomainModule;
-struct net_interface gInterface;
+struct net_interface_address gInterfaceAddress = {};
 extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
 struct net_socket *gServerSocket, *gClientSocket;
 static struct context sClientContext, sServerContext;
 
-static vint32 sPacketNumber = 1;
+static int32 sPacketNumber = 1;
 static double sRandomDrop = 0.0;
-static set<uint32> sDropList;
+static std::set<uint32> sDropList;
 static bigtime_t sRoundTripTime = 0;
 static bool sIncreasingRoundTrip = false;
 static bool sRandomRoundTrip = false;
 static bool sTCPDump = true;
 static bigtime_t sStartTime;
 static double sRandomReorder = 0.0;
-static set<uint32> sReorderList;
+static std::set<uint32> sReorderList;
 static bool sSimultaneousConnect = false;
 static bool sSimultaneousClose = false;
 static bool sServerActiveClose = false;
@@ -102,7 +106,7 @@ static bool sServerActiveClose = false;
 static struct net_domain sDomain = {
 	"ipv4",
 	AF_INET,
-	{},
+
 	&gDomainModule,
 	&gIPv4AddressModule
 };
@@ -281,9 +285,6 @@ socket_create(int family, int type, int protocol, net_socket **_socket)
 	socket->receive.low_water_mark = 1;
 	socket->receive.timeout = B_INFINITE_TIMEOUT;
 
-	list_init_etc(&socket->pending_children, offsetof(net_socket_private, link));
-	list_init_etc(&socket->connected_children, offsetof(net_socket_private, link));
-
 	socket->first_protocol = gTCPModule->init_protocol(socket);
 	if (socket->first_protocol == NULL) {
 		fprintf(stderr, "tcp_tester: cannot create protocol\n");
@@ -365,7 +366,7 @@ socket_bind(net_socket *socket, const struct sockaddr *address, socklen_t addres
 
 	memcpy(&socket->address, address, sizeof(sockaddr));
 
-	status_t status = socket->first_info->bind(socket->first_protocol, 
+	status_t status = socket->first_info->bind(socket->first_protocol,
 		(sockaddr *)address);
 	if (status < B_OK) {
 		// clear address again, as binding failed
@@ -463,6 +464,20 @@ socket_recv(net_socket *socket, void *data, size_t length, int flags)
 }
 
 
+bool
+socket_acquire(net_socket* _socket)
+{
+	return true;
+}
+
+
+bool
+socket_release(net_socket* _socket)
+{
+	return true;
+}
+
+
 status_t
 socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 {
@@ -491,7 +506,7 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 	memcpy(&socket->peer, &parent->peer, parent->peer.ss_len);
 
 	// add to the parent's list of pending connections
-	list_add_item(&parent->pending_children, socket);
+	parent->pending_children.Add(socket);
 	socket->parent = parent;
 	parent->child_count++;
 
@@ -507,7 +522,7 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 
 	mutex_lock(&parent->lock);
 
-	net_socket *socket = (net_socket *)list_remove_head_item(&parent->connected_children);
+	net_socket_private *socket = parent->connected_children.RemoveHead();
 	if (socket != NULL) {
 		socket->parent = NULL;
 		parent->child_count--;
@@ -526,14 +541,7 @@ socket_count_connected(net_socket *_parent)
 
 	MutexLocker _(parent->lock);
 
-	ssize_t count = 0;
-	void *item = NULL;
-	while ((item = list_get_next_item(&parent->connected_children,
-			item)) != NULL) {
-		count++;
-	}
-
-	return count;
+	return parent->connected_children.Count();
 }
 
 
@@ -548,15 +556,15 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 
 	mutex_lock(&socket->lock);
 
-	// first remove the pending connections, then the already connected ones as needed	
-	net_socket *child;
+	// first remove the pending connections, then the already connected ones as needed
+	net_socket_private *child;
 	while (socket->child_count > backlog
-		&& (child = (net_socket *)list_remove_tail_item(&socket->pending_children)) != NULL) {
+		&& (child = socket->pending_children.RemoveTail()) != NULL) {
 		child->parent = NULL;
 		socket->child_count--;
 	}
 	while (socket->child_count > backlog
-		&& (child = (net_socket *)list_remove_tail_item(&socket->connected_children)) != NULL) {
+		&& (child = socket->connected_children.RemoveTail()) != NULL) {
 		child->parent = NULL;
 		socket_delete(child);
 		socket->child_count--;
@@ -568,21 +576,26 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 }
 
 
-/*!
-	The socket has been connected. It will be moved to the connected queue
-	of its parent socket.
-*/
+bool
+socket_has_parent(net_socket* _socket)
+{
+	net_socket_private* socket = (net_socket_private*)_socket;
+	return socket->parent != NULL;
+}
+
+
 status_t
 socket_connected(net_socket *socket)
 {
-	net_socket_private *parent = (net_socket_private *)socket->parent;
+	net_socket_private *socket_private = (net_socket_private *)socket;
+	net_socket_private *parent = (net_socket_private *)socket_private->parent;
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
 	mutex_lock(&parent->lock);
 
-	list_remove_item(&parent->pending_children, socket);
-	list_add_item(&parent->connected_children, socket);
+	parent->pending_children.Remove(socket_private);
+	parent->connected_children.Add(socket_private);
 
 	mutex_unlock(&parent->lock);
 	return B_OK;
@@ -634,8 +647,6 @@ net_socket_module_info gNetSocketModule = {
 	NULL, // close,
 	NULL, // free,
 
-	NULL, // readv,
-	NULL, // writev,
 	NULL, // control,
 
 	NULL, // read_avail,
@@ -648,13 +659,17 @@ net_socket_module_info gNetSocketModule = {
 	NULL, // set_option,
 	NULL, // get_next_stat,
 
+	socket_acquire,
+	socket_release,
+
 	// connections
 	socket_spawn_pending,
-	socket_delete,
 	socket_dequeue_connected,
 	socket_count_connected,
 	socket_set_max_backlog,
+	socket_has_parent,
 	socket_connected,
+	NULL, // set_aborted
 
 	// notifications
 	NULL, // request_notification,
@@ -718,7 +733,7 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 {
 	struct context* context = (struct context*)route->gateway;
 
-	buffer->interface = &gInterface;
+	buffer->interface_address = &gInterfaceAddress;
 
 	context->lock.Lock();
 	list_add_item(&context->list, buffer);
@@ -757,13 +772,23 @@ net_datalink_module_info gNetDatalinkModule = {
 		std_ops
 	},
 
-	NULL, //datalink_control,
+	NULL, // control
 	datalink_send_data,
 	datalink_send_datagram,
 
-	NULL, //is_local_address,
-	NULL, //datalink_get_interface,
-	NULL, //datalink_get_interface_with_address,
+	NULL, // is_local_address
+	NULL, // is_local_link_address
+
+	NULL, // get_interface
+	NULL, // get_interface_with_address
+	NULL, // put_interface
+
+	NULL, // get_interface_address
+	NULL, // get_next_interface_address,
+	NULL, // put_interface_address
+
+	NULL, // join_multicast
+	NULL, // leave_multicast
 
 	NULL, //add_route,
 	NULL, //remove_route,
@@ -1036,15 +1061,15 @@ domain_receive_data(net_buffer *buffer)
 
 
 status_t
-domain_error(uint32 code, net_buffer *data)
+domain_error(net_error error, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-domain_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+domain_error_reply(net_protocol* self, net_buffer* cause,
+	net_error error, net_error_data* errorData)
 {
 	return B_ERROR;
 }
@@ -1237,7 +1262,7 @@ void
 setup_context(struct context& context, bool server)
 {
 	list_init(&context.list);
-	context.route.interface = &gInterface;
+	context.route.interface_address = &gInterfaceAddress;
 	context.route.gateway = (sockaddr *)&context;
 		// backpointer to the context
 	context.route.mtu = 1500;
@@ -1398,7 +1423,7 @@ do_drop(int argc, char** argv)
 
 		printf("Drop pakets:\n");
 
-		set<uint32>::iterator iterator = sDropList.begin();
+		std::set<uint32>::iterator iterator = sDropList.begin();
 		uint32 count = 0;
 		for (; iterator != sDropList.end(); iterator++) {
 			printf("%4lu\n", *iterator);
@@ -1455,7 +1480,7 @@ do_reorder(int argc, char** argv)
 
 		printf("Reorder packets:\n");
 
-		set<uint32>::iterator iterator = sReorderList.begin();
+		std::set<uint32>::iterator iterator = sReorderList.begin();
 		uint32 count = 0;
 		for (; iterator != sReorderList.end(); iterator++) {
 			printf("%4lu\n", *iterator);
@@ -1594,8 +1619,8 @@ main(int argc, char** argv)
 	interfaceAddress.sin_len = sizeof(sockaddr_in);
 	interfaceAddress.sin_family = AF_INET;
 	interfaceAddress.sin_addr.s_addr = htonl(0xc0a80001);
-	gInterface.address = (sockaddr*)&interfaceAddress;
-	gInterface.domain = &sDomain;
+	gInterfaceAddress.local = (sockaddr*)&interfaceAddress;
+	gInterfaceAddress.domain = &sDomain;
 
 	status = get_module("network/protocols/tcp/v1", (module_info **)&gTCPModule);
 	if (status < B_OK) {

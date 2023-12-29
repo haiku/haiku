@@ -6,6 +6,8 @@ SubDirHdrs [ FDirName $(HAIKU_TOP) src add-ons kernel network stack ] ;
 UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
 UsePrivateHeaders net shared ;
 
+DEFINES += _KERNEL_MODE ;
+
 SimpleTest tcp_shell :
 	tcp_shell.cpp
 
@@ -24,7 +26,7 @@ SimpleTest tcp_shell :
 	argv.c
 	ipv4_address.cpp
 
-	: be libkernelland_emu.so
+    : be libkernelland_emu.so [ TargetLibstdc++ ]
 ;
 
 SimpleTest BufferQueueTest :
