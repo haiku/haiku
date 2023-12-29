@@ -88,7 +88,11 @@ private:
 			SwsContext*			fSwsContext;
 
 			// For encoded audio:
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+			AVFifo*				fAudioFifo;
+#else
 			AVFifoBuffer*		fAudioFifo;
+#endif
 
 			int64				fFramesWritten;
 

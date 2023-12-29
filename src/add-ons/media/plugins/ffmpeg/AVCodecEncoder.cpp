@@ -63,7 +63,11 @@ AVCodecEncoder::_Init()
 		TRACE("  found AVCodec for %u: %p\n", fCodecID, fCodec);
 	}
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	fAudioFifo = av_fifo_alloc2(0, 1, AV_FIFO_FLAG_AUTO_GROW);
+#else
 	fAudioFifo = av_fifo_alloc(0);
+#endif
 
 	// Initial parameters, so we know if the user changed them
 	fEncodeParameters.avg_field_size = 0;
@@ -79,7 +83,11 @@ AVCodecEncoder::~AVCodecEncoder()
 	if (fSwsContext != NULL)
 		sws_freeContext(fSwsContext);
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	av_fifo_freep2(&fAudioFifo);
+#else
 	av_fifo_free(fAudioFifo);
+#endif
 
 	if (fFrame != NULL) {
 		av_frame_free(&fFrame);
@@ -524,22 +532,33 @@ AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	if (fCodecContext->frame_size > 1) {
 		// Encoded audio. Things work differently from raw audio. We need
 		// the fAudioFifo to pipe data.
-		if (av_fifo_realloc2(fAudioFifo,
-				av_fifo_size(fAudioFifo) + bufferSize) < 0) {
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+		if (av_fifo_grow2(fAudioFifo, bufferSize) < 0) {
+			TRACE("  av_fifo_grow2() failed\n");
+			return B_NO_MEMORY;
+		}
+		av_fifo_write(fAudioFifo, const_cast<uint8*>(buffer), bufferSize);
+#else
+		if (av_fifo_realloc2(fAudioFifo, av_fifo_size(fAudioFifo) + bufferSize) < 0) {
 			TRACE("  av_fifo_realloc2() failed\n");
-            return B_NO_MEMORY;
-        }
-        av_fifo_generic_write(fAudioFifo, const_cast<uint8*>(buffer),
-        	bufferSize, NULL);
+			return B_NO_MEMORY;
+		}
+		av_fifo_generic_write(fAudioFifo, const_cast<uint8*>(buffer), bufferSize, NULL);
+#endif
 
-		int frameBytes = fCodecContext->frame_size * inputFrameSize;
+		size_t frameBytes = fCodecContext->frame_size * inputFrameSize;
 		uint8* tempBuffer = new(std::nothrow) uint8[frameBytes];
 		if (tempBuffer == NULL)
 			return B_NO_MEMORY;
 
 		// Encode as many chunks as can be read from the FIFO.
-		while (av_fifo_size(fAudioFifo) >= frameBytes) {
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+		while (av_fifo_can_read(fAudioFifo) >= frameBytes) {
+			av_fifo_read(fAudioFifo, tempBuffer, frameBytes);
+#else
+		while (av_fifo_size(fAudioFifo) >= (int32)frameBytes) {
 			av_fifo_generic_read(fAudioFifo, tempBuffer, frameBytes, NULL);
+#endif
 
 			ret = _EncodeAudio(tempBuffer, frameBytes, fCodecContext->frame_size,
 				info);
