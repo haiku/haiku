@@ -534,12 +534,11 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	status_t ret;
 
 	// Encode one audio chunk/frame.
-	AVPacket packet;
-	av_init_packet(&packet);
+	AVPacket* packet = av_packet_alloc();
 	// By leaving these NULL, we let the encoder allocate memory as it needs.
 	// This way we don't risk iving a too small buffer.
-	packet.data = NULL;
-	packet.size = 0;
+	packet->data = NULL;
+	packet->size = 0;
 
 	int gotPacket = 0;
 
@@ -552,6 +551,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 
 		if (count < 0) {
 			TRACE("  avcodec_encode_audio() failed filling data: %d\n", count);
+			av_packet_free(&packet);
 			return B_ERROR;
 		}
 
@@ -561,11 +561,11 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		fFramesWritten += fFrame->nb_samples;
 
 		ret = avcodec_send_frame(fCodecContext, fFrame);
-		gotPacket = avcodec_receive_packet(fCodecContext, &packet) == 0;
+		gotPacket = avcodec_receive_packet(fCodecContext, packet) == 0;
 	} else {
 		// If called with NULL, ask the encoder to flush any buffers it may
 		// have pending.
-		ret = avcodec_receive_packet(fCodecContext, &packet);
+		ret = avcodec_receive_packet(fCodecContext, packet);
 		gotPacket = (ret == 0);
 	}
 
@@ -574,6 +574,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 
 	if (ret != 0) {
 		TRACE("  avcodec_encode_audio() failed: %s\n", strerror(ret));
+		av_packet_free(&packet);
 		return B_ERROR;
 	}
 
@@ -581,23 +582,23 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 
 	if (gotPacket) {
 		// Setup media_encode_info, most important is the time stamp.
-		info->start_time = packet.pts;
+		info->start_time = packet->pts;
 
-		if (packet.flags & AV_PKT_FLAG_KEY)
+		if (packet->flags & AV_PKT_FLAG_KEY)
 			info->flags = B_MEDIA_KEY_FRAME;
 		else
 			info->flags = 0;
 
 		// We got a packet out of the encoder, write it to the output stream
-		ret = WriteChunk(packet.data, packet.size, info);
+		ret = WriteChunk(packet->data, packet->size, info);
 		if (ret != B_OK) {
 			TRACE("  error writing chunk: %s\n", strerror(ret));
-			av_packet_unref(&packet);
+			av_packet_free(&packet);
 			return ret;
 		}
 	}
 
-	av_packet_unref(&packet);
+	av_packet_free(&packet);
 	return B_OK;
 }
 

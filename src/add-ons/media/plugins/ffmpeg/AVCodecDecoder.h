@@ -154,7 +154,7 @@ private:
 			int32				fDecodedDataBufferOffset;
 			int32				fDecodedDataBufferSize;
 
-			AVPacket			fTempPacket;
+			AVPacket*			fTempPacket;
 
 			// video deinterlace feature
 			AVFilterContext*	fBufferSinkContext;

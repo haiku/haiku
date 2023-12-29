@@ -72,7 +72,7 @@ public:
 private:
 			AVFormatContext*	fFormatContext;
 			AVStream*			fStream;
-			AVPacket			fPacket;
+			AVPacket*			fPacket;
 			// Since different threads may write to the target,
 			// we need to protect the file position and I/O by a lock.
 			BLocker*			fStreamLock;
@@ -87,13 +87,14 @@ AVFormatWriter::StreamCookie::StreamCookie(AVFormatContext* context,
 	fStream(NULL),
 	fStreamLock(streamLock)
 {
-	av_init_packet(&fPacket);
+	fPacket = av_packet_alloc();
 }
 
 
 AVFormatWriter::StreamCookie::~StreamCookie()
 {
 	// fStream is freed automatically when the codec context is closed
+	av_packet_free(&fPacket);
 }
 
 
@@ -105,7 +106,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 
 	BAutolock _(fStreamLock);
 
-	fPacket.stream_index = fFormatContext->nb_streams;
+	fPacket->stream_index = fFormatContext->nb_streams;
 	fStream = avformat_new_stream(fFormatContext, NULL);
 
 	if (fStream == NULL) {
@@ -113,7 +114,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		return B_ERROR;
 	}
 
-	fStream->id = fPacket.stream_index;
+	fStream->id = fPacket->stream_index;
 
 //	TRACE("  fStream->codecpar: %p\n", fStream->codecpar);
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
@@ -302,21 +303,21 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 
 	BAutolock _(fStreamLock);
 
-	fPacket.data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
-	fPacket.size = chunkSize;
-	fPacket.stream_index = fStream->index;
+	fPacket->data = const_cast<uint8_t*>((const uint8_t*)chunkBuffer);
+	fPacket->size = chunkSize;
+	fPacket->stream_index = fStream->index;
 
-	fPacket.pts = int64_t((double)encodeInfo->start_time
+	fPacket->pts = int64_t((double)encodeInfo->start_time
 		* fStream->time_base.den / (1000000.0 * fStream->time_base.num)
 		+ 0.5);
 
-	fPacket.dts = fPacket.pts;
+	fPacket->dts = fPacket->pts;
 
-	fPacket.flags = 0;
+	fPacket->flags = 0;
 	if ((encodeInfo->flags & B_MEDIA_KEY_FRAME) != 0)
-		fPacket.flags |= AV_PKT_FLAG_KEY;
+		fPacket->flags |= AV_PKT_FLAG_KEY;
 
-	TRACE_PACKET("  PTS: %" PRId64 " (stream->time_base: (%d/%d)\n", fPacket.pts,
+	TRACE_PACKET("  PTS: %" PRId64 " (stream->time_base: (%d/%d)\n", fPacket->pts,
 		fStream->time_base.num, fStream->time_base.den);
 
 #if 0
@@ -325,11 +326,11 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	// more than one stream. For the moment, this crashes in AVPacket
 	// shuffling inside libavformat. Maybe if we want to use this, we
 	// need to allocate a separate AVPacket and copy the chunk buffer.
-	int result = av_interleaved_write_frame(fFormatContext, &fPacket);
+	int result = av_interleaved_write_frame(fFormatContext, fPacket);
 	if (result < 0)
 		TRACE("  av_interleaved_write_frame(): %d\n", result);
 #else
-	int result = av_write_frame(fFormatContext, &fPacket);
+	int result = av_write_frame(fFormatContext, fPacket);
 	if (result < 0)
 		TRACE("  av_write_frame(): %d\n", result);
 #endif
