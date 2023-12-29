@@ -48,6 +48,12 @@ extern "C" {
 
 #define ERROR(a...) fprintf(stderr, a)
 
+// Compatibility with old ffmpeg 4.x, where the getters didn't exist yet
+#if LIBAVCODEC_VERSION_MAJOR < 60
+#define avformat_index_get_entry(stream, index) (&(stream)->index_entries[(index)])
+#define avformat_index_get_entries_count(stream) ((stream)->nb_index_entries)
+#endif
+
 
 static uint32
 avformat_to_beos_byte_order(AVSampleFormat format)
@@ -581,8 +587,8 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 			TRACE("  av_index_search_timestamp() failed\n");
 		} else {
 			if (index > 0) {
-				const AVIndexEntry& entry = fStream->index_entries[index];
-				streamTimeStamp = entry.timestamp;
+				const AVIndexEntry* entry = avformat_index_get_entry(fStream, index);
+				streamTimeStamp = entry->timestamp;
 			} else {
 				// Some demuxers use the first index entry to store some
 				// other information, like the total playing time for example.
@@ -596,7 +602,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 			if (timeDiff > 1000000
 				&& (fStreamBuildsIndexWhileReading
-					|| index == fStream->nb_index_entries - 1)) {
+					|| index == avformat_index_get_entries_count(fStream) - 1)) {
 				// If the stream is building the index on the fly while parsing
 				// it, we only have entries in the index for positions already
 				// decoded, i.e. we cannot seek into the future. In that case,
