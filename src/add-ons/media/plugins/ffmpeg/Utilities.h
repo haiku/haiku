@@ -208,43 +208,6 @@ CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int vide
 }
 
 
-/*! \brief Converts FFmpeg notation of video frame rate into the Media Kits
-		notation.
-
-	\see ConvertAVCodecContextToVideoFrameRate() for converting in the other
-		direction.
-
-	\param contextIn An AVCodeContext structure of FFmpeg containing the values
-		needed to calculate the Media Kit video frame rate.
-		The following fields are used for the calculation:
-			- AVCodecContext.time_base.num (must)
-			- AVCodecContext.time_base.den (must)
-			- AVCodecContext.ticks_per_frame (must)
-	\param frameRateOut On return contains Media Kits notation of the video
-		frame rate.
-*/
-inline void
-ConvertAVCodecContextToVideoFrameRate(AVCodecContext& contextIn, float& frameRateOut)
-{
-	// A framerate of 0 is allowed for single-frame "video" (cover art, for
-	// example)
-	if (contextIn.time_base.num == 0)
-		frameRateOut = 0.0f;
-
-	// assert that we can compute something
-	assert(contextIn.time_base.den > 0);
-
-	// The following code is based on private get_fps() function of FFmpeg's
-	// ratecontrol.c:
-	// https://lists.ffmpeg.org/pipermail/ffmpeg-cvslog/2012-April/049280.html
-	double possiblyInterlacedFrameRate = 1.0 / av_q2d(contextIn.time_base);
-	double numberOfInterlacedFramesPerFullFrame = FFMAX(contextIn.ticks_per_frame, 1);
-
-	frameRateOut
-		= possiblyInterlacedFrameRate / numberOfInterlacedFramesPerFullFrame;
-}
-
-
 /*!	\brief Converts the Media Kits notation of video frame rate to FFmpegs
 	notation.
 	
@@ -259,7 +222,8 @@ ConvertAVCodecContextToVideoFrameRate(AVCodecContext& contextIn, float& frameRat
 		fields stay as they were on input):
 			- AVCodecContext.time_base.num
 			- AVCodecContext.time_base.den
-			- AVCodecContext.ticks_per_frame is set to 1
+			- AVCodecContext.framerate.num
+			- AVCodecContext.framerate.den
 */
 inline void
 ConvertVideoFrameRateToAVCodecContext(float frameRateIn,
@@ -267,7 +231,7 @@ ConvertVideoFrameRateToAVCodecContext(float frameRateIn,
 {
 	assert(frameRateIn > 0);
 
-	contextOut.ticks_per_frame = 1;
+	contextOut.framerate = av_d2q(frameRateIn, 1024);
 	contextOut.time_base = av_d2q(1.0 / frameRateIn, 1024);
 }
 

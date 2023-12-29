@@ -140,6 +140,7 @@ private:
 			color_space			fOutputColorSpace;
 			int32				fOutputFrameCount;
 			float				fOutputFrameRate;
+									// only for audio streams
 			int					fOutputFrameSize;
 									// sample size * channel count
 			int					fInputFrameSize;

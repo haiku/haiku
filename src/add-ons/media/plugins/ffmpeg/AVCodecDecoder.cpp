@@ -522,31 +522,18 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		= fHeader.u.raw_video.pixel_width_aspect;
 	inOutFormat->u.raw_video.pixel_height_aspect
 		= fHeader.u.raw_video.pixel_height_aspect;
-#if 0
-	// This was added by Colin Günther in order to handle streams with a
-	// variable frame rate. fOutputFrameRate is computed from the stream
-	// time_base, but it actually assumes a timebase equal to the FPS. As far
-	// as I can see, a stream with a variable frame rate would have a higher
-	// resolution time_base and increment the pts (presentation time) of each
-	// frame by a value bigger than one.
+	// The framerate in fCodecContext is set to 0 if the codec doesn't know the framerate. Some
+	// codecs work only at a fixed framerate, while others allow each frame to have its owm
+	// timestamp. For example a stream may switch from 50 to 60Hz, depending on how it was
+	// constructed. In that case, it's fine to leave the field_rate as 0 as well, the media kit
+	// will handle that just fine as long as each frame comes with a correct presentation timestamp.
+	// In fact, it seems better to not set the field_rate at all, rather than set it to a wrong
+	// value.
 	//
-	// Fixed rate stream:
-	// time_base = 1/50s, frame PTS = 1, 2, 3... (for 50Hz)
-	//
-	// Variable rate stream:
-	// time_base = 1/300s, frame PTS = 6, 12, 18, ... (for 50Hz)
-	// time_base = 1/300s, frame PTS = 5, 10, 15, ... (for 60Hz)
-	//
-	// The fOutputFrameRate currently does not take this into account and
-	// ignores the PTS. This results in playing the above sample at 300Hz
-	// instead of 50 or 60.
-	//
-	// However, comparing the PTS for two consecutive implies we have already
-	// decoded 2 frames, which may not be the case when this method is first
-	// called.
-	inOutFormat->u.raw_video.field_rate = fOutputFrameRate;
-		// Was calculated by first call to _DecodeNextVideoFrame()
-#endif
+	// TODO The field_rate is twice the frame rate for interlaced streams, so we need to determine
+	// if we are decoding an interlaced stream, and wether ffmpeg delivers every half-frame or not
+	// in that case (since we let ffmpeg do the deinterlacing).
+	inOutFormat->u.raw_video.field_rate = av_q2d(fCodecContext->framerate);
 	inOutFormat->u.raw_video.display.format = fOutputColorSpace;
 	inOutFormat->u.raw_video.display.line_width
 		= fHeader.u.raw_video.display_line_width;
@@ -1214,9 +1201,6 @@ AVCodecDecoder::_UpdateMediaHeaderForAudioFrame()
 	and the start time it should be presented isn't established at the moment.
 	Though this	might change in the future.
 
-	More over the fOutputFrameRate variable is updated for every decoded video
-	frame.
-
 	On first call the member variables fSwsContext / fFormatConversionFunc	are
 	initialized.
 
@@ -1291,9 +1275,9 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 	conversionTime += doneTime - formatConversionStart;
 	profileCounter++;
 	if (!(fFrame % 5)) {
-		printf("[v] profile: d1 = %lld, d2 = %lld (%lld) required %lld\n",
+		printf("[v] profile: d1 = %lld, d2 = %lld (%lld)\n",
 			decodingTime / profileCounter, conversionTime / profileCounter,
-			fFrame, bigtime_t(1000000LL / fOutputFrameRate));
+			fFrame);
 		decodingTime = 0;
 		conversionTime = 0;
 		profileCounter = 0;
@@ -1485,8 +1469,6 @@ AVCodecDecoder::_HandleNewVideoFrameAndUpdateSystemState()
 	status_t postProcessStatus = _DeinterlaceAndColorConvertVideoFrame();
 	if (postProcessStatus != B_OK)
 		return postProcessStatus;
-
-	ConvertAVCodecContextToVideoFrameRate(*fCodecContext, fOutputFrameRate);
 
 #ifdef DEBUG
 	dump_ffframe_video(fRawDecodedPicture, "ffpict");
