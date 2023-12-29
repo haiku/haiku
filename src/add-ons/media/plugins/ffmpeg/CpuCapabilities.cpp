@@ -35,7 +35,7 @@ CPUCapabilities::_SetIntelCapabilities()
 {
 	cpuid_info baseInfo;
 	cpuid_info cpuInfo;
-	int32 maxStandardFunction, maxExtendedFunction = 0;
+	int32 maxStandardFunction = 0;
 
 	if (get_cpuid(&baseInfo, 0L, 0L) != B_OK) {
 		// this CPU doesn't support cpuid
@@ -51,11 +51,6 @@ CPUCapabilities::_SetIntelCapabilities()
 
 	get_cpuid(&cpuInfo, 0x80000000, 0L);
 
-	// extended cpuid is only supported if max_eax is greater than the service id
-	if (cpuInfo.eax_0.max_eax > 0x80000000) {
-		maxExtendedFunction = cpuInfo.eax_0.max_eax & 0xff;
-	}
-	
 	if (maxStandardFunction > 0) {
 
 		get_cpuid(&cpuInfo, 1L, 0L);
