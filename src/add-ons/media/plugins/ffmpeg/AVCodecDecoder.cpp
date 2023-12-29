@@ -345,6 +345,28 @@ AVCodecDecoder::_ResetTempPacket()
 }
 
 
+static int
+get_channel_count(AVCodecContext* context)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	return context->ch_layout.nb_channels;
+#else
+	return context->channels;
+#endif
+}
+
+
+static void
+set_channel_count(AVCodecContext* context, int count)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	context->ch_layout.nb_channels = count;
+#else
+	context->channels = count;
+#endif
+}
+
+
 status_t
 AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 {
@@ -383,7 +405,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	outputAudioFormat = media_raw_audio_format::wildcard;
 	outputAudioFormat.byte_order = B_MEDIA_HOST_ENDIAN;
 	outputAudioFormat.frame_rate = fCodecContext->sample_rate;
-	outputAudioFormat.channel_count = fCodecContext->channels;
+	outputAudioFormat.channel_count = get_channel_count(fCodecContext);
 	ConvertAVSampleFormatToRawAudioFormat(fCodecContext->sample_fmt,
 		outputAudioFormat.format);
 	// Check that format is not still a wild card!
@@ -421,6 +443,17 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		return B_NO_MEMORY;
 
 	if (av_sample_fmt_is_planar(fCodecContext->sample_fmt)) {
+		fResampleContext = NULL;
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+		swr_alloc_set_opts2(&fResampleContext,
+			&fCodecContext->ch_layout,
+			fCodecContext->request_sample_fmt,
+			fCodecContext->sample_rate,
+			&fCodecContext->ch_layout,
+			fCodecContext->sample_fmt,
+			fCodecContext->sample_rate,
+			0, NULL);
+#else
 		fResampleContext = swr_alloc_set_opts(NULL,
 			fCodecContext->channel_layout,
 			fCodecContext->request_sample_fmt,
@@ -429,6 +462,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 			fCodecContext->sample_fmt,
 			fCodecContext->sample_rate,
 			0, NULL);
+#endif
 		swr_init(fResampleContext);
 	}
 
@@ -768,13 +802,13 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 		containerProperties.output.format, fCodecContext->request_sample_fmt);
 	fCodecContext->sample_rate
 		= static_cast<int>(containerProperties.output.frame_rate);
-	fCodecContext->channels
-		= static_cast<int>(containerProperties.output.channel_count);
+	int channel_count = static_cast<int>(containerProperties.output.channel_count);
 	// Check that channel count is not still a wild card!
-	if (fCodecContext->channels == 0) {
+	if (channel_count == 0) {
 		TRACE("  channel_count still a wild-card, assuming stereo.\n");
-		fCodecContext->channels = 2;
-	}
+		set_channel_count(fCodecContext, 2);
+	} else
+		set_channel_count(fCodecContext, channel_count);
 
 	fCodecContext->block_align = fBlockAlign;
 	fCodecContext->extradata = reinterpret_cast<uint8_t*>(fExtraData);
@@ -941,7 +975,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		uintptr_t out = (uintptr_t)fRawDecodedAudio->data[0];
 		int32 offset = fDecodedDataBufferOffset;
 		for (int i = 0; i < frames; i++) {
-			for (int j = 0; j < fCodecContext->channels; j++) {
+			for (int j = 0; j < get_channel_count(fCodecContext); j++) {
 				memcpy((void*)out, fDecodedDataBuffer->data[j]
 					+ offset, fInputFrameSize);
 				out += fInputFrameSize;
@@ -970,7 +1004,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 
 		avformat_codec_context* codecContext
 			= static_cast<avformat_codec_context*>(fRawDecodedAudio->opaque);
-		codecContext->channels = fCodecContext->channels;
+		codecContext->channels = get_channel_count(fCodecContext);
 		codecContext->sample_rate = fCodecContext->sample_rate;
 	}
 

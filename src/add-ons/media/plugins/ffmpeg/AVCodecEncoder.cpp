@@ -238,6 +238,28 @@ AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 // #pragma mark -
 
 
+static int
+get_channel_count(AVCodecContext* context)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	return context->ch_layout.nb_channels;
+#else
+	return context->channels;
+#endif
+}
+
+
+static void
+set_channel_count(AVCodecContext* context, int count)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	context->ch_layout.nb_channels = count;
+#else
+	context->channels = count;
+#endif
+}
+
+
 status_t
 AVCodecEncoder::_Setup()
 {
@@ -322,11 +344,10 @@ AVCodecEncoder::_Setup()
 		// frame rate
 		fCodecContext->sample_rate = (int)fInputFormat.u.raw_audio.frame_rate;
 		// channels
-		fCodecContext->channels = fInputFormat.u.raw_audio.channel_count;
+		set_channel_count(fCodecContext, fInputFormat.u.raw_audio.channel_count);
 		// raw bitrate
-		rawBitRate = fCodecContext->sample_rate * fCodecContext->channels
-			* (fInputFormat.u.raw_audio.format
-				& media_raw_audio_format::B_AUDIO_SIZE_MASK) * 8;
+		rawBitRate = fCodecContext->sample_rate * get_channel_count(fCodecContext)
+			* (fInputFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK) * 8;
 		// sample format
 		switch (fInputFormat.u.raw_audio.format) {
 			case media_raw_audio_format::B_AUDIO_FLOAT:
@@ -350,6 +371,17 @@ AVCodecEncoder::_Setup()
 				return B_MEDIA_BAD_FORMAT;
 				break;
 		}
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+		if (fInputFormat.u.raw_audio.channel_mask == 0) {
+			// guess the channel mask...
+			av_channel_layout_default(&fCodecContext->ch_layout,
+				fInputFormat.u.raw_audio.channel_count);
+		} else {
+			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
+			av_channel_layout_from_mask(&fCodecContext->ch_layout,
+				fInputFormat.u.raw_audio.channel_mask);
+		}
+#else
 		if (fInputFormat.u.raw_audio.channel_mask == 0) {
 			// guess the channel mask...
 			switch (fInputFormat.u.raw_audio.channel_count) {
@@ -383,6 +415,7 @@ AVCodecEncoder::_Setup()
 			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
 			fCodecContext->channel_layout = fInputFormat.u.raw_audio.channel_mask;
 		}
+#endif
 	} else {
 		TRACE("  UNSUPPORTED MEDIA TYPE!\n");
 		return B_NOT_SUPPORTED;
@@ -390,8 +423,7 @@ AVCodecEncoder::_Setup()
 
 	// TODO: Support letting the user overwrite this via
 	// SetEncodeParameters(). See comments there...
-	int wantedBitRate = (int)(rawBitRate / fBitRateScale
-		* fEncodeParameters.quality);
+	int wantedBitRate = (int)(rawBitRate / fBitRateScale * fEncodeParameters.quality);
 	if (wantedBitRate == 0)
 		wantedBitRate = (int)(rawBitRate / fBitRateScale);
 
@@ -546,8 +578,8 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		av_frame_unref(fFrame);
 		fFrame->nb_samples = frameCount;
 
-		int count = avcodec_fill_audio_frame(fFrame, fCodecContext->channels,
-				fCodecContext->sample_fmt, (const uint8_t *) buffer, bufferSize, 1);
+		int count = avcodec_fill_audio_frame(fFrame, get_channel_count(fCodecContext),
+			fCodecContext->sample_fmt, (const uint8_t*)buffer, bufferSize, 1);
 
 		if (count < 0) {
 			TRACE("  avcodec_encode_audio() failed filling data: %d\n", count);

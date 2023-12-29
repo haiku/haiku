@@ -98,6 +98,17 @@ AVFormatWriter::StreamCookie::~StreamCookie()
 }
 
 
+static void
+set_channel_count(AVCodecParameters* context, int count)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	context->ch_layout.nb_channels = count;
+#else
+	context->channels = count;
+#endif
+}
+
+
 status_t
 AVFormatWriter::StreamCookie::Init(media_format* format,
 	const media_codec_info* codecInfo)
@@ -161,7 +172,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		fStream->codecpar->sample_rate = (int)format->u.raw_audio.frame_rate;
 
 		// channels
-		fStream->codecpar->channels = format->u.raw_audio.channel_count;
+		set_channel_count(fStream->codecpar, format->u.raw_audio.channel_count);
 
 		// set fStream to the audio format we want to use. This is only a hint
 		// (each encoder has a different set of accepted formats)
@@ -234,6 +245,17 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 			}
 		}
 
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+		if (format->u.raw_audio.channel_mask == 0) {
+			// guess the channel mask...
+			av_channel_layout_default(&fStream->codecpar->ch_layout,
+				format->u.raw_audio.channel_count);
+		} else {
+			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
+			av_channel_layout_from_mask(&fStream->codecpar->ch_layout,
+				format->u.raw_audio.channel_mask);
+		}
+#else
 		if (format->u.raw_audio.channel_mask == 0) {
 			// guess the channel mask...
 			switch (format->u.raw_audio.channel_count) {
@@ -267,6 +289,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 			// The bits match 1:1 for media_multi_channels and FFmpeg defines.
 			fStream->codecpar->channel_layout = format->u.raw_audio.channel_mask;
 		}
+#endif
 	}
 
 	TRACE("  stream->time_base: (%d/%d)\n",

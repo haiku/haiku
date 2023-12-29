@@ -943,6 +943,28 @@ AVFormatReader::Stream::~Stream()
 }
 
 
+static int
+get_channel_count(AVCodecParameters* context)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	return context->ch_layout.nb_channels;
+#else
+	return context->channels;
+#endif
+}
+
+
+static int
+get_channel_mask(AVCodecParameters* context)
+{
+#if LIBAVCODEC_VERSION_MAJOR >= 60
+	return context->ch_layout.u.mask;
+#else
+	return context->channel_layout;
+#endif
+}
+
+
 status_t
 AVFormatReader::Stream::Init(int32 virtualIndex)
 {
@@ -1052,8 +1074,8 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 	switch (format->type) {
 		case B_MEDIA_RAW_AUDIO:
 			format->u.raw_audio.frame_rate = (float)codecParams->sample_rate;
-			format->u.raw_audio.channel_count = codecParams->channels;
-			format->u.raw_audio.channel_mask = codecParams->channel_layout;
+			format->u.raw_audio.channel_count = get_channel_count(codecParams);
+			format->u.raw_audio.channel_mask = get_channel_mask(codecParams);
 			ConvertAVSampleFormatToRawAudioFormat(
 				(AVSampleFormat)codecParams->format,
 				format->u.raw_audio.format);
@@ -1077,10 +1099,8 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 			format->u.encoded_audio.output.frame_rate
 				= (float)codecParams->sample_rate;
 			// Channel layout bits match in Be API and FFmpeg.
-			format->u.encoded_audio.output.channel_count
-				= codecParams->channels;
-			format->u.encoded_audio.multi_info.channel_mask
-				= codecParams->channel_layout;
+			format->u.encoded_audio.output.channel_count = get_channel_count(codecParams);
+			format->u.encoded_audio.multi_info.channel_mask = get_channel_mask(codecParams);
 			format->u.encoded_audio.output.byte_order
 				= avformat_to_beos_byte_order(
 					(AVSampleFormat)codecParams->format);
@@ -1094,7 +1114,7 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 					= codecParams->block_align;
 			} else {
 				format->u.encoded_audio.output.buffer_size
-					= codecParams->frame_size * codecParams->channels
+					= codecParams->frame_size * get_channel_count(codecParams)
 						* (format->u.encoded_audio.output.format
 							& media_raw_audio_format::B_AUDIO_SIZE_MASK);
 			}
