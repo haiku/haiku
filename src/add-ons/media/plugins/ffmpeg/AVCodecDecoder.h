@@ -117,7 +117,7 @@ private:
 			bool				fIsAudio;
 
 			// FFmpeg related members
-			AVCodec*			fCodec;
+			const AVCodec*		fCodec;
 			AVCodecContext*		fCodecContext;
 			SwrContext*			fResampleContext;
 			uint8_t*			fDecodedData;
