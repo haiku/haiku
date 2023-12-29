@@ -30,6 +30,8 @@
 struct track_data {
 	BPoint		drag_start;
 	int32		item_index;
+	int32		buttons;
+	uint32		selected_click_count;
 	bool		was_selected;
 	bool		try_drag;
 	bool		is_dragging;
@@ -625,6 +627,13 @@ BListView::MouseDown(BPoint where)
 		Window()->UpdateIfNeeded();
 	}
 
+	int32 buttons = 0;
+	if (Window() != NULL) {
+		BMessage* currentMessage = Window()->CurrentMessage();
+		if (currentMessage != NULL)
+			currentMessage->FindInt32("buttons", &buttons);
+	}
+
 	int32 index = IndexOf(where);
 
 	// If the user double (or more) clicked within the current selection,
@@ -663,6 +672,13 @@ BListView::MouseDown(BPoint where)
 		SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 	}
 
+	// increment/reset selected click count
+	fTrack->buttons = buttons;
+	if (fTrack->buttons > 0 && fTrack->was_selected)
+		fTrack->selected_click_count++;
+	else
+		fTrack->selected_click_count = 0;
+
 	_DoSelection(index);
 
 	BView::MouseDown(where);
@@ -673,6 +689,7 @@ void
 BListView::MouseUp(BPoint where)
 {
 	// drag is over
+	fTrack->buttons = 0;
 	fTrack->try_drag = false;
 	fTrack->is_dragging = false;
 
@@ -719,14 +736,6 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 		}
 	}
 
-	// get mouse buttons from current message in case of change
-	int32 buttons = 0;
-	if (Window() != NULL) {
-		BMessage* currentMessage = Window()->CurrentMessage();
-		if (currentMessage != NULL)
-			currentMessage->FindInt32("buttons", &buttons);
-	}
-
 	int32 index = IndexOf(where);
 	if (index == -1) {
 		// If where is above top, scroll to the first item,
@@ -739,7 +748,7 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 	// don't scroll if button not pressed or index is invalid
 	int32 lastIndex = fFirstSelected;
-	if (buttons == 0 || index == -1)
+	if (fTrack->buttons == 0 || index == -1)
 		return BView::MouseMoved(where, code, dragMessage);
 
 	// don't scroll if mouse is left or right of the view
@@ -1598,6 +1607,8 @@ BListView::_InitObject(list_view_type type)
 	fTrack = new track_data;
 	fTrack->drag_start = B_ORIGIN;
 	fTrack->item_index = -1;
+	fTrack->buttons = 0;
+	fTrack->selected_click_count = 0;
 	fTrack->was_selected = false;
 	fTrack->try_drag = false;
 	fTrack->is_dragging = false;
@@ -2109,40 +2120,43 @@ void
 BListView::_DoSelection(int32 index)
 {
 	BListItem* item = ItemAt(index);
-	if (index >= 0 && item != NULL) {
-		if (fListType == B_MULTIPLE_SELECTION_LIST) {
-			// multiple-selection list
 
-			if ((modifiers() & B_SHIFT_KEY) != 0) {
-				// extend or contract selection
-				if (index >= fFirstSelected && index < fLastSelected) {
-					// clicked inside of selected items block, deselect all
-					// except from the first selected index to item index
-					DeselectExcept(fFirstSelected, index);
-				} else {
-					// extend selection up or down
-					Select(std::min(index, fFirstSelected),
-						std::max(index, fLastSelected));
-				}
+	// don't alter selection if invalid item clicked
+	if (index < 0 || item == NULL)
+		return;
+
+	// deselect all if clicked on disabled
+	if (!item->IsEnabled())
+		return DeselectAll();
+
+	if (fListType == B_MULTIPLE_SELECTION_LIST) {
+		// multiple-selection list
+
+		if ((modifiers() & B_SHIFT_KEY) != 0) {
+			if (index >= fFirstSelected && index < fLastSelected) {
+				// clicked inside of selected items block, deselect all
+				// except from the first selected index to item index
+				DeselectExcept(fFirstSelected, index);
 			} else {
-				if ((modifiers() & B_COMMAND_KEY) != 0) {
-					// toggle selection state (like in Tracker)
-					if (item->IsSelected())
-						Deselect(index);
-					else
-						Select(index, true);
-				} else if (item->IsEnabled()) // only select enabled item
-					Select(index);
+				// extend or contract selection
+				Select(std::min(index, fFirstSelected),
+					std::max(index, fLastSelected));
 			}
-		} else {
-			// single-selection list
-
+		} else if ((modifiers() & B_COMMAND_KEY) != 0) {
 			// toggle selection state
-			if ((modifiers() & B_COMMAND_KEY) != 0 && item->IsSelected())
+			if (item->IsSelected())
 				Deselect(index);
-			else if (item->IsEnabled()) // only select enabled item
-				Select(index);
-		}
-	} else if ((modifiers() & B_COMMAND_KEY) == 0)
-		DeselectAll();
+			else
+				Select(index, true);
+		} else if (fTrack->selected_click_count != 1)
+			Select(index); // eat a click on selected for drag and drop
+	} else {
+		// single-selection list
+
+		// toggle selection state
+		if ((modifiers() & B_COMMAND_KEY) != 0 && item->IsSelected())
+			Deselect(index);
+		else
+			Select(index);
+	}
 }
