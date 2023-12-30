@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2023, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
 #include "pcap.h"
 #include "utility.h"
 
+#include <AutoDeleter.h>
 #include <NetBufferUtilities.h>
 #include <net_buffer.h>
 #include <net_datalink.h>
@@ -1439,23 +1440,33 @@ do_connect(int argc, char** argv)
 }
 
 
+static ssize_t
+parse_size(const char* arg)
+{
+	char *unit;
+	ssize_t size = strtoul(arg, &unit, 0);
+	if (unit != NULL && unit[0]) {
+		if (unit[0] == 'k' || unit[0] == 'K')
+			size *= 1024;
+		else if (unit[0] == 'm' || unit[0] == 'M')
+			size *= 1024 * 1024;
+		else {
+			fprintf(stderr, "unknown unit specified!\n");
+			return -1;
+		}
+	}
+	return size;
+}
+
+
 static void
 do_send(int argc, char** argv)
 {
-	size_t size = 1024;
+	ssize_t size = 1024;
 	if (argc > 1 && isdigit(argv[1][0])) {
-		char *unit;
-		size = strtoul(argv[1], &unit, 0);
-		if (unit != NULL && unit[0]) {
-			if (unit[0] == 'k' || unit[0] == 'K')
-				size *= 1024;
-			else if (unit[0] == 'm' || unit[0] == 'M')
-				size *= 1024 * 1024;
-			else {
-				fprintf(stderr, "unknown unit specified!\n");
-				return;
-			}
-		}
+		size = parse_size(argv[1]);
+		if (size < 0)
+			return;
 	} else if (argc > 1) {
 		fprintf(stderr, "invalid args!\n");
 		return;
@@ -1471,6 +1482,7 @@ do_send(int argc, char** argv)
 		fprintf(stderr, "not enough memory!\n");
 		return;
 	}
+	MemoryDeleter bufferDeleter(buffer);
 
 	// initialize buffer with some not so random data
 	for (uint32 i = 0; i < size; i++) {
@@ -1481,6 +1493,43 @@ do_send(int argc, char** argv)
 	if (bytesWritten < B_OK) {
 		fprintf(stderr, "failed sending buffer: %s\n", strerror(bytesWritten));
 		return;
+	}
+}
+
+
+static void
+do_send_loop(int argc, char** argv)
+{
+	if (argc != 2 || !isdigit(argv[1][0])) {
+		fprintf(stderr, "invalid args!\n");
+		return;
+	}
+	ssize_t size = parse_size(argv[1]);
+	if (size < 0)
+		return;
+
+	const size_t bufferSize = 4096;
+	char *buffer = (char *)malloc(bufferSize);
+	if (buffer == NULL) {
+		fprintf(stderr, "not enough memory!\n");
+		return;
+	}
+	MemoryDeleter bufferDeleter(buffer);
+
+	// initialize buffer with some not so random data
+	for (uint32 i = 0; i < bufferSize; i++) {
+		buffer[i] = (char)(i & 0xff);
+	}
+
+	for (ssize_t total = 0; total < size; ) {
+		ssize_t bytesWritten = socket_send(gClientSocket, buffer, bufferSize, 0);
+		if (bytesWritten < B_OK) {
+			fprintf(stderr, "failed sending buffer (after %" B_PRIdSSIZE "): %s\n",
+				total, strerror(bytesWritten));
+			return;
+		}
+
+		total += bufferSize;
 	}
 }
 
@@ -1667,6 +1716,7 @@ do_dprintf(int argc, char** argv)
 static cmd_entry sBuiltinCommands[] = {
 	{"connect", do_connect, "Connects the client"},
 	{"send", do_send, "Sends data from the client to the server"},
+	{"send_loop", do_send_loop, "Sends data in a loop"},
 	{"close", do_close, "Performs an active or simultaneous close"},
 	{"dprintf", do_dprintf, "Toggles debug output"},
 	{"drop", do_drop, "Lets you drop packets during transfer"},
