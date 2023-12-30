@@ -26,7 +26,7 @@ SimpleTest tcp_shell :
 	argv.c
 	ipv4_address.cpp
 
-    : be libkernelland_emu.so [ TargetLibstdc++ ]
+	: be libkernelland_emu.so [ TargetLibstdc++ ]
 ;
 
 SimpleTest BufferQueueTest :
