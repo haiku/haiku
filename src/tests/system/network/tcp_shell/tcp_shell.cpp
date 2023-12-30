@@ -770,6 +770,12 @@ get_route(struct net_domain *_domain, const struct sockaddr *address)
 }
 
 
+static void
+put_route(struct net_domain* _domain, net_route* route)
+{
+}
+
+
 net_datalink_module_info gNetDatalinkModule = {
 	{
 		NET_DATALINK_MODULE_NAME,
@@ -795,13 +801,14 @@ net_datalink_module_info gNetDatalinkModule = {
 	NULL, // join_multicast
 	NULL, // leave_multicast
 
-	NULL, //add_route,
-	NULL, //remove_route,
+	NULL, // add_route,
+	NULL, // remove_route,
 	get_route,
-	NULL, //put_route,
-	NULL, //register_route_info,
-	NULL, //unregister_route_info,
-	NULL, //update_route_info
+	NULL, // get_buffer_route
+	put_route,
+	NULL, // register_route_info,
+	NULL, // unregister_route_info,
+	NULL, // update_route_info
 };
 
 
