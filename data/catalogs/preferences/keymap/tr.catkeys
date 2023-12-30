@@ -1,16 +1,19 @@
-1	turkish	x-vnd.Haiku-Keymap	1479919571
+1	turkish	x-vnd.Haiku-Keymap	139266573
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
 PG ↑	Keyboard Layout View	Very short for 'page up'	SF↑
+Scroll Lock	Keyboard Layout View		Sarma Kilidi
 Brazilian	KeymapNames		Brezilya
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		Sağ Seçenek
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Seçenek:
 Cancel	Modifier keys window		Vazgeç
 Sample and clipboard:	Keymap window		Örnek ve pano
 Polish	KeymapNames		Lehçe
+Right Shift	Keyboard Layout View		Sağ Üst Karakter
 Latin-American	KeymapNames		Latin Amerika
 Ukrainian	KeymapNames		Ukraynaca
 PAGE ↓	Keyboard Layout View		SAYFA ↓
@@ -26,7 +29,6 @@ Option	Keyboard Layout View	Option key	Seçenek
 US-International	KeymapNames		Birleşik Devletler-Uluslararası
 Turkish (Type-Q)	KeymapNames		Türkçe (Q)
 Revert	Modifier keys window		Eski haline döndür
-Caps:	Modifier keys window	Caps key role name	Büyük harf:
 Slovak	KeymapNames		Slovakça
 CAPS LOCK	Keyboard Layout View		BÜYÜK HARF
 Colemak	KeymapNames		Colemak
@@ -40,6 +42,7 @@ Croatian	KeymapNames		Hırvatça
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Değiştiren düğmeleri ayarla
 Apple Aluminium International	KeyboardLayoutNames		Apple Alüminyum Uluslararası
+Right Command	Keyboard Layout View		Sağ Komut
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Komut düğmesi
 PG ↓	Keyboard Layout View	Very short for 'page down'	SF ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -60,6 +63,7 @@ French (NF Z71-300)	KeymapNames		Fransızca (NF Z71-300)
 Modifier keys	Modifier keys window		Değiştiren düğmeler
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Uluslararası
 Kazakh	KeymapNames		Kazakça
+Left Option	Keyboard Layout View		Sol Seçenek
 Save as…	Keymap window		Farklı kaydet…
 Lithuanian (Standard)	KeymapNames		Litvanca (Standart)
 Error: duplicate keys	Modifier keys window		Hata: Yinelenen düğmeler
@@ -68,10 +72,12 @@ Bulgarian (Phonetic)	KeymapNames		Bulgarca (Fonetik)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanada Fransızcası
 Hungarian	KeymapNames		Macarca
+Right Control	Keyboard Layout View		Sağ Kontrol
 Control	Keyboard Layout View	Control key	Kontrol
 Irish	KeymapNames		İrlandaca
 Remove	Keyboard Layout View		Kaldır
 Tilde trigger	Keymap window		Tilde tetikleyicisi
+Caps Lock	Keyboard Layout View		Büyük Harf
 Shift	Keyboard Layout View	Shift key	Üst Karakter
 CONTROL	Keyboard Layout View		KONTROL
 Macedonian	KeymapNames		Makedonca
@@ -131,6 +137,7 @@ Shift:	Modifier keys window	Shift key role name	Üst Karakter:
 Keymap	System name		Klavye Dizilimi
 Slovene	KeymapNames		Slovence
 Lithuanian	KeymapNames		Litvanca
+Left Command	Keyboard Layout View		Sol Komut
 Set modifier keys…	Keymap window		Değiştiren düğmeleri ayarla…
 Switch shortcut keys to Haiku mode	Keymap window		Kestirmeleri Haiku kipine geçir
 Defaults	Keymap window		Saptanmışlar
@@ -145,7 +152,6 @@ Belgian (comma)	KeymapNames		Flamanca (virgül)
 Norwegian	KeymapNames		Norveççe
 Font	Keymap window		Yazıtipi
 Danish	KeymapNames		Danca
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Büyük harf düğmesi
 Generic 104-key	KeyboardLayoutNames		Standart 104 düğmeli
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Üst Karakter düğmesi
 Russian	KeymapNames		Rusça
@@ -154,6 +160,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Romence
 CMD	Keyboard Layout View	Very short for 'command'	KOMUT
 Command	Keyboard Layout View	Command key	Komut
+Left Shift	Keyboard Layout View		Sol Üst Karakter
 SCROLL	Keyboard Layout View		SAR
 File	Keymap window		Dosya
 Brazilian (ABNT2)	KeymapNames		Brezilya (ABNT2)
@@ -163,4 +170,6 @@ Dutch	KeymapNames		Hollandaca
 Diaeresis trigger	Keymap window		Tını imi tetikleyicisi
 Icelandic	KeymapNames		İzlandaca
 Open…	Keymap window		Aç…
+Left Control	Keyboard Layout View		Sol Kontrol
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400 (US)
+Num Lock	Keyboard Layout View		Sayı Kilidi

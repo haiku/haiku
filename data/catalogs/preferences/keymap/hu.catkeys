@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	4201668633
+1	hungarian	x-vnd.Haiku-Keymap	139266573
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
@@ -29,7 +29,6 @@ Option	Keyboard Layout View	Option key	Opció billentyű
 US-International	KeymapNames		Egyesült Államok (nemzetközi)
 Turkish (Type-Q)	KeymapNames		Török (Q-típus)
 Revert	Modifier keys window		Visszaállít
-Caps:	Modifier keys window	Caps key role name	Caps:
 Slovak	KeymapNames		Szlovák
 CAPS LOCK	Keyboard Layout View		Caps Lock
 Colemak	KeymapNames		Colemak
@@ -153,7 +152,6 @@ Belgian (comma)	KeymapNames		Belga (vessző)
 Norwegian	KeymapNames		Norvég
 Font	Keymap window		Betűtípus
 Danish	KeymapNames		Dán
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps Lock
 Generic 104-key	KeyboardLayoutNames		Hagyományos 104 billentyűs
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift billentyű
 Russian	KeymapNames		Orosz

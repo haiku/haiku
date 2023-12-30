@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	4201668633
+1	swedish	x-vnd.Haiku-Keymap	139266573
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Japanese	KeymapNames		Japanska
 US	KeymapNames		US
@@ -29,7 +29,6 @@ Option	Keyboard Layout View	Option key	Alternativ
 US-International	KeymapNames		US-Internationell
 Turkish (Type-Q)	KeymapNames		Turkiska (Typ-Q)
 Revert	Modifier keys window		Återställ
-Caps:	Modifier keys window	Caps key role name	Caps:
 Slovak	KeymapNames		Slovakiska
 CAPS LOCK	Keyboard Layout View		SKIFTLÅS
 Colemak	KeymapNames		Colemak
@@ -153,7 +152,6 @@ Belgian (comma)	KeymapNames		Belgiska (komma)
 Norwegian	KeymapNames		Norska
 Font	Keymap window		Typsnitt
 Danish	KeymapNames		Danska
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps key
 Generic 104-key	KeyboardLayoutNames		Generiskt 104-tangenters
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Skifttangent
 Russian	KeymapNames		Ryska

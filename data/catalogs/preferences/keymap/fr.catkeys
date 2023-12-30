@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Keymap	4201668633
+1	french	x-vnd.Haiku-Keymap	139266573
 Key	Modifier keys window	As in a computer keyboard key	Touche
 Japanese	KeymapNames		Japonais
 US	KeymapNames		US
@@ -29,7 +29,6 @@ Option	Keyboard Layout View	Option key	Option
 US-International	KeymapNames		US-International
 Turkish (Type-Q)	KeymapNames		Turc (Type-Q)
 Revert	Modifier keys window		Rétablir
-Caps:	Modifier keys window	Caps key role name	Maj :
 Slovak	KeymapNames		Slovaque
 CAPS LOCK	Keyboard Layout View		Verr. Maj.
 Colemak	KeymapNames		Colemak
@@ -153,7 +152,6 @@ Belgian (comma)	KeymapNames		Belge (virgule)
 Norwegian	KeymapNames		Norvégien
 Font	Keymap window		Police
 Danish	KeymapNames		Danois
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Touche majuscule
 Generic 104-key	KeyboardLayoutNames		Générique 104 touches
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
 Russian	KeymapNames		Russe

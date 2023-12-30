@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Keymap	4201668633
+1	german	x-vnd.Haiku-Keymap	139266573
 Key	Modifier keys window	As in a computer keyboard key	Taste
 Japanese	KeymapNames		Japanisch
 US	KeymapNames		US
@@ -29,7 +29,6 @@ Option	Keyboard Layout View	Option key	Option
 US-International	KeymapNames		US (international)
 Turkish (Type-Q)	KeymapNames		Türkisch (Typ-Q)
 Revert	Modifier keys window		Anfangswerte
-Caps:	Modifier keys window	Caps key role name	Feststell:
 Slovak	KeymapNames		Slowakisch
 CAPS LOCK	Keyboard Layout View		FESTSTELL
 Colemak	KeymapNames		Colemak
@@ -153,7 +152,6 @@ Belgian (comma)	KeymapNames		Belgisch (Komma)
 Norwegian	KeymapNames		Norwegisch
 Font	Keymap window		Schriftart
 Danish	KeymapNames		Dänisch
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Feststell-Taste
 Generic 104-key	KeyboardLayoutNames		Allgemeine 104-Tasten
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
 Russian	KeymapNames		Russisch

@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Keymap	1479919571
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Japansk
 US	KeymapNames		US
@@ -26,7 +26,6 @@ Option	Keyboard Layout View	Option key	Tilvalgstast
 US-International	KeymapNames		USA-internasjonalt
 Turkish (Type-Q)	KeymapNames		Tyrkisk (Type-Q)
 Revert	Modifier keys window		Tilbakestill
-Caps:	Modifier keys window	Caps key role name	Caps:
 Slovak	KeymapNames		Slovakisk
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -145,7 +144,6 @@ Belgian (comma)	KeymapNames		Belgisk (comma)
 Norwegian	KeymapNames		Norsk
 Font	Keymap window		Font
 Danish	KeymapNames		Dansk
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps key
 Generic 104-key	KeyboardLayoutNames		Generisk 104-taster
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-tasten
 Russian	KeymapNames		Russisk

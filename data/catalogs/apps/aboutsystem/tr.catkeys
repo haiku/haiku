@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-About	885044264
+1	turkish	x-vnd.Haiku-About	4264836225
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999-2007 Michael C. Ring. Tüm hakları saklıdır.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Telif hakkı © 2002-2004 Vivek Mohan. Tüm hakları saklıdır.
@@ -31,6 +31,8 @@ Licenses: 	AboutView		Lisanslar:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.'in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.'in tescilli markalarıdır.\n\n
 Copyright © 2009 Colin Percival	AboutView		Telif hakkı © 2009 Colin Percival
 Time running:	AboutView		Çalışma süresi:
+Version: %s	AboutView	Version: R1 or hrev99999	Sürüm: %s
+%d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB bellek:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Telif hakkı © 1996-2005 Julian R Seward. Tüm hakları saklıdır.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Telif hakkı © 1994-2009, Thomas G. Lane, Guido Vollbeding. Bu yazılım Independent JPEG Group'a ait olan işin bir parçası temel alınarak yazılmıştır.

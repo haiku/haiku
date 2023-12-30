@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Keymap	1479919571
+1	finnish	x-vnd.Haiku-Keymap	1712484807
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
@@ -26,7 +26,6 @@ Option	Keyboard Layout View	Option key	Valitsin
 US-International	KeymapNames		US-kansainvälinen
 Turkish (Type-Q)	KeymapNames		Turkkilainen (Type-Q)
 Revert	Modifier keys window		Palauta
-Caps:	Modifier keys window	Caps key role name	Kirjainkokonäppäimet:
 Slovak	KeymapNames		Slovakkialainen
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -145,7 +144,6 @@ Belgian (comma)	KeymapNames		Belgialaienn (pilkku)
 Norwegian	KeymapNames		Norjalainen
 Font	Keymap window		Kirjasin
 Danish	KeymapNames		Tanskalainen
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Kirjainkokonäppäin
 Generic 104-key	KeyboardLayoutNames		Generic 104-key
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Vaihtonäppäin
 Russian	KeymapNames		Venäläinen

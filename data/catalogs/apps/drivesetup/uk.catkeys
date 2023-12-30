@@ -9,7 +9,7 @@ Could not change the parameters of the selected partition.	MainWindow		Немо�
 PGP encrypted	Encryption utils		PGP-шифрування
 Delete partition	MainWindow		Видалити розділ
 Error: 	MainWindow	in any error alert	Помилка: 
-Removable	PartitionList		Removable
+Removable	PartitionList		Знімний
 Block size	PartitionList		Розмір блоку
 The panel experienced a problem!	MainWindow		З панеллю сталася проблема!
 Device	DiskView		Пристрій
@@ -19,12 +19,12 @@ Unmount	MainWindow		Відключити
 Failed to format the partition %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 Partition size	CreateParametersPanel		Розмір розділу
 Validation of the given parameters failed.	MainWindow		Збій при перевірці введених параметрів.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \"%s\"? Повторний запит буде видано безпосередньо перед записом змін на диск.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені, що бажаєте ініціалізувати розділ \«%s\»? Повторний запит буде видано безпосередньо перед записом змін на диск.
 DriveSetup	System name		DriveSetup
-Mounted at	PartitionList		Підключити як
+Mounted at	PartitionList		Підключено як
 Create…	MainWindow		Створити…
 Write changes	MainWindow		Записати зміни
-Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Збій ініціалізації розділу %s. (Нічого не було записано на диск.)
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Збій ініціалізації розділу %s. (На диск нічого не було записано.)
 Validation of the given creation parameters failed.	MainWindow		Не вдалося застосувати введені при створенні параметри.
 Eject	MainWindow		Вийняти
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на диску %s будуть безпозворотно втрачені, якщо Ви продовжите!
@@ -59,7 +59,7 @@ BitLocker encrypted	Encryption utils		Шифрування BitLocker
 You need to select a partition entry from the list.	MainWindow		Ви повинні вибрати розділ зі списку.
 Offset: %s	Support		Зміщення: %s
 SafeBoot encrypted	Encryption utils		Шифрування SafeBoot
-Volume name	PartitionList		Ім'я тому
+Volume name	PartitionList		Назва тому
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі будуть безповоротно втрачені!
 Change	ChangeParametersPanel		Змінити
 Partition name:	ChangeParametersPanel		Назва розділу:
@@ -85,7 +85,7 @@ Change parameters	MainWindow		Змінити параметри
 Rescan	MainWindow		Пересканувати
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні списка розділів.
 Failed to initialize the disk %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
-Disk system \"%s\" not found!	MainWindow		Дискова система \"%s\" не знайдена!
+Disk system \"%s\" not found!	MainWindow		Дискова система \«%s\» не знайдена!
 The partition cannot be unmounted.	MainWindow		Розділ не можна відключити.
 Delete	MainWindow		Видалити
 Partition type:	ChangeParametersPanel		Тип розділу:

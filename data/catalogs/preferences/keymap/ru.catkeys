@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	4201668633
+1	russian	x-vnd.Haiku-Keymap	139266573
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
 Japanese	KeymapNames		Японская
 US	KeymapNames		США
@@ -29,7 +29,6 @@ Option	Keyboard Layout View	Option key	Option
 US-International	KeymapNames		США-международная
 Turkish (Type-Q)	KeymapNames		Турецкая (тип Q)
 Revert	Modifier keys window		Вернуть
-Caps:	Modifier keys window	Caps key role name	Caps:
 Slovak	KeymapNames		Словацкая
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -153,7 +152,6 @@ Belgian (comma)	KeymapNames		Бельгийская с запятой
 Norwegian	KeymapNames		Норвежская
 Font	Keymap window		Шрифт
 Danish	KeymapNames		Датская
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	клавиша Caps
 Generic 104-key	KeyboardLayoutNames		Типовая 104-клавиши
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift
 Russian	KeymapNames		Русская

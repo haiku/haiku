@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Keymap	3696803769
+1	friulian	x-vnd.Haiku-Keymap	3929369005
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
@@ -28,7 +28,6 @@ Option	Keyboard Layout View	Option key	Opzion
 US-International	KeymapNames		US-Internazionâl
 Turkish (Type-Q)	KeymapNames		Turc (Gjenar-Q)
 Revert	Modifier keys window		Ripristine
-Caps:	Modifier keys window	Caps key role name	Maiusc:
 Slovak	KeymapNames		Slovac
 CAPS LOCK	Keyboard Layout View		BLOC MAIUSC
 Colemak	KeymapNames		Colemak
@@ -149,7 +148,6 @@ Belgian (comma)	KeymapNames		Belgjic (virgule)
 Norwegian	KeymapNames		Norvegjês
 Font	Keymap window		Caratar
 Danish	KeymapNames		Danês
-Caps key	Modifier keys window	Label of key above Shift, usually Caps Lock	Bloc maiusc
 Generic 104-key	KeyboardLayoutNames		Gjeneriche 104-tascj
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tast Maiusc
 Russian	KeymapNames		Rus
