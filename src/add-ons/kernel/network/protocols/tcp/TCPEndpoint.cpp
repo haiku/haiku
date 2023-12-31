@@ -1737,8 +1737,12 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 	}
 #endif
 
-	if (advertisedWindow > fSendWindow)
-		action |= IMMEDIATE_ACKNOWLEDGE;
+	if (fSendWindow < fSendMaxSegmentSize
+			&& advertisedWindow >= fSendMaxSegmentSize) {
+		// Our current send window is less than a segment wide, and the new one
+		// is larger, so trigger a send in case there's anything to be sent.
+		action |= SEND_QUEUED;
+	}
 
 	fSendWindow = advertisedWindow;
 	if (advertisedWindow > fSendMaxWindow)
@@ -1824,7 +1828,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	// The buffer may be freed if its data is added to the queue, so cache
 	// the size as we still need it later.
-	uint32 bufferSize = buffer->size;
+	const uint32 bufferSize = buffer->size;
 
 	if ((bufferSize > 0 || (segment.flags & TCP_FLAG_FINISH) != 0)
 		&& _ShouldReceive())
@@ -1933,6 +1937,9 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 		SendAcknowledge(true);
 	else if (segmentAction & ACKNOWLEDGE)
 		DelayedAcknowledge();
+
+	if (segmentAction & SEND_QUEUED)
+		_SendQueued();
 
 	if ((fFlags & (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE))
 			== (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE)) {

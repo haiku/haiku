@@ -269,12 +269,13 @@ struct tcp_segment_header {
 };
 
 enum tcp_segment_action {
-	KEEP					= 0x00,
-	DROP					= 0x01,
-	RESET					= 0x02,
-	ACKNOWLEDGE				= 0x04,
-	IMMEDIATE_ACKNOWLEDGE	= 0x08,
-	DELETED_ENDPOINT		= 0x10,
+	KEEP					= 0,
+	DROP					= (1 << 0),
+	RESET					= (1 << 1),
+	ACKNOWLEDGE				= (1 << 2),
+	IMMEDIATE_ACKNOWLEDGE	= (1 << 3),
+	SEND_QUEUED				= (1 << 4),
+	DELETED_ENDPOINT		= (1 << 5),
 };
 
 
