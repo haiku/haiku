@@ -1134,15 +1134,19 @@ TCPEndpoint::IsLocal() const
 status_t
 TCPEndpoint::DelayedAcknowledge()
 {
-	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
-		// timer was active, send an ACK now (with the exception above,
-		// we send every other ACK)
-		T(TimerSet(this, "delayed ack", -1));
-		return SendAcknowledge(true);
+	// ACKs "MUST" be generated within 500ms of the first unACKed packet, and
+	// "SHOULD" be for at least every second full-size segment. (RFC 5681 § 4.2)
+
+	bigtime_t delay = TCP_DELAYED_ACKNOWLEDGE_TIMEOUT;
+	if ((fReceiveNext - fLastAcknowledgeSent) >= (fReceiveMaxSegmentSize * 2)) {
+		// Trigger an immediate timeout rather than invoking Send directly,
+		// allowing multiple invocations to be coalesced.
+		delay = 0;
+	} else if (gStackModule->is_timer_active(&fDelayedAcknowledgeTimer)) {
+		return B_OK;
 	}
 
-	gStackModule->set_timer(&fDelayedAcknowledgeTimer,
-		TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
+	gStackModule->set_timer(&fDelayedAcknowledgeTimer, delay);
 	T(TimerSet(this, "delayed ack", TCP_DELAYED_ACKNOWLEDGE_TIMEOUT));
 	return B_OK;
 }
