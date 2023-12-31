@@ -2492,6 +2492,8 @@ TCPEndpoint::_PersistTimer(net_timer* timer, void* _endpoint)
 	// the timer might not have been canceled early enough
 	if (endpoint->State() == CLOSED)
 		return;
+	if (endpoint->fSendQueue.Available(endpoint->fSendNext) == 0)
+		return;
 
 	endpoint->_SendQueued(true);
 }
@@ -2509,6 +2511,8 @@ TCPEndpoint::_DelayedAcknowledgeTimer(net_timer* timer, void* _endpoint)
 
 	// the timer might not have been canceled early enough
 	if (endpoint->State() == CLOSED)
+		return;
+	if (endpoint->fLastAcknowledgeSent == endpoint->fReceiveNext)
 		return;
 
 	endpoint->SendAcknowledge(true);
