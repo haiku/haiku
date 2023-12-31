@@ -42,18 +42,18 @@
 //	- RFC 813 - Window and Acknowledgement Strategy in TCP
 //	- RFC 1337 - TIME_WAIT Assassination Hazards in TCP
 //
-// Things this implementation currently doesn't implement:
-//	- TCP Slow Start, Congestion Avoidance, Fast Retransmit, and Fast Recovery,
-//	  RFC 2001, RFC 2581, RFC 3042
-//	- NewReno Modification to TCP's Fast Recovery, RFC 2582
-//	- Explicit Congestion Notification (ECN), RFC 3168
-//	- SYN-Cache
-//	- SACK, Selective Acknowledgment - RFC 2018, RFC 2883, RFC 3517
-//	- Forward RTO-Recovery, RFC 4138
-//	- Time-Wait hash instead of keeping sockets alive
-//
 // Things incomplete in this implementation:
 //	- TCP Extensions for High Performance, RFC 1323 - RTTM, PAWS
+//	- Congestion Control, RFC 5681
+//	- Limited Transit, RFC 3042
+//	- SACK, Selective Acknowledgment; RFC 2018, RFC 2883, RFC 6675
+//	- NewReno Modification to TCP's Fast Recovery, RFC 2582
+//
+// Things this implementation currently doesn't implement:
+//	- Explicit Congestion Notification (ECN), RFC 3168
+//	- SYN-Cache
+//	- Forward RTO-Recovery, RFC 4138
+//	- Time-Wait hash instead of keeping sockets alive
 
 #define PrintAddress(address) \
 	AddressString(Domain(), address, true).Data()
