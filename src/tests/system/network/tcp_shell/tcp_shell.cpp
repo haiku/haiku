@@ -1139,6 +1139,11 @@ dump_printf(net_buffer* buffer, int32 packetNumber, bool willBeDropped)
 static void
 dump_pcap(net_buffer* buffer, int32 packetNumber, bool willBeDropped)
 {
+	if (willBeDropped) {
+		printf(" <DROPPED>\n");
+		return;
+	}
+
 	const bigtime_t time = real_time_clock_usecs();
 
 	struct pcap_packet_header pcap_header;
