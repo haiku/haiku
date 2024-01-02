@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src kits mail ;
 
 UsePrivateHeaders mail shared ;
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;

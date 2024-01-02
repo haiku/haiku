@@ -22,7 +22,7 @@
 #ifndef _REGEX_H
 #define _REGEX_H 1
 
-#include <compatibility/bsd/features.h>
+#include <features.h>
 #include <sys/types.h>
 
 /* Allow the use in C++ code.  */
