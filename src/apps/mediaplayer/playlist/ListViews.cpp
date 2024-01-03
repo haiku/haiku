@@ -398,13 +398,13 @@ DragSortableListView::MessageReceived(BMessage* message)
 void
 DragSortableListView::KeyDown( const char* bytes, int32 numBytes )
 {
-	if ( numBytes < 1 )
+	if (numBytes < 1)
 		return;
 
-	if ( ( bytes[0] == B_BACKSPACE ) || ( bytes[0] == B_DELETE ) )
+	if (bytes[0] == B_BACKSPACE)
 		RemoveSelected();
 
-	BListView::KeyDown( bytes, numBytes );
+	BListView::KeyDown(bytes, numBytes);
 }
 
 // MouseDown

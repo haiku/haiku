@@ -246,16 +246,6 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			fListView->RemoveSelected();
 			break;
 
-		case M_PLAYLIST_MOVE_TO_TRASH:
-		{
-			int32 index;
-			if (message->FindInt32("playlist index", &index) == B_OK)
-				fListView->RemoveToTrash(index);
-			else
-				fListView->RemoveSelectionToTrash();
-			break;
-		}
-
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -282,28 +272,21 @@ PlaylistWindow::_CreateMenu(BRect& frame)
 
 	fileMenu->AddSeparatorItem();
 
-	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
-		new BMessage(B_QUIT_REQUESTED), 'W'));
+	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Close"), new BMessage(B_QUIT_REQUESTED), 'W'));
 
 	BMenu* editMenu = new BMenu(B_TRANSLATE("Edit"));
 	fUndoMI = new BMenuItem(B_TRANSLATE("Undo"), new BMessage(B_UNDO), 'Z');
 	editMenu->AddItem(fUndoMI);
-	fRedoMI = new BMenuItem(B_TRANSLATE("Redo"), new BMessage(B_REDO), 'Z', 
-		B_SHIFT_KEY);
+	fRedoMI = new BMenuItem(B_TRANSLATE("Redo"), new BMessage(B_REDO), 'Z', B_SHIFT_KEY);
 	editMenu->AddItem(fRedoMI);
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Select all"),
-		new BMessage(B_SELECT_ALL), 'A'));
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Select all"), new BMessage(B_SELECT_ALL), 'A'));
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Randomize"),
-		new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
+	editMenu->AddItem(
+		new BMenuItem(B_TRANSLATE("Randomize"), new BMessage(M_PLAYLIST_RANDOMIZE), 'R'));
 	editMenu->AddSeparatorItem();
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove"),
-		new BMessage(M_PLAYLIST_REMOVE)/*, B_DELETE, 0*/));
-			// TODO: See if we can support the modifier-less B_DELETE
-			// and draw it properly too. B_NO_MODIFIER?
-	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Move file to Trash"),
-		new BMessage(M_PLAYLIST_MOVE_TO_TRASH), 'T'));
+	editMenu->AddItem(new BMenuItem(B_TRANSLATE("Remove"), new BMessage(M_PLAYLIST_REMOVE),
+		B_DELETE, B_NO_COMMAND_KEY));
 
 	menuBar->AddItem(editMenu);
 

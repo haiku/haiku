@@ -47,8 +47,6 @@ public:
 									int32 appendIndex);
 
 			void				Randomize();
-			void				RemoveSelectionToTrash();
-			void				RemoveToTrash(int32 index);
 			void				RemoveItemList(const BList& indices,
 									bool intoTrash);
 	virtual	void				SkipBackward();

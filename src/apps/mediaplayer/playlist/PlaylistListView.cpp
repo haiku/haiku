@@ -396,7 +396,6 @@ PlaylistListView::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_BACKSPACE:
-		case B_DELETE:
 			RemoveSelected();
 			break;
 
@@ -564,24 +563,6 @@ PlaylistListView::Randomize()
 
 	fCommandStack->Perform(new (nothrow) RandomizePLItemsCommand(fPlaylist,
 		indices));
-}
-
-
-void
-PlaylistListView::RemoveSelectionToTrash()
-{
-	BList indices;
-	GetSelectedItems(indices);
-	RemoveItemList(indices, true);
-}
-
-
-void
-PlaylistListView::RemoveToTrash(int32 index)
-{
-	BList indices;
-	indices.AddItem((void*)(addr_t)index);
-	RemoveItemList(indices, true);
 }
 
 
