@@ -116,7 +116,9 @@ public:
 	{
 		AutoWriteLocker _(fLock);
 
-		return fBuffer->Seek(_PositionToRelative(position), seekMode);
+		if (seekMode == SEEK_SET)
+			return fBuffer->Seek(_PositionToRelative(position), seekMode);
+		return fBuffer->Seek(position, seekMode);
 	}
 
 	virtual off_t Position() const
