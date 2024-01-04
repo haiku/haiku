@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -60,8 +60,8 @@ static const char* kDeleteShortcutUTF8 = "\xe2\x8c\xa6"; /* B_DELETE U+2326 */
 
 using BPrivate::MenuPrivate;
 
-BMenuItem::BMenuItem(const char* label, BMessage* message, char shortcut,
-	uint32 modifiers)
+
+BMenuItem::BMenuItem(const char* label, BMessage* message, char shortcut, uint32 modifiers)
 {
 	_InitData();
 	if (label != NULL)
@@ -70,11 +70,7 @@ BMenuItem::BMenuItem(const char* label, BMessage* message, char shortcut,
 	SetMessage(message);
 
 	fShortcutChar = shortcut;
-
-	if (shortcut != 0)
-		fModifiers = modifiers | B_COMMAND_KEY;
-	else
-		fModifiers = 0;
+	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
 }
 
 
@@ -163,7 +159,7 @@ BMenuItem::Archive(BMessage* data, bool deep) const
 	if (status == B_OK && fUserTrigger)
 		status = data->AddInt32("_user_trig", fUserTrigger);
 
-	if (status == B_OK && fShortcutChar) {
+	if (status == B_OK && fShortcutChar != 0) {
 		status = data->AddInt32("_shortcut", fShortcutChar);
 		if (status == B_OK)
 			status = data->AddInt32("_mods", fModifiers);
@@ -276,20 +272,14 @@ BMenuItem::SetTrigger(char trigger)
 void
 BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
 {
-	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) != 0
-		&& fWindow != NULL) {
+	if (fShortcutChar != 0 && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
-	}
 
 	fShortcutChar = shortcut;
+	fModifiers = (fShortcutChar != 0 ? modifiers : 0);
 
-	if (shortcut != 0)
-		fModifiers = modifiers | B_COMMAND_KEY;
-	else
-		fModifiers = 0;
-
-	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
-		fWindow->AddShortcut(fShortcutChar, fModifiers, this);
+	if (fShortcutChar != 0 && fWindow != NULL)
+		fWindow->_AddShortcut(fShortcutChar, fModifiers, this);
 
 	if (fSuper != NULL) {
 		fSuper->InvalidateLayout();
@@ -479,7 +469,7 @@ BMenuItem::Draw()
 	}
 
 	if (layout == B_ITEMS_IN_COLUMN) {
-		if (fShortcutChar)
+		if (fShortcutChar != 0)
 			_DrawShortcutSymbol(privateAccessor.HasSubmenus());
 
 		if (Submenu() != NULL)
@@ -576,11 +566,11 @@ BMenuItem::Install(BWindow* window)
 
 	fWindow = window;
 
-	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
-		window->AddShortcut(fShortcutChar, fModifiers, this);
+	if (fShortcutChar != 0 && fWindow != NULL)
+		fWindow->_AddShortcut(fShortcutChar, fModifiers, this);
 
 	if (!Messenger().IsValid())
-		SetTarget(window);
+		SetTarget(fWindow);
 }
 
 
@@ -632,10 +622,8 @@ BMenuItem::Uninstall()
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
-	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) != 0
-		&& fWindow != NULL) {
+	if (fShortcutChar != 0 && fWindow != NULL)
 		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
-	}
 
 	fWindow = NULL;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1307,6 +1307,7 @@
 	       - \c B_OPTION_KEY
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
+	       To remove \c B_COMMAND_KEY specify \c B_NO_COMMAND_KEY.
 	\param item The menu \a item to activate.
 
 	\since Haiku R1
@@ -1327,6 +1328,7 @@
 	       - \c B_OPTION_KEY
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
+	       To remove \c B_COMMAND_KEY specify \c B_NO_COMMAND_KEY.
 	\param message The \a message to send when the shortcut is activated. The
 	       BWindow takes ownership of the \a message.
 
@@ -1350,6 +1352,7 @@
 	       - \c B_OPTION_KEY
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
+	       To remove \c B_COMMAND_KEY specify \c B_NO_COMMAND_KEY.
 	\param message The \a message to send when the shortcut is activated. The
 	       BWindow takes ownership of the \a message.
 	\param target The handler to send the message to.
@@ -1369,6 +1372,7 @@
 	       - \c B_OPTION_KEY
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
+	       To remove \c B_COMMAND_KEY specify \c B_NO_COMMAND_KEY.
 
 	\returns \c true if the window has the specified shortcut, \c false
 	         otherwise.
@@ -1390,6 +1394,7 @@
 	       - \c B_OPTION_KEY
 	       - \c B_CONTROL_KEY
 	       - \c B_MENU_KEY
+	       To remove \c B_COMMAND_KEY specify \c B_NO_COMMAND_KEY.
 
 	\since BeOS R3
 */

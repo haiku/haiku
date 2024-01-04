@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_ITEM_H
@@ -23,8 +23,7 @@ class BMenuItem : public BArchivable, public BInvoker {
 public:
 								BMenuItem(const char* label, BMessage* message,
 									char shortcut = 0, uint32 modifiers = 0);
-								BMenuItem(BMenu* menu,
-									BMessage* message = NULL);
+								BMenuItem(BMenu* menu, BMessage* message = NULL);
 								BMenuItem(BMessage* data);
 	virtual						~BMenuItem();
 
@@ -94,6 +93,7 @@ private:
 			void				_DrawShortcutSymbol(bool);
 			void				_DrawSubmenuSymbol();
 			void				_DrawControlChar(char shortcut, BPoint where);
+			void				_DrawFunctionChar(uint32 rawKey, BPoint where);
 
 private:
 			char*				fLabel;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_WINDOW_H
@@ -316,7 +316,7 @@ private:
 			BPoint				AlertPosition(const BRect& frame);
 	virtual BMessage*			ConvertToMessage(void* raw, int32 code);
 
-			void				AddShortcut(uint32 key, uint32 modifiers,
+			void				_AddShortcut(uint32 key, uint32 modifiers,
 									BMenuItem* item);
 			BHandler*			_DetermineTarget(BMessage* message,
 									BHandler* target);
