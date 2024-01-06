@@ -573,9 +573,8 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (buffer == NULL || length < sizeof(status_t))
 				return B_BAD_VALUE;
 
-			*(status_t *)buffer = B_OK;
-			return B_OK;
-			break;
+			status_t status = B_OK;
+			return user_memcpy(buffer, &status, sizeof(status_t));
 		}
 
 		case B_GET_DEVICE_SIZE:

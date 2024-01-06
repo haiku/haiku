@@ -937,10 +937,7 @@ nvme_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
 		{
-			*(status_t *)buffer = info->media_status;
-			info->media_status = B_OK;
-			return B_OK;
-			break;
+			return user_memcpy(buffer, &info->media_status, sizeof(status_t));
 		}
 
 		case B_GET_DEVICE_SIZE:
