@@ -49,9 +49,9 @@ PopulatePkgSizesProcess::Description() const
 status_t
 PopulatePkgSizesProcess::RunInternal()
 {
-	int countPkgs = 0;
-	int countPkgSized = 0;
-	int countPkgUnsized = 0;
+	int32 countPkgs = 0;
+	int32 countPkgSized = 0;
+	int32 countPkgUnsized = 0;
 
 	HDINFO("[%s] will populate size for pkgs without a size", Name());
 

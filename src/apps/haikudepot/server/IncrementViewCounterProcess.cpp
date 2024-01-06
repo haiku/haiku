@@ -77,7 +77,7 @@ IncrementViewCounterProcess::RunInternal()
 	}
 
 	int32 attempts = ATTEMPTS;
-	status_t result;
+	status_t result = B_OK;
 
 	while (attempts > 0 && !WasStopped()) {
 		BMessage resultEnvelope;

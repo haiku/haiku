@@ -68,13 +68,11 @@ public:
 	{
 	}
 
-	virtual	void DownloadProgress(BUrlRequest* caller, off_t bytesReceived,
-		ssize_t bytesTotal)
+	virtual	void DownloadProgress(BUrlRequest* caller, off_t bytesReceived, off_t bytesTotal)
 	{
 	}
 
-	virtual void UploadProgress(BUrlRequest* caller, off_t bytesSent,
-		ssize_t bytesTotal)
+	virtual void UploadProgress(BUrlRequest* caller, off_t bytesSent, off_t bytesTotal)
 	{
 	}
 

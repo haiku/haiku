@@ -91,3 +91,15 @@ Logger::IsTraceEnabled()
 {
 	return IsLevelEnabled(LOG_LEVEL_TRACE);
 }
+
+
+/*! Returns a small integer that indicates the current thread identifier. This
+	is to _approximately_ be able to distinguish between threads in log lines.
+*/
+
+/*static*/ uint32
+Logger::CurrentThreadIndicator()
+{
+	uint32 thread_id_abs = static_cast<uint32>(find_thread(NULL));
+	return thread_id_abs % 1000;
+}

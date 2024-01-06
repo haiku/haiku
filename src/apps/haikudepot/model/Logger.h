@@ -32,10 +32,10 @@
 // conditional clauses in the code to prevent this otherwise would be
 // cumbersome.
 
-#define HDLOGPREFIX(L) printf("@%08" B_PRId64 " {%c} <t:%" B_PRId32 "> ", \
+#define HDLOGPREFIX(L) printf("@%08" B_PRId64 " {%c} <t:%" B_PRIu32 "> ", \
 	((system_time() / 1000L) % MILLIS_IN_DAY), \
 	HDLOGLEVELCHAR(L), \
-	abs(find_thread(NULL) % 1000) \
+	Logger::CurrentThreadIndicator() \
 );
 
 #define HDLOG(L, M...) do { if (Logger::IsLevelEnabled(L)) { \
@@ -77,6 +77,8 @@ public:
 	static	bool				IsInfoEnabled();
 	static	bool				IsDebugEnabled();
 	static	bool				IsTraceEnabled();
+
+	static	uint32				CurrentThreadIndicator();
 
 private:
 	static	log_level			fLevel;

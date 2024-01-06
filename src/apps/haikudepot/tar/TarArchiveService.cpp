@@ -52,7 +52,7 @@ TarArchiveService::ForEachEntry(BPositionIO& tarIo, TarEntryListener* listener)
 	uint8 buffer[LENGTH_BLOCK];
 	uint8 zero_buffer[LENGTH_BLOCK];
 	status_t result = B_OK;
-	uint32_t countItemsRead = 0;
+	uint32 countItemsRead = 0;
 	off_t offset = 0;
 
 	memset(zero_buffer, 0, sizeof zero_buffer);
