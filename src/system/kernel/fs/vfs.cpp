@@ -6439,7 +6439,7 @@ common_unlock_node(int fd, bool kernel)
 static status_t
 common_preallocate(int fd, off_t offset, off_t length, bool kernel)
 {
-	struct file_descriptor* descriptor;
+	CObjectDeleter<struct file_descriptor, void, put_fd> descriptor;
 	struct vnode* vnode;
 
 	if (offset < 0 || length == 0)
@@ -6447,8 +6447,8 @@ common_preallocate(int fd, off_t offset, off_t length, bool kernel)
 	if (offset > OFF_MAX - length)
 		return B_FILE_TOO_LARGE;
 
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-	if (descriptor == NULL || (descriptor->open_mode & O_RWMASK) == O_RDONLY)
+	descriptor.SetTo(get_fd_and_vnode(fd, &vnode, kernel));
+	if (!descriptor.IsSet() || (descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
 
 	switch (vnode->Type() & S_IFMT) {
