@@ -18,7 +18,7 @@ Memory usage	ProcessController		Utilización de almacenamiento
 Ok!	ProcessController		Vale!
 Normal priority	ProcessController		Prioridad Normal
 Restart Deskbar	ProcessController		Reactivar Deskbar
-About ProcessController…	ProcessController		Sobre el Contralador de Procesos...
+About ProcessController…	ProcessController		Sobre el Controlador de Procesos…
 Usage: %s [-deskbar]\n	ProcessController		Utilización: %s [-deskbar]\n
 Please confirm	ProcessController		Por favor confirma
 (c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr

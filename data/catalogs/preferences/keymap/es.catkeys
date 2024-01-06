@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	1712484807
+1	spanish; castilian	x-vnd.Haiku-Keymap	4164438959
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonés
 US	KeymapNames		Estados Unidos
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
+Scroll Lock	Keyboard Layout View		Bloq Despl
 Brazilian	KeymapNames		Brasileño
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
@@ -11,6 +12,7 @@ Option:	Modifier keys window	Option key role name	Opción:
 Cancel	Modifier keys window		Cancelar
 Sample and clipboard:	Keymap window		Muestra y portapapeles:
 Polish	KeymapNames		Polaco
+Right Shift	Keyboard Layout View		Mayús derecho
 Latin-American	KeymapNames		Latinoamericano
 Ukrainian	KeymapNames		Ucraniano
 PAGE ↓	Keyboard Layout View		PÁGINA ↓
@@ -39,6 +41,7 @@ Croatian	KeymapNames		Croata
 PAGE ↑	Keyboard Layout View		PÁGINA ↑
 Set modifier keys	Modifier keys window		Elegir teclas modificadoras
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
+Right Command	Keyboard Layout View		Comando derecho
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -50,6 +53,7 @@ Ukrainian (Mac)	KeymapNames		Ucraniano (Mac)
 Command:	Modifier keys window	Command key role name	Comando:
 French (Bépo)	KeymapNames		Francés (Bépo)
 Russian (Typewriter)	KeymapNames		Ruso (Mecanográfico)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Bloq Mayús:
 Acute trigger	Keymap window		Desencadenador de acento agudo (´)
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
 Italian	KeymapNames		Italiano
@@ -67,14 +71,17 @@ Bulgarian (Phonetic)	KeymapNames		Búlgaro (Fonético)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Franco Canadiense
 Hungarian	KeymapNames		Húngaro
+Right Control	Keyboard Layout View		Control derecho
 Control	Keyboard Layout View	Control key	Control
 Irish	KeymapNames		Irlandés
 Remove	Keyboard Layout View		Eliminar
 Tilde trigger	Keymap window		Desencadenador de virgulilla (~)
+Caps Lock	Keyboard Layout View		Bloq Mayús
 Shift	Keyboard Layout View	Shift key	Mayúsculas
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedonio
 Czech (Mac)	KeymapNames		Checo (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tecla de Bloq Mayús
 Albanian	KeymapNames		Albano
 (Current)	Keymap window		(Actual)
 OPT	Keyboard Layout View	Very short for 'option'	OPT

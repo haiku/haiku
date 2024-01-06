@@ -1,5 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-WonderBrushTranslator	2764474812
+1	spanish; castilian	x-vnd.Haiku-WonderBrushTranslator	1289038178
+WonderBrush image translator	WonderBrushTranslator		Intérprete de imagen WonderBrush
 WBI Settings	WonderBrushMain		Configuración de WonderBrush
 Version %d.%d.%d, %s	WonderBrushView		Versión %d.%d.%d, %s
 written by:	WonderBrushView		escrito por:
+WonderBrush images	WonderBrushTranslator		Imágenes WonderBrush
 WonderBrush image translator	WonderBrushView		Intérprete de imagen WonderBrush
+WonderBrush image	WonderBrushTranslator		Imagen WonderBrush
+WBI Settings	WonderBrushTranslator		Configuración de WBI

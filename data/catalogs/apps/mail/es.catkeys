@@ -60,7 +60,7 @@ Signature	Mail		Firma
 Use default account	Mail		Usar la cuenta por omisión
 draft	B_USER_DIRECTORY/mail/draft		borrador
 Really delete this signature? This cannot be undone.	Mail		¿Borrar realmente esta firma? Esto no se puede deshacer.
-spam	B_USER_DIRECTORY/mail/spam		Correo Basura
+spam	B_USER_DIRECTORY/mail/spam		correo basura
 Reply to all	Mail		Responder a todos
 Cancel	Mail		Cancelar
 Off	Mail		Apagado
@@ -129,9 +129,9 @@ Hide	Mail		Ocultar
 From:	Mail		De:
 No file attributes, just plain data	Mail		Sin atributos de archivo, solo información plana
 Add	Mail		Añadir
-out	B_USER_DIRECTORY/mail/out		fuera
+out	B_USER_DIRECTORY/mail/out		saliente
 Send this message before closing?	Mail		¿Enviar este mensaje antes de cerrar?
-in	B_USER_DIRECTORY/mail/in		en
+in	B_USER_DIRECTORY/mail/in		entrante
 Open	Mail		Abrir
 Don't save	Mail		No guardar
 Leave same	Mail		Dejar el mismo

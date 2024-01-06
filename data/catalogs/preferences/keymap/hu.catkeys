@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Keymap	139266573
+1	hungarian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Billentyű
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ukrán (Mac)
 Command:	Modifier keys window	Command key role name	Parancsbillentyű
 French (Bépo)	KeymapNames		Francia (Bépo)
 Russian (Typewriter)	KeymapNames		Orosz (írógép)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Caps Lock:
 Acute trigger	Keymap window		Ékezet kapcsoló
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s (nemzetközi)
 Italian	KeymapNames		Olasz
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Váltógomb
 CONTROL	Keyboard Layout View		Control
 Macedonian	KeymapNames		Macedón
 Czech (Mac)	KeymapNames		Cseh (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps Lock billentyű
 Albanian	KeymapNames		Albán
 (Current)	Keymap window		(jelenlegi)
 OPT	Keyboard Layout View	Very short for 'option'	OPT

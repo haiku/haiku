@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-NewMailNotification	2220310168
+1	spanish; castilian	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Ventana de registro
 none	NotifierConfigView		ninguno
 Alert	NotifierConfigView		Alerta
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Alerta central
 Beep	NotifierConfigView		Pitido
 Central beep	NotifierConfigView		Pitido central
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+New mail notification	NotifierFilter		Notificación de nuevo correo electrónico
 New messages	NotifierFilter		Mensajes nuevos
 Method:	NotifierConfigView		Método:
 Keyboard LEDs	NotifierConfigView		Luces LED de teclado

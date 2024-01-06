@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Keymap	139266573
+1	ukrainian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Клавіша
 Japanese	KeymapNames		Японська
 US	KeymapNames		US
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Українська (Mac)
 Command:	Modifier keys window	Command key role name	Command:
 French (Bépo)	KeymapNames		Французька (Bépo)
 Russian (Typewriter)	KeymapNames		Російська (Typewriter)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Caps Lock:
 Acute trigger	Keymap window		Ак'юте
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s міжнародна
 Italian	KeymapNames		Італійська
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Македонська
 Czech (Mac)	KeymapNames		Чешська (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Клавіша Caps Lock
 Albanian	KeymapNames		Албанська
 (Current)	Keymap window		(Поточна)
 OPT	Keyboard Layout View	Very short for 'option'	OPT

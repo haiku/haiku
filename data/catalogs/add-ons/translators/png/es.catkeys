@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PNGTranslator	1934143664
+1	spanish; castilian	x-vnd.Haiku-PNGTranslator	993682334
 PNG Settings	PNGTranslator		Configuración de PNG
 None	PNGTranslator		Nada
 PNG image	PNGTranslator		imagen PNG
@@ -7,3 +7,4 @@ Interlacing type:	PNGTranslator		Tipo de entrelazado:
 PNGTranslator Settings	PNGTranslator		Preferencias de PNGTranslator
 Version %d.%d.%d, %s	PNGTranslator		Versión %d.%d.%d, %s
 PNG image translator	PNGTranslator		Traductor de imágenes PNG
+Interlace Option	PNGTranslator		Opción de entrelazado

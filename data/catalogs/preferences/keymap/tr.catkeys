@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Keymap	139266573
+1	turkish	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Düğme
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ukraynaca (Mac)
 Command:	Modifier keys window	Command key role name	Komut:
 French (Bépo)	KeymapNames		Fransızca (Bépo)
 Russian (Typewriter)	KeymapNames		Rusça (Daktilo)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Büyük Harf:
 Acute trigger	Keymap window		Aksan tetikleyicisi
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Uluslararası
 Italian	KeymapNames		İtalyanca
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Üst Karakter
 CONTROL	Keyboard Layout View		KONTROL
 Macedonian	KeymapNames		Makedonca
 Czech (Mac)	KeymapNames		Çekçe (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Büyük Harf düğmesi
 Albanian	KeymapNames		Arnavutça
 (Current)	Keymap window		(Geçerli)
 OPT	Keyboard Layout View	Very short for 'option'	SEÇENEK

@@ -36,7 +36,7 @@ Show tool bar	Menus		Mostrar barra de herramientas
 First page	Menus		Primera página
 OK	SaveToFile		Aceptar
 Print…	Menus		Imprimir...
-The file '%s' could not be written.	SaveToFile		No se puede escribir el archivo archivo '%s'.
+The file '%s' could not be written.	SaveToFile		No se pudo escribir el archivo '%s'.
 Quit	Menus		Salir
 Rating	Menus		Calificar
 Close document	ClosePrompt		Cerrar documento

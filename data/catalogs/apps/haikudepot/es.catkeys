@@ -1,7 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	320327328
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2337058102
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema con la descarga de las condiciones de uso
 Available packages	MainWindow		Paquetes disponibles
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
+An unexpected error has been sent from the server [%li]	ServerHelper		Un error inesperado se ha recibido desde el servidor [%li]
 Create account	UserLoginWindow		Crear cuenta
 Agree	ToLatestUserUsageConditionsWindow		Aceptar
 Install %PackageTitle%	PackageManager		Instalar %PackageTitle%
@@ -19,6 +20,7 @@ Switch account…	MainWindow		Cambiar de cuenta…
 Preferred language:	UserLoginWindow		Idioma preferido:
 Name	PackageListView		Nombre
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problema de Autorización o seguridad. Cierre la sesión y vuelva a iniciarla para verificar que su contraseña sea correcta y también que haya aceptado las últimas condiciones de uso.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot se comunica con un componente del servidor llamado HaikuDepotServer. Estas son las condiciones de uso que el usuario '%Nickname%' aceptó en %AgreedToTimestamp% en relación al uso del servicio de HaikuDepotServer.
 don't activate package %source%	PackageProblem	don't change '%source%	no activar el paquete %source%
 Rate %Package%	RatePackageWindow		Puntuar %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Ocurrió un error al iniciar el administrador de paquetes: %message%
@@ -30,6 +32,7 @@ A requested object or an object involved in the request was not found on the ser
 Logout	ToLatestUserUsageConditionsWindow		Desconectarse
 The following additional package changes have to be made:	PackageResult		Deben hacerse los siguientes cambios adicionales sobre el paquete:
 No changelog available.	PackageInfoView		No hay registro de cambios disponible.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Las condiciones de uso actuales han sido aceptadas.
 Cancel	PackageProblem		Cancelar
 Version	PackageListView		Versión
 No, quit HaikuDepot	App		No, salir de HaikuDepot
@@ -116,6 +119,7 @@ Uninstalled	PackageListView		Desinstalado
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Acepto las condiciones de uso
 Installing \"%PackageName%\"	InstallPackageProcess		Instalando \"%PackageName%\"
 OK	App		Aceptar
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot se comunica con un componente del servidor llamado HaikuDepotServer. Estas son las últimas condiciones de uso para el servicio HaikuDepotServer.
 Fatal error	UninstallPackageAction		Error fatal
 Develop packages	MainWindow		Paquetes para desarrollo
 Starting the package daemon failed:\n\n%Error%	App		Fallo al iniciar el demonio de paquete:\n\n%Error%
@@ -138,6 +142,7 @@ User rating	RatePackageWindow		Puntuación del usuario
 Installed packages	MainWindow		Paquetes instalados
 Date	PackageListView		Fecha
 Error	App		Error
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Ha ocurrido un error al descargar las condiciones de uso. Compruebe el registro para más detalles e intente de nuevo. \nLa información sobre cómo ver los registros está disponible en la sección HaikuDepot de la Guía de usuario de Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Hubo una respuesta misteriosa desde el servicio Web.
 Opening \"%DeskbarLink%\"	OpenPackageProcess		Abriendo \"%DeskbarLink%\"
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Su evaluación fue subida con éxito. Puede actualizarla o eliminarla en el sitio web de HaikuDepot Server.
@@ -161,6 +166,7 @@ Inactive	PackageListView		Inactivo
 Nickname:	UserLoginWindow		Usuario:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizando meta datos de los repositorios
 OK	MainWindow		Aceptar
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Se requiere que los usuarios tengan al menos {0, plural, one{# año de edad} other{# años de edad}}.
 Version %Code%	UserUsageConditions		Versión %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Desinstalando \"%PackageName%\"

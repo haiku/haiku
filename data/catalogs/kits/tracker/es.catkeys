@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1440907020
+1	spanish; castilian	x-vnd.Haiku-libtracker	1880123832
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -336,6 +336,7 @@ yes	AttributesView		sí
 Make active printer	ContainerWindow		Convertir en la impresora activa
 Copy to	ContainerWindow		Copiar a 
 Name	SelectionWindow		Nombre
+Location	Default Query Columns		Ubicación
 by attribute	FindPanel		Por atributo
 Write	FilePermissionsView		Escribir
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si modifica la carpeta de sistema o sus contenidos, es posible que no pueda iniciar %osName!\n\n¿Está seguro de que desea hacer esto?\n\nPara modificar la carpeta de sistema o sus contenidos, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Sé lo que estoy haciendo\".

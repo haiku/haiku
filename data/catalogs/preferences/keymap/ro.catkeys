@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Keymap	139266573
+1	romanian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tastă
 Japanese	KeymapNames		Japoneză
 US	KeymapNames		US
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ucraineană (Mac)
 Command:	Modifier keys window	Command key role name	Comandă:
 French (Bépo)	KeymapNames		Franceză (Bépo)
 Russian (Typewriter)	KeymapNames		Rusă (mașină de scris)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Caps Lock:
 Acute trigger	Keymap window		Declanșator acut
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s internațional
 Italian	KeymapNames		Italiană
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedoneană
 Czech (Mac)	KeymapNames		Cehă (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tasta Caps Lock
 Albanian	KeymapNames		Albaneză
 (Current)	Keymap window		(Curentă)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
