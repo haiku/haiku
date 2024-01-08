@@ -4080,18 +4080,15 @@ read_file_io_vec_pages(int fd, const file_io_vec* fileVecs, size_t fileVecCount,
 	const iovec* vecs, size_t vecCount, uint32* _vecIndex, size_t* _vecOffset,
 	size_t* _bytes)
 {
-	struct file_descriptor* descriptor;
 	struct vnode* vnode;
-
-	descriptor = get_fd_and_vnode(fd, &vnode, true);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, true));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
 	status_t status = common_file_io_vec_pages(vnode, descriptor->cookie,
 		fileVecs, fileVecCount, vecs, vecCount, _vecIndex, _vecOffset, _bytes,
 		false);
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -4101,18 +4098,15 @@ write_file_io_vec_pages(int fd, const file_io_vec* fileVecs, size_t fileVecCount
 	const iovec* vecs, size_t vecCount, uint32* _vecIndex, size_t* _vecOffset,
 	size_t* _bytes)
 {
-	struct file_descriptor* descriptor;
 	struct vnode* vnode;
-
-	descriptor = get_fd_and_vnode(fd, &vnode, true);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, true));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
 	status_t status = common_file_io_vec_pages(vnode, descriptor->cookie,
 		fileVecs, fileVecCount, vecs, vecCount, _vecIndex, _vecOffset, _bytes,
 		true);
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -4370,17 +4364,15 @@ vfs_read_stat(int fd, const char* path, bool traverseLeafLink,
 			traverseLeafLink, stat, kernel);
 	} else {
 		// no path given: get the FD and use the FD operation
-		struct file_descriptor* descriptor
-			= get_fd(get_current_io_context(kernel), fd);
-		if (descriptor == NULL)
+		FileDescriptorPutter descriptor
+			(get_fd(get_current_io_context(kernel), fd));
+		if (!descriptor.IsSet())
 			return B_FILE_ERROR;
 
 		if (descriptor->ops->fd_read_stat)
-			status = descriptor->ops->fd_read_stat(descriptor, stat);
+			status = descriptor->ops->fd_read_stat(descriptor.Get(), stat);
 		else
 			status = B_UNSUPPORTED;
-
-		put_fd(descriptor);
 	}
 
 	return status;
@@ -6192,11 +6184,11 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 
 	struct io_context* context = get_current_io_context(kernel);
 
-	struct file_descriptor* descriptor = get_fd(context, fd);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd(context, fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
-	struct vnode* vnode = fd_vnode(descriptor);
+	struct vnode* vnode = fd_vnode(descriptor.Get());
 
 	status_t status = B_OK;
 
@@ -6208,10 +6200,8 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		else if (user_memcpy(&flock, (struct flock*)argument,
 				sizeof(struct flock)) != B_OK)
 			status = B_BAD_ADDRESS;
-		if (status != B_OK) {
-			put_fd(descriptor);
+		if (status != B_OK)
 			return status;
-		}
 	}
 
 	switch (op) {
@@ -6243,7 +6233,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 			// we only accept changes to O_APPEND and O_NONBLOCK
 			argument &= O_APPEND | O_NONBLOCK;
 			if (descriptor->ops->fd_set_flags != NULL) {
-				status = descriptor->ops->fd_set_flags(descriptor, argument);
+				status = descriptor->ops->fd_set_flags(descriptor.Get(), argument);
 			} else if (vnode != NULL && HAS_FS_CALL(vnode, set_flags)) {
 				status = FS_CALL(vnode, set_flags, descriptor->cookie,
 					(int)argument);
@@ -6266,7 +6256,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		case F_DUPFD:
 		case F_DUPFD_CLOEXEC:
 		{
-			status = new_fd_etc(context, descriptor, (int)argument);
+			status = new_fd_etc(context, descriptor.Get(), (int)argument);
 			if (status >= 0) {
 				mutex_lock(&context->io_mutex);
 				fd_set_close_on_exec(context, status, op == F_DUPFD_CLOEXEC);
@@ -6282,7 +6272,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 				struct flock normalizedLock;
 
 				memcpy(&normalizedLock, &flock, sizeof(struct flock));
-				status = normalize_flock(descriptor, &normalizedLock);
+				status = normalize_flock(descriptor.Get(), &normalizedLock);
 				if (status != B_OK)
 					break;
 
@@ -6324,7 +6314,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 
 		case F_SETLK:
 		case F_SETLKW:
-			status = normalize_flock(descriptor, &flock);
+			status = normalize_flock(descriptor.Get(), &flock);
 			if (status != B_OK)
 				break;
 
@@ -6363,7 +6353,6 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 			status = B_BAD_VALUE;
 	}
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -6371,22 +6360,19 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 static status_t
 common_sync(int fd, bool kernel)
 {
-	struct file_descriptor* descriptor;
-	struct vnode* vnode;
-	status_t status;
-
 	FUNCTION(("common_fsync: entry. fd %d kernel %d\n", fd, kernel));
 
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-	if (descriptor == NULL)
+	struct vnode* vnode;
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, kernel));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
+	status_t status;
 	if (HAS_FS_CALL(vnode, fsync))
 		status = FS_CALL_NO_PARAMS(vnode, fsync);
 	else
 		status = B_UNSUPPORTED;
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -6394,34 +6380,9 @@ common_sync(int fd, bool kernel)
 static status_t
 common_lock_node(int fd, bool kernel)
 {
-	struct file_descriptor* descriptor;
 	struct vnode* vnode;
-
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	status_t status = B_OK;
-
-	// We need to set the locking atomically - someone
-	// else might set one at the same time
-	if (atomic_pointer_test_and_set(&vnode->mandatory_locked_by, descriptor,
-			(file_descriptor*)NULL) != NULL)
-		status = B_BUSY;
-
-	put_fd(descriptor);
-	return status;
-}
-
-
-static status_t
-common_unlock_node(int fd, bool kernel)
-{
-	struct file_descriptor* descriptor;
-	struct vnode* vnode;
-
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, kernel));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
 	status_t status = B_OK;
@@ -6429,10 +6390,29 @@ common_unlock_node(int fd, bool kernel)
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
 	if (atomic_pointer_test_and_set(&vnode->mandatory_locked_by,
-			(file_descriptor*)NULL, descriptor) != descriptor)
+			descriptor.Get(), (file_descriptor*)NULL) != NULL)
+		status = B_BUSY;
+
+	return status;
+}
+
+
+static status_t
+common_unlock_node(int fd, bool kernel)
+{
+	struct vnode* vnode;
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, kernel));
+	if (!descriptor.IsSet())
+		return B_FILE_ERROR;
+
+	status_t status = B_OK;
+
+	// We need to set the locking atomically - someone
+	// else might set one at the same time
+	if (atomic_pointer_test_and_set(&vnode->mandatory_locked_by,
+			(file_descriptor*)NULL, descriptor.Get()) != descriptor.Get())
 		status = B_BAD_VALUE;
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -6440,15 +6420,13 @@ common_unlock_node(int fd, bool kernel)
 static status_t
 common_preallocate(int fd, off_t offset, off_t length, bool kernel)
 {
-	FileDescriptorPutter descriptor;
-	struct vnode* vnode;
-
 	if (offset < 0 || length == 0)
 		return B_BAD_VALUE;
 	if (offset > OFF_MAX - length)
 		return B_FILE_TOO_LARGE;
 
-	descriptor.SetTo(get_fd_and_vnode(fd, &vnode, kernel));
+	struct vnode* vnode;
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, kernel));
 	if (!descriptor.IsSet() || (descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
 
@@ -7048,26 +7026,22 @@ attr_write_stat(struct file_descriptor* descriptor, const struct stat* stat,
 static status_t
 attr_remove(int fd, const char* name, bool kernel)
 {
-	struct file_descriptor* descriptor;
-	struct vnode* vnode;
-	status_t status;
-
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
 	FUNCTION(("attr_remove: fd = %d, name = \"%s\", kernel %d\n", fd, name,
 		kernel));
 
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-	if (descriptor == NULL)
+	struct vnode* vnode;
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, kernel));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
+	status_t status;
 	if (HAS_FS_CALL(vnode, remove_attr))
 		status = FS_CALL(vnode, remove_attr, name);
 	else
 		status = B_READ_ONLY_DEVICE;
-
-	put_fd(descriptor);
 
 	return status;
 }
@@ -7077,12 +7051,6 @@ static status_t
 attr_rename(int fromFD, const char* fromName, int toFD, const char* toName,
 	bool kernel)
 {
-	struct file_descriptor* fromDescriptor;
-	struct file_descriptor* toDescriptor;
-	struct vnode* fromVnode;
-	struct vnode* toVnode;
-	status_t status;
-
 	if (fromName == NULL || *fromName == '\0' || toName == NULL
 		|| *toName == '\0')
 		return B_BAD_VALUE;
@@ -7090,31 +7058,25 @@ attr_rename(int fromFD, const char* fromName, int toFD, const char* toName,
 	FUNCTION(("attr_rename: from fd = %d, from name = \"%s\", to fd = %d, to "
 		"name = \"%s\", kernel %d\n", fromFD, fromName, toFD, toName, kernel));
 
-	fromDescriptor = get_fd_and_vnode(fromFD, &fromVnode, kernel);
-	if (fromDescriptor == NULL)
+	struct vnode* fromVnode;
+	FileDescriptorPutter fromDescriptor(get_fd_and_vnode(fromFD, &fromVnode, kernel));
+	if (!fromDescriptor.IsSet())
 		return B_FILE_ERROR;
 
-	toDescriptor = get_fd_and_vnode(toFD, &toVnode, kernel);
-	if (toDescriptor == NULL) {
-		status = B_FILE_ERROR;
-		goto err;
-	}
+	struct vnode* toVnode;
+	FileDescriptorPutter toDescriptor(get_fd_and_vnode(toFD, &toVnode, kernel));
+	if (!toDescriptor.IsSet())
+		return B_FILE_ERROR;
 
 	// are the files on the same volume?
-	if (fromVnode->device != toVnode->device) {
-		status = B_CROSS_DEVICE_LINK;
-		goto err1;
-	}
+	if (fromVnode->device != toVnode->device)
+		return B_CROSS_DEVICE_LINK;
 
+	status_t status;
 	if (HAS_FS_CALL(fromVnode, rename_attr)) {
 		status = FS_CALL(fromVnode, rename_attr, fromName, toVnode, toName);
 	} else
 		status = B_READ_ONLY_DEVICE;
-
-err1:
-	put_fd(toDescriptor);
-err:
-	put_fd(fromDescriptor);
 
 	return status;
 }
@@ -8760,17 +8722,15 @@ _kern_write_stat(int fd, const char* path, bool traverseLeafLink,
 			traverseLeafLink, stat, statMask, true);
 	} else {
 		// no path given: get the FD and use the FD operation
-		struct file_descriptor* descriptor
-			= get_fd(get_current_io_context(true), fd);
-		if (descriptor == NULL)
+		FileDescriptorPutter descriptor
+			(get_fd(get_current_io_context(true), fd));
+		if (!descriptor.IsSet())
 			return B_FILE_ERROR;
 
 		if (descriptor->ops->fd_write_stat)
-			status = descriptor->ops->fd_write_stat(descriptor, stat, statMask);
+			status = descriptor->ops->fd_write_stat(descriptor.Get(), stat, statMask);
 		else
 			status = B_UNSUPPORTED;
-
-		put_fd(descriptor);
 	}
 
 	return status;
@@ -9314,16 +9274,13 @@ _user_flock(int fd, int operation)
 			return B_BAD_VALUE;
 	}
 
-	struct file_descriptor* descriptor;
 	struct vnode* vnode;
-	descriptor = get_fd_and_vnode(fd, &vnode, false);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, false));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
-	if (descriptor->type != FDTYPE_FILE) {
-		put_fd(descriptor);
+	if (descriptor->type != FDTYPE_FILE)
 		return B_BAD_VALUE;
-	}
 
 	struct flock flock;
 	flock.l_start = 0;
@@ -9336,20 +9293,19 @@ _user_flock(int fd, int operation)
 		if (HAS_FS_CALL(vnode, release_lock))
 			status = FS_CALL(vnode, release_lock, descriptor->cookie, &flock);
 		else
-			status = release_advisory_lock(vnode, NULL, descriptor, &flock);
+			status = release_advisory_lock(vnode, NULL, descriptor.Get(), &flock);
 	} else {
 		if (HAS_FS_CALL(vnode, acquire_lock)) {
 			status = FS_CALL(vnode, acquire_lock, descriptor->cookie, &flock,
 				(operation & LOCK_NB) == 0);
 		} else {
-			status = acquire_advisory_lock(vnode, NULL, descriptor, &flock,
+			status = acquire_advisory_lock(vnode, NULL, descriptor.Get(), &flock,
 				(operation & LOCK_NB) == 0);
 		}
 	}
 
 	syscall_restart_handle_post(status);
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -9726,17 +9682,15 @@ _user_read_stat(int fd, const char* userPath, bool traverseLink,
 		status = common_path_read_stat(fd, path, traverseLink, &stat, false);
 	} else {
 		// no path given: get the FD and use the FD operation
-		struct file_descriptor* descriptor
-			= get_fd(get_current_io_context(false), fd);
-		if (descriptor == NULL)
+		FileDescriptorPutter descriptor
+			(get_fd(get_current_io_context(false), fd));
+		if (!descriptor.IsSet())
 			return B_FILE_ERROR;
 
 		if (descriptor->ops->fd_read_stat)
-			status = descriptor->ops->fd_read_stat(descriptor, &stat);
+			status = descriptor->ops->fd_read_stat(descriptor.Get(), &stat);
 		else
 			status = B_UNSUPPORTED;
-
-		put_fd(descriptor);
 	}
 
 	if (status != B_OK)
@@ -9784,18 +9738,16 @@ _user_write_stat(int fd, const char* userPath, bool traverseLeafLink,
 			statMask, false);
 	} else {
 		// no path given: get the FD and use the FD operation
-		struct file_descriptor* descriptor
-			= get_fd(get_current_io_context(false), fd);
-		if (descriptor == NULL)
+		FileDescriptorPutter descriptor
+			(get_fd(get_current_io_context(false), fd));
+		if (!descriptor.IsSet())
 			return B_FILE_ERROR;
 
 		if (descriptor->ops->fd_write_stat) {
-			status = descriptor->ops->fd_write_stat(descriptor, &stat,
+			status = descriptor->ops->fd_write_stat(descriptor.Get(), &stat,
 				statMask);
 		} else
 			status = B_UNSUPPORTED;
-
-		put_fd(descriptor);
 	}
 
 	return status;

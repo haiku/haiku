@@ -468,22 +468,19 @@ dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 static status_t
 fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 {
-	struct file_descriptor* descriptor;
-	int status;
-
-	descriptor = get_fd(get_current_io_context(kernelFD), fd);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd(get_current_io_context(kernelFD), fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
+	status_t status;
 	if (descriptor->ops->fd_ioctl)
-		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
+		status = descriptor->ops->fd_ioctl(descriptor.Get(), op, buffer, length);
 	else
 		status = B_DEV_INVALID_IOCTL;
 
 	if (status == B_DEV_INVALID_IOCTL)
 		status = ENOTTY;
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -856,20 +853,17 @@ _user_seek(int fd, off_t pos, int seekType)
 {
 	syscall_64_bit_return_value();
 
-	struct file_descriptor* descriptor;
-
-	descriptor = get_fd(get_current_io_context(false), fd);
-	if (!descriptor)
+	FileDescriptorPutter descriptor(get_fd(get_current_io_context(false), fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
 	TRACE(("user_seek(descriptor = %p)\n", descriptor));
 
 	if (descriptor->ops->fd_seek)
-		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
+		pos = descriptor->ops->fd_seek(descriptor.Get(), pos, seekType);
 	else
 		pos = ESPIPE;
 
-	put_fd(descriptor);
 	return pos;
 }
 
@@ -952,21 +946,18 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 status_t
 _user_rewind_dir(int fd)
 {
-	struct file_descriptor* descriptor;
-	status_t status;
-
 	TRACE(("user_rewind_dir(fd = %d)\n", fd));
 
-	descriptor = get_fd(get_current_io_context(false), fd);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd(get_current_io_context(false), fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
+	status_t status;
 	if (descriptor->ops->fd_rewind_dir)
-		status = descriptor->ops->fd_rewind_dir(descriptor);
+		status = descriptor->ops->fd_rewind_dir(descriptor.Get());
 	else
 		status = B_UNSUPPORTED;
 
-	put_fd(descriptor);
 	return status;
 }
 
@@ -1182,18 +1173,15 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 off_t
 _kern_seek(int fd, off_t pos, int seekType)
 {
-	struct file_descriptor* descriptor;
-
-	descriptor = get_fd(get_current_io_context(true), fd);
-	if (!descriptor)
+	FileDescriptorPutter descriptor(get_fd(get_current_io_context(true), fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_seek)
-		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
+		pos = descriptor->ops->fd_seek(descriptor.Get(), pos, seekType);
 	else
 		pos = ESPIPE;
 
-	put_fd(descriptor);
 	return pos;
 }
 
@@ -1213,27 +1201,24 @@ ssize_t
 _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 	uint32 maxCount)
 {
-	struct file_descriptor* descriptor;
-	ssize_t retval;
-
 	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = "
 		"%" B_PRIu32 ")\n",fd, buffer, bufferSize, maxCount));
 
 	struct io_context* ioContext = get_current_io_context(true);
-	descriptor = get_fd(ioContext, fd);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd(ioContext, fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
+	ssize_t retval;
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
-		retval = descriptor->ops->fd_read_dir(ioContext, descriptor, buffer,
+		retval = descriptor->ops->fd_read_dir(ioContext, descriptor.Get(), buffer,
 			bufferSize, &count);
 		if (retval >= 0)
 			retval = count;
 	} else
 		retval = B_UNSUPPORTED;
 
-	put_fd(descriptor);
 	return retval;
 }
 
@@ -1241,21 +1226,18 @@ _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 status_t
 _kern_rewind_dir(int fd)
 {
-	struct file_descriptor* descriptor;
-	status_t status;
-
 	TRACE(("sys_rewind_dir(fd = %d)\n",fd));
 
-	descriptor = get_fd(get_current_io_context(true), fd);
-	if (descriptor == NULL)
+	FileDescriptorPutter descriptor(get_fd(get_current_io_context(true), fd));
+	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
+	status_t status;
 	if (descriptor->ops->fd_rewind_dir)
-		status = descriptor->ops->fd_rewind_dir(descriptor);
+		status = descriptor->ops->fd_rewind_dir(descriptor.Get());
 	else
 		status = B_UNSUPPORTED;
 
-	put_fd(descriptor);
 	return status;
 }
 
