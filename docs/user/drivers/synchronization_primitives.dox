@@ -7,7 +7,7 @@
  */
 
  /*!
-	\page synchrnization_primitives Synchronization primitives
+	\page synchronization_primitives Synchronization primitives
 
 	In userspace code, there are many way to synchronize threads with each other. Pthreads provide
 	mutexes and condition variables. The Be API provides BLocker. There are also atomic functions
