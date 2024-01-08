@@ -32,6 +32,7 @@
 #include <StorageDefs.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 #include <block_cache.h>
 #include <boot/kernel_args.h>
 #include <debug_heap.h>
@@ -6439,7 +6440,7 @@ common_unlock_node(int fd, bool kernel)
 static status_t
 common_preallocate(int fd, off_t offset, off_t length, bool kernel)
 {
-	CObjectDeleter<struct file_descriptor, void, put_fd> descriptor;
+	FileDescriptorPutter descriptor;
 	struct vnode* vnode;
 
 	if (offset < 0 || length == 0)
