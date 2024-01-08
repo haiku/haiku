@@ -466,6 +466,8 @@ PowerStatusView::Update(bool force, bool notify)
 					state = B_TRANSLATE("charging");
 				else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
 					state = B_TRANSLATE("discharging");
+				else if ((fBatteryInfo.state & BATTERY_NOT_CHARGING) != 0)
+					state = B_TRANSLATE("not charging");
 
 				if (state != NULL) {
 					snprintf(text + length, sizeof(text) - length, "\n%s",

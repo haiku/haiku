@@ -106,6 +106,8 @@ ReadBatteryStatus(battery_driver_cookie* cookie,
 	if (batteryStatus->state == UINT32_MAX)
 		batteryStatus->state = BATTERY_CRITICAL_STATE;
 	batteryStatus->current_rate = GetUint32(pointer++);
+	if (batteryStatus->state == BATTERY_DISCHARGING && batteryStatus->current_rate == 0)
+		batteryStatus->state = BATTERY_NOT_CHARGING;
 	batteryStatus->capacity = GetUint32(pointer++);
 	batteryStatus->voltage = GetUint32(pointer++);
 

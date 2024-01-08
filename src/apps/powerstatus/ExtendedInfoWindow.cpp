@@ -102,6 +102,8 @@ BatteryInfoView::_GetTextForLine(size_t line)
 				string = B_TRANSLATE("Battery charging");
 			else if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0)
 				string = B_TRANSLATE("Battery discharging");
+			else if ((fBatteryInfo.state & BATTERY_NOT_CHARGING) != 0)
+				string = B_TRANSLATE("Battery not charging");
 			else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0
 				&& fBatteryExtendedInfo.model_number[0] == '\0'
 				&& fBatteryExtendedInfo.serial_number[0] == '\0'
