@@ -547,41 +547,6 @@ static struct fd_ops sQueryOps = {
 
 namespace {
 
-class VNodePutter {
-public:
-	VNodePutter(struct vnode* vnode = NULL) : fVNode(vnode) {}
-
-	~VNodePutter()
-	{
-		Put();
-	}
-
-	void SetTo(struct vnode* vnode)
-	{
-		Put();
-		fVNode = vnode;
-	}
-
-	void Put()
-	{
-		if (fVNode) {
-			put_vnode(fVNode);
-			fVNode = NULL;
-		}
-	}
-
-	struct vnode* Detach()
-	{
-		struct vnode* vnode = fVNode;
-		fVNode = NULL;
-		return vnode;
-	}
-
-private:
-	struct vnode* fVNode;
-};
-
-
 class FDCloser {
 public:
 	FDCloser() : fFD(-1), fKernel(true) {}
@@ -2509,7 +2474,7 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 
 	// See if the vnode is covering another vnode and move to the covered
 	// vnode so we get the underlying file system
-	VNodePutter vnodePutter;
+	VnodePutter vnodePutter;
 	if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
 		vnode = coveredVnode;
 		vnodePutter.SetTo(vnode);
@@ -2896,7 +2861,7 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 static status_t
 normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 {
-	VNodePutter dirPutter;
+	VnodePutter dirPutter;
 	struct vnode* dir = NULL;
 	status_t error;
 
@@ -2915,7 +2880,7 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 		// get file vnode, if we shall resolve links
 		bool fileExists = false;
 		struct vnode* fileVnode;
-		VNodePutter fileVnodePutter;
+		VnodePutter fileVnodePutter;
 		if (traverseLink) {
 			inc_vnode_ref_count(dir);
 			if (vnode_path_to_vnode(dir, path, false, 0, kernel, &fileVnode,
@@ -4575,7 +4540,7 @@ vfs_create_special_node(const char* path, fs_vnode* subVnode, mode_t mode,
 		inc_vnode_ref_count(dirNode);
 	}
 
-	VNodePutter _(dirNode);
+	VnodePutter _(dirNode);
 
 	// check support for creating special nodes
 	if (!HAS_FS_CALL(dirNode, create_special_node))
@@ -5211,14 +5176,14 @@ vfs_bind_mount_directory(dev_t mountID, ino_t nodeID, dev_t coveredMountID,
 	status_t error = get_vnode(mountID, nodeID, &vnode, true, false);
 	if (error != B_OK)
 		return B_BAD_VALUE;
-	VNodePutter vnodePutter(vnode);
+	VnodePutter vnodePutter(vnode);
 
 	Vnode* coveredVnode;
 	error = get_vnode(coveredMountID, coveredNodeID, &coveredVnode, true,
 		false);
 	if (error != B_OK)
 		return B_BAD_VALUE;
-	VNodePutter coveredVnodePutter(coveredVnode);
+	VnodePutter coveredVnodePutter(coveredVnode);
 
 	// establish the covered/covering links
 	WriteLocker locker(sVnodeLock);
@@ -5435,7 +5400,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 		// look the node up
 		status = lookup_dir_entry(directory, name, &vnode);
 		if (status == B_OK) {
-			VNodePutter putter(vnode);
+			VnodePutter putter(vnode);
 
 			if ((openMode & O_EXCL) != 0)
 				return B_FILE_EXISTS;
@@ -5443,7 +5408,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 			// If the node is a symlink, we have to follow it, unless
 			// O_NOTRAVERSE is set.
 			if (S_ISLNK(vnode->Type()) && traverse) {
-				putter.Put();
+				putter.Unset();
 				char clonedName[B_FILE_NAME_LENGTH + 1];
 				if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH)
 						>= B_FILE_NAME_LENGTH) {
@@ -9215,8 +9180,8 @@ _user_open_parent_dir(int fd, char* userName, size_t nameLength)
 		// get the vnodes
 		struct vnode* parentVNode = get_vnode_from_fd(parentFD, kernel);
 		struct vnode* dirVNode = get_vnode_from_fd(fd, kernel);
-		VNodePutter parentVNodePutter(parentVNode);
-		VNodePutter dirVNodePutter(dirVNode);
+		VnodePutter parentVNodePutter(parentVNode);
+		VnodePutter dirVNodePutter(dirVNode);
 		if (!parentVNode || !dirVNode)
 			return B_FILE_ERROR;
 
@@ -9558,7 +9523,7 @@ _user_create_fifo(int fd, const char* userPath, mode_t perms)
 	if (status != B_OK)
 		return status;
 
-	VNodePutter _(dir);
+	VnodePutter _(dir);
 
 	// the underlying FS needs to support creating FIFOs
 	if (!HAS_FS_CALL(dir, create_special_node))
