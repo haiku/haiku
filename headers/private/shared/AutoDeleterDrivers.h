@@ -26,7 +26,7 @@ typedef CObjectDeleter<void, status_t, unload_driver_settings>
 #if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
 
 typedef CObjectDeleter<struct vnode, void, vfs_put_vnode> VnodePutter;
-typedef CObjectDeleter<file_descriptor, void, put_fd> DescriptorPutter;
+typedef CObjectDeleter<file_descriptor, void, put_fd> FileDescriptorPutter;
 typedef MethodDeleter<VMAddressSpace, void, &VMAddressSpace::Put>
 	VMAddressSpacePutter;
 
@@ -62,7 +62,7 @@ using ::BPrivate::DriverSettingsUnloader;
 #if defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
 
 using ::BPrivate::VnodePutter;
-using ::BPrivate::DescriptorPutter;
+using ::BPrivate::FileDescriptorPutter;
 using ::BPrivate::VMAddressSpacePutter;
 using ::BPrivate::DeviceNodePutter;
 

@@ -658,7 +658,7 @@ _user_event_queue_select(int queue, event_wait_info* userInfos, int numInfos)
 
 	file_descriptor* descriptor;
 	GET_QUEUE_FD_OR_RETURN(queue, false, descriptor);
-	DescriptorPutter _(descriptor);
+	FileDescriptorPutter _(descriptor);
 
 	EventQueue* eventQueue = (EventQueue*)descriptor->u.queue;
 
@@ -711,7 +711,7 @@ _user_event_queue_wait(int queue, event_wait_info* userInfos, int numInfos,
 
 	file_descriptor* descriptor;
 	GET_QUEUE_FD_OR_RETURN(queue, false, descriptor);
-	DescriptorPutter _(descriptor);
+	FileDescriptorPutter _(descriptor);
 
 	EventQueue* eventQueue = (EventQueue*)descriptor->u.queue;
 
