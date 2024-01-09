@@ -416,11 +416,11 @@ static status_t common_path_read_stat(int fd, char* path, bool traverseLeafLink,
 
 static status_t vnode_path_to_vnode(struct vnode* vnode, char* path,
 	bool traverseLeafLink, int count, bool kernel,
-	struct vnode** _vnode, ino_t* _parentID);
+	VnodePutter& _vnode, ino_t* _parentID);
 static status_t dir_vnode_to_path(struct vnode* vnode, char* buffer,
 	size_t bufferSize, bool kernel);
 static status_t fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
-	struct vnode** _vnode, ino_t* _parentID, bool kernel);
+	VnodePutter& _vnode, ino_t* _parentID, bool kernel);
 static void inc_vnode_ref_count(struct vnode* vnode);
 static status_t dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree,
 	bool reenter);
@@ -2049,7 +2049,7 @@ get_dir_path_and_leaf(char* path, char* filename)
 
 static status_t
 entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char* name,
-	bool traverse, bool kernel, struct vnode** _vnode)
+	bool traverse, bool kernel, VnodePutter& _vnode)
 {
 	char clonedName[B_FILE_NAME_LENGTH + 1];
 	if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
@@ -2116,13 +2116,11 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 */
 static status_t
 vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
-	int count, struct io_context* ioContext, struct vnode** _vnode,
+	int count, struct io_context* ioContext, VnodePutter& _vnode,
 	ino_t* _parentID)
 {
-	status_t status = B_OK;
-	ino_t lastParentID = vnode->id;
-
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
+	ASSERT(!_vnode.IsSet() || _vnode.Get() != vnode);
 
 	if (path == NULL) {
 		put_vnode(vnode);
@@ -2134,6 +2132,8 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		return B_ENTRY_NOT_FOUND;
 	}
 
+	status_t status = B_OK;
+	ino_t lastParentID = vnode->id;
 	while (true) {
 		struct vnode* nextVnode;
 		char* nextPath;
@@ -2267,8 +2267,10 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 				// symlink was just "/"
 				nextVnode = vnode;
 			} else {
+				VnodePutter temp;
 				status = vnode_path_to_vnode(vnode, path, true, count + 1,
-					ioContext, &nextVnode, &lastParentID);
+					ioContext, temp, &lastParentID);
+				nextVnode = temp.Detach();
 			}
 
 			object_cache_free(sPathNameCache, buffer, 0);
@@ -2293,7 +2295,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		}
 	}
 
-	*_vnode = vnode;
+	_vnode.SetTo(vnode);
 	if (_parentID)
 		*_parentID = lastParentID;
 
@@ -2303,7 +2305,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 
 static status_t
 vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
-	int count, bool kernel, struct vnode** _vnode, ino_t* _parentID)
+	int count, bool kernel, VnodePutter& _vnode, ino_t* _parentID)
 {
 	return vnode_path_to_vnode(vnode, path, traverseLeafLink, count,
 		get_current_io_context(kernel), _vnode, _parentID);
@@ -2311,7 +2313,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 
 
 static status_t
-path_to_vnode(char* path, bool traverseLink, struct vnode** _vnode,
+path_to_vnode(char* path, bool traverseLink, VnodePutter& _vnode,
 	ino_t* _parentID, bool kernel)
 {
 	struct vnode* start = NULL;
@@ -2336,7 +2338,7 @@ path_to_vnode(char* path, bool traverseLink, struct vnode** _vnode,
 		start = get_root_vnode(kernel);
 
 		if (*path == '\0') {
-			*_vnode = start;
+			_vnode.SetTo(start);
 			return B_OK;
 		}
 
@@ -2363,7 +2365,7 @@ path_to_vnode(char* path, bool traverseLink, struct vnode** _vnode,
 	The path buffer must be able to store at least one additional character.
 */
 static status_t
-path_to_dir_vnode(char* path, struct vnode** _vnode, char* filename,
+path_to_dir_vnode(char* path, VnodePutter& _vnode, char* filename,
 	bool kernel)
 {
 	status_t status = get_dir_path_and_leaf(path, filename);
@@ -2399,7 +2401,7 @@ path_to_dir_vnode(char* path, struct vnode** _vnode, char* filename,
 	\return \c B_OK, if everything went fine, another error code otherwise.
 */
 static status_t
-fd_and_path_to_dir_vnode(int fd, char* path, struct vnode** _vnode,
+fd_and_path_to_dir_vnode(int fd, char* path, VnodePutter& _vnode,
 	char* filename, bool kernel)
 {
 	if (!path)
@@ -2429,6 +2431,9 @@ fd_and_path_to_dir_vnode(int fd, char* path, struct vnode** _vnode,
 	The caller has the responsibility to call put_vnode() on the returned
 	directory vnode.
 
+	Note, this reduces the ref_count of the starting \a vnode, no matter if
+	it is successful or not.
+
 	\param vnode The vnode. May be \c NULL.
 	\param path The absolute or relative path. Must not be \c NULL. The buffer
 	       is modified by this function. It must have at least room for a
@@ -2443,7 +2448,7 @@ fd_and_path_to_dir_vnode(int fd, char* path, struct vnode** _vnode,
 */
 static status_t
 vnode_and_path_to_dir_vnode(struct vnode* vnode, char* path,
-	struct vnode** _vnode, char* filename, bool kernel)
+	VnodePutter& _vnode, char* filename, bool kernel)
 {
 	if (!path)
 		return B_BAD_VALUE;
@@ -2453,11 +2458,10 @@ vnode_and_path_to_dir_vnode(struct vnode* vnode, char* path,
 		return path_to_dir_vnode(path, _vnode, filename, kernel);
 
 	status_t status = get_dir_path_and_leaf(path, filename);
-	if (status != B_OK)
+	if (status != B_OK) {
+		put_vnode(vnode);
 		return status;
-
-	inc_vnode_ref_count(vnode);
-		// vnode_path_to_vnode() always decrements the ref count
+	}
 
 	return vnode_path_to_vnode(vnode, path, true, 0, kernel, _vnode, NULL);
 }
@@ -2750,7 +2754,7 @@ get_vnode_from_fd(int fd, bool kernel)
 */
 static status_t
 fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
-	struct vnode** _vnode, ino_t* _parentID, bool kernel)
+	VnodePutter& _vnode, ino_t* _parentID, bool kernel)
 {
 	if (fd < 0 && !path)
 		return B_BAD_VALUE;
@@ -2775,7 +2779,7 @@ fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 
 	// there is no relative path to take into account
 
-	*_vnode = vnode;
+	_vnode.SetTo(vnode);
 	if (_parentID)
 		*_parentID = -1;
 
@@ -2861,31 +2865,24 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 static status_t
 normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 {
-	VnodePutter dirPutter;
-	struct vnode* dir = NULL;
+	VnodePutter dir;
 	status_t error;
 
 	for (int i = 0; i < B_MAX_SYMLINKS; i++) {
 		// get dir vnode + leaf name
-		struct vnode* nextDir;
 		char leaf[B_FILE_NAME_LENGTH];
-		error = vnode_and_path_to_dir_vnode(dir, path, &nextDir, leaf, kernel);
+		error = vnode_and_path_to_dir_vnode(dir.Detach(), path, dir, leaf, kernel);
 		if (error != B_OK)
 			return error;
-
-		dir = nextDir;
 		strcpy(path, leaf);
-		dirPutter.SetTo(dir);
 
 		// get file vnode, if we shall resolve links
 		bool fileExists = false;
-		struct vnode* fileVnode;
-		VnodePutter fileVnodePutter;
+		VnodePutter fileVnode;
 		if (traverseLink) {
-			inc_vnode_ref_count(dir);
-			if (vnode_path_to_vnode(dir, path, false, 0, kernel, &fileVnode,
+			inc_vnode_ref_count(dir.Get());
+			if (vnode_path_to_vnode(dir.Get(), path, false, 0, kernel, fileVnode,
 					NULL) == B_OK) {
-				fileVnodePutter.SetTo(fileVnode);
 				fileExists = true;
 			}
 		}
@@ -2895,18 +2892,15 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 			bool hasLeaf = true;
 			if (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0) {
 				// special cases "." and ".." -- get the dir, forget the leaf
-				inc_vnode_ref_count(dir);
-				error = vnode_path_to_vnode(dir, leaf, false, 0, kernel,
-					&nextDir, NULL);
+				error = vnode_path_to_vnode(dir.Detach(), leaf, false, 0, kernel,
+					dir, NULL);
 				if (error != B_OK)
 					return error;
-				dir = nextDir;
-				dirPutter.SetTo(dir);
 				hasLeaf = false;
 			}
 
 			// get the directory path
-			error = dir_vnode_to_path(dir, path, B_PATH_NAME_LENGTH, kernel);
+			error = dir_vnode_to_path(dir.Get(), path, B_PATH_NAME_LENGTH, kernel);
 			if (error != B_OK)
 				return error;
 
@@ -2927,7 +2921,7 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 		// read link
 		if (HAS_FS_CALL(fileVnode, read_symlink)) {
 			size_t bufferSize = B_PATH_NAME_LENGTH - 1;
-			error = FS_CALL(fileVnode, read_symlink, path, &bufferSize);
+			error = FS_CALL(fileVnode.Get(), read_symlink, path, &bufferSize);
 			if (error != B_OK)
 				return error;
 			if (bufferSize < B_PATH_NAME_LENGTH)
@@ -2955,13 +2949,12 @@ resolve_covered_parent(struct vnode* parent, dev_t* _device, ino_t* _node,
 		// vnode_path_to_vnode() puts the node
 
 	// ".." is guaranteed not to be clobbered by this call
-	struct vnode* vnode;
+	VnodePutter vnode;
 	status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
-		ioContext, &vnode, NULL);
+		ioContext, vnode, NULL);
 	if (status == B_OK) {
 		*_device = vnode->device;
 		*_node = vnode->id;
-		put_vnode(vnode);
 	}
 
 	return status;
@@ -4181,12 +4174,12 @@ vfs_get_vnode_from_path(const char* path, bool kernel, struct vnode** _vnode)
 	char* buffer = pathBuffer.LockBuffer();
 	strlcpy(buffer, path, pathBuffer.BufferSize());
 
-	struct vnode* vnode;
-	status_t status = path_to_vnode(buffer, true, &vnode, NULL, kernel);
+	VnodePutter vnode;
+	status_t status = path_to_vnode(buffer, true, vnode, NULL, kernel);
 	if (status != B_OK)
 		return status;
 
-	*_vnode = vnode;
+	*_vnode = vnode.Detach();
 	return B_OK;
 }
 
@@ -4209,7 +4202,10 @@ extern "C" status_t
 vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 	const char* name, struct vnode** _vnode)
 {
-	return entry_ref_to_vnode(mountID, directoryID, name, false, true, _vnode);
+	VnodePutter vnode;
+	status_t status = entry_ref_to_vnode(mountID, directoryID, name, false, true, vnode);
+	*_vnode = vnode.Detach();
+	return status;
 }
 
 
@@ -4283,15 +4279,15 @@ vfs_get_fs_node_from_path(fs_volume* volume, const char* path,
 	char* buffer = pathBuffer.LockBuffer();
 	strlcpy(buffer, path, pathBuffer.BufferSize());
 
-	struct vnode* vnode = mount->root_vnode;
+	VnodePutter vnode;
 
 	if (buffer[0] == '/')
-		status = path_to_vnode(buffer, traverseLeafLink, &vnode, NULL, kernel);
+		status = path_to_vnode(buffer, traverseLeafLink, vnode, NULL, kernel);
 	else {
-		inc_vnode_ref_count(vnode);
+		inc_vnode_ref_count(mount->root_vnode);
 			// vnode_path_to_vnode() releases a reference to the starting vnode
-		status = vnode_path_to_vnode(vnode, buffer, traverseLeafLink, 0,
-			kernel, &vnode, NULL);
+		status = vnode_path_to_vnode(mount->root_vnode, buffer, traverseLeafLink, 0,
+			kernel, vnode, NULL);
 	}
 
 	put_mount(mount);
@@ -4301,13 +4297,11 @@ vfs_get_fs_node_from_path(fs_volume* volume, const char* path,
 
 	if (vnode->device != volume->id) {
 		// wrong mount ID - must not gain access on foreign file system nodes
-		put_vnode(vnode);
 		return B_BAD_VALUE;
 	}
 
 	// Use get_vnode() to resolve the cookie for the right layer.
 	status = get_vnode(volume, vnode->id, _node);
-	put_vnode(vnode);
 
 	return status;
 }
@@ -4356,8 +4350,6 @@ status_t
 vfs_get_module_path(const char* basePath, const char* moduleName,
 	char* pathBuffer, size_t bufferSize)
 {
-	struct vnode* dir;
-	struct vnode* file;
 	status_t status;
 	size_t length;
 	char* path;
@@ -4366,7 +4358,8 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 		|| strlcpy(pathBuffer, basePath, bufferSize) >= bufferSize)
 		return B_BUFFER_OVERFLOW;
 
-	status = path_to_vnode(pathBuffer, true, &dir, NULL, true);
+	VnodePutter dir;
+	status = path_to_vnode(pathBuffer, true, dir, NULL, true);
 	if (status != B_OK)
 		return status;
 
@@ -4378,6 +4371,7 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 	path = pathBuffer + length;
 	bufferSize -= length;
 
+	VnodePutter file;
 	while (moduleName) {
 		char* nextPath = strchr(moduleName, '/');
 		if (nextPath == NULL)
@@ -4387,20 +4381,17 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 			nextPath++;
 		}
 
-		if (length + 1 >= bufferSize) {
-			status = B_BUFFER_OVERFLOW;
-			goto err;
-		}
+		if (length + 1 >= bufferSize)
+			return B_BUFFER_OVERFLOW;
 
 		memcpy(path, moduleName, length);
 		path[length] = '\0';
 		moduleName = nextPath;
 
-		status = vnode_path_to_vnode(dir, path, true, 0, true, &file, NULL);
-		if (status != B_OK) {
-			// vnode_path_to_vnode() has already released the reference to dir
+		// vnode_path_to_vnode() assumes ownership of the passed dir
+		status = vnode_path_to_vnode(dir.Detach(), path, true, 0, true, file, NULL);
+		if (status != B_OK)
 			return status;
-		}
 
 		if (S_ISDIR(file->Type())) {
 			// goto the next directory
@@ -4409,28 +4400,20 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 			path += length + 1;
 			bufferSize -= length + 1;
 
-			dir = file;
+			dir.SetTo(file.Detach());
 		} else if (S_ISREG(file->Type())) {
 			// it's a file so it should be what we've searched for
-			put_vnode(file);
-
 			return B_OK;
 		} else {
 			TRACE(("vfs_get_module_path(): something is strange here: "
 				"0x%08" B_PRIx32 "...\n", file->Type()));
-			status = B_ERROR;
-			dir = file;
-			goto err;
+			return B_ERROR;
 		}
 	}
 
 	// if we got here, the moduleName just pointed to a directory, not to
 	// a real module - what should we do in this case?
-	status = B_ENTRY_NOT_FOUND;
-
-err:
-	put_vnode(dir);
-	return status;
+	return B_ENTRY_NOT_FOUND;
 }
 
 
@@ -4515,7 +4498,7 @@ vfs_create_special_node(const char* path, fs_vnode* subVnode, mode_t mode,
 	uint32 flags, bool kernel, fs_vnode* _superVnode,
 	struct vnode** _createdVnode)
 {
-	struct vnode* dirNode;
+	VnodePutter dirNode;
 	char _leaf[B_FILE_NAME_LENGTH];
 	char* leaf = NULL;
 
@@ -4531,16 +4514,14 @@ vfs_create_special_node(const char* path, fs_vnode* subVnode, mode_t mode,
 
 		// get the dir vnode and the leaf name
 		leaf = _leaf;
-		status_t error = path_to_dir_vnode(tmpPath, &dirNode, leaf, kernel);
+		status_t error = path_to_dir_vnode(tmpPath, dirNode, leaf, kernel);
 		if (error != B_OK)
 			return error;
 	} else {
 		// No path. Create the node in the root FS.
-		dirNode = sRoot;
-		inc_vnode_ref_count(dirNode);
+		dirNode.SetTo(sRoot);
+		inc_vnode_ref_count(dirNode.Get());
 	}
-
-	VnodePutter _(dirNode);
 
 	// check support for creating special nodes
 	if (!HAS_FS_CALL(dirNode, create_special_node))
@@ -4549,7 +4530,7 @@ vfs_create_special_node(const char* path, fs_vnode* subVnode, mode_t mode,
 	// create the node
 	fs_vnode superVnode;
 	ino_t nodeID;
-	status_t status = FS_CALL(dirNode, create_special_node, leaf, subVnode,
+	status_t status = FS_CALL(dirNode.Get(), create_special_node, leaf, subVnode,
 		mode, flags, _superVnode != NULL ? _superVnode : &superVnode, &nodeID);
 	if (status != B_OK)
 		return status;
@@ -4825,7 +4806,7 @@ status_t
 vfs_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 	bool kernel, char* path, size_t pathLength)
 {
-	struct vnode* vnode;
+	VnodePutter vnode;
 	status_t status;
 
 	// filter invalid leaf names
@@ -4836,16 +4817,19 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
 		// special cases "." and "..": we can directly get the vnode of the
 		// referenced directory
-		status = entry_ref_to_vnode(device, inode, leaf, false, kernel, &vnode);
+		status = entry_ref_to_vnode(device, inode, leaf, false, kernel, vnode);
 		leaf = NULL;
-	} else
-		status = get_vnode(device, inode, &vnode, true, false);
+	} else {
+		struct vnode* temp;
+		status = get_vnode(device, inode, &temp, true, false);
+		vnode.SetTo(temp);
+	}
 	if (status != B_OK)
 		return status;
 
 	// get the directory path
-	status = dir_vnode_to_path(vnode, path, pathLength, kernel);
-	put_vnode(vnode);
+	status = dir_vnode_to_path(vnode.Get(), path, pathLength, kernel);
+	vnode.Unset();
 		// we don't need the vnode anymore
 	if (status != B_OK)
 		return status;
@@ -5382,7 +5366,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 {
 	bool traverse = ((openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0);
 	status_t status = B_ERROR;
-	struct vnode* vnode;
+	VnodePutter vnode;
 	void* cookie;
 	ino_t newID;
 
@@ -5398,17 +5382,19 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 	for (int i = 0; i < 3 && status != B_OK; i++) {
 		// look the node up
-		status = lookup_dir_entry(directory, name, &vnode);
+		{
+			struct vnode* entry = NULL;
+			status = lookup_dir_entry(directory, name, &entry);
+			vnode.SetTo(entry);
+		}
 		if (status == B_OK) {
-			VnodePutter putter(vnode);
-
 			if ((openMode & O_EXCL) != 0)
 				return B_FILE_EXISTS;
 
 			// If the node is a symlink, we have to follow it, unless
 			// O_NOTRAVERSE is set.
 			if (S_ISLNK(vnode->Type()) && traverse) {
-				putter.Unset();
+				vnode.Unset();
 				char clonedName[B_FILE_NAME_LENGTH + 1];
 				if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH)
 						>= B_FILE_NAME_LENGTH) {
@@ -5417,20 +5403,18 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 				inc_vnode_ref_count(directory);
 				status = vnode_path_to_vnode(directory, clonedName, true, 0,
-					kernel, &vnode, NULL);
+					kernel, vnode, NULL);
 				if (status != B_OK)
 					return status;
-
-				putter.SetTo(vnode);
 			}
 
 			if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 				return B_LINK_LIMIT;
 
-			int fd = open_vnode(vnode, openMode & ~O_CREAT, kernel);
+			int fd = open_vnode(vnode.Get(), openMode & ~O_CREAT, kernel);
 			// on success keep the vnode reference for the FD
 			if (fd >= 0)
-				putter.Detach();
+				vnode.Detach();
 
 			return fd;
 		}
@@ -5454,26 +5438,27 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 	// the node has been created successfully
 
 	rw_lock_read_lock(&sVnodeLock);
-	vnode = lookup_vnode(directory->device, newID);
+	vnode.SetTo(lookup_vnode(directory->device, newID));
 	rw_lock_read_unlock(&sVnodeLock);
 
-	if (vnode == NULL) {
+	if (!vnode.IsSet()) {
 		panic("vfs: fs_create() returned success but there is no vnode, "
 			"mount ID %" B_PRIdDEV "!\n", directory->device);
 		return B_BAD_VALUE;
 	}
 
-	int fd = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel);
-	if (fd >= 0)
+	int fd = get_new_fd(FDTYPE_FILE, NULL, vnode.Get(), cookie, openMode, kernel);
+	if (fd >= 0) {
+		vnode.Detach();
 		return fd;
+	}
 
 	status = fd;
 
 	// something went wrong, clean up
 
-	FS_CALL(vnode, close, cookie);
-	FS_CALL(vnode, free_cookie, cookie);
-	put_vnode(vnode);
+	FS_CALL(vnode.Get(), close, cookie);
+	FS_CALL(vnode.Get(), free_cookie, cookie);
 
 	FS_CALL(directory, unlink, name);
 
@@ -5563,16 +5548,13 @@ file_create(int fd, char* path, int openMode, int perms, bool kernel)
 
 	// get directory to put the new file in
 	char name[B_FILE_NAME_LENGTH];
-	struct vnode* directory;
-	status_t status = fd_and_path_to_dir_vnode(fd, path, &directory, name,
+	VnodePutter directory;
+	status_t status = fd_and_path_to_dir_vnode(fd, path, directory, name,
 		kernel);
 	if (status < 0)
 		return status;
 
-	status = create_vnode(directory, name, openMode, perms, kernel);
-
-	put_vnode(directory);
-	return status;
+	return create_vnode(directory.Get(), name, openMode, perms, kernel);
 }
 
 
@@ -5589,24 +5571,23 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
 
 	// get the vnode matching the entry_ref
-	struct vnode* vnode;
+	VnodePutter vnode;
 	status_t status = entry_ref_to_vnode(mountID, directoryID, name, traverse,
-		kernel, &vnode);
+		kernel, vnode);
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
-		put_vnode(vnode);
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 		return B_LINK_LIMIT;
-	}
 
-	int newFD = open_vnode(vnode, openMode, kernel);
+	int newFD = open_vnode(vnode.Get(), openMode, kernel);
 	if (newFD >= 0) {
-		// The vnode reference has been transferred to the FD
-		cache_node_opened(vnode, FDTYPE_FILE, vnode->cache, mountID,
+		cache_node_opened(vnode.Get(), FDTYPE_FILE, vnode->cache, mountID,
 			directoryID, vnode->id, name);
-	} else
-		put_vnode(vnode);
+
+		// The vnode reference has been transferred to the FD
+		vnode.Detach();
+	}
 
 	return newFD;
 }
@@ -5621,26 +5602,25 @@ file_open(int fd, char* path, int openMode, bool kernel)
 		fd, path, openMode, kernel));
 
 	// get the vnode matching the vnode + path combination
-	struct vnode* vnode;
+	VnodePutter vnode;
 	ino_t parentID;
-	status_t status = fd_and_path_to_vnode(fd, path, traverse, &vnode,
+	status_t status = fd_and_path_to_vnode(fd, path, traverse, vnode,
 		&parentID, kernel);
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
-		put_vnode(vnode);
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
 		return B_LINK_LIMIT;
-	}
 
 	// open the vnode
-	int newFD = open_vnode(vnode, openMode, kernel);
+	int newFD = open_vnode(vnode.Get(), openMode, kernel);
 	if (newFD >= 0) {
-		// The vnode reference has been transferred to the FD
-		cache_node_opened(vnode, FDTYPE_FILE, vnode->cache,
+		cache_node_opened(vnode.Get(), FDTYPE_FILE, vnode->cache,
 			vnode->device, parentID, vnode->id, NULL);
-	} else
-		put_vnode(vnode);
+
+		// The vnode reference has been transferred to the FD
+		vnode.Detach();
+	}
 
 	return newFD;
 }
@@ -5894,22 +5874,21 @@ static status_t
 dir_create(int fd, char* path, int perms, bool kernel)
 {
 	char filename[B_FILE_NAME_LENGTH];
-	struct vnode* vnode;
 	status_t status;
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms,
 		kernel));
 
-	status = fd_and_path_to_dir_vnode(fd, path, &vnode, filename, kernel);
+	VnodePutter vnode;
+	status = fd_and_path_to_dir_vnode(fd, path, vnode, filename, kernel);
 	if (status < 0)
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_dir)) {
-		status = FS_CALL(vnode, create_dir, filename, perms);
+		status = FS_CALL(vnode.Get(), create_dir, filename, perms);
 	} else
 		status = B_READ_ONLY_DEVICE;
 
-	put_vnode(vnode);
 	return status;
 }
 
@@ -5923,23 +5902,27 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char* name, bool kernel)
 		return B_BAD_VALUE;
 
 	// get the vnode matching the entry_ref/node_ref
-	struct vnode* vnode;
+	VnodePutter vnode;
 	status_t status;
 	if (name) {
 		status = entry_ref_to_vnode(mountID, parentID, name, true, kernel,
-			&vnode);
-	} else
-		status = get_vnode(mountID, parentID, &vnode, true, false);
+			vnode);
+	} else {
+		struct vnode* temp = NULL;
+		status = get_vnode(mountID, parentID, &temp, true, false);
+		vnode.SetTo(temp);
+	}
 	if (status != B_OK)
 		return status;
 
-	int newFD = open_dir_vnode(vnode, kernel);
+	int newFD = open_dir_vnode(vnode.Get(), kernel);
 	if (newFD >= 0) {
-		// The vnode reference has been transferred to the FD
-		cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, mountID, parentID,
+		cache_node_opened(vnode.Get(), FDTYPE_DIR, vnode->cache, mountID, parentID,
 			vnode->id, name);
-	} else
-		put_vnode(vnode);
+
+		// The vnode reference has been transferred to the FD
+		vnode.Detach();
+	}
 
 	return newFD;
 }
@@ -5952,21 +5935,22 @@ dir_open(int fd, char* path, bool kernel)
 		kernel));
 
 	// get the vnode matching the vnode + path combination
-	struct vnode* vnode = NULL;
+	VnodePutter vnode;
 	ino_t parentID;
-	status_t status = fd_and_path_to_vnode(fd, path, true, &vnode, &parentID,
+	status_t status = fd_and_path_to_vnode(fd, path, true, vnode, &parentID,
 		kernel);
 	if (status != B_OK)
 		return status;
 
 	// open the dir
-	int newFD = open_dir_vnode(vnode, kernel);
+	int newFD = open_dir_vnode(vnode.Get(), kernel);
 	if (newFD >= 0) {
-		// The vnode reference has been transferred to the FD
-		cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, vnode->device,
+		cache_node_opened(vnode.Get(), FDTYPE_DIR, vnode->cache, vnode->device,
 			parentID, vnode->id, NULL);
-	} else
-		put_vnode(vnode);
+
+		// The vnode reference has been transferred to the FD
+		vnode.Detach();
+	}
 
 	return newFD;
 }
@@ -6084,7 +6068,6 @@ static status_t
 dir_remove(int fd, char* path, bool kernel)
 {
 	char name[B_FILE_NAME_LENGTH];
-	struct vnode* directory;
 	status_t status;
 
 	if (path != NULL) {
@@ -6112,16 +6095,16 @@ dir_remove(int fd, char* path, bool kernel)
 			return B_NOT_ALLOWED;
 	}
 
-	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
+	VnodePutter directory;
+	status = fd_and_path_to_dir_vnode(fd, path, directory, name, kernel);
 	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(directory, remove_dir))
-		status = FS_CALL(directory, remove_dir, name);
+		status = FS_CALL(directory.Get(), remove_dir, name);
 	else
 		status = B_READ_ONLY_DEVICE;
 
-	put_vnode(directory);
 	return status;
 }
 
@@ -6426,19 +6409,18 @@ static status_t
 common_read_link(int fd, char* path, char* buffer, size_t* _bufferSize,
 	bool kernel)
 {
-	struct vnode* vnode;
+	VnodePutter vnode;
 	status_t status;
 
-	status = fd_and_path_to_vnode(fd, path, false, &vnode, NULL, kernel);
+	status = fd_and_path_to_vnode(fd, path, false, vnode, NULL, kernel);
 	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(vnode, read_symlink)) {
-		status = FS_CALL(vnode, read_symlink, buffer, _bufferSize);
+		status = FS_CALL(vnode.Get(), read_symlink, buffer, _bufferSize);
 	} else
 		status = B_BAD_VALUE;
 
-	put_vnode(vnode);
 	return status;
 }
 
@@ -6449,24 +6431,22 @@ common_create_symlink(int fd, char* path, const char* toPath, int mode,
 {
 	// path validity checks have to be in the calling function!
 	char name[B_FILE_NAME_LENGTH];
-	struct vnode* vnode;
 	status_t status;
 
 	FUNCTION(("common_create_symlink(fd = %d, path = %s, toPath = %s, "
 		"mode = %d, kernel = %d)\n", fd, path, toPath, mode, kernel));
 
-	status = fd_and_path_to_dir_vnode(fd, path, &vnode, name, kernel);
+	VnodePutter vnode;
+	status = fd_and_path_to_dir_vnode(fd, path, vnode, name, kernel);
 	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(vnode, create_symlink))
-		status = FS_CALL(vnode, create_symlink, name, toPath, mode);
+		status = FS_CALL(vnode.Get(), create_symlink, name, toPath, mode);
 	else {
 		status = HAS_FS_CALL(vnode, write)
 			? B_UNSUPPORTED : B_READ_ONLY_DEVICE;
 	}
-
-	put_vnode(vnode);
 
 	return status;
 }
@@ -6482,32 +6462,25 @@ common_create_link(int pathFD, char* path, int toFD, char* toPath,
 		toPath, kernel));
 
 	char name[B_FILE_NAME_LENGTH];
-	struct vnode* directory;
-	status_t status = fd_and_path_to_dir_vnode(pathFD, path, &directory, name,
+	VnodePutter directory;
+	status_t status = fd_and_path_to_dir_vnode(pathFD, path, directory, name,
 		kernel);
 	if (status != B_OK)
 		return status;
 
-	struct vnode* vnode;
-	status = fd_and_path_to_vnode(toFD, toPath, traverseLeafLink, &vnode, NULL,
+	VnodePutter vnode;
+	status = fd_and_path_to_vnode(toFD, toPath, traverseLeafLink, vnode, NULL,
 		kernel);
 	if (status != B_OK)
-		goto err;
+		return status;
 
-	if (directory->mount != vnode->mount) {
-		status = B_CROSS_DEVICE_LINK;
-		goto err1;
-	}
+	if (directory->mount != vnode->mount)
+		return B_CROSS_DEVICE_LINK;
 
 	if (HAS_FS_CALL(directory, link))
-		status = FS_CALL(directory, link, name, vnode);
+		status = FS_CALL(directory.Get(), link, name, vnode.Get());
 	else
 		status = B_READ_ONLY_DEVICE;
-
-err1:
-	put_vnode(vnode);
-err:
-	put_vnode(directory);
 
 	return status;
 }
@@ -6517,22 +6490,20 @@ static status_t
 common_unlink(int fd, char* path, bool kernel)
 {
 	char filename[B_FILE_NAME_LENGTH];
-	struct vnode* vnode;
 	status_t status;
 
 	FUNCTION(("common_unlink: fd: %d, path '%s', kernel %d\n", fd, path,
 		kernel));
 
-	status = fd_and_path_to_dir_vnode(fd, path, &vnode, filename, kernel);
+	VnodePutter vnode;
+	status = fd_and_path_to_dir_vnode(fd, path, vnode, filename, kernel);
 	if (status < 0)
 		return status;
 
 	if (HAS_FS_CALL(vnode, unlink))
-		status = FS_CALL(vnode, unlink, filename);
+		status = FS_CALL(vnode.Get(), unlink, filename);
 	else
 		status = B_READ_ONLY_DEVICE;
-
-	put_vnode(vnode);
 
 	return status;
 }
@@ -6541,21 +6512,19 @@ common_unlink(int fd, char* path, bool kernel)
 static status_t
 common_access(int fd, char* path, int mode, bool effectiveUserGroup, bool kernel)
 {
-	struct vnode* vnode;
 	status_t status;
 
 	// TODO: honor effectiveUserGroup argument
 
-	status = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
+	VnodePutter vnode;
+	status = fd_and_path_to_vnode(fd, path, true, vnode, NULL, kernel);
 	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(vnode, access))
-		status = FS_CALL(vnode, access, mode);
+		status = FS_CALL(vnode.Get(), access, mode);
 	else
 		status = B_OK;
-
-	put_vnode(vnode);
 
 	return status;
 }
@@ -6564,45 +6533,37 @@ common_access(int fd, char* path, int mode, bool effectiveUserGroup, bool kernel
 static status_t
 common_rename(int fd, char* path, int newFD, char* newPath, bool kernel)
 {
-	struct vnode* fromVnode;
-	struct vnode* toVnode;
-	char fromName[B_FILE_NAME_LENGTH];
-	char toName[B_FILE_NAME_LENGTH];
 	status_t status;
 
 	FUNCTION(("common_rename(fd = %d, path = %s, newFD = %d, newPath = %s, "
 		"kernel = %d)\n", fd, path, newFD, newPath, kernel));
 
-	status = fd_and_path_to_dir_vnode(fd, path, &fromVnode, fromName, kernel);
+	VnodePutter fromVnode;
+	char fromName[B_FILE_NAME_LENGTH];
+	status = fd_and_path_to_dir_vnode(fd, path, fromVnode, fromName, kernel);
 	if (status != B_OK)
 		return status;
 
-	status = fd_and_path_to_dir_vnode(newFD, newPath, &toVnode, toName, kernel);
+	VnodePutter toVnode;
+	char toName[B_FILE_NAME_LENGTH];
+	status = fd_and_path_to_dir_vnode(newFD, newPath, toVnode, toName, kernel);
 	if (status != B_OK)
-		goto err1;
+		return status;
 
-	if (fromVnode->device != toVnode->device) {
-		status = B_CROSS_DEVICE_LINK;
-		goto err2;
-	}
+	if (fromVnode->device != toVnode->device)
+		return B_CROSS_DEVICE_LINK;
 
 	if (fromName[0] == '\0' || toName[0] == '\0'
 		|| !strcmp(fromName, ".") || !strcmp(fromName, "..")
 		|| !strcmp(toName, ".") || !strcmp(toName, "..")
-		|| (fromVnode == toVnode && !strcmp(fromName, toName))) {
-		status = B_BAD_VALUE;
-		goto err2;
+		|| (fromVnode.Get() == toVnode.Get() && !strcmp(fromName, toName))) {
+		return B_BAD_VALUE;
 	}
 
 	if (HAS_FS_CALL(fromVnode, rename))
-		status = FS_CALL(fromVnode, rename, fromName, toVnode, toName);
+		status = FS_CALL(fromVnode.Get(), rename, fromName, toVnode.Get(), toName);
 	else
 		status = B_READ_ONLY_DEVICE;
-
-err2:
-	put_vnode(toVnode);
-err1:
-	put_vnode(fromVnode);
 
 	return status;
 }
@@ -6653,15 +6614,14 @@ common_path_read_stat(int fd, char* path, bool traverseLeafLink,
 	FUNCTION(("common_path_read_stat: fd: %d, path '%s', stat %p,\n", fd, path,
 		stat));
 
-	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode,
+	VnodePutter vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, vnode,
 		NULL, kernel);
 	if (status != B_OK)
 		return status;
 
-	status = vfs_stat_vnode(vnode, stat);
+	status = vfs_stat_vnode(vnode.Get(), stat);
 
-	put_vnode(vnode);
 	return status;
 }
 
@@ -6673,18 +6633,16 @@ common_path_write_stat(int fd, char* path, bool traverseLeafLink,
 	FUNCTION(("common_write_stat: fd: %d, path '%s', stat %p, stat_mask %d, "
 		"kernel %d\n", fd, path, stat, statMask, kernel));
 
-	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode,
+	VnodePutter vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, vnode,
 		NULL, kernel);
 	if (status != B_OK)
 		return status;
 
 	if (HAS_FS_CALL(vnode, write_stat))
-		status = FS_CALL(vnode, write_stat, stat, statMask);
+		status = FS_CALL(vnode.Get(), write_stat, stat, statMask);
 	else
 		status = B_READ_ONLY_DEVICE;
-
-	put_vnode(vnode);
 
 	return status;
 }
@@ -6696,15 +6654,15 @@ attr_dir_open(int fd, char* path, bool traverseLeafLink, bool kernel)
 	FUNCTION(("attr_dir_open(fd = %d, path = '%s', kernel = %d)\n", fd, path,
 		kernel));
 
-	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode,
+	VnodePutter vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverseLeafLink, vnode,
 		NULL, kernel);
 	if (status != B_OK)
 		return status;
 
-	status = open_attr_dir_vnode(vnode, kernel);
-	if (status < 0)
-		put_vnode(vnode);
+	status = open_attr_dir_vnode(vnode.Get(), kernel);
+	if (status >= 0)
+		vnode.Detach();
 
 	return status;
 }
@@ -6774,40 +6732,35 @@ attr_create(int fd, char* path, const char* name, uint32 type,
 		return B_BAD_VALUE;
 
 	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
-	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path, traverse, &vnode, NULL,
+	VnodePutter vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverse, vnode, NULL,
 		kernel);
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
-		status = B_LINK_LIMIT;
-		goto err;
-	}
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
+		return B_LINK_LIMIT;
 
-	if (!HAS_FS_CALL(vnode, create_attr)) {
-		status = B_READ_ONLY_DEVICE;
-		goto err;
-	}
+	if (!HAS_FS_CALL(vnode, create_attr))
+		return B_READ_ONLY_DEVICE;
 
 	void* cookie;
-	status = FS_CALL(vnode, create_attr, name, type, openMode, &cookie);
+	status = FS_CALL(vnode.Get(), create_attr, name, type, openMode, &cookie);
 	if (status != B_OK)
-		goto err;
+		return status;
 
-	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel);
-	if (fd >= 0)
+	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode.Get(), cookie, openMode, kernel);
+	if (fd >= 0) {
+		vnode.Detach();
 		return fd;
+	}
 
 	status = fd;
 
-	FS_CALL(vnode, close_attr, cookie);
-	FS_CALL(vnode, free_attr_cookie, cookie);
+	FS_CALL(vnode.Get(), close_attr, cookie);
+	FS_CALL(vnode.Get(), free_attr_cookie, cookie);
 
-	FS_CALL(vnode, remove_attr, name);
-
-err:
-	put_vnode(vnode);
+	FS_CALL(vnode.Get(), remove_attr, name);
 
 	return status;
 }
@@ -6820,39 +6773,34 @@ attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 		return B_BAD_VALUE;
 
 	bool traverse = (openMode & (O_NOTRAVERSE | O_NOFOLLOW)) == 0;
-	struct vnode* vnode;
-	status_t status = fd_and_path_to_vnode(fd, path, traverse, &vnode, NULL,
+	VnodePutter vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, traverse, vnode, NULL,
 		kernel);
 	if (status != B_OK)
 		return status;
 
-	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type())) {
-		status = B_LINK_LIMIT;
-		goto err;
-	}
+	if ((openMode & O_NOFOLLOW) != 0 && S_ISLNK(vnode->Type()))
+		return B_LINK_LIMIT;
 
-	if (!HAS_FS_CALL(vnode, open_attr)) {
-		status = B_UNSUPPORTED;
-		goto err;
-	}
+	if (!HAS_FS_CALL(vnode, open_attr))
+		return B_UNSUPPORTED;
 
 	void* cookie;
-	status = FS_CALL(vnode, open_attr, name, openMode, &cookie);
+	status = FS_CALL(vnode.Get(), open_attr, name, openMode, &cookie);
 	if (status != B_OK)
-		goto err;
+		return status;
 
 	// now we only need a file descriptor for this attribute and we're done
-	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel);
-	if (fd >= 0)
+	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode.Get(), cookie, openMode, kernel);
+	if (fd >= 0) {
+		vnode.Detach();
 		return fd;
+	}
 
 	status = fd;
 
-	FS_CALL(vnode, close_attr, cookie);
-	FS_CALL(vnode, free_attr_cookie, cookie);
-
-err:
-	put_vnode(vnode);
+	FS_CALL(vnode.Get(), close_attr, cookie);
+	FS_CALL(vnode.Get(), free_attr_cookie, cookie);
 
 	return status;
 }
@@ -7561,7 +7509,11 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		if (status != B_OK || mount->volume->ops == NULL)
 			goto err2;
 	} else {
-		status = path_to_vnode(path, true, &coveredNode, NULL, kernel);
+		{
+			VnodePutter temp;
+			status = path_to_vnode(path, true, temp, NULL, kernel);
+			coveredNode = temp.Detach();
+		}
 		if (status != B_OK)
 			goto err2;
 
@@ -7682,9 +7634,9 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	FUNCTION(("fs_unmount(path '%s', dev %" B_PRId32 ", kernel %d\n", path,
 		mountID, kernel));
 
-	struct vnode* pathVnode = NULL;
+	VnodePutter pathVnode;
 	if (path != NULL) {
-		err = path_to_vnode(path, true, &pathVnode, NULL, kernel);
+		err = path_to_vnode(path, true, pathVnode, NULL, kernel);
 		if (err != B_OK)
 			return B_ENTRY_NOT_FOUND;
 	}
@@ -7695,18 +7647,18 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	mount = find_mount(path != NULL ? pathVnode->device : mountID);
 	if (mount == NULL) {
 		panic("fs_unmount: find_mount() failed on root vnode @%p of mount\n",
-			pathVnode);
+			pathVnode.Get());
 	}
 
 	mountLocker.Unlock();
 
 	if (path != NULL) {
-		put_vnode(pathVnode);
-
-		if (mount->root_vnode != pathVnode) {
+		if (mount->root_vnode != pathVnode.Get()) {
 			// not mountpoint
 			return B_BAD_VALUE;
 		}
+
+		pathVnode.Unset();
 	}
 
 	// if the volume is associated with a partition, lock the device of the
@@ -8113,28 +8065,26 @@ static status_t
 set_cwd(int fd, char* path, bool kernel)
 {
 	struct io_context* context;
-	struct vnode* vnode = NULL;
 	struct vnode* oldDirectory;
-	status_t status;
 
 	FUNCTION(("set_cwd: path = \'%s\'\n", path));
 
 	// Get vnode for passed path, and bail if it failed
-	status = fd_and_path_to_vnode(fd, path, true, &vnode, NULL, kernel);
+	VnodePutter vnode;
+	status_t status = fd_and_path_to_vnode(fd, path, true, vnode, NULL, kernel);
 	if (status < 0)
 		return status;
 
 	if (!S_ISDIR(vnode->Type())) {
 		// nope, can't cwd to here
-		status = B_NOT_A_DIRECTORY;
-		goto err;
+		return B_NOT_A_DIRECTORY;
 	}
 
 	// We need to have the permission to enter the directory, too
 	if (HAS_FS_CALL(vnode, access)) {
-		status = FS_CALL(vnode, access, X_OK);
+		status = FS_CALL(vnode.Get(), access, X_OK);
 		if (status != B_OK)
-			goto err;
+			return status;
 	}
 
 	// Get current io context and lock
@@ -8143,7 +8093,7 @@ set_cwd(int fd, char* path, bool kernel)
 
 	// save the old current working directory first
 	oldDirectory = context->cwd;
-	context->cwd = vnode;
+	context->cwd = vnode.Detach();
 
 	mutex_unlock(&context->io_mutex);
 
@@ -8151,10 +8101,6 @@ set_cwd(int fd, char* path, bool kernel)
 		put_vnode(oldDirectory);
 
 	return B_NO_ERROR;
-
-err:
-	put_vnode(vnode);
-	return status;
 }
 
 
@@ -9518,12 +9464,10 @@ _user_create_fifo(int fd, const char* userPath, mode_t perms)
 
 	// split into directory vnode and filename path
 	char filename[B_FILE_NAME_LENGTH];
-	struct vnode* dir;
-	status = fd_and_path_to_dir_vnode(fd, path, &dir, filename, false);
+	VnodePutter dir;
+	status = fd_and_path_to_dir_vnode(fd, path, dir, filename, false);
 	if (status != B_OK)
 		return status;
-
-	VnodePutter _(dir);
 
 	// the underlying FS needs to support creating FIFOs
 	if (!HAS_FS_CALL(dir, create_special_node))
@@ -9532,7 +9476,7 @@ _user_create_fifo(int fd, const char* userPath, mode_t perms)
 	// create the entry	-- the FIFO sub node is set up automatically
 	fs_vnode superVnode;
 	ino_t nodeID;
-	status = FS_CALL(dir, create_special_node, filename, NULL,
+	status = FS_CALL(dir.Get(), create_special_node, filename, NULL,
 		S_IFIFO | (perms & S_IUMSK), 0, &superVnode, &nodeID);
 
 	// create_special_node() acquired a reference for us that we don't need.
@@ -10056,8 +10000,8 @@ _user_change_root(const char* userPath)
 	}
 
 	// get the vnode
-	struct vnode* vnode;
-	status_t status = path_to_vnode(path, true, &vnode, NULL, false);
+	VnodePutter vnode;
+	status_t status = path_to_vnode(path, true, vnode, NULL, false);
 	if (status != B_OK)
 		return status;
 
@@ -10065,7 +10009,7 @@ _user_change_root(const char* userPath)
 	struct io_context* context = get_current_io_context(false);
 	mutex_lock(&sIOContextRootLock);
 	struct vnode* oldRoot = context->root;
-	context->root = vnode;
+	context->root = vnode.Detach();
 	mutex_unlock(&sIOContextRootLock);
 
 	put_vnode(oldRoot);
