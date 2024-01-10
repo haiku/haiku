@@ -4837,7 +4837,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char* leaf,
 		status = entry_ref_to_vnode(device, inode, leaf, false, kernel, vnode);
 		leaf = NULL;
 	} else {
-		struct vnode* temp;
+		struct vnode* temp = NULL;
 		status = get_vnode(device, inode, &temp, true, false);
 		vnode.SetTo(temp);
 	}
