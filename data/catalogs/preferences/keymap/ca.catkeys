@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Keymap	139266573
+1	catalan; valencian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonès
 US	KeymapNames		EUA
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ucraïnès (Mac)
 Command:	Modifier keys window	Command key role name	Ordre:
 French (Bépo)	KeymapNames		Francès (Bépo)
 Russian (Typewriter)	KeymapNames		Rus (màquina d'escriure)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Blocatge de majúscules:
 Acute trigger	Keymap window		Accent agut
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
 Italian	KeymapNames		Italià
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Maj.
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedoni
 Czech (Mac)	KeymapNames		Txec (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tecla de blocatge de majúscules
 Albanian	KeymapNames		Albanès
 (Current)	Keymap window		(Actual)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
