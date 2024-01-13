@@ -62,6 +62,8 @@ public:
 			void					SeekCompleted();
 			status_t				SetBuffer(BPositionIO* buffer);
 
+			status_t				FlushBefore(off_t position);
+
 			BInputAdapter*			BuildInputAdapter();
 
 protected:
