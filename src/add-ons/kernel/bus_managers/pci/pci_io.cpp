@@ -70,7 +70,7 @@ get_io_port_address(int ioPort)
 	pci_resource_range range;
 	uint8 *mappedAdr;
 
-	if (gPCI->LookupRange(kPciRangeIoPort, ioPort, domain, range, &mappedAdr) < B_OK)
+	if (gPCI->LookupRange(B_IO_PORT, ioPort, domain, range, &mappedAdr) < B_OK)
 		return NULL;
 
 	return mappedAdr + ioPort;
