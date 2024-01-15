@@ -1,4 +1,4 @@
-/*	$OpenBSD: if_iwm.c,v 1.407 2023/04/14 12:45:10 stsp Exp $	*/
+/*	$OpenBSD: if_iwm.c,v 1.413 2023/12/20 07:32:05 stsp Exp $	*/
 
 /*
  * Copyright (c) 2014, 2016 genua gmbh <info@genua.de>
@@ -6174,7 +6174,7 @@ uint8_t
 iwm_get_vht_ctrl_pos(struct ieee80211com *ic, struct ieee80211_channel *chan)
 {
 	int center_idx = ic->ic_bss->ni_vht_chan_center_freq_idx0;
-	int primary_idx = ieee80211_chan2ieee(ic, ic->ic_bss->ni_chan);
+	int primary_idx = ic->ic_bss->ni_primary_chan;
 	/*
 	 * The FW is expected to check the control channel position only
 	 * when in HT/VHT and the channel width is not 20MHz. Return
@@ -6754,7 +6754,12 @@ iwm_tx(struct iwm_softc *sc, struct mbuf *m, struct ieee80211_node *ni, int ac)
 	 * client mode; the firmware's station table contains only one entry
 	 * which represents our access point.
 	 */
-	if (isset(sc->sc_enabled_capa, IWM_UCODE_TLV_CAPA_DQA_SUPPORT))
+	if (ic->ic_opmode == IEEE80211_M_MONITOR) {
+		if (isset(sc->sc_enabled_capa, IWM_UCODE_TLV_CAPA_DQA_SUPPORT))
+			qid = IWM_DQA_INJECT_MONITOR_QUEUE;
+		else
+			qid = IWM_AUX_QUEUE;
+	} else if (isset(sc->sc_enabled_capa, IWM_UCODE_TLV_CAPA_DQA_SUPPORT))
 		qid = IWM_DQA_MIN_MGMT_QUEUE + ac;
 	else
 		qid = ac;
@@ -6826,7 +6831,8 @@ iwm_tx(struct iwm_softc *sc, struct mbuf *m, struct ieee80211_node *ni, int ac)
 #endif
 	totlen = m->m_pkthdr.len;
 
-	if (wh->i_fc[1] & IEEE80211_FC1_PROTECTED) {
+	if (ic->ic_opmode != IEEE80211_M_MONITOR &&
+	    (wh->i_fc[1] & IEEE80211_FC1_PROTECTED)) {
 		k = ieee80211_get_txkey(ic, wh, ni);
 		if ((k->k_flags & IEEE80211_KEY_GROUP) ||
 		    (k->k_cipher != IEEE80211_CIPHER_CCMP)) {
@@ -6853,7 +6859,10 @@ iwm_tx(struct iwm_softc *sc, struct mbuf *m, struct ieee80211_node *ni, int ac)
 	    (ic->ic_flags & IEEE80211_F_USEPROT)))
 		flags |= IWM_TX_CMD_FLG_PROT_REQUIRE;
 
-	tx->sta_id = IWM_STATION_ID;
+	if (ic->ic_opmode == IEEE80211_M_MONITOR)
+		tx->sta_id = IWM_MONITOR_STA_ID;
+	else
+		tx->sta_id = IWM_STATION_ID;
 
 	if (type == IEEE80211_FC0_TYPE_MGT) {
 		if (subtype == IEEE80211_FC0_SUBTYPE_ASSOC_REQ ||
@@ -7715,6 +7724,7 @@ iwm_fill_probe_req(struct iwm_softc *sc, struct iwm_scan_probe_req *preq)
 				return ENOBUFS;
 			frm = ieee80211_add_vhtcaps(frm, ic);
 			remain -= frm - pos;
+			preq->band_data[1].len = htole16(frm - pos);
 		}
 	}
 
@@ -8594,7 +8604,7 @@ iwm_bgscan_done(struct ieee80211com *ic,
 	free(sc->bgscan_unref_arg, M_DEVBUF, sc->bgscan_unref_arg_size);
 	sc->bgscan_unref_arg = arg;
 	sc->bgscan_unref_arg_size = arg_size;
-	iwm_add_task(sc, sc->sc_nswq, &sc->bgscan_done_task);
+	iwm_add_task(sc, systq, &sc->bgscan_done_task);
 }
 
 void
@@ -9217,6 +9227,9 @@ iwm_delete_key(struct ieee80211com *ic, struct ieee80211_node *ni,
 		return;
 	}
 
+	if ((sc->sc_flags & IWM_FLAG_STA_ACTIVE) == 0)
+		return;
+
 	if (!isset(sc->sc_ucode_api, IWM_UCODE_TLV_API_TKIP_MIC_KEYS))
 		return iwm_delete_key_v1(ic, ni, k);
 
@@ -9302,8 +9315,17 @@ iwm_set_rate_table_vht(struct iwm_node *in, struct iwm_lq_cmd *lqcmd)
 				if (i < 2 && in->in_phyctxt->vht_chan_width >=
 				    IEEE80211_VHTOP0_CHAN_WIDTH_80)
 					tab |= IWM_RATE_MCS_CHAN_WIDTH_80;
-				else
+				else if (in->in_phyctxt->sco ==
+				    IEEE80211_HTOP0_SCO_SCA ||
+				    in->in_phyctxt->sco ==
+				    IEEE80211_HTOP0_SCO_SCB)
 					tab |= IWM_RATE_MCS_CHAN_WIDTH_40;
+				else {
+					/* no 40 MHz, fall back on MCS 8 */
+					tab &= ~IWM_RATE_VHT_MCS_RATE_CODE_MSK;
+					tab |= 8;
+				}
+					
 				tab |= IWM_RATE_MCS_RTS_REQUIRED_MSK;
 				if (i < 4) {
 					if (ieee80211_ra_vht_use_sgi(ni))
