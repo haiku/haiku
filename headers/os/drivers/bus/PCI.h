@@ -58,20 +58,11 @@ typedef struct pci_device_module_info {
 } pci_device_module_info;
 
 
-enum {
-	kPciRangeInvalid      = 0,
-	kPciRangeIoPort       = 1,
-	kPciRangeMmio         = 2,
-	kPciRangeMmio64Bit    = 1 << 0,
-	kPciRangeMmioPrefetch = 1 << 1,
-	kPciRangeMmioEnd      = 6,
-	kPciRangeEnd          = 6,
-};
-
 typedef struct pci_resource_range {
 	uint32 type;
-	phys_addr_t host_addr;
-	phys_addr_t pci_addr;
+	uint8 address_type;
+	phys_addr_t host_address;
+	phys_addr_t pci_address;
 	uint64 size;
 } pci_resource_range;
 

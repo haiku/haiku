@@ -245,7 +245,7 @@ ECAMPCIController::WriteIrq(uint8 bus, uint8 device, uint8 function,
 status_t
 ECAMPCIController::GetRange(uint32 index, pci_resource_range* range)
 {
-	if (index >= kPciRangeEnd)
+	if (index >= (uint32)fResourceRanges.Count())
 		return B_BAD_INDEX;
 
 	*range = fResourceRanges[index];

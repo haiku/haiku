@@ -81,8 +81,8 @@ pci_ram_address(phys_addr_t childAdr)
 #else
 	uint8 domain;
 	pci_resource_range range;
-	if (gPCI->LookupRange(kPciRangeMmio, childAdr, domain, range) >= B_OK)
-		hostAdr = childAdr - range.pci_addr + range.host_addr;
+	if (gPCI->LookupRange(B_IO_MEMORY, childAdr, domain, range) >= B_OK)
+		hostAdr = childAdr - range.pci_address + range.host_address;
 #endif
 	//dprintf("pci_ram_address(%#" B_PRIx64 ") -> %#" B_PRIx64 "\n", childAdr, hostAdr);
 	return hostAdr;
@@ -673,33 +673,27 @@ status_t
 PCI::LookupRange(uint32 type, phys_addr_t pciAddr,
 	uint8 &domain, pci_resource_range &range, uint8 **mappedAdr)
 {
-	if (type >= kPciRangeEnd)
-		return B_BAD_VALUE;
-
 	for (uint8 curDomain = 0; curDomain < fDomainCount; curDomain++) {
-		pci_resource_range const *const &ranges = fDomainData[curDomain].ranges;
+		const auto &ranges = fDomainData[curDomain].ranges;
 
-		uint32 typeBeg, typeEnd;
-		if (type == kPciRangeMmio) {
-			typeBeg = kPciRangeMmio;
-			typeEnd = kPciRangeMmioEnd;
-		} else {
-			typeBeg = type;
-			typeEnd = type + 1;
-		}
-		for (uint32 curType = typeBeg; curType < typeEnd; curType++) {
-			const pci_resource_range curRange = ranges[curType];
-			if (pciAddr >= curRange.pci_addr && pciAddr < curRange.pci_addr + curRange.size) {
+		for (int32 i = 0; i < ranges.Count(); i++) {
+			const pci_resource_range curRange = ranges[i];
+			if (curRange.type != type)
+				continue;
+
+			if (pciAddr >= curRange.pci_address
+					&& pciAddr < (curRange.pci_address + curRange.size)) {
 				domain = curDomain;
 				range = curRange;
 #if !(defined(__i386__) || defined(__x86_64__))
-				if (type == kPciRangeIoPort && mappedAdr != NULL)
+				if (type == B_IO_PORT && mappedAdr != NULL)
 					*mappedAdr = fDomainData[curDomain].io_port_adr;
 #endif
 				return B_OK;
 			}
 		}
 	}
+
 	return B_ENTRY_NOT_FOUND;
 }
 
@@ -716,23 +710,27 @@ PCI::InitDomainData(domain_data &data)
 	status = ctrl->get_max_bus_devices(ctrlCookie, &count);
 	data.max_bus_devices = (status == B_OK) ? count : 0;
 
-	memset(data.ranges, 0, sizeof(data.ranges));
 	pci_resource_range range;
-	for (uint32 j = 0; ctrl->get_range(ctrlCookie, j, &range) >= B_OK; j++) {
-		if (range.type < kPciRangeEnd && range.size > 0)
-			data.ranges[range.type] = range;
-	}
+	for (uint32 j = 0; ctrl->get_range(ctrlCookie, j, &range) >= B_OK; j++)
+		data.ranges.Add(range);
 
 #if !(defined(__i386__) || defined(__x86_64__))
-	// TODO: free resources when domain is detached
-	pci_resource_range &ioPortRange = data.ranges[kPciRangeIoPort];
-	if (ioPortRange.size > 0) {
-		data.io_port_area = map_physical_memory("PCI IO Ports",
-			ioPortRange.host_addr, ioPortRange.size, B_ANY_KERNEL_ADDRESS,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&data.io_port_adr);
+	for (int32 i = 0; i < data.ranges.Count(); i++) {
+		pci_resource_range &ioPortRange = data.ranges[i];
+		if (ioPortRange.type != B_IO_PORT)
+			continue;
 
-		if (data.io_port_area < B_OK)
-			data.io_port_adr = NULL;
+		if (ioPortRange.size > 0) {
+			data.io_port_area = map_physical_memory("PCI IO Ports",
+				ioPortRange.host_address, ioPortRange.size, B_ANY_KERNEL_ADDRESS,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&data.io_port_adr);
+
+			if (data.io_port_area < B_OK)
+				data.io_port_adr = NULL;
+
+			// TODO: Map other IO ports (if any.)
+			break;
+		}
 	}
 #endif
 }

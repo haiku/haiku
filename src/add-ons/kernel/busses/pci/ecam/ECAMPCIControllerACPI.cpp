@@ -106,8 +106,8 @@ DecodeAddress(const T& resource, pci_resource_range& range)
 		addressMaximum = acpiRange.minimum + addressLength - 1;
 	ASSERT((phys_addr_t)(acpiRange.minimum + addressLength - 1) == addressMaximum);
 
-	range.host_addr = acpiRange.minimum + acpiRange.translation_offset;
-	range.pci_addr  = acpiRange.minimum;
+	range.host_address = acpiRange.minimum + acpiRange.translation_offset;
+	range.pci_address  = acpiRange.minimum;
 	range.size = addressLength;
 }
 
@@ -115,44 +115,46 @@ DecodeAddress(const T& resource, pci_resource_range& range)
 acpi_status
 ECAMPCIControllerACPI::AcpiCrsScanCallbackInt(acpi_resource *res)
 {
-	uint32 outType;
-
-	switch (res->data.address.resource_type) {
-		case 0: // ACPI_MEMORY_RANGE
-			outType = kPciRangeMmio;
-			if (res->type == ACPI_RESOURCE_TYPE_ADDRESS64)
-				outType += kPciRangeMmio64Bit;
-			if (res->data.address.info.mem.caching == 3 /*ACPI_PREFETCHABLE_MEMORY*/)
-				outType += kPciRangeMmioPrefetch;
-			break;
-		case 1: // ACPI_IO_RANGE
-			outType = kPciRangeIoPort;
-			break;
-		default:
-			return B_OK;
-	}
-
-	pci_resource_range& range = fResourceRanges[outType];
-	range.type = outType;
+	pci_resource_range range = {};
 
 	switch (res->type) {
 		case ACPI_RESOURCE_TYPE_ADDRESS16: {
-			const auto &address = res->data.address16;
+			const auto& address = res->data.address16;
 			DecodeAddress(address, range);
 			break;
 		}
 		case ACPI_RESOURCE_TYPE_ADDRESS32: {
-			const auto &address = res->data.address32;
+			const auto& address = res->data.address32;
 			DecodeAddress(address, range);
+			range.address_type |= PCI_address_type_32;
 			break;
 		}
 		case ACPI_RESOURCE_TYPE_ADDRESS64: {
-			const auto &address = res->data.address64;
+			const auto& address = res->data.address64;
 			DecodeAddress(address, range);
+			range.address_type |= PCI_address_type_64;
 			break;
 		}
+
+		default:
+			return B_OK;
 	}
 
+	switch (res->data.address.resource_type) {
+		case 0: // ACPI_MEMORY_RANGE
+			range.type = B_IO_MEMORY;
+			if (res->data.address.info.mem.caching == 3 /*ACPI_PREFETCHABLE_MEMORY*/)
+				range.address_type |= PCI_address_prefetchable;
+			break;
+		case 1: // ACPI_IO_RANGE
+			range.type = B_IO_PORT;
+			break;
+
+		default:
+			return B_OK;
+	}
+
+	fResourceRanges.Add(range);
 	return B_OK;
 }
 

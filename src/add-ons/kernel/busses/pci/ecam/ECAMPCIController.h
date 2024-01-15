@@ -13,6 +13,7 @@
 
 #include <AutoDeleterOS.h>
 #include <lock.h>
+#include <util/Vector.h>
 
 
 #define CHECK_RET(err) {status_t _err = (err); if (_err < B_OK) return _err;}
@@ -128,7 +129,7 @@ protected:
 	uint8 volatile* fRegs{};
 	uint64 fRegsLen{};
 
-	pci_resource_range fResourceRanges[kPciRangeEnd] {};
+	Vector<pci_resource_range> fResourceRanges;
 };
 
 

@@ -201,27 +201,29 @@ DWPCIController::ReadResourceInfo()
 		uint64_t parentAdr = B_BENDIAN_TO_HOST_INT64(*(uint64_t*)(it + 3));
 		uint64_t len       = B_BENDIAN_TO_HOST_INT64(*(uint64_t*)(it + 5));
 
-		uint32 outType = kPciRangeInvalid;
+		pci_resource_range range = {};
+		range.host_address = parentAdr;
+		range.pci_address = childAdr;
+		range.size = len;
+
+		if ((type & fdtPciRangePrefechable) != 0)
+			range.address_type |= PCI_address_prefetchable;
+
 		switch (type & fdtPciRangeTypeMask) {
 		case fdtPciRangeIoPort:
-			outType = kPciRangeIoPort;
+			range.type = B_IO_PORT;
+			fResourceRanges.Add(range);
 			break;
 		case fdtPciRangeMmio32Bit:
-			outType = kPciRangeMmio;
+			range.type = B_IO_MEMORY;
+			range.address_type |= PCI_address_type_32;
+			fResourceRanges.Add(range);
 			break;
 		case fdtPciRangeMmio64Bit:
-			outType = kPciRangeMmio + kPciRangeMmio64Bit;
+			range.type = B_IO_MEMORY;
+			range.address_type |= PCI_address_type_64;
+			fResourceRanges.Add(range);
 			break;
-		}
-		if (outType >= kPciRangeMmio && outType < kPciRangeMmioEnd
-			&& (fdtPciRangePrefechable & type) != 0)
-			outType += kPciRangeMmioPrefetch;
-
-		if (outType != kPciRangeInvalid) {
-			fResourceRanges[outType].type = outType;
-			fResourceRanges[outType].host_addr = parentAdr;
-			fResourceRanges[outType].pci_addr = childAdr;
-			fResourceRanges[outType].size = len;
 		}
 
 		switch (type & fdtPciRangeTypeMask) {
@@ -392,7 +394,7 @@ DWPCIController::WriteIrq(uint8 bus, uint8 device, uint8 function,
 status_t
 DWPCIController::GetRange(uint32 index, pci_resource_range* range)
 {
-	if (index >= kPciRangeEnd)
+	if (index >= (uint32)fResourceRanges.Count())
 		return B_BAD_INDEX;
 
 	*range = fResourceRanges[index];

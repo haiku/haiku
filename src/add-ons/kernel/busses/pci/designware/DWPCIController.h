@@ -12,6 +12,7 @@
 
 #include <AutoDeleterOS.h>
 #include <lock.h>
+#include <util/Vector.h>
 
 
 #define CHECK_RET(err) {status_t _err = (err); if (_err < B_OK) return _err;}
@@ -231,7 +232,7 @@ private:
 	addr_t fConfigBase {};
 	size_t fConfigSize {};
 
-	pci_resource_range fResourceRanges[kPciRangeEnd] {};
+	Vector<pci_resource_range> fResourceRanges;
 	InterruptMapMask fInterruptMapMask {};
 	uint32 fInterruptMapLen {};
 	ArrayDeleter<InterruptMap> fInterruptMap;
