@@ -124,8 +124,10 @@ supports_device(device_node* parent)
 		case 0x1456:
 		case 0x1468:
 		case 0x1486:
+		case 0x14ca:
 		case 0x1537:
 		case 0x15df:
+		case 0x1649:
 			break;
 		default:
 			return 0.0f;
