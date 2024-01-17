@@ -248,7 +248,7 @@ xhci_error_string(uint32 error)
 		case COMP_COMMAND_RING_STOPPED: return "Command ring stopped";
 		case COMP_COMMAND_ABORTED: return "Command aborted";
 		case COMP_STOPPED: return "Stopped";
-		case COMP_LENGTH_INVALID: return "Length invalid";
+		case COMP_STOPPED_LENGTH_INVALID: return "Stopped (length invalid)";
 		case COMP_MAX_EXIT_LATENCY: return "Max exit latency too large";
 		case COMP_ISOC_OVERRUN: return "Isoch buffer overrun";
 		case COMP_EVENT_LOST: return "Event lost";
@@ -2637,29 +2637,42 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		return;
 	}
 
-	// In the case of an Event Data TRB, the "transferred" field refers
-	// to the actual number of bytes transferred across the whole TD.
-	// (XHCI 1.2 § 6.4.2.1 Table 6-38 p478.)
+	TRACE("HandleTransferComplete: ed %" B_PRIu32 ", status %" B_PRId32 "\n",
+		  (flags & TRB_3_EVENT_DATA_BIT), trb->status);
+
 	const uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
-	int32 transferred = TRB_2_REM_GET(trb->status), remainder = -1;
-
-	TRACE("HandleTransferComplete: ed %" B_PRIu32 ", code %" B_PRIu8 ", transferred %" B_PRId32 "\n",
-		  (flags & TRB_3_EVENT_DATA_BIT), completionCode, transferred);
-
-	if ((flags & TRB_3_EVENT_DATA_BIT) == 0) {
+	int32 remainder = TRB_2_REM_GET(trb->status), transferred = -1;
+	if ((flags & TRB_3_EVENT_DATA_BIT) != 0) {
+		// In the case of an Event Data TRB, value in the status field refers
+		// to the actual number of bytes transferred across the whole TD.
+		// (XHCI 1.2 § 6.4.2.1 Table 6-38 p478.)
+		transferred = remainder;
+		remainder = -1;
+	} else {
 		// This should only occur under error conditions.
 		TRACE("got an interrupt for a non-Event Data TRB!\n");
-		remainder = transferred;
-		transferred = -1;
+
+		if (completionCode == COMP_STOPPED_LENGTH_INVALID)
+			remainder = -1;
 	}
 
 	if (completionCode != COMP_SUCCESS && completionCode != COMP_SHORT_PACKET
-			&& completionCode != COMP_STOPPED) {
+			&& completionCode != COMP_STOPPED && completionCode != COMP_STOPPED_LENGTH_INVALID) {
 		TRACE_ALWAYS("transfer error on slot %" B_PRId8 " endpoint %" B_PRId8
 			": %s\n", slot, endpointNumber, xhci_error_string(completionCode));
 	}
 
-	const phys_addr_t source = B_LENDIAN_TO_HOST_INT64(trb->address);
+	phys_addr_t source = B_LENDIAN_TO_HOST_INT64(trb->address);
+	if (source >= endpoint->trb_addr
+			&& (source - endpoint->trb_addr) < (XHCI_ENDPOINT_RING_SIZE * sizeof(xhci_trb))) {
+		// The "source" address points to a TRB on the ring.
+		// See if we can figure out what it really corresponds to.
+		const int64 offset = (source - endpoint->trb_addr) / sizeof(xhci_trb);
+		const int32 type = TRB_3_TYPE_GET(endpoint->trbs[offset].flags);
+		if (type == TRB_TYPE_EVENT_DATA || type == TRB_TYPE_LINK)
+			source = B_LENDIAN_TO_HOST_INT64(endpoint->trbs[offset].address);
+	}
+
 	for (xhci_td *td = endpoint->td_head; td != NULL; td = td->next) {
 		int64 offset = (source - td->trb_addr) / sizeof(xhci_trb);
 		if (offset < 0 || offset >= td->trb_count)
@@ -2667,6 +2680,14 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 
 		TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found\n",
 			td, offset);
+
+		if (completionCode == COMP_STOPPED_LENGTH_INVALID) {
+			// To determine transferred length, sum up the lengths of all TRBs
+			// prior to the referenced one. (XHCI 1.2 § 4.6.9 p136.)
+			transferred = 0;
+			for (int32 i = 0; i < offset; i++)
+				transferred += TRB_2_BYTES_GET(td->trbs[i].status);
+		}
 
 		// The TRB at offset trb_used will be the link TRB, which we do not
 		// care about (and should not generate an interrupt at all.) We really
