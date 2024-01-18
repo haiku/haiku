@@ -276,7 +276,8 @@ virtio_gpu_attach_backing(virtio_gpu_driver_info* info, int resourceId)
 	for (int i = 0; i < 16; i++) {
 		if (entries[i].size == 0)
 			break;
-		TRACE("virtio_gpu_attach_backing %d %lx %lx\n", i, entries[i].address, entries[i].size);
+		TRACE("virtio_gpu_attach_backing %d %" B_PRIxPHYSADDR " %" B_PRIxPHYSADDR "\n", i,
+			entries[i].address, entries[i].size);
 		backing.entries[i].addr = entries[i].address;
 		backing.entries[i].length = entries[i].size;
 		backing.backing.nr_entries++;
@@ -413,7 +414,7 @@ virtio_gpu_set_display_mode(virtio_gpu_driver_info* info, display_mode *mode)
 	int newResourceId = info->displayResourceId + 1;
 
 	// create framebuffer area
-	TRACE("virtio_gpu_set_display_mode %" B_PRIu32 " %" B_PRIu32 "\n", mode->virtual_width,
+	TRACE("virtio_gpu_set_display_mode %" B_PRIu16 " %" B_PRIu16 "\n", mode->virtual_width,
 		mode->virtual_height);
 
 	status_t status = virtio_gpu_create_2d(info, newResourceId, mode->virtual_width, mode->virtual_height);

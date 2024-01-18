@@ -63,6 +63,7 @@ AddNewDriversToPackage disk			: nvme_disk usb_disk ;
 AddNewDriversToPackage disk mmc		: mmc_disk ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : ram_disk virtio_block ;
+AddNewDriversToPackage graphics		: virtio_gpu ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddNewDriversToPackage sensor		: $(SYSTEM_ADD_ONS_DRIVERS_SENSOR) ;
 AddNewDriversToPackage network		: usb_ecm virtio_net ;
