@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Keymap	3929369005
+1	friulian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tast
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Stâts Unîts
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PAGJ
 Scroll Lock	Keyboard Layout View		Bloc Scor
 Brazilian	KeymapNames		Brasilian
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		Opzion di diestre
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opzion:
@@ -41,6 +42,7 @@ Croatian	KeymapNames		Cravuat
 PAGE ↑	Keyboard Layout View		PAGJINE ↑
 Set modifier keys	Modifier keys window		Stabilìs i tascj modificadôrs
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium Internazionâl
+Right Command	Keyboard Layout View		Comant di diestre
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tast Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PAGJ
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -52,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ucrain (Mac)
 Command:	Modifier keys window	Command key role name	Comant:
 French (Bépo)	KeymapNames		Francês (Bépo)
 Russian (Typewriter)	KeymapNames		Rus (Machine di scrivi)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Bloc Maiusc:
 Acute trigger	Keymap window		Acent acût
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internazionâl
 Italian	KeymapNames		Talian
@@ -61,6 +64,7 @@ French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
 Modifier keys	Modifier keys window		Tascj modificadôrs
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internazionâl
 Kazakh	KeymapNames		Kazac
+Left Option	Keyboard Layout View		Opzion di çampe
 Save as…	Keymap window		Salve come…
 Lithuanian (Standard)	KeymapNames		Lituan (Standard)
 Error: duplicate keys	Modifier keys window		Erôr: tascj dopleâts
@@ -79,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Maiusc
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedon
 Czech (Mac)	KeymapNames		Cec (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tast Bloc Maiusc
 Albanian	KeymapNames		Albanês
 (Current)	Keymap window		(Atuâl)
 OPT	Keyboard Layout View	Very short for 'option'	OPZ
@@ -134,6 +139,7 @@ Shift:	Modifier keys window	Shift key role name	Maiusculis:
 Keymap	System name		Mape tastiere
 Slovene	KeymapNames		Sloven
 Lithuanian	KeymapNames		Lituan
+Left Command	Keyboard Layout View		Comant di çampe
 Set modifier keys…	Keymap window		Stabilìs tascj modificadôrs…
 Switch shortcut keys to Haiku mode	Keymap window		Passe ai tascj des scurtis de modalitât Haiku
 Defaults	Keymap window		Predefinîts
@@ -156,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumen
 CMD	Keyboard Layout View	Very short for 'command'	CMT
 Command	Keyboard Layout View	Command key	Comant
+Left Shift	Keyboard Layout View		Maiusc di çampe
 SCROLL	Keyboard Layout View		SCOR
 File	Keymap window		File
 Brazilian (ABNT2)	KeymapNames		Brasilian (ABNT2)

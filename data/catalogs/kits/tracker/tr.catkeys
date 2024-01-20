@@ -164,7 +164,7 @@ Filesystem:	InfoWindow		Dosya sistemi:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" açılamadı (%error). 
 Media parameter group	AttributesView		Ortam parametreleri grubu
 %name info	InfoWindow	InfoWindow Title	%name bilgisi
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ev klasörünü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Taşı\"ya basın.
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ana klasörü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Taşı\"ya basın.
 Property info	AttributesView		Özellik bilgisi
 Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, çöp içinde bağlantılar oluşturamazsınız.
 From	Email Query Columns		Şuradan
@@ -226,7 +226,7 @@ There was an error deleting \"%name\":\n\t%error	FSUtils		\%name\" silinirken ha
 Resize to fit	ContainerWindow		Sığacak biçimde boyutlandır
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	\"%name\" ögesini şuraya bağla:
 Mount server error	AutoMounterSettings		Bağlama sunucusu hatası
-If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ev klasörünün adını değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Yeniden adlandır\"a basın.
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ana klasörün adını değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Yeniden adlandır\"a basın.
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Seçimi tersine çevir
 Memory size	AttributesView		Bellek boyutu
@@ -260,7 +260,7 @@ Finish: after several years	StatusWindow		Bitiş: Birkaç yıl içinde
 Favorites	FilePanelPriv		Favoriler
 Point	AttributesView		Nokta
 You can't move or copy items to read-only volumes.	PoseView		Saltokunur disk bölümlerine ögeleri taşıyamaz veya kopyalayamazsınız.
-home	B_USER_DIRECTORY		ev
+home	B_USER_DIRECTORY		ana klasör
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Yeni İzleyici Şablonları
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
 Don't automount	AutoMounterSettings		Otomatik bağlama yok
@@ -498,7 +498,7 @@ Handles %type	OpenWithWindow		%type işler
 Cancel	PoseView		Vazgeç
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
-If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ana klasörü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
 Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, herhangi bir öge çöpe kopyalanamaz.
 Invert selection	VirtualDirectoryWindow		Seçimi tersine çevir
 New folder	FilePanelPriv		Yeni klasör

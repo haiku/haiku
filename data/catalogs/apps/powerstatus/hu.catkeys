@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	1085070685
+1	hungarian	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Futtatás ablakban
 Extended battery info	PowerStatus		Akkumulátor információ
 Show status icon	PowerStatus		Állapotikon megjelenítése
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Utolsó teljes feltöltés:
 Current rate: 	PowerStatus		Jelenlegi gyakoriság: 
 Show text label	PowerStatus		Szöveges címke megjelenítése
 Quit	PowerStatus		Kilépés
+Battery not charging	PowerStatus		Az akkumulátor nem töltődik
 Battery low	PowerStatus		Alacsony töltés
 Model number: 	PowerStatus		Típusszám: 
 Battery unused	PowerStatus		Használatlan akku
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Tervezett kapacitás figyelmeztetés:
 Capacity granularity 2: 	PowerStatus		Kapacitás granularitás 2: 
 Too bad!	PowerStatus		Kár...
 Technology: 	PowerStatus		Technológia: 
+not charging	PowerStatus		nem töltődik
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Energiaállapot
 Design capacity: 	PowerStatus		Tervezett kapacitás: 

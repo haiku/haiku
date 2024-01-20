@@ -26,6 +26,6 @@ Cancel	ScreenshotWindow		Vazgeç
 Delay:	ScreenshotWindow		Gecikme:
 Copy to clipboard	ScreenshotWindow		Panoya kopyala
 screenshot	Screenshot	Base filename of screenshot files	ekran görüntüsü
-Home folder	ScreenshotWindow		Ev klasörü
+Home folder	ScreenshotWindow		Ana klasör
 Save	ScreenshotWindow		Kaydet
 Capture active window	ScreenshotWindow		Etkin pencereyi yakala

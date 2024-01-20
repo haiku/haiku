@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-PowerStatus	1085070685
+1	friulian	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Eseguìs tal barcon
 Extended battery info	PowerStatus		Infomazions batarie estesis
 Show status icon	PowerStatus		Mostre icone di stât
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Ultime cjarie plene:
 Current rate: 	PowerStatus		Tas atuâl: 
 Show text label	PowerStatus		Mostre etichete di test
 Quit	PowerStatus		Jes
+Battery not charging	PowerStatus		La batarie no si sta cjariant
 Battery low	PowerStatus		Batarie basse
 Model number: 	PowerStatus		Numar model: 
 Battery unused	PowerStatus		Batarie no doprade
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Avîs capacitât di fabriche:
 Capacity granularity 2: 	PowerStatus		Granularitât de capacitât 2: 
 Too bad!	PowerStatus		Pecjât!
 Technology: 	PowerStatus		Tecnologjie: 
+not charging	PowerStatus		no si sta cjariant
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Stât de Batarie
 Design capacity: 	PowerStatus		Capacitât (dal costrutôr): 

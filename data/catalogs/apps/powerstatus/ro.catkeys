@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	1085070685
+1	romanian	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Rulează în fereastră
 Extended battery info	PowerStatus		Informații extinse despre baterie
 Show status icon	PowerStatus		Arată pictograma de stare
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Ultima încărcare completă:
 Current rate: 	PowerStatus		Rata curentă: 
 Show text label	PowerStatus		Arată eticheta text
 Quit	PowerStatus		Ieșire
+Battery not charging	PowerStatus		Bateria nu se încarcă
 Battery low	PowerStatus		Baterie descărcată
 Model number: 	PowerStatus		Număr de model: 
 Battery unused	PowerStatus		Baterie neutilizată
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Avertisment de capacitate de model:
 Capacity granularity 2: 	PowerStatus		Capacitatea de granularitate 2: 
 Too bad!	PowerStatus		Păcat!
 Technology: 	PowerStatus		Tehnologie: 
+not charging	PowerStatus		nu se încarcă
  mWh	PowerStatus		 mWh
 PowerStatus	System name		PowerStatus
 Design capacity: 	PowerStatus		Capacitate de model: 

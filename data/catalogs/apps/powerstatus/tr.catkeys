@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-PowerStatus	1085070685
+1	turkish	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Pencere içinde çalış
 Extended battery info	PowerStatus		Ek pil bilgisi
 Show status icon	PowerStatus		Durum simgesini göster
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Son tam dolum:
 Current rate: 	PowerStatus		Geçerli yüzde: 
 Show text label	PowerStatus		Metin etiketini göster
 Quit	PowerStatus		Çık
+Battery not charging	PowerStatus		Pil şarj olmuyor
 Battery low	PowerStatus		Pil düşük
 Model number: 	PowerStatus		Model numarası: 
 Battery unused	PowerStatus		Pil kullanılmamış
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Fabrika çıkış sığası uyarısı:
 Capacity granularity 2: 	PowerStatus		Sığa tanecikliği 2: 
 Too bad!	PowerStatus		Neyse artık!
 Technology: 	PowerStatus		Teknoloji: 
+not charging	PowerStatus		şarj olmuyor
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Güç Durumu
 Design capacity: 	PowerStatus		Fabrika çıkış sığası: 

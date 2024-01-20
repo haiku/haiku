@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	1880123832
+1	friulian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -300,6 +300,7 @@ Select all	ContainerWindow		Selezione ducj
 apps	B_APPS_DIRECTORY		aplicazions
 Error calculating folder size.	InfoWindow		Erôr tal calcolâ la dimension de cartele.
 Delete	FSUtils		Elimine
+Duplicate	FilePanelPriv		Dupliche
 Edit name	ContainerWindow		Modifiche non
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nol è stât pussibil vierzi \"%document\" (Al mancje il simbul: %symbol). \n
 ASCII Text	AttributesView		Test ASCII
