@@ -1132,7 +1132,7 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		// Clear the endpoint's TRBs.
 		memset(endpoint->trbs, 0, sizeof(xhci_trb) * XHCI_ENDPOINT_RING_SIZE);
 		endpoint->used = 0;
-		endpoint->current = 0;
+		endpoint->next = 0;
 
 		// Set dequeue pointer location to the beginning of the ring.
 		SetTRDequeue(endpoint->trb_addr, 0, endpoint->id + 1,
@@ -1647,7 +1647,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	endpoint0->id = 0;
 	endpoint0->td_head = NULL;
 	endpoint0->used = 0;
-	endpoint0->current = 0;
+	endpoint0->next = 0;
 	endpoint0->trbs = device->trbs;
 	endpoint0->trb_addr = device->trb_addr;
 
@@ -1881,7 +1881,7 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		endpoint->id = id;
 		endpoint->td_head = NULL;
 		endpoint->used = 0;
-		endpoint->current = 0;
+		endpoint->next = 0;
 
 		endpoint->trbs = device->trbs + id * XHCI_ENDPOINT_RING_SIZE;
 		endpoint->trb_addr = device->trb_addr
@@ -1984,6 +1984,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 	// "used" refers to the number of currently linked TDs, not the number of
 	// used TRBs on the ring (we use 2 TRBs on the ring per transfer.)
+	// Furthermore, we have to leave an empty item between the head and tail.
 	if (endpoint->used >= (XHCI_MAX_TRANSFERS - 1)) {
 		TRACE_ERROR("link descriptor for pipe: max transfers count exceeded\n");
 		return B_BAD_VALUE;
@@ -2000,15 +2001,18 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	descriptor->next = endpoint->td_head;
 	endpoint->td_head = descriptor;
 
-	const uint32 current = endpoint->current,
-		eventdata = current + 1,
-		last = XHCI_ENDPOINT_RING_SIZE - 1;
-	uint32 next = eventdata + 1;
+	uint32 link = endpoint->next, eventdata = link + 1, next = eventdata + 1;
+	if (eventdata == XHCI_ENDPOINT_RING_SIZE || next == XHCI_ENDPOINT_RING_SIZE) {
+		// If it's "next" not "eventdata" that got us here, we will be leaving
+		// one TRB at the end of the ring unused.
+		eventdata = 0;
+		next = 1;
+	}
 
-	TRACE("link descriptor for pipe: current %d, next %d\n", current, next);
+	TRACE("link descriptor for pipe: link %d, next %d\n", link, next);
 
 	// Add a Link TRB to the end of the descriptor.
-	phys_addr_t addr = endpoint->trb_addr + eventdata * sizeof(xhci_trb);
+	phys_addr_t addr = endpoint->trb_addr + (eventdata * sizeof(xhci_trb));
 	descriptor->trbs[descriptor->trb_used].address = addr;
 	descriptor->trbs[descriptor->trb_used].status = TRB_2_IRQ(0);
 	descriptor->trbs[descriptor->trb_used].flags = TRB_3_TYPE(TRB_TYPE_LINK)
@@ -2032,11 +2036,11 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 #endif
 
 	// Link the descriptor.
-	endpoint->trbs[current].address =
+	endpoint->trbs[link].address =
 		B_HOST_TO_LENDIAN_INT64(descriptor->trb_addr);
-	endpoint->trbs[current].status =
+	endpoint->trbs[link].status =
 		B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
-	endpoint->trbs[current].flags =
+	endpoint->trbs[link].flags =
 		B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK));
 
 	// Set up the Event Data TRB (XHCI 1.2 § 4.11.5.2 p230.)
@@ -2060,39 +2064,22 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_EVENT_DATA)
 			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
 
-	if (next == last) {
-		// We always use 2 TRBs per _Link..() call, so if "next" is the last
-		// TRB in the ring, we need to generate a link TRB at "next", and
-		// then wrap it to 0. (We write the cycle bit later, after wrapping,
-		// for the reason noted in the previous comment.)
-		endpoint->trbs[next].address =
-			B_HOST_TO_LENDIAN_INT64(endpoint->trb_addr);
-		endpoint->trbs[next].status =
-			B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
-		endpoint->trbs[next].flags =
-			B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK));
-
-		next = 0;
-	}
-
 	endpoint->trbs[next].address = 0;
 	endpoint->trbs[next].status = 0;
 	endpoint->trbs[next].flags = 0;
 
 	memory_write_barrier();
 
-	// Everything is ready, so write the cycle bit(s).
-	endpoint->trbs[current].flags |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
-	if (current == 0 && endpoint->trbs[last].address != 0)
-		endpoint->trbs[last].flags |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
+	// Everything is ready, so write the cycle bit.
+	endpoint->trbs[link].flags |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
 
-	TRACE("_LinkDescriptorForPipe pCurrent %p phys 0x%" B_PRIxPHYSADDR
-		" 0x%" B_PRIxPHYSADDR " 0x%08" B_PRIx32 "\n", &endpoint->trbs[current],
-		endpoint->trb_addr + current * sizeof(struct xhci_trb),
-		endpoint->trbs[current].address,
-		B_LENDIAN_TO_HOST_INT32(endpoint->trbs[current].flags));
+	TRACE("_LinkDescriptorForPipe pLink %p phys 0x%" B_PRIxPHYSADDR
+		" 0x%" B_PRIxPHYSADDR " 0x%08" B_PRIx32 "\n", &endpoint->trbs[link],
+		endpoint->trb_addr + link * sizeof(struct xhci_trb),
+		endpoint->trbs[link].address,
+		B_LENDIAN_TO_HOST_INT32(endpoint->trbs[link].flags));
 
-	endpoint->current = next;
+	endpoint->next = next;
 	endpointLocker.Unlock();
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
