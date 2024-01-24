@@ -6,6 +6,8 @@ HaikuPackage $(extrasPackage) ;
 ## Apps Oddities
 
 AddFilesToPackage bin : acpi_call ;
+AddFilesToPackage apps : TV ;
+AddSymlinkToPackage data deskbar menu Applications : apps : TV ;
 
 
 ## Driver Oddities
