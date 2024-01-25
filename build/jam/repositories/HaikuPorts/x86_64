@@ -83,9 +83,9 @@ RemotePackageRepository HaikuPorts
 	gawk-5.2.2-1
 	gettext-0.21.1-4
 	gettext_libintl-0.21.1-4
-	gcc-13.1.0_2023_06_20-1
-	gcc_syslibs-13.1.0_2023_06_20-1
-	gcc_syslibs_devel-13.1.0_2023_06_20-1
+	gcc-13.2.0_2023_08_10-3
+	gcc_syslibs-13.2.0_2023_08_10-3
+	gcc_syslibs_devel-13.2.0_2023_08_10-3
 	giflib-5.2.1-1
 	giflib_devel-5.2.1-1
 	git-2.37.3-1
@@ -295,7 +295,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint8
 	gzip
 	haikuporter
-	hqrfbuzz
+	harfbuzz
 	icu66
 	jam
 	jasper
