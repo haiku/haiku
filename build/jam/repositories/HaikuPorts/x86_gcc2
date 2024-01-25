@@ -104,8 +104,8 @@ RemotePackageRepository HaikuPorts
 	libogg_devel-1.3.5-2
 	libpcre-8.45-3
 	libpcre2-10.39-2
-	libpng16-1.6.38-3
-	libpng16_devel-1.6.38-3
+	libpng16-1.6.40-1
+	libpng16_devel-1.6.40-1
 	libsolv-0.3.0_haiku_2014_12_22-5
 	libsolv_devel-0.3.0_haiku_2014_12_22-5
 	libssh2-1.9.0-2
@@ -117,8 +117,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis-1.3.7-1
 	libvorbis_devel-1.3.7-1
 	libvpx-1.0.0-4
-	libwebp-1.2.4-2
-	libwebp_devel-1.2.4-2
+	libwebp-1.3.2-1
+	libwebp_devel-1.3.2-1
 	libxml2-2.10.4-2
 	libxml2_devel-2.10.4-2
 	live555-2016.06.22-5
@@ -170,8 +170,8 @@ RemotePackageRepository HaikuPorts
 	wonderbrush-2.1.2-11
 	wpa_supplicant-2.10.haiku.2-1
 	zip-3.0-4
-	zlib-1.2.13-2
-	zlib_devel-1.2.13-2
+	zlib-1.3-1
+	zlib_devel-1.3-1
 	zstd-1.5.2-3
 	zstd_devel-1.5.2-3
 	# secondary architecture (x86)
@@ -185,8 +185,8 @@ RemotePackageRepository HaikuPorts
 	coreutils_x86-9.3-3
 	curl_x86-8.1.2-1
 	curl_x86_devel-8.1.2-1
-	dav1d_x86-1.0.0-1
-	dav1d_x86_devel-1.0.0-1
+	dav1d_x86-1.2.1-1
+	dav1d_x86_devel-1.2.1-1
 	diffutils_x86-3.10-3
 	enca_x86-1.19-3
 	enca_x86_devel-1.19-3
@@ -205,9 +205,9 @@ RemotePackageRepository HaikuPorts
 	fribidi_x86_devel-1.0.13-1
 	game_music_emu_x86-0.6.3-2
 	game_music_emu_x86_devel-0.6.3-2
-	gcc_x86-13.1.0_2023_06_20-1
-	gcc_x86_syslibs-13.1.0_2023_06_20-1
-	gcc_x86_syslibs_devel-13.1.0_2023_06_20-1
+	gcc_x86-13.2.0_2023_08_10-3
+	gcc_x86_syslibs-13.2.0_2023_08_10-3
+	gcc_x86_syslibs_devel-13.2.0_2023_08_10-3
 	gettext_x86-0.21.1-4
 	gettext_x86_libintl-0.21.1-4
 	giflib_x86-5.2.1-1
@@ -218,12 +218,12 @@ RemotePackageRepository HaikuPorts
 	graphite2_x86-1.3.14-2
 	graphite2_x86_devel-1.3.14-2
 	grep_x86-3.8-1
-	haikuwebkit_x86-1.9.4-1
-	haikuwebkit_x86_devel-1.9.4-1
-	harfbuzz_x86-7.3.0-1
-	harfbuzz_x86_devel-7.3.0-1
-	icu66_x86-66.1-3
-	icu66_x86_devel-66.1-3
+	haikuwebkit_x86-1.9.11-2
+	haikuwebkit_x86_devel-1.9.11-2
+	harfbuzz_x86-8.3.0-2
+	harfbuzz_x86_devel-8.3.0-2
+	icu74_x86-74.1-3
+	icu74_x86_devel-74.1-3
 	jasper_x86-2.0.16-5
 	jasper_x86_devel-2.0.16-5
 	lame_x86-3.100-4
@@ -232,8 +232,8 @@ RemotePackageRepository HaikuPorts
 	lcms_x86_devel-2.12-2
 	libass_x86-0.17.1-1
 	libass_x86_devel-0.17.1-1
-	libavif_x86-0.9.3-3
-	libavif_x86_devel-0.9.3-3
+	libavif1.0_x86-1.0.3-1
+	libavif1.0_x86_devel-1.0.3-1
 	libedit_x86-20210910_3.1-3
 	libedit_x86_devel-20210910_3.1-3
 	libexecinfo_x86-1.1-6
@@ -248,7 +248,7 @@ RemotePackageRepository HaikuPorts
 	libidn2_x86-2.0.5-3
 	libjpeg_turbo_x86-2.1.4-2
 	libjpeg_turbo_x86_devel-2.1.4-2
-	libjxl_x86-0.6.1-2
+	libjxl_x86-0.6.1-4
 	libmodplug_x86-0.8.9.0-2
 	libogg_x86-1.3.5-2
 	libogg_x86_devel-1.3.5-2
@@ -257,8 +257,8 @@ RemotePackageRepository HaikuPorts
 	libpcap_x86-1.10.4-1
 	libpcre_x86-8.45-3
 	libpcre_x86_devel-8.45-3
-	libpng16_x86-1.6.38-3
-	libpng16_x86_devel-1.6.38-3
+	libpng16_x86-1.6.40-1
+	libpng16_x86_devel-1.6.40-1
 	libpsl_x86-0.21.1-3
 	libpsl_x86_devel-0.21.1-3
 	libsolv_x86-0.3.0_haiku_2014_12_22-5
@@ -275,11 +275,11 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86_devel-1.3.7-1
 	libvpx_x86-1.11.0-3
 	libvpx_x86_devel-1.11.0-3
-	libwebp_x86-1.2.4-2
-	libwebp_x86_devel-1.2.4-2
-	libxml2_x86-2.10.4-2
-	libxml2_x86_devel-2.10.4-2
-	libxslt_x86-1.1.34-4
+	libwebp_x86-1.3.2-1
+	libwebp_x86_devel-1.3.2-1
+	libxml2_x86-2.10.4-4
+	libxml2_x86_devel-2.10.4-4
+	libxslt_x86-1.1.39-2
 	live555_x86-2016.06.22-5
 	live555_x86_devel-2016.06.22-5
 	llvm12_x86_libs-12.0.1-7
@@ -309,6 +309,7 @@ RemotePackageRepository HaikuPorts
 	p7zip_x86-17.05-1
 	pkgconfig_x86-0.29.2-4
 	python3.9_x86-3.9.17-1
+	rav1e_x86-0.6.6-1
 	readline_x86-8.2.001-1
 	sharutils_x86-4.15.2-3
 	snappy_x86-1.1.10-1
@@ -330,8 +331,8 @@ RemotePackageRepository HaikuPorts
 	wavpack_x86_devel-5.5.0-3
 	xz_utils_x86-5.4.4-1
 	xz_utils_x86_devel-5.4.4-1
-	zlib_x86-1.2.13-2
-	zlib_x86_devel-1.2.13-2
+	zlib_x86-1.3-1
+	zlib_x86_devel-1.3-1
 	zstd_x86-1.5.2-3
 	zstd_x86_devel-1.5.2-3
 	:
@@ -381,14 +382,14 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_x86
 	harfbuzz_x86
 	icu
-	icu66_x86
+	icu74_x86
 	jam
 	jasper
 	keymapswitcher
 	lcms_x86
 	less
 	libass_x86
-	libavif_x86
+	libavif1.0_x86
 	libedit
 	libedit_x86
 	libexecinfo
@@ -454,6 +455,7 @@ RemotePackageRepository HaikuPorts
 	perl
 	pkgconfig
 	python3.9_x86
+	rav1e_x86
 	readline
 	sed
 	sharutils

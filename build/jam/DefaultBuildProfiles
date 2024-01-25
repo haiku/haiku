@@ -218,7 +218,7 @@ rule DefineDefaultBuildProfiles
 						expat
 						freetype
 						gcc
-						icu@gcc2 icu66@!gcc2
+						icu@gcc2 icu74@!gcc2
 						libsolv
 						libedit
 						ncurses6

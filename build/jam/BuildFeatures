@@ -112,11 +112,11 @@ if [ IsPackageAvailable icu_devel ] {
 		;
 
 	EnableBuildFeatures icu ;
-} else if [ IsPackageAvailable icu66_devel ] {
+} else if [ IsPackageAvailable icu74_devel ] {
 	ExtractBuildFeatureArchives icu :
-		file: base icu66
+		file: base icu74
 			runtime: lib
-		file: devel icu66_devel
+		file: devel icu74_devel
 			depends: base
 			libraries:
 				$(developLibDir)/libicudata.so
@@ -669,11 +669,11 @@ if [ IsPackageAvailable libwebp_devel ] {
 
 
 # libavif
-if [ IsPackageAvailable libavif_devel ] {
+if [ IsPackageAvailable libavif1.0_devel ] {
 	ExtractBuildFeatureArchives libavif :
-		file: base libavif
+		file: base libavif1.0
 			runtime: lib
-		file: devel libavif_devel
+		file: devel libavif1.0_devel
 			depends: base
 			library: $(developLibDir)/libavif.so
 			headers: $(developHeadersDir) $(developHeadersDir)/avif
