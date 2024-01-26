@@ -3110,15 +3110,6 @@ iflib_rxeof(iflib_rxq_t rxq, qidx_t budget)
 			DBG_COUNTER_INC(rx_if_input);
 			continue;
 		}
-#else /* __HAIKU __*/
-		if (mf != NULL) {
-			ifp->if_input(ifp, mf);
-			DBG_COUNTER_INC(rx_if_input);
-			mt = mf = NULL;
-		}
-		ifp->if_input(ifp, m);
-		DBG_COUNTER_INC(rx_if_input);
-		continue;
 #endif
 
 		if (mf == NULL)
