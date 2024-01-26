@@ -76,6 +76,9 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 	// Clear the message, as we're just going to add to it
 	apps->MakeEmpty();
 
+	BString typeString(type);
+	typeString.ToLower();
+
 	BMimeType mime(type);
 	status_t status = mime.InitCheck();
 	if (status != B_OK)
@@ -83,7 +86,7 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 
 	if (mime.IsSupertypeOnly()) {
 		// Add the apps that support this supertype (plus their count)
-		std::set<std::string> &superApps = fSupportingApps[type];
+		std::set<std::string> &superApps = fSupportingApps[typeString.String()];
 		int32 count = 0;
 		std::set<std::string>::const_iterator i;
 		for (i = superApps.begin(); i != superApps.end() && status == B_OK; i++) {
@@ -94,7 +97,7 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 			status = apps->AddInt32(kSupportingAppsSuperCountField, count);
 	} else {
 		// Add the apps that support this subtype (plus their count)
-		std::set<std::string> &subApps = fSupportingApps[type];
+		std::set<std::string> &subApps = fSupportingApps[typeString.String()];
 		int32 count = 0;
 		std::set<std::string>::const_iterator i;
 		for (i = subApps.begin(); i != subApps.end() && status == B_OK; i++) {
@@ -177,10 +180,11 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 	// supported types list and adding the app as a supporting app for
 	// each type.
 	newTypes.clear();
-	const char *type;
+	BString type;
 	for (int32 i = 0; types->FindString(kTypesField, i, &type) == B_OK; i++) {
-		newTypes.insert(type);
-		AddSupportingApp(type, app);
+		type.ToLower();
+		newTypes.insert(type.String());
+		AddSupportingApp(type.String(), app);
 	}
 
 	// Update the list of stranded types by removing any types that are newly
