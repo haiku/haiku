@@ -793,10 +793,24 @@ ether_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 }
 
 
-static void ether_input(struct ifnet *ifp, struct mbuf *m)
+static void
+ether_input(struct ifnet *ifp, struct mbuf *m)
 {
-	IF_ENQUEUE(&ifp->receive_queue, m);
-	release_sem_etc(ifp->receive_sem, 1, B_DO_NOT_RESCHEDULE);
+	int32 count = 0;
+
+	IF_LOCK(&ifp->receive_queue);
+	while (m != NULL) {
+		struct mbuf *mn = m->m_nextpkt;
+		m->m_nextpkt = NULL;
+
+		_IF_ENQUEUE(&ifp->receive_queue, m);
+		count++;
+
+		m = mn;
+	}
+	IF_UNLOCK(&ifp->receive_queue);
+
+	release_sem_etc(ifp->receive_sem, count, B_DO_NOT_RESCHEDULE);
 }
 
 
