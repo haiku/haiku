@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku.
+ * Copyright 2002-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,13 +35,13 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+
 /*!
 	\class SupportingApps
-	\brief Supporting apps information for the entire database
+	\brief Supporting apps information for the entire MIME database
 */
 
-// Constructor
-//! Constructs a new SupportingApps object
+
 SupportingApps::SupportingApps(DatabaseLocation* databaseLocation)
 	:
 	fDatabaseLocation(databaseLocation),
@@ -49,13 +49,12 @@ SupportingApps::SupportingApps(DatabaseLocation* databaseLocation)
 {
 }
 
-// Destructor
-//! Destroys the SupportingApps object
+
 SupportingApps::~SupportingApps()
 {
 }
 
-// GetSupportingApps
+
 /*! \brief Returns a list of signatures of supporting applications for the
 	given type in the pre-allocated \c BMessage pointed to by \c apps.
 
@@ -64,66 +63,71 @@ SupportingApps::~SupportingApps()
 status_t
 SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 {
-	status_t err = type && apps ? B_OK : B_BAD_VALUE;
+	if (type == NULL || apps == NULL)
+		return B_BAD_VALUE;
+
 	// See if we need to do our initial build still
-	if (!err && !fHaveDoneFullBuild)
-		err = BuildSupportingAppsTable();
+	if (!fHaveDoneFullBuild) {
+		status_t status = BuildSupportingAppsTable();
+		if (status != B_OK)
+			return status;
+	}
 
-	if (!err) {
-		// Clear the message, as we're just going to add to it
-		apps->MakeEmpty();
+	// Clear the message, as we're just going to add to it
+	apps->MakeEmpty();
 
-		BMimeType mime(type);
-		err = mime.InitCheck();
-		if (!err) {
-			if (mime.IsSupertypeOnly()) {
-				// Add the apps that support this supertype (plus their count)
-				std::set<std::string> &superApps = fSupportingApps[type];
-				int32 count = 0;
-				std::set<std::string>::const_iterator i;
-				for (i = superApps.begin(); i != superApps.end() && !err; i++) {
-					err = apps->AddString(kApplicationsField, (*i).c_str());
+	BMimeType mime(type);
+	status_t status = mime.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	if (mime.IsSupertypeOnly()) {
+		// Add the apps that support this supertype (plus their count)
+		std::set<std::string> &superApps = fSupportingApps[type];
+		int32 count = 0;
+		std::set<std::string>::const_iterator i;
+		for (i = superApps.begin(); i != superApps.end() && status == B_OK; i++) {
+			status = apps->AddString(kApplicationsField, (*i).c_str());
+			count++;
+		}
+		if (status == B_OK)
+			status = apps->AddInt32(kSupportingAppsSuperCountField, count);
+	} else {
+		// Add the apps that support this subtype (plus their count)
+		std::set<std::string> &subApps = fSupportingApps[type];
+		int32 count = 0;
+		std::set<std::string>::const_iterator i;
+		for (i = subApps.begin(); i != subApps.end() && status == B_OK; i++) {
+			status = apps->AddString(kApplicationsField, (*i).c_str());
+			count++;
+		}
+		if (status == B_OK)
+			status = apps->AddInt32(kSupportingAppsSubCountField, count);
+
+		// Now add any apps that support the supertype, but not the
+		// subtype (plus their count).
+		BMimeType superMime;
+		status = mime.GetSupertype(&superMime);
+		if (status == B_OK)
+			status = superMime.InitCheck();
+		if (status == B_OK) {
+			std::set<std::string> &superApps = fSupportingApps[superMime.Type()];
+			count = 0;
+			for (i = superApps.begin(); i != superApps.end() && status == B_OK; i++) {
+				if (subApps.find(*i) == subApps.end()) {
+					status = apps->AddString(kApplicationsField, (*i).c_str());
 					count++;
-				}
-				if (!err)
-					err = apps->AddInt32(kSupportingAppsSuperCountField, count);
-			} else {
-				// Add the apps that support this subtype (plus their count)
-				std::set<std::string> &subApps = fSupportingApps[type];
-				int32 count = 0;
-				std::set<std::string>::const_iterator i;
-				for (i = subApps.begin(); i != subApps.end() && !err; i++) {
-					err = apps->AddString(kApplicationsField, (*i).c_str());
-					count++;
-				}
-				if (!err)
-					err = apps->AddInt32(kSupportingAppsSubCountField, count);
-
-				// Now add any apps that support the supertype, but not the
-				// subtype (plus their count).
-				BMimeType superMime;
-				err = mime.GetSupertype(&superMime);
-				if (!err)
-					err = superMime.InitCheck();
-				if (!err) {
-					std::set<std::string> &superApps = fSupportingApps[superMime.Type()];
-					count = 0;
-					for (i = superApps.begin(); i != superApps.end() && !err; i++) {
-						if (subApps.find(*i) == subApps.end()) {
-							err = apps->AddString(kApplicationsField, (*i).c_str());
-							count++;
-						}
-					}
-					if (!err)
-						err = apps->AddInt32(kSupportingAppsSuperCountField, count);
 				}
 			}
+			if (status == B_OK)
+				status = apps->AddInt32(kSupportingAppsSuperCountField, count);
 		}
 	}
-	return err;
+
+	return status;
 }
 
-// SetSupportedTypes
+
 /*! \brief Sets the list of supported types for the given application and
 	updates the supporting apps mappings.
 
@@ -156,52 +160,53 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 status_t
 SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool fullSync)
 {
-	status_t err = app && types ? B_OK : B_BAD_VALUE;
+	if (app == NULL || types == NULL)
+		return B_BAD_VALUE;
+
 	if (!fHaveDoneFullBuild)
-		return err;
+		return B_OK;
 
 	std::set<std::string> oldTypes;
 	std::set<std::string> &newTypes = fSupportedTypes[app];
 	std::set<std::string> &strandedTypes = fStrandedTypes[app];
+
 	// Make a copy of the previous types if we're doing a full sync
-	if (!err) {
-		oldTypes = newTypes;
+	oldTypes = newTypes;
 
-		// Read through the list of new supported types, creating the new
-		// supported types list and adding the app as a supporting app for
-		// each type.
-		newTypes.clear();
-		const char *type;
-		for (int32 i = 0; types->FindString(kTypesField, i, &type) == B_OK;
-				i++) {
-			newTypes.insert(type);
-			AddSupportingApp(type, app);
-		}
-
-		// Update the list of stranded types by removing any types that are newly
-		// re-supported and adding any types that are newly un-supported
-		for (std::set<std::string>::const_iterator i = newTypes.begin();
-				i != newTypes.end(); i++) {
-			strandedTypes.erase(*i);
-		}
-		for (std::set<std::string>::const_iterator i = oldTypes.begin();
-				i != oldTypes.end(); i++) {
-			if (newTypes.find(*i) == newTypes.end())
-				strandedTypes.insert(*i);
-		}
-
-		// Now, if we're doing a full sync, remove the app as a supporting
-		// app for any of its stranded types and then clear said list of
-		// stranded types.
-		if (fullSync) {
-			for (std::set<std::string>::const_iterator i = strandedTypes.begin();
-					i != strandedTypes.end(); i++) {
-				RemoveSupportingApp((*i).c_str(), app);
-			}
-			strandedTypes.clear();
-		}
+	// Read through the list of new supported types, creating the new
+	// supported types list and adding the app as a supporting app for
+	// each type.
+	newTypes.clear();
+	const char *type;
+	for (int32 i = 0; types->FindString(kTypesField, i, &type) == B_OK; i++) {
+		newTypes.insert(type);
+		AddSupportingApp(type, app);
 	}
-	return err;
+
+	// Update the list of stranded types by removing any types that are newly
+	// re-supported and adding any types that are newly un-supported
+	for (std::set<std::string>::const_iterator i = newTypes.begin();
+			i != newTypes.end(); i++) {
+		strandedTypes.erase(*i);
+	}
+	for (std::set<std::string>::const_iterator i = oldTypes.begin();
+			i != oldTypes.end(); i++) {
+		if (newTypes.find(*i) == newTypes.end())
+			strandedTypes.insert(*i);
+	}
+
+	// Now, if we're doing a full sync, remove the app as a supporting
+	// app for any of its stranded types and then clear said list of
+	// stranded types.
+	if (fullSync) {
+		for (std::set<std::string>::const_iterator i = strandedTypes.begin();
+				i != strandedTypes.end(); i++) {
+			RemoveSupportingApp((*i).c_str(), app);
+		}
+		strandedTypes.clear();
+	}
+
+	return B_OK;
 }
 
 
@@ -217,7 +222,7 @@ SupportingApps::DeleteSupportedTypes(const char *app, bool fullSync)
 	return SetSupportedTypes(app, &types, fullSync);
 }
 
-// AddSupportingApp
+
 /*! \brief Adds the given application signature to the set of supporting
 	apps for the given type.
 
@@ -230,13 +235,14 @@ SupportingApps::DeleteSupportedTypes(const char *app, bool fullSync)
 status_t
 SupportingApps::AddSupportingApp(const char *type, const char *app)
 {
-	status_t err = type && app ? B_OK : B_BAD_VALUE;
-	if (!err)
-		fSupportingApps[type].insert(app);
-	return err;
+	if (type == NULL || app == NULL)
+		return B_BAD_VALUE;
+
+	fSupportingApps[type].insert(app);
+	return B_OK;
 }
 
-// RemoveSupportingApp
+
 /*! \brief Removes the given application signature from the set of supporting
 	apps for the given type.
 
@@ -249,13 +255,14 @@ SupportingApps::AddSupportingApp(const char *type, const char *app)
 status_t
 SupportingApps::RemoveSupportingApp(const char *type, const char *app)
 {
-	status_t err = type && app ? B_OK : B_BAD_VALUE;
-	if (!err)
-		fSupportingApps[type].erase(app);
-	return err;
+	if (type == NULL || app == NULL)
+		return B_BAD_VALUE;
+
+	fSupportingApps[type].erase(app);
+	return B_OK;
 }
 
-// BuildSupportingAppsTable
+
 /*! \brief Crawls the mime database and builds a list of supporting application
 	signatures for every supported type.
 */
@@ -268,42 +275,42 @@ SupportingApps::BuildSupportingAppsTable()
 
 	DatabaseDirectory dir;
 	status_t status = dir.Init(fDatabaseLocation, "application");
+	if (status != B_OK)
+		return status;
 
 	// Build the supporting apps table based on the mime database
-	if (status == B_OK) {
-		dir.Rewind();
+	dir.Rewind();
 
-		// Handle each application type
-		while (true) {
-			entry_ref ref;
-			status = dir.GetNextRef(&ref);
-			if (status < B_OK) {
-				// If we've come to the end of list, it's not an error
-				if (status == B_ENTRY_NOT_FOUND)
-					status = B_OK;
-				break;
-			}
+	// Handle each application type
+	while (true) {
+		entry_ref ref;
+		status = dir.GetNextRef(&ref);
+		if (status < B_OK) {
+			// If we've come to the end of list, it's not an error
+			if (status == B_ENTRY_NOT_FOUND)
+				status = B_OK;
+			break;
+		}
 
-			// read application signature from file
-			BString appSignature;
-			BNode node(&ref);
-			if (node.InitCheck() == B_OK && node.ReadAttrString(kTypeAttr,
-					&appSignature) >= B_OK) {
-				// Read in the list of supported types
-				BMessage msg;
-				if (fDatabaseLocation->ReadMessageAttribute(appSignature,
-						kSupportedTypesAttr, msg) == B_OK) {
-					// Iterate through the supported types, adding them to the list of
-					// supported types for the application and adding the application's
-					// signature to the list of supporting apps for each type
-					BString type;
-					std::set<std::string> &supportedTypes = fSupportedTypes[appSignature.String()];
-					for (int i = 0; msg.FindString(kTypesField, i, &type) == B_OK; i++) {
-						type.ToLower();
-							// MIME types are case insensitive, so we lowercase everything
-						supportedTypes.insert(type.String());
-						AddSupportingApp(type.String(), appSignature.String());
-					}
+		// read application signature from file
+		BString appSignature;
+		BNode node(&ref);
+		if (node.InitCheck() == B_OK && node.ReadAttrString(kTypeAttr,
+				&appSignature) >= B_OK) {
+			// Read in the list of supported types
+			BMessage msg;
+			if (fDatabaseLocation->ReadMessageAttribute(appSignature,
+					kSupportedTypesAttr, msg) == B_OK) {
+				// Iterate through the supported types, adding them to the list of
+				// supported types for the application and adding the application's
+				// signature to the list of supporting apps for each type
+				BString type;
+				std::set<std::string> &supportedTypes = fSupportedTypes[appSignature.String()];
+				for (int i = 0; msg.FindString(kTypesField, i, &type) == B_OK; i++) {
+					type.ToLower();
+						// MIME types are case insensitive, so we lowercase everything
+					supportedTypes.insert(type.String());
+					AddSupportingApp(type.String(), appSignature.String());
 				}
 			}
 		}
@@ -317,7 +324,7 @@ SupportingApps::BuildSupportingAppsTable()
 	return status;
 }
 
+
 } // namespace Mime
 } // namespace Storage
 } // namespace BPrivate
-
