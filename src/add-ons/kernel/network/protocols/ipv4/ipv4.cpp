@@ -1707,6 +1707,8 @@ ipv4_receive_data(net_buffer* buffer)
 {
 	TRACE("ipv4_receive_data(%p [%" B_PRIu32 " bytes])", buffer, buffer->size);
 
+	uint16 headerLength = 0;
+	{
 	NetBufferHeaderReader<ipv4_header> bufferHeader(buffer);
 	if (bufferHeader.Status() != B_OK)
 		return bufferHeader.Status();
@@ -1718,7 +1720,7 @@ ipv4_receive_data(net_buffer* buffer)
 		return B_BAD_TYPE;
 
 	uint16 packetLength = header.TotalLength();
-	uint16 headerLength = header.HeaderLength();
+	headerLength = header.HeaderLength();
 	if (packetLength > buffer->size
 		|| headerLength < sizeof(ipv4_header))
 		return B_BAD_DATA;
@@ -1810,13 +1812,13 @@ ipv4_receive_data(net_buffer* buffer)
 	// Since the buffer might have been changed (reassembled fragment)
 	// we must no longer access bufferHeader or header anymore after
 	// this point
+	}
 
 	bool rawDelivered = raw_receive_data(buffer);
 
 	// Preserve the ipv4 header for ICMP processing
 	gBufferModule->store_header(buffer);
-
-	bufferHeader.Remove(headerLength);
+	gBufferModule->remove_header(buffer, headerLength);
 		// the header is of variable size and may include IP options
 		// (TODO: that we ignore for now)
 
