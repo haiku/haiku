@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	1085070685
+1	ukrainian	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Запустити у вікні
 Extended battery info	PowerStatus		Розширені дані батареї
 Show status icon	PowerStatus		Показати значок стану
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Остання повна зарядка:
 Current rate: 	PowerStatus		Поточний розряд: 
 Show text label	PowerStatus		Показати надпис заряду
 Quit	PowerStatus		Вийти
+Battery not charging	PowerStatus		Батарея не заряджається
 Battery low	PowerStatus		Батарея розряджена
 Model number: 	PowerStatus		Номер моделі: 
 Battery unused	PowerStatus		Батарея не використовується
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Рівень низького заряд�
 Capacity granularity 2: 	PowerStatus		Деталізація ємності 2: 
 Too bad!	PowerStatus		Дуже погано!
 Technology: 	PowerStatus		Технологія: 
+not charging	PowerStatus		не заряджається
  mWh	PowerStatus		 мВт·год
 PowerStatus	System name		PowerStatus
 Design capacity: 	PowerStatus		Паспортна ємність: 

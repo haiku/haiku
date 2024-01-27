@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-CharacterMap	2891422290
+1	portuguese	x-vnd.Haiku-CharacterMap	3279536275
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbolos matemáticos diversos B
 Latin extended E	UnicodeBlocks		Latim expandido E
@@ -140,6 +140,7 @@ Oriya	UnicodeBlocks		Oriá
 Ancient Greek numbers	UnicodeBlocks		Números do grego antigo
 Superscripts and subscripts	UnicodeBlocks		Sobrescritos e subscritos
 Osmanya	UnicodeBlocks		Osmanya
+Modi	UnicodeBlocks		Modi
 Small form variants	UnicodeBlocks		Variantes em formato pequeno
 Arrows	UnicodeBlocks		Setas
 Tangut supplement	UnicodeBlocks		Suplemento Tangut
@@ -149,6 +150,7 @@ Ideographic description characters	UnicodeBlocks		Caracteres de descrição ideo
 Supplemental arrows A	UnicodeBlocks		Setas suplementares A
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Formas numéricas
+Avestan	UnicodeBlocks		Avestan
 Latin extended A	UnicodeBlocks		Latim expandido A
 Sundanese	UnicodeBlocks		Sundanês
 Geometric shapes	UnicodeBlocks		Formas geométricas
@@ -188,6 +190,7 @@ Buhid	UnicodeBlocks		Buhid
 Supplementary private use area B	UnicodeBlocks		Área de uso privado suplementar B
 Cuneiform	UnicodeBlocks		Cuneiforme
 Alphabetic presentation forms	UnicodeBlocks		Formas de apresentação alfabética
+Mayan numerals	UnicodeBlocks		Numeração Maia
 Tangut components	UnicodeBlocks		Componentes Tangut
 Letterlike symbols	UnicodeBlocks		Símbolos semelhantes a letras
 Spacing modifier letters	UnicodeBlocks		Letras modificadoras de espaçamento
@@ -210,6 +213,7 @@ Tamil supplement	UnicodeBlocks		Suplemento Tamil
 Cyrillic extended C	UnicodeBlocks		Cirílico Expandido C
 Syriac	UnicodeBlocks		Siríaco
 Private use area	UnicodeBlocks		Área de uso privado
+Vedic extensions	UnicodeBlocks		Extensões Védicas
 Supplement punctuation	UnicodeBlocks		Suplemento de pontuação
 Lycian	UnicodeBlocks		Lício
 Myanmar extended A	UnicodeBlocks		Myanmar expandido A
@@ -235,6 +239,7 @@ Combining diacritical marks	UnicodeBlocks		Marcas diacríticas de combinação
 Tags	UnicodeBlocks		Etiquetas
 Khmer	UnicodeBlocks		Khmer
 Hangul Jamo extended B	UnicodeBlocks		Hangul Jamo expandido B
+Tai Viet	UnicodeBlocks		Tai Viet
 Georgian supplement	UnicodeBlocks		Suplemento do Georgiano
 Tagalog	UnicodeBlocks		Tagalog
 Supplemental Symbols and Pictographs	UnicodeBlocks		Símbolos e pictogramas suplementares

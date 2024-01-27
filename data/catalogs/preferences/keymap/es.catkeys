@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	4164438959
+1	spanish; castilian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonés
 US	KeymapNames		Estados Unidos
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Scroll Lock	Keyboard Layout View		Bloq Despl
 Brazilian	KeymapNames		Brasileño
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		Opción Derecha
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opción:
@@ -63,6 +64,7 @@ French (NF Z71-300)	KeymapNames		Francés (NF Z71-300)
 Modifier keys	Modifier keys window		Teclas modificadoras
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internacional
 Kazakh	KeymapNames		Kazajo
+Left Option	Keyboard Layout View		Opción Izquierda
 Save as…	Keymap window		Guardar como...
 Lithuanian (Standard)	KeymapNames		Lituano (Estándar)
 Error: duplicate keys	Modifier keys window		Error: teclas duplicadas
@@ -137,6 +139,7 @@ Shift:	Modifier keys window	Shift key role name	Mayúsculas:
 Keymap	System name		Mapa de teclado
 Slovene	KeymapNames		Esloveno
 Lithuanian	KeymapNames		Lituano
+Left Command	Keyboard Layout View		Comando Izquierdo
 Set modifier keys…	Keymap window		Elegir teclas modificadoras…
 Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku
 Defaults	Keymap window		Valores predeterminados
@@ -159,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumano
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Comando
+Left Shift	Keyboard Layout View		Mayús Izquierdo
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Archivo
 Brazilian (ABNT2)	KeymapNames		Brasileño (ABNT2)
@@ -168,4 +172,6 @@ Dutch	KeymapNames		Danés
 Diaeresis trigger	Keymap window		Desencadenador de diéresis (¨)
 Icelandic	KeymapNames		Islandés
 Open…	Keymap window		Abrir…
+Left Control	Keyboard Layout View		Control Izquierdo
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Bloq Num

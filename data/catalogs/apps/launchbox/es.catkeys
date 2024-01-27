@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-LaunchBox	1530497419
+1	spanish; castilian	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Definir descripción...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		¿Realmente desea cerrar este pad?\n(El pad no se recordará)
 OK	LaunchBox		Aceptar
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Mostrar borde de ventana
 Failed to launch 'something', error in Pad data.	LaunchBox		Falló al lanzar 'algo', error en dato Pad
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Auto-levantar
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Tamaño de icono
 Open containing folder	LaunchBox		Abrir carpeta contenedora
 Add button here	LaunchBox		Insertar botón aquí

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1880123832
+1	spanish; castilian	x-vnd.Haiku-libtracker	99360811
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -300,6 +300,7 @@ Select all	ContainerWindow		Seleccionar todo
 apps	B_APPS_DIRECTORY		apps
 Error calculating folder size.	InfoWindow		Error calculando el tamaño de la carpeta
 Delete	FSUtils		Eliminar
+Duplicate	FilePanelPriv		Duplicar
 Edit name	ContainerWindow		Cambiar nombre
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		No se pudo abrir \"%document\" (Missing symbol: %symbol). \n
 ASCII Text	AttributesView		Texto ASCII

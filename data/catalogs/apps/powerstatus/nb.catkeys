@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	1085070685
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Kjør i vindu
 Extended battery info	PowerStatus		Utvidet batteriinformasjon
 Show status icon	PowerStatus		Vis statusikon
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Siste fullstendige lading:
 Current rate: 	PowerStatus		Gjeldende rate: 
 Show text label	PowerStatus		Vis tekst
 Quit	PowerStatus		Avslutt
+Battery not charging	PowerStatus		Batteriet lader ikke
 Battery low	PowerStatus		Lavt batterinivå
 Model number: 	PowerStatus		Modellnummer: 
 Battery unused	PowerStatus		Batteri ikke i bruk
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Advarsel om designkapasitet:
 Capacity granularity 2: 	PowerStatus		Kapasitetsgranularitet 2: 
 Too bad!	PowerStatus		Synd!
 Technology: 	PowerStatus		Teknologi: 
+not charging	PowerStatus		lader ikke
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Strøm
 Design capacity: 	PowerStatus		Designkapasitet: 

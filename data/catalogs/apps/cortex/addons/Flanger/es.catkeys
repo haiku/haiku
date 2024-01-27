@@ -1,6 +1,8 @@
-1	spanish; castilian	application/x-vnd.moon-Flanger.media_addon	455620896
+1	spanish; castilian	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no se pudo obtener la información del nodo (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Un complemento basado en FlangerNode.\nde Eric Moon (16 de junio de 1999)
 Delay	CortexAddOnsFlanger		Retraso
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no se pudo encontrar el nodo (%ld):\n%s\n
 Depth	CortexAddOnsFlanger		Profundidad
 Feedback	CortexAddOnsFlanger		Retroalimentación
 Sweep rate	CortexAddOnsFlanger		Ritmo de barrido
@@ -10,4 +12,5 @@ OK	CortexAddOnsCommonMediaNodeControlApp		Aceptar
 controls	CortexAddOnsCommonMediaNodeControlApp		controles
 Mix output	CortexAddOnsFlanger		Salida de la mezcla
 Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: sin parámetros para el nodo (%ld):\n%s\n
 Audio input	CortexAddOnsFlanger		Entrada de audio

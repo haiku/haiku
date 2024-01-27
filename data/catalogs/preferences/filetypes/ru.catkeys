@@ -14,17 +14,17 @@ Select same preferred application as	FileTypes Window		Выбрать такое
 Could not change attributes	Attribute Window		Невозможно изменить атрибуты
 Icon	FileTypes Window		Значок
 Add…	Application Type Window		Добавить…
-Attribute name:	Attribute Window		Имя атрибута:
+Attribute name:	Attribute Window		Название атрибута:
 Long description:	Application Type Window		Подробное описание:
 Cancel	Preferred App Menu		Отмена
 Remove	FileTypes Window		Удалить
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \"%s\" не поддерживает данный тип файлов.\nВы действительно хотите установить его?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Приложение \«%s\» не поддерживает данный тип файлов.\nВы действительно хотите установить его?
 Remove	Application Type Window		Удалить
 Gamma	Application Type Window		Гамма
 Cancel	Application Type Window		Отмена
 Attribute	Attribute Window		Атрибут
 Multiple launch	Application Type Window		Множественный запуск
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# тип приложения был удален} few{# типа приложений были удалены} other{# типов приложений было удалено}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# тип приложения был удалён} few{# типа приложений были удалены} other{# типов приложений было удалено}}
 Edit…	Application Types Window		Изменить…
 Could not set preferred application	FileTypes Window		Невозможно назначить предпочтительное приложение
 Description	FileTypes Window		Описание
@@ -48,14 +48,14 @@ Icon	Application Type Window		Значок
 Duration	Attribute ListView		Длительность
 Version:	Application Type Window		Версия:
 Default application	FileType Window		Приложение по умолчанию
-Internal name:	New File Type Window		Внутреннее имя:
+Internal name:	New File Type Window		MIME-тип:
 Integer 8 bit	Attribute ListView		Целое 8 бит
 Extension:	Extension Window		Расширение:
 Time	Attribute ListView		Время
 Extensions:	FileTypes Window		Расширения:
 Select preferred application	FileType Window		Выбрать предпочтительное приложение
 Description:	FileTypes Window		Описание:
-Multiple files from \"%s\" file type	FileType Window		Множество файлов из типа файла \"%s\"
+Multiple files from \"%s\" file type	FileType Window		Множество файлов из типа файла \«%s\»
 Add new group	New File Type Window		Добавить новую группу
 Remove uninstalled	Application Types Window		Очистить удаленные
 File	Application Type Window		Файл
@@ -75,7 +75,7 @@ Rating	Attribute ListView		Рейтинг
 duration	Attribute ListView		длительность
 File could not be opened	Preferred App Menu		Невозможно открыть файл
 Args only	Application Type Window		Только аргументы
-Could not open \"%s\":\n%s	FileTypes		Невозможно открыть \"%s\":\n%s
+Could not open \"%s\":\n%s	FileTypes		Невозможно открыть \«%s\»:\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	По правому краю
 Save changes before closing?	Application Type Window		Сохранить изменения перед выходом?
 Background app	Application Type Window		Фоновое приложение
@@ -86,7 +86,7 @@ New resource file…	FileTypes Window		Новый ресурс-файл…
 [Multiple files] file types	FileType Window		[Несколько файлов] типы файлов
 Application type	Application Type Window		Тип приложения
 Show in Tracker…	Application Types Window		Отобразить в Tracker…
-Type name:	FileTypes Window		Название типа:
+Type name:	FileTypes Window		Название:
 Visible	Attribute Window		Видимый
 Select preferred application	FileTypes Window		Выбрать предпочтительное приложение
 Path:	Application Types Window		Путь:
@@ -100,7 +100,7 @@ no icon	FileTypes Window		нет значка
 Single launch	Application Type Window		Одиночный запуск
 %s file type	FileType Window		Тип файла %s
 Default	Attribute ListView		Умолчание
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Удаление супертипа будет невозможно отменить.\nВсе типы файлов, которые принадлежат к этому супертипу, будут потеряны!\n\nВы уверены, что хотите сделать это? Для удаления всей группы зажмите клавишу Shift и нажмите \"Удалить\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Удаление супертипа будет невозможно отменить.\nВсе типы файлов, которые принадлежат к этому супертипу, будут потеряны!\n\nВы уверены, что хотите сделать это? Для удаления всей группы зажмите клавишу Shift и нажмите \«Удалить\».
 String	Attribute ListView		Строка
 Add type	New File Type Window		Добавить тип
 Remove icon	Icon View		Удалить значок
@@ -136,7 +136,7 @@ Beta	Application Type Window		Бета
 Could not retrieve preferred application of this file	Preferred App Menu		Невозможно определить предпочтительное приложение этого файла
 Application flags	Application Type Window		Флаги приложения
 OK	FileTypes		ОК
-Group name:	New File Type Window		Имя группы:
+Group name:	New File Type Window		Название группы:
 Move up	FileTypes Window		Вверх
 File	FileTypes Window		Файл
 Add	Attribute Window		Добавить
@@ -163,10 +163,10 @@ FileTypes	System name		Типы файлов
 Version	Application Types Window		Версия
 Quit	FileTypes Window		Выход
 File type	FileType Window		Тип файла
-Internal name:	FileTypes Window		Внутреннее имя:
+Internal name:	FileTypes Window		MIME-тип:
 Add…	FileTypes Window		Добавить…
 Edit icon…	Icon View		Изменить значок…
-Internal name:	Attribute Window		Внутреннее имя:
+Internal name:	Attribute Window		MIME-тип:
 Show recognition rule	FileTypes Window		Отображать правило распознавания
 Double	Attribute ListView		Двойной точности
 Move down	FileTypes Window		Вниз

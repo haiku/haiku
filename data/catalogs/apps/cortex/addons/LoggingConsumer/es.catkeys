@@ -1,5 +1,7 @@
-1	spanish; castilian	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	spanish; castilian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no se pudo obtener información del nodo (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioridad
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no se pudo encontrar el nodo (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latencia
 Logged input	CortexAddOnsLoggingConsumer		Entrada registrada
 CPU spin percentage	CortexAddOnsLoggingConsumer		Porcentaje de la CPU activo
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controles
 controls	CortexAddOnsCommonMediaNodeControlApp		controles
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Conectar
 percent	CortexAddOnsLoggingConsumer		porcentaje
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: sin parámetros para el nodo (%ld):\n%s\n

@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.haiku.SerialConnect	354154115
+1	spanish; castilian	x-vnd.haiku.SerialConnect	4294067463
 Hardware	SerialWindow	Flowcontrol	Hardware
 Connection	SerialWindow		Conexión
 Raw send…	SerialWindow		Envío sin procesar…
 Baud rate	SerialWindow		Tasa de baudios
+Paste	SerialWindow		Pegar
 Stop bits	SerialWindow		Bits de parada
 None	SerialWindow	Flowcontrol	Ninguno
 Cancel	Custom baudrate window		Cancelar

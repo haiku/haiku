@@ -1,7 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku.TV	3120244932
+1	spanish; castilian	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Sin menú
 No border	MainWin		Sin márgenes
 Error, connecting to interface failed:\n\n	MainWin		Error, la conexión con la interfaz falló:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forzar a 720 × 576, relación de aspecto 4:3
 Full screen	MainWin		Pantalla completa
 Scale to native size	MainWin		Escalar a tamaño nativo
 unknown	MainWin		desconocido
@@ -16,7 +17,10 @@ Channel	MainWin		Canal
 Previous channel	MainWin		Canal anterior
 OK	MainWin		Aceptar
 TV	MainWin		Televisión
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forzar a 544 × 576, relación de aspecto 4:3
 Settings	MainWin		Ajustes
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	forzar a 704 × 576, relación de aspecto 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Ajustes…
 None	MainWin		Ninguno

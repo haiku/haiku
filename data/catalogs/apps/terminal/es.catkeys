@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	1384517923
+1	spanish; castilian	x-vnd.Haiku-Terminal	1621801700
 Close other tabs	Terminal TermWindow		Cerrar otras pestañas
 Insert path	Terminal TermView		Insertar la ruta de acceso
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Lo sentimos, pero el Terminal no pudo iniciar la shell.
 Text encoding	Terminal TermWindow		Codificación de texto
+Colors	Terminal ThemeWindow		Colores
 OK	Terminal SetTitleWindow		Aceptar
 Edit	Terminal TermWindow		Editar
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               muestra esta ayuda\n  -t,     --title              ajusta el título de la ventana\n  -f,     --fullscreen         cambia a pantalla completa\n  -w,     --working-directory  ajusta el directorio de trabajo inicial\n
@@ -16,9 +17,11 @@ Print	Terminal TermWindow		Imprimir
 Settings	Terminal TermWindow		Ajustes
 %app% settings	Terminal PrefWindow	window title	Configuración de %app%
 ANSI bright black color	Terminal ThemeView		Color negro brillante ANSI
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo actual del proceso activo.\n\t\t\tOpcionalmente el número máximo de componentes de ruta que puede tener\n\t\t\tspecified. P.e. '%2d' a lo sumo dos componentes.\n\t%i\t-\tEl índice de la pestaña.\n\t%e\t-\tLa codificación de la pestaña actual. No se muestra para UTF-8.\n\t%p\t-\tEl nombre del proceso activo.
 Use default	Terminal SetTitleWindow		Usar predeterminado
 Close tab	Terminal TermWindow		Cerrar pestaña
 Error!	Terminal getString		¡Error!
+Colors…	Terminal TermWindow		Colores…
 Appearance	Terminal PrefWindow		Apariencia
 Set tab title	Terminal TermWindow		Fijar el título de la ventana
 Create link here	Terminal TermView		Crear enlace aquí
@@ -27,17 +30,23 @@ yellow	Terminal ThemeView		amarillo
 Change directory	Terminal TermView		Cambiar directorio 
 Custom	Terminal AppearancePrefView	Window size	Personalizada
 Page setup…	Terminal TermWindow		Configuración de la página...
+ANSI yellow color	Terminal ThemeView		Color ANSI amarillo
 Cancel	Terminal TermView		Cancelar
 Defaults	Terminal PrefWindow		Predeterminado
+black	Terminal ThemeView		negro
 Revert	Terminal PrefWindow		Revertir
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 Use selection	Terminal FindWindow		Utilizar selección
 Find next	Terminal TermWindow		Buscar siguiente
 Copy link location	Terminal TermView		Copiar ubicación del enlace
+Background	Terminal ThemeView		Fondo
 Window title:	Terminal AppearancePrefView		Titulo de la ventana:
 New tab	Terminal TermWindow		Nueva pestaña
+magenta	Terminal ThemeView		magenta
 Allow bold text	Terminal AppearancePrefView		Permitir texto en negrita
 Window title…	Terminal TermWindow		Título de la ventana...
+ANSI blue color	Terminal ThemeView		Color ANSI azul
+blue	Terminal ThemeView		azul
 Open path	Terminal TermView		Abrir ruta
 Cannot execute \"%command\":\n\t%error	Terminal Shell		No se pudo ejecutar \"%command\":\n\t%error
 Terminal	System name		Terminal
@@ -45,6 +54,7 @@ Custom	Terminal colors scheme		Personalizada
 Really close?	Terminal TermWindow		¿Está seguro de cerrar?
 Font size	Terminal TermWindow		Tamaño de tipografía
 OK	Terminal TermApp		Aceptar
+ANSI bright blue color	Terminal ThemeView		Color ANSI azul claro
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		El proceso \"%1\" está funcionando actualmente.\nSi cierras la terminal el proceso terminará.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opción no reconocida \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Título de la pestaña:
@@ -58,16 +68,23 @@ Find previous	Terminal TermWindow		Buscar anterior
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patrón especificando los títulos de las ventanas. Los siguientes marcadores de posición\npueden usarse:
 Close	Terminal TermWindow		Cerrar
 Save to file…	Terminal PrefWindow		Guardar a fichero...
+Defaults	Terminal ThemeWindow		Predeterminados
 Copy path	Terminal TermView		Copiar ruta
 Window size	Terminal TermWindow		Tamaño de la ventana
+Selected text	Terminal ThemeView		Texto seleccionado
 Copy absolute path	Terminal TermView		Copiar ruta absoluta
 Cancel	Terminal TermWindow		Cancelar
+ANSI cyan color	Terminal ThemeView		Color ANSI cian
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		El proceso \"%1\" todavía está funcionando.\nSi cierras la pestaña el proceso terminará.
 Full screen	Terminal TermWindow		Pantalla completa
 Shell 	Terminal TermWindow		Intérprete 
+Revert	Terminal ThemeWindow		Revertir
+ANSI green color	Terminal ThemeView		Color ANSI verde
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tEl carácter '%'.\n\t%<\t-\tInicia una sección que solo se mostrará si un marcador de posición\n\t\t\tque se encuentre a continuación no está vacío.\n\t%>\t-\tInicia una sección que solo se mostrará si un marcador de posición\n\t\t\tentre una %< section y ésta no está vacía.\n\t%-\t-\tFinaliza una sección %< o %>.\n\nCualquier carácter que no sea alfanumérico entre '%' y la letra de formato insertará un espacio sólo\nsi el valor del marcador de posición no está vacío. Lo agregará a la sección %<.
+ANSI bright cyan color	Terminal ThemeView		Color ANSI cian claro
 Tab title:	Terminal TermWindow		Título de la pestaña:
 Window title:	Terminal TermWindow		Título de la ventana:
+ANSI white color	Terminal ThemeView		Color ANSI blanco
 Window size:	Terminal AppearancePrefView		Tamaño de la ventana:
 Switch Terminals	Terminal TermWindow		Intercambiar terminales
 Decrease	Terminal TermWindow		Disminuir
@@ -79,25 +96,41 @@ Close active tab	Terminal TermWindow		Cerrar la pestaña activa
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patrón especifica el título de la ventana. Los siguientes marcadores de posición\ncpueden ser usados:\n
 Save as default	Terminal TermWindow		Definir como predeterminado
 Nothing is selected.	Terminal TermWindow		No se ha seleccionado nada.
+ANSI bright red color	Terminal ThemeView		Color ANSI rojo claro
 Use left Option as Meta key	Terminal AppearancePrefView		Usar la Opción izquierda como tecla Meta
 Find	Terminal FindWindow		Encontrar
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patrón especifica el título de la pestaña actual. Los siguientes marcadores de posición\nse pueden utilizar:\n
+Save to file…	Terminal ThemeWindow		Guardar a archivo…
 Font:	Terminal AppearancePrefView		Tipo de letra:
 Paste	Terminal TermWindow		Pegar
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patrón especificando los títulos de las ventanas. Los siguientes marcadores de posición\nse pueden utilizar:
+ANSI bright magenta color	Terminal ThemeView		Color ANSI magenta claro
 Copy here	Terminal TermView		Copiar aquí
 Use default shell	Terminal Shell		Usar intérprete predeterminado
+red	Terminal ThemeView		rojo
+white	Terminal ThemeView		blanco
 Open link	Terminal TermView		Abrir enlace
+Text	Terminal ThemeView		Texto
+ANSI bright yellow color	Terminal ThemeView		Color ANSI amarillo brillante
 Not found.	Terminal TermWindow		No encontrado.
+ANSI black color	Terminal ThemeView		Color ANSI negro
 Find…	Terminal TermWindow		Encontrar…
 No search string was entered.	Terminal TermWindow		No se ha especificado la cadena de búsqueda.
 Move here	Terminal TermView		Mover aquí
 Abort	Terminal Shell		Interrumpir
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Los siguientes procesos están activos:\n\n\t%1\n\nSi cierra la Terminal, los procesos finalizarán
 Set window title	Terminal TermWindow		Fijar el título de la ventana
+ANSI red color	Terminal ThemeView		Color ANSI rojo
 Increase	Terminal TermWindow		Aumentar
+green	Terminal ThemeView		verde
+ANSI bright green color	Terminal ThemeView		Color ANSI verde claro
 OK	Terminal TermWindow		Aceptar
+Text under cursor	Terminal ThemeView		Texto debajo del cursor
+ANSI bright white color	Terminal ThemeView		Color ANSI blanco claro
 Close window	Terminal TermWindow		Cerrar ventana
+ANSI magenta color	Terminal ThemeView		Color ANSI magenta
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui y Takashi Murai.\n\nModo de uso: %s [OPTION] [SHELL]\n
+cyan	Terminal ThemeView		cian
 Clear all	Terminal TermWindow		Limpiar todo
+Cursor	Terminal ThemeView		Cursor
 Search forward	Terminal FindWindow		Buscar hacia delante

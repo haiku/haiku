@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-GLTeapot	400822745
+1	spanish; castilian	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Derecha
 Backface culling	TeapotWindow		Ocultar caras traseras
 Add a teapot	TeapotWindow		Agregar una tetera
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Abajo a la izquierda
 Fog	TeapotWindow		Niebla
 FPS display	TeapotWindow		Mostrar FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Limitar FPS a la frecuencia de refresco
 Settings	TeapotWindow		Configuración
 Gouraud shading	TeapotWindow		Sombreado Gouraud
 Lighting	TeapotWindow		Iluminación

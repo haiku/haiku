@@ -1,9 +1,12 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	1928805340
+1	spanish; castilian	x-vnd.Haiku-Installer	3346789745
 Performing installation.	InstallProgress		Realizando instalación.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
 No optional packages available.	PackagesView		No hay paquetes opcionales disponibles.
+This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Este sistema operativo debe instalarse en una partición que use Be File System, pero actualmente no hay disponibles ese tipo de particiones en su sistema.
 The mount point could not be retrieved.	InstallProgress		No se pudo recuperar el punto de montaje.
 <none>	InstallerWindow	No partition available	<ninguna>
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalación completada. Se ha escrito el sector de arranque en '%s'. Haga clic en 'Reiniciar' para reiniciar el equipo o elija un nuevo volumen objetivo para realizar otra instalación.
+Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku debe instalarse en una partición que use Be File System, pero actualmente no hay disponibles ese tipo de particiones en su sistema.
 Please choose target	InstallerWindow		Por favor, elija destino
 Cancel	InstallProgress		Cancelar
 Are you sure you want to to stop the installation?	InstallerWindow		¿Está seguro de querer parar la instalación?

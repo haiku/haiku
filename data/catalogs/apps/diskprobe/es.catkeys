@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DiskProbe	4193379066
+1	spanish; castilian	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Editor en bruto
 Remove	AttributeWindow		Quitar
 Close	ProbeView		Cerrar
@@ -29,7 +29,9 @@ Open file…	FileWindow		Abrir archivo…
 32 bit unsigned pointer:	TypeEditors		Puntero sin signo de 32 bits:
 DiskProbe request	DiskProbe		Solicitud del Examinador de disco
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
+Block %lld (0x%Lx)	ProbeView		Bloque %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Falló la escritura al archivo:\n%s\n\nSe perderán todos los cambios al salir.
+Native: %lld (0x%0*Lx)	ProbeView		Nativo: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Examinar dispositivo:
 Number editor	TypeEditors		Editor de números
 Icon	TypeEditors		Ícono
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Solicitud del Examinador de disco
 Double precision floating-point value:	TypeEditors		Valor de coma flotante de doble precisión:
 Image	TypeEditors	This is the type of view	Imagen
+Swapped: %lld (0x%0*Lx)	ProbeView		Intercambiados: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		¿Guardar cambios antes de cerrar?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Formato PNG
 Number	TypeEditors	This is the type of editor	Número
 Edit	ProbeView		Editar

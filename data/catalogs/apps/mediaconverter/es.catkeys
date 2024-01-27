@@ -1,7 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-MediaConverter	2059124596
+1	spanish; castilian	x-vnd.Haiku-MediaConverter	3458127841
 Input file not recognized as Audio or Video	MediaConverter		El archivo de entrada no se ha podido reconocer como un archivo de audio o video.
 Source files	MediaConverter		Archivos de entrada
 Error writing video frame %lld	MediaConverter		Error al escribir el fotograma %lld del video
+Audio quality: %s	MediaConverter		Calidad de audio: %s
 Error converting '%filename'	MediaConverter		Error al convertir '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		No se encontró el directorio seleccionado. Se ha cambiado a /boot/home
 Conversion completed	MediaConverter		Conversión completada
@@ -58,6 +59,8 @@ File	Menu		Archivo
 Video quality not supported	MediaConverter		Calidad de video no soportada
 Select this folder	MediaConverter		Seleccionar esta carpeta
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canales
+Understood	MediaConverter		Entendido
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Sin video
 Continue	MediaConverter		Continuar

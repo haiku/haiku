@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-WebPTranslator	3577836064
+1	portuguese	x-vnd.Haiku-WebPTranslator	828165164
 High	ConfigView		Alta
 WebPTranslator Settings	ConfigView		Definições do WebPTranslator
 Low	ConfigView		Baixa
@@ -7,6 +7,7 @@ Photo	ConfigView		Fotografia
 WebP image translator	WebPTranslator		Tradutor de imagens WebP
 ©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
 ©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Imagem
 Default	ConfigView		Predefinição
 Text	ConfigView		Texto
 Preprocessing filter	ConfigView		Filtro de pré-processamento

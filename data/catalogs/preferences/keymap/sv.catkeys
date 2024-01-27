@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Keymap	139266573
+1	swedish	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tangent
 Japanese	KeymapNames		Japanska
 US	KeymapNames		US
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ukrainska (Mac)
 Command:	Modifier keys window	Command key role name	Kommando:
 French (Bépo)	KeymapNames		Franska (Bépo)
 Russian (Typewriter)	KeymapNames		Ryska (skrivmaskin)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Caps Lock:
 Acute trigger	Keymap window		Acute trigger
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internationellt
 Italian	KeymapNames		Italienska
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Skift
 CONTROL	Keyboard Layout View		KONTROLL
 Macedonian	KeymapNames		Makedonska
 Czech (Mac)	KeymapNames		Tjeckiska (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps Lock-tangent
 Albanian	KeymapNames		Albanska
 (Current)	Keymap window		(Nuvarande)
 OPT	Keyboard Layout View	Very short for 'option'	VAL

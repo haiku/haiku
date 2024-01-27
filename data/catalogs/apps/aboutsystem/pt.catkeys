@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-About	3179728439
+1	portuguese	x-vnd.Haiku-About	4264836225
 The Haikuware team and their bounty program\n	AboutView		À equipa do Haikuware e ao seu programa de recompensas\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Todos os direitos reservados.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Todos os direitos reservados.
@@ -31,6 +31,8 @@ Licenses: 	AboutView		Licenças:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		O copyright do código do Haiku é propriedade da Haiku, Inc. ou dos respetivos autores onde expressamente notado no código-fonte. Haiku® e o logótipo® HAIKU são marcas comerciais registadas da Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Time running:	AboutView		Tempo de actividade:
+Version: %s	AboutView	Version: R1 or hrev99999	Versão: %s
+%d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB de Memória:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Todos os direitos reservados.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Este software é baseado em parte no trabalho do Independent JPEG Group.
@@ -76,6 +78,7 @@ Translations:\n	AboutView		Traduções:\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. todos os direitos reservados.
 BSD (2-clause)	AboutWindow		BSD (2-clause)
 Website & marketing:\n	AboutView		Website & marketing:\n
+%d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB usados (%s)
 %.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f GHz
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 por Andy Ritger baseado na Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…e às muitas pessoas que têm feito donativos!\n\n

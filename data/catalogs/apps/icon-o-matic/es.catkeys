@@ -1,8 +1,12 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	1244334028
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	1837146713
 None	Icon-O-Matic-Properties		Ninguno
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Ruta de limpieza
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Agregar vacío
 Opening the icon failed!	Icon-O-Matic-Main		¡Error al abrir el icono!
+Reverse path	Icon-O-Matic-ReversePathCmd		Ruta reversa
 Add with path	Icon-O-Matic-ShapesList		Agregar con ruta
+Paste properties	Icon-O-Matic-Properties		Pegar propiedades
 Copy	Icon-O-Matic-Properties		Copiar
 Color	Icon-O-Matic-PropertyNames		Color
 Format	Icon-O-Matic-SavePanel		Formato
@@ -10,18 +14,26 @@ Color	Icon-O-Matic-StyleTypes		Color
 Select	Icon-O-Matic-Properties		Seleccionar
 Reset transformation	Icon-O-Matic-ShapesList		Restablecer transformación
 Duplicate	Icon-O-Matic-StylesList		Duplicar
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Rotar
 Shorten	Icon-O-Matic-PropertyNames		Acortar
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		Mover {0, plural, one{transformador} other{transformadores}}
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		El texto que está tratando importar es muy largo, ¿está seguro?
 Paste	Icon-O-Matic-Properties		Pegar
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Hay demasiados estilos. El formato HVIF admite un máximo de 255.
 Close	Icon-O-Matic-Menu-File		Cerrar
 Add rect	Icon-O-Matic-PathsList		Agregar rectángulo
 Rotation	Icon-O-Matic-PropertyNames		Rotación
+Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Color (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		Atributo BEOS:ICON
 Transform	Icon-O-Matic-PathManipulator		Transformar
 Add shape with style	Icon-O-Matic-Menu-Shape		Agregar forma con estilo
+Change color	Icon-O-Matic-SetColorCmd		Cambiar color
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Quitar {0, plural, one{vértice} other{vértices}}
 Remove	Icon-O-Matic-StylesList		Eliminar
 Cancel	Icon-O-Matic-Menu-Settings		Cancelar
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformación
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Move {0, plural, one{ruta} other{rutas}}
 Closed	Icon-O-Matic-PropertyNames		Cerrado
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nada que rehacer>
 Height	Icon-O-Matic-PropertyNames		Altura
@@ -35,26 +47,40 @@ Flip	Icon-O-Matic-PathManipulator		Intercambiar
 Opacity	Icon-O-Matic-PropertyNames		Opacidad
 OK	Icon-O-Matic-ColorPicker		Aceptar
 Error: 	Icon-O-Matic-Main		Error:
+Assign style	Icon-O-Matic-AssignStyleCmd		Asignar estilo
 Saving your document failed!	Icon-O-Matic-Exporter		¡El guardado de su documento falló!
 Snap to grid	Icon-O-Matic-Menu-Settings		Ajustar a la cuadrícula
 Opening the document failed!	Icon-O-Matic-Main		¡No se pudo abrir el documento!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		Quitar {0, plural, one{estilo} other{estilos}}
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Una o varias de las rutas tienen demasiados vértices. El formato HVIF admite un máximo de 255 vértices por ruta.
 Add with path & style	Icon-O-Matic-ShapesList		Agregar con ruta y estilo
 Shape	Icon-O-Matic-Menus		Forma
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		Dividir {0, plural, one{vértice} other{vértices}}
 <unavailable>	Icon-O-Matic-StyleTypes		<no disponible>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Editar degradado
 Min LOD	Icon-O-Matic-PropertyNames		LOD mínimo
+Redo: %action%	Icon-O-Matic-Main		Rehacer: %action%
 Add	Icon-O-Matic-TransformersList		Agregar
 Settings	Icon-O-Matic-Menus		Configuración
 Scale X	Icon-O-Matic-PropertyNames		Escala X
 Add	Icon-O-Matic-PathsList		Agregar
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		Añadir {0, plural, one{estilo} other{estilos}}
 Remove	Icon-O-Matic-PathManipulator		Eliminar
 Duplicate	Icon-O-Matic-ShapesList		Duplicar
+Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Contorno
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		Añadir {0, plural, one{transformador} other{transformadores}}
+Insert vertex	Icon-O-Matic-InsertPointCmd		Insertar vértice
 Rounding	Icon-O-Matic-PropertyNames		Redondear
 Joins	Icon-O-Matic-PropertyNames		Uniones
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Hay demasiadas formas. El formato HVIF admite un máximo de 255.
 Cancel	Icon-O-Matic-ColorPicker		Cancelar
 Duplicate	Icon-O-Matic-PathsList		Duplicar
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Move {0, plural, one{forma} other{formas}}
 Save	Icon-O-Matic-Menu-Settings		Guardar
 Export as…	Icon-O-Matic-Menu-File		Exportar como...
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Quitar {0, plural, one{forma} other{formas}}
+Undo: %action%	Icon-O-Matic-Main		Deshacer: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamante
 Don't save	Icon-O-Matic-Menu-Settings		No guardar
 Add shape with path	Icon-O-Matic-Menu-Shape		Agregar forma con ruta
@@ -62,22 +88,30 @@ Translation X	Icon-O-Matic-PropertyNames		Traslación X
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic podría no haber interpretado toda la información del SVG cuando se cargó. Si sobreescribe el archivo original, esta información se perderá.
 Rotate indices backwards	Icon-O-Matic-PathsList		Rotar índices hacia atras
 Overwrite	Icon-O-Matic-SVGExport		Sobrescribir
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Añadir {0, plural, one{forma} other{formas}}
 Cancel	Icon-O-Matic-SVGExport		Cancelar
 Open…	Icon-O-Matic-Menu-File		Abrir...
 Remove	Icon-O-Matic-ShapesList		Eliminar
+Bad news	Title of error alert		Malas noticias
+HVIF source code	Icon-O-Matic-SavePanel		Código fuente HVIF
 Drop shapes	Icon-O-Matic-ShapesList		Desechar las formas
 Linear	Icon-O-Matic-StyleTypes		Lineal
+Add vertex	Icon-O-Matic-AddPointCmd		Añadir vértice
 Clean up	Icon-O-Matic-PathsList		Limpiar
 Split	Icon-O-Matic-PathManipulator		Dividir
 Move	Icon-O-Matic-TransformationBoxStates		Mover
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Hay demasiadas rutas. El formato HVIF admite un máximo de 255.
 Conic	Icon-O-Matic-StyleTypes		Cónico
 Name	Icon-O-Matic-PropertyNames		Nombre
 Reset transformation	Icon-O-Matic-StylesList		Restablecer transformación
 Reverse	Icon-O-Matic-PathsList		Invertir
 Remove	Icon-O-Matic-PathsList		Eliminar
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Style type	Icon-O-Matic-StyleTypes		Tipo de estilo
 Quit	Icon-O-Matic-Menu-File		Salir
 Gradient	Icon-O-Matic-StyleTypes		Gradiente
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Color (#%02x%02x%02x)
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		Añadir {0, plural, one{ruta} other{rutas}}
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Agregar forma con ruta y estilo
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Texto demasiado largo
@@ -89,6 +123,7 @@ Rotate indices forwards	Icon-O-Matic-PathsList		Rotar indices hacia adelante
 Save	Icon-O-Matic-Menu-File		Guardar
 Add circle	Icon-O-Matic-PathsList		Agregar círculo
 Freeze transformation	Icon-O-Matic-ShapesList		Congelar transformación
+META:ICON attribute	Icon-O-Matic-SavePanel		Atributo META:ICON
 Untitled	Icon-O-Matic-Main		Sin título
 Max LOD	Icon-O-Matic-PropertyNames		LOD máximo
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		¿Guardar los cambios al icono actual antes de cerrar?
@@ -100,6 +135,7 @@ Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nada que deshacer>
 Add	Icon-O-Matic-StylesList		Agregar
 Translation Y	Icon-O-Matic-PropertyNames		Traslación Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Modificar vértice
 Scale	Icon-O-Matic-TransformationBoxStates		Escala
 All	Icon-O-Matic-Properties		Todo
 Transformer	Icon-O-Matic-Menus		Transformador
@@ -107,11 +143,14 @@ Invert selection	Icon-O-Matic-Properties		Invertir selección
 <unkown property>	Icon-O-Matic-PropertyNames		<propiedad desconocida>
 Pick a color	Icon-O-Matic-ColorPicker		Seleccionar un color
 Settings…	Icon-O-Matic-SavePanel		Configuración...
+Select all	Icon-O-Matic-PathManipulator		Seleccionar todo
 Add with style	Icon-O-Matic-ShapesList		Agregar con estilo
 New	Icon-O-Matic-Menu-File		Nuevo
 Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
+Perspective	Transformation		Perspectiva
 Export	Icon-O-Matic-Menu-File		Exportar
 Width	Icon-O-Matic-PropertyNames		Ancho
+Add reference image	Icon-O-Matic-ShapesList		Añadir imagen de referencia
 Style	Icon-O-Matic-Menus		Estilo
 Off	Icon-O-Matic-Menu-Settings		Apagado
 Edit	Icon-O-Matic-Menus		Editar

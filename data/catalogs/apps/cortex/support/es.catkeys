@@ -1,4 +1,4 @@
-1	spanish; castilian	application/x-vnd.Cortex.support	1625162530
+1	spanish; castilian	application/x-vnd.Cortex.support	761210807
 Header has flags	MediaString		El encabezado tiene marcas
 32 bit HLS	MediaString		HLS de 32 bits
 Recording	MediaString		Grabación
@@ -31,6 +31,7 @@ Back-center	MediaString		Central trasero
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{entero de # bits}}
 Ambisonic WXYZ	MediaString		WXYZ ambisónico
 (unknown video format)	MediaString		(formato de video desconocido)
+Video data between line %lu and %lu	MediaString		Datos de video entre las líneas %lu y %lu
 AVI format family	MediaString		Familia de formatos AVI
 Homogenous buffers	MediaString		Búferes homogéneos
 Interlaced 	MediaString		Entrelazado 
@@ -41,6 +42,7 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Derecha
+%ld × %ld	MediaString	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 32 bit RGB	MediaString		RGB de 32 bits
 System mixer	MediaString		Mezclador del sistema
 Physical output	MediaString		Salida física

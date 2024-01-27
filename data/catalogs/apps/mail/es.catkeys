@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	4073987023
+1	spanish; castilian	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Ajustar como Guardado
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
 Text wrapping:	Mail		Ajuste del texto:
@@ -38,7 +38,9 @@ Previous message	Mail		Mensaje anterior
 (Address unavailable)	Mail		(Dirección indisponible)
 Mail	System name		Correo
 Copy link location	Mail		Copiar la ubicación del enlace
+Add attachment…	Mail		Añadir archivo adjunto…
 Next	Mail		Siguiente
+Attachments:	Mail		Archivos adjuntos:
 Show icons only	Mail		Mostrar solo iconos
 Subject:	Mail		Asunto:
 OK	Mail		Aceptar
@@ -55,6 +57,7 @@ Reply to sender	Mail		Responder al remitente
 \\n - Newline	Mail		\\n - Nueva línea
 Copy	Mail		Copiar
 Add signature	Mail		Agregar firma
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Archivo adjunto: %name% (tipo: %type%)
 %n - Full name	Mail		%n - Nombre completo
 Signature	Mail		Firma
 Use default account	Mail		Usar la cuenta por omisión
@@ -104,8 +107,10 @@ Start now	Mail		Iniciar ahora
 (Name unavailable)	Mail		(Nombre indisponible)
 Move to trash	Mail		Mover a la papelera
 <none>	Mail		<ninguno>
+Mail settings	Mail		Ajustes de correo
 %d - Date	Mail		%d - Fecha
 Check spelling	Mail		Comprobar ortografía
+Status:	Mail		Estado:
 Redo	Mail		Rehacer
 Leave as '%s'	Mail		Dejar como '%s'
 Print…	Mail		Imprimir…
