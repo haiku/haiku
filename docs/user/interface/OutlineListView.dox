@@ -207,7 +207,7 @@
 	Responds to mouse clicks expanding or collapsing sections of the outline
 	when the user clicks on a latch.
 
-	\param where The point on the screen where to mouse pointer is when
+	\param where The point on the screen where the mouse pointer is when
 	       the mouse button is pressed.
 
 	\see BListView::MouseDown()
@@ -280,7 +280,7 @@
 
 	\param newItems The list of items to add.
 
-	\return \c true if the items was added, \c false otherwise.
+	\return \c true if the items were added, \c false otherwise.
 
 	\since BeOS R3
 */
@@ -291,9 +291,9 @@
 	\brief Adds a list of items at \a fullListIndex
 
 	\param newItems The list of items to add.
-	\param fullListIndex The index to add \a item at.
+	\param fullListIndex The index at which to start adding the items.
 
-	\return \c true if the items was added, \c false otherwise.
+	\return \c true if the items were added, \c false otherwise.
 
 	\since BeOS R3
 */
@@ -337,8 +337,8 @@
 /*!
 	\name Full List
 
-	These methods replicate similar methods in BListView except work on the
-	full list.
+	These methods replicate similar methods in BListView, but they work on the
+	full list, without discarding collapsed items.
 */
 
 
@@ -374,7 +374,7 @@
 	\fn int32 BOutlineListView::FullListIndexOf(BListItem* item) const
 	\brief Returns the full list index of \a item.
 
-	\return The index of the item at \a where or -1 if not found.
+	\return The index of \a item or -1 if not found.
 
 	\see BListView::IndexOf(BPoint point)
 
@@ -386,7 +386,7 @@
 	\fn BListItem* BOutlineListView::FullListFirstItem() const
 	\brief Returns a pointer to the first BListItem in the list.
 
-	\return A pointer to the first item in the list or \c NULL there are no
+	\return A pointer to the first item in the list or \c NULL if there are no
 	        items.
 
 	\see BListView::FirstItem()
@@ -399,7 +399,7 @@
 	\fn BListItem* BOutlineListView::FullListLastItem() const
 	\brief Returns a pointer to the list BListItem in the list
 
-	\return A pointer to the last item in the list or \c NULL there are no
+	\return A pointer to the last item in the list or \c NULL if there are no
 	        items.
 
 	\see BListView::LastItem()
@@ -547,7 +547,7 @@
 /*!
 	\fn void BOutlineListView::FullListSortItems(
 		int (*compareFunc)(const BListItem* a, const BListItem* b))
-	\brief Sort the items according the the passed in compare function.
+	\brief Sorts the items according to the passed in compare function.
 
 	\param compareFunc The compare function to use to sort the items.
 
@@ -610,10 +610,6 @@
 	\fn BListItem* BOutlineListView::ItemUnderAt(BListItem* superItem,
 		bool oneLevelOnly, int32 index) const
 	\brief Returns a pointer to the item at \a index under \a superItem.
-
-	\note If \a oneLevelOnly is \a false, this method acts like
-	      FullListItemAt() except the first item in the list is
-	      considered to be \a superItem.
 
 	\param superItem The base item.
 	\param oneLevelOnly if \c true, only items located one level under

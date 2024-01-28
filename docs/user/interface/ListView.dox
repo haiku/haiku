@@ -752,7 +752,7 @@
 	\fn BListItem* BListView::FirstItem() const
 	\brief Returns a pointer to the first list item.
 
-	\return A pointer to the first item in the list or \c NULL there are no items.
+	\return A pointer to the first item in the list or \c NULL if there are no items.
 
 	\since BeOS R3
 */
@@ -762,7 +762,7 @@
 	\fn BListItem* BListView::LastItem() const
 	\brief Returns a pointer to the last list item.
 
-	\return A pointer to the last item in the list or \c NULL there are no items.
+	\return A pointer to the last item in the list or \c NULL if there are no items.
 
 	\since BeOS R3
 */

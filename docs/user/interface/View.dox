@@ -1042,7 +1042,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::MouseDown(BPoint where)
 	\brief Hook method called when a mouse button is pressed.
 
-	\param where The point on the screen where to mouse pointer is when
+	\param where The point on the screen where the mouse pointer is when
 	       the mouse button is pressed.
 
 	\since BeOS R3
@@ -1053,7 +1053,7 @@ SetViewColor(Parent()->ViewColor());
 	\fn void BView::MouseUp(BPoint where)
 	\brief Hook method called when a mouse button is released.
 
-	\param where The point on the screen where to mouse pointer is when
+	\param where The point on the screen where the mouse pointer is when
 	       the mouse button is released.
 
 	\note Calling GetMouse() in MouseUp() will return the new state of the mouse buttons

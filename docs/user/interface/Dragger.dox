@@ -167,7 +167,7 @@
 	This results in the archiving of the target view and the dragger and
 	initiates a drag-and-drop operation.
 
-	\param point The point on the screen where to mouse pointer is when
+	\param point The point on the screen where the mouse pointer is when
 		the mouse is clicked.
 
 	\since BeOS R3
