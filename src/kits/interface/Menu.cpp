@@ -1451,7 +1451,11 @@ BMenu::SetTrackingHook(menu_tracking_hook func, void* state)
 void
 BMenu::SortItems(int (*compare)(const BMenuItem*, const BMenuItem*))
 {
-	fItems.SortItems((int (*)(const void*, const void*))compare);
+	BMenuItem** begin = (BMenuItem**)fItems.Items();
+	BMenuItem** end = begin + fItems.CountItems();
+
+	std::stable_sort(begin, end, compare);
+
 	InvalidateLayout();
 	if (Window() != NULL && !Window()->IsHidden() && LockLooper()) {
 		_LayoutItems(0);

@@ -103,8 +103,8 @@ WirelessNetworkMenuItem::DrawRadioIcon()
 WirelessNetworkMenuItem::CompareSignalStrength(const BMenuItem* a,
 	const BMenuItem* b)
 {
-	WirelessNetworkMenuItem* aItem = *(WirelessNetworkMenuItem**)a;
-	WirelessNetworkMenuItem* bItem = *(WirelessNetworkMenuItem**)b;
+	WirelessNetworkMenuItem* aItem = (WirelessNetworkMenuItem*)a;
+	WirelessNetworkMenuItem* bItem = (WirelessNetworkMenuItem*)b;
 
 	wireless_network aNetwork = aItem->Network();
 	wireless_network bNetwork = bItem->Network();
