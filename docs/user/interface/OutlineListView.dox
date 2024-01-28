@@ -580,7 +580,8 @@
 		bool oneLevelOnly) const
 	\brief Returns the number of items under \a superItem.
 
-	\param superItem The base item.
+	\param superItem The base item, or NULL to use the virtual super item
+	       of level 0 items.
 	\param oneLevelOnly if \c true, only items located one level under
 	       superItem are considered.
 
@@ -596,7 +597,8 @@
 		void* arg)
 	\brief Calls \a eachFunc for each item under \a superItem.
 
-	\param superItem The base item.
+	\param superItem The base item, or NULL to use the virtual super item
+	       of level 0 items.
 	\param oneLevelOnly if \c true, only items located one level under
 	       superItem are considered.
 	\param eachFunc The function to call on each item.
@@ -611,7 +613,8 @@
 		bool oneLevelOnly, int32 index) const
 	\brief Returns a pointer to the item at \a index under \a superItem.
 
-	\param superItem The base item.
+	\param superItem The base item, or NULL to use the virtual super item
+	       of level 0 items.
 	\param oneLevelOnly if \c true, only items located one level under
 	       superItem are considered.
 	\param index The index of the item to get.

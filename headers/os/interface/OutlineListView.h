@@ -139,6 +139,8 @@ private:
 									int32 level, int32* _superIndex = NULL);
 			int32				_FindPreviousVisibleIndex(int32 fullListIndex);
 
+			status_t			_ItemsUnderSetup(BListItem* superItem, int32& startIndex,
+									uint32& baseLevel) const;
 private:
 			BList				fFullList;
 
