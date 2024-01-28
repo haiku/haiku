@@ -3,24 +3,40 @@
  *
  * <UnicodeBlockObjects.h> is not included on purpose.
  */
+#include <AbstractLayoutItem.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
+#include <ChannelSlider.h>
 #include <CheckBox.h>
 #include <ColorControl.h>
 #include <Control.h>
+#include <ControlLook.h>
+#include <Deskbar.h>
 #include <Dragger.h>
 #include <Font.h>
+#include <GradientConic.h>
+#include <GradientDiamond.h>
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
 #include <GraphicsDefs.h>
+#include <GridLayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
+#include <IconUtils.h>
 #include <Input.h>
 #include <InterfaceDefs.h>
+#include <LayoutBuilder.h>
+#include <LayoutContext.h>
+#include <LayoutUtils.h>
 #include <ListItem.h>
 #include <ListView.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <OptionPopUp.h>
 #include <OutlineListView.h>
 #include <Picture.h>
 #include <PictureButton.h>
@@ -34,9 +50,11 @@
 #include <Screen.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
 #include <Shape.h>
 #include <Shelf.h>
 #include <Slider.h>
+#include <SplitLayoutBuilder.h>
 #include <StatusBar.h>
 #include <StringView.h>
 #include <TabView.h>
