@@ -1,13 +1,13 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/Menu.h	 hrev46321
- *		src/kits/interface/Menu.cpp	 hrev46321
+ *		headers/os/interface/Menu.h	 hrev55562
+ *		src/kits/interface/Menu.cpp	 hrev55562
  */
 
 
@@ -996,3 +996,53 @@
 
 	\since Haiku R1
 */
+
+
+/*!
+	\name Item reordering
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BMenu::SortItems(int (*compare)(const BMenuItem*, const BMenuItem*))
+	\brief Sort items in the menu.
+
+	\param compare Function used to compare items
+
+	Sort the items in the menu according to the order defined by the compare function.
+	The function should return -1 if the first item should be sorted before the second,
+	1 if it should be sorted after, and 0 if the items are equal.
+
+	The relative order between equal items is preserved, that is, if an item was before an equal
+	item in the list, it will still be before it when the sorting is completed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BMenu::SwapItems(int32 indexA, int32 indexB)
+	\brief Swap the positions of two items in the menu.
+
+	\return false in case one of the indexes is out of range
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BMenu::MoveItem(int32 indexFrom, int32 indexTo)
+	\brief Move a menu item to a new position in the menu
+
+	This is equivalent to removing the item at the old index then inserting it at the new one.
+
+	\return false in case one of the indexes is out of range
+
+	\since Haiku R1
+*/
+
+
+//! @}
