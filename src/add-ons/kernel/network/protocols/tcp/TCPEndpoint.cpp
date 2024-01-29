@@ -837,6 +837,10 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	while (left > 0) {
 		while (fSendQueue.Free() < socket->send.low_water_mark) {
+			// initiate a send before waiting
+			if (fState == ESTABLISHED || fState == FINISH_RECEIVED)
+				_SendQueued();
+
 			// wait until enough space is available
 			status_t status = _WaitForCondition(fSendCondition, lock, timeout);
 			if (status < B_OK) {
