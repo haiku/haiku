@@ -476,9 +476,6 @@ tcp_options_length(tcp_segment_header& segment)
 net_protocol*
 tcp_init_protocol(net_socket* socket)
 {
-	socket->send.buffer_size = 32768;
-		// override net_socket default
-
 	TCPEndpoint* protocol = new (std::nothrow) TCPEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
