@@ -229,7 +229,7 @@ enum vertical_alignment {
 // Layout spacing and insets, see BControlLook::ComposeSpacing()
 
 
-enum {
+enum BSpacing {
 	B_USE_DEFAULT_SPACING = -1002,
 	B_USE_ITEM_SPACING = -1003,
 	B_USE_ITEM_INSETS = B_USE_ITEM_SPACING,
