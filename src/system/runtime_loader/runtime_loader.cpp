@@ -374,19 +374,12 @@ open_executable(char *name, image_type type, const char *rpath,
 static void
 fixup_shebang(char *invoker)
 {
-	char *current = invoker;
-	while (*current == ' ' || *current == '\t') {
-		++current;
-	}
-
-	char *commandStart = current;
-	while (*current != ' ' && *current != '\t' && *current != '\0') {
-		++current;
-	}
+	while (*invoker == ' ' || *invoker == '\t')
+		++invoker;
 
 	// replace /usr/bin/ with /bin/
-	if (memcmp(commandStart, "/usr/bin/", strlen("/usr/bin/")) == 0)
-		memmove(commandStart, commandStart + 4, strlen(commandStart + 4) + 1);
+	if (memcmp(invoker, "/usr/bin/", strlen("/usr/bin/")) == 0)
+		memmove(invoker, invoker + 4, strlen(invoker + 4) + 1);
 }
 
 
