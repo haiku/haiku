@@ -1698,6 +1698,10 @@ ipv4_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 		mtu = route->interface_address->interface->device->mtu;
 
 	sDatalinkModule->put_route(sDomain, route);
+
+	if (mtu > 0xffff)
+		mtu = 0xffff;
+
 	return mtu - sizeof(ipv4_header);
 }
 
