@@ -578,7 +578,7 @@ ElfFile::SectionAt(int32 index, bool load)
 		if (load && !section->GetData()) {
 			if (section->Load() != B_OK) {
 				section = NULL;
-				printf("Failed to load section %ld\n", index);
+				printf("Failed to load section %" B_PRId32 "\n", index);
 			}
 		}
 	}
@@ -589,7 +589,7 @@ ElfFile::SectionAt(int32 index, bool load)
 void
 ElfFile::Dump()
 {
-	printf("%ld sections\n", fSectionCount);
+	printf("%" B_PRId32 " sections\n", fSectionCount);
 	for (int i = 0; i < fSectionCount; i++)
 		fSections[i].Dump();
 }
@@ -646,8 +646,7 @@ ElfFile::_SetTo(const char *filename)
 	// check the sanity of the header values
 	// ELF header size
 	if (headerSize < sizeof(Elf_Ehdr) || headerSize > kMaxELFHeaderSize) {
-		printf("Invalid ELF header: invalid ELF header size: %lu.",
-			   headerSize);
+		printf("Invalid ELF header: invalid ELF header size: %" B_PRIu32 ".", headerSize);
 		return B_BAD_VALUE;
 	}
 	// section header table offset
@@ -658,7 +657,7 @@ ElfFile::_SetTo(const char *filename)
 	uint32 sectionHeaderTableSize = 0;
 	if (sectionHeaderTableOffset < headerSize
 		|| sectionHeaderTableOffset > fileSize) {
-		printf("Invalid ELF header: invalid section header table offset: %lu.",
+		printf("Invalid ELF header: invalid section header table offset: %" B_PRIu32 ".",
 			   sectionHeaderTableOffset);
 		return B_BAD_VALUE;
 	}
@@ -666,7 +665,7 @@ ElfFile::_SetTo(const char *filename)
 	sectionHeaderTableSize = sectionHeaderSize * sectionHeaderCount;
 	if (sectionHeaderSize < sizeof(Elf_Shdr)
 		|| sectionHeaderTableOffset + sectionHeaderTableSize > fileSize) {
-		printf("Invalid ELF header: section header table exceeds file: %lu.",
+		printf("Invalid ELF header: section header table exceeds file: %" B_PRIu32 ".",
 			   sectionHeaderTableOffset + sectionHeaderTableSize);
 		return B_BAD_VALUE;
 	}
