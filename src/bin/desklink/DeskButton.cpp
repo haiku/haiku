@@ -62,10 +62,11 @@ DeskButton::DeskButton(BMessage *message)
 		index++;
 	}
 
-	fSegments = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)),
-		B_RGBA32);
-	BNodeInfo::GetTrackerIcon(&fRef, fSegments,
-		(icon_size)(fSegments->Bounds().IntegerWidth() + 1));
+	BRect bounds;
+	message->FindRect("bounds", &bounds);
+
+	fSegments = new BBitmap(bounds, B_RGBA32);
+	BNodeInfo::GetTrackerIcon(&fRef, fSegments, (icon_size)-1);
 }
 
 
@@ -98,6 +99,8 @@ DeskButton::Archive(BMessage *data, bool deep) const
 		data->AddString("title", *(BString*)fTitleList.ItemAt(i));
 		data->AddString("action", *(BString*)fActionList.ItemAt(i));
 	}
+
+	data->AddRect("bounds", fSegments->Bounds());
 
 	data->AddString("add_on", kAppSignature);
 	return B_NO_ERROR;

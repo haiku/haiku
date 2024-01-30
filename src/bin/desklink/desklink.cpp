@@ -140,8 +140,9 @@ main(int, char **argv)
 
 		err = deskbar.AddItem(&ref);
 		if (err != B_OK) {
+			const float height = deskbar.MaxItemHeight();
 			err = deskbar.AddItem(new DeskButton(BRect(BPoint(0, 0),
-					be_control_look->ComposeIconSize(B_MINI_ICON)),
+					BSize(height, height)),
 				&ref, ref.name, titleList, actionList));
 			if (err != B_OK) {
 				printf("desklink: Deskbar refuses link to '%s': %s\n", argv[i], strerror(err));
