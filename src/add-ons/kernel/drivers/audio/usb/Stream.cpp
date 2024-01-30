@@ -2,7 +2,6 @@
  *	Driver for USB Audio Device Class devices.
  *	Copyright (c) 2009-13 S.Zharski <imker@gmx.li>
  *	Distributed under the terms of the MIT license.
- *
  */
 
 
@@ -313,7 +312,7 @@ Stream::_QueueNextTransfer(size_t queuedBuffer, bool start)
 	status_t status = gUSBModule->queue_isochronous(fStreamEndpoint,
 		fKernelBuffers + bufferSize * queuedBuffer, bufferSize,
 		fDescriptors + queuedBuffer * packetsCount, packetsCount,
-		&fStartingFrame, start ? USB_ISO_ASAP : 0,
+		&fStartingFrame, USB_ISO_ASAP,
 		Stream::_TransferCallback, this);
 
 	TRACE(DTA, "frame:%#010x\n", fStartingFrame);
