@@ -72,7 +72,7 @@ typedef struct {
 
 #define DEVICE_NAME				"virtio_gpu"
 #define ACCELERANT_NAME	"virtio_gpu.accelerant"
-#define TRACE_VIRTIO_GPU
+//#define TRACE_VIRTIO_GPU
 #ifdef TRACE_VIRTIO_GPU
 #	define TRACE(x...) dprintf(DEVICE_NAME ": " x)
 #else
