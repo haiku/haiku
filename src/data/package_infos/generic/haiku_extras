@@ -16,6 +16,8 @@ licenses		MIT
 
 provides {
 	haiku_extras=%HAIKU_VERSION%
+	app:tv=%HAIKU_VERSION%
+	cmd:acpi_call=%HAIKU_VERSION%
 }
 
 requires {
