@@ -1314,12 +1314,6 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 		generic_io_vec *vector = transfer->Vector();
 		WriteIsochronousDescriptorChain(isoRequest,
 			isochronousData->packet_count, vector);
-	} else {
-		// Initialize the packet descriptors
-		for (uint32 i = 0; i < isochronousData->packet_count; i++) {
-			isochronousData->packet_descriptors[i].actual_length = 0;
-			isochronousData->packet_descriptors[i].status = B_NO_INIT;
-		}
 	}
 
 	TRACE("isochronous submitted size=%ld bytes, TDs=%" B_PRId32 ", "

@@ -1632,12 +1632,6 @@ OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
 	if (pipe->Direction() == Pipe::Out)
 		_WriteIsochronousDescriptorChain(firstDescriptor,
 			transfer->Vector(), transfer->VectorCount(), transfer->IsPhysical());
-	else
-		// Initialize the packet descriptors
-		for (uint32 i = 0; i < isochronousData->packet_count; i++) {
-			isochronousData->packet_descriptors[i].actual_length = 0;
-			isochronousData->packet_descriptors[i].status = B_NO_INIT;
-		}
 
 	// Add to the transfer list
 	ohci_endpoint_descriptor *endpoint

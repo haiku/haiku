@@ -302,6 +302,11 @@ IsochronousPipe::QueueIsochronous(void *data, size_t dataLength,
 	isochronousData->starting_frame_number = startingFrameNumber;
 	isochronousData->flags = flags;
 
+	for (uint32 i = 0; i < isochronousData->packet_count; i++) {
+		isochronousData->packet_descriptors[i].actual_length = 0;
+		isochronousData->packet_descriptors[i].status = B_NO_INIT;
+	}
+
 	Transfer *transfer = new(std::nothrow) Transfer(this);
 	if (!transfer) {
 		delete isochronousData;

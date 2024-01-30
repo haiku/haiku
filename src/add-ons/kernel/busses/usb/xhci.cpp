@@ -1015,15 +1015,6 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		}
 		if (isochronousData->starting_frame_number != NULL)
 			*isochronousData->starting_frame_number = frame;
-
-		// TODO: The OHCI bus driver seems to also do this for inbound
-		// isochronous transfers. Perhaps it should be moved into the stack?
-		if (directionIn) {
-			for (uint32 i = 0; i < isochronousData->packet_count; i++) {
-				isochronousData->packet_descriptors[i].actual_length = 0;
-				isochronousData->packet_descriptors[i].status = B_NO_INIT;
-			}
-		}
 	}
 
 	// Set the ENT (Evaluate Next TRB) bit, so that the HC will not switch
