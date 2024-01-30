@@ -176,6 +176,9 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 
 	if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0) {
 		_RemoveFromVariable();
+
+		if (fWaitStatus <= 0)
+			return fWaitStatus;
 		return B_WOULD_BLOCK;
 	}
 
