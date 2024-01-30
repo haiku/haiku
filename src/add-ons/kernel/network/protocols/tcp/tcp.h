@@ -266,6 +266,16 @@ struct tcp_segment_header {
 		return (flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH | TCP_FLAG_RESET
 			| TCP_FLAG_URGENT | TCP_FLAG_ACKNOWLEDGE)) == TCP_FLAG_ACKNOWLEDGE;
 	}
+
+	uint32 AdvertisedWindow(uint8 windowShift) const
+	{
+		return (uint32)advertised_window << windowShift;
+	}
+	void SetAdvertisedWindow(size_t availableBytes, uint8 windowShift)
+	{
+		availableBytes >>= windowShift;
+		advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
+	}
 };
 
 enum tcp_segment_action {
