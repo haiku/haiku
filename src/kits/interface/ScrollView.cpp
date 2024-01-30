@@ -920,14 +920,14 @@ BScrollView::_ComputeFrame(BRect frame, BScrollBar* horizontal,
 		frame.right += vertical->PreferredSize().Width();
 
 		const float minHeight = vertical->MinSize().Height();
-		if (frame.Height() < minHeight)
+		if (frame.Height() >= 0 && frame.Height() < minHeight)
 			frame.bottom += minHeight - frame.Height();
 	}
 	if (horizontal != NULL) {
 		frame.bottom += horizontal->PreferredSize().Height();
 
 		const float minWidth = horizontal->MinSize().Width();
-		if (frame.Width() < minWidth)
+		if (frame.Width() >= 0 && frame.Width() < minWidth)
 			frame.right += minWidth - frame.Width();
 	}
 
