@@ -1142,7 +1142,7 @@ tty_write_to_tty_master_unsafe(tty_cookie* sourceCookie, const char* data,
 			status = locker.AcquireWriter(dontBlock, bytesNeeded);
 			if (status != B_OK) {
 				*_length = bytesWritten;
-				return status;
+				return *_length == 0 ? status : B_OK;
 			}
 
 			writable = locker.AvailableBytes();
@@ -1227,7 +1227,7 @@ tty_write_to_tty_slave_unsafe(tty_cookie* sourceCookie, const char* data,
 			status = locker.AcquireWriter(dontBlock, bytesNeeded);
 			if (status != B_OK) {
 				*_length = bytesWritten;
-				return status;
+				return *_length == 0 ? status : B_OK;
 			}
 
 			writable = locker.AvailableBytes();
@@ -1298,16 +1298,16 @@ tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
 		// copy data to stack
 		char safeBuffer[256];
 		size_t toWrite = min_c(sizeof(safeBuffer), bytesRemaining);
-		status_t error = user_memcpy(safeBuffer, buffer, toWrite);
-		if (error != B_OK)
-			return error;
+		status_t status = user_memcpy(safeBuffer, buffer, toWrite);
+		if (status != B_OK)
+			return status;
 
 		// write them
 		size_t written = toWrite;
-		error = tty_write_to_tty_slave_unsafe(sourceCookie, safeBuffer,
+		status = tty_write_to_tty_slave_unsafe(sourceCookie, safeBuffer,
 			&written);
-		if (error != B_OK)
-			return error;
+		if (status != B_OK)
+			return *_length == 0 ? status : B_OK;
 
 		buffer += written;
 		bytesRemaining -= written;
