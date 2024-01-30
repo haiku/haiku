@@ -1610,7 +1610,6 @@ OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
 {
 	Pipe *pipe = transfer->TransferPipe();
 	bool directionIn = (pipe->Direction() == Pipe::In);
-	usb_isochronous_data *isochronousData = transfer->IsochronousData();
 
 	ohci_isochronous_td *firstDescriptor = NULL;
 	ohci_isochronous_td *lastDescriptor = NULL;
