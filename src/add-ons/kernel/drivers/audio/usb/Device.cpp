@@ -700,7 +700,7 @@ Device::_MultiBufferExchange(multi_buffer_info* multiInfo)
 	}
 
 	status_t status = acquire_sem_etc(fBuffersReadySem, 1,
-		B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000);
+		B_CAN_INTERRUPT, 0);
 	if (status == B_TIMED_OUT) {
 		TRACE(ERR, "Timeout during buffers exchange.\n");
 		return status;
