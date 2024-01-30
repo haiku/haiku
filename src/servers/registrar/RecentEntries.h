@@ -41,7 +41,7 @@ class BMessage;
 class TRoster;
 
 struct recent_entry {
-	recent_entry(const entry_ref *ref, const char *appSig, uint32 index);	
+	recent_entry(const entry_ref *ref, const char *appSig, uint32 index);
 	entry_ref ref;
 	std::string sig;
 	uint32 index;
@@ -53,18 +53,22 @@ class RecentEntries {
 public:
 	RecentEntries();
 	~RecentEntries();
-	
+
 	status_t Add(const entry_ref *ref, const char *appSig);
 	status_t Get(int32 maxCount, const char *fileTypes[], int32 fileTypesCount,
 	             const char *appSig, BMessage *result);
 	status_t Clear();
 	status_t Print();
 	status_t Save(FILE* file, const char *description, const char *tag);
+
+private:
+	static const int32 kMaxRecentEntries = 100;
+
 private:
 	friend class TRoster;
 
 	static status_t GetTypeForRef(const entry_ref *ref, char *result);
-	
+
 	std::list<recent_entry*> fEntryList;
 };
 

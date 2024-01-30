@@ -132,6 +132,12 @@ RecentEntries::Add(const entry_ref *ref, const char *appSig)
 		return B_NO_MEMORY;
 	}
 
+	int32 remove = fEntryList.size() - kMaxRecentEntries;
+	while (remove > 0) {
+		fEntryList.pop_back();
+		remove--;
+	}
+
 	return B_OK;
 }
 

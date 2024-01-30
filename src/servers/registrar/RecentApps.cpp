@@ -105,6 +105,12 @@ RecentApps::Add(const char *appSig, int32 appFlags)
 		return B_NO_MEMORY;
 	}
 
+	int32 remove = fAppList.size() - kMaxRecentApps;
+	while (remove > 0) {
+		fAppList.pop_back();
+		remove--;
+	}
+
 	return B_OK;
 }
 

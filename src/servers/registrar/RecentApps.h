@@ -45,20 +45,23 @@ class RecentApps {
 public:
 	RecentApps();
 	~RecentApps();
-	
+
 	status_t Add(const char *appSig, int32 appFlags = kQualifyingAppFlags);
 	status_t Add(const entry_ref *ref, int32 appFlags);
 	status_t Get(int32 maxCount, BMessage *list);
 	status_t Clear();
 	status_t Print();
 	status_t Save(FILE* file);
-	
+
+private:
+	static const int32 kMaxRecentApps = 100;
 	static const int32 kQualifyingAppFlags = 0;
+
 private:
 	friend class TRoster;
 		// For loading from disk
 
-	static status_t GetRefForApp(const char *appSig, entry_ref *result);	
+	static status_t GetRefForApp(const char *appSig, entry_ref *result);
 
 	std::list<std::string> fAppList;
 };
