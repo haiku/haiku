@@ -1244,6 +1244,8 @@ usb_disk_device_removed(void *cookie)
 	device->removed = true;
 	gUSBModule->cancel_queued_transfers(device->bulk_in);
 	gUSBModule->cancel_queued_transfers(device->bulk_out);
+	if (device->is_ufi)
+		gUSBModule->cancel_queued_transfers(device->interrupt);
 
 	// At this point, open_count should always be 0 anyway.
 	if (device->open_count == 0)
