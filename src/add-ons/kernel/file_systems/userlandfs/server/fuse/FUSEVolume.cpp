@@ -1066,23 +1066,16 @@ FUSEVolume::DoIO(void* _node, void* _cookie, const IORequestInfo& requestInfo)
 			requestInfo.length);
 	}
 
+	size_t bytes = 0;
 	if (error == B_OK) {
-		size_t bytesTransferred = 0;
-		while (bytesTransferred < requestInfo.length) {
-			size_t bytes = requestInfo.length - bytesTransferred;
-			error = _InternalIO(node, cookie, path, requestInfo.offset + bytesTransferred,
-				buffer + bytesTransferred, bytes, requestInfo.isWrite);
-
-			if (error == B_OK)
-				bytesTransferred += bytes;
-			else
-				break;
-		}
+		bytes = requestInfo.length;
+		error = _InternalIO(node, cookie, path, requestInfo.offset,
+			buffer, bytes, requestInfo.isWrite);
 	}
 
 	if (error == B_OK && !requestInfo.isWrite) {
-		error = UserlandFS::KernelEmu::write_to_io_request(GetID(), requestInfo.id, buffer,
-			requestInfo.length);
+		error = UserlandFS::KernelEmu::write_to_io_request(GetID(), requestInfo.id,
+			buffer, bytes);
 	}
 
 	UserlandFS::KernelEmu::notify_io_request(GetID(), requestInfo.id, error);
