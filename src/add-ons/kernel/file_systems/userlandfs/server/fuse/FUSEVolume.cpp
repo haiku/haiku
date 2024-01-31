@@ -1802,6 +1802,10 @@ FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 	}
 
 	if (S_ISREG(node->type)) {
+		// The caching logic does not seem to work quite right with many
+		// filesystems (e.g. sshfs is one such): read past the end of a file
+		// returns errors instead of no data, for instance.
+#if 0
 		if (cookie->direct_io || llCookie.direct_io) {
 			if (node->cacheCount > 0) {
 				// In some very rare cases, for the same node, the first `open`
@@ -1832,6 +1836,7 @@ FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 			// the cache from being deleted at close().
 			node->cacheCount += 1 + cookie->keep_cache + llCookie.keep_cache;
 		}
+#endif
 	}
 
 	cookieDeleter.Detach();
