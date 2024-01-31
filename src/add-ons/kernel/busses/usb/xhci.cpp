@@ -273,6 +273,10 @@ xhci_error_status(uint32 error, bool directionIn)
 			return directionIn ? B_DEV_WRITE_ERROR : B_DEV_READ_ERROR;
 		case COMP_BABBLE:
 			return directionIn ? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
+		case COMP_RING_UNDERRUN:
+			return B_DEV_FIFO_UNDERRUN;
+		case COMP_RING_OVERRUN:
+			return B_DEV_FIFO_OVERRUN;
 		case COMP_MISSED_SERVICE:
 			return B_DEV_TOO_LATE;
 		case COMP_USB_TRANSACTION:
@@ -1659,6 +1663,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	mutex_init(&endpoint0->lock, "xhci endpoint lock");
 	endpoint0->device = device;
 	endpoint0->id = 0;
+	endpoint0->status = 0;
 	endpoint0->td_head = NULL;
 	endpoint0->used = 0;
 	endpoint0->next = 0;
@@ -2641,7 +2646,15 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	TRACE("HandleTransferComplete: ed %" B_PRIu32 ", status %" B_PRId32 "\n",
 		  (flags & TRB_3_EVENT_DATA_BIT), trb->status);
 
-	const uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
+	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
+
+	if (completionCode == COMP_RING_OVERRUN || completionCode == COMP_RING_UNDERRUN) {
+		// These occur on isochronous endpoints when there is no TRB ready to be
+		// executed at the appropriate time. (XHCI 1.2 § 4.10.3.1 p204.)
+		endpoint->status = completionCode;
+		return;
+	}
+
 	int32 remainder = TRB_2_REM_GET(trb->status), transferred = -1;
 	if ((flags & TRB_3_EVENT_DATA_BIT) != 0) {
 		// In the case of an Event Data TRB, value in the status field refers
@@ -2706,6 +2719,12 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 					descriptor.status = B_OK;
 				}
 				transferred += descriptor.actual_length;
+			}
+
+			// Report the endpoint status (if any.)
+			if (completionCode == COMP_SUCCESS && endpoint->status != 0) {
+				completionCode = endpoint->status;
+				endpoint->status = 0;
 			}
 		} else if (completionCode == COMP_STOPPED_LENGTH_INVALID) {
 			// To determine transferred length, sum up the lengths of all TRBs
@@ -3130,7 +3149,7 @@ XHCI::FinishTransfers()
 					actualLength);
 			}
 
-			if (callbackStatus == B_OK && directionIn && actualLength > 0) {
+			if (directionIn && actualLength > 0) {
 				TRACE("copying in iov count %ld\n", transfer->VectorCount());
 				status_t status = transfer->PrepareKernelAccess();
 				if (status == B_OK) {

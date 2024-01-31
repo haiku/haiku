@@ -55,6 +55,7 @@ typedef struct xhci_endpoint {
 
 	xhci_device*	device;
 	uint8			id;
+	uint8			status;
 
 	uint16			max_burst_payload;
 
