@@ -45,7 +45,6 @@ protected:
 			Device*			fDevice;
 			status_t		fStatus;
 
-			uint8			fTerminalID;
 			usb_pipe		fStreamEndpoint;
 
 			bool			fIsRunning;
