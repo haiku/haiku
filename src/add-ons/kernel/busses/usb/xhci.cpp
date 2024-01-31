@@ -262,6 +262,29 @@ xhci_error_string(uint32 error)
 }
 
 
+static status_t
+xhci_error_status(uint32 error, bool directionIn)
+{
+	switch (error) {
+		case COMP_SHORT_PACKET:
+		case COMP_SUCCESS:
+			return B_OK;
+		case COMP_DATA_BUFFER:
+			return directionIn ? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
+		case COMP_BABBLE:
+			return directionIn ? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;
+		case COMP_MISSED_SERVICE:
+			return B_DEV_TOO_LATE;
+		case COMP_USB_TRANSACTION:
+			return B_DEV_CRC_ERROR;
+		case COMP_STALL:
+			return B_DEV_STALLED;
+		default:
+			return B_DEV_STALLED;
+	}
+}
+
+
 module_dependency module_dependencies[] = {
 	{ USB_FOR_CONTROLLER_MODULE_NAME, (module_info**)&gUSB },
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager },
@@ -2661,11 +2684,12 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 
 		if (td->transfer != NULL && td->transfer->IsochronousData() != NULL) {
 			usb_isochronous_data* isochronousData = td->transfer->IsochronousData();
+			usb_iso_packet_descriptor& descriptor = isochronousData->packet_descriptors[offset];
 			if (transferred < 0)
 				transferred = (TRB_2_BYTES_GET(td->trbs[offset].status) - remainder);
-			isochronousData->packet_descriptors[offset].actual_length = transferred;
-			isochronousData->packet_descriptors[offset].status = (transferred > 0)
-				? B_OK : B_DEV_FIFO_UNDERRUN;
+			descriptor.actual_length = transferred;
+			descriptor.status = xhci_error_status(completionCode,
+				(td->transfer->TransferPipe()->Direction() != Pipe::Out));
 
 			if (offset != (td->trb_used - 1)) {
 				// We'll be sent here again.
@@ -3094,31 +3118,8 @@ XHCI::FinishTransfers()
 
 			bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
 
-			status_t callbackStatus = B_OK;
 			const uint8 completionCode = td->trb_completion_code;
-			switch (completionCode) {
-				case COMP_SHORT_PACKET:
-				case COMP_SUCCESS:
-					callbackStatus = B_OK;
-					break;
-				case COMP_DATA_BUFFER:
-					callbackStatus = directionIn ? B_DEV_DATA_OVERRUN
-						: B_DEV_DATA_UNDERRUN;
-					break;
-				case COMP_BABBLE:
-					callbackStatus = directionIn ? B_DEV_FIFO_OVERRUN
-						: B_DEV_FIFO_UNDERRUN;
-					break;
-				case COMP_USB_TRANSACTION:
-					callbackStatus = B_DEV_CRC_ERROR;
-					break;
-				case COMP_STALL:
-					callbackStatus = B_DEV_STALLED;
-					break;
-				default:
-					callbackStatus = B_DEV_STALLED;
-					break;
-			}
+			status_t callbackStatus = xhci_error_status(completionCode, directionIn);
 
 			size_t actualLength = transfer->FragmentLength();
 			if (completionCode != COMP_SUCCESS) {
