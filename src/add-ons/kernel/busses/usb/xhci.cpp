@@ -270,9 +270,9 @@ xhci_error_status(uint32 error, bool directionIn)
 		case COMP_SUCCESS:
 			return B_OK;
 		case COMP_DATA_BUFFER:
-			return directionIn ? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
+			return directionIn ? B_DEV_WRITE_ERROR : B_DEV_READ_ERROR;
 		case COMP_BABBLE:
-			return directionIn ? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;
+			return directionIn ? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
 		case COMP_MISSED_SERVICE:
 			return B_DEV_TOO_LATE;
 		case COMP_USB_TRANSACTION:

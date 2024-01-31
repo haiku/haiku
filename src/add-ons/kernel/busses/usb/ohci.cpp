@@ -2594,10 +2594,10 @@ OHCI::_GetStatusOfConditionCode(uint8 conditionCode)
 			return B_DEV_DATA_UNDERRUN;
 
 		case OHCI_TD_CONDITION_BUFFER_OVERRUN:
-			return B_DEV_FIFO_OVERRUN;
+			return B_DEV_WRITE_ERROR;
 
 		case OHCI_TD_CONDITION_BUFFER_UNDERRUN:
-			return B_DEV_FIFO_UNDERRUN;
+			return B_DEV_READ_ERROR;
 
 		case OHCI_TD_CONDITION_NOT_ACCESSED:
 			return B_DEV_PENDING;

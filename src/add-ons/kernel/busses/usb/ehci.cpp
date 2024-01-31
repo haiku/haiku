@@ -1900,7 +1900,7 @@ EHCI::FinishTransfers()
 						int32 reasons = 0;
 						if (status & EHCI_QTD_STATUS_BUFFER) {
 							callbackStatus = transfer->incoming
-								? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
+								? B_DEV_WRITE_ERROR : B_DEV_READ_ERROR;
 							reasons++;
 						}
 						if (status & EHCI_QTD_STATUS_TERROR) {
@@ -1928,7 +1928,7 @@ EHCI::FinishTransfers()
 					} else if (status & EHCI_QTD_STATUS_BABBLE) {
 						// there is a babble condition
 						callbackStatus = transfer->incoming
-							? B_DEV_FIFO_OVERRUN : B_DEV_FIFO_UNDERRUN;
+							? B_DEV_DATA_OVERRUN : B_DEV_DATA_UNDERRUN;
 					} else {
 						// if the error counter didn't count down to zero
 						// and there was no babble, then this halt was caused
