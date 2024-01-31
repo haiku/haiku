@@ -242,9 +242,10 @@ RequestAllocator::AllocateAddress(Address& address, int32 size, int32 align,
 			B_ANY_ADDRESS,
 #endif
 			areaSize, B_NO_LOCK,
-			B_READ_AREA | B_WRITE_AREA
 #ifdef _KERNEL_MODE
-				| B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA
+#else
+			B_READ_AREA | B_WRITE_AREA
 #endif
 			);
 		if (area < 0)
