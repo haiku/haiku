@@ -2704,6 +2704,9 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			descriptor.status = xhci_error_status(completionCode,
 				(td->transfer->TransferPipe()->Direction() != Pipe::Out));
 
+			// Don't double-report completion status.
+			completionCode = COMP_SUCCESS;
+
 			if (offset != (td->trb_used - 1)) {
 				// We'll be sent here again.
 				return;
@@ -2722,7 +2725,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 			}
 
 			// Report the endpoint status (if any.)
-			if (completionCode == COMP_SUCCESS && endpoint->status != 0) {
+			if (endpoint->status != 0) {
 				completionCode = endpoint->status;
 				endpoint->status = 0;
 			}
