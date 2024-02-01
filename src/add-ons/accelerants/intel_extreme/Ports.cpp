@@ -21,9 +21,11 @@
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
-#include "FlexibleDisplayInterface.h"
 #include "intel_extreme.h"
+
+#include "FlexibleDisplayInterface.h"
 #include "PanelFitter.h"
+#include "TigerLakePLL.h"
 
 #include <new>
 
@@ -1675,13 +1677,13 @@ DisplayPort::SetPipe(Pipe* pipe)
 	CALLED();
 
 	if (pipe == NULL) {
-		ERROR("%s: Invalid pipe provided!\n", __func__);
+		ERROR("%s: Invalid pipe provided!\n", __PRETTY_FUNCTION__);
 		return B_ERROR;
 	}
 
 	// TODO: UnAssignPipe?  This likely needs reworked a little
 	if (fPipe != NULL) {
-		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
+		ERROR("%s: Can't reassign display pipe (yet)\n", __PRETTY_FUNCTION__);
 		return B_ERROR;
 	}
 
@@ -1690,7 +1692,8 @@ DisplayPort::SetPipe(Pipe* pipe)
 	// generation 7 gfx IvyBridge/IVB uses 2 bits (b29-30) on the eDP port.
 	// on all other DP ports pipe selections works differently (indirect).
 	// fixme: implement..
-	TRACE("%s: Assuming pipe is assigned by BIOS (fixme)\n", __func__);
+	TRACE("%s: Assuming pipe %d is assigned by BIOS to port %d (fixme)\n", __PRETTY_FUNCTION__,
+		pipe->Index(), PortIndex());
 
 	fPipe = pipe;
 
@@ -2258,19 +2261,20 @@ DigitalDisplayInterface::SetPipe(Pipe* pipe)
 	CALLED();
 
 	if (pipe == NULL) {
-		ERROR("%s: Invalid pipe provided!\n", __func__);
+		ERROR("%s: Invalid pipe provided!\n", __PRETTY_FUNCTION__);
 		return B_ERROR;
 	}
 
 	// TODO: UnAssignPipe?  This likely needs reworked a little
 	if (fPipe != NULL) {
-		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
+		ERROR("%s: Can't reassign display pipe (yet)\n", __PRETTY_FUNCTION__);
 		return B_ERROR;
 	}
 
 	// all DDI ports pipe selections works differently than on the old port types (indirect).
 	// fixme: implement..
-	TRACE("%s: Assuming pipe is assigned by BIOS (fixme)\n", __func__);
+	TRACE("%s: Assuming pipe %d is assigned by BIOS to port %d (fixme)\n", __PRETTY_FUNCTION__,
+		pipe->Index(), PortIndex());
 
 	fPipe = pipe;
 
@@ -2467,7 +2471,10 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing, uint32 p
 	//fixme: always so on pre gen 9?
 	uint32 linkBandwidth = 270000; //khz
 
-	if (gInfo->shared_info->device_type.Generation() >= 9) {
+	if (gInfo->shared_info->device_type.Generation() >= 11) {
+		ERROR("%s: DDI PLL selection not implemented for Gen11, "
+			"assuming default DP-link reference\n", __func__);
+	} else if (gInfo->shared_info->device_type.Generation() >= 9) {
 		if (pllSel != 0xff) {
 			linkBandwidth = (read32(SKL_DPLL_CTRL1) >> (1 + 6 * pllSel)) & SKL_DPLL_DP_LINKRATE_MASK;
 			switch (linkBandwidth) {
@@ -2686,13 +2693,16 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Program general pipe config
 	fPipe->Configure(target);
 
+	// TODO create a PLL class that can abstract the details of setting up the clock generation,
+	// and instanciate the correct type depending on the card generation
 	uint32 pllSel = 0xff; // no PLL selected
 	if (gInfo->shared_info->device_type.Generation() <= 8) {
 		unsigned int r2_out, n2_out, p_out;
 		hsw_ddi_calculate_wrpll(
 			hardwareTarget.pixel_clock * 1000 /* in Hz */,
 			&r2_out, &n2_out, &p_out);
-	} else {
+		// TODO the computed PLL values are not used for anything?
+	} else if (gInfo->shared_info->device_type.Generation() <= 11) {
 		skl_wrpll_params wrpll_params;
 		skl_ddi_calculate_wrpll(
 			hardwareTarget.pixel_clock * 1000 /* in Hz */,
@@ -2702,6 +2712,49 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 			hardwareTarget.pixel_clock,
 			PortIndex(),
 			&pllSel);
+	} else {
+		// Tiger Lake
+		// See volume 12, page 180, "HDMI Mode Combo PHY Programming"
+		int p, q, k;
+		float dco;
+		uint32 mode = fPipe->TranscoderMode();
+		if ((mode == PIPE_DDI_MODE_DVI || mode == PIPE_DDI_MODE_HDMI)
+			&& ComputeHdmiDpll(hardwareTarget.pixel_clock, &p, &q, &k, &dco)) {
+			TRACE("PLL settings: DCO=%f, P,Q,K=%d,%d,%d\n", dco, p, q, k);
+		} else if ((mode == PIPE_DDI_MODE_DP_SST || mode == PIPE_DDI_MODE_DP_MST)
+			&& ComputeDisplayPortDpll(hardwareTarget.pixel_clock, &p, &q, &k, &dco)) {
+			TRACE("PLL settings: DCO=%f, P,Q,K=%d,%d,%d\n", dco, p, q, k);
+		} else {
+			ERROR("%s: Could not find a matching PLL setting\n", __func__);
+			return B_ERROR;
+		}
+
+		// TODO write a proper way to assign PLLs to pipes and ports.
+		int chosenPLL = 0;
+		if (PortIndex() == 7)
+			chosenPLL = 1;
+		TRACE("Using DPLL %d for port %d. PLL settings: DCO=%f, P,Q,K=%d,%d,%d\n", chosenPLL,
+			PortIndex(), dco, p, q, k);
+		ProgramPLL(chosenPLL, p, q, k, dco);
+
+		// Configure DPLL mapping to port then turn on DPLL clock
+		uint32 config = read32(TGL_DPCLKA_CFGCR0);
+		TRACE("PLL configuration before changes: %" B_PRIx32 "\n", config);
+		if (chosenPLL == 0) {
+			config |= TGL_DPCLKA_DDIA_CLOCK_OFF;
+			config &= TGL_DPCLKA_DDIA_CLOCK_SELECT;
+			write32(TGL_DPCLKA_CFGCR0, config);
+			config &= ~TGL_DPCLKA_DDIA_CLOCK_OFF;
+			write32(TGL_DPCLKA_CFGCR0, config);
+		} else {
+			config |= TGL_DPCLKA_DDIB_CLOCK_OFF;
+			config &= TGL_DPCLKA_DDIB_CLOCK_SELECT;
+			config |= 1 << TGL_DPCLKA_DDIB_CLOCK_SELECT_SHIFT;
+			write32(TGL_DPCLKA_CFGCR0, config);
+			config &= ~TGL_DPCLKA_DDIB_CLOCK_OFF;
+			write32(TGL_DPCLKA_CFGCR0, config);
+		}
+		TRACE("PLL configuration after changes: %" B_PRIx32 "\n", config);
 	}
 
 	// Program target display mode

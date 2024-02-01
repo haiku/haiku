@@ -193,28 +193,40 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 				| ((uint32)target->timing.v_display - 1));
 		#endif
 	} else {
-		//on Skylake timing is already done in ConfigureTimings()
-
-		TRACE("%s: trans conf reg: 0x%" B_PRIx32"\n", __func__,
-			read32(DDI_SKL_TRANS_CONF_A + fPipeOffset));
-		TRACE("%s: trans DDI func ctl reg: 0x%" B_PRIx32"\n", __func__,
-			read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset));
-		switch ((read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset) & PIPE_DDI_MODESEL_MASK)
-				>> PIPE_DDI_MODESEL_SHIFT) {
-			case PIPE_DDI_MODE_DVI:
-				TRACE("%s: Transcoder uses DVI mode\n", __func__);
-				break;
-			case PIPE_DDI_MODE_DP_SST:
-				TRACE("%s: Transcoder uses DP SST mode\n", __func__);
-				break;
-			case PIPE_DDI_MODE_DP_MST:
-				TRACE("%s: Transcoder uses DP MST mode\n", __func__);
-				break;
-			default:
-				TRACE("%s: Transcoder uses HDMI mode\n", __func__);
-				break;
-		}
+		// on Skylake and later, timing is already done in ConfigureTimings()
 	}
+}
+
+
+uint32
+Pipe::TranscoderMode()
+{
+	if (gInfo->shared_info->device_type.Generation() < 9) {
+		ERROR("%s: Don't know how to get transcoder mode on older generations\n", __func__);
+		return 0;
+	}
+
+	TRACE("%s: trans conf reg: 0x%" B_PRIx32 "\n", __func__,
+		read32(DDI_SKL_TRANS_CONF_A + fPipeOffset));
+	TRACE("%s: trans DDI func ctl reg: 0x%" B_PRIx32 "\n", __func__,
+		read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset));
+	uint32 value = (read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset) & PIPE_DDI_MODESEL_MASK)
+		>> PIPE_DDI_MODESEL_SHIFT;
+	switch (value) {
+		case PIPE_DDI_MODE_DVI:
+			TRACE("%s: Transcoder uses DVI mode\n", __func__);
+			break;
+		case PIPE_DDI_MODE_DP_SST:
+			TRACE("%s: Transcoder uses DP SST mode\n", __func__);
+			break;
+		case PIPE_DDI_MODE_DP_MST:
+			TRACE("%s: Transcoder uses DP MST mode\n", __func__);
+			break;
+		default:
+			TRACE("%s: Transcoder uses HDMI mode\n", __func__);
+			break;
+	}
+	return value;
 }
 
 

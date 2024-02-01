@@ -472,8 +472,6 @@ refclk_activate_ilk(bool hasPanel)
 {
 	CALLED();
 
-	// aka, our engineers hate you
-
 	bool wantsSSC;
 	bool hasCK505;
 	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX) {

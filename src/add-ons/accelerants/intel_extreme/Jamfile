@@ -21,5 +21,6 @@ Addon intel_extreme.accelerant :
 	PanelFitter.cpp
 	Ports.cpp
 	Pipes.cpp
+	TigerLakePLL.cpp
 	: be $(TARGET_LIBSTDC++) libaccelerantscommon.a
 ;

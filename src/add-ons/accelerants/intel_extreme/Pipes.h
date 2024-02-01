@@ -58,6 +58,7 @@ public:
 										uint32 pixelClock,
 										port_index pllForPort,
 										uint32* pllSel);
+		uint32						TranscoderMode();
 
 		// access to the various parts of the pipe
 		::FDILink*					FDI()
