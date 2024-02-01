@@ -18,7 +18,7 @@
 const char* const kVersion = "ver.0.0.5";
 
 // initial buffer size in samples
-const uint32 kSamplesBufferSize = 1024;
+const uint32 kSamplesBufferSize = 2048;
 // [sub]buffers count
 const uint32 kSamplesBufferCount = 2;
 
