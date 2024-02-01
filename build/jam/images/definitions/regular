@@ -201,11 +201,12 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO +=
 	echo3g emuxki es1370
 	hda
 	ice1712
+	usb_audio
 	sis7018
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD +=
-	#cmedia usb_audio
+	#cmedia
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
