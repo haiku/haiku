@@ -1178,8 +1178,10 @@ Volume::_GetActivePackages(int fd)
 		requestDeleter.Unset();
 	}
 
+#if 0
 	INFORM("latest volume state:\n");
 	_DumpState(fLatestState);
+#endif
 
 	// check whether that matches the expected state
 	if (_CheckActivePackagesMatchLatestState(request)) {
@@ -1212,8 +1214,10 @@ Volume::_GetActivePackages(int fd)
 		state->SetPackageActive(package, true);
 	}
 
+#if 0
 	INFORM("currently active volume state:\n");
 	_DumpState(state);
+#endif
 
 	fActiveState = stateDeleter.Detach();
 	return B_OK;
