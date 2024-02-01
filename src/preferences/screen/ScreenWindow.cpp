@@ -795,6 +795,15 @@ ScreenWindow::_CheckRefreshMenu()
 void
 ScreenWindow::_UpdateRefreshControl()
 {
+	if (isnan(fSelected.refresh)) {
+		fRefreshMenu->SetEnabled(false);
+		fOtherRefresh->SetLabel(B_TRANSLATE("Unknown"));
+		fOtherRefresh->SetMarked(true);
+		return;
+	} else {
+		fRefreshMenu->SetEnabled(true);
+	}
+
 	for (int32 i = 0; i < fRefreshMenu->CountItems(); i++) {
 		BMenuItem* item = fRefreshMenu->ItemAt(i);
 		if (item->Message()->FindFloat("refresh") == fSelected.refresh) {
@@ -805,7 +814,7 @@ ScreenWindow::_UpdateRefreshControl()
 			return;
 		}
 	}
-
+	
 	// this is a non-standard refresh rate
 	if (fOtherRefresh != NULL) {
 		fOtherRefresh->Message()->ReplaceFloat("refresh", fSelected.refresh);
@@ -1383,9 +1392,13 @@ ScreenWindow::_UpdateMonitor()
 				info.max_pixel_clock / 1000.0);
 		}
 		if (info.serial_number[0] && length < sizeof(text)) {
+			if (length > 0) {
+				text[length++] = '\n';
+				text[length++] = '\n';
+				text[length] = '\0';
+			}
 			length += snprintf(text + length, sizeof(text) - length,
-				B_TRANSLATE("%sSerial no.: %s"), length ? "\n\n" : "",
-				info.serial_number);
+				B_TRANSLATE("Serial no.: %s"), info.serial_number);
 			if (info.produced.week != 0 && info.produced.year != 0
 				&& length < sizeof(text)) {
 				length += snprintf(text + length, sizeof(text) - length,
