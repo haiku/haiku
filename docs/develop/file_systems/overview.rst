@@ -5,7 +5,7 @@ Each filesystem driver must define a few structures which act as the
 interface between the VFS and the filesystem implementation. These
 structures contain function pointers, some of which are optional,
 which should point to functions defined by the implementer that
-perform the appropriate filesystem peration as defined by the
+perform the appropriate filesystem operation as defined by the
 documentation.
 
 See docs/user/drivers/fs_interface.dox for more detailed documentation
@@ -45,18 +45,25 @@ Moreover, the filesystem interacts with other components of the system
 For the early development steps, it is much easier to run the filesystem code
 in a more controlled environment. This can be achieved through the use of
 a "filesystem shell": a simple application that runs the filesystem code, and
-allows performing specific operations through a command line interface.
+allows performing specific operations through a command line interface. It can be
+executed on any platform (Haiku or another supported one such as Linux).
 
 Example of fs_shell implementations are available under src/tests/add-ons/kernel/file_systems/
 for the bfs and btrfs filesystems.
 
 For example, to build the fs_shell for btrfs, use
 
+.. code-block:: bash
+
    jam -q "<build>btrfs_shell"
 
 To run it, use
 
-   jam run objects/haiku_host/x86_gcc2/release/tests/add-ons/kernel/file_systems/btrfs/btrfs_shell/btrfs_shell [arguments]
+.. code-block:: bash
+
+   jam run ":<build>btrfs_shell" <.img file>
+
+:ref:`XFS Page` has a concrete example which can be tweaked for other filesystems.
 
 You need to pass at least a file or device containing a filesystem image as an
 argument. You need some tool to create one. It is possible to work using an
@@ -66,7 +73,7 @@ a file, or a RAM disk, depending on what you are doing.
 userlandfs
 ..........
 
-As a second step, it's possible to use the filesystem as part of a runing
+As a second step, it's possible to use the filesystem as part of a running
 system, while still running it in userland. This allows use of Debugger,
 memory protection, and in general any kind of userland debugging or tracing
 tool. When the filesystem crashes, it does not bring down the whole system.
@@ -74,6 +81,8 @@ tool. When the filesystem crashes, it does not bring down the whole system.
 Userlandfs can run the filesystem code using the same interface as the kernel,
 therefore, once everything is working with userlandfs, running the filesystem
 as kernel code is usually quite easy (and provides a performance boost)
+
+See more here: :ref:`Userland FS Page`
 
 Torture and performance tests
 .............................

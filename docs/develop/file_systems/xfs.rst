@@ -1,3 +1,5 @@
+.. _XFS Page:
+
 The XFS File System
 ===================
 
