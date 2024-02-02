@@ -357,34 +357,62 @@ ApplicationTypesWindow::_RemoveUninstalled()
 void
 ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 {
-	bool enabled = type != NULL;
-	bool appFound = true;
+	if (type == NULL) {
+		fCurrentType.Unset();
 
-	// update controls
+		// Information group
+		fNameView->SetText(NULL);
+		fNameView->SetEnabled(false);
+		fSignatureView->SetText(NULL);
+		fSignatureView->SetEnabled(false);
+		fPathView->SetText(NULL);
+		fPathView->SetEnabled(false);
 
-	if (type != NULL) {
-		if (fCurrentType == *type) {
-			if (!forceUpdate)
-				return;
-		} else
-			forceUpdate = B_EVERYTHING_CHANGED;
+		// Version group
+		fVersionView->SetText(NULL);
+		fVersionView->SetEnabled(false);
+		fDescriptionView->SetText(NULL);
+		fDescriptionLabel->SetEnabled(true);
 
-		if (&fCurrentType != type)
-			fCurrentType.SetTo(type->Type());
+		// Buttons
+		fEditButton->SetEnabled(false);
+		fLaunchButton->SetMessage(NULL);
+		fLaunchButton->SetEnabled(false);
+		fTrackerButton->SetMessage(NULL);
+		fTrackerButton->SetEnabled(false);
 
-		fSignatureView->SetText(type->Type());
+		return;
+	}
 
+	if (fCurrentType == *type) {
+		if (!forceUpdate)
+			return;
+	} else
+		forceUpdate = B_EVERYTHING_CHANGED;
+
+	if (&fCurrentType != type)
+		fCurrentType.SetTo(type->Type());
+
+	fSignatureView->SetText(type->Type());
+	fSignatureView->SetEnabled(true);
+
+	if ((forceUpdate & B_SHORT_DESCRIPTION_CHANGED) != 0) {
 		char description[B_MIME_TYPE_LENGTH];
 
-		if ((forceUpdate & B_SHORT_DESCRIPTION_CHANGED) != 0) {
-			if (type->GetShortDescription(description) != B_OK)
-				description[0] = '\0';
+		if (type->GetShortDescription(description) != B_OK) {
+			fNameView->SetText("");
+			fNameView->SetEnabled(false);
+		} else {
 			fNameView->SetText(description);
+			fNameView->SetEnabled(true);
 		}
+	}
 
+	if ((forceUpdate & B_APP_HINT_CHANGED) != 0) {
+		bool appInfoFound = false;
 		entry_ref ref;
-		if ((forceUpdate & B_APP_HINT_CHANGED) != 0
-			&& be_roster->FindApp(fCurrentType.Type(), &ref) == B_OK) {
+
+		if (be_roster->FindApp(fCurrentType.Type(), &ref) == B_OK) {
 			// Set launch message
 			BMessenger tracker("application/x-vnd.Be-TRAK");
 			BMessage* message = new BMessage(B_REFS_RECEIVED);
@@ -392,37 +420,14 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 
 			fLaunchButton->SetMessage(message);
 			fLaunchButton->SetTarget(tracker);
+			fLaunchButton->SetEnabled(true);
 
-			// Set path
-			BPath path(&ref);
-			path.GetParent(&path);
-			fPathView->SetText(path.Path());
-
-			// Set "Show In Tracker" message
-			BEntry entry(path.Path());
-			entry_ref directoryRef;
-			if (entry.GetRef(&directoryRef) == B_OK) {
-				BMessenger tracker("application/x-vnd.Be-TRAK");
-				message = new BMessage(B_REFS_RECEIVED);
-				message->AddRef("refs", &directoryRef);
-
-				fTrackerButton->SetMessage(message);
-				fTrackerButton->SetTarget(tracker);
-			} else {
-				fTrackerButton->SetMessage(NULL);
-				appFound = false;
-			}
-		} else if ((forceUpdate & B_APP_HINT_CHANGED) != 0) {
-			fLaunchButton->SetMessage(NULL);
-			fPathView->SetText(NULL);
-			fTrackerButton->SetMessage(NULL);
-		}
-
-		if (forceUpdate == B_EVERYTHING_CHANGED) {
 			// update version information
 
 			BFile file(&ref, B_READ_ONLY);
 			if (file.InitCheck() == B_OK) {
+				fEditButton->SetEnabled(true);
+
 				BAppFileInfo appInfo(&file);
 				version_info versionInfo;
 				if (appInfo.InitCheck() == B_OK
@@ -435,33 +440,59 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 						versionInfo.minor,
 						variety_to_text(versionInfo.variety),
 						versionInfo.internal);
+
 					fVersionView->SetText(version);
+					fVersionView->SetEnabled(true);
 					fDescriptionView->SetText(versionInfo.long_info);
-				} else {
-					fVersionView->SetText(NULL);
-					fDescriptionView->SetText(NULL);
+					fDescriptionLabel->SetEnabled(true);
+
+					appInfoFound = true;
 				}
+			} else {
+				fEditButton->SetEnabled(false);
 			}
+		} else {
+			fEditButton->SetEnabled(false);
+			fLaunchButton->SetMessage(NULL);
+			fLaunchButton->SetEnabled(false);
 		}
-	} else {
-		fNameView->SetText(NULL);
-		fSignatureView->SetText(NULL);
-		fPathView->SetText(NULL);
 
-		fVersionView->SetText(NULL);
-		fDescriptionView->SetText(NULL);
+		if (!appInfoFound) {
+			fVersionView->SetText(NULL);
+			fVersionView->SetEnabled(false);
+			fDescriptionView->SetText(NULL);
+			fDescriptionLabel->SetEnabled(false);
+		}
+
+		BPath path(&ref);
+		if (path.InitCheck() == B_OK) {
+			// Set path
+			path.GetParent(&path);
+			fPathView->SetText(path.Path());
+			fPathView->SetEnabled(true);
+
+			// Set "Show In Tracker" message
+			BEntry entry(path.Path());
+			entry_ref directoryRef;
+			if (entry.GetRef(&directoryRef) == B_OK) {
+				BMessenger tracker("application/x-vnd.Be-TRAK");
+				BMessage* message = new BMessage(B_REFS_RECEIVED);
+				message->AddRef("refs", &directoryRef);
+
+				fTrackerButton->SetMessage(message);
+				fTrackerButton->SetTarget(tracker);
+				fTrackerButton->SetEnabled(true);
+			} else {
+				fTrackerButton->SetMessage(NULL);
+				fTrackerButton->SetEnabled(false);
+			}
+		} else {
+			fPathView->SetText(NULL);
+			fPathView->SetEnabled(false);
+			fTrackerButton->SetMessage(NULL);
+			fTrackerButton->SetEnabled(false);
+		}
 	}
-
-	fNameView->SetEnabled(enabled);
-	fSignatureView->SetEnabled(enabled);
-	fPathView->SetEnabled(enabled);
-
-	fVersionView->SetEnabled(enabled);
-	fDescriptionLabel->SetEnabled(enabled);
-
-	fTrackerButton->SetEnabled(enabled && appFound);
-	fLaunchButton->SetEnabled(enabled && appFound);
-	fEditButton->SetEnabled(enabled && appFound);
 }
 
 
