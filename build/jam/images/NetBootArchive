@@ -7,7 +7,7 @@ SYSTEM_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame ;
 SYSTEM_NETWORK_PROTOCOLS = ipv4 tcp udp icmp unix ;
 
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
-	x86 @{
+	x86,x86_64 @{
 		3com
 		atheros813x
 		atheros81xx
@@ -22,7 +22,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		sis900
 		syskonnect
 		attansic_l2
-	}@ # x86
+	}@ # x86,x86_64
 
 	rtl81xx
 	etherpci
