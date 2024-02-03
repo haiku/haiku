@@ -261,13 +261,14 @@ AudioStreamAlternate::SetSamplingRate(uint32 newRate)
 			}
 			fSamplingRate = newRate;
 		} else {
-			for (int i = 0; i < frequencies.Count(); i++)
+			for (int i = 0; i < frequencies.Count(); i++) {
 				if (newRate == frequencies[i]) {
 					fSamplingRate = newRate;
 					return B_OK;
 				}
-				TRACE(ERR, "Rate %d not found - ignore it.\n", newRate);
-				return B_BAD_INDEX;
+			}
+			TRACE(ERR, "Rate %d not found - ignore it.\n", newRate);
+			return B_BAD_INDEX;
 		}
 	}
 
