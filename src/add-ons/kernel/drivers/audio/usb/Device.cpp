@@ -37,6 +37,11 @@ Device::Device(usb_device device)
 	fProductID = deviceDescriptor->product_id;
 	fUSBVersion = deviceDescriptor->usb_version;
 
+#if 1
+	if (fUSBVersion >= 0x200)
+		return;
+#endif
+
 	fBuffersReadySem = create_sem(0, DRIVER_NAME "_buffers_ready");
 	if (fBuffersReadySem < B_OK) {
 		TRACE(ERR, "Error of creating ready "
