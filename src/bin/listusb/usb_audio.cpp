@@ -297,8 +297,9 @@ DumpAudioCSInterfaceDescriptorFeatureUnit(
 	printf("                    Control Size ...... %u\n",
 			descriptor->r1.control_size);
 
-
-	uint8 channels = (descriptor->length - 6) / descriptor->r1.control_size;
+	uint8 channels = 0;
+	if (descriptor->r1.control_size > 0)
+		channels = (descriptor->length - 6) / descriptor->r1.control_size;
 	for (uint8 i = 0; i < channels; i++) {
 		switch (descriptor->r1.control_size) {
 			case 1:
@@ -314,6 +315,7 @@ DumpAudioCSInterfaceDescriptorFeatureUnit(
 				printf("                    BMA Channel %u ... ", i);
 				for (uint8 j = 0; j < descriptor->r1.control_size; j++)
 					printf("%02x ", descriptor->r1.bma_controls[i + j]);
+				printf("\n");
 				break;
 		}
 	}

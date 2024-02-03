@@ -25,6 +25,8 @@
 void
 DumpDescriptorData(const usb_generic_descriptor* descriptor)
 {
+	printf("                    Length............ 0x%02x\n",
+		descriptor->length);
 	printf("                    Type ............. 0x%02x\n",
 		descriptor->descriptor_type);
 
@@ -104,8 +106,8 @@ DumpInterface(const BUSBInterface* interface)
 			continue;
 
 		printf("                [Endpoint %" B_PRIu32 "]\n", i);
-		printf("                    MaxPacketSize .... %d\n",
-			endpoint->MaxPacketSize());
+		printf("                    MaxPacketSize .... %dx %d bytes\n",
+			((endpoint->MaxPacketSize() >> 11) & 0x3) + 1, endpoint->MaxPacketSize() & 0x7ff);
 		printf("                    Interval ......... %d\n",
 			endpoint->Interval());
 
