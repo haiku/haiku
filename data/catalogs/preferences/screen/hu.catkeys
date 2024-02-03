@@ -1,12 +1,12 @@
-1	hungarian	x-vnd.Haiku-Screen	2318349707
+1	hungarian	x-vnd.Haiku-Screen	3410763711
 no	Screen		nem
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
 Rows:	Screen		Sorok:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		A kijelzőmód nem állítható be erre:\n\t%s\n
-Keep	Screen		Megtartás
 /other…	Screen		/egyéb…
+Keep	Screen		Megtartás
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vízszíntes frekvencia:\t%lu - %lu kHz\nFüggőleges frekvencia:\t%lu - %lu Hz\n\nMaximális pixelórajel:\t%g MHz
 Refresh rate:	Screen		Frissítési frekvencia:
 Video format:	Screen		Videóformátum:
@@ -26,7 +26,6 @@ Screen	Screen		Képernyő
 Colors:	Screen		Színek:
 yes	Screen		igen
 Swap displays:	Screen		Kijezők megcserélése:
-%sSerial no.: %s	Screen		%sSorozatszám: %s
 8 bits/pixel, 256 colors	Screen		8 bit/pixel, 256 szín
 Revert	Screen		Visszaállít
 always	Screen		mindig

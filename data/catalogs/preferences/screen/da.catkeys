@@ -1,12 +1,12 @@
-1	danish	x-vnd.Haiku-Screen	133788249
+1	danish	x-vnd.Haiku-Screen	1226202253
 no	Screen		nej
 bits/pixel	Screen		bit/billedpunkt
 15 bits/pixel, 32768 colors	Screen		15 bit/billedpunkt, 32768 farver
 Rows:	Screen		Rækker:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Skærmens tilstand kunne ikke blive indstillet:\n\t%s\n
-Keep	Screen		Behold
 /other…	Screen		/andet…
+Keep	Screen		Behold
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vandret frekvens:\t%lu - %lu kHz\nLodret frekvens:\t%lu - %lu Hz\n\nMaksimal billedpunktsfrekvens:\t%g MHz
 Refresh rate:	Screen		Opdateringshastighed:
 Video format:	Screen		Videoformat:
@@ -25,7 +25,6 @@ Screen	Screen		Skærm
 Colors:	Screen		Farver:
 yes	Screen		ja
 Swap displays:	Screen		Skift skærme:
-%sSerial no.: %s	Screen		%sSerienummer: %s
 8 bits/pixel, 256 colors	Screen		8 bit/billedpunkt, 256 farver
 Revert	Screen		Tilbagefør
 always	Screen		altid

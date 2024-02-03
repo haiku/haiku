@@ -1,12 +1,12 @@
-1	czech	x-vnd.Haiku-Screen	2318349707
+1	czech	x-vnd.Haiku-Screen	3410763711
 no	Screen		ne
 bits/pixel	Screen		bitů/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitů/pixel, 32768 barev
 Rows:	Screen		Řádky:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nemohl být nastaven:\n\t%s\n
-Keep	Screen		Zachovat
 /other…	Screen		/jiné...
+Keep	Screen		Zachovat
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontální frekvence:\t%lu - %lu kHz\nVertikální frekvence:\t%lu - %lu Hz\n\nMaximální takt pixelů:\t%g MHz
 Refresh rate:	Screen		Obnovovací frekvence:
 Video format:	Screen		Formát videa:
@@ -26,7 +26,6 @@ Screen	Screen		Obrazovka
 Colors:	Screen		Barvy:
 yes	Screen		ano
 Swap displays:	Screen		Prohodit displeje:
-%sSerial no.: %s	Screen		%sSériové č.: %s
 8 bits/pixel, 256 colors	Screen		8 bitů/pixel, 256 barev
 Revert	Screen		Vrátit
 always	Screen		vždy

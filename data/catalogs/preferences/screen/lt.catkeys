@@ -1,12 +1,12 @@
-1	lithuanian	x-vnd.Haiku-Screen	2318349707
+1	lithuanian	x-vnd.Haiku-Screen	3410763711
 no	Screen		ne
 bits/pixel	Screen		bitų
 15 bits/pixel, 32768 colors	Screen		15 bitų spalvos, iš viso 32768
 Rows:	Screen		Eilutės:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Ekrano veiksenos pakeisti nepavyko:\n\t%s\n
-Keep	Screen		Palikti
 /other…	Screen		/kitas…
+Keep	Screen		Palikti
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Eilučių dažnis:\t%lu - %lu kHz\nKadrų dažnis:\t%lu - %lu Hz\n\nDidžiausias galimas taškų dažnis:\t%g MHz
 Refresh rate:	Screen		Kadrų dažnis:
 Video format:	Screen		Vaizdo formatas:
@@ -26,7 +26,6 @@ Screen	Screen		Ekranas
 Colors:	Screen		Spalvos:
 yes	Screen		taip
 Swap displays:	Screen		Sukeisti ekranus:
-%sSerial no.: %s	Screen		%sSerijos numeris: %s
 8 bits/pixel, 256 colors	Screen		8 bitų, iš viso 256
 Revert	Screen		Atšaukti pakeitimus
 always	Screen		visuomet

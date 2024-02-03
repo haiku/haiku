@@ -1,12 +1,12 @@
-1	indonesian	x-vnd.Haiku-Screen	133788249
+1	indonesian	x-vnd.Haiku-Screen	1226202253
 no	Screen		tidak
 bits/pixel	Screen		bits/piksel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 warna
 Rows:	Screen		Baris:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Mode layar tidak bisa diatur:\n\t%s\n
-Keep	Screen		Jaga
 /other…	Screen		/other…
+Keep	Screen		Jaga
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frekuensi horizonal:\t%lu - %lu kHz\nFrekuensi vertikal:\t%lu - %lu Hz\n\nDetak pixel maksimum:\t%g MHz
 Refresh rate:	Screen		Laju refresh:
 Video format:	Screen		Format video:
@@ -25,7 +25,6 @@ Screen	Screen		Layar
 Colors:	Screen		Warna:
 yes	Screen		ya
 Swap displays:	Screen		Tukar penampil digital:
-%sSerial no.: %s	Screen		%sNo seri.: %s
 8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 warna
 Revert	Screen		Pulihkan
 always	Screen		selalu

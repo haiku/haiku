@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	99360811
+1	hungarian	x-vnd.Haiku-libtracker	2787029568
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Előző keresések
 Mount all	MountMenu		Összes csatolása
 Size	Default Query Columns		Méret
 Favorites	FavoritesMenu		Kedvencek
-Delete	FilePanelPriv		Törlés
 <No recent items>	FavoritesMenu		<Nincsenek korábbi elemek>
 Formula %formula	FindPanel	FindResultTitle	%formula képlet
 Preparing to create links…	StatusWindow		Felkészülés a hivatkozások létrehozására…

@@ -1,12 +1,12 @@
-1	romanian	x-vnd.Haiku-Screen	2318349707
+1	romanian	x-vnd.Haiku-Screen	3410763711
 no	Screen		nu
 bits/pixel	Screen		biți/pixel
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 de culori
 Rows:	Screen		Rânduri:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Modul de ecran nu a putut fi stabilit:\n\t%s\n
-Keep	Screen		Păstrează
 /other…	Screen		/other…
+Keep	Screen		Păstrează
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecvență orizontală:\t%lu - %lu kHz\nFrecvență verticală:\t%lu - %lu Hz\n\nCeas de pixel maxim:\t%g MHz
 Refresh rate:	Screen		Cotă de reîmprospătare:
 Video format:	Screen		Format video:
@@ -26,7 +26,6 @@ Screen	Screen		Ecran
 Colors:	Screen		Culori:
 yes	Screen		da
 Swap displays:	Screen		Interschimbă afișaje:
-%sSerial no.: %s	Screen		%sNr. serie: %s
 8 bits/pixel, 256 colors	Screen		8 biți/pixel, 256 de culori
 Revert	Screen		Revenire
 always	Screen		întotdeauna

@@ -1,12 +1,12 @@
-1	ukrainian	x-vnd.Haiku-Screen	2318349707
+1	ukrainian	x-vnd.Haiku-Screen	3410763711
 no	Screen		ні
 bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
 Rows:	Screen		Рядки:
 %.1f Hz	Screen		%.1f Гц
 The screen mode could not be set:\n\t%s\n	Screen		Не вдалося встановити режим екрану:\n\t%s\n
-Keep	Screen		Зберегти
 /other…	Screen		/інше…
+Keep	Screen		Зберегти
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu кГц\nВертикальна частота:\t%lu - %lu Гц\n\nМаксимально пікселів:\t%g МГц
 Refresh rate:	Screen		Частота оновлення:
 Video format:	Screen		Відео формат:
@@ -26,7 +26,6 @@ Screen	Screen		Екран
 Colors:	Screen		Кольори:
 yes	Screen		так
 Swap displays:	Screen		Поміняти дисплеї:
-%sSerial no.: %s	Screen		%sСерійний №: %s
 8 bits/pixel, 256 colors	Screen		8 бітів/піксель, 256 кольорів
 Revert	Screen		Відкат змін
 always	Screen		завжди

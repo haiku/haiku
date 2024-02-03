@@ -1,12 +1,12 @@
-1	japanese	x-vnd.Haiku-Screen	2318349707
+1	japanese	x-vnd.Haiku-Screen	3410763711
 no	Screen		いいえ
 bits/pixel	Screen		ビット/ピクセル
 15 bits/pixel, 32768 colors	Screen		15 ビット/ピクセル, 32768 色
 Rows:	Screen		行:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		スクリーンモードは設定できません:\n\t%s\n
-Keep	Screen		保持
 /other…	Screen		/その他...
+Keep	Screen		保持
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平周波数: \t%lu - %lu kHz\n垂直周波数: \t%lu - %lu Hz\n\n最大ピクセルクロック: \t%g MHz
 Refresh rate:	Screen		リフレッシュレート:
 Video format:	Screen		ビデオフォーマット:
@@ -26,7 +26,6 @@ Screen	Screen		画面
 Colors:	Screen		色:
 yes	Screen		はい
 Swap displays:	Screen		ディスプレイを交換:
-%sSerial no.: %s	Screen		%sシリアルナンバー: %s
 8 bits/pixel, 256 colors	Screen		8 ビット/ピクセル, 256 色
 Revert	Screen		戻す
 always	Screen		常に

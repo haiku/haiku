@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2231325175
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris di
 <no info>	PackageInfoView		<cap informació>
 Usage conditions download problem	UserUsageConditions		Problema de baixada de les condicions d'ús
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hi ha hagut un error en baixar els requisits de la contrasenya necessaris per crear un usuari nou. Comproveu el registre per obtenir més informació i torneu-ho a provar.\nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari de Haiku.
+Fetching screenshot	CacheScreenshotProcess		S'obté la captura
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
 Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones

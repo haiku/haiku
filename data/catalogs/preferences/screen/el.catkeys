@@ -1,12 +1,12 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Screen	2318349707
+1	greek, modern (1453-)	x-vnd.Haiku-Screen	3410763711
 no	Screen		όχι
 bits/pixel	Screen		bits/εικονοστοιχείο
 15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
 Rows:	Screen		Γραμμές:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Δεν ήταν δυνατός ο ορισμός λειτουργίας οθόνης:\n\t%s\n
-Keep	Screen		Διατήρηση
 /other…	Screen		/άλλο…
+Keep	Screen		Διατήρηση
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Οριζόντια συχνότητα:\t%lu - %lu kHz\nΚάθετη συχνότητα:\t%lu - %lu Hz\n\nΜέγιστος μετρητής εικονοστοιχείων:\t%g MHz
 Refresh rate:	Screen		Ρυθμός Ανανέωσης:
 Video format:	Screen		Μορφή βίντεο:
@@ -26,7 +26,6 @@ Screen	Screen		Οθόνη
 Colors:	Screen		Χρώματα:
 yes	Screen		ναι
 Swap displays:	Screen		Ανταλαγή οθόνης:
-%sSerial no.: %s	Screen		%sΣειριακός αριθμός.: %s
 8 bits/pixel, 256 colors	Screen		8 bits/εικονοστοιχείο, 256 χρώματα
 Revert	Screen		Επαναφορά
 always	Screen		πάντα

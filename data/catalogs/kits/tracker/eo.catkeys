@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3582304341
+1	esperanto	x-vnd.Haiku-libtracker	1975005802
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -239,7 +239,6 @@ Recent queries	FindPanel		Ĵusaj serĉmendoj
 Mount all	MountMenu		Surmeti ĉion
 Size	Default Query Columns		Grando
 Favorites	FavoritesMenu		Preferaĵoj
-Delete	FilePanelPriv		Forigi
 <No recent items>	FavoritesMenu		<Neniu ĵusa elemento>
 Formula %formula	FindPanel	FindResultTitle	Formulo %formula
 Preparing to create links…	StatusWindow		Preparante krei ligilojn...

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1538613630
+1	slovak	x-vnd.Haiku-libtracker	4226282387
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -206,7 +206,6 @@ Recent queries	FindPanel		Nedávne požiadavky
 Mount all	MountMenu		Pripojiť všetky
 Size	Default Query Columns		Veľkosť
 Favorites	FavoritesMenu		Obľúbené
-Delete	FilePanelPriv		Zmazať
 <No recent items>	FavoritesMenu		<Žiadne nedávne položky>
 Formula %formula	FindPanel	FindResultTitle	Vzorec %formula
 Preparing to create links…	StatusWindow		Pripravuje sa vytvorenie odkazov…

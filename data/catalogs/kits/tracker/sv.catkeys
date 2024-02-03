@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	99360811
+1	swedish	x-vnd.Haiku-libtracker	2787029568
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Senaste frågor
 Mount all	MountMenu		Montera alla
 Size	Default Query Columns		Storlek
 Favorites	FavoritesMenu		Favoriter
-Delete	FilePanelPriv		Ta bort
 <No recent items>	FavoritesMenu		<Inga tidigare objekt>
 Formula %formula	FindPanel	FindResultTitle	Formel %formula
 Preparing to create links…	StatusWindow		Förbereder skapande av länkar...

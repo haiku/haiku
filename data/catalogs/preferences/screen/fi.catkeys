@@ -1,12 +1,12 @@
-1	finnish	x-vnd.Haiku-Screen	2318349707
+1	finnish	x-vnd.Haiku-Screen	3410763711
 no	Screen		ei
 bits/pixel	Screen		bittiä/pikseli
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
 Rows:	Screen		Rivit:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Näyttötilaa ei voitu asettaa:\n\t%s\n
-Keep	Screen		Pidä
 /other…	Screen		/muut...
+Keep	Screen		Pidä
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vaakasuora taajuus:\t%lu - %lu kHz\nPystysuora taajuus:\t%lu - %lu Hz\n\nMaksimi pikselikello:\t%g MHz
 Refresh rate:	Screen		Virkistystaajuus:
 Video format:	Screen		Videomuoto:
@@ -26,7 +26,6 @@ Screen	Screen		Näyttö
 Colors:	Screen		Värit:
 yes	Screen		kyllä
 Swap displays:	Screen		Vaihda näyttöjä:
-%sSerial no.: %s	Screen		%sSarjanumero: %s
 8 bits/pixel, 256 colors	Screen		8 bittiä/pikseli, 256 väriä
 Revert	Screen		Palauta
 always	Screen		aina

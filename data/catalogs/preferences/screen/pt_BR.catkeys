@@ -1,12 +1,12 @@
-1	portuguese (brazil)	x-vnd.Haiku-Screen	133788249
+1	portuguese (brazil)	x-vnd.Haiku-Screen	1226202253
 no	Screen		não
 bits/pixel	Screen		bits/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 cores
 Rows:	Screen		Linhas:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		O modo de tela não pode ser aceito\n\t%s\n
-Keep	Screen		Manter
 /other…	Screen		/outro…
+Keep	Screen		Manter
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frequência horizonal:\t%lu - %lu kHz\nFrequência vertical:\t%lu - %lu Hz\n\nRelógio máximo de pixel:\t%g MHz
 Refresh rate:	Screen		Taxa de atualizão:
 Video format:	Screen		Formato de vídeo:
@@ -25,7 +25,6 @@ Screen	Screen		Tela
 Colors:	Screen		Cores:
 yes	Screen		sim
 Swap displays:	Screen		Trocar monitores:
-%sSerial no.: %s	Screen		%sSerial no.: %s
 8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 cores
 Revert	Screen		Reverter
 always	Screen		sempre

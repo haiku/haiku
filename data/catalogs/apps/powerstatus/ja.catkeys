@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PowerStatus	1085070685
+1	japanese	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		ウィンドウモードで起動
 Extended battery info	PowerStatus		拡張バッテリー情報
 Show status icon	PowerStatus		状態アイコンの表示
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		前回の完全充電:
 Current rate: 	PowerStatus		電流率:
 Show text label	PowerStatus		テキストラベルの表示
 Quit	PowerStatus		終了
+Battery not charging	PowerStatus		バッテリーが充電されない
 Battery low	PowerStatus		バッテリー残量低下
 Model number: 	PowerStatus		モデルナンバー:
 Battery unused	PowerStatus		使用していないバッテリー
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		設計容量警告:
 Capacity granularity 2: 	PowerStatus		容量精度 2:
 Too bad!	PowerStatus		残念!
 Technology: 	PowerStatus		テクノロジー:
+not charging	PowerStatus		充電されない
  mWh	PowerStatus		 mWh
 PowerStatus	System name		バッテリーの状態
 Design capacity: 	PowerStatus		設計容量:

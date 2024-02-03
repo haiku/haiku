@@ -1,12 +1,12 @@
-1	esperanto	x-vnd.Haiku-Screen	133788249
+1	esperanto	x-vnd.Haiku-Screen	1226202253
 no	Screen		ne
 bits/pixel	Screen		bitoj/bildero
 15 bits/pixel, 32768 colors	Screen		15 bitoj/bildero, 32768 koloroj
 Rows:	Screen		Vicoj:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Malsukcesis apliki ekranan reĝimon:\n\t%s\n
-Keep	Screen		Konservi
 /other…	Screen		/alia…
+Keep	Screen		Konservi
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontala frekvenco:\t%lu - %lu kHz\nVertikala frekvenco:\t%lu - %lu Hz\n\nMaksimuma bildera taktofrekvenco:\t%g MHz
 Refresh rate:	Screen		Ofteco de aktualigo:
 Video format:	Screen		Videa formato:
@@ -25,7 +25,6 @@ Screen	Screen		Ekrano
 Colors:	Screen		Koloroj:
 yes	Screen		jes
 Swap displays:	Screen		Interŝanĝi ekaranojn:
-%sSerial no.: %s	Screen		%sSerial no.: %s
 8 bits/pixel, 256 colors	Screen		8 bitoj/bildero, 256 koloroj
 Revert	Screen		Malfari
 always	Screen		ĉiam

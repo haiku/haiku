@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	666830610
+1	dutch; flemish	x-vnd.Haiku-libtracker	3354499367
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -243,7 +243,6 @@ Recent queries	FindPanel		Recente zoekopdrachten
 Mount all	MountMenu		Betrek alles
 Size	Default Query Columns		Grootte
 Favorites	FavoritesMenu		Favorieten
-Delete	FilePanelPriv		Verwijderen
 <No recent items>	FavoritesMenu		<Geen recente items>
 Formula %formula	FindPanel	FindResultTitle	Formule %formula
 Preparing to create links…	StatusWindow		Voorbereiden om koppelingen te maken...

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2231325175
+1	japanese	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		ユーザー評価はありません
 <no info>	PackageInfoView		<情報無し>
 Usage conditions download problem	UserUsageConditions		使用条件のダウンロードで問題
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新規ユーザー作成に必要なパスワード要件のダウンロードの際にエラーを生じました。詳しくはログを確認して再度試してみてください。 \nログを見るための情報は Haiku ユーザーガイドの HaikuDepot の章で得られます。
+Fetching screenshot	CacheScreenshotProcess		スクリーンショットを取得中
 A network transport error has arisen communicating with the server system: %s	ServerHelper		サーバーシステムと通信中にネットワーク転送エラーが発生しました: %s
 Rating	PackageListView		評価
 Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期しています。

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	99360811
+1	ukrainian	x-vnd.Haiku-libtracker	2787029568
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Недавні запити
 Mount all	MountMenu		Підключити все
 Size	Default Query Columns		Розмір
 Favorites	FavoritesMenu		Вибрані папки
-Delete	FilePanelPriv		Видалити
 <No recent items>	FavoritesMenu		<Немає недавніх елементів>
 Formula %formula	FindPanel	FindResultTitle	Формула %formula
 Preparing to create links…	StatusWindow		Підготовка до створення посилань…

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1773232307
+1	turkish	x-vnd.Haiku-libtracker	165933768
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Son sorgular
 Mount all	MountMenu		Tümünü bağla
 Size	Default Query Columns		Boyut
 Favorites	FavoritesMenu		Favoriler
-Delete	FilePanelPriv		Sil
 <No recent items>	FavoritesMenu		<Son kullanılan yok>
 Formula %formula	FindPanel	FindResultTitle	%formula formülü
 Preparing to create links…	StatusWindow		Bağlantılar oluşturulmaya hazırlanıyor…

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	1203018991
+1	croatian	x-vnd.Haiku-libtracker	3890687748
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -176,7 +176,6 @@ Decrease size	ContainerWindow		Smanji veličinu
 Mount all	MountMenu		Montiraj sve
 Size	Default Query Columns		Veličina
 Favorites	FavoritesMenu		Favoriti
-Delete	FilePanelPriv		Obriši
 <No recent items>	FavoritesMenu		<No recent items>
 Formula %formula	FindPanel	FindResultTitle	Formula %formula
 Preparing to create links…	StatusWindow		Priprema za stvaranje  poveznica...

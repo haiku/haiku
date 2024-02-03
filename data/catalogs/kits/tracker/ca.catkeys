@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	99360811
+1	catalan; valencian	x-vnd.Haiku-libtracker	2787029568
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Consultes recents
 Mount all	MountMenu		Munta-ho tot
 Size	Default Query Columns		Mida
 Favorites	FavoritesMenu		Preferits
-Delete	FilePanelPriv		Suprimeix
 <No recent items>	FavoritesMenu		<Cap element recent>
 Formula %formula	FindPanel	FindResultTitle	Formula %formula
 Preparing to create links…	StatusWindow		Es prepara la creació d'enllaços...

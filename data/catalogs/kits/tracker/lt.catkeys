@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1369477460
+1	lithuanian	x-vnd.Haiku-libtracker	4057146217
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -181,7 +181,6 @@ Recent queries	FindPanel		Paskiausios užklausos
 Mount all	MountMenu		Prijungti visus
 Size	Default Query Columns		Dydis
 Favorites	FavoritesMenu		Parankiniai
-Delete	FilePanelPriv		Šalinti
 <No recent items>	FavoritesMenu		<Paskiausių objektų nėra>
 Formula %formula	FindPanel	FindResultTitle	Formulė %formula
 Preparing to create links…	StatusWindow		Rengiamasi kurti nuorodas…

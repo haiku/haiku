@@ -1,12 +1,12 @@
-1	catalan; valencian	x-vnd.Haiku-Screen	2318349707
+1	catalan; valencian	x-vnd.Haiku-Screen	3410763711
 no	Screen		no
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colors
 Rows:	Screen		Files:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		No s'ha pogut establir el mode de la pantalla:\n\t%s\n
-Keep	Screen		Mantén-la
 /other…	Screen		/altres…
+Keep	Screen		Mantén-la
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Freqüència horitzontal:\t%lu - %lu kHz\nFreqüència vertical:\t%lu - %lu Hz\n\nAmplada màxima de píxels:\t%g MHz
 Refresh rate:	Screen		Freqüència d'actualització:
 Video format:	Screen		Format del vídeo:
@@ -26,7 +26,6 @@ Screen	Screen		Pantalla
 Colors:	Screen		Colors:
 yes	Screen		sí
 Swap displays:	Screen		Intercanvia les pantalles:
-%sSerial no.: %s	Screen		Núm. de sèrie de %s : %s
 8 bits/pixel, 256 colors	Screen		8 bits/píxels, 256 colors
 Revert	Screen		Reverteix
 always	Screen		sempre

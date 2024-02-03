@@ -1,12 +1,12 @@
-1	english	x-vnd.Haiku-Screen	133788249
+1	english	x-vnd.Haiku-Screen	1226202253
 no	Screen		否
 bits/pixel	Screen		位/像素
 15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
 Rows:	Screen		行：
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		屏幕模式无法设置为：\n\t%s\n
-Keep	Screen		保持
 /other…	Screen		/其他...
+Keep	Screen		保持
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平频率：\t%lu - %lu kHz\n垂直频率：\t%lu - %lu Hz\n\n最大像素频率：\t%g MHz
 Refresh rate:	Screen		刷新频率：
 Video format:	Screen		视频格式：
@@ -25,7 +25,6 @@ Screen	Screen		屏幕
 Colors:	Screen		颜色：
 yes	Screen		是
 Swap displays:	Screen		交替显示：
-%sSerial no.: %s	Screen		%s 无序列号。：%s
 8 bits/pixel, 256 colors	Screen		8 位/像素，256 色
 Revert	Screen		还原
 always	Screen		总是

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	666830610
+1	english	x-vnd.Haiku-libtracker	3354499367
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -243,7 +243,6 @@ Recent queries	FindPanel		最近查询
 Mount all	MountMenu		挂载所有
 Size	Default Query Columns		大小
 Favorites	FavoritesMenu		选择
-Delete	FilePanelPriv		删除
 <No recent items>	FavoritesMenu		<无最近项目>
 Formula %formula	FindPanel	FindResultTitle	表达式 %formula
 Preparing to create links…	StatusWindow		准备创建链接...

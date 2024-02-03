@@ -1,12 +1,12 @@
-1	dutch; flemish	x-vnd.Haiku-Screen	133788249
+1	dutch; flemish	x-vnd.Haiku-Screen	1226202253
 no	Screen		nee
 bits/pixel	Screen		bits/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 kleuren
 Rows:	Screen		Rijen:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		De schermmodus kon niet worden ingesteld:\n\t%s\n
-Keep	Screen		Behouden
 /other…	Screen		/anders...
+Keep	Screen		Behouden
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontale frequentie:\t%lu - %lu kHz\nVerticale frequentie:\t%lu - %lu Hz\n\nMaximale pixelklok:\t%g MHz
 Refresh rate:	Screen		Verversingssnelheid:
 Video format:	Screen		Videoformaat:
@@ -25,7 +25,6 @@ Screen	Screen		Scherm
 Colors:	Screen		Kleuren:
 yes	Screen		ja
 Swap displays:	Screen		Diplays omwisselen:
-%sSerial no.: %s	Screen		%sSerienummer: %s
 8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 kleuren
 Revert	Screen		Omkeren
 always	Screen		altijd

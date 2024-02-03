@@ -1,12 +1,12 @@
-1	german	x-vnd.Haiku-Screen	2318349707
+1	german	x-vnd.Haiku-Screen	3410763711
 no	Screen		nein
 bits/pixel	Screen		Bits/Pixel
 15 bits/pixel, 32768 colors	Screen		15 Bits/Pixel, 32768 Farben
 Rows:	Screen		Zeilen:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Der Bildschirmmodus konnte nicht gesetzt werden:\n\t%s\n
-Keep	Screen		Beibehalten
 /other…	Screen		/andere …
+Keep	Screen		Beibehalten
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontale Frequenz:\t%lu - %lu kHz\nVertikale Frequenz:\t%lu - %lu Hz\n\nMax. Pixelrate:\t%g MHz
 Refresh rate:	Screen		Bildwiederholrate:
 Video format:	Screen		Videoformat:
@@ -26,7 +26,6 @@ Screen	Screen		Bildschirm
 Colors:	Screen		Farben: 
 yes	Screen		Ja
 Swap displays:	Screen		Bildschirme tauschen:
-%sSerial no.: %s	Screen		%sSeriennr.: %s
 8 bits/pixel, 256 colors	Screen		8 Bits/Pixel, 256 Farben
 Revert	Screen		Anfangswerte
 always	Screen		immer

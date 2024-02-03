@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	2932387334
+1	thai	x-vnd.Haiku-libtracker	1325088795
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -234,7 +234,6 @@ Recent queries	FindPanel		queries ล่าสุด
 Mount all	MountMenu		เชื่อมต่อทั้งหมด
 Size	Default Query Columns		ขนาด
 Favorites	FavoritesMenu		รายการโปรด
-Delete	FilePanelPriv		ลบ
 <No recent items>	FavoritesMenu		<No recent items>
 Formula %formula	FindPanel	FindResultTitle	สูตร %formula
 Preparing to create links…	StatusWindow		การเตรียมการเพื่อสร้างลิงก์

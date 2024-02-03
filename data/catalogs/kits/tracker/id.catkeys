@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	199241231
+1	indonesian	x-vnd.Haiku-libtracker	2886909988
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -235,7 +235,6 @@ Recent queries	FindPanel		Kueri terbaru
 Mount all	MountMenu		Memasang semua
 Size	Default Query Columns		Ukuran
 Favorites	FavoritesMenu		Favorit
-Delete	FilePanelPriv		Hapus
 <No recent items>	FavoritesMenu		<No recent items>
 Formula %formula	FindPanel	FindResultTitle	Rumus %formula
 Preparing to create links…	StatusWindow		Bersiap membuat link…

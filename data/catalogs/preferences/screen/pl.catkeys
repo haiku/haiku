@@ -1,12 +1,12 @@
-1	polish	x-vnd.Haiku-Screen	133788249
+1	polish	x-vnd.Haiku-Screen	1226202253
 no	Screen		nie
 bits/pixel	Screen		bitów/piksel
 15 bits/pixel, 32768 colors	Screen		15 bitów/piksel, 32768 kolorów
 Rows:	Screen		Wiersze:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Tryb ekranu nie może zostać ustawiony:\n\t%s\n
-Keep	Screen		Zachowaj
 /other…	Screen		/inne…
+Keep	Screen		Zachowaj
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Częstotliwość pozioma:\t%lu - %lu kHz\nCzęstotliwość pionowa:\t%lu - %lu Hz\n\nMaksymalne taktowanie piksela:\t%g MHz
 Refresh rate:	Screen		Częstotliwość odświeżania:
 Video format:	Screen		Format obrazu:
@@ -25,7 +25,6 @@ Screen	Screen		Ekran
 Colors:	Screen		Kolory:
 yes	Screen		tak
 Swap displays:	Screen		Zamień wyświetlacze:
-%sSerial no.: %s	Screen		%sNr seryjny: %s
 8 bits/pixel, 256 colors	Screen		8 bitów/piksel, 256 kolorów
 Revert	Screen		Cofnij
 always	Screen		zawsze

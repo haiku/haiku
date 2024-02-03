@@ -1,12 +1,12 @@
-1	turkish	x-vnd.Haiku-Screen	2318349707
+1	turkish	x-vnd.Haiku-Screen	3410763711
 no	Screen		hayır
 bits/pixel	Screen		bit/piksel
 15 bits/pixel, 32768 colors	Screen		15 bit/piksel, 32768 renk
 Rows:	Screen		Satırlar:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Ekran kipi ayarlanamıyor:\n\t%s\n
-Keep	Screen		Tut
 /other…	Screen		/diğer…
+Keep	Screen		Tut
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Yatay frekans:\t%lu - %lu kHz\nDikey frekans:\t%lu - %lu Hz\n\nEn hızlı piksel saati:\t%g MHz
 Refresh rate:	Screen		Yenileme hızı:
 Video format:	Screen		Video biçimi:
@@ -26,7 +26,6 @@ Screen	Screen		Ekran
 Colors:	Screen		Renkler:
 yes	Screen		evet
 Swap displays:	Screen		Ekranları değiştir:
-%sSerial no.: %s	Screen		%sSeri numarası.: %s
 8 bits/pixel, 256 colors	Screen		8 bit/piksel, 256 renk
 Revert	Screen		Eski haline döndür
 always	Screen		her zaman

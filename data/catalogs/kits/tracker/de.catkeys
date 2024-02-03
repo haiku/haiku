@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3333370037
+1	german	x-vnd.Haiku-libtracker	1726071498
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -241,7 +241,6 @@ Recent queries	FindPanel		Letzte Queries
 Mount all	MountMenu		Alle einhängen
 Size	Default Query Columns		Größe
 Favorites	FavoritesMenu		Favoriten
-Delete	FilePanelPriv		Löschen
 <No recent items>	FavoritesMenu		<Keine letzten Objekte>
 Formula %formula	FindPanel	FindResultTitle	Formel %formula
 Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet …

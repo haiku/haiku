@@ -1,12 +1,12 @@
-1	belarusian	x-vnd.Haiku-Screen	1388881963
+1	belarusian	x-vnd.Haiku-Screen	2481295967
 no	Screen		не
 bits/pixel	Screen		бітаў на піксель
 15 bits/pixel, 32768 colors	Screen		15 бітаў на піксель, 32768 колераў
 Rows:	Screen		Радкі:
 %.1f Hz	Screen		%.1f Гц
 The screen mode could not be set:\n\t%s\n	Screen		Не ўдалося прызначыць рэжым экрана:\n\t%s\n
-Keep	Screen		Трымаць
 /other…	Screen		/іншае…
+Keep	Screen		Трымаць
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Гарызантальная частата:\t%lu - %lu кГц\nВертыкальная частата:\t%lu - %lu Гц\n\nМаксімальная частата пікселяў:\t%g МГц
 Refresh rate:	Screen		Частата абнаўлення:
 Video format:	Screen		Фармат відэа:
@@ -23,7 +23,6 @@ Screen	Screen		Экран
 Colors:	Screen		Колеры:
 yes	Screen		так
 Swap displays:	Screen		Паменяць экраны месцамі:
-%sSerial no.: %s	Screen		%sСерыйны нумар.: %s
 8 bits/pixel, 256 colors	Screen		8 бітаў на піксель, 256 колераў
 Revert	Screen		Вярнуць
 always	Screen		заўсёды

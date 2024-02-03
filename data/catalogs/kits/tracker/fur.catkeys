@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	99360811
+1	friulian	x-vnd.Haiku-libtracker	2787029568
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Interogazions resintis
 Mount all	MountMenu		Monte ducj
 Size	Default Query Columns		Dimension
 Favorites	FavoritesMenu		Preferîts
-Delete	FilePanelPriv		Elimine
 <No recent items>	FavoritesMenu		<Nissun element resint>
 Formula %formula	FindPanel	FindResultTitle	Formule %formula
 Preparing to create links…	StatusWindow		Preparazion ae creazion dai colegaments…

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2231325175
+1	hungarian	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll
 <no info>	PackageInfoView		<nincs információ>
 Usage conditions download problem	UserUsageConditions		Hiba történt a felhasználási feltételek letöltésekor
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hiba történt az új felhasználó létrehozásához szükséges jelszókövetelmények letöltése során. Ellenőrizd a naplót a részletekért, majd próbálkozz újra.\nA naplók megtekintésével kapcsolatos információk a Haiku Felhasználói kézikönyv Raktár részében találhatók.
+Fetching screenshot	CacheScreenshotProcess		Képernyőkép lekérése
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hálózati hiba lépett fel a szerverrel való kommunikáció során: %s
 Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2231325175
+1	swedish	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		Ingen betygsättnings tillgänglig.
 <no info>	PackageInfoView		<Ingen information>
 Usage conditions download problem	UserUsageConditions		Nedladdningsproblem för användningsvillkor
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av lösenordskraven som krävs för att skapa en ny användare. Kontrollera loggen för detaljer och försök igen. \nInformation om hur man visar loggarna finns i HaikuDepot-delen av Haiku User Guide.
+Fetching screenshot	CacheScreenshotProcess		Hämtar skärmdump
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ett nättransportfel har uppstått vid kommunikation med serversystemet: %s
 Rating	PackageListView		Betyg
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserar ikoner

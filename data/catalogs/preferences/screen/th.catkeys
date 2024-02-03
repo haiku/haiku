@@ -1,12 +1,12 @@
-1	thai	x-vnd.Haiku-Screen	133788249
+1	thai	x-vnd.Haiku-Screen	1226202253
 no	Screen		ไม่
 bits/pixel	Screen		bits/pixel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 colors
 Rows:	Screen		แถว:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		ไม่สามารถตั้งค่าโหมดหน้าจอ:\n\t%s\n
-Keep	Screen		เก็บ
 /other…	Screen		/other
+Keep	Screen		เก็บ
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		ความถี่แนวนอน:\t%lu - %lu kHz\nความถี่แนวตั้ง:\t%lu - %lu Hz\n\nนาฬิกาพิกเซลสูงสุด:\t%g MHz
 Refresh rate:	Screen		อัตรารีเฟรซ:
 Video format:	Screen		รูปแบบวีดิโอ:
@@ -25,7 +25,6 @@ Screen	Screen		หน้าจอ
 Colors:	Screen		สี
 yes	Screen		ใช่
 Swap displays:	Screen		สลับการแสดง:
-%sSerial no.: %s	Screen		%sSerial no.: %s
 8 bits/pixel, 256 colors	Screen		8 bits/pixel, 256 colors
 Revert	Screen		เปลี่ยนกลับ
 always	Screen		ตลอด

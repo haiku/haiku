@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1440907020
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	4128575777
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Πρόσφατες αναζητήσεις
 Mount all	MountMenu		Προσάρτηση όλων
 Size	Default Query Columns		Μέγεθος
 Favorites	FavoritesMenu		Αγαπημένα
-Delete	FilePanelPriv		Διαγραφή
 <No recent items>	FavoritesMenu		<Κανένα πρόσφατο στοιχείο>
 Formula %formula	FindPanel	FindResultTitle	Τύπος %formula
 Preparing to create links…	StatusWindow		Προετοιμασία δημιουργίας συνδέσμων…

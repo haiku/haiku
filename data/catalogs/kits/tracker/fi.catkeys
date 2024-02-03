@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1440907020
+1	finnish	x-vnd.Haiku-libtracker	4128575777
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Äskettäiset kyselyt
 Mount all	MountMenu		Liitä kaikki
 Size	Default Query Columns		Koko
 Favorites	FavoritesMenu		Suosikit
-Delete	FilePanelPriv		Poista
 <No recent items>	FavoritesMenu		<Ei äskettäisiä kohteita>
 Formula %formula	FindPanel	FindResultTitle	Kaava %formula
 Preparing to create links…	StatusWindow		Valmistaudutaan luomaan linkkejä...

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	666830610
+1	polish	x-vnd.Haiku-libtracker	3354499367
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -243,7 +243,6 @@ Recent queries	FindPanel		Ostatnie zapytania
 Mount all	MountMenu		Zamontuj wszystko
 Size	Default Query Columns		Rozmiar
 Favorites	FavoritesMenu		Ulubione
-Delete	FilePanelPriv		Usuń
 <No recent items>	FavoritesMenu		<Brak ostatnio otwieranych obiektów>
 Formula %formula	FindPanel	FindResultTitle	Formuła %formula
 Preparing to create links…	StatusWindow		Przygotowanie do tworzenia dowiązań...

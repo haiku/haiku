@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	99360811
+1	romanian	x-vnd.Haiku-libtracker	2787029568
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -244,7 +244,6 @@ Recent queries	FindPanel		Interogări recente
 Mount all	MountMenu		Montează toate
 Size	Default Query Columns		Dimensiune
 Favorites	FavoritesMenu		Favorite
-Delete	FilePanelPriv		Șterge
 <No recent items>	FavoritesMenu		<No recent items>
 Formula %formula	FindPanel	FindResultTitle	Formula %formula
 Preparing to create links…	StatusWindow		Se pregătește crearea legăturilor…

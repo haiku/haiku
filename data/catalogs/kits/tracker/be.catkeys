@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	2833667794
+1	belarusian	x-vnd.Haiku-libtracker	1226369255
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -179,7 +179,6 @@ Recent queries	FindPanel		Папярэднія запыты
 Mount all	MountMenu		Мантаваць усё
 Size	Default Query Columns		Памер
 Favorites	FavoritesMenu		Выбранае
-Delete	FilePanelPriv		Выдаліць
 <No recent items>	FavoritesMenu		<Няма нядаўніх элементаў>
 Formula %formula	FindPanel	FindResultTitle	Формула %formula
 Preparing to create links…	StatusWindow		Падрыхтоўка да стварэння спасылак…

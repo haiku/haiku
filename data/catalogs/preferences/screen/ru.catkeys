@@ -1,12 +1,12 @@
-1	russian	x-vnd.Haiku-Screen	2318349707
+1	russian	x-vnd.Haiku-Screen	3410763711
 no	Screen		нет
 bits/pixel	Screen		бита на пиксель
 15 bits/pixel, 32768 colors	Screen		15 бит на пиксель, 32768 цветов
 Rows:	Screen		Ряды:
 %.1f Hz	Screen		%.1f Гц
 The screen mode could not be set:\n\t%s\n	Screen		Невозможно установить этот режим:\n\t%s\n
-Keep	Screen		Сохранить
 /other…	Screen		/другое…
+Keep	Screen		Сохранить
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальная частота:\t%lu - %lu кГц\nВертикальная частота:\t\t%lu - %lu Гц\n\nЧастота пикселизации:\t\t%g MГц
 Refresh rate:	Screen		Частота обновления:
 Video format:	Screen		Видео формат:
@@ -26,7 +26,6 @@ Screen	Screen		Экран
 Colors:	Screen		Цвета:
 yes	Screen		да
 Swap displays:	Screen		Поменять экраны местами:
-%sSerial no.: %s	Screen		%sСерийный №: %s
 8 bits/pixel, 256 colors	Screen		8 бит на пиксель, 256 цветов
 Revert	Screen		Вернуть
 always	Screen		всегда
