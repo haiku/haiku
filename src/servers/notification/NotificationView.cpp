@@ -25,6 +25,7 @@
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <Notification.h>
+#include <NumberFormat.h>
 #include <Path.h>
 #include <PropertyInfo.h>
 #include <Roster.h>
@@ -95,10 +96,14 @@ NotificationView::NotificationView(BNotification* notification, bigtime_t timeou
 			progress->SetMaxValue(1.0f);
 			progress->Update(fNotification->Progress());
 
-			BString label = "";
-			label << (int)(fNotification->Progress() * 100) << " %";
-			progress->SetTrailingText(label);
+			BNumberFormat numberFormat;
+			BString label;
+			double progressPercent = fNotification->Progress();
 
+			if (numberFormat.FormatPercent(label, progressPercent) != B_OK)
+				label.SetToFormat("%d%%", (int)(progressPercent * 100));
+
+			progress->SetTrailingText(label.String());
 			layout->AddView(progress);
 		}
 		// fall through.
