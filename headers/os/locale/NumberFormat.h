@@ -14,6 +14,7 @@ enum BNumberElement {
 	B_GROUPING_SEPARATOR,
 };
 
+
 class BNumberFormatImpl;
 
 
@@ -23,22 +24,18 @@ public:
 								BNumberFormat(const BLocale* locale);
 								~BNumberFormat();
 
-			ssize_t				Format(char* string, size_t maxSize,
-									const double value);
+			ssize_t				Format(char* string, size_t maxSize, const double value);
 			status_t			Format(BString& string, const double value);
-			ssize_t				Format(char* string, size_t maxSize,
-									const int32 value);
+			ssize_t				Format(char* string, size_t maxSize, const int32 value);
 			status_t			Format(BString& string, const int32 value);
 
-			ssize_t				FormatMonetary(char* string, size_t maxSize,
-									const double value);
-			status_t			FormatMonetary(BString& string,
-									const double value);
+			status_t			SetPrecision(int precision);
 
-			ssize_t				FormatPercent(char* string, size_t maxSize,
-									const double value);
-			status_t			FormatPercent(BString& string,
-									const double value);
+			ssize_t				FormatMonetary(char* string, size_t maxSize, const double value);
+			status_t			FormatMonetary(BString& string, const double value);
+
+			ssize_t				FormatPercent(char* string, size_t maxSize, const double value);
+			status_t			FormatPercent(BString& string, const double value);
 
 			status_t			Parse(const BString& string, double& value);
 

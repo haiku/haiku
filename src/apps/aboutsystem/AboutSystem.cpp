@@ -1189,12 +1189,15 @@ SysInfoView::_GetRamUsage(system_info* sysInfo)
 	BString ramUsage;
 	BString data;
 	double usedMemoryPercent = double(sysInfo->used_pages) / sysInfo->max_pages;
+	status_t status = fNumberFormat.FormatPercent(data, usedMemoryPercent);
 
-	if (fNumberFormat.FormatPercent(data, usedMemoryPercent) != B_OK)
-		data.SetToFormat("%d%%", (int)(100 * usedMemoryPercent));
-
-	ramUsage.SetToFormat(B_TRANSLATE_COMMENT("%d MiB used (%s)",
-		"326 MiB used (16%)"), used_pages(sysInfo), data.String());
+	if (status == B_OK) {
+		ramUsage.SetToFormat(B_TRANSLATE_COMMENT("%d MiB used (%s)",
+			"326 MiB used (16%)"), used_pages(sysInfo), data.String());
+	} else {
+		ramUsage.SetToFormat(B_TRANSLATE_COMMENT("%d MiB used (%d%%)",
+			"326 MiB used (16%)"), used_pages(sysInfo), (int)(100 * usedMemoryPercent));
+	}
 
 	return ramUsage;
 }
