@@ -1590,8 +1590,11 @@ AboutView::_CreateCreditsView()
 		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &fLinkColor);
-	fCreditsView->InsertHyperText("https://www.haiku-os.org",
+	fCreditsView->InsertHyperText(B_TRANSLATE("Visit the Haiku website"),
 		new URLAction("https://www.haiku-os.org"));
+	fCreditsView->Insert("\n");
+	fCreditsView->InsertHyperText(B_TRANSLATE("Make a donation"),
+		new URLAction("https://www.haiku-inc.org/donate"));
 	fCreditsView->Insert("\n\n");
 
 	font.SetSize(be_bold_font->Size());
