@@ -182,7 +182,7 @@ RNDISDevice::Open()
 
 	status_t status = _RNDISInitialize();
 	if (status != B_OK) {
-		TRACE_ALWAYS("failed to read mac address\n");
+		TRACE_ALWAYS("failed to initialize RNDIS device\n");
 		return status;
 	}
 
@@ -195,7 +195,7 @@ RNDISDevice::Open()
 	// TODO these are non-fatal but make sure we have sane defaults for them
 	status = _ReadMaxSegmentSize(fDevice);
 	if (status != B_OK) {
-		TRACE_ALWAYS("failed to read fragment siez\n");
+		TRACE_ALWAYS("failed to read fragment size\n");
 	}
 
 	status = _ReadMediaState(fDevice);
