@@ -108,6 +108,11 @@ acpi_ac_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 	if (*num_bytes < 1)
 		return B_IO_ERROR;
 
+	if (position > 0) {
+		*num_bytes = 0;
+		return B_OK;
+	}
+
 	*((uint8 *)(buf)) = device->last_status;
 
 	*num_bytes = 1;
