@@ -39,7 +39,7 @@ status_t
 BKeyStore::GetKey(BKeyType type, const char* identifier,
 	const char* secondaryIdentifier, BKey& key)
 {
-	return GetKey(NULL, type, identifier, secondaryIdentifier, true, key);
+	return GetKey(NULL, type, identifier, secondaryIdentifier, false, key);
 }
 
 
@@ -65,7 +65,7 @@ status_t
 BKeyStore::GetKey(const char* keyring, BKeyType type, const char* identifier,
 	const char* secondaryIdentifier, BKey& key)
 {
-	return GetKey(keyring, type, identifier, secondaryIdentifier, true, key);
+	return GetKey(keyring, type, identifier, secondaryIdentifier, false, key);
 }
 
 
