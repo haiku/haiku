@@ -60,6 +60,28 @@ typedef struct rgb_color {
 	int32 Brightness() const;
 
 	inline bool
+	IsDark() const
+	{
+		return Brightness() <= 127;
+	}
+
+	inline bool
+	IsLight() const
+	{
+		return Brightness() > 127;
+	}
+
+	static inline int32
+	Contrast(rgb_color colorA, rgb_color colorB)
+	{
+		int32 contrast = colorA.Brightness() - colorB.Brightness();
+		if (contrast < 0)
+			return -contrast;
+
+		return contrast;
+	}
+
+	inline bool
 	operator==(const rgb_color& other) const
 	{
 		return *(const uint32 *)this == *(const uint32 *)&other;

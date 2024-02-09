@@ -1043,24 +1043,11 @@ BPoseView::DeskTextColor() const
 	rgb_color textColor = HighColor();
 	rgb_color viewColor = ViewColor();
 
-	int textBrightness = BPrivate::perceptual_brightness(textColor);
-	int viewBrightness = BPrivate::perceptual_brightness(viewColor);
-	if (abs(viewBrightness - textBrightness) > 127) {
-		// The colors are different enough, we can use them as is
+	// The colors are different enough, we can use them as is
+	if (rgb_color::Contrast(viewColor, textColor) > 127)
 		return textColor;
-	} else {
-		if (viewBrightness > 127) {
-			textColor.red = 0;
-			textColor.green = 0;
-			textColor.blue = 0;
-		} else {
-			textColor.red = 255;
-			textColor.green = 255;
-			textColor.blue = 255;
-		}
 
-		return textColor;
-	}
+	return viewColor.IsLight() ? kBlack : kWhite;
 }
 
 

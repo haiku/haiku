@@ -91,8 +91,7 @@ float
 ReadOnlyTint(rgb_color base)
 {
 	// darken tint if read-only (or lighten if dark)
-	int viewBrightness = BPrivate::perceptual_brightness(base);
-	return viewBrightness > 127 ? B_DARKEN_1_TINT : 0.85;
+	return base.IsLight() ? B_DARKEN_1_TINT : 0.85;
 }
 
 

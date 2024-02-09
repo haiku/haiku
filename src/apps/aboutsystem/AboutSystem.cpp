@@ -913,9 +913,7 @@ SysInfoView::_DesktopTextColor(int32 workspace) const
 		workspace = current_workspace();
 
 	rgb_color viewColor = screen.DesktopColor(workspace);
-	int viewBrightness = BPrivate::perceptual_brightness(viewColor);
-	textColor.blue = textColor.green = textColor.red = viewBrightness > 127
-		? 0 : 255;
+	textColor.blue = textColor.green = textColor.red = viewColor.IsLight() ? 0 : 255;
 	textColor.alpha = 255;
 
 	return textColor;
