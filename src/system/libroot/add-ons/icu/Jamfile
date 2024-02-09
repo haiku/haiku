@@ -8,6 +8,9 @@ UsePrivateHeaders
 	shared
 	;
 
+# needed for -Werror=deprecated-declarations
+SubDirC++Flags -Wno-error ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

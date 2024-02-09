@@ -543,17 +543,11 @@ ICUCtypeData::_GetConverterForMbState(mbstate_t* mbState,
 	if (result != B_OK)
 		return result;
 
-	UErrorCode icuStatus = U_ZERO_ERROR;
-#if U_ICU_VERSION_MAJOR_NUM < 71
 	// ... and clone it into the mbstate
+	UErrorCode icuStatus = U_ZERO_ERROR;
 	int32_t bufferSize = sizeof(mbState->data);
 	UConverter* clone
 		= ucnv_safeClone(icuConverter, mbState->data, &bufferSize, &icuStatus);
-#else
-	// ... and clone it into the mbstate
-	UConverter* clone
-		= ucnv_clone(icuConverter, &icuStatus);
-#endif
 
 	if (clone == NULL || !U_SUCCESS(icuStatus))
 		return B_ERROR;
