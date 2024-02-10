@@ -29,13 +29,13 @@
 // system fonts.
 #define DEFAULT_FONT_SIZE 12.0f
 
-#define DEFAULT_PLAIN_FONT_FAMILY "Noto Sans Display"
+#define DEFAULT_PLAIN_FONT_FAMILY "Noto Sans"
 #define DEFAULT_PLAIN_FONT_STYLE "Regular"
 
 #define FALLBACK_PLAIN_FONT_FAMILY "Noto Sans Thai"
 #define FALLBACK_PLAIN_FONT_STYLE "Regular"
 
-#define DEFAULT_BOLD_FONT_FAMILY "Noto Sans Display"
+#define DEFAULT_BOLD_FONT_FAMILY "Noto Sans"
 #define DEFAULT_BOLD_FONT_STYLE "Bold"
 
 #define FALLBACK_BOLD_FONT_FAMILY "Noto Sans Thai"

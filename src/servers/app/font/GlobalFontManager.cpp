@@ -353,12 +353,12 @@ GlobalFontManager::_LoadRecentFontMappings()
 		ttfontsPath.Append("ttfonts");
 
 		BPath veraFontPath = ttfontsPath;
-		veraFontPath.Append("NotoSansDisplay-Regular.ttf");
-		_AddDefaultMapping("Noto Sans Display", "Book", veraFontPath.Path());
+		veraFontPath.Append("NotoSans-Regular.ttf");
+		_AddDefaultMapping("Noto Sans", "Book", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
-		veraFontPath.Append("NotoSansDisplay-Bold.ttf");
-		_AddDefaultMapping("Noto Sans Display", "Bold", veraFontPath.Path());
+		veraFontPath.Append("NotoSans-Bold.ttf");
+		_AddDefaultMapping("Noto Sans", "Bold", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
 		veraFontPath.Append("NotoSansMono-Regular.ttf");
