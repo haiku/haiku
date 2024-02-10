@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-Screen	3410763711
+1	finnish	x-vnd.Haiku-Screen	2577971458
 no	Screen		ei
 bits/pixel	Screen		bittiä/pikseli
 15 bits/pixel, 32768 colors	Screen		15 bittiä/pikseli, 32768 väriä
 Rows:	Screen		Rivit:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Näyttötilaa ei voitu asettaa:\n\t%s\n
+Serial no.: %s	Screen		Sarjanumero: %s
 /other…	Screen		/muut...
 Keep	Screen		Pidä
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vaakasuora taajuus:\t%lu - %lu kHz\nPystysuora taajuus:\t%lu - %lu Hz\n\nMaksimi pikselikello:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Nykyinen työtila
 vertically	Screen		pystysuoraan
 All workspaces	Screen		Kaikki työtilat
 Use laptop panel:	Screen		Käytä sylimikropaneelia
+Unknown	Screen		Tuntematon
 Could not write VESA mode settings file:\n\t	Screen		VESA-tila-asetustiedoston kirjoittaminen epäonnistui:\n\t
 Display info	Screen		Näyttötiedot
 Settings will revert in %seconds.	Screen		Asetukset palautuvat %seconds sekunnissa.

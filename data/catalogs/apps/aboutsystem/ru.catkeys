@@ -78,7 +78,7 @@ Translations:\n	AboutView		Переводчики:\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Все права защищены.
 BSD (2-clause)	AboutWindow		BSD (2-х пунктная)
 Website & marketing:\n	AboutView		Вебсайт и маркетинг:\n
-%d MiB used (%s)	AboutView	326 MiB used (16%)	использовано %d МБ  (%s)
+%d MiB used (%s)	AboutView	326 MiB used (16%)	Использовано %d МБ  (%s)
 %.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f ГГц
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		Разработал Andy Ritger в 2001, основано на Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…и многим другим людям, делающим пожертвования!\n\n

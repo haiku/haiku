@@ -1,10 +1,11 @@
-1	hungarian	x-vnd.Haiku-Screen	3410763711
+1	hungarian	x-vnd.Haiku-Screen	2577971458
 no	Screen		nem
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
 Rows:	Screen		Sorok:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		A kijelzőmód nem állítható be erre:\n\t%s\n
+Serial no.: %s	Screen		Sorozatszám: %s
 /other…	Screen		/egyéb…
 Keep	Screen		Megtartás
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vízszíntes frekvencia:\t%lu - %lu kHz\nFüggőleges frekvencia:\t%lu - %lu Hz\n\nMaximális pixelórajel:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Jelenlegi munkaasztal
 vertically	Screen		függőlegesen
 All workspaces	Screen		Minden munkaasztal
 Use laptop panel:	Screen		Használt laptopképernyő:
+Unknown	Screen		Ismeretlen
 Could not write VESA mode settings file:\n\t	Screen		A VESA mód beállítási fájl írása sikertelen:\n\t
 Display info	Screen		Monitor információk
 Settings will revert in %seconds.	Screen		A beállítások módosításai %seconds másodperc múlva visszavonásra kerülnek

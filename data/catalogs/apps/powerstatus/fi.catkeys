@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	1085070685
+1	finnish	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Suorita ikkunassa
 Extended battery info	PowerStatus		Laajennetut akkutiedot
 Show status icon	PowerStatus		Näytä tilakuvake
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Viimeinen täysi lataus:
 Current rate: 	PowerStatus		Virtamäärä: 
 Show text label	PowerStatus		Näytä tekstinimiö
 Quit	PowerStatus		Lopeta
+Battery not charging	PowerStatus		Paristo ei lataudu
 Battery low	PowerStatus		Akku lähes tyhjä
 Model number: 	PowerStatus		Mallinumero: 
 Battery unused	PowerStatus		Akku käyttämätön
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Suunnittelukapasiteettivaroitus:
 Capacity granularity 2: 	PowerStatus		Kapasiteettirakeisuus 2: 
 Too bad!	PowerStatus		Liian huono!
 Technology: 	PowerStatus		Teknologia: 
+not charging	PowerStatus		ei lataudu
  mWh	PowerStatus		mWh
 PowerStatus	System name		Virtatila
 Design capacity: 	PowerStatus		Suunnittelukapasiteetti:

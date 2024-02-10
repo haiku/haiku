@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Haiku-Screen	3410763711
+1	swedish	x-vnd.Haiku-Screen	2577971458
 no	Screen		nej
 bits/pixel	Screen		bitar/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
 Rows:	Screen		Rader:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Skärmläget kunde inte användas:\n\t%s\n
+Serial no.: %s	Screen		Serienummer: %s
 /other…	Screen		/annan...
 Keep	Screen		Behåll
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horisontal frekvens:\t%lu - %lu kHz\nVertikal frekvens:\t%lu - %lu Hz\n\nMaximal pixelklocka:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Nuvarande arbetsyta
 vertically	Screen		vertikalt
 All workspaces	Screen		Alla arbetsytor
 Use laptop panel:	Screen		Använd bärbar panel:
+Unknown	Screen		Okänd
 Could not write VESA mode settings file:\n\t	Screen		Kunde inte skriva VESA-lägesinställningar till fil:\n\t
 Display info	Screen		Skärminfo
 Settings will revert in %seconds.	Screen		Inställningarna kommer att återställas inom %seconds.

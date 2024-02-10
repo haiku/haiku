@@ -14,7 +14,7 @@ Long format:	TimeFormatSettings		Uzun biçim:
 Numbers	TimeFormatSettings		Sayılar
 Available languages	Locale Preflet Window		Kullanılabilir diller
 Locale	Locale Preflet		Yerel Ayarlar
-Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kullanılabilir diller bulunamıyor! Bu preflet'i kullanamazsınız!
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Kullanılabilir diller bulunamıyor! Bu paneli kullanamazsınız!
 Formatting	Locale Preflet Window		Biçimlendirme
 Use month/day-names from preferred language	TimeFormatSettings		Ay/gün adlarını tercih edilen dillerden al
 already chosen	LanguageListView		halihazırda seçili

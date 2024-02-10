@@ -1,16 +1,19 @@
-1	finnish	x-vnd.Haiku-Keymap	1712484807
+1	finnish	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Näppäin
 Japanese	KeymapNames		Japanilainen
 US	KeymapNames		US
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
+Scroll Lock	Keyboard Layout View		Vierityksen lukitus
 Brazilian	KeymapNames		Brasilialainen
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
+Right Option	Keyboard Layout View		Oikea option-näppäin
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Valitsin:
 Cancel	Modifier keys window		Peru
 Sample and clipboard:	Keymap window		Näyte ja leikepöytä:
 Polish	KeymapNames		Puolalainen
+Right Shift	Keyboard Layout View		Oikea vaihtonäppäin
 Latin-American	KeymapNames		Latinalaisamerikkalainen
 Ukrainian	KeymapNames		Ukrainalainen
 PAGE ↓	Keyboard Layout View		PAGE ↓
@@ -39,6 +42,7 @@ Croatian	KeymapNames		Kroatialainen
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		Aseta muuntonäppäimet
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
+Right Command	Keyboard Layout View		Oikea command-näppäin
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-näppäin
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -50,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ukrainalainen (Mac)
 Command:	Modifier keys window	Command key role name	Komento:
 French (Bépo)	KeymapNames		Ranskalainen (Bépo)
 Russian (Typewriter)	KeymapNames		Venäläinen (kirjoituskone)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Kirjainkoon lukitus:
 Acute trigger	Keymap window		Akuuttiaksenttiliipaisin
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
 Italian	KeymapNames		Italialainen
@@ -59,6 +64,7 @@ French (NF Z71-300)	KeymapNames		French (NF Z71-300)
 Modifier keys	Modifier keys window		Muuntonäppäimet
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
 Kazakh	KeymapNames		Kazakstanilainen
+Left Option	Keyboard Layout View		Vasen option-näppäin
 Save as…	Keymap window		Tallenna nimellä…
 Lithuanian (Standard)	KeymapNames		Liettualainen (vakio)
 Error: duplicate keys	Modifier keys window		Virhe: kaksinkertaiset avaimet
@@ -67,14 +73,17 @@ Bulgarian (Phonetic)	KeymapNames		Bulgarialainen (foneettinen)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Kanadalaisranskalainen
 Hungarian	KeymapNames		Unkarilainen
+Right Control	Keyboard Layout View		Oikea control-näppäin
 Control	Keyboard Layout View	Control key	Control-näppäin
 Irish	KeymapNames		Irlantilainen
 Remove	Keyboard Layout View		Poista
 Tilde trigger	Keymap window		Aaltoviivaliipaisin
+Caps Lock	Keyboard Layout View		Kirjainkoon lukitus
 Shift	Keyboard Layout View	Shift key	Vaihtonäppäin
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Makedonialainen
 Czech (Mac)	KeymapNames		Tšekkiläinen (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Kirjainkoon lukitusnäppäin
 Albanian	KeymapNames		Albanialainen
 (Current)	Keymap window		(Nykyinen)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
@@ -130,6 +139,7 @@ Shift:	Modifier keys window	Shift key role name	Vaihtonäppäin:
 Keymap	System name		Näppäimistöasetukset
 Slovene	KeymapNames		Slovenialainen
 Lithuanian	KeymapNames		Liettualainen
+Left Command	Keyboard Layout View		Vasen command-näppäin
 Set modifier keys…	Keymap window		Aseta muuntonäppäimet...
 Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
 Defaults	Keymap window		Oletukset
@@ -152,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Romanialainen
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Komento
+Left Shift	Keyboard Layout View		Vasen vaihtonäppäin
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Tiedosto
 Brazilian (ABNT2)	KeymapNames		Brasilialainen (ABNT2)
@@ -161,4 +172,6 @@ Dutch	KeymapNames		Hollantilainen
 Diaeresis trigger	Keymap window		Treemaliipaisin
 Icelandic	KeymapNames		Islantilainen
 Open…	Keymap window		Avaa…
+Left Control	Keyboard Layout View		Vasen control-näppäin
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Numerolukitus

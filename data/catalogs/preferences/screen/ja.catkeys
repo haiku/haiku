@@ -1,10 +1,11 @@
-1	japanese	x-vnd.Haiku-Screen	3410763711
+1	japanese	x-vnd.Haiku-Screen	2577971458
 no	Screen		いいえ
 bits/pixel	Screen		ビット/ピクセル
 15 bits/pixel, 32768 colors	Screen		15 ビット/ピクセル, 32768 色
 Rows:	Screen		行:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		スクリーンモードは設定できません:\n\t%s\n
+Serial no.: %s	Screen		シリアルナンバー: %s
 /other…	Screen		/その他...
 Keep	Screen		保持
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平周波数: \t%lu - %lu kHz\n垂直周波数: \t%lu - %lu Hz\n\n最大ピクセルクロック: \t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		現在のワークスペース
 vertically	Screen		垂直に
 All workspaces	Screen		すべてのワークスペース
 Use laptop panel:	Screen		ラップトップパネルを使用:
+Unknown	Screen		不明
 Could not write VESA mode settings file:\n\t	Screen		VESA モード設定ファイルを書き込めません:\n\t
 Display info	Screen		ディスプレイ情報
 Settings will revert in %seconds.	Screen		設定は %seconds 秒以内に元に戻ります。

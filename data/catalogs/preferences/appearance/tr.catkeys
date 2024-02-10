@@ -49,7 +49,7 @@ LCD subpixel	AntialiasingSettingsView		LCD altpiksel
 Window tab	Colors tab		Pencere sekmesi
 Link text	Colors tab		Bağlantı metni
 Tooltip background	Colors tab		Araç ipucu arka planı
-ControlLook:	DecorSettingsView		Görünüm Denetimci:
+ControlLook:	DecorSettingsView		Görünüm denetimcisi:
 Scroll bar thumb	Colors tab		Sarma çubuğu başı
 Default	DecorSettingsView		Saptanmış
 Link visited	Colors tab		Ziyaret edilmiş bağlantı

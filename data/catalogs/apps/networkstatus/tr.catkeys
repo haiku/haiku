@@ -2,7 +2,7 @@
 IPv6 address:	NetworkStatusView		IPv6 adresi:
 Quit	NetworkStatusView		Çık
 Unknown	NetworkStatusView		Bilinmeyen
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Ağ preflet'i başlatılamadı.\n\nHata: 
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Ağ paneli başlatılamadı.\n\nHata: 
 Install in Deskbar	NetworkStatus		Masaüstü Çubuğu'na kur
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus seçenekleri:\n\t--deskbar\tyineleneni kendiliğinden Masaüstü Çubuğu'na ekler\n\t--help\t\tbu iletiyi gösterir ve çıkar
 Open network preferences…	NetworkStatusView		Ağ tercihlerini aç…

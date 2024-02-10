@@ -8,7 +8,7 @@ Muted	NotificationView		Sessiz
  is already listed	NotificationView	Alert message	 zaten listelenmiş
 OK	PrefletWin		Tamam
 Notifications	PrefletWin		Bildirimler
-Notifications preflet sample	PrefletWin		Bildirimler preflet örneği
+Notifications preflet sample	PrefletWin		Bildirimler paneli örneği
 Mute notifications from this application	NotificationView		Bu uygulamadan gelen bildirimleri sessize al
 wide	GeneralView	Window width: Slider high text	geniş
 narrow	GeneralView	Window width: Slider low text	dar

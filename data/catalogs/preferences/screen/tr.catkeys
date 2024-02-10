@@ -1,10 +1,11 @@
-1	turkish	x-vnd.Haiku-Screen	3410763711
+1	turkish	x-vnd.Haiku-Screen	2577971458
 no	Screen		hayır
 bits/pixel	Screen		bit/piksel
 15 bits/pixel, 32768 colors	Screen		15 bit/piksel, 32768 renk
 Rows:	Screen		Satırlar:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Ekran kipi ayarlanamıyor:\n\t%s\n
+Serial no.: %s	Screen		Seri №: %s
 /other…	Screen		/diğer…
 Keep	Screen		Tut
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Yatay frekans:\t%lu - %lu kHz\nDikey frekans:\t%lu - %lu Hz\n\nEn hızlı piksel saati:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Geçerli çalışma alanı
 vertically	Screen		dikey olarak
 All workspaces	Screen		Tüm çalışma alanları
 Use laptop panel:	Screen		Dizüstü panelini kullan:
+Unknown	Screen		Bilinmiyor
 Could not write VESA mode settings file:\n\t	Screen		VESA kipi ayar dosyasına yazılamıyor:\n\t
 Display info	Screen		Ekran bilgisi
 Settings will revert in %seconds.	Screen		Ayarlar %seconds içinde eski haline dönecektir.

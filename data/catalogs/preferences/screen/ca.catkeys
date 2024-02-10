@@ -1,10 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-Screen	3410763711
+1	catalan; valencian	x-vnd.Haiku-Screen	2577971458
 no	Screen		no
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 colors
 Rows:	Screen		Files:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		No s'ha pogut establir el mode de la pantalla:\n\t%s\n
+Serial no.: %s	Screen		Número de sèrie: %s
 /other…	Screen		/altres…
 Keep	Screen		Mantén-la
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Freqüència horitzontal:\t%lu - %lu kHz\nFreqüència vertical:\t%lu - %lu Hz\n\nAmplada màxima de píxels:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Espai de treball actual
 vertically	Screen		verticalment
 All workspaces	Screen		Tots els espais de treball
 Use laptop panel:	Screen		Usa la pantalla del portàtil:
+Unknown	Screen		Desconegut
 Could not write VESA mode settings file:\n\t	Screen		No s'ha pogut escriure el fitxer de configuració del mode VESA:\n\t
 Display info	Screen		Informació de la pantalla
 Settings will revert in %seconds.	Screen		Els paràmetres es revertiran d'aquí a %seconds.

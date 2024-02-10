@@ -1,10 +1,11 @@
-1	friulian	x-vnd.Haiku-Screen	3410763711
+1	friulian	x-vnd.Haiku-Screen	2577971458
 no	Screen		no
 bits/pixel	Screen		bit/pixel
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colôrs
 Rows:	Screen		Riis:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Nol è stât pussibil configurâ la modalitât dal schermi:\n\t%s\n
+Serial no.: %s	Screen		N. seriâl: %s
 /other…	Screen		/altri…
 Keep	Screen		Ten
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecuence orizontâl:\t%lu - %lu kHz\nFrecuence Verticâl:\t%lu - %lu Hz\n\nMassim clock dai pixel:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Spazi di lavôr atuâl
 vertically	Screen		in verticâl
 All workspaces	Screen		Ducj i spazis di lavôr
 Use laptop panel:	Screen		Dopre panel dal portatil:
+Unknown	Screen		No cognossût
 Could not write VESA mode settings file:\n\t	Screen		Impussibil scrivi il file des impostazions de modalitât VESA:\n\t
 Display info	Screen		Mostre informazions
 Settings will revert in %seconds.	Screen		Si tornarà aes impostazions vieris chi di %seconds.

@@ -10,7 +10,7 @@ Audio track	MediaPlayer-Main		Äänikappale
 Muted	MediaPlayer-SettingsWindow		Mykistetty
 OK	MediaPlayer-RemovePLItemsCmd		Valmis
 Open Playlist	MediaPlayer-PlaylistWindow		Avaa soittoluettelo
-Subtitles	MediaPlayer-Main		Aliotsakkeet
+Subtitles	MediaPlayer-Main		Tekstitykset
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% kohtasi sisäisen virheen. Tiedoston avaus epäonnistui.
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Tiedostotiedot

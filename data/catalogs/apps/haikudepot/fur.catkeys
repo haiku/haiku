@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2231325175
+1	friulian	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis condizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		Nissune valutazion dai utents dispon
 <no info>	PackageInfoView		<nessune informazion>
 Usage conditions download problem	UserUsageConditions		Probleme tal discjamâ lis condizions di utilizazion
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjamant i recuisîts de password necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su cemût visualizâ i regjistris a son disponibilis te sezion di HaikuDepot de Vuide utent di Haiku.
+Fetching screenshot	CacheScreenshotProcess		Daûr a recuperâ la videade
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
