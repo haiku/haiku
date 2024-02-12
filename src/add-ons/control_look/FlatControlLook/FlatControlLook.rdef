@@ -4,6 +4,6 @@ resource app_version {
 	minor = 0,
 	variety = B_APPV_ALPHA,
 	internal = 0,
-	short_info = "Flat Control Look; Rev: 1.2 ",
-	long_info  = "Flat-like Control Look add-on ©2020 Haiku, Inc. Author: nhtello"
+	short_info = "Flat Control Look; Rev: 1.3 ",
+	long_info  = "Flat-like Control Look add-on ©2020-©2024 Haiku, Inc. Author: nhtello"
 };

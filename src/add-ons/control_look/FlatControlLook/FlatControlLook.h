@@ -258,23 +258,15 @@ protected:
 									float rightBottomRadius, const rgb_color& base,
 									bool popupIndicator, uint32 flags);
 
-			void				_DrawOuterResessedFrame(BView* view, BRect& rect,
-									const rgb_color& base, float contrast, float brightness,
-									uint32 flags, uint32 borders);
+	void						_DrawOuterResessedFrame(BView* view, BRect& rect, const rgb_color& base, float contrast, 
+									float brightness, uint32 flags = 0, uint32 borders = B_ALL_BORDERS);
 
-			void				_DrawButtonFrame(BView* view, BRect& rect,
-									const BRect& updateRect,
-									float leftTopRadius,
-									float rightTopRadius,
-									float leftBottomRadius,
-									float rightBottomRadius,
-									const rgb_color& base,
-									const rgb_color& background,
-									float contrast, float brightness = 1.0,
-									uint32 flags = 0,
-									uint32 borders = B_ALL_BORDERS);
+	void						_DrawButtonFrame(BView* view, BRect& rect, const BRect& updateRect, float leftTopRadius,
+									float rightTopRadius, float leftBottomRadius, float rightBottomRadius,
+									const rgb_color& base, const rgb_color& background, float contrast,
+									float brightness = 1.0, uint32 flags = 0, uint32 borders = B_ALL_BORDERS);
 
-			void				_DrawPopUpMarker(BView* view, const BRect& rect,
+	void						_DrawPopUpMarker(BView* view, const BRect& rect,
 									const rgb_color& base, uint32 flags);
 
 	rgb_color					_EdgeLightColor(const rgb_color& base, float contrast,
@@ -282,24 +274,22 @@ protected:
 	rgb_color					_EdgeShadowColor(const rgb_color& base, float contrast,
 									float brightness, uint32 flags);
 
-			rgb_color			_BevelLightColor(const rgb_color& base,
-									uint32 flags);
+	rgb_color					_BevelLightColor(const rgb_color& base, uint32 flags);
 
-			rgb_color			_BevelShadowColor(const rgb_color& base,
-									uint32 flags);
+	rgb_color					_BevelShadowColor(const rgb_color& base, uint32 flags);
 
-			void				_MakeGradient(BGradientLinear& gradient,
+	void						_MakeGradient(BGradientLinear& gradient,
 									const BRect& rect, const rgb_color& base,
 									float topTint, float bottomTint,
 									orientation orientation = B_HORIZONTAL) const;
 
-			void				_MakeGlossyGradient(BGradientLinear& gradient,
+	void						_MakeGlossyGradient(BGradientLinear& gradient,
 									const BRect& rect, const rgb_color& base,
 									float topTint, float middle1Tint,
 									float middle2Tint, float bottomTint,
 									orientation orientation = B_HORIZONTAL) const;
 
-			void				_MakeButtonGradient(BGradientLinear& gradient,
+	void						_MakeButtonGradient(BGradientLinear& gradient,
 									BRect& rect, const rgb_color& base,
 									uint32 flags, orientation orientation = B_HORIZONTAL) const;
 };
