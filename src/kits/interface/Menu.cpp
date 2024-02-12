@@ -106,6 +106,25 @@ public:
 };
 
 
+typedef int (*compare_func)(const BMenuItem*, const BMenuItem*);
+
+struct MenuItemComparator
+{
+	MenuItemComparator(compare_func compareFunc)
+		:
+		fCompareFunc(compareFunc)
+	{
+	}
+
+	bool operator () (const BMenuItem* item1, const BMenuItem* item2) {
+		return fCompareFunc(item1, item2) < 0;
+	}
+
+private:
+	compare_func fCompareFunc;
+};
+
+
 }	// namespace BPrivate
 
 
@@ -1454,7 +1473,7 @@ BMenu::SortItems(int (*compare)(const BMenuItem*, const BMenuItem*))
 	BMenuItem** begin = (BMenuItem**)fItems.Items();
 	BMenuItem** end = begin + fItems.CountItems();
 
-	std::stable_sort(begin, end, compare);
+	std::stable_sort(begin, end, BPrivate::MenuItemComparator(compare));
 
 	InvalidateLayout();
 	if (Window() != NULL && !Window()->IsHidden() && LockLooper()) {
