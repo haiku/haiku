@@ -160,10 +160,10 @@ FontCacheEntry::Init(const ServerFont& font, bool forceVector)
 
 	bool success;
 	if (font.FontData() != NULL)
-		success = fEngine.Init(NULL, 0, font.Size(), charMap,
+		success = fEngine.Init(NULL, font.FaceIndex(), font.Size(), charMap,
 			renderingType, hinting, (const void*)font.FontData(), font.FontDataSize());
 	else
-		success = fEngine.Init(font.Path(), 0, font.Size(), charMap,
+		success = fEngine.Init(font.Path(), font.FaceIndex(), font.Size(), charMap,
 			renderingType, hinting);
 
 	if (!success) {

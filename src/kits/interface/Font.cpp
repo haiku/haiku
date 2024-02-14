@@ -1459,9 +1459,18 @@ BFont::_GetExtraFlags() const
 status_t
 BFont::LoadFont(const char* path)
 {
+	return LoadFont(path, 0, 0);
+}
+
+
+status_t
+BFont::LoadFont(const char* path, uint16 index, uint16 instance)
+{
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_ADD_FONT_FILE);
 	link.AttachString(path);
+	link.Attach<uint16>(index);
+	link.Attach<uint16>(instance);
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK || status != B_OK) {
 		return status;
@@ -1480,6 +1489,13 @@ BFont::LoadFont(const char* path)
 status_t
 BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset)
 {
+	return LoadFont(fontAreaID, size, offset, 0);
+}
+
+
+status_t
+BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset, uint16 index)
+{
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_ADD_FONT_MEMORY);
@@ -1487,6 +1503,7 @@ BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset)
 	link.Attach<int32>(fontAreaID);
 	link.Attach<size_t>(size);
 	link.Attach<size_t>(offset);
+	link.Attach<uint16>(index);
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK || status != B_OK) {

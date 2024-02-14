@@ -239,8 +239,8 @@ GlobalFontManager::MessageReceived(BMessage* message)
 							if (fromDirectory != NULL) {
 								// find style in source and move it to the target
 								nodeRef.node = node;
-								FontStyle* style = fromDirectory->FindStyle(nodeRef);
-								if (style != NULL) {
+								FontStyle* style;
+								while ((style = fromDirectory->FindStyle(nodeRef)) != NULL) {
 									fromDirectory->styles.RemoveItem(style, false);
 									directory->styles.AddItem(style);
 									style->UpdatePath(directory->directory);
@@ -505,8 +505,8 @@ GlobalFontManager::_RemoveStyle(dev_t device, uint64 directoryNode, uint64 node)
 	if (directory != NULL) {
 		// find style in directory and remove it
 		nodeRef.node = node;
-		FontStyle* style = directory->FindStyle(nodeRef);
-		if (style != NULL)
+		FontStyle* style;
+		while ((style = directory->FindStyle(nodeRef)) != NULL)
 			_RemoveStyle(*directory, style);
 	}
 }
@@ -711,18 +711,39 @@ GlobalFontManager::_AddFont(font_directory& directory, BEntry& entry)
 		return status;
 
 	FT_Face face;
-	FT_Error error = FT_New_Face(gFreeTypeLibrary, path.Path(), 0, &face);
+	FT_Error error = FT_New_Face(gFreeTypeLibrary, path.Path(), -1, &face);
 	if (error != 0)
 		return B_ERROR;
+	FT_Long count = face->num_faces;
+	FT_Done_Face(face);
 
-	uint16 familyID, styleID;
-	status = FontManager::_AddFont(face, nodeRef, path.Path(), familyID, styleID);
-	if (status == B_NAME_IN_USE)
-		return B_OK;
-	if (status < B_OK)
-		return status;
+	for (FT_Long i = 0; i < count; i++) {
+		FT_Error error = FT_New_Face(gFreeTypeLibrary, path.Path(), -(i + 1), &face);
+		if (error != 0)
+			return B_ERROR;
+		uint32 variableCount = (face->style_flags & 0x7fff0000) >> 16;
+		FT_Done_Face(face);
 
-	directory.styles.AddItem(GetStyle(familyID, styleID));
+		uint32 j = variableCount == 0 ? 0 : 1;
+		do {
+			FT_Long faceIndex = i | (j << 16);
+			error = FT_New_Face(gFreeTypeLibrary, path.Path(), faceIndex, &face);
+			if (error != 0)
+				return B_ERROR;
+
+			uint16 familyID, styleID;
+			status = FontManager::_AddFont(face, nodeRef, path.Path(), familyID, styleID);
+			if (status == B_NAME_IN_USE) {
+				status = B_OK;
+				j++;
+				continue;
+			}
+			if (status < B_OK)
+				return status;
+			directory.styles.AddItem(GetStyle(familyID, styleID));
+			j++;
+		} while (j <= variableCount);
+	}
 
 	if (directory.AlreadyScanned())
 		directory.revision++;
