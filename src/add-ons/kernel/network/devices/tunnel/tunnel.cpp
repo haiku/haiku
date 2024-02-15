@@ -19,7 +19,6 @@
 #include <net_buffer.h>
 #include <net_device.h>
 #include <net_stack.h>
-#include <NetBufferUtilities.h>
 
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -163,14 +162,8 @@ tunnel_read(void* _cookie, off_t position, void* data, size_t* _length)
 	if (status != B_OK)
 		return status;
 
-	size_t offset = 0;
-	if (!cookie->device->is_tap) {
-		// TUN: Skip ethernet header.
-		offset = ETHER_HEADER_LENGTH;
-	}
-
-	const size_t length = min_c(*_length, buffer->size - offset);
-	status = gBufferModule->read(buffer, offset, data, length);
+	const size_t length = min_c(*_length, buffer->size);
+	status = gBufferModule->read(buffer, 0, data, length);
 	if (status != B_OK)
 		return status;
 	*_length = length;
@@ -196,7 +189,7 @@ tunnel_write(void* _cookie, off_t position, const void* data, size_t* _length)
 	}
 
 	if (!cookie->device->is_tap) {
-		// TUN: Detect packet type and prepend ethernet header.
+		// TUN: Detect packet type.
 		uint8 version;
 		status = gBufferModule->read(buffer, 0, &version, 1);
 		if (status != B_OK) {
@@ -213,30 +206,12 @@ tunnel_write(void* _cookie, off_t position, const void* data, size_t* _length)
 		buffer->type = (version == 6) ? B_NET_FRAME_TYPE_IPV6
 			: B_NET_FRAME_TYPE_IPV4;
 
-		NetBufferPrepend<ether_header> bufferHeader(buffer);
-		if (bufferHeader.Status() != B_OK) {
-			gBufferModule->free(buffer);
-			return bufferHeader.Status();
-		}
-
-		ether_header &header = bufferHeader.Data();
-		header.type = (version == 6) ? htons(ETHER_TYPE_IPV6)
-			: htons(ETHER_TYPE_IP);
-
-		memset(header.source, 0, ETHER_ADDRESS_LENGTH);
-		memset(header.destination, 0, ETHER_ADDRESS_LENGTH);
-		bufferHeader.Sync();
-
-		// At least sdl_type and sdl_e_type must be set.
-		struct sockaddr_dl& src = *(struct sockaddr_dl*)buffer->source;
-		struct sockaddr_dl& dst = *(struct sockaddr_dl*)buffer->destination;
-		src.sdl_len		= dst.sdl_len		= sizeof(sockaddr_dl);
-		src.sdl_family	= dst.sdl_family	= AF_LINK;
-		src.sdl_index	= dst.sdl_index		= cookie->device->index;
-		src.sdl_type	= dst.sdl_type		= IFT_ETHER;
-		src.sdl_e_type	= dst.sdl_e_type	= header.type;
-		src.sdl_nlen	= src.sdl_slen = dst.sdl_nlen = dst.sdl_slen = 0;
-		src.sdl_alen	= dst.sdl_alen = 0;
+		struct sockaddr_in& src = *(struct sockaddr_in*)buffer->source;
+		struct sockaddr_in& dst = *(struct sockaddr_in*)buffer->destination;
+		src.sin_len		= dst.sin_len		= sizeof(sockaddr_in);
+		src.sin_family	= dst.sin_family	= (version == 6) ? AF_INET6 : AF_INET;
+		src.sin_port	= dst.sin_port		= 0;
+		src.sin_addr.s_addr = dst.sin_addr.s_addr = 0;
 	}
 
 	// We use a queue and the receive_data() hook instead of device_enqueue_buffer()
@@ -448,13 +423,8 @@ tunnel_send_data(net_device* _device, net_buffer* buffer)
 	status_t status = B_OK;
 	if (!device->is_tap) {
 		// Ensure this is an IP frame.
-		uint16 type;
-		status = gBufferModule->read(buffer, offsetof(ether_header, type),
-			&type, sizeof(type));
-		if (status != B_OK)
-			return status;
-
-		if (type != htons(ETHER_TYPE_IP) && type != htons(ETHER_TYPE_IPV6))
+		struct sockaddr_in& dst = *(struct sockaddr_in*)buffer->destination;
+		if (dst.sin_family != AF_INET && dst.sin_family != AF_INET6)
 			return B_BAD_DATA;
 	}
 

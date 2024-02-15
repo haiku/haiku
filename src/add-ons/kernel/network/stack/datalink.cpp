@@ -18,17 +18,14 @@
 #include <string.h>
 #include <sys/sockio.h>
 
-#include <ByteOrder.h>
 #include <KernelExport.h>
 
 #include <net_datalink.h>
 #include <net_device.h>
-#include <NetBufferUtilities.h>
 #include <NetUtilities.h>
 
 #include "device_interfaces.h"
 #include "domains.h"
-#include "ethernet.h"
 #include "interfaces.h"
 #include "routes.h"
 #include "stack_private.h"
@@ -394,36 +391,8 @@ datalink_send_routed_data(struct net_route* route, net_buffer* buffer)
 		address->AcquireReference();
 		set_interface_address(buffer->interface_address, address);
 
-		if (atomic_get(&interface->DeviceInterface()->monitor_count) > 0) {
-			{
-				NetBufferPrepend<ether_header,StackNetBufferModuleGetter> bufferHeader(buffer);
-				if (bufferHeader.Status() != B_OK)
-					return bufferHeader.Status();
-
-				ether_header &header = bufferHeader.Data();
-				switch (buffer->interface_address->domain->family) {
-					case AF_INET:
-						header.type = B_HOST_TO_BENDIAN_INT16(ETHER_TYPE_IP);
-						break;
-					case AF_INET6:
-						header.type = B_HOST_TO_BENDIAN_INT16(ETHER_TYPE_IPV6);
-						break;
-					default:
-						header.type = 0;
-						break;
-				}
-
-				memset(header.source, 0, ETHER_ADDRESS_LENGTH);
-				memset(header.destination, 0, ETHER_ADDRESS_LENGTH);
-				bufferHeader.Sync();
-			}
+		if (atomic_get(&interface->DeviceInterface()->monitor_count) > 0)
 			device_interface_monitor_receive(interface->DeviceInterface(), buffer);
-			{
-				NetBufferHeaderRemover<ether_header,StackNetBufferModuleGetter> bufferHeader(buffer);
-				if (bufferHeader.Status() != B_OK)
-					return bufferHeader.Status();
-			}
-		}
 
 		// this one goes back to the domain directly
 		const size_t packetSize = buffer->size;
