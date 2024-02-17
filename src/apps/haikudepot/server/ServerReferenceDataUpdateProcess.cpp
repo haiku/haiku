@@ -123,10 +123,11 @@ status_t
 ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 	DumpExportReference* data)
 {
-	HDINFO("[%s] will populate %" B_PRId32 " natural languages",
+	HDINFO("[%s] will populate from %" B_PRId32 " possible natural languages",
 		Name(), data->CountNaturalLanguages());
 	AutoLocker<BLocker> locker(fModel->Lock());
 	LanguageModel* languageModel = fModel->Language();
+	languageModel->ClearSupportedLanguages();
 	int32 count = 0;
 
 	for (int32 i = 0; i < data->CountNaturalLanguages(); i++) {

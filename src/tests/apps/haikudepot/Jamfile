@@ -12,6 +12,7 @@ UsePrivateHeaders interface netservices shared ;
 
 local sourceDirs =
 	model
+	packagemodel
 	server
 	server/dumpexportrepository
 	util
@@ -46,6 +47,12 @@ UnitTestLib haikudepottest.so :
 
 	Logger.cpp
 
+	LocaleUtils.cpp
+
+	Language.cpp
+	LanguageModel.cpp
+	LanguageModelTest.cpp
+
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaDataJsonEventListenerTest.cpp
@@ -66,7 +73,9 @@ UnitTestLib haikudepottest.so :
 	ValidationUtils.cpp
 	ValidationUtilsTest.cpp
 
-	: be shared bnetapi package [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	:
+	be shared bnetapi package [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	localestub
 ;
 
 Application TextDocumentTest :

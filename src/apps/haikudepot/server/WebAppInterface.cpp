@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "WebAppInterface.h"
@@ -549,7 +549,10 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	const BString& architecture,
 	const BString& webAppRepositoryCode,
 	const BString& webAppRepositorySourceCode,
-	const BString& languageCode, const BString& comment,
+	const BString& naturalLanguageCode,
+		// This is the "ID" in the ICU system; the term `code` is used with the
+		// server system.
+	const BString& comment,
 	const BString& stability, int rating, BMessage& message)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
@@ -566,7 +569,7 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	requestEnvelopeWriter.WriteObjectName("repositorySourceCode");
 	requestEnvelopeWriter.WriteString(webAppRepositorySourceCode.String());
 	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
-	requestEnvelopeWriter.WriteString(languageCode.String());
+	requestEnvelopeWriter.WriteString(naturalLanguageCode.String());
 	requestEnvelopeWriter.WriteObjectName("pkgVersionType");
 	requestEnvelopeWriter.WriteString("SPECIFIC");
 	requestEnvelopeWriter.WriteObjectName("userNickname");
@@ -622,7 +625,10 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 
 status_t
 WebAppInterface::UpdateUserRating(const BString& ratingID,
-	const BString& languageCode, const BString& comment,
+	const BString& naturalLanguageCode,
+		// This is the "ID" in the ICU system; the term `code` is used with the
+		// server system.
+	const BString& comment,
 	const BString& stability, int rating, bool active, BMessage& message)
 {
 	BMallocIO* requestEnvelopeData = new BMallocIO();
@@ -634,7 +640,7 @@ WebAppInterface::UpdateUserRating(const BString& ratingID,
 	requestEnvelopeWriter.WriteObjectName("code");
 	requestEnvelopeWriter.WriteString(ratingID.String());
 	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
-	requestEnvelopeWriter.WriteString(languageCode.String());
+	requestEnvelopeWriter.WriteString(naturalLanguageCode.String());
 	requestEnvelopeWriter.WriteObjectName("active");
 	requestEnvelopeWriter.WriteBoolean(active);
 
@@ -702,9 +708,14 @@ WebAppInterface::RequestCaptcha(BMessage& message)
 
 status_t
 WebAppInterface::CreateUser(const BString& nickName,
-	const BString& passwordClear, const BString& email,
-	const BString& captchaToken, const BString& captchaResponse,
-	const BString& languageCode, const BString& userUsageConditionsCode,
+	const BString& passwordClear,
+	const BString& email,
+	const BString& captchaToken,
+	const BString& captchaResponse,
+	const BString& naturalLanguageCode,
+		// This is the "ID" in the ICU system; the term `code` is used with the
+		// server system.
+	const BString& userUsageConditionsCode,
 	BMessage& message)
 {
 		// BHttpRequest later takes ownership of this.
@@ -722,7 +733,7 @@ WebAppInterface::CreateUser(const BString& nickName,
 	requestEnvelopeWriter.WriteObjectName("captchaResponse");
 	requestEnvelopeWriter.WriteString(captchaResponse.String());
 	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
-	requestEnvelopeWriter.WriteString(languageCode.String());
+	requestEnvelopeWriter.WriteString(naturalLanguageCode.String());
 	requestEnvelopeWriter.WriteObjectName("userUsageConditionsCode");
 	requestEnvelopeWriter.WriteString(userUsageConditionsCode.String());
 

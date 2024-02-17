@@ -78,8 +78,10 @@ AbstractSingleFileServerProcess::RunInternal()
 
 		hasData = hasData && size > 0;
 
-		if (hasDataResult == B_OK && !hasData)
+		if (hasDataResult == B_OK && !hasData) {
+			HDINFO("[%s] there is no data to process", Name());
 			result = HD_ERR_NO_DATA;
+		}
 	}
 
 	if (IsSuccess(result)) {

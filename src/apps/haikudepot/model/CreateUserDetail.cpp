@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
  #include "CreateUserDetail.h"
@@ -13,7 +13,7 @@
 #define KEY_EMAIL								"email"
 #define KEY_CAPTCHA_TOKEN						"captchaToken"
 #define KEY_CAPTCHA_RESPONSE					"captchaResponse"
-#define KEY_LANGUAGE_CODE						"languageCode"
+#define KEY_LANGUAGE_ID							"languageId"
 #define KEY_AGREED_USER_USAGE_CONDITIONS_CODE	"agreedUserUsageConditionsCode"
 
 
@@ -25,7 +25,7 @@ CreateUserDetail::CreateUserDetail(BMessage* from)
 	from->FindString(KEY_EMAIL, &fEmail);
 	from->FindString(KEY_CAPTCHA_TOKEN, &fCaptchaToken);
 	from->FindString(KEY_CAPTCHA_RESPONSE, &fCaptchaResponse);
-	from->FindString(KEY_LANGUAGE_CODE, &fLanguageCode);
+	from->FindString(KEY_LANGUAGE_ID, &fLanguageId);
 	from->FindString(KEY_AGREED_USER_USAGE_CONDITIONS_CODE,
 		&fAgreedUserUsageConditionsCode);
 }
@@ -86,9 +86,9 @@ CreateUserDetail::CaptchaResponse() const
 
 
 const BString&
-CreateUserDetail::LanguageCode() const
+CreateUserDetail::LanguageId() const
 {
-	return fLanguageCode;
+	return fLanguageId;
 }
 
 
@@ -142,9 +142,9 @@ CreateUserDetail::SetCaptchaResponse(const BString& value)
 
 
 void
-CreateUserDetail::SetLanguageCode(const BString& value)
+CreateUserDetail::SetLanguageId(const BString& value)
 {
-	fLanguageCode = value;
+	fLanguageId = value;
 }
 
 
@@ -172,7 +172,7 @@ CreateUserDetail::Archive(BMessage* into, bool deep) const
 	if (result == B_OK)
 		result = into->AddString(KEY_CAPTCHA_RESPONSE, fCaptchaResponse);
 	if (result == B_OK)
-		result = into->AddString(KEY_LANGUAGE_CODE, fLanguageCode);
+		result = into->AddString(KEY_LANGUAGE_ID, fLanguageId);
 	if (result == B_OK) {
 		result = into->AddString(KEY_AGREED_USER_USAGE_CONDITIONS_CODE,
 			fAgreedUserUsageConditionsCode);

@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -77,7 +77,9 @@ public:
 									const BString& architecture,
 									const BString& webAppRepositoryCode,
 									const BString& webAppRepositorySourceCode,
-									const BString& languageCode,
+									const BString& naturalLanguageCode,
+										// This is the "ID" in the ICU system; the term `code`
+										// is used with the server system.
 									const BString& comment,
 									const BString& stability,
 									int rating,
@@ -85,7 +87,9 @@ public:
 
 			status_t			UpdateUserRating(
 									const BString& ratingID,
-									const BString& languageCode,
+									const BString& naturalLanguageCode,
+										// This is the "ID" in the ICU system; the term `code`
+										// is used with the server system.
 									const BString& comment,
 									const BString& stability,
 									int rating, bool active,
@@ -117,7 +121,9 @@ public:
 									const BString& email,
 									const BString& captchaToken,
 									const BString& captchaResponse,
-									const BString& languageCode,
+									const BString& naturalLanguageCode,
+										// This is the "ID" in the ICU system; the term `code`
+										// is used with the server system.
 									const BString& userUsageConditionsCode,
 									BMessage& message);
 

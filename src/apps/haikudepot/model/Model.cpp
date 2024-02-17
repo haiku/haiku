@@ -665,7 +665,10 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 					// Add the rating to the PackageInfo
 					UserRatingRef userRating(new UserRating(
 						UserInfo(user), rating,
-						comment, languageCode, versionString,
+						comment,
+						languageCode,
+							// note that language identifiers are "code" in HDS and "id" in Haiku
+						versionString,
 						(uint64) createTimestamp), true);
 					package->AddUserRating(userRating);
 					HDDEBUG("rating [%s] retrieved from server", code.String());

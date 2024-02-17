@@ -1,5 +1,5 @@
 /*
- * Copyright 2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2023-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "StringUtilsTest.h"
@@ -84,7 +84,7 @@ StringUtilsTest::TestInSituStripSpaceAndControl()
 	BString string = "\x01 To\tnic Wa\nter  ";
 
 // ----------------------
-	StringUtils::InSituTrimSpaceAndControl(string);
+	StringUtils::InSituStripSpaceAndControl(string);
 // ----------------------
 
 	const BString expected = "TonicWater";
@@ -102,7 +102,7 @@ StringUtilsTest::TestNoInSituStripSpaceAndControl()
 	StringUtils::InSituStripSpaceAndControl(string);
 // ----------------------
 
-	const BString expected = "Tonic Water";
+	const BString expected = "TonicWater";
 	CPPUNIT_ASSERT_EQUAL(expected, string);
 }
 

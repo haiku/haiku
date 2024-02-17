@@ -27,8 +27,13 @@
             "type": "string"
           },
           "identifier": {
-            "type": "string",
-            "javaType": "java.lang.String"
+            "type": "string"
+          },
+          "repoInfoUrl": {
+            "type": "string"
+          },
+          "architectureCode": {
+            "type": "string"
           },
           "extraIdentifiers": {
             "type": "array",

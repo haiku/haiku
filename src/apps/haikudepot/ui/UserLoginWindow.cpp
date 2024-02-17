@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -128,7 +128,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	fPasswordRequirements(NULL),
 	fUserUsageConditions(NULL),
 	fCaptcha(NULL),
-	fPreferredLanguageCode(LANGUAGE_DEFAULT_CODE),
+	fPreferredLanguageId(LANGUAGE_DEFAULT_ID),
 	fModel(model),
 	fMode(NONE),
 	fWorkerThread(-1),
@@ -154,20 +154,18 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	{
 		AutoLocker<BLocker> locker(fModel.Lock());
-		fPreferredLanguageCode = fModel.Language()->PreferredLanguage()->Code();
+		fPreferredLanguageId = fModel.Language()->PreferredLanguage()->ID();
 		// Construct languages popup
 		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
-		fLanguageCodeField = new BMenuField("language",
-			B_TRANSLATE("Preferred language:"), languagesMenu);
+		fLanguageIdField = new BMenuField("language", B_TRANSLATE("Preferred language:"),
+			languagesMenu);
 
 		LanguageMenuUtils::AddLanguagesToMenu(
 			fModel.Language(), languagesMenu);
 		languagesMenu->SetTargetForItems(this);
 
-		HDINFO("using preferred language code [%s]",
-			fPreferredLanguageCode.String());
-		LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageCode,
-			languagesMenu);
+		HDINFO("using preferred language code [%s]", fPreferredLanguageId.String());
+		LanguageMenuUtils::MarkLanguageInMenu(fPreferredLanguageId, languagesMenu);
 	}
 
 	fEmailField = new BTextControl(B_TRANSLATE("Email address:"), "", NULL);
@@ -223,7 +221,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		.Add(fPasswordRequirementsLink, 1, 2)
 		.AddTextControl(fRepeatPasswordField, 0, 3)
 		.AddTextControl(fEmailField, 0, 4)
-		.AddMenuField(fLanguageCodeField, 0, 5)
+		.AddMenuField(fLanguageIdField, 0, 5)
 		.Add(fCaptchaView, 0, 6)
 		.Add(fCaptchaResultField, 1, 6)
 		.Add(fConfirmMinimumAgeCheckBox, 1, 7)
@@ -323,7 +321,7 @@ UserLoginWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
-			message->FindString("code", &fPreferredLanguageCode);
+			message->FindString("id", &fPreferredLanguageId);
 			break;
 
 		case MSG_LOGIN_ERROR:
@@ -413,7 +411,7 @@ UserLoginWindow::_EnableMutableControls(bool enabled)
 	fNewPasswordField->SetEnabled(enabled);
 	fRepeatPasswordField->SetEnabled(enabled);
 	fEmailField->SetEnabled(enabled);
-	fLanguageCodeField->SetEnabled(enabled);
+	fLanguageIdField->SetEnabled(enabled);
 	fCaptchaResultField->SetEnabled(enabled);
 	fConfirmMinimumAgeCheckBox->SetEnabled(enabled);
 	fConfirmUserUsageConditionsCheckBox->SetEnabled(enabled);
@@ -1100,7 +1098,7 @@ UserLoginWindow::_AssembleCreateUserDetail(CreateUserDetail& detail)
 		detail.SetCaptchaToken(fCaptcha->Token());
 
 	detail.SetCaptchaResponse(fCaptchaResultField->Text());
-	detail.SetLanguageCode(fPreferredLanguageCode);
+	detail.SetLanguageId(fPreferredLanguageId);
 
 	if ( fUserUsageConditions != NULL
 		&& fConfirmMinimumAgeCheckBox->Value() == 1
@@ -1320,7 +1318,7 @@ UserLoginWindow::_CreateAccountThread(CreateUserDetail* detail)
 		detail->Email(),
 		detail->CaptchaToken(),
 		detail->CaptchaResponse(),
-		detail->LanguageCode(),
+		detail->LanguageId(),
 		detail->AgreedToUserUsageConditionsCode(),
 		responsePayload);
 

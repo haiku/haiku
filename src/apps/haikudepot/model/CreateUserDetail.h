@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef CREATE_USER_DETAIL_H
@@ -29,7 +29,7 @@ public:
 	const	BString&			Email() const;
 	const	BString&			CaptchaToken() const;
 	const	BString&			CaptchaResponse() const;
-	const	BString&			LanguageCode() const;
+	const	BString&			LanguageId() const;
 	const	BString&			AgreedToUserUsageConditionsCode() const;
 
 			void				SetNickname(const BString& value);
@@ -38,7 +38,7 @@ public:
 			void				SetEmail(const BString& value);
 			void				SetCaptchaToken(const BString& value);
 			void				SetCaptchaResponse(const BString& value);
-			void				SetLanguageCode(const BString& value);
+			void				SetLanguageId(const BString& value);
 			void				SetAgreedToUserUsageConditionsCode(
 									const BString& value);
 
@@ -50,7 +50,7 @@ private:
 			BString				fEmail;
 			BString				fCaptchaToken;
 			BString				fCaptchaResponse;
-			BString				fLanguageCode;
+			BString				fLanguageId;
 			BString				fAgreedUserUsageConditionsCode;
 };
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -180,7 +180,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fTextEditor(new TextEditor(), true),
 	fRating(RATING_NONE),
 	fRatingDeterminate(false),
-	fCommentLanguageCode(LANGUAGE_DEFAULT_CODE),
+	fCommentLanguageId(LANGUAGE_DEFAULT_ID),
 	fWorkerThread(-1)
 {
 	AddToSubset(parent);
@@ -270,11 +270,11 @@ void
 RatePackageWindow::_InitLanguagesMenu(BPopUpMenu* menu)
 {
 	AutoLocker<BLocker> locker(fModel.Lock());
-	fCommentLanguageCode = fModel.Language()->PreferredLanguage()->Code();
+	fCommentLanguageId = fModel.Language()->PreferredLanguage()->ID();
 
 	LanguageMenuUtils::AddLanguagesToMenu(fModel.Language(), menu);
 	menu->SetTargetForItems(this);
-	LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageCode, menu);
+	LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageId, menu);
 }
 
 
@@ -339,7 +339,7 @@ RatePackageWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_LANGUAGE_SELECTED:
-			message->FindString("code", &fCommentLanguageCode);
+			message->FindString("id", &fCommentLanguageId);
 			break;
 
 		case MSG_RATING_DETERMINATE_CHANGED:
@@ -492,12 +492,12 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 		if (response.FindString("userRatingStabilityCode",
 				&fStabilityCode) == B_OK) {
 			BMenu* menu = fStabilityField->Menu();
-			AppUtils::MarkItemWithCodeInMenu(fStabilityCode, menu);
+			AppUtils::MarkItemWithKeyValueInMenu(menu, "code", fStabilityCode);
 		}
 		if (response.FindString("naturalLanguageCode",
-			&fCommentLanguageCode) == B_OK && !comment.IsEmpty()) {
+			&fCommentLanguageId) == B_OK && !comment.IsEmpty()) {
 			LanguageMenuUtils::MarkLanguageInMenu(
-				fCommentLanguageCode, fCommentLanguageField->Menu());
+				fCommentLanguageId, fCommentLanguageField->Menu());
 		}
 		double rating;
 		if (response.FindDouble("rating", &rating) == B_OK) {
@@ -633,7 +633,8 @@ RatePackageWindow::_SendRatingThread()
 	int rating = (int)fRating;
 	BString stability = fStabilityCode;
 	BString comment = fRatingText->Text();
-	BString languageCode = fCommentLanguageCode;
+	BString languageId = fCommentLanguageId;
+		// note that the language is a "code" in the server and "id" in ICU
 	BString ratingID = fRatingID;
 	bool active = fRatingActive;
 
@@ -673,12 +674,12 @@ RatePackageWindow::_SendRatingThread()
 	if (ratingID.Length() > 0) {
 		HDINFO("will update the existing user rating [%s]", ratingID.String());
 		status = interface->UpdateUserRating(ratingID,
-			languageCode, comment, stability, rating, active, info);
+			languageId, comment, stability, rating, active, info);
 	} else {
 		HDINFO("will create a new user rating for pkg [%s]", package.String());
 		status = interface->CreateUserRating(package, fPackage->Version(),
 			architecture, webAppRepositoryCode, webAppRepositorySourceCode,
-			languageCode, comment, stability, rating, info);
+			languageId, comment, stability, rating, info);
 	}
 
 	if (status == B_OK) {

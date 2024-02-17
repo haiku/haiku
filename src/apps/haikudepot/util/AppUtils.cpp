@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -41,25 +41,25 @@ AppUtils::NotifySimpleError(const char* title, const char* text,
 
 
 /*static*/ status_t
-AppUtils::MarkItemWithCodeInMenuOrFirst(const BString& code, BMenu* menu)
+AppUtils::MarkItemWithKeyValueInMenuOrFirst(BMenu* menu, const BString& key, const BString& value)
 {
-	status_t result = AppUtils::MarkItemWithCodeInMenu(code, menu);
-	if (result != B_OK)
+	status_t result = AppUtils::MarkItemWithKeyValueInMenu(menu, key, value);
+	if (result != B_OK && menu->CountItems() > 0)
 		menu->ItemAt(0)->SetMarked(true);
 	return result;
 }
 
 
 /*static*/ status_t
-AppUtils::MarkItemWithCodeInMenu(const BString& code, BMenu* menu)
+AppUtils::MarkItemWithKeyValueInMenu(BMenu* menu, const BString& key, const BString& value)
 {
 	if (menu->CountItems() == 0)
 		HDFATAL("menu contains no items; not able to mark the item");
 
-	int32 index = AppUtils::IndexOfCodeInMenu(code, menu);
+	int32 index = AppUtils::IndexOfKeyValueInMenu(menu, key, value);
 
 	if (index == -1) {
-		HDINFO("unable to find the menu item [%s]", code.String());
+		HDINFO("unable to find the menu item with [%s] = [%s]", key.String(), value.String());
 		return B_ERROR;
 	}
 
@@ -69,13 +69,13 @@ AppUtils::MarkItemWithCodeInMenu(const BString& code, BMenu* menu)
 
 
 /*static*/ int32
-AppUtils::IndexOfCodeInMenu(const BString& code, BMenu* menu)
+AppUtils::IndexOfKeyValueInMenu(BMenu* menu, const BString& key, const BString& value)
 {
 	BString itemCode;
 	for (int32 i = 0; i < menu->CountItems(); i++) {
-		if (AppUtils::GetCodeAtIndexInMenu(menu, i, &itemCode) == B_OK
-				&& itemCode == code) {
-			return i;
+		if (AppUtils::GetValueForKeyAtIndexInMenu(menu, i, key, &itemCode) == B_OK) {
+			if (itemCode == value)
+				return i;
 		}
 	}
 
@@ -84,12 +84,12 @@ AppUtils::IndexOfCodeInMenu(const BString& code, BMenu* menu)
 
 
 /*static*/ status_t
-AppUtils::GetCodeAtIndexInMenu(BMenu* menu, int32 index, BString* result)
+AppUtils::GetValueForKeyAtIndexInMenu(BMenu* menu, int32 index, const BString& key, BString* result)
 {
 	BMessage *itemMessage = menu->ItemAt(index)->Message();
 	if (itemMessage == NULL)
 		return B_ERROR;
-	return itemMessage->FindString("code", result);
+	return itemMessage->FindString(key, result);
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -204,6 +204,8 @@ PackageFillingPkgListener::Complete()
 
 ServerPkgDataUpdateProcess::ServerPkgDataUpdateProcess(
 	BString naturalLanguageCode,
+		// note that this is the ID of the language from ICU but it is called
+		// `code` in the HDS system. Here we use the nomenclature of the server.
 	BString depotName,
 	Model *model,
 	uint32 serverProcessOptions)

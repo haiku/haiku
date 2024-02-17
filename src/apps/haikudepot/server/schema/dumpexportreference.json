@@ -19,6 +19,14 @@
           },
           "isPopular": {
             "type": "boolean"
+          },
+          "hasData": {
+            "type": "boolean",
+            "description": "True if there are any user ratings or localizations present for this language."
+          },
+          "hasLocalizationMessages": {
+            "type": "boolean",
+            "description": "True if there are localizations for the HaikuDepotServer application present for this language."
           }
         }
       }

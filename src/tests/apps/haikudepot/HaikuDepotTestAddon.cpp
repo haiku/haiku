@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023, Andrew Lindesay, apl@lindesay.co.nz
+ * Copyright 2017-2024, Andrew Lindesay, apl@lindesay.co.nz
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include "StandardMetaDataJsonEventListenerTest.h"
 #include "DataIOUtilsTest.h"
 #include "DumpExportRepositoryJsonListenerTest.h"
+#include "LanguageModelTest.h"
 #include "JwtTokenHelperTest.h"
 #include "ValidationFailureTest.h"
 #include "ValidationUtilsTest.h"
@@ -27,6 +28,7 @@ getTestSuite()
 	DataIOUtilsTest::AddTests(*suite);
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
+	LanguageModelTest::AddTests(*suite);
 	JwtTokenHelperTest::AddTests(*suite);
 	ValidationFailureTest::AddTests(*suite);
 	ValidationUtilsTest::AddTests(*suite);

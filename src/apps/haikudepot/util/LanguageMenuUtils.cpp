@@ -1,18 +1,25 @@
 /*
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "LanguageMenuUtils.h"
 
+#include <algorithm>
+
 #include <string.h>
 
 #include <Application.h>
+#include <Collator.h>
 #include <MenuItem.h>
 #include <Messenger.h>
 
 #include "AppUtils.h"
 #include "HaikuDepotConstants.h"
+#include "LocaleUtils.h"
 #include "Logger.h"
+
+
+static const char* kLanguageIdKey = "id";
 
 
 /*! This method will add the supplied languages to the menu.  It will
@@ -22,19 +29,30 @@
 
 /* static */ void
 LanguageMenuUtils::AddLanguagesToMenu(
-	const LanguageModel* languagesModel, BMenu* menu)
+	const LanguageModel* languageModel, BMenu* menu)
 {
-	if (languagesModel->CountSupportedLanguages() == 0)
+	if (languageModel->CountSupportedLanguages() == 0)
 		HDINFO("there are no languages defined");
 
-	int32 addedPopular = LanguageMenuUtils::_AddLanguagesToMenu(
-		languagesModel, menu, true);
+	// collect all of the languages into a vector so that they can be sorted
+	// and used.
+
+	std::vector<LanguageRef> languages(languageModel->CountSupportedLanguages());
+
+	for (int32 i = 0; i < languageModel->CountSupportedLanguages(); i++) {
+		languages[i] = languageModel->SupportedLanguageAt(i);
+	}
+
+	std::sort(languages.begin(), languages.end(), _IsLanguagePresentationBefore);
+
+	// now add the sorted languages to the menu.
+
+	int32 addedPopular = LanguageMenuUtils::_AddLanguagesToMenu(languages, menu, true);
 
 	if (addedPopular > 0)
 		menu->AddSeparatorItem();
 
-	int32 addedNonPopular = LanguageMenuUtils::_AddLanguagesToMenu(
-		languagesModel, menu, false);
+	int32 addedNonPopular = LanguageMenuUtils::_AddLanguagesToMenu(languages, menu, false);
 
 	HDDEBUG("did add %" B_PRId32 " popular languages and %" B_PRId32
 		" non-popular languages to a menu", addedPopular,
@@ -44,17 +62,17 @@ LanguageMenuUtils::AddLanguagesToMenu(
 
 /* static */ void
 LanguageMenuUtils::MarkLanguageInMenu(
-	const BString& languageCode, BMenu* menu) {
-	AppUtils::MarkItemWithCodeInMenuOrFirst(languageCode, menu);
+	const BString& languageId, BMenu* menu) {
+	AppUtils::MarkItemWithKeyValueInMenuOrFirst(menu, kLanguageIdKey, languageId);
 }
 
 
 /* static */ void
 LanguageMenuUtils::_AddLanguageToMenu(
-	const BString& code, const BString& name, BMenu* menu)
+	const BString& id, const BString& name, BMenu* menu)
 {
 	BMessage* message = new BMessage(MSG_LANGUAGE_SELECTED);
-	message->AddString("code", code);
+	message->AddString(kLanguageIdKey, id);
 	BMenuItem* item = new BMenuItem(name, message);
 	menu->AddItem(item);
 }
@@ -67,24 +85,48 @@ LanguageMenuUtils::_AddLanguageToMenu(
 	BString name;
 	if (language->GetName(name) != B_OK || name.IsEmpty())
 		name.SetTo("???");
-	LanguageMenuUtils::_AddLanguageToMenu(language->Code(), name, menu);
+	LanguageMenuUtils::_AddLanguageToMenu(language->ID(), name, menu);
 }
 
 
 /* static */ int32
-LanguageMenuUtils::_AddLanguagesToMenu(const LanguageModel* languageModel,
+LanguageMenuUtils::_AddLanguagesToMenu(const std::vector<LanguageRef>& languages,
 	BMenu* menu, bool isPopular)
 {
 	int32 count = 0;
 
-	for (int32 i = 0; i < languageModel->CountSupportedLanguages(); i++) {
-		const LanguageRef language = languageModel->SupportedLanguageAt(i);
+	for (uint32 i = 0; i < languages.size(); i++) {
+		const LanguageRef language = languages[i];
 
-		if (language->IsPopular() == isPopular) {
-			LanguageMenuUtils::_AddLanguageToMenu(language, menu);
+		if (languages[i]->IsPopular() == isPopular) {
+			LanguageMenuUtils::_AddLanguageToMenu(languages[i], menu);
 			count++;
 		}
 	}
 
 	return count;
+}
+
+
+/*static*/ int
+LanguageMenuUtils::_LanguagesPresentationCompareFn(const LanguageRef& l1, const LanguageRef& l2)
+{
+	BCollator* collator = LocaleUtils::GetSharedCollator();
+	BString name1;
+	BString name2;
+	int32 result = 0;
+
+	if (l1->GetName(name1) == B_OK && l2->GetName(name2) == B_OK)
+		result = collator->Compare(name1.String(), name2.String());
+	if (0 == result)
+		result = strcmp(l1->ID(), l2->ID());
+
+	return result;
+}
+
+
+/*static*/ bool
+LanguageMenuUtils::_IsLanguagePresentationBefore(const LanguageRef& l1, const LanguageRef& l2)
+{
+	return _LanguagesPresentationCompareFn(l1, l2) < 0;
 }

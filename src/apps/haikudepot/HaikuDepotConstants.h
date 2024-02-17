@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef HAIKU_DEPOT_CONSTANTS_H
@@ -111,8 +111,8 @@ enum UserUsageConditionsSelectionMode {
 };
 
 
-#define LANGUAGE_DEFAULT_CODE "en"
-#define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_CODE, "English", true)
+#define LANGUAGE_DEFAULT_ID "en"
+#define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_ID, "English", true)
 
 
 #define PACKAGE_INFO_MAX_USER_RATINGS 250

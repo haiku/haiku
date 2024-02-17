@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_LOGIN_WINDOW_H
@@ -139,7 +139,7 @@ private:
 			BTextControl*		fRepeatPasswordField;
 			LinkView*			fPasswordRequirementsLink;
 			BTextControl*		fEmailField;
-			BMenuField*			fLanguageCodeField;
+			BMenuField*			fLanguageIdField;
 			BitmapView*			fCaptchaView;
 			BTextControl*		fCaptchaResultField;
 			BCheckBox*			fConfirmMinimumAgeCheckBox;
@@ -154,7 +154,7 @@ private:
 			UserUsageConditions*
 								fUserUsageConditions;
 			Captcha*			fCaptcha;
-			BString				fPreferredLanguageCode;
+			BString				fPreferredLanguageId;
 
 			Model&				fModel;
 

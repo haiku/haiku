@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_RATING_H
@@ -18,7 +18,7 @@ public:
 								UserRating(const UserInfo& userInfo,
 									float rating,
 									const BString& comment,
-									const BString& language,
+									const BString& languageId,
 									const BString& packageVersion,
 									uint64 createTimestamp);
 								UserRating(const UserRating& other);
@@ -31,8 +31,8 @@ public:
 									{ return fUserInfo; }
 			const BString&		Comment() const
 									{ return fComment; }
-			const BString&		Language() const
-									{ return fLanguage; }
+			const BString&		LanguageId() const
+									{ return fLanguageId; }
 			const float			Rating() const
 									{ return fRating; }
 			const BString&		PackageVersion() const
@@ -43,7 +43,7 @@ private:
 			UserInfo			fUserInfo;
 			float				fRating;
 			BString				fComment;
-			BString				fLanguage;
+			BString				fLanguageId;
 			BString				fPackageVersion;
 			uint64				fCreateTimestamp;
 				// milliseconds since epoch
