@@ -1,0 +1,44 @@
+/*!
+  \page storage_intro Introduction to the storage kit
+
+\section Filesystem hierarchy
+
+The filesystems are organized in a hierarchy starting at the root directory (which has the path
+'/'). Unlike on typical UNIX systems, the root filsystem is not a mass storage filesystem that
+the OS was booted from. Instead, it is a virtual filesystem that can only contain directories,
+symbolic links, and mountpoints.
+
+All the other filesystems are mounted as subdirectories of the root filesystem or further down
+in the file hierarchy.
+
+The booted filesystem (what would be the rootfs in a typical UNIX) is mounted in '/boot'. For
+convenience, several links are created in the rootfs to well-known directories ('/bin', '/var',
+etc). These point into the corresponding directories in /boot/system, which are managed by
+packagefs.
+
+The packagefs is a read-only union filesystem that makes available the content of various software
+packages (installed as .hpkg files) to constitute the entire /boot/system directory. The files can
+be accessed either as a complete filesystem hierarchy directly in /boot/system, or by referencing
+specific packages exposed in /boot/system/package-links (each directory is a view of the packagefs,
+containing only the files for a given package and all its dependencies). In theory, this allows
+packages to be exposed in the package-links directory even while they are not actually "activated"
+in the main system hierarchy. It also allows to access a version of a file provided by a specific
+package, in the case that two packages provide identically named files.
+
+While packagefs is mostly read-only, some directories (called "shine-through") are actually
+exposing the content of the underlying filesystem. This includes for example the "config" directory
+(for configuration files) and the "non-packaged" directory, where a mirror of the standard
+filesystem hierarchy is available for non packaged software. This can be used to install software
+locally that is not available yet in HPKG form (for example, as a destination for "make install").
+
+For a complete list of directories and how to access them in a way that is safe to future
+filesystem reorganizations, see \link find_directory, \link find_path, and \link BPathFinder.
+
+*/
+
+/*!
+\addtgroup storage
+
+See \link storage_intro for general concepts and filesystem hierarchy description.
+
+*/

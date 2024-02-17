@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2024 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,7 +15,9 @@ Haiku implements a standard library containing the standard functions from C
 available in libroot, which is linked in by default.
 
 For convenience and POSIX compatibility, empty "m" and "pthread" libraries are
-also provided, but the math and thread functions are also defined in libroot.
+also provided, but the math and thread functions are also defined in libroot. However, this is
+currently not the case for "rt" and "trace" (both also part of the standard libraries required
+in POSIX).
 
 The C library also contains a number of GNU and BSD extensions to the C and
 POSIX standards. The BSD extensions are enabled by default unless a specific
@@ -29,5 +31,9 @@ _GNU_SOURCE.
 
 The GNU and BSD extensions are in a separate library, so the -lbsd linker flag
 may be needed to use them.
+
+On the other hand, network socket functions (socket, connect, bind, accept, ...) are provided in
+a separate library, libnetwork.so. To use these functions you will need to use the -lnetwork
+linker command line switch (instead of the POSIX specified -lxnet).
 
 */
