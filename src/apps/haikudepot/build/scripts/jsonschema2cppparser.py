@@ -504,7 +504,7 @@ bool
         }
         case B_JSON_STRING:
         {
-{{#propertyarray}} {{#property.isstring}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
+{{#propertyarray}}{{#property.isstring}}            if (fNextItemBitmask == {{cppobjectname}}::k{{property.cppname}}Bitmask)
                 fTarget->Set{{property.cppname}}(new BString(event.Content()));
 {{/property.isstring}}{{/propertyarray}}
             fNextItemBitmask = 0;
