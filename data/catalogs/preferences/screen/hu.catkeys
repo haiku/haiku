@@ -8,7 +8,7 @@ The screen mode could not be set:\n\t%s\n	Screen		A kijelzőmód nem állíthat�
 Serial no.: %s	Screen		Sorozatszám: %s
 /other…	Screen		/egyéb…
 Keep	Screen		Megtartás
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vízszíntes frekvencia:\t%lu - %lu kHz\nFüggőleges frekvencia:\t%lu - %lu Hz\n\nMaximális pixelórajel:\t%g MHz
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Vízszíntes frekvencia: %lu - %lu kHz\nFüggőleges frekvencia: %lu - %lu Hz\nMaximális pixelórajel: %g MHz
 Refresh rate:	Screen		Frissítési frekvencia:
 Video format:	Screen		Videóformátum:
 Undo	Screen		Visszavonás

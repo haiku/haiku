@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2231325175
+1	romanian	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		Nu sunt disponibile evaluări ale ut
 <no info>	PackageInfoView		<no info>
 Usage conditions download problem	UserUsageConditions		Problemă la descărcarea condițiilor de utilizare
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea cerințelor de parolă necesare pentru a crea un utilizator nou. Verificați jurnalul pentru detalii și încercați din nou.\nInformații despre cum să vizualizați jurnalele sunt disponibile în secțiunea HaikuDepot din Ghidul utilizatorului Haiku.
+Fetching screenshot	CacheScreenshotProcess		Se aduce captura de ecran
 A network transport error has arisen communicating with the server system: %s	ServerHelper		A apărut o eroare de transport în rețea la comunicarea cu sistemul de server: %s
 Rating	PackageListView		Evaluare
 Synchronizing icons	ServerIconExportUpdateProcess		Se sincronizează pictogramele

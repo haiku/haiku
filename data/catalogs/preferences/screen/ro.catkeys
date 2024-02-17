@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-Screen	3410763711
+1	romanian	x-vnd.Haiku-Screen	2577971458
 no	Screen		nu
 bits/pixel	Screen		biți/pixel
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 de culori
 Rows:	Screen		Rânduri:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Modul de ecran nu a putut fi stabilit:\n\t%s\n
+Serial no.: %s	Screen		Nr. serial: %s
 /other…	Screen		/other…
 Keep	Screen		Păstrează
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecvență orizontală:\t%lu - %lu kHz\nFrecvență verticală:\t%lu - %lu Hz\n\nCeas de pixel maxim:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Spațiul de lucru curent
 vertically	Screen		vertical
 All workspaces	Screen		Toate spațiile de lucru
 Use laptop panel:	Screen		Utilizează panoul de laptop:
+Unknown	Screen		Necunoscut
 Could not write VESA mode settings file:\n\t	Screen		Nu s-a putut scrie fișierul de configurări ale modului VESA:\n\t
 Display info	Screen		Informații de afișaj
 Settings will revert in %seconds.	Screen		Configurările vor reveni în %seconds secunde.

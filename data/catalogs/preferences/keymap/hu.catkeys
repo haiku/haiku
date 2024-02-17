@@ -16,8 +16,8 @@ Polish	KeymapNames		Lengyel
 Right Shift	Keyboard Layout View		Jobb Shift
 Latin-American	KeymapNames		Latin-Amerika
 Ukrainian	KeymapNames		Ukrán
-PAGE ↓	Keyboard Layout View		PAGE ↓
-DEL	Keyboard Layout View		DEL
+PAGE ↓	Keyboard Layout View		Page ↓
+DEL	Keyboard Layout View		Del
 United-Kingdom	KeymapNames		Egyesült Királyság
 Turkish (Type-F)	KeymapNames		Török (F-típus)
 Serbian (Cyrillic)	KeymapNames		Szerc (cirill)
@@ -44,7 +44,7 @@ Set modifier keys	Modifier keys window		Módosító billentyű megadása
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium (nemzetközi)
 Right Command	Keyboard Layout View		Jobb Command
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd billentyű
-PG ↓	Keyboard Layout View	Very short for 'page down'	Page ↓
+PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (Egyesült Államok)
 Spanish	KeymapNames		Spanyol
 Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
@@ -86,7 +86,7 @@ Czech (Mac)	KeymapNames		Cseh (Mac)
 Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps Lock billentyű
 Albanian	KeymapNames		Albán
 (Current)	Keymap window		(jelenlegi)
-OPT	Keyboard Layout View	Very short for 'option'	OPT
+OPT	Keyboard Layout View	Very short for 'option'	Opt
 Friulian	KeymapNames		Friuli
 END	Keyboard Layout View		End
 Esperanto	KeymapNames		Eszperantó
@@ -160,14 +160,14 @@ Russian	KeymapNames		Orosz
 PAUSE	Keyboard Layout View		Pause
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Román
-CMD	Keyboard Layout View	Very short for 'command'	CMD
+CMD	Keyboard Layout View	Very short for 'command'	Cmd
 Command	Keyboard Layout View	Command key	Parancsbillentyű
 Left Shift	Keyboard Layout View		Bal Shift
-SCROLL	Keyboard Layout View		SCROLL
+SCROLL	Keyboard Layout View		Scroll
 File	Keymap window		Fájl
 Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
-INS	Keyboard Layout View		INS
-OPTION	Keyboard Layout View		OPTION
+INS	Keyboard Layout View		Ins
+OPTION	Keyboard Layout View		Option
 Dutch	KeymapNames		Holland
 Diaeresis trigger	Keymap window		Tréma kapcsoló
 Icelandic	KeymapNames		Izlandi

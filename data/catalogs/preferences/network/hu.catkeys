@@ -23,13 +23,13 @@ off	ServiceListItem		ki
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nem található vezetéknélküli hálózat>
 Enable	IntefaceView		Engedélyezés
-connected	IntefaceView		kapcsolódva
+connected	IntefaceView		csatlakozva
 Apply	IntefaceAddressView		Alkalmaz
 Disable	ServiceView		Letiltás
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		A felület megjelenítése az Asztalsávon
 Mode:	IntefaceAddressView		Mód:
-connected	InterfaceListItem		kapcsolódva
+connected	InterfaceListItem		csatlakozva
 OK	NetworkWindow		Rendben
 Static	IntefaceAddressView		Állandó
 launch error	NetworkWindow		indítási hiba
