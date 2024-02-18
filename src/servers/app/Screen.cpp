@@ -42,8 +42,8 @@ get_mode_frequency(const display_mode& mode)
 Screen::Screen(::HWInterface *interface, int32 id)
 	:
 	fID(id),
-	fDriver(interface ? interface->CreateDrawingEngine() : NULL),
-	fHWInterface(interface)
+	fHWInterface(interface),
+	fDriver(interface != NULL ? interface->CreateDrawingEngine() : NULL)
 {
 }
 

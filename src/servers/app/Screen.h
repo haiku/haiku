@@ -61,10 +61,10 @@ private:
 									uint32 colorspace, float frequency) const;
 
 			int32				fID;
-			ObjectDeleter<DrawingEngine>
-								fDriver;
 			ObjectDeleter< ::HWInterface>
 								fHWInterface;
+			ObjectDeleter<DrawingEngine>
+								fDriver;
 };
 
 #endif	/* SCREEN_H */
