@@ -228,6 +228,8 @@ BitmapManager::BitmapRemoved(ServerBitmap* bitmap)
 	if (!locker.IsLocked())
 		return;
 
+	gTokenSpace.RemoveToken(bitmap->Token());
+
 	if (bitmap->Overlay() != NULL)
 		fOverlays.RemoveItem(bitmap);
 
