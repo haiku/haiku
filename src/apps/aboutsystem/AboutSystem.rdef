@@ -20,10 +20,14 @@ resource app_flags B_SINGLE_LAUNCH;
 
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
 #ifdef HAIKU_OFFICIAL_RELEASE
-resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - tiny.png";
+resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on transparent - tiny.png";
+resource(2, "logo_dark.png") #'PNG ' import "../../../data/artwork/HAIKU logo - white on transparent - tiny.png";
 #else
-resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on white - tiny - versioned.png";
+resource(1, "logo.png") #'PNG ' import "../../../data/artwork/HAIKU logo - black on transparent - tiny - versioned.png";
+resource(2, "logo_dark.png") #'PNG ' import "../../../data/artwork/HAIKU logo - white on transparent - tiny - versioned.png";
 #endif
+#else
+resource(1, "walter_logo.png") #'PNG ' import "../../../data/artwork/Walter logo.png";
 #endif
 
 resource vector_icon {

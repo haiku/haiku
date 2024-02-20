@@ -17,6 +17,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ColorConversion.h>
 #include <ControlLook.h>
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -107,10 +108,13 @@ LogoView::~LogoView(void)
 void
 LogoView::Draw(BRect update)
 {
+	BRect bounds(Bounds());
+	SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	FillRect(bounds, B_SOLID_LOW);
+
 	if (fLogo == NULL)
 		return;
 
-	BRect bounds(Bounds());
 	BPoint placement;
 	placement.x = (bounds.left + bounds.right - fLogo->Bounds().Width()) / 2;
 	placement.y = (bounds.top + bounds.bottom - fLogo->Bounds().Height()) / 2;
@@ -138,7 +142,18 @@ LogoView::GetPreferredSize(float* _width, float* _height)
 void
 LogoView::_Init()
 {
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
+	SetDrawingMode(B_OP_OVER);
+
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+	rgb_color bgColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+
+	if (bgColor.IsLight())
+		fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
+	else
+		fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo_dark.png");
+#else
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "walter_logo.png");
+#endif
 }
 
 
@@ -171,9 +186,10 @@ InstallerWindow::InstallerWindow()
 
 	LogoView* logoView = new LogoView();
 
-	fStatusView = new BTextView("statusView", be_plain_font, NULL,
+	rgb_color baseColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	fStatusView = new BTextView("statusView", be_plain_font, &baseColor,
 		B_WILL_DRAW);
-	fStatusView->SetViewColor(255, 255, 255, 255);
+	fStatusView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
 
@@ -190,7 +206,7 @@ InstallerWindow::InstallerWindow()
 	// Create a group view with a white background since the logo and status text won't have the
 	// same height, this background will show in the remaining space
 	fLogoGroup = new BGroupView(B_HORIZONTAL, 10);
-	fLogoGroup->SetViewColor(255, 255, 255);
+	fLogoGroup->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 	fLogoGroup->GroupLayout()->SetInsets(0, 0, 10, 0);
 	fLogoGroup->AddChild(logoView);
 	fLogoGroup->AddChild(fStatusView);

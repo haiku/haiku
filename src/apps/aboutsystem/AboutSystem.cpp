@@ -424,14 +424,23 @@ AboutWindow::QuitRequested()
 
 LogoView::LogoView()
 	:
-	BView("logo", B_WILL_DRAW),
-	fLogo(BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png"))
+	BView("logo", B_WILL_DRAW)
 {
+	SetDrawingMode(B_OP_OVER);
+
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+	rgb_color bgColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	if (bgColor.IsLight())
+		fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
+	else
+		fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo_dark.png");
+#else
+	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "walter_logo.png");
+#endif
+
 	// Set view color to panel background color when fLogo is NULL
 	// to prevent a white pixel from being drawn.
-	if (fLogo != NULL)
-		SetViewColor(255, 255, 255);
-	else
+	if (fLogo == NULL)
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
@@ -468,7 +477,11 @@ LogoView::Draw(BRect updateRect)
 	if (fLogo == NULL)
 		return;
 
-	DrawBitmap(fLogo, BPoint((Bounds().Width() - fLogo->Bounds().Width()) / 2, 0));
+	BRect bounds(Bounds());
+	SetLowColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	FillRect(bounds, B_SOLID_LOW);
+
+	DrawBitmap(fLogo, BPoint((bounds.Width() - fLogo->Bounds().Width()) / 2, 0));
 }
 
 
