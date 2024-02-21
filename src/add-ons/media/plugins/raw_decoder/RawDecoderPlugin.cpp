@@ -482,12 +482,13 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 	char *output_buffer = (char *)buffer;
 	mediaHeader->start_time = fStartTime;
 	*frameCount = 0;
+
+	status_t status = B_OK;
 	while (*frameCount < fOutputBufferFrameCount) {
 		if (fChunkSize == 0) {
 			media_header mh;
-			status_t err;
-			err = GetNextChunk(&fChunkBuffer, &fChunkSize, &mh);
-			if (err != B_OK || fChunkSize < (size_t)fInputFrameSize) {
+			status = GetNextChunk(&fChunkBuffer, &fChunkSize, &mh);
+			if (status != B_OK || fChunkSize < (size_t)fInputFrameSize) {
 				fChunkSize = 0;
 				break;
 			}
@@ -514,10 +515,10 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 
 	if (fSwapOutput)
 		fSwapOutput(buffer, *frameCount * fInputFormat.u.raw_audio.channel_count);
-	
+
 	TRACE("framecount %lld, time %lld\n",*frameCount, mediaHeader->start_time);
-		
-	return *frameCount ? B_OK : B_ERROR;
+
+	return *frameCount ? B_OK : (status != B_OK ? status : B_ERROR);
 }
 
 
