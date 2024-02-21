@@ -441,9 +441,12 @@ StreamBase::Duration() const
 	if ((flags & B_MEDIA_MUTABLE_SIZE) != 0)
 		return 0;
 
-	if ((int64)fStream->duration != AV_NOPTS_VALUE)
-		return _ConvertFromStreamTimeBase(fStream->duration);
-	else if ((int64)fContext->duration != AV_NOPTS_VALUE)
+	if ((int64)fStream->duration != AV_NOPTS_VALUE) {
+		int64_t time = fStream->duration;
+		if (fStream->start_time != AV_NOPTS_VALUE)
+			time += fStream->start_time;
+		return _ConvertFromStreamTimeBase(time);
+	} else if ((int64)fContext->duration != AV_NOPTS_VALUE)
 		return (bigtime_t)fContext->duration;
 
 	return 0;
@@ -877,8 +880,8 @@ StreamBase::_ConvertFromStreamTimeBase(int64_t time) const
 	if (fStream->start_time != AV_NOPTS_VALUE)
 		time -= fStream->start_time;
 
-	return bigtime_t(1000000.0 * time * fStream->time_base.num
-		/ fStream->time_base.den + 0.5);
+	return bigtime_t(1000000LL * time
+		* fStream->time_base.num / fStream->time_base.den);
 }
 
 
@@ -1262,7 +1265,8 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 	*frameCount = fStream->nb_frames * fStream->codecpar->frame_size;
 	if (*frameCount == 0) {
 		// Calculate from duration and frame rate
-		*frameCount = (int64)(*duration * frameRate / 1000000LL);
+		*frameCount = (int64)(fStream->duration * frameRate
+			* fStream->time_base.num / fStream->time_base.den);
 		TRACE("  frameCount calculated: %lld, from context: %lld\n",
 			*frameCount, fStream->nb_frames);
 	} else
