@@ -420,6 +420,7 @@ GlyphLayoutEngine::PopulateFallbacks(
 		"Noto Sans Thai",
 		"Noto Sans CJK JP",
 		"Noto Sans Symbols",
+		"Noto Sans Symbols 2",
 		"Noto Sans Symbols2",
 		"Noto Emoji",
 	};
