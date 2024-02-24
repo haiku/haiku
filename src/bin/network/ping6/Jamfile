@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src bin network ping6 ;
-
-UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
-
-BinCommand ping6 :
-	ping6.c
-	: libbsd.so $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) ;

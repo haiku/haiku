@@ -36,7 +36,6 @@ provides {
 	cmd:passwd
 	cmd:pidof
 	cmd:ping
-	cmd:ping6
 	cmd:prio
 	cmd:ps
 	cmd:renice

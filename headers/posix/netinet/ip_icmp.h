@@ -84,6 +84,8 @@ struct icmp {
 #define icmp_data      icmp_dun.id_data
 
 #define ICMP_MINLEN                        8 /* absolute minimum length */
+#define	ICMP_TSLEN                        (8 + 3 * sizeof (uint32_t)) /* timestamp */
+#define	ICMP_MASKLEN                      12 /* address mask */
 #define ICMP_ADVLENMIN (8 + sizeof(struct ip) + 8)
 #define ICMP_ADVLEN(p) (8 + ((p)->icmp_ip.ip_hl << 2) + 8)
 
