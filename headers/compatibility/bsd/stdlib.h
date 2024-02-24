@@ -27,6 +27,9 @@ uint32_t	arc4random_uniform(uint32_t upper_bound);
 
 int			mkstemps(char *templat, int slen);
 
+long long	strtonum(const char *numstr, long long minval,
+				long long maxval, const char **errstrp);
+
 #ifdef __cplusplus
 }
 #endif

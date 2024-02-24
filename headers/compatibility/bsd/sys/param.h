@@ -37,6 +37,8 @@
 
 #define NBBY 8
 
+#define nitems(x)	(sizeof((x)) / sizeof((x)[0]))
+
 
 #endif
 

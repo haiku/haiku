@@ -30,6 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			signal.c
 			string.cpp
 			stringlist.c
+			strtonum.c
 			termios.c
 			unvis.c
 			usershell.c
