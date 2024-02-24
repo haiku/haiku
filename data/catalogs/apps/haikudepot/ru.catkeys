@@ -5,7 +5,7 @@ It was not possible to create the new user.	UserLoginWindow		Не удалось
 An unexpected error has been sent from the server [%li]	ServerHelper		Сервер прислал непредвиденную ошибку [%li]
 Create account	UserLoginWindow		Создать учётную запись
 Agree	ToLatestUserUsageConditionsWindow		Принимаю
-Install %PackageTitle%	PackageManager		Инсталляция %PackageTitle%
+Install %PackageTitle%	PackageManager		Установка %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Ответ на капчу был неверным.
 Rate package…	PackageInfoView		Оценить пакет…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Вы успешно авторизовались как пользователь %Nickname%.
@@ -52,7 +52,7 @@ Start package daemon	App		Запустить пакетный демон
 There are problems in the supplied data:	UserLoginWindow		Есть проблемы в предоставленных данных:
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Пользователь «%Nickname%» не принял Условия использования.
 Usage conditions download problem	UserLoginWindow		Проблема загрузки условий использования
-install package %s from repository %s\n	PackageResult	Don't change '%s' variables	инсталляция пакета %s из репозитария %s\n
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	установить пакет %s из репозитория %s\n
 Package daemon problem	App		Проблема с пакетным демоном
 No	MainWindow		Нет
 Repository	PackageListView		Репозиторий
@@ -77,7 +77,7 @@ Language	RatePackageWindow		Язык
 Status	PackageListView		Статус
 Network transport error	ServerHelper		Ошибка передачи данных
 Cancel	PackageResult		Отмена
-Uninstall %PackageTitle%	PackageManager		Деинсталляция %PackageTitle%
+Uninstall %PackageTitle%	PackageManager		Цдалить %PackageTitle%
 Retry	PackageProblem		Повторить
 Update	RatePackageWindow		Обновить
 Language	UserLoginWindow		Язык
@@ -218,7 +218,7 @@ Screenshot	ScreenshotWindow		Снимок экрана
 Email address:	UserLoginWindow		Email адрес:
 View latest usage conditions…	MainWindow		Показать последние условия использования…
 Category:	FilterView		Категория:
-uninstall package %s\n	PackageResult	Don't change '%s' variable	деинсталляция пакета %s\n
+uninstall package %s\n	PackageResult	Don't change '%s' variable	удалить пакет %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Получение данных удалённого репозитория
 Description	PackageListView		Описание
 User creation error	UserLoginWindow		Ошибка создания пользователя

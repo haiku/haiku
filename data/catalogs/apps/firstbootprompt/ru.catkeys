@@ -48,7 +48,7 @@ Spanish	KeymapNames		Испанская
 Try it out	BootPromptWindow		Попробуй
 Ukrainian (Mac)	KeymapNames		Украинская (Mac)
 Estonian	KeymapNames		Эстонская 
-Install Haiku	BootPromptWindow		Инсталляция Haiku
+Install Haiku	BootPromptWindow		Установить Haiku
 French (Bépo)	KeymapNames		Французская (Bépo)
 Restart system	BootPromptWindow		Перезагрузить систему
 Serbian (Latin)	KeymapNames		Сербская (Латиница)
@@ -73,7 +73,7 @@ Canadian-French	KeymapNames		Канадо-Французская
 Welcome to Haiku!	BootPromptWindow		Добро пожаловать в Haiku!
 Russian	KeymapNames		Русская
 Hungarian	KeymapNames		Венгерская
-Install	BootPromptWindow		Инсталляция
+Install	BootPromptWindow		Установить
 Irish	KeymapNames		Ирландская
 Romanian	KeymapNames		Румынская
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Вы уверены, что хотите закрыть это окно? Это приведёт к перезагрузке компьютера!
