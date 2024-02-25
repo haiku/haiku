@@ -45,7 +45,6 @@ public:
 			void				Range(int32* min, int32* max);
 	virtual	void				SetRange(int32 min, int32 max);
 
-			int32				Value() const { return fValue; };
 	virtual	void				SetValue(int32 value);
 	virtual	void				SetValueFromText();
 
@@ -77,10 +76,9 @@ private:
 
 			int32				fMinValue;
 			int32				fMaxValue;
-			int32				fValue;
 
 	// FBC padding
-			uint32				_reserved[20];
+			uint32				_reserved[21];
 };
 
 

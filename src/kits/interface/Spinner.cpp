@@ -105,9 +105,6 @@ BSpinner::BSpinner(BMessage* data)
 
 	if (data->FindInt32("_max", &fMaxValue) != B_OK)
 		fMaxValue = INT32_MAX;
-
-	if (data->FindInt32("_val", &fValue) != B_OK)
-		fValue = 0;
 }
 
 
@@ -138,9 +135,6 @@ BSpinner::Archive(BMessage* data, bool deep) const
 	if (status == B_OK)
 		status = data->AddInt32("_max", fMaxValue);
 
-	if (status == B_OK)
-		status = data->AddInt32("_val", fValue);
-
 	return status;
 }
 
@@ -160,7 +154,7 @@ BSpinner::GetSupportedSuites(BMessage* message)
 void
 BSpinner::AttachedToWindow()
 {
-	SetValue(fValue);
+	SetValue(Value());
 
 	BAbstractSpinner::AttachedToWindow();
 }
@@ -243,10 +237,10 @@ BSpinner::SetValue(int32 value)
 	SetIncrementEnabled(IsEnabled() && value < fMaxValue);
 	SetDecrementEnabled(IsEnabled() && value > fMinValue);
 
-	if (value == fValue)
+	if (value == Value())
 		return;
 
-	fValue = value;
+	BControl::SetValue(value);
 	ValueChanged();
 
 	Invoke();
@@ -269,7 +263,6 @@ BSpinner::_InitObject()
 {
 	fMinValue = INT32_MIN;
 	fMaxValue = INT32_MAX;
-	fValue = 0;
 
 	TextView()->SetAlignment(B_ALIGN_RIGHT);
 	for (uint32 c = 0; c <= 42; c++)
