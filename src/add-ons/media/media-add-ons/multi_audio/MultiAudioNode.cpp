@@ -228,7 +228,8 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 				fDevice->FormatInfo().input.format);
 		fInputPreferredFormat.u.raw_audio.valid_bits
 			= MultiAudio::convert_to_valid_bits(fDevice->FormatInfo().input.format);
-		fInputPreferredFormat.u.raw_audio.channel_count = 2;
+		fInputPreferredFormat.u.raw_audio.channel_count
+			= fDevice->Description().input_channel_count;
 		fInputPreferredFormat.u.raw_audio.frame_rate
 			= MultiAudio::convert_to_sample_rate(fDevice->FormatInfo().input.rate);
 			// measured in Hertz
