@@ -1,19 +1,13 @@
 SubDir HAIKU_TOP src bin network traceroute ;
 
-local defines = [ FDefines HAVE_MALLOC_H=1 HAVE_SYS_SELECT=1 HAVE_NET_ROUTE_H=1
-			   HAVE_STRERROR=1 HAVE_USLEEP=1 HAVE_SETLINEBUF=1
-			   BYTESWAP_IP_HDR=1 HAVE_MALLOC_H=1
-			   HAVE_ICMP_NEXTMTU=1 HAVE_SOCKADDR_SA_LEN=1 ] ;
-
-SubDirCcFlags $(defines) ;
-SubDirC++Flags $(defines) ;
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
 
 BinCommand traceroute :
+	as.c
 	findsaddr-haiku.c
 	ifaddrlist.c
 	traceroute.c
-	version.c
-	: $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) ;
+	: $(TARGET_NETWORK_LIBS) $(TARGET_SELECT_UNAME_ETC_LIB) libbsd.so ;
 
 # Installation -- in the test directory for the time being
 HaikuInstall install-networking
