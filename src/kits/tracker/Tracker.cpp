@@ -59,6 +59,8 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
+#include <tracker_private.h>
+
 #include "Attributes.h"
 #include "AutoLock.h"
 #include "BackgroundImage.h"
@@ -854,11 +856,17 @@ TTracker::OpenRef(const entry_ref* ref, const node_ref* nodeToClose,
 	if (result != B_OK) {
 		BAlert* alert = new BAlert("",
 			B_TRANSLATE("There was an error resolving the link."),
-			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT);
+			B_TRANSLATE_COMMENT("Get info", "Tracker's 'Get info' panel [ALT+I]"),
+			B_TRANSLATE("Cancel"), 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-		alert->Go();
+		int32 choice = alert->Go();
 
+		if (choice == 0) {
+			BMessenger tracker(kTrackerSignature);
+			BMessage message(kGetInfo);
+			message.AddRef("refs", ref);
+			tracker.SendMessage(&message);
+		}
 		return result;
 	} else
 		model = new Model(&entry);
