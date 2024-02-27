@@ -37,7 +37,6 @@
 #define B_TRANSLATION_CONTEXT "Colors tab"
 
 #define COLOR_DROPPED 'cldp'
-#define DECORATOR_CHANGED 'dcch'
 
 
 APRView::APRView(const char* name)
@@ -45,32 +44,6 @@ APRView::APRView(const char* name)
 	BView(name, B_WILL_DRAW)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-
-#if 0
-	fDecorMenu = new BMenu("Window Style");
-	int32 decorCount = fDecorUtil->CountDecorators();
-	DecorInfo* decor = NULL;
-	if (decorCount > 1) {
-		for (int32 i = 0; i < decorCount; i++) {
-			decor = fDecorUtil->GetDecorator(i);
-			if (!decor)
-				continue;
-			fDecorMenu->AddItem(new BMenuItem(decor->Name().String(),
-				new BMessage(DECORATOR_CHANGED)));
-		}
-
-		BMenuField* field = new BMenuField("Window Style", fDecorMenu);
-		// TODO: use this menu field.
-	}
-	BMenuItem* marked = fDecorMenu->ItemAt(fDecorUtil->IndexOfCurrentDecorator());
-	if (marked)
-		marked->SetMarked(true);
-	else {
-		marked = fDecorMenu->FindItem("Default");
-		if (marked)
-			marked->SetMarked(true);
-	}
-#endif
 
 	LoadSettings();
 
