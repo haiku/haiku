@@ -123,7 +123,9 @@ acpi_lid_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 		return B_OK;
 	}
 
-	*((uint8 *)(buf)) = device->last_status;
+	if (user_memcpy(buf, &device->last_status, sizeof(uint8)) < B_OK)
+		return B_BAD_ADDRESS;
+
 	*num_bytes = 1;
 	device->updated = false;
 	return B_OK;

@@ -87,8 +87,10 @@ acpi_thermal_read(void* _cookie, off_t position, void* buf, size_t* num_bytes)
 		return B_IO_ERROR;
 
 	if (position == 0) {
-		size_t max_len = *num_bytes;
-		char* str = (char*)buf;
+		char string[128];
+		char* str = string;
+		size_t max_len = sizeof(string);
+
 		uint kelvinOffset = device->kelvin_offset;
 
 		acpi_thermal_control(device, drvOpGetThermalType, &therm_info, 0);
@@ -96,19 +98,21 @@ acpi_thermal_read(void* _cookie, off_t position, void* buf, size_t* num_bytes)
 		snprintf(str, max_len, "  Critical Temperature: %" B_PRIu32 ".%" B_PRIu32 " °C\n",
 				((therm_info.critical_temp - kelvinOffset) / 10),
 				((therm_info.critical_temp - kelvinOffset) % 10));
-
 		max_len -= strlen(str);
 		str += strlen(str);
+
 		snprintf(str, max_len, "  Current Temperature: %" B_PRIu32 ".%" B_PRIu32 " °C\n",
 				((therm_info.current_temp - kelvinOffset) / 10),
 				((therm_info.current_temp - kelvinOffset) % 10));
+		max_len -= strlen(str);
+		str += strlen(str);
 
 		if (therm_info.hot_temp > 0) {
-			max_len -= strlen(str);
-			str += strlen(str);
 			snprintf(str, max_len, "  Hot Temperature: %" B_PRIu32 ".%" B_PRIu32 " °C\n",
 					((therm_info.hot_temp - kelvinOffset) / 10),
 					((therm_info.hot_temp - kelvinOffset) % 10));
+			max_len -= strlen(str);
+			str += strlen(str);
 		}
 
 		if (therm_info.passive_package) {
@@ -128,7 +132,11 @@ acpi_thermal_read(void* _cookie, off_t position, void* buf, size_t* num_bytes)
 */
 			free(therm_info.passive_package);
 		}
-		*num_bytes = strlen((char*)buf);
+
+		max_len = user_strlcpy((char*)buf, string, *num_bytes);
+		if (max_len < B_OK)
+			return B_BAD_ADDRESS;
+		*num_bytes = max_len;
 	} else {
 		*num_bytes = 0;
 	}
