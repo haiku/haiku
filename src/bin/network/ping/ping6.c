@@ -1059,11 +1059,8 @@ ping6(int argc, char *argv[])
 	if (usepktinfo)
 		memcpy(cmsg_pktinfo, &pktinfo, sizeof(pktinfo));
 
-#ifndef __HAIKU__
-// unsupported on Haiku
 	if (connect(ssend, (struct sockaddr *)&dst, sizeof(dst)) != 0)
 		err(1, "connect() ssend");
-#endif
 
 #ifndef __HAIKU__
 	caph_cache_catpages();
@@ -1436,10 +1433,6 @@ pinger(void)
 		errx(1, "internal error; length mismatch");
 #endif
 
-#ifdef __HAIKU__
-	smsghdr.msg_name = (caddr_t)&dst;
-	smsghdr.msg_namelen = sizeof(dst);
-#endif
 	memset(&iov, 0, sizeof(iov));
 	iov[0].iov_base = (caddr_t)outpack;
 	iov[0].iov_len = cc;

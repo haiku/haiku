@@ -633,11 +633,8 @@ ping(int argc, char *const *argv)
 			err(1, "unable to limit access to system.dns service");
 	}
 #endif
-#ifndef __HAIKU__
-// unsupported on Haiku
 	if (connect(ssend, (struct sockaddr *)&whereto, sizeof(whereto)) != 0)
 		err(1, "connect");
-#endif
 
 	if (options & F_FLOOD && options & F_INTERVAL)
 		errx(EX_USAGE, "-f and -i: incompatible options");
@@ -1102,12 +1099,7 @@ pinger(void)
 		    sizeof(ip.ip_sum));
 		packet = outpackhdr;
 	}
-#ifndef __HAIKU__
 	i = send(ssend, (char *)packet, cc, 0);
-#else
-	i = sendto(ssend, (char *)packet, cc, 0, &whereto,
-		sizeof(struct sockaddr));
-#endif
 	if (i < 0 || i != cc)  {
 		if (i < 0) {
 			if (options & F_FLOOD && errno == ENOBUFS) {
