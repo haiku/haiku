@@ -5205,6 +5205,11 @@ vm_try_reserve_memory(size_t amount, int priority, bigtime_t timeout)
 		return B_OK;
 	}
 
+	if (amount >= (vm_page_num_pages() * B_PAGE_SIZE)) {
+		// Do not wait for something that will never happen.
+		return B_NO_MEMORY;
+	}
+
 	if (timeout <= 0)
 		return B_NO_MEMORY;
 
