@@ -1150,9 +1150,21 @@ ipv4_free(net_protocol* protocol)
 
 
 status_t
-ipv4_connect(net_protocol* protocol, const struct sockaddr* address)
+ipv4_connect(net_protocol* _protocol, const struct sockaddr* address)
 {
-	return B_ERROR;
+	ipv4_protocol* protocol = (ipv4_protocol*)_protocol;
+	RawSocket* raw = protocol->raw;
+	if (raw == NULL)
+		return B_ERROR;
+	if (address->sa_len != sizeof(struct sockaddr_in))
+		return B_BAD_VALUE;
+	if (address->sa_family != AF_INET)
+		return EAFNOSUPPORT;
+
+	memcpy(&protocol->socket->peer, address, sizeof(struct sockaddr_in));
+	sSocketModule->set_connected(protocol->socket);
+
+	return B_OK;
 }
 
 
