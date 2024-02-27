@@ -220,7 +220,7 @@ inline	uint32						_ReadReg(uint32 reg);
 		// Port management
 		uint8						fPortCount;
 
-		uint8						fIRQ;
+		uint32						fIRQ;
 		bool						fUseMSI;
 };
 

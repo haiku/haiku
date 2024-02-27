@@ -102,18 +102,21 @@ AHCIController::Init()
 	}
 
 	fIRQ = pciInfo.u.h0.interrupt_line;
+	if (fIRQ == 0xff)
+		fIRQ = 0;
+
 	if (fPCI->get_msi_count(fPCIDevice) >= 1) {
-		uint8 vector;
+		uint32 vector;
 		if (fPCI->configure_msi(fPCIDevice, 1, &vector) == B_OK
 			&& fPCI->enable_msi(fPCIDevice) == B_OK) {
-			TRACE("using MSI vector %u\n", vector);
+			TRACE("using MSI vector %" B_PRIu32 "\n", vector);
 			fIRQ = vector;
 			fUseMSI = true;
 		} else {
 			TRACE("couldn't use MSI\n");
 		}
 	}
-	if (fIRQ == 0 || fIRQ == 0xff) {
+	if (fIRQ == 0) {
 		TRACE("Error: PCI IRQ not assigned\n");
 		return B_ERROR;
 	}
@@ -215,7 +218,7 @@ AHCIController::Init()
 	TRACE("Ports Implemented Mask: %#08" B_PRIx32 " Number of Available Ports:"
 		" %d\n", fPortImplementedMask, count_bits_set(fPortImplementedMask));
 	TRACE("AHCI Version %02" B_PRIx32 "%02" B_PRIx32 ".%02" B_PRIx32 ".%02"
-		B_PRIx32 " Interrupt %u\n", fRegs->vs >> 24, (fRegs->vs >> 16) & 0xff,
+		B_PRIx32 " Interrupt %" B_PRIu32 "\n", fRegs->vs >> 24, (fRegs->vs >> 16) & 0xff,
 		(fRegs->vs >> 8) & 0xff, fRegs->vs & 0xff, fIRQ);
 
 	// setup interrupt handler

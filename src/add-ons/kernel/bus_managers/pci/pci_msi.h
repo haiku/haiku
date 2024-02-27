@@ -17,11 +17,11 @@
 typedef struct msi_info {
 	bool	msi_capable;
 	uint8	capability_offset;
-	uint8	message_count;
-	uint8	configured_count;
-	uint8	start_vector;
+	uint32	message_count;
+	uint32	configured_count;
+	uint32	start_vector;
 	uint16	control_value;
-	uint16	data_value;
+	uint32	data_value;
 	uint64	address_value;
 } msi_info;
 
@@ -30,7 +30,7 @@ typedef struct msi_info {
 typedef struct msix_info {
 	bool	msix_capable;
 	uint8	capability_offset;
-	uint8	message_count;
+	uint32	message_count;
 	uint8	table_bar;
 	uint32	table_offset;
 	area_id	table_area_id;
@@ -39,10 +39,10 @@ typedef struct msix_info {
 	uint32	pba_offset;
 	area_id	pba_area_id;
 	addr_t	pba_address;
-	uint8	configured_count;
-	uint8	start_vector;
+	uint32	configured_count;
+	uint32	start_vector;
 	uint16	control_value;
-	uint16	data_value;
+	uint32	data_value;
 	uint64	address_value;
 } msix_info;
 

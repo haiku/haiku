@@ -186,7 +186,7 @@ struct pci_module_info {
 	status_t		(*get_powerstate)(uint8 bus, uint8 device, uint8 function, uint8* state);
 	status_t		(*set_powerstate)(uint8 bus, uint8 device, uint8 function, uint8 newState);
 
-	uint8			(*get_msi_count)(
+	uint32			(*get_msi_count)(
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */
 						uint8 function);		/* function # in device */
@@ -195,8 +195,8 @@ struct pci_module_info {
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */
 						uint8 function,			/* function # in device */
-						uint8 count,			/* count of vectors desired */
-						uint8 *startVector);	/* first configured vector */
+						uint32 count,			/* count of vectors desired */
+						uint32 *startVector);	/* first configured vector */
 	status_t		(*unconfigure_msi)(
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */
@@ -211,7 +211,7 @@ struct pci_module_info {
 						uint8 device,			/* device # on bus */
 						uint8 function);		/* function # in device */
 
-	uint8			(*get_msix_count)(
+	uint32			(*get_msix_count)(
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */
 						uint8 function);		/* function # in device */
@@ -220,8 +220,8 @@ struct pci_module_info {
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */
 						uint8 function,			/* function # in device */
-						uint8 count,			/* count of vectors desired */
-						uint8 *startVector);	/* first configured vector */
+						uint32 count,			/* count of vectors desired */
+						uint32 *startVector);	/* first configured vector */
 	status_t		(*enable_msix)(
 						uint8 bus,				/* bus number */
 						uint8 device,			/* device # on bus */

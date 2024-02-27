@@ -443,13 +443,16 @@ init_interrupt_handler(intel_info &info)
 	}
 
 	// Find the right interrupt vector, using MSIs if available.
-	info.irq = 0xff;
+	info.irq = 0;
 	info.use_msi = false;
-	if (info.pci->u.h0.interrupt_pin != 0x00)
+	if (info.pci->u.h0.interrupt_pin != 0x00) {
 		info.irq = info.pci->u.h0.interrupt_line;
+		if (info.irq == 0xff)
+			info.irq = 0;
+	}
 	if (gPCI->get_msi_count(info.pci->bus,
 			info.pci->device, info.pci->function) >= 1) {
-		uint8 msiVector = 0;
+		uint32 msiVector = 0;
 		if (gPCI->configure_msi(info.pci->bus, info.pci->device,
 				info.pci->function, 1, &msiVector) == B_OK
 			&& gPCI->enable_msi(info.pci->bus, info.pci->device,
@@ -460,7 +463,7 @@ init_interrupt_handler(intel_info &info)
 		}
 	}
 
-	if (status == B_OK && info.irq != 0xff) {
+	if (status == B_OK && info.irq != 0) {
 		// we've gotten an interrupt line for us to use
 
 		info.fake_interrupts = false;

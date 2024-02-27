@@ -1153,18 +1153,26 @@ hda_hw_init(hda_controller* controller)
 	controller->irq = pciInfo.u.h0.interrupt_line;
 	controller->msi = false;
 
+	if (controller->irq == 0xff)
+		controller->irq = 0;
+
 	if ((quirks & HDA_QUIRK_NO_MSI) == 0
 			&& gPci->get_msi_count(pciInfo.bus, pciInfo.device,
 				pciInfo.function) >= 1) {
 		// Try MSI first
-		uint8 vector;
+		uint32 vector;
 		if (gPci->configure_msi(pciInfo.bus, pciInfo.device,
 			pciInfo.function, 1, &vector) == B_OK && gPci->enable_msi(
 				pciInfo.bus, pciInfo.device, pciInfo.function) == B_OK) {
-			dprintf("hda: using MSI vector %u\n", vector);
+			dprintf("hda: using MSI vector %" B_PRIu32 "\n", vector);
 			controller->irq = vector;
 			controller->msi = true;
 		}
+	}
+
+	if (controller->irq == 0) {
+		status = ENODEV;
+		goto no_irq_handler;
 	}
 
 	status = install_io_interrupt_handler(controller->irq,

@@ -24,7 +24,7 @@
 #define MSI_DELIVERY_MODE_EXT_INT		0x00000700
 
 
-void		msi_assign_interrupt_to_cpu(uint8 irq, int32 cpu);
+void		msi_assign_interrupt_to_cpu(uint32 irq, int32 cpu);
 
 
 #endif // _KERNEL_ARCH_x86_MSI_H

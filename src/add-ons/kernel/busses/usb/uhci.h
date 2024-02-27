@@ -256,7 +256,7 @@ inline	uint32						ReadReg32(uint32 reg);
 		uint8						fRootHubAddress;
 		uint8						fPortResetChange;
 
-		uint8						fIRQ;
+		uint32						fIRQ;
 		bool						fUseMSI;
 };
 

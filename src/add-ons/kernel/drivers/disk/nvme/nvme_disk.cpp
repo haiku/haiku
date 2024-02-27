@@ -229,16 +229,19 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	command &= ~(PCI_command_int_disable);
 	pci->write_pci_config(pcidev, PCI_command, 2, command);
 
-	uint8 irq = info->info.u.h0.interrupt_line;
+	uint32 irq = info->info.u.h0.interrupt_line;
+	if (irq == 0xFF)
+		irq = 0;
+
 	if (pci->get_msix_count(pcidev)) {
-		uint8 msixVector = 0;
+		uint32 msixVector = 0;
 		if (pci->configure_msix(pcidev, 1, &msixVector) == B_OK
 			&& pci->enable_msix(pcidev) == B_OK) {
 			TRACE_ALWAYS("using MSI-X\n");
 			irq = msixVector;
 		}
 	} else if (pci->get_msi_count(pcidev) >= 1) {
-		uint8 msiVector = 0;
+		uint32 msiVector = 0;
 		if (pci->configure_msi(pcidev, 1, &msiVector) == B_OK
 			&& pci->enable_msi(pcidev) == B_OK) {
 			TRACE_ALWAYS("using message signaled interrupts\n");
@@ -246,7 +249,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		}
 	}
 
-	if (irq == 0 || irq == 0xFF) {
+	if (irq == 0) {
 		TRACE_ERROR("device PCI:%d:%d:%d was assigned an invalid IRQ\n",
 			info->info.bus, info->info.device, info->info.function);
 		info->polling = 1;

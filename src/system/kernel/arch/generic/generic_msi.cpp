@@ -25,15 +25,14 @@ msi_supported()
 
 
 status_t
-msi_allocate_vectors(uint8 count, uint8 *startVector, uint64 *address, uint16 *data)
+msi_allocate_vectors(uint32 count, uint32 *startVector, uint64 *address, uint32 *data)
 {
 	return sMSIInterface->AllocateVectors(count, *startVector, *address, *data);
 }
 
 
 void
-msi_free_vectors(uint8 count, uint8 startVector)
+msi_free_vectors(uint32 count, uint32 startVector)
 {
 	sMSIInterface->FreeVectors(count, startVector);
 }
-

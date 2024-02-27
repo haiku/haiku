@@ -13,8 +13,8 @@
 class MSIInterface {
 public:
 	virtual status_t AllocateVectors(
-		uint8 count, uint8& startVector, uint64& address, uint16& data) = 0;
-	virtual void FreeVectors(uint8 count, uint8 startVector) = 0;
+		uint32 count, uint32& startVector, uint64& address, uint32& data) = 0;
+	virtual void FreeVectors(uint32 count, uint32 startVector) = 0;
 };
 
 
@@ -23,9 +23,9 @@ void msi_set_interface(MSIInterface* interface);
 #endif
 
 bool		msi_supported();
-status_t	msi_allocate_vectors(uint8 count, uint8 *startVector,
-				uint64 *address, uint16 *data);
-void		msi_free_vectors(uint8 count, uint8 startVector);
+status_t	msi_allocate_vectors(uint32 count, uint32 *startVector,
+				uint64 *address, uint32 *data);
+void		msi_free_vectors(uint32 count, uint32 startVector);
 
 #ifdef __cplusplus
 }

@@ -53,7 +53,7 @@ acpi_status pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 
 struct pch_i2c_crs {
 	uint16	i2c_addr;
-	uint8	irq;
+	uint32	irq;
     uint8	irq_triggering;
 	uint8	irq_polarity;
 	uint8	irq_shareable;
@@ -73,7 +73,7 @@ typedef enum {
 typedef struct {
 	phys_addr_t base_addr;
 	uint64 map_size;
-	uint8 irq;
+	uint32 irq;
 	i2c_bus sim;
 
 	device_node* node;

@@ -402,7 +402,7 @@ init_bus(device_node* node, void** bus_cookie)
 	gDeviceManager->put_node(parent);
 
 	TRACE_ALWAYS("init_bus() addr 0x%" B_PRIxPHYSADDR " size 0x%" B_PRIx64
-		" irq 0x%x\n", bus->base_addr, bus->map_size, bus->irq);
+		" irq 0x%" B_PRIx32 "\n", bus->base_addr, bus->map_size, bus->irq);
 
 	bus->registersArea = map_physical_memory("PCHI2C memory mapped registers",
 		bus->base_addr, bus->map_size, B_ANY_KERNEL_ADDRESS,

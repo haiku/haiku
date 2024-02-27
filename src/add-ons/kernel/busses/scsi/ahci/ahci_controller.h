@@ -51,7 +51,7 @@ private:
 	int						fCommandSlotCount;
 	int						fPortCount;
 	uint32					fPortImplementedMask;
-	uint8					fIRQ;
+	uint32					fIRQ;
 	bool					fUseMSI;
 	AHCIPort *				fPort[32];
 

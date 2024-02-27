@@ -140,13 +140,13 @@ public:
 								uint8 device, uint8 function,
 								uint8 newInterruptLineValue);
 
-			uint8			GetMSICount(PCIDev *device);
-			status_t		ConfigureMSI(PCIDev *device, uint8 count, uint8 *startVector);
+			uint32			GetMSICount(PCIDev *device);
+			status_t		ConfigureMSI(PCIDev *device, uint32 count, uint32 *startVector);
 			status_t		UnconfigureMSI(PCIDev *device);
 			status_t		EnableMSI(PCIDev *device);
 			status_t		DisableMSI(PCIDev *device);
-			uint8			GetMSIXCount(PCIDev *device);
-			status_t		ConfigureMSIX(PCIDev *device, uint8 count, uint8 *startVector);
+			uint32			GetMSIXCount(PCIDev *device);
+			status_t		ConfigureMSIX(PCIDev *device, uint32 count, uint32 *startVector);
 			status_t		EnableMSIX(PCIDev *device);
 
 private:

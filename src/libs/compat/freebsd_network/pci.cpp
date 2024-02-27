@@ -265,7 +265,7 @@ int
 pci_alloc_msi(device_t dev, int *count)
 {
 	pci_info* info = get_device_pci_info(dev);
-	uint8 startVector = 0;
+	uint32 startVector = 0;
 	if (gPci->configure_msi(info->bus, info->device, info->function, *count,
 			&startVector) != B_OK) {
 		return ENODEV;
@@ -318,7 +318,7 @@ int
 pci_alloc_msix(device_t dev, int *count)
 {
 	pci_info* info = get_device_pci_info(dev);
-	uint8 startVector = 0;
+	uint32 startVector = 0;
 	if (gPci->configure_msix(info->bus, info->device, info->function, *count,
 			&startVector) != B_OK) {
 		return ENODEV;

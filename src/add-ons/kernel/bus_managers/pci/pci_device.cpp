@@ -134,7 +134,7 @@ pci_device_module_info gPCIDeviceModule = {
 	.get_msi_count = [](pci_device *device) {
 		return gPCI->GetMSICount(device->device);
 	},
-	.configure_msi = [](pci_device *device, uint8 count, uint8 *startVector) {
+	.configure_msi = [](pci_device *device, uint32 count, uint32 *startVector) {
 		return gPCI->ConfigureMSI(device->device, count, startVector);
 	},
 	.unconfigure_msi = [](pci_device *device) {
@@ -149,7 +149,7 @@ pci_device_module_info gPCIDeviceModule = {
 	.get_msix_count = [](pci_device *device) {
 		return gPCI->GetMSIXCount(device->device);
 	},
-	.configure_msix = [](pci_device *device, uint8 count, uint8 *startVector) {
+	.configure_msix = [](pci_device *device, uint32 count, uint32 *startVector) {
 		return gPCI->ConfigureMSIX(device->device, count, startVector);
 	},
 	.enable_msix = [](pci_device *device) {

@@ -165,9 +165,9 @@ public:
 
 			status_t			Init(PciDbiRegs volatile* dbiRegs, int32 msiIrq);
 
-			status_t			AllocateVectors(uint8 count, uint8& startVector, uint64& address,
-									uint16& data) final;
-			void				FreeVectors(uint8 count, uint8 startVector) final;
+			status_t			AllocateVectors(uint32 count, uint32& startVector, uint64& address,
+									uint32& data) final;
+			void				FreeVectors(uint32 count, uint32 startVector) final;
 
 
 private:

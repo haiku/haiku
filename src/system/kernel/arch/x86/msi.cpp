@@ -14,7 +14,7 @@
 
 struct MSIConfiguration {
 	uint64*	fAddress;
-	uint16* fData;
+	uint32* fData;
 };
 
 static MSIConfiguration sMSIConfigurations[NUM_IO_VECTORS];
@@ -45,8 +45,8 @@ msi_supported()
 
 
 status_t
-msi_allocate_vectors(uint8 count, uint8 *startVector, uint64 *address,
-	uint16 *data)
+msi_allocate_vectors(uint32 count, uint32 *startVector, uint64 *address,
+	uint32 *data)
 {
 	if (!sMSISupported)
 		return B_UNSUPPORTED;
@@ -66,27 +66,27 @@ msi_allocate_vectors(uint8 count, uint8 *startVector, uint64 *address,
 	sMSIConfigurations[vector].fData = data;
 	x86_set_irq_source(vector, IRQ_SOURCE_MSI);
 
-	*startVector = (uint8)vector;
+	*startVector = (uint32)vector;
 	*address = MSI_ADDRESS_BASE | (sBootCPUAPICId << MSI_DESTINATION_ID_SHIFT)
 		| MSI_NO_REDIRECTION | MSI_DESTINATION_MODE_PHYSICAL;
 	*data = MSI_TRIGGER_MODE_EDGE | MSI_DELIVERY_MODE_FIXED
 		| ((uint16)vector + ARCH_INTERRUPT_BASE);
 
-	dprintf("msi_allocate_vectors: allocated %u vectors starting from %u\n",
+	dprintf("msi_allocate_vectors: allocated %" B_PRIu32 " vectors starting from %" B_PRIu32 "\n",
 		count, *startVector);
 	return B_OK;
 }
 
 
 void
-msi_free_vectors(uint8 count, uint8 startVector)
+msi_free_vectors(uint32 count, uint32 startVector)
 {
 	if (!sMSISupported) {
 		panic("trying to free msi vectors but msi not supported\n");
 		return;
 	}
 
-	dprintf("msi_free_vectors: freeing %u vectors starting from %u\n", count,
+	dprintf("msi_free_vectors: freeing %" B_PRIu32 " vectors starting from %" B_PRIu32 "\n", count,
 		startVector);
 
 	free_io_interrupt_vectors(count, startVector);
@@ -94,7 +94,7 @@ msi_free_vectors(uint8 count, uint8 startVector)
 
 
 void
-msi_assign_interrupt_to_cpu(uint8 irq, int32 cpu)
+msi_assign_interrupt_to_cpu(uint32 irq, int32 cpu)
 {
 	uint32 apic_id = x86_get_cpu_apic_id(cpu);
 

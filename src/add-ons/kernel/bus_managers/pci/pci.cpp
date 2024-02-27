@@ -1917,7 +1917,7 @@ PCI::SetPowerstate(uint8 domain, uint8 bus, uint8 _device, uint8 function,
 
 //#pragma mark - MSI
 
-uint8
+uint32
 PCI::GetMSICount(PCIDev *device)
 {
 	if (!msi_supported())
@@ -1932,7 +1932,7 @@ PCI::GetMSICount(PCIDev *device)
 
 
 status_t
-PCI::ConfigureMSI(PCIDev *device, uint8 count, uint8 *startVector)
+PCI::ConfigureMSI(PCIDev *device, uint32 count, uint32 *startVector)
 {
 	if (!msi_supported())
 		return B_UNSUPPORTED;
@@ -2070,7 +2070,7 @@ PCI::DisableMSI(PCIDev *device)
 }
 
 
-uint8
+uint32
 PCI::GetMSIXCount(PCIDev *device)
 {
 	if (!msi_supported())
@@ -2085,7 +2085,7 @@ PCI::GetMSIXCount(PCIDev *device)
 
 
 status_t
-PCI::ConfigureMSIX(PCIDev *device, uint8 count, uint8 *startVector)
+PCI::ConfigureMSIX(PCIDev *device, uint32 count, uint32 *startVector)
 {
 	if (!msi_supported())
 		return B_UNSUPPORTED;
@@ -2170,7 +2170,7 @@ PCI::ConfigureMSIX(PCIDev *device, uint8 count, uint8 *startVector)
 
 	info->configured_count = count;
 	*startVector = info->start_vector;
-	dprintf("msix configured for %d vectors\n", count);
+	dprintf("msix configured for %" B_PRIu32 " vectors\n", count);
 	return B_OK;
 }
 
