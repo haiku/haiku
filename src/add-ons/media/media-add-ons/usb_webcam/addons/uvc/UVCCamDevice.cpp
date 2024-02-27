@@ -93,7 +93,7 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon& _addon, BUSBDevice* _device)
 
 			if (interface->Class() == CC_VIDEO && interface->Subclass()
 				== SC_VIDEOCONTROL) {
-				printf("UVCCamDevice: (%lu,%lu): Found Video Control "
+				printf("UVCCamDevice: (%" B_PRIu32 ",%" B_PRIu32 "): Found Video Control "
 					"interface.\n", i, j);
 
 				// look for class specific interface descriptors and parse them
@@ -116,7 +116,7 @@ UVCCamDevice::UVCCamDevice(CamDeviceAddon& _addon, BUSBDevice* _device)
 				fInitStatus = B_OK;
 			} else if (interface->Class() == CC_VIDEO && interface->Subclass()
 				== SC_VIDEOSTREAMING) {
-				printf("UVCCamDevice: (%lu,%lu): Found Video Streaming "
+				printf("UVCCamDevice: (%" B_PRIu32 ",%" B_PRIu32 "): Found Video Streaming "
 					"interface.\n", i, j);
 
 				// look for class specific interface descriptors and parse them
@@ -229,19 +229,19 @@ UVCCamDevice::_ParseVideoStreaming(const usbvc_class_descriptor* _descriptor,
 				"fixedframerate=%s\n", descriptor->frameIndex,
 				(descriptor->capabilities & 1) ? "yes" : "no",
 				(descriptor->capabilities & 2) ? "yes" : "no");
-			printf("\twidth=%u,height=%u,min/max bitrate=%lu/%lu, maxbuf=%lu\n",
+			printf("\twidth=%u,height=%u,min/max bitrate=%" B_PRIu32 "/%" B_PRIu32 ", maxbuf=%" B_PRIu32 "\n",
 				descriptor->width, descriptor->height,
 				descriptor->minBitRate, descriptor->maxBitRate,
 				descriptor->maxVideoFrameBufferSize);
-			printf("\tdefault frame interval: %lu, #intervals(0=cont): %d\n",
+			printf("\tdefault frame interval: %" B_PRIu32 ", #intervals(0=cont): %d\n",
 				descriptor->defaultFrameInterval, descriptor->frameIntervalType);
 			if (descriptor->frameIntervalType == 0) {
-				printf("min/max frame interval=%lu/%lu, step=%lu\n",
+				printf("min/max frame interval=%" B_PRIu32 "/%" B_PRIu32 ", step=%" B_PRIu32 "\n",
 					descriptor->continuous.minFrameInterval,
 					descriptor->continuous.maxFrameInterval,
 					descriptor->continuous.frameIntervalStep);
 			} else for (uint8 i = 0; i < descriptor->frameIntervalType; i++) {
-				printf("\tdiscrete frame interval: %lu\n",
+				printf("\tdiscrete frame interval: %" B_PRIu32 "\n",
 					descriptor->discreteFrameIntervals[i]);
 			}
 			break;
@@ -557,7 +557,7 @@ UVCCamDevice::StopTransfer()
 status_t
 UVCCamDevice::SuggestVideoFrame(uint32& width, uint32& height)
 {
-	printf("UVCCamDevice::SuggestVideoFrame(%ld, %ld)\n", width, height);
+	printf("UVCCamDevice::SuggestVideoFrame(%" B_PRIu32 ", %" B_PRIu32 ")\n", width, height);
 	// As in AcceptVideoFrame(), the suggestion should probably just be the
 	// first advertised uncompressed format, but current applications prefer
 	// 320x240, so this is tried first here as a suggestion.
@@ -576,7 +576,7 @@ UVCCamDevice::SuggestVideoFrame(uint32& width, uint32& height)
 status_t
 UVCCamDevice::AcceptVideoFrame(uint32& width, uint32& height)
 {
-	printf("UVCCamDevice::AcceptVideoFrame(%ld, %ld)\n", width, height);
+	printf("UVCCamDevice::AcceptVideoFrame(%" B_PRIu32 ", %" B_PRIu32 ")\n", width, height);
 	if (width <= 0 || height <= 0) {
 		// Uncomment below when applications support dimensions other than 320x240
 		// This code selects the first listed available uncompressed frame format
@@ -613,7 +613,7 @@ status_t
 UVCCamDevice::_ProbeCommitFormat()
 {
 	printf("UVCCamDevice::_ProbeCommitFormat()\n");
-	printf("UVCCamDevice::fStreamingIndex = %ld\n", fStreamingIndex);
+	printf("UVCCamDevice::fStreamingIndex = %" B_PRIu32 "\n", fStreamingIndex);
 
 	/*
 	char error;
@@ -685,8 +685,8 @@ UVCCamDevice::_ProbeCommitFormat()
 
 	fMaxVideoFrameSize = response.maxVideoFrameSize;
 	fMaxPayloadTransferSize = response.maxPayloadTransferSize;
-	printf("usbvc_probecommit setup done maxVideoFrameSize:%ld"
-		" maxPayloadTransferSize:%ld\n", fMaxVideoFrameSize,
+	printf("usbvc_probecommit setup done maxVideoFrameSize:%" B_PRIu32 ""
+		" maxPayloadTransferSize:%" B_PRIu32 "\n", fMaxVideoFrameSize,
 		fMaxPayloadTransferSize);
 
 	printf("UVCCamDevice::_ProbeCommitFormat()\n --> SUCCESSFUL\n");
@@ -730,7 +730,7 @@ UVCCamDevice::_SelectBestAlternate()
 		return B_ERROR;
 	}
 
-	printf("UVCCamDevice::_SelectBestAlternate() %ld\n", bestBandwidth);
+	printf("UVCCamDevice::_SelectBestAlternate() %" B_PRIu32 "\n", bestBandwidth);
 	if (((BUSBInterface*)streaming)->SetAlternate(alternateIndex) != B_OK) {
 		fprintf(stderr, "UVCCamDevice::_SelectBestAlternate()"
 			" selecting alternate failed\n");
@@ -768,7 +768,6 @@ UVCCamDevice::_AddProcessingParameter(BParameterGroup* group,
 	int32 index, const usbvc_processing_unit_descriptor* descriptor)
 {
 	BParameterGroup* subgroup;
-	BContinuousParameter* p;
 	uint16 wValue = 0; // Control Selector
 	float minValue = 0.0;
 	float maxValue = 100.0;
@@ -854,7 +853,7 @@ UVCCamDevice::_AddProcessingParameter(BParameterGroup* group,
 					B_ENABLE);
 			} else { // Range of values
 				fBinaryBacklightCompensation = false;
-				p = subgroup->MakeContinuousParameter(index + 11,
+				subgroup->MakeContinuousParameter(index + 11,
 				B_MEDIA_RAW_VIDEO, "Backlight Compensation",
 				B_GAIN, "", minValue, maxValue, 1.0 / (maxValue - minValue));
 			}
@@ -873,7 +872,7 @@ UVCCamDevice::_AddProcessingParameter(BParameterGroup* group,
 				fPowerlineFrequency = data;
 			}
 			subgroup = group->MakeGroup("Power Line Frequency");
-			p = subgroup->MakeContinuousParameter(index + 13,
+			subgroup->MakeContinuousParameter(index + 13,
 				B_MEDIA_RAW_VIDEO, "Frequency", B_GAIN, "", 0, 60.0, 1.0 / 60.0);
 		}
 		// TODO Determine whether controls apply to these
@@ -926,7 +925,7 @@ UVCCamDevice::_AddParameter(BParameterGroup* group,
 	}
 
 	*subgroup = group->MakeGroup(name);
-	BContinuousParameter* p = (*subgroup)->MakeContinuousParameter(index,
+	(*subgroup)->MakeContinuousParameter(index,
 		B_MEDIA_RAW_VIDEO, name, B_GAIN, "", minValue, maxValue,
 		1.0 / (maxValue - minValue));
 	return currValue;
@@ -996,7 +995,7 @@ status_t
 UVCCamDevice::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 	size_t* size)
 {
-	printf("UVCCAmDevice::GetParameterValue(%ld)\n", id - fFirstParameterID);
+	printf("UVCCAmDevice::GetParameterValue(%" B_PRId32 ")\n", id - fFirstParameterID);
 	float* currValue;
 	int* currValueInt;
 	int16 data;
@@ -1116,7 +1115,7 @@ status_t
 UVCCamDevice::SetParameterValue(int32 id, bigtime_t when, const void* value,
 	size_t size)
 {
-	printf("UVCCamDevice::SetParameterValue(%ld)\n", id - fFirstParameterID);
+	printf("UVCCamDevice::SetParameterValue(%" B_PRId32 ")\n", id - fFirstParameterID);
 	switch (id - fFirstParameterID) {
 		case 0:
 			// debug_printf("\tBrightness:\n");
@@ -1239,14 +1238,14 @@ UVCCamDevice::FillFrameBuffer(BBuffer* buffer, bigtime_t* stamp)
 	memset(buffer->Data(), 0, buffer->SizeAvailable());
 	status_t err = fDeframer->WaitFrame(2000000);
 	if (err < B_OK) {
-		fprintf(stderr, "WaitFrame: %lx\n", err);
+		fprintf(stderr, "WaitFrame: %" B_PRIx32 "\n", err);
 		return err;
 	}
 
 	CamFrame* f;
 	err = fDeframer->GetFrame(&f, stamp);
 	if (err < B_OK) {
-		fprintf(stderr, "GetFrame: %lx\n", err);
+		fprintf(stderr, "GetFrame: %" B_PRIx32 "\n", err);
 		return err;
 	}
 
