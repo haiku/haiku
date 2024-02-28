@@ -1861,14 +1861,14 @@ FlatControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 
 		// draw a line on the left of the popup frame
 		rgb_color bevelShadowColor = tint_color(indicatorColor, 1.1);
-		if (dark)
+		if (base.IsDark())
 			bevelShadowColor = tint_color(indicatorColor, 0.9);
 		view->SetHighColor(bevelShadowColor);
-		
+
 		BPoint leftTopCorner(floorf(rightRect.left - spacing), floorf(rightRect.top - spacing));
-		BPoint leftBottomCorner(floorf(rightRect.left - spacing), 
+		BPoint leftBottomCorner(floorf(rightRect.left - spacing),
 			floorf(rightRect.bottom + spacing));
-		
+
 		for (float i = 0; i < spacing; i++)
 			view->StrokeLine(leftTopCorner + BPoint(i, 0), leftBottomCorner + BPoint(i, 0));
 
