@@ -29,7 +29,7 @@ AddFilesToPackage add-ons kernel busses ata
 	: generic_ide_pci it8211 legacy_sata silicon_image_3112 highpoint_ide_pci ide_isa@x86 ;
 
 AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
-AddFilesToPackage add-ons kernel busses mmc : sdhci_pci ;
+AddFilesToPackage add-ons kernel busses mmc : sdhci ;
 AddFilesToPackage add-ons kernel busses pci : 
 	<pci>designware@riscv64 <pci>ecam@riscv64,arm,arm64 <pci>x86@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses random : ccp_rng@x86,x86_64 virtio_rng ;
@@ -202,7 +202,7 @@ AddBootModuleSymlinksToPackage
 	<pci>designware@riscv64 <pci>ecam@riscv64,arm,arm64 <pci>x86@x86,x86_64
 	fdt@riscv64,arm,arm64
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
-	sdhci_pci
+	sdhci
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
 	virtio virtio_block virtio_mmio@riscv64,arm,arm64 virtio_pci virtio_scsi
 ;
