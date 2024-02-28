@@ -1378,13 +1378,13 @@ CalcView::_Colorize()
 {
 	if (fHasCustomBaseColor) {
 		// keypad text color
-		if (fBaseColor.Brightness() > 100)
+		if (fBaseColor.IsLight())
 			fButtonTextColor = (rgb_color){ 0, 0, 0, 255 };
 		else
 			fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
 
 		// expression text color
-		if (fExpressionBGColor.Brightness() > 100)
+		if (fExpressionBGColor.IsLight())
 			fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
 		else
 			fExpressionTextColor = (rgb_color){ 255, 255, 255, 255 };

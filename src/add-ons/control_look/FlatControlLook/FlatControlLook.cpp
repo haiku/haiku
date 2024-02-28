@@ -366,7 +366,6 @@ FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
-	bool dark = (base.Brightness() < 127);
 	rgb_color arrowColor;
 
 	bool isEnabled = (flags & B_DISABLED) == 0;
@@ -374,13 +373,13 @@ FlatControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	if (isEnabled) {
 		arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.6);
 		// if the base color is too dark, then lets make it lighter
-		if (dark) {
+		if (base.IsDark()) {
 			arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.3);;
 		}
 	} else {
 		arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.4);
 		// if the base color is too dark, then lets make it lighter
-		if (dark) {
+		if (base.IsDark()) {
 			arrowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.5);;
 		}
 	}
@@ -718,13 +717,8 @@ FlatControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 rgb_color
 FlatControlLook::SliderBarColor(const rgb_color& base)
 {
-	rgb_color customColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 1.05);
-	// if the color BACKGROUND used is too dark, then make it lighter using the
-	// same as B_CONTROL_TEXT_COLOR
-	if (base.Brightness() < 127)
-		customColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.95);
-
-	return customColor;
+	return base.IsLight() ? tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 1.05) :
+		tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.95);
 }
 
 
@@ -936,11 +930,11 @@ FlatControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRe
 	// figure out frame color
 	rgb_color frameLightColor;
 	rgb_color frameShadowColor;
-	rgb_color shadowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.5);
+	rgb_color shadowColor;
 
-	// If the color BACKGROUND used is too dark, then make it lighter using the same as
-	// B_CONTROL_TEXT_COLOR
-	if (base.Brightness() < 127)
+	if (base.IsLight())
+		shadowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 0.5);
+	else
 		shadowColor = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.55);
 
 	if ((flags & B_FOCUSED) != 0) {
@@ -1339,7 +1333,7 @@ FlatControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	dark1BorderColor = tint_color(customColor2, 0.5);
 
 	if ((flags & B_DISABLED) == 0 && (flags & B_FOCUSED) != 0) {
-		if (base.Brightness() < 127)
+		if (base.IsDark())
 			documentBackground = tint_color(documentBackground, 0.9);
 		else
 			documentBackground = tint_color(documentBackground, 1.5);
@@ -1370,8 +1364,7 @@ FlatControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRec
 {
 	rgb_color frameColor = tint_color(base, 1.1);
 
-	// if the base color is too dark, then lets make it lighter
-	if (base.Brightness() < 127)
+	if (base.IsDark())
 		frameColor = tint_color(base, 0.95);
 
 	// Draws only one flat frame:
@@ -1427,9 +1420,7 @@ FlatControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	rgb_color customColor = background; // custom color for borders
 	rgb_color customColor2 = tint_color(background, 1.3);
 
-	// if the color BACKGROUND used is too dark, then make it lighter using
-	// the same as B_CONTROL_TEXT_COLOR
-	if (base.Brightness() < 127)
+	if (base.IsDark())
 		customColor2 = tint_color(ui_color(B_CONTROL_TEXT_COLOR), 1.5);
 
 
@@ -1842,10 +1833,12 @@ FlatControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 	if (!ShouldDraw(view, rect, updateRect))
 		return;
 
-	bool dark = (base.Brightness() < 127);
-	rgb_color indicatorColor = tint_color(base, 1.05);
-	if (dark)
+	rgb_color indicatorColor;
+
+	if (base.IsDark())
 		indicatorColor = tint_color(base, 0.95);
+	else
+		indicatorColor = tint_color(base, 1.05);
 
 	if (popupIndicator) {
 		const float indicatorWidth = ComposeSpacing(kButtonPopUpIndicatorWidth);

@@ -376,7 +376,7 @@ URLInputGroup::URLTextView::InsertText(const char* inText, int32 inLength,
 	GetFont(&font);
 	const rgb_color hostColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	const rgb_color urlColor = tint_color(hostColor,
-		(hostColor.Brightness() < 128 ? B_LIGHTEN_1_TINT : B_DARKEN_1_TINT));
+		(hostColor.IsDark() ? B_LIGHTEN_1_TINT : B_DARKEN_1_TINT));
 	if (baseUrlStart > 0)
 		SetFontAndColor(0, baseUrlStart, &font, B_FONT_ALL, &urlColor);
 	if (baseUrlEnd > baseUrlStart) {

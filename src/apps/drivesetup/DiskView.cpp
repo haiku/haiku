@@ -546,7 +546,7 @@ DiskView::Draw(BRect updateRect)
 
 	FillRoundRect(messageBounds, 4, 4, B_SOLID_LOW);
 	rgb_color color = LowColor();
-	if (color.Brightness() > 100)
+	if (color.IsLight())
 		color = tint_color(color, B_DARKEN_4_TINT);
 	else
 		color = tint_color(color, B_LIGHTEN_2_TINT);

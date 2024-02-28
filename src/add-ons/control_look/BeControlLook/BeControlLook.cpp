@@ -1952,7 +1952,7 @@ BeControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 
 	rgb_color lightColor;
 	rgb_color shadowColor;
-	if (base.Brightness() > 128) {
+	if (base.IsLight()) {
 		lightColor = tint_color(base, B_DARKEN_2_TINT);
 		shadowColor = tint_color(base, B_LIGHTEN_2_TINT);
 	} else {
@@ -2221,7 +2221,7 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 	if (isDesktop) {
 		// enforce proper use of desktop label colors
-		if (low.Brightness() < 100) {
+		if (low.IsDark()) {
 			if (textColor == NULL)
 				color = make_color(255, 255, 255);
 
@@ -2259,7 +2259,7 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 			view->SetDrawingMode(B_OP_ALPHA);
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 			// Draw glow or outline
-			if (glowColor.Brightness() > 128) {
+			if (glowColor.IsLight()) {
 				font.SetFalseBoldWidth(2.0);
 				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 

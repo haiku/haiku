@@ -7,7 +7,7 @@
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/GraphicsDefs.h	hrev54374
+ *		headers/os/interface/GraphicsDefs.h	hrev57597
  *		src/kits/interface/GraphicsDefs.cpp	hrev49977
  */
 
@@ -202,14 +202,45 @@
 	\fn int32 rgb_color::Brightness() const
 	\brief Calculates a value representing the brightness of this color.
 
-	This method uses a fast algorithm to calculate the brightness in Luma of
-	the color.
+	This method calculates the perceptual brightness of a color.
 
-	\return A value representing the brightness.
+	\return A value representing the brightness. (0-255)
 
 	\since Haiku R1
 */
 
+/*!
+	\fn bool rgb_color::IsLight() const
+	\brief Determines if the color is light.
+
+	A color is considered 'light' if its Brightness() is > 127.
+
+	\since Haiku R1
+*/
+
+/*!
+	\fn bool rgb_color::IsDark() const
+	\brief Determines if the color is dark.
+
+	A color is considered 'dark' if its Brightness() is <= 127.
+
+	\since Haiku R1
+*/
+
+/*!
+	\fn static int32 rgb_color::Contrast(rgb_color colorA, rgb_color colorB)
+	\brief Calculates the contrast between two colors.
+
+	This method compares the Brightness of colorA and colorB and returns
+	the Contrast that is between them.
+
+	For example this can used to make sure a color combination is legible
+	on a specifc background.
+
+	\return A value representing the Contrast. (0-255)
+
+	\since Haiku R1
+*/
 
 /*!
 	\fn rgb_color make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255)

@@ -1345,7 +1345,7 @@ TBox::Draw(BRect update)
 	rgb_color veryDarkGray = {128, 128, 128, 255};
 	rgb_color darkGray = tint_color(panelColor, B_DARKEN_1_TINT);
 
-	if (panelColor.Brightness() < 100) {
+	if (panelColor.IsDark()) {
 		standardGray = tint_color(panelColor, 0.8);
 		darkGray = tint_color(panelColor, 0.85);
 		white = make_color(200, 200, 200, 255);
@@ -1435,7 +1435,7 @@ TBox::DrawIconScrollers(bool force)
 	rgb_color backgroundColor;
 	rgb_color dark;
 
-	if (panelColor.Brightness() > 100) {
+	if (panelColor.IsLight()) {
 		backgroundColor = tint_color(panelColor, B_DARKEN_1_TINT);
 		dark = tint_color(backgroundColor, B_DARKEN_3_TINT);
 	} else {
@@ -1517,7 +1517,7 @@ TBox::DrawWindowScrollers(bool force)
 	rgb_color backgroundColor;
 	rgb_color dark;
 
-	if (panelColor.Brightness() > 100) {
+	if (panelColor.IsLight()) {
 		backgroundColor = tint_color(panelColor, B_DARKEN_1_TINT);
 		dark = tint_color(backgroundColor, B_DARKEN_2_TINT);
 	} else {
@@ -1940,8 +1940,7 @@ TIconView::AnimateIcon(const BBitmap* start, const BBitmap* end)
 	fOffBitmap->Lock();
 
 	rgb_color bg = ui_color(B_PANEL_BACKGROUND_COLOR);
-	fOffView->SetHighColor(tint_color(bg, bg.Brightness() > 100
-		? B_DARKEN_1_TINT : 0.85));
+	fOffView->SetHighColor(tint_color(bg, bg.IsLight() ? B_DARKEN_1_TINT : 0.85));
 
 	// animate start icon
 	for (int i = 0; i < 2; i++) {
@@ -2093,7 +2092,7 @@ TIconView::DrawTeams(BRect update)
 	float tint = B_NO_TINT;
 	rgb_color panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	if (panelColor.Brightness() < 100)
+	if (panelColor.IsDark())
 		tint = 0.85;
 	else
 		tint = B_DARKEN_1_TINT;

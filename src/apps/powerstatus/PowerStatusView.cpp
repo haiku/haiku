@@ -181,7 +181,7 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 	lightningRect.left = rect.left;
 	lightningRect.InsetBy(0.0f, 5.0f * rect.Height() / 16);
 
-	if (view->LowColor().Brightness() > 100)
+	if (view->LowColor().IsLight())
 		view->SetHighColor(0, 0, 0);
 	else
 		view->SetHighColor(128, 128, 128);
@@ -219,7 +219,7 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 	if (fHasBattery) {
 		// draw unfilled area
 		rgb_color unfilledColor = make_color(0x4c, 0x4c, 0x4c);
-		if (view->LowColor().Brightness() < 128) {
+		if (view->LowColor().IsDark()) {
 			unfilledColor.red = 256 - unfilledColor.red;
 			unfilledColor.green = 256 - unfilledColor.green;
 			unfilledColor.blue = 256 - unfilledColor.blue;

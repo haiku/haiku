@@ -2232,7 +2232,7 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 
 	if (isDesktop) {
 		// enforce proper use of desktop label colors
-		if (low.Brightness() < 100) {
+		if (low.IsDark()) {
 			if (textColor == NULL)
 				color = make_color(255, 255, 255);
 
@@ -2270,7 +2270,7 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 			view->SetDrawingMode(B_OP_ALPHA);
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 			// Draw glow or outline
-			if (glowColor.Brightness() > 128) {
+			if (glowColor.IsLight()) {
 				font.SetFalseBoldWidth(2.0);
 				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 

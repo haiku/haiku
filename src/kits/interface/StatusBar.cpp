@@ -323,7 +323,7 @@ BStatusBar::Draw(BRect updateRect)
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 
 		if (backgroundColor != ui_color(B_PANEL_BACKGROUND_COLOR)) {
-			if (backgroundColor.Brightness() > 100)
+			if (backgroundColor.IsLight())
 				textColor = make_color(0, 0, 0, 255);
 			else
 				textColor = make_color(255, 255, 255, 255);
