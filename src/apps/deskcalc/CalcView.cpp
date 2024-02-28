@@ -193,12 +193,11 @@ CalcView::Instantiate(BMessage* archive)
 CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	:
 	BView(frame, "DeskCalc", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
+
 	fColumns(5),
 	fRows(4),
 
 	fBaseColor(rgbBaseColor),
-	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
-
 	fHasCustomBaseColor(rgbBaseColor != ui_color(B_PANEL_BACKGROUND_COLOR)),
 
 	fWidth(1),
@@ -227,11 +226,11 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 CalcView::CalcView(BMessage* archive)
 	:
 	BView(archive),
+
 	fColumns(5),
 	fRows(4),
 
 	fBaseColor(ui_color(B_PANEL_BACKGROUND_COLOR)),
-	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
 	fHasCustomBaseColor(false),
 
@@ -293,12 +292,14 @@ CalcView::AttachedToWindow()
 void
 CalcView::MessageReceived(BMessage* message)
 {
-	if (message->what == B_COLORS_UPDATED && !fHasCustomBaseColor) {
+	if (message->what == B_COLORS_UPDATED) {
 		const char* panelBgColorName = ui_color_name(B_PANEL_BACKGROUND_COLOR);
-		if (message->HasColor(panelBgColorName)) {
+		if (message->HasColor(panelBgColorName) && !fHasCustomBaseColor) {
 			fBaseColor = message->GetColor(panelBgColorName, fBaseColor);
 			_Colorize();
 		}
+		if (message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR)))
+			_Colorize();
 
 		return;
 	}
@@ -906,11 +907,6 @@ CalcView::SaveSettings(BMessage* archive) const
 			&fBaseColor, sizeof(rgb_color));
 	}
 
-	if (ret == B_OK) {
-		ret = archive->AddData("rgbDisplay", B_RGB_COLOR_TYPE,
-			&fExpressionBGColor, sizeof(rgb_color));
-	}
-
 	// record current options
 	if (ret == B_OK)
 		ret = fOptions->SaveSettings(archive);
@@ -1181,15 +1177,6 @@ CalcView::_LoadSettings(BMessage* archive)
 	} else
 		fBaseColor = *color;
 
-	if (archive->FindData("rgbDisplay", B_RGB_COLOR_TYPE,
-			(const void**)&color, &size) < B_OK
-		|| size != sizeof(rgb_color)) {
-		fExpressionBGColor = (rgb_color){ 0, 0, 0, 255 };
-		puts("Missing rgbBaseColor from CalcView archive!\n");
-	} else {
-		fExpressionBGColor = *color;
-	}
-
 	fHasCustomBaseColor = fBaseColor != ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	// load options
@@ -1376,21 +1363,14 @@ CalcView::_FlashKey(int32 key, uint32 flashFlags)
 void
 CalcView::_Colorize()
 {
-	if (fHasCustomBaseColor) {
-		// keypad text color
+	rgb_color panelColor = ui_color(B_PANEL_TEXT_COLOR);
+	if (rgb_color::Contrast(fBaseColor, panelColor) > 100)
+		fButtonTextColor = panelColor;
+	else {
 		if (fBaseColor.IsLight())
 			fButtonTextColor = (rgb_color){ 0, 0, 0, 255 };
 		else
 			fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
-
-		// expression text color
-		if (fExpressionBGColor.IsLight())
-			fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
-		else
-			fExpressionTextColor = (rgb_color){ 255, 255, 255, 255 };
-	} else {
-		fExpressionTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-		fButtonTextColor = ui_color(B_PANEL_TEXT_COLOR);
 	}
 }
 

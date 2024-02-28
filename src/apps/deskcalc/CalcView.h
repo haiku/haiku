@@ -123,8 +123,6 @@ class _EXPORT CalcView : public BView {
 			// color scheme
 			rgb_color			fBaseColor;
 			rgb_color			fButtonTextColor;
-			rgb_color			fExpressionBGColor;
-			rgb_color			fExpressionTextColor;
 
 			bool				fHasCustomBaseColor;
 
