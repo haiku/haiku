@@ -10,20 +10,20 @@ public:
 	: BView(rect, "test view", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 	{
 	}
-	
+
 	virtual void
 	MouseDown(BPoint where)
 	{
-		printf("Mouse DOWN !!! %lld\n", system_time());
-		
+		printf("Mouse DOWN !!! %ld\n", system_time());
+
 		BPoint mouseWhere;
-		ulong buttons;	
+		uint32 buttons;
 		do {
 			GetMouse(&mouseWhere, &buttons);
 			snooze(10000);
 		} while (buttons != 0);
-					
-		printf("Mouse UP !!! %lld\n", system_time());
+
+		printf("Mouse UP !!! %ld\n", system_time());
 	}
 };
 
@@ -35,7 +35,7 @@ public:
 	{
 		AddChild(new view(Bounds()));
 	}
-	
+
 	virtual void
 	DispatchMessage(BMessage *message, BHandler *handler)
 	{
@@ -43,13 +43,13 @@ public:
 		message->FindInt64("when", &when);
 		switch (message->what) {
 			case B_MOUSE_MOVED:
-				printf("B_MOUSE_MOVED: %lld\n", when);
+				printf("B_MOUSE_MOVED: %ld\n", when);
 				break;
 			case B_MOUSE_UP:
-				printf("B_MOUSE_UP: %lld\n", when);
+				printf("B_MOUSE_UP: %ld\n", when);
 				break;
 			case B_MOUSE_DOWN:
-				printf("B_MOUSE_DOWN: %lld\n", when);
+				printf("B_MOUSE_DOWN: %ld\n", when);
 				break;
 			default:
 				break;
@@ -62,7 +62,7 @@ int
 main()
 {
 	BApplication app("application/x-vnd.getmousetest");
-	
+
 	(new window())->Show();
 
 	app.Run();
