@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src tests kits app messaging ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
+UsePrivateKernelHeaders ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) src kits app ] ;
 
 SimpleTest PortLinkTest :
