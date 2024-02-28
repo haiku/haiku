@@ -147,6 +147,8 @@ SettingsWindow::SettingsWindow(BRect frame)
 	BGroupLayout* volumeGroup;
 	BGroupLayout* startGroup;
 	BGroupLayout* playGroup;
+	BGroupLayout* controlsGroup;
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.AddGroup(settingsLayout)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
@@ -158,11 +160,13 @@ SettingsWindow::SettingsWindow(BRect frame)
 				.AddGroup(B_VERTICAL, 0)
 					.GetLayout(&startGroup)
 					.Add(fAutostartCB)
-					.AddGrid(kSpacing, 0)
-						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 0)
-						.Add(fCloseWindowMoviesCB, 1, 0)
-						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing), 0, 1)
-						.Add(fCloseWindowSoundsCB, 1, 1)
+					.AddGroup(B_HORIZONTAL,0)
+						.Add(BSpaceLayoutItem::CreateHorizontalStrut(kSpacing*1.9))
+						.AddGroup(B_VERTICAL,0)
+							.GetLayout(&controlsGroup)
+							.Add(fCloseWindowMoviesCB)
+							.Add(fCloseWindowSoundsCB)
+						.End()
 					.End()
 					.Add(fLoopMoviesCB)
 					.Add(fLoopSoundsCB)
@@ -207,6 +211,7 @@ SettingsWindow::SettingsWindow(BRect frame)
 	startGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	playGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	volumeGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	controlsGroup->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
