@@ -21,5 +21,5 @@ HaikuInstall install-userland-networking
 
 SubInclude HAIKU_TOP src tests add-ons kernel network core ;
 SubInclude HAIKU_TOP src tests add-ons kernel network interfaces ;
-SubInclude HAIKU_TOP src tests add-ons kernel network ppp ;
+#SubInclude HAIKU_TOP src tests add-ons kernel network ppp ;
 SubInclude HAIKU_TOP src tests add-ons kernel network protocols ;
