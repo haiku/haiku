@@ -1471,6 +1471,8 @@ TCPEndpoint::_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
 {
 	MutexLocker _(fLock);
 
+	TRACE("Spawn()");
+
 	// TODO error checking
 	ProtocolSocket::Open();
 
@@ -1479,17 +1481,12 @@ TCPEndpoint::_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
 
 	fManager = parent->fManager;
 
-	LocalAddress().SetTo(buffer->destination);
-	PeerAddress().SetTo(buffer->source);
-
-	TRACE("Spawn()");
-
 	// TODO: proper error handling!
-	if (fManager->BindChild(this) != B_OK) {
+	if (fManager->BindChild(this, buffer->destination) != B_OK) {
 		T(Error(this, "binding failed", __LINE__));
 		return DROP;
 	}
-	if (_PrepareSendPath(*PeerAddress()) != B_OK) {
+	if (_PrepareSendPath(buffer->source) != B_OK) {
 		T(Error(this, "prepare send faild", __LINE__));
 		return DROP;
 	}

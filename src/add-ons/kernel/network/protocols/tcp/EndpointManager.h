@@ -82,7 +82,8 @@ public:
 
 			status_t		Bind(TCPEndpoint* endpoint,
 								const sockaddr* address);
-			status_t		BindChild(TCPEndpoint* endpoint);
+			status_t		BindChild(TCPEndpoint* endpoint,
+								const sockaddr* address);
 			status_t		Unbind(TCPEndpoint* endpoint);
 
 			status_t		ReplyWithReset(tcp_segment_header& segment,

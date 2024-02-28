@@ -393,10 +393,10 @@ EndpointManager::Bind(TCPEndpoint* endpoint, const sockaddr* address)
 
 
 status_t
-EndpointManager::BindChild(TCPEndpoint* endpoint)
+EndpointManager::BindChild(TCPEndpoint* endpoint, const sockaddr* address)
 {
 	WriteLocker _(fLock);
-	return _Bind(endpoint, *endpoint->LocalAddress());
+	return _Bind(endpoint, address);
 }
 
 
