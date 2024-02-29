@@ -74,12 +74,7 @@ DevicesView::CreateLayout()
 	orderByPopupMenu->AddItem(byCategory);
 	orderByPopupMenu->AddItem(byConnection);
 	fOrderByMenu = new BMenuField(B_TRANSLATE("Order by:"), orderByPopupMenu);
-
-	fTabView = new BTabView("fTabView", B_WIDTH_FROM_LABEL);
-	fDeviceDetailsTab = new BTab();
 	fAttributesView = new PropertyList("attributesView");
-	fTabView->AddTab(fAttributesView, fDeviceDetailsTab);
-	fDeviceDetailsTab->SetLabel(B_TRANSLATE("<No device selected>"));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(menuBar)
@@ -89,7 +84,7 @@ DevicesView::CreateLayout()
 				.Add(fOrderByMenu, 1)
 				.Add(scrollView, 2)
 				.End()
-			.Add(fTabView, 2);
+			.Add(fAttributesView, 2);
 }
 
 
@@ -395,9 +390,7 @@ DevicesView::MessageReceived(BMessage *msg)
 			if (selected >= 0) {
 				Device* device = (Device*)fDevicesOutline->ItemAt(selected);
 				fAttributesView->AddAttributes(device->GetAllAttributes());
-				fDeviceDetailsTab->SetLabel(device->GetName());
-				// hmm the label doesn't automatically refresh
-				fTabView->Invalidate();
+				fAttributesView->Invalidate();
 			}
 			break;
 		}
@@ -421,7 +414,6 @@ DevicesView::MessageReceived(BMessage *msg)
 		case kMsgRefresh:
 		{
 			fAttributesView->RemoveAll();
-			fDeviceDetailsTab->SetLabel(B_TRANSLATE("<No device selected>"));
 			RescanDevices();
 			RebuildDevicesOutline();
 			break;

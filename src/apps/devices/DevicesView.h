@@ -65,11 +65,9 @@ class DevicesView : public BView {
 		BOutlineListView*	fDevicesOutline;
 		PropertyList*		fAttributesView;
 		BMenuField*			fOrderByMenu;
-		BTabView*			fTabView;
 		Devices				fDevices;
 		OrderByType			fOrderBy;
 		CategoryMap			fCategoryMap;
-		BTab*				fDeviceDetailsTab;
 
 };
 
