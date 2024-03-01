@@ -40,7 +40,8 @@ public:
 			status_t			AddUserFontFromFile(const char* path, uint16 index, uint16 instance,
 									uint16& familyID, uint16& styleID);
 			status_t			AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size,
-									uint16 index, uint16& familyID, uint16& styleID);
+									uint16 index, uint16 instance,
+									uint16& familyID, uint16& styleID);
 			status_t			RemoveUserFont(uint16 familyID, uint16 styleID);
 
 private:

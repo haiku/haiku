@@ -79,7 +79,7 @@ AppFontManager::AddUserFontFromFile(const char* path, uint16 index, uint16 insta
 */
 status_t
 AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size, uint16 index,
-	uint16& familyID, uint16& styleID)
+	uint16 instance, uint16& familyID, uint16& styleID)
 {
 	ASSERT(IsLocked());
 
@@ -87,8 +87,8 @@ AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size, u
 	status_t status;
 
 	FT_Face face;
-	FT_Error error = FT_New_Memory_Face(gFreeTypeLibrary, fontAddress, size, index,
-		&face);
+	FT_Error error = FT_New_Memory_Face(gFreeTypeLibrary, fontAddress, size,
+		index | (instance << 16), &face);
 	if (error != 0)
 		return B_ERROR;
 

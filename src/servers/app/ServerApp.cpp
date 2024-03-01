@@ -1638,6 +1638,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 2) size_t - size of memory area for font
 			// 3) size_t - offset to start of font memory
 			// 4) uint16 - index in font buffer
+			// 5) uint16 - instance
 
 			// Returns:
 			// 1) uint16 - family ID of added font
@@ -1656,12 +1657,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			area_info fontAreaInfo;
 			char* area_addr;
 			size_t size, offset;
-			uint16 index;
+			uint16 index, instance;
 
 			link.Read<int32>(&fontAreaID);
 			link.Read<size_t>(&size);
 			link.Read<size_t>(&offset);
 			link.Read<uint16>(&index);
+			link.Read<uint16>(&instance);
 			fontAreaCloneID = clone_area("user font",
 				(void **)&area_addr,
 				B_ANY_ADDRESS,
@@ -1710,7 +1712,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint16 familyID, styleID;
 
-			status = fAppFontManager->AddUserFontFromMemory(fontData, size, index,
+			status = fAppFontManager->AddUserFontFromMemory(fontData, size, index, instance,
 				familyID, styleID);
 
 			if (status != B_OK) {

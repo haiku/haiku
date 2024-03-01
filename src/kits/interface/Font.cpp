@@ -1489,12 +1489,12 @@ BFont::LoadFont(const char* path, uint16 index, uint16 instance)
 status_t
 BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset)
 {
-	return LoadFont(fontAreaID, size, offset, 0);
+	return LoadFont(fontAreaID, size, offset, 0, 0);
 }
 
 
 status_t
-BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset, uint16 index)
+BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset, uint16 index, uint16 instance)
 {
 	BPrivate::AppServerLink link;
 
@@ -1504,6 +1504,7 @@ BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset, uint16 ind
 	link.Attach<size_t>(size);
 	link.Attach<size_t>(offset);
 	link.Attach<uint16>(index);
+	link.Attach<uint16>(instance);
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK || status != B_OK) {

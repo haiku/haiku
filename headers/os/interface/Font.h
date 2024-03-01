@@ -287,7 +287,7 @@ public:
 			status_t			LoadFont(const area_id fontAreaID,
 									size_t size = 0, size_t offset = 0);
 			status_t			LoadFont(const area_id fontAreaID,
-									size_t size = 0, size_t offset = 0, uint16 index = 0);
+									size_t size, size_t offset, uint16 index, uint16 instance);
 			status_t			UnloadFont();
 
 private:
