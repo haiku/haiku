@@ -66,6 +66,9 @@ export XDG_CONFIG_HOME="`finddir B_USER_SETTINGS_DIRECTORY`"
 # defaults to ~/.local/share
 export XDG_DATA_HOME="`finddir B_USER_NONPACKAGED_DATA_DIRECTORY`"
 
+# defaults to ~/.local/state
+export XDG_STATE_HOME="`finddir B_USER_VAR_DIRECTORY`"
+
 # defaults to /etc/xdg
 export XDG_CONFIG_DIRS="`finddir B_SYSTEM_SETTINGS_DIRECTORY`"
 # XXX: Should we add B_USER_ETC_DIRECTORY?
