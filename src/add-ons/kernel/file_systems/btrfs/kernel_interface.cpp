@@ -24,7 +24,7 @@
 #define INFORM(x...) TRACE(x)
 #define init_debugging()
 #define exit_debugging()
-#define FUNCTION() dprintf("btrfs: %s()\n",__FUNCTION__);
+#define FUNCTION() dprintf("\33[34mbtrfs:\33[0m %s()\n",__PRETTY_FUNCTION__);
 #define REPORT_ERROR(status) \
 	dprintf("btrfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));
 #define RETURN_ERROR(err) \
@@ -594,6 +594,7 @@ static status_t
 btrfs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 	void* buffer, size_t* _length)
 {
+	FUNCTION();
 	Inode* inode = (Inode*)_node->private_node;
 
 	if (!inode->IsFile()) {
@@ -639,6 +640,7 @@ static status_t
 btrfs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer,
 	size_t* _bufferSize)
 {
+	FUNCTION();
 	Inode* inode = (Inode*)_node->private_node;
 
 	if (!inode->IsSymLink())

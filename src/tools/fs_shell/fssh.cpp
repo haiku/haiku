@@ -761,8 +761,10 @@ command_cat(int argc, const char* const* argv)
 		while (fileLengthToRead > 0) {
 			if (fileLengthToRead < numBytes)
 				numBytes = fileLengthToRead;
-			if (_kern_read(fd, pos, buffer, numBytes) != (ssize_t)numBytes) {
-				fprintf(stderr, "error reading: %s\n", fssh_strerror(fd));
+
+			ssize_t statusOrNumBytes = _kern_read(fd, pos, buffer, numBytes);
+			if (statusOrNumBytes != (ssize_t)numBytes) {
+				fprintf(stderr, "error: %s\n", fssh_strerror(statusOrNumBytes));
 				_kern_close(fd);
 				return FSSH_B_BAD_VALUE;
 			}

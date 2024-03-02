@@ -23,6 +23,7 @@
 #	define ASSERT(x) ;
 #endif
 #define ERROR(x...) dprintf("\33[34mbtrfs:\33[0m " x)
+#define CALLED() TRACE("%s\n", __PRETTY_FUNCTION__);
 
 
 Inode::Inode(Volume* volume, ino_t id)
@@ -209,6 +210,7 @@ Inode::FindBlock(off_t pos, off_t& physical, off_t* _length)
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 {
+	CALLED();
 	size_t length = *_length;
 
 	// set/check boundaries for pos/length
