@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	2322690158
+1	turkish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Devices	System name		Aygıtlar
@@ -8,20 +8,19 @@ Processor	Device		İşlemci
 Generate system information	DevicesView		Sistem bilgisi üret
 Unknown	DeviceACPI		Bilinmiyor
 Class info	DevicePCI		Sınıf bilgisi
-<No device selected>	DevicesView		<seçili aygıt yok>
 USB bus	Device		USB veri yolu
 Computer	DevicesView		Bilgisayar
 Communications	DeviceSCSI		İletişim
 Mass storage controller	Device		Yığın depolama denetleyicisi
 Connection	DevicesView		Bağlantı
 Printer	DeviceSCSI		Yazıcı
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI işlemci ad alanı '%2'
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI işlemci ad alanı ‘%2’
 Manufacturer	Device		Üretici
 Scanner	DeviceSCSI		Tarayıcı
 Memory controller	Device		Bellek denetleyicisi
 Unknown device	DevicesView		Bilinmeyen aygıt
 Unknown	DevicePCI		Bilinmeyen
-ACPI node '%1'	DeviceACPI		'%1' ACPI düğümü
+ACPI node '%1'	DeviceACPI		‘%1’ ACPI düğümü
 Optical Drive	DeviceSCSI		Optik sürücü
 Name	PropertyList		Ad
 Manufacturer	DeviceSCSI		Üretici
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Uydu iletişimi denetleyicisi
 Device class	DeviceSCSI		Aygıt sınıfı
 Device	Device		Aygıt
 Input device controller	Device		Giriş aygıtı denetleyicisi
-PCI bus	DevicesView		PCI veri yolu
 ACPI System Indicator	DeviceACPI		ACPI sistem belirteci
+PCI bus	DevicesView		PCI veri yolu
 ACPI System Bus	DeviceACPI		ACPI sistem veri yolu
 Tape Drive	DeviceSCSI		Kaset sürücüsü
 Changer	DeviceSCSI		Değiştirici
@@ -48,7 +47,7 @@ Devices	DevicesView		Aygıtlar
 Device name	DeviceACPI		Aygıt adı
 Card Reader	DeviceSCSI		Kart okuyucusu
 Display controller	Device		Görüntü denetleyicisi
-ACPI Button '%1'	DeviceACPI		ACPI düğmesi '%1'
+ACPI Button '%1'	DeviceACPI		ACPI düğmesi ‘%1’
 ACPI <unknown>	DeviceACPI		ACPI <bilinmiyor>
 Device name	DevicePCI		Aygıt adı
 Disk Drive	DeviceSCSI		Disk sürücüsü

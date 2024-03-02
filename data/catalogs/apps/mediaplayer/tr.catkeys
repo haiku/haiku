@@ -37,7 +37,7 @@ Start media server	MediaPlayer-Main		Ortam sunucusu başlat
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Ortam sunucusu çalışmıyor gibi görünüyor.\nBaşlatılsın mı?
 Location	MediaPlayer-InfoWin		Konum
 %lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
-Opening '%s'.	MediaPlayer-Main		'%s' açılıyor.
+Opening '%s'.	MediaPlayer-Main		‘%s’ açılıyor.
 Medium	MediaPlayer-SettingsWindow		Orta
 Play mode	MediaPlayer-SettingsWindow		Oynatma kipi
 Playlist	MediaPlayer-PlaylistWindow		Oynatma Listesi
@@ -96,7 +96,7 @@ Always on top	MediaPlayer-Main		Her zaman üstte
 Open	MediaPlayer-PlaylistWindow		Aç
 always	MediaPlayer-SettingsWindow		Her zaman
 Loop video	MediaPlayer-SettingsWindow		Videoyu sürekli oynat
-Stream URL:	MediaPlayer-NetworkStream		Akış URL'si:
+Stream URL:	MediaPlayer-NetworkStream		Akış URL’si:
 <unknown>	PlaylistItem-album		<bilinmeyen>
 Stream settings	MediaPlayer-Main		Akış ayarları
 none	Subtitles menu		yok

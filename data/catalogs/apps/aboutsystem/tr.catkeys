@@ -17,25 +17,25 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Telif hakkı © 2003 Pete
 Testing and bug triaging:\n	AboutView		Sınama ve hata sınıflandırma:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, other{# işlemci:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi Firmware
-The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku'ya özel olan tüm kodlar, özellikle çekirdek ve uygulamaların bağlı olduğu kodlar <MIT lisansı> koşulları altında dağıtılmaktadır. Bazı sistem kitaplıkları ve üçüncü parti kodlar <LGPL lisansı> koşulları altında dağıtılır. Üçüncü parti kodların telif hakları ile ilgili bilgiyi aşağıda bulabilirsiniz.\n\n
+The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku’ya özel olan tüm kodlar, özellikle çekirdek ve uygulamaların bağlı olduğu kodlar <MIT lisansı> koşulları altında dağıtılmaktadır. Bazı sistem kitaplıkları ve üçüncü parti kodlar <LGPL lisansı> koşulları altında dağıtılır. Üçüncü parti kodların telif hakları ile ilgili bilgiyi aşağıda bulabilirsiniz.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Telif hakkı © 1996-1997 Jeff Prosise. Tüm hakları saklıdır.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Telif hakkı © 1999-2006 Brian Paul, Mesa 3D Project. Tüm hakları saklıdır.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Telif hakkı © 2010-2011 Google Inc. Tüm hakları saklıdır.
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Telif hakkı © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTüm hakları saklıdır.
 Past maintainers:\n	AboutView		Önceki geliştiriciler:\n
 Unknown	AboutView		Bilinmeyen
-Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ve geliştirici takımına BeOS'u yarattıkları için!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Telif hakkı © 2002-2014 Industrial Light & Magic, Lucas Digital Ltd. LLC'nin bir bölümü.
+Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ve geliştirici takımına BeOS’u yarattıkları için!\n\n
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Telif hakkı © 2002-2014 Industrial Light & Magic, Lucas Digital Ltd. LLC’nin bir bölümü.
 Licenses: 	AboutView		Lisanslar: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.'in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.'in tescilli markalarıdır.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.’in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.’in tescilli markalarıdır.\n\n
 Copyright © 2009 Colin Percival	AboutView		Telif hakkı © 2009 Colin Percival
 Time running:	AboutView		Çalışma süresi:
 Version: %s	AboutView	Version: R1 or hrev99999	Sürüm: %s
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB bellek:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Telif hakkı © 1996-2005 Julian R Seward. Tüm hakları saklıdır.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
-Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Telif hakkı © 1994-2009, Thomas G. Lane, Guido Vollbeding. Bu yazılım Independent JPEG Group'a ait olan işin bir parçası temel alınarak yazılmıştır.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Telif hakkı © 1994-2009, Thomas G. Lane, Guido Vollbeding. Bu yazılım Independent JPEG Group’a ait olan işin bir parçası temel alınarak yazılmıştır.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (proje kurucusu)\n\n
 Remove replicant	AboutView		Yineleneni kaldır
 BSD (3-clause)	AboutWindow		BSD (3 koşullu)
@@ -47,12 +47,12 @@ AboutSystem	System name		Sistem Hakkında
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Telif hakkı © 2019 Joe Drago. Tüm hakları saklıdır.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Telif hakkı © 1995-2001 Lars Düning. Tüm hakları saklıdır.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Telif hakkı © 1998-2000 Thai Open Source Software Center Ltd ve Clark Cooper.
-Source Code: 	AboutView		Kaynak Kodu: 
 \nCopyrights\n\n	AboutView		\nTelif hakları\n\n
+Source Code: 	AboutView		Kaynak Kodu: 
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Telif hakkı © 1996-2002, 2006 David Turner, Robert Wilhelm ve Werner Lemberg.
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		GNU Projesi’nden GPL ve LGPL lisanslı yazılımlar içerir:\nGNU C Kütüphanesi, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nTelif hakkı © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		HaikuPorts takımı\n
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		GNU Projesi'nden GPL ve LGPL lisanslı yazılımlar içerir:\nGNU C Kütüphanesi, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nTelif hakkı © The Free Software Foundation.
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Aşağıdaki yazılımlar FreeBSD projesinden alınmış olup BSD lisansı ile yayımlanmıştır:\nftpd, ping, telnet, Telnet, traceroute\nTelif hakkı © 1994-2008 The FreeBSD Project. Tüm hakları saklıdır.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Telif hakkı © 2002-2003 Steve Lhomme. Tüm hakları saklıdır.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Telif hakkı © 2000-2019 Fabrice Bellard ve diğerleri
@@ -84,4 +84,4 @@ Website & marketing:\n	AboutView		Web sayfası & pazarlama:\n
 …and the many people making donations!\n\n	AboutView		…ve bağış yapan birçok kişi!\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 BSD (4-clause)	AboutWindow		BSD (4 koşullu)
-BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER, Bitstream Inc.'in tescilli markasıdır.
+BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER, Bitstream Inc.’in tescilli markasıdır.

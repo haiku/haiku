@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	2322690158
+1	swedish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
@@ -8,7 +8,6 @@ Processor	Device		Processor
 Generate system information	DevicesView		Generera systeminformation
 Unknown	DeviceACPI		Okänd
 Class info	DevicePCI		Klass information
-<No device selected>	DevicesView		<Ingen enhet har valts>
 USB bus	Device		USB-buss
 Computer	DevicesView		Dator
 Communications	DeviceSCSI		Kommunikations
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Styrenhet för satellitkommunikation
 Device class	DeviceSCSI		Enhetsklass
 Device	Device		Enhet
 Input device controller	Device		Indataenhetskontroller
-PCI bus	DevicesView		PCI-buss
 ACPI System Indicator	DeviceACPI		ACPI systemindikator
+PCI bus	DevicesView		PCI-buss
 ACPI System Bus	DeviceACPI		ACPI systembuss
 Tape Drive	DeviceSCSI		Bandenhet
 Changer	DeviceSCSI		Växlare

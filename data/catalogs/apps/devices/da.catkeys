@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Devices	2322690158
+1	danish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Krypteringsstyreenhed
 Devices	System name		Enheder
@@ -8,7 +8,6 @@ Processor	Device		Processor
 Generate system information	DevicesView		Opbyg systemoplysninger
 Unknown	DeviceACPI		Ukendt
 Class info	DevicePCI		Klasseoplysninger
-<No device selected>	DevicesView		<Ingen enhed er valgt>
 USB bus	Device		USB-bus
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Kommunikation
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Styreenhed for satellitkommunikation
 Device class	DeviceSCSI		Enhedsklasse
 Device	Device		Enhed
 Input device controller	Device		Styreenhed for inddataenhed
-PCI bus	DevicesView		PCI-bus
 ACPI System Indicator	DeviceACPI		ACPI-systemindikator
+PCI bus	DevicesView		PCI-bus
 ACPI System Bus	DeviceACPI		ACPI-systembus
 Tape Drive	DeviceSCSI		Båndstation
 Changer	DeviceSCSI		Skifter

@@ -29,8 +29,8 @@ Satellite communications controller	Device		Satellietcommunicatie-controller
 Device class	DeviceSCSI		Apparaatklasse
 Device	Device		Apparaat
 Input device controller	Device		Inputapparaat-controller
-PCI bus	DevicesView		PCI-bus
 ACPI System Indicator	DeviceACPI		ACPI-systeemindicator
+PCI bus	DevicesView		PCI-bus
 ACPI System Bus	DeviceACPI		ACPI-systeembus
 Tape Drive	DeviceSCSI		Tape-station
 Changer	DeviceSCSI		Wisselaar

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Devices	2322690158
+1	russian	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Шина ACPI
 Encryption controller	Device		Контроллер шифрования
 Devices	System name		Устройства
@@ -8,7 +8,6 @@ Processor	Device		Процессор
 Generate system information	DevicesView		Сгенерировать информацию о системе
 Unknown	DeviceACPI		Неизвестно
 Class info	DevicePCI		Информация о классе
-<No device selected>	DevicesView		<Устройство не выбрано>
 USB bus	Device		Шина USB
 Computer	DevicesView		Компьютер
 Communications	DeviceSCSI		Устройства связи
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Контроллер спутник�
 Device class	DeviceSCSI		Класс устройства
 Device	Device		Устройство
 Input device controller	Device		Контроллер устройств ввода
-PCI bus	DevicesView		Шина PCI
 ACPI System Indicator	DeviceACPI		Системный индикатор ACPI
+PCI bus	DevicesView		Шина PCI
 ACPI System Bus	DeviceACPI		Системная шина ACPI
 Tape Drive	DeviceSCSI		Накопитель на ленте
 Changer	DeviceSCSI		Changer

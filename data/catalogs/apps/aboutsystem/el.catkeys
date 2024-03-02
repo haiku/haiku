@@ -45,12 +45,12 @@ AboutSystem	System name		Σχετικά
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Copyright © 2019 Joe Drago. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1995-2001 Lars Düning. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Πνευματική ιδιοκτησία © 1998-2000 Thai Open Source Software Center Ltd και Clark Cooper.
-Source Code: 	AboutView		Πηγαίος Κώδικας: 
 \nCopyrights\n\n	AboutView		\nΠνευματικά δικαιώματα\n\n
+Source Code: 	AboutView		Πηγαίος Κώδικας: 
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Πνευματική ιδιοκτησία © 1996-2002, 2006 David Turner, Robert Wilhelm και Werner Lemberg.
-The HaikuPorts team\n	AboutView		Η ομάδα HaikuPorts\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Εμπεριέχει λογισμικό από το GNU Project, το οποίο έχει δημοσιευτεί με τις άδειες χρήσεις GPL και GPL:\nΒιβλιοθήκη GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nΠνευματική ιδιοκτησία © The Free Software Foundation.
+The HaikuPorts team\n	AboutView		Η ομάδα HaikuPorts\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Εμπεριέχει λογισμικό από το FreeBSD Project, το οποίο έχει δημοσιευτεί με την άδεια χρήσης BSD:\nftpd, ping, telnet, telnetd, traceroute\nΠνευματική ιδιοκτησία © 1994-2008 The FreeBSD Project. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 2002-2003 Steve Lhomme. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Πνευματική ιδιοκτησία © 2000-2019 Fabrice Bellard, κλπ.

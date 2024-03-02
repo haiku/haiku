@@ -26,8 +26,8 @@ Satellite communications controller	Device		Radič satelitnej komunikácie
 Device class	DeviceSCSI		Trieda zariadenia
 Device	Device		Zariadenie
 Input device controller	Device		Radič vstupných zariadení
-PCI bus	DevicesView		Zbernica PCI
 ACPI System Indicator	DeviceACPI		Indikátor systému ACPI
+PCI bus	DevicesView		Zbernica PCI
 ACPI System Bus	DeviceACPI		Zbernica systému ACPI
 Tape Drive	DeviceSCSI		Pásková jednotka
 Changer	DeviceSCSI		Menič

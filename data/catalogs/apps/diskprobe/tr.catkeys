@@ -15,11 +15,11 @@ Text	TypeEditors	This is the type of editor	Metin
 File offset: 	ProbeView		Dosya ofseti: 
 Add	ProbeView		Ekle
 64 bit signed value:	TypeEditors		64 bit imzalanmış değer:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		\"%s\" özniteliğini \"%s\" dosyasından kaldırmak istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		“%s” özniteliğini “%s” dosyasından kaldırmak istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.
 No type editor available	AttributeWindow		Kullanılabilir bir tür düzenleyicisi yok
 Print…	ProbeView		Yazdır…
 New…	FileWindow		Yeni…
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: '%.4s'\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: ‘%.4s’\n\n
 OK	DiskProbe		Tamam
 DiskProbe	System name		Disk Sondası
 Back	ProbeView		Geri
@@ -44,7 +44,7 @@ Unknown format	TypeEditors		Bilinmeyen biçim
 File: 	ProbeView		Dosya: 
 Stop	ProbeView		Durdur
 Cancel	ProbeView		Vazgeç
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\" açılamadı:\n%s
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	“%s” açılamadı:\n%s
 Font size	ProbeView		Yazıtipi boyutu
 Type editor not supported	ProbeView		Tür düzenleyicisi desteklenmiyor
 Native: 0x%0*Lx	ProbeView		Yerel: 0x%0*Lx
@@ -71,7 +71,7 @@ Mode:	FindWindow		Kip:
 32 bit size or status:	TypeEditors		32 bit boyut veya durum:
 of 	ProbeView		/ 
 Contents:	TypeEditors		İçerik:
-Could not open file \"%s\": %s\n	DiskProbe		\"%s\" dosyası açılamadı: %s\n
+Could not open file \"%s\": %s\n	DiskProbe		“%s” dosyası açılamadı: %s\n
 Probe file…	OpenWindow		Dosya araştır…
 Block: 	ProbeView		Blok: 
 Bookmarks	ProbeView		Yer imleri

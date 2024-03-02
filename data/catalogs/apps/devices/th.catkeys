@@ -26,8 +26,8 @@ Satellite communications controller	Device		ตัวควบคุมการ
 Device class	DeviceSCSI		คลาสอุปกรณ์
 Device	Device		อุปกรณ์
 Input device controller	Device		ตัวควบคุมอุปกรณ์อินพุต
-PCI bus	DevicesView		PCI bus
 ACPI System Indicator	DeviceACPI		ตัวบ่งชี้ระบบ ACPI
+PCI bus	DevicesView		PCI bus
 ACPI System Bus	DeviceACPI		ACPI System Bus
 Tape Drive	DeviceSCSI		เทปไดรฟ์
 Changer	DeviceSCSI		ตัวแปลง

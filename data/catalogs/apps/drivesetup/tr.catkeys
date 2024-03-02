@@ -19,7 +19,7 @@ Unmount	MainWindow		Bağlantıyı kes
 Failed to format the partition %s!\n	MainWindow		%s bölüntüsünün biçimlendirilmesi başarısız oldu!\n
 Partition size	CreateParametersPanel		Bölüntü boyutu
 Validation of the given parameters failed.	MainWindow		Verilen ayarların doğrulaması başarısız oldu.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		\"%s\" bölüntüsünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		“%s” bölüntüsünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 DriveSetup	System name		Disk İzlencesi
 Mounted at	PartitionList		Bağlama noktası
 Create…	MainWindow		Oluştur…
@@ -54,7 +54,7 @@ Validation of the given initialization parameters failed.	MainWindow		Verilen il
 Not formatted (%s)	PartitionList		Biçimlendirilmemiş (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Bölüntü oluşturulamadı. Diske herhangi bir değişiklik yazılmadı.
 Shared	PartitionList		Paylaşılan
-MIMEs	PartitionList		MIME'ler
+MIMEs	PartitionList		MIME’ler
 BitLocker encrypted	Encryption utils		BitLocker şifreli
 You need to select a partition entry from the list.	MainWindow		Listeden bir bölüntü seçmelisiniz.
 Offset: %s	Support		Ofset: %s
@@ -85,7 +85,7 @@ Change parameters	MainWindow		Parametreleri değiştir
 Rescan	MainWindow		Yeniden tara
 There was an error acquiring the partition row.	MainWindow		Bölüntü satırını alırken bir hata oluştu.
 Failed to initialize the disk %s!\n	MainWindow		%s diski ilklendirilemedi!\n
-Disk system \"%s\" not found!	MainWindow		\"%s\" disk sistemi bulunamadı!
+Disk system \"%s\" not found!	MainWindow		“%s” disk sistemi bulunamadı!
 The partition cannot be unmounted.	MainWindow		Bölüntü bağlantısı kesilemiyor.
 Delete	MainWindow		Sil
 Partition type:	ChangeParametersPanel		Bölüntü türü:

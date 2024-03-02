@@ -12,6 +12,6 @@ usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]      
 usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		kullanım: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tFilePanel penceresi başlığını ayarla\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tyalnızca 1 dosyanın seçilmesine izin ver\n
--m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tFilePanel'ı kipsel kılar\n
+-m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\tFilePanel’ı kipsel kılar\n
 options:\n	FilePanelApp		seçenekler:\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\t<klasör> içinde aç\n

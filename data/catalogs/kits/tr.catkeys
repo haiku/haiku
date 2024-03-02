@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-libbe	2914417806
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, other{# bayt}}
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bayt} other{# bayt}}
 %.2f TiB/s	StringForRate		%.2f TiB/sn
 All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
 gold master	AboutWindow		altın kopya

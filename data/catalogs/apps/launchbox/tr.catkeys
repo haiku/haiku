@@ -7,10 +7,10 @@ Show on all workspaces	LaunchBox		Tüm çalışma alanlarında göster
 Name Panel	LaunchBox		Ad paneli
 Autostart	LaunchBox		Sistem açılırken başlat
 Clone	LaunchBox		Aynısından ekle
-Description for '%3'	LaunchBox		'%3' için açıklama
+Description for '%3'	LaunchBox		‘%3’ için açıklama
 Show window border	LaunchBox		Pencere kenarlığını göster
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nUygulama '%2' imzası ile başlatılamadı.\n\nHata:
-Failed to launch 'something', error in Pad data.	LaunchBox		'Bir şey' başlatılamadı, Rampa verisinde hata.
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nUygulama, ‘%2’ imzası ile başlatılamadı.\n\nHata:
+Failed to launch 'something', error in Pad data.	LaunchBox		‘Bir şey’ başlatılamadı, Rampa verisinde hata.
 LaunchBox	System name		Başlatma Rampası
 Auto-raise	LaunchBox		Kendiliğinden öne getir
 %ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
@@ -24,7 +24,7 @@ Bummer	LaunchBox		Hay aksi
 last chance	LaunchBox		son şans
 You can drag an icon here.	LaunchBox		Buraya bir simge sürükleyebilirsiniz.
 Pad 1	LaunchBox		Rampa 1
-Failed to launch '%1'.\n\nError:	LaunchBox		'%1' başlatılamadı.\n\nHata:
+Failed to launch '%1'.\n\nError:	LaunchBox		‘%1’ başlatılamadı.\n\nHata:
 Settings	LaunchBox		Ayarlar
 Vertical layout	LaunchBox		Dikey yerleşim
 Pad	LaunchBox		Rampa
@@ -33,5 +33,5 @@ Remove button	LaunchBox		Düğmeyi kaldır
 Quit	LaunchBox		Çık
 Horizontal layout	LaunchBox		Yatay yerleşim
 New	LaunchBox		Yeni
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		'Klasör aç' komutu İzleyici'ye gönderilemedi.\n\nHata: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		‘Klasör aç’ komutu İzleyici’ye gönderilemedi.\n\nHata: 
 Pad %1	LaunchBox		Rampa %1

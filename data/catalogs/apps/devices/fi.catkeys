@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Devices	2322690158
+1	finnish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI-väylä
 Encryption controller	Device		Salausohjain
 Devices	System name		Laitteet
@@ -8,7 +8,6 @@ Processor	Device		Suoritin
 Generate system information	DevicesView		Tuota järjestelmätiedot
 Unknown	DeviceACPI		Tuntematon
 Class info	DevicePCI		Luokkatiedot
-<No device selected>	DevicesView		<Ei valittua laitetta>
 USB bus	Device		USB-väylä
 Computer	DevicesView		Tietokone
 Communications	DeviceSCSI		Viestinnät
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Satelliittiviestintäohjain
 Device class	DeviceSCSI		Laiteluokka
 Device	Device		Laite
 Input device controller	Device		Syötelaiteohjain
-PCI bus	DevicesView		PCI-väylä
 ACPI System Indicator	DeviceACPI		ACPI-järjestelmäindikaattori
+PCI bus	DevicesView		PCI-väylä
 ACPI System Bus	DeviceACPI		ACPI-järjestelmäväylä
 Tape Drive	DeviceSCSI		Nauha-asema
 Changer	DeviceSCSI		Vaihtaja

@@ -10,5 +10,5 @@ Error while opening connection to %serv	smtp		%serv sunucusuna bağlanırken hat
 None	ConfigView		Yok
 SMTP server:	ConfigView		SMTP sunucusu:
 ESMTP	ConfigView		ESMTP
-POP3 before SMTP	ConfigView		SMTP'den önce POP3
+POP3 before SMTP	ConfigView		SMTP’den önce POP3
 SSL	ConfigView		SSL

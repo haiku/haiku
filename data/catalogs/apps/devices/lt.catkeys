@@ -26,8 +26,8 @@ Satellite communications controller	Device		Palydovinio ryšio valdiklis
 Device class	DeviceSCSI		Įrenginio klasė
 Device	Device		Įrenginys
 Input device controller	Device		Įvesties įrenginių valdiklis
-PCI bus	DevicesView		PCI magistralė
 ACPI System Indicator	DeviceACPI		ACPI sistemos indikatorius
+PCI bus	DevicesView		PCI magistralė
 ACPI System Bus	DeviceACPI		ACPI sistemos magistralė
 Tape Drive	DeviceSCSI		Juostų kaupiklis
 Changer	DeviceSCSI		Keitiklis

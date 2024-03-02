@@ -37,12 +37,12 @@ Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright �
 AboutSystem	System name		O systéme
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Všetky práva vyhradené.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd a Clark Cooper.
-Source Code: 	AboutView		Zdrojový kód: 
 \nCopyrights\n\n	AboutView		\nAutorské práva\n\n
+Source Code: 	AboutView		Zdrojový kód: 
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm a Werner Lemberg.
-The HaikuPorts team\n	AboutView		Tím Haiku-Ports\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Obsahuje softvér z projektu GNU uvoľnený za podmienok licencií GPL alebo LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
+The HaikuPorts team\n	AboutView		Tím Haiku-Ports\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Obsahuje softvér z projektu FreeBSD, uvoľnený za podmienok licencie BSD:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Všetky práva vyhradené.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Všetky práva vyhradené.
 Current maintainers:\n	AboutView		Aktívni vývojári:\n

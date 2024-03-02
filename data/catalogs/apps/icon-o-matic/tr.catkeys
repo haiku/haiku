@@ -156,7 +156,7 @@ META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON özniteliği
 Untitled	Icon-O-Matic-Main		Adsız
 Max LOD	Icon-O-Matic-PropertyNames		En yüksek ayrıntı düzeyi
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Kapatmadan önce değişiklikler kaydedilsin mi?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		'%s' dosyası bir SVG belgesi olarak açılamadı.\n\n
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		‘%s’ dosyası bir SVG belgesi olarak açılamadı.\n\n
 Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…
 Swatches	Icon-O-Matic-Menus		Örnekler
 <modify path>	Icon-O-Matic-PathCmd		<yol düzenle>

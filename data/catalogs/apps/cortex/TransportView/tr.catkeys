@@ -4,7 +4,7 @@ Roll	TransportView		Döndür
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# düğüm} other{# düğüm}}
 Start	TransportView		Başlat
 No errors.	TransportView		Hata yok.
-to	TransportView		->
+to	TransportView		→
 Offline	TransportView		Çevrimdışı
 (???)	TransportView		(???)
 Stop	TransportView		Durdur

@@ -1,6 +1,6 @@
 1	turkish	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		hedef dizin bekleniyordu
-reply: '%s'\n	SftpClient		yanıtla: '%s'\n
+reply: '%s'\n	SftpClient		yanıtla: ‘%s’\n
 PASS <suppressed>  (real password sent)	FtpClient		PAROLA <gizlenmiş>  (gönderilen gerçek parola)
 JPEG image	CodyCam		JPEG görseli
 Remote host has closed the connection.\n	FtpClient		Uzaktaki makine bağlantıyı kapattı.\n
@@ -27,7 +27,7 @@ read: %d\n	SftpClient		oku: %d\n
 Every 2 hours	CodyCam		Her 2 saatte bir
 Cannot get a time source	CodyCam		Bir zaman kaynağı alınamıyor
 Every 4 hours	CodyCam		Her 4 saatte bir
-cmd: '%s'\n	FtpClient		komut: '%s'\n
+cmd: '%s'\n	FtpClient		komut: ‘%s’\n
 Closing the window	VideoConsumer.cpp		Pencere kapatılıyor
 Never	CodyCam		Hiçbir zaman
 Every 8 hours	CodyCam		Her 8 saatte bir
@@ -76,12 +76,12 @@ Login:	CodyCam		Giriş yap:
 File	CodyCam		Dosya
 read: %ld\n	SftpClient		oku: %ld\n
 Every hour	CodyCam		Her saat
-login ID expected	CodyCam		giriş ID'si bekleniyordu
+login ID expected	CodyCam		giriş kimliği bekleniyordu
 Video settings	CodyCam		Video ayarları
 Can't find an available connection to the video window	CodyCam		Video penceresine uygun bir bağlantı bulunamıyor
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Çıktı dosyası oluşturulurken hata
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Bir video kaynağı bulunamıyor:\nCodyCam'i kullanmak için bir web kameranız olmalı.
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Bir video kaynağı bulunamıyor:\nCodyCam’i kullanmak için bir web kameranız olmalı.
 Logging in…	VideoConsumer.cpp		Giriş yapılıyor…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Çıktı dosyası yazılırken hata

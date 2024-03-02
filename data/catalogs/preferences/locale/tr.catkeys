@@ -25,6 +25,6 @@ Revert	Locale Preflet Window		Eski haline döndür
 Translate application and folder names	TimeFormatSettings		Uygulama ve klasör adlarını çevir
 12 hour	TimeFormatSettings		12 saat
 Positive:	TimeFormatSettings		Pozitif:
-Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Bu değişikliğin etkin olması için Masaüstü Çubuğu ve İzleyici'nin yeniden başlatılması gerekiyor. Şimdi yeniden başlatmak ister misiniz?
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Bu değişikliğin etkin olması için Masaüstü Çubuğu’nun ve İzleyici’nin yeniden başlatılması gerekiyor. Şimdi yeniden başlatmak ister misiniz?
 Restart	Locale Preflet Window		Yeniden başlat
 Currency	TimeFormatSettings		Para birimi

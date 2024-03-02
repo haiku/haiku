@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Devices	2322690158
+1	romanian	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Magistrală ACPI
 Encryption controller	Device		Controlor de criptare
 Devices	System name		Dispozitive
@@ -8,7 +8,6 @@ Processor	Device		Procesor
 Generate system information	DevicesView		Generează informațiile de sistem
 Unknown	DeviceACPI		Necunoscut
 Class info	DevicePCI		Informații clasă
-<No device selected>	DevicesView		<Niciun dispozitiv selectat>
 USB bus	Device		Magistrală USB
 Computer	DevicesView		Calculator
 Communications	DeviceSCSI		Comunicații
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Controlor de comunicații prin satel
 Device class	DeviceSCSI		Clasă de dispozitive
 Device	Device		Dispozitiv
 Input device controller	Device		Controlor de dispozitiv de intrare
-PCI bus	DevicesView		Magistrală PCI
 ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
+PCI bus	DevicesView		Magistrală PCI
 ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
 Tape Drive	DeviceSCSI		Unitate de bandă magnetică
 Changer	DeviceSCSI		Schimbător

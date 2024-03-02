@@ -5,4 +5,4 @@ Debug	DebugServer		Hata ayıkla
 Terminate	DebugServer		Sonlandır
 Save report	DebugServer		Raporu kaydet
 Write core file	DebugServer		Çekirdek dosya yaz
-Oh no!	DebugServer		N'ayır!
+Oh no!	DebugServer		N’ayır!

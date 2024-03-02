@@ -8,7 +8,7 @@ All existing files will be skipped?	PackageView		Tüm var olan dosyalar atlansı
 Replace	PackageView		Değiştir
 All existing files will be replaced?	PackageView		Tüm var olan dosyalar değiştirilsin mi?
 Other…	PackageView		Diğer…
-The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı sembolik bağ zaten var.\nBu bağ paketteki ile değiştirilsin mi?
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Verilen yolda ‘%s’ adlı sembolik bağ zaten var.\nBu bağ paketteki ile değiştirilsin mi?
 Stop	PackageStatus		Durdur
 Install to:	PackageView		Kurulum konumu:
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Bu paket hâlihazırda sisteminizde yüklü gibi görünüyor. Kaldırılıp yeniden yüklensin mi?
@@ -18,7 +18,7 @@ No installation type selected	PackageView		Hiçbir kurulum türü seçilmedi
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Bu seçimi kurulumun geri kalanında hatırlamak istiyor musunuz?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Seçili paket sisteminizden kaldırılamadı. Paket bilgisi dosyası hasar görmüş olabilir.
 Install…	UninstallView		Kuruluyor…
-The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı öge zaten var.\nBu öge paketteki ile değiştirilsin mi?
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Verilen yolda ‘%s’ adlı öge zaten var.\nBu öge paketteki ile değiştirilsin mi?
 Installing files and folders	PackageInstall		Dosyalar ve klasörler kuruluyor
 Installed packages	UninstallWindow		Yüklü paketler
 Remove	UninstallView		Kaldır
@@ -40,19 +40,19 @@ No package selected.	UninstallView		Hiçbir paket seçilmedi.
 Error while installing the package\n	PackageView		Paket kurulurken hata\n
 Finishing installation	PackageInstall		Kurulum tamamlanıyor
 No package available.	PackageInfo		Paket yok
-The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı betik zaten var.\nBu betik paketteki ile değiştirilsin mi?
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Verilen yolda ‘%s’ adlı betik zaten var.\nBu betik paketteki ile değiştirilsin mi?
 Installation type:	PackageView		Kurulum türü:
 The package you selected has been successfully removed from your system.	UninstallView		Seçtiğiniz paket sisteminizden başarıyla kaldırıldı.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Paket dosyasında bir dosya boyutu uyuşmazlığı var. Paket hasar görmüş veya sonradan değiştirilmiş olabilir. Yine de sürdürmek istiyor musunuz?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		İptal et
-The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı dosya zaten var.\nBu dosya paketteki ile değiştirilsin mi?
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Verilen yolda ‘%s’ adlı dosya zaten var.\nBu dosya paketteki ile değiştirilsin mi?
 Replace all	PackageView		Tümünü değiştir
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Paket dosyası okunabilir değil.\nBunun olası nedenlerinden bir tanesi istenilen dosyanın geçerli bir BeOS .pkg paketi olmaması olabilir.
 Continue	PackageInfo		Sürdür
 No package selected.	PackageInfo		Hiçbir paket seçilmedi.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hata! \"%s\" geçerli bir yol değil.\n
-The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Verilen yolda '%s' adlı dizin zaten var.\nBu dizin paketteki ile değiştirilsin mi?
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Hata! “%s”, geçerli bir yol değil.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Verilen yolda ‘%s’ adlı dizin zaten var.\nBu dizin paketteki ile değiştirilsin mi?
 LegacyPackageInstaller	System name		Eski Paket Kurucu
 Ask again	PackageView		Yeniden sor
 Begin	PackageView		Başlat

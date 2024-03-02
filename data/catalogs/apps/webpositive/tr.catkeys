@@ -22,7 +22,7 @@ Open containing folder	Download Window		İndirildiği klasörü aç
 Find previous	WebPositive Window		Öncekini bul
 Full screen	WebPositive Window		Tam ekran
 Downloads in progress	WebPositive		Süren indirmeler
-Copy URL to clipboard	Download Window		URL'yi panoya kopyala
+Copy URL to clipboard	Download Window		URL’yi panoya kopyala
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
 Clone current page	Settings Window		Geçerli sayfadan bir tane daha aç
 Start page:	Settings Window		Başlangıç sayfası:
@@ -58,7 +58,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Arama terimi
 Reload	WebPositive Window		Yeniden yükle
 Expiration	Cookie Manager		Son kullanım süresi
-Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU'nuz pek eski ve WebPositive'in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf kurmanızı öneririz.
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU’nuz pek eski ve WebPositive’in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf kurmanızı öneririz.
 Download finished	Download Window		İndirme bitti
 Cookie manager	WebPositive Window		Çerez yöneticisi
 OK	Authentication Panel		Tamam
@@ -111,7 +111,7 @@ Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile 
 Close tab	WebPositive Window		Sekmeyi kapat
 Remove	Download Window		Kaldır
 About	WebPositive Window		Hakkında
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Hâlâ süren indirmeler var, WebPositive'den çıkmak istediğinize emin misiniz?
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Hâlâ süren indirmeler var, WebPositive’den çıkmak istediğinizden emin misiniz?
 Continue downloads	WebPositive		İndirmeleri sürdür
 Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma gerektirir
 Cancel	Settings Window		Vazgeç

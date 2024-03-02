@@ -1,6 +1,6 @@
 1	turkish	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	Bu geçerli bir URL değil.
-Repository URL:	AddRepoWindow	Text box label	Depo URL'si:
+Repository URL:	AddRepoWindow	Text box label	Depo URL’si:
 There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name% depo önbelleği yenilenirken bir hata oluştu
 There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	%name% deposu devre dışı bırakılırken bir hata oluştu
 Unknown	Constants	Unknown repository name	Bilinmeyen
@@ -30,7 +30,7 @@ Description	TaskLooper	Failed task error description	Açıklama
 Failed	TaskLooper	Failed task status message	Başarısız
 Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	İyi haber! %name% deposunun görevi tamamlandı.
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Bazı görevler hâlâ çalışıyor. Bu görevleri durdurup çıkılsın mı?
-This repository URL already exists.	RepositoriesView	Error message	Bu depo URL'si hâlihazırda var.
+This repository URL already exists.	RepositoriesView	Error message	Bu depo URL’si hâlihazırda var.
 Repositories	System name		Depolar
 Changes pending:	RepositoriesView	Status view text	Bekleyen değişiklikler:
 Remove	RepositoriesView	Button label	Kaldır

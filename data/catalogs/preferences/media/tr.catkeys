@@ -1,26 +1,26 @@
 1	turkish	x-vnd.Haiku-Media	582516163
-Couldn't add volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu'na eklenemedi: %s\n
+Couldn't add volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu’na eklenemedi: %s\n
 Restart media services	Media views		Ortam servislerini yeniden başlat
 Quit	Media Window		Çık
 <none>	VideoInputMenu	Used when no video input is available	<yok>
-Couldn't remove volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu'ndan kaldırılamadı: %s\n
+Couldn't remove volume control in Deskbar: %s\n	Media views		Ses denetimi Masaüstü Çubuğu’ndan kaldırılamadı: %s\n
 Video output:	Media views		Video çıkışı:
 Video input:	Media views		Video girişi:
 Audio output:	Media views		Ses çıkışı:
 Please select a SoundFont.	Midi View		Lütfen bir SoundFont seçin.
 There are no SoundFonts installed.	Midi View		Yüklü SoundFont yok.
-Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ortam'dan çıkma ortam servislerinin yeniden başlatılmalarını durduracaktır. Bu işlem ortam işlevlerini sekteye uğratabilir.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ortam’dan çıkma ortam servislerinin yeniden başlatılmalarını durduracaktır. Bu işlem ortam işlevlerini sekteye uğratabilir.
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Ortam sunucusuna bağlanılamadı.\nŞimdi başlatmak ister misiniz?
 Video settings	Media Window		Video ayarları
 Audio mixer	Media Window		Ses karıştırıcısı
-Show volume control on Deskbar	Media views		Ses denetimini Masaüstü Çubuğu'nda göster
+Show volume control on Deskbar	Media views		Ses denetimini Masaüstü Çubuğu’nda göster
 Start media server	Media Window		Ortam sunucusunu başlat
 Audio settings	Media Window		Ses ayarları
 Quit anyway	Media Window		Yine de çık
 Media	System name		Ortam
 Warning!	Media Window		Uyarı!
 MIDI Settings	Media Window		MIDI ayarları
-SoundFonts	Midi View		SoundFont'lar
+SoundFonts	Midi View		SoundFont’lar
 Audio input:	Media views		Ses girişi:
 <none>	Media views		<yok>
 Channel:	Media views		Kanal:

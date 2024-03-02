@@ -26,8 +26,8 @@ Satellite communications controller	Device		Pengontrol komunikasi satelit
 Device class	DeviceSCSI		Kelas perangkat
 Device	Device		Perangkat
 Input device controller	Device		Pengontrol perangkat input
-PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indikator Sistem ACPI
+PCI bus	DevicesView		Bus PCI
 ACPI System Bus	DeviceACPI		Sistem Bus ACPI
 Tape Drive	DeviceSCSI		Drive Pita
 Changer	DeviceSCSI		Pengalih

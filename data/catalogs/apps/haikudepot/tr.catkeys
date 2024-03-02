@@ -20,14 +20,14 @@ Switch account…	MainWindow		Hesap değiştir…
 Preferred language:	UserLoginWindow		Tercih edilen dil:
 Name	PackageListView		Ad
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Kimlik doğrulama veya güvenlik sorunu. Parolanızın doğru olduğunu doğrulama ve güncel kullanım koşullarını kabul ettiğinizi denetlemek için çıkın ve yeniden giriş yapın.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Haiku Depo, Haiku Depo Sunucusu adı verilen bir sunucu bileşeni ile iletişim kurar. Bunlar, Haiku Depo Sunucusu servisinin kullanımı ile ilgili olarak, '%Nickname%' kullanıcısının %AgreedToTimestamp% tarihinde kullanımını kabul ettiği koşullardır.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Haiku Depo, Haiku Depo Sunucusu adı verilen bir sunucu bileşeni ile iletişim kurar. Bunlar, Haiku Depo Sunucusu servisinin kullanımı ile ilgili olarak, ‘%Nickname%’ kullanıcısının %AgreedToTimestamp% tarihinde kullanımını kabul ettiği koşullardır.
 don't activate package %source%	PackageProblem	don't change '%source%	%source% paketini etkinleştirme
 Rate %Package%	RatePackageWindow		%Package% paketini derecelendir
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Paket yöneticisi başlatılırken bir hata oluştu: %message%
-Quit HaikuDepot	App		Haiku Depo'dan çık
+Quit HaikuDepot	App		Haiku Depo’dan çık
 Category	FilterView		Kategori
 A response to the captcha question must be provided.	UserLoginWindow		CAPTCHA sorusuna bir yanıt sağlanmalıdır.
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		'%Property%' ile beklenmeyen bir '%Message%' hatası alındı
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		‘%Property%’ ile beklenmeyen bir ‘%Message%’ hatası alındı
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
 Logout	ToLatestUserUsageConditionsWindow		Çıkış yap
 Password requirements	UserLoginWindow		Parola gereklilikleri
@@ -36,7 +36,7 @@ No changelog available.	PackageInfoView		Kullanılabilir bir değişiklik günl�
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Geçerli kullanım koşulları kabul edildi.
 Cancel	PackageProblem		İptal
 Version	PackageListView		Sürüm
-No, quit HaikuDepot	App		Hayır, Haiku Depo'dan çık
+No, quit HaikuDepot	App		Hayır, Haiku Depo’dan çık
 Not logged in	MainWindow		Giriş yapılmadı
 Featured packages	FeaturedPackagesView		Öne çıkan paketler
 Available	PackageListView		Kullanılabilir
@@ -50,7 +50,7 @@ All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
 There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunlar var:
-The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		'%Nickname%' kullanıcısı, herhangi bir kullanım koşulunu kabul etmedi.
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		‘%Nickname%’ kullanıcısı, herhangi bir kullanım koşulunu kabul etmedi.
 Usage conditions download problem	UserLoginWindow		Kullanım koşulları indirilirken hata
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	şu depodan %s paketini kur: %s\n
 Package daemon problem	App		Paket hizmeti sorunu
@@ -59,9 +59,9 @@ Repository	PackageListView		Depo
 Close	RatePackageWindow		Kapat
 Close	UserLoginWindow		Kapat
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		‘%REPO_NAME%’ depo paket bilgisi eşitleniyor
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Kullanım koşulları kabul edildi
 Size	PackageListView		Boyut
 Your rating was updated.	RatePackageWindow		Derecelendirmeniz güncellendi.
@@ -118,7 +118,7 @@ User Created	UserLoginWindow		Kullanıcı Oluşturuldu
 Check for updates…	MainWindow		Güncellemeleri denetle…
 Uninstalled	PackageListView		Kaldırıldı
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Kullanım koşullarını kabul ediyorum
-Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" kuruluyor
+Installing \"%PackageName%\"	InstallPackageProcess		“%PackageName%” kuruluyor
 OK	App		Tamam
 HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		Haiku Depo, Haiku Depo Sunucusu adı verilen bir sunucu bileşeni ile iletişim kurar. Bunlar, Haiku Depo Sunucusu servisinin kullanımı ile ilgili güncel kullanım koşullarıdır.
 Fatal error	UninstallPackageAction		Onulmaz hata
@@ -127,7 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamad
 No user ratings available.	PackageInfoView		Kullanıcı derecelendirmesi yok.
 <no info>	PackageInfoView		<bilgi yok>
 Usage conditions download problem	UserUsageConditions		Kullanım koşullarını indirme sorunu
-An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gereken parola gereksinimleri indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlükleri görüntüleme ile ilgili bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gereken parola gereksinimleri indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlükleri görüntüleme ile ilgili bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 Fetching screenshot	CacheScreenshotProcess		Ekran görüntüsü getiriliyor…
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
 Rating	PackageListView		Derecelendirme
@@ -140,15 +140,15 @@ Ratings	PackageInfoView		Derecelendirmeler
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Aşağıdaki sorunlara denk gelindi. Lütfen, her birisi için bir çözüm seçin:
 Local	LocalPkgDataLoadProcess		Yerel
 Package changes	PackageResult	Window title	Paket değişiklikleri
-Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım istatistiklerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihinizi daha sonra \"Ayarlar\" penceresinden değiştirebilirsiniz.
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Anonim kullanım istatistiklerini Haiku Depo sunucusu ile paylaşmak ister misiniz? Tercihinizi daha sonra “Ayarlar” penceresinden değiştirebilirsiniz.
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Kurulu paketler
 Date	PackageListView		Tarih
 The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Parola en az %MinPasswordLength% karakter olmalıdır. %MinPasswordUppercaseChar% karakter BÜYÜK harf ve %MinPasswordDigitsChar% sayı zorunluluğu vardır.
 Error	App		Hata
-An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu'nun Haiku Depo bölümünden erişilebilir.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
-Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" açılıyor
+Opening \"%DeskbarLink%\"	OpenPackageProcess		“%DeskbarLink%” açılıyor
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Depo sunucusu web sitesinden güncelleyebilir veya silebilirsiniz.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan CAPTCHA görseli için sunucu ile iletişim kurulamadı.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		CAPTCHA yanıtı yanlış. Yeni bir CAPTCHA üretilecek; yeniden deneyin.
@@ -162,7 +162,7 @@ Changelog	PackageInfoView		Değişiklik günlüğü
 About	PackageInfoView		Hakkında
 Password requirements download problem	UserLoginWindow		Parola gereklilikleri indirme sorunu
 Password:	UserLoginWindow		Parola:
-This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Bu uygulama sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek bu uygulamanın yeni bir sürümünü edinin. Gerekli en düşük sürüm: \"%s\".
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Bu uygulama sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek bu uygulamanın yeni bir sürümünü edinin. Gerekli en düşük sürüm: “%s”.
 Stability	RatePackageWindow		Kararlılık
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
 Cancel	SettingsWindow		Vazgeç
@@ -174,7 +174,7 @@ OK	MainWindow		Tamam
 Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Kullanıcılar, en az {0, plural, one{# yaşında} other{# yaşında}} olmalıdır.
 Version %Code%	UserUsageConditions		Sürüm %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
-Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" kaldırılıyor
+Uninstalling \"%PackageName%\"	UninstallPackageAction		“%PackageName%” kaldırılıyor
 Downloading:	PackageInfoView		İndiriliyor:
 Quit	MainWindow		Çık
 Success	UserLoginWindow		Başarılı
@@ -187,14 +187,14 @@ HaikuDepot is stopping or completing running operations before quitting.	Shuttin
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		HaikuDepotServer sisteminde %Nickname% kullanıcısı başarıyla oluşturuldu. Kullanıcı bilgilerinizi web arayüzünü kullanarak yönetebilirsiniz. Şu anda bu kullanıcı ile giriş yapmış bulunmaktasınız.
 Repositories	MainWindow		Depolar
 This rating is visible to other users	RatePackageWindow		Bu derecelendirme diğer kullanıcılar tarafından görüntülenebilir
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Paket verisi güncellenirken verinin uygulamaya yansıtılamamasına neden olan bir sorun oluştu. Bu sorun hakkında ayrıntılı bilgiye uygulama günlüklerinden erişilebilir.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.
-An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu'nun Haiku Depo bölümünden erişilebilir.
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Paket verisi güncellenirken verinin uygulamaya yansıtılamamasına neden olan bir sorun oluştu. Bu sorun hakkında ayrıntılı bilgiye uygulama günlüklerinden erişilebilir.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu’nun Haiku Depo bölümünden erişilebilir.
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		[%Nickname%] kullanıcısının kimliği doğrulandı; ancak sürdürmeden önce güncel kullanım koşullarını kabul etmelisiniz.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya var olan derecelendirmeyi değiştirmek olanaklı değil.
 Apply	SettingsWindow		Uygula
 View the password requirements	UserLoginWindow		Parola gerekliliklerini görüntüle
-The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		\"%Nickname%\" kullanıcısı, daha önceden kullanım koşullarını kabul etti; ancak koşulların yeni bir sürümü var. Güncel koşulların kabul edilmesi gereklidir.
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		“%Nickname%” kullanıcısı, daha önceden kullanım koşullarını kabul etti; ancak koşulların yeni bir sürümü var. Güncel koşulların kabul edilmesi gereklidir.
 Log out	MainWindow		Çıkış yap
 Comment language:	RatePackageWindow		Yorum dili:
 The password has been incorrectly repeated.	UserLoginWindow		İkinci parola girişinde yanlış(lar) var.
@@ -209,7 +209,7 @@ The nickname is required.	UserLoginWindow		Takma ad gerekli.
 Apply changes	PackageResult		Değişiklikleri uygula
 Server error	ServerHelper		Sunucu hatası
 Rate package	RatePackageWindow		Paketi derecelendir
-Recording view of \"%PackageName%\"	IncrementViewCounterProcess		\"%PackageName%\" görüntülemesinin kaydı yazılıyor
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		“%PackageName%” görüntülemesinin kaydı yazılıyor
 Sending anonymous usage data	MainWindow		Anonim kullanım verisi gönder
 Log in	UserLoginWindow		Giriş yap
 Usage conditions	UserUsageConditions		Kullanım koşulları

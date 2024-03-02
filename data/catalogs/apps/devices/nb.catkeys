@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	2322690158
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringskontroller
 Devices	System name		Maskinvare
@@ -8,7 +8,6 @@ Processor	Device		Prosessor
 Generate system information	DevicesView		Generer systeminformasjon
 Unknown	DeviceACPI		Ukjent
 Class info	DevicePCI		Klasseinformasjon
-<No device selected>	DevicesView		<Ingen enhet valgt>
 USB bus	Device		USB bus
 Computer	DevicesView		Datamaskin
 Communications	DeviceSCSI		Kommunikasjon
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Satellittkommunikasjonskontroller
 Device class	DeviceSCSI		Enhetsklasse
 Device	Device		Enhet
 Input device controller	Device		Input-enhetskontroller
-PCI bus	DevicesView		PCI-buss
 ACPI System Indicator	DeviceACPI		ACPI-systemindikator
+PCI bus	DevicesView		PCI-buss
 ACPI System Bus	DeviceACPI		ACPI-systembuss
 Tape Drive	DeviceSCSI		Båndstasjon
 Changer	DeviceSCSI		Skifter

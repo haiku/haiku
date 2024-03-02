@@ -10,9 +10,9 @@ Don't save	ShortcutsWindow		Kaydetme
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kestirmeler, düğme kümenizi kaydedemedi.
 Save	ShortcutsWindow		Kaydet
 Either	ShortcutsSpec		Herhangi biri
-Oh no	ShortcutsWindow		N'olamaz
+Oh no	ShortcutsWindow		N’olamaz
 Key	ShortcutsWindow		Düğme
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*İletiGönder application/x-vnd.Be-TRAK 'Tfnd'
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*İletiGönder application/x-vnd.Be-TRAK ‘Tfnd’
 Select	ShortcutsWindow		Seç
 Shortcuts	System name		Kestirmeler
 Quit	ShortcutsWindow		Çık

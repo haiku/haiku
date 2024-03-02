@@ -15,7 +15,7 @@ Lower left	TeapotWindow		Alt sol
 Fog	TeapotWindow		Sis
 FPS display	TeapotWindow		FPS ekranı
 GLTeapot	System name		GL Çaydanlık
-Limit FPS to refresh rate	TeapotWindow		FPS'yi yenileme hızına sınırla
+Limit FPS to refresh rate	TeapotWindow		FPS’yi yenileme hızına sınırla
 Settings	TeapotWindow		Ayarlar
 Gouraud shading	TeapotWindow		Gouraud tonlaması
 Lighting	TeapotWindow		Işıklandırma

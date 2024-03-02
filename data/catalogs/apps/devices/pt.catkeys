@@ -29,8 +29,8 @@ Satellite communications controller	Device		Controlador de comunicações por sa
 Device class	DeviceSCSI		Classe de dispositivo
 Device	Device		Dispositivo
 Input device controller	Device		Controlador de dispositivo de introdução
-PCI bus	DevicesView		Barramento PCI
 ACPI System Indicator	DeviceACPI		Indicador de Sistema de ACPI
+PCI bus	DevicesView		Barramento PCI
 ACPI System Bus	DeviceACPI		Barramento de Sistema ACPI
 Tape Drive	DeviceSCSI		Dispositivo de Fita Magnética
 Changer	DeviceSCSI		Trocador

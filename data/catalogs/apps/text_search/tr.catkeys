@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku.TextSearch	1757850908
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Lütfen sizin için İzleyici'de seçilmesini dilediğiniz dosyaları seçin.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Lütfen sizin için İzleyici’de seçilmesini dilediğiniz dosyaları seçin.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Failed to start xargs program!	Grepper		xargs programı başlatılamadı!
 Open selection	GrepWindow		Seçimi aç
@@ -16,7 +16,7 @@ Follow symbolic links	GrepWindow		Sembolik bağlantıları izle
 Regular expression	GrepWindow		Düzenli ifade
 Text files only	GrepWindow		Yalnızca metin dosyaları
 Quit	GrepWindow		Çık
-Show files in Tracker	GrepWindow		Dosyaları İzleyici'de göster
+Show files in Tracker	GrepWindow		Dosyaları İzleyici’de göster
 Please select the files you wish to keep searching.	GrepWindow		Lütfen aramayı sürdürmeyi dilediğiniz dosyaları seçin.
 Trim to selection	GrepWindow		Seçime kırp
 Set target…	GrepWindow		Hedef belirle…

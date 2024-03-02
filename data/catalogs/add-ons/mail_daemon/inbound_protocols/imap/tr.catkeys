@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-IMAP	1343128980
-Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		\"%server%\" sunucusuna bağlanılamadı:\n%error%
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		“%server%” sunucusuna bağlanılamadı:\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		IMAP klasörlerine olan abonelikler güncelleniyor, lütfen bekleyin…
 Failed to fetch available storage.	IMAPFolderConfig		Kullanılabilir depolama alanı getirilemedi.
 Cancel	IMAPFolderConfig		Vazgeç

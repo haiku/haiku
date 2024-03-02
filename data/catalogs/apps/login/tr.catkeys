@@ -3,7 +3,7 @@ Invalid login!	Login View		Geçersiz giriş!
 Error	Login App		Hata
 Login application for Haiku\nUsage:	Login App		Haiku için oturum açma uygulaması\nKullanım:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tPencereyi kipsel kılma
-Welcome to Haiku	Login Window		Haiku'ya hoş geldiniz
+Welcome to Haiku	Login Window		Haiku’ya hoş geldiniz
 --edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tMasaüstünü özelleştirmeye izin vermek için raf düzenleme kipinde başlat
 Halt	Login View		Dur
 Desktop	Desktop Window		Masaüstü

@@ -10,5 +10,5 @@ Central beep	NotifierConfigView		Merkezi bip
 New mail notification	NotifierFilter		Yeni posta bildirimi
 New messages	NotifierFilter		Yeni iletiler
 Method:	NotifierConfigView		Yöntem:
-Keyboard LEDs	NotifierConfigView		Klavye LED'leri
+Keyboard LEDs	NotifierConfigView		Klavye LED’leri
 You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		%account hesabında {0, plural, one{bir yeni iletiniz} other{# yeni iletiniz}} var.

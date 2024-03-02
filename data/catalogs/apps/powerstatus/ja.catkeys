@@ -3,12 +3,12 @@ Run in window	PowerStatus		ウィンドウモードで起動
 Extended battery info	PowerStatus		拡張バッテリー情報
 Show status icon	PowerStatus		状態アイコンの表示
 Battery charging	PowerStatus		充電中
-Design capacity low warning: 	PowerStatus		設計容量の低下警告:
+Design capacity low warning: 	PowerStatus		低下警告設計容量:
 The battery level is critical, please plug in the device immediately.	PowerStatus		バッテリー残量が空に近いので、すぐにデバイスを電源につないでください。
 non-rechargeable	PowerStatus		再充電不能
 Last full charge: 	PowerStatus		前回の完全充電:
  mV	PowerStatus		 mV
-Current rate: 	PowerStatus		電流率:
+Current rate: 	PowerStatus		Cレート:
 Show text label	PowerStatus		テキストラベルの表示
 Quit	PowerStatus		終了
 Battery not charging	PowerStatus		バッテリーが充電されない
@@ -35,10 +35,10 @@ No supported battery detected. PowerStatus cannot be used on your system.	PowerS
 Show percent	PowerStatus		充電率の表示
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		バッテリー 残量が低下してきたので、デバイスを電源につないでください。
-Design capacity warning: 	PowerStatus		設計容量警告:
+Design capacity warning: 	PowerStatus		警告設計容量:
 Capacity granularity 2: 	PowerStatus		容量精度 2:
 Too bad!	PowerStatus		残念!
-Technology: 	PowerStatus		テクノロジー:
+Technology: 	PowerStatus		バッテリー技術:
 not charging	PowerStatus		充電されない
  mWh	PowerStatus		 mWh
 PowerStatus	System name		バッテリーの状態

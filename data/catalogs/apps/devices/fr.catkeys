@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Devices	2322690158
+1	french	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Contrôleur de chiffrement
 Devices	System name		Périphériques
@@ -8,7 +8,6 @@ Processor	Device		Microprocesseur
 Generate system information	DevicesView		Générer les informations systèmes
 Unknown	DeviceACPI		Inconnu
 Class info	DevicePCI		Information de classe
-<No device selected>	DevicesView		<Aucun périphérique sélectionné>
 USB bus	Device		Bus USB
 Computer	DevicesView		Ordinateur
 Communications	DeviceSCSI		Communications
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Contrôleur de communications par sa
 Device class	DeviceSCSI		Classe de périphérique
 Device	Device		Périphérique
 Input device controller	Device		Contrôleur de périphérique d’entrée
-PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indicateur système ACPI
+PCI bus	DevicesView		Bus PCI
 ACPI System Bus	DeviceACPI		Bus système ACPI
 Tape Drive	DeviceSCSI		Lecteur de bandes
 Changer	DeviceSCSI		Changeur de disques

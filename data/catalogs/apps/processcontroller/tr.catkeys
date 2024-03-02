@@ -8,7 +8,7 @@ Processor %d	ProcessController		İşlemci %d
 Live in the Deskbar	ProcessController		Canlı yenileme
 Kill this team!	ProcessController		Sonlandır
 OK	ProcessController		Tamam
-You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Süreç Denetimcisi'ni bir pencerede çalıştırabilir veya Masaüstü Çubuğu'na kurabilirsiniz.
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Süreç Denetimcisi’ni bir pencerede çalıştırabilir veya Masaüstü Çubuğu’na kurabilirsiniz.
 Real-time priority	ProcessController		Gerçek zamanlı öncelik
 Custom priority	ProcessController		Özel öncelik
 Debug this thread!	ProcessController		Bu iş parçacığını ayıkla!
@@ -17,7 +17,7 @@ Urgent display priority	ProcessController		İvedi görüntüleme önceliği
 Memory usage	ProcessController		Bellek kullanımı
 Ok!	ProcessController		Tamam!
 Normal priority	ProcessController		Normal öncelik
-Restart Deskbar	ProcessController		Masaüstü Çubuğu'nu yeniden başlat
+Restart Deskbar	ProcessController		Masaüstü Çubuğu’nu yeniden başlat
 About ProcessController…	ProcessController		Süreç Denetimcisi hakkında…
 Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
 Please confirm	ProcessController		Lütfen onaylayın
@@ -34,16 +34,16 @@ This team is already gone…	ProcessController		Bu takım zaten gitmiş…
 Gone teams…	ProcessController		Gidik takımlar…
 Quit an application	ProcessController		Bir uygulamadan çık
 Cancel	ProcessController		Vazgeç
-Install in Deskbar	ProcessController		Masaüstü Çubuğu'na kur
+Install in Deskbar	ProcessController		Masaüstü Çubuğu’na kur
 Debug this team!	ProcessController		Hata ayıkla
 ProcessController	System name		Süreç Denetimcisi
 Lowest active priority	ProcessController		En düşük etkin öncelik
-Restart Tracker	ProcessController		İzleyici'yi yeniden başlat
+Restart Tracker	ProcessController		İzleyici’yi yeniden başlat
 System resources & caches…	ProcessController		Sistem özkaynakları ve önbellekler…
 Damned!	ProcessController		Hadi be!
 New Terminal	ProcessController		Yeni uçbirim
 Power saving	ProcessController		Güç tasarrufu
-ProcessController is already installed in Deskbar.	ProcessController		Süreç Denetimcisi Masaüstü Çubuğu'nda zaten kurulu
+ProcessController is already installed in Deskbar.	ProcessController		Süreç Denetimcisi Masaüstü Çubuğu’nda zaten kurulu
 This is the last active processor…\nYou can't turn it off!	ProcessController		Bu son etkin işlemci…\nOnu kapatamazsınız!
 This thread is already gone…	ProcessController		Bu iş parçacığı zaten gitmiş…
 Run in window	ProcessController		Pencere içinde çalıştır

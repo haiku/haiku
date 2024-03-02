@@ -47,12 +47,12 @@ AboutSystem	System name		Über Haiku
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Copyright © 2019 Joe Drago. Alle Rechte vorbehalten.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Alle Rechte vorbehalten.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd und Clark Cooper.
-Source Code: 	AboutView		Quellcode: 
 \nCopyrights\n\n	AboutView		\nCopyrights\n\n
+Source Code: 	AboutView		Quellcode: 
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
-The HaikuPorts team\n	AboutView		Das HaikuPorts-Team\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Enthält Software des GNU-Projekts, die unter den GPL- und LGPL-Lizenzen veröffentlicht wurde:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © Free Software Foundation.
+The HaikuPorts team\n	AboutView		Das HaikuPorts-Team\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Enthält Software des FreeBSD-Projekts, die unter der BSD-Lizenz veröffentlicht wurde:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Alle Rechte vorbehalten.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Alle Rechte vorbehalten.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.

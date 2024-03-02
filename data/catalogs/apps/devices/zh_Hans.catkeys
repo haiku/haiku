@@ -29,8 +29,8 @@ Satellite communications controller	Device		卫星通讯控制器
 Device class	DeviceSCSI		设备类型
 Device	Device		设备
 Input device controller	Device		输入设备控制器
-PCI bus	DevicesView		PCI 总线
 ACPI System Indicator	DeviceACPI		ACPI 系统指示器
+PCI bus	DevicesView		PCI 总线
 ACPI System Bus	DeviceACPI		ACPI 系统总线
 Tape Drive	DeviceSCSI		磁带驱动
 Changer	DeviceSCSI		交换设备

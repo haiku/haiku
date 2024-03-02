@@ -3,8 +3,8 @@ IPv6 address:	NetworkStatusView		IPv6 adresi:
 Quit	NetworkStatusView		Çık
 Unknown	NetworkStatusView		Bilinmeyen
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Ağ paneli başlatılamadı.\n\nHata: 
-Install in Deskbar	NetworkStatus		Masaüstü Çubuğu'na kur
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus seçenekleri:\n\t--deskbar\tyineleneni kendiliğinden Masaüstü Çubuğu'na ekler\n\t--help\t\tbu iletiyi gösterir ve çıkar
+Install in Deskbar	NetworkStatus		Masaüstü Çubuğu’na kur
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus seçenekleri:\n\t--deskbar\tyineleneni kendiliğinden Masaüstü Çubuğu’na ekler\n\t--help\t\tbu iletiyi gösterir ve çıkar
 Open network preferences…	NetworkStatusView		Ağ tercihlerini aç…
 NetworkStatus	System name		Ağ Durumu
 Broadcast:	NetworkStatusView		Yayın:
@@ -16,7 +16,7 @@ Network Status	NetworkStatusView		Ağ Durumu
 Deskbar is not running, giving up.	NetworkStatus		Masaüstü Çubuğu çalışmıyor, vazgeçildi.
 Netmask:	NetworkStatusView		Ağ maskesi:
 No stateful configuration	NetworkStatusView		Durum yapılandırması yok
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ağ Durumu'nu bir pencerede çalıştırabilir veya Masaüstü Çubuğu'na yükleyebilirsiniz.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Ağ Durumu’nu bir pencerede çalıştırabilir veya Masaüstü Çubuğu’na yükleyebilirsiniz.
 IPv4 address:	NetworkStatusView		IPv4 adresi:
 %ifaceName information:\n	NetworkStatusView		%ifaceName bilgisi:\n
 Run in window	NetworkStatus		Pencerede çalıştır

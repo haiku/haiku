@@ -26,8 +26,8 @@ Satellite communications controller	Device		Satelitakomunika regilo
 Device class	DeviceSCSI		Aparata klaso
 Device	Device		Aparato
 Input device controller	Device		Enigaparata regilo
-PCI bus	DevicesView		PCI-buso
 ACPI System Indicator	DeviceACPI		ACPI Sistemindikilo
+PCI bus	DevicesView		PCI-buso
 ACPI System Bus	DeviceACPI		ACPI Sistembuso
 Tape Drive	DeviceSCSI		Bendolegilo
 Changer	DeviceSCSI		Ŝanĝanto

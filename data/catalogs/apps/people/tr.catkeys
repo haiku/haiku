@@ -10,7 +10,7 @@ Could not create %s.	People		%s oluşturulamadı.
 Quit	People		Çık
 Company	People		Şirket
 Name	People		Ad
-The file '%name%' could not be written.	People		'%name' dosyası yazılamadı.
+The file '%name%' could not be written.	People		‘%name’ dosyası yazılamadı.
 Contact name	People		Kişi adı
 Cancel	People		Vazgeç
 Edit	People		Düzen

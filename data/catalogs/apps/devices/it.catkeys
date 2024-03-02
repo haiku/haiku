@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Devices	2322690158
+1	italian	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controller di cifratura
 Devices	System name		Dispositivi
@@ -8,7 +8,6 @@ Processor	Device		Processore
 Generate system information	DevicesView		Genera informazioni di sistema
 Unknown	DeviceACPI		Sconosciuto
 Class info	DevicePCI		Informazioni sulla classe
-<No device selected>	DevicesView		<Nessun dispositivo selezionato>
 USB bus	Device		Bus USB
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Comunicazioni
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Controller comunicazioni satellitari
 Device class	DeviceSCSI		Classe dispositivo
 Device	Device		Dispositivo
 Input device controller	Device		Controller dispositivi di ingresso
-PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indicatore di Sistema ACPI
+PCI bus	DevicesView		Bus PCI
 ACPI System Bus	DeviceACPI		Bus di Sistema ACPI
 Tape Drive	DeviceSCSI		Unità a nastro
 Changer	DeviceSCSI		Modificatore

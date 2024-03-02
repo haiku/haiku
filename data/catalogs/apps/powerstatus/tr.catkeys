@@ -17,7 +17,7 @@ Model number: 	PowerStatus		Model numarası:
 Battery unused	PowerStatus		Pil kullanılmamış
 Type: 	PowerStatus		Tür: 
 Damaged battery	PowerStatus		Pil hasar görmüş
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Güç Durumu'nu bir pencere içinde çalıştırabilir veya Masaüstü Çubuğu'na kurabilirsiniz.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Güç Durumu’nu bir pencere içinde çalıştırabilir veya Masaüstü Çubuğu’na kurabilirsiniz.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Pil boşalıyor
 Design voltage: 	PowerStatus		Fabrika çıkış voltaj: 
@@ -46,5 +46,5 @@ Design capacity: 	PowerStatus		Fabrika çıkış sığası:
 OEM info: 	PowerStatus		OEM bilgisi: 
 no battery	PowerStatus		pil yok
 Empty battery slot	PowerStatus		Boş pil yuvası
-Install in Deskbar	PowerStatus		Masaüstü Çubuğu'na kur
+Install in Deskbar	PowerStatus		Masaüstü Çubuğu’na kur
 charging	PowerStatus		doluyor

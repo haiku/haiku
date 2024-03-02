@@ -23,7 +23,7 @@ Window width	GeneralView		Pencere genişliği
 Applications	NotificationView		Uygulamalar
 General	PrefletView		Genel
 OK	NotificationView		Tamam
-Follow Deskbar	GeneralView		Masaüstü Çubuğu'nu izle
+Follow Deskbar	GeneralView		Masaüstü Çubuğu’nu izle
 Notifications	System name		Bildirimler
 Allowed	NotificationView		İzin verilenler
 Duration:	GeneralView		Uzunluk:

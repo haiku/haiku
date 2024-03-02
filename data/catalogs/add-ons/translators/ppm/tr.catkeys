@@ -3,7 +3,7 @@ None	PPMTranslator		Yok
 PPM Settings	PPMMain		PPM Ayarları
 System palette 8 bits	PPMTranslator		8 bit sistem paleti
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Örnek kod telif hakkı 1999, Be Incorporated
-Something is wrong with the PPMTranslator!	PPMMain		PPMTranslator'da bir şeyler ters gidiyor!
+Something is wrong with the PPMTranslator!	PPMMain		PPMTranslator’da bir şeyler ters gidiyor!
 Grayscale 8 bits	PPMTranslator		8 bit gri tonlu
 Based on PPMTranslator sample code	PPMTranslator		PPMTranslator örnek kodu temel alınmıştır
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bit yüksek son haneli

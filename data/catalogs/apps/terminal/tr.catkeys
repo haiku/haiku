@@ -10,14 +10,14 @@ Edit	Terminal TermWindow		Düzen
 Select all	Terminal TermWindow		Tümünü seç
 Confirm exit if active programs exist	Terminal AppearancePrefView		Etkin program varsa çıkarken onay iste
 Color scheme:	Terminal ThemeView		Renk şeması:
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tSekmede çalışan etkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için '%2d'.\n\t%T\t-\Geçerli yerelleştirme için Uçbirim uygulaması adı\n\t%e\t-\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%i\t-\tPencere sırası\n\t%p\t-\tSekmedeki etkin işlemin adı\n\t%t\t-\tSekme başlığı
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tSekmede çalışan etkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için ‘%2d’.\n\t%T\t-\Geçerli yerelleştirme için Uçbirim uygulaması adı\n\t%e\t-\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%i\t-\tPencere sırası\n\t%p\t-\tSekmedeki etkin işlemin adı\n\t%t\t-\tSekme başlığı
 Copy	Terminal TermWindow		Kopyala
 Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
 Print	Terminal TermWindow		Yazdır
 Settings	Terminal TermWindow		Ayarlar
 %app% settings	Terminal PrefWindow	window title	%app% ayarları
 ANSI bright black color	Terminal ThemeView		ANSI açık siyah
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için '%2d'.\n\t%i\t-\tSekmenin indeksi.\n\t%e\t-\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin sürecin adı.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için ‘%2d’.\n\t%i\t-\tSekmenin indeksi.\n\t%e\t-\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin sürecin adı.
 Use default	Terminal SetTitleWindow		Saptanmışları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
 Error!	Terminal getString		Hata!
@@ -80,7 +80,7 @@ Full screen	Terminal TermWindow		Tam ekran
 Shell 	Terminal TermWindow		Kabuk 
 Revert	Terminal ThemeWindow		Eski haline döndür
 ANSI green color	Terminal ThemeView		ANSI yeşil
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' karakteri\n\t%<\t-\tYalnızca sonraki gelen yer tutucu boş\n\t\t\tdeğilse gösterilecek bir bölüm başlatır.\n\t%>\t-\tYalnızca bir önceki %< bölümü ve bunun arasındaki\n\t\t\tyer tutucu boş değilse gösterilecek bir bölüm başlatır.\n\t%-\t-\tBir %< veya %> bölümünü sonlandırır.\n\n'%' ve biçimlendirme harfi arasına konulacak her bir abece-sayısal olmayan karakter\nbir boşluk ekleyecektir. Ekleme %< bölümüne yapılacaktır.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t‘%’ karakteri\n\t%<\t-\tYalnızca sonraki gelen yer tutucu boş\n\t\t\tdeğilse gösterilecek bir bölüm başlatır.\n\t%>\t-\tYalnızca bir önceki %< bölümü ve bunun arasındaki\n\t\t\tyer tutucu boş değilse gösterilecek bir bölüm başlatır.\n\t%-\t-\tBir %< veya %> bölümünü sonlandırır.\n\n‘%’ ve biçimlendirme harfi arasına konulacak her bir abece-sayısal olmayan karakter\nbir boşluk ekleyecektir. Ekleme %< bölümüne yapılacaktır.
 ANSI bright cyan color	Terminal ThemeView		ANSI açık camgöbeği
 Tab title:	Terminal TermWindow		Sekme başlığı:
 Window title:	Terminal TermWindow		Pencere başlığı:
@@ -119,7 +119,7 @@ Find…	Terminal TermWindow		Bul…
 No search string was entered.	Terminal TermWindow		Hiçbir arama dizisi girilmedi.
 Move here	Terminal TermView		Buraya taşı
 Abort	Terminal Shell		İptal et
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Aşağıdaki süreçler hâlâ çalışıyor:\n\n\t%1\n\nUçbirim'i kapatırsanız süreçler sonlandırılacak.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Aşağıdaki süreçler hâlâ çalışıyor:\n\n\t%1\n\nUçbirim’i kapatırsanız süreçler sonlandırılacak.
 Set window title	Terminal TermWindow		Pencere başlığını ayarla
 ANSI red color	Terminal ThemeView		ANSI kırmızı
 Increase	Terminal TermWindow		Artır

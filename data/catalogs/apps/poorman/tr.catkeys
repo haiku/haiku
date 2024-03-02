@@ -8,7 +8,7 @@ Log to file	PoorMan		Dosyaya günlükle
 Shutting down.	PoorMan		Kapatılıyor…
 Error Dir	PoorMan		Hata dizini
 Web folder:	PoorMan		Web klasörü:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web'de yayımlanacak klasörü seçin.\n\nPoorMan sizin yerinize Ev klasörünüzde \"public_html\" adında saptanmış bir klasör oluşturabilir.\nİsterseniz kendi belirleyeceğiniz bir klasörü de seçebilirsiniz.
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Lütfen web’de yayımlanacak klasörü seçin.\n\nPoorMan sizin yerinize Ev klasörünüzde \"public_html\" adında saptanmış bir klasör oluşturabilir.\nİsterseniz kendi belirleyeceğiniz bir klasörü de seçebilirsiniz.
 Log To Console	PoorMan		Konsola günlükle
 File Name	PoorMan		Dosya adı
 Starting up... 	PoorMan		Başlatılıyor… 

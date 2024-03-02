@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Devices	2322690158
+1	friulian	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlôr di cifradure
 Devices	System name		Dispositîfs
@@ -8,7 +8,6 @@ Processor	Device		Processôr
 Generate system information	DevicesView		Gjenere informazions di sisteme
 Unknown	DeviceACPI		No cognossût
 Class info	DevicePCI		Informazions classe
-<No device selected>	DevicesView		<Nissun dispositîf selezionât>
 USB bus	Device		Bus USB
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Comunicazions
@@ -30,8 +29,8 @@ Satellite communications controller	Device		Controlôr di comunicazions satelit�
 Device class	DeviceSCSI		Classe dispositîf
 Device	Device		Dispositîf
 Input device controller	Device		Controlôr dispositîfs di input
-PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indicadôr di sisteme ACPI
+PCI bus	DevicesView		Bus PCI
 ACPI System Bus	DeviceACPI		Bus di Sisteme ACPI
 Tape Drive	DeviceSCSI		Unitât a curdele magnetiche
 Changer	DeviceSCSI		Modificadôr
