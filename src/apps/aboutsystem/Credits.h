@@ -539,7 +539,7 @@ static const Translation kTranslations[] = {
 	"François Revol\n" \
 	"Jonathan Schleifer\n" \
 	"John Scipione\n" \
-	"Joachim Seemer (Humdinger)\n"
+	"Joachim Seemer (Humdinger)\n" \
 	"Gerasim Troeglazov\n" \
 	"Alexander von Gluck IV\n" \
 	"\n"
