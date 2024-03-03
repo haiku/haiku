@@ -313,7 +313,7 @@ StreamBase::Init(int32 virtualIndex)
 {
 	BAutolock _(fStreamLock);
 
-	TRACE("StreamBase::Init(%ld)\n", virtualIndex);
+	TRACE("StreamBase::Init(%" B_PRId32 ")\n", virtualIndex);
 
 	if (fContext == NULL)
 		return B_NO_INIT;
@@ -324,7 +324,7 @@ StreamBase::Init(int32 virtualIndex)
 		return B_BAD_INDEX;
 	}
 
-	TRACE("  context stream index: %ld\n", streamIndex);
+	TRACE("  context stream index: %" B_PRId32 "\n", streamIndex);
 
 	// We need to remember the virtual index so that
 	// AVFormatReader::FreeCookie() can clear the correct stream entry.
@@ -461,8 +461,8 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 	if (fContext == NULL || fStream == NULL)
 		return B_NO_INIT;
 
-	TRACE_SEEK("StreamBase::Seek(%ld,%s%s%s%s, %lld, "
-		"%lld)\n", VirtualIndex(),
+	TRACE_SEEK("StreamBase::Seek(%" B_PRId32 ",%s%s%s%s, %" B_PRId64 ", "
+		"%" B_PRId64 ")\n", VirtualIndex(),
 		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
 		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
 		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD)
@@ -543,7 +543,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 						if (diff < 8192)
 							break;
 						timeStamp -= diff;
-						TRACE_SEEK("  need to seek back (%lld) (time: %.2f "
+						TRACE_SEEK("  need to seek back (%" B_PRIdBIGTIME ") (time: %.2f "
 							"-> %.2f)\n", timeStamp, *time / 1000000.0,
 							foundTime / 1000000.0);
 						if (timeStamp < 0)
@@ -559,7 +559,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 						if (diff < 8192)
 							break;
 						timeStamp += diff;
-						TRACE_SEEK("  need to seek forward (%lld) (time: "
+						TRACE_SEEK("  need to seek forward (%" B_PRId64 ") (time: "
 							"%.2f -> %.2f)\n", timeStamp, *time / 1000000.0,
 							foundTime / 1000000.0);
 						if (timeStamp > duration)
@@ -570,11 +570,11 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 						}
 					}
 				}
-				TRACE_SEEK("  found time: %lld -> %lld (%.2f)\n", *time,
+				TRACE_SEEK("  found time: %" B_PRIdBIGTIME " -> %" B_PRIdBIGTIME " (%.2f)\n", *time,
 					foundTime, foundTime / 1000000.0);
 				*time = foundTime;
 				*frame = (uint64)(*time * frameRate / 1000000LL + 0.5);
-				TRACE_SEEK("  seeked frame: %lld\n", *frame);
+				TRACE_SEEK("  seeked frame: %" B_PRId64 "\n", *frame);
 			} else {
 				TRACE_SEEK("  _NextPacket() failed!\n");
 				return B_ERROR;
@@ -664,7 +664,7 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 		*time = foundTime;
 		TRACE_SEEK("  sought time: %.2fs\n", *time / 1000000.0);
 		*frame = (uint64)(*time * frameRate / 1000000.0 + 0.5);
-		TRACE_SEEK("  sought frame: %lld\n", *frame);
+		TRACE_SEEK("  sought frame: %" B_PRId64 "\n", *frame);
 	}
 
 	return B_OK;
@@ -971,7 +971,7 @@ get_channel_mask(AVCodecParameters* context)
 status_t
 AVFormatReader::Stream::Init(int32 virtualIndex)
 {
-	TRACE("AVFormatReader::Stream::Init(%ld)\n", virtualIndex);
+	TRACE("AVFormatReader::Stream::Init(%" B_PRId32 ")\n", virtualIndex);
 
 	status_t ret = StreamBase::Init(virtualIndex);
 	if (ret != B_OK)
@@ -1216,7 +1216,7 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 {
 	BAutolock _(&fLock);
 
-	TRACE("AVFormatReader::Stream::GetStreamInfo(%ld)\n",
+	TRACE("AVFormatReader::Stream::GetStreamInfo(%" B_PRId32 ")\n",
 		VirtualIndex());
 
 	double frameRate = FrameRate();
@@ -1225,7 +1225,7 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 	#ifdef TRACE_AVFORMAT_READER
 	if (fStream->start_time != AV_NOPTS_VALUE) {
 		bigtime_t startTime = _ConvertFromStreamTimeBase(fStream->start_time);
-		TRACE("  start_time: %lld or %.5fs\n", startTime,
+		TRACE("  start_time: %" B_PRIdBIGTIME " or %.5fs\n", startTime,
 			startTime / 1000000.0);
 		// TODO: Handle start time in FindKeyFrame() and Seek()?!
 	}
@@ -1233,7 +1233,7 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 
 	*duration = Duration();
 
-	TRACE("  duration: %lld or %.5fs\n", *duration, *duration / 1000000.0);
+	TRACE("  duration: %" B_PRIdBIGTIME " or %.5fs\n", *duration, *duration / 1000000.0);
 
 	#if 0
 	if (fStream->nb_index_entries > 0) {
@@ -1267,10 +1267,10 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 		// Calculate from duration and frame rate
 		*frameCount = (int64)(fStream->duration * frameRate
 			* fStream->time_base.num / fStream->time_base.den);
-		TRACE("  frameCount calculated: %lld, from context: %lld\n",
+		TRACE("  frameCount calculated: %" B_PRIu64 ", from context: %" B_PRIu64 "\n",
 			*frameCount, fStream->nb_frames);
 	} else
-		TRACE("  frameCount: %lld\n", *frameCount);
+		TRACE("  frameCount: %" B_PRId64 "\n", *frameCount);
 
 	*format = fFormat;
 
@@ -1635,7 +1635,7 @@ AVFormatReader::GetMetaData(BMessage* _data)
 status_t
 AVFormatReader::AllocateCookie(int32 streamIndex, void** _cookie)
 {
-	TRACE("AVFormatReader::AllocateCookie(%ld)\n", streamIndex);
+	TRACE("AVFormatReader::AllocateCookie(%" B_PRId32 ")\n", streamIndex);
 
 	BAutolock _(fSourceLock);
 
