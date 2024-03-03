@@ -510,6 +510,7 @@ static const Translation kTranslations[] = {
 #define kNumberOfTranslations (sizeof(kTranslations) / sizeof(Translation))
 
 #define kCurrentMaintainers \
+	"Pascal R. G. Abresch\n" \
 	"Kyle Ambroff-Kao\n" \
 	"Stephan Aßmus\n" \
 	"Máximo Castañeda\n" \
@@ -538,6 +539,7 @@ static const Translation kTranslations[] = {
 	"François Revol\n" \
 	"Jonathan Schleifer\n" \
 	"John Scipione\n" \
+	"Joachim Seemer (Humdinger)\n"
 	"Gerasim Troeglazov\n" \
 	"Alexander von Gluck IV\n" \
 	"\n"
@@ -600,7 +602,6 @@ static const Translation kTranslations[] = {
 	"\n"
 
 #define kContributors \
-	"Pascal R. G. Abresch\n" \
 	"Andrea Anzani\n" \
 	"Sean Bartell\n" \
 	"Sambuddha Basu\n" \
