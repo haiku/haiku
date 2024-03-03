@@ -299,15 +299,9 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_LEFT_ARROW:
 			if (rawChar == B_LEFT_ARROW) {
-				if ((mod & B_OPTION_KEY) != 0) {
-					if (fView->fListener != NULL)
-						fView->fListener->PreviousTermView(fView);
-					return;
-				}
-
 				if ((mod & B_SHIFT_KEY) != 0)
 					toWrite = SHIFT_LEFT_ARROW_KEY_CODE;
-				else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
+				else if ((mod & B_CONTROL_KEY) != 0)
 					toWrite = CTRL_LEFT_ARROW_KEY_CODE;
 				else
 					toWrite = LEFT_ARROW_KEY_CODE;
@@ -316,15 +310,9 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_RIGHT_ARROW:
 			if (rawChar == B_RIGHT_ARROW) {
-				if ((mod & B_OPTION_KEY) != 0) {
-					if (fView->fListener != NULL)
-						fView->fListener->NextTermView(fView);
-					return;
-				}
-
 				if ((mod & B_SHIFT_KEY) != 0)
 					toWrite = SHIFT_RIGHT_ARROW_KEY_CODE;
-				else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
+				else if ((mod & B_CONTROL_KEY) != 0)
 					toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
 				else
 					toWrite = RIGHT_ARROW_KEY_CODE;
@@ -332,11 +320,11 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_UP_ARROW:
-			if ((mod & B_OPTION_KEY) && (mod & B_SHIFT_KEY)) {
-				fView->_ScrollTo(fView->fScrollOffset - fView->fFontHeight,
-					true);
+			if ((mod & B_CONTROL_KEY) && (mod & B_SHIFT_KEY)) {
+				fView->_ScrollTo(fView->fScrollOffset - fView->fFontHeight, true);
 				return;
 			}
+
 			if (rawChar == B_UP_ARROW) {
 				if ((mod & B_SHIFT_KEY) != 0)
 					toWrite = SHIFT_UP_ARROW_KEY_CODE;
@@ -348,9 +336,8 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_DOWN_ARROW:
-			if ((mod & B_OPTION_KEY) && (mod & B_SHIFT_KEY)) {
-				fView->_ScrollTo(fView->fScrollOffset + fView->fFontHeight,
-					true);
+			if ((mod & B_CONTROL_KEY) && (mod & B_SHIFT_KEY)) {
+				fView->_ScrollTo(fView->fScrollOffset + fView->fFontHeight, true);
 				return;
 			}
 
@@ -389,9 +376,7 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_PAGE_UP:
 			if (mod & B_SHIFT_KEY) {
-				fView->_ScrollTo(
-					fView->fScrollOffset - fView->fFontHeight  * fView->fRows,
-					true);
+				fView->_ScrollTo(fView->fScrollOffset - fView->fFontHeight * fView->fRows, true);
 				return;
 			}
 			if (rawChar == B_PAGE_UP)
@@ -400,9 +385,7 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_PAGE_DOWN:
 			if (mod & B_SHIFT_KEY) {
-				fView->_ScrollTo(
-					fView->fScrollOffset + fView->fFontHeight * fView->fRows,
-					true);
+				fView->_ScrollTo(fView->fScrollOffset + fView->fFontHeight * fView->fRows, true);
 				return;
 			}
 			if (rawChar == B_PAGE_DOWN)
