@@ -14,7 +14,7 @@ public:
 	virtual void
 	MouseDown(BPoint where)
 	{
-		printf("Mouse DOWN !!! %ld\n", system_time());
+		printf("Mouse DOWN !!! %" B_PRIdBIGTIME "\n", system_time());
 
 		BPoint mouseWhere;
 		uint32 buttons;
@@ -23,7 +23,7 @@ public:
 			snooze(10000);
 		} while (buttons != 0);
 
-		printf("Mouse UP !!! %ld\n", system_time());
+		printf("Mouse UP !!! %" B_PRIdBIGTIME "\n", system_time());
 	}
 };
 
@@ -43,13 +43,13 @@ public:
 		message->FindInt64("when", &when);
 		switch (message->what) {
 			case B_MOUSE_MOVED:
-				printf("B_MOUSE_MOVED: %ld\n", when);
+				printf("B_MOUSE_MOVED: %" B_PRIdBIGTIME "\n", when);
 				break;
 			case B_MOUSE_UP:
-				printf("B_MOUSE_UP: %ld\n", when);
+				printf("B_MOUSE_UP: %" B_PRIdBIGTIME "\n", when);
 				break;
 			case B_MOUSE_DOWN:
-				printf("B_MOUSE_DOWN: %ld\n", when);
+				printf("B_MOUSE_DOWN: %" B_PRIdBIGTIME "\n", when);
 				break;
 			default:
 				break;
