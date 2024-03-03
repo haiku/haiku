@@ -7713,7 +7713,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	// make sure, that the partition is not busy
 	if (partition != NULL) {
 		if ((flags & B_UNMOUNT_BUSY_PARTITION) == 0 && partition->IsBusy()) {
-			TRACE(("fs_unmount(): Partition is busy.\n"));
+			dprintf("fs_unmount(): Partition is busy.\n");
 			return B_BUSY;
 		}
 	}
@@ -7732,6 +7732,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 		VnodeList::Iterator iterator = mount->vnodes.GetIterator();
 		while (struct vnode* vnode = iterator.Next()) {
 			if (vnode->IsBusy()) {
+				dprintf("fs_unmount(): inode %" B_PRIdINO " is busy\n", vnode->id);
 				busy = true;
 				break;
 			}
@@ -7745,6 +7746,7 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 				refCount--;
 
 			if (refCount != 0) {
+				dprintf("fs_unmount(): inode %" B_PRIdINO " is still referenced\n", vnode->id);
 				// there are still vnodes in use on this mount, so we cannot
 				// unmount yet
 				busy = true;
