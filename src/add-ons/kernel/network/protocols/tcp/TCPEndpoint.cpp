@@ -2213,7 +2213,7 @@ TCPEndpoint::_SendQueued(bool force)
 		sendWindow -= consumedWindow;
 
 	uint32 length = min_c(fSendQueue.Available(fSendNext), sendWindow);
-	if (length == 0) {
+	if (length == 0 && !state_needs_finish(fState)) {
 		// Nothing to send.
 		return B_OK;
 	}
