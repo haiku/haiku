@@ -106,9 +106,9 @@ public:
 		uint8 ReadReg(uint32 reg) { return in8(fBase + reg); };
 		void WriteReg(uint32 reg, uint8 v) { out8(v, fBase + reg); };
 
-		void EnableIOInterrupt(int irq);
-		void DisableIOInterrupt(int irq);
-		bool AcknowledgeIOInterrupt(int irq);
+		void EnableIOInterrupt(int32 irq);
+		void DisableIOInterrupt(int32 irq);
+		bool AcknowledgeIOInterrupt(int32 irq);
 
 	private:
 		uint32 fBase;
@@ -149,9 +149,9 @@ public:
 	virtual char SerialDebugGetChar();
 	virtual void SerialDebugPutChar(char c);
 
-	virtual void EnableIOInterrupt(int irq);
-	virtual void DisableIOInterrupt(int irq);
-	virtual bool AcknowledgeIOInterrupt(int irq);
+	virtual void EnableIOInterrupt(int32 irq);
+	virtual void DisableIOInterrupt(int32 irq);
+	virtual bool AcknowledgeIOInterrupt(int32 irq);
 
 	virtual	uint8 ReadRTCReg(uint8 reg);
 	virtual	void WriteRTCReg(uint8 reg, uint8 val);
@@ -176,7 +176,7 @@ private:
 	int32 (*nfCall)(uint32 ID, ...);
 	char *nfPage;
 	uint32 nfDebugPrintfID;
-	
+
 };
 
 
@@ -277,7 +277,7 @@ M68KAtari::RTC::ReadReg(uint32 reg)
 		out8(0x0a, fBase+1);
 		while((in8(fBase+3) & 0x80) && --waitTime);
 	}
-	
+
 	out8((uint8)reg,fBase+1);
 	return in8(fBase+3);
 }
@@ -327,7 +327,7 @@ M68KAtari::Init(struct kernel_args *kernelArgs)
 	// initialize ARAnyM NatFeatures
 	nfGetID =
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_get_id;
-	nfCall = 
+	nfCall =
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_call;
 	nfPage = (char *)
 		kernelArgs->arch_args.plat_args.atari.nat_feat.nf_page;
@@ -338,7 +338,7 @@ M68KAtari::Init(struct kernel_args *kernelArgs)
 	} else
 		// won't really work anyway from here
 		panic("You MUST have an ST MFP! Wait, is that *really* an Atari ???");
-	
+
 	return B_OK;
 }
 
@@ -395,7 +395,7 @@ M68KAtari::InitRTC(struct kernel_args *kernelArgs,
 status_t
 M68KAtari::InitTimer(struct kernel_args *kernelArgs)
 {
-	
+
 	fMFP[0]->WriteReg(MFP_TACR, 0); // stop it
 	install_io_interrupt_handler(fMFP[0]->Vector()+13, &MFPTimerInterrupt, this, 0);
 	return B_OK;
@@ -553,7 +553,7 @@ M68KAtari::SerialDebugPutChar(char c)
 #if 0
 		static char buffer[2] = { '\0', '\0' };
 		buffer[0] = c;
-		
+
 		nfCall(nfDebugPrintfID /*| 0*/, buffer);
 #endif
 		nfPage[0] = c;
@@ -568,7 +568,7 @@ M68KAtari::SerialDebugPutChar(char c)
 
 
 void
-M68KAtari::EnableIOInterrupt(int irq)
+M68KAtari::EnableIOInterrupt(int32 irq)
 {
 	MFP *mfp = MFPForIrq(irq);
 
@@ -578,7 +578,7 @@ M68KAtari::EnableIOInterrupt(int irq)
 
 
 void
-M68KAtari::DisableIOInterrupt(int irq)
+M68KAtari::DisableIOInterrupt(int32 irq)
 {
 	MFP *mfp = MFPForIrq(irq);
 
@@ -588,7 +588,7 @@ M68KAtari::DisableIOInterrupt(int irq)
 
 
 bool
-M68KAtari::AcknowledgeIOInterrupt(int irq)
+M68KAtari::AcknowledgeIOInterrupt(int32 irq)
 {
 	MFP *mfp = MFPForIrq(irq);
 

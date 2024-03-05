@@ -70,7 +70,7 @@ struct iframe_stack gBootFrameStack;
 
 
 void
-arch_int_enable_io_interrupt(int irq)
+arch_int_enable_io_interrupt(int32 irq)
 {
 	//if (!sPIC)
 	//	return;
@@ -82,7 +82,7 @@ arch_int_enable_io_interrupt(int irq)
 
 
 void
-arch_int_disable_io_interrupt(int irq)
+arch_int_disable_io_interrupt(int32 irq)
 {
 	//if (!sPIC)
 	//	return;

@@ -11,8 +11,8 @@ class InterruptController;
 
 class InterruptController {
 public:
-	virtual void EnableInterrupt(int irq) = 0;
-	virtual void DisableInterrupt(int irq) = 0;
+	virtual void EnableInterrupt(int32 irq) = 0;
+	virtual void DisableInterrupt(int32 irq) = 0;
 
 	virtual void HandleInterrupt() = 0;
 

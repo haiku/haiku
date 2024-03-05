@@ -70,9 +70,9 @@ struct iframe_stack gBootFrameStack;
 
 
 void
-arch_int_enable_io_interrupt(int irq)
+arch_int_enable_io_interrupt(int32 irq)
 {
-	TRACE("arch_int_enable_io_interrupt(%d)\n", irq);
+	TRACE("arch_int_enable_io_interrupt(%" B_PRId32 ")\n", irq);
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->EnableInterrupt(irq);
@@ -80,9 +80,9 @@ arch_int_enable_io_interrupt(int irq)
 
 
 void
-arch_int_disable_io_interrupt(int irq)
+arch_int_disable_io_interrupt(int32 irq)
 {
-	TRACE("arch_int_disable_io_interrupt(%d)\n", irq);
+	TRACE("arch_int_disable_io_interrupt(%" B_PRId32 ")\n", irq);
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->DisableInterrupt(irq);

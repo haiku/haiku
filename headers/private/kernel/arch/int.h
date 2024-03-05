@@ -30,9 +30,9 @@ status_t arch_int_init_post_device_manager(struct kernel_args* args);
 void arch_int_enable_interrupts(void);
 int arch_int_disable_interrupts(void);
 void arch_int_restore_interrupts(int oldState);
-void arch_int_enable_io_interrupt(int irq);
-void arch_int_disable_io_interrupt(int irq);
-void arch_int_configure_io_interrupt(int irq, uint32 config);
+void arch_int_enable_io_interrupt(int32 irq);
+void arch_int_disable_io_interrupt(int32 irq);
+void arch_int_configure_io_interrupt(int32 irq, uint32 config);
 bool arch_int_are_interrupts_enabled(void);
 int32 arch_int_assign_to_cpu(int32 irq, int32 cpu);
 

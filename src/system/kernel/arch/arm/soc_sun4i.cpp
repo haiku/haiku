@@ -17,7 +17,7 @@
 
 
 void
-Sun4iInterruptController::EnableInterrupt(int irq)
+Sun4iInterruptController::EnableInterrupt(int32 irq)
 {
 	if (irq <= 31) {
 		fRegBase[SUN4I_INTC_MASK_REG0] |= 1 << irq;

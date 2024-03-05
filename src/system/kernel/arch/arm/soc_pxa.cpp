@@ -9,7 +9,7 @@
 #define PXA_ICMR2	0x28
 
 void
-PXAInterruptController::EnableInterrupt(int irq)
+PXAInterruptController::EnableInterrupt(int32 irq)
 {
 	if (irq <= 31) {
 		fRegBase[PXA_ICMR] |= 1 << irq;
@@ -21,7 +21,7 @@ PXAInterruptController::EnableInterrupt(int irq)
 
 
 void
-PXAInterruptController::DisableInterrupt(int irq)
+PXAInterruptController::DisableInterrupt(int32 irq)
 {
 	if (irq <= 31) {
 		fRegBase[PXA_ICMR] &= ~(1 << irq);

@@ -27,7 +27,7 @@ enum {
 
 
 void
-OMAP3InterruptController::EnableInterrupt(int irq)
+OMAP3InterruptController::EnableInterrupt(int32 irq)
 {
 	uint32 bit = irq % 32, bank = irq / 32;
 	fRegBase[INTCPS_MIR_CLEARn + (8 * bank)] = 1 << bit;
@@ -35,7 +35,7 @@ OMAP3InterruptController::EnableInterrupt(int irq)
 
 
 void
-OMAP3InterruptController::DisableInterrupt(int irq)
+OMAP3InterruptController::DisableInterrupt(int32 irq)
 {
 	uint32 bit = irq % 32, bank = irq / 32;
 	fRegBase[INTCPS_MIR_SETn + (8 * bank)] = 1 << bit;

@@ -179,7 +179,7 @@ private:
 
 			uint32				fAllocatedMsiIrqs[1];
 			phys_addr_t			fMsiPhysAddr {};
-			long				fMsiStartIrq {};
+			int32				fMsiStartIrq {};
 			uint64				fMsiData {};
 };
 

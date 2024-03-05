@@ -605,18 +605,18 @@ arch_int_init_io(kernel_args* args)
 
 
 void
-arch_int_enable_io_interrupt(int irq)
+arch_int_enable_io_interrupt(int32 irq)
 {
-	dprintf("arch_int_enable_io_interrupt(%d)\n", irq);
+	dprintf("arch_int_enable_io_interrupt(%" B_PRId32 ")\n", irq);
 	gPlicRegs->priority[irq] = 1;
 	gPlicRegs->enable[sPlicContexts[0]][irq / 32] |= 1 << (irq % 32);
 }
 
 
 void
-arch_int_disable_io_interrupt(int irq)
+arch_int_disable_io_interrupt(int32 irq)
 {
-	dprintf("arch_int_disable_io_interrupt(%d)\n", irq);
+	dprintf("arch_int_disable_io_interrupt(%" B_PRId32 ")\n", irq);
 	gPlicRegs->priority[irq] = 0;
 	gPlicRegs->enable[sPlicContexts[0]][irq / 32] &= ~(1 << (irq % 32));
 }

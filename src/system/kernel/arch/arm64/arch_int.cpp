@@ -41,7 +41,7 @@ struct iframe_stack gBootFrameStack;
 
 
 void
-arch_int_enable_io_interrupt(int irq)
+arch_int_enable_io_interrupt(int32 irq)
 {
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
@@ -50,7 +50,7 @@ arch_int_enable_io_interrupt(int irq)
 
 
 void
-arch_int_disable_io_interrupt(int irq)
+arch_int_disable_io_interrupt(int32 irq)
 {
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)

@@ -168,9 +168,9 @@ extern void			release_write_seqlock(seqlock* lock);
 extern uint32		acquire_read_seqlock(seqlock* lock);
 extern bool			release_read_seqlock(seqlock* lock, uint32 count);
 
-extern status_t		install_io_interrupt_handler(long interrupt_number,
-						interrupt_handler handler, void *data, ulong flags);
-extern status_t		remove_io_interrupt_handler(long interrupt_number,
+extern status_t		install_io_interrupt_handler(int32 interrupt_number,
+						interrupt_handler handler, void *data, uint32 flags);
+extern status_t		remove_io_interrupt_handler(int32 interrupt_number,
 						interrupt_handler handler, void	*data);
 
 extern status_t		add_timer(timer *t, timer_hook hook, bigtime_t period,

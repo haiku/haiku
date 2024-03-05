@@ -79,7 +79,7 @@ typedef struct interrupt_controller_s {
 } interrupt_controller;
 
 
-void x86_set_irq_source(int irq, irq_source source);
+void x86_set_irq_source(int32 irq, irq_source source);
 
 void arch_int_set_interrupt_controller(const interrupt_controller &controller);
 

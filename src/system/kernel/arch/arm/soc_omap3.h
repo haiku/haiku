@@ -11,8 +11,8 @@ class OMAP3InterruptController;
 class OMAP3InterruptController : public InterruptController {
 public:
 	OMAP3InterruptController(uint32_t reg_base);
-	void EnableInterrupt(int irq);
-	void DisableInterrupt(int irq);
+	void EnableInterrupt(int32 irq);
+	void DisableInterrupt(int32 irq);
 	void HandleInterrupt();
 
 protected:

@@ -51,7 +51,7 @@ msi_allocate_vectors(uint32 count, uint32 *startVector, uint64 *address,
 	if (!sMSISupported)
 		return B_UNSUPPORTED;
 
-	long vector;
+	int32 vector;
 	status_t result = allocate_io_interrupt_vectors(count, &vector,
 		INTERRUPT_TYPE_IRQ);
 	if (result != B_OK)

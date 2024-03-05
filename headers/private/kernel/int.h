@@ -77,12 +77,12 @@ are_interrupts_enabled(void)
 #define restore_interrupts(status)	arch_int_restore_interrupts(status)
 
 
-status_t reserve_io_interrupt_vectors(long count, long startVector,
+status_t reserve_io_interrupt_vectors(int32 count, int32 startVector,
 	enum interrupt_type type);
-status_t allocate_io_interrupt_vectors(long count, long *startVector,
+status_t allocate_io_interrupt_vectors(int32 count, int32 *startVector,
 	enum interrupt_type type);
-void free_io_interrupt_vectors(long count, long startVector);
+void free_io_interrupt_vectors(int32 count, int32 startVector);
 
-void assign_io_interrupt_to_cpu(long vector, int32 cpu);
+void assign_io_interrupt_to_cpu(int32 vector, int32 cpu);
 
 #endif /* _KERNEL_INT_H */
