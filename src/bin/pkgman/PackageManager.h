@@ -13,6 +13,8 @@
 #include <package/DaemonClient.h>
 #include <package/manager/PackageManager.h>
 
+#include <NumberFormat.h>
+
 #include "DecisionProvider.h"
 
 
@@ -68,6 +70,7 @@ private:
 
 private:
 			DecisionProvider	fDecisionProvider;
+			BNumberFormat		fNumberFormat;
 			BPackageManager::ClientInstallationInterface
 									fClientInstallationInterface;
 			bool				fInteractive;

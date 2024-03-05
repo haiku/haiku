@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2024, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -178,8 +178,12 @@ PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 	fLastRateCalcTime = system_time();
 	fDownloadRate = 0;
 
-	if (fShowProgress)
-		printf("  0%%");
+	if (fShowProgress) {
+		char percentString[32];
+		fNumberFormat.FormatPercent(percentString, sizeof(percentString), 0.0);
+		// Make sure there is enough space for '100 %' percent format
+		printf("%6s", percentString);
+	}
 }
 
 
@@ -215,10 +219,12 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 
 	if (width < 30) {
 		// Not much space for anything, just draw a percentage
-		leftStr.SetToFormat("%3d%%", (int)(completionPercentage * 100));
+		fNumberFormat.FormatPercent(leftStr, completionPercentage);
 	} else {
-		leftStr.SetToFormat("%3d%% %s", (int)(completionPercentage * 100),
-				packageName);
+		BString dataString;
+		fNumberFormat.FormatPercent(dataString, completionPercentage);
+		// Make sure there is enough space for '100 %' percent format
+		leftStr.SetToFormat("%6s %s", dataString.String(), packageName);
 
 		char byteBuffer[32];
 		char totalBuffer[32];
@@ -267,7 +273,10 @@ PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 	}
 
 	char byteBuffer[32];
-	printf("100%% %s [%s]\n", packageName,
+	char percentString[32];
+	fNumberFormat.FormatPercent(percentString, sizeof(percentString), 1.0);
+	// Make sure there is enough space for '100 %' percent format
+	printf("%6s %s [%s]\n", percentString, packageName,
 		string_for_size(fLastBytes, byteBuffer, sizeof(byteBuffer)));
 	fflush(stdout);
 }
