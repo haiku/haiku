@@ -360,7 +360,7 @@ chain::Add(ChainTable* chains, int family, int type, int protocol,
 		if (module == NULL)
 			break;
 
-		TRACE(("  [%ld] %s\n", count, module));
+		TRACE(("  [%" B_PRId32 "] %s\n", count, module));
 		chain->modules[count] = strdup(module);
 		if (chain->modules[count] == NULL
 			|| ++count >= MAX_CHAIN_MODULES) {
@@ -611,7 +611,7 @@ get_domain_receiving_protocol(net_domain* _domain, uint32 type,
 	struct net_domain_private* domain = (net_domain_private*)_domain;
 	struct chain* chain;
 
-	TRACE(("get_domain_receiving_protocol(family %d, type %lu)\n",
+	TRACE(("get_domain_receiving_protocol(family %d, type %" B_PRIu32 ")\n",
 		domain->family, type));
 
 	{
