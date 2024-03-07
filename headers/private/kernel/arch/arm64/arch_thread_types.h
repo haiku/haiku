@@ -18,7 +18,7 @@ struct iframe_stack {
 
 
 struct arch_thread {
-	uint64 regs[13]; // x19-x30, sp
+	uint64 regs[14]; // x19-x30, sp, tpidr_el0
 	uint64 fp_regs[8]; // d8-d15
 
 	// used to track interrupts on this thread

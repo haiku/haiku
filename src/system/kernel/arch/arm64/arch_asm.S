@@ -253,7 +253,8 @@ FUNCTION(_arch_context_swap):
 	stp x29, x30, [x0], #16
 
 	mov x2, sp
-	str x2, [x0], #8
+	mrs x3, TPIDR_EL0
+	stp  x2,  x3, [x0], #16
 
 	stp  d8,  d9, [x0], #16
 	stp d10, d11, [x0], #16
@@ -268,8 +269,9 @@ FUNCTION(_arch_context_swap):
 	ldp x27, x28, [x1], #16
 	ldp x29, x30, [x1], #16
 
-	ldr x2, [x1], #8
+	ldp  x2,  x3, [x1], #16
 	mov sp, x2
+	msr TPIDR_EL0, x3
 
 	ldp  d8,  d9, [x1], #16
 	ldp d10, d11, [x1], #16
