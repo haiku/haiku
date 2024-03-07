@@ -217,15 +217,15 @@ acpi_std_ops(int32 op,...)
 
 			if (checkAndLogFailure(AcpiInitializeSubsystem(),
 					"AcpiInitializeSubsystem failed"))
-				goto err;
+				goto err_dpc;
 
 			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
 					"AcpiInitializeTables failed"))
-				goto err;
+				goto err_acpi;
 
 			if (checkAndLogFailure(AcpiLoadTables(),
 					"AcpiLoadTables failed"))
-				goto err;
+				goto err_acpi;
 
 			/* Install the default address space handlers. */
 
@@ -234,12 +234,12 @@ acpi_std_ops(int32 op,...)
 			if (checkAndLogFailure(AcpiEnableSubsystem(
 						ACPI_FULL_INITIALIZATION),
 					"AcpiEnableSubsystem failed"))
-				goto err;
+				goto err_acpi;
 
 			if (checkAndLogFailure(AcpiInitializeObjects(
 						ACPI_FULL_INITIALIZATION),
 					"AcpiInitializeObjects failed"))
-				goto err;
+				goto err_acpi;
 
 			//TODO: Walk namespace init ALL _PRW's
 
@@ -261,7 +261,13 @@ acpi_std_ops(int32 op,...)
 			TRACE("ACPI initialized\n");
 			return B_OK;
 
-		err:
+		err_acpi:
+			checkAndLogFailure(AcpiTerminate(), "AcpiTerminate failed");
+
+		err_dpc:
+			gDPC->delete_dpc_queue(gDPCHandle);
+			gDPCHandle = NULL;
+
 			return B_ERROR;
 		}
 
