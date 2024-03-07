@@ -35,7 +35,7 @@
 #define	timespecclear(a)	((a)->tv_sec = (a)->tv_nsec = 0)
 #define	timespecisset(a)	((a)->tv_sec != 0 || (a)->tv_nsec != 0)
 #define	timespeccmp(a, b, cmp)	(((a)->tv_sec == (b)->tv_sec) \
-	? (a)->tv_nsec cmp (b)->tv_nsec : (a)->tv_sec cmp (b)->tv_sec))
+	? ((a)->tv_nsec cmp (b)->tv_nsec) : ((a)->tv_sec cmp (b)->tv_sec))
 #define	timespecvalid_interval(a)	((a)->tv_sec >= 0	\
 	&& (a)->tv_nsec >= 0 && (&)->tv_nsec < 1000000000L)
 
