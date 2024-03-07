@@ -138,6 +138,9 @@ struct iframe {
 	// exception info
 	uint64 esr;
 	uint64 far;
+
+	// fpu
+	struct aarch64_fpu_state fpu;
 };
 
 
