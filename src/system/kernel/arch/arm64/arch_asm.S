@@ -112,7 +112,7 @@ sub	sp, sp, \xt
 .endm
 
 .macro EXCEPTION_HANDLER el name func
-	FUNCTION(handle_\name):
+	STATIC_FUNCTION(handle_\name):
 		EXCEPTION_ENTRY \el
 
 		// prepare aligned sp for C function
