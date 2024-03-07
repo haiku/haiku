@@ -368,8 +368,8 @@ evaluate_integer(acpi_module_info* acpi, acpi_handle handle,
 
 static status_t
 handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
-	const acpi_pci_routing_table* acpiTable, uint8 currentBus,
-	irq_routing_entry& irqEntry)
+	acpi_handle parent, const acpi_pci_routing_table* acpiTable,
+	uint8 currentBus, irq_routing_entry& irqEntry)
 {
 	bool noSource = acpiTable->Source[0] == '\0';
 		// The above line would be correct according to specs...
@@ -381,7 +381,7 @@ handle_routing_table_entry(acpi_module_info* acpi, pci_module_info* pci,
 	status_t status;
 	acpi_handle source;
 	if (!noSource) {
-		status = acpi->get_handle(NULL, acpiTable->Source, &source);
+		status = acpi->get_handle(parent, acpiTable->Source, &source);
 		if (status != B_OK) {
 			dprintf("failed to get handle to link device\n");
 			return status;
@@ -609,8 +609,8 @@ ensure_all_functions_matched(pci_module_info* pci, uint8 bus,
 
 static status_t
 read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
-	acpi_handle device, uint8 currentBus, IRQRoutingTable& table,
-	IRQRoutingTable& unmatchedTable, bool rootBridge,
+	acpi_handle parent, acpi_handle device, uint8 currentBus,
+	IRQRoutingTable& table, IRQRoutingTable& unmatchedTable, bool rootBridge,
 	interrupt_available_check_function checkFunction)
 {
 	if (!rootBridge) {
@@ -707,7 +707,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 			= (acpi_pci_routing_table*)buffer.pointer;
 		while (acpiTable->Length) {
 			irq_routing_entry irqEntry;
-			status = handle_routing_table_entry(acpi, pci, acpiTable,
+			status = handle_routing_table_entry(acpi, pci, parent, acpiTable,
 				currentBus, irqEntry);
 			if (status == B_OK) {
 				if (irqEntry.source == NULL && !checkFunction(irqEntry.irq)) {
@@ -754,7 +754,7 @@ read_irq_routing_table_recursive(acpi_module_info* acpi, pci_module_info* pci,
 		}
 
 		TRACE("recursing down to child \"%s\"\n", childName);
-		status = read_irq_routing_table_recursive(acpi, pci, childHandle,
+		status = read_irq_routing_table_recursive(acpi, pci, device, childHandle,
 			currentBus, table, unmatchedTable, false, checkFunction);
 		if (status != B_OK)
 			break;
@@ -804,8 +804,8 @@ read_irq_routing_table(acpi_module_info* acpi, IRQRoutingTable& table,
 	}
 
 	IRQRoutingTable unmatchedTable;
-	status = read_irq_routing_table_recursive(acpi, pci, rootPciHandle, rootBus,
-		table, unmatchedTable, true, checkFunction);
+	status = read_irq_routing_table_recursive(acpi, pci, ACPI_ROOT_OBJECT,
+		rootPciHandle, rootBus, table, unmatchedTable, true, checkFunction);
 	if (status != B_OK) {
 		put_module(B_PCI_MODULE_NAME);
 		return status;
