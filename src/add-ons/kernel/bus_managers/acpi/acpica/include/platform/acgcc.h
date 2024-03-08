@@ -216,10 +216,12 @@ typedef __builtin_va_list       va_list;
  * C99, but this is not for any technical reason. Work around the
  * limitation.
  */
+#ifndef __cplusplus
 #define ACPI_FLEX_ARRAY(TYPE, NAME)             \
         struct {                                \
                 struct { } __Empty_ ## NAME;    \
                 TYPE NAME[];                    \
         }
+#endif
 
 #endif /* __ACGCC_H__ */
