@@ -1,9 +1,11 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	3870731252
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	326035708
 None	Icon-O-Matic-Properties		Κανένα
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Καθάρισμα διαδρομής
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
 Opening the icon failed!	Icon-O-Matic-Main		Το άνοιγμα του εικονιδίου απέτυχε!
 Reverse path	Icon-O-Matic-ReversePathCmd		Αντιστροφή διαδρομής
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	Μπιπ!
 Add with path	Icon-O-Matic-ShapesList		Προσθήκη με μονοπάτι
 Paste properties	Icon-O-Matic-Properties		Ρυθμίσεις επικόλλησης
 Copy	Icon-O-Matic-Properties		Αντιγραφή

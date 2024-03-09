@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2787029568
+1	catalan; valencian	x-vnd.Haiku-libtracker	2585450844
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -404,6 +404,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		No es pot desmuntar el volum 
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (Falta el símbol %symbol). \n
 New folder	ContainerWindow		Carpeta nova
 Name	OpenWithWindow		Nom
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Obtingueu informació
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Hi ha hagut un problema en intentar reemplaçar \"%name\". Potser l'element estava obert o ocupat.
 Windows	TrackerSettingsWindow		Finestres
 Show space bars on volumes	SettingsView		Mostra les barres d'espai dels volums

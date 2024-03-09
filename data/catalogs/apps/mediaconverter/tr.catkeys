@@ -3,7 +3,7 @@ Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses v
 Source files	MediaConverter		Kaynak dosyaları
 Error writing video frame %lld	MediaConverter		Video çerçevesi %lld yazılırken hata
 Audio quality: %s	MediaConverter		Ses kalitesi: %s
-Error converting '%filename'	MediaConverter		‘%filename’ dönüştürülürken hata
+Error converting '%filename'	MediaConverter		“%filename” dönüştürülürken hata
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Seçili dizin bulunamadı. Yerine /boot/home kullanılacak.
 Conversion completed	MediaConverter		Dönüştürme tamamlandı
 Audio:	MediaConverter-FileInfo		Ses:
@@ -21,14 +21,14 @@ Output format	MediaConverter		Çıktı biçimi
 %.1f kHz mono	MediaFileInfo		%.1f kHz tek kanallı
 %.1f kHz stereo	MediaFileInfo		%.1f kHz çift kanallı
 OK	MediaConverter		Tamam
-Error creating '%filename'	MediaConverter		‘%filename’ oluşturulurken hata
+Error creating '%filename'	MediaConverter		“%filename” oluşturulurken hata
 Error loading a file	MediaConverter		Dosya yüklenirken hata
 Encoder parameters	MediaConverter-EncoderWindow		Kodlayıcı parametreleri
 Open…	Menu		Aç…
 Audio encoding:	MediaConverter		Ses kodlaması:
 Multi-track file detected	MediaConverter		Çok parçalı dosya algılandı
 Cancelling…	MediaConverter		İptal ediliyor…
-Output file '%filename' created	MediaConverter		‘%filename’ çıktı dosyası oluşturuldu
+Output file '%filename' created	MediaConverter		“%filename” çıktı dosyası oluşturuldu
 Output folder	MediaConverter		Çıktı klasörü
 Error creating track.	MediaConverter		Parça oluşturulurken hata.
  seconds	MediaFileInfo		 saniye

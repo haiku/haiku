@@ -11,9 +11,9 @@ Undo	SudokuWindow		Geri al
 Export as…	SudokuWindow		Dışarı aktar…
 Quit	SudokuWindow		Çık
 Redo	SudokuWindow		Yinele
-Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" açılamıyor:\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		“%s” açılamadı:\n%s\n
 Blank	SudokuWindow		Boş
-Sudoku solved - congratulations!\n	SudokuWindow		Sudokü çözüldü - tebrikler!\n
+Sudoku solved - congratulations!\n	SudokuWindow		Sudokü çözüldü — tebrikler!\n
 Text	SudokuWindow		Metin
 Copy	SudokuWindow		Kopyala
 Solve	SudokuWindow		Çöz

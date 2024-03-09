@@ -147,7 +147,7 @@ Window	WebPositive Window		Παράθυρο
 Proxy server address:	Settings Window		Διεύθυνση μεσολαβητή:
 Search page:	Settings Window		Σελίδα αναζήτησης:
 Settings	WebPositive Window		Ρυθμίσεις
-Clear	URL Bar		Καθαρισμός
+Clear	URL Bar		Σβήσιμο
 Loading %url	WebPositive Window		Γίνεται φόρτωση του %url
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Ο καλύμνιος σφουγγαράς ψιθύρησε πως θα βουτήξει χωρίς να διστάζει.
 Start up:	Settings Window		Εκκίνηση:
@@ -158,7 +158,7 @@ Open all	WebPositive Window		Άνοιγμα όλων
 Cut	WebPositive Window		Αποκοπή
 Downloads	Download Window		Λήψεις
 Open blank page	Settings Window		Άνοιγμα κενής σελίδας
-Clear history	WebPositive Window		Καθαρισμός ιστορικού
+Clear history	WebPositive Window		Εκκαθάριση ιστορικού
 Cancel	WebPositive Window		Ακύρωση
 Script console	Console Window		Κονσόλα σεναρίων
 Copy	URL Bar		Αντιγραφή

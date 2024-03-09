@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2787029568
+1	romanian	x-vnd.Haiku-libtracker	2585450844
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -404,6 +404,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Nu se poate demonta volumul d
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \„%document\” cu aplicația \„%app\” (Simbol lipsă: %symbol). \n
 New folder	ContainerWindow		Dosar nou
 Name	OpenWithWindow		Nume
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Obține informații
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		A apărut o problemă la încercarea de înlocuire a \„%name\”. Elementul ar putea fi deschis sau ocupat.
 Windows	TrackerSettingsWindow		Ferestre
 Show space bars on volumes	SettingsView		Arată barele de spațiu pe volume

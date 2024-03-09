@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-PowerStatus	1085070685
+1	czech	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Spustit v okně
 Extended battery info	PowerStatus		Podrobnější informace o baterii
 Show status icon	PowerStatus		Zobrazit ikonu stavu
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Poslední plné nabití:
 Current rate: 	PowerStatus		Aktuální spotřeba: 
 Show text label	PowerStatus		Zobrazit popisek
 Quit	PowerStatus		Ukončit
+Battery not charging	PowerStatus		Baterie se nenabíjí
 Battery low	PowerStatus		Nízká úroveň baterie
 Model number: 	PowerStatus		Číslo modelu: 
 Battery unused	PowerStatus		Baterie nevyužita
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Varování kapacita (dle výrobce):
 Capacity granularity 2: 	PowerStatus		Přesnost kapacity 2: 
 Too bad!	PowerStatus		Průšvih!
 Technology: 	PowerStatus		Technologie: 
+not charging	PowerStatus		nenabíjí
  mWh	PowerStatus		 mWh
 PowerStatus	System name		PowerStatus
 Design capacity: 	PowerStatus		Původní kapacita: 

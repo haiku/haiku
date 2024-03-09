@@ -98,7 +98,7 @@ Attribute type: 	ProbeView		Τύπος σημαίας:
 15 bit	TypeEditors		15 bit
 Page setup…	ProbeView		Διαμόρφωση σελίδας…
 Boolean	TypeEditors	This is the type of editor	Boolean
-Icon view	TypeEditors		Προβολή εικονίδιου
+Icon view	TypeEditors		Προβολή εικονίδιων
 Select all	ProbeView		Επιλογή όλων
 64 bit unsigned value:	TypeEditors		64 bit μη-υπογεγραμμένη τιμή:
 OK	ProbeView		Εντάξει

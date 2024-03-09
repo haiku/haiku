@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	885044264
+1	greek, modern (1453-)	x-vnd.Haiku-About	3595470255
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Με επιφύλαξη παντός δικαιώματος.
@@ -31,6 +31,10 @@ Licenses: 	AboutView		Άδειες χρήσης:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Τα πνευματικά δικαιώματα του κώδικα του Haiku είναι ιδιοκτησία της Haiku, Inc. ή των αντίστοιχων δημιουργών που έχουν αναφερθεί ρητά στον πηγαίο κώδικα. Το Haiku® και το HAIKU logo® είναι εγγεγραμμένα σήματα κατατεθέν της Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Πνευματική ιδιοκτησία © 2009 Colin Percival
 Time running:	AboutView		Χρόνος λειτουργίας:
+Visit the Haiku website	AboutView		Επικεφθείτε τον ιστότοπο του Haiku
+Version: %s	AboutView	Version: R1 or hrev99999	Έκδοση:  %s
+Make a donation	AboutView		Πραγματοποιήστε μια δωρεά
+%d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB Μνήμη RAM:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1996-2005 Julian R Seward. Με επιφύλαξη παντός δικαιώματος.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Πνευματική ιδιοκτησία © 1994-2009, Thomas G. Lane, Guido Vollbeding. Αυτό το λογισμικό βασίζεται εν μέρει σε έργο της Independent JPEG Group.
@@ -64,6 +68,7 @@ GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Intel (2xxx firmware)	AboutWindow		Υλισμικό WiFi για Intel (2xxx)
 License: 	AboutView		Άδεια Χρήσης: 
 GNU GPL v2	AboutWindow		GNU GPL v2
+%d MiB used (%d%%)	AboutView	326 MiB used (16%)	%d MiB σε χρήση (%d%%)
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Το πανεπιστήμιο του Auckland και ο Christof Lutteroth\n\n
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Πνευματική ιδιοκτησία © 2012-2016 Ομάδα διεθνοποίησης Google.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld Εγχείρημα Haiku. 

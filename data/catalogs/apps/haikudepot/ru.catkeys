@@ -5,7 +5,7 @@ It was not possible to create the new user.	UserLoginWindow		Не удалось
 An unexpected error has been sent from the server [%li]	ServerHelper		Сервер прислал непредвиденную ошибку [%li]
 Create account	UserLoginWindow		Создать учётную запись
 Agree	ToLatestUserUsageConditionsWindow		Принимаю
-Install %PackageTitle%	PackageManager		Установка %PackageTitle%
+Install %PackageTitle%	PackageManager		Установить %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Ответ на капчу был неверным.
 Rate package…	PackageInfoView		Оценить пакет…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Вы успешно авторизовались как пользователь %Nickname%.
@@ -118,7 +118,7 @@ User Created	UserLoginWindow		Пользователь создан
 Check for updates…	MainWindow		Проверить обновления…
 Uninstalled	PackageListView		Деинсталлированные
 I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Я принимаю Условия использования
-Installing \"%PackageName%\"	InstallPackageProcess		Инсталлируется \«%PackageName%\»
+Installing \"%PackageName%\"	InstallPackageProcess		Устанавливается \«%PackageName%\»
 OK	App		OK
 HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot взаимодействует с серверным компонентом под названием HaikuDepotServer. Это актуальные Условия использования сервиса HaikuDepotServer.
 Fatal error	UninstallPackageAction		Критическая ошибка
@@ -173,7 +173,7 @@ OK	MainWindow		OK
 Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Пользователи должны быть не моложе {0, plural, one{# года} other{# лет}}.
 Version %Code%	UserUsageConditions		Версия %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
-Uninstalling \"%PackageName%\"	UninstallPackageAction		Деинсталлируется \«%PackageName%\»
+Uninstalling \"%PackageName%\"	UninstallPackageAction		Удаляется \«%PackageName%\»
 Downloading:	PackageInfoView		Загружается:
 Quit	MainWindow		Выйти
 Success	UserLoginWindow		Выполнено успешно

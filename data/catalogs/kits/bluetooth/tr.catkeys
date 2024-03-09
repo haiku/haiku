@@ -16,7 +16,7 @@ HiFi audio device	DeviceClass		HiFi ses aygıtı
 Microphone	DeviceClass		Mikrofon
 Capturing	DeviceClass		Yakalama
 Jacket	DeviceClass		Kılıf
-50-67% utilized	DeviceClass		%50-67 yararlanılıyor
+50-67% utilized	DeviceClass		%50–%67 yararlanılıyor
 Headphones	DeviceClass		Kulaklık
 Imaging	DeviceClass		İmajlama
 Device conforms to the headset profile	DeviceClass		Aygıt kafa seti profiline uyuyor
@@ -32,7 +32,7 @@ Wired modem or voice gateway	DeviceClass		Kablolu modem veya ses geçidi
 #NoOwnerError#Not Valid name	RemoteDevice		#SahibiYokHatası#Geçerli bir ad değil
 Camcorder	DeviceClass		Kayıt yapan kamera
 #NotCompletedRequest#Not Valid name	RemoteDevice		#Tamamlanamayanİstek#Geçerli bir ad değil
-17-33% utilized	DeviceClass		%17-33 yararlanılıyor
+17-33% utilized	DeviceClass		%17–%33 yararlanılıyor
 Desktop workstation	DeviceClass		Masaüstü çalışma istasyonu
 Unspecified	DeviceClass		Belirlenmemiş
 Miscellaneous	DeviceClass		Çeşitli
@@ -42,19 +42,19 @@ LAN access	DeviceClass		LAN erişimi
 Glasses	DeviceClass		Gözlük
 Phone	DeviceClass		Telefon
 Laptop	DeviceClass		Dizüstü
-67-83% utilized	DeviceClass		%67-83 yararlanılıyor
+67-83% utilized	DeviceClass		%67–%83 yararlanılıyor
 Cordless	DeviceClass		Kablosuz
 Invalid device class!\n	DeviceClass		Geçersiz aygıt sınıfı\n
 Minor class: 	DeviceClass		Alt sınıf: 
 Doll/Action figure	DeviceClass		Bebek/Koleksiyon figürü
 Not implemented	RemoteDevice		İşlevsel değil
-33-50% utilized	DeviceClass		%33-50 yararlanılıyor
+33-50% utilized	DeviceClass		%33–%50 yararlanılıyor
 Gaming/Toy	DeviceClass		Oyun/Oyuncak
 Video camera	DeviceClass		Video kamera
 Handheld	DeviceClass		Elde taşınan
 Service classes: 	DeviceClass		Servis sınıfları: 
 Loudspeaker	DeviceClass		Hoparlör
-83-99% utilized	DeviceClass		%83-99 yararlanılıyor
+83-99% utilized	DeviceClass		%83–%99 yararlanılıyor
 SIM card reader	DeviceClass		SIM kart okuyucusu
 Computer	DeviceClass		Bilgisayar
 Scanner	DeviceClass		Tarayıcı
@@ -80,7 +80,7 @@ Hands-free	DeviceClass		Eller serbest
 Digitizer tablet	DeviceClass		Sayısallaştırıcı tablet
 Portable audio	DeviceClass		Taşınabilir ses aygıtı
 Camera	DeviceClass		Kamera
-1-17% utilized	DeviceClass		%1-17 yararlanılıyor
+1-17% utilized	DeviceClass		%1–%17 yararlanılıyor
 Combo keyboard/pointing device	DeviceClass		Klavye/işaret aygıtı ikilisi
 Video conferencing	DeviceClass		Video konferans
 Peripheral	DeviceClass		Çevre birimi

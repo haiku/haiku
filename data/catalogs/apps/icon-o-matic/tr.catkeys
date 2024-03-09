@@ -98,7 +98,7 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Yol içeren şekil ekle
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Tüh
 Translation X	Icon-O-Matic-PropertyNames		X çevirisi
 Multi-paste properties	Icon-O-Matic-Properties		Çoklu yapıştır özellikleri
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic, SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Özgün dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon–O–Matic, SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Özgün dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
 Rotate indices backwards	Icon-O-Matic-PathsList		Belirticileri geriye doğru döndür
 Overwrite	Icon-O-Matic-SVGExport		Üzerine yaz
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		{0, plural, one{Şekil} other{Şekiller}} ekle
@@ -156,12 +156,12 @@ META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON özniteliği
 Untitled	Icon-O-Matic-Main		Adsız
 Max LOD	Icon-O-Matic-PropertyNames		En yüksek ayrıntı düzeyi
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Kapatmadan önce değişiklikler kaydedilsin mi?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		‘%s’ dosyası bir SVG belgesi olarak açılamadı.\n\n
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		“%s” dosyası bir SVG belgesi olarak açılamadı.\n\n
 Save as…	Icon-O-Matic-Menu-File		Farklı kaydet…
 Swatches	Icon-O-Matic-Menus		Örnekler
 <modify path>	Icon-O-Matic-PathCmd		<yol düzenle>
 Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Ayarla: %property%
-Icon-O-Matic	System name		Icon-O-Matic
+Icon-O-Matic	System name		Icon–O–Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<geri alınacak bir şey yok>
 Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		{0, plural, one{Yolu} other{Yolları}} kaldır
 Add	Icon-O-Matic-StylesList		Ekle

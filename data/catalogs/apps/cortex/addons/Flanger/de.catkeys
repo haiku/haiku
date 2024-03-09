@@ -1,5 +1,5 @@
 1	german	application/x-vnd.moon-Flanger.media_addon	278353351
-MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: keine Node Info erhalten (%ld):\n%s\n
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: keine Node-Info erhalten (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Eine Add-on Version der FlangerNode\ncon Eric Moon (16. Juni 1999)
 Delay	CortexAddOnsFlanger		Delay
 MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Node nicht gefunden (%ld):\n%s\n

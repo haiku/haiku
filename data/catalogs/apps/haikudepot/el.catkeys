@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	2837468702
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Σφάλμα λήψης όρων χρήσης
 Available packages	MainWindow		Διαθέσιμα πακέτα
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		Δεν υπάρχουν διαθέσ
 <no info>	PackageInfoView		<καμία πληροφορία>
 Usage conditions download problem	UserUsageConditions		Σφάλμα λήψης όρων χρήσης
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Προέκυψε ένα σφάλμα κατά τη λήψη των απαιτήσεων κωδικού πρόσβασης που απαιτούνται για τη δημιουργία νέου χρήστη. Ελέγξτε το αρχείο καταγραφής για λεπτομέρειες και δοκιμάστε ξανά. \nΠληροφορίες σχετικά με τον τρόπο προβολής των αρχείων καταγραφής είναι διαθέσιμες στην ενότητα HaikuDepot του Οδηγού χρήσης Haiku.
+Fetching screenshot	CacheScreenshotProcess		Λήψη στιγμιοτύπου σε εξέλιξη
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ένα δικτυακό σφάλμα μεταφοράς προέκυψε κατά την επικοινωνία με τον εξυπηρετητή: %s
 Rating	PackageListView		Αξιολόγηση
 Synchronizing icons	ServerIconExportUpdateProcess		Γίνεται συγχρονισμός εικονιδίων
@@ -212,6 +213,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Εγγραφή 
 Sending anonymous usage data	MainWindow		Αποστολή ανώνυμων στατιστικών χρήσης
 Log in	UserLoginWindow		Είσοδος
 Usage conditions	UserUsageConditions		Όροι χρήσης
+Populating package sizes	PopulatePkgSizesProcess		Συμπλήρωση μεγεθών πακέτων
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Στιγμιότυπο οθόνης
 Email address:	UserLoginWindow		Διεύθυνση ηλεκτρονικού ταχυδρομείου:

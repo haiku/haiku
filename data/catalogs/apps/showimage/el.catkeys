@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	3998703664
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		ShowImage
 Page setup…	Menus		Διαμόρφωση σελίδας…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Κατακόρυφη αναστροφή
 Zoom in	Menus		Μεγέθυνση
 Last page	Menus		Τελευταία σελίδα
 Cancel	ClosePrompt		Άκυρο
+Attributes	Menus		Ιδιότητες
 High-quality zooming	Menus		Υψηλής-ποιότητας μεγένθυση
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
 Close	Menus		Κλείσιμο
 Selection mode	Menus		Λειτουργία επιλογής
+Reset rating	Menus		Επαναφορά βαθμολογίας
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Προσαρμογή εικόνας στη σελίδα
 Show tool bar	Menus		Εμφάνιση εργαλειοθήκης
@@ -45,6 +47,7 @@ Job setup	PrintOptionsWindow		Διαμόρφωση εργασίας
 Clear selection	Menus		Εκκαθάριση επιλογής
 Rotate clockwise	Menus		Περιστροφή προς τα δεξιά
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Δεν ήταν δυνατή η φόρτωση της εικόνας! Το αρχείο ή ο μετατροπέας εικόνας δεν υπάρχει.
+Open with…	Menus		Άνοιγμα με…
 Rotate counterclockwise	Menus		Περιστροφή προς τα αριστερά
 Previous page	Menus		Προηγούμενη σελίδα
 Fit to window	Menus		Προσαρμογή σε παράθυρο

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ChartDemo	3491540808
+1	french	x-vnd.Haiku-ChartDemo	446404305
 (high) 100% 	ChartWindow		(haute) 100% 
 Spiral	ChartWindow		Spirale
 Orange	ChartWindow		Orange
@@ -6,9 +6,10 @@ Display:	ChartWindow		Affichage :
 Pink	ChartWindow		Rose
 Animation:	ChartWindow		Animation :
 Auto demo	ChartWindow		Démo automatique
+ 0.6 f/s  (logarithmic scale)	ChartWindow		0.6 i/s (échelle logarithmique)
 Red	ChartWindow		Rouge
 None	ChartWindow		Aucun
-600.0 f/s	ChartWindow		600.0 f/s
+600.0 f/s	ChartWindow		600.0 i/s
 Fast motion	ChartWindow		Mouvement rapide
 Special	ChartWindow		Spécial
 White	ChartWindow		Blanc

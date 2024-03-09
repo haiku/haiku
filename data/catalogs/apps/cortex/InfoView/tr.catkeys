@@ -13,12 +13,12 @@ Flags	InfoView		Bayraklar
 Media output	InfoView		Ortam çıkışı
 Active lines	InfoView		Etkin hatlar
 Buffer size	InfoView		Arabellek boyutu
-\n- Quality:	FileNodeInfoView		\n- Kalite:
+\n- Quality:	FileNodeInfoView		\n— Kalite:
 Kinds	LiveNodeInfoView		Türler
 Application	AppNodeInfoView		Uygulama
 Flavor flags	DormantNodeInfoView		Çeşit bayrakları
 Max. instances	DormantNodeInfoView		En çok oluşum
-\n- Duration:	FileNodeInfoView		\n- Süre:
+\n- Duration:	FileNodeInfoView		\n— Süre:
 Dormant media node	DormantNodeInfoView		Etkin olmayan ortam düğümü
 Latency	LiveNodeInfoView		Gecikme
 Media type	InfoView		Ortam türü
@@ -47,7 +47,7 @@ AddOn ID	DormantNodeInfoView		Eklenti kimliği
 Frame size	InfoView		Çerçeve boyutu
 Flavor ID	DormantNodeInfoView		Çeşit kimliği
 Run mode	LiveNodeInfoView		Çalışma kipi
-\n- Codec:	FileNodeInfoView		\n- Kod çözücü
+\n- Codec:	FileNodeInfoView		\n— Kod çözücü
 Port	LiveNodeInfoView		Kapı
 Output format	DormantNodeInfoView		Çıkış biçimi
 Aspect ratio	InfoView		En boy oranı

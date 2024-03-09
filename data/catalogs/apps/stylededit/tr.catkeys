@@ -1,6 +1,6 @@
 1	turkish	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Belge istatistikleri
-Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: \"%s\".
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: “%s”.
 Cut	Menus		Kes
 Center	Menus		Orta
 Increase size	Menus		Büyüt
@@ -22,7 +22,7 @@ line %d, column %d	StatusView		%d. satır, %d. sütun
 Words:	Statistics		Sözcük:
 ???	LoadAlert		???
 Recover	NodeMonitorAlerts		Kurtar
-Error saving \"%s\":\n%s	SaveAlert		\"%s\" kaydedilirken hata:\n%s
+Error saving \"%s\":\n%s	SaveAlert		“%s” kaydedilirken hata:\n%s
 OK	RevertToSavedAlert		Tamam
 Unlock file	StatusView		Dosya kilidini aç
 Italic	Menus		Eğik
@@ -31,11 +31,11 @@ Replace…	Menus		Değiştir…
 File	Menus		Dosya
 Paste	Menus		Yapıştır
 Bold	Menus		Kalın
-File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından değiştirilmiş, yeniden yüklensin mi?
-File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından kaldırılmış, kurtarılsın mı?
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		“%file%” başka bir uygulama tarafından değiştirilmiş, yeniden yüklensin mi?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		“%file%” başka bir uygulama tarafından kaldırılmış, kurtarılsın mı?
 Lines:	Statistics		Satır:
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yok saymak istediğinizden emin misiniz?
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		“%s” içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yok saymak istediğinizden emin misiniz?
 Save	SaveAlert		Kaydet
 Default	Open_and_SaveAsPanel		Saptanmış
 Cancel	RevertToSavedAlert		Vazgeç
@@ -44,17 +44,17 @@ Statistics…	Menus		İstatistikler…
 Encoding	Open_and_SaveAsPanel		Kodlama
 Replace all	FindandReplaceWindow		Tümünü değiştir
 Close	Menus		Kapat
-Error loading \"%s\":\n\tUnsupported format	LoadAlert		\"%s\" yüklenirken hata:\n\tDesteklenmeyen biçim
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		“%s” yüklenirken hata:\n\tDesteklenmeyen biçim
 Left	Menus		Sol
 Default	Menus		Saptanmış
 OK	SaveAlert		Tamam
 Color	Menus		Renk
-Save changes to the document \"%s\"? 	QuitAlert		\"%s\" içindeki değişiklikler kaydedilsin mi?
+Save changes to the document \"%s\"? 	QuitAlert		“%s” içindeki değişiklikler kaydedilsin mi?
 StyledEdit	System name		StyledEdit
 Underline	Menus		Altı çizili
 Find:	FindandReplaceWindow		Bul:
 Undo typing	QuitAlert		Yazımı geri al
-Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" yüklenirken hata:\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		“%s” yüklenirken hata:\n\t%s
 Don't save	SaveAlert		Kaydetme
 Reload…	Menus		Yeniden yükle…
 Print…	Menus		Yazdır…
@@ -84,7 +84,7 @@ Save as…	Menus		Farklı kaydet…
 Replace	FindandReplaceWindow		Değiştir
 Characters:	Statistics		Karakter:
 Don't save	QuitAlert		Kaydetme
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. \"%s\" belgesindeki değişiklikler kaydedilsin mi? 
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Bu dosya saltokunur olarak imlenmiş. “%s” belgesindeki değişiklikler kaydedilsin mi? 
 Font	Menus		Yazıtipi
 Align	Menus		Hizalama
 Select all	Menus		Tümünü seç

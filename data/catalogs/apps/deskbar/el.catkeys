@@ -21,7 +21,7 @@ Show calendar…	TimeView		Εμφάνιση ημερολογίου…
 Find…	DeskbarMenu		Αναζήτηση…
 Power off	DeskbarMenu		Απενεργοποίηση
 Defaults	PreferencesWindow		Προεπιλεγμένα
-Show replicants	DeskbarMenu		Εμφάνιση ρέπλικας
+Show replicants	DeskbarMenu		Εμφάνιση λαβών στις ρεπλίκες
 No windows	WindowMenu		Χωρίς παράθυρα
 Show clock	Tray		Εμφάνιση ρολογιού
 Close all	WindowMenu		Κλείσιμο όλων
@@ -30,7 +30,7 @@ About this system	DeskbarMenu		Πληροφορίες συστήματος
 Quit application	WindowMenu		Έξοδος εφαρμογής
 Hide application names	PreferencesWindow		Απόκρυψη ονομάτων εφαρμογών
 Applications	PreferencesWindow		Εφαρμογές
-Show application expander	PreferencesWindow		Εμφάνιση της εφαρμογής Αποσυμπιεστής
+Show application expander	PreferencesWindow		Εμφάνιση λαβής επέκτασης εφαρμογών
 Deskbar preferences…	DeskbarMenu		Προτιμήσεις Γραμμής Εργασιών…
 Suspend	DeskbarMenu		Αναστολή
 Shutdown…	DeskbarMenu		Κλείσιμο…

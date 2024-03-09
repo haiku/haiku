@@ -1,10 +1,11 @@
-1	czech	x-vnd.Haiku-Screen	3410763711
+1	czech	x-vnd.Haiku-Screen	2577971458
 no	Screen		ne
 bits/pixel	Screen		bitů/pixel
 15 bits/pixel, 32768 colors	Screen		15 bitů/pixel, 32768 barev
 Rows:	Screen		Řádky:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Režim obrazovky nemohl být nastaven:\n\t%s\n
+Serial no.: %s	Screen		Sériové číslo: %s
 /other…	Screen		/jiné...
 Keep	Screen		Zachovat
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Horizontální frekvence:\t%lu - %lu kHz\nVertikální frekvence:\t%lu - %lu Hz\n\nMaximální takt pixelů:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Aktuální pracovní plocha
 vertically	Screen		svisle
 All workspaces	Screen		Všechny pracovní plochy
 Use laptop panel:	Screen		Použít panel notebooku:
+Unknown	Screen		Neznámo
 Could not write VESA mode settings file:\n\t	Screen		Nemohu zapsat soubor nastavení VESA režimu:\n\t
 Display info	Screen		Informace o displeji
 Settings will revert in %seconds.	Screen		Nastavení bude vráceno za %seconds.

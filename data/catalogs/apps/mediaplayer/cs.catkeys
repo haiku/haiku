@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	834755355
+1	czech	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Ukončit
 Redo	MediaPlayer-PlaylistWindow		Znovu
 Move Entry	MediaPlayer-MovePLItemsCmd		Přesunout položku
+Reset rating	MediaPlayer-Main		Vynulovat hodnocení
 <unknown>	PlaylistItem-author		<neznámý>
 Cancel	MediaPlayer-SettingsWindow		Zrušit
 Large	MediaPlayer-SettingsWindow		Veliký

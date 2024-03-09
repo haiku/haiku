@@ -9,7 +9,7 @@ Halt	Login View		Dur
 Desktop	Desktop Window		Masaüstü
 Hide password	Login View		Parolayı gizle
 Reboot	Login View		Yeniden başlat
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Giriş uygulamasının arkasında gösterilen masaüstünü üzerine yinelenenler bırakarak özelleştirebilirsiniz.\n\nİşiniz bittiğinde uygulamadan çıkın. (Cmd-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Giriş uygulamasının arkasında gösterilen masaüstünü üzerine yinelenenler bırakarak özelleştirebilirsiniz.\n\nİşiniz bittiğinde uygulamadan çıkın. (Cmd–Q).
 OK	Login View		Tamam
 Info	Login App		Bilgi
 Login:	Login View		Giriş:

@@ -44,7 +44,7 @@ End   [ms]: 	MediaConverter		Ende [ms]:
 Cancel	MediaConverter		Abbrechen
 OK	MediaConverter-FileInfo		OK
 Video encoding:	MediaConverter		Videokodierung:
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Datei-Infos aufgetreten.\n\nFehler:
 Error	MediaConverter		Fehler
 File details	MediaConverter		Dateidetails
 No audio	Audio codecs list		Keine Tonspur

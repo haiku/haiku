@@ -17,7 +17,7 @@ About Pulse…	PulseView		Σχετικά με το Pulse…
 Pulse	NormalPulseView		Παλμός
 Deskbar mode	NormalPulseView		Λειτουργία Γραμμής Εργασιών
 Pulse settings	PulseApp		Ρυθμίσεις Pulse
-Remove replicant	CPUButton		Αφαίρεση ρέπλικας
+Remove replicant	CPUButton		Αφαίρεση ρεπλίκας
 You can't disable the last active CPU.	PulseView		Δεν μπορείτε να απενεργοποιήσετε την τελευταία ενεργή ΚΜΕ.
 Width of icon:	ConfigView		Πλάτος εικονιδίου:
 Deskbar mode	MiniPulseView		Λειτουργία Γραμμής Εργασιών

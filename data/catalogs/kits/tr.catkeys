@@ -45,5 +45,5 @@ Version history:	AboutWindow		Sürüm geçmişi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenen uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Mavi:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" için yinelenen oluşturulamıyor.\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		‘%description’ için yinelenen oluşturulamıyor.\n%error
 Written by:	AboutWindow		Yazan:

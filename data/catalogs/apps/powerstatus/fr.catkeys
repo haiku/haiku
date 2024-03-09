@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	1085070685
+1	french	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Exécuter en fenêtre
 Extended battery info	PowerStatus		Informations additionnelles
 Show status icon	PowerStatus		Afficher l’icône d’état
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Dernière charge complète :
 Current rate: 	PowerStatus		Consommation actuelle : 
 Show text label	PowerStatus		Afficher l’étiquette texte
 Quit	PowerStatus		Quitter
+Battery not charging	PowerStatus		Batterie hors charge
 Battery low	PowerStatus		Batterie faible
 Model number: 	PowerStatus		Numéro de modèle : 
 Battery unused	PowerStatus		Batterie inutilisée
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Avertissement de capacité nominale :
 Capacity granularity 2: 	PowerStatus		Granularité de charge 2 : 
 Too bad!	PowerStatus		Dommage !
 Technology: 	PowerStatus		Technologie : 
+not charging	PowerStatus		hors charge
  mWh	PowerStatus		 mWh
 PowerStatus	System name		État d’énergie
 Design capacity: 	PowerStatus		Capacité nominale : 

@@ -23,7 +23,7 @@ Control	ShortcutsSpec	Name for modifier on keyboard	Kontrol
 Left	ShortcutsSpec		Sol
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı işleyemedi!
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı kaydedemedi!
-*InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir \"Buraya metin girin\"
+*InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir “Buraya metin girin”
 Remove selected shortcut	ShortcutsWindow		Seçili kestirmeyi kaldır
 Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Seçenek
@@ -35,7 +35,7 @@ Both	ShortcutsSpec		Her ikisi de
 Save KeySet as…	ShortcutsWindow		Düğme kümesini farklı kaydet…
 Append KeySet…	ShortcutsWindow		Düğme kümesi iliştir…
 *MouseButton 1	ShortcutsWindow		*FareDüğmesi 1
-*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Çoklu \"*FareyiHareketEttir %100 0\" \"*FareDüğmesi 1\"
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Çoklu “*FareyiHareketEttir %100 0” “*FareDüğmesi 1”
 Right	ShortcutsSpec		Sağ
 OK	ShortcutsWindow		Tamam
 Add new shortcut	ShortcutsWindow		Yeni kestirme ekle

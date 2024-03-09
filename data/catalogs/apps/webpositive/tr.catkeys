@@ -17,7 +17,7 @@ Use proxy server to connect to the internet	Settings Window		İnternete bağlanm
 Auto-hide interface in full screen mode	Settings Window		Tam ekran kipinde arayüzü kendiliğinden gizle
 There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	Yer imleri klasörü getirilirken bir hata oluştu.\n\nHata: %error
 Delete	Cookie Manager		Sil
-(Finish: %date - Over %duration left)	Download Window		(Bitiş: %date - %duration kaldı)
+(Finish: %date - Over %duration left)	Download Window		(Bitiş: %date — %duration kaldı)
 Open containing folder	Download Window		İndirildiği klasörü aç
 Find previous	WebPositive Window		Öncekini bul
 Full screen	WebPositive Window		Tam ekran
@@ -55,7 +55,7 @@ The download could not be opened.	Download Window		İndirilen öge açılamadı.
 Cookies for %s	Cookie Manager		%s için çerezler
 Close	Download Window		Kapat
 WebPositive	System name		WebPositive
-%s - Search term	Settings Window		%s - Arama terimi
+%s - Search term	Settings Window		%s — Arama terimi
 Reload	WebPositive Window		Yeniden yükle
 Expiration	Cookie Manager		Son kullanım süresi
 Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU’nuz pek eski ve WebPositive’in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf kurmanızı öneririz.
@@ -123,7 +123,7 @@ Fixed font:	Settings Window		Eş aralıklı yazıtipi
 Quit	WebPositive Window		Çık
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Arama dizgisinin önceki oluşumlarını bul
 Remember username and password for this site	Authentication Panel		Bu site için kullanıcı adı ve parolayı hatırla
-(Finish: %date - %duration left)	Download Window		(Bitiş: %date - %duration kaldı)
+(Finish: %date - %duration left)	Download Window		(Bitiş: %date — %duration kaldı)
 Cookie manager	Cookie Manager		Çerez yöneticisi
 Show home button	Settings Window		Ana sayfa düğmesini göster
 Start new session	Settings Window		Yeni oturum başlat

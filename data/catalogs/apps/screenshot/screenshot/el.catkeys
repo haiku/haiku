@@ -26,6 +26,6 @@ Cancel	ScreenshotWindow		Άκυρο
 Delay:	ScreenshotWindow		Καθυστέρηση:
 Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
 screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο
-Home folder	ScreenshotWindow		Φάκελος χρήστη
+Home folder	ScreenshotWindow		Αρχικός φάκελος
 Save	ScreenshotWindow		Αποθήκευση
 Capture active window	ScreenshotWindow		Στιγμιότυπο ενεργού παραθύρου

@@ -2,7 +2,7 @@
 Error saving file	ProcessController		Dosya kaydedilirken hata
 Display priority	ProcessController		Görüntüleme önceliği
 That's no Fun!	ProcessController		O da nesi öyle!
-What do you want to do with the team \"%s\"?	ProcessController		\"%s\" takımı ile ne yapmak istiyorsunuz?
+What do you want to do with the team \"%s\"?	ProcessController		‘%s’ takımı ile ne yapmak istiyorsunuz?
 Your setting file could not be saved!\n(%s)	ProcessController		Ayar dosyanız kaydedilemedi!\n(%s)
 Processor %d	ProcessController		İşlemci %d
 Live in the Deskbar	ProcessController		Canlı yenileme
@@ -21,9 +21,9 @@ Restart Deskbar	ProcessController		Masaüstü Çubuğu’nu yeniden başlat
 About ProcessController…	ProcessController		Süreç Denetimcisi hakkında…
 Usage: %s [-deskbar]\n	ProcessController		Kullanım: %s [-deskbar]\n
 Please confirm	ProcessController		Lütfen onaylayın
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996–2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		İvedi öncelik
-What do you want to do with the thread \"%s\"?	ProcessController		\"%s\" iş parçacığı ile ne yapmak istiyorsanız?
+What do you want to do with the thread \"%s\"?	ProcessController		‘%s’ iş parçacığı ile ne yapmak istiyorsanız?
 Idle priority	ProcessController		Boştaki öncelik
 Real-time display priority	ProcessController		Gerçek zamanlı görüntüleme önceliği
 Threads and CPU usage	ProcessController		İş parçacıkları ve CPU kullanımı

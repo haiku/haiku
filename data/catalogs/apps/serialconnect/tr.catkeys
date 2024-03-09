@@ -5,7 +5,7 @@ Raw send…	SerialWindow		Ham gönder…
 Baud rate	SerialWindow		Baud hızı
 Paste	SerialWindow		Yapıştır
 Stop bits	SerialWindow		Durak bitleri
-None	SerialWindow	Flowcontrol	Hiçbiri
+None	SerialWindow	Flowcontrol	Yok
 Cancel	Custom baudrate window		Vazgeç
 Sending…	XModemStatus		Gönderiliyor…
 <no serial port available>	SerialWindow		<kullanılabilir seri kapı yok>
@@ -15,7 +15,7 @@ File	SerialWindow		Dosya
 SerialConnect	System name		Seri Bağlantı
 custom…	SerialWindow	Baudrate	özel…
 Parity	SerialWindow		Eşlik
-None	SerialWindow	Parity	Hiçbiri
+None	SerialWindow	Parity	Yok
 Disconnect	SerialWindow		Bağlantıyı kes
 Everything sent, waiting for acknowledge	XModemStatus		Tümü gönderildi, alındı bekleniyor
 Odd	SerialWindow	Parity	Tek

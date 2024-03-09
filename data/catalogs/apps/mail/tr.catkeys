@@ -48,17 +48,17 @@ UTF-8	Mail	This string is used as a key to set default message compose encoding.
 Quit	Mail		Çık
 Title:	Mail		Başlık:
 Account from mail	Mail		E-posta hesabı
-%e - E-mail address	Mail		%e - E-posta adresi
+%e - E-mail address	Mail		%e — E-posta adresi
 Cc:	Mail		Bilgi:
 No matches	Mail		Eşleşme yok
 Queries	Mail		Sorgular
 Cut	Mail		Kes
 Reply to sender	Mail		Göndereni yanıtla
-\\n - Newline	Mail		\\n - Yeni satır
+\\n - Newline	Mail		\\n — Yeni satır
 Copy	Mail		Kopyala
 Add signature	Mail		İmza ekle
 Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Ek: %name% (Tür: %type%)
-%n - Full name	Mail		%n - Tam ad
+%n - Full name	Mail		%n — Tam ad
 Signature	Mail		İmza
 Use default account	Mail		Saptanmış hesabı kullan
 draft	B_USER_DIRECTORY/mail/draft		taslaklar
@@ -108,7 +108,7 @@ Start now	Mail		Şimdi başlat
 Move to trash	Mail		Çöpe at
 <none>	Mail		<yok>
 Mail settings	Mail		Posta ayarları
-%d - Date	Mail		%d - Tarih
+%d - Date	Mail		%d — Tarih
 Check spelling	Mail		Yazımı denetle
 Status:	Mail		Durum:
 Redo	Mail		Yinele

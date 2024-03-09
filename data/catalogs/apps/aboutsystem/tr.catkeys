@@ -1,16 +1,16 @@
-1	turkish	x-vnd.Haiku-About	4264836225
+1	turkish	x-vnd.Haiku-About	3595470255
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
-Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999-2007 Michael C. Ring. Tüm hakları saklıdır.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Telif hakkı © 2002-2004 Vivek Mohan. Tüm hakları saklıdır.
+Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999–2007 Michael C. Ring. Tüm hakları saklıdır.
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Telif hakkı © 2002–2004 Vivek Mohan. Tüm hakları saklıdır.
 \n\nSpecial thanks to:\n	AboutView		\n\nÖzel teşekkürlerimizle:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ve kendisinin NewOS çekirdeği)\n
-Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Telif Hakkı © 1999-2000 Y. Takagi. Tüm hakları saklıdır.
+Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Telif Hakkı © 1999–2000 Y. Takagi. Tüm hakları saklıdır.
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google ve kendilerinin Google Summer of Code ve Google Code In programları\n
 Contributors:\n	AboutView		Katkıda bulunanlar:\n
 Kernel:	AboutView		Çekirdek:
-Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Telif hakkı © 2006-2012 Kentaro Fukuchi
-Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Telif hakkı © 1991-2000 Silicon Graphics, Inc. Tüm hakları saklıdır.
-Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Telif hakkı © 1990-2002 Info-ZIP. Tüm hakları saklıdır.
+Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Telif hakkı © 2006–2012 Kentaro Fukuçi
+Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Telif hakkı © 1991–2000 Silicon Graphics, Inc. Tüm hakları saklıdır.
+Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Telif hakkı © 1990–2002 Info-ZIP. Tüm hakları saklıdır.
 Past website & marketing:\n	AboutView		Eski web sitesi ve pazarlama:\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Telif hakkı © 2007 Ralink Technology Corporation. Tüm hakları saklıdır.
 Copyright © 2003 Peter Hanappe and others.	AboutView		Telif hakkı © 2003 Peter Hanappe ve diğerleri.
@@ -18,64 +18,67 @@ Testing and bug triaging:\n	AboutView		Sınama ve hata sınıflandırma:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, other{# işlemci:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi Firmware
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku’ya özel olan tüm kodlar, özellikle çekirdek ve uygulamaların bağlı olduğu kodlar <MIT lisansı> koşulları altında dağıtılmaktadır. Bazı sistem kitaplıkları ve üçüncü parti kodlar <LGPL lisansı> koşulları altında dağıtılır. Üçüncü parti kodların telif hakları ile ilgili bilgiyi aşağıda bulabilirsiniz.\n\n
-Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Telif hakkı © 1996-1997 Jeff Prosise. Tüm hakları saklıdır.
-Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Telif hakkı © 1999-2006 Brian Paul, Mesa 3D Project. Tüm hakları saklıdır.
-Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Telif hakkı © 2010-2011 Google Inc. Tüm hakları saklıdır.
-Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Telif hakkı © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTüm hakları saklıdır.
+Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Telif hakkı © 1996–1997 Jeff Prosise. Tüm hakları saklıdır.
+Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Telif hakkı © 1999–2006 Brian Paul, Mesa 3D Project. Tüm hakları saklıdır.
+Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Telif hakkı © 2010–2011 Google Inc. Tüm hakları saklıdır.
+Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Telif hakkı © 1987–1988 Digital Equipment Corporation, Maynard, Massachusetts.\nTüm hakları saklıdır.
 Past maintainers:\n	AboutView		Önceki geliştiriciler:\n
 Unknown	AboutView		Bilinmeyen
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ve geliştirici takımına BeOS’u yarattıkları için!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Telif hakkı © 2002-2014 Industrial Light & Magic, Lucas Digital Ltd. LLC’nin bir bölümü.
+Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Telif hakkı © 2002–2014 Industrial Light & Magic, Lucas Digital Ltd. LLC’nin bir bölümü.
 Licenses: 	AboutView		Lisanslar: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.’in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.’in tescilli markalarıdır.\n\n
 Copyright © 2009 Colin Percival	AboutView		Telif hakkı © 2009 Colin Percival
 Time running:	AboutView		Çalışma süresi:
+Visit the Haiku website	AboutView		Haiku web sitesini ziyaret edin
 Version: %s	AboutView	Version: R1 or hrev99999	Sürüm: %s
+Make a donation	AboutView		Projeye bağış yapın
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB bellek:
-Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Telif hakkı © 1996-2005 Julian R Seward. Tüm hakları saklıdır.
+Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Telif hakkı © 1996–2005 Julian R Seward. Tüm hakları saklıdır.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
-Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Telif hakkı © 1994-2009, Thomas G. Lane, Guido Vollbeding. Bu yazılım Independent JPEG Group’a ait olan işin bir parçası temel alınarak yazılmıştır.
+Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Telif hakkı © 1994–2009, Thomas G. Lane, Guido Vollbeding. Bu yazılım Independent JPEG Group’a ait olan işin bir parçası temel alınarak yazılmıştır.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (proje kurucusu)\n\n
 Remove replicant	AboutView		Yineleneni kaldır
 BSD (3-clause)	AboutWindow		BSD (3 koşullu)
 About this system	AboutWindow		Sistem Hakkında
-Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2003-2006 Intel Corporation. Tüm hakları saklıdır.
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Telif hakkı © 1999-2010 Gutenprint yazarları. Tüm hakları saklıdır.
-Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Telif hakkı © 1994-1997 Mark Kilgard. Tüm hakları saklıdır.
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2003–2006 Intel Corporation. Tüm hakları saklıdır.
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Telif hakkı © 1999–2010 Gutenprint yazarları. Tüm hakları saklıdır.
+Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Telif hakkı © 1994–1997 Mark Kilgard. Tüm hakları saklıdır.
 AboutSystem	System name		Sistem Hakkında
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Telif hakkı © 2019 Joe Drago. Tüm hakları saklıdır.
-Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Telif hakkı © 1995-2001 Lars Düning. Tüm hakları saklıdır.
-Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Telif hakkı © 1998-2000 Thai Open Source Software Center Ltd ve Clark Cooper.
+Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Telif hakkı © 1995–2001 Lars Düning. Tüm hakları saklıdır.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Telif hakkı © 1998–2000 Thai Open Source Software Center Ltd ve Clark Cooper.
 \nCopyrights\n\n	AboutView		\nTelif hakları\n\n
 Source Code: 	AboutView		Kaynak Kodu: 
 GNU GPL v3	AboutWindow		GNU GPL v3
-Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Telif hakkı © 1996-2002, 2006 David Turner, Robert Wilhelm ve Werner Lemberg.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Telif hakkı © 1996–2002, 2006 David Turner, Robert Wilhelm ve Werner Lemberg.
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		GNU Projesi’nden GPL ve LGPL lisanslı yazılımlar içerir:\nGNU C Kütüphanesi, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nTelif hakkı © The Free Software Foundation.
 The HaikuPorts team\n	AboutView		HaikuPorts takımı\n
-Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Aşağıdaki yazılımlar FreeBSD projesinden alınmış olup BSD lisansı ile yayımlanmıştır:\nftpd, ping, telnet, Telnet, traceroute\nTelif hakkı © 1994-2008 The FreeBSD Project. Tüm hakları saklıdır.
-Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Telif hakkı © 2002-2003 Steve Lhomme. Tüm hakları saklıdır.
-Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Telif hakkı © 2000-2019 Fabrice Bellard ve diğerleri
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Aşağıdaki yazılımlar FreeBSD projesinden alınmış olup BSD lisansı ile yayımlanmıştır:\nftpd, ping, telnet, Telnet, traceroute\nTelif hakkı © 1994–2008 The FreeBSD Project. Tüm hakları saklıdır.
+Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Telif hakkı © 2002–2003 Steve Lhomme. Tüm hakları saklıdır.
+Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Telif hakkı © 2000–2019 Fabrice Bellard ve diğerleri
 Current maintainers:\n	AboutView		Geliştiriciler:\n
-Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Telif hakkı © 1995, 1998-2001 Jef Poskanzer. Tüm hakları saklıdır.
+Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Telif hakkı © 1995, 1998–2001 Jef Poskanzer. Tüm hakları saklıdır.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
-Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Telif hakkı © 2007-2009 Marvell Semiconductor, Inc. Tüm hakları saklıdır.
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Telif hakkı © 2007–2009 Marvell Semiconductor, Inc. Tüm hakları saklıdır.
 Version:	AboutView		Sürüm:
 The BeGeistert team\n	AboutView		BeGeistert takımı\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
 License: 	AboutView		Lisans: 
 GNU GPL v2	AboutWindow		GNU GPL v2
+%d MiB used (%d%%)	AboutView	326 MiB used (16%)	%d MiB kullanılan (%%%d)
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland Üniversitesi ve Christof Lutteroth\n\n
-Copyright © 2012-2016 Google Internationalization team.	AboutView		Telif hakkı © 2012-2016 Google Yerelleştirme takımı.
-Copyright © 2001-%ld The Haiku project. 	AboutView		Telif hakkı © 2001-%ld The Haiku project. 
-Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Telif hakkı © 1994-2008 Xiph.Org. Tüm hakları saklıdır.
-Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Telif hakkı © 1995-2004 Jean-loup Gailly ve Mark Adler.
-Copyright © 2001-2003 Expat maintainers.	AboutView		Telif hakkı © 2001-2003 Expat geliştiricileri.
-Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Telif hakkı © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2012-2016 Google Internationalization team.	AboutView		Telif hakkı © 2012–2016 Google Yerelleştirme takımı.
+Copyright © 2001-%ld The Haiku project. 	AboutView		Telif hakkı © 2001–%ld The Haiku project. 
+Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Telif hakkı © 1994–2008 Xiph.Org. Tüm hakları saklıdır.
+Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Telif hakkı © 1995–2004 Jean-loup Gailly ve Mark Adler.
+Copyright © 2001-2003 Expat maintainers.	AboutView		Telif hakkı © 2001–2003 Expat geliştiricileri.
+Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Telif hakkı © 2002–2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Çeviriler:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…ve bahsetmeyi unuttuğumuz diğerleri (üzgünüz!)\n\n
-Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2006-2015 Intel Corporation. Tüm hakları saklıdır.
+Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2006–2015 Intel Corporation. Tüm hakları saklıdır.
 BSD (2-clause)	AboutWindow		BSD (2 koşullu)
 Website & marketing:\n	AboutView		Web sayfası & pazarlama:\n
 %d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB kullanılan (%s)

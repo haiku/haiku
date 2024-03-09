@@ -2,13 +2,13 @@
 No menu	MainWin		Menü yok
 No border	MainWin		Kenarlık yok
 Error, connecting to interface failed:\n\n	MainWin		Hata, arayüze bağlanma başarısız oldu:\n\n
-force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	720 × 576, ekran en-boy oranı 4:3 zorla
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	720 × 576, ekran en–boy oranı 4:3 zorla
 Full screen	MainWin		Tam ekran
 Scale to native size	MainWin		Doğal boyuta ölçekle
 unknown	MainWin		bilinmeyen
 Next channel	MainWin		Sonraki kanal
-Keep aspect ratio	MainWin		En-boy oranını koru
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Sayısal Video Yayın TV
+Keep aspect ratio	MainWin		En–boy oranını koru
+DVB - Digital Video Broadcasting TV	MainWin		DVB — Sayısal Video Yayın TV
 Always on top	MainWin		Her zaman üstte
 Debug	MainWin		Hata ayıkla
 Interface	MainWin		Arayüz
@@ -17,12 +17,12 @@ Channel	MainWin		Kanal
 Previous channel	MainWin		Önceki kanal
 OK	MainWin		Tamam
 TV	MainWin		TV
-force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	544 × 576, ekran en-boy oranı 4:3 zorla
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	544 × 576, ekran en–boy oranı 4:3 zorla
 Settings	MainWin		Ayarlar
-force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	704 × 576, ekran en-boy oranı 4:3 zorla
-%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	704 × 576, ekran en–boy oranı 4:3 zorla
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s — %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		TV
 Settings…	MainWin		Ayarlar…
-None	MainWin		Hiçbiri
+None	MainWin		Yok
 Error, interface is busy:\n\n	MainWin		Hata, arayüz meşgul:\n\n
-pixel aspect ratio	MainWin		piksel en-boy oranı
+pixel aspect ratio	MainWin		piksel en–boy oranı

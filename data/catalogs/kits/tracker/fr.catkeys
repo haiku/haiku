@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2925382142
+1	french	x-vnd.Haiku-libtracker	2189619380
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -342,6 +342,7 @@ If you alter the system folder or its contents, you won't be able to boot %osNam
 Save	FilePanelPriv		Sauvegarder
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (Il manque la bibliothèque : %library).\n
 Finish: %time	StatusWindow		Fin : %time
+Messenger	AttributesView		Messager
 after	FindPanel		après
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# octet de données>} other{<# octets de données>}}
 Version	OpenWithWindow		Version

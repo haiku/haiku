@@ -31,7 +31,7 @@ Site	PoorMan		Ιστοσελίδα
 Cannot start the server	PoorMan		Αδυναμία εκκίνησης του εξυπηρετητή
 Create log file	PoorMan		Δημιουργία αρχείου καταγραφής
 Create public_html	PoorMan		Δημιουργία public_html
-Clear hit counter	PoorMan		Καθαρισμός μετρητή επισκέψεων
+Clear hit counter	PoorMan		Επαναφορά μετρητή επισκέψεων
 Status: Stopped	PoorMan		Κατάσταση: Σταματημένο
 File	PoorMan		Αρχείο
 Settings…	PoorMan		Ρυθμίσεις…
@@ -43,7 +43,7 @@ Advanced	PoorMan		Προχωρημένοι
 Copy	PoorMan		Αντιγραφή
 Logging	PoorMan		Καταγραφή
 PoorMan	System name		Εξυπηρετητής Ιστού PoorMan
-Clear console log	PoorMan		Καθαρισμός καταγραφής κονσόλας
+Clear console log	PoorMan		Απαλοιφή καταγραφής κονσόλας
 Run server	PoorMan		Εκκίνηση εξυπηρετητή
 Create	PoorMan		Δημιουργία
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# σύνδεση} other{# συνδέσεις}}

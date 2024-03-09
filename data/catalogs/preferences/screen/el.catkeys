@@ -1,10 +1,11 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Screen	3410763711
+1	greek, modern (1453-)	x-vnd.Haiku-Screen	2577971458
 no	Screen		όχι
 bits/pixel	Screen		bits/εικονοστοιχείο
 15 bits/pixel, 32768 colors	Screen		15 bits/εικονοστοιχείο, 32768 χρώματα
 Rows:	Screen		Γραμμές:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Δεν ήταν δυνατός ο ορισμός λειτουργίας οθόνης:\n\t%s\n
+Serial no.: %s	Screen		Σειριακός κωδικός: %s
 /other…	Screen		/άλλο…
 Keep	Screen		Διατήρηση
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Οριζόντια συχνότητα:\t%lu - %lu kHz\nΚάθετη συχνότητα:\t%lu - %lu Hz\n\nΜέγιστος μετρητής εικονοστοιχείων:\t%g MHz
@@ -17,6 +18,7 @@ Current workspace	Screen		Τρέχων χώρος εργασίας
 vertically	Screen		κάθετα
 All workspaces	Screen		Όλοι οι χώροι εργασίας
 Use laptop panel:	Screen		Χρήση πάνελ φορητού υπολογιστή:
+Unknown	Screen		Άγνωστο
 Could not write VESA mode settings file:\n\t	Screen		Αδυναμία εγγραφής του αρχείο ρυθμίσεων της λειτουργίας VESA:\n\t
 Display info	Screen		Πληροφορίες οθόνης
 Settings will revert in %seconds.	Screen		Θα γίνει επαναφορά σε %seconds.

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	834755355
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Ήχος
 Quit	MediaPlayer-Main		Έξοδος
 Redo	MediaPlayer-PlaylistWindow		Επαναφορά
 Move Entry	MediaPlayer-MovePLItemsCmd		Μετακίνηση Αρχείων
+Reset rating	MediaPlayer-Main		Επαναφορά βαθμολογίας
 <unknown>	PlaylistItem-author		<άγνωστο>
 Cancel	MediaPlayer-SettingsWindow		Άκυρο
 Large	MediaPlayer-SettingsWindow		Μεγάλο

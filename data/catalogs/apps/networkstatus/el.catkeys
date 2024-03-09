@@ -4,7 +4,7 @@ Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του βοηθητικού προγράμματος δικτύου απέτυχε.\n\nΣφάλμα: 
 Install in Deskbar	NetworkStatus		Εγκατάσταση στην Γραμμή Εργασιών
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις Κατάστασης Δικτύου :\n\t--deskbar\tαυτόματη προσθήκη ρέπλικας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις Κατάστασης Δικτύου :\n\t--deskbar\tαυτόματη προσθήκη ρεπλίκας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
 Open network preferences…	NetworkStatusView		Άνοιγμα ρυθμίσεων δικτύου…
 NetworkStatus	System name		Κατάσταση Δικτύου
 Broadcast:	NetworkStatusView		Διεύθυνση broadcast:

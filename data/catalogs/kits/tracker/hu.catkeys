@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2787029568
+1	hungarian	x-vnd.Haiku-libtracker	2585450844
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -404,6 +404,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Nem sikerült a lemez (\"%nam
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\") a programmal (\"%app\"): hiányzik egy szimbólum: %symbol\n
 New folder	ContainerWindow		Új mappa
 Name	OpenWithWindow		Név
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Információk
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Hiba történt a felülírás közben: \"%name\". Lehet, hogy az elem épp használatban van.
 Windows	TrackerSettingsWindow		Ablakok
 Show space bars on volumes	SettingsView		Telítettség megjelenítése a lemezeken

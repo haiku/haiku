@@ -8,7 +8,7 @@ The screen mode could not be set:\n\t%s\n	Screen		Ekran kipi ayarlanamıyor:\n\t
 Serial no.: %s	Screen		Seri №: %s
 /other…	Screen		/diğer…
 Keep	Screen		Tut
-Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Yatay frekans:\t%lu - %lu kHz\nDikey frekans:\t%lu - %lu Hz\n\nEn hızlı piksel saati:\t%g MHz
+Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Yatay frekans:\t%lu–%lu kHz\nDikey frekans:\t%lu–%lu Hz\n\nEn hızlı piksel saati:\t%g MHz
 Refresh rate:	Screen		Yenileme hızı:
 Video format:	Screen		Video biçimi:
 Undo	Screen		Geri al

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-About	4264836225
+1	romanian	x-vnd.Haiku-About	3595470255
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Drepturi de autor © 1999-2007 Michael C. Ring. Toate drepturile rezervate.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Drepturi de autor © 2002-2004 Vivek Mohan. Toate drepturile rezervate.
@@ -31,7 +31,9 @@ Licenses: 	AboutView		Licențe:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea Haiku, Inc. sau a respectivilor autori atunci când este notat explicit în sursă. Haiku® şi logoul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Drepturi de autor © 2009 Colin Percival
 Time running:	AboutView		Timp de rulare:
+Visit the Haiku website	AboutView		Vizitați pagina web Haiku
 Version: %s	AboutView	Version: R1 or hrev99999	Versiune: %s
+Make a donation	AboutView		Efectuați o donație
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiO memorie:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Drepturi de autor © 1996-2005 Julian R Seward. Toate drepturile rezervate.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
@@ -66,6 +68,7 @@ GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Intel (2xxx firmware)	AboutWindow		Intel (firmware 2xxx)
 License: 	AboutView		Licență: 
 GNU GPL v2	AboutWindow		GNU GPL v2
+%d MiB used (%d%%)	AboutView	326 MiB used (16%)	%d MiO utilizați (%d%%)
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Universitatea Auckland și Christof Lutteroth\n\n
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Drepturi de autor © 2012-2016 echipa de Internaționalizare Google.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Drepturi de autor © 2001-%ld Proiectul Haiku. 

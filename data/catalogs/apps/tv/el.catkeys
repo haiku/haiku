@@ -1,7 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku.TV	3120244932
+1	greek, modern (1453-)	x-vnd.Haiku.TV	337483365
 No menu	MainWin		Χωρίς μενού
 No border	MainWin		Χωρίς περίγραμμα
 Error, connecting to interface failed:\n\n	MainWin		Σφάλμα, η διασύνδεση με τη διεπαφή απέτυχε:\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	εξαναγκασμός 720 × 576 σε ανάλυση 4:3
 Full screen	MainWin		Πλήρης οθόνη
 Scale to native size	MainWin		Κλιμάκωση στο φυσικό μέγεθος
 unknown	MainWin		άγνωστο
@@ -16,7 +17,10 @@ Channel	MainWin		Κανάλι
 Previous channel	MainWin		Προηγούμενο κανάλι
 OK	MainWin		Εντάξει
 TV	MainWin		Τηλεόραση
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	εξαναγκασμός 544 × 576 σε ανάλυση 4:3
 Settings	MainWin		Ρυθμίσεις
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	εξαναγκασμός 704 × 576 σε ανάλυση 4:3
+%s - %d × %d, %.3f:%.3f => %.0f × %.0f	MainWin	The '×' is the Unicode multiplication sign U+00D7	%s - %d × %d, %.3f:%.3f => %.0f × %.0f
 TV	System name		Τηλεόραση
 Settings…	MainWin		Ρυθμίσεις…
 None	MainWin		Κανένα

@@ -1,7 +1,8 @@
-1	french	x-vnd.Haiku-MediaConverter	2528567753
+1	french	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Le fichier d’entrée n’est pas reconnu comme un fichier audio ou vidéo
 Source files	MediaConverter		Fichiers sources
 Error writing video frame %lld	MediaConverter		Erreur d’écriture de l’image vidéo %lld
+Audio quality: %s	MediaConverter		Qualité audio : %s
 Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Le dossier sélectionné est introuvable. Dossier de repli : /boot/home
 Conversion completed	MediaConverter		Conversion achevée
@@ -10,6 +11,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MédiaConvertisseur+ : Dossier d�
 Error creating video.	MediaConverter		Erreur lors de la création de la vidéo.
 Cancelling	MediaConverter		Annulation
 None available	Audio codecs		Aucun disponible
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Le fichier comporte plusieurs pistes audio ou vidéo, seule la première piste de chaque type sera convertie.
 No file selected	MediaConverter-FileInfo		Aucun fichier sélectionné
 High	MediaConverter		Haute
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Le fichier n’est pas un média supporté :} other{# fichiers ne sont des médias supportés :}}
@@ -24,6 +26,7 @@ Error loading a file	MediaConverter		Erreur au chargement d’un fichier
 Encoder parameters	MediaConverter-EncoderWindow		Paramètres d’encodage
 Open…	Menu		Ouvrir…
 Audio encoding:	MediaConverter		Encodage audio :
+Multi-track file detected	MediaConverter		Fichier multipiste détecté.
 Cancelling…	MediaConverter		Annulation…
 Output file '%filename' created	MediaConverter		Le fichier cible « %filename » a été créé
 Output folder	MediaConverter		Dossier de sortie
@@ -36,6 +39,7 @@ Conversion cancelled	MediaConverter		Conversion annulée
 Low	MediaConverter		Basse
 Error loading files	MediaConverter		Erreur de chargement des fichiers
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		Qualité vidéo : %s
 End   [ms]: 	MediaConverter		Fin [ms] : 
 Cancel	MediaConverter		Annuler
 OK	MediaConverter-FileInfo		OK
@@ -49,8 +53,10 @@ Drop media files onto this window	MediaConverter		Déposez les médias à conver
 Error read audio frame %lld	MediaConverter		Erreur de lecture de la trame audio %lld
 Quit	Menu		Quitter
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octets}}
+Writing audio track: %s complete	MediaConverter		Écriture de la piste audio : %s effectués
 Duration:	MediaConverter-FileInfo		Durée :
 MediaConverter	System name		Convertisseur de média
+Writing video track: %s complete	MediaConverter		Écriture de la piste vidéo : %s effectués
 Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
 Error writing audio frame %lld	MediaConverter		Erreur d’écriture de la trame audio %lld
 File format:	MediaConverter		Format de fichier :

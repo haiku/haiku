@@ -2,7 +2,7 @@
 Include window border	ScreenshotWindow		Pencere kenarlığını içer
 Overwrite	ScreenshotWindow		Üzerine yaz
 Save in:	ScreenshotWindow		Kaydetme yeri:
-Error saving \"%s\":\n\t%s	ScreenshotWindow		\"%s\" kaydedilirken hata:\n\t%s
+Error saving \"%s\":\n\t%s	ScreenshotWindow		“%s” kaydedilirken hata:\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Bu dosya halihazırda var.\n Üzerine yazmak istediğinizden emin misiniz?
 OK	ScreenshotWindow		Tamam
 The destination path exists but is not a folder.	ScreenshotWindow		Hedef yol var; ancak bir klasör değil.

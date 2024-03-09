@@ -4,10 +4,10 @@ OK	ShutdownProcess		Tamam
 Do you really want to shut down the system?	ShutdownProcess		Sistemi kapatmak istediğinizden emin misiniz?
 Shutdown status	ShutdownProcess		Kapanma durumu
 Shut down	ShutdownProcess		Kapat
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\" uygulaması bir kipsel panelde takılı kalmış olabilir.
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		‘%appName%’ uygulaması bir kipsel panelde takılı kalmış olabilir.
 System is shut down	ShutdownProcess		Sistem kapandı
 Restart system	ShutdownProcess		Yeniden başlat
-Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" uygulaması kapanma işlemini yarıda kesti.
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		‘%appName%’ uygulaması kapanma işlemini yarıda kesti.
 Asking background applications to quit.	ShutdownProcess		Arka plan uygulamalarına kapanmaları söyleniyor…
 Do you really want to restart the system?	ShutdownProcess		Sistemi yeniden başlatmak istediğinizden emin misiniz?
 Restart	ShutdownProcess		Yeniden başlat
@@ -20,4 +20,4 @@ Tidying things up a bit.	ShutdownProcess		Ortalık toparlanıyor…
 Kill application	ShutdownProcess		Uygulamayı sonlandır
 Shutdown aborted	ShutdownProcess		Kapanma iptal edildi
 Shutting down…	ShutdownProcess		Kapatılıyor…
-Asking \"%appName%\" to quit.	ShutdownProcess		\"%appName%\" uygulamasına kapanması söyleniyor…
+Asking \"%appName%\" to quit.	ShutdownProcess		‘%appName%’ uygulamasına kapanması söyleniyor…

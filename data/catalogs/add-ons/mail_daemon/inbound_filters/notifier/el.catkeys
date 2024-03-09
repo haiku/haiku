@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NewMailNotification	2220310168
+1	greek, modern (1453-)	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Παράθυρο καταγραφής
 none	NotifierConfigView		κανένα
 Alert	NotifierConfigView		Ειδοποίηση
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Κεντρική ειδοποίηση
 Beep	NotifierConfigView		Μπίπ
 Central beep	NotifierConfigView		Κεντρικό μπίπ
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Ένα νέο μήνυμα} other{# νέα μηνύματα}}
+New mail notification	NotifierFilter		Ειδοποίηση νέας ηλ. αλληλογραφίας
 New messages	NotifierFilter		Νέα μηνύματα
 Method:	NotifierConfigView		Μέθοδος:
 Keyboard LEDs	NotifierConfigView		LED πληκτρολογίου

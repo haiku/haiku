@@ -48,15 +48,15 @@ Window title…	Terminal TermWindow		Pencere başlığı…
 ANSI blue color	Terminal ThemeView		ANSI mavi
 blue	Terminal ThemeView		mavi
 Open path	Terminal TermView		Yol aç
-Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" çalıştırılamadı:\n\t%error
+Cannot execute \"%command\":\n\t%error	Terminal Shell		‘%command’ yürütülemiyor:\n\t%error
 Terminal	System name		Uçbirim
 Custom	Terminal colors scheme		Özel
 Really close?	Terminal TermWindow		Gerçekten kapatılsın mı?
 Font size	Terminal TermWindow		Yazıtipi boyutu
 OK	Terminal TermApp		Tamam
 ANSI bright blue color	Terminal ThemeView		ANSI açık mavi
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" süreci hâlâ çalışıyor.\nUçbirimi kapatırsanız süreç sonlandırılacaktır.
-Unrecognized option \"%s\"\n	Terminal arguments parsing		Tanımlanamayan seçenek \"%s\"\n
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		‘%1’ süreci hâlâ çalışıyor.\nUçbirimi kapatırsanız süreç sonlandırılacaktır.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		Tanımlanamayan seçenek ‘%s’\n
 Tab title:	Terminal AppearancePrefView		Sekme başlığı:
 Text not found.	Terminal TermWindow		Metin bulunamadı.
 Match word	Terminal FindWindow		Tam sözcüğü eşleştir
@@ -75,7 +75,7 @@ Selected text	Terminal ThemeView		Seçili metin
 Copy absolute path	Terminal TermView		Tam yolu kopyala
 Cancel	Terminal TermWindow		Vazgeç
 ANSI cyan color	Terminal ThemeView		ANSI camgöbeği
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" işlemi hâlâ çalışıyor.\nBu sekmeyi kapatırsanız işlem sonlandırılacaktır.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		‘%1’ süreci hâlâ çalışıyor.\nBu sekmeyi kapatırsanız süreç sonlandırılacaktır.
 Full screen	Terminal TermWindow		Tam ekran
 Shell 	Terminal TermWindow		Kabuk 
 Revert	Terminal ThemeWindow		Eski haline döndür
@@ -130,7 +130,7 @@ Text under cursor	Terminal ThemeView		İmleç altındaki metin
 ANSI bright white color	Terminal ThemeView		ANSI açık beyaz
 Close window	Terminal TermWindow		Pencereyi kapat
 ANSI magenta color	Terminal ThemeView		ANSI mor
-Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nCopyright 2001-2020 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ve Takaşi Murai.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nCopyright 2001–2020 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ve Takaşi Murai.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
 cyan	Terminal ThemeView		camgöbeği
 Clear all	Terminal TermWindow		Tümünü temizle
 Cursor	Terminal ThemeView		İmleç

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ShowImage	3998703664
+1	czech	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		Prohlížeč obrázků
 Page setup…	Menus		Nastavení stránky...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stránka %d) byl změněn. Chcete jej zavřít?
@@ -26,10 +26,12 @@ Flip top to bottom	Menus		Převrátit shora dolů
 Zoom in	Menus		Přiblížit
 Last page	Menus		Poslední stránka
 Cancel	ClosePrompt		Zrušit
+Attributes	Menus		Atributy
 High-quality zooming	Menus		Vysoce kvalitní přiblížení
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' byl změněn. Chcete jej zavřít?
 Close	Menus		Zavřít
 Selection mode	Menus		Režim výběru
+Reset rating	Menus		Vynulovat hodnocení
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Přizpůsobit velikost obrázku stránce
 Show tool bar	Menus		Zobrazit panel nástrojů
@@ -45,6 +47,7 @@ Job setup	PrintOptionsWindow		Nastavení úlohy
 Clear selection	Menus		Zrušit výběr
 Rotate clockwise	Menus		Otočit po směru hodinových ručiček
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nemohu nahrát obrázek! Soubor nebo překladač pro něj neexistuje.
+Open with…	Menus		Otevřít pomocí...
 Rotate counterclockwise	Menus		Otočit proti směru hodinových ručiček
 Previous page	Menus		Předchozí stránka
 Fit to window	Menus		Přizpůsobit oknu

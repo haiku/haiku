@@ -1,5 +1,5 @@
 1	german	application/x-vnd.Be.LoggingConsumerApp	3475739170
-MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: keine Node Info erhalten (%ld):\n%s\n
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: keine Node-Info erhalten (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Priorität
 MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Node nicht gefunden (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latenz

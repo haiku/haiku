@@ -9,7 +9,7 @@ Halt	Login View		Παύση
 Desktop	Desktop Window		Επιφάνεια εργασίας
 Hide password	Login View		Κρύψιμο κωδικού
 Reboot	Login View		Επανεκκίνηση
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Μπορείτε να προσαρμόσετε την επιφάνεια εργασίας πίσω από την εφαρμογή Εισόδου τοποθετώντας ρέπλικες σε αυτήν.\n\nΌταν τελειώσετε, απλά κλείστε την εφαρμογή (Cmd-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Μπορείτε να προσαρμόσετε την επιφάνεια εργασίας πίσω από την εφαρμογή Εισόδου τοποθετώντας ρεπλίκες σε αυτήν.\n\nΌταν τελειώσετε, απλά κλείστε την εφαρμογή (Cmd-Q).
 OK	Login View		ΟΚ
 Info	Login App		Πληροφορίες
 Login:	Login View		Είσοδος:

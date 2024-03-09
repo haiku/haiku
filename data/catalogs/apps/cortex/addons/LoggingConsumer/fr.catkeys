@@ -1,5 +1,7 @@
-1	french	application/x-vnd.Be.LoggingConsumerApp	3412272087
+1	french	application/x-vnd.Be.LoggingConsumerApp	3235004542
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: impossible de lire les informations du nœud (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Priorité
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nœud introuvable (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Temps de latence
 Logged input	CortexAddOnsLoggingConsumer		Entrées journalisés
 CPU spin percentage	CortexAddOnsLoggingConsumer		Taux de charge du CPU
@@ -13,3 +15,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Contrôles
 controls	CortexAddOnsCommonMediaNodeControlApp		contrôles
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Connecter
 percent	CortexAddOnsLoggingConsumer		pourcent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: aucun paramètre pour le nœud (%ld):\n%s\n
