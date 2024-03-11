@@ -15,6 +15,11 @@ public:
 					LanguageTest();
 	virtual			~LanguageTest();
 
+			void	TestLanguageParseJapanese();
+			void	TestLanguageParseFrenchWithCountry();
+			void	TestLanguageParseSerbianScriptAndCountry();
+			void	TestLanguageParseSerbianScriptAndCountryHyphens();
+
 			void	TestLanguageNameFrenchInEnglish();
 			void	TestLanguageNameFrenchInFrench();
 			void	TestLanguagePropertiesFrench();

@@ -23,6 +23,70 @@ LanguageTest::~LanguageTest()
 
 
 void
+LanguageTest::TestLanguageParseJapanese()
+{
+	// GIVEN
+
+	// WHEN
+	BLanguage language("jp");
+
+	// THEN
+	CPPUNIT_ASSERT_EQUAL(BString("jp"), language.ID());
+	CPPUNIT_ASSERT_EQUAL(BString("jp"), language.Code());
+	CPPUNIT_ASSERT_EQUAL(BString(""), language.ScriptCode());
+	CPPUNIT_ASSERT_EQUAL(BString(""), language.CountryCode());
+}
+
+
+void
+LanguageTest::TestLanguageParseFrenchWithCountry()
+{
+	// GIVEN
+
+	// WHEN
+	BLanguage language("fr_FR");
+
+	// THEN
+	CPPUNIT_ASSERT_EQUAL(BString("fr_FR"), language.ID());
+	CPPUNIT_ASSERT_EQUAL(BString("fr"), language.Code());
+	CPPUNIT_ASSERT_EQUAL(BString(""), language.ScriptCode());
+	CPPUNIT_ASSERT_EQUAL(BString("FR"), language.CountryCode());
+}
+
+
+void
+LanguageTest::TestLanguageParseSerbianScriptAndCountry()
+{
+	// GIVEN
+
+	// WHEN
+	BLanguage language("sr_Latn_BA");
+
+	// THEN
+	CPPUNIT_ASSERT_EQUAL(BString("sr_Latn_BA"), language.ID());
+	CPPUNIT_ASSERT_EQUAL(BString("sr"), language.Code());
+	CPPUNIT_ASSERT_EQUAL(BString("BA"), language.CountryCode());
+	CPPUNIT_ASSERT_EQUAL(BString("Latn"), language.ScriptCode());
+}
+
+
+void
+LanguageTest::TestLanguageParseSerbianScriptAndCountryHyphens()
+{
+	// GIVEN
+
+	// WHEN
+	BLanguage language("sr-Latn-BA");
+
+	// THEN
+	CPPUNIT_ASSERT_EQUAL(BString("sr_Latn_BA"), language.ID());
+	CPPUNIT_ASSERT_EQUAL(BString("sr"), language.Code());
+	CPPUNIT_ASSERT_EQUAL(BString("BA"), language.CountryCode());
+	CPPUNIT_ASSERT_EQUAL(BString("Latn"), language.ScriptCode());
+}
+
+
+void
 LanguageTest::TestLanguageNameFrenchInEnglish()
 {
 	// GIVEN
@@ -73,6 +137,19 @@ LanguageTest::TestLanguagePropertiesFrench()
 LanguageTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("LanguageTest");
+
+	suite.addTest(new CppUnit::TestCaller<LanguageTest>(
+		"LanguageTest::TestLanguageParseJapanese",
+		&LanguageTest::TestLanguageParseJapanese));
+	suite.addTest(new CppUnit::TestCaller<LanguageTest>(
+		"LanguageTest::TestLanguageParseFrenchWithCountry",
+		&LanguageTest::TestLanguageParseFrenchWithCountry));
+	suite.addTest(new CppUnit::TestCaller<LanguageTest>(
+		"LanguageTest::TestLanguageParseSerbianScriptAndCountry",
+		&LanguageTest::TestLanguageParseSerbianScriptAndCountry));
+	suite.addTest(new CppUnit::TestCaller<LanguageTest>(
+		"LanguageTest::TestLanguageParseSerbianScriptAndCountryHyphens",
+		&LanguageTest::TestLanguageParseSerbianScriptAndCountryHyphens));
 
 	suite.addTest(new CppUnit::TestCaller<LanguageTest>(
 		"LanguageTest::TestLanguageNameFrenchInEnglish",
