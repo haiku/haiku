@@ -66,18 +66,6 @@ arch_cpu_sync_icache(void *address, size_t len)
 
 
 void
-arch_cpu_memory_read_barrier(void)
-{
-}
-
-
-void
-arch_cpu_memory_write_barrier(void)
-{
-}
-
-
-void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
 	arch_cpu_global_TLB_invalidate();
