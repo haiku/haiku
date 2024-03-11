@@ -139,9 +139,9 @@ GLifeConfig::_UpdateLabels()
 	if (delay <= 0)
 		newLabel = B_TRANSLATE("Grid life delay: none");
 	else {
-		newLabel.SetToFormat(B_TRANSLATE_CONTEXT("Grid life delay: "
-			"%" B_PRId32 "x", "This is a factor: the x represents 'times', "
-			"don't translate '%" B_PRId32"'"), delay);
+		newLabel.SetToFormat(B_TRANSLATE_CONTEXT("Grid life delay: %ld×",
+			"This is a factor: the × represents 'times', don't translate '%ld'"),
+			delay);
 	}
 	fGridDelay->SetLabel(newLabel);
 }
