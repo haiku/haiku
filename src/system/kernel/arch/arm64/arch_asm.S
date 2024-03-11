@@ -209,6 +209,13 @@ FUNCTION(_fp_save):
 	mrs x2, FPCR
 	str x1, [x0], #8
 	str x2, [x0], #8
+
+	// reset FPCR and FPSR to prevent userspace state affecting kernel
+	msr FPSR, xzr
+	cmp x2, xzr
+	beq 1f
+	msr FPCR, xzr
+1:
 	ret
 FUNCTION_END(_fp_save)
 
