@@ -25,6 +25,7 @@
 #define arm64_dmb()  		__asm__ __volatile__("dmb" : : : "memory")
 #define arm64_isb()  		__asm__ __volatile__("isb" : : : "memory")
 #define arm64_nop()  		__asm__ __volatile__("nop" : : : "memory")
+#define arm64_wfi()  		__asm__ __volatile__("wfi" : : : "memory")
 #define arm64_yield() 	__asm__ __volatile__("yield" : : : "memory")
 
 /* Extract CPU affinity levels 0-3 */
@@ -170,7 +171,7 @@ static inline void arch_cpu_pause(void)
 
 static inline void arch_cpu_idle(void)
 {
-	arm64_yield();
+	arm64_wfi();
 }
 
 
