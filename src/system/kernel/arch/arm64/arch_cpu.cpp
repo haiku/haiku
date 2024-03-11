@@ -62,6 +62,12 @@ arch_cpu_shutdown(bool reboot)
 void
 arch_cpu_sync_icache(void *address, size_t len)
 {
+	asm(
+		"dsb ishst\n"
+		"ic ialluis\n"
+		"dsb ish\n"
+		"isb"
+	);
 }
 
 
