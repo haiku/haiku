@@ -130,7 +130,6 @@ ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 			for (int32 i = 0; i < repoNames.CountStrings(); i++) {
 				AbstractProcessNode* processNode = new ThreadedProcessNode(
 					new ServerPkgDataUpdateProcess(
-						model->Language()->PreferredLanguage()->Code(),
 						repoNames.StringAt(i), model, serverProcessOptions));
 				processNode->AddPredecessor(serverRepositoryDataUpdate);
 				processNode->AddPredecessor(serverReferenceDataUpdate);

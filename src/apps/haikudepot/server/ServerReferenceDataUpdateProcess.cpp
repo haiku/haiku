@@ -66,7 +66,7 @@ ServerReferenceDataUpdateProcess::UrlPathComponent()
 	BString result;
 	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__reference/all-%s.json.gz",
-		fModel->Language()->PreferredLanguage()->Code());
+		fModel->Language()->PreferredLanguage()->ID());
 	return result;
 }
 

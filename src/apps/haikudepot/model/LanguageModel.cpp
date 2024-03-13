@@ -93,7 +93,7 @@ void
 LanguageModel::_SetPreferredLanguage(const Language& language)
 {
 	fPreferredLanguage = LanguageRef(new Language(language));
-	HDDEBUG("set preferred language [%s]", language.ID());
+	HDDEBUG("set preferred language [%s]", fPreferredLanguage->ID());
 }
 
 
@@ -271,9 +271,9 @@ LanguageModel::_NullSafeStrCmp(const char* s1, const char* s2) {
 	if ((NULL == s1) && (NULL == s2))
 		return 0;
 	if (NULL == s1)
-		return 1;
+		return -1;
 	if (NULL == s2)
-    	return -1;
+    	return 1;
 	return strcmp(s1, s2);
 }
 

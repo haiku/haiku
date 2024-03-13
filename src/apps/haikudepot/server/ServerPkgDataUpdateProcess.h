@@ -20,7 +20,6 @@
 class ServerPkgDataUpdateProcess : public AbstractSingleFileServerProcess {
 public:
 								ServerPkgDataUpdateProcess(
-									BString naturalLanguageCode,
 									BString depotName,
 									Model *model,
 									uint32 serverProcessOptions);
@@ -43,7 +42,6 @@ protected:
 private:
 			BString				_DeriveWebAppRepositorySourceCode() const;
 
-			BString				fNaturalLanguageCode;
 			Model*				fModel;
 			BString				fDepotName;
 			BString				fName;

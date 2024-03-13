@@ -834,7 +834,7 @@ Model::DumpExportRepositoryDataPath(BPath& path)
 {
 	BString leaf;
 	leaf.SetToFormat("repository-all_%s.json.gz",
-		Language()->PreferredLanguage()->Code());
+		Language()->PreferredLanguage()->ID());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -849,7 +849,7 @@ Model::DumpExportReferenceDataPath(BPath& path)
 {
 	BString leaf;
 	leaf.SetToFormat("reference-all_%s.json.gz",
-		Language()->PreferredLanguage()->Code());
+		Language()->PreferredLanguage()->ID());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -867,7 +867,7 @@ Model::DumpExportPkgDataPath(BPath& path,
 {
 	BString leaf;
 	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
-		Language()->PreferredLanguage()->Code());
+		Language()->PreferredLanguage()->ID());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 

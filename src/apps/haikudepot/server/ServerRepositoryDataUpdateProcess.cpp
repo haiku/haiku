@@ -191,7 +191,7 @@ ServerRepositoryDataUpdateProcess::UrlPathComponent()
 	BString result;
 	AutoLocker<BLocker> locker(fModel->Lock());
 	result.SetToFormat("/__repository/all-%s.json.gz",
-		fModel->Language()->PreferredLanguage()->Code());
+		fModel->Language()->PreferredLanguage()->ID());
 	return result;
 }
 

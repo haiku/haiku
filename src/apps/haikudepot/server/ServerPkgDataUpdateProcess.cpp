@@ -203,15 +203,11 @@ PackageFillingPkgListener::Complete()
 
 
 ServerPkgDataUpdateProcess::ServerPkgDataUpdateProcess(
-	BString naturalLanguageCode,
-		// note that this is the ID of the language from ICU but it is called
-		// `code` in the HDS system. Here we use the nomenclature of the server.
 	BString depotName,
 	Model *model,
 	uint32 serverProcessOptions)
 	:
 	AbstractSingleFileServerProcess(serverProcessOptions),
-	fNaturalLanguageCode(naturalLanguageCode),
 	fModel(model),
 	fDepotName(depotName)
 {
@@ -248,7 +244,7 @@ ServerPkgDataUpdateProcess::UrlPathComponent()
 	BString urlPath;
 	urlPath.SetToFormat("/__pkg/all-%s-%s.json.gz",
 		_DeriveWebAppRepositorySourceCode().String(),
-		fNaturalLanguageCode.String());
+		fModel->Language()->PreferredLanguage()->ID());
 	return urlPath;
 }
 
