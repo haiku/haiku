@@ -693,6 +693,19 @@ StreamBase::GetNextChunk(const void** chunkBuffer,
 	*chunkSize = fPacket.size;
 
 	if (mediaHeader != NULL) {
+#if __GNUC__ != 2
+		static_assert(sizeof(avpacket_user_data) <= sizeof(mediaHeader->user_data),
+			"avpacket user data too large");
+#endif
+		mediaHeader->user_data_type = AVPACKET_USER_DATA_TYPE;
+		avpacket_user_data* data = (avpacket_user_data*)mediaHeader->user_data;
+		data->pts = fPacket.pts;
+		data->dts = fPacket.dts;
+		data->stream_index = fPacket.stream_index;
+		data->flags = fPacket.flags;
+		data->duration = fPacket.duration;
+		data->pos = fPacket.pos;
+
 		mediaHeader->type = fFormat.type;
 		mediaHeader->buffer = 0;
 		mediaHeader->destination = -1;

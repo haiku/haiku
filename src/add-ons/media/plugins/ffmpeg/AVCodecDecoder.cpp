@@ -1402,26 +1402,23 @@ AVCodecDecoder::_LoadNextChunkIfNeededAndAssignStartTime()
 
 	fTempPacket->data = fChunkBuffer;
 	fTempPacket->size = fChunkBufferSize;
+
 	fTempPacket->dts = chunkMediaHeader.start_time;
 		// Let FFMPEG handle the correct relationship between start_time and
 		// decoded a/v frame. By doing so we are simply copying the way how it
 		// is implemented in ffplay.c for video frames (for audio frames it
 		// works, too, but isn't used by ffplay.c).
 		// \see http://git.videolan.org/?p=ffmpeg.git;a=blob;f=ffplay.c;h=09623db374e5289ed20b7cc28c262c4375a8b2e4;hb=9153b33a742c4e2a85ff6230aea0e75f5a8b26c2#l1502
-		//
-		// FIXME: Research how to establish a meaningful relationship between
-		// start_time and decoded a/v frame when the received chunk buffer
-		// contains partial a/v frames. Maybe some data formats do contain time
-		// stamps (ake pts / dts fields) that can be evaluated by FFMPEG. But
-		// as long as I don't have such video data to test it, it makes no
-		// sense trying to implement it.
-		//
-		// FIXME: Implement tracking start_time of video frames originating in
-		// data chunks that encode more than one video frame at a time. In that
-		// case on would increment the start_time for each consecutive frame of
-		// such a data chunk (like it is done for audio frame decoding). But as
-		// long as I don't have such video data to test it, it makes no sense
-		// to implement it.
+
+	if (chunkMediaHeader.user_data_type == AVPACKET_USER_DATA_TYPE) {
+		avpacket_user_data* data = (avpacket_user_data*)&chunkMediaHeader.user_data;
+		fTempPacket->pts = data->pts;
+		fTempPacket->dts = data->dts;
+		fTempPacket->stream_index = data->stream_index;
+		fTempPacket->flags = data->flags;
+		fTempPacket->duration = data->duration;
+		fTempPacket->pos = data->pos;
+	}
 
 #ifdef LOG_STREAM_TO_FILE
 	BFile* logFile = fIsAudio ? &sAudioStreamLogFile : &sVideoStreamLogFile;
@@ -1576,9 +1573,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	fHeader.type = B_MEDIA_RAW_VIDEO;
 	fHeader.file_pos = 0;
 	fHeader.orig_size = 0;
-	fHeader.start_time = fRawDecodedPicture->pkt_dts;
-		// The pkt_dts is already in microseconds, even if ffmpeg docs says
-		// 'in codec time_base units'
+	fHeader.start_time = fRawDecodedPicture->best_effort_timestamp;
 	fHeader.size_used = av_image_get_buffer_size(
 		colorspace_to_pixfmt(fOutputColorSpace), fRawDecodedPicture->width,
 		fRawDecodedPicture->height, 1);

@@ -23,6 +23,19 @@ extern "C" {
 }
 
 
+/*! \brief Structure used for passing AVPacket metadata through media_header::user_data. */
+struct avpacket_user_data {
+    int64_t pts;
+    int64_t dts;
+    int stream_index;
+    int flags;
+    int64_t duration;
+    int64_t pos;
+};
+
+#define AVPACKET_USER_DATA_TYPE 'ffav'
+
+
 /*! \brief Converts FFmpeg notation of video aspect ratio into the Media Kits
 		notation.
 
@@ -62,7 +75,7 @@ ConvertAVCodecContextToVideoAspectWidthAndHeight(AVCodecContext& contextIn,
 		// ourselve based solely on the video dimensions
 		av_reduce(&pixelAspectRatio.num, &pixelAspectRatio.den, contextIn.width,
 			contextIn.height, 1024 * 1024);
-	
+
 		pixelWidthAspectOut = static_cast<int16>(pixelAspectRatio.num);
 		pixelHeightAspectOut = static_cast<int16>(pixelAspectRatio.den);
 		return;
@@ -210,7 +223,7 @@ CalculateBytesPerRowWithColorSpaceAndVideoWidth(color_space colorSpace, int vide
 
 /*!	\brief Converts the Media Kits notation of video frame rate to FFmpegs
 	notation.
-	
+
 	\see ConvertAVCodecContextToVideoFrameRate() for converting in the other
 		direction.
 
