@@ -170,6 +170,9 @@ public:
 
 	BReference<Type> GetReference()
 	{
+		if (fPointer == NULL)
+			return BReference<Type>();
+
 		Type* object = static_cast<Type*>(fPointer->Get());
 		return BReference<Type>(object, true);
 	}
