@@ -1269,7 +1269,7 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 			*frameCount = (int64)(fStream->duration * frameRate
 				* fStream->time_base.num / fStream->time_base.den);
 		} else if (fContext->duration != AV_NOPTS_VALUE) {
-			*frameCount = (fContext->duration * frameRate);
+			*frameCount = (int64)(fContext->duration * frameRate);
 		}
 		TRACE("  frameCount calculated: %" B_PRIu64 ", from context: %" B_PRIu64 "\n",
 			*frameCount, fStream->nb_frames);
