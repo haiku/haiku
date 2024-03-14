@@ -329,9 +329,7 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 static void
 print_socket_line(net_socket_private* socket, const char* prefix)
 {
-	BReference<net_socket_private> parent;
-	if (socket->parent.PrivatePointer() != NULL)
-		parent = socket->parent.GetReference();
+	BReference<net_socket_private> parent = socket->parent.GetReference();
 	kprintf("%s%p %2d.%2d.%2d %6" B_PRId32 " %p %p  %p%s\n", prefix, socket,
 		socket->family, socket->type, socket->protocol, socket->owner,
 		socket->first_protocol, socket->first_info, parent.Get(),
@@ -352,9 +350,7 @@ dump_socket(int argc, char** argv)
 	kprintf("SOCKET %p\n", socket);
 	kprintf("  family.type.protocol: %d.%d.%d\n",
 		socket->family, socket->type, socket->protocol);
-	BReference<net_socket_private> parent;
-	if (socket->parent.PrivatePointer() != NULL)
-		parent = socket->parent.GetReference();
+	BReference<net_socket_private> parent = socket->parent.GetReference();
 	kprintf("  parent:               %p\n", parent.Get());
 	kprintf("  first protocol:       %p\n", socket->first_protocol);
 	kprintf("  first module_info:    %p\n", socket->first_info);
@@ -989,9 +985,7 @@ socket_getpeername(net_socket* _socket, struct sockaddr* address,
 	socklen_t* _addressLength)
 {
 	net_socket_private* socket = (net_socket_private*)_socket;
-	BReference<net_socket_private> parent;
-	if (socket->parent.PrivatePointer() != NULL)
-		parent = socket->parent.GetReference();
+	BReference<net_socket_private> parent = socket->parent.GetReference();
 
 	if ((!parent.IsSet() && !socket->is_connected) || socket->peer.ss_len == 0)
 		return ENOTCONN;
