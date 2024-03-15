@@ -6584,10 +6584,12 @@ common_rename(int fd, char* path, int newFD, char* newPath, bool kernel)
 	if (fromVnode->device != toVnode->device)
 		return B_CROSS_DEVICE_LINK;
 
+	if (fromVnode.Get() == toVnode.Get() && !strcmp(fromName, toName))
+		return B_OK;
+
 	if (fromName[0] == '\0' || toName[0] == '\0'
 		|| !strcmp(fromName, ".") || !strcmp(fromName, "..")
-		|| !strcmp(toName, ".") || !strcmp(toName, "..")
-		|| (fromVnode.Get() == toVnode.Get() && !strcmp(fromName, toName))) {
+		|| !strcmp(toName, ".") || !strcmp(toName, "..")) {
 		return B_BAD_VALUE;
 	}
 
