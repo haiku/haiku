@@ -18,7 +18,7 @@ RemotePackageRepository HaikuPorts
 	# primary architecture (riscv64)
 	autoconf-2.71-1
 	automake-1.16.5-1
-	bash-4.4.023-1
+	bash-5.2.026-2
 	bc-1.07.1-2
 	binutils-2.41-1
 	bison-3.0.5-1
@@ -35,6 +35,8 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_tools-4.3-2
 	ffmpeg-4.3-2
 	findutils-4.6.0-1
+	file-5.43-1
+	file_data-5.43-1
 	flex-2.5.35-1
 	fluidlite_devel-1.0.9-3
 	fluidlite-1.0.9-3
@@ -55,8 +57,8 @@ RemotePackageRepository HaikuPorts
 	grep-3.7-1
 	gutenprint8-5.3.1-2
 	gzip-1.11-1
-	icu_devel-57.2-2
-	icu-57.2-2
+	icu74_devel-74.1-3
+	icu74-74.1-3
 	jam-2.5_2018_11_21-8
 	lame-3.100-3
 	lcms_devel-2.12-1
@@ -105,6 +107,7 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-9
 	perl-5.32.1-1
 	pkgconfig-0.29.2-4
+	readline-8.2.001-1
 	sed-4.2.1-1
 	tar-1.34-1
 	tcpdump-4.99.1-1
@@ -114,8 +117,8 @@ RemotePackageRepository HaikuPorts
 	wget-1.21.1-1
 	which-2.21-6
 	wpa_supplicant-2.9.haiku.1-3
-	xz_utils_devel-5.2.5-1
-	xz_utils-5.2.5-1
+	xz_utils_devel-5.6.1-1
+	xz_utils-5.6.1-1
 	zip-3.0-4
 	zlib_devel-1.2.11-1
 	zlib-1.2.11-1
