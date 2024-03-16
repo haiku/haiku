@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1726071498
+1	german	x-vnd.Haiku-libtracker	1524492774
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -26,7 +26,7 @@ Unmount	ContainerWindow		Aushängen
 Eject when unmounting	AutoMounterSettings		Auswerfen beim Aushängen
 Searching for disks to mount…	StatusWindow		Es werden Datenträger zum Einhängen gesucht …
 Value	AttributesView		Wert
-Information	InfoWindow		Information
+Information	InfoWindow		Informationen
 Error emptying Trash	FSUtils		Fehler beim Leeren des Papierkorbs
 Opens with:	InfoWindow		Wird geöffnet mit:
 Size	QueryPoseView		Größe
@@ -107,7 +107,7 @@ Edit templates…	TemplatesMenu		Vorlagen bearbeiten …
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{(# Byte)} other{(# Bytes)}}
 8-bit integer	AttributesView		Integer 8-bit
 8-bit unsigned integer	AttributesView		Integer 8-bit, vorzeichenlos
-%s info	InfoWindow	window title	%s-Info
+%s info	InfoWindow	window title	Infos zu '%s'
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt – %free frei)
 Hide dotfiles	SettingsView		Mit Punkt (.) beginnende Dateien ausblenden
 Trash	Model		Papierkorb
@@ -160,7 +160,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Filesystem:	InfoWindow		Dateisystem:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet werden (%error).
 Media parameter group	AttributesView		Media-Parametergruppe
-%name info	InfoWindow	InfoWindow Title	%name-Info
+%name info	InfoWindow	InfoWindow Title	Infos zu '%name'
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Wird der Home-Ordner verschoben, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem verschieben?\n\nUm den Home-Ordner trotzdem zu verschieben, Shift-Taste gedrückt halten und \"Verschieben\" klicken.
 Property info	AttributesView		Property-Info
 Sorry, you can't create links in the Trash.	PoseView		Im Papierkorb können keine Verknüpfungen erstellt werden.
@@ -171,7 +171,7 @@ Preferences…	ContainerWindow		Einstellungen ...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Die Datei \"%document\" kann nicht geöffnet werden, weil sich das zugehörige Programm \"%app\" im Papierkorb befindet.
 Work Phone	Person Query Columns		Telefon (geschäftlich)
 Close	ContainerWindow		Schließen
-Get info	ContainerWindow		Datei-Info
+Get info	ContainerWindow		Informationen
 MIME Type	AttributesView		MIME-Typ
 Show folder location in title tab	SettingsView		Ordnerpfad im Fenstertitel zeigen
 There was an error resolving the link.	Tracker		Fehler beim Auflösen der Verknüpfung.
@@ -284,7 +284,7 @@ calculating…	InfoWindow		Berechnung läuft …
 Preferred for file	OpenWithWindow		Bevorzugt für Datei
 OK	AutoMounterSettings		OK
 copying	FSUtils		kopiert
-Get info	FilePanelPriv		Infos
+Get info	FilePanelPriv		Informationen
 MIME String	AttributesView		MIME Zeichenkette
 Delete	ContainerWindow		Löschen
 Execute	FilePermissionsView		Ausführen
@@ -399,6 +399,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Das Boot-Laufwerk \"%name\" k
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (Fehlendes Symbol: %symbol).\n
 New folder	ContainerWindow		Neuer Ordner
 Name	OpenWithWindow		Name
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Informationen
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Es ist ein Problem beim Ersetzen von \"%name\" aufgetreten. Das Objekt könnte geöffnet oder gerade in Benutzung sein.
 Windows	TrackerSettingsWindow		Fenster
 Show space bars on volumes	SettingsView		Speicherplatzbalken bei Datenträgern anzeigen

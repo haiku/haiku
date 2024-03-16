@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2787029568
+1	japanese	x-vnd.Haiku-libtracker	2585450844
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -404,6 +404,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		起動ボリューム \"%nam
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を \"%app\" で開けません (シンボル %symbol が見つかりません)。\n
 New folder	ContainerWindow		新しいフォルダー
 Name	OpenWithWindow		名前
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	詳細情報…
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\" を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。
 Windows	TrackerSettingsWindow		ウィンドウ
 Show space bars on volumes	SettingsView		ディスク容量グラフの表示
