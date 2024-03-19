@@ -1483,8 +1483,19 @@ GrepWindow::_OnOpenPanel()
 		return;
 
 	entry_ref path;
-	if (get_ref_for_path(fModel->fFilePanelPath.String(), &path) != B_OK)
-		return;
+	if (get_ref_for_path(fModel->fFilePanelPath.String(), &path) != B_OK) {
+		printf("get_ref_for_path() failed for saved fFilePanelPath: '%s'\n",
+			fModel->fFilePanelPath.String());
+
+		BPath home;
+		if (find_directory(B_USER_DIRECTORY, &home) != B_OK)
+			home = "/boot/home";
+
+		if (get_ref_for_path(home.Path(), &path) != B_OK) {
+			printf("'get_ref_for_path()' failed for: '%s'. Bailing out.\n", home.Path());
+			return;
+		}
+	}
 
 	BMessenger messenger(this);
 	BMessage message(MSG_REFS_RECEIVED);
