@@ -20,7 +20,7 @@ status_t	parse_elf64_header(Elf64_Ehdr* eheader, int32* _pheaderSize,
 	#endif
 #endif
 status_t	load_image(char const* name, image_type type, const char* rpath,
-				const char* requestingObjectPath, image_t** _image);
+	const char* runpath, const char* requestingObjectPath, image_t** _image);
 
 
 #endif	// ELF_LOAD_IMAGE_H

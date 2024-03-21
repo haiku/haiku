@@ -299,7 +299,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 
 
 int
-open_executable(char *name, image_type type, const char *rpath,
+open_executable(char *name, image_type type, const char *rpath, const char* runpath,
 	const char *programPath, const char *requestingObjectPath,
 	const char *abiSpecificSubDir)
 {
@@ -328,14 +328,17 @@ open_executable(char *name, image_type type, const char *rpath,
 		}
 	}
 
-	// try rpath (DT_RPATH)
-	if (rpath != NULL) {
+	// try runpath or rpath (DT_RUNPATH or DT_RPATH)
+	const char* pathString = runpath;
+	if (pathString == NULL)
+		pathString = rpath;
+	if (pathString != NULL) {
 		// It consists of a colon-separated search path list. Optionally a
 		// second search path list follows, separated from the first by a
 		// semicolon.
 		const char *semicolon = strchr(rpath, ';');
-		const char *firstList = (semicolon ? rpath : NULL);
-		const char *secondList = (semicolon ? semicolon + 1 : rpath);
+		const char *firstList = (semicolon ? pathString : NULL);
+		const char *secondList = (semicolon ? semicolon + 1 : pathString);
 			// If there is no ';', we set only secondList to simplify things.
 		if (firstList) {
 			fd = search_executable_in_path_list(name, firstList,
@@ -404,7 +407,7 @@ test_executable(const char *name, char *invoker)
 
 	strlcpy(path, name, sizeof(path));
 
-	fd = open_executable(path, B_APP_IMAGE, NULL, NULL, NULL, NULL);
+	fd = open_executable(path, B_APP_IMAGE, NULL, NULL, NULL, NULL, NULL);
 	if (fd < B_OK)
 		return fd;
 

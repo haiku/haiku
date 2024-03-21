@@ -389,7 +389,6 @@ parse_dynamic_segment(image_t* image)
 			// DT_SYMENT: The size of a symbol table entry.
 			// DT_PLTREL: The type of the PLT relocation entries (DT_JMPREL).
 			// DT_BIND_NOW/DF_BIND_NOW: No lazy binding allowed.
-			// DT_RUNPATH: Library search path (supersedes DT_RPATH).
 			// DT_TEXTREL/DF_TEXTREL: Indicates whether text relocations are
 			//		required (for optimization purposes only).
 		}
@@ -491,7 +490,7 @@ parse_elf64_header(Elf64_Ehdr* eheader, int32* _pheaderSize,
 
 
 status_t
-load_image(char const* name, image_type type, const char* rpath,
+load_image(char const* name, image_type type, const char* rpath, const char* runpath,
 	const char* requestingObjectPath, image_t** _image)
 {
 	int32 pheaderSize, sheaderSize;
@@ -523,19 +522,20 @@ load_image(char const* name, image_type type, const char* rpath,
 		if (found) {
 			atomic_add(&found->ref_count, 1);
 			*_image = found;
-			KTRACE("rld: load_container(\"%s\", type: %d, rpath: \"%s\") "
-				"already loaded", name, type, rpath);
+			KTRACE("rld: load_container(\"%s\", type: %d, %s: \"%s\") "
+				"already loaded", name, type,
+				runpath != NULL ? "runpath" : "rpath", runpath != NULL ? runpath : rpath);
 			return B_OK;
 		}
 	}
 
-	KTRACE("rld: load_container(\"%s\", type: %d, rpath: \"%s\")", name, type,
-		rpath);
+	KTRACE("rld: load_container(\"%s\", type: %d, %s: \"%s\")", name, type,
+		runpath != NULL ? "runpath" : "rpath", runpath != NULL ? runpath : rpath);
 
 	strlcpy(path, name, sizeof(path));
 
 	// find and open the file
-	fd = open_executable(path, type, rpath, get_program_path(),
+	fd = open_executable(path, type, rpath, runpath, get_program_path(),
 		requestingObjectPath, sSearchPathSubDir);
 	if (fd < 0) {
 		FATAL("Cannot open file %s (needed by %s): %s\n", name, requestingObjectPath, strerror(fd));

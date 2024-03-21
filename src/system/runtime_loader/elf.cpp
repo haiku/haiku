@@ -54,17 +54,31 @@ static recursive_lock sLock = RECURSIVE_LOCK_INITIALIZER(kLockName);
 
 
 static const char *
-find_dt_rpath(image_t *image)
+find_dt_string(image_t *image, int32 d_tag)
 {
 	int i;
 	elf_dyn *d = (elf_dyn *)image->dynamic_ptr;
 
 	for (i = 0; d[i].d_tag != DT_NULL; i++) {
-		if (d[i].d_tag == DT_RPATH)
+		if (d[i].d_tag == d_tag)
 			return STRING(image, d[i].d_un.d_val);
 	}
 
 	return NULL;
+}
+
+
+static const char *
+find_dt_rpath(image_t *image)
+{
+	return find_dt_string(image, DT_RPATH);
+}
+
+
+static const char *
+find_dt_runpath(image_t *image)
+{
+	return find_dt_string(image, DT_RUNPATH);
 }
 
 
@@ -76,7 +90,7 @@ preload_image(char const* path, image_t **image)
 
 	KTRACE("rld: preload_image(\"%s\")", path);
 
-	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, image);
+	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, NULL, image);
 	if (status < B_OK) {
 		KTRACE("rld: preload_image(\"%s\") failed to load container: %s", path,
 			strerror(status));
@@ -148,8 +162,7 @@ load_immediate_dependencies(image_t *image, bool preload)
 	bool reportErrors = report_errors();
 	status_t status = B_OK;
 	uint32 i, j;
-	const char *rpath;
-
+	const char *rpath = NULL, *runpath;
 	if (!d || (image->flags & RFLAG_DEPENDENCIES_LOADED))
 		return B_OK;
 
@@ -177,7 +190,9 @@ load_immediate_dependencies(image_t *image, bool preload)
 	memset(image->needed, 0, image->num_needed * sizeof(image_t *));
 	if (preload)
 		preload_images(image->needed);
-	rpath = find_dt_rpath(image);
+	runpath = find_dt_runpath(image);
+	if (runpath == NULL)
+		rpath = find_dt_rpath(image);
 
 	for (i = 0, j = preloadedCount; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
@@ -187,7 +202,7 @@ load_immediate_dependencies(image_t *image, bool preload)
 				const char *name = STRING(image, neededOffset);
 
 				status_t loadStatus = load_image(name, B_LIBRARY_IMAGE,
-					rpath, image->path, &image->needed[j]);
+					rpath, runpath, image->path, &image->needed[j]);
 				if (loadStatus < B_OK) {
 					status = loadStatus;
 					// correct error code in case the file could not been found
@@ -433,7 +448,7 @@ preload_addon(char const* path)
 	KTRACE("rld: preload_addon(\"%s\")", path);
 
 	image_t *image = NULL;
-	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, &image);
+	status_t status = load_image(path, B_LIBRARY_IMAGE, NULL, NULL, NULL, &image);
 	if (status < B_OK) {
 		KTRACE("rld: preload_addon(\"%s\") failed to load container: %s", path,
 			strerror(status));
@@ -535,7 +550,7 @@ load_program(char const *path, void **_entry)
 
 	TRACE(("rld: load %s\n", path));
 
-	status = load_image(path, B_APP_IMAGE, NULL, NULL, &gProgramImage);
+	status = load_image(path, B_APP_IMAGE, NULL, NULL, NULL, &gProgramImage);
 	if (status < B_OK)
 		goto err;
 
@@ -606,7 +621,7 @@ load_library(char const *path, uint32 flags, bool addOn, void* caller,
 	image_t *image = NULL;
 	image_type type = (addOn ? B_ADD_ON_IMAGE : B_LIBRARY_IMAGE);
 	status_t status;
-	const char* rpath = NULL;
+	const char* rpath = NULL, *runpath = NULL;
 	const char* requestingObjectPath = NULL;
 
 	if (path == NULL && addOn)
@@ -649,12 +664,14 @@ load_library(char const *path, uint32 flags, bool addOn, void* caller,
 			}
 		}
 		if (callerImage != NULL) {
-			rpath = find_dt_rpath(callerImage);
+			runpath = find_dt_runpath(callerImage);
+			if (runpath == NULL)
+				rpath = find_dt_rpath(callerImage);
 			requestingObjectPath = callerImage->path;
 		}
 	}
 
-	status = load_image(path, type, rpath, requestingObjectPath, &image);
+	status = load_image(path, type, rpath, runpath, requestingObjectPath, &image);
 	if (status < B_OK) {
 		KTRACE("rld: load_library(\"%s\") failed to load container: %s", path,
 			strerror(status));

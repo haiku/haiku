@@ -63,7 +63,7 @@ extern "C" {
 
 int runtime_loader(void* arg, void* commpage);
 int open_executable(char* name, image_type type, const char* rpath,
-	const char* programPath, const char* requestingObjectPath,
+	const char* runpath, const char* programPath, const char* requestingObjectPath,
 	const char* abiSpecificSubDir);
 status_t test_executable(const char* path, char* interpreter);
 status_t get_executable_architecture(const char* path,
