@@ -1155,8 +1155,10 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 		if (!targetNode) {
 			File *file = NULL;
 			error = targetDomain->CreateFile(target, sourceNode->Stat(), file);
-			if (error == 0)
+			if (error == 0) {
 				targetNode = file;
+				targetDeleter.SetTo(targetNode);
+			}
 		}
 	} else if (sourceNode->IsDirectory()) {
 		// check /recursive/
@@ -1170,8 +1172,10 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 			Directory *dir = NULL;
 			error = targetDomain->CreateDirectory(target, sourceNode->Stat(),
 				dir);
-			if (error == 0)
+			if (error == 0) {
 				targetNode = dir;
+				targetDeleter.SetTo(targetNode);
+			}
 		}
 	} else if (sourceNode->IsSymLink()) {
 		// read the source link
@@ -1189,8 +1193,10 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 		SymLink *link;
 		error = targetDomain->CreateSymLink(target, linkTo,
 			sourceNode->Stat(),	link);
-		if (error == 0)
+		if (error == 0) {
 			targetNode = link;
+			targetDeleter.SetTo(targetNode);
+		}
 	} else {
 		fprintf(stderr, "Error: Unknown node type. We shouldn't be here!\n");
 		return FSSH_EINVAL;
@@ -1201,7 +1207,6 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 			fssh_strerror(error));
 		return error;
 	}
-	targetDeleter.SetTo(targetNode);
 
 	// copy attributes
 	if (!options.ignoreAttributes) {
