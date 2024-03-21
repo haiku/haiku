@@ -15,3 +15,10 @@ user_memcpy(void* to, const void* from, size_t size)
 	memcpy(to, from, size);
 	return B_OK;
 }
+
+
+void
+debugger(const char *message)
+{
+	panic(message);
+}

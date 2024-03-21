@@ -118,7 +118,7 @@ for platform in [ MultiBootSubDirSetup ] {
 			stdio.cpp
 			system_revision.c
 			vfs.cpp
-			vm.cpp
+			misc.cpp
 
 			# libroot
 			driver_settings.cpp
