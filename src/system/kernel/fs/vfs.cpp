@@ -415,7 +415,7 @@ static status_t common_path_read_stat(int fd, char* path, bool traverseLeafLink,
 	struct stat* stat, bool kernel);
 
 static status_t vnode_path_to_vnode(struct vnode* vnode, char* path,
-	bool traverseLeafLink, int count, bool kernel,
+	bool traverseLeafLink, bool kernel,
 	VnodePutter& _vnode, ino_t* _parentID, char* leafName = NULL);
 static status_t dir_vnode_to_path(struct vnode* vnode, char* buffer,
 	size_t bufferSize, bool kernel);
@@ -2062,7 +2062,7 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char* name,
 	if (status < 0)
 		return status;
 
-	return vnode_path_to_vnode(directory, clonedName, traverse, 0, kernel,
+	return vnode_path_to_vnode(directory, clonedName, traverse, kernel,
 		_vnode, NULL);
 }
 
@@ -2302,9 +2302,9 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 
 static status_t
 vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
-	int count, bool kernel, VnodePutter& _vnode, ino_t* _parentID, char* leafName)
+	bool kernel, VnodePutter& _vnode, ino_t* _parentID, char* leafName)
 {
-	return vnode_path_to_vnode(vnode, path, traverseLeafLink, count,
+	return vnode_path_to_vnode(vnode, path, traverseLeafLink, 0,
 		get_current_io_context(kernel), _vnode, _parentID, leafName);
 }
 
@@ -2352,7 +2352,7 @@ path_to_vnode(char* path, bool traverseLink, VnodePutter& _vnode,
 			return B_ERROR;
 	}
 
-	return vnode_path_to_vnode(start, path, traverseLink, 0, kernel, _vnode,
+	return vnode_path_to_vnode(start, path, traverseLink, kernel, _vnode,
 		_parentID);
 }
 
@@ -2461,7 +2461,7 @@ vnode_and_path_to_dir_vnode(struct vnode* vnode, char* path,
 		return status;
 
 	vnodePutter.Detach();
-	return vnode_path_to_vnode(vnode, path, true, 0, kernel, _vnode, NULL);
+	return vnode_path_to_vnode(vnode, path, true, kernel, _vnode, NULL);
 }
 
 
@@ -2771,7 +2771,7 @@ fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 		return B_FILE_ERROR;
 
 	if (path != NULL) {
-		return vnode_path_to_vnode(vnode, path, traverseLeafLink, 0, kernel,
+		return vnode_path_to_vnode(vnode, path, traverseLeafLink, kernel,
 			_vnode, _parentID);
 	}
 
@@ -2879,7 +2879,7 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 		VnodePutter fileVnode;
 		if (traverseLink) {
 			inc_vnode_ref_count(dir.Get());
-			if (vnode_path_to_vnode(dir.Get(), path, false, 0, kernel, fileVnode,
+			if (vnode_path_to_vnode(dir.Get(), path, false, kernel, fileVnode,
 					NULL) == B_OK) {
 				fileExists = true;
 			}
@@ -2890,7 +2890,7 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 			bool hasLeaf = true;
 			if (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0) {
 				// special cases "." and ".." -- get the dir, forget the leaf
-				error = vnode_path_to_vnode(dir.Detach(), leaf, false, 0, kernel,
+				error = vnode_path_to_vnode(dir.Detach(), leaf, false, kernel,
 					dir, NULL);
 				if (error != B_OK)
 					return error;
@@ -2948,7 +2948,7 @@ resolve_covered_parent(struct vnode* parent, dev_t* _device, ino_t* _node,
 
 	// ".." is guaranteed not to be clobbered by this call
 	VnodePutter vnode;
-	status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
+	status_t status = vnode_path_to_vnode(parent, (char*)"..", false,
 		ioContext, vnode, NULL);
 	if (status == B_OK) {
 		*_device = vnode->device;
@@ -4284,7 +4284,7 @@ vfs_get_fs_node_from_path(fs_volume* volume, const char* path,
 	else {
 		inc_vnode_ref_count(mount->root_vnode);
 			// vnode_path_to_vnode() releases a reference to the starting vnode
-		status = vnode_path_to_vnode(mount->root_vnode, buffer, traverseLeafLink, 0,
+		status = vnode_path_to_vnode(mount->root_vnode, buffer, traverseLeafLink,
 			kernel, vnode, NULL);
 	}
 
@@ -4387,7 +4387,7 @@ vfs_get_module_path(const char* basePath, const char* moduleName,
 		moduleName = nextPath;
 
 		// vnode_path_to_vnode() assumes ownership of the passed dir
-		status = vnode_path_to_vnode(dir.Detach(), path, true, 0, true, file, NULL);
+		status = vnode_path_to_vnode(dir.Detach(), path, true, true, file, NULL);
 		if (status != B_OK)
 			return status;
 
@@ -5403,7 +5403,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 				inc_vnode_ref_count(directory);
 				dirPutter.Unset();
-				status = vnode_path_to_vnode(directory, clonedName, true, 0,
+				status = vnode_path_to_vnode(directory, clonedName, true,
 					kernel, vnode, NULL, clonedName);
 				if (status != B_OK) {
 					// vnode is not found, but maybe it has a parent and we can create it from
