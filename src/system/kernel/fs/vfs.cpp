@@ -2468,6 +2468,8 @@ static status_t
 vnode_and_path_to_dir_vnode(struct vnode* vnode, char* path,
 	VnodePutter& _vnode, char* filename, bool kernel)
 {
+	VnodePutter vnodePutter(vnode);
+
 	if (!path)
 		return B_BAD_VALUE;
 	if (*path == '\0')
@@ -2476,11 +2478,10 @@ vnode_and_path_to_dir_vnode(struct vnode* vnode, char* path,
 		return path_to_dir_vnode(path, _vnode, filename, kernel);
 
 	status_t status = get_dir_path_and_leaf(path, filename);
-	if (status != B_OK) {
-		put_vnode(vnode);
+	if (status != B_OK)
 		return status;
-	}
 
+	vnodePutter.Detach();
 	return vnode_path_to_vnode(vnode, path, true, 0, kernel, _vnode, NULL);
 }
 
