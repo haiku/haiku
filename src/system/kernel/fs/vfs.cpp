@@ -2126,22 +2126,19 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 	\param[out] _vnode If the function returns something else and leafname is NULL: not used.
 */
 static status_t
-vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
+vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 	int count, struct io_context* ioContext, VnodePutter& _vnode,
 	ino_t* _parentID, char* leafName)
 {
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
 	ASSERT(!_vnode.IsSet());
 
-	if (path == NULL) {
-		put_vnode(vnode);
-		return B_BAD_VALUE;
-	}
+	VnodePutter vnode(start);
 
-	if (*path == '\0') {
-		put_vnode(vnode);
+	if (path == NULL)
+		return B_BAD_VALUE;
+	if (*path == '\0')
 		return B_ENTRY_NOT_FOUND;
-	}
 
 	status_t status = B_OK;
 	ino_t lastParentID = vnode->id;
@@ -2173,16 +2170,14 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		// vnode so we pass the '..' path to the underlying filesystem.
 		// Also prevent breaking the root of the IO context.
 		if (strcmp("..", path) == 0) {
-			if (vnode == ioContext->root) {
+			if (vnode.Get() == ioContext->root) {
 				// Attempted prison break! Keep it contained.
 				path = nextPath;
 				continue;
 			}
 
-			if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
-				put_vnode(vnode);
-				vnode = coveredVnode;
-			}
+			if (Vnode* coveredVnode = get_covered_vnode(vnode.Get()))
+				vnode.SetTo(coveredVnode);
 		}
 
 		// check if vnode is really a directory
@@ -2193,20 +2188,22 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		// If a file system doesn't have the access() function, we assume that
 		// searching a directory is always allowed
 		if (status == B_OK && HAS_FS_CALL(vnode, access))
-			status = FS_CALL(vnode, access, X_OK);
+			status = FS_CALL(vnode.Get(), access, X_OK);
 
 		// Tell the filesystem to get the vnode of this path component (if we
 		// got the permission from the call above)
-		struct vnode* nextVnode;
-		if (status == B_OK)
-			status = lookup_dir_entry(vnode, path, &nextVnode);
+		VnodePutter nextVnode;
+		if (status == B_OK) {
+			struct vnode* temp = NULL;
+			status = lookup_dir_entry(vnode.Get(), path, &temp);
+			nextVnode.SetTo(temp);
+		}
 
 		if (status != B_OK) {
 			if (leafName != NULL) {
 				strlcpy(leafName, path, B_FILE_NAME_LENGTH);
-				_vnode.SetTo(vnode);
-			} else
-				put_vnode(vnode);
+				_vnode.SetTo(vnode.Detach());
+			}
 			return status;
 		}
 
@@ -2219,23 +2216,17 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 
 			TRACE(("traverse link\n"));
 
-			// it's not exactly nice style using goto in this way, but hey,
-			// it works :-/
-			if (count + 1 > B_MAX_SYMLINKS) {
-				status = B_LINK_LIMIT;
-				goto resolve_link_error;
-			}
+			if (count + 1 > B_MAX_SYMLINKS)
+				return B_LINK_LIMIT;
 
 			bufferSize = B_PATH_NAME_LENGTH;
 			buffer = (char*)object_cache_alloc(sPathNameCache, 0);
-			if (buffer == NULL) {
-				status = B_NO_MEMORY;
-				goto resolve_link_error;
-			}
+			if (buffer == NULL)
+				return B_NO_MEMORY;
 
 			if (HAS_FS_CALL(nextVnode, read_symlink)) {
 				bufferSize--;
-				status = FS_CALL(nextVnode, read_symlink, buffer, &bufferSize);
+				status = FS_CALL(nextVnode.Get(), read_symlink, buffer, &bufferSize);
 				// null-terminate
 				if (status >= 0 && bufferSize < B_PATH_NAME_LENGTH)
 					buffer[bufferSize] = '\0';
@@ -2244,14 +2235,9 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 
 			if (status != B_OK) {
 				free(buffer);
-
-		resolve_link_error:
-				put_vnode(vnode);
-				put_vnode(nextVnode);
-
 				return status;
 			}
-			put_vnode(nextVnode);
+			nextVnode.Unset();
 
 			// Check if we start from the root directory or the current
 			// directory ("vnode" still points to that one).
@@ -2260,60 +2246,53 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 			bool absoluteSymlink = false;
 			if (path[0] == '/') {
 				// we don't need the old directory anymore
-				put_vnode(vnode);
+				vnode.Unset();
 
 				while (*++path == '/')
 					;
 
 				mutex_lock(&sIOContextRootLock);
-				vnode = ioContext->root;
-				inc_vnode_ref_count(vnode);
+				vnode.SetTo(ioContext->root);
+				inc_vnode_ref_count(vnode.Get());
 				mutex_unlock(&sIOContextRootLock);
 
 				absoluteSymlink = true;
 			}
 
-			inc_vnode_ref_count(vnode);
+			inc_vnode_ref_count(vnode.Get());
 				// balance the next recursion - we will decrement the
 				// ref_count of the vnode, no matter if we succeeded or not
 
 			if (absoluteSymlink && *path == '\0') {
 				// symlink was just "/"
-				nextVnode = vnode;
+				nextVnode.SetTo(vnode.Get());
 			} else {
-				VnodePutter temp;
-				status = vnode_path_to_vnode(vnode, path, true, count + 1,
-					ioContext, temp, &lastParentID, leafName);
-				nextVnode = temp.Detach();
+				status = vnode_path_to_vnode(vnode.Get(), path, true, count + 1,
+					ioContext, nextVnode, &lastParentID, leafName);
 			}
 
 			object_cache_free(sPathNameCache, buffer, 0);
 
 			if (status != B_OK) {
 				if (leafName != NULL)
-					_vnode.SetTo(nextVnode);
-				else
-					put_vnode(nextVnode);
-				put_vnode(vnode);
+					_vnode.SetTo(nextVnode.Detach());
 				return status;
 			}
 		} else
 			lastParentID = vnode->id;
 
 		// decrease the ref count on the old dir we just looked up into
-		put_vnode(vnode);
+		vnode.Unset();
 
 		path = nextPath;
-		vnode = nextVnode;
+		vnode.SetTo(nextVnode.Detach());
 
 		// see if we hit a covered node
-		if (Vnode* coveringNode = get_covering_vnode(vnode)) {
-			put_vnode(vnode);
-			vnode = coveringNode;
-		}
+		if (Vnode* coveringNode = get_covering_vnode(vnode.Get()))
+			vnode.SetTo(coveringNode);
 	}
 
-	_vnode.SetTo(vnode);
+	_vnode.SetTo(vnode.Detach());
 	if (_parentID)
 		*_parentID = lastParentID;
 
