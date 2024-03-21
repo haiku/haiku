@@ -452,11 +452,22 @@ CommitTransactionHandler::_ApplyChanges()
 void
 CommitTransactionHandler::_CreateOldStateDirectory()
 {
-	// construct a nice name from the current date and time
-	time_t nowSeconds = time(NULL);
+	time_t stateTime = 0;
+	{
+		// use the modification time of the old activations file, if possible
+		BFile oldActivationFile;
+		BEntry oldActivationEntry;
+		if (_OpenPackagesFile(RelativePath(kAdminDirectoryName), kActivationFileName,
+				B_READ_ONLY, oldActivationFile, &oldActivationEntry) != B_OK
+					|| oldActivationEntry.GetModificationTime(&stateTime) != B_OK) {
+			stateTime = time(NULL);
+		}
+	}
+
+	// construct a nice name from the date and time
 	struct tm now;
 	BString baseName;
-	if (localtime_r(&nowSeconds, &now) != NULL) {
+	if (localtime_r(&stateTime, &now) != NULL) {
 		baseName.SetToFormat("state_%d-%02d-%02d_%02d:%02d:%02d",
 			1900 + now.tm_year, now.tm_mon + 1, now.tm_mday, now.tm_hour,
 			now.tm_min, now.tm_sec);
