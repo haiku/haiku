@@ -306,7 +306,7 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 		SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	} else {
 		if (!partitionType.IsEmpty()) {
-			partitionType.SetToFormat(B_TRANSLATE("Not formatted (%s)"),
+			partitionType.SetToFormat(B_TRANSLATE("Unknown (%s)"),
 				partitionType.String());
 			SetField(new BStringField(partitionType), kFilesystemColumn);
 		} else
