@@ -2841,6 +2841,22 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 	descriptor->type = type;
 	descriptor->open_mode = openMode;
 
+	if (descriptor->ops->fd_seek != NULL) {
+		// some kinds of files are not seekable
+		switch (vnode->Type() & S_IFMT) {
+			case S_IFIFO:
+			case S_IFSOCK:
+				ASSERT(descriptor->pos == -1);
+				break;
+
+			// The Open Group Base Specs don't mention any file types besides pipes,
+			// FIFOs, and sockets specially, so we allow seeking all others.
+			default:
+				descriptor->pos = 0;
+				break;
+		}
+	}
+
 	io_context* context = get_current_io_context(kernel);
 	fd = new_fd(context, descriptor);
 	if (fd < 0) {
@@ -5686,6 +5702,8 @@ file_read(struct file_descriptor* descriptor, off_t pos, void* buffer,
 
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
+	if (pos != -1 && descriptor->pos == -1)
+		return ESPIPE;
 
 	return FS_CALL(vnode, read, descriptor->cookie, pos, buffer, length);
 }
@@ -5701,6 +5719,9 @@ file_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 
 	if (S_ISDIR(vnode->Type()))
 		return B_IS_A_DIRECTORY;
+	if (pos != -1 && descriptor->pos == -1)
+		return ESPIPE;
+
 	if (!HAS_FS_CALL(vnode, write))
 		return B_READ_ONLY_DEVICE;
 
@@ -5718,22 +5739,14 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 	FUNCTION(("file_seek(pos = %" B_PRIdOFF ", seekType = %d)\n", pos,
 		seekType));
 
-	// some kinds of files are not seekable
-	switch (vnode->Type() & S_IFMT) {
-		case S_IFIFO:
-		case S_IFSOCK:
-			return ESPIPE;
+	if (descriptor->pos == -1)
+		return ESPIPE;
 
+	switch (vnode->Type() & S_IFMT) {
 		// drivers publish block devices as chr, so pick both
 		case S_IFBLK:
 		case S_IFCHR:
 			isDevice = true;
-			break;
-		// The Open Group Base Specs don't mention any file types besides pipes,
-		// fifos, and sockets specially, so we allow seeking them.
-		case S_IFREG:
-		case S_IFDIR:
-		case S_IFLNK:
 			break;
 	}
 

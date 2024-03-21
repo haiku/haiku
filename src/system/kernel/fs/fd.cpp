@@ -84,7 +84,7 @@ alloc_fd(void)
 	descriptor->ref_count = 1;
 	descriptor->open_count = 0;
 	descriptor->open_mode = 0;
-	descriptor->pos = 0;
+	descriptor->pos = -1;
 
 	return descriptor;
 }
@@ -697,7 +697,7 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 	}
 
 	bool movePosition = false;
-	if (pos == -1 && descriptor->ops->fd_seek != NULL) {
+	if (pos == -1 && descriptor->pos != -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -755,7 +755,7 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	}
 
 	bool movePosition = false;
-	if (pos == -1 && descriptor->ops->fd_seek != NULL) {
+	if (pos == -1 && descriptor->pos != -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -1000,7 +1000,7 @@ _kern_read(int fd, off_t pos, void* buffer, size_t length)
 		return B_FILE_ERROR;
 
 	bool movePosition = false;
-	if (pos == -1) {
+	if (pos == -1 && descriptor->pos != -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -1029,7 +1029,6 @@ _kern_read(int fd, off_t pos, void* buffer, size_t length)
 ssize_t
 _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 {
-	bool movePosition = false;
 	status_t status;
 
 	if (pos < -1)
@@ -1042,7 +1041,8 @@ _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY)
 		return B_FILE_ERROR;
 
-	if (pos == -1) {
+	bool movePosition = false;
+	if (pos == -1 && descriptor->pos != -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -1092,7 +1092,7 @@ _kern_write(int fd, off_t pos, const void* buffer, size_t length)
 		return B_FILE_ERROR;
 
 	bool movePosition = false;
-	if (pos == -1) {
+	if (pos == -1 && descriptor->pos != -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
@@ -1121,7 +1121,6 @@ _kern_write(int fd, off_t pos, const void* buffer, size_t length)
 ssize_t
 _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 {
-	bool movePosition = false;
 	status_t status;
 
 	if (pos < -1)
@@ -1134,7 +1133,8 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
 
-	if (pos == -1) {
+	bool movePosition = false;
+	if (pos == -1 && descriptor->pos != -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
