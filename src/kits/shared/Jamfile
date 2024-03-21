@@ -37,6 +37,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DateTimeEdit.cpp
 			DragTrackingFilter.cpp
 			DriverSettingsMessageAdapter.cpp
+			HSL.cpp
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp

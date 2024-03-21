@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences appearance ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app interface [ FDirName servers app ] ;
+UsePrivateHeaders shared app interface [ FDirName servers app ] ;
 
 Preference Appearance :
 	APRMain.cpp
@@ -23,7 +23,7 @@ Preference Appearance :
 	#CursorWhichItem.cpp
 	#SysCursorAPI.cpp
 
-	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub shared
 	: Appearance.rdef
 	;
 
