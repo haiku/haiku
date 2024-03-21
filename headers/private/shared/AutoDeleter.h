@@ -21,6 +21,12 @@
 #include <unistd.h>
 #include <SupportDefs.h>
 
+#ifndef _OS_H
+extern "C" {
+extern void			debugger(const char *message);
+}
+#endif
+
 
 namespace BPrivate {
 
@@ -48,6 +54,9 @@ public:
 
 	inline void SetTo(C *object)
 	{
+		if (object == fObject && object != NULL)
+			debugger("identical objects");
+
 		if (object != fObject) {
 			DeleteFunc destructor;
 			destructor(fObject);
