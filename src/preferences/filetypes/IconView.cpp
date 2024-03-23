@@ -454,7 +454,7 @@ Icon::GetIcon(BBitmap* bitmap) const
 		return B_OK;
 	}
 
-	BBitmap* source = width > B_LARGE_ICON && fLarge != NULL || fMini == NULL
+	BBitmap* source = (width > B_LARGE_ICON && fLarge != NULL) || fMini == NULL
 		? fLarge : fMini;
 	if (source == NULL)
 		return B_ENTRY_NOT_FOUND;
