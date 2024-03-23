@@ -336,7 +336,7 @@ open_executable(char *name, image_type type, const char *rpath, const char* runp
 		// It consists of a colon-separated search path list. Optionally a
 		// second search path list follows, separated from the first by a
 		// semicolon.
-		const char *semicolon = strchr(rpath, ';');
+		const char *semicolon = strchr(pathString, ';');
 		const char *firstList = (semicolon ? pathString : NULL);
 		const char *secondList = (semicolon ? semicolon + 1 : pathString);
 			// If there is no ';', we set only secondList to simplify things.
