@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	834755355
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	787895969
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
@@ -75,6 +75,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Salir
 Redo	MediaPlayer-PlaylistWindow		Rehacer
 Move Entry	MediaPlayer-MovePLItemsCmd		Mover entrada
+Reset rating	MediaPlayer-Main		Restablecer clasificación
 <unknown>	PlaylistItem-author		<desconocido>
 Cancel	MediaPlayer-SettingsWindow		Cancelar
 Large	MediaPlayer-SettingsWindow		Grande

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	2738926828
+1	spanish; castilian	x-vnd.Haiku-WebPositive	3381776628
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiar
@@ -8,6 +8,7 @@ Download folder:	Settings Window		Carpeta de descargas:
 Close window	WebPositive Window		Cerrar ventana
 Find:	WebPositive Window		Buscar:
 Script console	WebPositive Window		Consola de scripts
+There was an error setting up the bookmark.	WebPositive Window		Ha ocurrido un error al configurar el marcador.
 Fonts	Settings Window		Tipos de letra
 Path	Cookie Manager		Ruta
 Bookmarks	WebPositive Window		Marcadores
