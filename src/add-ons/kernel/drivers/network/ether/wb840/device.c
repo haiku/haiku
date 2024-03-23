@@ -58,10 +58,6 @@ wb840_open(const char* name, uint32 flags, void** cookie)
 		
 	*cookie = data;
 
-#ifdef DEBUG
-	load_driver_symbols("wb840");
-#endif
-
 	data->devId = i;
 	data->pciInfo = gDevList[i];
 	data->deviceName = gDevNameList[i];
