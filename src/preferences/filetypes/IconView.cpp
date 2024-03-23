@@ -454,7 +454,32 @@ Icon::GetIcon(BBitmap* bitmap) const
 		return B_OK;
 	}
 
-	return B_ENTRY_NOT_FOUND;
+	BBitmap* source = width > B_LARGE_ICON && fLarge != NULL || fMini == NULL
+		? fLarge : fMini;
+	if (source == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// Resize bitmap to fit the target
+	BBitmap* target = new (nothrow) BBitmap(bitmap->Bounds(),
+		B_BITMAP_ACCEPTS_VIEWS, bitmap->ColorSpace());
+	if (target != NULL && target->InitCheck() == B_OK && target->Lock()) {
+		BView* view = new BView(bitmap->Bounds(), NULL, B_FOLLOW_NONE,
+			B_WILL_DRAW);
+		target->AddChild(view);
+		view->DrawBitmap(source, bitmap->Bounds());
+		view->Flush();
+		target->RemoveChild(view);
+		target->Unlock();
+
+		// Copy target to original bitmap
+		bitmap->SetBits(target->Bits(), target->BitsLength(), 0,
+			target->ColorSpace());
+
+		delete view;
+	}
+	delete target;
+
+	return B_OK;
 }
 
 
@@ -503,9 +528,14 @@ Icon::AllocateBitmap(icon_size size, int32 space)
 	if (space == -1)
 		space = kSpace;
 
-	BBitmap* bitmap = new (nothrow) BBitmap(BRect(BPoint(0, 0),
-		be_control_look->ComposeIconSize(size)),
-		(color_space)space);
+	BBitmap* bitmap;
+	if (space == B_CMAP8) {
+		// Legacy mode; no scaling
+		bitmap = new (nothrow) BBitmap(BRect(0, 0, (int32)size - 1, (int32)size - 1), B_CMAP8);
+	} else {
+		bitmap = new (nothrow) BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(size)), (color_space)space);
+	}
 	if (bitmap == NULL || bitmap->InitCheck() != B_OK) {
 		delete bitmap;
 		return NULL;
