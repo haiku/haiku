@@ -1473,15 +1473,17 @@ TCPEndpoint::_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
 
 	TRACE("Spawn()");
 
-	// TODO error checking
-	ProtocolSocket::Open();
+	// TODO: proper error handling!
+	if (ProtocolSocket::Open() != B_OK) {
+		T(Error(this, "opening failed", __LINE__));
+		return DROP;
+	}
 
 	fState = SYNCHRONIZE_RECEIVED;
 	T(Spawn(parent, this));
 
 	fManager = parent->fManager;
 
-	// TODO: proper error handling!
 	if (fManager->BindChild(this, buffer->destination) != B_OK) {
 		T(Error(this, "binding failed", __LINE__));
 		return DROP;
