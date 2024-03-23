@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2024, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ICON_VIEW_H
@@ -146,15 +146,15 @@ private:
 			BMessage*			fModificationMessage;
 			icon_size			fIconSize;
 			BRect				fIconRect;
-			BBitmap*			fIcon;
-			BBitmap*			fHeapIcon;
+			BBitmap*			fIconBitmap;
+			BBitmap*			fHeapIconBitmap;
 
 			bool				fHasRef;
 			bool				fHasType;
 			entry_ref			fRef;
 			BMimeType			fType;
 			icon_source			fSource;
-			::Icon*				fIconData;
+			::Icon*				fIcon;
 
 			BPoint				fDragPoint;
 			bool				fTracking;
