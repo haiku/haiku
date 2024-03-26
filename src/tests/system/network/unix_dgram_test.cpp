@@ -348,6 +348,61 @@ send_test()
 
 
 int
+send_unbound_test()
+{
+	unlink("test-socket-unix");
+	int sock_server = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if (sock_server == -1) {
+		REPORT_ERROR("socket() failed: %s\n", strerror(errno));
+		return 1;
+	}
+
+	struct sockaddr_un addr;
+	addr.sun_family = AF_UNIX;
+	strcpy(addr.sun_path, "test-socket-unix");
+	int status = bind(sock_server, (struct sockaddr*)&addr, sizeof(addr));
+	if (status == -1) {
+		REPORT_ERROR("bind() failed: %s\n", strerror(errno));
+		unlink("test-socket-unix");
+		close(sock_server);
+		return 1;
+	}
+
+	int sock_client = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if (sock_client == -1) {
+		REPORT_ERROR("socket() failed: %s\n", strerror(errno));
+		unlink("test-socket-unix");
+		close(sock_server);
+		return 1;
+	}
+
+	status = sendto(sock_client, "t", 1, 0, (struct sockaddr*)&addr, sizeof(addr));
+	if (status != 1) {
+		REPORT_ERROR("sendto() failed: %s\n", strerror(errno));
+		unlink("test-socket-unix");
+		close(sock_server);
+		close(sock_client);
+		return 1;
+	}
+
+	char buf[1024];
+	memset(buf, 0, sizeof(buf));
+	struct sockaddr_un addr_sender;
+	memset(&addr_sender, 0, sizeof(addr_sender));
+	socklen_t addrlen = sizeof(addr_sender);
+	status = recvfrom(sock_server, buf, sizeof(buf), 0, (struct sockaddr*)&addr_sender, &addrlen);
+	if (strcmp(addr_sender.sun_path, "") != 0 || status != 1 || strcmp(buf, "t") != 0) {
+		REPORT_ERROR("recvfrom() failed: %s\n", strerror(errno));
+		unlink("test-socket-unix");
+		close(sock_server);
+		close(sock_client);
+		return 1;
+	}
+	return 0;
+}
+
+
+int
 shutdown_test()
 {
 	unlink("test.sock");
@@ -608,6 +663,9 @@ main()
 		return 1;
 
 	if (send_test() != 0)
+		return 1;
+
+	if (send_unbound_test() != 0)
 		return 1;
 
 	if (shutdown_test() != 0)
