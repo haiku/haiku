@@ -56,8 +56,8 @@ RemotePackageRepository HaikuPorts
 	curl_devel-8.1.2-1
 	expat-2.5.0-2
 	expat_devel-2.5.0-2
-	ffmpeg-4.2.9-1
-	ffmpeg_devel-4.2.9-1
+	ffmpeg6-6.1.1-2
+	ffmpeg6_devel-6.1.1-2
 	file-5.43-1
 	file_data-5.43-1
 	flex-2.6.4-4
@@ -119,8 +119,8 @@ RemotePackageRepository HaikuPorts
 	libvpx-1.0.0-4
 	libwebp-1.3.2-1
 	libwebp_devel-1.3.2-1
-	libxml2-2.10.4-2
-	libxml2_devel-2.10.4-2
+	libxml2-2.12.5-1
+	libxml2_devel-2.12.5-1
 	live555-2016.06.22-5
 	live555_devel-2016.06.22-5
 	make-4.1-5
@@ -185,16 +185,16 @@ RemotePackageRepository HaikuPorts
 	coreutils_x86-9.3-3
 	curl_x86-8.1.2-1
 	curl_x86_devel-8.1.2-1
-	dav1d_x86-1.2.1-1
-	dav1d_x86_devel-1.2.1-1
+	dav1d_x86-1.3.0-1
+	dav1d_x86_devel-1.3.0-1
 	diffutils_x86-3.10-3
 	enca_x86-1.19-3
 	enca_x86_devel-1.19-3
 	expat_x86-2.5.0-2
 	expat_x86_devel-2.5.0-2
 	fdk_aac_x86-2.0.2-4
-	ffmpeg_x86-4.2.9-1
-	ffmpeg_x86_devel-4.2.9-1
+	ffmpeg6_x86-6.1.1-2
+	ffmpeg6_x86_devel-6.1.1-2
 	findutils_x86-4.9.0-2
 	fluidlite_x86_devel-1.0.9-3
 	fontconfig_x86-2.13.96-2
@@ -214,7 +214,7 @@ RemotePackageRepository HaikuPorts
 	giflib_x86_devel-5.2.1-1
 	glu_x86-9.0.0-8
 	glu_x86_devel-9.0.0-8
-	gmp_x86-6.2.1-3
+	gmp_x86-6.3.0-1
 	graphite2_x86-1.3.14-2
 	graphite2_x86_devel-1.3.14-2
 	grep_x86-3.8-1
@@ -232,8 +232,8 @@ RemotePackageRepository HaikuPorts
 	lcms_x86_devel-2.12-2
 	libass_x86-0.17.1-1
 	libass_x86_devel-0.17.1-1
-	libavif1.0_x86-1.0.3-1
-	libavif1.0_x86_devel-1.0.3-1
+	libavif1.0_x86-1.0.4-1
+	libavif1.0_x86_devel-1.0.4-1
 	libedit_x86-20210910_3.1-3
 	libedit_x86_devel-20210910_3.1-3
 	libexecinfo_x86-1.1-6
@@ -252,8 +252,8 @@ RemotePackageRepository HaikuPorts
 	libmodplug_x86-0.8.9.0-2
 	libogg_x86-1.3.5-2
 	libogg_x86_devel-1.3.5-2
-	libopenmpt_x86-0.6.2-1
-	libopenmpt_x86_devel-0.6.2-1
+	libopenmpt_x86-0.7.2-1
+	libopenmpt_x86_devel-0.7.2-1
 	libpcap_x86-1.10.4-1
 	libpcre_x86-8.45-3
 	libpcre_x86_devel-8.45-3
@@ -273,12 +273,12 @@ RemotePackageRepository HaikuPorts
 	libunistring_x86-1.0-2
 	libvorbis_x86-1.3.7-1
 	libvorbis_x86_devel-1.3.7-1
-	libvpx_x86-1.11.0-3
-	libvpx_x86_devel-1.11.0-3
+	libvpx_x86-1.13.1-1
+	libvpx_x86_devel-1.13.1-1
 	libwebp_x86-1.3.2-1
 	libwebp_x86_devel-1.3.2-1
-	libxml2_x86-2.10.4-4
-	libxml2_x86_devel-2.10.4-4
+	libxml2_x86-2.12.5-1
+	libxml2_x86_devel-2.12.5-1
 	libxslt_x86-1.1.39-2
 	live555_x86-2016.06.22-5
 	live555_x86_devel-2016.06.22-5
