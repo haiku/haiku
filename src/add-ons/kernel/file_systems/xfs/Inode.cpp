@@ -12,162 +12,71 @@
 
 
 void
-xfs_inode_t::SwapEndian()
+Inode::SwapEndian()
 {
-	di_magic			=	B_BENDIAN_TO_HOST_INT16(di_magic);
-	di_mode				=	B_BENDIAN_TO_HOST_INT16(di_mode);
-	di_onlink			=	B_BENDIAN_TO_HOST_INT16(di_onlink);
-	di_uid				=	B_BENDIAN_TO_HOST_INT32(di_uid);
-	di_gid				=	B_BENDIAN_TO_HOST_INT32(di_gid);
-	di_nlink			=	B_BENDIAN_TO_HOST_INT32(di_nlink);
-	di_projid			=	B_BENDIAN_TO_HOST_INT16(di_projid);
-	di_flushiter		=	B_BENDIAN_TO_HOST_INT16(di_flushiter);
-	di_atime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_atime.t_sec);
-	di_atime.t_nsec		=	B_BENDIAN_TO_HOST_INT32(di_atime.t_nsec);
-	di_mtime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_mtime.t_sec);
-	di_mtime.t_nsec		=	B_BENDIAN_TO_HOST_INT32(di_mtime.t_nsec);
-	di_ctime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_ctime.t_sec);
-	di_ctime.t_nsec		=	B_BENDIAN_TO_HOST_INT32(di_ctime.t_nsec);
-	di_size				=	B_BENDIAN_TO_HOST_INT64(di_size);
-	di_nblocks			=	B_BENDIAN_TO_HOST_INT64(di_nblocks);
-	di_extsize			=	B_BENDIAN_TO_HOST_INT32(di_extsize);
-	di_nextents			=	B_BENDIAN_TO_HOST_INT32(di_nextents);
-	di_naextents		=	B_BENDIAN_TO_HOST_INT16(di_naextents);
-	di_dmevmask			=	B_BENDIAN_TO_HOST_INT32(di_dmevmask);
-	di_dmstate			=	B_BENDIAN_TO_HOST_INT16(di_dmstate);
-	di_flags			=	B_BENDIAN_TO_HOST_INT16(di_flags);
-	di_gen				=	B_BENDIAN_TO_HOST_INT32(di_gen);
-	di_next_unlinked	=	B_BENDIAN_TO_HOST_INT32(di_next_unlinked);
-	di_changecount		=	B_BENDIAN_TO_HOST_INT64(di_changecount);
-	di_lsn				=	B_BENDIAN_TO_HOST_INT64(di_lsn);
-	di_flags2			=	B_BENDIAN_TO_HOST_INT64(di_flags2);
-	di_cowextsize		=	B_BENDIAN_TO_HOST_INT64(di_cowextsize);
-	di_crtime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_crtime.t_sec);
-	di_crtime.t_nsec	=	B_BENDIAN_TO_HOST_INT32(di_crtime.t_nsec);
-	di_ino				=	B_BENDIAN_TO_HOST_INT64(di_ino);
-}
-
-
-uint8
-xfs_inode_t::ForkOffset() const
-{
-	return di_forkoff;
-}
-
-
-xfs_rfsblock_t
-xfs_inode_t::BlockCount() const
-{
-	return di_nblocks;
-}
-
-
-xfs_fsize_t
-xfs_inode_t::Size() const
-{
-	return di_size;
-}
-
-
-mode_t
-xfs_inode_t::Mode() const
-{
-	return di_mode;
-}
-
-
-uint32
-xfs_inode_t::UserId() const
-{
-	return di_uid;
-}
-
-
-uint32
-xfs_inode_t::GroupId() const
-{
-	return di_gid;
+	fNode->di_magic = B_BENDIAN_TO_HOST_INT16(fNode->di_magic);
+	fNode->di_mode = B_BENDIAN_TO_HOST_INT16(fNode->di_mode);
+	fNode->di_onlink = B_BENDIAN_TO_HOST_INT16(fNode->di_onlink);
+	fNode->di_uid = B_BENDIAN_TO_HOST_INT32(fNode->di_uid);
+	fNode->di_gid = B_BENDIAN_TO_HOST_INT32(fNode->di_gid);
+	fNode->di_nlink = B_BENDIAN_TO_HOST_INT32(fNode->di_nlink);
+	fNode->di_projid = B_BENDIAN_TO_HOST_INT16(fNode->di_projid);
+	fNode->di_flushiter = B_BENDIAN_TO_HOST_INT16(fNode->di_flushiter);
+	fNode->di_atime.t_sec = B_BENDIAN_TO_HOST_INT32(fNode->di_atime.t_sec);
+	fNode->di_atime.t_nsec = B_BENDIAN_TO_HOST_INT32(fNode->di_atime.t_nsec);
+	fNode->di_mtime.t_sec = B_BENDIAN_TO_HOST_INT32(fNode->di_mtime.t_sec);
+	fNode->di_mtime.t_nsec = B_BENDIAN_TO_HOST_INT32(fNode->di_mtime.t_nsec);
+	fNode->di_ctime.t_sec = B_BENDIAN_TO_HOST_INT32(fNode->di_ctime.t_sec);
+	fNode->di_ctime.t_nsec = B_BENDIAN_TO_HOST_INT32(fNode->di_ctime.t_nsec);
+	fNode->di_size = B_BENDIAN_TO_HOST_INT64(fNode->di_size);
+	fNode->di_nblocks = B_BENDIAN_TO_HOST_INT64(fNode->di_nblocks);
+	fNode->di_extsize = B_BENDIAN_TO_HOST_INT32(fNode->di_extsize);
+	fNode->di_nextents = B_BENDIAN_TO_HOST_INT32(fNode->di_nextents);
+	fNode->di_naextents = B_BENDIAN_TO_HOST_INT16(fNode->di_naextents);
+	fNode->di_dmevmask = B_BENDIAN_TO_HOST_INT32(fNode->di_dmevmask);
+	fNode->di_dmstate = B_BENDIAN_TO_HOST_INT16(fNode->di_dmstate);
+	fNode->di_flags = B_BENDIAN_TO_HOST_INT16(fNode->di_flags);
+	fNode->di_gen = B_BENDIAN_TO_HOST_INT32(fNode->di_gen);
+	fNode->di_next_unlinked = B_BENDIAN_TO_HOST_INT32(fNode->di_next_unlinked);
+	fNode->di_changecount = B_BENDIAN_TO_HOST_INT64(fNode->di_changecount);
+	fNode->di_lsn = B_BENDIAN_TO_HOST_INT64(fNode->di_lsn);
+	fNode->di_flags2 = B_BENDIAN_TO_HOST_INT64(fNode->di_flags2);
+	fNode->di_cowextsize = B_BENDIAN_TO_HOST_INT64(fNode->di_cowextsize);
+	fNode->di_crtime.t_sec = B_BENDIAN_TO_HOST_INT32(fNode->di_crtime.t_sec);
+	fNode->di_crtime.t_nsec = B_BENDIAN_TO_HOST_INT32(fNode->di_crtime.t_nsec);
+	fNode->di_ino = B_BENDIAN_TO_HOST_INT64(fNode->di_ino);
 }
 
 
 void
-xfs_inode_t::GetModificationTime(struct timespec& stamp)
+Inode::GetModificationTime(struct timespec& stamp) const
 {
-	stamp.tv_sec = di_mtime.t_sec;
-	stamp.tv_nsec = di_mtime.t_nsec;
+	stamp.tv_sec = fNode->di_mtime.t_sec;
+	stamp.tv_nsec = fNode->di_mtime.t_nsec;
 }
 
 
 void
-xfs_inode_t::GetAccessTime(struct timespec& stamp)
+Inode::GetAccessTime(struct timespec& stamp) const
 {
-	stamp.tv_sec = di_atime.t_sec;
-	stamp.tv_nsec = di_atime.t_nsec;
+	stamp.tv_sec = fNode->di_atime.t_sec;
+	stamp.tv_nsec = fNode->di_atime.t_nsec;
 }
 
 
 void
-xfs_inode_t::GetChangeTime(struct timespec& stamp)
+Inode::GetChangeTime(struct timespec& stamp) const
 {
-	stamp.tv_sec = di_ctime.t_sec;
-	stamp.tv_nsec = di_ctime.t_nsec;
+	stamp.tv_sec = fNode->di_ctime.t_sec;
+	stamp.tv_nsec = fNode->di_ctime.t_nsec;
 }
 
 
 void
-xfs_inode_t::GetCreationTime(struct timespec& stamp)
+Inode::GetCreationTime(struct timespec& stamp) const
 {
-	stamp.tv_sec = di_crtime.t_sec;
-	stamp.tv_nsec = di_crtime.t_nsec;
-}
-
-
-uint32
-xfs_inode_t::NLink() const
-{
-	return di_nlink;
-}
-
-
-int8
-xfs_inode_t::Version() const
-{
-	return di_version;
-}
-
-
-uint16
-xfs_inode_t::Flags() const
-{
-	return di_flags;
-}
-
-
-int8
-xfs_inode_t::Format() const
-{
-	return di_format;
-}
-
-
-int8
-xfs_inode_t::AttrFormat() const
-{
-	return di_aformat;
-}
-
-
-xfs_extnum_t
-xfs_inode_t::DataExtentsCount() const
-{
-	return di_nextents;
-}
-
-
-xfs_extnum_t
-xfs_inode_t::AttrExtentsCount() const
-{
-	return di_naextents;
+	stamp.tv_sec = fNode->di_crtime.t_sec;
+	stamp.tv_nsec = fNode->di_crtime.t_nsec;
 }
 
 
@@ -273,13 +182,13 @@ Inode::VerifyInode() const
 	}
 
 	// check if inode version is valid
-	if(fNode->Version() < 1 || fNode->Version() > 3) {
+	if (Version() < 1 || Version() > 3) {
 		ERROR("Bad inode version");
 		return false;
 	}
 
 	// verify version 3 inodes first
-	if(fNode->Version() == 3) {
+	if (Version() == 3) {
 
 		if(!HAS_V3INODES(fVolume)) {
 			ERROR("xfs v4 doesn't have v3 inodes");
@@ -375,16 +284,16 @@ uint32
 Inode::CoreInodeSize() const
 {
 	if (Version() == 3)
-		return sizeof(struct xfs_inode_t);
+		return sizeof(Dinode);
 
-	return offsetof(struct xfs_inode_t, di_crc);
+	return offsetof(Dinode, di_crc);
 }
 
 
 status_t
 Inode::Init()
 {
-	fNode = new(std::nothrow) xfs_inode_t;
+	fNode = new(std::nothrow) Dinode;
 	if (fNode == NULL)
 		return B_NO_MEMORY;
 
@@ -419,10 +328,10 @@ Inode::~Inode()
 bool
 Inode::HasFileTypeField() const
 {
-	if((fNode->Version() == 3 && fVolume->XfsHasIncompatFeature())
-			|| (fVolume->SuperBlockFeatures2() & XFS_SB_VERSION2_FTYPE))
+	if ((Version() == 3 && fVolume->XfsHasIncompatFeature())
+		|| (fVolume->SuperBlockFeatures2() & XFS_SB_VERSION2_FTYPE)) {
 		return true;
-
+	}
 	return false;
 }
 
@@ -434,8 +343,7 @@ Inode::CheckPermissions(int accessMode) const
 	if ((accessMode & W_OK) != 0 && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	return check_access_permissions(accessMode, Mode(),
-		(uint32)fNode->GroupId(), (uint32)fNode->UserId());
+	return check_access_permissions(accessMode, Mode(), (uint32)GroupId(), (uint32)UserId());
 }
 
 
@@ -816,11 +724,11 @@ Inode::GetFromDisk()
 	}
 
 	if(fVolume->IsVersion5())
-		memcpy(fNode, fBuffer, sizeof(xfs_inode_t));
+		memcpy(fNode, fBuffer, sizeof(Inode::Dinode));
 	else
 		memcpy(fNode, fBuffer, INODE_CRC_OFF);
 
-	fNode->SwapEndian();
+	SwapEndian();
 
 	return B_OK;
 }

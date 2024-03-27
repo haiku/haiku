@@ -17,7 +17,7 @@
 #define INODE_MAXSIZE_LOG	11
 #define INODE_MIN_SIZE	(1 << INODE_MINSIZE_LOG)
 #define INODE_MAX_SIZE	(1 << INODE_MAXSIZE_LOG)
-#define INODE_CRC_OFF	offsetof(struct xfs_inode_t, di_crc)
+#define INODE_CRC_OFF offsetof(Inode::Dinode, di_crc)
 #define MAXAEXTNUM	((xfs_aextnum_t) 0x7fff)
 #define MAXEXTNUM	((xfs_extnum_t) 0x7fffffff)
 
@@ -26,8 +26,7 @@
 
 // Inode size for given fs
 #define DINODE_SIZE(volume) \
-	(HAS_V3INODES(volume) ? \
-		sizeof(struct xfs_inode_t) : offsetof(struct xfs_inode_t, di_crc))
+	(HAS_V3INODES(volume) ? sizeof(Inode::Dinode) : offsetof(Inode::Dinode, di_crc))
 #define LITINO(volume) \
 	((volume)->InodeSize() - DINODE_SIZE(volume))
 
@@ -126,7 +125,7 @@ struct BlockInfoV5 {
 			uint64				owner;
 };
 
-#define XFS_BLOCK_CRC_OFF offsetof(struct BlockInfo, crc)
+#define XFS_BLOCK_CRC_OFF offsetof(struct BlockInfoV5, crc)
 
 
 struct ExtentMapEntry {
@@ -180,87 +179,66 @@ enum xfs_dinode_fmt_t {
 
 
 /*
- * The xfs_ino_t is the same for all types of inodes, the data and attribute
+ * The dinode is the same for all types of inodes, the data and attribute
  * fork might be different and that is to be handled accordingly.
  */
-struct xfs_inode_t {
-			void				SwapEndian();
-			int8				Version() const;
-			mode_t				Mode() const;
-			void				GetModificationTime(struct timespec&
-									timestamp);
-			void				GetChangeTime(struct timespec& timestamp);
-			void				GetAccessTime(struct timespec& timestamp);
-			void				GetCreationTime(struct timespec& timestamp);
-
-			int8				Format() const;
-				// The format of the inode
-			int8				AttrFormat() const;
-			xfs_fsize_t			Size() const;
-			xfs_rfsblock_t		BlockCount() const;
-			uint32				NLink() const;
-			uint16				Flags() const;
-			uint32				UserId() const;
-			uint32				GroupId() const;
-			xfs_extnum_t		DataExtentsCount() const;
-			xfs_extnum_t		AttrExtentsCount() const;
-			uint8				ForkOffset() const;
-			uint16				di_magic;
-			uint16				di_mode;
-				// uses standard S_Ixxx
-			int8				di_version;
-				//This either would be 1 or 2
-			int8				di_format;
-			uint16				di_onlink;
-			uint32				di_uid;
-			uint32				di_gid;
-			uint32				di_nlink;
-			uint16				di_projid;
-			uint8				di_pad[8];
-			uint16				di_flushiter;
-			xfs_timestamp_t		di_atime;
-			xfs_timestamp_t		di_mtime;
-			xfs_timestamp_t		di_ctime;
-			xfs_fsize_t			di_size;
-				// size in bytes or length if link
-			xfs_rfsblock_t		di_nblocks;
-				// blocks used including metadata
-				// extended attributes not included
-			xfs_extlen_t		di_extsize;
-				// extent size
-			xfs_extnum_t		di_nextents;
-				// number of data extents
-			xfs_aextnum_t		di_naextents;
-				// number of EA extents
-			uint8				di_forkoff;
-				// decides where di_a starts
-			int8				di_aformat;
-				// similar to di_format
-			uint32				di_dmevmask;
-			uint16				di_dmstate;
-			uint16				di_flags;
-			uint32				di_gen;
-			uint32				di_next_unlinked;
-
-			// XFS Version 5
-
-			uint32				di_crc;
-			uint64				di_changecount;
-			uint64				di_lsn;
-			uint64				di_flags2;
-			uint32				di_cowextsize;
-			uint8				di_pad2[12];
-
-			// fields only written to during inode creation
-
-			xfs_timestamp_t		di_crtime;
-			uint64				di_ino;
-			uuid_t				di_uuid;
-};
-
-
 class Inode {
 public:
+	typedef struct Dinode{
+	public:
+		uint16				di_magic;
+		uint16				di_mode;
+		// uses standard S_Ixxx
+		int8				di_version;
+		//This either would be 1 or 2
+		int8				di_format;
+		uint16				di_onlink;
+		uint32				di_uid;
+		uint32				di_gid;
+		uint32				di_nlink;
+		uint16				di_projid;
+		uint8				di_pad[8];
+		uint16				di_flushiter;
+		xfs_timestamp_t		di_atime;
+		xfs_timestamp_t		di_mtime;
+		xfs_timestamp_t		di_ctime;
+		xfs_fsize_t			di_size;
+		// size in bytes or length if link
+		xfs_rfsblock_t		di_nblocks;
+		// blocks used including metadata
+		// extended attributes not included
+		xfs_extlen_t		di_extsize;
+		// extent size
+		xfs_extnum_t		di_nextents;
+		// number of data extents
+		xfs_aextnum_t		di_naextents;
+		// number of EA extents
+		uint8				di_forkoff;
+		// decides where di_a starts
+		int8				di_aformat;
+		// similar to di_format
+		uint32				di_dmevmask;
+		uint16				di_dmstate;
+		uint16				di_flags;
+		uint32				di_gen;
+		uint32				di_next_unlinked;
+
+		// XFS Version 5
+
+		uint32				di_crc;
+		uint64				di_changecount;
+		uint64				di_lsn;
+		uint64				di_flags2;
+		uint32				di_cowextsize;
+		uint8				di_pad2[12];
+
+		// fields only written to during inode creation
+
+		xfs_timestamp_t		di_crtime;
+		uint64				di_ino;
+		uuid_t				di_uuid;
+	};
+
 								Inode(Volume* volume, xfs_ino_t id);
 								~Inode();
 
@@ -283,30 +261,29 @@ public:
 			bool				IsSymLink() const
 									{ return S_ISLNK(Mode()); }
 
-			mode_t				Mode() const { return fNode->Mode(); }
+			mode_t				Mode() const { return fNode->di_mode; }
 
 			Volume*				GetVolume() { return fVolume;}
 
-			int8				Format() const { return fNode->Format(); }
+			int8				Format() const { return fNode->di_format; }
 
-			int8				AttrFormat() const { return fNode->AttrFormat(); }
+			int8				AttrFormat() const { return fNode->di_aformat; }
 
 			bool				IsLocal() const
-									{ return
-										Format() == XFS_DINODE_FMT_LOCAL; }
+									{ return Format() == XFS_DINODE_FMT_LOCAL; }
 
-			uint32				NLink() const { return fNode->NLink(); }
+			uint32				NLink() const { return fNode->di_nlink; }
 
-			int8				Version() const { return fNode->Version(); }
+			int8				Version() const { return fNode->di_version; }
 
 			xfs_rfsblock_t		BlockCount() const
-									{ return fNode->BlockCount(); }
+									{ return fNode->di_nblocks; }
 
 			char*				Buffer() { return fBuffer; }
 
-			int16				Flags() const { return fNode->Flags(); }
+			int16				Flags() const { return fNode->di_flags; }
 
-			xfs_fsize_t			Size() const { return fNode->Size(); }
+			xfs_fsize_t			Size() const { return fNode->di_size; }
 
 			uint32				DirBlockSize() const
 									{ return fVolume->DirBlockSize(); }
@@ -316,31 +293,26 @@ public:
 
 			uint32				CoreInodeSize() const;
 
-			void				GetChangeTime(struct timespec& timestamp) const
-								{ fNode->GetChangeTime(timestamp); }
+			void				GetChangeTime(struct timespec& timestamp) const;
 
-			void				GetModificationTime(struct timespec& timestamp)
-									const
-								{ fNode->GetModificationTime(timestamp); }
+			void				GetModificationTime(struct timespec& timestamp) const;
 
-			void				GetAccessTime(struct timespec& timestamp) const
-								{ fNode->GetAccessTime(timestamp); }
+			void				GetAccessTime(struct timespec& timestamp) const;
 
-			void				GetCreationTime(struct timespec& timestamp) const
-								{ fNode->GetCreationTime(timestamp); }
+			void				GetCreationTime(struct timespec& timestamp) const;
 
 			unsigned char		XfsModeToFtype() const;
 			status_t			CheckPermissions(int accessMode) const;
-			uint32				UserId() const { return fNode->UserId(); }
-			uint32				GroupId() const { return fNode->GroupId(); }
+			uint32				UserId() const { return fNode->di_uid; }
+			uint32				GroupId() const { return fNode->di_gid; }
 			bool				HasFileTypeField() const;
 			xfs_extnum_t		DataExtentsCount() const
-									{ return fNode->DataExtentsCount(); }
+									{ return fNode->di_nextents; }
 			xfs_extnum_t		AttrExtentsCount() const
-									{ return fNode->AttrExtentsCount(); }
+									{ return fNode->di_naextents; }
 			uint64				FileSystemBlockToAddr(uint64 block);
 			uint8				ForkOffset() const
-									{ return fNode->ForkOffset(); }
+									{ return fNode->di_forkoff; }
 			status_t			ReadExtents();
 			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
 			status_t			GetNodefromTree(uint16& levelsInTree,
@@ -360,8 +332,10 @@ public:
 			size_t				GetPtrOffsetIntoNode(int pos);
 			uint32				SizeOfLongBlock();
 private:
+			void				SwapEndian();
+private:
 			status_t			GetFromDisk();
-			xfs_inode_t*		fNode;
+			Dinode*				fNode;
 			xfs_ino_t			fId;
 			Volume*				fVolume;
 			char*				fBuffer;
