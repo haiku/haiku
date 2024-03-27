@@ -1157,6 +1157,14 @@ BPackageInfo::ParseVersionString(const BString& string, bool revisionIsOptional,
 
 
 /*static*/ status_t
+BPackageInfo::ParseResolvableString(const BString& string,
+	BPackageResolvable& _expression, ParseErrorListener* listener)
+{
+	return Parser(listener).ParseResolvable(string, _expression);
+}
+
+
+/*static*/ status_t
 BPackageInfo::ParseResolvableExpressionString(const BString& string,
 	BPackageResolvableExpression& _expression, ParseErrorListener* listener)
 {

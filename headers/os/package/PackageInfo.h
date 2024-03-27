@@ -202,6 +202,10 @@ public:
 									bool revisionIsOptional,
 									BPackageVersion& _version,
 									ParseErrorListener* listener = NULL);
+	static	status_t			ParseResolvableString(
+									const BString& string,
+									BPackageResolvable& _expression,
+									ParseErrorListener* listener = NULL);
 	static	status_t			ParseResolvableExpressionString(
 									const BString& string,
 									BPackageResolvableExpression& _expression,

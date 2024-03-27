@@ -107,6 +107,31 @@ BPackageInfo::Parser::ParseVersion(const BString& versionString,
 
 
 status_t
+BPackageInfo::Parser::ParseResolvable(const BString& expressionString,
+	BPackageResolvable& _expression)
+{
+	fPos = expressionString.String();
+
+	try {
+		Token token(TOKEN_STRING, fPos, expressionString.Length());
+		_ParseResolvable(_NextToken(), _expression);
+	} catch (const ParseError& error) {
+		if (fListener != NULL) {
+			int32 offset = error.pos - expressionString.String();
+			fListener->OnError(error.message, 1, offset);
+		}
+		return B_BAD_DATA;
+	} catch (const std::bad_alloc& e) {
+		if (fListener != NULL)
+			fListener->OnError("out of memory", 0, 0);
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 BPackageInfo::Parser::ParseResolvableExpression(const BString& expressionString,
 	BPackageResolvableExpression& _expression)
 {
@@ -428,6 +453,50 @@ BPackageInfo::Parser::_ParseVersionValue(Token& word, BPackageVersion* value,
 
 
 void
+BPackageInfo::Parser::_ParseResolvable(const Token& token,
+	BPackageResolvable& _value)
+{
+	if (token.type != TOKEN_STRING) {
+		throw ParseError("expected word (a resolvable name)",
+			token.pos);
+	}
+
+	int32 errorPos;
+	if (!_IsValidResolvableName(token.text, &errorPos)) {
+		throw ParseError("invalid character in resolvable name",
+			token.pos + errorPos);
+	}
+
+	// parse version
+	BPackageVersion version;
+	Token op = _NextToken();
+	if (op.type == TOKEN_OPERATOR_ASSIGN) {
+		_ParseVersionValue(&version, true);
+	} else if (op.type == TOKEN_ITEM_SEPARATOR
+		|| op.type == TOKEN_CLOSE_BRACE || op.type == TOKEN_EOF) {
+		_RewindTo(op);
+	} else
+		throw ParseError("expected '=', comma or '}'", op.pos);
+
+	// parse compatible version
+	BPackageVersion compatibleVersion;
+	Token compatible = _NextToken();
+	if (compatible.type == TOKEN_STRING
+		&& (compatible.text == "compat"
+			|| compatible.text == "compatible")) {
+		op = _NextToken();
+		if (op.type == TOKEN_OPERATOR_GREATER_EQUAL) {
+			_ParseVersionValue(&compatibleVersion, true);
+		} else
+			_RewindTo(compatible);
+	} else
+		_RewindTo(compatible);
+
+	_value.SetTo(token.text, version, compatibleVersion);
+}
+
+
+void
 BPackageInfo::Parser::_ParseResolvableExpression(const Token& token,
 	BPackageResolvableExpression& _value, BString* _basePackage)
 {
@@ -611,44 +680,9 @@ BPackageInfo::Parser::_ParseResolvableList(
 
 		virtual void operator()(const Token& token)
 		{
-			if (token.type != TOKEN_STRING) {
-				throw ParseError("expected word (a resolvable name)",
-					token.pos);
-			}
-
-			int32 errorPos;
-			if (!_IsValidResolvableName(token.text, &errorPos)) {
-				throw ParseError("invalid character in resolvable name",
-					token.pos + errorPos);
-			}
-
-			// parse version
-			BPackageVersion version;
-			Token op = parser._NextToken();
-			if (op.type == TOKEN_OPERATOR_ASSIGN) {
-				parser._ParseVersionValue(&version, true);
-			} else if (op.type == TOKEN_ITEM_SEPARATOR
-				|| op.type == TOKEN_CLOSE_BRACE) {
-				parser._RewindTo(op);
-			} else
-				throw ParseError("expected '=', comma or '}'", op.pos);
-
-			// parse compatible version
-			BPackageVersion compatibleVersion;
-			Token compatible = parser._NextToken();
-			if (compatible.type == TOKEN_STRING
-				&& (compatible.text == "compat"
-					|| compatible.text == "compatible")) {
-				op = parser._NextToken();
-				if (op.type == TOKEN_OPERATOR_GREATER_EQUAL) {
-					parser._ParseVersionValue(&compatibleVersion, true);
-				} else
-					parser._RewindTo(compatible);
-			} else
-				parser._RewindTo(compatible);
-
-			value->AddItem(new BPackageResolvable(token.text, version,
-				compatibleVersion));
+			BPackageResolvable expression;
+			parser._ParseResolvable(token, expression);
+			value->AddItem(new BPackageResolvable(expression));
 		}
 	} resolvableParser(*this, value);
 

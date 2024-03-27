@@ -61,6 +61,7 @@ public:
 
 			BString				ToString() const;
 
+			status_t			SetToString(const BString& expressionString);
 			void				SetTo(const BString& name,
 									const BPackageVersion& version
 										= BPackageVersion(),

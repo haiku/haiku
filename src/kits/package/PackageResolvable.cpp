@@ -7,6 +7,7 @@
 #include <package/PackageResolvable.h>
 
 #include <package/hpkg/PackageInfoAttributeValue.h>
+#include <package/PackageInfo.h>
 
 
 namespace BPackageKit {
@@ -78,6 +79,18 @@ BPackageResolvable::ToString() const
 		string << " compat>=" << fCompatibleVersion.ToString();
 
 	return string;
+}
+
+
+status_t
+BPackageResolvable::SetToString(const BString& expressionString)
+{
+	fName.Truncate(0);
+	fVersion.Clear();
+	fCompatibleVersion.Clear();
+
+	return BPackageInfo::ParseResolvableString(expressionString,
+		*this);
 }
 
 
