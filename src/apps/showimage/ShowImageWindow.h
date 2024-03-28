@@ -11,6 +11,7 @@
 #define SHOW_IMAGE_WINDOW_H
 
 
+#include <NumberFormat.h>
 #include <ToolBar.h>
 #include <Window.h>
 
@@ -127,6 +128,7 @@ private:
 			BMenu*				fRatingMenu;
 			BMenu*	 			fOpenWithMenu;
 			BMenuItem*			fResetRatingItem;
+			BNumberFormat		fNumberFormat;
 			BToolBar*			fToolBar;
 			bool				fToolBarVisible;
 			BView*				fScrollArea;
