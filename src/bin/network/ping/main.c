@@ -155,6 +155,9 @@ main(int argc, char *argv[])
 	target = argv[argc - 1];
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_socktype = SOCK_RAW;
+#ifdef __HAIKU__
+	hints.ai_flags = AI_ADDRCONFIG;
+#endif
 	if (feature_present("inet") && !feature_present("inet6"))
 		hints.ai_family = AF_INET;
 	if (feature_present("inet6") && !feature_present("inet"))
