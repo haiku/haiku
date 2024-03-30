@@ -348,22 +348,14 @@ AVCodecDecoder::_ResetTempPacket()
 static int
 get_channel_count(AVCodecContext* context)
 {
-#if LIBAVCODEC_VERSION_MAJOR >= 60
 	return context->ch_layout.nb_channels;
-#else
-	return context->channels;
-#endif
 }
 
 
 static void
 set_channel_count(AVCodecContext* context, int count)
 {
-#if LIBAVCODEC_VERSION_MAJOR >= 60
 	context->ch_layout.nb_channels = count;
-#else
-	context->channels = count;
-#endif
 }
 
 
@@ -444,7 +436,6 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 
 	if (av_sample_fmt_is_planar(fCodecContext->sample_fmt)) {
 		fResampleContext = NULL;
-#if LIBAVCODEC_VERSION_MAJOR >= 60
 		swr_alloc_set_opts2(&fResampleContext,
 			&fCodecContext->ch_layout,
 			fCodecContext->request_sample_fmt,
@@ -453,16 +444,6 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 			fCodecContext->sample_fmt,
 			fCodecContext->sample_rate,
 			0, NULL);
-#else
-		fResampleContext = swr_alloc_set_opts(NULL,
-			fCodecContext->channel_layout,
-			fCodecContext->request_sample_fmt,
-			fCodecContext->sample_rate,
-			fCodecContext->channel_layout,
-			fCodecContext->sample_fmt,
-			fCodecContext->sample_rate,
-			0, NULL);
-#endif
 		swr_init(fResampleContext);
 	}
 
@@ -1644,11 +1625,7 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 	AVFrame deinterlacedPicture;
 	bool useDeinterlacedPicture = false;
 
-#if LIBAVCODEC_VERSION_MAJOR >= 60
 	if (fRawDecodedPicture->flags & AV_FRAME_FLAG_INTERLACED) {
-#else
-	if (fRawDecodedPicture->interlaced_frame) {
-#endif
 		AVFrame rawPicture;
 		rawPicture.data[0] = fRawDecodedPicture->data[0];
 		rawPicture.data[1] = fRawDecodedPicture->data[1];
@@ -1741,11 +1718,7 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		}
 	}
 
-#if LIBAVCODEC_VERSION_MAJOR >= 60
 	if (fRawDecodedPicture->flags & AV_FRAME_FLAG_INTERLACED)
-#else
-	if (fRawDecodedPicture->interlaced_frame)
-#endif
 		av_freep(&deinterlacedPicture.data[0]);
 
 	return B_OK;
