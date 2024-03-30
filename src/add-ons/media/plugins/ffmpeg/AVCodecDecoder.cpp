@@ -138,12 +138,12 @@ AVCodecDecoder::AVCodecDecoder()
 
 AVCodecDecoder::~AVCodecDecoder()
 {
-	TRACE("[%c] AVCodecDecoder::~AVCodecDecoder()\n", fIsAudio?('a'):('v'));
+	TRACE("[%c] AVCodecDecoder::~AVCodecDecoder()\n", fIsAudio ? 'a' : 'v');
 
 #if DO_PROFILING
 	if (profileCounter > 0) {
 		printf("[%c] profile: d1 = %lld, d2 = %lld (%lld)\n",
-			fIsAudio?('a'):('v'), decodingTime / profileCounter,
+			fIsAudio ? 'a' : 'v', decodingTime / profileCounter,
 			conversionTime / profileCounter, fFrame);
 	}
 #endif
@@ -193,16 +193,16 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 		return B_ERROR;
 
 	fIsAudio = (ioEncodedFormat->type == B_MEDIA_ENCODED_AUDIO);
-	TRACE("[%c] AVCodecDecoder::Setup()\n", fIsAudio?('a'):('v'));
+	TRACE("[%c] AVCodecDecoder::Setup()\n", fIsAudio ? 'a' : 'v');
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
 	string_for_format(*ioEncodedFormat, buffer, sizeof(buffer));
-	TRACE("[%c]   input_format = %s\n", fIsAudio?('a'):('v'), buffer);
-	TRACE("[%c]   infoSize = %ld\n", fIsAudio?('a'):('v'), infoSize);
-	TRACE("[%c]   user_data_type = %08lx\n", fIsAudio?('a'):('v'),
+	TRACE("[%c]   input_format = %s\n", fIsAudio ? 'a' : 'v', buffer);
+	TRACE("[%c]   infoSize = %ld\n", fIsAudio ? 'a' : 'v', infoSize);
+	TRACE("[%c]   user_data_type = %08" B_PRIx32 "\n", fIsAudio ? 'a' : 'v',
 		ioEncodedFormat->user_data_type);
-	TRACE("[%c]   meta_data_size = %ld\n", fIsAudio?('a'):('v'),
+	TRACE("[%c]   meta_data_size = %" B_PRId32 "\n", fIsAudio ? 'a' : 'v',
 		ioEncodedFormat->MetaDataSize());
 #endif
 
@@ -214,8 +214,8 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 		fCodec = avcodec_find_decoder(static_cast<CodecID>(
 			description.u.misc.codec));
 		if (fCodec == NULL) {
-			TRACE("  unable to find the correct FFmpeg "
-				"decoder (id = %lu)\n", description.u.misc.codec);
+			TRACE("  unable to find the correct FFmpeg decoder (id = %" B_PRIu32 ")\n",
+				description.u.misc.codec);
 			return B_ERROR;
 		}
 		TRACE("  found decoder %s\n", fCodec->name);
@@ -294,12 +294,12 @@ status_t
 AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 {
 	TRACE("AVCodecDecoder::NegotiateOutputFormat() [%c] \n",
-		fIsAudio?('a'):('v'));
+		fIsAudio ? 'a' : 'v');
 
 #ifdef TRACE_AV_CODEC
 	char buffer[1024];
 	string_for_format(*inOutFormat, buffer, sizeof(buffer));
-	TRACE("  [%c]  requested format = %s\n", fIsAudio?('a'):('v'), buffer);
+	TRACE("  [%c]  requested format = %s\n", fIsAudio ? 'a' : 'v', buffer);
 #endif
 
 	// close any previous instance
@@ -466,9 +466,9 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		swr_init(fResampleContext);
 	}
 
-	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, "
-		"output frame size: %d, count: %ld, rate: %.2f\n",
-		fCodecContext->bit_rate, fCodecContext->sample_rate, fCodecContext->channels,
+	TRACE("  bit_rate = %" PRId64 ", sample_rate = %d, channels = %d, "
+		"output frame size: %d, count: %" B_PRId32 ", rate: %.2f\n",
+		fCodecContext->bit_rate, fCodecContext->sample_rate, fCodecContext->ch_layout.nb_channels,
 		fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
 
 	return B_OK;
@@ -752,7 +752,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 	dump_ffframe_audio(fRawDecodedAudio, "ffaudi");
 #endif
 
-	TRACE_AUDIO("  frame count: %ld current: %lld\n",
+	TRACE_AUDIO("  frame count: %d current: %" B_PRId64 "\n",
 		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
@@ -826,11 +826,11 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 		fCodecContext->extradata_size = fInputFormat.MetaDataSize();
 	}
 
-	TRACE("  bit_rate %d, sample_rate %d, channels %d, block_align %d, "
+	TRACE("  bit_rate %" PRId64 ", sample_rate %d, channels %d, block_align %d, "
 		"extradata_size %d\n",
 		fCodecContext->bit_rate,
 		fCodecContext->sample_rate,
-		fCodecContext->channels,
+		fCodecContext->ch_layout.nb_channels,
 		fCodecContext->block_align,
 		fCodecContext->extradata_size);
 }
@@ -1278,8 +1278,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 			send_error = avcodec_send_packet(fCodecContext, fTempPacket);
 			if (send_error < 0 && send_error != AVERROR(EAGAIN)) {
-				TRACE("[v] AVCodecDecoder: ignoring error in decoding frame "
-				"%lld: %d\n", fFrame, error);
+				TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %" B_PRId64 ": %d\n",
+					fFrame, error);
 			}
 
 			// Packet is consumed, clear it
@@ -1288,8 +1288,8 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 
 			error = avcodec_receive_frame(fCodecContext, fRawDecodedPicture);
 			if (error != 0 && error != AVERROR(EAGAIN)) {
-				TRACE("[v] frame %lld - decoding error, error code: %d, "
-					"chunk size: %ld\n", fFrame, error, fChunkBufferSize);
+				TRACE("[v] frame %" B_PRId64 " decoding error: error code: %d, chunk size: %ld\n",
+					fFrame, error, fChunkBufferSize);
 			}
 
 		} while (error != 0);
@@ -1597,7 +1597,7 @@ AVCodecDecoder::_UpdateMediaHeaderForVideoFrame()
 	av_ts_make_time_string(timestamp,
 		fRawDecodedPicture->best_effort_timestamp, &fCodecContext->time_base);
 
-	TRACE("[v] start_time=%s field_sequence=%lu\n",
+	TRACE("[v] start_time=%s field_sequence=%" B_PRIu32 "\n",
 		timestamp, fHeader.u.raw_video.field_sequence);
 }
 
