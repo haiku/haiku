@@ -556,18 +556,32 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		= fHeader.u.raw_video.pixel_width_aspect;
 	inOutFormat->u.raw_video.pixel_height_aspect
 		= fHeader.u.raw_video.pixel_height_aspect;
-	// The framerate in fCodecContext is set to 0 if the codec doesn't know the framerate. Some
-	// codecs work only at a fixed framerate, while others allow each frame to have its owm
-	// timestamp. For example a stream may switch from 50 to 60Hz, depending on how it was
-	// constructed. In that case, it's fine to leave the field_rate as 0 as well, the media kit
-	// will handle that just fine as long as each frame comes with a correct presentation timestamp.
-	// In fact, it seems better to not set the field_rate at all, rather than set it to a wrong
-	// value.
+	// The framerate in fCodecContext is not always equivalent to the field rate. Instead it can
+	// be some internal value of the codec, for example mpeg4 uses a framerate of 90000 and then
+	// the video frames have timestamps that are several hundred values apart. This allows for
+	// example mixing 50 and 60Hz video in the same stream.
+	//
+	// Normally in ffmepg, one would use av_guess_frame_rate to compute this, but we can't do this
+	// here because we don't have direct access to the AVFormatContext nor the AVStream (in our
+	// architecture these are only available in the AVFormatReader class). So we provide a similar
+	// implementation here, trying to guess from the input format properties and the info for the
+	// first frame which we just decoded (that updates fCodecContext inside ffmpeg).
+	//
+	// If we don't know, the field can also be set to 0, and we will still provide correct
+	// presentation timestamps for each individual frame.
 	//
 	// TODO The field_rate is twice the frame rate for interlaced streams, so we need to determine
 	// if we are decoding an interlaced stream, and wether ffmpeg delivers every half-frame or not
 	// in that case (since we let ffmpeg do the deinterlacing).
-	inOutFormat->u.raw_video.field_rate = av_q2d(fCodecContext->framerate);
+	float fromFormat = fInputFormat.u.encoded_video.output.field_rate;
+	if (fromFormat < 70)
+		inOutFormat->u.raw_video.field_rate = fromFormat;
+	// See if the codec knows better (adapted from av_guess_frame_rate in ffmpeg)
+	AVRational codec_fr = fCodecContext->framerate;
+	if (codec_fr.num > 0 && codec_fr.den > 0
+		&& (fromFormat == 0 || av_q2d(codec_fr) < fromFormat * 0.7)) {
+		inOutFormat->u.raw_video.field_rate = av_q2d(fCodecContext->framerate);
+	}
 	inOutFormat->u.raw_video.display.format = fOutputColorSpace;
 	inOutFormat->u.raw_video.display.line_width
 		= fHeader.u.raw_video.display_line_width;
