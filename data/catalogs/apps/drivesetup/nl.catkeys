@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	2150010803
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Wissen (niet geïmplementeerd)
 The currently selected partition does not have a parent partition.	MainWindow		De nu geselecteerde partitie heeft geen bovenliggende partitie.
 Validation of the given initialization parameters failed.	MainWindow		Natrekken van de opgegeven initialisatieparameters is mislukt.
-Not formatted (%s)	PartitionList		Niet geformatteerd (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Het maken van de partitie is mislukt. Er zijn geen wijzigingen naar de schijf geschreven.
 Shared	PartitionList		Gedeeld
 MIMEs	PartitionList		MIMEs

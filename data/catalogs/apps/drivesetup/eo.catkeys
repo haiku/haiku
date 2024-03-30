@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DriveSetup	4048496535
+1	esperanto	x-vnd.Haiku-DriveSetup	547170618
 Could not unmount partition %s.	MainWindow		Ne sukcesis demeti subdiskon %s.
 Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
@@ -50,7 +50,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Viŝi (ne estas realigita)
 The currently selected partition does not have a parent partition.	MainWindow		La nuntempe elektita subdisko ne havas patran subdiskon.
 Validation of the given initialization parameters failed.	MainWindow		Validigo de la donitaj pravalorizadaj parametroj malsukcesis.
-Not formatted (%s)	PartitionList		Ne strukturita (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Malsukcesis krei la subdiskon. Neniu ŝanĝo estas konservita al disko.
 Shared	PartitionList		Komuna
 MIMEs	PartitionList		MIME-oj

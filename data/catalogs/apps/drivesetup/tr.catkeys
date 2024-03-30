@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	2150010803
+1	turkish	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		%s bölüntüsü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
 The currently selected partition does not have a parent partition.	MainWindow		Şu an seçili olan bölüntüde bir ana disk bölüntüsü yok.
 Validation of the given initialization parameters failed.	MainWindow		Verilen ilklendirme parametrelerinin doğrulanması başarısız oldu.
-Not formatted (%s)	PartitionList		Biçimlendirilmemiş (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Bölüntü oluşturulamadı. Diske herhangi bir değişiklik yazılmadı.
 Shared	PartitionList		Paylaşılan
 MIMEs	PartitionList		MIME’ler

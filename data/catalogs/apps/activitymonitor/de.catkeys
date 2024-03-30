@@ -1,15 +1,14 @@
-1	german	x-vnd.Haiku-ActivityMonitor	2310072434
+1	german	x-vnd.Haiku-ActivityMonitor	2803083455
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaphoren
 TX	DataSource	Shorter version for Sending	Senden
 Block cache memory	DataSource		Block-Cache-Speicher
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Media-Nodes
 Text clipboard	DataSource		Text-Ablage
 Network send	DataSource		Netzwerk senden
-Running applications	DataSource		Laufende Anwendungen
 Cache	DataSource		Cache
+Running applications	DataSource		Laufende Anwendungen
 CPU usage (combined)	DataSource		CPU-Auslastung (alle)
 Threads	DataSource		Threads
 Receiving	DataSource		Empfangen
@@ -28,7 +27,6 @@ Quit	ActivityWindow		Beenden
 Raw clipboard	DataSource		Raw-Ablage
 Settings	ActivityWindow		Einstellungen
 Used memory	DataSource		Benutzter Speicher
-%.1f faults/s	DataSource		%.1f Fehler/s
 Show legend	ActivityView		Legende anzeigen
 Cached memory	DataSource		Gecachter Speicher
 CPU %d usage	DataSource		CPU %d Auslastung
@@ -36,11 +34,10 @@ CPU %d speed	DataSource		CPU %d Takt
 File	ActivityWindow		Datei
 Ports	DataSource		Ports
 Page faults	DataSource		Seitenfehler
-Apps	DataSource		Apps
 Additional items	ActivityView		Zusätzliche Elemente
+Apps	DataSource		Apps
 Add graph	ActivityWindow		Graphen hinzufügen
 Sending	DataSource		Senden
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Immer im Vordergrund
 Swap	DataSource		Auslagerung
 %lld sec.	SettingsWindow		%lld Sek.

@@ -1,15 +1,14 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	826097672
+1	swedish	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Processer
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blockcacheminne
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Medianoder
 Text clipboard	DataSource		Urklipp text
 Network send	DataSource		Nätverkssändning
-Running applications	DataSource		Aktiva program
 Cache	DataSource		Buffert
+Running applications	DataSource		Aktiva program
 CPU usage (combined)	DataSource		CPU användning (kombinerad)
 Threads	DataSource		Trådar
 Receiving	DataSource		Tar emot
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Avsluta
 Raw clipboard	DataSource		Urklipp rådata
 Settings	ActivityWindow		Inställningar
 Used memory	DataSource		Minnesanvändning
-%.1f faults/s	DataSource		%.1f fel/s
 Show legend	ActivityView		Visa graftext
 Cached memory	DataSource		Buffertminne
 CPU %d usage	DataSource		CPU %d användande
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		CPU %d hastighet
 File	ActivityWindow		Arkiv
 Ports	DataSource		Portar
 Page faults	DataSource		Sidfel
-Apps	DataSource		Program
 Additional items	ActivityView		Ytterligare mätvärden
+Apps	DataSource		Program
 Add graph	ActivityWindow		Lägg till graf
 Sending	DataSource		Skickar
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Alltid överst
 Swap	DataSource		Växling
 %lld sec.	SettingsWindow		%lld sek.

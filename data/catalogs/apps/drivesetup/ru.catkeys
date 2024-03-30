@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	2150010803
+1	russian	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Форматировать (ещё не реализовано)
 The currently selected partition does not have a parent partition.	MainWindow		Выбранный раздел не имеет родительского раздела.
 Validation of the given initialization parameters failed.	MainWindow		Не удалось применить параметры, введённые при инициализации.
-Not formatted (%s)	PartitionList		Не инициализирован (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Не удалось создать раздел. Изменения не были записаны на диск.
 Shared	PartitionList		Разделяемый
 MIMEs	PartitionList		MIME типы

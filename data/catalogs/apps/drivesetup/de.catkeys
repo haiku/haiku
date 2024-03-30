@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	1508610435
+1	german	x-vnd.Haiku-DriveSetup	2302251814
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -50,7 +50,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
-Not formatted (%s)	PartitionList		Nicht formatiert (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Die Partition konnte nicht angelegt werden. Es wurden keine Änderungen auf den Datenträger geschrieben.
 Shared	PartitionList		Netzwerk
 MIMEs	PartitionList		MIMEs

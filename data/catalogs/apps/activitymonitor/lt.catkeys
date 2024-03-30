@@ -1,14 +1,13 @@
-1	lithuanian	x-vnd.Haiku-ActivityMonitor	3098384095
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	3591395116
 Teams	DataSource		Procesų grupės
 Semaphores	DataSource		Semaforai
 TX	DataSource	Shorter version for Sending	Išs.
 Block cache memory	DataSource		Blokinio podėlio atmintis
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Text clipboard	DataSource		Tekstas iškarpinėje
 Network send	DataSource		Išsiunčiami duomenys
-Running applications	DataSource		Veikiančios programos
 Cache	DataSource		Podėlis
+Running applications	DataSource		Veikiančios programos
 CPU usage (combined)	DataSource		Centrinio procesoriaus apkrova (kompleksinė)
 Threads	DataSource		Gijos
 Receiving	DataSource		Atsiuntimas
@@ -26,17 +25,15 @@ Quit	ActivityWindow		Baigti darbą
 Raw clipboard	DataSource		Iškarpinės apimtis
 Settings	ActivityWindow		Nuostatos
 Used memory	DataSource		Naudojama atmintis
-%.1f faults/s	DataSource		%.1f klaidų/s
 Show legend	ActivityView		Rodyti legendą
 Cached memory	DataSource		Atmintis podėlyje
 File	ActivityWindow		Failas
 Ports	DataSource		Prievadai
 Page faults	DataSource		Puslapiavimo klaidos
-Apps	DataSource		Programos
 Additional items	ActivityView		Papildomi elementai
+Apps	DataSource		Programos
 Add graph	ActivityWindow		Pridėti grafiką
 Sending	DataSource		Išsiuntimas
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Visada viršuje
 Swap	DataSource		Sukeitimų failas
 %lld sec.	SettingsWindow		%lld sek.

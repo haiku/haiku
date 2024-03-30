@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-RTFTranslator	334451110
 Version %d.%d.%d, %s	ConfigView		Sürüm %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF metin dosyaları
-RTF-Translator Settings	ConfigView		RTF-Translator Ayarları
+RTF-Translator Settings	ConfigView		RTF Çevirmeni Ayarları
 Rich Text Format (RTF) translator	ConfigView		Zengin Metin Biçimi (RTF) çevirmeni
 RTF Settings	main		RTF Ayarları
 RichTextFormat file	RTFTranslator		RichTextFormat dosyası

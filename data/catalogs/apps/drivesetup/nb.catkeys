@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2150010803
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Slett data (ikke implementert)
 The currently selected partition does not have a parent partition.	MainWindow		Den valgte partisjonen har ingen forelderpartisjon.
 Validation of the given initialization parameters failed.	MainWindow		Mislykket validering av de oppgitte initialiseringsparametrene.
-Not formatted (%s)	PartitionList		Ikke formatert (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke opprette partisjonen. Ingen endringer er skrevet til disken.
 Shared	PartitionList		Delt
 MIMEs	PartitionList		MIMEr

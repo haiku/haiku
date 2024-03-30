@@ -17,6 +17,6 @@ Read greyscale images as RGB32	JPEGTranslator		Gri tonlu görselleri RGB32 olara
 Output quality	JPEGTranslator		Çıkış kalitesi
 Low	JPEGTranslator		Düşük
 Write	JPEGTranslator		Yazma
-Prevent colors 'washing out'	JPEGTranslator		Renklerin ‘solmasını’ önle
+Prevent colors 'washing out'	JPEGTranslator		Renklerin “solmasını” önle
 JPEG Library Warning: %s\n	be_jerror		JPEG Kitaplık Uyarısı: %s\n
 JPEG images	JPEGTranslator		JPEG görselleri

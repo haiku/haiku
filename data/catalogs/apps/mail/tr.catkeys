@@ -87,7 +87,7 @@ Auto signature:	Mail		Hep eklenecek imza:
 Same subject	Mail		Aynı konu
 Send	Mail		Gönder
 Open draft	Mail		Taslağı aç
-Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	‘Yeni’ olarak bırak
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	“Yeni” olarak bırak
 Random	Mail		Rastgele
 Attach attributes:	Mail		Öznitelik ekle:
 Find again	Mail		Yeniden bul
@@ -112,7 +112,7 @@ Mail settings	Mail		Posta ayarları
 Check spelling	Mail		Yazımı denetle
 Status:	Mail		Durum:
 Redo	Mail		Yinele
-Leave as '%s'	Mail		‘%s’ olarak bırak
+Leave as '%s'	Mail		“%s” olarak bırak
 Print…	Mail		Yazdır…
 Settings…	Mail		Ayarlar…
 Warn unencodable:	Mail		Kodlanamayanları uyar:

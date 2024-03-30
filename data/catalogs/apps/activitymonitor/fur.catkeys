@@ -1,15 +1,14 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	826097672
+1	friulian	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Teams
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Memorie cache a blocs
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Grops multimediâi
 Text clipboard	DataSource		Notis di test
 Network send	DataSource		Rêt (inviament)
-Running applications	DataSource		Aplicazions in esecuzion
 Cache	DataSource		Cache
+Running applications	DataSource		Aplicazions in esecuzion
 CPU usage (combined)	DataSource		CPU doprade (cumbinât)
 Threads	DataSource		Thread
 Receiving	DataSource		Ricezion
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Jes
 Raw clipboard	DataSource		Notis gresis
 Settings	ActivityWindow		Impostazions
 Used memory	DataSource		Memorie doprade
-%.1f faults/s	DataSource		%.1f erôrs/s
 Show legend	ActivityView		Mostre liende
 Cached memory	DataSource		Memorie cache
 CPU %d usage	DataSource		CPU %d doprade
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Velocitât CPU %d
 File	ActivityWindow		File
 Ports	DataSource		Puartis
 Page faults	DataSource		Erôrs di pagjine
-Apps	DataSource		Aplicazions
 Additional items	ActivityView		Elements adizionâi
+Apps	DataSource		Aplicazions
 Add graph	ActivityWindow		Zonte grafic
 Sending	DataSource		Inviament
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Simpri denant
 Swap	DataSource		Mem. di scambi
 %lld sec.	SettingsWindow		%lld sec.

@@ -1,15 +1,14 @@
-1	belarusian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	belarusian	x-vnd.Haiku-ActivityMonitor	4165509559
 Teams	DataSource		Групы
 Semaphores	DataSource		Семафоры
 TX	DataSource	Shorter version for Sending	Адпр.
 Block cache memory	DataSource		Памяць блокавага кэшу
 %lld ms	SettingsWindow		%lld м.сек
-MiB	DataSource		МіБ
 Media nodes	DataSource		Медыя узлы
 Text clipboard	DataSource		Тэкставы буфер
 Network send	DataSource		Адпраўка па сетцы
-Running applications	DataSource		Запушчаныя праграмы
 Cache	DataSource		Кэш
+Running applications	DataSource		Запушчаныя праграмы
 CPU usage (combined)	DataSource		Выкарыстанне ЦП (камбінавана)
 Threads	DataSource		Патокі
 Receiving	DataSource		Атрыманне
@@ -27,17 +26,15 @@ Quit	ActivityWindow		Выйсці
 Raw clipboard	DataSource		Агульны буфер
 Settings	ActivityWindow		Наладкі
 Used memory	DataSource		Ужытая памяць
-%.1f faults/s	DataSource		%.1f памылак/сек
 Show legend	ActivityView		Паказаць легенду
 Cached memory	DataSource		Кэшаваная памяць
 File	ActivityWindow		Файл
 Ports	DataSource		Парты
 Page faults	DataSource		Памылкі старонак памяці
-Apps	DataSource		Праграмы
 Additional items	ActivityView		Дадатковыя элементы
+Apps	DataSource		Праграмы
 Add graph	ActivityWindow		Дадаць графік
 Sending	DataSource		Адпраўка
-%.1f MiB	DataSource		%.1f МБ
 Always on top	ActivityWindow		Заўсёды наверсе
 Swap	DataSource		Своп
 %lld sec.	SettingsWindow		%lld сек.

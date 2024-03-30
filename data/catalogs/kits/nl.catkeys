@@ -1,6 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libbe	2914417806
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
-%.2f TiB/s	StringForRate		%.2f TiB/s
+1	dutch; flemish	x-vnd.Haiku-libbe	535088175
 All Rights Reserved.	AboutWindow		Alle rechten voorbehouden.
 gold master	AboutWindow		gold master
 Undo	TextView		Ongedaan maken
@@ -8,42 +6,36 @@ OK	PrintJob		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		in ontwikkeling
 OK	Dragger		OK
-%3.2f GiB/s	StringForRate		%3.2f GiB/s
 Print Server is not responding.	PrintJob		Print Server antwoordt niet.
 About %app%	AboutMenuItem		Over %app%
 Warning	Dragger		Waarschuwing
 Green:	ColorControl		Groen:
-%3.2f KiB/s	StringForRate		%3.2f KiB/s
 Redo	TextView		Opnieuw
 No pages to print!	PrintJob		Geen pagina's om af te drukken!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Knippen
-%3.2f GiB	StringForSize		%3.2f GiB
 Default	Default decorator about box		Standaard
 Can't delete this replicant from its original application. Life goes on.	Dragger		De replica van de originele applicatie kan niet verwijderd worden. Het leven gaat voort.
 Error	ZombieReplicantView		Fout
 Paste	TextView		Plakken
 OK	AboutWindow		OK
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/s} other{# bytes/s}}
 Special Thanks:	AboutWindow		Speciale dank aan:
 Default Haiku window decorator.	Default decorator about box		Standaard Haiku venster decoratie.
-%.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Replica verwijderen
 Version	AboutWindow		Versie
 Red:	ColorControl		Rood:
 <empty>	Menu		<leeg>
 Copy	TextView		Kopiëren
 Select all	TextView		Alles selecteren
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alpha
-%3.2f MiB	StringForSize		%3.2f MiB
-%3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Fout
 About %app%	AboutWindow		Over %app%
 About %app…	Dragger		Over %app...
 Version history:	AboutWindow		Versiegeschiedenis:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		De applicatie voor de replica kan niet gelocaliseerd worden. Er is geen applicatiehandtekening gegeven.\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Blauw:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kan de replica voor \"%description\" niet maken.\n%error
 Written by:	AboutWindow		Door:

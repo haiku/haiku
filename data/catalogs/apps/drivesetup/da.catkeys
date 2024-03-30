@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	2150010803
+1	danish	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere diskafsnit %s.
 Mount all	MainWindow		Montér alle
 Disk	MainWindow		Disk
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Stryg (ikke implementeret)
 The currently selected partition does not have a parent partition.	MainWindow		Det valgte diskafsnit har ikke nogen forælderdiskafsnit.
 Validation of the given initialization parameters failed.	MainWindow		Validering af de angivne initialiseringsparametre mislykkedes.
-Not formatted (%s)	PartitionList		Ikke formateret (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Kunne ikke oprette diskafsnittet. Der er ikke blevet skrevet nogle ændringer til disken.
 Shared	PartitionList		Delt
 MIMEs	PartitionList		MIME'er

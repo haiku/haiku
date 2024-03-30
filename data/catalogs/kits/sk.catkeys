@@ -1,5 +1,4 @@
-1	slovak	x-vnd.Haiku-libbe	3337473349
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
+1	slovak	x-vnd.Haiku-libbe	1887867096
 All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
 gold master	AboutWindow		gold master
 Undo	TextView		Späť
@@ -16,27 +15,24 @@ No pages to print!	PrintJob		Nie je čo tlačiť!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Vystrihnúť
-%3.2f GiB	StringForSize		%3.2f GiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nemožno zmazať tohto replikanta z jeho pôvodnej aplikácie. C'est la vie.
 Error	ZombieReplicantView		Chyba
 Paste	TextView		Vložiť
 OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Zvláštne poďakovanie:
-%.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Odstrániť replikanta
 Version	AboutWindow		Verzia
 Red:	ColorControl		Červená:
 <empty>	Menu		<prázdne>
 Copy	TextView		Kopírovať
 Select all	TextView		Vybrať všetko
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
 alpha	AboutWindow		alfa
-%3.2f MiB	StringForSize		%3.2f MiB
 Error	PrintJob		Chyba
 About %app%	AboutWindow		O aplikácii %app%
 About %app…	Dragger		O aplikácii %app…
 Version history:	AboutWindow		História verzií:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Modrá:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nemožno vytvoriť replikanta pre „%description“.\n%error
 Written by:	AboutWindow		Napísal:

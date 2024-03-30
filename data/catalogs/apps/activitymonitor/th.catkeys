@@ -1,15 +1,14 @@
-1	thai	x-vnd.Haiku-ActivityMonitor	2601047281
+1	thai	x-vnd.Haiku-ActivityMonitor	3094058302
 Teams	DataSource		ทีม
 Semaphores	DataSource		การให้สัญญาณ
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		บล็อกหน่วยความจำแคช
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		โหนดสื่อ
 Text clipboard	DataSource		คลิปบอร์ดข้อความ
 Network send	DataSource		เครือข่ายส่ง
-Running applications	DataSource		แอพที่กำลังทำงาน
 Cache	DataSource		แคช
+Running applications	DataSource		แอพที่กำลังทำงาน
 CPU usage (combined)	DataSource		การใช้งาน CPU (รวมกัน)
 Threads	DataSource		Threads
 Receiving	DataSource		ได้รับ
@@ -28,18 +27,16 @@ Quit	ActivityWindow		หยุด
 Raw clipboard	DataSource		คลิปบอร์ดต้นฉบับ
 Settings	ActivityWindow		การตั้งค่า
 Used memory	DataSource		หน่วยความจำที่ใช้
-%.1f faults/s	DataSource		%.1f faults/s
 Show legend	ActivityView		แสดงคำอธิบาย
 Cached memory	DataSource		หน่วยความจำแคช
 CPU %d usage	DataSource		การใช้งาน CPU %d
 File	ActivityWindow		ไฟล์
 Ports	DataSource		พอร์ท
 Page faults	DataSource		ความผิดพลาดของหน้า
-Apps	DataSource		แอพส์
 Additional items	ActivityView		รายการเพิ่มเติม
+Apps	DataSource		แอพส์
 Add graph	ActivityWindow		เพิ่มกราฟ
 Sending	DataSource		ส่ง
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		อยู่ด้านบนเสมอ
 Swap	DataSource		สลับ
 %lld sec.	SettingsWindow		%lld sec.

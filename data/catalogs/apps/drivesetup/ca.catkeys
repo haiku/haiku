@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	2150010803
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Esborra (no implementat)
 The currently selected partition does not have a parent partition.	MainWindow		La partició seleccionada actualment no té una partició superior.
 Validation of the given initialization parameters failed.	MainWindow		Ha fallat validar els paràmetres d'iniciació indicats.
-Not formatted (%s)	PartitionList		Sense formatar (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Ha fallat crear la partició. No s'ha escrit cap canvi al disc.
 Shared	PartitionList		Compartida
 MIMEs	PartitionList		MIMEs

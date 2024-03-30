@@ -1,15 +1,14 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	826097672
+1	turkish	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Takımlar
 Semaphores	DataSource		Semaforlar
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blok önbellek dosyası
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Ortam düğümleri
 Text clipboard	DataSource		Metin panosu
 Network send	DataSource		Ağ giden trafik
-Running applications	DataSource		Çalışan uygulamalar
 Cache	DataSource		Önbellek
+Running applications	DataSource		Çalışan uygulamalar
 CPU usage (combined)	DataSource		CPU kullanımı (birleştirilmiş)
 Threads	DataSource		İş parçacıkları
 Receiving	DataSource		Alınıyor
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Çık
 Raw clipboard	DataSource		Ham pano
 Settings	ActivityWindow		Ayarlar
 Used memory	DataSource		Kullanılan bellek
-%.1f faults/s	DataSource		%.1f hata/sn
 Show legend	ActivityView		Göstergeleri aç
 Cached memory	DataSource		Önbellekteki dosya
 CPU %d usage	DataSource		%d. CPU kullanımı
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		%d. CPU hızı
 File	ActivityWindow		Dosya
 Ports	DataSource		Kapılar
 Page faults	DataSource		Sayfa hatası
-Apps	DataSource		Uygulamalar
 Additional items	ActivityView		Ek ögeler
+Apps	DataSource		Uygulamalar
 Add graph	ActivityWindow		Grafik ekle
 Sending	DataSource		Gönderiliyor
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Her zaman üstte
 Swap	DataSource		Takas
 %lld sec.	SettingsWindow		%lld san.

@@ -1,6 +1,4 @@
-1	turkish	x-vnd.Haiku-libbe	2914417806
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bayt} other{# bayt}}
-%.2f TiB/s	StringForRate		%.2f TiB/sn
+1	turkish	x-vnd.Haiku-libbe	535088175
 All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
 gold master	AboutWindow		altın kopya
 Undo	TextView		Geri al
@@ -8,42 +6,36 @@ OK	PrintJob		Tamam
 gamma	AboutWindow		gama
 development	AboutWindow		geliştirme
 OK	Dragger		Tamam
-%3.2f GiB/s	StringForRate		%3.2f GiB/sn
 Print Server is not responding.	PrintJob		Yazdırma sunucusu yanıt vermiyor.
 About %app%	AboutMenuItem		%app% hakkında
 Warning	Dragger		Uyarı
 Green:	ColorControl		Yeşil:
-%3.2f KiB/s	StringForRate		%3.2f KiB/sn
 Redo	TextView		Yinele
 No pages to print!	PrintJob		Yazdırılacak bir sayfa yok!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		Tamam
 Cut	TextView		Kes
-%3.2f GiB	StringForSize		%3.2f GiB
 Default	Default decorator about box		Saptanmış
 Can't delete this replicant from its original application. Life goes on.	Dragger		Bu yinelenen kendi özgün uygulamasından silinemiyor.
 Error	ZombieReplicantView		Hata
 Paste	TextView		Yapıştır
 OK	AboutWindow		Tamam
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# bayt/sn} other{# bayt/sn}}
 Special Thanks:	AboutWindow		Özel teşekkürlerimizle:
 Default Haiku window decorator.	Default decorator about box		Saptanmış Haiku pencere dekorcusu.
-%.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Yineleneni kaldır
 Version	AboutWindow		Sürüm
 Red:	ColorControl		Kırmızı:
 <empty>	Menu		<boş>
 Copy	TextView		Kopyala
 Select all	TextView		Tümünü seç
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# bayt} other{# bayt}}
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# bayt/sn} other{# bayt/sn}}
 alpha	AboutWindow		alfa
-%3.2f MiB	StringForSize		%3.2f MiB
-%3.2f MiB/s	StringForRate		%3.2f MiB/sn
 Error	PrintJob		Hata
 About %app%	AboutWindow		%app% hakkında
 About %app…	Dragger		%app hakkında…
 Version history:	AboutWindow		Sürüm geçmişi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenen uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Mavi:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		‘%description’ için yinelenen oluşturulamıyor.\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		“%description” için yinelenen oluşturulamıyor.\n%error
 Written by:	AboutWindow		Yazan:

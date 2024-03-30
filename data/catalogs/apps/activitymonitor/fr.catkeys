@@ -1,15 +1,14 @@
-1	french	x-vnd.Haiku-ActivityMonitor	826097672
+1	french	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Processus
 Semaphores	DataSource		Sémaphores
 TX	DataSource	Shorter version for Sending	Tx
 Block cache memory	DataSource		Mémoire cache de blocs
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		Mio
 Media nodes	DataSource		Nœuds média
 Text clipboard	DataSource		Presse-papier texte
 Network send	DataSource		Émission réseau
-Running applications	DataSource		Applications en cours
 Cache	DataSource		Cache
+Running applications	DataSource		Applications en cours
 CPU usage (combined)	DataSource		Activité CPU (combinée)
 Threads	DataSource		Tâches
 Receiving	DataSource		Réception
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Quitter
 Raw clipboard	DataSource		Presse-papier brut
 Settings	ActivityWindow		Réglages
 Used memory	DataSource		Mémoire utilisée
-%.1f faults/s	DataSource		%.1f fautes/s
 Show legend	ActivityView		Afficher la légende
 Cached memory	DataSource		Mémoire cache
 CPU %d usage	DataSource		Charge du CPU %d
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Fréquence CPU %d
 File	ActivityWindow		Fichier
 Ports	DataSource		Ports
 Page faults	DataSource		Fautes de pages
-Apps	DataSource		Applis
 Additional items	ActivityView		Éléments supplémentaires
+Apps	DataSource		Applis
 Add graph	ActivityWindow		Ajouter un graphe
 Sending	DataSource		Émission
-%.1f MiB	DataSource		%.1f Mio
 Always on top	ActivityWindow		Toujours au-dessus
 Swap	DataSource		Échange
 %lld sec.	SettingsWindow		%lld sec.

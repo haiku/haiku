@@ -14,13 +14,13 @@ Communications	DeviceSCSI		İletişim
 Mass storage controller	Device		Yığın depolama denetleyicisi
 Connection	DevicesView		Bağlantı
 Printer	DeviceSCSI		Yazıcı
-ACPI Processor Namespace '%2'	DeviceACPI		ACPI işlemci ad alanı ‘%2’
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI işlemci ad alanı “%2”
 Manufacturer	Device		Üretici
 Scanner	DeviceSCSI		Tarayıcı
 Memory controller	Device		Bellek denetleyicisi
 Unknown device	DevicesView		Bilinmeyen aygıt
 Unknown	DevicePCI		Bilinmeyen
-ACPI node '%1'	DeviceACPI		‘%1’ ACPI düğümü
+ACPI node '%1'	DeviceACPI		ACPI düğümü “%1”
 Optical Drive	DeviceSCSI		Optik sürücü
 Name	PropertyList		Ad
 Manufacturer	DeviceSCSI		Üretici
@@ -47,7 +47,7 @@ Devices	DevicesView		Aygıtlar
 Device name	DeviceACPI		Aygıt adı
 Card Reader	DeviceSCSI		Kart okuyucusu
 Display controller	Device		Görüntü denetleyicisi
-ACPI Button '%1'	DeviceACPI		ACPI düğmesi ‘%1’
+ACPI Button '%1'	DeviceACPI		ACPI düğmesi “%1”
 ACPI <unknown>	DeviceACPI		ACPI <bilinmiyor>
 Device name	DevicePCI		Aygıt adı
 Disk Drive	DeviceSCSI		Disk sürücüsü

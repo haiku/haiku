@@ -18,7 +18,7 @@ Attribute name:	Attribute Window		Öznitelik adı:
 Long description:	Application Type Window		Uzun açıklama:
 Cancel	Preferred App Menu		Vazgeç
 Remove	FileTypes Window		Kaldır
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		‘%s’ uygulaması bu dosya türünü desteklemiyor.\nYine de ayarlamak istiyor musunuz?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		“%s” uygulaması bu dosya türünü desteklemiyor.\nYine de ayarlamak istiyor musunuz?
 Remove	Application Type Window		Kaldır
 Gamma	Application Type Window		Gama
 Cancel	Application Type Window		Vazgeç
@@ -55,7 +55,7 @@ Time	Attribute ListView		Zaman
 Extensions:	FileTypes Window		Uzantılar:
 Select preferred application	FileType Window		Tercih edilen uygulamayı seç
 Description:	FileTypes Window		Açıklama:
-Multiple files from \"%s\" file type	FileType Window		‘%s’ dosya türünden birden çok dosya
+Multiple files from \"%s\" file type	FileType Window		“%s” dosya türünden birden çok dosya
 Add new group	New File Type Window		Yeni grup ekle
 Remove uninstalled	Application Types Window		Silinenleri kaldır
 File	Application Type Window		Dosya
@@ -75,7 +75,7 @@ Rating	Attribute ListView		Derecelendirme
 duration	Attribute ListView		uzunluk
 File could not be opened	Preferred App Menu		Dosya açılamadı
 Args only	Application Type Window		Yalnızca değişkenler
-Could not open \"%s\":\n%s	FileTypes		‘%s’ açılamadı:\n%s
+Could not open \"%s\":\n%s	FileTypes		“%s” açılamadı:\n%s
 Right	Attribute Window	Attribute column alignment in Tracker	Sağ
 Save changes before closing?	Application Type Window		Kapatmadan önce değişiklikler kaydedilsin mi?
 Background app	Application Type Window		Arka plan uygulaması

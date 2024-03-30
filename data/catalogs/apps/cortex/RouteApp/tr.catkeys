@@ -1,19 +1,19 @@
 1	turkish	application/x-vnd.Cortex.Route	25925955
-Node '%name%' released	CortexRouteApp		‘%name%’ düğümü salındı
+Node '%name%' released	CortexRouteApp		“%name%” düğümü salındı
 OK	CortexRouteApp		Tamam
 About Cortex/Route…	CortexRouteApp		Cortex/Route hakkında…
 File	CortexRouteApp		Dosya
-Connection '%name%' made	CortexRouteApp		‘%name%’ bağlantısı yapıldı
+Connection '%name%' made	CortexRouteApp		“%name%” bağlantısı yapıldı
 Save nodes…	CortexRouteApp		Düğümleri kaydet…
 %producer% and %consumer%	CortexRouteApp		%producer% ve %consumer%
-Node '%name%' created	CortexRouteApp		‘%name%’ düğümü oluşturuldu
+Node '%name%' created	CortexRouteApp		“%name%” düğümü oluşturuldu
 Negotiated format:	CortexRouteApp		Pazarlanan biçim:
 Window	CortexRouteApp		Pencere
 Transport	CortexRouteApp		Ulaşım
 Connection broken	CortexRouteApp		Bağlantı kesildi
 Untitled group	CortexRouteApp		Adsız grup
 Connection failed	CortexRouteApp		Bağlantı başarısız oldu
-Connection '%name%' broken	CortexRouteApp		‘%name%’ bağlantısı kesildi
+Connection '%name%' broken	CortexRouteApp		“%name%” bağlantısı kesildi
 Between:	CortexRouteApp		Arasında:
 Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Aç…

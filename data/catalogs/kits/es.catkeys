@@ -1,6 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	2914417806
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
-%.2f TiB/s	StringForRate		%.2f TiB/s
+1	spanish; castilian	x-vnd.Haiku-libbe	535088175
 All Rights Reserved.	AboutWindow		Todos los derechos reservados.
 gold master	AboutWindow		maestro dorado
 Undo	TextView		Deshacer
@@ -8,42 +6,36 @@ OK	PrintJob		Aceptar
 gamma	AboutWindow		gama
 development	AboutWindow		desarrollo
 OK	Dragger		Aceptar
-%3.2f GiB/s	StringForRate		%3.2f GiB/s
 Print Server is not responding.	PrintJob		El servidor de impresión no responde.
 About %app%	AboutMenuItem		Acerca de %app%
 Warning	Dragger		Advertencia
 Green:	ColorControl		Verde:
-%3.2f KiB/s	StringForRate		%3.2f KiB/s
 Redo	TextView		Rehacer
 No pages to print!	PrintJob		¡Sin páginas para imprimir!
 beta	AboutWindow		beta
 OK	ZombieReplicantView		Aceptar
 Cut	TextView		Cortar
-%3.2f GiB	StringForSize		%3.2f GiB
 Default	Default decorator about box		Predeterminado
 Can't delete this replicant from its original application. Life goes on.	Dragger		No se puede borrar este replicante de su aplicación original. La vida sigue.
 Error	ZombieReplicantView		Error
 Paste	TextView		Pegar
 OK	AboutWindow		Aceptar
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/s} other{# bytes/s}}
 Special Thanks:	AboutWindow		Agradecimientos especiales:
 Default Haiku window decorator.	Default decorator about box		Decorador de ventana predeterminado de Haiku
-%.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Quitar replicante
 Version	AboutWindow		Versión
 Red:	ColorControl		Rojo:
 <empty>	Menu		<vacío>
 Copy	TextView		Copiar
 Select all	TextView		Seleccionar todo
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
-%3.2f MiB	StringForSize		%3.2f MiB
-%3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Error
 About %app%	AboutWindow		Acerca de %app%
 About %app…	Dragger		Acerca de %app…
 Version history:	AboutWindow		Historal de versión:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No se puede localizar la aplicación para el replicante. Ninguna firma de aplicación se proporcionó:\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Azul:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No se puede crear el replicante para \"%description\".\n%error
 Written by:	AboutWindow		Escrito por:

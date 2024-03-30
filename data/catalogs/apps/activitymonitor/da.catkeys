@@ -1,15 +1,14 @@
-1	danish	x-vnd.Haiku-ActivityMonitor	826097672
+1	danish	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Hold
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blokmellemlagershukommelse
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Medienoder
 Text clipboard	DataSource		Tekstudklipsholder
 Network send	DataSource		Netværkssending
-Running applications	DataSource		Kørende programmer
 Cache	DataSource		Mellemlager
+Running applications	DataSource		Kørende programmer
 CPU usage (combined)	DataSource		CPU-forbrug (samlet)
 Threads	DataSource		Tråde
 Receiving	DataSource		Modtager
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Afslut
 Raw clipboard	DataSource		Rå udklipsholder
 Settings	ActivityWindow		Indstillinger
 Used memory	DataSource		Brugt hukommelse
-%.1f faults/s	DataSource		%.1f fejl/s
 Show legend	ActivityView		Vis forklaring
 Cached memory	DataSource		Mellemlagerhukommelse
 CPU %d usage	DataSource		CPU %d forbrug
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		CPU %d hastighed
 File	ActivityWindow		Fil
 Ports	DataSource		Porte
 Page faults	DataSource		Sidefejl
-Apps	DataSource		Programmer
 Additional items	ActivityView		Yderligere elementer
+Apps	DataSource		Programmer
 Add graph	ActivityWindow		Tilføj graf
 Sending	DataSource		Sender
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Altid øverst
 Swap	DataSource		Swap
 %lld sec.	SettingsWindow		%lld sek.

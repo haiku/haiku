@@ -1,15 +1,14 @@
-1	indonesian	x-vnd.Haiku-ActivityMonitor	826097672
+1	indonesian	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Tim
 Semaphores	DataSource		Semaphore
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Memori cache blok
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Simpul media
 Text clipboard	DataSource		Teks clipboard
 Network send	DataSource		Jaringan mengirim
-Running applications	DataSource		Menjalankan aplikasi
 Cache	DataSource		Cache
+Running applications	DataSource		Menjalankan aplikasi
 CPU usage (combined)	DataSource		Penggunaan CPU (gabungan)
 Threads	DataSource		Benang
 Receiving	DataSource		Menerima
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Keluar
 Raw clipboard	DataSource		Clipboard mentah
 Settings	ActivityWindow		Pengaturan
 Used memory	DataSource		Memori yang digunakan
-%.1f faults/s	DataSource		%.1f kesalahan/s
 Show legend	ActivityView		Tampilkan legenda
 Cached memory	DataSource		Memori cache
 CPU %d usage	DataSource		Penggunaan CPU %d
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Kecepatan CPU %d
 File	ActivityWindow		Berkas
 Ports	DataSource		Ports
 Page faults	DataSource		Kesalahan halaman
-Apps	DataSource		Aplikasi
 Additional items	ActivityView		Barang tambahan
+Apps	DataSource		Aplikasi
 Add graph	ActivityWindow		Menambahkan grafis
 Sending	DataSource		Mengirim
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Selalu di atas
 Swap	DataSource		Swap
 %lld sec.	SettingsWindow		%lld detik.

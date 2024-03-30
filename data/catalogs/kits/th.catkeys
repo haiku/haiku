@@ -1,5 +1,4 @@
-1	thai	x-vnd.Haiku-libbe	3337473349
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} อื่นๆ{# bytes}}
+1	thai	x-vnd.Haiku-libbe	1887867096
 All Rights Reserved.	AboutWindow		สงวนลิขสิทธิ์
 gold master	AboutWindow		gold master
 Undo	TextView		เลิกทำ
@@ -16,27 +15,24 @@ No pages to print!	PrintJob		ไม่มีหน้าที่พิมพ์
 beta	AboutWindow		เบต้า
 OK	ZombieReplicantView		ตกลง
 Cut	TextView		ตัด
-%3.2f GiB	StringForSize		%3.2f GiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		ไม่สามารถลบสำเนานี้จากแอปพลิเคชันเดิม ชีวิตดำเนินต่อไป
 Error	ZombieReplicantView		ผิดพลาด
 Paste	TextView		วาง
 OK	AboutWindow		ตกลง
 Special Thanks:	AboutWindow		ขอขอบคุณเป็นพิเศษ:
-%.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		ลบ replicant
 Version	AboutWindow		เวอร์ชั่น
 Red:	ColorControl		แดง:
 <empty>	Menu		<empty>
 Copy	TextView		คัดลอก
 Select all	TextView		เลือกทั้งหมด
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} อื่นๆ{# bytes}}
 alpha	AboutWindow		อัลฟ่า
-%3.2f MiB	StringForSize		%3.2f MiB
 Error	PrintJob		ผิดพลาด
 About %app%	AboutWindow		เกี่ยวกับ %app%
 About %app…	Dragger		เกี่ยวกับ %app
 Version history:	AboutWindow		ประวัติเวอร์ชั่น:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		ไม่สามารถค้นหาแอปพลิเคชันสำหรับเรพลิเคชัน ไม่มีลายเซ็นของแอปพลิเคชันระบุ \n%error
-%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		ฟ้า:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		ไม่สามารถสร้าง replicant สำหรับ \"%description\".\n%error
 Written by:	AboutWindow		เขียนโดย:

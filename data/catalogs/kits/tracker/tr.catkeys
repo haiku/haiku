@@ -33,7 +33,7 @@ Size	QueryPoseView		Boyut
 Disk mount	TrackerSettingsWindow		Disk bağlama
 Type	AttributesView		Tür
 Prompt	FSUtils		Sor
-Error in regular expression:\n\n'%errstring'	PoseView		Düzenli ifadede hata:\n\n‘%errstring’
+Error in regular expression:\n\n'%errstring'	PoseView		Düzenli ifadede hata:\n\n“%errstring’
 Small bitmap icon	AttributesView		Küçük biteşlem simge
 Would you like to find a suitable application to open the file?	FSUtils		Bu dosyayı açmak için uygun bir uygulama bulmak ister misiniz?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Bir klasörü veya sembolik bağlantıyı bir dosya ile değiştiremezsiniz.
@@ -82,7 +82,7 @@ Modified	FindPanel		Değiştirilme
 Select all	QueryContainerWindow		Tümünü seç
 Generate image thumbnails	SettingsView		Küçük görseller üret
 Select…	FilePanelPriv		Seç…
-An item named '%filename%' already exists.	FSUtils		‘%filename%’ adlı bir öge halihazırda var.
+An item named '%filename%' already exists.	FSUtils		“%filename%” adlı bir öge halihazırda var.
 preferences	B_PREFERENCES_DIRECTORY		tercihler
 Name	Person Query Columns		Ad
 Skip all	FSUtils		Tümünü atla
@@ -171,7 +171,7 @@ From	Email Query Columns		Şuradan
 Invert selection	QueryContainerWindow		Seçimi tersine çevir
 Open selection with:	OpenWithWindow		Seçimi şununla aç:
 Preferences…	ContainerWindow		Tercihler…
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		“%document” açılamadı; çünkü ‘%app’ uygulaması çöpte. 
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		“%document” açılamadı; çünkü “%app” uygulaması çöpte. 
 Work Phone	Person Query Columns		İş telefonu
 Close	ContainerWindow		Kapat
 Get info	ContainerWindow		Bilgi al
@@ -233,7 +233,7 @@ Memory size	AttributesView		Bellek boyutu
 New folder	TemplatesMenu		Yeni klasör
  (broken)	InfoWindow		 (çalışmıyor)
 Replace all	FSUtils		Tümünü değiştir
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		‘%appname’ uygulaması açmak istediğiniz belge türünü desteklemiyor.\nSürdürmek istediğinizden emin misiniz?\n\nUygulamanın bu dosyayı açtığını biliyorsanız uygulama geliştiricisi ile iletişime geçip uygulamalarının bu dosya türünü desteklediğini belirtecek biçimde güncellemesi gerektiğini iletin.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		“%appname” uygulaması açmak istediğiniz belge türünü desteklemiyor.\nSürdürmek istediğinizden emin misiniz?\n\nUygulamanın bu dosyayı açtığını biliyorsanız uygulama geliştiricisi ile iletişime geçip uygulamalarının bu dosya türünü desteklediğini belirtecek biçimde güncellemesi gerektiğini iletin.
 Reverse order	ContainerWindow		Ters sıra
 Copying: 	StatusWindow		Kopyalanıyor: 
 Show navigator	SettingsView		Adres çubuğunu göster
@@ -264,7 +264,7 @@ Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Y
 Disk mounting during boot	AutoMounterSettings		Önyükleme sırasında bağlama
 Don't automount	AutoMounterSettings		Otomatik bağlama yok
 Node ref	AttributesView		Düğüm başvurusu
-Could not find application \"%appname\"	OpenWithWindow		‘%appname’ uygulaması bulunamıyor
+Could not find application \"%appname\"	OpenWithWindow		“%appname” uygulaması bulunamıyor
 Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
 Extended attribute	AttributesView		Genişletilmiş öznitelik
 Unmatched brackets.	libtracker		Eşleşmeyen köşeli parantezler.
@@ -326,7 +326,7 @@ MIME Path	AttributesView		MIME Yolu
 less than	FindPanel		daha az
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		“%name” dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%document”, ‘%app’ uygulaması ile açılamadı (%error). 
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%document”, “%app” uygulaması ile açılamadı (%error). 
 Create %s clipping	PoseView		%s kırpma oluştur
 Error moving \"%name\"	FSUtils		“%name” taşınırken hata
 To: %dir	StatusWindow		Konum: %dir
@@ -341,7 +341,7 @@ by attribute	FindPanel		öznitelik ile
 Write	FilePermissionsView		Yazma
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Ne yaptığımı biliyorum’a tıklayın.
 Save	FilePanelPriv		Kaydet
-Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		“%document”, ‘%app’ uygulaması ile açılamadı (Eksik kitaplıklar: %library). \n
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		“%document”, “%app” uygulaması ile açılamadı (Eksik kitaplıklar: %library). \n
 Finish: %time	StatusWindow		Bitiş: %time
 Messenger	AttributesView		Ulak
 after	FindPanel		sonra
@@ -401,7 +401,7 @@ Object	AttributesView		Nesne
 Paste	ContainerWindow		Yapıştır
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		“%name” adındaki bir öge bu klasörde hâlihazırda var ve aynı adlı ögeler\niçeriyor olabilir. Bu ögeleri %verb ögelerle değiştirmek ister misiniz?
 Cannot unmount the boot volume \"%name\".	FSUtils		“%name” önyükleme disk bölümünün bağlantısı kesilemez.
-Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		“%document”, ‘%app’ uygulaması ile açılamadı (Eksik sembol: %symbol).\n
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		“%document”, “%app” uygulaması ile açılamadı (Eksik sembol: %symbol).\n
 New folder	ContainerWindow		Yeni klasör
 Name	OpenWithWindow		Ad
 Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Bilgi al

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2150010803
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Δεν ήταν δυνατή η αποπροσάρτηση της κατάτμησης %s.
 Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Εκκαθάριση (δεν έχει ενσωματωθεί ακόμα)
 The currently selected partition does not have a parent partition.	MainWindow		Η τρέχουσα επιλεγμένη κατάτμηση δεν έχει κατάτμηση γονέα.
 Validation of the given initialization parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων αρχικοποίησης απέτυχε.
-Not formatted (%s)	PartitionList		Αμορφοποίητο (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Η δημιουργία τομής απέτυχε. Καμιά αλλαγή δεν πραγματοποιήθηκε στο δίσκο.
 Shared	PartitionList		Κοινόχρηστη
 MIMEs	PartitionList		ΜΙΜΕ

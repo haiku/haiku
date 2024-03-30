@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	2150010803
+1	polish	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Mount all	MainWindow		Zamontuj wszystko
 Disk	MainWindow		Dysk
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Wyczyść (nie zaimplementowane)
 The currently selected partition does not have a parent partition.	MainWindow		Wybrana partycja nie posiada partycji nadrzędnej.
 Validation of the given initialization parameters failed.	MainWindow		Sprawdzenie poprawności parametrów inicjalizacji nie powiodło się.
-Not formatted (%s)	PartitionList		Niesformatowana (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Nie udało się stworzyć partycji. Zmiany nie zostały zapisane na dysku.
 Shared	PartitionList		Współdzielona
 MIMEs	PartitionList		Typy MIME

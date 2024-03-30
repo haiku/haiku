@@ -6,10 +6,10 @@ package %source% requires %dependency%, but none of the providers can be install
 package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		%source% paketi %target% tarafından sağlanan %dependency% bağımlılığını gereksiz kılıyor
 nothing provides requested %dependency%	SolverProblem		istenen %dependency% bağımlılığını hiçbir şey sağlamıyor
 do not keep %source% installed	SolverProblemSolution		%source% ögesini yüklü tutma
-do not deinstall \"%selection%\"	SolverProblemSolution		‘%selection%’ ögesi kurulumunu kaldırma
+do not deinstall \"%selection%\"	SolverProblemSolution		“%selection%” ögesi kurulumunu kaldırma
 install %source% despite its inferior architecture	SolverProblemSolution		%source% ögesini daha eski mimarisine rağmen kur
 conflicting requests	SolverProblem		çakışan istekler
-do not install the most recent version of \"%selection%\"	SolverProblemSolution		‘%selection%’ ögesinin en yeni sürümünü kurma
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		“%selection%” ögesinin en yeni sürümünü kurma
 allow replacement of %source% with %target%	SolverProblemSolution		%source% ögesinin %target% ile değiştirilmesine izin ver
 package %source% obsoletes %dependency% provided by %target%	SolverProblem		%source% paketi %target% tarafından sağlanan %dependency% bağımlılığını geçersiz kılıyor
 do not forbid installation of %source%	SolverProblemSolution		%source% ögesinin kurulumunu yasaklama
@@ -30,9 +30,9 @@ allow deinstallation of %source%	SolverProblemSolution		%source% paketinin kald�
 keep %source% from excluded repository	SolverProblemSolution		dışarıda bırakılan %source% ögesini tut
 keep old %source%	SolverProblemSolution		eski %source% ögesini tut
 package %source% conflicts with %dependency% provided by itself	SolverProblem		%source% paketi %dependency% ile çakışıyor
-allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		‘%sourceVendor%’ (%source%) sağlayıcısından ‘%targetVendor%’ (%target%) sağlayıcısına değişikliğe izin ver
-do not lock \"%selection%\"	SolverProblemSolution		‘%selection%’ seçimini kilitleme
-do not install \"%selection%\"	SolverProblemSolution		‘%selection%’ seçimini kurma
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		“%sourceVendor%” (%source%) sağlayıcısından “%targetVendor%” (%target%) sağlayıcısına değişikliğe izin ver
+do not lock \"%selection%\"	SolverProblemSolution		“%selection%” seçimini kilitleme
+do not install \"%selection%\"	SolverProblemSolution		“%selection%” seçimini kurma
 nothing provides %dependency% needed by %source%	SolverProblem		%source% ögesinin gereksinimi olan %dependency% bağımlılığını hiçbir şey sağlamıyor
 %source% has inferior architecture	SolverProblem		%source% ögesi daha eski mimariye sahip
-do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		‘%selection%’ tüm çözülebilirlerini kaldırma
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		tüm “%selection%” çözülebilirlerini kaldırma

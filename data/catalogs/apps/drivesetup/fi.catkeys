@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	2150010803
+1	finnish	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Alustus (ei ole toteutettu)
 The currently selected partition does not have a parent partition.	MainWindow		Nykyisellä valitulla osiolla ei ole yläosiota.
 Validation of the given initialization parameters failed.	MainWindow		Annettujen alustusparametrien todentaminen epäonnistui.
-Not formatted (%s)	PartitionList		Alustamatta (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Osion luominen epäonnistui. Levylle ei ole kirjoitettu mitään muutoksia.
 Shared	PartitionList		Jaettu
 MIMEs	PartitionList		MIME-tyypit

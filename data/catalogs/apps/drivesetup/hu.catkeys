@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	2150010803
+1	hungarian	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Formázás (még nem működik)
 The currently selected partition does not have a parent partition.	MainWindow		A kiválasztott partíciónak nincs főpartíciója.
 Validation of the given initialization parameters failed.	MainWindow		Az előkészítéshez megadott paramétereket nem sikerült érvényesíteni.
-Not formatted (%s)	PartitionList		Formázatlan (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Nem sikerült a partíció létrehozása. Nem történt változtatás a lemezem.
 Shared	PartitionList		Megosztott
 MIMEs	PartitionList		MIME-támogatás

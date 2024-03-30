@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-DriveSetup	2150010803
+1	italian	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Impossibile smontare la partizione %s.
 Mount all	MainWindow		Monta tutto
 Disk	MainWindow		Disco
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Pulisci (non implementato)
 The currently selected partition does not have a parent partition.	MainWindow		La partizione attualmente selezionata non ha una sopra-partizione.
 Validation of the given initialization parameters failed.	MainWindow		La validazione dei parametri di inizializzazione forniti è fallita.
-Not formatted (%s)	PartitionList		Non formattato (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Creazione della partizione fallita. Nessuna modifica è stata scritta sul disco.
 Shared	PartitionList		Condiviso
 MIMEs	PartitionList		MIME

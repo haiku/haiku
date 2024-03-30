@@ -1,15 +1,14 @@
-1	esperanto	x-vnd.Haiku-ActivityMonitor	2601047281
+1	esperanto	x-vnd.Haiku-ActivityMonitor	3094058302
 Teams	DataSource		Teamoj
 Semaphores	DataSource		Semaforoj
 TX	DataSource	Shorter version for Sending	Elsendado
 Block cache memory	DataSource		Bloka kaŝmemoro
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Plurmediaj nodoj
 Text clipboard	DataSource		Teksta tondujo
 Network send	DataSource		Reta elsendado
-Running applications	DataSource		Rulataj programoj
 Cache	DataSource		Kaŝmemoro
+Running applications	DataSource		Rulataj programoj
 CPU usage (combined)	DataSource		Ĉefprocesora uzado (kune)
 Threads	DataSource		Fadenoj
 Receiving	DataSource		Ricevado
@@ -28,18 +27,16 @@ Quit	ActivityWindow		Ĉesi
 Raw clipboard	DataSource		Kruda tondujo
 Settings	ActivityWindow		Agordo
 Used memory	DataSource		Uzita memoro
-%.1f faults/s	DataSource		%.1f eraroj/s
 Show legend	ActivityView		Montri klarigeton
 Cached memory	DataSource		Kaŝita memoro
 CPU %d usage	DataSource		CPU %d uzado
 File	ActivityWindow		Dosiero
 Ports	DataSource		Pordoj
 Page faults	DataSource		Permutodosieraj eraroj
-Apps	DataSource		Programoj
 Additional items	ActivityView		Pluaj eroj
+Apps	DataSource		Programoj
 Add graph	ActivityWindow		Aldoni grafeon
 Sending	DataSource		Elsendado
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Ĉiam videbla
 Swap	DataSource		Permutado
 %lld sec.	SettingsWindow		%lld sek.

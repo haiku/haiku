@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	2150010803
+1	friulian	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Nete vie (no implementât)
 The currently selected partition does not have a parent partition.	MainWindow		La partizion atualmentri selezionade no à une sore-partizion.
 Validation of the given initialization parameters failed.	MainWindow		La convalide dai parametris di inizializazion definîts e je falide.
-Not formatted (%s)	PartitionList		No formatade (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Impussibil creâ la partizion. No je stade scrite nissune modifiche sul disc.
 Shared	PartitionList		Condividût
 MIMEs	PartitionList		MIME

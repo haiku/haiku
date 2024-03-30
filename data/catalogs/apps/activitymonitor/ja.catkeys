@@ -1,15 +1,14 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	826097672
+1	japanese	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		チーム数
 Semaphores	DataSource		セマフォ数
 TX	DataSource	Shorter version for Sending	送信
 Block cache memory	DataSource		ブロックキャッシュメモリ
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		メディアノード数
 Text clipboard	DataSource		テキストクリップボード
 Network send	DataSource		ネットワーク送信量
-Running applications	DataSource		実行中のアプリケーション数
 Cache	DataSource		キャッシュ
+Running applications	DataSource		実行中のアプリケーション数
 CPU usage (combined)	DataSource		CPU 使用率 (合計)
 Threads	DataSource		スレッド数
 Receiving	DataSource		受信量
@@ -29,7 +28,6 @@ Quit	ActivityWindow		終了
 Raw clipboard	DataSource		バイナリクリップボード
 Settings	ActivityWindow		設定
 Used memory	DataSource		使用メモリ
-%.1f faults/s	DataSource		%.1f フォールト/s
 Show legend	ActivityView		説明の表示
 Cached memory	DataSource		キャッシュメモリ
 CPU %d usage	DataSource		CPU %d 使用率
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		CPU %d 速度
 File	ActivityWindow		ファイル
 Ports	DataSource		ポート数
 Page faults	DataSource		ページフォールト数
-Apps	DataSource		アプリ
 Additional items	ActivityView		追加項目
+Apps	DataSource		アプリ
 Add graph	ActivityWindow		グラフの追加
 Sending	DataSource		送信量
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		常に最前面
 Swap	DataSource		スワップ
 %lld sec.	SettingsWindow		%lld 秒

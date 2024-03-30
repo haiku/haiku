@@ -2,9 +2,9 @@
 Fetching repository-cache from %url	RefreshRepositoryRequest		%url konumundan depo önbelleği alınıyor
 Validating checksum for %repositoryName	RefreshRepositoryRequest		%repositoryName sağlama toplamı doğrulanıyor…
 Failed to remove transaction directory	PackageManagerKit		İşlem dizini kaldırılamadı
-Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		‘%s’ deposu için yapılandırma alınamadı. Atlanıyor.
-Refreshing repository \"%s\" failed	PackageManagerKit		‘%s’ deposunu güncelleme başarısız oldu
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		“%s” deposu için yapılandırma alınamadı. Atlanıyor.
+Refreshing repository \"%s\" failed	PackageManagerKit		“%s” deposunu güncelleme başarısız oldu
 Fetching repository checksum from %url	RefreshRepositoryRequest		%url konumundan depo sağlama toplamı alınıyor…
 Failed to get repository names	PackageManagerKit		Depo adları alınamadı
-Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		‘%s’ deposu için önbellek alınamadı. Atlanıyor.
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		%s–%s paketi kendi temel paketi olan ‘%s’ için bir eşleşmeye sahip değil
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		“%s” deposu için önbellek alınamadı. Atlanıyor.
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		%s–%s paketi kendi temel paketi olan “%s” için bir eşleşmeye sahip değil

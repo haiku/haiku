@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2787029568
+1	swedish	x-vnd.Haiku-libtracker	2585450844
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -404,6 +404,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Kan inte avmontera startvolym
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (Saknar symbol: %symbol). \n
 New folder	ContainerWindow		Ny mapp
 Name	OpenWithWindow		Namn
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Få information
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kunde inte ersätta \"%name\". Filen kan vara öppen eller upptagen.
 Windows	TrackerSettingsWindow		Fönster
 Show space bars on volumes	SettingsView		Visa ledigt utrymme på volymer

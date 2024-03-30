@@ -65,7 +65,7 @@ Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor
 Select this folder	MediaConverter		Bu klasörü seç
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
 Understood	MediaConverter		Anlaşıldı
-%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2f FPS
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Video yok
 Continue	MediaConverter		Sürdür

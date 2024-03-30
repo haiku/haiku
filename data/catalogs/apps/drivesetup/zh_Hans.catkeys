@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	2150010803
+1	english	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		擦除数据（未实现）
 The currently selected partition does not have a parent partition.	MainWindow		当前选中分区无父分区。
 Validation of the given initialization parameters failed.	MainWindow		给定初始化参数验证失败。
-Not formatted (%s)	PartitionList		未格式化 (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		创建分区失败。无改动写入磁盘。
 Shared	PartitionList		共享
 MIMEs	PartitionList		MIMEs

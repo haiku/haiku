@@ -1,6 +1,4 @@
-1	italian	x-vnd.Haiku-libbe	2914417806
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# byte}}
-%.2f TiB/s	StringForRate		%.2f TiB/s
+1	italian	x-vnd.Haiku-libbe	535088175
 All Rights Reserved.	AboutWindow		Tutti i diritti riservati.
 gold master	AboutWindow		gold master
 Undo	TextView		Annulla
@@ -8,42 +6,36 @@ OK	PrintJob		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		sviluppo
 OK	Dragger		OK
-%3.2f GiB/s	StringForRate		%3.2f GiB/s
 Print Server is not responding.	PrintJob		Il Server di stampa non risponde.
 About %app%	AboutMenuItem		Informazioni su %app%
 Warning	Dragger		Attenzione
 Green:	ColorControl		Verde:
-%3.2f KiB/s	StringForRate		%3.2f KiB/s
 Redo	TextView		Ripeti
 No pages to print!	PrintJob		Nessuna pagina da stampare
 beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Taglia
-%3.2f GiB	StringForSize		%3.2f GiB
 Default	Default decorator about box		Predefinito
 Can't delete this replicant from its original application. Life goes on.	Dragger		Impossibile separare questo replicante dalla sua applicazione.
 Error	ZombieReplicantView		Errore
 Paste	TextView		Incolla
 OK	AboutWindow		OK
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/s} other{# byte/s}}
 Special Thanks:	AboutWindow		Ringraziamenti speciali:
 Default Haiku window decorator.	Default decorator about box		Decoratore di finestre predefinito di Haiku. 
-%.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Rimuovi il replicante
 Version	AboutWindow		Versione
 Red:	ColorControl		Rosso:
 <empty>	Menu		<vuoto>
 Copy	TextView		Copia
 Select all	TextView		Seleziona tutto
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# byte}}
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# byte/s}}
 alpha	AboutWindow		alfa
-%3.2f MiB	StringForSize		%3.2f MiB
-%3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Errore
 About %app%	AboutWindow		Informazioni su %app%
 About %app…	Dragger		Informazioni su %app…
 Version history:	AboutWindow		Cronologia delle versioni:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossibile individuare l'applicazione da cui generare il replicante. Non è stata fornita alcuna firma per l'applicazione.\n%error
-%3.2f KiB	StringForSize		%3.2f KiB
 Blue:	ColorControl		Blu:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Impossibile creare il replicante per \"%description\".\n%error
 Written by:	AboutWindow		A cura di:

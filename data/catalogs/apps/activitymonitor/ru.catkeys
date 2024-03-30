@@ -1,15 +1,14 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	826097672
+1	russian	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Процессы
 Semaphores	DataSource		Семафоры
 TX	DataSource	Shorter version for Sending	Передача
 Block cache memory	DataSource		Память блокового кэша
 %lld ms	SettingsWindow		%lld мс
-MiB	DataSource		МБ
 Media nodes	DataSource		Медиа узлы
 Text clipboard	DataSource		Текстовый буфер обмена
 Network send	DataSource		Исходящий трафик
-Running applications	DataSource		Запущенные приложения
 Cache	DataSource		Кэш
+Running applications	DataSource		Запущенные приложения
 CPU usage (combined)	DataSource		Использование процессора (всего)
 Threads	DataSource		Потоки
 Receiving	DataSource		Прием
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Выход
 Raw clipboard	DataSource		Полный буфер обмена
 Settings	ActivityWindow		Настройки
 Used memory	DataSource		Используемая память
-%.1f faults/s	DataSource		%.1f отказов/с
 Show legend	ActivityView		Показать легенду
 Cached memory	DataSource		Кэшируемая память
 CPU %d usage	DataSource		Используется %d ЦП
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Скорость ЦП %d
 File	ActivityWindow		Файл
 Ports	DataSource		Порты
 Page faults	DataSource		Отказы страниц
-Apps	DataSource		Приложения
 Additional items	ActivityView		Дополнительные графики
+Apps	DataSource		Приложения
 Add graph	ActivityWindow		Добавить график
 Sending	DataSource		Отправка
-%.1f MiB	DataSource		%.1f МБ
 Always on top	ActivityWindow		Поверх всех окон
 Swap	DataSource		Файл подкачки
 %lld sec.	SettingsWindow		%lld сек.

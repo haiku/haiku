@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	2150010803
+1	czech	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Vymazat (není implementováno)
 The currently selected partition does not have a parent partition.	MainWindow		Právě vybraný oddíl nemá nadřazený oddíl.
 Validation of the given initialization parameters failed.	MainWindow		Ověření zadaných inicializačních parametrů selhalo.
-Not formatted (%s)	PartitionList		Neformátovaný (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Nepodařilo se vytvořit oddíl. Změny nebyly zapsány na disk.
 Shared	PartitionList		Sdílený
 MIMEs	PartitionList		MIME

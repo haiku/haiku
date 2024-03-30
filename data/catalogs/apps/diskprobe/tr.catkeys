@@ -19,7 +19,7 @@ Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou c
 No type editor available	AttributeWindow		Kullanılabilir bir tür düzenleyicisi yok
 Print…	ProbeView		Yazdır…
 New…	FileWindow		Yeni…
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: ‘%.4s’\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: “%.4s”\n\n
 OK	DiskProbe		Tamam
 DiskProbe	System name		Disk Sondası
 Back	ProbeView		Geri

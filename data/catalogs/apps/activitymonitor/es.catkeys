@@ -1,15 +1,14 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	826097672
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Equipos
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloquear memoria de caché
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Nodos de media
 Text clipboard	DataSource		Texto en el portapapeles
 Network send	DataSource		Envío de red
-Running applications	DataSource		Aplicaciones ejecutándose
 Cache	DataSource		Caché
+Running applications	DataSource		Aplicaciones ejecutándose
 CPU usage (combined)	DataSource		Uso de CPU (conjunto)
 Threads	DataSource		Hilos
 Receiving	DataSource		Recibiendo
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Salir
 Raw clipboard	DataSource		Portapapeles en bruto
 Settings	ActivityWindow		Configuración
 Used memory	DataSource		Memoria usada
-%.1f faults/s	DataSource		%.1f fallas/s
 Show legend	ActivityView		Mostrar clave
 Cached memory	DataSource		Memoria de caché
 CPU %d usage	DataSource		Uso CPU %d
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Velocidad de CPU %d
 File	ActivityWindow		Archivo
 Ports	DataSource		Puertos
 Page faults	DataSource		Errores de página
-Apps	DataSource		Aplicaciones
 Additional items	ActivityView		Elementos adicionales
+Apps	DataSource		Aplicaciones
 Add graph	ActivityWindow		Insertar gráfico
 Sending	DataSource		Enviando
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Siempre visible
 Swap	DataSource		Intercambio
 %lld sec.	SettingsWindow		%lld seg.

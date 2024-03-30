@@ -1,15 +1,14 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	826097672
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloca la memòria cau
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Nodes de mitjans
 Text clipboard	DataSource		Porta-retalls per a text
 Network send	DataSource		Envia amb la xarxa
-Running applications	DataSource		Aplicacions en execució
 Cache	DataSource		Memòria cau
+Running applications	DataSource		Aplicacions en execució
 CPU usage (combined)	DataSource		Ús de la CPU (combinat)
 Threads	DataSource		Fils
 Receiving	DataSource		Es rep
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Surt
 Raw clipboard	DataSource		Porta-retalls en cru
 Settings	ActivityWindow		Paràmetres
 Used memory	DataSource		Memòria usada
-%.1f faults/s	DataSource		%.1f falles/s
 Show legend	ActivityView		Mostra la llegenda
 Cached memory	DataSource		A la memòria cau
 CPU %d usage	DataSource		Ús de la CPU %d
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Velocitat de la CPU %d
 File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina
-Apps	DataSource		Aplicacions
 Additional items	ActivityView		Elements addicionals
+Apps	DataSource		Aplicacions
 Add graph	ActivityWindow		Afegeix-hi un gràfic
 Sending	DataSource		S'envia
-%.1f MiB	DataSource		%.1f MB
 Always on top	ActivityWindow		Sempre en primer pla
 Swap	DataSource		Memòria d'intercanvi
 %lld sec.	SettingsWindow		%lld seg.

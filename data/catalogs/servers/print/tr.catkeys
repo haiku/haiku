@@ -6,13 +6,13 @@ Get currently available ports/devices	Transport Scripting		Şu anda kullanılabi
 Retrieve or select the active printer	PrintServerApp Scripting		Etkin yazıcıyı seç veya bulup getir
 Cancel	PrintServerApp		Vazgeç
 Retrieve a specific printer	PrintServerApp Scripting		Belirli bir yazıcıyı bulup getir
-Page %1 to %2	ConfigWindow		Sayfa %1-%2
+Page %1 to %2	ConfigWindow		Sayfa %1–%2
 Get name of the printer add-on used for this printer	Printer Scripting		Bu yazıcı için kullanılan yazıcı eklentisinin adını al
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Tamam
 Cancel	ConfigWindow		Vazgeç
 Printer server	ConfigWindow		Yazıcı sunucusu
-Page %1 to %2, %3 copies	ConfigWindow		Sayfa %1-%2, %3 kopya
+Page %1 to %2, %3 copies	ConfigWindow		Sayfa %1–%2, %3 kopya
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Bu adda bir yazıcı var; ancak sürücüsü bulunamadı! Değiştirilsin mi?
 Yes	PrintServerApp		Evet
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger

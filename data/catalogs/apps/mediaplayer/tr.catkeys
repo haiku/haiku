@@ -102,7 +102,7 @@ Stream settings	MediaPlayer-Main		Akış ayarları
 none	Subtitles menu		yok
 Save Playlist	MediaPlayer-PlaylistWindow		Oynatma listesini kaydet
 Overlay	MediaPlayer-InfoWin		Bindirme
-2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2,35 : 1 (Cinemascope)
 Rating	MediaPlayer-Main		Derecelendirme
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		İç hata (yetersiz bellek). Oynatma listesi kaydedilemedi.
 Video	MediaPlayer-Main		Video
@@ -120,7 +120,7 @@ min	MediaPlayer-InfoWin	Minutes	dak
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Oynatma listesi kaydedilemedi:\n\nHata: 
 Video	MediaPlayer-InfoWin		Video
 File info…	MediaPlayer-Main		Dosya bilgisi…
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikan)
+1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikan)
 <unnamed>	PlaylistItem-name		<adsız>
 Track	Video Track Menu		Parça
 Full screen	MediaPlayer-Main		Tam ekran

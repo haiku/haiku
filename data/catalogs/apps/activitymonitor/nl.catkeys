@@ -1,15 +1,14 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	826097672
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaforen
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Geheugen blok-cache
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Media-eenheid
 Text clipboard	DataSource		Tekst klembord
 Network send	DataSource		Netwerk (uitgaand)
-Running applications	DataSource		Lopende toepassingen
 Cache	DataSource		Cache
+Running applications	DataSource		Lopende toepassingen
 CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
 Threads	DataSource		Threads
 Receiving	DataSource		Ontvangend
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Afsluiten
 Raw clipboard	DataSource		Onbewerkt klembord
 Settings	ActivityWindow		Instellingen
 Used memory	DataSource		Gebruikt geheugen
-%.1f faults/s	DataSource		%.1f fout(en)
 Show legend	ActivityView		Toon legenda
 Cached memory	DataSource		Geheugen in cache
 CPU %d usage	DataSource		CPU %d gebruik
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Snelheid CPU %d
 File	ActivityWindow		Bestand
 Ports	DataSource		Poorten
 Page faults	DataSource		Page-onderbrekingen
-Apps	DataSource		Toepassingen
 Additional items	ActivityView		Toegevoegde items
+Apps	DataSource		Toepassingen
 Add graph	ActivityWindow		Voeg grafiek toe
 Sending	DataSource		Versturend
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Altijd bovenop
 Swap	DataSource		Swap
 %lld sec.	SettingsWindow		%lld sec.

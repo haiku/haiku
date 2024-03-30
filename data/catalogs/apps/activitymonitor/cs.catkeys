@@ -1,15 +1,14 @@
-1	czech	x-vnd.Haiku-ActivityMonitor	826097672
+1	czech	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Týmy
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloková vyrovnávací paměť
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Mediální uzly
 Text clipboard	DataSource		Textová schránka
 Network send	DataSource		Odesláno sítí
-Running applications	DataSource		Spuštěné aplikace
 Cache	DataSource		Mezipaměť
+Running applications	DataSource		Spuštěné aplikace
 CPU usage (combined)	DataSource		Využití CPU (kombinované)
 Threads	DataSource		Vlákna
 Receiving	DataSource		Přijímání
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Ukončit
 Raw clipboard	DataSource		Schránka bez formátu
 Settings	ActivityWindow		Nastavení
 Used memory	DataSource		Využitá paměť
-%.1f faults/s	DataSource		%.1f chyb/s
 Show legend	ActivityView		Zobrazit legendu
 Cached memory	DataSource		Vyrovnávací paměť
 CPU %d usage	DataSource		Využití CPU %d
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		rychlost CPU %d
 File	ActivityWindow		Soubor
 Ports	DataSource		Porty
 Page faults	DataSource		Chyby stránkování
-Apps	DataSource		Aplikace
 Additional items	ActivityView		Přídavné položky
+Apps	DataSource		Aplikace
 Add graph	ActivityWindow		Přidat graf
 Sending	DataSource		Odesílání
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Vždy navrchu
 Swap	DataSource		Odkládací soubor
 %lld sec.	SettingsWindow		%lld sek.

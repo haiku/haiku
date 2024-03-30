@@ -1,15 +1,14 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	826097672
+1	polish	x-vnd.Haiku-ActivityMonitor	1319108693
 Teams	DataSource		Zespoły
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blokowa pamięć podręczna
 %lld ms	SettingsWindow		%lld ms
-MiB	DataSource		MiB
 Media nodes	DataSource		Węzły multimediów
 Text clipboard	DataSource		Schowek tekstowy
 Network send	DataSource		Wysłane
-Running applications	DataSource		Uruchomione aplikacje
 Cache	DataSource		Cache
+Running applications	DataSource		Uruchomione aplikacje
 CPU usage (combined)	DataSource		Użycie procesora (całkowite)
 Threads	DataSource		Wątki
 Receiving	DataSource		Otrzymane
@@ -29,7 +28,6 @@ Quit	ActivityWindow		Zakończ
 Raw clipboard	DataSource		Schowek binarny
 Settings	ActivityWindow		Ustawienia
 Used memory	DataSource		Używana pamięć
-%.1f faults/s	DataSource		%.1f błędów/s
 Show legend	ActivityView		Pokaż legendę
 Cached memory	DataSource		Pamięć podręczna
 CPU %d usage	DataSource		Użycie procesora %d
@@ -37,11 +35,10 @@ CPU %d speed	DataSource		Prędkość procesora %d
 File	ActivityWindow		Plik
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania
-Apps	DataSource		Aplikacje
 Additional items	ActivityView		Dodatkowe informacje
+Apps	DataSource		Aplikacje
 Add graph	ActivityWindow		Dodaj wykres
 Sending	DataSource		Wysłane
-%.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Zawsze na wierzchu
 Swap	DataSource		Przestrzeń wymiany
 %lld sec.	SettingsWindow		%lld s

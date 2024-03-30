@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	2150010803
+1	ukrainian	x-vnd.Haiku-DriveSetup	2943652182
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -51,7 +51,6 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Затерти (не реалізовано)
 The currently selected partition does not have a parent partition.	MainWindow		Поточний розділ не має батіківського розділу.
 Validation of the given initialization parameters failed.	MainWindow		Не вдалося застосувати параметри, введені при ініціалізації.
-Not formatted (%s)	PartitionList		Неформатований (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Не вдалося створити розділ. Ніякі зміни на диск не записувалися.
 Shared	PartitionList		Спільний доступ
 MIMEs	PartitionList		MIME-типи

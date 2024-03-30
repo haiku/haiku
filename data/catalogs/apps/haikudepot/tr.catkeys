@@ -20,14 +20,14 @@ Switch account…	MainWindow		Hesap değiştir…
 Preferred language:	UserLoginWindow		Tercih edilen dil:
 Name	PackageListView		Ad
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Kimlik doğrulama veya güvenlik sorunu. Parolanızın doğru olduğunu doğrulama ve güncel kullanım koşullarını kabul ettiğinizi denetlemek için çıkın ve yeniden giriş yapın.
-HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Haiku Depo, Haiku Depo Sunucusu adı verilen bir sunucu bileşeni ile iletişim kurar. Bunlar, Haiku Depo Sunucusu servisinin kullanımı ile ilgili olarak, ‘%Nickname%’ kullanıcısının %AgreedToTimestamp% tarihinde kullanımını kabul ettiği koşullardır.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		Haiku Depo, Haiku Depo Sunucusu adı verilen bir sunucu bileşeni ile iletişim kurar. Bunlar, Haiku Depo Sunucusu servisinin kullanımı ile ilgili olarak, “%Nickname%” kullanıcısının %AgreedToTimestamp% tarihinde kullanımını kabul ettiği koşullardır.
 don't activate package %source%	PackageProblem	don't change '%source%	%source% paketini etkinleştirme
 Rate %Package%	RatePackageWindow		%Package% paketini derecelendir
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Paket yöneticisi başlatılırken bir hata oluştu: %message%
 Quit HaikuDepot	App		Haiku Depo’dan çık
 Category	FilterView		Kategori
 A response to the captcha question must be provided.	UserLoginWindow		CAPTCHA sorusuna bir yanıt sağlanmalıdır.
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		‘%Property%’ ile beklenmeyen bir ‘%Message%’ hatası alındı
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		“%Property%” ile beklenmeyen bir “%Message%” hatası alındı
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
 Logout	ToLatestUserUsageConditionsWindow		Çıkış yap
 Password requirements	UserLoginWindow		Parola gereklilikleri
@@ -50,7 +50,7 @@ All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat
 There are problems in the supplied data:	UserLoginWindow		Girilen veride sorunlar var:
-The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		‘%Nickname%’ kullanıcısı, herhangi bir kullanım koşulunu kabul etmedi.
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		“%Nickname%” kullanıcısı herhangi bir kullanım koşulunu kabul etmedi.
 Usage conditions download problem	UserLoginWindow		Kullanım koşulları indirilirken hata
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	şu depodan %s paketini kur: %s\n
 Package daemon problem	App		Paket hizmeti sorunu
@@ -59,7 +59,7 @@ Repository	PackageListView		Depo
 Close	RatePackageWindow		Kapat
 Close	UserLoginWindow		Kapat
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		‘%REPO_NAME%’ depo paket bilgisi eşitleniyor
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		“%REPO_NAME%” deposunun paket bilgisi eşitleniyor
 View the usage conditions	UserLoginWindow		Kullanım koşullarını görüntüle
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu’nun Haiku Depo bölümünde bulabilirsiniz.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Kullanım koşulları kabul edildi

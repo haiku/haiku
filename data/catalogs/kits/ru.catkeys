@@ -1,6 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	2914417806
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# байт} few{# байта} other{# байтов}}
-%.2f TiB/s	StringForRate		%.2f Тб/с
+1	russian	x-vnd.Haiku-libbe	535088175
 All Rights Reserved.	AboutWindow		Все права защищены.
 gold master	AboutWindow		золотая
 Undo	TextView		Отменить
@@ -8,42 +6,36 @@ OK	PrintJob		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		в разработке
 OK	Dragger		ОК
-%3.2f GiB/s	StringForRate		%3.2f Гб/с
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
 About %app%	AboutMenuItem		О программе…
 Warning	Dragger		Внимание
 Green:	ColorControl		Зеленый:
-%3.2f KiB/s	StringForRate		%3.2f Кб/с
 Redo	TextView		Повторить
 No pages to print!	PrintJob		Нет страниц для печати!
 beta	AboutWindow		бета
 OK	ZombieReplicantView		ОК
 Cut	TextView		Вырезать
-%3.2f GiB	StringForSize		%3.2f ГБ
 Default	Default decorator about box		По умолчанию
 Can't delete this replicant from its original application. Life goes on.	Dragger		Не удалось удалить этот репликант из его изначальное приложения. Жизнь продолжается.
 Error	ZombieReplicantView		Ошибка
 Paste	TextView		Вставить
 OK	AboutWindow		ОК
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# байт/с} few{# байта/с} other{# байтов/с}}
 Special Thanks:	AboutWindow		Особые благодарности:
 Default Haiku window decorator.	Default decorator about box		Декоратор окно по умолчанию.
-%.2f TiB	StringForSize		%.2f ТБ
 Remove replicant	Dragger		Удалить репликант
 Version	AboutWindow		Версия
 Red:	ColorControl		Красный:
 <empty>	Menu		<пусто>
 Copy	TextView		Копировать
 Select all	TextView		Выделить все
+{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# байт} few{# байта} other{# байтов}}
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# байт/с} few{# байта/с} other{# байтов/с}}
 alpha	AboutWindow		альфа
-%3.2f MiB	StringForSize		%3.2f МБ
-%3.2f MiB/s	StringForRate		%3.2f Мб/с
 Error	PrintJob		Ошибка
 About %app%	AboutWindow		О программе…
 About %app…	Dragger		О программе…
 Version history:	AboutWindow		История версий:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
-%3.2f KiB	StringForSize		%3.2f КБ
 Blue:	ColorControl		Синий:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Невозможно удалить репликант \"%description\".\n%error
 Written by:	AboutWindow		Разработан:

@@ -12,7 +12,7 @@ Save	ShortcutsWindow		Kaydet
 Either	ShortcutsSpec		Herhangi biri
 Oh no	ShortcutsWindow		N’olamaz
 Key	ShortcutsWindow		Düğme
-*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*İletiGönder application/x-vnd.Be-TRAK ‘Tfnd’
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Seç
 Shortcuts	System name		Kestirmeler
 Quit	ShortcutsWindow		Çık
