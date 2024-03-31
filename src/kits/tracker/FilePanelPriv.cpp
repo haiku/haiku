@@ -1230,7 +1230,7 @@ TFilePanel::MessageReceived(BMessage* message)
 
 	switch (message->what) {
 		case B_REFS_RECEIVED:
-			// item was double clicked in file panel (PoseView)
+			// item was double clicked in file panel (PoseView) or from the favorites menu
 			if (message->FindRef("refs", &ref) == B_OK) {
 				BEntry entry(&ref, true);
 				if (entry.InitCheck() == B_OK) {
@@ -1247,12 +1247,15 @@ TFilePanel::MessageReceived(BMessage* message)
 						SwitchDirMenuTo(&ref);
 					} else {
 						// Otherwise, we have a file or a link to a file.
-						// AdjustButton has already tested the flavor;
-						// all we have to do is see if the button is enabled.
-						BButton* button = dynamic_cast<BButton*>(
-							FindView("default button"));
-						if (button == NULL || !button->IsEnabled())
-							break;
+						// AdjustButton has already tested the flavor if it comes from the file
+						// panel; all we have to do is see if the button is enabled.
+						// In other cases, however, we can't rely on that. So first check for
+						// TrackerViewToken in the message to see if it's coming from the pose view
+						if (message->HasMessenger("TrackerViewToken")) {
+							BButton* button = dynamic_cast<BButton*>(FindView("default button"));
+							if (button == NULL || !button->IsEnabled())
+								break;
+						}
 
 						if (IsSavePanel()) {
 							int32 count = 0;
