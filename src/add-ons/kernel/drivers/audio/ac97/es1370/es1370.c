@@ -385,21 +385,17 @@ init_hardware(void)
 	int ix=0;
 	pci_info info;
 	status_t err = ENODEV;
-	
-	LOG_CREATE();
-
-	PRINT(("init_hardware()\n"));
 
 	if (get_module(pci_name, (module_info **)&pci))
 		return ENOSYS;
 
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {
-		if (info.vendor_id == 0x1274 
-			&& (info.device_id == 0x5000
-			/*|| info.device_id == 0x1371
-			|| info.device_id == 0x5880*/)
-			)
-		 {
+		if (info.vendor_id == 0x1274 && (info.device_id == 0x5000
+			/*|| info.device_id == 0x1371 || info.device_id == 0x5880*/))
+		{
+			LOG_CREATE();
+			PRINT(("init_hardware()\n"));
+
 			err = B_OK;
 		}
 		ix++;
