@@ -12,6 +12,8 @@
 
 #include "FontSelectionView.h"
 
+#include "private/interface/FontPrivate.h"
+
 #include <Box.h>
 #include <Catalog.h>
 #include <Locale.h>
@@ -323,9 +325,12 @@ FontSelectionView::UpdateFontsMenu()
 		if (get_font_family(i, &family, &flags) != B_OK)
 			continue;
 
-		// if we're setting the fixed font, we only want to show fixed fonts
-		if (!strcmp(Name(), "fixed") && (flags & B_IS_FIXED) == 0)
+		// if we're setting the fixed font, we only want to show fixed and
+		// full-and-half-fixed fonts
+		if (strcmp(Name(), "fixed") == 0
+			&& (flags & (B_IS_FIXED | B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED)) == 0) {
 			continue;
+		}
 
 		font.SetFamilyAndFace(family, B_REGULAR_FACE);
 
