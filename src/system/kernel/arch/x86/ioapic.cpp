@@ -356,8 +356,8 @@ ioapic_map_ioapic(struct ioapic& ioapic, phys_addr_t physicalAddress)
 		= ((ioapic.version >> IO_APIC_MAX_REDIRECTION_ENTRY_SHIFT)
 			& IO_APIC_MAX_REDIRECTION_ENTRY_MASK);
 	if (ioapic.max_redirection_entry >= MAX_SUPPORTED_REDIRECTION_ENTRIES) {
-		dprintf("io-apic %u entry count exceeds max supported, only using the "
-			"first %u entries", ioapic.number,
+		dprintf("io-apic %u entry count %d exceeds max supported, only using the "
+			"first %u entries\n", ioapic.number, ioapic.max_redirection_entry,
 			(uint8)MAX_SUPPORTED_REDIRECTION_ENTRIES);
 		ioapic.max_redirection_entry = MAX_SUPPORTED_REDIRECTION_ENTRIES - 1;
 	}
