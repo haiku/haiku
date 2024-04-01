@@ -67,6 +67,7 @@ protected:
 			FT_CharMap			_GetSupportedCharmap(const FT_Face& face);
 
 			FontFamily*			_FindFamily(const char* family) const;
+			FontFamily*			_FindFamily(uint16 familyID) const;
 
 			status_t			_AddFont(FT_Face face, node_ref nodeRef,
 									const char* path,

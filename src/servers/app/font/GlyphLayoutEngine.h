@@ -429,20 +429,27 @@ GlyphLayoutEngine::PopulateFallbacks(
 		return;
 
 	static const int nFallbacks = B_COUNT_OF(fallbacks);
+	static const int acceptAnyStyle = 2;
 
-	for (int c = 0; c < 3; c++) {
+	for (int degradeLevel = 0; degradeLevel <= acceptAnyStyle; degradeLevel++) {
 		const char* fontStyle;
-		if (c == 0)
+		if (degradeLevel == 0)
 			fontStyle = font.Style();
-		else if (c == 1)
+		else if (degradeLevel == 1)
 			fontStyle = "Regular";
 		else
 			fontStyle = NULL;
 
 		for (int i = 0; i < nFallbacks; i++) {
 
-			FontStyle* fallbackStyle = gFontManager->GetStyle(fallbacks[i],
-				fontStyle, 0xffff, 0);
+			FontStyle* fallbackStyle;
+			if (degradeLevel != acceptAnyStyle) {
+				fallbackStyle = gFontManager->GetStyle(fallbacks[i], fontStyle);
+			} else {
+				// At this point we'll just take whatever we are given
+				fallbackStyle = gFontManager->GetStyleByIndex(fallbacks[i], 0);
+			}
+
 			if (fallbackStyle == NULL)
 				continue;
 
@@ -458,9 +465,7 @@ GlyphLayoutEngine::PopulateFallbacks(
 				fallbacksList.AddItem(cacheReference);
 			} else
 				FontCache::Default()->Recycle(entry);
-
 		}
-
 	}
 
 	gFontManager->Unlock();

@@ -166,7 +166,8 @@ FontManager::GetFamily(uint16 familyID) const
 	if (style != NULL)
 		return style->Family();
 
-	return NULL;
+	// Try the slow route in case style 0 was removed
+	return _FindFamily(familyID);
 }
 
 
@@ -371,6 +372,21 @@ FontManager::_FindFamily(const char* name) const
 	FontFamily family(name, 0);
 	return const_cast<FontFamily*>(fFamilies.BinarySearch(family,
 		compare_font_families));
+}
+
+
+FontFamily*
+FontManager::_FindFamily(uint16 familyID) const
+{
+	int32 count = fFamilies.CountItems();
+
+	for (int32 i = 0; i < count; i++) {
+		FontFamily* family = fFamilies.ItemAt(i);
+		if (family->ID() == familyID)
+			return family;
+	}
+
+	return NULL;
 }
 
 
