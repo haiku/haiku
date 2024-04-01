@@ -10,25 +10,21 @@
 #include "Inode.h"
 
 
-// xfs_attr_sf_hdr
-struct AShortFormHeader {
-			uint16				totsize;
-			uint8				count;
-			uint8				padding;
-};
-
-
-// xfs_attr_sf_entry
-struct AShortFormEntry {
-			uint8				namelen;
-			uint8				valuelen;
-			uint8				flags;
-			uint8				nameval[];
-};
-
-
 class ShortAttribute : public Attribute {
 public:
+			struct AShortFormEntry {
+			public:
+				uint8				namelen;
+				uint8				valuelen;
+				uint8				flags;
+				uint8				nameval[];
+			};
+
+			struct AShortFormHeader {
+				uint16				totsize;
+				uint8				count;
+				uint8				padding;
+			};
 								ShortAttribute(Inode* inode);
 								~ShortAttribute();
 
@@ -42,6 +38,8 @@ public:
 			status_t			GetNext(char* name, size_t* nameLength);
 
 			status_t			Lookup(const char* name, size_t* nameLength);
+private:
+			void				SwapEndian();
 private:
 			uint32				_DataLength(AShortFormEntry* entry);
 

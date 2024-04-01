@@ -31,7 +31,7 @@ ShortAttribute::_DataLength(AShortFormEntry* entry)
 }
 
 
-AShortFormEntry*
+ShortAttribute::AShortFormEntry*
 ShortAttribute::_FirstEntry()
 {
 	return (AShortFormEntry*) ((char*) fHeader + sizeof(AShortFormHeader));
@@ -169,4 +169,11 @@ ShortAttribute::Lookup(const char* name, size_t* nameLength)
 	}
 
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+void
+ShortAttribute::SwapEndian()
+{
+	fHeader->totsize = B_BENDIAN_TO_HOST_INT16(fHeader->totsize);
 }
