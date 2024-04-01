@@ -1152,7 +1152,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		}
 
 		// If the new node is a symbolic link, resolve it (if we've been told to do it)
-		if (FSSH_S_ISLNK(vnode->type)
+		if (FSSH_S_ISLNK(nextVnode->type)
 			&& !(!traverseLeafLink && nextPath[0] == '\0')) {
 			fssh_size_t bufferSize;
 			char *buffer;
@@ -1172,8 +1172,12 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			}
 
 			if (HAS_FS_CALL(nextVnode, read_symlink)) {
+				bufferSize--;
 				status = FS_CALL(nextVnode, read_symlink, buffer,
 					&bufferSize);
+				// null-terminate
+				if (status >= 0 && bufferSize < FSSH_B_PATH_NAME_LENGTH)
+					buffer[bufferSize] = '\0';
 			} else
 				status = FSSH_B_BAD_VALUE;
 
