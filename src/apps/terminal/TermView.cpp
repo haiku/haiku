@@ -1589,7 +1589,7 @@ TermView::FrameResized(float width, float height)
 	}
 
 	BString text;
-	text << columns << " x " << rows;
+	text.SetToFormat("%" B_PRId32 " × %" B_PRId32, columns, rows);
 	fResizeView->SetText(text.String());
 	fResizeView->GetPreferredSize(&width, &height);
 	fResizeView->ResizeTo(width * 1.5, height * 1.5);
