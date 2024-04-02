@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Haiku, Inc. All rights reserved.
+ * Copyright 2015-2025 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -144,7 +144,7 @@ BDecimalSpinner::BDecimalSpinner(BMessage* data)
 		fMinValue = 0.0;
 
 	if (data->FindDouble("_max", &fMaxValue) != B_OK)
-		fMinValue = 100.0;
+		fMaxValue = 100.0;
 
 	if (data->FindUInt32("_precision", &fPrecision) != B_OK)
 		fPrecision = 2;
@@ -159,6 +159,7 @@ BDecimalSpinner::BDecimalSpinner(BMessage* data)
 
 BDecimalSpinner::~BDecimalSpinner()
 {
+	delete fNumberFormat;
 }
 
 
@@ -246,6 +247,17 @@ BDecimalSpinner::SetEnabled(bool enable)
 
 
 void
+BDecimalSpinner::SetPrecision(uint32 precision)
+{
+	if (precision == fPrecision)
+		return;
+
+	fPrecision = precision;
+	fNumberFormat->SetPrecision(precision);
+}
+
+
+void
 BDecimalSpinner::SetMinValue(double min)
 {
 	fMinValue = min;
@@ -294,13 +306,10 @@ BDecimalSpinner::SetValue(double value)
 		value = fMaxValue;
 
 	// update the text view
-	char* format;
-	asprintf(&format, "%%.%" B_PRId32 "f", fPrecision);
-	char* valueString;
-	asprintf(&valueString, format, value);
-	TextView()->SetText(valueString);
-	free(format);
-	free(valueString);
+	BString valueString;
+	fNumberFormat->Format(valueString, value);
+
+	TextView()->SetText(valueString.String());
 
 	// update the up and down arrows
 	SetIncrementEnabled(IsEnabled() && value < fMaxValue);
@@ -320,7 +329,9 @@ BDecimalSpinner::SetValue(double value)
 void
 BDecimalSpinner::SetValueFromText()
 {
-	SetValue(roundTo(atof(TextView()->Text()), Precision()));
+	double parsedValue;
+	if (fNumberFormat->Parse(TextView()->Text(), parsedValue) == B_OK)
+		SetValue(roundTo(parsedValue, Precision()));
 }
 
 
@@ -335,6 +346,9 @@ BDecimalSpinner::_InitObject()
 	fPrecision = 2;
 	fStep = 1.0;
 	fValue = 0.0;
+
+	fNumberFormat = new BNumberFormat();
+	fNumberFormat->SetPrecision(fPrecision);
 
 	TextView()->SetAlignment(B_ALIGN_RIGHT);
 	for (uint32 c = 0; c <= 42; c++)
