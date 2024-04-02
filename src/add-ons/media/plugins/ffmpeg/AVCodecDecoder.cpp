@@ -22,6 +22,7 @@
 
 #include <Bitmap.h>
 #include <Debug.h>
+#include <OS.h>
 #include <String.h>
 
 #include "Utilities.h"
@@ -471,6 +472,13 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// Note: Doing this step unconditionally is OK, because the first call
 		// to _DecodeNextVideoFrame() will update the essential video format
 		// properties accordingly regardless of the settings here.
+
+	// Let ffmpeg use up to one thread per CPU core
+	system_info info;
+	get_system_info(&info);
+
+	fCodecContext->thread_type = FF_THREAD_FRAME;
+	fCodecContext->thread_count = info.cpu_count;
 
 	if (avcodec_open2(fCodecContext, fCodec, NULL) < 0) {
 		TRACE("avcodec_open() failed to init codec!\n");
