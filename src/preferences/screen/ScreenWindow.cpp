@@ -33,17 +33,17 @@
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <MenuBar.h>
-#include <MenuItem.h>
 #include <MenuField.h>
+#include <MenuItem.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
 #include <Spinner.h>
 #include <String.h>
 #include <StringView.h>
-#include <Roster.h>
 #include <Window.h>
 
 #include <InterfacePrivate.h>
@@ -85,13 +85,11 @@ static const struct {
 	{ B_RGB24, 24, B_TRANSLATE("24 bits/pixel, 16 Million colors") },
 	{ B_RGB32, 32, B_TRANSLATE("32 bits/pixel, 16 Million colors") }
 };
-static const int32 kColorSpaceCount
-	= sizeof(kColorSpaces) / sizeof(kColorSpaces[0]);
+static const int32 kColorSpaceCount = B_COUNT_OF(kColorSpaces);
 
 // list of standard refresh rates
 static const int32 kRefreshRates[] = { 60, 70, 72, 75, 80, 85, 95, 100 };
-static const int32 kRefreshRateCount
-	= sizeof(kRefreshRates) / sizeof(kRefreshRates[0]);
+static const int32 kRefreshRateCount = B_COUNT_OF(kRefreshRates);
 
 // list of combine modes
 static const struct {
@@ -102,8 +100,7 @@ static const struct {
 	{ kCombineHorizontally, B_TRANSLATE("horizontally") },
 	{ kCombineVertically, B_TRANSLATE("vertically") }
 };
-static const int32 kCombineModeCount
-	= sizeof(kCombineModes) / sizeof(kCombineModes[0]);
+static const int32 kCombineModeCount = B_COUNT_OF(kCombineModes);
 
 
 static BString
