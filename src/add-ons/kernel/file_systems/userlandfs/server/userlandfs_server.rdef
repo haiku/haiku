@@ -4,7 +4,7 @@
 
 resource app_signature "application/x-vnd.haiku.userlandfs-server";
 
-resource app_flags B_EXCLUSIVE_LAUNCH|B_BACKGROUND_APP;
+resource app_flags B_MULTIPLE_LAUNCH|B_BACKGROUND_APP;
 
 resource app_version {
 	major  = 1,
