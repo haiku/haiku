@@ -87,7 +87,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fFrame(0),
 	fIsAudio(false),
 	fCodec(NULL),
-	fCodecContext(avcodec_alloc_context3(NULL)),
+	fCodecContext(NULL),
 	fResampleContext(NULL),
 	fDecodedData(NULL),
 	fDecodedDataSizeInBytes(0),
@@ -127,13 +127,6 @@ AVCodecDecoder::AVCodecDecoder()
 	fFilterFrame(NULL)
 {
 	TRACE("AVCodecDecoder::AVCodecDecoder()\n");
-
-	system_info info;
-	get_system_info(&info);
-
-	fCodecContext->err_recognition = AV_EF_CAREFUL;
-	fCodecContext->error_concealment = 3;
-	fCodecContext->thread_count = info.cpu_count;
 }
 
 
@@ -157,8 +150,10 @@ AVCodecDecoder::~AVCodecDecoder()
 	av_frame_free(&fRawDecodedPicture);
 	av_free(fRawDecodedAudio->opaque);
 	av_frame_free(&fRawDecodedAudio);
-	fCodecContext->extradata = NULL;
-	avcodec_free_context(&fCodecContext);
+	if (fCodecContext != NULL) {
+		fCodecContext->extradata = NULL;
+		avcodec_free_context(&fCodecContext);
+	}
 	av_frame_free(&fDecodedDataBuffer);
 
 	av_frame_free(&fFilterFrame);
@@ -304,10 +299,20 @@ AVCodecDecoder::NegotiateOutputFormat(media_format* inOutFormat)
 #endif
 
 	// close any previous instance
-	fCodecContext->extradata = NULL;
-	avcodec_free_context(&fCodecContext);
+	if (fCodecContext != NULL) {
+		fCodecContext->extradata = NULL;
+		avcodec_free_context(&fCodecContext);
+	}
+
 	fCodecContext = avcodec_alloc_context3(fCodec);
 	fCodecInitDone = false;
+
+	system_info info;
+	get_system_info(&info);
+
+	fCodecContext->err_recognition = AV_EF_CAREFUL;
+	fCodecContext->error_concealment = 3;
+	fCodecContext->thread_count = info.cpu_count;
 
 	if (fIsAudio)
 		return _NegotiateAudioOutputFormat(inOutFormat);
@@ -472,13 +477,6 @@ AVCodecDecoder::_NegotiateVideoOutputFormat(media_format* inOutFormat)
 		// Note: Doing this step unconditionally is OK, because the first call
 		// to _DecodeNextVideoFrame() will update the essential video format
 		// properties accordingly regardless of the settings here.
-
-	// Let ffmpeg use up to one thread per CPU core
-	system_info info;
-	get_system_info(&info);
-
-	fCodecContext->thread_type = FF_THREAD_FRAME;
-	fCodecContext->thread_count = info.cpu_count;
 
 	if (avcodec_open2(fCodecContext, fCodec, NULL) < 0) {
 		TRACE("avcodec_open() failed to init codec!\n");
