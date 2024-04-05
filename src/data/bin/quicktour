@@ -12,7 +12,7 @@ localizedQuicktourBase=/boot/system/documentation/welcome/"$languageBase"/quickt
 
 if [ -f $localizedQuicktour ]; then
 	open file:$localizedQuicktour
-elif [ -f $localizedQuicktourBase ];
+elif [ -f $localizedQuicktourBase ]; then
 	open file:$localizedQuicktourBase
 elif [ -f $quicktour ]; then
 	open $quicktour
