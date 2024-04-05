@@ -2986,8 +2986,10 @@ BContainerWindow::BuildAddOnsMenu(BMenu* parentMenu)
 	if (item == NULL)
 		return;
 
-	BFont font;
-	parentMenu->GetFont(&font);
+	BFont font; {
+		AutoLock<BLooper> _(parentMenu->Looper());
+		parentMenu->GetFont(&font);
+	}
 
 	BMenu* menu = item->Submenu();
 	if (menu == NULL)
