@@ -11,7 +11,7 @@
 status_t
 null_hw_create_virtual_buffers(device_stream_t* stream, const char* name)
 {
-	int i;
+	uint32 i;
 	int buffer_size;
 	int area_size;
 	uint8* buffer;
