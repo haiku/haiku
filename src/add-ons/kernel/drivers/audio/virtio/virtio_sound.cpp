@@ -16,16 +16,16 @@
 #define VIRTIO_SOUND_DEVICE_ID_GEN 			"virtio_sound/device_id"
 
 
-struct {
+struct VirtIOSoundDriverInfo {
 	device_node* 				node;
 	::virtio_device 			virtio_dev;
 	virtio_device_interface*	iface;
 	uint32						features;
-} VirtIOSoundDriverInfo;
+};
 
-typedef struct {
+struct VirtIOSoundHandle {
     VirtIOSoundDriverInfo*		info;
-} VirtIOSoundHandle;
+};
 
 static device_manager_info*		sDeviceManager;
 
@@ -42,7 +42,7 @@ static float
 SupportsDevice(device_node* parent)
 {
 	uint16 deviceType;
-	char* bus;
+	const char* bus;
 
 	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK
 		|| sDeviceManager->get_attr_uint16(parent, VIRTIO_DEVICE_TYPE_ITEM,
@@ -75,11 +75,10 @@ InitDriver(device_node* node, void** cookie)
 }
 
 
-static status_t
+static void
 UninitDriver(void* cookie)
 {
 	free(cookie);
-	return B_OK;
 }
 
 

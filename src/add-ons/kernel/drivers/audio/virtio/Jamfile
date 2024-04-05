@@ -3,6 +3,6 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio virtio ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders drivers virtio ;
 
-KernelAddon virtio_audio :
-	virtio_audio.cpp
+KernelAddon virtio_sound :
+	virtio_sound.cpp
 ;
