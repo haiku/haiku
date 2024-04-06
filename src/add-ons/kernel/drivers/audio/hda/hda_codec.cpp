@@ -1501,18 +1501,18 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	codec->unsol_response_write = 0;
 
 	struct {
-		uint32 device : 16;
-		uint32 vendor : 16;
-		uint32 subsystem : 32;
-		uint32 stepping : 8;
-		uint32 revision : 8;
-		uint32 minor : 4;
-		uint32 major : 4;
-		uint32 _reserved0 : 8;
-		uint32 count : 8;
-		uint32 _reserved1 : 8;
-		uint32 start : 8;
-		uint32 _reserved2 : 8;
+		uint16 device;
+		uint16 vendor;
+		uint32 subsystem;
+		uint8 stepping;
+		uint8 revision;
+		uint8 minor : 4;
+		uint8 major : 4;
+		uint8 _reserved0;
+		uint8 count;
+		uint8 _reserved1;
+		uint8 start;
+		uint8 _reserved2;
 	} response;
 
 	corb_t verbs[4];
@@ -1571,15 +1571,12 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		}
 	}
 
-	TRACE("Codec %" B_PRIu32 " Vendor: %04" B_PRIx32 " "
-		"Product: %04" B_PRIx32 " "
+	TRACE("Codec %" B_PRIu32 " Vendor: %04" B_PRIx16 " Product: %04" B_PRIx16 " "
 		"Subsystem: %08" B_PRIx32 ", "
-		"Revision: %" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 ".%" B_PRIu32 " "
+		"Revision: %" B_PRIu8 ".%" B_PRIu8 ".%" B_PRIu8 ".%" B_PRIu8 " "
 		"Quirks: %04" B_PRIx32 "\n",
-		codecAddress,
-		response.vendor,
-		response.device,
-		codec->subsystem_id,
+		codecAddress, response.vendor, response.device,
+		(uint32)codec->subsystem_id,
 		response.major, response.minor, response.revision, response.stepping,
 		codec->quirks);
 
