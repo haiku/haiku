@@ -45,7 +45,7 @@ string gPLnkString;
 const char* gAppTypes[] = {
 	"APP",
 	"SHARED",
-	"STAITC",
+	"STATIC",
 	"DRIVER"
 };
 
@@ -54,10 +54,8 @@ string gAppName;
 
 struct hdr
 {
-			uint32	Id() { return
-						static_cast<uint32>(B_BENDIAN_TO_HOST_INT32(fId)); }
-			uint32	Size() { return
-						static_cast<uint32>(B_BENDIAN_TO_HOST_INT32(fSize)); }
+			uint32	Id() { return static_cast<uint32>(B_BENDIAN_TO_HOST_INT32(fId)); }
+			uint32	Size() { return static_cast<uint32>(B_BENDIAN_TO_HOST_INT32(fSize)); }
 			const char* Data() { return (char*)(this + 1); }
 private:
 			uint32 fId;
@@ -118,10 +116,8 @@ CheckFiles(const char* projPath, const char* makePath)
 		throw Error("Can not create makefile");
 
 	BPath templateFileName;
-	// not supporter yet in my haiku rev
-	// find_directory(B_SYSTEM_DEVELOP_DIR, &templateFileName);
-	// templateFileName.Append("etc/makefile");
-	templateFileName.SetTo("/boot/develop/etc/makefile");
+	find_directory(B_SYSTEM_DEVELOP_DIRECTORY, &templateFileName);
+	templateFileName.Append("etc/Makefile");
 
 	gTemplateFile.open(templateFileName.Path(), fstream::in);
 	if (!gTemplateFile.is_open())
@@ -153,14 +149,16 @@ ParseGenB(hdr* data)
 
 class _l {
 	static string _s;
+
 public:
-	_l() { _s += " " ; }
+	_l() { _s += " "; }
 	~_l() { _s.resize(_s.size() - 1); }
 
-	char* str() { _s.c_str(); }
+	const char* str() { return _s.c_str(); }
 };
 
 string _l::_s;
+
 
 void
 Parse(hdr* current, hdr* parent)
@@ -169,13 +167,13 @@ Parse(hdr* current, hdr* parent)
 
 	uint32 u = current->Id();
 	char* c = (char*)&u;
-	printf("%#06x:%s%c%c%c%c:%d\n",
-		(uint8*)current - gProjData, l.str(),
-		c[3], c[2], c[1], c[0], current->Size());
+	printf("%#06x:%s%c%c%c%c:%d\n", (uint8*)current - gProjData, l.str(), c[3], c[2], c[1], c[0],
+		current->Size());
 
 	bool useGrandParent = false;
 	size_t off = 0;
-	switch(current->Id()) {
+	BString data;
+	switch (current->Id()) {
 		case 'Fil1':
 		case 'Link':
 		case 'PLnk':
@@ -190,8 +188,19 @@ Parse(hdr* current, hdr* parent)
 			useGrandParent = true;
 			break;
 		case 'SPth':
+			data = &current->Data()[5];
+			// Avoid adding these library paths as include dirs.
+			if ((data.FindFirst("/boot/develop/lib") > -1)
+				|| (data.FindFirst("/boot/beos/system/lib") > -1)) {
+				return;
+			}
+			// Replace BeOS paths with Haiku's.
+			data.ReplaceFirst("/boot/develop/headers/be", "/boot/system/develop/os");
+			data.ReplaceFirst("/boot/develop/headers/cpp", "/boot/system/develop/c++");
+			data.ReplaceFirst("/boot/develop/headers/posix", "/boot/system/develop/headers/posix");
+
 			gSPthString += " \\\n\t";
-			gSPthString += &current->Data()[5];
+			gSPthString += data.String();
 			return;
 		case 'PPth':
 			gPPthString += " \\\n\t";
@@ -240,11 +249,11 @@ ReadProj()
 void
 Proj2Make()
 {
-	gFil1String = " ";
-	gLinkString = " ";
-	gPLnkString = " ";
-	gSPthString = " ";
-	gPPthString = " ";
+	gFil1String = "";
+	gLinkString = "";
+	gPLnkString = "";
+	gSPthString = "";
+	gPPthString = "";
 
 	ReadProj();
 	string str;
@@ -260,9 +269,9 @@ Proj2Make()
 		else if (str.find("LOCAL_INCLUDE_PATHS") == 0)
 			str = str + gPPthString;
 		else if (str.find("TYPE") == 0)
-			str = str + gAppTypes[gAppType];
+			str = str + " " + gAppTypes[gAppType];
 		else if (str.find("NAME") == 0)
-			str = str + gAppName;
+			str = str + " " + gAppName;
 		else if (str.find("RSRCS") == 0)
 			str = str + gPLnkString;
 
@@ -299,7 +308,7 @@ main(int argc, char** argv)
 
 		Proj2Make();
 
-	} catch(exception& exc) {
+	} catch (exception& exc) {
 		cerr << argv[0] << " : " << exc.what() << endl;
 		cerr << kUsageMessage;
 		return B_ERROR;
@@ -307,4 +316,3 @@ main(int argc, char** argv)
 
 	return B_OK;
 }
-
