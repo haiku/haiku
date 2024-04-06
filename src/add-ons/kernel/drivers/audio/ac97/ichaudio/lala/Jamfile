@@ -1,7 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
-
-
-KernelMergeObject ichaudio_lala.o :
-	driver.c
-	util.c
-;
