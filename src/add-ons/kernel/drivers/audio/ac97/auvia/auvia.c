@@ -73,7 +73,7 @@ auvia_mem_new(auvia_dev *card, size_t size)
 	if ((mem = malloc(sizeof(*mem))) == NULL)
 		return (NULL);
 
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "auvia buffer");
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "auvia buffer", false);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);
@@ -145,14 +145,14 @@ auvia_stream_set_audioparms(auvia_stream *stream, uint8 channels,
 	
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * stream->channels;
-	
+
 	stream->buffer = auvia_mem_alloc(stream->card, stream->bufframes 
 		* frame_size * stream->bufcount);
-	
+
 	stream->trigblk = 0;	/* This shouldn't be needed */
 	stream->blkmod = stream->bufcount;
 	stream->blksize = stream->bufframes * frame_size;
-		
+
 	return B_OK;
 }
 
@@ -160,50 +160,49 @@ auvia_stream_set_audioparms(auvia_stream *stream, uint8 channels,
 status_t
 auvia_stream_commit_parms(auvia_stream *stream)
 {
-	int             i;
-	uint32      	*page;
-	uint32			value;
+	int i;
+	uint32* page;
+	uint32 value;
 	LOG(("auvia_stream_commit_parms\n"));
-	
+
 	page = stream->dmaops_log_base;
-	
+
 	for(i = 0; i < stream->bufcount; i++) {
-		page[2*i] = ((uint32)stream->buffer->phy_base) + 
-			i * stream->blksize;
-		page[2*i + 1] = AUVIA_DMAOP_FLAG | stream->blksize;
+		page[2 * i] = stream->buffer->phy_base + i * stream->blksize;
+		page[2 * i + 1] = AUVIA_DMAOP_FLAG | stream->blksize;
 	}
-	
-	page[2*stream->bufcount - 1] &= ~AUVIA_DMAOP_FLAG;
-	page[2*stream->bufcount - 1] |= AUVIA_DMAOP_EOL;
-	
-	auvia_reg_write_32(&stream->card->config, stream->base + AUVIA_RP_DMAOPS_BASE, 
-		(uint32)stream->dmaops_phy_base);
-		
+
+	page[2 * stream->bufcount - 1] &= ~AUVIA_DMAOP_FLAG;
+	page[2 * stream->bufcount - 1] |= AUVIA_DMAOP_EOL;
+
+	auvia_reg_write_32(&stream->card->config, stream->base + AUVIA_RP_DMAOPS_BASE,
+		stream->dmaops_phy_base);
+
 	if(stream->use & AUVIA_USE_RECORD)
-		auvia_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, 
+		auvia_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE,
 			(uint16)stream->sample_rate);
 	else
-		auvia_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, 
+		auvia_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE,
 			(uint16)stream->sample_rate);
-	
+
 	if(IS_8233(&stream->card->config)) {
 		if(stream->base != AUVIA_8233_MP_BASE) {
-			value = auvia_reg_read_32(&stream->card->config, stream->base 
+			value = auvia_reg_read_32(&stream->card->config, stream->base
 				+ AUVIA_8233_RP_RATEFMT);
-			value &= ~(AUVIA_8233_RATEFMT_48K | AUVIA_8233_RATEFMT_STEREO 
+			value &= ~(AUVIA_8233_RATEFMT_48K | AUVIA_8233_RATEFMT_STEREO
 				| AUVIA_8233_RATEFMT_16BIT);
 			if(stream->use & AUVIA_USE_PLAY)
-				value |= AUVIA_8233_RATEFMT_48K * (stream->sample_rate / 20) 
+				value |= AUVIA_8233_RATEFMT_48K * (stream->sample_rate / 20)
 					/ (48000 / 20);
 			value |= (stream->channels == 2 ? AUVIA_8233_RATEFMT_STEREO : 0)
 				| (stream->b16 ? AUVIA_8233_RATEFMT_16BIT : 0);
-			auvia_reg_write_32(&stream->card->config, stream->base 
+			auvia_reg_write_32(&stream->card->config, stream->base
 				+ AUVIA_8233_RP_RATEFMT, value);
 		} else {
-			static const uint32 slottab[7] = {0, 0xff000011, 0xff000021, 
+			static const uint32 slottab[7] = {0, 0xff000011, 0xff000021,
 				0xff000521, 0xff004321, 0xff054321, 0xff654321};
 			value = (stream->b16 ? AUVIA_8233_MP_FORMAT_16BIT : AUVIA_8233_MP_FORMAT_8BIT)
-				| ((stream->channels << 4) & AUVIA_8233_MP_FORMAT_CHANNEL_MASK) ;
+				| ((stream->channels << 4) & AUVIA_8233_MP_FORMAT_CHANNEL_MASK);
 			auvia_reg_write_8(&stream->card->config, stream->base 
 				+ AUVIA_8233_OFF_MP_FORMAT, value);
 			auvia_reg_write_32(&stream->card->config, stream->base 
@@ -211,7 +210,7 @@ auvia_stream_commit_parms(auvia_stream *stream)
 		}
 	}
 	//auvia_codec_write(&stream->card->config, AC97_SPDIF_CONTROL, (uint16)stream->sample_rate);
-		
+
 	return B_OK;
 }
 
@@ -226,7 +225,7 @@ auvia_stream_get_nth_buffer(auvia_stream *stream, uint8 chan, uint8 buf,
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * stream->channels;
 	
-	*buffer = stream->buffer->log_base + (buf * stream->bufframes * frame_size)
+	*buffer =(char *)((addr_t)stream->buffer->log_base + (uintptr_t)(buf * stream->bufframes * frame_size))
 		+ chan * sample_size;
 	*stride = frame_size;
 	
@@ -240,12 +239,12 @@ auvia_stream_curaddr(auvia_stream *stream)
 	uint32 addr;
 	if(IS_8233(&stream->card->config)) {
 		addr = auvia_reg_read_32(&stream->card->config, stream->base + AUVIA_RP_DMAOPS_BASE);
-		TRACE(("stream_curaddr %p, phy_base %p\n", addr, (uint32)stream->dmaops_phy_base));
-		return (addr - (uint32)stream->dmaops_phy_base - 4) / 8;
+		TRACE(("stream_curaddr %p, phy_base %p\n", addr, stream->dmaops_phy_base));
+		return (addr - stream->dmaops_phy_base - 4) / 8;
 	} else {
 		addr = auvia_reg_read_32(&stream->card->config, stream->base + AUVIA_RP_DMAOPS_BASE);
-		TRACE(("stream_curaddr %p, phy_base %p\n", addr, (uint32)stream->dmaops_phy_base));
-		return (addr - (uint32)stream->dmaops_phy_base - 8) / 8;
+		TRACE(("stream_curaddr %p, phy_base %p\n", addr, stream->dmaops_phy_base));
+		return (addr - stream->dmaops_phy_base - 8) / 8;
 	}
 }
 
@@ -336,7 +335,7 @@ auvia_stream_new(auvia_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	
 	/* allocate memory for our dma ops */
 	stream->dmaops_area = alloc_mem(&stream->dmaops_phy_base, &stream->dmaops_log_base, 
-		VIA_TABLE_SIZE, "auvia dmaops");
+		VIA_TABLE_SIZE, "auvia dmaops", false);
 		
 	if (stream->dmaops_area < B_OK) {
 		PRINT(("couldn't allocate memory\n"));

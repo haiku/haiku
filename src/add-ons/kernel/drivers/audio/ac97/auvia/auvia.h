@@ -82,10 +82,10 @@
 
 typedef struct _auvia_mem {
 	LIST_ENTRY(_auvia_mem) next;
-	void	*log_base;
-	void	*phy_base;
-	area_id area;
-	size_t	size;
+	void*		log_base;
+	phys_addr_t	phy_base;
+	area_id		area;
+	size_t		size;
 } auvia_mem;
 
 /*
@@ -93,37 +93,37 @@ typedef struct _auvia_mem {
  */
 
 typedef struct _auvia_stream {
-	struct _auvia_dev 	*card;
-	uint8        		use;
-	uint8        		state;
-	uint8        		b16;
-	uint32       		sample_rate;
+	struct _auvia_dev	*card;
+	uint8				use;
+	uint8				state;
+	uint8				b16;
+	uint32				sample_rate;
 	uint8				channels;
-	uint32 				bufframes;
-	uint8 				bufcount;
+	uint32				bufframes;
+	uint8				bufcount;
 
 	uint32				base;
 
 	LIST_ENTRY(_auvia_stream)	next;
 
-	void            	(*inth) (void *);
-	void           		*inthparam;
+	void				(*inth) (void *);
+	void				*inthparam;
 
-	void	*dmaops_log_base;
-	void	*dmaops_phy_base;
-	area_id dmaops_area;
+	void*				dmaops_log_base;
+	phys_addr_t			dmaops_phy_base;
+	area_id				dmaops_area;
 
-	auvia_mem *buffer;
-	uint16       blksize;	/* in samples */
-	uint16       trigblk;	/* blk on which to trigger inth */
-	uint16       blkmod;	/* Modulo value to wrap trigblk */
+	auvia_mem*			buffer;
+	uint16				blksize;	/* in samples */
+	uint16				trigblk;	/* blk on which to trigger inth */
+	uint16				blkmod;	/* Modulo value to wrap trigblk */
 
 	/* multi_audio */
-	volatile int64	frames_count;	// for play or record
-	volatile bigtime_t real_time;	// for play or record
-	volatile int32	buffer_cycle;	// for play or record
-	int32 first_channel;
-	bool update_needed;
+	volatile int64		frames_count;	// for play or record
+	volatile bigtime_t	real_time;	// for play or record
+	volatile int32		buffer_cycle;	// for play or record
+	int32				first_channel;
+	bool				update_needed;
 } auvia_stream;
 
 /*

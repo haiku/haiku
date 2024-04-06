@@ -676,7 +676,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel debugger ;
 #	EnableWerror src add-ons kernel drivers audio ac97 ;
 	EnableWerror src add-ons kernel drivers audio ac97 auich ;
-#	EnableWerror src add-ons kernel drivers audio ac97 auvia ;
+	EnableWerror src add-ons kernel drivers audio ac97 auvia ;
 #	EnableWerror src add-ons kernel drivers audio ac97 es1370 ;
 #	EnableWerror src add-ons kernel drivers audio ac97 geode ;
 #	EnableWerror src add-ons kernel drivers audio ac97 ich ;
