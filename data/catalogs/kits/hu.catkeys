@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	535088175
+1	hungarian	x-vnd.Haiku-libbe	1737418561
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 gold master	AboutWindow		arany fokozatú
 Undo	TextView		Visszavonás
@@ -13,15 +13,20 @@ Green:	ColorControl		Zöld
 Redo	TextView		Újra
 No pages to print!	PrintJob		Nincs nyomtatható oldal!
 beta	AboutWindow		béta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		Rendben
 Cut	TextView		Kivágás
 Default	Default decorator about box		Alapértelmezett
+%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nem lehet ezt a replikánst törölni az eredeti programtól.
 Error	ZombieReplicantView		Hiba
 Paste	TextView		Beillesztés
 OK	AboutWindow		Rendben
+%s MiB/s	StringForRate	units per second	%s MiB/s
+%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Külön köszönet:
 Default Haiku window decorator.	Default decorator about box		Alapértelmezett Haiku ablak-dekoráció
+%s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Replikáns eltávolítása
 Version	AboutWindow		Verzió
 Red:	ColorControl		Vörös
@@ -32,10 +37,13 @@ Select all	TextView		Összes kijelölése
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# bájt/mp} other{# bájt/mp}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Hiba
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app%	AboutWindow		%app% névjegye
 About %app…	Dragger		%app névjegye…
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Előző verziók:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Kék
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nem lehet replikánst létrehozni ehhez: \"%description\".\n%error
 Written by:	AboutWindow		Írta:

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	romanian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Echipe
 Semaphores	DataSource		Semafoare
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Swap
 P-faults	DataSource		Defecțiuni-P
 Sems	DataSource		Sems
 Network receive	DataSource		Recepție rețea
+%s faults/s	DataSource		%s defecțiuni/s

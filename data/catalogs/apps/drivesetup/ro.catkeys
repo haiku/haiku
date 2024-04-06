@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	2943652182
+1	romanian	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Nu s-a putut demonta partiția %s.
 Mount all	MainWindow		Montează toate
 Disk	MainWindow		Disc
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		Nu s-a putut demonta partiția
 Create	CreateParametersPanel		Creează
 File system	PartitionList		Sistem de fișiere
+Unknown (%s)	PartitionList		Necunoscut (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Partiția selectată nu conține un sistem de partiționare.
 End: %s	Support		Final: %s
 Partition type	PartitionList		Tip de partiție

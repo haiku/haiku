@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libbe	535088175
+1	catalan; valencian	x-vnd.Haiku-libbe	1737418561
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
 gold master	AboutWindow		candidat
 Undo	TextView		Desfés
@@ -13,15 +13,20 @@ Green:	ColorControl		Verd:
 Redo	TextView		Refés
 No pages to print!	PrintJob		No hi ha cap pàgina per imprimir!
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		D'acord
 Cut	TextView		Retalla
 Default	Default decorator about box		Per defecte
+%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		No s'ha pogut suprimir aquest replicant de la seva aplicació original. La vida continua.
 Error	ZombieReplicantView		Error
 Paste	TextView		Enganxa
 OK	AboutWindow		D'acord
+%s MiB/s	StringForRate	units per second	%s MiB/s
+%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Agraïments especials:
 Default Haiku window decorator.	Default decorator about box		Decorador de finestres per defecte del Haiku
+%s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Suprimeix el replicant
 Version	AboutWindow		Versió
 Red:	ColorControl		Vermell:
@@ -32,10 +37,13 @@ Select all	TextView		Selecciona-ho tot
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Error
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app%	AboutWindow		Quant a %app%
 About %app…	Dragger		Quant a %app…
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Historial de versions:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es pot trobar l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Blau:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		No es pot crear el replicant per a \"%description\".\n%error
 Written by:	AboutWindow		Escrit per:

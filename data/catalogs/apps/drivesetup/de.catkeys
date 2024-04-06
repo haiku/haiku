@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	2302251814
+1	german	x-vnd.Haiku-DriveSetup	3717467260
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -41,6 +41,7 @@ Format	InitializeParametersPanel		Formatieren
 Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
 Create	CreateParametersPanel		Anlegen
 File system	PartitionList		Dateisystem
+Unknown (%s)	PartitionList		Unbekannt (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Die ausgewählte Partition enthält kein Partitionierungssystem.
 End: %s	Support		Ende: %s
 Partition type	PartitionList		Partitionstyp:

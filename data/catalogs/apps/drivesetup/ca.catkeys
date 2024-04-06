@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	2943652182
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		No s'ha pogut desmuntar la partició.
 Create	CreateParametersPanel		Crea
 File system	PartitionList		Sistema de fitxers
+Unknown (%s)	PartitionList		Desconegut (%s)
 The selected partition does not contain a partitioning system.	MainWindow		La partició seleccionada no conté un sistema de particions.
 End: %s	Support		Final: %s
 Partition type	PartitionList		Tipus de partició

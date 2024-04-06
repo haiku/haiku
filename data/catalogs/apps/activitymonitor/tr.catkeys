@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	1319108693
+1	turkish	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Takımlar
 Semaphores	DataSource		Semaforlar
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Takas
 P-faults	DataSource		Olasılık hataları
 Sems	DataSource		Semler
 Network receive	DataSource		Ağ gelen trafik
+%s faults/s	DataSource		%s hata/sn

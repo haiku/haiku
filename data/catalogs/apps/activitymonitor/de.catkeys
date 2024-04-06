@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	2803083455
+1	german	x-vnd.Haiku-ActivityMonitor	3951509502
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaphoren
 TX	DataSource	Shorter version for Sending	Senden
@@ -44,3 +44,4 @@ Swap	DataSource		Auslagerung
 P-faults	DataSource		Seitenfehler
 Sems	DataSource		Sems
 Network receive	DataSource		Netzwerk empfangen
+%s faults/s	DataSource		%s Fehler/s

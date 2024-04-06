@@ -55,7 +55,7 @@ Really close?	Terminal TermWindow		Virkelig lukke?
 Font size	Terminal TermWindow		Skriftstørrelse
 OK	Terminal TermApp		OK
 ANSI bright blue color	Terminal ThemeView		ANSI lys blå farge
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli drept.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker Terminal vil prosessen bli stoppet.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ukjent valg \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Fanetittel:
 Text not found.	Terminal TermWindow		Tekst ikke funnet.
@@ -75,7 +75,7 @@ Selected text	Terminal ThemeView		Valgt tekst
 Copy absolute path	Terminal TermView		Kopier absolutt sti
 Cancel	Terminal TermWindow		Avbryt
 ANSI cyan color	Terminal ThemeView		ANSI cyan farge
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker fanen vil prosessen bli drept.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\"-prosessen kjører fremdeles.\nHvis du lukker fanen vil prosessen bli stoppet.
 Full screen	Terminal TermWindow		Fullskjerm
 Shell 	Terminal TermWindow		Skall
 Revert	Terminal ThemeWindow		Tilbakestill
@@ -119,7 +119,7 @@ Find…	Terminal TermWindow		Finn…
 No search string was entered.	Terminal TermWindow		Ingen søkestreng ble angitt.
 Move here	Terminal TermView		Flytt hit
 Abort	Terminal Shell		Avbryt
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende prosesser kjører fremdeles:\n\n\t%1\n\nHvis du lukker Termina il prosessene bli drept.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende prosesser kjører fremdeles:\n\n\t%1\n\nHvis du lukker Terminalen vil prosessene bli stoppet.
 Set window title	Terminal TermWindow		Sett vindustittel
 ANSI red color	Terminal ThemeView		ANSI rød farge
 Increase	Terminal TermWindow		Øk

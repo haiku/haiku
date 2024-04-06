@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	hungarian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Csapatok
 Semaphores	DataSource		Szemaforok
 TX	DataSource	Shorter version for Sending	Adás
@@ -45,3 +45,4 @@ Swap	DataSource		Swap
 P-faults	DataSource		P hibák
 Sems	DataSource		Szemaforok
 Network receive	DataSource		Fogadott adatok
+%s faults/s	DataSource		%s hiba/mp

@@ -68,7 +68,7 @@ Find previous	Terminal TermWindow		Troba'n l'anterior
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patró que especifica els títols de les pestanyes. Es poden usar\nels marcadors de posició següents:
 Close	Terminal TermWindow		Tanca
 Save to file…	Terminal PrefWindow		Desa a un fitxer...
-Defaults	Terminal ThemeWindow		Per defecte
+Defaults	Terminal ThemeWindow		Valors predeterminats
 Copy path	Terminal TermView		Copia'n el camí
 Window size	Terminal TermWindow		Mida de la finestra
 Selected text	Terminal ThemeView		Text seleccionat

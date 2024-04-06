@@ -269,7 +269,7 @@ Unmatched parenthesis.	libtracker		Umatched parentes.
 Extended attribute	AttributesView		Utvidet attributt
 Unmatched brackets.	libtracker		Umatched klammeparentes.
 Error %error loading Add-On %name.	ContainerWindow		Feil %error ved lasting av tillegg %name.
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Du prøver å erstatte objektet:\n\t%name%dest\nmed:\n\t%name%src\n\nØnsker du å erstatte det med det du er %movemode?
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Du prøver å erstatte objektet:\n\t%name%dest\nmed:\n\t%name%src\n\nØnsker du å erstatte dette med det du %movemode?
 Empty Trash	ContainerWindow		Tøm søppelkurven
 no supporting apps	OpenWithWindow		ingen støttende programmer
 32-bit unsigned integer	AttributesView		32-bit unsigned integer

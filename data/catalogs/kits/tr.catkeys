@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libbe	535088175
+1	turkish	x-vnd.Haiku-libbe	1737418561
 All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
 gold master	AboutWindow		altın kopya
 Undo	TextView		Geri al
@@ -13,15 +13,20 @@ Green:	ColorControl		Yeşil:
 Redo	TextView		Yinele
 No pages to print!	PrintJob		Yazdırılacak bir sayfa yok!
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		Tamam
 Cut	TextView		Kes
 Default	Default decorator about box		Saptanmış
+%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Bu yinelenen kendi özgün uygulamasından silinemiyor.
 Error	ZombieReplicantView		Hata
 Paste	TextView		Yapıştır
 OK	AboutWindow		Tamam
+%s MiB/s	StringForRate	units per second	%s MiB/sn
+%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Özel teşekkürlerimizle:
 Default Haiku window decorator.	Default decorator about box		Saptanmış Haiku pencere dekorcusu.
+%s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Yineleneni kaldır
 Version	AboutWindow		Sürüm
 Red:	ColorControl		Kırmızı:
@@ -32,10 +37,13 @@ Select all	TextView		Tümünü seç
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# bayt/sn} other{# bayt/sn}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Hata
+%s TiB/s	StringForRate	units per second	%s TiB/sn
 About %app%	AboutWindow		%app% hakkında
 About %app…	Dragger		%app hakkında…
+%s GiB/s	StringForRate	units per second	%s GiB/sn
 Version history:	AboutWindow		Sürüm geçmişi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenen uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/sn
 Blue:	ColorControl		Mavi:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		“%description” için yinelenen oluşturulamıyor.\n%error
 Written by:	AboutWindow		Yazan:

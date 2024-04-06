@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	535088175
+1	japanese	x-vnd.Haiku-libbe	1737418561
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		ゴールデンマスター
 Undo	TextView		元に戻す
@@ -13,15 +13,20 @@ Green:	ColorControl		緑:
 Redo	TextView		やり直し
 No pages to print!	PrintJob		印刷するページがありません。
 beta	AboutWindow		β
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		OK
 Cut	TextView		切り取り
 Default	Default decorator about box		デフォルト
+%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。
 Error	ZombieReplicantView		エラー
 Paste	TextView		貼り付け
 OK	AboutWindow		OK
+%s MiB/s	StringForRate	units per second	%s MiB/s
+%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Special Thanks:
 Default Haiku window decorator.	Default decorator about box		デフォルトの Haiku ウィンドウデコレーター。
+%s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		レプリカントの削除
 Version	AboutWindow		バージョン
 Red:	ColorControl		赤:
@@ -32,10 +37,13 @@ Select all	TextView		すべて選択
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		α
 Error	PrintJob		エラー
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app%	AboutWindow		%app% について
 About %app…	Dragger		%appについて...
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		改訂履歴:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		青:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\" 用のレプリカントを作成できません。\n%error
 Written by:	AboutWindow		作者:

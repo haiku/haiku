@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ActivityMonitor	1319108693
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Lag
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Utveksling
 P-faults	DataSource		P-feil
 Sems	DataSource		Semaforer
 Network receive	DataSource		Mottatt nettverk
+%s faults/s	DataSource		%s feil/s

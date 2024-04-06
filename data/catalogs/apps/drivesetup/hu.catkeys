@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	2943652182
+1	hungarian	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formázás
 Could not unmount partition	MainWindow		Nem lehet leválasztani a partíciót
 Create	CreateParametersPanel		Létrehoz
 File system	PartitionList		Fájlrendszer
+Unknown (%s)	PartitionList		Ismeretlen (%s)
 The selected partition does not contain a partitioning system.	MainWindow		A kiválasztott partíción nincs particionálási séma.
 End: %s	Support		Vége: %s
 Partition type	PartitionList		Partíció típusa

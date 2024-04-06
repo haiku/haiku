@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1319108693
+1	japanese	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		チーム数
 Semaphores	DataSource		セマフォ数
 TX	DataSource	Shorter version for Sending	送信
@@ -45,3 +45,4 @@ Swap	DataSource		スワップ
 P-faults	DataSource		ページフォルト
 Sems	DataSource		セマフォ
 Network receive	DataSource		ネットワーク受信量
+%s faults/s	DataSource		%s faults/s

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	2943652182
+1	japanese	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できません。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		フォーマット
 Could not unmount partition	MainWindow		パーティションをマウント解除できません。
 Create	CreateParametersPanel		新規作成
 File system	PartitionList		ファイルシステム
+Unknown (%s)	PartitionList		不明なパーティション (%s)
 The selected partition does not contain a partitioning system.	MainWindow		選択されたパーティションにパーティションシステムはありません。
 End: %s	Support		終了位置: %s
 Partition type	PartitionList		パーティション種別 

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	2943652182
+1	turkish	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		%s bölüntüsü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Biçimlendir
 Could not unmount partition	MainWindow		Bölüntü bağlantısı kesilemedi
 Create	CreateParametersPanel		Oluştur
 File system	PartitionList		Dosya sistemi
+Unknown (%s)	PartitionList		Bilinmeyen (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Seçili bölüntü bir bölüntüleme sistemi içermiyor.
 End: %s	Support		Son: %s
 Partition type	PartitionList		Bölüntü türü

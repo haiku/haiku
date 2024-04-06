@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libbe	535088175
+1	german	x-vnd.Haiku-libbe	1737418561
 All Rights Reserved.	AboutWindow		Alle Rechte vorbehalten.
 gold master	AboutWindow		Golden Master
 Undo	TextView		Rückgängig
@@ -13,15 +13,20 @@ Green:	ColorControl		Grün:
 Redo	TextView		Wiederholen
 No pages to print!	PrintJob		Keine Seiten zum Drucken!
 beta	AboutWindow		Beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		OK
 Cut	TextView		Ausschneiden
 Default	Default decorator about box		Standard
+%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Dieser Replikant kann nicht von seinem Ursprungsprogramm entfernt werden. Das Leben geht weiter.
 Error	ZombieReplicantView		Fehler
 Paste	TextView		Einfügen
 OK	AboutWindow		OK
+%s MiB/s	StringForRate	units per second	%s MiB/s
+%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Besonderen Dank an:
 Default Haiku window decorator.	Default decorator about box		Standard-Dekorator aller Fenster
+%s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Replikant entfernen
 Version	AboutWindow		Version
 Red:	ColorControl		Rot:
@@ -32,10 +37,13 @@ Select all	TextView		Alles auswählen
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# Byte/s} other{# Bytes/s}}
 alpha	AboutWindow		Alpha
 Error	PrintJob		Fehler
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app%	AboutWindow		Über %app%
 About %app…	Dragger		Über %app ...
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Historie:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Blau:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Replikant für \"%description\" konnte nicht erstellt werden.\n%error
 Written by:	AboutWindow		Von:

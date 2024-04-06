@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	2943652182
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formater
 Could not unmount partition	MainWindow		Kunne ikke avmontere partisjonen
 Create	CreateParametersPanel		Opprett
 File system	PartitionList		Filsystem
+Unknown (%s)	PartitionList		Ukjent (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Den valgte partisjonen inneholder ikke et partisjoneringssystem.
 End: %s	Support		Slutt: %s
 Partition type	PartitionList		Partisjonstype

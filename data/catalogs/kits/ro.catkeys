@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	535088175
+1	romanian	x-vnd.Haiku-libbe	1737418561
 All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 gold master	AboutWindow		versiune finală
 Undo	TextView		Refă
@@ -13,15 +13,20 @@ Green:	ColorControl		Verde:
 Redo	TextView		Repetă
 No pages to print!	PrintJob		Fără pagini de tipărit!
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiO
 OK	ZombieReplicantView		OK
 Cut	TextView		Taie
 Default	Default decorator about box		Implicit
+%s KiB	StringForSize	size unit	%s KiO
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge acest replicant din locația originală. Viața merge mai departe.
 Error	ZombieReplicantView		Eroare
 Paste	TextView		Lipește
 OK	AboutWindow		OK
+%s MiB/s	StringForRate	units per second	%s MiO/s
+%s TiB	StringForSize	size unit	%s TiO
 Special Thanks:	AboutWindow		Mulţumiri speciale:
 Default Haiku window decorator.	Default decorator about box		Decorator de fereastră Haiku implicit.
+%s GiB	StringForSize	size unit	%s GiO
 Remove replicant	Dragger		Elimină replicantul
 Version	AboutWindow		Versiune
 Red:	ColorControl		Roșu:
@@ -32,10 +37,13 @@ Select all	TextView		Selectează toate
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Eroare
+%s TiB/s	StringForRate	units per second	%s TiO/s
 About %app%	AboutWindow		Despre %app%
 About %app…	Dragger		Despre %app…
+%s GiB/s	StringForRate	units per second	%s GiO/s
 Version history:	AboutWindow		Istoricul versiunii:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate localiza aplicația pentru replicant. Nu a fost furnizată nicio semnătură de aplicație.\n%error
+%s KiB/s	StringForRate	units per second	%s KiO/s
 Blue:	ColorControl		Albastru:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nu se poate crea replicantul pentru \„%description\”.\n%error
 Written by:	AboutWindow		Scris de:

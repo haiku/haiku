@@ -13,7 +13,7 @@ Quit	SudokuWindow		Avslutt
 Redo	SudokuWindow		Gjennomfør på nytt
 Could not open \"%s\":\n%s\n	SudokuWindow		Kunne ikke åpne \"%s\":\n%s\n
 Blank	SudokuWindow		Blank
-Sudoku solved - congratulations!\n	SudokuWindow		Sudoku løst - gratulere!\n
+Sudoku solved - congratulations!\n	SudokuWindow		Sudoku løst - gratulerer!\n
 Text	SudokuWindow		Tekst
 Copy	SudokuWindow		Kopier
 Solve	SudokuWindow		Løs

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX
@@ -34,7 +34,7 @@ CPU %d usage	DataSource		Ús de la CPU %d
 CPU %d speed	DataSource		Velocitat de la CPU %d
 File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
-Page faults	DataSource		Falles de pàgina
+Page faults	DataSource		Errors de pàgina
 Additional items	ActivityView		Elements addicionals
 Apps	DataSource		Aplicacions
 Add graph	ActivityWindow		Afegeix-hi un gràfic
@@ -42,6 +42,7 @@ Sending	DataSource		S'envia
 Always on top	ActivityWindow		Sempre en primer pla
 Swap	DataSource		Memòria d'intercanvi
 %lld sec.	SettingsWindow		%lld seg.
-P-faults	DataSource		Averies de P
+P-faults	DataSource		Errors de pàg.
 Sems	DataSource		Sems
 Network receive	DataSource		Rep de la xarxa
+%s faults/s	DataSource		%s errors/s
