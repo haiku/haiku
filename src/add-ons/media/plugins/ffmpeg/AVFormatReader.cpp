@@ -794,6 +794,10 @@ StreamBase::_Read(void* cookie, uint8* buffer, int bufferSize)
 		stream->fPosition += read;
 
 	TRACE_IO("  read: %ld\n", read);
+
+	if (read == 0)
+		return AVERROR_EOF;
+
 	return (int)read;
 
 }
