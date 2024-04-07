@@ -255,7 +255,7 @@ echo_get_mix(echo_dev *card, multi_mix_value_info * mmvi)
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
-		if (id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || (uint32)id >= card->multi.control_count) {
 			PRINT(("echo_get_mix : invalid control id requested : %" B_PRIu32
 				"\n", id));
 			continue;
@@ -297,7 +297,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
-		if (id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || (uint32)id >= card->multi.control_count) {
 			PRINT(("echo_set_mix : invalid control id requested : %" B_PRIu32
 				"\n", id));
 			continue;
@@ -308,7 +308,7 @@ echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 			multi_mixer_control *control2 = NULL;
 			if (i + 1 < mmvi->item_count) {
 				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
-				if (id < 0 || id >= card->multi.control_count) {
+				if (id < 0 || (uint32)id >= card->multi.control_count) {
 					PRINT(("echo_set_mix : invalid control id requested : %"
 						B_PRIu32 "\n", id));
 				} else {
