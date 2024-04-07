@@ -200,7 +200,7 @@ emuxki_parameter_set_mix(void *card, const void *cookie, int32 type, float *valu
 }
 
 static int32
-emuxki_create_group_control(multi_dev *multi, int32 *index, int32 parent,
+emuxki_create_group_control(multi_dev *multi, uint32 *index, int32 parent,
 	int32 string, const char* name) {
 	int32 i = *index;
 	(*index)++;
@@ -216,7 +216,7 @@ emuxki_create_group_control(multi_dev *multi, int32 *index, int32 parent,
 }
 
 static void
-emuxki_create_gpr_control(multi_dev *multi, int32 *index, int32 parent, int32 string,
+emuxki_create_gpr_control(multi_dev *multi, uint32 *index, int32 parent, int32 string,
 	const emuxki_gpr *gpr) {
 	int32 i = *index, id;
 	multi_mixer_control control;
