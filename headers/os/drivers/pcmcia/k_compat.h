@@ -79,7 +79,7 @@ static inline void *ioremap(u_long base, u_long size)
     area_id id;
     void *virt;
     sprintf(tag, "pccard %08lx", base);
-    id = map_physical_memory(tag, (void *)base,
+    id = map_physical_memory(tag, (phys_addr_t)base,
 			     size, B_ANY_KERNEL_ADDRESS,
 			     B_READ_AREA | B_WRITE_AREA, &virt);
     return (id < 0) ? NULL : virt;
@@ -184,7 +184,7 @@ void free(void *);
 //#define REQUEST_IRQ(i,h,f,n,d)	install_io_interrupt_handler(i,h,d,0)
 //#define FREE_IRQ(i,h,d)		remove_io_interrupt(i,h)
 //#define IRQ(i,d,r)		(d)
-#define IRQ
+#define IRQ(i,d,r)
 #define DEV_ID			dev_id
 #define NR_IRQS			16
 #define SA_SHIRQ		1
