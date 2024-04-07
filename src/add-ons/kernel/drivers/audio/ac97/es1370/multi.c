@@ -18,7 +18,6 @@
 
 #include "hmulti_audio.h"
 #include "multi.h"
-#include "ac97.h"
 
 //#define DEBUG 1
 
@@ -27,6 +26,7 @@
 #include "util.h"
 #include "io.h"
 
+#if 0
 static void	
 es1370_ac97_get_mix(void *card, const void *cookie, int32 type, float *values) {
 	es1370_dev *dev = (es1370_dev*)card;
@@ -157,6 +157,7 @@ es1370_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 
 }
 
+
 static int32
 es1370_create_group_control(multi_dev *multi, int32 *index, int32 parent, 
 	int32 string, const char* name) {
@@ -172,6 +173,8 @@ es1370_create_group_control(multi_dev *multi, int32 *index, int32 parent,
 		
 	return multi->controls[i].mix_control.id;
 }
+#endif
+
 
 static status_t
 es1370_create_controls_list(multi_dev *multi)
@@ -181,6 +184,7 @@ es1370_create_controls_list(multi_dev *multi)
 	return B_OK;
 }
 
+
 static status_t 
 es1370_get_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 {
@@ -188,7 +192,7 @@ es1370_get_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if (id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || (uint32)id >= card->multi.control_count) {
 			PRINT(("es1370_get_mix : invalid control id requested : %" B_PRId32
 				"\n", id));
 			continue;
@@ -228,7 +232,7 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if (id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || (uint32)id >= card->multi.control_count) {
 			PRINT(("es1370_set_mix : invalid control id requested : %" B_PRId32
 				"\n", id));
 			continue;
@@ -239,7 +243,7 @@ es1370_set_mix(es1370_dev *card, multi_mix_value_info * mmvi)
 			multi_mixer_control *control2 = NULL;
 			if (i+1<mmvi->item_count) {
 				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
-				if (id < 0 || id >= card->multi.control_count) {
+				if (id < 0 || (uint32)id >= card->multi.control_count) {
 					PRINT(("es1370_set_mix : invalid control id requested : %"
 						B_PRId32 "\n", id));
 				} else {
@@ -290,8 +294,8 @@ static status_t
 es1370_list_mix_controls(es1370_dev *card, multi_mix_control_info * mmci)
 {
 	multi_mix_control	*mmc;
-	int32 i;
-	
+	uint32 i;
+
 	mmc = mmci->controls;
 	if (mmci->control_count < 24)
 		return B_ERROR;
@@ -365,11 +369,11 @@ es1370_create_channels_list(multi_dev *multi)
 		B_CHANNEL_CENTER,
 		B_CHANNEL_SUB
 	};
-	
+
 	chans = multi->chans;
 	index = 0;
 
-	for (mode=ES1370_USE_PLAY; mode!=-1; 
+	for (mode = ES1370_USE_PLAY; (int32)mode != -1;
 		mode = (mode == ES1370_USE_PLAY) ? ES1370_USE_RECORD : -1) {
 		LIST_FOREACH(stream, &((es1370_dev*)multi->card)->streams, next) {
 			if ((stream->use & mode) == 0)
@@ -395,37 +399,38 @@ es1370_create_channels_list(multi_dev *multi)
 			multi->input_channel_count = index - multi->output_channel_count;
 		}
 	}
-	
+
 	chans[index].channel_id = index;
+
 	chans[index].kind = B_MULTI_OUTPUT_BUS;
 	chans[index].designations = B_CHANNEL_LEFT | B_CHANNEL_STEREO_BUS;
 	chans[index].connectors = B_CHANNEL_MINI_JACK_STEREO;
 	index++;
-	
+
 	chans[index].channel_id = index;
 	chans[index].kind = B_MULTI_OUTPUT_BUS;
 	chans[index].designations = B_CHANNEL_RIGHT | B_CHANNEL_STEREO_BUS;
 	chans[index].connectors = B_CHANNEL_MINI_JACK_STEREO;
 	index++;
-	
+
 	multi->output_bus_channel_count = index - multi->output_channel_count 
 		- multi->input_channel_count;
-	
+
 	chans[index].channel_id = index;
 	chans[index].kind = B_MULTI_INPUT_BUS;
 	chans[index].designations = B_CHANNEL_LEFT | B_CHANNEL_STEREO_BUS;
 	chans[index].connectors = B_CHANNEL_MINI_JACK_STEREO;
 	index++;
-	
+
 	chans[index].channel_id = index;
 	chans[index].kind = B_MULTI_INPUT_BUS;
 	chans[index].designations = B_CHANNEL_RIGHT | B_CHANNEL_STEREO_BUS;
 	chans[index].connectors = B_CHANNEL_MINI_JACK_STEREO;
 	index++;
-	
+
 	multi->input_bus_channel_count = index - multi->output_channel_count 
 		- multi->input_channel_count - multi->output_bus_channel_count;
-		
+
 	multi->aux_bus_channel_count = 0;
 }
 
@@ -458,7 +463,7 @@ es1370_get_description(es1370_dev *card, multi_description *data)
 
 	LOG(("request_channel_count = %" B_PRId32 "\n",
 		data->request_channel_count));
-	if (data->request_channel_count >= size) {
+	if (data->request_channel_count >= (int32)size) {
 		LOG(("copying data\n"));
 		memcpy(data->channels, card->multi.chans, size * sizeof(card->multi.chans[0]));
 	}
@@ -482,6 +487,7 @@ es1370_get_description(es1370_dev *card, multi_description *data)
 	return B_OK;
 }
 
+
 static status_t 
 es1370_get_enabled_channels(es1370_dev *card, multi_channel_enable *data)
 {
@@ -499,6 +505,8 @@ es1370_get_enabled_channels(es1370_dev *card, multi_channel_enable *data)
 	return B_OK;
 }
 
+
+#if 0
 static status_t 
 es1370_set_enabled_channels(es1370_dev *card, multi_channel_enable *data)
 {
@@ -508,8 +516,10 @@ es1370_set_enabled_channels(es1370_dev *card, multi_channel_enable *data)
 	PRINT(("set_enabled_channels 3 : %s\n", B_TEST_CHANNEL(data->enable_bits, 3) ? "enabled": "disabled"));
 	return B_OK;
 }
+#endif
 
-static status_t 
+
+static status_t
 es1370_get_global_format(es1370_dev *card, multi_format_info *data)
 {
 	data->output_latency = 0;
@@ -524,6 +534,7 @@ es1370_get_global_format(es1370_dev *card, multi_format_info *data)
 	return B_OK;
 }
 
+
 static status_t
 es1370_set_global_format(es1370_dev *card, multi_format_info *data)
 {
@@ -532,6 +543,7 @@ es1370_set_global_format(es1370_dev *card, multi_format_info *data)
 	 */
 	return B_OK;
 }
+
 
 static status_t 
 es1370_get_buffers(es1370_dev *card, multi_buffer_list *data)
