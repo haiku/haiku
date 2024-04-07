@@ -182,9 +182,10 @@ auich_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 
 
 static int32
-auich_create_group_control(multi_dev *multi, int32 *index, int32 parent,
-	int32 string, const char* name) {
-	int32 i = *index;
+auich_create_group_control(multi_dev *multi, uint32 *index, int32 parent, int32 string,
+	const char* name)
+{
+	uint32 i = *index;
 	(*index)++;
 	multi->controls[i].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + i;
 	multi->controls[i].mix_control.parent = parent;
@@ -201,7 +202,7 @@ auich_create_group_control(multi_dev *multi, int32 *index, int32 parent,
 static status_t
 auich_create_controls_list(multi_dev *multi)
 {
-	uint32 	i = 0, index = 0, count, id, parent, parent2, parent3;
+	uint32 i = 0, index = 0, count, id, parent, parent2, parent3;
 	const ac97_source_info *info;
 
 	/* AC97 Mixer */
@@ -397,7 +398,7 @@ auich_get_mix(auich_dev *card, multi_mix_value_info * mmvi)
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if (id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || (uint32)id >= card->multi.control_count) {
 			PRINT(("auich_get_mix : "
 				"invalid control id requested : %" B_PRIi32 "\n", id));
 			continue;
@@ -438,7 +439,7 @@ auich_set_mix(auich_dev *card, multi_mix_value_info * mmvi)
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if (id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || (uint32)id >= card->multi.control_count) {
 			PRINT(("auich_set_mix : "
 				"invalid control id requested : %" B_PRIi32 "\n", id));
 			continue;
@@ -449,7 +450,7 @@ auich_set_mix(auich_dev *card, multi_mix_value_info * mmvi)
 			multi_mixer_control *control2 = NULL;
 			if (i+1<mmvi->item_count) {
 				id = mmvi->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
-				if (id < 0 || id >= card->multi.control_count) {
+				if (id < 0 || (uint32)id >= card->multi.control_count) {
 					PRINT(("auich_set_mix : "
 						"invalid control id requested : %" B_PRIi32 "\n", id));
 				} else {
@@ -501,7 +502,7 @@ static status_t
 auich_list_mix_controls(auich_dev *card, multi_mix_control_info * mmci)
 {
 	multi_mix_control	*mmc;
-	int32 i;
+	uint32 i;
 
 	mmc = mmci->controls;
 	if (mmci->control_count < 24)
@@ -509,9 +510,9 @@ auich_list_mix_controls(auich_dev *card, multi_mix_control_info * mmci)
 
 	if (auich_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for (i = 0; i < card->multi.control_count; i++) {
+
+	for (i = 0; i < card->multi.control_count; i++)
 		mmc[i] = card->multi.controls[i].mix_control;
-	}
 
 	mmci->control_count = card->multi.control_count;
 	return B_OK;
@@ -582,7 +583,7 @@ auich_create_channels_list(multi_dev *multi)
 	chans = multi->chans;
 	index = 0;
 
-	for (mode=AUICH_USE_PLAY; mode!=-1;
+	for (mode = AUICH_USE_PLAY; (int32)mode != -1;
 		mode = (mode == AUICH_USE_PLAY) ? AUICH_USE_RECORD : -1) {
 		LIST_FOREACH(stream, &((auich_dev*)multi->card)->streams, next) {
 			if ((stream->use & mode) == 0)
@@ -595,18 +596,18 @@ auich_create_channels_list(multi_dev *multi)
 
 			for (i = 0; i < stream->channels; i++) {
 				chans[index].channel_id = index;
-				chans[index].kind = (mode == AUICH_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
+				chans[index].kind
+					= (mode == AUICH_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
 				chans[index].connectors = 0;
 				index++;
 			}
 		}
 
-		if (mode==AUICH_USE_PLAY) {
+		if (mode == AUICH_USE_PLAY)
 			multi->output_channel_count = index;
-		} else {
+		else
 			multi->input_channel_count = index - multi->output_channel_count;
-		}
 	}
 
 	chans[index].channel_id = index;
@@ -690,7 +691,7 @@ auich_get_description(auich_dev *card, multi_description *data)
 	// channels and input bus channels and finally auxillary channels,
 
 	LOG(("request_channel_count = %d\n",data->request_channel_count));
-	if (data->request_channel_count >= size) {
+	if (data->request_channel_count >= (int32)size) {
 		LOG(("copying data\n"));
 		memcpy(data->channels, card->multi.chans, size * sizeof(card->multi.chans[0]));
 	}
