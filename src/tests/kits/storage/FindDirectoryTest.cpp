@@ -43,6 +43,7 @@ const directory_which directories[] = {
 	B_SYSTEM_SPOOL_DIRECTORY,
 	B_SYSTEM_TEMP_DIRECTORY,
 	B_SYSTEM_VAR_DIRECTORY,
+	B_SYSTEM_DESKBAR_DIRECTORY,
 	// User directories.  These are interpreted in the context
 	// of the user making the find_directory call.
 	B_USER_DIRECTORY,
@@ -230,6 +231,9 @@ test_find_directory(directory_which dir, BPath &path, dev_t device)
 			break;
 		case B_SYSTEM_VAR_DIRECTORY:
 			error = path.SetTo("/boot/var");
+			break;
+		case B_SYSTEM_DESKBAR_DIRECTORY:
+			error = path.SetTo("/boot/system/data/deskbar/menu");
 			break;
 		// User directories.  These are interpreted in the context
 		// of the user making the find_directory call.

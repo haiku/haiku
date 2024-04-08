@@ -103,6 +103,7 @@ static const char *kSystemDirectories[] = {
 	SYSTEM "/develop",
 	SYSTEM "/packages",
 	SYSTEM "/develop/headers$a",
+	SYSTEM "/data/deskbar/menu",
 };
 
 /* Common directories, shared among users */
@@ -358,6 +359,7 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 		case B_SYSTEM_DEVELOP_DIRECTORY:
 		case B_SYSTEM_PACKAGES_DIRECTORY:
 		case B_SYSTEM_HEADERS_DIRECTORY:
+		case B_SYSTEM_DESKBAR_DIRECTORY:
 			templatePath = kSystemDirectories[which - B_SYSTEM_DIRECTORY];
 			break;
 
@@ -565,6 +567,7 @@ __find_directory(directory_which which, dev_t device, bool createIt,
 		case B_SYSTEM_DEVELOP_DIRECTORY:
 		case B_SYSTEM_PACKAGES_DIRECTORY:
 		case B_SYSTEM_HEADERS_DIRECTORY:
+		case B_SYSTEM_DESKBAR_DIRECTORY:
 			templatePath = kSystemDirectories[which - B_SYSTEM_DIRECTORY];
 			break;
 
