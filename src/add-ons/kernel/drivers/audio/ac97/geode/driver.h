@@ -15,7 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define DEVFS_PATH_FORMAT	"audio/hmulti/geode/%lu"
+#define DEVFS_PATH_FORMAT "audio/hmulti/geode/%" B_PRIu32
 #include <hmulti_audio.h>
 
 #include "ac97.h"

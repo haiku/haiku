@@ -297,7 +297,8 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 		* stream->buffer_length;
 	bufferSize = ALIGN(bufferSize, 128);
 
-	dprintf("geode: sample size %ld, num channels %ld, buffer length %ld ****************\n",
+	dprintf("geode: sample size %" B_PRIu32 ", num channels %" B_PRIu32 ", buffer length %"
+			B_PRIu32 "\n",
 		stream->sample_size, stream->num_channels, stream->buffer_length);
 
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
@@ -322,7 +323,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 
 	phys_addr_t bufferPhysicalAddress = pe.address;
 
-	dprintf("%s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
+	dprintf("%s(%s): Allocated %" B_PRId32 " bytes for %" B_PRIu32 " buffers\n", __func__, desc,
 		alloc, stream->num_buffers);
 
 	/* Store pointers (both virtual/physical) */
@@ -356,7 +357,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 
 	stream->physical_buffer_descriptors = pe.address;
 
-	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
+	dprintf("%s(%s): Allocated %" B_PRIu32 " bytes for %" B_PRIu32 " BDLEs\n", __func__, desc,
 		alloc, stream->num_buffers);
 
 	/* Setup buffer descriptor list (BDL) entries */
@@ -376,7 +377,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 	}
 
 	/* Configure stream registers */
-	dprintf("IRA: %s: setup stream SR=%ld\n", __func__, stream->rate);
+	dprintf("IRA: %s: setup stream SR=%" B_PRIu32 "\n", __func__, stream->rate);
 
 	stream->Write32(STREAM_PRD, stream->physical_buffer_descriptors);
 
@@ -442,7 +443,7 @@ reset_failed:
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)geode_interrupt_handler, controller);
 error:
-	dprintf("geode: ERROR: %s(%ld)\n", strerror(status), status);
+	dprintf("geode: ERROR: %s(%" B_PRId32 ")\n", strerror(status), status);
 
 	return status;
 }

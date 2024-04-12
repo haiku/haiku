@@ -83,8 +83,7 @@ get_description(geode_controller* controller, multi_description* data)
 	data->input_bus_channel_count = inChannels;
 	data->aux_bus_channel_count = 0;
 
-	dprintf("%s: request_channel_count: %ld\n", __func__,
-		data->request_channel_count);
+	dprintf("%s: request_channel_count: %" B_PRId32 "\n", __func__, data->request_channel_count);
 
 	if (data->request_channel_count >= (int)(sizeof(sChannels)
 			/ sizeof(sChannels[0]))) {
@@ -519,7 +518,7 @@ create_controls_list(geode_multi *multi)
 	}
 
 	multi->control_count = index;
-	TRACE("multi->control_count %lu\n", multi->control_count);
+	TRACE("multi->control_count %" B_PRIu32 "\n", multi->control_count);
 	return B_OK;
 }
 
@@ -564,7 +563,7 @@ get_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 	for (int32 i = 0; i < mmvi->item_count; i++) {
 		uint32 id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= controller->multi->control_count) {
-			dprintf("geode_get_mix : invalid control id requested : %li\n", id);
+			dprintf("geode_get_mix : invalid control id requested : %" B_PRId32 "\n", id);
 			continue;
 		}
 		multi_mixer_control *control = &controller->multi->controls[id];
@@ -603,7 +602,7 @@ set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 	for (int32 i = 0; i < mmvi->item_count; i++) {
 		uint32 id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
 		if (id < 0 || id >= multi->control_count) {
-			dprintf("geode_set_mix : invalid control id requested : %li\n", id);
+			dprintf("geode_set_mix : invalid control id requested : %" B_PRId32 "\n", id);
 			continue;
 		}
 		multi_mixer_control *control = &multi->controls[id];
@@ -613,7 +612,7 @@ set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 			if (i+1<mmvi->item_count) {
 				id = mmvi->values[i + 1].id - MULTI_CONTROL_FIRSTID;
 				if (id < 0 || id >= multi->control_count) {
-					dprintf("geode_set_mix : invalid control id requested : %li\n", id);
+					dprintf("geode_set_mix : invalid control id requested : %" B_PRId32 "\n", id);
 				} else {
 					control2 = &multi->controls[id];
 					if (control2->mix_control.master != control->mix_control.id)
@@ -662,10 +661,10 @@ set_mix(geode_controller *controller, multi_mix_value_info * mmvi)
 static status_t
 get_buffers(geode_controller* controller, multi_buffer_list* data)
 {
-	TRACE("playback: %ld buffers, %ld channels, %ld samples\n",
+	TRACE("playback: %" B_PRId32 " buffers, %" B_PRId32 " channels, %" B_PRIu32 " samples\n",
 		data->request_playback_buffers, data->request_playback_channels,
 		data->request_playback_buffer_size);
-	TRACE("record: %ld buffers, %ld channels, %ld samples\n",
+	TRACE("record: %" B_PRId32 " buffers, %" B_PRId32 " channels, %" B_PRIu32 " samples\n",
 		data->request_record_buffers, data->request_record_channels,
 		data->request_record_buffer_size);
 
