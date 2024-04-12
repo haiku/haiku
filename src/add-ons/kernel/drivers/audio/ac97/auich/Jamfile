@@ -4,7 +4,9 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders audio ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) generic ] ;
 
 KernelAddon auich :
 	ac97.c
