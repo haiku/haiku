@@ -142,7 +142,7 @@ typedef struct _emuxki_mem {
 	LIST_ENTRY(_emuxki_mem) next;
 	uint16	       ptbidx;
 	void	*log_base;
-	void	*phy_base;
+	phys_addr_t phy_base;
 	area_id area;
 	size_t	size;
 #define	EMU_RMEM		0xffff		/* recording memory */
@@ -353,10 +353,10 @@ typedef struct _emuxki_dev {
 	device_config config;
 	
 	void	*ptb_log_base;
-	void	*ptb_phy_base;
+	phys_addr_t ptb_phy_base;
 	area_id ptb_area;
 	void	*silentpage_log_base;
-	void	*silentpage_phy_base;
+	phys_addr_t silentpage_phy_base;
 	area_id silentpage_area;
 	
 	emuxki_channel	*channel[EMU_NUMCHAN];

@@ -252,7 +252,7 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 	uint32      j, *ptb, silentpage;
 
 	ptb = card->ptb_log_base;
-	silentpage = ((uintptr_t)card->silentpage_phy_base) << 1;
+	silentpage = card->silentpage_phy_base << 1;
 	numblocks = size / EMU_PTESIZE;
 	if (size % EMU_PTESIZE)
 		numblocks++;
@@ -276,19 +276,17 @@ emuxki_pmem_alloc(emuxki_dev *card, size_t size)
 					return (NULL);
 				}
 				PRINT(("emuxki_pmem_alloc : j == numblocks emuxki_mem_new ok\n"));
-				for (j = 0; j < numblocks; j++)
-					ptb[i + j] = B_HOST_TO_LENDIAN_INT32((uint32) (
-						(( ((uintptr_t)mem->phy_base) +
-						 j * EMU_PTESIZE) << 1)
-						| (i + j)));
+				for (j = 0; j < numblocks; j++) {
+					ptb[i + j] = B_HOST_TO_LENDIAN_INT32(
+						(uint32)((mem->phy_base + j * EMU_PTESIZE) << 1) | (i + j));
+				}
 				LIST_INSERT_HEAD(&(card->mem), mem, next);
 				PRINT(("emuxki_pmem_alloc : j == numblocks returning\n"));
 
 				//splx(s);
 				return mem->log_base;
 			} else {
-				PRINT(("emuxki_pmem_alloc : j != numblocks %" B_PRIu32 "\n",
-					j));
+				PRINT(("emuxki_pmem_alloc : j != numblocks %" B_PRIu32 "\n", j));
 				i += j;
 			}
 			//splx(s);
@@ -324,7 +322,7 @@ emuxki_mem_free(emuxki_dev *card, void *ptr)
 	uint32      	i, *ptb, silentpage;
 
 	ptb = card->ptb_log_base;
-	silentpage = ((uintptr_t)card->silentpage_phy_base) << 1;
+	silentpage = (card->silentpage_phy_base) << 1;
 	LOG(("emuxki_mem_free 1\n"));
 	LIST_FOREACH(mem, &card->mem, next) {
 		LOG(("emuxki_mem_free 2\n"));
@@ -542,7 +540,7 @@ emuxki_channel_commit_parms(emuxki_channel *chan)
 
 	start = chan->loop.start +
 		(voice->stereo ? 28 : 30) * (voice->b16 + 1);
-	mapval = ((uintptr_t)card->silentpage_phy_base) << 1 | EMU_CHAN_MAP_PTI_MASK;
+	mapval = (card->silentpage_phy_base) << 1 | EMU_CHAN_MAP_PTI_MASK;
 
 	//s = splaudio();
 	emuxki_chan_write(&card->config, chano, EMU_CHAN_CPF_STEREO, voice->stereo);
@@ -1196,7 +1194,7 @@ emuxki_voice_commit_parms(emuxki_voice *voice)
 			default:
 				return B_ERROR;
 		}
-		emuxki_chan_write(&voice->stream->card->config, 0, buffaddr_reg, (uintptr_t)voice->buffer->phy_base);
+		emuxki_chan_write(&voice->stream->card->config, 0, buffaddr_reg, voice->buffer->phy_base);
 		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, EMU_RECBS_BUFSIZE_NONE);
 		emuxki_chan_write(&voice->stream->card->config, 0, buffsize_reg, EMU_RECBS_BUFSIZE_4096);
 

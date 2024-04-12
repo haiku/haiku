@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src add-ons kernel drivers audio emuxki ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders audio device ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio generic ;
+
 KernelAddon emuxki :
 	ac97.c
 	debug.c
@@ -13,3 +15,7 @@ KernelAddon emuxki :
 	util.c
 #	joy.c
 ;
+
+SEARCH on [ FGristFiles
+		util.c
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio generic ] ;
