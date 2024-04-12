@@ -13,7 +13,9 @@
 
 #include <drivers/ISA.h>
 
+
 static isa_module_info* gISA;
+
 
 static void
 hw_codec_write_byte(sb16_dev_t* dev, uint8 value)
@@ -30,6 +32,7 @@ hw_codec_write_byte(sb16_dev_t* dev, uint8 value)
 	gISA->write_io_8(dev->port + SB16_CODEC_WRITE_DATA, value);
 }
 
+
 static int
 hw_codec_read_byte(sb16_dev_t* dev)
 {
@@ -44,6 +47,7 @@ hw_codec_read_byte(sb16_dev_t* dev)
 	return gISA->read_io_8(dev->port + SB16_CODEC_READ_DATA);
 }
 
+
 static void
 hw_codec_reg_write(sb16_dev_t* dev, uint8 index, uint8 value)
 {
@@ -51,6 +55,7 @@ hw_codec_reg_write(sb16_dev_t* dev, uint8 index, uint8 value)
 	gISA->write_io_8(dev->port + SB16_MIXER_ADDRESS, index);
 	gISA->write_io_8(dev->port + SB16_MIXER_DATA, value);
 }
+
 
 static int
 hw_codec_reg_read(sb16_dev_t* dev, uint8 index)
@@ -76,6 +81,10 @@ hw_codec_read_version(sb16_dev_t* dev)
 	return (major << 8) + minor;
 }
 
+
+#if 0
+// TODO for recording support
+
 static void
 hw_codec_read_irq_setup(sb16_dev_t* dev)
 {
@@ -93,6 +102,7 @@ hw_codec_read_irq_setup(sb16_dev_t* dev)
 	if (mask & 0x08)
 		dev->irq = 10;
 }
+
 
 static void
 hw_codec_read_dma_setup(sb16_dev_t* dev)
@@ -116,11 +126,13 @@ hw_codec_read_dma_setup(sb16_dev_t* dev)
         dev->dma16 = 6;
     if (mask & 0x80)
         dev->dma16 = 7;
-}   
-        
-static void 
+}
+#endif
+
+
+static void
 hw_codec_write_irq_setup(sb16_dev_t* dev)
-{       
+{
 	/* change programmable IRQ line resource */
 	int mask = 0x02;
 
@@ -136,12 +148,14 @@ hw_codec_write_irq_setup(sb16_dev_t* dev)
 	hw_codec_reg_write(dev, SB16_IRQ_SETUP, mask);
 }
 
+
 static void
 hw_codec_write_dma_setup(sb16_dev_t* dev)
 {
 	/* change programmable DMA channel resources */
 	hw_codec_reg_write(dev, SB16_DMA_SETUP, (1 << dev->dma8) | (1 << dev->dma16));
 }
+
 
 static int32
 hw_codec_inth(void* cookie)
@@ -188,7 +202,6 @@ hw_codec_inth(void* cookie)
 }
 
 
-
 static status_t
 hw_codec_reset(sb16_dev_t* dev)
 {
@@ -210,6 +223,7 @@ hw_codec_reset(sb16_dev_t* dev)
 	return B_IO_ERROR;
 }
 
+
 static status_t
 hw_codec_detect(sb16_dev_t* dev)
 {
@@ -228,7 +242,9 @@ hw_codec_detect(sb16_dev_t* dev)
 	return rc;
 }
 
+
 //#pragma mark -
+
 
 status_t
 sb16_stream_setup_buffers(sb16_dev_t* dev, sb16_stream_t* s, const char* desc)
@@ -236,11 +252,13 @@ sb16_stream_setup_buffers(sb16_dev_t* dev, sb16_stream_t* s, const char* desc)
 	return B_OK;
 }
 
+
 status_t
 sb16_stream_start(sb16_dev_t* dev, sb16_stream_t* s)
 {
 	return B_OK;
 }
+
 
 status_t 
 sb16_stream_stop(sb16_dev_t* dev, sb16_stream_t* s)
@@ -248,12 +266,15 @@ sb16_stream_stop(sb16_dev_t* dev, sb16_stream_t* s)
 	return B_OK;
 }
 
+
 void
 sb16_stream_buffer_done(sb16_stream_t* stream)
 {
 }
 
+
 //#pragma mark -
+
 
 status_t
 sb16_hw_init(sb16_dev_t* dev)
@@ -275,10 +296,12 @@ sb16_hw_init(sb16_dev_t* dev)
 	return rc;
 }
 
+
 void
 sb16_hw_stop(sb16_dev_t* dev)
 {
 }
+
 
 void
 sb16_hw_uninit(sb16_dev_t* dev)

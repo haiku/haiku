@@ -682,7 +682,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel drivers audio hda ;
 	EnableWerror src add-ons kernel drivers audio ice1712 ;
 	EnableWerror src add-ons kernel drivers audio null ;
-#	EnableWerror src add-ons kernel drivers audio sb16 ;
+	EnableWerror src add-ons kernel drivers audio sb16 ;
 	EnableWerror src add-ons kernel drivers audio usb ;
 	EnableWerror src add-ons kernel drivers audio virtio ;
 	EnableWerror src add-ons kernel drivers bluetooth ;

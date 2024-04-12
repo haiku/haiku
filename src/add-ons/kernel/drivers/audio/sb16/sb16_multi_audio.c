@@ -148,13 +148,16 @@ get_buffers(sb16_dev_t* dev, multi_buffer_list* data)
 {
 	uint32 playback_sample_size = dev->playback_stream.sample_size;
 	uint32 record_sample_size = dev->record_stream.sample_size;
-	uint32 cidx, bidx;
+	int32 bidx;
+	int32 cidx;
 	status_t rc;
 
-	dprintf("%s: playback: %ld buffers, %ld channels, %ld samples\n", __func__, 
-		data->request_playback_buffers, data->request_playback_channels, data->request_playback_buffer_size);
-	dprintf("%s: record: %ld buffers, %ld channels, %ld samples\n", __func__, 
-		data->request_record_buffers, data->request_record_channels, data->request_record_buffer_size);
+	dprintf("%s: playback: %" B_PRId32 " buffers, %" B_PRIu32 " channels, %" B_PRIu32 " samples\n",
+		__func__,  data->request_playback_buffers, data->request_playback_channels,
+		data->request_playback_buffer_size);
+	dprintf("%s: record: %" B_PRId32 " buffers, %" B_PRIu32 " channels, %" B_PRIu32 " samples\n",
+		__func__, data->request_record_buffers, data->request_record_channels,
+		data->request_record_buffer_size);
 
 	/* Workaround for Haiku multi_audio API, since it prefers to let the driver pick
 		values, while the BeOS multi_audio actually gives the user's defaults. */
@@ -202,8 +205,10 @@ get_buffers(sb16_dev_t* dev, multi_buffer_list* data)
 
 	for (bidx=0; bidx < data->return_playback_buffers; bidx++) {
 		for (cidx=0; cidx < data->return_playback_channels; cidx++) {
-			data->playback_buffers[bidx][cidx].base = dev->playback_stream.buffers[bidx] + (playback_sample_size * cidx);
-			data->playback_buffers[bidx][cidx].stride = playback_sample_size * data->return_playback_channels;
+			data->playback_buffers[bidx][cidx].base
+				= (char*)dev->playback_stream.buffers[bidx] + (playback_sample_size * cidx);
+			data->playback_buffers[bidx][cidx].stride
+				= playback_sample_size * data->return_playback_channels;
 		}
 	}
 
@@ -213,8 +218,10 @@ get_buffers(sb16_dev_t* dev, multi_buffer_list* data)
 
 	for (bidx=0; bidx < data->return_record_buffers; bidx++) {
 		for (cidx=0; cidx < data->return_record_channels; cidx++) {
-			data->record_buffers[bidx][cidx].base = dev->record_stream.buffers[bidx] + (record_sample_size * cidx);
-			data->record_buffers[bidx][cidx].stride = record_sample_size * data->return_record_channels;
+			data->record_buffers[bidx][cidx].base
+				= (char*)dev->record_stream.buffers[bidx] + (record_sample_size * cidx);
+			data->record_buffers[bidx][cidx].stride
+				= record_sample_size * data->return_record_channels;
 		}
 	}
 
