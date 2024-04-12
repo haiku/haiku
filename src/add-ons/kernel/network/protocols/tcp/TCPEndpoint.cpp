@@ -942,7 +942,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 	*_buffer = NULL;
 
-	if (fState == CLOSED) {
+	if (fState == CLOSED || fState == LISTEN) {
 		if (socket->error != B_OK)
 			return socket->error;
 		return ENOTCONN;
