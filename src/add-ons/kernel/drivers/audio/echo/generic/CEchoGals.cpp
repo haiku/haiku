@@ -161,7 +161,7 @@ CEchoGals::~CEchoGals()
 ECHOSTATUS CEchoGals::AssignResources
 (
 	PVOID		pvSharedMemory,		// Ptr to DSP registers
-	PCHAR		pszCardName				// Caller gets from registry
+	const char*		pszCardName				// Caller gets from registry
 )
 {
 	//
@@ -345,7 +345,7 @@ ECHOSTATUS CEchoGals::ServiceIrq(BOOL &fMidiReceived)
 // pStatusStrs is used if you want to print out a friendlier version of
 // the various ECHOSTATUS codes.
 //
-char *	pStatusStrs[ECHOSTATUS_LAST] =
+const char *	pStatusStrs[ECHOSTATUS_LAST] =
 {
 	"ECHOSTATUS_OK",
 	"ECHOSTATUS_BAD_FORMAT",

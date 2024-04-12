@@ -101,7 +101,7 @@ echo_mem_new(echo_dev *card, size_t size)
 	if ((mem = (echo_mem *) malloc(sizeof(*mem))) == NULL)
 		return (NULL);
 
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "echo buffer");
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "echo buffer", true);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);
@@ -354,7 +354,7 @@ echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 		return (NULL);
 	stream->card = card;
 	stream->use = use;
-	stream->state = !ECHO_STATE_STARTED;
+	stream->state = 0;
 	stream->bitsPerSample = 0;
 	stream->sample_rate = 0;
 	stream->channels = 0;
@@ -608,7 +608,7 @@ init_driver(void)
 			}
 #endif
 			if (echo_setup(&cards[num_cards])) {
-				PRINT(("Setup of " DRIVER_NAME " %ld failed\n", num_cards + 1));
+				PRINT(("Setup of " DRIVER_NAME " %" B_PRId32 " failed\n", num_cards + 1));
 #ifdef __HAIKU__
 				(*pci->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &cards[num_cards]);
@@ -720,10 +720,10 @@ cardbus_device_removed(void *cookie)
 
 
 static status_t
-echo_setup(echo_dev * card)
+echo_setup(echo_dev* card)
 {
 	unsigned char cmd;
-	char *name;
+	const char* name;
 
 	PRINT(("echo_setup(%p)\n", card));
 
@@ -809,6 +809,7 @@ echo_setup(echo_dev * card)
 		default:
 			PRINT(("card type 0x%x not supported by " DRIVER_NAME "\n",
 				card->type));
+			name = "Unknown";
 	}
 
 	if (card->pEG == NULL)
@@ -972,8 +973,8 @@ publish_devices(void)
 device_hooks *
 find_device(const char * name)
 {
-	echo_dev *dev;
 #ifdef CARDBUS
+	echo_dev *dev;
 	LIST_FOREACH(dev, &devices, next) {
 		if (!strcmp(dev->name, name)) {
 			return &multi_hooks;

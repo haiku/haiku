@@ -90,6 +90,7 @@ public:
 	(
 		PCChannelMask	pChannelMask
 	);
+	using CEchoGalsMTC::Start;
 
 	//
 	// Get a bitmask of all the clocks the hardware is currently detecting

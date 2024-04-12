@@ -114,6 +114,7 @@ ECHOSTATUS CPipeOutCtrl::Init(CEchoGals *pEG)
 		// Initialize pans and mutes
 		//
 		for (wPipe = 0; wPipe < m_wNumPipesOut; wPipe++)
+		{
 			for (wStereoBus = 0; wStereoBus < wNumStereoBusses; wStereoBus++)
 			{
 				WORD wIndex;
@@ -161,12 +162,13 @@ ECHOSTATUS CPipeOutCtrl::Init(CEchoGals *pEG)
 				SetGain(wPipe,wStereoBus << 1,ECHOGAIN_UPDATE,FALSE);
 				
 			}
+		}
 			
-			//
-			// Set the gain one more time with the immediate flag set to
-			// make sure the DSP gets the message
-			//
-			SetGain(0,0,ECHOGAIN_UPDATE,TRUE);
+		//
+		// Set the gain one more time with the immediate flag set to
+		// make sure the DSP gets the message
+		//
+		SetGain(0,0,ECHOGAIN_UPDATE,TRUE);
 	}
 	else
 	{

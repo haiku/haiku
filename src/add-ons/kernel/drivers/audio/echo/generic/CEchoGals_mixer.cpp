@@ -530,7 +530,7 @@ ECHOSTATUS CEchoGals::ProcessMixerFunction
 			break;
 
 		case MXF_GET_PROF_SPDIF :
-			if ( ECHOSTATUS_DSP_DEAD == IsProfessionalSpdif() )
+			if ( NULL == GetDspCommObject() )
 			{
 				Status = ECHOSTATUS_DSP_DEAD;				
 			}

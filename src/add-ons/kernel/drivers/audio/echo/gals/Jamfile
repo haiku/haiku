@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio echo gals ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
@@ -52,8 +53,8 @@ KernelAddon echogals :
 ;
 
 # suppress warnings on some files including the echo headers which provoke ugly warnings
-ObjectC++Flags $(echo_files) : -w ;
-ObjectC++Flags echo.cpp : -w ;
+# ObjectC++Flags $(echo_files) : -w ;
+# ObjectC++Flags echo.cpp : -w ;
 
 SEARCH on [ FGristFiles
 	$(echo_files)
@@ -69,5 +70,8 @@ SEARCH on [ FGristFiles
 		echo.cpp
 		midi.cpp
 		multi.cpp
-		util.c
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;
+
+SEARCH on [ FGristFiles
+		util.c
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio generic ] ;

@@ -103,6 +103,7 @@ public:
 protected:
 
 	virtual BOOL LoadASIC();
+	using CDspCommObject::LoadASIC;
 
 	//
 	//	Check status of ASIC - loaded or not loaded

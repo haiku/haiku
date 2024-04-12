@@ -66,6 +66,7 @@ public:
 protected:
 
 	virtual BOOL LoadASIC();
+	using CGMLDspCommObject::LoadASIC;
 
 	BYTE *	m_pbyAsic;					// Current ASIC code
 

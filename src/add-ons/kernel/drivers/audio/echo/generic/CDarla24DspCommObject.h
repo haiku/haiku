@@ -47,6 +47,7 @@ public:
 	//	Return rate that was set, -1 if error
 	//
 	virtual DWORD SetSampleRate( DWORD dwNewSampleRate );
+	using CGdDspCommObject::SetSampleRate;
 
 	//
 	//	Card information

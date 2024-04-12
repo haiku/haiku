@@ -116,6 +116,7 @@ protected:
 	// ASIC loader
 	//
 	virtual BOOL LoadASIC();
+	using CDspCommObject::LoadASIC;
 
 	//
 	//	Check status of external box

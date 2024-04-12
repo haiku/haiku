@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers audio echo 3g ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel drivers audio echo generic DSP ;
@@ -64,5 +65,8 @@ SEARCH on [ FGristFiles
 		echo.cpp
 		midi.cpp
 		multi.cpp
-		util.c
 	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio echo ] ;
+
+SEARCH on [ FGristFiles
+		util.c
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel drivers audio generic ] ;

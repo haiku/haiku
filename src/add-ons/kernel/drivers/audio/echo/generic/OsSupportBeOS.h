@@ -299,8 +299,8 @@ public:
 	//
 	void EchoErrorMsg
 	(
-		PCHAR pszMsg,
-		PCHAR pszTitle
+		const char* pszMsg,
+		const char* pszTitle
 	);
 
 	//

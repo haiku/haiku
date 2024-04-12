@@ -82,6 +82,7 @@ public:
 protected:
 
 	virtual BOOL LoadASIC();
+	using CGMLDspCommObject::LoadASIC;
 
 	//
 	//	Switch the external ASIC if not already loaded.

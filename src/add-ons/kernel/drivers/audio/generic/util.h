@@ -28,6 +28,10 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <KernelExport.h>
 
 area_id alloc_mem(phys_addr_t *phy, void **log, size_t size, const char *name,
@@ -38,5 +42,9 @@ cpu_status lock(void);
 void unlock(cpu_status status);
 
 extern spinlock	slock;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

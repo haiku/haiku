@@ -68,6 +68,7 @@ public:
 protected:
 
 	virtual BOOL LoadASIC();
+	using CGMLDspCommObject::LoadASIC;
 	BOOL SwitchAsic( DWORD dwMask96 );
 
 	//

@@ -124,7 +124,7 @@ public:
 	virtual ECHOSTATUS AssignResources
 	(
 		PVOID		pvSharedMemory,		// Virtual pointer to DSP registers
-		PCHAR		pszCardName				// Caller gets from registry
+		const char*		pszCardName				// Caller gets from registry
     );
 
 	//

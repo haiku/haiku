@@ -74,7 +74,7 @@ echo_mem_new(size_t size)
 	if ((mem = (echo_mem*)malloc(sizeof(*mem))) == NULL)
 		return (NULL);
 
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "echo buffer");
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "echo buffer", true);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);
@@ -374,7 +374,7 @@ ECHOSTATUS COsSupport::GetPageBlockPhysSegment
 //
 //	Display an error message w/title
 //
-void COsSupport::EchoErrorMsg(PCHAR pszMsg, PCHAR pszTitle)
+void COsSupport::EchoErrorMsg(const char* pszMsg, const char* pszTitle)
 {
 }
 
