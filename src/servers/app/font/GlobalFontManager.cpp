@@ -571,7 +571,7 @@ GlobalFontManager::GetStyle(uint16 familyID, uint16 styleID) const
 	\param family The font's family or NULL in which case \a familyID is used
 	\param style The font's style or NULL in which case \a styleID is used
 	\param familyID will only be used if \a family is NULL (or empty)
-	\param styleID will only be used if \a style is NULL (or empty)
+	\param styleID will only be used if \a family and \a style are NULL (or empty)
 	\param face is used to specify the style if both \a style is NULL or empty
 		and styleID is 0xffff.
 
@@ -584,6 +584,11 @@ GlobalFontManager::GetStyle(const char* familyName, const char* styleName,
 	ASSERT(IsLocked());
 
 	FontFamily* family;
+
+	if (styleID != 0xffff && (familyName == NULL || !familyName[0])
+		&& (styleName == NULL || !styleName[0])) {
+		return GetStyle(familyID, styleID);
+	}
 
 	// find family
 
@@ -612,9 +617,6 @@ GlobalFontManager::GetStyle(const char* familyName, const char* styleName,
 		_ScanFonts();
 		return family->GetStyle(styleName);
 	}
-
-	if (styleID != 0xffff)
-		return family->GetStyleByID(styleID);
 
 	// try to get from face
 	return family->GetStyleMatchingFace(face);

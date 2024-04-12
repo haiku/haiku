@@ -2014,7 +2014,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
 			// 3) family ID - only used if 1) is empty
-			// 4) style ID - only used if 2) is empty
+			// 4) style ID - only used if 1) and 2) are empty
 			// 5) face - the font's current face
 
 			// Returns:

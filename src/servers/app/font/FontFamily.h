@@ -35,7 +35,6 @@ public:
 
 			FontStyle*	GetStyle(const char* style) const;
 			FontStyle*	GetStyleMatchingFace(uint16 face) const;
-			FontStyle*	GetStyleByID(uint16 face) const;
 
 			uint16		ID() const
 							{ return fID; }

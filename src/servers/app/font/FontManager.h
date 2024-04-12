@@ -79,6 +79,9 @@ protected:
 
 private:
 			struct FontKey {
+				FontKey()
+					: familyID(0xffff), styleID(0xffff) {}
+
 				FontKey(uint16 family, uint16 style)
 					: familyID(family), styleID(style) {}
 
@@ -99,8 +102,11 @@ private:
 private:
 			typedef BObjectList<FontFamily>			FamilyList;
 			FamilyList			fFamilies;
+			HashMap<HashKeyPointer<FontFamily*>, int>
+								fDelistedFamilies;
 
 			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
+			HashMap<FontKey, FontStyle*> fDelistedStyleHashTable;
 
 			uint16				fNextID;
 };

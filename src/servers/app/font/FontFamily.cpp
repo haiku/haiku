@@ -135,8 +135,6 @@ FontFamily::RemoveStyle(FontStyle* style)
 	if (!fStyles.RemoveItem(style))
 		return false;
 
-	style->_SetFontFamily(NULL, -1);
-
 	// force a refresh if a request for font flags is needed
 	fFlags = kInvalidFamilyFlags;
 	return true;
@@ -233,20 +231,6 @@ FontFamily::GetStyle(const char *name) const
 	if (alternative.FindFirst("Oblique") >= 0) {
 		alternative.ReplaceFirst("Oblique", "Italic");
 		return _FindStyle(alternative.String());
-	}
-
-	return NULL;
-}
-
-
-FontStyle*
-FontFamily::GetStyleByID(uint16 id) const
-{
-	int32 count = fStyles.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		FontStyle* style = fStyles.ItemAt(i);
-		if (style->ID() == id)
-			return style;
 	}
 
 	return NULL;
