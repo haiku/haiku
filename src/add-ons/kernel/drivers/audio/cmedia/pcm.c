@@ -718,7 +718,6 @@ pcm_control(
 	size_t len)
 {
 	// declarations for SPDIF settings I/O
-	static int32 chipinfo[] = { 0,0 };
 	uchar reg_value;
 	char DriverVersion[] = "1.3.2 (Jul 17, 2001)";
 
@@ -1087,12 +1086,12 @@ pcm_control(
 		err = B_OK;
 		break;
 	case SOUND_SET_PLAYBACK_PREFERRED_BUF_SIZE:
-		config.play_buf_size = (int32)data;
+		config.play_buf_size = (intptr_t)data;
 		configure = true;
 		err = B_OK;
 		break;
 	case SOUND_SET_CAPTURE_PREFERRED_BUF_SIZE:
-		config.rec_buf_size = (int32)data;
+		config.rec_buf_size = (intptr_t)data;
 		configure = true;
 		err = B_OK;
 		break;
@@ -1244,8 +1243,9 @@ pcm_control(
 //		*(int32*)data.vendor_id = cards[0].info.vendor_id;
 //		*(int32*)data.device_id = cards[0].info.device_id;
 
+//		static int32 chipinfo[] = { 0,0 };
 //		chipinfo[0] = cards[0].info.vendor_id;
-		*(int32 *)data = cards[0].info.device_id;
+		*(int32*)data = cards[0].info.device_id;
 
 //		memcpy(data, &chipinfo, sizeof(chipinfo));
 		err = B_OK;
@@ -1351,7 +1351,7 @@ pcm_read(
 	pcm_dev * port = (pcm_dev *)cookie;
 	size_t to_read = *nread;
 	status_t err;
-	int block;
+	size_t block;
 	cpu_status cp;
 	int bytes_xferred;
 	void * hdrptr = data;
@@ -1433,9 +1433,9 @@ first_time:	/* we need to check whether anything's available first */
 		*nread += hdrsize;
 		hdr.capture_size = *nread;
 		hdr.sample_rate = port->config.sample_rate;
-		if (hdrsize > sizeof(hdr)) {
+		if ((uint32)hdrsize > sizeof(hdr))
 			hdrsize = sizeof(hdr);
-		}
+
 		memcpy(hdrptr, &hdr, hdrsize);
 	}
 
@@ -1635,7 +1635,7 @@ ddprintf(("cmedia_pci: dma_a 0x%x+0x%x\n", PCI_IO_RD_32((int)port->dma_a), PCI_I
 	else {
 		atomic_add(&port->write_waiting, 1);
 		/* if none there, fill with silence */
-		if (port->wr_silence < port->config.play_buf_size*2) {
+		if (port->wr_silence < (int32)port->config.play_buf_size * 2) {
 			if (port->config.format == 0x11) {
 				memset((void *)ptr, 0x80, port->wr_size);
 			}

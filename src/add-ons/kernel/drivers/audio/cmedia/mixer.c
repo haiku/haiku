@@ -44,6 +44,7 @@ typedef struct {
 	int mutemask;
 } mixer_info;
 
+
 /* mute is special -- when it's 0x01, it means enable... */
 mixer_info the_mixers[] = {
   {CMEDIA_PCI_LEFT_ADC_INPUT_G,			0,	   1.5,  0.0, 0, 15, 0, 0x0f, 0x00},
@@ -65,15 +66,19 @@ mixer_info the_mixers[] = {
   {CMEDIA_PCI_RIGHT_PCM_OUTPUT_GAM,		0x11, -1.5,  0.0, 0, 63, 0, 0x3f, 0x80},
   {CMEDIA_PCI_DIGITAL_LOOPBACK_AM,		0x16, -1.5,  0.0, 0, 63, 2, 0xfc, 0x01},
 };
+
+
 #define N_MIXERS (sizeof(the_mixers) / sizeof(the_mixers[0]))
+
 
 static int
 map_mixer(int selector) {
-  int i;
-  for (i = 0; i < N_MIXERS; i++)
-	if (the_mixers[i].selector == selector)
-	  return i;
-  return -1;
+	uint32 i;
+	for (i = 0; i < N_MIXERS; i++) {
+		if (the_mixers[i].selector == selector)
+		return i;
+	}
+	return -1;
 }
 
 

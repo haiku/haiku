@@ -187,8 +187,9 @@ uchar get_indirect(cmedia_pci_dev * card,int regno)
 }
 
 
+void dump_card(cmedia_pci_dev* card);
 #if 0
-void dump_card(cmedia_pci_dev * card)
+void dump_card(cmedia_pci_dev* card)
 {
 	int ix;
 	dprintf("\n");
@@ -207,7 +208,7 @@ void dump_card(cmedia_pci_dev * card)
 	dprintf("\n");
 }
 #else
-void dump_card(cmedia_pci_dev * card)
+void dump_card(cmedia_pci_dev* card)
 {
 }
 #endif
@@ -285,7 +286,7 @@ make_device_names(cmedia_pci_dev * card)
 #if DO_PCM
 	/* cmedia_pci DMA doesn't work when physical NULL isn't NULL from PCI */
 	/* this is a hack to not export bad devices on BeBox hardware */
-	if ((*pci->ram_address)(NULL) == NULL) {
+	if ((*pci->ram_address)(0) == 0) {
 		sprintf(card->pcm.name, "audio/raw/%s", name);
 		names[num_names++] = card->pcm.name;
 		sprintf(card->pcm.oldname, "audio/old/%s", name);
@@ -401,7 +402,7 @@ a_o_k:
 	ddprintf(("cmedia_pci: successfully found or created low area!\n"));
 	card->low_size = low_size;
 	card->low_mem = addr;
-	card->low_phys = (vuchar *)(addr_t)where.address;
+	card->low_phys = where.address;
 	card->map_low = curarea;
 	return B_OK;
 }
@@ -486,12 +487,13 @@ debug_cmedia(int argc, char * argv[])
 	}
 	dprintf("%s: enhanced registers at 0x%x\n", cards[ix].name,
 		cards[ix].enhanced);
-	dprintf("%s: open %ld   dma_a at 0x%x   dma_c 0x%x\n", cards[ix].pcm.name,
+	dprintf("%s: open %" B_PRId32 "   dma_a at 0x%x   dma_c 0x%x\n", cards[ix].pcm.name,
 		cards[ix].pcm.open_count, cards[ix].pcm.dma_a, cards[ix].pcm.dma_c);
 	if (cards[ix].pcm.open_count) {
-		dprintf("    dma_a: 0x%lx+0x%lx   dma_c: 0x%lx+0x%lx\n",
-			PCI_IO_RD_32((int)cards[ix].pcm.dma_a), PCI_IO_RD_32((int)cards[ix].pcm.dma_a+4),
-			PCI_IO_RD_32((int)cards[ix].pcm.dma_c), PCI_IO_RD_32((int)cards[ix].pcm.dma_c+4));
+		dprintf("    dma_a: 0x%" B_PRIu32 "+0x%" B_PRIu32 "   dma_c: 0x%" B_PRIu32 "+0x%" B_PRIu32
+				"\n",
+			PCI_IO_RD_32((int)cards[ix].pcm.dma_a), PCI_IO_RD_32((int)cards[ix].pcm.dma_a + 4),
+			PCI_IO_RD_32((int)cards[ix].pcm.dma_c), PCI_IO_RD_32((int)cards[ix].pcm.dma_c + 4));
 	}
 	return 0;
 }
@@ -546,7 +548,7 @@ init_driver(void)
 			}
 #endif
 			if (setup_cmedia_pci(&cards[num_cards])) {
-				dprintf("Setup of C-Media %ld failed\n", num_cards+1);
+				dprintf("Setup of C-Media %d failed\n", num_cards + 1);
 #ifdef __HAIKU__
 				(*pci->unreserve_device)(info.bus, info.device, info.function,
 					DRIVER_NAME, &cards[num_cards]);

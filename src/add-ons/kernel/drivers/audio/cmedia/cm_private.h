@@ -20,7 +20,7 @@
 #define DEVNAME 32
 
 
-#define EXPORT __declspec(dllexport)
+#define EXPORT __attribute__((visibility("default")))
 
 #if defined(__POWERPC__)
 #define EIEIO() __eieio()
@@ -153,7 +153,7 @@ typedef struct _cmedia_pci_dev
 	int			dma_base;
 	size_t		low_size;		/* size of low memory */
 	vuchar *	low_mem;
-	vuchar *	low_phys;		/* physical address */
+	phys_addr_t	low_phys;		/* physical address */
 	area_id		map_low;		/* area pointing to low memory */
 	pci_info	info;
 	midi_dev	midi;
