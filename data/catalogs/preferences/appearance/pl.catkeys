@@ -36,8 +36,8 @@ Menu font:	Font view		Font menu:
 Bold font:	Font view		Font pogrubiony:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutorzy:\n\t%decorAuthors\n\nURL: %decorURL\nLicencja: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Wybierz Dekorator
-Strong	AntialiasingSettingsView		Silny
 Failure	Colors tab		Niepowodzenie
+Strong	AntialiasingSettingsView		Silny
 Double:	DecorSettingsView		Podwójne:
 Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
 Size:	Font Selection view		Rozmiar:

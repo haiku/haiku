@@ -36,8 +36,8 @@ Menu font:	Font view		Fonte de menu:
 Bold font:	Font view		Negrito:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutores:\n\t %decorAuthors\n\nURL: %decorURL\nLicença: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Escolher Decorador
-Strong	AntialiasingSettingsView		Forte
 Failure	Colors tab		Falha
+Strong	AntialiasingSettingsView		Forte
 Double:	DecorSettingsView		Duplo:
 Selected menu item text	Colors tab		Texto do item do menu selecionado
 Size:	Font Selection view		Tamanho:

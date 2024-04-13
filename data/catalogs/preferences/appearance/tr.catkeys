@@ -36,8 +36,8 @@ Menu font:	Font view		Menü yazıtipi:
 Bold font:	Font view		Kalın yazıtipi:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nYazarlar:\n\t%decorAuthors\n\nURL: %decorURL\nLisans: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Dekorcu seç
-Strong	AntialiasingSettingsView		Güçlü
 Failure	Colors tab		Başarısız
+Strong	AntialiasingSettingsView		Güçlü
 Double:	DecorSettingsView		Çift:
 Selected menu item text	Colors tab		Seçili menü ögesi metni
 Size:	Font Selection view		Boyut:

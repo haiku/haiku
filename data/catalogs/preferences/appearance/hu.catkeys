@@ -36,8 +36,8 @@ Menu font:	Font view		Menü betűtípusa:
 Bold font:	Font view		Félkövér betű:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nKészítette:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Dekoráció kiválasztása
-Strong	AntialiasingSettingsView		Erős
 Failure	Colors tab		Nem sikerült
+Strong	AntialiasingSettingsView		Erős
 Double:	DecorSettingsView		Dupla:
 Selected menu item text	Colors tab		Kiválasztott menüelem
 Size:	Font Selection view		Méret:

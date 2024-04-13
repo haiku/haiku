@@ -36,8 +36,8 @@ Menu font:	Font view		แบบอักษรของเมนู:
 Bold font:	Font view		ตัวอักษรหนา:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nผู้เขียน:\n\t%decorAuthors\n\nURL: %decorURL\nใบอนุญาต: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		เลือกตัวตกแต่ง
-Strong	AntialiasingSettingsView		หนา
 Failure	Colors tab		ล้มเหลว
+Strong	AntialiasingSettingsView		หนา
 Double:	DecorSettingsView		สองเท่า:
 Selected menu item text	Colors tab		ข้อความรายการเมนูที่เลือก
 Size:	Font Selection view		ขนาด:

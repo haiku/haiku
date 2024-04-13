@@ -36,8 +36,8 @@ Menu font:	Font view		Font de meniu:
 Bold font:	Font view		Font bold:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicență: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Alege decorator
-Strong	AntialiasingSettingsView		Puternic
 Failure	Colors tab		Eşec
+Strong	AntialiasingSettingsView		Puternic
 Double:	DecorSettingsView		Dublu:
 Selected menu item text	Colors tab		Textul elementului de meniu selectat
 Size:	Font Selection view		Dimensiune:

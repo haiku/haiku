@@ -36,8 +36,8 @@ Menu font:	Font view		菜单字体:
 Bold font:	Font view		加粗字体：
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者：\n\t%decorAuthors\n\n网址：%decorURL\n协议：%decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		选择装饰
-Strong	AntialiasingSettingsView		强
 Failure	Colors tab		失败
+Strong	AntialiasingSettingsView		强
 Double:	DecorSettingsView		双行：
 Selected menu item text	Colors tab		选择菜单文本
 Size:	Font Selection view		大小：

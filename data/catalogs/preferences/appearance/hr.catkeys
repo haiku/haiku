@@ -21,8 +21,8 @@ Selected menu item background	Colors tab		Odabrana pozadina stavke izbornika
 Menu font:	Font view		Font izbornika:
 Bold font:	Font view		Podebljani font:
 Choose Decorator	DecorSettingsView		Odaberite dekorator
-Strong	AntialiasingSettingsView		Jako
 Failure	Colors tab		Neuspjeh
+Strong	AntialiasingSettingsView		Jako
 Double:	DecorSettingsView		Dvostruko:
 Selected menu item text	Colors tab		Tekst odabrane stavke izbornika
 Size:	Font Selection view		Veličina:

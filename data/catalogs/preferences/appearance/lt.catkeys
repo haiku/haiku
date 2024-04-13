@@ -35,8 +35,8 @@ Menu font:	Font view		Meniu šriftas:
 Bold font:	Font view		Pastorintas šriftas:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoriai:\n\t%decorAuthors\n\nTinklalapis: %decorURL\nLicencija: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Išsirinkite dekoruoklį
-Strong	AntialiasingSettingsView		Intensyvus
 Failure	Colors tab		Nesėkminga baigtis
+Strong	AntialiasingSettingsView		Intensyvus
 Double:	DecorSettingsView		Dvigubas:
 Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
 Size:	Font Selection view		Dydis:

@@ -36,8 +36,8 @@ Menu font:	Font view		Menua tiparo:
 Bold font:	Font view		Grasa tiparo:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAŭtoroj:\n\t%decorAuthors\n\nURL: %decorURL\nPermisilo: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Elekti dekoraciilon
-Strong	AntialiasingSettingsView		Forta
 Failure	Colors tab		Malsukceso
+Strong	AntialiasingSettingsView		Forta
 Double:	DecorSettingsView		Duobla:
 Selected menu item text	Colors tab		Teksto de elektita menuero
 Size:	Font Selection view		Grando:

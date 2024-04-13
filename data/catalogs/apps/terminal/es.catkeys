@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	1621801700
+1	spanish; castilian	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		Cerrar otras pestañas
 Insert path	Terminal TermView		Insertar la ruta de acceso
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Lo sentimos, pero el Terminal no pudo iniciar la shell.
@@ -94,6 +94,7 @@ Blinking cursor	Terminal AppearancePrefView		Cursor parpadeante
 Use text:	Terminal FindWindow		Utilizar texto:
 Close active tab	Terminal TermWindow		Cerrar la pestaña activa
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patrón especifica el título de la ventana. Los siguientes marcadores de posición\ncpueden ser usados:\n
+Selected background	Terminal ThemeView		Fondo seleccionado
 Save as default	Terminal TermWindow		Definir como predeterminado
 Nothing is selected.	Terminal TermWindow		No se ha seleccionado nada.
 ANSI bright red color	Terminal ThemeView		Color ANSI rojo claro

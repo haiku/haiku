@@ -36,8 +36,8 @@ Menu font:	Font view		Γραμματοσειρά μενού:
 Bold font:	Font view		Έντονη γραμματοσειρά:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nΔημιουργοί:\n\t%decorAuthors\n\nΙστοσελίδα: %decorURL\nΆδεια χρήσης: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Επιλέξετε Περίβλημα
-Strong	AntialiasingSettingsView		Ισχυρό
 Failure	Colors tab		Αποτυχία
+Strong	AntialiasingSettingsView		Ισχυρό
 Double:	DecorSettingsView		Με δύο κουμπιά σε κάθε άκρη:
 Selected menu item text	Colors tab		Επιλεγμένο κείμενο μενού
 Size:	Font Selection view		Μέγεθος:

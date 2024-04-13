@@ -34,8 +34,8 @@ Menu font:	Font view		Písmo menu:
 Bold font:	Font view		Hrubé písmo:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicencia: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Vyberte dekorátor
-Strong	AntialiasingSettingsView		Hrubý
 Failure	Colors tab		Zlyhanie
+Strong	AntialiasingSettingsView		Hrubý
 Double:	DecorSettingsView		Dvojité:
 Selected menu item text	Colors tab		Text položky zvoleného menu
 Size:	Font Selection view		Veľkosť:

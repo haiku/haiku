@@ -36,8 +36,8 @@ Menu font:	Font view		Tipo di carattere del menu:
 Bold font:	Font view		Tipo di carattere in grassetto:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicenza: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Scegli il decoratore
-Strong	AntialiasingSettingsView		Forte
 Failure	Colors tab		Insuccesso
+Strong	AntialiasingSettingsView		Forte
 Double:	DecorSettingsView		Doppio:
 Selected menu item text	Colors tab		Testo della voce selezionata nel menu
 Size:	Font Selection view		Dimensione:

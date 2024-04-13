@@ -36,8 +36,8 @@ Menu font:	Font view		Шрифт меню:
 Bold font:	Font view		Жирний шрифт:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАвтори:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцензія: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Вибір Декоратора
-Strong	AntialiasingSettingsView		Сильно
 Failure	Colors tab		Збій
+Strong	AntialiasingSettingsView		Сильно
 Double:	DecorSettingsView		Подвійний:
 Selected menu item text	Colors tab		Текст вибраного елемента меню
 Size:	Font Selection view		Розмір:

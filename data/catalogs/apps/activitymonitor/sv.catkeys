@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	1319108693
+1	swedish	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Processer
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Växling
 P-faults	DataSource		P-fel
 Sems	DataSource		Semaforer
 Network receive	DataSource		Nätverksmottagning
+%s faults/s	DataSource		%s fel/s

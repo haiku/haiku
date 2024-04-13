@@ -36,8 +36,8 @@ Menu font:	Font view		Skrifttype for menu:
 Bold font:	Font view		Fed skrifttype:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nForfattere:\n\t%decorAuthors\n\nURL: %decorURL\nLicens: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Vælg dekoratør
-Strong	AntialiasingSettingsView		Forstærket
 Failure	Colors tab		Fejl
+Strong	AntialiasingSettingsView		Forstærket
 Double:	DecorSettingsView		Dobbelt:
 Selected menu item text	Colors tab		Valgt menupunkts tekst
 Size:	Font Selection view		Størrelse:

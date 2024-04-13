@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	2943652182
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formato
 Could not unmount partition	MainWindow		No se pudo desmontar la partición
 Create	CreateParametersPanel		Crear
 File system	PartitionList		Sistema de archivos
+Unknown (%s)	PartitionList		Desconocido (%s)
 The selected partition does not contain a partitioning system.	MainWindow		La partición seleccionada no contiene un sistema de particionado.
 End: %s	Support		Final: %s
 Partition type	PartitionList		Tipo de partición

@@ -33,8 +33,8 @@ Menu font:	Font view		Шрыфт меню:
 Bold font:	Font view		Тлусты шрыфт:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАўтары:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцэнзія: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Абраць Дэкаратар
-Strong	AntialiasingSettingsView		Жырны
 Failure	Colors tab		Непаспяхова
+Strong	AntialiasingSettingsView		Жырны
 Double:	DecorSettingsView		Падвойны:
 Selected menu item text	Colors tab		Тэкст пазначанага пункту меню
 Size:	Font Selection view		Памер:

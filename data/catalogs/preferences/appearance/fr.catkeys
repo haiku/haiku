@@ -36,8 +36,8 @@ Menu font:	Font view		Police des menus :
 Bold font:	Font view		Caractères gras :
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAuteurs :\n\t%decorAuthors\n\nURL : %decorURL\nLicence : %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Choisir un décorateur
-Strong	AntialiasingSettingsView		Épais
 Failure	Colors tab		Échec
+Strong	AntialiasingSettingsView		Épais
 Double:	DecorSettingsView		Double :
 Selected menu item text	Colors tab		Texte de l’élément sélectionné dans le menu
 Size:	Font Selection view		Taille :

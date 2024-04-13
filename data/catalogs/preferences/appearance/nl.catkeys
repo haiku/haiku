@@ -36,8 +36,8 @@ Menu font:	Font view		Lettertype voor menu:
 Bold font:	Font view		Vet lettertype:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAuteurs:\n\t%decorAuthors\n\nURL: %decorURL\nLicentie: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Decorator kiezen
-Strong	AntialiasingSettingsView		Sterk
 Failure	Colors tab		Mislukt
+Strong	AntialiasingSettingsView		Sterk
 Double:	DecorSettingsView		Dubbel:
 Selected menu item text	Colors tab		Tekst geselecteerd menu-item
 Size:	Font Selection view		Grootte:

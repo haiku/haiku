@@ -36,8 +36,8 @@ Menu font:	Font view		Tipus de lletra del menú:
 Bold font:	Font view		Negreta:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutors:\n\t%decorAuthors\n\nURL: %decorURL\nLlicència: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Trieu el Decorador
-Strong	AntialiasingSettingsView		Fort
 Failure	Colors tab		Fallada
+Strong	AntialiasingSettingsView		Fort
 Double:	DecorSettingsView		Doble:
 Selected menu item text	Colors tab		Text de l'element seleccionat del menú
 Size:	Font Selection view		Mida:

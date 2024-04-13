@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaConverter	3458127841
+1	spanish; castilian	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		El archivo de entrada no se ha podido reconocer como un archivo de audio o video.
 Source files	MediaConverter		Archivos de entrada
 Error writing video frame %lld	MediaConverter		Error al escribir el fotograma %lld del video
@@ -39,6 +39,7 @@ Conversion cancelled	MediaConverter		Conversión cancelada
 Low	MediaConverter		Bajo
 Error loading files	MediaConverter		Error al cargar los archivos
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		Calidad de video: %s
 End   [ms]: 	MediaConverter		Fin  [ms]:
 Cancel	MediaConverter		Cancelar
 OK	MediaConverter-FileInfo		Aceptar
@@ -49,11 +50,15 @@ File details	MediaConverter		Detalles del archivo
 No audio	Audio codecs list		Sin audio
 Drop media files onto this window	MediaConverter		Arrastre los archivos multimedia en esta ventana
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Error read audio frame %lld	MediaConverter		Error de lectura del cuadro de audio %lld
 Quit	Menu		Salir
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Writing audio track: %s complete	MediaConverter		Escritura de pista de audio: %s completada
 Duration:	MediaConverter-FileInfo		Duración:
 MediaConverter	System name		MediaConverter
+Writing video track: %s complete	MediaConverter		Escritura de pista de video: %s completada
 Error launching: %strError%	MediaConverter		Error al ejecutar: %strError%
+Error writing audio frame %lld	MediaConverter		Error de escritura del cuadro de audio %lld
 File format:	MediaConverter		Formato de archivo:
 File	Menu		Archivo
 Video quality not supported	MediaConverter		Calidad de video no soportada
@@ -67,5 +72,6 @@ Continue	MediaConverter		Continuar
 Convert	MediaConverter		Convertir
 Audio quality not supported	MediaConverter		Calidad de audio no soportada
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Error al escribir en la ubicación %strPath%. Se establece como ubicación /boot/home
+Error read video frame %lld	MediaConverter		Error de lectura del cuadro de video %lld
 Preview	MediaConverter		Vista previa
 Start [ms]: 	MediaConverter		Iniciar [ms]:

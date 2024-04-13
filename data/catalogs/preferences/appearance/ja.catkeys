@@ -36,8 +36,8 @@ Menu font:	Font view		メニューフォント:
 Bold font:	Font view		太字フォント:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者:\n\t%decorAuthors\n\nURL: %decorURL\nライセンス: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		デコレーターの選択
-Strong	AntialiasingSettingsView		強い
 Failure	Colors tab		失敗
+Strong	AntialiasingSettingsView		強い
 Double:	DecorSettingsView		両方向:
 Selected menu item text	Colors tab		メニュー選択項目の文字
 Size:	Font Selection view		サイズ:

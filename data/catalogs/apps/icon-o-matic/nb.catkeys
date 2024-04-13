@@ -53,7 +53,7 @@ Move pivot	Icon-O-Matic-TransformationBoxStates		Flytt dreiepunkt
 Opacity	Icon-O-Matic-PropertyNames		Gjennomsiktighet
 OK	Icon-O-Matic-ColorPicker		OK
 Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Multi-sett %property%
-Error: 	Icon-O-Matic-Main		Feil:
+Error: 	Icon-O-Matic-Main		Feil: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Nullstill {0, plural, one{transformasjon} other{transformasjoner}}
 Assign style	Icon-O-Matic-AssignStyleCmd		Angi stil
 Saving your document failed!	Icon-O-Matic-Exporter		Lagring av dokumentet mislyktes!
@@ -139,7 +139,7 @@ One or more of the shapes has too many paths. The HVIF format supports a maximum
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Legg til form med sti & stil
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		For lang tekst
-Caps	Icon-O-Matic-PropertyNames		Store bokstaver
+Caps	Icon-O-Matic-PropertyNames		Ender
 OK	Icon-O-Matic-SVGImport		OK
 Import text	Icon-O-Matic-StyledTextImport		Importer tekst
 Append…	Icon-O-Matic-Menu-File		Bruk…

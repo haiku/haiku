@@ -36,8 +36,8 @@ Menu font:	Font view		Menu font:
 Bold font:	Font view		Fetstil
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nUpphovsmän:\n\t%decorAuthors\n\nURL: %decorURL\nLisens: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Välj dekor
-Strong	AntialiasingSettingsView		Framhävd
 Failure	Colors tab		Misslyckande
+Strong	AntialiasingSettingsView		Framhävd
 Double:	DecorSettingsView		Dubbel
 Selected menu item text	Colors tab		Textfärg för valt menyalternativ
 Size:	Font Selection view		Storlek:

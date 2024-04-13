@@ -36,8 +36,8 @@ Menu font:	Font view		Tipo de letra do menu:
 Bold font:	Font view		Tipo de letra negrito:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutores:\n\t%decorAuthors\n\nURL: %decorURL\nLicença: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Escolher Decorador
-Strong	AntialiasingSettingsView		Intenso
 Failure	Colors tab		Falha
+Strong	AntialiasingSettingsView		Intenso
 Double:	DecorSettingsView		Dupla:
 Selected menu item text	Colors tab		Texto do item de menu seleccionado
 Size:	Font Selection view		Tamanho:

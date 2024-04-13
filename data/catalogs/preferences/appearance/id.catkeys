@@ -36,8 +36,8 @@ Menu font:	Font view		Fon menu:
 Bold font:	Font view		Fon tebal:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nPengarang:\n\t%decorAuthors\n\nURL: %decorURL\nLissensi: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Pilih dekorator
-Strong	AntialiasingSettingsView		Kuat
 Failure	Colors tab		Kegagalan
+Strong	AntialiasingSettingsView		Kuat
 Double:	DecorSettingsView		Dobel:
 Selected menu item text	Colors tab		Teks item menu terpilih
 Size:	Font Selection view		Ukuran:

@@ -36,8 +36,8 @@ Menu font:	Font view		Menyskrift:
 Bold font:	Font view		Fet skrift:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nForfatter:\n\t%decorAuthors\n\nURL: %decorURL\nLisens: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Velg dekoratør
-Strong	AntialiasingSettingsView		Uthevet
 Failure	Colors tab		Mislykket
+Strong	AntialiasingSettingsView		Uthevet
 Double:	DecorSettingsView		Dobbel:
 Selected menu item text	Colors tab		Tekstfarge på valgt menyelement
 Size:	Font Selection view		Størrelse:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	2943652182
+1	swedish	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Mount all	MainWindow		Montera alla
 Disk	MainWindow		Disk
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formatera
 Could not unmount partition	MainWindow		Kunde inte avmontera partition
 Create	CreateParametersPanel		Skapa
 File system	PartitionList		Filsystem
+Unknown (%s)	PartitionList		Okänd (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Den valda partitionen innehåller inget partitionssystem.
 End: %s	Support		Slutar: %s
 Partition type	PartitionList		Partitionstyp

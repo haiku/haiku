@@ -36,8 +36,8 @@ Menu font:	Font view		Caratar dal menù:
 Bold font:	Font view		Caratar in neret:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutôrs:\n\t%decorAuthors\n\nURL: %decorURL\nLicence: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Sielç decoradôr
-Strong	AntialiasingSettingsView		Fuart
 Failure	Colors tab		Faliment
+Strong	AntialiasingSettingsView		Fuart
 Double:	DecorSettingsView		Dopli:
 Selected menu item text	Colors tab		Test dal element selezionât tal menù
 Size:	Font Selection view		Dimension:

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	3381776628
+1	spanish; castilian	x-vnd.Haiku-WebPositive	2813509533
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiar
@@ -102,6 +102,7 @@ Apply	Settings Window		Aplicar
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hubo un error al intentar mostrar la carpeta de Marcadores.\n\nError: %error
 Revert	Settings Window		Revertir
 Copy	WebPositive Window		Copiar
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{La última línea se repitió # vez.}other{La última línea se repitió # veces.}}
 Default standard font size:	Settings Window		Tamaño de texto predeterminado:
 Custom	Settings Window		Personalizado
 Bookmark this page	WebPositive Window		Agregar esta página a marcadores

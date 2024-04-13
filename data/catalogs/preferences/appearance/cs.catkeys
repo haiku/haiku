@@ -36,8 +36,8 @@ Menu font:	Font view		Písmo nabídky:
 Bold font:	Font view		Tučné písmo:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoři:\n\t%decorAuthors\n\nURL: %decorURL\nLicence: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Zvolit dekorátor
-Strong	AntialiasingSettingsView		Silný
 Failure	Colors tab		Chyba
+Strong	AntialiasingSettingsView		Silný
 Double:	DecorSettingsView		Dvojité:
 Selected menu item text	Colors tab		Text vybrané položky nabídky
 Size:	Font Selection view		Velikost:

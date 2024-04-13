@@ -36,8 +36,8 @@ Menu font:	Font view		Menü:
 Bold font:	Font view		Fett:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoren:\n\t%decorAuthors\n\nURL: %decorURL\nLizenz: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Dekorator wählen
-Strong	AntialiasingSettingsView		Stark
 Failure	Colors tab		Fehler
+Strong	AntialiasingSettingsView		Stark
 Double:	DecorSettingsView		Doppelt:
 Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Size:	Font Selection view		Größe:

@@ -36,8 +36,8 @@ Menu font:	Font view		Valikkokirjasin:
 Bold font:	Font view		Lihavoitu kirjasin:
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nTekijät:\n\t%decorAuthors\n\nVerkko-osoite: %decorURL\nLisenssi: %decorLic\n\n%decorDesc\n
 Choose Decorator	DecorSettingsView		Valitse koristelu
-Strong	AntialiasingSettingsView		Vahva
 Failure	Colors tab		Epäonnistuminen
+Strong	AntialiasingSettingsView		Vahva
 Double:	DecorSettingsView		Kaksikko:
 Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Size:	Font Selection view		Koko:

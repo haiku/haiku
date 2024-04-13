@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ShowImage	1337031375
+1	spanish; castilian	x-vnd.Haiku-ShowImage	276586646
 ShowImage	System name		Mostrar Imagen
 Page setup…	Menus		Configuración de la pagina
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
@@ -31,6 +31,7 @@ High-quality zooming	Menus		Ampliación de alta calidad
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' ha cambiado. ¿Desea cerrarlo?
 Close	Menus		Cerrar
 Selection mode	Menus		Modo de selección
+Reset rating	Menus		Restablecer calificación
 DPI:	PrintOptionsWindow		Puntos por pulgada (DPI):
 Fit image to page	PrintOptionsWindow		Ajustar imagen a la página
 Show tool bar	Menus		Mostrar barra de herramientas
