@@ -1,7 +1,0 @@
-#
-# Example Vagrantfile to launch a haiku image
-#
-Vagrant.configure("2") do |config|
-  config.vm.box = "haiku-os/r1beta3-x86_64"
-  config.vm.box_version = "20220216"
-end
