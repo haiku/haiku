@@ -289,15 +289,8 @@ FontManager::RemoveStyle(FontStyle* style)
 	if (family == NULL)
 		debugger("family is NULL!");
 
+	family->RemoveStyle(style);
 	fDelistedStyleHashTable.Remove(FontKey(family->ID(), style->ID()));
-	int count = fDelistedFamilies.Get(family) - 1;
-	if (count == 0)
-		fDelistedFamilies.Remove(family);
-	else if (count > 0)
-		fDelistedFamilies.Put(family, count);
-
-	if (family->CountStyles() == 0 && !fDelistedFamilies.ContainsKey(family))
-		delete family;
 }
 
 
@@ -307,22 +300,20 @@ FontManager::_AddFont(FT_Face face, node_ref nodeRef, const char* path,
 {
 	ASSERT(IsLocked());
 
-	FontFamily* family = _FindFamily(face->family_name);
-	bool isNewFontFamily = family == NULL;
+	BReference<FontFamily> family(_FindFamily(face->family_name));
+	bool isNewFontFamily = !family.IsSet();
 
-	if (family != NULL && family->HasStyle(face->style_name)) {
+	if (family.IsSet() && family->HasStyle(face->style_name)) {
 		// prevent adding the same style twice
 		// (this indicates a problem with the installed fonts maybe?)
 		FT_Done_Face(face);
 		return B_NAME_IN_USE;
 	}
 
-	if (family == NULL) {
-		family = new (std::nothrow) FontFamily(face->family_name, _NextID());
+	if (!family.IsSet()) {
+		family.SetTo(new (std::nothrow) FontFamily(face->family_name, _NextID()), true);
 
-		if (family == NULL
-			|| !fFamilies.BinaryInsert(family, compare_font_families)) {
-			delete family;
+		if (!family.IsSet() || !fFamilies.BinaryInsert(family, compare_font_families)) {
 			FT_Done_Face(face);
 			return B_NO_MEMORY;
 		}
@@ -335,10 +326,8 @@ FontManager::_AddFont(FT_Face face, node_ref nodeRef, const char* path,
 
 	if (style == NULL || !family->AddStyle(style)) {
 		delete style;
-		if (isNewFontFamily) {
+		if (isNewFontFamily)
 			fFamilies.RemoveItem(family);
-			delete family;
-		}
 		return B_NO_MEMORY;
 	}
 
@@ -362,7 +351,6 @@ FontManager::_RemoveFont(uint16 familyID, uint16 styleID)
 	if (style != NULL) {
 		fDelistedStyleHashTable.Put(key, style);
 		FontFamily* family = style->Family();
-		fDelistedFamilies.Put(family, fDelistedFamilies.Get(family) + 1);
 		if (family->RemoveStyle(style) && family->CountStyles() == 0)
 			fFamilies.RemoveItem(family);
 		fStyleHashTable.Remove(key);
@@ -374,20 +362,19 @@ FontManager::_RemoveFont(uint16 familyID, uint16 styleID)
 void
 FontManager::_RemoveAllFonts()
 {
-	for (int32 i = fFamilies.CountItems(); i-- > 0;) {
-		FontFamily* family = fFamilies.RemoveItemAt(i);
-		fDelistedFamilies.Remove(family);
-		delete family;
-	}
+	fFamilies.MakeEmpty();
 
-	HashMap<FontKey, FontStyle*>::Iterator it = fDelistedStyleHashTable.GetIterator();
-	while (it.HasNext()) {
-		FontFamily* family = it.Next().value->Family();
-		fDelistedFamilies.Remove(family);
-		delete family;
-	}
+	// Disconnect the styles from their families before removing them; once we
+	// get to this point, we are in the dtor and don't want them to call back.
 
-	fDelistedFamilies.Clear();
+	HashMap<FontKey, FontStyle*>::Iterator delisted = fDelistedStyleHashTable.GetIterator();
+	while (delisted.HasNext())
+		delisted.Next().value->_SetFontFamily(NULL, -1);
+	fDelistedStyleHashTable.Clear();
+
+	HashMap<FontKey, BReference<FontStyle> >::Iterator referenced = fStyleHashTable.GetIterator();
+	while (referenced.HasNext())
+		referenced.Next().value->_SetFontFamily(NULL, -1);
 	fStyleHashTable.Clear();
 }
 

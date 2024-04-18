@@ -102,8 +102,6 @@ private:
 private:
 			typedef BObjectList<FontFamily>			FamilyList;
 			FamilyList			fFamilies;
-			HashMap<HashKeyPointer<FontFamily*>, int>
-								fDelistedFamilies;
 
 			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
 			HashMap<FontKey, FontStyle*> fDelistedStyleHashTable;

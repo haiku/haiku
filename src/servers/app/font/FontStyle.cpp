@@ -96,7 +96,7 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face,
 FontStyle::~FontStyle()
 {
 	// make sure the font server is ours
-	if (fFamily != NULL && fFontManager->Lock()) {
+	if (fFamily.IsSet() && fFontManager->Lock()) {
 		fFontManager->RemoveStyle(this);
 		fFontManager->Unlock();
 	}
@@ -227,7 +227,10 @@ FontStyle::UpdateFace(FT_Face face)
 void
 FontStyle::_SetFontFamily(FontFamily* family, uint16 id)
 {
-	fFamily = family;
+	if (fFamily.IsSet())
+		fFamily->RemoveStyle(this);
+
+	fFamily.SetTo(family);
 	fID = id;
 }
 

@@ -144,6 +144,7 @@ class FontStyle : public BReferenceable {
 
 	private:
 		friend class FontFamily;
+		friend class FontManager;
 		uint16			_TranslateStyleToFace(const char *name) const;
 		void			_SetFontFamily(FontFamily* family, uint16 id);
 	private:
@@ -152,7 +153,8 @@ class FontStyle : public BReferenceable {
 		BPath			fPath;
 		node_ref		fNodeRef;
 
-		FontFamily*		fFamily;
+		BReference<FontFamily>
+						fFamily;
 		uint16			fID;
 
 		BRect			fBounds;
