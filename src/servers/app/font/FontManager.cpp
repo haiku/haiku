@@ -329,8 +329,10 @@ FontManager::_AddFont(FT_Face face, node_ref nodeRef, const char* path,
 
 	if (style == NULL || !family->AddStyle(style)) {
 		delete style;
-		if (isNewFontFamily)
+		if (isNewFontFamily) {
+			fFamilies.RemoveItem(family);
 			delete family;
+		}
 		return B_NO_MEMORY;
 	}
 
