@@ -57,7 +57,6 @@ public:
 	enum SettingsPage {
 		kDesktopSettings,
 		kWindowsSettings,
-		kTrashSettings,
 		kSpaceBarSettings,
 		kAutomountSettings
 	};
