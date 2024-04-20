@@ -1,9 +1,10 @@
-1	english (united kingdom)	x-vnd.Haiku-Appearance	239576495
+1	english (united kingdom)	x-vnd.Haiku-Appearance	4082436481
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce coloured edges filter strength:
 Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
 OK	DecorSettingsView		Alright
 Antialiasing	APRWindow		Anti-aliasing
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicence: %decorLic\n\n%decorDesc\n
+Automatically pick secondary colors	Colors tab		Automatically pick secondary colours
 Grayscale	AntialiasingSettingsView		Greyscale
 Antialiasing type:	AntialiasingSettingsView		Anti-aliasing type:
 Colors	APRWindow		Colours

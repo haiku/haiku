@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	663472720
+1	german	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Steuerelement - Rahmen
 Control mark	Colors tab		Steuerelement - Markierung
 Off	AntialiasingSettingsView		Aus
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Menü - Text (ausgewählt)
 Size:	Font Selection view		Größe:
 Panel background	Colors tab		Oberfläche - Hintergrund
 Plain font:	Font view		Normal:
+Automatically pick secondary colors	Colors tab		Übrige Farben automatisch anpassen
 Window tab text	Colors tab		Fensterreiter - Text
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
 LCD subpixel	AntialiasingSettingsView		LCD-Subpixel

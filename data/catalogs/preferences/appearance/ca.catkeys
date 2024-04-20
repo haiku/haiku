@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Appearance	663472720
+1	catalan; valencian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Vora del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivat
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Text de l'element seleccionat del menú
 Size:	Font Selection view		Mida:
 Panel background	Colors tab		Fons del plafó
 Plain font:	Font view		Lletra neta:
+Automatically pick secondary colors	Colors tab		Tria automàticament els colors secundaris
 Window tab text	Colors tab		Text de la pestanya de la finestra
 Navigation pulse	Colors tab		Pols de la navegació
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	663472720
+1	swedish	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Kontrollkant
 Control mark	Colors tab		Kontroll märke
 Off	AntialiasingSettingsView		Av
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Textfärg för valt menyalternativ
 Size:	Font Selection view		Storlek:
 Panel background	Colors tab		Panelbakgrund
 Plain font:	Font view		Vanlig font:
+Automatically pick secondary colors	Colors tab		Välj automatiskt sekundära färger
 Window tab text	Colors tab		Fönsterflik text
 Navigation pulse	Colors tab		Navigeringspuls
 LCD subpixel	AntialiasingSettingsView		LCD-subpixel

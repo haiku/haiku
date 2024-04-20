@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	663472720
+1	hungarian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Vezérlőelem kerete
 Control mark	Colors tab		Vezérlőelem jelölése
 Off	AntialiasingSettingsView		Ki
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Kiválasztott menüelem
 Size:	Font Selection view		Méret:
 Panel background	Colors tab		Panel háttere
 Plain font:	Font view		Alap betűtípus:
+Automatically pick secondary colors	Colors tab		A másodlagos színek automatikus meghatározása
 Window tab text	Colors tab		Ablakfül szövege
 Navigation pulse	Colors tab		Navigációs pulzálás
 LCD subpixel	AntialiasingSettingsView		LCD-szubpixel

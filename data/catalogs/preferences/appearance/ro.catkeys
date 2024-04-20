@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Appearance	663472720
+1	romanian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Margine de control
 Control mark	Colors tab		Semn de control
 Off	AntialiasingSettingsView		Oprit
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Textul elementului de meniu selectat
 Size:	Font Selection view		Dimensiune:
 Panel background	Colors tab		Fundal de panou
 Plain font:	Font view		Font simplu:
+Automatically pick secondary colors	Colors tab		Alege automat culorile secundare
 Window tab text	Colors tab		Text de filă de fereastră
 Navigation pulse	Colors tab		Puls de navigare
 LCD subpixel	AntialiasingSettingsView		Subpixel LCD

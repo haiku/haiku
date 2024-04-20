@@ -115,7 +115,7 @@ There was a puzzling response from the web service.	UserLoginWindow		Houve uma r
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Sua avaliação foi enviada com sucesso. Você pode atualizá-lo ou removê-lo no site do servidor HaikuDepot.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Não foi possível se comunicar com o servidor para obter uma imagem captcha necessária para criar um novo usuário.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		A resposta fornecida ao captcha está incorreta. Um novo captcha será gerado; tente novamente.
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O Depósito Haiku precisa do daemon de pacote para funcionar e ele parece não estar em execução.\nGostaria de iniciá-lo agora?
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		O HaikuDepot precisa do pacote daemon para funcionar, e parece que não estar em funcionando.\nGostaria de iniciá-lo agora?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		A senha deve ter pelo menos oito caracteres, pelo menos dois dígitos e um caractere maiúsculo.
 Contents	PackageInfoView		Conteúdo
 Share anonymous usage data with HaikuDepotServer	SettingsWindow		Compartilhar dados anônimos de uso com HaikuDepotServer

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Appearance	663472720
+1	japanese	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		コントロールの境界
 Control mark	Colors tab		コントロールの選択部
 Off	AntialiasingSettingsView		無効
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		メニュー選択項目の文字
 Size:	Font Selection view		サイズ:
 Panel background	Colors tab		パネルの背景
 Plain font:	Font view		標準フォント:
+Automatically pick secondary colors	Colors tab		自動的にセカンダリーカラーを選択する
 Window tab text	Colors tab		ウィンドウタブの文字
 Navigation pulse	Colors tab		ナビゲーションの点滅
 LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
