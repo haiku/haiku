@@ -90,6 +90,7 @@ DoCatalogs libbe.so
 	AboutMenuItem.cpp
 	AboutWindow.cpp
 	ColorControl.cpp
+	ColumnTypes.cpp
 	DecorInfo.cpp
 	Dragger.cpp
 	Menu.cpp

@@ -22,9 +22,11 @@
 
 using BPrivate::gSystemCatalog;
 
+#undef B_TRANSLATE_COMMENT
+#define B_TRANSLATE_COMMENT(str, comment) \
+	gSystemCatalog.GetString(B_TRANSLATE_MARK_COMMENT(str, comment), \
+		B_TRANSLATION_CONTEXT, (comment))
 
-#undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "ColumnTypes"
 
 #define kTEXT_MARGIN	8
 
@@ -408,6 +410,10 @@ BSizeColumn::BSizeColumn(const char* title, float width, float minWidth,
 }
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "StringForSize"
+
+
 void
 BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 {
@@ -417,42 +423,46 @@ BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 
 	float width = rect.Width() - (2 * kTEXT_MARGIN);
 
-	double value = ((BSizeField*)_field)->Size() / 1024.0;
+	double value = ((BSizeField*)_field)->Size();
 	parent->GetFont(&font);
+
 	// we cannot use string_for_size due to the precision/cell width logic
-	if (value < 1024.0) {
-		BStringFormat format(B_TRANSLATE_MARK_ALL("{0, plural, one{# byte} other{# bytes}}",
-			B_TRANSLATION_CONTEXT, "unit size"));
-		format.Format(printedSize, value);
-		string = gSystemCatalog.GetString(printedSize, B_TRANSLATION_CONTEXT, "unit size");
+	const char* kFormats[] = {
+		B_TRANSLATE_MARK_COMMENT("{0, plural, one{%s byte} other{%s bytes}}", "size unit"),
+		B_TRANSLATE_MARK_COMMENT("%s KiB", "size unit"),
+		B_TRANSLATE_MARK_COMMENT("%s MiB", "size unit"),
+		B_TRANSLATE_MARK_COMMENT("%s GiB", "size unit"),
+		B_TRANSLATE_MARK_COMMENT("%s TiB", "size unit")
+	};
+
+	size_t index = 0;
+	while (index < B_COUNT_OF(kFormats) - 1 && value >= 1024.0) {
+		value /= 1024.0;
+		index++;
+	}
+
+	BString format;
+	BStringFormat formatter(
+		gSystemCatalog.GetString(kFormats[index], B_TRANSLATION_CONTEXT, "size unit"));
+	formatter.Format(format, value);
+
+	if (index == 0) {
+		fNumberFormat.SetPrecision(0);
+		fNumberFormat.Format(printedSize, value);
+		string.SetToFormat(format.String(), printedSize.String());
+
 		if (font.StringWidth(string) > width) {
-			BString tmp = B_TRANSLATE_MARK_ALL("%s B", B_TRANSLATION_CONTEXT, "unit size");
-			fNumberFormat.Format(printedSize, value);
-			string.SetToFormat(gSystemCatalog.GetString(tmp, B_TRANSLATION_CONTEXT, "unit size"),
-				printedSize.String());
+			BStringFormat formatter(B_TRANSLATE_COMMENT("%s B", "size unit, narrow space"));
+			format.Truncate(0);
+			formatter.Format(format, value);
+			string.SetToFormat(format.String(), printedSize.String());
 		}
 	} else {
-		const char* kFormats[] = {
-			B_TRANSLATE_MARK_ALL("%s KiB", B_TRANSLATION_CONTEXT, "unit size"),
-			B_TRANSLATE_MARK_ALL("%s MiB", B_TRANSLATION_CONTEXT, "unit size"),
-			B_TRANSLATE_MARK_ALL("%s GiB", B_TRANSLATION_CONTEXT, "unit size"),
-			B_TRANSLATE_MARK_ALL("%s TiB", B_TRANSLATION_CONTEXT, "unit size")
-		};
-
-		size_t index = 0;
-		while (index < B_COUNT_OF(kFormats) && value >= 1024.0) {
-			value /= 1024.0;
-			index++;
-		}
-
 		int precision = 2;
 		while (precision >= 0) {
-			double formattedSize = value;
 			fNumberFormat.SetPrecision(precision);
-			fNumberFormat.Format(printedSize, formattedSize);
-			string.SetToFormat(
-				gSystemCatalog.GetString(kFormats[index], B_TRANSLATION_CONTEXT, "unit size"),
-				printedSize.String());
+			fNumberFormat.Format(printedSize, value);
+			string.SetToFormat(format.String(), printedSize.String());
 			if (font.StringWidth(string) <= width)
 				break;
 
@@ -463,6 +473,8 @@ BSizeColumn::DrawField(BField* _field, BRect rect, BView* parent)
 	parent->TruncateString(&string, B_TRUNCATE_MIDDLE, width + 2);
 	DrawString(string.String(), parent, rect);
 }
+
+#undef B_TRANSLATION_CONTEXT
 
 
 int

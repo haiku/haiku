@@ -27,7 +27,7 @@ Application DebugAnalyzer
 	<nogrist>DebugAnalyzer_model_loader.o
 	<nogrist>DebugAnalyzer_util.o
 
-	libcolumnlistview.a shared libdebug.so be
+	libcolumnlistview.a localestub shared libdebug.so be
 	[ TargetLibstdc++ ]
 	:
 	DebugAnalyzer.rdef
