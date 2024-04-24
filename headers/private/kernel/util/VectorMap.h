@@ -11,8 +11,8 @@
 #include <SupportDefs.h>
 
 #include <util/kernel_cpp.h>
-#include <KernelUtilsOrder.h>
-#include <Vector.h>
+#include <util/KernelUtilsOrder.h>
+#include <util/Vector.h>
 
 namespace VectorMapEntryStrategy {
 	// Pair
