@@ -7,6 +7,7 @@
 
 
 #include <net_buffer.h>
+#include <AutoDeleter.h>
 
 
 extern net_buffer_module_info* gBufferModule;
@@ -157,6 +158,29 @@ public:
 		this->Sync();
 	}
 };
+
+
+//! A class to automatically delete buffers on scope exit
+template<typename Module>
+struct NetBufferDelete
+{
+	inline void operator()(net_buffer* buffer)
+	{
+		if (buffer != NULL)
+			Module::Get()->free(buffer);
+	}
+};
+
+
+template<typename Module = NetBufferModuleGetter>
+struct NetBufferDeleter
+	: BPrivate::AutoDeleter<net_buffer, NetBufferDelete<Module> >
+{
+	NetBufferDeleter(net_buffer* buffer)
+		: BPrivate::AutoDeleter<net_buffer, NetBufferDelete<Module> >(buffer)
+	{}
+};
+
 
 
 #endif	// NET_BUFFER_UTILITIES_H
