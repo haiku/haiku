@@ -693,6 +693,7 @@ ramfs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat *st)
 		st->st_gid = node->GetGID();
 		st->st_size = node->GetSize();
 		st->st_blksize = kOptimalIOSize;
+		st->st_blocks = (st->st_size + st->st_blksize - 1) / st->st_blksize;
 		st->st_atime = node->GetATime();
 		st->st_mtime = node->GetMTime();
 		st->st_ctime = node->GetCTime();
@@ -883,8 +884,11 @@ ramfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 	status_t error = B_OK;
 	if (VolumeReadLocker locker = volume) {
 		// directory can be opened read-only
-		if (node->IsDirectory() && (openMode & O_RWMASK))
-			openMode &= ~O_RWMASK;
+		if (node->IsDirectory() && (openMode & O_RWMASK) != O_RDONLY)
+			error = B_IS_A_DIRECTORY;
+		if (error == B_OK && (openMode & O_DIRECTORY) != 0 && !node->IsDirectory())
+			error = B_NOT_A_DIRECTORY;
+
 		int accessMode = open_mode_to_access(openMode);
 		// truncating requires write permission
 		if (error == B_OK && (openMode & O_TRUNC))
