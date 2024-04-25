@@ -15,3 +15,8 @@ SimpleTest PllTest :
 SEARCH on [ FGristFiles pll.cpp ] = [
 	FDirName $(HAIKU_TOP) src add-ons accelerants intel_extreme ] ;
 
+SimpleTest intel_reg :
+	intel_reg.cpp
+	:
+	;
+
