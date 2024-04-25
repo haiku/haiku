@@ -190,7 +190,6 @@ Application Debugger :
 	<nogrist>DebugAnalyzer_gui_table.o
 
 	libcolumnlistview.a
-	localestub
 	shared
 
 	[ TargetLibstdc++ ]

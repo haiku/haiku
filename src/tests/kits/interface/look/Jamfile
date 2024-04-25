@@ -4,5 +4,5 @@ UsePrivateHeaders interface ;
 
 SimpleTest LookTest :
 	Look.cpp
-	: be tracker libcolumnlistview.a localestub [ TargetLibsupc++ ]
+	: be tracker libcolumnlistview.a [ TargetLibsupc++ ]
 	;	
