@@ -14,7 +14,7 @@
 #endif
 
 #define ERROR(x...) dprintf("bt: " x)
-#define CALLED(x...) TRACE("bt: CALLED %s\n", __PRETTY_FUNCTION__)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 #endif /* _BTDEBUG_H */
