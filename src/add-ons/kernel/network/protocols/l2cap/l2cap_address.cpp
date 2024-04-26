@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2024, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,21 +22,6 @@
 #include <bluetooth/L2CAP/btL2CAP.h>
 
 
-#define L2CAP_CHECKSUM(address) \
-	(address.b[0] + address.b[1] + address.b[2] + address.b[3] \
-		+ address.b[4] + address.b[5])
-
-
-/*!	Routing utility function: copies address \a from into a new address
-	that is put into \a to.
-	If \a replaceWithZeros is set \a from will be replaced by an empty
-	address.
-	If a \a mask is given it is applied to \a from (such that \a to is the
-	result of \a from & \a mask).
-	\return B_OK if the address could be copied
-	\return B_NO_MEMORY if the new address could not be allocated
-	\return B_MISMATCHED_VALUES if \a address does not match family AF_BLUETOOTH
-*/
 static status_t
 l2cap_copy_address(const sockaddr *from, sockaddr **to,
 	bool replaceWithZeros = false, const sockaddr *mask = NULL)
@@ -66,27 +51,6 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 }
 
 
-/*!	Routing utility function: applies \a mask to given \a address and puts
-	the resulting address into \a result.
-	\return B_OK if the mask has been applied
-	\return B_BAD_VALUE if \a address or \a mask is NULL
-*/
-static status_t
-l2cap_mask_address(const sockaddr *address, const sockaddr *mask,
-	sockaddr *result)
-{
-	if (address == NULL || result == NULL)
-		return B_BAD_VALUE;
-
-	return B_OK;
-}
-
-
-/*!	Checks if the given \a address is the empty address. By default, the port
-	is checked, too, but you can avoid that by passing \a checkPort = false.
-	\return true if \a address is NULL, uninitialized or the empty address,
-		false if not
-*/
 static bool
 l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 {
@@ -95,15 +59,11 @@ l2cap_is_empty_address(const sockaddr *address, bool checkPort)
 		return true;
 
 	return ((bdaddrUtils::Compare(
-		((const sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL)==0)
+		((const sockaddr_l2cap *)address)->l2cap_bdaddr, BDADDR_NULL))
 		&& (!checkPort || ((sockaddr_l2cap *)address)->l2cap_psm == 0));
 }
 
 
-/*!	Checks if the given \a address is L2CAP address.
-	\return false if \a address is NULL, or with family different from
-		AF_BLUETOOTH true if it has AF_BLUETOOTH address family
-*/
 static bool
 l2cap_is_same_family(const sockaddr *address)
 {
@@ -114,9 +74,6 @@ l2cap_is_same_family(const sockaddr *address)
 }
 
 
-/*!	Compares the IP-addresses of the two given address structures \a a and \a b.
-	\return true if IP-addresses of \a a and \a b are equal, false if not
-*/
 static bool
 l2cap_equal_addresses(const sockaddr *a, const sockaddr *b)
 {
@@ -132,9 +89,6 @@ l2cap_equal_addresses(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!	Compares the ports of the two given address structures \a a and \a b.
-	\return true if ports of \a a and \a b are equal, false if not
-*/
 static bool
 l2cap_equal_ports(const sockaddr *a, const sockaddr *b)
 {
@@ -144,11 +98,6 @@ l2cap_equal_ports(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!	Compares the IP-addresses and ports of the two given address structures
-	\a a and \a b.
-	\return true if IP-addresses and ports of \a a and \a b are equal, false if
-		not.
-*/
 static bool
 l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 {
@@ -165,77 +114,47 @@ l2cap_equal_addresses_and_ports(const sockaddr *a, const sockaddr *b)
 }
 
 
-/*!	Applies the given \a mask two \a a and \a b and then checks whether
-	the masked addresses match.
-	\return true if \a a matches \a b after masking both, false if not
-*/
 static bool
 l2cap_equal_masked_addresses(const sockaddr *a, const sockaddr *b,
 	const sockaddr *mask)
 {
-	if (a == NULL && b == NULL)
-		return true;
-
-    return false;
+	// no masks
+	return l2cap_equal_addresses(a, b);
 }
 
 
-/*!	Routing utility function: determines the least significant bit that is set
-	in the given \a mask.
-	\return the number of the first bit that is set (0-32, where 32 means
-		that there's no bit set in the mask).
-*/
 static int32
 l2cap_first_mask_bit(const sockaddr *_mask)
 {
-	if (_mask == NULL)
-		return 0;
-
 	return 0;
 }
 
 
-/*!	Routing utility function: checks the given \a mask for correctness (which
-	means that (starting with LSB) consists zero or more unset bits, followed
-	by bits that are all set).
-	\return true if \a mask is ok, false if not
-*/
 static bool
 l2cap_check_mask(const sockaddr *_mask)
 {
-
-	return true;
+	return false;
 }
 
 
-/*!	Creates a buffer for the given \a address and prints the address into
-	it (hexadecimal representation in host byte order or '<none>').
-	If \a printPort is set, the port is printed, too.
-	\return B_OK if the address could be printed, \a buffer will point to
-		the resulting string
-	\return B_BAD_VALUE if no buffer has been given
-	\return B_NO_MEMORY if the buffer could not be allocated
-*/
 static status_t
 l2cap_print_address_buffer(const sockaddr *_address, char *buffer,
 	size_t bufferSize, bool printPort)
 {
-	const sockaddr_l2cap *address = (const sockaddr_l2cap *)_address;
-
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	if (address == NULL)
+	const sockaddr_l2cap *address = (const sockaddr_l2cap *)_address;
+	if (address == NULL) {
 		strlcpy(buffer, "<none>", bufferSize);
-	else {
+	} else {
 		bdaddr_t addr = address->l2cap_bdaddr;
 		if (printPort) {
 			snprintf(buffer, bufferSize,
 				"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X|%u", addr.b[0],
 				addr.b[1],addr.b[2],addr.b[3],addr.b[4],addr.b[5],
 				address->l2cap_psm);
-		}
-		else {
+		} else {
 			snprintf(buffer, bufferSize,
 				"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",addr.b[0],
 				addr.b[1],addr.b[2],addr.b[3],addr.b[4],addr.b[5]);
@@ -263,9 +182,6 @@ l2cap_print_address(const sockaddr *_address, char **_buffer, bool printPort)
 }
 
 
-/*!	Determines the port of the given \a address.
-	\return uint16 representing the port-nr
-*/
 static uint16
 l2cap_get_port(const sockaddr *address)
 {
@@ -276,10 +192,6 @@ l2cap_get_port(const sockaddr *address)
 }
 
 
-/*!	Sets the port of the given \a address to \a port.
-	\return B_OK if the port has been set
-	\return B_BAD_VALUE if \a address is NULL
-*/
 static status_t
 l2cap_set_port(sockaddr *address, uint16 port)
 {
@@ -291,11 +203,6 @@ l2cap_set_port(sockaddr *address, uint16 port)
 }
 
 
-/*!	Sets \a address to \a from.
-	\return B_OK if \a from has been copied into \a address
-	\return B_BAD_VALUE if either \a address or \a from is NULL
-	\return B_MISMATCHED_VALUES if from is not of family AF_BLUETOOTH
-*/
 static status_t
 l2cap_set_to(sockaddr *address, const sockaddr *from)
 {
@@ -306,8 +213,16 @@ l2cap_set_to(sockaddr *address, const sockaddr *from)
 		return B_MISMATCHED_VALUES;
 
 	memcpy(address, from, sizeof(sockaddr_l2cap));
-	address->sa_len = sizeof(sockaddr_l2cap);
 	return B_OK;
+}
+
+
+static status_t
+l2cap_mask_address(const sockaddr *address, const sockaddr *mask,
+	sockaddr *result)
+{
+	// no masks
+	return l2cap_set_to(result, address);
 }
 
 
@@ -326,20 +241,16 @@ l2cap_update_to(sockaddr *_address, const sockaddr *_from)
 	address->l2cap_family = AF_BLUETOOTH;
 	address->l2cap_len = sizeof(sockaddr_l2cap);
 
+	if (bdaddrUtils::Compare(address->l2cap_bdaddr, BDADDR_NULL))
+		address->l2cap_bdaddr = from->l2cap_bdaddr;
+
 	if (address->l2cap_psm == 0)
 		address->l2cap_psm = from->l2cap_psm;
-
-	if (bdaddrUtils::Compare(address->l2cap_bdaddr, BDADDR_BROADCAST))
-		address->l2cap_bdaddr = from->l2cap_bdaddr;
 
 	return B_OK;
 }
 
 
-/*!	Sets \a address to the empty address.
-	\return B_OK if \a address has been set
-	\return B_BAD_VALUE if \a address is NULL
-*/
 static status_t
 l2cap_set_to_empty_address(sockaddr *address)
 {
@@ -357,14 +268,19 @@ static status_t
 l2cap_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
 	const sockaddr *_address, const sockaddr *_mask)
 {
-	// TODO: not implemented
-	return B_ERROR;
+	if (_address == NULL)
+		return B_BAD_VALUE;
+
+	status_t error = B_OK;
+	if (_defaultMask != NULL)
+		error = l2cap_set_to_empty_address(_defaultMask);
+	if (error == B_OK && _defaultBroadcast != NULL)
+		error = l2cap_set_to_empty_address(_defaultBroadcast);
+
+	return error;
 }
 
 
-/*!	Computes a hash value of the given \a address.
-	\return uint32 representing the hash value
-*/
 static uint32
 l2cap_hash_address(const struct sockaddr* _address, bool includePort)
 {
@@ -372,30 +288,24 @@ l2cap_hash_address(const struct sockaddr* _address, bool includePort)
 	if (address == NULL || address->l2cap_len == 0)
 		return 0;
 
-	return address->l2cap_psm ^ L2CAP_CHECKSUM(address->l2cap_bdaddr);
+	uint32 hash = 0;
+	for (size_t i = 0; i < sizeof(address->l2cap_bdaddr.b); i++)
+		hash += address->l2cap_bdaddr.b[i] << (i * 2);
+
+	if (includePort)
+		hash += address->l2cap_psm;
+	return hash;
 }
 
 
-/*!	Computes a hash-value of the given addresses \a ourAddress
-	and \a peerAddress.
-	\return uint32 representing the hash-value
-*/
 static uint32
 l2cap_hash_address_pair(const sockaddr *ourAddress, const sockaddr *peerAddress)
 {
-	const sockaddr_l2cap *our = (const sockaddr_l2cap *)ourAddress;
-	const sockaddr_l2cap *peer = (const sockaddr_l2cap *)peerAddress;
-
-	return ((our ? our->l2cap_psm : 0) | ((peer ? peer->l2cap_psm : 0) << 16))
-		^ (our ? L2CAP_CHECKSUM(our->l2cap_bdaddr) : 0)
-		^ (peer ? L2CAP_CHECKSUM(peer->l2cap_bdaddr) : 0);
+	return l2cap_hash_address(ourAddress, true) * 17
+		+ l2cap_hash_address(peerAddress, true);
 }
 
 
-/*!	Adds the given \a address to the IP-checksum \a checksum.
-	\return B_OK if \a address has been added to the checksum
-	\return B_BAD_VALUE if either \a address or \a checksum is NULL
-*/
 static status_t
 l2cap_checksum_address(struct Checksum *checksum, const sockaddr *address)
 {
@@ -409,7 +319,7 @@ l2cap_checksum_address(struct Checksum *checksum, const sockaddr *address)
 }
 
 
-net_address_module_info gL2cap4AddressModule = {
+net_address_module_info gL2capAddressModule = {
 	{
 		NULL,
 		0,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,6 @@
 #ifndef L2CAP_ADDRESS_H
 #define L2CAP_ADDRESS_H
 
-extern struct net_address_module_info gL2cap4AddressModule;
+extern struct net_address_module_info gL2capAddressModule;
 
 #endif	// L2CAP_ADDRESS_H
