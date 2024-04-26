@@ -3,8 +3,6 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ConnectionInterface.h"
-#include "ChannelInterface.h"
-#include "FrameInterface.h"
 
 
 #include <bluetooth/bdaddrUtils.h>
@@ -18,6 +16,7 @@
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 
+mutex sConnectionListLock = MUTEX_INITIALIZER("bt connection list");
 DoublyLinkedList<HciConnection> sConnectionList;
 net_buffer_module_info* gBufferModule = NULL;
 
@@ -33,64 +32,6 @@ inline bool
 ExistConnectionByHandle(uint16 handle, hci_id hid)
 {
 	return ConnectionByHandle(handle, hid);
-}
-
-
-static int
-DumpHciConnections(int argc, char** argv)
-{
-	HciConnection* conn;
-	L2capChannel* chan;
-	L2capFrame* frame;
-	DoublyLinkedList<HciConnection>::Iterator iterator
-		= sConnectionList.GetIterator();
-
-	while (iterator.HasNext()) {
-		conn = iterator.Next();
-		/*
-		kprintf("LocalDevice=0x%" B_PRIx32 " Destination=%s handle=%#x type=%d"
-			"outqueue=%" B_PRId32 " expected=%" B_PRId32 "\n", conn->Hid,
-			bdaddrUtils::ToString(conn->destination).String(), conn->handle,
-			conn->type, conn->OutGoingFrames.Count(),
-			conn->ExpectedResponses.Count());
-		*/
-
-		// each channel
-		kprintf("\tChannels\n");
-		DoublyLinkedList<L2capChannel>::Iterator channelIterator
-			= conn->ChannelList.GetIterator();
-
-		while (channelIterator.HasNext()) {
-			chan = channelIterator.Next();
-			kprintf("\t\tscid=%x dcid=%x state=%x cfg=%x\n", chan->scid,
-				chan->dcid, chan->state, chan->cfgState);
-		}
-
-		// Each outgoing
-		kprintf("\n\tOutGoingFrames\n");
-		DoublyLinkedList<L2capFrame>::Iterator frameIterator
-			= conn->OutGoingFrames.GetIterator();
-		while (frameIterator.HasNext()) {
-			frame = frameIterator.Next();
-			kprintf("\t\tscid=%x code=%x ident=%x type=%x, buffer=%p\n",
-				frame->channel->scid, frame->code, frame->ident,
-				frame->type, frame->buffer);
-		}
-
-		// Each expected
-		kprintf("\n\tExpectedFrames\n");
-		DoublyLinkedList<L2capFrame>::Iterator frameExpectedIterator
-			= conn->ExpectedResponses.GetIterator();
-
-		while (frameExpectedIterator.HasNext()) {
-			frame = frameExpectedIterator.Next();
-			kprintf("\t\tscid=%x code=%x ident=%x type=%x, buffer=%p\n",
-				frame->channel->scid, frame->code, frame->ident,
-				frame->type, frame->buffer);
-		}
-	}
-
-	return 0;
 }
 
 
@@ -161,25 +102,17 @@ bcd_std_ops(int32 op, ...)
 	switch (op) {
 		case B_MODULE_INIT:
 			new (&sConnectionList) DoublyLinkedList<HciConnection>;
-			add_debugger_command("btConnections", &DumpHciConnections,
-				"Lists Bluetooth Connections with RemoteDevices & channels");
 
 			status = get_module(NET_BUFFER_MODULE_NAME,
 				(module_info **)&gBufferModule);
-			if (status < B_OK)
+			if (status != B_OK)
 				return status;
 
 			return B_OK;
 
-		break;
-
 		case B_MODULE_UNINIT:
-
-			remove_debugger_command("btConnections", &DumpHciConnections);
 			put_module(NET_BUFFER_MODULE_NAME);
-
 			return B_OK;
-		break;
 	}
 
 	return B_ERROR;
@@ -199,29 +132,12 @@ bluetooth_core_data_module_info sBCDModule = {
 
 	RouteConnection,
 
-	SetAclBuffer,
-	SetAclExpectedSize,
-	AclPutting,
-	AclComplete,
-	AclOverFlowed,
-
 	ConnectionByHandle,
 	ConnectionByDestination,
 
-	AddChannel,
-	RemoveChannel,
-	ChannelBySourceID,
-	ChannelAllocateCid,
-	ChannelAllocateIdent,
-
-	SignalByIdent,
-	TimeoutSignal,
-	unTimeoutSignal,
-	SpawmFrame,
-	SpawmSignal,
-	AcknowledgeSignal,
-	QueueSignal,
-
+	allocate_command_ident,
+	lookup_command_ident,
+	free_command_ident,
 };
 
 

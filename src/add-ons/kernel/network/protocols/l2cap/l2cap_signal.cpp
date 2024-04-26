@@ -2,1128 +2,545 @@
  * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-/*-
- * Copyright (c) Maksim Yevmenkin <m_evmenkin@yahoo.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
-*/
 #include <KernelExport.h>
 #include <string.h>
 
+#include <net/if_dl.h>
+#include <net_datalink.h>
 #include <NetBufferUtilities.h>
 
-
 #include <l2cap.h>
+#include "L2capEndpoint.h"
+#include "L2capEndpointManager.h"
 #include "l2cap_internal.h"
 #include "l2cap_signal.h"
 #include "l2cap_command.h"
-#include "l2cap_upper.h"
-#include "l2cap_lower.h"
 
 #include <btDebug.h>
 
+#include <bluetooth/L2CAP/btL2CAP.h>
 #include <bluetooth/HCI/btHCI_command.h>
 
-typedef enum _option_status {
-	OPTION_NOT_PRESENT = 0,
-	OPTION_PRESENT = 1,
-	HEADER_TOO_SHORT = -1,
-	BAD_OPTION_LENGTH = -2,
-	OPTION_UNKNOWN = -3
-} option_status;
 
-
-l2cap_flow_t default_qos = {
-		/* flags */ 0x0,
-		/* service_type */ HCI_SERVICE_TYPE_BEST_EFFORT,
-		/* token_rate */ 0xffffffff, /* maximum */
-		/* token_bucket_size */ 0xffffffff, /* maximum */
-		/* peak_bandwidth */ 0x00000000, /* maximum */
-		/* latency */ 0xffffffff, /* don't care */
-		/* delay_variation */ 0xffffffff  /* don't care */
+struct l2cap_config_options {
+	uint16 mtu;
+	bool mtu_set;
+	uint16 flush_timeout;
+	bool flush_timeout_set;
+	l2cap_qos qos;
+	bool qos_set;
+	net_buffer* rejected;
 };
 
 
-static status_t
-l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer);
+// #pragma mark - incoming signals
 
-static status_t
-l2cap_process_con_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer);
 
 static status_t
-l2cap_process_cfg_req(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_connection_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
+{
+	NetBufferHeaderReader<l2cap_connection_req> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 psm = le16toh(command->psm);
+	const uint16 scid = le16toh(command->scid);
+
+	L2capEndpoint* endpoint = gL2capEndpointManager.ForPSM(psm);
+	if (endpoint == NULL) {
+		// Refuse connection.
+		send_l2cap_connection_rsp(conn, ident, 0, scid,
+			l2cap_connection_rsp::RESULT_PSM_NOT_SUPPORTED, 0);
+		return B_OK;
+	}
+
+	endpoint->_HandleConnectionReq(conn, ident, psm, scid);
+	return B_OK;
+}
+
+
+static void
+l2cap_handle_connection_rsp(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer)
+{
+	NetBufferHeaderReader<l2cap_connection_rsp> command(buffer);
+	if (command.Status() != B_OK)
+		return;
+
+	l2cap_connection_rsp response;
+	response.dcid = le16toh(command->dcid);
+	response.scid = le16toh(command->scid);
+	response.result = le16toh(command->result);
+	response.status = le16toh(command->status);
+
+	TRACE("%s: dcid=%d scid=%d result=%d status%d\n",
+		__func__, response.dcid, response.scid, response.result, response.status);
+
+	endpoint->_HandleConnectionRsp(ident, response);
+}
+
+
+static void
+parse_configuration_options(net_buffer* buffer, uint16 length, l2cap_config_options& options)
+{
+	for (size_t offset = sizeof(l2cap_configuration_req); offset < length; ) {
+		l2cap_configuration_option option;
+		if (gBufferModule->read(buffer, offset, &option, sizeof(option)) != B_OK)
+			break;
+
+		l2cap_configuration_option_value value;
+		if (gBufferModule->read(buffer, offset + sizeof(option), &value,
+				min_c(sizeof(value), option.length)) != B_OK) {
+			break;
+		}
+
+		const bool hint = (option.type & l2cap_configuration_option::OPTION_HINT_BIT);
+		option.type &= ~l2cap_configuration_option::OPTION_HINT_BIT;
+
+		switch (option.type) {
+			case l2cap_configuration_option::OPTION_MTU:
+				options.mtu = le16toh(value.mtu);
+				options.mtu_set = true;
+				break;
+
+			case l2cap_configuration_option::OPTION_FLUSH_TIMEOUT:
+				options.flush_timeout = le16toh(value.flush_timeout);
+				options.flush_timeout_set = true;
+				break;
+
+			case l2cap_configuration_option::OPTION_QOS:
+				options.qos.flags = value.qos.flags;
+				options.qos.service_type = value.qos.service_type;
+				options.qos.token_rate = le32toh(value.qos.token_rate);
+				options.qos.token_bucket_size = le32toh(value.qos.token_bucket_size);
+				options.qos.peak_bandwidth = le32toh(value.qos.peak_bandwidth);
+				options.qos.access_latency = le32toh(value.qos.access_latency);
+				options.qos.delay_variation = le32toh(value.qos.delay_variation);
+				options.qos_set = true;
+				break;
+
+			default: {
+				if (hint)
+					break;
+
+				// Unknown option: we need to reject it.
+				if (options.rejected == NULL)
+					options.rejected = gBufferModule->create(128);
+				gBufferModule->append_cloned(options.rejected, buffer, offset,
+					sizeof(option) + option.length);
+			}
+		}
+
+		offset += sizeof(option) + option.length;
+	}
+}
+
 
 static status_t
-l2cap_process_cfg_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_configuration_req(HciConnection* conn, uint8 ident, net_buffer* buffer, uint16 length)
+{
+	NetBufferHeaderReader<l2cap_configuration_req> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 dcid = le16toh(command->dcid);
+	L2capEndpoint* endpoint = gL2capEndpointManager.ForChannel(dcid);
+	if (endpoint == NULL) {
+		ERROR("l2cap: unexpected configuration req: channel does not exist (cid=%d)\n", dcid);
+		send_l2cap_command_reject(conn, ident,
+			l2cap_command_reject::REJECTED_INVALID_CID, 0, 0, 0);
+		return B_ERROR;
+	}
+
+	const uint16 flags = le16toh(command->flags);
+
+	// Read options (if any).
+	l2cap_config_options options = {};
+	parse_configuration_options(buffer, length, options);
+
+	if (options.rejected != NULL) {
+		// Reject without doing anything else.
+		send_l2cap_configuration_rsp(conn, ident, dcid, 0,
+			l2cap_configuration_rsp::RESULT_UNKNOWN_OPTION, options.rejected);
+		return B_OK;
+	}
+
+	endpoint->_HandleConfigurationReq(ident, flags,
+		options.mtu_set ? &options.mtu : NULL,
+		options.flush_timeout_set ? &options.flush_timeout : NULL,
+		options.qos_set ? &options.qos : NULL);
+	return B_OK;
+}
+
 
 static status_t
-l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_configuration_rsp(HciConnection* conn, L2capEndpoint* endpoint,
+	uint8 ident, net_buffer* buffer, uint16 length, bool& releaseIdent)
+{
+	if (endpoint == NULL) {
+		// The endpoint seems to be gone.
+		return B_ERROR;
+	}
+
+	NetBufferHeaderReader<l2cap_configuration_rsp> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 scid = le16toh(command->scid);
+	const uint16 flags = le16toh(command->flags);
+	const uint16 result = le16toh(command->result);
+	releaseIdent = (flags & L2CAP_CFG_FLAG_CONTINUATION) == 0;
+
+	// Read options (if any).
+	l2cap_config_options options = {};
+	parse_configuration_options(buffer, length, options);
+
+	if (options.rejected != NULL) {
+		// Reject without doing anything else.
+		send_l2cap_command_reject(conn, ident,
+			l2cap_command_reject::REJECTED_NOT_UNDERSTOOD, 0, 0, 0);
+		return B_OK;
+	}
+
+	endpoint->_HandleConfigurationRsp(ident, scid, flags, result,
+		options.mtu_set ? &options.mtu : NULL,
+		options.flush_timeout_set ? &options.flush_timeout : NULL,
+		options.qos_set ? &options.qos : NULL);
+	return B_OK;
+}
+
 
 static status_t
-l2cap_process_discon_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_disconnection_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
+{
+	NetBufferHeaderReader<l2cap_disconnection_req> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 dcid = le16toh(command->dcid);
+	L2capEndpoint* endpoint = gL2capEndpointManager.ForChannel(dcid);
+	if (endpoint == NULL) {
+		ERROR("l2cap: unexpected disconnection req: channel does not exist (cid=%d)\n", dcid);
+		send_l2cap_command_reject(conn, ident,
+			l2cap_command_reject::REJECTED_INVALID_CID, 0, 0, 0);
+		return B_ERROR;
+	}
+
+	const uint16 scid = le16toh(command->scid);
+
+	endpoint->_HandleDisconnectionReq(ident, scid);
+	return B_OK;
+}
+
 
 static status_t
-l2cap_process_echo_req(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_disconnection_rsp(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer)
+{
+	NetBufferHeaderReader<l2cap_disconnection_rsp> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 dcid = le16toh(command->dcid);
+	const uint16 scid = le16toh(command->scid);
+
+	endpoint->_HandleDisconnectionRsp(ident, dcid, scid);
+	return B_OK;
+}
+
 
 static status_t
-l2cap_process_echo_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_echo_req(HciConnection *conn, uint8 ident, net_buffer* buffer, uint16 length)
+{
+	net_buffer* reply = gBufferModule->clone(buffer, false);
+	if (reply == NULL)
+		return ENOMEM;
+
+	gBufferModule->trim(reply, length);
+	return send_l2cap_command(conn, L2CAP_ECHO_RSP, ident, reply);
+}
+
 
 static status_t
-l2cap_process_info_req(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_echo_rsp(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer, uint16 length)
+{
+	// Not currently triggered by this module.
+	return B_OK;
+}
+
 
 static status_t
-l2cap_process_info_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_info_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
+{
+	NetBufferHeaderReader<l2cap_information_req> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 type = le16toh(command->type);
+
+	net_buffer* reply = NULL;
+	uint8 replyCode = 0;
+	switch (type) {
+		case l2cap_information_req::TYPE_CONNECTIONLESS_MTU:
+			reply = make_l2cap_information_rsp(replyCode, type,
+				l2cap_information_rsp::RESULT_SUCCESS, L2CAP_MTU_DEFAULT);
+			break;
+
+	    default:
+			ERROR("l2cap: unhandled information request type %d\n", type);
+			reply = make_l2cap_information_rsp(replyCode, type,
+				l2cap_information_rsp::RESULT_NOT_SUPPORTED, 0);
+			break;
+	}
+
+	return send_l2cap_command(conn, replyCode, ident, reply);
+}
+
 
 static status_t
-l2cap_process_cmd_rej(HciConnection* conn, uint8 ident, net_buffer* buffer);
+l2cap_handle_info_rsp(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer)
+{
+	// Not currently triggered by this module.
+	return B_OK;
+}
 
 
-/*
- * Process L2CAP signaling command. We already know that destination channel ID
- * is 0x1 that means we have received signaling command from peer's L2CAP layer.
- * So get command header, decode and process it.
- *
- * XXX do we need to check signaling MTU here?
- */
+static status_t
+l2cap_handle_command_reject(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer)
+{	
+	if (endpoint == NULL) {
+		ERROR("l2cap: unexpected command rejected: ident %d unknown\n", ident);
+		return B_ERROR;
+	}
+
+	NetBufferHeaderReader<l2cap_command_reject> command(buffer);
+	if (command.Status() != B_OK)
+		return ENOBUFS;
+
+	const uint16 reason = le16toh(command->reason);
+	TRACE("%s: reason=%d\n", __func__, command->reason);
+
+	l2cap_command_reject_data data = {};
+	gBufferModule->read(buffer, sizeof(l2cap_command_reject),
+		&data, min_c(buffer->size, sizeof(l2cap_command_reject_data)));
+
+	endpoint->_HandleCommandRejected(ident, reason, data);
+
+	return B_OK;
+}
+
+
+// #pragma mark - outgoing signals
+
 
 status_t
-l2cap_process_signal_cmd(HciConnection* conn, net_buffer* buffer)
+send_l2cap_command(HciConnection* conn, uint8 code, uint8 ident, net_buffer* command)
 {
-	net_buffer* m = buffer;
+	// TODO: Command timeouts (probably in L2capEndpoint.)
+	{
+		NetBufferPrepend<l2cap_command_header> header(command);
+		header->code = code;
+		header->ident = ident;
+		header->length = htole16(command->size - sizeof(l2cap_command_header));
+	} {
+		NetBufferPrepend<l2cap_basic_header> basicHeader(command);
+		basicHeader->length = htole16(command->size - sizeof(l2cap_basic_header));
+		basicHeader->dcid = htole16(L2CAP_SIGNALING_CID);
+	}
+	command->type = conn->handle;
+	status_t status = btDevices->PostACL(conn->Hid, command);
+	if (status != B_OK)
+		gBufferModule->free(command);
+	return status;
+}
 
-	TRACE("%s: Signal size=%" B_PRIu32 "\n", __func__, buffer->size);
 
-	while (m != NULL) {
+status_t
+send_l2cap_command_reject(HciConnection* conn, uint8 ident, uint16 reason,
+	uint16 mtu, uint16 scid, uint16 dcid)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_command_reject(code, reason, mtu, scid, dcid);
+	if (buffer == NULL)
+		return ENOMEM;
 
-		/* Verify packet length */
-		if (buffer->size < sizeof(l2cap_cmd_hdr_t)) {
-			TRACE("%s: small L2CAP signaling command len=%" B_PRIu32 "\n",
-				__func__, buffer->size);
-			gBufferModule->free(buffer);
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+status_t
+send_l2cap_configuration_req(HciConnection* conn, uint8 ident, uint16 dcid, uint16 flags,
+	uint16* mtu, uint16* flush_timeout, l2cap_qos* flow)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_configuration_req(code, dcid, flags, mtu, flush_timeout, flow);
+	if (buffer == NULL)
+		return ENOMEM;
+
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+status_t
+send_l2cap_connection_req(HciConnection* conn, uint8 ident, uint16 psm, uint16 scid)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_connection_req(code, psm, scid);
+	if (buffer == NULL)
+		return ENOMEM;
+
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+status_t
+send_l2cap_connection_rsp(HciConnection* conn, uint8 ident, uint16 dcid, uint16 scid,
+	uint16 result, uint16 status)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_connection_rsp(code, dcid, scid, result, status);
+	if (buffer == NULL)
+		return ENOMEM;
+
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+status_t
+send_l2cap_configuration_rsp(HciConnection* conn, uint8 ident, uint16 scid, uint16 flags,
+	uint16 result, net_buffer* opt)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_configuration_rsp(code, scid, flags, result, opt);
+	if (buffer == NULL)
+		return ENOMEM;
+
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+status_t
+send_l2cap_disconnection_req(HciConnection* conn, uint8 ident, uint16 dcid, uint16 scid)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_disconnection_req(code, dcid, scid);
+	if (buffer == NULL)
+		return ENOMEM;
+
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+status_t
+send_l2cap_disconnection_rsp(HciConnection* conn, uint8 ident, uint16 dcid, uint16 scid)
+{
+	uint8 code = 0;
+	net_buffer* buffer = make_l2cap_disconnection_rsp(code, dcid, scid);
+	if (buffer == NULL)
+		return ENOMEM;
+
+	return send_l2cap_command(conn, code, ident, buffer);
+}
+
+
+// #pragma mark - dispatcher
+
+
+status_t
+l2cap_handle_signaling_command(HciConnection* connection, net_buffer* buffer)
+{
+	TRACE("%s: signal size=%" B_PRIu32 "\n", __func__, buffer->size);
+
+	// TODO: If there are multiple commands in a packet, we could accumulate the
+	// responses into a single packet also...
+
+	while (buffer->size != 0) {
+		NetBufferHeaderReader<l2cap_command_header> commandHeader(buffer);
+		if (commandHeader.Status() != B_OK)
+			return ENOBUFS;
+
+		const uint8 code = commandHeader->code;
+		const uint8 ident = commandHeader->ident;
+		const uint16 length = le16toh(commandHeader->length);
+
+		L2capEndpoint* endpoint = NULL;
+		bool releaseIdent = false;
+		if (L2CAP_IS_SIGNAL_RSP(code)) {
+			endpoint = static_cast<L2capEndpoint*>(
+				btCoreData->lookup_command_ident(connection, ident));
+			releaseIdent = true;
+		}
+
+		if (buffer->size < length) {
+			ERROR("%s: invalid L2CAP signaling command packet, code=%#x, "
+				"ident=%d, length=%d, buffer size=%" B_PRIu32 "\n", __func__,
+				code, ident, length,buffer->size);
 			return EMSGSIZE;
 		}
 
-		/* Get COMMAND header */
-		NetBufferHeaderReader<l2cap_cmd_hdr_t> commandHeader(buffer);
-		status_t status = commandHeader.Status();
-		if (status < B_OK) {
-			return ENOBUFS;
-		}
+		commandHeader.Remove();
 
-		uint8 processingCode = commandHeader->code;
-		uint8 processingIdent = commandHeader->ident;
-		uint16 processingLength = le16toh(commandHeader->length);
-
-		/* Verify command length */
-		if (buffer->size < processingLength) {
-			ERROR("%s: invalid L2CAP signaling command, code=%#x, "
-				"ident=%d, length=%d, buffer size=%" B_PRIu32 "\n", __func__,
-				processingCode, processingIdent, processingLength,
-				buffer->size);
-			gBufferModule->free(buffer);
-			return (EMSGSIZE);
-		}
-
-
-		commandHeader.Remove(); // pulling the header of the command
-
-		/* Process command processors responsible to delete the command*/
-		switch (processingCode) {
-			case L2CAP_CMD_REJ:
-				l2cap_process_cmd_rej(conn, processingIdent, buffer);
+		switch (code) {
+			case L2CAP_COMMAND_REJECT_RSP:
+				l2cap_handle_command_reject(endpoint, ident, buffer);
 				break;
 
-			case L2CAP_CON_REQ:
-				l2cap_process_con_req(conn, processingIdent, buffer);
+			case L2CAP_CONNECTION_REQ:
+				l2cap_handle_connection_req(connection, ident, buffer);
 				break;
 
-			case L2CAP_CON_RSP:
-				l2cap_process_con_rsp(conn, processingIdent, buffer);
+			case L2CAP_CONNECTION_RSP:
+				l2cap_handle_connection_rsp(endpoint, ident, buffer);
 				break;
 
-			case L2CAP_CFG_REQ:
-				l2cap_process_cfg_req(conn, processingIdent, buffer);
+			case L2CAP_CONFIGURATION_REQ:
+				l2cap_handle_configuration_req(connection, ident,
+					buffer, length);
 				break;
 
-			case L2CAP_CFG_RSP:
-				l2cap_process_cfg_rsp(conn, processingIdent, buffer);
+			case L2CAP_CONFIGURATION_RSP:
+				l2cap_handle_configuration_rsp(connection, endpoint, ident,
+					buffer, length, releaseIdent);
 				break;
 
-			case L2CAP_DISCON_REQ:
-				l2cap_process_discon_req(conn, processingIdent, buffer);
+			case L2CAP_DISCONNECTION_REQ:
+				l2cap_handle_disconnection_req(connection, ident, buffer);
 				break;
 
-			case L2CAP_DISCON_RSP:
-				l2cap_process_discon_rsp(conn, processingIdent, buffer);
+			case L2CAP_DISCONNECTION_RSP:
+				l2cap_handle_disconnection_rsp(endpoint, ident, buffer);
 				break;
 
 			case L2CAP_ECHO_REQ:
-				l2cap_process_echo_req(conn, processingIdent, buffer);
+				l2cap_handle_echo_req(connection, ident, buffer, length);
 				break;
 
 			case L2CAP_ECHO_RSP:
-				l2cap_process_echo_rsp(conn, processingIdent, buffer);
+				l2cap_handle_echo_rsp(endpoint, ident, buffer, length);
 				break;
 
-			case L2CAP_INFO_REQ:
-				l2cap_process_info_req(conn, processingIdent, buffer);
+			case L2CAP_INFORMATION_REQ:
+				l2cap_handle_info_req(connection, ident, buffer);
 				break;
 
-			case L2CAP_INFO_RSP:
-				l2cap_process_info_rsp(conn, processingIdent, buffer);
-				break;
-
-			default:
-				ERROR("%s: unknown L2CAP signaling command, "
-					"code=%#x, ident=%d\n", __func__, processingCode,
-					processingIdent);
-
-				// Send L2CAP_CommandRej. Do not really care about the result
-				// ORD: Remiaining commands in the same packet are also to
-				// be rejected?
-				// send_l2cap_reject(con, processingIdent,
-				// L2CAP_REJ_NOT_UNDERSTOOD, 0, 0, 0);
-				gBufferModule->free(m);
-				break;
-		}
-
-		// Is there still remaining size? processors should have pulled its content...
-		if (m->size == 0) {
-			// free the buffer
-			gBufferModule->free(m);
-			m = NULL;
-		}
-	}
-
-	return B_OK;
-}
-
-
-#if 0
-#pragma mark - Processing Incoming signals
-#endif
-
-
-/* Process L2CAP_ConnectReq command */
-static status_t
-l2cap_process_con_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capChannel* channel;
-	uint16 dcid, psm;
-
-	/* Get con req data */
-	NetBufferHeaderReader<l2cap_con_req_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	psm = le16toh(command->psm);
-	dcid = le16toh(command->scid);
-
-	command.Remove(); // pull the command body
-
-	// Create new channel and send L2CA_ConnectInd
-	// notification to the upper layer protocol.
-	channel = btCoreData->AddChannel(conn, psm /*, dcid, ident*/);
-	if (channel == NULL) {
-		TRACE("%s: No resources to create channel\n", __func__);
-		return (send_l2cap_con_rej(conn, ident, 0, dcid, L2CAP_NO_RESOURCES));
-	} else {
-		TRACE("%s: New channel created scid=%d\n", __func__, channel->scid);
-	}
-
-	channel->dcid = dcid;
-	channel->ident = ident;
-
-	status_t indicationStatus = l2cap_l2ca_con_ind(channel);
-
-	if ( indicationStatus == B_OK ) {
-		// channel->state = L2CAP_CHAN_W4_L2CA_CON_RSP;
-
-	} else if (indicationStatus == B_NO_MEMORY) {
-		/* send_l2cap_con_rej(con, ident, channel->scid, dcid, L2CAP_NO_RESOURCES);*/
-		btCoreData->RemoveChannel(conn, channel->scid);
-
-	} else {
-		send_l2cap_con_rej(conn, ident, channel->scid, dcid, L2CAP_PSM_NOT_SUPPORTED);
-		btCoreData->RemoveChannel(conn, channel->scid);
-	}
-
-	return (indicationStatus);
-}
-
-
-static status_t
-l2cap_process_con_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capFrame* cmd = NULL;
-	uint16 scid, dcid, result, status;
-	status_t error = 0;
-
-	/* Get command parameters */
-	NetBufferHeaderReader<l2cap_con_rsp_cp> command(buffer);
-	if (command.Status() < B_OK) {
-		return ENOBUFS;
-	}
-
-	dcid = le16toh(command->dcid);
-	scid = le16toh(command->scid);
-	result = le16toh(command->result);
-	status = le16toh(command->status);
-
-	command.Remove(); // pull the command body
-
-	TRACE("%s: dcid=%d scid=%d result=%d status%d\n", __func__, dcid, scid,
-		result, status);
-
-	/* Check if we have pending command descriptor */
-	cmd = btCoreData->SignalByIdent(conn, ident);
-	if (cmd == NULL) {
-		ERROR("%s: unexpected L2CAP_ConnectRsp command. ident=%d, "
-			"con_handle=%d\n", __func__, ident, conn->handle);
-		return ENOENT;
-	}
-
-	/* Verify channel state, if invalid - do nothing */
-	if (cmd->channel->state != L2CAP_CHAN_W4_L2CAP_CON_RSP) {
-		ERROR("%s: unexpected L2CAP_ConnectRsp. Invalid channel state, "
-			"cid=%d, state=%d\n", __func__, scid, cmd->channel->state);
-		goto reject;
-	}
-
-	/* Verify CIDs and send reject if does not match */
-	if (cmd->channel->scid != scid) {
-		ERROR("%s: unexpected L2CAP_ConnectRsp. Channel IDs do not match, "
-		"scid=%d(%d)\n", __func__, cmd->channel->scid, scid);
-		goto reject;
-	}
-
-	/*
-	 * Looks good. We got confirmation from our peer. Now process
-	 * it. First disable RTX timer. Then check the result and send
-	 * notification to the upper layer. If command timeout already
-	 * happened then ignore response.
-	 */
-
-	if ((error = btCoreData->UnTimeoutSignal(cmd)) != 0)
-		return error;
-
-	if (result == L2CAP_PENDING) {
-		/*
-		 * Our peer wants more time to complete connection. We shall
-		 * start ERTX timer and wait. Keep command in the list.
-		 */
-
-		cmd->channel->dcid = dcid;
-		btCoreData->TimeoutSignal(cmd, bluetooth_l2cap_ertx_timeout);
-
-		// TODO:
-		// INDICATION error = ng_l2cap_l2ca_con_rsp(cmd->channel, cmd->token,
-		// result, status);
-		// if (error != B_OK)
-		// btCoreData->RemoveChannel(conn, cmd->channel->scid);
-
-	} else {
-
-		if (result == L2CAP_SUCCESS) {
-			/*
-			 * Channel is open. Complete command and move to CONFIG
-			 * state. Since we have sent positive confirmation we
-			 * expect to receive L2CA_Config request from the upper
-			 * layer protocol.
-			 */
-
-			cmd->channel->dcid = dcid;
-			cmd->channel->state = L2CAP_CHAN_CONFIG;
-		}
-
-		error = l2cap_con_rsp_ind(conn, cmd->channel);
-
-		/* XXX do we have to remove the channel on error? */
-		if (error != 0 || result != L2CAP_SUCCESS) {
-			ERROR("%s: failed to open L2CAP channel, result=%d, status=%d\n",
-				__func__, result, status);
-			btCoreData->RemoveChannel(conn, cmd->channel->scid);
-		}
-
-		btCoreData->AcknowledgeSignal(cmd);
-	}
-
-	return error;
-
-reject:
-	/* Send reject. Do not really care about the result */
-	send_l2cap_reject(conn, ident, L2CAP_REJ_INVALID_CID, 0, scid, dcid);
-
-	return 0;
-}
-
-
-static option_status
-getNextSignalOption(net_buffer* nbuf, size_t* off, l2cap_cfg_opt_t* hdr,
-	l2cap_cfg_opt_val_t* val)
-{
-	int hint;
-	size_t len = nbuf->size - (*off);
-
-	if (len == 0)
-		return OPTION_NOT_PRESENT;
-	if (len < 0 || len < sizeof(*hdr))
-		return HEADER_TOO_SHORT;
-
-	gBufferModule->read(nbuf, *off, hdr, sizeof(*hdr));
-	*off += sizeof(*hdr);
-	len  -= sizeof(*hdr);
-
-	hint = L2CAP_OPT_HINT(hdr->type);
-	hdr->type &= L2CAP_OPT_HINT_MASK;
-
-	switch (hdr->type) {
-		case L2CAP_OPT_MTU:
-			if (hdr->length != L2CAP_OPT_MTU_SIZE || len < hdr->length)
-				return BAD_OPTION_LENGTH;
-
-			gBufferModule->read(nbuf, *off, val, L2CAP_OPT_MTU_SIZE);
-			val->mtu = le16toh(val->mtu);
-			*off += L2CAP_OPT_MTU_SIZE;
-			TRACE("%s: mtu %d specified\n", __func__, val->mtu);
-		break;
-
-		case L2CAP_OPT_FLUSH_TIMO:
-			if (hdr->length != L2CAP_OPT_FLUSH_TIMO_SIZE || len < hdr->length)
-				return BAD_OPTION_LENGTH;
-
-			gBufferModule->read(nbuf, *off, val, L2CAP_OPT_FLUSH_TIMO_SIZE);
-			val->flush_timo = le16toh(val->flush_timo);
-			TRACE("%s: flush specified\n", __func__);
-			*off += L2CAP_OPT_FLUSH_TIMO_SIZE;
-		break;
-
-		case L2CAP_OPT_QOS:
-			if (hdr->length != L2CAP_OPT_QOS_SIZE || len < hdr->length)
-				return BAD_OPTION_LENGTH;
-
-			gBufferModule->read(nbuf, *off, val, L2CAP_OPT_QOS_SIZE);
-			val->flow.token_rate = le32toh(val->flow.token_rate);
-			val->flow.token_bucket_size =	le32toh(val->flow.token_bucket_size);
-			val->flow.peak_bandwidth = le32toh(val->flow.peak_bandwidth);
-			val->flow.latency = le32toh(val->flow.latency);
-			val->flow.delay_variation = le32toh(val->flow.delay_variation);
-			*off += L2CAP_OPT_QOS_SIZE;
-			TRACE("%s: qos specified\n", __func__);
-		break;
-
-		default:
-			if (hint)
-				*off += hdr->length;
-			else
-				return OPTION_UNKNOWN;
-		break;
-	}
-
-	return OPTION_PRESENT;
-}
-
-
-static status_t
-l2cap_process_cfg_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capChannel* channel = NULL;
-	uint16 dcid;
-	uint16 respond;
-	uint16 result;
-
-	l2cap_cfg_opt_t hdr;
-	l2cap_cfg_opt_val_t val;
-
-	size_t off;
-	status_t error = 0;
-
-	/* Get command parameters */
-	NetBufferHeaderReader<l2cap_cfg_req_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	dcid = le16toh(command->dcid);
-	respond = L2CAP_OPT_CFLAG(le16toh(command->flags));
-
-	command.Remove(); // pull configuration header
-
-	/* Check if we have this channel and it is in valid state */
-	channel = btCoreData->ChannelBySourceID(conn, dcid);
-	if (channel == NULL) {
-		ERROR("%s: unexpected L2CAP_ConfigReq command. "
-			"Channel does not exist, cid=%d\n", __func__, dcid);
-		goto reject;
-	}
-
-	/* Verify channel state */
-	if (channel->state != L2CAP_CHAN_CONFIG
-		&& channel->state != L2CAP_CHAN_OPEN) {
-		ERROR("%s: unexpected L2CAP_ConfigReq. Invalid channel state, "
-			"cid=%d, state=%d\n", __func__, dcid, channel->state);
-		goto reject;
-	}
-
-	if (channel->state == L2CAP_CHAN_OPEN) { /* Re-configuration */
-		channel->cfgState = 0; // Reset configuration state
-		channel->state = L2CAP_CHAN_CONFIG;
-	}
-
-	for (result = 0, off = 0; ; ) {
-		error = getNextSignalOption(buffer, &off, &hdr, &val);
-
-		if (error == OPTION_NOT_PRESENT) { /* We done with this packet */
-			// TODO: configurations should have been pulled
-			break;
-		} else if (error > 0) { /* Got option */
-			switch (hdr.type) {
-			case L2CAP_OPT_MTU:
-				channel->configuration->omtu = val.mtu;
-				break;
-
-			case L2CAP_OPT_FLUSH_TIMO:
-				channel->configuration->flush_timo = val.flush_timo;
-				break;
-
-			case L2CAP_OPT_QOS:
-				memcpy(&val.flow, &channel->configuration->iflow,
-					sizeof(channel->configuration->iflow));
-				break;
-
-			default: /* Ignore unknown hint option */
-				break;
-			}
-		} else { /* Oops, something is wrong */
-			respond = 1;
-			if (error == OPTION_UNKNOWN) {
-				// TODO: Remote to get the next possible option
-				result = L2CAP_UNKNOWN_OPTION;
-			} else {
-				/* XXX FIXME Send other reject codes? */
-				gBufferModule->free(buffer);
-				result = L2CAP_REJECT;
-			}
-
-			break;
-		}
-	}
-
-	TRACE("%s: Pulled %ld of configuration fields respond=%d "
-		"remaining=%" B_PRIu32 "\n", __func__, off, respond, buffer->size);
-	gBufferModule->remove_header(buffer, off);
-
-
-	/*
-	 * Now check and see if we have to respond. If everything was OK then
-	 * respond contain "C flag" and (if set) we will respond with empty
-	 * packet and will wait for more options.
-	 *
-	 * Other case is that we did not like peer's options and will respond
-	 * with L2CAP_Config response command with Reject error code.
-	 *
-	 * When "respond == 0" than we have received all options and we will
-	 * sent L2CA_ConfigInd event to the upper layer protocol.
-	 */
-
-	if (respond) {
-		error = send_l2cap_cfg_rsp(conn, ident, channel->dcid, result, buffer);
-		if (error != 0) {
-			// TODO:
-			// INDICATION ng_l2cap_l2ca_discon_ind(ch);
-			btCoreData->RemoveChannel(conn, channel->scid);
-		}
-	} else {
-		/* Send L2CA_ConfigInd event to the upper layer protocol */
-		channel->cfgState |= L2CAP_CFG_IN;
-		channel->ident = ident; // sent ident to reply
-		error = l2cap_cfg_req_ind(channel);
-		if (error != 0)
-			btCoreData->RemoveChannel(conn, channel->scid);
-	}
-
-	return error;
-
-reject:
-	/* Send reject. Do not really care about the result */
-	gBufferModule->free(buffer);
-
-	send_l2cap_reject(conn, ident, L2CAP_REJ_INVALID_CID, 0, 0, dcid);
-
-	return B_OK;
-}
-
-
-/* Process L2CAP_ConfigRsp command */
-static status_t
-l2cap_process_cfg_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capFrame* cmd = NULL;
-	uint16 scid, cflag, result;
-
-	l2cap_cfg_opt_t hdr;
-	l2cap_cfg_opt_val_t val;
-
-	size_t off;
-	status_t error = 0;
-
-	NetBufferHeaderReader<l2cap_cfg_rsp_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	scid = le16toh(command->scid);
-	cflag = L2CAP_OPT_CFLAG(le16toh(command->flags));
-	result = le16toh(command->result);
-
-	command.Remove();
-
-	TRACE("%s: scid=%d cflag=%d result=%d\n", __func__, scid, cflag, result);
-
-	/* Check if we have this command */
-	cmd = btCoreData->SignalByIdent(conn, ident);
-	if (cmd == NULL) {
-		ERROR("%s: unexpected L2CAP_ConfigRsp command. "
-			"ident=%d, con_handle=%d\n", __func__, ident, conn->handle);
-		gBufferModule->free(buffer);
-		return ENOENT;
-	}
-
-	/* Verify CIDs and send reject if does not match */
-	if (cmd->channel->scid != scid) {
-		ERROR("%s: unexpected L2CAP_ConfigRsp.Channel ID does not match, "
-			"scid=%d(%d)\n", __func__, cmd->channel->scid, scid);
-		goto reject;
-	}
-
-	/* Verify channel state and reject if invalid */
-	if (cmd->channel->state != L2CAP_CHAN_CONFIG) {
-		ERROR("%s: unexpected L2CAP_ConfigRsp. Invalid channel state, scid=%d, "
-			"state=%d\n", __func__, cmd->channel->scid, cmd->channel->state);
-		goto reject;
-	}
-
-	/*
-	 * Looks like it is our response, so process it. First parse options,
-	 * then verify C flag. If it is set then we shall expect more
-	 * configuration options from the peer and we will wait. Otherwise we
-	 * have received all options and we will send L2CA_ConfigRsp event to
-	 * the upper layer protocol. If command timeout already happened then
-	 * ignore response.
-	 */
-
-	if ((error = btCoreData->UnTimeoutSignal(cmd)) != 0) {
-		gBufferModule->free(buffer);
-		return error;
-	}
-
-	for (off = 0; ; ) {
-		error = getNextSignalOption(buffer, &off, &hdr, &val);
-		// TODO: pull the option
-
-		if (error == OPTION_NOT_PRESENT) /* We done with this packet */
-			break;
-		else if (error > 0) { /* Got option */
-			switch (hdr.type) {
-			case L2CAP_OPT_MTU:
-				cmd->channel->configuration->imtu = val.mtu;
-			break;
-
-			case L2CAP_OPT_FLUSH_TIMO:
-				cmd->channel->configuration->flush_timo = val.flush_timo;
-				break;
-
-			case L2CAP_OPT_QOS:
-				memcpy(&val.flow, &cmd->channel->configuration->oflow,
-					sizeof(cmd->channel->configuration->oflow));
-			break;
-
-			default: /* Ignore unknown hint option */
-				break;
-			}
-		} else {
-			/*
-			 * XXX FIXME What to do here?
-			 *
-			 * This is really BAD :( options packet was broken, or
-			 * peer sent us option that we did not understand. Let
-			 * upper layer know and do not wait for more options.
-			 */
-
-			ERROR("%s: fail parsing configuration options\n", __func__);
-
-			// INDICATION
-			result = L2CAP_UNKNOWN;
-			cflag = 0;
-
-			break;
-		}
-	}
-
-	if (cflag) /* Restart timer and wait for more options */
-		btCoreData->TimeoutSignal(cmd, bluetooth_l2cap_rtx_timeout);
-	else {
-		/* Send L2CA_Config response to the upper layer protocol */
-		error = l2cap_cfg_rsp_ind(cmd->channel /*, cmd->token, result*/);
-		if (error != 0) {
-			/*
-			 * XXX FIXME what to do here? we were not able to send
-			 * response to the upper layer protocol, so for now
-			 * just close the channel. Send L2CAP_Disconnect to
-			 * remote peer?
-			 */
-
-			ERROR("%s: failed to send L2CA_Config response\n", __func__);
-
-			btCoreData->RemoveChannel(conn, cmd->channel->scid);
-		}
-
-		btCoreData->AcknowledgeSignal(cmd);
-	}
-
-	return error;
-
-reject:
-	/* Send reject. Do not really care about the result */
-	gBufferModule->free(buffer);
-	send_l2cap_reject(conn, ident, L2CAP_REJ_INVALID_CID, 0, scid, 0);
-
-	return B_OK;
-}
-
-
-/* Process L2CAP_DisconnectReq command */
-static status_t
-l2cap_process_discon_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capChannel* channel = NULL;
-	L2capFrame* cmd = NULL;
-	net_buffer* buff = NULL;
-	uint16 scid;
-	uint16 dcid;
-
-	NetBufferHeaderReader<l2cap_discon_req_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	dcid = le16toh(command->dcid);
-	scid = le16toh(command->scid);
-
-	command.Remove();
-
-	/* Check if we have this channel and it is in valid state */
-	channel = btCoreData->ChannelBySourceID(conn, dcid);
-	if (channel == NULL) {
-		ERROR("%s: unexpected L2CAP_DisconnectReq message. "
-			"Channel does not exist, cid=%x\n", __func__, dcid);
-		goto reject;
-	}
-
-	/* XXX Verify channel state and reject if invalid -- is that true? */
-	if (channel->state != L2CAP_CHAN_OPEN
-		&& channel->state != L2CAP_CHAN_CONFIG
-		&& channel->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
-		ERROR("%s: unexpected L2CAP_DisconnectReq. Invalid channel state, "
-			"cid=%d, state=%d\n", __func__, dcid, channel->state);
-		goto reject;
-	}
-
-	/* Match destination channel ID */
-	if (channel->dcid != scid || channel->scid != dcid) {
-		ERROR("%s: unexpected L2CAP_DisconnectReq. Channel IDs does not match, "
-			"channel: scid=%d, dcid=%d, request: scid=%d, dcid=%d\n", __func__,
-			channel->scid, channel->dcid, scid, dcid);
-		goto reject;
-	}
-
-	/*
-	 * Looks good, so notify upper layer protocol that channel is about
-	 * to be disconnected and send L2CA_DisconnectInd message. Then respond
-	 * with L2CAP_DisconnectRsp.
-	 */
-
-	// inform upper if we were not actually already waiting
-	if (channel->state != L2CAP_CHAN_W4_L2CAP_DISCON_RSP) {
-		l2cap_discon_req_ind(channel); // do not care about result
-	}
-
-	/* Send L2CAP_DisconnectRsp */
-	buff = l2cap_discon_rsp(ident, dcid, scid);
-	cmd = btCoreData->SpawnSignal(conn, channel, buff, ident, L2CAP_DISCON_RSP);
-	if (cmd == NULL)
-		return ENOMEM;
-
-	/* Link command to the queue */
-	SchedConnectionPurgeThread(conn);
-
-	return B_OK;
-
-reject:
-	/* Send reject. Do not really care about the result */
-	send_l2cap_reject(conn, ident, L2CAP_REJ_INVALID_CID, 0, scid, dcid);
-
-	return B_OK;
-}
-
-
-/* Process L2CAP_DisconnectRsp command */
-static status_t
-l2cap_process_discon_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capFrame* cmd = NULL;
-	int16 scid, dcid;
-	status_t error = 0;
-
-	/* Get command parameters */
-	NetBufferHeaderReader<l2cap_discon_rsp_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	dcid = le16toh(command->dcid);
-	scid = le16toh(command->scid);
-
-	command.Remove();
-	//? NG_FREE_M(con->rx_pkt);
-
-	/* Check if we have pending command descriptor */
-	cmd = btCoreData->SignalByIdent(conn, ident);
-	if (cmd == NULL) {
-		ERROR("%s: unexpected L2CAP_DisconnectRsp command. ident=%d, "
-			"con_handle=%d\n", __func__, ident, conn->handle);
-		goto out;
-	}
-
-	/* Verify channel state, do nothing if invalid */
-	if (cmd->channel->state != L2CAP_CHAN_W4_L2CA_DISCON_RSP) {
-		ERROR("%s: unexpected L2CAP_DisconnectRsp. Invalid state, cid=%d, "
-			"state=%d\n", __func__, scid, cmd->channel->state);
-		goto out;
-	}
-
-	/* Verify CIDs and send reject if does not match */
-	if (cmd->channel->scid != scid || cmd->channel->dcid != dcid) {
-		ERROR("%s: unexpected L2CAP_DisconnectRsp. Channel IDs do not match, "
-			"scid=%d(%d), dcid=%d(%d)\n", __func__, cmd->channel->scid, scid,
-			cmd->channel->dcid, dcid);
-		goto out;
-	}
-
-	/*
-	* Looks like we have successfuly disconnected channel, so notify
-	* upper layer. If command timeout already happened then ignore
-	* response.
-	*/
-
-	if ((error = btCoreData->UnTimeoutSignal(cmd)) != 0)
-		goto out;
-
-	l2cap_discon_rsp_ind(cmd->channel/* results? */);
-	btCoreData->RemoveChannel(conn, scid); /* this will free commands too */
-
-out:
-	return error;
-}
-
-
-static status_t
-l2cap_process_echo_req(HciConnection *conn, uint8 ident, net_buffer *buffer)
-{
-	L2capFrame* cmd = NULL;
-
-	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_echo_req(ident, NULL, 0),
-		ident, L2CAP_ECHO_RSP);
-	if (cmd == NULL) {
-		gBufferModule->free(buffer);
-		return ENOMEM;
-	}
-
-	/* Attach data and link command to the queue */
-	SchedConnectionPurgeThread(conn);
-
-	return B_OK;
-}
-
-
-/* Process L2CAP_EchoRsp command */
-static status_t
-l2cap_process_echo_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capFrame* cmd = NULL;
-	status_t error = 0;
-
-	/* Check if we have this command */
-	cmd = btCoreData->SignalByIdent(conn, ident);
-	if (cmd != NULL) {
-		/* If command timeout already happened then ignore response */
-		if ((error = btCoreData->UnTimeoutSignal(cmd)) != 0) {
-			return error;
-		}
-
-		// INDICATION error = ng_l2cap_l2ca_ping_rsp(cmd->conn, cmd->token,
-		// L2CAP_SUCCESS, conn->rx_pkt);
-		btCoreData->AcknowledgeSignal(cmd);
-
-	} else {
-		ERROR("%s: unexpected L2CAP_EchoRsp command. ident does not exist, "
-			"ident=%d\n", __func__, ident);
-		gBufferModule->free(buffer);
-		error = B_ERROR;
-	}
-
-	return error;
-}
-
-
-/* Process L2CAP_InfoReq command */
-static status_t
-l2cap_process_info_req(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capFrame* cmd = NULL;
-	net_buffer*	buf = NULL;
-	uint16 type;
-
-	/* Get command parameters */
-    NetBufferHeaderReader<l2cap_info_req_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	// ??
-	// command->type = le16toh(mtod(conn->rx_pkt,
-	// ng_l2cap_info_req_cp *)->type);
-    type = le16toh(command->type);
-
-	command.Remove();
-
-	switch (type) {
-	    case L2CAP_CONNLESS_MTU:
-		    buf = l2cap_info_rsp(ident, L2CAP_CONNLESS_MTU, L2CAP_SUCCESS,
-		    	L2CAP_MTU_DEFAULT);
-		break;
-
-	    default:
-		    buf = l2cap_info_rsp(ident, type, L2CAP_NOT_SUPPORTED, 0);
-		break;
-	}
-
-	cmd = btCoreData->SpawnSignal(conn, NULL, buf, ident, L2CAP_INFO_RSP);
-	if (cmd == NULL)
-		return ENOMEM;
-
-	/* Link command to the queue */
-	SchedConnectionPurgeThread(conn);
-
-	return B_OK;
-}
-
-
-/* Process L2CAP_InfoRsp command */
-static status_t
-l2cap_process_info_rsp(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	l2cap_info_rsp_cp* cp = NULL;
-	L2capFrame* cmd = NULL;
-	status_t error = B_OK;
-
-	/* Get command parameters */
-	NetBufferHeaderReader<l2cap_info_rsp_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	command->type = le16toh(command->type);
-	command->result = le16toh(command->result);
-
-	command.Remove();
-
-	/* Check if we have pending command descriptor */
-	cmd = btCoreData->SignalByIdent(conn, ident);
-	if (cmd == NULL) {
-		ERROR("%s: unexpected L2CAP_InfoRsp command. Requested ident does not "
-			"exist, ident=%d\n", __func__, ident);
-		gBufferModule->free(buffer);
-		return ENOENT;
-	}
-
-	/* If command timeout already happened then ignore response */
-	if ((error = btCoreData->UnTimeoutSignal(cmd)) != 0) {
-		gBufferModule->free(buffer);
-		return error;
-	}
-
-	if (command->result == L2CAP_SUCCESS) {
-		switch (command->type) {
-			case L2CAP_CONNLESS_MTU:
-				#if 0
-				/* TODO: Check specs ?? */
-				if (conn->rx_pkt->m_pkthdr.len == sizeof(uint16)) {
-					*mtod(conn->rx_pkt, uint16 *)
-						= le16toh(*mtod(conn->rx_pkt, uint16 *));
-				} else {
-					cp->result = L2CAP_UNKNOWN;  XXX
-					ERROR("%s: invalid L2CAP_InfoRsp command. "
-						"Bad connectionless MTU parameter, len=%d\n", __func__,
-						conn->rx_pkt->m_pkthdr.len);
-				}
-				#endif
+			case L2CAP_INFORMATION_RSP:
+				l2cap_handle_info_rsp(endpoint, ident, buffer);
 				break;
 
 			default:
-				ERROR("%s: invalid L2CAP_InfoRsp command. "
-					"Unknown info type=%d\n", __func__, cp->type);
+				ERROR("l2cap: unknown L2CAP signaling command, "
+					"code=%#x\n", code);
+				send_l2cap_command_reject(connection, ident,
+					l2cap_command_reject::REJECTED_NOT_UNDERSTOOD, 0, 0, 0);
 				break;
 		}
+
+		// Only release the ident if no more signals with it are expected.
+		if (releaseIdent)
+			btCoreData->free_command_ident(connection, ident);
+
+		// Advance to the next command (if any.)
+		gBufferModule->remove_header(buffer, length);
 	}
 
-	//INDICATION error = ng_l2cap_l2ca_get_info_rsp(cmd->conn, cmd->token, cp->result, conn->rx_pkt);
-	btCoreData->AcknowledgeSignal(cmd);
-
-	return error;
-}
-
-
-static status_t
-l2cap_process_cmd_rej(HciConnection* conn, uint8 ident, net_buffer* buffer)
-{
-	L2capFrame*	cmd = NULL;
-
-	/* TODO: review this command... Get command data */
-	NetBufferHeaderReader<l2cap_cmd_rej_cp> command(buffer);
-	status_t status = command.Status();
-	if (status < B_OK) {
-		return ENOBUFS;
-	}
-
-	command->reason = le16toh(command->reason);
-
-	TRACE("%s: reason=%d\n", __func__, command->reason);
-
-	command.Remove();
-
-	/* Check if we have pending command descriptor */
-	cmd = btCoreData->SignalByIdent(conn, ident);
-	if (cmd != NULL) {
-		/* If command timeout already happened then ignore reject */
-		if (btCoreData->UnTimeoutSignal(cmd) != 0) {
-			gBufferModule->free(buffer);
-			return ETIMEDOUT;
-		}
-
-
-		switch (cmd->code) {
-			case L2CAP_CON_REQ:
-				//INDICATION l2cap_l2ca_con_rsp(cmd->channel, cmd->token, cp->reason, 0);
-				btCoreData->RemoveChannel(conn, cmd->channel->scid);
-			break;
-
-			case L2CAP_CFG_REQ:
-				//INDICATION l2cap_l2ca_cfg_rsp(cmd->channel, cmd->token, cp->reason);
-			break;
-
-			case L2CAP_DISCON_REQ:
-				//INDICATION l2cap_l2ca_discon_rsp(cmd->channel, cmd->token, cp->reason);
-				btCoreData->RemoveChannel(conn, cmd->channel->scid);
-			break;
-
-			case L2CAP_ECHO_REQ:
-				//INDICATION l2cap_l2ca_ping_rsp(cmd->con, cmd->token, cp->reason, NULL);
-			break;
-
-			case L2CAP_INFO_REQ:
-				//INDICATION l2cap_l2ca_get_info_rsp(cmd->con, cmd->token, cp->reason, NULL);
-			break;
-
-		default:
-			ERROR("%s: unexpected L2CAP_CommandRej. Unexpected opcode=%d\n",
-				__func__, cmd->code);
-			break;
-		}
-
-		btCoreData->AcknowledgeSignal(cmd);
-
-	} else {
-		ERROR("%s: unexpected L2CAP_CommandRej command. "
-			"Requested ident does not exist, ident=%d\n", __func__, ident);
-	}
-
-	return B_OK;
-}
-
-
-#if 0
-#pragma mark - Queuing Outgoing signals
-#endif
-
-
-status_t
-send_l2cap_reject(HciConnection* conn, uint8 ident, uint16 reason,
-	uint16 mtu, uint16 scid, uint16 dcid)
-{
-	L2capFrame*	cmd = NULL;
-
-	cmd = btCoreData->SpawnSignal(conn, NULL, l2cap_cmd_rej(ident, reason,
-		mtu, scid, dcid), ident, L2CAP_CMD_REJ);
-	if (cmd == NULL)
-		return ENOMEM;
-
-	/* Link command to the queue */
-	SchedConnectionPurgeThread(conn);
-
-	return B_OK;
-}
-
-
-status_t
-send_l2cap_con_rej(HciConnection* conn, uint8 ident, uint16 scid, uint16 dcid,
-	uint16 result)
-{
-	L2capFrame*	cmd = NULL;
-
-	cmd = btCoreData->SpawnSignal(conn, NULL,
-		l2cap_con_rsp(ident, scid, dcid, result, 0), ident, L2CAP_CON_RSP);
-	if (cmd == NULL)
-		return ENOMEM;
-
-	/* Link command to the queue */
-	SchedConnectionPurgeThread(conn);
-
-	return B_OK;
-}
-
-
-status_t
-send_l2cap_cfg_rsp(HciConnection* conn, uint8 ident, uint16 scid,
-	uint16 result, net_buffer* opt)
-{
-	L2capFrame*	cmd = NULL;
-
-	cmd = btCoreData->SpawnSignal(conn, NULL,
-		l2cap_cfg_rsp(ident, scid, 0, result, opt),	ident, L2CAP_CFG_RSP);
-	if (cmd == NULL) {
-		gBufferModule->free(opt);
-		return ENOMEM;
-	}
-
-	/* Link command to the queue */
-	SchedConnectionPurgeThread(conn);
-
+	gBufferModule->free(buffer);
 	return B_OK;
 }

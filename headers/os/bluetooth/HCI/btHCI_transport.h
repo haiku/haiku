@@ -161,6 +161,5 @@ enum {
 #define BT_USERLAND_PORT_NAME "BT Kernel-User Event"
 #define BT_RX_PORT_NAME "BT Kernel RX assembly"
 #define BLUETOOTH_CONNECTION_PORT "bluetooth connection port"
-#define BLUETOOTH_CONNECTION_SCHED_PORT "bluetooth con sched port"
 
 #endif // _BTHCI_TRANSPORT_H_

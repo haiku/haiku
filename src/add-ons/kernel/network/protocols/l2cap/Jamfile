@@ -8,12 +8,6 @@ KernelAddon l2cap :
 	l2cap_address.cpp
 	l2cap_command.cpp
 	l2cap_signal.cpp
-	l2cap_lower.cpp
-	l2cap_upper.cpp
-# Stack subModules
-    L2capEndpoint.cpp
+	L2capEndpoint.cpp
+	L2capEndpointManager.cpp
 ;
-
-# Installation
-HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/protocols
-	: l2cap ;

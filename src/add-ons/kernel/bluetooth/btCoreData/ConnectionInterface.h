@@ -12,6 +12,7 @@
 
 #include <btCoreData.h>
 
+extern mutex sConnectionListLock;
 extern DoublyLinkedList<HciConnection> sConnectionList;
 
 HciConnection* ConnectionByHandle(uint16 handle, hci_id hid);
@@ -26,11 +27,8 @@ status_t RemoveConnection(uint16 handle, hci_id hid);
 
 hci_id RouteConnection(const bdaddr_t& destination);
 
-void SetAclBuffer(HciConnection* conn, net_buffer* nbuf);
-void SetAclExpectedSize(HciConnection* conn, size_t size);
-void AclPutting(HciConnection* conn, size_t size);
-bool AclComplete(HciConnection* conn);
-bool AclOverFlowed(HciConnection* conn);
-
+uint8 allocate_command_ident(HciConnection* conn, void* pointer);
+void* lookup_command_ident(HciConnection* conn, uint8 ident);
+void free_command_ident(HciConnection* conn, uint8 ident);
 
 #endif // _CONNECTION_INTERFACE_H

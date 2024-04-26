@@ -1,19 +1,9 @@
 SubDir HAIKU_TOP src add-ons kernel bluetooth btCoreData ;
 
-UsePrivateHeaders kernel net bluetooth ;
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
-#UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_KERNEL_PLATFORM) ] ;
-
-# disable debug output, if debugging is disabled
-if $(DEBUG) = 0 {
-	SubDirCcFlags [ FDefines DEBUG_MAX_LEVEL_FLOW=0 DEBUG_MAX_LEVEL_INFO=0 ] ;
-}
-
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net bluetooth ;
 
 KernelAddon btCoreData :
 	ConnectionInterface.cpp
-	ChannelInterface.cpp
-	FrameInterface.cpp
 	BTCoreData.cpp
 	;
-

@@ -51,13 +51,12 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 		return ENOBUFS;
 	}
 
-
 	// Get ACL connection handle, PB flag and payload length
-	aclHeader->handle = le16toh(aclHeader->handle);
+	aclHeader->handle = B_LENDIAN_TO_HOST_INT16(aclHeader->handle);
 
 	uint16 con_handle = get_acl_handle(aclHeader->handle);
 	uint16 pb = get_acl_pb_flag(aclHeader->handle);
-	uint16 length = le16toh(aclHeader->alen);
+	uint16 length = B_LENDIAN_TO_HOST_INT16(aclHeader->alen);
 
 	aclHeader.Remove();
 
@@ -95,32 +94,26 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 		}
 
 		// Get L2CAP header, ACL header was dimissed
-		if (nbuf->size < sizeof(l2cap_hdr_t)) {
+		if (nbuf->size < sizeof(l2cap_basic_header)) {
 			TRACE("%s: Invalid L2CAP start fragment, small, length=%" B_PRIu32
 				"\n", __func__, nbuf->size);
 			gBufferModule->free(nbuf);
 			return (EMSGSIZE);
 		}
 
-
-		NetBufferHeaderReader<l2cap_hdr_t> l2capHeader(nbuf);
-		status_t status = l2capHeader.Status();
-		if (status < B_OK) {
+		NetBufferHeaderReader<l2cap_basic_header> l2capHeader(nbuf);
+		if (l2capHeader.Status() != B_OK) {
 			gBufferModule->free(nbuf);
 			return ENOBUFS;
 		}
-
-		l2capHeader->length = le16toh(l2capHeader->length);
-		l2capHeader->dcid = le16toh(l2capHeader->dcid);
 
 		TRACE("%s: New L2CAP, handle=%#x length=%d\n", __func__, con_handle,
 			le16toh(l2capHeader->length));
 
 		// Start new L2CAP packet
 		conn->currentRxPacket = nbuf;
-		conn->currentRxExpectedLength = l2capHeader->length + sizeof(l2cap_hdr_t);
-
-
+		conn->currentRxExpectedLength = B_LENDIAN_TO_HOST_INT16(l2capHeader->length)
+			+ sizeof(l2cap_basic_header);
 	} else if (pb == HCI_ACL_PACKET_FRAGMENT) {
 		if (conn->currentRxPacket == NULL) {
 			gBufferModule->free(nbuf);
@@ -129,7 +122,6 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 
 		// Add fragment to the L2CAP packet
 		gBufferModule->merge(conn->currentRxPacket, nbuf, true);
-
 	} else {
 		ERROR("%s: invalid ACL data packet. Invalid PB flag=%#x\n", __func__,
 			pb);
@@ -153,6 +145,10 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 		// OK, we have got complete L2CAP packet, so process it
 		TRACE("%s: L2cap packet ready %" B_PRIu32 " bytes\n", __func__,
 			conn->currentRxPacket->size);
+
+		memcpy(conn->currentRxPacket->source, &conn->address_dest, sizeof(sockaddr_storage));
+		conn->currentRxPacket->interface_address = &conn->interface_address;
+
 		error = PostToUpper(conn, conn->currentRxPacket);
 		// clean
 		conn->currentRxPacket = NULL;
@@ -177,6 +173,5 @@ PostToUpper(HciConnection* conn, net_buffer* buf)
 		return B_ERROR;
 	} // TODO: someone put it
 
-	return L2cap->receive_data((net_buffer*)conn);// XXX pass handle in type
-
+	return L2cap->receive_data(buf);
 }

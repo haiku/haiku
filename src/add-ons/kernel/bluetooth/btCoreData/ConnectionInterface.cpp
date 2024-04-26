@@ -4,33 +4,59 @@
  */
 
 #include <util/DoublyLinkedList.h>
+#include <util/AutoLock.h>
 
-#include <KernelExport.h>
+#include <net_protocol.h>
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/bdaddrUtils.h>
+#include <bluetooth/L2CAP/btL2CAP.h>
 
 #include <btDebug.h>
+#include <btModules.h>
 
 #include <l2cap.h>
 
 #include "ConnectionInterface.h"
 
+struct net_protocol_module_info* L2cap = NULL;
+extern net_buffer_module_info* gBufferModule;
 
-void PurgeChannels(HciConnection* conn);
 
-
-HciConnection::HciConnection()
+HciConnection::HciConnection(hci_id hid)
 {
-	mutex_init(&fLock, "conn outgoing");
-	mutex_init(&fLockExpected, "frame expected");
+	mutex_init(&fLock, "HciConnection");
+	Hid = hid;
+	fNextIdent = L2CAP_FIRST_CID;
+
+	// TODO: This doesn't really belong here...
+	interface_address = {};
+	address_dl = {};
+	interface_address.local = (struct sockaddr*)&address_dl;
+	interface_address.destination = (struct sockaddr*)&address_dest;
+	address_dl.sdl_index = Hid;
 }
 
 
 HciConnection::~HciConnection()
 {
+	if (L2cap == NULL)
+	if (get_module(NET_BLUETOOTH_L2CAP_NAME, (module_info**)&L2cap) != B_OK) {
+		ERROR("%s: cannot get module \"%s\"\n", __func__,
+			NET_BLUETOOTH_L2CAP_NAME);
+	} // TODO: someone put it
+
+	// Inform the L2CAP module this connection is about to be gone.
+	if (L2cap != NULL) {
+		net_buffer* error = gBufferModule->create(128);
+		error->interface_address = &interface_address;
+		if (L2cap->error_received(B_NET_ERROR_UNREACH_HOST, error) != B_OK) {
+			error->interface_address = NULL;
+			gBufferModule->free(error);
+		}
+	}
+
 	mutex_destroy(&fLock);
-	mutex_destroy(&fLockExpected);
 }
 
 
@@ -43,7 +69,7 @@ AddConnection(uint16 handle, int type, const bdaddr_t& dst, hci_id hid)
 	if (conn != NULL)
 		goto update;
 
-	conn = new (std::nothrow) HciConnection;
+	conn = new (std::nothrow) HciConnection(hid);
 	if (conn == NULL)
 		goto bail;
 
@@ -54,15 +80,21 @@ AddConnection(uint16 handle, int type, const bdaddr_t& dst, hci_id hid)
 update:
 	// fill values
 	bdaddrUtils::Copy(conn->destination, dst);
+	{
+	sockaddr_l2cap* destination = (sockaddr_l2cap*)&conn->address_dest;
+	destination->l2cap_len = sizeof(sockaddr_l2cap);
+	destination->l2cap_family = AF_BLUETOOTH;
+	destination->l2cap_bdaddr = dst;
+	}
 	conn->type = type;
 	conn->handle = handle;
-	conn->Hid = hid;
 	conn->status = HCI_CONN_OPEN;
 	conn->mtu = L2CAP_MTU_MINIMUM; // TODO: give the mtu to the connection
-	conn->lastCid = L2CAP_FIRST_CID;
-	conn->lastIdent = L2CAP_FIRST_IDENT;
 
+	{
+	MutexLocker _(&sConnectionListLock);
 	sConnectionList.Add(conn);
+	}
 
 bail:
 	return conn;
@@ -72,6 +104,7 @@ bail:
 status_t
 RemoveConnection(const bdaddr_t& destination, hci_id hid)
 {
+	MutexLocker locker(&sConnectionListLock);
 	HciConnection*	conn;
 
 	DoublyLinkedList<HciConnection>::Iterator iterator
@@ -89,6 +122,7 @@ RemoveConnection(const bdaddr_t& destination, hci_id hid)
 				|| conn == sConnectionList.Head()) {
 				sConnectionList.Remove(conn);
 
+				locker.Unlock();
 				delete conn;
 				return B_OK;
 			}
@@ -101,6 +135,7 @@ RemoveConnection(const bdaddr_t& destination, hci_id hid)
 status_t
 RemoveConnection(uint16 handle, hci_id hid)
 {
+	MutexLocker locker(&sConnectionListLock);
 	HciConnection*	conn;
 
 	DoublyLinkedList<HciConnection>::Iterator iterator
@@ -116,7 +151,7 @@ RemoveConnection(uint16 handle, hci_id hid)
 				|| conn == sConnectionList.Head()) {
 				sConnectionList.Remove(conn);
 
-				PurgeChannels(conn);
+				locker.Unlock();
 				delete conn;
 				return B_OK;
 			}
@@ -127,8 +162,9 @@ RemoveConnection(uint16 handle, hci_id hid)
 
 
 hci_id
-RouteConnection(const bdaddr_t& destination) {
-
+RouteConnection(const bdaddr_t& destination)
+{
+	MutexLocker _(&sConnectionListLock);
 	HciConnection* conn;
 
 	DoublyLinkedList<HciConnection>::Iterator iterator
@@ -148,6 +184,7 @@ RouteConnection(const bdaddr_t& destination) {
 HciConnection*
 ConnectionByHandle(uint16 handle, hci_id hid)
 {
+	MutexLocker _(&sConnectionListLock);
 	HciConnection*	conn;
 
 	DoublyLinkedList<HciConnection>::Iterator iterator
@@ -167,13 +204,13 @@ ConnectionByHandle(uint16 handle, hci_id hid)
 HciConnection*
 ConnectionByDestination(const bdaddr_t& destination, hci_id hid)
 {
-	HciConnection*	conn;
+	MutexLocker _(&sConnectionListLock);
 
 	DoublyLinkedList<HciConnection>::Iterator iterator
 		= sConnectionList.GetIterator();
 	while (iterator.HasNext()) {
 
-		conn = iterator.Next();
+		HciConnection* conn = iterator.Next();
 		if (conn->Hid == hid
 			&& bdaddrUtils::Compare(conn->destination, destination)) {
 			return conn;
@@ -184,51 +221,47 @@ ConnectionByDestination(const bdaddr_t& destination, hci_id hid)
 }
 
 
-#if 0
-#pragma mark - ACL helper funcs
-#endif
-
-void
-SetAclBuffer(HciConnection* conn, net_buffer* nbuf)
+uint8
+allocate_command_ident(HciConnection* conn, void* pointer)
 {
-	conn->currentRxPacket = nbuf;
+	MutexLocker _(&conn->fLock);
+
+	uint8 ident = conn->fNextIdent + 1;
+
+	if (ident < L2CAP_FIRST_IDENT)
+		ident = L2CAP_FIRST_IDENT;
+
+	while (ident != conn->fNextIdent) {
+		if (conn->fInUseIdents.Find(ident) == conn->fInUseIdents.End()) {
+			conn->fInUseIdents.Insert(ident, pointer);
+			return ident;
+		}
+
+		ident++;
+		if (ident < L2CAP_FIRST_IDENT)
+			ident = L2CAP_FIRST_IDENT;
+	}
+
+	return L2CAP_NULL_IDENT;
+}
+
+
+void*
+lookup_command_ident(HciConnection* conn, uint8 ident)
+{
+	MutexLocker _(&conn->fLock);
+
+	auto iter = conn->fInUseIdents.Find(ident);
+	if (iter == conn->fInUseIdents.End())
+		return NULL;
+
+	return iter->Value();
 }
 
 
 void
-SetAclExpectedSize(HciConnection* conn, size_t size)
+free_command_ident(HciConnection* conn, uint8 ident)
 {
-	conn->currentRxExpectedLength = size;
-}
-
-
-void
-AclPutting(HciConnection* conn, size_t size)
-{
-	conn->currentRxExpectedLength -= size;
-}
-
-
-bool
-AclComplete(HciConnection* conn)
-{
-	return conn->currentRxExpectedLength == 0;
-}
-
-
-bool
-AclOverFlowed(HciConnection* conn)
-{
-	return conn->currentRxExpectedLength < 0;
-}
-
-
-#if 0
-#pragma mark - private funcs
-#endif
-
-void
-PurgeChannels(HciConnection* conn)
-{
-
+	MutexLocker _(&conn->fLock);
+	conn->fInUseIdents.Remove(ident);
 }

@@ -31,7 +31,7 @@ CreateL2capSocket(const bdaddr_t* bdaddr, struct sockaddr_l2cap& l2sa, uint16 ps
 	}
 
 	/* Bind a name to the socket. */
-	printf("Binding socket ...\n");
+	//printf("Binding socket ...\n");
 
 	size = sizeof(struct sockaddr_l2cap);
 
@@ -40,10 +40,12 @@ CreateL2capSocket(const bdaddr_t* bdaddr, struct sockaddr_l2cap& l2sa, uint16 ps
 	memcpy(&l2sa.l2cap_bdaddr, bdaddr, sizeof(bdaddr_t));
     l2sa.l2cap_psm = psm;
 
+#if 0
 	if (bind(sock, (struct sockaddr *)&l2sa, size) < 0) {
 		perror ("bind");
 		exit (EXIT_FAILURE);
 	}
+#endif
 
 	printf("Connecting socket for %s\n", bdaddrUtils::ToString(*bdaddr));
 	if ((error = connect(sock, (struct sockaddr *)&l2sa, sizeof(l2sa))) < 0) {
