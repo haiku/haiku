@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2787029568
+1	ukrainian	x-vnd.Haiku-libtracker	2585450844
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -404,6 +404,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Неможливо відкл
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Не вдалося відкрити \«%document\» програмою \«%app\» (Відсутній символ: %symbol). \n
 New folder	ContainerWindow		Нова папка
 Name	OpenWithWindow		Назва
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Дивитись інфо
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \«%name\». Елемент може бути відкритим або зайнятим.
 Windows	TrackerSettingsWindow		Вікна
 Show space bars on volumes	SettingsView		Показувати індикатори місця на томах

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-DriveSetup	2943652182
+1	french	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Impossible de démonter la partition %s.
 Mount all	MainWindow		Monter tout
 Disk	MainWindow		Disque
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Format
 Could not unmount partition	MainWindow		Impossible de démonter la partition
 Create	CreateParametersPanel		Créer
 File system	PartitionList		Système de fichiers
+Unknown (%s)	PartitionList		Inconnu (%s)
 The selected partition does not contain a partitioning system.	MainWindow		La partition sélectionnée ne contient pas de système de partitionnement.
 End: %s	Support		Fin : %s
 Partition type	PartitionList		Type de partition

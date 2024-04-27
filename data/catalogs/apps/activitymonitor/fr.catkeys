@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ActivityMonitor	1319108693
+1	french	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Processus
 Semaphores	DataSource		Sémaphores
 TX	DataSource	Shorter version for Sending	Tx
@@ -45,3 +45,4 @@ Swap	DataSource		Échange
 P-faults	DataSource		P-fautes
 Sems	DataSource		Sems
 Network receive	DataSource		Réception réseau
+%s faults/s	DataSource		%s défauts/s

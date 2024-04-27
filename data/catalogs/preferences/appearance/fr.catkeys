@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	663472720
+1	french	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Bordure des contrôles
 Control mark	Colors tab		Point de contrôle
 Off	AntialiasingSettingsView		Désactivé
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Texte de l’élément sélectionné dans le
 Size:	Font Selection view		Taille :
 Panel background	Colors tab		Arrière plan des panneaux
 Plain font:	Font view		Police simple :
+Automatically pick secondary colors	Colors tab		Sélection automatique des couleurs secondaires
 Window tab text	Colors tab		Texte des titres de fenêtres
 Navigation pulse	Colors tab		Pulsation de navigation
 LCD subpixel	AntialiasingSettingsView		Sous-pixel LCD
