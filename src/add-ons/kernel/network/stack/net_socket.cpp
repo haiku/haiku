@@ -648,7 +648,7 @@ socket_spawn_pending(net_socket* _parent, net_socket** _socket)
 	// inherit parent's properties
 	socket->send = parent->send;
 	socket->receive = parent->receive;
-	socket->options = parent->options & ~SO_ACCEPTCONN;
+	socket->options = parent->options & (SO_KEEPALIVE | SO_DONTROUTE | SO_LINGER | SO_OOBINLINE);
 	socket->linger = parent->linger;
 	socket->owner = parent->owner;
 	memcpy(&socket->address, &parent->address, parent->address.ss_len);
