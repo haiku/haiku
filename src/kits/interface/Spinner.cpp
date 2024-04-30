@@ -241,6 +241,8 @@ BSpinner::SetValue(int32 value)
 		return;
 
 	BControl::SetValue(value);
+	((int32*)_reserved)[0] = Value();
+
 	ValueChanged();
 
 	Invoke();
