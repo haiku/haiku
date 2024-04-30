@@ -616,9 +616,11 @@ set_font_family(void* _state, const char* _family, size_t length)
 		reinterpret_cast<BoundingBoxState*>(_state);
 
 	BString family(_family, length);
+	gFontManager->Lock();
 	FontStyle* fontStyle = gFontManager->GetStyleByIndex(family, 0);
 	ServerFont font;
 	font.SetStyle(fontStyle);
+	gFontManager->Unlock();
 	state->GetDrawState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
@@ -631,8 +633,10 @@ set_font_style(void* _state, const char* _style, size_t length)
 
 	BString style(_style, length);
 	ServerFont font(state->GetDrawState()->Font());
+	gFontManager->Lock();
 	FontStyle* fontStyle = gFontManager->GetStyle(font.Family(), style);
 	font.SetStyle(fontStyle);
+	gFontManager->Unlock();
 	state->GetDrawState()->SetFont(font, B_FONT_FAMILY_AND_STYLE);
 }
 
