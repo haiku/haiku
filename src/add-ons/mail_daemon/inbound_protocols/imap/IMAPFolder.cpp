@@ -411,14 +411,14 @@ IMAPFolder::RegisterPendingBodies(IMAP::MessageUIDList& uids,
 		if (replyTo != NULL) {
 			fPendingBodies[*iterator].push_back(*replyTo);
 		} else {
-			// Note: GCC 13 warns about the unused result of the statement below. This code should
-			//       be reviewed as part of #18478
-			#if __GNUC__ == 13
+			// Note: GCC 13 or later warns about the unused result of the statement below.
+			//       This code should be reviewed as part of #18478.
+			#if __GNUC__ >= 13
 			#  pragma GCC diagnostic push
 			#  pragma GCC diagnostic warning "-Wunused-result"
 			#endif
 			fPendingBodies[*iterator].begin();
-			#if __GNUC__ == 13
+			#if __GNUC__ >= 13
 			#  pragma GCC diagnostic pop
 			#endif
 		}
