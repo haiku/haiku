@@ -1158,6 +1158,9 @@ Equation<QueryPolicy>::PrintToStream()
 
 template<typename QueryPolicy>
 Expression<QueryPolicy>::Expression(char* expr)
+	:
+	fPosition(NULL),
+	fTerm(NULL)
 {
 	if (expr == NULL)
 		return;
