@@ -733,7 +733,7 @@ L2capEndpoint::_HandleConfigurationRsp(uint8 ident, uint16 scid, uint16 flags,
 			l2cap_command_reject::REJECTED_INVALID_CID, 0, scid, fChannelID);
 		return;
 	}
-	if (scid != fDestinationChannelID) {
+	if (scid != fChannelID) {
 		ERROR("l2cap: unexpected configuration rsp: invalid source channel (cid=%d, scid=%d)\n",
 			fChannelID, scid);
 		send_l2cap_command_reject(fConnection, ident,

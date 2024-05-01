@@ -80,9 +80,10 @@ l2cap_handle_connection_rsp(L2capEndpoint* endpoint, uint8 ident, net_buffer* bu
 
 
 static void
-parse_configuration_options(net_buffer* buffer, uint16 length, l2cap_config_options& options)
+parse_configuration_options(net_buffer* buffer, size_t offset, uint16 length,
+	l2cap_config_options& options)
 {
-	for (size_t offset = sizeof(l2cap_configuration_req); offset < length; ) {
+	while (offset < length) {
 		l2cap_configuration_option option;
 		if (gBufferModule->read(buffer, offset, &option, sizeof(option)) != B_OK)
 			break;
@@ -155,7 +156,7 @@ l2cap_handle_configuration_req(HciConnection* conn, uint8 ident, net_buffer* buf
 
 	// Read options (if any).
 	l2cap_config_options options = {};
-	parse_configuration_options(buffer, length, options);
+	parse_configuration_options(buffer, sizeof(l2cap_configuration_req), length, options);
 
 	if (options.rejected != NULL) {
 		// Reject without doing anything else.
@@ -192,7 +193,7 @@ l2cap_handle_configuration_rsp(HciConnection* conn, L2capEndpoint* endpoint,
 
 	// Read options (if any).
 	l2cap_config_options options = {};
-	parse_configuration_options(buffer, length, options);
+	parse_configuration_options(buffer, sizeof(l2cap_configuration_rsp), length, options);
 
 	if (options.rejected != NULL) {
 		// Reject without doing anything else.
@@ -305,7 +306,7 @@ l2cap_handle_info_rsp(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer)
 
 static status_t
 l2cap_handle_command_reject(L2capEndpoint* endpoint, uint8 ident, net_buffer* buffer)
-{	
+{
 	if (endpoint == NULL) {
 		ERROR("l2cap: unexpected command rejected: ident %d unknown\n", ident);
 		return B_ERROR;
@@ -472,7 +473,7 @@ l2cap_handle_signaling_command(HciConnection* connection, net_buffer* buffer)
 		if (buffer->size < length) {
 			ERROR("%s: invalid L2CAP signaling command packet, code=%#x, "
 				"ident=%d, length=%d, buffer size=%" B_PRIu32 "\n", __func__,
-				code, ident, length,buffer->size);
+				code, ident, length, buffer->size);
 			return EMSGSIZE;
 		}
 
