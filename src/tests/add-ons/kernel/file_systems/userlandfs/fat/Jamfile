@@ -1,4 +1,15 @@
-SubDir HAIKU_TOP src add-ons kernel file_systems fat ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs fat ;
+
+# set some additional defines
+{
+	local defines =
+		USER=1
+	;
+	
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
+}
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared storage file_systems ;
@@ -7,10 +18,13 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 local commonSource ;
 include [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat JamCommon ] ;
 
-KernelAddon fat :
+Addon <userland>fat :
 	$(commonSource)
 	mime_ext_table.c
-	;
+	:
+	libiconv.a
+	libuserlandfs_haiku_kernel.so
+;
 
 SEARCH on [ FGristFiles mime_ext_table.c ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

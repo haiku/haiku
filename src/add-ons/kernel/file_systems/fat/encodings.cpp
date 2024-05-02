@@ -3,16 +3,17 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <KernelExport.h>
+
+#include "encodings.h"
 
 #include <ctype.h>
+#ifndef FS_SHELL
 #include <stdio.h>
+#endif // !FS_SHELL
 #include <stdlib.h>
 #include <string.h>
 
-#include "encodings.h"
-#include "util.h"
-extern int debug_encodings;
+#include "support.h"
 
 #define TOUCH(x) ((void)(x))
 
@@ -23,7 +24,7 @@ extern int debug_encodings;
 	int _assert_(char *,int,char *) {return 0;}
 #endif
 
-#define DPRINTF(a,b) if (debug_encodings > (a)) dprintf b
+#define DPRINTF(a, b) ((void)0)
 
 enum {
 	MS_DOS_CONVERSION = 1,
@@ -1018,11 +1019,11 @@ _one_to_utf8(
 	for (srcCount = 0; srcCount < srcLimit; srcCount++) {
 		// table should be in host endian
 		uint16	unicode = table[(uchar)src[srcCount]];
-		uint16	*UNICODE = &unicode;
+		uint8* UNICODE = reinterpret_cast<uint8*>(&unicode);
 		uchar	utf8[4];
 		uchar	*UTF8 = utf8;
-	
-		*(uint32 *)utf8 = 0;
+
+		memset(utf8, 0, 4);
 		u_hostendian_to_utf8(UTF8, UNICODE);
 	
 		int32 utf8Len = UTF8 - utf8;
@@ -1104,18 +1105,6 @@ exit:
 	return ((dstCount > 0) ? B_NO_ERROR : B_ERROR);
 }
 
-inline bool is_unicode_japanese(uint16 c)
-{
-	if (((c >= 0x3000) && (c <= 0x30ff)) ||
-			((c >= 0x3200) && (c <= 0x3400)) ||
-			((c >= 0x4e00) && (c <= 0x9fff)) ||
-			((c >= 0xf900) && (c <= 0xfaff)) ||
-			((c >= 0xfe30) && (c <= 0xfe6f)) ||
-			((c >= 0xff00) && (c <= 0xffef)))
-		return true;
-
-	return false;
-}
 
 inline bool is_initial_sjis_byte(uchar c)
 {
@@ -1383,7 +1372,7 @@ generate_short_name_msdos(const uchar *utf8, const uint16 *uni,
 	return B_OK;
 }
 
-static status_t
+status_t
 generate_short_name_sjis(const uchar *utf8, const uint16 *uni,
 		uint32 unilen, uchar nshort[11])
 {
@@ -1586,16 +1575,17 @@ int main(int argc, char **argv)
 	for (i=1;i<argc;i++) {
 		char unicode[512];
 		status_t result;
-		result = utf8_to_unicode(argv[i], unicode, 512);
-		printf("result of %s = %x ", argv[i], result);
+		result = utf8_to_unicode(argv[i], (uchar*)unicode, 512);
+		printf("result of %s = %" B_PRIi32 " ", argv[i], result);
 		if (result > 0) {
 			char nshort[11];
 			int enc;
-			result = generate_short_name(unicode, result, nshort, &enc);
+			result = generate_short_name((uchar*)argv[i], (uchar*)unicode, result, (uchar*)nshort,
+				&enc);
 			printf("short [%s] ", nshort);
-			munge_short_name1(nshort, 1234, MS_DOS_CONVERSION);
+			munge_short_name1((uchar*)nshort, 1234, MS_DOS_CONVERSION);
 			printf("munged [%s] ", nshort);
-			printf("long name: %x\n", requires_long_name(argv[i]));
+			printf("long name: %x\n", requires_long_name(argv[i], (uchar*)unicode));
 		}
 		printf("\n");
 	}

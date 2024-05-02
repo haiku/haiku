@@ -1,14 +1,14 @@
-# Sample settings file for the dosfs plugin
+# Sample settings file for the FAT plugin
 #
 # This file should be moved to the directory
 # /boot/home/config/settings/kernel/drivers/
 #
-# lock device:
-# true = (default) locks the device's door if:
-# 	the filesystem is RW
-#	the device is removable
-# false = no door locking
-lock_device true
+# OEM code page:
+# Code page to use for DOS short filenames in the FAT userlandfs module.
+# Back up your data before changing this setting.
+# Has no effect on the regular FAT driver or FAT shell, which always use CP850.
+# If not set, defaults to CP1252.
+OEM_code_page CP1252
 
 # sync mode:
 # 0 = (default) no sync after each operation

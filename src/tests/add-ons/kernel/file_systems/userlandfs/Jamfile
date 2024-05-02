@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems userlandfs ;
 
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs bfs ;
+SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs fat ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs cdda ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ntfs ;
 SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs ;

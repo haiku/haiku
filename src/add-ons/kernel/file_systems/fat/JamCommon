@@ -1,0 +1,42 @@
+local fatTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat ] ;
+
+UseHeaders [ FDirName $(fatTop) bsd ] : true ;
+
+SEARCH_SOURCE += $(fatTop) ;
+SEARCH_SOURCE += [ FDirName $(fatTop) bsd fs msdosfs ] ;
+SEARCH_SOURCE += [ FDirName $(fatTop) bsd kern ] ;
+SEARCH_SOURCE += [ FDirName $(fatTop) bsd libkern ] ;
+SEARCH_SOURCE += [ FDirName $(fatTop) bsd vm ] ;
+
+local bsdDriver =
+	msdosfs_iconv.c
+	msdosfs_conv.c
+	msdosfs_denode.c
+	msdosfs_fat.c
+	msdosfs_lookup.c
+	msdosfs_vfsops.c
+	msdosfs_vnops.c
+;
+
+local bsdCompatability =
+	kern_lock.c
+	subr_clock.c
+	subr_fattime.c
+	vfs_bio.c
+	vfs_cache.c
+	vfs_hash.c
+	vfs_subr.c
+	vfs_vnops.c
+	iconv.c
+;
+
+commonSource = 
+	$(bsdDriver)
+	$(bsdCompatability)
+	debug.cpp
+	encodings.cpp
+	kernel_interface.cpp
+	mkdos.cpp
+	support.cpp
+	vcache.cpp
+;

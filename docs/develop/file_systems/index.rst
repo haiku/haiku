@@ -13,5 +13,6 @@ required. For example, NFS is a network filesystem, so it doesn't need one.
    /file_systems/userlandfs
    /file_systems/ufs2
    /file_systems/xfs
+   /file_systems/fat
    /file_systems/befs/resources
    /partitioning_systems/sun

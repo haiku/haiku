@@ -24,9 +24,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-*/
+Copyright 2024, Haiku, Inc. All rights reserved.
 
-#include "system_dependencies.h"
+*/
+#ifndef MKDOS_H
+#define MKDOS_H
+
+
+#ifdef FS_SHELL
+#include "fssh_api_wrapper.h"
+#else
+#include <SupportDefs.h>
+#include <disk_device_manager.h>
+#endif
 
 
 struct initialize_parameters {
@@ -35,17 +45,17 @@ struct initialize_parameters {
 	bool	verbose;
 };
 
+
 #ifdef __cplusplus
-extern "C" {
+extern "C" 
+{
 #endif
-
 status_t
-dosfs_initialize(int fd, partition_id partitionID, const char* name,
-	const char* parameterString, off_t /*partitionSize*/, disk_job_id job);
+_dosfs_initialize(int fd, partition_id partitionID, const char* name, const char* parameterString,
+	off_t partitionSize, disk_job_id job);
 status_t
-dosfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
-	uint32 blockSize, disk_job_id job);
-
+_dosfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize, uint32 blockSize,
+	disk_job_id job);
 #ifdef __cplusplus
 }
 #endif
@@ -145,14 +155,13 @@ struct fatdirent {
 
 //maximum size of a cluster
 #define CLUSTER_MAX_SIZE 32768
+#define FAT12_CLUSTER_MAX_SIZE 4084
 
-//not sure if that's correct
-#define FAT12_CLUSTER_MAX_SIZE	1024
 
 //limits
 #define FAT12_MAX_CLUSTER_COUNT 4084LL
 #define FAT16_MAX_CLUSTER_COUNT 65524LL
-#define FAT32_MAX_CLUSTER_COUNT 0x0fffffffLL
+#define FAT32_MAX_CLUSTER_COUNT 0x0ffffff4LL
 
 
 #define BOOTJMP_START_OFFSET 0x00
@@ -194,4 +203,7 @@ uint8 bootcode[] = {
 #define BACKUP_SECTOR_NUM 6
 #define FAT32_ROOT_CLUSTER 2
 
-#endif
+#endif // MKDOS
+
+
+#endif // MKDOS_H

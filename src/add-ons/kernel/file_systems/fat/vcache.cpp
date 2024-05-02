@@ -1,7 +1,10 @@
 /*
-	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
-	This file may be used under the terms of the Be Sample Code License.
+ * Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
+ * Copyright 2024, Haiku, Inc. All rights reserved.
+ * This file may be used under the terms of the Be Sample Code License.
 */
+
+
 /*
 The FAT file system has no good way of assigning unique persistent values to
 nodes. The only obvious choice, storing the starting cluster number of the
@@ -34,18 +37,34 @@ invalid from the start.
 Since we can't change vnode id's once they are assigned, we have to create a
 mapping table to translate vnode id's to locations. This file serves this
 purpose.
+
+It also allows the FS to check whether a node with a given inode number has been constructed,
+without calling get_vnode().
 */
 
 
 #include "vcache.h"
 
-#include "system_dependencies.h"
+#ifdef FS_SHELL
+#include "fssh_api_wrapper.h"
+#else // !FS_SHELL
+#include <new>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#endif // !FS_SHELL
 
+#ifndef FS_SHELL
+#include <fs_cache.h>
+#include <fs_interface.h>
+#endif // !FS_SHELL
+
+#define _KERNEL
+#include "sys/vnode.h"
+
+#include "debug.h"
 #include "dosfs.h"
-#include "util.h"
 
-
-#define DPRINTF(a,b) if (debug_vcache > (a)) dprintf b
 
 #define LOCK_CACHE_R \
 	rw_lock_read_lock(&vol->vcache.lock)
@@ -65,30 +84,44 @@ purpose.
 struct vcache_entry {
 	ino_t	vnid;		/* originally reported vnid */
 	ino_t	loc;		/* where the file is now */
+	bool	constructed;	/* has the node been set up by _dosfs_read_vnode */
 	struct vcache_entry *next_vnid; /* next entry in vnid hash table */
 	struct vcache_entry *next_loc;  /* next entry in location hash table */
+#ifdef DEBUG
+	struct vnode* node;
+#endif
 };
 
 
 void
-dump_vcache(nspace *vol)
+dump_vcache(const mount* vol)
 {
 	uint32 i;
 	struct vcache_entry *c;
+#if defined DEBUG && defined _KERNEL_MODE
 	kprintf("vnid cache size %" B_PRIu32 ", cur vnid = %" B_PRIdINO "\n"
-		"vnid             loc\n", vol->vcache.cache_size, vol->vcache.cur_vnid);
+		"vnid                loc              %-*s\n", vol->vcache.cache_size, vol->vcache.cur_vnid,
+		B_PRINTF_POINTER_WIDTH, "struct vnode");
 	for (i = 0; i < vol->vcache.cache_size; i++) {
 		for (c = vol->vcache.by_vnid[i]; c ; c = c->next_vnid)
-			kprintf("%16" B_PRIdINO " %16" B_PRIdINO "\n", c->vnid, c->loc);
+			kprintf("%19" B_PRIdINO " %16" B_PRIdINO " %p\n", c->vnid, c->loc, c->node);
 	}
+#else
+	kprintf("vnid cache size %" B_PRIu32 ", cur vnid = %" B_PRIdINO "\n"
+		"vnid                loc\n", vol->vcache.cache_size, vol->vcache.cur_vnid);
+	for (i = 0; i < vol->vcache.cache_size; i++) {
+		for (c = vol->vcache.by_vnid[i]; c ; c = c->next_vnid)
+			kprintf("%19" B_PRIdINO " %16" B_PRIdINO "\n", c->vnid, c->loc);
+	}
+#endif // !DEBUG
 }
 
 
 status_t
-init_vcache(nspace *vol)
+init_vcache(mount* vol)
 {
 	char name[16];
-	DPRINTF(0, ("init_vcache called\n"));
+	FUNCTION();
 
 	vol->vcache.cur_vnid = ARTIFICIAL_VNID_BITS;
 #if DEBUG
@@ -100,35 +133,35 @@ init_vcache(nspace *vol)
 	vol->vcache.by_vnid = (vcache_entry**)calloc(sizeof(struct vache_entry *),
 		vol->vcache.cache_size);
 	if (vol->vcache.by_vnid == NULL) {
-		dprintf("init_vcache: out of memory\n");
+		INFORM("init_vcache: out of memory\n");
 		return ENOMEM;
 	}
 
 	vol->vcache.by_loc = (vcache_entry**)calloc(sizeof(struct vache_entry *),
 		vol->vcache.cache_size);
 	if (vol->vcache.by_loc == NULL) {
-		dprintf("init_vcache: out of memory\n");
+		INFORM("init_vcache: out of memory\n");
 		free(vol->vcache.by_vnid);
 		vol->vcache.by_vnid = NULL;
 		return ENOMEM;
 	}
 
-	sprintf(name, "fat cache %" B_PRIdDEV, vol->id);
+	sprintf(name, "fat cache %" B_PRIdDEV, vol->mnt_fsvolume->id);
 	rw_lock_init(&vol->vcache.lock, "fat cache");
 
-	DPRINTF(0, ("init_vcache: initialized vnid cache with %" B_PRIu32
-		" entries\n", vol->vcache.cache_size));
+	PRINT("init_vcache: initialized vnid cache with %" B_PRIu32
+		" entries\n", vol->vcache.cache_size);
 
 	return 0;
 }
 
 
 status_t
-uninit_vcache(nspace *vol)
+uninit_vcache(mount* vol)
 {
 	uint32 i, count = 0;
 	struct vcache_entry *c, *n;
-	DPRINTF(0, ("uninit_vcache called\n"));
+	FUNCTION();
 
 	LOCK_CACHE_W;
 
@@ -143,7 +176,7 @@ uninit_vcache(nspace *vol)
 		}
 	}
 
-	DPRINTF(0, ("%" B_PRIu32 " vcache entries removed\n", count));
+	PRINT("%" B_PRIu32 " vcache entries removed\n", count);
 
 	free(vol->vcache.by_vnid); vol->vcache.by_vnid = NULL;
 	free(vol->vcache.by_loc); vol->vcache.by_loc = NULL;
@@ -154,30 +187,35 @@ uninit_vcache(nspace *vol)
 
 
 ino_t
-generate_unique_vnid(nspace *vol)
+generate_unique_vnid(mount* vol)
 {
-	DPRINTF(0, ("generate_unique_vnid\n"));
-	/* only one thread per volume will be in here at any given time anyway
-	 * due to volume locking */
-	return vol->vcache.cur_vnid++;
+	FUNCTION();
+
+#ifdef FS_SHELL
+	LOCK_CACHE_W;
+	ino_t current = vol->vcache.cur_vnid++;
+	UNLOCK_CACHE_W;
+
+	return current;
+#else
+	return atomic_add64(&vol->vcache.cur_vnid, 1);
+#endif // !FS_SHELL
 }
 
 
 static status_t
-_add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
+_add_to_vcache_(mount* vol, ino_t vnid, ino_t loc)
 {
 	int hash1 = hash(vnid), hash2 = hash(loc);
 	struct vcache_entry *e, *c, *p;
 
-	DPRINTF(0, ("add_to_vcache %" B_PRIdINO "/%" B_PRIdINO "\n", vnid, loc));
-
-	ASSERT(vnid != loc);
+	FUNCTION_START("%" B_PRIdINO "/%" B_PRIdINO "\n", vnid, loc);
 
 	e = (vcache_entry*)malloc(sizeof(struct vcache_entry));
 	if (e == NULL)
 		return ENOMEM;
 
-	e->vnid = vnid; e->loc = loc; e->next_vnid = NULL; e->next_loc = NULL;
+	e->vnid = vnid; e->loc = loc; e->constructed = false; e->next_vnid = NULL; e->next_loc = NULL;
 
 	c = p = vol->vcache.by_vnid[hash1];
 	while (c) {
@@ -216,12 +254,12 @@ _add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 
 
 static status_t
-_remove_from_vcache_(nspace *vol, ino_t vnid)
+_remove_from_vcache_(mount* vol, ino_t vnid)
 {
 	int hash1 = hash(vnid), hash2;
 	struct vcache_entry *c, *p, *e;
 
-	DPRINTF(0, ("remove_from_vcache %" B_PRIdINO "\n", vnid));
+	FUNCTION_START("%" B_PRIdINO "\n", vnid);
 
 	c = p = vol->vcache.by_vnid[hash1];
 	while (c) {
@@ -265,7 +303,7 @@ _remove_from_vcache_(nspace *vol, ino_t vnid)
 
 
 static struct vcache_entry *
-_find_vnid_in_vcache_(nspace *vol, ino_t vnid)
+_find_vnid_in_vcache_(mount* vol, ino_t vnid)
 {
 	int hash1 = hash(vnid);
 	struct vcache_entry *c;
@@ -283,7 +321,7 @@ _find_vnid_in_vcache_(nspace *vol, ino_t vnid)
 
 
 static struct vcache_entry *
-_find_loc_in_vcache_(nspace *vol, ino_t loc)
+_find_loc_in_vcache_(mount* vol, ino_t loc)
 {
 	int hash2 = hash(loc);
 	struct vcache_entry *c;
@@ -301,7 +339,7 @@ _find_loc_in_vcache_(nspace *vol, ino_t loc)
 
 
 status_t
-add_to_vcache(nspace *vol, ino_t vnid, ino_t loc)
+add_to_vcache(mount* vol, ino_t vnid, ino_t loc)
 {
 	status_t result;
 
@@ -309,27 +347,43 @@ add_to_vcache(nspace *vol, ino_t vnid, ino_t loc)
 	result = _add_to_vcache_(vol,vnid,loc);
 	UNLOCK_CACHE_W;
 
-	if (result < 0) DPRINTF(0, ("add_to_vcache failed (%s)\n", strerror(result)));
+	if (result < 0) INFORM("add_to_vcache failed (%s)\n", strerror(result));
 	return result;
 }
 
 
-/* XXX: do this in a smarter fashion */
 static status_t
-_update_loc_in_vcache_(nspace *vol, ino_t vnid, ino_t loc)
+_update_loc_in_vcache_(mount* vol, ino_t vnid, ino_t loc)
 {
 	status_t result;
+	bool constructed;
+	result = vcache_get_constructed(vol, vnid, &constructed);
+	if (result != B_OK)
+		return result;
+#if DEBUG
+	struct vnode *node;
+	result = vcache_get_node(vol, vnid, &node);
+	if (result != B_OK)
+		return result;
+#endif // DEBUG
 
 	result = _remove_from_vcache_(vol, vnid);
-	if (result == 0)
+	if (result == 0) {
 		result = _add_to_vcache_(vol, vnid, loc);
+		if (result == B_OK && constructed == true)
+			result = vcache_set_constructed(vol, vnid);
+#if DEBUG
+		if (result == B_OK)
+			result = vcache_set_node(vol, vnid, node);
+#endif // DEBUG
+	}
 
 	return result;
 }
 
 
 status_t
-remove_from_vcache(nspace *vol, ino_t vnid)
+remove_from_vcache(mount* vol, ino_t vnid)
 {
 	status_t result;
 
@@ -337,18 +391,17 @@ remove_from_vcache(nspace *vol, ino_t vnid)
 	result = _remove_from_vcache_(vol, vnid);
 	UNLOCK_CACHE_W;
 
-	if (result < 0) DPRINTF(0, ("remove_from_vcache failed (%s)\n", strerror(result)));
+	if (result < 0) INFORM("remove_from_vcache failed (%s)\n", strerror(result));
 	return result;
 }
 
 
 status_t
-vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
+vcache_vnid_to_loc(mount* vol, ino_t vnid, ino_t* loc)
 {
 	struct vcache_entry *e;
 
-	DPRINTF(1, ("vcache_vnid_to_loc %" B_PRIdINO " %p\n", vnid,
-		loc));
+	FUNCTION_START("%" B_PRIdINO " %p\n", vnid,	loc);
 
 	LOCK_CACHE_R;
 	e = _find_vnid_in_vcache_(vol, vnid);
@@ -361,12 +414,11 @@ vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
 
 
 status_t
-vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
+vcache_loc_to_vnid(mount* vol, ino_t loc, ino_t* vnid)
 {
 	struct vcache_entry *e;
 
-	DPRINTF(1, ("vcache_loc_to_vnid %" B_PRIdINO " %p\n", loc,
-		vnid));
+	FUNCTION_START("%" B_PRIdINO " %p\n", loc, vnid);
 
 	LOCK_CACHE_R;
 	e = _find_loc_in_vcache_(vol, loc);
@@ -379,54 +431,175 @@ vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
 
 
 status_t
-vcache_set_entry(nspace *vol, ino_t vnid, ino_t loc)
+vcache_set_entry(mount* vol, ino_t vnid, ino_t loc)
 {
 	struct vcache_entry *e;
 	status_t result = B_OK;
 
-	DPRINTF(0, ("vcache_set_entry: %" B_PRIdINO " -> %" B_PRIdINO "\n", vnid,
-		loc));
-
-	/*if (is_vnode_removed(vol->id, vnid) > 0) {
-		if (!IS_ARTIFICIAL_VNID(loc))
-			return B_OK;
-	} else {
-		ASSERT(is_vnode_removed(vol->id, vnid) == 0);
-	}*/
+	FUNCTION_START("vcache_set_entry: %" B_PRIdINO " -> %" B_PRIdINO "\n", vnid, loc);
 
 	LOCK_CACHE_W;
 
 	e = _find_vnid_in_vcache_(vol, vnid);
 
-	if (e) {
-		if (e->vnid == loc)
-			result = _remove_from_vcache_(vol, vnid);
-		else
-			result = _update_loc_in_vcache_(vol, vnid, loc);
-	} else {
-		if (vnid != loc)
-			result = _add_to_vcache_(vol,vnid,loc);
-	}
+	if (e)
+		result = _update_loc_in_vcache_(vol, vnid, loc);
+	else
+		result = _add_to_vcache_(vol,vnid,loc);
 
 	UNLOCK_CACHE_W;
 
 	return result;
 }
 
+
+status_t
+vcache_set_constructed(mount* vol, ino_t vnid, bool constructed)
+{
+	struct vcache_entry* cEntry;
+	status_t result = B_OK;
+
+	FUNCTION_START("%" B_PRIdINO "\n", vnid);
+
+	LOCK_CACHE_W;
+
+	cEntry = _find_vnid_in_vcache_(vol, vnid);
+
+	if (cEntry != NULL)
+		cEntry->constructed = constructed;
+	else
+		result = B_BAD_VALUE;
+
+	UNLOCK_CACHE_W;
+
+	return result;
+}
+
+
+status_t
+vcache_get_constructed(mount* vol, ino_t vnid, bool* constructed)
+{
+	struct vcache_entry* cEntry;
+	status_t result = B_OK;
+
+	FUNCTION_START("%" B_PRIdINO "\n", vnid);
+
+	LOCK_CACHE_W;
+
+	cEntry = _find_vnid_in_vcache_(vol, vnid);
+
+	if (cEntry != NULL)
+		*constructed = cEntry->constructed;
+	else
+		result = B_BAD_VALUE;
+
+	UNLOCK_CACHE_W;
+
+	return result;
+}
+
+
+status_t
+sync_all_files(mount* vol)
+{
+	uint32 count = 0, errors = 0;
+	vnode* bsdNode = NULL;
+	status_t status = B_OK;
+
+	FUNCTION_START("volume @ %p\n", vol);
+
+	LOCK_CACHE_R;
+
+	for (uint32 i = 0; i < vol->vcache.cache_size; i++) {
+		for (vcache_entry* cEntry = vol->vcache.by_vnid[i]; cEntry != NULL ;
+			cEntry = cEntry->next_vnid) {
+			if (cEntry->constructed == true) {
+				status = get_vnode(vol->mnt_fsvolume, cEntry->vnid,
+					reinterpret_cast<void**>(&bsdNode));
+				if (status != B_OK) {
+					INFORM("get_vnode:  %s\n", strerror(status));
+					errors++;
+				} else {
+					if (bsdNode->v_type == VREG) {
+						status = file_cache_sync(bsdNode->v_cache);
+						if (status != B_OK)
+							errors++;
+						else
+							count++;
+					}
+					put_vnode(vol->mnt_fsvolume, cEntry->vnid);
+				}
+			}
+		}
+	}
+
+	UNLOCK_CACHE_R;
+
+	PRINT("sync'd %" B_PRIu32 " files with %" B_PRIu32 " errors\n", count, errors);
+
+	return (errors == 0) ? B_OK : B_ERROR;
+}
+
+
 #if DEBUG
+status_t
+vcache_set_node(mount* vol, ino_t vnid, struct vnode* node)
+{
+	vcache_entry* cEntry;
+	status_t result = B_OK;
+
+	FUNCTION_START("%" B_PRIdINO "\n", vnid);
+
+	LOCK_CACHE_W;
+
+	cEntry = _find_vnid_in_vcache_(vol, vnid);
+
+	if (cEntry != NULL)
+		cEntry->node = node;
+	else
+		result = B_BAD_VALUE;
+
+	UNLOCK_CACHE_W;
+
+	return result;
+}
+
+
+status_t
+vcache_get_node(mount* vol, ino_t vnid, struct vnode** node)
+{
+	vcache_entry* cEntry;
+	status_t result = B_OK;
+
+	FUNCTION_START("%" B_PRIdINO "\n", vnid);
+
+	LOCK_CACHE_W;
+
+	cEntry = _find_vnid_in_vcache_(vol, vnid);
+
+	if (cEntry != NULL)
+		*node = cEntry->node;
+	else
+		result = B_BAD_VALUE;
+
+	UNLOCK_CACHE_W;
+
+	return result;
+}
+
 
 int
 debug_dfvnid(int argc, char **argv)
 {
 	int i;
-	nspace *vol;
+	mount* vol;
 
 	if (argc < 3) {
-		kprintf("dfvnid nspace vnid\n");
+		kprintf("dfvnid volume vnid\n");
 		return B_OK;
 	}
 
-	vol = (nspace *)strtoul(argv[1], NULL, 0);
+	vol = reinterpret_cast<mount*>(strtoul(argv[1], NULL, 0));
 	if (vol == NULL)
 		return B_OK;
 
@@ -449,14 +622,14 @@ int
 debug_dfloc(int argc, char **argv)
 {
 	int i;
-	nspace *vol;
+	mount* vol;
 
 	if (argc < 3) {
-		kprintf("dfloc nspace vnid\n");
+		kprintf("dfloc volume vnid\n");
 		return B_OK;
 	}
 
-	vol = (nspace *)strtoul(argv[1], NULL, 0);
+	vol = reinterpret_cast<mount*>(strtoul(argv[1], NULL, 0));
 	if (vol == NULL)
 		return B_OK;
 
@@ -473,5 +646,4 @@ debug_dfloc(int argc, char **argv)
 
 	return B_OK;
 }
-
-#endif
+#endif // DEBUG
