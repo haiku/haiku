@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src libs bsd ;
 
-UsePrivateHeaders system ;
+UsePrivateHeaders libroot shared system ;
 UsePrivateHeaders [ FDirName system arch $(TARGET_ARCH) ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 

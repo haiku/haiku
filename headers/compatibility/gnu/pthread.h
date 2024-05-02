@@ -7,7 +7,7 @@
 
 
 #include_next <pthread.h>
-
+#include <features.h>
 
 #ifdef _GNU_SOURCE
 

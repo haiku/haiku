@@ -22,6 +22,7 @@ extern "C" {
 
 int sigsetmask(int mask);
 int sigblock(int mask);
+int pthread_sigqueue(pthread_t thread, int sig, const union sigval value);
 
 #ifdef __cplusplus
 }
