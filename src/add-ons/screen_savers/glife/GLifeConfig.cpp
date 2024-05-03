@@ -126,21 +126,21 @@ void
 GLifeConfig::_UpdateLabels()
 {
 	BString newLabel;
-	newLabel.SetToFormat(B_TRANSLATE("Grid width: %li"), fGridWidth->Value());
+	newLabel.SetToFormat(B_TRANSLATE("Grid width: %d"), (int)fGridWidth->Value());
 	fGridWidth->SetLabel(newLabel);
 
-	newLabel.SetToFormat(B_TRANSLATE("Grid height: %li"), fGridHeight->Value());
+	newLabel.SetToFormat(B_TRANSLATE("Grid height: %d"), (int)fGridHeight->Value());
 	fGridHeight->SetLabel(newLabel);
 
-	newLabel.SetToFormat(B_TRANSLATE("Grid border: %li"), fGridBorder->Value());
+	newLabel.SetToFormat(B_TRANSLATE("Grid border: %d"), (int)fGridBorder->Value());
 	fGridBorder->SetLabel(newLabel);
 
-	int32 delay = fGridDelay->Value();
+	int delay = fGridDelay->Value();
 	if (delay <= 0)
 		newLabel = B_TRANSLATE("Grid life delay: none");
 	else {
-		newLabel.SetToFormat(B_TRANSLATE_CONTEXT("Grid life delay: %ld×",
-			"This is a factor: the × represents 'times', don't translate '%ld'"),
+		newLabel.SetToFormat(B_TRANSLATE_CONTEXT("Grid life delay: %d×",
+			"This is a factor: the × represents 'times', don't translate '%d'"),
 			delay);
 	}
 	fGridDelay->SetLabel(newLabel);
