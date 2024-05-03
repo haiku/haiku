@@ -31,7 +31,8 @@ public:
 
 			const char*			GetString(const char* string,
 									const char* context = NULL,
-									const char* comment = NULL);
+									const char* comment = NULL)
+									__attribute__((format_arg(2)));
 			const char*			GetString(uint32 id);
 
 			status_t			GetData(const char* name, BMessage* msg);
