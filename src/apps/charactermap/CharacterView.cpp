@@ -202,6 +202,11 @@ CharacterView::UnicodeToUTF8(uint32 c, char* text, size_t textSize)
 /*static*/ void
 CharacterView::UnicodeToUTF8Hex(uint32 c, char* text, size_t textSize)
 {
+	if (c == 0) {
+		snprintf(text, textSize, "\\x00");
+		return;
+	}
+
 	char character[16];
 	CharacterView::UnicodeToUTF8(c, character, sizeof(character));
 
@@ -228,7 +233,7 @@ CharacterView::MessageReceived(BMessage* message)
 				character = fCurrentCharacter;
 			}
 
-			char text[16];
+			char text[17];
 			if (message->what == kMsgCopyAsEscapedString)
 				UnicodeToUTF8Hex(character, text, sizeof(text));
 			else
@@ -466,7 +471,7 @@ CharacterView::MouseMoved(BPoint where, uint32 transit,
 		view->FillRect(frame, B_SOLID_LOW);
 
 		// Draw character
-		char text[16];
+		char text[17];
 		UnicodeToUTF8(character, text, sizeof(text));
 
 		view->SetDrawingMode(B_OP_ALPHA);
