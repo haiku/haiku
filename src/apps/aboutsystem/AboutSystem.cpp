@@ -1158,7 +1158,7 @@ SysInfoView::_GetCPUFrequency()
 {
 	BString clockSpeed;
 
-	int32 frequency = get_rounded_cpu_speed();
+	long int frequency = get_rounded_cpu_speed();
 	if (frequency < 1000) {
 		clockSpeed.SetToFormat(B_TRANSLATE_COMMENT("%ld MHz",
 			"750 Mhz (CPU clock speed)"), frequency);

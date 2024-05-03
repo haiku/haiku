@@ -468,9 +468,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					&& msg->FindInt32("maximum", &maximumCount) == B_OK) {
 					char buffer[64];
 					snprintf(buffer, sizeof(buffer),
-						B_TRANSLATE_COMMENT("%1ld of %2ld",
-							"number of files copied"),
-						currentCount, maximumCount);
+						B_TRANSLATE_COMMENT("%1ld of %2ld", "number of files copied"),
+						(long int)currentCount, (long int)maximumCount);
 					trailingLabel << buffer;
 				} else {
 					trailingLabel <<

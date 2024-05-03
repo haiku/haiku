@@ -3250,17 +3250,14 @@ FSCreateNewFolderIn(const node_ref* dirNode, entry_ref* newRef,
 		char name[B_FILE_NAME_LENGTH];
 		strlcpy(name, B_TRANSLATE("New folder"), sizeof(name));
 
-		int32 fnum = 1;
+		int fnum = 1;
 		while (dir.Contains(name)) {
 			// if base name already exists then add a number
 			// TODO: move this logic to FSMakeOriginalName
-			if (++fnum > 9) {
-				snprintf(name, sizeof(name), B_TRANSLATE("New folder%ld"),
-					fnum);
-			} else {
-				snprintf(name, sizeof(name), B_TRANSLATE("New folder %ld"),
-					fnum);
-			}
+			if (++fnum > 9)
+				snprintf(name, sizeof(name), B_TRANSLATE("New folder%d"), fnum);
+			else
+				snprintf(name, sizeof(name), B_TRANSLATE("New folder %d"), fnum);
 		}
 
 		BDirectory newDir;

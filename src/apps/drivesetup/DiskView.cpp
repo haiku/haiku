@@ -357,12 +357,8 @@ public:
 		if (name.Length() == 0) {
 			if (partition->CountChildren() > 0)
 				name << partition->Type();
-			else {
-				char buffer[64];
-				snprintf(buffer, 64, B_TRANSLATE("Partition %ld"),
-					partition->ID(), partition);
-				name << buffer;
-			}
+			else
+				name.SetToFormat(B_TRANSLATE("Partition %ld"), (long int)partition->ID());
 		}
 		partition_id id = partition->ID();
 		PartitionView* view = new PartitionView(name.String(), scale, offset,

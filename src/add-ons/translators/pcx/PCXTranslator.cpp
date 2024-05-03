@@ -109,7 +109,7 @@ PCXTranslator::DerivedIdentify(BPositionIO *stream,
 	info->quality = PCX_IN_QUALITY;
 	info->capability = PCX_IN_CAPABILITY;
 	snprintf(info->name, sizeof(info->name), B_TRANSLATE("PCX %lu bit image"),
-		bitsPerPixel);
+		(long int)bitsPerPixel);
 	strcpy(info->MIME, kPCXMimeType);
 
 	return B_OK;

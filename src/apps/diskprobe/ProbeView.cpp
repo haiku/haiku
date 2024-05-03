@@ -1518,10 +1518,10 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 	char buffer[128];
 	if (fDataView->Base() == kHexBase) {
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: 0x%0*Lx"),
-			size * 2, position);
+			size * 2, (long long int)position);
 	} else {
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Native: %lld (0x%0*Lx)"),
-			position, size * 2, position);
+			(long long int)position, size * 2, (long long int)position);
 	}
 
 	fNativeMenuItem->SetLabel(buffer);
@@ -1532,10 +1532,10 @@ ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 	position = B_SWAP_INT64(position) >> (8 * (8 - size));
 	if (fDataView->Base() == kHexBase) {
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: 0x%0*Lx"),
-			size * 2, position);
+			size * 2, (long long int)position);
 	} else {
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Swapped: %lld (0x%0*Lx)"),
-			position, size * 2, position);
+			(long long int)position, size * 2, (long long int)position);
 	}
 
 	fSwappedMenuItem->SetLabel(buffer);
@@ -1560,9 +1560,11 @@ ProbeView::_UpdateBookmarkMenuItems()
 
 		char buffer[128];
 		if (fDataView->Base() == kHexBase)
-			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), block);
-		else
-			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %lld (0x%Lx)"), block, block);
+			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), (long long unsigned)block);
+		else {
+			snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %lld (0x%Lx)"),
+				(long long int)block, (long long unsigned)block);
+		}
 
 		item->SetLabel(buffer);
 	}
@@ -1600,9 +1602,11 @@ ProbeView::_AddBookmark(off_t position)
 
 	char buffer[128];
 	if (fDataView->Base() == kHexBase)
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), block);
-	else
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %lld (0x%Lx)"), block, block);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block 0x%Lx"), (long long unsigned)block);
+	else {
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("Block %lld (0x%Lx)"),
+			(long long int)block, (long long unsigned)block);
+	}
 
 	BMessage* message;
 	item = new BMenuItem(buffer, message = new BMessage(kMsgPositionUpdate));

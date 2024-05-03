@@ -473,8 +473,7 @@ InfoWin::_UpdateAudio()
 
 		fAudioFormatInfo->SetText(info.String());
 
-		uint32 bitsPerSample = 8 * (audioFormat.format
-			& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+		int bitsPerSample = 8 * (audioFormat.format & media_raw_audio_format::B_AUDIO_SIZE_MASK);
 		uint32 channelCount = audioFormat.channel_count;
 		float sr = audioFormat.frame_rate;
 

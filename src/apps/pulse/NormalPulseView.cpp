@@ -279,7 +279,7 @@ NormalPulseView::Draw(BRect rect)
 	if (cpuSpeed > 1000 && (cpuSpeed % 10) == 0)
 		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%.2f GHz"), cpuSpeed / 1000.0f);
 	else
-		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%ld MHz"), cpuSpeed);
+		snprintf(buffer, sizeof(buffer), B_TRANSLATE("%ld MHz"), (long int)cpuSpeed);
 
 	// We can't assume anymore that a CPU clock speed is always static.
 	// Let's compute the best font size for the CPU speed string each time...

@@ -1382,10 +1382,12 @@ ScreenWindow::_UpdateMonitor()
 			&& info.max_pixel_clock != 0) {
 			length = snprintf(text, sizeof(text),
 				B_TRANSLATE("Horizonal frequency:\t%lu - %lu kHz\n"
-				"Vertical frequency:\t%lu - %lu Hz\n\n"
-				"Maximum pixel clock:\t%g MHz"),
-				info.min_horizontal_frequency, info.max_horizontal_frequency,
-				info.min_vertical_frequency, info.max_vertical_frequency,
+					"Vertical frequency:\t%lu - %lu Hz\n\n"
+					"Maximum pixel clock:\t%g MHz"),
+				(long unsigned)info.min_horizontal_frequency,
+				(long unsigned)info.max_horizontal_frequency,
+				(long unsigned)info.min_vertical_frequency,
+				(long unsigned)info.max_vertical_frequency,
 				info.max_pixel_clock / 1000.0);
 		}
 		if (info.serial_number[0] && length < sizeof(text)) {

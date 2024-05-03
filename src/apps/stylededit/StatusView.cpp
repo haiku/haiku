@@ -197,8 +197,7 @@ StatusView::SetStatus(BMessage* message)
 		&& B_OK == message->FindInt32("column", &column))
 	{
 		char info[256];
-		snprintf(info, sizeof(info),
-				B_TRANSLATE("line %d, column %d"), line, column);
+		snprintf(info, sizeof(info), B_TRANSLATE("line %d, column %d"), (int)line, (int)column);
 		fCellText[kPositionCell].SetTo(info);
 	}
 

@@ -738,8 +738,7 @@ VideoConsumer::FtpSave(char* filename)
 		case 2:
 			return B_OK;
 		default:
-			fprintf(stderr, B_TRANSLATE("invalid upload client %ld\n"),
-				fUploadClient);
+			fprintf(stderr, B_TRANSLATE("invalid upload client %ld\n"), (long int)fUploadClient);
 			return EINVAL;
 	}
 

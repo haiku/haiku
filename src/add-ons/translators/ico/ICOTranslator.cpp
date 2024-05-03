@@ -117,10 +117,9 @@ ICOTranslator::DerivedIdentify(BPositionIO *stream,
 	info->group = B_TRANSLATOR_BITMAP;
 	info->quality = ICO_IN_QUALITY;
 	info->capability = ICO_IN_CAPABILITY;
-	snprintf(info->name, sizeof(info->name), 
-		B_TRANSLATE("Windows %s %ld bit image"),
-		type == ICO::kTypeIcon ? B_TRANSLATE("Icon") : B_TRANSLATE("Cursor"), 
-		bitsPerPixel);
+	snprintf(info->name, sizeof(info->name), B_TRANSLATE("Windows %s %ld bit image"),
+		type == ICO::kTypeIcon ? B_TRANSLATE("Icon") : B_TRANSLATE("Cursor"),
+		(long int)bitsPerPixel);
 	strcpy(info->MIME, kICOMimeType);
 
 	return B_OK;

@@ -78,7 +78,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 			details.SetToFormat(
 				B_TRANSLATE_COMMENT("%u × %u, %.2ffps", "Width × Height, fps;"
 				"The '×' is the Unicode multiplication sign U+00D7"),
-				format.Width(), format.Height(),
+				(unsigned)format.Width(), (unsigned)format.Height(),
 				rvf->field_rate / rvf->interlace);
 
 			details << " / ";
@@ -126,7 +126,7 @@ MediaFileInfo::LoadInfo(BMediaFile* file)
 					raf->frame_rate / 1000.f);
 			} else {
 				channels.SetToFormat(B_TRANSLATE("%.1f kHz %ld channel"),
-					raf->frame_rate / 1000.f, raf->channel_count);
+					raf->frame_rate / 1000.f, (long int)raf->channel_count);
 			}
 
 			channels << " / ";

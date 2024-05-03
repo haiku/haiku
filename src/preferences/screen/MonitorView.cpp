@@ -108,7 +108,7 @@ MonitorView::Draw(BRect updateRect)
 	float height = ceilf(fontHeight.ascent + fontHeight.descent);
 
 	char text[64];
-	snprintf(text, sizeof(text), B_TRANSLATE("%ld dpi"), fDPI);
+	snprintf(text, sizeof(text), B_TRANSLATE("%ld dpi"), (long int)fDPI);
 
 	float width = StringWidth(text);
 	if (width > innerRect.Width() || height > innerRect.Height())

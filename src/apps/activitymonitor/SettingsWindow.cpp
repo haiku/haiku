@@ -74,10 +74,11 @@ private:
 			return NULL;
 
 		bigtime_t interval = kUpdateIntervals[level];
-		if ((interval % 1000) == 0)
-			snprintf(fText, sizeof(fText), B_TRANSLATE("%lld sec."), interval / 1000);
-		else
-			snprintf(fText, sizeof(fText), B_TRANSLATE("%lld ms"), interval);
+		if ((interval % 1000) == 0) {
+			snprintf(fText, sizeof(fText), B_TRANSLATE("%lld sec."),
+				(long long int)interval / 1000);
+		} else
+			snprintf(fText, sizeof(fText), B_TRANSLATE("%lld ms"), (long long int)interval);
 
 		return fText;
 	}

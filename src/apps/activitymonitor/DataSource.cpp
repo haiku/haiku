@@ -923,8 +923,8 @@ CPUFrequencyDataSource::_SetCPU(int32 cpu)
 	fCPU = cpu;
 
 	if (SystemInfo().CPUCount() > 1) {
-		fLabel.SetToFormat(B_TRANSLATE("CPU %d speed"), cpu + 1);
-		fShortLabel.SetToFormat(B_TRANSLATE("CPU %d"), cpu + 1);
+		fLabel.SetToFormat(B_TRANSLATE("CPU %d speed"), (int)cpu + 1);
+		fShortLabel.SetToFormat(B_TRANSLATE("CPU %d"), (int)cpu + 1);
 	} else {
 		fLabel = B_TRANSLATE("CPU usage");
 		fShortLabel = B_TRANSLATE("CPU");
@@ -1078,8 +1078,8 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 	fCPU = cpu;
 
 	if (SystemInfo().CPUCount() > 1) {
-		fLabel.SetToFormat(B_TRANSLATE("CPU %d usage"), cpu + 1);
-		fShortLabel.SetToFormat(B_TRANSLATE("CPU %d"), cpu + 1);
+		fLabel.SetToFormat(B_TRANSLATE("CPU %d usage"), (int)cpu + 1);
+		fShortLabel.SetToFormat(B_TRANSLATE("CPU %d"), (int)cpu + 1);
 
 	} else {
 		fLabel = B_TRANSLATE("CPU usage");

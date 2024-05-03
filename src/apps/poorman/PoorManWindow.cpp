@@ -473,7 +473,7 @@ void
 PoorManWindow::UpdateHitsLabel()
 {
 	if (Lock()) {
-		sprintf(fHitsLabel, B_TRANSLATE("Hits: %lu"), GetHits());
+		sprintf(fHitsLabel, B_TRANSLATE("Hits: %lu"), (long unsigned)GetHits());
 		fHitsView->SetText(fHitsLabel);
 
 		Unlock();
