@@ -1,11 +1,11 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libbe	535088175
+1	greek, modern (1453-)	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Με επιφύλαξη παντός δικαιώματος.
 gold master	AboutWindow		gold master
 Undo	TextView		Αναίρεση
 OK	PrintJob		Εντάξει
+OK	Dragger		Εντάξει
 gamma	AboutWindow		gamma
 development	AboutWindow		σε ανάπτυξη
-OK	Dragger		Εντάξει
 Print Server is not responding.	PrintJob		Ο Εξυπηρετητής Εκτυπώσεων δεν ανταποκρίνεται.
 About %app%	AboutMenuItem		Σχετικά με το %app%
 Warning	Dragger		Προειδοποίηση
@@ -28,12 +28,10 @@ Red:	ColorControl		Κόκκινο:
 <empty>	Menu		<άδειο>
 Copy	TextView		Αντιγραφή
 Select all	TextView		Επιλογή όλων
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/δευτ.} other{# bytes/δευτ.}}
 alpha	AboutWindow		alpha
 Error	PrintJob		Σφάλμα
-About %app%	AboutWindow		Σχετικά με το %app%
 About %app…	Dragger		Σχετικά με το %app…
+About %app%	AboutWindow		Σχετικά με το %app%
 Version history:	AboutWindow		Ιστορικό έκδοσης:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ο εντοπισμός της εφαρμογής που αντιστοιχεί στη ρεπλίκα απέτυχε. Δεν παρέχεται υπογραφή εφαρμογής.\n%error
 Blue:	ColorControl		Μπλέ:

@@ -1,11 +1,11 @@
-1	english	x-vnd.Haiku-libbe	535088175
+1	english	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		保留所有权利
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
 OK	PrintJob		确定
+OK	Dragger		确定
 gamma	AboutWindow		伽马
 development	AboutWindow		开发
-OK	Dragger		确定
 Print Server is not responding.	PrintJob		打印服务未响应。
 About %app%	AboutMenuItem		关于 %app%
 Warning	Dragger		警告
@@ -28,12 +28,10 @@ Red:	ColorControl		红色:
 <empty>	Menu		<空>
 Copy	TextView		复制
 Select all	TextView		全选
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		测试
 Error	PrintJob		错误
-About %app%	AboutWindow		关于 %app%
 About %app…	Dragger		关于 %app...
+About %app%	AboutWindow		关于 %app%
 Version history:	AboutWindow		版本历史：
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
 Blue:	ColorControl		蓝色:

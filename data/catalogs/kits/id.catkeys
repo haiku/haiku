@@ -1,11 +1,11 @@
-1	indonesian	x-vnd.Haiku-libbe	535088175
+1	indonesian	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Hak Cipta dilindungi undang-undang.
 gold master	AboutWindow		master emas
 Undo	TextView		Batal
 OK	PrintJob		OKE
+OK	Dragger		OKE
 gamma	AboutWindow		gamma
 development	AboutWindow		pengembangan
-OK	Dragger		OKE
 Print Server is not responding.	PrintJob		Server Cetak tidak merespon.
 About %app%	AboutMenuItem		Tentang %app%
 Warning	Dragger		Peringatan
@@ -28,12 +28,10 @@ Red:	ColorControl		Merah:
 <empty>	Menu		<kosong>
 Copy	TextView		Salin
 Select all	TextView		Pilih semua
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alpha
 Error	PrintJob		Galat
-About %app%	AboutWindow		Tentang %app%
 About %app…	Dragger		Tentang %app…
+About %app%	AboutWindow		Tentang %app%
 Version history:	AboutWindow		Sejarah versi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Tidak dapat menemukan aplikasi untuk replicant tersebut. Tidak ada tanda tangan aplikasi yang disediakan.\n%error
 Blue:	ColorControl		Biru:

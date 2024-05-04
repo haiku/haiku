@@ -1,11 +1,11 @@
-1	danish	x-vnd.Haiku-libbe	535088175
+1	danish	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Alle rettigheder forbeholdes.
 gold master	AboutWindow		guldmaster
 Undo	TextView		Fortryd
 OK	PrintJob		O.k.
+OK	Dragger		O.k.
 gamma	AboutWindow		gamma
 development	AboutWindow		udvikling
-OK	Dragger		O.k.
 Print Server is not responding.	PrintJob		Udskriftsserveren svarer ikke.
 About %app%	AboutMenuItem		Om %app%
 Warning	Dragger		Advarsel
@@ -28,12 +28,10 @@ Red:	ColorControl		Rød:
 <empty>	Menu		<tom>
 Copy	TextView		Kopiér
 Select all	TextView		Vælg alle
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Fejl
-About %app%	AboutWindow		Om %app%
 About %app…	Dragger		Om %app…
+About %app%	AboutWindow		Om %app%
 Version history:	AboutWindow		Versionshistorik:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan ikke finde programmet for replikanten. Ingen programsignatur er angivet.\n%error
 Blue:	ColorControl		Blå:

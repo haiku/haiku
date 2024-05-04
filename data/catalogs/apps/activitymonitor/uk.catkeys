@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Процеси
 Semaphores	DataSource		Семафори
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Файл підкачки
 P-faults	DataSource		Відмови сторінки
 Sems	DataSource		Семафори
 Network receive	DataSource		Отримано по мережі
+%s faults/s	DataSource		%s відмов/с

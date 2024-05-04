@@ -1,11 +1,11 @@
-1	thai	x-vnd.Haiku-libbe	1887867096
+1	thai	x-vnd.Haiku-libbe	1136819888
 All Rights Reserved.	AboutWindow		สงวนลิขสิทธิ์
 gold master	AboutWindow		gold master
 Undo	TextView		เลิกทำ
 OK	PrintJob		ตกลง
+OK	Dragger		ตกลง
 gamma	AboutWindow		แกมม่า
 development	AboutWindow		การพัฒนา
-OK	Dragger		ตกลง
 Print Server is not responding.	PrintJob		เซิร์ฟเวอร์การพิมพ์ไม่ตอบสนอง
 About %app%	AboutMenuItem		เกี่ยวกับ %app%
 Warning	Dragger		คำเตือน
@@ -26,11 +26,10 @@ Red:	ColorControl		แดง:
 <empty>	Menu		<empty>
 Copy	TextView		คัดลอก
 Select all	TextView		เลือกทั้งหมด
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} อื่นๆ{# bytes}}
 alpha	AboutWindow		อัลฟ่า
 Error	PrintJob		ผิดพลาด
-About %app%	AboutWindow		เกี่ยวกับ %app%
 About %app…	Dragger		เกี่ยวกับ %app
+About %app%	AboutWindow		เกี่ยวกับ %app%
 Version history:	AboutWindow		ประวัติเวอร์ชั่น:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		ไม่สามารถค้นหาแอปพลิเคชันสำหรับเรพลิเคชัน ไม่มีลายเซ็นของแอปพลิเคชันระบุ \n%error
 Blue:	ColorControl		ฟ้า:

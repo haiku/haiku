@@ -1,11 +1,11 @@
-1	slovak	x-vnd.Haiku-libbe	1887867096
+1	slovak	x-vnd.Haiku-libbe	1136819888
 All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
 gold master	AboutWindow		gold master
 Undo	TextView		Späť
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gama
 development	AboutWindow		vývoj
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Tlačový server neodpovedá.
 About %app%	AboutMenuItem		O aplikácii %app%
 Warning	Dragger		Upozornenie
@@ -26,11 +26,10 @@ Red:	ColorControl		Červená:
 <empty>	Menu		<prázdne>
 Copy	TextView		Kopírovať
 Select all	TextView		Vybrať všetko
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Chyba
-About %app%	AboutWindow		O aplikácii %app%
 About %app…	Dragger		O aplikácii %app…
+About %app%	AboutWindow		O aplikácii %app%
 Version history:	AboutWindow		História verzií:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nemožno nájsť aplikáciu pre replikanta. Nebol dodaný žiaden podpis aplikácie.\n%error
 Blue:	ColorControl		Modrá:

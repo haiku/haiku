@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Appearance	663472720
+1	turkish	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Denetim kenarlığı
 Control mark	Colors tab		Denetim imi
 Off	AntialiasingSettingsView		Kapalı
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Seçili menü ögesi metni
 Size:	Font Selection view		Boyut:
 Panel background	Colors tab		Panel arka planı
 Plain font:	Font view		Düz yazıtipi:
+Automatically pick secondary colors	Colors tab		İkincil renkleri kendiliğinden seç
 Window tab text	Colors tab		Pencere sekmesi metni
 Navigation pulse	Colors tab		Navigasyon nabzı
 LCD subpixel	AntialiasingSettingsView		LCD altpiksel

@@ -1,11 +1,11 @@
-1	romanian	x-vnd.Haiku-libbe	1737418561
+1	romanian	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 gold master	AboutWindow		versiune finală
 Undo	TextView		Refă
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		dezvoltare
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
 About %app%	AboutMenuItem		Despre %app%
 Warning	Dragger		Avertisment
@@ -17,14 +17,14 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Taie
 Default	Default decorator about box		Implicit
-%s KiB	StringForSize	size unit	%s KiO
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nu se poate șterge acest replicant din locația originală. Viața merge mai departe.
+%s KiB	StringForSize	size unit	%s KiO
 Error	ZombieReplicantView		Eroare
 Paste	TextView		Lipește
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiO/s
-%s TiB	StringForSize	size unit	%s TiO
 Special Thanks:	AboutWindow		Mulţumiri speciale:
+%s TiB	StringForSize	size unit	%s TiO
 Default Haiku window decorator.	Default decorator about box		Decorator de fereastră Haiku implicit.
 %s GiB	StringForSize	size unit	%s GiO
 Remove replicant	Dragger		Elimină replicantul
@@ -33,13 +33,11 @@ Red:	ColorControl		Roșu:
 <empty>	Menu		<empty>
 Copy	TextView		Copiază
 Select all	TextView		Selectează toate
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Eroare
 %s TiB/s	StringForRate	units per second	%s TiO/s
-About %app%	AboutWindow		Despre %app%
 About %app…	Dragger		Despre %app…
+About %app%	AboutWindow		Despre %app%
 %s GiB/s	StringForRate	units per second	%s GiO/s
 Version history:	AboutWindow		Istoricul versiunii:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate localiza aplicația pentru replicant. Nu a fost furnizată nicio semnătură de aplicație.\n%error

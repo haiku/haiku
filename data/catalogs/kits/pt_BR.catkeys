@@ -1,11 +1,11 @@
-1	portuguese (brazil)	x-vnd.Haiku-libbe	535088175
+1	portuguese (brazil)	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Todos os direitos reservados.
 gold master	AboutWindow		cópia mestra
 Undo	TextView		Desfazer
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gama
 development	AboutWindow		desenvolvimento
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Servidor de impressão não está respondendo.
 About %app%	AboutMenuItem		Sobre %app%
 Warning	Dragger		Aviso
@@ -28,12 +28,10 @@ Red:	ColorControl		Vermelho:
 <empty>	Menu		<vazio>
 Copy	TextView		Copiar
 Select all	TextView		Selecionar tudo
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Erro
-About %app%	AboutWindow		Sobre %app%
 About %app…	Dragger		Sobre %app…
+About %app%	AboutWindow		Sobre %app%
 Version history:	AboutWindow		Histórico de versões
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Não é possível localizar o aplicativo para o replicante. Nenhuma assinatura de aplicativo fornecida.\n%error
 Blue:	ColorControl		Azul:

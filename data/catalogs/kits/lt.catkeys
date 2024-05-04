@@ -3,9 +3,9 @@ All Rights Reserved.	AboutWindow		Visos teisės saugomos.
 gold master	AboutWindow		galutinė
 Undo	TextView		Atšaukti
 OK	PrintJob		Gerai
+OK	Dragger		Gerai
 gamma	AboutWindow		gama
 development	AboutWindow		vystoma
-OK	Dragger		Gerai
 Print Server is not responding.	PrintJob		Spausdinimo serveris neatsako.
 About %app%	AboutMenuItem		Apie „%app%“
 Warning	Dragger		Įspėjimas
@@ -26,8 +26,8 @@ Red:	ColorControl		Raudona:
 Copy	TextView		Kopijuoti
 alpha	AboutWindow		alfa
 Error	PrintJob		Klaida
-About %app%	AboutWindow		Apie „%app%“
 About %app…	Dragger		Apie programą „%app“…
+About %app%	AboutWindow		Apie „%app%“
 Version history:	AboutWindow		Versijų istorija:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nepavyko rasti replikantą suteikiančios programos. Nepateiktas programos identifikatorius.\n%error
 Blue:	ColorControl		Mėlyna:

@@ -1,11 +1,11 @@
-1	friulian	x-vnd.Haiku-libbe	535088175
+1	friulian	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Ducj i dirits riservâts.
 gold master	AboutWindow		gold master
 Undo	TextView		Disfe
 OK	PrintJob		Va ben
+OK	Dragger		Va ben
 gamma	AboutWindow		schirie
 development	AboutWindow		disvilup
-OK	Dragger		Va ben
 Print Server is not responding.	PrintJob		Il servidôr di stampe nol rispuint.
 About %app%	AboutMenuItem		Informazions su %app%
 Warning	Dragger		Atenzion
@@ -28,12 +28,10 @@ Red:	ColorControl		Ros:
 <empty>	Menu		<vueit>
 Copy	TextView		Copie
 Select all	TextView		Selezione dut
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# byte}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# byte/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Erôr
-About %app%	AboutWindow		Informazions su %app%
 About %app…	Dragger		Informazions su %app…
+About %app%	AboutWindow		Informazions su %app%
 Version history:	AboutWindow		Cronologjie des versions:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impussibil individuâ la aplicazion pal replicant. Nissune firme di aplicazion furnide.\n%error
 Blue:	ColorControl		Blu:

@@ -2,8 +2,8 @@
 All Rights Reserved.	AboutWindow		Sva prava pridržana.
 Undo	TextView		Poništi
 OK	PrintJob		U redu
-development	AboutWindow		razvoj
 OK	Dragger		U redu
+development	AboutWindow		razvoj
 Print Server is not responding.	PrintJob		Poslužitelj ispisa ne odgovara.
 About %app%	AboutMenuItem		O %app%
 Warning	Dragger		Upozorenje
@@ -23,8 +23,8 @@ Copy	TextView		Kopiraj
 Select all	TextView		Odaberi sve
 alpha	AboutWindow		alfa
 Error	PrintJob		Greška
-About %app%	AboutWindow		O %app%
 About %app…	Dragger		O %app%...
+About %app%	AboutWindow		O %app%
 Version history:	AboutWindow		Povijest verzija:
 Blue:	ColorControl		Plavo:
 Written by:	AboutWindow		Napisao:

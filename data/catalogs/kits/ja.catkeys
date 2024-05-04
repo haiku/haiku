@@ -1,11 +1,11 @@
-1	japanese	x-vnd.Haiku-libbe	1737418561
+1	japanese	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		ゴールデンマスター
 Undo	TextView		元に戻す
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		γ
 development	AboutWindow		開発版
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。
 About %app%	AboutMenuItem		%app% について
 Warning	Dragger		警告
@@ -17,14 +17,14 @@ beta	AboutWindow		β
 OK	ZombieReplicantView		OK
 Cut	TextView		切り取り
 Default	Default decorator about box		デフォルト
-%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		このレプリカントを元々のアプリケーションから削除することはできません。現状を維持します。
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		エラー
 Paste	TextView		貼り付け
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Special Thanks:
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		デフォルトの Haiku ウィンドウデコレーター。
 %s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		レプリカントの削除
@@ -33,13 +33,11 @@ Red:	ColorControl		赤:
 <empty>	Menu		<空>
 Copy	TextView		コピー
 Select all	TextView		すべて選択
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# バイト} other{# バイト}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		α
 Error	PrintJob		エラー
 %s TiB/s	StringForRate	units per second	%s TiB/s
-About %app%	AboutWindow		%app% について
 About %app…	Dragger		%appについて...
+About %app%	AboutWindow		%app% について
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		改訂履歴:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error

@@ -1,11 +1,11 @@
-1	esperanto	x-vnd.Haiku-libbe	535088175
+1	esperanto	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Ĉiuj rajtoj estas rezervitaj.
 gold master	AboutWindow		ora mastro
 Undo	TextView		Malfari
 OK	PrintJob		Bone
+OK	Dragger		Bone
 gamma	AboutWindow		gamo
 development	AboutWindow		kostrukciado
-OK	Dragger		Bone
 Print Server is not responding.	PrintJob		Servilo de presado ne respondas.
 About %app%	AboutMenuItem		Pri %app%
 Warning	Dragger		Averto
@@ -28,12 +28,10 @@ Red:	ColorControl		Ruĝa:
 <empty>	Menu		<malplena>
 Copy	TextView		Kopii
 Select all	TextView		Elekti ĉion
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# bitoko} other{# bitokoj}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# bitoko/s} other{# bitokoj/s}}
 alpha	AboutWindow		alfo
 Error	PrintJob		Eraro
-About %app%	AboutWindow		Pri %app%
 About %app…	Dragger		Pri %app…
+About %app%	AboutWindow		Pri %app%
 Version history:	AboutWindow		Historio de versioj:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ne povas trovi la programon por la replikilo. Subskribo por programo ne estas disponita.\n%error
 Blue:	ColorControl		Blua:

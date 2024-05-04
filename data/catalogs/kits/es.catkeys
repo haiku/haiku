@@ -1,11 +1,11 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	535088175
+1	spanish; castilian	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Todos los derechos reservados.
 gold master	AboutWindow		maestro dorado
 Undo	TextView		Deshacer
 OK	PrintJob		Aceptar
+OK	Dragger		Aceptar
 gamma	AboutWindow		gama
 development	AboutWindow		desarrollo
-OK	Dragger		Aceptar
 Print Server is not responding.	PrintJob		El servidor de impresión no responde.
 About %app%	AboutMenuItem		Acerca de %app%
 Warning	Dragger		Advertencia
@@ -28,12 +28,10 @@ Red:	ColorControl		Rojo:
 <empty>	Menu		<vacío>
 Copy	TextView		Copiar
 Select all	TextView		Seleccionar todo
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Error
-About %app%	AboutWindow		Acerca de %app%
 About %app…	Dragger		Acerca de %app…
+About %app%	AboutWindow		Acerca de %app%
 Version history:	AboutWindow		Historal de versión:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No se puede localizar la aplicación para el replicante. Ninguna firma de aplicación se proporcionó:\n%error
 Blue:	ColorControl		Azul:

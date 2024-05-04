@@ -48,7 +48,7 @@ Device name	DeviceACPI		Назва пристрою
 Card Reader	DeviceSCSI		Кардрідер
 Display controller	Device		Контролер дисплея
 ACPI Button '%1'	DeviceACPI		Кнопка ACPI '%1'
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
+ACPI <unknown>	DeviceACPI		ACPI <невідомий>
 Device name	DevicePCI		Назва пристрою
 Disk Drive	DeviceSCSI		Дисковий привід
 Report compatibility	DevicesView		Звіт про сумісність

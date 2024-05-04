@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Appearance	663472720
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Kontrollkant
 Control mark	Colors tab		Kontrollmerke
 Off	AntialiasingSettingsView		Av
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Tekstfarge på valgt menyelement
 Size:	Font Selection view		Størrelse:
 Panel background	Colors tab		Panelbakgrunn
 Plain font:	Font view		Vanlig font:
+Automatically pick secondary colors	Colors tab		Velg sekundære farger automatisk
 Window tab text	Colors tab		Vindusfanetekst
 Navigation pulse	Colors tab		Navigasjonspuls
 LCD subpixel	AntialiasingSettingsView		LCD subpixel

@@ -1,11 +1,11 @@
-1	swedish	x-vnd.Haiku-libbe	1737418561
+1	swedish	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 gold master	AboutWindow		guld mästare
 Undo	TextView		Ångra
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		utveckling
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.
 About %app%	AboutMenuItem		Om %app%
 Warning	Dragger		Varning
@@ -17,14 +17,14 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Klippa ut
 Default	Default decorator about box		Standard
-%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Kan inte ta bort replikanten från dess program. Livet fortsätter som vanligt.
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		Fel
 Paste	TextView		Klistra in
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Särskilt tack till:
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Standard Haiku window decorator.
 %s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Ta bort replikant
@@ -33,13 +33,11 @@ Red:	ColorControl		Röd:
 <empty>	Menu		<tom>
 Copy	TextView		Kopiera
 Select all	TextView		Markera allt
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Fel
 %s TiB/s	StringForRate	units per second	%s TiB/s
-About %app%	AboutWindow		Om %app%
 About %app…	Dragger		Om %app...
+About %app%	AboutWindow		Om %app%
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Versionshistorik:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error

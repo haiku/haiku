@@ -9,7 +9,7 @@ Or	FindPanel		Eller
 MIME Description	AttributesView		MIME-beskrivelse
 before	FindPanel		før
 Volume icons	TrackerSettingsWindow		Volumikoner
-Ignore case	SelectionWindow		Ikke skill mellom stor og liten bokstav
+Ignore case	SelectionWindow		Ikke skill mellom store og små bokstaver
 Current folder	ContainerWindow		Nåværende mappe
 Finish: %time - Over %finishtime left	StatusWindow		Ferdig: %time - Mer enn %finishtime left
 Mount all disks now	AutoMounterSettings		Monter alle disker nå

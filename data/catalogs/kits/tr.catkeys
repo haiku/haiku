@@ -1,11 +1,11 @@
-1	turkish	x-vnd.Haiku-libbe	1737418561
+1	turkish	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
 gold master	AboutWindow		altın kopya
 Undo	TextView		Geri al
 OK	PrintJob		Tamam
+OK	Dragger		Tamam
 gamma	AboutWindow		gama
 development	AboutWindow		geliştirme
-OK	Dragger		Tamam
 Print Server is not responding.	PrintJob		Yazdırma sunucusu yanıt vermiyor.
 About %app%	AboutMenuItem		%app% hakkında
 Warning	Dragger		Uyarı
@@ -17,14 +17,14 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		Tamam
 Cut	TextView		Kes
 Default	Default decorator about box		Saptanmış
-%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Bu yinelenen kendi özgün uygulamasından silinemiyor.
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		Hata
 Paste	TextView		Yapıştır
 OK	AboutWindow		Tamam
 %s MiB/s	StringForRate	units per second	%s MiB/sn
-%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Özel teşekkürlerimizle:
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Saptanmış Haiku pencere dekorcusu.
 %s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Yineleneni kaldır
@@ -33,13 +33,11 @@ Red:	ColorControl		Kırmızı:
 <empty>	Menu		<boş>
 Copy	TextView		Kopyala
 Select all	TextView		Tümünü seç
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# bayt} other{# bayt}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# bayt/sn} other{# bayt/sn}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Hata
 %s TiB/s	StringForRate	units per second	%s TiB/sn
-About %app%	AboutWindow		%app% hakkında
 About %app…	Dragger		%app hakkında…
+About %app%	AboutWindow		%app% hakkında
 %s GiB/s	StringForRate	units per second	%s GiB/sn
 Version history:	AboutWindow		Sürüm geçmişi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenen uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error

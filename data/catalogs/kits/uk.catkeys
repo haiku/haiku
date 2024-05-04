@@ -1,11 +1,11 @@
-1	ukrainian	x-vnd.Haiku-libbe	535088175
+1	ukrainian	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
 Undo	TextView		Відмінити
 OK	PrintJob		ОК
+OK	Dragger		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		розробка
-OK	Dragger		ОК
 Print Server is not responding.	PrintJob		Принт-сервер недоступний.
 About %app%	AboutMenuItem		Про %app%
 Warning	Dragger		Попередження
@@ -13,29 +13,35 @@ Green:	ColorControl		Зелений:
 Redo	TextView		Повтор дії
 No pages to print!	PrintJob		Жодної сторінки для друку!
 beta	AboutWindow		бета
+%s MiB	StringForSize	size unit	%s MБ
 OK	ZombieReplicantView		ОК
 Cut	TextView		Вирізати
 Default	Default decorator about box		За замовчуванням
 Can't delete this replicant from its original application. Life goes on.	Dragger		Не вдалося видалити реплікант з оригінальної програми. Життя продовжується.
+%s KiB	StringForSize	size unit	%s кБ
 Error	ZombieReplicantView		Помилка
 Paste	TextView		Вставити
 OK	AboutWindow		ОК
+%s MiB/s	StringForRate	units per second	%s MБ/с
 Special Thanks:	AboutWindow		Особлива подяка:
+%s TiB	StringForSize	size unit	%s TБ
 Default Haiku window decorator.	Default decorator about box		Декоратор вікон Haiku за замовчуванням.
+%s GiB	StringForSize	size unit	%s ГБ
 Remove replicant	Dragger		Прибрати реплікант
 Version	AboutWindow		Версія
 Red:	ColorControl		Червоний:
 <empty>	Menu		<пусто>
 Copy	TextView		Копіювати
 Select all	TextView		Вибрати все
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# байт} few{# байти} other{# байтів}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# байт/с} few{# байти/с} other{# байтів/с}}
 alpha	AboutWindow		альфа
 Error	PrintJob		Помилка
-About %app%	AboutWindow		Про %app%
+%s TiB/s	StringForRate	units per second	%s TБ/с
 About %app…	Dragger		Про %app…
+About %app%	AboutWindow		Про %app%
+%s GiB/s	StringForRate	units per second	%s ГБ/с
 Version history:	AboutWindow		Історія версій:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити програму для репліканта. Не знайдено сигнатуру програми.\n%error
+%s KiB/s	StringForRate	units per second	%s кБ/с
 Blue:	ColorControl		Синій:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%description\".\n%error
 Written by:	AboutWindow		Автор:

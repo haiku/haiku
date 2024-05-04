@@ -1,11 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-libbe	535088175
+1	dutch; flemish	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Alle rechten voorbehouden.
 gold master	AboutWindow		gold master
 Undo	TextView		Ongedaan maken
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		in ontwikkeling
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Print Server antwoordt niet.
 About %app%	AboutMenuItem		Over %app%
 Warning	Dragger		Waarschuwing
@@ -28,12 +28,10 @@ Red:	ColorControl		Rood:
 <empty>	Menu		<leeg>
 Copy	TextView		Kopiëren
 Select all	TextView		Alles selecteren
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alpha
 Error	PrintJob		Fout
-About %app%	AboutWindow		Over %app%
 About %app…	Dragger		Over %app...
+About %app%	AboutWindow		Over %app%
 Version history:	AboutWindow		Versiegeschiedenis:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		De applicatie voor de replica kan niet gelocaliseerd worden. Er is geen applicatiehandtekening gegeven.\n%error
 Blue:	ColorControl		Blauw:

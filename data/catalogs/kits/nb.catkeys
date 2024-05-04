@@ -1,11 +1,11 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libbe	1737418561
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		Alle rettigheter forbeholdt.
 gold master	AboutWindow		gold master
 Undo	TextView		Tilbakestill
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		development
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Print Server svarer ikke.
 About %app%	AboutMenuItem		Om %app%
 Warning	Dragger		Advarsel
@@ -17,14 +17,14 @@ beta	AboutWindow		beta
 OK	ZombieReplicantView		OK
 Cut	TextView		Klipp ut
 Default	Default decorator about box		Standard
-%s KiB	StringForSize	size unit	%s KiB
 Can't delete this replicant from its original application. Life goes on.	Dragger		Kan ikke slette denne replikanten fra den opprinnelige applikasjonen. Livet går videre.
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		Feil
 Paste	TextView		Lim inn
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s MiB/s
-%s TiB	StringForSize	size unit	%s TiB
 Special Thanks:	AboutWindow		Spesiell takk:
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Standard Haiku vindusdekorator.
 %s GiB	StringForSize	size unit	%s GiB
 Remove replicant	Dragger		Fjern replikant
@@ -33,13 +33,11 @@ Red:	ColorControl		Rød:
 <empty>	Menu		<tom>
 Copy	TextView		Kopier
 Select all	TextView		Velg alle
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# byte} other{# bytes}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# byte/s} other{# bytes/s}}
 alpha	AboutWindow		alpha
 Error	PrintJob		Feil
 %s TiB/s	StringForRate	units per second	%s TiB/s
-About %app%	AboutWindow		Om %app%
 About %app…	Dragger		Om %app...
+About %app%	AboutWindow		Om %app%
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Versjonshistorikk:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan ikke finne applikasjonen for replikanten. Ingen programsignatur oppgitt.\n%error

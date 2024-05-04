@@ -1,11 +1,11 @@
-1	french	x-vnd.Haiku-libbe	1737418561
+1	french	x-vnd.Haiku-libbe	2539827825
 All Rights Reserved.	AboutWindow		Tous droits réservés.
 gold master	AboutWindow		finale
 Undo	TextView		Annuler
 OK	PrintJob		OK
+OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		développement
-OK	Dragger		OK
 Print Server is not responding.	PrintJob		Le serveur d’impression ne répond pas.
 About %app%	AboutMenuItem		À propos de %app%
 Warning	Dragger		Avertissement
@@ -17,14 +17,14 @@ beta	AboutWindow		bêta
 OK	ZombieReplicantView		OK
 Cut	TextView		Couper
 Default	Default decorator about box		Par défaut
-%s KiB	StringForSize	size unit	%s Kio
 Can't delete this replicant from its original application. Life goes on.	Dragger		Impossible de supprimer ce réplicant à partir de son application d’origine. La vie continue.
+%s KiB	StringForSize	size unit	%s Kio
 Error	ZombieReplicantView		Erreur
 Paste	TextView		Coller
 OK	AboutWindow		OK
 %s MiB/s	StringForRate	units per second	%s Mio/s
-%s TiB	StringForSize	size unit	%s Tio
 Special Thanks:	AboutWindow		Remerciements particuliers :
+%s TiB	StringForSize	size unit	%s Tio
 Default Haiku window decorator.	Default decorator about box		Décorateur de fenêtre Haiku par défaut.
 %s GiB	StringForSize	size unit	%s Gio
 Remove replicant	Dragger		Enlever le réplicant
@@ -33,13 +33,11 @@ Red:	ColorControl		Rouge :
 <empty>	Menu		<vide>
 Copy	TextView		Copier
 Select all	TextView		Sélectionner tout
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# octet} other{# octets}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# octet/s} other{# octets/s}}
 alpha	AboutWindow		alpha
 Error	PrintJob		Erreur
 %s TiB/s	StringForRate	units per second	%s Tio/s
-About %app%	AboutWindow		À propos de %app%
 About %app…	Dragger		À propos de %app…
+About %app%	AboutWindow		À propos de %app%
 %s GiB/s	StringForRate	units per second	%s Gio/s
 Version history:	AboutWindow		Historique des versions :
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l’application du réplicant. Aucune signature d’application fournie.\n%error

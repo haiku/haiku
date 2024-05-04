@@ -1,11 +1,11 @@
-1	russian	x-vnd.Haiku-libbe	535088175
+1	russian	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		Все права защищены.
 gold master	AboutWindow		золотая
 Undo	TextView		Отменить
 OK	PrintJob		ОК
+OK	Dragger		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		в разработке
-OK	Dragger		ОК
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
 About %app%	AboutMenuItem		О программе…
 Warning	Dragger		Внимание
@@ -28,12 +28,10 @@ Red:	ColorControl		Красный:
 <empty>	Menu		<пусто>
 Copy	TextView		Копировать
 Select all	TextView		Выделить все
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# байт} few{# байта} other{# байтов}}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# байт/с} few{# байта/с} other{# байтов/с}}
 alpha	AboutWindow		альфа
 Error	PrintJob		Ошибка
-About %app%	AboutWindow		О программе…
 About %app…	Dragger		О программе…
+About %app%	AboutWindow		О программе…
 Version history:	AboutWindow		История версий:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
 Blue:	ColorControl		Синий:

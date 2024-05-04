@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2231325175
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3762371345
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -128,6 +128,7 @@ No user ratings available.	PackageInfoView		Оцінювання користу�
 <no info>	PackageInfoView		<немає інформації>
 Usage conditions download problem	UserUsageConditions		Проблеми при завантаженні Умов користування
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Під час завантаження вимог до пароля, необхідних для створення нового користувача, виникла помилка. Перегляньте подробиці в журналі та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна у розділі HaikuDepot Посібника користувача Haiku.
+Fetching screenshot	CacheScreenshotProcess		Отримую знімок екрана
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм

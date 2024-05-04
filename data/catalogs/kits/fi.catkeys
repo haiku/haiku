@@ -1,11 +1,11 @@
-1	finnish	x-vnd.Haiku-libbe	535088175
+1	finnish	x-vnd.Haiku-libbe	1337497439
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		gold master
 Undo	TextView		Peru
 OK	PrintJob		Valmis
+OK	Dragger		Valmis
 gamma	AboutWindow		gamma
 development	AboutWindow		ohjelmakehitys
-OK	Dragger		Valmis
 Print Server is not responding.	PrintJob		Tulostuspalvelin ei vastaa.
 About %app%	AboutMenuItem		Ohjelmasta %app%
 Warning	Dragger		Varoitus
@@ -28,12 +28,10 @@ Red:	ColorControl		Punainen:
 <empty>	Menu		<tyhjä>
 Copy	TextView		Kopioi
 Select all	TextView		Valitse kaikki
-{0, plural, one{# byte} other{# bytes}}	StringForSize	size unit	{0, plural, one{# merkki} other{# merkkiä}
-{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate	bytes per second	{0, plural, one{# tavu/s} other{# tavua/s}}
 alpha	AboutWindow		alfa
 Error	PrintJob		Virhe
-About %app%	AboutWindow		Ohjelmasta %app%
 About %app…	Dragger		Ohjelmasta %app...
+About %app%	AboutWindow		Ohjelmasta %app%
 Version history:	AboutWindow		Versiohistoria:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kopion sovelluksen paikantaminen epäonnistui. Sovellusallekirjoitusta ei ole tarjottu.\n%error
 Blue:	ColorControl		Sininen:

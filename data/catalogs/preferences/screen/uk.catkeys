@@ -1,10 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Screen	3410763711
+1	ukrainian	x-vnd.Haiku-Screen	2577971458
 no	Screen		ні
 bits/pixel	Screen		бітів/піксель
 15 bits/pixel, 32768 colors	Screen		15 біт/піксель, 32768 кольорів
 Rows:	Screen		Рядки:
 %.1f Hz	Screen		%.1f Гц
 The screen mode could not be set:\n\t%s\n	Screen		Не вдалося встановити режим екрану:\n\t%s\n
+Serial no.: %s	Screen		Серійний номер: %s
 /other…	Screen		/інше…
 Keep	Screen		Зберегти
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Горизонтальна частота:\t%lu - %lu кГц\nВертикальна частота:\t%lu - %lu Гц\n\nМаксимально пікселів:\t%g МГц
@@ -17,6 +18,7 @@ Current workspace	Screen		Поточна робоча область
 vertically	Screen		вертикально
 All workspaces	Screen		Всі робочі області
 Use laptop panel:	Screen		Використовувати панель ноутбука:
+Unknown	Screen		Невідомий
 Could not write VESA mode settings file:\n\t	Screen		Не вдалося записати файл налаштувань режиму VESA :\n\t
 Display info	Screen		Інфо про дісплей
 Settings will revert in %seconds.	Screen		Відкат налаштувань через %seconds.

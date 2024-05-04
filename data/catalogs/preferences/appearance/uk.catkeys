@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Appearance	663472720
+1	ukrainian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Рамка елемента
 Control mark	Colors tab		Відмітка
 Off	AntialiasingSettingsView		Вимкнено
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Текст вибраного елемент
 Size:	Font Selection view		Розмір:
 Panel background	Colors tab		Фон панелі
 Plain font:	Font view		Простий шрифт:
+Automatically pick secondary colors	Colors tab		Автоматично вибирати інші кольори
 Window tab text	Colors tab		Текст заголовку вікна
 Navigation pulse	Colors tab		Навігація pulse
 LCD subpixel	AntialiasingSettingsView		Субпіксельне згладжування
