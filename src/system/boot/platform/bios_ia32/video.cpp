@@ -708,13 +708,14 @@ video_mode_menu()
 }
 
 
-static void
+static status_t
 set_vga_mode(void)
 {
 	// sets 640x480 16 colors graphics mode
 	bios_regs regs;
 	regs.eax = 0x0012;
 	call_bios(0x10, &regs);
+	return (regs.eax == 0x4f) ? B_OK : B_NOT_SUPPORTED;
 }
 
 
@@ -872,8 +873,11 @@ platform_switch_to_logo(void)
 		gKernelArgs.frame_buffer.physical_buffer.start = modeInfo.physical_base;
 	} else {
 fallback:
-		// use standard VGA mode 640x480x4
-		set_vga_mode();
+		// try to use standard VGA mode 640x480x4
+		if (set_vga_mode() != B_OK) {
+			dprintf("no standard VGA output\n");
+			return;
+		}
 
 		gKernelArgs.frame_buffer.width = 640;
 		gKernelArgs.frame_buffer.height = 480;
