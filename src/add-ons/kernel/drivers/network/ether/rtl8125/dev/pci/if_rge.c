@@ -286,7 +286,7 @@ rge_attach(struct device *parent, struct device *self, void *aux)
 		if (intrstr != NULL)
 			printf(" at %s", intrstr);
 		printf("\n");
-		return;
+		goto fail;
 	}
 	printf(": %s", intrstr);
 
