@@ -555,6 +555,15 @@ extern const float kExactMatchScore;
 float ComputeTypeAheadScore(const char* text, const char* match,
 	bool wordMode = false);
 
+
+inline float
+ActualFontHeight(const BView* view)
+{
+	font_height height;
+	view->GetFontHeight(&height);
+	return height.ascent + height.descent + 1;
+}
+
 } // namespace BPrivate
 
 

@@ -502,7 +502,7 @@ BPose::PointInPose(const BPoseView* poseView, BPoint where) const
 		}
 
 		rect.top = location.y + poseView->IconSizeInt();
-		rect.bottom = rect.top + poseView->FontHeight();
+		rect.bottom = rect.top + ActualFontHeight(poseView);
 
 		return rect.Contains(where);
 	}
@@ -967,8 +967,8 @@ BPose::CalcRect(const BPoseView* poseView) const
 
 		// big font sizes can push top above icon location top
 		rect.bottom = location.y
-			+ roundf((B_MINI_ICON + poseView->FontHeight()) / 2);
-		rect.top = rect.bottom - floorf(poseView->FontHeight());
+			+ roundf((B_MINI_ICON + ActualFontHeight(poseView)) / 2) + 1;
+		rect.top = rect.bottom - floorf(ActualFontHeight(poseView));
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget != NULL)
 			rect.right += ceil(widget->TextWidth(poseView) + 1);
