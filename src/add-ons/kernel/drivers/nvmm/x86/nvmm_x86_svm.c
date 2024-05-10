@@ -26,15 +26,20 @@
  * SUCH DAMAGE.
  */
 
+#if defined(__HAIKU__)
+#include "../nvmm_os.h"
+#else
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/kernel.h>
 #include <sys/mman.h>
+#endif
 
 #include "../nvmm.h"
 #include "../nvmm_internal.h"
 #include "nvmm_x86.h"
 
+#if 0
 void svm_vmrun(paddr_t, uint64_t *);
 
 static inline void
@@ -48,6 +53,7 @@ svm_stgi(void)
 {
 	__asm volatile ("stgi" ::: "memory");
 }
+#endif
 
 #define	MSR_VM_HSAVE_PA	0xC0010117
 
@@ -492,9 +498,16 @@ static struct {
 
 struct svm_hsave {
 	paddr_t pa;
+#if defined(__HAIKU__)
+	vaddr_t va;
+#endif
 };
 
+#if defined(__HAIKU__)
+static struct svm_hsave *hsave;
+#else
 static struct svm_hsave hsave[OS_MAXCPUS];
+#endif
 
 static uint8_t *svm_asidmap __read_mostly;
 static uint32_t svm_maxasid __read_mostly;
@@ -529,6 +542,7 @@ static uint64_t svm_xcr0_mask __read_mostly;
 
 /* -------------------------------------------------------------------------- */
 
+#if 0
 struct svm_machdata {
 	volatile uint64_t mach_htlb_gen;
 };
@@ -819,11 +833,13 @@ svm_inkernel_advance(struct vmcb *vmcb)
 	vmcb->ctrl.intr &= ~VMCB_CTRL_INTR_SHADOW;
 }
 
+#endif
 #define SVM_CPUID_MAX_BASIC		0xD
 #define SVM_CPUID_MAX_HYPERVISOR	0x40000000
 #define SVM_CPUID_MAX_EXTENDED		0x8000001F
 static uint32_t svm_cpuid_max_basic __read_mostly;
 static uint32_t svm_cpuid_max_extended __read_mostly;
+#if 0
 
 static void
 svm_inkernel_exec_cpuid(struct svm_cpudata *cpudata, uint32_t eax, uint32_t ecx)
@@ -1361,8 +1377,10 @@ svm_exit_invalid(struct nvmm_vcpu_exit *exit, uint64_t code)
 	exit->reason = NVMM_VCPU_EXIT_INVALID;
 }
 
+#endif // 0
 /* -------------------------------------------------------------------------- */
 
+#if 0
 static void
 svm_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 {
@@ -1454,9 +1472,11 @@ svm_vcpu_guest_misc_leave(struct nvmm_cpu *vcpu)
 	wrmsr(MSR_FSBASE, cpudata->hstate.fsbase);
 	wrmsr(MSR_KERNELGSBASE, cpudata->hstate.kernelgsbase);
 }
+#endif
 
 /* -------------------------------------------------------------------------- */
 
+#if 0
 static inline void
 svm_gtlb_catchup(struct nvmm_cpu *vcpu, int hcpu)
 {
@@ -1721,9 +1741,11 @@ svm_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 
 	return error;
 }
+#endif
 
 /* -------------------------------------------------------------------------- */
 
+#if 0
 #define SVM_MSRBM_READ	__BIT(0)
 #define SVM_MSRBM_WRITE	__BIT(1)
 
@@ -2099,9 +2121,11 @@ svm_vcpu_state_commit(struct nvmm_cpu *vcpu)
 	vcpu->comm->state_commit = 0;
 	svm_vcpu_setstate(vcpu);
 }
+#endif // 0
 
 /* -------------------------------------------------------------------------- */
 
+#if 0
 static void
 svm_asid_alloc(struct nvmm_cpu *vcpu)
 {
@@ -2349,9 +2373,11 @@ svm_vcpu_destroy(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 
 	os_pagemem_free(cpudata, sizeof(*cpudata));
 }
+#endif
 
 /* -------------------------------------------------------------------------- */
 
+#if 0
 static int
 svm_vcpu_configure_cpuid(struct svm_cpudata *cpudata, void *data)
 {
@@ -2419,9 +2445,11 @@ svm_vcpu_configure(struct nvmm_cpu *vcpu, uint64_t op, void *data)
 		return EINVAL;
 	}
 }
+#endif
 
 /* -------------------------------------------------------------------------- */
 
+#if 0
 #ifdef __NetBSD__
 static void
 svm_tlb_flush(struct pmap *pm)
@@ -2472,6 +2500,7 @@ svm_machine_configure(struct nvmm_machine *mach, uint64_t op, void *data)
 {
 	panic("%s: impossible", __func__);
 }
+#endif // 0
 
 /* -------------------------------------------------------------------------- */
 
@@ -2622,9 +2651,23 @@ svm_init(void)
 	svm_global_hstate.cstar = rdmsr(MSR_CSTAR);
 	svm_global_hstate.sfmask = rdmsr(MSR_SFMASK);
 
+#if defined(__HAIKU__)
+	hsave = os_mem_zalloc(sizeof(struct svm_hsave) * haiku_smp_get_num_cpus());
+#else
 	memset(hsave, 0, sizeof(hsave));
+#endif
 	OS_CPU_FOREACH(cpu) {
+#if defined(__HAIKU__)
+		int32 cpu_index = os_cpu_number(cpu);
+		paddr_t *pa = &hsave[cpu_index].pa;
+		vaddr_t *va = &hsave[cpu_index].va;
+		int error = os_contigpa_zalloc(pa, va, 1);
+		if (error) {
+			panic("%s: out of memory", __func__);
+		}
+#else
 		hsave[os_cpu_number(cpu)].pa = os_pa_zalloc();
+#endif
 	}
 
 	os_ipi_broadcast(svm_change_cpu, (void *)true);
@@ -2648,12 +2691,25 @@ svm_fini(void)
 
 	os_ipi_broadcast(svm_change_cpu, (void *)false);
 
+#if defined(__HAIKU__)
+	size_t n_cpus = haiku_smp_get_num_cpus();
+	for (i = 0; i < n_cpus; i++) {
+#else
 	for (i = 0; i < OS_MAXCPUS; i++) {
+#endif
 		if (hsave[i].pa != 0)
+#if defined(__HAIKU__)
+			os_contigpa_free(hsave[i].pa, hsave[i].va, 1);
+#else
 			os_pa_free(hsave[i].pa);
+#endif
 	}
 
 	svm_fini_asid();
+#if defined(__HAIKU__)
+	// second argument is ignored
+	os_mem_free(hsave, 0);
+#endif
 }
 
 static void
@@ -2672,7 +2728,7 @@ const struct nvmm_impl nvmm_x86_svm = {
 	.ident = svm_ident,
 	.init = svm_init,
 	.fini = svm_fini,
-	.capability = svm_capability,
+	.capability = svm_capability/*,
 	.mach_conf_max = NVMM_X86_MACH_NCONF,
 	.mach_conf_sizes = NULL,
 	.vcpu_conf_max = NVMM_X86_VCPU_NCONF,
@@ -2687,5 +2743,5 @@ const struct nvmm_impl nvmm_x86_svm = {
 	.vcpu_setstate = svm_vcpu_setstate,
 	.vcpu_getstate = svm_vcpu_getstate,
 	.vcpu_inject = svm_vcpu_inject,
-	.vcpu_run = svm_vcpu_run
+	.vcpu_run = svm_vcpu_run*/
 };

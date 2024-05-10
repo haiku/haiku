@@ -43,6 +43,8 @@
 #define NVMM_MAX_RAM		(128ULL * (1 << 30))
 #elif defined(__DragonFly__)
 #define NVMM_MAX_RAM		(127ULL * 1024ULL * (1 << 30))
+#elif defined(__HAIKU__)
+#define NVMM_MAX_RAM            (128ULL * (1 << 30))
 #else
 #error "OS dependency for NVMM_MAX_RAM required"
 #endif
@@ -88,7 +90,7 @@ struct nvmm_machine {
 	os_vmobj_t *commvmobj;
 
 	/* Kernel */
-	struct vmspace *vm;
+	os_vmspace_t *vm;
 	gpaddr_t gpa_begin;
 	gpaddr_t gpa_end;
 

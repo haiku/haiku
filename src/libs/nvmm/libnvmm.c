@@ -38,6 +38,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#if defined(__HAIKU__)
+#include <machine/specialreg.h>
+#endif
+
 #include "nvmm.h"
 
 static struct nvmm_capability __capability;
@@ -160,7 +164,11 @@ nvmm_init(void)
 {
 	if (nvmm_fd != -1)
 		return 0;
+#if defined(__HAIKU__)
+	nvmm_fd = open("/dev/misc/nvmm", O_RDONLY | O_CLOEXEC);
+#else
 	nvmm_fd = open("/dev/nvmm", O_RDONLY | O_CLOEXEC);
+#endif
 	if (nvmm_fd == -1)
 		return -1;
 	if (nvmm_capability(&__capability) == -1) {
@@ -171,7 +179,11 @@ nvmm_init(void)
 	if (__capability.version != NVMM_KERN_VERSION) {
 		close(nvmm_fd);
 		nvmm_fd = -1;
+#if defined(__HAIKU__)
+		errno = EPERM;
+#else
 		errno = EPROGMISMATCH;
+#endif
 		return -1;
 	}
 
@@ -183,7 +195,11 @@ nvmm_root_init(void)
 {
 	if (nvmm_fd != -1)
 		return 0;
+#if defined(__HAIKU__)
+	nvmm_fd = open("/dev/misc/nvmm", O_WRONLY | O_CLOEXEC);
+#else
 	nvmm_fd = open("/dev/nvmm", O_WRONLY | O_CLOEXEC);
+#endif
 	if (nvmm_fd == -1)
 		return -1;
 	if (nvmm_capability(&__capability) == -1) {
@@ -194,7 +210,11 @@ nvmm_root_init(void)
 	if (__capability.version != NVMM_KERN_VERSION) {
 		close(nvmm_fd);
 		nvmm_fd = -1;
+#if defined(__HAIKU__)
+		errno = EPERM;
+#else
 		errno = EPROGMISMATCH;
+#endif
 		return -1;
 	}
 

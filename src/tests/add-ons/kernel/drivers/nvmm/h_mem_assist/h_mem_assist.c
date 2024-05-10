@@ -32,12 +32,16 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <string.h>
-#include <err.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/mman.h>
+#if defined(__HAIKU__)
+#include <machine/specialreg.h>
+#else
+#include <err.h>
 #include <machine/segments.h>
 #include <machine/psl.h>
+#endif
 
 #include <nvmm.h>
 
@@ -46,13 +50,17 @@
 #include <machine/pte.h>
 #define PAGE_SIZE 4096
 
-#else /* DragonFly */
+#elif defined(__DragonFly__) /* DragonFly */
 
 #include <machine/pmap.h>
 #define PTE_P		X86_PG_V	/* 0x001: P (Valid) */
 #define PTE_W		X86_PG_RW	/* 0x002: R/W (Read/Write) */
 #define PSL_MBO		PSL_RESERVED_DEFAULT	/* 0x00000002 */
 #define SDT_SYS386BSY	SDT_SYSBSY	/* 11: system 64-bit TSS busy */
+
+#elif defined(__HAIKU__)
+
+#include "../haiku_defs.h"
 
 #endif /* __NetBSD__ */
 

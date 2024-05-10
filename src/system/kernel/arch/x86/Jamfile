@@ -21,6 +21,7 @@ local archSpecificSources ;
 if $(TARGET_ARCH) = x86_64 {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 64 ] ;
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 64bit ] ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) paging nested ] ;
 
 	archSpecificSources =
 		arch.S
@@ -40,6 +41,10 @@ if $(TARGET_ARCH) = x86_64 {
 		X86PagingMethod64Bit.cpp
 		X86PagingStructures64Bit.cpp
 		X86VMTranslationMap64Bit.cpp
+		
+		# paging/nested
+		X86PagingMethodEPT.cpp
+		X86VMTranslationMapEPT.cpp
 	;
 } else {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) 32 ] ;

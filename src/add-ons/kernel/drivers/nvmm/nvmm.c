@@ -26,11 +26,13 @@
  * SUCH DAMAGE.
  */
 
+#if defined(__NetBSD__) || defined(__DragonFly__)
 #include <sys/param.h>
 #include <sys/systm.h>
 
 #include <sys/kernel.h>
 #include <sys/mman.h>
+#endif
 
 #include "nvmm.h"
 #include "nvmm_internal.h"
@@ -51,7 +53,6 @@ const struct nvmm_impl *nvmm_impl __read_mostly = NULL;
 struct nvmm_owner nvmm_root_owner;
 
 /* -------------------------------------------------------------------------- */
-
 static int
 nvmm_machine_alloc(struct nvmm_machine **ret)
 {
@@ -68,7 +69,11 @@ nvmm_machine_alloc(struct nvmm_machine **ret)
 		}
 
 		mach->present = true;
+#if defined(__HAIKU__)
+		time(&mach->time);
+#else
 		mach->time = time_second;
+#endif
 		*ret = mach;
 		os_atomic_inc_uint(&nmachines);
 		return 0;
@@ -151,7 +156,9 @@ nvmm_vcpu_alloc(struct nvmm_machine *mach, nvmm_cpuid_t cpuid,
 static void
 nvmm_vcpu_free(struct nvmm_machine *mach, struct nvmm_cpu *vcpu)
 {
+#if !defined(__HAIKU__)
 	OS_ASSERT(os_mtx_owned(&vcpu->lock));
+#endif
 	vcpu->present = false;
 	if (vcpu->comm != NULL) {
 		os_vmobj_unmap(os_kernel_map, (vaddr_t)vcpu->comm,
@@ -381,12 +388,21 @@ nvmm_vcpu_create(struct nvmm_owner *owner, struct nvmm_ioc_vcpu_create *args)
 	if (error)
 		goto out;
 
+#if defined(__HAIKU__)
+	/* Map the comm page on the kernel side, as wired. */
+	error = os_vmobj_map(os_kernel_map, (vaddr_t *)&vcpu->comm,
+	    NVMM_COMM_PAGE_SIZE, mach->commvmobj,
+	    args->cpuid * NVMM_COMM_PAGE_SIZE, true /* wired */,
+	    false /* !fixed */, true /* shared */, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+	    B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+#else
 	/* Map the comm page on the kernel side, as wired. */
 	error = os_vmobj_map(os_kernel_map, (vaddr_t *)&vcpu->comm,
 	    NVMM_COMM_PAGE_SIZE, mach->commvmobj,
 	    args->cpuid * NVMM_COMM_PAGE_SIZE, true /* wired */,
 	    false /* !fixed */, true /* shared */, PROT_READ | PROT_WRITE,
 	    PROT_READ | PROT_WRITE);
+#endif
 	if (error) {
 		nvmm_vcpu_free(mach, vcpu);
 		nvmm_vcpu_put(vcpu);
@@ -395,12 +411,21 @@ nvmm_vcpu_create(struct nvmm_owner *owner, struct nvmm_ioc_vcpu_create *args)
 
 	memset(vcpu->comm, 0, NVMM_COMM_PAGE_SIZE);
 
+#if defined(__HAIKU__)
+	os_vmmap_t *os_curproc_map = os_get_curproc_map();
+#endif
+
 	/* Map the comm page on the user side, as pageable. */
 	error = os_vmobj_map(os_curproc_map, (vaddr_t *)&args->comm,
 	    NVMM_COMM_PAGE_SIZE, mach->commvmobj,
 	    args->cpuid * NVMM_COMM_PAGE_SIZE, false /* !wired */,
 	    false /* !fixed */, true /* shared */, PROT_READ | PROT_WRITE,
 	    PROT_READ | PROT_WRITE);
+
+#if defined(__HAIKU__)
+	os_free_curproc_map(os_curproc_map);
+#endif
+
 	if (error) {
 		nvmm_vcpu_free(mach, vcpu);
 		nvmm_vcpu_put(vcpu);
@@ -567,7 +592,7 @@ static int
 nvmm_do_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
     struct nvmm_vcpu_exit *exit)
 {
-	struct vmspace *vm = mach->vm;
+	os_vmspace_t *vm = mach->vm;
 	int ret;
 
 	while (1) {
@@ -722,9 +747,16 @@ nvmm_hmapping_free(struct nvmm_machine *mach, uintptr_t hva, size_t size)
 			continue;
 		}
 
+#if defined(__HAIKU__)
+		os_vmmap_t *os_curproc_map = os_get_curproc_map();
+#endif
 		os_vmobj_unmap(os_curproc_map, hmapping->hva,
 		    hmapping->hva + hmapping->size, false);
 		os_vmobj_rel(hmapping->vmobj);
+
+#if defined(__HAIKU__)
+		os_free_curproc_map(os_curproc_map);
+#endif
 
 		hmapping->vmobj = NULL;
 		hmapping->present = false;
@@ -762,10 +794,18 @@ nvmm_hva_map(struct nvmm_owner *owner, struct nvmm_ioc_hva_map *args)
 	hmapping->vmobj = os_vmobj_create(hmapping->size);
 	uva = hmapping->hva;
 
+#if defined(__HAIKU__)
+	os_vmmap_t *os_curproc_map = os_get_curproc_map();
+#endif
+
 	/* Map the vmobj into the user address space, as pageable. */
 	error = os_vmobj_map(os_curproc_map, &uva, hmapping->size,
 	    hmapping->vmobj, 0, false /* !wired */, true /* fixed */,
 	    true /* shared */, PROT_READ | PROT_WRITE, PROT_READ | PROT_WRITE);
+
+#if defined(__HAIKU__)
+	os_free_curproc_map(os_curproc_map);
+#endif
 
 out:
 	nvmm_machine_put(mach);
@@ -845,10 +885,18 @@ nvmm_gpa_map(struct nvmm_owner *owner, struct nvmm_ioc_gpa_map *args)
 		goto out;
 	}
 
+#if defined(__HAIKU__)
+	os_vmmap_t *vm_map = os_vmspace_get_vmmap(mach->vm);
+	/* Map the vmobj into the machine address space, as pageable. */
+	error = os_vmobj_map(vm_map, &gpa, args->size, vmobj, off,
+	    false /* !wired */, true /* fixed */, false /* !shared */,
+	    args->prot, PROT_READ | PROT_WRITE | PROT_EXEC);
+#else
 	/* Map the vmobj into the machine address space, as pageable. */
 	error = os_vmobj_map(&mach->vm->vm_map, &gpa, args->size, vmobj, off,
 	    false /* !wired */, true /* fixed */, false /* !shared */,
 	    args->prot, PROT_READ | PROT_WRITE | PROT_EXEC);
+#endif
 
 out:
 	nvmm_machine_put(mach);
@@ -891,8 +939,14 @@ nvmm_gpa_unmap(struct nvmm_owner *owner, struct nvmm_ioc_gpa_unmap *args)
 		goto out;
 	}
 
+#if defined(__HAIKU__)
+	os_vmmap_t *vm_map = os_vmspace_get_vmmap(mach->vm);
+	/* Unmap the memory from the machine. */
+	os_vmobj_unmap(vm_map, gpa, gpa + args->size, false);
+#else
 	/* Unmap the memory from the machine. */
 	os_vmobj_unmap(&mach->vm->vm_map, gpa, gpa + args->size, false);
+#endif
 
 out:
 	nvmm_machine_put(mach);

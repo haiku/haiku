@@ -26,14 +26,19 @@
  * SUCH DAMAGE.
  */
 
+#if defined(__HAIKU__)
+#include "../nvmm_os.h"
+#else
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/kernel.h>
 #include <sys/mman.h>
+#endif
 
 #include "../nvmm.h"
 #include "../nvmm_internal.h"
 #include "nvmm_x86.h"
+
 
 int vmx_vmlaunch(uint64_t *gprs);
 int vmx_vmresume(uint64_t *gprs);
@@ -175,13 +180,30 @@ vmx_vmclear(paddr_t *pa)
 static inline void
 vmx_cli(void)
 {
+#if defined(__HAIKU__)
+	/*
+	 * vmx_cli() and vmx_sti() are only called from vmx_vcpu_run(). They
+	 * are called after vmx_vmcs_enter() (which disables preemption) and
+	 * before vmx_vmcs_leave() (which enables preemption). In Haiku we
+	 * need to disable interrupts to disable preemption, so if we leave
+	 * this code unmodified the call to vmx_sti() would enable preemption
+	 * before vmx_vmcs_leave() is called, when it should be still disabled.
+	 */
+	OS_ASSERT(!interrupts_enabled());
+	__asm volatile("" ::: "memory");
+#else
 	__asm volatile ("cli" ::: "memory");
+#endif
 }
 
 static inline void
 vmx_sti(void)
 {
+#if defined(__HAIKU__)
+	__asm volatile("" ::: "memory");
+#else
 	__asm volatile ("sti" ::: "memory");
+#endif
 }
 
 #define MSR_IA32_FEATURE_CONTROL	0x003A
@@ -630,7 +652,11 @@ struct vmxoncpu {
 	paddr_t pa;
 };
 
+#if defined(__HAIKU__)
+static struct vmxoncpu *vmxoncpu;
+#else
 static struct vmxoncpu vmxoncpu[OS_MAXCPUS];
+#endif
 
 struct vmcs {
 	uint32_t ident;
@@ -2056,6 +2082,12 @@ vmx_vcpu_guest_fpu_enter(struct nvmm_cpu *vcpu)
 	 *       FPU or not.  Need to use npxpush()/npxpop() to handle this.
 	 */
 	npxpush(&cpudata->hstate.hmctx);
+#elif defined(__HAIKU__)
+	/*
+	 * Haiku allows floating point on kernel and it handles save and restore
+	 * FPU state on context switches (see commit 396b742). The only thing
+	 * we need to save and restore manually is the XCR0 register.
+	 */
 #endif
 
 	x86_restore_fpu(&cpudata->gxsave, vmx_xcr0_mask);
@@ -2183,7 +2215,7 @@ vmx_htlb_flush(struct nvmm_machine *mach, struct vmx_cpudata *cpudata)
 	struct ept_desc ept_desc;
 	uint64_t machgen;
 
-#if defined(__NetBSD__)
+#if defined(__NetBSD__) || defined(__HAIKU__)
 	machgen = ((struct vmx_machdata *)mach->machdata)->mach_htlb_gen;
 #elif defined(__DragonFly__)
 	clear_xinvltlb();
@@ -2441,6 +2473,11 @@ vmx_vcpu_run(struct nvmm_machine *mach, struct nvmm_cpu *vcpu,
 		if (exit->reason != NVMM_VCPU_EXIT_NONE) {
 			break;
 		}
+
+#if defined(__HAIKU__)
+		// FIXME: ugly hack
+		break;
+#endif
 	}
 
 	cpudata->vmcs_launched = launched;
@@ -3586,7 +3623,11 @@ vmx_init(void)
 	vmx_global_hstate.cstar = rdmsr(MSR_CSTAR);
 	vmx_global_hstate.sfmask = rdmsr(MSR_SFMASK);
 
+#if defined(__HAIKU__)
+	vmxoncpu = os_mem_zalloc(sizeof(struct vmxoncpu) * haiku_smp_get_num_cpus());
+#else
 	memset(vmxoncpu, 0, sizeof(vmxoncpu));
+#endif
 	revision = vmx_get_revision();
 
 	OS_CPU_FOREACH(cpu) {
@@ -3622,12 +3663,21 @@ vmx_fini(void)
 
 	os_ipi_broadcast(vmx_change_cpu, (void *)false);
 
+#if defined(__HAIKU__)
+	size_t n_cpus = haiku_smp_get_num_cpus();
+	for (i = 0; i < n_cpus; i++) {
+#else
 	for (i = 0; i < OS_MAXCPUS; i++) {
+#endif
 		if (vmxoncpu[i].pa != 0)
 			os_contigpa_free(vmxoncpu[i].pa, vmxoncpu[i].va, 1);
 	}
 
 	vmx_fini_asid();
+#if defined(__HAIKU__)
+	// second argument is ignored
+	os_mem_free(vmxoncpu, 0);
+#endif
 }
 
 static void

@@ -38,6 +38,9 @@
 #define _C_LABEL(x)	x
 #include <machine/asmacros.h>
 #include "assym.s"
+#elif defined(__HAIKU__)
+#define _C_LABEL(x)	x
+#include <machine/asmacros.h>
 #endif
 
 #define ASM_NVMM
@@ -204,12 +207,22 @@ ENTRY(vmx_resume_rip)
 END(vmx_resume_rip)
 
 ENTRY(vmx_insn_failvalid)
+// this is a (hopefully) temporary workaround
+#ifdef __HAIKU__
+	movq	0,%rdi
+#else
 	movq	$.Lvmx_validstr,%rdi
+#endif
 	call	_C_LABEL(panic)
 END(vmx_insn_failvalid)
 
 ENTRY(vmx_insn_failinvalid)
+// this is a (hopefully) temporary workaround
+#ifdef __HAIKU__
+	movq	0,%rdi
+#else
 	movq	$.Lvmx_invalidstr,%rdi
+#endif
 	call	_C_LABEL(panic)
 END(vmx_insn_failinvalid)
 

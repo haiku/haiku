@@ -36,6 +36,11 @@
 #include <stdbool.h>
 #endif
 
+#if defined(__HAIKU__)
+#include <stdint.h>
+#include <stdbool.h>
+#endif
+
 typedef uint64_t	gpaddr_t;
 typedef uint64_t	gvaddr_t;
 
@@ -45,13 +50,19 @@ typedef uint32_t	nvmm_cpuid_t;
 #undef CTASSERT
 #define CTASSERT(x)		NVMM_CTASSERT(x, __LINE__)
 #define NVMM_CTASSERT(x, y)	NVMM__CTASSERT(x, y)
-#define NVMM__CTASSERT(x, y)	typedef char __assert ## y[(x) ? 1 : -1] __unused
+#if defined(__cplusplus)
+#define NVMM__CTASSERT(x, y)	static_assert(x, #x)
+#else
+#define NVMM__CTASSERT(x, y)	_Static_assert(x, #x)
+#endif
 
 #if defined(__x86_64__)
 #if defined(__NetBSD__)
 #include <dev/nvmm/x86/nvmm_x86.h>
 #elif defined(__DragonFly__)
 #include <dev/virtual/nvmm/x86/nvmm_x86.h>
+#elif defined(__HAIKU__)
+#include "x86/nvmm_x86.h"
 #endif
 #endif /* __x86_64__ */
 

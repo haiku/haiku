@@ -37,6 +37,22 @@
 
 /* -------------------------------------------------------------------------- */
 
+#if defined(__HAIKU__) && defined(_KERNEL)
+#define _ASSEMBLER
+#include <arch/x86/descriptors.h>
+#undef _ASSEMBLER
+
+#define	GSEL(s,r)	(((s) << 3) | r)
+#define	GCODE_SEL	KERNEL_CODE_SEGMENT
+#define	GDATA_SEL	KERNEL_DATA_SEGMENT
+#define GUDATA_SEL	USER_DATA_SEGMENT
+#define	SEL_KPL		DPL_KERNEL
+#define	SEL_UPL		DPL_USER
+
+#define	PSL_I		0x00000200	/* interrupt enable bit */
+#define	PSL_RF		0x00010000	/* resume flag bit */
+#endif
+
 #ifndef ASM_NVMM
 
 struct nvmm_x86_exit_memory {
@@ -221,6 +237,7 @@ struct nvmm_cap_md {
 
 #ifndef ASM_NVMM
 
+#if defined(__NetBSD__) || defined(__DragonFly__)
 #include <sys/types.h>
 #include <sys/bitops.h>
 #if defined(__DragonFly__)
@@ -229,8 +246,9 @@ struct nvmm_cap_md {
 #define __BIT(__n)		__BIT64(__n)
 #undef  __BITS
 #define __BITS(__m, __n)	__BITS64(__m, __n)
+#endif /* __DragonFly__ */
 #endif /* __x86_64__ */
-#endif
+#endif /* defined(__NetBSD__) || defined(__DragonFly__) */
 
 /* Segment state. */
 struct nvmm_x64_state_seg {
@@ -657,7 +675,7 @@ struct nvmm_vcpu_conf_tpr {
  * Register defines. We mainly rely on the already-existing OS definitions.
  */
 
-#if defined(__DragonFly__)
+#if defined(__DragonFly__) || defined(__HAIKU__)
 
 #define XCR0_X87		CPU_XFEATURE_X87	/* 0x00000001 */
 #define XCR0_SSE		CPU_XFEATURE_SSE	/* 0x00000002 */
@@ -732,6 +750,8 @@ uint32_t nvmm_x86_xsave_size(uint64_t);
 #elif defined(__DragonFly__)
 #include <machine/cpufunc.h>
 #include <machine/npx.h>
+#elif defined(__HAIKU__)
+#include <machine/cpufunc.h>
 #endif
 
 /* CPUID. */
@@ -745,6 +765,9 @@ typedef struct {
 #elif defined(__DragonFly__)
 #define x86_get_cpuid(l, d)	do_cpuid(l, (uint32_t *)d)
 #define x86_get_cpuid2(l, c, d)	cpuid_count(l, c, (uint32_t *)d)
+#elif defined(__HAIKU__)
+void x86_get_cpuid(uint32_t eax, cpuid_desc_t *descriptors);
+void x86_get_cpuid2(uint32_t eax, uint32_t ecx, cpuid_desc_t *descriptors);
 #endif
 
 /* Control registers. */
@@ -757,6 +780,14 @@ typedef struct {
 #define x86_set_cr2(v)		lcr2(v)
 #define x86_set_cr4(v)		lcr4(v)
 #elif defined(__DragonFly__)
+#define x86_get_cr0()		rcr0()
+#define x86_get_cr2()		rcr2()
+#define x86_get_cr3()		rcr3()
+#define x86_get_cr4()		rcr4()
+#define x86_set_cr0(v)		load_cr0(v)
+#define x86_set_cr2(v)		load_cr2(v)
+#define x86_set_cr4(v)		load_cr4(v)
+#elif defined(__HAIKU__)
 #define x86_get_cr0()		rcr0()
 #define x86_get_cr2()		rcr2()
 #define x86_get_cr3()		rcr3()
@@ -835,6 +866,26 @@ x86_curthread_restore_dbregs(uint64_t *drs)
 #define x86_set_dr3(v)		load_dr3(v)
 #define x86_set_dr6(v)		load_dr6(v)
 #define x86_set_dr7(v)		load_dr7(v)
+#elif defined(__HAIKU__)
+#define x86_get_dr0()		rdr0()
+#define x86_get_dr1()		rdr1()
+#define x86_get_dr2()		rdr2()
+#define x86_get_dr3()		rdr3()
+#define x86_get_dr6()		rdr6()
+#define x86_get_dr7()		rdr7()
+#define x86_set_dr0(v)		load_dr0(v)
+#define x86_set_dr1(v)		load_dr1(v)
+#define x86_set_dr2(v)		load_dr2(v)
+#define x86_set_dr3(v)		load_dr3(v)
+#define x86_set_dr6(v)		load_dr6(v)
+#define x86_set_dr7(v)		load_dr7(v)
+
+static inline void
+x86_curthread_save_dbregs(uint64_t *drs)
+{
+	/* not needed */
+}
+void x86_curthread_restore_dbregs(uint64_t *drs);
 #endif
 
 /* FPU. */
@@ -856,6 +907,10 @@ x86_curthread_restore_dbregs(uint64_t *drs)
 		__asm volatile("clts" ::: "memory");	\
 		fpurstor((union savefpu *)(a), m);	\
 	})
+#elif defined(__HAIKU__)
+// Haiku allows floating point in kernel, we don't need to save and restore FPU
+#define x86_save_fpu(a, m)
+#define x86_restore_fpu(a, m)
 #endif
 
 /* XCRs. */
@@ -891,6 +946,9 @@ x86_set_xcr(uint32_t xcr, uint64_t val)
 #if defined(__DragonFly__)
 #define x86_xsave_features	npx_xcr0_mask
 #define x86_fpu_mxcsr_mask	npx_mxcsr_mask
+#elif defined(__HAIKU__)
+#define x86_xsave_features	haiku_get_xsave_mask()
+#define x86_fpu_mxcsr_mask	0xFFBF /* default */
 #endif
 
 #endif /* _KERNEL */
