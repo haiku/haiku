@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	2585450844
+1	czech	x-vnd.Haiku-libtracker	1124891868
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Skrýt soubory začínající tečkou
 Trash	Model		Koš
 Enable type-ahead filtering	SettingsView		Povolit filtrování během psaní
 copy	FSUtils	filename copy	kopie
-New folder%ld	FSUtils		Nový adresář%ld
 Location	OpenWithWindow		Umístnění
 Resize to fit	QueryContainerWindow		Přizpůsobit velikost
 List folders first	SettingsView		Adresáře na začátek
@@ -456,7 +455,6 @@ Move to Trash	FilePanelPriv		Přesun do Koše
 is	FindPanel		je
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Pokud přejmenujete systémovou složku nebo její obsah, nebudete s to spustit %osName!\n\nOpravdu to chcete udělat?\n\nPokud trváte na přejmenování systémové složky nebo jejího obsahu, podržte klávesu Shift a klikněte na \"Přejmenovat\".
 Permissions	FilePermissionsView		Oprávnění
-New folder %ld	FSUtils		Nový adresář %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" je zastaralý spustitelný soubor. Sežeňte prosím novější verzi nebo překompilujte aplikaci.
 Only the boot disk	AutoMounterSettings		Pouze startovní disk
 Message	AttributesView		Zpráva

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libbe	2539827825
+1	catalan; valencian	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Tots els drets reservats.
 gold master	AboutWindow		candidat
 Undo	TextView		Desfés
@@ -6,6 +6,7 @@ OK	PrintJob		D'acord
 OK	Dragger		D'acord
 gamma	AboutWindow		gamma
 development	AboutWindow		desenvolupament
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s byte/s} other{%s bytes/s}}
 Print Server is not responding.	PrintJob		El servidor d'impressió no respon.
 About %app%	AboutMenuItem		Quant a %app%
 Warning	Dragger		Avís
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Agraïments especials:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Decorador de finestres per defecte del Haiku
 %s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Suprimeix el replicant
 Version	AboutWindow		Versió
 Red:	ColorControl		Vermell:
@@ -38,6 +40,7 @@ Error	PrintJob		Error
 %s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		Quant a %app…
 About %app%	AboutWindow		Quant a %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s byte} other{%s bytes}}
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Historial de versions:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		No es pot trobar l'aplicació del replicant. No s'ha proporcionat cap signatura de l'aplicació.\n%error

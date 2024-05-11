@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2585450844
+1	japanese	x-vnd.Haiku-libtracker	1124891868
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		ドットファイルを隠す
 Trash	Model		ごみ箱
 Enable type-ahead filtering	SettingsView		先行入力フィルターを有効にする
 copy	FSUtils	filename copy	コピー
-New folder%ld	FSUtils		新規フォルダー %ld 
 Location	OpenWithWindow		場所
 Resize to fit	QueryContainerWindow		最適な表示サイズに変更
 List folders first	SettingsView		フォルダーを先頭に表示
@@ -456,7 +455,6 @@ Move to Trash	FilePanelPriv		ごみ箱に捨てる
 is	FindPanel		と等しい
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		システムフォルダーやその内容の名前を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダーやその内容の名前を変更するなら、シフトキーを押しながら \"名前の変更\" をクリックしてください。
 Permissions	FilePermissionsView		アクセス権
-New folder %ld	FSUtils		新規フォルダー %ld 
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションを再コンパイルしてください。
 Only the boot disk	AutoMounterSettings		起動ディスクのみ
 Message	AttributesView		Message

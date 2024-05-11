@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2585450844
+1	catalan; valencian	x-vnd.Haiku-libtracker	1818550058
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Amaga els fitxers amb un punt inicial
 Trash	Model		Paperera
 Enable type-ahead filtering	SettingsView		Habilita el filtratge d'anticipació de tecleig
 copy	FSUtils	filename copy	copia
-New folder%ld	FSUtils		Carpeta nova %ld
 Location	OpenWithWindow		Ubicació
 Resize to fit	QueryContainerWindow		Ajusta a l'espai
 List folders first	SettingsView		Mostra primer les carpetes
@@ -333,6 +332,7 @@ To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
 Cancel	Tracker		Cancel·la
 yes	AttributesView		sí
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Error a l'hora de copiar el fitxer \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom
@@ -456,7 +456,6 @@ Move to Trash	FilePanelPriv		Mou a la paperera
 is	FindPanel		és
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si canvieu de nom la carpeta de sistema, no podreu fer arrencar el sistema %osName!\n\nSegur que ho voleu fer?\n\nSi tanmateix voleu fer-ho, manteniu premuda la tecla Maj. i cliqueu a \"Canvia'n el nom\".
 Permissions	FilePermissionsView		Permisos
-New folder %ld	FSUtils		Carpeta nova %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" és un executable de llegat. Si us plau, obteniu-ne una versió actualitzada o recompileu l'aplicació.
 Only the boot disk	AutoMounterSettings		Només el disc de l'arrencada
 Message	AttributesView		Missatge
@@ -479,6 +478,7 @@ Color	AttributesView		Color
 Copy layout	ContainerWindow		Copia la disposició
 Duplicate	ContainerWindow		Duplica
 16-bit integer	AttributesView		Enter de 16 bits
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Nota: els noms de fitxers del sistema de fitxers de destinació no distingeixen entre majúscules i minúscules.\n
 Untitled clipping	PoseView		Retall sense títol
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Ja existeix un fitxer amb el nom \"%name\" a la carpeta especificada. El voleu reemplaçar?
 , indexed	InfoWindow		, indexat

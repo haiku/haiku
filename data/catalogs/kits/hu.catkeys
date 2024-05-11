@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libbe	2539827825
+1	hungarian	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Minden jog fenntartva.
 gold master	AboutWindow		arany fokozatú
 Undo	TextView		Visszavonás
@@ -6,6 +6,7 @@ OK	PrintJob		Rendben
 OK	Dragger		Rendben
 gamma	AboutWindow		gamma
 development	AboutWindow		fejlesztés
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s bájt/mp} other{%s bájt/mp}}
 Print Server is not responding.	PrintJob		A nyomtatókiszolgáló nem válaszol.
 About %app%	AboutMenuItem		%app% névjegye
 Warning	Dragger		Figyelmeztetés
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Külön köszönet:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Alapértelmezett Haiku ablak-dekoráció
 %s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Replikáns eltávolítása
 Version	AboutWindow		Verzió
 Red:	ColorControl		Vörös
@@ -38,6 +40,7 @@ Error	PrintJob		Hiba
 %s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		%app névjegye…
 About %app%	AboutWindow		%app% névjegye
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s bájt} other{%s bájt}}
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Előző verziók:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nem található a replikánshoz tartozó program. Nincs megadva programaláírás.\n%error

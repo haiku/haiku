@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2787029568
+1	friulian	x-vnd.Haiku-libtracker	1326470592
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Plate i files .*
 Trash	Model		Scovacere
 Enable type-ahead filtering	SettingsView		Abilite filtri pe ricercje datilografant
 copy	FSUtils	filename copy	copie
-New folder%ld	FSUtils		Gnove cartele%ld
 Location	OpenWithWindow		Posizion
 Resize to fit	QueryContainerWindow		Adate
 List folders first	SettingsView		Liste prime lis cartelis
@@ -455,7 +454,6 @@ Move to Trash	FilePanelPriv		Sposte te Scovacere
 is	FindPanel		al è
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se si cambie non ae cartele di sisteme o al so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar cambiâ non distès ae cartele di sisteme o al so contignût, ten fracât il tast Maiusc e fâs clic su \"Cambie non\".
 Permissions	FilePermissionsView		Permès
-New folder %ld	FSUtils		Gnove cartele %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" al è un eseguibil de vecje maniere. Si pree di otignî une version inzornade de aplicazion o di tornâ a compilâle.
 Only the boot disk	AutoMounterSettings		Dome il disc di inviament
 Message	AttributesView		Messaç

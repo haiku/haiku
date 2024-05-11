@@ -1,14 +1,10 @@
-1	swedish	x-vnd.Haiku-GLifeScreensaver	358758987
+1	swedish	x-vnd.Haiku-GLifeScreensaver	1505005443
 by Aaron Hill	GLife ScreenSaver		av Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Rutnätets livslängd: ingen
 None	GLife ScreenSaver		Ingen
-Grid height: %li	GLife ScreenSaver		Rutnätets höjd %li
 Grid width: 	GLife ScreenSaver		Rutnätets bredd: 
-Grid border: %li	GLife ScreenSaver		Rutnätets kant: %li
 Grid border: 	GLife ScreenSaver		Rutnätets kant: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Game of Life\"
 Grid height: 	GLife ScreenSaver		Rutnätets höjd: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
-Grid width: %li	GLife ScreenSaver		Rutnätets bredd: %li
-Grid life delay: %ldx	This is a factor: the x represents 'times', don't translate '%ld'		Rutnätets livslängd: %ldx
 Grid life delay: 	GLife ScreenSaver		Rutnätets livslängd: 

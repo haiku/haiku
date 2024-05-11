@@ -1,14 +1,10 @@
-1	ukrainian	x-vnd.Haiku-GLifeScreensaver	358758987
+1	ukrainian	x-vnd.Haiku-GLifeScreensaver	1505005443
 by Aaron Hill	GLife ScreenSaver		розробник Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Затримка ітерації: без затримки
 None	GLife ScreenSaver		Нема
-Grid height: %li	GLife ScreenSaver		Висота решітки: %li
 Grid width: 	GLife ScreenSaver		Ширина решітки: 
-Grid border: %li	GLife ScreenSaver		Рамка решітки: %li
 Grid border: 	GLife ScreenSaver		Рамка решітки: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Гра Життя\"
 Grid height: 	GLife ScreenSaver		Висота сітки: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4х
-Grid width: %li	GLife ScreenSaver		Ширина решітки: %li
-Grid life delay: %ldx	This is a factor: the x represents 'times', don't translate '%ld'		Затримка ітерації: %ldx
 Grid life delay: 	GLife ScreenSaver		Затримка ітерації: 

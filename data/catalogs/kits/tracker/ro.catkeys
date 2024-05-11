@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2585450844
+1	romanian	x-vnd.Haiku-libtracker	1124891868
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Ascunde fișierele dot
 Trash	Model		Gunoi
 Enable type-ahead filtering	SettingsView		Activează filtrarea type-ahead
 copy	FSUtils	filename copy	copiază
-New folder%ld	FSUtils		Dosar nou%ld
 Location	OpenWithWindow		Locație
 Resize to fit	QueryContainerWindow		Redimensionează pentru a potrivi
 List folders first	SettingsView		Enumeră dosarele mai întâi
@@ -456,7 +455,6 @@ Move to Trash	FilePanelPriv		Mută la gunoi
 is	FindPanel		este
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Dacă redenumiți dosarul de sistem sau conținutul acestuia, nu veți putea boota %osName!\n\nSigur doriți să faceți asta?\n\nPentru a redenumi dosarul de sistem sau conținutul acestuia oricum, țineți apăsată tasta Shift și dați clic pe \„Redenumește\”.
 Permissions	FilePermissionsView		Permisiuni
-New folder %ld	FSUtils		Dosar nou %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\„%name\” este un executabil moștenit. Obțineți o versiune actualizată sau recompilați aplicația.
 Only the boot disk	AutoMounterSettings		Doar discul de boot
 Message	AttributesView		Mesaj

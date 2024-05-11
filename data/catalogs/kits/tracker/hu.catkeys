@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2585450844
+1	hungarian	x-vnd.Haiku-libtracker	1818550058
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Ponttal kezdődő fájlnevek elrejtése
 Trash	Model		Szemetes
 Enable type-ahead filtering	SettingsView		Gépelés közbeni szűrés engedélyezése
 copy	FSUtils	filename copy	másolata
-New folder%ld	FSUtils		Új mappa%ld
 Location	OpenWithWindow		Hely
 Resize to fit	QueryContainerWindow		Átméretezés hogy elférjen
 List folders first	SettingsView		A mappákat listázza elsőként
@@ -333,6 +332,7 @@ To: %dir	StatusWindow		Ide: %dir
 Paste layout	ContainerWindow		Elrendezés beillesztése
 Cancel	Tracker		Mégse
 yes	AttributesView		igen
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Hia történt a fájl \"%name\" másolása közben:\n\t%error\n\n
 Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Copy to	ContainerWindow		Másolás
 Name	SelectionWindow		A név
@@ -456,7 +456,6 @@ Move to Trash	FilePanelPriv		Mozgatás a Szemetesbe
 is	FindPanel		egyenlő
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ha átnevezed a rendszermappát vagy annak tartalmát, akkor a %osName nem indítható!\n\nBiztosan ezt akarod tenni?\n\nA rendszermappa vagy annak tartalmának átnevezéséhez tartsd lenyomva a Shift billentyűt, és kattints az \"Átnevezés\" gombra.
 Permissions	FilePermissionsView		Jogosultságok
-New folder %ld	FSUtils		Új mappa %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" egy régebbi futtatható fájl. Frissítés vagy újra felépítés szükséges.
 Only the boot disk	AutoMounterSettings		Csak a rendszer lemezt
 Message	AttributesView		Üzenet
@@ -479,6 +478,7 @@ Color	AttributesView		Szín
 Copy layout	ContainerWindow		Elrendezés másolása
 Duplicate	ContainerWindow		Megkettőzés
 16-bit integer	AttributesView		16-bites egész
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Megjegyzés: a fájlnevek a cél-fájlrendszeren nem kis-/nagybetű érzékenyek.\n
 Untitled clipping	PoseView		Névtelen kivágás
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy ilyen nevű fájl: \"%name\". Szeretnéd felülírni?
 , indexed	InfoWindow		, indexelt

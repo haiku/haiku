@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	4057146217
+1	lithuanian	x-vnd.Haiku-libtracker	2596587241
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -80,7 +80,6 @@ Edit templates…	TemplatesMenu		Tvarkyti šablonus…
 Trash	Model		Šiukšlinė
 Enable type-ahead filtering	SettingsView		Leisti filtravimą renkant tekstą
 copy	FSUtils	filename copy	kopija
-New folder%ld	FSUtils		Naujas aplankas %ld
 Location	OpenWithWindow		Vieta
 Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
 List folders first	SettingsView		Aplankus rikiuoti pirmiau
@@ -338,7 +337,6 @@ Outline selection rectangle only	SettingsView		Žymint, rodyti tik kontūrą
 by formula	FindPanel		pagal formulę
 Move to Trash	FilePanelPriv		Išmesti Šiukšlinėn
 is	FindPanel		lygus
-New folder %ld	FSUtils		Naujas aplankas %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name%“ yra pasenusio tipo vykdomasis failas. Įsigykite naujesnę programos versiją arba ją perkompiliuokite.
 Only the boot disk	AutoMounterSettings		Tik paleidimo tomą
 Modified	Default Query Columns		Modifikavimo data

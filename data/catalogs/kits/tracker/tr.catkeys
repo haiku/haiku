@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	4259322340
+1	turkish	x-vnd.Haiku-libtracker	2798763364
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Nokta ile başlayan dosyaları gizle
 Trash	Model		Çöp
 Enable type-ahead filtering	SettingsView		Hemen bulan süzmeyi etkinleştir
 copy	FSUtils	filename copy	kopyası
-New folder%ld	FSUtils		Yeni klasör%ld
 Location	OpenWithWindow		Konum
 Resize to fit	QueryContainerWindow		Sığacak biçimde boyutlandır
 List folders first	SettingsView		Klasörleri ilk listele
@@ -455,7 +454,6 @@ Resize to fit	VirtualDirectoryWindow		Sığacak biçimde boyutlandır
 Move to Trash	FilePanelPriv		Çöpe at
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Yeniden adlandır’a tıklayın.
 Permissions	FilePermissionsView		İzinler
-New folder %ld	FSUtils		Yeni klasör %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		“%name” eski bir yürütülebilir. Lütfen güncellenmiş bir sürümünü edinin veya uygulamayı yeniden derleyin.
 Only the boot disk	AutoMounterSettings		Yalnızca önyükleme diski
 Message	AttributesView		İleti

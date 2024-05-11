@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	4226282387
+1	slovak	x-vnd.Haiku-libtracker	2765723411
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -92,7 +92,6 @@ Hide dotfiles	SettingsView		Skryť súbory s bodkou na začiatku
 Trash	Model		Kôš
 Enable type-ahead filtering	SettingsView		Zapnúť filtrovanie počas písania
 copy	FSUtils	filename copy	kopírovať
-New folder%ld	FSUtils		Nový priečinok%ld
 Location	OpenWithWindow		Umiestnenie
 Resize to fit	QueryContainerWindow		Prispôsobiť veľkosť
 List folders first	SettingsView		Uviesť priečinky na začiatku
@@ -378,7 +377,6 @@ by formula	FindPanel		podľa vzorca
 Move to Trash	FilePanelPriv		Presunúť do Koša
 is	FindPanel		je
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ak premenujete systémový priečinok alebo jeho obsah, %osName sa nemusí správať správne!\n\nSte si istý, že to chcete urobiť?\n\nAk chcete napriek tomu premenovať systémový priečinok alebo jeho obsah, podržte kláves Shift a kliknite na „Premenovať“.
-New folder %ld	FSUtils		Nový priečinok %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name“ je spustiteľný súbor v starom formáte. Prosím, zožeňte si aktualizovanú verziu alebo znovu skompilujte aplikáciu.
 Only the boot disk	AutoMounterSettings		Iba zavádzací disk
 Modified	Default Query Columns		Zmenené

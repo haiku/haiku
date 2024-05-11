@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2189619380
+1	french	x-vnd.Haiku-libtracker	729060404
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Masquer les fichiers cachés
 Trash	Model		Corbeille
 Enable type-ahead filtering	SettingsView		Activer le filtrage au cours de la saisie
 copy	FSUtils	filename copy	copie
-New folder%ld	FSUtils		Nouveau dossier%ld
 Location	OpenWithWindow		Emplacement
 Resize to fit	QueryContainerWindow		Ajuster
 List folders first	SettingsView		Lister les dossiers en premier
@@ -454,7 +453,6 @@ Move to Trash	FilePanelPriv		Envoyer à la corbeille
 is	FindPanel		est
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si vous renommez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour renommer quand-même le dossier système ou son contenu , maintenez la touche Majuscule enfoncée et cliquez sur « renommer ».
 Permissions	FilePermissionsView		Autorisations
-New folder %ld	FSUtils		Nouveau dossier %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		« %name » est un exécutable ancien. Veuillez vous procurer une version mise à jour, ou recompiler l’application.
 Only the boot disk	AutoMounterSettings		Seulement le disque de démarrage
 Message	AttributesView		Message

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2886909988
+1	indonesian	x-vnd.Haiku-libtracker	1426351012
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -108,7 +108,6 @@ Hide dotfiles	SettingsView		Sembunyikan berkas awalan titik
 Trash	Model		Sampah
 Enable type-ahead filtering	SettingsView		Aktifkan penyaringan ketik-didepan
 copy	FSUtils	filename copy	salin
-New folder%ld	FSUtils		Folder baru%ld
 Location	OpenWithWindow		Lokasi
 Resize to fit	QueryContainerWindow		Ubah ukuran agar sesuai
 List folders first	SettingsView		Daftar folder dahulukan
@@ -436,7 +435,6 @@ Move to Trash	FilePanelPriv		Buang ke Tong Sampah
 is	FindPanel		adalah
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jika Anda mengubah nama folder sistem atau isinya, Anda tidak akan bisa boot %osName!\n\nApakah anda yakin melakukan ini?\n\nUntuk tetap mengubah nama folder sistem, tekan kunci Shift dan klik \"Ubah\".
 Permissions	FilePermissionsView		Perijinan
-New folder %ld	FSUtils		Folder baru %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" adalah warisan yang dapat dijalankan. Silakan dapatkan versi terbaru atau kompilasi ulang aplikasi.
 Only the boot disk	AutoMounterSettings		Hanya disk boot
 Message	AttributesView		Pesan

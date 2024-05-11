@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	1975005802
+1	esperanto	x-vnd.Haiku-libtracker	514446826
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -111,7 +111,6 @@ Hide dotfiles	SettingsView		Kaŝi dosierojn antaŭigitajn per punkto
 Trash	Model		Rubujo
 Enable type-ahead filtering	SettingsView		Ŝalti antaŭtajpan filtradon
 copy	FSUtils	filename copy	kopii
-New folder%ld	FSUtils		Nova dosierujo%Id
 Location	OpenWithWindow		Loko
 Resize to fit	QueryContainerWindow		Adapti laŭ grando
 List folders first	SettingsView		Listigi dosierujojn unue
@@ -444,7 +443,6 @@ Move to Trash	FilePanelPriv		Movi al la Rubujo
 is	FindPanel		estas
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se vi renomos la sisteman dosierujon aŭ ĝian enhavon, vi ne kapablos praŝargi %osName!\n\nĈu vi certas, ke vi deziras fari tion?\n\nPor renomi la sisteman dosierujon aŭ ĝian enhavon senkondiĉe, premu la majuskligklavon kaj klaku \"Renomi\".
 Permissions	FilePermissionsView		Permesoj
-New folder %ld	FSUtils		Nova dosierujo %Id
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" estas malaktuala rulebla dosiero. Bonvolu akiri ĝisdatigitan version aŭ rekompili la programon.
 Only the boot disk	AutoMounterSettings		Nur la praŝarga disko
 Message	AttributesView		Mesaĝo

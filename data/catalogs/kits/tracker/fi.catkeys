@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2787029568
+1	finnish	x-vnd.Haiku-libtracker	1326470592
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Piilota pistetiedostot
 Trash	Model		Roskakori
 Enable type-ahead filtering	SettingsView		Ota pois käytöstä kirjoituspuskurisuodatus
 copy	FSUtils	filename copy	kopioi
-New folder%ld	FSUtils		Uusi kansio%ld
 Location	OpenWithWindow		Sijainti
 Resize to fit	QueryContainerWindow		Sovita koko
 List folders first	SettingsView		Luettele kansiot ensin
@@ -455,7 +454,6 @@ Move to Trash	FilePanelPriv		Siirrä roskakoriin
 is	FindPanel		on
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Jos nimeät uudelleen järjestelmäkansion tai sen sisällön, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin nimeät uudelleen järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Nimeä uudelleen”.
 Permissions	FilePermissionsView		Käyttöoikeudet
-New folder %ld	FSUtils		Uusi kansio %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		”%name” on perinnäisjärjestelmän suoritettava tiedosto. Hanki päivitetty versio tai käännä sovellus uudelleen.
 Only the boot disk	AutoMounterSettings		Vain käynnistyslevy
 Message	AttributesView		Viesti

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2585450844
+1	swedish	x-vnd.Haiku-libtracker	1124891868
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Dölj . filer
 Trash	Model		Papperskorg
 Enable type-ahead filtering	SettingsView		Markera filer som matchar tangentsekvens
 copy	FSUtils	filename copy	kopia
-New folder%ld	FSUtils		Ny mapp%ld
 Location	OpenWithWindow		Plats
 Resize to fit	QueryContainerWindow		Anpassa
 List folders first	SettingsView		Visa mappar först
@@ -456,7 +455,6 @@ Move to Trash	FilePanelPriv		Flytta till papperskorg
 is	FindPanel		är
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Om du byter namn på systemmappen eller dess innehåll kommer du kanske inte kunna starta %osName!\n\nÄr du säker på att du vill göra detta?\n\nFör att byta namn ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Byt namn\".
 Permissions	FilePermissionsView		Behörigheter
-New folder %ld	FSUtils		Ny mapp %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" Den körbara filen är från ett gammalt system. Var vänlig uppdatera din fil eller bygg om programmet.
 Only the boot disk	AutoMounterSettings		Bara uppstartsdisken
 Message	AttributesView		Meddelande

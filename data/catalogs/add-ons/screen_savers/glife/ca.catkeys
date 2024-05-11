@@ -1,14 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-GLifeScreensaver	358758987
+1	catalan; valencian	x-vnd.Haiku-GLifeScreensaver	1505005443
 by Aaron Hill	GLife ScreenSaver		per Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Retard de l'activació de la graella: cap
 None	GLife ScreenSaver		Cap
-Grid height: %li	GLife ScreenSaver		Alçada de la graella: %li
 Grid width: 	GLife ScreenSaver		Amplada de la graella: 
-Grid border: %li	GLife ScreenSaver		Vora de la graella: %li
 Grid border: 	GLife ScreenSaver		Vora de la graella: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Joc de la Vida\"
 Grid height: 	GLife ScreenSaver		Alçada de la graella: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
-Grid width: %li	GLife ScreenSaver		Amplada de la graella: %li
-Grid life delay: %ldx	This is a factor: the x represents 'times', don't translate '%ld'		Retard de la vida de la graella: %ldx
 Grid life delay: 	GLife ScreenSaver		Retard de l'activació de la graella: 

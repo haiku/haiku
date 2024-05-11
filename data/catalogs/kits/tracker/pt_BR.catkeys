@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	1510254370
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	49695394
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -112,7 +112,6 @@ Hide dotfiles	SettingsView		Esconder arquivos de ponto
 Trash	Model		Lixeira
 Enable type-ahead filtering	SettingsView		Habilitar filtro de autocompletar
 copy	FSUtils	filename copy	cópia
-New folder%ld	FSUtils		Nova pasta%ld
 Location	OpenWithWindow		Local
 Resize to fit	QueryContainerWindow		Reduzir para caber
 List folders first	SettingsView		Listar pastas primeiro
@@ -445,7 +444,6 @@ Move to Trash	FilePanelPriv		Mover para o Lixo
 is	FindPanel		é
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se alterar o nome da pasta de sistema ou do seu conteúdo, deixará de conseguir iniciar o %osName!\n\nTem a certeza de que pretende fazer isso?\n\nPara alterar de qualquer modo o nome da pasta de sistema ou do seu conteúdo, mantenha pressionado a tecla Shift e clique \"Alterar nome\".
 Permissions	FilePermissionsView		Permissões
-New folder %ld	FSUtils		Nova pasta %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" é um executável legado. Por favor obtenha uma versão atualizada ou recompile o aplicativo.
 Only the boot disk	AutoMounterSettings		Somente o disco de inicialização
 Message	AttributesView		Mensagem

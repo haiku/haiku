@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	1325088795
+1	thai	x-vnd.Haiku-libtracker	4159497115
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -107,7 +107,6 @@ Hide dotfiles	SettingsView		ซ่อน dotfiles
 Trash	Model		ขยะ
 Enable type-ahead filtering	SettingsView		เปิดใช้งานการกรองแบบพิมพ์ล่วงหน้า
 copy	FSUtils	filename copy	คัดลอก
-New folder%ld	FSUtils		โฟลเดอร์ใหม่%ld
 Location	OpenWithWindow		สถานที่
 Resize to fit	QueryContainerWindow		ปรับขนาดให้พอดี
 List folders first	SettingsView		รายการโฟลเดอร์ก่อน
@@ -435,7 +434,6 @@ Move to Trash	FilePanelPriv		ย้ายไปถังขยะ
 is	FindPanel		เป็น
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		หากคุณเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบคุณจะไม่สามารถบูต %osName! \n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้?\n\nหากต้องการเปลี่ยนชื่อโฟลเดอร์ระบบหรือเนื้อหาในระบบให้กดปุ่ม Shift ค้างไว้แล้วคลิก \"เปลี่ยนชื่อ\"
 Permissions	FilePermissionsView		อนุญาต
-New folder %ld	FSUtils		โฟลเดอร์ใหม่ %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" เป็นไฟล์ปฏิบัติการแบบเก่า โปรดรับรุ่นที่ปรับปรุงแล้วหรือคอมไพล์แอปพลิเคชันใหม่
 Only the boot disk	AutoMounterSettings		เฉพาะดิสก์สำหรับบูต
 Message	AttributesView		ข้อความ

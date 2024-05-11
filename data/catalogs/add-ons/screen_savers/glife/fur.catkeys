@@ -1,14 +1,10 @@
-1	friulian	x-vnd.Haiku-GLifeScreensaver	358758987
+1	friulian	x-vnd.Haiku-GLifeScreensaver	1505005443
 by Aaron Hill	GLife ScreenSaver		di Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Ritart te gridele de vite: nissun
 None	GLife ScreenSaver		Nissun
-Grid height: %li	GLife ScreenSaver		Altece gridele: %li
 Grid width: 	GLife ScreenSaver		Largjece gridele: 
-Grid border: %li	GLife ScreenSaver		Ôr gridele: %li
 Grid border: 	GLife ScreenSaver		Ôr gridele: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		Il \"Zûc de Vite\" in version OpenGL
 Grid height: 	GLife ScreenSaver		Altece gridele: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
-Grid width: %li	GLife ScreenSaver		Largjece gridele: %li
-Grid life delay: %ldx	This is a factor: the x represents 'times', don't translate '%ld'		Ritart de vite te gridele: %ldx
 Grid life delay: 	GLife ScreenSaver		Ritart te gridele de vite: 

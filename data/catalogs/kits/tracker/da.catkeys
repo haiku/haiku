@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	1802712727
+1	danish	x-vnd.Haiku-libtracker	342153751
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Skjul punktumfiler
 Trash	Model		Papirkurv
 Enable type-ahead filtering	SettingsView		Slå forudskrivningsfiltrering til
 copy	FSUtils	filename copy	kopi
-New folder%ld	FSUtils		Ny mappe%ld
 Location	OpenWithWindow		Placering
 Resize to fit	QueryContainerWindow		Tilpas størrelse
 List folders first	SettingsView		Vis mapper først
@@ -451,7 +450,6 @@ Move to Trash	FilePanelPriv		Flyt til papirkurven
 is	FindPanel		er
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Hvis du omdøber systemmappen eller dens indhold, vil du ikke være i stand til at opstarte %osName!\n\nEr du sikker på, du vil gøre det?\n\nFor alligevel at omdøbe systemmappen eller dens indhold, hold Skift-tasten nede og klik på \"Omdøb\".
 Permissions	FilePermissionsView		Rettigheder
-New folder %ld	FSUtils		Ny mappe %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" er en forældet kørbar fil. Hent en opdateret version eller genoversæt programmet.
 Only the boot disk	AutoMounterSettings		Kun opstartsdisken
 Message	AttributesView		Meddelelse

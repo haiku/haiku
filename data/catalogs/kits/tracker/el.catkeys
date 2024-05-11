@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2585450844
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1124891868
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Απόκρυψη αρχείων με τελεία σ
 Trash	Model		Κάδος
 Enable type-ahead filtering	SettingsView		Ενεργοποίηση προβλεπτικού φίλτρου
 copy	FSUtils	filename copy	αντιγραφή
-New folder%ld	FSUtils		Νέος φάκελος%ld
 Location	OpenWithWindow		Τοποθεσία
 Resize to fit	QueryContainerWindow		Προσαρμογή μεγέθους
 List folders first	SettingsView		Λίστα φακέλων πρώτα
@@ -456,7 +455,6 @@ Move to Trash	FilePanelPriv		Μετακίνηση στον Κάδο
 is	FindPanel		είναι
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Αν μετονομάσετε τον φάκελο συστήματος ή τα περιεχόμενά του, δεν θα μπορέσετε να εκκινήσετε το %osName!\n\nΕίστε σίγουρος πως θέλετε να το κάνετε αυτό;\n\nΓια να μετονομάσετε τον φάκελο ή τα περιεχόμενά του ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Μετονομασία\".
 Permissions	FilePermissionsView		Άδειες
-New folder %ld	FSUtils		Νέος φάκελος %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		Το \"%name\" είναι ένα απαρχαιωμένο εκτελέσιμο αρχείο. Παρακαλώ βρείτε μία ενημερωμένη έκδοση ή δημιουργήστε το δικό σας εκτελέσιμο αρχείο.
 Only the boot disk	AutoMounterSettings		Μόνο ο δίσκος εκκίνησης
 Message	AttributesView		Μήνυμα

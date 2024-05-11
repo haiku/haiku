@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2585450844
+1	ukrainian	x-vnd.Haiku-libtracker	1124891868
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -115,7 +115,6 @@ Hide dotfiles	SettingsView		Сховати файли з крапкою
 Trash	Model		Смітник
 Enable type-ahead filtering	SettingsView		Включити випереджаючу фільтрацію
 copy	FSUtils	filename copy	копія
-New folder%ld	FSUtils		Нова папка%ld
 Location	OpenWithWindow		Розташування
 Resize to fit	QueryContainerWindow		Припасувати
 List folders first	SettingsView		Список папок спочатку
@@ -456,7 +455,6 @@ Move to Trash	FilePanelPriv		До смітника
 is	FindPanel		є
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		При зміні назви каталога system або його вмісту може стати неможливим завантаження %osName!\n\nВи впевнені що бажаєте цього? \n\nЩоб все рівно змінити назву каталога system або його вміст, утримуйте клавішу Shift та натисніть \«Перейменувати\».
 Permissions	FilePermissionsView		Дозволи
-New folder %ld	FSUtils		Нова папка %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\«%name\» програма застарілого типу. Будь-ласка отримайте оновлену версію.
 Only the boot disk	AutoMounterSettings		Тільки загрузочний диск
 Message	AttributesView		Повідомлення

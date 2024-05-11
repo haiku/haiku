@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1226369255
+1	belarusian	x-vnd.Haiku-libtracker	4060777575
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -79,7 +79,6 @@ Edit templates…	TemplatesMenu		Правіць шаблоны…
 Trash	Model		Сметніца
 Enable type-ahead filtering	SettingsView		Уключыць фільтар апераджальнага друкавання
 copy	FSUtils	filename copy	копія
-New folder%ld	FSUtils		Новы каталог%ld
 Location	OpenWithWindow		Месцазнаходжанне
 Resize to fit	QueryContainerWindow		Расцягнуць каб умясціць
 List folders first	SettingsView		Спачатку паказваць спіс каталогаў
@@ -336,7 +335,6 @@ Outline selection rectangle only	SettingsView		Непразрыстае выдз
 by formula	FindPanel		па формуле
 Move to Trash	FilePanelPriv		Адправіць у Сметніцу
 is	FindPanel		-
-New folder %ld	FSUtils		Новы каталог %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" есць праграмай старога тыпу. Калі ласка набудзце ці збярыце яе новую версію.
 Only the boot disk	AutoMounterSettings		Толькі загрузачны дыск
 Modified	Default Query Columns		Зменены

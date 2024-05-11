@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1524492774
+1	german	x-vnd.Haiku-libtracker	757591988
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -113,7 +113,6 @@ Hide dotfiles	SettingsView		Mit Punkt (.) beginnende Dateien ausblenden
 Trash	Model		Papierkorb
 Enable type-ahead filtering	SettingsView		Filtern während der Eingabe
 copy	FSUtils	filename copy	Kopie
-New folder%ld	FSUtils		Neuer Ordner%ld
 Location	OpenWithWindow		Ort
 Resize to fit	QueryContainerWindow		Optimale Größe
 List folders first	SettingsView		Ordner zuerst listen
@@ -328,6 +327,7 @@ To: %dir	StatusWindow		Nach: %dir
 Paste layout	ContainerWindow		Anordnung einfügen
 Cancel	Tracker		Abbrechen
 yes	AttributesView		ja
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Fehler beim Kopieren von \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Zum aktiven Drucker machen
 Copy to	ContainerWindow		Kopieren nach
 Name	SelectionWindow		Name:
@@ -451,7 +451,6 @@ Move to Trash	FilePanelPriv		In Papierkorb verschieben
 is	FindPanel		ist
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Wird der System-Ordner oder dessen Inhalt umbenannt, kann %osName nicht mehr gestartet werden!\n\nTrotzdem umbenennen?\n\nUm den System-Ordner oder dessen Inhalt trotzdem umzubenennen, Shift-Taste gedrückt halten und \"Umbenennen\" klicken.
 Permissions	FilePermissionsView		Berechtigungen
-New folder %ld	FSUtils		Neuer Ordner %ld
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" hat ein veraltetest Programmformat. Die Anwendung muss neu kompiliert, bzw. eine aktualisierte Version installiert werden.
 Only the boot disk	AutoMounterSettings		Nur den Boot-Datenträger
 Message	AttributesView		Message
@@ -474,6 +473,7 @@ Color	AttributesView		Farbe
 Copy layout	ContainerWindow		Anordnung kopieren
 Duplicate	ContainerWindow		Duplizieren
 16-bit integer	AttributesView		Integer 16-bit
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Das Ziel-Dateisystem unterscheidet bei Dateinamen keine Groß-/Kleinschreibung.\n
 Untitled clipping	PoseView		Unbenannter Ausschnitt
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Die Datei \"%name\" existiert bereits in diesem Ordner. Soll sie ersetzt werden?
 , indexed	InfoWindow		, indiziert
