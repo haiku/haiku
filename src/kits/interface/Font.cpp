@@ -1547,11 +1547,12 @@ BFont::UnloadFont()
 	}
 
 	// reset to plain font
-	fFamilyID = 0;
-	fStyleID = 0;
-	fFace = 0;
+	fFamilyID = sPlainFont.fFamilyID;
+	fStyleID = sPlainFont.fStyleID;
+	fFace = sPlainFont.fFace;
+	fExtraFlags = sPlainFont.fExtraFlags;
+
 	fHeight.ascent = kUninitializedAscent;
-	fExtraFlags = kUninitializedExtraFlags;
 
 	return B_OK;
 }
