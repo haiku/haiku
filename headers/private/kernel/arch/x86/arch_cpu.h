@@ -496,8 +496,8 @@ typedef struct x86_cpu_module_info {
 
 // features
 enum x86_feature_type {
-	FEATURE_COMMON = 0,     // cpuid eax=1, ecx register
-	FEATURE_EXT,            // cpuid eax=1, edx register
+	FEATURE_COMMON = 0,     // cpuid eax=1, edx register
+	FEATURE_EXT,            // cpuid eax=1, ecx register
 	FEATURE_EXT_AMD_ECX,	// cpuid eax=0x80000001, ecx register (AMD)
 	FEATURE_EXT_AMD,        // cpuid eax=0x80000001, edx register (AMD)
 	FEATURE_5_ECX,			// cpuid eax=5, ecx register
