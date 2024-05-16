@@ -472,6 +472,8 @@ ProcessController::MessageReceived(BMessage *message)
 				set_scheduler_mode(SCHEDULER_MODE_POWER_SAVING);
 			else
 				set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
+			Preferences preferences(kPreferencesFileName);
+			preferences.SaveInt32(get_scheduler_mode(), "scheduler_mode");
 			break;
 		}
 
@@ -841,6 +843,12 @@ thread_popup(void *arg)
 
 	// Scheduler modes
 	int32 currentMode = get_scheduler_mode();
+	Preferences preferences(kPreferencesFileName, NULL, false);
+	int32 savedMode;
+	if (preferences.ReadInt32(savedMode, "scheduler_mode") && currentMode != savedMode) {
+		set_scheduler_mode(savedMode);
+		currentMode = get_scheduler_mode();
+	}
 	BMessage* msg = new BMessage('Schd');
 	item = new BMenuItem(B_TRANSLATE("Power saving"), msg);
 	if ((uint32)currentMode == SCHEDULER_MODE_POWER_SAVING)
