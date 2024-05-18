@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	1337497439
+1	finnish	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		gold master
 Undo	TextView		Peru
@@ -6,6 +6,7 @@ OK	PrintJob		Valmis
 OK	Dragger		Valmis
 gamma	AboutWindow		gamma
 development	AboutWindow		ohjelmakehitys
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s tavu/s} other{%s tavua/s}}
 Print Server is not responding.	PrintJob		Tulostuspalvelin ei vastaa.
 About %app%	AboutMenuItem		Ohjelmasta %app%
 Warning	Dragger		Varoitus
@@ -13,15 +14,21 @@ Green:	ColorControl		Vihreä:
 Redo	TextView		Tee uudelleen
 No pages to print!	PrintJob		Ei ole tulostettavia sivuja!
 beta	AboutWindow		beeta
+%s MiB	StringForSize	size unit	%s Mebitavua
 OK	ZombieReplicantView		Valmis
 Cut	TextView		Leikkaa
 Default	Default decorator about box		Oletus
 Can't delete this replicant from its original application. Life goes on.	Dragger		Alkuperäisen sovelluksen tämän kopion poistaminen epäonnistui. Elämä jatkuu.
+%s KiB	StringForSize	size unit	%s Kibitavua
 Error	ZombieReplicantView		Virhe
 Paste	TextView		Liitä
 OK	AboutWindow		Valmis
+%s MiB/s	StringForRate	units per second	%s Mebitavua/s
 Special Thanks:	AboutWindow		Erityiskiitokset:
+%s TiB	StringForSize	size unit	%s Tebitavua
 Default Haiku window decorator.	Default decorator about box		Oletus Haiku-ikkunakoristemaalari.
+%s GiB	StringForSize	size unit	%s Gibitavua
+%s B	StringForSize	size unit, narrow space	%s tavua
 Remove replicant	Dragger		Poista kopio
 Version	AboutWindow		Versio
 Red:	ColorControl		Punainen:
@@ -30,10 +37,14 @@ Copy	TextView		Kopioi
 Select all	TextView		Valitse kaikki
 alpha	AboutWindow		alfa
 Error	PrintJob		Virhe
+%s TiB/s	StringForRate	units per second	%s Tebitavua/s
 About %app…	Dragger		Ohjelmasta %app...
 About %app%	AboutWindow		Ohjelmasta %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s tavu} other{%s tavut}}
+%s GiB/s	StringForRate	units per second	%s Gibitavua/s
 Version history:	AboutWindow		Versiohistoria:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kopion sovelluksen paikantaminen epäonnistui. Sovellusallekirjoitusta ei ole tarjottu.\n%error
+%s KiB/s	StringForRate	units per second	%s Kibitavua/s
 Blue:	ColorControl		Sininen:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Kohteen ”%description” kopion luominen epäonnistui.\n%error
 Written by:	AboutWindow		Tekijä:

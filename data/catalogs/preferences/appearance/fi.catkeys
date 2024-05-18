@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Appearance	663472720
+1	finnish	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Säätimen reuna
 Control mark	Colors tab		Ohjausmerkki
 Off	AntialiasingSettingsView		Pois päältä
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Size:	Font Selection view		Koko:
 Panel background	Colors tab		Paneelin tausta
 Plain font:	Font view		Tavallinen kirjasin:
+Automatically pick secondary colors	Colors tab		Poimi automaattisesti toissijaiset värit
 Window tab text	Colors tab		Ikkunavälilehden teksti
 Navigation pulse	Colors tab		Navigoinnin välke
 LCD subpixel	AntialiasingSettingsView		LCD-alipikseli

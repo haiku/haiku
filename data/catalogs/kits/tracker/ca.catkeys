@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	1818550058
+1	catalan; valencian	x-vnd.Haiku-libtracker	2482866522
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Error en moure \"%name\" a la
 Or	FindPanel		O
 MIME Description	AttributesView		Descripció de MIME
 before	FindPanel		abans
+New folder%d	FSUtils		Carpeta nova %d
 Volume icons	TrackerSettingsWindow		Icones dels volums
 Ignore case	SelectionWindow		Ignora les diferències de majúscules i minúscules
 Current folder	ContainerWindow		Carpeta actual
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		No el muntis automàticament
 Node ref	AttributesView		Ref. del node
 Could not find application \"%appname\"	OpenWithWindow		No s'ha pogut trobar l'aplicació \"%appname\".
 Unmatched parenthesis.	libtracker		Parèntesis no coincidents.
+New folder %d	FSUtils		Carpeta nova %d
 Extended attribute	AttributesView		Atribut ampliat
 Unmatched brackets.	libtracker		Claudàtors no coincidents.
 Error %error loading Add-On %name.	ContainerWindow		Hi ha hagut un error (%error) en carregar el complement %name.

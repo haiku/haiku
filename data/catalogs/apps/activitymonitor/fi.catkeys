@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	1319108693
+1	finnish	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Ryhmät
 Semaphores	DataSource		Opastimet
 TX	DataSource	Shorter version for Sending	Läh.
@@ -45,3 +45,4 @@ Swap	DataSource		Vaihda
 P-faults	DataSource		P-viat
 Sems	DataSource		Opastimet
 Network receive	DataSource		Verkkovastaanotto
+%s faults/s	DataSource		%s vikaa/s

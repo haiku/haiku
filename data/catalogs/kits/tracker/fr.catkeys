@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	729060404
+1	french	x-vnd.Haiku-libtracker	2087035058
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Erreur en envoyant « %name�
 Or	FindPanel		Ou
 MIME Description	AttributesView		Description MIME
 before	FindPanel		avant
+New folder%d	FSUtils		Nouveau dossier%d
 Volume icons	TrackerSettingsWindow		Icônes des volumes
 Ignore case	SelectionWindow		Ignorer la casse
 Current folder	ContainerWindow		Dossier courant
@@ -264,6 +265,7 @@ Don't automount	AutoMounterSettings		Ne pas monter automatiquement
 Node ref	AttributesView		Référence de nœud
 Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l’application « %appname »
 Unmatched parenthesis.	libtracker		Parenthèses non appariées.
+New folder %d	FSUtils		Nouveau dossier %d
 Extended attribute	AttributesView		Attribut étendu
 Unmatched brackets.	libtracker		Crochets non appariées.
 Error %error loading Add-On %name.	ContainerWindow		Erreur %error au chargement de l’extension %name.
@@ -331,6 +333,7 @@ To: %dir	StatusWindow		Vers : %dir
 Paste layout	ContainerWindow		Coller la disposition
 Cancel	Tracker		Annuler
 yes	AttributesView		oui
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Erreur à la copie du fichier « %name » :\n\t%error\n\n
 Make active printer	ContainerWindow		Activer l’imprimante
 Copy to	ContainerWindow		Copier vers
 Name	SelectionWindow		Nom
@@ -475,6 +478,7 @@ Color	AttributesView		Couleur
 Copy layout	ContainerWindow		Copier la disposition
 Duplicate	ContainerWindow		Dupliquer
 16-bit integer	AttributesView		Entier 16-bits
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Remarque : dans le système de fichiers cible, les noms de fichiers ne sont pas sensibles à la casse.\n
 Untitled clipping	PoseView		Extrait sans titre
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Le fichier « %name » existe déjà dans le dossier indiqué. Voulez-vous le remplacer ?
 , indexed	InfoWindow		, indexé

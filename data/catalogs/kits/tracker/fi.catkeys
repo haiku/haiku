@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1326470592
+1	finnish	x-vnd.Haiku-libtracker	2482866522
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdett
 Or	FindPanel		tai
 MIME Description	AttributesView		MIME-kuvaus
 before	FindPanel		ennen
+New folder%d	FSUtils		Uusi kansio%d
 Volume icons	TrackerSettingsWindow		Taltiokuvakkeet
 Ignore case	SelectionWindow		Ohita kirjainkoko
 Current folder	ContainerWindow		Nykyiset kansiot
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		Älä liitä automaattisesti
 Node ref	AttributesView		Solmuviite
 Could not find application \"%appname\"	OpenWithWindow		Sovelluksen ”%appname” löytäminen epäonnistui
 Unmatched parenthesis.	libtracker		Parittomat sulkeet.
+New folder %d	FSUtils		Uusi kansio %d
 Extended attribute	AttributesView		Laajennettu attribuutti
 Unmatched brackets.	libtracker		Parittomat sulkeet.
 Error %error loading Add-On %name.	ContainerWindow		Virhe %error ladattaessa lisäosaa %name.
@@ -332,6 +334,7 @@ To: %dir	StatusWindow		Vastaanottaja: %dir
 Paste layout	ContainerWindow		Liitä sijoittelu
 Cancel	Tracker		Peru
 yes	AttributesView		kyllä
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Virhe kopioitaessa tiedostoa \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Aseta aktiivinen tulostin
 Copy to	ContainerWindow		Kopioi kohteeseen
 Name	SelectionWindow		Nimi
@@ -403,6 +406,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Et voi irrottaa käynnistysta
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Asiakirjan ”%document” avaus sovelluksella ”%app” epäonnistui (Puuttuva symboli: %symbol). \n
 New folder	ContainerWindow		Uusi kansio
 Name	OpenWithWindow		Nimi
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Hae tiedot
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Kohteen ”%name” korvaaminen epäonnistui. Kohde on ehkä avattu tai se on varattu.
 Windows	TrackerSettingsWindow		Ikkunat
 Show space bars on volumes	SettingsView		Näytä tilapalkit taltioissa
@@ -476,6 +480,7 @@ Color	AttributesView		Väri
 Copy layout	ContainerWindow		Kopioi sijoittelu
 Duplicate	ContainerWindow		Kaksoiskappale
 16-bit integer	AttributesView		16-bittinen kokonaisluku
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Huomaa: tiedostonimet kohdetiedostojärjestelmässä eivät ole kirjainkoosta riippuvia.\n
 Untitled clipping	PoseView		Otsikoton leikkaus
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto ”%name” on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
 , indexed	InfoWindow		, indeksoitu

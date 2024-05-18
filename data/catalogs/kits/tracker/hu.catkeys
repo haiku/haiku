@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1818550058
+1	hungarian	x-vnd.Haiku-libtracker	2482866522
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Hiba történt a Szemetesbe m
 Or	FindPanel		Vagy
 MIME Description	AttributesView		MIME leírása
 before	FindPanel		előtte
+New folder%d	FSUtils		Új mappa %d
 Volume icons	TrackerSettingsWindow		Lemez ikonok
 Ignore case	SelectionWindow		Nem betűérzékeny
 Current folder	ContainerWindow		Jelenlegi mappa
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		Ne csatoljon automatikusan
 Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		A program (\"%appname\") nem található
 Unmatched parenthesis.	libtracker		Páratlan zárójel.
+New folder %d	FSUtils		Új mappa %d
 Extended attribute	AttributesView		Kiegészített jellemzők
 Unmatched brackets.	libtracker		Páratlan kapcsos-zárójel.
 Error %error loading Add-On %name.	ContainerWindow		Hiba történt a bővítmény (%name) betöltése közben: %error.

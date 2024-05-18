@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	2943652182
+1	finnish	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Alusta
 Could not unmount partition	MainWindow		Osion irrottaminen epäonnistui
 Create	CreateParametersPanel		Luo
 File system	PartitionList		Tiedostojärjestelmä
+Unknown (%s)	PartitionList		Tuntomaton (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Valittu osio ei sisällä osiointijärjestelmää.
 End: %s	Support		Loppu: %s
 Partition type	PartitionList		Osiotyyppi
