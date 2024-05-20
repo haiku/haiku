@@ -83,7 +83,7 @@ public:
 private:
 			status_t			_UpdateIfNecessary();
 			status_t			_Update();
-			int32				_RevisionOnServer();
+			uint32				_RevisionOnServer();
 			family*				_FindFamily(font_family name);
 	static	void				_InitSingleton();
 
@@ -91,7 +91,7 @@ private:
 			BObjectList<family>	fFamilies;
 			family*				fLastFamily;
 			bigtime_t			fLastUpdate;
-			int32				fRevision;
+			uint32				fRevision;
 
 	static	pthread_once_t		sDefaultInitOnce;
 	static	FontList*			sDefaultInstance;
@@ -224,7 +224,7 @@ FontList::_Update()
 {
 	// check version
 
-	int32 revision = _RevisionOnServer();
+	uint32 revision = _RevisionOnServer();
 	fLastUpdate = system_time();
 
 	// are we up-to-date already?
@@ -293,18 +293,21 @@ FontList::_UpdateIfNecessary()
 }
 
 
-int32
+uint32
 FontList::_RevisionOnServer()
 {
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_FONT_LIST_REVISION);
 
 	int32 code;
-	if (link.FlushWithReply(code) != B_OK || code != B_OK)
-		return B_ERROR;
+	if (link.FlushWithReply(code) != B_OK || code != B_OK) {
+		// Go on as if our list is up to date. If it is a one-time thing
+		// we'll try again soon. If it isn't, we have a bigger problem.
+		return fRevision;
+	}
 
-	int32 revision;
-	link.Read<int32>(&revision);
+	uint32 revision;
+	link.Read<uint32>(&revision);
 
 	return revision;
 }

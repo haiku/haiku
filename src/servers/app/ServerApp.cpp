@@ -1929,8 +1929,10 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			FTRACE(("ServerApp %s: AS_GET_FONT_LIST_REVISION\n", Signature()));
 
 			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(
-				gFontManager->CheckRevision(fDesktop->UserID()));
+			gFontManager->Lock();
+			fLink.Attach<uint32>(gFontManager->Revision());
+				// TODO: get value per fDesktop->UserID()
+			gFontManager->Unlock();
 			fLink.Flush();
 			break;
 		}

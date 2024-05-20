@@ -62,6 +62,8 @@ public:
 				// This call must not be used by anything else than class
 				// FontStyle.
 
+	virtual	uint32				Revision();
+
 
 protected:
 			FT_CharMap			_GetSupportedCharmap(const FT_Face& face);
@@ -106,6 +108,7 @@ private:
 			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
 			HashMap<FontKey, FontStyle*> fDelistedStyleHashTable;
 
+			uint32				fRevision;
 			uint16				fNextID;
 };
 

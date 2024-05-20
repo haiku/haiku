@@ -44,6 +44,7 @@ compare_font_families(const FontFamily* a, const FontFamily* b)
 FontManager::FontManager()
 	:
 	fFamilies(20),
+	fRevision(0),
 	fNextID(0)
 {
 }
@@ -294,6 +295,13 @@ FontManager::RemoveStyle(FontStyle* style)
 }
 
 
+uint32
+FontManager::Revision()
+{
+	return fRevision;
+}
+
+
 status_t
 FontManager::_AddFont(FT_Face face, node_ref nodeRef, const char* path,
 	uint16& familyID, uint16& styleID)
@@ -337,6 +345,7 @@ FontManager::_AddFont(FT_Face face, node_ref nodeRef, const char* path,
 	fStyleHashTable.Put(FontKey(familyID, styleID), style);
 	style->ReleaseReference();
 
+	fRevision++;
 	return B_OK;
 }
 
@@ -355,6 +364,8 @@ FontManager::_RemoveFont(uint16 familyID, uint16 styleID)
 			fFamilies.RemoveItem(family);
 		fStyleHashTable.Remove(key);
 	}
+
+	fRevision++;
 	return style;
 }
 

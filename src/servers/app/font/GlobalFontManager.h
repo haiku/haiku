@@ -51,8 +51,6 @@ public:
 	virtual	int32				CountStyles(const char* family);
 	virtual	int32				CountStyles(uint16 familyID);
 
-			int32				CheckRevision(uid_t user);
-
 			const ServerFont*	DefaultPlainFont() const;
 			const ServerFont*	DefaultBoldFont() const;
 			const ServerFont*	DefaultFixedFont() const;
@@ -69,6 +67,8 @@ public:
 									uint16 familyID = 0xffff,
 									uint16 styleID = 0xffff,
 									uint16 face = 0);
+
+	virtual	uint32				Revision();
 
 private:
 			struct font_directory;
