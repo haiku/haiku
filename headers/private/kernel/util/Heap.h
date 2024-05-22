@@ -78,7 +78,7 @@ public:
 						Heap(int initialSize);
 						~Heap();
 
-	inline	Element*	PeekRoot() const;
+	inline	Element*	PeekRoot(int32 index = 0) const;
 
 	static	const Key&	GetKey(Element* element);
 
@@ -188,10 +188,10 @@ HEAP_CLASS_NAME::~Heap()
 
 HEAP_TEMPLATE_LIST
 Element*
-HEAP_CLASS_NAME::PeekRoot() const
+HEAP_CLASS_NAME::PeekRoot(int32 index) const
 {
-	if (fLastElement > 0)
-		return fElements[0];
+	if (index < fLastElement)
+		return fElements[index];
 	return NULL;
 }
 

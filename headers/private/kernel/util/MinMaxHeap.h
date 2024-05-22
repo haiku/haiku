@@ -73,8 +73,8 @@ public:
 						MinMaxHeap(int initialSize);
 						~MinMaxHeap();
 
-	inline	Element*	PeekMinimum() const;
-	inline	Element*	PeekMaximum() const;
+	inline	Element*	PeekMinimum(int32 index = 0) const;
+	inline	Element*	PeekMaximum(int32 index = 0) const;
 
 	static	const Key&	GetKey(Element* element);
 
@@ -190,13 +190,12 @@ MIN_MAX_HEAP_CLASS_NAME::~MinMaxHeap()
 
 MIN_MAX_HEAP_TEMPLATE_LIST
 Element*
-MIN_MAX_HEAP_CLASS_NAME::PeekMinimum() const
+MIN_MAX_HEAP_CLASS_NAME::PeekMinimum(int32 index) const
 {
-	if (fMinLastElement > 0)
-		return fMinElements[0];
-	else if (fMaxLastElement > 0) {
-		ASSERT(fMaxLastElement == 1);
-		return fMaxElements[0];
+	if (index < fMinLastElement)
+		return fMinElements[index];
+	else if (index - fMinLastElement < fMaxLastElement) {
+		return fMaxElements[fMaxLastElement - (index - fMinLastElement) - 1];
 	}
 
 	return NULL;
@@ -205,13 +204,12 @@ MIN_MAX_HEAP_CLASS_NAME::PeekMinimum() const
 
 MIN_MAX_HEAP_TEMPLATE_LIST
 Element*
-MIN_MAX_HEAP_CLASS_NAME::PeekMaximum() const
+MIN_MAX_HEAP_CLASS_NAME::PeekMaximum(int32 index) const
 {
-	if (fMaxLastElement > 0)
-		return fMaxElements[0];
-	else if (fMinLastElement > 0) {
-		ASSERT(fMinLastElement == 1);
-		return fMinElements[0];
+	if (index < fMaxLastElement)
+		return fMaxElements[index];
+	else if (index - fMaxLastElement < fMinLastElement) {
+		return fMinElements[fMinLastElement - (index - fMaxLastElement) - 1];
 	}
 
 	return NULL;

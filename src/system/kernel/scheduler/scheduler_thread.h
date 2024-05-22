@@ -39,6 +39,7 @@ public:
 
 	inline	int32		GetPriority() const	{ return fThread->priority; }
 	inline	Thread*		GetThread() const	{ return fThread; }
+	inline	CPUSet		GetCPUMask() const	{ return fThread->cpumask.And(gCPUEnabled); }
 
 	inline	bool		IsRealTime() const;
 	inline	bool		IsIdle() const;

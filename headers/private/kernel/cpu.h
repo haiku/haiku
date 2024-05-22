@@ -90,6 +90,7 @@ typedef struct CACHE_LINE_ALIGN cpu_ent {
 
 extern cpu_ent gCPU[];
 extern uint32 gCPUCacheLevelCount;
+extern CPUSet gCPUEnabled;
 
 
 #ifdef __cplusplus

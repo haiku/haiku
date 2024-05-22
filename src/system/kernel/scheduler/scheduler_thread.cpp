@@ -59,10 +59,16 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 
 	int32 threadPriority = GetEffectivePriority();
 
-	if (fThread->previous_cpu != NULL) {
+	CPUSet mask = GetCPUMask();
+	if (mask.IsEmpty())
+		mask.SetAll();
+	ASSERT(mask.Matches(core->CPUMask()));
+
+	if (fThread->previous_cpu != NULL && !fThread->previous_cpu->disabled
+		&& mask.GetBit(fThread->previous_cpu->cpu_num)) {
 		CPUEntry* previousCPU
 			= CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
-		if (previousCPU->Core() == core && !fThread->previous_cpu->disabled) {
+		if (previousCPU->Core() == core) {
 			CoreCPUHeapLocker _(core);
 			if (CPUPriorityHeap::GetKey(previousCPU) < threadPriority) {
 				previousCPU->UpdatePriority(threadPriority);
@@ -73,7 +79,11 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 	}
 
 	CoreCPUHeapLocker _(core);
-	CPUEntry* cpu = core->CPUHeap()->PeekRoot();
+	int32 index = 0;
+	CPUEntry* cpu;
+	do {
+		cpu = core->CPUHeap()->PeekRoot(index++);
+	} while (cpu != NULL && !mask.GetBit(cpu->ID()));
 	ASSERT(cpu != NULL);
 
 	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
@@ -156,12 +166,21 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 
 	bool rescheduleNeeded = false;
 
+	if (targetCore != NULL && !targetCore->CPUMask().Matches(GetCPUMask()))
+		targetCore = NULL;
+	if (targetCPU != NULL && !GetCPUMask().GetBit(targetCPU->ID()))
+		targetCPU = NULL;
+
 	if (targetCore == NULL && targetCPU != NULL)
 		targetCore = targetCPU->Core();
 	else if (targetCore != NULL && targetCPU == NULL)
 		targetCPU = _ChooseCPU(targetCore, rescheduleNeeded);
 	else if (targetCore == NULL && targetCPU == NULL) {
 		targetCore = _ChooseCore();
+		CPUSet mask = GetCPUMask();
+		if (mask.IsEmpty())
+			mask.SetAll();
+		ASSERT(mask.Matches(targetCore->CPUMask()));
 		targetCPU = _ChooseCPU(targetCore, rescheduleNeeded);
 	}
 

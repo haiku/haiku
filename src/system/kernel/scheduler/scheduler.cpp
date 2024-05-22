@@ -117,7 +117,7 @@ enqueue(Thread* thread, bool newOne)
 
 	const bool rescheduleNeeded = threadData->ChooseCoreAndCPU(targetCore, targetCPU);
 
-	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
+	TRACE("enqueueing thread %" B_PRId32 " with priority %" B_PRId32 " on CPU %" B_PRId32 " (core %" B_PRId32 ")\n",
 		thread->id, threadPriority, targetCPU->ID(), targetCore->ID());
 
 	bool wasRunQueueEmpty = false;
@@ -153,7 +153,7 @@ scheduler_enqueue_in_run_queue(Thread *thread)
 
 	SchedulerModeLocker _;
 
-	TRACE("enqueueing new thread %ld with static priority %ld\n", thread->id,
+	TRACE("enqueueing new thread %" B_PRId32 " with static priority %" B_PRId32 "\n", thread->id,
 		thread->priority);
 
 	ThreadData* threadData = thread->scheduler_data;
@@ -180,7 +180,7 @@ scheduler_set_thread_priority(Thread *thread, int32 priority)
 	ThreadData* threadData = thread->scheduler_data;
 	int32 oldPriority = thread->priority;
 
-	TRACE("changing thread %ld priority to %ld (old: %ld, effective: %ld)\n",
+	TRACE("changing thread %" B_PRId32 " priority to %" B_PRId32 " (old: %" B_PRId32 ", effective: %" B_PRId32 ")\n",
 		thread->id, priority, oldPriority, threadData->GetEffectivePriority());
 
 	thread->priority = priority;
@@ -333,7 +333,7 @@ reschedule(int32 nextState)
 
 	SchedulerModeLocker modeLocker;
 
-	TRACE("reschedule(): cpu %ld, current thread = %ld\n", thisCPU,
+	TRACE("reschedule(): cpu %" B_PRId32 ", current thread = %" B_PRId32 "\n", thisCPU,
 		oldThread->id);
 
 	oldThread->state = nextState;
@@ -348,7 +348,7 @@ reschedule(int32 nextState)
 		case B_THREAD_READY:
 			enqueueOldThread = true;
 
-			if (!oldThreadData->IsIdle()) {
+			if (!oldThreadData->IsIdle() && oldThreadData->GetCPUMask().GetBit(thisCPU)) {
 				oldThreadData->Continues();
 				if (oldThreadData->HasQuantumEnded(oldThread->cpu->preempted,
 						oldThread->has_yielded)) {
@@ -394,9 +394,21 @@ reschedule(int32 nextState)
 		} else
 			nextThreadData = oldThreadData;
 	} else {
+		CPUSet mask = oldThreadData->GetCPUMask();
+		if (mask.IsEmpty())
+			mask.SetAll();
+		bool oldThreadShouldMigrate = !mask.GetBit(thisCPU);
+		if (oldThreadShouldMigrate)
+			enqueueOldThread = false;
 		nextThreadData
 			= cpu->ChooseNextThread(enqueueOldThread ? oldThreadData : NULL,
 				putOldThreadAtBack);
+		if (oldThreadShouldMigrate) {
+			enqueue(oldThread, true);
+			// replace with the idle thread, if no other thread could be found
+			if (oldThreadData == nextThreadData)
+				nextThreadData = cpu->PeekIdleThread();
+		}
 
 		// update CPU heap
 		CoreCPUHeapLocker cpuLocker(core);
@@ -417,7 +429,7 @@ reschedule(int32 nextState)
 		acquire_spinlock(&nextThread->scheduler_lock);
 	}
 
-	TRACE("reschedule(): cpu %ld, next thread = %ld\n", thisCPU,
+	TRACE("reschedule(): cpu %" B_PRId32 ", next thread = %" B_PRId32 "\n", thisCPU,
 		nextThread->id);
 
 	T(ScheduleThread(nextThread, oldThread));
@@ -572,6 +584,10 @@ scheduler_set_cpu_enabled(int32 cpuID, bool enabled)
 	}
 
 	gCPU[cpuID].disabled = !enabled;
+	if (enabled)
+		gCPUEnabled.SetBitAtomic(cpuID);
+	else
+		gCPUEnabled.ClearBitAtomic(cpuID);
 
 	if (!enabled) {
 		cpu->Stop();

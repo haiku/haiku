@@ -197,6 +197,8 @@ extern status_t		_kern_get_team_usage_info(team_id team, int32 who,
 extern status_t		_kern_get_extended_team_info(team_id teamID, uint32 flags,
 						void* buffer, size_t size, size_t* _sizeNeeded);
 extern int			_kern_get_cpu();
+extern status_t		_kern_get_thread_affinity(thread_id id, void* userMask, size_t size);
+extern status_t		_kern_set_thread_affinity(thread_id id, const void* userMask, size_t size);
 
 extern status_t		_kern_start_watching_system(int32 object, uint32 flags,
 						port_id port, int32 token);

@@ -44,7 +44,7 @@ has_cache_expired(const ThreadData* threadData)
 
 
 static CoreEntry*
-choose_core(const ThreadData* /* threadData */)
+choose_core(const ThreadData* threadData)
 {
 	SCHEDULER_ENTER_FUNCTION();
 
@@ -55,16 +55,31 @@ choose_core(const ThreadData* /* threadData */)
 		package = PackageEntry::GetMostIdlePackage();
 	}
 
+	int32 index = 0;
+	CPUSet mask = threadData->GetCPUMask();
+	if (mask.IsEmpty()) {
+		// ignore when empty
+		mask.SetAll();
+	}
 	CoreEntry* core = NULL;
-	if (package != NULL)
-		core = package->GetIdleCore();
-
+	if (package != NULL) {
+		do {
+			core = package->GetIdleCore(index++);
+		} while (core != NULL && !core->CPUMask().Matches(mask));
+	}
 	if (core == NULL) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
+		index = 0;
 		// no idle cores, use least occupied core
-		core = gCoreLoadHeap.PeekMinimum();
-		if (core == NULL)
-			core = gCoreHighLoadHeap.PeekMinimum();
+		do {
+			core = gCoreLoadHeap.PeekMinimum(index++);
+		} while (core != NULL && !core->CPUMask().Matches(mask));
+		if (core == NULL) {
+			index = 0;
+			do {
+				core = gCoreHighLoadHeap.PeekMinimum(index++);
+			} while (core != NULL && !core->CPUMask().Matches(mask));
+		}
 	}
 
 	ASSERT(core != NULL);
@@ -82,9 +97,25 @@ rebalance(const ThreadData* threadData)
 
 	// Get the least loaded core.
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
-	CoreEntry* other = gCoreLoadHeap.PeekMinimum();
-	if (other == NULL)
-		other = gCoreHighLoadHeap.PeekMinimum();
+	CPUSet mask = threadData->GetCPUMask();
+	if (mask.IsEmpty()) {
+		// ignore when empty
+		mask.SetAll();
+	}
+	int32 index = 0;
+	CoreEntry* other;
+	do {
+		other = gCoreLoadHeap.PeekMinimum(index++);
+		if (other != NULL && other->CPUMask().IsEmpty())
+			panic("other->CPUMask().IsEmpty()\n");
+	} while (other != NULL && !other->CPUMask().Matches(mask));
+
+	if (other == NULL) {
+		index = 0;
+		do {
+			other = gCoreHighLoadHeap.PeekMinimum(index++);
+		} while (other != NULL && !other->CPUMask().Matches(mask));
+	}
 	coreLocker.Unlock();
 	ASSERT(other != NULL);
 

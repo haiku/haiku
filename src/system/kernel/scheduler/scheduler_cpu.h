@@ -8,6 +8,7 @@
 
 #include <OS.h>
 
+#include <smp.h>
 #include <thread.h>
 #include <util/AutoLock.h>
 #include <util/Heap.h>
@@ -131,6 +132,8 @@ public:
 	inline				PackageEntry*	Package() const	{ return fPackage; }
 	inline				int32			CPUCount() const
 											{ return fCPUCount; }
+	inline				const CPUSet&	CPUMask() const
+											{ return fCPUSet; }
 
 	inline				void			LockCPUHeap();
 	inline				void			UnlockCPUHeap();
@@ -182,6 +185,7 @@ private:
 						PackageEntry*	fPackage;
 
 						int32			fCPUCount;
+						CPUSet			fCPUSet;
 						int32			fIdleCPUCount;
 						CPUPriorityHeap	fCPUHeap;
 						spinlock		fCPULock;
@@ -229,7 +233,7 @@ public:
 	inline				void				CoreGoesIdle(CoreEntry* core);
 	inline				void				CoreWakesUp(CoreEntry* core);
 
-	inline				CoreEntry*			GetIdleCore() const;
+	inline				CoreEntry*			GetIdleCore(int32 index = 0) const;
 
 						void				AddIdleCore(CoreEntry* core);
 						void				RemoveIdleCore(CoreEntry* core);
@@ -538,10 +542,14 @@ CoreEntry::GetCore(int32 cpu)
 
 
 inline CoreEntry*
-PackageEntry::GetIdleCore() const
+PackageEntry::GetIdleCore(int32 index) const
 {
 	SCHEDULER_ENTER_FUNCTION();
-	return fIdleCores.Last();
+	CoreEntry* element = fIdleCores.Last();
+	for (int32 i = 0; element != NULL && i < index; i++)
+		element = fIdleCores.GetPrevious(element);
+
+	return element;
 }
 
 
