@@ -12,6 +12,9 @@
 #ifdef _GNU_SOURCE
 
 
+#include <sched.h>
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,6 +24,9 @@ extern int pthread_getattr_np(pthread_t thread, pthread_attr_t* attr);
 
 extern int pthread_getname_np(pthread_t thread, char* buffer, size_t length);
 extern int pthread_setname_np(pthread_t thread, const char* name);
+
+extern int pthread_setaffinity_np(pthread_t thread, size_t cpusetsize, const cpuset_t* mask);
+extern int pthread_getaffinity_np(pthread_t thread, size_t cpusetsize, cpuset_t* mask);
 
 
 #ifdef __cplusplus

@@ -4,5 +4,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility gnu ] : true ;
 SubDirC++Flags [ FDefines _GNU_SOURCE=1 ] ;
 
 SimpleTest sched_getcpu_test : sched_getcpu_test.cpp : libgnu.so ;
+SimpleTest sched_affinity_test : sched_affinity_test.cpp : libgnu.so ;
 
 
