@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	indonesian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Tim
 Semaphores	DataSource		Semaphore
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Swap
 P-faults	DataSource		P-faults
 Sems	DataSource		Sems
 Network receive	DataSource		Jaringan menerima
+%s faults/s	DataSource		%s galat/d

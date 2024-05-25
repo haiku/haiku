@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2798763364
+1	turkish	x-vnd.Haiku-libtracker	4156738018
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		“%name”, çöpe atılırk
 Or	FindPanel		veya
 MIME Description	AttributesView		MIME Tanımı
 before	FindPanel		önce
+New folder%d	FSUtils		Yeni klasör%d
 Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
 Current folder	ContainerWindow		Geçerli klasör
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		Otomatik bağlama yok
 Node ref	AttributesView		Düğüm başvurusu
 Could not find application \"%appname\"	OpenWithWindow		“%appname” uygulaması bulunamıyor
 Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
+New folder %d	FSUtils		Yeni klasör %d
 Extended attribute	AttributesView		Genişletilmiş öznitelik
 Unmatched brackets.	libtracker		Eşleşmeyen köşeli parantezler.
 Error %error loading Add-On %name.	ContainerWindow		%name eklentisi yüklenirken %error hatası
@@ -332,6 +334,7 @@ To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
 Cancel	Tracker		Vazgeç
 yes	AttributesView		evet
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		“%name” dosyasını kopyalarken hata:\n\t%error\n\n
 Make active printer	ContainerWindow		Etkin yazıcı kıl
 Copy to	ContainerWindow		Kopyala
 Name	SelectionWindow		Ad
@@ -476,6 +479,7 @@ Color	AttributesView		Renk
 Copy layout	ContainerWindow		Yerleşimi kopyala
 Duplicate	ContainerWindow		Çoğalt
 16-bit integer	AttributesView		16 bit tamsayı
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Not: Hedef dosya sistemindeki dosya adları BÜYÜK/küçük harf duyarlı değil.\n
 Untitled clipping	PoseView		Adsız kırpma
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		“%name” adı belirtilen klasörde hâlihazırda var. Değiştirmek istiyor musunuz?
 , indexed	InfoWindow		, indeksli

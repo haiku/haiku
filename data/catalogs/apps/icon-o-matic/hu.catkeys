@@ -1,9 +1,12 @@
-1	hungarian	x-vnd.haiku-icon_o_matic	3497964386
+1	hungarian	x-vnd.haiku-icon_o_matic	1614073665
 None	Icon-O-Matic-Properties		Nincs
+Clean up path	Icon-O-Matic-CleanUpPathCmd		Útvonal megtisztítása
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Hozzáadás
 Opening the icon failed!	Icon-O-Matic-Main		Az ikon megnyitása sikertelen!
+Reverse path	Icon-O-Matic-ReversePathCmd		Fordított útvonal
 Add with path	Icon-O-Matic-ShapesList		Hozzáadás útvonallal együtt
+Paste properties	Icon-O-Matic-Properties		Beillesztés tulajdonságai
 Copy	Icon-O-Matic-Properties		Másolás
 Color	Icon-O-Matic-PropertyNames		Szín
 Format	Icon-O-Matic-SavePanel		Formátum
@@ -14,17 +17,24 @@ Duplicate	Icon-O-Matic-StylesList		Megkettőzés
 32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Elforgatás
 Shorten	Icon-O-Matic-PropertyNames		Rövidítés
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{Átalakítás} other{Átalakítás}} mozgatása
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		A szöveg amit importálni kívánsz nagyon hosszú. Biztos importálod?
 Paste	Icon-O-Matic-Properties		Beillesztés
+There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Túl sok stílus van megadva. A HVIF formátum maximum 255-öt támogat.
 Close	Icon-O-Matic-Menu-File		Bezárás
 Add rect	Icon-O-Matic-PathsList		Téglalap hozzáadása
 Rotation	Icon-O-Matic-PropertyNames		Elforgatás
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport	Style name after dropping a color	Szín (#%02x%02x%02x)
+BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON attribute
 Transform	Icon-O-Matic-PathManipulator		Átalakítás
 Add shape with style	Icon-O-Matic-Menu-Shape		Hozzáadás stílussal
+Change color	Icon-O-Matic-SetColorCmd		Szín módosítása
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		{0, plural, one{Csúcs} other{Csúcs}} eltávolítása
+Unassign path	Icon-O-Matic-UnassignPathCmd		Útvonal társításának megszüntetése
 Remove	Icon-O-Matic-StylesList		Eltávolítás
 Cancel	Icon-O-Matic-Menu-Settings		Mégse
 Transformation	Icon-O-Matic-TransformationBoxStates		Átalakítás
+Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		{0, plural, one{Útvonal} other{Útvonal}} mozgatása
 Closed	Icon-O-Matic-PropertyNames		Zárt
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nincs mit újra végrehajtani>
 Height	Icon-O-Matic-PropertyNames		Magasság
@@ -38,27 +48,42 @@ Flip	Icon-O-Matic-PathManipulator		Tükrözés
 Opacity	Icon-O-Matic-PropertyNames		Átlátszóság
 OK	Icon-O-Matic-ColorPicker		Rendben
 Error: 	Icon-O-Matic-Main		Hiba:
+Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		{0, plural, one{Átalakítás} other{Átalakítás}} visszaállítása
+Assign style	Icon-O-Matic-AssignStyleCmd		Stílus társítása
 Saving your document failed!	Icon-O-Matic-Exporter		A dokumentum mentése sikertelen volt!
 Snap to grid	Icon-O-Matic-Menu-Settings		Rácshoz illesztés
 Opening the document failed!	Icon-O-Matic-Main		Nem sikerült megnyitni a dokumentumot!
+Remove {0, plural, one{style} other{styles}}	Icon-O-Matic-RemoveStylesCmd		{0, plural, one{Stílus} other{Stílus}} eltávolítása
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		Egy vagy több útvonal is túl sok csúcsot tartalmaz. A HVIF formátum maximum 255-öt támogat útvonalanként.
 Add with path & style	Icon-O-Matic-ShapesList		Hozzáadás útvonallal és stílussal együtt
 Shape	Icon-O-Matic-Menus		Alakzat
+Split {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-SplitPointsCmd		{0, plural, one{Csúcs} other{Csúcs}} felosztása
 <unavailable>	Icon-O-Matic-StyleTypes		<nem elérhető>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Átmenet szerkesztése
 Min LOD	Icon-O-Matic-PropertyNames		Min RSz
+Redo: %action%	Icon-O-Matic-Main		Újra: %action%
 Add	Icon-O-Matic-TransformersList		Hozzáadás
 Settings	Icon-O-Matic-Menus		Beállítások
 Scale X	Icon-O-Matic-PropertyNames		X skála
 Add	Icon-O-Matic-PathsList		Hozzáadás
+Add {0, plural, one{style} other{styles}}	Icon-O-Matic-AddStylesCmd		{0, plural, one{Stílus} other{Stílus}} hozzáadása
 Remove	Icon-O-Matic-PathManipulator		Eltávolítás
 Duplicate	Icon-O-Matic-ShapesList		Megkettőzés
 Alpha	Icon-O-Matic-PropertyNames		Alfa
 Contour	Transformation		Körvonal
+Add {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-AddTransformersCmd		{0, plural, one{Átalakítás} other{Átalakítás}} hozzáadása
+Insert vertex	Icon-O-Matic-InsertPointCmd		Csúcs hozzáadása
 Rounding	Icon-O-Matic-PropertyNames		Kerekítés
 Joins	Icon-O-Matic-PropertyNames		Csatlakozási pontok
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Túl sok alakzat van megadva. A HVIF formátum maximum 255-öt támogat.
 Cancel	Icon-O-Matic-ColorPicker		Mégse
 Duplicate	Icon-O-Matic-PathsList		Megkettőzés
+Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		{0, plural, one{Alakzat} other{Alakzat}} mozgatása
 Save	Icon-O-Matic-Menu-Settings		Mentés
 Export as…	Icon-O-Matic-Menu-File		Exportálás másként…
+Freeze {0, plural, one{shape} other{shapes}}	Icon-O-Matic-FreezeTransformationCmd		{0, plural, one{Alakzat} other{Alakzat}} rögzítése
+Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		{0, plural, one{Alakzat} other{Alakzat}} eltávolítása
+Undo: %action%	Icon-O-Matic-Main		Visszavonás: %action%
 Diamond	Icon-O-Matic-StyleTypes		Rombusz
 Don't save	Icon-O-Matic-Menu-Settings		Ne mentse
 Add shape with path	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal
@@ -66,31 +91,50 @@ Translation X	Icon-O-Matic-PropertyNames		X fordítás
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Az Icon-O-Matic nem biztos hogy az SVG fájl betöltésekor annak minden részét értelmezte. Az eredeti fájl felülírásával ezeket az adatok elvésznek.
 Rotate indices backwards	Icon-O-Matic-PathsList		Forgatás balra
 Overwrite	Icon-O-Matic-SVGExport		Felülírás
+Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		{0, plural, one{Alakzat} other{Alakzat}} hozzáadása
 Cancel	Icon-O-Matic-SVGExport		Mégse
 Open…	Icon-O-Matic-Menu-File		Megnyitás…
+Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		{0, plural, one{Átalakítás} other{Átalakítás}} eltávolítása
+Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Kattints egy fenti alakzatra
 Remove	Icon-O-Matic-ShapesList		Eltávolítás
+HVIF source code	Icon-O-Matic-SavePanel		HVIF forráskód
 Drop shapes	Icon-O-Matic-ShapesList		Alakzatok eldobása
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Ikon mentése
+Assign {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{Útvonal} other{Útvonal}} társítása
+Remove {0, plural, one{item} other{items}}	Icon-O-Matic-RemoveItemsCmd		{0, plural, one{Elem} other{Elem}} eltávolítása
 Linear	Icon-O-Matic-StyleTypes		Egyenes
+Move {0, plural, one{item} other{items}}	Icon-O-Matic-MoveItemsCmd		{0, plural, one{Elem} other{Elem}} mozgatása
+Add vertex	Icon-O-Matic-AddPointCmd		Csúcspont hozzáadása
 Clean up	Icon-O-Matic-PathsList		Tisztítás
 Split	Icon-O-Matic-PathManipulator		Szétvágás
 Move	Icon-O-Matic-TransformationBoxStates		Áthelyezés
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		Túl sok útvonal van megadva. A HVIF formátum maximum 255-öt támogat.
 Conic	Icon-O-Matic-StyleTypes		Kúpos
 Name	Icon-O-Matic-PropertyNames		Név
 Reset transformation	Icon-O-Matic-StylesList		Átalakítás visszaállítása
 Reverse	Icon-O-Matic-PathsList		Megfordítás
 Remove	Icon-O-Matic-PathsList		Eltávolítás
 64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
+Load error	Icon-O-Matic-SVGImport		Betöltési hiba
 Style type	Icon-O-Matic-StyleTypes		Stílus típusa
 Quit	Icon-O-Matic-Menu-File		Kilépés
+One or more of the shapes have too many transformers. The HVIF format supports a maximum of 255 transformers per shape.	Icon-O-Matic-FlatIconExporter		Egy vagy több alakzat is túl sok átalakítást tartalmaz. A HVIF formátum maximum 255-öt támogat alakzatonként.
 Gradient	Icon-O-Matic-StyleTypes		Átmenet
 Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Szín (#%02x%02x%02x)
+Detect orient.	Icon-O-Matic-PropertyNames		Tájolás észlelése.
+Add {0, plural, one{path} other{paths}}	Icon-O-Matic-AddPathsCmd		{0, plural, one{Útvonal} other{Útvonal}} hozzáadása
+One or more of the shapes has too many paths. The HVIF format supports a maximum of 255 paths per shape.	Icon-O-Matic-FlatIconExporter		Egy vagy több alakzat is túl sok útvonalat tartalmaz. A HVIF formátum maximum 255-öt támogat alakzatonként.
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Hozzáadás útvonallal és stílussal
 Radial	Icon-O-Matic-StyleTypes		Sugaras
 Text too long	Icon-O-Matic-StyledTextImport		A szöveg túl hosszú
 Caps	Icon-O-Matic-PropertyNames		Vonalvég
 OK	Icon-O-Matic-SVGImport		Rendben
+Import text	Icon-O-Matic-StyledTextImport		Szöveg importálása
 Append…	Icon-O-Matic-Menu-File		Hozzáfűzés…
 Scale Y	Icon-O-Matic-PropertyNames		Y skála
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Ikon exportálása
+Rotate path indices	Icon-O-Matic-RotatePathIndiciesCmd		Görbeindexek elforgatása
+Add {0, plural, one{item} other{items}}	Icon-O-Matic-AddItemsCmd		{0, plural, one{Elem} other{Elem}} hozzáadása
 Rotate indices forwards	Icon-O-Matic-PathsList		Forgatás jobbra
 Save	Icon-O-Matic-Menu-File		Mentés
 Cancel	Icon-O-Matic-StyledTextImport		Mégse
@@ -104,20 +148,29 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nem
 Save as…	Icon-O-Matic-Menu-File		Mentés másként…
 Swatches	Icon-O-Matic-Menus		Paletta
 <modify path>	Icon-O-Matic-PathCmd		<útvonal módosítása>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	%property% beállítása
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nincs mit visszavonni>
+Remove {0, plural, one{path} other{paths}}	Icon-O-Matic-RemovePathsCmd		{0, plural, one{Útvonal} other{Útvonal}} eltávolítása
 Add	Icon-O-Matic-StylesList		Hozzáadás
 Translation Y	Icon-O-Matic-PropertyNames		Y fordítás
+Modify vertex	Icon-O-Matic-ChangePointCmd		Csúcs módosítása
+Move {0, plural, one{style} other{styles}}	Icon-O-Matic-MoveStylesCmd		{0, plural, one{Stílus} other{Stílus}} mozgatása
 Scale	Icon-O-Matic-TransformationBoxStates		Méretezés
 All	Icon-O-Matic-Properties		Összes
 Transformer	Icon-O-Matic-Menus		Átalaktító
+Flip {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-FlipPointsCmd		{0, plural, one{Csúcs} other{Csúcs}} tükrözése
 Invert selection	Icon-O-Matic-Properties		Kijelölés megfordítása
 <unkown property>	Icon-O-Matic-PropertyNames		<ismeretlen tulajdonság>
 Pick a color	Icon-O-Matic-ColorPicker		Szín kiválasztása
 Settings…	Icon-O-Matic-SavePanel		Beállítások…
+Select all	Icon-O-Matic-PathManipulator		Mindent kijelöl
 Add with style	Icon-O-Matic-ShapesList		Hozzáadás stílussal együtt
 New	Icon-O-Matic-Menu-File		Új
+Change perspective	Icon-O-Matic-PerspectiveCommand		Perspektíva módosítása
+Nudge {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-NudgePointsCommand		{0, plural, one{Csúcs} other{Csúcs}} meglökése
 Gradient type	Icon-O-Matic-StyleTypes		Színátmenet típusa
+Perspective	Transformation		Perspektíva
 Export	Icon-O-Matic-Menu-File		Exportálás
 Width	Icon-O-Matic-PropertyNames		Szélesség
 Add reference image	Icon-O-Matic-ShapesList		Referenciakép hozzáadása

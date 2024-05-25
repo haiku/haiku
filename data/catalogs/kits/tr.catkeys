@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libbe	2539827825
+1	turkish	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Tüm hakları saklıdır.
 gold master	AboutWindow		altın kopya
 Undo	TextView		Geri al
@@ -6,6 +6,7 @@ OK	PrintJob		Tamam
 OK	Dragger		Tamam
 gamma	AboutWindow		gama
 development	AboutWindow		geliştirme
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s bayt/sn} other{%s bayt/sn}}
 Print Server is not responding.	PrintJob		Yazdırma sunucusu yanıt vermiyor.
 About %app%	AboutMenuItem		%app% hakkında
 Warning	Dragger		Uyarı
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Özel teşekkürlerimizle:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Saptanmış Haiku pencere dekorcusu.
 %s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Yineleneni kaldır
 Version	AboutWindow		Sürüm
 Red:	ColorControl		Kırmızı:
@@ -38,6 +40,7 @@ Error	PrintJob		Hata
 %s TiB/s	StringForRate	units per second	%s TiB/sn
 About %app…	Dragger		%app hakkında…
 About %app%	AboutWindow		%app% hakkında
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s bayt} other{%s bayt}}
 %s GiB/s	StringForRate	units per second	%s GiB/sn
 Version history:	AboutWindow		Sürüm geçmişi:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Yinelenen uygulaması konumu bulunamıyor. Hiçbir uygulama imzası sağlanmamış.\n%error

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	2943652182
+1	russian	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Форматировать
 Could not unmount partition	MainWindow		Невозможно отключить раздел
 Create	CreateParametersPanel		Создать
 File system	PartitionList		Файловая система
+Unknown (%s)	PartitionList		Неизвестно (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Выбранный раздел не содержит таблицу разделов.
 End: %s	Support		Конец: %s
 Partition type	PartitionList		Тип раздела

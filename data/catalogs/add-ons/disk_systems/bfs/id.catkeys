@@ -5,4 +5,4 @@ Name:	BFS_Initialize_Parameter		Nama:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Sebagian besar berkas ukuran besar)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Direkomendasikan)
 1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Kebanyakan berkas kecil)
-Blocksize:	BFS_Initialize_Parameter		Ukuranblok:
+Blocksize:	BFS_Initialize_Parameter		Ukuran blok:

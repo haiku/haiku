@@ -52,7 +52,7 @@ edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd 
 Move pivot	Icon-O-Matic-TransformationBoxStates		Перемістити центр
 Opacity	Icon-O-Matic-PropertyNames		Прозорість
 OK	Icon-O-Matic-ColorPicker		ОК
-Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	МультиВибір %property%
+Multi-set %property%	Icon-O-Matic-Properties	Don't translate %property%	Мульти-набір %property%
 Error: 	Icon-O-Matic-Main		Помилка: 
 Reset {0, plural, one{transformation} other{transformations}}	Icon-O-Matic-ResetTransformationCmd		Скинути {0, plural, one{трансформацію} few{трансформації} other{трансформацій}}
 Assign style	Icon-O-Matic-AssignStyleCmd		Визначити стиль
@@ -97,7 +97,7 @@ Don't save	Icon-O-Matic-Menu-Settings		Не зберігати
 Add shape with path	Icon-O-Matic-Menu-Shape		Додати форму з контуром
 Bummer	Icon-O-Matic-Main	Cancel button - error alert	Досадно
 Translation X	Icon-O-Matic-PropertyNames		Перенести по X
-Multi-paste properties	Icon-O-Matic-Properties		МультиВставка властивостей
+Multi-paste properties	Icon-O-Matic-Properties		Мультивставка властивостей
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG при завантаженні файлу. Якщо перезаписати оригінальний файл, ця інформація буде втрачена.
 Rotate indices backwards	Icon-O-Matic-PathsList		Обійти точки проти годинника
 Overwrite	Icon-O-Matic-SVGExport		Перезаписати
@@ -107,7 +107,7 @@ Open…	Icon-O-Matic-Menu-File		Відкрити…
 Remove {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-RemoveTransformersCmd		Прибрати {0, plural, one{трансформатор} few{трансформатори} other{трансформаторів}}
 Click on a shape above	Icon-O-Matic-TransformersList	Empty transformers list - 1st line	Натисніть на форму вище,
 Remove	Icon-O-Matic-ShapesList		Прибрати
-Multi-paste	Icon-O-Matic-Properties		МультиВставка
+Multi-paste	Icon-O-Matic-Properties		Мультивставка
 Bad news	Title of error alert		Погані новини
 HVIF source code	Icon-O-Matic-SavePanel		HVIF вихідний код
 Drop shapes	Icon-O-Matic-ShapesList		Скинути форми

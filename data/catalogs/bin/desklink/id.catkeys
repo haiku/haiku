@@ -1,8 +1,9 @@
-1	indonesian	x-vnd.Haiku-desklink	618383392
+1	indonesian	x-vnd.Haiku-desklink	2223625451
 desklink	MediaReplicant	Title of an alert box	desklink
 Muted	MediaReplicant		Diredam
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		OKE
+Sounds preferences…	MediaReplicant		Preferensi suara…
 Couldn't launch 	MediaReplicant		Tak bisa meluncurkan 
 Volume	VolumeControl		Volume
 Open MediaPlayer	MediaReplicant		Buka PemutarMedia

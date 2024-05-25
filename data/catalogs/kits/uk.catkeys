@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	2539827825
+1	ukrainian	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Всі права захищені.
 gold master	AboutWindow		золотий майстер
 Undo	TextView		Відмінити
@@ -6,6 +6,7 @@ OK	PrintJob		ОК
 OK	Dragger		ОК
 gamma	AboutWindow		гамма
 development	AboutWindow		розробка
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{(%s байт/с)} few{(%s байти/с)} other{%s (байтів/с)}}
 Print Server is not responding.	PrintJob		Принт-сервер недоступний.
 About %app%	AboutMenuItem		Про %app%
 Warning	Dragger		Попередження
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Особлива подяка:
 %s TiB	StringForSize	size unit	%s TБ
 Default Haiku window decorator.	Default decorator about box		Декоратор вікон Haiku за замовчуванням.
 %s GiB	StringForSize	size unit	%s ГБ
+%s B	StringForSize	size unit, narrow space	%s Б
 Remove replicant	Dragger		Прибрати реплікант
 Version	AboutWindow		Версія
 Red:	ColorControl		Червоний:
@@ -38,10 +40,11 @@ Error	PrintJob		Помилка
 %s TiB/s	StringForRate	units per second	%s TБ/с
 About %app…	Dragger		Про %app…
 About %app%	AboutWindow		Про %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{(%s байт)} few{(%s байти)} other{%s (байтів)}}
 %s GiB/s	StringForRate	units per second	%s ГБ/с
 Version history:	AboutWindow		Історія версій:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити програму для репліканта. Не знайдено сигнатуру програми.\n%error
 %s KiB/s	StringForRate	units per second	%s кБ/с
 Blue:	ColorControl		Синій:
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%description\".\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \«%description\».\n%error
 Written by:	AboutWindow		Автор:

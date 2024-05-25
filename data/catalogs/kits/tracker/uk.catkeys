@@ -1,13 +1,14 @@
-1	ukrainian	x-vnd.Haiku-libtracker	1124891868
+1	ukrainian	x-vnd.Haiku-libtracker	2482866522
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
 Kind	ContainerWindow		Тип
 Open with…	ContainerWindow		Відкрити у…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Помилка переміщення \«%name\» до смітника. (%error)
-Or	FindPanel		Або
+Or	FindPanel		АБО
 MIME Description	AttributesView		Опис MIME
 before	FindPanel		до
+New folder%d	FSUtils		Нова папка%d
 Volume icons	TrackerSettingsWindow		Значки томів
 Ignore case	SelectionWindow		Ігнорувати регістр
 Current folder	ContainerWindow		Поточна папка
@@ -119,7 +120,7 @@ Location	OpenWithWindow		Розташування
 Resize to fit	QueryContainerWindow		Припасувати
 List folders first	SettingsView		Список папок спочатку
 Find	FSUtils		Знайти
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Елемент з назвою \«%name\» вже існує у цій папці. Бажаєте замінити його посиланням, що створюєте?
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Об'єкт з назвою \«%name\» вже існує у цій папці. Бажаєте замінити його посиланням, що створюєте?
 List view	ContainerWindow		У вигляді списку
 Temporary	FindPanel		Тимчасовий
 Modified	QueryPoseView		Змінений
@@ -163,7 +164,7 @@ Filesystem:	InfoWindow		Файлова система:
 Could not open \"%name\" (%error). 	FSUtils		Не вдалося відкрити \«%name\» (%error). 
 Media parameter group	AttributesView		Група параметрів медіа
 %name info	InfoWindow	InfoWindow Title	%name інфо
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо Ви перемістите папку home, %osName може вести себе неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення папки home затисніть кнопку Shift та натисніть \«Перемістити\».
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо перемістити каталог home, %osName може працювати неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення home, затисніть кнопку Shift та натисніть \«Перемістити\».
 Property info	AttributesView		Інфо про властивості
 Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання в смітнику.
 From	Email Query Columns		Від
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		Не підключати автомати�
 Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		Програма \«%appname\» не знайдена
 Unmatched parenthesis.	libtracker		Невизначені фігурні дужки
+New folder %d	FSUtils		Нова папка %d
 Extended attribute	AttributesView		Розширені атрибути
 Unmatched brackets.	libtracker		Неузгоджені дужки.
 Error %error loading Add-On %name.	ContainerWindow		Помилка %error при завантаженні доповнення %name.
@@ -326,12 +328,13 @@ less than	FindPanel		менше ніж
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання файлу \«%name\»:\n\t%error\n\nБажаєте продовжити?
 Creating links: 	StatusWindow		Створення посилань: 
 Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не вдалося відкрити \«%document\» програмою \«%app\» (%error). 
-Create %s clipping	PoseView		Створити %s вирізку
+Create %s clipping	PoseView		Зберегти фрагмент як %s
 Error moving \"%name\"	FSUtils		Помилка переміщення \«%name\»
 To: %dir	StatusWindow		До: %dir
 Paste layout	ContainerWindow		Вставити макет
 Cancel	Tracker		Скасувати
 yes	AttributesView		так
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Помилка копіювання файлу \«%name\»:\n\t%error\n\n
 Make active printer	ContainerWindow		Зробити принтер активним
 Copy to	ContainerWindow		Копіювати до
 Name	SelectionWindow		Назва
@@ -356,7 +359,7 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Copy	ContainerWindow		Копіювати
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прикро, атрибут «Символ» не може містити багатобайтовий знак.
 Open parent	VirtualDirectoryWindow		Відкрити батьківський каталог
-And	FindPanel		і
+And	FindPanel		І
 Palette-indexed picture	AttributesView		Малюнок з індексованими кольорами
 multiple disks	FindPanel		кілька дисків
 Drawing pattern	AttributesView		Рисована текстура
@@ -477,6 +480,7 @@ Color	AttributesView		Колір
 Copy layout	ContainerWindow		Копіювати макет
 Duplicate	ContainerWindow		Дублікат
 16-bit integer	AttributesView		16-бітове ціле
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Примітка: файлова система призначення не чутлива до регістру.\n
 Untitled clipping	PoseView		Неназвана вирізка
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \«%name\» вже існує у цій папці. Замінити його?
 , indexed	InfoWindow		, індексовано

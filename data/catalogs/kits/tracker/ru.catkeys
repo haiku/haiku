@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1326470592
+1	russian	x-vnd.Haiku-libtracker	2684445246
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при пере�
 Or	FindPanel		или
 MIME Description	AttributesView		MIME Описание
 before	FindPanel		до
+New folder%d	FSUtils		Новая папка%d
 Volume icons	TrackerSettingsWindow		Значки дисков
 Ignore case	SelectionWindow		Игнорировать регистр
 Current folder	ContainerWindow		Текущую папку
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		Не подключать автомати�
 Node ref	AttributesView		Ссылка на узел
 Could not find application \"%appname\"	OpenWithWindow		Невозможно найти приложение \"%appname\"
 Unmatched parenthesis.	libtracker		Непарные скобки
+New folder %d	FSUtils		Новая папка %d
 Extended attribute	AttributesView		Расширенные атрибуты
 Unmatched brackets.	libtracker		Непарные скобки.
 Error %error loading Add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
@@ -332,6 +334,7 @@ To: %dir	StatusWindow		В: %dir
 Paste layout	ContainerWindow		Вставить вид папки
 Cancel	Tracker		Отмена
 yes	AttributesView		да
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Ошибка копирования файла \«%name\»:\n\t%error\n\n
 Make active printer	ContainerWindow		Сделать принтер основным
 Copy to	ContainerWindow		Копировать в
 Name	SelectionWindow		Имя
@@ -476,6 +479,7 @@ Color	AttributesView		Цвет
 Copy layout	ContainerWindow		Копировать вид папки
 Duplicate	ContainerWindow		Дублировать
 16-bit integer	AttributesView		16-битное целое
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Примечание: файловая система назначения не чувствительна к регистру.\n
 Untitled clipping	PoseView		Безымянная выборка
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" уже существует в указанной папке. Вы хотите заменить его?
 , indexed	InfoWindow		, индексировано

@@ -18,7 +18,7 @@ Chaos	ChartWindow		Хаос
 Amas	ChartWindow		Amas
 Yellow	ChartWindow		Жовтий
 Frames/s	ChartWindow		Кадрів/с
-CPU load	ChartWindow		Навантаження ЦП
+CPU load	ChartWindow		Загрузка ЦП
 Green	ChartWindow		Зелений
 Colors	ChartWindow		Кольори
 Refresh rate	ChartWindow		Частота оновлення

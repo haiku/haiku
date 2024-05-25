@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	663472720
+1	russian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Граница элемента
 Control mark	Colors tab		Отметка
 Off	AntialiasingSettingsView		Выключить
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Текст выделенного пункт
 Size:	Font Selection view		Размер:
 Panel background	Colors tab		Фон панели
 Plain font:	Font view		Простой шрифт:
+Automatically pick secondary colors	Colors tab		Автоматически подбирать производные цвета
 Window tab text	Colors tab		Текст заголовка окна
 Navigation pulse	Colors tab		Навигационная пульсация
 LCD subpixel	AntialiasingSettingsView		Субпиксельное сглаживание

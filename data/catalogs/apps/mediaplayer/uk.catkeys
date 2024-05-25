@@ -103,8 +103,8 @@ none	Subtitles menu		пусто
 Save Playlist	MediaPlayer-PlaylistWindow		Зберегти Плейлист
 Overlay	MediaPlayer-InfoWin		Оверлей
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (CinemaScope)
-Rating	MediaPlayer-Main		Рейтинг
-Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (нестача памяті). Збій збереження списку відтворення.
+Rating	MediaPlayer-Main		Оцінка
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (нестача пам'яті). Збій збереження списку відтворення.
 Video	MediaPlayer-Main		Відео
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Відсутній декодер для обробки файлів такого типу, або декодер не розпізнає конкретну версію формату.
 Lock Peaks	MediaPlayer-PeakView		Блокувати піки

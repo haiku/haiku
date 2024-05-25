@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	russian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Процессы
 Semaphores	DataSource		Семафоры
 TX	DataSource	Shorter version for Sending	Передача
@@ -45,3 +45,4 @@ Swap	DataSource		Файл подкачки
 P-faults	DataSource		Отказы страниц
 Sems	DataSource		Семафоры
 Network receive	DataSource		Входящий трафик
+%s faults/s	DataSource		%s отказов/с

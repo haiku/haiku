@@ -13,7 +13,7 @@ Settings…	DeskbarView		Налаштування…
 New Messages	MailDaemon		Нові повідомлення
 <no accounts>	DeskbarView		<облікові записи відсутні>
 Mail status	Notifier		Статус пошти
-Check for mails only	DeskbarView		Перевірити пошту акаунта…
+Check for mails only	DeskbarView		Тільки перевірка пошти
 Check for mail now	DeskbarView		Перевірити пошту зараз
 Sending mail for %name	Notifier		Відправка пошти для %name
 Mail daemon status log	MailDaemon		Журнал стану поштового демона

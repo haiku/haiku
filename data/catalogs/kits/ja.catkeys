@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libbe	2539827825
+1	japanese	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		All Rights Reserved.
 gold master	AboutWindow		ゴールデンマスター
 Undo	TextView		元に戻す
@@ -6,6 +6,7 @@ OK	PrintJob		OK
 OK	Dragger		OK
 gamma	AboutWindow		γ
 development	AboutWindow		開発版
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s byte/s} other{%s bytes/s}}
 Print Server is not responding.	PrintJob		プリントサーバーが応答しません。
 About %app%	AboutMenuItem		%app% について
 Warning	Dragger		警告
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Special Thanks:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		デフォルトの Haiku ウィンドウデコレーター。
 %s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		レプリカントの削除
 Version	AboutWindow		バージョン
 Red:	ColorControl		赤:
@@ -38,6 +40,7 @@ Error	PrintJob		エラー
 %s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		%appについて...
 About %app%	AboutWindow		%app% について
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s byte} other{%s bytes}}
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		改訂履歴:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error

@@ -2,9 +2,9 @@
 If the application will not quit you may have to kill it.	Team monitor		Якщо Ви не можете вийти з програми, Ви можете знищити її.
 Quit application	Team monitor		Вийти з програми
 Open Terminal	Team monitor		Відкрити Terminal
-{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural, one{Утримуйте CONTROL+ALT+DELETE протягом # секунди, щоб перезавантажитися.} other{Утримуйте CONTROL+ALT+DELETE протягом # секунд, щоб перезавантажитися.}}
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural, one{Утримання CONTROL+ALT+DELETE протягом # секунди перезагрузить систему.} other{Утримання CONTROL+ALT+DELETE протягом # секунд перезагрузить систему.}}
 Restart the desktop	Team monitor		Перезапустити Робочий стіл
-Force reboot	Team monitor		Перезавантажити примусово
+Force reboot	Team monitor		Перезагрузити примусово
 Team monitor	Team monitor		Монітор процесів
 Kill application	Team monitor		Припинити примусово
 Cancel	Team monitor		Скасувати

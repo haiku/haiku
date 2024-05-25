@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1124891868
+1	japanese	x-vnd.Haiku-libtracker	2482866522
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨�
 Or	FindPanel		または
 MIME Description	AttributesView		MIME 説明
 before	FindPanel		以前
+New folder%d	FSUtils		新規フォルダー%d
 Volume icons	TrackerSettingsWindow		ディスクアイコン
 Ignore case	SelectionWindow		大文字小文字を区別しない
 Current folder	ContainerWindow		現在のフォルダー
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		自動マウントを使わない
 Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりません
 Unmatched parenthesis.	libtracker		括弧が不一致です。
+New folder %d	FSUtils		新規フォルダー %d
 Extended attribute	AttributesView		拡張属性
 Unmatched brackets.	libtracker		角括弧が不一致です。
 Error %error loading Add-On %name.	ContainerWindow		アドオン %name の読み込み中に %error エラーが発生。
@@ -332,6 +334,7 @@ To: %dir	StatusWindow		%dir
 Paste layout	ContainerWindow		レイアウトを貼り付け
 Cancel	Tracker		中止
 yes	AttributesView		はい
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		ファイル \"%name\"をコピー中に以下のエラー発生:\n\t%error\n\n
 Make active printer	ContainerWindow		プリンターを有効にする
 Copy to	ContainerWindow		次へコピー
 Name	SelectionWindow		名前
@@ -477,6 +480,7 @@ Color	AttributesView		色
 Copy layout	ContainerWindow		レイアウトのコピー
 Duplicate	ContainerWindow		複製
 16-bit integer	AttributesView		16 ビット整数
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		注意: 転送先ファイルシステムのファイル名は大文字小文字を区別しません。\n
 Untitled clipping	PoseView		無名クリッピング
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに \"%name\" というファイルがすでに存在します。置き換えますか?
 , indexed	InfoWindow		, インデックス有

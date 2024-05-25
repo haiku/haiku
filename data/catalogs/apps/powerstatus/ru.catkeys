@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	1085070685
+1	russian	x-vnd.Haiku-PowerStatus	4080343264
 Run in window	PowerStatus		Запустить в окне
 Extended battery info	PowerStatus		Расширенная информация о батарее
 Show status icon	PowerStatus		Показать значок статуса
@@ -11,6 +11,7 @@ Last full charge: 	PowerStatus		Последняя полная зарядка:
 Current rate: 	PowerStatus		Текущее значение: 
 Show text label	PowerStatus		Показать текстовую метку
 Quit	PowerStatus		Выход
+Battery not charging	PowerStatus		Батарея не заряжается
 Battery low	PowerStatus		Низкий заряд батареи
 Model number: 	PowerStatus		Номер модели: 
 Battery unused	PowerStatus		Батарея не используется
@@ -38,6 +39,7 @@ Design capacity warning: 	PowerStatus		Уровень низкого заряд�
 Capacity granularity 2: 	PowerStatus		Детализация ёмкости 2: 
 Too bad!	PowerStatus		Очень жаль!
 Technology: 	PowerStatus		Технология: 
+not charging	PowerStatus		нет зарядки
  mWh	PowerStatus		 мВтч
 PowerStatus	System name		Электропитание
 Design capacity: 	PowerStatus		Штатная емкость: 

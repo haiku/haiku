@@ -6,13 +6,13 @@ Get currently available ports/devices	Transport Scripting		Отримати до
 Retrieve or select the active printer	PrintServerApp Scripting		Отримати або вибрати активний принтер
 Cancel	PrintServerApp		Скасувати
 Retrieve a specific printer	PrintServerApp Scripting		Отримати визначений принтер
-Page %1 to %2	ConfigWindow		Стор. %1 до %2
+Page %1 to %2	ConfigWindow		Сторінка %1 до %2
 Get name of the printer add-on used for this printer	Printer Scripting		Отримати назву доповнення, що працює з цим принтером.
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		ОК
 Cancel	ConfigWindow		Скасувати
 Printer server	ConfigWindow		Принт-сервер
-Page %1 to %2, %3 copies	ConfigWindow		Стор. %1 до %2, %3 копій
+Page %1 to %2, %3 copies	ConfigWindow		Сторінка %1 до %2, %3 копій
 A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Принтер з таким ім'ям уже існує, але його драйвер не вдалося знайти! Замінити?
 Yes	PrintServerApp		Так
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	ANSI B (ledger)

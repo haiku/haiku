@@ -1,2 +1,6 @@
-1	indonesian	x-vnd.Haiku-PNGTranslator	2249099168
+1	indonesian	x-vnd.Haiku-PNGTranslator	1658638347
 PNG Settings	PNGTranslator		Pengaturan PNG
+None	PNGTranslator		Tidak ada
+PNG image	PNGTranslator		Gambar PNG
+Version %d.%d.%d, %s	PNGTranslator		Versi %d.%d.%d, %s
+PNG image translator	PNGTranslator		Penerjemah gambar PNG

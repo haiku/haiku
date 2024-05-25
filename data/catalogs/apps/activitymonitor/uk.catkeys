@@ -4,7 +4,7 @@ Semaphores	DataSource		Семафори
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Блок кеш-пам'яті
 %lld ms	SettingsWindow		%lld мс
-Media nodes	DataSource		Вузли Медіа
+Media nodes	DataSource		Вузли медіа
 Text clipboard	DataSource		Буфер обміну (Text)
 Network send	DataSource		Відправлено по мережі
 Cache	DataSource		Кеш

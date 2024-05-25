@@ -1,10 +1,11 @@
-1	indonesian	x-vnd.Haiku-Screen	1226202253
+1	indonesian	x-vnd.Haiku-Screen	2577971458
 no	Screen		tidak
 bits/pixel	Screen		bits/piksel
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 warna
 Rows:	Screen		Baris:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Mode layar tidak bisa diatur:\n\t%s\n
+Serial no.: %s	Screen		No. Serial: %s
 /other…	Screen		/other…
 Keep	Screen		Jaga
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frekuensi horizonal:\t%lu - %lu kHz\nFrekuensi vertikal:\t%lu - %lu Hz\n\nDetak pixel maksimum:\t%g MHz
@@ -13,9 +14,11 @@ Video format:	Screen		Format video:
 Undo	Screen		Batal
 OK	Screen		OKE
 Current workspace	Screen		Workspace saat ini
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		secara vertikal
 All workspaces	Screen		Semua workspace
 Use laptop panel:	Screen		Memakai panel laptop:
+Unknown	Screen		Tidak Dikenal
 Could not write VESA mode settings file:\n\t	Screen		Tidak bisa menulis berkas pengaturan mode VESA:\n\t
 Display info	Screen		Info tampilan
 Settings will revert in %seconds.	Screen		Pengaturan akan dipulihkan dalam %seconds.

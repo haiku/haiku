@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-JPEGTranslator	61542728
+1	thai	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		อ่าน
 Be Bitmap Format (JPEGTranslator)	JPEGTranslator		เป็นรูปแบบBitmap (JPEGTranslator)
 Show warning messages	JPEGTranslator		แสดงข้อความเตือน
@@ -11,3 +11,12 @@ Version %d.%d.%d	JPEGTranslator		เวอร์ชั่น %d.%d.%d
 Write black-and-white images as RGB24	JPEGTranslator		เขียนภาพขาวดำเป็น RGB24
 Output smoothing strength	JPEGTranslator		ความแข็งแรงของผลลัพธ์ที่ราบเรียบ
 Use progressive compression	JPEGTranslator		ใช้การบีบอัดแบบโปรเกรสซีฟ
+Make file smaller (sligthtly worse quality)	JPEGTranslator		ทำให้ไฟล์เล็กลง (คุณภาพแย่ลงเล็กน้อย)
+High	JPEGTranslator		สูง
+Read greyscale images as RGB32	JPEGTranslator		อ่านภาพระดับสีเทาเป็น RGB32
+Output quality	JPEGTranslator		คุณภาพผลที่แสดงออกมา
+Low	JPEGTranslator		ต่ำ
+Write	JPEGTranslator		เขียน
+Prevent colors 'washing out'	JPEGTranslator		ป้องกันไม่ให้สี 'หลุดลอก'
+JPEG Library Warning: %s\n	be_jerror		คำเตือนไลบรารี JPEG: %s\n
+JPEG images	JPEGTranslator		ภาพ JPEG

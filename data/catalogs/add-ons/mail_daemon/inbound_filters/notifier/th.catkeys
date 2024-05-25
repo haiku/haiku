@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-NewMailNotification	2220310168
+1	thai	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		หน้าต่างบันทึกข้อความ
 none	NotifierConfigView		ไม่มี
 Alert	NotifierConfigView		เตือน
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		เตือนจากส่วนกลา�
 Beep	NotifierConfigView		เสียง
 Central beep	NotifierConfigView		เสียงจากส่วนกลาง
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} อื่นๆ{# new messages}}
+New mail notification	NotifierFilter		การแจ้งเตือนจดหมายใหม่
 New messages	NotifierFilter		ข้อความใหม่
 Method:	NotifierConfigView		วิธีการ:
 Keyboard LEDs	NotifierConfigView		คีย์บอร์ด LED

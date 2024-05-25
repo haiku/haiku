@@ -28,7 +28,7 @@ Open…	Menu		Відкрити…
 Audio encoding:	MediaConverter		Кодування аудіо:
 Multi-track file detected	MediaConverter		Файл розпізнаний як багатоканальний
 Cancelling…	MediaConverter		Скасовується…
-Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
+Output file '%filename' created	MediaConverter		Вихідний файл «%filename» створено
 Output folder	MediaConverter		Вихідна папка
 Error creating track.	MediaConverter		Помилка при створенні доріжки.
  seconds	MediaFileInfo		 секунд

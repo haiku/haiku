@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-NewMailNotification	2220310168
+1	indonesian	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Jendela log
 none	NotifierConfigView		tak satupun
 Alert	NotifierConfigView		Peringatan
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Pusat peringatan
 Beep	NotifierConfigView		Bunyi bip
 Central beep	NotifierConfigView		Bunyi utama
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+New mail notification	NotifierFilter		Notifikasi surat baru
 New messages	NotifierFilter		Pesan baru
 Method:	NotifierConfigView		Metode:
 Keyboard LEDs	NotifierConfigView		Led papan ketik

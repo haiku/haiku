@@ -20,7 +20,7 @@ Read only!	DrivesPage	Cannot install	Тільки для читання!
 Write boot menu	BootManagerController	Button	Записати меню загрузки
 OK	BootManagerController	Button	ОК
 Uninstall boot manager	BootManagerController	Title	Деінсталяція BootManager
-About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для запису меню до загрузочного диску (%s). Перевірте інформацію перед тим як  продовжити.
+About to write the following boot menu to the boot disk (%s). Please verify the information below before continuing.	BootManagerController		Все готово для запису меню до загрузочного диску (%s). Перевірте інформацію перед тим як продовжити.
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Перший розділ починається зарано і на ньому немає місця для встановлення меню загрузки.\nBootManager потребує принаймні 2 KБ перед першим розділом.
 Uninstall	DrivesPage	Button	Деінсталяція
 Update	DrivesPage	Button	Оновити
@@ -38,7 +38,7 @@ After five seconds	DefaultPartitionPage		п'ять секунд
 Timeout: %s	DefaultPartitionPage		Затримка: %s
 The Master Boot Record could not be restored!	BootManagerController		MBR неможливо відновити!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Таблиця розділів першого жорсткого диска несумісна з BootManager.\nBootManager працює тільки з MBR розділами IBM PC.
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Виберіть пристрій на який треба встановити або з якого треба видалити BootManager.
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Виберіть пристрій, на який треба встановити або з якого треба видалити BootManager.
 After four seconds	DefaultPartitionPage		чотири секунди
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Unnamed %d
 First partition starts too early	BootManagerController	Title	Перший розділ починається занадто рано
@@ -65,5 +65,5 @@ Install	DrivesPage	Button	Інсталяція
 File:	FileSelectionPage	Text control label	Файл:
 Error reading partition table	BootManagerController	Title	Помилка при читанні таблиці розділів
 Back	BootManagerController	Button	Назад
-The boot manager has been successfully installed on your system.	BootManagerController		Менеджер завантаження успішно встановлений на Вашу систему.
+The boot manager has been successfully installed on your system.	BootManagerController		Інсталяція BootManager завершена успішно.
 The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Старий MBR не був збережений до %s. Ви можете продовжити інсталяцію але у Вас не залишиться можливості провести деінсталяцію меню загрузки.
