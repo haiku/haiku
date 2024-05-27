@@ -42,26 +42,34 @@
 
 
 static net_stack_interface_module_info* sStackInterface = NULL;
-static vint32 sStackInterfaceInitialized = 0;
-static mutex sLock = MUTEX_INITIALIZER("stack interface");
+static int32 sStackInterfaceConsumers = 0;
+static rw_lock sLock = RW_LOCK_INITIALIZER("stack interface");
 
 
 static net_stack_interface_module_info*
 get_stack_interface_module()
 {
-	MutexLocker _(sLock);
+	atomic_add(&sStackInterfaceConsumers, 1);
 
-	if (sStackInterfaceInitialized++ == 0) {
-		// load module
-		net_stack_interface_module_info* module;
-		// TODO: Add driver settings option to load the userland net stack.
-		status_t error = get_module(NET_STACK_INTERFACE_MODULE_NAME,
-			(module_info**)&module);
-		if (error == B_OK)
-			sStackInterface = module;
-		else
-			sStackInterface = NULL;
-	}
+	ReadLocker readLocker(sLock);
+	if (sStackInterface != NULL)
+		return sStackInterface;
+
+	readLocker.Unlock();
+	WriteLocker writeLocker(sLock);
+	if (sStackInterface != NULL)
+		return sStackInterface;
+
+	// load module
+	net_stack_interface_module_info* module;
+	// TODO: Add driver settings option to load the userland net stack.
+	status_t error = get_module(NET_STACK_INTERFACE_MODULE_NAME,
+		(module_info**)&module);
+	if (error == B_OK)
+		sStackInterface = module;
+
+	if (sStackInterface == NULL)
+		atomic_add(&sStackInterfaceConsumers, -1);
 
 	return sStackInterface;
 }
@@ -70,10 +78,19 @@ get_stack_interface_module()
 static void
 put_stack_interface_module()
 {
-	MutexLocker _(sLock);
+	if (atomic_add(&sStackInterfaceConsumers, -1) != 1)
+		return;
 
-	if (sStackInterfaceInitialized-- == 1)
-		put_module(NET_STACK_INTERFACE_MODULE_NAME);
+#if 0 /* Just leave the stack loaded, for now. */
+	WriteLocker _(sLock);
+	if (atomic_get(&sStackInterfaceConsumers) > 0)
+		return;
+	if (sStackInterface == NULL)
+		return;
+
+	put_module(NET_STACK_INTERFACE_MODULE_NAME);
+	sStackInterface = NULL;
+#endif
 }
 
 
