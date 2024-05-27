@@ -23,7 +23,7 @@
 #include "sdhci.h"
 
 
-#define TRACE_SDHCI
+//#define TRACE_SDHCI
 #ifdef TRACE_SDHCI
 #	define TRACE(x...) dprintf("\33[33msdhci:\33[0m " x)
 #else
