@@ -22,6 +22,7 @@
 
 #include <lock.h>
 #include <util/AutoLock.h>
+#include <util/Vector.h>
 
 #include <KernelExport.h>
 
@@ -743,6 +744,7 @@ scan_modules(const char* path)
 	if (cookie == NULL)
 		return;
 
+	Vector<module_info*> modules;
 	while (true) {
 		char name[B_FILE_NAME_LENGTH];
 		size_t length = sizeof(name);
@@ -751,15 +753,19 @@ scan_modules(const char* path)
 
 		TRACE(("scan %s\n", name));
 
+		// we don't need the module right now, but we give it a chance
+		// to register itself
 		module_info* module;
-		if (get_module(name, &module) == B_OK) {
-			// we don't need the module right now, but we give it a chance
-			// to register itself
-			put_module(name);
-		}
+		if (get_module(name, &module) == B_OK)
+			modules.Add(module);
 	}
 
 	close_module_list(cookie);
+
+	// We don't need the modules right now, so put them all.
+	// (This is done at the end to avoid repeated loading/unloading of dependencies.)
+	for (int32 i = 0; i < modules.Count(); i++)
+		put_module(modules[i]->name);
 }
 
 
