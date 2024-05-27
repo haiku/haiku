@@ -8,13 +8,17 @@
 
 #include_next <endian.h>
 #include <features.h>
+#include <stdint.h>
 
 
 #ifdef _DEFAULT_SOURCE
 
 #include <config/HaikuConfig.h>
+
+#if __GNUC__ < 4
 #include <support/ByteOrder.h>
 #include <support/SupportDefs.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,9 +27,15 @@ extern "C" {
 /*
  * General byte order swapping functions.
  */
-#define	bswap16(x)	__swap_int16(x)
-#define	bswap32(x)	__swap_int32(x)
-#define	bswap64(x)	__swap_int64(x)
+#if __GNUC__ >= 4
+#define bswap16(x) __builtin_bswap16(x)
+#define bswap32(x) __builtin_bswap32(x)
+#define bswap64(x) __builtin_bswap64(x)
+#else
+#define bswap16(x) __swap_int16(x)
+#define bswap32(x) __swap_int32(x)
+#define bswap64(x) __swap_int64(x)
+#endif
 
 /*
  * Host to big endian, host to little endian, big endian to host, and little
