@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -40,13 +36,9 @@ typedef struct {
 
 extern Modelist modelist[];
 
-typedef struct {
-    int
-	system,			/* what the current time is */
-	echotoggle,		/* last time user entered echo character */
-	modenegotiated,		/* last time operating mode negotiated */
-	didnetreceive,		/* last time we read data from network */
-	gotDM;			/* when did we last see a data mark */
-} Clocks;
+struct termspeeds {
+    int speed;
+    int value;
+};
 
-extern Clocks clocks;
+extern struct termspeeds termspeeds[];

@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -31,7 +27,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)externs.h	8.3 (Berkeley) 5/30/95
- *	$FreeBSD: src/contrib/telnet/telnet/externs.h,v 1.10 2003/05/11 18:17:00 markm Exp $
+ *	$FreeBSD$
  */
 
 #ifndef	BSD
@@ -72,7 +68,7 @@ typedef unsigned char cc_t;
 #include <string.h>
 
 #if defined(IPSEC)
-#include <netinet6/ipsec.h>
+#include <netipsec/ipsec.h>
 #if defined(IPSEC_POLICY_IPSEC)
 extern char *ipsec_policy_in;
 extern char *ipsec_policy_out;
@@ -231,9 +227,12 @@ extern unsigned char
     NetTraceFile[];	/* Name of file where debugging output goes */
 extern void
     SetNetTrace(char *);	/* Function to change where debugging goes */
+extern unsigned char
+    ComPortBaudRate[];	/* Baud rate of the remote end */
+extern void
+    DoBaudRate(char *);	/* Function to set the baud rate of the remote end */
 
 extern jmp_buf
-    peerdied,
     toplevel;		/* For error conditions. */
 
 extern void
@@ -476,6 +475,16 @@ extern cc_t termAytChar;
 # endif
 #endif
 
+typedef struct {
+    int
+	system,			/* what the current time is */
+	echotoggle,		/* last time user entered echo character */
+	modenegotiated,		/* last time operating mode negotiated */
+	didnetreceive,		/* last time we read data from network */
+	gotDM;			/* when did we last see a data mark */
+} Clocks;
+
+extern Clocks clocks;
 
 /* Ring buffer structures which are shared */
 

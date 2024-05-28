@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,7 +33,7 @@ static const char sccsid[] = "@(#)main.c	8.3 (Berkeley) 5/30/95";
 #endif
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnet/main.c,v 1.20 2005/01/09 10:24:45 maxim Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/socket.h>
@@ -91,10 +87,10 @@ usage(void)
 	fprintf(stderr, "usage: %s %s%s%s%s\n",
 	    prompt,
 #ifdef	AUTHENTICATION
-	    "[-4] [-6] [-8] [-E] [-K] [-L] [-N] [-S tos] [-X atype] [-c] [-d]",
-	    "\n\t[-e char] [-k realm] [-l user] [-f/-F] [-n tracefile] ",
+	    "[-4] [-6] [-8] [-B baudrate] [-E] [-K] [-L] [-N] [-S tos] [-X atype]",
+	    "\n\t[-c] [-d] [-e char] [-k realm] [-l user] [-f/-F] [-n tracefile] ",
 #else
-	    "[-4] [-6] [-8] [-E] [-L] [-N] [-S tos] [-c] [-d]",
+	    "[-4] [-6] [-8] [-B baudrate] [-E] [-L] [-N] [-S tos] [-c] [-d]",
 	    "\n\t[-e char] [-l user] [-n tracefile] ",
 #endif
 	    "[-r] [-s src_addr] [-u] ",
@@ -117,17 +113,16 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	int ch;
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-	char *ep;
 	u_long ultmp;
-#endif
-	char *user;
+	int ch;
+	char *ep, *user;
 	char *src_addr = NULL;
 #ifdef	FORWARD
 	extern int forward_flags;
 #endif	/* FORWARD */
 
+	setbuf(stdout, NULL);
+	setbuf(stderr, NULL);
 	tninit();		/* Clear out things */
 
 	TerminalSaveState();
@@ -156,11 +151,8 @@ main(int argc, char *argv[])
 #else
 #define IPSECOPT
 #endif
-
-	crlf = 1;
-
 	while ((ch = getopt(argc, argv,
-			    "468EKLNS:X:acde:fFk:l:n:rs:uxy" IPSECOPT)) != -1)
+			    "468B:EKLNS:X:acde:fFk:l:n:rs:uxy" IPSECOPT)) != -1)
 #undef IPSECOPT
 	{
 		switch(ch) {
@@ -174,6 +166,9 @@ main(int argc, char *argv[])
 #endif
 		case '8':
 			eight = 3;	/* binary output and input */
+			break;
+		case 'B':
+			DoBaudRate(optarg);
 			break;
 		case 'E':
 			rlogin = escape = _POSIX_VDISABLE;
@@ -190,18 +185,15 @@ main(int argc, char *argv[])
 			doaddrlookup = 0;
 			break;
 		case 'S':
-#if (defined(__BEOS__) || defined(__HAIKU__))
-			fprintf(stderr, "-S option is not supported\n");
-#else
-# ifdef	HAS_GETTOS
+#ifdef	HAS_GETTOS
 
 			if ((tos = parsetos(optarg, "tcp")) < 0)
 				fprintf(stderr, "%s%s%s%s\n",
 					prompt, ": Bad TOS argument '",
 					optarg,
 					"; will try to use default TOS");
-# else
-# define	MAXTOS	255
+#else
+#define	MAXTOS	255
 			ultmp = strtoul(optarg, &ep, 0);
 			if (*ep || ep == optarg || ultmp > MAXTOS)
 				fprintf(stderr, "%s%s%s%s\n",
@@ -210,8 +202,7 @@ main(int argc, char *argv[])
 					"; will try to use default TOS");
 			else
 				tos = ultmp;
-# endif
-#endif	/* __BEOS__ */
+#endif
 			break;
 		case 'X':
 #ifdef	AUTHENTICATION

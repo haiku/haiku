@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,25 +33,21 @@ static const char sccsid[] = "@(#)telnetd.c	8.4 (Berkeley) 5/30/95";
 #endif
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnetd/telnetd.c,v 1.28 2005/05/21 15:28:42 ume Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "telnetd.h"
 #include "pathnames.h"
 
-//#include <sys/mman.h>
+#include <sys/mman.h>
 #include <err.h>
 #include <libutil.h>
 #include <paths.h>
 #include <termcap.h>
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-# include <utmp.h>
-#endif
 
 #include <arpa/inet.h>
 
 #ifdef	AUTHENTICATION
 #include <libtelnet/auth.h>
-int	auth_level = 0;
 #endif
 #ifdef	ENCRYPTION
 #include <libtelnet/encrypt.h>
@@ -133,16 +125,14 @@ char user_name[256];
 int
 main(int argc, char *argv[])
 {
+	u_long ultmp;
 	struct sockaddr_storage from;
 	int on = 1, fromlen;
 	int ch;
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-	u_long ultmp;
-	char *ep;
-#endif
 #if	defined(IPPROTO_IP) && defined(IP_TOS)
 	int tos = -1;
 #endif
+	char *ep;
 
 	pfrontp = pbackp = ptyobuf;
 	netip = netibuf;
@@ -273,16 +263,13 @@ main(int argc, char *argv[])
 			break;
 
 		case 'S':
-#if (defined(__BEOS__) || defined(__HAIKU__))
-			fprintf(stderr, "-S option is not supported\n");
-#else
-# ifdef	HAS_GETTOS
+#ifdef	HAS_GETTOS
 			if ((tos = parsetos(optarg, "tcp")) < 0)
 				warnx("%s%s%s",
 					"bad TOS argument '", optarg,
 					"'; will try to use default TOS");
-# else
-# define	MAXTOS	255
+#else
+#define	MAXTOS	255
 			ultmp = strtoul(optarg, &ep, 0);
 			if (*ep || ep == optarg || ultmp > MAXTOS)
 				warnx("%s%s%s",
@@ -290,8 +277,7 @@ main(int argc, char *argv[])
 					"'; will try to use default TOS");
 			else
 				tos = ultmp;
-# endif
-#endif	/* !__BEOS__ */
+#endif
 			break;
 
 		case 'u':
@@ -489,11 +475,13 @@ getterminaltype(char *name undef2)
     /*
      * Handle the Authentication option before we do anything else.
      */
-    send_do(TELOPT_AUTHENTICATION, 1);
-    while (his_will_wont_is_changing(TELOPT_AUTHENTICATION))
-	ttloop();
-    if (his_state_is_will(TELOPT_AUTHENTICATION)) {
-	retval = auth_wait(name);
+    if (auth_level >= 0) {
+	send_do(TELOPT_AUTHENTICATION, 1);
+	while (his_will_wont_is_changing(TELOPT_AUTHENTICATION))
+	    ttloop();
+	if (his_state_is_will(TELOPT_AUTHENTICATION)) {
+	    retval = auth_wait(name);
+	}
     }
 #endif
 
@@ -671,6 +659,11 @@ doit(struct sockaddr *who)
 	int ptynum;
 
 	/*
+	 * Initialize the slc mapping table.
+	 */
+	get_slc_defaults();
+
+	/*
 	 * Find an available pty to use.
 	 */
 #ifndef	convex
@@ -699,9 +692,6 @@ doit(struct sockaddr *who)
 	Please contact your net administrator");
 	remote_hostname[sizeof(remote_hostname) - 1] = '\0';
 
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-	trimdomain(remote_hostname, UT_HOSTSIZE);
-#endif
 	if (!isdigit(remote_hostname[0]) && strlen(remote_hostname) > utmp_len)
 		err_ = getnameinfo(who, who->sa_len, remote_hostname,
 				  sizeof(remote_hostname), NULL, 0,
@@ -750,12 +740,11 @@ telnet(int f, int p, char *host)
 	char *HE;
 	char *HN;
 	char *IM;
+	char *IF;
+	char *if_buf;
+	int if_fd = -1;
+	struct stat statbuf;
 	int nfd;
-
-	/*
-	 * Initialize the slc mapping table.
-	 */
-	get_slc_defaults();
 
 	/*
 	 * Do some tests where it is desireable to wait for a response.
@@ -917,8 +906,13 @@ telnet(int f, int p, char *host)
 		HE = Getstr("he", &cp);
 		HN = Getstr("hn", &cp);
 		IM = Getstr("im", &cp);
+		IF = Getstr("if", &cp);
 		if (HN && *HN)
 			(void) strlcpy(host_name, HN, sizeof(host_name));
+		if (IF) {
+		    if_fd = open(IF, O_RDONLY, 000);
+		    IM = 0;
+		}
 		if (IM == 0)
 			IM = strdup("");
 	} else {
@@ -928,6 +922,17 @@ telnet(int f, int p, char *host)
 	edithost(HE, host_name);
 	if (hostinfo && *IM)
 		putf(IM, ptyibuf2);
+	if (if_fd != -1) {
+		if (fstat(if_fd, &statbuf) != -1 && statbuf.st_size > 0) {
+			if_buf = (char *) mmap (0, statbuf.st_size,
+			    PROT_READ, 0, if_fd, 0);
+			if (if_buf != MAP_FAILED) {
+				putf(if_buf, ptyibuf2);
+				munmap(if_buf, statbuf.st_size);
+			}
+		}
+		close (if_fd);
+	}
 
 	if (pcc)
 		(void) strncat(ptyibuf2, ptyip, pcc+1);
@@ -1102,7 +1107,7 @@ telnet(int f, int p, char *host)
 #if (!defined(__BEOS__) && !defined(__HAIKU__))
 				if (ptyibuf[0] & TIOCPKT_FLUSHWRITE) {
 					netclear();	/* clear buffer back */
-# ifndef	NO_URGENT
+#ifndef	NO_URGENT
 					/*
 					 * There are client telnets on some
 					 * operating systems get screwed up
@@ -1114,7 +1119,7 @@ telnet(int f, int p, char *host)
 					DIAG(TD_OPTIONS,
 					    printoption("td: send IAC", DM));
 
-# endif
+#endif
 				}
 				if (his_state_is_will(TELOPT_LFLOW) &&
 				    (ptyibuf[0] &
@@ -1183,7 +1188,7 @@ interrupt(void)
 	ptyflush();	/* half-hearted */
 
 #ifdef	TCSIG
-	(void) ioctl(pty, TCSIG, (char *)SIGINT);
+	(void) ioctl(pty, TCSIG, SIGINT);
 #else	/* TCSIG */
 	init_termbuf();
 	*pfrontp++ = slctab[SLC_IP].sptr ?
@@ -1201,7 +1206,7 @@ sendbrk(void)
 {
 	ptyflush();	/* half-hearted */
 #ifdef	TCSIG
-	(void) ioctl(pty, TCSIG, (char *)SIGQUIT);
+	(void) ioctl(pty, TCSIG, SIGQUIT);
 #else	/* TCSIG */
 	init_termbuf();
 	*pfrontp++ = slctab[SLC_ABORT].sptr ?
@@ -1215,7 +1220,7 @@ sendsusp(void)
 #ifdef	SIGTSTP
 	ptyflush();	/* half-hearted */
 # ifdef	TCSIG
-	(void) ioctl(pty, TCSIG, (char *)SIGTSTP);
+	(void) ioctl(pty, TCSIG, SIGTSTP);
 # else	/* TCSIG */
 	*pfrontp++ = slctab[SLC_SUSP].sptr ?
 			(unsigned char)*slctab[SLC_SUSP].sptr : '\032';
@@ -1232,7 +1237,7 @@ recv_ayt(void)
 {
 #if	defined(SIGINFO) && defined(TCSIG)
 	if (slctab[SLC_AYT].sptr && *slctab[SLC_AYT].sptr != _POSIX_VDISABLE) {
-		(void) ioctl(pty, TCSIG, (char *)SIGINFO);
+		(void) ioctl(pty, TCSIG, SIGINFO);
 		return;
 	}
 #endif

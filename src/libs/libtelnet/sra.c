@@ -30,7 +30,7 @@
 
 #include <sys/cdefs.h>
 
-__FBSDID("$FreeBSD: src/contrib/telnet/libtelnet/sra.c,v 1.16 2002/05/06 09:48:02 markm Exp $");
+__FBSDID("$FreeBSD$");
 
 #ifdef	SRA
 #ifdef	ENCRYPTION
@@ -303,7 +303,7 @@ sra_reply(Authenticator *ap, unsigned char *data, int cnt)
 			goto enc_user;
 		}
 		/* encode password */
-		memset(pass,0,sizeof(pass));
+		memset(pass,0,256);
 		telnet_gets("Password: ",pass,255,0);
 		pk_encode(pass,xpass,&ck);
 		/* send it off */

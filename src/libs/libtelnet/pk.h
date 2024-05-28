@@ -26,13 +26,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  * 
- * $FreeBSD: src/contrib/telnet/libtelnet/pk.h,v 1.6 2001/11/30 21:06:34 markm Exp $
+ * $FreeBSD$
  */
 
 /* header for the des routines that we will use */
 
 typedef unsigned char byte, DesData[ 8], IdeaData[16];
-#define DesKeys des_key_schedule
+#define DesKeys DES_key_schedule
 
 #define DES_DECRYPT 0
 #define DES_ENCRYPT 1

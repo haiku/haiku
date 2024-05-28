@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,17 +33,15 @@ static const char sccsid[] = "@(#)commands.c	8.4 (Berkeley) 5/30/95";
 #endif
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnet/commands.c,v 1.35 2005/02/28 12:46:52 tobez Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-# include <sys/file.h>
-#endif
-#include <sys/socket.h>
 #include <sys/un.h>
-#include <sys/wait.h>
+#include <sys/file.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <err.h>
 #include <errno.h>
@@ -78,9 +72,9 @@ __FBSDID("$FreeBSD: src/contrib/telnet/telnet/commands.c,v 1.35 2005/02/28 12:46
 #include <libtelnet/encrypt.h>
 #endif
 
-//#include <netinet/in_systm.h>
+#include <netinet/in_systm.h>
 #include <netinet/ip.h>
-//#include <netinet/ip6.h>
+#include <netinet/ip6.h>
 
 #ifndef       MAXHOSTNAMELEN
 #define       MAXHOSTNAMELEN 256
@@ -115,7 +109,7 @@ static int send_tncmd(void (*)(int, int), const char *, char *);
 static int setmod(int);
 static int clearmode(int);
 static int modehelp(void);
-static int sourceroute(struct addrinfo *, char *, char **, int *, int *, int *);
+static int sourceroute(struct addrinfo *, char *, unsigned char **, int *, int *, int *);
 
 typedef struct {
 	const char *name;	/* command name */
@@ -863,7 +857,7 @@ toggle(int argc, char *argv[])
  */
 
 #ifdef	USE_TERMIO
-struct termio new_tc;
+struct termio new_tc = { 0, 0, 0, 0, {}, 0, 0 };
 #endif
 
 struct setlist {
@@ -899,6 +893,7 @@ static struct setlist Setlist[] = {
     { "forw1",	"alternate end of line character", NULL, termForw1Charp },
     { "forw2",	"alternate end of line character", NULL, termForw2Charp },
     { "ayt",	"alternate AYT character", NULL, termAytCharp },
+    { "baudrate", "set remote baud rate", DoBaudRate, ComPortBaudRate },
     { NULL, NULL, NULL, NULL }
 };
 
@@ -943,7 +938,7 @@ setcmd(int argc, char *argv[])
     }
 
     ct = getset(argv[1]);
-    if (ct == 0) {
+    if (ct == 0 || !(ct->name && ct->name[0] != ' ')) {
 	c = GETTOGGLE(argv[1]);
 	if (c == 0) {
 	    fprintf(stderr, "'%s': unknown argument ('set ?' for help).\n",
@@ -1019,7 +1014,7 @@ unsetcmd(int argc, char *argv[])
     while (argc--) {
 	name = *argv++;
 	ct = getset(name);
-	if (ct == 0) {
+	if (ct == 0 || !(ct->name && ct->name[0] != ' ')) {
 	    c = GETTOGGLE(name);
 	    if (c == 0) {
 		fprintf(stderr, "'%s': unknown argument ('unset ?' for help).\n",
@@ -1657,10 +1652,10 @@ env_init(void)
 		char hbuf[256+1];
 		char *cp2 = strchr((char *)ep->value, ':');
 
-		gethostname(hbuf, 256);
-		hbuf[256] = '\0';
-		cp = (char *)malloc(strlen(hbuf) + strlen(cp2) + 1);
-		sprintf((char *)cp, "%s%s", hbuf, cp2);
+		gethostname(hbuf, sizeof(hbuf));
+		hbuf[sizeof(hbuf)-1] = '\0';
+		asprintf(&cp, "%s%s", hbuf, cp2);
+		assert(cp != NULL);
 		free(ep->value);
 		ep->value = (unsigned char *)cp;
 	}
@@ -2096,9 +2091,6 @@ static const char *
 sockaddr_ntop(struct sockaddr *sa)
 {
     void *addr;
-#ifndef INET6_ADDRSTRLEN
-# define INET6_ADDRSTRLEN 256
-#endif
     static char addrbuf[INET6_ADDRSTRLEN];
 
     switch (sa->sa_family) {
@@ -2176,7 +2168,7 @@ switch_af(struct addrinfo **aip)
 int
 tn(int argc, char *argv[])
 {
-    char *srp = 0;
+    unsigned char *srp = 0;
     int proto, opt;
     int srlen;
     int srcroute = 0, result;
@@ -2271,9 +2263,9 @@ tn(int argc, char *argv[])
 	hostname = hostp;
 	memset(&su, 0, sizeof su);
 	su.sun_family = AF_UNIX;
-	strlcpy(su.sun_path, hostp, sizeof su.sun_path);
+	strncpy(su.sun_path, hostp, sizeof su.sun_path);
 	printf("Trying %s...\n", hostp);
-	net = socket(AF_UNIX, SOCK_STREAM, 0);
+	net = socket(PF_UNIX, SOCK_STREAM, 0);
 	if ( net < 0) {
 	    perror("socket");
 	    goto fail;
@@ -2497,8 +2489,7 @@ tn(int argc, char *argv[])
 	env_export("USER");
     }
     (void) call(status, "status", "notmuch", 0);
-    if (setjmp(peerdied) == 0)
-	telnet(user);
+    telnet(user); 
     (void) NetClose(net);
     ExitString("Connection closed by foreign host.\n",1);
     /*NOTREACHED*/
@@ -2703,7 +2694,7 @@ help(int argc, char *argv[])
 			printf("?Ambiguous help command %s\n", arg);
 		else if (c == (Command *)0)
 			printf("?Invalid help command %s\n", arg);
-		else
+		else if (c->help)
 			printf("%s\n", c->help);
 	}
 	return 0;
@@ -2850,10 +2841,10 @@ cmdrc(char *m1, char *m2)
  *		setsockopt, as socket protocol family.
  */
 static int
-sourceroute(struct addrinfo *ai, char *arg, char **cpp, int *lenp, int *protop, int *optp)
+sourceroute(struct addrinfo *ai, char *arg, unsigned char **cpp, int *lenp, int *protop, int *optp)
 {
 	static char buf[1024 + ALIGNBYTES];	/*XXX*/
-	char *cp, *cp2, *lsrp, *ep;
+	unsigned char *cp, *cp2, *lsrp, *ep;
 	struct sockaddr_in *_sin;
 #ifdef INET6
 	struct sockaddr_in6 *sin6;

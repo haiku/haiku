@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,7 +33,7 @@ static const char sccsid[] = "@(#)utility.c	8.4 (Berkeley) 5/30/95";
 #endif /* not lint */
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnetd/utility.c,v 1.13 2003/05/04 02:54:49 obrien Exp $");
+__FBSDID("$FreeBSD$");
 
 #ifdef __FreeBSD__
 #include <locale.h>
@@ -151,31 +147,38 @@ ptyflush(void)
  * character.
  */
 static char *
-nextitem(char *current)
+nextitem(char *current, const char *endp)
 {
+    if (current >= endp) {
+	return NULL;
+    }
     if ((*current&0xff) != IAC) {
 	return current+1;
+    }
+    if (current+1 >= endp) {
+	return NULL;
     }
     switch (*(current+1)&0xff) {
     case DO:
     case DONT:
     case WILL:
     case WONT:
-	return current+3;
+	return current+3 <= endp ? current+3 : NULL;
     case SB:		/* loop forever looking for the SE */
 	{
 	    char *look = current+2;
 
-	    for (;;) {
+	    while (look < endp) {
 		if ((*look++&0xff) == IAC) {
-		    if ((*look++&0xff) == SE) {
+		    if (look < endp && (*look++&0xff) == SE) {
 			return look;
 		    }
 		}
 	    }
+	    return NULL;
 	}
     default:
-	return current+2;
+	return current+2 <= endp ? current+2 : NULL;
     }
 }  /* end of nextitem */
 
@@ -201,7 +204,7 @@ netclear(void)
     char *thisitem, *next;
     char *good;
 #define	wewant(p)	((nfrontp > p) && ((*p&0xff) == IAC) && \
-				((*(p+1)&0xff) != EC) && ((*(p+1)&0xff) != EL))
+				(nfrontp > p+1) && ((*(p+1)&0xff) != EC) && ((*(p+1)&0xff) != EL))
 
 #ifdef	ENCRYPTION
     thisitem = nclearto > netobuf ? nclearto : netobuf;
@@ -209,7 +212,7 @@ netclear(void)
     thisitem = netobuf;
 #endif	/* ENCRYPTION */
 
-    while ((next = nextitem(thisitem)) <= nbackp) {
+    while ((next = nextitem(thisitem, nbackp)) != NULL && (next <= nbackp)) {
 	thisitem = next;
     }
 
@@ -221,20 +224,23 @@ netclear(void)
     good = netobuf;	/* where the good bytes go */
 #endif	/* ENCRYPTION */
 
-    while (nfrontp > thisitem) {
+    while ((thisitem != NULL) && (nfrontp > thisitem)) {
 	if (wewant(thisitem)) {
 	    int length;
 
 	    next = thisitem;
 	    do {
-		next = nextitem(next);
-	    } while (wewant(next));
+		next = nextitem(next, nfrontp);
+	    } while ((next != NULL) && wewant(next) && (nfrontp > next));
+	    if (next == NULL) {
+		next = nfrontp;
+	    }
 	    length = next-thisitem;
 	    memmove(good, thisitem, length);
 	    good += length;
 	    thisitem = next;
 	} else {
-	    thisitem = nextitem(thisitem);
+	    thisitem = nextitem(thisitem, nfrontp);
 	}
     }
 
@@ -360,30 +366,30 @@ edithost(char *pat, char *host)
 {
 	char *res = editedhost;
 
-	if (!pat)
-		pat = strdup("");
-	while (*pat) {
-		switch (*pat) {
+	if (pat) {
+		while (*pat) {
+			switch (*pat) {
 
-		case '#':
-			if (*host)
-				host++;
-			break;
+			case '#':
+				if (*host)
+					host++;
+				break;
 
-		case '@':
-			if (*host)
-				*res++ = *host++;
-			break;
+			case '@':
+				if (*host)
+					*res++ = *host++;
+				break;
 
-		default:
-			*res++ = *pat;
-			break;
+			default:
+				*res++ = *pat;
+				break;
+			}
+			if (res == &editedhost[sizeof editedhost - 1]) {
+				*res = '\0';
+				return;
+			}
+			pat++;
 		}
-		if (res == &editedhost[sizeof editedhost - 1]) {
-			*res = '\0';
-			return;
-		}
-		pat++;
 	}
 	if (*host)
 		(void) strncpy(res, host,
@@ -847,22 +853,22 @@ printsub(char direction, unsigned char *pointer, int length)
 		    for (i = 2; i < length; i++ ) {
 			switch (pointer[i]) {
 			case NEW_ENV_VAR:
-			    output_data("\" VAR " + noquote);
+			    output_data("%s", "\" VAR " + noquote);
 			    noquote = 2;
 			    break;
 
 			case NEW_ENV_VALUE:
-			    output_data("\" VALUE " + noquote);
+			    output_data("%s", "\" VALUE " + noquote);
 			    noquote = 2;
 			    break;
 
 			case ENV_ESC:
-			    output_data("\" ESC " + noquote);
+			    output_data("%s", "\" ESC " + noquote);
 			    noquote = 2;
 			    break;
 
 			case ENV_USERVAR:
-			    output_data("\" USERVAR " + noquote);
+			    output_data("%s", "\" USERVAR " + noquote);
 			    noquote = 2;
 			    break;
 

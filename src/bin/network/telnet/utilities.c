@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,7 +33,7 @@ static const char sccsid[] = "@(#)utilities.c	8.3 (Berkeley) 5/30/95";
 #endif
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnet/utilities.c,v 1.8 2003/05/04 02:54:48 obrien Exp $");
+__FBSDID("$FreeBSD$");
 
 #define	TELOPTS
 #define	TELCMDS
@@ -629,7 +625,7 @@ printsub(char direction, unsigned char *pointer, int length)
 		}
 		{
 		    char tbuf[64];
-		    sprintf(tbuf, "%s%s%s%s%s",
+		    snprintf(tbuf, sizeof(tbuf), "%s%s%s%s%s",
 			pointer[2]&MODE_EDIT ? "|EDIT" : "",
 			pointer[2]&MODE_TRAPSIG ? "|TRAPSIG" : "",
 			pointer[2]&MODE_SOFT_TAB ? "|SOFT_TAB" : "",
@@ -782,7 +778,7 @@ printsub(char direction, unsigned char *pointer, int length)
 				    fprintf(NetTrace, "\" VAR " + noquote);
 			    } else
 #endif /* OLD_ENVIRON */
-				fprintf(NetTrace, "\" VALUE " + noquote);
+				fprintf(NetTrace, "%s", "\" VALUE " + noquote);
 			    noquote = 2;
 			    break;
 
@@ -798,17 +794,17 @@ printsub(char direction, unsigned char *pointer, int length)
 				    fprintf(NetTrace, "\" VALUE " + noquote);
 			    } else
 #endif /* OLD_ENVIRON */
-				fprintf(NetTrace, "\" VAR " + noquote);
+				fprintf(NetTrace, "%s", "\" VAR " + noquote);
 			    noquote = 2;
 			    break;
 
 			case ENV_ESC:
-			    fprintf(NetTrace, "\" ESC " + noquote);
+			    fprintf(NetTrace, "%s", "\" ESC " + noquote);
 			    noquote = 2;
 			    break;
 
 			case ENV_USERVAR:
-			    fprintf(NetTrace, "\" USERVAR " + noquote);
+			    fprintf(NetTrace, "%s", "\" USERVAR " + noquote);
 			    noquote = 2;
 			    break;
 

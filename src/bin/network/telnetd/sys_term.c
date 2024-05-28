@@ -1,4 +1,4 @@
- /*
+/*
  * Copyright (c) 1989, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,18 +33,17 @@ static const char sccsid[] = "@(#)sys_term.c	8.4+1 (Berkeley) 5/30/95";
 #endif
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnetd/sys_term.c,v 1.18 2003/05/04 02:54:49 obrien Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
+//#include <sys/tty.h>
 #include <libutil.h>
 #include <stdlib.h>
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-# include <sys/tty.h>
-# include <utmp.h>
-#endif
 
 #include "telnetd.h"
 #include "pathnames.h"
+#include "types.h"
+#include "baud.h"
 
 #ifdef	AUTHENTICATION
 #include <libtelnet/auth.h>
@@ -56,22 +51,6 @@ __FBSDID("$FreeBSD: src/contrib/telnet/telnetd/sys_term.c,v 1.18 2003/05/04 02:5
 
 int cleanopen(char *);
 void scrub_env(void);
-
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-
-struct	utmp wtmp;
-
-# ifdef _PATH_WTMP
-char    wtmpf[] = _PATH_WTMP;
-# else
-char	wtmpf[]	= "/var/log/wtmp";
-# endif
-# ifdef _PATH_UTMP
-char    utmpf[] = _PATH_UTMP;
-# else
-char	utmpf[] = "/var/run/utmp";
-# endif
-#endif
 
 char	*envinit[3];
 extern char **environ;
@@ -397,49 +376,30 @@ spcset(int func, cc_t *valp, cc_t **valpp)
  *
  * Returns the file descriptor of the opened pty.
  */
-char alpha[] = "0123456789abcdefghijklmnopqrstuv";
-
 int
 getpty(int *ptynum __unused)
 {
 	int p;
-	const char *cp;
-	char *p1, *p2;
-	int i;
+	const char *pn;
 
-#if (defined(__BEOS__) || defined(__HAIKU__))
-	(void) strcpy(line, "/dev/pt/XX");
-#else
-	(void) strcpy(line, _PATH_DEV);
-	(void) strcat(line, "ptyXX");
-#endif
-	p1 = &line[8];
-	p2 = &line[9];
+	p = posix_openpt(O_RDWR|O_NOCTTY);
+	if (p < 0)
+		return (-1);
+	
+	if (grantpt(p) == -1)
+		return (-1);
 
-	for (cp = "pqrsPQRS"; *cp; cp++) {
-		struct stat stb;
+	if (unlockpt(p) == -1)
+		return (-1);
+	
+	pn = ptsname(p);
+	if (pn == NULL)
+		return (-1);
+	
+	if (strlcpy(line, pn, sizeof line) >= sizeof line)
+		return (-1);
 
-		*p1 = *cp;
-		*p2 = '0';
-		/*
-		 * This stat() check is just to keep us from
-		 * looping through all 256 combinations if there
-		 * aren't that many ptys available.
-		 */
-		if (stat(line, &stb) < 0)
-			break;
-		for (i = 0; i < 32; i++) {
-			*p2 = alpha[i];
-			p = open(line, 2);
-			if (p > 0) {
-				line[5] = 't';
-				chown(line, 0, 0);
-				chmod(line, 0600);
-					return(p);
-			}
-		}
-	}
-	return(-1);
+	return (p);
 }
 
 #ifdef	LINEMODE
@@ -779,56 +739,6 @@ tty_iscrnl(void)
 #endif
 }
 
-/*
- * Try to guess whether speeds are "encoded" (4.2BSD) or just numeric (4.4BSD).
- */
-#if B4800 != 4800
-#define	DECODE_BAUD
-#endif
-
-#ifdef	DECODE_BAUD
-
-/*
- * A table of available terminal speeds
- */
-struct termspeeds {
-	int	speed;
-	int	value;
-} termspeeds[] = {
-	{ 0,      B0 },      { 50,    B50 },    { 75,     B75 },
-	{ 110,    B110 },    { 134,   B134 },   { 150,    B150 },
-	{ 200,    B200 },    { 300,   B300 },   { 600,    B600 },
-	{ 1200,   B1200 },   { 1800,  B1800 },  { 2400,   B2400 },
-	{ 4800,   B4800 },
-#ifdef	B7200
-	{ 7200,  B7200 },
-#endif
-	{ 9600,   B9600 },
-#ifdef	B14400
-	{ 14400,  B14400 },
-#endif
-#ifdef	B19200
-	{ 19200,  B19200 },
-#endif
-#ifdef	B28800
-	{ 28800,  B28800 },
-#endif
-#ifdef	B38400
-	{ 38400,  B38400 },
-#endif
-#ifdef	B57600
-	{ 57600,  B57600 },
-#endif
-#ifdef	B115200
-	{ 115200, B115200 },
-#endif
-#ifdef	B230400
-	{ 230400, B230400 },
-#endif
-	{ -1,     0 }
-};
-#endif	/* DECODE_BAUD */
-
 void
 tty_tspeed(int val)
 {
@@ -1000,40 +910,6 @@ cleanopen(char *li)
 	return(t);
 }
 
-
-#if (defined(__BEOS__) || defined(__HAIKU__))
-/* taken from DragonFly's telnetd */
-int
-login_tty(int t)
-{
-	if (setsid() < 0) {
-		fatalperror(net, "setsid()");
-	}
-
-	/*
-	 * We get our controlling tty assigned as a side-effect
-	 * of opening up a tty device.  But on BSD based systems,
-	 * this only happens if our process group is zero.  The
-	 * setsid() call above may have set our pgrp, so clear
-	 * it out before opening the tty...
-	 */
-	setpgid(0, 0);
-	close(open(line, O_RDWR));
-
-	setenv("TTY", line, 1);
-
-	if (t != 0)
-		(void) dup2(t, 0);
-	if (t != 1)
-		(void) dup2(t, 1);
-	if (t != 2)
-		(void) dup2(t, 2);
-	if (t > 2)
-		close(t);
-	return(0);
-}
-#endif	/* __BEOS__ */
-
 /*
  * startslave(host)
  *
@@ -1098,6 +974,10 @@ void
 start_login(char *host undef1, int autologin undef1, char *name undef1)
 {
 	char **argv;
+	char *user;
+
+	user = getenv("USER");
+	user = (user != NULL) ? strdup(user) : NULL;
 
 	scrub_env();
 
@@ -1120,11 +1000,11 @@ start_login(char *host undef1, int autologin undef1, char *name undef1)
 	 */
 	if ((auth_level < 0) || (autologin != AUTH_VALID))
 # endif
+#endif /* AUTHENTICATION */
 	{
 		argv = addarg(argv, "-h");
 		argv = addarg(argv, host);
 	}
-#endif /* AUTHENTICATION */
 #endif
 #if	!defined(NO_LOGIN_P)
 	argv = addarg(argv, "-p");
@@ -1232,9 +1112,9 @@ start_login(char *host undef1, int autologin undef1, char *name undef1)
 # endif
 	} else
 #endif
-	if (getenv("USER")) {
+	if (user != NULL) {
  		argv = addarg(argv, "--");
-		argv = addarg(argv, getenv("USER"));
+		argv = addarg(argv, user);
 #if	defined(LOGIN_ARGS) && defined(NO_LOGIN_P)
 		{
 			char **cpp;
@@ -1242,17 +1122,6 @@ start_login(char *host undef1, int autologin undef1, char *name undef1)
 				argv = addarg(argv, *cpp);
 		}
 #endif
-		/*
-		 * Assume that login will set the USER variable
-		 * correctly.  For SysV systems, this means that
-		 * USER will no longer be set, just LOGNAME by
-		 * login.  (The problem is that if the auto-login
-		 * fails, and the user then specifies a different
-		 * account name, he can get logged in with both
-		 * LOGNAME and USER in his environment, but the
-		 * USER value will be wrong.
-		 */
-		unsetenv("USER");
 	}
 #ifdef	AUTHENTICATION
 #if	defined(NO_LOGIN_F) && defined(LOGIN_R)
@@ -1261,6 +1130,9 @@ start_login(char *host undef1, int autologin undef1, char *name undef1)
 #endif
 #endif /* AUTHENTICATION */
 	closelog();
+
+	if (user != NULL)
+		free(user);
 
 	if (altlogin == NULL) {
 		altlogin = _PATH_LOGIN;
@@ -1283,7 +1155,7 @@ addarg(char **argv, const char *val)
 		 */
 		argv = (char **)malloc(sizeof(*argv) * 12);
 		if (argv == NULL)
-			return(NULL);
+			fatal(net, "failure allocating argument space");
 		*argv++ = (char *)10;
 		*argv = (char *)0;
 	}
@@ -1294,11 +1166,12 @@ addarg(char **argv, const char *val)
 		*argv = (char *)((long)(*argv) + 10);
 		argv = (char **)realloc(argv, sizeof(*argv)*((long)(*argv) + 2));
 		if (argv == NULL)
-			return(NULL);
+			fatal(net, "failure allocating argument space");
 		argv++;
 		cpp = &argv[(long)argv[-1] - 10];
 	}
-	*cpp++ = strdup(val);
+	if ((*cpp++ = strdup(val)) == NULL)
+		fatal(net, "failure allocating argument space");
 	*cpp = 0;
 	return(argv);
 }
@@ -1329,8 +1202,18 @@ scrub_env(void)
 
 	char **cpp, **cpp2;
 	const char **p;
+	char ** new_environ;
+	size_t count;
 
- 	for (cpp2 = cpp = environ; *cpp; cpp++) {
+	/* Allocate space for scrubbed environment. */
+	for (count = 1, cpp = environ; *cpp; count++, cpp++)
+		continue;
+	if ((new_environ = malloc(count * sizeof(char *))) == NULL) {
+		environ = NULL;
+		return;
+	}
+
+ 	for (cpp2 = new_environ, cpp = environ; *cpp; cpp++) {
 		int reject_it = 0;
 
 		for(p = rej; *p; p++)
@@ -1344,10 +1227,15 @@ scrub_env(void)
 		for(p = acc; *p; p++)
 			if(strncmp(*cpp, *p, strlen(*p)) == 0)
 				break;
-		if(*p != NULL)
- 			*cpp2++ = *cpp;
+		if(*p != NULL) {
+			if ((*cpp2++ = strdup(*cpp)) == NULL) {
+				environ = new_environ;
+				return;
+			}
+		}
  	}
 	*cpp2 = NULL;
+	environ = new_environ;
 }
 
 /*
@@ -1360,26 +1248,7 @@ scrub_env(void)
 void
 cleanup(int sig __unused)
 {
-	char *p;
-	sigset_t mask;
 
-	p = line + sizeof(_PATH_DEV) - 1;
-	/*
-	 * Block all signals before clearing the utmp entry.  We don't want to
-	 * be called again after calling logout() and then not add the wtmp
-	 * entry because of not finding the corresponding entry in utmp.
-	 */
-	sigfillset(&mask);
-	sigprocmask(SIG_SETMASK, &mask, NULL);
-#if (!defined(__BEOS__) && !defined(__HAIKU__))
-	if (logout(p))
-		logwtmp(p, "", "");
-	(void)chmod(line, 0666);
-	(void)chown(line, 0, 0);
-	*p = 'p';
-	(void)chmod(line, 0666);
-	(void)chown(line, 0, 0);
-#endif
-	(void) shutdown(net, 2);
+	(void) shutdown(net, SHUT_RDWR);
 	_exit(1);
 }

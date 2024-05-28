@@ -4,11 +4,9 @@ UseBuildFeatureHeaders ncurses ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs libtelnet ] : false ;
+UseHeaders [ FDirName $(SUBDIR) .. telnet ] : false ;
 
-local defines = [ FDefines USE_TERMIO=1 ] ;
-
-SubDirCcFlags $(defines) ;
-SubDirC++Flags $(defines) ;
+SubDirCcFlags [ FDefines USE_TERMIO=1 ] ;
 
 local sources =
 	authenc.c

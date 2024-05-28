@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -37,7 +33,7 @@ static const char sccsid[] = "@(#)terminal.c	8.2 (Berkeley) 2/16/95";
 #endif
 #endif
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/contrib/telnet/telnet/terminal.c,v 1.7 2003/05/04 02:54:48 obrien Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <arpa/telnet.h>
 #include <sys/types.h>
@@ -111,7 +107,8 @@ init_terminal(void)
 }
 
 /*
- *		Send as much data as possible to the terminal.
+ *		Send as much data as possible to the terminal, else exits if
+ *		it encounters a permanent failure when writing to the tty.
  *
  *		Return value:
  *			-1: No useful work done, data waiting to go out.
@@ -152,8 +149,19 @@ ttyflush(int drop)
 	}
 	ring_consumed(&ttyoring, n);
     }
-    if (n < 0)
+    if (n < 0) {
+	if (errno == EAGAIN || errno == EINTR) {
+	    return -1;
+	} else {
+	    ring_consumed(&ttyoring, ring_full_count(&ttyoring));
+	    setconnmode(0);
+	    setcommandmode();
+	    NetClose(net);
+	    fprintf(stderr, "Write error on local output.\n");
+	    exit(1);
+	}
 	return -1;
+    }
     if (n == n0) {
 	if (n0)
 	    return -1;
