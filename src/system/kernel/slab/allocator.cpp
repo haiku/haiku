@@ -23,6 +23,9 @@
 #include "MemoryManager.h"
 
 
+#if USE_SLAB_ALLOCATOR_FOR_MALLOC
+
+
 //#define TEST_ALL_CACHES_DURING_BOOT
 
 static const size_t kBlockSizes[] = {
@@ -202,9 +205,6 @@ block_allocator_init_rest()
 // #pragma mark - public API
 
 
-#if USE_SLAB_ALLOCATOR_FOR_MALLOC
-
-
 void*
 memalign(size_t alignment, size_t size)
 {
@@ -292,6 +292,29 @@ void*
 realloc(void* address, size_t newSize)
 {
 	return realloc_etc(address, newSize, 0);
+}
+
+
+#else
+
+
+void*
+block_alloc_early(size_t size)
+{
+	panic("block allocator not enabled!");
+	return NULL;
+}
+
+
+void
+block_allocator_init_boot()
+{
+}
+
+
+void
+block_allocator_init_rest()
+{
 }
 
 
