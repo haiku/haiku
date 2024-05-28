@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 
 
 /*!	Dumps the contents of the attribute in the form of raw data. This view
