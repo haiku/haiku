@@ -445,6 +445,16 @@ MemoryManager::Init(kernel_args* args)
 	sFreeAreas = NULL;
 	sFreeAreaCount = 0;
 	sMaintenanceNeeded = false;
+
+#if USE_DEBUG_HEAP_FOR_MALLOC || USE_GUARDED_HEAP_FOR_MALLOC
+	// Allocate one area immediately. Otherwise, we might try to allocate before
+	// post-area initialization but after page initialization, during which time
+	// we can't actually reserve pages.
+	MutexLocker locker(sLock);
+	Area* area = NULL;
+	_AllocateArea(0, area);
+	_AddArea(area);
+#endif
 }
 
 
