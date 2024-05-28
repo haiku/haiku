@@ -81,7 +81,8 @@ put_stack_interface_module()
 	if (atomic_add(&sStackInterfaceConsumers, -1) != 1)
 		return;
 
-#if 0 /* Just leave the stack loaded, for now. */
+	// Keep the stack loaded on non-KDEBUG kernels.
+#if KDEBUG
 	WriteLocker _(sLock);
 	if (atomic_get(&sStackInterfaceConsumers) > 0)
 		return;
