@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1985, 1988, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -10,11 +12,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -47,8 +45,6 @@ static char sccsid[] = "@(#)ftpcmd.y	8.3 (Berkeley) 4/6/94";
 #endif /* not lint */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/libexec/ftpd/ftpcmd.y,v 1.66 2007/04/18 22:43:39 yar Exp $");
-
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -76,30 +72,7 @@ __FBSDID("$FreeBSD: src/libexec/ftpd/ftpcmd.y,v 1.66 2007/04/18 22:43:39 yar Exp
 #include "extern.h"
 #include "pathnames.h"
 
-extern	union sockunion data_dest, his_addr;
-extern	int hostinfo;
-extern	int logged_in;
-extern	struct passwd *pw;
-extern	int guest;
-extern	char *homedir;
-extern 	int paranoid;
-extern	int logging;
-extern	int type;
-extern	int form;
-extern	int ftpdebug;
-extern	int timeout;
-extern	int maxtimeout;
-extern  int pdata;
-extern	char *hostname;
-extern	char proctitle[];
-extern	int usedefault;
-extern  char tmpline[];
-extern	int readonly;
-extern	int assumeutf8;
-extern	int noepsv;
-extern	int noretr;
-extern	int noguestretr;
-extern	char *typenames[]; /* defined in <arpa/ftp.h> included from ftpd.c */
+#define	yylex	ftpcmd_yylex
 
 off_t	restart_point;
 
@@ -109,8 +82,6 @@ static	int cmd_bytesz;
 static	int state;
 char	cbuf[512];
 char	*fromname = NULL;
-
-extern int epsvall;
 
 #define	CMD	0	/* beginning of command */
 #define	ARGS	1	/* expect miscellaneous arguments */
@@ -252,8 +223,8 @@ static int	 port_check(const char *);
 #ifdef INET6
 static int	 port_check_v6(const char *);
 #endif
-static int	 check_login1(void);
 static void	 sizecmd(char *);
+static int	 check_login1(void);
 static void	 toolong(int);
 #ifdef INET6
 static void	 v4map_data_dest(void);
@@ -542,7 +513,7 @@ cmd
 				case MODE_S:
 					reply(200, "MODE S accepted.");
 					break;
-
+	
 				default:
 					reply(502, "Unimplemented MODE type.");
 				}
@@ -915,7 +886,7 @@ rcmd
 					free(fromname);
 				fromname = NULL;
 				restart_point = $4.o;
-				reply(350, "Restarting at %lld. %s",
+				reply(350, "Restarting at %jd. %s",
 				    (intmax_t)restart_point,
 				    "Send STORE or RETRIEVE to initiate transfer.");
 			}
@@ -1194,10 +1165,10 @@ lookup(struct tab *p, char *cmd)
 #include <arpa/telnet.h>
 
 /*
- * ftpd_getline - a hacked up version of fgets to ignore TELNET escape codes.
+ * get_line - a hacked up version of fgets to ignore TELNET escape codes.
  */
-int *
-ftpd_getline(char *s, int n, FILE *iop)
+int
+get_line(char *s, int n, FILE *iop)
 {
 	int c;
 	register char *cs;
@@ -1316,7 +1287,7 @@ yylex(void)
 		case CMD:
 			(void) signal(SIGALRM, toolong);
 			(void) alarm(timeout);
-			n = ftpd_getline(cbuf, sizeof(cbuf)-1, stdin);
+			n = get_line(cbuf, sizeof(cbuf)-1, stdin);
 			if (n == -1) {
 				reply(221, "You could at least say goodbye.");
 				dologout(0);
@@ -1624,7 +1595,7 @@ sizecmd(char *filename)
 		else if (!S_ISREG(stbuf.st_mode))
 			reply(550, "%s: not a plain file.", filename);
 		else
-			reply(213, "%lld", (intmax_t)stbuf.st_size);
+			reply(213, "%jd", (intmax_t)stbuf.st_size);
 		break; }
 	case TYPE_A: {
 		FILE *fin;
@@ -1658,7 +1629,7 @@ sizecmd(char *filename)
 		}
 		(void) fclose(fin);
 
-		reply(213, "%lld", (intmax_t)count);
+		reply(213, "%jd", (intmax_t)count);
 		break; }
 	default:
 		reply(504, "SIZE not implemented for type %s.",
@@ -1750,7 +1721,7 @@ exptilde(char *s)
  * Avoid expanding to a pathname including '\r' or '\n' in order to
  * not disrupt the FTP protocol.
  * The expansion found must be unique.
- * Return the result as a malloced string, or NULL if an error occured.
+ * Return the result as a malloced string, or NULL if an error occurred.
  *
  * Problem: this production is used for all pathname
  * processing, but only gives a 550 error reply.

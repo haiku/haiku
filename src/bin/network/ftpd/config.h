@@ -1,4 +1,3 @@
-/* $FreeBSD: src/libexec/ftpd/config.h,v 1.1 2001/07/19 17:45:14 obrien Exp $ */
 
 
 /* config.h.  Generated automatically by configure.  */
@@ -199,7 +198,7 @@
 #define HAVE_SOCKLEN_T 1
 
 /* Define if AF_INET6 exists in <sys/socket.h> */
-/* #define HAVE_AF_INET6 1 */
+#define HAVE_AF_INET6 1
 
 /* Define if `struct sockaddr_in6' exists in <netinet/in.h> */
 #define HAVE_SOCKADDR_IN6 1

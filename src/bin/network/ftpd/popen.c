@@ -1,4 +1,6 @@
-/*
+/*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1988, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -13,11 +15,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -41,8 +39,6 @@ static char sccsid[] = "@(#)popen.c	8.3 (Berkeley) 4/6/94";
 #endif /* not lint */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/libexec/ftpd/popen.c,v 1.26 2004/11/18 13:46:29 yar Exp $");
-
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
@@ -64,7 +60,7 @@ __FBSDID("$FreeBSD: src/libexec/ftpd/popen.c,v 1.26 2004/11/18 13:46:29 yar Exp 
 #define	MAXGLOBARGS	1000
 
 /*
- * Special version of popen which avoids call to shell.  This ensures noone
+ * Special version of popen which avoids call to shell.  This ensures no one
  * may create a pipe to a hidden program as a side effect of a list or dir
  * command.
  */
@@ -147,6 +143,9 @@ ftpd_popen(char *program, char *type)
 			(void)close(pdes[1]);
 		}
 #ifdef BUILTIN_LS
+		/* Drop privileges before proceeding */
+		if (getuid() != geteuid() && setuid(geteuid()) < 0)
+			_exit(1);
 		if (strcmp(gargv[0], _PATH_LS) == 0) {
 			/* Reset getopt for ls_main() */
 			optreset = optind = optopt = 1;

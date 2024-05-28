@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -10,11 +12,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -31,7 +29,6 @@
  * SUCH DAMAGE.
  *
  *	@(#)extern.h	8.2 (Berkeley) 4/4/94
- * $FreeBSD: src/libexec/ftpd/extern.h,v 1.19 2002/02/04 01:23:44 kris Exp $
  */
 
 #include <sys/types.h>
@@ -46,7 +43,7 @@ void	fatalerror(char *);
 void    ftpd_logwtmp(char *, char *, struct sockaddr *addr);
 int	ftpd_pclose(FILE *);
 FILE   *ftpd_popen(char *, char *);
-int   *ftpd_getline(char *, int, FILE *);
+int	get_line(char *, int, FILE *);
 void	lreply(int, const char *, ...) __printflike(2, 3);
 void	makedir(char *);
 void	nack(char *);
@@ -69,6 +66,35 @@ void	user(char *);
 void	yyerror(char *);
 int	yyparse(void);
 int	ls_main(int, char **);
+
+extern	int assumeutf8;
+extern	char cbuf[];
+extern	union sockunion data_dest;
+extern	int epsvall;
+extern	int form;
+extern	int ftpdebug;
+extern	int guest;
+extern	union sockunion his_addr;
+extern	char *homedir;
+extern	int hostinfo;
+extern	char *hostname;
+extern	int maxtimeout;
+extern	int logged_in;
+extern	int logging;
+extern	int noepsv;
+extern	int noguestretr;
+extern	int noretr;
+extern	int paranoid;
+extern	struct passwd *pw;
+extern	int pdata;
+extern	char proctitle[];
+extern	int readonly;
+extern	off_t restart_point;
+extern	int timeout;
+extern  char tmpline[];
+extern	int type;
+extern	char *typenames[]; /* defined in <arpa/ftp.h> included from ftpd.c */
+extern	int usedefault;
 
 struct sockaddr_in;
 struct sockaddr_in6;
