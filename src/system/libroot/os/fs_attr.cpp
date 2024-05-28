@@ -17,10 +17,6 @@
 #include <syscall_utils.h>
 
 
-// TODO: think about adding special syscalls for the read/write/stat functions
-// to speed them up
-
-
 static DIR *
 open_attr_dir(int file, const char *path, bool traverse)
 {
