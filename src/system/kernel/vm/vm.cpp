@@ -4234,6 +4234,11 @@ is_page_in_physical_memory_range(kernel_args* args, phys_addr_t address)
 page_num_t
 vm_allocate_early_physical_page(kernel_args* args)
 {
+	if (args->num_physical_allocated_ranges == 0) {
+		panic("early physical page allocations no longer possible!");
+		return 0;
+	}
+
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
 		phys_addr_t nextPage;
 
@@ -4306,9 +4311,12 @@ vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
 
 		//dprintf("vm_allocate_early: paddr 0x%lx\n", physicalAddress);
 
-		arch_vm_translation_map_early_map(args, virtualBase + i * B_PAGE_SIZE,
+		status_t status = arch_vm_translation_map_early_map(args,
+			virtualBase + i * B_PAGE_SIZE,
 			physicalAddress * B_PAGE_SIZE, attributes,
 			&vm_allocate_early_physical_page);
+		if (status != B_OK)
+			panic("error mapping early page!");
 	}
 
 	return virtualBase;
