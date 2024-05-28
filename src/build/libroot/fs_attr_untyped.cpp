@@ -62,7 +62,48 @@ static const size_t kMaxAttributeListingLength = 10240;
 static const size_t kMaxAttributeLength = 10240 * 4;
 
 
-// mangle_attribute_name
+//#define HEX_ENCODE_ATTRIBUTE_NAMES
+#ifdef HEX_ENCODE_ATTRIBUTE_NAMES
+static string
+mangle_attribute_name(const char* name)
+{
+	string mangledName = kAttributeNamespace;
+
+	static const char* const kHexChars = "0123456789abcdef";
+	for (int i = 0; name[i] != '\0'; i++) {
+		mangledName += kHexChars[name[i] >> 4];
+		mangledName += kHexChars[name[i] & 0xf];
+	}
+
+	return mangledName;
+}
+
+
+static bool
+demangle_attribute_name(const char* name, string& demangledName)
+{
+	if (strncmp(name, kAttributeNamespace, kAttributeNamespaceLen) != 0)
+		return false;
+
+	name += kAttributeNamespaceLen;
+
+	demangledName = "";
+
+	for (int i = 0; name[i] != '\0'; i += 2) {
+		char c[3];
+		c[2] = '\0';
+		memcpy(c, name + i, 2);
+
+		char out;
+		out = strtol(c, NULL, 16);
+		if (out == '\0')
+			return false;
+		demangledName += out;
+	}
+
+	return true;
+}
+#else
 static string
 mangle_attribute_name(const char* name)
 {
@@ -89,11 +130,10 @@ mangle_attribute_name(const char* name)
 }
 
 
-// demangle_attribute_name
 static bool
 demangle_attribute_name(const char* name, string& demangledName)
 {
-	// chop of our xattr namespace and translate:
+	// chop off our xattr namespace and translate:
 	// "%\" -> '/'
 	// "%%" -> '%'
 
@@ -120,6 +160,7 @@ demangle_attribute_name(const char* name, string& demangledName)
 
 	return true;
 }
+#endif
 
 
 namespace {
