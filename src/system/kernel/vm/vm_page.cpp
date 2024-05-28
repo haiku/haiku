@@ -955,11 +955,14 @@ dump_page_long(int argc, char **argv)
 		page = vm_lookup_page(pageAddress / B_PAGE_SIZE);
 	}
 
+	const page_num_t expected = sPhysicalPageOffset + (page - sPages);
+
 	kprintf("PAGE: %p\n", page);
 	kprintf("queue_next,prev: %p, %p\n", page->queue_link.next,
 		page->queue_link.previous);
-	kprintf("physical_number: %#" B_PRIxPHYSADDR "\n",
-		page->physical_page_number);
+	kprintf("physical_number: %#" B_PRIxPHYSADDR "\n", page->physical_page_number);
+	if (page->physical_page_number != expected)
+		kprintf("\t(expected %#" B_PRIxSIZE ")!\n", expected);
 	kprintf("cache:           %p\n", page->Cache());
 	kprintf("cache_offset:    %" B_PRIuPHYSADDR "\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
