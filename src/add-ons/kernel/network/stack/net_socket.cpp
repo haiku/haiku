@@ -459,24 +459,6 @@ status_t
 socket_control(net_socket* socket, uint32 op, void* data, size_t length)
 {
 	switch (op) {
-		case FIONBIO:
-		{
-			if (data == NULL)
-				return B_BAD_VALUE;
-
-			int value;
-			if (is_syscall()) {
-				if (!IS_USER_ADDRESS(data)
-					|| user_memcpy(&value, data, sizeof(int)) != B_OK) {
-					return B_BAD_ADDRESS;
-				}
-			} else
-				value = *(int*)data;
-
-			return socket_setsockopt(socket, SOL_SOCKET, SO_NONBLOCK, &value,
-				sizeof(int));
-		}
-
 		case FIONREAD:
 		{
 			if (data == NULL || (socket->options & SO_ACCEPTCONN) != 0)

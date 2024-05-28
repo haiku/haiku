@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 
 #include <OS.h>
 
@@ -471,6 +472,26 @@ fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 	FileDescriptorPutter descriptor(get_fd(get_current_io_context(kernelFD), fd));
 	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
+
+	// Special case: translate FIONBIO into fcntl(F_SETFL).
+	if (op == FIONBIO) {
+		if (buffer == NULL)
+			return B_BAD_VALUE;
+
+		int value;
+		if (is_called_via_syscall()) {
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&value, buffer, sizeof(int)) != B_OK) {
+				return B_BAD_ADDRESS;
+			}
+		} else
+			value = *(int*)buffer;
+
+		size_t argument = descriptor->open_mode & ~O_NONBLOCK;
+		argument |= (value ? O_NONBLOCK : 0);
+
+		return (kernelFD ? _kern_fcntl : _user_fcntl)(fd, F_SETFL, argument);
+	}
 
 	status_t status;
 	if (descriptor->ops->fd_ioctl)

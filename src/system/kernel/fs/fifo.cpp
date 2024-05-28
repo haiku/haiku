@@ -1065,25 +1065,6 @@ fifo_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 op,
 		_node, _cookie, op, buffer, length);
 
 	switch (op) {
-		case FIONBIO:
-		{
-			if (buffer == NULL)
-				return B_BAD_VALUE;
-
-			int value;
-			if (is_called_via_syscall()) {
-				if (!IS_USER_ADDRESS(buffer)
-					|| user_memcpy(&value, buffer, sizeof(int)) != B_OK) {
-					return B_BAD_ADDRESS;
-				}
-			} else
-				value = *(int*)buffer;
-
-			MutexLocker locker(inode->RequestLock());
-			cookie->SetNonBlocking(value != 0);
-			return B_OK;
-		}
-
 		case FIONREAD:
 		{
 			if (buffer == NULL)
