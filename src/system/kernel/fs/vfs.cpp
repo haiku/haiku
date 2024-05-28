@@ -6202,10 +6202,13 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		}
 
 		case F_SETFL:
+		{
 			// Set file descriptor open mode
 
-			// we only accept changes to O_APPEND and O_NONBLOCK
-			argument &= O_APPEND | O_NONBLOCK;
+			// we only accept changes to certain flags
+			const int32 modifiableFlags = O_APPEND | O_NONBLOCK;
+			argument &= modifiableFlags;
+
 			if (descriptor->ops->fd_set_flags != NULL) {
 				status = descriptor->ops->fd_set_flags(descriptor.Get(), argument);
 			} else if (vnode != NULL && HAS_FS_CALL(vnode, set_flags)) {
@@ -6217,10 +6220,11 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 			if (status == B_OK) {
 				// update this descriptor's open_mode field
 				descriptor->open_mode = (descriptor->open_mode
-					& ~(O_APPEND | O_NONBLOCK)) | argument;
+					& ~modifiableFlags) | argument;
 			}
 
 			break;
+		}
 
 		case F_GETFL:
 			// Get file descriptor open mode
