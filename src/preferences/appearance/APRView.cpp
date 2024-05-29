@@ -253,7 +253,8 @@ APRView::_CreateItems()
 		fAttrList->AddItem(new ColorWhichItem(text, which, ui_color(which)));
 	}
 
-	fAttrList->Select(0);
+	if (Window() != NULL)
+		fAttrList->Select(0);
 }
 
 
