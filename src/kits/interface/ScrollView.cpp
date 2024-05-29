@@ -916,18 +916,22 @@ BScrollView::_AlignScrollBars(bool horizontal, bool vertical, BRect targetFrame)
 BScrollView::_ComputeFrame(BRect frame, BScrollBar* horizontal,
 	BScrollBar* vertical, border_style border, uint32 borders)
 {
-	if (vertical != NULL) {
+	if (vertical != NULL)
 		frame.right += vertical->PreferredSize().Width();
+	if (horizontal != NULL)
+		frame.bottom += horizontal->PreferredSize().Height();
 
+	// Take the other minimum dimensions into account, too, but only if
+	// the frame already has a greater-than-zero value for them. Otherwise,
+	// non-layouted applications could wind up with broken layouts.
+	if (vertical != NULL) {
 		const float minHeight = vertical->MinSize().Height();
-		if (frame.Height() >= 0 && frame.Height() < minHeight)
+		if (frame.Height() > 0 && frame.Height() < minHeight)
 			frame.bottom += minHeight - frame.Height();
 	}
 	if (horizontal != NULL) {
-		frame.bottom += horizontal->PreferredSize().Height();
-
 		const float minWidth = horizontal->MinSize().Width();
-		if (frame.Width() >= 0 && frame.Width() < minWidth)
+		if (frame.Width() > 0 && frame.Width() < minWidth)
 			frame.right += minWidth - frame.Width();
 	}
 
