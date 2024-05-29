@@ -1636,17 +1636,16 @@ team_create_thread_start_internal(void* args)
 		return B_BAD_ADDRESS;
 	}
 
-	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
-
-	// set team args and update state
-	team->Lock();
-	team->SetArgs(path, teamArgs->flat_args + 1, argCount - 1);
-	team->state = TEAM_STATE_NORMAL;
-	team->Unlock();
-
 	free_team_arg(teamArgs);
 		// the arguments are already on the user stack, we no longer need
 		// them in this form
+
+	TRACE(("team_create_thread_start: loading elf binary '%s'\n", path));
+
+	// update state
+	team->Lock();
+	team->state = TEAM_STATE_NORMAL;
+	team->Unlock();
 
 	// Clone commpage area
 	area_id commPageArea = clone_commpage_area(team->id,
@@ -1807,6 +1806,8 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 
 	_flatArgs = NULL;
 		// args are owned by the team_arg structure now
+
+	team->SetArgs(path, teamArgs->flat_args + 1, argCount - 1);
 
 	// create a new io_context for this team
 	team->io_context = vfs_new_io_context(parentIOContext, true);
@@ -2013,6 +2014,8 @@ exec_team(const char* path, char**& _flatArgs, size_t flatArgsSize,
 
 	_flatArgs = NULL;
 		// args are owned by the team_arg structure now
+
+	team->SetArgs(path, teamArgs->flat_args + 1, argCount - 1);
 
 	// TODO: remove team resources if there are any left
 	// thread_atkernel_exit() might not be called at all
