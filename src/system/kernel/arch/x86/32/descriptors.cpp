@@ -211,8 +211,8 @@ init_double_fault(int cpuNum)
 	struct tss* tss = &gCPU[cpuNum].arch.double_fault_tss;
 
 	memset(tss, 0, sizeof(struct tss));
-	size_t stackSize = 0;
-	//tss->sp0 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
+	size_t stackSize;
+	tss->sp0 = (addr_t)x86_get_double_fault_stack(cpuNum, &stackSize);
 	tss->sp0 += stackSize;
 	tss->ss0 = KERNEL_DATA_SELECTOR;
 	tss->cr3 = x86_read_cr3();
