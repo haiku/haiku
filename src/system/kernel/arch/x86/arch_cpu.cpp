@@ -1786,7 +1786,7 @@ arch_cpu_init_post_vm(kernel_args* args)
 		kDoubleFaultStackSize * smp_get_num_cpus(),
 		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (stacks < B_OK)
-		panic("failed to create double fault stacks area: %d", stacks);
+		panic("failed to create double fault stacks area: %" B_PRId32, stacks);
 
 	X86PagingStructures* kernelPagingStructures
 		= static_cast<X86VMTranslationMap*>(
