@@ -2268,26 +2268,10 @@ bfs_open_query(fs_volume* _volume, const char* queryString, uint32 flags,
 
 	Volume* volume = (Volume*)_volume->private_volume;
 
-	Expression* expression = new(std::nothrow) Expression((char*)queryString);
-	if (expression == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
-
-	if (expression->InitCheck() < B_OK) {
-		INFORM(("Could not parse query \"%s\", stopped at: \"%s\"\n",
-			queryString, expression->Position()));
-
-		delete expression;
-		RETURN_ERROR(B_BAD_VALUE);
-	}
-
-	Query* query = new(std::nothrow) Query(volume, expression, flags);
-	if (query == NULL) {
-		delete expression;
-		RETURN_ERROR(B_NO_MEMORY);
-	}
-
-	if (flags & B_LIVE_QUERY)
-		query->SetLiveMode(port, token);
+	Query* query;
+	status_t error = Query::Create(volume, queryString, flags, port, token, query);
+	if (error != B_OK)
+		return error;
 
 	*_cookie = (void*)query;
 
@@ -2309,9 +2293,7 @@ bfs_free_query_cookie(fs_volume* _volume, void* cookie)
 	FUNCTION();
 
 	Query* query = (Query*)cookie;
-	Expression* expression = query->GetExpression();
 	delete query;
-	delete expression;
 
 	return B_OK;
 }

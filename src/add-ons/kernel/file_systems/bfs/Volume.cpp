@@ -413,7 +413,7 @@ Volume::UpdateLiveQueries(Inode* inode, const char* attribute, int32 type,
 {
 	MutexLocker _(fQueryLock);
 
-	SinglyLinkedList<Query>::Iterator iterator = fQueries.GetIterator();
+	DoublyLinkedList<Query>::Iterator iterator = fQueries.GetIterator();
 	while (iterator.HasNext()) {
 		Query* query = iterator.Next();
 		query->LiveUpdate(inode, attribute, type, oldKey, oldLength, newKey,
@@ -431,7 +431,7 @@ Volume::UpdateLiveQueriesRenameMove(Inode* inode, ino_t oldDirectoryID,
 	size_t oldLength = strlen(oldName);
 	size_t newLength = strlen(newName);
 
-	SinglyLinkedList<Query>::Iterator iterator = fQueries.GetIterator();
+	DoublyLinkedList<Query>::Iterator iterator = fQueries.GetIterator();
 	while (iterator.HasNext()) {
 		Query* query = iterator.Next();
 		query->LiveUpdateRenameMove(inode, oldDirectoryID, oldName, oldLength,

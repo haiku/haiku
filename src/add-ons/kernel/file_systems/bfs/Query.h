@@ -1,5 +1,6 @@
 /*
  * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2024, Haiku, Inc. All rights reserved.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef QUERY_H
@@ -10,70 +11,47 @@
 #include "Index.h"
 
 
-class Volume;
-class Term;
-class Equation;
-class TreeIterator;
-class Query;
-
-
-class Expression {
-public:
-							Expression(char* expr);
-							~Expression();
-
-			status_t		InitCheck();
-			const char*		Position() const { return fPosition; }
-			Term*			Root() const { return fTerm; }
-
-protected:
-			Term*			ParseOr(char** expr);
-			Term*			ParseAnd(char** expr);
-			Term*			ParseEquation(char** expr);
-
-			bool			IsOperator(char** expr, char op);
-
-private:
-							Expression(const Expression& other);
-							Expression& operator=(const Expression& other);
-								// no implementation
-
-			char*			fPosition;
-			Term*			fTerm;
+namespace QueryParser {
+	template<typename QueryPolicy> class Query;
 };
 
-class Query : public SinglyLinkedListLinkImpl<Query> {
+class Volume;
+
+
+class Query : public DoublyLinkedListLinkImpl<Query> {
 public:
-							Query(Volume* volume, Expression* expression,
-								uint32 flags);
 							~Query();
 
-			status_t		Rewind();
-			status_t		GetNextEntry(struct dirent* , size_t size);
+	static	status_t		Create(Volume* volume, const char* queryString,
+								uint32 flags, port_id port, uint32 token,
+								Query*& _query);
 
-			void			SetLiveMode(port_id port, int32 token);
-			void			LiveUpdate(Inode* inode, const char* attribute,
-								int32 type, const uint8* oldKey,
-								size_t oldLength, const uint8* newKey,
-								size_t newLength);
-			void			LiveUpdateRenameMove(Inode* inode,
+			status_t		Rewind();
+			status_t		GetNextEntry(struct dirent* entry, size_t size);
+
+			void			LiveUpdate(Inode* inode,
+								const char* attribute, int32 type,
+								const void* oldKey, size_t oldLength,
+								const void* newKey, size_t newLength);
+			void			LiveUpdateRenameMove(Inode* node,
 								ino_t oldDirectoryID, const char* oldName,
 								size_t oldLength, ino_t newDirectoryID,
 								const char* newName, size_t newLength);
+private:
+			struct QueryPolicy;
+			friend struct QueryPolicy;
+			typedef QueryParser::Query<QueryPolicy> QueryImpl;
 
-			Expression*		GetExpression() const { return fExpression; }
+private:
+							Query(Volume* volume);
+
+			status_t		_Init(const char* queryString, uint32 flags,
+								port_id port, uint32 token);
 
 private:
 			Volume*			fVolume;
-			Expression*		fExpression;
-			Equation*		fCurrent;
-			TreeIterator*	fIterator;
-			Index			fIndex;
-			Stack<Equation*> fStack;
-
-			uint32			fFlags;
-			port_id			fPort;
-			int32			fToken;
+			QueryImpl*		fImpl;
 };
+
 
 #endif	// QUERY_H

@@ -173,7 +173,7 @@ protected:
 			vint32			fDirtyCachedBlocks;
 
 			mutex			fQueryLock;
-			SinglyLinkedList<Query> fQueries;
+			DoublyLinkedList<Query> fQueries;
 
 			uint32			fFlags;
 
