@@ -3374,8 +3374,7 @@ vm_page_init(kernel_args *args)
 			args->physical_allocated_range[i].size / B_PAGE_SIZE, true);
 	}
 
-	// prevent future accesses to the kernel args ranges
-	args->num_physical_memory_ranges = 0;
+	// prevent future allocations from the kernel args ranges
 	args->num_physical_allocated_ranges = 0;
 
 	// The target of actually free pages. This must be at least the system
