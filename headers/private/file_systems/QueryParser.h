@@ -249,6 +249,8 @@ public:
 
 			status_t	ParseQuotedString(char** _start, char** _end);
 			char*		CopyString(char* start, char* end);
+	inline	bool		_IsEquationChar(char c) const;
+	inline	bool		_IsOperatorChar(char c) const;
 
 	virtual	status_t	Match(Entry* entry, Node* node,
 							const char* attribute = NULL, int32 type = 0,
@@ -278,7 +280,6 @@ private:
 			status_t	ConvertValue(type_code type);
 			bool		CompareTo(const uint8* value, size_t size);
 			uint8*		Value() const { return (uint8*)&fValue; }
-			status_t	MatchEmptyString();
 
 			char*		fAttribute;
 			char*		fString;
@@ -401,16 +402,17 @@ Equation<QueryPolicy>::Equation(char** expr)
 		// set string to a valid start of the equation symbol
 		string = end + 2;
 		skipWhitespace(&string);
-		if (*string != '=' && *string != '<' && *string != '>'
-			&& *string != '!') {
+		if (!_IsEquationChar(string[0])) {
 			*expr = string;
 			return;
 		}
 	} else {
 		// search the (in)equation for the actual equation symbol (and for other operators
 		// in case the equation is malformed)
-		while (*string && *string != '=' && *string != '<' && *string != '>'
-			&& *string != '!' && *string != '&' && *string != '|') {
+		while (string[0] != 0 && !_IsOperatorChar(string[0])
+			&& !_IsEquationChar(string[0])) {
+			if (string[0] == '\\' && string[1] != 0)
+				string++;
 			string++;
 		}
 
@@ -474,7 +476,7 @@ Equation<QueryPolicy>::Equation(char** expr)
 		string = end + 2;
 		skipWhitespace(&string);
 	} else {
-		while (*string && *string != '&' && *string != '|' && *string != ')')
+		while (string[0] && !_IsOperatorChar(string[0]) && string[0] != ')')
 			string++;
 
 		end = string - 1;
@@ -564,10 +566,35 @@ Equation<QueryPolicy>::CopyString(char* start, char* end)
 	if (copy == NULL)
 		return NULL;
 
-	memcpy(copy, start, length - 1);
+	// Filter out remaining escaping slashes
+	for (int32 i = 0; i < length; i++) {
+		char c = start++[0];
+		if (c == '\\' && i < length) {
+			length--;
+			i--;
+			continue;
+		}
+		copy[i] = c;
+	}
 	copy[length - 1] = '\0';
 
 	return copy;
+}
+
+
+template<typename QueryPolicy>
+bool
+Equation<QueryPolicy>::_IsEquationChar(char c) const
+{
+	return c == '=' || c == '<' || c == '>' || c == '!';
+}
+
+
+template<typename QueryPolicy>
+bool
+Equation<QueryPolicy>::_IsOperatorChar(char c) const
+{
+	return c == '&' || c == '|';
 }
 
 
@@ -598,6 +625,9 @@ Equation<QueryPolicy>::ConvertValue(type_code type)
 			fValue.Int32 = strtoul(string, &string, 0);
 			fSize = sizeof(uint32);
 			break;
+		case B_TIME_TYPE:
+			type = B_INT64_TYPE;
+			// supposed to fall through
 		case B_INT64_TYPE:
 			fValue.Int64 = strtoll(string, &string, 0);
 			fSize = sizeof(int64);
@@ -684,27 +714,6 @@ Equation<QueryPolicy>::Complement()
 }
 
 
-template<typename QueryPolicy>
-status_t
-Equation<QueryPolicy>::MatchEmptyString()
-{
-	// There is no matching attribute, we will just bail out if we
-	// already know that our value is not of a string type.
-	// If not, it will be converted to a string - and then be compared with "".
-	// That's why we have to call ConvertValue() here - but it will be
-	// a cheap call for the next time
-	// TODO: Should we do this only for OP_UNEQUAL?
-	if (fType != 0 && fType != B_STRING_TYPE)
-		return NO_MATCH;
-
-	status_t status = ConvertValue(B_STRING_TYPE);
-	if (status == B_OK)
-		status = CompareTo((const uint8*)"", fSize) ? MATCH_OK : NO_MATCH;
-
-	return status;
-}
-
-
 /*!	Matches the node's attribute value with the equation.
 	Returns MATCH_OK if it matches, NO_MATCH if not, < 0 if something went
 	wrong.
@@ -722,12 +731,8 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 
 	// first, check if we are matching for a live query and use that value
 	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
-		if (key == NULL) {
-			if (type == B_STRING_TYPE)
-				return MatchEmptyString();
-
+		if (key == NULL)
 			return NO_MATCH;
-		}
 		buffer = const_cast<uint8*>(key);
 	} else if (!strcmp(fAttribute, "name")) {
 		// if not, check for "fake" attributes ("name", "size", "last_modified")
@@ -750,7 +755,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 		size = bufferSize;
 		if (QueryPolicy::NodeGetAttribute(nodeHolder, node,
 				fAttribute, buffer, &size, &type) != B_OK) {
-			return MatchEmptyString();
+			return NO_MATCH;
 		}
 	}
 
@@ -973,14 +978,16 @@ Equation<QueryPolicy>::GetNextMatching(Context* context,
 			ssize_t nameLength = QueryPolicy::EntryGetName(entry,
 				dirent->d_name,
 				(const char*)dirent + bufferSize - dirent->d_name);
-			if (nameLength < 0)
-				QUERY_RETURN_ERROR(nameLength);
+			if (nameLength < 0) {
+				// Invalid or unknown name.
+				nameLength = 0;
+			}
 
 			dirent->d_dev = QueryPolicy::ContextGetVolumeID(context);
 			dirent->d_ino = QueryPolicy::EntryGetNodeID(entry);
 			dirent->d_pdev = dirent->d_dev;
 			dirent->d_pino = QueryPolicy::EntryGetParentID(entry);
-			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name) + 1;
+			dirent->d_reclen = offsetof(struct dirent, d_name) + nameLength;
 		}
 
 		if (status == MATCH_OK)
