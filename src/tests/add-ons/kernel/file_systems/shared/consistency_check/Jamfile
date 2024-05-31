@@ -1,6 +1,6 @@
-SubDir HAIKU_TOP src tests add-ons kernel file_systems consistency_check ;
+SubDir HAIKU_TOP src tests add-ons kernel file_systems shared consistency_check ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders shared libroot ;
 
 SimpleTest generate_hashs :
 	generate_hashs.cpp
