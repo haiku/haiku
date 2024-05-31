@@ -34,5 +34,3 @@ Addon <userland>reiserfs
 	  be	# for BLocker only
 	  [ TargetLibsupc++ ]
 ;
-
-HaikuSubInclude beos_interface ;

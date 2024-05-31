@@ -49,5 +49,3 @@ Addon <userland>ramfs
 	: libuserlandfs_haiku_kernel.so
 ;
 
-SubInclude HAIKU_TOP src tests add-ons kernel file_systems userlandfs ramfs
-	beos_interface ;
