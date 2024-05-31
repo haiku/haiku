@@ -7,45 +7,44 @@ local ramFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems ramfs ]
 
 DEFINES += USER=1 ;
 
+UsePrivateKernelHeaders ;
+UsePrivateHeaders file_systems storage ;
 SubDirHdrs [ FDirName $(userlandFSIncludes) shared ] ;
 
 SEARCH_SOURCE += $(ramFSTop) ;
 SEARCH_SOURCE += [ FDirName $(userlandFSTop) shared ] ;
 
 Addon <userland>ramfs
-	: Debug.cpp
-	  Locker.cpp
-	  String.cpp
+	:
+	AllocationInfo.cpp
+	Attribute.cpp
+	AttributeIndex.cpp
+	AttributeIndexImpl.cpp
+	AttributeIterator.cpp
+	DataContainer.cpp
+	Directory.cpp
+	Entry.cpp
+	EntryIterator.cpp
+	EntryListener.cpp
+	File.cpp
+	Index.cpp
+	IndexDirectory.cpp
+	kernel_interface.cpp
+	LastModifiedIndex.cpp
+	NameIndex.cpp
+	Node.cpp
+	NodeListener.cpp
+	NodeTable.cpp
+	Query.cpp
+	SizeIndex.cpp
+	SymLink.cpp
+	Volume.cpp
 
-	  AllocationInfo.cpp
-	  AreaUtils.cpp
-	  Attribute.cpp
-	  AttributeIndex.cpp
-	  AttributeIndexImpl.cpp
-	  AttributeIterator.cpp
-	  BlockAllocator.cpp
-	  BlockAllocatorArea.cpp
-	  BlockAllocatorAreaBucket.cpp
-	  BlockReferenceManager.cpp
-	  DataContainer.cpp
-	  Directory.cpp
-	  Entry.cpp
-	  EntryIterator.cpp
-	  EntryListener.cpp
-	  File.cpp
-	  Index.cpp
-	  IndexDirectory.cpp
-	  kernel_interface.cpp
-	  LastModifiedIndex.cpp
-	  NameIndex.cpp
-	  Node.cpp
-	  NodeListener.cpp
-	  NodeTable.cpp
-	  Query.cpp
-	  SizeIndex.cpp
-	  SymLink.cpp
-	  Volume.cpp
+	DebugSupport.cpp
+	QueryParserUtils.cpp
 
 	: libuserlandfs_haiku_kernel.so
 ;
 
+SEARCH on [ FGristFiles DebugSupport.cpp QueryParserUtils.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
