@@ -11,6 +11,7 @@
 
 #include <OS.h>
 #include <SupportDefs.h>
+#include <fs_query.h>
 
 #include <util/DoublyLinkedList.h>
 
@@ -24,9 +25,6 @@ namespace QueryParser {
 
 class Node;
 class Volume;
-
-
-#define B_QUERY_NON_INDEXED	0x00000002
 
 
 class Query : public DoublyLinkedListLinkImpl<Query> {

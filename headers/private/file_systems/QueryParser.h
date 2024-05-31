@@ -124,6 +124,7 @@ public:
 			typedef typename QueryPolicy::Index Index;
 			typedef typename QueryPolicy::IndexIterator IndexIterator;
 			typedef typename QueryPolicy::Node Node;
+			typedef typename QueryPolicy::NodeHolder NodeHolder;
 			typedef typename QueryPolicy::Context Context;
 
 public:
@@ -184,6 +185,7 @@ public:
 			typedef typename QueryPolicy::Index Index;
 			typedef typename QueryPolicy::IndexIterator IndexIterator;
 			typedef typename QueryPolicy::Node Node;
+			typedef typename QueryPolicy::NodeHolder NodeHolder;
 			typedef typename QueryPolicy::Context Context;
 
 public:
@@ -236,6 +238,7 @@ public:
 			typedef typename QueryPolicy::Index Index;
 			typedef typename QueryPolicy::IndexIterator IndexIterator;
 			typedef typename QueryPolicy::Node Node;
+			typedef typename QueryPolicy::NodeHolder NodeHolder;
 			typedef typename QueryPolicy::Context Context;
 
 public:
@@ -712,6 +715,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 	const char* attributeName, int32 type, const uint8* key, size_t size)
 {
 	// get a pointer to the attribute in question
+	NodeHolder nodeHolder;
 	union value<QueryPolicy> value;
 	uint8* buffer = (uint8*)&value;
 	const size_t bufferSize = sizeof(value);
@@ -729,8 +733,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 		// if not, check for "fake" attributes ("name", "size", "last_modified")
 		if (entry == NULL)
 			return B_ERROR;
-		buffer = (uint8*)QueryPolicy::EntryGetNameNoCopy(entry, buffer,
-			sizeof(value));
+		buffer = (uint8*)QueryPolicy::EntryGetNameNoCopy(nodeHolder, entry);
 		if (buffer == NULL)
 			return B_ERROR;
 
@@ -740,13 +743,13 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 		value.Int64 = QueryPolicy::NodeGetSize(node);
 		type = B_INT64_TYPE;
 	} else if (!strcmp(fAttribute, "last_modified")) {
-		value.Int32 = QueryPolicy::NodeGetLastModifiedTime(node);
-		type = B_INT32_TYPE;
+		value.Int64 = QueryPolicy::NodeGetLastModifiedTime(node);
+		type = B_INT64_TYPE;
 	} else {
 		// then for attributes
 		size = bufferSize;
-		if (QueryPolicy::NodeGetAttribute(node, fAttribute, buffer, &size,
-				&type) != B_OK) {
+		if (QueryPolicy::NodeGetAttribute(nodeHolder, node,
+				fAttribute, buffer, &size, &type) != B_OK) {
 			return MatchEmptyString();
 		}
 	}
@@ -887,18 +890,19 @@ Equation<QueryPolicy>::GetNextMatching(Context* context,
 	IndexIterator* iterator, struct dirent* dirent, size_t bufferSize)
 {
 	while (true) {
+		NodeHolder nodeHolder;
 		union value<QueryPolicy> indexValue;
 		size_t keyLength;
-		Entry* entry = NULL;
+		size_t duplicate = 0;
 
-		status_t status = QueryPolicy::IndexIteratorGetNextEntry(iterator,
-			&indexValue, &keyLength, (size_t)sizeof(indexValue), &entry);
+		status_t status = QueryPolicy::IndexIteratorFetchNextEntry(iterator,
+			&indexValue, &keyLength, (size_t)sizeof(indexValue), &duplicate);
 		if (status != B_OK)
 			return status;
 
 		// only compare against the index entry when this is the correct
 		// index for the equation
-		if (fHasIndex && !CompareTo((uint8*)&indexValue, keyLength)) {
+		if (fHasIndex && duplicate < 2 && !CompareTo((uint8*)&indexValue, keyLength)) {
 			// They aren't equal? Let the operation decide what to do. Since
 			// we always start at the beginning of the index (or the correct
 			// position), only some needs to be stopped if the entry doesn't
@@ -908,6 +912,16 @@ Equation<QueryPolicy>::GetNextMatching(Context* context,
 				|| (Term<QueryPolicy>::fOp == OP_EQUAL && !fIsPattern))
 				return B_ENTRY_NOT_FOUND;
 
+			if (duplicate > 0)
+				QueryPolicy::IndexIteratorSkipDuplicates(iterator);
+			continue;
+		}
+
+		Entry* entry = NULL;
+		status = QueryPolicy::IndexIteratorGetEntry(context, iterator,
+			nodeHolder, &entry);
+		if (status != B_OK) {
+			// try with next
 			continue;
 		}
 
@@ -1596,9 +1610,8 @@ void
 Query<QueryPolicy>::_SendEntryNotification(Entry* entry,
 	status_t (*notify)(port_id, int32, dev_t, ino_t, const char*, ino_t))
 {
-	char nameBuffer[QueryPolicy::kMaxFileNameLength];
-	const char* name = QueryPolicy::EntryGetNameNoCopy(entry, nameBuffer,
-		sizeof(nameBuffer));
+	NodeHolder nodeHolder;
+	const char* name = QueryPolicy::EntryGetNameNoCopy(nodeHolder, entry);
 	if (name != NULL) {
 		notify(fPort, fToken, QueryPolicy::ContextGetVolumeID(fContext),
 			QueryPolicy::EntryGetParentID(entry), name,

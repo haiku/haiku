@@ -104,6 +104,7 @@ struct Query::QueryPolicy {
 	typedef Query Context;
 	typedef ::Entry Entry;
 	typedef ::Node Node;
+	typedef void* NodeHolder;
 
 	struct Index {
 		Query*		query;
@@ -117,6 +118,8 @@ struct Query::QueryPolicy {
 	};
 
 	struct IndexIterator : ::IndexIterator {
+		Entry* entry;
+
 		IndexIterator(::Index* index)
 			:
 			::IndexIterator(index)
@@ -154,8 +157,7 @@ struct Query::QueryPolicy {
 		return nameLength + 1;
 	}
 
-	static const char* EntryGetNameNoCopy(Entry* entry, void* buffer,
-		size_t bufferSize)
+	static const char* EntryGetNameNoCopy(NodeHolder& holder, Entry* entry)
 	{
 		return entry->GetName();
 	}
@@ -214,10 +216,22 @@ struct Query::QueryPolicy {
 		return indexIterator->Find((const uint8*)value, size);
 	}
 
-	static status_t IndexIteratorGetNextEntry(IndexIterator* indexIterator,
-		void* value, size_t* _valueLength, size_t bufferSize, Entry** _entry)
+	static status_t IndexIteratorFetchNextEntry(IndexIterator* indexIterator,
+		void* value, size_t* _valueLength, size_t bufferSize, size_t* duplicate)
 	{
-		return indexIterator->GetNextEntry((uint8*)value, _valueLength, _entry);
+		return indexIterator->GetNextEntry((uint8*)value, _valueLength, &indexIterator->entry);
+	}
+
+	static status_t IndexIteratorGetEntry(Context* context, IndexIterator* indexIterator,
+		NodeHolder& holder, Entry** _entry)
+	{
+		*_entry = indexIterator->entry;
+		return B_OK;
+	}
+
+	static void IndexIteratorSkipDuplicates(IndexIterator* indexIterator)
+	{
+		// Nothing to do.
 	}
 
 	static void IndexIteratorSuspend(IndexIterator* indexIterator)
@@ -242,8 +256,8 @@ struct Query::QueryPolicy {
 		return node->GetMTime();
 	}
 
-	static status_t NodeGetAttribute(Node* node, const char* attribute,
-		void* buffer, size_t* _size, int32* _type)
+	static status_t NodeGetAttribute(NodeHolder& nodeHolder, Node* node,
+		const char* attribute, void* buffer, size_t* _size, int32* _type)
 	{
 		Attribute* attr = NULL;
 		status_t error = node->FindAttribute(attribute, &attr);
