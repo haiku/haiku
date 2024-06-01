@@ -10,7 +10,7 @@ Pairs did not find enough vector icons to start; it needs at least %zu, found %z
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Вы завершили игру в {0, plural, one{# клик} few{# клика} other{# кликов}}.\n
 Small	PairsWindow		Маленькая
 Size	PairsWindow		Размер
-%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tВсе права защищены (с) 2008-2010, Haiku Inc.\n\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tразработал Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n
 Quit game	PairsWindow		Выход
 Large	PairsWindow		Большая
 Beginner (4x4)	PairsWindow		Новичок (4x4)

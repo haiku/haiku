@@ -83,13 +83,13 @@ Modified	FindPanel		Змінений
 Select all	QueryContainerWindow		Вибрати все
 Generate image thumbnails	SettingsView		Генерувати мініатюри зображень
 Select…	FilePanelPriv		Вибрати…
-An item named '%filename%' already exists.	FSUtils		Елемент з назвою '%filename%' вже існує.
+An item named '%filename%' already exists.	FSUtils		Елемент з назвою «%filename%» вже існує.
 preferences	B_PREFERENCES_DIRECTORY		Налаштування
 Name	Person Query Columns		Ім'я
 Skip all	FSUtils		Пропустити все
 Corrupted opcode.	libtracker		Пошкоджений опкод.
 Atom	AttributesView		Atom
-%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/с
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed з %TotalSize, %BytesPerSecond/s
 Preparing to restore items…	StatusWindow		Підготовка до відновлення елементів…
 Mount	ContainerWindow		Підключити
 {0, plural, other{<# rectangles>}}	AttributesView		{0, plural, other{<# прямокутників>}}
@@ -110,7 +110,7 @@ Edit templates…	TemplatesMenu		Редагувати шаблони…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байти} other{# байтів}}
 8-bit integer	AttributesView		8-бітове ціле
 8-bit unsigned integer	AttributesView		8-бітове ціле беззнакове
-%s info	InfoWindow	window title	%s інфо
+%s info	InfoWindow	window title	Зведення про «%s»
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used використано -- %free вільно)
 Hide dotfiles	SettingsView		Сховати файли з крапкою
 Trash	Model		Смітник
@@ -163,7 +163,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Filesystem:	InfoWindow		Файлова система:
 Could not open \"%name\" (%error). 	FSUtils		Не вдалося відкрити \«%name\» (%error). 
 Media parameter group	AttributesView		Група параметрів медіа
-%name info	InfoWindow	InfoWindow Title	%name інфо
+%name info	InfoWindow	InfoWindow Title	Зведення про «%name»
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Якщо перемістити каталог home, %osName може працювати неналежним чином!\n\nВи дійсно бажаєте цього?\n\nДля переміщення home, затисніть кнопку Shift та натисніть \«Перемістити\».
 Property info	AttributesView		Інфо про властивості
 Sorry, you can't create links in the Trash.	PoseView		Вибачте, Ви не можете створювати посилання в смітнику.
@@ -481,7 +481,7 @@ Copy layout	ContainerWindow		Копіювати макет
 Duplicate	ContainerWindow		Дублікат
 16-bit integer	AttributesView		16-бітове ціле
 Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Примітка: файлова система призначення не чутлива до регістру.\n
-Untitled clipping	PoseView		Неназвана вирізка
+Untitled clipping	PoseView		Фрагмент без назви
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \«%name\» вже існує у цій папці. Замінити його?
 , indexed	InfoWindow		, індексовано
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам потрібно скинути об'єкт на будь-який із значків диска у вікні \«Диски\».

@@ -1,10 +1,14 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GLifeScreensaver	1505005443
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-GLifeScreensaver	3750244792
 by Aaron Hill	GLife ScreenSaver		av Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Forsinkelse for rutenettliv: ingen
 None	GLife ScreenSaver		Ingen
 Grid width: 	GLife ScreenSaver		Rutenettbredde: 
+Grid life delay: %d×	This is a factor: the × represents 'times', don't translate '%d'		Forsinkelse for rutenettliv: %d×
+Grid border: %d	GLife ScreenSaver		Omriss på rutenett: %d
+Grid width: %d	GLife ScreenSaver		Bredde: %d
 Grid border: 	GLife ScreenSaver		Rutenettkant: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Game of Life\"
 Grid height: 	GLife ScreenSaver		Rutenetthøyde: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
 Grid life delay: 	GLife ScreenSaver		Forsinkelse rutenettliv: 
+Grid height: %d	GLife ScreenSaver		Høyde: %d

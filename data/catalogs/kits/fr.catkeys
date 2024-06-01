@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libbe	2539827825
+1	french	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Tous droits réservés.
 gold master	AboutWindow		finale
 Undo	TextView		Annuler
@@ -6,6 +6,7 @@ OK	PrintJob		OK
 OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		développement
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s octet/s} other{%s octets/s}}
 Print Server is not responding.	PrintJob		Le serveur d’impression ne répond pas.
 About %app%	AboutMenuItem		À propos de %app%
 Warning	Dragger		Avertissement
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Remerciements particuliers :
 %s TiB	StringForSize	size unit	%s Tio
 Default Haiku window decorator.	Default decorator about box		Décorateur de fenêtre Haiku par défaut.
 %s GiB	StringForSize	size unit	%s Gio
+%s B	StringForSize	size unit, narrow space	%s o
 Remove replicant	Dragger		Enlever le réplicant
 Version	AboutWindow		Version
 Red:	ColorControl		Rouge :
@@ -38,6 +40,7 @@ Error	PrintJob		Erreur
 %s TiB/s	StringForRate	units per second	%s Tio/s
 About %app…	Dragger		À propos de %app…
 About %app%	AboutWindow		À propos de %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s octet} other{%s octets}}
 %s GiB/s	StringForRate	units per second	%s Gio/s
 Version history:	AboutWindow		Historique des versions :
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Impossible de localiser l’application du réplicant. Aucune signature d’application fournie.\n%error

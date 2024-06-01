@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	757591988
+1	german	x-vnd.Haiku-libtracker	1421908452
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Fehler beim Verschieben von \
 Or	FindPanel		Oder
 MIME Description	AttributesView		MIME-Beschreibung
 before	FindPanel		vor
+New folder%d	FSUtils		Neuer Ordner%d
 Volume icons	TrackerSettingsWindow		Datenträger-Icons
 Ignore case	SelectionWindow		Ignoriere Groß-/Kleinschreibung
 Current folder	ContainerWindow		Aktueller Ordner
@@ -262,6 +263,7 @@ Don't automount	AutoMounterSettings		Nicht automatisch einhängen
 Node ref	AttributesView		Node-Ref
 Could not find application \"%appname\"	OpenWithWindow		Die Anwendung \"%appname\" wurde nicht gefunden.
 Unmatched parenthesis.	libtracker		Öffnende Klammer ohne schließende Klammer.
+New folder %d	FSUtils		Neuer Ordner %d
 Extended attribute	AttributesView		Erweitertes Attribut
 Unmatched brackets.	libtracker		Öffnende Klammer ohne schließende Klammer.
 Error %error loading Add-On %name.	ContainerWindow		Fehler %error beim Laden des Add-ons %name
