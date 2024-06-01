@@ -8,19 +8,11 @@
 #define _FILE_SYSTEMS_QUERY_PARSER_H
 
 
-/*!	Query parsing and evaluation
-
-	The pattern matching is roughly based on code originally written
-	by J. Kercheval, and on code written by Kenneth Almquist, though
-	it shares no code.
-*/
+/*!	Query parsing and evaluation. */
 
 
-// The parser has a very static design, but it will do what is required.
-//
-// ParseOr(), ParseAnd(), ParseEquation() are guarantying the operator
-// precedence, that is =,!=,>,<,>=,<= .. && .. ||.
-// Apparently, the "!" (not) can only be used with brackets.
+// The operator precedence is =,!=,>,<,>=,<= .. && .. ||.
+// Apparently, the "!" (not) can only be used with parentheses.
 //
 // If you think that there are too few NULL pointer checks in some places
 // of the code, just read the beginning of the query constructor.
@@ -48,8 +40,6 @@
 #	include <util/Stack.h>
 
 #	include <query_private.h>
-
-#	include <lock.h>
 #endif	// !FS_SHELL
 
 #include <file_systems/QueryParserUtils.h>
@@ -242,13 +232,13 @@ public:
 			typedef typename QueryPolicy::Context Context;
 
 public:
-						Equation(char** expression);
+						Equation(const char** expression);
 	virtual				~Equation();
 
 	virtual	status_t	InitCheck();
 
-			status_t	ParseQuotedString(char** _start, char** _end);
-			char*		CopyString(char* start, char* end);
+			status_t	ParseQuotedString(const char** _start, const char** _end);
+			char*		CopyString(const char* start, const char* end);
 	inline	bool		_IsEquationChar(char c) const;
 	inline	bool		_IsOperatorChar(char c) const;
 
@@ -349,26 +339,21 @@ public:
 			typedef typename QueryPolicy::Context Context;
 
 public:
-							Expression(char* expr);
+							Expression();
 							~Expression();
 
-			status_t		InitCheck();
-			const char*		Position() const { return fPosition; }
+			status_t		Init(const char* expr, const char** position);
+
 			Term<QueryPolicy>* Root() const { return fTerm; }
 
 protected:
-			Term<QueryPolicy>* ParseOr(char** expr);
-			Term<QueryPolicy>* ParseAnd(char** expr);
-			Term<QueryPolicy>* ParseEquation(char** expr);
-
-			bool			IsOperator(char** expr, char op);
+			bool			IsOperator(const char** expr, char op);
 
 private:
 							Expression(const Expression& other);
 							Expression& operator=(const Expression& other);
 								// no implementation
 
-			char*			fPosition;
 			Term<QueryPolicy>* fTerm;
 };
 
@@ -377,7 +362,7 @@ private:
 
 
 template<typename QueryPolicy>
-Equation<QueryPolicy>::Equation(char** expr)
+Equation<QueryPolicy>::Equation(const char** expr)
 	:
 	Term<QueryPolicy>(OP_EQUATION),
 	fAttribute(NULL),
@@ -385,9 +370,9 @@ Equation<QueryPolicy>::Equation(char** expr)
 	fType(0),
 	fIsPattern(false)
 {
-	char* string = *expr;
-	char* start = string;
-	char* end = NULL;
+	const char* string = *expr;
+	const char* start = string;
+	const char* end = NULL;
 
 	// Since the equation is the integral part of any query, we're just parsing
 	// the whole thing here.
@@ -530,11 +515,11 @@ Equation<QueryPolicy>::InitCheck()
 
 template<typename QueryPolicy>
 status_t
-Equation<QueryPolicy>::ParseQuotedString(char** _start, char** _end)
+Equation<QueryPolicy>::ParseQuotedString(const char** _start, const char** _end)
 {
-	char* start = *_start;
-	char quote = *start++;
-	char* end = start;
+	const char* start = *_start;
+	const char quote = *start++;
+	const char* end = start;
 
 	for (; *end && *end != quote; end++) {
 		if (*end == '\\')
@@ -552,7 +537,7 @@ Equation<QueryPolicy>::ParseQuotedString(char** _start, char** _end)
 
 template<typename QueryPolicy>
 char*
-Equation<QueryPolicy>::CopyString(char* start, char* end)
+Equation<QueryPolicy>::CopyString(const char* start, const char* end)
 {
 	// end points to the last character of the string - and the length
 	// also has to include the null-termination
@@ -676,7 +661,7 @@ Equation<QueryPolicy>::CompareTo(const uint8* value, size_t size)
 		// we have already validated the pattern, so we don't check for failing
 		// here - if something is broken, and matchString() returns an error,
 		// we just don't match
-		compare = matchString(fValue.String, (char*)value) == MATCH_OK ? 0 : 1;
+		compare = matchString(fValue.String, (const char*)value) == MATCH_OK ? 0 : 1;
 	} else
 		compare = compareKeys(fType, value, size, Value(), fSize);
 
@@ -703,7 +688,7 @@ template<typename QueryPolicy>
 void
 Equation<QueryPolicy>::Complement()
 {
-	QUERY_D(if (fOp <= OP_EQUATION || fOp > OP_LESS_THAN_OR_EQUAL) {
+	QUERY_D(if (Term<QueryPolicy>::fOp <= OP_EQUATION || Term<QueryPolicy>::fOp > OP_LESS_THAN_OR_EQUAL) {
 		QUERY_FATAL("op out of range!\n");
 		return;
 	});
@@ -1178,27 +1163,202 @@ Equation<QueryPolicy>::PrintToStream()
 
 
 template<typename QueryPolicy>
-Expression<QueryPolicy>::Expression(char* expr)
+Expression<QueryPolicy>::Expression()
 	:
-	fPosition(NULL),
 	fTerm(NULL)
 {
-	if (expr == NULL)
-		return;
+}
 
-	fTerm = ParseOr(&expr);
-	if (fTerm != NULL && fTerm->InitCheck() < B_OK) {
-		QUERY_FATAL("Corrupt tree in expression!\n");
-		delete fTerm;
-		fTerm = NULL;
+
+template<typename QueryPolicy>
+status_t
+Expression<QueryPolicy>::Init(const char* expr, const char** position)
+{
+	if (expr == NULL)
+		return B_BAD_VALUE;
+	if (fTerm != NULL)
+		return EALREADY;
+
+	struct ExpressionNode {
+		Term<QueryPolicy>* term = NULL;
+		bool negated = false;
+		ops op = OP_NONE;
+	};
+	status_t status = B_OK;
+	Stack<Stack<ExpressionNode>*> exprsTree;
+	Stack<ExpressionNode>* currentExpr = NULL;
+	ExpressionNode* current = NULL;
+	while (expr != NULL) {
+		skipWhitespace(&expr);
+
+		if (currentExpr == NULL) {
+			 currentExpr = new(std::nothrow) Stack<ExpressionNode>;
+			 if (currentExpr == NULL) {
+				 status = B_NO_MEMORY;
+				 break;
+			 }
+		}
+
+		const char c = *expr;
+		bool complete = false;
+
+		if (c == ')' || c == '\0') {
+			if (currentExpr->IsEmpty())
+				break; // Illegal empty expression.
+
+			complete = true;
+		}
+
+		if (current == NULL && !complete) {
+			currentExpr->Push(ExpressionNode());
+			current = currentExpr->Array() + (currentExpr->CountItems() - 1);
+		}
+
+		if (c == '(') {
+			exprsTree.Push(currentExpr);
+			currentExpr = NULL;
+			current = NULL;
+			expr++;
+		} else if (c == '!') {
+			skipWhitespace(&expr, 1);
+			if (*expr != '(')
+				break; // Not allowed.
+			current->negated = true;
+		} else if (c == '|' || c == '&') {
+			if (current->term == NULL)
+				break; // Nothing to operate on.
+
+			ops op = OP_NONE;
+			if (IsOperator(&expr, '|'))
+				op = OP_OR;
+			else if (IsOperator(&expr, '&'))
+				op = OP_AND;
+			else
+				break; // Illegal operator.
+
+			current->op = op;
+			current = NULL;
+		} else if (!complete) {
+			if (current->term != NULL)
+				break; // There already is a term.
+
+			Equation<QueryPolicy>* equation
+				= new(std::nothrow) Equation<QueryPolicy>(&expr);
+			if (equation == NULL) {
+				status = B_NO_MEMORY;
+				break;
+			}
+			if (equation == NULL || equation->InitCheck() != B_OK) {
+				status = equation->InitCheck();
+				delete equation;
+				break;
+			}
+
+			current->term = equation;
+		}
+		if (!complete)
+			continue;
+
+		if (currentExpr->CountItems() == 1) {
+			if (current == NULL)
+				break; // Probably an anomalous operator.
+		}
+
+		// First pass: negation.
+		for (int32 i = 0; i < currentExpr->CountItems(); i++) {
+			current = currentExpr->Array() + i;
+			// If the term is negated, we just complement the tree, to get
+			// rid of the not, a.k.a. DeMorgan's Law.
+			if (current->negated) {
+				current->term->Complement();
+				current->negated = false;
+			}
+		}
+		// Second & third passes: && and ||.
+		int32 nodes = currentExpr->CountItems();
+		for (ops op = OP_AND; op <= OP_OR; op = (ops)(op + 1)) {
+			for (int32 i = 0; i < (currentExpr->CountItems() - 1); i++) {
+				ExpressionNode* left = currentExpr->Array() + i;
+				if (left->op != op)
+					continue;
+
+				// Find the right-hand expression (may have to jump over now-unused nodes.)
+				ExpressionNode* right = NULL;
+				for (int32 j = i + 1; j < currentExpr->CountItems(); j++) {
+					current = currentExpr->Array() + j;
+					if (current->term == NULL)
+						continue;
+
+					right = current;
+					break;
+				}
+				if (right == NULL)
+					break; // Invalid expression, somehow.
+
+				Term<QueryPolicy>* newTerm = new(std::nothrow) Operator<QueryPolicy>(
+					left->term, left->op, right->term);
+				if (newTerm == NULL) {
+					status = B_NO_MEMORY;
+					break;
+				}
+
+				left->term = newTerm;
+				left->op = right->op;
+				right->op = OP_NONE;
+				right->term = NULL;
+				nodes--;
+			}
+		}
+
+		// At this point we should have only one node left.
+		if (nodes != 1)
+			break;
+
+		current = currentExpr->Array();
+		Term<QueryPolicy>* term = current->term;
+
+		delete currentExpr;
+		currentExpr = NULL;
+		if (exprsTree.Pop(&currentExpr)) {
+			current = currentExpr->Array() + (currentExpr->CountItems() - 1);
+			if (current->term != NULL)
+				break; // There already is a term.
+			current->term = term;
+		} else {
+			if (c != '\0')
+				break; // Unexpected end of expression.
+
+			fTerm = term;
+			break;
+		}
+
+		expr++;
 	}
+
+	if (position != NULL)
+		*position = expr;
+
+	do {
+		if (currentExpr == NULL)
+			continue;
+
+		ExpressionNode item;
+		while (currentExpr->Pop(&item))
+			delete item.term;
+		delete currentExpr;
+	} while (exprsTree.Pop(&currentExpr));
+
+	if (fTerm == NULL && status == B_OK)
+		return B_BAD_VALUE;
+
 	QUERY_D(if (fTerm != NULL) {
 		fTerm->PrintToStream();
 		QUERY_D(__out("\n"));
 		if (*expr != '\0')
 			PRINT(("Unexpected end of string: \"%s\"!\n", expr));
 	});
-	fPosition = expr;
+
+	return status;
 }
 
 
@@ -1210,131 +1370,16 @@ Expression<QueryPolicy>::~Expression()
 
 
 template<typename QueryPolicy>
-Term<QueryPolicy>*
-Expression<QueryPolicy>::ParseEquation(char** expr)
-{
-	skipWhitespace(expr);
-
-	bool _not = false;
-	if (**expr == '!') {
-		skipWhitespace(expr, 1);
-		if (**expr != '(')
-			return NULL;
-
-		_not = true;
-	}
-
-	if (**expr == ')') {
-		// shouldn't be handled here
-		return NULL;
-	} else if (**expr == '(') {
-		skipWhitespace(expr, 1);
-
-		Term<QueryPolicy>* term = ParseOr(expr);
-
-		skipWhitespace(expr);
-
-		if (**expr != ')') {
-			delete term;
-			return NULL;
-		}
-
-		// If the term is negated, we just complement the tree, to get
-		// rid of the not, a.k.a. DeMorgan's Law.
-		if (_not)
-			term->Complement();
-
-		skipWhitespace(expr, 1);
-
-		return term;
-	}
-
-	Equation<QueryPolicy>* equation
-		= new(std::nothrow) Equation<QueryPolicy>(expr);
-	if (equation == NULL || equation->InitCheck() < B_OK) {
-		delete equation;
-		return NULL;
-	}
-	return equation;
-}
-
-
-template<typename QueryPolicy>
-Term<QueryPolicy>*
-Expression<QueryPolicy>::ParseAnd(char** expr)
-{
-	Term<QueryPolicy>* left = ParseEquation(expr);
-	if (left == NULL)
-		return NULL;
-
-	while (IsOperator(expr, '&')) {
-		Term<QueryPolicy>* right = ParseAnd(expr);
-		Term<QueryPolicy>* newParent = NULL;
-
-		if (right == NULL
-			|| (newParent = new(std::nothrow) Operator<QueryPolicy>(left,
-				OP_AND, right)) == NULL) {
-			delete left;
-			delete right;
-
-			return NULL;
-		}
-		left = newParent;
-	}
-
-	return left;
-}
-
-
-template<typename QueryPolicy>
-Term<QueryPolicy>*
-Expression<QueryPolicy>::ParseOr(char** expr)
-{
-	Term<QueryPolicy>* left = ParseAnd(expr);
-	if (left == NULL)
-		return NULL;
-
-	while (IsOperator(expr, '|')) {
-		Term<QueryPolicy>* right = ParseAnd(expr);
-		Term<QueryPolicy>* newParent = NULL;
-
-		if (right == NULL
-			|| (newParent = new(std::nothrow) Operator<QueryPolicy>(left, OP_OR,
-				right)) == NULL) {
-			delete left;
-			delete right;
-
-			return NULL;
-		}
-		left = newParent;
-	}
-
-	return left;
-}
-
-
-template<typename QueryPolicy>
 bool
-Expression<QueryPolicy>::IsOperator(char** expr, char op)
+Expression<QueryPolicy>::IsOperator(const char** expr, char op)
 {
-	char* string = *expr;
+	const char* string = *expr;
 
 	if (*string == op && *(string + 1) == op) {
 		*expr += 2;
 		return true;
 	}
 	return false;
-}
-
-
-template<typename QueryPolicy>
-status_t
-Expression<QueryPolicy>::InitCheck()
-{
-	if (fTerm == NULL)
-		return B_BAD_VALUE;
-
-	return B_OK;
 }
 
 
@@ -1384,16 +1429,18 @@ Query<QueryPolicy>::Create(Context* context, const char* queryString,
 	uint32 flags, port_id port, uint32 token, Query<QueryPolicy>*& _query)
 {
 	Expression<QueryPolicy>* expression
-		= new(std::nothrow) Expression<QueryPolicy>((char*)queryString);
+		= new(std::nothrow) Expression<QueryPolicy>;
 	if (expression == NULL)
 		QUERY_RETURN_ERROR(B_NO_MEMORY);
 
-	if (expression->InitCheck() != B_OK) {
+	const char* position = NULL;
+	status_t status = expression->Init(queryString, &position);
+	if (status != B_OK) {
 		QUERY_INFORM("Could not parse query \"%s\", stopped at: \"%s\"\n",
-			queryString, expression->Position());
+			queryString, position);
 
 		delete expression;
-		QUERY_RETURN_ERROR(B_BAD_VALUE);
+		QUERY_RETURN_ERROR(status);
 	}
 
 	Query<QueryPolicy>* query = new(std::nothrow) Query<QueryPolicy>(context,

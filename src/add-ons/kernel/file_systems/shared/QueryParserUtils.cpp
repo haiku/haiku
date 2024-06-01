@@ -37,18 +37,18 @@ compare_integral(const Key& a, const Key& b)
 
 
 void
-skipWhitespace(char** expr, int32 skip)
+skipWhitespace(const char** expr, int32 skip)
 {
-	char* string = (*expr) + skip;
+	const char* string = (*expr) + skip;
 	while (*string == ' ' || *string == '\t') string++;
 	*expr = string;
 }
 
 
 void
-skipWhitespaceReverse(char** expr, char* stop)
+skipWhitespaceReverse(const char** expr, const char* stop)
 {
-	char* string = *expr;
+	const char* string = *expr;
 	while (string > stop && (*string == ' ' || *string == '\t'))
 		string--;
 	*expr = string;
@@ -92,7 +92,7 @@ compareKeys(uint32 type, const void* key1, size_t length1, const void* key2,
 
 
 uint32
-utf8ToUnicode(char** string)
+utf8ToUnicode(const char** string)
 {
 	uint8* bytes = (uint8*)*string;
 	int32 length;
@@ -132,7 +132,7 @@ utf8ToUnicode(char** string)
 
 
 int32
-getFirstPatternSymbol(char* string)
+getFirstPatternSymbol(const char* string)
 {
 	char c;
 
@@ -145,7 +145,7 @@ getFirstPatternSymbol(char* string)
 
 
 status_t
-isValidPattern(char* pattern)
+isValidPattern(const char* pattern)
 {
 	while (*pattern) {
 		switch (*pattern++) {
@@ -181,9 +181,13 @@ isValidPattern(char* pattern)
 /*!	Matches the string against the given wildcard pattern.
 	Returns either MATCH_OK, or NO_MATCH when everything went fine, or
 	values < 0 (see enum at the top of Query.cpp) if an error occurs.
+
+	The pattern matching is roughly based on code originally written
+	by J. Kercheval, and on code written by Kenneth Almquist, though
+	it shares no code.
 */
 status_t
-matchString(char* pattern, char* string)
+matchString(const char* pattern, const char* string)
 {
 	while (*pattern) {
 		// end of string == valid end of pattern?

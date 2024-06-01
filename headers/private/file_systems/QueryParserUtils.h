@@ -42,14 +42,14 @@ enum {
 __BEGIN_DECLS
 
 
-void		skipWhitespace(char** expr, int32 skip = 0);
-void		skipWhitespaceReverse(char** expr, char* stop);
+void		skipWhitespace(const char** expr, int32 skip = 0);
+void		skipWhitespaceReverse(const char** expr, const char* stop);
 int			compareKeys(uint32 type, const void* key1, size_t length1,
 				const void* key2, size_t length2);
-uint32		utf8ToUnicode(char** string);
-int32		getFirstPatternSymbol(char* string);
-status_t	isValidPattern(char* pattern);
-status_t	matchString(char* pattern, char* string);
+uint32		utf8ToUnicode(const char** string);
+int32		getFirstPatternSymbol(const char* string);
+status_t	isValidPattern(const char* pattern);
+status_t	matchString(const char* pattern, const char* string);
 
 
 __END_DECLS
