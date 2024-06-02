@@ -76,7 +76,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages openssl_devel
+			AddHaikuImageDisabledPackages openssl3_devel
 				libjpeg_turbo_devel libpng16_devel zlib_devel zstd_devel ;
 		}
 	}

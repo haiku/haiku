@@ -82,7 +82,7 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 
 # If enabled, make sure that OpenSSL is added to the image.
 if [ FIsBuildFeatureEnabled openssl ] {
-	AddHaikuImageSystemPackages openssl ;
+	AddHaikuImageSystemPackages openssl3 ;
 }
 
 # add additionally requested packages
