@@ -295,9 +295,6 @@ static void apps_ssl_info_callback(const SSL *s, int where, int ret)
 /* static */ void
 BSecureSocket::Private::_CreateContext()
 {
-	// We want SSL to report errors in human readable format.
-	SSL_load_error_strings();
-
 	// "SSLv23" means "any SSL or TLS version". We disable SSL v2 and v3 below
 	// to keep only TLS 1.0 and above.
 	sContext = SSL_CTX_new(SSLv23_method());

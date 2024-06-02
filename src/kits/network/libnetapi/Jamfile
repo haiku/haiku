@@ -12,15 +12,13 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
-		local sslSources ;
 
 		UsePrivateSystemHeaders ;
 
 		if [ FIsBuildFeatureEnabled openssl ] {
 			SubDirC++Flags -DOPENSSL_ENABLED -DOPENSSL_API_COMPAT=10101 -DOPENSSL_NO_DEPRECATED=1 ;
 			UseBuildFeatureHeaders openssl ;
-			sslSources = SSL.cpp ;
-			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
+			Includes [ FGristFiles SecureSocket.cpp
 					HttpAuthentication.cpp Certificate.cpp ]
 				: [ BuildFeatureAttribute openssl : headers ] ;
 				# Dependency needed to trigger downloading/unzipping the package
@@ -37,7 +35,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetBuffer.cpp
 			NetDebug.cpp
 
-			$(sslSources)
 			Certificate.cpp
 
 			NetworkAddress.cpp

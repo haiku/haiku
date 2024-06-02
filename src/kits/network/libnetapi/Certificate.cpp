@@ -80,14 +80,14 @@ BCertificate::Version() const
 time_t
 BCertificate::StartDate() const
 {
-	return parse_ASN1(X509_get_notBefore(fPrivate->fX509));
+	return parse_ASN1(X509_getm_notBefore(fPrivate->fX509));
 }
 
 
 time_t
 BCertificate::ExpirationDate() const
 {
-	return parse_ASN1(X509_get_notAfter(fPrivate->fX509));
+	return parse_ASN1(X509_getm_notAfter(fPrivate->fX509));
 }
 
 

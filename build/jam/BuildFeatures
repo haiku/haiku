@@ -15,16 +15,16 @@ local unavailableBuildFeatures ;
 # SSL
 
 # Automatically enable the SSL feature, when the OpenSSL package is enabled.
-if [ IsHaikuImagePackageAdded openssl ] {
+if [ IsHaikuImagePackageAdded openssl3 ] {
 	HAIKU_BUILD_FEATURE_SSL = 1 ;
 }
 
 if $(HAIKU_BUILD_FEATURE_SSL) {
-	if [ IsPackageAvailable openssl_devel ] {
+	if [ IsPackageAvailable openssl3_devel ] {
 		ExtractBuildFeatureArchives openssl :
-			file: base openssl
+			file: base openssl3
 				runtime: lib
-			file: devel openssl_devel
+			file: devel openssl3_devel
 				depends: base
 				libraries:
 					$(developLibDir)/libcrypto.so
