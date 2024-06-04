@@ -1000,7 +1000,8 @@ user_debug_team_created(team_id teamID)
 
 
 void
-user_debug_team_deleted(team_id teamID, port_id debuggerPort)
+user_debug_team_deleted(team_id teamID, port_id debuggerPort, status_t status,
+	team_usage_info* usageInfo)
 {
 	if (debuggerPort >= 0) {
 		TRACE(("user_debug_team_deleted(team: %" B_PRId32 ", debugger port: "
@@ -1010,6 +1011,8 @@ user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 		message.origin.thread = -1;
 		message.origin.team = teamID;
 		message.origin.nub_port = -1;
+		message.status = status;
+		message.usage = *usageInfo;
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
 			sizeof(message), B_RELATIVE_TIMEOUT, 0);
 	}
@@ -1075,7 +1078,7 @@ user_debug_thread_created(thread_id threadID)
 
 
 void
-user_debug_thread_deleted(team_id teamID, thread_id threadID)
+user_debug_thread_deleted(team_id teamID, thread_id threadID, status_t status)
 {
 	// Things are a bit complicated here, since this thread no longer belongs to
 	// the debugged team (but to the kernel). So we can't use debugger_write().
@@ -1121,6 +1124,7 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 		message.origin.thread = threadID;
 		message.origin.team = teamID;
 		message.origin.nub_port = -1;
+		message.status = status;
 
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
 			&message, sizeof(message), B_KILL_CAN_INTERRUPT, 0);

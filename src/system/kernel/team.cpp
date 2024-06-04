@@ -3341,9 +3341,21 @@ team_delete_team(Team* team, port_id debuggerPort)
 		}
 	}
 
+	// get team exit information
+	status_t exitStatus = team->exit.status;
+
 	teamLocker.Unlock();
 
 	sNotificationService.Notify(TEAM_REMOVED, team);
+
+	// get team usage information
+	InterruptsSpinLocker timeLocker(team->time_lock);
+
+	team_usage_info usageInfo;
+	usageInfo.kernel_time = team->dead_threads_kernel_time;
+	usageInfo.user_time = team->dead_threads_user_time;
+
+	timeLocker.Unlock();
 
 	// free team resources
 
@@ -3356,7 +3368,7 @@ team_delete_team(Team* team, port_id debuggerPort)
 	team->ReleaseReference();
 
 	// notify the debugger, that the team is gone
-	user_debug_team_deleted(teamID, debuggerPort);
+	user_debug_team_deleted(teamID, debuggerPort, exitStatus, &usageInfo);
 }
 
 

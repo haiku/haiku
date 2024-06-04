@@ -560,6 +560,8 @@ typedef struct {
 typedef struct {
 	debug_origin	origin;			// thread is < 0, team is the deleted team
 									// (asynchronous message)
+	status_t		status;			// the exit code of the team
+	team_usage_info	usage;			// the usage info of the team
 } debug_team_deleted;
 
 // B_DEBUGGER_MESSAGE_TEAM_EXEC
@@ -580,6 +582,7 @@ typedef struct {
 
 typedef struct {
 	debug_origin	origin;			// the deleted thread (asynchronous message)
+	status_t		status;			// the exit code of the thread
 } debug_thread_deleted;
 
 // B_DEBUGGER_MESSAGE_IMAGE_CREATED

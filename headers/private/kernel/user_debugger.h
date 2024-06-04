@@ -258,11 +258,12 @@ bool user_debug_handle_signal(int signal, struct sigaction *handler,
 		siginfo_t *info, bool deadly);
 void user_debug_stop_thread();
 void user_debug_team_created(team_id teamID);
-void user_debug_team_deleted(team_id teamID, port_id debuggerPort);
+void user_debug_team_deleted(team_id teamID, port_id debuggerPort, status_t status,
+		team_usage_info* usageInfo);
 void user_debug_team_exec();
 void user_debug_update_new_thread_flags(Thread* thread);
 void user_debug_thread_created(thread_id threadID);
-void user_debug_thread_deleted(team_id teamID, thread_id threadID);
+void user_debug_thread_deleted(team_id teamID, thread_id threadID, status_t status);
 void user_debug_thread_exiting(Thread* thread);
 void user_debug_image_created(const image_info *imageInfo);
 void user_debug_image_deleted(const image_info *imageInfo);

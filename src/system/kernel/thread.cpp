@@ -2306,7 +2306,7 @@ thread_exit(void)
 
 	// notify the debugger
 	if (teamID != kernelTeam->id)
-		user_debug_thread_deleted(teamID, thread->id);
+		user_debug_thread_deleted(teamID, thread->id, thread->exit.status);
 
 	// enqueue in the undertaker list and reschedule for the last time
 	UndertakerEntry undertakerEntry(thread, teamID);
