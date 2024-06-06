@@ -1704,6 +1704,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					case PCI_audio:
 					case PCI_hd_audio:
 						_AddPath(*stack, "drivers", "audio");
+						_AddPath(*stack, "busses", "virtio");
 						break;
 					case PCI_video:
 						_AddPath(*stack, "drivers", "video");

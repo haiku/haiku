@@ -3,7 +3,6 @@
  *  Distributed under the terms of the MIT License.
  */
 
-#include <fs/devfs.h>
 #include <virtio.h>
 
 #include <stdio.h>
@@ -11,8 +10,8 @@
 #include <string.h>
 
 
-#define VIRTIO_SOUND_DRIVER_MODULE_NAME 	"drivers/audio/virtio/driver_v1"
-#define VIRTIO_SOUND_DEVICE_MODULE_NAME 	"drivers/audio/virtio/device_v1"
+#define VIRTIO_SOUND_DRIVER_MODULE_NAME 	"drivers/audio/hmulti/virtio_sound/driver_v1"
+#define VIRTIO_SOUND_DEVICE_MODULE_NAME 	"drivers/audio/hmulti/virtio_sound/device_v1"
 #define VIRTIO_SOUND_DEVICE_ID_GEN 			"virtio_sound/device_id"
 
 
@@ -61,6 +60,19 @@ SupportsDevice(device_node* parent)
 
 
 static status_t
+RegisterDevice(device_node* node)
+{
+	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Virtio Sound"} },
+		{ NULL }
+	};
+
+	return sDeviceManager->register_node(node, VIRTIO_SOUND_DRIVER_MODULE_NAME,
+		attrs, NULL, NULL);
+}
+
+
+static status_t
 InitDriver(device_node* node, void** cookie)
 {
 	VirtIOSoundDriverInfo* info = (VirtIOSoundDriverInfo*)malloc(sizeof(VirtIOSoundDriverInfo));
@@ -90,6 +102,7 @@ struct driver_module_info sVirtioSoundDriver = {
 	},
 
 	.supports_device = SupportsDevice,
+	.register_device = RegisterDevice,
 
 	.init_driver = InitDriver,
 	.uninit_driver = UninitDriver,
