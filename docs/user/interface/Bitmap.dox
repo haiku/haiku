@@ -80,7 +80,8 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\param bytesPerRow The number of bytes per row the bitmap should use.
 		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
 		   value.
-	\param screenID ???
+	\param screenID Currently unused. May be used for multi-monitor support in
+		   the future.
 
 	\since Haiku R1
 */
@@ -135,6 +136,32 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\brief Creates a BBitmap object as a clone of another bitmap.
 
 	\param source The source bitmap.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBitmap::BBitmap(area_id area, ptrdiff_t areaOffset,
+		BRect bounds, uint32 flags, color_space colorSpace,
+		int32 bytesPerRow, screen_id screenID)
+	\brief Creates a BBitmap object inside of an existing memory area.
+
+	This method is useful if you want to create a BBitmap on top of existing
+	memory or want to share a BBitmap between two or more applications.
+
+	This BBitmap should be deleted before the area is deleted.
+
+	\param area The memory area to use
+	\param areaOffset Offset within the memory area to place bitmap.
+	\param bounds The bitmap dimensions.
+	\param flags Creation flags.
+	\param colorSpace The bitmap's color space.
+	\param bytesPerRow The number of bytes per row the bitmap should use.
+		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
+		   value.
+	\param screenID Currently unused. May be used for multi-monitor support in
+		   the future.
 
 	\since Haiku R1
 */
