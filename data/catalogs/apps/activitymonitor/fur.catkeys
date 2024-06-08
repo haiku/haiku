@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	1319108693
+1	friulian	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Teams
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Mem. di scambi
 P-faults	DataSource		Erôrs-pagjine
 Sems	DataSource		Sems
 Network receive	DataSource		Rêt (ricezion)
+%s faults/s	DataSource		%s erôrs/s

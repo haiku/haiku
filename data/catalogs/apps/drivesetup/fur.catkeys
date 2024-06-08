@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	2943652182
+1	friulian	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formate
 Could not unmount partition	MainWindow		Impussibil dismontâ la partizion
 Create	CreateParametersPanel		Cree
 File system	PartitionList		File system
+Unknown (%s)	PartitionList		No cognossût (%s)
 The selected partition does not contain a partitioning system.	MainWindow		La partizion selezionade no conten un sisteme di partizionament.
 End: %s	Support		Fin: %s
 Partition type	PartitionList		Gjenar di partizion

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Appearance	663472720
+1	friulian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Ôrs dal control
 Control mark	Colors tab		Marcadôr dal control
 Off	AntialiasingSettingsView		Disativât
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Test dal element selezionât tal menù
 Size:	Font Selection view		Dimension:
 Panel background	Colors tab		Fonts dal panel
 Plain font:	Font view		Caratar sempliç:
+Automatically pick secondary colors	Colors tab		Sielç in automatic i colôrs secondaris
 Window tab text	Colors tab		Test de lenghete dal barcon
 Navigation pulse	Colors tab		Impuls di navigazion
 LCD subpixel	AntialiasingSettingsView		Sub-pixel LCD
