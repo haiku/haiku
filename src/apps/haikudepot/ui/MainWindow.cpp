@@ -262,6 +262,10 @@ MainWindow::MainWindow(const BMessage& settings)
 }
 
 
+/*!	This constructor is used when the application is loaded for the purpose of
+	viewing an HPKG file.
+*/
+
 MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	:
 	BWindow(BRect(50, 50, 650, 350), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
@@ -282,6 +286,11 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	fSinglePackageMode(true),
 	fIncrementViewCounterDelayedRunner(NULL)
 {
+	BString title = B_TRANSLATE("HaikuDepot - %PackageName% %PackageVersion%");
+	title.ReplaceAll("%PackageName%", package->Name());
+	title.ReplaceAll("%PackageVersion%", package->Version().ToString());
+	SetTitle(title);
+
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
 
