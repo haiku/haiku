@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -89,7 +89,7 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	if (!publisherName.IsEmpty())
 		publisherName.Prepend("© ");
 
-	fPublisher = PublisherInfo(publisherName, "", publisherURL);
+	fPublisher = PublisherInfo(publisherName, publisherURL);
 }
 
 

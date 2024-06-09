@@ -632,7 +632,6 @@ private:
 
 
 enum {
-	MSG_EMAIL_PUBLISHER				= 'emlp',
 	MSG_VISIT_PUBLISHER_WEBSITE		= 'vpws',
 };
 
@@ -642,7 +641,6 @@ public:
 	AboutView()
 		:
 		BView("about view", 0),
-		fEmailIcon("text/x-email"),
 		fWebsiteIcon("text/html")
 	{
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
@@ -672,11 +670,6 @@ public:
 		fScreenshotView->SetExplicitAlignment(
 			BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
 
-		fEmailIconView = new BitmapView("email icon view");
-		fEmailLinkView = new LinkView("email link view", "",
-			new BMessage(MSG_EMAIL_PUBLISHER));
-		fEmailLinkView->SetFont(&smallFont);
-
 		fWebsiteIconView = new BitmapView("website icon view");
 		fWebsiteLinkView = new LinkView("website link view", "",
 			new BMessage(MSG_VISIT_PUBLISHER_WEBSITE));
@@ -686,7 +679,6 @@ public:
 			B_USE_DEFAULT_SPACING);
 
 		fScreenshotView->SetViewUIColor(ViewUIColor(), kContentTint);
-		fEmailLinkView->SetViewUIColor(ViewUIColor(), kContentTint);
 		fWebsiteLinkView->SetViewUIColor(ViewUIColor(), kContentTint);
 
 		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
@@ -694,8 +686,6 @@ public:
 				.Add(fScreenshotView)
 				.AddGroup(B_HORIZONTAL)
 					.AddGrid(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
-						.Add(fEmailIconView, 0, 0)
-						.Add(fEmailLinkView, 1, 0)
 						.Add(fWebsiteIconView, 0, 1)
 						.Add(fWebsiteLinkView, 1, 1)
 					.End()
@@ -718,7 +708,6 @@ public:
 	virtual void AttachedToWindow()
 	{
 		fScreenshotView->SetTarget(this);
-		fEmailLinkView->SetTarget(this);
 		fWebsiteLinkView->SetTarget(this);
 	}
 
@@ -737,15 +726,6 @@ public:
 			{
 				// Forward to window for now
 				Window()->PostMessage(message, Window());
-				break;
-			}
-
-			case MSG_EMAIL_PUBLISHER:
-			{
-				// TODO: Implement. If memory serves, there is a
-				// standard command line interface which mail apps should
-				// support, i.e. to open a compose window with the TO: field
-				// already set.
 				break;
 			}
 
@@ -776,8 +756,6 @@ public:
 	void SetPackage(const PackageInfoRef package)
 	{
 		fDescriptionView->SetText(package->ShortDescription(), package->FullDescription());
-		fEmailIconView->SetBitmap(&fEmailIcon, BITMAP_SIZE_16);
-		_SetContactInfo(fEmailLinkView, package->Publisher().Email());
 		fWebsiteIconView->SetBitmap(&fWebsiteIcon, BITMAP_SIZE_16);
 		_SetContactInfo(fWebsiteLinkView, package->Publisher().Website());
 	}
@@ -785,8 +763,6 @@ public:
 	void Clear()
 	{
 		fDescriptionView->SetText("");
-		fEmailIconView->UnsetBitmap();
-		fEmailLinkView->SetText("");
 		fWebsiteIconView->UnsetBitmap();
 		fWebsiteLinkView->SetText("");
 		fScreenshotView->UnsetBitmap();
@@ -809,10 +785,6 @@ private:
 	MarkupTextView*		fDescriptionView;
 
 	LinkedBitmapView*	fScreenshotView;
-
-	SharedBitmap		fEmailIcon;
-	BitmapView*			fEmailIconView;
-	LinkView*			fEmailLinkView;
 
 	SharedBitmap		fWebsiteIcon;
 	BitmapView*			fWebsiteIconView;
