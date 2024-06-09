@@ -30,8 +30,6 @@ public:
 									Model& model);
 	virtual						~RatePackageWindow();
 
-	virtual	void				DispatchMessage(BMessage* message,
-									BHandler *handler);
 	virtual	void				MessageReceived(BMessage* message);
 
 			void				SetPackage(const PackageInfoRef& package);
