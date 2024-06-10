@@ -16,6 +16,9 @@
 #include <Window.h>
 
 
+const char* kMimeTypePlainText = "text/plain";
+
+
 enum {
 	MSG_BLINK_CARET		= 'blnk',
 };
@@ -60,6 +63,9 @@ TextDocumentView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_COPY:
 			Copy(be_clipboard);
+			break;
+		case B_PASTE:
+			Paste(be_clipboard);
 			break;
 		case B_SELECT_ALL:
 			SelectAll();
@@ -416,6 +422,63 @@ TextDocumentView::GetSelection(int32& start, int32& end) const
 
 
 void
+TextDocumentView::Paste(BClipboard* clipboard)
+{
+	if (!fTextDocument.IsSet() || !fTextEditor.IsSet())
+		return;
+
+	if (!clipboard->Lock())
+		return;
+
+	BMessage* clip = clipboard->Data();
+
+	if (clip != NULL) {
+		const void* plainTextData;
+		ssize_t plainTextDataSize;
+
+		if (clip->FindData(kMimeTypePlainText, B_MIME_TYPE, &plainTextData, &plainTextDataSize)
+			== B_OK) {
+
+			if (plainTextDataSize > 0) {
+				if (_PastePossiblyDisallowedChars(static_cast<const char*>(plainTextData),
+					static_cast<int32>(plainTextDataSize)) != B_OK) {
+					fprintf(stderr, "unable to paste text owing to internal error");
+						// don't use HaikuDepot logging system as this is in the text engine
+				}
+			}
+		}
+	}
+
+	clipboard->Unlock();
+}
+
+
+/*!	This method will check that all of the characters in the provided
+	string are allowed in the text document. Returns true if this is the case.
+*/
+/*static*/ bool
+TextDocumentView::_AreCharsAllowed(const char* str, int32 maxLength)
+{
+	for (int32 i = 0; str[i] != 0 && i < maxLength; i++) {
+		if (!TextDocumentView::_IsAllowedChar(i))
+			return false;
+	}
+	return true;
+}
+
+
+/*static*/ bool
+TextDocumentView::_IsAllowedChar(char c)
+{
+	return c >= ' '
+		|| c == '\t'
+		|| c == '\n'
+		|| c == 127 // delete
+		;
+}
+
+
+void
 TextDocumentView::Copy(BClipboard* clipboard)
 {
 	if (!HasSelection() || !fTextDocument.IsSet()) {
@@ -435,8 +498,7 @@ TextDocumentView::Copy(BClipboard* clipboard)
 		GetSelection(start, end);
 
 		BString text = fTextDocument->Text(start, end - start);
-		clip->AddData("text/plain", B_MIME_TYPE, text.String(),
-			text.Length());
+		clip->AddData(kMimeTypePlainText, B_MIME_TYPE, text.String(), text.Length());
 
 		// TODO: Support for "application/x-vnd.Be-text_run_array"
 
@@ -667,3 +729,67 @@ TextDocumentView::_GetSelectionShape(BShape& shape, int32 start, int32 end)
 }
 
 
+/*!	The data provided in the `str` parameter may contain characters that are
+	not allowed. This method should filter those out and then apply them to
+	the text body.
+*/
+status_t
+TextDocumentView::_PastePossiblyDisallowedChars(const char* str, int32 maxLength)
+{
+	if (maxLength <= 0)
+		return B_OK;
+
+	if (TextDocumentView::_AreCharsAllowed(str, maxLength)) {
+		_PasteAllowedChars(str, maxLength);
+	} else {
+		char* strFiltered = new(std::nothrow) char[maxLength];
+
+		if (strFiltered == NULL)
+			return B_NO_MEMORY;
+
+		int32 strFilteredLength = 0;
+
+		for (int i = 0; str[i] != '\0' && i < maxLength; i++) {
+			if (_IsAllowedChar(str[i])) {
+				strFiltered[strFilteredLength] = str[i];
+				strFilteredLength++;
+			}
+		}
+
+		strFiltered[strFilteredLength] = '\0';
+		_PasteAllowedChars(strFiltered, strFilteredLength);
+
+		delete[] strFiltered;
+	}
+
+	return B_OK;
+}
+
+
+/*! Here the data in `str` should be clean of control characters.
+ */
+void
+TextDocumentView::_PasteAllowedChars(const char* str, int32 maxLength)
+{
+	BString plainText(str, maxLength);
+
+	if (plainText.IsEmpty())
+		return;
+
+	if (fTextEditor.IsSet()) {
+		if (fTextEditor->HasSelection()) {
+			int32 start = fTextEditor->SelectionStart();
+			int32 end = fTextEditor->SelectionEnd();
+			fTextEditor->Replace(start, end - start, plainText);
+			Invalidate();
+			_UpdateScrollBars();
+		} else {
+			int32 caretOffset = fTextEditor->CaretOffset();
+			if (caretOffset >= 0) {
+				fTextEditor->Insert(caretOffset, plainText);
+				Invalidate();
+				_UpdateScrollBars();
+			}
+		}
+	}
+}

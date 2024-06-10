@@ -72,6 +72,7 @@ public:
 			void				GetSelection(int32& start, int32& end) const;
 
 			void				Copy(BClipboard* clipboard);
+			void				Paste(BClipboard* clipboard);
 
 private:
 			float				_TextLayoutWidth(float viewWidth) const;
@@ -84,6 +85,11 @@ private:
 			void				_DrawSelection();
 			void				_GetSelectionShape(BShape& shape,
 									int32 start, int32 end);
+
+			status_t			_PastePossiblyDisallowedChars(const char* str, int32 maxLength);
+			void				_PasteAllowedChars(const char* str, int32 maxLength);
+	static	bool				_IsAllowedChar(char c);
+	static	bool				_AreCharsAllowed(const char* str, int32 maxLength);
 
 private:
 			TextDocumentRef		fTextDocument;

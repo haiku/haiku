@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -130,8 +130,13 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 {
 	TextDocumentRef document = NormalizeText(text, characterStyle,
 		paragraphStyle);
-	if (!document.IsSet() || document->Length() != text.CountChars())
+
+	if (!document.IsSet())
 		return B_NO_MEMORY;
+
+	if (document->Length() != text.CountChars())
+		return B_NO_MEMORY;
+
 	return Replace(textOffset, length, document);
 }
 
@@ -441,11 +446,11 @@ TextDocument::NormalizeText(const BString& text,
 	int32 chunkStart = 0;
 	while (chunkStart < length) {
 		int32 chunkEnd = text.FindFirst('\n', chunkStart);
-		bool foundLineBreak = chunkEnd >= chunkStart;
-		if (foundLineBreak)
-			chunkEnd++;
-		else
+
+		if (chunkEnd == B_ERROR)
 			chunkEnd = length;
+		else
+			chunkEnd++; // the paragraph includes the `\n`
 
 		BString chunk;
 		text.CopyCharsInto(chunk, chunkStart, chunkEnd - chunkStart);
@@ -457,7 +462,7 @@ TextDocument::NormalizeText(const BString& text,
 			throw B_NO_MEMORY;
 
 		paragraph = Paragraph(paragraphStyle);
-		chunkStart = chunkEnd + 1;
+		chunkStart = chunkEnd;
 	}
 
 	return document;
