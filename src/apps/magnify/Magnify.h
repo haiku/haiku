@@ -187,8 +187,8 @@ class TInfoView : public BBox {
 
 		char			fInfoStr[64];
 		char			fRGBStr[64];
-		char			fCH1Str[64];
-		char			fCH2Str[64];
+		BString			fCH1Str;
+		BString			fCH2Str;
 
 		bool			fInfoTextVisible;
 };
