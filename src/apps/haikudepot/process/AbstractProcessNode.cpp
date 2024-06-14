@@ -44,7 +44,7 @@ AbstractProcessNode::Process() const
 bool
 AbstractProcessNode::IsRunning()
 {
-	return Process()->ProcessState() != PROCESS_COMPLETE;
+	return Process()->ProcessState() == PROCESS_RUNNING;
 }
 
 

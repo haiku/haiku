@@ -25,6 +25,7 @@ private:
 	static	status_t			_RunProcessThreadEntry(void* cookie);
 	static	void				_RunProcessThreadExit(void* cookie);
 
+private:
 			thread_id			fWorker;
 			int32				fStartTimeoutSeconds;
 };
