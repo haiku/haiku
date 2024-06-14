@@ -225,12 +225,17 @@ TextDocumentView::KeyDown(const char* bytes, int32 numBytes)
 		message->FindInt32("modifiers", &event.modifiers);
 	}
 
+	float viewHeightPrior = fTextEditor->Layout()->Height();
+
 	fTextEditor->KeyDown(event);
 	_ShowCaret(true);
 	// TODO: It is necessary to invalidate all, since neither the caret bounds
-	// are updated in a way that would work here, nor is the text updated 
-	// correcty which has been edited.
+	// are updated in a way that would work here, nor is the text updated
+	// correctly which has been edited.
 	Invalidate();
+
+	if (fTextEditor->Layout()->Height() != viewHeightPrior)
+		_UpdateScrollBars();
 }
 
 
