@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libbe	2539827825
+1	swedish	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Alla rättigheter resarverade.
 gold master	AboutWindow		guld mästare
 Undo	TextView		Ångra
@@ -6,6 +6,7 @@ OK	PrintJob		OK
 OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		utveckling
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s byte/s} other{%s bytes/s}}
 Print Server is not responding.	PrintJob		Utskriftservern svarar inte.
 About %app%	AboutMenuItem		Om %app%
 Warning	Dragger		Varning
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Särskilt tack till:
 %s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Standard Haiku window decorator.
 %s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Ta bort replikant
 Version	AboutWindow		Version
 Red:	ColorControl		Röd:
@@ -38,6 +40,7 @@ Error	PrintJob		Fel
 %s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		Om %app...
 About %app%	AboutWindow		Om %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s byte} other{%s bytes}}
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Versionshistorik:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Kan inte hitta programmet för replikanten. Ingen programsignatur är angiven.\n%error

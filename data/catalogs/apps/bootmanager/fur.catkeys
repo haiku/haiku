@@ -1,6 +1,6 @@
 1	friulian	x-vnd.Haiku-BootManager	867546001
 Old Master Boot Record backup failure	BootManagerController	Title	Faliment dal Backup dal Master Boot Record vieli
-At least one partition must be selected!	BootManagerController		Si scugne selezionâ almancul une partizion!
+At least one partition must be selected!	BootManagerController		Tu âs di selezionâ almancul une partizion!
 No space available!	DrivesPage	Cannot install	Spazi insuficient!
 Boot Manager is unable to read the partition table!	BootManagerController		Il gjestôr di inviament nol rive a lei la tabele des partizions!
 Immediately	DefaultPartitionPage		Daurman

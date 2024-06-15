@@ -56,7 +56,7 @@ Failed to create the partition. No changes have been written to disk.	MainWindow
 Shared	PartitionList		Condividût
 MIMEs	PartitionList		MIME
 BitLocker encrypted	Encryption utils		Cifrât cun BitLocker
-You need to select a partition entry from the list.	MainWindow		Si scugne selezionâ une partizion de liste.
+You need to select a partition entry from the list.	MainWindow		Tu âs di selezionâ une partizion de liste.
 Offset: %s	Support		Spostament: %s
 SafeBoot encrypted	Encryption utils		Cifrât cun SafeBoot
 Volume name	PartitionList		Non dal volum

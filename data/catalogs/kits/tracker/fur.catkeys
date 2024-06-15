@@ -253,7 +253,7 @@ The mount server could not be contacted.	AutoMounterSettings		Nol è stât pussi
 Query template	FindPanel		Model di interogazion
 ends with	SelectionWindow		al finìs cun
 Open	OpenWithWindow		Vierç
-You must have at least one attribute showing.	PoseView		Si scugne vê almancul un atribût di mostrâ.
+You must have at least one attribute showing.	PoseView		Tu scugnis vê almancul un atribût di mostrâ.
 Cut	FilePanelPriv		Taie
 Finish: after several years	StatusWindow		Finît: dopo tancj agns
 Favorites	FilePanelPriv		Preferîts
@@ -394,7 +394,7 @@ Proceed	FSUtils		Procêt
 Edit favorites…	FilePanelPriv		Modifiche preferîts…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		No tu puedis spostâ une cartele dentri se stesse o cualsisei altre des sôs sot-cartelis. 
 New	ContainerWindow		Gnûf
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Si scugne strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Tu âs di strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si modifiche %target, %osName al funzionarà mâl!\n\nContinuâ pardabon?
 Sorry, you can't copy items to the Trash.	FSClipBoard		No tu puedis copiâ i elements te Scovacere.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Cualchi element al esist za in cheste cartele cui stes non di chei che si sta %verb.\n \nSostituîju cun chei che si sta %verb o domandâ par ogniun di lôr?

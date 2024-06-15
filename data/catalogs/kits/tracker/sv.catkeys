@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1124891868
+1	swedish	x-vnd.Haiku-libtracker	2482866522
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -8,6 +8,7 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Fel vid flytt av \"%name\" ti
 Or	FindPanel		Eller
 MIME Description	AttributesView		MIME-beskrivning
 before	FindPanel		före
+New folder%d	FSUtils		Ny mapp %d
 Volume icons	TrackerSettingsWindow		Volymikoner
 Ignore case	SelectionWindow		Ignorera skiftesläge
 Current folder	ContainerWindow		Nuvarande mapp
@@ -265,6 +266,7 @@ Don't automount	AutoMounterSettings		Automontera inte
 Node ref	AttributesView		Nod ref
 Could not find application \"%appname\"	OpenWithWindow		Kunde inte hitta programmet \"%appname\"
 Unmatched parenthesis.	libtracker		Ojämförlig parentes.
+New folder %d	FSUtils		Ny mapp %d
 Extended attribute	AttributesView		Utökat attribut
 Unmatched brackets.	libtracker		Omatchade paranteser.
 Error %error loading Add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
@@ -332,6 +334,7 @@ To: %dir	StatusWindow		Till: %dir
 Paste layout	ContainerWindow		Klistra in layout
 Cancel	Tracker		Avbryt
 yes	AttributesView		ja
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Fel vid kopiering av filen \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Gör till aktiv skrivare
 Copy to	ContainerWindow		Kopiera till
 Name	SelectionWindow		Namn
@@ -477,6 +480,7 @@ Color	AttributesView		Färg
 Copy layout	ContainerWindow		Kopiera layout
 Duplicate	ContainerWindow		Duplicera
 16-bit integer	AttributesView		16-bitars integer
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Obs: filnamnen i målfilsystemet är inte skiftlägeskänsliga.\n
 Untitled clipping	PoseView		Namnlöst urklipp
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen \"%name\" finns redan i den valda katalogen. Vill du ersätta den?
 , indexed	InfoWindow		, indexerad
