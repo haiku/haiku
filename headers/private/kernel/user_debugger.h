@@ -259,7 +259,7 @@ bool user_debug_handle_signal(int signal, struct sigaction *handler,
 void user_debug_stop_thread();
 void user_debug_team_created(team_id teamID);
 void user_debug_team_deleted(team_id teamID, port_id debuggerPort, status_t status,
-		team_usage_info* usageInfo);
+		int signal, team_usage_info* usageInfo);
 void user_debug_team_exec();
 void user_debug_update_new_thread_flags(Thread* thread);
 void user_debug_thread_created(thread_id threadID);

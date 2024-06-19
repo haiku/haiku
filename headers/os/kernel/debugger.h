@@ -561,6 +561,7 @@ typedef struct {
 	debug_origin	origin;			// thread is < 0, team is the deleted team
 									// (asynchronous message)
 	status_t		status;			// the exit code of the team
+	int				signal;			// the signal causing the exit, < 0 if none
 	team_usage_info	usage;			// the usage info of the team
 } debug_team_deleted;
 

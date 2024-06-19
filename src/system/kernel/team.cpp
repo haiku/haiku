@@ -3345,7 +3345,17 @@ team_delete_team(Team* team, port_id debuggerPort)
 	}
 
 	// get team exit information
-	status_t exitStatus = team->exit.status;
+	status_t exitStatus = -1;
+	int signal = -1;
+
+	switch (team->exit.reason) {
+		case CLD_EXITED:
+			exitStatus = team->exit.status;
+			break;
+		case CLD_KILLED:
+			signal = team->exit.signal;
+			break;
+	}
 
 	teamLocker.Unlock();
 
@@ -3371,7 +3381,7 @@ team_delete_team(Team* team, port_id debuggerPort)
 	team->ReleaseReference();
 
 	// notify the debugger, that the team is gone
-	user_debug_team_deleted(teamID, debuggerPort, exitStatus, &usageInfo);
+	user_debug_team_deleted(teamID, debuggerPort, exitStatus, signal, &usageInfo);
 }
 
 

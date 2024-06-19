@@ -1654,7 +1654,7 @@ send_signal_to_team_locked(Team* team, uint32 signalNumber, Signal* signal,
 			// (only the main thread shuts down the team).
 			Thread* mainThread = team->main_thread;
 			if (mainThread != NULL) {
-				mainThread->AddPendingSignal(SIGKILLTHR);
+				mainThread->AddPendingSignal(signalNumber);
 
 				// wake up main thread
 				mainThread->going_to_suspend = false;
