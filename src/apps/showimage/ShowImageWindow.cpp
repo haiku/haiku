@@ -444,8 +444,7 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	_AddItemMenu(menu, B_TRANSLATE("Move to Trash"), kMsgDeleteCurrentFile, 'T', 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Use as background" B_UTF8_ELLIPSIS),
 		MSG_DESKTOP_BACKGROUND, 0, 0, this);
-	_AddItemMenu(menu, B_TRANSLATE("Get info" B_UTF8_ELLIPSIS),
-		MSG_GET_INFO, 'I', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Get info"), MSG_GET_INFO, 'I', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		MSG_PAGE_SETUP, 0, 0, this);

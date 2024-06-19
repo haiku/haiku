@@ -1736,8 +1736,7 @@ MainWin::_CreateMenu()
 	fMenuBar->AddItem(fVideoMenu);
 	fMenuBar->AddItem(fAttributesMenu);
 
-	BMenuItem* item = new BMenuItem(B_TRANSLATE("New player" B_UTF8_ELLIPSIS),
-		new BMessage(M_NEW_PLAYER), 'N');
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("New player"), new BMessage(M_NEW_PLAYER), 'N');
 	fFileMenu->AddItem(item);
 	item->SetTarget(be_app);
 
@@ -1753,8 +1752,7 @@ MainWin::_CreateMenu()
 		new BMessage(M_NETWORK_STREAM_OPEN));
 	fFileMenu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("Eject Device"),
-		new BMessage(M_EJECT_DEVICE));
+	item = new BMenuItem(B_TRANSLATE("Eject device"), new BMessage(M_EJECT_DEVICE));
 	fFileMenu->AddItem(item);
 
 	fFileMenu->AddSeparatorItem();
