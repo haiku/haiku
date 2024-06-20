@@ -2487,6 +2487,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 3) int32 - numChars
 			// 4) int32 - numBytes
 			// 5) char - the char buffer with size numBytes
+			// 6) bool - whether to try fallback fonts
 
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
@@ -2506,13 +2507,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			link.Read(charArray, numBytes);
 
+			bool useFallbacks;
+			link.Read<bool>(&useFallbacks);
+
 			ServerFont font;
 			status_t status = font.SetFamilyAndStyle(familyID, styleID,
 				fAppFontManager);
 
 			if (status == B_OK) {
-				status = font.GetHasGlyphs(charArray, numBytes, numChars,
-					hasArray);
+				status = font.GetHasGlyphs(charArray, numBytes, numChars, hasArray, useFallbacks);
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					fLink.Attach(hasArray, numChars * sizeof(bool));

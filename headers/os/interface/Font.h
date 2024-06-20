@@ -275,6 +275,8 @@ public:
 			void				GetHasGlyphs(const char charArray[],
 									int32 numChars,
 									bool hasArray[]) const;
+			void				GetHasGlyphs(const char charArray[], int32 numChars,
+									bool hasArray[], bool useFallbacks) const;
 
 			BFont&				operator=(const BFont& font);
 			bool				operator==(const BFont& font) const;

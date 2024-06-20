@@ -1346,6 +1346,14 @@ void
 BFont::GetHasGlyphs(const char charArray[], int32 numChars,
 	bool hasArray[]) const
 {
+	GetHasGlyphs(charArray, numChars, hasArray, true);
+}
+
+
+void
+BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[],
+	bool useFallbacks) const
+{
 	if (!charArray || numChars < 1 || !hasArray)
 		return;
 
@@ -1360,6 +1368,8 @@ BFont::GetHasGlyphs(const char charArray[], int32 numChars,
 	uint32 bytesInBuffer = UTF8CountBytes(charArray, numChars);
 	link.Attach<int32>(bytesInBuffer);
 	link.Attach(charArray, bytesInBuffer);
+
+	link.Attach<bool>(useFallbacks);
 
 	if (link.FlushWithReply(code) != B_OK || code != B_OK)
 		return;

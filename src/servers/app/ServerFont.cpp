@@ -692,8 +692,8 @@ ServerFont::IncludesUnicodeBlock(uint32 start, uint32 end, bool& hasBlock)
 
 
 status_t
-ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
-	bool* hasArray) const
+ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars, bool* hasArray,
+	bool useFallbacks) const
 {
 	if (string == NULL || numBytes <= 0 || numChars <= 0 || hasArray == NULL)
 		return B_BAD_DATA;
@@ -714,7 +714,7 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 	while (charIndex < numChars && (charCode = UTF8ToCharCode(&string)) != 0) {
 		hasArray[charIndex] = entry->CanCreateGlyph(charCode);
 
-		if (hasArray[charIndex] == false) {
+		if (hasArray[charIndex] == false && useFallbacks) {
 			if (fallbacks.IsEmpty())
 				GlyphLayoutEngine::PopulateFallbacks(fallbacks, *this, false);
 
