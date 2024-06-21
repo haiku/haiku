@@ -1886,6 +1886,10 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 	// more precisely: It's owned by the team's main thread, now.
 	teamReference.Detach();
 
+	// notify the debugger while the main thread is still suspended so that it
+	// has a chance to attach early to the child.
+	user_debug_team_created(teamID);
+
 	// wait for the loader of the new team to finish its work
 	if ((flags & B_WAIT_TILL_LOADED) != 0) {
 		if (mainThread != NULL) {
@@ -1910,9 +1914,6 @@ load_image_internal(char**& _flatArgs, size_t flatArgsSize, int32 argCount,
 		if (loadingInfo.result < B_OK)
 			return loadingInfo.result;
 	}
-
-	// notify the debugger
-	user_debug_team_created(teamID);
 
 	return thread;
 
