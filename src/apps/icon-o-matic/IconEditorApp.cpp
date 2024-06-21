@@ -291,6 +291,9 @@ IconEditorApp::_NewWindow()
 	MainWindow* window = new MainWindow(fLastWindowFrame, this,
 		&fLastWindowSettings);
 	fWindowCount++;
+
+	window->MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
+
 	return window;
 }
 
