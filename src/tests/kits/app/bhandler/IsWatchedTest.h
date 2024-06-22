@@ -27,6 +27,9 @@ class TIsWatchedTest : public TestCase
 
 		void IsWatched1();
 		void IsWatched2();
+		void IsWatched3();
+		void IsWatched4();
+		void IsWatched5();
 
 		static Test* Suite();
 

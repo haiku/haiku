@@ -29,6 +29,9 @@ case 1: feed meaningless data, should return B_ERROR
 IsWatched()
 case 1: No added watchers; should return false
 case 2: Add watcher, should return true; remove watcher, should return false
+case 3: Add watcher, should return true; send notice, remove watcher, should return false
+case 4: Remove watcher, should return false
+case 5: Send notices without watchers, should return false
 
 Looper()
 case 1: Not added to a BLooper, should return NULL
