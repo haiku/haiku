@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	787895969
+1	italian	x-vnd.Haiku-MediaPlayer	171477831
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		Disegna bitmap
 File info	MediaPlayer-InfoWin		Informazioni sul file…
 raw audio	MediaPlayer-InfoWin		audio grezzo
 Select all	MediaPlayer-PlaylistWindow		Seleziona tutto
-New player…	MediaPlayer-Main		Nuova riproduzione…
 Move Entries	MediaPlayer-MovePLItemsCmd		Sposta elementi
 OK	MediaPlayer-Main		OK
 Remove	MediaPlayer-PlaylistWindow		Elimina
@@ -30,7 +29,6 @@ Open file…	MediaPlayer-Main		Apri file…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Ridimensiona controlli nella modalità a schermo intero
 View options	MediaPlayer-SettingsWindow		Opzioni di visualizzazione
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		Espelli Dispositivo
 Full volume	MediaPlayer-SettingsWindow		Volume massimo
 <untitled>	PlaylistItem-title		<senza titolo>
 Start media server	MediaPlayer-Main		Avvia il media server

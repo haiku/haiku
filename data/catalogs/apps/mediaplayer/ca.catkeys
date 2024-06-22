@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	787895969
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	171477831
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		Dibuix de mapa de bits
 File info	MediaPlayer-InfoWin		Informació del fitxer
 raw audio	MediaPlayer-InfoWin		àudio en cru
 Select all	MediaPlayer-PlaylistWindow		Selecciona-ho tot
-New player…	MediaPlayer-Main		Reproductor nou...
 Move Entries	MediaPlayer-MovePLItemsCmd		Mou les entrades
 OK	MediaPlayer-Main		D'acord
 Remove	MediaPlayer-PlaylistWindow		Suprimeix
@@ -30,7 +29,6 @@ Open file…	MediaPlayer-Main		Obre un fitxer...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escala els controls en mode de pantalla completa.
 View options	MediaPlayer-SettingsWindow		Opcions de visualització
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		Expulsa el dispositiu
 Full volume	MediaPlayer-SettingsWindow		Volum complet
 <untitled>	PlaylistItem-title		<sense títol>
 Start media server	MediaPlayer-Main		Inicia el servidor multimèdia

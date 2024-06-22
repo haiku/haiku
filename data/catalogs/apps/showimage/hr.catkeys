@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-ShowImage	3861016830
+1	croatian	x-vnd.Haiku-ShowImage	437869151
 ShowImage	System name		Prikaži sliku
 Page setup…	Menus		Postavljanje stranice...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stranica %d) je promjenjen. Želite li zatvoriti dokument?
@@ -16,7 +16,6 @@ Original size	Menus		Izvorna veličina
 Width:	PrintOptionsWindow		Širina:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Promjeni veličinu (u 1/72 inča):
 Zoom factor in %:	PrintOptionsWindow		Zoom u %:
-Get info…	Menus		Dobavi informacije…
 Zoom out	Menus		Smanji
 OK	Alerts		U redu
 File	Menus		Datoteka

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ShowImage	276586646
+1	spanish; castilian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Mostrar Imagen
 Page setup…	Menus		Configuración de la pagina
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
@@ -16,7 +16,6 @@ Original size	Menus		Tamaño original
 Width:	PrintOptionsWindow		Ancho:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar a  (en 1/72 de pulgada):
 Zoom factor in %:	PrintOptionsWindow		Factor de zoom en %:
-Get info…	Menus		Obtener información…
 Zoom out	Menus		Alejar
 OK	Alerts		Aceptar
 File	Menus		Archivo

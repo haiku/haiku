@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	3998703664
+1	english	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		图像查看器
 Page setup…	Menus		页面启动...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		文档'%s' (page %d) 已经改变。是否关闭文档？
@@ -16,7 +16,6 @@ Original size	Menus		原始尺寸
 Width:	PrintOptionsWindow		宽度：
 Resize to (in 1/72 inches):	PrintOptionsWindow		缩放到(in 1/72 inches):
 Zoom factor in %:	PrintOptionsWindow		缩放比例 %：
-Get info…	Menus		获得信息…
 Zoom out	Menus		缩小
 OK	Alerts		确定
 File	Menus		文件

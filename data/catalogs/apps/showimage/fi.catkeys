@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	276586646
+1	finnish	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Kuvakatselin
 Page setup…	Menus		Sivuasetus...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
@@ -16,7 +16,6 @@ Original size	Menus		Alkuperäiskoko
 Width:	PrintOptionsWindow		Leveys:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Skaalaa kokoon (1/72 tuumissa):
 Zoom factor in %:	PrintOptionsWindow		Rajaustekijä kohteessa %:
-Get info…	Menus		Haetaan tiedot...
 Zoom out	Menus		Loitonna
 OK	Alerts		Valmis
 File	Menus		Tiedosto

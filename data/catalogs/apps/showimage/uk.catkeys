@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	276586646
+1	ukrainian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		ShowImage
 Page setup…	Menus		Налаштування сторінки…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ «%s» (сторінка %d) був змінений. Закрити його?
@@ -16,7 +16,6 @@ Original size	Menus		Оригінальний розмір
 Width:	PrintOptionsWindow		Ширина:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Змінити розмір (в 1/72 дюйма):
 Zoom factor in %:	PrintOptionsWindow		Масштаб зображення %:
-Get info…	Menus		Дивитись інфо…
 Zoom out	Menus		Зменшити
 OK	Alerts		ОК
 File	Menus		Файл

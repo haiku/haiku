@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MediaPlayer	277523627
+1	belarusian	x-vnd.Haiku-MediaPlayer	2711109766
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Адправіць элемент у Сметніцу
 Close	MediaPlayer-PlaylistWindow		Закрыць
 Volume of background clips	MediaPlayer-SettingsWindow		Гучнасць фонавых кліпаў
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Інфармацыя пра файл
 raw audio	MediaPlayer-InfoWin		нефарматаване аўдыё
 Select all	MediaPlayer-PlaylistWindow		Пазначыць усе
-New player…	MediaPlayer-Main		Новы плеер…
 Move Entries	MediaPlayer-MovePLItemsCmd		Перамясціць элементы
 OK	MediaPlayer-Main		ОК
 Remove	MediaPlayer-PlaylistWindow		Выдаліць

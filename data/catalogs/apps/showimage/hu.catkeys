@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	276586646
+1	hungarian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Képmegjelenítő
 Page setup…	Menus		Oldalbeállítás…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
@@ -16,7 +16,6 @@ Original size	Menus		Eredeti méret
 Width:	PrintOptionsWindow		Szélesség:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Átméretezés (1/72 colban):
 Zoom factor in %:	PrintOptionsWindow		Nagyítás mértéke százalékban:
-Get info…	Menus		Információ lekérése…
 Zoom out	Menus		Kicsinyítés
 OK	Alerts		Rendben
 File	Menus		Fájl

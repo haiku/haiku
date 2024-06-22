@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	3762371345
+1	swedish	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Alla repositorier
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
 User Created	UserLoginWindow		Användare skapad
 Check for updates…	MainWindow		Leta efter uppdateringar…

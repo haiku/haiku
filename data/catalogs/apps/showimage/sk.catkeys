@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ShowImage	3998703664
+1	slovak	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		Prehliadač obrázkov
 Page setup…	Menus		Nastavenie stránky…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s“ (stránka %d) bol zmenený. Chcete dokument zatvoriť?
@@ -16,7 +16,6 @@ Original size	Menus		Pôvodná veľkosť
 Width:	PrintOptionsWindow		Šírka:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Zmeniť veľkosť na (v 1/72 palca):
 Zoom factor in %:	PrintOptionsWindow		Priblíženie v %:
-Get info…	Menus		Získať informácie…
 Zoom out	Menus		Oddialiť
 OK	Alerts		OK
 File	Menus		Súbor

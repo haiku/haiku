@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	1174293009
+1	german	x-vnd.Haiku-ShowImage	2046112626
 Page setup…	Menus		Seite einrichten …
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
 Previous file	Menus		Vorherige Datei
@@ -15,7 +15,6 @@ Original size	Menus		Originalgröße
 Width:	PrintOptionsWindow		Breite:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Größe ändern zu (in 1/72 Zoll):
 Zoom factor in %:	PrintOptionsWindow		Vergrößerungsfaktor in %:
-Get info…	Menus		Datei-Info …
 Zoom out	Menus		Verkleinern
 OK	Alerts		OK
 File	Menus		Datei

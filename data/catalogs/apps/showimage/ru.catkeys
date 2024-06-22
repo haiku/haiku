@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	276586646
+1	russian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Просмотр изображений
 Page setup…	Menus		Настройка печати…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
@@ -16,7 +16,6 @@ Original size	Menus		Оригинальный размер
 Width:	PrintOptionsWindow		Ширина:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Изменить размер (1/72 дюйма):
 Zoom factor in %:	PrintOptionsWindow		Масштаб в %:
-Get info…	Menus		Свойства…
 Zoom out	Menus		Уменьшить
 OK	Alerts		ОК
 File	Menus		Файл

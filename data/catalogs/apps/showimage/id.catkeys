@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ShowImage	3998703664
+1	indonesian	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		ShowImage
 Page setup…	Menus		Atur Halaman…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumen '%s' (halaman %d) telah diubah. Apakah Anda ingin menutup dokumen?
@@ -16,7 +16,6 @@ Original size	Menus		Ukuran asli
 Width:	PrintOptionsWindow		Lebar:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ubah ukuran menjadi(dalam 1/72 inci):
 Zoom factor in %:	PrintOptionsWindow		Faktor zoom dalam %:
-Get info…	Menus		Dapatkan Info…
 Zoom out	Menus		Perkecil
 OK	Alerts		Oke
 File	Menus		Berkas

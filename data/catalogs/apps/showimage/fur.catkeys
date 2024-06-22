@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ShowImage	276586646
+1	friulian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		MostreImagjin
 Page setup…	Menus		Impostazions pagjine…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' (pagjine %d) al è stât modificât. Sierâ il document?
@@ -16,7 +16,6 @@ Original size	Menus		Dimension origjinâl
 Width:	PrintOptionsWindow		Largjece:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ridimensione a (in 1/72 oncis):
 Zoom factor in %:	PrintOptionsWindow		Fatôr di ingrandiment in %:
-Get info…	Menus		Oten informazions…
 Zoom out	Menus		Impiçulìs
 OK	Alerts		Va ben
 File	Menus		File

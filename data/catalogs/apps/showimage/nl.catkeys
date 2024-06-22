@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ShowImage	3998703664
+1	dutch; flemish	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		ShowImage
 Page setup…	Menus		Paginaconfiguratie...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Het document '%s' (pagina %d) werd veranderd. Wilt u het document sluiten?
@@ -16,7 +16,6 @@ Original size	Menus		Oorspronkelijke maat
 Width:	PrintOptionsWindow		Breedte:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Omvormen naar (in eenheden van 1/72 inch):
 Zoom factor in %:	PrintOptionsWindow		Zoomfactor in %:
-Get info…	Menus		Informatie ophalen…
 Zoom out	Menus		Uitzoomen
 OK	Alerts		Oké
 File	Menus		Bestand

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	276586646
+1	romanian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configurare pagină…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
@@ -16,7 +16,6 @@ Original size	Menus		Dimensiune originală
 Width:	PrintOptionsWindow		Lățime:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionare la (în 1/72 țoli):
 Zoom factor in %:	PrintOptionsWindow		Factor de focalizare în %:
-Get info…	Menus		Obține informații…
 Zoom out	Menus		Micșorează
 OK	Alerts		OK
 File	Menus		Fișier

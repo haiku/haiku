@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	276586646
+1	greek, modern (1453-)	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		ShowImage
 Page setup…	Menus		Διαμόρφωση σελίδας…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Το έγγραφο '%s' (σελίδα %d) έχει αλλάξει. Θέλετε να κλείσετε το έγγραφο;
@@ -16,7 +16,6 @@ Original size	Menus		Αρχικό μέγεθος
 Width:	PrintOptionsWindow		Πλάτος:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Αλλαγή μεγέθους σε (στο 1/72 ίντσες):
 Zoom factor in %:	PrintOptionsWindow		Συντελεστής κλίμακας σε %:
-Get info…	Menus		Πληροφορίες…
 Zoom out	Menus		Σμίκρυνση
 OK	Alerts		Εντάξει
 File	Menus		Αρχείο

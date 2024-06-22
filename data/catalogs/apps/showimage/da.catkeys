@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-ShowImage	3998703664
+1	danish	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		Billedviser
 Page setup…	Menus		Sideopsætning…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er blevet ændret. Vil du lukke dokumentet?
@@ -16,7 +16,6 @@ Original size	Menus		Oprindelig størrelse
 Width:	PrintOptionsWindow		Bredde:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Sæt størrelse til (i 1/72 tommer):
 Zoom factor in %:	PrintOptionsWindow		Zoom-faktor i %:
-Get info…	Menus		Hent oplysninger…
 Zoom out	Menus		Zoom ud
 OK	Alerts		O.k.
 File	Menus		Fil

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ShowImage	276586646
+1	czech	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Prohlížeč obrázků
 Page setup…	Menus		Nastavení stránky...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stránka %d) byl změněn. Chcete jej zavřít?
@@ -16,7 +16,6 @@ Original size	Menus		Původní velikost
 Width:	PrintOptionsWindow		Šířka:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Změnit velikost na (v 1/72 palce):
 Zoom factor in %:	PrintOptionsWindow		Přiblížení v %:
-Get info…	Menus		Získat informace...
 Zoom out	Menus		Oddálit
 OK	Alerts		OK
 File	Menus		Soubor

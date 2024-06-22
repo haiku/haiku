@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ShowImage	276586646
+1	turkish	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Görsel Görüntüleyicisi
 Page setup…	Menus		Sayfa yapısı…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		“%s” belgesi (sayfa %d) değiştirildi. Belgeyi kapatmak istiyor musunuz?
@@ -16,7 +16,6 @@ Original size	Menus		Özgün boyut
 Width:	PrintOptionsWindow		Genişlik:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Yeniden boyutlandır (1/72 inç):
 Zoom factor in %:	PrintOptionsWindow		% olarak yakınlaştırma derecesi:
-Get info…	Menus		Bilgi al…
 Zoom out	Menus		Uzaklaştır
 OK	Alerts		Tamam
 File	Menus		Dosya

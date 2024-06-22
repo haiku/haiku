@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	3708050243
+1	slovak	x-vnd.Haiku-MediaPlayer	1846669086
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstrániť položku do Koša
 Close	MediaPlayer-PlaylistWindow		Zatvoriť
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitosť klipov na pozadí
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		Nakresliť bitmapu
 File info	MediaPlayer-InfoWin		Info o súbore
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Select all	MediaPlayer-PlaylistWindow		Vybrať všetky
-New player…	MediaPlayer-Main		Nový prehrávač…
 Move Entries	MediaPlayer-MovePLItemsCmd		Presunúť položky
 OK	MediaPlayer-Main		OK
 Remove	MediaPlayer-PlaylistWindow		Odstrániť

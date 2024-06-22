@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ShowImage	276586646
+1	swedish	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		BildVisning
 Page setup…	Menus		Sidinställningar...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (sida %d) har ändrats. Vill du verkligen stänga dokumentet?
@@ -16,7 +16,6 @@ Original size	Menus		Originalstorlek
 Width:	PrintOptionsWindow		Bredd:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Ändra storlek till (i måttenheten 1/72 tum):
 Zoom factor in %:	PrintOptionsWindow		Zoomläge i %:
-Get info…	Menus		Hämta info...
 Zoom out	Menus		Zooma ut
 OK	Alerts		OK
 File	Menus		Arkiv

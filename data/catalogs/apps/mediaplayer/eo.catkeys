@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-MediaPlayer	1961774506
+1	esperanto	x-vnd.Haiku-MediaPlayer	100393349
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Movi la dosieron al la Rubujo
 Close	MediaPlayer-PlaylistWindow		Fermi
 Volume of background clips	MediaPlayer-SettingsWindow		Laŭteco de fonaj aŭdvidaĵoj
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Dosiera informo
 raw audio	MediaPlayer-InfoWin		neprilaborita aŭdaĵo
 Select all	MediaPlayer-PlaylistWindow		Elekti ĉion
-New player…	MediaPlayer-Main		Nova ludilo…
 Move Entries	MediaPlayer-MovePLItemsCmd		Movi anojn
 OK	MediaPlayer-Main		Bone
 Remove	MediaPlayer-PlaylistWindow		Forigi

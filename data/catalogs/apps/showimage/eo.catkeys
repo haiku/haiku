@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-ShowImage	3998703664
+1	esperanto	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		La Bildmontrilo
 Page setup…	Menus		Agordo de paĝo…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		La dokumento '%s' (paĝo %d) estas ŝanĝita. Ĉu vi volas fermi ĝin?
@@ -16,7 +16,6 @@ Original size	Menus		Origina grando
 Width:	PrintOptionsWindow		Larĝo:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Adapti al (per 1/72 da coloj):
 Zoom factor in %:	PrintOptionsWindow		Zoma koeficiento per %:
-Get info…	Menus		Preni informon…
 Zoom out	Menus		Malzomi
 OK	Alerts		Bone
 File	Menus		Dosiero

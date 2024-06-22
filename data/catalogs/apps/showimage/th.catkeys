@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-ShowImage	3998703664
+1	thai	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		แสดงภาพ
 Page setup…	Menus		ตั้งค่าหน้า
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		เอกสาร '%s' (หน้า%d) มีการเปลี่ยนแปลง คุณต้องการปิดเอกสารหรือไม่?
@@ -16,7 +16,6 @@ Original size	Menus		ขนาดเดิม
 Width:	PrintOptionsWindow		ความกว้าง:
 Resize to (in 1/72 inches):	PrintOptionsWindow		ลดขนาดลง (ใน 1/72 นิ้ว):
 Zoom factor in %:	PrintOptionsWindow		อัตราการซูมเป็น%:
-Get info…	Menus		รับข้อมูล
 Zoom out	Menus		ซุมออก
 OK	Alerts		ตกลง
 File	Menus		ไฟล์

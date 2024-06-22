@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ShowImage	3998703664
+1	portuguese	x-vnd.Haiku-ShowImage	575555985
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configuração de página…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' (página %d) foi modificado. Você deseja fechar o documento?
@@ -16,7 +16,6 @@ Original size	Menus		Tamanho original
 Width:	PrintOptionsWindow		Largura:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar para (em 1/72 polegadas):
 Zoom factor in %:	PrintOptionsWindow		Zoom em %:
-Get info…	Menus		Obter informações…
 Zoom out	Menus		Diminuir zoom
 OK	Alerts		OK
 File	Menus		Ficheiro

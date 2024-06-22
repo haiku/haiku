@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	1961774506
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	100393349
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Remover Entrada para a Lixeira
 Close	MediaPlayer-PlaylistWindow		Fechar
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clipes em segundo plano
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		Desenhar Mapa de Bits
 File info	MediaPlayer-InfoWin		Informações do arquivo
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Select all	MediaPlayer-PlaylistWindow		Selecionar tudo
-New player…	MediaPlayer-Main		Novo tocador…
 Move Entries	MediaPlayer-MovePLItemsCmd		Mover Entradas
 OK	MediaPlayer-Main		OK
 Remove	MediaPlayer-PlaylistWindow		Remover

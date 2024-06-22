@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	276586646
+1	french	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Visionneuse
 Page setup…	Menus		Mise en page…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
@@ -16,7 +16,6 @@ Original size	Menus		Taille originale
 Width:	PrintOptionsWindow		Largeur :
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionner (en 1/72 pouces) :
 Zoom factor in %:	PrintOptionsWindow		Facteur de zoom en % :
-Get info…	Menus		Obtenir les informations…
 Zoom out	Menus		Zoom arrière
 OK	Alerts		OK
 File	Menus		Fichier

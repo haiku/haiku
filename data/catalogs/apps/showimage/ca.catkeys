@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ShowImage	276586646
+1	catalan; valencian	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		Mostra la imatge
 Page setup…	Menus		Configuració de la pàgina...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El document %s (pàgina %d) ha canviat. Voleu tancar-lo?
@@ -16,7 +16,6 @@ Original size	Menus		Mida original
 Width:	PrintOptionsWindow		Amplada:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Canvia'n la mida a (en 1/72 polzades):
 Zoom factor in %:	PrintOptionsWindow		Factor d'ampliació en %:
-Get info…	Menus		Obtén informació...
 Zoom out	Menus		Redueix
 OK	Alerts		D'acord
 File	Menus		Fitxer

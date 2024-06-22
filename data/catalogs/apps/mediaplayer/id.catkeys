@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	716811487
+1	indonesian	x-vnd.Haiku-MediaPlayer	100393349
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Info berkas
 raw audio	MediaPlayer-InfoWin		audio mentah
 Select all	MediaPlayer-PlaylistWindow		Pilih semua
-New player…	MediaPlayer-Main		Pemutar baru…
 Move Entries	MediaPlayer-MovePLItemsCmd		Pindahkan Entri
 OK	MediaPlayer-Main		OKE
 Remove	MediaPlayer-PlaylistWindow		Hapus
@@ -30,7 +29,6 @@ Open file…	MediaPlayer-Main		Buka berkas…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skalakan kontrol dalam mode layar penuh
 View options	MediaPlayer-SettingsWindow		Opsi tampilan
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		Keluarkan Perangkat
 Full volume	MediaPlayer-SettingsWindow		Suara penuh
 <untitled>	PlaylistItem-title		<tak diketahui>
 Start media server	MediaPlayer-Main		Mulai server media

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	725133719
+1	german	x-vnd.Haiku-MediaPlayer	108715581
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -12,10 +12,9 @@ Open Playlist	MediaPlayer-PlaylistWindow		Playliste öffnen
 Subtitles	MediaPlayer-Main		Untertitel
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		Es ist ein interner Fehler in %app% aufgetreten. Die Datei konnte nicht geöffnet werden.
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
-File info	MediaPlayer-InfoWin		Datei-Info
+File info	MediaPlayer-InfoWin		Informationen
 raw audio	MediaPlayer-InfoWin		Raw-Audio
 Select all	MediaPlayer-PlaylistWindow		Alles auswählen
-New player…	MediaPlayer-Main		Neuer Player …
 Move Entries	MediaPlayer-MovePLItemsCmd		Einträge verschieben
 OK	MediaPlayer-Main		OK
 Remove	MediaPlayer-PlaylistWindow		Entfernen
@@ -29,7 +28,6 @@ Open file…	MediaPlayer-Main		Öffne Datei …
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Bedienelemente im Vollbildmodus vergrößern
 View options	MediaPlayer-SettingsWindow		Darstellung
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		Disk auswerfen
 Full volume	MediaPlayer-SettingsWindow		Volle Lautstärke
 <untitled>	PlaylistItem-title		<unbenannt>
 Start media server	MediaPlayer-Main		Mediaserver starten
@@ -118,7 +116,7 @@ Settings…	MediaPlayer-Main		Einstellungen …
 min	MediaPlayer-InfoWin	Minutes	min
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen:\n\nFehler:
 Video	MediaPlayer-InfoWin		Video
-File info…	MediaPlayer-Main		Datei-Info …
+File info…	MediaPlayer-Main		Informationen …
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikanisch)
 <unnamed>	PlaylistItem-name		<unbenannt>
 Track	Video Track Menu		Track

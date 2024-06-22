@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	787895969
+1	greek, modern (1453-)	x-vnd.Haiku-MediaPlayer	171477831
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Μετακίνηση Αρχείου στον Κάδο Απορριμάτων
 Close	MediaPlayer-PlaylistWindow		Κλείσιμο
 Volume of background clips	MediaPlayer-SettingsWindow		Ένταση κλιπ παρασκηνίου
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Πληροφορίες αρχείου
 raw audio	MediaPlayer-InfoWin		ανεπεξέργαστος ήχος
 Select all	MediaPlayer-PlaylistWindow		Επιλογή όλων
-New player…	MediaPlayer-Main		Νέος παίκτης…
 Move Entries	MediaPlayer-MovePLItemsCmd		Μετακίνηση Αρχείων
 OK	MediaPlayer-Main		Εντάξει
 Remove	MediaPlayer-PlaylistWindow		Αφαίρεση
@@ -30,7 +29,6 @@ Open file…	MediaPlayer-Main		Άνοιγμα αρχείου…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Να μεταβάλλεται το μέγεθος των κουμπιών ελέγχου σε λειτουργία πλήρης οθόνης 
 View options	MediaPlayer-SettingsWindow		Προβολή ρυθμίσεων
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		Εξαγωγή συσκευής
 Full volume	MediaPlayer-SettingsWindow		Μέγιστη ένταση
 <untitled>	PlaylistItem-title		<χωρίς τίτλο>
 Start media server	MediaPlayer-Main		Εκκίνηση διακομιστή πολυμέσων

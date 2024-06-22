@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	276586646
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	1148406263
 ShowImage	System name		ShowImage
 Page setup…	Menus		Sideoppsett…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
@@ -16,7 +16,6 @@ Original size	Menus		Originalstørrelse
 Width:	PrintOptionsWindow		Bredde:
 Resize to (in 1/72 inches):	PrintOptionsWindow		Endre størrelse til (i 1/72 tommer):
 Zoom factor in %:	PrintOptionsWindow		zoomfaktor i %:
-Get info…	Menus		Hent info…
 Zoom out	Menus		Zoom ut
 OK	Alerts		OK
 File	Menus		Fil

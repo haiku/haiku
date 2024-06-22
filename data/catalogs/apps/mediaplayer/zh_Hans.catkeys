@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	716811487
+1	english	x-vnd.Haiku-MediaPlayer	100393349
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		文件信息
 raw audio	MediaPlayer-InfoWin		原始音频
 Select all	MediaPlayer-PlaylistWindow		全选
-New player…	MediaPlayer-Main		新建播放器...
 Move Entries	MediaPlayer-MovePLItemsCmd		移动条目
 OK	MediaPlayer-Main		确定
 Remove	MediaPlayer-PlaylistWindow		移除
@@ -30,7 +29,6 @@ Open file…	MediaPlayer-Main		打开文件…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		全屏模式拉伸控件
 View options	MediaPlayer-SettingsWindow		视图选项
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		弹出设备
 Full volume	MediaPlayer-SettingsWindow		最大音量
 <untitled>	PlaylistItem-title		<未命名>
 Start media server	MediaPlayer-Main		启动媒体服务器

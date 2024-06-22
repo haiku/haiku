@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3762371345
+1	hungarian	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Összes tároló
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		Raktár - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
 User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…

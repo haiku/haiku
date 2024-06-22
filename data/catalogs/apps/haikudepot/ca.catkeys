@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3762371345
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Tots els repositoris
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		Dipòsit del Haiku - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
 User Created	UserLoginWindow		Usuari creat
 Check for updates…	MainWindow		Comprova si hi ha actualitzacions...

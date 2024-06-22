@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	787895969
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	171477831
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -16,7 +16,6 @@ DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Filinfo
 raw audio	MediaPlayer-InfoWin		rå audio
 Select all	MediaPlayer-PlaylistWindow		Velg alle
-New player…	MediaPlayer-Main		Ny spiller…
 Move Entries	MediaPlayer-MovePLItemsCmd		Flytt oppføringer
 OK	MediaPlayer-Main		OK
 Remove	MediaPlayer-PlaylistWindow		Fjern
@@ -30,7 +29,6 @@ Open file…	MediaPlayer-Main		Åpne fil…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaler kontroller i fullskjerm-modus
 View options	MediaPlayer-SettingsWindow		Visningsalternativer
 %d kHz	MediaPlayer-InfoWin		%d kHz
-Eject Device	MediaPlayer-Main		Løs ut enhet
 Full volume	MediaPlayer-SettingsWindow		Fullt volum
 <untitled>	PlaylistItem-title		<uten navn>
 Start media server	MediaPlayer-Main		Start medieserver

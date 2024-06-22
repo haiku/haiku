@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3762371345
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Усі репозитарії
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на обнови…
