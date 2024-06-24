@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2003 Stuart Walsh
  *
@@ -24,7 +24,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-/* $FreeBSD: releng/12.0/sys/dev/bfe/if_bfereg.h 326255 2017-11-27 14:52:40Z pfg $ */
 
 #ifndef _BFE_H
 #define _BFE_H
@@ -247,7 +246,6 @@
 #define BFE_AP_RSV          0x00000030 /* Reserved */
 #define BFE_IBE             0x00020000 /* In Band Error */
 #define BFE_TO              0x00040000 /* Timeout */
-
 
 /* Seems the bcm440x has a fairly generic core, we only need be concerned with
  * a couple of these
@@ -584,7 +582,7 @@ struct bfe_hw_stats {
 
 struct bfe_softc
 {
-    struct ifnet            *bfe_ifp;     /* interface info */
+    if_t                    bfe_ifp;     /* interface info */
     device_t                bfe_dev;
     device_t                bfe_miibus;
     bus_dma_tag_t           bfe_tag;

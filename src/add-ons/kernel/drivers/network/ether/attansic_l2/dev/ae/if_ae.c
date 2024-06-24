@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2008 Stanislav Sedov <stas@FreeBSD.org>.
  * All rights reserved.
@@ -30,8 +30,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ae/if_ae.c 339735 2018-10-25 17:00:39Z brooks $");
-
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/bus.h>
@@ -114,8 +112,8 @@ static int	ae_detach(device_t dev);
 static int	ae_miibus_readreg(device_t dev, int phy, int reg);
 static int	ae_miibus_writereg(device_t dev, int phy, int reg, int val);
 static void	ae_miibus_statchg(device_t dev);
-static void	ae_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr);
-static int	ae_mediachange(struct ifnet *ifp);
+static void	ae_mediastatus(if_t ifp, struct ifmediareq *ifmr);
+static int	ae_mediachange(if_t ifp);
 static void	ae_retrieve_address(ae_softc_t *sc);
 static void	ae_dmamap_cb(void *arg, bus_dma_segment_t *segs, int nsegs,
     int error);
@@ -128,8 +126,8 @@ static void	ae_powersave_enable(ae_softc_t *sc);
 static int	ae_resume(device_t dev);
 static unsigned int	ae_tx_avail_size(ae_softc_t *sc);
 static int	ae_encap(ae_softc_t *sc, struct mbuf **m_head);
-static void	ae_start(struct ifnet *ifp);
-static void	ae_start_locked(struct ifnet *ifp);
+static void	ae_start(if_t ifp);
+static void	ae_start_locked(if_t ifp);
 static void	ae_link_task(void *arg, int pending);
 static void	ae_stop_rxmac(ae_softc_t *sc);
 static void	ae_stop_txmac(ae_softc_t *sc);
@@ -143,7 +141,7 @@ static void	ae_watchdog(ae_softc_t *sc);
 static void	ae_tick(void *arg);
 static void	ae_rxfilter(ae_softc_t *sc);
 static void	ae_rxvlan(ae_softc_t *sc);
-static int	ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data);
+static int	ae_ioctl(if_t ifp, u_long cmd, caddr_t data);
 static void	ae_stop(ae_softc_t *sc);
 static int	ae_check_eeprom_present(ae_softc_t *sc, int *vpdc);
 static int	ae_vpd_read_word(ae_softc_t *sc, int reg, uint32_t *word);
@@ -166,7 +164,6 @@ static device_method_t ae_methods[] = {
 	DEVMETHOD(miibus_readreg,	ae_miibus_readreg),
 	DEVMETHOD(miibus_writereg,	ae_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	ae_miibus_statchg),
-
 	{ NULL, NULL }
 };
 static driver_t ae_driver = {
@@ -174,12 +171,11 @@ static driver_t ae_driver = {
         ae_methods,
         sizeof(ae_softc_t)
 };
-static devclass_t ae_devclass;
 
-DRIVER_MODULE(ae, pci, ae_driver, ae_devclass, 0, 0);
+DRIVER_MODULE(ae, pci, ae_driver, 0, 0);
 MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, ae, ae_devs,
     nitems(ae_devs));
-DRIVER_MODULE(miibus, ae, miibus_driver, miibus_devclass, 0, 0);
+DRIVER_MODULE(miibus, ae, miibus_driver, 0, 0);
 MODULE_DEPEND(ae, pci, 1, 1, 1);
 MODULE_DEPEND(ae, ether, 1, 1, 1);
 MODULE_DEPEND(ae, miibus, 1, 1, 1);
@@ -240,7 +236,7 @@ static int
 ae_attach(device_t dev)
 {
 	ae_softc_t *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint8_t chiprev;
 	uint32_t pcirev;
 	int nmsi, pmc;
@@ -337,22 +333,21 @@ ae_attach(device_t dev)
 		goto fail;
 	}
 
-	ifp->if_softc = sc;
+	if_setsoftc(ifp, sc);
 	if_initname(ifp, device_get_name(dev), device_get_unit(dev));
-	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
-	ifp->if_ioctl = ae_ioctl;
-	ifp->if_start = ae_start;
-	ifp->if_init = ae_init;
-	ifp->if_capabilities = IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING;
-	ifp->if_hwassist = 0;
-	ifp->if_snd.ifq_drv_maxlen = ifqmaxlen;
-	IFQ_SET_MAXLEN(&ifp->if_snd, ifp->if_snd.ifq_drv_maxlen);
-	IFQ_SET_READY(&ifp->if_snd);
+	if_setflags(ifp, IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST);
+	if_setioctlfn(ifp, ae_ioctl);
+	if_setstartfn(ifp, ae_start);
+	if_setinitfn(ifp, ae_init);
+	if_setcapabilities(ifp, IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING);
+	if_sethwassist(ifp, 0);
+	if_setsendqlen(ifp, ifqmaxlen);
+	if_setsendqready(ifp);
 	if (pci_find_cap(dev, PCIY_PMG, &pmc) == 0) {
-		ifp->if_capabilities |= IFCAP_WOL_MAGIC;
+		if_setcapabilitiesbit(ifp, IFCAP_WOL_MAGIC, 0);
 		sc->flags |= AE_FLAG_PMG;
 	}
-	ifp->if_capenable = ifp->if_capabilities;
+	if_setcapenable(ifp, if_getcapabilities(ifp));
 
 	/*
 	 * Configure and attach MII bus.
@@ -367,7 +362,7 @@ ae_attach(device_t dev)
 
 	ether_ifattach(ifp, sc->eaddr);
 	/* Tell the upper layer(s) we support long frames. */
-	ifp->if_hdrlen = sizeof(struct ether_vlan_header);
+	if_setifheaderlen(ifp, sizeof(struct ether_vlan_header));
 
 	/*
 	 * Create and run all helper tasks.
@@ -419,13 +414,13 @@ ae_init_tunables(ae_softc_t *sc)
 	ctx = device_get_sysctl_ctx(sc->dev);
 	root = device_get_sysctl_tree(sc->dev);
 	stats = SYSCTL_ADD_NODE(ctx, SYSCTL_CHILDREN(root), OID_AUTO, "stats",
-	    CTLFLAG_RD, NULL, "ae statistics");
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "ae statistics");
 
 	/*
 	 * Receiver statistcics.
 	 */
 	stats_rx = SYSCTL_ADD_NODE(ctx, SYSCTL_CHILDREN(stats), OID_AUTO, "rx",
-	    CTLFLAG_RD, NULL, "Rx MAC statistics");
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "Rx MAC statistics");
 	AE_SYSCTL(ctx, SYSCTL_CHILDREN(stats_rx), "bcast",
 	    "broadcast frames", &ae_stats->rx_bcast);
 	AE_SYSCTL(ctx, SYSCTL_CHILDREN(stats_rx), "mcast",
@@ -451,7 +446,7 @@ ae_init_tunables(ae_softc_t *sc)
 	 * Receiver statistcics.
 	 */
 	stats_tx = SYSCTL_ADD_NODE(ctx, SYSCTL_CHILDREN(stats), OID_AUTO, "tx",
-	    CTLFLAG_RD, NULL, "Tx MAC statistics");
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "Tx MAC statistics");
 	AE_SYSCTL(ctx, SYSCTL_CHILDREN(stats_tx), "bcast",
 	    "broadcast frames", &ae_stats->tx_bcast);
 	AE_SYSCTL(ctx, SYSCTL_CHILDREN(stats_tx), "mcast",
@@ -559,7 +554,7 @@ ae_phy_init(ae_softc_t *sc)
 static int
 ae_init_locked(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	struct mii_data *mii;
 	uint8_t eaddr[ETHER_ADDR_LEN];
 	uint32_t val;
@@ -568,7 +563,7 @@ ae_init_locked(ae_softc_t *sc)
 	AE_LOCK_ASSERT(sc);
 
 	ifp = sc->ifp;
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+	if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 		return (0);
 	mii = device_get_softc(sc->miibus);
 
@@ -586,7 +581,7 @@ ae_init_locked(ae_softc_t *sc)
 	/*
 	 * Set the MAC address.
 	 */
-	bcopy(IF_LLADDR(ifp), eaddr, ETHER_ADDR_LEN);
+	bcopy(if_getlladdr(ifp), eaddr, ETHER_ADDR_LEN);
 	val = eaddr[2] << 24 | eaddr[3] << 16 | eaddr[4] << 8 | eaddr[5];
 	AE_WRITE_4(sc, AE_EADDR0_REG, val);
 	val = eaddr[0] << 8 | eaddr[1];
@@ -655,7 +650,7 @@ ae_init_locked(ae_softc_t *sc)
 	/*
 	 * Configure MTU.
 	 */
-	val = ifp->if_mtu + ETHER_HDR_LEN + ETHER_VLAN_ENCAP_LEN +
+	val = if_getmtu(ifp) + ETHER_HDR_LEN + ETHER_VLAN_ENCAP_LEN +
 	    ETHER_CRC_LEN;
 	AE_WRITE_2(sc, AE_MTU_REG, val);
 
@@ -745,8 +740,8 @@ ae_init_locked(ae_softc_t *sc)
 
 	callout_reset(&sc->tick_ch, hz, ae_tick, sc);
 
-	ifp->if_drv_flags |= IFF_DRV_RUNNING;
-	ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
+	if_setdrvflagbits(ifp, IFF_DRV_RUNNING, 0);
+	if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE);
 
 #ifdef AE_DEBUG
 	device_printf(sc->dev, "Initialization complete.\n");
@@ -759,7 +754,7 @@ static int
 ae_detach(device_t dev)
 {
 	struct ae_softc *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 
 	sc = device_get_softc(dev);
 	KASSERT(sc != NULL, ("[ae: %d]: sc is NULL", __LINE__));
@@ -884,12 +879,12 @@ ae_miibus_statchg(device_t dev)
 }
 
 static void
-ae_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr)
+ae_mediastatus(if_t ifp, struct ifmediareq *ifmr)
 {
 	ae_softc_t *sc;
 	struct mii_data *mii;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	KASSERT(sc != NULL, ("[ae, %d]: sc is NULL", __LINE__));
 
 	AE_LOCK(sc);
@@ -901,7 +896,7 @@ ae_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr)
 }
 
 static int
-ae_mediachange(struct ifnet *ifp)
+ae_mediachange(if_t ifp)
 {
 	ae_softc_t *sc;
 	struct mii_data *mii;
@@ -909,7 +904,7 @@ ae_mediachange(struct ifnet *ifp)
 	int error;
 
 	/* XXX: check IFF_UP ?? */
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	KASSERT(sc != NULL, ("[ae, %d]: sc is NULL", __LINE__));
 	AE_LOCK(sc);
 	mii = device_get_softc(sc->miibus);
@@ -1322,7 +1317,7 @@ ae_powersave_enable(ae_softc_t *sc)
 static void
 ae_pm_init(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	uint32_t val;
 	uint16_t pmstat;
 	struct mii_data *mii;
@@ -1340,7 +1335,7 @@ ae_pm_init(ae_softc_t *sc)
 	/*
 	 * Configure WOL if enabled.
 	 */
-	if ((ifp->if_capenable & IFCAP_WOL) != 0) {
+	if ((if_getcapenable(ifp) & IFCAP_WOL) != 0) {
 		mii = device_get_softc(sc->miibus);
 		mii_pollstat(mii);
 		if ((mii->mii_media_status & IFM_AVALID) != 0 &&
@@ -1362,7 +1357,7 @@ ae_pm_init(ae_softc_t *sc)
 			    IFM_FDX) != 0)
 				val |= AE_MAC_FULL_DUPLEX;
 			AE_WRITE_4(sc, AE_MAC_REG, val);
-
+			    
 		} else {	/* No link. */
 			AE_WRITE_4(sc, AE_WOL_REG, AE_WOL_LNKCHG | \
 			    AE_WOL_LNKCHG_PME);
@@ -1388,7 +1383,7 @@ ae_pm_init(ae_softc_t *sc)
 	if (pci_find_cap(sc->dev, PCIY_PMG, &pmc) == 0) {
 		pmstat = pci_read_config(sc->dev, pmc + PCIR_POWER_STATUS, 2);
 		pmstat &= ~(PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE);
-		if ((ifp->if_capenable & IFCAP_WOL) != 0)
+		if ((if_getcapenable(ifp) & IFCAP_WOL) != 0)
 			pmstat |= PCIM_PSTAT_PME | PCIM_PSTAT_PMEENABLE;
 		pci_write_config(sc->dev, pmc + PCIR_POWER_STATUS, pmstat, 2);
 	}
@@ -1419,7 +1414,7 @@ ae_resume(device_t dev)
 
 	AE_LOCK(sc);
 	AE_READ_4(sc, AE_WOL_REG);	/* Clear WOL status. */
-	if ((sc->ifp->if_flags & IFF_UP) != 0)
+	if ((if_getflags(sc->ifp) & IFF_UP) != 0)
 		ae_init_locked(sc);
 	AE_UNLOCK(sc);
 
@@ -1514,25 +1509,25 @@ ae_encap(ae_softc_t *sc, struct mbuf **m_head)
 }
 
 static void
-ae_start(struct ifnet *ifp)
+ae_start(if_t ifp)
 {
 	ae_softc_t *sc;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	AE_LOCK(sc);
 	ae_start_locked(ifp);
 	AE_UNLOCK(sc);
 }
 
 static void
-ae_start_locked(struct ifnet *ifp)
+ae_start_locked(if_t ifp)
 {
 	ae_softc_t *sc;
 	unsigned int count;
 	struct mbuf *m0;
 	int error;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	KASSERT(sc != NULL, ("[ae, %d]: sc is NULL", __LINE__));
 	AE_LOCK_ASSERT(sc);
 
@@ -1540,21 +1535,21 @@ ae_start_locked(struct ifnet *ifp)
 	if_printf(ifp, "Start called.\n");
 #endif
 
-	if ((ifp->if_drv_flags & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
+	if ((if_getdrvflags(ifp) & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
 	    IFF_DRV_RUNNING || (sc->flags & AE_FLAG_LINK) == 0)
 		return;
 
 	count = 0;
-	while (!IFQ_DRV_IS_EMPTY(&ifp->if_snd)) {
-		IFQ_DRV_DEQUEUE(&ifp->if_snd, m0);
+	while (!if_sendq_empty(ifp)) {
+		m0 = if_dequeue(ifp);
 		if (m0 == NULL)
 			break;	/* Nothing to do. */
 
 		error = ae_encap(sc, &m0);
 		if (error != 0) {
 			if (m0 != NULL) {
-				IFQ_DRV_PREPEND(&ifp->if_snd, m0);
-				ifp->if_drv_flags |= IFF_DRV_OACTIVE;
+				if_sendq_prepend(ifp, m0);
+				if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0);
 #ifdef AE_DEBUG
 				if_printf(ifp, "Setting OACTIVE.\n");
 #endif
@@ -1585,7 +1580,7 @@ ae_link_task(void *arg, int pending)
 {
 	ae_softc_t *sc;
 	struct mii_data *mii;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint32_t val;
 
 	sc = (ae_softc_t *)arg;
@@ -1595,7 +1590,7 @@ ae_link_task(void *arg, int pending)
 	ifp = sc->ifp;
 	mii = device_get_softc(sc->miibus);
 	if (mii == NULL || ifp == NULL ||
-	    (ifp->if_drv_flags & IFF_DRV_RUNNING) == 0) {
+	    (if_getdrvflags(ifp) & IFF_DRV_RUNNING) == 0) {
 		AE_UNLOCK(sc);	/* XXX: could happen? */
 		return;
 	}
@@ -1755,7 +1750,7 @@ static void
 ae_int_task(void *arg, int pending)
 {
 	ae_softc_t *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint32_t val;
 
 	sc = (ae_softc_t *)arg;
@@ -1779,10 +1774,10 @@ ae_int_task(void *arg, int pending)
 	if_printf(ifp, "Interrupt received: 0x%08x\n", val);
 #endif
 
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
+	if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0) {
 		if ((val & (AE_ISR_DMAR_TIMEOUT | AE_ISR_DMAW_TIMEOUT |
 		    AE_ISR_PHY_LINKDOWN)) != 0) {
-			ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
+			if_setdrvflagbits(ifp, 0, IFF_DRV_RUNNING);
 			ae_init_locked(sc);
 			AE_UNLOCK(sc);
 			return;
@@ -1797,7 +1792,7 @@ ae_int_task(void *arg, int pending)
 		AE_WRITE_4(sc, AE_ISR_REG, 0);
 
 		if ((sc->flags & AE_FLAG_TXAVAIL) != 0) {
-			if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+			if (!if_sendq_empty(ifp))
 				ae_start_locked(ifp);
 		}
 	}
@@ -1808,7 +1803,7 @@ ae_int_task(void *arg, int pending)
 static void
 ae_tx_intr(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	ae_txd_t *txd;
 	ae_txs_t *txs;
 	uint16_t flags;
@@ -1864,7 +1859,7 @@ ae_tx_intr(ae_softc_t *sc)
 	}
 
 	if ((sc->flags & AE_FLAG_TXAVAIL) != 0)
-		ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
+		if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE);
 	if (sc->tx_inproc < 0) {
 		if_printf(ifp, "Received stray Tx interrupt(s).\n");
 		sc->tx_inproc = 0;
@@ -1885,7 +1880,7 @@ ae_tx_intr(ae_softc_t *sc)
 static void
 ae_rxeof(ae_softc_t *sc, ae_rxd_t *rxd)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	struct mbuf *m;
 	unsigned int size;
 	uint16_t flags;
@@ -1911,7 +1906,7 @@ ae_rxeof(ae_softc_t *sc, ae_rxd_t *rxd)
 		return;
 	}
 
-	if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0 &&
+	if ((if_getcapenable(ifp) & IFCAP_VLAN_HWTAGGING) != 0 &&
 	    (flags & AE_RXD_HAS_VLAN) != 0) {
 		m->m_pkthdr.ether_vtag = AE_RXD_VLAN(le16toh(rxd->vlan));
 		m->m_flags |= M_VLANTAG;
@@ -1922,7 +1917,7 @@ ae_rxeof(ae_softc_t *sc, ae_rxd_t *rxd)
 	 * Pass it through.
 	 */
 	AE_UNLOCK(sc);
-	(*ifp->if_input)(ifp, m);
+	if_input(ifp, m);
 	AE_LOCK(sc);
 }
 
@@ -1930,7 +1925,7 @@ static void
 ae_rx_intr(ae_softc_t *sc)
 {
 	ae_rxd_t *rxd;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint16_t flags;
 	int count;
 
@@ -1979,7 +1974,7 @@ ae_rx_intr(ae_softc_t *sc)
 static void
 ae_watchdog(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 
 	KASSERT(sc != NULL, ("[ae, %d]: sc is NULL!", __LINE__));
 	AE_LOCK_ASSERT(sc);
@@ -1994,9 +1989,9 @@ ae_watchdog(ae_softc_t *sc)
 		if_printf(ifp, "watchdog timeout - resetting.\n");
 
 	if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
-	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
+	if_setdrvflagbits(ifp, 0, IFF_DRV_RUNNING);
 	ae_init_locked(sc);
-	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+	if (!if_sendq_empty(ifp))
 		ae_start_locked(ifp);
 }
 
@@ -2019,24 +2014,33 @@ ae_tick(void *arg)
 static void
 ae_rxvlan(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	uint32_t val;
 
 	AE_LOCK_ASSERT(sc);
 	ifp = sc->ifp;
 	val = AE_READ_4(sc, AE_MAC_REG);
 	val &= ~AE_MAC_RMVLAN_EN;
-	if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0)
+	if ((if_getcapenable(ifp) & IFCAP_VLAN_HWTAGGING) != 0)
 		val |= AE_MAC_RMVLAN_EN;
 	AE_WRITE_4(sc, AE_MAC_REG, val);
+}
+
+static u_int
+ae_hash_maddr(void *arg, struct sockaddr_dl *sdl, u_int cnt)
+{
+	uint32_t crc, *mchash = arg;
+
+	crc = ether_crc32_be(LLADDR(sdl), ETHER_ADDR_LEN);
+	mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
+
+	return (1);
 }
 
 static void
 ae_rxfilter(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
-	struct ifmultiaddr *ifma;
-	uint32_t crc;
+	if_t ifp;
 	uint32_t mchash[2];
 	uint32_t rxcfg;
 
@@ -2049,11 +2053,11 @@ ae_rxfilter(ae_softc_t *sc)
 	rxcfg = AE_READ_4(sc, AE_MAC_REG);
 	rxcfg &= ~(AE_MAC_MCAST_EN | AE_MAC_BCAST_EN | AE_MAC_PROMISC_EN);
 
-	if ((ifp->if_flags & IFF_BROADCAST) != 0)
+	if ((if_getflags(ifp) & IFF_BROADCAST) != 0)
 		rxcfg |= AE_MAC_BCAST_EN;
-	if ((ifp->if_flags & IFF_PROMISC) != 0)
+	if ((if_getflags(ifp) & IFF_PROMISC) != 0)
 		rxcfg |= AE_MAC_PROMISC_EN;
-	if ((ifp->if_flags & IFF_ALLMULTI) != 0)
+	if ((if_getflags(ifp) & IFF_ALLMULTI) != 0)
 		rxcfg |= AE_MAC_MCAST_EN;
 
 	/*
@@ -2061,7 +2065,7 @@ ae_rxfilter(ae_softc_t *sc)
 	 */
 	AE_WRITE_4(sc, AE_REG_MHT0, 0);
 	AE_WRITE_4(sc, AE_REG_MHT1, 0);
-	if ((ifp->if_flags & (IFF_PROMISC | IFF_ALLMULTI)) != 0) {
+	if ((if_getflags(ifp) & (IFF_PROMISC | IFF_ALLMULTI)) != 0) {
 		AE_WRITE_4(sc, AE_REG_MHT0, 0xffffffff);
 		AE_WRITE_4(sc, AE_REG_MHT1, 0xffffffff);
 		AE_WRITE_4(sc, AE_MAC_REG, rxcfg);
@@ -2072,29 +2076,21 @@ ae_rxfilter(ae_softc_t *sc)
 	 * Load multicast tables.
 	 */
 	bzero(mchash, sizeof(mchash));
-	if_maddr_rlock(ifp);
-	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
-		if (ifma->ifma_addr->sa_family != AF_LINK)
-			continue;
-		crc = ether_crc32_be(LLADDR((struct sockaddr_dl *)
-			ifma->ifma_addr), ETHER_ADDR_LEN);
-		mchash[crc >> 31] |= 1 << ((crc >> 26) & 0x1f);
-	}
-	if_maddr_runlock(ifp);
+	if_foreach_llmaddr(ifp, ae_hash_maddr, &mchash);
 	AE_WRITE_4(sc, AE_REG_MHT0, mchash[0]);
 	AE_WRITE_4(sc, AE_REG_MHT1, mchash[1]);
 	AE_WRITE_4(sc, AE_MAC_REG, rxcfg);
 }
 
 static int
-ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
+ae_ioctl(if_t ifp, u_long cmd, caddr_t data)
 {
 	struct ae_softc *sc;
 	struct ifreq *ifr;
 	struct mii_data *mii;
 	int error, mask;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	ifr = (struct ifreq *)data;
 	error = 0;
 
@@ -2102,11 +2098,11 @@ ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 	case SIOCSIFMTU:
 		if (ifr->ifr_mtu < ETHERMIN || ifr->ifr_mtu > ETHERMTU)
 			error = EINVAL;
-		else if (ifp->if_mtu != ifr->ifr_mtu) {
+		else if (if_getmtu(ifp) != ifr->ifr_mtu) {
 			AE_LOCK(sc);
-			ifp->if_mtu = ifr->ifr_mtu;
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
-				ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
+			if_setmtu(ifp, ifr->ifr_mtu);
+			if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0) {
+				if_setdrvflagbits(ifp, 0, IFF_DRV_RUNNING);
 				ae_init_locked(sc);
 			}
 			AE_UNLOCK(sc);
@@ -2114,9 +2110,9 @@ ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		break;
 	case SIOCSIFFLAGS:
 		AE_LOCK(sc);
-		if ((ifp->if_flags & IFF_UP) != 0) {
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
-				if (((ifp->if_flags ^ sc->if_flags)
+		if ((if_getflags(ifp) & IFF_UP) != 0) {
+			if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0) {
+				if (((if_getflags(ifp) ^ sc->if_flags)
 				    & (IFF_PROMISC | IFF_ALLMULTI)) != 0)
 					ae_rxfilter(sc);
 			} else {
@@ -2124,16 +2120,16 @@ ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 					ae_init_locked(sc);
 			}
 		} else {
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+			if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 				ae_stop(sc);
 		}
-		sc->if_flags = ifp->if_flags;
+		sc->if_flags = if_getflags(ifp);
 		AE_UNLOCK(sc);
 		break;
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
 		AE_LOCK(sc);
-		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 			ae_rxfilter(sc);
 		AE_UNLOCK(sc);
 		break;
@@ -2144,10 +2140,10 @@ ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		break;
 	case SIOCSIFCAP:
 		AE_LOCK(sc);
-		mask = ifr->ifr_reqcap ^ ifp->if_capenable;
+		mask = ifr->ifr_reqcap ^ if_getcapenable(ifp);
 		if ((mask & IFCAP_VLAN_HWTAGGING) != 0 &&
-		    (ifp->if_capabilities & IFCAP_VLAN_HWTAGGING) != 0) {
-			ifp->if_capenable ^= IFCAP_VLAN_HWTAGGING;
+		    (if_getcapabilities(ifp) & IFCAP_VLAN_HWTAGGING) != 0) {
+			if_togglecapenable(ifp, IFCAP_VLAN_HWTAGGING);
 			ae_rxvlan(sc);
 		}
 		VLAN_CAPABILITIES(ifp);
@@ -2163,13 +2159,13 @@ ae_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 static void
 ae_stop(ae_softc_t *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	int i;
 
 	AE_LOCK_ASSERT(sc);
 
 	ifp = sc->ifp;
-	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
+	if_setdrvflagbits(ifp, 0, (IFF_DRV_RUNNING | IFF_DRV_OACTIVE));
 	sc->flags &= ~AE_FLAG_LINK;
 	sc->wd_timer = 0;	/* Cancel watchdog. */
 	callout_stop(&sc->tick_ch);

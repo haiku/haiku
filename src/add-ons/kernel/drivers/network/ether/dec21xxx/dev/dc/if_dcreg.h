@@ -30,8 +30,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/dc/if_dcreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 /*
@@ -734,7 +732,7 @@ struct dc_type {
 /* End of ULi M5263 specific registers */
 
 struct dc_softc {
-	struct ifnet		*dc_ifp;	/* interface info */
+	if_t			dc_ifp;		/* interface info */
 	device_t		dc_dev;		/* device info */
 	bus_space_handle_t	dc_bhandle;	/* bus space handle */
 	bus_space_tag_t		dc_btag;	/* bus space tag */

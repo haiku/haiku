@@ -1,4 +1,3 @@
-/* $FreeBSD: releng/12.0/sys/dev/mii/e1000phyreg.h 326022 2017-11-20 19:36:21Z pfg $ */
 /*-
  * Principal Author: Parag Patel
  * Copyright (c) 2001

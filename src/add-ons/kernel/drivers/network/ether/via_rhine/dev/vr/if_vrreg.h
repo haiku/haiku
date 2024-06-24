@@ -30,8 +30,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/vr/if_vrreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 /*
@@ -491,7 +489,6 @@ struct vr_desc {
 #define	VR_RXCTL_RXLERR		0x00800000	/* 6105M */
 #define VR_RXCTL_RX_INTR	0x00800000
 
-
 #define VR_RXCTL (VR_RXCTL_CHAIN|VR_RXCTL_RX_INTR)
 
 #define VR_TXSTAT_DEFER		0x00000001
@@ -525,7 +522,6 @@ struct vr_desc {
 #define VR_FLAG_FORCEDELAY	1
 #define VR_FLAG_SCHEDDELAY	2
 #define VR_FLAG_DELAYTIMEO	3
-
 
 #define VR_TIMEOUT		1000
 #define VR_MII_TIMEOUT		10000
@@ -713,7 +709,7 @@ struct vr_statistics {
 };
 
 struct vr_softc {
-	struct ifnet		*vr_ifp;	/* interface info */
+	if_t			vr_ifp;	/* interface info */
 	device_t		vr_dev;
 	struct resource		*vr_res;
 	int			vr_res_id;

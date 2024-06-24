@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2008, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
@@ -25,8 +25,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/jme/if_jmereg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef	_IF_JMEREG_H
@@ -180,7 +178,7 @@
  * Misc registers         128 bytes     BAR2 + 0x80 ~       BAR0 + 0x800 ~
  *                                       BAR2 + 0x7F         BAR0 + 0x87F
  * -----------------------------------------------------------------------
- * To simplify register access fuctions and to get better performance
+ * To simplify register access functions and to get better performance
  * this driver doesn't support IO space access. It could be implemented
  * as a function which selects appropriate BARs to access requested
  * register.

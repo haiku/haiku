@@ -1,7 +1,7 @@
 /*	$NetBSD: nsphyterreg.h,v 1.4 2005/12/11 12:22:42 christos Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1999, 2001 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -30,8 +30,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/mii/nsphyterreg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef _DEV_MII_NSPHYTERREG_H_
@@ -71,13 +69,11 @@
 #define	PHYSTS_MP_JABBER	0x0020	/* jabber detect */
 #define	PHYSTS_MP_NWAYCOMP	0x0010	/* NWAY complete */
 
-
 #define	MII_NSPHYTER_MIPSCR	0x11	/* MII interrupt PHY specific
 					   control */
 
 #define	MIPSCR_INTEN		0x0002	/* interrupt enable */
 #define	MIPSCR_TINT		0x0001	/* test interrupt */
-
 
 #define	MII_NSPHYTER_MIPGSR	0x12	/* MII interrupt PHY generic
 					   status */
@@ -95,7 +91,6 @@
 #define	MII_NSPHYTER_FCSCR	0x14	/* False carrier sense counter */
 
 #define	MII_NSPHYTER_RECR	0x15	/* Receive error counter */
-
 
 #define	MII_NSPHYTER_PCSR	0x16	/* PCS configuration and status */
 #define	PCSR_SINGLE_SD		0x8000	/* single-ended SD mode */
@@ -121,7 +116,6 @@
 #define	PCSR_MP_SD_OPTION	0x0100	/* enhanced signal detection alg. */
 #define	PCSR_MP_NRZI_BYPASS	0x0004	/* NRZI bypass enabled */
 
-
 	/* The bits below are not on MacPHYTER. */
 #define	MII_NSPHYTER_LBR	0x17	/* loopback and bypass */
 #define	LBR_BP_STRETCH		0x4000	/* bypass LED stretching */
@@ -132,7 +126,6 @@
 #define	LBR_100_DP_CTL		0x0380	/* 100Mb/s data patch control */
 #define	LBR_TW_LBEN		0x0020	/* TWISTER loopback enable */
 #define	LBR_10_ENDEC_LB		0x0010	/* 10Mb/s ENDEC loopback */
-
 
 	/* The bits below are not on MacPHYTER. */
 #define	MII_NSPHYTER_10BTSCR	0x18	/* 10baseT status and control */
@@ -150,7 +143,6 @@
 #define	BTSCR_THIN_SEL		0x0008	/* thin ethernet select */
 #define	BTSCR_TX_FILT_DS	0x0004	/* TPI receive filter disable */
 
-
 #define	MII_NSPHYTER_PHYCTRL	0x19	/* PHY control */
 #define	PHYCTRL_TW_EQSEL	0x3000	/* TWISTER e.q. select */
 #define	PHYCTRL_BLW_DS		0x0800	/* TWISTER base line wander disable */
@@ -165,7 +157,6 @@
 #define	PHYCTRL_MP_BIST_START	0x0200	/* start BIST */
 #define	PHYCTRL_MP_BP_STRETCH	0x0100	/* bypass LED stretching */
 #define	PHYCTRL_MP_PAUSE_STS	0x0080	/* pause status */
-
 
 	/* The bits below are MacPHYTER only. */
 #define	MII_MACPHYTER_TBTCTL	0x1a	/* 10baseT Control */

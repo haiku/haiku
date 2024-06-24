@@ -14,8 +14,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/nfe/if_nfevar.h 216925 2011-01-03 18:28:30Z jhb $
  */
 
 struct nfe_tx_data {
@@ -104,7 +102,7 @@ struct nfe_hw_stats {
 };
 
 struct nfe_softc {
-	struct ifnet		*nfe_ifp;
+	if_t			nfe_ifp;
 	device_t		nfe_dev;
 	uint16_t		nfe_devid;
 	uint16_t		nfe_revid;

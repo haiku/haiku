@@ -30,8 +30,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/mii/amphyreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 #ifndef _DEV_MII_AMTPHYREG_H_
@@ -40,7 +38,6 @@
 /*
  * AMD Am79C873 registers.
  */
-
 
 #define MII_AMPHY_DSCR		0x10	/* Specified configuration register */a
 #define DSCR_BP4B5B		0x8000	/* Bypass 4B5B encoding */

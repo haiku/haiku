@@ -33,8 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/dc/dcphy.c 325966 2017-11-18 14:26:50Z pfg $");
-
 /*
  * Pseudo-driver for internal NWAY support on DEC 21143 and workalike
  * controllers.  Technically we're abusing the miibus code to handle
@@ -101,15 +99,13 @@ static device_method_t dcphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t dcphy_devclass;
-
 static driver_t dcphy_driver = {
 	"dcphy",
 	dcphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(dcphy, miibus, dcphy_driver, dcphy_devclass, 0, 0);
+DRIVER_MODULE(dcphy, miibus, dcphy_driver, 0, 0);
 
 static int	dcphy_service(struct mii_softc *, struct mii_data *, int);
 static void	dcphy_status(struct mii_softc *);

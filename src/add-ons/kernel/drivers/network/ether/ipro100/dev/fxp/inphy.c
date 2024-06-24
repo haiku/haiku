@@ -31,8 +31,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/fxp/inphy.c 326022 2017-11-20 19:36:21Z pfg $");
-
 /*
  * driver for Intel 82553 and 82555 PHYs
  */
@@ -68,15 +66,13 @@ static device_method_t inphy_methods[] = {
 	{ 0, 0 }
 };
 
-static devclass_t inphy_devclass;
-
 static driver_t inphy_driver = {
 	"inphy",
 	inphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(inphy, miibus, inphy_driver, inphy_devclass, 0, 0);
+DRIVER_MODULE(inphy, miibus, inphy_driver, 0, 0);
 
 static int	inphy_service(struct mii_softc *, struct mii_data *, int);
 static void	inphy_status(struct mii_softc *);

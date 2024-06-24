@@ -1,7 +1,7 @@
 /*	$NetBSD: nsphy.c,v 1.18 1999/07/14 23:57:36 thorpej Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD AND BSD-2-Clause
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1998, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -57,8 +57,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/nsphy.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * driver for National Semiconductor's DP83840A ethernet 10/100 PHY
  * Data Sheet available from www.national.com
@@ -96,15 +94,13 @@ static device_method_t nsphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t nsphy_devclass;
-
 static driver_t nsphy_driver = {
 	"nsphy",
 	nsphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(nsphy, miibus, nsphy_driver, nsphy_devclass, 0, 0);
+DRIVER_MODULE(nsphy, miibus, nsphy_driver, 0, 0);
 
 static int	nsphy_service(struct mii_softc *, struct mii_data *, int);
 static void	nsphy_status(struct mii_softc *);
@@ -131,15 +127,8 @@ nsphy_probe(device_t dev)
 static int
 nsphy_attach(device_t dev)
 {
-	u_int flags;
 
-	flags = MIIF_NOMANPAUSE;
-	/*
-	 * Am79C971 wedge when isolating all of their external PHYs.
-	 */
-	if (mii_dev_mac_match(dev,"pcn"))
-		flags |= MIIF_NOISOLATE;
-	mii_phy_dev_attach(dev, flags, &nsphy_funcs, 1);
+	mii_phy_dev_attach(dev, MIIF_NOMANPAUSE, &nsphy_funcs, 1);
 	return (0);
 }
 

@@ -33,8 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/brgphy.c 325966 2017-11-18 14:26:50Z pfg $");
-
 /*
  * Driver for the Broadcom BCM54xx/57xx 1000baseTX PHY.
  */
@@ -89,15 +87,13 @@ static device_method_t brgphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t brgphy_devclass;
-
 static driver_t brgphy_driver = {
 	"brgphy",
 	brgphy_methods,
 	sizeof(struct brgphy_softc)
 };
 
-DRIVER_MODULE(brgphy, miibus, brgphy_driver, brgphy_devclass, 0, 0);
+DRIVER_MODULE(brgphy, miibus, brgphy_driver, 0, 0);
 
 static int	brgphy_service(struct mii_softc *, struct mii_data *, int);
 static void	brgphy_setmedia(struct mii_softc *, int);
@@ -115,6 +111,7 @@ static void	brgphy_fixup_ber_bug(struct mii_softc *);
 static void	brgphy_fixup_crc_bug(struct mii_softc *);
 static void	brgphy_fixup_jitter_bug(struct mii_softc *);
 static void	brgphy_ethernet_wirespeed(struct mii_softc *);
+static void	brgphy_bcm54xx_clock_delay(struct mii_softc *);
 static void	brgphy_jumbo_settings(struct mii_softc *, u_long);
 
 static const struct mii_phydesc brgphys[] = {
@@ -152,11 +149,14 @@ static const struct mii_phydesc brgphys[] = {
 #ifdef notyet	/* better handled by ukphy(4) until WARs are implemented */
 	MII_PHY_DESC(BROADCOM2, BCM5785),
 #endif
+	MII_PHY_DESC(BROADCOM3, BCM54616S),
+	MII_PHY_DESC(BROADCOM3, BCM54618SE),
 	MII_PHY_DESC(BROADCOM3, BCM5717C),
 	MII_PHY_DESC(BROADCOM3, BCM5719C),
 	MII_PHY_DESC(BROADCOM3, BCM5720C),
 	MII_PHY_DESC(BROADCOM3, BCM57765),
 	MII_PHY_DESC(BROADCOM3, BCM57780),
+	MII_PHY_DESC(BROADCOM4, BCM54213PE),
 	MII_PHY_DESC(BROADCOM4, BCM5725C),
 	MII_PHY_DESC(xxBROADCOM_ALT1, BCM5906),
 	MII_PHY_END
@@ -378,7 +378,6 @@ brgphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 		if (sc->mii_ticks <= sc->mii_anegticks)
 			break;
 
-
 		/* Retry autonegotiation */
 		sc->mii_ticks = 0;
 		brgphy_mii_phy_auto(sc, ife->ifm_media);
@@ -413,6 +412,12 @@ brgphy_service(struct mii_softc *sc, struct mii_data *mii, int cmd)
 				break;
 			}
 			break;
+		case MII_OUI_BROADCOM4:
+			switch (sc->mii_mpd_model) {
+			case MII_MODEL_BROADCOM4_BCM54213PE:
+				brgphy_bcm54xx_clock_delay(sc);
+				break;
+			}
 		}
 	}
 	mii_phy_update(sc, cmd);
@@ -863,6 +868,37 @@ brgphy_ethernet_wirespeed(struct mii_softc *sc)
 }
 
 static void
+brgphy_bcm54xx_clock_delay(struct mii_softc *sc)
+{
+	uint16_t val;
+
+	if (!(sc->mii_flags & (MIIF_RX_DELAY | MIIF_TX_DELAY)))
+		/* Adjusting the clocks in rgmii mode causes packet losses. */
+		return;
+
+	PHY_WRITE(sc, BRGPHY_MII_AUXCTL, BRGPHY_AUXCTL_SHADOW_MISC |
+	    BRGPHY_AUXCTL_SHADOW_MISC << BRGPHY_AUXCTL_MISC_READ_SHIFT);
+	val = PHY_READ(sc, BRGPHY_MII_AUXCTL);
+	val &= BRGPHY_AUXCTL_MISC_DATA_MASK;
+	if (sc->mii_flags & MIIF_RX_DELAY)
+		val |= BRGPHY_AUXCTL_MISC_RGMII_SKEW_EN;
+	else
+		val &= ~BRGPHY_AUXCTL_MISC_RGMII_SKEW_EN;
+	PHY_WRITE(sc, BRGPHY_MII_AUXCTL, BRGPHY_AUXCTL_MISC_WRITE_EN |
+	    BRGPHY_AUXCTL_SHADOW_MISC | val);
+
+	PHY_WRITE(sc, BRGPHY_MII_SHADOW_1C, BRGPHY_SHADOW_1C_CLK_CTRL);
+	val = PHY_READ(sc, BRGPHY_MII_SHADOW_1C);
+	val &= BRGPHY_SHADOW_1C_DATA_MASK;
+	if (sc->mii_flags & MIIF_TX_DELAY)
+		val |= BRGPHY_SHADOW_1C_GTXCLK_EN;
+	else
+		val &= ~BRGPHY_SHADOW_1C_GTXCLK_EN;
+	PHY_WRITE(sc, BRGPHY_MII_SHADOW_1C, BRGPHY_SHADOW_1C_WRITE_EN |
+	    BRGPHY_SHADOW_1C_CLK_CTRL | val);
+}
+
+static void
 brgphy_jumbo_settings(struct mii_softc *sc, u_long mtu)
 {
 	uint32_t	val;
@@ -991,7 +1027,6 @@ brgphy_reset(struct mii_softc *sc)
 	} else if (bce_sc) {
 		if (BCE_CHIP_NUM(bce_sc) == BCE_CHIP_NUM_5708 &&
 			(bce_sc->bce_phy_flags & BCE_PHY_SERDES_FLAG)) {
-
 			/* Store autoneg capabilities/results in digital block (Page 0) */
 			PHY_WRITE(sc, BRGPHY_5708S_BLOCK_ADDR, BRGPHY_5708S_DIG3_PG2);
 			PHY_WRITE(sc, BRGPHY_5708S_PG2_DIGCTL_3_0,
@@ -1040,7 +1075,6 @@ brgphy_reset(struct mii_softc *sc)
 			}
 		} else if (BCE_CHIP_NUM(bce_sc) == BCE_CHIP_NUM_5709 &&
 			(bce_sc->bce_phy_flags & BCE_PHY_SERDES_FLAG)) {
-
 			/* Select the SerDes Digital block of the AN MMD. */
 			PHY_WRITE(sc, BRGPHY_BLOCK_ADDR, BRGPHY_BLOCK_ADDR_SERDES_DIG);
 			val = PHY_READ(sc, BRGPHY_SERDES_DIG_1000X_CTL1);

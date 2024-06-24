@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1995, David Greenman
  * Copyright (c) 2001 Jonathan Lemon <jlemon@freebsd.org>
@@ -30,8 +30,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/fxp/if_fxp.c 338948 2018-09-26 17:12:14Z imp $");
-
 /*
  * Intel EtherExpress Pro/100B PCI Fast Ethernet driver
  */
@@ -245,7 +243,7 @@ static void		fxp_discard_rfabuf(struct fxp_softc *sc,
 			    struct fxp_rx *rxp);
 static int		fxp_new_rfabuf(struct fxp_softc *sc,
 			    struct fxp_rx *rxp);
-static int		fxp_mc_addrs(struct fxp_softc *sc);
+static void		fxp_mc_addrs(struct fxp_softc *sc);
 static void		fxp_mc_setup(struct fxp_softc *sc);
 static uint16_t		fxp_eeprom_getword(struct fxp_softc *sc, int offset,
 			    int autosize);
@@ -303,13 +301,10 @@ static driver_t fxp_driver = {
 	sizeof(struct fxp_softc),
 };
 
-static devclass_t fxp_devclass;
-
-DRIVER_MODULE_ORDERED(fxp, pci, fxp_driver, fxp_devclass, NULL, NULL,
-    SI_ORDER_ANY);
+DRIVER_MODULE_ORDERED(fxp, pci, fxp_driver, NULL, NULL, SI_ORDER_ANY);
 MODULE_PNP_INFO("U16:vendor;U16:device", pci, fxp, fxp_ident_table,
     nitems(fxp_ident_table) - 1);
-DRIVER_MODULE(miibus, fxp, miibus_driver, miibus_devclass, NULL, NULL);
+DRIVER_MODULE(miibus, fxp, miibus_driver, NULL, NULL);
 
 static struct resource_spec fxp_res_spec_mem[] = {
 	{ SYS_RES_MEMORY,	FXP_PCI_MMBA,	RF_ACTIVE },
@@ -667,8 +662,7 @@ fxp_attach(device_t dev)
 	error = bus_dma_tag_create(bus_get_dma_tag(dev), 2, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    sc->maxsegsize * sc->maxtxseg + sizeof(struct ether_vlan_header),
-	    sc->maxtxseg, sc->maxsegsize, 0,
-	    busdma_lock_mutex, &Giant, &sc->fxp_txmtag);
+	    sc->maxtxseg, sc->maxsegsize, 0, NULL, NULL, &sc->fxp_txmtag);
 	if (error) {
 		device_printf(dev, "could not create TX DMA tag\n");
 		goto fail;
@@ -676,8 +670,7 @@ fxp_attach(device_t dev)
 
 	error = bus_dma_tag_create(bus_get_dma_tag(dev), 2, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
-	    MCLBYTES, 1, MCLBYTES, 0,
-	    busdma_lock_mutex, &Giant, &sc->fxp_rxmtag);
+	    MCLBYTES, 1, MCLBYTES, 0, NULL, NULL, &sc->fxp_rxmtag);
 	if (error) {
 		device_printf(dev, "could not create RX DMA tag\n");
 		goto fail;
@@ -686,7 +679,7 @@ fxp_attach(device_t dev)
 	error = bus_dma_tag_create(bus_get_dma_tag(dev), 4, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    sizeof(struct fxp_stats), 1, sizeof(struct fxp_stats), 0,
-	    busdma_lock_mutex, &Giant, &sc->fxp_stag);
+	    NULL, NULL, &sc->fxp_stag);
 	if (error) {
 		device_printf(dev, "could not create stats DMA tag\n");
 		goto fail;
@@ -708,8 +701,7 @@ fxp_attach(device_t dev)
 
 	error = bus_dma_tag_create(bus_get_dma_tag(dev), 4, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
-	    FXP_TXCB_SZ, 1, FXP_TXCB_SZ, 0,
-	    busdma_lock_mutex, &Giant, &sc->cbl_tag);
+	    FXP_TXCB_SZ, 1, FXP_TXCB_SZ, 0, NULL, NULL, &sc->cbl_tag);
 	if (error) {
 		device_printf(dev, "could not create TxCB DMA tag\n");
 		goto fail;
@@ -733,7 +725,7 @@ fxp_attach(device_t dev)
 	error = bus_dma_tag_create(bus_get_dma_tag(dev), 4, 0,
 	    BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 	    sizeof(struct fxp_cb_mcs), 1, sizeof(struct fxp_cb_mcs), 0,
-	    busdma_lock_mutex, &Giant, &sc->mcs_tag);
+	    NULL, NULL, &sc->mcs_tag);
 	if (error) {
 		device_printf(dev,
 		    "could not create multicast setup DMA tag\n");
@@ -1408,7 +1400,6 @@ fxp_start_body(if_t ifp)
 static int
 fxp_encap(struct fxp_softc *sc, struct mbuf **m_head)
 {
-	if_t ifp;
 	struct mbuf *m;
 	struct fxp_tx *txp;
 	struct fxp_cb_tx *cbp;
@@ -1417,7 +1408,6 @@ fxp_encap(struct fxp_softc *sc, struct mbuf **m_head)
 	int error, i, nseg, tcp_payload;
 
 	FXP_LOCK_ASSERT(sc, MA_OWNED);
-	ifp = sc->ifp;
 
 	tcp_payload = 0;
 	tcp = NULL;
@@ -1627,7 +1617,7 @@ fxp_encap(struct fxp_softc *sc, struct mbuf **m_head)
 		cbp->tbd_number = nseg;
 	/* Configure TSO. */
 	if (m->m_pkthdr.csum_flags & CSUM_TSO) {
-		cbp->tbd[-1].tb_size = htole32(m->m_pkthdr.tso_segsz << 16);
+		cbp->tbdtso.tb_size = htole32(m->m_pkthdr.tso_segsz << 16);
 		cbp->tbd[1].tb_size |= htole32(tcp_payload << 16);
 		cbp->ipcb_ip_schedule |= FXP_IPCB_LARGESEND_ENABLE |
 		    FXP_IPCB_IP_CHECKSUM_ENABLE |
@@ -2985,27 +2975,37 @@ fxp_ioctl(if_t ifp, u_long command, caddr_t data)
 	return (error);
 }
 
+static u_int
+fxp_setup_maddr(void *arg, struct sockaddr_dl *sdl, u_int cnt)
+{
+	struct fxp_softc *sc = arg;
+	struct fxp_cb_mcs *mcsp = sc->mcsp;
+
+	if (mcsp->mc_cnt < MAXMCADDR)
+		bcopy(LLADDR(sdl), mcsp->mc_addr[mcsp->mc_cnt * ETHER_ADDR_LEN],
+		    ETHER_ADDR_LEN);
+	mcsp->mc_cnt++;
+	return (1);
+}
+
 /*
  * Fill in the multicast address list and return number of entries.
  */
-static int
+static void
 fxp_mc_addrs(struct fxp_softc *sc)
 {
 	struct fxp_cb_mcs *mcsp = sc->mcsp;
 	if_t ifp = sc->ifp;
-	int nmcasts = 0;
 
 	if ((if_getflags(ifp) & IFF_ALLMULTI) == 0) {
-		if_maddr_rlock(ifp);
-		if_setupmultiaddr(ifp, mcsp->mc_addr, &nmcasts, MAXMCADDR);
-		if (nmcasts >= MAXMCADDR) {
+		mcsp->mc_cnt = 0;
+		if_foreach_llmaddr(sc->ifp, fxp_setup_maddr, sc);
+		if (mcsp->mc_cnt >= MAXMCADDR) {
 			if_setflagbits(ifp, IFF_ALLMULTI, 0);
-			nmcasts = 0;
+			mcsp->mc_cnt = 0;
 		}
-		if_maddr_runlock(ifp);
 	}
-	mcsp->mc_cnt = htole16(nmcasts * ETHER_ADDR_LEN);
-	return (nmcasts);
+	mcsp->mc_cnt = htole16(mcsp->mc_cnt * ETHER_ADDR_LEN);
 }
 
 /*
@@ -3152,12 +3152,12 @@ fxp_sysctl_node(struct fxp_softc *sc)
 	ctx = device_get_sysctl_ctx(sc->dev);
 	child = SYSCTL_CHILDREN(device_get_sysctl_tree(sc->dev));
 
-	SYSCTL_ADD_PROC(ctx, child,
-	    OID_AUTO, "int_delay", CTLTYPE_INT | CTLFLAG_RW,
+	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "int_delay",
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_MPSAFE,
 	    &sc->tunable_int_delay, 0, sysctl_hw_fxp_int_delay, "I",
 	    "FXP driver receive interrupt microcode bundling delay");
-	SYSCTL_ADD_PROC(ctx, child,
-	    OID_AUTO, "bundle_max", CTLTYPE_INT | CTLFLAG_RW,
+	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "bundle_max",
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_MPSAFE,
 	    &sc->tunable_bundle_max, 0, sysctl_hw_fxp_bundle_max, "I",
 	    "FXP driver receive interrupt microcode bundle size limit");
 	SYSCTL_ADD_INT(ctx, child,OID_AUTO, "rnr", CTLFLAG_RD, &sc->rnr, 0,
@@ -3175,13 +3175,13 @@ fxp_sysctl_node(struct fxp_softc *sc)
 	sc->rnr = 0;
 
 	hsp = &sc->fxp_hwstats;
-	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats", CTLFLAG_RD,
-	    NULL, "FXP statistics");
+	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "FXP statistics");
 	parent = SYSCTL_CHILDREN(tree);
 
 	/* Rx MAC statistics. */
-	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx", CTLFLAG_RD,
-	    NULL, "Rx MAC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "Rx MAC statistics");
 	child = SYSCTL_CHILDREN(tree);
 	FXP_SYSCTL_STAT_ADD(ctx, child, "good_frames",
 	    &hsp->rx_good, "Good frames");
@@ -3208,8 +3208,8 @@ fxp_sysctl_node(struct fxp_softc *sc)
 		    &hsp->rx_tco, "TCO frames");
 
 	/* Tx MAC statistics. */
-	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx", CTLFLAG_RD,
-	    NULL, "Tx MAC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "Tx MAC statistics");
 	child = SYSCTL_CHILDREN(tree);
 	FXP_SYSCTL_STAT_ADD(ctx, child, "good_frames",
 	    &hsp->tx_good, "Good frames");

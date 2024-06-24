@@ -33,8 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/ciphy.c 325966 2017-11-18 14:26:50Z pfg $");
-
 /*
  * Driver for the Cicada/Vitesse CS/VSC8xxx 10/100/1000 copper PHY.
  */
@@ -72,15 +70,13 @@ static device_method_t ciphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t ciphy_devclass;
-
 static driver_t ciphy_driver = {
 	"ciphy",
 	ciphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(ciphy, miibus, ciphy_driver, ciphy_devclass, 0, 0);
+DRIVER_MODULE(ciphy, miibus, ciphy_driver, 0, 0);
 
 static int	ciphy_service(struct mii_softc *, struct mii_data *, int);
 static void	ciphy_status(struct mii_softc *);

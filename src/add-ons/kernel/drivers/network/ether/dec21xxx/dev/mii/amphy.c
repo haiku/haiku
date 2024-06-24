@@ -33,8 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/amphy.c 325966 2017-11-18 14:26:50Z pfg $");
-
 /*
  * driver for AMD AM79c873 PHYs
  * This driver also works for Davicom DM910{1,2} PHYs, which appear
@@ -71,15 +69,13 @@ static device_method_t amphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t amphy_devclass;
-
 static driver_t amphy_driver = {
 	"amphy",
 	amphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(amphy, miibus, amphy_driver, amphy_devclass, 0, 0);
+DRIVER_MODULE(amphy, miibus, amphy_driver, 0, 0);
 
 static int	amphy_service(struct mii_softc *, struct mii_data *, int);
 static void	amphy_status(struct mii_softc *);

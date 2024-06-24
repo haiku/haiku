@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2010, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
@@ -30,8 +30,6 @@
 /* Driver for DM&P Electronics, Inc, Vortex86 RDC R6040 FastEthernet. */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/vte/if_vte.c 333813 2018-05-18 20:13:34Z mmacy $");
-
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/bus.h>
@@ -102,7 +100,7 @@ static const struct vte_ident *
 		vte_find_ident(device_t);
 #ifndef __NO_STRICT_ALIGNMENT
 static struct mbuf *
-		vte_fixup_rx(struct ifnet *, struct mbuf *);
+		vte_fixup_rx(if_t, struct mbuf *);
 #endif
 static void	vte_get_macaddr(struct vte_softc *);
 static void	vte_init(void *);
@@ -110,15 +108,15 @@ static void	vte_init_locked(struct vte_softc *);
 static int	vte_init_rx_ring(struct vte_softc *);
 static int	vte_init_tx_ring(struct vte_softc *);
 static void	vte_intr(void *);
-static int	vte_ioctl(struct ifnet *, u_long, caddr_t);
-static uint64_t	vte_get_counter(struct ifnet *, ift_counter);
+static int	vte_ioctl(if_t, u_long, caddr_t);
+static uint64_t	vte_get_counter(if_t, ift_counter);
 static void	vte_mac_config(struct vte_softc *);
 static int	vte_miibus_readreg(device_t, int, int);
 static void	vte_miibus_statchg(device_t);
 static int	vte_miibus_writereg(device_t, int, int, int);
-static int	vte_mediachange(struct ifnet *);
-static int	vte_mediachange_locked(struct ifnet *);
-static void	vte_mediastatus(struct ifnet *, struct ifmediareq *);
+static int	vte_mediachange(if_t);
+static int	vte_mediachange_locked(if_t);
+static void	vte_mediastatus(if_t, struct ifmediareq *);
 static int	vte_newbuf(struct vte_softc *, struct vte_rxdesc *);
 static int	vte_probe(device_t);
 static void	vte_reset(struct vte_softc *);
@@ -126,7 +124,7 @@ static int	vte_resume(device_t);
 static void	vte_rxeof(struct vte_softc *);
 static void	vte_rxfilter(struct vte_softc *);
 static int	vte_shutdown(device_t);
-static void	vte_start(struct ifnet *);
+static void	vte_start(if_t);
 static void	vte_start_locked(struct vte_softc *);
 static void	vte_start_mac(struct vte_softc *);
 static void	vte_stats_clear(struct vte_softc *);
@@ -164,10 +162,8 @@ static driver_t vte_driver = {
 	sizeof(struct vte_softc)
 };
 
-static devclass_t vte_devclass;
-
-DRIVER_MODULE(vte, pci, vte_driver, vte_devclass, 0, 0);
-DRIVER_MODULE(miibus, vte, miibus_driver, miibus_devclass, 0, 0);
+DRIVER_MODULE(vte, pci, vte_driver, 0, 0);
+DRIVER_MODULE(miibus, vte, miibus_driver, 0, 0);
 
 static int
 vte_miibus_readreg(device_t dev, int phy, int reg)
@@ -221,14 +217,14 @@ vte_miibus_statchg(device_t dev)
 {
 	struct vte_softc *sc;
 	struct mii_data *mii;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint16_t val;
 
 	sc = device_get_softc(dev);
 
 	mii = device_get_softc(sc->vte_miibus);
 	ifp = sc->vte_ifp;
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
+	if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) == 0)
 		return;
 
 	sc->vte_flags &= ~VTE_FLAG_LINK;
@@ -274,14 +270,14 @@ vte_miibus_statchg(device_t dev)
 }
 
 static void
-vte_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr)
+vte_mediastatus(if_t ifp, struct ifmediareq *ifmr)
 {
 	struct vte_softc *sc;
 	struct mii_data *mii;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	VTE_LOCK(sc);
-	if ((ifp->if_flags & IFF_UP) == 0) {
+	if ((if_getflags(ifp) & IFF_UP) == 0) {
 		VTE_UNLOCK(sc);
 		return;
 	}
@@ -294,12 +290,12 @@ vte_mediastatus(struct ifnet *ifp, struct ifmediareq *ifmr)
 }
 
 static int
-vte_mediachange(struct ifnet *ifp)
+vte_mediachange(if_t ifp)
 {
 	struct vte_softc *sc;
 	int error;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	VTE_LOCK(sc);
 	error = vte_mediachange_locked(ifp);
 	VTE_UNLOCK(sc);
@@ -307,14 +303,14 @@ vte_mediachange(struct ifnet *ifp)
 }
 
 static int
-vte_mediachange_locked(struct ifnet *ifp)
+vte_mediachange_locked(if_t ifp)
 {
 	struct vte_softc *sc;
 	struct mii_data *mii;
 	struct mii_softc *miisc;
 	int error;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	mii = device_get_softc(sc->vte_miibus);
 	LIST_FOREACH(miisc, &mii->mii_phys, mii_list)
 		PHY_RESET(miisc);
@@ -377,7 +373,7 @@ static int
 vte_attach(device_t dev)
 {
 	struct vte_softc *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint16_t macid;
 	int error, rid;
 
@@ -446,16 +442,15 @@ vte_attach(device_t dev)
 		goto fail;
 	}
 
-	ifp->if_softc = sc;
+	if_setsoftc(ifp, sc);
 	if_initname(ifp, device_get_name(dev), device_get_unit(dev));
-	ifp->if_flags = IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST;
-	ifp->if_ioctl = vte_ioctl;
-	ifp->if_start = vte_start;
-	ifp->if_init = vte_init;
-	ifp->if_get_counter = vte_get_counter;
-	ifp->if_snd.ifq_drv_maxlen = VTE_TX_RING_CNT - 1;
-	IFQ_SET_MAXLEN(&ifp->if_snd, ifp->if_snd.ifq_drv_maxlen);
-	IFQ_SET_READY(&ifp->if_snd);
+	if_setflags(ifp, IFF_BROADCAST | IFF_SIMPLEX | IFF_MULTICAST);
+	if_setioctlfn(ifp, vte_ioctl);
+	if_setstartfn(ifp, vte_start);
+	if_setinitfn(ifp, vte_init);
+	if_setgetcounterfn(ifp, vte_get_counter);
+	if_setsendqlen(ifp, VTE_TX_RING_CNT - 1);
+	if_setsendqready(ifp);
 
 	/*
 	 * Set up MII bus.
@@ -481,10 +476,10 @@ vte_attach(device_t dev)
 	ether_ifattach(ifp, sc->vte_eaddr);
 
 	/* VLAN capability setup. */
-	ifp->if_capabilities |= IFCAP_VLAN_MTU;
-	ifp->if_capenable = ifp->if_capabilities;
+	if_setcapabilitiesbit(ifp, IFCAP_VLAN_MTU, 0);
+	if_setcapenable(ifp, if_getcapabilities(ifp));
 	/* Tell the upper layer we support VLAN over-sized frames. */
-	ifp->if_hdrlen = sizeof(struct ether_vlan_header);
+	if_setifheaderlen(ifp, sizeof(struct ether_vlan_header));
 
 	error = bus_setup_intr(dev, sc->vte_irq, INTR_TYPE_NET | INTR_MPSAFE,
 	    NULL, vte_intr, sc, &sc->vte_intrhand);
@@ -505,7 +500,7 @@ static int
 vte_detach(device_t dev)
 {
 	struct vte_softc *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 
 	sc = device_get_softc(dev);
 
@@ -564,11 +559,13 @@ vte_sysctl_node(struct vte_softc *sc)
 	child = SYSCTL_CHILDREN(device_get_sysctl_tree(sc->vte_dev));
 
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "int_rx_mod",
-	    CTLTYPE_INT | CTLFLAG_RW, &sc->vte_int_rx_mod, 0,
-	    sysctl_hw_vte_int_mod, "I", "vte RX interrupt moderation");
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT,
+	    &sc->vte_int_rx_mod, 0, sysctl_hw_vte_int_mod, "I",
+	    "vte RX interrupt moderation");
 	SYSCTL_ADD_PROC(ctx, child, OID_AUTO, "int_tx_mod",
-	    CTLTYPE_INT | CTLFLAG_RW, &sc->vte_int_tx_mod, 0,
-	    sysctl_hw_vte_int_mod, "I", "vte TX interrupt moderation");
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT,
+	    &sc->vte_int_tx_mod, 0, sysctl_hw_vte_int_mod, "I",
+	    "vte TX interrupt moderation");
 	/* Pull in device tunables. */
 	sc->vte_int_rx_mod = VTE_IM_RX_BUNDLE_DEFAULT;
 	error = resource_int_value(device_get_name(sc->vte_dev),
@@ -596,13 +593,13 @@ vte_sysctl_node(struct vte_softc *sc)
 		}
 	}
 
-	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats", CTLFLAG_RD,
-	    NULL, "VTE statistics");
+	tree = SYSCTL_ADD_NODE(ctx, child, OID_AUTO, "stats",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "VTE statistics");
 	parent = SYSCTL_CHILDREN(tree);
 
 	/* RX statistics. */
-	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx", CTLFLAG_RD,
-	    NULL, "RX MAC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "rx",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "RX MAC statistics");
 	child = SYSCTL_CHILDREN(tree);
 	VTE_SYSCTL_STAT_ADD32(ctx, child, "good_frames",
 	    &stats->rx_frames, "Good frames");
@@ -625,8 +622,8 @@ vte_sysctl_node(struct vte_softc *sc)
 	    &stats->rx_pause_frames, "Pause control frames");
 
 	/* TX statistics. */
-	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx", CTLFLAG_RD,
-	    NULL, "TX MAC statistics");
+	tree = SYSCTL_ADD_NODE(ctx, parent, OID_AUTO, "tx",
+	    CTLFLAG_RD | CTLFLAG_MPSAFE, NULL, "TX MAC statistics");
 	child = SYSCTL_CHILDREN(tree);
 	VTE_SYSCTL_STAT_ADD32(ctx, child, "good_frames",
 	    &stats->tx_frames, "Good frames");
@@ -943,13 +940,13 @@ static int
 vte_suspend(device_t dev)
 {
 	struct vte_softc *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 
 	sc = device_get_softc(dev);
 
 	VTE_LOCK(sc);
 	ifp = sc->vte_ifp;
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+	if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 		vte_stop(sc);
 	VTE_UNLOCK(sc);
 
@@ -960,14 +957,14 @@ static int
 vte_resume(device_t dev)
 {
 	struct vte_softc *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 
 	sc = device_get_softc(dev);
 
 	VTE_LOCK(sc);
 	ifp = sc->vte_ifp;
-	if ((ifp->if_flags & IFF_UP) != 0) {
-		ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
+	if ((if_getflags(ifp) & IFF_UP) != 0) {
+		if_setdrvflagbits(ifp, 0, IFF_DRV_RUNNING);
 		vte_init_locked(sc);
 	}
 	VTE_UNLOCK(sc);
@@ -1099,11 +1096,11 @@ vte_encap(struct vte_softc *sc, struct mbuf **m_head)
 }
 
 static void
-vte_start(struct ifnet *ifp)
+vte_start(if_t ifp)
 {
 	struct vte_softc *sc;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	VTE_LOCK(sc);
 	vte_start_locked(sc);
 	VTE_UNLOCK(sc);
@@ -1112,24 +1109,24 @@ vte_start(struct ifnet *ifp)
 static void
 vte_start_locked(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	struct vte_txdesc *txd;
 	struct mbuf *m_head;
 	int enq;
 
 	ifp = sc->vte_ifp;
 
-	if ((ifp->if_drv_flags & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
+	if ((if_getdrvflags(ifp) & (IFF_DRV_RUNNING | IFF_DRV_OACTIVE)) !=
 	    IFF_DRV_RUNNING || (sc->vte_flags & VTE_FLAG_LINK) == 0)
 		return;
 
-	for (enq = 0; !IFQ_DRV_IS_EMPTY(&ifp->if_snd); ) {
+	for (enq = 0; !if_sendq_empty(ifp); ) {
 		/* Reserve one free TX descriptor. */
 		if (sc->vte_cdata.vte_tx_cnt >= VTE_TX_RING_CNT - 1) {
-			ifp->if_drv_flags |= IFF_DRV_OACTIVE;
+			if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0);
 			break;
 		}
-		IFQ_DRV_DEQUEUE(&ifp->if_snd, m_head);
+		m_head = if_dequeue(ifp);
 		if (m_head == NULL)
 			break;
 		/*
@@ -1139,7 +1136,7 @@ vte_start_locked(struct vte_softc *sc)
 		 */
 		if ((txd = vte_encap(sc, &m_head)) == NULL) {
 			if (m_head != NULL)
-				IFQ_DRV_PREPEND(&ifp->if_snd, m_head);
+				if_sendq_prepend(ifp, m_head);
 			break;
 		}
 
@@ -1166,7 +1163,7 @@ vte_start_locked(struct vte_softc *sc)
 static void
 vte_watchdog(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 
 	VTE_LOCK_ASSERT(sc);
 
@@ -1176,42 +1173,42 @@ vte_watchdog(struct vte_softc *sc)
 	ifp = sc->vte_ifp;
 	if_printf(sc->vte_ifp, "watchdog timeout -- resetting\n");
 	if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
-	ifp->if_drv_flags &= ~IFF_DRV_RUNNING;
+	if_setdrvflagbits(ifp, 0, IFF_DRV_RUNNING);
 	vte_init_locked(sc);
-	if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+	if (!if_sendq_empty(ifp))
 		vte_start_locked(sc);
 }
 
 static int
-vte_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
+vte_ioctl(if_t ifp, u_long cmd, caddr_t data)
 {
 	struct vte_softc *sc;
 	struct ifreq *ifr;
 	struct mii_data *mii;
 	int error;
 
-	sc = ifp->if_softc;
+	sc = if_getsoftc(ifp);
 	ifr = (struct ifreq *)data;
 	error = 0;
 	switch (cmd) {
 	case SIOCSIFFLAGS:
 		VTE_LOCK(sc);
-		if ((ifp->if_flags & IFF_UP) != 0) {
-			if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0 &&
-			    ((ifp->if_flags ^ sc->vte_if_flags) &
+		if ((if_getflags(ifp) & IFF_UP) != 0) {
+			if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0 &&
+			    ((if_getflags(ifp) ^ sc->vte_if_flags) &
 			    (IFF_PROMISC | IFF_ALLMULTI)) != 0)
 				vte_rxfilter(sc);
 			else
 				vte_init_locked(sc);
-		} else if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		} else if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 			vte_stop(sc);
-		sc->vte_if_flags = ifp->if_flags;
+		sc->vte_if_flags = if_getflags(ifp);
 		VTE_UNLOCK(sc);
 		break;
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
 		VTE_LOCK(sc);
-		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+		if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 			vte_rxfilter(sc);
 		VTE_UNLOCK(sc);
 		break;
@@ -1309,7 +1306,7 @@ vte_stats_update(struct vte_softc *sc)
 }
 
 static uint64_t
-vte_get_counter(struct ifnet *ifp, ift_counter cnt)
+vte_get_counter(if_t ifp, ift_counter cnt)
 {
 	struct vte_softc *sc;
 	struct vte_hw_stats *stat;
@@ -1338,7 +1335,7 @@ static void
 vte_intr(void *arg)
 {
 	struct vte_softc *sc;
-	struct ifnet *ifp;
+	if_t ifp;
 	uint16_t status;
 	int n;
 
@@ -1357,7 +1354,7 @@ vte_intr(void *arg)
 	/* Disable interrupts. */
 	CSR_WRITE_2(sc, VTE_MIER, 0);
 	for (n = 8; (status & VTE_INTRS) != 0;) {
-		if ((ifp->if_drv_flags & IFF_DRV_RUNNING) == 0)
+		if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) == 0)
 			break;
 		if ((status & (MISR_RX_DONE | MISR_RX_DESC_UNAVAIL |
 		    MISR_RX_FIFO_FULL)) != 0)
@@ -1366,7 +1363,7 @@ vte_intr(void *arg)
 			vte_txeof(sc);
 		if ((status & MISR_EVENT_CNT_OFLOW) != 0)
 			vte_stats_update(sc);
-		if (!IFQ_DRV_IS_EMPTY(&ifp->if_snd))
+		if (!if_sendq_empty(ifp))
 			vte_start_locked(sc);
 		if (--n > 0)
 			status = CSR_READ_2(sc, VTE_MISR);
@@ -1374,7 +1371,7 @@ vte_intr(void *arg)
 			break;
 	}
 
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0) {
+	if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0) {
 		/* Re-enable interrupts. */
 		CSR_WRITE_2(sc, VTE_MIER, VTE_INTRS);
 	}
@@ -1384,7 +1381,7 @@ vte_intr(void *arg)
 static void
 vte_txeof(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	struct vte_txdesc *txd;
 	uint16_t status;
 	int cons, prog;
@@ -1422,7 +1419,7 @@ vte_txeof(struct vte_softc *sc)
 	}
 
 	if (prog > 0) {
-		ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
+		if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE);
 		sc->vte_cdata.vte_tx_cons = cons;
 		/*
 		 * Unarm watchdog timer only when there is no pending
@@ -1478,7 +1475,7 @@ vte_newbuf(struct vte_softc *sc, struct vte_rxdesc *rxd)
  */
 #ifndef __NO_STRICT_ALIGNMENT
 static struct mbuf *
-vte_fixup_rx(struct ifnet *ifp, struct mbuf *m)
+vte_fixup_rx(if_t ifp, struct mbuf *m)
 {
         uint16_t *src, *dst;
         int i;
@@ -1496,7 +1493,7 @@ vte_fixup_rx(struct ifnet *ifp, struct mbuf *m)
 static void
 vte_rxeof(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	struct vte_rxdesc *rxd;
 	struct mbuf *m;
 	uint16_t status, total_len;
@@ -1507,7 +1504,7 @@ vte_rxeof(struct vte_softc *sc)
 	    BUS_DMASYNC_POSTWRITE);
 	cons = sc->vte_cdata.vte_rx_cons;
 	ifp = sc->vte_ifp;
-	for (prog = 0; (ifp->if_drv_flags & IFF_DRV_RUNNING) != 0; prog++,
+	for (prog = 0; (if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0; prog++,
 	    VTE_DESC_INC(cons, VTE_RX_RING_CNT)) {
 		rxd = &sc->vte_cdata.vte_rxdesc[cons];
 		status = le16toh(rxd->rx_desc->drst);
@@ -1539,7 +1536,7 @@ vte_rxeof(struct vte_softc *sc)
 		vte_fixup_rx(ifp, m);
 #endif
 		VTE_UNLOCK(sc);
-		(*ifp->if_input)(ifp, m);
+		if_input(ifp, m);
 		VTE_LOCK(sc);
 	}
 
@@ -1603,9 +1600,10 @@ vte_tick(void *arg)
 static void
 vte_reset(struct vte_softc *sc)
 {
-	uint16_t mcr;
+	uint16_t mcr, mdcsc;
 	int i;
 
+	mdcsc = CSR_READ_2(sc, VTE_MDCSC);
 	mcr = CSR_READ_2(sc, VTE_MCR1);
 	CSR_WRITE_2(sc, VTE_MCR1, mcr | MCR1_MAC_RESET);
 	for (i = VTE_RESET_TIMEOUT; i > 0; i--) {
@@ -1623,6 +1621,14 @@ vte_reset(struct vte_softc *sc)
 	CSR_WRITE_2(sc, VTE_MACSM, 0x0002);
 	CSR_WRITE_2(sc, VTE_MACSM, 0);
 	DELAY(5000);
+
+	/*
+	 * On some SoCs (like Vortex86DX3) MDC speed control register value
+	 * needs to be restored to original value instead of default one,
+	 * otherwise some PHY registers may fail to be read.
+	 */
+	if (mdcsc != MDCSC_DEFAULT)
+		CSR_WRITE_2(sc, VTE_MDCSC, mdcsc);
 }
 
 static void
@@ -1639,7 +1645,7 @@ vte_init(void *xsc)
 static void
 vte_init_locked(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	bus_addr_t paddr;
 	uint8_t *eaddr;
 
@@ -1647,7 +1653,7 @@ vte_init_locked(struct vte_softc *sc)
 
 	ifp = sc->vte_ifp;
 
-	if ((ifp->if_drv_flags & IFF_DRV_RUNNING) != 0)
+	if ((if_getdrvflags(ifp) & IFF_DRV_RUNNING) != 0)
 		return;
 	/*
 	 * Cancel any pending I/O.
@@ -1677,7 +1683,7 @@ vte_init_locked(struct vte_softc *sc)
 	 * configure the remaining three addresses as perfect
 	 * multicast addresses.
 	 */
-	eaddr = IF_LLADDR(sc->vte_ifp);
+	eaddr = if_getlladdr(sc->vte_ifp);
 	CSR_WRITE_2(sc, VTE_MID0L, eaddr[1] << 8 | eaddr[0]);
 	CSR_WRITE_2(sc, VTE_MID0M, eaddr[3] << 8 | eaddr[2]);
 	CSR_WRITE_2(sc, VTE_MID0H, eaddr[5] << 8 | eaddr[4]);
@@ -1755,14 +1761,14 @@ vte_init_locked(struct vte_softc *sc)
 
 	callout_reset(&sc->vte_tick_ch, hz, vte_tick, sc);
 
-	ifp->if_drv_flags |= IFF_DRV_RUNNING;
-	ifp->if_drv_flags &= ~IFF_DRV_OACTIVE;
+	if_setdrvflagbits(ifp, IFF_DRV_RUNNING, 0);
+	if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE);
 }
 
 static void
 vte_stop(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
+	if_t ifp;
 	struct vte_txdesc *txd;
 	struct vte_rxdesc *rxd;
 	int i;
@@ -1772,7 +1778,7 @@ vte_stop(struct vte_softc *sc)
 	 * Mark the interface down and cancel the watchdog timer.
 	 */
 	ifp = sc->vte_ifp;
-	ifp->if_drv_flags &= ~(IFF_DRV_RUNNING | IFF_DRV_OACTIVE);
+	if_setdrvflagbits(ifp, 0, (IFF_DRV_RUNNING | IFF_DRV_OACTIVE));
 	sc->vte_flags &= ~VTE_FLAG_LINK;
 	callout_stop(&sc->vte_tick_ch);
 	sc->vte_watchdog_timer = 0;
@@ -1955,86 +1961,94 @@ vte_init_rx_ring(struct vte_softc *sc)
 	return (0);
 }
 
+struct vte_maddr_ctx {
+	uint16_t rxfilt_perf[VTE_RXFILT_PERFECT_CNT][3];
+	uint16_t mchash[4];
+	u_int nperf;
+};
+
+static u_int
+vte_hash_maddr(void *arg, struct sockaddr_dl *sdl, u_int cnt)
+{
+	struct vte_maddr_ctx *ctx = arg;
+	uint8_t *eaddr;
+	uint32_t crc;
+
+	/*
+	 * Program the first 3 multicast groups into the perfect filter.
+	 * For all others, use the hash table.
+	 */
+	if (ctx->nperf < VTE_RXFILT_PERFECT_CNT) {
+		eaddr = LLADDR(sdl);
+		ctx->rxfilt_perf[ctx->nperf][0] = eaddr[1] << 8 | eaddr[0];
+		ctx->rxfilt_perf[ctx->nperf][1] = eaddr[3] << 8 | eaddr[2];
+		ctx->rxfilt_perf[ctx->nperf][2] = eaddr[5] << 8 | eaddr[4];
+		ctx->nperf++;
+
+		return (1);
+	}
+	crc = ether_crc32_be(LLADDR(sdl), ETHER_ADDR_LEN);
+	ctx->mchash[crc >> 30] |= 1 << ((crc >> 26) & 0x0F);
+
+	return (1);
+}
+
 static void
 vte_rxfilter(struct vte_softc *sc)
 {
-	struct ifnet *ifp;
-	struct ifmultiaddr *ifma;
-	uint8_t *eaddr;
-	uint32_t crc;
-	uint16_t rxfilt_perf[VTE_RXFILT_PERFECT_CNT][3];
-	uint16_t mchash[4], mcr;
-	int i, nperf;
+	if_t ifp;
+	struct vte_maddr_ctx ctx;
+	uint16_t mcr;
+	int i;
 
 	VTE_LOCK_ASSERT(sc);
 
 	ifp = sc->vte_ifp;
 
-	bzero(mchash, sizeof(mchash));
+	bzero(ctx.mchash, sizeof(ctx.mchash));
 	for (i = 0; i < VTE_RXFILT_PERFECT_CNT; i++) {
-		rxfilt_perf[i][0] = 0xFFFF;
-		rxfilt_perf[i][1] = 0xFFFF;
-		rxfilt_perf[i][2] = 0xFFFF;
+		ctx.rxfilt_perf[i][0] = 0xFFFF;
+		ctx.rxfilt_perf[i][1] = 0xFFFF;
+		ctx.rxfilt_perf[i][2] = 0xFFFF;
 	}
+	ctx.nperf = 0;
 
 	mcr = CSR_READ_2(sc, VTE_MCR0);
 	mcr &= ~(MCR0_PROMISC | MCR0_MULTICAST);
 	mcr |= MCR0_BROADCAST_DIS;
-	if ((ifp->if_flags & IFF_BROADCAST) != 0)
+	if ((if_getflags(ifp) & IFF_BROADCAST) != 0)
 		mcr &= ~MCR0_BROADCAST_DIS;
-	if ((ifp->if_flags & (IFF_PROMISC | IFF_ALLMULTI)) != 0) {
-		if ((ifp->if_flags & IFF_PROMISC) != 0)
+	if ((if_getflags(ifp) & (IFF_PROMISC | IFF_ALLMULTI)) != 0) {
+		if ((if_getflags(ifp) & IFF_PROMISC) != 0)
 			mcr |= MCR0_PROMISC;
-		if ((ifp->if_flags & IFF_ALLMULTI) != 0)
+		if ((if_getflags(ifp) & IFF_ALLMULTI) != 0)
 			mcr |= MCR0_MULTICAST;
-		mchash[0] = 0xFFFF;
-		mchash[1] = 0xFFFF;
-		mchash[2] = 0xFFFF;
-		mchash[3] = 0xFFFF;
+		ctx.mchash[0] = 0xFFFF;
+		ctx.mchash[1] = 0xFFFF;
+		ctx.mchash[2] = 0xFFFF;
+		ctx.mchash[3] = 0xFFFF;
 		goto chipit;
 	}
 
-	nperf = 0;
-	if_maddr_rlock(ifp);
-	TAILQ_FOREACH(ifma, &sc->vte_ifp->if_multiaddrs, ifma_link) {
-		if (ifma->ifma_addr->sa_family != AF_LINK)
-			continue;
-		/*
-		 * Program the first 3 multicast groups into
-		 * the perfect filter.  For all others, use the
-		 * hash table.
-		 */
-		if (nperf < VTE_RXFILT_PERFECT_CNT) {
-			eaddr = LLADDR((struct sockaddr_dl *)ifma->ifma_addr);
-			rxfilt_perf[nperf][0] = eaddr[1] << 8 | eaddr[0];
-			rxfilt_perf[nperf][1] = eaddr[3] << 8 | eaddr[2];
-			rxfilt_perf[nperf][2] = eaddr[5] << 8 | eaddr[4];
-			nperf++;
-			continue;
-		}
-		crc = ether_crc32_be(LLADDR((struct sockaddr_dl *)
-		    ifma->ifma_addr), ETHER_ADDR_LEN);
-		mchash[crc >> 30] |= 1 << ((crc >> 26) & 0x0F);
-	}
-	if_maddr_runlock(ifp);
-	if (mchash[0] != 0 || mchash[1] != 0 || mchash[2] != 0 ||
-	    mchash[3] != 0)
+	if_foreach_llmaddr(ifp, vte_hash_maddr, &ctx);
+	if (ctx.mchash[0] != 0 || ctx.mchash[1] != 0 ||
+	    ctx.mchash[2] != 0 || ctx.mchash[3] != 0)
 		mcr |= MCR0_MULTICAST;
 
 chipit:
 	/* Program multicast hash table. */
-	CSR_WRITE_2(sc, VTE_MAR0, mchash[0]);
-	CSR_WRITE_2(sc, VTE_MAR1, mchash[1]);
-	CSR_WRITE_2(sc, VTE_MAR2, mchash[2]);
-	CSR_WRITE_2(sc, VTE_MAR3, mchash[3]);
+	CSR_WRITE_2(sc, VTE_MAR0, ctx.mchash[0]);
+	CSR_WRITE_2(sc, VTE_MAR1, ctx.mchash[1]);
+	CSR_WRITE_2(sc, VTE_MAR2, ctx.mchash[2]);
+	CSR_WRITE_2(sc, VTE_MAR3, ctx.mchash[3]);
 	/* Program perfect filter table. */
 	for (i = 0; i < VTE_RXFILT_PERFECT_CNT; i++) {
 		CSR_WRITE_2(sc, VTE_RXFILTER_PEEFECT_BASE + 8 * i + 0,
-		    rxfilt_perf[i][0]);
+		    ctx.rxfilt_perf[i][0]);
 		CSR_WRITE_2(sc, VTE_RXFILTER_PEEFECT_BASE + 8 * i + 2,
-		    rxfilt_perf[i][1]);
+		    ctx.rxfilt_perf[i][1]);
 		CSR_WRITE_2(sc, VTE_RXFILTER_PEEFECT_BASE + 8 * i + 4,
-		    rxfilt_perf[i][2]);
+		    ctx.rxfilt_perf[i][2]);
 	}
 	CSR_WRITE_2(sc, VTE_MCR0, mcr);
 	CSR_READ_2(sc, VTE_MCR0);

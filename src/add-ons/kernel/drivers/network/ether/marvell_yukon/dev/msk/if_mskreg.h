@@ -95,7 +95,6 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*$FreeBSD: releng/12.0/sys/dev/msk/if_mskreg.h 325966 2017-11-18 14:26:50Z pfg $*/
 
 /*
  * SysKonnect PCI vendor ID
@@ -2555,7 +2554,7 @@ struct msk_softc {
 
 /* Softc for each logical interface. */
 struct msk_if_softc {
-	struct ifnet		*msk_ifp;	/* interface info */
+	if_t			msk_ifp;	/* interface info */
 	device_t		msk_miibus;
 	device_t		msk_if_dev;
 	int32_t			msk_port;	/* port # on controller */

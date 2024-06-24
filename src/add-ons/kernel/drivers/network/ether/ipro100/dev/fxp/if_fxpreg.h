@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1995, David Greenman
  * Copyright (c) 2001 Jonathan Lemon <jlemon@freebsd.org>
@@ -26,8 +26,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/fxp/if_fxpreg.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #define FXP_PCI_MMBA	0x10
@@ -281,10 +279,15 @@ struct fxp_cb_tx {
 	uint16_t cb_status;
 	uint16_t cb_command;
 	uint32_t link_addr;
-	uint32_t tbd_array_addr;
-	uint16_t byte_count;
-	uint8_t tx_threshold;
-	uint8_t tbd_number;
+	union {
+		struct {
+			uint32_t tbd_array_addr;
+			uint16_t byte_count;
+			uint8_t tx_threshold;
+			uint8_t tbd_number;
+		};
+		struct fxp_tbd tbdtso;
+	};
 
 	/*
 	 * The following structure isn't actually part of the TxCB,

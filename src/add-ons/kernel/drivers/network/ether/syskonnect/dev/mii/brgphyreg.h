@@ -30,8 +30,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/mii/brgphyreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 #ifndef _DEV_MII_BRGPHYREG_H_
@@ -293,6 +291,17 @@
 /* Begin: PHY register values for the 5706 PHY         */
 /*******************************************************/
 
+/*
+ * Aux control shadow register, bits 0-2 select function (0x00 to
+ * 0x07).
+ */
+#define	BRGPHY_AUXCTL_SHADOW_MISC	0x07
+#define	BRGPHY_AUXCTL_MISC_DATA_MASK	0x7ff8
+#define	BRGPHY_AUXCTL_MISC_READ_SHIFT	12
+#define	BRGPHY_AUXCTL_MISC_WRITE_EN	0x8000
+#define	BRGPHY_AUXCTL_MISC_RGMII_SKEW_EN 0x0200
+#define	BRGPHY_AUXCTL_MISC_WIRESPEED_EN	0x0010
+
 /* 
  * Shadow register 0x1C, bit 15 is write enable,
  * bits 14-10 select function (0x00 to 0x1F).
@@ -300,6 +309,11 @@
 #define	BRGPHY_MII_SHADOW_1C		0x1C
 #define	BRGPHY_SHADOW_1C_WRITE_EN	0x8000
 #define	BRGPHY_SHADOW_1C_SELECT_MASK	0x7C00
+#define	BRGPHY_SHADOW_1C_DATA_MASK	0x03FF
+
+/* Shadow 0x1C Clock Alignment Control Register (select value 0x03) */
+#define	BRGPHY_SHADOW_1C_CLK_CTRL	(0x03 << 10)
+#define	BRGPHY_SHADOW_1C_GTXCLK_EN	0x0200
 
 /* Shadow 0x1C Mode Control Register (select value 0x1F) */
 #define	BRGPHY_SHADOW_1C_MODE_CTRL	(0x1F << 10)
@@ -343,7 +357,6 @@
 #define	BRGPHY_5708S_PG0_1000X_STAT1_SPEED_100	(0x1 << 3)
 #define	BRGPHY_5708S_PG0_1000X_STAT1_SPEED_1G	(0x2 << 3)
 #define	BRGPHY_5708S_PG0_1000X_STAT1_SPEED_25G	(0x3 << 3)
-
 
 #define	BRGPHY_5708S_PG0_1000X_CTL2		0x11
 #define	BRGPHY_5708S_PG0_1000X_CTL2_PAR_DET_EN	0x0001

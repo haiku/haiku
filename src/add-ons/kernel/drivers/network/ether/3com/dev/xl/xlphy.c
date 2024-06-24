@@ -1,7 +1,7 @@
 /*	$NetBSD: exphy.c,v 1.16 1999/04/23 04:24:32 thorpej Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD AND BSD-2-Clause
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1998, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -57,8 +57,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/xl/xlphy.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * driver for 3Com internal PHYs
  */
@@ -91,15 +89,13 @@ static device_method_t xlphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t xlphy_devclass;
-
 static driver_t xlphy_driver = {
 	"xlphy",
 	xlphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(xlphy, miibus, xlphy_driver, xlphy_devclass, 0, 0);
+DRIVER_MODULE(xlphy, miibus, xlphy_driver, 0, 0);
 
 static int	xlphy_service(struct mii_softc *, struct mii_data *, int);
 static void	xlphy_reset(struct mii_softc *);

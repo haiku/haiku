@@ -5,6 +5,9 @@
 
 #include <machine/bus.h>
 
+#include <net/if.h>
+#include <net/if_var.h>
+
 #include <dev/rl/if_rlreg.h>
 
 HAIKU_FBSD_DRIVER_GLUE(rtl8139, rl, pci);

@@ -28,8 +28,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/rl/if_rlreg.h 306102 2016-09-21 14:15:15Z kevlo $
  */
 
 /*
@@ -196,6 +194,7 @@
 #define	RL_HWREV_8168EP		0x50000000
 #define	RL_HWREV_8168GU		0x50800000
 #define	RL_HWREV_8168H		0x54000000
+#define	RL_HWREV_8168FP		0x54800000
 #define	RL_HWREV_8411B		0x5C800000
 #define	RL_HWREV_8139		0x60000000
 #define	RL_HWREV_8139A		0x70000000
@@ -863,7 +862,7 @@ struct rl_list_data {
 enum rl_twist { DONE, CHK_LINK, FIND_ROW, SET_PARAM, RECHK_LONG, RETUNE };
 
 struct rl_softc {
-	struct ifnet		*rl_ifp;	/* interface info */
+	if_t			rl_ifp;	/* interface info */
 	bus_space_handle_t	rl_bhandle;	/* bus space handle */
 	bus_space_tag_t		rl_btag;	/* bus space tag */
 	device_t		rl_dev;
@@ -993,12 +992,14 @@ struct rl_softc {
 /*
  * RealTek chip device IDs.
  */
+#define	RT_DEVICEID_2600          		0x2600
 #define	RT_DEVICEID_8139D			0x8039
 #define	RT_DEVICEID_8129			0x8129
 #define	RT_DEVICEID_8101E			0x8136
 #define	RT_DEVICEID_8138			0x8138
 #define	RT_DEVICEID_8139			0x8139
 #define	RT_DEVICEID_8169SC			0x8167
+#define	RT_DEVICEID_8161			0x8161
 #define	RT_DEVICEID_8168			0x8168
 #define	RT_DEVICEID_8169			0x8169
 #define	RT_DEVICEID_8100			0x8100

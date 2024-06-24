@@ -33,8 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/xmphy.c 325966 2017-11-18 14:26:50Z pfg $");
-
 /*
  * driver for the XaQti XMAC II's internal PHY. This is sort of
  * like a 10/100 PHY, except the only thing we're really autoselecting
@@ -71,15 +69,13 @@ static device_method_t xmphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t xmphy_devclass;
-
 static driver_t xmphy_driver = {
 	"xmphy",
 	xmphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(xmphy, miibus, xmphy_driver, xmphy_devclass, 0, 0);
+DRIVER_MODULE(xmphy, miibus, xmphy_driver, 0, 0);
 
 static int	xmphy_service(struct mii_softc *, struct mii_data *, int);
 static void	xmphy_status(struct mii_softc *);

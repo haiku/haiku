@@ -1,7 +1,7 @@
 /*	$NetBSD: nsphyter.c,v 1.28 2008/01/20 07:58:19 msaitoh Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD AND BSD-2-Clause
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1998, 1999, 2000, 2001 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -57,8 +57,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/nsphyter.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * Driver for the National Semiconductor's DP83843, DP83847 and DP83849
  * `PHYTER' Ethernet 10/100 PHYs
@@ -99,15 +97,13 @@ static device_method_t nsphyter_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t nsphyter_devclass;
-
 static driver_t nsphyter_driver = {
 	"nsphyter",
 	nsphyter_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(nsphyter, miibus, nsphyter_driver, nsphyter_devclass, 0, 0);
+DRIVER_MODULE(nsphyter, miibus, nsphyter_driver, 0, 0);
 
 static int	nsphyter_service(struct mii_softc *, struct mii_data *, int);
 static void	nsphyter_status(struct mii_softc *);

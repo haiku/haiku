@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2010, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
@@ -28,8 +28,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/rdcphy.c 327173 2017-12-25 04:48:39Z kan $");
-
 /*
  * Driver for the RDC Semiconductor R6040 10/100 PHY.
  */
@@ -70,21 +68,20 @@ static device_method_t rdcphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t rdcphy_devclass;
-
 static driver_t rdcphy_driver = {
 	"rdcphy",
 	rdcphy_methods,
 	sizeof(struct rdcphy_softc)
 };
 
-DRIVER_MODULE(rdcphy, miibus, rdcphy_driver, rdcphy_devclass, 0, 0);
+DRIVER_MODULE(rdcphy, miibus, rdcphy_driver, 0, 0);
 
 static int	rdcphy_service(struct mii_softc *, struct mii_data *, int);
 static void	rdcphy_status(struct mii_softc *);
 
 static const struct mii_phydesc rdcphys[] = {
 	MII_PHY_DESC(RDC, R6040),
+	MII_PHY_DESC(RDC, R6040_2),
 	MII_PHY_END
 };
 

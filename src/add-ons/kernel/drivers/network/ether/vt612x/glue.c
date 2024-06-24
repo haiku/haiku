@@ -10,6 +10,8 @@
 #include <sys/rman.h>
 #include <sys/mutex.h>
 
+#include <net/if.h>
+#include <net/if_var.h>
 
 #include <dev/vge/if_vgereg.h>
 #include <dev/vge/if_vgevar.h>

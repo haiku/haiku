@@ -1,7 +1,7 @@
 /*	$NetBSD: icsphy.c,v 1.41 2006/11/16 21:24:07 christos Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1998, 1999, 2000 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -57,8 +57,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/icsphy.c 337425 2018-08-07 17:13:42Z markj $");
-
 /*
  * driver for Integrated Circuit Systems' ICS1889-1893 ethernet 10/100 PHY
  * datasheet from www.icst.com
@@ -94,15 +92,13 @@ static device_method_t icsphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t icsphy_devclass;
-
 static driver_t icsphy_driver = {
 	"icsphy",
 	icsphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(icsphy, miibus, icsphy_driver, icsphy_devclass, 0, 0);
+DRIVER_MODULE(icsphy, miibus, icsphy_driver, 0, 0);
 
 static int	icsphy_service(struct mii_softc *, struct mii_data *, int);
 static void	icsphy_status(struct mii_softc *);

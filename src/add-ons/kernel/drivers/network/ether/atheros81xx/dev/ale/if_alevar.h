@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2008, Pyun YongHyeon <yongari@FreeBSD.org>
  * All rights reserved.
@@ -25,8 +25,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ale/if_alevar.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #ifndef	_IF_ALEVAR_H
@@ -183,7 +181,7 @@ struct ale_hw_stats {
  * Software state per device.
  */
 struct ale_softc {
-	struct ifnet 		*ale_ifp;
+	if_t			ale_ifp;
 	device_t		ale_dev;
 	device_t		ale_miibus;
 	struct resource		*ale_res[1];

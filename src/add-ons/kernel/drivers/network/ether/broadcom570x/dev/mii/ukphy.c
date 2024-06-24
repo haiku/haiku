@@ -1,7 +1,7 @@
 /*	$NetBSD: ukphy.c,v 1.2 1999/04/23 04:24:32 thorpej Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1998, 1999 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -57,8 +57,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/ukphy.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * driver for generic unknown PHYs
  */
@@ -91,15 +89,13 @@ static device_method_t ukphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t ukphy_devclass;
-
 static driver_t ukphy_driver = {
 	"ukphy",
 	ukphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(ukphy, miibus, ukphy_driver, ukphy_devclass, 0, 0);
+DRIVER_MODULE(ukphy, miibus, ukphy_driver, 0, 0);
 
 static int	ukphy_service(struct mii_softc *, struct mii_data *, int);
 

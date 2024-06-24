@@ -32,8 +32,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/sk/if_skreg.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 /*-
@@ -132,7 +130,6 @@
  * blocks are actually used. Most registers are 32 bits wide, but
  * there are a few 16-bit and 8-bit ones as well.
  */
-
 
 /* Start of remappable register window. */
 #define SK_WIN_BASE		0x0080
@@ -408,7 +405,7 @@
  * fiber-based cards or BCOM for 1000baseT cards with a Broadcom
  * PHY.
  */
-#define SK_PHYTYPE_XMAC		0	/* integeated XMAC II PHY */
+#define SK_PHYTYPE_XMAC		0	/* integrated XMAC II PHY */
 #define SK_PHYTYPE_BCOM		1	/* Broadcom BCM5400 */
 #define SK_PHYTYPE_LONE		2	/* Level One LXT1000 */
 #define SK_PHYTYPE_NAT		3	/* National DP83891 */
@@ -1475,7 +1472,7 @@ struct sk_softc {
 
 /* Softc for each logical interface */
 struct sk_if_softc {
-	struct ifnet		*sk_ifp;	/* interface info */
+	if_t			sk_ifp;	/* interface info */
 	device_t		sk_miibus;
 	device_t		sk_if_dev;
 	u_int8_t		sk_port;	/* port # on controller */

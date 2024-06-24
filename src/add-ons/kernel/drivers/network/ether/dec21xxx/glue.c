@@ -14,6 +14,9 @@
 #include <machine/bus.h>
 #include <shared.h>
 
+#include <net/if.h>
+#include <net/if_var.h>
+
 #include "if_dcreg.h"
 
 

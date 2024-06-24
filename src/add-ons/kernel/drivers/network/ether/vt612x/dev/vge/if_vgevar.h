@@ -30,8 +30,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/dev/vge/if_vgevar.h 325966 2017-11-18 14:26:50Z pfg $
  */
 
 #define VGE_JUMBO_MTU	9000
@@ -177,7 +175,7 @@ struct vge_hw_stats {
 };
 
 struct vge_softc {
-	struct ifnet		*vge_ifp;	/* interface info */
+	if_t			vge_ifp;	/* interface info */
 	device_t		vge_dev;
 	struct resource		*vge_res;
 	struct resource		*vge_irq;
@@ -246,4 +244,3 @@ struct vge_softc {
 
 #define VGE_RXCHUNK		4
 #define VGE_TIMEOUT		10000
-

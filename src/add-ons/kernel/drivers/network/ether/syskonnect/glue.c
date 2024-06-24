@@ -12,8 +12,10 @@
 
 #include <machine/bus.h>
 
-#include "if_skreg.h"
+#include <net/if.h>
+#include <net/if_var.h>
 
+#include "if_skreg.h"
 #include "xmaciireg.h"
 
 HAIKU_FBSD_DRIVER_GLUE(syskonnect, skc, pci)

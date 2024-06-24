@@ -1,7 +1,7 @@
 /*	$NetBSD: if_le_pci.c,v 1.43 2005/12/11 12:22:49 christos Exp $	*/
 
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD AND BSD-3-Clause
+ * SPDX-License-Identifier: BSD-2-Clause AND BSD-3-Clause
  *
  * Copyright (c) 1997, 1998 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -67,8 +67,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/le/if_le_pci.c 326255 2017-11-27 14:52:40Z pfg $");
-
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/bus.h>
@@ -136,7 +134,7 @@ static device_method_t le_pci_methods[] = {
 };
 
 DEFINE_CLASS_0(le, le_pci_driver, le_pci_methods, sizeof(struct le_pci_softc));
-DRIVER_MODULE(le, pci, le_pci_driver, le_devclass, 0, 0);
+DRIVER_MODULE(le, pci, le_pci_driver, 0, 0);
 MODULE_DEPEND(le, ether, 1, 1, 1);
 
 static const int le_home_supmedia[] = {

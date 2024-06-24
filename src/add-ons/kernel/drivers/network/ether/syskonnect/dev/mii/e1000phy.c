@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Principal Author: Parag Patel
  * Copyright (c) 2001
@@ -32,8 +32,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/e1000phy.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * driver for the Marvell 88E1000 series external 1000/100/10-BT PHY.
  */
@@ -76,14 +74,13 @@ static device_method_t e1000phy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t e1000phy_devclass;
 static driver_t e1000phy_driver = {
 	"e1000phy",
 	e1000phy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(e1000phy, miibus, e1000phy_driver, e1000phy_devclass, 0, 0);
+DRIVER_MODULE(e1000phy, miibus, e1000phy_driver, 0, 0);
 
 static int	e1000phy_service(struct mii_softc *, struct mii_data *, int);
 static void	e1000phy_status(struct mii_softc *);

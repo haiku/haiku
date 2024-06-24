@@ -33,8 +33,6 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD$
  */
 
 #ifndef _IF_SGEREG_H
@@ -96,7 +94,7 @@
 #define	INTR_MAGIC_FRAME	0x00040000
 #define	INTR_WAKE_FRAME		0x00020000
 #define	INTR_LINK		0x00010000
-#define	INTR_RX_IDLE		0x00000080
+#define	INTR_RX_IDLE		0x00000080	
 #define	INTR_RX_DONE		0x00000040
 #define	INTR_TXQ1_IDLE		0x00000020
 #define	INTR_TXQ1_DONE		0x00000010
@@ -338,7 +336,7 @@ struct sge_type {
 };
 
 struct sge_softc {
-	struct ifnet		*sge_ifp;	/* interface info */
+	if_t			sge_ifp;	/* interface info */
 	struct resource		*sge_res;
 	int			sge_res_id;
 	int			sge_res_type;

@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-NetBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 1998, 1999, 2000, 2001 The NetBSD Foundation, Inc.
  * All rights reserved.
@@ -58,8 +58,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mii/bmtphy.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * Driver for the Broadcom BCM5201/BCM5202 "Mini-Theta" PHYs.  This also
  * drives the PHY on the 3Com 3c905C.  The 3c905C's PHY is described in
@@ -96,15 +94,13 @@ static device_method_t bmtphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t	bmtphy_devclass;
-
 static driver_t	bmtphy_driver = {
 	"bmtphy",
 	bmtphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(bmtphy, miibus, bmtphy_driver, bmtphy_devclass, 0, 0);
+DRIVER_MODULE(bmtphy, miibus, bmtphy_driver, 0, 0);
 
 static int	bmtphy_service(struct mii_softc *, struct mii_data *, int);
 static void	bmtphy_status(struct mii_softc *);

@@ -33,8 +33,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/dc/pnphy.c 325966 2017-11-18 14:26:50Z pfg $");
-
 /*
  * Pseudo-driver for media selection on the Lite-On PNIC 82c168
  * chip.  The NWAY support on this chip is horribly broken, so we
@@ -80,15 +78,13 @@ static device_method_t pnphy_methods[] = {
 	DEVMETHOD_END
 };
 
-static devclass_t pnphy_devclass;
-
 static driver_t pnphy_driver = {
 	"pnphy",
 	pnphy_methods,
 	sizeof(struct mii_softc)
 };
 
-DRIVER_MODULE(pnphy, miibus, pnphy_driver, pnphy_devclass, 0, 0);
+DRIVER_MODULE(pnphy, miibus, pnphy_driver, 0, 0);
 
 static int	pnphy_service(struct mii_softc *, struct mii_data *, int);
 static void	pnphy_status(struct mii_softc *);
