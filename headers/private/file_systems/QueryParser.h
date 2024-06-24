@@ -1179,12 +1179,15 @@ Expression<QueryPolicy>::Init(const char* expr, const char** position)
 	if (fTerm != NULL)
 		return EALREADY;
 
+	status_t status = B_OK;
+	int32 equations = 0;
+	const int32 kMaxEquations = 32;
+
 	struct ExpressionNode {
 		Term<QueryPolicy>* term = NULL;
 		bool negated = false;
 		ops op = OP_NONE;
 	};
-	status_t status = B_OK;
 	Stack<Stack<ExpressionNode>*> exprsTree;
 	Stack<ExpressionNode>* currentExpr = NULL;
 	ExpressionNode* current = NULL;
@@ -1241,6 +1244,10 @@ Expression<QueryPolicy>::Init(const char* expr, const char** position)
 		} else if (!complete) {
 			if (current->term != NULL)
 				break; // There already is a term.
+			if ((equations + 1) > kMaxEquations) {
+				status = E2BIG;
+				break;
+			}
 
 			Equation<QueryPolicy>* equation
 				= new(std::nothrow) Equation<QueryPolicy>(&expr);
@@ -1255,6 +1262,7 @@ Expression<QueryPolicy>::Init(const char* expr, const char** position)
 			}
 
 			current->term = equation;
+			equations++;
 		}
 		if (!complete)
 			continue;
