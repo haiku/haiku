@@ -656,7 +656,6 @@ struct ifaddr {
 	int	ifa_metric;		/* cost of going out this interface */
 	int (*ifa_claim_addr)		/* check if an addr goes to this if */
 		(struct ifaddr *, struct sockaddr *);
-	struct mtx ifa_mtx;
 };
 #define	IFA_ROUTE	RTF_UP		/* route installed */
 
@@ -667,13 +666,6 @@ struct ifaddr {
 struct ifaddr *	ifa_alloc(size_t size, int flags);
 void	ifa_free(struct ifaddr *ifa);
 void	ifa_ref(struct ifaddr *ifa);
-
-
-#define	IFA_LOCK_INIT(ifa)	\
-    mtx_init(&(ifa)->ifa_mtx, "ifaddr", NULL, MTX_DEF)
-#define	IFA_LOCK(ifa)		mtx_lock(&(ifa)->ifa_mtx)
-#define	IFA_UNLOCK(ifa)		mtx_unlock(&(ifa)->ifa_mtx)
-#define	IFA_DESTROY(ifa)	mtx_destroy(&(ifa)->ifa_mtx)
 
 /*
  * The prefix structure contains information about one prefix
@@ -708,9 +700,6 @@ struct ifmultiaddr {
 };
 
 #ifdef _KERNEL
-#define	IFA_LOCK(ifa)		mtx_lock(&(ifa)->ifa_mtx)
-#define	IFA_UNLOCK(ifa)		mtx_unlock(&(ifa)->ifa_mtx)
-
 extern	struct rw_lock ifnet_rwlock;
 #define	IFNET_LOCK_INIT()		rw_lock_init(&ifnet_rwlock, "ifnet rwlock")
 #define	IFNET_WLOCK()			rw_lock_write_lock(&ifnet_rwlock)
@@ -720,8 +709,7 @@ extern	struct rw_lock ifnet_rwlock;
 #define	IFNET_RUNLOCK()			rw_lock_read_unlock(&ifnet_rwlock)
 #define	IFNET_RUNLOCK_NOSLEEP()	rw_lock_read_unlock(&ifnet_rwlock)
 
-struct ifnet	*ifnet_byindex(u_short idx);
-struct ifnet	*ifnet_byindex_locked(u_short idx);
+if_t ifnet_byindex(u_int);
 
 extern	struct ifnethead ifnet;
 extern	int ifqmaxlen;
@@ -754,70 +742,107 @@ struct	ifnet *ifunit(const char *);
 int if_alloc_inplace(struct ifnet *ifp, u_char type);
 void if_free_inplace(struct ifnet *ifp);
 
-struct	ifaddr *ifa_ifwithaddr(struct sockaddr *);
-struct	ifaddr *ifa_ifwithbroadaddr(struct sockaddr *);
-struct	ifaddr *ifa_ifwithdstaddr(struct sockaddr *);
-struct	ifaddr *ifa_ifwithnet(struct sockaddr *);
-struct	ifaddr *ifa_ifwithroute(int, struct sockaddr *, struct sockaddr *);
-struct	ifaddr *ifaof_ifpforaddr(struct sockaddr *, struct ifnet *);
-
-int	if_simloop(struct ifnet *ifp, struct mbuf *m, int af, int hlen);
-
-typedef	void *if_com_alloc_t(u_char type, struct ifnet *ifp);
-typedef	void if_com_free_t(void *com, u_char type);
-void	if_register_com_alloc(u_char type, if_com_alloc_t *a, if_com_free_t *f);
-void	if_deregister_com_alloc(u_char type);
-void	if_data_copy(struct ifnet *, struct if_data *);
 uint64_t if_get_counter_default(struct ifnet *, ift_counter);
 void	if_inc_counter(struct ifnet *, ift_counter, int64_t);
 
 #define IF_LLADDR(ifp)							\
-    LLADDR((struct sockaddr_dl *)((ifp)->if_addr->ifa_addr))
+	LLADDR((struct sockaddr_dl *)((ifp)->if_addr->ifa_addr))
 
 uint64_t if_setbaudrate(if_t ifp, uint64_t baudrate);
-uint64_t if_getbaudrate(if_t ifp);
+uint64_t if_getbaudrate(const if_t ifp);
 int if_setcapabilities(if_t ifp, int capabilities);
 int if_setcapabilitiesbit(if_t ifp, int setbit, int clearbit);
-int if_getcapabilities(if_t ifp);
+int if_getcapabilities(const if_t ifp);
 int if_togglecapenable(if_t ifp, int togglecap);
 int if_setcapenable(if_t ifp, int capenable);
 int if_setcapenablebit(if_t ifp, int setcap, int clearcap);
-int if_getcapenable(if_t ifp);
-const char *if_getdname(if_t ifp);
+int if_getcapenable(const if_t ifp);
+int if_setcapabilities2(if_t ifp, int capabilities);
+int if_setcapabilities2bit(if_t ifp, int setbit, int clearbit);
+int if_getcapabilities2(const if_t ifp);
+int if_togglecapenable2(if_t ifp, int togglecap);
+int if_setcapenable2(if_t ifp, int capenable);
+int if_setcapenable2bit(if_t ifp, int setcap, int clearcap);
+int if_getcapenable2(const if_t ifp);
+int if_getdunit(const if_t ifp);
+int if_getindex(const if_t ifp);
+int if_getidxgen(const if_t ifp);
+const char *if_getdname(const if_t ifp);
+void if_setdname(if_t ifp, const char *name);
+const char *if_name(if_t ifp);
+int if_setname(if_t ifp, const char *name);
+int if_rename(if_t ifp, char *new_name);
+const char *if_getdescr(if_t ifp);
+void if_setdescr(if_t ifp, char *descrbuf);
+char *if_allocdescr(size_t sz, int malloc_flag);
+void if_freedescr(char *descrbuf);
+void if_setlastchange(if_t ifp);
+int if_getalloctype(const if_t ifp);
+int if_gettype(const if_t ifp);
 int if_setdev(if_t ifp, void *dev);
 int if_setdrvflagbits(if_t ifp, int if_setflags, int clear_flags);
-int if_getdrvflags(if_t ifp);
+int if_getdrvflags(const if_t ifp);
 int if_setdrvflags(if_t ifp, int flags);
+int if_getlinkstate(if_t ifp);
 int if_clearhwassist(if_t ifp);
 int if_sethwassistbits(if_t ifp, int toset, int toclear);
 int if_sethwassist(if_t ifp, int hwassist_bit);
-int if_gethwassist(if_t ifp);
+int if_gethwassist(const if_t ifp);
+int if_togglehwassist(if_t ifp, int toggle_bits);
 int if_setsoftc(if_t ifp, void *softc);
 void *if_getsoftc(if_t ifp);
 int if_setflags(if_t ifp, int flags);
-int if_gethwaddr(if_t ifp, struct ifreq *);
+void if_setllsoftc(if_t ifp, void *softc);
+void *if_getllsoftc(if_t ifp);
+u_int if_getfib(if_t ifp);
+uint8_t if_getaddrlen(if_t ifp);
+int if_gethwaddr(const if_t ifp, struct ifreq *);
+const uint8_t *if_getbroadcastaddr(const if_t ifp);
+void if_setbroadcastaddr(if_t ifp, const uint8_t *);
 int if_setmtu(if_t ifp, int mtu);
-int if_getmtu(if_t ifp);
-int if_getmtu_family(if_t ifp, int family);
+int if_getmtu(const if_t ifp);
+int if_getmtu_family(const if_t ifp, int family);
+void if_notifymtu(if_t ifp);
 int if_setflagbits(if_t ifp, int set, int clear);
-int if_getflags(if_t ifp);
+int if_setflags(if_t ifp, int flags);
+int if_getflags(const if_t ifp);
+int if_getnumadomain(if_t ifp);
 int if_sendq_empty(if_t ifp);
 int if_setsendqready(if_t ifp);
 int if_setsendqlen(if_t ifp, int tx_desc_count);
-int if_input(if_t ifp, struct mbuf* sendmp);
+int if_sethwtsomax(if_t ifp, u_int if_hw_tsomax);
+int if_sethwtsomaxsegcount(if_t ifp, u_int if_hw_tsomaxsegcount);
+int if_sethwtsomaxsegsize(if_t ifp, u_int if_hw_tsomaxsegsize);
+u_int if_gethwtsomax(const if_t ifp);
+u_int if_gethwtsomaxsegcount(const if_t ifp);
+u_int if_gethwtsomaxsegsize(const if_t ifp);
+void if_input(if_t ifp, struct mbuf* sendmp);
 int if_sendq_prepend(if_t ifp, struct mbuf *m);
 struct mbuf *if_dequeue(if_t ifp);
 int if_setifheaderlen(if_t ifp, int len);
 void if_setrcvif(struct mbuf *m, if_t ifp);
-
 void if_setvtag(struct mbuf *m, u_int16_t tag);
 u_int16_t if_getvtag(struct mbuf *m);
 int if_vlantrunkinuse(if_t ifp);
-caddr_t if_getlladdr(if_t ifp);
+caddr_t if_getlladdr(const if_t ifp);
+struct vnet *if_getvnet(const if_t ifp);
 void *if_gethandle(u_char);
+void if_vlancap(if_t ifp);
+int if_transmit(if_t ifp, struct mbuf *m);
+void if_init(if_t ifp, void *ctx);
+int if_ioctl(if_t ifp, u_long cmd, void *data);
+int if_resolvemulti(if_t ifp, struct sockaddr **, struct sockaddr *);
+uint64_t if_getcounter(if_t ifp, ift_counter counter);
+struct label *if_getmaclabel(if_t ifp);
+void if_setmaclabel(if_t ifp, struct label *label);
+struct bpf_if *if_getbpf(if_t ifp);
+uint8_t if_getpcp(if_t ifp);
+void *if_getl2com(if_t ifp);
+struct ifvlantrunk *if_getvlantrunk(if_t ifp);
+bool if_altq_is_enabled(if_t ifp);
+
 void if_bpfmtap(if_t ifp, struct mbuf *m);
 void if_etherbpfmtap(if_t ifp, struct mbuf *m);
-void if_vlancap(if_t ifp);
 
 int if_setupmultiaddr(if_t ifp, void *mta, int *cnt, int max);
 int if_multiaddr_array(if_t ifp, void *mta, int *cnt, int max);

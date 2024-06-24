@@ -13,14 +13,11 @@ static inline int
 if_input_openbsd(if_t ifp, struct mbuf_list* ml)
 {
 	struct mbuf* m;
-	int status = 0;
 	while ((m = ml_dequeue(ml)) != NULL) {
-		status = if_input(ifp, m);
-		if (status != 0)
-			break;
+		if_input(ifp, m);
 	}
 
-	return status;
+	return 0;
 }
 #define if_input if_input_openbsd
 

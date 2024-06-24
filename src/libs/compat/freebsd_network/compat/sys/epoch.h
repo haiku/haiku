@@ -12,6 +12,7 @@ struct epoch_tracker {
 
 #define NET_EPOCH_ENTER(et)
 #define NET_EPOCH_EXIT(et)
+#define NET_EPOCH_ASSERT()
 
 
 #endif	/* _FBSD_COMPAT_SYS_EPOCH_H_ */

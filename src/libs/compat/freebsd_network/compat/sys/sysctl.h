@@ -191,6 +191,7 @@ SYSCTL_CHILDREN(void *ptr)
 #define SYSCTL_NODE(...)
 #define SYSCTL_INT(...)
 #define SYSCTL_UINT(...)
+#define SYSCTL_BOOL(...)
 #define SYSCTL_PROC(...)
 
 #endif

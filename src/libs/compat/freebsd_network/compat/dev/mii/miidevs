@@ -1,4 +1,4 @@
-$FreeBSD: stable/11/sys/dev/mii/miidevs 337755 2018-08-14 14:17:20Z markj $
+$FreeBSD$
 /*$NetBSD: miidevs,v 1.105 2011/11/25 23:28:14 jakllsch Exp $*/
 
 /*-
@@ -33,7 +33,7 @@ $FreeBSD: stable/11/sys/dev/mii/miidevs 337755 2018-08-14 14:17:20Z markj $
 
 /*
  * List of known MII OUIs.
- * For a complete list see http://standards.ieee.org/regauth/oui/
+ * For a complete list see http://standards-oui.ieee.org/
  *
  * XXX Vendors do obviously not agree how OUIs (24 bit) are mapped
  * to the 22 bits available in the id registers.
@@ -63,6 +63,7 @@ oui JMICRON			0x00d831	JMicron Technologies
 oui LEVEL1			0x00207b	Level 1
 oui MARVELL			0x005043	Marvell Semiconductor
 oui MICREL			0x0010a1	Micrel
+oui MOTORCOMM			0x000000	Motorcomm
 oui MYSON			0x00c0b4	Myson Technology
 oui NATSEMI			0x080017	National Semiconductor
 oui PMCSIERRA			0x00e004	PMC-Sierra
@@ -110,6 +111,7 @@ oui xxPMCSIERRA			0x0009c0	PMC-Sierra
 oui xxPMCSIERRA2		0x009057	PMC-Sierra
 oui xxREALTEK			0x000732	RealTek Semicondctor
 oui yyREALTEK			0x000004	RealTek Semicondctor
+oui xxTI			0x100014	Texas Instruments
 
 /*
  * List of known models.  Grouped by oui.
@@ -190,11 +192,14 @@ model BROADCOM2 BCM5784		0x003a BCM5784 10/100/1000baseT PHY
 model BROADCOM2 BCM5709C	0x003c BCM5709 10/100/1000baseT PHY
 model BROADCOM2 BCM5761		0x003d BCM5761 10/100/1000baseT PHY
 model BROADCOM2 BCM5709S	0x003f BCM5709S/5720S 1000/2500baseSX PHY
+model BROADCOM3 BCM54618SE	0x000d BCM54618SE 10/100/1000BASE-T PHY
+model BROADCOM3 BCM54616S	0x0011 BCM54616S 10/100/1000BASE-T PHY
 model BROADCOM3 BCM57780	0x0019 BCM57780 1000BASE-T media interface
 model BROADCOM3 BCM5717C	0x0020 BCM5717C 1000BASE-T media interface
 model BROADCOM3 BCM5719C	0x0022 BCM5719C 1000BASE-T media interface
 model BROADCOM3 BCM57765	0x0024 BCM57765 1000BASE-T media interface
 model BROADCOM3 BCM5720C	0x0036 BCM5720C 1000BASE-T media interface
+model BROADCOM4 BCM54213PE	0x000a BCM54213PE 1000BASE-T media interface
 model BROADCOM4 BCM5725C	0x0038 BCM5725C 1000BASE-T media interface
 model xxBROADCOM_ALT1 BCM5906	0x0004 BCM5906 10/100baseTX media interface
 
@@ -207,6 +212,7 @@ model xxCICADA CS8201A		0x0020 Cicada CS8201 10/100/1000TX PHY
 model xxCICADA CS8201B		0x0021 Cicada CS8201 10/100/1000TX PHY
 model xxCICADA CS8244		0x002c Cicada CS8244 10/100/1000TX PHY
 model xxVITESSE VSC8601		0x0002 Vitesse VSC8601 10/100/1000TX PHY
+model xxVITESSE VSC8641		0x0003 Vitesse VSC8641 10/100/1000TX PHY
 
 /* Davicom Semiconductor PHYs */
 /* AMD Am79C873 seems to be a relabeled DM9101 */
@@ -269,6 +275,7 @@ model xxMARVELL E1112		0x0009 Marvell 88E1112 Gigabit PHY
 model xxMARVELL E1149		0x000b Marvell 88E1149 Gigabit PHY
 model xxMARVELL E1111		0x000c Marvell 88E1111 Gigabit PHY
 model xxMARVELL E1145		0x000d Marvell 88E1145 Quad Gigabit PHY
+model xxMARVELL E1512		0x001d Marvell 88E1512 Gigabit PHY
 model xxMARVELL E1116		0x0021 Marvell 88E1116 Gigabit PHY
 model xxMARVELL E1116R		0x0024 Marvell 88E1116R Gigabit PHY
 model xxMARVELL E1118		0x0022 Marvell 88E1118 Gigabit PHY
@@ -286,6 +293,9 @@ model MARVELL E1111		0x000c Marvell 88E1111 Gigabit PHY
 model MICREL KSZ8081		0x0016 Micrel KSZ8081 10/100 PHY
 model MICREL KSZ9021		0x0021 Micrel KSZ9021 10/100/1000 PHY
 model MICREL KSZ9031		0x0022 Micrel KSZ9031 10/100/1000 PHY
+
+/* Motorcomm PHYs */
+model MOTORCOMM YT8511		0x010a Motorcomm YT8511 10/100/1000 PHY
 
 /* Myson Technology PHYs */
 model xxMYSON MTD972		0x0000 MTD972 10/100 media interface
@@ -312,14 +322,16 @@ model xxQUALSEMI QS6612		0x0000 QS6612 10/100 media interface
 
 /* RDC Semiconductor PHYs */
 model RDC R6040			0x0003 R6040 10/100 media interface
+model RDC R6040_2		0x0005 R6040 10/100 media interface
 
 /* RealTek Semicondctor PHYs */
 model yyREALTEK RTL8201L	0x0020 RTL8201L 10/100 media interface
 model xxREALTEK RTL8169S	0x0011 RTL8169S/8110S/8211 1000BASE-T media interface
 model REALTEK RTL8305SC		0x0005 RTL8305SC 10/100 802.1q switch
 model REALTEK RTL8201E		0x0008 RTL8201E 10/100 media interface
-model REALTEK RTL8251		0x0000 RTL8251 1000BASE-T media interface
+model REALTEK RTL8251		0x0000 RTL8251/8153 1000BASE-T media interface
 model REALTEK RTL8169S		0x0011 RTL8169S/8110S/8211 1000BASE-T media interface
+model REALTEK RTL8211FVD	0x0007 RTL8211F-VD 1000BASE-T media interface
 
 /* Seeq Seeq PHYs */
 model SEEQ 80220		0x0003 Seeq 80220 10/100 media interface
@@ -333,6 +345,8 @@ model SIS 900			0x0000 SiS 900 10/100 media interface
 model TI TLAN10T		0x0001 ThunderLAN 10BASE-T media interface
 model TI 100VGPMI		0x0002 ThunderLAN 100VG-AnyLan media interface
 model TI TNETE2101		0x0003 TNETE2101 media interface
+model xxTI DP83867		0x0023 High Immunity 10/100/1000 PHY
+model xxTI DP83822		0x0024 High Immunity 10/100 PHY
 
 /* TDK Semiconductor PHYs */
 model xxTSC 78Q2120		0x0014 78Q2120 10/100 media interface
@@ -340,7 +354,8 @@ model xxTSC 78Q2121		0x0015 78Q2121 100BASE-TX media interface
 
 /* Vitesse Semiconductor (now Microsemi) */
 model xxVITESSE VSC8501		0x0013 Vitesse VSC8501 10/100/1000TX PHY
-model xxVITESSE VSC8641		0x0003 Vitesse VSC8641 10/100/1000TX PHY
+model xxVITESSE VSC8504		0x000c Vitesse VSC8504 10/100/1000TX PHY
+model xxVITESSE VSC8514		0x0027 Vitesse VSC8514 10/100/1000TX PHY
 
 /* XaQti Corp. PHYs */
 model xxXAQTI XMACII		0x0000 XaQti Corp. XMAC II gigabit interface

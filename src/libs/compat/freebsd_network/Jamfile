@@ -11,6 +11,7 @@ SubDirC++Flags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
 	fbsd_ether.c
+	fbsd_if.c
 	fbsd_if_media.c
 	fbsd_kern_mbuf.c
 	fbsd_uipc_mbuf.c
