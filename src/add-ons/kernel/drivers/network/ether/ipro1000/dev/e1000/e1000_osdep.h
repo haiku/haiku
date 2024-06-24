@@ -31,7 +31,6 @@
   POSSIBILITY OF SUCH DAMAGE.
 
 ******************************************************************************/
-/*$FreeBSD$*/
 
 
 #ifndef _FREEBSD_OS_H_
@@ -135,18 +134,6 @@ typedef int8_t		s8;
 #define __le16		u16
 #define __le32		u32
 #define __le64		u64
-
-#if __FreeBSD_version < 800000
-#if defined(__i386__) || defined(__amd64__)
-#define mb()	__asm volatile("mfence" ::: "memory")
-#define wmb()	__asm volatile("sfence" ::: "memory")
-#define rmb()	__asm volatile("lfence" ::: "memory")
-#else
-#define mb()
-#define rmb()
-#define wmb()
-#endif
-#endif /*__FreeBSD_version < 800000 */
 
 #if defined(INVARIANTS) && !defined(__HAIKU__)
 #define ASSERT_CTX_LOCK_HELD(hw) (sx_assert(iflib_ctx_lock_get(((struct e1000_osdep *)hw->back)->ctx), SX_XLOCKED))

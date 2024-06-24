@@ -28,8 +28,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include "if_igc.h"
 #include <sys/sbuf.h>
 
@@ -47,7 +45,7 @@ __FBSDID("$FreeBSD$");
  *  { Vendor ID, Device ID, String }
  *********************************************************************/
 
-static pci_vendor_info_t igc_vendor_info_array[] =
+static const pci_vendor_info_t igc_vendor_info_array[] =
 {
 	/* Intel(R) PRO/1000 Network Connection - igc */
 	PVID(0x8086, IGC_DEV_ID_I225_LM, "Intel(R) Ethernet Controller I225-LM"),
@@ -165,8 +163,7 @@ static driver_t igc_driver = {
 	"igc", igc_methods, sizeof(struct igc_adapter),
 };
 
-static devclass_t igc_devclass;
-DRIVER_MODULE(igc, pci, igc_driver, igc_devclass, 0, 0);
+DRIVER_MODULE(igc, pci, igc_driver, 0, 0);
 
 MODULE_DEPEND(igc, pci, 1, 1, 1);
 MODULE_DEPEND(igc, ether, 1, 1, 1);
@@ -256,13 +253,6 @@ static int igc_debug_sbp = true;
 SYSCTL_INT(_hw_igc, OID_AUTO, sbp, CTLFLAG_RDTUN, &igc_debug_sbp, 0,
     "Show bad packets in promiscuous mode");
 
-/* How many packets rxeof tries to clean at a time */
-static int igc_rx_process_limit = 100;
-SYSCTL_INT(_hw_igc, OID_AUTO, rx_process_limit, CTLFLAG_RDTUN,
-    &igc_rx_process_limit, 0,
-    "Maximum number of received packets to process "
-    "at a time, -1 means unlimited");
-
 /* Energy efficient ethernet - default to OFF */
 static int igc_eee_setting = 1;
 SYSCTL_INT(_hw_igc, OID_AUTO, eee_setting, CTLFLAG_RDTUN, &igc_eee_setting, 0,
@@ -271,7 +261,7 @@ SYSCTL_INT(_hw_igc, OID_AUTO, eee_setting, CTLFLAG_RDTUN, &igc_eee_setting, 0,
 /*
 ** Tuneable Interrupt rate
 */
-static int igc_max_interrupt_rate = 8000;
+static int igc_max_interrupt_rate = 20000;
 SYSCTL_INT(_hw_igc, OID_AUTO, max_interrupt_rate, CTLFLAG_RDTUN,
     &igc_max_interrupt_rate, 0, "Maximum interrupts per second");
 
@@ -467,8 +457,6 @@ igc_if_attach_pre(if_ctx_t ctx)
 	scctx = adapter->shared = iflib_get_softc_ctx(ctx);
 	adapter->media = iflib_get_media(ctx);
 	hw = &adapter->hw;
-
-	adapter->tx_process_limit = scctx->isc_ntxd[0];
 
 	/* SYSCTL stuff */
 	SYSCTL_ADD_PROC(device_get_sysctl_ctx(dev),
@@ -1871,7 +1859,7 @@ igc_if_rx_queues_alloc(if_ctx_t ctx, caddr_t *vaddrs, uint64_t *paddrs, int nrxq
 		rxr->rx_base = (union igc_rx_desc_extended *)vaddrs[i*nrxqs];
 		rxr->rx_paddr = paddrs[i*nrxqs];
 	}
-
+ 
 	if (bootverbose)
 		device_printf(iflib_get_dev(ctx),
 		    "allocated for %d rx_queues\n", adapter->rx_num_queues);
@@ -1985,6 +1973,7 @@ igc_initialize_transmit_unit(if_ctx_t ctx)
  *  Enable receive unit.
  *
  **********************************************************************/
+#define BSIZEPKT_ROUNDUP	((1<<IGC_SRRCTL_BSIZEPKT_SHIFT)-1)
 
 static void
 igc_initialize_receive_unit(if_ctx_t ctx)
@@ -2050,23 +2039,18 @@ igc_initialize_receive_unit(if_ctx_t ctx)
 		igc_initialize_rss_mapping(adapter);
 
 	if (if_getmtu(ifp) > ETHERMTU) {
-		/* Set maximum packet len */
-		if (adapter->rx_mbuf_sz <= 4096) {
-			srrctl |= 4096 >> IGC_SRRCTL_BSIZEPKT_SHIFT;
-			rctl |= IGC_RCTL_SZ_4096 | IGC_RCTL_BSEX;
-		} else if (adapter->rx_mbuf_sz > 4096) {
-			srrctl |= 8192 >> IGC_SRRCTL_BSIZEPKT_SHIFT;
-			rctl |= IGC_RCTL_SZ_8192 | IGC_RCTL_BSEX;
-		}
 		psize = scctx->isc_max_frame_size;
 		/* are we on a vlan? */
 		if (if_vlantrunkinuse(ifp))
 			psize += VLAN_TAG_SIZE;
 		IGC_WRITE_REG(&adapter->hw, IGC_RLPML, psize);
-	} else {
-		srrctl |= 2048 >> IGC_SRRCTL_BSIZEPKT_SHIFT;
-		rctl |= IGC_RCTL_SZ_2048;
 	}
+
+	/* Set maximum packet buffer len */
+	srrctl |= (adapter->rx_mbuf_sz + BSIZEPKT_ROUNDUP) >>
+	    IGC_SRRCTL_BSIZEPKT_SHIFT;
+	/* srrctl above overrides this but set the register to a sane value */
+	rctl |= IGC_RCTL_SZ_2048;
 
 	/*
 	 * If TX flow control is disabled and there's >1 queue defined,
@@ -2408,7 +2392,7 @@ igc_if_get_counter(if_ctx_t ctx, ift_counter cnt)
  * @ctx: iflib context
  * @event: event code to check
  *
- * Defaults to returning true for unknown events.
+ * Defaults to returning false for unknown events.
  *
  * @returns true if iflib needs to reinit the interface
  */
@@ -2417,9 +2401,8 @@ igc_if_needs_restart(if_ctx_t ctx __unused, enum iflib_restart_event event)
 {
 	switch (event) {
 	case IFLIB_RESTART_VLAN_CONFIG:
-		return (false);
 	default:
-		return (true);
+		return (false);
 	}
 }
 

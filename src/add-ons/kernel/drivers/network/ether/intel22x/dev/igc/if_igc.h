@@ -25,8 +25,6 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
- * $FreeBSD$
  */
 
 
@@ -370,8 +368,6 @@ struct igc_adapter {
 
         u32		txd_cmd;
 
-        u32             tx_process_limit;
-        u32             rx_process_limit;
 	u32		rx_mbuf_sz;
 
 	/* Management and WOL features */
