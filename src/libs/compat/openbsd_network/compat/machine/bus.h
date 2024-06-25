@@ -145,7 +145,7 @@ static void
 bus_dmamem_free_obsd(bus_dma_tag_t tag, bus_dma_segment_t* segs, int nsegs)
 {
 	for (int i = 0; i < nsegs; i++)
-		bus_dmamem_free_tagless(segs[i].ds_addr, segs[i].ds_len);
+		bus_dmamem_free_tagless((void*)segs[i].ds_addr, segs[i].ds_len);
 }
 #define bus_dmamem_free bus_dmamem_free_obsd
 
