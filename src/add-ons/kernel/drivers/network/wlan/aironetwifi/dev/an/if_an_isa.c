@@ -40,7 +40,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/an/if_an_isa.c 327102 2017-12-23 06:49:27Z imp $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_inet.h"
 

@@ -31,7 +31,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: releng/12.0/sys/dev/an/if_anreg.h 325966 2017-11-18 14:26:50Z pfg $
+ * $FreeBSD$
  */
 
 #define AN_TIMEOUT	65536
@@ -353,7 +353,6 @@ struct an_rxframe_802_3 {
 	u_int8_t		an_rx_src_addr[6];      /* 0x3E */
 };
 #define AN_RXGAP_MAX	8
-
 
 struct an_txframe_802_3 {
 /*

@@ -40,7 +40,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/an/if_an_pccard.c 325966 2017-11-18 14:26:50Z pfg $");
+__FBSDID("$FreeBSD$");
 
 #include "opt_inet.h"
 
@@ -88,7 +88,6 @@ static device_method_t an_pccard_methods[] = {
 	DEVMETHOD(device_attach,	an_pccard_attach),
 	DEVMETHOD(device_detach,	an_detach),
 	DEVMETHOD(device_shutdown,	an_shutdown),
-
 	{ 0, 0 }
 };
 
