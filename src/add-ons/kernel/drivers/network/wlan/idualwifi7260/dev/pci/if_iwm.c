@@ -12277,9 +12277,7 @@ static driver_t iwm_pci_driver = {
 	sizeof (struct iwm_softc)
 };
 
-static devclass_t iwm_devclass;
-
-DRIVER_MODULE(iwm, pci, iwm_pci_driver, iwm_devclass, NULL, NULL);
+DRIVER_MODULE(iwm, pci, iwm_pci_driver, NULL, NULL);
 #else
 int
 iwm_activate(struct device *self, int act)

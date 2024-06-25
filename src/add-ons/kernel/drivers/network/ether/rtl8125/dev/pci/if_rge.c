@@ -414,9 +414,7 @@ static driver_t rge_pci_driver = {
 	sizeof (struct rge_softc)
 };
 
-static devclass_t rge_devclass;
-
-DRIVER_MODULE(rge, pci, rge_pci_driver, rge_devclass, NULL, NULL);
+DRIVER_MODULE(rge, pci, rge_pci_driver, NULL, NULL);
 #else
 int
 rge_activate(struct device *self, int act)

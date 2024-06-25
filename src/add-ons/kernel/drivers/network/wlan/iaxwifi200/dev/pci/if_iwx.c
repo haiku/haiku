@@ -11571,9 +11571,7 @@ static driver_t iwx_pci_driver = {
 	sizeof (struct iwx_softc)
 };
 
-static devclass_t iwx_devclass;
-
-DRIVER_MODULE(iwx, pci, iwx_pci_driver, iwx_devclass, NULL, NULL);
+DRIVER_MODULE(iwx, pci, iwx_pci_driver, NULL, NULL);
 #else
 int
 iwx_activate(struct device *self, int act)

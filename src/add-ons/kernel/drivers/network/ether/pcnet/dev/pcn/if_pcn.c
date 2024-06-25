@@ -190,12 +190,10 @@ static driver_t pcn_driver = {
 	sizeof(struct pcn_softc)
 };
 
-static devclass_t pcn_devclass;
-
-DRIVER_MODULE(pcn, pci, pcn_driver, pcn_devclass, 0, 0);
+DRIVER_MODULE(pcn, pci, pcn_driver, 0, 0);
 MODULE_PNP_INFO("U16:vendor;U16:device", pci, pcn, pcn_devs,
     nitems(pcn_devs) - 1);
-DRIVER_MODULE(miibus, pcn, miibus_driver, miibus_devclass, 0, 0);
+DRIVER_MODULE(miibus, pcn, miibus_driver, 0, 0);
 
 #define PCN_CSR_SETBIT(sc, reg, x)			\
 	pcn_csr_write(sc, reg, pcn_csr_read(sc, reg) | (x))

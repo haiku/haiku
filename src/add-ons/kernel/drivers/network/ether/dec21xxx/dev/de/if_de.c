@@ -4909,9 +4909,7 @@ static driver_t tulip_pci_driver = {
     sizeof(tulip_softc_t),
 };
 
-static devclass_t tulip_devclass;
-
-DRIVER_MODULE(de, pci, tulip_pci_driver, tulip_devclass, 0, 0);
+DRIVER_MODULE(de, pci, tulip_pci_driver, 0, 0);
 
 #ifdef DDB
 void	tulip_dumpring(int unit, int ring);
