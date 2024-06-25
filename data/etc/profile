@@ -68,3 +68,11 @@ if [ -d /etc/profile.d ]; then
   done
   unset i
 fi
+
+# Locale
+export LC_MESSAGES=`locale --message`
+export LC_NUMERIC=`locale --format`
+export LC_TIME=`locale --time`
+export LC_COLLATE=$LC_MESSAGES
+export LC_CTYPE=$LC_MESSAGES
+export LC_MONETARY=$LC_NUMERIC
