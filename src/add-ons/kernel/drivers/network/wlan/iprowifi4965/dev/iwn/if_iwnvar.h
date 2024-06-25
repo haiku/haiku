@@ -1,4 +1,3 @@
-/*	$FreeBSD: releng/12.0/sys/dev/iwn/if_iwnvar.h 314923 2017-03-08 22:49:22Z avos $	*/
 /*	$OpenBSD: if_iwnvar.h,v 1.18 2010/04/30 16:06:46 damien Exp $	*/
 
 /*-

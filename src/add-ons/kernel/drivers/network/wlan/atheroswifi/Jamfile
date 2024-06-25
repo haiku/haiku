@@ -145,9 +145,6 @@ KernelMergeObject atheroswifi_hal.o :
 
 	# AR9001 and AR9002 support
 	ar9285_btcoex.c
-	ar9130_attach.c
-	ar9130_eeprom.c
-	ar9130_phy.c
 	ar9160_attach.c
 	ar9280_attach.c
 	ar9280_olc.c

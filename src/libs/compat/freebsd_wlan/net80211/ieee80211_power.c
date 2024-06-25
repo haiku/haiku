@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -26,8 +26,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_power.c 326272 2017-11-27 15:23:17Z pfg $");
-
 /*
  * IEEE 802.11 power save support.
  */
@@ -582,7 +580,7 @@ ieee80211_sta_tim_notify(struct ieee80211vap *vap, int set)
 		    "%s: wake up from bgscan vap sleep\n",
 		    __func__);
 		/*
-		 * We may be in BGSCAN mode - this means the VAP is is in STA
+		 * We may be in BGSCAN mode - this means the VAP is in STA
 		 * mode powersave.  If it is, we need to wake it up so we
 		 * can process outbound traffic.
 		 */

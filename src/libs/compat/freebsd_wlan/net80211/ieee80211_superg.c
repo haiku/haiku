@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -26,8 +26,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_superg.c 326272 2017-11-27 15:23:17Z pfg $");
-
 #include "opt_wlan.h"
 
 #ifdef	IEEE80211_SUPPORT_SUPERG
@@ -326,7 +324,7 @@ ieee80211_ff_decap(struct ieee80211_node *ni, struct mbuf *m)
 		vap->iv_stats.is_ff_tooshort++;
 		return NULL;
 	}
-	n = m_split(m, framelen, M_NOWAIT);
+	n = m_split(m, framelen, IEEE80211_M_NOWAIT);
 	if (n == NULL) {
 		IEEE80211_DISCARD_MAC(vap, IEEE80211_MSG_ANY,
 		    ni->ni_macaddr, "fast-frame",
@@ -445,7 +443,7 @@ ieee80211_ff_encap(struct ieee80211vap *vap, struct mbuf *m1, int hdrspace,
 	 */
 	m->m_next = m2;			/* NB: last mbuf from above */
 	m1->m_pkthdr.len += m2->m_pkthdr.len;
-	M_PREPEND(m1, sizeof(uint32_t)+2, M_NOWAIT);
+	M_PREPEND(m1, sizeof(uint32_t)+2, IEEE80211_M_NOWAIT);
 	if (m1 == NULL) {		/* XXX cannot happen */
 		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SUPERG,
 		    "%s: no space for tunnel header\n", __func__);
@@ -454,7 +452,7 @@ ieee80211_ff_encap(struct ieee80211vap *vap, struct mbuf *m1, int hdrspace,
 	}
 	memset(mtod(m1, void *), 0, sizeof(uint32_t)+2);
 
-	M_PREPEND(m1, sizeof(struct llc), M_NOWAIT);
+	M_PREPEND(m1, sizeof(struct llc), IEEE80211_M_NOWAIT);
 	if (m1 == NULL) {		/* XXX cannot happen */
 		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SUPERG,
 		    "%s: no space for llc header\n", __func__);

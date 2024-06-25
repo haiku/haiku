@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -26,8 +26,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_crypto_wep.c 326272 2017-11-27 15:23:17Z pfg $");
-
 /*
  * IEEE 802.11 WEP crypto support.
  */
@@ -100,7 +98,7 @@ wep_attach(struct ieee80211vap *vap, struct ieee80211_key *k)
 
 	ctx->wc_vap = vap;
 	ctx->wc_ic = vap->iv_ic;
-	get_random_bytes(&ctx->wc_iv, sizeof(ctx->wc_iv));
+	net80211_get_random_bytes(&ctx->wc_iv, sizeof(ctx->wc_iv));
 	nrefs++;			/* NB: we assume caller locking */
 	return ctx;
 }
@@ -202,7 +200,7 @@ wep_encap(struct ieee80211_key *k, struct mbuf *m)
 	/*
 	 * Copy down 802.11 header and add the IV + KeyID.
 	 */
-	M_PREPEND(m, wep.ic_header, M_NOWAIT);
+	M_PREPEND(m, wep.ic_header, IEEE80211_M_NOWAIT);
 	if (m == NULL)
 		return 0;
 	ivp = mtod(m, uint8_t *);
@@ -241,10 +239,7 @@ wep_decap(struct ieee80211_key *k, struct mbuf *m, int hdrlen)
 {
 	struct wep_ctx *ctx = k->wk_private;
 	struct ieee80211vap *vap = ctx->wc_vap;
-	struct ieee80211_frame *wh;
 	const struct ieee80211_rx_stats *rxs;
-
-	wh = mtod(m, struct ieee80211_frame *);
 
 	rxs = ieee80211_get_rx_params_ptr(m);
 
@@ -258,6 +253,11 @@ wep_decap(struct ieee80211_key *k, struct mbuf *m, int hdrlen)
 	 */
 	if ((k->wk_flags & IEEE80211_KEY_SWDECRYPT) &&
 	    !wep_decrypt(k, m, hdrlen)) {
+#ifdef IEEE80211_DEBUG
+		struct ieee80211_frame *wh;
+
+		wh = mtod(m, struct ieee80211_frame *);
+#endif
 		IEEE80211_NOTE_MAC(vap, IEEE80211_MSG_CRYPTO, wh->i_addr2,
 		    "%s", "WEP ICV mismatch on decrypt");
 		vap->iv_stats.is_rx_wepfail++;

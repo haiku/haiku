@@ -25,7 +25,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/iwn/if_iwn.c 338949 2018-09-26 17:12:30Z imp $");
 
 #include <sys/param.h>
 #include <sys/sockio.h>
@@ -371,9 +370,8 @@ static driver_t iwn_driver = {
 	iwn_methods,
 	sizeof(struct iwn_softc)
 };
-static devclass_t iwn_devclass;
 
-DRIVER_MODULE(iwn, pci, iwn_driver, iwn_devclass, NULL, NULL);
+DRIVER_MODULE(iwn, pci, iwn_driver, NULL, NULL);
 MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, iwn, iwn_ident_table,
     nitems(iwn_ident_table) - 1);
 MODULE_VERSION(iwn, 1);
@@ -4457,7 +4455,7 @@ iwn_check_rate_needs_protection(struct iwn_softc *sc,
 	/*
 	 * 11bg protection not enabled? Then don't use it.
 	 */
-	if ((ic->ic_flags & IEEE80211_F_USEPROT) == 0)
+	if ((vap->iv_flags & IEEE80211_F_USEPROT) == 0)
 		return (0);
 
 	/*
@@ -4943,7 +4941,7 @@ iwn_tx_cmd(struct iwn_softc *sc, struct mbuf *m, struct ieee80211_node *ni,
 	data->ni = ni;
 
 	DPRINTF(sc, IWN_DEBUG_XMIT, "%s: qid %d idx %d len %d nsegs %d "
-	    "plcp %d\n",
+	    "plcp 0x%x\n",
 	    __func__, ring->qid, ring->cur, totlen, nsegs, tx->rate);
 
 	/* Fill TX descriptor. */
@@ -6663,18 +6661,18 @@ iwn5000_runtime_calib(struct iwn_softc *sc)
 }
 
 static uint32_t
-iwn_get_rxon_ht_flags(struct iwn_softc *sc, struct ieee80211_channel *c)
+iwn_get_rxon_ht_flags(struct iwn_softc *sc, struct ieee80211vap *vap,
+    struct ieee80211_channel *c)
 {
-	struct ieee80211com *ic = &sc->sc_ic;
 	uint32_t htflags = 0;
 
 	if (! IEEE80211_IS_CHAN_HT(c))
 		return (0);
 
-	htflags |= IWN_RXON_HT_PROTMODE(ic->ic_curhtprotmode);
+	htflags |= IWN_RXON_HT_PROTMODE(vap->iv_curhtprotmode);
 
 	if (IEEE80211_IS_CHAN_HT40(c)) {
-		switch (ic->ic_curhtprotmode) {
+		switch (vap->iv_curhtprotmode) {
 		case IEEE80211_HTINFO_OPMODE_HT20PR:
 			htflags |= IWN_RXON_HT_MODEPURE40;
 			break;
@@ -6921,7 +6919,7 @@ iwn_config(struct iwn_softc *sc)
 	    sc->rxchainmask,
 	    sc->nrxchains);
 
-	sc->rxon->flags |= htole32(iwn_get_rxon_ht_flags(sc, ic->ic_curchan));
+	sc->rxon->flags |= htole32(iwn_get_rxon_ht_flags(sc, vap, ic->ic_curchan));
 
 	DPRINTF(sc, IWN_DEBUG_RESET,
 	    "%s: setting configuration; flags=0x%08x\n",
@@ -7035,7 +7033,7 @@ iwn_scan(struct iwn_softc *sc, struct ieee80211vap *vap,
 	int buflen, error;
 	int is_active;
 	uint16_t dwell_active, dwell_passive;
-	uint32_t extra, scan_service_time;
+	uint32_t scan_service_time;
 
 	DPRINTF(sc, IWN_DEBUG_TRACE, "->%s begin\n", __func__);
 
@@ -7079,9 +7077,12 @@ iwn_scan(struct iwn_softc *sc, struct ieee80211vap *vap,
 	 * suspend_time: 100 (TU)
 	 *
 	 */
+#if 0
 	extra = (100 /* suspend_time */ / 100 /* beacon interval */) << 22;
-	//scan_service_time = extra | ((100 /* susp */ % 100 /* int */) * 1024);
+	scan_service_time = extra | ((100 /* susp */ % 100 /* int */) * 1024);
+#else
 	scan_service_time = (4 << 22) | (100 * 1024);	/* Hardcode for now! */
+#endif
 	hdr->pause_svc = htole32(scan_service_time);
 
 	/* Select antennas for scanning. */
@@ -7159,9 +7160,9 @@ iwn_scan(struct iwn_softc *sc, struct ieee80211vap *vap,
 	wh->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_MGT |
 	    IEEE80211_FC0_SUBTYPE_PROBE_REQ;
 	wh->i_fc[1] = IEEE80211_FC1_DIR_NODS;
-	IEEE80211_ADDR_COPY(wh->i_addr1, vap->iv_ifp->if_broadcastaddr);
-	IEEE80211_ADDR_COPY(wh->i_addr2, IF_LLADDR(vap->iv_ifp));
-	IEEE80211_ADDR_COPY(wh->i_addr3, vap->iv_ifp->if_broadcastaddr);
+	IEEE80211_ADDR_COPY(wh->i_addr1, if_getbroadcastaddr(vap->iv_ifp));
+	IEEE80211_ADDR_COPY(wh->i_addr2, if_getlladdr(vap->iv_ifp));
+	IEEE80211_ADDR_COPY(wh->i_addr3, if_getbroadcastaddr(vap->iv_ifp));
 	*(uint16_t *)&wh->i_dur[0] = 0;	/* filled by HW */
 	*(uint16_t *)&wh->i_seq[0] = 0;	/* filled by HW */
 
@@ -7294,9 +7295,17 @@ iwn_auth(struct iwn_softc *sc, struct ieee80211vap *vap)
 	sc->rxon->flags = htole32(IWN_RXON_TSF | IWN_RXON_CTS_TO_SELF);
 	if (IEEE80211_IS_CHAN_2GHZ(ni->ni_chan))
 		sc->rxon->flags |= htole32(IWN_RXON_AUTO | IWN_RXON_24GHZ);
-	if (ic->ic_flags & IEEE80211_F_SHSLOT)
+
+	/*
+	 * We always set short slot on 5GHz channels.
+	 * We optionally set it for 2.4GHz channels.
+	 */
+	if (IEEE80211_IS_CHAN_5GHZ(ni->ni_chan))
 		sc->rxon->flags |= htole32(IWN_RXON_SHSLOT);
-	if (ic->ic_flags & IEEE80211_F_SHPREAMBLE)
+	else if (vap->iv_flags & IEEE80211_F_SHSLOT)
+		sc->rxon->flags |= htole32(IWN_RXON_SHSLOT);
+
+	if (vap->iv_flags & IEEE80211_F_SHPREAMBLE)
 		sc->rxon->flags |= htole32(IWN_RXON_SHPREAMBLE);
 	if (IEEE80211_IS_CHAN_A(ni->ni_chan)) {
 		sc->rxon->cck_mask  = 0;
@@ -7311,7 +7320,7 @@ iwn_auth(struct iwn_softc *sc, struct ieee80211vap *vap)
 	}
 
 	/* try HT */
-	sc->rxon->flags |= htole32(iwn_get_rxon_ht_flags(sc, ic->ic_curchan));
+	sc->rxon->flags |= htole32(iwn_get_rxon_ht_flags(sc, vap, ic->ic_curchan));
 
 	DPRINTF(sc, IWN_DEBUG_STATE, "rxon chan %d flags %x cck %x ofdm %x\n",
 	    sc->rxon->chan, sc->rxon->flags, sc->rxon->cck_mask,
@@ -7358,9 +7367,14 @@ iwn_run(struct iwn_softc *sc, struct ieee80211vap *vap)
 	sc->rxon->flags = htole32(IWN_RXON_TSF | IWN_RXON_CTS_TO_SELF);
 	if (IEEE80211_IS_CHAN_2GHZ(ni->ni_chan))
 		sc->rxon->flags |= htole32(IWN_RXON_AUTO | IWN_RXON_24GHZ);
-	if (ic->ic_flags & IEEE80211_F_SHSLOT)
+
+	/* As previously - short slot only on 5GHz */
+	if (IEEE80211_IS_CHAN_5GHZ(ni->ni_chan))
 		sc->rxon->flags |= htole32(IWN_RXON_SHSLOT);
-	if (ic->ic_flags & IEEE80211_F_SHPREAMBLE)
+	else if (vap->iv_flags & IEEE80211_F_SHSLOT)
+		sc->rxon->flags |= htole32(IWN_RXON_SHSLOT);
+
+	if (vap->iv_flags & IEEE80211_F_SHPREAMBLE)
 		sc->rxon->flags |= htole32(IWN_RXON_SHPREAMBLE);
 	if (IEEE80211_IS_CHAN_A(ni->ni_chan)) {
 		sc->rxon->cck_mask  = 0;
@@ -7374,10 +7388,10 @@ iwn_run(struct iwn_softc *sc, struct ieee80211vap *vap)
 		sc->rxon->ofdm_mask = 0x15;
 	}
 	/* try HT */
-	sc->rxon->flags |= htole32(iwn_get_rxon_ht_flags(sc, ni->ni_chan));
+	sc->rxon->flags |= htole32(iwn_get_rxon_ht_flags(sc, vap, ni->ni_chan));
 	sc->rxon->filter |= htole32(IWN_FILTER_BSS);
 	DPRINTF(sc, IWN_DEBUG_STATE, "rxon chan %d flags %x, curhtprotmode=%d\n",
-	    sc->rxon->chan, le32toh(sc->rxon->flags), ic->ic_curhtprotmode);
+	    sc->rxon->chan, le32toh(sc->rxon->flags), vap->iv_curhtprotmode);
 
 	if ((error = iwn_send_rxon(sc, 0, 1)) != 0) {
 		device_printf(sc->sc_dev, "%s: could not send RXON\n",
@@ -7706,9 +7720,9 @@ static void
 iwn5000_ampdu_tx_start(struct iwn_softc *sc, struct ieee80211_node *ni,
     int qid, uint8_t tid, uint16_t ssn)
 {
-	struct iwn_node *wn = (void *)ni;
-
 	DPRINTF(sc, IWN_DEBUG_TRACE, "->Doing %s\n", __func__);
+
+	struct iwn_node *wn = (void *)ni;
 
 	/* Stop TX scheduler while we're changing its configuration. */
 	iwn_prph_write(sc, IWN5000_SCHED_QUEUE_STATUS(qid),
@@ -9119,7 +9133,7 @@ iwn_set_channel(struct ieee80211com *ic)
 		error = iwn_config(sc);
 		if (error != 0)
 		device_printf(sc->sc_dev,
-		    "%s: error %d settting channel\n", __func__, error);
+		    "%s: error %d setting channel\n", __func__, error);
 	}
 	IWN_UNLOCK(sc);
 }

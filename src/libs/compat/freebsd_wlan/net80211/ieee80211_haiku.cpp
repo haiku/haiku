@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Colin Günther, coling@gmx.de. All rights reserved.
- * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Copyright 2018-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -263,7 +263,7 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 
 
 void
-get_random_bytes(void* p, size_t n)
+net80211_get_random_bytes(void* p, size_t n)
 {
 	uint8_t* dp = (uint8_t*)p;
 
@@ -924,8 +924,8 @@ ieee80211_notify_radio(struct ieee80211com* ic, int state)
 }
 
 
-void
-ieee80211_notify_ifnet_change(struct ieee80211vap *vap)
+extern "C" void
+ieee80211_notify_ifnet_change(struct ieee80211vap *vap, int if_flags_mask)
 {
 	dprintf("%s not implemented, yet.\n", __func__);
 }

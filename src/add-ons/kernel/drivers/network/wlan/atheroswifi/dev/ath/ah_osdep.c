@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -27,8 +27,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ah_osdep.c 326255 2017-11-27 14:52:40Z pfg $
  */
 #include "opt_ah.h"
 
@@ -434,11 +432,13 @@ ath_hal_modevent(module_t mod __unused, int type, void *data __unused)
 
 	switch (type) {
 	case MOD_LOAD:
-		printf("[ath_hal] loaded\n");
+		if (bootverbose)
+			printf("[ath_hal] loaded\n");
 		break;
 
 	case MOD_UNLOAD:
-		printf("[ath_hal] unloaded\n");
+		if (bootverbose)
+			printf("[ath_hal] unloaded\n");
 		break;
 
 	case MOD_SHUTDOWN:

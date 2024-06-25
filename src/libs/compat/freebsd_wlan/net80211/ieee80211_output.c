@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2001 Atsushi Onoe
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
@@ -27,17 +27,15 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_output.c 330688 2018-03-09 11:33:56Z avos $");
-
 #include "opt_inet.h"
 #include "opt_inet6.h"
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h>
+#include <sys/systm.h> 
 #include <sys/kernel.h>
 #include <sys/malloc.h>
-#include <sys/mbuf.h>
+#include <sys/mbuf.h>   
 #include <sys/endian.h>
 
 #include <sys/socket.h>
@@ -48,6 +46,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_output.c 330688 2018-03-0
 #include <net/if_var.h>
 #include <net/if_llc.h>
 #include <net/if_media.h>
+#include <net/if_private.h>
 #include <net/if_vlan_var.h>
 
 #include <net80211/ieee80211_var.h>
@@ -63,7 +62,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_output.c 330688 2018-03-0
 #include <net80211/ieee80211_vht.h>
 
 #if defined(INET) || defined(INET6)
-#include <netinet/in.h>
+#include <netinet/in.h> 
 #endif
 
 #ifdef INET
@@ -126,10 +125,12 @@ ieee80211_vap_pkt_send_dest(struct ieee80211vap *vap, struct mbuf *m,
 	struct ifnet *ifp = vap->iv_ifp;
 	int mcast;
 	int do_ampdu = 0;
+#ifdef IEEE80211_SUPPORT_SUPERG
 	int do_amsdu = 0;
 	int do_ampdu_amsdu = 0;
 	int no_ampdu = 1; /* Will be set to 0 if ampdu is active */
 	int do_ff = 0;
+#endif
 
 	if ((ni->ni_flags & IEEE80211_NODE_PWR_MGT) &&
 	    (m->m_flags & M_PWR_SAV) == 0) {
@@ -168,11 +169,11 @@ ieee80211_vap_pkt_send_dest(struct ieee80211vap *vap, struct mbuf *m,
 	 * uses any existing value for rcvif to identify the
 	 * interface it (might have been) received on.
 	 */
+	//MPASS((m->m_pkthdr.csum_flags & CSUM_SND_TAG) == 0);
 	m->m_pkthdr.rcvif = (void *)ni;
 	mcast = (m->m_flags & (M_MCAST | M_BCAST)) ? 1: 0;
 
 	BPF_MTAP(ifp, m);		/* 802.3 tx */
-
 
 	/*
 	 * Figure out if we can do A-MPDU, A-MSDU or FF.
@@ -187,12 +188,14 @@ ieee80211_vap_pkt_send_dest(struct ieee80211vap *vap, struct mbuf *m,
 	 */
 	do_ampdu = ((ni->ni_flags & IEEE80211_NODE_AMPDU_TX) &&
 	    (vap->iv_flags_ht & IEEE80211_FHT_AMPDU_TX));
+#ifdef IEEE80211_SUPPORT_SUPERG
 	do_amsdu = ((ni->ni_flags & IEEE80211_NODE_AMSDU_TX) &&
 	    (vap->iv_flags_ht & IEEE80211_FHT_AMSDU_TX));
 	do_ff =
 	    ((ni->ni_flags & IEEE80211_NODE_HT) == 0) &&
 	    ((ni->ni_flags & IEEE80211_NODE_VHT) == 0) &&
 	    (IEEE80211_ATH_CAP(vap, ni, IEEE80211_NODE_FF));
+#endif
 
 	/*
 	 * Check if A-MPDU tx aggregation is setup or if we
@@ -246,9 +249,11 @@ ieee80211_vap_pkt_send_dest(struct ieee80211vap *vap, struct mbuf *m,
 			 * have also set or cleared the amsdu-in-ampdu txa_flags
 			 * combination so we can correctly do A-MPDU + A-MSDU.
 			 */
+#ifdef IEEE80211_SUPPORT_SUPERG
 			no_ampdu = (! IEEE80211_AMPDU_RUNNING(tap)
 			    || (IEEE80211_AMPDU_NACKED(tap)));
 			do_ampdu_amsdu = IEEE80211_AMPDU_RUNNING_AMSDU(tap);
+#endif
 		}
 	}
 
@@ -326,8 +331,6 @@ ieee80211_vap_pkt_send_dest(struct ieee80211vap *vap, struct mbuf *m,
 	return (0);
 }
 
-
-
 /*
  * Send the given mbuf through the given vap.
  *
@@ -354,7 +357,7 @@ ieee80211_start_pkt(struct ieee80211vap *vap, struct mbuf *m)
 	 */
 	if (ic->ic_flags & IEEE80211_F_SCAN)
 		ieee80211_cancel_anyscan(vap);
-	/*
+	/* 
 	 * Find the node for the destination so we can do
 	 * things like power save and fast frames aggregation.
 	 *
@@ -565,6 +568,7 @@ ieee80211_raw_output(struct ieee80211vap *vap, struct ieee80211_node *ni,
 	 * that the mbuf has the same node value that
 	 * it would if it were going via the normal path.
 	 */
+	//MPASS((m->m_pkthdr.csum_flags & CSUM_SND_TAG) == 0);
 	m->m_pkthdr.rcvif = (void *)ni;
 
 	/*
@@ -617,7 +621,7 @@ ieee80211_validate_frame(struct mbuf *m,
 	}
 
 	if ((params && (params->ibp_flags & IEEE80211_BPF_CRYPTO) != 0) ||
-	    (wh->i_fc[1] & IEEE80211_FC1_PROTECTED) != 0) {
+	    (IEEE80211_IS_PROTECTED(wh))) {
 		int subtype;
 
 		subtype = wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK;
@@ -1032,7 +1036,7 @@ ieee80211_mgmt_output(struct ieee80211_node *ni, struct mbuf *m, int type,
 		return EIO;		/* XXX */
 	}
 
-	M_PREPEND(m, sizeof(struct ieee80211_frame), M_NOWAIT);
+	M_PREPEND(m, sizeof(struct ieee80211_frame), IEEE80211_M_NOWAIT);
 	if (m == NULL) {
 		ieee80211_free_node(ni);
 		return ENOMEM;
@@ -1058,7 +1062,7 @@ ieee80211_mgmt_output(struct ieee80211_node *ni, struct mbuf *m, int type,
 	/* avoid printing too many frames */
 	if ((ieee80211_msg_debug(vap) && doprint(vap, type)) ||
 	    ieee80211_msg_dumppkts(vap)) {
-		printf("[%s] send %s on channel %u\n",
+		ieee80211_note(vap, "[%s] send %s on channel %u\n",
 		    ether_sprintf(wh->i_addr1),
 		    ieee80211_mgt_subtype_name(type),
 		    ieee80211_chan2ieee(ic, ic->ic_curchan));
@@ -1106,7 +1110,7 @@ ieee80211_send_nulldata(struct ieee80211_node *ni)
 	if (vap->iv_state == IEEE80211_S_CAC) {
 		IEEE80211_NOTE(vap, IEEE80211_MSG_OUTPUT | IEEE80211_MSG_DOTH,
 		    ni, "block %s frame in CAC state", "null data");
-		ieee80211_unref_node(&ni);
+		ieee80211_node_decref(ni);
 		vap->iv_stats.is_tx_badstate++;
 		return EIO;		/* XXX */
 	}
@@ -1124,13 +1128,13 @@ ieee80211_send_nulldata(struct ieee80211_node *ni)
 	m = ieee80211_getmgtframe(&frm, ic->ic_headroom + hdrlen, 0);
 	if (m == NULL) {
 		/* XXX debug msg */
-		ieee80211_unref_node(&ni);
+		ieee80211_node_decref(ni);
 		vap->iv_stats.is_tx_nobuf++;
 		return ENOMEM;
 	}
 	KASSERT(M_LEADINGSPACE(m) >= hdrlen,
 	    ("leading space %zd", M_LEADINGSPACE(m)));
-	M_PREPEND(m, hdrlen, M_NOWAIT);
+	M_PREPEND(m, hdrlen, IEEE80211_M_NOWAIT);
 	if (m == NULL) {
 		/* NB: cannot happen */
 		ieee80211_free_node(ni);
@@ -1191,7 +1195,7 @@ ieee80211_send_nulldata(struct ieee80211_node *ni)
 	return (ret);
 }
 
-/*
+/* 
  * Assign priority to a frame based on any vlan tag assigned
  * to the station and/or any Diffserv setting in an IP header.
  * Finally, if an ACM policy is setup (in station mode) it's
@@ -1251,7 +1255,7 @@ ieee80211_classify(struct ieee80211_node *ni, struct mbuf *m)
 		goto done;
 	}
 
-	/*
+	/* 
 	 * If node has a vlan tag then all traffic
 	 * to it must have a matching tag.
 	 */
@@ -1270,9 +1274,14 @@ ieee80211_classify(struct ieee80211_node *ni, struct mbuf *m)
 		v_wme_ac = TID_TO_WME_AC(EVL_PRIOFTAG(ni->ni_vlan));
 	}
 
+	if (eh == NULL)
+		goto no_eh;
+
 	/* XXX m_copydata may be too slow for fast path */
+	switch (ntohs(eh->ether_type)) {
 #ifdef INET
-	if (eh && eh->ether_type == htons(ETHERTYPE_IP)) {
+	case ETHERTYPE_IP:
+	{
 		uint8_t tos;
 		/*
 		 * IP frame, map the DSCP bits from the TOS field.
@@ -1282,10 +1291,12 @@ ieee80211_classify(struct ieee80211_node *ni, struct mbuf *m)
 		    offsetof(struct ip, ip_tos), sizeof(tos), &tos);
 		tos >>= 5;		/* NB: ECN + low 3 bits of DSCP */
 		d_wme_ac = TID_TO_WME_AC(tos);
-	} else {
-#endif /* INET */
+		break;
+	}
+#endif
 #ifdef INET6
-	if (eh && eh->ether_type == htons(ETHERTYPE_IPV6)) {
+	case ETHERTYPE_IPV6:
+	{
 		uint32_t flow;
 		uint8_t tos;
 		/*
@@ -1297,15 +1308,15 @@ ieee80211_classify(struct ieee80211_node *ni, struct mbuf *m)
 		tos = (uint8_t)(ntohl(flow) >> 20);
 		tos >>= 5;		/* NB: ECN + low 3 bits of DSCP */
 		d_wme_ac = TID_TO_WME_AC(tos);
-	} else {
-#endif /* INET6 */
+		break;
+	}
+#endif
+	default:
+no_eh:
 		d_wme_ac = WME_AC_BE;
-#ifdef INET6
+		break;
 	}
-#endif
-#ifdef INET
-	}
-#endif
+
 	/*
 	 * Use highest priority AC.
 	 */
@@ -1359,7 +1370,7 @@ ieee80211_mbuf_adjust(struct ieee80211vap *vap, int hdrsize,
 		 * XXX handle SWMIC specially
 		 */
 		if (key->wk_flags & (IEEE80211_KEY_SWENCRYPT|IEEE80211_KEY_SWENMIC)) {
-			m = m_unshare(m, M_NOWAIT);
+			m = m_unshare(m, IEEE80211_M_NOWAIT);
 			if (m == NULL) {
 				IEEE80211_DPRINTF(vap, IEEE80211_MSG_OUTPUT,
 				    "%s: cannot get writable mbuf\n", __func__);
@@ -1378,7 +1389,7 @@ ieee80211_mbuf_adjust(struct ieee80211vap *vap, int hdrsize,
 	 */
 	/* XXX check trailing space and copy instead? */
 	if (M_LEADINGSPACE(m) < needed_space - TO_BE_RECLAIMED) {
-		struct mbuf *n = m_gethdr(M_NOWAIT, m->m_type);
+		struct mbuf *n = m_gethdr(IEEE80211_M_NOWAIT, m->m_type);
 		if (n == NULL) {
 			IEEE80211_DPRINTF(vap, IEEE80211_MSG_OUTPUT,
 			    "%s: cannot expand storage\n", __func__);
@@ -1422,7 +1433,7 @@ ieee80211_mbuf_adjust(struct ieee80211vap *vap, int hdrsize,
  * Return the transmit key to use in sending a unicast frame.
  * If a unicast key is set we use that.  When no unicast key is set
  * we fall back to the default transmit key.
- */
+ */ 
 static __inline struct ieee80211_key *
 ieee80211_crypto_getucastkey(struct ieee80211vap *vap,
 	struct ieee80211_node *ni)
@@ -1441,7 +1452,7 @@ ieee80211_crypto_getucastkey(struct ieee80211vap *vap,
  * Return the transmit key to use in sending a multicast frame.
  * Multicast traffic always uses the group key which is installed as
  * the default tx key.
- */
+ */ 
 static __inline struct ieee80211_key *
 ieee80211_crypto_getmcastkey(struct ieee80211vap *vap,
 	struct ieee80211_node *ni)
@@ -1683,7 +1694,7 @@ ieee80211_encap(struct ieee80211vap *vap, struct ieee80211_node *ni,
 	}
 	datalen = m->m_pkthdr.len;		/* NB: w/o 802.11 header */
 
-	M_PREPEND(m, hdrspace + meshhdrsize, M_NOWAIT);
+	M_PREPEND(m, hdrspace + meshhdrsize, IEEE80211_M_NOWAIT);
 	if (m == NULL) {
 		vap->iv_stats.is_tx_nobuf++;
 		goto bad;
@@ -1810,7 +1821,7 @@ ieee80211_encap(struct ieee80211vap *vap, struct ieee80211_node *ni,
 		else
 #endif
 			qos[1] = 0;
-		wh->i_fc[0] |= IEEE80211_FC0_SUBTYPE_QOS;
+		wh->i_fc[0] |= IEEE80211_FC0_SUBTYPE_QOS_DATA;
 
 		/*
 		 * If this is an A-MSDU then ensure we set the
@@ -1992,7 +2003,7 @@ ieee80211_fragment(struct ieee80211vap *vap, struct mbuf *m0,
 	prev = m0;
 	do {
 		fragsize = MIN(totalhdrsize + remainder, mtu);
-		m = m_get2(fragsize, M_NOWAIT, MT_DATA, M_PKTHDR);
+		m = m_get2(fragsize, IEEE80211_M_NOWAIT, MT_DATA, M_PKTHDR);
 		if (m == NULL)
 			goto bad;
 		/* leave room to prepend any cipher header */
@@ -2088,7 +2099,7 @@ ieee80211_add_xrates(uint8_t *frm, const struct ieee80211_rateset *rs)
 	return frm;
 }
 
-/*
+/* 
  * Add an ssid element to a frame.
  */
 uint8_t *
@@ -2421,85 +2432,77 @@ ieee80211_add_qos(uint8_t *frm, const struct ieee80211_node *ni)
 }
 
 /*
- * Send a probe request frame with the specified ssid
- * and any optional information element data.
+ * ieee80211_send_probereq(): send a probe request frame with the specified ssid
+ * and any optional information element data;  some helper functions as FW based
+ * HW scans need some of that information passed too.
  */
-int
-ieee80211_send_probereq(struct ieee80211_node *ni,
-	const uint8_t sa[IEEE80211_ADDR_LEN],
-	const uint8_t da[IEEE80211_ADDR_LEN],
-	const uint8_t bssid[IEEE80211_ADDR_LEN],
-	const uint8_t *ssid, size_t ssidlen)
+static uint32_t
+ieee80211_probereq_ie_len(struct ieee80211vap *vap, struct ieee80211com *ic)
 {
-	struct ieee80211vap *vap = ni->ni_vap;
-	struct ieee80211com *ic = ni->ni_ic;
-	struct ieee80211_node *bss;
-	const struct ieee80211_txparam *tp;
-	struct ieee80211_bpf_params params;
 	const struct ieee80211_rateset *rs;
-	struct mbuf *m;
-	uint8_t *frm;
-	int ret;
 
-	bss = ieee80211_ref_node(vap->iv_bss);
-
-	if (vap->iv_state == IEEE80211_S_CAC) {
-		IEEE80211_NOTE(vap, IEEE80211_MSG_OUTPUT, ni,
-		    "block %s frame in CAC state", "probe request");
-		vap->iv_stats.is_tx_badstate++;
-		ieee80211_free_node(bss);
-		return EIO;		/* XXX */
-	}
-
-	/*
-	 * Hold a reference on the node so it doesn't go away until after
-	 * the xmit is complete all the way in the driver.  On error we
-	 * will remove our reference.
-	 */
-#ifndef __HAIKU__
-	IEEE80211_DPRINTF(vap, IEEE80211_MSG_NODE,
-		"ieee80211_ref_node (%s:%u) %p<%s> refcnt %d\n",
-		__func__, __LINE__,
-		ni, ether_sprintf(ni->ni_macaddr),
-		ieee80211_node_refcnt(ni)+1);
-#endif
-	ieee80211_ref_node(ni);
+	rs = ieee80211_get_suprates(ic, ic->ic_curchan);
 
 	/*
 	 * prreq frame format
 	 *	[tlv] ssid
 	 *	[tlv] supported rates
-	 *	[tlv] RSN (optional)
-	 *	[tlv] extended supported rates
+	 *	[tlv] extended supported rates (if needed)
 	 *	[tlv] HT cap (optional)
 	 *	[tlv] VHT cap (optional)
 	 *	[tlv] WPA (optional)
 	 *	[tlv] user-specified ie's
 	 */
-	m = ieee80211_getmgtframe(&frm,
-		 ic->ic_headroom + sizeof(struct ieee80211_frame),
-	       	 2 + IEEE80211_NWID_LEN
+	return ( 2 + IEEE80211_NWID_LEN
 	       + 2 + IEEE80211_RATE_SIZE
-	       + sizeof(struct ieee80211_ie_htcap)
-	       + sizeof(struct ieee80211_ie_vhtcap)
+	       + ((rs->rs_nrates > IEEE80211_RATE_SIZE) ?
+	           2 + (rs->rs_nrates - IEEE80211_RATE_SIZE) : 0)
+	       + (((vap->iv_opmode == IEEE80211_M_IBSS) &&
+		    (vap->iv_flags_ht & IEEE80211_FHT_HT)) ?
+	                sizeof(struct ieee80211_ie_htcap) : 0)
+#ifdef notyet
 	       + sizeof(struct ieee80211_ie_htinfo)	/* XXX not needed? */
-	       + sizeof(struct ieee80211_ie_wpa)
-	       + 2 + (IEEE80211_RATE_MAXSIZE - IEEE80211_RATE_SIZE)
-	       + sizeof(struct ieee80211_ie_wpa)
+	       + 2 + sizeof(struct ieee80211_vht_cap)
+#endif
+	       + ((vap->iv_flags & IEEE80211_F_WPA1 && vap->iv_wpa_ie != NULL) ?
+	           vap->iv_wpa_ie[1] : 0)
 	       + (vap->iv_appie_probereq != NULL ?
 		   vap->iv_appie_probereq->ie_len : 0)
 	);
-	if (m == NULL) {
-		vap->iv_stats.is_tx_nobuf++;
-		ieee80211_free_node(ni);
-		ieee80211_free_node(bss);
-		return ENOMEM;
-	}
+}
 
-	frm = ieee80211_add_ssid(frm, ssid, ssidlen);
+int
+ieee80211_probereq_ie(struct ieee80211vap *vap, struct ieee80211com *ic,
+    uint8_t **frmp, uint32_t *frmlen, const uint8_t *ssid, size_t ssidlen,
+    bool alloc)
+{
+	const struct ieee80211_rateset *rs;
+	uint8_t	*frm;
+	uint32_t len;
+
+	if (!alloc && (frmp == NULL || frmlen == NULL))
+		return (EINVAL);
+
+	len = ieee80211_probereq_ie_len(vap, ic);
+	if (!alloc && len > *frmlen)
+		return (ENOBUFS);
+
+	/* For HW scans we usually do not pass in the SSID as IE. */
+	if (ssidlen == -1)
+		len -= (2 + IEEE80211_NWID_LEN);
+
+	if (alloc) {
+		frm = IEEE80211_MALLOC(len, M_80211_VAP,
+		    IEEE80211_M_WAITOK | IEEE80211_M_ZERO);
+		*frmp = frm;
+		*frmlen = len;
+	} else
+		frm = *frmp;
+
+	if (ssidlen != -1)
+		frm = ieee80211_add_ssid(frm, ssid, ssidlen);
 	rs = ieee80211_get_suprates(ic, ic->ic_curchan);
 	frm = ieee80211_add_rates(frm, rs);
-	frm = ieee80211_add_rsn(frm, vap);
 	frm = ieee80211_add_xrates(frm, rs);
 
 	/*
@@ -2526,13 +2529,13 @@ ieee80211_send_probereq(struct ieee80211_node *ni,
 	 * XXX TODO: need to figure out what/how to update the
 	 * VHT channel.
 	 */
-#if 0
-	(vap->iv_flags_vht & IEEE80211_FVHT_VHT) {
+#ifdef notyet
+	if (vap->iv_vht_flags & IEEE80211_FVHT_VHT) {
 		struct ieee80211_channel *c;
 
 		c = ieee80211_ht_adjust_channel(ic, ic->ic_curchan,
 		    vap->iv_flags_ht);
-		c = ieee80211_vht_adjust_channel(ic, c, vap->iv_flags_vht);
+		c = ieee80211_vht_adjust_channel(ic, c, vap->iv_vht_flags);
 		frm = ieee80211_add_vhtcap_ch(frm, vap, c);
 	}
 #endif
@@ -2540,11 +2543,76 @@ ieee80211_send_probereq(struct ieee80211_node *ni,
 	frm = ieee80211_add_wpa(frm, vap);
 	if (vap->iv_appie_probereq != NULL)
 		frm = add_appie(frm, vap->iv_appie_probereq);
-	m->m_pkthdr.len = m->m_len = frm - mtod(m, uint8_t *);
 
+	if (!alloc) {
+		*frmp = frm;
+		*frmlen = len;
+	}
+
+	return (0);
+}
+
+int
+ieee80211_send_probereq(struct ieee80211_node *ni,
+	const uint8_t sa[IEEE80211_ADDR_LEN],
+	const uint8_t da[IEEE80211_ADDR_LEN],
+	const uint8_t bssid[IEEE80211_ADDR_LEN],
+	const uint8_t *ssid, size_t ssidlen)
+{
+	struct ieee80211vap *vap = ni->ni_vap;
+	struct ieee80211com *ic = ni->ni_ic;
+	struct ieee80211_node *bss;
+	const struct ieee80211_txparam *tp;
+	struct ieee80211_bpf_params params;
+	struct mbuf *m;
+	uint8_t *frm;
+	uint32_t frmlen;
+	int ret;
+
+	bss = ieee80211_ref_node(vap->iv_bss);
+
+	if (vap->iv_state == IEEE80211_S_CAC) {
+		IEEE80211_NOTE(vap, IEEE80211_MSG_OUTPUT, ni,
+		    "block %s frame in CAC state", "probe request");
+		vap->iv_stats.is_tx_badstate++;
+		ieee80211_free_node(bss);
+		return EIO;		/* XXX */
+	}
+
+	/*
+	 * Hold a reference on the node so it doesn't go away until after
+	 * the xmit is complete all the way in the driver.  On error we
+	 * will remove our reference.
+	 */
+#ifndef __HAIKU__
+	IEEE80211_DPRINTF(vap, IEEE80211_MSG_NODE,
+		"ieee80211_ref_node (%s:%u) %p<%s> refcnt %d\n",
+		__func__, __LINE__,
+		ni, ether_sprintf(ni->ni_macaddr),
+		ieee80211_node_refcnt(ni)+1);
+#endif
+	ieee80211_ref_node(ni);
+
+	/* See comments above for entire frame format. */
+	frmlen = ieee80211_probereq_ie_len(vap, ic);
+	m = ieee80211_getmgtframe(&frm,
+	    ic->ic_headroom + sizeof(struct ieee80211_frame), frmlen);
+	if (m == NULL) {
+		vap->iv_stats.is_tx_nobuf++;
+		ieee80211_free_node(ni);
+		ieee80211_free_node(bss);
+		return ENOMEM;
+	}
+
+	ret = ieee80211_probereq_ie(vap, ic, &frm, &frmlen, ssid, ssidlen,
+	    false);
+	KASSERT(ret == 0,
+	    ("%s: ieee80211_probereq_ie failed: %d\n", __func__, ret));
+
+	m->m_pkthdr.len = m->m_len = frm - mtod(m, uint8_t *);
 	KASSERT(M_LEADINGSPACE(m) >= sizeof(struct ieee80211_frame),
 	    ("leading space %zd", M_LEADINGSPACE(m)));
-	M_PREPEND(m, sizeof(struct ieee80211_frame), M_NOWAIT);
+	M_PREPEND(m, sizeof(struct ieee80211_frame), IEEE80211_M_NOWAIT);
 	if (m == NULL) {
 		/* NB: cannot happen */
 		ieee80211_free_node(ni);
@@ -2651,7 +2719,6 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 
 	memset(&params, 0, sizeof(params));
 	switch (type) {
-
 	case IEEE80211_FC0_SUBTYPE_AUTH:
 		status = arg >> 16;
 		arg &= 0xffff;
@@ -2675,8 +2742,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 			  ic->ic_headroom + sizeof(struct ieee80211_frame),
 			  3 * sizeof(uint16_t)
 			+ (has_challenge && status == IEEE80211_STATUS_SUCCESS ?
-				sizeof(uint16_t)+IEEE80211_CHALLENGE_LEN : 0)
-		);
+				sizeof(uint16_t)+IEEE80211_CHALLENGE_LEN : 0));
 		if (m == NULL)
 			senderr(ENOMEM, is_tx_nobuf);
 
@@ -2763,7 +2829,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		       + 2 + 26
 		       + sizeof(struct ieee80211_wme_info)
 		       + sizeof(struct ieee80211_ie_htcap)
-		       + sizeof(struct ieee80211_ie_vhtcap)
+		       + 2 + sizeof(struct ieee80211_vht_cap)
 		       + 4 + sizeof(struct ieee80211_ie_htcap)
 #ifdef IEEE80211_SUPPORT_SUPERG
 		       + sizeof(struct ieee80211_ath_ie)
@@ -2829,7 +2895,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 			frm = ieee80211_add_htcap(frm, ni);
 		}
 
-		if ((vap->iv_flags_vht & IEEE80211_FVHT_VHT) &&
+		if ((vap->iv_vht_flags & IEEE80211_FVHT_VHT) &&
 		    IEEE80211_IS_CHAN_VHT(ni->ni_chan) &&
 		    ni->ni_ies.vhtcap_ie != NULL &&
 		    ni->ni_ies.vhtcap_ie[0] == IEEE80211_ELEMID_VHT_CAP) {
@@ -2837,7 +2903,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		}
 
 		frm = ieee80211_add_wpa(frm, vap);
-		if ((ic->ic_flags & IEEE80211_F_WME) &&
+		if ((vap->iv_flags & IEEE80211_F_WME) &&
 		    ni->ni_ies.wme_ie != NULL)
 			frm = ieee80211_add_wme_info(frm, &ic->ic_wme, ni);
 
@@ -2853,7 +2919,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		}
 #ifdef IEEE80211_SUPPORT_SUPERG
 		if (IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS)) {
-			frm = ieee80211_add_ath(frm,
+			frm = ieee80211_add_ath(frm, 
 				IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS),
 				((vap->iv_flags & IEEE80211_F_WPA) == 0 &&
 				 ni->ni_authmode != IEEE80211_AUTH_8021X) ?
@@ -2896,8 +2962,8 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		       + 2 + (IEEE80211_RATE_MAXSIZE - IEEE80211_RATE_SIZE)
 		       + sizeof(struct ieee80211_ie_htcap) + 4
 		       + sizeof(struct ieee80211_ie_htinfo) + 4
-		       + sizeof(struct ieee80211_ie_vhtcap)
-		       + sizeof(struct ieee80211_ie_vht_operation)
+		       + 2 + sizeof(struct ieee80211_vht_cap)
+		       + 2 + sizeof(struct ieee80211_vht_operation)
 		       + sizeof(struct ieee80211_wme_param)
 #ifdef IEEE80211_SUPPORT_SUPERG
 		       + sizeof(struct ieee80211_ath_ie)
@@ -2943,7 +3009,7 @@ ieee80211_send_mgmt(struct ieee80211_node *ni, int type, int arg)
 		}
 #ifdef IEEE80211_SUPPORT_SUPERG
 		if (IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS))
-			frm = ieee80211_add_ath(frm,
+			frm = ieee80211_add_ath(frm, 
 				IEEE80211_ATH_CAP(vap, ni, IEEE80211_F_ATHEROS),
 				((vap->iv_flags & IEEE80211_F_WPA) == 0 &&
 				 ni->ni_authmode != IEEE80211_AUTH_8021X) ?
@@ -3055,8 +3121,8 @@ ieee80211_alloc_proberesp(struct ieee80211_node *bss, int legacy)
 	       + sizeof(struct ieee80211_wme_param)
 	       + 4 + sizeof(struct ieee80211_ie_htcap)
 	       + 4 + sizeof(struct ieee80211_ie_htinfo)
-	       +  sizeof(struct ieee80211_ie_vhtcap)
-	       +  sizeof(struct ieee80211_ie_vht_operation)
+	       + 2 + sizeof(struct ieee80211_vht_cap)
+	       + 2 + sizeof(struct ieee80211_vht_operation)
 #ifdef IEEE80211_SUPPORT_SUPERG
 	       + sizeof(struct ieee80211_ath_ie)
 #endif
@@ -3208,7 +3274,7 @@ ieee80211_send_proberesp(struct ieee80211vap *vap,
 		return ENOMEM;
 	}
 
-	M_PREPEND(m, sizeof(struct ieee80211_frame), M_NOWAIT);
+	M_PREPEND(m, sizeof(struct ieee80211_frame), IEEE80211_M_NOWAIT);
 	KASSERT(m != NULL, ("no room for header"));
 
 	IEEE80211_TX_LOCK(ic);
@@ -3244,7 +3310,7 @@ ieee80211_alloc_rts(struct ieee80211com *ic,
 	struct mbuf *m;
 
 	/* XXX honor ic_headroom */
-	m = m_gethdr(M_NOWAIT, MT_DATA);
+	m = m_gethdr(IEEE80211_M_NOWAIT, MT_DATA);
 	if (m != NULL) {
 		rts = mtod(m, struct ieee80211_frame_rts *);
 		rts->i_fc[0] = IEEE80211_FC0_VERSION_0 |
@@ -3270,7 +3336,7 @@ ieee80211_alloc_cts(struct ieee80211com *ic,
 	struct mbuf *m;
 
 	/* XXX honor ic_headroom */
-	m = m_gethdr(M_NOWAIT, MT_DATA);
+	m = m_gethdr(IEEE80211_M_NOWAIT, MT_DATA);
 	if (m != NULL) {
 		cts = mtod(m, struct ieee80211_frame_cts *);
 		cts->i_fc[0] = IEEE80211_FC0_VERSION_0 |
@@ -3323,6 +3389,12 @@ ieee80211_tx_mgt_timeout(void *arg)
 {
 	struct ieee80211vap *vap = arg;
 
+	IEEE80211_DPRINTF(vap, IEEE80211_MSG_STATE | IEEE80211_MSG_DEBUG,
+	    "vap %p mode %s state %s flags %#x & %#x\n", vap,
+	    ieee80211_opmode_name[vap->iv_opmode],
+	    ieee80211_state_name[vap->iv_state],
+	    vap->iv_ic->ic_flags, IEEE80211_F_SCAN);
+
 	IEEE80211_LOCK(vap->iv_ic);
 	if (vap->iv_state != IEEE80211_S_INIT &&
 	    (vap->iv_ic->ic_flags & IEEE80211_F_SCAN) == 0) {
@@ -3368,6 +3440,11 @@ ieee80211_tx_mgt_cb(struct ieee80211_node *ni, void *arg, int status)
 	 * XXX what happens if !acked but response shows up before callback?
 	 */
 	if (vap->iv_state == ostate) {
+		IEEE80211_DPRINTF(vap, IEEE80211_MSG_STATE | IEEE80211_MSG_DEBUG,
+		    "ni %p mode %s state %s arg %p status %d\n", ni,
+		    ieee80211_opmode_name[vap->iv_opmode],
+		    ieee80211_state_name[vap->iv_state], arg, status);
+
 		callout_reset(&vap->iv_mgtsend,
 			status == 0 ? IEEE80211_TRANS_WAIT*hz : 0,
 			ieee80211_tx_mgt_timeout, vap);
@@ -3481,7 +3558,7 @@ ieee80211_beacon_construct(struct mbuf *m, uint8_t *frm,
 
 		tie->tim_ie = IEEE80211_ELEMID_TIM;
 		tie->tim_len = 4;	/* length */
-		tie->tim_count = 0;	/* DTIM count */
+		tie->tim_count = 0;	/* DTIM count */ 
 		tie->tim_period = vap->iv_dtim_period;	/* DTIM period */
 		tie->tim_bitctl = 0;	/* bitmap control */
 		tie->tim_bitmap[0] = 0;	/* Partial Virtual Bitmap */
@@ -3497,7 +3574,7 @@ ieee80211_beacon_construct(struct mbuf *m, uint8_t *frm,
 			frm = ieee80211_add_powerconstraint(frm, vap);
 		bo->bo_csa = frm;
 		if (ic->ic_flags & IEEE80211_F_CSAPENDING)
-			frm = ieee80211_add_csa(frm, vap);
+			frm = ieee80211_add_csa(frm, vap);	
 	} else
 		bo->bo_csa = frm;
 
@@ -3659,8 +3736,8 @@ ieee80211_beacon_alloc(struct ieee80211_node *ni)
 		 /* XXX conditional? */
 		 + 4+2*sizeof(struct ieee80211_ie_htcap)/* HT caps */
 		 + 4+2*sizeof(struct ieee80211_ie_htinfo)/* HT info */
-		 + sizeof(struct ieee80211_ie_vhtcap)/* VHT caps */
-		 + sizeof(struct ieee80211_ie_vht_operation)/* VHT info */
+		 + 2 + sizeof(struct ieee80211_vht_cap)/* VHT caps */
+		 + 2 + sizeof(struct ieee80211_vht_operation)/* VHT info */
 		 + (vap->iv_caps & IEEE80211_C_WME ?	/* WME */
 			sizeof(struct ieee80211_wme_param) : 0)
 #ifdef IEEE80211_SUPPORT_SUPERG
@@ -3686,7 +3763,7 @@ ieee80211_beacon_alloc(struct ieee80211_node *ni)
 	}
 	ieee80211_beacon_construct(m, frm, ni);
 
-	M_PREPEND(m, sizeof(struct ieee80211_frame), M_NOWAIT);
+	M_PREPEND(m, sizeof(struct ieee80211_frame), IEEE80211_M_NOWAIT);
 	KASSERT(m != NULL, ("no space for 802.11 header?"));
 	wh = mtod(m, struct ieee80211_frame *);
 	wh->i_fc[0] = IEEE80211_FC0_VERSION_0 | IEEE80211_FC0_TYPE_MGT |
@@ -3865,7 +3942,7 @@ ieee80211_beacon_update(struct ieee80211_node *ni, struct mbuf *m, int mcast)
 			(struct ieee80211_tim_ie *) bo->bo_tim;
 		if (isset(bo->bo_flags, IEEE80211_BEACON_TIM)) {
 			u_int timlen, timoff, i;
-			/*
+			/* 
 			 * ATIM/DTIM needs updating.  If it fits in the
 			 * current space allocated then just copy in the
 			 * new bits.  Otherwise we need to move any trailing
@@ -4070,7 +4147,7 @@ ieee80211_ff_encap1(struct ieee80211vap *vap, struct mbuf *m,
 	llc->llc_snap.ether_type = eh->ether_type;
 	payload = m->m_pkthdr.len;		/* NB: w/o Ethernet header */
 
-	M_PREPEND(m, sizeof(struct ether_header), M_NOWAIT);
+	M_PREPEND(m, sizeof(struct ether_header), IEEE80211_M_NOWAIT);
 	if (m == NULL) {		/* XXX cannot happen */
 		IEEE80211_DPRINTF(vap, IEEE80211_MSG_SUPERG,
 			"%s: no space for ether_header\n", __func__);
@@ -4115,8 +4192,13 @@ ieee80211_tx_complete(struct ieee80211_node *ni, struct mbuf *m, int status)
 				if_inc_counter(ifp, IFCOUNTER_OMCASTS, 1);
 		} else
 			if_inc_counter(ifp, IFCOUNTER_OERRORS, 1);
-		if (m->m_flags & M_TXCB)
+		if (m->m_flags & M_TXCB) {
+			IEEE80211_DPRINTF(ni->ni_vap, IEEE80211_MSG_STATE | IEEE80211_MSG_DEBUG,
+			   "ni %p vap %p mode %s state %s m %p status %d\n", ni, ni->ni_vap,
+			   ieee80211_opmode_name[ni->ni_vap->iv_opmode],
+			   ieee80211_state_name[ni->ni_vap->iv_state], m, status);
 			ieee80211_process_callback(ni, m, status);
+		}
 		ieee80211_free_node(ni);
 	}
 	m_freem(m);

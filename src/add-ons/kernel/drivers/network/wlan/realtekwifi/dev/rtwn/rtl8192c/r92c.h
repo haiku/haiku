@@ -15,11 +15,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: if_urtwnreg.h,v 1.3 2010/11/16 18:02:59 damien Exp $
- * $FreeBSD$
  */
 
 #ifndef RTL8192C_H
 #define RTL8192C_H
+
+#include <dev/rtwn/if_rtwn_ridx.h>
 
 /*
  * Global definitions.
@@ -54,9 +55,9 @@ uint8_t	r92c_temp_read(struct rtwn_softc *);
 
 /* r92c_chan.c */
 void	r92c_get_txpower(struct rtwn_softc *, int,
-	    struct ieee80211_channel *, uint8_t[]);
+	    struct ieee80211_channel *, uint8_t[RTWN_RIDX_COUNT]);
 void	r92c_write_txpower(struct rtwn_softc *, int,
-	    uint8_t power[]);
+	    uint8_t power[RTWN_RIDX_COUNT]);
 void	r92c_set_bw20(struct rtwn_softc *, uint8_t);
 void	r92c_set_chan(struct rtwn_softc *, struct ieee80211_channel *);
 void	r92c_set_gain(struct rtwn_softc *, uint8_t);

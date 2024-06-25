@@ -38,8 +38,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/ath_rate/sample/sample.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * John Bicket's SampleRate control algorithm.
  */
@@ -1435,10 +1433,12 @@ ath_rate_fetch_node_stats(struct ath_softc *sc, struct ath_node *an,
 	const HAL_RATE_TABLE *rt = sc->sc_currates;
 	struct ath_rateioctl_tlv av;
 	struct ath_rateioctl_rt *tv;
-	int y;
+	int error, y;
 	int o = 0;
 
 	ATH_NODE_LOCK_ASSERT(an);
+
+	error = 0;
 
 	/*
 	 * Ensure there's enough space for the statistics.
@@ -1480,9 +1480,13 @@ ath_rate_fetch_node_stats(struct ath_softc *sc, struct ath_node *an,
 	 */
 	av.tlv_id = ATH_RATE_TLV_RATETABLE;
 	av.tlv_len = sizeof(struct ath_rateioctl_rt);
-	copyout(&av, rs->buf + o, sizeof(struct ath_rateioctl_tlv));
+	error = copyout(&av, rs->buf + o, sizeof(struct ath_rateioctl_tlv));
+	if (error != 0)
+		goto out;
 	o += sizeof(struct ath_rateioctl_tlv);
-	copyout(tv, rs->buf + o, sizeof(struct ath_rateioctl_rt));
+	error = copyout(tv, rs->buf + o, sizeof(struct ath_rateioctl_rt));
+	if (error != 0)
+		goto out;
 	o += sizeof(struct ath_rateioctl_rt);
 
 	/*
@@ -1490,18 +1494,22 @@ ath_rate_fetch_node_stats(struct ath_softc *sc, struct ath_node *an,
 	 */
 	av.tlv_id = ATH_RATE_TLV_SAMPLENODE;
 	av.tlv_len = sizeof(struct sample_node);
-	copyout(&av, rs->buf + o, sizeof(struct ath_rateioctl_tlv));
+	error = copyout(&av, rs->buf + o, sizeof(struct ath_rateioctl_tlv));
+	if (error != 0)
+		goto out;
 	o += sizeof(struct ath_rateioctl_tlv);
 
 	/*
 	 * Copy the statistics over to the provided buffer.
 	 */
-	copyout(sn, rs->buf + o, sizeof(struct sample_node));
+	error = copyout(sn, rs->buf + o, sizeof(struct sample_node));
+	if (error != 0)
+		goto out;
 	o += sizeof(struct sample_node);
 
+out:
 	free(tv, M_TEMP);
-
-	return (0);
+	return (error);
 }
 
 static void

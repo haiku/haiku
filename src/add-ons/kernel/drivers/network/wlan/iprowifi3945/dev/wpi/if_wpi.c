@@ -18,8 +18,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/wpi/if_wpi.c 327479 2018-01-02 00:07:28Z adrian $");
-
 /*
  * Driver for Intel PRO/Wireless 3945ABG 802.11 network adapters.
  *
@@ -299,9 +297,8 @@ static driver_t wpi_driver = {
 	wpi_methods,
 	sizeof (struct wpi_softc)
 };
-static devclass_t wpi_devclass;
 
-DRIVER_MODULE(wpi, pci, wpi_driver, wpi_devclass, NULL, NULL);
+DRIVER_MODULE(wpi, pci, wpi_driver, NULL, NULL);
 
 MODULE_VERSION(wpi, 1);
 
@@ -2187,11 +2184,10 @@ wpi_notif_intr(struct wpi_softc *sc)
 	hw = (hw == 0) ? WPI_RX_RING_COUNT - 1 : hw - 1;
 
 	while (sc->rxq.cur != hw) {
-		struct wpi_rx_data *data;
-		struct wpi_rx_desc *desc;
 		sc->rxq.cur = (sc->rxq.cur + 1) % WPI_RX_RING_COUNT;
 
-		data = &sc->rxq.data[sc->rxq.cur];
+		struct wpi_rx_data *data = &sc->rxq.data[sc->rxq.cur];
+		struct wpi_rx_desc *desc;
 
 		bus_dmamap_sync(sc->rxq.data_dmat, data->map,
 		    BUS_DMASYNC_POSTREAD);
@@ -2310,11 +2306,10 @@ wpi_notif_intr(struct wpi_softc *sc)
 		}
 		case WPI_STATE_CHANGED:
 		{
-			uint32_t *status;
 			bus_dmamap_sync(sc->rxq.data_dmat, data->map,
 			    BUS_DMASYNC_POSTREAD);
 
-			status = (uint32_t *)(desc + 1);
+			uint32_t *status = (uint32_t *)(desc + 1);
 
 			DPRINTF(sc, WPI_DEBUG_STATE, "state changed to %x\n",
 			    le32toh(*status));
@@ -2346,11 +2341,10 @@ wpi_notif_intr(struct wpi_softc *sc)
 #endif
 		case WPI_STOP_SCAN:
 		{
-			struct wpi_stop_scan *scan;
 			bus_dmamap_sync(sc->rxq.data_dmat, data->map,
 			    BUS_DMASYNC_POSTREAD);
 
-			scan =
+			struct wpi_stop_scan *scan =
 			    (struct wpi_stop_scan *)(desc + 1);
 
 			DPRINTF(sc, WPI_DEBUG_SCAN,
@@ -2773,7 +2767,7 @@ wpi_cmd2(struct wpi_softc *sc, struct wpi_buf *buf)
 		ring->pending = 0;
 		sc->sc_update_tx_ring(sc, ring);
 	} else
-		ieee80211_node_incref(data->ni);
+		(void) ieee80211_ref_node(data->ni);
 
 end:	DPRINTF(sc, WPI_DEBUG_TRACE, error ? TRACE_STR_END_ERR : TRACE_STR_END,
 	    __func__);
@@ -4549,6 +4543,7 @@ wpi_run(struct wpi_softc *sc, struct ieee80211vap *vap)
 	    sc->rxon.chan, sc->rxon.flags);
 
 	if ((error = wpi_send_rxon(sc, 0, 1)) != 0) {
+		WPI_RXON_UNLOCK(sc);
 		device_printf(sc->sc_dev, "%s: could not send RXON\n",
 		    __func__);
 		return error;

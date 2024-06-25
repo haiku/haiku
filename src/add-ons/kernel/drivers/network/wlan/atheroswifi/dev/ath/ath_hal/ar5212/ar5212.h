@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5212/ar5212.h 326695 2017-12-08 15:57:29Z pfg $
  */
 #ifndef _ATH_AR5212_H_
 #define _ATH_AR5212_H_
@@ -529,6 +527,8 @@ extern	HAL_STATUS ar5212SetQuiet(struct ath_hal *ah, uint32_t period,
 extern	HAL_BOOL ar5212GetMibCycleCounts(struct ath_hal *,
 		HAL_SURVEY_SAMPLE *);
 extern	void ar5212SetChainMasks(struct ath_hal *, uint32_t, uint32_t);
+extern	u_int ar5212GetNav(struct ath_hal *);
+extern	void ar5212SetNav(struct ath_hal *, u_int);
 
 extern	HAL_BOOL ar5212SetPowerMode(struct ath_hal *ah, HAL_POWER_MODE mode,
 		int setChip);
@@ -572,7 +572,7 @@ extern	HAL_BOOL ar5212ResetCalValid(struct ath_hal *ah,
 		const struct ieee80211_channel *);
 extern	int16_t ar5212GetNoiseFloor(struct ath_hal *ah);
 extern	void ar5212InitNfCalHistBuffer(struct ath_hal *);
-extern	int16_t ar5212GetNfHistMid(const int16_t calData[]);
+extern	int16_t ar5212GetNfHistMid(const int16_t calData[AR512_NF_CAL_HIST_MAX]);
 extern	void ar5212SetSpurMitigation(struct ath_hal *,
 		 const struct ieee80211_channel *);
 extern	HAL_BOOL ar5212SetAntennaSwitchInternal(struct ath_hal *ah,

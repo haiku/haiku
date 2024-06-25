@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -27,8 +27,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/if_ath_misc.h 326255 2017-11-27 14:52:40Z pfg $
  */
 #ifndef	__IF_ATH_MISC_H__
 #define	__IF_ATH_MISC_H__
@@ -105,7 +103,7 @@ extern	void ath_tx_update_tim(struct ath_softc *sc,
  * if_ath.c and do the ath_start() call there.  Once that's done,
  * we can kill this.
  */
-extern void ath_start(struct ifnet *ifp);
+extern void ath_start(if_t ifp);
 extern	void ath_start_task(void *arg, int npending);
 
 extern void ath_tx_dump(struct ath_softc *sc, struct ath_txq *txq);

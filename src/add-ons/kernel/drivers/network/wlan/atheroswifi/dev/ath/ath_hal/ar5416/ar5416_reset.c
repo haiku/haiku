@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5416/ar5416_reset.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -204,11 +202,11 @@ ar5416Reset(struct ath_hal *ah, HAL_OPMODE opmode,
 		    AR_MAC_PCU_ASYNC_FIFO_REG3_SOFT_RESET);
 	}
 
-	/* Override ini values (that can be overriden in this fashion) */
+	/* Override ini values (that can be overridden in this fashion) */
 	ar5416OverrideIni(ah, chan);
 
 	/* Setup 11n MAC/Phy mode registers */
-	ar5416Set11nRegs(ah, chan);	
+	ar5416Set11nRegs(ah, chan);
 
 	OS_MARK(ah, AH_MARK_RESET_LINE, __LINE__);
 

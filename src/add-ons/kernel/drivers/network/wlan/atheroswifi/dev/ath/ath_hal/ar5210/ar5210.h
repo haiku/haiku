@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5210/ar5210.h 326695 2017-12-08 15:57:29Z pfg $
  */
 #ifndef _ATH_AR5210_H_
 #define _ATH_AR5210_H_
@@ -269,6 +267,8 @@ extern	void ar5210SetChainMasks(struct ath_hal *, uint32_t, uint32_t);
 extern	void ar5210EnableDfs(struct ath_hal *, HAL_PHYERR_PARAM *);
 extern	void ar5210GetDfsThresh(struct ath_hal *, HAL_PHYERR_PARAM *);
 extern	void ar5210UpdateDiagReg(struct ath_hal *ah, uint32_t val);
+extern	void ar5210SetNav(struct ath_hal *ah, u_int val);
+extern	u_int ar5210GetNav(struct ath_hal *ah);
 
 extern	u_int ar5210GetKeyCacheSize(struct ath_hal *);
 extern	HAL_BOOL ar5210IsKeyCacheEntryValid(struct ath_hal *, uint16_t);
@@ -278,7 +278,7 @@ extern	HAL_BOOL ar5210SetKeyCacheEntry(struct ath_hal *, uint16_t entry,
 extern	HAL_BOOL ar5210SetKeyCacheEntryMac(struct ath_hal *,
 			uint16_t, const uint8_t *);
 
-extern	HAL_BOOL ar5210SetPowerMode(struct ath_hal *, uint32_t powerRequest,
+extern	HAL_BOOL ar5210SetPowerMode(struct ath_hal *, HAL_POWER_MODE mode,
 		int setChip);
 extern	HAL_POWER_MODE ar5210GetPowerMode(struct ath_hal *);
 

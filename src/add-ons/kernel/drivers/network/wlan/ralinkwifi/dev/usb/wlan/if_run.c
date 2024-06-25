@@ -18,8 +18,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 /*-
  * Ralink Technology RT2700U/RT2800U/RT3000U/RT3900E chipset driver.
  * http://www.ralinktech.com/
@@ -414,7 +412,7 @@ static void	run_get_txpower(struct run_softc *);
 static int	run_read_eeprom(struct run_softc *);
 static struct ieee80211_node *run_node_alloc(struct ieee80211vap *,
 			    const uint8_t mac[IEEE80211_ADDR_LEN]);
-static int	run_media_change(struct ifnet *);
+static int	run_media_change(if_t);
 static int	run_newstate(struct ieee80211vap *, enum ieee80211_state, int);
 static int	run_wme_update(struct ieee80211com *);
 static void	run_key_set_cb(void *);
@@ -2117,9 +2115,9 @@ run_node_alloc(struct ieee80211vap *vap, const uint8_t mac[IEEE80211_ADDR_LEN])
 }
 
 static int
-run_media_change(struct ifnet *ifp)
+run_media_change(if_t ifp)
 {
-	struct ieee80211vap *vap = ifp->if_softc;
+	struct ieee80211vap *vap = if_getsoftc(ifp);
 	struct ieee80211com *ic = vap->iv_ic;
 	const struct ieee80211_txparam *tp;
 	struct run_softc *sc = ic->ic_softc;
@@ -2155,8 +2153,8 @@ run_media_change(struct ifnet *ifp)
 	}
 
 #if 0
-	if ((ifp->if_flags & IFF_UP) &&
-	    (ifp->if_drv_flags &  RUN_RUNNING)){
+	if ((if_getflags(ifp) & IFF_UP) &&
+	    (if_getdrvflags(ifp) &  RUN_RUNNING)){
 		run_init_locked(sc);
 	}
 #endif
@@ -2873,7 +2871,6 @@ run_rx_frame(struct run_softc *sc, struct mbuf *m, uint32_t dmalen)
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ieee80211_frame *wh;
 	struct ieee80211_node *ni;
-	struct epoch_tracker et;
 	struct rt2870_rxd *rxd;
 	struct rt2860_rxwi *rxwi;
 	uint32_t flags;
@@ -2996,14 +2993,12 @@ run_rx_frame(struct run_softc *sc, struct mbuf *m, uint32_t dmalen)
 		}
 	}
 
-	NET_EPOCH_ENTER(et);
 	if (ni != NULL) {
 		(void)ieee80211_input(ni, m, rssi, nf);
 		ieee80211_free_node(ni);
 	} else {
 		(void)ieee80211_input_all(ic, m, rssi, nf);
 	}
-	NET_EPOCH_EXIT(et);
 
 	return;
 
@@ -3494,7 +3489,7 @@ run_tx(struct run_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 			dur = rt2860_rates[ctl_ridx].sp_ack_dur;
 		else
 			dur = rt2860_rates[ctl_ridx].lp_ack_dur;
-		*(uint16_t *)wh->i_dur = htole16(dur);
+		USETW(wh->i_dur, dur);
 	}
 
 	/* reserve slots for mgmt packets, just in case */
@@ -3610,7 +3605,7 @@ run_tx_mgt(struct run_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 
 		dur = ieee80211_ack_duration(ic->ic_rt, rt2860_rates[ridx].rate, 
 		    ic->ic_flags & IEEE80211_F_SHPREAMBLE);
-		*(uint16_t *)wh->i_dur = htole16(dur);
+		USETW(wh->i_dur, dur);
 	}
 
 	if (sc->sc_epq[0].tx_nfree == 0)
@@ -6438,9 +6433,7 @@ static driver_t run_driver = {
 	.size = sizeof(struct run_softc)
 };
 
-static devclass_t run_devclass;
-
-DRIVER_MODULE(run, uhub, run_driver, run_devclass, run_driver_loaded, NULL);
+DRIVER_MODULE(run, uhub, run_driver, run_driver_loaded, NULL);
 MODULE_DEPEND(run, wlan, 1, 1, 1);
 MODULE_DEPEND(run, usb, 1, 1, 1);
 MODULE_DEPEND(run, firmware, 1, 1, 1);

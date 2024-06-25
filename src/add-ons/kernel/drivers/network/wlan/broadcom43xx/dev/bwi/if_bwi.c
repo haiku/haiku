@@ -37,8 +37,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/bwi/if_bwi.c 337570 2018-08-10 13:06:14Z kevans $");
-
 #include "opt_inet.h"
 #include "opt_bwi.h"
 #include "opt_wlan.h"
@@ -3397,7 +3395,7 @@ bwi_txeof(struct bwi_softc *sc)
 {
 
 	for (;;) {
-		uint32_t tx_status0, tx_status1;
+		uint32_t tx_status0, tx_status1 __unused;
 		uint16_t tx_id;
 		int data_txcnt;
 

@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2007-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2007-2009 Marvell Semiconductor, Inc.
@@ -28,12 +28,10 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
- *
- * $FreeBSD: releng/12.0/sys/dev/mwl/mwlhal.c 326255 2017-11-27 14:52:40Z pfg $
  */
 
 #include <sys/param.h>
-#include <sys/systm.h>
+#include <sys/systm.h> 
 #include <sys/sysctl.h>
 #include <sys/malloc.h>
 #include <sys/lock.h>
@@ -192,7 +190,7 @@ static void dumpresult(struct mwl_hal_priv *, int showresult);
 #endif /* MWLHAL_DEBUG */
 
 SYSCTL_DECL(_hw_mwl);
-static SYSCTL_NODE(_hw_mwl, OID_AUTO, hal, CTLFLAG_RD, 0,
+static SYSCTL_NODE(_hw_mwl, OID_AUTO, hal, CTLFLAG_RD | CTLFLAG_MPSAFE, 0,
     "Marvell HAL parameters");
 
 static __inline void
@@ -318,7 +316,7 @@ mwl_hal_attach(device_t dev, uint16_t devid,
 
 	/* allocate descriptors */
 	error = bus_dmamem_alloc(mh->mh_dmat, (void**) &mh->mh_cmdbuf,
-				 BUS_DMA_NOWAIT | BUS_DMA_COHERENT,
+				 BUS_DMA_NOWAIT | BUS_DMA_COHERENT, 
 				 &mh->mh_dmamap);
 	if (error != 0) {
 		device_printf(dev, "unable to allocate memory for cmd buffer, "
@@ -622,11 +620,9 @@ mwl_hal_sethwdma(struct mwl_hal *mh0, const struct mwl_hal_txrxdma *dma)
 	pCmd->TotalRxWcb = htole32(1);		/* XXX */
 	pCmd->RxPdWrPtr = htole32(dma->rxDescRead);
 	pCmd->Flags = htole32(SET_HW_SPEC_HOSTFORM_BEACON
-/*
 #ifdef MWL_HOST_PS_SUPPORT
 		    | SET_HW_SPEC_HOST_POWERSAVE
 #endif
-*/
 		    | SET_HW_SPEC_HOSTFORM_PROBERESP);
 	/* disable multi-bss operation for A1-A4 parts */
 	if (mh->mh_revs.mh_macRev < 5)
@@ -834,7 +830,7 @@ mwl_hal_setradardetection(struct mwl_hal *mh0, MWL_HAL_RADAR action)
 	retval = mwlExecuteCmd(mh, HostCmd_CMD_802_11H_DETECT_RADAR);
 	MWL_HAL_UNLOCK(mh);
 	return retval;
-}
+} 
 
 /*
  * Convert public channel flags definition to a
@@ -984,7 +980,7 @@ mwl_hal_settxrate(struct mwl_hal_vap *vap, MWL_HAL_TXRATE_HANDLING handling,
 			n++;
 		}
 		pCmd->EntryCount = htole32(n);
-	} else
+	} else 
 		pCmd->Action = htole32(HostCmd_ACT_NOT_USE_FIXED_RATE);
 
 	retval = mwlExecuteCmd(mh, HostCmd_CMD_SET_FIXED_RATE);
@@ -1384,7 +1380,7 @@ bastream_check_available(struct mwl_hal_vap *vap, int qid,
 	_VCMD_SETUP(vap, pCmd, HostCmd_FW_BASTREAM, HostCmd_CMD_BASTREAM);
 	pCmd->ActionType = htole32(BaCheckCreateStream);
 	pCmd->BaInfo.CreateParams.BarThrs = htole32(63);
-	pCmd->BaInfo.CreateParams.WindowSize = htole32(64);
+	pCmd->BaInfo.CreateParams.WindowSize = htole32(64); 
 	pCmd->BaInfo.CreateParams.IdleThrs = htole32(0x22000);
 	IEEE80211_ADDR_COPY(&pCmd->BaInfo.CreateParams.PeerMacAddr[0], Macaddr);
 	pCmd->BaInfo.CreateParams.DialogToken = 10;
@@ -1568,7 +1564,7 @@ mwl_hal_bastream_get_seqno(struct mwl_hal *mh0,
 		*pseqno = le16toh(pCmd->SeqNo);
 	MWL_HAL_UNLOCK(mh);
 	return retval;
-}
+}	
 
 int
 mwl_hal_getwatchdogbitmap(struct mwl_hal *mh0, uint8_t bitmap[1])
@@ -1610,7 +1606,7 @@ mwl_hal_setaggampduratemode(struct mwl_hal *mh0, int mode, int threshold)
 	pCmd->Threshold = htole32(threshold);
 
 	retval = mwlExecuteCmd(mh, HostCmd_CMD_AMPDU_RETRY_RATEDROP_MODE);
-	MWL_HAL_UNLOCK(mh);
+	MWL_HAL_UNLOCK(mh);   
 	return retval;
 }
 
@@ -1627,7 +1623,7 @@ mwl_hal_getaggampduratemode(struct mwl_hal *mh0, int *mode, int *threshold)
 	pCmd->Action = htole16(0);
 
 	retval = mwlExecuteCmd(mh, HostCmd_CMD_AMPDU_RETRY_RATEDROP_MODE);
-	MWL_HAL_UNLOCK(mh);
+	MWL_HAL_UNLOCK(mh);   
 	*mode =  le32toh(pCmd->Option);
 	*threshold = le32toh(pCmd->Threshold);
 	return retval;
@@ -1649,7 +1645,7 @@ mwl_hal_setcfend(struct mwl_hal *mh0, int ena)
 	pCmd->Enable = htole32(ena);
 
 	retval = mwlExecuteCmd(mh, HostCmd_CMD_CFEND_ENABLE);
-	MWL_HAL_UNLOCK(mh);
+	MWL_HAL_UNLOCK(mh); 
 	return retval;
 }
 
@@ -1685,7 +1681,7 @@ cvtPeerInfo(PeerInfo_t *to, const MWL_HAL_PEERINFO *from)
 /* XXX station id must be in [0..63] */
 int
 mwl_hal_newstation(struct mwl_hal_vap *vap,
-	const uint8_t addr[IEEE80211_ADDR_LEN], uint16_t aid, uint16_t sid,
+	const uint8_t addr[IEEE80211_ADDR_LEN], uint16_t aid, uint16_t sid, 
 	const MWL_HAL_PEERINFO *peer, int isQosSta, int wmeInfo)
 {
 	struct mwl_hal_priv *mh = MWLVAP(vap);
@@ -2006,7 +2002,7 @@ mwlGetCalTable(struct mwl_hal_priv *mh, uint8_t annex, uint8_t index)
 	    pCmd->calTbl[0] != annex && annex != 0 && annex != 255)
 		retval = EIO;
 	return retval;
-}
+}							  
 
 /*
  * Calculate the max tx power from the channel's cal data.
@@ -2211,7 +2207,7 @@ mwl_hal_GetBeacon(struct mwl_hal *mh0, uint8_t *pBcn, uint16_t *pLen)
 	}
 	MWL_HAL_UNLOCK(mh);
 	return retval;
-}
+}	
 
 int
 mwl_hal_SetRifs(struct mwl_hal *mh0, uint8_t QNum)
@@ -2347,13 +2343,12 @@ mwl_hal_getdiagstate(struct mwl_hal *mh0, int request,
 static void
 mwlSendCmd(struct mwl_hal_priv *mh)
 {
-	uint32_t dummy;
 
 	bus_dmamap_sync(mh->mh_dmat, mh->mh_dmamap,
 	    BUS_DMASYNC_PREREAD | BUS_DMASYNC_PREWRITE);
 
 	WR4(mh, MACREG_REG_GEN_PTR, mh->mh_cmdaddr);
-	dummy = RD4(mh, MACREG_REG_INT_CODE);
+	RD4(mh, MACREG_REG_INT_CODE);
 
 	WR4(mh, MACREG_REG_H2A_INTERRUPT_EVENTS, MACREG_H2ARIC_BIT_DOOR_BELL);
 }
@@ -2423,9 +2418,9 @@ mwlExecuteCmd(struct mwl_hal_priv *mh, unsigned short cmd)
 /*
  * Firmware download support.
  */
-#define FW_DOWNLOAD_BLOCK_SIZE	256
+#define FW_DOWNLOAD_BLOCK_SIZE	256  
 #define FW_CHECK_USECS		(5*1000)	/* 5ms */
-#define FW_MAX_NUM_CHECKS	200
+#define FW_MAX_NUM_CHECKS	200  
 
 #if 0
 /* XXX read f/w from file */
@@ -2448,18 +2443,17 @@ mwlFwReset(struct mwl_hal_priv *mh)
 static void
 mwlTriggerPciCmd(struct mwl_hal_priv *mh)
 {
-	uint32_t dummy;
 
 	bus_dmamap_sync(mh->mh_dmat, mh->mh_dmamap, BUS_DMASYNC_PREWRITE);
 
 	WR4(mh, MACREG_REG_GEN_PTR, mh->mh_cmdaddr);
-	dummy = RD4(mh, MACREG_REG_INT_CODE);
+	RD4(mh, MACREG_REG_INT_CODE);
 
 	WR4(mh, MACREG_REG_INT_CODE, 0x00);
-	dummy = RD4(mh, MACREG_REG_INT_CODE);
+	RD4(mh, MACREG_REG_INT_CODE);
 
 	WR4(mh, MACREG_REG_H2A_INTERRUPT_EVENTS, MACREG_H2ARIC_BIT_DOOR_BELL);
-	dummy = RD4(mh, MACREG_REG_INT_CODE);
+	RD4(mh, MACREG_REG_INT_CODE);
 }
 
 static int

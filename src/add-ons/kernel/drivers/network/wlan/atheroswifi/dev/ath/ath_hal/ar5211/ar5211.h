@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5211/ar5211.h 326695 2017-12-08 15:57:29Z pfg $
  */
 #ifndef _ATH_AR5211_H_
 #define _ATH_AR5211_H_
@@ -291,6 +289,8 @@ extern	uint32_t ar5211Get11nExtBusy(struct ath_hal *);
 extern	HAL_BOOL ar5211GetMibCycleCounts(struct ath_hal *,
 		HAL_SURVEY_SAMPLE *);
 extern	void ar5211SetChainMasks(struct ath_hal *ah, uint32_t, uint32_t);
+extern	void ar5211SetNav(struct ath_hal *ah, u_int);
+extern	u_int ar5211GetNav(struct ath_hal *ah);
 
 extern	void ar5211EnableDfs(struct ath_hal *, HAL_PHYERR_PARAM *);
 extern	void ar5211GetDfsThresh(struct ath_hal *, HAL_PHYERR_PARAM *);
@@ -304,7 +304,7 @@ extern	HAL_BOOL ar5211SetKeyCacheEntry(struct ath_hal *, uint16_t entry,
 extern	HAL_BOOL ar5211SetKeyCacheEntryMac(struct ath_hal *,
 			uint16_t, const uint8_t *);
 
-extern	HAL_BOOL ar5211SetPowerMode(struct ath_hal *, uint32_t powerRequest,
+extern	HAL_BOOL ar5211SetPowerMode(struct ath_hal *, HAL_POWER_MODE mode,
 		int setChip);
 extern	HAL_POWER_MODE ar5211GetPowerMode(struct ath_hal *);
 

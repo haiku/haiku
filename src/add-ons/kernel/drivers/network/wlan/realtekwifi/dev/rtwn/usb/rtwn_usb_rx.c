@@ -19,8 +19,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include "opt_wlan.h"
 
 #include <sys/param.h>
@@ -367,7 +365,7 @@ rtwn_bulk_rx_callback(struct usb_xfer *xfer, usb_error_t error)
 	struct rtwn_softc *sc = &uc->uc_sc;
 	struct ieee80211com *ic = &sc->sc_ic;
 	struct ieee80211_node *ni;
-	struct mbuf *m = NULL, *next;
+	struct mbuf *m0, *m = NULL, *next;
 	struct rtwn_data *data;
 
 	RTWN_ASSERT_LOCKED(sc);
@@ -399,23 +397,29 @@ tr_setup:
 		 * ieee80211_input() because here is at the end of a USB
 		 * callback and safe to unlock.
 		 */
+		m0 = m;
+		while (m != NULL) {
+			M_ASSERTPKTHDR(m);
+			m->m_pkthdr.PH_loc.ptr = rtwn_rx_frame(sc, m);
+			m = m->m_nextpkt;
+		}
+		RTWN_UNLOCK(sc);
+		m = m0;
 		while (m != NULL) {
 			next = m->m_nextpkt;
 			m->m_nextpkt = NULL;
 
-			ni = rtwn_rx_frame(sc, m);
-
-			RTWN_UNLOCK(sc);
-
+			ni = m->m_pkthdr.PH_loc.ptr;
+			m->m_pkthdr.PH_loc.ptr = NULL;
 			if (ni != NULL) {
 				(void)ieee80211_input_mimo(ni, m);
 				ieee80211_free_node(ni);
 			} else {
 				(void)ieee80211_input_mimo_all(ic, m);
 			}
-			RTWN_LOCK(sc);
 			m = next;
 		}
+		RTWN_LOCK(sc);
 		break;
 	default:
 		/* needs it to the inactive queue due to a error. */

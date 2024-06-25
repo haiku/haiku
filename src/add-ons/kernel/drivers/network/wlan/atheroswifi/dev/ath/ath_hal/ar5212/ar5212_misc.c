@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5212/ar5212_misc.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -1457,4 +1455,31 @@ void
 ar5212SetChainMasks(struct ath_hal *ah, uint32_t tx_chainmask,
     uint32_t rx_chainmask)
 {
+}
+
+/*
+ * Get the current NAV value from the hardware.
+ *
+ * 0xdeadbeef indicates the hardware is currently powered off.
+ */
+u_int
+ar5212GetNav(struct ath_hal *ah)
+{
+	uint32_t reg;
+
+	reg = OS_REG_READ(ah, AR_NAV);
+
+	if (reg == 0xdeadbeef)
+		return (0);
+	return (reg);
+}
+
+/*
+ * Set the current NAV value to the hardware.
+ */
+void
+ar5212SetNav(struct ath_hal *ah, u_int val)
+{
+
+	OS_REG_WRITE(ah, AR_NAV, val);
 }

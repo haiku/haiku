@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2007-2009 Sam Leffler, Errno Consulting
  * Copyright (c) 2007-2009 Marvell Semiconductor, Inc.
@@ -32,7 +32,6 @@
 
 #include <sys/cdefs.h>
 #ifdef __FreeBSD__
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/mwl/if_mwl_pci.c 326255 2017-11-27 14:52:40Z pfg $");
 #endif
 
 /*
@@ -281,13 +280,14 @@ static device_method_t mwl_pci_methods[] = {
 	DEVMETHOD(device_resume,	mwl_pci_resume),
 	{ 0,0 }
 };
+
 static driver_t mwl_pci_driver = {
 	"mwl",
 	mwl_pci_methods,
 	sizeof (struct mwl_pci_softc)
 };
-static	devclass_t mwl_devclass;
-DRIVER_MODULE(mwl, pci, mwl_pci_driver, mwl_devclass, 0, 0);
+
+DRIVER_MODULE(mwl, pci, mwl_pci_driver, 0, 0);
 MODULE_VERSION(mwl, 1);
 MODULE_DEPEND(mwl, wlan, 1, 1, 1);		/* 802.11 media layer */
 MODULE_DEPEND(mwl, firmware, 1, 1, 1);

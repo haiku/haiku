@@ -1047,8 +1047,8 @@ ar9300_spur_mitigate_ofdm(struct ath_hal *ah, struct ieee80211_channel *chan)
     int mode;
     u_int8_t* spur_chans_ptr;
     struct ath_hal_9300 *ahp;
+    ahp = AH9300(ah);
     HAL_CHANNEL_INTERNAL *ichan = ath_hal_checkchannel(ah, chan);
-	ahp = AH9300(ah);
 
     if (IS_CHAN_5GHZ(ichan)) {
         spur_chans_ptr = ar9300_eeprom_get_spur_chans_ptr(ah, 0);
@@ -3879,7 +3879,7 @@ ar9300_init_cal_internal(struct ath_hal *ah, struct ieee80211_channel *chan,
                 cl_tab_reg = BB_cl_tab_b[ch_idx];
                 for (j = 0; j < BB_cl_tab_entry; j++) {
                     OS_REG_WRITE(ah, cl_tab_reg, ichan->tx_clcal[ch_idx][j]);
-                    cl_tab_reg += 4;;
+                    cl_tab_reg += 4;
                 }
             }
             HALDEBUG(ah, HAL_DEBUG_FCS_RTT,
@@ -4538,7 +4538,7 @@ ar9300_reset(struct ath_hal *ah, HAL_OPMODE opmode, struct ieee80211_channel *ch
     u_int8_t                clk_25mhz = AH9300(ah)->clk_25mhz;
     HAL_BOOL                    stopped, cal_ret;
     HAL_BOOL                    apply_last_iqcorr = AH_FALSE;
-
+    uint64_t tsf;
 
     if (OS_REG_READ(ah, AR_IER) == AR_IER_ENABLE) {
         HALDEBUG(AH_NULL, HAL_DEBUG_UNMASKABLE, "** Reset called with WLAN "
@@ -4869,10 +4869,15 @@ ar9300_reset(struct ath_hal *ah, HAL_OPMODE opmode, struct ieee80211_channel *ch
     /* Mark PHY inactive prior to reset, to be undone in ar9300_init_bb () */
     ar9300_mark_phy_inactive(ah);
 
+    /* Save/restore TSF across a potentially full reset */
+    /* XXX TODO: only do this if we do a cold reset */
+    tsf = ar9300_get_tsf64(ah);
     if (!ar9300_chip_reset(ah, chan, reset_type)) {
         HALDEBUG(ah, HAL_DEBUG_RESET, "%s: chip reset failed\n", __func__);
         FAIL(HAL_EIO);
     }
+    if (tsf != 0)
+        ar9300_set_tsf64(ah, tsf);
 
     OS_MARK(ah, AH_MARK_RESET_LINE, __LINE__);
 
@@ -6293,7 +6298,6 @@ HAL_BOOL
 ar9300_interference_is_present(struct ath_hal *ah)
 {
     int i;
-	HAL_NFCAL_HIST_FULL *h;
     struct ath_hal_private  *ahpriv = AH_PRIVATE(ah);
     const struct ieee80211_channel *chan = ahpriv->ah_curchan;
     HAL_CHANNEL_INTERNAL *ichan = ath_hal_checkchannel(ah, chan);
@@ -6310,7 +6314,7 @@ ar9300_interference_is_present(struct ath_hal *ah)
      * hence check if any value (Chain 0/Primary Channel)
      * is outside the bounds.
      */
-    h = AH_HOME_CHAN_NFCAL_HIST(ah, ichan);
+    HAL_NFCAL_HIST_FULL *h = AH_HOME_CHAN_NFCAL_HIST(ah, ichan);
     for (i = 0; i < HAL_NF_CAL_HIST_LEN_FULL; i++) {
         if (h->nf_cal_buffer[i][0] >
             AH9300(ah)->nfp->nominal + AH9300(ah)->nf_cw_int_delta)

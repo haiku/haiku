@@ -34,8 +34,6 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGES.
  *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar9003/ar9300_devid.h 326255 2017-11-27 14:52:40Z pfg $
- *
  */
 #ifndef	__AR9300_DEVID_H__
 #define	__AR9300_DEVID_H__

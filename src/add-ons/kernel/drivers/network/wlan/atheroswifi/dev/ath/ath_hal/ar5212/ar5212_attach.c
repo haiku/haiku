@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ar5212/ar5212_attach.c 326695 2017-12-08 15:57:29Z pfg $
  */
 #include "opt_ah.h"
 
@@ -137,6 +135,8 @@ static const struct ath_hal_private ar5212hal = {{
 	.ah_setQuiet			= ar5212SetQuiet,
 	.ah_getMibCycleCounts		= ar5212GetMibCycleCounts,
 	.ah_setChainMasks		= ar5212SetChainMasks,
+	.ah_getNav			= ar5212GetNav,
+	.ah_setNav			= ar5212SetNav,
 
 	/* DFS Functions */
 	.ah_enableDfs			= ar5212EnableDfs,

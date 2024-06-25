@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -30,8 +30,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/if_ath_sysctl.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * Driver for the Atheros Wireless LAN controller.
  *
@@ -1237,7 +1235,7 @@ ath_sysctl_stats_attach(struct ath_softc *sc)
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "ast_rx_2040", CTLFLAG_RD,
 	    &sc->sc_stats.ast_rx_2040, 0, "number of HT/40 frames received");
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "ast_rx_pre_crc_err", CTLFLAG_RD,
-	    &sc->sc_stats.ast_rx_pre_crc_err, 0, "number of delimeter-CRC errors detected");
+	    &sc->sc_stats.ast_rx_pre_crc_err, 0, "number of delimiter-CRC errors detected");
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "ast_rx_post_crc_err", CTLFLAG_RD,
 	    &sc->sc_stats.ast_rx_post_crc_err, 0, "number of post-delimiter CRC errors detected");
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "ast_rx_decrypt_busy_err", CTLFLAG_RD,
@@ -1300,6 +1298,10 @@ ath_sysctl_stats_attach(struct ath_softc *sc)
 	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "ast_tx_ldpc",
 	    CTLFLAG_RD, &sc->sc_stats.ast_tx_ldpc, 0,
 	    "Number of LDPC frames transmitted");
+
+	SYSCTL_ADD_UINT(ctx, child, OID_AUTO, "ast_tsfoor",
+	    CTLFLAG_RD, &sc->sc_stats.ast_tsfoor, 0,
+	    "Number of TSF out of range interrupts/resets");
 
 	/* Attach the RX phy error array */
 	ath_sysctl_stats_attach_rxphyerr(sc, child);

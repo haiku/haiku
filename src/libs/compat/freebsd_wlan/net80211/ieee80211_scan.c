@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2008 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -26,15 +26,13 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_scan.c 326272 2017-11-27 15:23:17Z pfg $");
-
 /*
  * IEEE 802.11 scanning support.
  */
 #include "opt_wlan.h"
 
 #include <sys/param.h>
-#include <sys/systm.h>
+#include <sys/systm.h> 
 #include <sys/proc.h>
 #include <sys/kernel.h>
 #include <sys/malloc.h>
@@ -45,6 +43,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_scan.c 326272 2017-11-27 
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_media.h>
+#include <net/if_private.h>
 #include <net/ethernet.h>
 
 #include <net80211/ieee80211_var.h>
@@ -277,7 +276,8 @@ ieee80211_scan_update_locked(struct ieee80211vap *vap,
 	}
 }
 
-void
+#ifdef IEEE80211_DEBUG
+static void
 ieee80211_scan_dump_channels(const struct ieee80211_scan_state *ss)
 {
 	struct ieee80211com *ic = ss->ss_ic;
@@ -294,7 +294,6 @@ ieee80211_scan_dump_channels(const struct ieee80211_scan_state *ss)
 	}
 }
 
-#ifdef IEEE80211_DEBUG
 void
 ieee80211_scan_dump(struct ieee80211_scan_state *ss)
 {
@@ -574,7 +573,7 @@ ieee80211_scan_dump_probe_beacon(uint8_t subtype, int isnew,
 	printf(" rssi %d\n", rssi);
 
 	if (isnew) {
-		printf("[%s] caps 0x%x bintval %u erp 0x%x",
+		printf("[%s] caps 0x%x bintval %u erp 0x%x", 
 			ether_sprintf(mac), sp->capinfo, sp->bintval, sp->erp);
 		if (sp->country != NULL)
 			dump_country(sp->country);
@@ -616,7 +615,8 @@ ieee80211_scan_timeout(struct ieee80211com *ic)
  * Mark a scan cache entry after a successful associate.
  */
 void
-ieee80211_scan_assoc_success(struct ieee80211vap *vap, const uint8_t mac[])
+ieee80211_scan_assoc_success(struct ieee80211vap *vap,
+    const uint8_t mac[IEEE80211_ADDR_LEN])
 {
 	struct ieee80211_scan_state *ss = vap->iv_ic->ic_scan;
 
@@ -632,7 +632,7 @@ ieee80211_scan_assoc_success(struct ieee80211vap *vap, const uint8_t mac[])
  */
 void
 ieee80211_scan_assoc_fail(struct ieee80211vap *vap,
-	const uint8_t mac[], int reason)
+	const uint8_t mac[IEEE80211_ADDR_LEN], int reason)
 {
 	struct ieee80211_scan_state *ss = vap->iv_ic->ic_scan;
 

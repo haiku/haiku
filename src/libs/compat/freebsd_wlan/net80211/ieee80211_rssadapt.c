@@ -1,4 +1,3 @@
-/*	$FreeBSD: releng/12.0/sys/net80211/ieee80211_rssadapt.c 326272 2017-11-27 15:23:17Z pfg $	*/
 /* $NetBSD: ieee80211_rssadapt.c,v 1.9 2005/02/26 22:45:09 perry Exp $ */
 /*-
  * SPDX-License-Identifier: BSD-3-Clause

@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -27,8 +27,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/if_athvar.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*
@@ -61,6 +59,7 @@
 /*
  * 802.11n requires more TX and RX buffers to do AMPDU.
  */
+#define	ATH_ENABLE_11N			/* 802.11n support for AR5416 and later */
 #ifdef	ATH_ENABLE_11N
 #define	ATH_TXBUF	512
 #define	ATH_RXBUF	512
@@ -763,7 +762,7 @@ struct ath_softc {
 	u_int			sc_txqsetup;	/* h/w queues setup */
 	u_int			sc_txintrperiod;/* tx interrupt batching */
 	struct ath_txq		sc_txq[HAL_NUM_TX_QUEUES];
-	struct ath_txq		*sc_ac2q[5];	/* WME AC -> h/w q map */
+	struct ath_txq		*sc_ac2q[5];	/* WME AC -> h/w q map */ 
 	struct task		sc_txtask;	/* tx int processing */
 	struct task		sc_txqtask;	/* tx proc processing */
 
@@ -784,6 +783,7 @@ struct ath_softc {
 						/* recent tx frames/antenna */
 	struct ath_txq		*sc_cabq;	/* tx q for cab frames */
 	struct task		sc_bmisstask;	/* bmiss int processing */
+	struct task		sc_tsfoortask;	/* TSFOOR int processing */
 	struct task		sc_bstucktask;	/* stuck beacon processing */
 	struct task		sc_resettask;	/* interface reset task */
 	struct task		sc_fataltask;	/* fatal task */
@@ -1495,6 +1495,10 @@ void	ath_intr(void *);
 	((*(_ah)->ah_setChainMasks)((_ah), (_txchainmask), (_rxchainmask)))
 #define	ath_hal_set_quiet(_ah, _p, _d, _o, _f) \
 	((*(_ah)->ah_setQuiet)((_ah), (_p), (_d), (_o), (_f)))
+#define	ath_hal_getnav(_ah) \
+	((*(_ah)->ah_getNav)((_ah)))
+#define	ath_hal_setnav(_ah, _val) \
+	((*(_ah)->ah_setNav)((_ah), (_val)))
 
 #define	ath_hal_spectral_supported(_ah) \
 	(ath_hal_getcapability(_ah, HAL_CAP_SPECTRAL_SCAN, 0, NULL) == HAL_OK)

@@ -15,8 +15,6 @@
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/ath_hal/ah.h 334197 2018-05-25 01:27:39Z adrian $
  */
 
 #ifndef _ATH_AH_H_
@@ -1030,7 +1028,7 @@ typedef struct {
 	u_int16_t	ss_fft_period;	/* Skip interval for FFT reports */
 	u_int16_t	ss_period;	/* Spectral scan period */
 	u_int16_t	ss_count;	/* # of reports to return from ss_active */
-	u_int16_t	ss_short_report;/* Set to report ony 1 set of FFT results */
+	u_int16_t	ss_short_report;/* Set to report only 1 set of FFT results */
 	u_int8_t	radar_bin_thresh_sel;	/* strong signal radar FFT threshold configuration */
 	u_int16_t	ss_spectral_pri;		/* are we doing a noise power cal ? */
 	int8_t		ss_nf_cal[AH_MAX_CHAINS*2];     /* nf calibrated values for ctl+ext from eeprom */
@@ -1404,6 +1402,8 @@ struct ath_hal {
 				HAL_QUIET_FLAG flag);
 	void	  __ahdecl(*ah_setChainMasks)(struct ath_hal *,
 				uint32_t, uint32_t);
+	u_int	  __ahdecl(*ah_getNav)(struct ath_hal*);
+	void	  __ahdecl(*ah_setNav)(struct ath_hal*, u_int);
 
 	/* DFS functions */
 	void	  __ahdecl(*ah_enableDfs)(struct ath_hal *ah,

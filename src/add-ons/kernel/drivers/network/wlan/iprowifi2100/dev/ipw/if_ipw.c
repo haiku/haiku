@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2004-2006
  *      Damien Bergamini <damien.bergamini@free.fr>. All rights reserved.
@@ -30,8 +30,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ipw/if_ipw.c 339975 2018-10-31 23:02:59Z glebius $");
-
 /*-
  * Intel(R) PRO/Wireless 2100 MiniPCI driver
  * http://www.intel.com/network/connectivity/products/wireless/prowireless_mobile.htm
@@ -115,7 +113,7 @@ static struct ieee80211vap *ipw_vap_create(struct ieee80211com *,
 static void	ipw_vap_delete(struct ieee80211vap *);
 static int	ipw_dma_alloc(struct ipw_softc *);
 static void	ipw_release(struct ipw_softc *);
-static void	ipw_media_status(struct ifnet *, struct ifmediareq *);
+static void	ipw_media_status(if_t, struct ifmediareq *);
 static int	ipw_newstate(struct ieee80211vap *, enum ieee80211_state, int);
 static uint16_t	ipw_read_prom_word(struct ipw_softc *, uint8_t);
 static uint16_t	ipw_read_chanmask(struct ipw_softc *);
@@ -199,9 +197,7 @@ static driver_t ipw_driver = {
 	sizeof (struct ipw_softc)
 };
 
-static devclass_t ipw_devclass;
-
-DRIVER_MODULE(ipw, pci, ipw_driver, ipw_devclass, NULL, NULL);
+DRIVER_MODULE(ipw, pci, ipw_driver, NULL, NULL);
 MODULE_PNP_INFO("U16:vendor;U16:device;D:#", pci, ipw, ipw_ident_table,
     nitems(ipw_ident_table) - 1);
 
@@ -330,13 +326,14 @@ ipw_attach(device_t dev)
 	 */
 	SYSCTL_ADD_PROC(device_get_sysctl_ctx(dev),
 	    SYSCTL_CHILDREN(device_get_sysctl_tree(dev)), OID_AUTO, "radio",
-	    CTLTYPE_INT | CTLFLAG_RD, sc, 0, ipw_sysctl_radio, "I",
+	    CTLTYPE_INT | CTLFLAG_RD | CTLFLAG_NEEDGIANT, sc, 0,
+	    ipw_sysctl_radio, "I",
 	    "radio transmitter switch state (0=off, 1=on)");
 
 	SYSCTL_ADD_PROC(device_get_sysctl_ctx(dev),
 	    SYSCTL_CHILDREN(device_get_sysctl_tree(dev)), OID_AUTO, "stats",
-	    CTLTYPE_OPAQUE | CTLFLAG_RD, sc, 0, ipw_sysctl_stats, "S",
-	    "statistics");
+	    CTLTYPE_OPAQUE | CTLFLAG_RD | CTLFLAG_NEEDGIANT, sc, 0,
+	    ipw_sysctl_stats, "S", "statistics");
 
 	/*
 	 * Hook our interrupt after all initialization is complete.
@@ -834,9 +831,9 @@ ipw_cvtrate(int ipwrate)
  * value here.
  */
 static void
-ipw_media_status(struct ifnet *ifp, struct ifmediareq *imr)
+ipw_media_status(if_t ifp, struct ifmediareq *imr)
 {
-	struct ieee80211vap *vap = ifp->if_softc;
+	struct ieee80211vap *vap = if_getsoftc(ifp);
 	struct ieee80211com *ic = vap->iv_ic;
 	struct ipw_softc *sc = ic->ic_softc;
 
@@ -1326,10 +1323,7 @@ ipw_release_sbd(struct ipw_softc *sc, struct ipw_soft_bd *sbd)
 		bus_dmamap_unload(sc->txbuf_dmat, sbuf->map);
 		SLIST_INSERT_HEAD(&sc->free_sbuf, sbuf, next);
 
-		if (sbuf->m->m_flags & M_TXCB)
-			ieee80211_process_callback(sbuf->ni, sbuf->m, 0/*XXX*/);
-		m_freem(sbuf->m);
-		ieee80211_free_node(sbuf->ni);
+		ieee80211_tx_complete(sbuf->ni, sbuf->m, 0/*XXX*/);
 
 		sc->sc_tx_timer = 0;
 		break;
@@ -1526,9 +1520,8 @@ ipw_cmd(struct ipw_softc *sc, uint32_t type, void *data, uint32_t len)
 		    0, 0, len);
 		/* Print the data buffer in the higher debug level */
 		if (ipw_debug >= 9 && len > 0) {
-			int i;
 			printf(" data: 0x");
-			for (i = 1; i <= len; i++)
+			for (int i = 1; i <= len; i++)
 				printf("%1D", (u_char *)data + len - i, "");
 		}
 		printf("\n");

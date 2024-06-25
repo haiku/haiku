@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2005-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -23,8 +23,6 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $FreeBSD: releng/12.0/sys/net80211/ieee80211_scan.h 326272 2017-11-27 15:23:17Z pfg $
  */
 #ifndef _NET80211_IEEE80211_SCAN_H_
 #define _NET80211_IEEE80211_SCAN_H_
@@ -136,6 +134,7 @@ struct ieee80211_scan_state {
 #define	IEEE80211_SCAN_ONCE	0x0010		/* do one complete pass */
 #define	IEEE80211_SCAN_NOBCAST	0x0020		/* no broadcast probe req */
 #define	IEEE80211_SCAN_NOJOIN	0x0040		/* no auto-sequencing */
+#define	IEEE80211_SCAN_PUBLIC_MASK	0x0fff	/* top 4 bits for internal use */
 #define	IEEE80211_SCAN_GOTPICK	0x1000		/* got candidate, can stop */
 	uint8_t		ss_nssid;		/* # ssid's to probe/match */
 	struct ieee80211_scan_ssid ss_ssid[IEEE80211_SCAN_MAX_SSID];
@@ -147,6 +146,10 @@ struct ieee80211_scan_state {
 	unsigned long	ss_mindwell;		/* min dwell on channel */
 	unsigned long	ss_maxdwell;		/* max dwell on channel */
 };
+
+#define	IEEE80211_SS_FLAGS_BITS \
+	"\20\1NOPICK\2ACTIVE\3PICK1ST\4BGSCAN\5ONCE\6NOBCAST\7NOJOIN" \
+	"\15GOTPICK"
 
 /*
  * The upper 16 bits of the flags word is used to communicate
@@ -162,8 +165,6 @@ void	ieee80211_scan_attach(struct ieee80211com *);
 void	ieee80211_scan_detach(struct ieee80211com *);
 void	ieee80211_scan_vattach(struct ieee80211vap *);
 void	ieee80211_scan_vdetach(struct ieee80211vap *);
-
-void	ieee80211_scan_dump_channels(const struct ieee80211_scan_state *);
 
 #define	IEEE80211_SCAN_FOREVER	0x7fffffff
 int	ieee80211_start_scan(struct ieee80211vap *, int flags,
@@ -213,6 +214,7 @@ enum {
 	IEEE80211_BPARSE_OFFCHAN	= 0x20,	/* DSPARMS chan != curchan */
 	IEEE80211_BPARSE_BINTVAL_INVALID= 0x40,	/* invalid beacon interval */
 	IEEE80211_BPARSE_CSA_INVALID	= 0x80,	/* invalid CSA ie */
+	IEEE80211_BPARSE_MESHID_INVALID = 0x100, /* invalid Mesh ID ie */
 };
 
 /*
@@ -223,7 +225,7 @@ enum {
  * All multi-byte values must be in host byte order.
  */
 struct ieee80211_scanparams {
-	uint8_t		status;		/* bitmask of IEEE80211_BPARSE_* */
+	uint32_t	status;		/* bitmask of IEEE80211_BPARSE_* */
 	uint8_t		chan;		/* channel # from FH/DSPARMS */
 	uint8_t		bchan;		/* curchan's channel # */
 	uint8_t		fhindex;
@@ -330,7 +332,7 @@ struct ieee80211_scanner {
 	void	(*scan_spare0)(void);
 	void	(*scan_spare1)(void);
 	void	(*scan_spare2)(void);
-	void	(*scan_spare4)(void);
+	void	(*scan_spare3)(void);
 };
 void	ieee80211_scanner_register(enum ieee80211_opmode,
 		const struct ieee80211_scanner *);

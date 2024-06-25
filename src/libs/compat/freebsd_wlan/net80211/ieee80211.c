@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2001 Atsushi Onoe
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
@@ -27,8 +27,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211.c 336184 2018-07-10 23:30:19Z kevans $");
-
 /*
  * IEEE 802.11 generic handler
  */
@@ -47,6 +45,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211.c 336184 2018-07-10 23:30
 #include <net/if_var.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
+#include <net/if_private.h>
 #include <net/if_types.h>
 #include <net/ethernet.h>
 #include <net/vnet.h>
@@ -337,12 +336,13 @@ ieee80211_ifattach(struct ieee80211com *ic)
 	TAILQ_INIT(&ic->ic_vaps);
 
 	/* Create a taskqueue for all state changes */
-	ic->ic_tq = taskqueue_create("ic_taskq", M_WAITOK | M_ZERO,
+	ic->ic_tq = taskqueue_create("ic_taskq",
+	    IEEE80211_M_WAITOK | IEEE80211_M_ZERO,
 	    taskqueue_thread_enqueue, &ic->ic_tq);
 	taskqueue_start_threads(&ic->ic_tq, 1, PI_NET, "%s net80211 taskq",
 	    ic->ic_name);
-	ic->ic_ierrors = counter_u64_alloc(M_WAITOK);
-	ic->ic_oerrors = counter_u64_alloc(M_WAITOK);
+	ic->ic_ierrors = counter_u64_alloc(IEEE80211_M_WAITOK);
+	ic->ic_oerrors = counter_u64_alloc(IEEE80211_M_WAITOK);
 	/*
 	 * Fill in 802.11 available channel set, mark all
 	 * available channels as active, and pick a default
@@ -557,7 +557,7 @@ ieee80211_vap_setup(struct ieee80211com *ic, struct ieee80211vap *vap,
 	vap->iv_htextcaps = ic->ic_htextcaps;
 
 	/* 11ac capabilities - XXX methodize */
-	vap->iv_vhtcaps = ic->ic_vhtcaps;
+	vap->iv_vht_cap.vht_cap_info = ic->ic_vht_cap.vht_cap_info;
 	vap->iv_vhtextcaps = ic->ic_vhtextcaps;
 
 	vap->iv_opmode = opmode;
@@ -734,6 +734,7 @@ ieee80211_vap_detach(struct ieee80211vap *vap)
 {
 	struct ieee80211com *ic = vap->iv_ic;
 	struct ifnet *ifp = vap->iv_ifp;
+	int i;
 
 	CURVNET_SET(ifp->if_vnet);
 
@@ -748,7 +749,8 @@ ieee80211_vap_detach(struct ieee80211vap *vap)
 	/*
 	 * Flush any deferred vap tasks.
 	 */
-	ieee80211_draintask(ic, &vap->iv_nstate_task);
+	for (i = 0; i < NET80211_IV_NSTATE_NUM; i++)
+		ieee80211_draintask(ic, &vap->iv_nstate_task[i]);
 	ieee80211_draintask(ic, &vap->iv_swbmiss_task);
 	ieee80211_draintask(ic, &vap->iv_wme_task);
 	ieee80211_draintask(ic, &ic->ic_parent_task);
@@ -943,14 +945,14 @@ ieee80211_syncflag_vht_locked(struct ieee80211com *ic, int flag)
 
 	bit = 0;
 	TAILQ_FOREACH(vap, &ic->ic_vaps, iv_next)
-		if (vap->iv_flags_vht & flag) {
+		if (vap->iv_vht_flags & flag) {
 			bit = 1;
 			break;
 		}
 	if (bit)
-		ic->ic_flags_vht |= flag;
+		ic->ic_vht_flags |= flag;
 	else
-		ic->ic_flags_vht &= ~flag;
+		ic->ic_vht_flags &= ~flag;
 }
 
 void
@@ -961,9 +963,9 @@ ieee80211_syncflag_vht(struct ieee80211vap *vap, int flag)
 	IEEE80211_LOCK(ic);
 	if (flag < 0) {
 		flag = -flag;
-		vap->iv_flags_vht &= ~flag;
+		vap->iv_vht_flags &= ~flag;
 	} else
-		vap->iv_flags_vht |= flag;
+		vap->iv_vht_flags |= flag;
 	ieee80211_syncflag_vht_locked(ic, flag);
 	IEEE80211_UNLOCK(ic);
 }
@@ -1291,8 +1293,8 @@ addchan(struct ieee80211_channel chans[], int maxchans, int *nchans,
 		return (ENOBUFS);
 
 #if 0
-	printf("%s: %d: ieee=%d, freq=%d, flags=0x%08x\n",
-	    __func__, *nchans, ieee, freq, flags);
+	printf("%s: %d of %d: ieee=%d, freq=%d, flags=0x%08x\n",
+	    __func__, *nchans, maxchans, ieee, freq, flags);
 #endif
 
 	c = &chans[(*nchans)++];
@@ -1321,8 +1323,8 @@ copychan_prev(struct ieee80211_channel chans[], int maxchans, int *nchans,
 		return (ENOBUFS);
 
 #if 0
-	printf("%s: %d: flags=0x%08x\n",
-	    __func__, *nchans, flags);
+	printf("%s: %d of %d: flags=0x%08x\n",
+	    __func__, *nchans, maxchans, flags);
 #endif
 
 	c = &chans[(*nchans)++];
@@ -1555,7 +1557,7 @@ ieee80211_get_channel_center_freq(const struct ieee80211_channel *c)
  * For 5, 10, 20MHz channels it'll be the normally configured channel
  * frequency.
  *
- * For 40MHz, 80MHz, 160Mhz channels it'll the the centre of the
+ * For 40MHz, 80MHz, 160MHz channels it will be the centre of the
  * wide channel, not the centre of the primary channel (that's ic_freq).
  *
  * For 80+80MHz channels this will be the centre of the primary
@@ -1822,6 +1824,8 @@ ieee80211_lookup_channel_rxstatus(struct ieee80211vap *vap,
 		return (NULL);
 	if ((rxs->r_flags & IEEE80211_R_IEEE) == 0)
 		return (NULL);
+	if ((rxs->r_flags & IEEE80211_R_BAND) == 0)
+		return (NULL);
 
 	/*
 	 * If the rx status contains a valid ieee/freq, then
@@ -1832,11 +1836,20 @@ ieee80211_lookup_channel_rxstatus(struct ieee80211vap *vap,
 	 */
 
 	/* Determine a band */
-	/* XXX should be done by the driver? */
-	if (rxs->c_freq < 3000) {
+	switch (rxs->c_band) {
+	case IEEE80211_CHAN_2GHZ:
 		flags = IEEE80211_CHAN_G;
-	} else {
+		break;
+	case IEEE80211_CHAN_5GHZ:
 		flags = IEEE80211_CHAN_A;
+		break;
+	default:
+		if (rxs->c_freq < 3000) {
+			flags = IEEE80211_CHAN_G;
+		} else {
+			flags = IEEE80211_CHAN_A;
+		}
+		break;
 	}
 
 	/* Channel lookup */
@@ -2197,7 +2210,11 @@ media_status(enum ieee80211_opmode opmode, const struct ieee80211_channel *chan)
 		status |= IFM_IEEE80211_MBSS;
 		break;
 	}
-	if (IEEE80211_IS_CHAN_HTA(chan)) {
+	if (IEEE80211_IS_CHAN_VHT_5GHZ(chan)) {
+		status |= IFM_IEEE80211_VHT5G;
+	} else if (IEEE80211_IS_CHAN_VHT_2GHZ(chan)) {
+		status |= IFM_IEEE80211_VHT2G;
+	} else if (IEEE80211_IS_CHAN_HTA(chan)) {
 		status |= IFM_IEEE80211_11NA;
 	} else if (IEEE80211_IS_CHAN_HTG(chan)) {
 		status |= IFM_IEEE80211_11NG;

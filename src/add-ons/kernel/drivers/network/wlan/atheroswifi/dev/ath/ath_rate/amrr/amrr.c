@@ -39,8 +39,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/ath_rate/amrr/amrr.c 326255 2017-11-27 14:52:40Z pfg $");
-
 /*
  * AMRR rate control. See:
  * http://www-sop.inria.fr/rapports/sophia/RR-5208.html

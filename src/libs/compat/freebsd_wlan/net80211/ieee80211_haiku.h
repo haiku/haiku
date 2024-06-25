@@ -382,6 +382,8 @@ struct ieee80211com;
 int ieee80211_parent_xmitpkt(struct ieee80211com *ic, struct mbuf *m);
 int ieee80211_vap_xmitpkt(struct ieee80211vap *vap, struct mbuf *m);
 
+void	net80211_get_random_bytes(void *, size_t);
+
 void	ieee80211_sysctl_attach(struct ieee80211com *);
 void	ieee80211_sysctl_detach(struct ieee80211com *);
 void	ieee80211_sysctl_vattach(struct ieee80211vap *);

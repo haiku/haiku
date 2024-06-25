@@ -1,4 +1,3 @@
-/*	$FreeBSD$	*/
 
 /*-
  * Copyright (c) 2005, 2006
@@ -18,8 +17,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 /*-
  * Ralink Technology RT2560 chipset driver
  * http://www.ralinktech.com/
@@ -2453,7 +2450,6 @@ rt2560_read_config(struct rt2560_softc *sc)
 	DPRINTF(sc, "rssi correction %d, calibrate 0x%02x\n",
 		 sc->rssi_corr, val);
 }
-
 
 static void
 rt2560_scan_start(struct ieee80211com *ic)

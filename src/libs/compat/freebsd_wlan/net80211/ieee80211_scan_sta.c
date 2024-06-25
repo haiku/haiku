@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -26,8 +26,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_scan_sta.c 327231 2017-12-27 03:23:21Z eadler $");
-
 /*
  * IEEE 802.11 station scanning support.
  */
@@ -1682,7 +1680,7 @@ notfound:
 				chan = ieee80211_ht_adjust_channel(ic,
 				    chan, vap->iv_flags_ht);
 				chan = ieee80211_vht_adjust_channel(ic,
-				    chan, vap->iv_flags_vht);
+				    chan, vap->iv_vht_flags);
 				ieee80211_create_ibss(vap, chan);
 				return 1;
 			}
@@ -1715,7 +1713,7 @@ notfound:
 	chan = ieee80211_ht_adjust_channel(ic,
 	    chan, vap->iv_flags_ht);
 	chan = ieee80211_vht_adjust_channel(ic,
-	    chan, vap->iv_flags_vht);
+	    chan, vap->iv_vht_flags);
 	if (!ieee80211_sta_join(vap, chan, &selbs->base))
 		goto notfound;
 	return 1;				/* terminate scan */
@@ -1868,7 +1866,7 @@ ap_end(struct ieee80211_scan_state *ss, struct ieee80211vap *vap)
 		return 1;
 	}
 	chan = ieee80211_ht_adjust_channel(ic, bestchan, vap->iv_flags_ht);
-	chan = ieee80211_vht_adjust_channel(ic, chan, vap->iv_flags_vht);
+	chan = ieee80211_vht_adjust_channel(ic, chan, vap->iv_vht_flags);
 	ieee80211_create_ibss(vap, chan);
 
 	return 1;
@@ -1948,7 +1946,7 @@ notfound:
 					chan = ieee80211_ht_adjust_channel(ic,
 					    chan, vap->iv_flags_ht);
 					chan = ieee80211_vht_adjust_channel(ic,
-					    chan, vap->iv_flags_vht);
+					    chan, vap->iv_vht_flags);
 					}
 			} else
 				chan = vap->iv_des_chan;

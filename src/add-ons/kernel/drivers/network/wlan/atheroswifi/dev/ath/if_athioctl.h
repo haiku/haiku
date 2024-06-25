@@ -1,5 +1,5 @@
 /*-
- * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ * SPDX-License-Identifier: BSD-2-Clause
  *
  * Copyright (c) 2002-2009 Sam Leffler, Errno Consulting
  * All rights reserved.
@@ -27,8 +27,6 @@
  * IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGES.
- *
- * $FreeBSD: releng/12.0/sys/dev/ath/if_athioctl.h 326255 2017-11-27 14:52:40Z pfg $
  */
 
 /*
@@ -177,6 +175,7 @@ struct ath_stats {
 	u_int32_t	ast_tx_nodeq_overflow;	/* node sw queue overflow */
 	u_int32_t	ast_tx_ldpc;		/* TX LDPC frame */
 	u_int32_t	ast_tx_stbc;		/* TX STBC frame */
+	u_int32_t	ast_tsfoor;		/* TSFOOR interrupts */
 	u_int32_t	ast_pad[10];
 };
 

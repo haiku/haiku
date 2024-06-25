@@ -225,7 +225,7 @@ ar9300_eeprom_restore_something(struct ath_hal *ah, ar9300_eeprom_t *mptr,
 HAL_BOOL
 ar9300_eeprom_read_word(struct ath_hal *ah, u_int off, u_int16_t *data)
 {
-    if (AR_SREV_OSPREY(ah) || AR_SREV_POSEIDON(ah))
+    if (AR_SREV_OSPREY(ah) || AR_SREV_POSEIDON(ah) || AR_SREV_JUPITER(ah))
     {
         (void) OS_REG_READ(ah, AR9300_EEPROM_OFFSET + (off << AR9300_EEPROM_S));
         if (!ath_hal_wait(ah,
@@ -3040,6 +3040,33 @@ ar9300_eeprom_set_transmit_power(struct ath_hal *ah,
     ahp->reg_dmn = ath_hal_getctl(ah, chan);
 
     /*
+     * After reading FCC/OET 13TR1003 (Directional Gain of IEEE 802.11
+     * MIMO devices employing cyclic delay diversity) and looking at what
+     * ath9k does, let's disable the CDD check until it's clearer exactly
+     * how the maximum cap should be applied here.
+     *
+     * Right now the CDD check is simply unconditionally reducing the
+     * gain of legacy and 1/2 stream rates depending upon the chainmask.
+     * (CDD is used when transmitting rates that don't already use up the
+     * full set of streams - eg OFDM or MCS0-7 on a 2 or 3 chain TX path.)
+     *
+     * It's dropping the 2-chain TX by 3dB and 3-chain by 5dB to "meet"
+     * power spectral density requirements but it's not currently taking
+     * into account how close to the regulatory limit the hardware/antenna
+     * system is already at.  It doesn't help that the conductive testing
+     * limits have the array gain at 0dB for all AR9300/derivative
+     * configurations.
+     *
+     * It also doesn't let us do single chain transmit at the full allowed
+     * power for the regulatory/CTL limits as it subtracts it from what's
+     * programmed into the hardware.
+     *
+     * ath9k doesn't factor any of the CDD stuff into account, so I'm going
+     * to disable it here and in the TPC path until I get a better idea
+     * of what to really do here.
+     */
+#if 0
+    /*
      * Always use CDD/direct per rate power table for register based approach.
      * For FCC, CDD calculations should factor in the array gain, hence 
      * this adjust call. ETSI and MKK does not have this requirement.
@@ -3050,6 +3077,7 @@ ar9300_eeprom_set_transmit_power(struct ath_hal *ah,
             __func__);
         ar9300_adjust_reg_txpower_cdd(ah, target_power_val_t2);
     }
+#endif
 
     if (ar9300_eeprom_get(ahp, EEP_PAPRD_ENABLED)) {
         for (i = 0;  i < ar9300_rate_size; i++) {
@@ -4291,7 +4319,7 @@ ar9300_eeprom_restore_internal(struct ath_hal *ah, ar9300_eeprom_t *mptr,
     }
 #endif
     if (nptr < 0) {
-        ath_hal_printf(ah, "%s[%d] No vaid CAL, calling default template\n",
+        ath_hal_printf(ah, "%s[%d] No valid CAL, calling default template\n",
             __func__, __LINE__);
         nptr = ar9300_eeprom_restore_something(ah, mptr, mdata_size);
     }

@@ -24,8 +24,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_scan_sw.c 308007 2016-10-28 02:09:45Z adrian $");
-
 /*
  * IEEE 802.11 scanning support.
  */
@@ -43,6 +41,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/net80211/ieee80211_scan_sw.c 308007 2016-10-
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_media.h>
+#include <net/if_private.h>
 #include <net/ethernet.h>
 
 #include <net80211/ieee80211_var.h>
@@ -195,8 +194,7 @@ ieee80211_swscan_start_scan_locked(const struct ieee80211_scanner *scan,
 			if ((flags & IEEE80211_SCAN_NOSSID) == 0)
 				ieee80211_scan_copy_ssid(vap, ss, nssid, ssids);
 
-			/* NB: top 4 bits for internal use */
-			ss->ss_flags = flags & 0xfff;
+			ss->ss_flags = flags & IEEE80211_SCAN_PUBLIC_MASK;
 			if (ss->ss_flags & IEEE80211_SCAN_ACTIVE)
 				vap->iv_stats.is_scan_active++;
 			else
@@ -306,7 +304,7 @@ ieee80211_swscan_check_scan(const struct ieee80211_scanner *scan,
 			ic->ic_flags |= IEEE80211_F_SCAN;
 
 			/* NB: need to use supplied flags in check */
-			ss->ss_flags = flags & 0xff;
+			ss->ss_flags = flags & IEEE80211_SCAN_PUBLIC_MASK;
 			result = ss->ss_ops->scan_end(ss, vap);
 
 			ic->ic_flags &= ~IEEE80211_F_SCAN;
@@ -335,12 +333,14 @@ ieee80211_swscan_bg_scan(const struct ieee80211_scanner *scan,
 {
 	struct ieee80211com *ic = vap->iv_ic;
 	struct ieee80211_scan_state *ss = ic->ic_scan;
+	bool scanning;
 
 	/* XXX assert unlocked? */
 	// IEEE80211_UNLOCK_ASSERT(ic);
 
 	IEEE80211_LOCK(ic);
-	if ((ic->ic_flags & IEEE80211_F_SCAN) == 0) {
+	scanning = ic->ic_flags & IEEE80211_F_SCAN;
+	if (!scanning) {
 		u_int duration;
 		/*
 		 * Go off-channel for a fixed interval that is large
@@ -388,9 +388,10 @@ ieee80211_swscan_bg_scan(const struct ieee80211_scanner *scan,
 				 *     scan_start method to populate it.
 				 */
 				ss->ss_next = 0;
-				if (ss->ss_last != 0)
+				if (ss->ss_last != 0) {
+					ieee80211_notify_scan_done(vap);
 					ss->ss_ops->scan_restart(ss, vap);
-				else {
+				} else {
 					ss->ss_ops->scan_start(ss, vap);
 #ifdef IEEE80211_DEBUG
 					if (ieee80211_msg_scan(vap))
@@ -404,6 +405,7 @@ ieee80211_swscan_bg_scan(const struct ieee80211_scanner *scan,
 			ic->ic_flags_ext |= IEEE80211_FEXT_BGSCAN;
 			ieee80211_runtask(ic,
 			    &SCAN_PRIVATE(ss)->ss_scan_start);
+			scanning = true;
 		} else {
 			/* XXX msg+stat */
 		}
@@ -414,8 +416,7 @@ ieee80211_swscan_bg_scan(const struct ieee80211_scanner *scan,
 	}
 	IEEE80211_UNLOCK(ic);
 
-	/* NB: racey, does it matter? */
-	return (ic->ic_flags & IEEE80211_F_SCAN);
+	return (scanning);
 }
 
 /*
@@ -674,7 +675,7 @@ scan_start(void *arg, int pending)
 }
 
 static void
-scan_curchan_task(void *arg, int pending)
+scan_curchan_task(void *arg, int pending __unused)
 {
 	struct ieee80211_scan_state *ss = arg;
 	struct scan_state *ss_priv = SCAN_PRIVATE(ss);
@@ -857,6 +858,7 @@ scan_end(struct ieee80211_scan_state *ss, int scandone)
 		else
 			vap->iv_stats.is_scan_passive++;
 
+		ieee80211_notify_scan_done(vap);
 		ss->ss_ops->scan_restart(ss, vap);	/* XXX? */
 		ieee80211_runtask(ic, &ss_priv->ss_scan_start);
 		IEEE80211_UNLOCK(ic);

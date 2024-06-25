@@ -19,8 +19,6 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD$");
-
 #include "opt_wlan.h"
 
 #include <sys/param.h>
@@ -364,9 +362,7 @@ r92c_set_rssi(struct rtwn_softc *sc)
 static void
 r92c_ratectl_tx_complete(struct rtwn_softc *sc, uint8_t *buf, int len)
 {
-#if __FreeBSD_version >= 1200012
 	struct ieee80211_ratectl_tx_status txs;
-#endif
 	struct r92c_c2h_tx_rpt *rpt;
 	struct ieee80211_node *ni;
 	uint8_t macid;
@@ -412,7 +408,6 @@ r92c_ratectl_tx_complete(struct rtwn_softc *sc, uint8_t *buf, int len)
 		    (rpt->rptb7 & R92C_RPTB7_PKT_OK) ? "" : " not",
 		    ntries);
 
-#if __FreeBSD_version >= 1200012
 		txs.flags = IEEE80211_RATECTL_STATUS_LONG_RETRY;
 		txs.long_retries = ntries;
 		if (rpt->rptb7 & R92C_RPTB7_PKT_OK)
@@ -424,16 +419,6 @@ r92c_ratectl_tx_complete(struct rtwn_softc *sc, uint8_t *buf, int len)
 		else
 			txs.status = IEEE80211_RATECTL_TX_FAIL_UNSPECIFIED;
 		ieee80211_ratectl_tx_complete(ni, &txs);
-#else
-		struct ieee80211vap *vap = ni->ni_vap;
-		if (rpt->rptb7 & R92C_RPTB7_PKT_OK) {
-			ieee80211_ratectl_tx_complete(vap, ni,
-			    IEEE80211_RATECTL_TX_SUCCESS, &ntries, NULL);
-		} else {
-			ieee80211_ratectl_tx_complete(vap, ni,
-			    IEEE80211_RATECTL_TX_FAILURE, &ntries, NULL);
-		}
-#endif
 	} else {
 		RTWN_DPRINTF(sc, RTWN_DEBUG_INTR, "%s: macid %u, ni is NULL\n",
 		    __func__, macid);
