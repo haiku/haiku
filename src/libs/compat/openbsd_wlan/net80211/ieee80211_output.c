@@ -1,4 +1,4 @@
-/*	$OpenBSD: ieee80211_output.c,v 1.137 2022/03/14 15:07:24 stsp Exp $	*/
+/*	$OpenBSD: ieee80211_output.c,v 1.139 2024/05/08 14:02:59 stsp Exp $	*/
 /*	$NetBSD: ieee80211_output.c,v 1.13 2004/05/31 11:02:55 dyoung Exp $	*/
 
 /*-
@@ -575,6 +575,9 @@ ieee80211_encap(struct ifnet *ifp, struct mbuf *m, struct ieee80211_node **pni)
 #endif
 
  fallback:
+	if (ic->ic_opmode == IEEE80211_M_MONITOR)
+		goto bad;
+
 	if (m->m_len < sizeof(struct ether_header)) {
 		m = m_pullup(m, sizeof(struct ether_header));
 		if (m == NULL) {
@@ -804,14 +807,16 @@ ieee80211_add_tim(u_int8_t *frm, struct ieee80211com *ic)
 	u_int i, offset = 0, len;
 
 	/* find first non-zero octet in the virtual bit map */
-	for (i = 0; i < ic->ic_tim_len && ic->ic_tim_bitmap[i] == 0; i++);
+	for (i = 0; i < ic->ic_tim_len && ic->ic_tim_bitmap[i] == 0; i++)
+		;
 
 	/* clear the lsb as it is reserved for the broadcast indication bit */
 	if (i < ic->ic_tim_len)
 		offset = i & ~1;
 
 	/* find last non-zero octet in the virtual bit map */
-	for (i = ic->ic_tim_len - 1; i > 0 && ic->ic_tim_bitmap[i] == 0; i--);
+	for (i = ic->ic_tim_len - 1; i > 0 && ic->ic_tim_bitmap[i] == 0; i--)
+		;
 
 	len = i - offset + 1;
 

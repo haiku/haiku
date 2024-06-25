@@ -1,4 +1,4 @@
-/*	$OpenBSD: ieee80211_input.c,v 1.250 2023/01/09 00:22:47 daniel Exp $	*/
+/*	$OpenBSD: ieee80211_input.c,v 1.254 2024/05/23 11:19:13 stsp Exp $	*/
 /*	$NetBSD: ieee80211_input.c,v 1.24 2004/05/31 11:12:24 dyoung Exp $	*/
 
 /*-
@@ -75,7 +75,6 @@ void	ieee80211_ba_move_window(struct ieee80211com *,
 	    struct ieee80211_node *, u_int8_t, u_int16_t, struct mbuf_list *);
 void	ieee80211_input_ba_seq(struct ieee80211com *,
 	    struct ieee80211_node *, uint8_t, uint16_t, struct mbuf_list *);
-struct	mbuf *ieee80211_align_mbuf(struct mbuf *);
 void	ieee80211_decap(struct ieee80211com *, struct mbuf *,
 	    struct ieee80211_node *, int, struct mbuf_list *);
 int	ieee80211_amsdu_decap_validate(struct ieee80211com *, struct mbuf *,
@@ -190,8 +189,10 @@ ieee80211_input_hwdecrypt(struct ieee80211com *ic, struct ieee80211_node *ni,
 			 */
 			break;
 		}
-		if (ieee80211_ccmp_get_pn(&pn, &prsc, m, k) != 0)
+		if (ieee80211_ccmp_get_pn(&pn, &prsc, m, k) != 0) {
+			ic->ic_stats.is_ccmp_dec_errs++;
 			return NULL;
+		}
 		if (rxi->rxi_flags & IEEE80211_RXI_HWDEC_SAME_PN) {
 			if (pn < *prsc) {
 				ic->ic_stats.is_ccmp_replays++;
@@ -1901,7 +1902,7 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, struct mbuf *m,
 		 * This probe response indicates the AP is still serving us
 		 * so don't allow ieee80211_watchdog() to move us into SCAN.
 		 */
-		 if ((ic->ic_flags & IEEE80211_F_BGSCAN) == 0)
+		if ((ic->ic_flags & IEEE80211_F_BGSCAN) == 0)
 		 	ic->ic_mgt_timer = 0;
 	}
 	/*
@@ -2837,6 +2838,11 @@ ieee80211_recv_addba_req(struct ieee80211com *ic, struct mbuf *m,
 	u_int16_t params, ssn, bufsz, timeout;
 	u_int8_t token, tid;
 	int err = 0;
+
+	/* Ignore if we are not ready to receive data frames. */
+	if (ic->ic_state != IEEE80211_S_RUN ||
+	    ((ic->ic_flags & IEEE80211_F_RSNON) && !ni->ni_port_valid))
+		return;
 
 	if (!(ni->ni_flags & IEEE80211_NODE_HT)) {
 		DPRINTF(("received ADDBA req from non-HT STA %s\n",
