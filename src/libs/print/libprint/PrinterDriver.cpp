@@ -43,7 +43,7 @@ PrinterDriver::~PrinterDriver()
 {
 	delete fGraphicsDriver;
 	fGraphicsDriver = NULL;
-	
+
 	delete fPrinterCap;
 	fPrinterCap = NULL;
 
@@ -75,7 +75,7 @@ PrinterDriver::About()
 	copyright = "libprint Copyright © 1999-2000 Y.Takagi\n";
 	copyright << GetCopyright();
 	copyright << "All Rights Reserved.";
-	
+
 	AboutBox app(GetSignature(), GetDriverName(), GetVersion(), copyright.String());
 	app.Run();
 }
@@ -89,7 +89,7 @@ PrinterDriver::AddPrinter(char* printerName)
 	DBGMSG((">%s: add_printer\n", GetDriverName()));
 	DBGMSG(("\tprinter_name: %s\n", printerName));
 	DBGMSG(("<%s: add_printer\n", GetDriverName()));
-	
+
 	if (fPrinterCap->Supports(PrinterCap::kProtocolClass)) {
 		if (fPrinterCap->CountCap(PrinterCap::kProtocolClass) > 1) {
 			AddPrinterDlg *dialog;
@@ -117,7 +117,7 @@ PrinterDriver::ConfigPage(BMessage* settings)
 	DBGMSG((">%s: config_page\n", GetDriverName()));
 	DUMP_BMESSAGE(settings);
 	DUMP_BNODE(fSpoolFolder);
-	
+
 	BMessage pageSettings(*settings);
 	_MergeWithPreviousSettings(kAttrPageSettings, &pageSettings);
 	UIDriver uiDriver(&pageSettings, fPrinterData, fPrinterCap);
@@ -135,13 +135,13 @@ PrinterDriver::ConfigJob(BMessage* settings)
 	DBGMSG((">%s: config_job\n", GetDriverName()));
 	DUMP_BMESSAGE(settings);
 	DUMP_BNODE(fSpoolFolder);
-	
+
 	BMessage jobSettings(*settings);
 	_MergeWithPreviousSettings(kAttrJobSettings, &jobSettings);
 	UIDriver uiDriver(&jobSettings, fPrinterData, fPrinterCap);
 	BMessage *result = uiDriver.ConfigJob();
 	_WriteSettings(kAttrJobSettings, result);
-	
+
 	DUMP_BMESSAGE(result);
 	DBGMSG(("<%s: config_job\n", GetDriverName()));
 	return result;
@@ -163,7 +163,7 @@ PrinterDriver::TakeJob(BFile* printJob, BMessage* settings)
 			return new BMessage('okok');
 		}
 		printJob->Seek(offset, SEEK_SET);
-	}	
+	}
 	BMessage *result = fGraphicsDriver->TakeJob(printJob);
 
 	DUMP_BMESSAGE(result);
@@ -179,7 +179,7 @@ PrinterDriver::_ReadSettings(const char* attrName, BMessage* settings)
 	ssize_t size;
 
 	settings->MakeEmpty();
-	
+
 	if (fSpoolFolder->GetAttrInfo(attrName, &info) == B_OK && info.size > 0) {
 		BStackOrHeapArray<char, 0> data(info.size);
 		if (!data.IsValid())
@@ -197,11 +197,11 @@ void
 PrinterDriver::_WriteSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL || settings->what != 'okok') return;
-	
+
 	status_t status;
 	BMallocIO data;
 	status = settings->Flatten(&data);
-	
+
 	if (status == B_OK) {
 		fSpoolFolder->WriteAttr(attrName, B_MESSAGE_TYPE, 0, data.Buffer(),
 			data.BufferLength());
@@ -213,7 +213,7 @@ void
 PrinterDriver::_MergeWithPreviousSettings(const char* attrName, BMessage* settings)
 {
 	if (settings == NULL) return;
-	
+
 	BMessage stored;
 	if (_ReadSettings(attrName, &stored)) {
 		AddFields(&stored, settings);

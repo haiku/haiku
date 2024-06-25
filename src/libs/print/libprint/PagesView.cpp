@@ -16,7 +16,7 @@ PagesView::PagesView(BRect frame, const char* name, uint32 resizeMask, uint32 fl
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 }
-	
+
 void PagesView::GetPreferredSize(float *width, float *height)
 {
 	*width  = kWidth;
@@ -32,11 +32,11 @@ void PagesView::Draw(BRect rect)
 	}
 	SetHighColor(backgroundColor);
 	FillRect(rect);
-	
+
 	BFont font(be_plain_font);
 	font.SetSize(8);
 	SetFont(&font);
-	
+
 	BPoint position(3, 3);
 	if (fCollate) {
 		BPoint next(kPageWidth + kPageHorizontalIndent * 2 + 10, 0);
@@ -81,7 +81,7 @@ void PagesView::_DrawPage(BPoint position, int number)
 	const rgb_color pageBackgroundColor = {255, 255, 255};
 	const rgb_color pageBorderColor = {0, 0, 0};
 	const rgb_color pageNumberColor = {0, 0, 0};
-	
+
 	BPoint page[5];
 	page[0].x = position.x + 3;
 	page[0].y = position.y;
@@ -93,22 +93,22 @@ void PagesView::_DrawPage(BPoint position, int number)
 	page[2].y = position.y + kPageHeight - 1;
 	page[3].x = position.x;
 	page[3].y = position.y + kPageHeight - 1;
-	
+
 	SetHighColor(pageBackgroundColor);
 	FillPolygon(page, 5);
-	
+
 	SetHighColor(pageBorderColor);
-	StrokePolygon(page, 5);	
+	StrokePolygon(page, 5);
 	StrokeLine(position + BPoint(3, 1), position + BPoint(3, 3));
 	StrokeLine(position + BPoint(3, 3), position + BPoint(1, 3));
-	
+
 	SetHighColor(pageNumberColor);
 	SetLowColor(pageBackgroundColor);
-	DrawChar('0' + number, 
-		position + 
+	DrawChar('0' + number,
+		position +
 		BPoint(kPageWidth - kPageHorizontalIndent + 1, kPageHeight - 2));
 }
-	
+
 void PagesView::SetCollate(bool collate)
 {
 	fCollate = collate;

@@ -156,7 +156,7 @@ Halftone::Dither(uchar* destination, const uchar* source, int x, int y,
 {
 	if (fPlanes == kPlaneRGB1) {
 		switch (fCurrentPlane) {
-			case 0: 
+			case 0:
 				SetGrayFunction(kRedChannel);
 				break;
 			case 1:
@@ -295,15 +295,15 @@ void
 Halftone::SetupErrorBuffer(int x, int y, int width)
 {
 	DeleteErrorTables();
-	fX = x; 
-	fY = y; 
+	fX = x;
+	fY = y;
 	fWidth = width;
 	for (int i = 0; i < fNumberOfPlanes; i ++) {
 		// reserve also space for sentinals at both ends of error table
 		const int size = width + 2;
 		fErrorTables[i] = new int[size];
 		memset(fErrorTables[i], 0, sizeof(int) * size);
-	}	
+	}
 }
 
 
@@ -327,16 +327,16 @@ Halftone::DitherFloydSteinberg(uchar *destination, const uchar* source0,
 	const ColorRGB32 *source = reinterpret_cast<const ColorRGB32 *>(source0);
 	uchar cur = 0; // cleared bit means white, set bit means black
 	for (int x = 0; x < width; x ++, source ++) {
-		const int bit = 7 - x % 8;		
+		const int bit = 7 - x % 8;
 		const int density = GetDensity(*source) + current_error / 16;
-		
+
 		if (density < 128) {
 			error = density;
 			cur |= (1 << bit);
 		} else {
 			error = density - 255;
 		}
-		
+
 		// distribute error using this pattern:
 		//        0 X 7 (current_error)
 		// (left) 3 5 1 (right)
@@ -344,13 +344,13 @@ Halftone::DitherFloydSteinberg(uchar *destination, const uchar* source0,
 		int* right = &errorTable[x+1];
 		current_error = (*right) + 7 * error;
 		*right = 1 * error;
-		
+
 		int* middle = right - 1;
 		*middle += 5 * error;
-		
+
 		int* left = middle - 1;
 		*left += 3 * error;
-		
+
 		if (bit == 0) {
 			*destination = ConvertUsingBlackValue(cur);
 			// advance to next byte
@@ -358,7 +358,7 @@ Halftone::DitherFloydSteinberg(uchar *destination, const uchar* source0,
 			cur = 0;
 		}
 	}
-	
+
 	const bool hasRest = (width % 8) != 0;
 	if (hasRest) {
 		*destination = ConvertUsingBlackValue(cur);

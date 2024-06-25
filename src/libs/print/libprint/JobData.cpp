@@ -258,12 +258,12 @@ JobData::Load(BMessage* message, const PrinterCap* printerCap,
 	fSettingType = settingType;
 
 	const PaperCap *paperCap = NULL;
- 
- 	if (message->HasBool(kJDShowPreview))
- 		fShowPreview = message->FindBool(kJDShowPreview);
- 	else
- 		fShowPreview = false;
- 
+
+	if (message->HasBool(kJDShowPreview))
+		fShowPreview = message->FindBool(kJDShowPreview);
+	else
+		fShowPreview = false;
+
 	if (message->HasInt32(kJDPaper))
 		fPaper = (Paper)message->FindInt32(kJDPaper);
 	else if (printerCap->Supports(PrinterCap::kPaper)) {
@@ -284,14 +284,14 @@ JobData::Load(BMessage* message, const PrinterCap* printerCap,
 	}
 
 	if (message->HasInt64(kJDXRes)) {
-		int64 xres64; 
+		int64 xres64;
 		message->FindInt64(kJDXRes, &xres64);
-		fXRes = xres64; 
+		fXRes = xres64;
 	} else if (printerCap->Supports(PrinterCap::kResolution)) {
 		fXRes = ((const ResolutionCap *)printerCap->GetDefaultCap(
 			PrinterCap::kResolution))->fXResolution;
 	} else {
-		fXRes = 300; 
+		fXRes = 300;
 	}
 
 	if (message->HasInt64(kJDYRes)) {
@@ -431,12 +431,12 @@ JobData::Load(BMessage* message, const PrinterCap* printerCap,
 			PrinterCap::kColor))->fColor;
 	else
 		fColor = kMonochrome;
-	
+
 	if (message->HasInt32(kJDDitherType))
 		fDitherType = (Halftone::DitherType)message->FindInt32(kJDDitherType);
 	else
 		fDitherType = Halftone::kTypeFloydSteinberg;
-	
+
 	if (message->HasInt32(kJDPageSelection))
 		fPageSelection = (PageSelection)message->FindInt32(kJDPageSelection);
 	else
@@ -469,7 +469,7 @@ JobData::Save(BMessage* message)
 
 	message->RemoveName(kJDXRes);
 	message->AddInt64(kJDXRes, fXRes);
-	
+
 	message->RemoveName(kJDYRes);
 	message->AddInt64(kJDYRes, fYRes);
 
@@ -501,14 +501,14 @@ JobData::Save(BMessage* message)
 	message->AddInt32(kJDMarginUnit, fMarginUnit);
 
 	// page settings end here
-	
+
 	// job settings
 
 	// make sure job settings are not present in page settings
 	message->RemoveName(kJDShowPreview);
 	if (fSettingType == kJobSettings)
 		message->AddBool(kJDShowPreview, fShowPreview);
-	
+
 	message->RemoveName(kJDNup);
 	if (fSettingType == kJobSettings)
 		message->AddInt32(kJDNup, fNup);
@@ -564,7 +564,7 @@ JobData::Save(BMessage* message)
 	message->RemoveName(kJDDitherType);
 	if (fSettingType == kJobSettings)
 		message->AddInt32(kJDDitherType, fDitherType);
-	
+
 	message->RemoveName(kJDPageSelection);
 	if (fSettingType == kJobSettings)
 		message->AddInt32(kJDPageSelection, fPageSelection);

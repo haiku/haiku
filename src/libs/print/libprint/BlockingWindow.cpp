@@ -86,7 +86,7 @@ void
 HWindow::Init(uint32 escape_msg)
 {
 	AddShortcut('i', 0, new BMessage(B_ABOUT_REQUESTED));
-	AddCommonFilter(new EscapeMessageFilter(this, escape_msg));	
+	AddCommonFilter(new EscapeMessageFilter(this, escape_msg));
 }
 
 
@@ -124,7 +124,7 @@ HWindow::AboutRequested()
 			v->SetFontAndColor(i+1, i+2, NULL, 0, &red);
 			s += 2;
 		}
-		// first text line 
+		// first text line
 		s = strchr(text, '\n');
 		BFont font;
 		v->GetFontAndColor(0, &font);
@@ -155,14 +155,14 @@ BlockingWindow::BlockingWindow(BRect frame, const char *title, window_look look,
 }
 
 
-BlockingWindow::~BlockingWindow() 
+BlockingWindow::~BlockingWindow()
 {
 	delete_sem(fExitSem);
 }
 
 
 void
-BlockingWindow::Init(const char* title) 
+BlockingWindow::Init(const char* title)
 {
 	fUserQuitResult = B_OK;
 	fResult = NULL;

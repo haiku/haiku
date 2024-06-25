@@ -69,7 +69,7 @@ void AboutBoxView::AttachedToWindow()
 
 class AboutBoxWindow : public BWindow {
 public:
-	AboutBoxWindow(BRect frame, const char *driver_name, const char *version, const char *copyright); 
+	AboutBoxWindow(BRect frame, const char *driver_name, const char *version, const char *copyright);
 	virtual void MessageReceived(BMessage *msg);
 	virtual	bool QuitRequested();
 };

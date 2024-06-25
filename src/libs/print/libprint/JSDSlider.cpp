@@ -22,8 +22,8 @@ JSDSlider::JSDSlider(const char* name, const char* label,
 
 
 JSDSlider::~JSDSlider()
-{ 
-} 
+{
+}
 
 
 const char*

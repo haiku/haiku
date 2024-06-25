@@ -53,12 +53,12 @@ public:
 		unsigned char thisbyte;
 		unsigned char runbyte;
 		STATUS status;
-	
+
 		i = 0;
 		status  = INITIAL;
 		control = runbuf = destination;
 		runbyte = *source++;
-	
+
 		while (--n) {
 			thisbyte = *source++;
 			switch (status) {
@@ -73,7 +73,7 @@ public:
 				}
 				i = 1;
 				break;
-	
+
 			case UNDECIDED:
 				if (i == MAXINBYTES) {
 					WRITE_CONTROL(CONTROL2(i));
@@ -94,7 +94,7 @@ public:
 					i++;
 				}
 				break;
-	
+
 			case UNMATCHED:
 				if (i == MAXINBYTES) {
 					WRITE_CONTROL(CONTROL2(i));
@@ -108,7 +108,7 @@ public:
 				WRITE_TO_RUN_BUF(runbyte);
 				runbyte   = thisbyte;
 				break;
-	
+
 			case MATCHED:
 				if ((thisbyte != runbyte) || (i == MAXINBYTES)) {
 					runbuf    = control;
@@ -122,7 +122,7 @@ public:
 				break;
 			}
 		}
-	
+
 		switch (status) {
 		case INITIAL:
 			WRITE_TO_RUN_BUF(CONTROL2(1));
@@ -137,7 +137,7 @@ public:
 			break;
 		}
 		WRITE_TO_RUN_BUF(runbyte);
-	
+
 		return runbuf - destination;
 	}
 };

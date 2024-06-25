@@ -20,15 +20,15 @@ HalftonePreviewView::Preview(float gamma, float min,
 	const float right = Bounds().Width();
 	const float bottom = Bounds().Height();
 	BRect rect(0, 0, right, bottom);
-	
+
 	BBitmap testImage(rect, kColorSpace, true);
 	BBitmap preview(rect, kColorSpace);
 	BView view(rect, "", B_FOLLOW_ALL, B_WILL_DRAW);
-	
+
 	// create test image
 	testImage.Lock();
 	testImage.AddChild(&view);
-	
+
 	// color bars
 	const int height = Bounds().IntegerHeight()+1;
 	const int width  = Bounds().IntegerWidth()+1;
@@ -37,10 +37,10 @@ HalftonePreviewView::Preview(float gamma, float min,
 	const float green_bottom = red_bottom + delta;
 	const float blue_bottom  = green_bottom + delta;
 	const float gray_bottom  = height - 1;
-	
+
 	for (int x = 0; x <= right; x ++) {
 		uchar value = x * 255 / width;
-		
+
 		BPoint from(x, 0);
 		BPoint to(x, red_bottom);
 		// red
@@ -66,17 +66,17 @@ HalftonePreviewView::Preview(float gamma, float min,
 	view.Sync();
 	testImage.RemoveChild(&view);
 	testImage.Unlock();
-	
-	// create preview image 
+
+	// create preview image
 	Halftone halftone(kColorSpace, gamma, min, ditherType);
 	halftone.SetBlackValue(Halftone::kLowValueMeansBlack);
 
 	const int widthBytes = (width + 7) / 8; // byte boundary
 	uchar* buffer = new uchar[widthBytes];
-	
+
 	const uchar* src = (uchar*)testImage.Bits();
 	uchar* dstRow = (uchar*)preview.Bits();
-	
+
 	const int numPlanes = color ? 3 : 1;
 	if (color) {
 		halftone.SetPlanes(Halftone::kPlaneRGB1);
@@ -86,7 +86,7 @@ HalftonePreviewView::Preview(float gamma, float min,
 		for (int plane = 0; plane < numPlanes;  plane ++) {
 			// halftone the preview image
 			halftone.Dither(buffer, src, 0, y, width);
-			
+
 			// convert the plane(s) to RGB32
 			ColorRGB32Little* dst = (ColorRGB32Little*)dstRow;
 			const uchar* bitmap = buffer;
@@ -94,7 +94,7 @@ HalftonePreviewView::Preview(float gamma, float min,
 				const int bit = 7 - (x % 8);
 				const bool isSet = (*bitmap & (1 << bit)) != 0;
 				uchar value = isSet ? 255 : 0;
-				
+
 				if (color) {
 					switch (plane) {
 						case 0: dst->red = value;
@@ -107,20 +107,20 @@ HalftonePreviewView::Preview(float gamma, float min,
 				} else {
 					dst->red = dst->green = dst->blue = value;
 				}
-				
+
 				if (bit == 0) {
 					bitmap ++;
 				}
 			}
 		}
-		
+
 		// next row
 		src += testImage.BytesPerRow();
 		dstRow += preview.BytesPerRow();
 	}
 
 	delete[] buffer;
-	
+
 	SetViewBitmap(&preview);
 	Invalidate();
 }
@@ -135,7 +135,7 @@ HalftoneView::HalftoneView(BRect frame, const char* name, uint32 resizeMask,
 
 	BRect r(frame);
 	float size, max;
-	
+
 	r.OffsetTo(0, 0);
 	const int height = r.IntegerHeight()+1;
 	const int delta  = height / 4;
@@ -143,12 +143,11 @@ HalftoneView::HalftoneView(BRect frame, const char* name, uint32 resizeMask,
 	const float green_top = delta;
 	const float blue_top  = green_top + delta;
 	const float gray_top  = r.bottom - delta;
-	
+
 	const char* kRedLabel   = "Red: ";
 	const char* kGreenLabel = "Green: ";
 	const char* kBlueLabel  = "Blue: ";
 	const char* kGrayLabel  = "Black: ";
-	
 
 	BFont font(be_plain_font);
 	font_height fh;

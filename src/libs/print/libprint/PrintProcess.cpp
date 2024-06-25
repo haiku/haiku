@@ -27,7 +27,7 @@ PictureData::PictureData(BFile *file)
 	DBGMSG(("2: current seek position = 0x%x\n", (int)file->Position()));
 
 	picture->Unflatten(file);
-	
+
 	DBGMSG(("3: current seek position = 0x%x\n", (int)file->Position()));
 }
 

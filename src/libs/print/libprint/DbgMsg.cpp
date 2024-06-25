@@ -55,7 +55,7 @@ void DUMP_BMESSAGE(BMessage *msg)
 	DBGMSG(("\t************ START - DUMP BMessage ***********\n"));
 	DBGMSG(("\taddress: %p\n", msg));
 	if (!msg)
-		return;	
+		return;
 
 //	DBGMSG(("\tmsg->what: 0x%x\n", msg->what));
 	DBGMSG(("\tmsg->what: %c%c%c%c\n",
