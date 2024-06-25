@@ -7,6 +7,8 @@
 //! Empty main temporary directory
 
 
+#include <fs_volume.h>
+
 #include "InitSharedMemoryDirectoryJob.h"
 
 
@@ -20,5 +22,12 @@ InitSharedMemoryDirectoryJob::InitSharedMemoryDirectoryJob()
 status_t
 InitSharedMemoryDirectoryJob::Execute()
 {
-	return CreateAndEmpty("/var/shared_memory");
+	status_t status = CreateAndEmpty("/var/shared_memory");
+	if (status != B_OK)
+		return status;
+
+	status = fs_mount_volume("/var/shared_memory", NULL, "ramfs", 0, NULL);
+	if (status < B_OK)
+		return status;
+	return B_OK;
 }
