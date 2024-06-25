@@ -703,18 +703,6 @@ if_delmulti(struct ifnet *ifp, struct sockaddr *sa)
 }
 
 
-void
-if_purgemaddrs(struct ifnet *ifp)
-{
-	struct ifmultiaddr *ifma;
-	struct ifmultiaddr *next;
-
-	IF_ADDR_LOCK(ifp);
-	TAILQ_FOREACH_SAFE(ifma, &ifp->if_multiaddrs, ifma_link, next)
-		if_delmulti_locked(ifp, ifma, 1);
-	IF_ADDR_UNLOCK(ifp);
-}
-
 /*
  * Return counter values from counter(9)s stored in ifnet.
  */
@@ -936,64 +924,6 @@ if_inc_counter(struct ifnet *ifp, ift_counter cnt, int64_t inc)
 		case IFCOUNTERS:
 			KASSERT(cnt < IFCOUNTERS, ("%s: invalid cnt %d", __func__, cnt));
 	}
-}
-
-/* XXX */
-#ifndef ETH_ADDR_LEN
-#define ETH_ADDR_LEN 6
-#endif
-
-int
-if_setupmultiaddr(if_t ifp, void *mta, int *cnt, int max)
-{
-	struct ifmultiaddr *ifma;
-	uint8_t *lmta = (uint8_t *)mta;
-	int mcnt = 0;
-
-	TAILQ_FOREACH(ifma, &((struct ifnet *)ifp)->if_multiaddrs, ifma_link) {
-		if (ifma->ifma_addr->sa_family != AF_LINK)
-			continue;
-
-		if (mcnt == max)
-			break;
-
-		bcopy(LLADDR((struct sockaddr_dl *)ifma->ifma_addr),
-		    &lmta[mcnt * ETH_ADDR_LEN], ETH_ADDR_LEN);
-		mcnt++;
-	}
-	*cnt = mcnt;
-
-	return (0);
-}
-
-int
-if_multiaddr_array(if_t ifp, void *mta, int *cnt, int max)
-{
-	int error;
-
-	if_maddr_rlock(ifp);
-	error = if_setupmultiaddr(ifp, mta, cnt, max);
-	if_maddr_runlock(ifp);
-	return (error);
-}
-
-int
-if_multiaddr_count(if_t ifp, int max)
-{
-	struct ifmultiaddr *ifma;
-	int count;
-
-	count = 0;
-	if_maddr_rlock(ifp);
-	TAILQ_FOREACH(ifma, &((struct ifnet *)ifp)->if_multiaddrs, ifma_link) {
-		if (ifma->ifma_addr->sa_family != AF_LINK)
-			continue;
-		count++;
-		if (count == max)
-			break;
-	}
-	if_maddr_runlock(ifp);
-	return (count);
 }
 
 void

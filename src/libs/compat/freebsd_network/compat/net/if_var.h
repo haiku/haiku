@@ -724,7 +724,6 @@ int	if_delmulti(struct ifnet *, struct sockaddr *);
 void	if_detach(struct ifnet *);
 void	if_purgeaddrs(struct ifnet *);
 void    if_delallmulti(struct ifnet *);
-void	if_purgemaddrs(struct ifnet *);
 void	if_down(struct ifnet *);
 void	if_free(struct ifnet *);
 void	if_free_type(struct ifnet *, u_char);
@@ -843,10 +842,6 @@ bool if_altq_is_enabled(if_t ifp);
 
 void if_bpfmtap(if_t ifp, struct mbuf *m);
 void if_etherbpfmtap(if_t ifp, struct mbuf *m);
-
-int if_setupmultiaddr(if_t ifp, void *mta, int *cnt, int max);
-int if_multiaddr_array(if_t ifp, void *mta, int *cnt, int max);
-int if_multiaddr_count(if_t ifp, int max);
 
 /*
  * Traversing through interface address lists.

@@ -69,25 +69,11 @@ typedef struct {
 #define DEFINE_CLASS_0(name, driver, methods, size) \
 	driver_t driver = { #name, methods, size }
 
-#define DRIVER_MODULE5(name, busname, driver, evh, arg) \
+#define DRIVER_MODULE(name, busname, driver, evh, arg) \
 	driver_t *DRIVER_MODULE_NAME(name, busname) = &(driver)
 
-#define DRIVER_MODULE_ORDERED6(name, busname, driver, evh, arg, order) \
+#define DRIVER_MODULE_ORDERED(name, busname, driver, evh, arg, order) \
 	DRIVER_MODULE(name, busname, driver, evh, arg)
-
-/* backwards compatibility */
-#define	_DRIVER_MODULE_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, NAME, ...)	\
-	NAME
-#define	DRIVER_MODULE_ORDERED7(name, busname, driver, devclass, evh, arg, order) \
-	DRIVER_MODULE_ORDERED6(name, busname, driver,, evh, arg, order)
-#define	DRIVER_MODULE_ORDERED(...)					\
-	_DRIVER_MODULE_MACRO(__VA_ARGS__, INVALID,			\
-		DRIVER_MODULE_ORDERED7, DRIVER_MODULE_ORDERED6)(__VA_ARGS__)
-#define	DRIVER_MODULE6(name, busname, driver, devclass, evh, arg)	\
-	DRIVER_MODULE5(name, busname, driver, evh, arg)
-#define	DRIVER_MODULE(...)						\
-	_DRIVER_MODULE_MACRO(__VA_ARGS__, INVALID, INVALID,		\
-		DRIVER_MODULE6, DRIVER_MODULE5)(__VA_ARGS__)
 
 #define DRIVER_MODULE_NAME(name, busname) \
 	__fbsd_ ## name ## _ ## busname
