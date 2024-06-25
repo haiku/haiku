@@ -26,6 +26,41 @@ static __inline int imin(int a, int b) { return (a < b ? a : b); }
 extern int abs(int a);
 
 
+#define        ffs(x)  __builtin_ffs(x)
+
+static __inline __pure2 int
+ffsl(long mask)
+{
+	return (__builtin_ffsl((u_long)mask));
+}
+
+static __inline __pure2 int
+ffsll(long long mask)
+{
+	return (__builtin_ffsll((unsigned long long)mask));
+}
+
+static __inline __pure2 int
+fls(int mask)
+{
+	return (mask == 0 ? 0 :
+		8 * sizeof(mask) - __builtin_clz((u_int)mask));
+}
+
+static __inline __pure2 int
+flsl(long mask)
+{
+	return (mask == 0 ? 0 :
+		8 * sizeof(mask) - __builtin_clzl((u_long)mask));
+}
+
+static __inline __pure2 int
+flsll(long long mask)
+{
+	return (mask == 0 ? 0 :
+		8 * sizeof(mask) - __builtin_clzll((unsigned long long)mask));
+}
+
 __END_DECLS
 
 #endif /* _FBSD_COMPAT_SYS_LIBKERN_H_ */
