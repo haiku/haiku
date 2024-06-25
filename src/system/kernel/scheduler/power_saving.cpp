@@ -150,8 +150,10 @@ rebalance(const ThreadData* threadData)
 			sSmallTaskCore = NULL;
 			CoreEntry* smallTaskCore = choose_small_task_core();
 
-			if (threadLoad > coreLoad / 3 || !smallTaskCore->CPUMask().Matches(mask))
+			if (threadLoad > coreLoad / 3 || smallTaskCore == NULL
+				|| !smallTaskCore->CPUMask().Matches(mask)) {
 				return core;
+			}
 			return coreLoad > kVeryHighLoad ? smallTaskCore : core;
 		}
 
