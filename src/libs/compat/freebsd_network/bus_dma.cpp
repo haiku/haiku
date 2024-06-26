@@ -201,7 +201,7 @@ _prepare_bounce_buffer(bus_dmamap_t map, bus_size_t reqsize, int flags)
 		return B_NOT_ALLOWED;
 	}
 	if (map->buffer_type != bus_dmamap::BUFFER_NONE) {
-		panic("bounce buffer already in use!");
+		panic("bounce buffer already in use! (type %d)", map->buffer_type);
 		return EBUSY;
 	}
 
