@@ -1285,10 +1285,12 @@ Expression<QueryPolicy>::Init(const char* expr, const char** position)
 		// Second & third passes: && and ||.
 		int32 nodes = currentExpr->CountItems();
 		for (ops op = OP_AND; op <= OP_OR; op = (ops)(op + 1)) {
-			for (int32 i = 0; i < (currentExpr->CountItems() - 1); i++) {
+			for (int32 i = 0; i < (currentExpr->CountItems() - 1); ) {
 				ExpressionNode* left = currentExpr->Array() + i;
-				if (left->op != op)
+				if (left->op != op) {
+					i++;
 					continue;
+				}
 
 				// Find the right-hand expression (may have to jump over now-unused nodes.)
 				ExpressionNode* right = NULL;
