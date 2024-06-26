@@ -536,7 +536,7 @@ print_stats(FILE* outputFile)
 
 		print_to_string(&string, &length, "%6.2f %10" B_PRIu64 " %7" B_PRIu32
 			" %10" B_PRIu64 " %s\n", percent, stats.time, stats.count, perCall,
-			callIterator->first->c_str());
+			callIterator->first->c_str() + 6);
 	}
 
 	print_buffer(outputFile, buffer, sizeof(buffer) - length);
