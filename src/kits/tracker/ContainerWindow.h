@@ -186,14 +186,7 @@ public:
 	static bool DefaultStateSourceNode(const char* name, BNode* result,
 		bool createNew = false, bool createFolder = true);
 
-	// add-on iteration
-	void EachAddOn(bool (*)(const Model*, const char*, uint32 shortcut,
-			uint32 modifiers, bool primary, void*, BContainerWindow*, BMenu*),
-		void*, BStringList&, BMenu*);
-
 	BMessage* AddOnMessage(int32);
-	entry_ref GetCurrentDirRef();
-
 	BPopUpMenu* ContextMenu();
 
 	// drag&drop support
@@ -274,11 +267,12 @@ protected:
 	BHandler* ResolveSpecifier(BMessage*, int32, BMessage*, int32,
 		const char*);
 
-	bool EachAddOn(BPath &path,
-		bool (*)(const Model*, const char*, uint32, bool, void*),
-		BObjectList<Model>*, void*, BStringList&);
 	void LoadAddOn(BMessage*);
+	void EachAddOn(bool (*)(const Model*, const char*, uint32 shortcut,
+			uint32 modifiers, bool primary, void*, BContainerWindow*, BMenu*),
+		void*, BStringList&, BMenu*);
 
+protected:
 	LockingList<BWindow>* fWindowList;
 	uint32 fOpenFlags;
 	bool fUsesLayout;

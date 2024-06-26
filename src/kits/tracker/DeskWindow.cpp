@@ -263,24 +263,23 @@ void
 BDeskWindow::InitAddOnsList(bool update)
 {
 	AutoLock<LockingList<AddOnShortcut> > lock(fAddOnsList);
-	if (lock.IsLocked()) {
-		if (update) {
-			for (int i = fAddOnsList->CountItems() - 1; i >= 0; i--) {
-				AddOnShortcut* item = fAddOnsList->ItemAt(i);
-				RemoveShortcut(item->key, B_OPTION_KEY | B_COMMAND_KEY);
-			}
-			fAddOnsList->MakeEmpty(true);
-		}
+	if (!lock.IsLocked())
+		return;
 
-		BStringList addOnPaths;
-		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker",
-			addOnPaths);
-		int32 count = addOnPaths.CountStrings();
-		for (int32 i = 0; i < count; i++) {
-			LoadAddOnDir(BDirectory(addOnPaths.StringAt(i)), this,
-				fAddOnsList);
+	if (update) {
+		for (int i = fAddOnsList->CountItems() - 1; i >= 0; i--) {
+			AddOnShortcut* item = fAddOnsList->ItemAt(i);
+			RemoveShortcut(item->key, B_OPTION_KEY | B_COMMAND_KEY);
 		}
+		fAddOnsList->MakeEmpty(true);
 	}
+
+	BStringList addOnPaths;
+	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "Tracker",
+		addOnPaths);
+	int32 count = addOnPaths.CountStrings();
+	for (int32 i = 0; i < count; i++)
+		LoadAddOnDir(BDirectory(addOnPaths.StringAt(i)), this, fAddOnsList);
 }
 
 
@@ -288,87 +287,88 @@ void
 BDeskWindow::ApplyShortcutPreferences(bool update)
 {
 	AutoLock<LockingList<AddOnShortcut> > lock(fAddOnsList);
-	if (lock.IsLocked()) {
-		if (!update) {
-			BPath path;
-			if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-				BPathMonitor::StartWatching(path.Path(),
-					B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
-				path.Append(kShortcutsSettings);
-				fShortcutsSettings = new char[strlen(path.Path()) + 1];
-				strcpy(fShortcutsSettings, path.Path());
+	if (!lock.IsLocked())
+		return;
+
+	if (!update) {
+		BPath path;
+		if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+			BPathMonitor::StartWatching(path.Path(),
+				B_WATCH_STAT | B_WATCH_FILES_ONLY, this);
+			path.Append(kShortcutsSettings);
+			fShortcutsSettings = new char[strlen(path.Path()) + 1];
+			strcpy(fShortcutsSettings, path.Path());
+		}
+	}
+
+	fAddOnsList->EachElement(RevertToDefault, this);
+
+	BFile shortcutSettings(fShortcutsSettings, B_READ_ONLY);
+	BMessage fileMsg;
+	if (shortcutSettings.InitCheck() != B_OK
+		|| fileMsg.Unflatten(&shortcutSettings) != B_OK) {
+		fNodeRef = NULL;
+		return;
+	}
+	shortcutSettings.GetNodeRef(fNodeRef);
+
+	int32 i = 0;
+	BMessage message;
+	while (fileMsg.FindMessage("spec", i++, &message) == B_OK) {
+		int32 key;
+		if (message.FindInt32("key", &key) != B_OK)
+			continue;
+
+		// only handle shortcuts referring add-ons
+		BString command;
+		if (message.FindString("command", &command) != B_OK)
+			continue;
+
+		bool isInAddOns = false;
+
+		BStringList addOnPaths;
+		BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
+			"Tracker/", addOnPaths);
+		for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
+			if (command.StartsWith(addOnPaths.StringAt(i))) {
+				isInAddOns = true;
+				break;
 			}
 		}
 
-		fAddOnsList->EachElement(RevertToDefault, this);
+		if (!isInAddOns)
+			continue;
 
-		BFile shortcutSettings(fShortcutsSettings, B_READ_ONLY);
-		BMessage fileMsg;
-		if (shortcutSettings.InitCheck() != B_OK
-			|| fileMsg.Unflatten(&shortcutSettings) != B_OK) {
-			fNodeRef = NULL;
-			return;
-		}
-		shortcutSettings.GetNodeRef(fNodeRef);
+		BEntry entry(command);
+		if (entry.InitCheck() != B_OK)
+			continue;
 
-		int32 i = 0;
-		BMessage message;
-		while (fileMsg.FindMessage("spec", i++, &message) == B_OK) {
-			int32 key;
-			if (message.FindInt32("key", &key) == B_OK) {
-				// only handle shortcuts referring add-ons
-				BString command;
-				if (message.FindString("command", &command) != B_OK)
-					continue;
+		const char* shortcut = GetKeyName(key);
+		if (strlen(shortcut) != 1)
+			continue;
 
-				bool isInAddOns = false;
+		uint32 modifiers = B_COMMAND_KEY;
+			// it's required by interface kit to at least
+			// have B_COMMAND_KEY
+		int32 value;
+		if (message.FindInt32("mcidx", 0, &value) == B_OK)
+			modifiers |= (value != 0 ? B_SHIFT_KEY : 0);
 
-				BStringList addOnPaths;
-				BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
-					"Tracker/", addOnPaths);
-				for (int32 i = 0; i < addOnPaths.CountStrings(); i++) {
-					if (command.StartsWith(addOnPaths.StringAt(i))) {
-						isInAddOns = true;
-						break;
-					}
-				}
+		if (message.FindInt32("mcidx", 1, &value) == B_OK)
+			modifiers |= (value != 0 ? B_CONTROL_KEY : 0);
 
-				if (!isInAddOns)
-					continue;
+		if (message.FindInt32("mcidx", 3, &value) == B_OK)
+			modifiers |= (value != 0 ? B_OPTION_KEY : 0);
 
-				BEntry entry(command);
-				if (entry.InitCheck() != B_OK)
-					continue;
+		Model model(&entry);
+		AddOnShortcut* item = fAddOnsList->EachElement(FindElement, &model);
+		if (item != NULL) {
+			if (item->key != '\0')
+				RemoveShortcut(item->key, item->modifiers);
 
-				const char* shortcut = GetKeyName(key);
-				if (strlen(shortcut) != 1)
-					continue;
-
-				uint32 modifiers = B_COMMAND_KEY;
-					// it's required by interface kit to at least
-					// have B_COMMAND_KEY
-				int32 value;
-				if (message.FindInt32("mcidx", 0, &value) == B_OK)
-					modifiers |= (value != 0 ? B_SHIFT_KEY : 0);
-
-				if (message.FindInt32("mcidx", 1, &value) == B_OK)
-					modifiers |= (value != 0 ? B_CONTROL_KEY : 0);
-
-				if (message.FindInt32("mcidx", 3, &value) == B_OK)
-					modifiers |= (value != 0 ? B_OPTION_KEY : 0);
-
-				Model model(&entry);
-				AddOnShortcut* item = fAddOnsList->EachElement(FindElement,
-					&model);
-				if (item != NULL) {
-					if (item->key != '\0')
-						RemoveShortcut(item->key, item->modifiers);
-
-					item->key = shortcut[0];
-					item->modifiers = modifiers;
-					AddOneShortcut(&model, item->key, item->modifiers, this);
-				}
-			}
+			item->key = shortcut[0];
+			item->modifiers = modifiers;
+			AddOneShortcut(&model, item->key, item->modifiers, this);
 		}
 	}
 }

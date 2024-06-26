@@ -2897,52 +2897,53 @@ BContainerWindow::EachAddOn(bool (*eachAddOn)(const Model*, const char*,
 	void* passThru, BStringList& mimeTypes, BMenu* menu)
 {
 	AutoLock<LockingList<AddOnShortcut> > lock(fAddOnsList);
-	if (lock.IsLocked()) {
-		for (int i = fAddOnsList->CountItems() - 1; i >= 0; i--) {
-			struct AddOnShortcut* item = fAddOnsList->ItemAt(i);
-			bool primary = false;
+	if (!lock.IsLocked())
+		return;
 
-			if (mimeTypes.CountStrings() > 0) {
-				BFile file(item->model->EntryRef(), B_READ_ONLY);
-				if (file.InitCheck() == B_OK) {
-					BAppFileInfo info(&file);
-					if (info.InitCheck() == B_OK) {
-						bool secondary = true;
+	for (int i = fAddOnsList->CountItems() - 1; i >= 0; i--) {
+		struct AddOnShortcut* item = fAddOnsList->ItemAt(i);
+		bool primary = false;
 
-						// does this add-on has types set at all?
-						BMessage message;
-						if (info.GetSupportedTypes(&message) == B_OK) {
-							type_code typeCode;
-							int32 count;
-							if (message.GetInfo("types", &typeCode,
-									&count) == B_OK) {
-								secondary = false;
-							}
+		if (mimeTypes.CountStrings() > 0) {
+			BFile file(item->model->EntryRef(), B_READ_ONLY);
+			if (file.InitCheck() == B_OK) {
+				BAppFileInfo info(&file);
+				if (info.InitCheck() == B_OK) {
+					bool secondary = true;
+
+					// does this add-on has types set at all?
+					BMessage message;
+					if (info.GetSupportedTypes(&message) == B_OK) {
+						type_code typeCode;
+						int32 count;
+						if (message.GetInfo("types", &typeCode,
+								&count) == B_OK) {
+							secondary = false;
 						}
-
-						// check all supported types if it has some set
-						if (!secondary) {
-							for (int32 i = mimeTypes.CountStrings();
-									!primary && i-- > 0;) {
-								BString type = mimeTypes.StringAt(i);
-								if (info.IsSupportedType(type.String())) {
-									BMimeType mimeType(type.String());
-									if (info.Supports(&mimeType))
-										primary = true;
-									else
-										secondary = true;
-								}
-							}
-						}
-
-						if (!secondary && !primary)
-							continue;
 					}
+
+					// check all supported types if it has some set
+					if (!secondary) {
+						for (int32 i = mimeTypes.CountStrings();
+								!primary && i-- > 0;) {
+							BString type = mimeTypes.StringAt(i);
+							if (info.IsSupportedType(type.String())) {
+								BMimeType mimeType(type.String());
+								if (info.Supports(&mimeType))
+									primary = true;
+								else
+									secondary = true;
+							}
+						}
+					}
+
+					if (!secondary && !primary)
+						continue;
 				}
 			}
-			((eachAddOn)(item->model, item->model->Name(), item->key,
-				item->modifiers, primary, passThru, this, menu));
 		}
+		((eachAddOn)(item->model, item->model->Name(), item->key,
+			item->modifiers, primary, passThru, this, menu));
 	}
 }
 
