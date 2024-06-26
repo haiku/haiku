@@ -164,11 +164,14 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 	if (message.msg_iovlen < 0 || message.msg_iovlen > IOV_MAX)
 		return EMSGSIZE;
 	if (userVecs != NULL && message.msg_iovlen > 0) {
-		iovec* vecs;
+		iovec* vecs = (iovec*)malloc(sizeof(iovec) * message.msg_iovlen);
+		if (vecs == NULL)
+			return B_NO_MEMORY;
+		vecsDeleter.SetTo(vecs);
+
 		status_t error = get_iovecs_from_user(message.msg_iov, message.msg_iovlen, vecs);
 		if (error != B_OK)
 			return error;
-		vecsDeleter.SetTo(vecs);
 		message.msg_iov = vecs;
 	} else {
 		message.msg_iov = NULL;

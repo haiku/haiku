@@ -22,6 +22,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <StackOrHeapArray.h>
 
 #include <arch/int.h>
 #include <heap.h>
@@ -1920,10 +1921,13 @@ _user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
 
 	if (userVecs == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
-	if (userVecs != NULL && !IS_USER_ADDRESS(userVecs))
-		return B_BAD_ADDRESS;
+	if (vecCount > IOV_MAX)
+		return B_BAD_VALUE;
 
-	iovec *vecs = NULL;
+	BStackOrHeapArray<iovec, 16> vecs(vecCount);
+	if (!vecs.IsValid())
+		return B_NO_MEMORY;
+
 	if (userVecs != NULL && vecCount != 0) {
 		status_t status = get_iovecs_from_user(userVecs, vecCount, vecs);
 		if (status != B_OK)
@@ -1934,7 +1938,6 @@ _user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
 		bufferSize, flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT,
 		timeout);
 
-	free(vecs);
 	return syscall_restart_handle_timeout_post(status, timeout);
 }
 

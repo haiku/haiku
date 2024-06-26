@@ -19,6 +19,7 @@
 #include <AutoDeleter.h>
 #include <AutoDeleterDrivers.h>
 #include <BytePointer.h>
+#include <StackOrHeapArray.h>
 
 #include <syscalls.h>
 #include <syscall_restart.h>
@@ -759,12 +760,16 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 {
 	if (pos < -1)
 		return B_BAD_VALUE;
+	if (count > IOV_MAX)
+		return B_BAD_VALUE;
 
-	iovec* vecs;
+	BStackOrHeapArray<iovec, 16> vecs(count);
+	if (!vecs.IsValid())
+		return B_NO_MEMORY;
+
 	status_t error = get_iovecs_from_user(userVecs, count, vecs, true);
 	if (error != B_OK)
 		return error;
-	MemoryDeleter _(vecs);
 
 	FileDescriptorPutter descriptor(get_fd(get_current_io_context(false), fd));
 	if (!descriptor.IsSet())

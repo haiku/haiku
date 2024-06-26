@@ -41,36 +41,31 @@ generic_memcpy(generic_addr_t dest, bool destPhysical, generic_addr_t src, bool 
 
 #ifdef IS_USER_ADDRESS
 
+/*!
+ * Copies an array of `iovec`s from userland.
+ * Callers must verify vecCount <= IOV_MAX and supply their own vecs buffer.
+ */
 static inline status_t
-get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec*& vecs,
+get_iovecs_from_user(const iovec* userVecs, size_t vecCount, iovec* vecs,
 	bool permitNull = false)
 {
-	// prevent integer overflow
-	if (vecCount > IOV_MAX || vecCount == 0)
+	if (vecCount == 0)
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userVecs))
 		return B_BAD_ADDRESS;
 
-	vecs = (iovec*)malloc(sizeof(iovec) * vecCount);
-	if (vecs == NULL)
-		return B_NO_MEMORY;
-
-	if (user_memcpy(vecs, userVecs, sizeof(iovec) * vecCount) != B_OK) {
-		free(vecs);
+	if (user_memcpy(vecs, userVecs, sizeof(iovec) * vecCount) != B_OK)
 		return B_BAD_ADDRESS;
-	}
 
 	size_t total = 0;
 	for (size_t i = 0; i < vecCount; i++) {
 		if (permitNull && vecs[i].iov_base == NULL)
 			continue;
 		if (!is_user_address_range(vecs[i].iov_base, vecs[i].iov_len)) {
-			free(vecs);
 			return B_BAD_ADDRESS;
 		}
 		if (vecs[i].iov_len > SSIZE_MAX || total > (SSIZE_MAX - vecs[i].iov_len)) {
-			free(vecs);
 			return B_BAD_VALUE;
 		}
 		total += vecs[i].iov_len;
