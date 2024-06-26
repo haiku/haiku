@@ -12,17 +12,19 @@
 #include <mail_encoding.h>
 
 #include <Alert.h>
-#include <Autolock.h>
 #include <AutoLocker.h>
+#include <Autolock.h>
+#include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <Button.h>
 #include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <PopUpMenu.h>
 #include <TextControl.h>
+#include <TranslationUtils.h>
 
 #include "AppUtils.h"
+#include "BitmapHolder.h"
 #include "BitmapView.h"
 #include "Captcha.h"
 #include "HaikuDepotConstants.h"
@@ -988,11 +990,16 @@ UserLoginWindow::_SetCaptcha(Captcha* captcha)
 	if (fCaptcha == NULL)
 		fCaptchaView->UnsetBitmap();
 	else {
-		off_t size;
-		fCaptcha->PngImageData()->GetSize(&size);
-		SharedBitmap* captchaImage
-			= new SharedBitmap(*(fCaptcha->PngImageData()));
-		fCaptchaView->SetBitmap(captchaImage);
+		BBitmap* bitmap = BTranslationUtils::GetBitmap(fCaptcha->PngImageData());
+
+		if (bitmap == NULL) {
+			HDERROR("unable to read the captcha bitmap as an image");
+			fCaptchaView->UnsetBitmap();
+		} else {
+			BitmapHolderRef bitmapHolderRef
+				= BitmapHolderRef(new(std::nothrow) BitmapHolder(bitmap), true);
+			fCaptchaView->SetBitmap(bitmapHolderRef);
+		}
 	}
 	fCaptchaResultField->SetText("");
 }

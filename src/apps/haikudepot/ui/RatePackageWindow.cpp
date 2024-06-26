@@ -28,6 +28,7 @@
 #include "MarkupParser.h"
 #include "RatingView.h"
 #include "ServerHelper.h"
+#include "SharedIcons.h"
 #include "TextDocumentView.h"
 #include "WebAppInterface.h"
 
@@ -154,8 +155,8 @@ protected:
 	virtual const BBitmap* StarBitmap()
 	{
 		if (fRatingDeterminate)
-			return fStarBlueBitmap->Bitmap(BITMAP_SIZE_16);
-		return fStarGrayBitmap->Bitmap(BITMAP_SIZE_16);
+			return SharedIcons::IconStarBlue16Scaled()->Bitmap();
+		return SharedIcons::IconStarGrey16Scaled()->Bitmap();
 	}
 
 private:

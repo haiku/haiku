@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,12 +8,7 @@
 
 #include "HaikuDepotConstants.h"
 #include "RatingUtils.h"
-
-
-BReference<SharedBitmap> RatingUtils::sStarBlueBitmap
-	= BReference<SharedBitmap>(new SharedBitmap(RSRC_STAR_BLUE));
-BReference<SharedBitmap> RatingUtils::sStarGrayBitmap
-	= BReference<SharedBitmap>(new SharedBitmap(RSRC_STAR_GREY));
+#include "SharedIcons.h"
 
 
 /*static*/ void
@@ -22,9 +17,9 @@ RatingUtils::Draw(BView* target, BPoint at, float value)
 	const BBitmap* star;
 
 	if (value < RATING_MIN)
-		star = sStarGrayBitmap->Bitmap(BITMAP_SIZE_16);
+		star = SharedIcons::IconStarGrey16Scaled()->Bitmap();
 	else
-		star = sStarBlueBitmap->Bitmap(BITMAP_SIZE_16);
+		star = SharedIcons::IconStarBlue16Scaled()->Bitmap();
 
 	if (star == NULL) {
 		debugger("no star icon found in application resources.");

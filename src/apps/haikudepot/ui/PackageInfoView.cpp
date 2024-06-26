@@ -42,11 +42,12 @@
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
 #include "PackageContentsView.h"
-#include "ProcessCoordinatorFactory.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
+#include "ProcessCoordinatorFactory.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
+#include "SharedIcons.h"
 #include "TextView.h"
 
 
@@ -359,12 +360,12 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
-		BitmapRef bitmap;
+		BitmapHolderRef bitmapHolderRef;
 		status_t iconResult = fPackageIconRepository.GetIcon(
-			package->Name(), BITMAP_SIZE_64, bitmap);
+			package->Name(), 32, bitmapHolderRef);
 
 		if (iconResult == B_OK)
-			fIconView->SetBitmap(bitmap, BITMAP_SIZE_32);
+			fIconView->SetBitmap(bitmapHolderRef);
 		else
 			fIconView->UnsetBitmap();
 
@@ -640,8 +641,7 @@ class AboutView : public BView {
 public:
 	AboutView()
 		:
-		BView("about view", 0),
-		fWebsiteIcon("text/html")
+		BView("about view", 0)
 	{
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
@@ -656,12 +656,6 @@ public:
 		GetFont(&smallFont);
 		smallFont.SetSize(std::max(9.0f, ceilf(smallFont.Size() * 0.85f)));
 
-		// TODO: Clicking the screen shot view should open ShowImage with the
-		// the screen shot. This could be done by writing the screen shot to
-		// a temporary folder, launching ShowImage to display it, and writing
-		// all other screenshots associated with the package to the same folder
-		// so the user can use the ShowImage navigation to view the other
-		// screenshots.
 		fScreenshotView = new LinkedBitmapView("screenshot view",
 			new BMessage(MSG_SHOW_SCREENSHOT));
 		fScreenshotView->SetExplicitMinSize(BSize(64.0f, 64.0f));
@@ -742,10 +736,10 @@ public:
 		}
 	}
 
-	void SetScreenshotThumbnail(const BitmapRef& bitmapRef)
+	void SetScreenshotThumbnail(BitmapHolderRef bitmapHolderRef)
 	{
-		if (bitmapRef.IsSet()) {
-			fScreenshotView->SetBitmap(bitmapRef);
+		if (bitmapHolderRef.IsSet()) {
+			fScreenshotView->SetBitmap(bitmapHolderRef);
 			fScreenshotView->SetEnabled(true);
 		} else {
 			fScreenshotView->UnsetBitmap();
@@ -756,7 +750,7 @@ public:
 	void SetPackage(const PackageInfoRef package)
 	{
 		fDescriptionView->SetText(package->ShortDescription(), package->FullDescription());
-		fWebsiteIconView->SetBitmap(&fWebsiteIcon, BITMAP_SIZE_16);
+		fWebsiteIconView->SetBitmap(SharedIcons::IconHTMLPackage16Scaled());
 		_SetContactInfo(fWebsiteLinkView, package->Publisher().Website());
 	}
 
@@ -786,7 +780,6 @@ private:
 
 	LinkedBitmapView*	fScreenshotView;
 
-	SharedBitmap		fWebsiteIcon;
 	BitmapView*			fWebsiteIconView;
 	LinkView*			fWebsiteLinkView;
 };
@@ -1162,7 +1155,7 @@ public:
 		Clear();
 	}
 
-	void SetScreenshotThumbnail(const BitmapRef& bitmap)
+	void SetScreenshotThumbnail(BitmapHolderRef bitmap)
 	{
 		fAboutView->SetScreenshotThumbnail(bitmap);
 	}
@@ -1398,7 +1391,7 @@ PackageInfoView::_SetPackageScreenshotThumb(const PackageInfoRef& package)
 		HDDEBUG("no screenshot for pkg [%s]", package->Name().String());
 
 	if (!hasCachedBitmap)
-		fPagesView->SetScreenshotThumbnail(BitmapRef());
+		fPagesView->SetScreenshotThumbnail(BitmapHolderRef());
 }
 
 
@@ -1422,6 +1415,8 @@ PackageInfoView::_ScreenshotThumbCoordinate(const PackageInfoRef& package)
 void
 PackageInfoView::HandleScreenshotCached(const ScreenshotCoordinate& coordinate)
 {
+	HDINFO("handle screenshot cached [%s] %" B_PRIu16 " x %" B_PRIu16, coordinate.Code().String(),
+		coordinate.Width(), coordinate.Height());
 	_HandleScreenshotCached(fPackage, coordinate);
 }
 
@@ -1431,23 +1426,18 @@ PackageInfoView::_HandleScreenshotCached(const PackageInfoRef& package,
 	const ScreenshotCoordinate& coordinate)
 {
 	ScreenshotCoordinate desiredCoordinate = _ScreenshotThumbCoordinate(package);
-	bool hasBitmap = false;
 
 	if (desiredCoordinate.IsValid() && desiredCoordinate == coordinate) {
 		HDDEBUG("screenshot [%s] has been cached and matched; will load",
 			coordinate.Code().String());
-		BitmapRef bitmapRef;
-		if (fModel->GetPackageScreenshotRepository()->CacheAndLoadScreenshot(
-				coordinate, &bitmapRef) != B_OK) {
+		BitmapHolderRef bitmapHolderRef;
+		if (fModel->GetPackageScreenshotRepository()->CacheAndLoadScreenshot(coordinate,
+				bitmapHolderRef) != B_OK) {
 			HDERROR("unable to load the screenshot [%s]", coordinate.Code().String());
 		} else {
-			fPagesView->SetScreenshotThumbnail(bitmapRef);
-			hasBitmap = true;
+			fPagesView->SetScreenshotThumbnail(bitmapHolderRef);
 		}
 	}
-
-	if (!hasBitmap)
-		fPagesView->SetScreenshotThumbnail(BitmapRef());
 }
 
 

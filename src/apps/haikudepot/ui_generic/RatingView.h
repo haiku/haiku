@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef RATING_VIEW_H
@@ -9,8 +9,6 @@
 
 #include <Referenceable.h>
 #include <View.h>
-
-#include "SharedBitmap.h"
 
 
 class RatingView : public BView {
@@ -30,10 +28,6 @@ public:
 
 protected:
 	virtual const BBitmap*		StarBitmap();
-			BReference<SharedBitmap>
-								fStarBlueBitmap;
-			BReference<SharedBitmap>
-								fStarGrayBitmap;
 
 private:
 			float				fRating;

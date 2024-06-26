@@ -1,16 +1,17 @@
 /*
- * Copyright 2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SCREENSHOT_REPOSITORY_H
 #define SCREENSHOT_REPOSITORY_H
 
 
+#include <Bitmap.h>
 #include <Path.h>
 #include <String.h>
 
+#include "BitmapHolder.h"
 #include "ScreenshotCoordinate.h"
-#include "SharedBitmap.h"
 
 
 class WebAppInterface;
@@ -38,9 +39,10 @@ public:
 									WebAppInterface* webAppInterface);
 								~PackageScreenshotRepository();
 
-			status_t			LoadScreenshot(const ScreenshotCoordinate& coord, BitmapRef* bitmap);
+			status_t			LoadScreenshot(const ScreenshotCoordinate& coord,
+									BitmapHolderRef& bitmapHolderRef);
 			status_t			CacheAndLoadScreenshot(const ScreenshotCoordinate& coord,
-									BitmapRef* bitmap);
+									BitmapHolderRef& bitmapHolderRef);
 
 			status_t			HasCachedScreenshot(const ScreenshotCoordinate& coord, bool* value);
 			status_t			CacheScreenshot(const ScreenshotCoordinate& coord);

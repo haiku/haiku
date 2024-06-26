@@ -20,7 +20,6 @@
 #include "PublisherInfo.h"
 #include "RatingSummary.h"
 #include "ScreenshotInfo.h"
-#include "SharedBitmap.h"
 #include "UserRating.h"
 
 
@@ -170,8 +169,6 @@ public:
 private:
 			void				_NotifyListeners(uint32 changes);
 			void				_NotifyListenersImmediate(uint32 changes);
-
-			bool				_HasScreenshot(const BitmapRef& screenshot);
 
 private:
 			BString				fName;

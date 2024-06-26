@@ -20,6 +20,7 @@
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "Model.h"
+#include "SharedIcons.h"
 #include "WebAppInterface.h"
 
 
@@ -30,11 +31,6 @@
 static const rgb_color kBackgroundColor = { 51, 102, 152, 255 };
 	// Drawn as a border around the screenshots and also what's behind their
 	// transparent regions
-
-static BitmapRef sNextButtonIcon(
-	new(std::nothrow) SharedBitmap(RSRC_ARROW_LEFT), true);
-static BitmapRef sPreviousButtonIcon(
-	new(std::nothrow) SharedBitmap(RSRC_ARROW_RIGHT), true);
 
 
 ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame, Model* model)
@@ -59,10 +55,8 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame, Model* model)
 
 	fToolBar = new BToolBar();
 	fToolBar->AddAction(MSG_PREVIOUS_SCREENSHOT, this,
-		sNextButtonIcon->Bitmap(BITMAP_SIZE_22),
-		NULL, NULL);
-	fToolBar->AddAction(MSG_NEXT_SCREENSHOT, this,
-		sPreviousButtonIcon->Bitmap(BITMAP_SIZE_22),
+		SharedIcons::IconArrowLeft22Scaled()->Bitmap(), NULL, NULL);
+	fToolBar->AddAction(MSG_NEXT_SCREENSHOT, this, SharedIcons::IconArrowRight22Scaled()->Bitmap(),
 		NULL, NULL);
 	fToolBar->AddView(fIndexView);
 	fToolBar->AddGlue();
@@ -88,7 +82,7 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame, Model* model)
 	;
 
 	fScreenshotView->SetLowColor(kBackgroundColor);
-		// Set after attaching all views to prevent it from being overriden
+		// Set after attaching all views to prevent it from being overridden
 		// again by BitmapView::AllAttached()
 
 	CenterOnScreen();
@@ -183,14 +177,6 @@ ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 	atomic_set(&fCurrentScreenshotIndex, 0);
 
 	_UpdateToolBar();
-}
-
-
-/* static */ void
-ScreenshotWindow::CleanupIcons()
-{
-	sNextButtonIcon.Unset();
-	sPreviousButtonIcon.Unset();
 }
 
 
@@ -290,12 +276,11 @@ ScreenshotWindow::_DownloadThread()
 		new BMessage(MSG_DOWNLOAD_START),
 		kProgressIndicatorDelay, 1);
 
-	BitmapRef screenshot;
+	BitmapHolderRef screenshot;
 
 	// Retrieve screenshot from web-app
 	status_t status = fModel->GetPackageScreenshotRepository()->LoadScreenshot(
-		ScreenshotCoordinate(info->Code(), info->Width(), info->Height()),
-		&screenshot);
+		ScreenshotCoordinate(info->Code(), info->Width(), info->Height()), screenshot);
 
 	delayedMessenger.SetCount(0);
 	messenger.SendMessage(MSG_DOWNLOAD_STOP);

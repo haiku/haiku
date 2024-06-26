@@ -13,6 +13,7 @@
 #include <package/PackageDefs.h>
 #include <package/PackageFlags.h>
 
+#include "HaikuDepotConstants.h"
 #include "Logger.h"
 
 

@@ -11,6 +11,7 @@
 #include <ToolBar.h>
 #include <Window.h>
 
+#include "BitmapHolder.h"
 #include "PackageInfo.h"
 
 
@@ -43,8 +44,6 @@ public:
 
 			void				SetPackage(const PackageInfoRef& package);
 
-	static	void				CleanupIcons();
-
 private:
 			void				_DownloadScreenshot();
 
@@ -71,7 +70,7 @@ private:
 			bool				fBarberPoleShown;
 			BStringView*		fIndexView;
 
-			BitmapRef			fScreenshot;
+			BitmapHolderRef		fScreenshot;
 			BitmapView*			fScreenshotView;
 
 			int32				fCurrentScreenshotIndex; // atomic

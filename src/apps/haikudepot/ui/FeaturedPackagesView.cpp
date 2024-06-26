@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -29,8 +29,7 @@
 #include "MessagePackageListener.h"
 #include "RatingUtils.h"
 #include "RatingView.h"
-#include "ScrollableGroupView.h"
-#include "SharedBitmap.h"
+#include "SharedIcons.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -46,10 +45,6 @@
 #define Y_PROPORTION_PUBLISHER 0.60f
 #define Y_PROPORTION_CHRONOLOGICAL_DATA 0.75f
 #define PADDING 8.0f
-
-
-static BitmapRef sInstalledIcon(new(std::nothrow)
-	SharedBitmap(RSRC_INSTALLED), true);
 
 
 // #pragma mark - PackageView
@@ -418,16 +413,16 @@ public:
 	void _DrawPackageIcon(BRect updateRect, PackageInfoRef pkg, float y,
 		bool selected)
 	{
-		BitmapRef icon;
+		BitmapHolderRef icon;
 		status_t iconResult = fModel.GetPackageIconRepository().GetIcon(
-			pkg->Name(), BITMAP_SIZE_64, icon);
+			pkg->Name(), 64, icon);
 
 		if (iconResult == B_OK) {
 			if (icon.IsSet()) {
 				float inset = (HEIGHT_PACKAGE - SIZE_ICON) / 2.0;
 				BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
 					y + SIZE_ICON + inset);
-				const BBitmap* bitmap = icon->Bitmap(BITMAP_SIZE_64);
+				const BBitmap* bitmap = icon->Bitmap();
 
 				if (bitmap != NULL && bitmap->IsValid()) {
 					SetDrawingMode(B_OP_ALPHA);
@@ -462,8 +457,7 @@ public:
 		DrawString(pkg->Title(), pt);
 
 		if (pkg->State() == ACTIVATED) {
-			const BBitmap* bitmap = sInstalledIcon->Bitmap(
-				BITMAP_SIZE_16);
+			const BBitmap* bitmap = SharedIcons::IconInstalled16Scaled()->Bitmap();
 			if (bitmap != NULL && bitmap->IsValid()) {
 				float stringWidth = StringWidth(pkg->Title());
 				float offsetX = pt.x + stringWidth + PADDING;
@@ -771,11 +765,4 @@ FeaturedPackagesView::_AdjustViews()
 {
 	fScrollView->FrameResized(fScrollView->Frame().Width(),
 		fScrollView->Frame().Height());
-}
-
-
-void
-FeaturedPackagesView::CleanupIcons()
-{
-	sInstalledIcon.Unset();
 }

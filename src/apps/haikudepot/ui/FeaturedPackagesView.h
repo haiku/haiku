@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef FEATURED_PACKAGES_VIEW_H
@@ -32,8 +32,6 @@ public:
 
 			void				SelectPackage(const PackageInfoRef& package,
 									bool scrollToEntry = false);
-
-	static	void				CleanupIcons();
 
 private:
 			void				_AdjustViews();

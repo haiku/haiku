@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -13,13 +13,12 @@
 
 #include "HaikuDepotConstants.h"
 #include "RatingUtils.h"
+#include "SharedIcons.h"
 
 
 RatingView::RatingView(const char* name)
 	:
 	BView(name, B_WILL_DRAW),
-	fStarBlueBitmap(new SharedBitmap(RSRC_STAR_BLUE)),
-	fStarGrayBitmap(new SharedBitmap(RSRC_STAR_GREY)),
 	fRating(RATING_MISSING)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -47,8 +46,8 @@ const BBitmap*
 RatingView::StarBitmap()
 {
 	if (fRating < RATING_MIN)
-		return fStarGrayBitmap->Bitmap(BITMAP_SIZE_16);
-	return fStarBlueBitmap->Bitmap(BITMAP_SIZE_16);
+		return SharedIcons::IconStarGrey16Scaled()->Bitmap();
+	return SharedIcons::IconStarBlue16Scaled()->Bitmap();
 }
 
 

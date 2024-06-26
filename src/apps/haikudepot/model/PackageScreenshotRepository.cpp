@@ -6,6 +6,9 @@
 
 #include <unistd.h>
 
+#include <AutoDeleter.h>
+#include <TranslationUtils.h>
+
 #include "FileIO.h"
 #include "Logger.h"
 #include "StorageUtils.h"
@@ -40,11 +43,9 @@ PackageScreenshotRepository::~PackageScreenshotRepository()
 */
 
 status_t
-PackageScreenshotRepository::LoadScreenshot(const ScreenshotCoordinate& coord, BitmapRef* bitmap)
+PackageScreenshotRepository::LoadScreenshot(const ScreenshotCoordinate& coord,
+	BitmapHolderRef& bitmapHolderRef)
 {
-	if (bitmap == NULL)
-		debugger("expected the bitmap to be supplied");
-
 	if (!coord.IsValid())
 		return B_BAD_VALUE;
 
@@ -62,7 +63,12 @@ PackageScreenshotRepository::LoadScreenshot(const ScreenshotCoordinate& coord, B
 
 		if (result == B_OK) {
 			BFileIO fileIo(file, true); // takes ownership
-			*bitmap = BitmapRef(new(std::nothrow)SharedBitmap(fileIo), true);
+			BBitmap* bitmap = BTranslationUtils::GetBitmap(&fileIo);
+
+			if (bitmap == NULL)
+				return B_IO_ERROR;
+
+			bitmapHolderRef.SetTo(new(std::nothrow) BitmapHolder(bitmap), true);
 		}
 	}
 
@@ -77,11 +83,8 @@ PackageScreenshotRepository::LoadScreenshot(const ScreenshotCoordinate& coord, B
 
 status_t
 PackageScreenshotRepository::CacheAndLoadScreenshot(const ScreenshotCoordinate& coord,
-	BitmapRef* bitmap)
+	BitmapHolderRef& bitmapHolderRef)
 {
-	if (bitmap == NULL)
-		debugger("expected the bitmap to be supplied");
-
 	if (!coord.IsValid())
 		return B_BAD_VALUE;
 
@@ -91,8 +94,13 @@ PackageScreenshotRepository::CacheAndLoadScreenshot(const ScreenshotCoordinate& 
 	status_t result = _CreateCachedData(coord, &data);
 
 	if (result == B_OK) {
-		*bitmap = BitmapRef(new(std::nothrow)SharedBitmap(*data), true);
-		delete data;
+		ObjectDeleter<BPositionIO> dataDeleter(data);
+		BBitmap* bitmap = BTranslationUtils::GetBitmap(data);
+
+		if (bitmap == NULL)
+			return B_IO_ERROR;
+
+		bitmapHolderRef.SetTo(new(std::nothrow) BitmapHolder(bitmap), true);
 	}
 
 	return result;

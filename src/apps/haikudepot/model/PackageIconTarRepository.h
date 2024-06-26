@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_ICON_TAR_REPOSITORY_H
@@ -17,6 +17,7 @@
 #include "LRUCache.h"
 #include "PackageIconRepository.h"
 
+
 typedef BReference<IconTarPtr> IconTarPtrRef;
 
 
@@ -29,12 +30,10 @@ public:
 
 			void				AddIconTarPtr(const BString& pkgName,
 									BitmapSize size, off_t offset);
-	virtual	status_t			GetIcon(const BString& pkgName, BitmapSize size,
-									BitmapRef& bitmap);
+	virtual	status_t			GetIcon(const BString& pkgName, uint32 size,
+									BitmapHolderRef& bitmapHolderRef);
 	virtual	bool				HasAnyIcon(const BString& pkgName);
 	virtual	void				Clear();
-
-	static	void				CleanupDefaultIcon();
 
 private:
 			void				_Close();
@@ -47,22 +46,29 @@ private:
 			IconTarPtrRef		_GetIconTarPtr(const BString& pkgName) const;
 
 			status_t			_CreateIconFromTarOffset(off_t offset,
-									BitmapRef& bitmap);
+									BitmapHolderRef& bitmapHolderRef);
 
-	static	off_t				_OffsetToBestRepresentation(
-									const IconTarPtrRef iconTarPtrRef,
-									BitmapSize desiredSize,
-									BitmapSize* actualSize);
+			status_t			_GetDefaultIcon(uint32 size, BitmapHolderRef& bitmapHolderRef);
+
+	static	BitmapSize			_BestStoredSize(const IconTarPtrRef iconTarPtrRef,
+									int32 desiredSize);
+
+			void				_InitDefaultVectorIcon();
 
 private:
 			BLocker				fLock;
 			BPositionIO*		fTarIo;
-			LRUCache<HashString, BitmapRef>
+			LRUCache<HashString, BitmapHolderRef>
 								fIconCache;
 			HashMap<HashString, IconTarPtrRef>
 								fIconTarPtrs;
 
-	static	BitmapRef			sDefaultIcon;
+			uint8*				fDefaultIconVectorData;
+			size_t				fDefaultIconVectorDataSize;
+			LRUCache<HashString, BitmapHolderRef>
+								fDefaultIconCache;
+
+			BMallocIO*			fIconDataBuffer;
 };
 
 #endif // PACKAGE_ICON_TAR_REPOSITORY_H

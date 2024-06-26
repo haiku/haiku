@@ -115,6 +115,7 @@ local textDocumentSources =
 local applicationSources =
 	App.cpp
 	AccessToken.cpp
+	BitmapHolder.cpp
 	BitmapView.cpp
 	Captcha.cpp
 	CreateUserDetail.cpp
@@ -152,7 +153,7 @@ local applicationSources =
 	ScreenshotCoordinate.cpp
 	ScrollableGroupView.cpp
 	SettingsWindow.cpp
-	SharedBitmap.cpp
+	SharedIcons.cpp
 	ShuttingDownWindow.cpp
 	ToLatestUserUsageConditionsWindow.cpp
 	UserCredentials.cpp

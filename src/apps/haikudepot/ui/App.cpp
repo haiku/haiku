@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -24,13 +24,11 @@
 #include "support.h"
 
 #include "AppUtils.h"
-#include "FeaturedPackagesView.h"
 #include "Logger.h"
 #include "MainWindow.h"
-#include "PackageIconTarRepository.h"
 #include "ServerHelper.h"
 #include "ServerSettings.h"
-#include "ScreenshotWindow.h"
+#include "SharedIcons.h"
 #include "StorageUtils.h"
 
 
@@ -56,9 +54,7 @@ App::~App()
 	// We cannot let global destructors cleanup static BitmapRef objects,
 	// since calling BBitmap destructors needs a valid BApplication still
 	// around. That's why we do it here.
-	PackageIconTarRepository::CleanupDefaultIcon();
-	FeaturedPackagesView::CleanupIcons();
-	ScreenshotWindow::CleanupIcons();
+	SharedIcons::UnsetAllIcons();
 }
 
 

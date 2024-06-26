@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022, Andrew Lindesay, <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay, <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
@@ -229,7 +229,7 @@ private:
 };
 
 
-// #pragma mark - SharedBitmapStringField
+// #pragma mark - PackageIconAndTitleField
 
 
 PackageIconAndTitleField::PackageIconAndTitleField(const char* packageName,
@@ -418,16 +418,15 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		}
 
 		// draw the bitmap
-		BitmapRef bitmapRef;
+		BitmapHolderRef bitmapHolderRef;
 		status_t bitmapResult;
 
 		bitmapResult = fModel->GetPackageIconRepository().GetIcon(
-			packageIconAndTitleField->PackageName(), BITMAP_SIZE_16,
-			bitmapRef);
+			packageIconAndTitleField->PackageName(), 16, bitmapHolderRef);
 
 		if (bitmapResult == B_OK) {
-			if (bitmapRef.IsSet()) {
-				const BBitmap* bitmap = bitmapRef->Bitmap(BITMAP_SIZE_16);
+			if (bitmapHolderRef.IsSet()) {
+				const BBitmap* bitmap = bitmapHolderRef->Bitmap();
 				if (bitmap != NULL && bitmap->IsValid()) {
 					parent->SetDrawingMode(B_OP_ALPHA);
 					BRect viewRect(x, y, x + 15, y + 15);

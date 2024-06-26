@@ -57,6 +57,7 @@ enum BitmapSize {
 
 #define kProgressIndeterminate				-1.0f
 
+#define MAX_IMAGE_SIZE						1000
 
 #define RGB_COLOR_WHITE						(rgb_color) { 255, 255, 255, 255 }
 
