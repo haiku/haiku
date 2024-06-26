@@ -814,7 +814,8 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 		else
 			bytesTransferred += (ssize_t)length;
 
-		pos += length;
+		if (movePosition)
+			pos += length;
 
 		if (length < vecs[i].iov_len)
 			break;
@@ -1089,7 +1090,8 @@ _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 		else
 			bytesRead += (ssize_t)length;
 
-		pos += vecs[i].iov_len;
+		if (movePosition)
+			pos += vecs[i].iov_len;
 	}
 
 	if (movePosition)
@@ -1181,7 +1183,8 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 		else
 			bytesWritten += (ssize_t)length;
 
-		pos += vecs[i].iov_len;
+		if (movePosition)
+			pos += vecs[i].iov_len;
 	}
 
 	if (movePosition)
