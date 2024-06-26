@@ -96,7 +96,7 @@ choose_core(const ThreadData* threadData)
 
 	// try to pack all threads on one core
 	core = choose_small_task_core();
-	if (!core->CPUMask().Matches(mask))
+	if (core != NULL && !core->CPUMask().Matches(mask))
 		core = NULL;
 
 	if (core == NULL || core->GetLoad() + threadData->GetLoad() >= kHighLoad) {
