@@ -268,7 +268,7 @@ protected:
 		const char*);
 
 	void LoadAddOn(BMessage*);
-	void EachAddOn(bool (*)(const Model*, const char*, uint32 shortcut,
+	void EachAddOn(void (*)(const Model*, const char*, uint32 shortcut,
 			uint32 modifiers, bool primary, void*, BContainerWindow*, BMenu*),
 		void*, BStringList&, BMenu*);
 

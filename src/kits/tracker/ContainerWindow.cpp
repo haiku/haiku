@@ -237,7 +237,7 @@ end:
 }
 
 
-static bool
+static void
 AddOneAddOn(const Model* model, const char* name, uint32 shortcut,
 	uint32 modifiers, bool primary, void* context,
 	BContainerWindow* window, BMenu* menu)
@@ -247,8 +247,14 @@ AddOneAddOn(const Model* model, const char* name, uint32 shortcut,
 	BMessage* message = new BMessage(kLoadAddOn);
 	message->AddRef("refs", model->EntryRef());
 
-	ModelMenuItem* item = new ModelMenuItem(model, name, message,
-		(char)shortcut, modifiers);
+	ModelMenuItem* item;
+	try {
+		item = new ModelMenuItem(model, name, message,
+			(char)shortcut, modifiers);
+	} catch (...) {
+		delete message;
+		return;
+	}
 
 	const entry_ref* addOnRef = model->EntryRef();
 	AddOnMenuGenerate(addOnRef, menu, window);
@@ -257,8 +263,6 @@ AddOneAddOn(const Model* model, const char* name, uint32 shortcut,
 		params->primaryList->AddItem(item);
 	else
 		params->secondaryList->AddItem(item);
-
-	return false;
 }
 
 
@@ -2891,7 +2895,7 @@ BContainerWindow::AddTrashContextMenus(BMenu* menu)
 
 
 void
-BContainerWindow::EachAddOn(bool (*eachAddOn)(const Model*, const char*,
+BContainerWindow::EachAddOn(void (*eachAddOn)(const Model*, const char*,
 		uint32 shortcut, uint32 modifiers, bool primary, void* context,
 		BContainerWindow* window, BMenu* menu),
 	void* passThru, BStringList& mimeTypes, BMenu* menu)
