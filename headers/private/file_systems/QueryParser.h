@@ -768,9 +768,14 @@ Equation<QueryPolicy>::CalculateScore(Index &index)
 	}
 
 	// if we have a pattern, how much does it help our search?
-	if (fIsPattern)
+	if (fIsPattern) {
 		fScore = getFirstPatternSymbol(fString) << 3;
-	else {
+
+		// Even if the first pattern symbol is at position 0,
+		// there's still an index, so don't let our score revert to zero.
+		if (fScore == 0)
+			fScore = 1;
+	} else {
 		// Score by operator
 		if (Term<QueryPolicy>::fOp == OP_EQUAL) {
 			// higher than pattern="255 chars+*"
