@@ -617,40 +617,13 @@ format_pointer(Context &context, message_args *msg)
 
 
 static string
-get_iovec(Context &context, iovec *iov, int iovlen)
-{
-	if (iov == NULL && iovlen == 0)
-		return "(empty)";
-
-	iovec vecs[iovlen];
-	int32 bytesRead;
-
-	string r = "[";
-	status_t err = context.Reader().Read(iov, vecs, sizeof(vecs), bytesRead);
-	if (err != B_OK) {
-		r += context.FormatPointer(iov);
-		r += ", " + context.FormatSigned(iovlen);
-	} else {
-		for (int i = 0; i < iovlen; i++) {
-			if (i > 0)
-				r += ", ";
-			r += "{iov_base=" + context.FormatPointer(vecs[i].iov_base);
-			r += ", iov_len=" + context.FormatUnsigned(vecs[i].iov_len);
-			r += "}";
-		}
-	}
-	return r + "]";
-}
-
-
-static string
 format_pointer(Context &context, msghdr *h)
 {
 	string r;
 
 	r  =   "name = " + format_pointer_value<sockaddr>(context, h->msg_name);
 	r += ", name_len = " + context.FormatUnsigned(h->msg_namelen);
-	r += ", iov = " + get_iovec(context, h->msg_iov, h->msg_iovlen);
+	r += ", iov = " + format_iovecs(context, h->msg_iov, h->msg_iovlen);
 	if (h->msg_control != NULL || h->msg_controllen != 0) {
 		r += ", control = " + context.FormatPointer(h->msg_control);
 		r += ", control_len = " + context.FormatUnsigned(h->msg_controllen);

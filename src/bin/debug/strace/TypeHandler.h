@@ -100,6 +100,8 @@ extern TypeHandler *create_pointer_type_handler();
 extern TypeHandler *create_string_type_handler();
 extern TypeHandler *create_status_t_type_handler();
 
+extern string format_iovecs(Context &context, const struct iovec *iov, int iovlen);
+
 // specialization for "const char*"
 template<>
 struct TypeHandlerFactory<const char*> {
@@ -123,6 +125,7 @@ struct fd_set;
 struct flock;
 struct ifconf;
 struct ifreq;
+struct iovec;
 struct msghdr;
 struct message_args;
 struct pollfd;
@@ -135,6 +138,7 @@ DEFINE_FACTORY(fdset_ptr, fd_set *);
 DEFINE_FACTORY(flock_ptr, flock *);
 DEFINE_FACTORY(ifconf_ptr, ifconf *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);
+DEFINE_FACTORY(iovec_ptr, const iovec *);
 DEFINE_FACTORY(msghdr_ptr, msghdr *);
 DEFINE_FACTORY(msghdr_ptr, const msghdr *);
 DEFINE_FACTORY(message_args_ptr, message_args *);

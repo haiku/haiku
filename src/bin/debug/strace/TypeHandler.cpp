@@ -11,6 +11,7 @@
 
 #include <string.h>
 #include <String.h>
+#include <sys/uio.h>
 
 #include "Context.h"
 #include "MemoryReader.h"
@@ -124,6 +125,57 @@ create_status_t_type_handler()
 	return new StatusTypeHandler;
 }
 
+
+// iovec*
+string
+format_iovecs(Context &context, const iovec *iov, int iovlen)
+{
+	if (iov == NULL && iovlen == 0)
+		return "(empty)";
+
+	iovec vecs[iovlen];
+	int32 bytesRead;
+
+	string r = "[";
+	status_t err = context.Reader().Read((void*)iov, vecs, sizeof(vecs), bytesRead);
+	if (err != B_OK) {
+		r += context.FormatPointer(iov);
+		r += ", " + context.FormatSigned(iovlen);
+	} else {
+		for (int i = 0; i < iovlen; i++) {
+			if (i > 0)
+				r += ", ";
+			r += "{iov_base=" + context.FormatPointer(vecs[i].iov_base);
+			r += ", iov_len=" + context.FormatUnsigned(vecs[i].iov_len);
+			r += "}";
+		}
+	}
+	return r + "]";
+}
+
+class IovecTypeHandler : public TypeHandler {
+public:
+	IovecTypeHandler() {}
+
+	string GetParameterValue(Context &context, Parameter *param, const void *address)
+	{
+		Parameter *size = context.GetNextSibling(param);
+		return format_iovecs(context, (const iovec*)*(void **)address,
+			context.ReadValue<size_t>(size));
+	}
+
+	string GetReturnValue(Context &context, uint64 value)
+	{
+		return context.FormatPointer((void *)value);
+	}
+};
+
+TypeHandler *
+create_iovec_ptr_type_handler()
+{
+	return new IovecTypeHandler;
+}
+
 // read_string
 static
 string
@@ -176,6 +228,8 @@ TypeHandlerImpl<const char*>::GetReturnValue(Context &context, uint64 value)
 {
 	return read_string(context, (void *)value);
 }
+
+// #pragma mark - enums, flags
 
 EnumTypeHandler::EnumTypeHandler(const EnumMap &m) : fMap(m) {}
 
