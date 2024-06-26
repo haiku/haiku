@@ -28,15 +28,6 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libicns_ENABLED
 	lib:libicns
 #endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openexr_ENABLED
-#ifdef HAIKU_PACKAGING_ARCH_x86_gcc2
-	lib:libilmimf
-	lib:libilmimfutil
-#else
-	lib:libilmimf_2_4
-	lib:libilmimfutil_2_4
-#endif
-#endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_jasper_ENABLED
 	lib:libjasper
 #endif

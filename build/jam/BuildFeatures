@@ -565,30 +565,6 @@ if [ IsPackageAvailable tiff4_devel ] {
 }
 
 
-# openexr
-if [ IsPackageAvailable openexr_devel ] {
-	ExtractBuildFeatureArchives openexr :
-		file: base openexr
-			runtime: lib
-		file: devel openexr_devel
-			depends: base
-			libraries:
-				$(developLibDir)/libIlmImf.so
-				$(developLibDir)/libIlmImfUtil.so
-				$(developLibDir)/libHalf.so
-				$(developLibDir)/libIex.so
-				$(developLibDir)/libIexMath.so
-				$(developLibDir)/libIlmThread.so
-				$(developLibDir)/libImath.so
-			headers: $(developHeadersDir) $(developHeadersDir)/OpenEXR
-		;
-
-	EnableBuildFeatures openexr ;
-} else {
-	unavailableBuildFeatures += openexr ;
-}
-
-
 # libdvdread
 if [ IsPackageAvailable libdvdread_devel ] {
 	ExtractBuildFeatureArchives libdvdread :

@@ -1910,13 +1910,6 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDFourClause)
 		.SetURL("http://bzip.org"));
 
-	// OpenEXR copyrights
-	_AddPackageCredit(PackageCredit("OpenEXR")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2014 Industrial "
-			"Light & Magic, a division of Lucas Digital Ltd. LLC."))
-		.SetLicense(kBSDThreeClause)
-		.SetURL("https://openexr.com"));
-
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("ACPI Component Architecture (ACPICA)")
 		.SetCopyright(COPYRIGHT_STRING "1999-2018 Intel Corp.")

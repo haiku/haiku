@@ -36,9 +36,6 @@ requires {
 	lib:libtiff_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 5.6
 	lib:libwebp_%HAIKU_SECONDARY_PACKAGING_ARCH%
 
-	lib:libilmimf_2_4_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libilmimfutil_2_4_%HAIKU_SECONDARY_PACKAGING_ARCH%
-
 	lib:libavcodec_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 60
 	lib:libavfilter_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 9
 	lib:libavformat_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 60
