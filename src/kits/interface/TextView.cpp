@@ -2814,12 +2814,12 @@ BTextView::_ValidateLayoutData()
 	if (fWrap)
 		fLayoutData->preferred.width = min.width + 5 * lineHeight;
 	else {
-		float maxWidth = fLines->MaxWidth();
+		float maxWidth = fLines->MaxWidth() + fLayoutData->leftInset + fLayoutData->rightInset;
 		if (maxWidth < min.width)
 			maxWidth = min.width;
 
-		fLayoutData->preferred.width
-			= maxWidth + fLayoutData->leftInset + fLayoutData->rightInset;
+		fLayoutData->preferred.width = maxWidth;
+		fLayoutData->min = fLayoutData->preferred;
 	}
 
 	fLayoutData->valid = true;
@@ -3855,8 +3855,8 @@ BTextView::_RecalculateLineBreaks(int32* startLine, int32* endLine)
 
 	float width = fTextRect.Width();
 
-	// don't try to compute anything if the text rect is not set
-	if (!fTextRect.IsValid() || width == 0)
+	// don't try to compute anything with word wrapping if the text rect is not set
+	if (fWrap && (!fTextRect.IsValid() || width == 0))
 		return;
 
 	// sanity check
