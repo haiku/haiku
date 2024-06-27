@@ -379,7 +379,7 @@ reschedule(int32 nextState)
 
 	// select thread with the biggest priority and enqueue back the old thread
 	ThreadData* nextThreadData;
-	if (!gCPUEnabled.GetBit(thisCPU)) {
+	if (gCPU[thisCPU].disabled) {
 		if (!oldThreadData->IsIdle()) {
 			if (oldThread->pinned_to_cpu == 0) {
 				putOldThreadAtBack = true;
