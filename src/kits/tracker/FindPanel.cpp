@@ -44,6 +44,7 @@ All rights reserved.
 #include <string.h>
 #include <strings.h>
 
+#include <Alert.h>
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
@@ -53,19 +54,20 @@ All rights reserved.
 #include <Cursor.h>
 #include <Debug.h>
 #include <Directory.h>
-#include <FindDirectory.h>
 #include <File.h>
 #include <FilePanel.h>
+#include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
+#include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Mime.h>
 #include <NodeInfo.h>
-#include <PopUpMenu.h>
 #include <Path.h>
+#include <PopUpMenu.h>
 #include <Query.h>
 #include <SeparatorView.h>
 #include <Size.h>
@@ -213,12 +215,14 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	:
 	BWindow(BRect(), B_TRANSLATE("Find"), B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE
-			| B_AUTO_UPDATE_SIZE_LIMITS),
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fFile(TryOpening(newRef)),
 	fFromTemplate(false),
 	fEditTemplateOnly(false),
-	fSaveAsTemplatePanel(NULL)
+	fSaveAsPanel(NULL),
+	fOpenQueryPanel(NULL),
+	fSaveQueryOrTemplateItem(new BMenuItem(B_TRANSLATE("Save"),
+		new BMessage(kSaveQueryOrTemplate), 'S'))
 {
 	if (fFile != NULL) {
 		fRef = *newRef;
@@ -247,13 +251,23 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 			} else
 				SaveQueryAttributes(fFile, true);
 		}
+
+		fSaveQueryOrTemplateItem->SetEnabled(false);
 	}
 
 	fFromTemplate = IsQueryTemplate(fFile);
 
 	fBackground = new FindPanel(fFile, this, fFromTemplate,
 		fEditTemplateOnly);
-	SetLayout(new BGroupLayout(B_VERTICAL));
+
+	BuildMenuBar();
+
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	layout->SetSpacing(0);
+	layout->SetInsets(0, 0, 0, 0);
+
+	GetLayout()->AddView(fMenuBar);
 	GetLayout()->AddView(fBackground);
 	CenterOnScreen();
 }
@@ -262,7 +276,239 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 FindWindow::~FindWindow()
 {
 	delete fFile;
-	delete fSaveAsTemplatePanel;
+	delete fSaveAsPanel;
+	delete fOpenQueryPanel;
+}
+
+
+void
+FindWindow::BuildMenuBar()
+{
+	fMenuBar = new BMenuBar("Menu Bar");
+
+	fQueryMenu = new BMenu(B_TRANSLATE("Query"));
+	fOptionsMenu = new BMenu(B_TRANSLATE("Options"));
+	fTemplatesMenu = new BMenu(B_TRANSLATE("Templates"));
+
+	fHistoryMenu = new BMenu(B_TRANSLATE("Recent queries"));
+	BMessenger messenger(fBackground);
+	FindPanel::AddRecentQueries(fHistoryMenu, false, &messenger, kSwitchToQueryTemplate, false);
+	if (fHistoryMenu->CountItems() > 0) {
+		fHistoryMenu->AddSeparatorItem();
+		fHistoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear history"),
+			new BMessage(kClearHistory)));
+	}
+
+	BMenuItem* saveAsQueryItem = new BMenuItem(B_TRANSLATE("Save as query" B_UTF8_ELLIPSIS), NULL);
+	BMessage* saveAsQueryMessage = new BMessage(kOpenSaveAsPanel);
+	saveAsQueryMessage->AddBool("saveastemplate", false);
+	saveAsQueryItem->SetMessage(saveAsQueryMessage);
+	BMenuItem* saveAsQueryTemplateItem = new BMenuItem(B_TRANSLATE("Save as template"
+			B_UTF8_ELLIPSIS),
+		NULL);
+	BMessage* saveAsQueryTemplateMessage = new BMessage(kOpenSaveAsPanel);
+	saveAsQueryTemplateMessage->AddBool("saveastemplate", true);
+	saveAsQueryTemplateItem->SetMessage(saveAsQueryTemplateMessage);
+
+	fQueryMenu->AddItem(fSaveQueryOrTemplateItem);
+	fQueryMenu->AddItem(saveAsQueryItem);
+	fQueryMenu->AddItem(saveAsQueryTemplateItem);
+	fQueryMenu->AddItem(new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
+		new BMessage(kOpenLoadQueryPanel), 'O'));
+	fQueryMenu->AddSeparatorItem();
+	fQueryMenu->AddItem(fHistoryMenu);
+	fSearchInTrash = new BMenuItem(B_TRANSLATE("Include trash"),
+		new BMessage(kSearchInTrashOptionClicked));
+	fOptionsMenu->AddItem(fSearchInTrash);
+
+	PopulateTemplatesMenu();
+
+	fMenuBar->AddItem(fQueryMenu);
+	fMenuBar->AddItem(fOptionsMenu);
+	fMenuBar->AddItem(fTemplatesMenu);
+}
+
+
+void
+FindWindow::UpdateFileReferences(const entry_ref* ref)
+{
+	if (ref == NULL) {
+		fFile->Unset();
+		fFile = NULL;
+		fFromTemplate = false;
+		fRef = entry_ref();
+	}
+
+	BEntry entry(ref);
+	if (!entry.Exists())
+		return;
+
+	fFile->Unset();
+	fFile = NULL;
+	fFile = TryOpening(ref);
+
+	if (fFile != NULL) {
+		entry.GetRef(&fRef);
+		fFromTemplate = IsQueryTemplate(fFile);
+	}
+}
+
+
+void
+ClearMenu(BMenu* menu)
+{
+	int32 count = menu->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BMenuItem* item = menu->RemoveItem(static_cast<int32>(0));
+		delete item;
+	}
+}
+
+
+status_t
+FindWindow::DeleteQueryOrTemplate(BEntry* entry)
+{
+	// params checking
+	if (entry == NULL)
+		return B_BAD_VALUE;
+
+	if (entry->Exists()) {
+		entry_ref ref;
+		entry->GetRef(&ref);
+		if (fRef == ref) {
+			UpdateFileReferences(NULL);
+			fSaveQueryOrTemplateItem->SetEnabled(false);
+		}
+		entry->Remove();
+		return B_OK;
+	} else {
+		return B_ENTRY_NOT_FOUND;
+	}
+}
+
+
+void
+FindWindow::ClearHistoryOrTemplates(bool clearTemplates, bool temporaryOnly)
+{
+	BVolumeRoster roster;
+	BVolume volume;
+	while (roster.GetNextVolume(&volume) == B_OK) {
+		if (volume.IsPersistent() && volume.KnowsQuery() && volume.KnowsAttr()) {
+			BQuery query;
+			query.SetVolume(&volume);
+			query.SetPredicate("_trk/recentQuery == 1");
+			if (query.Fetch() != B_OK)
+				continue;
+
+			BEntry entry;
+			entry_ref ref;
+			while (query.GetNextEntry(&entry) == B_OK) {
+				entry.GetRef(&ref);
+				if (FSInTrashDir(&ref) && !BEntry(&ref).Exists())
+					continue;
+				char type[B_MIME_TYPE_LENGTH];
+				BNodeInfo(new BNode(&entry)).GetType(type);
+				if (strcmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0) {
+					if (clearTemplates)
+						DeleteQueryOrTemplate(&entry);
+					else
+						continue;
+				}
+
+				if (!clearTemplates) {
+					BFile file(&entry, B_READ_ONLY);
+					bool isTemporary;
+					if (file.ReadAttr("_trk/temporary", B_BOOL_TYPE, 0, &isTemporary,
+						sizeof(isTemporary))
+					== sizeof(isTemporary)) {
+						if (!temporaryOnly) {
+							DeleteQueryOrTemplate(&entry);
+						} else {
+							if (isTemporary)
+								DeleteQueryOrTemplate(&entry);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (clearTemplates) {
+		ClearMenu(fTemplatesMenu);
+	} else {
+		ClearMenu(fHistoryMenu);
+		BMessenger messenger(fBackground);
+		FindPanel::AddRecentQueries(fHistoryMenu, false, &messenger, kSwitchToQueryTemplate, false,
+			false, true);
+		if (fHistoryMenu->CountItems() > 0) {
+			fHistoryMenu->AddSeparatorItem();
+			fHistoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear history"),
+				new BMessage(kClearHistory)));
+		}
+	}
+}
+
+bool
+CheckForDuplicates(BObjectList<entry_ref>* list, entry_ref* ref)
+{
+	// Simple Helper Function To Check For Duplicates Within an Entry List of Templates
+	int32 count = list->CountItems();
+	BPath comparison(ref);
+	for (int32 i = 0; i < count; i++) {
+		if (BPath(list->ItemAt(i)) == comparison)
+			return true;
+	}
+	return false;
+}
+
+
+void
+FindWindow::PopulateTemplatesMenu()
+{
+	ClearMenu(fTemplatesMenu);
+	BObjectList<entry_ref> templates(10, true);
+	BVolumeRoster roster;
+	BVolume volume;
+	while (roster.GetNextVolume(&volume) == B_OK) {
+		if (volume.IsPersistent() && volume.KnowsQuery() && volume.KnowsAttr()) {
+			BQuery query;
+			query.SetVolume(&volume);
+			query.SetPredicate("_trk/recentQuery == 1");
+
+			if (query.Fetch() != B_OK)
+				continue;
+
+			entry_ref ref;
+			while (query.GetNextRef(&ref) == B_OK) {
+				if (FSInTrashDir(&ref))
+					continue;
+
+				char type[B_MIME_TYPE_LENGTH];
+				BNode node(&ref);
+				BNodeInfo(&node).GetType(type);
+				if (strcmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0 && BEntry(&ref).Exists()
+					&& CheckForDuplicates(&templates, &ref) == false) {
+					// Checking for duplicates as BQuery returns multiple instances
+					// of the same file if they are deleted at times.
+
+					BMessage* message = new BMessage(kSwitchToQueryTemplate);
+					message->AddRef("refs", &ref);
+					BMenuItem* item = new IconMenuItem(ref.name, message, type);
+					item->SetTarget(BMessenger(fBackground));
+					fTemplatesMenu->AddItem(item);
+					templates.AddItem(new entry_ref(ref));
+				}
+			}
+		}
+	}
+}
+
+
+void
+FindWindow::SetOptions(bool searchInTrash)
+{
+	ASSERT(fSearchInTrash != NULL);
+	fSearchInTrash->SetMarked(searchInTrash);
 }
 
 
@@ -422,9 +668,8 @@ FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 
 
 status_t
-FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
-	bool queryTemplate, const BMessage* oldAttributes,
-	const BPoint* oldLocation)
+FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate,
+	const BMessage* oldAttributes, const BPoint* oldLocation, bool temporary)
 {
 	if (oldAttributes != NULL) {
 		// revive old window settings
@@ -488,6 +733,18 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry,
 			buffer.UnlockBuffer();
 		}
 		// default to query for everything
+	}
+
+	file->WriteAttr("_trk/temporary", B_BOOL_TYPE, 0, &temporary, sizeof(temporary));
+
+	MoreOptionsStruct saveMoreOptions;
+	saveMoreOptions.searchTrash = fSearchInTrash->IsMarked();
+	saveMoreOptions.temporary = temporary;
+
+	if (file->WriteAttr(kAttrQueryMoreOptions, B_RAW_TYPE, 0, &saveMoreOptions,
+			sizeof(saveMoreOptions))
+		== sizeof(saveMoreOptions)) {
+		file->RemoveAttr(kAttrQueryMoreOptionsForeign);
 	}
 
 	fBackground->SaveWindowState(file, fEditTemplateOnly);
@@ -557,10 +814,6 @@ FindWindow::Find()
 		}
 	}
 
-	int32 currentTime = (int32)time(0);
-	fFile->WriteAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &currentTime,
-		sizeof(int32));
-
 	// tell the tracker about it
 	BMessage message(B_REFS_RECEIVED);
 	message.AddRef("refs", &fRef);
@@ -568,6 +821,50 @@ FindWindow::Find()
 
 	// close the find panel
 	PostMessage(B_QUIT_REQUESTED);
+}
+
+
+status_t
+FindWindow::GetQueryLastChangeTimeFromFile(BMessage* message)
+{
+	// params checking
+	if (message == NULL)
+		return B_BAD_VALUE;
+
+	struct attr_info info;
+	status_t error = fFile->GetAttrInfo(kAttrQueryLastChange, &info);
+	if (error == B_OK) {
+		if (info.type == B_MESSAGE_TYPE) {
+			char* buffer = new char[info.size];
+			ssize_t readSize = fFile->ReadAttr(kAttrQueryLastChange, B_MESSAGE_TYPE, 0, buffer,
+				static_cast<size_t>(info.size));
+			if (readSize == info.size) {
+				if (message->Unflatten(buffer) == B_OK) {
+					delete[] buffer;
+						// Delete the dynamically allocated memory in both situations
+					return B_OK;
+				} else {
+					delete[] buffer;
+						// Delete the dynamically allocated memory in both situations.
+					return B_ERROR;
+				}
+			}
+		} else if (info.type == B_INT32_TYPE) {
+			int32 previousChangedTime;
+			if (fFile->ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &previousChangedTime,
+					(int32)info.size)
+				== sizeof(int32)) {
+				return message->AddInt32(kAttrQueryLastChange, previousChangedTime);
+			} else {
+				return B_ERROR;
+			}
+		}
+
+		// If it reaches till here, that means the entry type is wrong!
+		return B_BAD_VALUE;
+	} else {
+		return error;
+	}
 }
 
 
@@ -592,7 +889,11 @@ FindWindow::FindSaveCommon(bool find)
 		hadLocation = FSGetPoseLocation(fFile, &location);
 	}
 
+	BMessage message;
 	if (replaceOriginal) {
+		if (GetQueryLastChangeTimeFromFile(&message) != B_OK)
+			message.MakeEmpty();
+
 		fFile->Unset();
 		entry.Remove();
 			// remove the current entry - need to do this to quit the
@@ -631,8 +932,15 @@ FindWindow::FindSaveCommon(bool find)
 	fFile = new BFile(&entry, O_RDWR | O_CREAT);
 	ASSERT(fFile->InitCheck() == B_OK);
 
+	int32 currentTime = (int32)time(0);
+	message.AddInt32(kAttrQueryLastChange, currentTime);
+	ssize_t size = message.FlattenedSize();
+	char* buffer = new char[size];
+	if (message.Flatten(buffer, size) == B_OK)
+		fFile->WriteAttr(kAttrQueryLastChange, B_MESSAGE_TYPE, 0, buffer, (int32)size);
+
 	SaveQueryAsAttributes(fFile, &entry, !find, newFile ? 0 : &oldAttributes,
-		(hadLocation && keepPoseLocation) ? &location : 0);
+		(hadLocation && keepPoseLocation) ? &location : 0, newFile);
 
 	return newFile;
 }
@@ -650,34 +958,96 @@ FindWindow::MessageReceived(BMessage* message)
 			Save();
 			break;
 
+		case kSaveQueryOrTemplate:
+		{
+			BEntry entry(&fRef);
+			SaveQueryAsAttributes(fFile, &entry, IsQueryTemplate(fFile), 0, 0, false);
+			break;
+		}
+
+		case kClearHistory:
+		{
+			// BAlert will manage its memory independently
+			BAlert* alert = new BAlert(B_TRANSLATE("Clear history?"),
+				B_TRANSLATE("Do you want to clear temporary queries or all queries?"
+					" This action is irreversible!"),
+				B_TRANSLATE("Cancel"),
+				B_TRANSLATE("Clear all"),
+				B_TRANSLATE("Clear temporary queries only"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
+				B_WARNING_ALERT);
+			alert->SetShortcut(0, B_ESCAPE);
+			int32 choice = alert->Go();
+			if (choice)
+				ClearHistoryOrTemplates(false, choice == 2);
+			break;
+		}
+
+		case kOpenSaveAsPanel:
+		{
+			if (fSaveAsPanel == NULL)
+				fSaveAsPanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(fBackground));
+
+			bool isTemplate;
+			if (message->FindBool("saveastemplate", &isTemplate) != B_OK)
+				isTemplate = false;
+
+			BMessage* saveMessage = new BMessage(B_SAVE_REQUESTED);
+			saveMessage->AddBool("includeintemplates", isTemplate);
+			fSaveAsPanel->SetMessage(saveMessage);
+			fSaveAsPanel->Window()->SetTitle(isTemplate ? B_TRANSLATE("Save query template:") :
+				B_TRANSLATE("Save query:"));
+			fSaveAsPanel->Show();
+			break;
+		}
+
+		case kOpenLoadQueryPanel:
+		{
+			if (fOpenQueryPanel == NULL)
+				fOpenQueryPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(fBackground));
+
+			fOpenQueryPanel->SetMessage(new BMessage(kSwitchToQueryTemplate));
+			fOpenQueryPanel->Window()->SetTitle(B_TRANSLATE("Open query:"));
+			fOpenQueryPanel->Show();
+		}
+
+		case kSearchInTrashOptionClicked:
+		{
+			fSearchInTrash->SetMarked(!fSearchInTrash->IsMarked());
+			break;
+		}
+
 		case kAttachFile:
-			{
-				entry_ref dir;
-				const char* name;
-				bool queryTemplate;
-				if (message->FindString("name", &name) == B_OK
-					&& message->FindRef("directory", &dir) == B_OK
-					&& message->FindBool("template", &queryTemplate)
-						== B_OK) {
-					delete fFile;
-					fFile = NULL;
-					BDirectory directory(&dir);
-					BEntry entry(&directory, name);
-					entry_ref tmpRef;
-					entry.GetRef(&tmpRef);
-					fFile = TryOpening(&tmpRef);
-					if (fFile != NULL) {
-						fRef = tmpRef;
-						SaveQueryAsAttributes(fFile, &entry, queryTemplate,
-							0, 0);
-							// try to save whatever state we aleady have
-							// to the new query so that if the user
-							// opens it before runing it from the find panel,
-							// something reasonable happens
-					}
+		{
+			entry_ref dir;
+			const char* name;
+			bool queryTemplate;
+			if (message->FindString("name", &name) == B_OK
+				&& message->FindRef("directory", &dir) == B_OK
+				&& message->FindBool("template", &queryTemplate) == B_OK) {
+				delete fFile;
+				fFile = NULL;
+				BDirectory directory(&dir);
+				BEntry entry(&directory, name);
+				entry_ref tmpRef;
+				entry.GetRef(&tmpRef);
+				fFile = TryOpening(&tmpRef);
+				if (fFile != NULL) {
+					fRef = tmpRef;
+					fFromTemplate = IsQueryTemplate(fFile);
+					SaveQueryAsAttributes(fFile, &entry, queryTemplate, 0, 0, false);
+						// try to save whatever state we aleady have
+						// to the new query so that if the user
+						// opens it before runing it from the find panel,
+						// something reasonable happens
 				}
 			}
-			break;
+		}
+		// Refresh Template Menu
+		ClearMenu(fTemplatesMenu);
+		PopulateTemplatesMenu();
+
+		fSaveQueryOrTemplateItem->SetEnabled(true);
+		break;
 
 		case kSwitchToQueryTemplate:
 		{
@@ -685,22 +1055,24 @@ FindWindow::MessageReceived(BMessage* message)
 			if (message->FindRef("refs", &ref) == B_OK)
 				SwitchToTemplate(&ref);
 
+			UpdateFileReferences(&ref);
+			fSaveQueryOrTemplateItem->SetEnabled(true);
 			break;
 		}
 
 		case kRunSaveAsTemplatePanel:
-			if (fSaveAsTemplatePanel != NULL)
-				fSaveAsTemplatePanel->Show();
-			else {
+		{
+			if (fSaveAsPanel != NULL) {
+				fSaveAsPanel->Show();
+			} else {
 				BMessenger panel(BackgroundView());
-				fSaveAsTemplatePanel = new BFilePanel(B_SAVE_PANEL, &panel);
-				fSaveAsTemplatePanel->SetSaveText(
-					B_TRANSLATE("Query template"));
-				fSaveAsTemplatePanel->Window()->SetTitle(
-					B_TRANSLATE("Save as Query template:"));
-				fSaveAsTemplatePanel->Show();
+				fSaveAsPanel = new BFilePanel(B_SAVE_PANEL, &panel);
+				fSaveAsPanel->SetSaveText(B_TRANSLATE("Query template"));
+				fSaveAsPanel->Window()->SetTitle(B_TRANSLATE("Save as query template:"));
+				fSaveAsPanel->Show();
 			}
 			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
@@ -724,11 +1096,6 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	SetLowUIColor(ViewUIColor());
 
 	uint32 initialMode = InitialMode(node);
-
-	BMessenger self(this);
-	fRecentQueries = new BPopUpMenu(B_TRANSLATE("Recent queries"), false,
-		false);
-	AddRecentQueries(fRecentQueries, true, &self, kSwitchToQueryTemplate);
 
 	// add popup for mime types
 	fMimeTypeMenu = new BPopUpMenu("MimeTypeMenu");
@@ -759,55 +1126,6 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	volumeField->SetDivider(volumeField->StringWidth(volumeField->Label()) + 8);
 	AddVolumes(fVolMenu);
 
-	if (!editTemplateOnly) {
-		BPoint draggableIconOrigin(0, 0);
-		BMessage dragNDropMessage(B_SIMPLE_DATA);
-		dragNDropMessage.AddInt32("be:actions", B_COPY_TARGET);
-		dragNDropMessage.AddString("be:types", B_FILE_MIME_TYPE);
-		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[0]);
-		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[1]);
-		dragNDropMessage.AddString("be:actionspecifier",
-			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[0]));
-		dragNDropMessage.AddString("be:actionspecifier",
-			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[1]));
-
-		BMessenger self(this);
-		BRect draggableRect = DraggableIcon::PreferredRect(draggableIconOrigin,
-			B_LARGE_ICON);
-		fDraggableIcon = new DraggableQueryIcon(draggableRect,
-			"saveHere", &dragNDropMessage, self,
-			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
-		fDraggableIcon->SetExplicitMaxSize(
-			BSize(draggableRect.right - draggableRect.left,
-				draggableRect.bottom - draggableRect.top));
-		BCursor grabCursor(B_CURSOR_ID_GRAB);
-		fDraggableIcon->SetViewCursor(&grabCursor);
-	}
-
-	fQueryName = new BTextControl("query name", B_TRANSLATE("Query name:"),
-		"", NULL, B_WILL_DRAW | B_NAVIGABLE | B_NAVIGABLE_JUMP);
-	FillCurrentQueryName(fQueryName, parent);
-	fSearchTrashCheck = new BCheckBox("searchTrash",
-		B_TRANSLATE("Include trash"), NULL);
-	fTemporaryCheck = new BCheckBox("temporary",
-		B_TRANSLATE("Temporary"), NULL);
-	fTemporaryCheck->SetValue(B_CONTROL_ON);
-
-	BView* checkboxGroup = BLayoutBuilder::Group<>(B_HORIZONTAL)
-		.Add(fSearchTrashCheck)
-		.Add(fTemporaryCheck)
-		.View();
-
-	// add the more options collapsible pane
-	fMoreOptions = new BBox(B_NO_BORDER, BLayoutBuilder::Group<>()
-		.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
-			.Add(fQueryName->CreateLabelLayoutItem(), 0, 0)
-			.Add(fQueryName->CreateTextViewLayoutItem(), 1, 0)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(0), 0, 1)
-			.Add(checkboxGroup, 1, 1)
-			.End()
-		.View());
-
 	// add Search button
 	BButton* button;
 	if (editTemplateOnly) {
@@ -819,12 +1137,6 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	}
 	button->MakeDefault(true);
 
-	BView* icon = fDraggableIcon;
-	if (icon == NULL) {
-		icon = new BBox("no draggable icon", B_WILL_DRAW, B_NO_BORDER);
-		icon->SetExplicitMaxSize(BSize(0, 0));
-	}
-
 	BView* mimeTypeFieldSpacer = new BBox("MimeTypeMenuSpacer", B_WILL_DRAW,
 		B_NO_BORDER);
 	mimeTypeFieldSpacer->SetExplicitMaxSize(BSize(0, 0));
@@ -833,14 +1145,12 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	queryControls->SetBorder(B_NO_BORDER);
 
 	BBox* queryBox = new BBox("Outer Controls");
-	queryBox->SetLabel(new BMenuField("RecentQueries", NULL, fRecentQueries));
 
 	BGroupView* queryBoxView = new BGroupView(B_VERTICAL,
 		B_USE_DEFAULT_SPACING);
 	queryBoxView->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING);
 	queryBox->AddChild(queryBoxView);
 
-	icon->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_BOTTOM));
 	button->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_BOTTOM));
 
 	BLayoutBuilder::Group<>(queryBoxView, B_VERTICAL, B_USE_DEFAULT_SPACING)
@@ -858,14 +1168,8 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(queryBox)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-			.AddGroup(B_VERTICAL)
-				.Add(icon)
-				.AddGlue()
-			.End()
-			.Add(fMoreOptions)
 			.AddGlue()
 			.AddGroup(B_VERTICAL)
-				.AddGlue()
 				.Add(button)
 			.End();
 
@@ -896,7 +1200,6 @@ FindPanel::AttachedToWindow()
 
 	BNode* node = findWindow->QueryNode();
 	fSearchModeMenu->SetTargetForItems(this);
-	fQueryName->SetTarget(this);
 	RestoreMimeTypeMenuSelection(node);
 		// preselect the mime we used the last time have to do it here
 		// because AddByAttributeItems will build different menus based
@@ -944,8 +1247,6 @@ FindPanel::AttachedToWindow()
 
 	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
-
-	fRecentQueries->SetTargetForItems(findWindow);
 }
 
 
@@ -1188,11 +1489,6 @@ FindPanel::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kNameModifiedMessage:
-			// the query name was edited, make the query permanent
-			fTemporaryCheck->SetValue(0);
-			break;
-
 		case kAttributeItem:
 			if (message->FindPointer("source", (void**)&item) != B_OK)
 				return;
@@ -1212,20 +1508,6 @@ FindPanel::MessageReceived(BMessage* message)
 
 			Invalidate();
 			break;
-
-		case kLatchChanged:
-		{
-			int32 value;
-			if (message->FindInt32("be:value", &value) != B_OK)
-				break;
-
-			if (value == 0 && !fMoreOptions->IsHidden(this))
-				fMoreOptions->Hide();
-			else if (value == 1 && fMoreOptions->IsHidden(this))
-				fMoreOptions->Show();
-
-			break;
-		}
 
 		case B_SAVE_REQUESTED:
 		{
@@ -1248,9 +1530,12 @@ FindPanel::MessageReceived(BMessage* message)
 					error = message->FindString("name", &name);
 			}
 
-			if (error == B_OK)
-				SaveAsQueryOrTemplate(&dir, name, true);
+			bool includeInTemplates;
 
+			if (error == B_OK
+				&& message->FindBool("includeintemplates", &includeInTemplates) == B_OK) {
+				SaveAsQueryOrTemplate(&dir, name, includeInTemplates);
+			}
 			break;
 		}
 
@@ -1564,10 +1849,7 @@ FindPanel::GetDefaultName(BString& name) const
 const char*
 FindPanel::UserSpecifiedName() const
 {
-	if (fQueryName->Text()[0] == '\0')
-		return NULL;
-
-	return fQueryName->Text();
+	return NULL;
 }
 
 
@@ -1988,10 +2270,30 @@ AddOneRecentItem(const entry_ref* ref, void* castToParams)
 	return NULL;
 }
 
+// Helper Function To Catch Entries caused from duplicate files received through BQuery
+bool
+CheckForDuplicates(BObjectList<EntryWithDate>* list, EntryWithDate* entry)
+{
+	// params checking
+	if (list == NULL || entry == NULL)
+		return false;
+
+	int32 count = list->CountItems();
+	for (int32 i = 0; i < count; i++) {
+		EntryWithDate* item = list->ItemAt(i);
+		if (entry != NULL && item != NULL && item->first == entry->first
+			&& entry->second == item->second) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 
 void
-FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
-	const BMessenger* target, uint32 what)
+FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* target, uint32 what,
+	bool includeTemplates, bool includeTemporaryQueries, bool includePersistedQueries)
 {
 	BObjectList<entry_ref> templates(10, true);
 	BObjectList<EntryWithDate> recentQueries(10, true);
@@ -2012,22 +2314,67 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem,
 			entry_ref ref;
 			while (query.GetNextRef(&ref) == B_OK) {
 				// ignore queries in the Trash
-				if (FSInTrashDir(&ref))
+				BEntry entry(&ref);
+				if (FSInTrashDir(&ref) || !entry.Exists())
 					continue;
 
 				char type[B_MIME_TYPE_LENGTH];
 				BNode node(&ref);
 				BNodeInfo(&node).GetType(type);
 
-				if (strcasecmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0)
+				if (strcasecmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0 && includeTemplates) {
 					templates.AddItem(new entry_ref(ref));
-				else {
-					uint32 changeTime;
-					if (node.ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0,
-						&changeTime, sizeof(uint32)) != sizeof(uint32))
-						continue;
+				} else if (strcasecmp(type, B_QUERY_MIMETYPE) == 0) {
+					bool isTemporary = true;
+					node.ReadAttr("_trk/temporary", B_BOOL_TYPE, 0, &isTemporary, sizeof(bool));
 
-					recentQueries.AddItem(new EntryWithDate(ref, changeTime));
+					struct attr_info info;
+					if (node.GetAttrInfo(kAttrQueryLastChange, &info) != B_OK)
+						continue;
+					
+					if (info.type == B_MESSAGE_TYPE) {
+						char* buffer = new char[info.size];
+						BMessage message;
+						if (node.ReadAttr(kAttrQueryLastChange, B_MESSAGE_TYPE, 0, buffer,
+								static_cast<size_t>(info.size))
+							!= info.size || message.Unflatten(buffer) != B_OK)
+							continue;
+						
+						int32 count;
+						if (message.GetInfo(kAttrQueryLastChange, NULL, &count) != B_OK)
+							continue;
+						
+						for (int32 i = 0; i < count; i++) {
+							int32 time;
+							if (message.FindInt32(kAttrQueryLastChange, i, &time)
+								== B_OK) {
+								EntryWithDate* item = new EntryWithDate(ref, time);
+								if (((isTemporary && includeTemporaryQueries)
+										|| (!isTemporary
+											&& includePersistedQueries))
+									&& !CheckForDuplicates(&recentQueries, item)) {
+									recentQueries.AddItem(item);
+								} else {
+									delete item;
+								}
+							}
+						}
+					}
+					if (info.type == B_INT32_TYPE) {
+						int32 changeTime;
+						if (node.ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &changeTime,
+								sizeof(int32))
+							== sizeof(int32)) {
+							EntryWithDate* item = new EntryWithDate(ref, changeTime);
+							if (((isTemporary && includeTemporaryQueries)
+									|| (!isTemporary && includePersistedQueries))
+								&& !CheckForDuplicates(&recentQueries, item)) {
+								recentQueries.AddItem(item);
+							} else {
+								delete item;
+							}
+						}
+					}
 				}
 			}
 		}
@@ -2273,16 +2620,6 @@ FindPanel::SaveWindowState(BNode* node, bool editTemplate)
 	node->WriteAttr(kAttrQueryInitialMode, B_INT32_TYPE, 0,
 		(int32*)&mode, sizeof(int32));
 
-	MoreOptionsStruct saveMoreOptions;
-	saveMoreOptions.searchTrash = fSearchTrashCheck->Value() != 0;
-	saveMoreOptions.temporary = fTemporaryCheck->Value() != 0;
-
-	if (node->WriteAttr(kAttrQueryMoreOptions, B_RAW_TYPE, 0,
-		&saveMoreOptions,
-		sizeof(saveMoreOptions)) == sizeof(saveMoreOptions)) {
-		node->RemoveAttr(kAttrQueryMoreOptionsForeign);
-	}
-
 	if (editTemplate) {
 		if (UserSpecifiedName()) {
 			BString name(UserSpecifiedName());
@@ -2384,19 +2721,7 @@ FindPanel::RestoreWindowState(const BNode* node)
 
 		saveMoreOptions.showMoreOptions = true; // Now unused
 
-		fSearchTrashCheck->SetValue(saveMoreOptions.searchTrash);
-		fTemporaryCheck->SetValue(saveMoreOptions.temporary);
-
-		fQueryName->SetModificationMessage(NULL);
-		FindWindow* findWindow = dynamic_cast<FindWindow*>(Window());
-		if (findWindow != NULL)
-			FillCurrentQueryName(fQueryName, findWindow);
-
-		// set modification message after checking the temporary check box,
-		// and filling out the text control so that we do not always trigger
-		// clearing of the temporary check box.
-		fQueryName->SetModificationMessage(
-			new BMessage(kNameModifiedMessage));
+		static_cast<FindWindow*>(Window())->SetOptions(saveMoreOptions.searchTrash);
 	}
 
 	// get volumes to perform query on
@@ -3215,6 +3540,18 @@ TrackerBuildRecentFindItemsMenu(const char* title)
 
 
 //	#pragma mark -
+
+void
+DraggableQueryIcon::Draw(BRect updateRect)
+{
+	BRect rect(Bounds());
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
+	be_control_look->DrawBorder(this, rect, updateRect, base, B_PLAIN_BORDER, 0,
+		BControlLook::B_BOTTOM_BORDER);
+	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base, 0,
+		BControlLook::B_ALL_BORDERS & ~BControlLook::B_LEFT_BORDER);
+	DraggableIcon::Draw(updateRect);
+}
 
 
 DraggableQueryIcon::DraggableQueryIcon(BRect frame, const char* name,

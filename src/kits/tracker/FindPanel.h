@@ -51,9 +51,11 @@ class BQuery;
 class BBox;
 class BTextControl;
 class BCheckBox;
+class BMenuBar;
 class BMenuField;
 class BFile;
 class BPopUpMenu;
+class BGroupView;
 class BGridLayout;
 
 namespace BPrivate {
@@ -70,6 +72,14 @@ const uint32 kByAttributeItem = 'Fbya';
 const uint32 kByFormulaItem = 'Fbyq';
 const uint32 kAddItem = 'Fadd';
 const uint32 kRemoveItem = 'Frem';
+
+const uint32 kClearHistory = 'FClH';
+const uint32 kClearTemplates = 'FClT';
+const uint32 kSaveQueryOrTemplate = 'FSaQ';
+const uint32 kOpenSaveAsPanel = 'Fosv';
+const uint32 kOpenLoadQueryPanel = 'Folo';
+const uint32 kTemporaryOptionClicked = 'FTCl';
+const uint32 kSearchInTrashOptionClicked = 'FSCl';
 
 #ifdef _IMPEXP_TRACKER
 _IMPEXP_TRACKER
@@ -135,6 +145,8 @@ public:
 	const 	char* 				QueryName() const;
 
 	static 	bool 				IsQueryTemplate(BNode* file);
+			void				SetOptions(bool searchInTrash);
+			void				AddIconToMenuBar(BView*);
 
 protected:
 	virtual	void 				MessageReceived(BMessage* message);
@@ -155,11 +167,18 @@ private:
 
 			status_t 			SaveQueryAsAttributes(BNode*, BEntry*, bool queryTemplate,
 									const BMessage* oldAttributes = 0,
-									const BPoint* oldLocation = 0);
+									const BPoint* oldLocation = 0, bool temporary = true);
+			status_t			GetQueryLastChangeTimeFromFile(BMessage* message);
 
 			void 				GetDefaultName(BString&);
 			// dynamic date is a date such as 'today'
 			void 				GetPredicateString(BString&, bool& dynamicDate);
+
+			void				BuildMenuBar();
+			void				PopulateTemplatesMenu();
+			void				UpdateFileReferences(const entry_ref*);
+			void				ClearHistoryOrTemplates(bool clearTemplates, bool temporaryOnly);
+			status_t			DeleteQueryOrTemplate(BEntry*);
 
 private:
 			BFile* 				fFile;
@@ -168,7 +187,19 @@ private:
 			bool 				fEditTemplateOnly;
 			FindPanel* 			fBackground;
 	mutable BString 			fQueryNameFromTemplate;
-			BFilePanel* 		fSaveAsTemplatePanel;
+			BFilePanel* 		fSaveAsPanel;
+			BFilePanel*			fOpenQueryPanel;
+
+			// Menu Bar For New Panel
+			BGroupView*			fMenuBarContainer;
+			BMenuBar*			fMenuBar;
+			BMenu*				fQueryMenu;
+			BMenuItem*			fSaveQueryOrTemplateItem;
+			BMenu*				fOptionsMenu;
+			BMenu*				fTemplatesMenu;
+			BMenu*				fHistoryMenu;
+			BMenu*				fSaveAsMenu;
+			BMenuItem*			fSearchInTrash;
 
 	typedef BWindow _inherited;
 };
@@ -210,7 +241,10 @@ public:
 
 	// populate the recent query menu with query templates and recent queries
 	static 	void 				AddRecentQueries(BMenu*, bool addSaveAsItem,
-									const BMessenger* target, uint32 what);
+									const BMessenger* target, uint32 what,
+									bool includeTemplates = true,
+									bool includeTemporaryQueries = true,
+									bool includePersistedQueries = true);
 
 private:
 	// populates the type menu
@@ -276,9 +310,6 @@ private:
 			BBox* 				fMoreOptions;
 			BTextControl* 		fQueryName;
 			BString 			fInitialQueryName;
-
-			BCheckBox* 			fTemporaryCheck;
-			BCheckBox* 			fSearchTrashCheck;
 
 			DraggableIcon* 		fDraggableIcon;
 
@@ -347,6 +378,7 @@ public:
 
 protected:
 	virtual bool 				DragStarted(BMessage*);
+	virtual	void				Draw(BRect);
 };
 
 } // namespace BPrivate
