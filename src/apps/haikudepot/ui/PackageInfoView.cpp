@@ -997,17 +997,18 @@ public:
 			noRatingsView->SetExplicitMaxSize(
 				BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 			fRatingContainerLayout->AddView(0, noRatingsView);
-			return;
+		} else {
+			for (int i = count - 1; i >= 0; i--) {
+				UserRatingRef rating = package->UserRatingAtIndex(i);
+					// was previously filtering comments just for the current
+					// user's language, but as there are not so many comments at
+					// the moment, just show all of them for now.
+				RatingItemView* view = new RatingItemView(rating);
+				fRatingContainerLayout->AddView(0, view);
+			}
 		}
 
-		for (int i = count - 1; i >= 0; i--) {
-			UserRatingRef rating = package->UserRatingAtIndex(i);
-				// was previously filtering comments just for the current
-				// user's language, but as there are not so many comments at
-				// the moment, just show all of them for now.
-			RatingItemView* view = new RatingItemView(rating);
-			fRatingContainerLayout->AddView(0, view);
-		}
+		InvalidateLayout();
 	}
 
 	void Clear()
