@@ -696,10 +696,71 @@ fd_vnode(struct file_descriptor* descriptor)
 }
 
 
-static status_t
-common_close(int fd, bool kernel)
+static ssize_t
+common_vector_io(int fd, off_t pos, const iovec* vecs, size_t count, bool write, bool kernel)
 {
-	return close_fd_index(get_current_io_context(kernel), fd);
+	if (pos < -1)
+		return B_BAD_VALUE;
+
+	FileDescriptorPutter descriptor(get_fd(get_current_io_context(kernel), fd));
+	if (!descriptor.IsSet())
+		return B_FILE_ERROR;
+
+	if (write ? (descriptor->open_mode & O_RWMASK) == O_RDONLY
+			: (descriptor->open_mode & O_RWMASK) == O_WRONLY) {
+		return B_FILE_ERROR;
+	}
+
+	bool movePosition = false;
+	if (pos == -1 && descriptor->pos != -1) {
+		pos = descriptor->pos;
+		movePosition = true;
+	}
+
+	if (write ? descriptor->ops->fd_write == NULL
+			: descriptor->ops->fd_read == NULL) {
+		return B_BAD_VALUE;
+	}
+
+	status_t status = B_OK;
+	ssize_t bytesTransferred = 0;
+	for (size_t i = 0; i < count; i++) {
+		if (vecs[i].iov_base == NULL)
+			continue;
+
+		size_t length = vecs[i].iov_len;
+		if (write) {
+			status = descriptor->ops->fd_write(descriptor.Get(), pos,
+				vecs[i].iov_base, &length);
+		} else {
+			status = descriptor->ops->fd_read(descriptor.Get(), pos, vecs[i].iov_base,
+				&length);
+		}
+
+		if (status != B_OK) {
+			if (bytesTransferred == 0)
+				return status;
+			break;
+		}
+
+		if ((uint64)bytesTransferred + length > SSIZE_MAX)
+			bytesTransferred = SSIZE_MAX;
+		else
+			bytesTransferred += (ssize_t)length;
+
+		if (pos != -1)
+			pos += length;
+
+		if (length < vecs[i].iov_len)
+			break;
+	}
+
+	if (movePosition) {
+		descriptor->pos = write && (descriptor->open_mode & O_APPEND) != 0
+			? descriptor->ops->fd_seek(descriptor.Get(), 0, SEEK_END) : pos;
+	}
+
+	return bytesTransferred;
 }
 
 
@@ -758,8 +819,6 @@ static ssize_t
 common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	bool write)
 {
-	if (pos < -1)
-		return B_BAD_VALUE;
 	if (count > IOV_MAX)
 		return B_BAD_VALUE;
 
@@ -771,67 +830,17 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	if (error != B_OK)
 		return error;
 
-	FileDescriptorPutter descriptor(get_fd(get_current_io_context(false), fd));
-	if (!descriptor.IsSet())
-		return B_FILE_ERROR;
+	SyscallRestartWrapper<ssize_t> result = common_vector_io(fd, pos,
+		vecs, count, write, false);
 
-	if (write ? (descriptor->open_mode & O_RWMASK) == O_RDONLY
-			: (descriptor->open_mode & O_RWMASK) == O_WRONLY) {
-		return B_FILE_ERROR;
-	}
+	return result;
+}
 
-	bool movePosition = false;
-	if (pos == -1 && descriptor->pos != -1) {
-		pos = descriptor->pos;
-		movePosition = true;
-	}
 
-	if (write ? descriptor->ops->fd_write == NULL
-			: descriptor->ops->fd_read == NULL) {
-		return B_BAD_VALUE;
-	}
-
-	SyscallRestartWrapper<status_t> status;
-
-	ssize_t bytesTransferred = 0;
-	for (size_t i = 0; i < count; i++) {
-		if (vecs[i].iov_base == NULL)
-			continue;
-
-		size_t length = vecs[i].iov_len;
-		if (write) {
-			status = descriptor->ops->fd_write(descriptor.Get(), pos,
-				vecs[i].iov_base, &length);
-		} else {
-			status = descriptor->ops->fd_read(descriptor.Get(), pos, vecs[i].iov_base,
-				&length);
-		}
-
-		if (status != B_OK) {
-			if (bytesTransferred == 0)
-				return status;
-			status = B_OK;
-			break;
-		}
-
-		if ((uint64)bytesTransferred + length > SSIZE_MAX)
-			bytesTransferred = SSIZE_MAX;
-		else
-			bytesTransferred += (ssize_t)length;
-
-		if (pos != -1)
-			pos += length;
-
-		if (length < vecs[i].iov_len)
-			break;
-	}
-
-	if (movePosition) {
-		descriptor->pos = write && (descriptor->open_mode & O_APPEND) != 0
-			? descriptor->ops->fd_seek(descriptor.Get(), 0, SEEK_END) : pos;
-	}
-
-	return bytesTransferred;
+static status_t
+common_close(int fd, bool kernel)
+{
+	return close_fd_index(get_current_io_context(kernel), fd);
 }
 
 
@@ -1054,59 +1063,6 @@ _kern_read(int fd, off_t pos, void* buffer, size_t length)
 
 
 ssize_t
-_kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
-{
-	status_t status;
-
-	if (pos < -1)
-		return B_BAD_VALUE;
-
-	FileDescriptorPutter descriptor(get_fd(get_current_io_context(true), fd));
-
-	if (!descriptor.IsSet())
-		return B_FILE_ERROR;
-	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY)
-		return B_FILE_ERROR;
-
-	bool movePosition = false;
-	if (pos == -1 && descriptor->pos != -1) {
-		pos = descriptor->pos;
-		movePosition = true;
-	}
-
-	if (descriptor->ops->fd_read == NULL)
-		return B_BAD_VALUE;
-
-	SyscallFlagUnsetter _;
-
-	ssize_t bytesRead = 0;
-
-	for (size_t i = 0; i < count; i++) {
-		size_t length = vecs[i].iov_len;
-		status = descriptor->ops->fd_read(descriptor.Get(), pos,
-			vecs[i].iov_base, &length);
-		if (status != B_OK) {
-			bytesRead = status;
-			break;
-		}
-
-		if ((uint64)bytesRead + length > SSIZE_MAX)
-			bytesRead = SSIZE_MAX;
-		else
-			bytesRead += (ssize_t)length;
-
-		if (pos != -1)
-			pos += vecs[i].iov_len;
-	}
-
-	if (movePosition)
-		descriptor->pos = pos;
-
-	return bytesRead;
-}
-
-
-ssize_t
 _kern_write(int fd, off_t pos, const void* buffer, size_t length)
 {
 	if (pos < -1)
@@ -1147,55 +1103,18 @@ _kern_write(int fd, off_t pos, const void* buffer, size_t length)
 
 
 ssize_t
+_kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
+{
+	SyscallFlagUnsetter _;
+	return common_vector_io(fd, pos, vecs, count, false, true);
+}
+
+
+ssize_t
 _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 {
-	status_t status;
-
-	if (pos < -1)
-		return B_BAD_VALUE;
-
-	FileDescriptorPutter descriptor(get_fd(get_current_io_context(true), fd));
-
-	if (!descriptor.IsSet())
-		return B_FILE_ERROR;
-	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
-		return B_FILE_ERROR;
-
-	bool movePosition = false;
-	if (pos == -1 && descriptor->pos != -1) {
-		pos = descriptor->pos;
-		movePosition = true;
-	}
-
-	if (descriptor->ops->fd_write == NULL)
-		return B_BAD_VALUE;
-
 	SyscallFlagUnsetter _;
-
-	ssize_t bytesWritten = 0;
-
-	for (size_t i = 0; i < count; i++) {
-		size_t length = vecs[i].iov_len;
-		status = descriptor->ops->fd_write(descriptor.Get(), pos,
-			vecs[i].iov_base, &length);
-		if (status != B_OK) {
-			bytesWritten = status;
-			break;
-		}
-
-		if ((uint64)bytesWritten + length > SSIZE_MAX)
-			bytesWritten = SSIZE_MAX;
-		else
-			bytesWritten += (ssize_t)length;
-
-		if (pos != -1)
-			pos += vecs[i].iov_len;
-	}
-
-	if (movePosition)
-		descriptor->pos = pos;
-
-	return bytesWritten;
+	return common_vector_io(fd, pos, vecs, count, true, true);
 }
 
 
