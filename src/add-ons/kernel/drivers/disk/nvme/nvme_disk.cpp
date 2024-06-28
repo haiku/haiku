@@ -667,20 +667,24 @@ nvme_disk_io(void* cookie, io_request* request)
 			// Avoid copies by going straight into the vtophys array.
 			status = get_memory_map_etc(request->TeamID(), (void*)virt.base,
 				virt.length, vtophys + nvme_request.iovec_count, &entries);
+
+			if (status == B_BAD_VALUE && entries == 0)
+				status = B_BUFFER_OVERFLOW;
 			if (status == B_BUFFER_OVERFLOW) {
 				TRACE("vtophys array was too small, reallocating\n");
 
-				vtophysDeleter.Detach();
 				vtophys_length *= 2;
 				nvme_request.iovecs = vtophys = (physical_entry*)realloc(vtophys,
 					sizeof(physical_entry) * vtophys_length);
-				vtophysDeleter.SetTo(vtophys);
-				if (vtophys == NULL) {
-					status = B_NO_MEMORY;
-				} else {
+				if (vtophys != NULL) {
+					vtophysDeleter.Detach();
+					vtophysDeleter.SetTo(vtophys);
+
 					// Try again, with the larger buffer this time.
 					i--;
 					continue;
+				} else {
+					status = B_NO_MEMORY;
 				}
 			}
 			if (status != B_OK) {
