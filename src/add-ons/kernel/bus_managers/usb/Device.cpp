@@ -341,10 +341,12 @@ Device::~Device()
 	// though, since we may be deleted because the device was unplugged already.
 	Unconfigure(false);
 
-	status_t error = gDeviceManager->unregister_node(fNode);
-	if (error != B_OK && error != B_BUSY)
-		TRACE_ERROR("failed to unregister device node\n");
-	fNode = NULL;
+	if (fNode != NULL) {
+		status_t error = gDeviceManager->unregister_node(fNode);
+		if (error != B_OK && error != B_BUSY)
+			TRACE_ERROR("failed to unregister device node\n");
+		fNode = NULL;
+	}
 
 	// Destroy all Interfaces in the Configurations hierarchy.
 	for (int32 i = 0; fConfigurations != NULL
