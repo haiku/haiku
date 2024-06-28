@@ -976,6 +976,10 @@ SystemProfiler::_ThreadAdded(Thread* thread)
 	event->team = thread->team->id;
 	event->thread = thread->id;
 	strlcpy(event->name, thread->name, sizeof(event->name));
+	{
+		SpinLocker timeLocker(thread->time_lock);
+		event->cpu_time = thread->CPUTime(false);
+	}
 
 	fHeader->size = fBufferSize;
 
@@ -1003,6 +1007,10 @@ SystemProfiler::_ThreadRemoved(Thread* thread)
 
 	event->team = thread->team->id;
 	event->thread = thread->id;
+	{
+		SpinLocker timeLocker(thread->time_lock);
+		event->cpu_time = thread->CPUTime(false);
+	}
 
 	fHeader->size = fBufferSize;
 

@@ -38,14 +38,15 @@ ThreadImage::~ThreadImage()
 }
 
 
-// #pragma mark - ThreadI
+// #pragma mark - Thread
 
 
-Thread::Thread(thread_id threadID, const char* name, Team* team)
+Thread::Thread(Team* team, thread_id threadID, const char* name, bigtime_t initialCPUTime)
 	:
+	fTeam(team),
 	fID(threadID),
 	fName(name),
-	fTeam(team),
+	fLastCPUTime(initialCPUTime),
 	fSampleArea(-1),
 	fSamples(NULL),
 	fProfileResult(NULL),
@@ -224,6 +225,17 @@ void
 Thread::AddSamples(addr_t* samples, int32 sampleCount)
 {
 	fProfileResult->AddSamples(this, samples, sampleCount);
+}
+
+
+void
+Thread::UpdateCPUTime(bigtime_t time)
+{
+	bigtime_t elapsed = time - fLastCPUTime;
+	int64 expectedTicks = elapsed / fProfileResult->Interval();
+	fLastCPUTime = time;
+
+	fProfileResult->AddExpectedTicks(expectedTicks);
 }
 
 

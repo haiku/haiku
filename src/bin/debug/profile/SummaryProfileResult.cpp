@@ -76,6 +76,13 @@ SummaryProfileResult::AddSamples(ImageProfileResultContainer* container,
 
 
 void
+SummaryProfileResult::AddExpectedTicks(int32 expected)
+{
+	fResult->AddExpectedTicks(expected);
+}
+
+
+void
 SummaryProfileResult::AddDroppedTicks(int32 dropped)
 {
 	fResult->AddDroppedTicks(dropped);

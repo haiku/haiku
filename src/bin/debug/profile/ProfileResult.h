@@ -70,11 +70,13 @@ public:
 			ProfiledEntity*		Entity() const	{ return fEntity; }
 
 	virtual	void				SetInterval(bigtime_t interval);
+			bigtime_t			Interval() const { return fInterval; }
 
 	virtual	void				AddSamples(
 									ImageProfileResultContainer* container,
 									addr_t* samples,
 									int32 sampleCount) = 0;
+	virtual	void				AddExpectedTicks(int32 expected) = 0;
 	virtual	void				AddDroppedTicks(int32 dropped) = 0;
 	virtual	void				PrintResults(
 									ImageProfileResultContainer* container) = 0;

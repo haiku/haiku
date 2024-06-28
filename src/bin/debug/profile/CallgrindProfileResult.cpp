@@ -122,6 +122,7 @@ CallgrindProfileResult::CallgrindProfileResult()
 	:
 	fTotalTicks(0),
 	fUnkownTicks(0),
+	fExpectedTicks(0),
 	fDroppedTicks(0),
 	fNextImageOutputIndex(1),
 	fNextFunctionOutputIndex(1)
@@ -160,6 +161,13 @@ CallgrindProfileResult::AddSamples(ImageProfileResultContainer* container,
 		fUnkownTicks++;
 
 	fTotalTicks++;
+}
+
+
+void
+CallgrindProfileResult::AddExpectedTicks(int32 expected)
+{
+	fExpectedTicks += expected;
 }
 
 

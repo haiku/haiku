@@ -622,6 +622,7 @@ typedef struct {
 										//   <sample 1> ... <sample stack_depth>
 	bool				stopped;		// if true, the thread is no longer
 										// being profiled
+	bigtime_t			last_cpu_time;	// only set if "stopped" is
 } debug_profiler_update;
 
 // B_DEBUGGER_MESSAGE_HANDED_OVER

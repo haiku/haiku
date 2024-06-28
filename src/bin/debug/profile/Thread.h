@@ -36,8 +36,8 @@ private:
 class Thread : public ProfiledEntity, public DoublyLinkedListLinkImpl<Thread>,
 	private ImageProfileResultContainer {
 public:
-								Thread(thread_id threadID, const char* name,
-									Team* team);
+								Thread(Team* team, thread_id threadID,
+									const char* name, bigtime_t initialCPUTime);
 	virtual						~Thread();
 
 	inline	thread_id			ID() const;
@@ -66,6 +66,8 @@ public:
 									int32 stackDepth, bool variableStackDepth,
 									int32 event);
 			void				AddSamples(addr_t* samples, int32 sampleCount);
+			void				UpdateCPUTime(bigtime_t time);
+
 			void				PrintResults();
 
 private:
@@ -82,9 +84,10 @@ private:
 			void				_SynchronizeImages(int32 event);
 
 private:
+			::Team*				fTeam;
 			thread_id			fID;
 			BString				fName;
-			::Team*				fTeam;
+			bigtime_t			fLastCPUTime;
 			area_id				fSampleArea;
 			addr_t*				fSamples;
 			ProfileResult*		fProfileResult;

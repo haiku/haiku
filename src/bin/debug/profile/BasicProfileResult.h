@@ -36,6 +36,7 @@ class BasicProfileResult : public ProfileResult {
 public:
 								BasicProfileResult();
 
+	virtual	void				AddExpectedTicks(int32 expected);
 	virtual	void				AddDroppedTicks(int32 dropped);
 	virtual	void				PrintResults(
 									ImageProfileResultContainer* container);
@@ -47,6 +48,7 @@ public:
 protected:
 			int64				fTotalTicks;
 			int64				fUnkownTicks;
+			int64				fExpectedTicks;
 			int64				fDroppedTicks;
 			int64				fTotalSampleCount;
 };

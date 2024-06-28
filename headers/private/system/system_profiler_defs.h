@@ -112,12 +112,14 @@ struct system_profiler_thread_added {
 	team_id		team;
 	thread_id	thread;
 	char		name[B_OS_NAME_LENGTH];
+	bigtime_t	cpu_time;
 };
 
 // B_SYSTEM_PROFILER_THREAD_REMOVED
 struct system_profiler_thread_removed {
 	team_id		team;
 	thread_id	thread;
+	bigtime_t	cpu_time;
 };
 
 // B_SYSTEM_PROFILER_IMAGE_ADDED

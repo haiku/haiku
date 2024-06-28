@@ -66,6 +66,7 @@ public:
 	virtual	void				AddSamples(
 									ImageProfileResultContainer* container,
 									addr_t* samples, int32 sampleCount);
+	virtual	void				AddExpectedTicks(int32 expected);
 	virtual	void				AddDroppedTicks(int32 dropped);
 	virtual	void				PrintResults(
 									ImageProfileResultContainer* container);

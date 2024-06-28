@@ -1177,6 +1177,10 @@ user_debug_thread_exiting(Thread* thread)
 	threadDebugInfo.profile.sample_area = -1;
 	threadDebugInfo.profile.samples = NULL;
 	threadDebugInfo.profile.buffer_full = false;
+	bigtime_t lastCPUTime; {
+		SpinLocker threadTimeLocker(thread->time_lock);
+		lastCPUTime = thread->CPUTime(false);
+	}
 
 	atomic_or(&threadDebugInfo.flags, B_THREAD_DEBUG_DYING);
 
@@ -1194,6 +1198,7 @@ user_debug_thread_exiting(Thread* thread)
 	message.variable_stack_depth = variableStackDepth;
 	message.image_event = imageEvent;
 	message.stopped = true;
+	message.last_cpu_time = lastCPUTime;
 	debugger_write(debuggerPort, B_DEBUGGER_MESSAGE_PROFILER_UPDATE,
 		&message, sizeof(message), false);
 
@@ -2375,6 +2380,7 @@ debug_nub_thread(void *)
 				bool variableStackDepth = false;
 				int32 imageEvent = 0;
 				int32 droppedTicks = 0;
+				bigtime_t lastCPUTime = 0;
 
 				// get the thread and detach the profile info
 				Thread* thread = Thread::GetAndLock(threadID);
@@ -2400,6 +2406,10 @@ debug_nub_thread(void *)
 						threadDebugInfo.profile.samples = NULL;
 						threadDebugInfo.profile.buffer_full = false;
 						threadDebugInfo.profile.dropped_ticks = 0;
+						{
+							SpinLocker threadTimeLocker(thread->time_lock);
+							lastCPUTime = thread->CPUTime(false);
+						}
 					} else
 						result = B_BAD_VALUE;
 				} else
@@ -2417,6 +2427,7 @@ debug_nub_thread(void *)
 					reply.profiler_update.sample_count = sampleCount;
 					reply.profiler_update.dropped_ticks = droppedTicks;
 					reply.profiler_update.stopped = true;
+					reply.profiler_update.last_cpu_time = lastCPUTime;
 				} else
 					reply.profiler_update.origin.thread = result;
 

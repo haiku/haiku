@@ -119,9 +119,17 @@ BasicProfileResult::BasicProfileResult()
 	:
 	fTotalTicks(0),
 	fUnkownTicks(0),
+	fExpectedTicks(0),
 	fDroppedTicks(0),
 	fTotalSampleCount(0)
 {
+}
+
+
+void
+BasicProfileResult::AddExpectedTicks(int32 expected)
+{
+	fExpectedTicks += expected;
 }
 
 
@@ -172,6 +180,8 @@ BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 		std::sort(hitSymbols, hitSymbols + hitSymbolCount);
 
 	int64 totalTicks = fTotalTicks;
+	const int64 missedTicks = fExpectedTicks - fTotalTicks;
+
 	fprintf(gOptions.output, "\nprofiling results for %s \"%s\" "
 		"(%" B_PRId32 "):\n", fEntity->EntityType(), fEntity->EntityName(),
 		fEntity->EntityID());
@@ -180,8 +190,14 @@ BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 	fprintf(gOptions.output,
 		"  total ticks:    %" B_PRId64 " (%" B_PRId64 " us)\n",
 		totalTicks, totalTicks * fInterval);
+	if (fExpectedTicks != 0) {
+		fprintf(gOptions.output,
+			"  expected ticks: %" B_PRId64 " (missed %" B_PRId64 ")\n",
+			fExpectedTicks, missedTicks);
+	}
 	if (totalTicks == 0)
 		totalTicks = 1;
+
 	fprintf(gOptions.output,
 		"  unknown ticks:  %" B_PRId64 " (%" B_PRId64 " us, %6.2f%%)\n",
 		fUnkownTicks, fUnkownTicks * fInterval,
