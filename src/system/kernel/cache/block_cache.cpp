@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/uio.h>
 
 #include <KernelExport.h>
 #include <fs_cache.h>
@@ -22,6 +23,7 @@
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
+#include <StackOrHeapArray.h>
 #include <vm/vm_page.h>
 
 #include "kernel_debug_config.h"
@@ -302,7 +304,7 @@ public:
 
 private:
 			void*				_Data(cached_block* block) const;
-			status_t			_WriteBlock(cached_block* block);
+			status_t			_WriteBlocks(cached_block** blocks, uint32 count);
 			void				_BlockDone(cached_block* block,
 									cache_transaction* transaction);
 			void				_UnmarkWriting(cached_block* block);
@@ -1205,25 +1207,34 @@ BlockWriter::Write(cache_transaction* transaction, bool canUnlock)
 	if (canUnlock)
 		mutex_unlock(&fCache->lock);
 
-	// Sort blocks in their on-disk order
-	// TODO: ideally, this should be handled by the I/O scheduler
-
+	// Sort blocks in their on-disk order, so we can merge consecutive writes.
 	qsort(fBlocks, fCount, sizeof(void*), &_CompareBlocks);
 	fDeletedTransaction = false;
 
 	bigtime_t start = system_time();
 
 	for (uint32 i = 0; i < fCount; i++) {
-		status_t status = _WriteBlock(fBlocks[i]);
+		uint32 blocks = 1;
+		for (; (i + blocks) < fCount && blocks < IOV_MAX; blocks++) {
+			const uint32 j = i + blocks;
+			if (fBlocks[j]->block_number != (fBlocks[j - 1]->block_number + 1))
+				break;
+		}
+
+		status_t status = _WriteBlocks(fBlocks + i, blocks);
 		if (status != B_OK) {
 			// propagate to global error handling
 			if (fStatus == B_OK)
 				fStatus = status;
 
-			_UnmarkWriting(fBlocks[i]);
-			fBlocks[i] = NULL;
-				// This block will not be marked clean
+			for (uint32 j = i; j < (i + blocks); j++) {
+				_UnmarkWriting(fBlocks[j]);
+				fBlocks[j] = NULL;
+					// This block will not be marked clean
+			}
 		}
+
+		i += (blocks - 1);
 	}
 
 	bigtime_t finish = system_time();
@@ -1271,23 +1282,32 @@ BlockWriter::_Data(cached_block* block) const
 
 
 status_t
-BlockWriter::_WriteBlock(cached_block* block)
+BlockWriter::_WriteBlocks(cached_block** blocks, uint32 count)
 {
-	ASSERT(block->busy_writing);
+	const size_t blockSize = fCache->block_size;
 
-	TRACE(("BlockWriter::_WriteBlock(block %" B_PRIdOFF ")\n", block->block_number));
-	TB(Write(fCache, block));
-	TB2(BlockData(fCache, block, "before write"));
+	BStackOrHeapArray<iovec, 8> vecs(count);
+	for (uint32 i = 0; i < count; i++) {
+		cached_block* block = blocks[i];
+		ASSERT(block->busy_writing);
+		ASSERT(i == 0 || block->block_number == (blocks[i - 1]->block_number + 1));
 
-	size_t blockSize = fCache->block_size;
+		TRACE(("BlockWriter::_WriteBlocks(block %" B_PRIdOFF ", count %" B_PRIu32 ")\n",
+			block->block_number, count));
+		TB(Write(fCache, block));
+		TB2(BlockData(fCache, block, "before write"));
 
-	ssize_t written = write_pos(fCache->fd,
-		block->block_number * blockSize, _Data(block), blockSize);
+		vecs[i].iov_base = _Data(block);
+		vecs[i].iov_len = blockSize;
+	}
 
-	if (written != (ssize_t)blockSize) {
+	ssize_t written = writev_pos(fCache->fd,
+		blocks[0]->block_number * blockSize, vecs, count);
+
+	if (written != (ssize_t)(blockSize * count)) {
 		TB(Error(fCache, block->block_number, "write failed", written));
-		TRACE_ALWAYS("could not write back block %" B_PRIdOFF " (%s)\n",
-			block->block_number, strerror(errno));
+		TRACE_ALWAYS("could not write back %" B_PRIu32 " blocks (start block %" B_PRIdOFF "): %s\n",
+			count, blocks[0]->block_number, strerror(errno));
 		if (written < 0)
 			return errno;
 
