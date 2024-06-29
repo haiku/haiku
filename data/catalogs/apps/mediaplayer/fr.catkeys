@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	171477831
+1	french	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envoyer l’entrée à la corbeille
 Close	MediaPlayer-PlaylistWindow		Fermer
 Volume of background clips	MediaPlayer-SettingsWindow		Volume en arrière-plan
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Réglages de MédiaPlayer
 Copyright	MediaPlayer-InfoWin		Droits d’auteurs
 Invalid URL inserted!	MediaPlayer-NetworkStream		L’URL saisie est invalide !
 Aspect ratio	MediaPlayer-Main		Aspect proportionnel
+Eject device	MediaPlayer-Main		Éjecter le périphérique
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		La sauvegarde de la liste de lecture a échoué.\n\nErreur : 
 <no media>	MediaPlayer-InfoWin		<aucun média>
 Hide interface	MediaPlayer-Main		Masquer l’interface
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Plein écran
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erreur interne (échec du verrouillage). La liste de lecture n’a pas pu être sauvegardée.
 100% scale	MediaPlayer-Main		Échelle 100%
+New player	MediaPlayer-Main		Nouveau lecteur
 <nothing to redo>	MediaPlayer-PlaylistWindow		<rien à rétablir>
 Bad URL	MediaPlayer-NetworkStream		URL invalide
 Save	MediaPlayer-Main		Enregistrer

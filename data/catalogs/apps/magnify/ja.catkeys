@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Magnify	1465621918
+1	japanese	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  size must be > 4 and a multiple of 4
 Decrease pixel size	Magnify-Main		ピクセルの縮小
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		ウィンドウの拡大
 Save image	Magnify-Main		イメージの保存
 Show grid	Magnify-Main		グリッドの表示
 Magnify	System name		拡大鏡
+height	Magnify-Main		高さ
+width	Magnify-Main		幅
 Info	Magnify-Main		情報
 Show info	Magnify-Main		情報の表示
 Make square	Magnify-Main		正方形にする

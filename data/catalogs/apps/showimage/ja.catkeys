@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ShowImage	1148406263
+1	japanese	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		画像ビューワ
 Page setup…	Menus		ページ設定...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		'%s' の %d ページが変更されました。それでもファイルを閉じますか?
@@ -39,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		印刷...
 The file '%s' could not be written.	SaveToFile		画像ファイル '%s' を保存できません。
 Quit	Menus		終了
+Get info	Menus		詳細情報
 Rating	Menus		評価
 Close document	ClosePrompt		ファイルを閉じる
 Stretch to window	Menus		ウィンドウの大きさに広げる

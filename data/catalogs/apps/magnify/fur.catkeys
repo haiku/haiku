@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Magnify	1465621918
+1	friulian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  la dimension e scugne jessi > 4 e un multipli di 4
 Decrease pixel size	Magnify-Main		Diminuìs la dimension dai pixel
 no clip msg	In console, when clipboard is empty after clicking Copy image		nissun msg ritaiât
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Aumente la dimension dal barcon
 Save image	Magnify-Main		Salve imagjin
 Show grid	Magnify-Main		Mostre gridele
 Magnify	System name		Magnify
+height	Magnify-Main		altece
+width	Magnify-Main		largjece
 Info	Magnify-Main		Informazions
 Show info	Magnify-Main		Mostre informazions
 Make square	Magnify-Main		Rint cuadrât il barcon

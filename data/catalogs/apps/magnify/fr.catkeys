@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Magnify	1465621918
+1	french	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  la taille doit être > 4 et un multiple de 4
 Decrease pixel size	Magnify-Main		Réduire le grossissement
 no clip msg	In console, when clipboard is empty after clicking Copy image		pas de message du presse-papier
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Augmenter la taille de la fenêtre
 Save image	Magnify-Main		Enregistrer l’image
 Show grid	Magnify-Main		Afficher la grille
 Magnify	System name		Loupe
+height	Magnify-Main		hauteur
+width	Magnify-Main		largeur
 Info	Magnify-Main		Information
 Show info	Magnify-Main		Afficher les infos
 Make square	Magnify-Main		Rendre carré

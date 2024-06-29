@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ShowImage	1148406263
+1	friulian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		MostreImagjin
 Page setup…	Menus		Impostazions pagjine…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il document '%s' (pagjine %d) al è stât modificât. Sierâ il document?
@@ -39,6 +39,7 @@ OK	SaveToFile		Va ben
 Print…	Menus		Stampe…
 The file '%s' could not be written.	SaveToFile		Impussibil scrivi il file '%s'.
 Quit	Menus		Jes
+Get info	Menus		Oten informazions
 Rating	Menus		Valutazion
 Close document	ClosePrompt		Siere document
 Stretch to window	Menus		Slungje al barcon

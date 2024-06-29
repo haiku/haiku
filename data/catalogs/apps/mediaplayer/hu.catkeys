@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	171477831
+1	hungarian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzés Szemetesbe helyezése
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Médialejátszó beállításai
 Copyright	MediaPlayer-InfoWin		Másolásvédett
 Invalid URL inserted!	MediaPlayer-NetworkStream		A megadott cím érvénytelen!
 Aspect ratio	MediaPlayer-Main		Képarány
+Eject device	MediaPlayer-Main		Eszköz kiadása
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Lejátszási lista mentése sikertelen.\n\nHiba:
 <no media>	MediaPlayer-InfoWin		<nincs fájl>
 Hide interface	MediaPlayer-Main		Vezérlők elrejtése
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Teljes képernyő
 OK	MediaPlayer-NetworkStream		Rendben
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Belső hiba (nem sikerült zárolni). A lejátszási lista mentése sikertelen.
 100% scale	MediaPlayer-Main		100%-os méret
+New player	MediaPlayer-Main		Új lejátszó
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nincs mit újra csinálni>
 Bad URL	MediaPlayer-NetworkStream		Hibás cím
 Save	MediaPlayer-Main		Mentés

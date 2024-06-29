@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	1148406263
+1	hungarian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Képmegjelenítő
 Page setup…	Menus		Oldalbeállítás…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum %d. oldala megváltozott. Bezárja a dokumentumot?
@@ -39,6 +39,7 @@ OK	SaveToFile		Rendben
 Print…	Menus		Nyomtatás…
 The file '%s' could not be written.	SaveToFile		A '%s' nevű fájl írása sikertelen.
 Quit	Menus		Kilépés
+Get info	Menus		Információk
 Rating	Menus		Értékelés
 Close document	ClosePrompt		Dokumentum bezárása
 Stretch to window	Menus		Nyújtás az ablakhoz

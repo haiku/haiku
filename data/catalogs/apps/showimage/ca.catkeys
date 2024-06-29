@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ShowImage	1148406263
+1	catalan; valencian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Mostra la imatge
 Page setup…	Menus		Configuració de la pàgina...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El document %s (pàgina %d) ha canviat. Voleu tancar-lo?
@@ -39,6 +39,7 @@ OK	SaveToFile		D'acord
 Print…	Menus		Imprimeix...
 The file '%s' could not be written.	SaveToFile		El fitxer %s no s'ha pogut escriure.
 Quit	Menus		Surt
+Get info	Menus		Obtén informació
 Rating	Menus		Puntuació
 Close document	ClosePrompt		Tanca el document
 Stretch to window	Menus		Amplia a la finestra
