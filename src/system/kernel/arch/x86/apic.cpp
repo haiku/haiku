@@ -151,20 +151,16 @@ void
 apic_set_interrupt_command(uint32 destination, uint32 mode)
 {
 	if (sX2APIC) {
-		uint64 command = x86_read_msr(IA32_MSR_APIC_INTR_COMMAND);
-		command &= APIC_INTR_COMMAND_1_MASK;
+		uint64 command = 0;
 		command |= (uint64)destination << 32;
 		command |= mode;
 		x86_write_msr(IA32_MSR_APIC_INTR_COMMAND, command);
 	} else {
-		uint32 command2 = apic_read(APIC_INTR_COMMAND_2)
-				& APIC_INTR_COMMAND_2_MASK;
+		uint32 command2 = 0;
 		command2 |= destination << 24;
 		apic_write(APIC_INTR_COMMAND_2, command2);
 
-		uint32 command1 = apic_read(APIC_INTR_COMMAND_1)
-				& APIC_INTR_COMMAND_1_MASK;
-		command1 |= mode;
+		uint32 command1 = mode;
 		apic_write(APIC_INTR_COMMAND_1, command1);
 	}
 }
