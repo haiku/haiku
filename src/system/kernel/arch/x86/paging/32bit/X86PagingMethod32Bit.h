@@ -15,7 +15,7 @@ class TranslationMapPhysicalPageMapper;
 class X86PhysicalPageMapper;
 
 
-class X86PagingMethod32Bit : public X86PagingMethod {
+class X86PagingMethod32Bit final : public X86PagingMethod {
 public:
 								X86PagingMethod32Bit();
 	virtual						~X86PagingMethod32Bit();

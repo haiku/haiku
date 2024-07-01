@@ -90,7 +90,7 @@ private:
 // #pragma mark -
 
 
-class LargeMemoryTranslationMapPhysicalPageMapper
+class LargeMemoryTranslationMapPhysicalPageMapper final
 	: public TranslationMapPhysicalPageMapper {
 public:
 								LargeMemoryTranslationMapPhysicalPageMapper();
@@ -115,7 +115,7 @@ private:
 };
 
 
-class LargeMemoryPhysicalPageMapper : public X86PhysicalPageMapper {
+class LargeMemoryPhysicalPageMapper final : public X86PhysicalPageMapper {
 public:
 								LargeMemoryPhysicalPageMapper();
 

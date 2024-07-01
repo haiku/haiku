@@ -14,7 +14,7 @@
 struct ObjectCache;
 
 
-struct VMKernelAddressSpace : VMAddressSpace {
+struct VMKernelAddressSpace final : VMAddressSpace {
 public:
 								VMKernelAddressSpace(team_id id, addr_t base,
 									size_t size);

@@ -15,7 +15,7 @@
 struct X86PagingStructuresPAE;
 
 
-struct X86VMTranslationMapPAE : X86VMTranslationMap {
+struct X86VMTranslationMapPAE final : X86VMTranslationMap {
 								X86VMTranslationMapPAE();
 	virtual						~X86VMTranslationMapPAE();
 

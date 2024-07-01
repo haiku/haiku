@@ -47,7 +47,7 @@ using X86LargePhysicalPageMapper::PhysicalPageSlot;
 // #pragma mark - X86PagingMethod32Bit::PhysicalPageSlotPool
 
 
-struct X86PagingMethod32Bit::PhysicalPageSlotPool
+struct X86PagingMethod32Bit::PhysicalPageSlotPool final
 	: X86LargePhysicalPageMapper::PhysicalPageSlotPool {
 public:
 	virtual						~PhysicalPageSlotPool();

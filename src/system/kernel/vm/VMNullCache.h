@@ -13,7 +13,7 @@
 #include <vm/VMCache.h>
 
 
-class VMNullCache : public VMCache {
+class VMNullCache final : public VMCache {
 public:
 			status_t			Init(uint32 allocationFlags);
 

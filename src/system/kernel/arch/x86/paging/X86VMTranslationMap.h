@@ -9,11 +9,6 @@
 #include <vm/VMTranslationMap.h>
 
 
-#if __GNUC__ < 4
-#define final
-#endif
-
-
 #define PAGE_INVALIDATE_CACHE_SIZE 64
 
 

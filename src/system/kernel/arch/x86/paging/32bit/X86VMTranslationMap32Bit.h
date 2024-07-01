@@ -12,7 +12,7 @@
 struct X86PagingStructures32Bit;
 
 
-struct X86VMTranslationMap32Bit : X86VMTranslationMap {
+struct X86VMTranslationMap32Bit final : X86VMTranslationMap {
 								X86VMTranslationMap32Bit();
 	virtual						~X86VMTranslationMap32Bit();
 

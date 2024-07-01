@@ -23,7 +23,7 @@ class TranslationMapPhysicalPageMapper;
 class X86PhysicalPageMapper;
 
 
-class X86PagingMethodPAE : public X86PagingMethod {
+class X86PagingMethodPAE final : public X86PagingMethod {
 public:
 								X86PagingMethodPAE();
 	virtual						~X86PagingMethodPAE();

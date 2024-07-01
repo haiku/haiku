@@ -10,7 +10,7 @@
 #include "paging/X86PagingStructures.h"
 
 
-struct X86PagingStructures32Bit : X86PagingStructures {
+struct X86PagingStructures32Bit final : X86PagingStructures {
 	page_directory_entry*		pgdir_virt;
 
 								X86PagingStructures32Bit();

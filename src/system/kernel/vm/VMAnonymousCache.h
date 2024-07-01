@@ -31,7 +31,7 @@ extern "C" {
 }
 
 
-class VMAnonymousCache : public VMCache {
+class VMAnonymousCache final : public VMCache {
 public:
 	virtual						~VMAnonymousCache();
 

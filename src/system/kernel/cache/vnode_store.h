@@ -13,7 +13,7 @@
 struct file_cache_ref;
 
 
-class VMVnodeCache : public VMCache {
+class VMVnodeCache final : public VMCache {
 public:
 			status_t			Init(struct vnode* vnode,
 									uint32 allocationFlags);

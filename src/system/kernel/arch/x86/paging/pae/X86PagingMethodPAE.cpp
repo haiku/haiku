@@ -351,7 +351,7 @@ private:
 // #pragma mark - PhysicalPageSlotPool
 
 
-struct X86PagingMethodPAE::PhysicalPageSlotPool
+struct X86PagingMethodPAE::PhysicalPageSlotPool final
 	: X86LargePhysicalPageMapper::PhysicalPageSlotPool {
 public:
 	virtual						~PhysicalPageSlotPool();
