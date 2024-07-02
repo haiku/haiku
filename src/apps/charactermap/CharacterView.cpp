@@ -97,17 +97,15 @@ CharacterView::IsShowingBlock(int32 blockIndex) const
 	if (!fShowPrivateBlocks && kUnicodeBlocks[blockIndex].private_block)
 		return false;
 
-	// the reason for two checks is BeOS compatibility.
-	// The Includes method checks for unicode blocks as
-	// defined by Be, but there are only 71 such blocks.
+	// The reason for two checks is BeOS compatibility.
+	// The first one checks for unicode blocks as defined by Be,
+	// but there are only 71 such blocks.
 	// The rest of the blocks (denoted by kNoBlock) need to
 	// be queried by searching for the start and end codepoints
 	// via the IncludesBlock method.
 	if (fShowContainedBlocksOnly) {
-		if (kUnicodeBlocks[blockIndex].block != kNoBlock
-			&& !fUnicodeBlocks.Includes(
-				kUnicodeBlocks[blockIndex].block))
-			return false;
+		if (kUnicodeBlocks[blockIndex].block != kNoBlock)
+			return (fUnicodeBlocks & kUnicodeBlocks[blockIndex].block) != kNoBlock;
 
 		if (!fCharacterFont.IncludesBlock(
 				kUnicodeBlocks[blockIndex].start,
