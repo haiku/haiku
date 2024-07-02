@@ -69,6 +69,7 @@ private:
 								int32& offset) const;
 			BRect			_FrameFor(uint32 character) const;
 			void			_CopyToClipboard(const char* text);
+			bool			_HasGlyphForCharacter(const char* character) const;
 
 private:
 			BMessenger		fTarget;

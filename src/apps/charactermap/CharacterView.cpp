@@ -313,7 +313,13 @@ class PreviewItem: public BMenuItem
 			menu->PushState();
 			menu->SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 			menu->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
-			menu->SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
+			if (IsEnabled()) {
+				menu->SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
+			} else {
+				rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+				rgb_color backColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+				menu->SetHighColor(disable_color(textColor, backColor));
+			}
 			menu->FillRect(box, B_SOLID_LOW);
 
 			// Draw the character in the center of the menu
@@ -364,7 +370,7 @@ CharacterView::MouseDown(BPoint where)
 			// Memorize click point for dragging
 			fClickPoint = where;
 
-			char text[16];
+			char text[5];
 			UnicodeToUTF8(fCurrentCharacter, text, sizeof(text));
 
 			fMenu = new NoMarginMenu();
@@ -372,6 +378,7 @@ CharacterView::MouseDown(BPoint where)
 				fCharacterHeight));
 			fMenu->SetFont(&fCharacterFont);
 			fMenu->SetFontSize(fCharacterFont.Size() * 2.5);
+			fMenu->ItemAt(0)->SetEnabled(_HasGlyphForCharacter(text));
 
 			uint32 character;
 			BRect rect;
@@ -511,6 +518,7 @@ CharacterView::Draw(BRect updateRect)
 	rgb_color highlight = (rgb_color){220, 220, 220, 255};
 	rgb_color enclose = mix_color(highlight,
 		ui_color(B_CONTROL_HIGHLIGHT_COLOR), 128);
+	rgb_color disabled = disable_color(color, ViewColor());
 
 	for (int32 i = _BlockAt(updateRect.LeftTop()); i < (int32)kNumUnicodeBlocks;
 			i++) {
@@ -540,15 +548,13 @@ CharacterView::Draw(BRect updateRect)
 					SetHighColor(enclose);
 					StrokeRect(BRect(x, y, x + fCharacterWidth,
 						y + fCharacterHeight - fGap));
-
-					SetHighColor(color);
-					SetLowColor(highlight);
 				}
 
 				// Draw character
-				char character[16];
+				char character[5];
 				UnicodeToUTF8(c, character, sizeof(character));
 
+				SetHighColor(_HasGlyphForCharacter(character) ? color : disabled);
 				DrawString(character,
 					BPoint(x + (fCharacterWidth - StringWidth(character)) / 2,
 						y + fCharacterBase));
@@ -794,4 +800,13 @@ CharacterView::_CopyToClipboard(const char* text)
 	}
 
 	be_clipboard->Unlock();
+}
+
+
+bool
+CharacterView::_HasGlyphForCharacter(const char* character) const
+{
+	bool hasGlyph;
+	fCharacterFont.GetHasGlyphs(character, 1, &hasGlyph, false);
+	return hasGlyph;
 }
