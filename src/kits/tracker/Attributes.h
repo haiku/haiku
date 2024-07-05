@@ -70,6 +70,8 @@ namespace BPrivate {
 #define kAttrThumbnail						"Media:Thumbnail"
 #define kAttrThumbnailCreationTime			"Media:Thumbnail:CreationTime"
 
+#define kAttrTemplateSubMenu				"_trk/_template_submenu"
+
 #define kAttrDisksFrame						"_trk/d_windframe"
 #define kAttrDisksWorkspace					"_trk/d_windwkspc"
 

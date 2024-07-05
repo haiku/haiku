@@ -57,6 +57,9 @@ public:
 
 private:
 	bool BuildMenu(bool addItems = true);
+	int IterateTemplateDirectory(bool addItems, BPath* path, BMenu* menu);
+	status_t SetTargetForSubmenuItems(BMenu* menu, BMessenger messenger);
+	status_t SetTargetForSubmenuItems(BMenu* menu, BHandler* target);
 
 	BMessenger fTarget;
 	BMenuItem* fOpenItem;
