@@ -14,6 +14,7 @@
 #include <CardLayout.h>
 #include <Catalog.h>
 #include <ColumnListView.h>
+#include <ControlLook.h>
 #include <Font.h>
 #include <GridView.h>
 #include <LayoutBuilder.h>
@@ -64,7 +65,7 @@ enum {
 
 
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
-static const uint16 kScreenshotSize = 320;
+static const uint32 kScreenshotSize = 320;
 
 
 class RatingsScrollView : public GeneralContentScrollView {
@@ -361,8 +362,9 @@ public:
 	void SetPackage(const PackageInfoRef package)
 	{
 		BitmapHolderRef bitmapHolderRef;
-		status_t iconResult = fPackageIconRepository.GetIcon(
-			package->Name(), 32, bitmapHolderRef);
+		BSize iconSize = BControlLook::ComposeIconSize(32.0);
+		status_t iconResult = fPackageIconRepository.GetIcon(package->Name(), iconSize.Width() + 1,
+			bitmapHolderRef);
 
 		if (iconResult == B_OK)
 			fIconView->SetBitmap(bitmapHolderRef);
@@ -1402,7 +1404,13 @@ PackageInfoView::_ScreenshotThumbCoordinate(const PackageInfoRef& package)
 		return ScreenshotCoordinate();
 	if (package->CountScreenshotInfos() == 0)
 		return ScreenshotCoordinate();
-	return ScreenshotCoordinate(package->ScreenshotInfoAtIndex(0)->Code(), kScreenshotSize, kScreenshotSize);
+
+	uint32 screenshotSizeScaled
+		= MAX(static_cast<uint32>(BControlLook::ComposeIconSize(kScreenshotSize).Width()),
+			MAX_IMAGE_SIZE);
+
+	return ScreenshotCoordinate(package->ScreenshotInfoAtIndex(0)->Code(), screenshotSizeScaled + 1,
+		screenshotSizeScaled + 1);
 }
 
 

@@ -13,7 +13,23 @@ class BView;
 class BBitmap;
 
 
-class RatingUtils {
+class RatingStarsMetrics
+{
+public:
+							RatingStarsMetrics(BSize starSize);
+
+	const	BSize			StarSize() const;
+			float			SpacingBetweenStars() const;
+	const	BPoint			LocationOfStarAtIndex(int index) const;
+	const	BSize			Size() const;
+
+private:
+			BSize			fStarSize;
+};
+
+
+class RatingUtils
+{
 public:
 	static	void			Draw(BView* target, BPoint at, float value,
 								const BBitmap* star);

@@ -61,8 +61,8 @@ RatingView::Draw(BRect updateRect)
 BSize
 RatingView::MinSize()
 {
-	BSize size(16 * 5 + 2 * 4, 16 + 2);
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(), size);
+	RatingStarsMetrics metrics(StarBitmap()->Bounds().Size());
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), metrics.Size());
 }
 
 

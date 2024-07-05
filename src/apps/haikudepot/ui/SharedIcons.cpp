@@ -5,6 +5,7 @@
 
 #include "SharedIcons.h"
 
+#include <ControlLook.h>
 #include <IconUtils.h>
 #include <Resources.h>
 
@@ -150,7 +151,8 @@ SharedIcons::_CreateIconForResourceChecked(int32 resourceID, uint32 size,
 		status = B_ERROR;
 	}
 
-	BBitmap* bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
+	BSize iconSize = BControlLook::ComposeIconSize(size);
+	BBitmap* bitmap = new BBitmap(BRect(BPoint(0, 0), iconSize), 0, B_RGBA32);
 	status = bitmap->InitCheck();
 
 	if (status == B_OK)
@@ -187,7 +189,8 @@ SharedIcons::_CreateIconForMimeTypeChecked(const char* mimeTypeStr, uint32 size,
 	BBitmap* bitmap = NULL;
 
 	if (status == B_OK) {
-		bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
+		BSize iconSize = BControlLook::ComposeIconSize(size);
+		bitmap = new BBitmap(BRect(BPoint(0, 0), iconSize), 0, B_RGBA32);
 		status = bitmap->InitCheck();
 	}
 

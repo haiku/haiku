@@ -22,12 +22,12 @@ ScreenshotCoordinate::ScreenshotCoordinate()
 ScreenshotCoordinate::ScreenshotCoordinate(const BMessage* from)
 {
 	from->FindString(kCodeKey, &fCode);
-	from->FindUInt16(kWidthKey, &fWidth);
-	from->FindUInt16(kHeightKey, &fHeight);
+	from->FindUInt32(kWidthKey, &fWidth);
+	from->FindUInt32(kHeightKey, &fHeight);
 }
 
 
-ScreenshotCoordinate::ScreenshotCoordinate(BString code, uint16 width, uint16 height)
+ScreenshotCoordinate::ScreenshotCoordinate(BString code, uint32 width, uint32 height)
 	:
 	fCode(code),
 	fWidth(width),
@@ -48,14 +48,14 @@ ScreenshotCoordinate::Code() const
 }
 
 
-uint16
+uint32
 ScreenshotCoordinate::Width() const
 {
 	return fWidth;
 }
 
 
-uint16
+uint32
 ScreenshotCoordinate::Height() const
 {
 	return fHeight;
@@ -80,7 +80,7 @@ const BString
 ScreenshotCoordinate::Key() const
 {
 	BString result;
-	result.SetToFormat("%s_%" B_PRIu16 "x%" B_PRIu16 , fCode.String(), fWidth, fHeight);
+	result.SetToFormat("%s_%" B_PRIu32 "x%" B_PRIu32, fCode.String(), fWidth, fHeight);
 	return result;
 }
 
@@ -99,8 +99,8 @@ ScreenshotCoordinate::Archive(BMessage* into, bool deep) const
 	if (result == B_OK)
 		result = into->AddString(kCodeKey, fCode);
 	if (result == B_OK)
-		result = into->AddUInt16(kWidthKey, fWidth);
+		result = into->AddUInt32(kWidthKey, fWidth);
 	if (result == B_OK)
-		result = into->AddUInt16(kHeightKey, fHeight);
+		result = into->AddUInt32(kHeightKey, fHeight);
 	return result;
 }

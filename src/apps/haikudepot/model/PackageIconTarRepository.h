@@ -38,15 +38,15 @@ public:
 private:
 			void				_Close();
 
-	const	char*				_ToIconCacheKeySuffix(BitmapSize size);
-	const	HashString			_ToIconCacheKey(const BString& pkgName,
-									BitmapSize size);
+	const	char*				_ToIconCacheKeyPart(BitmapSize size);
+	const	HashString			_ToIconCacheKey(const BString& pkgName, BitmapSize storedSize,
+									uint32 size);
 
 			IconTarPtrRef		_GetOrCreateIconTarPtr(const BString& pkgName);
 			IconTarPtrRef		_GetIconTarPtr(const BString& pkgName) const;
 
-			status_t			_CreateIconFromTarOffset(off_t offset,
-									BitmapHolderRef& bitmapHolderRef);
+			status_t			_CreateIconFromTarOffset(off_t offset, BitmapSize bitmapSize,
+									uint32 size, BitmapHolderRef& bitmapHolderRef);
 
 			status_t			_GetDefaultIcon(uint32 size, BitmapHolderRef& bitmapHolderRef);
 

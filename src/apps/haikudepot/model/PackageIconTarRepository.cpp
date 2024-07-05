@@ -89,35 +89,32 @@ IconTarPtrEntryListener::Handle(const TarArchiveHeader& header,
 	fileName.CopyInto(packageName, 5, secondSlashIdx - 5);
 	fileName.CopyInto(leafName, secondSlashIdx + 1,
 		fileName.Length() - (secondSlashIdx + 1));
-	BitmapSize bitmapSize;
+	BitmapSize storedSize;
 
-	if (_LeafNameToBitmapSize(leafName, &bitmapSize) == B_OK) {
-		fPackageIconTarRepository->AddIconTarPtr(packageName, bitmapSize,
-			offset);
-	}
+	if (_LeafNameToBitmapSize(leafName, &storedSize) == B_OK)
+		fPackageIconTarRepository->AddIconTarPtr(packageName, storedSize, offset);
 
 	return B_OK;
 }
 
 
 status_t
-IconTarPtrEntryListener::_LeafNameToBitmapSize(BString& leafName,
-	BitmapSize* bitmapSize)
+IconTarPtrEntryListener::_LeafNameToBitmapSize(BString& leafName, BitmapSize* storedSize)
 {
 	if (leafName == "icon.hvif") {
-		*bitmapSize = BITMAP_SIZE_ANY;
+		*storedSize = BITMAP_SIZE_ANY;
 		return B_OK;
 	}
 	if (leafName == "64.png") {
-		*bitmapSize = BITMAP_SIZE_64;
+		*storedSize = BITMAP_SIZE_64;
 		return B_OK;
 	}
 	if (leafName == "32.png") {
-		*bitmapSize = BITMAP_SIZE_32;
+		*storedSize = BITMAP_SIZE_32;
 		return B_OK;
 	}
 	if (leafName == "16.png") {
-		*bitmapSize = BITMAP_SIZE_16;
+		*storedSize = BITMAP_SIZE_16;
 		return B_OK;
 	}
 	return B_BAD_VALUE;
@@ -230,11 +227,11 @@ PackageIconTarRepository::_Close()
 	the parsing of the tar headers.  It is called from the listener above.
 */
 void
-PackageIconTarRepository::AddIconTarPtr(const BString& packageName, BitmapSize bitmapSize,
+PackageIconTarRepository::AddIconTarPtr(const BString& packageName, BitmapSize storedSize,
 	off_t offset)
 {
 	IconTarPtrRef tarPtrRef = _GetOrCreateIconTarPtr(packageName);
-	tarPtrRef->SetOffset(bitmapSize, offset);
+	tarPtrRef->SetOffset(storedSize, offset);
 }
 
 
@@ -263,20 +260,20 @@ PackageIconTarRepository::GetIcon(const BString& pkgName, uint32 size,
 	status_t result = B_OK;
 	off_t iconDataTarOffset = -1;
 	const IconTarPtrRef tarPtrRef = _GetIconTarPtr(pkgName);
-	BitmapSize bitmapSize;
+	BitmapSize storedSize;
 
 	if (tarPtrRef.IsSet()) {
-		bitmapSize = _BestStoredSize(tarPtrRef, size);
-		iconDataTarOffset = tarPtrRef->Offset(bitmapSize);
+		storedSize = _BestStoredSize(tarPtrRef, size);
+		iconDataTarOffset = tarPtrRef->Offset(storedSize);
 	}
 
 	if (iconDataTarOffset >= 0) {
-		HashString key = _ToIconCacheKey(pkgName, bitmapSize);
+		HashString key = _ToIconCacheKey(pkgName, storedSize, size);
 
 		if (fIconCache.ContainsKey(key)) {
 			bitmapHolderRef.SetTo(fIconCache.Get(key).Get());
 		} else {
-			result = _CreateIconFromTarOffset(iconDataTarOffset, bitmapHolderRef);
+			result = _CreateIconFromTarOffset(iconDataTarOffset, storedSize, size, bitmapHolderRef);
 			if (result == B_OK) {
 				HDTRACE("loaded package icon [%s] of size %" B_PRId32, pkgName.String(), size);
 				fIconCache.Put(key, bitmapHolderRef);
@@ -303,10 +300,9 @@ PackageIconTarRepository::_GetIconTarPtr(const BString& pkgName) const
 
 
 const char*
-PackageIconTarRepository::_ToIconCacheKeySuffix(BitmapSize size)
+PackageIconTarRepository::_ToIconCacheKeyPart(BitmapSize storedSize)
 {
-	switch (size)
-	{
+	switch (storedSize) {
 		case BITMAP_SIZE_16:
 			return "16";
 		// note that size 22 is not supported.
@@ -324,16 +320,19 @@ PackageIconTarRepository::_ToIconCacheKeySuffix(BitmapSize size)
 
 
 const HashString
-PackageIconTarRepository::_ToIconCacheKey(const BString& pkgName, BitmapSize size)
+PackageIconTarRepository::_ToIconCacheKey(const BString& pkgName, BitmapSize storedSize,
+	uint32 size)
 {
-	return HashString(BString(pkgName) << "__x" << _ToIconCacheKeySuffix(size));
+	return HashString(
+		BString(pkgName) << "__s" << _ToIconCacheKeyPart(storedSize) << "__x" << size);
 }
 
 
 /*!	This method must only be invoked with the class locked.
  */
 status_t
-PackageIconTarRepository::_CreateIconFromTarOffset(off_t offset, BitmapHolderRef& bitmapHolderRef)
+PackageIconTarRepository::_CreateIconFromTarOffset(off_t offset, BitmapSize storedSize, uint32 size,
+	BitmapHolderRef& bitmapHolderRef)
 {
 	fTarIo->Seek(offset, SEEK_SET);
 	fIconDataBuffer->Seek(0, SEEK_SET);
@@ -365,16 +364,28 @@ PackageIconTarRepository::_CreateIconFromTarOffset(off_t offset, BitmapHolderRef
 
 	fIconDataBuffer->Seek(0, SEEK_SET);
 
-	if (result == B_OK) {
-		BBitmap* bitmap = BTranslationUtils::GetBitmap(fIconDataBuffer);
+	BBitmap* bitmap = NULL;
 
-		if (bitmap == NULL) {
-			HDERROR("unable to decode data from tar for icon image");
-			result = B_ERROR;
+	if (result == B_OK) {
+		if (BITMAP_SIZE_ANY == storedSize) {
+			bitmap = new BBitmap(BRect(0, 0, size - 1, size - 1), 0, B_RGBA32);
+			result = bitmap->InitCheck();
+			result = BIconUtils::GetVectorIcon(
+				reinterpret_cast<const uint8*>(fIconDataBuffer->Buffer()), header.Length(), bitmap);
 		} else {
-			bitmapHolderRef.SetTo(new(std::nothrow) BitmapHolder(bitmap), true);
+			bitmap = BTranslationUtils::GetBitmap(fIconDataBuffer);
+
+			if (bitmap == NULL) {
+				HDERROR("unable to decode data from tar for icon image");
+				result = B_ERROR;
+			}
 		}
 	}
+
+	if (result != B_OK)
+		delete bitmap;
+	else
+		bitmapHolderRef.SetTo(new(std::nothrow) BitmapHolder(bitmap), true);
 
 	return result;
 }

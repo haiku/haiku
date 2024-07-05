@@ -12,13 +12,13 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Font.h>
 #include <LayoutBuilder.h>
 #include <LayoutItem.h>
 #include <Message.h>
 #include <ScrollView.h>
 #include <StringView.h>
-#include <SpaceLayoutItem.h>
 
 #include "BitmapView.h"
 #include "HaikuDepotConstants.h"
@@ -35,19 +35,146 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "FeaturedPackagesView"
 
-
-#define HEIGHT_PACKAGE 84.0f
 #define SIZE_ICON 64.0f
-#define X_POSITION_RATING 350.0f
-#define X_POSITION_SUMMARY 500.0f
-#define WIDTH_RATING 100.0f
-#define Y_PROPORTION_TITLE 0.35f
-#define Y_PROPORTION_PUBLISHER 0.60f
-#define Y_PROPORTION_CHRONOLOGICAL_DATA 0.75f
-#define PADDING 8.0f
+
+// If the space for the summary has less than this many "M" characters then the summary will not be
+// displayed.
+#define MINIMUM_M_COUNT_SUMMARY 10.0f
+
+// The title area will be this many times the width of an "M".
+#define M_COUNT_TITLE 10
 
 
 // #pragma mark - PackageView
+
+
+class StackedFeaturesPackageBandMetrics
+{
+public:
+	StackedFeaturesPackageBandMetrics(float width, BFont* titleFont, BFont* metadataFont)
+	{
+		float padding = be_control_look->DefaultItemSpacing();
+		BSize iconSize = BControlLook::ComposeIconSize(SIZE_ICON);
+
+		font_height titleFontHeight;
+		font_height metadataFontHeight;
+		titleFont->GetHeight(&titleFontHeight);
+		metadataFont->GetHeight(&metadataFontHeight);
+
+		float totalTitleAndMetadataHeight = titleFontHeight.ascent + titleFontHeight.descent
+			+ titleFontHeight.leading
+			+ metadataFontHeight.leading
+			+ 2.0 * (metadataFontHeight.ascent + metadataFontHeight.descent);
+
+		fHeight = fmaxf(totalTitleAndMetadataHeight, iconSize.Height()) + 2.0 * padding;
+
+		{
+			float iconInset = (fHeight - iconSize.Width()) / 2.0;
+			fIconRect = BRect(padding, iconInset, iconSize.Width() + padding,
+				iconSize.Height() + iconInset);
+		}
+
+		{
+			float titleWidthM = titleFont->StringWidth("M");
+
+			float leftTitlePublisherAndChronologicalInfo = fIconRect.right + padding;
+			float rightTitlePublisherAndChronologicalInfo = fminf(width, fIconRect.Size().Width()
+				+ (2.0 * padding) + (titleWidthM * M_COUNT_TITLE));
+
+// left, top, right bottom
+			fTitleRect = BRect(leftTitlePublisherAndChronologicalInfo,
+				(fHeight - totalTitleAndMetadataHeight) / 2.0,
+				rightTitlePublisherAndChronologicalInfo,
+				((fHeight - totalTitleAndMetadataHeight) / 2.0)
+					+ titleFontHeight.ascent + titleFontHeight.descent);
+
+			fPublisherRect = BRect(leftTitlePublisherAndChronologicalInfo,
+				fTitleRect.bottom + titleFontHeight.leading,
+				rightTitlePublisherAndChronologicalInfo,
+				fTitleRect.bottom + titleFontHeight.leading
+					+ metadataFontHeight.ascent + metadataFontHeight.descent);
+
+			fChronologicalInfoRect = BRect(leftTitlePublisherAndChronologicalInfo,
+				fPublisherRect.bottom + metadataFontHeight.leading,
+				rightTitlePublisherAndChronologicalInfo,
+				fPublisherRect.bottom + metadataFontHeight.leading
+					+ metadataFontHeight.ascent + metadataFontHeight.descent);
+        }
+
+        // sort out the ratings display
+
+		{
+			BSize ratingStarSize = SharedIcons::IconStarBlue16Scaled()->Bitmap()->Bounds().Size();
+			RatingStarsMetrics ratingStarsMetrics(ratingStarSize);
+
+			fRatingStarsRect = BRect(BPoint(fTitleRect.right + padding,
+				(fHeight - ratingStarsMetrics.Size().Height()) / 2), ratingStarsMetrics.Size());
+
+			if (fRatingStarsRect.right > width)
+				fRatingStarsRect = BRect();
+			else {
+				// Now sort out the position for the summary. This is reckoned as a container
+				// rect because it would be nice to layout the text with newlines and not just a
+				// single line.
+
+				fSummaryContainerRect = BRect(fRatingStarsRect.right + (padding * 2.0), padding,
+					width - padding, fHeight - (padding * 2.0));
+
+				float metadataWidthM = metadataFont->StringWidth("M");
+
+				if (fSummaryContainerRect.Size().Width() < MINIMUM_M_COUNT_SUMMARY * metadataWidthM)
+					fSummaryContainerRect = BRect();
+			}
+		}
+	}
+
+	float Height()
+	{
+		return fHeight;
+	}
+
+	BRect IconRect()
+	{
+		return fIconRect;
+	}
+
+	BRect TitleRect()
+	{
+		return fTitleRect;
+	}
+
+	BRect PublisherRect()
+	{
+		return fPublisherRect;
+	}
+
+	BRect ChronologicalInfoRect()
+	{
+		return fChronologicalInfoRect;
+	}
+
+	BRect RatingStarsRect()
+	{
+		return fRatingStarsRect;
+	}
+
+	BRect SummaryContainerRect()
+	{
+		return fSummaryContainerRect;
+	}
+
+private:
+			float 				fHeight;
+
+			BRect				fIconRect;
+			BRect				fTitleRect;
+			BRect				fPublisherRect;
+			BRect				fChronologicalInfoRect;
+
+			BRect				fRatingStarsRect;
+
+			BRect				fSummaryContainerRect;
+};
 
 
 class StackedFeaturedPackagesView : public BView {
@@ -62,6 +189,12 @@ public:
 		fLowestIndexAddedOrRemoved(-1)
 	{
 		SetEventMask(B_POINTER_EVENTS);
+
+		fTitleFont = StackedFeaturedPackagesView::CreateTitleFont();
+		fMetadataFont = StackedFeaturedPackagesView::CreateMetadataFont();
+		fSummaryFont = StackedFeaturedPackagesView::CreateSummaryFont();
+		fBandMetrics = CreateBandMetrics();
+
 		Clear();
 	}
 
@@ -70,6 +203,10 @@ public:
 	{
 		fPackageListener->SetPackage(PackageInfoRef(NULL));
 		fPackageListener->ReleaseReference();
+		delete fBandMetrics;
+		delete fTitleFont;
+		delete fMetadataFont;
+		delete fSummaryFont;
 	}
 
 // #pragma mark - message handling and events
@@ -144,7 +281,7 @@ public:
 			case B_PAGE_DOWN:
 			{
 				BRect bounds = Bounds();
-				float height = fPackages.size() * HEIGHT_PACKAGE;
+				float height = fPackages.size() * fBandMetrics->Height();
 				float maxScrollY = height - bounds.Height();
 				float pageDownScrollY = bounds.top + bounds.Height();
 				ScrollTo(0, fminf(maxScrollY, pageDownScrollY));
@@ -177,12 +314,10 @@ public:
 	{
 		BView::FrameResized(width, height);
 
-		// because the summary text will wrap, a resize of the frame will
-		// result in all of the summary area needing to be redrawn.
+		delete fBandMetrics;
+		fBandMetrics = CreateBandMetrics();
 
-		BRect rectToInvalidate = Bounds();
-		rectToInvalidate.left = X_POSITION_SUMMARY;
-		Invalidate(rectToInvalidate);
+		Invalidate();
 	}
 
 
@@ -208,7 +343,43 @@ public:
 		}
 		fPackages.clear();
 		fSelectedIndex = -1;
+
 		Invalidate();
+	}
+
+
+	static BFont* CreateTitleFont()
+	{
+		BFont* font = new BFont(be_plain_font);
+		font_family family;
+		font_style style;
+		font->SetSize(ceilf(font->Size() * 1.8f));
+		font->GetFamilyAndStyle(&family, &style);
+		font->SetFamilyAndStyle(family, "Bold");
+		return font;
+	}
+
+
+    static BFont* CreateMetadataFont()
+    {
+		BFont* font = new BFont(be_plain_font);
+		font_family family;
+		font_style style;
+		font->GetFamilyAndStyle(&family, &style);
+		font->SetFamilyAndStyle(family, "Italic");
+		return font;
+	}
+
+
+	static BFont* CreateSummaryFont()
+	{
+		return new BFont(be_plain_font);
+	}
+
+
+	StackedFeaturesPackageBandMetrics* CreateBandMetrics()
+	{
+		return new StackedFeaturesPackageBandMetrics(Bounds().Width(), fTitleFont, fMetadataFont);
 	}
 
 
@@ -386,13 +557,11 @@ public:
 
 	void _DrawPackageAtIndex(BRect updateRect, int32 index)
 	{
-		_DrawPackage(updateRect, fPackages[index], index, _YOfIndex(index),
-			index == fSelectedIndex);
+		_DrawPackage(updateRect, fPackages[index], _YOfIndex(index), index == fSelectedIndex);
 	}
 
 
-	void _DrawPackage(BRect updateRect, PackageInfoRef pkg, int index, float y,
-		bool selected)
+	void _DrawPackage(BRect updateRect, PackageInfoRef pkg, float y, bool selected)
 	{
 		if (selected) {
 			SetLowUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
@@ -400,152 +569,155 @@ public:
 		} else {
 			SetLowUIColor(B_LIST_BACKGROUND_COLOR);
 		}
+
+		BRect iconRect = fBandMetrics->IconRect();
+		BRect titleRect = fBandMetrics->TitleRect();
+		BRect publisherRect = fBandMetrics->PublisherRect();
+		BRect chronologicalInfoRect = fBandMetrics->ChronologicalInfoRect();
+		BRect ratingStarsRect = fBandMetrics->RatingStarsRect();
+		BRect summaryContainerRect = fBandMetrics->SummaryContainerRect();
+
+		iconRect.OffsetBy(0.0, y);
+		titleRect.OffsetBy(0.0, y);
+		publisherRect.OffsetBy(0.0, y);
+		chronologicalInfoRect.OffsetBy(0.0, y);
+		ratingStarsRect.OffsetBy(0.0, y);
+		summaryContainerRect.OffsetBy(0.0, y);
+
 		// TODO; optimization; the updateRect may only cover some of this?
-		_DrawPackageIcon(updateRect, pkg, y, selected);
-		_DrawPackageTitle(updateRect, pkg, y, selected);
-		_DrawPackagePublisher(updateRect, pkg, y, selected);
-		_DrawPackageCronologicalInfo(updateRect, pkg, y, selected);
-		_DrawPackageRating(updateRect, pkg, y, selected);
-		_DrawPackageSummary(updateRect, pkg, y, selected);
+		_DrawPackageIcon(iconRect, pkg, selected);
+		_DrawPackageTitle(titleRect, pkg, selected);
+		_DrawPackagePublisher(publisherRect, pkg, selected);
+		_DrawPackageChronologicalInfo(chronologicalInfoRect, pkg, selected);
+		_DrawPackageRating(ratingStarsRect, pkg);
+		_DrawPackageSummary(summaryContainerRect, pkg, selected);
 	}
 
 
-	void _DrawPackageIcon(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackageIcon(BRect iconRect, PackageInfoRef pkg, bool selected)
 	{
+		if (!iconRect.IsValid())
+			return;
+
 		BitmapHolderRef icon;
-		status_t iconResult = fModel.GetPackageIconRepository().GetIcon(
-			pkg->Name(), 64, icon);
+		status_t iconResult = fModel.GetPackageIconRepository().GetIcon(pkg->Name(),
+			iconRect.Width(), icon);
 
 		if (iconResult == B_OK) {
 			if (icon.IsSet()) {
-				float inset = (HEIGHT_PACKAGE - SIZE_ICON) / 2.0;
-				BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
-					y + SIZE_ICON + inset);
 				const BBitmap* bitmap = icon->Bitmap();
 
 				if (bitmap != NULL && bitmap->IsValid()) {
 					SetDrawingMode(B_OP_ALPHA);
-					DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
-						B_FILTER_BITMAP_BILINEAR);
+					DrawBitmap(bitmap, bitmap->Bounds(), iconRect, B_FILTER_BITMAP_BILINEAR);
 				}
 			}
 		}
 	}
 
 
-	void _DrawPackageTitle(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackageTitle(BRect textRect, PackageInfoRef pkg, bool selected)
 	{
-		static BFont* sFont = NULL;
+		if (!textRect.IsValid())
+			return;
 
-		if (sFont == NULL) {
-			sFont = new BFont(be_plain_font);
-			GetFont(sFont);
-  			font_family family;
-			font_style style;
-			sFont->SetSize(ceilf(sFont->Size() * 1.8f));
-			sFont->GetFamilyAndStyle(&family, &style);
-			sFont->SetFamilyAndStyle(family, "Bold");
-		}
+		const BBitmap* installedIconBitmap = SharedIcons::IconInstalled16Scaled()->Bitmap();
 
 		SetDrawingMode(B_OP_COPY);
-		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR
-			: B_LIST_ITEM_TEXT_COLOR);
-		SetFont(sFont);
-		BPoint pt(HEIGHT_PACKAGE, y + (HEIGHT_PACKAGE * Y_PROPORTION_TITLE));
-		DrawString(pkg->Title(), pt);
+		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR : B_LIST_ITEM_TEXT_COLOR);
+		SetFont(fTitleFont);
+
+		font_height fontHeight;
+		fTitleFont->GetHeight(&fontHeight);
+		BPoint pt = textRect.LeftTop() + BPoint(0.0, + fontHeight.ascent);
+
+		BString renderedText = pkg->Title();
+		float installedIconAllowance = installedIconBitmap->Bounds().Width() * 1.5;
+		TruncateString(&renderedText, B_TRUNCATE_END, textRect.Width() - installedIconAllowance);
+
+		DrawString(renderedText, pt);
 
 		if (pkg->State() == ACTIVATED) {
-			const BBitmap* bitmap = SharedIcons::IconInstalled16Scaled()->Bitmap();
-			if (bitmap != NULL && bitmap->IsValid()) {
-				float stringWidth = StringWidth(pkg->Title());
-				float offsetX = pt.x + stringWidth + PADDING;
-				BRect targetRect(offsetX, pt.y - 16,
-					offsetX + 16, pt.y);
-				SetDrawingMode(B_OP_ALPHA);
-				DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
-					B_FILTER_BITMAP_BILINEAR);
-			}
+			float stringWidth = StringWidth(pkg->Title());
+			BRect iconRect = BRect(
+				BPoint(textRect.left + stringWidth + (installedIconBitmap->Bounds().Width() / 2.0),
+				textRect.top + (textRect.Height() / 2.0)
+					- (installedIconBitmap->Bounds().Height() / 2.0)),
+				installedIconBitmap->Bounds().Size());
+			SetDrawingMode(B_OP_ALPHA);
+			DrawBitmap(installedIconBitmap, installedIconBitmap->Bounds(), iconRect,
+				B_FILTER_BITMAP_BILINEAR);
 		}
 	}
 
 
-	void _DrawPackageGenericTextSlug(BRect updateRect, PackageInfoRef pkg,
-		const BString& text, float y, float yProportion, bool selected)
+	void _DrawPackageGenericTextSlug(BRect textRect, const BString& text, bool selected)
 	{
-		static BFont* sFont = NULL;
-
-		if (sFont == NULL) {
-			sFont = new BFont(be_plain_font);
-			font_family family;
-			font_style style;
-			sFont->SetSize(std::max(9.0f, floorf(sFont->Size() * 0.92f)));
-			sFont->GetFamilyAndStyle(&family, &style);
-			sFont->SetFamilyAndStyle(family, "Italic");
-		}
+		if (!textRect.IsValid())
+			return;
 
 		SetDrawingMode(B_OP_COPY);
-		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR
-			: B_LIST_ITEM_TEXT_COLOR);
-		SetFont(sFont);
+		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR : B_LIST_ITEM_TEXT_COLOR);
+		SetFont(fMetadataFont);
 
-		float maxTextWidth = (X_POSITION_RATING - HEIGHT_PACKAGE) - PADDING;
+		font_height fontHeight;
+		fMetadataFont->GetHeight(&fontHeight);
+		BPoint pt = textRect.LeftTop() + BPoint(0.0, + fontHeight.ascent);
+
 		BString renderedText(text);
-		TruncateString(&renderedText, B_TRUNCATE_END, maxTextWidth);
+		TruncateString(&renderedText, B_TRUNCATE_END, textRect.Width());
 
-		DrawString(renderedText, BPoint(HEIGHT_PACKAGE,
-			y + (HEIGHT_PACKAGE * yProportion)));
+		DrawString(renderedText, pt);
 	}
 
 
-	void _DrawPackagePublisher(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackagePublisher(BRect textRect, PackageInfoRef pkg, bool selected)
 	{
-		_DrawPackageGenericTextSlug(updateRect, pkg, pkg->Publisher().Name(), y,
-			Y_PROPORTION_PUBLISHER, selected);
+		_DrawPackageGenericTextSlug(textRect, pkg->Publisher().Name(), selected);
 	}
 
 
-	void _DrawPackageCronologicalInfo(BRect updateRect, PackageInfoRef pkg,
-		float y, bool selected)
+	void _DrawPackageChronologicalInfo(BRect textRect, PackageInfoRef pkg, bool selected)
 	{
 		BString versionCreateTimestampPresentation
 			= LocaleUtils::TimestampToDateString(pkg->VersionCreateTimestamp());
-		_DrawPackageGenericTextSlug(updateRect, pkg,
-			versionCreateTimestampPresentation, y,
-			Y_PROPORTION_CHRONOLOGICAL_DATA, selected);
+		_DrawPackageGenericTextSlug(textRect, versionCreateTimestampPresentation, selected);
 	}
 
 
 	// TODO; show the sample size
-	void _DrawPackageRating(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackageRating(BRect ratingRect, PackageInfoRef pkg)
 	{
-		BPoint at(X_POSITION_RATING,
-			y + (HEIGHT_PACKAGE - SIZE_RATING_STAR) / 2.0f);
-		RatingUtils::Draw(this, at,
-			pkg->CalculateRatingSummary().averageRating);
+		if (!ratingRect.IsValid())
+			return;
+		RatingUtils::Draw(this, ratingRect.LeftTop(), pkg->CalculateRatingSummary().averageRating);
 	}
 
 
 	// TODO; handle multi-line rendering of the text
-	void _DrawPackageSummary(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackageSummary(BRect textRect, PackageInfoRef pkg, bool selected)
 	{
-		BRect bounds = Bounds();
+		if (!textRect.IsValid())
+			return;
 
 		SetDrawingMode(B_OP_COPY);
-		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR
-			: B_LIST_ITEM_TEXT_COLOR);
-		SetFont(be_plain_font);
+		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR : B_LIST_ITEM_TEXT_COLOR);
+		SetFont(fSummaryFont);
 
-		float maxTextWidth = bounds.Width() - X_POSITION_SUMMARY - PADDING;
+		font_height fontHeight;
+		fSummaryFont->GetHeight(&fontHeight);
+
+		// The text rect is a container into which later text can be made to flow multi-line. For
+		// now just draw one line of the summary.
+
+		BPoint pt = textRect.LeftTop() + BPoint(0.0,
+			(textRect.Size().Height() / 2.0) - ((fontHeight.ascent + fontHeight.descent) / 2.0)
+				+ fontHeight.ascent);
+
 		BString summary(pkg->ShortDescription());
-		TruncateString(&summary, B_TRUNCATE_END, maxTextWidth);
+		TruncateString(&summary, B_TRUNCATE_END, textRect.Width());
 
-		DrawString(summary, BPoint(X_POSITION_SUMMARY,
-			y + (HEIGHT_PACKAGE * 0.5)));
+		DrawString(summary, pt);
 	}
 
 
@@ -563,13 +735,11 @@ public:
 	{
 		if (!_IsIndexEntirelyVisible(index)) {
 			BRect bounds = Bounds();
-			int32 indexOfCentreVisible = _IndexOfY(
-				bounds.top + bounds.Height() / 2);
+			int32 indexOfCentreVisible = _IndexOfY(bounds.top + bounds.Height() / 2);
 			if (index < indexOfCentreVisible)
 				ScrollTo(0, _YOfIndex(index));
 			else {
-				float scrollPointY = (_YOfIndex(index) + HEIGHT_PACKAGE)
-					- bounds.Height();
+				float scrollPointY = (_YOfIndex(index) + fBandMetrics->Height()) - bounds.Height();
 				ScrollTo(0, scrollPointY);
 			}
 		}
@@ -613,13 +783,13 @@ public:
 
 	BRect _RectOfY(float y) const
 	{
-		return BRect(0, y, Bounds().Width(), y + HEIGHT_PACKAGE);
+		return BRect(0, y, Bounds().Width(), y + fBandMetrics->Height());
 	}
 
 
 	float _YOfIndex(int32 i) const
 	{
-		return i * HEIGHT_PACKAGE;
+		return i * fBandMetrics->Height();
 	}
 
 
@@ -632,7 +802,7 @@ public:
 	{
 		if (fPackages.empty())
 			return -1;
-		int32 i = static_cast<int32>(y / HEIGHT_PACKAGE);
+		int32 i = static_cast<int32>(y / fBandMetrics->Height());
 		if (i < 0 || i >= static_cast<int32>(fPackages.size()))
 			return -1;
 		return i;
@@ -649,7 +819,7 @@ public:
 	{
 		if (fPackages.empty())
 			return -1;
-		int32 i = static_cast<int32>(y / HEIGHT_PACKAGE);
+		int32 i = static_cast<int32>(y / fBandMetrics->Height());
 		if (i < 0)
 			return 0;
 		return std::min(i, (int32) (fPackages.size() - 1));
@@ -658,7 +828,8 @@ public:
 
 	virtual BSize PreferredSize()
 	{
-		return BSize(B_SIZE_UNLIMITED, HEIGHT_PACKAGE * fPackages.size());
+		return BSize(B_SIZE_UNLIMITED,
+			fBandMetrics->Height() * static_cast<float>(fPackages.size()));
 	}
 
 
@@ -670,6 +841,12 @@ private:
 			OnePackageMessagePackageListener*
 								fPackageListener;
 			int32				fLowestIndexAddedOrRemoved;
+			StackedFeaturesPackageBandMetrics*
+								fBandMetrics;
+
+			BFont*				fTitleFont;
+			BFont*				fMetadataFont;
+			BFont*				fSummaryFont;
 };
 
 

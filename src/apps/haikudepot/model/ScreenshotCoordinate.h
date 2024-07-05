@@ -18,13 +18,13 @@
 class ScreenshotCoordinate : public BArchivable {
 public:
 								ScreenshotCoordinate(const BMessage* from);
-								ScreenshotCoordinate(BString code, uint16 width, uint16 height);
+								ScreenshotCoordinate(BString code, uint32 width, uint32 height);
 								ScreenshotCoordinate();
 	virtual						~ScreenshotCoordinate();
 
 	const	BString				Code() const;
-			uint16				Width() const;
-			uint16				Height() const;
+			uint32				Width() const;
+			uint32				Height() const;
 
 			bool				operator==(const ScreenshotCoordinate& other) const;
 
@@ -36,8 +36,8 @@ public:
 
 private:
 			BString				fCode;
-			uint16				fWidth;
-			uint16				fHeight;
+			uint32				fWidth;
+			uint32				fHeight;
 };
 
 

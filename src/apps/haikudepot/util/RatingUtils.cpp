@@ -7,8 +7,45 @@
 
 
 #include "HaikuDepotConstants.h"
+#include "Logger.h"
 #include "RatingUtils.h"
 #include "SharedIcons.h"
+
+
+RatingStarsMetrics::RatingStarsMetrics(BSize starSize)
+	:
+	fStarSize(starSize)
+{
+}
+
+
+const BSize
+RatingStarsMetrics::StarSize() const
+{
+	return fStarSize;
+}
+
+
+float
+RatingStarsMetrics::SpacingBetweenStars() const
+{
+	return 2.0 * fStarSize.Width() / 16.0;
+}
+
+
+const BPoint
+RatingStarsMetrics::LocationOfStarAtIndex(int index) const
+{
+	float indexf = static_cast<float>(index);
+	return BPoint(indexf * (fStarSize.Width() + SpacingBetweenStars()), 0.0);
+}
+
+
+const BSize
+RatingStarsMetrics::Size() const
+{
+	return BSize((fStarSize.Width() * 5) + (SpacingBetweenStars() * 4), fStarSize.Height());
+}
 
 
 /*static*/ void
@@ -34,38 +71,32 @@ RatingUtils::Draw(BView* target, BPoint at, float value)
 RatingUtils::Draw(BView* target, BPoint at, float value,
 	const BBitmap* star)
 {
-	BRect rect = BOUNDS_RATING;
-	rect.OffsetBy(at);
-
-		// a rectangle covering the whole area of the stars
-	target->FillRect(rect, B_SOLID_LOW);
-
 	if (star == NULL) {
-		debugger("no star icon found in application resources.");
+		HDFATAL("no star icon found in application resources.");
 		return;
 	}
 
+	RatingStarsMetrics metrics(star->Bounds().Size());
+	BRect rect(at, metrics.Size());
+
+	target->FillRect(rect, B_SOLID_LOW);
+		// a rectangle covering the whole area of the stars
+
 	target->SetDrawingMode(B_OP_OVER);
 
-	float x = 0;
-	for (int i = 0; i < 5; i++) {
-		target->DrawBitmap(star, at + BPoint(x, 0));
-		x += SIZE_RATING_STAR + WIDTH_RATING_STAR_SPACING;
-	}
+	for (int i = 0; i < 5; i++)
+		target->DrawBitmap(star, rect.LeftTop() + metrics.LocationOfStarAtIndex(i));
 
 	if (value >= RATING_MIN && value < 5.0f) {
 		target->SetDrawingMode(B_OP_OVER);
-
-		rect = BOUNDS_RATING;
-		rect.right = x - 2;
-		rect.left = ceilf(rect.left + (value / 5.0f) * rect.Width());
-		rect.OffsetBy(at);
+		BRect shadeOverRect = rect;
+		shadeOverRect.left = ceilf(rect.right - (1.0 - (value / 5.0f)) * rect.Width());
 
 		rgb_color color = target->LowColor();
 		color.alpha = 190;
 		target->SetHighColor(color);
 
 		target->SetDrawingMode(B_OP_ALPHA);
-		target->FillRect(rect, B_SOLID_HIGH);
+		target->FillRect(shadeOverRect, B_SOLID_HIGH);
 	}
 }
