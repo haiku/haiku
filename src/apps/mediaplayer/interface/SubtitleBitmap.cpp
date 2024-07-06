@@ -25,12 +25,10 @@ SubtitleBitmap::SubtitleBitmap()
 {
 	fTextView->SetStylable(true);
 	fTextView->MakeEditable(false);
-	fTextView->SetWordWrap(false);
 	fTextView->SetAlignment(B_ALIGN_CENTER);
 
 	fShadowTextView->SetStylable(true);
 	fShadowTextView->MakeEditable(false);
-	fShadowTextView->SetWordWrap(false);
 	fShadowTextView->SetAlignment(B_ALIGN_CENTER);
 }
 
@@ -275,8 +273,6 @@ apply_state(BTextView* textView, const ParseState* state, BFont font,
 			face |= B_BOLD_FACE;
 		if (state->italic)
 			face |= B_ITALIC_FACE;
-		// NOTE: This is probably not supported by the app_server (perhaps
-		// it is if the font contains a specific underline face).
 		if (state->underlined)
 			face |= B_UNDERSCORE_FACE;
 	} else
@@ -349,6 +345,7 @@ SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius,
 
 	fTextView->SetText(NULL);
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &color);
+	fTextView->ResizeTo(fVideoBounds.Width(), fVideoBounds.Height());
 
 	fTextView->Insert(" ");
 	parse_text(fText, fTextView, font, color, true);
@@ -357,6 +354,7 @@ SubtitleBitmap::_InsertText(BRect& textRect, float& outlineRadius,
 	fShadowTextView->ForceFontAliasing(overlayMode);
 	fShadowTextView->SetText(NULL);
 	fShadowTextView->SetFontAndColor(&font, B_FONT_ALL, &shadow);
+	fShadowTextView->ResizeTo(fVideoBounds.Width(), fVideoBounds.Height());
 
 	fShadowTextView->Insert(" ");
 	parse_text(fText, fShadowTextView, font, shadow, false);

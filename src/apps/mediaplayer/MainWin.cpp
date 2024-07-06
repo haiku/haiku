@@ -1872,11 +1872,9 @@ MainWin::_SetupVideoAspectItems(BMenu* menu)
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(item = new BMenuItem("4 : 3",
-		new BMessage(M_ASPECT_4_3), 2, B_SHIFT_KEY));
+	menu->AddItem(item = new BMenuItem("4 : 3", new BMessage(M_ASPECT_4_3), '2', B_SHIFT_KEY));
 	item->SetMarked(fWidthAspect == 4 && fHeightAspect == 3);
-	menu->AddItem(item = new BMenuItem("16 : 9",
-		new BMessage(M_ASPECT_16_9), 3, B_SHIFT_KEY));
+	menu->AddItem(item = new BMenuItem("16 : 9", new BMessage(M_ASPECT_16_9), '3', B_SHIFT_KEY));
 	item->SetMarked(fWidthAspect == 16 && fHeightAspect == 9);
 
 	menu->AddSeparatorItem();
