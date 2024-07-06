@@ -10,9 +10,6 @@
 #include <String.h>
 
 
-class BFile;
-
-
 struct SubTitle {
 	BString		text;
 	BPoint		placement;

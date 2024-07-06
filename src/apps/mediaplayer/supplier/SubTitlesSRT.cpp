@@ -8,12 +8,45 @@
 
 #include <new>
 
+#include <stdio.h>
 #include <stdlib.h>
 
+#include <AutoDeleter.h>
 #include <File.h>
+#include <StringList.h>
 #include <TextEncoding.h>
 
-#include "FileReadWrite.h"
+
+static void
+ReadLines(BFile* file, BStringList& lines)
+{
+	if (file == NULL)
+		return;
+	if (file->InitCheck() != B_OK)
+		return;
+
+	off_t size;
+	if (file->GetSize(&size) != B_OK || size == 0)
+		return;
+
+	ArrayDeleter<char> buffer(new(std::nothrow) char[size + 1]);
+	if (!buffer.IsSet())
+		return;
+
+	if (file->Read(buffer.Get(), size) < size)
+		return;
+	buffer[size] = '\0';
+
+	BPrivate::BTextEncoding decoder(buffer.Get(), size);
+	size_t decodedLength = size * 4;
+	BString content;
+	char* decoded = content.LockBuffer(decodedLength);
+	size_t consumed = size;
+	decoder.Decode(buffer.Get(), consumed, decoded, decodedLength);
+	content.UnlockBuffer(decodedLength);
+
+	content.Split("\n", false, lines);
+}
 
 
 SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
@@ -22,13 +55,10 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 	fName(name),
 	fSubTitles(64)
 {
-	if (file == NULL)
-		return;
-	if (file->InitCheck() != B_OK)
-		return;
+	BStringList lines;
+	ReadLines(file, lines);
+	int32 totalLines = lines.CountStrings();
 
-	FileReadWrite lineProvider(file);
-	BString line;
 	enum {
 		EXPECT_SEQUENCE_NUMBER = 0,
 		EXPECT_TIME_CODE,
@@ -37,13 +67,10 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 
 	SubTitle subTitle;
 	int32 lastSequenceNumber = 0;
-	int32 currentLine = 0;
-
-	BPrivate::BTextEncoding* decoder = NULL;
 
 	int32 state = EXPECT_SEQUENCE_NUMBER;
-	while (lineProvider.Next(line)) {
-		line.RemoveAll("\n");
+	for (int32 currentLine = 0; currentLine < totalLines; currentLine++) {
+		BString line(lines.StringAt(currentLine));
 		line.RemoveAll("\r");
 		switch (state) {
 			case EXPECT_SEQUENCE_NUMBER:
@@ -127,26 +154,11 @@ SubTitlesSRT::SubTitlesSRT(BFile* file, const char* name)
 
 					state = EXPECT_SEQUENCE_NUMBER;
 				} else {
-					if (decoder == NULL) {
-						// We try to guess the encoding from the first line of
-						// text in the subtitle file.
-						decoder = new BPrivate::BTextEncoding(line.String(),
-							line.Length());
-					}
-					char buffer[line.Length() * 4];
-					size_t inLength = line.Length();
-					size_t outLength = line.Length() * 4;
-					decoder->Decode(line.String(), inLength, buffer, outLength);
-					buffer[outLength] = 0;
-					subTitle.text << buffer << '\n';
+					subTitle.text << line << '\n';
 				}
 				break;
 		}
-		line.SetTo("");
-		currentLine++;
 	}
-
-	delete decoder;
 }
 
 
@@ -167,15 +179,10 @@ SubTitlesSRT::Name() const
 const SubTitle*
 SubTitlesSRT::SubTitleAt(bigtime_t time) const
 {
-	int32 index = _IndexFor(time);
-	SubTitle* subTitle
-		= reinterpret_cast<SubTitle*>(fSubTitles.ItemAt(index));
-	if (subTitle != NULL && subTitle->startTime > time)
-		subTitle = reinterpret_cast<SubTitle*>(fSubTitles.ItemAt(index - 1));
-	if (subTitle != NULL && subTitle->startTime <= time
-		&& subTitle->startTime + subTitle->duration > time) {
+	int32 index = _IndexFor(time) - 1;
+	SubTitle* subTitle = reinterpret_cast<SubTitle*>(fSubTitles.ItemAt(index));
+	if (subTitle != NULL && subTitle->startTime + subTitle->duration > time)
 		return subTitle;
-	}
 	return NULL;
 }
 
@@ -197,6 +204,3 @@ SubTitlesSRT::_IndexFor(bigtime_t startTime) const
 	}
 	return lower;
 }
-
-
-
