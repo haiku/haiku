@@ -826,6 +826,10 @@ void
 TitledSeparatorItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
+
+	// Adjust for the extra space needed by the separator bars at the left and right
+	if (width)
+		*width += (kMinSeparatorStubX + kStubToStringSlotX) * 2;
 }
 
 
