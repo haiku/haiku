@@ -132,7 +132,7 @@ static status_t iterative_io_finished_hook(void* cookie, io_request* request, st
 
 static status_t _dosfs_sync(mount* volume, bool data = true);
 static status_t _dosfs_fsync(vnode* bsdNode);
-static status_t _dosfs_read_vnode(mount* bsdVolume, const ino_t id, vnode** newNode);
+static status_t _dosfs_read_vnode(mount* bsdVolume, const ino_t id, vnode** newNode, bool createFileCache = true);
 
 static status_t bsd_volume_init(fs_volume* fsVolume, const uint32 flags, mount** volume);
 status_t bsd_volume_uninit(mount* volume);
@@ -711,7 +711,7 @@ dosfs_read_vnode(fs_volume* volume, ino_t id, fs_vnode* vnode, int* _type, uint3
 
  */
 static status_t
-_dosfs_read_vnode(mount* bsdVolume, const ino_t id, vnode** newNode)
+_dosfs_read_vnode(mount* bsdVolume, const ino_t id, vnode** newNode, bool createFileCache)
 {
 	msdosfsmount* fatVolume = reinterpret_cast<msdosfsmount*>(bsdVolume->mnt_data);
 
@@ -737,14 +737,12 @@ _dosfs_read_vnode(mount* bsdVolume, const ino_t id, vnode** newNode)
 		if (status != B_OK)
 			REPORT_ERROR(status);
 
-		// We attempt to set up the file cache and file map now, but if this function was
-		// called directly by the filesystem, this will fail because the VFS is not aware of the
-		// node yet. In those cases, the file cache and file map need to be created
-		// after the client function (e.g. dosfs_create) calls publish_vnode.
-		bsdNode->v_cache
-			= file_cache_create(fatVolume->pm_dev->si_id, fatNode->de_inode, fatNode->de_FileSize);
-		bsdNode->v_file_map
-			= file_map_create(fatVolume->pm_dev->si_id, fatNode->de_inode, fatNode->de_FileSize);
+		if (createFileCache) {
+			bsdNode->v_cache
+				= file_cache_create(fatVolume->pm_dev->si_id, fatNode->de_inode, fatNode->de_FileSize);
+			bsdNode->v_file_map
+				= file_map_create(fatVolume->pm_dev->si_id, fatNode->de_inode, fatNode->de_FileSize);
+		}
 	}
 
 	// identify the parent directory
@@ -2102,7 +2100,7 @@ dosfs_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode, i
 
 	// set up the actual node
 	vnode* bsdNode;
-	status = _dosfs_read_vnode(bsdVolume, inode, &bsdNode);
+	status = _dosfs_read_vnode(bsdVolume, inode, &bsdNode, false);
 	if (status != B_OK)
 		RETURN_ERROR(status);
 	mode_t nodeType = 0;
@@ -2124,7 +2122,7 @@ dosfs_create(fs_volume* volume, fs_vnode* dir, const char* name, int openMode, i
 
 	status = publish_vnode(volume, inode, bsdNode, &gFATVnodeOps, nodeType, 0);
 
-	// This was attempted already in _dosfs_read_vnode. However, the node wasn't published yet,
+	// This is usually done in _dosfs_read_vnode. However, the node wasn't published yet,
 	// so it would not have worked there.
 	bsdNode->v_cache
 		= file_cache_create(fatVolume->pm_dev->si_id, fatNode->de_inode, fatNode->de_FileSize);
