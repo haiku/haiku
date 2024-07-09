@@ -11,7 +11,9 @@
 #include <assert.h>
 
 
+#ifndef LONGLONG_MAX
 #define LONGLONG_MAX LONG_LONG_MAX
+#endif
 
 #ifdef B_USE_POSITIVE_POSIX_ERRORS
 #define B_TO_POSIX_ERROR(error) (-(error))
