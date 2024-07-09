@@ -1405,7 +1405,7 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, char *name,
 	char buffer[sizeof(struct fssh_dirent) + FSSH_B_FILE_NAME_LENGTH];
 	struct fssh_dirent *dirent = (struct fssh_dirent *)buffer;
 
-	fssh_status_t status = get_vnode_name(vnode, parent, buffer, sizeof(buffer));
+	fssh_status_t status = get_vnode_name(vnode, parent, dirent, sizeof(buffer));
 	if (status != FSSH_B_OK)
 		return status;
 
