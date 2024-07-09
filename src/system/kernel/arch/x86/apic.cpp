@@ -39,14 +39,14 @@ x2apic_available()
 }
 
 
-uint32
+static uint32
 apic_read(uint32 offset)
 {
 	return *(volatile uint32 *)((char *)sLocalAPIC + offset);
 }
 
 
-void
+static void
 apic_write(uint32 offset, uint32 data)
 {
 	*(volatile uint32 *)((char *)sLocalAPIC + offset) = data;
