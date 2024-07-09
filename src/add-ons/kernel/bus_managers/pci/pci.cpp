@@ -1566,13 +1566,18 @@ PCI::ReadConfig(uint8 domain, uint8 bus, uint8 device, uint8 function,
 		|| (size != 1 && size != 2 && size != 4)
 		|| (size == 2 && (offset & 3) == 3)
 		|| (size == 4 && (offset & 3) != 0)) {
-		dprintf("PCI: can't read config for domain %d, bus %u, device %u, function %u, offset %u, size %u\n",
+		dprintf("PCI: can't read config for domain %d, %u:%u:%u, offset %u, size %u\n",
 			 domain, bus, device, function, offset, size);
 		return B_ERROR;
 	}
 
-	return (*info->controller->read_pci_config)(info->controller_cookie, bus,
-		device, function, offset, size, value);
+	status_t status = (*info->controller->read_pci_config)(info->controller_cookie,
+		bus, device, function, offset, size, value);
+	if (status != B_OK) {
+		dprintf("PCI: failed to read config for domain %d, %u:%u:%u, offset %u, size %u\n",
+			domain, bus, device, function, offset, size);
+	}
+	return status;
 }
 
 
