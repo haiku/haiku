@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src tools fat_shell ;
 
-# prevent inclusion of HaikuBuildCompatibility.h and BSD headers
-DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
+# prevent inclusion of HaikuBuildCompatibility.h
+DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 
 # set some additional defines
 {
@@ -10,12 +10,7 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
 		;
 	defines = [ FDefines $(defines) ] ;
 
-	local c++flags = 
-		-fno-rtti
-		;
-	if $(HOST_CC_IS_LEGACY_GCC) != 1 {
-		c++flags += -std=c++11 ;
-	}
+	local c++flags = -fno-rtti ;
 
 	SubDirCcFlags $(defines) [ FDefines _FSSH_AUTO_LOCKER_H=1 _FSSH_STACK_H=1 ] ;
 		# prevent inclusion of C++ headers
@@ -30,17 +25,17 @@ local commonSource ;
 
 include [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat JamCommon ] ;
 
-BuildPlatformMergeObject <build>fatfs.o 
-	: 
+BuildPlatformMergeObject <build>fatfs.o
+	:
 	$(commonSource)
 ;
 
 BuildPlatformMain <build>fat_shell
 	: :
 	<build>fatfs.o
-	<build>fs_shell.a 
+	<build>fs_shell.a
 	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
-	$(HOST_LIBROOT) 
+	$(HOST_LIBROOT)
 	$(fsShellCommandLibs)
 ;
 
@@ -49,6 +44,6 @@ BuildPlatformMain <build>fat_fuse
 	<build>fatfs.o
 	<build>fuse_module.a
 	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
-	$(HOST_STATIC_LIBROOT) 
+	$(HOST_STATIC_LIBROOT)
 	$(fsShellCommandLibs) fuse
 ;
