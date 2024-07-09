@@ -562,9 +562,10 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 		// immediately notify the select call
 		eventsToSelect &= ~SELECT_OUTPUT_ONLY_FLAGS;
 		if (eventsToSelect != 0)
-			return notify_select_events(info, eventsToSelect);
-		else
-			return B_OK;
+			notify_select_events(info, eventsToSelect);
+
+		info->selected_events = 0;
+		return B_UNSUPPORTED;
 	}
 
 	// We need the FD to stay open while we're doing this, so no select()/

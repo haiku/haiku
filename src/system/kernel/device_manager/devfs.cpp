@@ -1615,9 +1615,8 @@ devfs_select(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	// If the device has no select() hook, notify select() now.
 	if (!vnode->stream.u.dev.device->HasSelect()) {
 		if (!SELECT_TYPE_IS_OUTPUT_ONLY(event))
-			return notify_select_event((selectsync*)sync, event);
-		else
-			return B_OK;
+			notify_select_event((selectsync*)sync, event);
+		return B_UNSUPPORTED;
 	}
 
 	return vnode->stream.u.dev.device->Select(cookie->device_cookie, event,
@@ -1635,7 +1634,6 @@ devfs_deselect(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 	if (!S_ISCHR(vnode->stream.type))
 		return B_NOT_ALLOWED;
 
-	// If the device has no select() hook, notify select() now.
 	if (!vnode->stream.u.dev.device->HasDeselect())
 		return B_OK;
 
