@@ -184,14 +184,14 @@ ECAMPCIController::ReadConfig(uint8 bus, uint8 device, uint8 function,
 {
 	addr_t address = ConfigAddress(bus, device, function, offset);
 	if (address == 0)
-		return B_ERROR;
+		return ERANGE;
 
 	switch (size) {
 		case 1: value = ReadReg8(address); break;
 		case 2: value = ReadReg16(address); break;
 		case 4: value = *(vuint32*)address; break;
 		default:
-			return B_ERROR;
+			return B_BAD_VALUE;
 	}
 
 	return B_OK;
@@ -204,14 +204,14 @@ ECAMPCIController::WriteConfig(uint8 bus, uint8 device, uint8 function,
 {
 	addr_t address = ConfigAddress(bus, device, function, offset);
 	if (address == 0)
-		return B_ERROR;
+		return ERANGE;
 
 	switch (size) {
 		case 1: WriteReg8(address, value); break;
 		case 2: WriteReg16(address, value); break;
 		case 4: *(vuint32*)address = value; break;
 		default:
-			return B_ERROR;
+			return B_BAD_VALUE;
 	}
 
 	return B_OK;

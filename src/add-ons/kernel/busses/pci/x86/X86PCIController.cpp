@@ -190,7 +190,7 @@ X86PCIControllerMeth1::ReadConfig(
 	uint16 offset, uint8 size, uint32 &value)
 {
 	if (offset > 0xff)
-		return B_BAD_VALUE;
+		return ERANGE;
 
 	InterruptsSpinLocker lock(fLock);
 	out32(PCI_MECH1_REQ_DATA(bus, device, function, offset), PCI_MECH1_REQ_PORT);
@@ -205,7 +205,7 @@ X86PCIControllerMeth1::ReadConfig(
 			value = in32(PCI_MECH1_DATA_PORT);
 			break;
 		default:
-			return B_ERROR;
+			return B_BAD_VALUE;
 	}
 
 	return B_OK;
@@ -218,7 +218,7 @@ X86PCIControllerMeth1::WriteConfig(
 	uint16 offset, uint8 size, uint32 value)
 {
 	if (offset > 0xff)
-		return B_BAD_VALUE;
+		return ERANGE;
 
 	InterruptsSpinLocker lock(fLock);
 	out32(PCI_MECH1_REQ_DATA(bus, device, function, offset), PCI_MECH1_REQ_PORT);
@@ -233,7 +233,7 @@ X86PCIControllerMeth1::WriteConfig(
 			out32(value, PCI_MECH1_DATA_PORT);
 			break;
 		default:
-			return B_ERROR;
+			return B_BAD_VALUE;
 	}
 
 	return B_OK;
@@ -273,7 +273,7 @@ X86PCIControllerMeth2::ReadConfig(
 	uint16 offset, uint8 size, uint32 &value)
 {
 	if (offset > 0xff)
-		return B_BAD_VALUE;
+		return ERANGE;
 
 	InterruptsSpinLocker lock(fLock);
 	out8((uint8)(0xf0 | (function << 1)), PCI_MECH2_ENABLE_PORT);
@@ -289,7 +289,7 @@ X86PCIControllerMeth2::ReadConfig(
 			value = in32(PCI_MECH2_CONFIG_PORT(device, offset));
 			break;
 		default:
-			return B_ERROR;
+			return B_BAD_VALUE;
 	}
 	out8(0, PCI_MECH2_ENABLE_PORT);
 
@@ -303,7 +303,7 @@ X86PCIControllerMeth2::WriteConfig(
 	uint16 offset, uint8 size, uint32 value)
 {
 	if (offset > 0xff)
-		return B_BAD_VALUE;
+		return ERANGE;
 
 	InterruptsSpinLocker lock(fLock);
 	out8((uint8)(0xf0 | (function << 1)), PCI_MECH2_ENABLE_PORT);
@@ -319,7 +319,7 @@ X86PCIControllerMeth2::WriteConfig(
 			out32(value, PCI_MECH2_CONFIG_PORT(device, offset));
 			break;
 		default:
-			return B_ERROR;
+			return B_BAD_VALUE;
 	}
 	out8(0, PCI_MECH2_ENABLE_PORT);
 
