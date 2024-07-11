@@ -135,7 +135,7 @@ ICUTimeData::SetTo(const Locale& locale, const char* posixLocaleName)
 	if (result == B_OK) {
 		try {
 			DateFormat* format = DateFormat::createDateTimeInstance(
-				DateFormat::kFull, DateFormat::kFull, fLocale);
+				DateFormat::kDefault, DateFormat::kDefault, fLocale);
 			result = _SetLCTimePattern(format, fDateTimeFormat,
 				sizeof(fDateTimeFormat));
 			delete format;
