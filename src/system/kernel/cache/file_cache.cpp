@@ -1053,7 +1053,7 @@ cache_prefetch(dev_t mountID, ino_t vnodeID, off_t offset, size_t size)
 
 
 extern "C" void
-cache_node_opened(struct vnode* vnode, int32 fdType, VMCache* cache,
+cache_node_opened(struct vnode* vnode, VMCache* cache,
 	dev_t mountID, ino_t parentID, ino_t vnodeID, const char* name)
 {
 	if (sCacheModule == NULL || sCacheModule->node_opened == NULL)
@@ -1066,13 +1066,13 @@ cache_node_opened(struct vnode* vnode, int32 fdType, VMCache* cache,
 			size = cache->virtual_end;
 	}
 
-	sCacheModule->node_opened(vnode, fdType, mountID, parentID, vnodeID, name,
+	sCacheModule->node_opened(vnode, mountID, parentID, vnodeID, name,
 		size);
 }
 
 
 extern "C" void
-cache_node_closed(struct vnode* vnode, int32 fdType, VMCache* cache,
+cache_node_closed(struct vnode* vnode, VMCache* cache,
 	dev_t mountID, ino_t vnodeID)
 {
 	if (sCacheModule == NULL || sCacheModule->node_closed == NULL)
@@ -1083,7 +1083,7 @@ cache_node_closed(struct vnode* vnode, int32 fdType, VMCache* cache,
 		// ToDo: set accessType
 	}
 
-	sCacheModule->node_closed(vnode, fdType, mountID, vnodeID, accessType);
+	sCacheModule->node_closed(vnode, mountID, vnodeID, accessType);
 }
 
 

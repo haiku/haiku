@@ -549,7 +549,7 @@ EventQueue::_GetEvent(int32 object, uint16 type)
 static status_t
 event_queue_close(file_descriptor* descriptor)
 {
-	EventQueue* queue = (EventQueue*)descriptor->u.queue;
+	EventQueue* queue = (EventQueue*)descriptor->cookie;
 	queue->Closed();
 	return B_OK;
 }
@@ -558,27 +558,8 @@ event_queue_close(file_descriptor* descriptor)
 static void
 event_queue_free(file_descriptor* descriptor)
 {
-	EventQueue* queue = (EventQueue*)descriptor->u.queue;
+	EventQueue* queue = (EventQueue*)descriptor->cookie;
 	put_select_sync(queue);
-}
-
-
-static status_t
-get_queue_descriptor(int fd, bool kernel, file_descriptor*& descriptor)
-{
-	if (fd < 0)
-		return B_FILE_ERROR;
-
-	descriptor = get_fd(get_current_io_context(kernel), fd);
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	if (descriptor->type != FDTYPE_EVENT_QUEUE) {
-		put_fd(descriptor);
-		return B_BAD_VALUE;
-	}
-
-	return B_OK;
 }
 
 
@@ -607,6 +588,25 @@ static struct fd_ops sEventQueueFDOps = {
 };
 
 
+static status_t
+get_queue_descriptor(int fd, bool kernel, file_descriptor*& descriptor)
+{
+	if (fd < 0)
+		return B_FILE_ERROR;
+
+	descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (descriptor->ops != &sEventQueueFDOps) {
+		put_fd(descriptor);
+		return B_BAD_VALUE;
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark - User syscalls
 
 
@@ -623,9 +623,8 @@ _user_event_queue_create(int openFlags)
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
 
-	descriptor->type = FDTYPE_EVENT_QUEUE;
 	descriptor->ops = &sEventQueueFDOps;
-	descriptor->u.queue = (struct event_queue*)queue;
+	descriptor->cookie = (struct event_queue*)queue;
 	descriptor->open_mode = O_RDWR | openFlags;
 
 	io_context* context = get_current_io_context(false);
@@ -660,7 +659,7 @@ _user_event_queue_select(int queue, event_wait_info* userInfos, int numInfos)
 	GET_QUEUE_FD_OR_RETURN(queue, false, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	EventQueue* eventQueue = (EventQueue*)descriptor->u.queue;
+	EventQueue* eventQueue = (EventQueue*)descriptor->cookie;
 
 	if (user_memcpy(infos, userInfos, sizeof(event_wait_info) * numInfos) != B_OK)
 		return B_BAD_ADDRESS;
@@ -713,7 +712,7 @@ _user_event_queue_wait(int queue, event_wait_info* userInfos, int numInfos,
 	GET_QUEUE_FD_OR_RETURN(queue, false, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	EventQueue* eventQueue = (EventQueue*)descriptor->u.queue;
+	EventQueue* eventQueue = (EventQueue*)descriptor->cookie;
 
 	ssize_t result = eventQueue->Wait(infos, numInfos, flags, timeout);
 	if (result < 0)

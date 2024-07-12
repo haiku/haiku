@@ -2785,8 +2785,28 @@ fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 }
 
 
+struct vnode*
+fd_vnode(struct file_descriptor* descriptor)
+{
+	if (descriptor->ops == &sFileOps
+			|| descriptor->ops == &sDirectoryOps
+			|| descriptor->ops == &sAttributeOps
+			|| descriptor->ops == &sAttributeDirectoryOps)
+		return descriptor->u.vnode;
+
+	return NULL;
+}
+
+
+bool
+fd_is_file(struct file_descriptor* descriptor)
+{
+	return descriptor->ops == &sFileOps;
+}
+
+
 static int
-get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
+get_new_fd(struct fd_ops* ops, struct fs_mount* mount, struct vnode* vnode,
 	void* cookie, int openMode, bool kernel)
 {
 	struct file_descriptor* descriptor;
@@ -2795,7 +2815,7 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 	// If the vnode is locked, we don't allow creating a new file/directory
 	// file_descriptor for it
 	if (vnode && vnode->mandatory_locked_by != NULL
-		&& (type == FDTYPE_FILE || type == FDTYPE_DIR))
+		&& (ops == &sFileOps || ops == &sDirectoryOps))
 		return B_BUSY;
 
 	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
@@ -2811,34 +2831,7 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 		descriptor->u.mount = mount;
 	descriptor->cookie = cookie;
 
-	switch (type) {
-		// vnode types
-		case FDTYPE_FILE:
-			descriptor->ops = &sFileOps;
-			break;
-		case FDTYPE_DIR:
-			descriptor->ops = &sDirectoryOps;
-			break;
-		case FDTYPE_ATTR:
-			descriptor->ops = &sAttributeOps;
-			break;
-		case FDTYPE_ATTR_DIR:
-			descriptor->ops = &sAttributeDirectoryOps;
-			break;
-
-		// mount types
-		case FDTYPE_INDEX_DIR:
-			descriptor->ops = &sIndexDirectoryOps;
-			break;
-		case FDTYPE_QUERY:
-			descriptor->ops = &sQueryOps;
-			break;
-
-		default:
-			panic("get_new_fd() called with unknown type %d\n", type);
-			break;
-	}
-	descriptor->type = type;
+	descriptor->ops = ops;
 	descriptor->open_mode = openMode;
 
 	if (descriptor->ops->fd_seek != NULL) {
@@ -3376,7 +3369,7 @@ dump_io_context(int argc, char** argv)
 	kprintf(" max fds:\t%" B_PRIu32 "\n", context->table_size);
 
 	if (context->num_used_fds) {
-		kprintf("   no.  type    %*s  ref  open  mode         pos    %*s\n",
+		kprintf("   no.    %*s  ref  open  mode         pos    %*s\n",
 			B_PRINTF_POINTER_WIDTH, "ops", B_PRINTF_POINTER_WIDTH, "cookie");
 	}
 
@@ -3385,12 +3378,11 @@ dump_io_context(int argc, char** argv)
 		if (fd == NULL)
 			continue;
 
-		kprintf("  %3" B_PRIu32 ":  %4" B_PRId32 "  %p  %3" B_PRId32 "  %4"
+		kprintf("  %3" B_PRIu32 ":  %p  %3" B_PRId32 "  %4"
 			B_PRIu32 "  %4" B_PRIx32 "  %10" B_PRIdOFF "  %p  %s %p\n", i,
-			fd->type, fd->ops, fd->ref_count, fd->open_count, fd->open_mode,
+			fd->ops, fd->ref_count, fd->open_count, fd->open_mode,
 			fd->pos, fd->cookie,
-			fd->type >= FDTYPE_INDEX && fd->type <= FDTYPE_QUERY
-				? "mount" : "vnode",
+			(fd_vnode(fd) != NULL) ? "vnode" : "mount",
 			fd->u.vnode);
 	}
 
@@ -5361,7 +5353,7 @@ open_vnode(struct vnode* vnode, int openMode, bool kernel)
 	if (status != B_OK)
 		return status;
 
-	int fd = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel);
+	int fd = get_new_fd(&sFileOps, NULL, vnode, cookie, openMode, kernel);
 	if (fd < 0) {
 		FS_CALL(vnode, close, cookie);
 		FS_CALL(vnode, free_cookie, cookie);
@@ -5476,7 +5468,7 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 		return B_BAD_VALUE;
 	}
 
-	int fd = get_new_fd(FDTYPE_FILE, NULL, vnode.Get(), cookie, openMode, kernel);
+	int fd = get_new_fd(&sFileOps, NULL, vnode.Get(), cookie, openMode, kernel);
 	if (fd >= 0) {
 		vnode.Detach();
 		return fd;
@@ -5510,7 +5502,7 @@ open_dir_vnode(struct vnode* vnode, bool kernel)
 		return status;
 
 	// directory is opened, create a fd
-	status = get_new_fd(FDTYPE_DIR, NULL, vnode, cookie, O_CLOEXEC, kernel);
+	status = get_new_fd(&sDirectoryOps, NULL, vnode, cookie, O_CLOEXEC, kernel);
 	if (status >= 0)
 		return status;
 
@@ -5537,7 +5529,7 @@ open_attr_dir_vnode(struct vnode* vnode, bool kernel)
 		return status;
 
 	// directory is opened, create a fd
-	status = get_new_fd(FDTYPE_ATTR_DIR, NULL, vnode, cookie, O_CLOEXEC,
+	status = get_new_fd(&sAttributeDirectoryOps, NULL, vnode, cookie, O_CLOEXEC,
 		kernel);
 	if (status >= 0)
 		return status;
@@ -5611,7 +5603,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char* name,
 
 	int newFD = open_vnode(vnode.Get(), openMode, kernel);
 	if (newFD >= 0) {
-		cache_node_opened(vnode.Get(), FDTYPE_FILE, vnode->cache, mountID,
+		cache_node_opened(vnode.Get(), vnode->cache, mountID,
 			directoryID, vnode->id, name);
 
 		// The vnode reference has been transferred to the FD
@@ -5644,7 +5636,7 @@ file_open(int fd, char* path, int openMode, bool kernel)
 	// open the vnode
 	int newFD = open_vnode(vnode.Get(), openMode, kernel);
 	if (newFD >= 0) {
-		cache_node_opened(vnode.Get(), FDTYPE_FILE, vnode->cache,
+		cache_node_opened(vnode.Get(), vnode->cache,
 			vnode->device, parentID, vnode->id, NULL);
 
 		// The vnode reference has been transferred to the FD
@@ -5663,7 +5655,7 @@ file_close(struct file_descriptor* descriptor)
 
 	FUNCTION(("file_close(descriptor = %p)\n", descriptor));
 
-	cache_node_closed(vnode, FDTYPE_FILE, vnode->cache, vnode->device,
+	cache_node_closed(vnode, vnode->cache, vnode->device,
 		vnode->id);
 	if (HAS_FS_CALL(vnode, close)) {
 		status = FS_CALL(vnode, close, descriptor->cookie);
@@ -5942,7 +5934,7 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char* name, bool kernel)
 
 	int newFD = open_dir_vnode(vnode.Get(), kernel);
 	if (newFD >= 0) {
-		cache_node_opened(vnode.Get(), FDTYPE_DIR, vnode->cache, mountID, parentID,
+		cache_node_opened(vnode.Get(), vnode->cache, mountID, parentID,
 			vnode->id, name);
 
 		// The vnode reference has been transferred to the FD
@@ -5970,7 +5962,7 @@ dir_open(int fd, char* path, bool kernel)
 	// open the dir
 	int newFD = open_dir_vnode(vnode.Get(), kernel);
 	if (newFD >= 0) {
-		cache_node_opened(vnode.Get(), FDTYPE_DIR, vnode->cache, vnode->device,
+		cache_node_opened(vnode.Get(), vnode->cache, vnode->device,
 			parentID, vnode->id, NULL);
 
 		// The vnode reference has been transferred to the FD
@@ -5988,7 +5980,7 @@ dir_close(struct file_descriptor* descriptor)
 
 	FUNCTION(("dir_close(descriptor = %p)\n", descriptor));
 
-	cache_node_closed(vnode, FDTYPE_DIR, vnode->cache, vnode->device,
+	cache_node_closed(vnode, vnode->cache, vnode->device,
 		vnode->id);
 	if (HAS_FS_CALL(vnode, close_dir))
 		return FS_CALL(vnode, close_dir, descriptor->cookie);
@@ -6166,7 +6158,7 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 	status_t status = B_OK;
 
 	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
-		if (descriptor->type != FDTYPE_FILE)
+		if (descriptor->ops != &sFileOps)
 			status = B_BAD_VALUE;
 		else if (kernel)
 			memcpy(&flock, (struct flock*)argument, sizeof(struct flock));
@@ -6780,7 +6772,7 @@ attr_create(int fd, char* path, const char* name, uint32 type,
 	if (status != B_OK)
 		return status;
 
-	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode.Get(), cookie, openMode, kernel);
+	fd = get_new_fd(&sAttributeOps, NULL, vnode.Get(), cookie, openMode, kernel);
 	if (fd >= 0) {
 		vnode.Detach();
 		return fd;
@@ -6822,7 +6814,7 @@ attr_open(int fd, char* path, const char* name, int openMode, bool kernel)
 		return status;
 
 	// now we only need a file descriptor for this attribute and we're done
-	fd = get_new_fd(FDTYPE_ATTR, NULL, vnode.Get(), cookie, openMode, kernel);
+	fd = get_new_fd(&sAttributeOps, NULL, vnode.Get(), cookie, openMode, kernel);
 	if (fd >= 0) {
 		vnode.Detach();
 		return fd;
@@ -7050,7 +7042,7 @@ index_dir_open(dev_t mountID, bool kernel)
 
 	// get fd for the index directory
 	int fd;
-	fd = get_new_fd(FDTYPE_INDEX_DIR, mount, NULL, cookie, O_CLOEXEC, kernel);
+	fd = get_new_fd(&sIndexDirectoryOps, mount, NULL, cookie, O_CLOEXEC, kernel);
 	if (fd >= 0)
 		return fd;
 
@@ -7253,7 +7245,7 @@ query_open(dev_t device, const char* query, uint32 flags, port_id port,
 
 	// get fd for the index directory
 	int fd;
-	fd = get_new_fd(FDTYPE_QUERY, mount, NULL, cookie, O_CLOEXEC, kernel);
+	fd = get_new_fd(&sQueryOps, mount, NULL, cookie, O_CLOEXEC, kernel);
 	if (fd >= 0)
 		return fd;
 
@@ -9223,7 +9215,7 @@ _user_flock(int fd, int operation)
 	if (!descriptor.IsSet())
 		return B_FILE_ERROR;
 
-	if (descriptor->type != FDTYPE_FILE)
+	if (descriptor->ops != &sFileOps)
 		return B_BAD_VALUE;
 
 	struct flock flock;

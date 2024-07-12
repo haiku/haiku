@@ -709,7 +709,7 @@ SessionGetter::Stop()
 
 
 static void
-node_opened(struct vnode *vnode, int32 fdType, dev_t device, ino_t parent,
+node_opened(struct vnode *vnode, dev_t device, ino_t parent,
 	ino_t node, const char *name, off_t size)
 {
 	if (device < gBootDevice) {
@@ -744,7 +744,7 @@ node_opened(struct vnode *vnode, int32 fdType, dev_t device, ino_t parent,
 
 
 static void
-node_closed(struct vnode *vnode, int32 fdType, dev_t device, ino_t node,
+node_closed(struct vnode *vnode, dev_t device, ino_t node,
 	int32 accessType)
 {
 	Session *session;

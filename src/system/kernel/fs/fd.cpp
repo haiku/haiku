@@ -205,7 +205,7 @@ void
 close_fd(struct io_context* context, struct file_descriptor* descriptor)
 {
 	// POSIX advisory locks need to be released when any file descriptor closes
-	if (descriptor->type == FDTYPE_FILE)
+	if (fd_is_file(descriptor))
 		vfs_release_posix_lock(context, descriptor);
 
 	if (atomic_add(&descriptor->open_count, -1) == 1) {
@@ -683,21 +683,6 @@ fd_is_valid(int fd, bool kernel)
 }
 
 
-struct vnode*
-fd_vnode(struct file_descriptor* descriptor)
-{
-	switch (descriptor->type) {
-		case FDTYPE_FILE:
-		case FDTYPE_DIR:
-		case FDTYPE_ATTR_DIR:
-		case FDTYPE_ATTR:
-			return descriptor->u.vnode;
-	}
-
-	return NULL;
-}
-
-
 static ssize_t
 common_vector_io(int fd, off_t pos, const iovec* vecs, size_t count, bool write, bool kernel)
 {
@@ -728,7 +713,7 @@ common_vector_io(int fd, off_t pos, const iovec* vecs, size_t count, bool write,
 	// for vnodes that have no cache, as the I/O hook bypasses the cache entirely.
 	struct vnode* vnode = descriptor->u.vnode;
 	status_t status = B_OK;
-	if (!movePosition && pos != -1 && count > 1 && descriptor->type == FDTYPE_FILE
+	if (!movePosition && pos != -1 && count > 1 && fd_is_file(descriptor.Get())
 			&& vnode != NULL && vnode->cache == NULL && vnode->ops->io != NULL) {
 		BStackOrHeapArray<generic_io_vec, 8> iovecs(count);
 		if (!iovecs.IsValid())
