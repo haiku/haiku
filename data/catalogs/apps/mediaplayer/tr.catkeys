@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaPlayer	171477831
+1	turkish	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcısı ayarları
 Copyright	MediaPlayer-InfoWin		Telif hakkı
 Invalid URL inserted!	MediaPlayer-NetworkStream		Geçersiz URL girildi!
 Aspect ratio	MediaPlayer-Main		En boy oranı
+Eject device	MediaPlayer-Main		Aygıtı çıkar
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Oynatma listesi kaydedilemedi.\n\nHata: 
 <no media>	MediaPlayer-InfoWin		<ortam yok>
 Hide interface	MediaPlayer-Main		Arayüzü gizle
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Tam ekran
 OK	MediaPlayer-NetworkStream		Tamam
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		İç hata (kilitleme başarısız). Oynatma listesi kaydedilemedi.
 100% scale	MediaPlayer-Main		%100 ölçek
+New player	MediaPlayer-Main		Yeni oynatıcı
 <nothing to redo>	MediaPlayer-PlaylistWindow		<yinelenecek bir şey yok>
 Bad URL	MediaPlayer-NetworkStream		Kötü URL
 Save	MediaPlayer-Main		Kaydet

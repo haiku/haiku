@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Magnify	1465621918
+1	turkish	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  boyut > 4 ve 4’ün bir katı olmalıdır
 Decrease pixel size	Magnify-Main		Piksel boyutunu azalt
 no clip msg	In console, when clipboard is empty after clicking Copy image		pano boş
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Pencere boyutunu artır
 Save image	Magnify-Main		Görseli kaydet
 Show grid	Magnify-Main		Izgarayı göster
 Magnify	System name		Ekranı Büyüt
+height	Magnify-Main		yükseklik
+width	Magnify-Main		genişlik
 Info	Magnify-Main		Bilgi
 Show info	Magnify-Main		Bilgi ver
 Make square	Magnify-Main		Kare yap

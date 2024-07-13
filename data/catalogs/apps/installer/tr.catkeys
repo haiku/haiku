@@ -5,7 +5,7 @@ No optional packages available.	PackagesView		İsteğe bağlı paket yok.
 This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Bu işletim sistemi, Be Dosya Sistemi kullanan bir bölüntüye kurulmalı; ancak sisteminizde böyle bir bölüntü yok.
 The mount point could not be retrieved.	InstallProgress		Bağlama noktası bulunup getirilemedi.
 <none>	InstallerWindow	No partition available	<yok>
-Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Bilgisayarı yeniden başlatmak için ‘Yeniden başlat’a tıklayın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Bilgisayarı yeniden başlatmak için “Yeniden başlat”a tıklayın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
 Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Haiku, Be Dosya Sistemi kullanan bir bölüntüye kurulmalı; ancak sisteminizde böyle bir bölüntü yok.
 Please choose target	InstallerWindow		Lütfen hedef seçin
 BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Önyükleme Yöneticisi başlatılamadı.
@@ -13,20 +13,20 @@ Cancel	InstallProgress		Vazgeç
 Are you sure you want to to stop the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
 Installer	System name		Haiku Kur
 Unknown Type	InstallProgress	Partition content type	Bilinmeyen tür
-Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		“1%s” → “%2s” kurulumunu başlatmak için ‘Başlat’a basın.
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		“1%s” → “%2s” kurulumunu başlatmak için “Başlat”a basın.
 Are you sure you want to stop the installation?	InstallerWindow		Kurulumu durdurmak istediğinizden emin misiniz?
 README	InstallerApp		BENİOKU
 Quit	InstallerWindow		Çık
 Please close the BootManager window before closing the Installer window.	InstallerWindow		Haiku Kur penceresini kapatmadan önce Önyükleme Yöneticisi penceresini kapatın.
 Write boot sector to '%s'	InstallerWindow		Önyükleme alanını “%s” içine yaz
 Boot sector not written because of an internal error.	InstallProgress		Bir iç hatadan dolayı önyükleme alanı yazılamadı.
-Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Açılır menülerden kaynak ve hedef diski seçin. Sonrasında ‘Başlat’a tıklayın.
+Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Açılır menülerden kaynak ve hedef diski seçin. Sonrasında “Başlat”a tıklayın.
 Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Önyükleme Yöneticisi ve Disk İzlencesi çalışıyor…\n\nKurulumu sürdürmek için her iki uygulamayı da kapatın.
-Click on 'Set up partitions…' to create one.	InstallerWindow		Bir tane oluşturmak için ‘Bölüntüleri ayarla…’ya tıklayın.
+Click on 'Set up partitions…' to create one.	InstallerWindow		Bir tane oluşturmak için “Bölüntüleri ayarla…”ya tıklayın.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Haiku Kur’a hoş geldiniz!\n\n
 ?? of ??	InstallerWindow	Unknown progress	??/??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Disk İzlencesi açılamadı.
-Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Haiku Kur’dan çıkmak için ‘Çık’a tıklayın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Kurulum tamamlandı. Önyükleme dilimi “%s” konumuna yazıldı. Haiku Kur’dan çıkmak için “Çık”a tıklayın veya başka bir kurulum gerçekleştirmek için yeni bir hedef bölüm seçin.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Hedef disk boş değil; halihazırda bir Haiku kurulumu içeriyorsa üzerine yazılır. Bu işlem tüm kurulu yazılımları kaldırır.\n\nSisteminizi, kurulu yazılımları kaldırmadan güncellemek istiyorsanız güncelleme yönergeleri için Haiku Kullanıcı Kılavuzu’nun “Yazılım Güncelleyicisi” bölümüne bakın.\n\nKurulumu sürdürmek istediğinizden emin misiniz?
 Quit DriveSetup	InstallerWindow		Disk İzlencesi’nden çık
 Write boot sector	InstallerWindow		Önyükleme alanını yaz
@@ -38,7 +38,7 @@ This is beta-quality software! It means there is a risk of losing important data
 ???	InstallerWindow	Unknown currently copied item	???
 Install anyway	InstallProgress		Yine de kur
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Haiku’yu bir öykünücü değil de gerçek bir makineye kuruyorsanız başka işletim sistemleri için bir disk bölüntüsü bırakmak isteyebilirsiniz (bunun için örneğin GParted Canlı CD sürümünü kullanabilirsiniz, bu sürüm var olan bölüntülerin de boyutunu değiştirebilir).\nEğer isterseniz disk bölüntüleme için Disk İzlencesi uygulamasını Haiku Kur içinden çalıştırabilirsiniz; ancak bu yazılım var olan bölüntülerin boyutunu değiştiremez. Disk İzlencesi uzun yıllardır kullanılan sınanmış bir yazılım olmasına rağmen diğer disk bölüntülerinin güncel bir yedeğine sahip olmanız tavsiye edilir. N’olur n’olmaz…
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Haiku Kur, Haiku bölüntüsünü önyüklenebilir yapar; ancak Haiku’yu var olan bir önyükleme menüsüne eklemez. Sisteminizde GRUB yüklüyse Haiku’yu ona ekleyebilirsiniz.\nAyrıntılar için Haiku web sitesindeki önyükleme kılavuzuna bakabilirsiniz: https://www.haiku-os.org/guides/booting.\nBunun yanında, Haiku Kur’un ‘Araçlar’ menüsünden bir önyükleme menüsü ayarlanabilir. Ek bilgi için Haiku Kullanıcı Kılavuzu’nun “Önyükleme Yöneticisi” bölümüne bakın.\n\n\n
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Haiku Kur, Haiku bölüntüsünü önyüklenebilir yapar; ancak Haiku’yu var olan bir önyükleme menüsüne eklemez. Sisteminizde GRUB yüklüyse Haiku’yu ona ekleyebilirsiniz.\nAyrıntılar için Haiku web sitesindeki önyükleme kılavuzuna bakabilirsiniz: https://www.haiku-os.org/guides/booting.\nBunun yanında, Haiku Kur’un “Araçlar” menüsünden bir önyükleme menüsü ayarlanabilir. Ek bilgi için Haiku Kullanıcı Kılavuzu’nun “Önyükleme Yöneticisi” bölümüne bakın.\n\n\n
 Hide optional packages	InstallerWindow		İsteğe bağlı paketleri gizle
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Haiku’yu denediğiniz için teşekkür ederiz!
@@ -76,12 +76,12 @@ Set up partitions…	InstallerWindow		Bölüntüleri ayarla…
 Install progress:  	InstallerWindow		Kuruluyor:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Bir diskin içeriğini kendi üzerine kuramazsınız. Lütfen başka bir disk seçin.
 Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haiku Kur penceresini kapatmadan önce lütfen Önyükleme Yöneticisi ve Disk İzlencesi pencerelerini kapatın.
-Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Açılır menüden kaynak diski seçin. Sonrasında ‘Başlat’a tıklayın.
+Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Açılır menüden kaynak diski seçin. Sonrasında “Başlat”a tıklayın.
 OK	InstallProgress		Tamam
 Quit BootManager	InstallerWindow		Önyükleme Yöneticisi’nden Çık
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Geçerli önyükleme diskine kurmak istediğinizden emin misiniz? Haiku Kur, makinenizi yeniden başlatacaktır.
 Onto:	InstallerWindow		Şuraya:
 Tools	InstallerWindow		Araçlar
 scanning…	InstallerWindow		taranıyor…
-Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Açılır menüden üzerine kurmak istediğiniz diski seçin. Sonrasında ‘Başlat’a tıklayın.
+Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Açılır menüden üzerine kurmak istediğiniz diski seçin. Sonrasında “Başlat”a tıklayın.
 Continue	InstallerApp		Sürdür

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ShowImage	1148406263
+1	turkish	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Görsel Görüntüleyicisi
 Page setup…	Menus		Sayfa yapısı…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		“%s” belgesi (sayfa %d) değiştirildi. Belgeyi kapatmak istiyor musunuz?
@@ -39,6 +39,7 @@ OK	SaveToFile		Tamam
 Print…	Menus		Yazdır…
 The file '%s' could not be written.	SaveToFile		“%s” dosyası yazılamadı.
 Quit	Menus		Çık
+Get info	Menus		Bilgi al
 Rating	Menus		Derecelendirme
 Close document	ClosePrompt		Belgeyi kapat
 Stretch to window	Menus		Pencereye gerdir

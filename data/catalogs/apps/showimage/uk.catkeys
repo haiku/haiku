@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	1148406263
+1	ukrainian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		ShowImage
 Page setup…	Menus		Налаштування сторінки…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ «%s» (сторінка %d) був змінений. Закрити його?
@@ -39,6 +39,7 @@ OK	SaveToFile		ОК
 Print…	Menus		Друк…
 The file '%s' could not be written.	SaveToFile		Файл «%s» не може бути записаний.
 Quit	Menus		Вийти
+Get info	Menus		Дивитись інфо
 Rating	Menus		Оцінка
 Close document	ClosePrompt		Закрити документ
 Stretch to window	Menus		Розтягнути по вікну
