@@ -253,7 +253,7 @@ CharacterView::AttachedToWindow()
 {
 	Window()->AddShortcut('C', B_SHIFT_KEY,
 		new BMessage(kMsgCopyAsEscapedString), this);
-	SetViewColor(255, 255, 255, 255);
+	SetViewUIColor(B_LIST_BACKGROUND_COLOR);
 	SetLowColor(ViewColor());
 }
 
@@ -514,11 +514,14 @@ CharacterView::Draw(BRect updateRect)
 	BFont font;
 	GetFont(&font);
 
-	rgb_color color = (rgb_color){0, 0, 0, 255};
-	rgb_color highlight = (rgb_color){220, 220, 220, 255};
-	rgb_color enclose = mix_color(highlight,
-		ui_color(B_CONTROL_HIGHLIGHT_COLOR), 128);
-	rgb_color disabled = disable_color(color, ViewColor());
+	rgb_color color = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	rgb_color highlight = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	rgb_color enclose = mix_color(highlight, ui_color(B_CONTROL_HIGHLIGHT_COLOR), 128);
+	rgb_color disabled = tint_color(disable_color(color, ViewColor()),
+		color.IsLight() ? B_LIGHTEN_1_TINT : B_DARKEN_2_TINT);
+	rgb_color selected = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+	rgb_color selectedDisabled = tint_color(disable_color(selected, ViewColor()),
+		selected.IsLight() ? B_LIGHTEN_1_TINT : B_DARKEN_2_TINT);
 
 	for (int32 i = _BlockAt(updateRect.LeftTop()); i < (int32)kNumUnicodeBlocks;
 			i++) {
@@ -541,7 +544,8 @@ CharacterView::Draw(BRect updateRect)
 			if (y + fCharacterHeight > updateRect.top
 				&& y < updateRect.bottom) {
 				// Stroke frame around the active character
-				if (fHasCharacter && fCurrentCharacter == c) {
+				bool selection = fHasCharacter && fCurrentCharacter == c;
+				if (selection) {
 					SetHighColor(highlight);
 					FillRect(BRect(x, y, x + fCharacterWidth,
 						y + fCharacterHeight - fGap));
@@ -554,7 +558,11 @@ CharacterView::Draw(BRect updateRect)
 				char character[5];
 				UnicodeToUTF8(c, character, sizeof(character));
 
-				SetHighColor(_HasGlyphForCharacter(character) ? color : disabled);
+				if (selection)
+					SetHighColor(_HasGlyphForCharacter(character) ? selected : selectedDisabled);
+				else
+					SetHighColor(_HasGlyphForCharacter(character) ? color : disabled);
+
 				DrawString(character,
 					BPoint(x + (fCharacterWidth - StringWidth(character)) / 2,
 						y + fCharacterBase));
