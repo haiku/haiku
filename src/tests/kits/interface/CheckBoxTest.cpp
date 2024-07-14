@@ -66,7 +66,7 @@ class Window : public BWindow {
 
 
 Window::Window()
-	: BWindow(BRect(100, 100, 520, 430), "CheckBox-Test",
+	: BWindow(BRect(100, 100, 520, 550), "CheckBox-Test",
 			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BRect rect(20, 10, 200, 30);
@@ -75,7 +75,7 @@ Window::Window()
 	AddChild(stringView);
 
 	rect.OffsetBy(0, 40);
-	BView *checkBox = new BCheckBox(rect, NULL, "Test 1", NULL);
+	BControl *checkBox = new BCheckBox(rect, NULL, "Test 1", NULL);
 	AddChild(checkBox);
 
 	rect.OffsetBy(0, 60);
@@ -110,6 +110,18 @@ Window::Window()
 	checkBox = new BCheckBox(rect.OffsetToCopy(15, 15), NULL, "Test 5", NULL);
 	checkBox->ResizeToPreferred();
 	view->AddChild(checkBox);
+
+	rect.OffsetBy(0, 60);
+	checkBox = new BCheckBox(rect.OffsetByCopy(15, 15), NULL, "Test 6", NULL);
+	checkBox->SetValue(B_CONTROL_PARTIALLY_ON);
+	AddChild(checkBox);
+
+	rect.OffsetBy(0, 60);
+	checkBox = new BCheckBox(rect.OffsetByCopy(15, 15), NULL, "Test 7", NULL);
+	checkBox->ResizeToPreferred();
+	checkBox->SetValue(B_CONTROL_PARTIALLY_ON);
+	checkBox->SetEnabled(false);
+	AddChild(checkBox);
 
 	// Haiku's BCheckBox
 
@@ -154,6 +166,20 @@ Window::Window()
 	checkBox = new HCheckBox(rect.OffsetToCopy(15, 15), NULL, "Test 5", NULL);
 	checkBox->ResizeToPreferred();
 	view->AddChild(checkBox);
+
+	rect.OffsetBy(0, 60);
+	checkBox = new HCheckBox(rect.OffsetByCopy(15, 15), NULL, "Test 6", NULL);
+	checkBox->ResizeToPreferred();
+	checkBox->SetValue(B_CONTROL_PARTIALLY_ON);
+	AddChild(checkBox);
+
+	rect.OffsetBy(0, 60);
+	checkBox = new HCheckBox(rect.OffsetByCopy(15, 15), NULL, "Test 7", NULL);
+	checkBox->ResizeToPreferred();
+	checkBox->SetValue(B_CONTROL_PARTIALLY_ON);
+	checkBox->SetEnabled(false);
+	AddChild(checkBox);
+
 }
 
 

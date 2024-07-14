@@ -480,10 +480,17 @@ HaikuControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect
 			rect.bottom++;
 		}
 
-		view->SetPenSize(penSize);
 		view->SetDrawingMode(B_OP_OVER);
-		view->StrokeLine(rect.LeftTop(), rect.RightBottom());
-		view->StrokeLine(rect.LeftBottom(), rect.RightTop());
+		view->SetPenSize(penSize);
+		if (flags & B_PARTIALLY_ACTIVATED) {
+			float x1 = rect.left;
+			float x2 = rect.right;
+			float y = (rect.top + rect.bottom) / 2;
+			view->StrokeLine(BPoint(x1, y), BPoint(x2,y));
+		} else {
+			view->StrokeLine(rect.LeftTop(), rect.RightBottom());
+			view->StrokeLine(rect.LeftBottom(), rect.RightTop());
+		}
 	}
 }
 
@@ -3917,11 +3924,8 @@ HaikuControlLook::_RadioButtonAndCheckBoxMarkColor(const rgb_color& base,
 			// becoming activated (or losing partial activation)
 			mix = 0.3;
 		}
-	} else if ((flags & B_PARTIALLY_ACTIVATED) != 0) {
-		// partially activated
-		mix = 0.5;
 	} else {
-		// simply activated
+		// simply activated or partially activated
 	}
 
 	color.red = uint8(color.red * mix + base.red * (1.0 - mix));
