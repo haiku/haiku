@@ -8,7 +8,9 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/cdefs.h>
+#include <syscalls.h>
 
+#include "private/system/random_defs.h"
 #include "private/system/symbol_visibility.h"
 
 
@@ -23,15 +25,14 @@ __init_stack_protector()
 	if (__stack_chk_guard != 0)
 		return;
 
-	bool done = false;
-	int fd = open("/dev/random", O_RDONLY, 0);
-	if (fd >= 0) {
-		done = read(fd, &__stack_chk_guard, sizeof(__stack_chk_guard))
-			== sizeof(__stack_chk_guard);
-		close(fd);
-	}
+	struct random_get_entropy_args args;
+	args.buffer = &__stack_chk_guard;
+	args.length = sizeof(__stack_chk_guard);
 
-	if (!done) {
+	status_t status = _kern_generic_syscall(RANDOM_SYSCALLS, RANDOM_GET_ENTROPY,
+		&args, sizeof(args));
+
+	if (status != B_OK || args.length != sizeof(__stack_chk_guard)) {
 		unsigned char* p = (unsigned char *)&__stack_chk_guard;
 		p[0] = 0;
 		p[1] = 0;
