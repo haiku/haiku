@@ -1,9 +1,0 @@
-1	english	x-vnd.Haiku-EXRTranslator	3596882613
-EXR image translator	ConfigView		EXR 图像转换器
-a division of Lucasfilm Entertainment Company Ltd	ConfigView		一个卢卡斯电影娱乐有限公司部门
-Version %d.%d.%d, %s	ConfigView		版本 %d.%d.%d, %s
-EXR images	EXRTranslator		EXR 图像
-EXR image	EXRTranslator		EXR 图像
-EXR image translator	EXRTranslator		EXR 图像转换器
-Based on OpenEXR %version%	ConfigView		基于 OpenEXR %version%
-EXR Settings	main		EXR 设置

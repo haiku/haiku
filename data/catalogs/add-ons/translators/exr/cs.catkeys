@@ -1,9 +1,0 @@
-1	czech	x-vnd.Haiku-EXRTranslator	3596882613
-EXR image translator	ConfigView		Převaděč EXR obrázků
-a division of Lucasfilm Entertainment Company Ltd	ConfigView		divize společnosti Lucasfilm Entertainment Ltd
-Version %d.%d.%d, %s	ConfigView		Verze %d.%d.%d, %s
-EXR images	EXRTranslator		Obrázky EXR
-EXR image	EXRTranslator		EXR obrázek
-EXR image translator	EXRTranslator		Převaděč EXR obrázků
-Based on OpenEXR %version%	ConfigView		Založeno na OpenEXR %version%
-EXR Settings	main		nastavení EXR

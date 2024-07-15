@@ -1,9 +1,0 @@
-1	greek, modern (1453-)	x-vnd.Haiku-EXRTranslator	3596882613
-EXR image translator	ConfigView		Μεταφταστής εικόνων EXR
-a division of Lucasfilm Entertainment Company Ltd	ConfigView		ένα τμήμα της Lucasfilm Entertainment Company Ltd
-Version %d.%d.%d, %s	ConfigView		Έκδοση %d.%d.%d, %s
-EXR images	EXRTranslator		Εικόνες EXR
-EXR image	EXRTranslator		Εικόνα EXR
-EXR image translator	EXRTranslator		Μεταφραστής εικόνων EXR
-Based on OpenEXR %version%	ConfigView		Βασισμένος στη βιβλιοθήκη OpenEXR έκδοσης %version%
-EXR Settings	main		EXR Ρυθμίσεις
