@@ -217,11 +217,26 @@ Stack::ExploreThread(void *data)
 void
 Stack::Explore()
 {
-	// Acquire the device manager lock before the explore lock, to prevent lock-order inversion.
-	RecursiveLocker dmLocker(device_manager_get_lock());
+	recursive_lock* dmLock = device_manager_get_lock();
+	if (find_thread(NULL) != fExploreThread
+			&& RECURSIVE_LOCK_HOLDER(dmLock) == find_thread(NULL)) {
+		// This should only happen during the initial device scan, during which
+		// we should be able to acquire the explore lock immediately (since the
+		// explore thread will be waiting on the device manager lock as below),
+		// but in case we aren't, use a timeout to avoid lock-order-inversion deadlocks.
+		if (mutex_lock_with_timeout(&fExploreLock, B_RELATIVE_TIMEOUT, 1000) != B_OK) {
+			release_sem(fExploreSem);
+			return;
+		}
+	} else {
+		// Temporarily acquire the device manager lock, to ensure it isn't scanning.
+		RecursiveLocker dmLocker(dmLock);
 
-	if (mutex_lock(&fExploreLock) != B_OK)
-		return;
+		if (mutex_lock(&fExploreLock) != B_OK)
+			return;
+
+		dmLocker.Unlock();
+	}
 
 	int32 semCount = 0;
 	get_sem_count(fExploreSem, &semCount);
@@ -256,12 +271,13 @@ Stack::Explore()
 void
 Stack::AddBusManager(BusManager *busManager)
 {
+	MutexLocker _(fExploreLock);
 	fBusManagers.PushBack(busManager);
 }
 
 
 int32
-Stack::IndexOfBusManager(BusManager *busManager)
+Stack::IndexOfBusManager(BusManager *busManager) const
 {
 	return fBusManagers.IndexOf(busManager);
 }

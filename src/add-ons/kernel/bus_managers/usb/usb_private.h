@@ -143,7 +143,7 @@ public:
 		Object *						GetObjectNoLock(usb_id id) const;
 
 		void							AddBusManager(BusManager *bus);
-		int32							IndexOfBusManager(BusManager *bus);
+		int32							IndexOfBusManager(BusManager *bus) const;
 		BusManager *					BusManagerAt(int32 index) const;
 
 		status_t						AllocateChunk(void **logicalAddress,
