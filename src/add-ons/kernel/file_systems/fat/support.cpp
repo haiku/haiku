@@ -312,6 +312,8 @@ check_bootsector(const uint8* bootsector, FatType& _type, bool& _dos33)
 	// It appears to be a valid FAT volume of some kind.
 	// Determine the FAT type by counting the data clusters.
 	uint32 sectorsPerCluster = bootsector[0xd];
+	if (sectorsPerCluster == 0)
+		return B_BAD_VALUE;
 	uint32 rootDirEntries = read16(bootsector, 0x11);
 	uint32 rootDirSectors = ((rootDirEntries * 32) + (bytesPerSector - 1)) / bytesPerSector;
 	uint32 sectorsPerFat = read16(bootsector, 0x16);
