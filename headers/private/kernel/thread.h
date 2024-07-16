@@ -142,7 +142,6 @@ status_t _user_set_thread_priority(thread_id thread, int32 newPriority);
 status_t _user_rename_thread(thread_id thread, const char *name);
 status_t _user_suspend_thread(thread_id thread);
 status_t _user_resume_thread(thread_id thread);
-status_t _user_rename_thread(thread_id thread, const char *name);
 thread_id _user_spawn_thread(struct thread_creation_attributes* attributes);
 status_t _user_wait_for_thread(thread_id id, status_t *_returnCode);
 status_t _user_wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
