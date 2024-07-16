@@ -2035,9 +2035,6 @@ LaunchDaemon::_SetupEnvironment()
 {
 	// Determine safemode kernel option
 	setenv("SAFEMODE", IsSafeMode() ? "yes" : "no", true);
-
-	// Default locale settings
-	setenv("LC_TYPE", "en_US.UTF-8", true);
 }
 
 
