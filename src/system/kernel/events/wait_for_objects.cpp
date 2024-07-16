@@ -624,7 +624,7 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout,
 	// deselect file descriptors
 
 	for (uint32 i = 0; i < numFDs; i++) {
-		if (fds[i].fd >= 0 && (fds[i].revents & POLLNVAL) == 0)
+		if (fds[i].fd >= 0 && (sync->set[i].events & POLLNVAL) == 0)
 			deselect_fd(fds[i].fd, sync->set + i, kernel);
 	}
 
@@ -704,7 +704,7 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 
 	for (int i = 0; i < numInfos; i++) {
 		uint16 type = infos[i].type;
-		if ((infos[i].events & B_EVENT_INVALID) == 0)
+		if ((sync->set[i].events & B_EVENT_INVALID) == 0)
 			deselect_object(type, infos[i].object, sync->set + i, kernel);
 	}
 
