@@ -7,36 +7,28 @@
 #include <KernelExport.h>
 
 #include <debug.h>
+#include <stdio.h>
+
+#include "Zycore/Format.h"
+#include "Zydis/Zydis.h"
 
 #include "disasm_arch.h"
 #include "elf.h"
-#include "udis86.h"
 
 
-static ud_t sUDState;
-static addr_t sCurrentReadAddress;
-static void (*sSyntax)(ud_t *) = UD_SYN_ATT;
-static unsigned int sVendor = UD_VENDOR_INTEL;
+static ZydisDecoder sDecoder;
+static ZydisFormatter sFormatter;
+static ZydisFormatterFunc sDefaultPrintAddressAbsolute;
 
 
-static int
-read_next_byte(struct ud*)
+static ZyanStatus
+ZydisFormatterPrintAddressAbsolute(const ZydisFormatter* formatter, ZydisFormatterBuffer* buffer,
+	ZydisFormatterContext* context)
 {
-	uint8_t buffer;
-	if (debug_memcpy(B_CURRENT_TEAM, &buffer, (void*)sCurrentReadAddress, 1)
-			!= B_OK) {
-		kprintf("<read fault>\n");
-		return UD_EOI;
-	}
+	ZyanU64 address;
+	ZYAN_CHECK(ZydisCalcAbsoluteAddress(context->instruction, context->operand,
+		context->runtime_address, &address));
 
-	sCurrentReadAddress++;
-	return buffer;
-}
-
-
-static const char*
-resolve_symbol(struct ud*, uint64_t address, int64_t* offset)
-{
 	const char* symbolName;
 	addr_t baseAddress;
 	status_t error;
@@ -50,28 +42,27 @@ resolve_symbol(struct ud*, uint64_t address, int64_t* offset)
 			&symbolName, NULL, NULL);
 	}
 
-	if (error != B_OK)
-		return NULL;
+	if (error == B_OK) {
+		ZYAN_CHECK(ZydisFormatterBufferAppend(buffer, ZYDIS_TOKEN_SYMBOL));
+		ZyanString* string;
+		ZYAN_CHECK(ZydisFormatterBufferGetString(buffer, &string));
+		int64_t offset = address - baseAddress;
+		if (offset == 0)
+			return ZyanStringAppendFormat(string, "<%s>", symbolName);
+		return ZyanStringAppendFormat(string, "<%s+0x%" B_PRIx64 ">", symbolName, offset);
+	}
 
-	*offset = address - baseAddress;
-	return symbolName;
+	return sDefaultPrintAddressAbsolute(formatter, buffer, context);
 }
 
 
-static void
-setup_disassembler(addr_t where)
+extern "C" void
+diasm_arch_assert_fail(const char* assertion, const char* file, unsigned int line,
+	const char* function)
 {
-	ud_set_input_hook(&sUDState, &read_next_byte);
-	sCurrentReadAddress	= where;
-#ifdef __x86_64__
-	ud_set_mode(&sUDState, 64);
-#else
-	ud_set_mode(&sUDState, 32);
-#endif
-	ud_set_pc(&sUDState, (uint64_t)where);
-	ud_set_syntax(&sUDState, sSyntax);
-	ud_set_vendor(&sUDState, sVendor);
-	ud_set_sym_resolver(&sUDState, resolve_symbol);
+	kprintf("assert_fail: %s\n", assertion);
+	while (true)
+		;
 }
 
 
@@ -86,16 +77,21 @@ status_t
 disasm_arch_dump_insns(addr_t where, int count, addr_t baseAddress,
 	int backCount)
 {
+	ZyanU8 buffer[ZYDIS_MAX_INSTRUCTION_LENGTH];
+	ZydisDecodedInstruction instruction;
 	int skipCount = 0;
 
 	if (backCount > 0) {
 		// count the instructions from base address to start address
-		setup_disassembler(baseAddress);
 		addr_t address = baseAddress;
+
 		int baseCount = 0;
-		int len;
-		while (address < where && (len = ud_disassemble(&sUDState)) >= 1) {
-			address += len;
+
+		while (address < where
+			&& debug_memcpy(B_CURRENT_TEAM, &buffer, (const void*)address, sizeof(buffer)) == B_OK
+			&& ZYAN_SUCCESS(ZydisDecoderDecodeInstruction(&sDecoder,
+				(ZydisDecoderContext*)ZYAN_NULL, buffer, sizeof(buffer), &instruction))) {
+			address += instruction.length;
 			baseCount++;
 		}
 
@@ -108,27 +104,45 @@ disasm_arch_dump_insns(addr_t where, int count, addr_t baseAddress,
 	} else
 		baseAddress = where;
 
-	setup_disassembler(baseAddress);
+	ZyanUSize offset = 0;
 
-	for (int i = 0; i < count; i++) {
-		int ret;
-		ret = ud_disassemble(&sUDState);
-		if (ret < 1)
+	for (int i = 0; i < count; i++, offset += instruction.length) {
+		if (debug_memcpy(B_CURRENT_TEAM, &buffer, (const void*)(baseAddress + offset),
+				sizeof(buffer))
+			!= B_OK) {
+			kprintf("<read fault>\n");
 			break;
-
+		}
+		ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
+		if (!ZYAN_SUCCESS(ZydisDecoderDecodeFull(&sDecoder, buffer, sizeof(buffer), &instruction,
+				operands))) {
+			break;
+		}
 		if (skipCount > 0) {
 			skipCount--;
 			continue;
 		}
 
-		addr_t address = (addr_t)ud_insn_off(&sUDState);
+		addr_t address = baseAddress + offset;
 		if (address == where)
 			kprintf("\x1b[34m");
 
-		// TODO: dig operands and lookup symbols
-		kprintf("0x%08lx: %16.16s\t%s\n", address, ud_insn_hex(&sUDState),
-			ud_insn_asm(&sUDState));
+		char hexString[32];
+		char* srcHex = hexString;
+		for (ZyanUSize i = 0; i < instruction.length; i++) {
+			sprintf(srcHex, "%02" PRIx8, buffer[i]);
+			srcHex += 2;
+		}
 
+		char formatted[1024];
+		if (ZYAN_SUCCESS(ZydisFormatterFormatInstruction(&sFormatter, &instruction, operands,
+				instruction.operand_count_visible, formatted, sizeof(formatted),
+				baseAddress + offset, NULL))) {
+			kprintf("%#16llx: %16.16s\t%s\n", static_cast<unsigned long long>(address), hexString,
+				formatted);
+		} else {
+			kprintf("%#16llx: failed-to-format\n", static_cast<unsigned long long>(address));
+		}
 		if (address == where)
 			kprintf("\x1b[m");
 	}
@@ -139,7 +153,28 @@ disasm_arch_dump_insns(addr_t where, int count, addr_t baseAddress,
 status_t
 disasm_arch_init()
 {
-	ud_init(&sUDState);
+#ifdef __x86_64__
+	ZydisDecoderInit(&sDecoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
+#else
+	ZydisDecoderInit(&sDecoder, ZYDIS_MACHINE_MODE_LEGACY_32, ZYDIS_STACK_WIDTH_32);
+#endif
+
+	ZydisFormatterInit(&sFormatter, ZYDIS_FORMATTER_STYLE_ATT);
+	ZydisFormatterSetProperty(&sFormatter, ZYDIS_FORMATTER_PROP_FORCE_SIZE, ZYAN_TRUE);
+	ZydisFormatterSetProperty(&sFormatter, ZYDIS_FORMATTER_PROP_HEX_UPPERCASE, ZYAN_FALSE);
+	ZydisFormatterSetProperty(&sFormatter, ZYDIS_FORMATTER_PROP_ADDR_PADDING_ABSOLUTE,
+		ZYDIS_PADDING_DISABLED);
+	ZydisFormatterSetProperty(&sFormatter, ZYDIS_FORMATTER_PROP_ADDR_PADDING_RELATIVE,
+		ZYDIS_PADDING_DISABLED);
+	ZydisFormatterSetProperty(&sFormatter, ZYDIS_FORMATTER_PROP_DISP_PADDING,
+		ZYDIS_PADDING_DISABLED);
+	ZydisFormatterSetProperty(&sFormatter, ZYDIS_FORMATTER_PROP_IMM_PADDING,
+		ZYDIS_PADDING_DISABLED);
+
+	sDefaultPrintAddressAbsolute = (ZydisFormatterFunc)&ZydisFormatterPrintAddressAbsolute;
+	ZydisFormatterSetHook(&sFormatter, ZYDIS_FORMATTER_FUNC_PRINT_ADDRESS_ABS,
+		(const void**)&sDefaultPrintAddressAbsolute);
+
 	// XXX: check for AMD and set sVendor;
 	return B_OK;
 }

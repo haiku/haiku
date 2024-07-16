@@ -1,27 +1,61 @@
 SubDir HAIKU_TOP src add-ons kernel debugger disasm $(TARGET_KERNEL_ARCH_DIR) ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-UseHeaders [ LibraryHeaders udis86 ] ;
-UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
 UsePrivateKernelHeaders ;
 
-DEFINES += __UD_STANDALONE__ ;
+local zydisSourceDirectory = [ FDirName $(HAIKU_TOP) src libs zydis ] ;
+UseHeaders [ LibraryHeaders zydis ] : true ;
+UseHeaders [ FDirName $(zydisSourceDirectory) Zydis ] : true ;
+
+SubDirCcFlags -Wno-error=missing-prototypes ;
+
 DEFINES += assert=disasm_arch_assert ;
-DEFINES += __assert_fail=disasm_arch_assert ;
+DEFINES += __assert_fail=diasm_arch_assert_fail ;
+DEFINES += __posix ;
+DEFINES += ZYDIS_DISABLE_ENCODER ;
 
-local libUdis86Sources =
-	decode.c
-	itab.c
-	syn-att.c
-	syn.c
-	syn-intel.c
-	udis86.c
+local zydisSources =
+	Decoder.c
+	DecoderData.c
+	Disassembler.c
+	Formatter.c
+	FormatterBuffer.c
+	FormatterATT.c
+	FormatterBase.c
+	FormatterIntel.c
+	MetaInfo.c
+	Mnemonic.c
+	Register.c
+	SharedData.c
+	String.c
+	Utils.c
+	Zydis.c
 ;
 
-KernelStaticLibrary disasm_arch.a :
-	$(libUdis86Sources)
-	disasm_arch.cpp
+local zycoreSources =
+	Zycore.c
+	Allocator.c
+	Bitset.c
+	Format.c
+	List.c
+	String.c
+	Vector.c
 ;
 
-SEARCH on [ FGristFiles $(libUdis86Sources) ]
-	= [ FDirName $(HAIKU_TOP) src libs udis86 ] ;
+
+SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) zydis ] ;
+MakeLocate [ FGristFiles $(zydisSources:S=$(SUFOBJ)) ]
+	: [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) zydis ] ;
+KernelStaticLibrary disasm_arch.a : $(zydisSources) ;
+LOCATE on [ FGristFiles $(zydisSources) ] = [ FDirName $(zydisSourceDirectory) Zydis ] ;
+
+SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) zycore ] ;
+MakeLocate [ FGristFiles $(zycoreSources:S=$(SUFOBJ)) ]
+	: [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) zycore ] ;
+KernelStaticLibrary disasm_arch.a : $(zycoreSources)
+;
+LOCATE on [ FGristFiles $(zycoreSources) ] = [ FDirName $(zydisSourceDirectory) Zycore ] ;
+
+SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) ] ;
+KernelStaticLibrary disasm_arch.a : disasm_arch.cpp ;
+
