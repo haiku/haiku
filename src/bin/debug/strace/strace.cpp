@@ -323,6 +323,9 @@ print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 	ssize_t length = vsnprintf(*_buffer, *_length, format, list);
 	va_end(list);
 
+	if (length > *_length)
+		length = *_length;
+
 	*_buffer += length;
 	*_length -= length;
 }
