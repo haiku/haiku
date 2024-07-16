@@ -19,6 +19,7 @@
 #include <libroot_private.h>
 #include <syscalls.h>
 #include <thread_defs.h>
+#include <time_private.h>
 #include <tls.h>
 
 #include <user_thread.h>
@@ -141,6 +142,32 @@ __pthread_set_default_priority(int32 priority)
 }
 
 
+static int
+__pthread_join(pthread_t thread, void** _value, int flags = 0, bigtime_t timeout = 0)
+{
+	status_t status;
+	do {
+		status_t dummy;
+		status = wait_for_thread_etc(thread->id, flags, timeout, &dummy);
+	} while (status == B_INTERRUPTED);
+
+	if (status == B_BAD_THREAD_ID)
+		RETURN_AND_TEST_CANCEL(ESRCH);
+	if (status == B_WOULD_BLOCK || status == B_TIMED_OUT)
+		RETURN_AND_TEST_CANCEL(ETIMEDOUT);
+	if (status < B_OK)
+		RETURN_AND_TEST_CANCEL(status);
+
+	if (_value != NULL)
+		*_value = thread->exit_value;
+
+	if ((atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD) != 0)
+		free(thread);
+
+	RETURN_AND_TEST_CANCEL(B_OK);
+}
+
+
 // #pragma mark - public API
 
 
@@ -199,22 +226,7 @@ pthread_equal(pthread_t t1, pthread_t t2)
 int
 pthread_join(pthread_t thread, void** _value)
 {
-	status_t dummy;
-	status_t error;
-	do {
-		error = wait_for_thread(thread->id, &dummy);
-	} while (error == B_INTERRUPTED);
-
-	if (error == B_BAD_THREAD_ID)
-		RETURN_AND_TEST_CANCEL(ESRCH);
-
-	if (_value != NULL)
-		*_value = thread->exit_value;
-
-	if ((atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD) != 0)
-		free(thread);
-
-	RETURN_AND_TEST_CANCEL(error);
+	return __pthread_join(thread, _value);
 }
 
 
@@ -343,6 +355,24 @@ pthread_setname_np(pthread_t thread, const char* name)
 	if (status < B_OK)
 		return status;
 	return 0;
+}
+
+
+extern "C" int
+pthread_timedjoin_np(pthread_t thread, void** _value, const struct timespec* abstime)
+{
+	int flags = 0;
+	bigtime_t timeout = 0;
+	if (abstime != NULL) {
+		if (!timespec_to_bigtime(*abstime, timeout))
+			RETURN_AND_TEST_CANCEL(EINVAL);
+		flags |= B_ABSOLUTE_REAL_TIME_TIMEOUT;
+	} else {
+		timeout = 0;
+		flags |= B_RELATIVE_TIMEOUT;
+	}
+
+	return __pthread_join(thread, _value, flags, timeout);
 }
 
 
