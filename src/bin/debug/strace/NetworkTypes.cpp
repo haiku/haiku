@@ -52,6 +52,52 @@ format_number(uint32 value)
 
 
 static string
+format_iovecs(Context &context, const iovec *iov, int iovlen)
+{
+	if (iov == NULL && iovlen == 0)
+		return "(empty)";
+
+	iovec vecs[iovlen];
+	int32 bytesRead;
+
+	string r = "[";
+	status_t err = context.Reader().Read((void*)iov, vecs, sizeof(vecs), bytesRead);
+	if (err != B_OK) {
+		r += context.FormatPointer(iov);
+		r += ", " + context.FormatSigned(iovlen);
+	} else {
+		for (int i = 0; i < iovlen; i++) {
+			if (i > 0)
+				r += ", ";
+			r += "{iov_base=" + context.FormatPointer(vecs[i].iov_base);
+			r += ", iov_len=" + context.FormatUnsigned(vecs[i].iov_len);
+			r += "}";
+		}
+	}
+	return r + "]";
+}
+
+
+template<>
+string
+TypeHandlerImpl<iovec *>::GetParameterValue(Context &context, Parameter *param,
+	const void *address)
+{
+	Parameter *size = context.GetNextSibling(param);
+	return format_iovecs(context, (const iovec*)*(void **)address,
+		context.ReadValue<size_t>(size));
+}
+
+
+template<>
+string
+TypeHandlerImpl<iovec *>::GetReturnValue(Context &context, uint64 value)
+{
+	return context.FormatPointer((void *)value);
+}
+
+
+static string
 read_fdset(Context &context, void *data)
 {
 	// default FD_SETSIZE is 1024
@@ -731,6 +777,7 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 		return new SpecializedPointerTypeHandler<type>(); \
 	}
 
+DEFINE_TYPE(iovec_ptr, iovec *);
 DEFINE_TYPE(fdset_ptr, fd_set *);
 POINTER_TYPE(flock_ptr, flock);
 POINTER_TYPE(ifconf_ptr, ifconf);

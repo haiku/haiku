@@ -100,8 +100,6 @@ extern TypeHandler *create_pointer_type_handler();
 extern TypeHandler *create_string_type_handler();
 extern TypeHandler *create_status_t_type_handler();
 
-extern string format_iovecs(Context &context, const struct iovec *iov, int iovlen);
-
 // specialization for "const char*"
 template<>
 struct TypeHandlerFactory<const char*> {
