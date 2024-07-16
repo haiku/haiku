@@ -230,6 +230,7 @@ patch_syscalls()
 	// kernel/syscalls.h and have it parsed automatically
 
 	extern void patch_area();
+	extern void patch_events();
 	extern void patch_exec();
 	extern void patch_fcntl();
 	extern void patch_ioctl();
@@ -248,6 +249,7 @@ patch_syscalls()
 	}
 
 	patch_area();
+	patch_events();
 	patch_exec();
 	patch_fcntl();
 	patch_ioctl();

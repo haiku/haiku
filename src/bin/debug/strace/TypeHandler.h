@@ -44,9 +44,9 @@ public:
 	string GetParameterValue(Context &c, Parameter *, const void *);
 	string GetReturnValue(Context &, uint64 value);
 
-private:
 	string RenderValue(Context &, unsigned int value) const;
 
+private:
 	const EnumMap &fMap;
 };
 
@@ -63,7 +63,6 @@ public:
 	string GetParameterValue(Context &c, Parameter *, const void *);
 	string GetReturnValue(Context &, uint64 value);
 
-protected:
 	string RenderValue(Context &, unsigned int value) const;
 
 private:
@@ -118,6 +117,12 @@ struct TypeHandlerFactory<const char*> {
 			return create_##name##_type_handler(); \
 		} \
 	} \
+
+#define DEFINE_TYPE(name, type) \
+	TypeHandler *create_##name##_type_handler() \
+	{ \
+		return new TypeHandlerImpl<type>(); \
+	}
 
 struct fd_set;
 struct flock;

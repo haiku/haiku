@@ -102,68 +102,6 @@ TypeHandlerImpl<iovec *>::GetReturnValue(Context &context, uint64 value)
 
 
 static string
-read_fdset(Context &context, void *data)
-{
-	// default FD_SETSIZE is 1024
-	unsigned long tmp[1024 / (sizeof(unsigned long) * 8)];
-	int32 bytesRead;
-
-	status_t err = context.Reader().Read(data, &tmp, sizeof(tmp), bytesRead);
-	if (err != B_OK)
-		return context.FormatPointer(data);
-
-	/* implicitly align to unsigned long lower boundary */
-	int count = bytesRead / sizeof(unsigned long);
-	int added = 0;
-
-	string r;
-	r.reserve(16);
-
-	r = "[";
-
-	for (int i = 0; i < count && added < 8; i++) {
-		for (int j = 0;
-			 j < (int)(sizeof(unsigned long) * 8) && added < 8; j++) {
-			if (tmp[i] & (1UL << j)) {
-				if (added > 0)
-					r += " ";
-				unsigned int fd = i * sizeof(unsigned long) * 8 + j;
-				r += format_number(fd);
-				added++;
-			}
-		}
-	}
-
-	if (added >= 8)
-		r += " ...";
-
-	r += "]";
-
-	return r;
-}
-
-
-template<>
-string
-TypeHandlerImpl<fd_set *>::GetParameterValue(Context &context, Parameter *,
-	const void *address)
-{
-	void *data = *(void **)address;
-	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
-		return read_fdset(context, data);
-	return context.FormatPointer(data);
-}
-
-
-template<>
-string
-TypeHandlerImpl<fd_set *>::GetReturnValue(Context &context, uint64 value)
-{
-	return context.FormatPointer((void *)value);
-}
-
-
-static string
 format_ltype(Context &context, int ltype)
 {
 	if (context.GetContents(Context::ENUMERATIONS)) {
@@ -217,127 +155,6 @@ format_pointer(Context &context, flock *lock)
 	return r;
 }
 
-
-
-static string
-format_signed_number(int32 value)
-{
-	char tmp[32];
-	snprintf(tmp, sizeof(tmp), "%d", (signed int)value);
-	return tmp;
-}
-
-
-static string
-read_pollfd(Context &context, void *data)
-{
-	nfds_t numfds = context.ReadValue<nfds_t>(context.GetSibling(1));
-	if ((int64)numfds <= 0)
-		return string();
-
-	pollfd tmp[numfds];
-	int32 bytesRead;
-
-	status_t err = context.Reader().Read(data, &tmp, sizeof(tmp), bytesRead);
-	if (err != B_OK)
-		return context.FormatPointer(data);
-
-	int added = 0;
-
-	string r;
-	r.reserve(16);
-
-	r = "[";
-
-	for (nfds_t i = 0; i < numfds && added < 8; i++) {
-		if ((tmp[i].fd == -1 || tmp[i].revents == 0)
-			&& context.GetContents(Context::OUTPUT_VALUES)) {
-			continue;
-		}
-		if (added > 0)
-			r += ", ";
-		r += "{fd=" + format_signed_number(tmp[i].fd);
-		if (tmp[i].fd != -1 && context.GetContents(Context::INPUT_VALUES)) {
-			r += ", events=";
-			int flags = 0;
-			if ((tmp[i].events & POLLIN) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLIN";
-				flags++;
-			}
-			if ((tmp[i].events & POLLOUT) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLOUT";
-				flags++;
-			}
-		}
-		if (context.GetContents(Context::OUTPUT_VALUES)) {
-			r += ", revents=";
-			int flags = 0;
-			if ((tmp[i].revents & POLLIN) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLIN";
-				flags++;
-			}
-			if ((tmp[i].revents & POLLOUT) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLOUT";
-				flags++;
-			}
-			if ((tmp[i].revents & POLLERR) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLERR";
-				flags++;
-			}
-			if ((tmp[i].revents & POLLHUP) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLHUP";
-				flags++;
-			}
-			if ((tmp[i].revents & POLLNVAL) != 0) {
-				if (flags > 0)
-					r += "|";
-				r += "POLLNVAL";
-				flags++;
-			}
-		}
-		added++;
-		r += "}";
-	}
-
-	if (added >= 8)
-		r += " ...";
-
-	r += "]";
-
-	return r;
-}
-
-
-template<>
-string
-TypeHandlerImpl<pollfd *>::GetParameterValue(Context &context, Parameter *,
-	const void *address)
-{
-	void *data = *(void **)address;
-	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
-		return read_pollfd(context, data);
-	return context.FormatPointer(data);
-}
-
-
-template<>
-string
-TypeHandlerImpl<pollfd *>::GetReturnValue(Context &context, uint64 value)
-{
-	return context.FormatPointer((void *)value);
-}
 
 
 template<typename Type>
@@ -769,12 +586,6 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 	}
 };
 
-#define DEFINE_TYPE(name, type) \
-	TypeHandler *create_##name##_type_handler() \
-	{ \
-		return new TypeHandlerImpl<type>(); \
-	}
-
 #define POINTER_TYPE(name, type) \
 	TypeHandler *create_##name##_type_handler() \
 	{ \
@@ -782,11 +593,9 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 	}
 
 DEFINE_TYPE(iovec_ptr, iovec *);
-DEFINE_TYPE(fdset_ptr, fd_set *);
 POINTER_TYPE(flock_ptr, flock);
 POINTER_TYPE(ifconf_ptr, ifconf);
 POINTER_TYPE(ifreq_ptr, ifreq);
-DEFINE_TYPE(pollfd_ptr, pollfd *);
 POINTER_TYPE(siginfo_t_ptr, siginfo_t);
 POINTER_TYPE(msghdr_ptr, msghdr);
 DEFINE_TYPE(sockaddr_ptr, sockaddr *);
@@ -796,4 +605,3 @@ POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
 POINTER_TYPE(sockopt_args_ptr, sockopt_args);
 POINTER_TYPE(socket_args_ptr, socket_args);
 #endif
-

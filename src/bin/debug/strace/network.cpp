@@ -124,18 +124,6 @@ patch_network()
 	shutdown->GetParameter("how")->SetHandler(
 		new EnumTypeHandler(kShutdownHowMap));
 
-	Syscall *poll = get_syscall("_kern_poll");
-	poll->ParameterAt(0)->SetInOut(true);
-
-	Syscall *select = get_syscall("_kern_select");
-	select->ParameterAt(1)->SetInOut(true);
-	select->ParameterAt(2)->SetInOut(true);
-	select->ParameterAt(3)->SetInOut(true);
-
-	Syscall *wait = get_syscall("_kern_wait_for_child");
-	wait->ParameterAt(2)->SetOut(true);
-	wait->ParameterAt(3)->SetOut(true);
-
 	Syscall *createPipe = get_syscall("_kern_create_pipe");
 	createPipe->ParameterAt(0)->SetOut(true);
 	createPipe->ParameterAt(0)->SetCount(2);
@@ -147,5 +135,4 @@ patch_network()
 		new EnumTypeHandler(kSocketFamilyMap));
 	socketPair->GetParameter("type")->SetHandler(
 		new EnumTypeHandler(kSocketTypeMap));
-
 }

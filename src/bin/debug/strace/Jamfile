@@ -21,6 +21,7 @@ local straceSources =
 	MemoryReader.cpp
 
 	area.cpp
+	events.cpp
 	exec.cpp
 	fcntl.cpp
 	ioctl.cpp
