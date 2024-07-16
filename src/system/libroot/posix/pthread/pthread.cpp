@@ -1,4 +1,5 @@
 /*
+ * Copyright 2024, Haiku, Inc. All rights reserved.
  * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
@@ -318,7 +319,7 @@ pthread_setschedparam(pthread_t thread, int policy,
 // #pragma mark - extensions
 
 
-int
+extern "C" int
 pthread_getname_np(pthread_t thread, char* buffer, size_t length)
 {
 	thread_info info;
@@ -333,7 +334,7 @@ pthread_getname_np(pthread_t thread, char* buffer, size_t length)
 }
 
 
-int
+extern "C" int
 pthread_setname_np(pthread_t thread, const char* name)
 {
 	status_t status = _kern_rename_thread(thread->id, name);
