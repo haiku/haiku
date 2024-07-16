@@ -299,14 +299,42 @@ int
 pthread_setschedparam(pthread_t thread, int policy,
 	const struct sched_param *param)
 {
-	status_t status;
 	if (policy != SCHED_RR && policy != SCHED_OTHER)
 		return ENOTSUP;
 	if (policy == SCHED_RR && param->sched_priority < B_FIRST_REAL_TIME_PRIORITY)
 		return EINVAL;
 	if (policy == SCHED_OTHER && param->sched_priority >= B_FIRST_REAL_TIME_PRIORITY)
 		return EINVAL;
-	status = _kern_set_thread_priority(thread->id, param->sched_priority);
+
+	status_t status = _kern_set_thread_priority(thread->id, param->sched_priority);
+	if (status == B_BAD_THREAD_ID)
+		return ESRCH;
+	if (status < B_OK)
+		return status;
+	return 0;
+}
+
+
+// #pragma mark - extensions
+
+
+int
+pthread_getname_np(pthread_t thread, char* buffer, size_t length)
+{
+	thread_info info;
+	status_t status = _kern_get_thread_info(thread->id, &info);
+	if (status == B_BAD_THREAD_ID)
+		return ESRCH;
+	if (strlcpy(buffer, info.name, length) >= length)
+		return ERANGE;
+	return 0;
+}
+
+
+int
+pthread_setname_np(pthread_t thread, const char* name)
+{
+	status_t status = _kern_rename_thread(thread->id, name);
 	if (status == B_BAD_THREAD_ID)
 		return ESRCH;
 	if (status < B_OK)
@@ -323,31 +351,3 @@ get_pthread_thread_id(pthread_t thread)
 {
 	return thread->id;
 }
-
-
-int
-__pthread_getname_np(pthread_t thread, char* buffer, size_t length)
-{
-    thread_info info;
-    status_t status = _kern_get_thread_info(thread->id, &info);
-    if (status == B_BAD_THREAD_ID)
-        return ESRCH;
-    if (strlcpy(buffer, info.name, length) >= length)
-        return ERANGE;
-    return 0;
-}
-
-
-int
-__pthread_setname_np(pthread_t thread, const char* name)
-{
-    status_t status = _kern_rename_thread(thread->id, name);
-    if (status == B_BAD_THREAD_ID)
-        return ESRCH;
-    if (status < B_OK)
-        return status;
-    return 0;
-}
-
-B_DEFINE_WEAK_ALIAS(__pthread_getname_np, pthread_getname_np);
-B_DEFINE_WEAK_ALIAS(__pthread_setname_np, pthread_setname_np);
