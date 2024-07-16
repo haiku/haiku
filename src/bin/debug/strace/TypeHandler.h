@@ -124,20 +124,22 @@ struct TypeHandlerFactory<const char*> {
 		return new TypeHandlerImpl<type>(); \
 	}
 
-struct fd_set;
 struct flock;
 struct ifconf;
 struct ifreq;
 struct iovec;
 struct msghdr;
 struct message_args;
-struct pollfd;
 struct sockaddr;
 struct sockaddr_args;
 struct socket_args;
 struct sockopt_args;
 
-DEFINE_FACTORY(fdset_ptr, fd_set *);
+struct fd_set;
+struct pollfd;
+struct object_wait_info;
+struct event_wait_info;
+
 DEFINE_FACTORY(flock_ptr, flock *);
 DEFINE_FACTORY(ifconf_ptr, ifconf *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);
@@ -145,13 +147,17 @@ DEFINE_FACTORY(iovec_ptr, const iovec *);
 DEFINE_FACTORY(msghdr_ptr, msghdr *);
 DEFINE_FACTORY(msghdr_ptr, const msghdr *);
 DEFINE_FACTORY(message_args_ptr, message_args *);
-DEFINE_FACTORY(pollfd_ptr, pollfd *);
 DEFINE_FACTORY(siginfo_t_ptr, siginfo_t *);
 DEFINE_FACTORY(sockaddr_ptr, sockaddr *);
 DEFINE_FACTORY(sockaddr_ptr, const sockaddr *);
 DEFINE_FACTORY(sockaddr_args_ptr, sockaddr_args *);
 DEFINE_FACTORY(socket_args_ptr, socket_args *);
 DEFINE_FACTORY(sockopt_args_ptr, sockopt_args *);
+
+DEFINE_FACTORY(fdset_ptr, fd_set *);
+DEFINE_FACTORY(pollfd_ptr, pollfd *);
+DEFINE_FACTORY(object_wait_infos_ptr, object_wait_info *);
+DEFINE_FACTORY(event_wait_infos_ptr, event_wait_info *);
 
 DEFINE_FACTORY(int_ptr, int *);
 DEFINE_FACTORY(long_ptr, long *);

@@ -7,6 +7,8 @@
 #include <OS.h>
 #include <poll.h>
 
+#include <event_queue_defs.h>
+
 #include "strace.h"
 #include "Syscall.h"
 #include "Context.h"
@@ -45,8 +47,37 @@ static const FlagsTypeHandler::FlagInfo kPollFlagInfos[] = {
 };
 
 
+static const FlagsTypeHandler::FlagInfo kEventFlagInfos[] = {
+	FLAG_INFO_ENTRY(B_EVENT_READ),
+	FLAG_INFO_ENTRY(B_EVENT_WRITE),
+	FLAG_INFO_ENTRY(B_EVENT_ERROR),
+	FLAG_INFO_ENTRY(B_EVENT_PRIORITY_READ),
+	FLAG_INFO_ENTRY(B_EVENT_PRIORITY_WRITE),
+	FLAG_INFO_ENTRY(B_EVENT_HIGH_PRIORITY_READ),
+	FLAG_INFO_ENTRY(B_EVENT_HIGH_PRIORITY_WRITE),
+	FLAG_INFO_ENTRY(B_EVENT_DISCONNECTED),
+	FLAG_INFO_ENTRY(B_EVENT_INVALID),
+
+	/* event queue only */
+	FLAG_INFO_ENTRY(B_EVENT_LEVEL_TRIGGERED),
+	FLAG_INFO_ENTRY(B_EVENT_ONE_SHOT),
+
+	{ 0, NULL }
+};
+
+
+static const char* kObjectTypes[] = {
+	"fd",
+	"sem",
+	"port",
+	"thread",
+};
+
+
 static FlagsTypeHandler::FlagsList kPollFlags;
 static FlagsTypeHandler sPollFlagsHandler(kPollFlags);
+static FlagsTypeHandler::FlagsList kEventFlags;
+static FlagsTypeHandler sEventFlagsHandler(kEventFlags);
 
 
 // #pragma mark - specialized type handlers
@@ -182,8 +213,150 @@ TypeHandlerImpl<pollfd *>::GetReturnValue(Context &context, uint64 value)
 }
 
 
+static string
+read_object_wait_infos(Context &context, Parameter *param, void *data)
+{
+	int numInfos = context.ReadValue<int>(context.GetNextSibling(param));
+	if (numInfos <= 0)
+		return string();
+
+	object_wait_info tmp[numInfos];
+	int32 bytesRead;
+
+	status_t err = context.Reader().Read(data, &tmp, sizeof(tmp), bytesRead);
+	if (err != B_OK)
+		return context.FormatPointer(data);
+
+	string r;
+	r.reserve(16);
+
+	r = "[";
+
+	for (int i = 0; i < numInfos; i++) {
+		if (i > 0)
+			r += ", ";
+		if (i >= 8) {
+			r += "...";
+			break;
+		}
+
+		r += "{";
+		r += (tmp[i].type < sizeof(kObjectTypes)) ?
+			kObjectTypes[tmp[i].type] : context.FormatUnsigned(tmp[i].type);
+		r += "=";
+		r += context.FormatSigned(tmp[i].object);
+
+		r += ", events=";
+		r += sEventFlagsHandler.RenderValue(context, tmp[i].events);
+		r += "}";
+	}
+
+	r += "]";
+	return r;
+}
+
+
+template<>
+string
+TypeHandlerImpl<object_wait_info *>::GetParameterValue(Context &context, Parameter *param,
+	const void *address)
+{
+	void *data = *(void **)address;
+	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
+		return read_object_wait_infos(context, param, data);
+	return context.FormatPointer(data);
+}
+
+
+template<>
+string
+TypeHandlerImpl<object_wait_info *>::GetReturnValue(Context &context, uint64 value)
+{
+	return context.FormatPointer((void *)value);
+}
+
+
+static string
+read_event_wait_infos(Context &context, Parameter *param, void *data)
+{
+	int numInfos = 0;
+	if (param->Out())
+		numInfos = context.GetReturnValue();
+	else
+		numInfos = context.ReadValue<int>(context.GetNextSibling(param));
+	if (numInfos <= 0)
+		return context.FormatPointer(data);
+
+	event_wait_info tmp[numInfos];
+	int32 bytesRead;
+
+	status_t err = context.Reader().Read(data, &tmp, sizeof(tmp), bytesRead);
+	if (err != B_OK)
+		return context.FormatPointer(data);
+
+	string r;
+	r.reserve(16);
+
+	r = "[";
+
+	for (int i = 0; i < numInfos; i++) {
+		if (i > 0)
+			r += ", ";
+		if (i >= 8) {
+			r += "...";
+			break;
+		}
+
+		r += "{";
+		r += (tmp[i].type < sizeof(kObjectTypes)) ?
+			kObjectTypes[tmp[i].type] : context.FormatUnsigned(tmp[i].type);
+		r += "=";
+		r += context.FormatSigned(tmp[i].object);
+
+		r += ", events=";
+		if (tmp[i].events == -1)
+			r += "-1";
+		else if (tmp[i].events < 0)
+			r += strerror(tmp[i].events);
+		else
+			r += sEventFlagsHandler.RenderValue(context, tmp[i].events);
+
+		if (tmp[i].user_data != NULL) {
+			r += ", user_data=";
+			r += context.FormatPointer(tmp[i].user_data);
+		}
+		r += "}";
+	}
+
+	r += "]";
+	return r;
+}
+
+
+template<>
+string
+TypeHandlerImpl<event_wait_info *>::GetParameterValue(Context &context, Parameter *param,
+	const void *address)
+{
+	void *data = *(void **)address;
+	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
+		return read_event_wait_infos(context, param, data);
+	return context.FormatPointer(data);
+}
+
+
+template<>
+string
+TypeHandlerImpl<event_wait_info *>::GetReturnValue(Context &context, uint64 value)
+{
+	return context.FormatPointer((void *)value);
+}
+
+
 DEFINE_TYPE(fdset_ptr, fd_set *)
 DEFINE_TYPE(pollfd_ptr, pollfd *)
+DEFINE_TYPE(object_wait_infos_ptr, object_wait_info *)
+DEFINE_TYPE(event_wait_infos_ptr, event_wait_info *)
 
 
 // #pragma mark - patch function
@@ -194,6 +367,8 @@ patch_events()
 {
 	for (int i = 0; kPollFlagInfos[i].name != NULL; i++)
 		kPollFlags.push_back(kPollFlagInfos[i]);
+	for (int i = 0; kEventFlagInfos[i].name != NULL; i++)
+		kEventFlags.push_back(kEventFlagInfos[i]);
 
 	Syscall *poll = get_syscall("_kern_poll");
 	poll->ParameterAt(0)->SetInOut(true);
@@ -203,7 +378,16 @@ patch_events()
 	select->ParameterAt(2)->SetInOut(true);
 	select->ParameterAt(3)->SetInOut(true);
 
-	Syscall *wait = get_syscall("_kern_wait_for_child");
-	wait->ParameterAt(2)->SetOut(true);
-	wait->ParameterAt(3)->SetOut(true);
+	Syscall *wait_for_objects = get_syscall("_kern_wait_for_objects");
+	wait_for_objects->ParameterAt(0)->SetInOut(true);
+
+	Syscall *event_queue_select = get_syscall("_kern_event_queue_select");
+	event_queue_select->ParameterAt(1)->SetInOut(true);
+
+	Syscall *event_queue_wait = get_syscall("_kern_event_queue_wait");
+	event_queue_wait->ParameterAt(1)->SetOut(true);
+
+	Syscall *wait_for_child = get_syscall("_kern_wait_for_child");
+	wait_for_child->ParameterAt(2)->SetOut(true);
+	wait_for_child->ParameterAt(3)->SetOut(true);
 }
