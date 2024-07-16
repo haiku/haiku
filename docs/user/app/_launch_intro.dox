@@ -132,7 +132,7 @@ be either specified directly, or you can let a shell script define them for you:
 service  x-vnd.MyGreatServer {
 	env {
 		from_script /path/to/my/script.sh
-		LC_TYPE C.UTF-8
+		LC_CTYPE C.UTF-8
 	}
 	launch /path/to/my/great/server
 }
