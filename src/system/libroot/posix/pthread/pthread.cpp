@@ -325,6 +325,8 @@ pthread_getname_np(pthread_t thread, char* buffer, size_t length)
 	status_t status = _kern_get_thread_info(thread->id, &info);
 	if (status == B_BAD_THREAD_ID)
 		return ESRCH;
+	if (status < B_OK)
+		return status;
 	if (strlcpy(buffer, info.name, length) >= length)
 		return ERANGE;
 	return 0;
