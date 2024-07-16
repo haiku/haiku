@@ -481,6 +481,8 @@ extern void 	encrypt(char block[64], int edflag);
 extern int		getopt(int argc, char *const *argv, const char *shortOpts);
 extern void 	swab(const void *src, void *dest, ssize_t nbytes);
 
+int				getentropy(void *buf, size_t buflen);
+
 /* getopt() related external variables */
 extern char *optarg;
 extern int optind, opterr, optopt;

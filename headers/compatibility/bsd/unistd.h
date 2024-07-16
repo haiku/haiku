@@ -28,8 +28,6 @@ char	*getusershell(void);
 int		issetugid(void);
 void	setusershell(void);
 
-int		getentropy(void *buf, size_t buflen);
-
 #ifdef __cplusplus
 }
 #endif
