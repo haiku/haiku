@@ -3131,7 +3131,8 @@ dosfs_read_attr(fs_volume* volume, fs_vnode* vnode, void* cookie, off_t pos, voi
 	if ((pos < 0) || (pos > static_cast<off_t>(strlen(bsdNode->v_mime))))
 		return B_BAD_VALUE;
 
-	ssize_t copied = strlcpy(reinterpret_cast<char*>(buffer), bsdNode->v_mime + pos, *length);
+	ssize_t copied = user_strlcpy(reinterpret_cast<char*>(buffer),
+		bsdNode->v_mime + pos, *length);
 	if (copied < 0)
 		return B_BAD_ADDRESS;
 
