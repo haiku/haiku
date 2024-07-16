@@ -69,6 +69,10 @@ format_iovecs(Context &context, const iovec *iov, int iovlen)
 		for (int i = 0; i < iovlen; i++) {
 			if (i > 0)
 				r += ", ";
+			if (i >= 8) {
+				r += "...";
+				break;
+			}
 			r += "{iov_base=" + context.FormatPointer(vecs[i].iov_base);
 			r += ", iov_len=" + context.FormatUnsigned(vecs[i].iov_len);
 			r += "}";
