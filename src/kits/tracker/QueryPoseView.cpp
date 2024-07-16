@@ -94,6 +94,45 @@ BQueryPoseView::~BQueryPoseView()
 }
 
 
+bool
+FolderFilterFunction(const entry_ref* directory, const entry_ref* model)
+{
+	if (directory == NULL || model == NULL)
+		return false;
+
+	BPath directoryPath(directory);
+	BPath modelPath(model);
+
+	if (directoryPath.InitCheck() != B_OK || modelPath.InitCheck() != B_OK)
+		return false;
+
+	char* requiredDirectoryPath = const_cast<char*>(directoryPath.Path());
+	strcat(requiredDirectoryPath, "/");
+	// only supports searching completely in the directories as well as subdirectories for now.
+	return strncmp(requiredDirectoryPath, modelPath.Path(), strlen(requiredDirectoryPath)) == 0;
+}
+
+
+bool
+QueryRefFilter::PassThroughDirectoryFilters(const entry_ref* ref) const
+{
+	int32 count = fDirectoryFilters.CountItems();
+	bool passed = count == 0;
+		// in this context, even if the model passes through a single filter, it is considered
+		// as the folder selections are combined with OR! and not AND!
+
+	for (int32 i = 0; i < count; i++) {
+		entry_ref* filterDirectory = fDirectoryFilters.ItemAt(i);
+		if (FolderFilterFunction(filterDirectory, ref)) {
+			passed = true;
+			break;
+		}
+	}
+
+	return passed;
+}
+
+
 void
 BQueryPoseView::MessageReceived(BMessage* message)
 {
@@ -322,7 +361,11 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 			delta);
 	}
 
-	SetRefFilter(new QueryRefFilter(fQueryListContainer->ShowResultsFromTrash()));
+	QueryRefFilter* filter = new QueryRefFilter(fQueryListContainer->ShowResultsFromTrash());
+	TargetModel()->OpenNode();
+	filter->LoadDirectoryFiltersFromFile(TargetModel()->Node());
+	TargetModel()->CloseNode();
+	SetRefFilter(filter);
 
 	return fQueryListContainer->Clone();
 }
@@ -391,13 +434,85 @@ QueryRefFilter::QueryRefFilter(bool showResultsFromTrash)
 }
 
 
+QueryRefFilter::~QueryRefFilter()
+{
+	int32 count = fDirectoryFilters.CountItems();
+	for (int32 i = 0; i < count; i++)
+		delete fDirectoryFilters.RemoveItemAt(0);
+}
+
+
+status_t
+QueryRefFilter::LoadDirectoryFiltersFromFile(const BNode* node)
+{
+	// params checking
+	if (node == NULL || node->InitCheck() != B_OK)
+		return B_BAD_VALUE;
+
+	struct attr_info info;
+	status_t error = node->GetAttrInfo("_trk/directories", &info);
+	if (error != B_OK)
+		return error;
+
+	BString bufferString;
+	char* buffer = bufferString.LockBuffer(info.size);
+	if (node->ReadAttr("_trk/directories", B_MESSAGE_TYPE, 0, buffer, info.size) != info.size)
+		return B_ERROR;
+
+	BMessage message;
+	error = message.Unflatten(buffer);
+	if (error != B_OK)
+		return error;
+
+	int32 count;
+	if ((error = message.GetInfo("refs", NULL, &count)) != B_OK)
+		return error;
+
+	for (int32 i = 0; i < count; i++) {
+		entry_ref ref;
+		if ((error = message.FindRef("refs", i, &ref)) != B_OK)
+			continue;
+
+		AddDirectoryFilter(&ref);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+QueryRefFilter::AddDirectoryFilter(const entry_ref* ref)
+{
+	if (ref == NULL)
+		return B_BAD_VALUE;
+
+	// checking for duplicates
+	int32 count = fDirectoryFilters.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		entry_ref* item = fDirectoryFilters.ItemAt(i);
+		if (ref != NULL && item != NULL && *item == *ref)
+			return B_CANCELED;
+	}
+
+	BEntry entry(ref, true);
+	if (entry.InitCheck() != B_OK || !entry.Exists() || !entry.IsDirectory())
+		return B_ERROR;
+
+	entry_ref symlinkTraversedRef;
+	entry.GetRef(&symlinkTraversedRef);
+
+	fDirectoryFilters.AddItem(new entry_ref(symlinkTraversedRef));
+	return B_OK;
+}
+
+
 bool
 QueryRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 	const char* filetype)
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	return !(!fShowResultsFromTrash && tracker != NULL
-		&& tracker->InTrashNode(ref));
+	return !(!fShowResultsFromTrash && tracker != NULL && tracker->InTrashNode(ref))
+		&& PassThroughDirectoryFilters(ref);
 }
 
 

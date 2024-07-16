@@ -96,11 +96,17 @@ private:
 class QueryRefFilter : public BRefFilter {
 public:
 	QueryRefFilter(bool showResultsFromTrash);
-	bool Filter(const entry_ref* ref, BNode* node, stat_beos* st,
+	virtual ~QueryRefFilter();
+	virtual bool Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 		const char* filetype);
+
+	status_t LoadDirectoryFiltersFromFile(const BNode*);
+	status_t AddDirectoryFilter(const entry_ref*);
+	bool PassThroughDirectoryFilters(const entry_ref*) const;
 
 private:
 	bool fShowResultsFromTrash;
+	BObjectList<entry_ref> fDirectoryFilters;
 };
 
 
