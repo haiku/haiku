@@ -4,7 +4,6 @@
 #
 
 export HOME=/boot/home
-export LC_CTYPE="en_US.UTF-8"
 
 BUILDHOME=/boot/system/develop
 
