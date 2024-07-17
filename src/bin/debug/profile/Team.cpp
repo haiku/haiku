@@ -88,7 +88,8 @@ Team::Init(team_id teamID, port_id debuggerPort)
 
 	// set team debugging flags
 	int32 teamDebugFlags = B_TEAM_DEBUG_THREADS
-		| B_TEAM_DEBUG_TEAM_CREATION | B_TEAM_DEBUG_IMAGES;
+		| B_TEAM_DEBUG_TEAM_CREATION | B_TEAM_DEBUG_IMAGES
+		| B_TEAM_DEBUG_STOP_NEW_THREADS;
 	error = set_team_debugging_flags(fNubPort, teamDebugFlags);
 	if (error != B_OK)
 		return error;
@@ -174,8 +175,8 @@ Team::InitThread(Thread* thread)
 
 		fThreads.Add(thread);
 
-		// resume the target thread to be sure, it's running
-		resume_thread(thread->ID());
+		// resume the target thread to be sure it's running
+		continue_thread(fDebugContext.nub_port, thread->ID());
 	} else {
 		// debugger-less profiling
 		thread->SetInterval(gOptions.interval);
