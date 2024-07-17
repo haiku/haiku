@@ -1142,6 +1142,15 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 	addr_t bp = x86_get_stack_frame();
 	bool onKernelStack = true;
 
+	if ((flags & (STACK_TRACE_KERNEL | STACK_TRACE_USER)) == STACK_TRACE_USER) {
+		iframe* frame = x86_get_user_iframe();
+		if (frame == NULL)
+			return 0;
+
+		bp = frame->bp;
+		onKernelStack = false;
+	}
+
 	while (bp != 0 && count < maxCount) {
 		onKernelStack = onKernelStack
 			&& is_kernel_stack_address(thread, bp);
@@ -1170,11 +1179,10 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		if (ip == 0)
 			break;
 
-		if (skipFrames <= 0
-			&& ((flags & STACK_TRACE_KERNEL) != 0 || onKernelStack)) {
-			returnAddresses[count++] = ip;
-		} else
+		if (skipFrames > 0)
 			skipFrames--;
+		else
+			returnAddresses[count++] = ip;
 
 		bp = nextBp;
 	}
