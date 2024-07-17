@@ -1,0 +1,63 @@
+SubDir HAIKU_TOP src libs zydis ;
+
+local zydisSourceDirectory = [ FDirName $(HAIKU_TOP) src libs zydis ] ;
+UseHeaders [ LibraryHeaders zydis ] : true ;
+UseHeaders [ FDirName $(zydisSourceDirectory) Zydis ] : true ;
+
+SubDirCcFlags -Wno-error=missing-prototypes ;
+
+DEFINES += __posix ;
+DEFINES += ZYDIS_DISABLE_ENCODER ;
+
+local zydisSources =
+	Decoder.c
+	DecoderData.c
+	Disassembler.c
+	Formatter.c
+	FormatterBuffer.c
+	FormatterATT.c
+	FormatterBase.c
+	FormatterIntel.c
+	MetaInfo.c
+	Mnemonic.c
+	Register.c
+	SharedData.c
+	String.c
+	Utils.c
+	Zydis.c
+;
+
+local zycoreSources =
+	Zycore.c
+	Allocator.c
+	Bitset.c
+	Format.c
+	List.c
+	String.c
+	Vector.c
+;
+
+
+if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+	# GCC 2 can't compile C11, so we use the modern GCC .
+	original_TARGET_CC_x86_gcc2 = $(TARGET_CC_x86_gcc2) ;
+	TARGET_CC_x86_gcc2 = $(TARGET_CC_x86) -Wa,-mrelax-relocations=no ;
+}
+
+SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) zydis ] ;
+MakeLocate [ FGristFiles $(zydisSources:S=$(SUFOBJ)) ]
+	: [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) zydis ] ;
+StaticLibrary libzydis.a : $(zydisSources) ;
+LOCATE on [ FGristFiles $(zydisSources) ] = [ FDirName $(zydisSourceDirectory) Zydis ] ;
+
+SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) zycore ] ;
+MakeLocate [ FGristFiles $(zycoreSources:S=$(SUFOBJ)) ]
+	: [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) zycore ] ;
+StaticLibrary libzydis.a : $(zycoreSources)
+;
+LOCATE on [ FGristFiles $(zycoreSources) ] = [ FDirName $(zydisSourceDirectory) Zycore ] ;
+
+if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
+	TARGET_CC_x86_gcc2 = $(original_TARGET_CC_x86_gcc2) ;
+}
+

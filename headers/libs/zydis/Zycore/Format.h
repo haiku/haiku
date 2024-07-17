@@ -61,10 +61,12 @@ ZYAN_INLINE ZyanU64 ZyanAbsI64(ZyanI64 x)
     // INT_MIN special case. Can't use the value directly because GCC thinks
     // it's too big for an INT64 literal, however is perfectly happy to accept
     // this expression. This is also hit INT64_MIN is defined in `stdint.h`.
+#if defined(__GNUC__) && (__GNUC__ >= 4)
     if (x == (-0x7fffffffffffffff - 1))
     {
         return 0x8000000000000000u;
     }
+#endif
 
     return (ZyanU64)(x < 0 ? -x : x);
 }

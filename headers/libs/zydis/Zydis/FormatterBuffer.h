@@ -127,7 +127,9 @@ typedef ZyanU8 ZydisTokenType;
 /* Token                                                                                          */
 /* ---------------------------------------------------------------------------------------------- */
 
+#if !defined(__HAIKU__) || (defined(__GNUC__) && (__GNUC__ >= 4))
 #pragma pack(push, 1)
+#endif
 
 /**
  * Defines the `ZydisFormatterToken` struct.
@@ -147,7 +149,9 @@ typedef struct ZydisFormatterToken_
     ZyanU8 next;
 } ZydisFormatterToken;
 
+#if !defined(__HAIKU__) || (defined(__GNUC__) && (__GNUC__ >= 4))
 #pragma pack(pop)
+#endif
 
 /**
  * Defines the `ZydisFormatterTokenConst` data-type.
