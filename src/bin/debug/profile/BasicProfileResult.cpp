@@ -348,6 +348,7 @@ ExclusiveProfileResult::AddSamples(ImageProfileResultContainer* container,
 				break;
 			if (firstImage == NULL)
 				firstImage = image;
+			image = NULL;
 		}
 	}
 
