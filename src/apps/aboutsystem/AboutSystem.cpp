@@ -1992,14 +1992,14 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDTwoClause)
 		.SetURL("https://www.acme.com/software/thttpd"));
 
-#ifdef __i386__
-	// Udis86 copyrights
-	_AddPackageCredit(PackageCredit("Udis86")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2002-2004 "
-			"Vivek Mohan. All rights reserved."))
-		.SetLicense(kBSDTwoClause)
-		.SetURL("https://udis86.sourceforge.net"));
+	// Zydis copyrights
+	_AddPackageCredit(PackageCredit("Zydis")
+		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "2014-2024 Florian Bernd "
+			"and Joel Höner. All rights reserved."))
+		.SetLicense("MIT")
+		.SetURL("https://zydis.re/"));
 
+#ifdef __i386__
 	// Intel PRO/Wireless 2100 & 2200BG firmwares
 	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2100 & 2200BG firmwares")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2003-2006 "
