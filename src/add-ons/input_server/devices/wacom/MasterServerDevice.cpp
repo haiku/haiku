@@ -27,6 +27,7 @@
 
 static const char* kWatchFolder			= "input/wacom/usb";
 static const char* kDeviceFolder		= "/dev/input/wacom/usb";
+static const char* kDeviceName			= "Wacom Tablet";
 
 //static const char* kPS2MouseThreadName	= "PS/2 Mouse";
 
@@ -48,9 +49,9 @@ MasterServerDevice::MasterServerDevice()
 	  fPS2DisablerThread(B_ERROR),
 	  fDeviceLock("device list lock")
 {
-	get_mouse_speed(&fSpeed);
-	get_mouse_acceleration(&fAcceleration);
-	get_click_speed(&fDblClickSpeed);
+	get_mouse_speed(kDeviceName, &fSpeed);
+	get_mouse_acceleration(kDeviceName, &fAcceleration);
+	get_click_speed(kDeviceName, &fDblClickSpeed);
 	_CalculateAccelerationTable();
 
 	if (_LockDevices()) {
@@ -141,7 +142,7 @@ MasterServerDevice::Control(const char* device, void* cookie, uint32 code, BMess
 			_CalculateAccelerationTable();
 			break;
 		case B_CLICK_SPEED_CHANGED:
-			get_click_speed(&fDblClickSpeed);
+			get_click_speed(device, &fDblClickSpeed);
 			break;
 		case B_MOUSE_ACCELERATION_CHANGED:
 			get_mouse_acceleration(device, &fAcceleration);
@@ -215,8 +216,7 @@ MasterServerDevice::_AddDevice(const char* path)
 			// start device polling only if we're started
 			if (fActive)
 				device->Start();
-			input_device_ref device = { (char *)"Wacom Tablet",
-				B_POINTING_DEVICE, (void*)this };
+			input_device_ref device = { (char*)kDeviceName, B_POINTING_DEVICE, (void*)this };
 			input_device_ref* deviceList[2] = { &device, NULL };
 			RegisterDevices(deviceList);
 		} else {

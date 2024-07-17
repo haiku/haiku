@@ -555,14 +555,12 @@ MouseDevice::_UpdateSettings()
 	MD_CALLED();
 	// retrieve current values
 
-	if (get_mouse_map(&fSettings.map) != B_OK)
+	if (get_mouse_map(fDeviceRef.name, &fSettings.map) != B_OK)
 		LOG_ERR("error when get_mouse_map\n");
-	else {
-		fDeviceRemapsButtons
-			= ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
-	}
+	else
+		fDeviceRemapsButtons = ioctl(fDevice, MS_SET_MAP, &fSettings.map) == B_OK;
 
-	if (get_click_speed(&fSettings.click_speed) == B_OK) {
+	if (get_click_speed(fDeviceRef.name, &fSettings.click_speed) == B_OK) {
 		if (fIsTouchpad)
 			fTouchpadMovementMaker.click_speed = fSettings.click_speed;
 		ioctl(fDevice, MS_SET_CLICKSPEED, &fSettings.click_speed);

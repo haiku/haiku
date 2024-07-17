@@ -41,9 +41,9 @@ status_t
 MouseSettings::_RetrieveSettings()
 {
 	// retrieve current values
-	if (get_mouse_map(&fSettings.map) != B_OK)
+	if (get_mouse_map(fName, &fSettings.map) != B_OK)
 		return B_ERROR;
-	if (get_click_speed(&fSettings.click_speed) != B_OK)
+	if (get_click_speed(fName, &fSettings.click_speed) != B_OK)
 		return B_ERROR;
 	if (get_mouse_speed(fName, &fSettings.accel.speed) != B_OK)
 		return B_ERROR;
@@ -73,15 +73,8 @@ MouseSettings::Defaults()
 	SetAcceptFirstClick(kDefaultAcceptFirstClick);
 
 	mouse_map map;
-	if (get_mouse_map(&map) != B_OK) {
-		// Set some default values
-		map.button[0] = B_PRIMARY_MOUSE_BUTTON;
-		map.button[1] = B_SECONDARY_MOUSE_BUTTON;
-		map.button[2] = B_TERTIARY_MOUSE_BUTTON;
-		map.button[3] = B_MOUSE_BUTTON(4);
-		map.button[4] = B_MOUSE_BUTTON(5);
-		map.button[5] = B_MOUSE_BUTTON(6);
-	}
+	for (int i = 0; i < B_MAX_MOUSE_BUTTONS; i++)
+		map.button[i] = B_MOUSE_BUTTON(i + 1);
 	SetMapping(map);
 }
 
@@ -160,7 +153,7 @@ MouseSettings::ClickSpeed() const
 void
 MouseSettings::SetClickSpeed(bigtime_t clickSpeed)
 {
-	if (set_click_speed(clickSpeed) == B_OK)
+	if (set_click_speed(fName, clickSpeed) == B_OK)
 		fSettings.click_speed = clickSpeed;
 }
 
@@ -199,14 +192,14 @@ void
 MouseSettings::SetMapping(int32 index, uint32 button)
 {
 	fSettings.map.button[index] = button;
-	set_mouse_map(&fSettings.map);
+	set_mouse_map(fName, &fSettings.map);
 }
 
 
 void
 MouseSettings::SetMapping(mouse_map& map)
 {
-	if (set_mouse_map(&map) == B_OK)
+	if (set_mouse_map(fName, &map) == B_OK)
 		fSettings.map = map;
 }
 

@@ -582,33 +582,48 @@ set_mouse_type(const char* mouse_name, int32 type)
 
 
 status_t
-get_mouse_map(mouse_map *map)
+get_mouse_map(mouse_map* map)
+{
+	return get_mouse_map("", map);
+}
+
+
+status_t
+set_mouse_map(mouse_map* map)
+{
+	return set_mouse_map("", map);
+}
+
+
+status_t
+get_mouse_map(const char* mouse_name, mouse_map* map)
 {
 	BMessage command(IS_GET_MOUSE_MAP);
 	BMessage reply;
 	const void *data = 0;
 	ssize_t count;
 
-	status_t err = _control_input_server_(&command, &reply);
+	status_t err = command.AddString("mouse_name", mouse_name);
+	if (err == B_OK)
+		err = _control_input_server_(&command, &reply);
 	if (err == B_OK)
 		err = reply.FindData("mousemap", B_RAW_TYPE, &data, &count);
-	if (err != B_OK)
-		return err;
+	if (err == B_OK)
+		memcpy(map, data, count);
 
-	memcpy(map, data, count);
-
-	return B_OK;
+	return err;
 }
 
 
 status_t
-set_mouse_map(mouse_map *map)
+set_mouse_map(const char* mouse_name, mouse_map* map)
 {
 	BMessage command(IS_SET_MOUSE_MAP);
 	BMessage reply;
 
-	status_t err = command.AddData("mousemap", B_RAW_TYPE, map,
-		sizeof(mouse_map));
+	status_t err = command.AddString("mouse_name", mouse_name);
+	if (err == B_OK)
+		err = command.AddData("mousemap", B_RAW_TYPE, map, sizeof(mouse_map));
 	if (err != B_OK)
 		return err;
 	return _control_input_server_(&command, &reply);
@@ -616,12 +631,28 @@ set_mouse_map(mouse_map *map)
 
 
 status_t
-get_click_speed(bigtime_t *speed)
+get_click_speed(bigtime_t* speed)
+{
+	return get_click_speed("", speed);
+}
+
+
+status_t
+set_click_speed(bigtime_t speed)
+{
+	return set_click_speed("", speed);
+}
+
+
+status_t
+get_click_speed(const char* mouse_name, bigtime_t* speed)
 {
 	BMessage command(IS_GET_CLICK_SPEED);
 	BMessage reply;
 
-	status_t err = _control_input_server_(&command, &reply);
+	status_t err = command.AddString("mouse_name", mouse_name);
+	if (err == B_OK)
+		err = _control_input_server_(&command, &reply);
 	if (err != B_OK)
 		return err;
 
@@ -633,11 +664,16 @@ get_click_speed(bigtime_t *speed)
 
 
 status_t
-set_click_speed(bigtime_t speed)
+set_click_speed(const char* mouse_name, bigtime_t speed)
 {
 	BMessage command(IS_SET_CLICK_SPEED);
 	BMessage reply;
-	command.AddInt64("speed", speed);
+
+	status_t err = command.AddString("mouse_name", mouse_name);
+	if (err == B_OK)
+		err = command.AddInt64("speed", speed);
+	if (err != B_OK)
+		return err;
 	return _control_input_server_(&command, &reply);
 }
 

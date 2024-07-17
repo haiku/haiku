@@ -58,6 +58,7 @@ FILE *EasyPenInputDevice::sLogFile = NULL;
 #define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
 const static uint32 kTabletThreadPriority = B_FIRST_REAL_TIME_PRIORITY + 4;
+const static char* kDeviceName = "Genius EasyPen";
 
 struct tablet_device {
 	tablet_device(BSerialPort *port);
@@ -152,7 +153,7 @@ EasyPenInputDevice::InitCheck()
 
 	LOG("Found %ld devices\n", fDevices.CountItems());
 
-	get_click_speed(&fClickSpeed);
+	get_click_speed(kDeviceName, &fClickSpeed);
 
 	return fDevices.CountItems() > 0 ? B_OK : B_ERROR;
 }
@@ -206,7 +207,7 @@ EasyPenInputDevice::Control(const char *name, void *cookie,
 	LOG("%s(%s, code: %lu)\n", __PRETTY_FUNCTION__, name, command);
 
 	if (command == B_CLICK_SPEED_CHANGED)
-		get_click_speed(&fClickSpeed);
+		get_click_speed(kDeviceName, &fClickSpeed);
 
 	return B_OK;
 }
@@ -292,7 +293,7 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 				message->AddFloat("be:tablet_x", movements.xpos);
 				message->AddFloat("be:tablet_y", movements.ypos);
 				message->AddFloat("be:tablet_pressure", movements.pressure);
-				message->AddInt32("be:tablet_eraser", movements.eraser);
+				message->AddInt32("be:tablet_eraser", (movements.switches & B_ERASER) != 0);
 				if (movements.tilt_x != 0.0 || movements.tilt_y != 0.0) {
 					message->AddFloat("be:tablet_tilt_x", movements.tilt_x);
 					message->AddFloat("be:tablet_tilt_y", movements.tilt_y);
@@ -327,7 +328,7 @@ tablet_device::tablet_device(BSerialPort *port)
 	serial = port;
 	device_watcher = -1;
 	active = false;
-	device_ref.name = strdup("Genius EasyPen");
+	device_ref.name = strdup(kDeviceName);
 	device_ref.type = B_POINTING_DEVICE;
 	device_ref.cookie = this;
 };

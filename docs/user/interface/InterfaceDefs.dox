@@ -756,57 +756,157 @@
 
 	If there are multiple mouses connected, the number of buttons for one of
 	them picked at random will be returned.
+
+	\deprecated Use \ref "get_mouse_type(const char* mouse_name, int32* type)"
+		instead.
 */
 
 
 /*!
-	\fn status_t set_mouse_type(int32 type)
-	\brief Set the number of buttons of the mouse.
-	\deprecated use set_mouse_type_by_name instead.
-*/
-
-
-/*!
-	\fn status_t get_mouse_type_by_name(BString mouse_name, int32* type)
+	\fn status_t get_mouse_type(const char* mouse_name, int32* type)
 	\brief Get the number of buttons for a specific mouse.
 
 	Mouse names can be known from BInputDevice.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t set_mouse_type_by_name(BString mouse_name, int32 type)
+	\fn status_t set_mouse_type(const char* mouse_name, int32 type)
 	\brief Configure the number of buttons for a specific mouse.
 
 	The setting is saved and persists accross reboots.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t get_mouse_map(mouse_map* map)
+	\brief Get the button map of the mouse.
+
+	\deprecated Use \ref "get_mouse_map(const char* mouse_name, mouse_map* map)"
+		instead.
+*/
+
+
+/*!
+	\fn status_t get_mouse_map(const char* mouse_name, mouse_map* map)
+	\brief Get the button map for a specific mouse.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t set_mouse_map(mouse_map* map)
+	\brief Set the button map of the mouse.
+
+	\deprecated Use \ref "set_mouse_map(const char* mouse_name, mouse_map* map)"
+		instead.
+*/
+
+
+/*!
+	\fn status_t set_mouse_map(const char* mouse_name, mouse_map* map)
+	\brief Set the button map for a specific mouse.
+
+	The setting is saved and persists accross reboots.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t get_click_speed(bigtime_t* speed)
+	\brief Get the double-click maximum delay.
+
+	\deprecated Use \ref "get_click_speed(const char* mouse_name, bigtime_t* speed)"
+		instead.
+*/
+
+
+/*!
+	\fn status_t get_click_speed(const char* mouse_name, bigtime_t* speed)
+	\brief Get the double-click maximum delay for a specific mouse.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t set_click_speed(bigtime_t speed)
+	\brief Set the double-click maximum delay.
+
+	\deprecated Use \ref "get_click_speed(const char* mouse_name, bigtime_t* speed)"
+		instead.
+*/
+
+
+/*!
+	\fn status_t set_click_speed(const char* mouse_name, bigtime_t speed)
+	\brief Set the double-click maximum delay for a specific mouse.
+
+	\since Haiku R1
 */
 
 
 /*!
 	\fn status_t get_mouse_speed(int32* speed)
-	\brief Get the mouse speed
+	\brief Get the mouse speed.
 
-	If there are multiple mouses connected, this function return the speed
+	If there are multiple mouses connected, this function returns the speed
 	from a random one.
+
+	\deprecated Use \ref "get_mouse_speed(const char* mouse_name, int32* speed)"
+		instead.
 */
 
 
 /*!
-	\fn status_t set_mouse_speed(int32 speed)
-	\brief Set the mouse speed
-	\deprecated use set_mouse_speed_by_name instead.
+	\fn status_t get_mouse_speed(const char* mouse_name, int32* speed)
+	\brief Get the mouse speed setting for a specific mouse.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn status_t get_mouse_speed_by_name(BString mouse_name, int32* speed)
-	\brief Get the mouse speed setting for a specific mouse
-*/
-
-
-/*!
-	\fn status_t set_mouse_speed_by_name(BString mouse_name, int32 speed)
+	\fn status_t set_mouse_speed(const char* mouse_name, int32 speed)
 	\brief Set the mouse speed for a specific mouse.
 
 	The setting is saved and persists accross reboots.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t get_mouse_acceleration(int32* speed)
+	\brief Get the mouse acceleration.
+
+	If there are multiple mouses connected, this function returns the speed
+	from a random one.
+
+	\deprecated Use \ref "get_mouse_acceleration(const char* mouse_name, int32* speed)"
+		instead.
+*/
+
+
+/*!
+	\fn status_t get_mouse_acceleration(const char* mouse_name, int32* speed)
+	\brief Get the mouse acceleration setting for a specific mouse.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t set_mouse_acceleration(const char* mouse_name, int32 speed)
+	\brief Set the mouse acceleration for a specific mouse.
+
+	The setting is saved and persists accross reboots.
+
+	\since Haiku R1
 */
