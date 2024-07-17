@@ -147,6 +147,8 @@ struct thread_debug_info {
 			// the buffer
 		bool			variable_stack_depth;
 			// record a variable number of samples per hit
+		bool			profile_kernel;
+			// record samples in kernel stack frames
 		bool			buffer_full;
 			// indicates that the sample buffer is full
 		union {

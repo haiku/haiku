@@ -21,6 +21,7 @@ struct system_profiler_parameters {
 	// sampling
 	bigtime_t	interval;				// interval at which to take samples
 	uint32		stack_depth;			// maximum stack depth to sample
+	bool		profile_kernel;			// sample kernel stack frames
 };
 
 

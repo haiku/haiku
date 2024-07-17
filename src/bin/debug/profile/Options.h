@@ -19,7 +19,7 @@ struct Options {
 		output(NULL),
 		callgrind_directory(NULL),
 		profile_all(false),
-		profile_kernel(true),
+		profile_kernel(false),
 		profile_loading(false),
 		profile_teams(true),
 		profile_threads(true),

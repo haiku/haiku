@@ -1367,19 +1367,26 @@ profiling_do_sample(bool& flushBuffer)
 	}
 
 	// get the samples
+	uint32 flags = STACK_TRACE_USER;
+	int32 skipIFrames = 0;
+	if (debugInfo.profile.profile_kernel) {
+		flags |= STACK_TRACE_KERNEL;
+		skipIFrames = 1;
+	}
+
 	addr_t* returnAddresses = debugInfo.profile.samples
 		+ debugInfo.profile.sample_count;
 	if (debugInfo.profile.variable_stack_depth) {
 		// variable sample count per hit
 		*returnAddresses = arch_debug_get_stack_trace(returnAddresses + 1,
-			stackDepth - 1, 1, 0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
+			stackDepth - 1, skipIFrames, 0, flags);
 
 		debugInfo.profile.sample_count += *returnAddresses + 1;
 	} else {
 		// fixed sample count per hit
-		if (stackDepth > 1) {
+		if (stackDepth > 1 || !debugInfo.profile.profile_kernel) {
 			int32 count = arch_debug_get_stack_trace(returnAddresses,
-				stackDepth, 1, 0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
+				stackDepth, skipIFrames, 0, flags);
 
 			for (int32 i = count; i < stackDepth; i++)
 				returnAddresses[i] = 0;
@@ -2262,6 +2269,7 @@ debug_nub_thread(void *)
 				int32 stackDepth = message.start_profiler.stack_depth;
 				bool variableStackDepth
 					= message.start_profiler.variable_stack_depth;
+				bool profileKernel = message.start_profiler.profile_kernel;
 				bigtime_t interval = max_c(message.start_profiler.interval,
 					B_DEBUG_MIN_PROFILE_INTERVAL);
 				status_t result = B_OK;
@@ -2333,6 +2341,7 @@ debug_nub_thread(void *)
 							threadDebugInfo.profile.stack_depth = stackDepth;
 							threadDebugInfo.profile.variable_stack_depth
 								= variableStackDepth;
+							threadDebugInfo.profile.profile_kernel = profileKernel;
 							threadDebugInfo.profile.buffer_full = false;
 							threadDebugInfo.profile.interval_left = interval;
 							threadDebugInfo.profile.installed_timer = NULL;

@@ -407,6 +407,7 @@ typedef struct {
 	bool				variable_stack_depth;
 										// variable number of samples per hit;
 										// cf. debug_profiler_update
+	bool				profile_kernel;	// sample kernel stack frames
 } debug_nub_start_profiler;
 
 typedef struct {

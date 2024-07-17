@@ -157,6 +157,7 @@ Team::InitThread(Thread* thread)
 		message.sample_area = sampleArea;
 		message.stack_depth = gOptions.stack_depth;
 		message.variable_stack_depth = gOptions.analyze_full_stack;
+		message.profile_kernel = gOptions.profile_kernel;
 
 		debug_nub_start_profiler_reply reply;
 		error = send_debug_message(&fDebugContext,

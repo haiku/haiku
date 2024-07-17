@@ -180,6 +180,7 @@ private:
 			uint32				fFlags;
 			uint32				fStackDepth;
 			bigtime_t			fInterval;
+			bool				fProfileKernel;
 			system_profiler_buffer_header* fHeader;
 			uint8*				fBufferBase;
 			size_t				fBufferCapacity;
@@ -257,6 +258,7 @@ SystemProfiler::SystemProfiler(team_id team, const area_info& userAreaInfo,
 	fFlags(parameters.flags),
 	fStackDepth(parameters.stack_depth),
 	fInterval(parameters.interval),
+	fProfileKernel(parameters.profile_kernel),
 	fHeader(NULL),
 	fBufferBase(NULL),
 	fBufferCapacity(0),
@@ -1413,8 +1415,14 @@ SystemProfiler::_DoSample()
 	CPUProfileData& cpuData = fCPUData[cpu];
 
 	// get the samples
-	int32 count = arch_debug_get_stack_trace(cpuData.buffer, fStackDepth, 1,
-		0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
+	uint32 flags = STACK_TRACE_USER;
+	int32 skipIFrames = 0;
+	if (fProfileKernel) {
+		flags |= STACK_TRACE_KERNEL;
+		skipIFrames = 1;
+	}
+	int32 count = arch_debug_get_stack_trace(cpuData.buffer, fStackDepth,
+		skipIFrames, 0, flags);
 
 	InterruptsSpinLocker locker(fLock);
 

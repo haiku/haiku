@@ -79,7 +79,7 @@ static const char* kUsage =
 	"                   Default is 1000 (1 ms). On a fast machine, a shorter\n"
 	"                   interval might lead to better results, while it might\n"
 	"                   make them worse on slow machines.\n"
-	"  -k             - Don't check kernel images for hits.\n"
+	"  -k             - Also profile kernel frames.\n"
 	"  -l             - Also profile loading the executable.\n"
 	"  -o <output>    - Print the results to file <output>.\n"
 	"  -r, --recorded - Don't profile, but evaluate a recorded kernel profile\n"
@@ -712,6 +712,7 @@ profile_all(const char* const* programArgs, int programArgCount)
 		| B_SYSTEM_PROFILER_SAMPLING_EVENTS;
 	profilerParameters.interval = gOptions.interval;
 	profilerParameters.stack_depth = gOptions.stack_depth;
+	profilerParameters.profile_kernel = gOptions.profile_kernel;
 
 	error = _kern_system_profiler_start(&profilerParameters);
 	if (error != B_OK) {
@@ -1055,7 +1056,7 @@ main(int argc, const char* const* argv)
 				gOptions.interval = atol(optarg);
 				break;
 			case 'k':
-				gOptions.profile_kernel = false;
+				gOptions.profile_kernel = true;
 				break;
 			case 'l':
 				gOptions.profile_loading = true;
