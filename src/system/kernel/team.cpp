@@ -1676,6 +1676,7 @@ team_create_thread_start_internal(void* args)
 			strerror(image)));
 		return image;
 	}
+	user_debug_image_created(&imageInfo.basic_info);
 
 	// NOTE: Normally arch_thread_enter_userspace() never returns, that is
 	// automatic variables with function scope will never be destroyed.
