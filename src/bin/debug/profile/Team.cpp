@@ -138,18 +138,6 @@ Team::InitThread(Thread* thread)
 	}
 
 	if (!_SynchronousProfiling()) {
-		// set thread debugging flags and start profiling
-		int32 threadDebugFlags = 0;
-//		if (!traceTeam) {
-//			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
-//				| (traceChildThreads
-//					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
-//		}
-		status_t error = set_thread_debugging_flags(fNubPort, thread->ID(),
-			threadDebugFlags);
-		if (error != B_OK)
-			return error;
-
 		// start profiling
 		debug_nub_start_profiler message;
 		message.reply_port = fDebugContext.reply_port;
@@ -161,7 +149,7 @@ Team::InitThread(Thread* thread)
 		message.profile_kernel = gOptions.profile_kernel;
 
 		debug_nub_start_profiler_reply reply;
-		error = send_debug_message(&fDebugContext,
+		status_t error = send_debug_message(&fDebugContext,
 			B_DEBUG_START_PROFILER, &message, sizeof(message), &reply,
 			sizeof(reply));
 		if (error != B_OK || (error = reply.error) != B_OK) {
