@@ -325,11 +325,10 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 				break;
 		}
 
-		if (skipFrames <= 0
-			&& ((flags & STACK_TRACE_KERNEL) != 0 || onKernelStack)) {
-			returnAddresses[count++] = ip;
-		} else
+		if (skipFrames > 0)
 			skipFrames--;
+		else
+			returnAddresses[count++] = ip;
 
 		framePointer = nextFrame;
 	}
