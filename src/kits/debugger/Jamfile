@@ -347,7 +347,7 @@ SharedLibrary libdebugger.so :
 	<nogrist>Debugger_disasm_x86_64.o
 	<nogrist>Debugger_dwarf.o
 
-	libudis86.a
+	libzydis.a
 	<bin>debug_utils.a
 	shared
 

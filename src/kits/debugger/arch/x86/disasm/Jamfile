@@ -5,12 +5,12 @@ UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName debugger arch ] ;
 UsePrivateHeaders [ FDirName debugger types ] ;
 
-UseHeaders [ LibraryHeaders udis86 ] ;
-UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
+UseHeaders [ LibraryHeaders zydis ] : true ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
+DEFINES += ZYDIS_DISABLE_ENCODER ;
 
 MergeObject Debugger_disasm_x86.o
 	:

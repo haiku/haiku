@@ -10,7 +10,8 @@
 
 #include <new>
 
-#include "udis86.h"
+#include "Zycore/Format.h"
+#include "Zydis/Zydis.h"
 
 #include <OS.h>
 
@@ -19,43 +20,34 @@
 #include "InstructionInfo.h"
 
 
-static uint8 RegisterNumberFromUdisIndex(int32 udisIndex)
+void
+CpuStateToZydisRegContext(CpuStateX8664* state, ZydisRegisterContext* context)
 {
-	switch (udisIndex) {
-		case UD_R_RIP: return X86_64_REGISTER_RIP;
-		case UD_R_RSP: return X86_64_REGISTER_RSP;
-		case UD_R_RBP: return X86_64_REGISTER_RBP;
-
-		case UD_R_RAX: return X86_64_REGISTER_RAX;
-		case UD_R_RBX: return X86_64_REGISTER_RBX;
-		case UD_R_RCX: return X86_64_REGISTER_RCX;
-		case UD_R_RDX: return X86_64_REGISTER_RDX;
-
-		case UD_R_RSI: return X86_64_REGISTER_RSI;
-		case UD_R_RDI: return X86_64_REGISTER_RDI;
-
-		case UD_R_R8: return X86_64_REGISTER_R8;
-		case UD_R_R9: return X86_64_REGISTER_R9;
-		case UD_R_R10: return X86_64_REGISTER_R10;
-		case UD_R_R11: return X86_64_REGISTER_R11;
-		case UD_R_R12: return X86_64_REGISTER_R12;
-		case UD_R_R13: return X86_64_REGISTER_R13;
-		case UD_R_R14: return X86_64_REGISTER_R14;
-		case UD_R_R15: return X86_64_REGISTER_R15;
-
-		case UD_R_CS: return X86_64_REGISTER_CS;
-		case UD_R_DS: return X86_64_REGISTER_DS;
-		case UD_R_ES: return X86_64_REGISTER_ES;
-		case UD_R_FS: return X86_64_REGISTER_FS;
-		case UD_R_GS: return X86_64_REGISTER_GS;
-		case UD_R_SS: return X86_64_REGISTER_SS;
-	}
-
-	return X86_64_INT_REGISTER_END;
+	context->values[ZYDIS_REGISTER_RAX] = state->IntRegisterValue(X86_64_REGISTER_RAX);
+	context->values[ZYDIS_REGISTER_RSP] = state->IntRegisterValue(X86_64_REGISTER_RSP);
+	context->values[ZYDIS_REGISTER_RIP] = state->IntRegisterValue(X86_64_REGISTER_RIP);
+	// context->values[ZYDIS_REGISTER_RFLAGS] = eflags;
+	context->values[ZYDIS_REGISTER_RCX] = state->IntRegisterValue(X86_64_REGISTER_RCX);
+	context->values[ZYDIS_REGISTER_RDX] = state->IntRegisterValue(X86_64_REGISTER_RDX);
+	context->values[ZYDIS_REGISTER_RBX] = state->IntRegisterValue(X86_64_REGISTER_RBX);
+	context->values[ZYDIS_REGISTER_RBP] = state->IntRegisterValue(X86_64_REGISTER_RBP);
+	context->values[ZYDIS_REGISTER_RSI] = state->IntRegisterValue(X86_64_REGISTER_RSI);
+	context->values[ZYDIS_REGISTER_RDI] = state->IntRegisterValue(X86_64_REGISTER_RDI);
+	context->values[ZYDIS_REGISTER_R8] = state->IntRegisterValue(X86_64_REGISTER_R8);
+	context->values[ZYDIS_REGISTER_R9] = state->IntRegisterValue(X86_64_REGISTER_R9);
+	context->values[ZYDIS_REGISTER_R10] = state->IntRegisterValue(X86_64_REGISTER_R10);
+	context->values[ZYDIS_REGISTER_R11] = state->IntRegisterValue(X86_64_REGISTER_R11);
+	context->values[ZYDIS_REGISTER_R12] = state->IntRegisterValue(X86_64_REGISTER_R12);
+	context->values[ZYDIS_REGISTER_R13] = state->IntRegisterValue(X86_64_REGISTER_R13);
+	context->values[ZYDIS_REGISTER_R14] = state->IntRegisterValue(X86_64_REGISTER_R14);
+	context->values[ZYDIS_REGISTER_R15] = state->IntRegisterValue(X86_64_REGISTER_R15);
 }
 
 
-struct DisassemblerX8664::UdisData : ud_t {
+struct DisassemblerX8664::ZydisData {
+	ZydisDecoder decoder ;
+	ZydisFormatter formatter;
+	ZyanUSize offset;
 };
 
 
@@ -64,14 +56,14 @@ DisassemblerX8664::DisassemblerX8664()
 	fAddress(0),
 	fCode(NULL),
 	fCodeSize(0),
-	fUdisData(NULL)
+	fZydisData(NULL)
 {
 }
 
 
 DisassemblerX8664::~DisassemblerX8664()
 {
-	delete fUdisData;
+	delete fZydisData;
 }
 
 
@@ -79,25 +71,33 @@ status_t
 DisassemblerX8664::Init(target_addr_t address, const void* code, size_t codeSize)
 {
 	// unset old data
-	delete fUdisData;
-	fUdisData = NULL;
+	delete fZydisData;
+	fZydisData = NULL;
 
 	// set new data
-	fUdisData = new(std::nothrow) UdisData;
-	if (fUdisData == NULL)
+	fZydisData = new(std::nothrow) ZydisData;
+	if (fZydisData == NULL)
 		return B_NO_MEMORY;
 
 	fAddress = address;
 	fCode = (const uint8*)code;
 	fCodeSize = codeSize;
 
-	// init udis
-	ud_init(fUdisData);
-	ud_set_input_buffer(fUdisData, (unsigned char*)fCode, fCodeSize);
-	ud_set_mode(fUdisData, 64);
-	ud_set_pc(fUdisData, (uint64_t)fAddress);
-	ud_set_syntax(fUdisData, UD_SYN_ATT);
-	ud_set_vendor(fUdisData, UD_VENDOR_INTEL);
+	// init zydis
+	fZydisData->offset = 0;
+	ZydisDecoderInit(&fZydisData->decoder, ZYDIS_MACHINE_MODE_LONG_64, ZYDIS_STACK_WIDTH_64);
+	ZydisFormatterInit(&fZydisData->formatter, ZYDIS_FORMATTER_STYLE_ATT);
+	ZydisFormatterSetProperty(&fZydisData->formatter, ZYDIS_FORMATTER_PROP_FORCE_SIZE, ZYAN_TRUE);
+	ZydisFormatterSetProperty(&fZydisData->formatter, ZYDIS_FORMATTER_PROP_HEX_UPPERCASE,
+		ZYAN_FALSE);
+	ZydisFormatterSetProperty(&fZydisData->formatter, ZYDIS_FORMATTER_PROP_ADDR_PADDING_ABSOLUTE,
+		ZYDIS_PADDING_DISABLED);
+	ZydisFormatterSetProperty(&fZydisData->formatter, ZYDIS_FORMATTER_PROP_ADDR_PADDING_RELATIVE,
+		ZYDIS_PADDING_DISABLED);
+	ZydisFormatterSetProperty(&fZydisData->formatter, ZYDIS_FORMATTER_PROP_DISP_PADDING,
+		ZYDIS_PADDING_DISABLED);
+	ZydisFormatterSetProperty(&fZydisData->formatter, ZYDIS_FORMATTER_PROP_IMM_PADDING,
+		ZYDIS_PADDING_DISABLED);
 		// TODO: Set the correct vendor!
 
 	return B_OK;
@@ -108,20 +108,35 @@ status_t
 DisassemblerX8664::GetNextInstruction(BString& line, target_addr_t& _address,
 	target_size_t& _size, bool& _breakpointAllowed)
 {
-	unsigned int size = ud_disassemble(fUdisData);
-	if (size < 1)
+	const uint8* buffer = fCode + fZydisData->offset;
+	ZydisDecodedInstruction instruction;
+	ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
+	if (!ZYAN_SUCCESS(ZydisDecoderDecodeFull(&fZydisData->decoder, buffer,
+		fCodeSize - fZydisData->offset, &instruction, operands))) {
 		return B_ENTRY_NOT_FOUND;
+	}
 
-	target_addr_t address = ud_insn_off(fUdisData);
+	target_addr_t address = fAddress + fZydisData->offset;
+	fZydisData->offset += instruction.length;
 
-	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "0x%016" B_PRIx64 ": %16.16s  %s", address,
-		ud_insn_hex(fUdisData), ud_insn_asm(fUdisData));
-			// TODO: Resolve symbols!
+	char hexString[32];
+	char* srcHex = hexString;
+	for (ZyanUSize i = 0; i < instruction.length; i++) {
+		sprintf(srcHex, "%02" PRIx8, buffer[i]);
+		srcHex += 2;
+	}
 
-	line = buffer;
+	char formatted[1024];
+	if (ZYAN_SUCCESS(ZydisFormatterFormatInstruction(&fZydisData->formatter, &instruction, operands,
+		instruction.operand_count_visible, formatted, sizeof(formatted), address, NULL))) {
+		line.SetToFormat("0x%016" B_PRIx64 ": %16.16s  %s", address, hexString, formatted);
+	} else {
+		line.SetToFormat("0x%016" B_PRIx64 ": failed-to-format", address);
+	}
+		// TODO: Resolve symbols!
+
 	_address = address;
-	_size = size;
+	_size = instruction.length;
 	_breakpointAllowed = true;
 		// TODO: Implement (rep!)!
 
@@ -138,14 +153,19 @@ DisassemblerX8664::GetPreviousInstruction(target_addr_t nextAddress,
 
 	// loop until hitting the last instruction
 	while (true) {
-		target_size_t size = ud_disassemble(fUdisData);
-		if (size < 1)
+		const uint8* buffer = fCode + fZydisData->offset;
+		ZydisDecodedInstruction instruction;
+		if (!ZYAN_SUCCESS(ZydisDecoderDecodeInstruction(&fZydisData->decoder,
+				(ZydisDecoderContext*)ZYAN_NULL, buffer, fCodeSize - fZydisData->offset,
+				&instruction))) {
 			return B_ENTRY_NOT_FOUND;
+		}
 
-		target_addr_t address = ud_insn_off(fUdisData);
-		if (address + size == nextAddress) {
+		fZydisData->offset += instruction.length;
+		target_addr_t address = fAddress + fZydisData->offset;
+		if (address == nextAddress) {
 			_address = address;
-			_size = size;
+			_size = instruction.length;
 			return B_OK;
 		}
 	}
@@ -156,104 +176,55 @@ status_t
 DisassemblerX8664::GetNextInstructionInfo(InstructionInfo& _info,
 	CpuState* state)
 {
-	unsigned int size = ud_disassemble(fUdisData);
-	if (size < 1)
+	const uint8* buffer = fCode + fZydisData->offset;
+	ZydisDecodedInstruction instruction;
+	ZydisDecodedOperand operands[ZYDIS_MAX_OPERAND_COUNT];
+	if (!ZYAN_SUCCESS(ZydisDecoderDecodeFull(&fZydisData->decoder, buffer,
+		fCodeSize - fZydisData->offset, &instruction, operands))) {
 		return B_ENTRY_NOT_FOUND;
+	}
 
-	target_addr_t address = ud_insn_off(fUdisData);
+	target_addr_t address = fAddress + fZydisData->offset;
+	fZydisData->offset += instruction.length;
+
+	char hexString[32];
+	char* srcHex = hexString;
+	for (ZyanUSize i = 0; i < instruction.length; i++) {
+		sprintf(srcHex, "%02" PRIx8, buffer[i]);
+		srcHex += 2;
+	}
 
 	instruction_type type = INSTRUCTION_TYPE_OTHER;
 	target_addr_t targetAddress = 0;
-
-	ud_mnemonic_code mnemonic = ud_insn_mnemonic(fUdisData);
-	if (mnemonic == UD_Icall)
+	if (instruction.mnemonic == ZYDIS_MNEMONIC_CALL)
 		type = INSTRUCTION_TYPE_SUBROUTINE_CALL;
-	else if (mnemonic == UD_Ijmp)
+	else if (instruction.mnemonic == ZYDIS_MNEMONIC_JMP)
 		type = INSTRUCTION_TYPE_JUMP;
-	if (state != NULL)
-		targetAddress = GetInstructionTargetAddress(state);
+	if (state != NULL) {
+		CpuStateX8664* x64State = dynamic_cast<CpuStateX8664*>(state);
+		if (x64State != NULL) {
+			ZydisRegisterContext registers;
+			CpuStateToZydisRegContext(x64State, &registers);
+			ZYAN_CHECK(ZydisCalcAbsoluteAddressEx(&instruction, operands,
+				address, &registers, &targetAddress));
+		}
+	}
 
-	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "0x%016" B_PRIx64 ": %16.16s  %s", address,
-		ud_insn_hex(fUdisData), ud_insn_asm(fUdisData));
-			// TODO: Resolve symbols!
+	char string[1024];
+	int written = snprintf(string, sizeof(string), "0x%016" B_PRIx64 ": %16.16s  ", address,
+		hexString);
+	char* formatted = string + written;
+	if (!ZYAN_SUCCESS(ZydisFormatterFormatInstruction(&fZydisData->formatter, &instruction,
+		operands, instruction.operand_count_visible, formatted, sizeof(string) - written,
+		address, NULL))) {
+		snprintf(string, sizeof(string), "0x%016" B_PRIx64 ": failed-to-format", address);
+	}
 
-	if (!_info.SetTo(address, targetAddress, size, type, true, buffer))
+		// TODO: Resolve symbols!
+
+	if (!_info.SetTo(address, targetAddress, instruction.length, type, true, string))
 		return B_NO_MEMORY;
 
 	return B_OK;
 }
 
-
-target_addr_t
-DisassemblerX8664::GetInstructionTargetAddress(CpuState* state) const
-{
-	ud_mnemonic_code mnemonic = ud_insn_mnemonic(fUdisData);
-	if (mnemonic != UD_Icall && mnemonic != UD_Ijmp)
-		return 0;
-
-	CpuStateX8664* x64State = dynamic_cast<CpuStateX8664*>(state);
-	if (x64State == NULL)
-		return 0;
-
-	target_addr_t targetAddress = 0;
-	const struct ud_operand* op = ud_insn_opr(fUdisData, 0);
-	switch (op->type) {
-		case UD_OP_REG:
-		{
-			targetAddress = x64State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(op->base));
-			targetAddress += op->offset;
-		}
-		break;
-		case UD_OP_MEM:
-		{
-			targetAddress = x64State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(op->base));
-			targetAddress += x64State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(op->index))
-				* op->scale;
-			off_t offset = 0;
-			switch (op->offset) {
-				case 8:
-					offset = op->lval.sbyte;
-					break;
-				case 16:
-					offset = op->lval.sword;
-					break;
-				case 32:
-					offset = op->lval.sdword;
-					break;
-				case 64:
-					offset = op->lval.sqword;
-					break;
-			}
-			targetAddress += offset;
-		}
-		break;
-		case UD_OP_JIMM:
-		{
-			targetAddress = ud_insn_off(fUdisData) + ud_insn_len(fUdisData);
-			if (op->size == 32)
-				targetAddress += op->lval.sdword;
-			else
-				targetAddress += op->lval.sqword;
-		}
-		break;
-
-		case UD_OP_IMM:
-		case UD_OP_CONST:
-		{
-			if (op->size == 32)
-				targetAddress = op->lval.udword;
-			else if (op->size == 64)
-				targetAddress = op->lval.uqword;
-		}
-		break;
-
-		default:
-		break;
-	}
-
-	return targetAddress;
-}

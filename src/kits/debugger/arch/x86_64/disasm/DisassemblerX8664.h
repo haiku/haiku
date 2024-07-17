@@ -36,16 +36,13 @@ public:
 									CpuState* state);
 
 private:
-			target_addr_t		GetInstructionTargetAddress(
-									CpuState* state) const;
-private:
-			struct UdisData;
+			struct ZydisData;
 
 private:
 			target_addr_t		fAddress;
 			const uint8*		fCode;
 			size_t				fCodeSize;
-			UdisData*			fUdisData;
+			ZydisData*			fZydisData;
 };
 
 
