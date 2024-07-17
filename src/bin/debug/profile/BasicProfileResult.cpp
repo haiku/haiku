@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <new>
+#include <StackOrHeapArray.h>
 
 #include "Options.h"
 #include "ProfiledEntity.h"
@@ -144,8 +145,8 @@ void
 BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 {
 	// get hit images
-	BasicImageProfileResult* images[container->CountImages()];
-	int32 imageCount = GetHitImages(container, images);
+	BStackOrHeapArray<BasicImageProfileResult*, 128> images(container->CountImages());
+	int32 imageCount = GetHitImages(container, &*images);
 
 	// count symbols
 	int32 symbolCount = 0;
@@ -156,7 +157,7 @@ BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 	}
 
 	// find and sort the hit symbols
-	HitSymbol hitSymbols[symbolCount];
+	BStackOrHeapArray<HitSymbol, 128> hitSymbols(symbolCount);
 	int32 hitSymbolCount = 0;
 
 	for (int32 k = 0; k < imageCount; k++) {
@@ -177,7 +178,7 @@ BasicProfileResult::PrintResults(ImageProfileResultContainer* container)
 	}
 
 	if (hitSymbolCount > 1)
-		std::sort(hitSymbols, hitSymbols + hitSymbolCount);
+		std::sort(&*hitSymbols, hitSymbols + hitSymbolCount);
 
 	int64 totalTicks = fTotalTicks;
 	const int64 missedTicks = fExpectedTicks - fTotalTicks;

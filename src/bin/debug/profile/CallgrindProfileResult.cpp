@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <new>
+#include <StackOrHeapArray.h>
 
 #include "Options.h"
 #include "ProfiledEntity.h"
@@ -221,8 +222,8 @@ CallgrindProfileResult::PrintResults(ImageProfileResultContainer* container)
 		fTotalTicks, fTotalTicks * fInterval);
 
 	// get hit images
-	CallgrindImageProfileResult* images[container->CountImages()];
-	int32 imageCount = GetHitImages(container, images);
+	BStackOrHeapArray<CallgrindImageProfileResult*, 128> images(container->CountImages());
+	int32 imageCount = GetHitImages(container, &*images);
 
 	for (int32 i = 0; i < imageCount; i++) {
 		CallgrindImageProfileResult* image = images[i];
