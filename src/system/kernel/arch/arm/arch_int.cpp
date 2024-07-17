@@ -474,12 +474,7 @@ arch_arm_irq(struct iframe *iframe)
 
 	Thread* thread = thread_get_current_thread();
 	cpu_status state = disable_interrupts();
-	if (thread->cpu->invoke_scheduler) {
-		SpinLocker schedulerLocker(thread->scheduler_lock);
-		scheduler_reschedule(B_THREAD_READY);
-		schedulerLocker.Unlock();
-		restore_interrupts(state);
-	} else if (thread->post_interrupt_callback != NULL) {
+	if (thread->post_interrupt_callback != NULL) {
 		void (*callback)(void*) = thread->post_interrupt_callback;
 		void* data = thread->post_interrupt_data;
 
@@ -489,6 +484,11 @@ arch_arm_irq(struct iframe *iframe)
 		restore_interrupts(state);
 
 		callback(data);
+	} else if (thread->cpu->invoke_scheduler) {
+		SpinLocker schedulerLocker(thread->scheduler_lock);
+		scheduler_reschedule(B_THREAD_READY);
+		schedulerLocker.Unlock();
+		restore_interrupts(state);
 	}
 }
 
