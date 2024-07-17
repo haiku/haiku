@@ -815,8 +815,8 @@ main(int argc, const char *const *argv)
 			exit(1);
 		}
 
-		// resume the target thread to be sure, it's running
-		resume_thread(threadID);
+		// resume the target thread to be sure it's running
+		continue_thread(nubPort, threadID);
 	}
 
 	thread_id currentThreadID = -1;
