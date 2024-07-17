@@ -72,17 +72,17 @@ static void
 add_event_to_list(timer* event, timer* volatile* list)
 {
 	timer* next;
-	timer* last = NULL;
+	timer* previous = NULL;
 
 	// stick it in the event list
-	for (next = *list; next; last = next, next = (timer*)next->next) {
+	for (next = *list; next != NULL; previous = next, next = (timer*)next->next) {
 		if ((bigtime_t)next->schedule_time >= (bigtime_t)event->schedule_time)
 			break;
 	}
 
-	if (last != NULL) {
-		event->next = last->next;
-		last->next = event;
+	if (previous != NULL) {
+		event->next = previous->next;
+		previous->next = event;
 	} else {
 		event->next = next;
 		*list = event;
@@ -282,13 +282,13 @@ timer_interrupt()
 		acquire_spinlock(spinlock);
 
 		if ((mode & ~B_TIMER_FLAGS) == B_PERIODIC_TIMER
-			&& cpuData.current_event != NULL) {
+				&& cpuData.current_event != NULL) {
 			// we need to adjust it and add it back to the list
 			event->schedule_time += event->period;
 
 			// If the new schedule time is a full interval or more in the past,
 			// skip ticks.
-			bigtime_t now =  system_time();
+			bigtime_t now = system_time();
 			if (now >= event->schedule_time + event->period) {
 				// pick the closest tick in the past
 				event->schedule_time = now
@@ -299,7 +299,6 @@ timer_interrupt()
 		}
 
 		cpuData.current_event = NULL;
-
 		event = cpuData.events;
 	}
 
@@ -400,20 +399,20 @@ cancel_timer(timer* event)
 	if (event != cpuData.current_event) {
 		// The timer hook is not yet being executed.
 		timer* current = cpuData.events;
-		timer* last = NULL;
+		timer* previous = NULL;
 
 		while (current != NULL) {
 			if (current == event) {
 				// we found it
-				if (last == NULL)
+				if (previous == NULL)
 					cpuData.events = current->next;
 				else
-					last->next = current->next;
+					previous->next = current->next;
 				current->next = NULL;
 				// break out of the whole thing
 				break;
 			}
-			last = current;
+			previous = current;
 			current = current->next;
 		}
 
