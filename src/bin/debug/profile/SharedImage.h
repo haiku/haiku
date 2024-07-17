@@ -106,8 +106,8 @@ SharedImage::SymbolCount() const
 bool
 SharedImage::ContainsAddress(addr_t address) const
 {
-	return address >= (addr_t)fInfo.text
-		&& address <= (addr_t)fInfo.data + fInfo.data_size - 1;
+	return (address >= (addr_t)fInfo.text && address < ((addr_t)fInfo.text + fInfo.text_size))
+		|| (address >= (addr_t)fInfo.data && address < ((addr_t)fInfo.data + fInfo.data_size));
 }
 
 
