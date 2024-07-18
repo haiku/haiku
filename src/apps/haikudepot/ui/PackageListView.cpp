@@ -24,7 +24,8 @@
 
 #include "LocaleUtils.h"
 #include "Logger.h"
-#include "MainWindow.h"
+#include "RatingUtils.h"
+#include "SharedIcons.h"
 #include "WorkStatusView.h"
 
 
@@ -140,6 +141,7 @@ public:
 									float width, float minWidth,
 									float maxWidth, uint32 truncateMode,
 									alignment align = B_ALIGN_LEFT);
+	virtual						~PackageColumn();
 
 	virtual	void				DrawField(BField* field, BRect rect,
 									BView* parent);
@@ -154,6 +156,7 @@ public:
 private:
 			Model*				fModel;
 			uint32				fTruncateMode;
+			RatingStarsMetrics*	fRatingsMetrics;
 	static	float				sTextMargin;
 };
 
@@ -251,7 +254,7 @@ PackageIconAndTitleField::~PackageIconAndTitleField()
 
 RatingField::RatingField(float rating)
 	:
-	fRating(0.0f)
+	fRating(RATING_MISSING)
 {
 	SetRating(rating);
 }
@@ -265,14 +268,6 @@ RatingField::~RatingField()
 void
 RatingField::SetRating(float rating)
 {
-	if (rating < 0.0f)
-		rating = 0.0f;
-	if (rating > 5.0f)
-		rating = 5.0f;
-
-	if (rating == fRating)
-		return;
-
 	fRating = rating;
 }
 
@@ -374,6 +369,15 @@ PackageColumn::PackageColumn(Model* model, const char* title, float width,
 	fTruncateMode(truncateMode)
 {
 	SetWantsEvents(true);
+
+	BSize ratingStarSize = SharedIcons::IconStarBlue12Scaled()->Bitmap()->Bounds().Size();
+	fRatingsMetrics = new RatingStarsMetrics(ratingStarSize);
+}
+
+
+PackageColumn::~PackageColumn()
+{
+	delete fRatingsMetrics;
 }
 
 
@@ -454,60 +458,31 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		DrawString(stringField->ClippedString(), parent, rect);
 
 	} else if (ratingField != NULL) {
+		float width = rect.Width();
+		float padding = be_control_look->ComposeSpacing(B_USE_SMALL_SPACING);
+		bool isRatingValid = ratingField->Rating() >= RATING_MIN;
 
-		const float kDefaultTextMargin = 8;
+		if (!isRatingValid || width < fRatingsMetrics->Size().Width() + padding * 2.0) {
+			BString ratingAsText = "-";
 
-		float width = rect.Width() - (2 * kDefaultTextMargin);
+			if (isRatingValid)
+				ratingAsText.SetToFormat("%.1f", ratingField->Rating());
 
-		BString string = "★★★★★";
-		float stringWidth = parent->StringWidth(string);
-		bool drawOverlay = true;
+			float ratingAsTextWidth = parent->StringWidth(ratingAsText);
 
-		if (width < stringWidth) {
-			string.SetToFormat("%.1f", ratingField->Rating());
-			drawOverlay = false;
-			stringWidth = parent->StringWidth(string);
-		}
-
-		switch (Alignment()) {
-			default:
-			case B_ALIGN_LEFT:
-				rect.left += kDefaultTextMargin;
-				break;
-			case B_ALIGN_CENTER:
-				rect.left = rect.left + (width - stringWidth) / 2.0f;
-				break;
-
-			case B_ALIGN_RIGHT:
-				rect.left = rect.right - (stringWidth + kDefaultTextMargin);
-				break;
-		}
-
-		rect.left = floorf(rect.left);
-		rect.right = rect.left + stringWidth;
-
-		if (drawOverlay)
-			parent->SetHighColor(0, 170, 255);
-
-		font_height	fontHeight;
-		parent->GetFontHeight(&fontHeight);
-		float y = rect.top + (rect.Height()
-			- (fontHeight.ascent + fontHeight.descent)) / 2
-			+ fontHeight.ascent;
-
-		parent->DrawString(string, BPoint(rect.left, y));
-
-		if (drawOverlay) {
-			rect.left = ceilf(rect.left
-				+ (ratingField->Rating() / 5.0f) * rect.Width());
-
-			rgb_color color = parent->LowColor();
-			color.alpha = 190;
-			parent->SetHighColor(color);
-
-			parent->SetDrawingMode(B_OP_ALPHA);
-			parent->FillRect(rect, B_SOLID_HIGH);
-
+			if (ratingAsTextWidth + padding * 2.0 < width) {
+				font_height fontHeight;
+				parent->GetFontHeight(&fontHeight);
+				float fullHeight = fontHeight.ascent + fontHeight.descent;
+				float y = rect.top + (rect.Height() - fullHeight) / 2 + fontHeight.ascent;
+				parent->DrawString(ratingAsText, BPoint(rect.left + padding, y));
+			}
+		} else {
+			const BBitmap* starIcon = SharedIcons::IconStarBlue12Scaled()->Bitmap();
+			float ratingsStarsHeight = fRatingsMetrics->Size().Height();
+			BPoint starsPt(floorf(rect.LeftTop().x + padding),
+				floorf(rect.LeftTop().y + (rect.Size().Height() / 2.0) - ratingsStarsHeight / 2.0));
+			RatingUtils::Draw(parent, starsPt, ratingField->Rating(), starIcon);
 		}
 	}
 }

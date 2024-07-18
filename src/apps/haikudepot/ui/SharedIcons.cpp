@@ -15,12 +15,24 @@
 #include "support.h"
 
 
+BitmapHolderRef SharedIcons::sIconStarBlue12Scaled;
 BitmapHolderRef SharedIcons::sIconStarBlue16Scaled;
 BitmapHolderRef SharedIcons::sIconStarGrey16Scaled;
 BitmapHolderRef SharedIcons::sIconInstalled16Scaled;
 BitmapHolderRef SharedIcons::sIconArrowLeft22Scaled;
 BitmapHolderRef SharedIcons::sIconArrowRight22Scaled;
 BitmapHolderRef SharedIcons::sIconHTMLPackage16Scaled;
+
+
+/*static*/ BitmapHolderRef
+SharedIcons::IconStarBlue12Scaled()
+{
+	if (!SharedIcons::sIconStarBlue12Scaled.IsSet()) {
+		SharedIcons::sIconStarBlue12Scaled
+			= SharedIcons::_CreateIconForResource(RSRC_STAR_BLUE, 12);
+	}
+	return SharedIcons::sIconStarBlue12Scaled;
+}
 
 
 /*static*/ BitmapHolderRef
@@ -92,6 +104,7 @@ SharedIcons::IconHTMLPackage16Scaled()
 /*static*/ void
 SharedIcons::UnsetAllIcons()
 {
+	sIconStarBlue12Scaled.Unset();
 	sIconStarBlue16Scaled.Unset();
 	sIconStarGrey16Scaled.Unset();
 	sIconInstalled16Scaled.Unset();

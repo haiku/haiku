@@ -8,10 +8,12 @@
 
 #include "RatingSummary.h"
 
+#include "HaikuDepotConstants.h"
+
 
 RatingSummary::RatingSummary()
 	:
-	averageRating(0.0f),
+	averageRating(RATING_MISSING),
 	ratingCount(0)
 {
 for (int i = 0; i < 5; i++)

@@ -16,6 +16,7 @@ public:
 	static	void			UnsetAllIcons();
 
 	// icons from application resources
+	static	BitmapHolderRef	IconStarBlue12Scaled();
 	static	BitmapHolderRef	IconStarBlue16Scaled();
 	static	BitmapHolderRef	IconStarGrey16Scaled();
 	static	BitmapHolderRef	IconInstalled16Scaled();
@@ -35,6 +36,7 @@ private:
        								BitmapHolderRef* bitmapHolderRef);
 
 private:
+	static	BitmapHolderRef	sIconStarBlue12Scaled;
 	static	BitmapHolderRef	sIconStarBlue16Scaled;
 	static	BitmapHolderRef	sIconStarGrey16Scaled;
 	static	BitmapHolderRef	sIconInstalled16Scaled;
