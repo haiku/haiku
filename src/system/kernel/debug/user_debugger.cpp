@@ -63,6 +63,8 @@ static timer sProfilingTimers[SMP_MAX_CPUS];
 
 static void schedule_profiling_timer(Thread* thread, bigtime_t interval);
 static int32 profiling_event(timer* unused);
+static void profiling_flush(void*);
+
 static status_t ensure_debugger_installed();
 static void get_team_debug_info(team_debug_info &teamDebugInfo);
 
@@ -308,7 +310,7 @@ init_thread_debug_info(struct thread_debug_info *info)
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
 		info->profile.samples = NULL;
-		info->profile.buffer_full = false;
+		info->profile.flush_needed = false;
 		info->profile.installed_timer = NULL;
 	}
 }
@@ -335,7 +337,7 @@ clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
 		info->profile.samples = NULL;
-		info->profile.buffer_full = false;
+		info->profile.flush_needed = false;
 	}
 }
 
@@ -869,6 +871,10 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	if (!(teamDebugFlags & B_TEAM_DEBUG_DEBUGGER_INSTALLED))
 		return;
 
+	// check if we need to flush the profiling buffer
+	if (thread->debug_info.profile.flush_needed)
+		profiling_flush(NULL);
+
 	// check whether post-syscall tracing is enabled for team or thread
 	int32 threadDebugFlags = atomic_get(&thread->debug_info.flags);
 	if (!(teamDebugFlags & B_TEAM_DEBUG_POST_SYSCALL)
@@ -1176,7 +1182,7 @@ user_debug_thread_exiting(Thread* thread)
 	int32 imageEvent = threadDebugInfo.profile.image_event;
 	threadDebugInfo.profile.sample_area = -1;
 	threadDebugInfo.profile.samples = NULL;
-	threadDebugInfo.profile.buffer_full = false;
+	threadDebugInfo.profile.flush_needed = false;
 	bigtime_t lastCPUTime; {
 		SpinLocker threadTimeLocker(thread->time_lock);
 		lastCPUTime = thread->CPUTime(false);
@@ -1305,9 +1311,21 @@ static void
 schedule_profiling_timer(Thread* thread, bigtime_t interval)
 {
 	struct timer* timer = &sProfilingTimers[thread->cpu->cpu_num];
+	ASSERT(thread->debug_info.profile.installed_timer == NULL);
 	thread->debug_info.profile.installed_timer = timer;
 	thread->debug_info.profile.timer_end = system_time() + interval;
 	add_timer(timer, &profiling_event, interval, B_ONE_SHOT_RELATIVE_TIMER);
+}
+
+
+/*!	Returns the time remaining for the current profiling timer.
+	The caller must hold the thread's debug info lock.
+	\param thread The current thread.
+*/
+static bigtime_t
+profiling_timer_left(Thread* thread)
+{
+	return thread->debug_info.profile.timer_end - system_time();
 }
 
 
@@ -1346,14 +1364,15 @@ profiling_do_sample(bool& flushBuffer)
 		}
 
 		if (debugInfo.profile.last_image_event < imageEvent
-			|| debugInfo.profile.flush_threshold - sampleCount < stackDepth) {
-			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc(NULL))) {
-				flushBuffer = true;
-				return true;
-			}
+				|| debugInfo.profile.flush_threshold - sampleCount < stackDepth) {
+			debugInfo.profile.flush_needed = true;
 
-			// We can't flush the buffer now, since we interrupted a kernel
-			// function. If the buffer is not full yet, we add the samples,
+			// If we've interrupted a kernel function, we can't flush now.
+			// (The flush will instead happen in the post_syscall hook.)
+			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc(NULL)))
+				flushBuffer = true;
+
+			// If the buffer is not full yet, we add the samples,
 			// otherwise we have to drop them.
 			if (maxSamples - sampleCount < stackDepth) {
 				debugInfo.profile.dropped_ticks++;
@@ -1401,11 +1420,13 @@ profiling_do_sample(bool& flushBuffer)
 
 
 static void
-profiling_buffer_full(void*)
+profiling_flush(void*)
 {
-	// It is undefined whether the function is called with interrupts enabled
-	// or disabled. We are allowed to enable interrupts, though. First make
-	// sure interrupts are disabled.
+	// This function may be called as a post_interrupt_callback. When it is,
+	// it is undefined whether the function is called with interrupts enabled
+	// or disabled. (When called elsewhere, interrupts will always be enabled.)
+	// We are allowed to enable interrupts, though. First make sure interrupts
+	// are disabled.
 	disable_interrupts();
 
 	Thread* thread = thread_get_current_thread();
@@ -1413,16 +1434,26 @@ profiling_buffer_full(void*)
 
 	SpinLocker threadDebugInfoLocker(debugInfo.lock);
 
-	if (debugInfo.profile.samples != NULL && debugInfo.profile.buffer_full) {
+	if (debugInfo.profile.samples != NULL && debugInfo.profile.flush_needed) {
 		int32 sampleCount = debugInfo.profile.sample_count;
 		int32 droppedTicks = debugInfo.profile.dropped_ticks;
 		int32 stackDepth = debugInfo.profile.stack_depth;
 		bool variableStackDepth = debugInfo.profile.variable_stack_depth;
 		int32 imageEvent = debugInfo.profile.image_event;
 
+		// prevent the timer from running until after we flush
+		bigtime_t interval = debugInfo.profile.interval;
+		if (debugInfo.profile.installed_timer != NULL) {
+			interval = max_c(profiling_timer_left(thread), 0);
+			cancel_timer(debugInfo.profile.installed_timer);
+			debugInfo.profile.installed_timer = NULL;
+		}
+		debugInfo.profile.interval_left = -1;
+
 		// notify the debugger
 		debugInfo.profile.sample_count = 0;
 		debugInfo.profile.dropped_ticks = 0;
+		debugInfo.profile.flush_needed = false;
 
 		threadDebugInfoLocker.Unlock();
 		enable_interrupts();
@@ -1441,13 +1472,7 @@ profiling_buffer_full(void*)
 
 		disable_interrupts();
 		threadDebugInfoLocker.Lock();
-
-		// do the sampling and reschedule timer, if still profiling this thread
-		bool flushBuffer;
-		if (profiling_do_sample(flushBuffer)) {
-			debugInfo.profile.buffer_full = false;
-			schedule_profiling_timer(thread, debugInfo.profile.interval);
-		}
+		schedule_profiling_timer(thread, interval);
 	}
 
 	threadDebugInfoLocker.Unlock();
@@ -1465,21 +1490,23 @@ profiling_event(timer* /*unused*/)
 	thread_debug_info& debugInfo = thread->debug_info;
 
 	SpinLocker threadDebugInfoLocker(debugInfo.lock);
+	debugInfo.profile.installed_timer = NULL;
 
 	bool flushBuffer = false;
 	if (profiling_do_sample(flushBuffer)) {
 		if (flushBuffer) {
 			// The sample buffer needs to be flushed; we'll have to notify the
 			// debugger. We can't do that right here. Instead we set a post
-			// interrupt callback doing that for us, and don't reschedule the
-			// timer yet.
-			thread->post_interrupt_callback = profiling_buffer_full;
-			debugInfo.profile.installed_timer = NULL;
-			debugInfo.profile.buffer_full = true;
+			// interrupt callback doing that for us.
+			thread->post_interrupt_callback = profiling_flush;
+
+			// We don't reschedule the timer here because profiling_flush() will
+			// lead to the thread being descheduled until we are told to continue.
+			// The timer will be rescheduled after the flush concludes.
+			debugInfo.profile.interval_left = -1;
 		} else
 			schedule_profiling_timer(thread, debugInfo.profile.interval);
-	} else
-		debugInfo.profile.installed_timer = NULL;
+	}
 
 	return B_HANDLED_INTERRUPT;
 }
@@ -1497,7 +1524,7 @@ user_debug_thread_unscheduled(Thread* thread)
 	struct timer* timer = thread->debug_info.profile.installed_timer;
 	if (timer != NULL) {
 		// track remaining time
-		bigtime_t left = thread->debug_info.profile.timer_end - system_time();
+		bigtime_t left = profiling_timer_left(thread);
 		thread->debug_info.profile.interval_left = max_c(left, 0);
 		thread->debug_info.profile.installed_timer = NULL;
 
@@ -1520,7 +1547,7 @@ user_debug_thread_scheduled(Thread* thread)
 	SpinLocker threadDebugInfoLocker(thread->debug_info.lock);
 
 	if (thread->debug_info.profile.samples != NULL
-		&& !thread->debug_info.profile.buffer_full) {
+			&& thread->debug_info.profile.interval_left >= 0) {
 		// install profiling timer
 		schedule_profiling_timer(thread,
 			thread->debug_info.profile.interval_left);
@@ -2342,7 +2369,7 @@ debug_nub_thread(void *)
 							threadDebugInfo.profile.variable_stack_depth
 								= variableStackDepth;
 							threadDebugInfo.profile.profile_kernel = profileKernel;
-							threadDebugInfo.profile.buffer_full = false;
+							threadDebugInfo.profile.flush_needed = false;
 							threadDebugInfo.profile.interval_left = interval;
 							threadDebugInfo.profile.installed_timer = NULL;
 							threadDebugInfo.profile.image_event = imageEvent;
@@ -2413,7 +2440,7 @@ debug_nub_thread(void *)
 						imageEvent = threadDebugInfo.profile.image_event;
 						threadDebugInfo.profile.sample_area = -1;
 						threadDebugInfo.profile.samples = NULL;
-						threadDebugInfo.profile.buffer_full = false;
+						threadDebugInfo.profile.flush_needed = false;
 						threadDebugInfo.profile.dropped_ticks = 0;
 						{
 							SpinLocker threadTimeLocker(thread->time_lock);

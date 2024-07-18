@@ -149,8 +149,8 @@ struct thread_debug_info {
 			// record a variable number of samples per hit
 		bool			profile_kernel;
 			// record samples in kernel stack frames
-		bool			buffer_full;
-			// indicates that the sample buffer is full
+		bool			flush_needed;
+			// indicates that a flush of the sample buffer is needed
 		union {
 			bigtime_t	interval_left;
 				// when unscheduled: the time left of the current sampling
