@@ -38,6 +38,7 @@ ShuttingDownWindow::ShuttingDownWindow(BWindow* parent)
 		.End();
 
 	CenterOnScreen();
+	ResizeToPreferred();
 }
 
 
