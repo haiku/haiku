@@ -27,19 +27,6 @@ struct SymbolLookupInfo {
 	const elf_version_info*	version;
 	elf_sym*				requestingSymbol;
 
-	SymbolLookupInfo(const char* name, int32 type, uint32 hash,
-		const elf_version_info* version = NULL, uint32 flags = 0,
-		elf_sym* requestingSymbol = NULL)
-		:
-		name(name),
-		type(type),
-		hash(hash),
-		flags(flags),
-		version(version),
-		requestingSymbol(requestingSymbol)
-	{
-	}
-
 	SymbolLookupInfo(const char* name, int32 type,
 		const elf_version_info* version = NULL, uint32 flags = 0,
 		elf_sym* requestingSymbol = NULL)
