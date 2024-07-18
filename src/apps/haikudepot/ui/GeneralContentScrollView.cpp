@@ -6,6 +6,8 @@
 
 #include "GeneralContentScrollView.h"
 
+#include <ControlLook.h>
+
 
 GeneralContentScrollView::GeneralContentScrollView(
 	const char* name, BView* target)
@@ -18,8 +20,9 @@ GeneralContentScrollView::GeneralContentScrollView(
 void
 GeneralContentScrollView::DoLayout()
 {
+	float scrollBarWidth = be_control_look->GetScrollBarWidth(B_VERTICAL);
 	BRect innerFrame = Bounds();
-	innerFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
+	innerFrame.right -= scrollBarWidth + 1;
 
 	BView* target = Target();
 	if (target != NULL) {
@@ -32,7 +35,7 @@ GeneralContentScrollView::DoLayout()
 	if (scrollBar != NULL) {
 		BRect rect = innerFrame;
 		rect.left = rect.right + 1;
-		rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
+		rect.right = rect.left + scrollBarWidth;
 
 		scrollBar->MoveTo(rect.left, rect.top);
 		scrollBar->ResizeTo(rect.Width(), rect.Height());
