@@ -1799,6 +1799,7 @@ void getcwd() {}
 void getdelim() {}
 void getdtablesize() {}
 void getegid() {}
+void getentropy() {}
 void getenv() {}
 void geteuid() {}
 void getgid() {}
