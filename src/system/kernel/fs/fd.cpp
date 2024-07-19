@@ -855,8 +855,8 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	if (error != B_OK)
 		return error;
 
-	SyscallRestartWrapper<ssize_t> result = common_vector_io(fd, pos,
-		vecs, count, write, false);
+	SyscallRestartWrapper<ssize_t> result;
+	result = common_vector_io(fd, pos, vecs, count, write, false);
 
 	return result;
 }
