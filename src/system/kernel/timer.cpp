@@ -245,19 +245,16 @@ timer_real_time_clock_changed()
 int32
 timer_interrupt()
 {
-	timer* event;
-	spinlock* spinlock;
 	per_cpu_timer_data& cpuData = sPerCPU[smp_get_current_cpu()];
 	int32 rc = B_HANDLED_INTERRUPT;
 
 	TRACE(("timer_interrupt: time %" B_PRIdBIGTIME ", cpu %" B_PRId32 "\n",
 		system_time(), smp_get_current_cpu()));
 
-	spinlock = &cpuData.lock;
-
+	spinlock* spinlock = &cpuData.lock;
 	acquire_spinlock(spinlock);
 
-	event = cpuData.events;
+	timer* event = cpuData.events;
 	while (event != NULL && ((bigtime_t)event->schedule_time < system_time())) {
 		// this event needs to happen
 		int mode = event->flags;
@@ -425,7 +422,7 @@ cancel_timer(timer* event)
 		event->cpu = 0xffff;
 
 		// If on the current CPU, also reset the hardware timer.
-		if (cpu == smp_get_current_cpu()) {
+		if (cpu == smp_get_current_cpu() && previous == NULL) {
 			if (cpuData.events == NULL)
 				arch_timer_clear_hardware_timer();
 			else
