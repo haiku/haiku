@@ -1331,11 +1331,10 @@ profiling_timer_left(Thread* thread)
 
 /*!	Samples the current thread's instruction pointer/stack trace.
 	The caller must hold the current thread's debug info lock.
-	\param flushBuffer Return parameter: Set to \c true when the sampling
-		buffer must be flushed.
+	\returns Whether the profiling timer should be rescheduled.
 */
 static bool
-profiling_do_sample(bool& flushBuffer)
+profiling_do_sample()
 {
 	Thread* thread = thread_get_current_thread();
 	thread_debug_info& debugInfo = thread->debug_info;
@@ -1366,11 +1365,6 @@ profiling_do_sample(bool& flushBuffer)
 		if (debugInfo.profile.last_image_event < imageEvent
 				|| debugInfo.profile.flush_threshold - sampleCount < stackDepth) {
 			debugInfo.profile.flush_needed = true;
-
-			// If we've interrupted a kernel function, we can't flush now.
-			// (The flush will instead happen in the post_syscall hook.)
-			if (!IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc(NULL)))
-				flushBuffer = true;
 
 			// If the buffer is not full yet, we add the samples,
 			// otherwise we have to drop them.
@@ -1472,7 +1466,8 @@ profiling_flush(void*)
 
 		disable_interrupts();
 		threadDebugInfoLocker.Lock();
-		schedule_profiling_timer(thread, interval);
+		if (debugInfo.profile.samples != NULL)
+			schedule_profiling_timer(thread, interval);
 	}
 
 	threadDebugInfoLocker.Unlock();
@@ -1492,12 +1487,13 @@ profiling_event(timer* /*unused*/)
 	SpinLocker threadDebugInfoLocker(debugInfo.lock);
 	debugInfo.profile.installed_timer = NULL;
 
-	bool flushBuffer = false;
-	if (profiling_do_sample(flushBuffer)) {
-		if (flushBuffer) {
-			// The sample buffer needs to be flushed; we'll have to notify the
-			// debugger. We can't do that right here. Instead we set a post
-			// interrupt callback doing that for us.
+	if (profiling_do_sample()) {
+		// Check if the sample buffer needs to be flushed. We can't do it here,
+		// since we're in an interrupt handler, and we can't set the callback
+		// if we interrupted a kernel function, since the callback will pause
+		// this thread. (The post_syscall hook will do the flush in that case.)
+		if (debugInfo.profile.flush_needed
+				&& !IS_KERNEL_ADDRESS(arch_debug_get_interrupt_pc(NULL))) {
 			thread->post_interrupt_callback = profiling_flush;
 
 			// We don't reschedule the timer here because profiling_flush() will
