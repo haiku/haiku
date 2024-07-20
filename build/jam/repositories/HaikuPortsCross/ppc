@@ -27,11 +27,12 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap-2.14-1
 	icu_bootstrap-67.1-2
 	icu_bootstrap_devel-67.1-2
+	libffi_bootstrap-3.4.6-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-4.3-1
 	ncurses6_bootstrap-6.2-1
 	ncurses6_bootstrap_devel-6.2-1
-	python_bootstrap-2.7.6-1
+	python_bootstrap-3.9.1-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
 	zlib_bootstrap-1.2.13-1
@@ -55,6 +56,8 @@ BootstrapPackageRepository HaikuPortsCross
 	icu_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
+	libffi_bootstrap
+	libsolv_bootstrap
 	m4_bootstrap
 	make_bootstrap
 	ncurses6_bootstrap
@@ -62,7 +65,7 @@ BootstrapPackageRepository HaikuPortsCross
 	sed_bootstrap
 	texinfo_bootstrap
 	zlib_bootstrap
-	libsolv_bootstrap
+	zstd_bootstrap
 	:
 	# debuginfo packages
 	;
