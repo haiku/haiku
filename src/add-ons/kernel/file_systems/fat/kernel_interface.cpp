@@ -918,7 +918,7 @@ dosfs_remove_vnode(fs_volume* volume, fs_vnode* vnode, bool reenter)
 
 	free(fatNode);
 
-	locker.Unlock();
+	locker.Detach();
 	rw_lock_destroy(&bsdNode->v_vnlock->haikuRW);
 
 	free(bsdNode);
@@ -2164,7 +2164,12 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 		return B_BAD_VALUE;
 	}
 
-	WriteLocker locker(bsdNode->v_vnlock->haikuRW);
+	ReadLocker readLocker;
+	WriteLocker writeLocker;
+	if ((openMode & O_TRUNC) != 0)
+		writeLocker.SetTo(bsdNode->v_vnlock->haikuRW, false);
+	else
+		readLocker.SetTo(bsdNode->v_vnlock->haikuRW, false);
 
 	// Opening a directory read-only is allowed, although you can't read
 	// any data from it.
@@ -2200,7 +2205,8 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 		rw_lock_write_unlock(&fatVolume->pm_fatlock.haikuRW);
 		if (status != B_OK)
 			RETURN_ERROR(status);
-		locker.Unlock();
+
+		writeLocker.Unlock();
 		status = file_cache_set_size(bsdNode->v_cache, 0);
 		if (status != B_OK)
 			RETURN_ERROR(status);
@@ -2215,13 +2221,39 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 static status_t
 dosfs_close(fs_volume* volume, fs_vnode* vnode, void* cookie)
 {
+	FUNCTION_START("%p\n", vnode->private_node);
+
+	return B_OK;
+}
+
+
+static status_t
+dosfs_free_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
+{
 	struct vnode* bsdNode = reinterpret_cast<struct vnode*>(vnode->private_node);
 	denode* fatNode = reinterpret_cast<denode*>(bsdNode->v_data);
 
 	FUNCTION_START("%s (inode %" B_PRIu64 " at %p)\n", fatNode->de_Name, fatNode->de_inode,
 		bsdNode);
 
-	WriteLocker locker(bsdNode->v_vnlock->haikuRW);
+	ReadLocker readLocker;
+	WriteLocker writeLocker;
+	bool correctLock = false;
+	while (correctLock == false) {
+		if ((fatNode->de_flag & (DE_UPDATE | DE_ACCESS | DE_CREATE)) != 0) {
+			writeLocker.SetTo(bsdNode->v_vnlock->haikuRW, false);
+			if ((fatNode->de_flag & (DE_UPDATE | DE_ACCESS | DE_CREATE)) != 0)
+				correctLock = true;
+			else
+				writeLocker.Unlock();
+		} else {
+			readLocker.SetTo(bsdNode->v_vnlock->haikuRW, false);
+			if ((fatNode->de_flag & (DE_UPDATE | DE_ACCESS | DE_CREATE)) == 0)
+				correctLock = true;
+			else
+				readLocker.Unlock();
+		}
+	}
 
 	struct timespec timeSpec;
 	vfs_timestamp(&timeSpec);
@@ -2242,16 +2274,7 @@ dosfs_close(fs_volume* volume, fs_vnode* vnode, void* cookie)
 	if ((bsdNode->v_mount->mnt_flag & MNT_SYNCHRONOUS) != 0)
 		deupdat(fatNode, 1);
 
-	return B_OK;
-}
-
-
-static status_t
-dosfs_free_cookie(fs_volume* volume, fs_vnode* vnode, void* cookie)
-{
-	FUNCTION_START("%p\n", vnode->private_node);
-
-	delete reinterpret_cast<FileCookie*>(cookie);
+	delete fatCookie;
 
 	return B_OK;
 }
@@ -3403,7 +3426,6 @@ dev_bsd_node_uninit(vnode* devNode)
 		free(listEntry);
 	}
 
-	rw_lock_write_unlock(&devNode->v_bufobj.bo_lock.haikuRW);
 	rw_lock_destroy(&devNode->v_bufobj.bo_lock.haikuRW);
 
 	free(devNode);
