@@ -394,6 +394,7 @@ MIMESET_COMMAND="$(PWD)/$(2[2])"
 SYSTEM_MIME_DB="$(PWD)/$(2[3])"
 LICENSES_DIRECTORY="$(HAIKU_ABSOLUTE_TOP)/data/system/data/licenses"
 OUTPUT_DIRECTORY="$(HAIKU_REPOSITORY_BUILD_DIRECTORY)"
+CREATE_SOURCE_PACKAGES="yes"
 EOF
 
 	# If we have cross tools, add the cross tools directory.
