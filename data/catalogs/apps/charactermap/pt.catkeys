@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-CharacterMap	3279536275
+1	portuguese	x-vnd.Haiku-CharacterMap	2213480441
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbolos matemáticos diversos B
 Latin extended E	UnicodeBlocks		Latim expandido E
@@ -171,6 +171,7 @@ Tai Le	UnicodeBlocks		Tai Le
 Old Sogdian	UnicodeBlocks		Sogdian antigo
 Devanagari extended	UnicodeBlocks		Devanágari expandido
 Lao	UnicodeBlocks		Lao
+Chorasmian	UnicodeBlocks		Corásmio
 Lisu supplement	UnicodeBlocks		Suplemento Lisu
 Takri	UnicodeBlocks		Takri
 Shorthand format controls	UnicodeBlocks		Controlos de formato de taquigrafia
@@ -182,6 +183,7 @@ Greek extended	UnicodeBlocks		Grego expandido
 Myanmar extended B	UnicodeBlocks		Myanmar expandido B
 Mahajani	UnicodeBlocks		Mahajani
 Lepcha	UnicodeBlocks		Lepcha
+Mandaic	UnicodeBlocks		Mandeu
 Old italic	UnicodeBlocks		Itálico antigo
 Quit	CharacterWindow		Sair
 Playing cards	UnicodeBlocks		Cartas de jogar
@@ -201,11 +203,13 @@ Mathematical operators	UnicodeBlocks		Operadores matemáticos
 Bopomofo	UnicodeBlocks		Bopomofo
 Variation selectors	UnicodeBlocks		Seletores de variação
 Variation selectors supplement	UnicodeBlocks		Suplemento de seletores de variação
+Old Permic	UnicodeBlocks		Pérmico antigo
 Supplemental mathematical operators	UnicodeBlocks		Operadores matemáticos suplementares
 Sinhala	UnicodeBlocks		Cingalês
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Dives Akuru	UnicodeBlocks		Dives Akuru
 Ugaritic	UnicodeBlocks		Ugarítico
+Old North Arabian	UnicodeBlocks		Antigo Arábico Norte
 Mende Kikakui	UnicodeBlocks		Mende Kikakui
 Geometric shapes extended	UnicodeBlocks		Formas geométricas expandido
 Transport and map symbols	UnicodeBlocks		Símbolos de mapas e transportes
@@ -220,15 +224,18 @@ Myanmar extended A	UnicodeBlocks		Myanmar expandido A
 Ancient symbols	UnicodeBlocks		Símbolos antigos
 Arabic mathematical alphabetic symbols	UnicodeBlocks		Símbolos alfabéticos matemáticos árabes
 Miscellaneous symbols and arrows	UnicodeBlocks		Setas e símbolos diversos
+Common Indic number forms	UnicodeBlocks		Formas numéricas Índicas comuns
 Kharoshthi	UnicodeBlocks		Kharoshthi
 Buginese	UnicodeBlocks		Buginês
 Telugu	UnicodeBlocks		Telugo
 Cyrillic supplement	UnicodeBlocks		Suplemento Cirílico
+Grantha	UnicodeBlocks		Grantha
 Yi Radicals	UnicodeBlocks		Radicais Yi
 Supplementary private use area A	UnicodeBlocks		Área de uso privado suplementar A
 Armenian	UnicodeBlocks		Arménio
 Miscellaneous symbols and pictographs	UnicodeBlocks		Símbolos e pictogramas diversos
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabateu
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Ideogramas de compatibilidade CJK
 Show private blocks	CharacterWindow		Mostrar blocos privados
@@ -280,7 +287,9 @@ Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Persa antigo
 Malayalam	UnicodeBlocks		Malaiala
 CJK radicals supplement	UnicodeBlocks		Suplemento de radicais CJK
+Old South Arabian	UnicodeBlocks		Arábico Antigo do Sul
 Marchen	UnicodeBlocks		Marchen
+Sogdian	UnicodeBlocks		Sogdiano
 Control pictures	UnicodeBlocks		Imagens de controlo
 Tai Tham	UnicodeBlocks		Tai Tham
 Cyrillic extended A	UnicodeBlocks		Cirílico expandido A

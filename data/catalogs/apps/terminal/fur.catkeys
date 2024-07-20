@@ -85,7 +85,7 @@ ANSI bright cyan color	Terminal ThemeView		Colôr ciano slusint ANSI
 Tab title:	Terminal TermWindow		Titul schede:
 Window title:	Terminal TermWindow		Titul barcon:
 ANSI white color	Terminal ThemeView		Colôr blanc ANSI
-Window size:	Terminal AppearancePrefView		Dimension barcon:
+Window size:	Terminal AppearancePrefView		Dimensions dal barcon:
 Switch Terminals	Terminal TermWindow		Scambie terminâi
 Decrease	Terminal TermWindow		Diminuìs
 Settings…	Terminal TermWindow		Impostazions…

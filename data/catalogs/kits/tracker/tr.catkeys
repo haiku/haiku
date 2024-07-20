@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	4156738018
+1	turkish	x-vnd.Haiku-libtracker	4243797227
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
 Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time — Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
-Location:	InfoWindow		Konum:
 Name	PoseView		Ad
+Location:	InfoWindow		Konum:
 Kind:	InfoWindow		Tür:
 contains	FindPanel		içerir:
 Open	FilePanelPriv		Aç
@@ -105,7 +105,6 @@ Window	ContainerWindow		Pencere
 Remove	FindPanel		Kaldır
 Company	Person Query Columns		Şirket
 Recent documents	FavoritesMenu		Son belgeler
-Save as Query template:	FindPanel		Sorgu şablonu olarak kaydet:
 Edit templates…	TemplatesMenu		Şablonları düzenle…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bayt} other{# bayt}}
 8-bit integer	AttributesView		8 bit tamsayı
@@ -122,7 +121,6 @@ List folders first	SettingsView		Klasörleri ilk listele
 Find	FSUtils		Bul
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Bu klasörde “%name” adında bir öge hâlihazırda var. Bu ögeyi, oluşturduğunuz sembolik bağlantı ile değiştirmek istediğinizden emin misiniz?
 List view	ContainerWindow		Liste görünümü
-Temporary	FindPanel		Sorguyu kaydetme
 Modified	QueryPoseView		Değiştirilme
 Create relative link	ContainerWindow		Göreceli bağlantı oluştur
 Owner	FilePermissionsView		Sahibi
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		destekleyen uygulama yok
 32-bit unsigned integer	AttributesView		32 bit imzalanmamış tamsayı
 Preparing to empty Trash…	StatusWindow		Çöpü boşaltmaya hazırlanıyor…
 Deleting: 	StatusWindow		Siliniyor: 
+label too long	PoseView		etiket çok uzun
 the MIME settings	FSUtils		MIME ayarları
 You can't move or copy the trash.	FSUtils		Çöp kopyalanamaz veya taşınamaz.
-label too long	PoseView		etiket çok uzun
 Error creating link to \"%name\".	FSUtils		“%name” ögesine bağlantı yaratılırken hata.
 Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME Yolu
 less than	FindPanel		daha az
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		“%name” dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%document”, “%app” uygulaması ile açılamadı (%error). 
 Create %s clipping	PoseView		%s kırpma oluştur
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%document”, “%app” uygulaması ile açılamadı (%error). 
 Error moving \"%name\"	FSUtils		“%name” taşınırken hata
 To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Tanımlamaya zorla
 no items	CountView		öge yok
 Time	AttributesView		Zaman
 Disks	DirMenu		Diskler
-Query name:	FindPanel		Sorgu adı:
 Open parent	ContainerWindow		Üst klasörü aç
 Find…	ContainerWindow		Bul…
 moving	FSUtils		taşıdığınız
@@ -479,8 +476,8 @@ Color	AttributesView		Renk
 Copy layout	ContainerWindow		Yerleşimi kopyala
 Duplicate	ContainerWindow		Çoğalt
 16-bit integer	AttributesView		16 bit tamsayı
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Not: Hedef dosya sistemindeki dosya adları BÜYÜK/küçük harf duyarlı değil.\n
 Untitled clipping	PoseView		Adsız kırpma
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Not: Hedef dosya sistemindeki dosya adları BÜYÜK/küçük harf duyarlı değil.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		“%name” adı belirtilen klasörde hâlihazırda var. Değiştirmek istiyor musunuz?
 , indexed	InfoWindow		, indeksli
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri, “Diskler” penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.
@@ -496,8 +493,8 @@ True-color picture	AttributesView		Gerçek renkli resim
 Add-ons	FilePanelPriv		Eklentiler
 Alignment	AttributesView		Hizalama
 Move to Trash	FSUtils		Çöpe at
-Handles %type	OpenWithWindow		%type işler
 Cancel	PoseView		Vazgeç
+Handles %type	OpenWithWindow		%type işler
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ana klasörü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve “Ne yaptığımı biliyorum”a tıklayın.

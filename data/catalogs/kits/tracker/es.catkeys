@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1124891868
+1	spanish; castilian	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -8,13 +8,14 @@ Error moving \"%name\" to Trash. (%error)	FSUtils		Error moviendo \"%name\" a la
 Or	FindPanel		O
 MIME Description	AttributesView		Descripción MIME
 before	FindPanel		Antes
+New folder%d	FSUtils		Nueva carpeta%d
 Volume icons	TrackerSettingsWindow		Iconos de volumenes
 Ignore case	SelectionWindow		Ignorar supuesto
 Current folder	ContainerWindow		Carpeta actual
 Finish: %time - Over %finishtime left	StatusWindow		Terminar: %time - alrededor de %finishtime restante
 Mount all disks now	AutoMounterSettings		Montar todos los discos ahora
-Location:	InfoWindow		Ubicación:
 Name	PoseView		Nombre
+Location:	InfoWindow		Ubicación:
 Kind:	InfoWindow		Tipo:
 contains	FindPanel		contiene
 Open	FilePanelPriv		Abrir
@@ -104,7 +105,6 @@ Window	ContainerWindow		Ventana
 Remove	FindPanel		Eliminar
 Company	Person Query Columns		Empresa
 Recent documents	FavoritesMenu		Documentos recientes
-Save as Query template:	FindPanel		Guardar como una Consulta de plantilla
 Edit templates…	TemplatesMenu		Editar plantillas
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Entero de 8 bits
@@ -121,7 +121,6 @@ List folders first	SettingsView		Lista de carpetas primero
 Find	FSUtils		Encontrar
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un elemnto llamano \"%name\" ya existe en esta carpeta. ¿Quieres reemplazarlo con el link simbólico que has cerrado ?
 List view	ContainerWindow		Vista de lista
-Temporary	FindPanel		Temporales
 Modified	QueryPoseView		Modificado
 Create relative link	ContainerWindow		Crear enlace relativo
 Owner	FilePermissionsView		Propietario
@@ -265,6 +264,7 @@ Don't automount	AutoMounterSettings		No automontar
 Node ref	AttributesView		Nodo ref
 Could not find application \"%appname\"	OpenWithWindow		No se puede encontrar la aplicación \"%appname\"
 Unmatched parenthesis.	libtracker		Paréntesis que no coinciden.
+New folder %d	FSUtils		Nueva carpeta %d
 Extended attribute	AttributesView		Atributo extendido
 Unmatched brackets.	libtracker		Paréntesis que no coinciden.
 Error %error loading Add-On %name.	ContainerWindow		Error %error Cargando Añadido %nombre.
@@ -274,9 +274,9 @@ no supporting apps	OpenWithWindow		Aplicaciones no soportadas
 32-bit unsigned integer	AttributesView		Entero de 32 bits sin signo
 Preparing to empty Trash…	StatusWindow		Preparándose para vaciar la papelera…
 Deleting: 	StatusWindow		Eliminando:
+label too long	PoseView		etiqueta demasiado larga
 the MIME settings	FSUtils		las configuraciones MIME
 You can't move or copy the trash.	FSUtils		No puedes mover o copiar la papelera.
-label too long	PoseView		etiqueta demasiado larga
 Error creating link to \"%name\".	FSUtils		Error creando un enlace a \"%name\"
 Unknown	FilePermissionsView		Desconocido
 Paste links	ContainerWindow		Pegar enlaces
@@ -325,13 +325,14 @@ MIME Path	AttributesView		Ubicación MIME
 less than	FindPanel		menos que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error copiando el archivo \"%name\":\n\t%error\n\n¿Quieres continuar ?
 Creating links: 	StatusWindow		Creando enlaces:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No se pudo abrir \"%document\" con la aplicación \"%app\" (%error). 
 Create %s clipping	PoseView		Cree %s recorte
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No se pudo abrir \"%document\" con la aplicación \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Error moviendo \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Pegar distribución
 Cancel	Tracker		Cancelar
 yes	AttributesView		sí
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Error al copiar el archivo \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Convertir en la impresora activa
 Copy to	ContainerWindow		Copiar a 
 Name	SelectionWindow		Nombre
@@ -374,7 +375,6 @@ Force identify	ContainerWindow		Forzar identificación
 no items	CountView		Sin elementos
 Time	AttributesView		Hora
 Disks	DirMenu		Discos
-Query name:	FindPanel		Nombre de la Consulta:
 Open parent	ContainerWindow		Abrir padre
 Find…	ContainerWindow		Encontrar...
 moving	FSUtils		moviendo
@@ -478,6 +478,7 @@ Copy layout	ContainerWindow		Copia de la disposición
 Duplicate	ContainerWindow		Duplicar
 16-bit integer	AttributesView		Entero de 16 bits
 Untitled clipping	PoseView		Recorte sin título
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Nota: el sistema de archivos de destino no distingue mayúsculas de minúsculas en los nombres de archivos.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		El archivo \"%name\" ya existe en la carpeta especificada. ¿Quieres reemplazarlo?
 , indexed	InfoWindow		, indexado
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Tienes que arrastrar elementos a uno de los iconos de disco en la \"Disks\" ventana
@@ -493,8 +494,8 @@ True-color picture	AttributesView		Imagen en color verdadero
 Add-ons	FilePanelPriv		Añadidos
 Alignment	AttributesView		Alineación
 Move to Trash	FSUtils		Mover a la Papelera
-Handles %type	OpenWithWindow		Maneja %type
 Cancel	PoseView		Cancelar
+Handles %type	OpenWithWindow		Maneja %type
 Delete	PoseView		Eliminar
 Media parameter	AttributesView		Parámetro de medios
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si modificas la carpeta home, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?\n\nPara modificar la carpeta home, mantén presionada la tecla Mayúsculas y haz clic en \"Sé lo que estoy haciendo\".

@@ -6,7 +6,7 @@ OK	NotifierFilter		Aceptar
 Central alert	NotifierConfigView		Alerta central 
 Beep	NotifierConfigView		Pitido
 Central beep	NotifierConfigView		Pitido central
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Un mensaje nuevo} other{# mensajes nuevos}}
 New mail notification	NotifierFilter		Notificación de nuevo correo electrónico
 New messages	NotifierFilter		Mensajes nuevos
 Method:	NotifierConfigView		Método:

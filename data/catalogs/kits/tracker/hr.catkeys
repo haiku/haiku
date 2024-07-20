@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	2430128772
+1	croatian	x-vnd.Haiku-libtracker	1085176173
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -10,8 +10,8 @@ Volume icons	TrackerSettingsWindow		Ikone diskova
 Ignore case	SelectionWindow		Ignoriraj slučaj
 Current folder	ContainerWindow		Trenutna mapa
 Mount all disks now	AutoMounterSettings		Montiraj sve diskove
-Location:	InfoWindow		Lokacija:
 Name	PoseView		Ime
+Location:	InfoWindow		Lokacija:
 Kind:	InfoWindow		Vrsta:
 contains	FindPanel		sadrži
 Open	FilePanelPriv		Otvori
@@ -85,7 +85,6 @@ Resize to fit	QueryContainerWindow		Promjeni veličinu da se uklopi
 List folders first	SettingsView		Najprije izlistaj mape
 Find	FSUtils		Nađi
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Stavka imenonana kao \"%name\" već postoji u ovoj mapi. Želite li je zamijeniti simboličkom poveznicom koju stvarate?
-Temporary	FindPanel		Privremeno
 Modified	QueryPoseView		Izmjenjeno
 Create relative link	ContainerWindow		Kreiraj relativne poveznice
 Owner	FilePermissionsView		Vlasnik
@@ -193,8 +192,8 @@ Empty Trash	ContainerWindow		Isprazni smeće
 no supporting apps	OpenWithWindow		nema podržanih programa
 Preparing to empty Trash…	StatusWindow		Priprema za pražnjenje smeća...
 Deleting: 	StatusWindow		Brisanje: 
-You can't move or copy the trash.	FSUtils		Ne možeš pomicati ili kopirati smeće.
 label too long	PoseView		naljepnica je preduga
+You can't move or copy the trash.	FSUtils		Ne možeš pomicati ili kopirati smeće.
 Error creating link to \"%name\".	FSUtils		Greška pri stvaranju poveznice ka \"%name\".
 Unknown	FilePermissionsView		Nepoznato
 Paste links	ContainerWindow		Zalijepi poveznice

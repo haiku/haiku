@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1124891868
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1211951077
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Αγνόηση
 Current folder	ContainerWindow		Τρέχων κατάλογος
 Finish: %time - Over %finishtime left	StatusWindow		Ολοκλήρωση: %time - Παραμένουν πάνω από %finishtime
 Mount all disks now	AutoMounterSettings		Προσάρτηση όλων των δίσκων τώρα
-Location:	InfoWindow		Τοποθεσία:
 Name	PoseView		Όνομα
+Location:	InfoWindow		Τοποθεσία:
 Kind:	InfoWindow		Είδος:
 contains	FindPanel		περιέχει
 Open	FilePanelPriv		Άνοιγμα
@@ -104,7 +104,6 @@ Window	ContainerWindow		Παράθυρο
 Remove	FindPanel		Αφαίρεση
 Company	Person Query Columns		Εταιρία
 Recent documents	FavoritesMenu		Πρόσφατα έγγραφα
-Save as Query template:	FindPanel		Αποθήκευση ως πρότυπο Query:
 Edit templates…	TemplatesMenu		Επεξεργασία προτύπων…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Ακέραιος αριθμός 8-bit
@@ -121,7 +120,6 @@ List folders first	SettingsView		Λίστα φακέλων πρώτα
 Find	FSUtils		Εύρεση
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ένα στοιχείο που ονομάζεται \"%name\" υπάρχει ήδη σε αυτό το φάκελο. Θα θέλατε να τον αντικαταστήσετε με τον συμβολικό δεσμό που δημιουργείτε;
 List view	ContainerWindow		Προβολή λίστας
-Temporary	FindPanel		Προσωρινό
 Modified	QueryPoseView		Τροποποιήθηκε
 Create relative link	ContainerWindow		Δημιουργία συγγενικού συνδέσμου
 Owner	FilePermissionsView		Ιδιοκτήτης
@@ -274,9 +272,9 @@ no supporting apps	OpenWithWindow		καμία υποστηριζόμενη εφ�
 32-bit unsigned integer	AttributesView		Ακέραιος αριθμός χωρίς πρόσημο 32-bit
 Preparing to empty Trash…	StatusWindow		Γίνεται προετοιμασία καθαρισμού του Κάδου…
 Deleting: 	StatusWindow		Γίνεται διαγραφή: 
+label too long	PoseView		ετικέτα πολύ μεγάλη
 the MIME settings	FSUtils		οι ρυθμίσεις MIME
 You can't move or copy the trash.	FSUtils		Δεν μπορείτε να μετακινήσετε ή να αντιγράψετε στο καλάθι αχρήστων.
-label too long	PoseView		ετικέτα πολύ μεγάλη
 Error creating link to \"%name\".	FSUtils		Σφάλμα κατά τη δημιουργία συνδέσμου με το \"%name\".
 Unknown	FilePermissionsView		Άγνωστο
 Paste links	ContainerWindow		Επικόλληση συνδέσμων
@@ -325,8 +323,8 @@ MIME Path	AttributesView		Διαδρομή MIME
 less than	FindPanel		λιγότερο από
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Σφάλμα αντιγραφής του αρχείου \"%name\":\n\t%error\n\nΘα θέλατε να συνεχίσετε;
 Creating links: 	StatusWindow		Γίνεται δημιουργία συνδέσμων: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%document\" με την εφαρμογή \"%app\" (%error). 
 Create %s clipping	PoseView		Δημιουργία %s αποκόμματος
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%document\" με την εφαρμογή \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Σφάλμα κατά τη μετακίνηση του \"%name\"
 To: %dir	StatusWindow		Στο: %dir
 Paste layout	ContainerWindow		Επικόλληση διάταξης
@@ -374,7 +372,6 @@ Force identify	ContainerWindow		Εξαναγκασμός αναγνώρισης
 no items	CountView		καθόλου αντικείμενα
 Time	AttributesView		Ώρα
 Disks	DirMenu		Δίσκοι
-Query name:	FindPanel		Όνομα ερωτήματος:
 Open parent	ContainerWindow		Άνοιγμα γονέα
 Find…	ContainerWindow		Εύρεση…
 moving	FSUtils		μετακίνηση
@@ -493,8 +490,8 @@ True-color picture	AttributesView		Φωτογραφία ρεαλιστικών �
 Add-ons	FilePanelPriv		Πρόσθετα
 Alignment	AttributesView		Στοίχιση
 Move to Trash	FSUtils		Μετακίνηση στον Κάδο
-Handles %type	OpenWithWindow		Χειρίζεται %type
 Cancel	PoseView		Άκυρο
+Handles %type	OpenWithWindow		Χειρίζεται %type
 Delete	PoseView		Διαγραφή
 Media parameter	AttributesView		Παράμετρος πολυμέσων
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Αν πειράξετε τον αρχικό φάκελο, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΘέλετε σίγουρα να το κάνετε αυτό;\n\nΓια να μετακινήσετε τον αρχικό φάκελο ούτως ή άλλως, κρατήστε πατημένο το πλήκτρο Shift και κάντε κλικ στο κουμπί \"Ξέρω τι κάνω\".

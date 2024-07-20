@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2482866522
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		Ikke skill mellom store og små bokstaver
 Current folder	ContainerWindow		Nåværende mappe
 Finish: %time - Over %finishtime left	StatusWindow		Ferdig: %time - Mer enn %finishtime left
 Mount all disks now	AutoMounterSettings		Monter alle disker nå
-Location:	InfoWindow		Sted:
 Name	PoseView		Navn
+Location:	InfoWindow		Sted:
 Kind:	InfoWindow		Type:
 contains	FindPanel		inneholder
 Open	FilePanelPriv		Åpne
@@ -105,7 +105,6 @@ Window	ContainerWindow		Vindu
 Remove	FindPanel		Fjern
 Company	Person Query Columns		Selskap
 Recent documents	FavoritesMenu		Siste dokumenter
-Save as Query template:	FindPanel		Lagre som mal for Søk
 Edit templates…	TemplatesMenu		Rediger maler
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bit integer
@@ -122,7 +121,6 @@ List folders first	SettingsView		List mapper først
 Find	FSUtils		Finn
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		En oppføring kalt \"%name\" finnes fra før i denne mappen. Vil du erstatte den med den symbolske lenken du lager nå?
 List view	ContainerWindow		Listevisning
-Temporary	FindPanel		Midlertidig
 Modified	QueryPoseView		Endret
 Create relative link	ContainerWindow		Lag relativ lenke
 Owner	FilePermissionsView		Eier
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		ingen støttende programmer
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		Forbereder tømming av søppelkurv...
 Deleting: 	StatusWindow		Sletter:
+label too long	PoseView		for lang merkelapp
 the MIME settings	FSUtils		MIME-innstillingene
 You can't move or copy the trash.	FSUtils		Du kan ikke flytte eller kopiere søppelkurven.
-label too long	PoseView		for lang merkelapp
 Error creating link to \"%name\".	FSUtils		Feil ved oppretting av lenke til \"%name\".
 Unknown	FilePermissionsView		Ukjent
 Paste links	ContainerWindow		Lim inn lenker
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME-sti
 less than	FindPanel		mindre enn
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Feil ved kopiering av \"%name\":\n\t%error\n\nØnsker du å fortsette?
 Creating links: 	StatusWindow		Oppretter lenker:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne ikke åpne \"%document\" med programmet \"%app\" (%error).
 Create %s clipping	PoseView		Lag %s utklipp
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne ikke åpne \"%document\" med programmet \"%app\" (%error).
 Error moving \"%name\"	FSUtils		Feil ved flytting av \"%name\"
 To: %dir	StatusWindow		Til %dir
 Paste layout	ContainerWindow		Lim inn layout
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Tving identifisering
 no items	CountView		Ingen oppføringer
 Time	AttributesView		Tid
 Disks	DirMenu		Disker
-Query name:	FindPanel		Spørringsnavn:
 Open parent	ContainerWindow		Åpne overmappe
 Find…	ContainerWindow		Finn...
 moving	FSUtils		flytter
@@ -480,8 +477,8 @@ Color	AttributesView		Farge
 Copy layout	ContainerWindow		Kopier layout
 Duplicate	ContainerWindow		Dupliser
 16-bit integer	AttributesView		16-bit integer
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Merk: destinasjonens filsystem skiller ikke mellom store og små bokstaver i filnavn.\n
 Untitled clipping	PoseView		Utklipp uten navn
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Merk: destinasjonens filsystem skiller ikke mellom store og små bokstaver i filnavn.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen \"%name\" eksisterer allerede i den spesifiserte mappen. Ønsker du å erstatte den?
 , indexed	InfoWindow		, indeksert
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du må slippe elementer på et av diskikonene i \"Disks\"-vinduet
@@ -497,8 +494,8 @@ True-color picture	AttributesView		Ekte fargebilde
 Add-ons	FilePanelPriv		Tillegg
 Alignment	AttributesView		Justering
 Move to Trash	FSUtils		Flytt til søppelkurven
-Handles %type	OpenWithWindow		Håndterer %type
 Cancel	PoseView		Avbryt
+Handles %type	OpenWithWindow		Håndterer %type
 Delete	PoseView		Slett
 Media parameter	AttributesView		Medieparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du endrer hjemmemappen, kan det hende at %osName ikke oppfører seg ordentlig!\n\nEr du sikker på at du vil gjøre dette?\n\nFor å endre hjemmemappen uansett, hold nede Shift-tasten og klikk på \"Jeg vet hva jeg gjør\".

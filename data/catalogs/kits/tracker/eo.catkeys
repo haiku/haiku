@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	514446826
+1	esperanto	x-vnd.Haiku-libtracker	601506035
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Malatenti usklecon
 Current folder	ContainerWindow		Nuna dosierujo
 Finish: %time - Over %finishtime left	StatusWindow		Fino: %time - Ĉirkaŭ %finishtime restis
 Mount all disks now	AutoMounterSettings		Surmeti ĉiujn diskojn nun
-Location:	InfoWindow		Loko:
 Name	PoseView		Nomo
+Location:	InfoWindow		Loko:
 Kind:	InfoWindow		Speco:
 contains	FindPanel		enhavas
 Open	FilePanelPriv		Uzi
@@ -100,7 +100,6 @@ Window	ContainerWindow		Fenestro
 Remove	FindPanel		Forigi
 Company	Person Query Columns		Kompanio
 Recent documents	FavoritesMenu		Ĵusaj dokumentoj
-Save as Query template:	FindPanel		Konservi kiel ŝablono de serĉmendo:
 Edit templates…	TemplatesMenu		Redakti ŝablonojn…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bitoko} other{# bitokoj}}
 8-bit integer	AttributesView		8-bita entjero
@@ -117,7 +116,6 @@ List folders first	SettingsView		Listigi dosierujojn unue
 Find	FSUtils		Serĉi
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Elemento nomita \"%name\" jam ekzistas en ĉi tiu dosierujo. Ĉu vi volas anstataŭi ĝin per la simbola ligilo kiun vi kreas?
 List view	ContainerWindow		Lista vido
-Temporary	FindPanel		Provizora
 Modified	QueryPoseView		Redaktita
 Create relative link	ContainerWindow		Krei relativan ligilon
 Owner	FilePermissionsView		Posedanto
@@ -268,9 +266,9 @@ no supporting apps	OpenWithWindow		nesubtenantaj aplikaĵoj
 32-bit unsigned integer	AttributesView		32-bita sensignuma entjero
 Preparing to empty Trash…	StatusWindow		Preparante malplenigi la Rubujon…
 Deleting: 	StatusWindow		Forigante: 
+label too long	PoseView		etikedo tro longa
 the MIME settings	FSUtils		agordo de la MIME
 You can't move or copy the trash.	FSUtils		Vi ne povas movi aŭ kopii la Rubujon.
-label too long	PoseView		etikedo tro longa
 Error creating link to \"%name\".	FSUtils		Eraris kreante ligilon al \"%name\".
 Unknown	FilePermissionsView		Nekonata
 Paste links	ContainerWindow		Alglui ligilojn
@@ -318,8 +316,8 @@ MIME Path	AttributesView		Itinero de MIME
 less than	FindPanel		malpli ol
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eraris kopiante dosieron de \"%name\":\n\t%error\n\nĈu vi volas daŭrigi?
 Creating links: 	StatusWindow		Kreante ligilojn: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Malsukcesis uzi \"%document\"-on per programo \"%app\" (%error). 
 Create %s clipping	PoseView		Krei %s tondado
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Malsukcesis uzi \"%document\"-on per programo \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Eraris movante \"%name\"
 To: %dir	StatusWindow		Al: %dir
 Paste layout	ContainerWindow		Alglui aranĝon
@@ -365,7 +363,6 @@ Force identify	ContainerWindow		Devige identigi
 no items	CountView		neniu elemento
 Time	AttributesView		Horo
 Disks	DirMenu		Diskoj
-Query name:	FindPanel		Serĉmenda nomo:
 Open parent	ContainerWindow		Uzi la patran
 Find…	ContainerWindow		Serĉi...
 moving	FSUtils		movante
@@ -480,8 +477,8 @@ True-color picture	AttributesView		Vere-kolora bildo
 Add-ons	FilePanelPriv		Aldonaĵoj
 Alignment	AttributesView		Vicigo
 Move to Trash	FSUtils		Movi al la Rubujo
-Handles %type	OpenWithWindow		Traktas %type
 Cancel	PoseView		Nuligi
+Handles %type	OpenWithWindow		Traktas %type
 Delete	PoseView		Forigi
 Media parameter	AttributesView		Parametro de plurmedio
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se vi redaktos la hejman dosierujon, %osName eble ne kondutos dece!\n\nĈu vi certas, ke vi deziras fari tion?\n\nPor redakti la hejman dosierujon senkondiĉe, premu la majuskligklavon kaj klaku \"Mi scias kion mi faras\".

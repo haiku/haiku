@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Appearance	663472720
+1	spanish; castilian	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Borde del control
 Control mark	Colors tab		Marca de control
 Off	AntialiasingSettingsView		Desactivado
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Texto de elemento de menú seleccionado
 Size:	Font Selection view		Tamaño:
 Panel background	Colors tab		Fondo de panel
 Plain font:	Font view		Tipo de letra plano:
+Automatically pick secondary colors	Colors tab		Elegir automáticamente los colores secundarios
 Window tab text	Colors tab		Texto de pestaña de ventana
 Navigation pulse	Colors tab		Pulso de navegación
 LCD subpixel	AntialiasingSettingsView		Subpíxel LCD

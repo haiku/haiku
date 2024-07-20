@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	1633080283
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	3594145904
 None	Icon-O-Matic-Properties		Ninguno
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Ruta de limpieza
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -122,6 +122,7 @@ Append…	Icon-O-Matic-Menu-File		Agregar...
 Scale Y	Icon-O-Matic-PropertyNames		Escala Y
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotar indices hacia adelante
 Save	Icon-O-Matic-Menu-File		Guardar
+Cancel	Icon-O-Matic-StyledTextImport		Cancelar
 Add circle	Icon-O-Matic-PathsList		Agregar círculo
 Freeze transformation	Icon-O-Matic-ShapesList		Congelar transformación
 META:ICON attribute	Icon-O-Matic-SavePanel		Atributo META:ICON
@@ -132,6 +133,7 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No 
 Save as…	Icon-O-Matic-Menu-File		Guardar como...
 Swatches	Icon-O-Matic-Menus		Muestras
 <modify path>	Icon-O-Matic-PathCmd		<modificar ruta>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Establecer %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nada que deshacer>
 Add	Icon-O-Matic-StylesList		Agregar
@@ -147,6 +149,7 @@ Settings…	Icon-O-Matic-SavePanel		Configuración...
 Select all	Icon-O-Matic-PathManipulator		Seleccionar todo
 Add with style	Icon-O-Matic-ShapesList		Agregar con estilo
 New	Icon-O-Matic-Menu-File		Nuevo
+Change perspective	Icon-O-Matic-PerspectiveCommand		Cambiar perspectiva
 Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
 Perspective	Transformation		Perspectiva
 Export	Icon-O-Matic-Menu-File		Exportar

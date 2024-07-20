@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ChartDemo	3491540808
+1	portuguese	x-vnd.Haiku-ChartDemo	446404305
 (high) 100% 	ChartWindow		(alto) 100% 
 Spiral	ChartWindow		Espiral
 Orange	ChartWindow		Cor de laranja
@@ -6,6 +6,7 @@ Display:	ChartWindow		Apresentação:
 Pink	ChartWindow		Cor de rosa
 Animation:	ChartWindow		Animação:
 Auto demo	ChartWindow		Demo automática
+ 0.6 f/s  (logarithmic scale)	ChartWindow		 0.6 f/s  (escala logarítmica)
 Red	ChartWindow		Vermelho
 None	ChartWindow		Nenhum
 600.0 f/s	ChartWindow		600,0 f/s

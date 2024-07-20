@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2482866522
+1	russian	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		Игнорировать регистр
 Current folder	ContainerWindow		Текущую папку
 Finish: %time - Over %finishtime left	StatusWindow		Окончание: %time - Осталось более %finishtime
 Mount all disks now	AutoMounterSettings		Подключить все диски сейчас
-Location:	InfoWindow		Путь:
 Name	PoseView		Имя
+Location:	InfoWindow		Путь:
 Kind:	InfoWindow		Тип:
 contains	FindPanel		содержит
 Open	FilePanelPriv		Открыть
@@ -105,7 +105,6 @@ Window	ContainerWindow		Окно
 Remove	FindPanel		Удалить
 Company	Person Query Columns		Компания
 Recent documents	FavoritesMenu		Недавние документы
-Save as Query template:	FindPanel		Сохранить запрос как шаблон:
 Edit templates…	TemplatesMenu		Изменить шаблоны…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байта} other{# байтов}}
 8-bit integer	AttributesView		8-битное целое
@@ -122,7 +121,6 @@ List folders first	SettingsView		Отображать папки в начале
 Find	FSUtils		Найти
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Объект с именем \"%name\" уже существует в этой папке. Заменить его ссылкой, которую вы создаёте?
 List view	ContainerWindow		Список
-Temporary	FindPanel		Временный запрос
 Modified	QueryPoseView		Изменён
 Create relative link	ContainerWindow		Создать относительную ссылку в
 Owner	FilePermissionsView		Владелец
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		нет поддерживающих прог�
 32-bit unsigned integer	AttributesView		32-битное целое без знака
 Preparing to empty Trash…	StatusWindow		Подготовка к очищению корзины…
 Deleting: 	StatusWindow		Удаление: 
+label too long	PoseView		слишком длинное имя
 the MIME settings	FSUtils		настройки MIME
 You can't move or copy the trash.	FSUtils		Вы не можете перемещать или копировать корзину.
-label too long	PoseView		слишком длинное имя
 Error creating link to \"%name\".	FSUtils		Ошибка при создании ссылки к \"%name\".
 Unknown	FilePermissionsView		Неизвестно
 Paste links	ContainerWindow		Вставить ссылки
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME Путь
 less than	FindPanel		меньше чем
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании файла \"%name\":\n\t%error\n\nВы хотите продолжить?
 Creating links: 	StatusWindow		Создание ссылок: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
 Create %s clipping	PoseView		Сохранить как %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Ошибка при перемещении \"%name\"
 To: %dir	StatusWindow		В: %dir
 Paste layout	ContainerWindow		Вставить вид папки
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Опознать принудительно
 no items	CountView		нет объектов
 Time	AttributesView		Время
 Disks	DirMenu		Диски
-Query name:	FindPanel		Имя запроса:
 Open parent	ContainerWindow		На папку вверх
 Find…	ContainerWindow		Найти…
 moving	FSUtils		перемещаемый
@@ -480,8 +477,8 @@ Color	AttributesView		Цвет
 Copy layout	ContainerWindow		Копировать вид папки
 Duplicate	ContainerWindow		Дублировать
 16-bit integer	AttributesView		16-битное целое
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Примечание: файловая система назначения не чувствительна к регистру.\n
 Untitled clipping	PoseView		Безымянная выборка
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Примечание: файловая система назначения не чувствительна к регистру.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" уже существует в указанной папке. Вы хотите заменить его?
 , indexed	InfoWindow		, индексировано
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам нужно перетащить объект(ы) на один из значков диска в окне \"Диски\".
@@ -497,8 +494,8 @@ True-color picture	AttributesView		Полноцветная картинка
 Add-ons	FilePanelPriv		Дополнения
 Alignment	AttributesView		Выравнивание
 Move to Trash	FSUtils		В корзину
-Handles %type	OpenWithWindow		Поддерживает %type
 Cancel	PoseView		Отмена
+Handles %type	OpenWithWindow		Поддерживает %type
 Delete	PoseView		Удалить
 Media parameter	AttributesView		Параметры медиа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените домашнюю папку, %osName может вести себя непредсказуемо!\n\nВы уверены, что это нужно сделать?\n\nЧтобы изменить домашнюю папку, зажмите клавишу "Shift" и нажмите \"Я знаю, что я делаю\".

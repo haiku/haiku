@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1124891868
+1	romanian	x-vnd.Haiku-libtracker	1211951077
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Ignoră majusculele
 Current folder	ContainerWindow		Dosar curent
 Finish: %time - Over %finishtime left	StatusWindow		Finalizare: %time - peste %finishtime rămase
 Mount all disks now	AutoMounterSettings		Montează toate discurile acum
-Location:	InfoWindow		Locație:
 Name	PoseView		Nume
+Location:	InfoWindow		Locație:
 Kind:	InfoWindow		Fel:
 contains	FindPanel		conține
 Open	FilePanelPriv		Deschide
@@ -104,7 +104,6 @@ Window	ContainerWindow		Fereastră
 Remove	FindPanel		Elimină
 Company	Person Query Columns		Companie
 Recent documents	FavoritesMenu		Documente recente
-Save as Query template:	FindPanel		Salvează ca șablon de interogare:
 Edit templates…	TemplatesMenu		Editare șabloane…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		întreg pe 8 biți
@@ -121,7 +120,6 @@ List folders first	SettingsView		Enumeră dosarele mai întâi
 Find	FSUtils		Găsește
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element cu numele \„%name\” există deja în acest dosar. Doriți să îl înlocuiți cu legătura simbolică pe care o creați?
 List view	ContainerWindow		Vizualizare listă
-Temporary	FindPanel		Temporar
 Modified	QueryPoseView		Modificat
 Create relative link	ContainerWindow		Creează legătură relativă
 Owner	FilePermissionsView		Proprietar
@@ -274,9 +272,9 @@ no supporting apps	OpenWithWindow		fără aplicații suport
 32-bit unsigned integer	AttributesView		întreg fără semn pe 32 de biți
 Preparing to empty Trash…	StatusWindow		Se pregătește curățarea gunoiului…
 Deleting: 	StatusWindow		Se șterge: 
+label too long	PoseView		etichetă prea lungă
 the MIME settings	FSUtils		configurările MIME
 You can't move or copy the trash.	FSUtils		Nu puteți muta sau copia gunoiul.
-label too long	PoseView		etichetă prea lungă
 Error creating link to \"%name\".	FSUtils		Eroare la crearea legăturii la \„%name\”.
 Unknown	FilePermissionsView		Necunoscut
 Paste links	ContainerWindow		Lipește legăturile
@@ -325,8 +323,8 @@ MIME Path	AttributesView		Cale MIME
 less than	FindPanel		mai puțin decât
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea fișierului \„%name\”:\n\t%error\n\nDoriți să continuați?
 Creating links: 	StatusWindow		Se creează legăturile: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nu s-a putut deschide \„%document\” cu aplicația \„%app\” (%error). 
 Create %s clipping	PoseView		Creează tăierea %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nu s-a putut deschide \„%document\” cu aplicația \„%app\” (%error). 
 Error moving \"%name\"	FSUtils		Eroare la mutarea \„%name\”
 To: %dir	StatusWindow		La: %dir
 Paste layout	ContainerWindow		Lipește aranjamentul
@@ -374,7 +372,6 @@ Force identify	ContainerWindow		Forțează identificarea
 no items	CountView		fără elemente
 Time	AttributesView		Oră
 Disks	DirMenu		Discuri
-Query name:	FindPanel		Nume de interogare:
 Open parent	ContainerWindow		Deschide superior
 Find…	ContainerWindow		Găsește…
 moving	FSUtils		se mută
@@ -493,8 +490,8 @@ True-color picture	AttributesView		Poză cu culori reale
 Add-ons	FilePanelPriv		Suplimente
 Alignment	AttributesView		Aliniere
 Move to Trash	FSUtils		Mută la gunoi
-Handles %type	OpenWithWindow		Gestionează %type
 Cancel	PoseView		Anulează
+Handles %type	OpenWithWindow		Gestionează %type
 Delete	PoseView		Șterge
 Media parameter	AttributesView		Parametru media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Dacă alterați dosarul home, este posibil ca %osName să nu funcționeze corespunzător!\n\nSigur doriți să faceți asta?\n\nPentru a altera dosarul home oricum, țineți apăsată tasta Shift și dați clic pe \„Știu ce fac\”.

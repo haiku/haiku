@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	1124891868
+1	czech	x-vnd.Haiku-libtracker	1211951077
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Ignorovat velikost znaků
 Current folder	ContainerWindow		Současný adresář
 Finish: %time - Over %finishtime left	StatusWindow		Konec: %time - zbývá přes %finishtime
 Mount all disks now	AutoMounterSettings		Připojit teď všechny disky
-Location:	InfoWindow		Umístnění:
 Name	PoseView		Jméno
+Location:	InfoWindow		Umístnění:
 Kind:	InfoWindow		Druh:
 contains	FindPanel		obsahuje
 Open	FilePanelPriv		Otevřít
@@ -104,7 +104,6 @@ Window	ContainerWindow		Okno
 Remove	FindPanel		Odebrat
 Company	Person Query Columns		Společnost
 Recent documents	FavoritesMenu		Nedávné dokumenty
-Save as Query template:	FindPanel		Uložit jako šablonu Dotazu:
 Edit templates…	TemplatesMenu		Upravit šablony...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bajt} few{# bajty} other{# bajtů}}
 8-bit integer	AttributesView		8 bitové celé číslo
@@ -121,7 +120,6 @@ List folders first	SettingsView		Adresáře na začátek
 Find	FSUtils		Najít
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Položka s názvem \"%name\" již v této složce existuje. Přejete si ji nahradit symbolickým odkazem, který právě vytváříte?
 List view	ContainerWindow		Seznam
-Temporary	FindPanel		Dočasné
 Modified	QueryPoseView		Změněno
 Create relative link	ContainerWindow		Vytvořit relativní odkaz
 Owner	FilePermissionsView		Vlastník
@@ -274,9 +272,9 @@ no supporting apps	OpenWithWindow		žádná vhodná aplikace
 32-bit unsigned integer	AttributesView		32 bitové přirozené číslo
 Preparing to empty Trash…	StatusWindow		Připrava vysypání koše...
 Deleting: 	StatusWindow		Odstraňování: 
+label too long	PoseView		štítek je příliš dlouhý
 the MIME settings	FSUtils		nastavení MIME
 You can't move or copy the trash.	FSUtils		Nelze přesunout nebo kopírovat koš.
-label too long	PoseView		štítek je příliš dlouhý
 Error creating link to \"%name\".	FSUtils		Chyba při vytváření odkazu na \"%name\".
 Unknown	FilePermissionsView		Neznámý
 Paste links	ContainerWindow		Vložit odkazy
@@ -325,8 +323,8 @@ MIME Path	AttributesView		Cesta MIME
 less than	FindPanel		méne než
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba kopírování souboru \"%name\":\n\t%error\n\nPřejete si pokračovat?
 Creating links: 	StatusWindow		Vytváření odkazů: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nelze otevřít \"%document\" v aplikaci \"%app\" (%error). 
 Create %s clipping	PoseView		Vytvořit %s výstřižek
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nelze otevřít \"%document\" v aplikaci \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Chyba přesunu \"%name\"
 To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Vložit rozložení
@@ -374,7 +372,6 @@ Force identify	ContainerWindow		Nucená identita
 no items	CountView		žádné položky
 Time	AttributesView		Čas
 Disks	DirMenu		Disky
-Query name:	FindPanel		Název Dotazu:
 Open parent	ContainerWindow		Otevřít nadřazený
 Find…	ContainerWindow		Vyhledat...
 moving	FSUtils		přesun
@@ -493,8 +490,8 @@ True-color picture	AttributesView		24 bitový obrázek
 Add-ons	FilePanelPriv		Doplňky
 Alignment	AttributesView		Zarovnání
 Move to Trash	FSUtils		Přesunout do Koše
-Handles %type	OpenWithWindow		Obstarává %type
 Cancel	PoseView		Zrušit
+Handles %type	OpenWithWindow		Obstarává %type
 Delete	PoseView		Odstranit
 Media parameter	AttributesView		Multimediální parametr
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Pokud změníte domovský adresář, %osName nemusí fungovat správně!\n\nOpravdu to chcete?\n\nPokud i tak chcete změnit domovský adresář, držte Shift a klikněte na \"Vím, co dělám\".

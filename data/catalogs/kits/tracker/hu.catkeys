@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2482866522
+1	hungarian	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		Nem betűérzékeny
 Current folder	ContainerWindow		Jelenlegi mappa
 Finish: %time - Over %finishtime left	StatusWindow		Befejezés: %time - Több, mint %finishtime van hátra
 Mount all disks now	AutoMounterSettings		Összes lemez csatolása most
-Location:	InfoWindow		Útvonal:
 Name	PoseView		Név
+Location:	InfoWindow		Útvonal:
 Kind:	InfoWindow		Típus:
 contains	FindPanel		tartalmazza
 Open	FilePanelPriv		Megnyitás
@@ -105,7 +105,6 @@ Window	ContainerWindow		Ablak
 Remove	FindPanel		Eltávolítás
 Company	Person Query Columns		Szervezet
 Recent documents	FavoritesMenu		Legutóbbi dokumentumok
-Save as Query template:	FindPanel		Mentés keresési sablonként:
 Edit templates…	TemplatesMenu		Sablonok szerkesztése…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bájt} other{# bájt}}
 8-bit integer	AttributesView		8-bites egész
@@ -122,7 +121,6 @@ List folders first	SettingsView		A mappákat listázza elsőként
 Find	FSUtils		Keresés
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Már van ebben a mappában egy elem ezzel a névvel: \"%name\". Szeretnéd felülírni a most elkészítendő szimbolikus hivatkozást?
 List view	ContainerWindow		Lista nézet
-Temporary	FindPanel		Ideiglenes megőrzés
 Modified	QueryPoseView		Módosítva
 Create relative link	ContainerWindow		Relatív hivatkozás létrehozása
 Owner	FilePermissionsView		Tulajdonos
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		nincs használható program
 32-bit unsigned integer	AttributesView		32-bites előjel nélküli egész
 Preparing to empty Trash…	StatusWindow		Felkészülés a Szemetes ürítésére…
 Deleting: 	StatusWindow		Törlés:
+label too long	PoseView		túl hosszú címke
 the MIME settings	FSUtils		MIME beállítások
 You can't move or copy the trash.	FSUtils		A Szemetest nem lehet mozgatni vagy másolni.
-label too long	PoseView		túl hosszú címke
 Error creating link to \"%name\".	FSUtils		Hiba történt a hivatkozás (\"%name\") létrehozása közben.
 Unknown	FilePermissionsView		Ismeretlen
 Paste links	ContainerWindow		Hivatkozások beillesztése
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME útvonala
 less than	FindPanel		kisebb, mint
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a másolás közben: \"%name\"\n\t%error\n\nSzeretnéd folytatni?
 Creating links: 	StatusWindow		Hivatkozások készítése:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\") a programmal (\"%app\"): %error.
 Create %s clipping	PoseView		%s kivágás készítése
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\") a programmal (\"%app\"): %error.
 Error moving \"%name\"	FSUtils		Hiba történt a mozgatás közben: \"%name\"
 To: %dir	StatusWindow		Ide: %dir
 Paste layout	ContainerWindow		Elrendezés beillesztése
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Kikényszerített azonosítás
 no items	CountView		nincs elem
 Time	AttributesView		Idő
 Disks	DirMenu		Lemezek
-Query name:	FindPanel		Keresés neve:
 Open parent	ContainerWindow		Szülő megnyitása
 Find…	ContainerWindow		Keresés…
 moving	FSUtils		mozgatni
@@ -480,8 +477,8 @@ Color	AttributesView		Szín
 Copy layout	ContainerWindow		Elrendezés másolása
 Duplicate	ContainerWindow		Megkettőzés
 16-bit integer	AttributesView		16-bites egész
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Megjegyzés: a fájlnevek a cél-fájlrendszeren nem kis-/nagybetű érzékenyek.\n
 Untitled clipping	PoseView		Névtelen kivágás
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Megjegyzés: a fájlnevek a cél-fájlrendszeren nem kis-/nagybetű érzékenyek.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy ilyen nevű fájl: \"%name\". Szeretnéd felülírni?
 , indexed	InfoWindow		, indexelt
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Húzzon elemeket a \"Lemezek\" ablakban az egyik lemez ikonjára.
@@ -497,8 +494,8 @@ True-color picture	AttributesView		Valódi színű kép
 Add-ons	FilePanelPriv		Kiegészítők
 Alignment	AttributesView		Igazítás
 Move to Trash	FSUtils		Mozgatás a Szemetesbe
-Handles %type	OpenWithWindow		Ezt kezeli: %type
 Cancel	PoseView		Mégse
+Handles %type	OpenWithWindow		Ezt kezeli: %type
 Delete	PoseView		Törlés
 Media parameter	AttributesView		Média paraméter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ha módosítod a saját mappát, akkor a %osName nem biztos, hogy megfelelően működik!\n\nBiztosan ezt akarod tenni?\n\nA saját mappa megváltoztatásához tartsd lenyomva a Shift billentyűt, és kattints a \"Tudom, mit csinálok\" gombra.

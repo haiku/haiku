@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	1893940391
+1	polish	x-vnd.Haiku-libtracker	1980999600
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Ignoruj wielkość liter
 Current folder	ContainerWindow		Bieżący katalog
 Finish: %time - Over %finishtime left	StatusWindow		Koniec o: %time - Pozostało %finishtime
 Mount all disks now	AutoMounterSettings		Zamontuj wszystkie dyski
-Location:	InfoWindow		Położenie:
 Name	PoseView		Nazwa
+Location:	InfoWindow		Położenie:
 Kind:	InfoWindow		Typ:
 contains	FindPanel		zawiera
 Open	FilePanelPriv		Otwórz
@@ -103,7 +103,6 @@ Window	ContainerWindow		Okno
 Remove	FindPanel		Usuń
 Company	Person Query Columns		Firma
 Recent documents	FavoritesMenu		Ostatnio otwierane dokumenty
-Save as Query template:	FindPanel		Zapisz jako szablon Zapytania:
 Edit templates…	TemplatesMenu		Modyfikuj szablony…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bajt} few{# bajty} many{# bajtów} other{# bajta}}
 8-bit integer	AttributesView		8-bitowa liczba całkowita
@@ -120,7 +119,6 @@ List folders first	SettingsView		Listuj foldery w pierwszej kolejności
 Find	FSUtils		Znajdź
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Obiekt o nazwie „%name” już istnieje w tym katalogu. Zamienić na dowiązanie symboliczne?
 List view	ContainerWindow		Widok listy
-Temporary	FindPanel		Tymczasowy
 Modified	QueryPoseView		Zmodyfikowano
 Create relative link	ContainerWindow		Utwórz wględny skrót
 Owner	FilePermissionsView		Właściciel
@@ -272,9 +270,9 @@ no supporting apps	OpenWithWindow		brak obsługujących aplikacji
 32-bit unsigned integer	AttributesView		32-bitowa liczba całkowita bez znaku
 Preparing to empty Trash…	StatusWindow		Przygotowanie do opróżnienia Kosza…
 Deleting: 	StatusWindow		Usuwanie: 
+label too long	PoseView		opis jest zbyt długi
 the MIME settings	FSUtils		ustawienia MIME
 You can't move or copy the trash.	FSUtils		Nie możesz przenieść ani skopiować kosza.
-label too long	PoseView		opis jest zbyt długi
 Error creating link to \"%name\".	FSUtils		Błąd przy tworzeniu dowiązania do „%name”.
 Unknown	FilePermissionsView		Nieznany
 Paste links	ContainerWindow		Wklej odnośniki
@@ -322,8 +320,8 @@ MIME Path	AttributesView		Ścieżka MIME
 less than	FindPanel		mniej niż
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku „%name”:\n\t%error\n\nCzy chcesz kontynuować?
 Creating links: 	StatusWindow		Tworzenie dowiązań: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć „%document” z aplikacją „%app” (%error). 
 Create %s clipping	PoseView		Utwórz wycinek %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć „%document” z aplikacją „%app” (%error). 
 Error moving \"%name\"	FSUtils		Błąd przy przenoszeniu „%name”
 To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Wklej układ
@@ -369,7 +367,6 @@ Force identify	ContainerWindow		Wymuś indentyfikację
 no items	CountView		brak elementów
 Time	AttributesView		Czas
 Disks	DirMenu		Dyski
-Query name:	FindPanel		Nazwa zapytania:
 Open parent	ContainerWindow		W górę
 Find…	ContainerWindow		Znajdź…
 moving	FSUtils		przenosisz
@@ -485,8 +482,8 @@ True-color picture	AttributesView		Obraz True-color
 Add-ons	FilePanelPriv		Dodatki
 Alignment	AttributesView		Wyrównanie
 Move to Trash	FSUtils		Przenieś do kosza
-Handles %type	OpenWithWindow		Obsługuje %type
 Cancel	PoseView		Anuluj
+Handles %type	OpenWithWindow		Obsługuje %type
 Delete	PoseView		Usuń
 Media parameter	AttributesView		Parametr mediów
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jeżeli podmienisz katalog „home”, %osName może nie działać poprawnie!\n\nJesteś pewien, że chcesz to zrobić?\n\nJeżeli nadal chcesz podmienić katalog „home”, naciśnij klawisz Shift i kliknij „Wiem co robię”.

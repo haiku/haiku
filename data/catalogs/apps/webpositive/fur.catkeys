@@ -47,7 +47,7 @@ New tabs:	Settings Window		Gnovis schedis:
 Open downloads folder	Download Window		Vierç cartele dai files discjariâts
 Proxy server	Settings Window		Servidôr proxy
 Darn!	WebPositive		Maledizion!
-Decrease size	WebPositive Window		Diminuìs dimension
+Decrease size	WebPositive Window		Diminuìs dimensions
 Default fixed font size:	Settings Window		Dimension predefinide dal caratar a spaziadure fisse:
 Sans serif font:	Settings Window		Caratar Sans serif:
 Clear	WebPositive Window		Nete
@@ -81,7 +81,7 @@ View	WebPositive Window		Viodude
 Paste	URL Bar		Tache
 Find next	WebPositive Window		Cjate sucessîf
 Open search page	Settings Window		Vierç pagjine di ricercje
-Increase size	WebPositive Window		Aumente dimension
+Increase size	WebPositive Window		Aumente dimensions
 New tab	WebPositive Window		Gnove schede
 Today	WebPositive Window		Vuê
 Open location	WebPositive Window		Vierç posizion
@@ -104,7 +104,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Ripristine
 Copy	WebPositive Window		Copie
 {0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Ultime rie ripetude # volte.}other{Ultime rie ripetude # voltis.}}
-Default standard font size:	Settings Window		Dimension dal caratar standard predefinide:
+Default standard font size:	Settings Window		Dimension predefinide dal caratar standard:
 Custom	Settings Window		Personalizât
 Bookmark this page	WebPositive Window		Zonte cheste pagjine ai segnelibris
 Show tabs if only one page is open	Settings Window		Mostre schedis ancje se e je vierte dome une pagjine
@@ -115,7 +115,7 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Ripie i discjariaments
 Proxy server requires authentication	Settings Window		Il servidôr proxy al domande autenticazion
 Cancel	Settings Window		Anule
-Reset size	WebPositive Window		Ristabilìs dimension
+Reset size	WebPositive Window		Ristabilìs dimensions
 History	WebPositive Window		Cronologjie
 Do you really want to clear the browsing history?	WebPositive Window		Netâ pardabon la cronologjie di navigazion?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Cjate il prossim câs dai tiermins di ricercje

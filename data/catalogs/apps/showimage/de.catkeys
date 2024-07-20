@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ShowImage	2046112626
+1	german	x-vnd.Haiku-ShowImage	3351102793
 Page setup…	Menus		Seite einrichten …
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Das Dokument '%s' (Seite %d) wurde verändert. Trotzdem schließen?
 Previous file	Menus		Vorherige Datei
@@ -38,6 +38,7 @@ OK	SaveToFile		OK
 Print…	Menus		Drucken …
 The file '%s' could not be written.	SaveToFile		Die Datei '%s' konnte nicht gespeichert werden.
 Quit	Menus		Beenden
+Get info	Menus		Informationen
 Rating	Menus		Bewertung
 Close document	ClosePrompt		Dokument schließen
 Stretch to window	Menus		Auf Fenstergröße vergrößern

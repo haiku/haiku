@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	1326470592
+1	italian	x-vnd.Haiku-libtracker	1413529801
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Ignora maiuscole/minuscole
 Current folder	ContainerWindow		Cartella corrente
 Finish: %time - Over %finishtime left	StatusWindow		Completamento: %time - %finishtime mancanti
 Mount all disks now	AutoMounterSettings		Monta tutti i dischi ora
-Location:	InfoWindow		Posizione:
 Name	PoseView		Nome
+Location:	InfoWindow		Posizione:
 Kind:	InfoWindow		Tipo:
 contains	FindPanel		contiene
 Open	FilePanelPriv		Apri
@@ -104,7 +104,6 @@ Window	ContainerWindow		Finestra
 Remove	FindPanel		Rimuovi
 Company	Person Query Columns		Organizzazione
 Recent documents	FavoritesMenu		Documenti recenti
-Save as Query template:	FindPanel		Salva come modello di interrogazione
 Edit templates…	TemplatesMenu		Modifica modelli…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# byte}}
 8-bit integer	AttributesView		Intero a 8 bit
@@ -121,7 +120,6 @@ List folders first	SettingsView		Elenca prima le cartelle
 Find	FSUtils		Trova
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Esiste già in questa cartella un elemento chiamato \"%name\". Vuoi sostituirlo con il collegamento simbolico che stai creando?
 List view	ContainerWindow		Vista a liste
-Temporary	FindPanel		Temporanea
 Modified	QueryPoseView		Modificato
 Create relative link	ContainerWindow		Crea collegamenti relativi
 Owner	FilePermissionsView		Proprietario
@@ -274,9 +272,9 @@ no supporting apps	OpenWithWindow		nessuna applicazione supportata
 32-bit unsigned integer	AttributesView		Intero senza segno a 32 bit
 Preparing to empty Trash…	StatusWindow		Peparazione alla pulitura del Cestino...
 Deleting: 	StatusWindow		Eliminazione: 
+label too long	PoseView		etichetta troppo lunga
 the MIME settings	FSUtils		impostazioni MIME
 You can't move or copy the trash.	FSUtils		Non è possibile spostare o copiare il Cestino.
-label too long	PoseView		etichetta troppo lunga
 Error creating link to \"%name\".	FSUtils		Errore nella creazione del collegamento a \"%name\".
 Unknown	FilePermissionsView		Sconosciuto
 Paste links	ContainerWindow		Incolla collegamenti
@@ -325,8 +323,8 @@ MIME Path	AttributesView		Percorso MIME
 less than	FindPanel		meno di
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Errore durante la copia del file \"%name\":\n\t%error\n\nVuoi continuare?
 Creating links: 	StatusWindow		Creazione collegamenti: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (%error). 
 Create %s clipping	PoseView		Crea l'appunto %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Errore nello spostamento di \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Incolla layout
@@ -374,7 +372,6 @@ Force identify	ContainerWindow		Forza indentificazione
 no items	CountView		nessun oggetto
 Time	AttributesView		Ora
 Disks	DirMenu		Dischi
-Query name:	FindPanel		Nome Interrogazione:
 Open parent	ContainerWindow		Vai alla cartella superiore
 Find…	ContainerWindow		Trova...
 moving	FSUtils		spostamento
@@ -492,8 +489,8 @@ True-color picture	AttributesView		Immagine True-color
 Add-ons	FilePanelPriv		Componenti Aggiuntivi
 Alignment	AttributesView		Allineamento
 Move to Trash	FSUtils		Sposta nel Cestino
-Handles %type	OpenWithWindow		Gestisce %type
 Cancel	PoseView		Annulla
+Handles %type	OpenWithWindow		Gestisce %type
 Delete	PoseView		Elimina
 Media parameter	AttributesView		Parametro media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se modifichi la tua cartella personale, %osName potrebbe non funzionare correttamente!\n\nSei sicuro di voler procedere?\n\nPer modificare la cartella home, tieni premuto il tasto Maiusc e clicca su \"So quello che faccio\".

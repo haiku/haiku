@@ -22,6 +22,6 @@ Maximum convolution	Capabilities		Convoluzion massime
 Maximum 3D texture size	Capabilities		Dimension massime de texture 3D
 Maximum recommended index elements	Capabilities		Numar massim di elements de tabele conseâts
 Unknown version	InfoView		Version no cognossude
-List stack size	Capabilities		Dimension dal stack de liste
-Model stack size	Capabilities		Dimension dal stack dal model
-Projection stack size	Capabilities		Dimension dal stack de proiezion
+List stack size	Capabilities		Dimension dal stack des listis
+Model stack size	Capabilities		Dimension dal stack dai modei
+Projection stack size	Capabilities		Dimension dal stack des proiezions

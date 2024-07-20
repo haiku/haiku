@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	1893940391
+1	portuguese	x-vnd.Haiku-libtracker	1980999600
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Ignorar maiúsculas/minúsculas
 Current folder	ContainerWindow		Pasta atual
 Finish: %time - Over %finishtime left	StatusWindow		Fim: %time - Falta mais de %finishtime
 Mount all disks now	AutoMounterSettings		Montar todos os discos agora
-Location:	InfoWindow		Localização:
 Name	PoseView		Nome
+Location:	InfoWindow		Localização:
 Kind:	InfoWindow		Tipo:
 contains	FindPanel		contém
 Open	FilePanelPriv		Abrir
@@ -103,7 +103,6 @@ Window	ContainerWindow		Janela
 Remove	FindPanel		Remover
 Company	Person Query Columns		Empresa
 Recent documents	FavoritesMenu		Documentos recentes
-Save as Query template:	FindPanel		Guardar como modelo de Consulta:
 Edit templates…	TemplatesMenu		Editar modelos…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Inteiro de 8 bits
@@ -120,7 +119,6 @@ List folders first	SettingsView		Listar pastas primeiro
 Find	FSUtils		Procurar
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Já existe nesta pasta um item com o nome \"%name\". Pretende substituí-lo pela ligação simbólica que está a criar?
 List view	ContainerWindow		Vista em lista
-Temporary	FindPanel		Temporário
 Modified	QueryPoseView		Modificado
 Create relative link	ContainerWindow		Criar atalho relativo
 Owner	FilePermissionsView		Proprietário
@@ -272,9 +270,9 @@ no supporting apps	OpenWithWindow		sem aplicações que ofereçam suporte
 32-bit unsigned integer	AttributesView		Inteiro sem sinal de 32 bits
 Preparing to empty Trash…	StatusWindow		A preparar para esvaziar o Lixo…
 Deleting: 	StatusWindow		A eliminar: 
+label too long	PoseView		rótulo demasiado longo
 the MIME settings	FSUtils		configurações MIME
 You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar o lixo.
-label too long	PoseView		rótulo demasiado longo
 Error creating link to \"%name\".	FSUtils		Erro ao criar atalho para \"%name\".
 Unknown	FilePermissionsView		Desconhecido
 Paste links	ContainerWindow		Colar atalhos
@@ -322,8 +320,8 @@ MIME Path	AttributesView		Caminho MIME
 less than	FindPanel		menor que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ocorreu um erro ao copiar o ficheiro \"%name\":\n\t%error\n\nPretende continuar?
 Creating links: 	StatusWindow		A criar atalhos: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não foi possível abrir \"%document\" com a aplicação \"%app\" (%error). 
 Create %s clipping	PoseView		Criar recorte %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não foi possível abrir \"%document\" com a aplicação \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Erro ao mover \"%name\"
 To: %dir	StatusWindow		Para: %dir
 Paste layout	ContainerWindow		Colar a disposição
@@ -369,7 +367,6 @@ Force identify	ContainerWindow		Forçar identificação
 no items	CountView		sem itens
 Time	AttributesView		Hora
 Disks	DirMenu		Discos
-Query name:	FindPanel		Nome da consulta:
 Open parent	ContainerWindow		Abrir pasta acima
 Find…	ContainerWindow		Procurar…
 moving	FSUtils		a mover
@@ -485,8 +482,8 @@ True-color picture	AttributesView		Imagem True-color
 Add-ons	FilePanelPriv		Extensões
 Alignment	AttributesView		Alinhamento
 Move to Trash	FSUtils		Mover para o Lixo
-Handles %type	OpenWithWindow		Suporta %tipo
 Cancel	PoseView		Cancelar
+Handles %type	OpenWithWindow		Suporta %tipo
 Delete	PoseView		Apagar
 Media parameter	AttributesView		Parâmetro de multimédia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta pessoal, o %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar de qualquer modo a pasta pessoal, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".
