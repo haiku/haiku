@@ -30,223 +30,6 @@
 static uint32 sPlicContexts[SMP_MAX_CPUS];
 
 
-//#pragma mark debug output
-
-static void
-WriteMode(int mode)
-{
-	switch (mode) {
-		case modeU: dprintf("u"); break;
-		case modeS: dprintf("s"); break;
-		case modeM: dprintf("m"); break;
-		default: dprintf("%d", mode);
-	}
-}
-
-
-static void
-WriteModeSet(uint32_t val)
-{
-	bool first = true;
-	dprintf("{");
-	for (int i = 0; i < 32; i++) {
-		if (((1LL << i) & val) != 0) {
-			if (first) first = false; else dprintf(", ");
-			WriteMode(i);
-		}
-	}
-	dprintf("}");
-}
-
-
-static void
-WriteExt(uint64_t val)
-{
-	switch (val) {
-		case 0: dprintf("off"); break;
-		case 1: dprintf("initial"); break;
-		case 2: dprintf("clean"); break;
-		case 3: dprintf("dirty"); break;
-		default: dprintf("%" B_PRId64, val);
-	}
-}
-
-
-static void
-WriteSstatus(uint64_t val)
-{
-	SstatusReg status{.val = val};
-	dprintf("(");
-	dprintf("ie: "); WriteModeSet(status.ie);
-	dprintf(", pie: "); WriteModeSet(status.pie);
-	dprintf(", spp: "); WriteMode(status.spp);
-	dprintf(", fs: "); WriteExt(status.fs);
-	dprintf(", xs: "); WriteExt(status.xs);
-	dprintf(", sum: %d", (int)status.sum);
-	dprintf(", mxr: %d", (int)status.mxr);
-	dprintf(", uxl: %d", (int)status.uxl);
-	dprintf(", sd: %d", (int)status.sd);
-	dprintf(")");
-}
-
-
-static void
-WriteInterrupt(uint64_t val)
-{
-	switch (val) {
-		case 0 + modeU: dprintf("uSoft"); break;
-		case 0 + modeS: dprintf("sSoft"); break;
-		case 0 + modeM: dprintf("mSoft"); break;
-		case 4 + modeU: dprintf("uTimer"); break;
-		case 4 + modeS: dprintf("sTimer"); break;
-		case 4 + modeM: dprintf("mTimer"); break;
-		case 8 + modeU: dprintf("uExtern"); break;
-		case 8 + modeS: dprintf("sExtern"); break;
-		case 8 + modeM: dprintf("mExtern"); break;
-		default: dprintf("%" B_PRId64, val);
-	}
-}
-
-
-static void
-WriteInterruptSet(uint64_t val)
-{
-	bool first = true;
-	dprintf("{");
-	for (int i = 0; i < 64; i++) {
-		if (((1LL << i) & val) != 0) {
-			if (first) first = false; else dprintf(", ");
-			WriteInterrupt(i);
-		}
-	}
-	dprintf("}");
-}
-
-
-static void
-WriteCause(uint64_t cause)
-{
-	if ((cause & causeInterrupt) == 0) {
-		dprintf("exception ");
-		switch (cause) {
-			case causeExecMisalign: dprintf("execMisalign"); break;
-			case causeExecAccessFault: dprintf("execAccessFault"); break;
-			case causeIllegalInst: dprintf("illegalInst"); break;
-			case causeBreakpoint: dprintf("breakpoint"); break;
-			case causeLoadMisalign: dprintf("loadMisalign"); break;
-			case causeLoadAccessFault: dprintf("loadAccessFault"); break;
-			case causeStoreMisalign: dprintf("storeMisalign"); break;
-			case causeStoreAccessFault: dprintf("storeAccessFault"); break;
-			case causeUEcall: dprintf("uEcall"); break;
-			case causeSEcall: dprintf("sEcall"); break;
-			case causeMEcall: dprintf("mEcall"); break;
-			case causeExecPageFault: dprintf("execPageFault"); break;
-			case causeLoadPageFault: dprintf("loadPageFault"); break;
-			case causeStorePageFault: dprintf("storePageFault"); break;
-			default: dprintf("%" B_PRId64, cause);
-			}
-	} else {
-		dprintf("interrupt "); WriteInterrupt(cause & ~causeInterrupt);
-	}
-}
-
-
-const static char* registerNames[] = {
-	" ra", " t6", " sp", " gp",
-	" tp", " t0", " t1", " t2",
-	" t5", " s1", " a0", " a1",
-	" a2", " a3", " a4", " a5",
-	" a6", " a7", " s2", " s3",
-	" s4", " s5", " s6", " s7",
-	" s8", " s9", "s10", "s11",
-	" t3", " t4", " fp", "epc"
-};
-
-
-static void WriteRegisters(iframe* frame)
-{
-	uint64* regs = &frame->ra;
-	for (int i = 0; i < 32; i += 4) {
-		dprintf(
-			"  %s: 0x%016" B_PRIx64
-			"  %s: 0x%016" B_PRIx64
-			"  %s: 0x%016" B_PRIx64
-			"  %s: 0x%016" B_PRIx64 "\n",
-			registerNames[i + 0], regs[i + 0],
-			registerNames[i + 1], regs[i + 1],
-			registerNames[i + 2], regs[i + 2],
-			registerNames[i + 3], regs[i + 3]
-		);
-	}
-}
-
-
-static void
-DumpMemory(uint64* adr, size_t len)
-{
-	while (len > 0) {
-		if ((addr_t)adr % 0x10 == 0)
-			dprintf("%08" B_PRIxADDR " ", (addr_t)adr);
-		uint64 val;
-		if (user_memcpy(&val, adr++, sizeof(val)) < B_OK) {
-			dprintf(" ????????????????");
-		} else {
-			dprintf(" %016" B_PRIx64, val);
-		}
-		if ((addr_t)adr % 0x10 == 0)
-			dprintf("\n");
-		len -= 8;
-	}
-	if ((addr_t)adr % 0x10 != 0)
-		dprintf("\n");
-
-	dprintf("%08" B_PRIxADDR "\n\n", (addr_t)adr);
-}
-
-
-void
-WriteTrapInfo(iframe* frame)
-{
-	InterruptsLocker locker;
-	dprintf("STrap("); WriteCause(frame->cause); dprintf(")\n");
-	dprintf("  sstatus: "); WriteSstatus(frame->status); dprintf("\n");
-//	dprintf("  sie: "); WriteInterruptSet(Sie()); dprintf("\n");
-//	dprintf("  sip: "); WriteInterruptSet(Sip()); dprintf("\n");
-	//dprintf("  stval: "); WritePC(Stval()); dprintf("\n");
-	dprintf("  stval: 0x%" B_PRIx64 "\n", frame->tval);
-//	dprintf("  tp: 0x%" B_PRIxADDR "(%s)\n", Tp(),
-//		thread_get_current_thread()->name);
-
-	WriteRegisters(frame);
-#if 0
-	dprintf("  kernel stack: %#" B_PRIxADDR " - %#" B_PRIxADDR "\n",
-		thread_get_current_thread()->kernel_stack_base,
-		thread_get_current_thread()->kernel_stack_top - 1
-	);
-	dprintf("  user stack: %#" B_PRIxADDR " - %#" B_PRIxADDR "\n",
-		thread_get_current_thread()->user_stack_base,
-		thread_get_current_thread()->user_stack_base +
-		thread_get_current_thread()->user_stack_size - 1
-	);
-	if (thread_get_current_thread()->arch_info.userFrame != NULL) {
-		WriteRegisters(thread_get_current_thread()->arch_info.userFrame);
-
-		dprintf("Stack memory dump:\n");
-		DumpMemory(
-			(uint64*)thread_get_current_thread()->arch_info.userFrame->sp,
-			thread_get_current_thread()->user_stack_base +
-			thread_get_current_thread()->user_stack_size -
-			thread_get_current_thread()->arch_info.userFrame->sp
-		);
-//		if (true) {
-//		} else {
-//			DumpMemory((uint64*)frame->sp, thread_get_current_thread()->kernel_stack_top - frame->sp);
-//		}
-	}
-#endif
-}
-
-
 //#pragma mark -
 
 static void
@@ -256,8 +39,6 @@ SendSignal(debug_exception_type type, uint32 signalNumber, int32 signalCode,
 	if (SstatusReg{.val = Sstatus()}.spp == modeU) {
 		struct sigaction action;
 		Thread* thread = thread_get_current_thread();
-
-		//DoStackTrace(Fp(), 0);
 
 		enable_interrupts();
 
@@ -352,29 +133,6 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 extern "C" void
 STrap(iframe* frame)
 {
-	// dprintf("STrap("); WriteCause(Scause()); dprintf(")\n");
-
-/*
-	iframe oldFrame = *frame;
-	const auto& frameChangeChecker = MakeScopeExit([&]() {
-			InterruptsLocker locker;
-			bool first = true;
-			for (int i = 0; i < 32; i++) {
-				uint64 oldVal = ((int64*)&oldFrame)[i];
-				uint64 newVal = ((int64*)frame)[i];
-				if (oldVal != newVal) {
-					if (first) {
-						dprintf("FrameChangeChecker, thread: %" B_PRId32 "(%s)\n", thread_get_current_thread()->id, thread_get_current_thread()->name);
-						first = false;
-					}
-					dprintf("  %s: %#" B_PRIxADDR " -> %#" B_PRIxADDR "\n", registerNames[i], oldVal, newVal);
-				}
-			}
-
-			if (frame->epc == 0)
-				panic("FrameChangeChecker: EPC = 0");
-	});
-*/
 	switch (frame->cause) {
 		case causeExecPageFault:
 		case causeLoadPageFault:
@@ -536,15 +294,6 @@ STrap(iframe* frame)
 					}
 				}
 			}
-/*
-			switch (syscall) {
-				case SYSCALL_READ_PORT_ETC:
-				case SYSCALL_WRITE_PORT_ETC:
-					DoStackTrace(Fp(), 0);
-					break;
-			}
-*/
-			// dprintf("syscall: %s\n", kExtendedSyscallInfos[syscall].name);
 
 			enable_interrupts();
 			uint64 returnValue = 0;
