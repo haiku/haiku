@@ -88,11 +88,6 @@ int _nl_global_locale;
 int _obstack;
 int _rtDebugFlag;
 int _single_threaded;
-int _ufc_keytab;
-int _ufc_sb0;
-int _ufc_sb1;
-int _ufc_sb2;
-int _ufc_sb3;
 int argv_save;
 int daylight;
 int environ;
@@ -125,7 +120,7 @@ void BufferCapacity__CQ28BPrivate8KMessage() {}
 void Buffer__CQ28BPrivate8KMessage() {}
 void ContentSize__CQ28BPrivate8KMessage() {}
 void CountElements__CQ28BPrivate13KMessageField() {}
-void CreateBackend__Q38BPrivate7Libroot13LocaleBackend() {}
+void CreateBackend__Q38BPrivate7Libroot13LocaleBackendRPQ38BPrivate7Libroot13LocaleBackend() {}
 void DestroyBackend__Q38BPrivate7Libroot13LocaleBackendPQ38BPrivate7Libroot13LocaleBackend() {}
 void Digest__Q28BPrivate6SHA256() {}
 void Dump__CQ28BPrivate8KMessagePFPCce_v() {}
@@ -422,6 +417,7 @@ void __allocate_pthread() {}
 void __arch_get_stack_trace() {}
 void __arch_get_system_time_offset() {}
 void __arch_init_time() {}
+void __asctime_r() {}
 void __ashldi3() {}
 void __ashrdi3() {}
 void __asprintf() {}
@@ -524,14 +520,17 @@ void __ctype_b_loc() {}
 void __ctype_get_mb_cur_max() {}
 void __ctype_tolower_loc() {}
 void __ctype_toupper_loc() {}
+void __current_locale_t() {}
 void __cxa_atexit() {}
 void __cxa_finalize() {}
 void __default_terminate() {}
 void __default_unexpected__Fv() {}
 void __deregister_frame() {}
 void __deregister_frame_info() {}
+void __des_setkey() {}
 void __divdi3() {}
 void __dl__FPvRC9nothrow_t() {}
+void __do_des() {}
 void __drand48_iterate() {}
 void __dummy() {}
 void __dynamic_cast() {}
@@ -593,7 +592,6 @@ void __get_architecture() {}
 void __get_architectures() {}
 void __get_cpu_info() {}
 void __get_cpu_topology_info() {}
-void __get_current_time_locale() {}
 void __get_dynamic_handler_chain() {}
 void __get_eh_context() {}
 void __get_eh_info() {}
@@ -606,7 +604,6 @@ void __get_scheduler_mode() {}
 void __get_secondary_architectures() {}
 void __get_system_info() {}
 void __get_system_time_offset() {}
-void __get_time_locale() {}
 void __getc_unlocked() {}
 void __getdelim() {}
 void __getenv_reentrant() {}
@@ -669,6 +666,7 @@ void __mbtowc() {}
 void __memrchr() {}
 void __mktime_fallback() {}
 void __moddi3() {}
+void __month_to_secs() {}
 void __mpn_add() {}
 void __mpn_add_1() {}
 void __mpn_add_n() {}
@@ -716,6 +714,7 @@ void __overflow() {}
 void __parse_invoke_line() {}
 void __partial_sort__H2ZPQ217EnvironmentFilter5EntryZQ217EnvironmentFilter5Entry_X01X01X01PX11_v() {}
 void __path_search() {}
+void __posix_locale_t() {}
 void __ppoll() {}
 void __printf_fp() {}
 void __printf_fphex() {}
@@ -726,12 +725,10 @@ void __pthread_cleanup_pop_handler() {}
 void __pthread_cleanup_push_handler() {}
 void __pthread_destroy_thread() {}
 void __pthread_getattr_np() {}
-void __pthread_getname_np() {}
 void __pthread_init_creation_attributes() {}
 void __pthread_key_call_destructors() {}
 void __pthread_mutex_lock__FP14_pthread_mutexUlx() {}
 void __pthread_set_default_priority() {}
-void __pthread_setname_np() {}
 void __pthread_sigmask() {}
 void __pthread_sigmask_beos() {}
 void __pure_virtual() {}
@@ -769,6 +766,7 @@ void __rw_lock_read_lock() {}
 void __rw_lock_read_unlock() {}
 void __rw_lock_write_lock() {}
 void __rw_lock_write_unlock() {}
+void __secs_to_tm() {}
 void __seed48_r() {}
 void __set_scheduler_mode() {}
 void __set_stack_protection() {}
@@ -823,6 +821,9 @@ void __stack_chk_fail() {}
 void __start_cp_handler() {}
 void __start_watching_system() {}
 void __stop_watching_system() {}
+void __stpncpy() {}
+void __strftime_fmt_1() {}
+void __strftime_l() {}
 void __strtod_internal() {}
 void __strtof_internal() {}
 void __strtol_internal() {}
@@ -883,6 +884,7 @@ void __throw_type_match_rtti() {}
 void __timegm_fallback() {}
 void __times() {}
 void __times_beos() {}
+void __tm_to_secs() {}
 void __tsearch_balance() {}
 void __ucmpdi2() {}
 void __udiv_w_sdiv() {}
@@ -896,6 +898,7 @@ void __unguarded_insertion_sort_aux__H2ZPQ217EnvironmentFilter5EntryZQ217Environ
 void __unguarded_linear_insert__H2ZPQ217EnvironmentFilter5EntryZQ217EnvironmentFilter5Entry_X01X11_v() {}
 void __unguarded_partition__H2ZPQ217EnvironmentFilter5EntryZQ217EnvironmentFilter5Entry_X01X01X11_X01() {}
 void __unwinding_cleanup() {}
+void __utc() {}
 void __vd__FPvRC9nothrow_t() {}
 void __vfscanf() {}
 void __vfwprintf() {}
@@ -919,6 +922,7 @@ void __wcscoll_l() {}
 void __wcscpy() {}
 void __wcscspn() {}
 void __wcsdup() {}
+void __wcsftime_l() {}
 void __wcslcat() {}
 void __wcslcpy() {}
 void __wcslen() {}
@@ -959,8 +963,11 @@ void __woverflow() {}
 void __wuflow() {}
 void __wunderflow() {}
 void __x86_setup_system_time() {}
+void __year_to_secs() {}
 void _call_atexit_hooks_for_range() {}
 void _call_init_routines_() {}
+void _crypt_des_r() {}
+void _crypt_rn() {}
 void _debugFlag() {}
 void _debugPrintf() {}
 void _debuggerAssert() {}
@@ -1043,6 +1050,9 @@ void _kern_dup() {}
 void _kern_dup2() {}
 void _kern_entry_ref_to_path() {}
 void _kern_estimate_max_scheduling_latency() {}
+void _kern_event_queue_create() {}
+void _kern_event_queue_select() {}
+void _kern_event_queue_wait() {}
 void _kern_exec() {}
 void _kern_exit_team() {}
 void _kern_exit_thread() {}
@@ -1061,6 +1071,7 @@ void _kern_fsync() {}
 void _kern_generic_syscall() {}
 void _kern_get_area_info() {}
 void _kern_get_clock() {}
+void _kern_get_cpu() {}
 void _kern_get_cpu_info() {}
 void _kern_get_cpu_topology_info() {}
 void _kern_get_cpuid() {}
@@ -1091,6 +1102,7 @@ void _kern_get_sem_info() {}
 void _kern_get_system_info() {}
 void _kern_get_team_info() {}
 void _kern_get_team_usage_info() {}
+void _kern_get_thread_affinity() {}
 void _kern_get_thread_info() {}
 void _kern_get_timer() {}
 void _kern_get_timezone() {}
@@ -1208,6 +1220,7 @@ void _kern_set_scheduler_mode() {}
 void _kern_set_sem_owner() {}
 void _kern_set_signal_mask() {}
 void _kern_set_signal_stack() {}
+void _kern_set_thread_affinity() {}
 void _kern_set_thread_priority() {}
 void _kern_set_timer() {}
 void _kern_set_timezone() {}
@@ -1332,8 +1345,6 @@ void _thread_do_exit_notification() {}
 void _thread_do_exit_work() {}
 void _to_negative_error() {}
 void _to_positive_error() {}
-void _ufc_dofinalperm() {}
-void _ufc_doit() {}
 void _utimes() {}
 void _waitpid() {}
 void _xdebugPrintf() {}
@@ -1517,8 +1528,6 @@ void create_area() {}
 void create_port() {}
 void create_sem() {}
 void crypt() {}
-void crypt16() {}
-void crypt_legacy() {}
 void crypto_scrypt__FPCUcUlT0UlUxUiUiPUcUl() {}
 void crypto_scrypt_smix__FPUcUlUxPvT3() {}
 void csin() {}
@@ -1878,7 +1887,6 @@ void imaxabs() {}
 void imaxdiv() {}
 void index() {}
 void initNumProcs__Q28BPrivate9hoardHeap() {}
-void init_des() {}
 void initgroups() {}
 void initialize_before() {}
 void initstate() {}
@@ -2134,10 +2142,12 @@ void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}
 void posix_spawn() {}
-void posix_spawn_file_actions_addchdir_np__FPP25_posix_spawn_file_actionsPCc() {}
+void posix_spawn_file_actions_addchdir() {}
+void posix_spawn_file_actions_addchdir_np() {}
 void posix_spawn_file_actions_addclose() {}
 void posix_spawn_file_actions_adddup2() {}
-void posix_spawn_file_actions_addfchdir_np__FPP25_posix_spawn_file_actionsi() {}
+void posix_spawn_file_actions_addfchdir() {}
+void posix_spawn_file_actions_addfchdir_np() {}
 void posix_spawn_file_actions_addopen() {}
 void posix_spawn_file_actions_destroy() {}
 void posix_spawn_file_actions_init() {}
@@ -2263,6 +2273,7 @@ void pthread_spin_lock() {}
 void pthread_spin_trylock() {}
 void pthread_spin_unlock() {}
 void pthread_testcancel() {}
+void pthread_timedjoin_np() {}
 void ptsname() {}
 void putc() {}
 void putc_unlocked() {}
@@ -2471,6 +2482,7 @@ void stats__Q28BPrivate11processHeap() {}
 void statvfs() {}
 void stime() {}
 void stpcpy() {}
+void stpncpy() {}
 void strcasecmp() {}
 void strcasecmp_l() {}
 void strcasestr() {}
@@ -2597,8 +2609,6 @@ void ttyname_r() {}
 void twalk() {}
 void tzset() {}
 void ualarm() {}
-void ufc_do_pw() {}
-void ufc_setup_password() {}
 void umask() {}
 void uname() {}
 void uncaught_exception__Fv() {}
@@ -2660,6 +2670,7 @@ void wcscpy() {}
 void wcscspn() {}
 void wcsdup() {}
 void wcsftime() {}
+void wcsftime_l() {}
 void wcslcat() {}
 void wcslcpy() {}
 void wcslen() {}
