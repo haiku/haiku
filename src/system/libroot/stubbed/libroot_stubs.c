@@ -60,11 +60,6 @@ int _nl_global_locale;
 int _obstack;
 int _rtDebugFlag;
 int _single_threaded;
-int _ufc_keytab;
-int _ufc_sb0;
-int _ufc_sb1;
-int _ufc_sb2;
-int _ufc_sb3;
 int argv_save;
 int daylight;
 int environ;
@@ -286,8 +281,6 @@ void _Z18crypto_scrypt_smixPhmmPvS0_() {}
 void _Z20__pthread_mutex_lockP14_pthread_mutexjl() {}
 void _Z22internal_path_for_pathPcmPKcS1_19path_base_directoryS1_jS_m() {}
 void _Z26get_driver_settings_stringPvPcPlb() {}
-void _Z36posix_spawn_file_actions_addchdir_npPP25_posix_spawn_file_actionsPKc() {}
-void _Z37posix_spawn_file_actions_addfchdir_npPP25_posix_spawn_file_actionsi() {}
 void _Z5exectPKcPKPc() {}
 void _Z6fcryptPKcS0_() {}
 void _ZGTtNKSt13bad_exception4whatEv() {}
@@ -372,7 +365,7 @@ void _ZN8BPrivate6SHA256C2Ev() {}
 void _ZN8BPrivate6SHA256D1Ev() {}
 void _ZN8BPrivate6SHA256D2Ev() {}
 void _ZN8BPrivate7Libroot13LocaleBackend11LoadBackendEv() {}
-void _ZN8BPrivate7Libroot13LocaleBackend13CreateBackendEv() {}
+void _ZN8BPrivate7Libroot13LocaleBackend13CreateBackendERPS1_() {}
 void _ZN8BPrivate7Libroot13LocaleBackend14DestroyBackendEPS1_() {}
 void _ZN8BPrivate7Libroot13LocaleBackendC1Ev() {}
 void _ZN8BPrivate7Libroot13LocaleBackendC2Ev() {}
@@ -446,7 +439,6 @@ void _ZN8BPrivate9hoardHeap19removeMaxSuperblockEi() {}
 void _ZN8BPrivate9hoardHeap23findAvailableSuperblockEiRPNS_5blockEPNS_11processHeapE() {}
 void _ZN8BPrivate9hoardHeap5reuseEi() {}
 void _ZN8BPrivate9hoardHeap7recycleEPNS_10superblockE() {}
-void _ZN8BPrivate9hoardHeap8decStatsEiii() {}
 void _ZN8BPrivate9hoardHeap9freeBlockERPNS_5blockERPNS_10superblockEiPNS_11processHeapE() {}
 void _ZN8BPrivate9hoardHeapC1Ev() {}
 void _ZN8BPrivate9hoardHeapC2Ev() {}
@@ -621,6 +613,7 @@ void __allocate_pthread() {}
 void __arch_get_stack_trace() {}
 void __arch_get_system_time_offset() {}
 void __arch_init_time() {}
+void __asctime_r() {}
 void __asprintf() {}
 void __assert_fail() {}
 void __assert_perror_fail() {}
@@ -703,6 +696,7 @@ void __ctype_b_loc() {}
 void __ctype_get_mb_cur_max() {}
 void __ctype_tolower_loc() {}
 void __ctype_toupper_loc() {}
+void __current_locale_t() {}
 void __cxa_allocate_dependent_exception() {}
 void __cxa_allocate_exception() {}
 void __cxa_atexit() {}
@@ -727,6 +721,8 @@ void __cxa_init_primary_exception() {}
 void __cxa_rethrow() {}
 void __cxa_throw() {}
 void __cxa_throw_bad_array_new_length() {}
+void __des_setkey() {}
+void __do_des() {}
 void __drand48_iterate() {}
 void __erand48_r() {}
 void __fcloseall() {}
@@ -765,7 +761,6 @@ void __get_architecture() {}
 void __get_architectures() {}
 void __get_cpu_info() {}
 void __get_cpu_topology_info() {}
-void __get_current_time_locale() {}
 void __get_haiku_revision() {}
 void __get_next_image_dependency() {}
 void __get_primary_architecture() {}
@@ -773,7 +768,6 @@ void __get_scheduler_mode() {}
 void __get_secondary_architectures() {}
 void __get_system_info() {}
 void __get_system_time_offset() {}
-void __get_time_locale() {}
 void __getc_unlocked() {}
 void __getdelim() {}
 void __getenv_reentrant() {}
@@ -870,6 +864,7 @@ void __nrand48_r() {}
 void __overflow() {}
 void __parse_invoke_line() {}
 void __path_search() {}
+void __posix_locale_t() {}
 void __ppoll() {}
 void __printf_fp() {}
 void __printf_fphex() {}
@@ -880,11 +875,9 @@ void __pthread_cleanup_pop_handler() {}
 void __pthread_cleanup_push_handler() {}
 void __pthread_destroy_thread() {}
 void __pthread_getattr_np() {}
-void __pthread_getname_np() {}
 void __pthread_init_creation_attributes() {}
 void __pthread_key_call_destructors() {}
 void __pthread_set_default_priority() {}
-void __pthread_setname_np() {}
 void __pthread_sigmask() {}
 void __pthread_sigmask_beos() {}
 void __random_r() {}
@@ -958,6 +951,7 @@ void __stack_chk_fail() {}
 void __stack_chk_fail_local() {}
 void __start_watching_system() {}
 void __stop_watching_system() {}
+void __stpncpy() {}
 void __strtod_internal() {}
 void __strtof_internal() {}
 void __strtol_internal() {}
@@ -980,6 +974,7 @@ void __times_beos() {}
 void __tls_get_addr() {}
 void __uflow() {}
 void __underflow() {}
+void __utc() {}
 void __vfscanf() {}
 void __vfwprintf() {}
 void __vfwscanf() {}
@@ -1000,6 +995,7 @@ void __wcscoll_l() {}
 void __wcscpy() {}
 void __wcscspn() {}
 void __wcsdup() {}
+void __wcsftime_l() {}
 void __wcslcat() {}
 void __wcslcpy() {}
 void __wcslen() {}
@@ -1042,6 +1038,8 @@ void __wunderflow() {}
 void __x86_setup_system_time() {}
 void _call_atexit_hooks_for_range() {}
 void _call_init_routines_() {}
+void _crypt_des_r() {}
+void _crypt_rn() {}
 void _debugFlag() {}
 void _debugPrintf() {}
 void _debuggerAssert() {}
@@ -1123,6 +1121,9 @@ void _kern_dup() {}
 void _kern_dup2() {}
 void _kern_entry_ref_to_path() {}
 void _kern_estimate_max_scheduling_latency() {}
+void _kern_event_queue_create() {}
+void _kern_event_queue_select() {}
+void _kern_event_queue_wait() {}
 void _kern_exec() {}
 void _kern_exit_team() {}
 void _kern_exit_thread() {}
@@ -1141,6 +1142,7 @@ void _kern_fsync() {}
 void _kern_generic_syscall() {}
 void _kern_get_area_info() {}
 void _kern_get_clock() {}
+void _kern_get_cpu() {}
 void _kern_get_cpu_info() {}
 void _kern_get_cpu_topology_info() {}
 void _kern_get_cpuid() {}
@@ -1171,6 +1173,7 @@ void _kern_get_sem_info() {}
 void _kern_get_system_info() {}
 void _kern_get_team_info() {}
 void _kern_get_team_usage_info() {}
+void _kern_get_thread_affinity() {}
 void _kern_get_thread_info() {}
 void _kern_get_timer() {}
 void _kern_get_timezone() {}
@@ -1288,6 +1291,7 @@ void _kern_set_scheduler_mode() {}
 void _kern_set_sem_owner() {}
 void _kern_set_signal_mask() {}
 void _kern_set_signal_stack() {}
+void _kern_set_thread_affinity() {}
 void _kern_set_thread_priority() {}
 void _kern_set_timer() {}
 void _kern_set_timezone() {}
@@ -1403,8 +1407,6 @@ void _thread_do_exit_notification() {}
 void _thread_do_exit_work() {}
 void _to_negative_error() {}
 void _to_positive_error() {}
-void _ufc_dofinalperm() {}
-void _ufc_doit() {}
 void _utimes() {}
 void _waitpid() {}
 void _xdebugPrintf() {}
@@ -1480,6 +1482,7 @@ void cacosh() {}
 void cacoshf() {}
 void cacoshl() {}
 void cacosl() {}
+void call_once() {}
 void calloc() {}
 void carg() {}
 void cargf() {}
@@ -1550,6 +1553,12 @@ void closedir() {}
 void closelog() {}
 void closelog_team() {}
 void closelog_thread() {}
+void cnd_broadcast() {}
+void cnd_destroy() {}
+void cnd_init() {}
+void cnd_signal() {}
+void cnd_timedwait() {}
+void cnd_wait() {}
 void confstr() {}
 void conj() {}
 void conjf() {}
@@ -1579,8 +1588,6 @@ void create_area() {}
 void create_port() {}
 void create_sem() {}
 void crypt() {}
-void crypt16() {}
-void crypt_legacy() {}
 void csin() {}
 void csinf() {}
 void csinh() {}
@@ -1914,7 +1921,6 @@ void ilogbl() {}
 void imaxabs() {}
 void imaxdiv() {}
 void index() {}
-void init_des() {}
 void initgroups() {}
 void initialize_before() {}
 void initstate() {}
@@ -2105,6 +2111,12 @@ void msgrcv() {}
 void msgsnd() {}
 void mstats() {}
 void msync() {}
+void mtx_destroy() {}
+void mtx_init() {}
+void mtx_lock() {}
+void mtx_timedlock() {}
+void mtx_trylock() {}
+void mtx_unlock() {}
 void munlock() {}
 void munmap() {}
 void nan() {}
@@ -2157,8 +2169,12 @@ void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}
 void posix_spawn() {}
+void posix_spawn_file_actions_addchdir() {}
+void posix_spawn_file_actions_addchdir_np() {}
 void posix_spawn_file_actions_addclose() {}
 void posix_spawn_file_actions_adddup2() {}
+void posix_spawn_file_actions_addfchdir() {}
+void posix_spawn_file_actions_addfchdir_np() {}
 void posix_spawn_file_actions_addopen() {}
 void posix_spawn_file_actions_destroy() {}
 void posix_spawn_file_actions_init() {}
@@ -2284,6 +2300,7 @@ void pthread_spin_lock() {}
 void pthread_spin_trylock() {}
 void pthread_spin_unlock() {}
 void pthread_testcancel() {}
+void pthread_timedjoin_np() {}
 void ptsname() {}
 void putc() {}
 void putc_unlocked() {}
@@ -2479,6 +2496,7 @@ void sscanf() {}
 void statvfs() {}
 void stime() {}
 void stpcpy() {}
+void stpncpy() {}
 void strcasecmp() {}
 void strcasecmp_l() {}
 void strcasestr() {}
@@ -2607,13 +2625,15 @@ void truncate() {}
 void truncf() {}
 void truncl() {}
 void tsearch() {}
+void tss_create() {}
+void tss_delete() {}
+void tss_get() {}
+void tss_set() {}
 void ttyname() {}
 void ttyname_r() {}
 void twalk() {}
 void tzset() {}
 void ualarm() {}
-void ufc_do_pw() {}
-void ufc_setup_password() {}
 void umask() {}
 void uname() {}
 void ungetc() {}
@@ -2670,6 +2690,7 @@ void wcscpy() {}
 void wcscspn() {}
 void wcsdup() {}
 void wcsftime() {}
+void wcsftime_l() {}
 void wcslcat() {}
 void wcslcpy() {}
 void wcslen() {}
