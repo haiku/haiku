@@ -41,158 +41,8 @@
 static const char* kHaikuDepotKeyring = "HaikuDepot";
 
 
-PackageFilter::~PackageFilter()
-{
-}
-
-
 ModelListener::~ModelListener()
 {
-}
-
-
-// #pragma mark - PackageFilters
-
-
-class AnyFilter : public PackageFilter {
-public:
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		return true;
-	}
-};
-
-
-class CategoryFilter : public PackageFilter {
-public:
-	CategoryFilter(const BString& category)
-		:
-		fCategory(category)
-	{
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		if (!package.IsSet())
-			return false;
-
-		for (int i = package->CountCategories() - 1; i >= 0; i--) {
-			const CategoryRef& category = package->CategoryAtIndex(i);
-			if (!category.IsSet())
-				continue;
-			if (category->Code() == fCategory)
-				return true;
-		}
-		return false;
-	}
-
-	const BString& Category() const
-	{
-		return fCategory;
-	}
-
-private:
-	BString		fCategory;
-};
-
-
-class StateFilter : public PackageFilter {
-public:
-	StateFilter(PackageState state)
-		:
-		fState(state)
-	{
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		return package->State() == NONE;
-	}
-
-private:
-	PackageState	fState;
-};
-
-
-class SearchTermsFilter : public PackageFilter {
-public:
-	SearchTermsFilter(const BString& searchTerms)
-	{
-		// Separate the string into terms at spaces
-		int32 index = 0;
-		while (index < searchTerms.Length()) {
-			int32 nextSpace = searchTerms.FindFirst(" ", index);
-			if (nextSpace < 0)
-				nextSpace = searchTerms.Length();
-			if (nextSpace > index) {
-				BString term;
-				searchTerms.CopyInto(term, index, nextSpace - index);
-				term.ToLower();
-				fSearchTerms.Add(term);
-			}
-			index = nextSpace + 1;
-		}
-	}
-
-	virtual bool AcceptsPackage(const PackageInfoRef& package) const
-	{
-		if (!package.IsSet())
-			return false;
-		// Every search term must be found in one of the package texts
-		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
-			const BString& term = fSearchTerms.StringAt(i);
-			if (!_TextContains(package->Name(), term)
-				&& !_TextContains(package->Title(), term)
-				&& !_TextContains(package->Publisher().Name(), term)
-				&& !_TextContains(package->ShortDescription(), term)
-				&& !_TextContains(package->FullDescription(), term)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	BString SearchTerms() const
-	{
-		BString searchTerms;
-		for (int32 i = 0; i < fSearchTerms.CountStrings(); i++) {
-			const BString& term = fSearchTerms.StringAt(i);
-			if (term.IsEmpty())
-				continue;
-			if (!searchTerms.IsEmpty())
-				searchTerms.Append(" ");
-			searchTerms.Append(term);
-		}
-		return searchTerms;
-	}
-
-private:
-	bool _TextContains(BString text, const BString& string) const
-	{
-		text.ToLower();
-		int32 index = text.FindFirst(string);
-		return index >= 0;
-	}
-
-private:
-	BStringList fSearchTerms;
-};
-
-
-static inline bool
-is_source_package(const PackageInfoRef& package)
-{
-	const BString& packageName = package->Name();
-	return packageName.EndsWith("_source");
-}
-
-
-static inline bool
-is_develop_package(const PackageInfoRef& package)
-{
-	const BString& packageName = package->Name();
-	return packageName.EndsWith("_devel")
-		|| packageName.EndsWith("_debuginfo");
 }
 
 
@@ -203,16 +53,10 @@ Model::Model()
 	:
 	fDepots(),
 	fCategories(),
-	fCategoryFilter(PackageFilterRef(new AnyFilter(), true)),
-	fDepotFilter(""),
-	fSearchTermsFilter(PackageFilterRef(new AnyFilter(), true)),
 	fPackageListViewMode(PROMINENT),
-	fShowAvailablePackages(true),
-	fShowInstalledPackages(true),
-	fShowSourcePackages(false),
-	fShowDevelopPackages(false),
 	fCanShareAnonymousUsageData(false)
 {
+	fPackageFilterModel = new PackageFilterModel();
 	fPackageScreenshotRepository = new PackageScreenshotRepository(
 		PackageScreenshotRepositoryListenerRef(this),
 		&fWebAppInterface);
@@ -221,6 +65,7 @@ Model::Model()
 
 Model::~Model()
 {
+	delete fPackageFilterModel;
 	delete fPackageScreenshotRepository;
 }
 
@@ -229,6 +74,13 @@ LanguageModel*
 Model::Language()
 {
 	return &fLanguageModel;
+}
+
+
+PackageFilterModel*
+Model::PackageFilter()
+{
+	return fPackageFilterModel;
 }
 
 
@@ -277,19 +129,6 @@ Model::PackageForName(const BString& name)
 			return packageInfoRef;
 	}
 	return PackageInfoRef();
-}
-
-
-bool
-Model::MatchesFilter(const PackageInfoRef& package) const
-{
-	return fCategoryFilter->AcceptsPackage(package)
-			&& fSearchTermsFilter->AcceptsPackage(package)
-			&& (fDepotFilter.IsEmpty() || fDepotFilter == package->DepotName())
-			&& (fShowAvailablePackages || package->State() != NONE)
-			&& (fShowInstalledPackages || package->State() != ACTIVATED)
-			&& (fShowSourcePackages || !is_source_package(package))
-			&& (fShowDevelopPackages || !is_develop_package(package));
 }
 
 
@@ -386,73 +225,6 @@ Model::SetStateForPackagesByName(BStringList& packageNames, PackageState state)
 }
 
 
-// #pragma mark - filters
-
-
-void
-Model::SetCategory(const BString& category)
-{
-	PackageFilter* filter;
-
-	if (category.Length() == 0)
-		filter = new AnyFilter();
-	else
-		filter = new CategoryFilter(category);
-
-	fCategoryFilter.SetTo(filter, true);
-}
-
-
-BString
-Model::Category() const
-{
-	CategoryFilter* filter
-		= dynamic_cast<CategoryFilter*>(fCategoryFilter.Get());
-	if (filter == NULL)
-		return "";
-	return filter->Category();
-}
-
-
-void
-Model::SetDepot(const BString& depot)
-{
-	fDepotFilter = depot;
-}
-
-
-BString
-Model::Depot() const
-{
-	return fDepotFilter;
-}
-
-
-void
-Model::SetSearchTerms(const BString& searchTerms)
-{
-	PackageFilter* filter;
-
-	if (searchTerms.Length() == 0)
-		filter = new AnyFilter();
-	else
-		filter = new SearchTermsFilter(searchTerms);
-
-	fSearchTermsFilter.SetTo(filter, true);
-}
-
-
-BString
-Model::SearchTerms() const
-{
-	SearchTermsFilter* filter
-		= dynamic_cast<SearchTermsFilter*>(fSearchTermsFilter.Get());
-	if (filter == NULL)
-		return "";
-	return filter->SearchTerms();
-}
-
-
 void
 Model::SetPackageListViewMode(package_list_view_mode mode)
 {
@@ -464,34 +236,6 @@ void
 Model::SetCanShareAnonymousUsageData(bool value)
 {
 	fCanShareAnonymousUsageData = value;
-}
-
-
-void
-Model::SetShowAvailablePackages(bool show)
-{
-	fShowAvailablePackages = show;
-}
-
-
-void
-Model::SetShowInstalledPackages(bool show)
-{
-	fShowInstalledPackages = show;
-}
-
-
-void
-Model::SetShowSourcePackages(bool show)
-{
-	fShowSourcePackages = show;
-}
-
-
-void
-Model::SetShowDevelopPackages(bool show)
-{
-	fShowDevelopPackages = show;
 }
 
 

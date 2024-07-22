@@ -13,6 +13,7 @@
 #include "AbstractProcess.h"
 #include "DepotInfo.h"
 #include "LanguageModel.h"
+#include "PackageFilterModel.h"
 #include "PackageIconTarRepository.h"
 #include "PackageInfo.h"
 #include "PackageScreenshotRepository.h"
@@ -30,17 +31,6 @@ typedef enum package_list_view_mode {
 	PROMINENT,
 	ALL
 } package_list_view_mode;
-
-
-class PackageFilter : public BReferenceable {
-public:
-	virtual						~PackageFilter();
-
-	virtual	bool				AcceptsPackage(
-									const PackageInfoRef& package) const = 0;
-};
-
-typedef BReference<PackageFilter> PackageFilterRef;
 
 
 class ModelListener : public BReferenceable {
@@ -70,6 +60,7 @@ public:
 	virtual						~Model();
 
 			LanguageModel*		Language();
+			PackageFilterModel*	PackageFilter();
 			PackageIconRepository&
 								GetPackageIconRepository();
 			status_t			InitPackageIconRepository();
@@ -82,8 +73,6 @@ public:
 			void				AddListener(const ModelListenerRef& listener);
 
 			PackageInfoRef		PackageForName(const BString& name);
-			bool				MatchesFilter(
-									const PackageInfoRef& package) const;
 
 			void				MergeOrAddDepot(const DepotInfoRef& depot);
 			bool				HasDepot(const BString& name) const;
@@ -110,31 +99,13 @@ public:
 									BStringList& packageNames,
 									PackageState state);
 
-			// Configure PackageFilters
-			void				SetCategory(const BString& category);
-			BString				Category() const;
-			void				SetDepot(const BString& depot);
-			BString				Depot() const;
-			void				SetSearchTerms(const BString& searchTerms);
-			BString				SearchTerms() const;
 
 			void				SetPackageListViewMode(
 									package_list_view_mode mode);
 			package_list_view_mode
 								PackageListViewMode() const
 									{ return fPackageListViewMode; }
-			void				SetShowAvailablePackages(bool show);
-			bool				ShowAvailablePackages() const
-									{ return fShowAvailablePackages; }
-			void				SetShowInstalledPackages(bool show);
-			bool				ShowInstalledPackages() const
-									{ return fShowInstalledPackages; }
-			void				SetShowSourcePackages(bool show);
-			bool				ShowSourcePackages() const
-									{ return fShowSourcePackages; }
-			void				SetShowDevelopPackages(bool show);
-			bool				ShowDevelopPackages() const
-									{ return fShowDevelopPackages; }
+
 			void				SetCanShareAnonymousUsageData(bool value);
 			bool				CanShareAnonymousUsageData() const
 									{ return fCanShareAnonymousUsageData; }
@@ -200,20 +171,14 @@ private:
 
 			BStringList			fPopulatedPackageNames;
 
-			PackageFilterRef	fCategoryFilter;
-			BString				fDepotFilter;
-			PackageFilterRef	fSearchTermsFilter;
-
 			package_list_view_mode
 								fPackageListViewMode;
-			bool				fShowAvailablePackages;
-			bool				fShowInstalledPackages;
-			bool				fShowSourcePackages;
-			bool				fShowDevelopPackages;
+
 			bool				fCanShareAnonymousUsageData;
 
 			WebAppInterface		fWebAppInterface;
 			LanguageModel		fLanguageModel;
+			PackageFilterModel*	fPackageFilterModel;
 			PackageIconTarRepository
 								fPackageIconRepository;
 			PackageScreenshotRepository*

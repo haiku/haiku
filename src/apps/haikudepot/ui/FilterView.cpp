@@ -120,7 +120,7 @@ FilterView::AdoptModel(Model& model)
 
 	showMenu->SetEnabled(categoryCount > 0);
 
-	if (!_SelectCategoryCode(showMenu, model.Category()))
+	if (!_SelectCategoryCode(showMenu, model.PackageFilter()->Category()))
 		showMenu->ItemAt(0)->SetMarked(true);
 }
 

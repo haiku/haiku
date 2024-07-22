@@ -481,8 +481,8 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_SHOW_AVAILABLE_PACKAGES:
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetShowAvailablePackages(
-					!fModel.ShowAvailablePackages());
+				PackageFilterModel* filterModel = fModel.PackageFilter();
+				filterModel->SetShowAvailablePackages(!filterModel->ShowAvailablePackages());
 			}
 			_AdoptModel();
 			break;
@@ -490,8 +490,8 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_SHOW_INSTALLED_PACKAGES:
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetShowInstalledPackages(
-					!fModel.ShowInstalledPackages());
+				PackageFilterModel* filterModel = fModel.PackageFilter();
+				filterModel->SetShowInstalledPackages(!filterModel->ShowInstalledPackages());
 			}
 			_AdoptModel();
 			break;
@@ -499,7 +499,8 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_SHOW_SOURCE_PACKAGES:
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetShowSourcePackages(!fModel.ShowSourcePackages());
+				PackageFilterModel* filterModel = fModel.PackageFilter();
+				filterModel->SetShowSourcePackages(!filterModel->ShowSourcePackages());
 			}
 			_AdoptModel();
 			break;
@@ -507,7 +508,8 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_SHOW_DEVELOP_PACKAGES:
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetShowDevelopPackages(!fModel.ShowDevelopPackages());
+				PackageFilterModel* filterModel = fModel.PackageFilter();
+				filterModel->SetShowDevelopPackages(!filterModel->ShowDevelopPackages());
 			}
 			_AdoptModel();
 			break;
@@ -562,7 +564,7 @@ MainWindow::MessageReceived(BMessage* message)
 				code = "";
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetCategory(code);
+				fModel.PackageFilter()->SetCategory(code);
 			}
 			_AdoptModel();
 			break;
@@ -575,7 +577,7 @@ MainWindow::MessageReceived(BMessage* message)
 				name = "";
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetDepot(name);
+				fModel.PackageFilter()->SetDepotName(name);
 			}
 			_AdoptModel();
 			_UpdateAvailableRepositories();
@@ -590,7 +592,7 @@ MainWindow::MessageReceived(BMessage* message)
 				searchTerms = "";
 			{
 				BAutolock locker(fModel.Lock());
-				fModel.SetSearchTerms(searchTerms);
+				fModel.PackageFilter()->SetSearchTerms(searchTerms);
 			}
 			_AdoptModel();
 			break;
@@ -690,14 +692,16 @@ MainWindow::StoreSettings(BMessage& settings)
 		settings.AddString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			main_window_package_list_view_mode_str(
 				fModel.PackageListViewMode()));
+
 		settings.AddBool(SETTING_SHOW_AVAILABLE_PACKAGES,
-			fModel.ShowAvailablePackages());
+			fModel.PackageFilter()->ShowAvailablePackages());
 		settings.AddBool(SETTING_SHOW_INSTALLED_PACKAGES,
-			fModel.ShowInstalledPackages());
+			fModel.PackageFilter()->ShowInstalledPackages());
 		settings.AddBool(SETTING_SHOW_DEVELOP_PACKAGES,
-			fModel.ShowDevelopPackages());
+			fModel.PackageFilter()->ShowDevelopPackages());
 		settings.AddBool(SETTING_SHOW_SOURCE_PACKAGES,
-			fModel.ShowSourcePackages());
+			fModel.PackageFilter()->ShowSourcePackages());
+
 		settings.AddBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
 			fModel.CanShareAnonymousUsageData());
 	}
@@ -871,14 +875,16 @@ MainWindow::_RestoreModelSettings(const BMessage& settings)
 	}
 
 	bool showOption;
+
 	if (settings.FindBool(SETTING_SHOW_AVAILABLE_PACKAGES, &showOption) == B_OK)
-		fModel.SetShowAvailablePackages(showOption);
+		fModel.PackageFilter()->SetShowAvailablePackages(showOption);
 	if (settings.FindBool(SETTING_SHOW_INSTALLED_PACKAGES, &showOption) == B_OK)
-		fModel.SetShowInstalledPackages(showOption);
+		fModel.PackageFilter()->SetShowInstalledPackages(showOption);
 	if (settings.FindBool(SETTING_SHOW_DEVELOP_PACKAGES, &showOption) == B_OK)
-		fModel.SetShowDevelopPackages(showOption);
+		fModel.PackageFilter()->SetShowDevelopPackages(showOption);
 	if (settings.FindBool(SETTING_SHOW_SOURCE_PACKAGES, &showOption) == B_OK)
-		fModel.SetShowSourcePackages(showOption);
+		fModel.PackageFilter()->SetShowSourcePackages(showOption);
+
 	if (settings.FindBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
 			&showOption) == B_OK) {
 		fModel.SetCanShareAnonymousUsageData(showOption);
@@ -934,10 +940,10 @@ MainWindow::_AdoptModelControls()
 		return;
 
 	BAutolock locker(fModel.Lock());
-	fShowAvailablePackagesItem->SetMarked(fModel.ShowAvailablePackages());
-	fShowInstalledPackagesItem->SetMarked(fModel.ShowInstalledPackages());
-	fShowSourcePackagesItem->SetMarked(fModel.ShowSourcePackages());
-	fShowDevelopPackagesItem->SetMarked(fModel.ShowDevelopPackages());
+	fShowAvailablePackagesItem->SetMarked(fModel.PackageFilter()->ShowAvailablePackages());
+	fShowInstalledPackagesItem->SetMarked(fModel.PackageFilter()->ShowInstalledPackages());
+	fShowSourcePackagesItem->SetMarked(fModel.PackageFilter()->ShowSourcePackages());
+	fShowDevelopPackagesItem->SetMarked(fModel.PackageFilter()->ShowDevelopPackages());
 
 	if (fModel.PackageListViewMode() == PROMINENT)
 		fListTabs->Select(TAB_PROMINENT_PACKAGES);
@@ -982,7 +988,7 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 
 	{
 		AutoLocker<BLocker> modelLocker(fModel.Lock());
-		matches = fModel.MatchesFilter(package);
+		matches = fModel.PackageFilter()->Filter()->AcceptsPackage(package);
 	}
 
 	if (matches) {
@@ -1363,7 +1369,7 @@ MainWindow::_UpdateAvailableRepositories()
 
 			fRepositoryMenu->AddItem(item);
 
-			if (depot->Name() == fModel.Depot()) {
+			if (depot->Name() == fModel.PackageFilter()->DepotName()) {
 				item->SetMarked(true);
 				foundSelectedDepot = true;
 			}

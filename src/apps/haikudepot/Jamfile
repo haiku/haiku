@@ -177,6 +177,8 @@ local applicationSources =
 	DepotInfo.cpp
 	Language.cpp
 	PackageCategory.cpp
+	PackageFilter.cpp
+	PackageFilterModel.cpp
 	PackageInfo.cpp
 	PublisherInfo.cpp
 	RatingSummary.cpp
