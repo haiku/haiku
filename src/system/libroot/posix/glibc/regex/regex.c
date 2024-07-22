@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002-2014 Free Software Foundation, Inc.
+   Copyright (C) 2002-2018 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -15,14 +15,22 @@
 
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+   <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+#if !defined _LIBC && !defined __HAIKU__
+# include <config.h>
+
+# if (__GNUC__ == 4 && 6 <= __GNUC_MINOR__) || 4 < __GNUC__
+#  pragma GCC diagnostic ignored "-Wsuggest-attribute=pure"
+# endif
+# if (__GNUC__ == 4 && 3 <= __GNUC_MINOR__) || 4 < __GNUC__
+#  pragma GCC diagnostic ignored "-Wold-style-definition"
+#  pragma GCC diagnostic ignored "-Wtype-limits"
+# endif
 #endif
 
-/* Make sure noone compiles this code with a C++ compiler.  */
-#ifdef __cplusplus
+/* Make sure no one compiles this code with a C++ compiler.  */
+#if defined __cplusplus && defined _LIBC
 # error "This is C code, use a C compiler"
 #endif
 
@@ -55,9 +63,6 @@
    GNU regex allows.  Include it before <regex.h>, which correctly
    #undefs RE_DUP_MAX and sets it to the right value.  */
 #include <limits.h>
-
-/* This header defines the MIN and MAX macros.  */
-#include <sys/param.h>
 
 #include <regex.h>
 #include "regex_internal.h"
