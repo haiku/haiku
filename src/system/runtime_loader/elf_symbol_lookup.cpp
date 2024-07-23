@@ -49,16 +49,12 @@ elf_hash(const char* _name)
 {
 	const uint8* name = (const uint8*)_name;
 
-	uint32 hash = 0;
-	uint32 temp;
-
-	while (*name) {
-		hash = (hash << 4) + *name++;
-		if ((temp = hash & 0xf0000000))
-			hash ^= temp >> 24;
-		hash &= ~temp;
+	uint32 h = 0;
+	while (*name != '\0') {
+		h = (h << 4) + *name++;
+		h ^= (h >> 24) & 0xf0;
 	}
-	return hash;
+	return (h & 0x0fffffff);
 }
 
 

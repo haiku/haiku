@@ -301,22 +301,6 @@ delete_elf_image(struct elf_image_info *image)
 }
 
 
-static uint32
-elf_hash(const char *name)
-{
-	uint32 hash = 0;
-	uint32 temp;
-
-	while (*name) {
-		hash = (hash << 4) + (uint8)*name++;
-		if ((temp = hash & 0xf0000000) != 0)
-			hash ^= temp >> 24;
-		hash &= ~temp;
-	}
-	return hash;
-}
-
-
 static const char *
 get_symbol_type_string(elf_sym *symbol)
 {
@@ -600,6 +584,20 @@ void dump_symbol(struct elf_image_info *image, elf_sym *sym)
 
 
 #endif // ELF32_COMPAT
+
+
+static uint32
+elf_hash(const char* _name)
+{
+	const uint8* name = (const uint8*)_name;
+
+	uint32 h = 0;
+	while (*name != '\0') {
+		h = (h << 4) + *name++;
+		h ^= (h >> 24) & 0xf0;
+	}
+	return (h & 0x0fffffff);
+}
 
 
 static elf_sym *
