@@ -17,12 +17,13 @@
 
 
 uint32 elf_hash(const char* name);
+uint32 elf_gnuhash(const char* name);
 
 
 struct SymbolLookupInfo {
 	const char*				name;
 	int32					type;
-	uint32					hash;
+	uint32					hash, gnuhash;
 	uint32					flags;
 	const elf_version_info*	version;
 	elf_sym*				requestingSymbol;
@@ -33,7 +34,8 @@ struct SymbolLookupInfo {
 		:
 		name(name),
 		type(type),
-		hash(elf_hash(name)),
+		hash(0),
+		gnuhash(0),
 		flags(flags),
 		version(version),
 		requestingSymbol(requestingSymbol)

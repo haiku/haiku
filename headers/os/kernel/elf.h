@@ -544,6 +544,8 @@ typedef struct {
 #define DT_PREINIT_ARRAY	32	/* preinitialization array */
 #define DT_PREINIT_ARRAYSZ	33	/* preinitialization array size */
 
+#define	DT_GNU_HASH		0x6ffffef5	/* GNU-style hash table */
+
 #define DT_VERSYM       0x6ffffff0	/* symbol version table */
 #define DT_VERDEF		0x6ffffffc	/* version definition table */
 #define DT_VERDEFNUM	0x6ffffffd	/* number of version definitions */

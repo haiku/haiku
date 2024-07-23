@@ -31,7 +31,7 @@
 	\return \c true, iff \a name is non-NULL and matches the name of \a image.
 */
 static bool
-equals_image_name(image_t* image, const char* name)
+equals_image_name(const image_t* image, const char* name)
 {
 	if (name == NULL)
 		return false;
@@ -62,6 +62,19 @@ elf_hash(const char* _name)
 }
 
 
+uint32
+elf_gnuhash(const char* _name)
+{
+	const uint8* name = (const uint8*)_name;
+
+	uint32 h = 5381;
+	for (uint8 c = *name; c != '\0'; c = *++name)
+		h = (h * 33) + c;
+
+	return h;
+}
+
+
 struct match_result {
 	elf_sym* symbol;
 	elf_sym* versioned_symbol;
@@ -72,7 +85,7 @@ struct match_result {
 
 
 static bool
-match_symbol(image_t* image, const SymbolLookupInfo& lookupInfo, uint32 symIdx,
+match_symbol(const image_t* image, const SymbolLookupInfo& lookupInfo, uint32 symIdx,
 	match_result& result)
 {
 	elf_sym* symbol = &image->syms[symIdx];
@@ -188,8 +201,43 @@ match_symbol(image_t* image, const SymbolLookupInfo& lookupInfo, uint32 symIdx,
 }
 
 
-elf_sym*
-find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
+static elf_sym*
+find_symbol_gnuhash(const image_t* image, const SymbolLookupInfo& lookupInfo)
+{
+	// Test against the Bloom filter.
+	const uint32 wordSize = sizeof(elf_addr) * 8;
+	const uint32 firstHash = lookupInfo.gnuhash & (wordSize - 1);
+	const uint32 secondHash = lookupInfo.gnuhash >> image->gnuhash.shift2;
+	const uint32 index = (lookupInfo.gnuhash / wordSize) & image->gnuhash.mask_words_count_mask;
+	const elf_addr bloomWord = image->gnuhash.bloom[index];
+	if (((bloomWord >> firstHash) & (bloomWord >> secondHash) & 1) == 0)
+		return NULL;
+
+	// Locate hash chain and corresponding value element.
+	const uint32 bucket = image->gnuhash.buckets[lookupInfo.gnuhash % image->gnuhash.bucket_count];
+	if (bucket == 0)
+		return NULL;
+
+	match_result result;
+	const uint32* chain0 = image->gnuhash.chain0;
+	const uint32* hashValue = &chain0[bucket];
+	do {
+		if (((*hashValue ^ lookupInfo.gnuhash) >> 1) != 0)
+			continue;
+
+		uint32 symIndex = hashValue - chain0;
+		if (match_symbol(image, lookupInfo, symIndex, result))
+			return result.symbol;
+	} while ((*hashValue++ & 1) == 0);
+
+	if (result.versioned_symbol_count == 1)
+		return result.versioned_symbol;
+	return NULL;
+}
+
+
+static elf_sym*
+find_symbol_sysv(const image_t* image, const SymbolLookupInfo& lookupInfo)
 {
 	if (image->dynamic_ptr == 0)
 		return NULL;
@@ -206,6 +254,21 @@ find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
 	if (result.versioned_symbol_count == 1)
 		return result.versioned_symbol;
 	return NULL;
+}
+
+
+elf_sym*
+find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
+{
+	if (image->gnuhash.buckets != NULL) {
+		if (lookupInfo.gnuhash == 0)
+			const_cast<uint32&>(lookupInfo.gnuhash) = elf_gnuhash(lookupInfo.name);
+		return find_symbol_gnuhash(image, lookupInfo);
+	}
+
+	if (lookupInfo.hash == 0)
+		const_cast<uint32&>(lookupInfo.hash) = elf_hash(lookupInfo.name);
+	return find_symbol_sysv(image, lookupInfo);
 }
 
 

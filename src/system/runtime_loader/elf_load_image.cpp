@@ -321,6 +321,23 @@ parse_dynamic_segment(image_t* image)
 			case DT_SONAME:
 				sonameOffset = d[i].d_un.d_val;
 				break;
+			case DT_GNU_HASH:
+			{
+				uint32* gnuhash = (uint32*)
+					(d[i].d_un.d_ptr + image->regions[0].delta);
+				const uint32 bucketCount = gnuhash[0];
+				const uint32 symIndex = gnuhash[1];
+				const uint32 maskWordsCount = gnuhash[2];
+				const uint32 bloomSize = maskWordsCount * (sizeof(elf_addr) / 4);
+
+				image->gnuhash.mask_words_count_mask = maskWordsCount - 1;
+				image->gnuhash.shift2 = gnuhash[3];
+				image->gnuhash.bucket_count = bucketCount;
+				image->gnuhash.bloom = (elf_addr*)(gnuhash + 4);
+				image->gnuhash.buckets = gnuhash + 4 + bloomSize;
+				image->gnuhash.chain0 = image->gnuhash.buckets + bucketCount - symIndex;
+				break;
+			}
 			case DT_VERSYM:
 				image->symbol_versions = (elf_versym*)
 					(d[i].d_un.d_ptr + image->regions[0].delta);
