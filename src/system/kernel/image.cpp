@@ -227,8 +227,6 @@ remove_images(Team *team)
 
 	while ((image = (struct image*)list_remove_head_item(&images))
 			!= NULL) {
-		user_debug_image_deleted(&image->info.basic_info);
-		sNotificationService.Notify(IMAGE_REMOVED, image);
 		free(image);
 	}
 

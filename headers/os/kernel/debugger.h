@@ -193,6 +193,7 @@ typedef enum {
 											// one
 	B_DEBUGGER_MESSAGE_TEAM_DELETED,		// the debugged team is gone
 	B_DEBUGGER_MESSAGE_TEAM_EXEC,			// the debugged team executes exec()
+											// (implies all images have been deleted)
 	B_DEBUGGER_MESSAGE_THREAD_CREATED,		// a thread has been created
 	B_DEBUGGER_MESSAGE_THREAD_DELETED,		// a thread has been deleted
 	B_DEBUGGER_MESSAGE_IMAGE_CREATED,		// an image has been created
