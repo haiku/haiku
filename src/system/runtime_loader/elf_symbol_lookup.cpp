@@ -54,12 +54,158 @@ elf_hash(const char* _name)
 
 	while (*name) {
 		hash = (hash << 4) + *name++;
-		if ((temp = hash & 0xf0000000)) {
+		if ((temp = hash & 0xf0000000))
 			hash ^= temp >> 24;
-		}
 		hash &= ~temp;
 	}
 	return hash;
+}
+
+
+struct match_result {
+	elf_sym* symbol;
+	elf_sym* versioned_symbol;
+	uint32 versioned_symbol_count;
+
+	match_result() : symbol(NULL), versioned_symbol(NULL), versioned_symbol_count(0) {}
+};
+
+
+static bool
+match_symbol(image_t* image, const SymbolLookupInfo& lookupInfo, uint32 symIdx,
+	match_result& result)
+{
+	elf_sym* symbol = &image->syms[symIdx];
+	if (symbol->st_shndx == SHN_UNDEF)
+		return false;
+	if (symbol->Bind() != STB_GLOBAL && symbol->Bind() != STB_WEAK)
+		return false;
+
+	// check if the type matches
+	uint32 type = symbol->Type();
+	if ((lookupInfo.type == B_SYMBOL_TYPE_TEXT && type != STT_FUNC)
+		|| (lookupInfo.type == B_SYMBOL_TYPE_DATA
+			&& type != STT_OBJECT && type != STT_FUNC)) {
+		return false;
+	}
+
+	// check the symbol name
+	if (strcmp(SYMNAME(image, symbol), lookupInfo.name) != 0)
+		return false;
+
+	// check the version
+
+	// Handle the simple cases -- the image doesn't have version
+	// information -- first.
+	if (image->symbol_versions == NULL) {
+		if (lookupInfo.version == NULL) {
+			// No specific symbol version was requested either, so the
+			// symbol is just fine.
+			result.symbol = symbol;
+			return true;
+		}
+
+		// A specific version is requested. If it's the dependency
+		// referred to by the requested version, it's apparently an
+		// older version of the dependency and we're not happy.
+		if (equals_image_name(image, lookupInfo.version->file_name)) {
+			// TODO: That should actually be kind of fatal!
+			return false;
+		}
+
+		// This is some other image. We accept the symbol.
+		result.symbol = symbol;
+		return true;
+	}
+
+	// The image has version information. Let's see what we've got.
+	uint32 versionID = image->symbol_versions[symIdx];
+	uint32 versionIndex = VER_NDX(versionID);
+	elf_version_info& version = image->versions[versionIndex];
+
+	// skip local versions
+	if (versionIndex == VER_NDX_LOCAL)
+		return false;
+
+	if (lookupInfo.version != NULL) {
+		// a specific version is requested
+
+		// compare the versions
+		if (version.hash == lookupInfo.version->hash
+			&& strcmp(version.name, lookupInfo.version->name) == 0) {
+			// versions match
+			result.symbol = symbol;
+			return true;
+		}
+
+		// The versions don't match. We're still fine with the
+		// base version, if it is public and we're not looking for
+		// the default version.
+		if ((versionID & VER_NDX_FLAG_HIDDEN) == 0
+			&& versionIndex == VER_NDX_GLOBAL
+			&& (lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION)
+				== 0) {
+			// TODO: Revise the default version case! That's how
+			// FreeBSD implements it, but glibc doesn't handle it
+			// specially.
+			result.symbol = symbol;
+			return true;
+		}
+	} else {
+		// No specific version requested, but the image has version
+		// information. This can happen in either of these cases:
+		//
+		// * The dependent object was linked against an older version
+		//   of the now versioned dependency.
+		// * The symbol is looked up via find_image_symbol() or dlsym().
+		//
+		// In the first case we return the base version of the symbol
+		// (VER_NDX_GLOBAL or VER_NDX_INITIAL), or, if that doesn't
+		// exist, the unique, non-hidden versioned symbol.
+		//
+		// In the second case we want to return the public default
+		// version of the symbol. The handling is pretty similar to the
+		// first case, with the exception that we treat VER_NDX_INITIAL
+		// as regular version.
+
+		// VER_NDX_GLOBAL is always good, VER_NDX_INITIAL is fine, if
+		// we don't look for the default version.
+		if (versionIndex == VER_NDX_GLOBAL
+			|| ((lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION) == 0
+				&& versionIndex == VER_NDX_INITIAL)) {
+			result.symbol = symbol;
+			return true;
+		}
+
+		// If not hidden, remember the version -- we'll return it, if
+		// it is the only one.
+		if ((versionID & VER_NDX_FLAG_HIDDEN) == 0) {
+			result.versioned_symbol_count++;
+			result.versioned_symbol = symbol;
+		}
+	}
+	return false;
+}
+
+
+elf_sym*
+find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
+{
+	if (image->dynamic_ptr == 0)
+		return NULL;
+
+	match_result result;
+
+	uint32 bucket = lookupInfo.hash % HASHTABSIZE(image);
+	for (uint32 symIndex = HASHBUCKETS(image)[bucket]; symIndex != STN_UNDEF;
+			symIndex = HASHCHAINS(image)[symIndex]) {
+		if (match_symbol(image, lookupInfo, symIndex, result))
+			return result.symbol;
+	}
+
+	if (result.versioned_symbol_count == 1)
+		return result.versioned_symbol;
+	return NULL;
 }
 
 
@@ -90,127 +236,6 @@ patch_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 			symbol, type);
 		patcher = patcher->next;
 	}
-}
-
-
-elf_sym*
-find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
-{
-	if (image->dynamic_ptr == 0)
-		return NULL;
-
-	elf_sym* versionedSymbol = NULL;
-	uint32 versionedSymbolCount = 0;
-
-	uint32 bucket = lookupInfo.hash % HASHTABSIZE(image);
-
-	for (uint32 i = HASHBUCKETS(image)[bucket]; i != STN_UNDEF;
-			i = HASHCHAINS(image)[i]) {
-		elf_sym* symbol = &image->syms[i];
-
-		if (symbol->st_shndx != SHN_UNDEF
-			&& ((symbol->Bind() == STB_GLOBAL)
-				|| (symbol->Bind() == STB_WEAK))
-			&& !strcmp(SYMNAME(image, symbol), lookupInfo.name)) {
-
-			// check if the type matches
-			uint32 type = symbol->Type();
-			if ((lookupInfo.type == B_SYMBOL_TYPE_TEXT && type != STT_FUNC)
-				|| (lookupInfo.type == B_SYMBOL_TYPE_DATA
-					&& type != STT_OBJECT && type != STT_FUNC)) {
-				continue;
-			}
-
-			// check the version
-
-			// Handle the simple cases -- the image doesn't have version
-			// information -- first.
-			if (image->symbol_versions == NULL) {
-				if (lookupInfo.version == NULL) {
-					// No specific symbol version was requested either, so the
-					// symbol is just fine.
-					return symbol;
-				}
-
-				// A specific version is requested. If it's the dependency
-				// referred to by the requested version, it's apparently an
-				// older version of the dependency and we're not happy.
-				if (equals_image_name(image, lookupInfo.version->file_name)) {
-					// TODO: That should actually be kind of fatal!
-					return NULL;
-				}
-
-				// This is some other image. We accept the symbol.
-				return symbol;
-			}
-
-			// The image has version information. Let's see what we've got.
-			uint32 versionID = image->symbol_versions[i];
-			uint32 versionIndex = VER_NDX(versionID);
-			elf_version_info& version = image->versions[versionIndex];
-
-			// skip local versions
-			if (versionIndex == VER_NDX_LOCAL)
-				continue;
-
-			if (lookupInfo.version != NULL) {
-				// a specific version is requested
-
-				// compare the versions
-				if (version.hash == lookupInfo.version->hash
-					&& strcmp(version.name, lookupInfo.version->name) == 0) {
-					// versions match
-					return symbol;
-				}
-
-				// The versions don't match. We're still fine with the
-				// base version, if it is public and we're not looking for
-				// the default version.
-				if ((versionID & VER_NDX_FLAG_HIDDEN) == 0
-					&& versionIndex == VER_NDX_GLOBAL
-					&& (lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION)
-						== 0) {
-					// TODO: Revise the default version case! That's how
-					// FreeBSD implements it, but glibc doesn't handle it
-					// specially.
-					return symbol;
-				}
-			} else {
-				// No specific version requested, but the image has version
-				// information. This can happen in either of these cases:
-				//
-				// * The dependent object was linked against an older version
-				//   of the now versioned dependency.
-				// * The symbol is looked up via find_image_symbol() or dlsym().
-				//
-				// In the first case we return the base version of the symbol
-				// (VER_NDX_GLOBAL or VER_NDX_INITIAL), or, if that doesn't
-				// exist, the unique, non-hidden versioned symbol.
-				//
-				// In the second case we want to return the public default
-				// version of the symbol. The handling is pretty similar to the
-				// first case, with the exception that we treat VER_NDX_INITIAL
-				// as regular version.
-
-				// VER_NDX_GLOBAL is always good, VER_NDX_INITIAL is fine, if
-				// we don't look for the default version.
-				if (versionIndex == VER_NDX_GLOBAL
-					|| ((lookupInfo.flags & LOOKUP_FLAG_DEFAULT_VERSION) == 0
-						&& versionIndex == VER_NDX_INITIAL)) {
-					return symbol;
-				}
-
-				// If not hidden, remember the version -- we'll return it, if
-				// it is the only one.
-				if ((versionID & VER_NDX_FLAG_HIDDEN) == 0) {
-					versionedSymbolCount++;
-					versionedSymbol = symbol;
-				}
-			}
-		}
-	}
-
-	return versionedSymbolCount == 1 ? versionedSymbol : NULL;
 }
 
 
