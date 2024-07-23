@@ -431,24 +431,28 @@ static int open_vnode(struct vnode* vnode, int openMode, bool kernel);
 
 
 static struct fd_ops sFileOps = {
+	file_close,
+	file_free_fd,
 	file_read,
 	file_write,
+	NULL,		// readv()
+	NULL,		// writev()
 	file_seek,
 	common_ioctl,
-	NULL,		// set_flags
+	NULL,		// set_flags()
 	file_select,
 	file_deselect,
 	NULL,		// read_dir()
 	NULL,		// rewind_dir()
 	common_read_stat,
 	common_write_stat,
-	file_close,
-	file_free_fd
 };
 
 static struct fd_ops sDirectoryOps = {
-	NULL,		// read()
-	NULL,		// write()
+	dir_close,
+	dir_free_fd,
+	NULL, NULL,	// read(), write()
+	NULL, NULL,	// readv(), writev()
 	NULL,		// seek()
 	common_ioctl,
 	NULL,		// set_flags
@@ -458,13 +462,13 @@ static struct fd_ops sDirectoryOps = {
 	dir_rewind,
 	common_read_stat,
 	common_write_stat,
-	dir_close,
-	dir_free_fd
 };
 
 static struct fd_ops sAttributeDirectoryOps = {
-	NULL,		// read()
-	NULL,		// write()
+	attr_dir_close,
+	attr_dir_free_fd,
+	NULL, NULL,	// read(), write()
+	NULL, NULL,	// readv(), writev()
 	NULL,		// seek()
 	common_ioctl,
 	NULL,		// set_flags
@@ -474,46 +478,48 @@ static struct fd_ops sAttributeDirectoryOps = {
 	attr_dir_rewind,
 	common_read_stat,
 	common_write_stat,
-	attr_dir_close,
-	attr_dir_free_fd
 };
 
 static struct fd_ops sAttributeOps = {
+	attr_close,
+	attr_free_fd,
 	attr_read,
 	attr_write,
+	NULL,		// readv()
+	NULL,		// writev()
 	attr_seek,
 	common_ioctl,
-	NULL,		// set_flags
+	NULL,		// set_flags()
 	NULL,		// select()
 	NULL,		// deselect()
 	NULL,		// read_dir()
 	NULL,		// rewind_dir()
 	attr_read_stat,
 	attr_write_stat,
-	attr_close,
-	attr_free_fd
 };
 
 static struct fd_ops sIndexDirectoryOps = {
-	NULL,		// read()
-	NULL,		// write()
+	index_dir_close,
+	index_dir_free_fd,
+	NULL, NULL,	// read(), write()
+	NULL, NULL,	// readv(), writev()
 	NULL,		// seek()
 	NULL,		// ioctl()
-	NULL,		// set_flags
+	NULL,		// set_flags()
 	NULL,		// select()
 	NULL,		// deselect()
 	index_dir_read,
 	index_dir_rewind,
 	NULL,		// read_stat()
 	NULL,		// write_stat()
-	index_dir_close,
-	index_dir_free_fd
 };
 
 #if 0
 static struct fd_ops sIndexOps = {
-	NULL,		// read()
-	NULL,		// write()
+	NULL,		// dir_close()
+	NULL,		// free_fd()
+	NULL, NULL,	// read(), write()
+	NULL, NULL,	// readv(), writev()
 	NULL,		// seek()
 	NULL,		// ioctl()
 	NULL,		// set_flags
@@ -523,25 +529,23 @@ static struct fd_ops sIndexOps = {
 	NULL,		// dir_rewind()
 	index_read_stat,	// read_stat()
 	NULL,		// write_stat()
-	NULL,		// dir_close()
-	NULL		// free_fd()
 };
 #endif
 
 static struct fd_ops sQueryOps = {
-	NULL,		// read()
-	NULL,		// write()
+	query_close,
+	query_free_fd,
+	NULL, NULL,	// read(), write()
+	NULL, NULL,	// readv(), writev()
 	NULL,		// seek()
 	NULL,		// ioctl()
-	NULL,		// set_flags
+	NULL,		// set_flags()
 	NULL,		// select()
 	NULL,		// deselect()
 	query_read,
 	query_rewind,
 	NULL,		// read_stat()
 	NULL,		// write_stat()
-	query_close,
-	query_free_fd
 };
 
 

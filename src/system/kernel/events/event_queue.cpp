@@ -572,17 +572,6 @@ event_queue_free(file_descriptor* descriptor)
 
 
 static struct fd_ops sEventQueueFDOps = {
-	NULL,	// fd_read
-	NULL,	// fd_write
-	NULL,	// fd_seek
-	NULL,	// fd_ioctl
-	NULL,	// fd_set_flags
-	NULL,	// fd_select
-	NULL,	// fd_deselect
-	NULL,	// fd_read_dir
-	NULL,	// fd_rewind_dir
-	NULL,	// fd_read_stat
-	NULL,	// fd_write_stat
 	&event_queue_close,
 	&event_queue_free
 };

@@ -296,8 +296,11 @@ socket_free(struct file_descriptor *descriptor)
 
 
 static struct fd_ops sSocketFDOps = {
+	&socket_close,
+	&socket_free,
 	&socket_read,
 	&socket_write,
+	NULL, NULL, // readv(), writev()
 	NULL,	// fd_seek
 	&socket_ioctl,
 	&socket_set_flags,
@@ -307,8 +310,6 @@ static struct fd_ops sSocketFDOps = {
 	NULL,	// fd_rewind_dir
 	&socket_read_stat,
 	NULL,	// fd_write_stat
-	&socket_close,
-	&socket_free
 };
 
 
