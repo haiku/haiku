@@ -218,6 +218,28 @@ socket_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
 }
 
 
+static ssize_t
+socket_readv(struct file_descriptor *descriptor, off_t pos,
+	const struct iovec *vecs, int count)
+{
+	struct msghdr message = {};
+	message.msg_iov = (struct iovec*)vecs;
+	message.msg_iovlen = count;
+	return sStackInterface->recvmsg((net_socket*)descriptor->cookie, &message, 0);
+}
+
+
+static ssize_t
+socket_writev(struct file_descriptor *descriptor, off_t pos,
+	const struct iovec *vecs, int count)
+{
+	struct msghdr message = {};
+	message.msg_iov = (struct iovec*)vecs;
+	message.msg_iovlen = count;
+	return sStackInterface->sendmsg((net_socket*)descriptor->cookie, &message, 0);
+}
+
+
 static status_t
 socket_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 	size_t length)
@@ -300,7 +322,8 @@ static struct fd_ops sSocketFDOps = {
 	&socket_free,
 	&socket_read,
 	&socket_write,
-	NULL, NULL, // readv(), writev()
+	&socket_readv,
+	&socket_writev,
 	NULL,	// fd_seek
 	&socket_ioctl,
 	&socket_set_flags,
