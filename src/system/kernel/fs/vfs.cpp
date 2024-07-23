@@ -358,6 +358,10 @@ static status_t file_read(struct file_descriptor* descriptor, off_t pos,
 	void* buffer, size_t* _bytes);
 static status_t file_write(struct file_descriptor* descriptor, off_t pos,
 	const void* buffer, size_t* _bytes);
+static ssize_t file_readv(struct file_descriptor* descriptor, off_t pos,
+	const struct iovec *vecs, int count);
+static ssize_t file_writev(struct file_descriptor* descriptor, off_t pos,
+	const struct iovec *vecs, int count);
 static off_t file_seek(struct file_descriptor* descriptor, off_t pos,
 	int seekType);
 static void file_free_fd(struct file_descriptor* descriptor);
@@ -435,8 +439,8 @@ static struct fd_ops sFileOps = {
 	file_free_fd,
 	file_read,
 	file_write,
-	NULL,		// readv()
-	NULL,		// writev()
+	file_readv,
+	file_writev,
 	file_seek,
 	common_ioctl,
 	NULL,		// set_flags()
@@ -5722,6 +5726,63 @@ file_write(struct file_descriptor* descriptor, off_t pos, const void* buffer,
 		return B_READ_ONLY_DEVICE;
 
 	return FS_CALL(vnode, write, descriptor->cookie, pos, buffer, length);
+}
+
+
+static ssize_t
+file_vector_io(struct file_descriptor* descriptor, off_t pos,
+	const struct iovec *vecs, int count, bool write)
+{
+	struct vnode* vnode = descriptor->u.vnode;
+	if (pos != -1 && descriptor->pos == -1)
+		return ESPIPE;
+	if (S_ISDIR(vnode->Type()))
+		return B_IS_A_DIRECTORY;
+
+	if (pos == -1)
+		return B_UNSUPPORTED;
+	if (!HAS_FS_CALL(vnode, io))
+		return B_UNSUPPORTED;
+
+	// We can only perform real vectored I/O for vnodes that have no cache,
+	// because the I/O hook bypasses the cache entirely.
+	if (vnode->cache != NULL)
+		return B_UNSUPPORTED;
+
+	BStackOrHeapArray<generic_io_vec, 8> iovecs(count);
+	if (!iovecs.IsValid())
+		return B_NO_MEMORY;
+
+	generic_size_t length = 0;
+	for (int i = 0; i < count; i++) {
+		iovecs[i].base = (generic_addr_t)vecs[i].iov_base;
+		iovecs[i].length = vecs[i].iov_len;
+		length += vecs[i].iov_len;
+	}
+
+	status_t status = (write ? vfs_write_pages : vfs_read_pages)(vnode,
+		descriptor->cookie, pos, iovecs, count, 0, &length);
+	if (length > 0)
+		return length;
+	return status;
+}
+
+
+static ssize_t
+file_readv(struct file_descriptor* descriptor, off_t pos,
+	const struct iovec *vecs, int count)
+{
+	FUNCTION(("file_readv: pos %" B_PRIdOFF "\n", pos));
+	return file_vector_io(descriptor, pos, vecs, count, false);
+}
+
+
+static ssize_t
+file_writev(struct file_descriptor* descriptor, off_t pos,
+	const struct iovec *vecs, int count)
+{
+	FUNCTION(("file_writev: pos %" B_PRIdOFF "\n", pos));
+	return file_vector_io(descriptor, pos, vecs, count, true);
 }
 
 

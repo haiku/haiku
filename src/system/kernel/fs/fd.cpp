@@ -29,7 +29,6 @@
 #include <vfs.h>
 #include <wait_for_objects.h>
 
-#include "Vnode.h"
 #include "vfs_tracing.h"
 
 
@@ -709,30 +708,22 @@ common_vector_io(int fd, off_t pos, const iovec* vecs, size_t count, bool write,
 		return B_BAD_VALUE;
 	}
 
-	// See if we can bypass the loop and perform I/O directly. We can only do this
-	// for vnodes that have no cache, as the I/O hook bypasses the cache entirely.
-	struct vnode* vnode = descriptor->u.vnode;
-	status_t status = B_OK;
-	if (!movePosition && pos != -1 && count > 1 && fd_is_file(descriptor.Get())
-			&& vnode != NULL && vnode->cache == NULL && vnode->ops->io != NULL) {
-		BStackOrHeapArray<generic_io_vec, 8> iovecs(count);
-		if (!iovecs.IsValid())
-			return B_NO_MEMORY;
-
-		generic_size_t length = 0;
-		for (size_t i = 0; i < count; i++) {
-			iovecs[i].base = (generic_addr_t)vecs[i].iov_base;
-			iovecs[i].length = vecs[i].iov_len;
-			length += vecs[i].iov_len;
+	if (!movePosition && count > 1 && (write ? descriptor->ops->fd_writev != NULL
+			: descriptor->ops->fd_readv != NULL)) {
+		ssize_t result;
+		if (write) {
+			result = descriptor->ops->fd_writev(descriptor.Get(), pos,
+				vecs, count);
+		} else {
+			result = descriptor->ops->fd_readv(descriptor.Get(), pos,
+				vecs, count);
 		}
-
-		status = (write ? vfs_write_pages : vfs_read_pages)(vnode,
-			descriptor->cookie, pos, iovecs, count, 0, &length);
-		if (length > 0)
-			return length;
-		return status;
+		if (result != B_UNSUPPORTED)
+			return result;
+		// If not supported, just fall back to the loop.
 	}
 
+	status_t status = B_OK;
 	ssize_t bytesTransferred = 0;
 	for (size_t i = 0; i < count; i++) {
 		if (vecs[i].iov_base == NULL)
@@ -743,8 +734,8 @@ common_vector_io(int fd, off_t pos, const iovec* vecs, size_t count, bool write,
 			status = descriptor->ops->fd_write(descriptor.Get(), pos,
 				vecs[i].iov_base, &length);
 		} else {
-			status = descriptor->ops->fd_read(descriptor.Get(), pos, vecs[i].iov_base,
-				&length);
+			status = descriptor->ops->fd_read(descriptor.Get(), pos,
+				vecs[i].iov_base, &length);
 		}
 
 		if (status != B_OK) {
