@@ -1147,8 +1147,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		if (frame == NULL)
 			return 0;
 
-		bp = frame->bp;
-		onKernelStack = false;
+		bp = (addr_t)frame;
 	}
 
 	while (bp != 0 && count < maxCount) {
