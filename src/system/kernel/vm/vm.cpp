@@ -2109,16 +2109,16 @@ vm_create_vnode_cache(struct vnode* vnode, struct VMCache** cache)
 */
 static void
 pre_map_area_pages(VMArea* area, VMCache* cache,
-	vm_page_reservation* reservation)
+	vm_page_reservation* reservation, int32 maxCount)
 {
 	addr_t baseAddress = area->Base();
 	addr_t cacheOffset = area->cache_offset;
 	page_num_t firstPage = cacheOffset / B_PAGE_SIZE;
 	page_num_t endPage = firstPage + area->Size() / B_PAGE_SIZE;
 
-	for (VMCachePagesTree::Iterator it
-				= cache->pages.GetIterator(firstPage, true, true);
-			vm_page* page = it.Next();) {
+	VMCachePagesTree::Iterator it = cache->pages.GetIterator(firstPage, true, true);
+	vm_page* page;
+	while ((page = it.Next()) != NULL && maxCount > 0) {
 		if (page->cache_offset >= endPage)
 			break;
 
@@ -2130,6 +2130,7 @@ pre_map_area_pages(VMArea* area, VMCache* cache,
 		map_page(area, page,
 			baseAddress + (page->cache_offset * B_PAGE_SIZE - cacheOffset),
 			B_READ_AREA | B_KERNEL_READ_AREA, reservation);
+		maxCount--;
 		DEBUG_PAGE_ACCESS_END(page);
 	}
 }
@@ -2276,8 +2277,11 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		cache->ReleaseRefLocked();
 	}
 
-	if (status == B_OK && (protection & B_READ_AREA) != 0)
-		pre_map_area_pages(area, cache, &reservation);
+	if (status == B_OK && (protection & B_READ_AREA) != 0) {
+		// Pre-map at most 10MB worth of pages.
+		pre_map_area_pages(area, cache, &reservation,
+			(10LL * 1024 * 1024) / B_PAGE_SIZE);
+	}
 
 	cache->Unlock();
 
