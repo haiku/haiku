@@ -780,7 +780,7 @@ list_page(vm_page* page)
 	if (page->busy_writing) kprintf("W"); else kprintf("-");
 	if (page->accessed)     kprintf("A"); else kprintf("-");
 	if (page->modified)     kprintf("M"); else kprintf("-");
-	if (page->unused)       kprintf("U"); else kprintf("-");
+	kprintf("-");
 
 	kprintf(" usage:%3u", page->usage_count);
 	kprintf(" wired:%5u", page->WiredCount());

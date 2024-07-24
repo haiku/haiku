@@ -151,7 +151,7 @@ public:
 		// used in VMAnonymousCache::Merge()
 	bool					accessed : 1;
 	bool					modified : 1;
-	uint8					unused : 1;
+	uint8					_unused : 1;
 
 	uint8					usage_count;
 
