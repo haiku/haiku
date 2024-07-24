@@ -326,6 +326,7 @@ clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 		// cancel profiling timer
 		if (info->profile.installed_timer != NULL) {
 			cancel_timer(info->profile.installed_timer);
+			info->profile.installed_timer->hook = NULL;
 			info->profile.installed_timer = NULL;
 		}
 
@@ -757,7 +758,6 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		atomic_and(&thread->debug_info.flags, ~B_THREAD_DEBUG_STOPPED);
 
 		update_thread_user_debug_flag(thread);
-
 	} else {
 		// the debugger is gone: cleanup our info completely
 		threadDebugInfo = thread->debug_info;
@@ -1311,7 +1311,8 @@ static void
 schedule_profiling_timer(Thread* thread, bigtime_t interval)
 {
 	struct timer* timer = &sProfilingTimers[thread->cpu->cpu_num];
-	ASSERT(thread->debug_info.profile.installed_timer == NULL);
+	// Use the "hook" field to sanity-check that this timer is not scheduled.
+	ASSERT(timer->hook == NULL);
 	thread->debug_info.profile.installed_timer = timer;
 	thread->debug_info.profile.timer_end = system_time() + interval;
 	add_timer(timer, &profiling_event, interval, B_ONE_SHOT_RELATIVE_TIMER);
@@ -1440,6 +1441,7 @@ profiling_flush(void*)
 		if (debugInfo.profile.installed_timer != NULL) {
 			interval = max_c(profiling_timer_left(thread), 0);
 			cancel_timer(debugInfo.profile.installed_timer);
+			debugInfo.profile.installed_timer->hook = NULL;
 			debugInfo.profile.installed_timer = NULL;
 		}
 		debugInfo.profile.interval_left = -1;
@@ -1485,6 +1487,7 @@ profiling_event(timer* /*unused*/)
 	thread_debug_info& debugInfo = thread->debug_info;
 
 	SpinLocker threadDebugInfoLocker(debugInfo.lock);
+	debugInfo.profile.installed_timer->hook = NULL;
 	debugInfo.profile.installed_timer = NULL;
 
 	if (profiling_do_sample()) {
@@ -1522,6 +1525,7 @@ user_debug_thread_unscheduled(Thread* thread)
 		// track remaining time
 		bigtime_t left = profiling_timer_left(thread);
 		thread->debug_info.profile.interval_left = max_c(left, 0);
+		thread->debug_info.profile.installed_timer->hook = NULL;
 		thread->debug_info.profile.installed_timer = NULL;
 
 		// cancel timer
@@ -1620,7 +1624,7 @@ nub_thread_cleanup(Thread *nubThread)
 
 	team_debug_info &info = nubThread->team->debug_info;
 	if (info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED
-		&& info.nub_thread == nubThread->id) {
+			&& info.nub_thread == nubThread->id) {
 		teamDebugInfo = info;
 		clear_team_debug_info(&info, false);
 		destroyDebugInfo = true;
