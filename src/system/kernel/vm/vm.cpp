@@ -2570,7 +2570,8 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area,
 {
 	ASSERT(!area->IsWired());
 
-	VMAreas::Remove(area);
+	if (area->id >= 0)
+		VMAreas::Remove(area);
 
 	// At this point the area is removed from the global hash table, but
 	// still exists in the area list.
@@ -3991,6 +3992,17 @@ vm_delete_areas(struct VMAddressSpace* addressSpace, bool deletingAddressSpace)
 
 	// remove all reserved areas in this address space
 	addressSpace->UnreserveAllAddressRanges(0);
+
+	// remove all areas from the areas map at once (to avoid lock contention)
+	VMAreas::WriteLock();
+	{
+		VMAddressSpace::AreaIterator it = addressSpace->GetAreaIterator();
+		while (VMArea* area = it.Next()) {
+			VMAreas::Remove(area);
+			area->id = INT32_MIN;
+		}
+	}
+	VMAreas::WriteUnlock();
 
 	// delete all the areas in this address space
 	while (VMArea* area = addressSpace->FirstArea()) {
