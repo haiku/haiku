@@ -974,12 +974,12 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	offset = ROUNDDOWN(offset, B_PAGE_SIZE);
 	size = ROUNDUP(size, B_PAGE_SIZE);
 
-	size_t reservePages = size / B_PAGE_SIZE;
+	const size_t pagesCount = size / B_PAGE_SIZE;
 
 	// Don't do anything if we don't have the resources left, or the cache
 	// already contains more than 2/3 of its pages
-	if (offset >= fileSize || vm_page_num_unused_pages() < 2 * reservePages
-		|| 3 * cache->page_count > 2 * fileSize / B_PAGE_SIZE) {
+	if (offset >= fileSize || vm_page_num_unused_pages() < 2 * pagesCount
+		|| (3 * cache->page_count) > (2 * fileSize / B_PAGE_SIZE)) {
 		cache->ReleaseRef();
 		return;
 	}
@@ -988,7 +988,7 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	off_t lastOffset = offset;
 
 	vm_page_reservation reservation;
-	vm_page_reserve_pages(&reservation, reservePages, VM_PRIORITY_USER);
+	vm_page_reserve_pages(&reservation, pagesCount, VM_PRIORITY_USER);
 
 	cache->Lock();
 
