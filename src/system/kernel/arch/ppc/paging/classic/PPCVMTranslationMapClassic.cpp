@@ -863,7 +863,7 @@ PPCVMTranslationMapClassic::UnmapPages(VMArea* area, addr_t base, size_t size,
 	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
 		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
 	while (vm_page_mapping* mapping = queue.RemoveHead())
-		object_cache_free(gPageMappingsObjectCache, mapping, freeFlags);
+		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 #endif
 }
 
@@ -968,7 +968,7 @@ PPCVMTranslationMapClassic::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
 		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
 	while (vm_page_mapping* mapping = mappings.RemoveHead())
-		object_cache_free(gPageMappingsObjectCache, mapping, freeFlags);
+		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 #endif
 }
 

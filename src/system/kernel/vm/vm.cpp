@@ -244,7 +244,8 @@ static const size_t kMemoryReserveForPriority[] = {
 };
 
 
-ObjectCache* gPageMappingsObjectCache;
+static ObjectCache** sPageMappingsObjectCaches;
+static uint32 sPageMappingsMask;
 
 static rw_lock sAreaCacheLock = RW_LOCK_INITIALIZER("area->cache");
 
@@ -410,6 +411,61 @@ private:
 #endif	// VM_PAGE_FAULT_TRACING
 
 
+//	#pragma mark - page mappings allocation
+
+
+static void
+create_page_mappings_object_caches()
+{
+	// We want an even power of 2 smaller than the number of CPUs.
+	const int32 numCPUs = smp_get_num_cpus();
+	int32 count = next_power_of_2(numCPUs);
+	if (count > numCPUs)
+		count >>= 1;
+	sPageMappingsMask = count - 1;
+
+	sPageMappingsObjectCaches = new object_cache*[count];
+	if (sPageMappingsObjectCaches == NULL)
+		panic("failed to allocate page mappings object_cache array");
+
+	for (int32 i = 0; i < count; i++) {
+		char name[32];
+		snprintf(name, sizeof(name), "page mappings %" B_PRId32, i);
+
+		object_cache* cache = create_object_cache_etc(name,
+			sizeof(vm_page_mapping), 0, 0, 64, 128, CACHE_LARGE_SLAB, NULL, NULL,
+			NULL, NULL);
+		if (cache == NULL)
+			panic("failed to create page mappings object_cache");
+
+		object_cache_set_minimum_reserve(cache, 1024);
+		sPageMappingsObjectCaches[i] = cache;
+	}
+}
+
+
+static object_cache*
+page_mapping_object_cache_for(page_num_t page)
+{
+	return sPageMappingsObjectCaches[page & sPageMappingsMask];
+}
+
+
+static vm_page_mapping*
+allocate_page_mapping(page_num_t page, uint32 flags = 0)
+{
+	return (vm_page_mapping*)object_cache_alloc(page_mapping_object_cache_for(page),
+		flags);
+}
+
+
+void
+vm_free_page_mapping(page_num_t page, vm_page_mapping* mapping, uint32 flags)
+{
+	object_cache_free(page_mapping_object_cache_for(page), mapping, flags);
+}
+
+
 //	#pragma mark -
 
 
@@ -561,8 +617,7 @@ map_page(VMArea* area, vm_page* page, addr_t address, uint32 protection,
 		DEBUG_PAGE_ACCESS_CHECK(page);
 
 		bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
-		vm_page_mapping* mapping = (vm_page_mapping*)object_cache_alloc(
-			gPageMappingsObjectCache,
+		vm_page_mapping* mapping = allocate_page_mapping(page->physical_page_number,
 			CACHE_DONT_WAIT_FOR_MEMORY
 				| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0));
 		if (mapping == NULL)
@@ -4429,14 +4484,7 @@ vm_init(kernel_args* args)
 		(void *)ROUNDDOWN(0xdeadbeef, B_PAGE_SIZE), B_PAGE_SIZE * 64);
 #endif
 
-	// create the object cache for the page mappings
-	gPageMappingsObjectCache = create_object_cache_etc("page mappings",
-		sizeof(vm_page_mapping), 0, 0, 64, 128, CACHE_LARGE_SLAB, NULL, NULL,
-		NULL, NULL);
-	if (gPageMappingsObjectCache == NULL)
-		panic("failed to create page mappings object cache");
-
-	object_cache_set_minimum_reserve(gPageMappingsObjectCache, 1024);
+	create_page_mappings_object_caches();
 
 #if DEBUG_CACHE_LIST
 	if (vm_page_num_free_pages() >= 200 * 1024 * 1024 / B_PAGE_SIZE) {
@@ -5073,7 +5121,8 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 				context.UnlockAll();
 
-				if (object_cache_reserve(gPageMappingsObjectCache, 1, 0)
+				if (object_cache_reserve(page_mapping_object_cache_for(
+							context.page->physical_page_number), 1, 0)
 						!= B_OK) {
 					// Apparently the situation is serious. Let's get ourselves
 					// killed.
