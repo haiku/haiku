@@ -3242,7 +3242,7 @@ dump_vnode(int argc, char** argv)
 		argi++;
 	}
 
-	if (argi >= argc || argi + 2 < argc) {
+	if (argi >= argc || argi + 2 < argc || strcmp(argv[argi], "--help") == 0) {
 		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
