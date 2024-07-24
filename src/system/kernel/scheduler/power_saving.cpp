@@ -89,14 +89,11 @@ choose_core(const ThreadData* threadData)
 	CoreEntry* core = NULL;
 
 	CPUSet mask = threadData->GetCPUMask();
-	if (mask.IsEmpty()) {
-		// ignore when empty
-		mask.SetAll();
-	}
+	const bool useMask = !mask.IsEmpty();
 
 	// try to pack all threads on one core
 	core = choose_small_task_core();
-	if (core != NULL && !core->CPUMask().Matches(mask))
+	if (core != NULL && (useMask && !core->CPUMask().Matches(mask)))
 		core = NULL;
 
 	if (core == NULL || core->GetLoad() + threadData->GetLoad() >= kHighLoad) {
@@ -106,12 +103,12 @@ choose_core(const ThreadData* threadData)
 		int32 index = 0;
 		do {
 			core = gCoreLoadHeap.PeekMinimum(index++);
-		} while (core != NULL && !core->CPUMask().Matches(mask));
+		} while (useMask && core != NULL && !core->CPUMask().Matches(mask));
 		if (core == NULL) {
 			coreLocker.Unlock();
 
 			core = choose_idle_core();
-			if (!core->CPUMask().Matches(mask))
+			if (useMask && !core->CPUMask().Matches(mask))
 				core = NULL;
 
 			if (core == NULL) {
@@ -119,7 +116,7 @@ choose_core(const ThreadData* threadData)
 				index = 0;
 				do {
 					core = gCoreHighLoadHeap.PeekMinimum(index++);
-				} while (core != NULL && !core->CPUMask().Matches(mask));
+				} while (useMask && core != NULL && !core->CPUMask().Matches(mask));
 			}
 		}
 	}
@@ -137,10 +134,8 @@ rebalance(const ThreadData* threadData)
 	ASSERT(!gSingleCore);
 
 	CPUSet mask = threadData->GetCPUMask();
-	if (mask.IsEmpty()) {
-		// ignore when empty
-		mask.SetAll();
-	}
+	const bool useMask = !mask.IsEmpty();
+
 	CoreEntry* core = threadData->Core();
 
 	int32 coreLoad = core->GetLoad();
@@ -151,7 +146,7 @@ rebalance(const ThreadData* threadData)
 			CoreEntry* smallTaskCore = choose_small_task_core();
 
 			if (threadLoad > coreLoad / 3 || smallTaskCore == NULL
-				|| !smallTaskCore->CPUMask().Matches(mask)) {
+					|| (useMask && !smallTaskCore->CPUMask().Matches(mask))) {
 				return core;
 			}
 			return coreLoad > kVeryHighLoad ? smallTaskCore : core;
@@ -165,12 +160,12 @@ rebalance(const ThreadData* threadData)
 		int32 index = 0;
 		do {
 			other = gCoreLoadHeap.PeekMaximum(index++);
-		} while (other != NULL && !core->CPUMask().Matches(mask));
+		} while (useMask && other != NULL && !other->CPUMask().Matches(mask));
 		if (other == NULL) {
 			index = 0;
 			do {
 				other = gCoreHighLoadHeap.PeekMinimum(index++);
-			} while (other != NULL && !core->CPUMask().Matches(mask));
+			} while (useMask && other != NULL && !other->CPUMask().Matches(mask));
 		}
 		coreLocker.Unlock();
 		ASSERT(other != NULL);
@@ -184,7 +179,7 @@ rebalance(const ThreadData* threadData)
 		return core;
 
 	CoreEntry* smallTaskCore = choose_small_task_core();
-	if (smallTaskCore == NULL || !smallTaskCore->CPUMask().Matches(mask))
+	if (smallTaskCore == NULL || (useMask && !smallTaskCore->CPUMask().Matches(mask)))
 		return core;
 	return smallTaskCore->GetLoad() + threadLoad < kHighLoad
 		? smallTaskCore : core;

@@ -57,15 +57,13 @@ choose_core(const ThreadData* threadData)
 
 	int32 index = 0;
 	CPUSet mask = threadData->GetCPUMask();
-	if (mask.IsEmpty()) {
-		// ignore when empty
-		mask.SetAll();
-	}
+	const bool useMask = !mask.IsEmpty();
+
 	CoreEntry* core = NULL;
 	if (package != NULL) {
 		do {
 			core = package->GetIdleCore(index++);
-		} while (core != NULL && !core->CPUMask().Matches(mask));
+		} while (useMask && core != NULL && !core->CPUMask().Matches(mask));
 	}
 	if (core == NULL) {
 		ReadSpinLocker coreLocker(gCoreHeapsLock);
@@ -73,12 +71,12 @@ choose_core(const ThreadData* threadData)
 		// no idle cores, use least occupied core
 		do {
 			core = gCoreLoadHeap.PeekMinimum(index++);
-		} while (core != NULL && !core->CPUMask().Matches(mask));
+		} while (useMask && core != NULL && !core->CPUMask().Matches(mask));
 		if (core == NULL) {
 			index = 0;
 			do {
 				core = gCoreHighLoadHeap.PeekMinimum(index++);
-			} while (core != NULL && !core->CPUMask().Matches(mask));
+			} while (useMask && core != NULL && !core->CPUMask().Matches(mask));
 		}
 	}
 
@@ -98,23 +96,21 @@ rebalance(const ThreadData* threadData)
 	// Get the least loaded core.
 	ReadSpinLocker coreLocker(gCoreHeapsLock);
 	CPUSet mask = threadData->GetCPUMask();
-	if (mask.IsEmpty()) {
-		// ignore when empty
-		mask.SetAll();
-	}
+	const bool useMask = !mask.IsEmpty();
+
 	int32 index = 0;
 	CoreEntry* other;
 	do {
 		other = gCoreLoadHeap.PeekMinimum(index++);
-		if (other != NULL && other->CPUMask().IsEmpty())
+		if (other != NULL && (useMask && other->CPUMask().IsEmpty()))
 			panic("other->CPUMask().IsEmpty()\n");
-	} while (other != NULL && !other->CPUMask().Matches(mask));
+	} while (useMask && other != NULL && !other->CPUMask().Matches(mask));
 
 	if (other == NULL) {
 		index = 0;
 		do {
 			other = gCoreHighLoadHeap.PeekMinimum(index++);
-		} while (other != NULL && !other->CPUMask().Matches(mask));
+		} while (useMask && other != NULL && !other->CPUMask().Matches(mask));
 	}
 	coreLocker.Unlock();
 	ASSERT(other != NULL);

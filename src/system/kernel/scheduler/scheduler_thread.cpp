@@ -60,12 +60,11 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 	int32 threadPriority = GetEffectivePriority();
 
 	CPUSet mask = GetCPUMask();
-	if (mask.IsEmpty())
-		mask.SetAll();
-	ASSERT(mask.Matches(core->CPUMask()));
+	const bool useMask = !mask.IsEmpty();
+	ASSERT(!useMask || mask.Matches(core->CPUMask()));
 
 	if (fThread->previous_cpu != NULL && !fThread->previous_cpu->disabled
-		&& mask.GetBit(fThread->previous_cpu->cpu_num)) {
+			&& (!useMask || mask.GetBit(fThread->previous_cpu->cpu_num))) {
 		CPUEntry* previousCPU
 			= CPUEntry::GetCPU(fThread->previous_cpu->cpu_num);
 		if (previousCPU->Core() == core) {
@@ -83,7 +82,7 @@ ThreadData::_ChooseCPU(CoreEntry* core, bool& rescheduleNeeded) const
 	CPUEntry* cpu;
 	do {
 		cpu = core->CPUHeap()->PeekRoot(index++);
-	} while (cpu != NULL && !mask.GetBit(cpu->ID()));
+	} while (useMask && cpu != NULL && !mask.GetBit(cpu->ID()));
 	ASSERT(cpu != NULL);
 
 	if (CPUPriorityHeap::GetKey(cpu) < threadPriority) {
@@ -166,9 +165,12 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 
 	bool rescheduleNeeded = false;
 
-	if (targetCore != NULL && !targetCore->CPUMask().Matches(GetCPUMask()))
+	CPUSet mask = GetCPUMask();
+	const bool useMask = !mask.IsEmpty();
+
+	if (targetCore != NULL && (useMask && !targetCore->CPUMask().Matches(mask)))
 		targetCore = NULL;
-	if (targetCPU != NULL && !GetCPUMask().GetBit(targetCPU->ID()))
+	if (targetCPU != NULL && (useMask && !mask.GetBit(targetCPU->ID())))
 		targetCPU = NULL;
 
 	if (targetCore == NULL && targetCPU != NULL)
@@ -177,10 +179,7 @@ ThreadData::ChooseCoreAndCPU(CoreEntry*& targetCore, CPUEntry*& targetCPU)
 		targetCPU = _ChooseCPU(targetCore, rescheduleNeeded);
 	else if (targetCore == NULL && targetCPU == NULL) {
 		targetCore = _ChooseCore();
-		CPUSet mask = GetCPUMask();
-		if (mask.IsEmpty())
-			mask.SetAll();
-		ASSERT(mask.Matches(targetCore->CPUMask()));
+		ASSERT(!useMask || mask.Matches(targetCore->CPUMask()));
 		targetCPU = _ChooseCPU(targetCore, rescheduleNeeded);
 	}
 

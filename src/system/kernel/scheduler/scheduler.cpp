@@ -329,6 +329,9 @@ reschedule(int32 nextState)
 	Thread* oldThread = thread_get_current_thread();
 	ThreadData* oldThreadData = oldThread->scheduler_data;
 
+	CPUSet oldThreadMask;
+	bool useOldThreadMask, fetchedOldThreadMask = false;
+
 	oldThreadData->StopCPUTime();
 
 	SchedulerModeLocker modeLocker;
@@ -348,7 +351,11 @@ reschedule(int32 nextState)
 		case B_THREAD_READY:
 			enqueueOldThread = true;
 
-			if (!oldThreadData->IsIdle() && oldThreadData->GetCPUMask().GetBit(thisCPU)) {
+			oldThreadMask = oldThreadData->GetCPUMask();
+			useOldThreadMask = !oldThreadMask.IsEmpty();
+			fetchedOldThreadMask = true;
+
+			if (!oldThreadData->IsIdle() && (!useOldThreadMask || oldThreadMask.GetBit(thisCPU))) {
 				oldThreadData->Continues();
 				if (oldThreadData->HasQuantumEnded(oldThread->cpu->preempted,
 						oldThread->has_yielded)) {
@@ -394,15 +401,19 @@ reschedule(int32 nextState)
 		} else
 			nextThreadData = oldThreadData;
 	} else {
-		CPUSet mask = oldThreadData->GetCPUMask();
-		if (mask.IsEmpty())
-			mask.SetAll();
-		bool oldThreadShouldMigrate = !mask.GetBit(thisCPU);
+		if (!fetchedOldThreadMask) {
+			oldThreadMask = oldThreadData->GetCPUMask();
+			useOldThreadMask = !oldThreadMask.IsEmpty();
+			fetchedOldThreadMask = true;
+		}
+		bool oldThreadShouldMigrate = useOldThreadMask && !oldThreadMask.GetBit(thisCPU);
 		if (oldThreadShouldMigrate)
 			enqueueOldThread = false;
+
 		nextThreadData
 			= cpu->ChooseNextThread(enqueueOldThread ? oldThreadData : NULL,
 				putOldThreadAtBack);
+
 		if (oldThreadShouldMigrate) {
 			enqueue(oldThread, true);
 			// replace with the idle thread, if no other thread could be found

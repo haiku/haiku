@@ -204,7 +204,6 @@ Thread::Thread(const char* name, thread_id threadID, struct cpu_ent* cpu)
 {
 	id = threadID >= 0 ? threadID : allocate_thread_id();
 	visible = false;
-	cpumask.SetAll();
 
 	// init locks
 	char lockName[32];
@@ -2755,7 +2754,6 @@ thread_init(kernel_args *args)
 		thread->team = team_get_kernel_team();
 		thread->priority = B_IDLE_PRIORITY;
 		thread->state = B_THREAD_RUNNING;
-		thread->cpumask.SetAll();
 
 		sprintf(name, "idle thread %" B_PRIu32 " kstack", i + 1);
 		thread->kernel_stack_area = find_area(name);
