@@ -205,18 +205,23 @@ inline void
 vm_page::Init(page_num_t pageNumber)
 {
 	physical_page_number = pageNumber;
-	InitState(PAGE_STATE_FREE);
 	new(&mappings) vm_page_mappings();
-	fWiredCount = 0;
-	usage_count = 0;
-	busy_writing = false;
 	SetCacheRef(NULL);
-	#if DEBUG_PAGE_QUEUE
-		queue = NULL;
-	#endif
-	#if DEBUG_PAGE_ACCESS
-		accessing_thread = -1;
-	#endif
+
+	InitState(PAGE_STATE_FREE);
+	busy = busy_writing = false;
+	accessed = modified = false;
+	_unused = 0;
+	usage_count = 0;
+
+	fWiredCount = 0;
+
+#if DEBUG_PAGE_QUEUE
+	queue = NULL;
+#endif
+#if DEBUG_PAGE_ACCESS
+	accessing_thread = -1;
+#endif
 }
 
 
