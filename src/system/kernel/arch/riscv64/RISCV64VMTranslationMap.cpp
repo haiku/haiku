@@ -35,82 +35,6 @@ extern uint32 gPlatform;
 
 
 static void
-WriteVmPage(vm_page* page)
-{
-	dprintf("0x%08" B_PRIxADDR " ",
-		(addr_t)(page->physical_page_number * B_PAGE_SIZE));
-	switch (page->State()) {
-		case PAGE_STATE_ACTIVE:
-			dprintf("A");
-			break;
-		case PAGE_STATE_INACTIVE:
-			dprintf("I");
-			break;
-		case PAGE_STATE_MODIFIED:
-			dprintf("M");
-			break;
-		case PAGE_STATE_CACHED:
-			dprintf("C");
-			break;
-		case PAGE_STATE_FREE:
-			dprintf("F");
-			break;
-		case PAGE_STATE_CLEAR:
-			dprintf("L");
-			break;
-		case PAGE_STATE_WIRED:
-			dprintf("W");
-			break;
-		case PAGE_STATE_UNUSED:
-			dprintf("-");
-			break;
-	}
-	dprintf(" ");
-	if (page->busy)
-		dprintf("B");
-	else
-		dprintf("-");
-
-	if (page->busy_writing)
-		dprintf("W");
-	else
-		dprintf("-");
-
-	if (page->accessed)
-		dprintf("A");
-	else
-		dprintf("-");
-
-	if (page->modified)
-		dprintf("M");
-	else
-		dprintf("-");
-
-	if (page->unused)
-		dprintf("U");
-	else
-		dprintf("-");
-
-	dprintf(" usage:%3u", page->usage_count);
-	dprintf(" wired:%5u", page->WiredCount());
-
-	bool first = true;
-	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
-	vm_page_mapping* mapping;
-	while ((mapping = iterator.Next()) != NULL) {
-		if (first) {
-			dprintf(": ");
-			first = false;
-		} else
-			dprintf(", ");
-
-		dprintf("%" B_PRId32 " (%s)", mapping->area->id, mapping->area->name);
-		mapping = mapping->page_link.next;
-	}
-}
-
-
-static void
 FreePageTable(page_num_t ppn, bool isKernel, uint32 level = 2)
 {
 	if (level > 0) {
@@ -472,9 +396,6 @@ RISCV64VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 			// get the page
 			vm_page* page = vm_lookup_page(oldPte.ppn);
 			ASSERT(page != NULL);
-			if (false) {
-				WriteVmPage(page); dprintf("\n");
-			}
 
 			DEBUG_PAGE_ACCESS_START(page);
 
