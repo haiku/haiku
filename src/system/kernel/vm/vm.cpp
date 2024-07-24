@@ -2282,10 +2282,14 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	cache->Unlock();
 
 	if (status == B_OK) {
-		// TODO: this probably deserves a smarter solution, ie. don't always
-		// prefetch stuff, and also, probably don't trigger it at this place.
-		cache_prefetch_vnode(vnode, offset, min_c(size, 10LL * 1024 * 1024));
-			// prefetches at max 10 MB starting from "offset"
+		// TODO: this probably deserves a smarter solution, e.g. probably
+		// trigger prefetch somewhere else.
+
+		// Prefetch at most 10MB starting from "offset", but only if the cache
+		// doesn't already contain more pages than the prefetch size.
+		const size_t prefetch = min_c(size, 10LL * 1024 * 1024);
+		if (cache->page_count < (prefetch / B_PAGE_SIZE))
+			cache_prefetch_vnode(vnode, offset, prefetch);
 	}
 
 	if (status != B_OK)
