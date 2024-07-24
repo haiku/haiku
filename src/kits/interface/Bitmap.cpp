@@ -1210,7 +1210,7 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 
 	if (fInitError == B_OK) {
 		// clear to white if the flags say so.
-		if (flags & (B_BITMAP_CLEAR_TO_WHITE | B_BITMAP_ACCEPTS_VIEWS)) {
+		if (flags & B_BITMAP_CLEAR_TO_WHITE) {
 			if (fColorSpace == B_CMAP8) {
 				// "255" is the "transparent magic" index for B_CMAP8 bitmaps
 				// use the correct index for "white"
