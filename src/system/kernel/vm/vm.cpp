@@ -2123,7 +2123,7 @@ pre_map_area_pages(VMArea* area, VMCache* cache,
 			break;
 
 		// skip busy and inactive pages
-		if (page->busy || page->usage_count == 0)
+		if (page->busy || (page->usage_count == 0 && !page->accessed))
 			continue;
 
 		DEBUG_PAGE_ACCESS_START(page);
