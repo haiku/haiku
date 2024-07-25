@@ -246,9 +246,6 @@ HOST_KERNEL_ARCH = host ;
 
 # set packaging architecture
 HOST_PACKAGING_ARCH		?= $(HOST_CPU) ;
-if $(HOST_PACKAGING_ARCH) = x86 && $(HOST_CC_IS_LEGACY_GCC) = 1 {
-	HOST_PACKAGING_ARCH = x86_gcc2 ;
-}
 HOST_PACKAGING_ARCHS = $(HOST_PACKAGING_ARCH) ;
 
 # directories
@@ -278,9 +275,7 @@ HOST_C++FLAGS += -Wno-multichar ;
 HOST_PIC_CCFLAGS += -fPIC ;
 HOST_PIC_C++FLAGS += -fPIC ;
 
-if $(HOST_CC_IS_LEGACY_GCC) != 1 {
-	HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-delete-null-pointer-checks ;
-}
+HOST_GCC_BASE_FLAGS += -fno-strict-aliasing -fno-delete-null-pointer-checks ;
 
 HOST_KERNEL_CCFLAGS += $(HOST_GCC_BASE_FLAGS) -finline -fno-builtin
 	-D_KERNEL_MODE ;
@@ -308,9 +303,7 @@ if $(HOST_ARCH) = m68k {
 if $(HOST_PLATFORM) != darwin {
 	# fix for new changes to DSO linking policies
 	HOST_LINKFLAGS += -Xlinker --no-as-needed ;
-	if $(HOST_CC_IS_LEGACY_GCC) != 1 {
-		HOST_LINKFLAGS += -Wl,--copy-dt-needed-entries ;
-	}
+	HOST_LINKFLAGS += -Wl,--copy-dt-needed-entries ;
 }
 
 
@@ -390,13 +383,8 @@ if $(HOST_PLATFORM) != darwin {
 
 if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	# the C++ standard and support libraries
-	if $(HOST_CC_IS_LEGACY_GCC) = 1 {
-		HOST_LIBSTDC++ = stdc++.r4 ;
-		HOST_LIBSUPC++ = ;
-	} else {
-		HOST_LIBSTDC++ = stdc++ ;
-		HOST_LIBSUPC++ = supc++ ;
-	}
+	HOST_LIBSTDC++ = stdc++ ;
+	HOST_LIBSUPC++ = supc++ ;
 
 	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
 		= "LIBRARY_PATH=\"$LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)\"" ;
@@ -423,11 +411,7 @@ if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_PTHREAD_LINKFLAGS = -pthread ;
 
 	# the C++ support library
-	if $(HOST_CC_IS_LEGACY_GCC) = 1 {
-		HOST_LIBSUPC++ = ;
-	} else {
-		HOST_LIBSUPC++ = supc++ ;
-	}
+	HOST_LIBSUPC++ = supc++ ;
 
 	if $(HOST_PLATFORM) = darwin {
 		# part of the C++ runtime lives in libstdc++ on Darwin

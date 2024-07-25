@@ -19,10 +19,7 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
 
 	defines = [ FDefines $(defines) ] ;
 
-	local c++flags = ;
-	if $(HOST_CC_IS_LEGACY_GCC) != 1 {
-		c++flags += -std=c++11 ;
-	}
+	local c++flags = -std=c++11 ;
 
 	SubDirCcFlags $(defines) -Wno-multichar ;
 	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;

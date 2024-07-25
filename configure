@@ -358,7 +358,6 @@ standard_gcc_settings()
 	set_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch \
 		`is_legacy_gcc $gccRawVersion`
 	set_variable HAIKU_CC_IS_CLANG_$targetArch $useClang
-	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
 	set_variable HAIKU_GCC_LIB_DIR_$targetArch $gccdir
 	set_variable HAIKU_BOOT_CXX_HEADERS_DIR_$targetArch "$bootCxxHeaders"
@@ -603,6 +602,11 @@ gdbSources=
 if [ -z "$CC" ]; then
 	CC=gcc
 fi
+if [ $(is_legacy_gcc $($CC -dumpversion)) -ne 0 ]; then
+	echo The host tools cannot be built with a legacy version of GCC.
+	echo Please specify a more modern compiler in the "CC" environ.
+	exit 1
+fi
 
 # detect the build platform
 case "${platform}" in
@@ -637,8 +641,6 @@ fi
 # exported (BuildSetup) default parameter values
 #
 GIT_DIR=`git -C "$configureDir" rev-parse --git-dir | sed 's/^gitdir: //'`
-HOST_GCC_RAW_VERSION=`$CC -dumpversion`
-HOST_CC_IS_LEGACY_GCC=`is_legacy_gcc $HOST_GCC_RAW_VERSION`
 HOST_GCC_MACHINE=`$CC -dumpmachine`
 HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
@@ -1124,7 +1126,6 @@ HAIKU_HOST_BUILD_ONLY		?= "${HAIKU_HOST_BUILD_ONLY}" ;
 JAMSHELL					?= ${JAMSHELL} -e -c ;
 
 HOST_CC						?= ${CC} ;
-HOST_CC_IS_LEGACY_GCC		?= ${HOST_CC_IS_LEGACY_GCC} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
