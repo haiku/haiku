@@ -113,9 +113,6 @@ CapabilitiesView::~CapabilitiesView()
 		fCapabilitiesList->RemoveRow(row);
 		delete row;
 	}
-	delete fCapabilityColumn;
-	delete fValueColumn;
-	delete fCapabilitiesList;
 }
 
 

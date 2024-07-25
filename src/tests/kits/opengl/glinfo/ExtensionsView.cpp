@@ -61,8 +61,6 @@ ExtensionsView::~ExtensionsView()
 		fExtensionsList->RemoveRow(row);
 		delete row;
 	}
-	delete fAvailableColumn;
-	delete fExtensionsList;
 }
 
 
