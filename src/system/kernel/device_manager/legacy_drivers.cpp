@@ -1251,13 +1251,14 @@ LegacyDevice::LegacyDevice(legacy_driver* driver, const char* path,
 	fRemovedFromParent(false)
 {
 	fDeviceModule = (device_module_info*)malloc(sizeof(device_module_info));
-	if (fDeviceModule != NULL)
+	if (fDeviceModule != NULL) {
 		memset(fDeviceModule, 0, sizeof(device_module_info));
+		SetHooks(hooks);
+	}
 
 	fDeviceData = this;
 	fPath = strdup(path);
 
-	SetHooks(hooks);
 }
 
 
