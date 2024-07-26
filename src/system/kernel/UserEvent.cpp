@@ -117,7 +117,7 @@ TeamSignalEvent::Create(Team* team, uint32 signalNumber, int32 signalCode,
 		return NULL;
 
 	// create the event
-	TeamSignalEvent* event = new TeamSignalEvent(team, signal);
+	TeamSignalEvent* event = new(std::nothrow) TeamSignalEvent(team, signal);
 	if (event == NULL) {
 		delete signal;
 		return NULL;
@@ -187,7 +187,7 @@ ThreadSignalEvent::Create(Thread* thread, uint32 signalNumber, int32 signalCode,
 		return NULL;
 
 	// create the event
-	ThreadSignalEvent* event = new ThreadSignalEvent(thread, signal);
+	ThreadSignalEvent* event = new(std::nothrow) ThreadSignalEvent(thread, signal);
 	if (event == NULL) {
 		delete signal;
 		return NULL;
