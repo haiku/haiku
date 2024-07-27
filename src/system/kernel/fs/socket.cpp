@@ -40,6 +40,8 @@
 			return getError;							\
 	} while (false)
 
+#define FD_SOCKET(descriptor) ((net_socket*)descriptor->cookie)
+
 
 static net_stack_interface_module_info* sStackInterface = NULL;
 static int32 sStackInterfaceConsumers = 0;
@@ -200,7 +202,7 @@ static status_t
 socket_read(struct file_descriptor *descriptor, off_t pos, void *buffer,
 	size_t *_length)
 {
-	ssize_t bytesRead = sStackInterface->recv((net_socket*)descriptor->cookie, buffer,
+	ssize_t bytesRead = sStackInterface->recv(FD_SOCKET(descriptor), buffer,
 		*_length, 0);
 	*_length = bytesRead >= 0 ? bytesRead : 0;
 	return bytesRead >= 0 ? B_OK : bytesRead;
@@ -211,7 +213,7 @@ static status_t
 socket_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
 	size_t *_length)
 {
-	ssize_t bytesWritten = sStackInterface->send((net_socket*)descriptor->cookie, buffer,
+	ssize_t bytesWritten = sStackInterface->send(FD_SOCKET(descriptor), buffer,
 		*_length, 0);
 	*_length = bytesWritten >= 0 ? bytesWritten : 0;
 	return bytesWritten >= 0 ? B_OK : bytesWritten;
@@ -225,7 +227,7 @@ socket_readv(struct file_descriptor *descriptor, off_t pos,
 	struct msghdr message = {};
 	message.msg_iov = (struct iovec*)vecs;
 	message.msg_iovlen = count;
-	return sStackInterface->recvmsg((net_socket*)descriptor->cookie, &message, 0);
+	return sStackInterface->recvmsg(FD_SOCKET(descriptor), &message, 0);
 }
 
 
@@ -236,7 +238,7 @@ socket_writev(struct file_descriptor *descriptor, off_t pos,
 	struct msghdr message = {};
 	message.msg_iov = (struct iovec*)vecs;
 	message.msg_iovlen = count;
-	return sStackInterface->sendmsg((net_socket*)descriptor->cookie, &message, 0);
+	return sStackInterface->sendmsg(FD_SOCKET(descriptor), &message, 0);
 }
 
 
@@ -244,7 +246,7 @@ static status_t
 socket_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 	size_t length)
 {
-	return sStackInterface->ioctl((net_socket*)descriptor->cookie, op, buffer, length);
+	return sStackInterface->ioctl(FD_SOCKET(descriptor), op, buffer, length);
 }
 
 
@@ -255,7 +257,7 @@ socket_set_flags(struct file_descriptor *descriptor, int flags)
 	uint32 op = (flags & O_NONBLOCK) != 0
 		? B_SET_NONBLOCKING_IO : B_SET_BLOCKING_IO;
 
-	return sStackInterface->ioctl((net_socket*)descriptor->cookie, op, NULL, 0);
+	return sStackInterface->ioctl(FD_SOCKET(descriptor), op, NULL, 0);
 }
 
 
@@ -263,7 +265,7 @@ static status_t
 socket_select(struct file_descriptor *descriptor, uint8 event,
 	struct selectsync *sync)
 {
-	return sStackInterface->select((net_socket*)descriptor->cookie, event, sync);
+	return sStackInterface->select(FD_SOCKET(descriptor), event, sync);
 }
 
 
@@ -271,7 +273,7 @@ static status_t
 socket_deselect(struct file_descriptor *descriptor, uint8 event,
 	struct selectsync *sync)
 {
-	return sStackInterface->deselect((net_socket*)descriptor->cookie, event, sync);
+	return sStackInterface->deselect(FD_SOCKET(descriptor), event, sync);
 }
 
 
@@ -305,14 +307,14 @@ socket_read_stat(struct file_descriptor *descriptor, struct stat *st)
 static status_t
 socket_close(struct file_descriptor *descriptor)
 {
-	return sStackInterface->close((net_socket*)descriptor->cookie);
+	return sStackInterface->close(FD_SOCKET(descriptor));
 }
 
 
 static void
 socket_free(struct file_descriptor *descriptor)
 {
-	sStackInterface->free((net_socket*)descriptor->cookie);
+	sStackInterface->free(FD_SOCKET(descriptor));
 	put_stack_interface_module();
 }
 
@@ -425,7 +427,7 @@ common_bind(int fd, const struct sockaddr *address, socklen_t addressLength,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->bind((net_socket*)descriptor->cookie, address, addressLength);
+	return sStackInterface->bind(FD_SOCKET(descriptor), address, addressLength);
 }
 
 
@@ -436,7 +438,7 @@ common_shutdown(int fd, int how, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->shutdown((net_socket*)descriptor->cookie, how);
+	return sStackInterface->shutdown(FD_SOCKET(descriptor), how);
 }
 
 
@@ -448,7 +450,7 @@ common_connect(int fd, const struct sockaddr *address,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->connect((net_socket*)descriptor->cookie, address,
+	return sStackInterface->connect(FD_SOCKET(descriptor), address,
 		addressLength);
 }
 
@@ -460,7 +462,7 @@ common_listen(int fd, int backlog, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->listen((net_socket*)descriptor->cookie, backlog);
+	return sStackInterface->listen(FD_SOCKET(descriptor), backlog);
 }
 
 
@@ -473,7 +475,7 @@ common_accept(int fd, struct sockaddr *address, socklen_t *_addressLength,
 	FileDescriptorPutter _(descriptor);
 
 	net_socket* acceptedSocket;
-	status_t error = sStackInterface->accept((net_socket*)descriptor->cookie, address,
+	status_t error = sStackInterface->accept(FD_SOCKET(descriptor), address,
 		_addressLength, &acceptedSocket);
 	if (error != B_OK)
 		return error;
@@ -499,7 +501,7 @@ common_recv(int fd, void *data, size_t length, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->recv((net_socket*)descriptor->cookie, data, length, flags);
+	return sStackInterface->recv(FD_SOCKET(descriptor), data, length, flags);
 }
 
 
@@ -511,7 +513,7 @@ common_recvfrom(int fd, void *data, size_t length, int flags,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->recvfrom((net_socket*)descriptor->cookie, data, length,
+	return sStackInterface->recvfrom(FD_SOCKET(descriptor), data, length,
 		flags, address, _addressLength);
 }
 
@@ -523,7 +525,7 @@ common_recvmsg(int fd, struct msghdr *message, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->recvmsg((net_socket*)descriptor->cookie, message, flags);
+	return sStackInterface->recvmsg(FD_SOCKET(descriptor), message, flags);
 }
 
 
@@ -534,7 +536,7 @@ common_send(int fd, const void *data, size_t length, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->send((net_socket*)descriptor->cookie, data, length, flags);
+	return sStackInterface->send(FD_SOCKET(descriptor), data, length, flags);
 }
 
 
@@ -546,7 +548,7 @@ common_sendto(int fd, const void *data, size_t length, int flags,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->sendto((net_socket*)descriptor->cookie, data, length, flags,
+	return sStackInterface->sendto(FD_SOCKET(descriptor), data, length, flags,
 		address, addressLength);
 }
 
@@ -558,7 +560,7 @@ common_sendmsg(int fd, const struct msghdr *message, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->sendmsg((net_socket*)descriptor->cookie, message, flags);
+	return sStackInterface->sendmsg(FD_SOCKET(descriptor), message, flags);
 }
 
 
@@ -570,7 +572,7 @@ common_getsockopt(int fd, int level, int option, void *value,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->getsockopt((net_socket*)descriptor->cookie, level, option,
+	return sStackInterface->getsockopt(FD_SOCKET(descriptor), level, option,
 		value, _length);
 }
 
@@ -583,7 +585,7 @@ common_setsockopt(int fd, int level, int option, const void *value,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->setsockopt((net_socket*)descriptor->cookie, level, option,
+	return sStackInterface->setsockopt(FD_SOCKET(descriptor), level, option,
 		value, length);
 }
 
@@ -596,7 +598,7 @@ common_getpeername(int fd, struct sockaddr *address,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->getpeername((net_socket*)descriptor->cookie, address,
+	return sStackInterface->getpeername(FD_SOCKET(descriptor), address,
 		_addressLength);
 }
 
@@ -609,7 +611,7 @@ common_getsockname(int fd, struct sockaddr *address,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->getsockname((net_socket*)descriptor->cookie, address,
+	return sStackInterface->getsockname(FD_SOCKET(descriptor), address,
 		_addressLength);
 }
 
@@ -621,7 +623,7 @@ common_sockatmark(int fd, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FileDescriptorPutter _(descriptor);
 
-	return sStackInterface->sockatmark((net_socket*)descriptor->cookie);
+	return sStackInterface->sockatmark(FD_SOCKET(descriptor));
 }
 
 
