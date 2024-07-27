@@ -204,7 +204,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 
 
 static void
-print_stack_frame(Thread* thread, addr_t pc, addr_t fp, addr_t nextFp,
+print_stack_frame(Thread* thread, addr_t pc, addr_t calleeFp, addr_t fp,
 	int32 callIndex, bool demangle)
 {
 	const char* symbol;
@@ -214,10 +214,10 @@ print_stack_frame(Thread* thread, addr_t pc, addr_t fp, addr_t nextFp,
 	status_t status;
 	addr_t diff;
 
-	diff = nextFp - fp;
+	diff = fp - calleeFp;
 
-	// MSB set = kernel space/user space switch
-	if (diff & ~((addr_t)-1 >> 1))
+	// kernel space/user space switch
+	if (calleeFp > fp)
 		diff = 0;
 
 	status = lookup_symbol(thread, pc, &baseAddress, &symbol, &image,
@@ -229,7 +229,7 @@ print_stack_frame(Thread* thread, addr_t pc, addr_t fp, addr_t nextFp,
 	if (status == B_OK) {
 		if (exactMatch && demangle) {
 			status = print_demangled_call(image, symbol,
-				nextFp, false, false);
+				fp, false, false);
 		}
 
 		if (!exactMatch || !demangle || status != B_OK) {
