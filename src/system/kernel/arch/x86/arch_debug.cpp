@@ -370,7 +370,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 
 
 static void
-print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
+print_stack_frame(Thread* thread, addr_t ip, addr_t calleeBp, addr_t bp,
 	int32 callIndex, bool demangle)
 {
 	const char* symbol;
@@ -380,10 +380,10 @@ print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
 	status_t status;
 	addr_t diff;
 
-	diff = nextBp - bp;
+	diff = bp - calleeBp;
 
-	// MSB set = kernel space/user space switch
-	if (diff & ~((addr_t)-1 >> 1))
+	// kernel space/user space switch
+	if (calleeBp > bp)
 		diff = 0;
 
 	status = lookup_symbol(thread, ip, &baseAddress, &symbol, &image,
@@ -395,7 +395,7 @@ print_stack_frame(Thread* thread, addr_t ip, addr_t bp, addr_t nextBp,
 	if (status == B_OK) {
 		if (exactMatch && demangle) {
 			status = print_demangled_call(image, symbol,
-				nextBp + sizeof(stack_frame), false, false);
+				bp + sizeof(stack_frame), false, false);
 		}
 
 		if (!exactMatch || !demangle || status != B_OK) {
@@ -711,7 +711,7 @@ stack_trace(int argc, char** argv)
 
 	bool onKernelStack = true;
 
-	for (int32 callIndex = 0;; callIndex++) {
+	for (int32 callIndex = 0; ; callIndex++) {
 		onKernelStack = onKernelStack
 			&& is_kernel_stack_address(thread, bp);
 
