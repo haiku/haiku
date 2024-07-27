@@ -6,17 +6,12 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
-		UseBuildFeatureHeaders libsolv ;
-
-		local libsolvHeaders
-			= [ BuildFeatureAttribute libsolv : headers : path ] ;
-		UseHeaders [ FDirName $(libsolvHeaders) solv ] ;
+		UseHeaders [ FDirName $(HAIKU_TOP) src libs libsolv ] : true ;
+		UsePrivateHeaders shared ;
 
 		AddResources $(libsolv) :
 			LibsolvSolver.rdef
 			;
-
-		UsePrivateHeaders shared ;
 
 		SharedLibrary
 			[ MultiArchDefaultGristFiles libpackage-add-on-libsolv.so ]
@@ -24,7 +19,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			LibsolvSolver.cpp
 			:
 			package
-			[ BuildFeatureAttribute libsolv : libraries ]
+			[ MultiArchDefaultGristFiles libsolv.a libsolvext.a ]
 			be [ TargetLibstdc++ ]
 		;
 
@@ -32,8 +27,5 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# External headers use the C++20 reserved keyword `requires`
 			ObjectC++Flags LibsolvSolver.cpp : -Wno-error=c++20-compat ;
 		}
-
-		Includes [ FGristFiles LibsolvSolver.cpp ]
-			: [ BuildFeatureAttribute libsolv : headers ] ;
 	}
 }

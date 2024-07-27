@@ -1,9 +1,6 @@
 SubDir HAIKU_TOP src build libpackage solver ;
 
-UseBuildFeatureHeaders libsolv ;
-
-local libsolvHeaders = [ BuildFeatureAttribute libsolv : headers : path ] ;
-UseHeaders [ FDirName $(libsolvHeaders) solv ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs libsolv ] : true ;
 
 UsePrivateHeaders shared ;
 
@@ -19,10 +16,7 @@ BuildPlatformSharedLibrary libpackage-add-on-libsolv_build.so
 	:
 	LibsolvSolver.cpp
 	:
-	libsolvext_build.so libsolv_build.so
+	libsolvext_build.a libsolv_build.a
 	libpackage_build.so
 	libbe_build.so $(HOST_LIBSTDC++)
 ;
-
-Includes [ FGristFiles LibsolvSolver.cpp ]
-	: [ BuildFeatureAttribute libsolv : headers ] ;

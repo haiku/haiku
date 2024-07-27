@@ -1,21 +1,15 @@
 SubDir HAIKU_TOP src build libsolv ;
 
 local libsolvSourceBaseDirectory
-	= [ BuildFeatureAttribute libsolv : sources : path ] ;
-local libsolvSourceDirectory = [ FDirName $(libsolvSourceBaseDirectory) src ] ;
+	= [ FDirName $(HAIKU_TOP) src libs libsolv ] ;
+local libsolvSourceDirectory
+	= [ FDirName $(libsolvSourceBaseDirectory) solv ] ;
 local libsolvextSourceDirectory
 	= [ FDirName $(libsolvSourceBaseDirectory) ext ] ;
-
-local libsolvMajor = 0 ;
-local libsolvMinor = 3 ;
-local libsolvPatch = 0 ;
-local libsolvVersion = $(libsolvMajor).$(libsolvMinor).$(libsolvPatch) ;
 
 DEFINES =
 	LIBSOLV_INTERNAL
 	HAIKU
-	ENABLE_HAIKU
-	VERSION=\\\"$(libsolvVersion)\\\"
 	_GNU_SOURCE
 	;
 
@@ -40,6 +34,9 @@ switch $(HOST_PLATFORM) {
 
 SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
 
+SubDirCcFlags $(HOST_PIC_CCFLAGS) ;
+SubDirC++Flags $(HOST_PIC_C++FLAGS) ;
+
 
 # libsolv
 
@@ -54,11 +51,8 @@ local libsolvSources = [ FGristFiles
 	] ;
 
 LOCATE on $(libsolvSources) = $(libsolvSourceDirectory) ;
-Depends $(libsolvSources) : [ BuildFeatureAttribute libsolv : sources ] ;
 
-MakeLocate libsolv_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
-
-BuildPlatformSharedLibrary libsolv_build.so
+BuildPlatformStaticLibrary libsolv_build.a
 	:
 	$(libsolvSources)
 	;
@@ -73,44 +67,10 @@ local libsolvextSources = [ FGristFiles
 	] ;
 
 LOCATE on $(libsolvextSources) = $(libsolvextSourceDirectory) ;
-Depends $(libsolvextSources) : [ BuildFeatureAttribute libsolv : sources ] ;
 
-USES_BE_API on libsolvext_build.so = true ;
+USES_BE_API on libsolvext_build.a = true ;
 
-MakeLocate libsolvext_build.so : $(HOST_BUILD_COMPATIBILITY_LIB_DIR) ;
-
-BuildPlatformSharedLibrary libsolvext_build.so
+BuildPlatformStaticLibrary libsolvext_build.a
 	:
 	$(libsolvextSources)
-	:
-	libsolv_build.so
-	libpackage_build.so
-	z
 	;
-
-
-# generate solvversion.h
-
-actions GenerateLibsolvVersionHeader
-{
-	sed -e s,@VERSION@,$(LIBSOLV_VERSION),g \
-		-e s,@LIBSOLV_MAJOR@,$(LIBSOLV_MAJOR),g \
-		-e s,@LIBSOLV_MINOR@,$(LIBSOLV_MINOR),g \
-		-e s,@LIBSOLV_PATCH@,$(LIBSOLV_PATCH),g \
-		$(2) > $(1)
-}
-
-local versionHeaderIn = solvversion.h.in ;
-LOCATE on $(versionHeaderIn) = $(libsolvSourceDirectory) ;
-Depends $(versionHeaderIn) : [ BuildFeatureAttribute libsolv : sources ] ;
-
-local versionHeader = [ FGristFiles solvversion.h ] ;
-MakeLocate $(versionHeader) : $(LOCATE_SOURCE) ;
-Depends $(versionHeader) : $(versionHeaderIn) ;
-LIBSOLV_VERSION on $(versionHeader) = $(libsolvVersion) ;
-LIBSOLV_MAJOR on $(versionHeader) = $(libsolvMajor) ;
-LIBSOLV_MINOR on $(versionHeader) = $(libsolvMinor) ;
-LIBSOLV_PATCH on $(versionHeader) = $(libsolvPatch) ;
-GenerateLibsolvVersionHeader $(versionHeader) : $(versionHeaderIn) ;
-
-Includes $(libsolvSources) $(libsolvextSources) : $(versionHeader) ;

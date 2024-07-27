@@ -218,7 +218,6 @@ rule DefineDefaultBuildProfiles
 						freetype
 						gcc
 						icu@gcc2 icu74@!gcc2
-						libsolv
 						libedit
 						ncurses6
 						zlib

@@ -101,10 +101,6 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ncurses_ENABLED
 	lib:libncurses >= 6.0
 #endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libsolv_ENABLED
-	lib:libsolv
-	lib:libsolvext
-#endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openssl_ENABLED
 	lib:libssl
 	lib:libcrypto

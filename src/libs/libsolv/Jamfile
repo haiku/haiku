@@ -1,0 +1,40 @@
+SubDir HAIKU_TOP src libs libsolv ;
+
+DEFINES =
+	LIBSOLV_INTERNAL
+	HAIKU
+	_GNU_SOURCE
+
+	HAVE_STRCHRNUL
+	HAVE_FOPENCOOKIE
+	;
+
+SubDirCcFlags -Wno-sign-compare -Wno-missing-prototypes ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) solv ] ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) ext ] ;
+
+		UseBuildFeatureHeaders zlib ;
+		Includes [ FGristFiles solv_xfopen.c ]
+			: [ BuildFeatureAttribute zlib : headers ] ;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libsolv.a ] :
+			bitmap.c chksum.c md5.c sha1.c sha2.c
+			pool.c poolarch.c poolvendor.c poolid.c strpool.c dirpool.c
+			solver.c solverdebug.c solvable.c
+			repo_solv.c repo_write.c repo.c repodata.c repopage.c
+			selection.c transaction.c policy.c rules.c problems.c
+			evr.c util.c queue.c
+			solvversion.c
+			;
+
+		StaticLibrary [ MultiArchDefaultGristFiles libsolvext.a ] :
+			repo_haiku.cpp
+			solv_xfopen.c
+			testcase.c
+			;
+	}
+}

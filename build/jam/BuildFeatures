@@ -510,30 +510,6 @@ if [ IsPackageAvailable libedit_devel ] {
 }
 
 
-# libsolv
-if [ IsPackageAvailable libsolv_devel ] {
-	ExtractBuildFeatureArchives libsolv :
-		file: base libsolv
-			runtime: lib
-		file: devel libsolv_devel
-			depends: base
-			libraries:
-				$(developLibDir)/libsolv.so
-				$(developLibDir)/libsolvext.so
-			headers: $(developHeadersDir)
-		# sources are required for the primary architecture only
-		primary @{
-			file: source libsolv_source
-				sources: develop/sources/%portRevisionedName%/sources
-		}@
-		;
-
-	EnableBuildFeatures libsolv ;
-} else {
-	unavailableBuildFeatures += libsolv ;
-}
-
-
 # qrencode
 if [ IsPackageAvailable qrencode_kdl_devel ] {
 	ExtractBuildFeatureArchives libqrencode_kdl :

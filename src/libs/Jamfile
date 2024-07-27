@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src libs glut ;
 SubInclude HAIKU_TOP src libs gnu ;
 SubInclude HAIKU_TOP src libs icon ;
 SubInclude HAIKU_TOP src libs iconv ;
+SubInclude HAIKU_TOP src libs libsolv ;
 SubInclude HAIKU_TOP src libs libtelnet ;
 SubInclude HAIKU_TOP src libs linprog ;
 SubInclude HAIKU_TOP src libs mapm ;
