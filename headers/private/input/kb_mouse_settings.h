@@ -32,6 +32,12 @@ typedef struct {
 	bigtime_t	click_speed;
 } mouse_settings;
 
+static const bigtime_t kDefaultClickSpeed = 500000;
+static const int32 kDefaultMouseSpeed = 65536;
+static const int32 kDefaultMouseType = 3;	// 3 button mouse
+static const int32 kDefaultAccelerationFactor = 65536;
+static const bool kDefaultAcceptFirstClick = true;
+
 #define mouse_settings_file "Mouse_settings"
 
 #endif	/* _KB_MOUSE_SETTINGS_H */

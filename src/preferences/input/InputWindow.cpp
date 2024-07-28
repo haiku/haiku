@@ -8,25 +8,22 @@
  */
 
 
-#include <Alert.h>
-#include <Alignment.h>
-#include <Application.h>
-#include <Button.h>
 #include <CardLayout.h>
 #include <CardView.h>
 #include <Catalog.h>
 #include <Control.h>
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
-#include <Screen.h>
-#include <SplitView.h>
+#include <ScrollView.h>
 
 #include <private/input/InputServerTypes.h>
 
 #include "InputConstants.h"
 #include "InputDeviceView.h"
+#include "InputKeyboard.h"
 #include "InputMouse.h"
 #include "InputTouchpadPref.h"
+#include "InputTouchpadPrefView.h"
 #include "InputWindow.h"
 #include "MouseSettings.h"
 #include "SettingsView.h"

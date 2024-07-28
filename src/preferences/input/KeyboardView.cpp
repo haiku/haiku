@@ -12,17 +12,14 @@
 #include "KeyboardView.h"
 
 #include <Bitmap.h>
-#include <Button.h>
 #include <Catalog.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Slider.h>
 #include <TextControl.h>
-#include <Window.h>
 
 #include "InputConstants.h"
-#include "KeyboardSettings.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "KeyboardView"

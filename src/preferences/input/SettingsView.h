@@ -11,12 +11,9 @@
 #define SETTINGS_VIEW_H
 
 
-#include <Bitmap.h>
 #include <Box.h>
-#include <Button.h>
 #include <CheckBox.h>
 #include <OptionPopUp.h>
-#include <PopUpMenu.h>
 #include <Slider.h>
 
 

@@ -13,7 +13,7 @@
 #define KEYBOARD_VIEW_H
 
 
-#include <Application.h>
+#include <Bitmap.h>
 #include <GroupView.h>
 #include <InterfaceDefs.h>
 #include <Slider.h>

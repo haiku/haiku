@@ -13,10 +13,9 @@
 #include <GroupLayoutBuilder.h>
 
 #include "InputConstants.h"
-#include "InputMouse.h"
+#include "InputDeviceView.h"
+#include "InputTouchpadPrefView.h"
 #include "InputWindow.h"
-#include "MouseSettings.h"
-#include "MouseView.h"
 
 
 #undef B_TRANSLATION_CONTEXT

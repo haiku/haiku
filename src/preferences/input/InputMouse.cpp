@@ -9,9 +9,6 @@
 
 #include "InputMouse.h"
 
-#include <Application.h>
-#include <Bitmap.h>
-#include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
@@ -19,18 +16,10 @@
 #include <Debug.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
-#include <MenuField.h>
-#include <MenuItem.h>
-#include <PopUpMenu.h>
-#include <Screen.h>
-#include <Slider.h>
-#include <StringView.h>
-#include <TabView.h>
+#include <SeparatorView.h>
 
 #include "InputConstants.h"
-#include "InputWindow.h"
 #include "MouseSettings.h"
-#include "MouseView.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -157,7 +146,7 @@ InputMouse::MessageReceived(BMessage* message)
 			int32 value;
 			if (message->FindInt32("be:value", &value) == B_OK) {
 				// slow = 1000000, fast = 0
-				fSettings->SetClickSpeed(value * 1000);
+				fSettings->SetClickSpeed(1000000LL - value * 1000);
 				fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
 				fRevertButton->SetEnabled(fSettings->IsRevertable());
 			}

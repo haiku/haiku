@@ -11,18 +11,11 @@
 #define INPUT_MOUSE_H
 
 
-#include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
-#include <CheckBox.h>
-#include <ListView.h>
-#include <MenuField.h>
-#include <PopUpMenu.h>
-#include <Slider.h>
-#include <TabView.h>
+#include <Input.h>
 #include <View.h>
 
-#include "InputDeviceView.h"
 #include "MouseSettings.h"
 #include "MouseView.h"
 #include "SettingsView.h"

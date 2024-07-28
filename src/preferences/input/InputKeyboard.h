@@ -11,13 +11,11 @@
 #define INPUT_KEYBOARD_H
 
 #include <Button.h>
-#include <Window.h>
+#include <Input.h>
 
-#include "InputDeviceView.h"
 #include "KeyboardSettings.h"
 #include "KeyboardView.h"
 
-class DeviceListView;
 
 class InputKeyboard : public BView
 {

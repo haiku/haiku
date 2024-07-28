@@ -23,7 +23,7 @@ public :
 
 	void Revert();
 	void Defaults();
-	bool IsDefaultable();
+	bool IsDefaultable() const;
 
 	int32 KeyboardRepeatRate() const
 		{ return fSettings.key_repeat_rate; }

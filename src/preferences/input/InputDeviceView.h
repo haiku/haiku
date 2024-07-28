@@ -11,29 +11,16 @@
 #define _INPUT_DEVICE_VIEW_H
 
 #include <ListItem.h>
-#include <ListView.h>
-#include <Message.h>
-#include <ScrollBar.h>
-#include <ScrollView.h>
 #include <String.h>
-#include <StringItem.h>
 #include <View.h>
-
-#include "InputIcons.h"
-#include "InputTouchpadPref.h"
-#include "MouseSettings.h"
 
 
 #define ITEM_SELECTED 'I1s'
 
 #define kITEM_MARGIN	1
-#define GREATER_THAN	-1
-#define LESS_THAN	1
 
 
 class InputIcons;
-class TouchpadPref;
-class MouseSettings;
 
 enum input_type {
 	MOUSE_TYPE,

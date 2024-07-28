@@ -18,17 +18,6 @@
 #include <stdio.h>
 
 
-// The R5 settings file differs from that of Haiku;
-// the latter maps 16 different mouse buttons
-#define R5_COMPATIBLE 0
-
-static const bigtime_t kDefaultClickSpeed = 500000;
-static const int32 kDefaultMouseSpeed = 65536;
-static const int32 kDefaultMouseType = 3; // 3 button mouse
-static const int32 kDefaultAccelerationFactor = 65536;
-static const bool kDefaultAcceptFirstClick = true;
-
-
 MouseSettings::MouseSettings(BString name)
 	:
 	fName(name)
@@ -43,45 +32,8 @@ MouseSettings::MouseSettings(BString name)
 }
 
 
-MouseSettings::MouseSettings(mouse_settings settings, BString name)
-	:
-	fSettings(settings)
-{
-	fName = name;
-
-#ifdef DEBUG
-	Dump();
-#endif
-
-	// These are not stored in mouse_settings, get the current values from
-	// app_server
-	// FIXME these should be moved out of the MouseSettings class, since they
-	// are not specific to each mouse, but are global settings.
-	fMode = mouse_mode();
-	fFocusFollowsMouseMode = focus_follows_mouse_mode();
-	fAcceptFirstClick = accept_first_click();
-
-	fOriginalSettings = fSettings;
-	fOriginalMode = fMode;
-	fOriginalFocusFollowsMouseMode = fFocusFollowsMouseMode;
-	fOriginalAcceptFirstClick = fAcceptFirstClick;
-}
-
-
 MouseSettings::~MouseSettings()
 {
-}
-
-
-status_t
-MouseSettings::_GetSettingsPath(BPath& path)
-{
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status < B_OK)
-		return status;
-
-	path.Append(mouse_settings_file);
-	return B_OK;
 }
 
 
@@ -106,73 +58,6 @@ MouseSettings::_RetrieveSettings()
 
 	return B_OK;
 }
-
-
-status_t
-MouseSettings::_LoadLegacySettings()
-{
-	BPath path;
-	if (_GetSettingsPath(path) < B_OK)
-		return B_ERROR;
-
-	BFile file(path.Path(), B_READ_ONLY);
-	if (file.InitCheck() < B_OK)
-		return B_ERROR;
-
-	// Read the settings from the file
-	file.Read((void*)&fSettings, sizeof(mouse_settings));
-
-#ifdef DEBUG
-	Dump();
-#endif
-
-	return B_OK;
-}
-
-
-#ifdef DEBUG
-void
-MouseSettings::Dump()
-{
-	printf("type:\t\t%" B_PRId32 " button mouse\n", fSettings.type);
-	for (int i = 0; i < 5; i++)
-		printf("button[%d]: %" B_PRId32 "\n", i, fSettings.map.button[i]);
-	printf("click speed:\t%" B_PRId64 "\n", fSettings.click_speed);
-	printf("accel:\t\t%s\n", fSettings.accel.enabled ? "enabled" : "disabled");
-	printf("accel factor:\t%" B_PRId32 "\n", fSettings.accel.accel_factor);
-	printf("speed:\t\t%" B_PRId32 "\n", fSettings.accel.speed);
-
-	const char* mode = "unknown";
-	switch (fMode) {
-		case B_NORMAL_MOUSE:
-			mode = "click to focus and raise";
-			break;
-		case B_CLICK_TO_FOCUS_MOUSE:
-			mode = "click to focus";
-			break;
-		case B_FOCUS_FOLLOWS_MOUSE:
-			mode = "focus follows mouse";
-			break;
-	}
-	printf("mouse mode:\t%s\n", mode);
-
-	const char* focus_follows_mouse_mode = "unknown";
-	switch (fFocusFollowsMouseMode) {
-		case B_NORMAL_FOCUS_FOLLOWS_MOUSE:
-			focus_follows_mouse_mode = "normal";
-			break;
-		case B_WARP_FOCUS_FOLLOWS_MOUSE:
-			focus_follows_mouse_mode = "warp";
-			break;
-		case B_INSTANT_WARP_FOCUS_FOLLOWS_MOUSE:
-			focus_follows_mouse_mode = "instant warp";
-			break;
-	}
-	printf("focus follows mouse mode:\t%s\n", focus_follows_mouse_mode);
-	printf("accept first click:\t%s\n",
-		fAcceptFirstClick ? "enabled" : "disabled");
-}
-#endif
 
 
 // Resets the settings to the system defaults
@@ -203,7 +88,7 @@ MouseSettings::Defaults()
 
 // Checks if the settings are different then the system defaults
 bool
-MouseSettings::IsDefaultable()
+MouseSettings::IsDefaultable() const
 {
 	return fSettings.click_speed != kDefaultClickSpeed
 		|| fSettings.accel.speed != kDefaultMouseSpeed
@@ -239,7 +124,7 @@ MouseSettings::Revert()
 
 // Checks if the settings are different then the original settings
 bool
-MouseSettings::IsRevertable()
+MouseSettings::IsRevertable() const
 {
 	return fSettings.click_speed != fOriginalSettings.click_speed
 		|| fSettings.accel.speed != fOriginalSettings.accel.speed
@@ -268,16 +153,13 @@ MouseSettings::SetMouseType(int32 type)
 bigtime_t
 MouseSettings::ClickSpeed() const
 {
-	return 1000000LL - fSettings.click_speed;
-		// to correct the Sliders 0-100000 scale
+	return fSettings.click_speed;
 }
 
 
 void
 MouseSettings::SetClickSpeed(bigtime_t clickSpeed)
 {
-	clickSpeed = 1000000LL - clickSpeed;
-
 	if (set_click_speed(clickSpeed) == B_OK)
 		fSettings.click_speed = clickSpeed;
 }
@@ -362,185 +244,31 @@ MouseSettings::GetSettings()
 
 MultipleMouseSettings::MultipleMouseSettings()
 {
-	fDeprecatedMouseSettings = NULL;
-	RetrieveSettings();
-
-#ifdef DEBUG
-	Dump();
-#endif
 }
 
 
 MultipleMouseSettings::~MultipleMouseSettings()
 {
-	SaveSettings();
-
-#ifdef DEBUG
-	Dump();
-#endif
-
 	std::map<BString, MouseSettings*>::iterator itr;
-	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
-		++itr)
+	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end(); ++itr)
 		delete itr->second;
-
-	delete fDeprecatedMouseSettings;
 }
-
-
-status_t
-MultipleMouseSettings::GetSettingsPath(BPath& path)
-{
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if (status < B_OK)
-		return status;
-
-	path.Append(mouse_settings_file);
-	return B_OK;
-}
-
-
-void
-MultipleMouseSettings::RetrieveSettings()
-{
-	// retrieve current values
-	// also try to load the window position from disk
-
-	BPath path;
-	if (GetSettingsPath(path) < B_OK)
-		return;
-
-	BFile file(path.Path(), B_READ_ONLY);
-	if (file.InitCheck() < B_OK)
-		return;
-
-	BMessage message;
-
-	if (message.Unflatten(&file) == B_OK) {
-		int i = 0;
-		BString deviceName;
-		mouse_settings* settings;
-		ssize_t size = 0;
-
-		while (message.FindString("mouseDevice", i, &deviceName) == B_OK) {
-			message.FindData(
-				"mouseSettings", B_ANY_TYPE, i, (const void**)&settings, &size);
-			MouseSettings* mouseSettings
-				= new MouseSettings(*settings, deviceName);
-			fMouseSettingsObject.insert(
-				std::pair<BString, MouseSettings*>(deviceName, mouseSettings));
-			i++;
-		}
-	} else {
-		// Does not look like a BMessage, try loading using the old format
-		fDeprecatedMouseSettings = new MouseSettings("");
-		if (fDeprecatedMouseSettings->_LoadLegacySettings() != B_OK) {
-			delete fDeprecatedMouseSettings;
-			fDeprecatedMouseSettings = NULL;
-		}
-	}
-}
-
-
-status_t
-MultipleMouseSettings::Archive(BMessage* into, bool deep) const
-{
-	std::map<BString, MouseSettings*>::const_iterator itr;
-	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
-		++itr) {
-		into->AddString("mouseDevice", itr->first);
-		into->AddData("mouseSettings", B_ANY_TYPE, itr->second->GetSettings(),
-			sizeof(*(itr->second->GetSettings())));
-	}
-
-	return B_OK;
-}
-
-
-status_t
-MultipleMouseSettings::SaveSettings()
-{
-	BPath path;
-	status_t status = GetSettingsPath(path);
-	if (status < B_OK)
-		return status;
-
-	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	status = file.InitCheck();
-	if (status != B_OK)
-		return status;
-
-	BMessage message;
-	Archive(&message, true);
-	message.Flatten(&file);
-
-	return B_OK;
-}
-
-
-void
-MultipleMouseSettings::Defaults()
-{
-	std::map<BString, MouseSettings*>::iterator itr;
-	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
-		++itr) {
-		itr->second->Defaults();
-	}
-
-}
-
-
-#ifdef DEBUG
-void
-MultipleMouseSettings::Dump()
-{
-	std::map<BString, MouseSettings*>::iterator itr;
-	for (itr = fMouseSettingsObject.begin(); itr != fMouseSettingsObject.end();
-		++itr) {
-		printf("mouse_name:\t%s\n", itr->first.String());
-		itr->second->Dump();
-		printf("\n");
-	}
-}
-#endif
 
 
 MouseSettings*
 MultipleMouseSettings::AddMouseSettings(BString mouse_name)
-{
-	if (fDeprecatedMouseSettings != NULL) {
-		MouseSettings* RetrievedSettings = new(std::nothrow) MouseSettings(
-			*(fDeprecatedMouseSettings->GetSettings()), mouse_name);
-
-		if (RetrievedSettings != NULL) {
-			fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>(
-				mouse_name, RetrievedSettings));
-
-			return RetrievedSettings;
-		}
-	}
-
-	MouseSettings* settings = GetMouseSettings(mouse_name);
-	if (settings)
-		return settings;
-
-	settings = new(std::nothrow) MouseSettings(mouse_name);
-	if (settings == NULL)
-		return NULL;
-
-	fMouseSettingsObject.insert(
-		std::pair<BString, MouseSettings*>(mouse_name, settings));
-	return settings;
-}
-
-
-MouseSettings*
-MultipleMouseSettings::GetMouseSettings(BString mouse_name)
 {
 	std::map<BString, MouseSettings*>::iterator itr;
 	itr = fMouseSettingsObject.find(mouse_name);
 
 	if (itr != fMouseSettingsObject.end())
 		return itr->second;
-	return NULL;
+
+	MouseSettings* settings = new(std::nothrow) MouseSettings(mouse_name);
+	if (settings == NULL)
+		return NULL;
+
+	fMouseSettingsObject.insert(
+		std::pair<BString, MouseSettings*>(mouse_name, settings));
+	return settings;
 }

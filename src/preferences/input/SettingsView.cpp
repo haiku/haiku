@@ -7,25 +7,17 @@
  */
 
 
-#include "InputMouse.h"
+#include "SettingsView.h"
 
-#include <Bitmap.h>
 #include <Box.h>
-#include <Button.h>
 #include <Catalog.h>
-#include <ControlLook.h>
 #include <Debug.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
-#include <MenuField.h>
-#include <MenuItem.h>
-#include <PopUpMenu.h>
 #include <SeparatorView.h>
 #include <Slider.h>
 #include <TextControl.h>
-#include <TranslationUtils.h>
-#include <Window.h>
 
 #include "InputConstants.h"
 #include "MouseSettings.h"
@@ -186,7 +178,7 @@ SettingsView::MouseMapUpdated()
 void
 SettingsView::UpdateFromSettings()
 {
-	int32 value = int32(fSettings.ClickSpeed() / 1000);
+	int32 value = int32((1000000LL - fSettings.ClickSpeed()) / 1000);
 	// slow = 1000000, fast = 0
 	fClickSpeedSlider->SetValue(value);
 

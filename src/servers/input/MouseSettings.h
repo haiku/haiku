@@ -31,7 +31,7 @@
 class MouseSettings {
 	public:
 		MouseSettings();
-		MouseSettings(mouse_settings* originalSettings);
+		MouseSettings(const mouse_settings* originalSettings);
 		~MouseSettings();
 
 		void Defaults();
@@ -65,23 +65,16 @@ class MouseSettings {
 		bool AcceptFirstClick() const { return fAcceptFirstClick; }
 		void SetAcceptFirstClick(bool acceptFirstClick);
 
-		void RetrieveSettings();
-		status_t SaveSettings();
-
 		const mouse_settings* GetSettings() { return &fSettings; }
 
 	private:
-		static status_t GetSettingsPath(BPath &path);
-
-		mouse_settings	fSettings, fOriginalSettings;
+		mouse_settings	fSettings;
 
 		// FIXME all these extra settings are not specific to each mouse.
 		// They should be moved into MultipleMouseSettings directly
-		mode_mouse		fMode, fOriginalMode;
+		mode_mouse		fMode;
 		mode_focus_follows_mouse	fFocusFollowsMouseMode;
-		mode_focus_follows_mouse	fOriginalFocusFollowsMouseMode;
 		bool			fAcceptFirstClick;
-		bool			fOriginalAcceptFirstClick;
 };
 
 
@@ -103,8 +96,6 @@ class MultipleMouseSettings: public BArchivable {
 	private:
 		static status_t GetSettingsPath(BPath &path);
 		void RetrieveSettings();
-
-		MouseSettings*	fDeprecatedMouseSettings;
 
 		typedef std::map<BString, MouseSettings*> mouse_settings_object;
 		mouse_settings_object  fMouseSettingsObject;

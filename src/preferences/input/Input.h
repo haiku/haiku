@@ -15,13 +15,9 @@
 #include <Catalog.h>
 #include <Locale.h>
 
-#include "InputMouse.h"
+#include "InputIcons.h"
 #include "InputWindow.h"
-#include "MouseSettings.h"
 
-
-class SettingsView;
-class MouseSettings;
 
 class InputApplication : public BApplication {
 public:

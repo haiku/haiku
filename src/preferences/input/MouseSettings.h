@@ -13,10 +13,6 @@
 
 #include <map>
 
-#include <Archivable.h>
-#include <Input.h>
-#include <InterfaceDefs.h>
-#include <Point.h>
 #include <String.h>
 #include <SupportDefs.h>
 
@@ -28,14 +24,12 @@ class BPath;
 class MouseSettings {
 public:
 		MouseSettings(BString name);
-		MouseSettings(mouse_settings settings, BString name);
 		~MouseSettings();
 
 		void Revert();
-		bool IsRevertable();
+		bool IsRevertable() const;
 		void Defaults();
-		bool IsDefaultable();
-		void Dump();
+		bool IsDefaultable() const;
 
 		int32 MouseType() const { return fSettings.type; }
 		void SetMouseType(int32 type);
@@ -64,13 +58,11 @@ public:
 
 		bool AcceptFirstClick() const { return fAcceptFirstClick; }
 		void SetAcceptFirstClick(bool accept_first_click);
-		status_t _RetrieveSettings();
-		status_t _LoadLegacySettings();
 
 		mouse_settings* GetSettings();
 
 private:
-		static status_t _GetSettingsPath(BPath &path);
+		status_t _RetrieveSettings();
 
 private:
 		BString						fName;
@@ -84,30 +76,15 @@ private:
 };
 
 
-class MultipleMouseSettings: public BArchivable
+class MultipleMouseSettings
 {
 	public:
 		MultipleMouseSettings();
 		~MultipleMouseSettings();
 
-		status_t Archive(BMessage* into, bool deep = false) const;
-
-		void Defaults();
-		void Dump();
-		status_t SaveSettings();
-
-		/** Get or create settings for the given mouse */
 		MouseSettings* AddMouseSettings(BString mouse_name);
-		/** Get the existing settings, or return NULL */
-		MouseSettings* GetMouseSettings(BString mouse_name);
 
 	private:
-		static status_t GetSettingsPath(BPath &path);
-		void RetrieveSettings();
-
-	private:
-		MouseSettings*	fDeprecatedMouseSettings;
-
 		typedef std::map<BString, MouseSettings*> mouse_settings_object;
 		mouse_settings_object  fMouseSettingsObject;
 };

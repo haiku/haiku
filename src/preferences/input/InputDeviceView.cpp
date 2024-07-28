@@ -11,15 +11,10 @@
 
 
 #include <Catalog.h>
-#include <DateFormat.h>
-#include <Input.h>
-#include <LayoutBuilder.h>
-#include <ListView.h>
 #include <Locale.h>
-#include <ScrollView.h>
 #include <String.h>
-#include <StringItem.h>
 
+#include "InputIcons.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DeviceList"
