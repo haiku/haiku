@@ -7,6 +7,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
 		UseHeaders [ FDirName $(HAIKU_TOP) src libs libsolv ] : true ;
+		UseHeaders [ FDirName $(HAIKU_TOP) src libs libsolv solv ] ;
 		UsePrivateHeaders shared ;
 
 		AddResources $(libsolv) :
