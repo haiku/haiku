@@ -127,8 +127,10 @@ bus_dmamem_alloc_obsd(bus_dma_tag_t tag, bus_size_t size, bus_size_t alignment, 
 		return error;
 
 	error = bus_dmamem_alloc(local, (void**)&segs[0].ds_addr, flags, NULL);
-	if (error)
+	if (error) {
+		bus_dma_tag_destroy(local);
 		return error;
+	}
 	segs[0].ds_len = size;
 
 	error = bus_dma_tag_destroy(local);
