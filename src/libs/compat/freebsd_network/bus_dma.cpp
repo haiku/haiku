@@ -193,6 +193,108 @@ bus_dmamap_create(bus_dma_tag_t dmat, int flags, bus_dmamap_t* mapp)
 }
 
 
+extern "C" int
+bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
+{
+	if (map == NULL)
+		return 0;
+	if (map->buffer_type > bus_dmamap::BUFFER_PROHIBITED)
+		return EBUSY;
+
+	atomic_add(&map->dmat->map_count, -1);
+	kernel_contigfree(map->bounce_buffer, map->bounce_buffer_size, M_DEVBUF);
+	free(map->segments);
+	free(map);
+	return 0;
+}
+
+
+static int
+_allocate_dmamem(bus_dma_tag_t dmat, phys_size_t size, void** vaddr, int mflags)
+{
+	// FreeBSD uses standard malloc() for the case where size <= PAGE_SIZE,
+	// but we want to keep DMA'd memory a bit more separate, so we always use
+	// contigmalloc.
+
+	// The range specified by lowaddr, highaddr is an *exclusion* range,
+	// not an inclusion range. So we want to at least start with the low end,
+	// if possible. (The most common exclusion range is 32-bit only, and
+	// ones other than that are very rare, so typically this will succeed.)
+	if (dmat->lowaddr > B_PAGE_SIZE) {
+		*vaddr = kernel_contigmalloc(size, M_DEVBUF, mflags,
+			0, dmat->lowaddr,
+			dmat->alignment ? dmat->alignment : 1ul, dmat->boundary);
+		if (*vaddr == NULL)
+			dprintf("bus_dmamem_alloc: failed to allocate with lowaddr "
+				"0x%" B_PRIxPHYSADDR "\n", dmat->lowaddr);
+	}
+	if (*vaddr == NULL && dmat->highaddr < BUS_SPACE_MAXADDR) {
+		*vaddr = kernel_contigmalloc(size, M_DEVBUF, mflags,
+			dmat->highaddr, BUS_SPACE_MAXADDR,
+			dmat->alignment ? dmat->alignment : 1ul, dmat->boundary);
+	}
+
+	if (*vaddr == NULL) {
+		dprintf("bus_dmamem_alloc: failed to allocate for tag (size %d, "
+			"low 0x%" B_PRIxPHYSADDR ", high 0x%" B_PRIxPHYSADDR ", "
+			"boundary 0x%" B_PRIxPHYSADDR ")\n",
+			(int)size, dmat->lowaddr, dmat->highaddr, dmat->boundary);
+		return ENOMEM;
+	} else if (vtophys(*vaddr) & (dmat->alignment - 1)) {
+		dprintf("bus_dmamem_alloc: failed to align memory: wanted %#x, got %#x\n",
+			dmat->alignment, vtophys(vaddr));
+		bus_dmamem_free_tagless(*vaddr, size);
+		return ENOMEM;
+	}
+
+	return 0;
+}
+
+
+extern "C" int
+bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
+	bus_dmamap_t* mapp)
+{
+	int mflags;
+	if (flags & BUS_DMA_NOWAIT)
+		mflags = M_NOWAIT;
+	else
+		mflags = M_WAITOK;
+
+	if (flags & BUS_DMA_ZERO)
+		mflags |= M_ZERO;
+
+	// FreeBSD does not permit the "mapp" argument to be NULL, but we do
+	// (primarily for the OpenBSD shims.)
+	if (mapp != NULL) {
+		bus_dmamap_create(dmat, flags, mapp);
+
+		// Drivers assume dmamem will never be bounced, so ensure that.
+		(*mapp)->buffer_type = bus_dmamap::BUFFER_PROHIBITED;
+	}
+
+	int status = _allocate_dmamem(dmat, dmat->maxsize, vaddr, mflags);
+	if (status != 0 && mapp != NULL)
+		bus_dmamap_destroy(dmat, *mapp);
+	return status;
+}
+
+
+extern "C" void
+bus_dmamem_free_tagless(void* vaddr, size_t size)
+{
+	kernel_contigfree(vaddr, size, M_DEVBUF);
+}
+
+
+extern "C" void
+bus_dmamem_free(bus_dma_tag_t dmat, void* vaddr, bus_dmamap_t map)
+{
+	bus_dmamem_free_tagless(vaddr, dmat->maxsize);
+	bus_dmamap_destroy(dmat, map);
+}
+
+
 static int
 _prepare_bounce_buffer(bus_dmamap_t map, bus_size_t reqsize, int flags)
 {
@@ -213,104 +315,16 @@ _prepare_bounce_buffer(bus_dmamap_t map, bus_size_t reqsize, int flags)
 		map->bounce_buffer = NULL;
 	}
 
-	bus_dmamap_t extraMap;
-	int error = bus_dmamem_alloc(map->dmat, &map->bounce_buffer, flags, &extraMap);
+	// The contiguous allocator will round up anyway, so we might as well
+	// do it first so that we know how large our buffer really is.
+	reqsize = ROUNDUP(reqsize, B_PAGE_SIZE);
+
+	int error = _allocate_dmamem(map->dmat, reqsize, &map->bounce_buffer, flags);
 	if (error != 0)
-		return error; // TODO: retry with a smaller size?
-	map->bounce_buffer_size = map->dmat->maxsize;
-	bus_dmamap_destroy(map->dmat, extraMap);
+		return error;
+	map->bounce_buffer_size = reqsize;
 
 	return 0;
-}
-
-
-extern "C" int
-bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
-{
-	if (map == NULL)
-		return 0;
-	if (map->buffer_type > bus_dmamap::BUFFER_PROHIBITED)
-		return EBUSY;
-
-	atomic_add(&map->dmat->map_count, -1);
-	kernel_contigfree(map->bounce_buffer, map->bounce_buffer_size, M_DEVBUF);
-	free(map->segments);
-	free(map);
-	return 0;
-}
-
-
-extern "C" int
-bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
-	bus_dmamap_t* mapp)
-{
-	int mflags;
-	if (flags & BUS_DMA_NOWAIT)
-		mflags = M_NOWAIT;
-	else
-		mflags = M_WAITOK;
-
-	if (flags & BUS_DMA_ZERO)
-		mflags |= M_ZERO;
-
-	// FreeBSD does not permit the "mapp" argument to be NULL, but we do.
-	if (mapp != NULL) {
-		bus_dmamap_create(dmat, flags, mapp);
-
-		// Drivers assume dmamem will never be bounced, so ensure that.
-		(*mapp)->buffer_type = bus_dmamap::BUFFER_PROHIBITED;
-	}
-
-	// FreeBSD uses standard malloc() for the case where maxsize <= PAGE_SIZE,
-	// but we want to keep DMA'd memory a bit more separate, so we always use
-	// contigmalloc.
-
-	// The range specified by lowaddr, highaddr is an *exclusion* range,
-	// not an inclusion range. So we want to at least start with the low end,
-	// if possible. (The most common exclusion range is 32-bit only, and
-	// ones other than that are very rare, so typically this will succeed.)
-	if (dmat->lowaddr > B_PAGE_SIZE) {
-		*vaddr = kernel_contigmalloc(dmat->maxsize, M_DEVBUF, mflags,
-			0, dmat->lowaddr,
-			dmat->alignment ? dmat->alignment : 1ul, dmat->boundary);
-		if (*vaddr == NULL)
-			dprintf("bus_dmamem_alloc: failed to allocate with lowaddr "
-				"0x%" B_PRIxPHYSADDR "\n", dmat->lowaddr);
-	}
-	if (*vaddr == NULL && dmat->highaddr < BUS_SPACE_MAXADDR) {
-		*vaddr = kernel_contigmalloc(dmat->maxsize, M_DEVBUF, mflags,
-			dmat->highaddr, BUS_SPACE_MAXADDR,
-			dmat->alignment ? dmat->alignment : 1ul, dmat->boundary);
-	}
-
-	if (*vaddr == NULL) {
-		dprintf("bus_dmamem_alloc: failed to allocate for tag (size %d, "
-			"low 0x%" B_PRIxPHYSADDR ", high 0x%" B_PRIxPHYSADDR ", "
-		    "boundary 0x%" B_PRIxPHYSADDR ")\n",
-			(int)dmat->maxsize, dmat->lowaddr, dmat->highaddr, dmat->boundary);
-		return ENOMEM;
-	} else if (vtophys(*vaddr) & (dmat->alignment - 1)) {
-		dprintf("bus_dmamem_alloc: failed to align memory: wanted %#x, got %#x\n",
-			dmat->alignment, vtophys(vaddr));
-		bus_dmamem_free(dmat, *vaddr, (mapp != NULL) ? *mapp : NULL);
-		return ENOMEM;
-	}
-	return 0;
-}
-
-
-extern "C" void
-bus_dmamem_free_tagless(void* vaddr, size_t size)
-{
-	kernel_contigfree(vaddr, size, M_DEVBUF);
-}
-
-
-extern "C" void
-bus_dmamem_free(bus_dma_tag_t dmat, void* vaddr, bus_dmamap_t map)
-{
-	bus_dmamem_free_tagless(vaddr, dmat->maxsize);
-	bus_dmamap_destroy(dmat, map);
 }
 
 
