@@ -20,7 +20,12 @@
 // ... and a lot of reserves to keep running.
 #define HEAP_GROW_SIZE				128 * 1024 * 1024
 
-#else // USE_GUARDED_HEAP_FOR_MALLOC && USE_GUARDED_HEAP_FOR_OBJECT_CACHE
+#elif USE_GUARDED_HEAP_FOR_MALLOC
+
+#define INITIAL_HEAP_SIZE			32 * 1024 * 1024
+#define HEAP_GROW_SIZE				32 * 1024 * 1024
+
+#else
 
 // allocate 16MB initial heap for the kernel
 #define INITIAL_HEAP_SIZE			16 * 1024 * 1024
@@ -31,7 +36,7 @@
 // use areas for allocations bigger than 1MB
 #define HEAP_AREA_USE_THRESHOLD		1 * 1024 * 1024
 
-#endif // !(USE_GUARDED_HEAP_FOR_MALLOC && USE_GUARDED_HEAP_FOR_OBJECT_CACHE)
+#endif
 
 
 // allocation/deallocation flags for {malloc,free}_etc()
