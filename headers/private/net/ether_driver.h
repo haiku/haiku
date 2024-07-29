@@ -23,8 +23,11 @@ enum {
 	ETHER_GETFRAMESIZE,						/* get frame size (required) (int *) */
 	ETHER_SET_LINK_STATE_SEM,
 		/* pass over a semaphore to release on link state changes (sem_id *) */
-	ETHER_GET_LINK_STATE
+	ETHER_GET_LINK_STATE,
 		/* get line speed, quality, duplex mode, etc. (ether_link_state_t *) */
+
+	ETHER_SEND_NET_BUFFER,					/* send a net_buffer */
+	ETHER_RECEIVE_NET_BUFFER,				/* receive a net_buffer */
 };
 
 

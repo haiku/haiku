@@ -39,6 +39,7 @@ struct ethernet_device : net_device, DoublyLinkedListLinkImpl<ethernet_device> {
 
 	int		fd;
 	uint32	frame_size;
+	bool	supports_net_buffer;
 
 	void* read_buffer, *write_buffer;
 	mutex read_buffer_lock, write_buffer_lock;
@@ -199,6 +200,12 @@ ethernet_up(net_device *_device)
 	if (ioctl(device->fd, ETHER_GETADDR, device->address.data, ETHER_ADDRESS_LENGTH) < 0)
 		goto err;
 
+	if (ioctl(device->fd, ETHER_SEND_NET_BUFFER, NULL, 0) != 0) {
+		// Check if the returned error code is B_BAD_DATA (not EINVAL or EOPNOTSUPP).
+		if (errno == B_BAD_DATA)
+			device->supports_net_buffer = true;
+	}
+
 	if (ioctl(device->fd, ETHER_GETFRAMESIZE, &device->frame_size, sizeof(uint32)) < 0) {
 		// this call is obviously optional
 		device->frame_size = ETHER_MAX_FRAME_SIZE;
@@ -287,6 +294,12 @@ ethernet_send_data(net_device *_device, net_buffer *buffer)
 	if (buffer->size > device->frame_size || buffer->size < ETHER_HEADER_LENGTH)
 		return B_BAD_VALUE;
 
+	if (device->supports_net_buffer) {
+		if (ioctl(device->fd, ETHER_SEND_NET_BUFFER, buffer, sizeof(net_buffer)) != 0)
+			return errno;
+		return 0;
+	}
+
 	net_buffer *allocated = NULL;
 	net_buffer *original = buffer;
 
@@ -346,6 +359,12 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 
 	if (device->fd == -1)
 		return B_FILE_ERROR;
+
+	if (device->supports_net_buffer) {
+		if (ioctl(device->fd, ETHER_RECEIVE_NET_BUFFER, _buffer, sizeof(net_buffer*)) != 0)
+			return errno;
+		return 0;
+	}
 
 	// TODO: better header space
 	net_buffer *buffer = gBufferModule->create(256);
