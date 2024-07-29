@@ -25,7 +25,7 @@
 
 spinlock __haiku_intr_spinlock;
 
-struct net_stack_module_info *gStack;
+struct net_buffer_module_info *gBufferModule;
 
 static struct list sRootDevices;
 static int sNextUnit;

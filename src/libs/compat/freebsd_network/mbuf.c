@@ -11,6 +11,8 @@
 #include <string.h>
 #include <slab/Slab.h>
 
+#include <net_buffer.h>
+
 #include <compat/sys/malloc.h>
 #include <compat/sys/mbuf.h>
 #include <compat/sys/kernel.h>
@@ -311,6 +313,10 @@ m_free(struct mbuf* memoryBuffer)
 status_t
 init_mbufs()
 {
+	status_t status = get_module(NET_BUFFER_MODULE_NAME, (module_info **)&gBufferModule);
+	if (status != B_OK)
+		goto clean;
+
 	sMBufCache = create_object_cache("mbufs", MSIZE, 8, NULL, NULL, NULL);
 	if (sMBufCache == NULL)
 		goto clean;
@@ -335,6 +341,7 @@ clean:
 		delete_object_cache(sChunkCache);
 	if (sMBufCache != NULL)
 		delete_object_cache(sMBufCache);
+	put_module(NET_BUFFER_MODULE_NAME);
 	return B_NO_MEMORY;
 }
 
