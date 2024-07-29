@@ -372,11 +372,10 @@ parse_bpb(msdosfsmount* volume, const bootsector* bootsector, bool dos33)
 	volume->pm_Heads = getushort(bpb->bpbHeads);
 
 	// check the validity of some universal fields
-	if (volume->pm_BytesPerSec != 0x200) {
-		// FAT is compatible with 0x400, 0x800, and 0x1000 as well, but this driver has not
-		// been tested with those values
-		INFORM("driver does not yet support devices with > 1 block per sector\n");
-		status = B_UNSUPPORTED;
+	if (volume->pm_BytesPerSec != 0x200 && volume->pm_BytesPerSec != 0x400
+		&& volume->pm_BytesPerSec != 0x800 && volume->pm_BytesPerSec != 0x1000) {
+		INFORM("invalid bytes per sector (%d)\n", volume->pm_BytesPerSec);
+		status = B_BAD_VALUE;
 	} else if (volume->pm_BytesPerSec < DEV_BSIZE) {
 		INFORM("invalid bytes per sector (%d)\n", volume->pm_BytesPerSec);
 		status = B_BAD_VALUE;
@@ -595,8 +594,8 @@ check_fat(const msdosfsmount* volume)
 	// for each block
 	for (uint32 i = 0; i < volume->pm_FATsecs; ++i) {
 		// read a block from the first/active fat
-		off_t position = volume->pm_BytesPerSec
-			* (volume->pm_ResSectors + volume->pm_curfat * volume->pm_FATsecs + i);
+		uint32 resBlocks = volume->pm_ResSectors * volume->pm_BlkPerSec;
+		off_t position = 512 * (resBlocks + volume->pm_curfat * volume->pm_FATsecs + i);
 		ssize_t bytes_read
 			= read_pos(volume->pm_dev->si_fd, position, reinterpret_cast<void*>(fatBuffer), 0x200);
 		if (bytes_read != 0x200)
@@ -609,8 +608,7 @@ check_fat(const msdosfsmount* volume)
 
 		// for each mirror
 		for (uint32 j = 1; j < volume->pm_FATs; ++j) {
-			position
-				= volume->pm_BytesPerSec * (volume->pm_ResSectors + volume->pm_FATsecs * j + i);
+			position = 512 * (resBlocks + volume->pm_FATsecs * j + i);
 			bytes_read = read_pos(volume->pm_dev->si_fd, position,
 				reinterpret_cast<void*>(mirrorBuffer), 0x200);
 			if (bytes_read != 0x200)

@@ -3228,7 +3228,8 @@ dosfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize, uint32
 
 /*! Initialize a FreeBSD-style struct cdev.
 	@param _readOnly As input, reflects the user-selected mount options; as output, will be set to
-	true if the device is read-only.
+	true if the device is read-only or device parameters are outside the driver's scope of
+	read-write support.
 */
 static status_t
 bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cdev** bsdDevice,
@@ -3266,15 +3267,29 @@ bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cde
 		// support mounting disk images
 		struct stat imageStat;
 		if (fstat(device->si_fd, &imageStat) >= 0 && S_ISREG(imageStat.st_mode)) {
-			geometry->bytes_per_sector = 0x200;
+			uint8 bootSector[512];
+			if (read_pos(device->si_fd, 0, bootSector, 512) != 512) {
+				INFORM("bsd_device_init: bootsector read failure\n");
+				close(device->si_fd);
+				return B_ERROR;
+			}
+			geometry->bytes_per_sector = read16(bootSector, 0xb);
 			geometry->sectors_per_track = 1;
-			geometry->cylinder_count = imageStat.st_size / 0x200;
+			geometry->cylinder_count = imageStat.st_size / geometry->bytes_per_sector;
 			geometry->head_count = 1;
 			geometry->removable = true;
 			geometry->read_only = !(imageStat.st_mode & S_IWUSR);
 			geometry->write_once = false;
 #ifndef FS_SHELL
-			geometry->bytes_per_physical_sector = 0x200;
+			dev_t imageParentDev = dev_for_path(deviceFile);
+			fs_info parentInfo;
+			status_t status = fs_stat_dev(imageParentDev, &parentInfo);
+			if (status != 0) {
+				INFORM("bsd_device_init: fs_stat failure\n");
+				close(device->si_fd);
+				return B_FROM_POSIX_ERROR(status);
+			}
+			geometry->bytes_per_physical_sector = parentInfo.block_size;
 #endif
 			device->si_mediasize = imageStat.st_size;
 		} else {
@@ -3286,23 +3301,23 @@ bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cde
 			* geometry->sectors_per_track * geometry->bytes_per_sector;
 	}
 
-	if (static_cast<uint64>(device->si_mediasize) > 2ULL << 34) {
-		// the driver has not been tested on volumes > 32 GB
-		INFORM("The FAT driver does not currently support volumes larger than 32 GB.\n");
-		close(device->si_fd);
-		return B_UNSUPPORTED;
+	if (geometry->read_only) {
+		PRINT("%s is read-only\n", deviceFile);
+		*_readOnly = true;
+	}
+
+	if (*_readOnly == false && static_cast<uint64>(device->si_mediasize) > 2ULL << 37) {
+		// the driver has not been tested on volumes > 256 GB
+		INFORM("The FAT driver does not currently support write access to volumes larger than 256 "
+			"GB.\n");
+		*_readOnly = true;
 	}
 
 	if (geometry->bytes_per_sector != 0x200) {
 		// FAT is compatible with 0x400, 0x800, and 0x1000 as well, but this driver has not
 		// been tested with those values
-		INFORM("driver does not yet support devices with > 1 block per sector\n");
-		close(device->si_fd);
-		return B_UNSUPPORTED;
-	}
-
-	if (geometry->read_only) {
-		PRINT("%s is read-only\n", deviceFile);
+		INFORM("The FAT driver does not currently support write access to volumes with > 1 block "
+			"per sector\n");
 		*_readOnly = true;
 	}
 
@@ -3661,7 +3676,7 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 	bool readOnly = (fatFlags & MSDOSFSMNT_RONLY) != 0;
 	device_geometry* geometry = dev->si_geometry;
 	if (geometry != NULL
-		&& fatVolume->pm_HugeSectors
+		&& fatVolume->pm_HugeSectors / fatVolume->pm_BlkPerSec
 			> geometry->sectors_per_track * geometry->cylinder_count * geometry->head_count) {
 		INFORM("dosfs: volume extends past end of partition, mounting read-only\n");
 		readOnly = true;
