@@ -2297,7 +2297,7 @@ OHCI::_WriteDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vect
 			status_t status = generic_memcpy(
 				(generic_addr_t)current->buffer_logical + bufferOffset, false,
 				vector[vectorIndex].base + vectorOffset, physical, length);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2354,7 +2354,7 @@ OHCI::_WriteIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 			status_t status = generic_memcpy(
 				(generic_addr_t)current->buffer_logical + bufferOffset, false,
 				vector[vectorIndex].base + vectorOffset, physical, length);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2418,7 +2418,7 @@ OHCI::_ReadDescriptorChain(ohci_general_td *topDescriptor, generic_io_vec *vecto
 			status_t status = generic_memcpy(
 				vector[vectorIndex].base + vectorOffset, physical,
 				(generic_addr_t)current->buffer_logical + bufferOffset, false, length);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2472,7 +2472,7 @@ OHCI::_ReadIsochronousDescriptorChain(ohci_isochronous_td *topDescriptor,
 				status_t status = generic_memcpy(
 					vector[vectorIndex].base + vectorOffset, physical,
 					(generic_addr_t)current->buffer_logical + bufferOffset, false, length);
-				ASSERT(status == B_OK);
+				ASSERT_ALWAYS(status == B_OK);
 
 				actualLength += length;
 				vectorOffset += length;

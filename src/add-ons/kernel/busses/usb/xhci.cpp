@@ -1465,7 +1465,7 @@ XHCI::WriteDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vector
 				(generic_addr_t)descriptor->buffers[bufIdx] + bufUsed, false,
 				vector[vecIdx].base + (vector[vecIdx].length - length), physical,
 				toCopy);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			written += toCopy;
 			bufUsed += toCopy;
@@ -1496,7 +1496,7 @@ XHCI::ReadDescriptor(xhci_td *descriptor, generic_io_vec *vector, size_t vectorC
 			status_t status = generic_memcpy(
 				vector[vecIdx].base + (vector[vecIdx].length - length), physical,
 				(generic_addr_t)descriptor->buffers[bufIdx] + bufUsed, false, toCopy);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			read += toCopy;
 			bufUsed += toCopy;

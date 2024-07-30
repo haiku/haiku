@@ -2807,7 +2807,7 @@ EHCI::WriteDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
 			status_t status = generic_memcpy(
 				(generic_addr_t)current->buffer_log + bufferOffset, false,
 				vector[vectorIndex].base + vectorOffset, physical, length);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2867,7 +2867,7 @@ EHCI::ReadDescriptorChain(ehci_qtd *topDescriptor, generic_io_vec *vector,
 			status_t status = generic_memcpy(
 				vector[vectorIndex].base + vectorOffset, physical,
 				(generic_addr_t)current->buffer_log + bufferOffset, false, length);
-			ASSERT(status == B_OK);
+			ASSERT_ALWAYS(status == B_OK);
 
 			actualLength += length;
 			vectorOffset += length;
@@ -2982,7 +2982,7 @@ EHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer)
 				status_t status = generic_memcpy(
 					vector[vectorIndex].base + vectorOffset, physical,
 					(generic_addr_t)transfer->buffer_log + bufferOffset, false, length);
-				ASSERT(status == B_OK);
+				ASSERT_ALWAYS(status == B_OK);
 
 				offset += length;
 				vectorOffset += length;
