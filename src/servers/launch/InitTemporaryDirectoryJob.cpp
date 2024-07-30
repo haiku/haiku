@@ -28,7 +28,8 @@ InitTemporaryDirectoryJob::Execute()
 	BPath path;
 	status_t status = find_directory(B_SYSTEM_TEMP_DIRECTORY, &path, true);
 	if (status == B_OK)
-		return CreateAndEmpty(path.Path());
+		status = CreateAndEmpty(path.Path());
 
+	chmod(path.Path(), 0777);
 	return status;
 }

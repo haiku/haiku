@@ -29,5 +29,7 @@ InitSharedMemoryDirectoryJob::Execute()
 	status = fs_mount_volume("/var/shared_memory", NULL, "ramfs", 0, NULL);
 	if (status < B_OK)
 		return status;
+
+	chmod("/var/shared_memory", 0777);
 	return B_OK;
 }
