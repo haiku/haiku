@@ -16,6 +16,12 @@
 #define NET_BUFFER_MODULE_NAME "network/stack/buffer/v1"
 
 
+enum net_buffer_flags {
+	NET_BUFFER_L3_CHECKSUM_VALID = (1 << 0),
+	NET_BUFFER_L4_CHECKSUM_VALID = (1 << 1),
+};
+
+
 typedef struct net_buffer {
 	struct list_link		link;
 
@@ -35,6 +41,7 @@ typedef struct net_buffer {
 	uint32					msg_flags;
 	uint32					size;
 	uint8					protocol;
+	uint16					buffer_flags;
 } net_buffer;
 
 struct ancillary_data_container;
