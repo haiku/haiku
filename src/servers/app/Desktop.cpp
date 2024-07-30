@@ -688,7 +688,7 @@ Desktop::SetCursor(ServerCursor* newCursor)
 	if (newCursor == fCursor)
 		return;
 
-	fCursor = newCursor;
+	fCursor.SetTo(newCursor, false);
 
 	if (!fManagementCursor.IsSet())
 		HWInterface()->SetCursor(newCursor);
@@ -708,7 +708,7 @@ Desktop::SetManagementCursor(ServerCursor* newCursor)
 	if (newCursor == fManagementCursor)
 		return;
 
-	fManagementCursor = newCursor;
+	fManagementCursor.SetTo(newCursor, false);
 
 	HWInterface()->SetCursor(newCursor != NULL ? newCursor : fCursor.Get());
 }
