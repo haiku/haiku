@@ -71,7 +71,7 @@ vn_vget_ino_gen(struct vnode* vp, vn_get_ino_t alloc, void* alloc_arg, int lkfla
 		= (uint64)fatVolume->pm_bpcluster * dotdotLocation->cluster + dotdotLocation->blkoff;
 
 	status_t status = assign_inode(bsdVolume, (ino_t*)&inode);
-	ASSERT(status == B_OK && node_exists(bsdVolume, inode));
+	ASSERT_ALWAYS(status == B_OK && node_exists(bsdVolume, inode));
 		// It's important that this node has already been constructed.
 		// If it hasn't, then deget will construct a private node without publishing it to the VFS.
 

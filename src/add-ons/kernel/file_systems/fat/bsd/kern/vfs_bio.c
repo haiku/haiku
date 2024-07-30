@@ -128,7 +128,7 @@ _bwrite(struct buf* buf)
 		ASSERT((fatNode->de_Attributes & ATTR_READONLY) == 0);
 
 		fileOffset = de_cn2off(fatVolume, buf->b_lblkno);
-		ASSERT((u_long)(fileOffset + buf->b_bufsize) <= fatNode->de_FileSize);
+		ASSERT_ALWAYS((u_long)(fileOffset + buf->b_bufsize) <= fatNode->de_FileSize);
 
 		bytesWritten = (size_t)buf->b_bufsize;
 		status = file_cache_write(bsdNode->v_cache, NULL, fileOffset, buf->b_data, &bytesWritten);

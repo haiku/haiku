@@ -73,7 +73,7 @@ lockmgr_assert(const struct lock* lk, int what)
 {
 #ifndef FS_SHELL
 	if (what == KA_XLOCKED)
-		ASSERT_WRITE_LOCKED_RW_LOCK(&lk->haikuRW)
+		ASSERT_WRITE_LOCKED_RW_LOCK(&lk->haikuRW);
 	else
 		panic("lockmgr_assert:  unrecognized flag\n");
 #endif // !FS_SHELL
