@@ -813,7 +813,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		buffer->size, buffer->flags, fSendQueue.Size(), fSendQueue.Free());
 	T(APICall(this, "senddata"));
 
-	const uint32 flags = buffer->flags;
+	const uint32 flags = buffer->msg_flags;
 	if ((flags & ~(MSG_DONTWAIT | MSG_OOB | MSG_EOF)) != 0)
 		return EOPNOTSUPP;
 

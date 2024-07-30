@@ -605,7 +605,7 @@ handle_arp_request(net_buffer *buffer, arp_header &header)
 	memcpy(LLADDR((sockaddr_dl *)buffer->destination), header.hardware_target,
 		ETHER_ADDRESS_LENGTH);
 
-	buffer->flags = 0;
+	buffer->msg_flags = 0;
 		// make sure this won't be a broadcast message
 
 	gBufferModule->trim(buffer, sizeof(arp_header));
@@ -820,7 +820,7 @@ arp_start_resolve(arp_protocol* protocol, in_addr_t address, arp_entry** _entry)
 	source.sdl_alen = ETHER_ADDRESS_LENGTH;
 	memcpy(source.sdl_data, device->address.data, ETHER_ADDRESS_LENGTH);
 
-	entry->request_buffer->flags = MSG_BCAST;
+	entry->request_buffer->msg_flags = MSG_BCAST;
 		// this is a broadcast packet, we don't need to fill in the destination
 
 	entry->protocol = protocol;
@@ -1024,13 +1024,13 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 		memcpy(buffer->source, &protocol->hardware_address,
 			protocol->hardware_address.sdl_len);
 
-		if ((buffer->flags & MSG_MCAST) != 0) {
+		if ((buffer->msg_flags & MSG_MCAST) != 0) {
 			sockaddr_dl multicastDestination;
 			ipv4_to_ether_multicast(&multicastDestination,
 				(sockaddr_in *)buffer->destination);
 			memcpy(buffer->destination, &multicastDestination,
 				sizeof(multicastDestination));
-		} else if ((buffer->flags & MSG_BCAST) == 0) {
+		} else if ((buffer->msg_flags & MSG_BCAST) == 0) {
 			// Lookup destination (we may need to wait for this)
 			arp_entry *entry = arp_entry::Lookup(
 				((struct sockaddr_in *)buffer->destination)->sin_addr.s_addr);

@@ -291,9 +291,9 @@ UdpDomainSupport::DemuxIncomingBuffer(net_buffer *buffer)
 	// NOTE: multicast is delivered directly to the endpoint
 	MutexLocker _(fLock);
 
-	if ((buffer->flags & MSG_BCAST) != 0)
+	if ((buffer->msg_flags & MSG_BCAST) != 0)
 		return _DemuxBroadcast(buffer);
-	if ((buffer->flags & MSG_MCAST) != 0)
+	if ((buffer->msg_flags & MSG_MCAST) != 0)
 		return B_ERROR;
 
 	return _DemuxUnicast(buffer);
@@ -303,7 +303,7 @@ UdpDomainSupport::DemuxIncomingBuffer(net_buffer *buffer)
 status_t
 UdpDomainSupport::DeliverError(status_t error, net_buffer* buffer)
 {
-	if ((buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0)
+	if ((buffer->msg_flags & (MSG_BCAST | MSG_MCAST)) != 0)
 		return B_ERROR;
 
 	MutexLocker _(fLock);

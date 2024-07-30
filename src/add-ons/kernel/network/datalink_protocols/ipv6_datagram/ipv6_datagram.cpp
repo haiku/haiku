@@ -719,7 +719,7 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 	memcpy(&destination->sin6_addr, &source->sin6_addr, sizeof(in6_addr));
 	memcpy(&source->sin6_addr, &header.target_address, sizeof(in6_addr));
 
-	buffer->flags = 0;
+	buffer->msg_flags = 0;
 		// make sure this won't be a broadcast message
 
 	if (sIPv6Protocol == NULL)
@@ -737,7 +737,7 @@ static void
 ndp_receive_advertisement(net_buffer* buffer)
 {
 	// TODO: also process unsolicited advertisments?
-	if ((buffer->flags & MSG_MCAST) != 0)
+	if ((buffer->msg_flags & MSG_MCAST) != 0)
 		return;
 
 	NetBufferHeaderReader<neighbor_discovery_header> bufferHeader(buffer);
@@ -1026,7 +1026,7 @@ ipv6_datalink_send_data(net_datalink_protocol* _protocol, net_buffer* buffer)
 	memcpy(buffer->source, &protocol->hardware_address,
 		protocol->hardware_address.sdl_len);
 
-	if ((buffer->flags & MSG_MCAST) != 0) {
+	if ((buffer->msg_flags & MSG_MCAST) != 0) {
 		sockaddr_dl multicastDestination;
 		ipv6_to_ether_multicast(&multicastDestination,
 			(sockaddr_in6*)buffer->destination);

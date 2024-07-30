@@ -32,7 +32,7 @@ typedef struct net_buffer {
 		uint32				index;
 		int32				type;
 	};
-	uint32					flags;
+	uint32					msg_flags;
 	uint32					size;
 	uint8					protocol;
 } net_buffer;

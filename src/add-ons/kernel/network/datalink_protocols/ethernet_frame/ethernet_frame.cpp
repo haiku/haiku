@@ -68,9 +68,9 @@ ethernet_deframe(net_device* device, net_buffer* buffer)
 
 	// Mark buffer if it was a broadcast/multicast packet
 	if (!memcmp(header.destination, kBroadcastAddress, ETHER_ADDRESS_LENGTH))
-		buffer->flags |= MSG_BCAST;
+		buffer->msg_flags |= MSG_BCAST;
 	else if ((header.destination[0] & 0x01) != 0)
-		buffer->flags |= MSG_MCAST;
+		buffer->msg_flags |= MSG_MCAST;
 
 	// Translate the ethernet specific type to a generic one if possible
 	switch (type) {
@@ -154,7 +154,7 @@ ethernet_frame_send_data(net_datalink_protocol* protocol, net_buffer* buffer)
 
 	header.type = source.sdl_e_type;
 	memcpy(header.source, LLADDR(&source), ETHER_ADDRESS_LENGTH);
-	if ((buffer->flags & MSG_BCAST) != 0)
+	if ((buffer->msg_flags & MSG_BCAST) != 0)
 		memcpy(header.destination, kBroadcastAddress, ETHER_ADDRESS_LENGTH);
 	else
 		memcpy(header.destination, LLADDR(&destination), ETHER_ADDRESS_LENGTH);

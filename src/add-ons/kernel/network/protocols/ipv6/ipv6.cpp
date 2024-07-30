@@ -792,7 +792,7 @@ raw_receive_data(net_buffer* buffer)
 
 	TRACE("RawReceiveData(%i)", buffer->protocol);
 
-	if ((buffer->flags & MSG_MCAST) != 0) {
+	if ((buffer->msg_flags & MSG_MCAST) != 0) {
 		deliver_multicast(&gIPv6Module, buffer, true);
 	} else {
 		RawSocketList::Iterator iterator = sRawSockets.GetIterator();
@@ -1252,7 +1252,7 @@ ip6_select_hoplimit(net_protocol* _protocol, net_buffer* buffer)
 	// 3. The system default hoplimit.
 
 	ipv6_protocol* protocol = (ipv6_protocol*)_protocol;
-	const bool isMulticast = buffer->flags & MSG_MCAST;
+	const bool isMulticast = buffer->msg_flags & MSG_MCAST;
 
 	if (protocol) {
 		return isMulticast ? protocol->multicast_time_to_live
@@ -1283,13 +1283,13 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	sockaddr_in6& source = *(sockaddr_in6*)buffer->source;
 	sockaddr_in6& destination = *(sockaddr_in6*)buffer->destination;
 
-	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+	buffer->msg_flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	if (IN6_IS_ADDR_UNSPECIFIED(&destination.sin6_addr))
 		return EDESTADDRREQ;
 
 	if (IN6_IS_ADDR_MULTICAST(&destination.sin6_addr))
-		buffer->flags |= MSG_MCAST;
+		buffer->msg_flags |= MSG_MCAST;
 
 	uint16 dataLength = buffer->size;
 
@@ -1469,13 +1469,13 @@ ipv6_receive_data(net_buffer* buffer)
 		return B_BAD_DATA;
 
 	// lower layers notion of Broadcast or Multicast have no relevance to us
-	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+	buffer->msg_flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	sockaddr_in6 destination;
 	fill_sockaddr_in6(&destination, header.Dst());
 
 	if (IN6_IS_ADDR_MULTICAST(&destination.sin6_addr)) {
-		buffer->flags |= MSG_MCAST;
+		buffer->msg_flags |= MSG_MCAST;
 	} else {
 		uint32 matchedAddressType = 0;
 
@@ -1497,7 +1497,7 @@ ipv6_receive_data(net_buffer* buffer)
 		}
 
 		// copy over special address types (MSG_BCAST or MSG_MCAST):
-		buffer->flags |= matchedAddressType;
+		buffer->msg_flags |= matchedAddressType;
 	}
 
 	// set net_buffer's source/destination address
@@ -1547,7 +1547,7 @@ ipv6_receive_data(net_buffer* buffer)
 		return EAFNOSUPPORT;
 	}
 
-	if ((buffer->flags & MSG_MCAST) != 0) {
+	if ((buffer->msg_flags & MSG_MCAST) != 0) {
 		// Unfortunately historical reasons dictate that the IP multicast
 		// model be a little different from the unicast one. We deliver
 		// this frame directly to all sockets registered with interest

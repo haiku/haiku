@@ -562,7 +562,7 @@ icmp_error_reply(net_protocol* protocol, net_buffer* buffer, net_error error,
 	}
 
 	// a datagram to an IP multicast or broadcast address,
-	if ((buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0)
+	if ((buffer->msg_flags & (MSG_BCAST | MSG_MCAST)) != 0)
 		return B_ERROR;
 
 	// a non-initial fragment

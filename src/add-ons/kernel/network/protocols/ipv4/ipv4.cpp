@@ -757,7 +757,7 @@ raw_receive_data(net_buffer* buffer)
 
 	TRACE("RawReceiveData(%i)", buffer->protocol);
 
-	if ((buffer->flags & MSG_MCAST) != 0) {
+	if ((buffer->msg_flags & MSG_MCAST) != 0) {
 		// we need to call deliver_multicast here separately as
 		// buffer still has the IP header, and it won't in the
 		// next call. This isn't very optimized but works for now.
@@ -1493,7 +1493,7 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	if (protocol != NULL)
 		headerIncluded = (protocol->flags & IP_FLAG_HEADER_INCLUDED) != 0;
 
-	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+	buffer->msg_flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	if (destination.sin_addr.s_addr == INADDR_ANY)
 		return EDESTADDRREQ;
@@ -1504,9 +1504,9 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 					== broadcastAddress->sin_addr.s_addr))) {
 		if (protocol && !(protocol->socket->options & SO_BROADCAST))
 			return B_BAD_VALUE;
-		buffer->flags |= MSG_BCAST;
+		buffer->msg_flags |= MSG_BCAST;
 	} else if (IN_MULTICAST(ntohl(destination.sin_addr.s_addr)))
-		buffer->flags |= MSG_MCAST;
+		buffer->msg_flags |= MSG_MCAST;
 
 	// Add IP header (if needed)
 
@@ -1522,10 +1522,10 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 		header->id = htons(atomic_add(&sPacketID, 1));
 		header->fragment_offset = 0;
 		if (protocol) {
-			header->time_to_live = (buffer->flags & MSG_MCAST) != 0
+			header->time_to_live = (buffer->msg_flags & MSG_MCAST) != 0
 				? protocol->multicast_time_to_live : protocol->time_to_live;
 		} else {
-			header->time_to_live = (buffer->flags & MSG_MCAST) != 0
+			header->time_to_live = (buffer->msg_flags & MSG_MCAST) != 0
 				? kDefaultMulticastTTL : kDefaultTTL;
 		}
 		header->protocol = protocol
@@ -1561,7 +1561,7 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 			sizeof(ipv4_header), true);
 	}
 
-	if ((buffer->flags & MSG_MCAST) != 0
+	if ((buffer->msg_flags & MSG_MCAST) != 0
 		&& (protocol != NULL && protocol->multicast_loopback)) {
 		// copy an IP multicast packet to the input queue of the loopback
 		// interface
@@ -1747,22 +1747,22 @@ ipv4_receive_data(net_buffer* buffer)
 
 	// lower layers notion of broadcast or multicast have no relevance to us
 	// other than deciding whether to send an ICMP error
-	bool wasMulticast = (buffer->flags & (MSG_BCAST | MSG_MCAST)) != 0;
+	bool wasMulticast = (buffer->msg_flags & (MSG_BCAST | MSG_MCAST)) != 0;
 	bool notForUs = false;
-	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+	buffer->msg_flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	sockaddr_in destination;
 	fill_sockaddr_in(&destination, header.destination);
 
 	if (header.destination == INADDR_BROADCAST) {
-		buffer->flags |= MSG_BCAST;
+		buffer->msg_flags |= MSG_BCAST;
 
 		// Find first interface with a matching family
 		if (!sDatalinkModule->is_local_link_address(sDomain, true,
 				buffer->destination, &buffer->interface_address))
 			notForUs = !wasMulticast;
 	} else if (IN_MULTICAST(ntohl(header.destination))) {
-		buffer->flags |= MSG_MCAST;
+		buffer->msg_flags |= MSG_MCAST;
 	} else {
 		uint32 matchedAddressType = 0;
 
@@ -1774,12 +1774,12 @@ ipv4_receive_data(net_buffer* buffer)
 			// if the buffer was a link layer multicast, regard it as a
 			// broadcast, and let the upper levels decide what to do with it
 			if (wasMulticast)
-				buffer->flags |= MSG_BCAST;
+				buffer->msg_flags |= MSG_BCAST;
 			else
 				notForUs = true;
 		} else {
 			// copy over special address types (MSG_BCAST or MSG_MCAST):
-			buffer->flags |= matchedAddressType;
+			buffer->msg_flags |= matchedAddressType;
 		}
 	}
 
@@ -1848,7 +1848,7 @@ ipv4_receive_data(net_buffer* buffer)
 		return EAFNOSUPPORT;
 	}
 
-	if ((buffer->flags & MSG_MCAST) != 0) {
+	if ((buffer->msg_flags & MSG_MCAST) != 0) {
 		// Unfortunately historical reasons dictate that the IP multicast
 		// model be a little different from the unicast one. We deliver
 		// this frame directly to all sockets registered with interest
@@ -1898,16 +1898,16 @@ ipv4_error_received(net_error error, net_buffer* buffer)
 
 	// lower layers notion of broadcast or multicast have no relevance to us
 	// TODO: they actually have when deciding whether to send an ICMP error
-	buffer->flags &= ~(MSG_BCAST | MSG_MCAST);
+	buffer->msg_flags &= ~(MSG_BCAST | MSG_MCAST);
 
 	fill_sockaddr_in((struct sockaddr_in*)buffer->source, header.source);
 	fill_sockaddr_in((struct sockaddr_in*)buffer->destination,
 		header.destination);
 
 	if (header.destination == INADDR_BROADCAST)
-		buffer->flags |= MSG_BCAST;
+		buffer->msg_flags |= MSG_BCAST;
 	else if (IN_MULTICAST(ntohl(header.destination)))
-		buffer->flags |= MSG_MCAST;
+		buffer->msg_flags |= MSG_MCAST;
 
 	// test if the packet is really from us
 	if (!sDatalinkModule->is_local_address(sDomain, buffer->source, NULL,

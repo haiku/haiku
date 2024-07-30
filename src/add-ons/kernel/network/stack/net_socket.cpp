@@ -1394,7 +1394,7 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		}
 
 		size_t bufferSize = buffer->size;
-		buffer->flags = flags;
+		buffer->msg_flags = flags;
 		memcpy(buffer->source, &socket->address, socket->address.ss_len);
 		memcpy(buffer->destination, address, addressLength);
 		buffer->destination->sa_len = addressLength;

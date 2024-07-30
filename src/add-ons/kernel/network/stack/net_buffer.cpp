@@ -609,9 +609,9 @@ dump_buffer(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
-	dprintf("buffer %p, size %" B_PRIu32 ", flags %" B_PRIx32 ", stored header "
+	dprintf("buffer %p, size %" B_PRIu32 ", msg_flags %" B_PRIx32 ", stored header "
 		"%" B_PRIuSIZE ", interface address %p\n", buffer, buffer->size,
-		buffer->flags, buffer->stored_header_length, buffer->interface_address);
+		buffer->msg_flags, buffer->stored_header_length, buffer->interface_address);
 
 	dump_address("source", buffer->source, buffer->interface_address);
 	dump_address("destination", buffer->destination, buffer->interface_address);
@@ -1073,7 +1073,7 @@ copy_metadata(net_buffer* destination, const net_buffer* source)
 	memcpy(destination->destination, source->destination,
 		min_c(source->destination->sa_len, sizeof(sockaddr_storage)));
 
-	destination->flags = source->flags;
+	destination->msg_flags = source->msg_flags;
 	destination->interface_address = source->interface_address;
 	if (destination->interface_address != NULL)
 		((InterfaceAddress*)destination->interface_address)->AcquireReference();
@@ -1126,7 +1126,7 @@ create_buffer(size_t headerSpace)
 
 	buffer->interface_address = NULL;
 	buffer->offset = 0;
-	buffer->flags = 0;
+	buffer->msg_flags = 0;
 	buffer->size = 0;
 
 	CHECK_BUFFER(buffer);
