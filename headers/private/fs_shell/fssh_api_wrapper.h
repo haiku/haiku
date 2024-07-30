@@ -1005,6 +1005,8 @@
 #define add_debugger_command	fssh_add_debugger_command
 #define remove_debugger_command	fssh_remove_debugger_command
 
+#define ASSERT_ALWAYS	ASSERT
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_lock.h
