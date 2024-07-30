@@ -6,6 +6,9 @@
 
 
 #include <net/if_media.h>
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/ip6.h>
 #include <new>
 
 #include <ethernet.h>
@@ -293,9 +296,9 @@ virtio_net_init_device(void* _info, void** _cookie)
 
 	info->virtio->negotiate_features(info->virtio_device,
 		VIRTIO_NET_F_STATUS | VIRTIO_NET_F_MAC | VIRTIO_NET_F_MTU
-		| VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_CTRL_RX
-		/* | VIRTIO_NET_F_MQ */,
-		 &info->features, &get_feature_name);
+			| VIRTIO_NET_F_CTRL_VQ | VIRTIO_NET_F_CTRL_RX | VIRTIO_NET_F_GUEST_CSUM
+			/* | VIRTIO_NET_F_MQ */,
+		&info->features, &get_feature_name);
 
 	if ((info->features & VIRTIO_NET_F_MQ) != 0
 			&& (info->features & VIRTIO_NET_F_CTRL_VQ) != 0
@@ -661,11 +664,44 @@ virtio_net_receive(void* cookie, net_buffer** _buffer)
 		sBufferModule->free(buffer);
 		buffer = NULL;
 	}
-	*_buffer = buffer;
-
+	const uint8_t flags = buf->hdr->flags;
 	rxLocker.Lock();
 	virtio_net_rx_enqueue_buf(info, buf);
-	return (buffer != NULL) ? B_OK : B_NO_MEMORY;
+	rxLocker.Unlock();
+
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	if ((flags & (VIRTIO_NET_HDR_F_DATA_VALID | VIRTIO_NET_HDR_F_NEEDS_CSUM)) != 0) {
+		buffer->buffer_flags |= NET_BUFFER_L3_CHECKSUM_VALID;
+
+		// virtio also checks the L4 checksum for common protocols.
+		uint16 etherType;
+		if (sBufferModule->read(buffer, offsetof(ether_header, type),
+				&etherType, sizeof(etherType)) == B_OK) {
+			uint8 protocol = 0;
+			etherType = ntohs(etherType);
+			if (etherType == ETHER_TYPE_IP) {
+				sBufferModule->read(buffer,
+					ETHER_HEADER_LENGTH + offsetof(struct ip, ip_p),
+					&protocol, sizeof(protocol));
+			} else if (etherType == ETHER_TYPE_IPV6) {
+				sBufferModule->read(buffer,
+					ETHER_HEADER_LENGTH + offsetof(struct ip6_hdr, ip6_nxt),
+					&protocol, sizeof(protocol));
+			}
+			if (protocol == IPPROTO_TCP || protocol == IPPROTO_UDP)
+				buffer->buffer_flags |= NET_BUFFER_L4_CHECKSUM_VALID;
+		}
+
+		if ((flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) != 0) {
+			// The data is known to be valid but the checksum in the packet is incomplete.
+			// Ignore this flag for now; the stack accepts packets with CHECKSUM_VALID set.
+		}
+	}
+
+	*_buffer = buffer;
+	return B_OK;
 }
 
 
