@@ -1559,6 +1559,7 @@ ipv4_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	if (checksumNeeded) {
 		*IPChecksumField(buffer) = gBufferModule->checksum(buffer, 0,
 			sizeof(ipv4_header), true);
+		buffer->buffer_flags |= NET_BUFFER_L3_CHECKSUM_VALID;
 	}
 
 	if ((buffer->msg_flags & MSG_MCAST) != 0
@@ -1741,9 +1742,10 @@ ipv4_receive_data(net_buffer* buffer)
 		|| headerLength < sizeof(ipv4_header))
 		return B_BAD_DATA;
 
-	// TODO: would be nice to have a direct checksum function somewhere
-	if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
-		return B_BAD_DATA;
+	if ((buffer->buffer_flags & NET_BUFFER_L3_CHECKSUM_VALID) == 0) {
+		if (gBufferModule->checksum(buffer, 0, headerLength, true) != 0)
+			return B_BAD_DATA;
+	}
 
 	// lower layers notion of broadcast or multicast have no relevance to us
 	// other than deciding whether to send an ICMP error

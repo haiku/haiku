@@ -828,7 +828,7 @@ UdpEndpointManager::Deframe(net_buffer* buffer)
 	if (buffer->size > udpLength)
 		gBufferModule->trim(buffer, udpLength);
 
-	if (header.udp_checksum != 0) {
+	if (header.udp_checksum != 0 && (buffer->buffer_flags & NET_BUFFER_L4_CHECKSUM_VALID) == 0) {
 		// check UDP-checksum (simulating a so-called "pseudo-header"):
 		uint16 sum = Checksum::PseudoHeader(addressModule, gBufferModule,
 			buffer, IPPROTO_UDP);
@@ -1042,6 +1042,7 @@ UdpEndpoint::SendRoutedData(net_buffer *buffer, net_route *route)
 		calculatedChecksum = 0xffff;
 
 	*UDPChecksumField(buffer) = calculatedChecksum;
+	buffer->buffer_flags |= NET_BUFFER_L4_CHECKSUM_VALID;
 
 	return next->module->send_routed_data(next, route, buffer);
 }
