@@ -13,6 +13,7 @@
 
 #include <Drivers.h>
 #include <ether_driver.h>
+#include <kernel.h>
 #include <net_buffer.h>
 
 #include <compat/sys/haiku-module.h>
@@ -150,6 +151,11 @@ compat_receive(void *cookie, net_buffer **_buffer)
 		m_freem(mb);
 		return status;
 	}
+
+	if ((mb->m_pkthdr.csum_flags & CSUM_L3_VALID) != 0)
+		buffer->buffer_flags |= NET_BUFFER_L3_CHECKSUM_VALID;
+	if ((mb->m_pkthdr.csum_flags & CSUM_L4_VALID) != 0)
+		buffer->buffer_flags |= NET_BUFFER_L4_CHECKSUM_VALID;
 
 	*_buffer = buffer;
 	m_freem(mb);
