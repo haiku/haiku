@@ -581,9 +581,7 @@ FontStyle*
 GlobalFontManager::GetStyle(const char* familyName, const char* styleName,
 	uint16 familyID, uint16 styleID, uint16 face)
 {
-	ASSERT(IsLocked());
-
-	FontFamily* family;
+	BAutolock locker(this);
 
 	if (styleID != 0xffff && (familyName == NULL || !familyName[0])
 		&& (styleName == NULL || !styleName[0])) {
@@ -592,6 +590,7 @@ GlobalFontManager::GetStyle(const char* familyName, const char* styleName,
 
 	// find family
 
+	FontFamily* family;
 	if (familyName != NULL && familyName[0])
 		family = GetFamily(familyName);
 	else
