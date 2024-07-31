@@ -1218,8 +1218,10 @@ restart:
 		uint32 flags;
 		status = FS_MOUNT_CALL(vnode->mount, get_vnode, vnodeID, vnode, &type,
 			&flags, reenter);
-		if (status == B_OK && vnode->private_node == NULL)
+		if (status == B_OK && (vnode->private_node == NULL || vnode->ops == NULL)) {
+			KDEBUG_ONLY(panic("filesystem get_vnode returned 0 with unset fields"));
 			status = B_BAD_VALUE;
+		}
 
 		bool gotNode = status == B_OK;
 		bool publishSpecialSubNode = false;
