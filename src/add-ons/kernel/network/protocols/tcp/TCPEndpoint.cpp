@@ -2462,6 +2462,9 @@ TCPEndpoint::_Retransmit()
 void
 TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime, int32 expectedSamples)
 {
+	if (roundTripTime <= 0)
+		return;
+
 	if (fSmoothedRoundTripTime == 0) {
 		fSmoothedRoundTripTime = roundTripTime;
 		fRoundTripVariation = roundTripTime / 2;
