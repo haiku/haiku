@@ -2008,7 +2008,7 @@ TCPEndpoint::_PrepareSendSegment()
 				&& (fFlags & FLAG_OPTION_SACK_PERMITTED) != 0) {
 			segment.options |= TCP_HAS_SACK;
 			int maxSackCount = MAX_SACK_BLKS
-				- ((fFlags & FLAG_OPTION_TIMESTAMP) != 0) ? 1 : 0;
+				- (((fFlags & FLAG_OPTION_TIMESTAMP) != 0) ? 1 : 0);
 			memset(segment.sacks, 0, sizeof(segment.sacks));
 			segment.sackCount = fReceiveQueue.PopulateSackInfo(fReceiveNext,
 				maxSackCount, segment.sacks);
