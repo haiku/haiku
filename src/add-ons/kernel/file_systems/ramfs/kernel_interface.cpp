@@ -241,8 +241,10 @@ ramfs_get_vnode(fs_volume* _volume, ino_t vnid, fs_vnode* node, int* _type,
 	status_t error = B_OK;
 	if (VolumeReadLocker locker = volume) {
 		error = volume->FindNode(vnid, &foundNode);
-		if (error == B_OK)
+		if (error == B_OK) {
 			node->private_node = foundNode;
+			node->ops = &gRamFSVnodeOps;
+		}
 	} else
 		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
