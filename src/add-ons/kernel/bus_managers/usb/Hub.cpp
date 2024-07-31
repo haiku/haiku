@@ -287,7 +287,7 @@ Hub::Explore(change_item **changeList)
 					// transaction translator for the device.
 					int8 hubAddress = HubAddress();
 					uint8 hubPort = HubPort();
-					if (Speed() == USB_SPEED_HIGHSPEED || Speed() == USB_SPEED_SUPERSPEED) {
+					if (Speed() == USB_SPEED_HIGHSPEED || Speed() >= USB_SPEED_SUPERSPEED) {
 						hubAddress = DeviceAddress();
 						hubPort = i + 1;
 					}

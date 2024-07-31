@@ -536,7 +536,7 @@ Device::InitEndpoints(int32 interfaceIndex)
 			Pipe* pipe = NULL;
 
 			usb_endpoint_ss_companion_descriptor* comp_descr = NULL;
-			if (fSpeed == USB_SPEED_SUPERSPEED) {
+			if (fSpeed >= USB_SPEED_SUPERSPEED) {
 				// We should have a companion descriptor for this device.
 				// Let's find it: it'll be the "i"th one.
 				size_t k = 0;

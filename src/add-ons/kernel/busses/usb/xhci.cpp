@@ -1596,6 +1596,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	case USB_SPEED_SUPERSPEED:
 		dwslot0 |= SLOT_0_SPEED(4);
 		break;
+	case USB_SPEED_SUPERSPEEDPLUS:
+		dwslot0 |= SLOT_0_SPEED(5);
+		break;
 	default:
 		TRACE_ERROR("unknown usb speed\n");
 		break;
@@ -2198,6 +2201,7 @@ XHCI::ConfigureEndpoint(xhci_endpoint* ep, uint8 slot, uint8 number, uint8 type,
 
 		case USB_SPEED_HIGHSPEED:
 		case USB_SPEED_SUPERSPEED:
+		case USB_SPEED_SUPERSPEEDPLUS:
 		default:
 			// Convert 1-16 into 0-15.
 			calcInterval = min_c(max_c(interval, 1), 16) - 1;
@@ -2216,7 +2220,7 @@ XHCI::ConfigureEndpoint(xhci_endpoint* ep, uint8 slot, uint8 number, uint8 type,
 	if (speed == USB_SPEED_HIGHSPEED && (type & (USB_OBJECT_INTERRUPT_PIPE
 			| USB_OBJECT_ISO_PIPE)) != 0) {
 		maxBurst = (maxPacketSize & 0x1800) >> 11;
-	} else if (speed != USB_SPEED_SUPERSPEED) {
+	} else if (speed < USB_SPEED_SUPERSPEED) {
 		maxBurst = 0;
 	}
 	dwendpoint1 |= ENDPOINT_1_MAXBURST(maxBurst);
@@ -2255,7 +2259,7 @@ XHCI::ConfigureEndpoint(xhci_endpoint* ep, uint8 slot, uint8 number, uint8 type,
 		// for isochronous endpoints that specifies the maximum ESIT payload.
 		// We don't fetch this yet, so just fall back to the USB2 computation
 		// method if bytesPerInterval is 0.
-		if (speed == USB_SPEED_SUPERSPEED && bytesPerInterval != 0)
+		if (speed >= USB_SPEED_SUPERSPEED && bytesPerInterval != 0)
 			dwendpoint4 |= ENDPOINT_4_MAXESITPAYLOAD(bytesPerInterval);
 		else if (speed >= USB_SPEED_HIGHSPEED)
 			dwendpoint4 |= ENDPOINT_4_MAXESITPAYLOAD((maxBurst + 1) * maxPacketSize);
@@ -2302,6 +2306,9 @@ XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 	case 4:
 		*speed = USB_SPEED_SUPERSPEED;
 		break;
+	case 5:
+		*speed = USB_SPEED_SUPERSPEEDPLUS;
+		break;
 	default:
 		TRACE_ALWAYS("nonstandard port speed %" B_PRId32 ", assuming SuperSpeed\n",
 			PS_SPEED_GET(portStatus));
@@ -2344,12 +2351,12 @@ XHCI::GetPortStatus(uint8 index, usb_port_status* status)
 	if (portStatus & PS_PR)
 		status->status |= PORT_STATUS_RESET;
 	if (portStatus & PS_PP) {
-		if (fPortSpeeds[index] == USB_SPEED_SUPERSPEED)
+		if (fPortSpeeds[index] >= USB_SPEED_SUPERSPEED)
 			status->status |= PORT_STATUS_SS_POWER;
 		else
 			status->status |= PORT_STATUS_POWER;
 	}
-	if (fPortSpeeds[index] == USB_SPEED_SUPERSPEED)
+	if (fPortSpeeds[index] >= USB_SPEED_SUPERSPEED)
 		status->status |= portStatus & PS_PLS_MASK;
 
 	// build the change
@@ -2362,7 +2369,7 @@ XHCI::GetPortStatus(uint8 index, usb_port_status* status)
 	if (portStatus & PS_PRC)
 		status->change |= PORT_STATUS_RESET;
 
-	if (fPortSpeeds[index] == USB_SPEED_SUPERSPEED) {
+	if (fPortSpeeds[index] >= USB_SPEED_SUPERSPEED) {
 		if (portStatus & PS_PLC)
 			status->change |= PORT_CHANGE_LINK_STATE;
 		if (portStatus & PS_WRC)

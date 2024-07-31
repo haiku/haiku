@@ -303,6 +303,7 @@ Transfer::_CalculateBandwidth()
 		}
 
 		case USB_SPEED_SUPERSPEED:
+		case USB_SPEED_SUPERSPEEDPLUS:
 		{
 			// TODO it should only be useful for isochronous type
 			bandwidthNS = 0;
