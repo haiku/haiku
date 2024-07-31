@@ -52,9 +52,6 @@ public:
 			const uint8*		CursorData() const
 									{ return fCursorData; }
 
-protected:
-	virtual	void				LastReferenceReleased();
-
 private:
 	friend class CursorManager;
 

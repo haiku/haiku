@@ -182,28 +182,20 @@ CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 }
 
 
-/*!	\brief Removes a cursor if it's not referenced anymore.
+/*!	\brief Removes a cursor.
 
 	If this was the last reference to this cursor, it will be deleted.
-	Only if the cursor is deleted, \c true is returned.
 */
-bool
+void
 CursorManager::RemoveCursor(ServerCursor* cursor)
 {
 	if (!Lock())
-		return false;
-
-	// TODO: this doesn't work as it looks like, and it's not safe!
-	if (cursor->CountReferences() > 0) {
-		// cursor has been referenced again in the mean time
-		Unlock();
-		return false;
-	}
+		return;
 
 	_RemoveCursor(cursor);
+	cursor->ReleaseReference();
 
 	Unlock();
-	return true;
 }
 
 
@@ -218,8 +210,11 @@ CursorManager::DeleteCursors(team_id team)
 
 	for (int32 index = fCursorList.CountItems(); index-- > 0;) {
 		ServerCursor* cursor = (ServerCursor*)fCursorList.ItemAtFast(index);
-		if (cursor->OwningTeam() == team)
-			cursor->ReleaseReference();
+		if (cursor->OwningTeam() != team)
+			continue;
+
+		_RemoveCursor(cursor);
+		cursor->ReleaseReference();
 	}
 
 	Unlock();
@@ -439,4 +434,5 @@ CursorManager::_RemoveCursor(ServerCursor* cursor)
 {
 	fCursorList.RemoveItem(cursor);
 	fTokenSpace.RemoveToken(cursor->fToken);
+	cursor->fToken = -1;
 }

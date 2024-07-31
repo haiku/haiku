@@ -43,7 +43,7 @@ public:
 									int32 token = -1);
 			void				DeleteCursors(team_id team);
 
-			bool				RemoveCursor(ServerCursor* cursor);
+			void				RemoveCursor(ServerCursor* cursor);
 
 			void				SetCursorSet(const char* path);
 			ServerCursor*		GetCursor(BCursorID which);

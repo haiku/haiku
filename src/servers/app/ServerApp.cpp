@@ -1248,27 +1248,46 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_REFERENCE_CURSOR:
+		case AS_CLONE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Reference BCursor\n", Signature()));
 
 			// Attached data:
-			// 1) int32 token ID of the cursor to reference
+			// 1) int32 token ID of the cursor to clone
 
 			int32 token;
 			if (link.Read<int32>(&token) != B_OK)
 				break;
 
-			if (!fDesktop->GetCursorManager().Lock())
-				break;
+			status_t status = B_ERROR;
+			ServerCursor* cursor = NULL;
 
-			ServerCursor* cursor
-				= fDesktop->GetCursorManager().FindCursor(token);
-			if (cursor != NULL)
-				cursor->AcquireReference();
+			if (fDesktop->GetCursorManager().Lock()) {
+				ServerCursor* existingCursor
+					= fDesktop->GetCursorManager().FindCursor(token);
+				if (existingCursor != NULL)
+					cursor = new(std::nothrow) ServerCursor(existingCursor);
+				if (cursor != NULL) {
+					cursor->SetOwningTeam(fClientTeam);
+					token = fDesktop->GetCursorManager().AddCursor(cursor);
+					if (token < 0) {
+						delete cursor;
+						cursor = NULL;
+					}
+				}
 
-			fDesktop->GetCursorManager().Unlock();
+				fDesktop->GetCursorManager().Unlock();
+			}
 
+			if (cursor != NULL) {
+				// Synchronous message - BApplication is waiting on the
+				// cursor's ID
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(cursor->Token());
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
 			break;
 		}
 
@@ -1288,8 +1307,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			ServerCursor* cursor
 				= fDesktop->GetCursorManager().FindCursor(token);
-			if (cursor != NULL)
-				cursor->ReleaseReference();
+			if (cursor != NULL && cursor->OwningTeam() == fClientTeam)
+				fDesktop->GetCursorManager().RemoveCursor(cursor);
 
 			fDesktop->GetCursorManager().Unlock();
 

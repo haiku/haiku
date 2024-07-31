@@ -190,12 +190,3 @@ ServerCursor::AttachedToManager(CursorManager* manager)
 {
 	fManager = manager;
 }
-
-
-void
-ServerCursor::LastReferenceReleased()
-{
-	if (fManager == NULL || fManager->RemoveCursor(this))
-		delete this;
-}
-
