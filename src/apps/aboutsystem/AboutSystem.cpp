@@ -1994,7 +1994,7 @@ AboutView::_CreateCreditsView()
 
 	// Zydis copyrights
 	_AddPackageCredit(PackageCredit("Zydis")
-		.SetCopyrights(B_TRANSLATE(COPYRIGHT_STRING "2014-2024 Florian Bernd "
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2014-2024 Florian Bernd "
 			"and Joel Höner. All rights reserved."))
 		.SetLicense("MIT")
 		.SetURL("https://zydis.re/"));
