@@ -30,6 +30,7 @@
 #include <NetUtilities.h>
 
 #include <lock.h>
+#include <low_resource_manager.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
@@ -321,6 +322,7 @@ enum {
 	FLAG_LOCAL					= 0x20,
 	FLAG_RECOVERY				= 0x40,
 	FLAG_OPTION_SACK_PERMITTED	= 0x80,
+	FLAG_AUTO_RECEIVE_BUFFER_SIZE = 0x100,
 };
 
 
@@ -452,7 +454,8 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fCongestionWindow(0),
 	fSlowStartThreshold(0),
 	fState(CLOSED),
-	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP | FLAG_OPTION_SACK_PERMITTED)
+	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP
+		| FLAG_OPTION_SACK_PERMITTED | FLAG_AUTO_RECEIVE_BUFFER_SIZE)
 {
 	// TODO: to be replaced with a real read/write locking strategy!
 	mutex_init(&fLock, "tcp lock");
@@ -1073,6 +1076,7 @@ TCPEndpoint::SetReceiveBufferSize(size_t length)
 {
 	MutexLocker _(fLock);
 	fReceiveQueue.SetMaxBytes(length);
+	fFlags &= ~FLAG_AUTO_RECEIVE_BUFFER_SIZE;
 	return B_OK;
 }
 
@@ -1351,6 +1355,67 @@ TCPEndpoint::_UpdateTimestamps(tcp_segment_header& segment,
 }
 
 
+void
+TCPEndpoint::_UpdateReceiveBuffer()
+{
+	if (fReceiveWindowShift == 0 || fSmoothedRoundTripTime < 0)
+		return;
+	if ((fFlags & FLAG_AUTO_RECEIVE_BUFFER_SIZE) == 0)
+		return;
+
+	const uint64 maxWindowSize = UINT16_MAX << fReceiveWindowShift;
+	if (fReceiveQueue.Size() == maxWindowSize) {
+		// The window is already as large as it could be.
+		return;
+	}
+
+	if (fReceiveSizingTimestamp == 0) {
+		fReceiveSizingTimestamp = tcp_now();
+		fReceiveSizingReference = fReceiveNext;
+		return;
+	}
+
+	const uint32 received = (fReceiveNext - fReceiveSizingReference).Number();
+	if (received < (fReceiveQueue.Size() / 2))
+		return;
+
+	const uint32 since = tcp_diff_timestamp(fReceiveSizingTimestamp);
+	if (since == 0 || since < ((uint32)fSmoothedRoundTripTime * 2))
+		return;
+
+	fReceiveSizingTimestamp = tcp_now();
+	fReceiveSizingReference = fReceiveNext;
+
+	// TODO: add low_resource hook to reduce window sizes.
+	if (low_resource_state(B_KERNEL_RESOURCE_MEMORY) != B_NO_LOW_RESOURCE)
+		return;
+
+	// Target a window large enough to fit one second of traffic.
+	const uint64 oneSecondReceive = (received * 1000LL) / since;
+	if (fReceiveQueue.Size() >= oneSecondReceive)
+		return;
+
+	// Don't increase the window size too rapidly.
+	uint32 newWindowSize = min_c(oneSecondReceive, UINT32_MAX);
+	if (newWindowSize > (fReceiveQueue.Size() * 2))
+		newWindowSize = fReceiveQueue.Size() * 2;
+
+	// Round to the window shift and max segment size.
+	uint32 newWindowShifted = newWindowSize >> fReceiveWindowShift;
+	const uint32 maxSegmentShifted = fReceiveMaxSegmentSize >> fReceiveWindowShift;
+	newWindowShifted = (newWindowShifted / maxSegmentShifted) * maxSegmentShifted;
+	newWindowSize = newWindowShifted << fReceiveWindowShift;
+
+	if (newWindowSize > maxWindowSize)
+		newWindowSize = maxWindowSize;
+	if (fReceiveQueue.Size() >= newWindowSize)
+		return;
+
+	fReceiveQueue.SetMaxBytes(newWindowSize);
+	TRACE("TCPEndpoint: updated receive buffer size to %" B_PRIu32 "\n", newWindowSize);
+}
+
+
 ssize_t
 TCPEndpoint::_AvailableData() const
 {
@@ -1403,6 +1468,8 @@ TCPEndpoint::_AddData(tcp_segment_header& segment, net_buffer* buffer)
 	TRACE("  _AddData(): adding data, receive next = %" B_PRIu32 ". Now have %"
 		B_PRIuSIZE " bytes.", fReceiveNext.Number(), fReceiveQueue.Available());
 
+	_UpdateReceiveBuffer();
+
 	if ((segment.flags & TCP_FLAG_PUSH) != 0)
 		fReceiveQueue.SetPushPointer();
 
@@ -1415,6 +1482,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 {
 	fInitialReceiveSequence = segment.sequence;
 	fFinishReceived = false;
+	fReceiveSizingTimestamp = 0;
 
 	// count the received SYN
 	segment.sequence++;
@@ -1445,8 +1513,10 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 		} else
 			fFlags &= ~FLAG_OPTION_TIMESTAMP;
 
-		if ((segment.options & TCP_SACK_PERMITTED) == 0)
+		if ((segment.options & TCP_SACK_PERMITTED) == 0) {
 			fFlags &= ~FLAG_OPTION_SACK_PERMITTED;
+			fFlags &= ~FLAG_AUTO_RECEIVE_BUFFER_SIZE;
+		}
 	}
 
 	if (fSendMaxSegmentSize > 2190)
@@ -2342,9 +2412,13 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 	// this option, this will be reset to 0 (when its SYN is received)
 	fReceiveWindowShift = 0;
 	while (fReceiveWindowShift < TCP_MAX_WINDOW_SHIFT
-		&& (0xffffUL << fReceiveWindowShift) < socket->receive.buffer_size) {
+			&& (0xffffUL << fReceiveWindowShift) < socket->receive.buffer_size) {
 		fReceiveWindowShift++;
 	}
+
+	// Increase to a default of 8 (window minimum 256 bytes, maximum 15 MB.)
+	if (fReceiveWindowShift < 8 && !IsLocal())
+		fReceiveWindowShift = 8;
 
 	return B_OK;
 }

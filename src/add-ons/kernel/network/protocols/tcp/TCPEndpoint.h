@@ -100,6 +100,7 @@ private:
 							net_buffer* buffer);
 			void		_UpdateTimestamps(tcp_segment_header& segment,
 							size_t segmentLength);
+			void		_UpdateReceiveBuffer();
 			void		_MarkEstablished();
 			status_t	_WaitForEstablished(MutexLocker& lock,
 							bigtime_t timeout);
@@ -179,6 +180,9 @@ private:
 	bigtime_t		fRetransmitTimeout;
 
 	uint32			fReceivedTimestamp;
+
+	tcp_sequence	fReceiveSizingReference;
+	uint32			fReceiveSizingTimestamp;
 
 	uint32			fCongestionWindow;
 	uint32			fSlowStartThreshold;
