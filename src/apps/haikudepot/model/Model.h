@@ -12,7 +12,7 @@
 
 #include "AbstractProcess.h"
 #include "DepotInfo.h"
-#include "LanguageModel.h"
+#include "LanguageRepository.h"
 #include "PackageFilterModel.h"
 #include "PackageIconTarRepository.h"
 #include "PackageInfo.h"
@@ -59,7 +59,6 @@ public:
 								Model();
 	virtual						~Model();
 
-			LanguageModel*		Language();
 			PackageFilterModel*	PackageFilter();
 			PackageIconRepository&
 								GetPackageIconRepository();
@@ -71,6 +70,10 @@ public:
 									{ return &fLock; }
 
 			void				AddListener(const ModelListenerRef& listener);
+
+			LanguageRef			PreferredLanguage() const;
+			void				SetPreferredLanguage(LanguageRef value);
+			LanguageRepository*	Languages();
 
 			PackageInfoRef		PackageForName(const BString& name);
 
@@ -162,6 +165,8 @@ private:
 private:
 			BLocker				fLock;
 
+			LanguageRef			fPreferredLanguage;
+
 			std::vector<DepotInfoRef>
 								fDepots;
 			std::vector<CategoryRef>
@@ -177,8 +182,10 @@ private:
 			bool				fCanShareAnonymousUsageData;
 
 			WebAppInterface		fWebAppInterface;
-			LanguageModel		fLanguageModel;
+
 			PackageFilterModel*	fPackageFilterModel;
+
+			LanguageRepository*	fLanguageRepository;
 			PackageIconTarRepository
 								fPackageIconRepository;
 			PackageScreenshotRepository*

@@ -16,15 +16,16 @@
 #include <FileIO.h>
 #include <Url.h>
 
-#include "ServerSettings.h"
-#include "StorageUtils.h"
-#include "Logger.h"
 #include "DumpExportReference.h"
+#include "DumpExportReferenceCountry.h"
+#include "DumpExportReferenceJsonListener.h"
 #include "DumpExportReferenceNaturalLanguage.h"
 #include "DumpExportReferencePkgCategory.h"
 #include "DumpExportReferenceUserRatingStability.h"
-#include "DumpExportReferenceCountry.h"
-#include "DumpExportReferenceJsonListener.h"
+#include "LocaleUtils.h"
+#include "Logger.h"
+#include "ServerSettings.h"
+#include "StorageUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -65,8 +66,7 @@ ServerReferenceDataUpdateProcess::UrlPathComponent()
 {
 	BString result;
 	AutoLocker<BLocker> locker(fModel->Lock());
-	result.SetToFormat("/__reference/all-%s.json.gz",
-		fModel->Language()->PreferredLanguage()->ID());
+	result.SetToFormat("/__reference/all-%s.json.gz", fModel->PreferredLanguage()->ID());
 	return result;
 }
 
@@ -126,28 +126,26 @@ ServerReferenceDataUpdateProcess::_ProcessNaturalLanguages(
 	HDINFO("[%s] will populate from %" B_PRId32 " possible natural languages",
 		Name(), data->CountNaturalLanguages());
 	AutoLocker<BLocker> locker(fModel->Lock());
-	LanguageModel* languageModel = fModel->Language();
-	languageModel->ClearSupportedLanguages();
+
+	LanguageRepository* languageRepository = fModel->Languages();
+	languageRepository->Clear();
 	int32 count = 0;
 
 	for (int32 i = 0; i < data->CountNaturalLanguages(); i++) {
 		DumpExportReferenceNaturalLanguage* naturalLanguage =
 			data->NaturalLanguagesItemAt(i);
-		languageModel->AddSupportedLanguage(LanguageRef(
-			new Language(
-				*(naturalLanguage->Code()),
-				*(naturalLanguage->Name()),
-				naturalLanguage->IsPopular()
-			),
-			true)
-		);
+		languageRepository->AddLanguage(
+			LanguageRef(new Language(*(naturalLanguage->Code()), *(naturalLanguage->Name()),
+					naturalLanguage->IsPopular()),
+		true));
 		count++;
 	}
 
-	languageModel->SetPreferredLanguageToSystemDefault();
+	// it could be that the preferred language does not exist in the
+	// list.  In this case it is necessary to choose one from the list.
+	fModel->SetPreferredLanguage(LocaleUtils::DeriveDefaultLanguage(fModel->Languages()));
 
-	HDINFO("[%s] did add %" B_PRId32 " supported languages",
-		Name(), count);
+	HDINFO("[%s] did add %" B_PRId32 " supported languages", Name(), count);
 
 	return B_OK;
 }

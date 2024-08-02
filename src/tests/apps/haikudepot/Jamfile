@@ -50,8 +50,8 @@ UnitTestLib haikudepottest.so :
 	LocaleUtils.cpp
 
 	Language.cpp
-	LanguageModel.cpp
-	LanguageModelTest.cpp
+	LanguageRepository.cpp
+	LocaleUtilsTest.cpp
 
 	StandardMetaData.cpp
 	StandardMetaDataJsonEventListener.cpp

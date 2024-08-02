@@ -89,7 +89,9 @@ private:
 									const BMessage& settings);
 			void				_PromptCanShareAnonymousUserData();
 
+			void				_InitPreferredLanguage();
 			void				_InitWorkerThreads();
+
 			void				_AdoptModelControls();
 			void				_AdoptModel();
 			void				_AddRemovePackageFromLists(

@@ -39,6 +39,19 @@ StringUtils::InSituStripSpaceAndControl(BString& value)
 }
 
 
+/*static*/ int
+StringUtils::NullSafeCompare(const char* s1, const char* s2)
+{
+	if ((NULL == s1) && (NULL == s2))
+		return 0;
+	if (NULL == s1)
+		return 1;
+	if (NULL == s2)
+		return -1;
+	return strcmp(s1, s2);
+}
+
+
 /*static*/ bool
 StringUtils::_IsSpaceOrControl(char ch)
 {

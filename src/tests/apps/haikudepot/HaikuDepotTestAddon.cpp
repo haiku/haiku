@@ -7,16 +7,16 @@
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "StandardMetaDataJsonEventListenerTest.h"
 #include "DataIOUtilsTest.h"
 #include "DumpExportRepositoryJsonListenerTest.h"
-#include "LanguageModelTest.h"
 #include "JwtTokenHelperTest.h"
-#include "ValidationFailureTest.h"
-#include "ValidationUtilsTest.h"
+#include "LocaleUtilsTest.h"
+#include "StandardMetaDataJsonEventListenerTest.h"
 #include "StorageUtilsTest.h"
 #include "StringUtilsTest.h"
 #include "TarArchiveServiceTest.h"
+#include "ValidationFailureTest.h"
+#include "ValidationUtilsTest.h"
 
 
 BTestSuite*
@@ -28,7 +28,7 @@ getTestSuite()
 	DataIOUtilsTest::AddTests(*suite);
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
 	DumpExportRepositoryJsonListenerTest::AddTests(*suite);
-	LanguageModelTest::AddTests(*suite);
+	LocaleUtilsTest::AddTests(*suite);
 	JwtTokenHelperTest::AddTests(*suite);
 	ValidationFailureTest::AddTests(*suite);
 	ValidationUtilsTest::AddTests(*suite);

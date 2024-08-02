@@ -9,6 +9,10 @@
 #include <String.h>
 
 
+#include "Language.h"
+#include "LanguageRepository.h"
+
+
 class BCollator;
 
 
@@ -22,11 +26,29 @@ public:
 
 	static	BString			CreateTranslatedIAmMinimumAgeSlug(int minimumAge);
 
+	static	LanguageRef		DeriveDefaultLanguage(LanguageRepository* repository);
+
+	static	void			SetForcedSystemDefaultLanguageID(const BString& id);
+		// exposed for testing
+
 private:
-	static	void			GetCollator(BCollator* collator);
+
+	static	LanguageRef		_FindBestMatchingLanguage(LanguageRepository* repository,
+								const char* code, const char* countryCode,
+								const char* scriptCode);
+
+	static	LanguageRef		_DeriveSystemDefaultLanguage();
+
+	static	int32			_IndexOfBestMatchingLanguage(LanguageRepository* repository,
+								const char* code, const char* countryCode,
+								const char* scriptCode);
+
+	static	void			_GetCollator(BCollator* collator);
 
 private:
 	static	BCollator*		sSharedCollator;
+
+	static	BString			sForcedSystemDefaultLanguageID;
 };
 
 

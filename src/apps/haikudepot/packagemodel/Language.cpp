@@ -9,6 +9,13 @@
 #include "Language.h"
 
 
+#include "Logger.h"
+#include "StringUtils.h"
+
+
+/*! serverName is the name of the language on the server.
+ */
+
 Language::Language(const char* language, const BString& serverName,
 	bool isPopular)
 	:
@@ -29,8 +36,7 @@ Language::Language(const Language& other)
 
 
 status_t
-Language::GetName(BString& name,
-const BLanguage* displayLanguage) const
+Language::GetName(BString& name, const BLanguage* displayLanguage) const
 {
 	status_t result = BLanguage::GetName(name, displayLanguage);
 
@@ -38,4 +44,25 @@ const BLanguage* displayLanguage) const
 		name.SetTo(fServerName);
 
 	return result;
+}
+
+
+int
+Language::Compare(const Language& other) const
+{
+	int result = StringUtils::NullSafeCompare(Code(), other.Code());
+	if (0 == result)
+		result = StringUtils::NullSafeCompare(CountryCode(), other.CountryCode());
+	if (0 == result)
+		result = StringUtils::NullSafeCompare(ScriptCode(), other.ScriptCode());
+	return result;
+}
+
+
+bool
+IsLanguageBefore(const LanguageRef& l1, const LanguageRef& l2)
+{
+	if (!l1.IsSet() || !l2.IsSet())
+		HDFATAL("unexpected NULL reference in a referencable");
+	return l1.Get()->Compare(*(l2.Get())) < 0;
 }

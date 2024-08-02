@@ -242,9 +242,8 @@ BString
 ServerPkgDataUpdateProcess::UrlPathComponent()
 {
 	BString urlPath;
-	urlPath.SetToFormat("/__pkg/all-%s-%s.json.gz",
-		_DeriveWebAppRepositorySourceCode().String(),
-		fModel->Language()->PreferredLanguage()->ID());
+	urlPath.SetToFormat("/__pkg/all-%s-%s.json.gz", _DeriveWebAppRepositorySourceCode().String(),
+		fModel->PreferredLanguage()->ID());
 	return urlPath;
 }
 

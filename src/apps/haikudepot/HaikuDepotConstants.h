@@ -102,8 +102,6 @@ enum UserUsageConditionsSelectionMode {
 
 
 #define LANGUAGE_DEFAULT_ID "en"
-#define LANGUAGE_DEFAULT Language(LANGUAGE_DEFAULT_ID, "English", true)
-
 
 #define PACKAGE_INFO_MAX_USER_RATINGS 250
 

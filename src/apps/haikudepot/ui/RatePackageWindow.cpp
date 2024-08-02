@@ -270,9 +270,9 @@ void
 RatePackageWindow::_InitLanguagesMenu(BPopUpMenu* menu)
 {
 	AutoLocker<BLocker> locker(fModel.Lock());
-	fCommentLanguageId = fModel.Language()->PreferredLanguage()->ID();
+	fCommentLanguageId = fModel.PreferredLanguage()->ID();
 
-	LanguageMenuUtils::AddLanguagesToMenu(fModel.Language(), menu);
+	LanguageMenuUtils::AddLanguagesToMenu(fModel.Languages(), menu);
 	menu->SetTargetForItems(this);
 	LanguageMenuUtils::MarkLanguageInMenu(fCommentLanguageId, menu);
 }

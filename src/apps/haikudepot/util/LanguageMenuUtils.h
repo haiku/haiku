@@ -18,7 +18,7 @@ class LanguageMenuUtils {
 
 public:
 	static	void			AddLanguagesToMenu(
-								const LanguageModel* languagesModel,
+								const LanguageRepository* repository,
 								BMenu* menu);
 	static	void			MarkLanguageInMenu(
 								const BString& languageId,

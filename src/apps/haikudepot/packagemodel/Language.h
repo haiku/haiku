@@ -29,10 +29,18 @@ public:
 			bool				IsPopular() const
 									{ return fIsPopular; }
 
+			int					Compare(const Language& language) const;
+
 private:
 			BString				fServerName;
 			bool				fIsPopular;
 };
+
+
+typedef BReference<Language> LanguageRef;
+
+
+extern bool IsLanguageBefore(const LanguageRef& l1, const LanguageRef& l2);
 
 
 #endif // LANGUAGE_H

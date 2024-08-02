@@ -51,11 +51,18 @@ ModelListener::~ModelListener()
 
 Model::Model()
 	:
+	fPreferredLanguage(LanguageRef(new Language(LANGUAGE_DEFAULT_ID, "English", true), true)),
 	fDepots(),
 	fCategories(),
 	fPackageListViewMode(PROMINENT),
 	fCanShareAnonymousUsageData(false)
 {
+
+	// setup the language into a default state with a hard-coded language so
+	// that there is a language at all.
+	fLanguageRepository = new LanguageRepository();
+	fLanguageRepository->AddLanguage(fPreferredLanguage);
+
 	fPackageFilterModel = new PackageFilterModel();
 	fPackageScreenshotRepository = new PackageScreenshotRepository(
 		PackageScreenshotRepositoryListenerRef(this),
@@ -67,13 +74,14 @@ Model::~Model()
 {
 	delete fPackageFilterModel;
 	delete fPackageScreenshotRepository;
+	delete fLanguageRepository;
 }
 
 
-LanguageModel*
-Model::Language()
+LanguageRepository*
+Model::Languages()
 {
-	return &fLanguageModel;
+	return fLanguageRepository;
 }
 
 
@@ -113,6 +121,23 @@ void
 Model::AddListener(const ModelListenerRef& listener)
 {
 	fListeners.push_back(listener);
+}
+
+
+LanguageRef
+Model::PreferredLanguage() const
+{
+	return fPreferredLanguage;
+}
+
+
+void
+Model::SetPreferredLanguage(LanguageRef value)
+{
+	if (value.IsSet()) {
+		if (fPreferredLanguage != value)
+			fPreferredLanguage = value;
+	}
 }
 
 
@@ -577,8 +602,7 @@ status_t
 Model::DumpExportRepositoryDataPath(BPath& path)
 {
 	BString leaf;
-	leaf.SetToFormat("repository-all_%s.json.gz",
-		Language()->PreferredLanguage()->ID());
+	leaf.SetToFormat("repository-all_%s.json.gz", PreferredLanguage()->ID());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -592,8 +616,7 @@ status_t
 Model::DumpExportReferenceDataPath(BPath& path)
 {
 	BString leaf;
-	leaf.SetToFormat("reference-all_%s.json.gz",
-		Language()->PreferredLanguage()->ID());
+	leaf.SetToFormat("reference-all_%s.json.gz", PreferredLanguage()->ID());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 
@@ -611,7 +634,7 @@ Model::DumpExportPkgDataPath(BPath& path,
 {
 	BString leaf;
 	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(),
-		Language()->PreferredLanguage()->ID());
+		PreferredLanguage()->ID());
 	return StorageUtils::LocalWorkingFilesPath(leaf, path);
 }
 

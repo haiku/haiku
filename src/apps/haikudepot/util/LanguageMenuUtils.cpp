@@ -28,22 +28,20 @@ static const char* kLanguageIdKey = "id";
 */
 
 /* static */ void
-LanguageMenuUtils::AddLanguagesToMenu(
-	const LanguageModel* languageModel, BMenu* menu)
+LanguageMenuUtils::AddLanguagesToMenu(const LanguageRepository* repository, BMenu* menu)
 {
-	if (languageModel->CountSupportedLanguages() == 0)
+	if (repository->IsEmpty())
 		HDINFO("there are no languages defined");
 
 	// collect all of the languages into a vector so that they can be sorted
 	// and used.
 
-	std::vector<LanguageRef> languages(languageModel->CountSupportedLanguages());
+	std::vector<LanguageRef> languages(repository->CountLanguages());
 
-	for (int32 i = 0; i < languageModel->CountSupportedLanguages(); i++) {
-		languages[i] = languageModel->SupportedLanguageAt(i);
-	}
+	for (int32 i = repository->CountLanguages(); i >= 0; i--)
+		languages[i] = repository->LanguageAtIndex(i);
 
-	std::sort(languages.begin(), languages.end(), _IsLanguagePresentationBefore);
+	std::sort(languages.begin(), languages.end(), IsLanguageBefore);
 
 	// now add the sorted languages to the menu.
 

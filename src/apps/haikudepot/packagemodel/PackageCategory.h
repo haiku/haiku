@@ -38,8 +38,7 @@ private:
 typedef BReference<PackageCategory> CategoryRef;
 
 
-extern bool IsPackageCategoryBefore(const CategoryRef& c1,
-	const CategoryRef& c2);
+extern bool IsPackageCategoryBefore(const CategoryRef& c1, const CategoryRef& c2);
 
 
 #endif // PACKAGE_CATEGORY_H

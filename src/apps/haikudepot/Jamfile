@@ -128,7 +128,7 @@ local applicationSources =
 	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
 	JwtTokenHelper.cpp
-	LanguageModel.cpp
+	LanguageRepository.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp
 	Logger.cpp

@@ -156,14 +156,13 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 
 	{
 		AutoLocker<BLocker> locker(fModel.Lock());
-		fPreferredLanguageId = fModel.Language()->PreferredLanguage()->ID();
+		fPreferredLanguageId = fModel.PreferredLanguage()->ID();
 		// Construct languages popup
 		BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
 		fLanguageIdField = new BMenuField("language", B_TRANSLATE("Preferred language:"),
 			languagesMenu);
 
-		LanguageMenuUtils::AddLanguagesToMenu(
-			fModel.Language(), languagesMenu);
+		LanguageMenuUtils::AddLanguagesToMenu(fModel.Languages(), languagesMenu);
 		languagesMenu->SetTargetForItems(this);
 
 		HDINFO("using preferred language code [%s]", fPreferredLanguageId.String());
