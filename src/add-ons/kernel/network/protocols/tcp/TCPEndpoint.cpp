@@ -390,17 +390,18 @@ is_establishing(tcp_state state)
 }
 
 
-static inline uint32 tcp_now()
+static inline uint32
+tcp_now()
 {
 	return system_time() / kTimestampFactor;
 }
 
 
-static inline uint32 tcp_diff_timestamp(uint32 base)
+static inline uint32
+tcp_diff_timestamp(uint32 base)
 {
-	uint32 now = tcp_now();
-
-	if (now > base)
+	const uint32 now = tcp_now();
+	if (now >= base)
 		return now - base;
 
 	return now + UINT_MAX - base;
@@ -445,7 +446,7 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fReceiveWindow(socket->receive.buffer_size),
 	fReceiveMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
 	fReceiveQueue(socket->receive.buffer_size),
-	fSmoothedRoundTripTime(0),
+	fSmoothedRoundTripTime(-1),
 	fRoundTripVariation(0),
 	fSendTime(0),
 	fRoundTripStartSequence(0),
@@ -2541,10 +2542,10 @@ TCPEndpoint::_Retransmit()
 void
 TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime, int32 expectedSamples)
 {
-	if (roundTripTime <= 0)
+	if (roundTripTime < 0)
 		return;
 
-	if (fSmoothedRoundTripTime == 0) {
+	if (fSmoothedRoundTripTime <= 0) {
 		fSmoothedRoundTripTime = roundTripTime;
 		fRoundTripVariation = roundTripTime / 2;
 		fRetransmitTimeout = (fSmoothedRoundTripTime + max_c(100, fRoundTripVariation * 4))
