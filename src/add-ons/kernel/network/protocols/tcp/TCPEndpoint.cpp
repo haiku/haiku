@@ -1031,9 +1031,17 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	if (fReceiveQueue.Available() == 0 && fState == FINISH_RECEIVED)
 		socket->receive.low_water_mark = 0;
 
-	// if we are opening the window, check if we should send an ACK
-	if (!clone)
-		_SendAcknowledge();
+	// if we opened the window, check if we should send a window update
+	if (!clone) {
+		// Only send if there's less than half the window size remaining.
+		// TODO: This should use fReceiveWindow but that stays constant at present
+		// due to another TODO.
+		uint32 windowSizeRemaining = (fReceiveMaxAdvertised - fReceiveNext).Number();
+		if (fReceiveNext == (fReceiveMaxAdvertised + 1))
+			windowSizeRemaining = 0;
+		if (windowSizeRemaining <= (fReceiveQueue.Size() / 2))
+			_SendAcknowledge();
+	}
 
 	return receivedBytes;
 }
@@ -2136,6 +2144,8 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header& segment, uint32 length,
 		// correct the window to take into account what already has been advertised
 		uint32 window = segment.AdvertisedWindow(fReceiveWindowShift)
 			- (fReceiveMaxAdvertised - fReceiveNext).Number();
+		if (fReceiveNext == (fReceiveMaxAdvertised + 1))
+			window = 0;
 
 		// if we can advertise a window larger than twice the maximum segment
 		// size, or half the maximum buffer size we send a window update
