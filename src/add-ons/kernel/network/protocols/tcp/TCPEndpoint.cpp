@@ -1696,16 +1696,11 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	int32 action = KEEP;
 
-	// immediately acknowledge out-of-order segment to trigger fast-retransmit at the sender
-	if (drop != 0) {
-		// If we have SACK enabled, the receive queue is already discontiguous, and
-		// this segment follows the highest-received one, don't send a duplicate ACK,
-		// because we already did. (The standard delayed ACK with SACK suffices.)
-		if (!((fFlags & FLAG_OPTION_SACK_PERMITTED) != 0
-				&& !fReceiveQueue.IsContiguous()
-				&& fReceiveQueue.LastSequence() == segment.sequence))
-			action |= IMMEDIATE_ACKNOWLEDGE;
-	}
+	// Immediately acknowledge out-of-order segments, as well as any
+	// in-order segments following out-of-order segments, to trigger
+	// fast-retransmit and fast-recovery at the sender.
+	if (drop != 0 || (drop == 0 && !fReceiveQueue.IsContiguous()))
+		action |= IMMEDIATE_ACKNOWLEDGE;
 
 	drop = (int32)(segment.sequence + buffer->size
 		- (fReceiveNext + fReceiveWindow)).Number();
