@@ -739,8 +739,7 @@ tcp_receive_data(net_buffer* buffer)
 		// There are some states in which the socket could have been deleted
 		// while handling a segment. If this flag is set in segmentAction
 		// then we know the socket has been freed and can skip releasing
-		// the reference acquired in EndpointManager::FindConnection()
-		// above.
+		// the reference acquired in EndpointManager::FindConnection().
 		if ((segmentAction & DELETED_ENDPOINT) == 0)
 			gSocketModule->release_socket(endpoint->socket);
 	} else if ((segment.flags & TCP_FLAG_RESET) == 0)

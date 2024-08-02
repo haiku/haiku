@@ -1167,9 +1167,8 @@ TCPEndpoint::_EnterTimeWait()
 {
 	TRACE("_EnterTimeWait()");
 
-	if (fState == TIME_WAIT) {
+	if (fState == TIME_WAIT)
 		_CancelConnectionTimers();
-	}
 
 	_UpdateTimeWait();
 }
@@ -1298,7 +1297,7 @@ TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 		fPreviousFlightSize = (fSendMax - fSendUnacknowledged).Number();
 
 	if (++fDuplicateAcknowledgeCount < 3) {
-		if (fSendQueue.Available(fSendMax) != 0  && fSendWindow != 0) {
+		if (fSendQueue.Available(fSendMax) != 0 && fSendWindow != 0) {
 			fSendNext = fSendMax;
 			fCongestionWindow += fDuplicateAcknowledgeCount * fSendMaxSegmentSize;
 			_SendQueued();
