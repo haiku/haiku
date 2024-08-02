@@ -587,13 +587,13 @@ TCPEndpoint::Free()
 	if (fState <= SYNCHRONIZE_SENT)
 		return;
 
-	// we are only interested in the timer, not in changing state
-	_EnterTimeWait();
-
 	fFlags |= FLAG_CLOSED;
 	if ((fFlags & FLAG_DELETE_ON_CLOSE) == 0) {
 		// we'll be freed later when the 2MSL timer expires
 		gSocketModule->acquire_socket(socket);
+
+		// we are only interested in the timer, not in changing state
+		_EnterTimeWait();
 	}
 }
 
