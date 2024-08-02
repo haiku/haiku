@@ -2592,6 +2592,7 @@ void
 TCPEndpoint::Dump() const
 {
 	kprintf("TCP endpoint %p\n", this);
+	kprintf("  socket: %p\n", socket);
 	kprintf("  state: %s\n", name_for_state(fState));
 	kprintf("  flags: 0x%" B_PRIx32 "\n", fFlags);
 #if KDEBUG
