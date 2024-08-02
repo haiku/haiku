@@ -1733,7 +1733,8 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 #endif
 
 	if (fSendWindow < fSendMaxSegmentSize
-			&& advertisedWindow >= fSendMaxSegmentSize) {
+			&& (advertisedWindow >= fSendMaxSegmentSize
+				|| advertisedWindow > (TCP_DEFAULT_MAX_SEGMENT_SIZE * 3))) {
 		// Our current send window is less than a segment wide, and the new one
 		// is larger, so trigger a send in case there's anything to be sent.
 		action |= SEND_QUEUED;
