@@ -29,8 +29,7 @@ WeakPointer::~WeakPointer()
 BWeakReferenceable*
 WeakPointer::Get()
 {
-	int32 count = -11;
-
+	int32 count;
 	do {
 		count = atomic_get(&fUseCount);
 		if (count == 0)
