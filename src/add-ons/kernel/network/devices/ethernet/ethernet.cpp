@@ -152,7 +152,7 @@ ethernet_init(const char *name, net_device **_device)
 	strcpy(device->name, name);
 	device->flags = IFF_BROADCAST | IFF_LINK;
 	device->type = IFT_ETHER;
-	device->mtu = 1500;
+	device->mtu = ETHER_MAX_FRAME_SIZE - ETHER_HEADER_LENGTH;
 	device->media = IFM_ACTIVE | IFM_ETHER;
 	device->header_length = ETHER_HEADER_LENGTH;
 	device->fd = -1;
