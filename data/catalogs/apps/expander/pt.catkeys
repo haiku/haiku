@@ -1,10 +1,11 @@
-1	portuguese	x-vnd.Haiku-Expander	3300517306
+1	portuguese	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destino
 Other	ExpanderPreferences		Outro
 Automatically show contents listing	ExpanderPreferences		Mostrar automaticamente listagem do conteúdo
 Expander	System name		Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Escolher destino
 Set source…	ExpanderMenu		Definir a fonte…
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
 The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida ou renomeada, ou não é suportada.
 Close window when done expanding	ExpanderPreferences		Fechar a janela quando terminar a expansão

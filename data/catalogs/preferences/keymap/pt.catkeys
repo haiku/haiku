@@ -1,16 +1,19 @@
-1	portuguese	x-vnd.Haiku-Keymap	1712484807
+1	portuguese	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tecla
 Japanese	KeymapNames		Japonês
 US	KeymapNames		EUA (US)
 PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
+Scroll Lock	Keyboard Layout View		Bloqueio de deslocamento (scroll)
 Brazilian	KeymapNames		Brasileiro
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (EUA)
+Right Option	Keyboard Layout View		Opção Direita
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opção:
 Cancel	Modifier keys window		Cancelar
 Sample and clipboard:	Keymap window		Exemplo e área de transferência:
 Polish	KeymapNames		Polaco
+Right Shift	Keyboard Layout View		Shift Direita
 Latin-American	KeymapNames		Latino-americano
 Ukrainian	KeymapNames		Ucraniano
 PAGE ↓	Keyboard Layout View		PÁGINA ↓
@@ -39,6 +42,7 @@ Croatian	KeymapNames		Croata
 PAGE ↑	Keyboard Layout View		PÁGINA ↑
 Set modifier keys	Modifier keys window		Ativar teclas modificadoras
 Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium Internacional
+Right Command	Keyboard Layout View		Comando Direita
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Tecla Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
@@ -50,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ucraniano (Mac)
 Command:	Modifier keys window	Command key role name	Comando:
 French (Bépo)	KeymapNames		Francês (Bépo)
 Russian (Typewriter)	KeymapNames		Russo (máquina de escrever)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Bloqueio de Maiúsculas (Caps Lock):
 Acute trigger	Keymap window		Acento agudo
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internacional
 Italian	KeymapNames		Italiano
@@ -59,6 +64,7 @@ French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
 Modifier keys	Modifier keys window		Teclas modificadoras
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Internacional
 Kazakh	KeymapNames		Cazaque
+Left Option	Keyboard Layout View		Opção Esquerda
 Save as…	Keymap window		Guardar como…
 Lithuanian (Standard)	KeymapNames		Lituano (padrão)
 Error: duplicate keys	Modifier keys window		Erro: teclas duplicadas
@@ -67,14 +73,17 @@ Bulgarian (Phonetic)	KeymapNames		Búlgaro (fonético)
 Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage
 Canadian-French	KeymapNames		Francês canadiano
 Hungarian	KeymapNames		Húngaro
+Right Control	Keyboard Layout View		Controlo Direita
 Control	Keyboard Layout View	Control key	Controlo
 Irish	KeymapNames		Irlandês
 Remove	Keyboard Layout View		Remover
 Tilde trigger	Keymap window		Til
+Caps Lock	Keyboard Layout View		Bloqueio de Maiúsculas (Caps Lock)
 Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROLO
 Macedonian	KeymapNames		Macedónio
 Czech (Mac)	KeymapNames		Checo (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tecla de Bloqueio de Maiúsculas (Caps Lock)
 Albanian	KeymapNames		Albanês
 (Current)	Keymap window		(Actual)
 OPT	Keyboard Layout View	Very short for 'option'	OPT
@@ -130,6 +139,7 @@ Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Disposição do Teclado
 Slovene	KeymapNames		Esloveno
 Lithuanian	KeymapNames		Lituano
+Left Command	Keyboard Layout View		Comando Esquerda
 Set modifier keys…	Keymap window		Definir teclas modificadoras…
 Switch shortcut keys to Haiku mode	Keymap window		Teclas de atalho em modo Haiku
 Defaults	Keymap window		Predefinições
@@ -152,6 +162,7 @@ TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Romeno
 CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	Comando
+Left Shift	Keyboard Layout View		Shift Esquerda
 SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		Ficheiro
 Brazilian (ABNT2)	KeymapNames		Brasileiro (ABNT2)
@@ -161,4 +172,6 @@ Dutch	KeymapNames		Holandês
 Diaeresis trigger	Keymap window		Trema
 Icelandic	KeymapNames		Islandês
 Open…	Keymap window		Abrir…
+Left Control	Keyboard Layout View		Controlo Esquerda
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)
+Num Lock	Keyboard Layout View		Bloqueio de teclado numérico (Num Lock)

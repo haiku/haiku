@@ -44,7 +44,7 @@ Unknown format	TypeEditors		Невідомий формат
 File: 	ProbeView		Файл: 
 Stop	ProbeView		Зупинити
 Cancel	ProbeView		Скасувати
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Неможливо відкрити \"%s\":\n%s
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Неможливо відкрити \«%s\»:\n%s
 Font size	ProbeView		Розмір шрифту
 Type editor not supported	ProbeView		Редактор типу не підтримується
 Native: 0x%0*Lx	ProbeView		Нативний: 0x%0*Lx
@@ -71,7 +71,7 @@ Mode:	FindWindow		Режим:
 32 bit size or status:	TypeEditors		32-бітовий розмір або стан:
 of 	ProbeView		з 
 Contents:	TypeEditors		Вміст:
-Could not open file \"%s\": %s\n	DiskProbe		Не вдалося відкрити файл \"%s\": %s\n
+Could not open file \"%s\": %s\n	DiskProbe		Не вдалося відкрити файл \«%s\»: %s\n
 Probe file…	OpenWindow		Дослідити файл…
 Block: 	ProbeView		Блок: 
 Bookmarks	ProbeView		Закладки

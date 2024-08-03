@@ -1,5 +1,6 @@
-1	portuguese	x-vnd.haiku-icon_o_matic	1244334028
+1	portuguese	x-vnd.haiku-icon_o_matic	3741627193
 None	Icon-O-Matic-Properties		Nenhum
+16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Adicionar vazia
 Opening the icon failed!	Icon-O-Matic-Main		Falhou a abertura do ícone!
 Add with path	Icon-O-Matic-ShapesList		Adicionar com caminho
@@ -10,6 +11,7 @@ Color	Icon-O-Matic-StyleTypes		Cor
 Select	Icon-O-Matic-Properties		Selecionar
 Reset transformation	Icon-O-Matic-ShapesList		Repor transformação
 Duplicate	Icon-O-Matic-StylesList		Duplicar
+32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		Rodar
 Shorten	Icon-O-Matic-PropertyNames		Encurtar
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		O texto que está a importar é bastante longo, quer continuar?
@@ -19,6 +21,7 @@ Add rect	Icon-O-Matic-PathsList		Adicionar rect
 Rotation	Icon-O-Matic-PropertyNames		Rotação
 Transform	Icon-O-Matic-PathManipulator		Transformar
 Add shape with style	Icon-O-Matic-Menu-Shape		Adicionar forma com estilo
+Change color	Icon-O-Matic-SetColorCmd		Alterar cor
 Remove	Icon-O-Matic-StylesList		Remover
 Cancel	Icon-O-Matic-Menu-Settings		Cancelar
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformação
@@ -35,13 +38,16 @@ Flip	Icon-O-Matic-PathManipulator		Espelhar
 Opacity	Icon-O-Matic-PropertyNames		Opacidade
 OK	Icon-O-Matic-ColorPicker		OK
 Error: 	Icon-O-Matic-Main		Erro: 
+Assign style	Icon-O-Matic-AssignStyleCmd		Atribuir estilo
 Saving your document failed!	Icon-O-Matic-Exporter		Ocorreu uma falha ao guardar o documento!
 Snap to grid	Icon-O-Matic-Menu-Settings		Ajustar à grelha
 Opening the document failed!	Icon-O-Matic-Main		Falhou a abertura do documento!
 Add with path & style	Icon-O-Matic-ShapesList		Adicionar com caminho & estilo
 Shape	Icon-O-Matic-Menus		Forma
 <unavailable>	Icon-O-Matic-StyleTypes		<não disponível>
+Edit gradient	Icon-O-Matic-SetGradientCmd		Editar gradiente
 Min LOD	Icon-O-Matic-PropertyNames		LOD mínimo
+Redo: %action%	Icon-O-Matic-Main		Refazer: %action%
 Add	Icon-O-Matic-TransformersList		Adicionar
 Settings	Icon-O-Matic-Menus		Definições
 Scale X	Icon-O-Matic-PropertyNames		Escala em X
@@ -49,12 +55,14 @@ Add	Icon-O-Matic-PathsList		Adicionar
 Remove	Icon-O-Matic-PathManipulator		Remover
 Duplicate	Icon-O-Matic-ShapesList		Duplicar
 Contour	Transformation		Contorno
+Insert vertex	Icon-O-Matic-InsertPointCmd		Inserir vértice
 Rounding	Icon-O-Matic-PropertyNames		Arredondamento
 Joins	Icon-O-Matic-PropertyNames		Junções
 Cancel	Icon-O-Matic-ColorPicker		Cancelar
 Duplicate	Icon-O-Matic-PathsList		Duplicar
 Save	Icon-O-Matic-Menu-Settings		Guardar
 Export as…	Icon-O-Matic-Menu-File		Exportar como…
+Undo: %action%	Icon-O-Matic-Main		Desfazer: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamante
 Don't save	Icon-O-Matic-Menu-Settings		Não guardar
 Add shape with path	Icon-O-Matic-Menu-Shape		Adicionar forma com caminho
@@ -65,8 +73,11 @@ Overwrite	Icon-O-Matic-SVGExport		Sobrescrever
 Cancel	Icon-O-Matic-SVGExport		Cancelar
 Open…	Icon-O-Matic-Menu-File		Abrir…
 Remove	Icon-O-Matic-ShapesList		Remover
+Bad news	Title of error alert		Más notícias
 Drop shapes	Icon-O-Matic-ShapesList		Largar formas
+Save icon	Icon-O-Matic-SavePanel	Dialog title	Guardar ícone
 Linear	Icon-O-Matic-StyleTypes		Linear
+Add vertex	Icon-O-Matic-AddPointCmd		Adicionar vértice
 Clean up	Icon-O-Matic-PathsList		Limpar
 Split	Icon-O-Matic-PathManipulator		Dividir
 Move	Icon-O-Matic-TransformationBoxStates		Mover
@@ -75,18 +86,23 @@ Name	Icon-O-Matic-PropertyNames		Nome
 Reset transformation	Icon-O-Matic-StylesList		Repor transformação
 Reverse	Icon-O-Matic-PathsList		Inverter
 Remove	Icon-O-Matic-PathsList		Remover
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
 Style type	Icon-O-Matic-StyleTypes		Tipo de estilo
 Quit	Icon-O-Matic-Menu-File		Sair
 Gradient	Icon-O-Matic-StyleTypes		Gradiente
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	Cor (#%02x%02x%02x)
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Adicionar forma com caminho & estilo
 Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Texto demasiado longo
 Caps	Icon-O-Matic-PropertyNames		Pontas
 OK	Icon-O-Matic-SVGImport		OK
+Import text	Icon-O-Matic-StyledTextImport		Importar texto
 Append…	Icon-O-Matic-Menu-File		Acrescentar…
 Scale Y	Icon-O-Matic-PropertyNames		Escala em Y
+Export icon	Icon-O-Matic-SavePanel	Dialog title	Exportar ícone
 Rotate indices forwards	Icon-O-Matic-PathsList		Rodar índices
 Save	Icon-O-Matic-Menu-File		Guardar
+Cancel	Icon-O-Matic-StyledTextImport		Cancelar
 Add circle	Icon-O-Matic-PathsList		Adicionar círculo
 Freeze transformation	Icon-O-Matic-ShapesList		Congelar transformação
 Untitled	Icon-O-Matic-Main		Sem título
@@ -100,6 +116,7 @@ Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nada para desfazer>
 Add	Icon-O-Matic-StylesList		Adicionar
 Translation Y	Icon-O-Matic-PropertyNames		Translação Y
+Modify vertex	Icon-O-Matic-ChangePointCmd		Modificar vértice
 Scale	Icon-O-Matic-TransformationBoxStates		Redimensionar
 All	Icon-O-Matic-Properties		Tudo
 Transformer	Icon-O-Matic-Menus		Transformador
@@ -107,11 +124,15 @@ Invert selection	Icon-O-Matic-Properties		Inverter seleção
 <unkown property>	Icon-O-Matic-PropertyNames		<propriedade desconhecida>
 Pick a color	Icon-O-Matic-ColorPicker		Escolha uma cor
 Settings…	Icon-O-Matic-SavePanel		Definições…
+Select all	Icon-O-Matic-PathManipulator		Selecionar tudo
 Add with style	Icon-O-Matic-ShapesList		Adicionar com estilo
 New	Icon-O-Matic-Menu-File		Novo
+Change perspective	Icon-O-Matic-PerspectiveCommand		Alterar perspetiva
 Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
+Perspective	Transformation		Perspetiva
 Export	Icon-O-Matic-Menu-File		Exportar
 Width	Icon-O-Matic-PropertyNames		Largura
+Add reference image	Icon-O-Matic-ShapesList		Adicionar imagem de referência
 Style	Icon-O-Matic-Menus		Estilo
 Off	Icon-O-Matic-Menu-Settings		Desligar
 Edit	Icon-O-Matic-Menus		Editar

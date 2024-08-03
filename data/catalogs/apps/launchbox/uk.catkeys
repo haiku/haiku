@@ -33,5 +33,5 @@ Remove button	LaunchBox		Прибрати кнопку
 Quit	LaunchBox		Вийти
 Horizontal layout	LaunchBox		Розмістити горизонтально
 New	LaunchBox		Нова
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Невдала команда 'відкрити папку' для Tracker.\n\nПомилка: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Невдала команда «відкрити папку» для Tracker.\n\nПомилка: 
 Pad %1	LaunchBox		Панель %1

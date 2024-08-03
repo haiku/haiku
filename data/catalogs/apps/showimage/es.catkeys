@@ -1,6 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-ShowImage	1148406263
+1	spanish; castilian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Mostrar Imagen
-Page setup…	Menus		Configuración de la pagina
+Page setup…	Menus		Configuración de la pagina…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		El documento '%s' (página %d) ha cambiado. ¿Desea cerrarlo?
 Previous file	Menus		Archivo anterior
 View	Menus		Ver
@@ -9,12 +9,12 @@ Show caption in full screen mode	Menus		Mostrar título en modo de pantalla comp
 Flip left to right	Menus		Invertir de izquierda a derecha
 Full screen	Menus		Pantalla completa
 Copy	Menus		Copiar
-Height: 	PrintOptionsWindow		Alto:
+Height: 	PrintOptionsWindow		Alto: 
 Next file	Menus		Archivo siguiente
 Slide show	Menus		Exponer diapositivas
 Original size	Menus		Tamaño original
 Width:	PrintOptionsWindow		Ancho:
-Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar a  (en 1/72 de pulgada):
+Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionar a (en 1/72 de pulgada):
 Zoom factor in %:	PrintOptionsWindow		Factor de zoom en %:
 Zoom out	Menus		Alejar
 OK	Alerts		Aceptar
@@ -36,9 +36,10 @@ Fit image to page	PrintOptionsWindow		Ajustar imagen a la página
 Show tool bar	Menus		Mostrar barra de herramientas
 First page	Menus		Primera página
 OK	SaveToFile		Aceptar
-Print…	Menus		Imprimir...
+Print…	Menus		Imprimir…
 The file '%s' could not be written.	SaveToFile		No se pudo escribir el archivo '%s'.
 Quit	Menus		Salir
+Get info	Menus		Mostrar información
 Rating	Menus		Calificar
 Close document	ClosePrompt		Cerrar documento
 Stretch to window	Menus		Estirar ventana
@@ -56,8 +57,8 @@ Progress monitor	ProgressWindow		Monitor de progresos
 Edit	Menus		Editar
 Move to Trash	Menus		Mover a la papelera
 Use as background…	Menus		Usar como fondo de pantalla…
-Open…	Menus		Abrir....
-Save as…	Menus		Guardar como...
+Open…	Menus		Abrir…
+Save as…	Menus		Guardar como…
 Next page	Menus		Página siguiente
 Print options	PrintOptionsWindow		Opciones de impresión
 Slide delay	Menus		Retardo de diapositiva
