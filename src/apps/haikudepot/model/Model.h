@@ -135,12 +135,6 @@ public:
 			WebAppInterface*    GetWebAppInterface()
 									{ return &fWebAppInterface; }
 
-			status_t			IconTarPath(BPath& path) const;
-			status_t			DumpExportReferenceDataPath(BPath& path);
-			status_t			DumpExportRepositoryDataPath(BPath& path);
-			status_t			DumpExportPkgDataPath(BPath& path,
-									const BString& repositorySourceCode);
-
 			// PackageScreenshotRepositoryListener
     virtual	void				ScreenshotCached(const ScreenshotCoordinate& coord);
 

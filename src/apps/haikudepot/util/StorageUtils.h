@@ -7,6 +7,8 @@
 
 #include <Path.h>
 
+#include "Language.h"
+
 class StorageUtils {
 
 public:
@@ -41,6 +43,13 @@ public:
 	static	BString			SwapExtensionOnPathComponent(
 								const char* pathComponent,
 								const char* extension);
+
+	static	status_t		IconTarPath(BPath& path);
+    static	status_t		DumpExportReferenceDataPath(BPath& path, const LanguageRef language);
+    static	status_t		DumpExportRepositoryDataPath(BPath& path, const LanguageRef language);
+    static	status_t		DumpExportPkgDataPath(BPath& path, const BString& repositorySourceCode,
+    							const LanguageRef language);
+
 };
 
 #endif // PATH_UTILS_H

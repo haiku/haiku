@@ -255,7 +255,8 @@ ServerPkgDataUpdateProcess::GetLocalPath(BPath& path) const
 
 	if (!webAppRepositorySourceCode.IsEmpty()) {
 		AutoLocker<BLocker> locker(fModel->Lock());
-		return fModel->DumpExportPkgDataPath(path, webAppRepositorySourceCode);
+		return StorageUtils::DumpExportPkgDataPath(path, webAppRepositorySourceCode,
+			fModel->PreferredLanguage());
 	}
 
 	return B_ERROR;

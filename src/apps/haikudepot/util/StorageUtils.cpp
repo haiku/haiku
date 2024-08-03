@@ -452,3 +452,49 @@ StorageUtils::SwapExtensionOnPathComponent(const char* pathComponent,
 	result.Append(extension);
 	return result;
 }
+
+
+/*!	When bulk repository data comes down from the server, it will
+	arrive as a json.gz payload.  This is stored locally as a cache
+	and this method will provide the on-disk storage location for
+	this file.
+*/
+
+status_t
+StorageUtils::DumpExportRepositoryDataPath(BPath& path, const LanguageRef language)
+{
+	BString leaf;
+	leaf.SetToFormat("repository-all_%s.json.gz", language->ID());
+	return LocalWorkingFilesPath(leaf, path);
+}
+
+
+/*!	When the system downloads reference data (eg; categories) from the server
+	then the downloaded data is stored and cached at the path defined by this
+	method.
+*/
+
+status_t
+StorageUtils::DumpExportReferenceDataPath(BPath& path, const LanguageRef language)
+{
+	BString leaf;
+	leaf.SetToFormat("reference-all_%s.json.gz", language->ID());
+	return LocalWorkingFilesPath(leaf, path);
+}
+
+
+status_t
+StorageUtils::IconTarPath(BPath& path)
+{
+	return LocalWorkingFilesPath("pkgicon-all.tar", path);
+}
+
+
+status_t
+StorageUtils::DumpExportPkgDataPath(BPath& path, const BString& repositorySourceCode,
+	const LanguageRef language)
+{
+	BString leaf;
+	leaf.SetToFormat("pkg-all-%s-%s.json.gz", repositorySourceCode.String(), language->ID());
+	return LocalWorkingFilesPath(leaf, path);
+}

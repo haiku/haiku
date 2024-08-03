@@ -131,7 +131,7 @@ ServerIconExportUpdateProcess::ProcessLocalData()
 status_t
 ServerIconExportUpdateProcess::GetLocalPath(BPath& path) const
 {
-	return fModel->IconTarPath(path);
+	return StorageUtils::IconTarPath(path);
 }
 
 

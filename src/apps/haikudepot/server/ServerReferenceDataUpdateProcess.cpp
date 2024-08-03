@@ -75,7 +75,7 @@ status_t
 ServerReferenceDataUpdateProcess::GetLocalPath(BPath& path) const
 {
 	AutoLocker<BLocker> locker(fModel->Lock());
-	return fModel->DumpExportReferenceDataPath(path);
+	return StorageUtils::DumpExportReferenceDataPath(path, fModel->PreferredLanguage());
 }
 
 
