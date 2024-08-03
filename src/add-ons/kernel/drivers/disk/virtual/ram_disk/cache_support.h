@@ -47,8 +47,8 @@ cache_get_pages(VMCache* cache, off_t offset, off_t length, bool isWrite, vm_pag
 			if (pages[i] != NULL)
 				continue;
 
-			pages[i] = vm_page_allocate_page(&reservation,
-				PAGE_STATE_WIRED | VM_PAGE_ALLOC_BUSY);
+			pages[i] = vm_page_allocate_page(&reservation, VM_PAGE_ALLOC_CLEAR
+				| PAGE_STATE_WIRED | VM_PAGE_ALLOC_BUSY);
 
 			if (--missingPages == 0)
 				break;
