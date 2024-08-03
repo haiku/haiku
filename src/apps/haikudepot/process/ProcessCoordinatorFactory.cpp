@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ProcessCoordinatorFactory.h"
@@ -22,7 +22,9 @@
 #include "Model.h"
 #include "OpenPackageProcess.h"
 #include "PackageInfoListener.h"
+#include "PopulatePkgChangelogFromServerProcess.h"
 #include "PopulatePkgSizesProcess.h"
+#include "PopulatePkgUserRatingsFromServerProcess.h"
 #include "ProcessCoordinator.h"
 #include "ServerHelper.h"
 #include "ServerIconExportUpdateProcess.h"
@@ -168,11 +170,24 @@ ProcessCoordinatorFactory::CreatePackageActionCoordinator(
 ProcessCoordinatorFactory::CacheScreenshotCoordinator(Model* model,
 	ScreenshotCoordinate& screenshotCoordinate)
 {
-	ProcessCoordinator* processCoordinator = new ProcessCoordinator("CacheScreenshot");
-	AbstractProcessNode* cacheScreenshotNode = new ThreadedProcessNode(
+	return _CreateSingleProcessCoordinator("CacheScreenshot",
 		new CacheScreenshotProcess(model, screenshotCoordinate));
-	processCoordinator->AddNode(cacheScreenshotNode);
-	return processCoordinator;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(Model* model, PackageInfoRef package)
+{
+	return _CreateSingleProcessCoordinator("PopulatePkgChangelog",
+		new PopulatePkgChangelogFromServerProcess(package, model));
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(Model* model, PackageInfoRef package)
+{
+	return _CreateSingleProcessCoordinator("PopulatePkgUserRatings",
+		new PopulatePkgUserRatingsFromServerProcess(package, model));
 }
 
 
@@ -269,4 +284,15 @@ ProcessCoordinatorFactory::_CalculateServerProcessOptions()
 		processOptions |= SERVER_PROCESS_DROP_CACHE;
 
 	return processOptions;
+}
+
+
+/*static*/ ProcessCoordinator*
+ProcessCoordinatorFactory::_CreateSingleProcessCoordinator(const char* name,
+	AbstractProcess* process)
+{
+	ProcessCoordinator* processCoordinator = new ProcessCoordinator(name);
+	AbstractProcessNode* cacheScreenshotNode = new ThreadedProcessNode(process);
+	processCoordinator->AddNode(cacheScreenshotNode);
+	return processCoordinator;
 }

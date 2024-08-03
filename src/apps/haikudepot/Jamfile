@@ -194,7 +194,9 @@ local applicationSources =
 	CacheScreenshotProcess.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
+	PopulatePkgChangelogFromServerProcess.cpp
 	PopulatePkgSizesProcess.cpp
+	PopulatePkgUserRatingsFromServerProcess.cpp
 	ProcessCoordinator.cpp
 	ProcessCoordinatorFactory.cpp
 	ServerHelper.cpp

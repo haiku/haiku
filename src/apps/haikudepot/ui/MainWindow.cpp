@@ -257,7 +257,6 @@ MainWindow::MainWindow(const BMessage& settings)
 	BPackageRoster().StartWatching(this,
 		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
 
-	_InitWorkerThreads();
 	_AdoptModel();
 	_StartBulkLoad();
 }
@@ -326,8 +325,6 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	// start worker threads
 	BPackageRoster().StartWatching(this,
 		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
-
-	_InitWorkerThreads();
 }
 
 
@@ -348,9 +345,6 @@ MainWindow::~MainWindow()
 		if (fShuttingDownWindow->Lock())
 			fShuttingDownWindow->Quit();
 	}
-
-	delete_sem(fPackageToPopulateSem);
-	wait_for_thread(fPopulatePackageWorker, NULL);
 
 	// We must clear the model early to release references.
 	fModel.Clear();
@@ -931,20 +925,6 @@ MainWindow::_InitPreferredLanguage()
 
 
 void
-MainWindow::_InitWorkerThreads()
-{
-	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
-	if (fPackageToPopulateSem >= 0) {
-		fPopulatePackageWorker = spawn_thread(&_PopulatePackageWorker,
-			"Package Populator", B_NORMAL_PRIORITY, this);
-		if (fPopulatePackageWorker >= 0)
-			resume_thread(fPopulatePackageWorker);
-	} else
-		fPopulatePackageWorker = -1;
-}
-
-
-void
 MainWindow::_AdoptModelControls()
 {
 	if (fSinglePackageMode)
@@ -1232,60 +1212,46 @@ MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 }
 
 
-/*! This method will cause the package to have its data refreshed from
-    the server application.  The refresh happens in the background; this method
-    is asynchronous.
+/*! Initially only superficial data is loaded from the server into the data
+	model of the packages.  When the package is viewed, additional data needs
+	to be populated including ratings.
+
+	This method will cause the package to have its data refreshed from
+	the server application.  The refresh happens in the background; this method
+	is asynchronous.
 */
 
 void
 MainWindow::_PopulatePackageAsync(bool forcePopulate)
 {
-		// Trigger asynchronous package population from the web-app
-	{
-		AutoLocker<BLocker> lock(&fPackageToPopulateLock);
-		fPackageToPopulate = fPackageInfoView->Package();
-		fForcePopulatePackage = forcePopulate;
-	}
-	release_sem_etc(fPackageToPopulateSem, 1, 0);
+	const PackageInfoRef package = fPackageInfoView->Package();
 
-	HDDEBUG("pkg [%s] will be updated from the server.",
-		fPackageToPopulate->Name().String());
-}
+	if (!fModel.CanPopulatePackage(package))
+		return;
 
+	const char* packageNameStr = package->Name().String();
 
-/*! This method will run in the background.  The thread will block until there
-    is a package to be updated.  When the thread unblocks, it will update the
-    package with information from the server.
-*/
-
-status_t
-MainWindow::_PopulatePackageWorker(void* arg)
-{
-	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
-
-	while (acquire_sem(window->fPackageToPopulateSem) == B_OK) {
-		PackageInfoRef package;
-		bool force;
-		{
-			AutoLocker<BLocker> lock(&window->fPackageToPopulateLock);
-			package = window->fPackageToPopulate;
-			force = window->fForcePopulatePackage;
-		}
-
-		if (package.IsSet()) {
-			uint32 populateFlags = Model::POPULATE_USER_RATINGS
-				| Model::POPULATE_CHANGELOG;
-
-			if (force)
-				populateFlags |= Model::POPULATE_FORCE;
-
-			window->fModel.PopulatePackage(package, populateFlags);
-
-			HDDEBUG("populating package [%s]", package->Name().String());
-		}
+	if (package->HasChangelog() && (forcePopulate || package->Changelog().IsEmpty())) {
+		_AddProcessCoordinator(
+			ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(&fModel, package));
+		HDINFO("pkg [%s] will have changelog updated from server.", packageNameStr);
+	} else {
+		HDDEBUG("pkg [%s] not have changelog updated from server.", packageNameStr);
 	}
 
-	return 0;
+	// TODO; (apl 4.Aug.2024) soon HDS will be able to pass through the count of user ratings; when
+	//    available this will mean we can avoid the need to fetch the user ratings if we know in
+	//    advance that there are none to get. This will reduce network chatter and speed up the
+	//    UI display. Also note that the member variable `fDidPopulateUserRatings` can then also be
+	//    removed from the `PackageInfo` class too.
+
+	if (forcePopulate || !package->DidPopulateUserRatings()) {
+		_AddProcessCoordinator(
+			ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(&fModel, package));
+		HDINFO("pkg [%s] will have user ratings updated from server.", packageNameStr);
+	} else {
+		HDDEBUG("pkg [%s] not have user ratings updated from server.", packageNameStr);
+	}
 }
 
 

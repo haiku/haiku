@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -121,6 +121,9 @@ public:
 			int32				CountCategories() const;
 			CategoryRef			CategoryAtIndex(int32 index) const;
 
+			bool				DidPopulateUserRatings() const;
+			void				SetDidPopulateUserRatings();
+
 			void				ClearUserRatings();
 			void				AddUserRating(const UserRatingRef& rating);
 			int32				CountUserRatings() const;
@@ -183,6 +186,7 @@ private:
 								fCategories;
 			std::vector<UserRatingRef>
 								fUserRatings;
+			bool				fDidPopulateUserRatings;
 			RatingSummary		fCachedRatingSummary;
 			int64				fProminence;
 			std::vector<ScreenshotInfoRef>

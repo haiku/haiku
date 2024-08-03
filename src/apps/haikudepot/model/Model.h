@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -113,18 +113,8 @@ public:
 			bool				CanShareAnonymousUsageData() const
 									{ return fCanShareAnonymousUsageData; }
 
-			// Retrieve package information
-	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;
-	static	const uint32		POPULATE_CACHED_ICON	= 1 << 1;
-	static	const uint32		POPULATE_USER_RATINGS	= 1 << 2;
-	static	const uint32		POPULATE_CHANGELOG		= 1 << 3;
-	static	const uint32		POPULATE_CATEGORIES		= 1 << 4;
-	static	const uint32		POPULATE_FORCE			= 1 << 5;
-
 			bool				CanPopulatePackage(
 									const PackageInfoRef& package);
-			void				PopulatePackage(const PackageInfoRef& package,
-									uint32 flags);
 
 			void				SetNickname(BString nickname);
 			const BString&		Nickname();
@@ -147,11 +137,6 @@ private:
 			void				_MaybeLogJsonRpcError(
 									const BMessage &responsePayload,
 									const char *sourceDescription) const;
-
-	static	int32				_PopulateAllPackagesEntry(void* cookie);
-
-			void				_PopulatePackageChangelog(
-									const PackageInfoRef& package);
 
 			void				_NotifyAuthorizationChanged();
 			void				_NotifyCategoryListChanged();

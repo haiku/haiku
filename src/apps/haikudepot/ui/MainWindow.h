@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -90,7 +90,6 @@ private:
 			void				_PromptCanShareAnonymousUserData();
 
 			void				_InitPreferredLanguage();
-			void				_InitWorkerThreads();
 
 			void				_AdoptModelControls();
 			void				_AdoptModel();
@@ -184,12 +183,6 @@ private:
 			bool				fShouldCloseWhenNoProcessesToCoordinate;
 
 			bool				fSinglePackageMode;
-
-			thread_id			fPopulatePackageWorker;
-			PackageInfoRef		fPackageToPopulate;
-			bool				fForcePopulatePackage;
-			BLocker				fPackageToPopulateLock;
-			sem_id				fPackageToPopulateSem;
 
 			PackageInfoListenerRef
 								fPackageInfoListener;
