@@ -5,7 +5,7 @@
  */
 #include "DataContainer.h"
 
-#include <AutoDeleter.h>
+#include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
 #include <util/BitUtils.h>
 
@@ -282,10 +282,9 @@ DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
 	const off_t rounded_offset = ROUNDDOWN(offset, B_PAGE_SIZE);
 	const size_t rounded_len = ROUNDUP((length) + (offset - rounded_offset),
 		B_PAGE_SIZE);
-	vm_page** pages = new(std::nothrow) vm_page*[rounded_len / B_PAGE_SIZE];
-	if (pages == NULL)
+	BStackOrHeapArray<vm_page*, 16> pages(rounded_len / B_PAGE_SIZE);
+	if (!pages.IsValid())
 		return B_NO_MEMORY;
-	ArrayDeleter<vm_page*> pagesDeleter(pages);
 
 	cache_get_pages(fCache, rounded_offset, rounded_len, isWrite, pages);
 

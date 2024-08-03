@@ -19,6 +19,7 @@
 #include <Drivers.h>
 
 #include <AutoDeleter.h>
+#include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 
@@ -575,12 +576,11 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			ASSERT(offset % B_PAGE_SIZE == 0);
 			ASSERT(length % B_PAGE_SIZE == 0);
 
-			vm_page** pages = new(std::nothrow) vm_page*[length / B_PAGE_SIZE];
-			if (pages == NULL) {
+			BStackOrHeapArray<vm_page*, 16> pages(length / B_PAGE_SIZE);
+			if (!pages.IsValid()) {
 				result = B_NO_MEMORY;
 				break;
 			}
-			ArrayDeleter<vm_page*> pagesDeleter(pages);
 
 			cache_get_pages(fCache, (off_t)offset, (off_t)length, false, pages);
 
@@ -604,8 +604,6 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 
 		return result;
 	}
-
-
 
 	status_t DoIO(IORequest* request)
 	{
@@ -636,10 +634,9 @@ private:
 		generic_size_t vecOffset = 0;
 		bool isWrite = operation->IsWrite();
 
-		vm_page** pages = new(std::nothrow) vm_page*[length / B_PAGE_SIZE];
-		if (pages == NULL)
+		BStackOrHeapArray<vm_page*, 16> pages(length / B_PAGE_SIZE);
+		if (!pages.IsValid())
 			return B_NO_MEMORY;
-		ArrayDeleter<vm_page*> pagesDeleter(pages);
 
 		cache_get_pages(fCache, offset, length, isWrite, pages);
 
