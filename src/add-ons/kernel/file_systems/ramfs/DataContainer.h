@@ -1,17 +1,20 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2019, Haiku, Inc.
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Copyright 2019-2024, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 #ifndef DATA_CONTAINER_H
 #define DATA_CONTAINER_H
 
+
 #include <OS.h>
+
 
 struct vm_page;
 class VMCache;
 class AllocationInfo;
 class Volume;
+
 
 class DataContainer {
 public:
@@ -52,5 +55,6 @@ private:
 	uint8*				fSmallBuffer;
 	off_t				fSmallBufferSize;
 };
+
 
 #endif	// DATA_CONTAINER_H

@@ -1,7 +1,7 @@
 /*
  * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2019, Haiku, Inc.
- * All rights reserved. Distributed under the terms of the MIT license.
+ * Copyright 2019-2024, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
  */
 #include "DataContainer.h"
 
@@ -42,7 +42,7 @@ static const off_t kMinimumSmallBufferSize = 32;
 static const off_t kMaximumSmallBufferSize = (B_PAGE_SIZE / 4);
 
 
-// constructor
+
 DataContainer::DataContainer(Volume *volume)
 	: fVolume(volume),
 	  fSize(0),
@@ -52,7 +52,7 @@ DataContainer::DataContainer(Volume *volume)
 {
 }
 
-// destructor
+
 DataContainer::~DataContainer()
 {
 	if (fCache != NULL) {
@@ -66,14 +66,14 @@ DataContainer::~DataContainer()
 	}
 }
 
-// InitCheck
+
 status_t
 DataContainer::InitCheck() const
 {
 	return (fVolume != NULL ? B_OK : B_ERROR);
 }
 
-// GetCache
+
 VMCache*
 DataContainer::GetCache()
 {
@@ -84,7 +84,7 @@ DataContainer::GetCache()
 	return fCache;
 }
 
-// Resize
+
 status_t
 DataContainer::Resize(off_t newSize)
 {
@@ -130,7 +130,7 @@ DataContainer::Resize(off_t newSize)
 	return error;
 }
 
-// ReadAt
+
 status_t
 DataContainer::ReadAt(off_t offset, void *_buffer, size_t size,
 	size_t *bytesRead)
@@ -166,7 +166,7 @@ DataContainer::ReadAt(off_t offset, void *_buffer, size_t size,
 	return error;
 }
 
-// WriteAt
+
 status_t
 DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 	size_t *bytesWritten)
@@ -207,7 +207,7 @@ DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 	return error;
 }
 
-// GetAllocationInfo
+
 void
 DataContainer::GetAllocationInfo(AllocationInfo &info)
 {
@@ -218,7 +218,7 @@ DataContainer::GetAllocationInfo(AllocationInfo &info)
 	}
 }
 
-// _RequiresCacheMode
+
 inline bool
 DataContainer::_RequiresCacheMode(size_t size)
 {
@@ -227,14 +227,14 @@ DataContainer::_RequiresCacheMode(size_t size)
 	return _IsCacheMode() || (size > kMaximumSmallBufferSize);
 }
 
-// _IsCacheMode
+
 inline bool
 DataContainer::_IsCacheMode() const
 {
 	return fCache != NULL;
 }
 
-// _CountBlocks
+
 inline int32
 DataContainer::_CountBlocks() const
 {
@@ -245,7 +245,7 @@ DataContainer::_CountBlocks() const
 	return 1;	// small buffer mode, non-empty buffer
 }
 
-// _SwitchToCacheMode
+
 status_t
 DataContainer::_SwitchToCacheMode()
 {
@@ -271,7 +271,7 @@ DataContainer::_SwitchToCacheMode()
 	return error;
 }
 
-// _DoCacheIO
+
 status_t
 DataContainer::_DoCacheIO(const off_t offset, uint8* buffer, ssize_t length,
 	size_t* bytesProcessed, bool isWrite)
