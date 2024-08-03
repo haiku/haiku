@@ -69,11 +69,6 @@ typedef NetBufferField<uint16, offsetof(icmp_header, checksum)>
 	ICMPChecksumField;
 
 
-// type unreach codes
-#define ICMP_CODE_UNREACH_NEED_FRAGMENT	4
-	// this is used for path MTU discovery
-
-
 struct icmp_protocol : net_protocol {
 };
 
