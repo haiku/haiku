@@ -199,6 +199,14 @@ ethernet_up(net_device *_device)
 		device->frame_size = ETHER_MAX_FRAME_SIZE;
 	}
 
+#if 1
+	// The network stack does not handle path MTU discovery correctly at present,
+	// so don't report frame sizes larger than the standard ethernet maximum.
+	// (We will still handle receiving frames larger than this.)
+	if (device->frame_size > ETHER_MAX_FRAME_SIZE)
+		device->frame_size = ETHER_MAX_FRAME_SIZE;
+#endif
+
 	if (update_link_state(device, false) == B_OK) {
 		// device supports retrieval of the link state
 
