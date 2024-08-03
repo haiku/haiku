@@ -273,7 +273,7 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 					break;
 			}
 
-			frameSize = ifp->if_mtu + (ETHER_HDR_LEN + ETHER_CRC_LEN);
+			frameSize = ifp->if_mtu + ETHER_HDR_LEN;
 			return user_memcpy(arg, &frameSize, 4);
 		}
 
