@@ -19,7 +19,7 @@ static uint32
 ReadReg8(addr_t adr)
 {
 	uint32 ofs = adr % 4;
-	adr = adr / 4 * 4;
+	adr = ROUNDDOWN(adr, 4);
 	union {
 		uint32 in;
 		uint8 out[4];
@@ -32,7 +32,7 @@ static uint32
 ReadReg16(addr_t adr)
 {
 	uint32 ofs = adr / 2 % 2;
-	adr = adr / 4 * 4;
+	adr = ROUNDDOWN(adr, 4);
 	union {
 		uint32 in;
 		uint16 out[2];
@@ -45,7 +45,7 @@ static void
 WriteReg8(addr_t adr, uint32 value)
 {
 	uint32 ofs = adr % 4;
-	adr = adr / 4 * 4;
+	adr = ROUNDDOWN(adr, 4);
 	union {
 		uint32 in;
 		uint8 out[4];
@@ -59,7 +59,7 @@ static void
 WriteReg16(addr_t adr, uint32 value)
 {
 	uint32 ofs = adr / 2 % 2;
-	adr = adr / 4 * 4;
+	adr = ROUNDDOWN(adr, 4);
 	union {
 		uint32 in;
 		uint16 out[2];
@@ -159,6 +159,10 @@ ECAMPCIController::UninitDriver()
 #endif
 
 
+/** Compute the virtual address for accessing a PCI ECAM register.
+ *
+ * \returns NULL if the address is out of bounds.
+ */
 addr_t
 ECAMPCIController::ConfigAddress(uint8 bus, uint8 device, uint8 function, uint16 offset)
 {
@@ -168,7 +172,7 @@ ECAMPCIController::ConfigAddress(uint8 bus, uint8 device, uint8 function, uint16
 		.device = device,
 		.bus = bus
 	};
-	if ((address.val + 4) > fRegsLen)
+	if ((ROUNDDOWN(address.val, 4) + 4) > fRegsLen)
 		return 0;
 
 	return (addr_t)fRegs + address.val;
