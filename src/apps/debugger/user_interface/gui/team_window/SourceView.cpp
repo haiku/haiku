@@ -71,16 +71,41 @@ static const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 // TODO: make configurable.
 // Current values taken from Pe's defaults.
-static rgb_color kSyntaxColors[] = {
-	{0, 0, 0, 255}, 			// SYNTAX_HIGHLIGHT_NONE
+static rgb_color kSyntaxColorsLight[] = {
+	{0, 0, 0, 255}, 		// SYNTAX_HIGHLIGHT_NONE
 	{0x39, 0x74, 0x79, 255},	// SYNTAX_HIGHLIGHT_KEYWORD
-	{0, 0x64, 0, 255},			// SYNTAX_HIGHLIGHT_PREPROCESSOR_KEYWORD
-	{0, 0, 0, 255},				// SYNTAX_HIGHLIGHT_IDENTIFIER
+	{0, 0x64, 0, 255},		// SYNTAX_HIGHLIGHT_PREPROCESSOR_KEYWORD
+	{0, 0, 0, 255},			// SYNTAX_HIGHLIGHT_IDENTIFIER
 	{0x44, 0x8a, 0, 255},		// SYNTAX_HIGHLIGHT_OPERATOR
 	{0x70, 0x70, 0x70, 255},	// SYNTAX_HIGHLIGHT_TYPE
 	{0x85, 0x19, 0x19, 255},	// SYNTAX_HIGHLIGHT_NUMERIC_LITERAL
 	{0x3f, 0x48, 0x84, 255},	// SYNTAX_HIGHLIGHT_STRING_LITERAL
 	{0xa1, 0x64, 0xe, 255},		// SYNTAX_HIGHLIGHT_COMMENT
+};
+
+// Dark theme values are the light colors, inverted.
+static rgb_color kSyntaxColorsDark[] = {
+	{255, 255, 255, 255},		// SYNTAX_HIGHLIGHT_NONE
+	{0xc6, 0x8b, 0x86, 255},	// SYNTAX_HIGHLIGHT_KEYWORD
+	{255, 0x9b, 255, 255},		// SYNTAX_HIGHLIGHT_PREPROCESSOR_KEYWORD
+	{255, 255, 255, 255},		// SYNTAX_HIGHLIGHT_IDENTIFIER
+	{0xbb, 0x75, 255, 255},		// SYNTAX_HIGHLIGHT_OPERATOR
+	{0x8f, 0x8f, 0x8f, 255},	// SYNTAX_HIGHLIGHT_TYPE
+	{0x7a, 0xe6, 0xe6, 255},	// SYNTAX_HIGHLIGHT_NUMERIC_LITERAL
+	{0xc0, 0xb7, 0x7b, 255},	// SYNTAX_HIGHLIGHT_STRING_LITERAL
+	{0x5e, 0x9b, 0xf1, 255},	// SYNTAX_HIGHLIGHT_COMMENT
+};
+
+static rgb_color kHighlightColorsLight[] = {
+	{96, 216, 216, 255},
+	{216, 216, 216, 255},
+	{255, 255, 0, 255},
+};
+
+static rgb_color kHighlightColorsDark[] = {
+	{0, 120, 120, 255},
+	{42, 42, 42, 255},
+	{100, 100, 0, 255},
 };
 
 
@@ -1175,6 +1200,15 @@ SourceView::TextView::Draw(BRect updateRect)
 	syntax_highlight_type types[kMaxHighlightsPerLine];
 	SyntaxHighlightInfo* info = fSourceView->fCurrentSyntaxInfo;
 
+	rgb_color *syntaxColors, *highlightColors;
+	if (ui_color(B_DOCUMENT_BACKGROUND_COLOR).IsLight()) {
+		syntaxColors = kSyntaxColorsLight;
+		highlightColors = kHighlightColorsLight;
+	} else {
+		syntaxColors = kSyntaxColorsDark;
+		highlightColors = kHighlightColorsDark;
+	}
+
 	for (int32 i = minLine; i <= maxLine; i++) {
 		int32 syntaxCount = 0;
 		if (info != NULL) {
@@ -1189,31 +1223,31 @@ SourceView::TextView::Draw(BRect updateRect)
 			B_SOLID_LOW);
 		for (int32 j = markerIndex; j < markers.CountItems(); j++) {
 			marker = markers.ItemAt(j);
-			 if (marker->Line() < (uint32)i) {
+			if (marker->Line() < (uint32)i) {
 				++markerIndex;
-			 	continue;
-			 } else if (marker->Line() == (uint32)i) {
-			 	++markerIndex;
-			 	 ipMarker = dynamic_cast<SourceView::MarkerManager
-			 	 	::InstructionPointerMarker*>(marker);
-			 	if (ipMarker != NULL) {
-			 		if (ipMarker->IsCurrentIP())
-			 			SetLowColor(96, 216, 216, 255);
-			 		else
-			 			SetLowColor(216, 216, 216, 255);
+				continue;
+			} else if (marker->Line() == (uint32)i) {
+				++markerIndex;
+				ipMarker = dynamic_cast<SourceView::MarkerManager
+					::InstructionPointerMarker*>(marker);
+				if (ipMarker != NULL) {
+					if (ipMarker->IsCurrentIP())
+						SetLowColor(highlightColors[0]);
+					else
+						SetLowColor(highlightColors[1]);
 
-			 	} else
-					SetLowColor(255, 255, 0, 255);
+				} else
+					SetLowColor(highlightColors[2]);
 				break;
-			 } else
-			 	break;
+			} else
+				break;
 		}
 
 		FillRect(BRect(kLeftTextMargin, y, Bounds().right,
 			y + fFontInfo->lineHeight - 1), B_SOLID_LOW);
 
 		syntax_highlight_type currentHighlight = SYNTAX_HIGHLIGHT_NONE;
-		SetHighColor(kSyntaxColors[currentHighlight]);
+		SetHighColor(syntaxColors[currentHighlight]);
 		const char* lineData = fSourceCode->LineAt(i);
 		int32 lineLength = fSourceCode->LineLengthAt(i);
 		BPoint linePoint(kLeftTextMargin, y + fFontInfo->fontHeight.ascent);
@@ -1227,7 +1261,7 @@ SourceView::TextView::Draw(BRect updateRect)
 				lineOffset += length;
 			}
 			currentHighlight = types[j];
-			SetHighColor(kSyntaxColors[currentHighlight]);
+			SetHighColor(syntaxColors[currentHighlight]);
 		}
 
 		// draw remainder, if any.
