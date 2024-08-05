@@ -744,8 +744,9 @@ DelayedMessageSender::_MessageLoop()
 	bigtime_t timeout = B_INFINITE_TIMEOUT;
 
 	while (true) {
-		timeout = atomic_get64(&fScheduledWakeup) - (system_time()
-			+ (DM_MINIMUM_DELAY / 2));
+		timeout = atomic_get64(&fScheduledWakeup);
+		if (timeout != B_INFINITE_TIMEOUT)
+			timeout -= (system_time() + (DM_MINIMUM_DELAY / 2));
 
 		if (timeout > DM_MINIMUM_DELAY / 4) {
 			status = read_port_etc(fPort, &code, NULL, 0, B_RELATIVE_TIMEOUT,
