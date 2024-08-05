@@ -27,8 +27,8 @@
 
 struct per_cpu_timer_data {
 	spinlock		lock;
-	timer* volatile	events;
-	timer* volatile	current_event;
+	timer*			events;
+	timer*			current_event;
 	int32			current_event_in_progress;
 	bigtime_t		real_time_offset;
 };
@@ -67,9 +67,9 @@ set_hardware_timer(bigtime_t scheduleTime)
 }
 
 
-/*! NOTE: expects interrupts to be off */
+/*! NOTE: expects the list to be locked. */
 static void
-add_event_to_list(timer* event, timer* volatile* list)
+add_event_to_list(timer* event, timer** list)
 {
 	timer* next;
 	timer* previous = NULL;
