@@ -2875,6 +2875,7 @@ static status_t
 thread_block_timeout(timer* timer)
 {
 	Thread* thread = (Thread*)timer->user_data;
+	timer->user_data = NULL;
 	thread_unblock(thread, B_TIMED_OUT);
 
 	return B_HANDLED_INTERRUPT;
@@ -2961,8 +2962,8 @@ thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 	if (thread->wait.status != 1)
 		return thread->wait.status;
 
-	bool useTimer = (timeoutFlags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT))
-		&& timeout != B_INFINITE_TIMEOUT;
+	bool useTimer = (timeoutFlags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0
+		&& timeout < B_INFINITE_TIMEOUT;
 
 	if (useTimer) {
 		// Timer flags: absolute/relative.
@@ -2981,13 +2982,12 @@ thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 			timerFlags);
 	}
 
-	// block
 	status_t error = thread_block_locked(thread);
 
 	locker.Unlock();
 
 	// cancel timer, if it didn't fire
-	if (error != B_TIMED_OUT && useTimer)
+	if (useTimer && thread->wait.unblock_timer.user_data != NULL)
 		cancel_timer(&thread->wait.unblock_timer);
 
 	return error;
