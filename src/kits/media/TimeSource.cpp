@@ -180,9 +180,8 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 {
 	PRINT(8, "CALLED BTimeSource::RealTimeFor()\n");
 
-	if (fIsRealtime) {
+	if (fIsRealtime)
 		return performance_time - with_latency;
-	}
 
 	bigtime_t last_perf_time;
 	bigtime_t last_real_time;
@@ -354,12 +353,15 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 	TRACE_TIMESOURCE("BTimeSource::PublishTime timesource %" B_PRId32
 		", perf %16" B_PRId64 ", real %16" B_PRId64 ", drift %2.2f\n", ID(),
 		performance_time, real_time, drift);
-	if (0 == fBuf) {
+	if (fBuf == NULL) {
 		ERROR("BTimeSource::PublishTime timesource %" B_PRId32
 			", fBuf = NULL\n", ID());
 		fStarted = true;
 		return;
 	}
+
+	if (drift == 0.0f)
+		debugger("BTimeSource::PublishTime: drift must not be 0");
 
 	int32 index = atomic_add(&fBuf->writeindex, 1);
 	index &= (TS_INDEX_COUNT - 1);
