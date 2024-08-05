@@ -324,12 +324,8 @@ add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 	TRACE(("add_timer: event %p\n", event));
 
 	// compute the schedule time
-	bigtime_t scheduleTime;
-	if ((flags & B_TIMER_USE_TIMER_STRUCT_TIMES) != 0) {
-		scheduleTime = event->schedule_time;
-		period = event->period;
-	} else {
-		scheduleTime = period;
+	if ((flags & B_TIMER_USE_TIMER_STRUCT_TIMES) == 0) {
+		bigtime_t scheduleTime = period;
 		if ((flags & ~B_TIMER_FLAGS) != B_ONE_SHOT_ABSOLUTE_TIMER)
 			scheduleTime += currentTime;
 		event->schedule_time = (int64)scheduleTime;
@@ -347,7 +343,7 @@ add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 	// If the timer is an absolute real-time base timer, convert the schedule
 	// time to system time.
 	if ((flags & ~B_TIMER_FLAGS) == B_ONE_SHOT_ABSOLUTE_TIMER
-		&& (flags & B_TIMER_REAL_TIME_BASE) != 0) {
+			&& (flags & B_TIMER_REAL_TIME_BASE) != 0) {
 		if (event->schedule_time > cpuData.real_time_offset)
 			event->schedule_time -= cpuData.real_time_offset;
 		else
@@ -359,7 +355,7 @@ add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 
 	// if we were stuck at the head of the list, set the hardware timer
 	if (event == cpuData.events)
-		set_hardware_timer(scheduleTime, currentTime);
+		set_hardware_timer(event->schedule_time, currentTime);
 
 	release_spinlock(&cpuData.lock);
 	restore_interrupts(state);
