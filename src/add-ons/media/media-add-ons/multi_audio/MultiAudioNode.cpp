@@ -1312,7 +1312,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
 				_StopOutputThread();
-				PublishTime(0, 0, 0);
+				PublishTime(0, 0, 1.0f);
 			}
 			break;
 		case B_TIMESOURCE_STOP_IMMEDIATELY:
@@ -1322,7 +1322,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
 				_StopOutputThread();
-				PublishTime(0, 0, 0);
+				PublishTime(0, 0, 1.0f);
 			}
 			break;
 		case B_TIMESOURCE_SEEK:
@@ -2039,7 +2039,7 @@ MultiAudioNode::_StartOutputThreadIfNeeded()
 	if (fThread >= 0)
 		return B_OK;
 
-	PublishTime(-50, 0, 0);
+	PublishTime(-50, 0, 1.0f);
 
 	fThread = spawn_thread(_OutputThreadEntry, "multi_audio audio output",
 		B_REAL_TIME_PRIORITY, this);

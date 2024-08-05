@@ -1060,7 +1060,7 @@ ESDSinkNode::TimeSourceOp(const time_source_op_info &op, void *_reserved)
 				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
-				PublishTime(0, 0, 0);
+				PublishTime(0, 0, 1.0f);
 			}
 			break;
 		case B_TIMESOURCE_STOP_IMMEDIATELY:
@@ -1069,7 +1069,7 @@ ESDSinkNode::TimeSourceOp(const time_source_op_info &op, void *_reserved)
 				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
-				PublishTime(0, 0, 0);
+				PublishTime(0, 0, 1.0f);
 			}
 			break;
 		case B_TIMESOURCE_SEEK:
