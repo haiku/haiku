@@ -2594,6 +2594,8 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 
 	// Check the debugger team: It must neither be the kernel team nor the
 	// debugged team.
+	if (teamID == B_CURRENT_TEAM)
+		teamID = team_get_current_team_id();
 	if (debuggerTeam == team_get_kernel_team_id() || debuggerTeam == teamID) {
 		TRACE(("install_team_debugger(): Can't debug kernel or debugger team. "
 			"debugger: %" B_PRId32 ", debugged: %" B_PRId32 "\n", debuggerTeam,
@@ -2608,9 +2610,6 @@ install_team_debugger(team_id teamID, port_id debuggerPort,
 	error = prepare_debugger_change(teamID, debugChangeCondition, team);
 	if (error != B_OK)
 		return error;
-
-	// get the real team ID
-	teamID = team->id;
 
 	// check, if a debugger is already installed
 
