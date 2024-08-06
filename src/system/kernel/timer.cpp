@@ -106,7 +106,7 @@ per_cpu_real_time_clock_changed(void*, int cpu)
 	cpuData.real_time_offset = realTimeOffset;
 
 	timer* affectedTimers = NULL;
-	timer* volatile* it = &cpuData.events;
+	timer** it = &cpuData.events;
 	timer* firstEvent = *it;
 	while (timer* event = *it) {
 		// check whether it's an absolute real-time timer
