@@ -1748,6 +1748,8 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 	if (directories == NULL)
 		return B_OK;
 
+	NodeWriteLocker rootDirectoryWriteLocker(fRootDirectory);
+
 	// iterate through the directory list and create the directories
 	while (const char* directoryName = *(directories++)) {
 		// create the directory
