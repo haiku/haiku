@@ -14,6 +14,7 @@
 
 #include <AutoDeleter.h>
 #include <NetBufferUtilities.h>
+#include <Referenceable.h>
 #include <net_buffer.h>
 #include <net_datalink.h>
 #include <net_protocol.h>
@@ -74,6 +75,11 @@ struct net_socket_private : net_socket,
 };
 
 
+struct InterfaceAddress : DoublyLinkedListLinkImpl<InterfaceAddress>,
+		net_interface_address, BReferenceable {
+};
+
+
 extern "C" status_t _add_builtin_module(module_info *info);
 extern "C" status_t _get_builtin_dependencies(void);
 extern bool gDebugOutputEnabled;
@@ -88,7 +94,7 @@ extern module_info *modules[];
 
 
 extern struct net_protocol_module_info gDomainModule;
-struct net_interface_address gInterfaceAddress = {};
+struct InterfaceAddress gInterfaceAddress;
 extern struct net_socket_module_info gNetSocketModule;
 struct net_protocol_module_info *gTCPModule;
 struct net_socket *gServerSocket, *gClientSocket;
@@ -435,7 +441,7 @@ socket_send(net_socket *socket, const void *data, size_t length, int flags)
 		return ENOBUFS;
 	}
 
-	buffer->flags = flags;
+	buffer->msg_flags = flags;
 	memcpy(buffer->source, &socket->address, socket->address.ss_len);
 	memcpy(buffer->destination, &socket->peer, socket->peer.ss_len);
 
@@ -740,6 +746,7 @@ datalink_send_data(struct net_route *route, net_buffer *buffer)
 	struct context* context = (struct context*)route->gateway;
 
 	buffer->interface_address = &gInterfaceAddress;
+	gInterfaceAddress.AcquireReference();
 
 	context->lock.Lock();
 	list_add_item(&context->list, buffer);
