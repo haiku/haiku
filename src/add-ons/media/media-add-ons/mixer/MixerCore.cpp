@@ -476,22 +476,25 @@ MixerCore::_MixThreadEntry(void* arg)
 void
 MixerCore::_MixThread()
 {
-	// The broken BeOS R5 multiaudio node starts with time 0,
-	// then publishes negative times for about 50ms, publishes 0
-	// again until it finally reaches time values > 0
 	if (!Lock())
 		return;
-	bigtime_t start = fTimeSource->Now();
-	Unlock();
-	while (start <= 0) {
-		TRACE("MixerCore: delaying _MixThread start, timesource is at %lld\n",
-			start);
-		snooze(5000);
-		if (!Lock())
-			return;
-		start = fTimeSource->Now();
-		Unlock();
+	{
+		// Delay starting the mixer until we have a valid time source.
+		bigtime_t performanceTime, realTime;
+		float drift;
+		while (fTimeSource->GetTime(&performanceTime, &realTime, &drift) != B_OK
+				|| performanceTime <= 0 || realTime <= 0) {
+			TRACE("MixerCore: delaying _MixThread start, timesource is at %lld\n",
+				start);
+			Unlock();
+			snooze(5000);
+			if (!Lock())
+				return;
+		}
 	}
+	Unlock();
+
+	const bigtime_t start = fTimeSource->Now();
 
 	fEventLatency = max((bigtime_t)3600, bigtime_t(0.4 * buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio)));
@@ -507,9 +510,9 @@ MixerCore::_MixThread()
 	// We must read from the input buffer at a position (pos) that is always
 	// a multiple of fMixBufferFrameCount.
 	int64 temp = frames_for_duration(fMixBufferFrameRate, start);
-	int64 frameBase = ((temp / fMixBufferFrameCount) + 1)
+	const int64 frameBase = ((temp / fMixBufferFrameCount) + 1)
 		* fMixBufferFrameCount;
-	bigtime_t timeBase = duration_for_frames(fMixBufferFrameRate, frameBase);
+	const bigtime_t timeBase = duration_for_frames(fMixBufferFrameRate, frameBase);
 
 	TRACE("MixerCore: starting _MixThread, start %lld, timeBase %lld, "
 		"frameBase %lld\n", start, timeBase, frameBase);
