@@ -1843,12 +1843,14 @@ MultiAudioNode::_OutputThread()
 			}
 		}
 
+#if 0
 		PRINT(("MultiAudioNode::RunThread: recorded_real_time: %" B_PRIdBIGTIME
 				"\n", bufferInfo.recorded_real_time));
 		PRINT(("MultiAudioNode::RunThread: recorded_frames_count: %"
 				B_PRId64 "\n", bufferInfo.recorded_frames_count));
 		PRINT(("MultiAudioNode::RunThread: record_buffer_cycle: %" B_PRIi32
 				"\n", bufferInfo.record_buffer_cycle));
+#endif
 
 		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
 			node_output* output = (node_output*)fOutputs.ItemAt(i);
