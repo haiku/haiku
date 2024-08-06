@@ -2088,6 +2088,8 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info, node_input& input)
 	//CALLED();
 	if (!fTimeSourceStarted)
 		return;
+	if (info.played_real_time == 0)
+		return;
 
 	fTimeComputer.AddTimeStamp(info.played_real_time,
 		info.played_frames_count);
