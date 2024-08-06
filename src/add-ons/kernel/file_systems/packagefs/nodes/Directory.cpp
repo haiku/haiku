@@ -79,6 +79,7 @@ Directory::ReadSymlink(void* buffer, size_t* bufferSize)
 void
 Directory::AddChild(Node* node)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	fChildTable.Insert(node);
 	fChildList.Add(node);
 	node->AcquireReference();
