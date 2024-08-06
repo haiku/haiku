@@ -484,8 +484,8 @@ MixerCore::_MixThread()
 		float drift;
 		while (fTimeSource->GetTime(&performanceTime, &realTime, &drift) != B_OK
 				|| performanceTime <= 0 || realTime <= 0) {
-			TRACE("MixerCore: delaying _MixThread start, timesource is at %lld\n",
-				start);
+			TRACE("MixerCore: delaying _MixThread start, timesource is at %" B_PRIdBIGTIME "\n",
+				performanceTime);
 			Unlock();
 			snooze(5000);
 			if (!Lock())
