@@ -113,7 +113,7 @@ UnpackingLeafNode::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 	ASSERT(fFinalPackageNode == NULL);
 
 	if (S_ISDIR(packageNode->Mode()))
-		return B_BAD_VALUE;
+		return B_IS_A_DIRECTORY;
 
 	PackageLeafNode* packageLeafNode
 		= dynamic_cast<PackageLeafNode*>(packageNode);

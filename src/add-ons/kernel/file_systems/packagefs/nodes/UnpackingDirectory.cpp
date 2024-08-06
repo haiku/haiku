@@ -103,7 +103,7 @@ status_t
 UnpackingDirectory::AddPackageNode(PackageNode* packageNode, dev_t deviceID)
 {
 	if (!S_ISDIR(packageNode->Mode()))
-		return B_BAD_VALUE;
+		return B_NOT_A_DIRECTORY;
 
 	PackageDirectory* packageDirectory
 		= dynamic_cast<PackageDirectory*>(packageNode);

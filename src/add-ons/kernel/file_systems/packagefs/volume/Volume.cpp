@@ -1239,6 +1239,10 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 
 	status_t error = unpackingNode->AddPackageNode(packageNode, ID());
 	if (error != B_OK) {
+		dprintf("packagefs: Failed to add node \"%s\" of package \"%s\": %s\n",
+			packageNode->Name().Data(), packageNode->GetPackage()->Name().Data(),
+			strerror(error));
+
 		// Remove the node, if created before. If the node was created to
 		// replace the previous node, send out notifications instead.
 		if (newNode) {
