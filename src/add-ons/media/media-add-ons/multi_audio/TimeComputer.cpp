@@ -2,9 +2,9 @@
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "TimeComputer.h"
+
+#include <OS.h>
 
 
 TimeComputer::TimeComputer()
@@ -53,6 +53,8 @@ TimeComputer::AddTimeStamp(bigtime_t realTime, uint64 frames)
 	bigtime_t estimatedPerformanceTime = fPerformanceTime
 		+ bigtime_t((realTime - fRealTime) * fDrift);
 
+	if (realTime < fRealTime)
+		debugger("TimeComputer: real time went backwards!");
 	fRealTime = realTime;
 
 	if (fResetTimeBase) {
