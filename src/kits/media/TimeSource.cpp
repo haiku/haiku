@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012, Haiku. All Rights Reserved.
+ * Copyright 2002-2024, Haiku. All rights reserved.
  * This file may be used under the terms of the MIT License.
  *
  * Authors:
@@ -169,8 +169,16 @@ BTimeSource::PerformanceTimeFor(bigtime_t real_time)
 	if (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
 		debugger("BTimeSource::PerformanceTimeFor: GetTime failed");
 
-	return last_perf_time
-		+ (bigtime_t)((real_time - last_real_time) * last_drift);
+	bigtime_t real_time_difference = real_time - last_real_time;
+	if (real_time_difference >= (1 << FLT_MANT_DIG)) {
+		// The difference is too large fit in a float.
+		if (last_drift == 1.0f)
+			return last_perf_time + real_time_difference;
+
+		debugger("BTimeSource::PerformanceTimeFor: real time too large");
+	}
+
+	return last_perf_time + (bigtime_t)(real_time_difference * last_drift);
 }
 
 
@@ -190,8 +198,17 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 	if (GetTime(&last_perf_time, &last_real_time, &last_drift) != B_OK)
 		debugger("BTimeSource::RealTimeFor: GetTime failed");
 
+	bigtime_t perf_time_difference = performance_time - last_perf_time;
+	if (perf_time_difference >= (1 << FLT_MANT_DIG)) {
+		// The difference is too large to fit in a float.
+		if (last_drift == 1.0f)
+			return last_real_time - with_latency + perf_time_difference;
+
+		debugger("BTimeSource::PerformanceTimeFor: performance time too large");
+	}
+
 	return last_real_time - with_latency
-		+ (bigtime_t)((performance_time - last_perf_time) / last_drift);
+		+ (bigtime_t)(perf_time_difference / last_drift);
 }
 
 
