@@ -96,7 +96,7 @@ DataContainer::Resize(off_t newSize)
 			// shrink
 			// resize the VMCache, which will automatically free pages
 			AutoLocker<VMCache> _(fCache);
-			error = fCache->Resize(newSize, VM_PRIORITY_SYSTEM);
+			error = fCache->Resize(newSize, VM_PRIORITY_USER);
 			if (error != B_OK)
 				return error;
 		} else {
@@ -107,7 +107,7 @@ DataContainer::Resize(off_t newSize)
 				return error;
 
 			AutoLocker<VMCache> _(fCache);
-			fCache->Resize(newSize, VM_PRIORITY_SYSTEM);
+			fCache->Resize(newSize, VM_PRIORITY_USER);
 
 			// pages will be added as they are written to; so nothing else
 			// needs to be done here.
@@ -250,14 +250,14 @@ status_t
 DataContainer::_SwitchToCacheMode()
 {
 	status_t error = VMCacheFactory::CreateAnonymousCache(fCache, false, 0,
-		0, false, VM_PRIORITY_SYSTEM);
+		0, false, VM_PRIORITY_USER);
 	if (error != B_OK)
 		return error;
 
 	fCache->temporary = 1;
 	fCache->virtual_end = fSize;
 
-	error = fCache->Commit(fSize, VM_PRIORITY_SYSTEM);
+	error = fCache->Commit(fSize, VM_PRIORITY_USER);
 	if (error != B_OK)
 		return error;
 
