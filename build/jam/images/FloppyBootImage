@@ -26,11 +26,22 @@ if $(NET_BOOT) = 1 {
 }
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	acpi@x86,x86_64 ata dpc pci
-	isa@x86,x86_64 <pci>x86@x86,x86_64 scsi $(USB_ONLY)usb fdt@arm
+	acpi@x86,x86_64
+	ata
+	dpc
+	pci
+	isa@x86,x86_64
+	<pci>x86@x86,x86_64
+	scsi
+	$(USB_ONLY)usb
+	fdt@arm
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS =
-	attribute_overlay@!m68k bfs iso9660@!m68k packagefs write_overlay@!m68k
+	attribute_overlay@!m68k
+	bfs
+	iso9660@!m68k
+	packagefs
+	write_overlay@!m68k
 	;
 
 # modules
@@ -38,44 +49,86 @@ AddFilesToFloppyBootArchive system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 
 AddFilesToFloppyBootArchive system add-ons kernel busses ata
-	: generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
-		it8211 ;
+	:
+	generic_ide_pci
+	ide_isa@x86
+	silicon_image_3112
+	legacy_sata
+	it8211
+	;
 
 AddFilesToFloppyBootArchive system add-ons kernel busses scsi
-	: ahci ;
-AddFilesToFloppyBootArchive system add-ons kernel console : vga_text ;
+	:
+	ahci
+	;
+AddFilesToFloppyBootArchive system add-ons kernel console
+	:
+	vga_text
+	;
 AddFilesToFloppyBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive system add-ons kernel generic
-	: ata_adapter locked_pool scsi_periph ;
+	:
+	ata_adapter
+	locked_pool
+	scsi_periph
+	;
 AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
-	: intel session ;
+	:
+	intel
+	session
+	;
 AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
-	: openpic@ppc ;
+	:
+	openpic@ppc
+	;
 
 if $(USB_BOOT) = 1 {
 	AddFilesToFloppyBootArchive system add-ons kernel busses usb
-		: <usb>uhci <usb>ohci <usb>ehci ;
+		:
+		<usb>uhci
+		<usb>ohci
+		<usb>ehci
+		;
 }
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	AddFilesToFloppyBootArchive system add-ons kernel cpu : generic_x86 ;
+	AddFilesToFloppyBootArchive system add-ons kernel cpu
+		:
+		generic_x86
+		;
 }
 
 # drivers
-AddNewDriversToFloppyBootArchive disk scsi : scsi_cd scsi_disk ;
-AddNewDriversToFloppyBootArchive disk : norflash@arm ;
+AddNewDriversToFloppyBootArchive disk scsi
+	:
+	scsi_cd
+	scsi_disk
+	;
+AddNewDriversToFloppyBootArchive disk
+	:
+	norflash@arm
+	;
 if $(USB_BOOT) = 1 {
-	AddDriversToFloppyBootArchive disk usb : usb_disk ;
+	AddDriversToFloppyBootArchive disk usb
+		:
+		usb_disk
+		;
 }
 if $(NET_BOOT) = 1 {
-	AddDriversToFloppyBootArchive disk virtual : remote_disk ;
-	AddDriversToFloppyBootArchive net : $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+	AddDriversToFloppyBootArchive disk virtual
+		:
+		remote_disk
+		;
+	AddDriversToFloppyBootArchive net
+		: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
 }
 
 # kernel
 AddFilesToFloppyBootArchive system
-	: <revisioned>kernel_$(TARGET_ARCH) ;
+	:
+	<revisioned>kernel_$(TARGET_ARCH)
+	;
 
 # scripts and data files
 
@@ -88,7 +141,10 @@ AddFilesToFloppyBootArchive home config settings kernel drivers
 if $(NET_BOOT) = 1 {
 	# add-ons
 	AddFilesToFloppyBootArchive system add-ons kernel network
-		: stack socket ;
+		:
+		stack
+		socket
+		;
 	AddFilesToFloppyBootArchive
 		system add-ons kernel network devices
 		: $(SYSTEM_NETWORK_DEVICES) ;
@@ -107,13 +163,25 @@ if $(NET_BOOT) = 1 {
 AddBootModuleSymlinksToFloppyBootArchive [ FFilterByBuildFeatures
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	openpic@ppc
-	ata_adapter locked_pool scsi_periph
+	ata_adapter
+	locked_pool
+	scsi_periph
 	generic_x86@x86
-	ahci generic_ide_pci ide_isa@x86 silicon_image_3112 legacy_sata
+	ahci
+	generic_ide_pci
+	ide_isa@x86
+	silicon_image_3112
+	legacy_sata
 	it8211
-	$(USB_ONLY)<usb>uhci $(USB_ONLY)<usb>ohci $(USB_ONLY)<usb>ehci
-	scsi_cd scsi_disk $(USB_ONLY)usb_disk norflash@arm
-	intel session
+	$(USB_ONLY)<usb>uhci
+	$(USB_ONLY)<usb>ohci
+	$(USB_ONLY)<usb>ehci
+	scsi_cd
+	scsi_disk
+	$(USB_ONLY)usb_disk
+	norflash@arm
+	intel
+	session
 	$(SYSTEM_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
 ] ;
