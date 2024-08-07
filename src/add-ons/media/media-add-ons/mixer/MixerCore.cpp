@@ -519,10 +519,6 @@ MixerCore::_MixThread()
 
 	ASSERT(fMixBufferFrameCount > 0);
 
-#if DEBUG
-	uint64 bufferIndex = 0;
-#endif
-
 	typedef RtList<chan_info> chan_info_list;
 	chan_info_list inputChanInfos[MAX_CHANNEL_TYPES];
 	BStackOrHeapArray<chan_info_list, 16> mixChanInfos(fMixBufferChannelCount);
@@ -535,9 +531,10 @@ MixerCore::_MixThread()
 	fEventTime = timeBase;
 	int64 framePos = 0;
 	status_t ret = B_ERROR;
+	uint64 bufferIndex = 0;
 
-	while(fRunning == true) {
-		if (fHasEvent == false)
+	while (fRunning) {
+		if (!fHasEvent)
 			goto schedule_next_event;
 
 		ret = acquire_sem(fMixThreadWaitSem);
@@ -572,21 +569,13 @@ MixerCore::_MixThread()
 				hdr->time_source = fTimeSource->ID();
 				hdr->start_time = fEventTime;
 				if (fNode->SendBuffer(buffer, fOutput) != B_OK) {
-#if DEBUG
 					ERROR("MixerCore: SendBuffer failed for buffer %lld\n",
 						bufferIndex);
-#else
-					ERROR("MixerCore: SendBuffer failed\n");
-#endif
 					buffer->Recycle();
 				}
 			} else {
-#if DEBUG
 				ERROR("MixerCore: RequestBuffer failed for buffer %lld\n",
 					bufferIndex);
-#else
-				ERROR("MixerCore: RequestBuffer failed\n");
-#endif
 			}
 			goto schedule_next_event;
 		}
@@ -708,21 +697,13 @@ MixerCore::_MixThread()
 			// send the buffer
 			status_t res = fNode->SendBuffer(buffer, fOutput);
 			if (res != B_OK) {
-#if DEBUG
 				ERROR("MixerCore: SendBuffer failed for buffer %lld\n",
 					bufferIndex);
-#else
-				ERROR("MixerCore: SendBuffer failed\n");
-#endif
 				buffer->Recycle();
 			}
 		} else {
-#if DEBUG
 			ERROR("MixerCore: RequestBuffer failed for buffer %lld\n",
 				bufferIndex);
-#else
-			ERROR("MixerCore: RequestBuffer failed\n");
-#endif
 		}
 
 		// make all lists empty
@@ -730,6 +711,8 @@ MixerCore::_MixThread()
 			inputChanInfos[i].MakeEmpty();
 		for (int i = 0; i < fOutput->GetOutputChannelCount(); i++)
 			mixChanInfos[i].MakeEmpty();
+
+		bufferIndex++;
 
 schedule_next_event:
 		Unlock();
@@ -748,9 +731,5 @@ schedule_next_event:
 			TRACE("MixerCore::_MixThread: can't write to owner port\n");
 
 		fHasEvent = true;
-
-#if DEBUG
-		bufferIndex++;
-#endif
 	}
 }
