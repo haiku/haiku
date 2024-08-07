@@ -204,14 +204,6 @@ status_t
 AudioMixer::HandleMessage(int32 message, const void *data, size_t size)
 {
 	// since we're using a mediaeventlooper, there shouldn't be any messages
-	// except the message we are using to schedule output events for the
-	// process thread.
-
-	if (message == MIXER_SCHEDULE_EVENT) {
-		RealTimeQueue()->AddEvent(*(const media_timed_event*)data);
-		return B_OK;
-	}
-
 	return B_ERROR;
 }
 
@@ -1120,10 +1112,6 @@ AudioMixer::HandleEvent(const media_timed_event *event, bigtime_t lateness,
 			ERROR("DataStatus message\n");
 			break;
 		}
-
-		case MIXER_PROCESS_EVENT:
-			fCore->Process();
-		break;
 
 		default:
 			break;

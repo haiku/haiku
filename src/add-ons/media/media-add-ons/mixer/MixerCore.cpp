@@ -84,7 +84,6 @@ MixerCore::MixerCore(AudioMixer *node)
 	fTimeSource(0),
 	fMixThread(-1),
 	fMixThreadWaitSem(-1),
-	fHasEvent(false),
 	fOutputGain(1.0)
 {
 }
@@ -496,7 +495,7 @@ MixerCore::_MixThread()
 
 	const bigtime_t start = fTimeSource->Now();
 
-	fEventLatency = max((bigtime_t)3600, bigtime_t(0.4 * buffer_duration(
+	bigtime_t eventLatency = max((bigtime_t)3600, bigtime_t(0.4 * buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio)));
 
 	// TODO: when the format changes while running, everything is wrong!
@@ -505,7 +504,7 @@ MixerCore::_MixThread()
 
 	TRACE("MixerCore: starting _MixThread at %lld with latency %lld and "
 		"downstream latency %lld, bufferRequestTimeout %lld\n", start,
-		fEventLatency, fDownstreamLatency, bufferRequestTimeout);
+		eventLatency, fDownstreamLatency, bufferRequestTimeout);
 
 	// We must read from the input buffer at a position (pos) that is always
 	// a multiple of fMixBufferFrameCount.
@@ -528,22 +527,25 @@ MixerCore::_MixThread()
 		return;
 	}
 
-	fEventTime = timeBase;
 	int64 framePos = 0;
-	status_t ret = B_ERROR;
 	uint64 bufferIndex = 0;
-
+	bigtime_t eventTime, nextRun = B_INFINITE_TIMEOUT;
 	while (fRunning) {
-		if (!fHasEvent)
-			goto schedule_next_event;
+		if (nextRun == B_INFINITE_TIMEOUT) {
+			eventTime = timeBase + bigtime_t((1000000LL * framePos)
+				/ fMixBufferFrameRate);
+			nextRun = fTimeSource->RealTimeFor(eventTime, 0)
+				- eventLatency - fDownstreamLatency;
+		}
 
-		ret = acquire_sem(fMixThreadWaitSem);
-		if (ret == B_INTERRUPTED)
-			continue;
-		else if (ret != B_OK)
+		status_t status = acquire_sem_etc(fMixThreadWaitSem, 1,
+			B_ABSOLUTE_TIMEOUT, nextRun);
+		if (status != B_TIMED_OUT) {
+			if (status == B_OK || status == B_INTERRUPTED)
+				continue;
 			return;
-
-		fHasEvent = false;
+		}
+		nextRun = B_INFINITE_TIMEOUT;
 
 		if (!LockWithTimeout(10000)) {
 			ERROR("MixerCore: LockWithTimeout failed\n");
@@ -567,7 +569,7 @@ MixerCore::_MixThread()
 				hdr->type = B_MEDIA_RAW_AUDIO;
 				hdr->size_used = size;
 				hdr->time_source = fTimeSource->ID();
-				hdr->start_time = fEventTime;
+				hdr->start_time = eventTime;
 				if (fNode->SendBuffer(buffer, fOutput) != B_OK) {
 					ERROR("MixerCore: SendBuffer failed for buffer %lld\n",
 						bufferIndex);
@@ -577,7 +579,12 @@ MixerCore::_MixThread()
 				ERROR("MixerCore: RequestBuffer failed for buffer %lld\n",
 					bufferIndex);
 			}
-			goto schedule_next_event;
+
+			bufferIndex++;
+			framePos += fMixBufferFrameCount;
+
+			Unlock();
+			continue;
 		}
 
 		int64 currentFramePos;
@@ -587,7 +594,7 @@ MixerCore::_MixThread()
 		ASSERT(currentFramePos % fMixBufferFrameCount == 0);
 
 		PRINT(4, "create new buffer event at %lld, reading input frames at "
-			"%lld\n", fEventTime, currentFramePos);
+			"%lld\n", eventTime, currentFramePos);
 
 		// Init the channel information for each MixerInput.
 		for (int i = 0; MixerInput* input = Input(i); i++) {
@@ -598,7 +605,7 @@ MixerCore::_MixThread()
 				uint32 sampleOffset;
 				float gain;
 				if (!input->GetMixerChannelInfo(channel, currentFramePos,
-						fEventTime, &base, &sampleOffset, &type, &gain)) {
+						eventTime, &base, &sampleOffset, &type, &gain)) {
 					continue;
 				}
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
@@ -689,7 +696,7 @@ MixerCore::_MixThread()
 			hdr->size_used
 				= fOutput->MediaOutput().format.u.raw_audio.buffer_size;
 			hdr->time_source = fTimeSource->ID();
-			hdr->start_time = fEventTime;
+			hdr->start_time = eventTime;
 
 			// swap byte order if necessary
 			fOutput->AdjustByteOrder(buffer);
@@ -713,23 +720,8 @@ MixerCore::_MixThread()
 			mixChanInfos[i].MakeEmpty();
 
 		bufferIndex++;
-
-schedule_next_event:
-		Unlock();
-
-		// schedule next event
 		framePos += fMixBufferFrameCount;
-		fEventTime = timeBase + bigtime_t((1000000LL * framePos)
-			/ fMixBufferFrameRate);
 
-		media_timed_event mixerEvent(PickEvent(),
-			MIXER_PROCESS_EVENT, 0, BTimedEventQueue::B_NO_CLEANUP);
-
-		ret = write_port(fNode->ControlPort(), MIXER_SCHEDULE_EVENT,
-			&mixerEvent, sizeof(mixerEvent));
-		if (ret != B_OK)
-			TRACE("MixerCore::_MixThread: can't write to owner port\n");
-
-		fHasEvent = true;
+		Unlock();
 	}
 }
