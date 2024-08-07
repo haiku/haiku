@@ -11,7 +11,6 @@
 #include "Volume.h"
 
 
-// constructor
 Node::Node(Volume *volume, uint8 type)
 	: fVolume(volume),
 	  fID(fVolume->NextNodeID()),
@@ -25,9 +24,7 @@ Node::Node(Volume *volume, uint8 type)
 	  fCrTime(0),
 	  fModified(0),
 	  fIsKnownToVFS(false),
-	  // attribute management
 	  fAttributes(),
-	  // referrers
 	  fReferrers()
 {
 	// set file type
@@ -46,7 +43,7 @@ Node::Node(Volume *volume, uint8 type)
 	fATime = fMTime = fCTime = fCrTime = time(NULL);
 }
 
-// destructor
+
 Node::~Node()
 {
 	ASSERT(fRefCount == 0);
@@ -61,14 +58,14 @@ Node::~Node()
 	}
 }
 
-// InitCheck
+
 status_t
 Node::InitCheck() const
 {
 	return (fVolume && fID >= 0 ? B_OK : B_NO_INIT);
 }
 
-// AddReference
+
 status_t
 Node::AddReference()
 {
@@ -85,7 +82,7 @@ Node::AddReference()
 	return B_OK;
 }
 
-// RemoveReference
+
 void
 Node::RemoveReference()
 {
@@ -96,7 +93,7 @@ Node::RemoveReference()
 	}
 }
 
-// Link
+
 status_t
 Node::Link(Entry *entry)
 {
@@ -110,7 +107,7 @@ PRINT("Node[%" B_PRIdINO "]::Link(): %" B_PRId32 " ->...\n", fID, fRefCount);
 	return error;
 }
 
-// Unlink
+
 status_t
 Node::Unlink(Entry *entry)
 {
@@ -121,7 +118,7 @@ PRINT("Node[%" B_PRIdINO "]::Unlink(): %" B_PRId32 " ->...\n", fID, fRefCount);
 	return B_OK;
 }
 
-// SetMTime
+
 void
 Node::SetMTime(time_t mTime)
 {
@@ -133,14 +130,14 @@ Node::SetMTime(time_t mTime)
 	}
 }
 
-// CheckPermissions
+
 status_t
 Node::CheckPermissions(int mode) const
 {
 	return check_access_permissions(mode, fMode, fGID, fUID);
 }
 
-// CreateAttribute
+
 status_t
 Node::CreateAttribute(const char *name, Attribute **_attribute)
 {
@@ -164,7 +161,7 @@ Node::CreateAttribute(const char *name, Attribute **_attribute)
 	return error;
 }
 
-// DeleteAttribute
+
 status_t
 Node::DeleteAttribute(Attribute *attribute)
 {
@@ -174,7 +171,7 @@ Node::DeleteAttribute(Attribute *attribute)
 	return error;
 }
 
-// AddAttribute
+
 status_t
 Node::AddAttribute(Attribute *attribute)
 {
@@ -190,7 +187,7 @@ Node::AddAttribute(Attribute *attribute)
 	return error;
 }
 
-// RemoveAttribute
+
 status_t
 Node::RemoveAttribute(Attribute *attribute)
 {
@@ -232,7 +229,7 @@ Node::RemoveAttribute(Attribute *attribute)
 	return error;
 }
 
-// FindAttribute
+
 status_t
 Node::FindAttribute(const char *name, Attribute **_attribute) const
 {
@@ -250,7 +247,7 @@ Node::FindAttribute(const char *name, Attribute **_attribute) const
 	return error;
 }
 
-// GetPreviousAttribute
+
 status_t
 Node::GetPreviousAttribute(Attribute **attribute) const
 {
@@ -268,7 +265,7 @@ Node::GetPreviousAttribute(Attribute **attribute) const
 	return error;
 }
 
-// GetNextAttribute
+
 status_t
 Node::GetNextAttribute(Attribute **attribute) const
 {
@@ -286,35 +283,35 @@ Node::GetNextAttribute(Attribute **attribute) const
 	return error;
 }
 
-// GetFirstReferrer
+
 Entry *
 Node::GetFirstReferrer() const
 {
 	return fReferrers.First();
 }
 
-// GetLastReferrer
+
 Entry *
 Node::GetLastReferrer() const
 {
 	return fReferrers.Last();
 }
 
-// GetPreviousReferrer
+
 Entry *
 Node::GetPreviousReferrer(Entry *entry) const
 {
 	return (entry ? fReferrers.GetPrevious(entry) : NULL );
 }
 
-// GetNextReferrer
+
 Entry *
 Node::GetNextReferrer(Entry *entry) const
 {
 	return (entry ? fReferrers.GetNext(entry) : NULL );
 }
 
-// GetAllocationInfo
+
 void
 Node::GetAllocationInfo(AllocationInfo &info)
 {
