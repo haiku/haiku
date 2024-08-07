@@ -73,10 +73,6 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 	fListView = new ResListView(r, "gridview", B_FOLLOW_ALL, B_WILL_DRAW, B_FANCY_BORDER);
 	AddChild(fListView);
 	
-	rgb_color white = { 255, 255, 255, 255 };
-	fListView->SetColor(B_COLOR_BACKGROUND, white);
-	fListView->SetColor(B_COLOR_SELECTION, ui_color(B_MENU_BACKGROUND_COLOR));
-	
 	float width = be_plain_font->StringWidth("00000") + 20;
 	fListView->AddColumn(new BStringColumn("ID", width, width, 100, B_TRUNCATE_END), 0);
 	
