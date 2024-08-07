@@ -1653,7 +1653,7 @@ MultiAudioNode::MakeParameterWeb()
 const char*
 MultiAudioNode::_GetControlName(multi_mix_control& control)
 {
-	if (control.string != S_null)
+	if (control.string > S_null && control.string < B_COUNT_OF(kMultiControlString))
 		return kMultiControlString[control.string];
 
 	return control.name;
