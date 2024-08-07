@@ -71,6 +71,7 @@ const uint32 kEditItem = 'Tedt';
 const uint32 kEditQuery = 'Qedt';
 const uint32 kNewFolder = 'Tnwf';
 const uint32 kNewEntryFromTemplate = 'Tnwe';
+const uint32 kNewTemplateSubmenu = 'Tnsb';
 const uint32 kCopySelectionTo = 'Tcsl';
 const uint32 kMoveSelectionTo = 'Tmsl';
 const uint32 kCreateLink = 'Tlnk';

@@ -162,10 +162,7 @@ TemplatesMenu::BuildMenu(bool addItems)
 	mkdir(path.Path(), 0777);
 
 	count = 0;
-
 	count += IterateTemplateDirectory(addItems, &path, this);
-
-	AddSeparatorItem();
 
 	// this is the message sent to open the templates folder
 	BDirectory templatesDir(path.Path());
@@ -180,10 +177,31 @@ TemplatesMenu::BuildMenu(bool addItems)
 	// add item to show templates folder
 	fOpenItem = new BMenuItem(B_TRANSLATE("Edit templates" B_UTF8_ELLIPSIS), message);
 	AddItem(fOpenItem);
+
 	if (dirRef == entry_ref())
 		fOpenItem->SetEnabled(false);
 
 	return count > 0;
+}
+
+
+BMenuItem*
+TemplatesMenu::NewSubmenuItem(BPath subdirPath)
+{
+	// add item to create new submenu folder
+	BDirectory templatesDir(subdirPath.Path());
+	BEntry entry;
+	entry_ref dirRef;
+	if (templatesDir.GetEntry(&entry) == B_OK)
+		entry.GetRef(&dirRef);
+	BMessage* message = new BMessage(kNewTemplateSubmenu);
+	message->AddRef("refs", &dirRef);
+	BMenuItem* submenuItem = new BMenuItem(B_TRANSLATE("Add new submenu" B_UTF8_ELLIPSIS), message);
+
+	if (dirRef == entry_ref())
+		submenuItem->SetEnabled(false);
+
+	return submenuItem;
 }
 
 
@@ -271,22 +289,30 @@ TemplatesMenu::IterateTemplateDirectory(bool addItems, BPath* path, BMenu* menu)
 	}
 
 	// Add submenus to menu
-	for (int32 i = 0; i < subMenus.CountItems(); i++)
+	int32 itemCount = subMenus.CountItems();
+	for (int32 i = 0; i < itemCount; i++)
 		menu->AddItem((BMenu*)subMenus.ItemAt(i));
 
-	if (subMenus.CountItems() > 0)
+	if (itemCount > 0)
 		menu->AddSeparatorItem();
 
 	// Add subdirs to menu
-	for (int32 i = 0; i < subDirs.CountItems(); i++)
+	itemCount = subDirs.CountItems();
+	for (int32 i = 0; i < itemCount; i++)
 		menu->AddItem((BMenuItem*)subDirs.ItemAt(i));
 
-	if (subDirs.CountItems() > 0)
+	if (itemCount > 0)
 		menu->AddSeparatorItem();
 
 	// Add files to menu
-	for (int32 i = 0; i < files.CountItems(); i++)
+	itemCount = files.CountItems();
+	for (int32 i = 0; i < itemCount; i++)
 		menu->AddItem((BMenuItem*)files.ItemAt(i));
+
+	if (itemCount > 0)
+		menu->AddSeparatorItem();
+
+	menu->AddItem(NewSubmenuItem(*path));
 
 	return count > 0;
 }
