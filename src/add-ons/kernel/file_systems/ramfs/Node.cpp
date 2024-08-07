@@ -10,23 +10,6 @@
 #include "Node.h"
 #include "Volume.h"
 
-// is_user_in_group
-inline static
-bool
-is_user_in_group(gid_t gid)
-{
-// Either I miss something, or we don't have getgroups() in the kernel. :-(
-/*
-	gid_t groups[NGROUPS_MAX];
-	int groupCount = getgroups(NGROUPS_MAX, groups);
-	for (int i = 0; i < groupCount; i++) {
-		if (gid == groups[i])
-			return true;
-	}
-*/
-	return (gid == getegid());
-}
-
 
 // constructor
 Node::Node(Volume *volume, uint8 type)
@@ -154,29 +137,7 @@ Node::SetMTime(time_t mTime)
 status_t
 Node::CheckPermissions(int mode) const
 {
-	int userPermissions = (fMode & S_IRWXU) >> 6;
-	int groupPermissions = (fMode & S_IRWXG) >> 3;
-	int otherPermissions = fMode & S_IRWXO;
-	// get the permissions for this uid/gid
-	int permissions = 0;
-	uid_t uid = geteuid();
-	// user is root
-	if (uid == 0) {
-		// root has always read/write permission, but at least one of the
-		// X bits must be set for execute permission
-		permissions = userPermissions | groupPermissions | otherPermissions
-			| ACCESS_R | ACCESS_W;
-	// user is node owner
-	} else if (uid == fUID)
-		permissions = userPermissions;
-	// user is in owning group
-	else if (is_user_in_group(fGID))
-		permissions = groupPermissions;
-	// user is one of the others
-	else
-		permissions = otherPermissions;
-	// do the check
-	return ((mode & ~permissions) ? B_NOT_ALLOWED : B_OK);
+	return check_access_permissions(mode, fMode, fGID, fUID);
 }
 
 // CreateAttribute
