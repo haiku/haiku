@@ -2963,7 +2963,7 @@ thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
 		return thread->wait.status;
 
 	bool useTimer = (timeoutFlags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0
-		&& timeout < B_INFINITE_TIMEOUT;
+		&& timeout != B_INFINITE_TIMEOUT;
 
 	if (useTimer) {
 		// Timer flags: absolute/relative.
