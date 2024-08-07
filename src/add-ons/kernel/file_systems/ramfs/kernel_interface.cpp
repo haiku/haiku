@@ -244,6 +244,8 @@ ramfs_get_vnode(fs_volume* _volume, ino_t vnid, fs_vnode* node, int* _type,
 		if (error == B_OK) {
 			node->private_node = foundNode;
 			node->ops = &gRamFSVnodeOps;
+			*_type = foundNode->GetMode();
+			*_flags = 0;
 		}
 	} else
 		SET_ERROR(error, B_ERROR);
