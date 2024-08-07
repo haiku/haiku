@@ -436,7 +436,7 @@ ramfs_create_symlink(fs_volume* _volume, fs_vnode* _dir, const char *name,
 					node->SetUID(geteuid());
 					node->SetGID(getegid());
 					// put the node
-					volume->PutVNode(node->GetID());
+					volume->PutVNode(node);
 				}
 			}
 		}
@@ -1164,7 +1164,7 @@ ramfs_create_dir(fs_volume* _volume, fs_vnode* _dir, const char *name, int mode)
 					node->SetUID(geteuid());
 					node->SetGID(getegid());
 					// put the node
-					volume->PutVNode(node->GetID());
+					volume->PutVNode(node);
 				}
 			}
 		}
