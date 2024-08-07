@@ -1653,7 +1653,7 @@ MultiAudioNode::MakeParameterWeb()
 const char*
 MultiAudioNode::_GetControlName(multi_mix_control& control)
 {
-	if (control.string > S_null && control.string < B_COUNT_OF(kMultiControlString))
+	if (control.string > S_null && (size_t)control.string < B_COUNT_OF(kMultiControlString))
 		return kMultiControlString[control.string];
 
 	return control.name;
@@ -2088,7 +2088,10 @@ MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info, node_input& input)
 	//CALLED();
 	if (!fTimeSourceStarted)
 		return;
-	if (info.played_real_time == 0)
+
+	// For the first playback buffer, we might get a time of 0 or in the past. Ignore it,
+	// as otherwise we will wind up with incorrect computations from the TimeComputer.
+	if (info.played_real_time == 0 || info.played_real_time < fTimeComputer.RealTime())
 		return;
 
 	fTimeComputer.AddTimeStamp(info.played_real_time,

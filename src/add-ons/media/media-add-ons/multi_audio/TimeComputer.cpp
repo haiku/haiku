@@ -53,8 +53,6 @@ TimeComputer::AddTimeStamp(bigtime_t realTime, uint64 frames)
 	bigtime_t estimatedPerformanceTime = fPerformanceTime
 		+ bigtime_t((realTime - fRealTime) * fDrift);
 
-	if (realTime < fRealTime)
-		debugger("TimeComputer: real time went backwards!");
 	fRealTime = realTime;
 
 	if (fResetTimeBase) {
