@@ -751,6 +751,8 @@ profile_all(const char* const* programArgs, int programArgCount)
 		// get next buffer
 		uint64 droppedEvents = 0;
 		error = _kern_system_profiler_next_buffer(bufferSize, &droppedEvents);
+		if (droppedEvents > 0)
+			fprintf(stderr, "system profiler: dropped %" B_PRIu64 "events\n", droppedEvents);
 
 		if (error != B_OK) {
 			if (error == B_INTERRUPTED) {
