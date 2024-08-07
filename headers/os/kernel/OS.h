@@ -22,7 +22,7 @@ extern "C" {
 /* System constants */
 
 #define B_OS_NAME_LENGTH	32
-#define B_INFINITE_TIMEOUT	(9223372036854775807LL)
+#define B_INFINITE_TIMEOUT	(0x7FFFFFFFFFFFFFFFLL)
 
 #define B_PAGE_SIZE			PAGESIZE
 
