@@ -290,7 +290,7 @@ BClipboard::_DownloadFromSystem(bool force)
 	// optimization in R5. Currently, we ignore it.
 	BMessage message(B_REG_DOWNLOAD_CLIPBOARD), reply;
 	if (message.AddString("name", fName) == B_OK
-		&& fClipHandler.SendMessage(&message, &reply) == B_OK
+		&& fClipHandler.SendMessage(&message, &reply, 10000000, 10000000) == B_OK
 		&& reply.FindMessage("data", fData) == B_OK
 		&& reply.FindMessenger("data source", &fDataSource) == B_OK
 		&& reply.FindInt32("count", (int32 *)&fCount) == B_OK)
