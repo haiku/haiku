@@ -71,14 +71,16 @@ public:
 			void				SetTimingInfo(BTimeSource* timeSource,
 									bigtime_t downstreamLatency);
 			void				EnableOutput(bool enabled);
+
 			bool				Start();
 			bool				Stop();
 
-			void				StartMixThread();
-			void				StopMixThread();
 			uint32				OutputChannelCount();
 
 private:
+			void				_StartMixThread();
+			void				_StopMixThread();
+
 			void				_UpdateResamplers(
 									const media_multi_audio_format& format);
 			void				_ApplyOutputFormat();

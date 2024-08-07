@@ -983,9 +983,6 @@ AudioMixer::Disconnect(const media_source& what, const media_destination& where)
 	fDefaultFormat.u.raw_audio.frame_rate = 96000;
 	fDefaultFormat.u.raw_audio.channel_count = 2;
 
-	// force a stop
-	fCore->Stop();
-
 	fCore->RemoveOutput();
 
 	// destroy buffer group

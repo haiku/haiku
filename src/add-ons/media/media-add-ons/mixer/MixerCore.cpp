@@ -160,17 +160,18 @@ MixerOutput*
 MixerCore::AddOutput(const media_output& output)
 {
 	ASSERT_LOCKED();
-	if (fOutput) {
+	if (fOutput != NULL) {
 		ERROR("MixerCore::AddOutput: already connected\n");
 		return fOutput;
 	}
+
 	fOutput = new MixerOutput(this, output);
 	// the output format might have been adjusted inside MixerOutput
 	_ApplyOutputFormat();
 
 	ASSERT(!fRunning);
 	if (fStarted && fOutputEnabled)
-		StartMixThread();
+		_StartMixThread();
 
 	return fOutput;
 }
@@ -196,14 +197,14 @@ bool
 MixerCore::RemoveOutput()
 {
 	ASSERT_LOCKED();
-	if (!fOutput)
+	if (fOutput == NULL)
 		return false;
 
-	if (fStarted)
-		StopMixThread();
+	if (fRunning)
+		_StopMixThread();
 
 	delete fOutput;
-	fOutput = 0;
+	fOutput = NULL;
 	fOutputEnabled = true;
 	return true;
 }
@@ -263,16 +264,15 @@ void
 MixerCore::OutputFormatChanged(const media_multi_audio_format &format)
 {
 	ASSERT_LOCKED();
-	bool was_started = fStarted;
 
-	if (was_started)
-		Stop();
+	if (fRunning)
+		_StopMixThread();
 
 	fOutput->ChangeFormat(format);
 	_ApplyOutputFormat();
 
-	if (was_started)
-		Start();
+	if (fStarted)
+		_StartMixThread();
 }
 
 
@@ -307,10 +307,10 @@ MixerCore::EnableOutput(bool enabled)
 	fOutputEnabled = enabled;
 
 	if (fRunning && !fOutputEnabled)
-		StopMixThread();
+		_StopMixThread();
 
-	if (!fRunning && fOutput && fStarted && fOutputEnabled)
-		StartMixThread();
+	if (!fRunning && fOutput != NULL && fStarted && fOutputEnabled)
+		_StartMixThread();
 }
 
 
@@ -334,8 +334,8 @@ MixerCore::Start()
 	ASSERT(!fRunning);
 
 	// only start the mix thread if we have an output
-	if (fOutput && fOutputEnabled)
-		StartMixThread();
+	if (fOutput != NULL && fOutputEnabled)
+		_StartMixThread();
 
 	return true;
 }
@@ -350,7 +350,7 @@ MixerCore::Stop()
 		return false;
 
 	if (fRunning)
-		StopMixThread();
+		_StopMixThread();
 
 	fStarted = false;
 	return true;
@@ -358,11 +358,12 @@ MixerCore::Stop()
 
 
 void
-MixerCore::StartMixThread()
+MixerCore::_StartMixThread()
 {
-	ASSERT(fOutputEnabled == true);
-	ASSERT(fRunning == false);
-	ASSERT(fOutput);
+	ASSERT(fOutputEnabled);
+	ASSERT(!fRunning);
+	ASSERT(fOutput != NULL);
+
 	fRunning = true;
 	fMixThreadWaitSem = create_sem(0, "mix thread wait");
 	fMixThread = spawn_thread(_MixThreadEntry, "Yeah baby, very shagadelic",
@@ -372,9 +373,9 @@ MixerCore::StartMixThread()
 
 
 void
-MixerCore::StopMixThread()
+MixerCore::_StopMixThread()
 {
-	ASSERT(fRunning == true);
+	ASSERT(fRunning);
 	ASSERT(fMixThread > 0);
 	ASSERT(fMixThreadWaitSem > 0);
 
