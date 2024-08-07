@@ -1214,8 +1214,8 @@ restart:
 
 		rw_lock_write_unlock(&sVnodeLock);
 
-		int type;
-		uint32 flags;
+		int type = 0;
+		uint32 flags = 0;
 		status = FS_MOUNT_CALL(vnode->mount, get_vnode, vnodeID, vnode, &type,
 			&flags, reenter);
 		if (status == B_OK && (vnode->private_node == NULL || vnode->ops == NULL)) {
