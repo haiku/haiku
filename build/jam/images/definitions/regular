@@ -9,26 +9,49 @@ SYSTEM_BIN += userguide quicktour welcome ;
 
 SYSTEM_BIN += [ FFilterByBuildFeatures
 	cddb_lookup
-	clipboard CortexAddOnHost
+	clipboard
+	CortexAddOnHost
 	dpms
 	FirstBootPrompt
-	<bin>i2c@x86,x86_64 installsound
-	mail mail2mbox mbox2mail media_client mount_nfs
-	pidof recover screenshot setcontrollook setdecor spamdbm
+	<bin>i2c@x86,x86_64
+	installsound
+	mail
+	mail2mbox
+	mbox2mail
+	media_client
+	mount_nfs
+	pidof
+	recover
+	screenshot
+	setcontrollook
+	setdecor
+	spamdbm
 	translate
 	WindowShade
 ] ;
 
 SYSTEM_APPS += [ FFilterByBuildFeatures
-	ActivityMonitor AutoRaise
+	ActivityMonitor
+	AutoRaise
 	CodyCam
 	GLInfo@mesa
 	HaikuDepot
-	Icon-O-Matic@expat LaunchBox LegacyPackageInstaller
-	Magnify Mail MediaConverter MediaPlayer MidiPlayer
-	People PoorMan PowerStatus
+	Icon-O-Matic@expat
+	LaunchBox
+	LegacyPackageInstaller
+	Magnify
+	Mail
+	MediaConverter
+	MediaPlayer
+	MidiPlayer
+	People
+	PoorMan
+	PowerStatus
 	RemoteDesktop
-	Screenshot SerialConnect SoftwareUpdater SoundRecorder
+	Screenshot
+	SerialConnect
+	SoftwareUpdater
+	SoundRecorder
 ] ;
 
 DESKBAR_APPLICATIONS +=
@@ -36,9 +59,16 @@ DESKBAR_APPLICATIONS +=
 	CodyCam
 	HaikuDepot
 	Icon-O-Matic
-	Magnify Mail MediaConverter MediaPlayer MidiPlayer
-	People PoorMan
-	SerialConnect SoftwareUpdater SoundRecorder
+	Magnify
+	Mail
+	MediaConverter
+	MediaPlayer
+	MidiPlayer
+	People
+	PoorMan
+	SerialConnect
+	SoftwareUpdater
+	SoundRecorder
 ;
 
 DESKBAR_DESKTOP_APPLETS +=
@@ -54,13 +84,24 @@ SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
 	Media
 	Printers
 	Repositories
-	ScreenSaver Sounds
+	ScreenSaver
+	Sounds
 ] ;
 
 SYSTEM_DEMOS += [ FFilterByBuildFeatures
-	Chart Clock Cortex@expat FontDemo GLTeapot@mesa
-	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@mesa Mandelbrot OverlayImage Pairs
-	PatchBay Playground Pulse Sudoku
+	Chart
+	Clock
+	Cortex@expat
+	FontDemo
+	GLTeapot@mesa
+	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@mesa
+	Mandelbrot
+	OverlayImage
+	Pairs
+	PatchBay
+	Playground
+	Pulse
+	Sudoku
 ] ;
 
 
@@ -73,17 +114,26 @@ rule HaikuImageGetSystemLibs
 		# libs with standard grist
 		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
 			libalm.so
-			libbe.so libbsd.so libbnetapi.so
+			libbe.so
+			libbsd.so
+			libbnetapi.so
 			libbluetooth.so
 			libdebug.so
 			libdebugger.so@primary
 			libdevice.so
-			libgame.so libglut.so@mesa libgnu.so
-			libmail.so libmedia.so libmidi.so libmidi2.so
+			libgame.so
+			libglut.so@mesa
+			libgnu.so
+			libmail.so
+			libmedia.so
+			libmidi.so
+			libmidi2.so
 			libnetwork.so
 			libpackage.so
 			libscreensaver.so
-			libtextencoding.so libtracker.so libtranslation.so
+			libtextencoding.so
+			libtracker.so
+			libtranslation.so
 		] ]
 		;
 }
@@ -100,14 +150,24 @@ rule HaikuImageGetPrivateSystemLibs
 
 
 SYSTEM_SERVERS += [ FFilterByBuildFeatures
-	mail_daemon media_addon_server media_server midi_server
-	nfs4_idmapper_server bluetooth_server
-	print_server print_addon_server
+	mail_daemon
+	media_addon_server
+	media_server
+	midi_server
+	nfs4_idmapper_server
+	bluetooth_server
+	print_server
+	print_addon_server
 ] ;
 
 # Bluetooth stack + drivers
-#SYSTEM_NETWORK_PROTOCOLS += l2cap ;
-SYSTEM_BT_STACK = hci btCoreData ;
+SYSTEM_NETWORK_PROTOCOLS +=
+#	l2cap
+;
+SYSTEM_BT_STACK =
+	hci
+	btCoreData
+;
 SYSTEM_ADD_ONS_DRIVERS_BT_H2 +=
 	h2generic
 ;
@@ -115,14 +175,18 @@ SYSTEM_ADD_ONS_DRIVERS_BT_H2 +=
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		ati.accelerant
-		intel_810.accelerant intel_extreme.accelerant
+		intel_810.accelerant
+		intel_extreme.accelerant
 		matrox.accelerant
 		nvidia.accelerant
-		radeon.accelerant radeon_hd.accelerant
+		radeon.accelerant
+		radeon_hd.accelerant
 		via.accelerant
 	}@ # x86,x86_64
 	x86 @{
-		3dfx.accelerant neomagic.accelerant s3.accelerant
+		3dfx.accelerant
+		neomagic.accelerant
+		s3.accelerant
 	}@ # x86
 	virtio_gpu.accelerant
 ] ;
@@ -132,17 +196,25 @@ SYSTEM_ADD_ONS_TRANSLATORS += [ FFilterByBuildFeatures
 	BMPTranslator
 	GIFTranslator
 	HVIFTranslator
-	ICOTranslator ICNSTranslator@libicns
+	ICOTranslator
+	ICNSTranslator@libicns
 	JPEGTranslator@jpeg	JPEG2000Translator@jasper
-	PCXTranslator PNGTranslator@libpng PPMTranslator PSDTranslator
-	RAWTranslator RTFTranslator
+	PCXTranslator
+	PNGTranslator@libpng
+	PPMTranslator
+	PSDTranslator
+	RAWTranslator
+	RTFTranslator
 	SGITranslator
-	TGATranslator TIFFTranslator@tiff
-	WebPTranslator@libwebp WonderBrushTranslator
+	TGATranslator
+	TIFFTranslator@tiff
+	WebPTranslator@libwebp
+	WonderBrushTranslator
 ] ;
 
 SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
-	cortex_audioadapter.media_addon	cortex_flanger.media_addon
+	cortex_audioadapter.media_addon
+	cortex_flanger.media_addon
 	cortex_logging_consumer.media_addon
 	dvb.media_addon@x86
 	equalizer.media_addon
@@ -152,7 +224,8 @@ SYSTEM_ADD_ONS_MEDIA += [ FFilterByBuildFeatures
 	opensound.media_addon
 	tone_producer_demo.media_addon
 	usb_webcam.media_addon
-	video_producer_demo.media_addon	video_window_demo.media_addon
+	video_producer_demo.media_addon
+	video_window_demo.media_addon
 	vst_host.media_addon
 ] ;
 
@@ -187,8 +260,10 @@ SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
 	Butterfly
 	DebugNow
 	Flurry@mesa
-	GLife@mesa Gravity@mesa
-	Icons IFS
+	GLife@mesa
+	Gravity@mesa
+	Icons
+	IFS
 	Leaves
 	Message
 	Nebula
@@ -197,8 +272,11 @@ SYSTEM_ADD_ONS_SCREENSAVERS += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_AUDIO +=
-	auich auvia
-	echo3g emuxki es1370
+	auich
+	auvia
+	echo3g
+	emuxki
+	es1370
 	hda
 	ice1712
 	usb_audio
@@ -212,10 +290,12 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD +=
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		ati
-		intel_810 intel_extreme
+		intel_810
+		intel_extreme
 		matrox
 		nvidia
-		radeon radeon_hd
+		radeon
+		radeon_hd
 		via
 	}@ # x86,x86_64
 	x86 @{
@@ -234,12 +314,19 @@ SYSTEM_ADD_ONS_DRIVERS_MIDI +=
 SYSTEM_ADD_ONS_DRIVERS_NET += [ FFilterByBuildFeatures
 	# WLAN drivers
 	x86,x86_64,riscv64 @{
-		aironetwifi atheroswifi
+		aironetwifi
+		atheroswifi
 		broadcom43xx
-		iaxwifi200 idualwifi7260
-		iprowifi2100 iprowifi2200 iprowifi3945 iprowifi4965
-		marvell88w8363 marvell88w8335
-		ralinkwifi realtekwifi
+		iaxwifi200
+		idualwifi7260
+		iprowifi2100
+		iprowifi2200
+		iprowifi3945
+		iprowifi4965
+		marvell88w8363
+		marvell88w8335
+		ralinkwifi
+		realtekwifi
 	}@ # x86,x86_64,riscv64
 ] ;
 
@@ -250,7 +337,8 @@ SYSTEM_ADD_ONS_DRIVERS_POWER += [ FFilterByBuildFeatures
 SYSTEM_ADD_ONS_FILE_SYSTEMS +=
 	cdda
 	#googlefs
-	nfs nfs4
+	nfs
+	nfs4
 	ufs2
 ;
 
