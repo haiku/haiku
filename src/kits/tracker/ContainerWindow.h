@@ -342,6 +342,7 @@ private:
 	void _UpdateSelectionMIMEInfo();
 	void _AddFolderIcon();
 	void _PassMessageToAddOn(BMessage*);
+	void _NewTemplateSubmenu(entry_ref);
 };
 
 

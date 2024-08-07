@@ -1341,6 +1341,14 @@ BContainerWindow::MessageReceived(BMessage* message)
 			PostMessage(message, PoseView());
 			break;
 
+		case kNewTemplateSubmenu:
+		{
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) == B_OK)
+				_NewTemplateSubmenu(ref);
+			break;
+		}
+
 		case kRestoreState:
 			if (message->HasMessage("state")) {
 				BMessage state;
@@ -3242,6 +3250,37 @@ BContainerWindow::_PassMessageToAddOn(BMessage* message)
 {
 	LaunchInNewThread("Add-on-Pass-Message", B_NORMAL_PRIORITY,
 		&RunAddOnMessageThread, new BMessage(*message), (void*)NULL);
+}
+
+
+void
+BContainerWindow::_NewTemplateSubmenu(entry_ref dirRef)
+{
+	entry_ref submenuRef;
+	BPath path(&dirRef);
+	path.Append(B_TRANSLATE_COMMENT("New submenu", "Folder name of New-template submenu"));
+	get_ref_for_path(path.Path(), &submenuRef);
+
+	if (FSCreateNewFolder(&submenuRef) != B_OK)
+		return;
+
+	// kAttrTemplateSubMenu shows the folder to be a submenu
+	BNode node(&submenuRef);
+	if (node.InitCheck() != B_OK)
+		return;
+	bool flag = true;
+	node.WriteAttr(kAttrTemplateSubMenu, B_BOOL_TYPE, 0, &flag, sizeof(bool));
+
+	// show and select new submenu in Tracker
+	BEntry entry(&submenuRef);
+	node_ref nref;
+	if (entry.GetNodeRef(&nref) != B_OK)
+		return;
+
+	BMessage message(B_REFS_RECEIVED);
+	message.AddRef("refs", &dirRef);
+	message.AddData("nodeRefToSelect", B_RAW_TYPE, (void*)&nref, sizeof(node_ref));
+	be_app->PostMessage(&message);
 }
 
 
