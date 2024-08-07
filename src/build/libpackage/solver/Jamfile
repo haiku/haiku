@@ -18,5 +18,5 @@ BuildPlatformSharedLibrary libpackage-add-on-libsolv_build.so
 	:
 	libsolvext_build.a libsolv_build.a
 	libpackage_build.so
-	libbe_build.so $(HOST_LIBSTDC++)
+	libbe_build.so $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;

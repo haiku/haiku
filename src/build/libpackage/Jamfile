@@ -134,7 +134,7 @@ BuildPlatformSharedLibrary libpackage_build.so
 	SolverRepository.cpp
 	SolverResult.cpp
 	:
-	libshared_build.a $(HOST_LIBBE) $(HOST_LIBSTDC++)
+	libshared_build.a $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
 ;
 
 HaikuSubInclude solver ;
