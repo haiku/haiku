@@ -1717,9 +1717,9 @@ BColumnListView::DrawLatch(BView* view, BRect rect, LatchType position, BRow*)
 
 	rgb_color highColor = view->HighColor();
 	if (highColor.IsLight())
-		view->SetHighColor({0, 0, 0});
+		view->SetHighColor(make_color(0, 0, 0));
 	else
-		view->SetHighColor({255, 255, 255});
+		view->SetHighColor(make_color(255, 255, 255));
 
 	switch (position) {
 		case B_OPEN_LATCH:
