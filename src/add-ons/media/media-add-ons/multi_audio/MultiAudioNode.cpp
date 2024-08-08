@@ -1186,7 +1186,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		// the previous buffer for this channel has been processed...
 		if (channel->fBuffer != NULL) {
 			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId: "
-				"%" B_PRIi32 ", how_early:%" B_PRIdBIGTIME "\n",
+				"%" B_PRIi32 ", lateness:%" B_PRIdBIGTIME "\n",
 				channel->fChannelId, lateness));
 			//channel->fBuffer->Recycle();
 			snooze(100);
