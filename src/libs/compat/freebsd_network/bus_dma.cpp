@@ -313,6 +313,7 @@ _prepare_bounce_buffer(bus_dmamap_t map, bus_size_t reqsize, int flags)
 	if (map->bounce_buffer != NULL) {
 		kernel_contigfree(map->bounce_buffer, map->bounce_buffer_size, 0);
 		map->bounce_buffer = NULL;
+		map->bounce_buffer_size = 0;
 	}
 
 	// The contiguous allocator will round up anyway, so we might as well
