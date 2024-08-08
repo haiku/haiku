@@ -142,7 +142,7 @@ compat_receive(void *cookie, net_buffer **_buffer)
 	}
 
 	for (struct mbuf *m = mb; m != NULL; m = m->m_next) {
-		status = gBufferModule->append(buffer, mtod(m, void *), mb->m_len);
+		status = gBufferModule->append(buffer, mtod(m, void *), m->m_len);
 		if (status != B_OK)
 			break;
 	}
