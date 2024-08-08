@@ -488,8 +488,10 @@ MixerCore::_MixThread()
 				performanceTime);
 			Unlock();
 			snooze(5000);
-			if (!Lock())
-				return;
+			while (!LockWithTimeout(10000)) {
+				if (!fRunning)
+					return;
+			}
 		}
 	}
 	Unlock();
