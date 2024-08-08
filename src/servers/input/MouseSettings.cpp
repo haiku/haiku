@@ -39,6 +39,10 @@ MouseSettings::MouseSettings(const mouse_settings* originalSettings)
 		fAcceptFirstClick = accept_first_click();
 
 		fSettings = *originalSettings;
+
+		if (MouseType() < 1 || MouseType() > B_MAX_MOUSE_BUTTONS)
+			SetMouseType(kDefaultMouseType);
+		_AssureValidMapping();
 	}
 
 #ifdef DEBUG
@@ -122,6 +126,9 @@ MouseSettings::Defaults()
 void
 MouseSettings::SetMouseType(int32 type)
 {
+	if (type <= 0 || type > B_MAX_MOUSE_BUTTONS)
+		return;
+
 	fSettings.type = type;
 }
 
@@ -157,6 +164,9 @@ MouseSettings::SetAccelerationFactor(int32 factor)
 uint32
 MouseSettings::Mapping(int32 index) const
 {
+	if (index < 0 || index >= B_MAX_MOUSE_BUTTONS)
+		return 0;
+
 	return fSettings.map.button[index];
 }
 
@@ -171,7 +181,11 @@ MouseSettings::Mapping(mouse_map &map) const
 void
 MouseSettings::SetMapping(int32 index, uint32 button)
 {
+	if (index < 0 || index >= B_MAX_MOUSE_BUTTONS)
+		return;
+
 	fSettings.map.button[index] = button;
+	_AssureValidMapping();
 }
 
 
@@ -179,6 +193,23 @@ void
 MouseSettings::SetMapping(mouse_map &map)
 {
 	fSettings.map = map;
+	_AssureValidMapping();
+}
+
+
+void
+MouseSettings::_AssureValidMapping()
+{
+	bool hasPrimary = false;
+
+	for (int i = 0; i < MouseType(); i++) {
+		if (fSettings.map.button[i] == 0)
+			fSettings.map.button[i] = B_MOUSE_BUTTON(i + 1);
+		hasPrimary |= fSettings.map.button[i] & B_MOUSE_BUTTON(1);
+	}
+
+	if (!hasPrimary)
+		fSettings.map.button[0] = B_MOUSE_BUTTON(1);
 }
 
 
