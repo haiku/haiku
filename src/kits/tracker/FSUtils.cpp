@@ -2477,7 +2477,7 @@ FSMakeOriginalName(BString &string, const BDirectory* destDir,
 		return;
 
 	FSMakeOriginalName(string.LockBuffer(B_FILE_NAME_LENGTH),
-		const_cast<BDirectory*>(destDir), suffix ? suffix : " copy");
+		const_cast<BDirectory*>(destDir), suffix ? suffix : NULL);
 	string.UnlockBuffer();
 }
 
@@ -2494,6 +2494,11 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 	if (!destDir->Contains(name))
 		return;
 
+	BString copySuffix(B_TRANSLATE_COMMENT("copy", "filename copy"));
+	size_t suffixLength = copySuffix.Length();
+	if (suffix == NULL)
+		suffix = copySuffix;
+
 	// Determine if we're copying a 'copy'. This algorithm isn't perfect.
 	// If you're copying a file whose REAL name ends with 'copy' then
 	// this method will return "<filename> 1", not "<filename> copy"
@@ -2503,9 +2508,9 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 
 	bool copycopy = false;		// are we copying a copy?
 	int32 len = (int32)strlen(name);
-	char* p = name + len - 1;	// get pointer to end os name
+	char* p = name + len - 1;	// get pointer to end of name
 
-	// eat up optional numbers (if were copying "<filename> copy 34")
+	// eat up optional numbers (if we're copying "<filename> copy 34")
 	while ((p > name) && isdigit(*p))
 		p--;
 
@@ -2517,7 +2522,8 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 	if (p > name) {
 		// p points to the last char of the word. For example, 'y' in 'copy'
 
-		if ((p - 4 > name) && (strncmp(p - 4, suffix, 5) == 0)) {
+		if ((p - suffixLength > name)
+			&& (strncmp(p - suffixLength, suffix, suffixLength + 1) == 0)) {
 			// we found 'copy' in the right place.
 			// so truncate after 'copy'
 			*(p + 1) = '\0';
@@ -2526,19 +2532,20 @@ FSMakeOriginalName(char* name, BDirectory* destDir, const char* suffix)
 			// save the 'root' name of the file, for possible later use.
 			// that is copy everything but trailing " copy". Need to
 			// NULL terminate after copy
-			strncpy(root, name, (uint32)((p - name) - 4));
-			root[(p - name) - 4] = '\0';
+			strncpy(root, name, (uint32)((p - name) - suffixLength));
+			root[(p - name) - suffixLength] = '\0';
 		}
 	}
 
 	if (!copycopy) {
 		// The name can't be longer than B_FILE_NAME_LENGTH.
-		// The algoritm adds " copy XX" to the name. That's 8 characters.
+		// The algorithm adds a localized " copy XX" to the name.
+		// That's the number of characters of "copy" + 4 (spaces + "XX").
 		// B_FILE_NAME_LENGTH already accounts for NULL termination so we
 		// don't need to save an extra char at the end.
-		if (strlen(name) > B_FILE_NAME_LENGTH - 8) {
+		if (strlen(name) > B_FILE_NAME_LENGTH - (suffixLength + 4)) {
 			// name is too long - truncate it!
-			name[B_FILE_NAME_LENGTH - 8] = '\0';
+			name[B_FILE_NAME_LENGTH - (suffixLength + 4)] = '\0';
 		}
 
 		strlcpy(root, name, sizeof(root));
@@ -3213,7 +3220,7 @@ FSCreateTrashDirs()
 
 
 status_t
-FSCreateNewFolder(const entry_ref* ref)
+FSCreateNewFolder(entry_ref* ref)
 {
 	node_ref node;
 	node.device = ref->device;
@@ -3226,7 +3233,8 @@ FSCreateNewFolder(const entry_ref* ref)
 
 	// ToDo: is that really necessary here?
 	BString name(ref->name);
-	FSMakeOriginalName(name, &dir, "-");
+	FSMakeOriginalName(name, &dir, " -");
+	ref->set_name(name.String()); // update ref in case the folder got renamed
 
 	BDirectory newDir;
 	result = dir.CreateDirectory(name.String(), &newDir);
