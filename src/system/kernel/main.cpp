@@ -133,7 +133,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		// setup debug output
 		debug_init(&sKernelArgs);
-		set_dprintf_enabled(true);
+		set_dprintf_enabled(false);
 		dprintf("Welcome to kernel debugger output!\n");
 		dprintf("Haiku revision: %s, debug level: %d\n", get_haiku_revision(),
 			KDEBUG_LEVEL);
