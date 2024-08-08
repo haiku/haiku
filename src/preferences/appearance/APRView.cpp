@@ -324,7 +324,8 @@ APRView::_SetColor(color_which which, rgb_color color)
 			= tint_color(color, isDark ? B_LIGHTEN_2_TINT : B_DARKEN_2_TINT);
 		_SetOneColor(B_MENU_SELECTED_BACKGROUND_COLOR, menuSelectedBackground);
 
-		const rgb_color controlBackground = tint_color(color, 0.25 /* lighten "> 2" */);
+		const rgb_color controlBackground = tint_color(color, isDark
+			? 0.8 /* lighten "< 1" */ : 0.25 /* lighten "> 2" */);
 		_SetOneColor(B_CONTROL_BACKGROUND_COLOR, controlBackground);
 
 		const rgb_color controlBorder
