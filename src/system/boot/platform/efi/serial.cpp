@@ -97,9 +97,11 @@ serial_disable(void)
 extern "C" void
 serial_enable(void)
 {
+#if 0
 	sSerialEnabled = true;
 	if ((gUART != NULL) && !gUARTSkipInit)
 		gUART->InitPort(kSerialBaudRate);
+#endif
 }
 
 
