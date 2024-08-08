@@ -237,8 +237,8 @@ rule DefineDefaultBuildProfiles
 
 
 	# Uncomment in official release branch.
-	#HAIKU_DEFINES += HAIKU_OFFICIAL_RELEASE ;
-	#TARGET_DEFINES += HAIKU_OFFICIAL_RELEASE ;
+	HAIKU_DEFINES += HAIKU_OFFICIAL_RELEASE ;
+	TARGET_DEFINES += HAIKU_OFFICIAL_RELEASE ;
 
 
 	# If a build profile was specified on the command line, now is the time to
