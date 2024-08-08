@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2020, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2024, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BE_BUILD_H
@@ -36,9 +36,11 @@
 #define B_HAIKU_VERSION_1_PRE_BETA_4	0x00000701
 #define B_HAIKU_VERSION_1_BETA_4		0x00000800
 #define B_HAIKU_VERSION_1_PRE_BETA_5	0x00000801
+#define B_HAIKU_VERSION_1_BETA_5		0x00000900
+#define B_HAIKU_VERSION_1_PRE_BETA_6	0x00000901
 #define B_HAIKU_VERSION_1				0x00010000
 
-#define B_HAIKU_VERSION					B_HAIKU_VERSION_1_PRE_BETA_5
+#define B_HAIKU_VERSION					B_HAIKU_VERSION_1_PRE_BETA_6
 
 /* Haiku ABI */
 #define B_HAIKU_ABI_MAJOR				0xffff0000
