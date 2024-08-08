@@ -235,7 +235,7 @@ ReadAttrResult ReadAttr(const BNode*, const char* hostAttrName,
 ReadAttrResult GetAttrInfo(const BNode*, const char* hostAttrName,
 	const char* foreignAttrName, type_code* = NULL, size_t* = NULL);
 
-status_t FSCreateNewFolder(const entry_ref*);
+status_t FSCreateNewFolder(entry_ref*);
 status_t FSRecursiveCreateFolder(const char* path);
 void FSMakeOriginalName(BString &name, const BDirectory* destDir,
 	const char* suffix = 0);
