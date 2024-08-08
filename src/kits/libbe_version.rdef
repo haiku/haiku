@@ -7,8 +7,8 @@ resource app_version {
 
 	internal = 9,
 
-	short_info = "Walter",
-	long_info = "©2001-2021 Haiku Inc."
+	short_info = "R1/beta5",
+	long_info = "©2001-2024 Haiku Inc."
 };
 
 resource app_signature "application/x-vnd.Haiku-libbe" ;
