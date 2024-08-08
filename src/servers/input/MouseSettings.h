@@ -68,6 +68,9 @@ class MouseSettings {
 		const mouse_settings* GetSettings() { return &fSettings; }
 
 	private:
+		void _AssureValidMapping();
+
+	private:
 		mouse_settings	fSettings;
 
 		// FIXME all these extra settings are not specific to each mouse.
