@@ -210,8 +210,17 @@ bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
 
 
 static int
-_allocate_dmamem(bus_dma_tag_t dmat, phys_size_t size, void** vaddr, int mflags)
+_allocate_dmamem(bus_dma_tag_t dmat, phys_size_t size, void** vaddr, int flags)
 {
+	int mflags;
+	if (flags & BUS_DMA_NOWAIT)
+		mflags = M_NOWAIT;
+	else
+		mflags = M_WAITOK;
+
+	if (flags & BUS_DMA_ZERO)
+		mflags |= M_ZERO;
+
 	// FreeBSD uses standard malloc() for the case where size <= PAGE_SIZE,
 	// but we want to keep DMA'd memory a bit more separate, so we always use
 	// contigmalloc.
@@ -255,15 +264,6 @@ extern "C" int
 bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 	bus_dmamap_t* mapp)
 {
-	int mflags;
-	if (flags & BUS_DMA_NOWAIT)
-		mflags = M_NOWAIT;
-	else
-		mflags = M_WAITOK;
-
-	if (flags & BUS_DMA_ZERO)
-		mflags |= M_ZERO;
-
 	// FreeBSD does not permit the "mapp" argument to be NULL, but we do
 	// (primarily for the OpenBSD shims.)
 	if (mapp != NULL) {
@@ -273,7 +273,7 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 		(*mapp)->buffer_type = bus_dmamap::BUFFER_PROHIBITED;
 	}
 
-	int status = _allocate_dmamem(dmat, dmat->maxsize, vaddr, mflags);
+	int status = _allocate_dmamem(dmat, dmat->maxsize, vaddr, flags);
 	if (status != 0 && mapp != NULL)
 		bus_dmamap_destroy(dmat, *mapp);
 	return status;
