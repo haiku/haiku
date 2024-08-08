@@ -532,7 +532,7 @@ MixerCore::_MixThread()
 
 	int64 framePos = 0;
 	uint64 bufferIndex = 0;
-	bigtime_t eventTime, nextRun = B_INFINITE_TIMEOUT;
+	bigtime_t eventTime = 0, nextRun = B_INFINITE_TIMEOUT;
 	while (fRunning) {
 		if (nextRun == B_INFINITE_TIMEOUT) {
 			eventTime = timeBase + bigtime_t((1000000LL * framePos)
