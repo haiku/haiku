@@ -462,14 +462,14 @@ write_rgba32b(jas_matrix_t** pixels, uchar* scanline, int width)
 
 
 static int
-Read(jas_stream_obj_t* object, char* buffer, const int length)
+Read(jas_stream_obj_t* object, char* buffer, const unsigned int length)
 {
 	return (*(BPositionIO**)object)->Read(buffer, length);
 }
 
 
 static int
-Write(jas_stream_obj_t* object, char* buffer, const int length)
+Write(jas_stream_obj_t* object, const char* buffer, const unsigned int length)
 {
 	return (*(BPositionIO**)object)->Write(buffer, length);
 }
