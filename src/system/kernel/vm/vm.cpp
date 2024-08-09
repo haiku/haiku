@@ -6432,7 +6432,7 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 	if (status != B_OK)
 		return status;
 
-	if (info.team != thread_get_current_thread()->team->id)
+	if (!kernel && info.team != thread_get_current_thread()->team->id)
 		return B_PERMISSION_DENIED;
 
 	// We need to mark the area cloneable so the following operations work.
