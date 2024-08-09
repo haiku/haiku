@@ -136,6 +136,7 @@
 // Enables the (boot) system profiler for use with "profile -r"
 #define SYSTEM_PROFILER					0
 #define SYSTEM_PROFILE_SIZE				40 * 1024 * 1024
+#define SYSTEM_PROFILE_SCHEDULING		0
 #define SYSTEM_PROFILE_STACK_DEPTH		10
 #define SYSTEM_PROFILE_INTERVAL			10000
 

@@ -48,7 +48,10 @@ class SystemProfiler;
 
 static spinlock sProfilerLock = B_SPINLOCK_INITIALIZER;
 static SystemProfiler* sProfiler = NULL;
+
+#if SYSTEM_PROFILER
 static struct system_profiler_parameters* sRecordedParameters = NULL;
+#endif
 
 
 class SystemProfiler : public BReferenceable, private NotificationListener,
@@ -1502,12 +1505,19 @@ start_system_profiler(size_t areaSize, uint32 stackDepth, bigtime_t interval)
 
 	sRecordedParameters->buffer_area = area;
 	sRecordedParameters->flags = B_SYSTEM_PROFILER_TEAM_EVENTS
-		| B_SYSTEM_PROFILER_THREAD_EVENTS | B_SYSTEM_PROFILER_IMAGE_EVENTS
-		| B_SYSTEM_PROFILER_IO_SCHEDULING_EVENTS
-		| B_SYSTEM_PROFILER_SAMPLING_EVENTS;
+		| B_SYSTEM_PROFILER_THREAD_EVENTS;
+	if (interval > 0 && stackDepth > 0) {
+		sRecordedParameters->flags |= B_SYSTEM_PROFILER_SAMPLING_EVENTS
+			| B_SYSTEM_PROFILER_IMAGE_EVENTS;
+	}
 	sRecordedParameters->locking_lookup_size = 4096;
 	sRecordedParameters->interval = interval;
 	sRecordedParameters->stack_depth = stackDepth;
+
+#if SYSTEM_PROFILE_SCHEDULING
+	sRecordedParameters->flags |= B_SYSTEM_PROFILER_SCHEDULING_EVENTS;
+	sRecordedParameters->locking_lookup_size = 64 * 1024;
+#endif
 
 	area_info areaInfo;
 	get_area_info(area, &areaInfo);
@@ -1684,10 +1694,11 @@ _user_system_profiler_recorded(system_profiler_parameters* userParameters)
 
 	if (userParameters == NULL || !IS_USER_ADDRESS(userParameters))
 		return B_BAD_ADDRESS;
+
+#if SYSTEM_PROFILER
 	if (sRecordedParameters == NULL)
 		return B_ERROR;
 
-#if SYSTEM_PROFILER
 	stop_system_profiler();
 
 	// Transfer the area to the userland process

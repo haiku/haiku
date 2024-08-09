@@ -44,6 +44,7 @@ static const char* kUsage =
 	"Options:\n"
 	"  -l           - When a command line is given: Start recording before\n"
 	"                 executable has been loaded.\n"
+	"  -r           - Don't profile, but evaluate recorded kernel profile data.\n"
 	"  -h, --help   - Print this usage info.\n"
 ;
 
@@ -203,6 +204,48 @@ public:
 		_kern_system_profiler_stop();
 	}
 
+	void DumpRecorded()
+	{
+		// retrieve recorded samples and parameters
+		system_profiler_parameters profilerParameters;
+		status_t error = _kern_system_profiler_recorded(&profilerParameters);
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Failed to get recorded profiling buffer: %s\n",
+				kCommandName, strerror(error));
+			exit(1);
+		}
+
+		// create an area for the sample buffer
+		area_info info;
+		error = get_area_info(profilerParameters.buffer_area, &info);
+		if (error != B_OK) {
+			fprintf(stderr, "%s: Recorded profiling buffer invalid: %s\n",
+				kCommandName, strerror(error));
+			exit(1);
+		}
+
+		system_profiler_buffer_header* bufferHeader
+			= (system_profiler_buffer_header*)info.address;
+
+		uint8* bufferBase = (uint8*)(bufferHeader + 1);
+		size_t totalBufferSize = info.size - (bufferBase - (uint8*)bufferHeader);
+
+		// get the current buffer
+		size_t bufferStart = bufferHeader->start;
+		size_t bufferSize = bufferHeader->size;
+		uint8* buffer = bufferBase + bufferStart;
+
+		if (bufferStart + bufferSize <= totalBufferSize) {
+			_ProcessEventBuffer(buffer, bufferSize);
+		} else {
+			size_t remainingSize = bufferStart + bufferSize - totalBufferSize;
+			if (!_ProcessEventBuffer(buffer,
+					bufferSize - remainingSize)) {
+				_ProcessEventBuffer(bufferBase, remainingSize);
+			}
+		}
+	}
+
 private:
 	bool _ProcessEventBuffer(uint8* buffer, size_t bufferSize)
 	{
@@ -274,6 +317,7 @@ main(int argc, const char* const* argv)
 {
 	Recorder recorder;
 
+	bool dumpRecorded = false;
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
@@ -281,7 +325,7 @@ main(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+hl", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+hlr", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -291,6 +335,10 @@ main(int argc, const char* const* argv)
 				break;
 			case 'l':
 				recorder.SetSkipLoading(false);
+				break;
+
+			case 'r':
+				dumpRecorded = true;
 				break;
 
 			default:
@@ -313,7 +361,10 @@ main(int argc, const char* const* argv)
 		exit(1);
 
 	// start the action
-	recorder.Run(programArgs, programArgCount);
+	if (!dumpRecorded)
+		recorder.Run(programArgs, programArgCount);
+	else
+		recorder.DumpRecorded();
 
 	return 0;
 }
