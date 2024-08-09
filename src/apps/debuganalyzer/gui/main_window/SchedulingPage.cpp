@@ -1769,6 +1769,7 @@ MainWindow::SchedulingPage::SchedulingPage(MainWindow* parent)
 				&fSelectionModel),
 			fFontInfo, &fFilterModel)).View();
 	;
+	scrollChild->SetFlags(scrollChild->Flags() | B_SCROLL_VIEW_AWARE);
 
 	AddChild(fScrollView = new BScrollView("scroll", scrollChild, 0, true,
 		true));
