@@ -647,7 +647,10 @@ virtio_net_receive(void* cookie, net_buffer** _buffer)
 				break;
 			}
 
-			buf->rxUsedLength = usedLength;
+			if (usedLength > sizeof(virtio_net_hdr))
+				buf->rxUsedLength = usedLength - sizeof(virtio_net_hdr);
+			else
+				buf->rxUsedLength = 0;
 			info->rxFullList.Add(buf);
 		}
 		TRACE("virtio_net_read: finished waiting\n");
