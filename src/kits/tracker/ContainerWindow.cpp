@@ -1452,6 +1452,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 
 			bool wasInTrash = IsTrash() || InTrash();
 			bool isRoot = TargetModel()->IsRoot();
+			bool isVolume = TargetModel()->IsVolume();
 
 			// Switch dir and apply new state
 			WindowStateNodeOpener opener(this, false);
@@ -1463,8 +1464,8 @@ BContainerWindow::MessageReceived(BMessage* message)
 			fIsTrash = FSIsTrashDir(&entry);
 			fInTrash = FSInTrashDir(&ref);
 
-			if (wasInTrash ^ (IsTrash() || InTrash())
-				|| isRoot != TargetModel()->IsRoot()) {
+			if (wasInTrash ^ (IsTrash() || InTrash()) || isRoot != TargetModel()->IsRoot()
+				|| isVolume != TargetModel()->IsVolume()) {
 				RepopulateMenus();
 			}
 
