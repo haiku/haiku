@@ -1644,13 +1644,10 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 		bool generic = false;
 		uint16 type = 0;
 		uint16 subType = 0;
-		uint16 interface = 0;
 		if (get_attr_uint16(this, B_DEVICE_TYPE, &type, false) != B_OK
 			|| get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false)
 					!= B_OK)
 			generic = true;
-
-		get_attr_uint16(this, B_DEVICE_INTERFACE, &interface, false);
 
 		// TODO: maybe make this extendible via settings file?
 		switch (type) {
@@ -1764,9 +1761,13 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 							|| !strcmp(sGenericContextPath, "bus"))) {
 						_AddPath(*stack, "busses");
 					}
+					const char* bus;
+					if (get_attr_string(this, B_DEVICE_BUS, &bus, false) == B_OK) {
+						if (strcmp(bus, "virtio") == 0)
+							_AddPath(*stack, "busses/scsi");
+					}
 					_AddPath(*stack, "drivers", sGenericContextPath);
 					_AddPath(*stack, "busses/i2c");
-					_AddPath(*stack, "busses/scsi");
 					_AddPath(*stack, "busses/random");
 					_AddPath(*stack, "busses/virtio");
 					_AddPath(*stack, "bus_managers/pci");
