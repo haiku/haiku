@@ -195,7 +195,7 @@ PrecacheIO::IOFinished(status_t status, bool partialTransfer,
 	phys_size_t pagesTransferred
 		= (bytesTransferred + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 
-	if (fOffset + (off_t)bytesTransferred > fCache->virtual_end)
+	if ((fOffset + (off_t)bytesTransferred) > fCache->virtual_end)
 		bytesTransferred = fCache->virtual_end - fOffset;
 
 	for (uint32 i = 0; i < pagesTransferred; i++) {

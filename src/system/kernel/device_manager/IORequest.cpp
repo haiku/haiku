@@ -965,6 +965,7 @@ IORequest::NotifyFinished()
 	ASSERT(fPendingChildren == 0);
 	ASSERT(fChildren.IsEmpty()
 		|| dynamic_cast<IOOperation*>(fChildren.Head()) == NULL);
+	ASSERT(fTransferSize <= fLength);
 
 	// unlock the memory
 	if (fBuffer->IsMemoryLocked())
@@ -977,8 +978,9 @@ IORequest::NotifyFinished()
 	io_request_finished_callback finishedCallback = fFinishedCallback;
 	void* finishedCookie = fFinishedCookie;
 	status_t status = fStatus;
+	generic_size_t transferredBytes = fTransferSize;
 	generic_size_t lastTransferredOffset
-		= fRelativeParentOffset + fTransferSize;
+		= fRelativeParentOffset + transferredBytes;
 	bool partialTransfer = status != B_OK || fPartialTransfer;
 	bool deleteRequest = (fFlags & B_DELETE_IO_REQUEST) != 0;
 
@@ -991,7 +993,7 @@ IORequest::NotifyFinished()
 	// notify callback
 	if (finishedCallback != NULL) {
 		finishedCallback(finishedCookie, this, status, partialTransfer,
-			lastTransferredOffset);
+			transferredBytes);
 	}
 
 	// notify parent
@@ -1076,8 +1078,8 @@ void
 IORequest::SubRequestFinished(IORequest* request, status_t status,
 	bool partialTransfer, generic_size_t transferEndOffset)
 {
-	TRACE("IORequest::SubrequestFinished(%p, %#" B_PRIx32 ", %d, %"
-		B_PRIuGENADDR "): request: %p\n", request, status, partialTransfer, transferEndOffset, this);
+	TRACE("IORequest::SubrequestFinished(%p, %#" B_PRIx32 ", %d, %" B_PRIuGENADDR
+		"): request: %p\n", request, status, partialTransfer, transferEndOffset, this);
 
 	MutexLocker locker(fLock);
 
@@ -1121,8 +1123,6 @@ IORequest::SetTransferredBytes(bool partialTransfer,
 		partialTransfer, transferredBytes);
 
 	MutexLocker _(fLock);
-
-	ASSERT(transferredBytes <= fLength);
 
 	fPartialTransfer = partialTransfer;
 	fTransferSize = transferredBytes;

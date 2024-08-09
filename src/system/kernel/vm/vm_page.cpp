@@ -1966,6 +1966,7 @@ public:
 
 	virtual void IOFinished(status_t status, bool partialTransfer,
 		generic_size_t bytesTransferred);
+
 private:
 	PageWriterRun*		fRun;
 	struct VMCache*		fCache;
