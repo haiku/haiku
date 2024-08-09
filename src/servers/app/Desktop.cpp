@@ -470,7 +470,6 @@ Desktop::~Desktop()
 {
 	delete_area(fSharedReadOnlyArea);
 	delete_port(fMessagePort);
-	gFontManager->DetachUser(fUserID);
 
 	free(fTargetScreen);
 }
@@ -502,8 +501,6 @@ Desktop::Init()
 		B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (fSharedReadOnlyArea < B_OK)
 		return fSharedReadOnlyArea;
-
-	gFontManager->AttachUser(fUserID);
 
 	fSettings.SetTo(new DesktopSettingsPrivate(fServerReadOnlyMemory));
 

@@ -55,9 +55,6 @@ public:
 			const ServerFont*	DefaultBoldFont() const;
 			const ServerFont*	DefaultFixedFont() const;
 
-			void				AttachUser(uid_t userID);
-			void				DetachUser(uid_t userID);
-
 	virtual	FontFamily*			GetFamily(uint16 familyID) const;
 	virtual	FontFamily*			GetFamily(const char* name);
 
@@ -81,6 +78,7 @@ private:
 									const char* style = NULL);
 			void				_PrecacheFontFile(const ServerFont* font);
 			void				_AddSystemPaths();
+			void				_AddUserPaths();
 			font_directory*		_FindDirectory(node_ref& nodeRef);
 			void				_RemoveDirectory(font_directory* directory);
 			status_t			_CreateDirectories(const char* path);
