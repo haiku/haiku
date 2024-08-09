@@ -113,6 +113,7 @@ GlobalFontManager::GlobalFontManager()
 	fInitStatus = FT_Init_FreeType(&gFreeTypeLibrary) == 0 ? B_OK : B_ERROR;
 	if (fInitStatus == B_OK) {
 		_AddSystemPaths();
+		_AddUserPaths();
 		_LoadRecentFontMappings();
 
 		fInitStatus = _SetDefaultFonts();
@@ -659,6 +660,20 @@ GlobalFontManager::_AddSystemPaths()
 
 
 void
+GlobalFontManager::_AddUserPaths()
+{
+#if !TEST_MODE
+	// TODO: avoids user fonts in safe mode
+	BPath path;
+	if (find_directory(B_USER_FONTS_DIRECTORY, &path, true) == B_OK)
+		_AddPath(path.Path());
+	if (find_directory(B_USER_NONPACKAGED_FONTS_DIRECTORY, &path, true) == B_OK)
+		_AddPath(path.Path());
+#endif
+}
+
+
+void
 GlobalFontManager::_ScanFontsIfNecessary()
 {
 	if (!fScanned)
@@ -991,32 +1006,4 @@ const ServerFont*
 GlobalFontManager::DefaultFixedFont() const
 {
 	return fDefaultFixedFont.Get();
-}
-
-
-void
-GlobalFontManager::AttachUser(uid_t userID)
-{
-	BAutolock locker(this);
-
-#if !TEST_MODE
-	// TODO: actually, find_directory() cannot know which user ID we want here
-	// TODO: avoids user fonts in safe mode
-	BPath path;
-	if (find_directory(B_USER_FONTS_DIRECTORY, &path, true) == B_OK)
-		_AddPath(path.Path());
-	if (find_directory(B_USER_NONPACKAGED_FONTS_DIRECTORY, &path, true)
-			== B_OK) {
-		_AddPath(path.Path());
-	}
-#endif
-}
-
-
-void
-GlobalFontManager::DetachUser(uid_t userID)
-{
-	BAutolock locker(this);
-
-	// TODO!
 }
