@@ -302,10 +302,10 @@ public:
 									bool partialTransfer,
 									generic_size_t bytesTransferred) = 0;
 
-	static	status_t 			IORequestCallback(void* data,
+	static	void	 			IORequestCallback(void* data,
 									io_request* request, status_t status,
 									bool partialTransfer,
-									generic_size_t transferEndOffset);
+									generic_size_t bytesTransferred);
 };
 
 

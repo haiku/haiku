@@ -199,10 +199,9 @@ typedef IOOperation io_operation;
 typedef DoublyLinkedList<IOOperation> IOOperationList;
 
 typedef struct IORequest io_request;
-typedef status_t (*io_request_finished_callback)(void* data,
+typedef void (*io_request_finished_callback)(void* data,
 			io_request* request, status_t status, bool partialTransfer,
-			generic_size_t transferEndOffset);
-			// TODO: Return type: status_t -> void
+			generic_size_t transferredBytes);
 typedef status_t (*io_request_iterate_callback)(void* data,
 			io_request* request, bool* _partialTransfer);
 

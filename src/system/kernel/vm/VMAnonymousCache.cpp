@@ -429,7 +429,6 @@ public:
 		}
 
 		fNextCallback->IOFinished(status, partialTransfer, bytesTransferred);
-
 		delete this;
 	}
 

@@ -26,13 +26,12 @@ AsyncIOCallback::~AsyncIOCallback()
 }
 
 
-/* static */ status_t
+/* static */ void
 AsyncIOCallback::IORequestCallback(void* data, io_request* request,
-	status_t status, bool partialTransfer, generic_size_t transferEndOffset)
+	status_t status, bool partialTransfer, generic_size_t bytesTransferred)
 {
 	((AsyncIOCallback*)data)->IOFinished(status, partialTransfer,
-		transferEndOffset);
-	return B_OK;
+		bytesTransferred);
 }
 
 
@@ -257,27 +256,25 @@ do_iterative_fd_io_iterate(void* _cookie, io_request* request,
 }
 
 
-static status_t
+static void
 do_iterative_fd_io_finish(void* _cookie, io_request* request, status_t status,
-	bool partialTransfer, generic_size_t transferEndOffset)
+	bool partialTransfer, generic_size_t bytesTransferred)
 {
 	iterative_io_cookie* cookie = (iterative_io_cookie*)_cookie;
 
 	if (cookie->finished != NULL) {
 		cookie->finished(cookie->cookie, request, status, partialTransfer,
-			transferEndOffset);
+			bytesTransferred);
 	}
 
 	put_fd(cookie->descriptor);
 
 	if (cookie->next_finished_callback != NULL) {
 		cookie->next_finished_callback(cookie->next_finished_cookie, request,
-			status, partialTransfer, transferEndOffset);
+			status, partialTransfer, bytesTransferred);
 	}
 
 	delete cookie;
-
-	return B_OK;
 }
 
 
