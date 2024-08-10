@@ -129,8 +129,8 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentMin ]
 
 # Git
 if [ IsOptionalHaikuImagePackageAdded Git ] {
-	AddHaikuImageSystemPackages git git_daemon perl ;
-	AddHaikuImageSourcePackages git ;
+	AddHaikuImageSystemPackages git@!gcc2 git_x86@secondary_x86 ;
+	AddHaikuImageSourcePackages git@!gcc2 git_x86@secondary_x86 ;
 }
 
 

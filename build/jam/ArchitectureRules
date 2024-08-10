@@ -155,6 +155,7 @@ rule ArchitectureSetup architecture
 
 	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 		HAIKU_DEFINES_$(architecture) += _BEOS_R5_COMPATIBLE_ ;
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unknown-pragmas ;
 	}
 
 	# private shared kernel/libroot headers
