@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Magnify	1465621918
+1	romanian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  dimensiunea trebuie să fie > 4 și un multiplu de 4
 Decrease pixel size	Magnify-Main		Micșorează dimensiunea pixelului
 no clip msg	In console, when clipboard is empty after clicking Copy image		niciun mesaj de clipboard
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Mărește dimensiunea ferestrei
 Save image	Magnify-Main		Salvează imaginea
 Show grid	Magnify-Main		Arată grila
 Magnify	System name		Amplifică
+height	Magnify-Main		înălțime
+width	Magnify-Main		lățime
 Info	Magnify-Main		Informații
 Show info	Magnify-Main		Arată informațiile
 Make square	Magnify-Main		Realizează pătrat

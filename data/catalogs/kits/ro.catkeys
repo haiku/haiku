@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	2539827825
+1	romanian	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
 gold master	AboutWindow		versiune finală
 Undo	TextView		Refă
@@ -6,6 +6,7 @@ OK	PrintJob		OK
 OK	Dragger		OK
 gamma	AboutWindow		gamma
 development	AboutWindow		dezvoltare
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s byte/s} other{%s bytes/s}}
 Print Server is not responding.	PrintJob		Serverul de imprimare nu răspunde.
 About %app%	AboutMenuItem		Despre %app%
 Warning	Dragger		Avertisment
@@ -27,6 +28,7 @@ Special Thanks:	AboutWindow		Mulţumiri speciale:
 %s TiB	StringForSize	size unit	%s TiO
 Default Haiku window decorator.	Default decorator about box		Decorator de fereastră Haiku implicit.
 %s GiB	StringForSize	size unit	%s GiO
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Elimină replicantul
 Version	AboutWindow		Versiune
 Red:	ColorControl		Roșu:
@@ -38,6 +40,7 @@ Error	PrintJob		Eroare
 %s TiB/s	StringForRate	units per second	%s TiO/s
 About %app…	Dragger		Despre %app…
 About %app%	AboutWindow		Despre %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s byte} other{%s bytes}}
 %s GiB/s	StringForRate	units per second	%s GiO/s
 Version history:	AboutWindow		Istoricul versiunii:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate localiza aplicația pentru replicant. Nu a fost furnizată nicio semnătură de aplicație.\n%error

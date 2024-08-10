@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	1148406263
+1	romanian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		ShowImage
 Page setup…	Menus		Configurare pagină…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul „%s” (pagina %d) a fost modificat. Doriți să închideți documentul?
@@ -39,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		Tipărire…
 The file '%s' could not be written.	SaveToFile		Fișierul „%s” nu a putut fi scris.
 Quit	Menus		Ieșire
+Get info	Menus		Obține informații
 Rating	Menus		Evaluare
 Close document	ClosePrompt		Închide documentul
 Stretch to window	Menus		Întinde la fereastră

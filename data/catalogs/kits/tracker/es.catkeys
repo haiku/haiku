@@ -107,7 +107,7 @@ Character	AttributesView		Carácter
 All disks	FindPanel		Todos los discos
 Affine transform	AttributesView		Transformación afine
 Window	ContainerWindow		Ventana
-%BytesPerSecond/s	StatusWindow		%BytesPorSegundo/s
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Eliminar
 Company	Person Query Columns		Empresa
 Recent documents	FavoritesMenu		Documentos recientes

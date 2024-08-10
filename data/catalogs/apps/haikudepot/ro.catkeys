@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3762371345
+1	romanian	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Toate depozitele
 Repository update error	LocalRepositoryUpdateProcess		Eroare de actualizare a depozitului
 Network error	ServerHelper		Eroare de rețea
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare la reîmprospătarea depozitului: %error%
 User Created	UserLoginWindow		Utilizator creat
 Check for updates…	MainWindow		Verifică pentru actualizări…
