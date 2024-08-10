@@ -4,11 +4,11 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-7
-	ca_root_certificates-2022_10_11-1
-	haikuporter-1.2.7-1
-	intel_wifi_firmwares-2022_01_11-5
-	noto_sans_cjk_jp-1.004-2
-	noto-20200106-1
+	ca_root_certificates-2024_07_02-1
+	haikuporter-1.2.9-1
+	intel_wifi_firmwares-2023_03_06-1
+	noto_sans_cjk_jp-2.004-1
+	noto-20240201-1
 	ralink_wifi_firmwares-2015_02_11-2
 	realtek_wifi_firmwares-2019_01_02-1
 	timgmsoundfont-fixed-5
@@ -25,8 +25,8 @@ RemotePackageRepository HaikuPorts
 	bzip2_devel-1.0.8-1
 	bzip2-1.0.8-1
 	coreutils-9.0-6
-	curl_devel-7.76.1-1
-	curl-7.76.1-1
+	curl_devel-8.8.0-2
+	curl-8.8.0-2
 	diffutils-3.8-1
 	expat_devel-2.4.6-1
 	expat-2.4.6-1
@@ -36,7 +36,7 @@ RemotePackageRepository HaikuPorts
 	ffmpeg-4.3-2
 	findutils-4.6.0-1
 	file-5.43-1
-	file_data-5.43-1
+	file_data-5.43-2
 	flex-2.5.35-1
 	fluidlite_devel-1.0.9-3
 	fluidlite-1.0.9-3
@@ -47,11 +47,11 @@ RemotePackageRepository HaikuPorts
 	gcc_syslibs_devel-13.2.0_2023_08_10-2
 	gcc_syslibs-13.2.0_2023_08_10-2
 	gcc-13.2.0_2023_08_10-2
-	gettext_libintl-0.19.8.1-7
+	gettext_libintl-0.22.5-1
 	giflib_devel-5.2.1-1
 	giflib-5.2.1-1
-	git_daemon-2.30.2-3
-	git-2.30.2-3
+	git_daemon-2.45.2-7
+	git-2.45.2-7
 	gmp_devel-6.2.1-3
 	gmp-6.2.1-3
 	grep-3.7-1
@@ -73,9 +73,11 @@ RemotePackageRepository HaikuPorts
 	libjpeg_turbo-2.1.3-1
 	libpcap-1.8.1-4
 	libpcre-8.45-1
-	libpcre2-10.39-1
+	libpcre2-10.43-2
 	libpng16_devel-1.6.37-1
 	libpng16-1.6.37-1
+	libssh2-1.9.0-4
+	libssh2_devel-1.9.0-4
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libvorbis_devel-1.3.7-1
@@ -95,17 +97,17 @@ RemotePackageRepository HaikuPorts
 	ncurses6_devel-6.3-1
 	ncurses6-6.3-1
 	netcat-1.10-4
-	nghttp2_devel-1.43.0-1
-	nghttp2-1.43.0-1
+	nghttp2_devel-1.59.0-1
+	nghttp2-1.59.0-1
 	openjpeg_devel-2.4.0-1
 	openjpeg-2.4.0-1
-	openssh-9.7p1-1
-	openssl_devel-1.1.1n-1
-	openssl-1.1.1n-1
+	openssh-9.8p1-2
+	openssl3_devel-3.0.14-1
+	openssl3-3.0.14-1
 	p7zip-17.04-2
 	patch-2.7.6-2
 	pe-2.4.5-9
-	perl-5.32.1-1
+	perl-5.40.0-3
 	pkgconfig-0.29.2-4
 	readline-8.2.001-1
 	sed-4.2.1-1
@@ -114,9 +116,9 @@ RemotePackageRepository HaikuPorts
 	texinfo-4.13a-1
 	tiff4-4.2.0-1
 	unzip-6.10c23-4
-	wget-1.21.1-1
+	wget-1.24.5-2
 	which-2.21-6
-	wpa_supplicant-2.9.haiku.1-3
+	wpa_supplicant-2.10.haiku.3-3
 	xz_utils_devel-5.6.1-1
 	xz_utils-5.6.1-1
 	zip-3.0-4
