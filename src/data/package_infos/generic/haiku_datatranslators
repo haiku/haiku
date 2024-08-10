@@ -41,7 +41,7 @@ requires {
 	lib:libavif
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_tiff_ENABLED
-	lib:libtiff >= 5.6
+	lib:libtiff
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libwebp_ENABLED
 	lib:libwebp
