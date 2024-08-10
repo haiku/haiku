@@ -461,15 +461,22 @@ write_rgba32b(jas_matrix_t** pixels, uchar* scanline, int width)
 //	#pragma mark -	jasper I/O
 
 
+#if __GNUC__ == 2
+typedef int jasper_length_t;
+#else
+typedef unsigned int jasper_length_t;
+#endif
+
+
 static int
-Read(jas_stream_obj_t* object, char* buffer, const unsigned int length)
+Read(jas_stream_obj_t* object, char* buffer, const jasper_length_t length)
 {
 	return (*(BPositionIO**)object)->Read(buffer, length);
 }
 
 
 static int
-Write(jas_stream_obj_t* object, const char* buffer, const unsigned int length)
+Write(jas_stream_obj_t* object, const char* buffer, const jasper_length_t length)
 {
 	return (*(BPositionIO**)object)->Write(buffer, length);
 }
