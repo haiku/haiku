@@ -7,6 +7,7 @@
 
 
 #include_next <sched.h>
+#include <features.h>
 
 #include <stdint.h>
 #include <sys/types.h>
