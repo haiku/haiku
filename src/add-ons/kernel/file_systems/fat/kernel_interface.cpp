@@ -2822,7 +2822,7 @@ dosfs_readdir(fs_volume* volume, fs_vnode* vnode, void* cookie, struct dirent* b
 			// 512 bytes for the FAT12/16 root directory
 		daddr_t readBlock;
 			// volume-relative index of the readSize-sized block into entriesBuf
-		size_t volumeCluster;
+		u_long volumeCluster;
 			// volume-relative cluster number containing the next entry to read
 		status = B_FROM_POSIX_ERROR(
 			pcbmap(fatNode, logicalCluster, &readBlock, &volumeCluster, &readSize));
