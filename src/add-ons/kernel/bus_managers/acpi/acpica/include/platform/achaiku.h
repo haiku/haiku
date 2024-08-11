@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2023, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2024, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -191,14 +191,11 @@ struct mutex;
 /* ACPICA cache implementation is adequate. */
 #define ACPI_USE_LOCAL_CACHE
 
-/* On other platform the default definition (do nothing) is fine. */
-#if defined(__i386__) || defined(__x86_64__)
 #define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
-#endif
 
 /* Based on FreeBSD's due to lack of documentation */
-extern int AcpiOsAcquireGlobalLock(volatile uint32_t *lock);
-extern int AcpiOsReleaseGlobalLock(volatile uint32_t *lock);
+int AcpiOsAcquireGlobalLock(uint32 *lock);
+int AcpiOsReleaseGlobalLock(uint32 *lock);
 
 #define ACPI_ACQUIRE_GLOBAL_LOCK(GLptr, Acq)    do {                \
         (Acq) = AcpiOsAcquireGlobalLock(&((GLptr)->GlobalLock));    \
@@ -211,7 +208,7 @@ extern int AcpiOsReleaseGlobalLock(volatile uint32_t *lock);
 #else /* _KERNEL_MODE */
 /* Host-dependent types and defines for user-space ACPICA */
 
-#warning "We only support kernel mode ACPI atm."
+#error "We only support kernel mode ACPI atm."
 
 #endif /* _KERNEL_MODE */
 #endif /* __ACHAIKU_H__ */
