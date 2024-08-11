@@ -36,14 +36,17 @@ rendering as a PNG, for example:
     ShowImage /tmp/packages.png
 """
 
+# Collect the list of packages to be analyzed
 path = "/system/packages"
 if len(sys.argv) > 1:
     packages = sys.argv[1:]
 else:
     packages = [join(path, f) for f in listdir(path) if(isfile(join(path, f)))]
 
-print('strict digraph {\nrankdir="LR"\nsplines=ortho\nnode [ fontname="Noto", fontsize=10];')
 
+# List the provides and requires for each package
+# pmap maps any provides to the corresponding packagename
+# rmap maps a packagename to the corresponding requires
 pmap = {}
 rmap = {}
 
@@ -66,17 +69,27 @@ for p in packages:
             if line != b'haiku' and line != b'haiku_x86':
                 requires.append(line)
 
+    basename = provides[0]
+    # Merge devel packages with the parent package
+    basename = basename.decode("utf-8").removesuffix("_devel")
     for pro in provides:
-        pmap[pro] = provides[0]
+        pmap[pro] = basename
     if len(requires) > 0:
-        rmap[provides[0]] = requires
+        if basename not in rmap:
+            rmap[basename] = requires
+        else:
+            rmap[basename].extend(requires)
 
-for k,v in rmap.items():
-    for dep in v:
+# Generate the graph in dot/graphviz format
+# For each package, there is an edge to each dependency package
+print('strict digraph {\nrankdir="LR"\nsplines=ortho\nnode [ fontname="Noto", fontsize=10];')
+
+for name, dependencies in rmap.items():
+    for dep in dependencies:
         color = "red"
         if dep in pmap:
             dep = pmap[dep]
             color = "blue"
-        print('"%s" -> "%s" [color=%s]' % (k.decode('utf-8'), dep.decode('utf-8'), color))
+        print(f'"{name}" -> "{dep}" [color={color}]')
 
 print("}")
