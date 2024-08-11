@@ -213,7 +213,7 @@ extern int AcpiOsReleaseGlobalLock(volatile uint32_t *lock);
 #else /* _KERNEL_MODE */
 /* Host-dependent types and defines for user-space ACPICA */
 
-#error "We only support kernel mode ACPI atm."
+#warning "We only support kernel mode ACPI atm."
 
 #endif /* _KERNEL_MODE */
 #endif /* __ACHAIKU_H__ */
