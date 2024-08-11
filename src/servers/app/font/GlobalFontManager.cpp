@@ -914,6 +914,9 @@ GlobalFontManager::_ScanFontDirectory(font_directory& fontDirectory)
 	// This bad boy does all the real work. It loads each entry in the
 	// directory. If a valid font file, it adds both the family and the style.
 
+	if (fontDirectory.scanned)
+		return B_OK;
+
 	BDirectory directory;
 	status_t status = directory.SetTo(&fontDirectory.directory);
 	if (status != B_OK)
@@ -924,8 +927,10 @@ GlobalFontManager::_ScanFontDirectory(font_directory& fontDirectory)
 		if (entry.IsDirectory()) {
 			// scan this directory recursively
 			font_directory* newDirectory;
-			if (_AddPath(entry, &newDirectory) == B_OK && newDirectory != NULL)
+			if (_AddPath(entry, &newDirectory) == B_OK && newDirectory != NULL
+				&& !newDirectory->scanned) {
 				_ScanFontDirectory(*newDirectory);
+			}
 
 			continue;
 		}
