@@ -213,7 +213,7 @@ RemotePackageRepository HaikuPorts
 	pe-2.4.5-10
 	perl-5.40.0-3
 	pkgconfig-0.29.2-4
-	python3.10-3.10.14-4
+	python3.10-3.10.14-5
 	qrencode_kdl_devel-3.4.4-2
 	rav1e-0.7.1-1
 	readline-8.2.001-1

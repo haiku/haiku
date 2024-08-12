@@ -152,8 +152,8 @@ RemotePackageRepository HaikuPorts
 	taglib-1.7.2-4
 	taglib_devel-1.7.2-4
 	texinfo-6.1-8
-	tiff4-4.2.0-1
-	tiff4_devel-4.2.0-1
+	tiff-4.2.0-1
+	tiff_devel-4.2.0-1
 	tnftp-20151004-6
 	unzip-6.10c23-5
 	vision-0.10.6-2
@@ -301,7 +301,7 @@ RemotePackageRepository HaikuPorts
 	p7zip_x86-17.05-1
 	perl_x86-5.40.0-3
 	pkgconfig_x86-0.29.2-4
-	python3.10_x86-3.10.14-4
+	python3.10_x86-3.10.14-5
 	rav1e_x86-0.7.1-1
 	readline_x86-8.2.001-1
 	sharutils_x86-4.15.2-3
