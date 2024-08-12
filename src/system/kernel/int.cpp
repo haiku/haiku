@@ -315,6 +315,9 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 			handled = true;
 	}
 
+	ASSERT_PRINT(!are_interrupts_enabled(),
+		"interrupts enabled after calling handlers for vector %d", vector);
+
 #if DEBUG_INTERRUPTS
 	sVectors[vector].trigger_count++;
 	if (status != B_UNHANDLED_INTERRUPT || handled) {
