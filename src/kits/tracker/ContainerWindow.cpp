@@ -1803,12 +1803,10 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 			TemplatesMenu* templatesMenu = new TemplatesMenu(PoseView(),
 				B_TRANSLATE("New"));
 			menu->AddItem(templatesMenu);
-			templatesMenu->SetEnabled(!PoseView()->TargetVolumeIsReadOnly());
 			templatesMenu->SetTargetForItems(PoseView());
 		} else {
 			item = new BMenuItem(B_TRANSLATE("New folder"),
 				new BMessage(kNewFolder), 'N');
-			item->SetEnabled(!PoseView()->TargetVolumeIsReadOnly());
 			menu->AddItem(item);
 		}
 	}
@@ -2804,13 +2802,11 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 			TemplatesMenu* templatesMenu = new TemplatesMenu(PoseView(),
 				B_TRANSLATE("New"));
 			menu->AddItem(templatesMenu);
-			templatesMenu->SetEnabled(!PoseView()->TargetVolumeIsReadOnly());
 			templatesMenu->SetTargetForItems(PoseView());
 			templatesMenu->SetFont(be_plain_font);
 		} else {
 			BMenuItem* item = new BMenuItem(B_TRANSLATE("New folder"),
 				new BMessage(kNewFolder), 'N');
-			item->SetEnabled(!PoseView()->TargetVolumeIsReadOnly());
 			menu->AddItem(item);
 		}
 	}
@@ -3056,6 +3052,11 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 	}
 
 	if (context == kMenuBarContext || context == kPosePopUpContext) {
+		if (!PoseView()->IsFilePanel())
+			EnableNamedMenuItem(menu, B_TRANSLATE("New"), !PoseView()->TargetVolumeIsReadOnly());
+		else
+			EnableNamedMenuItem(menu, kNewFolder, !PoseView()->TargetVolumeIsReadOnly());
+
 		SetupEditQueryItem(menu);
 
 		EnableNamedMenuItem(menu, kEditItem, PoseView()->CanEditName());
