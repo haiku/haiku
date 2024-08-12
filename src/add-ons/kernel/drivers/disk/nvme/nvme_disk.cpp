@@ -645,24 +645,22 @@ nvme_disk_io(void* cookie, io_request* request)
 		}
 		// SetStatusAndNotify() takes care of unlocking memory if necessary.
 
-		// This is slightly inefficient, as we could use a BStackOrHeapArray in
-		// the optimal case (few physical entries required), but we would not
-		// know whether or not that was possible until calling get_memory_map()
-		// and then potentially reallocating, which would complicate the logic.
-
-		int32 vtophys_length = (request->Length() / B_PAGE_SIZE) + 2;
-		nvme_request.iovecs = vtophys = (physical_entry*)malloc(sizeof(physical_entry)
-			* vtophys_length);
+		const int32 vtophysLength = (request->Length() / B_PAGE_SIZE) + 2;
+		if (vtophysLength <= 8) {
+			vtophys = (physical_entry*)alloca(sizeof(physical_entry) * vtophysLength);
+		} else {
+			vtophys = (physical_entry*)malloc(sizeof(physical_entry) * vtophysLength);
+			vtophysDeleter.SetTo(vtophys);
+		}
 		if (vtophys == NULL) {
 			TRACE_ERROR("failed to allocate memory for iovecs\n");
 			request->SetStatusAndNotify(B_NO_MEMORY);
 			return B_NO_MEMORY;
 		}
-		vtophysDeleter.SetTo(vtophys);
 
 		for (size_t i = 0; i < buffer->VecCount(); i++) {
 			generic_io_vec virt = buffer->VecAt(i);
-			uint32 entries = vtophys_length - nvme_request.iovec_count;
+			uint32 entries = vtophysLength - nvme_request.iovec_count;
 
 			// Avoid copies by going straight into the vtophys array.
 			status = get_memory_map_etc(request->TeamID(), (void*)virt.base,
@@ -671,21 +669,10 @@ nvme_disk_io(void* cookie, io_request* request)
 			if (status == B_BAD_VALUE && entries == 0)
 				status = B_BUFFER_OVERFLOW;
 			if (status == B_BUFFER_OVERFLOW) {
-				TRACE("vtophys array was too small, reallocating\n");
-
-				vtophys_length *= 2;
-				nvme_request.iovecs = vtophys = (physical_entry*)realloc(vtophys,
-					sizeof(physical_entry) * vtophys_length);
-				if (vtophys != NULL) {
-					vtophysDeleter.Detach();
-					vtophysDeleter.SetTo(vtophys);
-
-					// Try again, with the larger buffer this time.
-					i--;
-					continue;
-				} else {
-					status = B_NO_MEMORY;
-				}
+				// Too many physical_entries to use unbounced I/O.
+				vtophysDeleter.Delete();
+				vtophys = NULL;
+				break;
 			}
 			if (status != B_OK) {
 				TRACE_ERROR("I/O get_memory_map failed: %s\n", strerror(status));
@@ -695,6 +682,8 @@ nvme_disk_io(void* cookie, io_request* request)
 
 			nvme_request.iovec_count += entries;
 		}
+
+		nvme_request.iovecs = vtophys;
 	} else {
 		nvme_request.iovecs = (physical_entry*)buffer->Vecs();
 		nvme_request.iovec_count = buffer->VecCount();
@@ -702,7 +691,7 @@ nvme_disk_io(void* cookie, io_request* request)
 
 	// See if we need to bounce anything other than the first or last vec.
 	const size_t block_size = handle->info->block_size;
-	bool bounceAll = false;
+	bool bounceAll = (nvme_request.iovecs == NULL);
 	for (int32 i = 1; !bounceAll && i < (nvme_request.iovec_count - 1); i++) {
 		if ((nvme_request.iovecs[i].address % B_PAGE_SIZE) != 0)
 			bounceAll = true;
