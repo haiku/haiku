@@ -378,6 +378,22 @@
 </sect1>
 
 <sect1>
+<title>Easy Access to Recently Used Files</title>
+<para>The Deskbar provides the most recently used documents, folders and applications,
+	but those lists are limited in slots (defaults to 10) and not permanent. Therefore,
+	applications that deal with files should provide the user with a list of files they
+	have opened or saved most recently.</para>
+
+<para>It's recommended to show the last 10 opened or saved files in a submenu of
+	the Open menu item in the File menu. If the user clicks the Open label, the
+	regular file dialog appears, otherwise they can choose the file to open from its
+	submenu. An example of this is the StyledEdit application.</para>
+
+<para>The Haiku API provides BRecentFilesList::NewFileListMenu() in the RecentItems.h
+    header that creates the recent files menu and has the system do all its management.</para>
+</sect1>
+
+<sect1>
 <title>Make Your App's Look Fit in with Others</title>
 
 <para>Certain function calls have been provided in the API to aid in making sure
