@@ -321,7 +321,7 @@ APRView::_SetColor(color_which which, rgb_color color)
 		_SetOneColor(B_SCROLL_BAR_THUMB_COLOR, color);
 
 		const rgb_color menuSelectedBackground
-			= tint_color(color, isDark ? B_LIGHTEN_2_TINT : B_DARKEN_2_TINT);
+			= tint_color(color, isDark ? 0.8 /* lighten "< 1" */ : B_DARKEN_2_TINT);
 		_SetOneColor(B_MENU_SELECTED_BACKGROUND_COLOR, menuSelectedBackground);
 
 		const rgb_color controlBackground = tint_color(color, isDark
