@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	2813509533
+1	spanish; castilian	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Autenticación requerida
 Previous	WebPositive Window		Anterior
 Copy	Console Window		Copiar
@@ -46,6 +46,7 @@ New tabs:	Settings Window		Nuevas pestañas:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falló
 Open downloads folder	Download Window		Abrir carpeta de descargas
 Proxy server	Settings Window		Servidor proxy
+Darn!	WebPositive		¡Rayos!
 Decrease size	WebPositive Window		Disminuir tamaño
 Default fixed font size:	Settings Window		Tamaño de fuente monoespaciada por defecto:
 Sans serif font:	Settings Window		Tipo de letra Sans serif:

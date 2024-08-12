@@ -1,7 +1,6 @@
-1	turkish	x-vnd.Haiku-About	3595470255
+1	turkish	x-vnd.Haiku-About	1807839374
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999–2007 Michael C. Ring. Tüm hakları saklıdır.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Telif hakkı © 2002–2004 Vivek Mohan. Tüm hakları saklıdır.
 \n\nSpecial thanks to:\n	AboutView		\n\nÖzel teşekkürlerimizle:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ve kendisinin NewOS çekirdeği)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Telif Hakkı © 1999–2000 Y. Takagi. Tüm hakları saklıdır.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Önceki geliştiriciler:\n
 Unknown	AboutView		Bilinmeyen
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. ve geliştirici takımına BeOS’u yarattıkları için!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Telif hakkı © 2002–2014 Industrial Light & Magic, Lucas Digital Ltd. LLC’nin bir bölümü.
 Licenses: 	AboutView		Lisanslar: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku işletim sistemi kodunun telif hakkı Haiku, Inc.’in veya kaynak kodunda belirtilen yazarların mülkiyetine tabidir. Haiku® ve HAIKU logosu® Haiku Inc.’in tescilli markalarıdır.\n\n

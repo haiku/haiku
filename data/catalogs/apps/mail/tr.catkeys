@@ -75,7 +75,7 @@ View	Mail		Görüntü
 Signatures	Mail		İmzalar
 On	Mail		Açık
 Find	Mail		Bul
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Üzgünüm, ‘Kişi’ veri türünü destekleyen bir uygulama bulunamadı.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Üzgünüm, “Kişi” veri türünü destekleyen bir uygulama bulunamadı.
 Date:	Mail		Tarih:
 Expert	Mail		Uzman
 Automatically mark mail as read:	Mail		E-postaları kendiliğinden okundu olarak imle:

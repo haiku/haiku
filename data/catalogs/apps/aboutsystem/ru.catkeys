@@ -1,7 +1,6 @@
-1	russian	x-vnd.Haiku-About	3595470255
+1	russian	x-vnd.Haiku-About	1807839374
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		© 1999-2007 Michael C. Ring. Все права защищены.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		© 2002-2004 Vivek Mohan. Все права защищены.
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Все права защищены.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
 Unknown	AboutView		Неизвестно
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Корпорации Be и её команде разработчиков, за создание BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, подразделение Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Лицензии: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld МГц
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n

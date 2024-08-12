@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	171477831
+1	japanese	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		項目をごみ箱に捨てる
 Close	MediaPlayer-PlaylistWindow		閉じる
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		メディアプレーヤー設�
 Copyright	MediaPlayer-InfoWin		著作権
 Invalid URL inserted!	MediaPlayer-NetworkStream		無効な URL が書き込まれました!
 Aspect ratio	MediaPlayer-Main		アスペクト比
+Eject device	MediaPlayer-Main		デバイスの取り出し
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		プレイリストの保存に失敗しました。\n\nエラー:
 <no media>	MediaPlayer-InfoWin		<メディアはありません>
 Hide interface	MediaPlayer-Main		インターフェイスを隠す
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		全画面表示
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (ロックに失敗)。プレイリストの保存に失敗しました。
 100% scale	MediaPlayer-Main		100% 表示
+New player	MediaPlayer-Main		新規プレーヤー
 <nothing to redo>	MediaPlayer-PlaylistWindow		<やり直しできません>
 Bad URL	MediaPlayer-NetworkStream		Bad URL
 Save	MediaPlayer-Main		保存

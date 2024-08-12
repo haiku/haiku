@@ -20,13 +20,13 @@ Mini icon view	MediaRoutingView		Вид «Міні-значки»
 Select all	MediaRoutingView		Вибрати все
 (same as group)	MediaNodePanel		(як для групи)
 Input	MediaJack		Вхід
-Get info	MediaJack		Дивитись Інфо
+Get info	MediaJack		Дивитись інфо
 Start time source	MediaNodePanel		Запустити відлік часу
 Error	MediaRoutingView		Помилка
 Could not release '%refname%'	MediaRoutingView		Не вдалося відключити «%refname%»
 Output	MediaJack		Вихід
-Get info	MediaNodePanel		Дивитись Інфо
-Get info	MediaRoutingView		Дивитись Інфо
+Get info	MediaNodePanel		Дивитись інфо
+Get info	MediaRoutingView		Дивитись інфо
 Clean up	MediaRoutingView		Упорядкувати
 Start control panel	MediaNodePanel		Запустити панель управління
 Tweak parameters	MediaNodePanel		Настройка параметрів

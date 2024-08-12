@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaPlayer	171477831
+1	catalan; valencian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Envia l'entrada a la paperera
 Close	MediaPlayer-PlaylistWindow		Tanca
 Volume of background clips	MediaPlayer-SettingsWindow		Volum dels clips de fons
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Paràmetres del Reproductor mul
 Copyright	MediaPlayer-InfoWin		Dret de reproducció
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL proporcionat no vàlid!
 Aspect ratio	MediaPlayer-Main		Relació d'aspecte
+Eject device	MediaPlayer-Main		Expulsa el dispostiu
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Ha fallat desar la llista de reproducció.\n\nError: 
 <no media>	MediaPlayer-InfoWin		<sense mitjans>
 Hide interface	MediaPlayer-Main		Amaga la interfície
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Pantalla completa
 OK	MediaPlayer-NetworkStream		D'acord
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error intern (fallada de blocatge). Ha fallat desar la llista de reproducció.
 100% scale	MediaPlayer-Main		Escala de 100 %
+New player	MediaPlayer-Main		Reproductor nou
 <nothing to redo>	MediaPlayer-PlaylistWindow		<res per refer>
 Bad URL	MediaPlayer-NetworkStream		URL incorrecte
 Save	MediaPlayer-Main		Desa

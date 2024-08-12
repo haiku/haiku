@@ -1,7 +1,6 @@
-1	japanese	x-vnd.Haiku-About	3595470255
+1	japanese	x-vnd.Haiku-About	3675341430
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. All rights reserved.
 \n\nSpecial thanks to:\n	AboutView		\n\n下記の協力者の方々に深く感謝します:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (ならびに彼が開発した NewOS カーネル)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y. Takagi. All rights reserved.
@@ -13,7 +12,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. All rights reserved.
 Past website & marketing:\n	AboutView		過去のウェブサイトおよびマーケティング:\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. All rights reserved.
-Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe他
+Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe and others.
 Testing and bug triaging:\n	AboutView		テストとバグの分別:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{プロセッサ:} other{#プロセッサ:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi ファームウェア
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		過去のメンテナー:\n
 Unknown	AboutView		不明
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc.およびその開発チーム: 彼らはBeOSを創造してくれました!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		ライセンス:
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku のコードの著作権はHaiku, Inc.または各ソースコードに明示された個々の著者に帰属します。Haiku® および HAIKU ロゴ・マーク® は Haiku, Inc. の(登録)商標です。\n\n
@@ -48,7 +46,7 @@ Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright �
 AboutSystem	System name		このシステムについて
 Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Copyright © 2019 Joe Drago. All rights reserved.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. All rights reserved.
-Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center LtdおよびClark Cooper.
+Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.
 \nCopyrights\n\n	AboutView		\n著作権\n\n
 Source Code: 	AboutView		ソースコード:
 GNU GPL v3	AboutWindow		GNU GPL v3
@@ -69,7 +67,7 @@ Intel (2xxx firmware)	AboutWindow		Intel (2xxx ファームウェア)
 License: 	AboutView		ライセンス:
 GNU GPL v2	AboutWindow		GNU GPL v2
 %d MiB used (%d%%)	AboutView	326 MiB used (16%)	%d MiB 使用済 (%d%%)
-The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 および Christof Lutteroth\n\n
+The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland and Christof Lutteroth\n\n
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld The Haiku project. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. All rights reserved.
@@ -77,11 +75,12 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat maintainers.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		各国語翻訳:\n
+Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n...おそらく、ここに記載し忘れた方々もいることでしょう (すみません!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. All rights reserved.
 BSD (2-clause)	AboutWindow		BSD (二条項)
 Website & marketing:\n	AboutView		ウェブサイトおよびマーケティング:\n
-%d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB 使用済 (%s)
+%d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB 使用 (%s)
 %.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f GHz
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger based on the Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		...寄付をしていただいた大勢の方々!\n\n

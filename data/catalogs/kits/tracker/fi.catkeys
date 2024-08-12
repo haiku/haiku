@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2482866522
+1	finnish	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		Ohita kirjainkoko
 Current folder	ContainerWindow		Nykyiset kansiot
 Finish: %time - Over %finishtime left	StatusWindow		Loppuu: %time - Yli %finistime jäljellä
 Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
-Location:	InfoWindow		Sijainti:
 Name	PoseView		Nimi
+Location:	InfoWindow		Sijainti:
 Kind:	InfoWindow		Tyyppi:
 contains	FindPanel		sisältää
 Open	FilePanelPriv		Avaa
@@ -105,7 +105,6 @@ Window	ContainerWindow		Ikkuna
 Remove	FindPanel		Poista
 Company	Person Query Columns		Yritys
 Recent documents	FavoritesMenu		Äskettäiset asiakirjat
-Save as Query template:	FindPanel		Tallenna kyselymallinteena
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# tavu} other{# tavua}}
 8-bit integer	AttributesView		8-bittinen kokonaisluku
@@ -122,7 +121,6 @@ List folders first	SettingsView		Luettele kansiot ensin
 Find	FSUtils		Etsi
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Kohde nimeltä ”%name” on jo olemassa tässä kansiossa. Haluaisitko korvata sen symbolisella linkillä, jota olet luomassa?
 List view	ContainerWindow		Luettelonäkymä
-Temporary	FindPanel		Tilapäinen
 Modified	QueryPoseView		Muokattu
 Create relative link	ContainerWindow		Luo suhteellinen linkki
 Owner	FilePermissionsView		Omistaja
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		ei tukevia sovelluksia
 32-bit unsigned integer	AttributesView		32-bittinen etumerkitön kokonaisluku
 Preparing to empty Trash…	StatusWindow		Valmistaudutaan tyhjentämään roskakori...
 Deleting: 	StatusWindow		Poistetaan: 
+label too long	PoseView		nimike on liian pitkä
 the MIME settings	FSUtils		MIME-asetukset
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
-label too long	PoseView		nimike on liian pitkä
 Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen ”%name”.
 Unknown	FilePermissionsView		Tuntematon
 Paste links	ContainerWindow		Liitä linkit
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME-polku
 less than	FindPanel		pienempi kuin
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 Creating links: 	StatusWindow		Luodaan linkit: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Create %s clipping	PoseView		Luo %s-leikkaus
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
 To: %dir	StatusWindow		Vastaanottaja: %dir
 Paste layout	ContainerWindow		Liitä sijoittelu
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Pakota tunnistus
 no items	CountView		ei kohteita
 Time	AttributesView		Aika
 Disks	DirMenu		Levyt
-Query name:	FindPanel		Kyselynimi:
 Open parent	ContainerWindow		Avaa päätaso
 Find…	ContainerWindow		Etsi...
 moving	FSUtils		siirretään
@@ -480,8 +477,8 @@ Color	AttributesView		Väri
 Copy layout	ContainerWindow		Kopioi sijoittelu
 Duplicate	ContainerWindow		Kaksoiskappale
 16-bit integer	AttributesView		16-bittinen kokonaisluku
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Huomaa: tiedostonimet kohdetiedostojärjestelmässä eivät ole kirjainkoosta riippuvia.\n
 Untitled clipping	PoseView		Otsikoton leikkaus
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Huomaa: tiedostonimet kohdetiedostojärjestelmässä eivät ole kirjainkoosta riippuvia.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto ”%name” on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
 , indexed	InfoWindow		, indeksoitu
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudotettava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.
@@ -497,8 +494,8 @@ True-color picture	AttributesView		Tosivärikuva
 Add-ons	FilePanelPriv		Lisäosat
 Alignment	AttributesView		Tasaus
 Move to Trash	FSUtils		Siirrä roskakoriin
-Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Cancel	PoseView		Peru
+Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Delete	PoseView		Poista
 Media parameter	AttributesView		Mediaparametri
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kotikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.

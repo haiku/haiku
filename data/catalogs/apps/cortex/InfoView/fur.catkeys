@@ -44,7 +44,7 @@ Input format	DormantNodeInfoView		Formât di jentrade
 Format	InfoView		Formât
 Version	AppNodeInfoView		Version
 AddOn ID	DormantNodeInfoView		ID de zonte
-Frame size	InfoView		Dimension ricuadri
+Frame size	InfoView		Dimensions ricuadri
 Flavor ID	DormantNodeInfoView		ID dai savôrs
 Run mode	LiveNodeInfoView		Modalitât di esecuzion
 \n- Codec:	FileNodeInfoView		\n- Codec:

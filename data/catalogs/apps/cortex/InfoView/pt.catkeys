@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.InfoView	1782197806
+1	portuguese	application/x-vnd.Cortex.InfoView	1385552321
 Offset	InfoView		Deslocamento
 Description	DormantNodeInfoView		Descrição
 Byte order	InfoView		Ordem de bytes
@@ -10,6 +10,7 @@ Signature	AppNodeInfoView		Assinatura
 Video data between	InfoView		Dados de vídeo entre
 Any number	DormantNodeInfoView	For 'Max. instances' field	Qualquer número
 Flags	InfoView		Atributos
+Media output	InfoView		Saída de multimédia
 Active lines	InfoView		Linhas ativas
 Buffer size	InfoView		Tamanho do buffer
 \n- Quality:	FileNodeInfoView		\n- Qualidade:
@@ -18,7 +19,7 @@ Application	AppNodeInfoView		Aplicação
 Max. instances	DormantNodeInfoView		Nº máx. instâncias
 \n- Duration:	FileNodeInfoView		\n- Duração:
 Latency	LiveNodeInfoView		Latência
-Media type	InfoView		Tipo de mídia
+Media type	InfoView		Tipo de multimédia
 Kinds	DormantNodeInfoView		Tipos
 Resolution	InfoView		Resolução
 Chunk size	InfoView		Tamanho do bloco
@@ -28,7 +29,7 @@ Channels	InfoView		Canais
 Sample rate	InfoView		Taxa de amostragem
 File format	FileNodeInfoView		Formato de ficheiro
 (no file)	FileNodeInfoView		(nenhum ficheiro)
-Media input	InfoView		Entrada de mídia
+Media input	InfoView		Entrada de multimédia
 Bit rate	InfoView		Taxa de bit
 Input format	DormantNodeInfoView		Formato de entrada
 Format	InfoView		Formato

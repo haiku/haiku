@@ -2,7 +2,7 @@
 Loop	RecorderWindow		Cicli continui
 Cannot find default audio hardware	RecorderWindow		Impussibil cjatâ l'hardware audio predefinît
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Impussibil cjatâ il file temporani creât par conservâ la gnove regjistrazion
-Sample size:	RecorderWindow		Dimension di campionament:
+Sample size:	RecorderWindow		Dimension dal campionament:
 Nothing to play	RecorderWindow		Nie di riprodusi
 None of the files appear to be audio files.	RecorderWindow		Nissun dai files al somee jessi un file audio.
 Duration: 	RecorderWindow		Durade: 

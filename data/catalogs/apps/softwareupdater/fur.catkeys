@@ -17,10 +17,10 @@ New packages to be installed	SoftwareUpdaterWindow	List super item label	Gnûfs 
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pachets di inzornâ
 to	SoftwareUpdaterWindow	List item text	a
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Daûr a cirî di anulâ i inzornaments…
-Contacting software repositories to check for package updates.	CheckManager		Daûr a contatâ i dipuesits dal software par verificâ la presince di inzornaments di pachets.
+Contacting software repositories to check for package updates.	CheckManager		Daûr a contatâ i dipuesits dal software par verificâ la presince di pachets inzornâts.
 Available updates found	CheckManager		Inzornaments disponibii cjatâts
 from repository	SoftwareUpdaterWindow	List item text	dal dipuesit
-Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Daûr a contatâ i dipuesits software par verificâ la presince di inzornaments di pachets.
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Daûr a contatâ i dipuesits software par verificâ la presince di pachets inzornâts.
 Cancelling updates	SoftwareUpdaterWindow		Anulament dai inzornaments
 Cancel	SoftwareUpdaterWindow	Alert button label	Anule
 There were no updates found.	UpdateAction		Nissun inzornament cjatât.

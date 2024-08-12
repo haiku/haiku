@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	1148406263
+1	french	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Visionneuse
 Page setup…	Menus		Mise en page…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » (page %d) a changé. Voulez-vous fermer le document ?
@@ -39,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		Imprimer…
 The file '%s' could not be written.	SaveToFile		Le fichier « %s » ne peut pas être écrit.
 Quit	Menus		Quitter
+Get info	Menus		Obtenir les informations
 Rating	Menus		Évaluation
 Close document	ClosePrompt		Fermer le document
 Stretch to window	Menus		Étirer à la fenêtre

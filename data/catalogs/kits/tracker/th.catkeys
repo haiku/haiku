@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	4159497115
+1	thai	x-vnd.Haiku-libtracker	4246556324
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -12,8 +12,8 @@ Ignore case	SelectionWindow		ละเว้นกรณี
 Current folder	ContainerWindow		โฟลเดอร์ปัจจุบัน
 Finish: %time - Over %finishtime left	StatusWindow		เสร็จ:%time - มากกว่า %finishtime คงเหลือ
 Mount all disks now	AutoMounterSettings		เมาท์ดิสก์ทั้งหมดตอนนี้
-Location:	InfoWindow		สถานที่:
 Name	PoseView		ชื่อ
+Location:	InfoWindow		สถานที่:
 Kind:	InfoWindow		ชนิด:
 contains	FindPanel		มี
 Open	FilePanelPriv		เปิด
@@ -97,7 +97,6 @@ Window	ContainerWindow		หน้าต่าง
 Remove	FindPanel		ลบ
 Company	Person Query Columns		บริษัท
 Recent documents	FavoritesMenu		เอกสารล่าสุด
-Save as Query template:	FindPanel		บันทึกเป็นแม่แบบ Query:
 Edit templates…	TemplatesMenu		แก้ไขเทมเพลต
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} อื่นๆ{# bytes}}
 8-bit integer	AttributesView		8-bit integer
@@ -113,7 +112,6 @@ List folders first	SettingsView		รายการโฟลเดอร์ก�
 Find	FSUtils		ค้นหา
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		มีรายการชื่อ \"%name\" อยู่ในโฟลเดอร์นี้แล้ว คุณต้องการแทนที่ด้วยลิงก์สัญลักษณ์ที่คุณกำลังสร้างหรือไม่?
 List view	ContainerWindow		รายการดู
-Temporary	FindPanel		ชั่วคราว
 Modified	QueryPoseView		แก้ไข
 Create relative link	ContainerWindow		สร้างลิงค์ที่เกี่ยวข้อง
 Owner	FilePermissionsView		เจ้าของ
@@ -262,9 +260,9 @@ no supporting apps	OpenWithWindow		ไม่มีแอพที่รองร
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		กำลังเตรียมที่จะล้างถังขยะ
 Deleting: 	StatusWindow		กำลังลบ:
+label too long	PoseView		ป้ายกำกับยาวเกินไป
 the MIME settings	FSUtils		ตั้งค่า MIME
 You can't move or copy the trash.	FSUtils		คุณไม่สามารถย้ายหรือคัดลอกถังขยะ
-label too long	PoseView		ป้ายกำกับยาวเกินไป
 Error creating link to \"%name\".	FSUtils		เกิดข้อผิดพลาดในการสร้างลิงก์ไปยัง \"%name\"
 Unknown	FilePermissionsView		ไม่รู้จัก
 Paste links	ContainerWindow		วางลิงค์
@@ -311,8 +309,8 @@ of %items	StatusWindow		ของ %items
 less than	FindPanel		น้อยกว่า
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		เกิดข้อผิดพลาดในการคัดลอกไฟล์ \"%name\":\n\t%error\n\nคุณต้องการที่จะดำเนินการต่อไป?
 Creating links: 	StatusWindow		สร้างลิงค์:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ไม่สามารถเปิด \"%document\" ด้วยแอปพลิเคชัน \"%app\" (%error)
 Create %s clipping	PoseView		สร้าง %s การตัด
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ไม่สามารถเปิด \"%document\" ด้วยแอปพลิเคชัน \"%app\" (%error)
 Error moving \"%name\"	FSUtils		เกิดข้อผิดพลาดในการย้าย \"%name\"
 To: %dir	StatusWindow		ไปที่: %dir
 Paste layout	ContainerWindow		วางเลย์เอาต์
@@ -357,7 +355,6 @@ Force identify	ContainerWindow		บังคับแสดง
 no items	CountView		ไม่มีรายการ
 Time	AttributesView		เวลา
 Disks	DirMenu		ดิสก์
-Query name:	FindPanel		ชื่อ Query:
 Open parent	ContainerWindow		เปิด parent
 Find…	ContainerWindow		ค้นหา
 moving	FSUtils		กำลังย้าย
@@ -471,8 +468,8 @@ True-color picture	AttributesView		ภาพสีจริง
 Add-ons	FilePanelPriv		เพิ่มเติม
 Alignment	AttributesView		การวางแนว
 Move to Trash	FSUtils		ย้ายไปที่ถังขยะ
-Handles %type	OpenWithWindow		จัดการ %type
 Cancel	PoseView		ยกเลิก
+Handles %type	OpenWithWindow		จัดการ %type
 Delete	PoseView		ลบ
 Media parameter	AttributesView		พารามิเตอร์สื่อ
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		หากคุณเปลี่ยนโฟลเดอร์หลัก %osName อาจทำงานไม่ถูกต้อง!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้\n\nหากต้องการแก้ไขโฟลเดอร์หลักให้กดแป้น Shift ค้างไว้แล้วคลิก \"ฉันรู้ว่าฉันกำลังทำอะไร\"

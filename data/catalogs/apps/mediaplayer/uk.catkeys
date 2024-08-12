@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	171477831
+1	ukrainian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -35,7 +35,7 @@ Start media server	MediaPlayer-Main		Запустити Медіасервер
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже, медіасервер не працює.\nБажаєте запустити його?
 Location	MediaPlayer-InfoWin		Шлях
 %lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
-Opening '%s'.	MediaPlayer-Main		Відкриття '%s'.
+Opening '%s'.	MediaPlayer-Main		Відкриття «%s».
 Medium	MediaPlayer-SettingsWindow		Середній
 Play mode	MediaPlayer-SettingsWindow		Режим відтворення
 Playlist	MediaPlayer-PlaylistWindow		Плейлист
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Мед
 Copyright	MediaPlayer-InfoWin		Авторське право
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
+Eject device	MediaPlayer-Main		Вийняти пристрій
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збій збереження списку відтворення.\n\nПомилка: 
 <no media>	MediaPlayer-InfoWin		<відсутні медіа>
 Hide interface	MediaPlayer-Main		Приховати інтерфейс
@@ -125,13 +126,14 @@ Full screen	MediaPlayer-Main		Повний екран
 OK	MediaPlayer-NetworkStream		ОК
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (збій блокування). Збій збереження списку відтворення.
 100% scale	MediaPlayer-Main		Масштаб 100%
+New player	MediaPlayer-Main		Новий Плеєр…
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого повторити>
 Bad URL	MediaPlayer-NetworkStream		Недійсний URL
 Save	MediaPlayer-Main		Зберегти
 Close window after playing video	MediaPlayer-SettingsWindow		Закрити вікно після відтворення відео
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Плавний масштаб відео (без режиму накладання)
 200% scale	MediaPlayer-Main		Масштаб 200%
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' неможливо відкрити.\n\n
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл «%filename» неможливо відкрити.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден із файлів, які Ви хотіли відтворити не є файлом медіа.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Вилучити запис
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Вилучити записи до смітника

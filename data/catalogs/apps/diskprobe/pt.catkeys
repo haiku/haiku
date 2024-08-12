@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-DiskProbe	4193379066
+1	portuguese	x-vnd.Haiku-DiskProbe	534195942
 Raw editor	AttributeWindow		Editor de ficheiro em formato 'raw'
 Remove	AttributeWindow		Remover
 Close	ProbeView		Fechar
@@ -116,6 +116,7 @@ DiskProbe request	ProbeView		Solicitação do Analisador de Disco
 Double precision floating-point value:	TypeEditors		Valor de vírgula-flutuante de dupla precisão:
 Image	TypeEditors	This is the type of view	Imagem
 Save changes before closing?	ProbeView		Guardar alterações antes de fechar?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		Formato PNG
 Number	TypeEditors	This is the type of editor	Número
 Edit	ProbeView		Editar

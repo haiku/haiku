@@ -14,7 +14,7 @@ Failed to launch 'something', error in Pad data.	LaunchBox		Esecuzion di 'alc' f
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Tire sù in automatic
 %ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
-Icon size	LaunchBox		Dimension iconis
+Icon size	LaunchBox		Dimensions iconis
 Open containing folder	LaunchBox		Mostre te cartele
 Add button here	LaunchBox		Zonte boton achì
 Cancel	LaunchBox		Anule

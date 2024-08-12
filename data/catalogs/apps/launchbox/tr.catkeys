@@ -33,5 +33,5 @@ Remove button	LaunchBox		Düğmeyi kaldır
 Quit	LaunchBox		Çık
 Horizontal layout	LaunchBox		Yatay yerleşim
 New	LaunchBox		Yeni
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		‘Klasör aç’ komutu İzleyici’ye gönderilemedi.\n\nHata: 
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		“Klasör aç” komutu İzleyici’ye gönderilemedi.\n\nHata: 
 Pad %1	LaunchBox		Rampa %1

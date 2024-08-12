@@ -1,7 +1,6 @@
-1	polish	x-vnd.Haiku-About	3179728439
+1	polish	x-vnd.Haiku-About	1392097558
 The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Wszelkie prawa zastrzeżone.
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travisa Geiselbrechta (i jego jądra NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Wszelkie prawa zastrzeżone..
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Wcześniejsi współpracownicy:\n
 Unknown	AboutView		Nieznany
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. i jej zespołu programistów, za stworzenie BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, oddział Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Licencje: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Prawa autorskie do kodu Haiku są własnością Haiku Inc. lub autorów, gdzie jest to wyraźnie zaznaczone w źródłach. Haiku® i logo HAIKU® są zarejestrowanymi znakami towarowymi Haiku Inc.\n\n

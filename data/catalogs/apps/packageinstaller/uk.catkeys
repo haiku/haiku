@@ -59,6 +59,6 @@ Begin	PackageView		Почати
 OK	PackageView		ОК
 Abort	PackageInfo		Перервати
 Done	PackageInstall		Готово
-Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Помилка (%s)! Не вдалося відкрити \"%s\".\n
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Помилка (%s)! Не вдалося відкрити \«%s\».\n
 Skip	PackageView		Пропустити
 Image not loaded correctly	PackageImageViewer		Зображення завантажено неправильно

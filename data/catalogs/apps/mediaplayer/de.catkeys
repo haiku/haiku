@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaPlayer	108715581
+1	german	x-vnd.Haiku-MediaPlayer	328199515
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
@@ -48,6 +48,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer-Einstellungen
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Eingegebene URL ungültig!
 Aspect ratio	MediaPlayer-Main		Seitenverhältnis
+Eject device	MediaPlayer-Main		Disk auswerfen
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Speichern der Playliste fehlgeschlagen.\n\nFehler:
 <no media>	MediaPlayer-InfoWin		<leere Playliste>
 Hide interface	MediaPlayer-Main		Oberfläche ausblenden
@@ -124,6 +125,7 @@ Full screen	MediaPlayer-Main		Vollbild
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interner Fehler (Sperren fehlgeschlagen). Speichern der Playliste fehlgeschlagen.
 100% scale	MediaPlayer-Main		100% Zoom
+New player	MediaPlayer-Main		Neuer Player
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nichts zu wiederholen>
 Bad URL	MediaPlayer-NetworkStream		Ungültige URL
 Save	MediaPlayer-Main		Speichern

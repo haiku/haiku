@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1124891868
+1	spanish; castilian	x-vnd.Haiku-libtracker	724917431
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -7,14 +7,19 @@ Open with…	ContainerWindow		Abrir con…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Error moviendo \"%name\" a la Papelera. (%error)
 Or	FindPanel		O
 MIME Description	AttributesView		Descripción MIME
+Query	FindPanel		Consulta
 before	FindPanel		Antes
+New folder%d	FSUtils		Nueva carpeta%d
 Volume icons	TrackerSettingsWindow		Iconos de volumenes
 Ignore case	SelectionWindow		Ignorar supuesto
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		¿Desea borrar las consultas temporales o todas las consultas? ¡Esta acción es irreversible!
+Save query:	FindPanel		Guardar consulta:
+Save as query template:	FindPanel		Guardar como plantilla de consulta:
 Current folder	ContainerWindow		Carpeta actual
 Finish: %time - Over %finishtime left	StatusWindow		Terminar: %time - alrededor de %finishtime restante
 Mount all disks now	AutoMounterSettings		Montar todos los discos ahora
-Location:	InfoWindow		Ubicación:
 Name	PoseView		Nombre
+Location:	InfoWindow		Ubicación:
 Kind:	InfoWindow		Tipo:
 contains	FindPanel		contiene
 Open	FilePanelPriv		Abrir
@@ -50,6 +55,7 @@ Select…	ContainerWindow		Seleccionar...
 Show shared volumes on Desktop	SettingsView		Mostrar las carpetas compartidas en el escritorio
 Size	PoseView		Tamaño
 matches wildcard expression	SelectionWindow		coincide con la expresión comodín
+Clear history?	FindPanel		¿Borrar el historial?
 Title	Bookmark Query Columns		Título
 Identify	ContainerWindow		Identificar
 Create link	ContainerWindow		Crear enlace
@@ -77,6 +83,7 @@ Select	InfoWindow		Seleccionar
 OK	OpenWithWindow		Aceptar
 Include trash	FindPanel		Incluir la papelera
 Clean up	ContainerWindow		Limpiar
+Clear all	FindPanel		Borrar todo
 Modified	FindPanel		Modificado
  (block size: 	InfoWindow		 (tamaño de bloque: 
 Select all	QueryContainerWindow		Seleccionar todo
@@ -100,12 +107,12 @@ Character	AttributesView		Carácter
 All disks	FindPanel		Todos los discos
 Affine transform	AttributesView		Transformación afine
 Window	ContainerWindow		Ventana
-%BytesPerSecond/s	StatusWindow		%BytesPorSegundo/s
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Eliminar
 Company	Person Query Columns		Empresa
 Recent documents	FavoritesMenu		Documentos recientes
-Save as Query template:	FindPanel		Guardar como una Consulta de plantilla
 Edit templates…	TemplatesMenu		Editar plantillas
+Clear temporary queries only	FindPanel		Borrar únicamente las consultas temporales
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Entero de 8 bits
 8-bit unsigned integer	AttributesView		Entero de 8 bits sin signo
@@ -121,16 +128,17 @@ List folders first	SettingsView		Lista de carpetas primero
 Find	FSUtils		Encontrar
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un elemnto llamano \"%name\" ya existe en esta carpeta. ¿Quieres reemplazarlo con el link simbólico que has cerrado ?
 List view	ContainerWindow		Vista de lista
-Temporary	FindPanel		Temporales
 Modified	QueryPoseView		Modificado
 Create relative link	ContainerWindow		Crear enlace relativo
 Owner	FilePermissionsView		Propietario
 Cancel	FSClipBoard		Cancelar
 Modified	PoseView		Modificado
+Save as template…	FindPanel		Guardar como plantilla…
 Move to Trash	ContainerWindow		Mover a la Papelera
 All files and folders	FindPanel		Todos los archivos y carpetas
 Add-ons	ContainerWindow		Añadidos
 Too many parenthesis.	libtracker		Demasiados paréntesis.
+Save query template:	FindPanel		Guardar plantilla de consulta:
 Increase size	ContainerWindow		Aumentar tamaño
 \nShould this be fixed?	FSUtils		\n¿Debería ser arreglado?
 URL	Bookmark Query Columns		URL
@@ -208,6 +216,7 @@ Cancel	FSUtils		Cancelar
 Original name	ContainerWindow		Nombre original
 Unknown	WidgetAttributeText		Desconocido
 32-bit integer	AttributesView		Entero de 32 bits
+Save as query…	FindPanel		Guardar como consulta…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		El nombre especificado está siendo ya usado como el nombre de una carpeta. Elije otro nombre
 Modified	ContainerWindow		Modificado
 Mini icon view	ContainerWindow		Vista de icono pequeño
@@ -265,23 +274,25 @@ Don't automount	AutoMounterSettings		No automontar
 Node ref	AttributesView		Nodo ref
 Could not find application \"%appname\"	OpenWithWindow		No se puede encontrar la aplicación \"%appname\"
 Unmatched parenthesis.	libtracker		Paréntesis que no coinciden.
+New folder %d	FSUtils		Nueva carpeta %d
 Extended attribute	AttributesView		Atributo extendido
 Unmatched brackets.	libtracker		Paréntesis que no coinciden.
-Error %error loading Add-On %name.	ContainerWindow		Error %error Cargando Añadido %nombre.
+Error %error loading Add-On %name.	ContainerWindow		Ha ocurrido el error %error al intentar cargar el complemento %name.
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Estas intentado reemplazar el archivo:\n\t%name%dest\npor:\n\t%name%src\n\n¿Deseas reemplazarlo con el que se %movemode?
 Empty Trash	ContainerWindow		Vaciar papelera
 no supporting apps	OpenWithWindow		Aplicaciones no soportadas
 32-bit unsigned integer	AttributesView		Entero de 32 bits sin signo
 Preparing to empty Trash…	StatusWindow		Preparándose para vaciar la papelera…
 Deleting: 	StatusWindow		Eliminando:
+label too long	PoseView		etiqueta demasiado larga
 the MIME settings	FSUtils		las configuraciones MIME
 You can't move or copy the trash.	FSUtils		No puedes mover o copiar la papelera.
-label too long	PoseView		etiqueta demasiado larga
 Error creating link to \"%name\".	FSUtils		Error creando un enlace a \"%name\"
 Unknown	FilePermissionsView		Desconocido
 Paste links	ContainerWindow		Pegar enlaces
 Restoring: 	StatusWindow		Restaurando:
 The Tracker must be running to set the default printer.	PoseView		Tracker debe estar en ejecución para configurar la impresora por defecto.
+Cancel	FindPanel		Cancelar
 calculating…	InfoWindow		Calculando...
 Preferred for file	OpenWithWindow		Preferencia para el archivo
 OK	AutoMounterSettings		Aceptar
@@ -314,6 +325,7 @@ starts with	SelectionWindow		Empezar con
 Any	AttributesView		Cualquier
 New	DeskWindow		Nuevo
 Invert	SelectionWindow		Invertir
+Open…	FindPanel		Abrir…
 Would you like to find some other suitable application?	FSUtils		¿Le gustaría encontrar alguna aplicación adecuada?
 *+? operand may be empty.	libtracker		Los operandos *+? pueden estar vacíos.
 (unknown)	AttributesView		(desconocido)
@@ -325,13 +337,14 @@ MIME Path	AttributesView		Ubicación MIME
 less than	FindPanel		menos que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error copiando el archivo \"%name\":\n\t%error\n\n¿Quieres continuar ?
 Creating links: 	StatusWindow		Creando enlaces:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No se pudo abrir \"%document\" con la aplicación \"%app\" (%error). 
 Create %s clipping	PoseView		Cree %s recorte
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No se pudo abrir \"%document\" con la aplicación \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Error moviendo \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Pegar distribución
 Cancel	Tracker		Cancelar
 yes	AttributesView		sí
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Error al copiar el archivo \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Convertir en la impresora activa
 Copy to	ContainerWindow		Copiar a 
 Name	SelectionWindow		Nombre
@@ -366,6 +379,7 @@ Subject	Email Query Columns		Asunto
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error copiando la carpeta \"%name\":\n\t%error\n\n¿Deseas continuar?
 You cannot create a link to the root directory.	FSUtils		No puedes crear un enlace a la carpeta root
 Select all	FilePanelPriv		Seleccionar todo
+Clear history	FindPanel		Borrar historial
 Other	FilePermissionsView		Otro
 Automatic disk mounting	AutoMounterSettings		Montar discos automáticamente
 parent folder	NavMenu		Carpeta de nivel superior
@@ -374,7 +388,6 @@ Force identify	ContainerWindow		Forzar identificación
 no items	CountView		Sin elementos
 Time	AttributesView		Hora
 Disks	DirMenu		Discos
-Query name:	FindPanel		Nombre de la Consulta:
 Open parent	ContainerWindow		Abrir padre
 Find…	ContainerWindow		Encontrar...
 moving	FSUtils		moviendo
@@ -415,6 +428,7 @@ Revert	TrackerSettingsWindow		Revertir
 trash	B_TRASH_DIRECTORY		trash
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si mueve la carpeta de sistema o sus contenidos, es posible que no pueda iniciar %osName!\n\n¿Está seguro de que desea hacer esto?\n\nPara modificar la carpeta de sistema o sus contenidos, mantenga presionada la tecla Mayúsculas (Shift) y haga clic en \"Mover\".
+Open query:	FindPanel		Abrir consulta:
 Close all in workspace	ContainerWindow		Cerrar todo en el área de trabajo
 Corrupted expression.	libtracker		Expresión dañada.
 Network address	AttributesView		Dirección de red
@@ -426,9 +440,10 @@ All Haiku disks	AutoMounterSettings		Todos los discos de Haiku
 Close all	ContainerWindow		Cerrar todo
 Paused: click to resume or stop	StatusWindow		Pausado: Click para continuar o parar
 Name	QueryPoseView		Nombre
-Error %error loading add-On %name.	ContainerWindow		Error %error cargando agregado %nombre.
+Error %error loading add-On %name.	ContainerWindow		Ha ocurrido el error %error al intentar cargar el complemento %name.
 Does not handle file	OpenWithWindow		Eso no es un archivo de título
 E-mail	Person Query Columns		Correo electrónico
+Templates	FindPanel		Plantillas
 Arrange by	ContainerWindow		Ordenado por
 Attributes	AttributesView		Atributos
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Lo sentimos, el ahorro de más de un elemento no está permitido.
@@ -478,6 +493,7 @@ Copy layout	ContainerWindow		Copia de la disposición
 Duplicate	ContainerWindow		Duplicar
 16-bit integer	AttributesView		Entero de 16 bits
 Untitled clipping	PoseView		Recorte sin título
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Nota: el sistema de archivos de destino no distingue mayúsculas de minúsculas en los nombres de archivos.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		El archivo \"%name\" ya existe en la carpeta especificada. ¿Quieres reemplazarlo?
 , indexed	InfoWindow		, indexado
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Tienes que arrastrar elementos a uno de los iconos de disco en la \"Disks\" ventana
@@ -493,9 +509,10 @@ True-color picture	AttributesView		Imagen en color verdadero
 Add-ons	FilePanelPriv		Añadidos
 Alignment	AttributesView		Alineación
 Move to Trash	FSUtils		Mover a la Papelera
-Handles %type	OpenWithWindow		Maneja %type
 Cancel	PoseView		Cancelar
+Handles %type	OpenWithWindow		Maneja %type
 Delete	PoseView		Eliminar
+Options	FindPanel		Opciones
 Media parameter	AttributesView		Parámetro de medios
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si modificas la carpeta home, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?\n\nPara modificar la carpeta home, mantén presionada la tecla Mayúsculas y haz clic en \"Sé lo que estoy haciendo\".
 Sorry, you can't copy items to the Trash.	PoseView		Lo sentimos, No puedes copiar elementos a la papelera

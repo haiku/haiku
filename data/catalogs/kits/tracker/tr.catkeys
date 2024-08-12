@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	4156738018
+1	turkish	x-vnd.Haiku-libtracker	4243797227
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
 Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time — Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
-Location:	InfoWindow		Konum:
 Name	PoseView		Ad
+Location:	InfoWindow		Konum:
 Kind:	InfoWindow		Tür:
 contains	FindPanel		içerir:
 Open	FilePanelPriv		Aç
@@ -105,7 +105,6 @@ Window	ContainerWindow		Pencere
 Remove	FindPanel		Kaldır
 Company	Person Query Columns		Şirket
 Recent documents	FavoritesMenu		Son belgeler
-Save as Query template:	FindPanel		Sorgu şablonu olarak kaydet:
 Edit templates…	TemplatesMenu		Şablonları düzenle…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bayt} other{# bayt}}
 8-bit integer	AttributesView		8 bit tamsayı
@@ -122,7 +121,6 @@ List folders first	SettingsView		Klasörleri ilk listele
 Find	FSUtils		Bul
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Bu klasörde “%name” adında bir öge hâlihazırda var. Bu ögeyi, oluşturduğunuz sembolik bağlantı ile değiştirmek istediğinizden emin misiniz?
 List view	ContainerWindow		Liste görünümü
-Temporary	FindPanel		Sorguyu kaydetme
 Modified	QueryPoseView		Değiştirilme
 Create relative link	ContainerWindow		Göreceli bağlantı oluştur
 Owner	FilePermissionsView		Sahibi
@@ -164,7 +162,7 @@ Filesystem:	InfoWindow		Dosya sistemi:
 Could not open \"%name\" (%error). 	FSUtils		“%name” açılamadı (%error). 
 Media parameter group	AttributesView		Ortam parametreleri grubu
 %name info	InfoWindow	InfoWindow Title	%name bilgisi
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ana klasörü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Taşı’ya basın.
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ana klasörü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve “Taşı”ya basın.
 Property info	AttributesView		Özellik bilgisi
 Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, çöp içinde bağlantılar oluşturamazsınız.
 From	Email Query Columns		Şuradan
@@ -226,7 +224,7 @@ There was an error deleting \"%name\":\n\t%error	FSUtils		“%name” silinirken
 Resize to fit	ContainerWindow		Sığacak biçimde boyutlandır
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	“%name” ögesini şuraya bağlantıla:
 Mount server error	AutoMounterSettings		Bağlama sunucusu hatası
-If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ana klasörün adını değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Yeniden adlandır’a basın.
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Ana klasörün adını değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve “Yeniden adlandır”a basın.
 Boolean	AttributesView		Boolean
 Invert selection	FilePanelPriv		Seçimi tersine çevir
 Memory size	AttributesView		Bellek boyutu
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		destekleyen uygulama yok
 32-bit unsigned integer	AttributesView		32 bit imzalanmamış tamsayı
 Preparing to empty Trash…	StatusWindow		Çöpü boşaltmaya hazırlanıyor…
 Deleting: 	StatusWindow		Siliniyor: 
+label too long	PoseView		etiket çok uzun
 the MIME settings	FSUtils		MIME ayarları
 You can't move or copy the trash.	FSUtils		Çöp kopyalanamaz veya taşınamaz.
-label too long	PoseView		etiket çok uzun
 Error creating link to \"%name\".	FSUtils		“%name” ögesine bağlantı yaratılırken hata.
 Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME Yolu
 less than	FindPanel		daha az
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		“%name” dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%document”, “%app” uygulaması ile açılamadı (%error). 
 Create %s clipping	PoseView		%s kırpma oluştur
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		“%document”, “%app” uygulaması ile açılamadı (%error). 
 Error moving \"%name\"	FSUtils		“%name” taşınırken hata
 To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
@@ -341,7 +339,7 @@ Name	SelectionWindow		Ad
 Location	Default Query Columns		Konum
 by attribute	FindPanel		öznitelik ile
 Write	FilePermissionsView		Yazma
-If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Ne yaptığımı biliyorum’a tıklayın.
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Sistem klasörünü veya içeriğini değiştirirseniz %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve “Ne yaptığımı biliyorum”a tıklayın.
 Save	FilePanelPriv		Kaydet
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		“%document”, “%app” uygulaması ile açılamadı (Eksik kitaplıklar: %library). \n
 Finish: %time	StatusWindow		Bitiş: %time
@@ -357,7 +355,7 @@ Permissions	ContainerWindow		İzinler
 Size:	InfoWindow		Boyut:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge çöpe taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
 Copy	ContainerWindow		Kopyala
-Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Üzgünüm, ‘Karakter’ özniteliği bir çoklu bayt glifini depolayamaz.
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Üzgünüm, “Karakter” özniteliği bir çoklu bayt glifini depolayamaz.
 Open parent	VirtualDirectoryWindow		Üst klasörü aç
 And	FindPanel		ve
 Palette-indexed picture	AttributesView		Palet sıralı resim
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Tanımlamaya zorla
 no items	CountView		öge yok
 Time	AttributesView		Zaman
 Disks	DirMenu		Diskler
-Query name:	FindPanel		Sorgu adı:
 Open parent	ContainerWindow		Üst klasörü aç
 Find…	ContainerWindow		Bul…
 moving	FSUtils		taşıdığınız
@@ -394,7 +391,7 @@ Proceed	FSUtils		Sürdür
 Edit favorites…	FilePanelPriv		Favorileri düzenle…
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Bir klasörü kendi içine veya herhangi bir alt klasörünün içine taşıyamazsınız.
 New	ContainerWindow		Yeni
-You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri, ‘Diskler’ penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri, “Diskler” penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
 Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, herhangi bir öge çöpe kopyalanamaz.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Bu klasördeki bazı ögeler %verb bazı ögelerle aynı ada sahip.\n\nBu ögeleri %verb ögelerle değiştirmek ister misiniz veya teker teker sorulsun mu?
@@ -417,7 +414,7 @@ Emptying Trash… 	StatusWindow		Çöp boşaltılıyor…
 Revert	TrackerSettingsWindow		Eski haline döndür
 trash	B_TRASH_DIRECTORY		çöp
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
-If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Sistem klasörünü veya içindekileri taşırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Taşı’ya basın.
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Sistem klasörünü veya içindekileri taşırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve “Taşı”ya basın.
 Close all in workspace	ContainerWindow		Bu çalışma alanındakileri kapat
 Corrupted expression.	libtracker		Hasar görmüş ifade.
 Network address	AttributesView		Ağ adresi
@@ -455,7 +452,7 @@ Outline selection rectangle only	SettingsView		Yalnızca dış hat seçim dikdö
 by formula	FindPanel		formül ile
 Resize to fit	VirtualDirectoryWindow		Sığacak biçimde boyutlandır
 Move to Trash	FilePanelPriv		Çöpe at
-If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Yeniden adlandır’a tıklayın.
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız Üst Karakter düğmesini basılı tutun ve “Yeniden adlandır”a tıklayın.
 Permissions	FilePermissionsView		İzinler
 \"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		“%name” eski bir yürütülebilir. Lütfen güncellenmiş bir sürümünü edinin veya uygulamayı yeniden derleyin.
 Only the boot disk	AutoMounterSettings		Yalnızca önyükleme diski
@@ -479,11 +476,11 @@ Color	AttributesView		Renk
 Copy layout	ContainerWindow		Yerleşimi kopyala
 Duplicate	ContainerWindow		Çoğalt
 16-bit integer	AttributesView		16 bit tamsayı
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Not: Hedef dosya sistemindeki dosya adları BÜYÜK/küçük harf duyarlı değil.\n
 Untitled clipping	PoseView		Adsız kırpma
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Not: Hedef dosya sistemindeki dosya adları BÜYÜK/küçük harf duyarlı değil.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		“%name” adı belirtilen klasörde hâlihazırda var. Değiştirmek istiyor musunuz?
 , indexed	InfoWindow		, indeksli
-You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri, ‘Diskler’ penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri, “Diskler” penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.
 Version:	InfoWindow		Sürüm:
 OK	PoseView		Tamam
 Add-ons	DeskWindow		Eklentiler
@@ -496,11 +493,11 @@ True-color picture	AttributesView		Gerçek renkli resim
 Add-ons	FilePanelPriv		Eklentiler
 Alignment	AttributesView		Hizalama
 Move to Trash	FSUtils		Çöpe at
-Handles %type	OpenWithWindow		%type işler
 Cancel	PoseView		Vazgeç
+Handles %type	OpenWithWindow		%type işler
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
-If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ana klasörü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve ‘Ne yaptığımı biliyorum’a tıklayın.
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ana klasörü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve “Ne yaptığımı biliyorum”a tıklayın.
 Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, herhangi bir öge çöpe kopyalanamaz.
 Invert selection	VirtualDirectoryWindow		Seçimi tersine çevir
 New folder	FilePanelPriv		Yeni klasör

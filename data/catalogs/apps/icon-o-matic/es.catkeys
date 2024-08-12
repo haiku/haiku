@@ -1,10 +1,11 @@
-1	spanish; castilian	x-vnd.haiku-icon_o_matic	1633080283
+1	spanish; castilian	x-vnd.haiku-icon_o_matic	2100512185
 None	Icon-O-Matic-Properties		Ninguno
 Clean up path	Icon-O-Matic-CleanUpPathCmd		Ruta de limpieza
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		Agregar vacío
 Opening the icon failed!	Icon-O-Matic-Main		¡Error al abrir el icono!
 Reverse path	Icon-O-Matic-ReversePathCmd		Ruta reversa
+Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	¡Bip!
 Add with path	Icon-O-Matic-ShapesList		Agregar con ruta
 Paste properties	Icon-O-Matic-Properties		Pegar propiedades
 Copy	Icon-O-Matic-Properties		Copiar
@@ -30,8 +31,10 @@ Transform	Icon-O-Matic-PathManipulator		Transformar
 Add shape with style	Icon-O-Matic-Menu-Shape		Agregar forma con estilo
 Change color	Icon-O-Matic-SetColorCmd		Cambiar color
 Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Quitar {0, plural, one{vértice} other{vértices}}
+Unassign path	Icon-O-Matic-UnassignPathCmd		Desasignar ruta
 Remove	Icon-O-Matic-StylesList		Eliminar
 Cancel	Icon-O-Matic-Menu-Settings		Cancelar
+PNG set	Icon-O-Matic-SavePanel		Conjunto de PNG
 Transformation	Icon-O-Matic-TransformationBoxStates		Transformación
 Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Move {0, plural, one{ruta} other{rutas}}
 Closed	Icon-O-Matic-PropertyNames		Cerrado
@@ -39,14 +42,17 @@ Closed	Icon-O-Matic-PropertyNames		Cerrado
 Height	Icon-O-Matic-PropertyNames		Altura
 warning	Icon-O-Matic-SVGExport		Aviso
 File	Icon-O-Matic-Menus		Archivo
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	cualquiera de las otras listas a
 Properties	Icon-O-Matic-Menus		Propiedades
 Path	Icon-O-Matic-PropertyNames		Ruta
 Path	Icon-O-Matic-Menus		Ruta
 Stroke	Transformation		Trazo
 Flip	Icon-O-Matic-PathManipulator		Intercambiar
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	edita sus propiedades aquí.
+Move pivot	Icon-O-Matic-TransformationBoxStates		Mover eje
 Opacity	Icon-O-Matic-PropertyNames		Opacidad
 OK	Icon-O-Matic-ColorPicker		Aceptar
-Error: 	Icon-O-Matic-Main		Error:
+Error: 	Icon-O-Matic-Main		Error: 
 Assign style	Icon-O-Matic-AssignStyleCmd		Asignar estilo
 Saving your document failed!	Icon-O-Matic-Exporter		¡El guardado de su documento falló!
 Snap to grid	Icon-O-Matic-Menu-Settings		Ajustar a la cuadrícula
@@ -78,7 +84,7 @@ Cancel	Icon-O-Matic-ColorPicker		Cancelar
 Duplicate	Icon-O-Matic-PathsList		Duplicar
 Move {0, plural, one{shape} other{shapes}}	Icon-O-Matic-MoveShapesCommand		Move {0, plural, one{forma} other{formas}}
 Save	Icon-O-Matic-Menu-Settings		Guardar
-Export as…	Icon-O-Matic-Menu-File		Exportar como...
+Export as…	Icon-O-Matic-Menu-File		Exportar como…
 Remove {0, plural, one{shape} other{shapes}}	Icon-O-Matic-RemoveShapesCmd		Quitar {0, plural, one{forma} other{formas}}
 Undo: %action%	Icon-O-Matic-Main		Deshacer: %action%
 Diamond	Icon-O-Matic-StyleTypes		Diamante
@@ -91,7 +97,7 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Rotar índices hacia atras
 Overwrite	Icon-O-Matic-SVGExport		Sobrescribir
 Add {0, plural, one{shape} other{shapes}}	Icon-O-Matic-AddShapesCmd		Añadir {0, plural, one{forma} other{formas}}
 Cancel	Icon-O-Matic-SVGExport		Cancelar
-Open…	Icon-O-Matic-Menu-File		Abrir...
+Open…	Icon-O-Matic-Menu-File		Abrir…
 Remove	Icon-O-Matic-ShapesList		Eliminar
 Bad news	Title of error alert		Malas noticias
 HVIF source code	Icon-O-Matic-SavePanel		Código fuente HVIF
@@ -118,10 +124,11 @@ Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Texto demasiado largo
 Caps	Icon-O-Matic-PropertyNames		Mayúsculas
 OK	Icon-O-Matic-SVGImport		Aceptar
-Append…	Icon-O-Matic-Menu-File		Agregar...
+Append…	Icon-O-Matic-Menu-File		Agregar…
 Scale Y	Icon-O-Matic-PropertyNames		Escala Y
 Rotate indices forwards	Icon-O-Matic-PathsList		Rotar indices hacia adelante
 Save	Icon-O-Matic-Menu-File		Guardar
+Cancel	Icon-O-Matic-StyledTextImport		Cancelar
 Add circle	Icon-O-Matic-PathsList		Agregar círculo
 Freeze transformation	Icon-O-Matic-ShapesList		Congelar transformación
 META:ICON attribute	Icon-O-Matic-SavePanel		Atributo META:ICON
@@ -129,9 +136,10 @@ Untitled	Icon-O-Matic-Main		Sin título
 Max LOD	Icon-O-Matic-PropertyNames		LOD máximo
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		¿Guardar los cambios al icono actual antes de cerrar?
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		No se puede abrir el archivo «%s» como documento SVG.\n\n
-Save as…	Icon-O-Matic-Menu-File		Guardar como...
+Save as…	Icon-O-Matic-Menu-File		Guardar como…
 Swatches	Icon-O-Matic-Menus		Muestras
 <modify path>	Icon-O-Matic-PathCmd		<modificar ruta>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	Establecer %property%
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<nada que deshacer>
 Add	Icon-O-Matic-StylesList		Agregar
@@ -143,10 +151,11 @@ Transformer	Icon-O-Matic-Menus		Transformador
 Invert selection	Icon-O-Matic-Properties		Invertir selección
 <unkown property>	Icon-O-Matic-PropertyNames		<propiedad desconocida>
 Pick a color	Icon-O-Matic-ColorPicker		Seleccionar un color
-Settings…	Icon-O-Matic-SavePanel		Configuración...
+Settings…	Icon-O-Matic-SavePanel		Ajustes…
 Select all	Icon-O-Matic-PathManipulator		Seleccionar todo
 Add with style	Icon-O-Matic-ShapesList		Agregar con estilo
 New	Icon-O-Matic-Menu-File		Nuevo
+Change perspective	Icon-O-Matic-PerspectiveCommand		Cambiar perspectiva
 Gradient type	Icon-O-Matic-StyleTypes		Tipo de gradiente
 Perspective	Transformation		Perspectiva
 Export	Icon-O-Matic-Menu-File		Exportar

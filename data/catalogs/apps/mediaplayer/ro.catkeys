@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	171477831
+1	romanian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrarea la gunoi
 Close	MediaPlayer-PlaylistWindow		Închide
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor de fundal
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Configurări MediaPlayer
 Copyright	MediaPlayer-InfoWin		Drepturi de autor
 Invalid URL inserted!	MediaPlayer-NetworkStream		A fost introdusă o adresă URL nevalidă!
 Aspect ratio	MediaPlayer-Main		Raport de aspect
+Eject device	MediaPlayer-Main		Scoate dispozitivul
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvarea listei de redare a eșuat.\n\nEroare: 
 <no media>	MediaPlayer-InfoWin		<no media>
 Hide interface	MediaPlayer-Main		Ascunde interfața
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Ecran complet
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Eroare internă (blocarea a eșuat). Salvarea listei de redare a eșuat.
 100% scale	MediaPlayer-Main		scală 100%
+New player	MediaPlayer-Main		Player nou
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nothing to redo>
 Bad URL	MediaPlayer-NetworkStream		URL greșit
 Save	MediaPlayer-Main		Salvează

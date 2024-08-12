@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	3762371345
+1	german	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Alle Paketquellen
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellen-Aktualisierung
 Network error	ServerHelper		Netzwerkfehler
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
 User Created	UserLoginWindow		Benutzerkonto erstellt
 Check for updates…	MainWindow		Aktualisierungen suchen …

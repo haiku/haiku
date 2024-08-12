@@ -1,7 +1,6 @@
-1	hungarian	x-vnd.Haiku-About	3595470255
+1	hungarian	x-vnd.Haiku-About	3675341430
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Minden jog fenntartva.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Minden jog fenntartva.
 \n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Minden jog fenntartva.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Régebbi karbantartók:\n
 Unknown	AboutView		Ismeretlen
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. és a fejlesztői csapata, a BeOS megteremtéséért!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Licencek: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		A Haiku kódjának szerzői jogai a Haiku, Inc.-et vagy, ha nevük a forráskódban külön ki van emelve, a kód egyes íróit illetik. A Haiku® és a HAIKU logo® a Haiku, Inc. bejegyzett védjegye.\n\n
@@ -77,6 +75,7 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat üzemeltetők.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		© 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Fordítások:\n
+Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Copyright © 2014-2024 Florian Bernd és Joel Höner. Minden jog fenntartva.
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Minden jog fenntartva.
 BSD (2-clause)	AboutWindow		BSD (2-clause)

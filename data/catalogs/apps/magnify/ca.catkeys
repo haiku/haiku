@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Magnify	1465621918
+1	catalan; valencian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  cal que sigui > 4 i un múltiple de 4
 Decrease pixel size	Magnify-Main		Redueix la mida del píxel
 no clip msg	In console, when clipboard is empty after clicking Copy image		res al porta-retalls
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Augmenta l'amplada de la finestra
 Save image	Magnify-Main		Desa la imatge
 Show grid	Magnify-Main		Mostra la graella
 Magnify	System name		Lupa
+height	Magnify-Main		alçada
+width	Magnify-Main		amplada
 Info	Magnify-Main		Informació
 Show info	Magnify-Main		Mostra'n la informació
 Make square	Magnify-Main		Fes un quadrat

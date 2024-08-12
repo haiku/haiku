@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	1893940391
+1	dutch; flemish	x-vnd.Haiku-libtracker	1980999600
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Niet hoofd-/kleine lettergevoelig
 Current folder	ContainerWindow		Huidige map
 Finish: %time - Over %finishtime left	StatusWindow		Einde: %time - Meer dan %finishtime resterend
 Mount all disks now	AutoMounterSettings		Betrek alle schijven nu
-Location:	InfoWindow		Locatie:
 Name	PoseView		Naam
+Location:	InfoWindow		Locatie:
 Kind:	InfoWindow		Soort:
 contains	FindPanel		bevat
 Open	FilePanelPriv		Openen
@@ -103,7 +103,6 @@ Window	ContainerWindow		Venster
 Remove	FindPanel		Verwijderen
 Company	Person Query Columns		Bedrijf
 Recent documents	FavoritesMenu		Recente documenten
-Save as Query template:	FindPanel		Opslaan als zoekopdracht-sjabloon:
 Edit templates…	TemplatesMenu		Wijzig sjablonen...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bit integer
@@ -120,7 +119,6 @@ List folders first	SettingsView		Toon mappen eerst
 Find	FSUtils		Zoeken
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Er bestaat al een item \"%name\" in deze map. Wilt u het vervangen door het gelinkte bestand dat u aan het maken bent?
 List view	ContainerWindow		Lijstweergave
-Temporary	FindPanel		Tijdelijk
 Modified	QueryPoseView		Gewijzigd
 Create relative link	ContainerWindow		Maak een relatieve link
 Owner	FilePermissionsView		Eigenaar
@@ -272,9 +270,9 @@ no supporting apps	OpenWithWindow		geen ondersteunde toepassingen
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		Leegmaken prullenbak voorbereiden...
 Deleting: 	StatusWindow		Verwijdert:
+label too long	PoseView		label te lang
 the MIME settings	FSUtils		de MIME-instellingen
 You can't move or copy the trash.	FSUtils		U kunt de prullenbak niet verplaatsen of kopiëren.
-label too long	PoseView		label te lang
 Error creating link to \"%name\".	FSUtils		Fout bij het aanmaken van de link naar \"%name\".
 Unknown	FilePermissionsView		Onbekend
 Paste links	ContainerWindow		Links plakken
@@ -322,8 +320,8 @@ MIME Path	AttributesView		MIME-pad
 less than	FindPanel		minder dan
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fout bij het kopiëren van het bestand \"%name\":\n\t%error\n\nWilt u doorgaan?
 Creating links: 	StatusWindow		Bezig met maken van koppelingen:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" kon niet met \"%app\" geopend worden (%error).
 Create %s clipping	PoseView		Maak %s clipping
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" kon niet met \"%app\" geopend worden (%error).
 Error moving \"%name\"	FSUtils		Fout bij het verplaatsen van \"%name\"
 To: %dir	StatusWindow		Naar: %dir
 Paste layout	ContainerWindow		Lay-out plakken
@@ -369,7 +367,6 @@ Force identify	ContainerWindow		Forceer identificatie
 no items	CountView		geen items
 Time	AttributesView		Tijd
 Disks	DirMenu		Schijven
-Query name:	FindPanel		Zoekopdracht-naam:
 Open parent	ContainerWindow		Open bovenliggende map
 Find…	ContainerWindow		Zoeken...
 moving	FSUtils		bezig met verplaatsen
@@ -485,8 +482,8 @@ True-color picture	AttributesView		Afbeelding in ware kleuren
 Add-ons	FilePanelPriv		Invoegtoepassingen
 Alignment	AttributesView		Uitlijning
 Move to Trash	FSUtils		Verplaats naar Prullenbak
-Handles %type	OpenWithWindow		Behandelt %type
 Cancel	PoseView		Annuleren
+Handles %type	OpenWithWindow		Behandelt %type
 Delete	PoseView		Verwijderen
 Media parameter	AttributesView		Mediaparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Als de thuismap gewijzigd wordt, dan functioneert %osName mogelijk niet goed meer!\n\nWeet u zeker dat u wilt doorgaan?\n\nOm de thuismap niettemin te wijzigen, houd de Shift-knop ingedrukt en klik op \"Ik weet zeker wat ik doe\".

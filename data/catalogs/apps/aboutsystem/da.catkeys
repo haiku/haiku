@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-About	885044264
+1	danish	x-vnd.Haiku-About	3392380679
 The Haikuware team and their bounty program\n	AboutView		Haikuware-holdet og deres dusørprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Ophavsret © 1999-2007 Michael C. Ring. Alle rettigheder forbeholdes.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Ophavsret © 2002-2004 Vivek Mohan. Alle rettigheder forbeholdes.
 \n\nSpecial thanks to:\n	AboutView		\n\nSærlig tak til:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (og hans NewOS-kerne)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Ophavsret © 1999-2000 Y.Takagi. Alle rettigheder forbeholdes.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Forhenværende vedligeholdere:\n
 Unknown	AboutView		Ukendt
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. og deres udviklingshold, for at have skabt BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Ophavsret © 2002-2014 Industrial Light & Magic, et datterselskab af Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Licenser: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Ophavsretten til Haikus kode tilhører Haiku, Inc. eller de respektive ophavsmænd, som udtrykkeligt er angivet i kildekoden. Haiku® og HAIKU-logoet® er registrerede varemærker tilhørende Haiku, Inc.\n\n

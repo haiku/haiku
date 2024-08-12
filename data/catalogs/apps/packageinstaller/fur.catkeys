@@ -43,7 +43,7 @@ No package available.	PackageInfo		Nissun pachet disponibil.
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Il script clamât '%s' al esist za tal percors indicât.\nSostituîlu cun chel di chest pachet o saltâ?
 Installation type:	PackageView		Gjenar di instalazion:
 The package you selected has been successfully removed from your system.	UninstallView		Il pachet selezionât al è stât gjavât dal sisteme cun sucès.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Al somee che no sedi corispondence te dimension dal file dal pachet. Al è pussibil che il pachet al sedi ruvinât o che al vedi vût modifichis daspò la sô creazion. Continuâ distès?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Al somee che no sedi corispondence tes dimensions dal file dal pachet. Al è pussibil che il pachet al sedi ruvinât o che al vedi vût modifichis daspò la sô creazion. Continuâ distès?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Anule
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Il file clamât '%s' al esist za tal percors indicât.\nSostituîlu cun chel di chest pachet o saltâ?

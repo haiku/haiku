@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Magnify	1465621918
+1	ukrainian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  розмір має бути > 4 та кратним 4
 Decrease pixel size	Magnify-Main		Зменшити розмір пікселя
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Збільшити розмір вікна
 Save image	Magnify-Main		Зберегти зображення
 Show grid	Magnify-Main		Показати сітку
 Magnify	System name		Magnify
+height	Magnify-Main		висота
+width	Magnify-Main		ширина
 Info	Magnify-Main		Інфо
 Show info	Magnify-Main		Показати інфо
 Make square	Magnify-Main		Зробити квадратним

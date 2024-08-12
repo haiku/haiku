@@ -1,5 +1,5 @@
 1	spanish; castilian	x-vnd.Haiku-SpamFilter	468104950
-or empty e-mail	SpamFilterConfig		o un e-mail vacío.
+or empty e-mail	SpamFilterConfig		o un e-mail vacío
 Genuine below and uncertain above:	SpamFilterConfig		Original lo siguiente e incierto lo anterior:
 Spam above:	SpamFilterConfig		Spam anterior:
 Add spam rating to start of subject	SpamFilterConfig		Añada una calificación de spam al comienzo del asunto

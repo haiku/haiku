@@ -1,7 +1,6 @@
-1	german	x-vnd.Haiku-About	3595470255
+1	german	x-vnd.Haiku-About	3675341430
 The Haikuware team and their bounty program\n	AboutView		Das Haikuware-Team und deren Bounty-Programm\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Alle Rechte vorbehalten.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Alle Rechte vorbehalten.
 \n\nSpecial thanks to:\n	AboutView		\n\nBesonderer Dank an:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (und seinen NewOS-Kernel)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y. Takagi. Alle Rechte vorbehalten.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Ehemalige Betreuer:\n
 Unknown	AboutView		Unbekannt
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. und dessen Programmier-Team für die Entwicklung von BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, Teil von Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Lizenzen: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Die Urheberrechte am Haiku-Code liegen bei Haiku, Inc., beziehungsweise bei den entsprechenden Autoren, die explizit im Quelltext aufgeführt sind. Haiku® und das HAIKU Logo® sind registrierte Marken von Haiku, Inc.\n\n
@@ -77,6 +75,7 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat-Entwickler.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Übersetzungen:\n
+Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Copyright © 2014-2024 Florian Bernd und Joel Höner. Alle Rechte vorbehalten
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… und vermutlich noch einige mehr, die wir leider vergessen haben zu erwähnen.\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Alle Rechte vorbehalten.
 BSD (2-clause)	AboutWindow		BSD (2-Klausel)

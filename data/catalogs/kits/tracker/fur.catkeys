@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2482866522
+1	friulian	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		Ignore maiusculis/minusculis
 Current folder	ContainerWindow		Cartele atuâl
 Finish: %time - Over %finishtime left	StatusWindow		Completament: %time - Tor %finishtime restants
 Mount all disks now	AutoMounterSettings		Monte ducj i discs cumò
-Location:	InfoWindow		Posizion:
 Name	PoseView		Non
+Location:	InfoWindow		Posizion:
 Kind:	InfoWindow		Gjenar:
 contains	FindPanel		al conten
 Open	FilePanelPriv		Vierç
@@ -79,7 +79,7 @@ OK	OpenWithWindow		Va ben
 Include trash	FindPanel		Inclût scovacere
 Clean up	ContainerWindow		Met a puest
 Modified	FindPanel		Modificât
- (block size: 	InfoWindow		 (dimension bloc: 
+ (block size: 	InfoWindow		  (dimension bloc: 
 Select all	QueryContainerWindow		Selezione dutis
 Generate image thumbnails	SettingsView		Gjenere miniaturis di imagjins
 Select…	FilePanelPriv		Selezione…
@@ -105,7 +105,6 @@ Window	ContainerWindow		Barcon
 Remove	FindPanel		Gjave
 Company	Person Query Columns		Aziende
 Recent documents	FavoritesMenu		Documents resints
-Save as Query template:	FindPanel		Salve come model di interogazion
 Edit templates…	TemplatesMenu		Modifiche modei…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# byte}}
 8-bit integer	AttributesView		Intîr a 8 bit 
@@ -122,7 +121,6 @@ List folders first	SettingsView		Liste prime lis cartelis
 Find	FSUtils		Cjate
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element clamât \"%name\" al esist za in cheste cartele. Sostituîlu cul colegament simbolic che si sta creant?
 List view	ContainerWindow		Viodude a liste
-Temporary	FindPanel		Temporani
 Modified	QueryPoseView		Modificât
 Create relative link	ContainerWindow		Cree colegament relatîf
 Owner	FilePermissionsView		Proprietari
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		nissune aplicazion supuartade
 32-bit unsigned integer	AttributesView		Intîr cence segn a 32 bit
 Preparing to empty Trash…	StatusWindow		Preparazions par disvuedâ la Scovacere…
 Deleting: 	StatusWindow		Eliminazion: 
+label too long	PoseView		etichete masse lungje
 the MIME settings	FSUtils		lis impostazions MIME
 You can't move or copy the trash.	FSUtils		No tu puedis spostâ o copiâ la Scovacere.
-label too long	PoseView		etichete masse lungje
 Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%name\".
 Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
@@ -327,8 +325,8 @@ MIME Path	AttributesView		Percors MIME
 less than	FindPanel		mancul di
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ il file \"%name\":\n\t%error\n\nContinuâ?
 Creating links: 	StatusWindow		Creazion colegaments: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (%error). 
 Create %s clipping	PoseView		Cree ritai %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Erôr tal spostâ \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Tache disposizion
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Sfuarce identificazion
 no items	CountView		nissun element
 Time	AttributesView		Ore
 Disks	DirMenu		Discs
-Query name:	FindPanel		Non interogazion:
 Open parent	ContainerWindow		Va ae cartele superiôr
 Find…	ContainerWindow		Cjate…
 moving	FSUtils		spostant
@@ -480,8 +477,8 @@ Color	AttributesView		Colôr
 Copy layout	ContainerWindow		Copie disposizion
 Duplicate	ContainerWindow		Dupliche
 16-bit integer	AttributesView		Intîr a 16 bit
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Note: i nons dai files tal filesystem di destinazion a ignorin maiusculis e minusculis.\n
 Untitled clipping	PoseView		Ritai cence non
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Note: i nons dai files tal filesystem di destinazion a ignorin maiusculis e minusculis.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Il file \"%name\" al esist za te cartele specificade. Sostituîlu?
 , indexed	InfoWindow		, cun tabele
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Si à di strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
@@ -497,8 +494,8 @@ True-color picture	AttributesView		Imagjin a colôrs reâi
 Add-ons	FilePanelPriv		Components adizionâi
 Alignment	AttributesView		Inliniament
 Move to Trash	FSUtils		Sposte te Scovacere
-Handles %type	OpenWithWindow		Al gjestìs %type
 Cancel	PoseView		Anule
+Handles %type	OpenWithWindow		Al gjestìs %type
 Delete	PoseView		Elimine
 Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".

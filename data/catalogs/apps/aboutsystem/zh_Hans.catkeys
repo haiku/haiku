@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-About	3179728439
+1	english	x-vnd.Haiku-About	1392097558
 The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		版权所有 © 1999-2007 Michael C. Ring，保留所有权利。
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		版权所有 © 2002-2004 Vivek Mohan. 保留所有权利。
 \n\nSpecial thanks to:\n	AboutView		\n\n特别感谢：\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht（和他的 NewOS 内核）\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		版权所有 © 1999-2000 Y.Takagi。保留所有权利。
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		先前维护人员：\n
 Unknown	AboutView		未知
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. 及其开发团队，它们的努力孕育了 BeOS！\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		版权所有 © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		协议：
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Haiku 代码的版权属于 Haiku, Inc. ，或者代码中注明的相应作者。Haiku® 和 HAIKU 标志® 是 Haiku, Inc. 的注册商标。\n\n

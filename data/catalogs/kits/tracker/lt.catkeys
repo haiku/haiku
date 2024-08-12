@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2596587241
+1	lithuanian	x-vnd.Haiku-libtracker	2683646450
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -11,8 +11,8 @@ Ignore case	SelectionWindow		Nepaisyti raidžių registro
 Current folder	ContainerWindow		Šis aplankas
 Finish: %time - Over %finishtime left	StatusWindow		Pabaiga: %time – liko dar virš %finishtime
 Mount all disks now	AutoMounterSettings		Prijungti visus tomus dabar
-Location:	InfoWindow		Vieta:
 Name	PoseView		Vardas
+Location:	InfoWindow		Vieta:
 Kind:	InfoWindow		Tipas:
 contains	FindPanel		savyje turi
 Open	FilePanelPriv		Atverti
@@ -74,7 +74,6 @@ Window	ContainerWindow		Langas
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Pašalinti
 Recent documents	FavoritesMenu		Paskiausi dokumentai
-Save as Query template:	FindPanel		Įrašyti kaip užklausos šabloną:
 Edit templates…	TemplatesMenu		Tvarkyti šablonus…
 %capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
 Trash	Model		Šiukšlinė
@@ -85,7 +84,6 @@ Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
 List folders first	SettingsView		Aplankus rikiuoti pirmiau
 Find	FSUtils		Ieškoti
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Objektas vardu „%name“ jau egzistuoja šiame aplanke. Ar norite jį pakeisti kuriama simboline nuoroda?
-Temporary	FindPanel		Užklausa laikina
 Modified	QueryPoseView		Modifikavimo data
 Create relative link	ContainerWindow		Kurti santykinę nuorodą
 Owner	FilePermissionsView		Savininkas
@@ -203,8 +201,8 @@ Empty Trash	ContainerWindow		Ištuštinti šiukšlinę
 no supporting apps	OpenWithWindow		palaikančių programų nėra
 Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
 Deleting: 	StatusWindow		Šalinama:
-You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
 label too long	PoseView		vardas per ilgas
+You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
 Error creating link to \"%name\".	FSUtils		Klaida kuriant nuorodą į „%name“.
 Unknown	FilePermissionsView		Nežinomas
 Paste links	ContainerWindow		Įdėti nuorodas
@@ -242,8 +240,8 @@ of %items	StatusWindow		iš %items
 less than	FindPanel		mažesnis nei
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant failą „%name“:\n\t%error\n\nAr norite tęsti?
 Creating links: 	StatusWindow		Kuriamos nuorodos:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error). 
 Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error). 
 Error moving \"%name\"	FSUtils		Klaida perkeliant „%name“
 To: %dir	StatusWindow		Į: %dir
 Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
@@ -279,7 +277,6 @@ Create link here	ContainerWindow		Sukurti nuorodą čia
 Force identify	ContainerWindow		Priverstinai atpažinti
 no items	CountView		Objektų nėra
 Disks	DirMenu		Tomai
-Query name:	FindPanel		Užklausos vardas:
 Open parent	ContainerWindow		Atverti viršaplankį
 Find…	ContainerWindow		Ieškoti…
 moving	FSUtils		perkeliate
@@ -364,8 +361,8 @@ Defaults	TrackerSettingsWindow		Numatytai
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Deja, paskirties tome nepakanka laisvos vietos pažymėtiems objektams nukopijuoti.
 Add-ons	FilePanelPriv		Priedai
 Move to Trash	FSUtils		Išmesti Šiukšlinėn
-Handles %type	OpenWithWindow		Palaiko %type
 Cancel	PoseView		Atsisakyti
+Handles %type	OpenWithWindow		Palaiko %type
 Delete	PoseView		Šalinti
 Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 New folder	FilePanelPriv		Naujas aplankas

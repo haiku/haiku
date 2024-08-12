@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Magnify	1243657898
+1	german	x-vnd.Haiku-Magnify	3087507543
   size must be > 4 and a multiple of 4	Console		  Größe muss > 4 und durch 4 teilbar sein
 Decrease pixel size	Magnify-Main		Pixel verkleinern
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
@@ -15,6 +15,8 @@ usage: magnify [size] (magnify size * size pixels)	Console		Gebrauch: Magnify [G
 Increase window size	Magnify-Main		Fenster vergrößern
 Save image	Magnify-Main		Bild speichern
 Show grid	Magnify-Main		Raster anzeigen
+height	Magnify-Main		Höhe
+width	Magnify-Main		Breite
 Info	Magnify-Main		Info
 Show info	Magnify-Main		Info anzeigen
 Make square	Magnify-Main		Quadratisches Fenster

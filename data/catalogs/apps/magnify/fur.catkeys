@@ -1,21 +1,23 @@
-1	friulian	x-vnd.Haiku-Magnify	1465621918
+1	friulian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  la dimension e scugne jessi > 4 e un multipli di 4
-Decrease pixel size	Magnify-Main		Diminuìs la dimension dai pixel
+Decrease pixel size	Magnify-Main		Diminuìs la dimension dai pixels
 no clip msg	In console, when clipboard is empty after clicking Copy image		nissun msg ritaiât
-Increase pixel size	Magnify-Main		Aumente la dimension dai pixel
+Increase pixel size	Magnify-Main		Aumente la dimension dai pixels
 magnify: size must be a multiple of 4	Console		magnify: la dimension e scugne jessi un multipli di 4
 Stick coordinates	Magnify-Main		Ten chestis coordenadis
 Copy image	Magnify-Main		Copie imagjin
-Decrease window size	Magnify-Main		Diminuìs la dimension dal barcon
+Decrease window size	Magnify-Main		Diminuìs lis dimensions dal barcon
 Remove a crosshair	Magnify-Main		Gjave une smire
 Add a crosshair	Magnify-Main		Zonte une smire
 Freeze image	Magnify-Main		Bloche imagjin
 %width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
-usage: magnify [size] (magnify size * size pixels)	Console		ûs: magnify [dimension] (magnify dimension * dimension pixel)
-Increase window size	Magnify-Main		Aumente la dimension dal barcon
+usage: magnify [size] (magnify size * size pixels)	Console		ûs: magnify [dimensions] (magnify dimension * dimension pixels)
+Increase window size	Magnify-Main		Aumente lis dimensions dal barcon
 Save image	Magnify-Main		Salve imagjin
 Show grid	Magnify-Main		Mostre gridele
 Magnify	System name		Magnify
+height	Magnify-Main		altece
+width	Magnify-Main		largjece
 Info	Magnify-Main		Informazions
 Show info	Magnify-Main		Mostre informazions
 Make square	Magnify-Main		Rint cuadrât il barcon

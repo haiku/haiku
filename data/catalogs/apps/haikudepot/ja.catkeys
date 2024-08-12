@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	3762371345
+1	japanese	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		すべてのリポジトリ
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
 User Created	UserLoginWindow		作成されたユーザー
 Check for updates…	MainWindow		更新のチェック...

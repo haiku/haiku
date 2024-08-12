@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	381023409
+1	portuguese	x-vnd.Haiku-HaikuDepot	1152950481
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema ao descarregar condições de utilização
 Available packages	MainWindow		Pacotes disponíveis
 It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo utilizador.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		É necess�
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Ocorreu um erro inesperado '%Message%' com a propriedade  '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Um objeto pedido ou um objeto envolvido no pedido não foi encontrado no servidor.
 Logout	ToLatestUserUsageConditionsWindow		Terminar sessão
+Password requirements	UserLoginWindow		Requisitos de palavra-passe
 The following additional package changes have to be made:	PackageResult		As seguintes alterações de pacotes adicionais são necessárias:
 No changelog available.	PackageInfoView		Nenhum registo de alterações disponível.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Foi dada concordância com as condições de utilização atuais.
@@ -112,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Todos os repositórios
 Repository update error	LocalRepositoryUpdateProcess		Erro na atualização de repositório
 Network error	ServerHelper		Erro de rede
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
 User Created	UserLoginWindow		Utilizador Criado
 Check for updates…	MainWindow		Verificar atualizações…
@@ -126,6 +128,7 @@ Starting the package daemon failed:\n\n%Error%	App		Falhou a inicialização do 
 No user ratings available.	PackageInfoView		Não há avaliações de utilizadores disponíveis.
 <no info>	PackageInfoView		<sem informação>
 Usage conditions download problem	UserUsageConditions		Problema na descarga das condições de utilização
+Fetching screenshot	CacheScreenshotProcess		A obter captura de ecrã
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Ocorreu um erro de transporte da rede ao comunicar com o sistema servidor: %s
 Rating	PackageListView		Avaliação
 Synchronizing icons	ServerIconExportUpdateProcess		A sincronizar ícones
@@ -187,6 +190,7 @@ View agreed usage conditions…	MainWindow		Ver condições de utilização acor
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		O utilizador [%Nickname%] foi autenticado mas, antes de prosseguir, deverá concordar com as condições de utilização mais recentes.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Este pacote parece não estar localizado no servidor HaikuDepot, pelo que não é possível criar uma nova avaliação ou editar uma já existente.
 Apply	SettingsWindow		Aplicar
+View the password requirements	UserLoginWindow		Visualizar os requisitos de palavra-passe
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		O utilizador \"%Nickname%\" concordou anteriormente com condições de utilização, mas estas foram entretanto atualizadas. É agora necessário concordar com as condições de utilização atualizadas.
 Log out	MainWindow		Terminar sessão
 Comment language:	RatePackageWindow		Língua do comentário:

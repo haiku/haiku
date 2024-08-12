@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	171477831
+1	friulian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
 Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazions di MediaPlayer
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Inserît URL no valit!
 Aspect ratio	MediaPlayer-Main		Proporzions
+Eject device	MediaPlayer-Main		Pare fûr dispositîf
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvament de liste di riproduzion falît.\n\nErôr: 
 <no media>	MediaPlayer-InfoWin		<cence media>
 Hide interface	MediaPlayer-Main		Plate interface
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Plen visôr
 OK	MediaPlayer-NetworkStream		Va ben
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erôr interni (erôr tal blocâ/lock). Salvament de liste di riproduzion falît.
 100% scale	MediaPlayer-Main		Scjale 100%
+New player	MediaPlayer-Main		Gnûf riprodutôr
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nie di tornâ a fâ>
 Bad URL	MediaPlayer-NetworkStream		URL sbaliât
 Save	MediaPlayer-Main		Salve

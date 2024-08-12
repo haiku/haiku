@@ -1,10 +1,11 @@
-1	portuguese	x-vnd.Haiku-Screen	1226202253
+1	portuguese	x-vnd.Haiku-Screen	2577971458
 no	Screen		não
 bits/pixel	Screen		bits/píxel
 15 bits/pixel, 32768 colors	Screen		15 bits/píxel, 32768 cores
 Rows:	Screen		Linhas:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		Não foi possível definir o modo do ecrã:\n\t%s\n
+Serial no.: %s	Screen		N.º de série: %s
 /other…	Screen		/outra…
 Keep	Screen		Manter
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frequência horizontal:\t%lu - %lu kHz\nFrequência vertical:\t%lu - %lu Hz\n\nPixel clock máximo:\t%g MHz
@@ -13,9 +14,11 @@ Video format:	Screen		Formato de vídeo:
 Undo	Screen		Desfazer
 OK	Screen		OK
 Current workspace	Screen		Área de trabalho atual
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		verticalmente
 All workspaces	Screen		Todas as áreas de trabalho
 Use laptop panel:	Screen		Usar o painel do portátil:
+Unknown	Screen		Desconhecido
 Could not write VESA mode settings file:\n\t	Screen		Não foi possível escrever o ficheiro das definições do modo VESA:\n\t
 Display info	Screen		Informação do monitor
 Settings will revert in %seconds.	Screen		As definições serão revertidas em %seconds.

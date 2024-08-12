@@ -14,7 +14,7 @@ Restart system	DeskbarMenu		Torne invie
 Recent documents:	PreferencesWindow		Documents resints:
 Auto-raise	PreferencesWindow		Tire sù in automatic
 Mount	DeskbarMenu		Monte
-Icon size	PreferencesWindow		Dimension iconis
+Icon size	PreferencesWindow		Dimensions iconis
 About Haiku	DeskbarMenu		Informazions su Haiku
 Small	PreferencesWindow		Piçulis
 Show calendar…	TimeView		Mostre il calendari…

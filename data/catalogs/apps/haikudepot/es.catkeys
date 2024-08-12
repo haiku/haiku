@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3762371345
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2433106963
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema con la descarga de las condiciones de uso
 Available packages	MainWindow		Paquetes disponibles
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
@@ -43,7 +43,7 @@ Available	PackageListView		Disponible
 Click a package to view information	PackageInfoView		Haga clic en un paquete para ver su información
 Cancel	UserLoginWindow		Cancelar
 Rating not possible	MainWindow		No ha sido posible puntuar
-Package update error	MainWindow		Error de actualización del paquete.
+Package update error	MainWindow		Error de actualización del paquete
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Reboot required	PackageManager		Reinicio requerido
 All packages	PackageListView		Todos los paquetes
@@ -96,7 +96,7 @@ A reboot is necessary to complete the installation process.	PackageManager		Es n
 Yes	MainWindow		Sí
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 Pending…	PackageListView		Pendiente…
-Search terms:	FilterView		Términos de búsqueda
+Search terms:	FilterView		Términos de búsqueda:
 Quit	App		Salir
 The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		El apodo esta malformado. Los apodos solo pueden contener numeros y letras minusculas con tipografia latin. El apodo pudiera estar entre cuatro y seis letras de logitud.
 Authentication failed	UserLoginWindow		Falló la autenticación
@@ -113,6 +113,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Todos los repositorios
 Repository update error	LocalRepositoryUpdateProcess		Error de actualización de repositorio
 Network error	ServerHelper		Error de red
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocurrió un error al actualizar el repositorio: %error%
 User Created	UserLoginWindow		Usuario creado
 Check for updates…	MainWindow		Buscar actualizaciones…
@@ -186,10 +187,10 @@ Your rating:	RatePackageWindow		Su puntuación:
 HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot está deteniendo o completando las operaciones en marcha antes de cerrarse.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		El usuario %Nickname% ha sido creado en el sistema de HaikuDepotServer. Usted puede administratar los detalles de su usuario usando la interface web. Usted ahora puede iniciar con este nuevo usuario.
 Repositories	MainWindow		Repositorios
-This rating is visible to other users	RatePackageWindow		Esta calificación es visible para otros usuarios.
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Hubo un error al actualizar la información del paquete que puede causar que la misma no se muestre, o se muestre desactualizada.  Pueden obtenerse detalles adicionales sobre este problema consultando los archivos de registro de la aplicación. \nLa información sobre como acceder a los archivos de registro está disponible en la sección HaikuDepot de la Guía de Usuario de Haiku.
+This rating is visible to other users	RatePackageWindow		Esta calificación es visible para otros usuarios
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Hubo un error al actualizar la información del paquete que puede causar que la misma no se muestre, o se muestre desactualizada.  Pueden obtenerse detalles adicionales sobre este problema consultando los archivos de registro de la aplicación.\nLa información sobre como acceder a los archivos de registro está disponible en la sección HaikuDepot de la Guía de Usuario de Haiku.
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Ha ocurrido un error al intentar descargar las condiciones de uso. Compruebe el registro para obtener más detalles e intente de nuevo. \nLa información sobre cómo consultar los registros está disponible en la sección sobre HaikuDepot de la guía de usuario de Haiku.
-View agreed usage conditions…	MainWindow		Ver acuerdo de uso de condiciones...
+View agreed usage conditions…	MainWindow		Ver acuerdo de uso de condiciones…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		El usuario [%Nickname%] se ha autenticado, pero antes de proceder, debe aceptar las últimas condiciones de uso.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		No parece que este paquete esté en el servidor de HaikuDepot, por lo que no es posible crear una nueva valoración o modificar una ya existente.
 Apply	SettingsWindow		Aplicar

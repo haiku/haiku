@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-About	3595470255
+1	swedish	x-vnd.Haiku-About	1807839374
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Alla rättigheter förbehållna.
 \n\nSpecial thanks to:\n	AboutView		\n\nSärskilt tack till:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Upphovsrätt © 1999-2000 Y. Takagi. Med ensamrätt.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Tidigare projektledare:\n
 Unknown	AboutView		Okänd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. och deras utvecklarteam, för att ha skapat BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Upphovsrätt © 2002-2014 Industrial Light & Magic, en division av Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Licenser: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten till Haiku's källkod en egendom tillhörande Haiku, Inc. eller respektive upphovsman, där det uttryckligen är angivet i källkoden. Haiku® och Haiku's logo® är registrerade varumärken tillhörande Haiku, Inc.\n\n

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Magnify	1465621918
+1	hungarian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		a méretnek 4 többszörösének kell lennie
 Decrease pixel size	Magnify-Main		Képpontméret csökkentése
 no clip msg	In console, when clipboard is empty after clicking Copy image		a vágólap üres
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Ablak méretének növelése
 Save image	Magnify-Main		Kép mentése
 Show grid	Magnify-Main		Rács megjelenítése
 Magnify	System name		Nagyító
+height	Magnify-Main		magasság
+width	Magnify-Main		szélesség
 Info	Magnify-Main		Infó
 Show info	Magnify-Main		Információk megjelenításe
 Make square	Magnify-Main		Négyzetté alakítás

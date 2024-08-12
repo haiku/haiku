@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	574585393
+1	indonesian	x-vnd.Haiku-libtracker	661644602
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Abaikan huruf kapital/bukan
 Current folder	ContainerWindow		Folder saat ini
 Finish: %time - Over %finishtime left	StatusWindow		Selesai: %time - lebih %finishtime tersisa
 Mount all disks now	AutoMounterSettings		Memasang semua disk sekarang
-Location:	InfoWindow		Lokasi:
 Name	PoseView		Nama
+Location:	InfoWindow		Lokasi:
 Kind:	InfoWindow		Jenis:
 contains	FindPanel		berisi
 Open	FilePanelPriv		Buka
@@ -100,7 +100,6 @@ Window	ContainerWindow		Jendela
 Remove	FindPanel		Hapus
 Company	Person Query Columns		Perusahaan
 Recent documents	FavoritesMenu		Dokumen terbaru
-Save as Query template:	FindPanel		Simpan sebagai template Query:
 Edit templates…	TemplatesMenu		Sunting template…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} lain{# bytes}}
 8-bit integer	AttributesView		integer 8-bit
@@ -117,7 +116,6 @@ List folders first	SettingsView		Daftar folder dahulukan
 Find	FSUtils		Cari
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Item bernama \"%name\" sudah ada di folder ini. Apakah Anda ingin menggantinya dengan membuat link simbolik?
 List view	ContainerWindow		Tampilan daftar
-Temporary	FindPanel		Sementara
 Modified	QueryPoseView		Diubah
 Create relative link	ContainerWindow		Buat link relatif
 Owner	FilePermissionsView		Pemilik
@@ -268,9 +266,9 @@ no supporting apps	OpenWithWindow		takada aplikasi pendukung
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		Persiapan pengosongan tong sampah…
 Deleting: 	StatusWindow		Menghapus: 
+label too long	PoseView		label terlalu panjang
 the MIME settings	FSUtils		pengaturan MIME
 You can't move or copy the trash.	FSUtils		Anda tidak dapat memindahkan atau menyalin sampah.
-label too long	PoseView		label terlalu panjang
 Error creating link to \"%name\".	FSUtils		Terjadi kesalahan saat membuat tautan ke \"%name\".
 Unknown	FilePermissionsView		Tak diketahui
 Paste links	ContainerWindow		Tempel tautan
@@ -319,8 +317,8 @@ MIME Path	AttributesView		Jalur MIME
 less than	FindPanel		kurang dari
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ada kesalahan menyalin file \"%name\":\n\t%error\n\nApakah anda ingin melanjutkan?
 Creating links: 	StatusWindow		Membuat link: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Tidak bisa membuka \"%document\" dengan aplikasi \"%app\" (%error). 
 Create %s clipping	PoseView		Buat kliping %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Tidak bisa membuka \"%document\" dengan aplikasi \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Ada galat saat memindahkan \"%name\"
 To: %dir	StatusWindow		Ke: %dir
 Paste layout	ContainerWindow		Temple layout
@@ -368,7 +366,6 @@ Force identify	ContainerWindow		Memaksa mengidentifikasi
 no items	CountView		tak ada item
 Time	AttributesView		Waktu
 Disks	DirMenu		Diska
-Query name:	FindPanel		Cari nama:
 Open parent	ContainerWindow		Buka induk
 Find…	ContainerWindow		Menemukan…
 moving	FSUtils		memindah
@@ -483,8 +480,8 @@ True-color picture	AttributesView		Gambar warna-nyata
 Add-ons	FilePanelPriv		Pengaya
 Alignment	AttributesView		Perataan
 Move to Trash	FSUtils		Buang ke Tong Sampah
-Handles %type	OpenWithWindow		Menangani %type
 Cancel	PoseView		Batal
+Handles %type	OpenWithWindow		Menangani %type
 Delete	PoseView		Hapus
 Media parameter	AttributesView		Parameter media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jika Anda mengubah folder rumah, %osName mungkin tidak berperilaku dengan semestinya!\n\nApakah Anda yakin ingin melakukan ini?\n\nUntuk tetap mengubah folder rumah jua, tahan tombol Shift dan klik \"Saya tahu apa yang saya lakukan\".

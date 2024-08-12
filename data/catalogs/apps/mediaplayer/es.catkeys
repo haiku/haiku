@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	171477831
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Configuración del Reproductor 
 Copyright	MediaPlayer-InfoWin		Derechos de autor
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida.
 Aspect ratio	MediaPlayer-Main		Relación de aspecto:
+Eject device	MediaPlayer-Main		Expulsar dispositivo
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló.\n\nError:
 <no media>	MediaPlayer-InfoWin		<sin medios>
 Hide interface	MediaPlayer-Main		Esconder interfaz
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Pantalla completa
 OK	MediaPlayer-NetworkStream		Aceptar
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (bloquear falló). Guardar la lista de reproducción falló.
 100% scale	MediaPlayer-Main		Escala al 100%
+New player	MediaPlayer-Main		Nueva instancia de reproductor
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nada para rehacer>
 Bad URL	MediaPlayer-NetworkStream		URL incorrecta
 Save	MediaPlayer-Main		Guardar

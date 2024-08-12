@@ -1,7 +1,6 @@
-1	portuguese	x-vnd.Haiku-About	4264836225
+1	portuguese	x-vnd.Haiku-About	2843036442
 The Haikuware team and their bounty program\n	AboutView		À equipa do Haikuware e ao seu programa de recompensas\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Todos os direitos reservados.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Todos os direitos reservados.
 \n\nSpecial thanks to:\n	AboutView		\n\nAgradecimentos especiais a:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (e o seu núcleo NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Todos os direitos reservados.
@@ -25,13 +24,14 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Ex-programadores:\n
 Unknown	AboutView		Desconhecido
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. e à sua equipa de desenvolvimento, por terem criado o BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Copyright © 2002-2014 Industrial Light & Magic, uma divisão da Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Licenças: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		O copyright do código do Haiku é propriedade da Haiku, Inc. ou dos respetivos autores onde expressamente notado no código-fonte. Haiku® e o logótipo® HAIKU são marcas comerciais registadas da Haiku, Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Time running:	AboutView		Tempo de actividade:
+Visit the Haiku website	AboutView		Visitar a página web do Haiku
 Version: %s	AboutView	Version: R1 or hrev99999	Versão: %s
+Make a donation	AboutView		Fazer um donativo
 %d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB de Memória:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Todos os direitos reservados.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
@@ -74,6 +74,7 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Os mantenedores de Expat.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemaranev (McSeem).
 Translations:\n	AboutView		Traduções:\n
+Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Copyright © 2014-2024 Florian Bernd e Joel Höner. Todos os direitos reservados.
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…e provavelmente alguns mais que nos esquecemos de mencionar (pedimos desculpa!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. todos os direitos reservados.
 BSD (2-clause)	AboutWindow		BSD (2-clause)

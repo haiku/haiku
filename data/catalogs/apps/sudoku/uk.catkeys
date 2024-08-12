@@ -11,7 +11,7 @@ Undo	SudokuWindow		Відкат дії
 Export as…	SudokuWindow		Експортувати як…
 Quit	SudokuWindow		Вийти
 Redo	SudokuWindow		Повтор дії
-Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
+Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \«%s\»:\n%s\n
 Blank	SudokuWindow		Бланк
 Sudoku solved - congratulations!\n	SudokuWindow		Вітаємо - Судоку розв'язане!\n
 Text	SudokuWindow		Текст

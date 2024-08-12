@@ -2,7 +2,7 @@
 Start bluetooth services…	Window		Bluetooth servislerini başlat…
 From all devices	Settings view		Tüm aygıtlardan
 Defaults	Window		Saptanmışlar
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Uzak aygıtınızın Bluetooth özelliğinin açık olduğundan emin olun. ‘Tara’ya basıp taramayı başlatın. Aygıt adlarının getirilme süresi tam bilinememekle birlikte, aygıt başına 3 saniyeyi genelde aşmaz. Bundan sonra aygıtları ana listenize ekleyip bağlanma kısmına geçebilirsiniz.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Uzak aygıtınızın Bluetooth özelliğinin açık olduğundan emin olun. “Tara”ya basıp taramayı başlatın. Aygıt adlarının getirilme süresi tam bilinememekle birlikte, aygıt başına 3 saniyeyi genelde aşmaz. Bundan sonra aygıtları ana listenize ekleyip bağlanma kısmına geçebilirsiniz.
 Laptop	Settings view		Dizüstü
 Scanning progress	Inquiry panel		Tarama ilerlemesi
 Only from trusted devices	Settings view		Yalnızca güvenilir aygıtlardan

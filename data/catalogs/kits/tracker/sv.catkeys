@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2482866522
+1	swedish	x-vnd.Haiku-libtracker	2569925731
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -14,8 +14,8 @@ Ignore case	SelectionWindow		Ignorera skiftesläge
 Current folder	ContainerWindow		Nuvarande mapp
 Finish: %time - Over %finishtime left	StatusWindow		Klar: %time - Över %finishtime kvar
 Mount all disks now	AutoMounterSettings		Montera alla diskar nu
-Location:	InfoWindow		Plats:
 Name	PoseView		Namn
+Location:	InfoWindow		Plats:
 Kind:	InfoWindow		Typ:
 contains	FindPanel		innehåller
 Open	FilePanelPriv		Öppna
@@ -105,7 +105,6 @@ Window	ContainerWindow		Fönster
 Remove	FindPanel		Ta bort
 Company	Person Query Columns		Företag
 Recent documents	FavoritesMenu		Senaste dokumenten
-Save as Query template:	FindPanel		Spara som Sökmall:
 Edit templates…	TemplatesMenu		Redigera mallar...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bitars integer
@@ -122,7 +121,6 @@ List folders first	SettingsView		Visa mappar först
 Find	FSUtils		Sök
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Ett objekt med namnet \"%name\" finns redan i denna katalog. Vill du ersätta det med den symboliska länken du skapar?
 List view	ContainerWindow		Listvy
-Temporary	FindPanel		Tillfällig
 Modified	QueryPoseView		Modifierad
 Create relative link	ContainerWindow		Skapa relativ länk
 Owner	FilePermissionsView		Ägare
@@ -276,9 +274,9 @@ no supporting apps	OpenWithWindow		program saknas
 32-bit unsigned integer	AttributesView		32-bitars osignerad integer
 Preparing to empty Trash…	StatusWindow		Förbereder inför tömning av Papperskorgen...
 Deleting: 	StatusWindow		Tar bort:
+label too long	PoseView		etiketten är för lång
 the MIME settings	FSUtils		MIME-inställningarna
 You can't move or copy the trash.	FSUtils		Du kan inte flytta eller kopiera Papperskorgen.
-label too long	PoseView		etiketten är för lång
 Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till \"%name\".
 Unknown	FilePermissionsView		Okänd
 Paste links	ContainerWindow		Klistra in länkar
@@ -327,8 +325,8 @@ MIME Path	AttributesView		MIME-sökväg
 less than	FindPanel		mindre än
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen \"%name\":\n\t%error\n\nVill du fortsätta?
 Creating links: 	StatusWindow		Skapar länkar:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (%error). 
 Create %s clipping	PoseView		Skapa %s förkortning
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Fel vid flyttande av \"%name\"
 To: %dir	StatusWindow		Till: %dir
 Paste layout	ContainerWindow		Klistra in layout
@@ -377,7 +375,6 @@ Force identify	ContainerWindow		Tvinga identifiering
 no items	CountView		inga objekt
 Time	AttributesView		Tid
 Disks	DirMenu		Diskar
-Query name:	FindPanel		Sökningsnamn:
 Open parent	ContainerWindow		Öppna förälder
 Find…	ContainerWindow		Sök...
 moving	FSUtils		flyttar
@@ -480,8 +477,8 @@ Color	AttributesView		Färg
 Copy layout	ContainerWindow		Kopiera layout
 Duplicate	ContainerWindow		Duplicera
 16-bit integer	AttributesView		16-bitars integer
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Obs: filnamnen i målfilsystemet är inte skiftlägeskänsliga.\n
 Untitled clipping	PoseView		Namnlöst urklipp
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Obs: filnamnen i målfilsystemet är inte skiftlägeskänsliga.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen \"%name\" finns redan i den valda katalogen. Vill du ersätta den?
 , indexed	InfoWindow		, indexerad
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du måste släppa objekt(en) på en av diskikonerna i fönstret \"Volymer\".
@@ -497,8 +494,8 @@ True-color picture	AttributesView		Bild i miljontals färger
 Add-ons	FilePanelPriv		Tillägg
 Alignment	AttributesView		Orientation
 Move to Trash	FSUtils		Flytta till Papperskorgen
-Handles %type	OpenWithWindow		Hanterar %type
 Cancel	PoseView		Avbryt
+Handles %type	OpenWithWindow		Hanterar %type
 Delete	PoseView		Ta bort
 Media parameter	AttributesView		Mediaparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Om du gör ändringar i hemmappen kommer kanske inte %osName fungera som det ska!\n\nÄr du säker på att du vill göra detta?\n\nFör att göra ändringar ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Jag vet vad jag håller på med\".

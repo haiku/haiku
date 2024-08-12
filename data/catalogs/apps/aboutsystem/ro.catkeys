@@ -1,7 +1,6 @@
-1	romanian	x-vnd.Haiku-About	3595470255
+1	romanian	x-vnd.Haiku-About	3675341430
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Drepturi de autor © 1999-2007 Michael C. Ring. Toate drepturile rezervate.
-Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Drepturi de autor © 2002-2004 Vivek Mohan. Toate drepturile rezervate.
 \n\nSpecial thanks to:\n	AboutView		\n\nMulțumiri speciale:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (și nucleul său NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Drepturi de autor © 1999-2000 Y.Takagi. Toate drepturile rezervate.
@@ -25,7 +24,6 @@ Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nA
 Past maintainers:\n	AboutView		Responsabili anteriori:\n
 Unknown	AboutView		Necunoscut
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. și echipei sale de dezvoltatori, pentru că au creat BeOS!\n\n
-Copyright © 2002-2014 Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.	AboutView		Drepturi de autor © 2002-2014 Industrial Light & Magic, o divizie a Lucas Digital Ltd. LLC.
 Licenses: 	AboutView		Licențe: 
 %ld MHz	AboutView	750 Mhz (CPU clock speed)	%ld MHz
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea Haiku, Inc. sau a respectivilor autori atunci când este notat explicit în sursă. Haiku® şi logoul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
@@ -77,6 +75,7 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Drepturi de a
 Copyright © 2001-2003 Expat maintainers.	AboutView		Drepturi de autor © 2001-2003 responsabili Expat.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Drepturi de autor © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Traduceri:\n
+Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Drepturi de autor © 2014-2024 Florian Bernd și Joel Höner. Toate drepturile rezervate.
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…și probabil mai mulți pe care am uitat să îi menționăm (scuze!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Drepturi de autor © 2006-2015 Intel Corporation. Toate drepturile rezervate.
 BSD (2-clause)	AboutWindow		BSD (clauza 2)

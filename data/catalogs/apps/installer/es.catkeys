@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	1442243277
+1	spanish; castilian	x-vnd.Haiku-Installer	1195671691
 Performing installation.	InstallProgress		Realizando instalación.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
 No optional packages available.	PackagesView		No hay paquetes opcionales disponibles.
@@ -58,6 +58,7 @@ Restart	InstallerWindow		Reiniciar
 The disk can't be mounted. Please choose a different disk.	InstallProgress		No se puede montar el disco. Por favor, elija otro.
 Begin	InstallerWindow		Empezar
 Collecting copy information.	InstallProgress		Recopilando información para la copia.
+Set up boot menu…	InstallerWindow		Configurar menú de arranque…
 Show optional packages	InstallerWindow		Mostrar paquetes opcionales
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		No se ha detectado ninguna partición apropiada para la instalación. Por favor, configure las particiones y formatee al menos una particion con el sistema de archivos Be File System.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		El disco de destino puede que no tenga suficiente espacio libre. Intente seleccionar otro disco o desmarque elementos opcionales.
@@ -73,6 +74,7 @@ Set up partitions…	InstallerWindow		Configurar particiones…
 Install progress:  	InstallerWindow		Progreso de instalación:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No puede instalar los contenidos de un disco sobre sí mismos. Por favor, elija otro disco.
 OK	InstallProgress		Aceptar
+Quit BootManager	InstallerWindow		Salir del Gestor de arranque
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		¿Está seguro de querer instalar sobre el disco de arranque actual? El instalador tendrá que reiniciar la máquina.
 Onto:	InstallerWindow		En:
 Tools	InstallerWindow		Herramientas
