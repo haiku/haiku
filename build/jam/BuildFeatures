@@ -531,7 +531,7 @@ if [ IsPackageAvailable tiff_devel ] {
 			runtime: lib
 		file: devel tiff_devel
 			depends: base
-			library: $(developLibDir)/libtiff.so.6
+			library: $(developLibDir)/libtiff.so
 			headers: $(developHeadersDir) $(developHeadersDir)/tiff
 		;
 
