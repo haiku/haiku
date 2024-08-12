@@ -48,8 +48,7 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS =
 AddFilesToFloppyBootArchive system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
 
-AddFilesToFloppyBootArchive system add-ons kernel busses ata
-	:
+AddFilesToFloppyBootArchive system add-ons kernel busses ata :
 	generic_ide_pci
 	ide_isa@x86
 	silicon_image_3112
@@ -57,29 +56,24 @@ AddFilesToFloppyBootArchive system add-ons kernel busses ata
 	it8211
 	;
 
-AddFilesToFloppyBootArchive system add-ons kernel busses scsi
-	:
+AddFilesToFloppyBootArchive system add-ons kernel busses scsi :
 	ahci
 	;
-AddFilesToFloppyBootArchive system add-ons kernel console
-	:
+AddFilesToFloppyBootArchive system add-ons kernel console :
 	vga_text
 	;
 AddFilesToFloppyBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToFloppyBootArchive system add-ons kernel generic
-	:
+AddFilesToFloppyBootArchive system add-ons kernel generic :
 	ata_adapter
 	locked_pool
 	scsi_periph
 	;
-AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems
-	:
+AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems :
 	intel
 	session
 	;
-AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers
-	:
+AddFilesToFloppyBootArchive system add-ons kernel interrupt_controllers :
 	openpic@ppc
 	;
 
@@ -100,13 +94,11 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 }
 
 # drivers
-AddNewDriversToFloppyBootArchive disk scsi
-	:
+AddNewDriversToFloppyBootArchive disk scsi :
 	scsi_cd
 	scsi_disk
 	;
-AddNewDriversToFloppyBootArchive disk
-	:
+AddNewDriversToFloppyBootArchive disk :
 	norflash@arm
 	;
 if $(USB_BOOT) = 1 {
@@ -125,8 +117,7 @@ if $(NET_BOOT) = 1 {
 }
 
 # kernel
-AddFilesToFloppyBootArchive system
-	:
+AddFilesToFloppyBootArchive system :
 	<revisioned>kernel_$(TARGET_ARCH)
 	;
 

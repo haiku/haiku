@@ -7,54 +7,135 @@ HaikuPackage $(haikuPackage) ;
 
 # modules
 AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToPackage add-ons kernel busses agp_gart : <agp_gart>intel@x86,x86_64 ;
+AddFilesToPackage add-ons kernel busses agp_gart :
+	<agp_gart>intel@x86,x86_64
+	;
 
-AddFilesToPackage add-ons kernel busses ata
-	: generic_ide_pci it8211 legacy_sata silicon_image_3112 highpoint_ide_pci ide_isa@x86 ;
+AddFilesToPackage add-ons kernel busses ata :
+	generic_ide_pci
+	it8211
+	legacy_sata
+	silicon_image_3112
+	highpoint_ide_pci
+	ide_isa@x86
+	;
 
-AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
-AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci ;
-AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
-AddFilesToPackage add-ons kernel console : vga_text ;
-AddFilesToPackage add-ons kernel debugger
-	: <kdebug>demangle <kdebug>disasm@x86 #<kdebug>hangman
-	  <kdebug>invalidate_on_exit <kdebug>usb_keyboard
-	  <kdebug>run_on_exit ;
+AddFilesToPackage add-ons kernel busses scsi :
+	ahci
+	virtio_scsi
+	;
+AddFilesToPackage add-ons kernel busses usb :
+	<usb>uhci
+	<usb>ohci
+	<usb>ehci
+	;
+AddFilesToPackage add-ons kernel busses virtio :
+	virtio_pci
+	;
+AddFilesToPackage add-ons kernel console :
+	vga_text
+	;
+AddFilesToPackage add-ons kernel debugger :
+	<kdebug>demangle
+	<kdebug>disasm@x86
+	#<kdebug>hangman
+	<kdebug>invalidate_on_exit
+	<kdebug>usb_keyboard
+	<kdebug>run_on_exit
+	;
 AddFilesToPackage add-ons kernel file_systems : $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToPackage add-ons kernel generic
-	: ata_adapter bios@x86,x86_64 dpc
-		locked_pool mpu401 scsi_periph <module>tty ;
-AddFilesToPackage add-ons kernel partitioning_systems
-	: amiga_rdb@m68k apple@ppc efi_gpt intel session ;
-AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
-AddFilesToPackage add-ons kernel power cpufreq : intel_pstates@x86,x86_64 ;
-AddFilesToPackage add-ons kernel power cpuidle : intel_cstates@x86,x86_64 ;
+AddFilesToPackage add-ons kernel generic :
+	ata_adapter
+	bios@x86,x86_64
+	dpc
+	locked_pool
+	mpu401
+	scsi_periph
+	<module>tty
+	;
+AddFilesToPackage add-ons kernel partitioning_systems :
+	amiga_rdb@m68k
+	apple@ppc
+	efi_gpt
+	intel
+	session
+	;
+AddFilesToPackage add-ons kernel interrupt_controllers :
+	openpic@ppc
+	;
+AddFilesToPackage add-ons kernel power cpufreq :
+	intel_pstates@x86,x86_64
+	;
+AddFilesToPackage add-ons kernel power cpuidle :
+	intel_cstates@x86,x86_64
+	;
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
-	AddFilesToPackage add-ons kernel cpu : generic_x86 ;
+	AddFilesToPackage add-ons kernel cpu
+		:
+		generic_x86
+		;
 }
 
 # drivers
-AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
-AddNewDriversToPackage disk virtual	: ram_disk virtio_block ;
-AddNewDriversToPackage power		: acpi_battery@x86 ;
-AddNewDriversToPackage network		: virtio_net ;
-#AddNewDriversToPackage display		: display_adapter@x86 ;
+AddNewDriversToPackage disk scsi :
+	scsi_cd
+	scsi_disk
+	;
+AddNewDriversToPackage disk virtual :
+	ram_disk
+	virtio_block
+	;
+AddNewDriversToPackage power :
+	acpi_battery@x86
+	;
+AddNewDriversToPackage network :
+	virtio_net
+	;
+AddNewDriversToPackage display :
+#	display_adapter@x86
+	;
 
 # legacy drivers
-AddDriversToPackage					: console dprintf null random <driver>tty
-										zero ;
-AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
-AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
-AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToPackage bus				: usb_raw ;
-AddDriversToPackage disk virtual	: nbd ;
-AddDriversToPackage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
-AddDriversToPackage input			: ps2_hid usb_hid wacom ;
-AddDriversToPackage misc			: <driver>poke <driver>mem ;
-AddDriversToPackage net				: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
-AddDriversToPackage ports			: pc_serial usb_serial ;
-AddDriversToPackage power			: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
+AddDriversToPackage :
+	console
+	dprintf
+	null
+	random
+	<driver>tty
+	zero
+	;
+AddDriversToPackage audio hmulti
+	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
+AddDriversToPackage audio old
+	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
+AddDriversToPackage midi
+	: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
+AddDriversToPackage bus :
+	usb_raw
+	;
+AddDriversToPackage disk virtual :
+	nbd
+	;
+AddDriversToPackage graphics
+	: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
+AddDriversToPackage input :
+	ps2_hid
+	usb_hid
+	wacom
+	;
+AddDriversToPackage misc :
+	<driver>poke
+	<driver>mem
+	;
+AddDriversToPackage net
+	: $(SYSTEM_ADD_ONS_DRIVERS_NET) ;
+AddDriversToPackage ports :
+	pc_serial
+	usb_serial
+	;
+AddDriversToPackage power
+	: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 
 # kernel
 AddFilesToPackage : <revisioned>kernel_$(TARGET_ARCH) ;
@@ -79,11 +160,21 @@ if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToPackage				: runtime_loader Deskbar Tracker ;
-AddFilesToPackage bin			: $(SYSTEM_BIN) consoled ;
-AddFilesToPackage apps			: $(SYSTEM_APPS) ;
-AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
-AddFilesToPackage demos			: $(SYSTEM_DEMOS) ;
+AddFilesToPackage :
+	runtime_loader
+	Deskbar
+	Tracker
+	;
+AddFilesToPackage bin :
+	$(SYSTEM_BIN)
+	consoled
+	;
+AddFilesToPackage apps
+	: $(SYSTEM_APPS) ;
+AddFilesToPackage preferences
+	: $(SYSTEM_PREFERENCES) ;
+AddFilesToPackage demos
+	: $(SYSTEM_DEMOS) ;
 
 SEARCH on install-wifi-firmwares.sh = [ FDirName $(HAIKU_TOP) data bin ] ;
 AddFilesToPackage bin : install-wifi-firmwares.sh ;
@@ -142,19 +233,37 @@ AddFilesToPackage data Terminal Themes : $(terminalThemes) ;
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ata pci isa@x86,x86_64 dpc
-	scsi usb
+	acpi@x86,x86_64
+	ata
+	pci
+	isa@x86,x86_64
+	dpc
+	scsi
+	usb
 	openpic@ppc
-	ata_adapter locked_pool scsi_periph
-	ahci generic_ide_pci it8211 legacy_sata silicon_image_3112
+	ata_adapter
+	locked_pool
+	scsi_periph
+	ahci
+	generic_ide_pci
+	it8211
+	legacy_sata
+	silicon_image_3112
 	highpoint_ide_pci
 	ide_isa@x86
-	<usb>uhci <usb>ohci <usb>ehci
-	scsi_cd scsi_disk
-	virtio virtio_pci virtio_block virtio_scsi
+	<usb>uhci
+	<usb>ohci
+	<usb>ehci
+	scsi_cd
+	scsi_disk
+	virtio
+	virtio_pci
+	virtio_block
+	virtio_scsi
 	efi_gpt
 	intel
-	bfs packagefs
+	bfs
+	packagefs
 ;
 
 # add-ons
@@ -162,9 +271,14 @@ AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
 AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
-AddFilesToPackage add-ons Tracker
-	: FileType Mark\ as… Mark\ as\ Read Open\ Target\ Folder
-		Open\ Terminal ZipOMatic ;
+AddFilesToPackage add-ons Tracker :
+	FileType
+	Mark\ as…
+	Mark\ as\ Read
+	Open\ Target\ Folder
+	Open\ Terminal
+	ZipOMatic
+	;
 AddSymlinkToPackage add-ons Tracker
 	: /boot/system/preferences/Backgrounds : Background-B ;
 AddSymlinkToPackage add-ons Tracker
@@ -172,22 +286,38 @@ AddSymlinkToPackage add-ons Tracker
 AddSymlinkToPackage add-ons Tracker
 	: /boot/system/apps/DiskUsage : DiskUsage-I ;
 
-AddFilesToPackage add-ons input_server devices
-	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
-AddFilesToPackage add-ons input_server filters
-	: switch_workspace ;
+AddFilesToPackage add-ons input_server devices :
+	<input>keyboard
+	<input>mouse
+	<input>tablet
+	<input>wacom
+	;
+AddFilesToPackage add-ons input_server filters :
+	switch_workspace
+	;
 
-AddFilesToPackage add-ons kernel network : <net>notifications stack ;
-AddFilesToPackage add-ons kernel network : dns_resolver ;
-AddFilesToPackage add-ons kernel network devices : $(SYSTEM_NETWORK_DEVICES) ;
+AddFilesToPackage add-ons kernel network :
+	<net>notifications
+	stack
+	;
+AddFilesToPackage add-ons kernel network :
+	dns_resolver
+	;
+AddFilesToPackage add-ons kernel network devices
+	: $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToPackage add-ons kernel network datalink_protocols
 	: $(SYSTEM_NETWORK_DATALINK_PROTOCOLS) ;
-AddFilesToPackage add-ons kernel network ppp : $(SYSTEM_NETWORK_PPP) ;
+AddFilesToPackage add-ons kernel network ppp
+	: $(SYSTEM_NETWORK_PPP) ;
 AddFilesToPackage add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 
-AddFilesToPackage add-ons disk_systems
-	: <disk_system>intel <disk_system>gpt <disk_system>bfs <disk_system>ntfs ;
+AddFilesToPackage add-ons disk_systems :
+	<disk_system>intel
+	<disk_system>gpt
+	<disk_system>bfs
+	<disk_system>ntfs
+	;
 
 
 # the MIME DB
@@ -197,9 +327,17 @@ CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 # Deskbar menu symlinks
 
 # "Applications" links
-DESKBAR_APPLICATIONS = ActivityMonitor CharacterMap DeskCalc
-	Devices DiskProbe DriveSetup DiskUsage Expander Installer
-	StyledEdit Terminal
+DESKBAR_APPLICATIONS =
+	ActivityMonitor
+	CharacterMap DeskCalc
+	Devices
+	DiskProbe
+	DriveSetup
+	DiskUsage
+	Expander
+	Installer
+	StyledEdit
+	Terminal
 ;
 local linkTarget ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
@@ -208,7 +346,11 @@ for linkTarget in $(DESKBAR_APPLICATIONS) {
 }
 
 # "Desktop applets" links
-DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
+DESKBAR_DESKTOP_APPLETS =
+	LaunchBox
+	NetworkStatus
+	PowerStatus
+	ProcessController
 	Workspaces
 ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
