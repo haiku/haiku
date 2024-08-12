@@ -48,39 +48,32 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS =
 # modules
 AddFilesToNetBootArchive system add-ons kernel bus_managers
 	: $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
-AddFilesToNetBootArchive system add-ons kernel busses agp_gart
-	:
+AddFilesToNetBootArchive system add-ons kernel busses agp_gart :
 	<agp_gart>intel@x86
 	;
-AddFilesToNetBootArchive system add-ons kernel busses ide
-	:
+AddFilesToNetBootArchive system add-ons kernel busses ide :
 	generic_ide_pci
 	ide_isa@x86
 	silicon_image_3112
 	;
-AddFilesToNetBootArchive system add-ons kernel busses scsi
-	:
+AddFilesToNetBootArchive system add-ons kernel busses scsi :
 	ahci
 	;
-AddFilesToNetBootArchive system add-ons kernel console
-	:
+AddFilesToNetBootArchive system add-ons kernel console :
 	vga_text
 	;
 AddFilesToNetBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
-AddFilesToNetBootArchive system add-ons kernel generic
-	:
+AddFilesToNetBootArchive system add-ons kernel generic :
 	ata_adapter
 	locked_pool
 	scsi_periph
 	;
-AddFilesToNetBootArchive system add-ons kernel partitioning_systems
-	:
+AddFilesToNetBootArchive system add-ons kernel partitioning_systems :
 	intel
 	session
 	;
-AddFilesToNetBootArchive system add-ons kernel interrupt_controllers
-	:
+AddFilesToNetBootArchive system add-ons kernel interrupt_controllers :
 	openpic@ppc
 	;
 
@@ -92,17 +85,14 @@ if $(TARGET_ARCH) = x86 {
 }
 
 # drivers
-AddNewDriversToNetBootArchive disk scsi
-	:
+AddNewDriversToNetBootArchive disk scsi :
 	scsi_cd
 	scsi_disk
 	;
-AddDriversToNetBootArchive disk virtual
-	:
+AddDriversToNetBootArchive disk virtual :
 #	nbd
 	;
-AddDriversToNetBootArchive disk virtual
-	:
+AddDriversToNetBootArchive disk virtual :
 	remote_disk
 	;
 AddDriversToNetBootArchive net
@@ -121,8 +111,7 @@ AddFilesToNetBootArchive home config settings kernel drivers
 	: $(driverSettingsFiles) ;
 
 # add-ons
-AddFilesToNetBootArchive system add-ons kernel network
-	:
+AddFilesToNetBootArchive system add-ons kernel network :
 	stack
 	;
 AddFilesToNetBootArchive system add-ons kernel network devices

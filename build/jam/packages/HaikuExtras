@@ -5,16 +5,23 @@ HaikuPackage $(extrasPackage) ;
 
 ## Apps Oddities
 
-AddFilesToPackage bin : acpi_call ;
-AddFilesToPackage apps : TV ;
+AddFilesToPackage bin :
+	acpi_call
+	;
+AddFilesToPackage apps :
+	TV
+	;
 AddSymlinkToPackage data deskbar menu Applications : ../../../../apps/TV : TV ;
 
 
 ## Driver Oddities
 
 # kernel modules
-AddFilesToPackage add-ons kernel partitioning_systems
-	: amiga_rdb@!m68k apple@!ppc sun@!sparc ;
+AddFilesToPackage add-ons kernel partitioning_systems :
+	amiga_rdb@!m68k
+	apple@!ppc
+	sun@!sparc
+	;
 
 
 ## Visual Oddities
@@ -22,10 +29,16 @@ AddFilesToPackage add-ons kernel partitioning_systems
 # MacDecorator WinDecorator need improved stack and tile support
 
 # Control Looks
-AddFilesToPackage add-ons control_look : BeControlLook FlatControlLook ;
+AddFilesToPackage add-ons control_look :
+	BeControlLook
+	FlatControlLook
+	;
 
 # Decorators
-AddFilesToPackage add-ons decorators : BeDecorator FlatDecorator ;
+AddFilesToPackage add-ons decorators :
+	BeDecorator
+	FlatDecorator
+	;
 
 
 BuildHaikuPackage $(extrasPackage) : haiku_extras ;
