@@ -162,8 +162,10 @@ kevent(int kq,
 			for (int i = 0; i < changedInfos; i++) {
 				if (waitInfos[i].events > 0)
 					continue;
-				if (nevents == 0)
+				if (nevents == 0) {
+					errors = -1;
 					break;
+				}
 
 				short filter = filter_from_info(waitInfos[i]);
 				int64_t data = waitInfos[i].events;
@@ -173,10 +175,11 @@ kevent(int kq,
 				nevents--;
 				errors++;
 			}
-			if (nevents == 0 || errors == 0) {
-				__set_errno(status);
-				return -1;
-			}
+
+			if (errors > 0)
+				return errors;
+			__set_errno(status);
+			return -1;
 		}
 	}
 
