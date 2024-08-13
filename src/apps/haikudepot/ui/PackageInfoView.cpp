@@ -378,8 +378,10 @@ public:
 			fPublisherView->SetToolTip(publisher);
 			fPublisherView->SetText(publisher.TruncateChars(45)
 				.Append(B_UTF8_ELLIPSIS));
-		} else
+		} else {
+			fPublisherView->SetToolTip("");
 			fPublisherView->SetText(publisher);
+		}
 
 		fVersionInfo->SetText(package->Version().ToString());
 

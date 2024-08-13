@@ -86,9 +86,16 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 		publisherURL = info.URLList().StringAt(0);
 
 	BString publisherName = info.Vendor();
-	const BStringList& rightsList = info.CopyrightList();
-	if (rightsList.CountStrings() > 0)
-		publisherName = rightsList.Last();
+	const BStringList& copyrightList = info.CopyrightList();
+	if (!copyrightList.IsEmpty()) {
+		publisherName = "";
+
+		for (int32 i = 0; i < copyrightList.CountStrings(); i++) {
+			if (!publisherName.IsEmpty())
+				publisherName << ", ";
+			publisherName << copyrightList.StringAt(i);
+		}
+	}
 	if (!publisherName.IsEmpty())
 		publisherName.Prepend("© ");
 
