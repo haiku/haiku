@@ -315,8 +315,7 @@ timer_interrupt()
 status_t
 add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 {
-	bigtime_t currentTime = system_time();
-	cpu_status state;
+	const bigtime_t currentTime = system_time();
 
 	if (event == NULL || hook == NULL || period < 0)
 		return B_BAD_VALUE;
@@ -335,10 +334,10 @@ add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 	event->hook = hook;
 	event->flags = flags;
 
-	state = disable_interrupts();
-	int currentCPU = smp_get_current_cpu();
+	InterruptsLocker interruptsLocker;
+	const int currentCPU = smp_get_current_cpu();
 	per_cpu_timer_data& cpuData = sPerCPU[currentCPU];
-	acquire_spinlock(&cpuData.lock);
+	SpinLocker locker(&cpuData.lock);
 
 	// If the timer is an absolute real-time base timer, convert the schedule
 	// time to system time.
@@ -356,9 +355,6 @@ add_timer(timer* event, timer_hook hook, bigtime_t period, int32 flags)
 	// if we were stuck at the head of the list, set the hardware timer
 	if (event == cpuData.events)
 		set_hardware_timer(event->schedule_time, currentTime);
-
-	release_spinlock(&cpuData.lock);
-	restore_interrupts(state);
 
 	return B_OK;
 }
