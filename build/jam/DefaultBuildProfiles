@@ -92,9 +92,9 @@ rule DefineDefaultBuildProfiles
 				wpa_supplicant
 				# Some packages can't be built with gcc2, so we install the gcc13
 				# secondary architecture package instead in this case
-				!gcc2 @{ nano p7zip python3.9 xz_utils }@
+				!gcc2 @{ nano p7zip python3.10 xz_utils }@
 				gcc2 @{ nano_x86@secondary_x86 p7zip_x86@secondary_x86
-					python3.9_x86@secondary_x86 xz_utils_x86@secondary_x86 }@
+					python3.10_x86@secondary_x86 xz_utils_x86@secondary_x86 }@
 				;
 			AddHaikuImageSourcePackages
 				bepdf
