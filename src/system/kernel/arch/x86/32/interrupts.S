@@ -172,10 +172,6 @@
 		addl	$8, %esp;
 
 #	define TRACE_POST_SYSCALL()	\
-		testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi);	\
-		jnz		1f;															\
-		xor		%edx, %edx;													\
-1:																			\
 		push	%edx;							/* syscall return value */	\
 		push	%eax;														\
 		movl	IFRAME_orig_eax(%ebp), %eax;	/* syscall number */		\
@@ -646,8 +642,12 @@ STATIC_FUNCTION(handle_syscall):
 	// call the syscall function
 	call	*SYSCALL_INFO_function(%esi)
 
-	// overwrite the values of %eax and %edx on the stack (the syscall return
-	// value)
+	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
+	jnz		1f
+	xor		%edx, %edx
+  1:
+
+	// overwrite the values of %eax and %edx on the stack (the syscall return value)
 	movl	%edx, IFRAME_dx(%ebp)
 	movl	%eax, IFRAME_ax(%ebp)
 
