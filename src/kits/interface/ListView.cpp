@@ -1235,9 +1235,9 @@ BListView::ScrollTo(int32 index)
 	BRect itemFrame = ItemFrame(index);
 	BRect bounds = Bounds();
 	if (itemFrame.top < bounds.top)
-		ScrollTo(itemFrame.LeftTop());
+		BListView::ScrollTo(itemFrame.LeftTop());
 	else if (itemFrame.bottom > bounds.bottom)
-		ScrollTo(BPoint(0, itemFrame.bottom - bounds.Height()));
+		BListView::ScrollTo(BPoint(0, itemFrame.bottom - bounds.Height()));
 }
 
 
