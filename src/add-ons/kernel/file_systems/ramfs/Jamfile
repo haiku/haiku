@@ -4,6 +4,7 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders file_systems storage ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers disk virtual ram_disk ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src system kernel vm ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src system kernel cache ] ;
 
 DEFINES += DEBUG_APP="\\\"ramfs\\\"" ;
 

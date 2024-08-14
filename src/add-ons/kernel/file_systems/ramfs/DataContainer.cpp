@@ -14,6 +14,7 @@
 #include <vm/VMCache.h>
 #include <vm/vm_page.h>
 #include "VMAnonymousNoSwapCache.h"
+#include "vnode_store.h"
 
 #include "AllocationInfo.h"
 #include "DebugSupport.h"
@@ -73,6 +74,7 @@ public:
 protected:
 	virtual	void DeleteObject()
 	{
+		static_assert(sizeof(VMForVnodeCache) <= sizeof(VMVnodeCache), "cache too large");
 		object_cache_delete(gVnodeCacheObjectCache, this);
 	}
 
