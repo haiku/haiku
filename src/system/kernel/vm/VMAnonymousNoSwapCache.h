@@ -13,7 +13,7 @@
 #include <vm/VMCache.h>
 
 
-class VMAnonymousNoSwapCache final : public VMCache {
+class VMAnonymousNoSwapCache : public VMCache {
 public:
 	virtual						~VMAnonymousNoSwapCache();
 

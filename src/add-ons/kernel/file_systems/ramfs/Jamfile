@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel file_systems ramfs ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders file_systems storage ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers disk virtual ram_disk ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src system kernel vm ] ;
 
 DEFINES += DEBUG_APP="\\\"ramfs\\\"" ;
 

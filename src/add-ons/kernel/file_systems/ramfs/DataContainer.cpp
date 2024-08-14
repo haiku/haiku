@@ -8,9 +8,12 @@
 #include <StackOrHeapArray.h>
 #include <util/AutoLock.h>
 #include <util/BitUtils.h>
+#include <slab/Slab.h>
 
+#include <vfs.h>
 #include <vm/VMCache.h>
 #include <vm/vm_page.h>
+#include "VMAnonymousNoSwapCache.h"
 
 #include "AllocationInfo.h"
 #include "DebugSupport.h"
@@ -41,6 +44,42 @@
 static const off_t kMinimumSmallBufferSize = 32;
 static const off_t kMaximumSmallBufferSize = (B_PAGE_SIZE / 4);
 
+
+// We don't use VMVnodeCache because it's for caching pages that exist on disk.
+// All we need is an AnonymousCache that tracks when the vnode is referenced.
+class VMForVnodeCache final : public VMAnonymousNoSwapCache {
+public:
+	status_t Init()
+	{
+		fVnode = NULL;
+		return VMAnonymousNoSwapCache::Init(false, 0, 0, 0);
+	}
+
+	status_t AcquireUnreferencedStoreRef() override
+	{
+		return B_NOT_SUPPORTED;
+	}
+
+	void AcquireStoreRef() override
+	{
+		vfs_acquire_vnode(fVnode);
+	}
+
+	void ReleaseStoreRef() override
+	{
+		vfs_put_vnode(fVnode);
+	}
+
+protected:
+	virtual	void DeleteObject()
+	{
+		object_cache_delete(gVnodeCacheObjectCache, this);
+	}
+
+private:
+	friend class DataContainer;
+	struct vnode* fVnode;
+};
 
 
 DataContainer::DataContainer(Volume *volume)
@@ -75,12 +114,13 @@ DataContainer::InitCheck() const
 
 
 VMCache*
-DataContainer::GetCache()
+DataContainer::GetCache(struct vnode* vnode)
 {
 	// TODO: Because we always get the cache for files on creation vs. on demand,
 	// this means files (no matter how small) always use cache mode at present.
 	if (!_IsCacheMode())
 		_SwitchToCacheMode();
+	((VMForVnodeCache*)fCache)->fVnode = vnode;
 	return fCache;
 }
 
@@ -249,11 +289,15 @@ DataContainer::_CountBlocks() const
 status_t
 DataContainer::_SwitchToCacheMode()
 {
-	status_t error = VMCacheFactory::CreateAnonymousCache(fCache, false, 0,
-		0, false, VM_PRIORITY_USER);
+	VMForVnodeCache* cache = new(gVnodeCacheObjectCache, 0) VMForVnodeCache;
+	if (cache == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = cache->Init();
 	if (error != B_OK)
 		return error;
 
+	fCache = cache;
 	fCache->temporary = 1;
 	fCache->unmergeable = 1;
 	fCache->virtual_end = fSize;

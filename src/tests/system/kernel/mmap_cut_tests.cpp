@@ -94,6 +94,9 @@ map_cut_fork_test()
 	uint8* ptr = (uint8*)mmap(NULL, B_PAGE_SIZE * 4, PROT_NONE, MAP_PRIVATE,
 		fd, 0);
 
+	// we can close the FD as mmap acquires another reference to the vnode
+	close(fd);
+
 	// make the head accessible and also force the kernel to allocate the
 	// page_protections array
 	mprotect(ptr, B_PAGE_SIZE, PROT_READ | PROT_WRITE);
