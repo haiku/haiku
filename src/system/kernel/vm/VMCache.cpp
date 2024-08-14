@@ -627,8 +627,8 @@ VMCacheRef::VMCacheRef(VMCache* cache)
 bool
 VMCache::_IsMergeable() const
 {
-	return areas == NULL && temporary && !consumers.IsEmpty()
-		&& consumers.Head() == consumers.Tail();
+	return areas == NULL && temporary && !unmergeable
+		&& !consumers.IsEmpty() && consumers.Head() == consumers.Tail();
 }
 
 
@@ -657,6 +657,7 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 	virtual_end = 0;
 	committed_size = 0;
 	temporary = 0;
+	unmergeable = 0;
 	page_count = 0;
 	fWiredPagesCount = 0;
 	type = cacheType;

@@ -198,6 +198,7 @@ public:
 				// TODO: Remove!
 			uint32				page_count;
 			uint32				temporary : 1;
+			uint32				unmergeable : 1;
 			uint32				type : 6;
 
 #if DEBUG_CACHE_LIST
