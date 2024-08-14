@@ -277,14 +277,18 @@ put_image(image_t* image)
 	// and remove all dependencies
 
 	if (atomic_add(&image->ref_count, -1) == 1) {
-		size_t i;
-
 		dequeue_image(&sLoadedImages, image);
 		enqueue_image(&sDisposableImages, image);
 		sLoadedImageCount--;
 
-		for (i = 0; i < image->num_needed; i++)
+		// If the image wasn't fully loaded, its NEEDED may be incomplete.
+		if (image->needed == NULL)
+			image->num_needed = 0;
+		for (size_t i = 0; i < image->num_needed; i++) {
+			if (image->needed[i] == NULL)
+				continue;
 			put_image(image->needed[i]);
+		}
 	}
 }
 

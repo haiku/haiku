@@ -716,8 +716,7 @@ load_library(char const *path, uint32 flags, bool addOn, void* caller,
 err:
 	KTRACE("rld: load_library(\"%s\") failed: %s", path, strerror(status));
 
-	dequeue_loaded_image(image);
-	delete_image(image);
+	unload_library(image, -1, addOn);
 	return status;
 }
 
@@ -744,28 +743,24 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 	// we only check images that have been already initialized
 
-	status_t status = B_BAD_IMAGE_ID;
-
 	if (handle != NULL) {
 		image = (image_t*)handle;
 		put_image(image);
-		status = B_OK;
 	} else {
 		image = find_loaded_image_by_id(imageID, true);
-		if (image != NULL) {
-			// unload image
-			if (type == image->type) {
-				put_image(image);
-				status = B_OK;
-			} else
-				status = B_BAD_VALUE;
-		}
+		if (image == NULL)
+			return B_BAD_IMAGE_ID;
+
+		// unload image
+		if (type != image->type)
+			return B_BAD_VALUE;
+		put_image(image);
 	}
 
-	if (status == B_OK) {
-		while ((image = get_disposable_images().head) != NULL) {
-			dequeue_disposable_image(image);
+	while ((image = get_disposable_images().head) != NULL) {
+		dequeue_disposable_image(image);
 
+		if ((image->flags & RFLAG_INITIALIZED) != 0) {
 			// Call the exit hooks that live in this image.
 			// Note: With the Itanium ABI this shouldn't really be done this
 			// way anymore, since global destructors are registered via
@@ -778,7 +773,7 @@ unload_library(void* handle, image_id imageID, bool addOn)
 			// probably more expensive than calling
 			// call_atexit_hooks_for_range() only here, which happens only when
 			// libraries are unloaded dynamically.
-			if (gRuntimeLoader.call_atexit_hooks_for_range) {
+			if (gRuntimeLoader.call_atexit_hooks_for_range != NULL) {
 				gRuntimeLoader.call_atexit_hooks_for_range(
 					image->regions[0].vmstart, image->regions[0].vmsize);
 			}
@@ -786,18 +781,18 @@ unload_library(void* handle, image_id imageID, bool addOn)
 			image_event(image, IMAGE_EVENT_UNINITIALIZING);
 
 			call_term_functions(image);
-
-			TLSBlockTemplates::Get().Unregister(image->dso_tls_id);
-
-			unmap_image(image);
-
-			image_event(image, IMAGE_EVENT_UNLOADING);
-
-			delete_image(image);
 		}
+
+		TLSBlockTemplates::Get().Unregister(image->dso_tls_id);
+
+		unmap_image(image);
+
+		image_event(image, IMAGE_EVENT_UNLOADING);
+
+		delete_image(image);
 	}
 
-	return status;
+	return B_OK;
 }
 
 
