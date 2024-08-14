@@ -28,7 +28,7 @@ public:
 	status_t Resize(off_t newSize);
 	off_t GetSize() const { return fSize; }
 
-	VMCache* GetCache();
+	VMCache* GetCache(struct vnode* vnode);
 
 	virtual status_t ReadAt(off_t offset, void *buffer, size_t size,
 							size_t *bytesRead);

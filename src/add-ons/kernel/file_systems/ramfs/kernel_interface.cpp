@@ -856,7 +856,7 @@ ramfs_create(fs_volume* _volume, fs_vnode* _dir, const char *name, int openMode,
 					// set cache in vnode
 					struct vnode* vnode;
 					if (vfs_lookup_vnode(_volume->id, node->GetID(), &vnode) == B_OK) {
-						vfs_set_vnode_cache(vnode, file->GetCache());
+						vfs_set_vnode_cache(vnode, file->GetCache(vnode));
 					}
 				}
 			}
