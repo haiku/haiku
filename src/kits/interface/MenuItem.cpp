@@ -473,10 +473,12 @@ BMenuItem::Draw()
 	// draw extra symbols
 	MenuPrivate privateAccessor(fSuper);
 	const menu_layout layout = privateAccessor.Layout();
-	if (layout == B_ITEMS_IN_COLUMN) {
+	if (layout != B_ITEMS_IN_ROW) {
 		if (IsMarked())
 			_DrawMarkSymbol();
+	}
 
+	if (layout == B_ITEMS_IN_COLUMN) {
 		if (fShortcutChar)
 			_DrawShortcutSymbol(privateAccessor.HasSubmenus());
 
