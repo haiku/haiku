@@ -84,7 +84,6 @@ add_event_to_list(timer* event, timer** list)
 		previous->next = event;
 	else
 		*list = event;
-	}
 }
 
 
