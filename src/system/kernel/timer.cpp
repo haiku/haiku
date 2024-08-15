@@ -74,17 +74,15 @@ add_event_to_list(timer* event, timer** list)
 	timer* next;
 	timer* previous = NULL;
 
-	// stick it in the event list
-	for (next = *list; next != NULL; previous = next, next = (timer*)next->next) {
+	for (next = *list; next != NULL; previous = next, next = previous->next) {
 		if ((bigtime_t)next->schedule_time >= (bigtime_t)event->schedule_time)
 			break;
 	}
 
-	if (previous != NULL) {
-		event->next = previous->next;
+	event->next = next;
+	if (previous != NULL)
 		previous->next = event;
-	} else {
-		event->next = next;
+	else
 		*list = event;
 	}
 }
@@ -259,7 +257,7 @@ timer_interrupt()
 		// this event needs to happen
 		int mode = event->flags;
 
-		cpuData.events = (timer*)event->next;
+		cpuData.events = event->next;
 		cpuData.current_event = event;
 		atomic_set(&cpuData.current_event_in_progress, 1);
 
