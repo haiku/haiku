@@ -66,7 +66,7 @@ void
 Console::SetHandles(intptr_t readHandle, intptr_t writeHandle, bool takeOwnership)
 {
 	fReadHandle.SetHandle(readHandle, takeOwnership);
-	fWriteHandle.SetHandle(readHandle, takeOwnership);
+	fWriteHandle.SetHandle(writeHandle, takeOwnership);
 }
 
 
