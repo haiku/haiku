@@ -3053,11 +3053,6 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 	}
 
 	if (context == kMenuBarContext || context == kPosePopUpContext) {
-		if (!PoseView()->IsFilePanel())
-			EnableNamedMenuItem(menu, B_TRANSLATE("New"), !PoseView()->TargetVolumeIsReadOnly());
-		else
-			EnableNamedMenuItem(menu, kNewFolder, !PoseView()->TargetVolumeIsReadOnly());
-
 		SetupEditQueryItem(menu);
 
 		EnableNamedMenuItem(menu, kEditItem, PoseView()->CanEditName());
@@ -3072,6 +3067,11 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 	}
 
 	if (context == kMenuBarContext || context == kWindowPopUpContext) {
+		if (!PoseView()->IsFilePanel())
+			EnableNamedMenuItem(menu, B_TRANSLATE("New"), !PoseView()->TargetVolumeIsReadOnly());
+		else
+			EnableNamedMenuItem(menu, kNewFolder, !PoseView()->TargetVolumeIsReadOnly());
+
 		uint32 viewMode = PoseView()->ViewMode();
 
 		BMenu* iconSizeMenu = NULL;
