@@ -36,10 +36,6 @@
 #define B_TRANSLATION_CONTEXT "Font Selection view"
 
 
-#define INSTANT_UPDATE
-	// if defined, the system font will be updated immediately, and not
-	// only on exit
-
 static const float kMinSize = 8.0;
 static const float kMaxSize = 72.0;
 
@@ -56,29 +52,7 @@ extern status_t _get_system_default_font_(const char* which,
 	font_family family, font_style style, float* _size);
 
 
-#ifdef B_BEOS_VERSION_DANO
-// this call only exists under R5
-void
-_set_system_font_(const char *which, font_family family,
-	font_style style, float size)
-{
-	puts("you don't have _set_system_font_()");
-}
-#endif
-
-#if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-// this call only exists under Haiku (and the test environment)
-status_t
-_get_system_default_font_(const char* which, font_family family,
-	font_style style, float* _size)
-{
-	puts("you don't have _get_system_default_font_()");
-	return B_ERROR;
-}
-#endif
-
-
-//	#pragma mark -
+// #pragma mark -
 
 
 FontSelectionView::FontSelectionView(const char* name,
@@ -166,9 +140,6 @@ FontSelectionView::FontSelectionView(const char* name,
 
 FontSelectionView::~FontSelectionView()
 {
-#ifndef INSTANT_UPDATE
-	_UpdateSystemFont();
-#endif
 }
 
 
@@ -287,9 +258,7 @@ FontSelectionView::_SelectCurrentSize()
 void
 FontSelectionView::_UpdateFontPreview()
 {
-#ifdef INSTANT_UPDATE
 	_UpdateSystemFont();
-#endif
 
 	fPreviewTextView->SetFontAndColor(&fCurrentFont);
 	fPreviewTextView->SetExplicitSize(BSize(fPreviewTextWidth,
