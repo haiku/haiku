@@ -54,6 +54,7 @@ All rights reserved.
 #include "FSUtils.h"
 #include "MimeTypeList.h"
 #include "MimeTypes.h"
+#include "TFindPanel.h"
 #include "Tracker.h"
 
 #include <fs_attr.h>
@@ -83,7 +84,9 @@ BQueryPoseView::BQueryPoseView(Model* model)
 	fRefFilter(NULL),
 	fQueryList(NULL),
 	fQueryListContainer(NULL),
-	fCreateOldPoseList(false)
+	fCreateOldPoseList(false),
+	fFindPanel(NULL),
+	fUpdateLocker(new BLocker())
 {
 }
 
@@ -137,10 +140,31 @@ void
 BQueryPoseView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kUpdatePoseView:
+		{
+			entry_ref ref;
+			message->FindRef("refs", &ref);
+			
+			delete fModel;
+			fModel = new Model(&ref);
+			
+			fAddPosesThreads.clear();
+			snooze(5000);
+			_inherited::Refresh();
+			break;
+		}
+
 		case kFSClipboardChanges:
 		{
 			// poses have always to be updated for the query view
 			UpdatePosesClipboardModeFromClipboard(message);
+			break;
+		}
+
+		case '1234':
+		{
+			fAddPosesThreads.clear();
+			HideBarberPole();
 			break;
 		}
 
@@ -247,6 +271,51 @@ BQueryPoseView::AddPosesCompleted()
 	}
 
 	_inherited::AddPosesCompleted();
+	
+	BMessenger(FindPanel()).SendMessage(new BMessage('2345'));
+}
+
+
+status_t
+BQueryPoseView::SetFindPanel(TFindPanel* panel)
+{
+	if (panel == NULL)
+		return B_BAD_VALUE;
+	
+	fFindPanel = panel;
+	return B_OK;
+}
+
+
+bool
+BQueryPoseView::RemoveColumn(BColumn* column, bool runAlert)
+{
+	bool status = _inherited::RemoveColumn(column, runAlert);
+
+	if (status && FindPanel() != NULL) {
+		BMessage* message = new BMessage(kRemoveColumn);
+		message->AddPointer("pointer", column);
+		BMessenger(FindPanel()).SendMessage(message);
+	}
+	
+	return status;
+}
+
+
+bool
+BQueryPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
+{
+	if (newColumn == NULL)
+		return false;
+
+	bool status = _inherited::AddColumn(newColumn, after);
+	if (status && fFindPanel != NULL) {
+		BMessage* message = new BMessage(kAddColumn);
+		message->AddPointer("pointer", newColumn);
+		BMessenger(FindPanel()).SendMessage(message);
+	}
+	
+	return status;
 }
 
 
@@ -512,7 +581,7 @@ QueryRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
 {
 	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 	return !(!fShowResultsFromTrash && tracker != NULL && tracker->InTrashNode(ref))
-		&& PassThroughDirectoryFilters(ref);
+		&& PassThroughFilters(ref);
 }
 
 

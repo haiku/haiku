@@ -91,6 +91,7 @@ All rights reserved.
 #include "MimeTypes.h"
 #include "Navigator.h"
 #include "Pose.h"
+#include "QueryPoseView.h"
 #include "InfoWindow.h"
 #include "Tests.h"
 #include "Thread.h"
@@ -232,9 +233,10 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fDropEnabled(true),
 	fSelectionHandler(be_app),
 	fPoseList(new PoseList(40, true)),
+	fTitleView(NULL),
+	fModel(model),
 	fHScrollBar(NULL),
 	fVScrollBar(NULL),
-	fModel(model),
 	fActivePose(NULL),
 	fExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
 	fFilteredPoseList(new PoseList()),
@@ -255,7 +257,6 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fLastClickButtons(0),
 	fLastClickedPose(NULL),
 	fLastExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
-	fTitleView(NULL),
 	fRefFilter(NULL),
 	fAutoScrollInc(20),
 	fAutoScrollState(kAutoScrollOff),
@@ -301,6 +302,8 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 
 BPoseView::~BPoseView()
 {
+	fAddPosesThreads.clear();
+
 	delete fPoseList;
 	delete fFilteredPoseList;
 	delete fVSPoseList;
@@ -339,7 +342,12 @@ BPoseView::InitCommon()
 	BContainerWindow* window = ContainerWindow();
 
 	// Create the TitleView and CountView
-	fTitleView = new BTitleView(this);
+	BQueryPoseView* queryPoseView = dynamic_cast<BQueryPoseView*>(this);
+	if (queryPoseView != NULL)
+		fTitleView = new BQueryTitleView(queryPoseView);
+	else
+		fTitleView = new BTitleView(this);
+
 	if (ViewMode() != kListMode)
 		fTitleView->Hide();
 	if (fHScrollBar != NULL)
@@ -1282,7 +1290,7 @@ BPoseView::AddPoses(Model* model)
 	AddPosesParams* params = new AddPosesParams();
 	BMessenger tmp(this);
 	params->target = tmp;
-
+	
 	if (model != NULL)
 		params->ref = *model->EntryRef();
 
@@ -1425,7 +1433,6 @@ BPoseView::AddPosesTask(void* castToParams)
 	try {
 		for (;;) {
 			lock.Unlock();
-
 			status_t result = B_OK;
 			char entBuf[1024];
 			dirent* eptr = (dirent*)entBuf;
@@ -1475,7 +1482,8 @@ BPoseView::AddPosesTask(void* castToParams)
 				// switched and an old AddPosesTask needs to die.
 				// we might no longer be the current async thread
 				// for this view - if not then we're done
-				view->HideBarberPole();
+				if (view->fAddPosesThreads.size() == 0)
+					view->HideBarberPole();
 
 				view->ReturnDirentIterator(container);
 				container = NULL;

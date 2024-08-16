@@ -47,6 +47,7 @@ namespace BPrivate {
 class BPoseView;
 class BColumn;
 class BColumnTitle;
+class BQueryPoseView;
 class ColumnTrackState;
 class OffscreenBitmap;
 
@@ -55,7 +56,7 @@ const int32 kTitleColumnLeftExtraMargin = 11;
 const int32 kTitleColumnRightExtraMargin = 5;
 const int32 kTitleColumnExtraMargin = kTitleColumnLeftExtraMargin
 	+ kTitleColumnRightExtraMargin;
-const int32 kMinColumnWidth = 20;
+const int32 kMinColumnWidth = 110;
 const int32 kRemoveTitleMargin = 10;
 
 
@@ -85,13 +86,11 @@ public:
 
 protected:
 	void MouseMoved(BPoint, uint32, const BMessage*);
-
-private:
 	BColumnTitle* FindColumnTitle(BPoint) const;
 	BColumnTitle* InColumnResizeArea(BPoint) const;
 	BColumnTitle* FindColumnTitle(const BColumn*) const;
 
-private:
+protected:
 	BPoseView* fPoseView;
 	BObjectList<BColumnTitle> fTitleList;
 	BCursor fHorizontalResizeCursor;
@@ -107,6 +106,14 @@ private:
 
 	friend class ColumnTrackState;
 	friend class ColumnDragState;
+};
+
+
+class BQueryTitleView : public BTitleView {
+public:
+								BQueryTitleView(BQueryPoseView*);
+	virtual						~BQueryTitleView();
+	using BTitleView::FindColumnTitle;
 };
 
 
@@ -175,6 +182,14 @@ private:
 	typedef ColumnTrackState _inherited;
 };
 
+
+class QueryColumnResizeState : public ColumnResizeState {
+public:
+	QueryColumnResizeState(BTitleView* titleView, BColumnTitle* columnTitle,
+		BPoint where, bigtime_t pastClickTime);
+protected:
+	virtual void Moved(BPoint where, uint32 buttons);
+};
 
 class ColumnDragState : public ColumnTrackState {
 public:

@@ -228,8 +228,8 @@ public:
 
 	// column handling
 	void ColumnRedraw(BRect updateRect);
-	bool AddColumn(BColumn*, const BColumn* after = NULL);
-	bool RemoveColumn(BColumn* column, bool runAlert);
+	virtual bool AddColumn(BColumn*, const BColumn* after = NULL);
+	virtual bool RemoveColumn(BColumn* column, bool runAlert);
 	void MoveColumnTo(BColumn* src, BColumn* dest);
 	bool ResizeColumnToWidest(BColumn* column);
 	BPoint ResizeColumn(BColumn*, float, float* lastLineDrawPos = NULL,
@@ -726,21 +726,22 @@ protected:
 	BLooper* fSelectionHandler;
 
 	std::set<thread_id> fAddPosesThreads;
+	HashSet<node_ref_key> fInsertedNodes;
 	PoseList* fPoseList;
 
 	PendingNodeMonitorCache pendingNodeMonitorCache;
+	BTitleView* fTitleView;
+	Model* fModel;
 
 private:
 	TScrollBar* fHScrollBar;
 	BScrollBar* fVScrollBar;
-	Model* fModel;
 	BPose* fActivePose;
 	BRect fExtent;
 	// the following should probably be just member lists, not pointers
 	PoseList* fFilteredPoseList;
 	PoseList* fVSPoseList;
 	PoseList* fSelectionList;
-	HashSet<node_ref_key> fInsertedNodes;
 	BObjectList<BString> fMimeTypesInSelectionCache;
 		// used for mime string based icon highliting during a drag
 	BObjectList<Model>* fZombieList;
@@ -759,7 +760,6 @@ private:
 	const BPose* fLastClickedPose;
 	BPoint fLastLeftTop;
 	BRect fLastExtent;
-	BTitleView* fTitleView;
 	BRefFilter* fRefFilter;
 	BPoint fGrid;
 	BPoint fOffset;

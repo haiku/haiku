@@ -53,6 +53,8 @@ All rights reserved.
 #include "Commands.h"
 #include "ContainerWindow.h"
 #include "PoseView.h"
+#include "QueryPoseView.h"
+#include "TFindPanel.h"
 #include "Utilities.h"
 
 
@@ -343,8 +345,12 @@ BTitleView::MouseDown(BPoint where)
 
 	// track the mouse
 	if (resizedTitle) {
-		fTrackingState = new ColumnResizeState(this, resizedTitle, where,
-			system_time() + doubleClickSpeed);
+		if (dynamic_cast<BQueryTitleView*>(this) == NULL)
+			fTrackingState = new ColumnResizeState(this, resizedTitle, where,
+				system_time() + doubleClickSpeed);
+		else
+			fTrackingState = new QueryColumnResizeState(this, resizedTitle, where,
+				system_time() + doubleClickSpeed);
 	} else {
 		fTrackingState = new ColumnDragState(this, title, where,
 			system_time() + doubleClickSpeed);
@@ -436,6 +442,35 @@ BTitleView::FindColumnTitle(const BColumn* column) const
 	}
 
 	return NULL;
+}
+
+
+BQueryTitleView::BQueryTitleView(BQueryPoseView* poseView)
+	:
+	BTitleView(poseView)
+{
+}
+
+
+BQueryTitleView::~BQueryTitleView()
+{
+}
+
+
+QueryColumnResizeState::QueryColumnResizeState(BTitleView* titleView, BColumnTitle* columnTitle,
+	BPoint where, bigtime_t pastClickTime)
+	:
+	ColumnResizeState(titleView, columnTitle, where, pastClickTime)
+{
+}
+
+
+void
+QueryColumnResizeState::Moved(BPoint where, uint32 buttons)
+{
+	ColumnResizeState::Moved(where, buttons);
+	BMessenger messenger(dynamic_cast<BQueryPoseView*>(fTitleView->PoseView())->FindPanel());
+	messenger.SendMessage(new BMessage(kMoveColumn));
 }
 
 
@@ -785,6 +820,14 @@ ColumnDragState::Moved(BPoint where, uint32)
 			// swap the columns
 			fTitleView->PoseView()->MoveColumnTo(column, overTitle->Column());
 			// re-grab the title object looking it up by the column
+			
+			BQueryPoseView* queryPoseView = dynamic_cast<BQueryPoseView*>(fTitleView->PoseView());
+			if (queryPoseView != NULL) {
+				TFindPanel* findPanel = queryPoseView->FindPanel();
+				BMessenger messenger(findPanel);
+				messenger.SendMessage(kMoveColumn);
+			}
+			
 			fTitle = fTitleView->FindColumnTitle(column);
 			// recalc initialMouseTrackOffset
 			fInitialMouseTrackOffset += fTitle->Bounds().left;
