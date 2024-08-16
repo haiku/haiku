@@ -151,6 +151,7 @@ AHCIController::Init()
 	fPortCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 
 	fPortImplementedMask = fRegs->pi;
+
 	// reported mask of implemented ports is sometimes empty
 	if (fPortImplementedMask == 0) {
 		fPortImplementedMask = 0xffffffff >> (32 - fPortCount);
@@ -340,9 +341,14 @@ AHCIController::ResetController()
 			TRACE("don't know how to enable SATA ports 9 to %d\n", portCount);
 			portCount = 8;
 		}
+		// If not all ports are enabled, try to enable them. If they are already enabled, don't
+		// rewrite the register.
+		uint16 mask = 0xff >> (8 - portCount);
 		uint16 pcs = fPCI->read_pci_config(fPCIDevice, 0x92, 2);
-		pcs |= (0xff >> (8 - portCount));
-		fPCI->write_pci_config(fPCIDevice, 0x92, 2, pcs);
+		if ((pcs & mask) != mask) {
+			pcs |= (0xff >> (8 - portCount));
+			fPCI->write_pci_config(fPCIDevice, 0x92, 2, pcs);
+		}
 	}
 	return B_OK;
 }
