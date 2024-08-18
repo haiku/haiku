@@ -185,9 +185,9 @@ TOnscreenView::InitObject(BRect rect, short mRadius, short hRadius,
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
 		fOffscreen->AddChild(fOffscreenView);
 		fOffscreen->Unlock();
-
-		fOffscreenView->DrawX();
 	}
+
+	Pulse();
 }
 
 
