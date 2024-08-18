@@ -32,40 +32,54 @@ In addition to the keys listed in the picture above, some more keys are defined:
 International keyboards each differ a bit but generally share an extra key
 located in-between the left shift key and Z with the key code 0x69.
 
-Mac keyboards have an equal sign in the keypad with key code 0x6a and some
-other differences. Often times the keys produce the same key code but appear in
-different locations.
+Japanese keyboards also have a second extra key, either at the left of or under backspace.
+This second extra key gets the code 0x6b.
+
+Mac keyboards have an equal sign in the keypad with key code 0x6a. Some
+other keys produce the same key code but appear in different locations than their PC counterparts.
+
+BeOS used to allocate 0x6b to the power button on ADB keyboards. This is not the case in Haiku,
+instead, see the "multimedia" keys information below for the power button handling.
 
 Some keyboards provide additional "multimedia" keys. These are reported based on their USB HID
 keycodes. Note that these codes are larger than 127, and therefore cannot be mapped in the keymap.
 These keys can only be handled using B_UNMAPPED_KEY_DOWN messages and are never associated with a
 character.
 
-Here is a list of the commonly available key codes:
+Here is a list of the commonly available key codes not visible in the keyboard picture above:
 
-Key code     | Description
------------- | --------------------------------
-0x00010081   | Power off
-0x00010082   | Sleep
-0x00010083   | Wake up
-0x000C00B0   | Play media
-0x000C00B5   | Scan next track
-0x000C00B6   | Scan previous track
-0x000C00B7   | Stop media
-0x000C00E2   | Mute sound
-0x000C00E9   | Increase sound volume
-0x000C00EA   | Decrease sound volume
-0x000C0183   | Launch control configuration application
-0x000C018A   | Launch e-mail application
-0x000C0192   | Launch calculator application
-0x000C0194   | Launch file manager application
-0x000C0221   | Search
-0x000C0223   | Go to home page
-0x000C0224   | Previous page
-0x000C0225   | Next page
-0x000C0226   | Stop
-0x000C0227   | Refresh
-0x000C022A   | Bookmarks
+<table>
+<tr><th>Key code</th><th>Description</th></tr>
+<tr><td>0x69</td><td>First extra international key</td></tr>
+<tr><td>0x6a</td><td>Numpad =</td></tr>
+<tr><td>0x6b</td><td>Second extra international key</td></tr>
+<tr><td>0x6c</td><td>Muhenkan (left of space bar on Japanese keyboards)</td></tr>
+<tr><td>0x6d</td><td>Henkan (first key right of spacebar on Japanese keyboards)</td></tr>
+<tr><td>0x6e</td><td>Katakana/Hiragana (second key right of spacebar on Japanese keyboards)</td></tr>
+<tr><td>0xf0</td><td>Hangul key (for Korean keyboards)</td></tr>
+<tr><td>0xf1</td><td>Hangul hanja key (for Korean keyboards)</td></tr>
+<tr><td>0x00010081</td><td>Power off</td></tr>
+<tr><td>0x00010082</td><td>Sleep</td></tr>
+<tr><td>0x00010083</td><td>Wake up</td></tr>
+<tr><td>0x000C00B0</td><td>Play media</td></tr>
+<tr><td>0x000C00B5</td><td>Scan next track</td></tr>
+<tr><td>0x000C00B6</td><td>Scan previous track</td></tr>
+<tr><td>0x000C00B7</td><td>Stop media</td></tr>
+<tr><td>0x000C00E2</td><td>Mute sound</td></tr>
+<tr><td>0x000C00E9</td><td>Increase sound volume</td></tr>
+<tr><td>0x000C00EA</td><td>Decrease sound volume</td></tr>
+<tr><td>0x000C0183</td><td>Launch control configuration application</td></tr>
+<tr><td>0x000C018A</td><td>Launch e-mail application</td></tr>
+<tr><td>0x000C0192</td><td>Launch calculator application</td></tr>
+<tr><td>0x000C0194</td><td>Launch file manager application</td></tr>
+<tr><td>0x000C0221</td><td>Search</td></tr>
+<tr><td>0x000C0223</td><td>Go to home page</td></tr>
+<tr><td>0x000C0224</td><td>Previous page</td></tr>
+<tr><td>0x000C0225</td><td>Next page</td></tr>
+<tr><td>0x000C0226</td><td>Stop</td></tr>
+<tr><td>0x000C0227</td><td>Refresh</td></tr>
+<tr><td>0x000C022A</td><td>Bookmarks</td></tr>
+</table>
 
 \section modifiers Modifier Keys
 

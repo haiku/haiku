@@ -10,10 +10,9 @@
 #include <Drivers.h>
 
 
-#define KEY_Scroll      0x0f
-#define KEY_Pause       0x10
-#define KEY_Num         0x22
-#define KEY_CapsLock    0x3b
+// FIXME: these should go in InterfaceDefs.h (in the same enum as B_F1_KEY), but the names would
+// clash with names in the modifiers enum also defined there, so we would need to first rename the
+// values in the modifiers enumeration.
 #define KEY_ShiftL      0x4b
 #define KEY_ShiftR      0x56
 #define KEY_ControlL    0x5c
@@ -27,11 +26,8 @@
 #define KEY_OptR        0x67
 #define KEY_WinR        0x67
 #define KEY_Menu        0x68
-#define KEY_NumEqual    0x6a
-#define KEY_Power       0x6b
 #define KEY_SysRq       0x7e
 #define KEY_Break       0x7f
-#define KEY_Spacebar	0x5e
 
 #define KB_DEFAULT_CONTROL_ALT_DEL_TIMEOUT 4000000
 

@@ -30,7 +30,6 @@
 #                       left option  = 0x66
 #                       right option = 0x67
 #                       keypad '='   = 0x6a
-#                       power key    = 0x6b
 Version = 3
 CapsLock = 0x3b
 ScrollLock = 0x0f

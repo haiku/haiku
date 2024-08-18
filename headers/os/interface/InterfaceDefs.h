@@ -63,11 +63,10 @@ enum {
 
 	B_FUNCTION_KEY		= 0x10,
 
-	// for Japanese and Korean keyboards
+	// For Japanese keyboards, two modifier keys are mapped to invalid UTF-8, with just a single
+	// byte having the 8th bit set.
 	B_KATAKANA_HIRAGANA	= 0xf2,
 	B_HANKAKU_ZENKAKU	= 0xf3,
-	B_HANGUL			= 0xf0,
-	B_HANGUL_HANJA		= 0xf1
 };
 
 enum {
@@ -85,7 +84,14 @@ enum {
 	B_F12_KEY			= 0x0d,
 	B_PRINT_KEY			= 0x0e,
 	B_SCROLL_KEY		= 0x0f,
-	B_PAUSE_KEY			= 0x10
+	B_PAUSE_KEY			= 0x10,
+	B_NUM_LOCK_KEY		= 0x22,
+	B_CAPS_LOCK_KEY		= 0x3b,
+	B_SPACE_BAR_KEY		= 0x5e,
+	B_NUMPAD_EQUAL_KEY	= 0x6a,
+	// For Korean keyboards
+	B_HANGUL_KEY		= 0xf0,
+	B_HANGUL_HANJA_KEY	= 0xf1
 };
 
 struct key_map {

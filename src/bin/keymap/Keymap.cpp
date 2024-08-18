@@ -868,8 +868,7 @@ Keymap::_SaveSourceText(FILE* file)
 		"#\tNOTE: On an Apple Extended Keyboard:\n"
 		"#\t\t\tleft option  = 0x66\n"
 		"#\t\t\tright option = 0x67\n"
-		"#\t\t\tkeypad '='   = 0x6a\n"
-		"#\t\t\tpower key    = 0x6b\n");
+		"#\t\t\tkeypad '='   = 0x6a\n");
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (runs != NULL) {

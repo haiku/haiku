@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <interface/InterfaceDefs.h>
 #include <usb/USB_hid.h>
 #include <util/AutoLock.h>
 
@@ -641,7 +642,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		0x53,	// ,
 		0x54,	// .
 		0x55,	// /
-		KEY_CapsLock,	// Caps
+		B_CAPS_LOCK_KEY,	// Caps
 		0x02,	// F1
 		0x03,	// F2
 		0x04,	// F3
@@ -655,8 +656,8 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		0x0c,	// F11
 		0x0d,	// F12
 		0x0e,	// PrintScreen
-		KEY_Scroll,	// Scroll Lock
-		KEY_Pause,	// Pause (0x7f with Ctrl)
+		B_SCROLL_KEY,	// Scroll Lock
+		B_PAUSE_KEY,	// Pause (0x7f with Ctrl)
 		0x1f,	// Insert
 		0x20,	// Home
 		0x21,	// Page up
@@ -686,8 +687,8 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		0x65,	// Pad .
 		0x69,	// <
 		KEY_Menu,	// Menu
-		KEY_Power,	// Power
-		KEY_NumEqual,	// Pad =
+		0x00,	// Power unmapped
+		B_NUMPAD_EQUAL_KEY,	// Pad =
 		0x00,	// F13 unmapped
 		0x00,	// F14 unmapped
 		0x00,	// F15 unmapped
@@ -732,8 +733,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		0xf1,	// Hangul_Hanja, korean, Eisu, Mac japanese USB
 	};
 
-	static const size_t kKeyTableSize
-		= sizeof(kKeyTable) / sizeof(kKeyTable[0]);
+	static const size_t kKeyTableSize = B_COUNT_OF(kKeyTable);
 
 	bool phantomState = true;
 	for (size_t i = 0; i < fKeyCount; i++) {
@@ -780,7 +780,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 				if (current[i] < kKeyTableSize)
 					key = kKeyTable[current[i]];
 
-				if (key == KEY_Pause && (modifiers & ALT_KEYS) != 0)
+				if (key == B_PAUSE_KEY && (modifiers & ALT_KEYS) != 0)
 					key = KEY_Break;
 				else if (key == 0xe && (modifiers & ALT_KEYS) != 0) {
 					key = KEY_SysRq;
