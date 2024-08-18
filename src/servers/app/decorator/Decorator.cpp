@@ -162,6 +162,10 @@ Decorator::RemoveTab(int32 index, BRegion* updateRegion)
 {
 	AutoWriteLocker _(fLocker);
 
+	// add removed tab area to update region before removing it
+	if (updateRegion != NULL)
+		updateRegion->Include(TabRect(index));
+
 	Decorator::Tab* tab = fTabList.RemoveItemAt(index);
 	if (tab == NULL)
 		return false;
