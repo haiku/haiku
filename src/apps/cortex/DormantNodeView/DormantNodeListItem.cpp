@@ -120,7 +120,7 @@ void DormantNodeListItem::DrawItem(
 	r.bottom = r.top + m_fontHeight.ascent + m_fontHeight.descent;		
 	if (IsSelected() || drawEverything) {
 		if (IsSelected()) {
-			owner->SetHighColor(16, 64, 96, 255);
+			owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 		}
 		else {
 			owner->SetHighColor(owner->ViewColor());
@@ -128,10 +128,10 @@ void DormantNodeListItem::DrawItem(
 		owner->FillRect(r);
 	}
 	if (IsSelected()) {
-		owner->SetHighColor(255, 255, 255, 255);
+		owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 	}
 	else {
-		owner->SetHighColor(0, 0, 0, 0);
+		owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 	}
 	BPoint labelOffset(r.left + 1.0, r.bottom - m_fontHeight.descent);
 	owner->DrawString(m_info.name, labelOffset);
