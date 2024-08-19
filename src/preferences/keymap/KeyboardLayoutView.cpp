@@ -32,10 +32,9 @@
 #define B_TRANSLATION_CONTEXT "Keyboard Layout View"
 
 
-static const rgb_color kBrightColor = {230, 230, 230, 255};
 static const rgb_color kDarkColor = {200, 200, 200, 255};
-static const rgb_color kSecondDeadKeyColor = {240, 240, 150, 255};
-static const rgb_color kDeadKeyColor = {152, 203, 255, 255};
+static const rgb_color kIdealSecondDeadKeyColor = {190, 190, 100, 255};
+static const rgb_color kIdealDeadKeyColor = {102, 153, 205, 255};
 static const rgb_color kLitIndicatorColor = {116, 212, 83, 255};
 
 
@@ -709,9 +708,16 @@ void
 KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	BRect rect, bool pressed)
 {
-	rgb_color base = key->dark ? kDarkColor : kBrightColor;
+	rgb_color base;
+	if (ui_color(B_CONTROL_BACKGROUND_COLOR).IsLight()) {
+		base = key->dark ? tint_color(ui_color(B_CONTROL_BACKGROUND_COLOR), B_DARKEN_1_TINT)
+			: ui_color(B_CONTROL_BACKGROUND_COLOR);
+	} else {
+		base = key->dark ? tint_color(ui_color(B_CONTROL_BACKGROUND_COLOR), 0.8)
+			: ui_color(B_CONTROL_BACKGROUND_COLOR);
+	}
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color keyLabelColor = make_color(0, 0, 0, 255);
+	rgb_color keyLabelColor = ui_color(B_CONTROL_TEXT_COLOR);
 	key_kind keyKind = kNormalKey;
 	int32 deadKey = 0;
 	bool secondDeadKey = false;
@@ -733,9 +739,9 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 	uint32 flags = pressed ? BControlLook::B_ACTIVATED : 0;
 
 	if (secondDeadKey)
-		base = kSecondDeadKeyColor;
+		base = mix_color(ui_color(B_CONTROL_BACKGROUND_COLOR), kIdealSecondDeadKeyColor, 100);
 	else if (deadKey > 0 && isDeadKeyEnabled)
-		base = kDeadKeyColor;
+		base = mix_color(ui_color(B_CONTROL_BACKGROUND_COLOR), kIdealDeadKeyColor, 100);
 
 	if (key->shape == kRectangleKeyShape) {
 		_DrawKeyButton(view, rect, updateRect, base, background, pressed);
@@ -844,7 +850,7 @@ KeyboardLayoutView::_DrawIndicator(BView* view, BRect updateRect,
 		GetFontHeight(&fontHeight);
 		if (ceilf(rect.top - fontHeight.ascent + fontHeight.descent - 2)
 				>= rectTop) {
-			view->SetHighColor(0, 0, 0);
+			view->SetHighUIColor(B_PANEL_TEXT_COLOR);
 			view->SetLowColor(ViewColor());
 
 			BString text(label);
