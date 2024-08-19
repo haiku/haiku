@@ -56,6 +56,8 @@ delete_ancillary_data_container(ancillary_data_container* container)
 			data->destructor(&data->header, data->Data());
 		free(data);
 	}
+
+	delete container;
 }
 
 
