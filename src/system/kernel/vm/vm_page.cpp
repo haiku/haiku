@@ -955,14 +955,30 @@ dump_page_long(int argc, char **argv)
 		page = vm_lookup_page(pageAddress / B_PAGE_SIZE);
 	}
 
-	const page_num_t expected = sPhysicalPageOffset + (page - sPages);
+	if (page == NULL) {
+		kprintf("Page not found.\n");
+		return 0;
+	}
 
 	kprintf("PAGE: %p\n", page);
+
+	const off_t pageOffset = (addr_t)page - (addr_t)sPages;
+	const off_t pageIndex = pageOffset / (off_t)sizeof(vm_page);
+	if (pageIndex < 0) {
+		kprintf("\taddress is before start of page array!"
+			" (offset %" B_PRIdOFF ")\n", pageOffset);
+	} else if ((page_num_t)pageIndex >= sNumPages) {
+		kprintf("\taddress is after end of page array!"
+			" (offset %" B_PRIdOFF ")\n", pageOffset);
+	} else if ((pageIndex * (off_t)sizeof(vm_page)) != pageOffset) {
+		kprintf("\taddress isn't a multiple of page structure size!"
+			" (offset %" B_PRIdOFF ", expected align %" B_PRIuSIZE ")\n",
+			pageOffset, sizeof(vm_page));
+	}
+
 	kprintf("queue_next,prev: %p, %p\n", page->queue_link.next,
 		page->queue_link.previous);
 	kprintf("physical_number: %#" B_PRIxPHYSADDR "\n", page->physical_page_number);
-	if (page->physical_page_number != expected)
-		kprintf("\t(expected %#" B_PRIxPHYSADDR ")!\n", expected);
 	kprintf("cache:           %p\n", page->Cache());
 	kprintf("cache_offset:    %" B_PRIuPHYSADDR "\n", page->cache_offset);
 	kprintf("cache_next:      %p\n", page->cache_next);
@@ -973,14 +989,19 @@ dump_page_long(int argc, char **argv)
 	kprintf("busy_writing:    %d\n", page->busy_writing);
 	kprintf("accessed:        %d\n", page->accessed);
 	kprintf("modified:        %d\n", page->modified);
-	#if DEBUG_PAGE_QUEUE
-		kprintf("queue:           %p\n", page->queue);
-	#endif
-	#if DEBUG_PAGE_ACCESS
-		kprintf("accessor:        %" B_PRId32 "\n", page->accessing_thread);
-	#endif
-	kprintf("area mappings:\n");
+#if DEBUG_PAGE_QUEUE
+	kprintf("queue:           %p\n", page->queue);
+#endif
+#if DEBUG_PAGE_ACCESS
+	kprintf("accessor:        %" B_PRId32 "\n", page->accessing_thread);
+#endif
 
+	if (pageIndex < 0 || (page_num_t)pageIndex >= sNumPages) {
+		// Don't try to read the mappings.
+		return 0;
+	}
+
+	kprintf("area mappings:\n");
 	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
 	vm_page_mapping *mapping;
 	while ((mapping = iterator.Next()) != NULL) {
@@ -1017,9 +1038,9 @@ dump_page_long(int argc, char **argv)
 	}
 
 	set_debug_variable("_cache", (addr_t)page->Cache());
-	#if DEBUG_PAGE_ACCESS
-		set_debug_variable("_accessor", page->accessing_thread);
-	#endif
+#if DEBUG_PAGE_ACCESS
+	set_debug_variable("_accessor", page->accessing_thread);
+#endif
 
 	return 0;
 }
