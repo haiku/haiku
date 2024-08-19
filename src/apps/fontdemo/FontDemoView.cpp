@@ -37,6 +37,9 @@ FontDemoView::FontDemoView(BRect rect)
 	fDrawShapes(false),
 	fShapes(NULL)
 {
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
+
 	BString setStr = B_TRANSLATE("Haiku, Inc.");
 	SetString(setStr);
 	SetFontSize(fFontSize);
@@ -66,7 +69,6 @@ FontDemoView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_COPY);
 
 	BRect rect = Bounds();
-	SetHighColor(255, 255, 255);
 
 	if (!fString)
 		return;
@@ -125,13 +127,10 @@ FontDemoView::Draw(BRect updateRect)
 
 		if (OutLineLevel()) {
 			MovePenTo(xCoordArray[i], yCoordArray[i]);
-			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 			FillShape(fShapes[i]);
 			SetPenSize(OutLineLevel());
-			SetHighColor(0, 0, 0);
 			StrokeShape(fShapes[i]);
 		} else {
-			SetHighColor(0, 0, 0);
 			SetDrawingMode(fDrawingMode);
 			int32 charLength;
 			const char* charAt = fString.CharAt(i, &charLength);
