@@ -1,4 +1,4 @@
-Critical Milestones
+Release Cookbook
 ===================
 
 This page documents the steps needed during a release.

@@ -6,7 +6,7 @@ accomplished. These steps are time tested as a best roadmap to draft a successfu
 
 .. toctree::
 
-   milestones
+   cookbook
 
 Important first steps
 ---------------------
@@ -41,7 +41,7 @@ to drive Haiku towards this release date.
 * Branch haiku for (RELEASE)
 * Setup CI/CD pipelines for (RELEASE)
 * Generate first test candidates (TC0, TC1, etc), encourage extreme testing.
-* Begin accepting bugfixes in branches via code review 
+* Begin accepting bugfixes in branches via code review
 * Final translations synchronization
 * Generate first release candidates (RC0, RC1, etc), encourage testing.
 * Profit
