@@ -535,14 +535,14 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 		sec[2] = 0xFF;
 	} else if (fatbits == 16) {
 		//FAT[0] contains media byte in lower 8 bits, all other bits set to 1
-		sec[0] = 0xF8;
+		sec[0] = hasDeviceGeometry && deviceGeometry.removable ? 0xF0 : 0xF8;
 		sec[1] = 0xFF;
 		//FAT[1] contains EOF marker
 		sec[2] = 0xFF;
 		sec[3] = 0xFF;
 	} else if (fatbits == 32) {
 		//FAT[0] contains media byte in lower 8 bits, all other bits set to 1
-		sec[0] = 0xF8;
+		sec[0] = hasDeviceGeometry && deviceGeometry.removable ? 0xF0 : 0xF8;
 		sec[1] = 0xFF;
 		sec[2] = 0xFF;
 		sec[3] = 0xFF;
