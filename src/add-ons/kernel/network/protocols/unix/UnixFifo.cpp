@@ -77,9 +77,9 @@ UnixRequest::GetCurrentChunk(void*& data, size_t& size)
 
 
 void
-UnixRequest::SetAncillaryData(ancillary_data_container* data)
+UnixRequest::UnsetAncillaryData()
 {
-	fAncillaryData = data;
+	fAncillaryData = NULL;
 }
 
 
@@ -213,6 +213,7 @@ UnixBufferQueue::Read(UnixRequest& request)
 				while (entry != NULL && offsetDelta > entry->offset) {
 					fAncillaryData.RemoveHead();
 					offsetDelta -= entry->offset;
+					gStackModule->delete_ancillary_data_container(entry->data);
 					delete entry;
 
 					entry = fAncillaryData.Head();
@@ -296,7 +297,7 @@ UnixBufferQueue::Write(UnixRequest& request)
 		if (ancillaryEntry != NULL) {
 			fAncillaryData.Add(ancillaryEntry);
 			ancillaryEntryDeleter.Detach();
-			request.SetAncillaryData(NULL);
+			request.UnsetAncillaryData();
 			ancillaryEntry = NULL;
 		}
 

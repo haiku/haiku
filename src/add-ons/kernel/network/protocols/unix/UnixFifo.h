@@ -47,8 +47,8 @@ public:
 	bool GetCurrentChunk(void*& data, size_t& size);
 
 	ancillary_data_container* AncillaryData() const	 { return fAncillaryData; }
-	void SetAncillaryData(ancillary_data_container* data);
 	void AddAncillaryData(ancillary_data_container* data);
+	void UnsetAncillaryData();
 
 	struct sockaddr_storage* Address() const	{ return fAddress; }
 
