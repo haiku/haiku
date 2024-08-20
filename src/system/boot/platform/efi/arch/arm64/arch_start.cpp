@@ -115,11 +115,6 @@ arch_start_kernel(addr_t kernelEntry)
 
 		dprintf("Kernel entry accessibility W: %x R: %x\n", arch_mmu_write_access(kernelEntry),
 			arch_mmu_read_access(kernelEntry));
-
-		if (el == 1) {
-			// Disable CACHE & MMU before dealing with TTBRx
-			arch_cache_disable();
-		}
 	}
 
 	// Generate page tables for use after ExitBootServices.

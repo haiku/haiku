@@ -13,10 +13,9 @@ arch_cache_disable()
 {
 	if (arch_mmu_cache_enabled()) {
 		uint64 sctlr = _arch_mmu_get_sctlr();
-		sctlr &= ~(SCTLR_M | SCTLR_C);
+		sctlr &= ~(SCTLR_M | SCTLR_C | SCTLR_I);
 		_arch_mmu_set_sctlr(sctlr);
 
-// 		_arch_cache_flush_invalidate_all();
 		_arch_cache_clean_poc();
 		_arch_mmu_invalidate_tlb_all(arch_exception_level());
 	}
@@ -28,7 +27,7 @@ arch_cache_enable()
 {
 	if (!arch_mmu_cache_enabled()) {
 		uint64 sctlr = _arch_mmu_get_sctlr();
-		sctlr |= (SCTLR_M | SCTLR_C);
+		sctlr |= (SCTLR_M | SCTLR_C | SCTLR_I);
 		_arch_mmu_set_sctlr(sctlr);
 	}
 }

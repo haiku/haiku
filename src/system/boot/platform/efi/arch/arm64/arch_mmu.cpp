@@ -348,7 +348,9 @@ arch_mmu_allocate_kernel_page_tables(void)
 	if (page == NULL) {
 		page = CurrentRegime.AllocatePage();
 		if (page != NULL) {
+			arch_cache_disable();
 			WRITE_SPECIALREG(TTBR1_EL1, page);
+			arch_cache_enable();
 		} else {
 			panic("Not enough memory for kernel initial page\n");
 		}
