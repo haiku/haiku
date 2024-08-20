@@ -302,7 +302,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 		return B_BAD_VALUE;
 
 	int* fds = (int*)CMSG_DATA(header);
-	int count = (header->cmsg_len - CMSG_ALIGN(sizeof(cmsghdr))) / sizeof(int);
+	int count = (header->cmsg_len - CMSG_LEN(0)) / sizeof(int);
 	if (count == 0)
 		return B_BAD_VALUE;
 
