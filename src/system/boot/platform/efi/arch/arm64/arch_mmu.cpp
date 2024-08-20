@@ -122,7 +122,14 @@ void arch_mmu_setup_EL1(uint64 tcr) {
 	// TODO: Compiler dependency?
 	tcr |= TCR_T1SZ(__builtin_popcountl(KERNEL_BASE));
 
+	// Flush the cache so that we don't receive unexpected writebacks later.
+	_arch_cache_clean_poc();
+
 	WRITE_SPECIALREG(TCR_EL1, tcr);
+
+	// Invalidate all TLB entries. Also ensures that all memory traffic has
+	// resolved, and flushes the instruction pipeline.
+	_arch_mmu_invalidate_tlb_all(arch_exception_level());
 }
 
 
@@ -348,9 +355,7 @@ arch_mmu_allocate_kernel_page_tables(void)
 	if (page == NULL) {
 		page = CurrentRegime.AllocatePage();
 		if (page != NULL) {
-			arch_cache_disable();
 			WRITE_SPECIALREG(TTBR1_EL1, page);
-			arch_cache_enable();
 		} else {
 			panic("Not enough memory for kernel initial page\n");
 		}
