@@ -219,10 +219,12 @@ add_ancillary_data(net_socket* socket, ancillary_data_container* container,
 		if (status != B_OK)
 			return status;
 
-		if (dataLen <= _ALIGN(header->cmsg_len))
+		const size_t alignedLength = CMSG_ALIGN(header->cmsg_len);
+		if (dataLen <= alignedLength)
 			break;
-		dataLen -= _ALIGN(header->cmsg_len);
-		header = (cmsghdr*)((uint8*)header + _ALIGN(header->cmsg_len));
+
+		dataLen -= alignedLength;
+		header = (cmsghdr*)((uint8*)header + alignedLength);
 	}
 
 	return B_OK;
