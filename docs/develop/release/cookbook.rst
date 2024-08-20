@@ -17,8 +17,8 @@ Community Concensus
 
 Each of the steps below should be announced on the mailing list to remind everyone where we're at.
 
-Scramle. Enhancement Deadline
------------------------------
+Scramble. Enhancement Deadline
+------------------------------
 
 **Time:** ~ 1 week
 
@@ -40,10 +40,10 @@ Branch
 * Branch haiku and buildtools (git push origin master:r1beta1)
     * Update the version constants in the branch (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=b5c9e6620ee731bd33d8cb3ef6ac01749122b6b3>`_)
     * Update copyright years in the `bootloader menu <https://git.haiku-os.org/haiku/tree/src/system/boot/platform/generic/text_menu.cpp#n212>`_
-    * Disable serial debug output in bootloader and kernel config file (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=81fb2084b01e87c15bdde507e024e2938af71272>`_)
+    * Disable serial debug output in bootloader and kernel config file (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta5&id=9d0312eb00a75051275accf9967ddc1c64154334>`_)
     * Turn KDEBUG_LEVEL down to 1, for performance reasons (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=6db6c0b275f684d0b25d49e87d5183e40c7cd4ec>`_)
     * Enable ``HAIKU_OFFICIAL_RELEASE`` (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ff2059f2bd001bba84b980617e9bdf4dc6a46799>`_), and update logos
-    * Update both package repos to use the branch's repos (`part 1 <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ebd3fb55d9549247be65c4b62e3653f9bc1a7841>`_, `part 2 <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=3d0db15a6f2963f011554f421611ee9c9b31c6f5>`_)
+    * Update both package repos to use the branch's repos (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta4&id=b9c0fea70a1fd7edc396e0e6992b77a7c5a3b4f8>`_)
 
 Configure CI/CD Pipelines
 -------------------------
@@ -65,7 +65,7 @@ Testing
 * Agressively market Test Candidate builds for *(RELEASE)*
 * Bugs should be opened on Trac under the *new* version (make sure it is available in Trac admin pages).
 * **Release Coordinator** should be downright obnoxious about people testing TC images!
-* Have people test on as much hardware as possible to find issues with drivers
+* Have people test on as much hardware as possible to find issues
 * Use Gerrit "cherry-pick" function to propose a change for inclusion in the release branch
 
 Finalization
@@ -73,12 +73,11 @@ Finalization
 
 **Time:** ~ 1 week
 
-* If everything is going well, produce Release Candidate images
-* Tag the release candidate builds on the brach (rc0)
-* RC images all want to be *(RELEASE)*
-* Any RC image can be renamed *(RELEASE)*
+* Synchronize **i18n** strings and userguide
+* Produce **Release Candidate** images
+* **Tag** the release candidate builds on the brach (rc0)
 * Ensure release notes and press release are almost done.
-* MOAR Testing!
+* More testing!
 * When you have decided that an RC is actually the release, tag it in git
 
 Distribution
@@ -103,16 +102,27 @@ Distribution
          |--haiku-[release-name]-buildtools-src-[YYYY-MM-DD]
          |--[all optional packages]
 
-* rsync release-files-directory to http://haiku-files.org/files/releases/[release-name]
+* rsync release-files-directory to /files/releases/[release-name]
 * rsync release-files-directory to baron:/srv/rsync/haiku-mirror-seed/releases/[release-name]/ (the 3rd-party rsync mirrors will automatically mirror the files)
 * Give mirrors time to... mirror via rsync
 * Tell Distrowatch: http://distrowatch.com/table.php?distribution=haiku (?)
-* Update the freshmeat/freecode page: http://freecode.com/projects/haiku (mmu_man)
 * Update website references.
     * Double check listed mirrors have release
     * Comment out any mirrors which don't have it (a few missing is fine)
     * Put release notes on proper place on website
 * Release!
+
+Website Pages to update:
+
+* https://www.haiku-os.org/ "Download" button
+* https://www.haiku-os.org/get-haiku
+* https://www.haiku-os.org/get-haiku/release-notes
+* https://www.haiku-os.org/get-haiku/installation-guide
+* https://www.haiku-os.org/get-haiku/burn-cd
+* https://www.haiku-os.org/guides/making_haiku_usb_stick
+* https://www.haiku-os.org/slideshows/haiku-tour
+* https://www.haiku-os.org/docs/userguide/en/contents.html -- sync with branch or tag.
+
 
 After the release
 -----------------
@@ -122,23 +132,3 @@ After the release
 * Make the new "version" in Trac be the default for newly creatred tickets
 * Update the Roadmap wiki page again with the final release date
 * Prepare graphics for the download page: stamp, ladybugs, cd/dvd graphics
-
-Website Pages to update:
-
-* Official Article
-* http://www.haiku-os.org/get-haiku
-* http://www.haiku-os.org/get-haiku/release-notes
-* http://www.haiku-os.org/get-haiku/installation-guide
-* http://www.haiku-os.org/get-haiku/burn-cd
-* http://www.haiku-os.org/guides/making_haiku_usb_stick
-* http://www.haiku-os.org/slideshows/haiku-tour
-* http://www.haiku-os.org/docs/userguide/en/contents.html -- sync with branch or tag.
-
-Updating download logo for website front page:
-
-.. code-block:: bash
-
-    sudo bash
-    cd /srv/www/drupal/haiku-os.org/themes/shijin/haiku-images
-    mv bg-download-box.png GET-HAIKU-download-box-r1a1.png
-    cp GET-HAIKU-download-box-r1a2.png bg-download-box.png
