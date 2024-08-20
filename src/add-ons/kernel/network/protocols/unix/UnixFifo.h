@@ -103,7 +103,7 @@ private:
 };
 
 
-class UnixFifo : public BReferenceable {
+class UnixFifo final : public BReferenceable {
 public:
 	UnixFifo(size_t capacity, UnixFifoType type);
 	~UnixFifo();

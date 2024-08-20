@@ -30,7 +30,7 @@ enum class unix_stream_endpoint_state {
 typedef AutoLocker<UnixStreamEndpoint> UnixStreamEndpointLocker;
 
 
-class UnixStreamEndpoint : public UnixEndpoint, public BReferenceable {
+class UnixStreamEndpoint final : public UnixEndpoint, public BReferenceable {
 public:
 								UnixStreamEndpoint(net_socket* socket);
 	virtual						~UnixStreamEndpoint() override;

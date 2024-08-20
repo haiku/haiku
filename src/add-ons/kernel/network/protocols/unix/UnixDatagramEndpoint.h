@@ -14,7 +14,7 @@
 class UnixFifo;
 
 
-class UnixDatagramEndpoint : public UnixEndpoint, public BReferenceable {
+class UnixDatagramEndpoint final : public UnixEndpoint, public BReferenceable {
 public:
 								UnixDatagramEndpoint(net_socket* socket);
 	virtual						~UnixDatagramEndpoint() override;
