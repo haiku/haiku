@@ -3278,17 +3278,12 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage* clipboardReport)
 	clipboardReport->FindInt32("device", &node.device);
 	clipboardReport->FindInt64("directory", &node.node);
 
-	bool clearClipboard = false;
-	clipboardReport->FindBool("clearClipboard", &clearClipboard);
-
+	bool clearClipboard = clipboardReport->GetBool("clearClipboard", false);
 	if (clearClipboard && fHasPosesInClipboard) {
-		// clear all poses
+		// clear all poses from clipboard, leave selection alone
 		int32 poseCount = fPoseList->CountItems();
-		for (int32 index = 0; index < poseCount; index++) {
-			BPose* pose = fPoseList->ItemAt(index);
-			pose->Select(false);
-			pose->SetClipboardMode(0);
-		}
+		for (int32 index = 0; index < poseCount; index++)
+			fPoseList->ItemAt(index)->SetClipboardMode(0);
 		SetHasPosesInClipboard(false);
 		fullInvalidateNeeded = true;
 		fHasPosesInClipboard = false;
@@ -3309,7 +3304,6 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage* clipboardReport)
 
 		if (clipNode->moveMode != pose->ClipboardMode() || pose->IsSelected()) {
 			pose->SetClipboardMode(clipNode->moveMode);
-			pose->Select(false);
 
 			if (!fullInvalidateNeeded) {
 				if (ViewMode() == kListMode) {
@@ -3337,9 +3331,6 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage* clipboardReport)
 				hasPosesInClipboard = true;
 		}
 	}
-
-	fSelectionList->MakeEmpty();
-	fMimeTypesInSelectionCache.MakeEmpty();
 
 	SetHasPosesInClipboard(hasPosesInClipboard || fHasPosesInClipboard);
 
