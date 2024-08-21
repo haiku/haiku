@@ -69,8 +69,13 @@ DwarfLoadingStateHandler::HandleState(
 	DwarfFileLoadingState& fileState = dwarfState->GetFileState();
 
 	BString requiredPackage;
-	_GetMatchingDebugInfoPackage(fileState.externalInfoFileName,
-		requiredPackage);
+	try {
+		// Package Kit may throw exceptions.
+		_GetMatchingDebugInfoPackage(fileState.externalInfoFileName,
+			requiredPackage);
+	} catch (...) {
+		return;
+	}
 
 	// loop so that the user has a chance to retry or locate the file manually
 	// in case package installation fails, e.g. due to transient download
