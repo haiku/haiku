@@ -128,7 +128,7 @@ rule DefineDefaultBuildProfiles
 			if $(DEBUG) != 0 {
 				HAIKU_IMAGE_SIZE ?= 850 ;
 			}
-			HAIKU_IMAGE_SIZE ?= 600 ;
+			HAIKU_IMAGE_SIZE ?= 650 ;
 			HAIKU_NIGHTLY_BUILD = 1 ;
 
 			AddHaikuImageSystemPackages
