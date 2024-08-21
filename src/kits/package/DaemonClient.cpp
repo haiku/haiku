@@ -64,9 +64,11 @@ BDaemonClient::GetInstallationLocationInfo(
 
 	// send the request
 	BMessage reply;
-	fDaemonMessenger.SendMessage(&request, &reply);
+	error = fDaemonMessenger.SendMessage(&request, &reply);
+	if (error != B_OK)
+		return error;
 	if (reply.what != B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY)
-		return B_ERROR;
+		return B_BAD_REPLY;
 
 	// extract the location info
 	int32 baseDirectoryDevice;
