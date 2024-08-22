@@ -79,7 +79,7 @@ DwarfLoadingStateHandler::HandleState(
 		_GetMatchingDebugInfoPackage(fileState.externalInfoFileName,
 			requiredPackage);
 	} catch (...) {
-		return;
+		requiredPackage = BString();
 	}
 
 	// loop so that the user has a chance to retry or locate the file manually
