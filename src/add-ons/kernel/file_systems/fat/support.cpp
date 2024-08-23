@@ -582,7 +582,8 @@ write_fsinfo(msdosfsmount* volume)
 }
 
 
-/*! Perform sanity checks on the FAT.
+/*! Perform sanity checks on the FATs, in addition to the media descriptor check of the active FAT
+	that is done by fillinusemap().
 
 */
 status_t
@@ -591,8 +592,13 @@ check_fat(const msdosfsmount* volume)
 	uint8 fatBuffer[512];
 	uint8 mirrorBuffer[512];
 
+	// For small FATs, check whether each FAT mirror matches the active FAT.
+	// For large FATs, that takes too long, so just check the first block of each FAT.
+	uint32 checkBlocks = volume->pm_FATsecs > 4096 ? 1 : volume->pm_FATsecs;
+	PRINT("check_fat checking %" B_PRIu32 " blocks\n", checkBlocks);
+
 	// for each block
-	for (uint32 i = 0; i < volume->pm_FATsecs; ++i) {
+	for (uint32 i = 0; i < checkBlocks; ++i) {
 		// read a block from the first/active fat
 		uint32 resBlocks = volume->pm_ResSectors * volume->pm_BlkPerSec;
 		off_t position = 512 * (resBlocks + volume->pm_curfat * volume->pm_FATsecs + i);
@@ -601,13 +607,10 @@ check_fat(const msdosfsmount* volume)
 		if (bytes_read != 0x200)
 			RETURN_ERROR(B_IO_ERROR);
 
-		if (i == 0 && fatBuffer[0] != volume->pm_Media) {
-			INFORM("media descriptor mismatch (%x != %x)\n", fatBuffer[0], volume->pm_Media);
-			return B_BAD_VALUE;
-		}
-
 		// for each mirror
-		for (uint32 j = 1; j < volume->pm_FATs; ++j) {
+		for (uint32 j = 0; j < volume->pm_FATs; ++j) {
+			if (j == volume->pm_curfat)
+				continue;
 			position = 512 * (resBlocks + volume->pm_FATsecs * j + i);
 			bytes_read = read_pos(volume->pm_dev->si_fd, position,
 				reinterpret_cast<void*>(mirrorBuffer), 0x200);
