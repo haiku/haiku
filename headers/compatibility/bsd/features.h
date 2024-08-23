@@ -20,4 +20,4 @@
 #endif
 
 
-#endif // _FEATURES_H
+#endif /* _FEATURES_H */
