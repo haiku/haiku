@@ -1068,20 +1068,16 @@ else
 
 		# Override the cross tools variables, if the tools were built or a
 		# prefix was specified.
-		if [ $useClang = 1 ]; then
-			get_build_tool_path LD_$targetArch ld.lld
-			get_build_tool_path ELFEDIT_$targetArch elfedit
-		elif [ -n "$crossToolsPrefix" ]; then
-			get_build_tool_path LD_$targetArch ${crossToolsPrefix}ld
-			if [ `get_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch` -eq 0 ]; then
-				get_build_tool_path ELFEDIT_$targetArch ${crossToolsPrefix}elfedit
-			fi
-		fi
 		if [ -n "$crossToolsPrefix" ]; then
 			get_build_tool_path AR_$targetArch ${crossToolsPrefix}ar
 			get_build_tool_path OBJCOPY_$targetArch ${crossToolsPrefix}objcopy
 			get_build_tool_path RANLIB_$targetArch ${crossToolsPrefix}ranlib
 			get_build_tool_path STRIP_$targetArch ${crossToolsPrefix}strip
+
+			get_build_tool_path LD_$targetArch ${crossToolsPrefix}ld
+			if [ `get_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch` -eq 0 ]; then
+				get_build_tool_path ELFEDIT_$targetArch ${crossToolsPrefix}elfedit
+			fi
 		fi
 
 		# check whether the Haiku compiler really targets Haiku
