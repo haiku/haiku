@@ -20,7 +20,7 @@ struct taskq {
 static void
 task_set(struct task *t, void (*fn)(void *), void *arg)
 {
-	TASK_INIT(t, 0, fn, arg);
+	TASK_INIT(t, 0, (task_fn_t*)fn, arg);
 }
 
 
