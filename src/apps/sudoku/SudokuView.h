@@ -131,7 +131,6 @@ private:
 			void				_DrawHints(uint32 x, uint32 y);
 
 private:
-			rgb_color			fBackgroundColor;
 			SudokuField*		fField;
 			BObjectList<BMessage> fUndos;
 			BObjectList<BMessage> fRedos;
