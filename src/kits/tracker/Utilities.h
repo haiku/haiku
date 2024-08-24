@@ -182,6 +182,8 @@ void DisallowFilenameKeys(BTextView*);
 bool ValidateStream(BMallocIO*, uint32, int32 version);
 
 float ReadOnlyTint(rgb_color base);
+rgb_color InvertColor(rgb_color color);
+rgb_color InvertedBackColor(rgb_color background);
 
 bool SecondaryMouseButtonDown(int32 modifiers, int32 buttons);
 uint32 HashString(const char* string, uint32 seed);

@@ -72,6 +72,9 @@ protected:
 	void AdaptToVolumeChange(BMessage*);
 	void AdaptToDesktopIntegrationChange(BMessage*);
 
+	virtual rgb_color TextColor(bool selected = false) const;
+	virtual rgb_color BackColor(bool selected = false) const;
+
 private:
 	typedef BPoseView _inherited;
 };

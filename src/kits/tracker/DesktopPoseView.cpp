@@ -281,3 +281,54 @@ DesktopPoseView::AdaptToDesktopIntegrationChange(BMessage* message)
 	ShowVolumes(false, mountSharedVolumesOntoDesktop);
 	ShowVolumes(mountVolumesOnDesktop, mountSharedVolumesOntoDesktop);
 }
+
+
+rgb_color
+DesktopPoseView::TextColor(bool selected) const
+{
+	// The desktop color is chosen independently for the desktop.
+	// The text color is chosen globally for all directories.
+	// It's fairly easy to get something unreadable (even with the default
+	// settings, it's expected that text will be black on white in Tracker
+	// folders, but white on blue on the desktop).
+	// So here we check if the colors are different enough, and otherwise,
+	// force the text to be either white or black.
+	rgb_color textColor = HighColor();
+	rgb_color viewColor = ViewColor();
+
+	// The colors are different enough, we can use them as is
+	if (rgb_color::Contrast(viewColor, textColor) > 127)
+		return textColor;
+
+	return viewColor.IsLight() ? kBlack : kWhite;
+}
+
+
+rgb_color
+DesktopPoseView::BackColor(bool selected) const
+{
+	// returns black or white color depending on the desktop background
+	int32 thresh = 0;
+	rgb_color color = LowColor();
+
+	if (color.red > 150)
+		thresh++;
+
+	if (color.green > 150)
+		thresh++;
+
+	if (color.blue > 150)
+		thresh++;
+
+	if (thresh > 1) {
+		color.red = 255;
+		color.green = 255;
+		color.blue = 255;
+	} else {
+		color.red = 0;
+		color.green = 0;
+		color.blue = 0;
+	}
+
+	return color;
+}

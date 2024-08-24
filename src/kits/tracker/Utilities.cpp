@@ -95,6 +95,27 @@ ReadOnlyTint(rgb_color base)
 }
 
 
+rgb_color
+InvertColor(rgb_color color)
+{
+	return make_color(255 - color.red, 255 - color.green, 255 - color.blue);
+}
+
+
+rgb_color
+InvertedBackColor(rgb_color background)
+{
+	rgb_color inverted = InvertColor(background);
+
+	// The colors are different enough, we can use inverted
+	if (rgb_color::Contrast(background, inverted) > 127)
+		return inverted;
+
+	// use black or white
+	return background.IsLight() ? kBlack : kWhite;
+}
+
+
 bool
 SecondaryMouseButtonDown(int32 modifiers, int32 buttons)
 {
