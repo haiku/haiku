@@ -109,6 +109,12 @@ arch_vm_supports_protection(uint32 protection)
 		return false;
 	}
 
+	// User-Execute implies User-Read, because it would break PAN otherwise
+	if ((protection & B_EXECUTE_AREA) != 0
+	    && (protection & B_READ_AREA) == 0) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -122,5 +128,7 @@ arch_vm_unset_memory_type(VMArea* area)
 status_t
 arch_vm_set_memory_type(VMArea* area, phys_addr_t physicalBase, uint32 type)
 {
+	// Memory type is set in page tables during mapping,
+	// no need to do anything more here.
 	return B_OK;
 }
