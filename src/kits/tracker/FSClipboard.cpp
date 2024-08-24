@@ -439,19 +439,15 @@ FSClipboardPaste(Model* model, uint32 linksMode)
 							moveList->AddItem(new entry_ref(ref));
 						} else if (moveMode == kCopySelectionTo)
 							copyList->AddItem(new entry_ref(ref));
-					} else {
-						// if the entry should have been removed from its
-						// directory, we want to copy that entry next time, no
-						// matter if the items don't have to be moved at all
-						// (source == target)
-						if (moveMode == kMoveSelectionTo)
-							newMoveMode = kCopySelectionTo;
-						else {
-							// we are copying a file into its same directory, do
-							// a duplicate
-							duplicateList->AddItem(new entry_ref(ref));
-						}
+					} else if (moveMode != kMoveSelectionTo) {
+						// we are copying a file into its same directory, do a duplicate
+						duplicateList->AddItem(new entry_ref(ref));
 					}
+
+					// Whether the entry changed directories or not we want to copy that entry
+					// next time, even if the items don't have to be moved (source == target).
+					if (moveMode == kMoveSelectionTo)
+						newMoveMode = kCopySelectionTo;
 				}
 
 				// add the change to the update message (if necessary)
