@@ -210,13 +210,6 @@ CopySelectionListToEntryRefList(const PoseList* original,
 }
 
 
-static rgb_color
-invert_color(rgb_color color)
-{
-	return make_color(255 - color.red, 255 - color.green, 255 - color.blue);
-}
-
-
 //	#pragma mark - BPoseView
 
 
@@ -9115,9 +9108,6 @@ BPoseView::DrawPose(BPose* pose, int32 index, bool fullDraw)
 rgb_color
 BPoseView::TextColor(bool selected) const
 {
-	if (IsDesktopWindow())
-		return DeskTextColor();
-
 	if (selected)
 		return ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	else
@@ -9129,33 +9119,12 @@ rgb_color
 BPoseView::BackColor(bool selected) const
 {
 	if (selected) {
-		if (IsDesktopWindow())
-			return DeskTextBackColor();
-
-		return InvertedBackColor();
+		return InvertedBackColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	} else {
-		if (IsDesktopWindow())
-			return BView::ViewColor();
-
 		rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 		return tint_color(background,
 			TargetVolumeIsReadOnly() ? ReadOnlyTint(background) : B_NO_TINT);
 	}
-}
-
-
-rgb_color
-BPoseView::InvertedBackColor() const
-{
-	rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	rgb_color inverted = invert_color(background);
-
-	// The colors are different enough, we can use inverted
-	if (rgb_color::Contrast(background, inverted) > 127)
-		return inverted;
-
-	// use black or white
-	return background.IsLight() ? kBlack : kWhite;
 }
 
 

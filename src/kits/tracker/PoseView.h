@@ -213,11 +213,8 @@ public:
 	int32 CountItems() const;
 	void UpdateCount();
 
-	rgb_color DeskTextColor() const;
-	rgb_color DeskTextBackColor() const;
-
-	rgb_color TextColor(bool selected = false) const;
-	rgb_color BackColor(bool selected = false) const;
+	virtual rgb_color TextColor(bool selected = false) const;
+	virtual rgb_color BackColor(bool selected = false) const;
 
 	bool WidgetTextOutline() const;
 	void SetWidgetTextOutline(bool);
@@ -681,7 +678,6 @@ protected:
 private:
 	void DrawOpenAnimation(BRect);
 	void ApplyBackgroundColor();
-	rgb_color InvertedBackColor() const;
 
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);
 
@@ -1027,57 +1023,6 @@ inline bool
 BPoseView::IsDesktopView() const
 {
 	return false;
-}
-
-
-inline rgb_color
-BPoseView::DeskTextColor() const
-{
-	// The desktop color is chosen independently for the desktop.
-	// The text color is chosen globally for all directories.
-	// It's fairly easy to get something unreadable (even with the default
-	// settings, it's expected that text will be black on white in Tracker
-	// folders, but white on blue on the desktop).
-	// So here we check if the colors are different enough, and otherwise,
-	// force the text to be either white or black.
-	rgb_color textColor = HighColor();
-	rgb_color viewColor = ViewColor();
-
-	// The colors are different enough, we can use them as is
-	if (rgb_color::Contrast(viewColor, textColor) > 127)
-		return textColor;
-
-	return viewColor.IsLight() ? kBlack : kWhite;
-}
-
-
-inline rgb_color
-BPoseView::DeskTextBackColor() const
-{
-	// returns black or white color depending on the desktop background
-	int32 thresh = 0;
-	rgb_color color = LowColor();
-
-	if (color.red > 150)
-		thresh++;
-
-	if (color.green > 150)
-		thresh++;
-
-	if (color.blue > 150)
-		thresh++;
-
-	if (thresh > 1) {
-		color.red = 255;
-		color.green = 255;
-		color.blue = 255;
-	} else {
-		color.red = 0;
-		color.green = 0;
-		color.blue = 0;
-	}
-
-	return color;
 }
 
 
