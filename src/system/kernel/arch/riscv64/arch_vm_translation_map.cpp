@@ -136,7 +136,7 @@ arch_vm_translation_map_init(kernel_args *args,
 	dprintf("physMemBase: %#" B_PRIxADDR "\n", args->physical_memory_range[0].start);
 	gVirtFromPhysOffset = args->arch_args.physMap.start - args->physical_memory_range[0].start;
 
-	clear_ac();
+	arch_cpu_disable_user_access();
 
 	*_physicalPageMapper = new(&sPhysicalPageMapperData)
 		RISCV64VMPhysicalPageMapper();

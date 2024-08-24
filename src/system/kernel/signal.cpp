@@ -942,17 +942,17 @@ handle_signals(Thread* thread)
 	sigset_t nonBlockedMask = ~thread->sig_block_mask;
 	sigset_t signalMask = thread->AllPendingSignals() & nonBlockedMask;
 
-	set_ac();
+	arch_cpu_enable_user_access();
 	if (thread->user_thread->defer_signals > 0
 		&& (signalMask & NON_DEFERRABLE_SIGNALS) == 0
 		&& thread->sigsuspend_original_unblocked_mask == 0) {
 		thread->user_thread->pending_signals = signalMask;
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return;
 	}
 
 	thread->user_thread->pending_signals = 0;
-	clear_ac();
+	arch_cpu_disable_user_access();
 
 	// determine syscall restart behavior
 	uint32 restartFlags = atomic_and(&thread->flags,

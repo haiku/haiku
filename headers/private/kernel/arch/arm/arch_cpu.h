@@ -16,8 +16,8 @@
 #define dmb() __asm__ __volatile__("dmb" : : : "memory")
 #define wfi() __asm__ __volatile__("wfi" : : : "memory")
 
-#define set_ac()
-#define clear_ac()
+#define arch_cpu_enable_user_access()
+#define arch_cpu_disable_user_access()
 
 
 #ifndef _ASSEMBLER

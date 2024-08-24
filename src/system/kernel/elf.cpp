@@ -1988,9 +1988,9 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 			size_t amount = fileUpperBound
 				- (programHeaders[i].p_vaddr % B_PAGE_SIZE)
 				- (programHeaders[i].p_filesz);
-			set_ac();
+			arch_cpu_enable_user_access();
 			memset((void *)start, 0, amount);
-			clear_ac();
+			arch_cpu_disable_user_access();
 
 			// Check if we need extra storage for the bss - we have to do this if
 			// the above region doesn't already comprise the memory size, too.
@@ -2050,20 +2050,20 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	// modify the dynamic ptr by the delta of the regions
 	image->dynamic_section += image->text_region.delta;
 
-	set_ac();
+	arch_cpu_enable_user_access();
 	status = elf_parse_dynamic_section(image);
 	if (status != B_OK) {
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return status;
 	}
 
 	status = elf_relocate(image, image);
 	if (status != B_OK) {
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return status;
 	}
 
-	clear_ac();
+	arch_cpu_disable_user_access();
 
 	// set correct area protection
 	for (int i = 0; i < elfHeader.e_phnum; i++) {

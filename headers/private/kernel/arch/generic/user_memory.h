@@ -65,12 +65,12 @@ bool user_access(Function function)
 	// destructor.
 	auto fail = setjmp(thread_get_current_thread()->fault_handler_state);
 	if (fail == 0) {
-		set_ac();
+		arch_cpu_enable_user_access();
 		function();
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return true;
 	}
-	clear_ac();
+	arch_cpu_disable_user_access();
 	return false;
 }
 

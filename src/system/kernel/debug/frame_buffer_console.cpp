@@ -27,10 +27,10 @@
 #else
 #define mutex_lock(...)
 #define mutex_unlock(...)
-#undef set_ac
-#undef clear_ac
-#define set_ac()
-#define clear_ac()
+#undef arch_cpu_enable_user_access
+#undef arch_cpu_disable_user_access
+#define arch_cpu_enable_user_access()
+#define arch_cpu_disable_user_access()
 #endif
 
 #include "font.h"
@@ -153,7 +153,7 @@ render_glyph(int32 column, int32 row, uint8 glyph, uint8 attr)
 		uint8* color = get_palette_entry(foreground_color(attr));
 		uint8* backgroundColor = get_palette_entry(background_color(attr));
 
-		set_ac();
+		arch_cpu_enable_user_access();
 		for (int y = 0; y < sConsole.font->glyphHeight; y++) {
 			uint16_t bits = get_font_data(glyph, y);
 			for (int x = 0; x < sConsole.font->glyphWidth; x++) {
@@ -170,8 +170,7 @@ render_glyph(int32 column, int32 row, uint8 glyph, uint8 attr)
 
 			base += sConsole.bytes_per_row;
 		}
-		clear_ac();
-
+		arch_cpu_disable_user_access();
 	} else {
 		// VGA mode will be treated as monochrome
 		// (ie. only the first plane will be used)
@@ -181,7 +180,7 @@ render_glyph(int32 column, int32 row, uint8 glyph, uint8 attr)
 			+ column * sConsole.font->glyphWidth / 8);
 		uint8 baseOffset =  (column * sConsole.font->glyphWidth) & 0x7;
 
-		set_ac();
+		arch_cpu_enable_user_access();
 		for (int y = 0; y < sConsole.font->glyphHeight; y++) {
 			uint16_t bits = get_font_data(glyph, y);
 			uint8 offset = baseOffset;
@@ -204,7 +203,7 @@ render_glyph(int32 column, int32 row, uint8 glyph, uint8 attr)
 
 			base += sConsole.bytes_per_row;
 		}
-		clear_ac();
+		arch_cpu_disable_user_access();
 	}
 }
 
@@ -226,14 +225,14 @@ draw_cursor(int32 x, int32 y)
 		endY /= 8;
 	}
 
-	set_ac();
+	arch_cpu_enable_user_access();
 	for (; y < endY; y++) {
 		for (int32 x2 = x; x2 < endX; x2++)
 			base[x2] = ~base[x2];
 
 		base += sConsole.bytes_per_row;
 	}
-	clear_ac();
+	arch_cpu_disable_user_access();
 }
 
 
@@ -318,14 +317,14 @@ console_blit(int32 srcx, int32 srcy, int32 width, int32 height, int32 destx,
 		destx = destx * sConsole.font->glyphWidth / 8;
 	}
 
-	set_ac();
+	arch_cpu_enable_user_access();
 	for (int32 y = 0; y < height; y++) {
 		memmove((void*)(sConsole.frame_buffer + (desty + y)
 				* sConsole.bytes_per_row + destx),
 			(void*)(sConsole.frame_buffer + (srcy + y) * sConsole.bytes_per_row
 				+ srcx), width);
 	}
-	clear_ac();
+	arch_cpu_disable_user_access();
 }
 
 
@@ -335,7 +334,7 @@ console_clear(uint8 attr)
 	if (!frame_buffer_console_available())
 		return;
 
-	set_ac();
+	arch_cpu_enable_user_access();
 	switch (sConsole.bytes_per_pixel) {
 		case 1:
 			if (sConsole.depth >= 8) {
@@ -364,8 +363,8 @@ console_clear(uint8 attr)
 			break;
 		}
 	}
+	arch_cpu_disable_user_access();
 
-	clear_ac();
 	sConsole.cursor_x = -1;
 	sConsole.cursor_y = -1;
 }

@@ -651,14 +651,14 @@ enter_userspace(Thread* thread, UserThreadEntryArguments* args)
 
 	// init the thread's user_thread
 	user_thread* userThread = thread->user_thread;
-	set_ac();
+	arch_cpu_enable_user_access();
 	userThread->pthread = args->pthread;
 	userThread->flags = 0;
 	userThread->wait_status = B_OK;
 	userThread->defer_signals
 		= (args->flags & THREAD_CREATION_FLAG_DEFER_SIGNALS) != 0 ? 1 : 0;
 	userThread->pending_signals = 0;
-	clear_ac();
+	arch_cpu_disable_user_access();
 
 	// initialize default TLS fields
 	addr_t tls[TLS_FIRST_FREE_SLOT];
@@ -674,12 +674,12 @@ enter_userspace(Thread* thread, UserThreadEntryArguments* args)
 		// This is a fork()ed thread.
 
 		// Update select TLS values, do not clear the whole array.
-		set_ac();
+		arch_cpu_enable_user_access();
 		addr_t* userTls = (addr_t*)thread->user_local_storage;
 		ASSERT(userTls[TLS_BASE_ADDRESS_SLOT] == thread->user_local_storage);
 		userTls[TLS_THREAD_ID_SLOT] = tls[TLS_THREAD_ID_SLOT];
 		userTls[TLS_USER_THREAD_SLOT] = tls[TLS_USER_THREAD_SLOT];
-		clear_ac();
+		arch_cpu_disable_user_access();
 
 		// Copy the fork args onto the stack and free them.
 		arch_fork_arg archArgs = *args->forkArgs;

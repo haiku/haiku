@@ -83,9 +83,9 @@ user_atomic_or(int32* value, int32 orValue, bool isWired)
 {
 	int32 result;
 	if (isWired) {
-		set_ac();
+		arch_cpu_enable_user_access();
 		result = atomic_or(value, orValue);
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return result;
 	}
 
@@ -100,9 +100,9 @@ user_atomic_and(int32* value, int32 andValue, bool isWired)
 {
 	int32 result;
 	if (isWired) {
-		set_ac();
+		arch_cpu_enable_user_access();
 		result = atomic_and(value, andValue);
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return result;
 	}
 
@@ -117,9 +117,9 @@ user_atomic_get(int32* value, bool isWired)
 {
 	int32 result;
 	if (isWired) {
-		set_ac();
+		arch_cpu_enable_user_access();
 		result = atomic_get(value);
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return result;
 	}
 
@@ -135,9 +135,9 @@ user_atomic_test_and_set(int32* value, int32 newValue, int32 testAgainst,
 {
 	int32 result;
 	if (isWired) {
-		set_ac();
+		arch_cpu_enable_user_access();
 		result = atomic_test_and_set(value, newValue, testAgainst);
-		clear_ac();
+		arch_cpu_disable_user_access();
 		return result;
 	}
 

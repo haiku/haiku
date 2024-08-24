@@ -286,10 +286,10 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	// entry function returns to the top of the stack to act as the return
 	// address. The stub is inside commpage.
 	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
-	set_ac();
+	arch_cpu_enable_user_access();
 	codeAddr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_X86_THREAD_EXIT]
 		+ commPageAddress;
-	clear_ac();
+	arch_cpu_disable_user_access();
 	if (user_memcpy((void*)stackTop, (const void*)&codeAddr, sizeof(codeAddr))
 			!= B_OK)
 		return B_BAD_ADDRESS;
@@ -406,10 +406,10 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 	// stack. First argument points to the frame data.
 	addr_t* commPageAddress = (addr_t*)thread->team->commpage_address;
 	frame->user_sp = (addr_t)userStack;
-	set_ac();
+	arch_cpu_enable_user_access();
 	frame->ip = commPageAddress[COMMPAGE_ENTRY_X86_SIGNAL_HANDLER]
 		+ (addr_t)commPageAddress;
-	clear_ac();
+	arch_cpu_disable_user_access();
 	frame->di = (addr_t)userSignalFrameData;
 	frame->flags &= ~(uint64)(X86_EFLAGS_TRAP | X86_EFLAGS_DIRECTION);
 
