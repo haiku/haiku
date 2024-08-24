@@ -119,7 +119,8 @@ rule ArchitectureSetup architecture
 			-Wno-builtin-requires-header ;
 		HAIKU_WARNING_C++FLAGS_$(architecture) +=
 			-Wno-unused-private-field -Wno-gnu-designator
-			-Wno-builtin-requires-header ;
+			-Wno-builtin-requires-header
+			-Wno-non-c-typedef-for-linkage -Wno-non-power-of-two-alignment ;
 	}
 
 	HAIKU_WERROR_FLAGS_$(architecture) = ;
