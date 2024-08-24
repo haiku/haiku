@@ -24,7 +24,10 @@ local genericSources =
 	mpn2dbl.c mpn2flt.c mpn2ldbl.c
 	mul.c mul_n.c
 
-	s_isnan.c s_isnanf.c s_finite.c s_finitef.c s_isinf.c s_isinff.c
+	s_isnan.c s_isnanf.c
+	s_finite.c s_finitef.c
+	s_isinf.c s_isinff.c
+
 	s_clog.c s_clogf.c s_clogl.c
 	s_csqrt.c s_csqrtf.c s_csqrtl.c
 	s_cacos.c s_cacosf.c s_cacosl.c
