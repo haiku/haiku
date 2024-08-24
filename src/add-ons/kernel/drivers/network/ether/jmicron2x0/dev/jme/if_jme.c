@@ -179,7 +179,7 @@ static device_method_t jme_methods[] = {
 	DEVMETHOD(miibus_writereg,	jme_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	jme_miibus_statchg),
 
-	{ NULL, NULL }
+	DEVMETHOD_END
 };
 
 static driver_t jme_driver = {

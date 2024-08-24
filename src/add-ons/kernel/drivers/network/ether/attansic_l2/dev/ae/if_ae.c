@@ -164,7 +164,8 @@ static device_method_t ae_methods[] = {
 	DEVMETHOD(miibus_readreg,	ae_miibus_readreg),
 	DEVMETHOD(miibus_writereg,	ae_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	ae_miibus_statchg),
-	{ NULL, NULL }
+
+	DEVMETHOD_END
 };
 static driver_t ae_driver = {
         "ae",

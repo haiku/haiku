@@ -167,7 +167,8 @@ static device_method_t age_methods[] = {
 	DEVMETHOD(miibus_readreg,	age_miibus_readreg),
 	DEVMETHOD(miibus_writereg,	age_miibus_writereg),
 	DEVMETHOD(miibus_statchg,	age_miibus_statchg),
-	{ NULL, NULL }
+
+	DEVMETHOD_END
 };
 
 static driver_t age_driver = {
