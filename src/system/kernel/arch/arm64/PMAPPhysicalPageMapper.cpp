@@ -34,28 +34,31 @@ PMAPPhysicalPageMapper::MemsetPhysical(phys_addr_t address, int value, phys_size
 	return B_OK;
 }
 
-
 status_t
 PMAPPhysicalPageMapper::MemcpyFromPhysical(void* to, phys_addr_t from, size_t length, bool user)
 {
-	if (user)
-		panic("MemcpyFromPhysical user not impl");
-
 	ASSERT(from < KERNEL_PMAP_SIZE);
-	memcpy(to, reinterpret_cast<void*>(KERNEL_PMAP_BASE + from), length);
 
-	return B_OK;
+	if (!user) {
+		memcpy(to, reinterpret_cast<void*>(KERNEL_PMAP_BASE + from), length);
+		return B_OK;
+	} else {
+		return user_memcpy(to, reinterpret_cast<void*>(KERNEL_PMAP_BASE + from), length);
+	}
 }
 
 
 status_t
 PMAPPhysicalPageMapper::MemcpyToPhysical(phys_addr_t to, const void* from, size_t length, bool user)
 {
-	if (user)
-		panic("MemcpyToPhysical user not impl");
-
 	ASSERT(to < KERNEL_PMAP_SIZE);
-	memcpy(reinterpret_cast<void*>(KERNEL_PMAP_BASE + to), from, length);
+
+	if (!user) {
+		memcpy(reinterpret_cast<void*>(KERNEL_PMAP_BASE + to), from, length);
+		return B_OK;
+	} else {
+		return user_memcpy(reinterpret_cast<void*>(KERNEL_PMAP_BASE + to), from, length);
+	}
 
 	return B_OK;
 }
