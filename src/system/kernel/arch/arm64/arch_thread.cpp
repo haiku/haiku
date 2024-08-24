@@ -15,6 +15,7 @@
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 #include <arch_vm.h>
+#include <arch/vm.h>
 #include <arch/vm_translation_map.h>
 
 #include <string.h>
@@ -96,6 +97,7 @@ extern "C" void _arch_context_swap(arch_thread *from, arch_thread *to);
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	arch_vm_aspace_swap(from->team->address_space, to->team->address_space);
 	arm64_set_tls_context(to);
 	_arch_context_swap(&from->arch_info, &to->arch_info);
 }
