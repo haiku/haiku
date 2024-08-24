@@ -39,6 +39,7 @@ static char sccsid[] = "@(#)getent.c	8.2 (Berkeley) 12/15/93";
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "misc-proto.h"
 
