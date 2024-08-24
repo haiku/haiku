@@ -23,7 +23,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
+			vuint32 padding:16;
 			vuint32 CCD:1;
 			vuint32 CFD:1;
 			vuint32 LASE:1;
@@ -52,7 +52,7 @@ namespace LINFlexRegisters {
 			vuint32 LASE:1;
 			vuint32 CFD:1;
 			vuint32 CCD:1;
-			vuint32 :16;
+			vuint32 padding:16;
 	#endif
 		} B;
 	} LINCR1_register;
@@ -62,13 +62,13 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
+			vuint32 padding:16;
 			vuint32 SZIE:1;
 			vuint32 OCIE:1;
 			vuint32 BEIE:1;
 			vuint32 CEIE:1;
 			vuint32 HEIE:1;
-			vuint32:2;
+			vuint32 padding1:2;
 			vuint32 FEIE:1;
 			vuint32 BOIE:1;
 			vuint32 LSIE:1;
@@ -87,11 +87,11 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
+			vuint32 padding:16;
 			vuint32 LINS:4;
-			vuint32:2;
+			vuint32 padding1:2;
 			vuint32 RMB:1;
-			vuint32:1;
+			vuint32 padding2:1;
 			vuint32 RBSY:1;
 			vuint32 RPS:1;
 			vuint32 WUF:1;
@@ -109,7 +109,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
+			vuint32 padding:16;
 			vuint32 SZF:1;
 			vuint32 OCF:1;
 			vuint32 BEF:1;
@@ -119,7 +119,7 @@ namespace LINFlexRegisters {
 			vuint32 IDPEF:1;
 			vuint32 FEF:1;
 			vuint32 BOF:1;
-			vuint32:6;
+			vuint32 padding1:6;
 			vuint32 NF:1;
 	#endif
 		} B;
@@ -130,10 +130,10 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
-			vuint32:1;
+			vuint32 padding:16;
+			vuint32 padding1:1;
 			vuint32 TDFL:2;
-			vuint32:1;
+			vuint32 padding2:1;
 			vuint32 RDFL:2;
 			vuint32 RFBM:1;
 			vuint32 TFBM:1;
@@ -158,10 +158,10 @@ namespace LINFlexRegisters {
 			vuint32 TFBM:1;
 			vuint32 RFBM:1;
 			vuint32 RDFL:2;
-			vuint32:1;
+			vuint32 padding2:1;
 			vuint32 TDFL:2;
-			vuint32:1;
-			vuint32 :16;
+			vuint32 padding1:1;
+			vuint32 padding:16;
 	#endif
 		} B;
 	} UARTCR_register;
@@ -171,7 +171,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
+			vuint32 padding:16;
 			vuint32 SZF:1;
 			vuint32 OCF:1;
 			vuint32 PE:4; /*Can check all 4 RX'd bytes at once with array*/
@@ -180,7 +180,7 @@ namespace LINFlexRegisters {
 			vuint32 BOF:1;
 			vuint32 RPS:1;
 			vuint32 WUF:1;
-			vuint32:2;
+			vuint32 padding1:2;
 			vuint32 DRF:1;
 			vuint32 DTF:1;
 			vuint32 NF:1;
@@ -189,7 +189,7 @@ namespace LINFlexRegisters {
 			vuint32 NF:1;
 			vuint32 DTF:1;
 			vuint32 DRF:1;
-			vuint32:2;
+			vuint32 padding1:2;
 			vuint32 WUF:1;
 			vuint32 RPS:1;
 			vuint32 BOF:1;
@@ -198,7 +198,7 @@ namespace LINFlexRegisters {
 			vuint32 PE:4; /*Can check all 4 RX'd bytes at once with array*/
 			vuint32 OCF:1;
 			vuint32 SZF:1;
-			vuint32 :16;
+			vuint32 padding:16;
 	#endif
 		} B;
 	} UARTSR_register;
@@ -208,8 +208,8 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
-			vuint32:5;
+			vuint32 padding:16;
+			vuint32 padding1:5;
 			vuint32 LTOM:1;
 			vuint32 IOT:1;
 			vuint32 TOCE:1;
@@ -223,7 +223,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :16;
+			vuint32 padding:16;
 			vuint32 OC2:8;
 			vuint32 OC1:8;
 	#endif
@@ -235,9 +235,9 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32 :20;
+			vuint32 padding:20;
 			vuint32 RTO:4;
-			vuint32:1;
+			vuint32 padding:1;
 			vuint32 HTO:7;
 	#endif
 		} B;
@@ -248,7 +248,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:28;
+			vuint32 padding:28;
 			vuint32 DIV_F:4;
 	#endif
 		} B;
@@ -259,7 +259,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:19;
+			vuint32 padding:19;
 			vuint32 DIV_M:13;
 	#endif
 		} B;
@@ -270,7 +270,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:24;
+			vuint32 padding:24;
 			vuint32 CF:8;
 	#endif
 		} B;
@@ -281,7 +281,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:17;
+			vuint32 padding:17;
 			vuint32 IOBE:1;
 			vuint32 IOPE:1;
 			vuint32 WURQ:1;
@@ -299,11 +299,11 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:16;
+			vuint32 padding:16;
 			vuint32 DFL:6;
 			vuint32 DIR:1;
 			vuint32 CCS:1;
-			vuint32:2;
+			vuint32 padding1:2;
 			vuint32 ID:6;
 	#endif
 		} B;
@@ -340,7 +340,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:24;
+			vuint32 padding:24;
 			vuint32 FACT:8;
 	#endif
 		} B;
@@ -351,7 +351,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:28;
+			vuint32 padding:28;
 			vuint32 IFMI:4;
 	#endif
 		} B;
@@ -362,7 +362,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:28;
+			vuint32 padding:28;
 			vuint32 IFM:4;
 	#endif
 		} B;
@@ -373,12 +373,12 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:16;
-			vuint32:3;
+			vuint32 padding:16;
+			vuint32 padding1:3;
 			vuint32 DFL:3;
 			vuint32 DIR:1;
 			vuint32 CCS:1;
-			vuint32:2;
+			vuint32 padding2:2;
 			vuint32 ID:6;
 	#endif
 		} B;
@@ -389,7 +389,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:26;
+			vuint32 padding:26;
 			vuint32 TDFBM:1;
 			vuint32 RDFBM:1;
 			vuint32 TDLIS:1;
@@ -405,7 +405,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:20;
+			vuint32 padding:20;
 			vuint32 PTO:12;
 	#endif
 		} B;
@@ -416,7 +416,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:20;
+			vuint32 padding:20;
 			vuint32 CTO:12;
 	#endif
 		} B;
@@ -427,7 +427,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:16;
+			vuint32 padding:16;
 			vuint32 DTE15:1;
 			vuint32 DTE14:1;
 			vuint32 DTE13:1;
@@ -453,7 +453,7 @@ namespace LINFlexRegisters {
 		vuint32 R;
 		struct {
 	#if __BYTE_ORDER == __BIG_ENDIAN
-			vuint32:16;
+			vuint32 padding:16;
 			vuint32 DRE15:1;
 			vuint32 DRE14:1;
 			vuint32 DRE13:1;
