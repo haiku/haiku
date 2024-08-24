@@ -205,6 +205,10 @@ ns_parserr(ns_msg *handle, ns_sect section, int rrnum, ns_rr *rr) {
 	return (0);
 }
 
+extern int
+ns_name_unpack2(const u_char *msg, const u_char *eom, const u_char *src,
+		u_char *dst, size_t dstsiz, size_t *dstlen);
+
 /*
  * This is identical to the above but uses network-format (uncompressed) names.
  */

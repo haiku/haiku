@@ -189,23 +189,6 @@ ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 	return (int)(dn - dst);
 }
 
-/*%
- *	Convert a ascii string into an encoded domain name as per RFC1035.
- *
- * return:
- *
- *\li	-1 if it fails
- *\li	1 if string was fully qualified
- *\li	0 is string was not fully qualified
- *
- * notes:
- *\li	Enforces label and domain length limits.
- */
-int
-ns_name_pton(const char *src, u_char *dst, size_t dstsiz) {
-	return (ns_name_pton2(src, dst, dstsiz, NULL));
-}
-
 /*
  * ns_name_pton2(src, dst, dstsiz, *dstlen)
  *	Convert a ascii string into an encoded domain name as per RFC1035.
@@ -345,6 +328,23 @@ ns_name_pton2(const char *src, u_char *dst, size_t dstsiz, size_t *dstlen) {
 }
 
 /*%
+ *	Convert a ascii string into an encoded domain name as per RFC1035.
+ *
+ * return:
+ *
+ *\li	-1 if it fails
+ *\li	1 if string was fully qualified
+ *\li	0 is string was not fully qualified
+ *
+ * notes:
+ *\li	Enforces label and domain length limits.
+ */
+int
+ns_name_pton(const char *src, u_char *dst, size_t dstsiz) {
+	return (ns_name_pton2(src, dst, dstsiz, NULL));
+}
+
+/*%
  *	Convert a network strings labels into all lowercase.
  *
  * return:
@@ -397,19 +397,6 @@ ns_name_ntol(const u_char *src, u_char *dst, size_t dstsiz)
 	*dn++ = '\0';
 	assert(INT_MIN <= (dn - dst) && (dn - dst) <= INT_MAX);
 	return (int)(dn - dst);
-}
-
-/*%
- *	Unpack a domain name from a message, source may be compressed.
- *
- * return:
- *\li	-1 if it fails, or consumed octets if it succeeds.
- */
-int
-ns_name_unpack(const u_char *msg, const u_char *eom, const u_char *src,
-	       u_char *dst, size_t dstsiz)
-{
-	return (ns_name_unpack2(msg, eom, src, dst, dstsiz, NULL));
 }
 
 /*
@@ -499,6 +486,19 @@ ns_name_unpack2(const u_char *msg, const u_char *eom, const u_char *src,
 		len = (int)(srcp - src);
 	}
 	return len;
+}
+
+/*%
+ *	Unpack a domain name from a message, source may be compressed.
+ *
+ * return:
+ *\li	-1 if it fails, or consumed octets if it succeeds.
+ */
+int
+ns_name_unpack(const u_char *msg, const u_char *eom, const u_char *src,
+		   u_char *dst, size_t dstsiz)
+{
+	return (ns_name_unpack2(msg, eom, src, dst, dstsiz, NULL));
 }
 
 /*%
