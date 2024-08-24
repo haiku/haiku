@@ -45,10 +45,6 @@ rule ArchitectureSetup architecture
 		case riscv64 : archFlags += -march=rv64gc ;
 	}
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		# TODO: These should be included in Clang's compiler specs.
-		ccBaseFlags += -fPIC ;
-		HAIKU_LINKFLAGS_$(architecture) += -shared ;
-
 		# lld doesn't currently implement R_RISCV_ALIGN relaxation
 		if $(cpu) = riscv64 {
 			ccBaseFlags += -mno-relax ;
@@ -353,12 +349,7 @@ rule KernelArchitectureSetup architecture
 	local ccBaseFlags = -finline -fno-builtin -Wno-main ;
 
 	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) != 1 {
-		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
-			# Clang does not yet understand this flag.
-			ccBaseFlags += -fno-semantic-interposition ;
-		}
-
-		ccBaseFlags += -ffreestanding ;
+		ccBaseFlags += -ffreestanding -fno-semantic-interposition ;
 
 		# Since GCC 13, autovectorization generates code which causes problems
 		# in various virtual machines (bare metal is apparently unaffected.)
@@ -379,31 +370,17 @@ rule KernelArchitectureSetup architecture
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
 
-	# Common boot-related cflags which apply to all loaders
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		HAIKU_KERNEL_PIC_LINKFLAGS += -z noseparate-code -z norelro --no-rosegment ;
+		HAIKU_KERNEL_ADDON_LINKFLAGS += -z noseparate-code -z norelro -Wl,--no-rosegment ;
+	}
+
+	# Common boot-related flags which apply to all loaders.
 	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
 	HAIKU_BOOT_OPTIM = -Os ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
-
-	# Remove -fPIC and other unwanted options from the BOOT flags (they are sometimes
-	# added to force PIC in general.)
-	local fixedBootCCFlags ;
-	local fixedBootC++Flags ;
-	for flag in $(HAIKU_BOOT_CCFLAGS) {
-		if $(flag) = "-fpic" || $(flag) = "-fPIC" {
-			continue ;
-		}
-		fixedBootCCFlags += $(flag) ;
-	}
-	for flag in $(HAIKU_BOOT_C++FLAGS) {
-		if $(flag) = "-fpic" || $(flag) = "-fPIC" {
-			continue ;
-		}
-		fixedBootC++Flags += $(flag) ;
-	}
-	HAIKU_BOOT_CCFLAGS = $(fixedBootCCFlags) ;
-	HAIKU_BOOT_C++FLAGS = $(fixedBootC++Flags) ;
 
 	# Any special kernel base addresses
 	if $(HAIKU_BOOT_LOADER_BASE) {
