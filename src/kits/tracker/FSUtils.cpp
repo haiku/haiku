@@ -517,8 +517,8 @@ FSGetPoseLocation(const BNode* node, BPoint* point)
 
 
 static void
-SetupPoseLocation(ino_t sourceParentIno, ino_t destParentIno,
-	const BNode* sourceNode, BNode* destNode, BPoint* loc)
+SetupPoseLocation(ino_t sourceParentIno, ino_t destParentIno, const BNode* sourceNode,
+	BNode* destNode, BPoint* loc)
 {
 	BPoint point;
 	if (loc == NULL
@@ -997,8 +997,7 @@ delete_point(void* point)
 
 
 static status_t
-MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
-	uint32 moveMode)
+MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList, uint32 moveMode)
 {
 	ASSERT(!srcList->IsEmpty());
 
@@ -1169,26 +1168,25 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 			}
 
 			// get location to place this item
-			if (pointList && moveMode != kCopySelectionTo) {
+			if (pointList != NULL && moveMode != kCopySelectionTo) {
 				loc = (BPoint*)pointList->ItemAt(i);
 
-				BNode* src_node = GetWritableNode(&sourceEntry);
-				if (src_node && src_node->InitCheck() == B_OK) {
+				BNode* sourceNode = GetWritableNode(&sourceEntry);
+				if (sourceNode && sourceNode->InitCheck() == B_OK) {
 					PoseInfo poseInfo;
 					poseInfo.fInvisible = false;
 					poseInfo.fInitedDirectory = deststat.st_ino;
 					poseInfo.fLocation = *loc;
-					src_node->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0,
-						&poseInfo, sizeof(poseInfo));
+					sourceNode->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
+						sizeof(poseInfo));
 				}
-				delete src_node;
+				delete sourceNode;
 			}
 
-			if (pointList)
- 				loc = (BPoint*)pointList->ItemAt(i);
+			if (pointList != NULL)
+				loc = (BPoint*)pointList->ItemAt(i);
 
-			result = MoveItem(&sourceEntry, &destDir, loc, moveMode, NULL,
-				undo, &loopControl);
+			result = MoveItem(&sourceEntry, &destDir, loc, moveMode, NULL, undo, &loopControl);
 			if (result != B_OK)
 				break;
 		}
@@ -1733,8 +1731,7 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 
 
 status_t
-RecursiveMove(BEntry* entry, BDirectory* destDir,
-	CopyLoopControl* loopControl)
+RecursiveMove(BEntry* entry, BDirectory* destDir, CopyLoopControl* loopControl)
 {
 	const char* name = entry->Name();
 
@@ -1809,7 +1806,7 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 					getcwd(oldwd, B_PATH_NAME_LENGTH);
 
 					BEntry destEntry;
-					destDir -> GetEntry(&destEntry);
+					destDir->GetEntry(&destEntry);
 					BPath destPath;
 					destEntry.GetPath(&destPath);
 
@@ -1892,7 +1889,6 @@ MoveItem(BEntry* entry, BDirectory* destDir, BPoint* loc, uint32 moveMode,
 		// if move is on same volume don't copy
 		if (statbuf.st_dev == destNode.device && moveMode != kCopySelectionTo
 			&& moveMode != kDuplicateSelection) {
-
 			// for "Move" the size for status is always 1 - since file
 			// size is irrelevant when simply moving to a new folder
 			loopControl->UpdateStatus(ref.name, ref, 1);
@@ -2129,17 +2125,15 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 		undo.UpdateEntry(entry, name);
 	}
 
-	BNode* src_node = 0;
-	if (loc && loc != (BPoint*)-1
-		&& (src_node = GetWritableNode(entry, &statbuf)) != 0) {
+	BNode* sourceNode = 0;
+	if (loc && loc != (BPoint*)-1 && (sourceNode = GetWritableNode(entry, &statbuf)) != 0) {
 		trash_dir.GetStat(&statbuf);
 		PoseInfo poseInfo;
 		poseInfo.fInvisible = false;
 		poseInfo.fInitedDirectory = statbuf.st_ino;
 		poseInfo.fLocation = *loc;
-		src_node->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo,
-			sizeof(poseInfo));
-		delete src_node;
+		sourceNode->WriteAttr(kAttrPoseInfo, B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
+		delete sourceNode;
 	}
 
 	BNode node(entry);
@@ -2152,8 +2146,8 @@ MoveEntryToTrash(BEntry* entry, BPoint* loc, Undo &undo)
 	}
 
 	TrackerCopyLoopControl loopControl;
-	MoveItem(entry, &trash_dir, loc, kMoveSelectionTo, name, undo,
-		&loopControl);
+	MoveItem(entry, &trash_dir, loc, kMoveSelectionTo, name, undo, &loopControl);
+
 	return B_OK;
 }
 
