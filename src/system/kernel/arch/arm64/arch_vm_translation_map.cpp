@@ -8,6 +8,7 @@
 #include <boot/kernel_args.h>
 #include <vm/VMAddressSpace.h>
 #include <vm/vm.h>
+#include <vm/vm_page.h>
 
 #include "PMAPPhysicalPageMapper.h"
 #include "VMSAv8TranslationMap.h"
@@ -18,12 +19,37 @@ static char sPhysicalPageMapperData[sizeof(PMAPPhysicalPageMapper)];
 // low bit is implicitly zero.
 static constexpr uint64_t kTtbrBasePhysAddrMask = (((1UL << 47) - 1) << 1);
 
+// Physical pointer to an empty page table, which is used for break-before-make
+// when updating TTBR0_EL1.
+static phys_addr_t sEmptyTable;
+
+
+static void
+arch_vm_alloc_empty_table(void)
+{
+	vm_page_reservation reservation;
+	vm_page_reserve_pages(&reservation, 1, VM_PRIORITY_SYSTEM);
+	vm_page* page = vm_page_allocate_page(&reservation, PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
+	DEBUG_PAGE_ACCESS_END(page);
+	sEmptyTable = page->physical_page_number << PAGE_SHIFT;
+}
+
+
+void
+arch_vm_install_empty_table_ttbr0(void)
+{
+	WRITE_SPECIALREG(TTBR0_EL1, sEmptyTable);
+	asm("isb");
+}
+
+
 status_t
 arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 {
 	phys_addr_t pt = 0;
 	if (kernel) {
 		pt = READ_SPECIALREG(TTBR1_EL1) & kTtbrBasePhysAddrMask;
+		arch_vm_install_empty_table_ttbr0();
 	}
 
 	*_map = new (std::nothrow) VMSAv8TranslationMap(kernel, pt, 12, 48, 1);
@@ -39,6 +65,9 @@ status_t
 arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physicalPageMapper)
 {
 	dprintf("arch_vm_translation_map_init\n");
+
+	// Create an empty page table for use when we don't want a userspace page table.
+	arch_vm_alloc_empty_table();
 
 	// nuke TTBR0 mapping, we use identity mapping in kernel space at KERNEL_PMAP_BASE
 	memset((void*) READ_SPECIALREG(TTBR0_EL1), 0, B_PAGE_SIZE);
