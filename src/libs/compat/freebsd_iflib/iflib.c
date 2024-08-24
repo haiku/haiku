@@ -4529,7 +4529,11 @@ iflib_if_qflush(if_t ifp)
 	 * When ALTQ is enabled, this will also take care of purging the
 	 * ALTQ queue(s).
 	 */
+#ifdef __HAIKU__
+	ifp->if_qflush(ifp);
+#else
 	if_qflush(ifp);
+#endif
 }
 
 #define IFCAP_FLAGS (IFCAP_HWCSUM_IPV6 | IFCAP_HWCSUM | IFCAP_LRO | \

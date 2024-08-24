@@ -1464,16 +1464,6 @@ nvlist_add_nvpair(nvlist_t *nvl, const nvpair_t *nvp)
 }
 
 void
-nvlist_add_stringf(nvlist_t *nvl, const char *name, const char *valuefmt, ...)
-{
-	va_list valueap;
-
-	va_start(valueap, valuefmt);
-	nvlist_add_stringv(nvl, name, valuefmt, valueap);
-	va_end(valueap);
-}
-
-void
 nvlist_add_stringv(nvlist_t *nvl, const char *name, const char *valuefmt,
     va_list valueap)
 {
@@ -1491,6 +1481,16 @@ nvlist_add_stringv(nvlist_t *nvl, const char *name, const char *valuefmt,
 	} else {
 		(void)nvlist_move_nvpair(nvl, nvp);
 	}
+}
+
+void
+nvlist_add_stringf(nvlist_t *nvl, const char *name, const char *valuefmt, ...)
+{
+	va_list valueap;
+
+	va_start(valueap, valuefmt);
+	nvlist_add_stringv(nvl, name, valuefmt, valueap);
+	va_end(valueap);
 }
 
 void
