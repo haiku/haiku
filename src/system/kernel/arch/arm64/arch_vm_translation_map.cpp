@@ -14,15 +14,16 @@
 
 static char sPhysicalPageMapperData[sizeof(PMAPPhysicalPageMapper)];
 
+// The base address of TTBR*_EL1 is in bits [47:1] of the register, and the
+// low bit is implicitly zero.
+static constexpr uint64_t kTtbrBasePhysAddrMask = (((1UL << 47) - 1) << 1);
 
 status_t
 arch_vm_translation_map_create_map(bool kernel, VMTranslationMap** _map)
 {
 	phys_addr_t pt = 0;
 	if (kernel) {
-		pt = READ_SPECIALREG(TTBR1_EL1);
-	} else {
-		panic("arch_vm_translation_map_create_map user not implemented");
+		pt = READ_SPECIALREG(TTBR1_EL1) & kTtbrBasePhysAddrMask;
 	}
 
 	*_map = new (std::nothrow) VMSAv8TranslationMap(kernel, pt, 12, 48, 1);
@@ -51,8 +52,10 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 	uint64_t ttbr1 = READ_SPECIALREG(TTBR1_EL1);
 	uint64_t mair = READ_SPECIALREG(MAIR_EL1);
 	uint64_t mmfr1 = READ_SPECIALREG(ID_AA64MMFR1_EL1);
+	uint64_t mmfr2 = READ_SPECIALREG(ID_AA64MMFR2_EL1);
 	uint64_t sctlr = READ_SPECIALREG(SCTLR_EL1);
 
+	ASSERT(VMSAv8TranslationMap::fHwFeature == 0);
 	uint64_t hafdbs = ID_AA64MMFR1_HAFDBS(mmfr1);
 	if (hafdbs == ID_AA64MMFR1_HAFDBS_AF) {
 		VMSAv8TranslationMap::fHwFeature = VMSAv8TranslationMap::HW_ACCESS;
@@ -64,13 +67,17 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 		tcr |= (1UL << 40) | (1UL << 39);
 	}
 
+	if (ID_AA64MMFR2_CNP(mmfr2) == ID_AA64MMFR2_CNP_IMPL) {
+		VMSAv8TranslationMap::fHwFeature |= VMSAv8TranslationMap::HW_COMMON_NOT_PRIVATE;
+	}
+
 	VMSAv8TranslationMap::fMair = mair;
 
 	WRITE_SPECIALREG(TCR_EL1, tcr);
 
-	dprintf("vm config: MMFR1: %lx, TCR: %lx\nTTBR0: %lx, TTBR1: %lx\nT0SZ: %u, T1SZ: %u, TG0: %u, "
-			"TG1: %u, MAIR: %lx, SCTLR: %lx\n",
-		mmfr1, tcr, ttbr0, ttbr1, t0sz, t1sz, tg0, tg1, mair, sctlr);
+	dprintf("vm config: MMFR1: %lx, MMFR2: %lx, TCR: %lx\nTTBR0: %lx, TTBR1: %lx\nT0SZ: %u, "
+			"T1SZ: %u, TG0: %u, TG1: %u, MAIR: %lx, SCTLR: %lx\n",
+		mmfr1, mmfr2, tcr, ttbr0, ttbr1, t0sz, t1sz, tg0, tg1, mair, sctlr);
 
 	*_physicalPageMapper = new (&sPhysicalPageMapperData) PMAPPhysicalPageMapper();
 
@@ -178,7 +185,7 @@ arch_vm_translation_map_early_map(kernel_args* args, addr_t va, phys_addr_t pa, 
 	uint64_t va_mask = (1UL << va_bits) - 1;
 	ASSERT((va & ~va_mask) == ~va_mask);
 
-	phys_addr_t ptPa = READ_SPECIALREG(TTBR1_EL1);
+	phys_addr_t ptPa = READ_SPECIALREG(TTBR1_EL1) & kTtbrBasePhysAddrMask;
 	int level = VMSAv8TranslationMap::CalcStartLevel(va_bits, page_bits);
 	va &= va_mask;
 	pa |= VMSAv8TranslationMap::GetMemoryAttr(attributes, 0, true);

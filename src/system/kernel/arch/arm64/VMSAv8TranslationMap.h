@@ -60,8 +60,12 @@ public:
 	virtual	void				Flush();
 
 	enum HWFeature {
+		// Can HW update Access and Dirty flags, respectively?
 		HW_ACCESS = 0x1,
-		HW_DIRTY = 0x2
+		HW_DIRTY = 0x2,
+
+		// Can we use the CNP bit to indicate that ASIDs are consistent across cores?
+		HW_COMMON_NOT_PRIVATE = 0x4
 	};
 
 	static uint32_t fHwFeature;
