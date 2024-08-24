@@ -18,14 +18,14 @@ extern "C" {
 #endif
 
 
-static inline ssize_t
+static __inline ssize_t
 preadv(int fd, const struct iovec *vecs, int count, off_t pos)
 {
 	return readv_pos(fd, pos, vecs, count);
 }
 
 
-static inline ssize_t
+static __inline ssize_t
 pwritev(int fd, const struct iovec *vecs, int count, off_t pos)
 {
 	return writev_pos(fd, pos, vecs, count);
