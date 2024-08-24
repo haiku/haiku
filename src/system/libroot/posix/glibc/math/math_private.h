@@ -286,8 +286,6 @@ extern int   __kernel_rem_pio2l (long double*,long double*,int,int,
 /* prototypes required to compile the ldbl-96 support without warnings */
 extern int __finitel (long double);
 extern int __ilogbl (long double);
-extern int __isinfl (long double);
-extern int __isnanl (long double);
 extern long double __atanl (long double);
 extern long double __copysignl (long double, long double);
 extern long double __expm1l (long double);

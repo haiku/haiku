@@ -27,13 +27,13 @@
 
 __BEGIN_DECLS
 
-#if __GNUC__ >= 7
-#define __isinfl(value) __builtin_isinfl(value)
+#if __GNUC__ >= 7 || defined(__clang__)
 #define __isnan(value) __builtin_isnan(value)
-#define __isnanf(value) __builtin_isnanf(value)
-#define __isnanl(value) __builtin_isnanl(value)
+#define __isnanf(value) __builtin_isnan(value)
+#define __isnanl(value) __builtin_isnan(value)
 #define __isinf(value) __builtin_isinf(value)
-#define __isinff(value) __builtin_isinff(value)
+#define __isinff(value) __builtin_isinf(value)
+#define __isinfl(value) __builtin_isinf(value)
 #endif
 
 /* We might need to add support for more compilers here.  But since ISO
