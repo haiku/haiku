@@ -19,7 +19,7 @@
 
 #include <errno.h>
 #include <float.h>
-#include <stdio.h>
+#include <stdio_private.h>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>

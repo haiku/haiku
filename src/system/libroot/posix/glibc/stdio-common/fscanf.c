@@ -17,7 +17,7 @@
    02111-1307 USA.  */
 
 #include <stdarg.h>
-#include <stdio.h>
+#include <stdio_private.h>
 
 /* Read formatted input from STREAM according to the format string FORMAT.  */
 /* VARARGS2 */

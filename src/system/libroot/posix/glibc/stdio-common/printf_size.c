@@ -88,10 +88,6 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
     }									      \
   while (0)
 
-/* Prototype for helper functions.  */
-extern int __printf_fp (FILE *fp, const struct printf_info *info,
-			const void *const *args);
-
 
 int
 printf_size (FILE *fp, const struct printf_info *info, const void *const *args)

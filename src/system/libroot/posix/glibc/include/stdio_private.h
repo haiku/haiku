@@ -27,6 +27,13 @@ extern int __vsscanf (__const char *__restrict __s,
 		      _G_va_list __arg)
      __attribute__ ((__format__ (__scanf__, 2, 0)));
 
+extern int __printf_fp (FILE *fp,
+	 const struct printf_info *info,
+	 const void *const *args);
+extern int __printf_fphex (FILE *fp,
+	const struct printf_info *info,
+	const void *const *args);
+
 /* Prototypes for compatibility functions.  */
 extern FILE *__new_tmpfile (void);
 extern FILE *__old_tmpfile (void);

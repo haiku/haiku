@@ -29,7 +29,7 @@
 #include <sys/param.h>
 #include "_itoa.h"
 #include <locale/localeinfo.h>
-#include <stdio.h>
+#include <stdio_private.h>
 
 /* This code is shared between the standard stdio implementation found
    in GNU C library and the libio implementation originally found in
