@@ -365,23 +365,23 @@ struct registers {
 
 	// Preset values
 	volatile uint64_t preset_value[2];
-	volatile uint32_t :32;
+	volatile uint32_t padding1 :32;
 	volatile uint16_t uhs2_preset_value;
-	volatile uint16_t :16;
+	volatile uint16_t padding2 :16;
 
 	// ADMA3
 	volatile uint64_t adma3_id_address;
 
 	// UHS-II
 	volatile uint16_t uhs2_block_size;
-	volatile uint16_t :16;
+	volatile uint16_t padding3 :16;
 	volatile uint32_t uhs2_block_count;
 	volatile uint8_t uhs2_command_packet[20];
 	volatile uint16_t uhs2_transfer_mode;
 	volatile uint16_t uhs2_command;
 	volatile uint8_t uhs2_response[20];
 	volatile uint8_t uhs2_msg_select;
-	volatile uint8_t padding2[3];
+	volatile uint8_t padding4[3];
 	volatile uint32_t uhs2_msg;
 	volatile uint16_t uhs2_device_interrupt_status;
 	volatile uint8_t uhs2_device_select;
@@ -391,7 +391,7 @@ struct registers {
 	volatile uint32_t uhs2_error_interrupt_status;
 	volatile uint32_t uhs2_error_interrupt_status_enable;
 	volatile uint32_t uhs2_error_interrupt_signal_enable;
-	volatile uint8_t padding3[16];
+	volatile uint8_t padding5[16];
 
 	// Pointers
 	volatile uint16_t uhs2_settings_pointer;
@@ -400,7 +400,7 @@ struct registers {
 	volatile uint16_t embedded_control_pointer;
 	volatile uint16_t vendor_specific_pointer;
 	volatile uint16_t reserved_specific_pointer;
-	volatile uint8_t padding4[16];
+	volatile uint8_t padding6[16];
 
 	// Common area
 	volatile uint16_t slot_interrupt_status;
