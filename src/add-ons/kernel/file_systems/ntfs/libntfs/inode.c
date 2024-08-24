@@ -37,6 +37,10 @@
 #include <errno.h>
 #endif
 
+#ifdef __HAIKU__
+#include <KernelExport.h>
+#endif
+
 #include "param.h"
 #include "compat.h"
 #include "types.h"

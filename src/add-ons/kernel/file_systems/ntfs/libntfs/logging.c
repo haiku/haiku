@@ -44,6 +44,10 @@
 #include <syslog.h>
 #endif
 
+#ifdef __HAIKU__
+#include <KernelExport.h>
+#endif
+
 #include "logging.h"
 #include "misc.h"
 
@@ -476,17 +480,17 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 		file = strrchr(file, PATH_SEP) + 1;
 
 	if (ntfs_log.flags & NTFS_LOG_FLAG_PREFIX)	/* Prefix the output */
-		ret += fprintf(stream, "%s", ntfs_log_get_prefix(level));
+		fprintf(stream, "%s", ntfs_log_get_prefix(level));
 
 	if (ntfs_log.flags & NTFS_LOG_FLAG_FILENAME)	/* Source filename */
-		ret += fprintf(stream, "%s ", file);
+		fprintf(stream, "%s ", file);
 
 	if (ntfs_log.flags & NTFS_LOG_FLAG_LINE)	/* Source line number */
-		ret += fprintf(stream, "(%d) ", line);
+		fprintf(stream, "(%d) ", line);
 
 	if ((ntfs_log.flags & NTFS_LOG_FLAG_FUNCTION) || /* Source function */
 	    (level & NTFS_LOG_LEVEL_TRACE) || (level & NTFS_LOG_LEVEL_ENTER))
-		ret += fprintf(stream, "%s(): ", function);
+		fprintf(stream, "%s(): ", function);
 
 #ifndef __HAIKU__
 	ret += vfprintf(stream, format, args);
@@ -496,7 +500,7 @@ int ntfs_log_handler_fprintf(const char *function, const char *file,
 #endif
 
 	if (level & NTFS_LOG_LEVEL_PERROR)
-		ret += fprintf(stream, ": %s\n", strerror(olderr));
+		fprintf(stream, ": %s\n", strerror(olderr));
 
 #ifdef DEBUG
 	if (level == NTFS_LOG_LEVEL_ENTER)

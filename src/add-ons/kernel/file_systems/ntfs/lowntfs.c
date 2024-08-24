@@ -22,9 +22,12 @@
  */
 #include "lowntfs.h"
 
+#include <stdlib.h>
 #include <errno.h>
 
 #include "libntfs/dir.h"
+#include "libntfs/reparse.h"
+#include "libntfs/misc.h"
 
 
 #define DISABLE_PLUGINS
