@@ -6,8 +6,10 @@
 #define _FBSD_COMPAT_SYS_LIBKERN_H_
 
 
+#include <strings.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
+
 
 __BEGIN_DECLS
 
@@ -25,8 +27,6 @@ static __inline int imin(int a, int b) { return (a < b ? a : b); }
 
 extern int abs(int a);
 
-
-#define        ffs(x)  __builtin_ffs(x)
 
 static __inline __pure2 int
 ffsl(long mask)
