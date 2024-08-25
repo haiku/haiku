@@ -138,6 +138,7 @@ SECTIONS
   .jcr            : { KEEP (*(.jcr)) }
   .data.rel.ro : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*) }
   .dynamic        : { *(.dynamic) }
+  .got            : { *(.got.plt) *(.igot.plt) *(.got) *(.igot) }
   . = DATA_SEGMENT_RELRO_END (0, .);
   .data           :
   {
@@ -145,7 +146,6 @@ SECTIONS
     SORT(CONSTRUCTORS)
   }
   .data1          : { *(.data1) }
-  .got            : { *(.got.plt) *(.igot.plt) *(.got) *(.igot) }
   /* We want the small data sections together, so single-instruction offsets
    * can access them all, and initialized data all before uninitialized, so
    * we can shorten the on-disk segment size.  */
