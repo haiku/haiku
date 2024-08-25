@@ -329,15 +329,16 @@ FindWindow::BuildMenuBar()
 	saveAsQueryTemplateMessage->AddBool("saveastemplate", true);
 	saveAsQueryTemplateItem->SetMessage(saveAsQueryTemplateMessage);
 
+	fQueryMenu->AddItem(
+		new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS), new BMessage(kOpenLoadQueryPanel), 'O'));
 	fQueryMenu->AddItem(fSaveQueryOrTemplateItem);
 	fQueryMenu->AddItem(saveAsQueryItem);
 	fQueryMenu->AddItem(saveAsQueryTemplateItem);
-	fQueryMenu->AddItem(new BMenuItem(B_TRANSLATE("Open" B_UTF8_ELLIPSIS),
-		new BMessage(kOpenLoadQueryPanel), 'O'));
 	fQueryMenu->AddSeparatorItem();
 	fQueryMenu->AddItem(fHistoryMenu);
-	fSearchInTrash = new BMenuItem(B_TRANSLATE("Include trash"),
-		new BMessage(kSearchInTrashOptionClicked));
+
+	fSearchInTrash = new BMenuItem(
+		B_TRANSLATE("Include Trash"), new BMessage(kSearchInTrashOptionClicked));
 	fOptionsMenu->AddItem(fSearchInTrash);
 
 	PopulateTemplatesMenu();
@@ -1176,7 +1177,8 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 
 	// add popup for volume list
 	fVolMenu = new BPopUpMenu("", false, false);
-	BMenuField* volumeField = new BMenuField("", B_TRANSLATE("On"), fVolMenu);
+	BMenuField* volumeField = new BMenuField("", B_TRANSLATE_COMMENT("Target:",
+		"The disks/folders that are searched. Similar to TextSearch's 'Set target'."), fVolMenu);
 	volumeField->SetDivider(volumeField->StringWidth(volumeField->Label()) + 8);
 	AddVolumes(fVolMenu);
 	fVolMenu->AddSeparatorItem();
