@@ -29,9 +29,47 @@ static constexpr uint64_t kTLBIMask = ((1UL << 44) - 1);
 uint32_t VMSAv8TranslationMap::fHwFeature;
 uint64_t VMSAv8TranslationMap::fMair;
 
-// Maping of ASIDs to maps, and accompanying lock.
-static VMSAv8TranslationMap* sAsidMapping[256];
+// ASID Management
+static constexpr size_t kAsidBits = 8;
+static constexpr size_t kNumAsids = (1 << kAsidBits);
 static spinlock sAsidLock = B_SPINLOCK_INITIALIZER;
+// A bitmap to track which ASIDs are in use.
+static uint64 sAsidBitMap[kNumAsids / 64] = {};
+// A mapping from ASID to translation map.
+static VMSAv8TranslationMap* sAsidMapping[kNumAsids] = {};
+
+
+static void
+free_asid(size_t asid)
+{
+	for (size_t i = 0; i < B_COUNT_OF(sAsidBitMap); ++i) {
+		if (asid < 64) {
+			sAsidBitMap[i] &= ~(uint64_t{1} << asid);
+			return;
+		}
+		asid -= 64;
+	}
+
+	panic("Could not free ASID!");
+}
+
+
+static size_t
+alloc_first_free_asid(void)
+{
+	int asid = 0;
+	for (size_t i = 0; i < B_COUNT_OF(sAsidBitMap); ++i) {
+		int avail = __builtin_ffsll(~sAsidBitMap[i]);
+		if (avail != 0) {
+			sAsidBitMap[i] |= (uint64_t{1} << (avail-1));
+			asid += (avail - 1);
+			return asid;
+		}
+		asid += 64;
+	}
+
+	return kNumAsids;
+}
 
 
 VMSAv8TranslationMap::VMSAv8TranslationMap(
@@ -42,7 +80,8 @@ VMSAv8TranslationMap::VMSAv8TranslationMap(
 	fPageBits(pageBits),
 	fVaBits(vaBits),
 	fMinBlockLevel(minBlockLevel),
-	fASID(-1)
+	fASID(-1),
+	fRefcount(0)
 {
 	dprintf("VMSAv8TranslationMap\n");
 
@@ -53,6 +92,7 @@ VMSAv8TranslationMap::VMSAv8TranslationMap(
 VMSAv8TranslationMap::~VMSAv8TranslationMap()
 {
 	ASSERT(!fIsKernel);
+	ASSERT(fRefcount == 0);
 	{
 		ThreadCPUPinner pinner(thread_get_current_thread());
 		FreeTable(fPageTable, 0, fInitialLevel, [](int level, uint64_t oldPte) {});
@@ -61,9 +101,67 @@ VMSAv8TranslationMap::~VMSAv8TranslationMap()
 	{
 		InterruptsSpinLocker locker(sAsidLock);
 
-		if (fASID != -1)
+		if (fASID != -1) {
 			sAsidMapping[fASID] = NULL;
+			free_asid(fASID);
+		}
 	}
+}
+
+
+// Switch user map into TTBR0.
+// Passing kernel map here configures empty page table.
+void
+VMSAv8TranslationMap::SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8TranslationMap *to)
+{
+	SpinLocker locker(sAsidLock);
+
+	if (!from->fIsKernel) {
+		from->fRefcount--;
+	}
+
+	if (!to->fIsKernel) {
+		to->fRefcount++;
+	} else {
+		arch_vm_install_empty_table_ttbr0();
+		return;
+	}
+
+	ASSERT(to->fPageTable != 0);
+	uint64_t ttbr = to->fPageTable | ((fHwFeature & HW_COMMON_NOT_PRIVATE) != 0 ? 1 : 0);
+
+	if (to->fASID != -1) {
+		WRITE_SPECIALREG(TTBR0_EL1, ((uint64_t)to->fASID << 48) | ttbr);
+		asm("isb");
+		return;
+	}
+
+	size_t allocatedAsid = alloc_first_free_asid();
+	if (allocatedAsid != kNumAsids) {
+		to->fASID = allocatedAsid;
+		sAsidMapping[allocatedAsid] = to;
+
+		WRITE_SPECIALREG(TTBR0_EL1, (allocatedAsid << 48) | ttbr);
+		asm("isb");
+		return;
+	}
+
+	for (size_t i = 0; i < kNumAsids; ++i) {
+		if (sAsidMapping[i]->fRefcount == 0) {
+			sAsidMapping[i]->fASID = -1;
+			to->fASID = i;
+			sAsidMapping[i] = to;
+
+			WRITE_SPECIALREG(TTBR0_EL1, (i << 48) | ttbr);
+			asm("dsb ishst");
+			asm("tlbi aside1is, %0" :: "r" (i << 48));
+			asm("dsb ish");
+			asm("isb");
+			return;
+		}
+	}
+
+	panic("cannot assign ASID");
 }
 
 

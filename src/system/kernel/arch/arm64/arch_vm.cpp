@@ -12,6 +12,7 @@
 #include <vm/VMAddressSpace.h>
 #include <vm/vm_types.h>
 
+#include "VMSAv8TranslationMap.h"
 
 //#define TRACE_ARCH_VM
 #ifdef TRACE_ARCH_VM
@@ -96,7 +97,10 @@ arch_vm_init_post_modules(kernel_args* args)
 void
 arch_vm_aspace_swap(struct VMAddressSpace* from, struct VMAddressSpace* to)
 {
-	TRACE("arch_vm_aspace_swap\n");
+	VMSAv8TranslationMap* fromMap = (VMSAv8TranslationMap*)from->TranslationMap();
+	VMSAv8TranslationMap* toMap = (VMSAv8TranslationMap*)to->TranslationMap();
+	if (fromMap != toMap)
+		VMSAv8TranslationMap::SwitchUserMap(fromMap, toMap);
 }
 
 

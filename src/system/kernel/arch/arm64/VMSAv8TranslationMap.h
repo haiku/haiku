@@ -74,6 +74,8 @@ public:
 	static uint64_t GetMemoryAttr(uint32 attributes, uint32 memoryType, bool isKernel);
 	static int CalcStartLevel(int vaBits, int pageBits);
 
+	static void SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8TranslationMap *to);
+
 private:
 	bool fIsKernel;
 	phys_addr_t fPageTable;
@@ -86,6 +88,8 @@ private:
 	int fASID;
 
 	enum class VMAction { MAP, SET_ATTR, CLEAR_FLAGS, UNMAP };
+
+	int fRefcount;
 
 	uint64_t tmp_pte; // todo: remove kludge
 
