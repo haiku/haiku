@@ -297,7 +297,8 @@ ModifierKeysWindow::_CreateMenuField(BPopUpMenu** _menu, BMenuField** _menuField
 
 		BMessage* message = new BMessage(kMsgUpdateModifier);
 		message->AddInt32(keyName, key);
-		BMenuItem* item = new BMenuItem(B_TRANSLATE_NOCOLLECT(_KeyToString(key)), message);
+		StatusMenuItem* item
+			= new StatusMenuItem(B_TRANSLATE_NOCOLLECT(_KeyToString(key)), message);
 		menu->AddItem(item, key);
 	}
 
