@@ -244,12 +244,13 @@ VMAreas::Find(const char* name)
 }
 
 
-/*static*/ void
+/*static*/ status_t
 VMAreas::Insert(VMArea* area)
 {
 	WriteLock();
-	sTree.Insert(area);
+	status_t status = sTree.Insert(area);
 	WriteUnlock();
+	return status;
 }
 
 

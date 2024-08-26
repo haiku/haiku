@@ -1219,7 +1219,9 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		cache->Unlock();
 
 	// insert the area in the global areas map
-	VMAreas::Insert(area);
+	status = VMAreas::Insert(area);
+	if (status != B_OK)
+		goto err3;
 
 	// grab a ref to the address space (the area holds this)
 	addressSpace->Get();
@@ -1230,6 +1232,10 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	*_area = area;
 	return B_OK;
 
+err3:
+	cache->Lock();
+	cache->RemoveArea(area);
+	area->cache = NULL;
 err2:
 	if (mapping == REGION_PRIVATE_MAP) {
 		// We created this cache, so we must delete it again. Note, that we
