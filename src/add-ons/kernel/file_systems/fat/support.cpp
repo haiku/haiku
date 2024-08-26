@@ -79,8 +79,6 @@
 
 extern struct iconv_functions* msdosfs_iconv;
 
-const char* LABEL_ILLEGAL = "\"*+,./:;<=>?[\\]|";
-
 struct emptyDir gDirTemplate = {
 	//	{	".          ",				/* the . entry */
 	{
@@ -193,12 +191,58 @@ is_shortname_legal(const u_char* name)
 }
 
 
+/*! Convert a volume label from a null-terminated string to the format stored on disk.
+	@param label A C string of size LABEL_CSTRING.
+	@post The first LABEL_LENGTH characters of label contain an all-caps space-padded label, or
+	an error is returned.
+*/
+status_t
+label_to_fat(char* label)
+{
+	if (label[0] == 0) {
+		// bad name, kiddo
+		INFORM("label_to_fat: empty name\n");
+		return B_BAD_VALUE;
+	}
+
+	if (label[0] == ' ') {
+		INFORM("label_to_fat: vol name starts with space\n");
+		return B_BAD_VALUE;
+	}
+
+	uint32 length = strlen(label);
+	if (length > LABEL_LENGTH)
+		return B_NAME_TOO_LONG;
+
+	for (uint32 i = 0; i < length; i++) {
+		char c = label[i];
+		if (c >= 'a' && c <= 'z')
+			c+= 'A' - 'a';
+		// spaces acceptable in volume names
+		if (strchr(sAcceptable, c) || c == ' ') {
+			label[i] = c;
+		} else {
+			INFORM("label_to_fat: vol name contains illegal char (%c at index %" B_PRIu32
+				")\n", label[i], i);
+			return B_BAD_VALUE;
+		}
+	}
+
+	for (uint32 i = length; i < LABEL_LENGTH; i++)
+		label[i] = ' ';
+
+	PRINT("label_to_fat: converted to [%11.11s].\n", label);
+
+	return B_OK;
+}
+
+
 /*! Convert a volume label from the format stored on disk into a normal string.
 	@param name A character array of length 11 or a C string of size 12.
-	@post Name is null-teriminated after the last non-space character, and converted to lower case.
+	@post Name is null-teriminated after the last non-space character.
 */
 void
-sanitize_label(char* name)
+label_from_fat(char* name)
 {
 	int i;
 	for (i = 10; i > 0; i--) {
@@ -206,11 +250,6 @@ sanitize_label(char* name)
 			break;
 	}
 	name[i + 1] = 0;
-
-	for (; i >= 0; i--) {
-		if (name[i] >= 'A' && name[i] <= 'Z')
-			name[i] += 'a' - 'A';
-	}
 }
 
 
@@ -219,7 +258,8 @@ sanitize_label(char* name)
 	dosfs_identify_partition, volume->pm_dev will not be initialized.
 	@param label The pre-allocated (LABEL_CSTRING bytes) string into which the label is copied.
 	@pre The following members of volume are initialized:  pm_rootdirsize, pm_BlkPerSec,
-	pm_BytesPerSec, pm_bpcluster, pm_rootdirblk, pm_bnshift.
+	pm_BytesPerSec, pm_bpcluster, pm_rootdirblk, pm_bnshift.  For a FAT32 volume,
+	pm_firstcluster must also be initialized.
 	@post If volume is an old DOS 3.3 era FAT volume, which will not have a label, then label is
 	set to an empty string and the function returns B_OK. For other volumes, the root
 	directory label is returned in label, if found; if not, the BPB label is returned.
@@ -234,7 +274,7 @@ read_label(const msdosfsmount* volume, int fd, const uint8* buffer, char* label)
 	uint8 offset = fat32 == true ? 0x47 : 0x2b;
 	if (buffer[check] == EXBOOTSIG && memcmp(buffer + offset, "           ", LABEL_LENGTH) != 0) {
 		memcpy(label, buffer + offset, LABEL_LENGTH);
-		sanitize_label(label);
+		label_from_fat(label);
 	} else {
 		return B_OK;
 	}
@@ -272,7 +312,7 @@ read_label(const msdosfsmount* volume, int fd, const uint8* buffer, char* label)
 		if (direntry->deName[0] != SLOT_DELETED && direntry->deAttributes != ATTR_WIN95
 			&& (direntry->deAttributes & ATTR_VOLUME) != 0) {
 			memcpy(label, direntry->deName, 11);
-			sanitize_label(label);
+			label_from_fat(label);
 			PRINT("found volume label in root directory:  %s at i = %" B_PRIu32 "\n", label, i);
 			if (volume->pm_mountp != NULL)
 				volume->pm_mountp->mnt_volentry = i;

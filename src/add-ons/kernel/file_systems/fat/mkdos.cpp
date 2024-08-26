@@ -46,31 +46,6 @@ create_volume_label_sector(void *sector, const char *label)
 
 
 status_t
-check_volume_name(const char* name)
-{
-	if (name == NULL)
-		return B_BAD_VALUE;
-	if (strlen(name) > LABEL_LENGTH)
-		return B_NAME_TOO_LONG;
-
-	if (name[0] == ' ') {
-		dprintf("vol name starts with space\n");
-		return B_BAD_VALUE;
-	}
-
-	for (uint32 i = 0; i < strlen(name); ++i) {
-		if (strchr(LABEL_ILLEGAL, name[i]) != NULL || name[i] < ' ') {
-			dprintf("vol name (%s) contains illegal char (%c at index %" B_PRIu32 ")\n", name,
-				name[i], i);
-			return B_BAD_VALUE;
-		}
-	}
-
-	return B_OK;
-}
-
-
-status_t
 parse_initialize_parameters(const char* parameterString,
 	initialize_parameters& parameters)
 {
@@ -115,21 +90,20 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 		return B_BAD_VALUE;
 	}
 
-	// check name
-	status_t status = check_volume_name(name);
-	if (status != B_OK)
-		return status;
-
 	// parse parameters
 	initialize_parameters parameters;
-	status = parse_initialize_parameters(parameterString, parameters);
+	status_t status = parse_initialize_parameters(parameterString, parameters);
 	if (status != B_OK)
 		return status;
 
 	update_disk_device_job_progress(job, 0);
 
 	int fatbits = parameters.fatBits;
-	const char *label = name;
+	char label[LABEL_CSTRING];
+	strlcpy(label, name, LABEL_CSTRING);
+	status = label_to_fat(label);
+	if (status != B_OK)
+		return status;
 
 	if (fatbits != 0 && fatbits != 12 && fatbits != 16 && fatbits != 32) {
 		dprintf("dosfs Error: don't know how to create a %d bit fat\n", fatbits);

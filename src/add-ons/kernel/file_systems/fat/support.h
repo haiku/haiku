@@ -94,12 +94,10 @@ extern "C"
 #define LABEL_CSTRING 12
 #define LABEL_LENGTH 11
 
-// legal characters in a volume label
+// legal characters in a short file name
 const char sAcceptable[] = "!#$%&'()-0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`{}~";
-// characters not permitted in a file name
+// characters not permitted in a short file name
 const char sIllegal[] = "\\/:*?\"<>|";
-// characters not permitted in a volume label
-extern const char* LABEL_ILLEGAL;
 
 // C++ struct used to simplify handling of the FreeBSD C struct componentname
 struct ComponentName {
@@ -114,7 +112,8 @@ struct ComponentName {
 
 bool is_filename_legal(const char* name);
 bool is_shortname_legal(const u_char* name);
-void sanitize_label(char* name);
+status_t label_to_fat(char* label);
+void label_from_fat(char* name);
 status_t read_label(const msdosfsmount* volume, int fd, const uint8* buffer, char* label);
 
 //**************************************

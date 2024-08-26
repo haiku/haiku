@@ -386,10 +386,13 @@ dosfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 	dummyVolume.pm_bpcluster
 		= dummyVolume.pm_bpb.bpbSecPerClust * dummyVolume.pm_BlkPerSec * DEV_BSIZE;
 	dummyVolume.pm_bnshift = ffs(DEV_BSIZE) - 1;
-	// for FAT12/16, parse_bpb doesn't initialize pm_rootdirblk
-	if (type != fat32) {
-		dummyVolume.pm_BlkPerSec = dummyVolume.pm_BytesPerSec / DEV_BSIZE;
-		dummyVolume.pm_fatblk = dummyVolume.pm_ResSectors * dummyVolume.pm_BlkPerSec;
+	dummyVolume.pm_fatblk = dummyVolume.pm_ResSectors * dummyVolume.pm_BlkPerSec;
+	if (type == fat32) {
+		// for FAT32, read_label depends on pm_firstcluster
+		dummyVolume.pm_firstcluster
+			= dummyVolume.pm_fatblk + dummyVolume.pm_FATs * dummyVolume.pm_FATsecs;
+	} else {
+		// for FAT12/16, parse_bpb doesn't initialize pm_rootdirblk
 		dummyVolume.pm_rootdirblk
 			= dummyVolume.pm_fatblk + dummyVolume.pm_FATs * dummyVolume.pm_FATsecs;
 	}
@@ -397,7 +400,6 @@ dosfs_identify_partition(int fd, partition_data* partition, void** _cookie)
 	char name[LABEL_CSTRING];
 	strcpy(name, "no name");
 	read_label(&dummyVolume, fd, buf, name);
-	sanitize_label(name);
 
 	IdentifyCookie* cookie = new(std::nothrow) IdentifyCookie;
 	if (!cookie)
@@ -510,7 +512,6 @@ dosfs_read_fs_stat(fs_volume* volume, struct fs_info* info)
 	info->free_nodes = LONGLONG_MAX;
 
 	strlcpy(info->volume_name, fatVolume->pm_dev->si_name, sizeof(info->volume_name));
-	sanitize_label(info->volume_name);
 
 	strlcpy(info->device_name, fatVolume->pm_dev->si_device, sizeof(info->device_name));
 
@@ -537,27 +538,17 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 	if ((bsdVolume->mnt_flag & MNT_RDONLY) != 0)
 		return B_READ_ONLY_DEVICE;
 
-	// convert volume_name into an all-caps space-padded array
-	char name[LABEL_LENGTH];
-	int i, j;
-	memset(name, ' ', LABEL_LENGTH);
 	PRINT("wfsstat: setting name to %s\n", info->volume_name);
-	for (i = j = 0; (i < LABEL_LENGTH) && (info->volume_name[j]); j++) {
-		char c = info->volume_name[j];
-		if ((c >= 'a') && (c <= 'z'))
-			c += 'A' - 'a';
-		// spaces acceptable in volume names
-		if (strchr(sAcceptable, c) || (c == ' '))
-			name[i++] = c;
-	}
-	if (i == 0) // bad name, kiddo
-		return B_BAD_VALUE;
-	PRINT("wfsstat: converted to [%11.11s]\n", name);
+	char name[LABEL_CSTRING];
+	strlcpy(name, info->volume_name, LABEL_CSTRING);
+	status_t status = label_to_fat(name);
+	if (status != B_OK)
+		return status;
 
 	// update the BPB, unless the volume is too old to have a label field in the BPB
 	void* blockCache = bsdVolume->mnt_cache;
 	u_char* buffer;
-	status_t status
+	status
 		= block_cache_get_writable_etc(blockCache, 0, 0, 1, -1, reinterpret_cast<void**>(&buffer));
 	if (status != B_OK)
 		return status;
@@ -569,7 +560,7 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 		// double check the position by verifying the name presently stored there
 		char bpbLabel[LABEL_CSTRING];
 		memcpy(bpbLabel, buffer + labelOffset, LABEL_LENGTH);
-		sanitize_label(bpbLabel);
+		label_from_fat(bpbLabel);
 		if (strncmp(bpbLabel, memoryLabel, LABEL_LENGTH) == 0) {
 			memcpy(buffer + labelOffset, name, LABEL_LENGTH);
 		} else {
@@ -596,7 +587,7 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 
 			char rootLabel[LABEL_CSTRING];
 			memcpy(rootLabel, label_direntry->deName, LABEL_LENGTH);
-			sanitize_label(rootLabel);
+			label_from_fat(rootLabel);
 			if (strncmp(rootLabel, memoryLabel, LABEL_LENGTH) == 0) {
 				memcpy(label_direntry->deName, name, LABEL_LENGTH);
 			} else {
@@ -612,7 +603,7 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 
 	if (status == B_OK) {
 		memcpy(memoryLabel, name, LABEL_LENGTH);
-		sanitize_label(memoryLabel);
+		label_from_fat(memoryLabel);
 	}
 
 	if ((bsdVolume->mnt_flag & MNT_SYNCHRONOUS) != 0)
