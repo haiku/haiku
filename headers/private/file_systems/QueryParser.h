@@ -630,10 +630,9 @@ Equation<QueryPolicy>::ConvertValue(type_code type)
 			fSize = sizeof(double);
 			break;
 		default:
-			QUERY_FATAL("query value conversion to 0x%x requested!\n",
-				(int)type);
-			// should we fail here or just do a safety int32 conversion?
-			return B_ERROR;
+			QUERY_INFORM("query attribute '%s': unsupported value conversion to 0x%x requested!\n",
+				fAttribute, (int)type);
+			return B_BAD_TYPE;
 	}
 
 	fType = type;
