@@ -24,10 +24,9 @@ static constexpr uint64_t kAttrPXN = (1UL << 53);
 static constexpr uint64_t kAttrDBM = (1UL << 51);
 static constexpr uint64_t kAttrNG = (1UL << 11);
 static constexpr uint64_t kAttrAF = (1UL << 10);
-static constexpr uint64_t kAttrSH1 = (1UL << 9);
-static constexpr uint64_t kAttrSH0 = (1UL << 8);
-static constexpr uint64_t kAttrAP2 = (1UL << 7);
-static constexpr uint64_t kAttrAP1 = (1UL << 6);
+static constexpr uint64_t kAttrSHInnerShareable = (3UL << 8);
+static constexpr uint64_t kAttrAPReadOnly = (1UL << 7);
+static constexpr uint64_t kAttrAPUserAccess = (1UL << 6);
 
 static constexpr uint64_t kTLBIMask = ((1UL << 44) - 1);
 
@@ -453,7 +452,7 @@ VMSAv8TranslationMap::ClearAttrFlags(uint64_t attr, uint32 flags)
 		attr &= ~kAttrAF;
 
 	if ((flags & PAGE_MODIFIED) != 0 && (attr & kAttrSWDBM) != 0)
-		attr |= kAttrAP2;
+		attr |= kAttrAPReadOnly;
 
 	return attr;
 }
@@ -464,8 +463,8 @@ VMSAv8TranslationMap::MoveAttrFlags(uint64_t newAttr, uint64_t oldAttr)
 {
 	if ((oldAttr & kAttrAF) != 0)
 		newAttr |= kAttrAF;
-	if (((newAttr & oldAttr) & kAttrSWDBM) != 0 && (oldAttr & kAttrAP2) == 0)
-		newAttr &= ~kAttrAP2;
+	if (((newAttr & oldAttr) & kAttrSWDBM) != 0 && (oldAttr & kAttrAPReadOnly) == 0)
+		newAttr &= ~kAttrAPReadOnly;
 
 	return newAttr;
 }
@@ -484,22 +483,44 @@ VMSAv8TranslationMap::GetMemoryAttr(uint32 attributes, uint32 memoryType, bool i
 	if ((attributes & B_KERNEL_EXECUTE_AREA) == 0)
 		attr |= kAttrPXN;
 
-	if ((attributes & B_READ_AREA) == 0) {
-		attr |= kAttrAP2;
-		if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-			attr |= kAttrSWDBM;
-	} else {
-		attr |= kAttrAP2 | kAttrAP1;
-		if ((attributes & B_WRITE_AREA) != 0)
-			attr |= kAttrSWDBM;
-	}
+	// SWDBM is software reserved bit that we use to mark that
+	// writes are allowed, and fault handler should clear kAttrAPReadOnly.
+	// In that case kAttrAPReadOnly doubles as not-dirty bit.
+	// Additionally dirty state can be stored in SWDIRTY, in order not to lose
+	// dirty state when changing protection from RW to RO.
 
-	if ((fHwFeature & HW_DIRTY) != 0 && (attr & kAttrSWDBM))
+	// All page permissions begin life in RO state.
+	attr |= kAttrAPReadOnly;
+
+	// User-Execute implies User-Read, because it would break PAN otherwise
+	if ((attributes & B_READ_AREA) != 0 || (attributes & B_EXECUTE_AREA) != 0)
+		attr |= kAttrAPUserAccess; // Allow user reads
+
+	if ((attributes & B_WRITE_AREA) != 0 || (attributes & B_KERNEL_WRITE_AREA) != 0)
+		attr |= kAttrSWDBM; // Mark as writeable
+
+	// When supported by hardware copy our SWDBM bit into DBM,
+	// so that kAttrAPReadOnly is cleared on write attempt automatically
+	// without going through fault handler.
+	if ((fHwFeature & HW_DIRTY) != 0 && (attr & kAttrSWDBM) != 0)
 		attr |= kAttrDBM;
 
-	attr |= kAttrSH1 | kAttrSH0;
+	attr |= kAttrSHInnerShareable; // Inner Shareable
 
-	attr |= MairIndex(MAIR_NORMAL_WB) << 2;
+	uint8_t type = MAIR_NORMAL_WB;
+
+	if (memoryType & B_MTR_UC)
+		type = MAIR_DEVICE_nGnRnE; // TODO: This probably should be nGnRE for PCI
+	else if (memoryType & B_MTR_WC)
+		type = MAIR_NORMAL_NC;
+	else if (memoryType & B_MTR_WT)
+		type = MAIR_NORMAL_WT;
+	else if (memoryType & B_MTR_WP)
+		type = MAIR_NORMAL_WT;
+	else if (memoryType & B_MTR_WB)
+		type = MAIR_NORMAL_WB;
+
+	attr |= MairIndex(type) << 2;
 
 	return attr;
 }
@@ -571,7 +592,7 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 
 	pinner.Unlock();
 	locker.Detach();
-	PageUnmapped(area, pa >> fPageBits, (tmp_pte & kAttrAF) != 0, (tmp_pte & kAttrAP2) == 0,
+	PageUnmapped(area, pa >> fPageBits, (tmp_pte & kAttrAF) != 0, (tmp_pte & kAttrAPReadOnly) == 0,
 		updatePageQueue);
 
 	return B_OK;
@@ -645,7 +666,7 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 
 		if ((pte & kAttrAF) != 0)
 			result |= PAGE_ACCESSED;
-		if ((pte & kAttrAP2) == 0)
+		if ((pte & kAttrAPReadOnly) == 0)
 			result |= PAGE_MODIFIED;
 
 		if ((pte & kAttrUXN) == 0)
@@ -655,13 +676,13 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 
 		result |= B_KERNEL_READ_AREA;
 
-		if ((pte & kAttrAP1) != 0)
+		if ((pte & kAttrAPUserAccess) != 0)
 			result |= B_READ_AREA;
 
-		if ((pte & kAttrAP2) == 0 || (pte & kAttrSWDBM) != 0) {
+		if ((pte & kAttrAPReadOnly) == 0 || (pte & kAttrSWDBM) != 0) {
 			result |= B_KERNEL_WRITE_AREA;
 
-			if ((pte & kAttrAP1) != 0)
+			if ((pte & kAttrAPUserAccess) != 0)
 				result |= B_WRITE_AREA;
 		}
 	}
