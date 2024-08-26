@@ -219,7 +219,7 @@ struct VMAreas {
 									{ return sTree.Find(id); }
 	static	VMArea*				Lookup(area_id id);
 	static	area_id				Find(const char* name);
-	static	void				Insert(VMArea* area);
+	static	status_t			Insert(VMArea* area);
 	static	void				Remove(VMArea* area);
 
 	static	VMAreasTree::Iterator GetIterator()
