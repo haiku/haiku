@@ -37,10 +37,17 @@ using namespace BPackageKit::BHPKG;
 using namespace BPackageKit;
 
 
+static bool sTrustFilenames = false;
+
+
 bool operator< (const BPackageInfo & left, const BPackageInfo & right)
 {
+	if (sTrustFilenames)
+		return left.FileName().Compare(right.FileName()) < 0;
+
 	if (left.Name() != right.Name())
 		return left.Name() < right.Name();
+
 	return left.Version().Compare(right.Version()) < 0;
 }
 
@@ -110,6 +117,12 @@ struct PackageInfosCollector : BRepositoryContentHandler {
 				name.IsEmpty() ? "<unknown-package>" : name.String());
 			return B_BAD_DATA;
 		}
+
+		if (sTrustFilenames) {
+			// Cache the canonical name to avoid repeated fallbacks
+			fPackageInfo.SetFileName(fPackageInfo.CanonicalFileName());
+		}
+
 		fPackageInfos[fPackageInfo] = false;
 		return B_OK;
 	}
@@ -218,11 +231,12 @@ command_update(int argc, const char* const* argv)
 			{ "help", no_argument, 0, 'h' },
 			{ "quiet", no_argument, 0, 'q' },
 			{ "verbose", no_argument, 0, 'v' },
+			{ "trust-filenames", no_argument, 0, 't' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+C:hqv", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+C:hqvt", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -241,6 +255,10 @@ command_update(int argc, const char* const* argv)
 
 			case 'v':
 				verbose = true;
+				break;
+
+			case 't':
+				sTrustFilenames = true;
 				break;
 
 			default:
@@ -338,13 +356,19 @@ command_update(int argc, const char* const* argv)
 	// add all given package files
 	for (int i = 0; i < packageNames.CountItems(); ++i) {
 		BPackageInfo packageInfo;
-		if ((result = packageInfo.ReadFromPackageFile(
+
+		if (sTrustFilenames)
+			packageInfo.SetFileName(*packageNames.ItemAt(i));
+		else {
+			if ((result = packageInfo.ReadFromPackageFile(
 					packageNames.ItemAt(i)->String())) != B_OK) {
-			listener.PrintError(
-				"Error: Failed to read package-info from \"%s\": %s\n",
-				packageNames.ItemAt(i)->String(), strerror(result));
-			return 1;
+				listener.PrintError(
+					"Error: Failed to read package-info from \"%s\": %s\n",
+					packageNames.ItemAt(i)->String(), strerror(result));
+				return 1;
+			}
 		}
+
 		PackageInfos::iterator infoIter = packageInfos.find(packageInfo);
 		if (infoIter != packageInfos.end()) {
 			infoIter->second = true;
