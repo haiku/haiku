@@ -13,6 +13,11 @@
 static constexpr uint64_t kPteAddrMask = (((1UL << 36) - 1) << 12);
 static constexpr uint64_t kPteAttrMask = ~(kPteAddrMask | 0x3);
 
+static constexpr uint64_t kPteTypeMask = 0x3;
+static constexpr uint64_t kPteTypeL012Table = 0x3;
+static constexpr uint64_t kPteTypeL012Block = 0x1;
+static constexpr uint64_t kPteTypeL3Page = 0x3;
+
 static constexpr uint64_t kAttrSWDBM = (1UL << 55);
 static constexpr uint64_t kAttrUXN = (1UL << 54);
 static constexpr uint64_t kAttrPXN = (1UL << 53);
@@ -263,9 +268,9 @@ VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level,
 	for (uint64_t i = 0; i < tableSize; i++) {
 		uint64_t oldPte = (uint64_t) atomic_get_and_set64((int64*) &pt[i], 0);
 
-		if (level < 3 && (oldPte & 0x3) == 0x3) {
+		if (level < 3 && (oldPte & kPteTypeMask) == kPteTypeL012Table) {
 			FreeTable(oldPte & kPteAddrMask, nextVa, level + 1, entryRemoved);
-		} else if ((oldPte & 0x1) != 0) {
+		} else if ((oldPte & kPteTypeMask) != 0) {
 			uint64_t fullVa = (fIsKernel ? ~vaMask : 0) | nextVa;
 			asm("dsb ishst");
 			asm("tlbi vaae1is, %0" :: "r" ((fullVa >> 12) & kTLBIMask));
@@ -285,52 +290,53 @@ VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level,
 }
 
 
+// Make a new page sub-table.
+// The parent table is `ptPa`, and the new sub-table's PTE will be at `index`
+// in it.
+// Returns the physical address of the new table, or the address of the existing
+// one if the PTE is already filled.
 phys_addr_t
 VMSAv8TranslationMap::MakeTable(
 	phys_addr_t ptPa, int level, int index, vm_page_reservation* reservation)
 {
-	if (level == 3)
-		return 0;
+	ASSERT(level < 3);
 
-	uint64_t* pte = &TableFromPa(ptPa)[index];
-	vm_page* page = NULL;
+	uint64_t* ptePtr = TableFromPa(ptPa) + index;
+	uint64_t oldPte = atomic_get64((int64*) ptePtr);
 
-retry:
-	uint64_t oldPte = atomic_get64((int64*) pte);
-
-	int type = oldPte & 0x3;
-	if (type == 0x3) {
+	int type = oldPte & kPteTypeMask;
+	if (type == kPteTypeL012Table) {
+		// This is table entry already, just return it
 		return oldPte & kPteAddrMask;
-	} else if (reservation != NULL) {
-		if (page == NULL)
-			page = vm_page_allocate_page(reservation, PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
+	} else if (reservation != nullptr) {
+		// Create new table there
+		vm_page* page = vm_page_allocate_page(reservation, PAGE_STATE_WIRED | VM_PAGE_ALLOC_CLEAR);
 		phys_addr_t newTablePa = page->physical_page_number << fPageBits;
+		DEBUG_PAGE_ACCESS_END(page);
 
-		if (type == 0x1) {
-			// If we're replacing existing block mapping convert it to pagetable
-			int tableBits = fPageBits - 3;
-			int shift = tableBits * (3 - (level + 1)) + fPageBits;
-			uint64_t entrySize = 1UL << shift;
-			uint64_t tableSize = 1UL << tableBits;
+		// We only create mappings at the final level so we don't need to handle
+		// splitting block mappings
+		ASSERT(type != kPteTypeL012Block);
 
-			uint64_t* newTable = TableFromPa(newTablePa);
-			uint64_t addr = oldPte & kPteAddrMask;
-			uint64_t attr = oldPte & kPteAttrMask;
+		// Ensure that writes to page being attached have completed
+		asm("dsb ishst");
 
-			for (uint64_t i = 0; i < tableSize; i++) {
-				newTable[i] = MakeBlock(addr + i * entrySize, level + 1, attr);
-			}
+		uint64_t oldPteRefetch = (uint64_t)atomic_test_and_set64((int64*) ptePtr,
+			newTablePa | kPteTypeL012Table, oldPte);
+		if (oldPteRefetch != oldPte) {
+			// If the old PTE has mutated, it must be because another thread has allocated the
+			// sub-table at the same time as us. If that has happened, deallocate the page we
+			// setup and use the one they installed instead.
+			ASSERT((oldPteRefetch & kPteTypeMask) == kPteTypeL012Table);
+			DEBUG_PAGE_ACCESS_START(page);
+			vm_page_set_state(page, PAGE_STATE_FREE);
+			return oldPteRefetch & kPteAddrMask;
 		}
-
-		asm("dsb ish");
-
-		// FIXME: this is not enough on real hardware with SMP
-		if ((uint64_t) atomic_test_and_set64((int64*) pte, newTablePa | 0x3, oldPte) != oldPte)
-			goto retry;
 
 		return newTablePa;
 	}
 
+	// There's no existing table and we have no reservation
 	return 0;
 }
 
@@ -380,7 +386,7 @@ VMSAv8TranslationMap::MapRange(phys_addr_t ptPa, int level, addr_t va, phys_addr
 
 		if (blockAllowed) {
 			// Everything is aligned, we can make block mapping there
-			uint64_t* pte = &TableFromPa(ptPa)[index];
+			uint64_t* pte = TableFromPa(ptPa) + index;
 
 		retry:
 			uint64_t oldPte = atomic_get64((int64*) pte);
