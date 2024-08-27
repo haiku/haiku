@@ -642,6 +642,20 @@ rule ArchitectureSetupWarnings architecture
 		WARNINGS on $(file) = $(WARNINGS) ;
 	}
 
+	# Enable -Werror for as much of Haiku as possible. Ideally, all of the code would compile
+	# without errors, but that is difficult to achieve due to using multiple compiler versions,
+	# compiling for multiple platforms, and keeping 3rd party code in sync with its upstream
+	# provenance.
+	# This list allows to track where -Werror is enabled. The idea is to enable it as globally
+	# as possible (for example: all of the accelerants), and otherwise list all subdirectories,
+	# commenting out the ones that can't currently be enabled. This allows to easily identify
+	# if a directory has all its subdirectories already compiled with -Werror, and the rule can
+	# be "collapsed" to declare just the parent directory.
+	# Notable places where 3rd party code is used, and fixing problems should be done in
+	# collaboration with upstream:
+	# - The NTFS filesystem driver (upstream: ntfs-3g)
+	# - All network drivers imported from FreeBSD or OpenBSD
+
 	EnableWerror src add-ons accelerants ;
 	EnableWerror src add-ons bluetooth ;
 	EnableWerror src add-ons decorators ;
