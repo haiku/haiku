@@ -723,7 +723,7 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate
 		? B_QUERY_TEMPLATE_MIMETYPE : B_QUERY_MIMETYPE);
 
 	BString predicate;
-	bool dynamicDate;
+	bool dynamicDate = false;
 	GetPredicateString(predicate, dynamicDate);
 	file->WriteAttrString(kAttrQueryString, &predicate);
 
