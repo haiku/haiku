@@ -7,7 +7,7 @@ Package installer	PackageView		Instalador de paquete
 All existing files will be skipped?	PackageView		¿Todos los archivos existentes serán omitidos?
 Replace	PackageView		Reemplazar
 All existing files will be replaced?	PackageView		Serán reemplazados todos los archivos existentes?
-Other…	PackageView		Otro...
+Other…	PackageView		Otro…
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		El enlace simbólico llamado '%s' ya existe en la ruta dada.\n¿Remplazar el enlace con el contenido en este paquete o saltarlo?
 Stop	PackageStatus		Parar
 Install to:	PackageView		Instalar a:

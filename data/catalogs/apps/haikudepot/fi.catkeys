@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3762371345
+1	finnish	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 An unexpected error has been sent from the server [%li]	ServerHelper		Odottamaton virhe lähetetty palvelimesta [%li]
 Create account	UserLoginWindow		Luo tili
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Noudetaan pakkauksen muutoslokia
 Agree	ToLatestUserUsageConditionsWindow		Hyväksy
 Install %PackageTitle%	PackageManager		Asenna %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
@@ -113,6 +114,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Kaikki tietovarastot
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuVarasto - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
 User Created	UserLoginWindow		Käyttäjän luoma
 Check for updates…	MainWindow		Tarkista päivitykset…
@@ -177,6 +179,7 @@ Version %Code%	UserUsageConditions		Versio %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Poistetaan asennus \"%PackageName%\"
 Downloading:	PackageInfoView		Ladataan:
 Quit	MainWindow		Poistu
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Noudetaan pakkauksen muutoslokia
 Success	UserLoginWindow		Valmis
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versio %hd.version%)

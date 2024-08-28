@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	4147836784
+1	belarusian	x-vnd.Haiku-libtracker	2945476766
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -263,7 +263,6 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Copy	ContainerWindow		Капіяваць
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Прабачце, атрыбут 'Сімвал' не можа мясціць многабайтавы знак.
 And	FindPanel		І
-multiple disks	FindPanel		множныя дыскі
 Name = %name	FindPanel	FindResultTitle	Імя = %name
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Памылка пры капіяванні каталога \"%name\":\n\t %error\n\nЖадаеце працягваць?
 You cannot create a link to the root directory.	FSUtils		Вы не можаце стварыць спасылку на карнявы каталог.

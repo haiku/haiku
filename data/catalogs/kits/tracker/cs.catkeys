@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	1211951077
+1	czech	x-vnd.Haiku-libtracker	9591059
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -356,7 +356,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Otevřít rodiče
 And	FindPanel		A
 Palette-indexed picture	AttributesView		Obrázek s indexovanou paletou
-multiple disks	FindPanel		více disků
 Drawing pattern	AttributesView		Výkresový vzor
 File offset	AttributesView		Ofset souboru
 Name = %name	FindPanel	FindResultTitle	Jméno = %name

@@ -1,9 +1,10 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2433106963
+1	turkish	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 An unexpected error has been sent from the server [%li]	ServerHelper		Sunucudan beklenmeyen bir hata alındı [%li]
 Create account	UserLoginWindow		Hesap oluştur
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Paket için değişiklik günlüğü getiriliyor
 Agree	ToLatestUserUsageConditionsWindow		Kabul et
 Install %PackageTitle%	PackageManager		Kur: %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		CAPTCHA yanıtı yanlış.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Sürüm %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		“%PackageName%” kaldırılıyor
 Downloading:	PackageInfoView		İndiriliyor:
 Quit	MainWindow		Çık
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Paket için değişiklik günlüğü getiriliyor
 Success	UserLoginWindow		Başarılı
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (sürüm %hd.version%)

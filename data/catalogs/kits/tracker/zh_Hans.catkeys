@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1980999600
+1	english	x-vnd.Haiku-libtracker	778639582
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -351,7 +351,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		打开父目录
 And	FindPanel		添加
 Palette-indexed picture	AttributesView		模板索引图像
-multiple disks	FindPanel		多轴磁盘
 Drawing pattern	AttributesView		绘制模板
 File offset	AttributesView		文件偏移量
 Name = %name	FindPanel	FindResultTitle	名称 = %name

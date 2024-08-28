@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	1980999600
+1	dutch; flemish	x-vnd.Haiku-libtracker	778639582
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -351,7 +351,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Bovenliggende openen
 And	FindPanel		En
 Palette-indexed picture	AttributesView		Afbeelding met paletindex
-multiple disks	FindPanel		meerdere schijven
 Drawing pattern	AttributesView		Tekenpatroon
 File offset	AttributesView		Startpunt in bestand
 Name = %name	FindPanel	FindResultTitle	Naam = %name

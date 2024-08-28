@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2569925731
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1367565713
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -359,7 +359,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Åpne overliggende
 And	FindPanel		Og
 Palette-indexed picture	AttributesView		Palett-indeksert bilde
-multiple disks	FindPanel		flere disker
 Drawing pattern	AttributesView		Tegnemønster
 File offset	AttributesView		Filforskyvning
 Name = %name	FindPanel	FindResultTitle	Navn = %name

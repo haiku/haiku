@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	724917431
+1	ukrainian	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -371,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Відкрити батьківський каталог
 And	FindPanel		І
 Palette-indexed picture	AttributesView		Малюнок з індексованими кольорами
-multiple disks	FindPanel		кілька дисків
 Drawing pattern	AttributesView		Рисована текстура
 File offset	AttributesView		Відносна адреса файлу
 Name = %name	FindPanel	FindResultTitle	Текст запиту = %name

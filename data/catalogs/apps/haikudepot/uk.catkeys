@@ -1,9 +1,10 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2433106963
+1	ukrainian	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
 An unexpected error has been sent from the server [%li]	ServerHelper		Сервер надіслав неочікувану помилку [%li]
 Create account	UserLoginWindow		Створити обліковий запис
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Отримую журнал змін для пакета
 Agree	ToLatestUserUsageConditionsWindow		Згоден
 Install %PackageTitle%	PackageManager		Інсталяція %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Невірна відповідь на капчу.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Версія %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Деінсталяція \«%PackageName%\»
 Downloading:	PackageInfoView		Завантаження:
 Quit	MainWindow		Вийти
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Отримую журнал змін для пакета
 Success	UserLoginWindow		Успішно
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (версія %hd.version%)

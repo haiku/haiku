@@ -17,7 +17,7 @@ Available languages	Locale Preflet Window		Idiomas disponibles
 Locale	Locale Preflet		Región de procedencia
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		¡No se pueden encontrar los idiomas disponibles! ¡No se puede usar este preflet!
 Formatting	Locale Preflet Window		Formato
-Use month/day-names from preferred language	TimeFormatSettings		Usar nombres de mes/día del lenguaje preferido
+Use month/day-names from preferred language	TimeFormatSettings		Usar nombres de día o mes del idioma preferido
 already chosen	LanguageListView		ya escogido
 Preferred languages	Locale Preflet Window		Idiomas preferidos
 Full format:	TimeFormatSettings		Formato completo:

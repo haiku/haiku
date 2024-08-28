@@ -1,9 +1,10 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2433106963
+1	romanian	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problemă la descărcarea condițiilor de utilizare
 Available packages	MainWindow		Pachete disponibile
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 An unexpected error has been sent from the server [%li]	ServerHelper		O eroare neașteptată a fost trimită de la serverul [%li]
 Create account	UserLoginWindow		Creează un cont
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Se aduce istoricul de modificări pentru pachet
 Agree	ToLatestUserUsageConditionsWindow		De acord
 Install %PackageTitle%	PackageManager		Instalează %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Versiunea %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Se dezinstalează \„%PackageName%\”
 Downloading:	PackageInfoView		Se descarcă:
 Quit	MainWindow		Ieșire
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Se aduce istoricul de modificări pentru pachet
 Success	UserLoginWindow		Succes
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versiunea %hd.version%)

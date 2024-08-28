@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2569925731
+1	russian	x-vnd.Haiku-libtracker	1367565713
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -359,7 +359,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		На папку вверх
 And	FindPanel		и
 Palette-indexed picture	AttributesView		Индексированная картинка
-multiple disks	FindPanel		нескольких дисках
 Drawing pattern	AttributesView		Отрисовка шаблона
 File offset	AttributesView		Смещение файла
 Name = %name	FindPanel	FindResultTitle	Имя = %name

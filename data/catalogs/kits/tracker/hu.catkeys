@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	724917431
+1	hungarian	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -371,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Szülő mappa megnyitása
 And	FindPanel		És
 Palette-indexed picture	AttributesView		Paletta-indexelt kép
-multiple disks	FindPanel		több lemez
 Drawing pattern	AttributesView		Rajz minta
 File offset	AttributesView		Fájl eltolás
 Name = %name	FindPanel	FindResultTitle	Név = %name

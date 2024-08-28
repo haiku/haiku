@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		Bajar parcialmente m
 Password:	ProtocolConfigView		Contraseña:
 Remove mail from server when deleted	ProtocolConfigView		Eliminar del servidor de correo cuando se borren
 Mail server:	ProtocolConfigView		Servidor de correo:
-Select…	MailKit		Seleccionar...
+Select…	MailKit		Seleccionar…
 Connection type:	ProtocolConfigView		Tipo de conexión:
 KB	ProtocolConfigView	kilo byte	KB
 Leave mail on server	ProtocolConfigView		Dejar el correo en el servidor

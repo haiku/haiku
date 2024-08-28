@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	663472720
+1	polish	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Obramowanie kontrolki
 Control mark	Colors tab		Znak sterujący
 Off	AntialiasingSettingsView		Wyłącz
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Tekst zaznaczonego elementu menu
 Size:	Font Selection view		Rozmiar:
 Panel background	Colors tab		Tło panelu
 Plain font:	Font view		Font zwykły:
+Automatically pick secondary colors	Colors tab		Automatycznie wybierz kolory pomocnicze
 Window tab text	Colors tab		Tekst zakładki okna
 Navigation pulse	Colors tab		Puls nawigacji
 LCD subpixel	AntialiasingSettingsView		Podpikselowe LCD

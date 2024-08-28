@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2433106963
+1	japanese	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
 An unexpected error has been sent from the server [%li]	ServerHelper		サーバーから予期しないエラーが送信されました [%li]
 Create account	UserLoginWindow		アカウントの作成
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		パッケージの変更記録の取得中
 Agree	ToLatestUserUsageConditionsWindow		同意
 Install %PackageTitle%	PackageManager		%PackageTitle% をインストール
 The response to the captcha was incorrect.	ServerHelper		キャプチャの回答が間違っていました
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		バージョン %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" をアンインストール中
 Downloading:	PackageInfoView		ダウンロード中:
 Quit	MainWindow		終了
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		パッケージの変更記録の取得中
 Success	UserLoginWindow		成功
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (バージョン %hd.version%)

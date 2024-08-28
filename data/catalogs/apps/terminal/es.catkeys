@@ -12,7 +12,7 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar la 
 Color scheme:	Terminal ThemeView		Esquema de color:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo del proceso activo en la pestaña actual.\n\t\t\tOpcionalmente puede especificarse el número máximo de\n\t\t\tcomponentes de ruta. P.ej. '%2d' para al menos dos componentes.\n\t%T\t-\tEl nombre en Terminal de la aplicación para el local actual.\n\t%e\t-\tLa codificación de la pestaña actual. No mostrado para UTF-8.\n\t%i\t-\tEl índice de la ventana.\n\t%p\t-\tEl nombre del proceso activo en la pestaña actual.\n\t%t\t-\tEl nombre de la pestaña actual.
 Copy	Terminal TermWindow		Copiar
-Edit tab title…	Terminal TermWindow		Cambiar el título de la pestaña
+Edit tab title…	Terminal TermWindow		Cambiar título de pestaña…
 Print	Terminal TermWindow		Imprimir
 Settings	Terminal TermWindow		Ajustes
 %app% settings	Terminal PrefWindow	window title	Configuración de %app%
@@ -25,11 +25,11 @@ Colors…	Terminal TermWindow		Colores…
 Appearance	Terminal PrefWindow		Apariencia
 Set tab title	Terminal TermWindow		Fijar el título de la ventana
 Create link here	Terminal TermView		Crear enlace aquí
-Encoding:	Terminal AppearancePrefView		Personalizado
+Encoding:	Terminal AppearancePrefView		Codificación:
 yellow	Terminal ThemeView		amarillo
 Change directory	Terminal TermView		Cambiar directorio 
 Custom	Terminal AppearancePrefView	Window size	Personalizada
-Page setup…	Terminal TermWindow		Configuración de la página...
+Page setup…	Terminal TermWindow		Configuración de página…
 ANSI yellow color	Terminal ThemeView		Color ANSI amarillo
 Cancel	Terminal TermView		Cancelar
 Defaults	Terminal PrefWindow		Predeterminado
@@ -44,7 +44,7 @@ Window title:	Terminal AppearancePrefView		Titulo de la ventana:
 New tab	Terminal TermWindow		Nueva pestaña
 magenta	Terminal ThemeView		magenta
 Allow bold text	Terminal AppearancePrefView		Permitir texto en negrita
-Window title…	Terminal TermWindow		Título de la ventana...
+Window title…	Terminal TermWindow		Título de ventana…
 ANSI blue color	Terminal ThemeView		Color ANSI azul
 blue	Terminal ThemeView		azul
 Open path	Terminal TermView		Abrir ruta
@@ -67,7 +67,7 @@ Match case	Terminal FindWindow		Coincidir mayúsculas y minúsculas
 Find previous	Terminal TermWindow		Buscar anterior
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patrón especificando los títulos de las ventanas. Los siguientes marcadores de posición\npueden usarse:
 Close	Terminal TermWindow		Cerrar
-Save to file…	Terminal PrefWindow		Guardar a fichero...
+Save to file…	Terminal PrefWindow		Guardar a archivo…
 Defaults	Terminal ThemeWindow		Predeterminados
 Copy path	Terminal TermView		Copiar ruta
 Window size	Terminal TermWindow		Tamaño de la ventana
@@ -88,7 +88,7 @@ ANSI white color	Terminal ThemeView		Color ANSI blanco
 Window size:	Terminal AppearancePrefView		Tamaño de la ventana:
 Switch Terminals	Terminal TermWindow		Intercambiar terminales
 Decrease	Terminal TermWindow		Disminuir
-Settings…	Terminal TermWindow		Ajustes...
+Settings…	Terminal TermWindow		Ajustes…
 Cancel	Terminal SetTitleWindow		Cancelar
 Blinking cursor	Terminal AppearancePrefView		Cursor parpadeante
 Use text:	Terminal FindWindow		Utilizar texto:

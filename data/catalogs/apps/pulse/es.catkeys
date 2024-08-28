@@ -18,7 +18,7 @@ Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Modo minimizado
 Pulse settings	PulseApp		Configuración de Pulse
 Remove replicant	CPUButton		Eliminar duplicador
-You can't disable the last active CPU.	PulseView		No puedes desactivar el último procesador activo
+You can't disable the last active CPU.	PulseView		No se puede desactivar el último procesador activo.
 Width of icon:	ConfigView		Ancho de icono:
 Deskbar mode	MiniPulseView		Modo escritorio
 OK	PulseView		Ok
@@ -27,13 +27,13 @@ OK	PrefsWindow		Aceptar
 Pulse	PulseApp		Pulso
 Removing from Deskbar failed.\n%s	DeskbarPulseView		La eliminación de la Barra de Escritorio falló.\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Sobre pulse....
+About Pulse…	CPUButton		Acerca de Pulse…
 Deskbar mode	PrefsWindow		Modo escritorio
 Mini mode	DeskbarPulseView		Modo reducido
-You can't disable the last active CPU.	CPUButton		No se puede deshabilitar el último procesador activo
+You can't disable the last active CPU.	CPUButton		No se puede deshabilitar el último procesador activo.
 OK	CPUButton		OK
 Deskbar	CPUButton		Barra del escritorio
-Settings…	PulseView		Ajustes...
+Settings…	PulseView		Ajustes…
 Deskbar menu	CPUButton		Menu de escritorio
 Mini mode	NormalPulseView		Modo reducido
 Quit	MiniPulseView		Salir

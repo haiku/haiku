@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ShowImage	1148406263
+1	finnish	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Kuvakatselin
 Page setup…	Menus		Sivuasetus...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Asiakirja ’%s’ (sivu %d) on muuttunut. Haluatko sulkea asiakirjan?
@@ -39,6 +39,7 @@ OK	SaveToFile		Valmis
 Print…	Menus		Tulosta...
 The file '%s' could not be written.	SaveToFile		Tiedoston ’%s’ kirjoittaminen epäonnistui.
 Quit	Menus		Lopeta
+Get info	Menus		Hae tietoja
 Rating	Menus		Arvosana
 Close document	ClosePrompt		Sulje asiakirja
 Stretch to window	Menus		Venytä ikkunaan

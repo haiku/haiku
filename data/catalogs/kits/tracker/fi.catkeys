@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2569925731
+1	finnish	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -7,10 +7,14 @@ Open with…	ContainerWindow		Avaa sovelluksella...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Virhe siirrettäessä kohdetta ”%name” roskakoriin. (%error)
 Or	FindPanel		tai
 MIME Description	AttributesView		MIME-kuvaus
+Query	FindPanel		Kysely
 before	FindPanel		ennen
 New folder%d	FSUtils		Uusi kansio%d
 Volume icons	TrackerSettingsWindow		Taltiokuvakkeet
 Ignore case	SelectionWindow		Ohita kirjainkoko
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Haluatko poistaa tilapäiset kyselyt vai kaikki kyselyt? Tämä toiminto on peruuttamaton!
+Save query:	FindPanel		Tallenna kysely:
+Save as query template:	FindPanel		Tallenna kysely mallinteena:
 Current folder	ContainerWindow		Nykyiset kansiot
 Finish: %time - Over %finishtime left	StatusWindow		Loppuu: %time - Yli %finistime jäljellä
 Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
@@ -51,6 +55,7 @@ Select…	ContainerWindow		Valitse...
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä
 Size	PoseView		Koko
 matches wildcard expression	SelectionWindow		täsmää jokerimerkkilausekkeeseen
+Clear history?	FindPanel		Nollaatko historian?
 Title	Bookmark Query Columns		Otsikko
 Identify	ContainerWindow		Tunnista
 Create link	ContainerWindow		Luo linkki
@@ -78,6 +83,7 @@ Select	InfoWindow		Valitse
 OK	OpenWithWindow		Valmis
 Include trash	FindPanel		Sisällytä roskakori
 Clean up	ContainerWindow		Tyhjennä
+Clear all	FindPanel		Nollaa kaikki
 Modified	FindPanel		Muokattu
  (block size: 	InfoWindow		 (lohkokoko: 
 Select all	QueryContainerWindow		Valitse kaikki
@@ -106,6 +112,7 @@ Remove	FindPanel		Poista
 Company	Person Query Columns		Yritys
 Recent documents	FavoritesMenu		Äskettäiset asiakirjat
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
+Clear temporary queries only	FindPanel		Poista vain tilapäiset kyselyt
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# tavu} other{# tavua}}
 8-bit integer	AttributesView		8-bittinen kokonaisluku
 8-bit unsigned integer	AttributesView		8-bittinen etumerkitön kokonaisluku
@@ -126,10 +133,12 @@ Create relative link	ContainerWindow		Luo suhteellinen linkki
 Owner	FilePermissionsView		Omistaja
 Cancel	FSClipBoard		Peru
 Modified	PoseView		Muokattu
+Save as template…	FindPanel		Tallenna mallinteena…
 Move to Trash	ContainerWindow		Siirrä roskakoriin
 All files and folders	FindPanel		Kaikki tiedostot ja kansiot
 Add-ons	ContainerWindow		Lisäosat
 Too many parenthesis.	libtracker		Liian monia sulkeita.
+Save query template:	FindPanel		Tallenna kyselymallinne:
 Increase size	ContainerWindow		#document
 \nShould this be fixed?	FSUtils		\nPitäisikö tämä korjata?
 URL	Bookmark Query Columns		Verkko-osoite
@@ -207,6 +216,7 @@ Cancel	FSUtils		Peru
 Original name	ContainerWindow		Alkuperäinen nimi
 Unknown	WidgetAttributeText		Tuntematon
 32-bit integer	AttributesView		32-bittinen kokonaisluku
+Save as query…	FindPanel		Tallenna kyselynä…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Määritelty nimi on jo käytössä kansionimenä. Valitse toinen nimi.
 Modified	ContainerWindow		Muokattu
 Mini icon view	ContainerWindow		Minikuvakenäkymä
@@ -282,6 +292,7 @@ Unknown	FilePermissionsView		Tuntematon
 Paste links	ContainerWindow		Liitä linkit
 Restoring: 	StatusWindow		Palautetaan: 
 The Tracker must be running to set the default printer.	PoseView		Oletustulostimen asettamiseksi Seuraajan on oltava käynnissä.
+Cancel	FindPanel		Peru
 calculating…	InfoWindow		lasketaan...
 Preferred for file	OpenWithWindow		Ensisijainen tiedostolle
 OK	AutoMounterSettings		Valmis
@@ -314,6 +325,7 @@ starts with	SelectionWindow		alkaa kohteella
 Any	AttributesView		Mikä tahansa
 New	DeskWindow		Uusi
 Invert	SelectionWindow		Käänteinen
+Open…	FindPanel		Avaa…
 Would you like to find some other suitable application?	FSUtils		Haluaisitko etsiä jonkun toisen sopivan sovelluksen?
 *+? operand may be empty.	libtracker		*+?-operandi on ehkä tyhjä.
 (unknown)	AttributesView		(tuntematon)
@@ -359,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Avoin periytyminen
 And	FindPanel		ja
 Palette-indexed picture	AttributesView		Paletti-indeksoitu kuva
-multiple disks	FindPanel		useita levyjä
 Drawing pattern	AttributesView		Piirrosmalli
 File offset	AttributesView		Tiedostosiirrososoite
 Name = %name	FindPanel	FindResultTitle	Nimi = %name
@@ -367,6 +378,7 @@ Subject	Email Query Columns		Aihe
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa kansiota ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 You cannot create a link to the root directory.	FSUtils		Et voi luoda linkkiä juurihakemistoon.
 Select all	FilePanelPriv		Valitse kaikki
+Clear history	FindPanel		Nollaa historia
 Other	FilePermissionsView		Muu
 Automatic disk mounting	AutoMounterSettings		Automaattinen levyliittäminen
 parent folder	NavMenu		ylemmän tason kansio
@@ -415,6 +427,7 @@ Revert	TrackerSettingsWindow		Palauta
 trash	B_TRASH_DIRECTORY		roskakori
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Jos siirrät järjestelmäkansiota tai sen sisältöä, et ehkä kykene käynnistämään käyttöjärjestelmää %osName!\n\nOletko varma, että haluat tehdä tämän?\n\nJos kuitenkin siirrät järjestelmäkansion tai sen sisällön, pidä Vaihto-näppäin alhaalla ja napsauta ”Siirrä”.
+Open query:	FindPanel		Avaa kysely:
 Close all in workspace	ContainerWindow		Sulje kaikki työtilassa
 Corrupted expression.	libtracker		Vaurioitunut lauseke.
 Network address	AttributesView		Verkko-osoite
@@ -429,6 +442,7 @@ Name	QueryPoseView		Nimi
 Error %error loading add-On %name.	ContainerWindow		Virhe %error ladattaessa lisäosaa %name.
 Does not handle file	OpenWithWindow		Ei käsittele tiedostoa
 E-mail	Person Query Columns		Sähköposti
+Templates	FindPanel		Mallinteet
 Arrange by	ContainerWindow		Järjestä:
 Attributes	AttributesView		Attribuutit
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Useamman kuin yhden kohteen tallentaminen ei ole sallittua.
@@ -497,6 +511,7 @@ Move to Trash	FSUtils		Siirrä roskakoriin
 Cancel	PoseView		Peru
 Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Delete	PoseView		Poista
+Options	FindPanel		Valinnat
 Media parameter	AttributesView		Mediaparametri
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kotikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.
 Sorry, you can't copy items to the Trash.	PoseView		Et voi kopioida kohteita roskakoriin.

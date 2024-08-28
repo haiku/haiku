@@ -26,7 +26,7 @@ OK	AboutWindow		Aceptar
 %s MiB/s	StringForRate	units per second	%s MiB/s
 Special Thanks:	AboutWindow		Agradecimientos especiales:
 %s TiB	StringForSize	size unit	%s TiB
-Default Haiku window decorator.	Default decorator about box		Decorador de ventana predeterminado de Haiku
+Default Haiku window decorator.	Default decorator about box		Decorador de ventana predeterminado de Haiku.
 %s GiB	StringForSize	size unit	%s GiB
 %s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Quitar replicante

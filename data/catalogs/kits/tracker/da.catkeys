@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	429212960
+1	danish	x-vnd.Haiku-libtracker	3521820238
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -354,7 +354,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Åbn forælder
 And	FindPanel		Og
 Palette-indexed picture	AttributesView		Paletteindekseret billede
-multiple disks	FindPanel		flere diske
 Drawing pattern	AttributesView		Tegningsmønster
 File offset	AttributesView		Filforskydning
 Name = %name	FindPanel	FindResultTitle	Navn = %name

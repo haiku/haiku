@@ -1,9 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2433106963
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
 An unexpected error has been sent from the server [%li]	ServerHelper		S'ha enviat un error inesperat des del servidor [%li]
 Create account	UserLoginWindow		Creeu un compte
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		S'obté el registre de canvis per al paquet
 Agree	ToLatestUserUsageConditionsWindow		D'acord
 Install %PackageTitle%	PackageManager		Instal·la %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		La resposta al CAPTCHA ha estat incorrecta.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Versió %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Es desinstal·la \"%PackageName%\"
 Downloading:	PackageInfoView		Es baixa:
 Quit	MainWindow		Surt
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		S'obté el registre de canvis per al paquet
 Success	UserLoginWindow		Correcte
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versió %hd.version%)

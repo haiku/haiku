@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	171477831
+1	swedish	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Flytta post till Papperskorgen
 Close	MediaPlayer-PlaylistWindow		Stäng
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		MediaSpelarens inställningar
 Copyright	MediaPlayer-InfoWin		Upphovsrätt
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ogiltig URL angiven!
 Aspect ratio	MediaPlayer-Main		Bildförhållande
+Eject device	MediaPlayer-Main		Mata ut enheten
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Kunde inte spara spellistan.\n\nFel:
 <no media>	MediaPlayer-InfoWin		<ingen media>
 Hide interface	MediaPlayer-Main		Göm gränssnitt
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Fullskärmsläge
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (låsning misslyckades). Kunde inte spara spellistan.
 100% scale	MediaPlayer-Main		Skala till 100%
+New player	MediaPlayer-Main		Ny spelare
 <nothing to redo>	MediaPlayer-PlaylistWindow		<inget att göra om>
 Bad URL	MediaPlayer-NetworkStream		Felaktig URL
 Save	MediaPlayer-Main		Spara

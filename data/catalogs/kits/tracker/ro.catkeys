@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	724917431
+1	romanian	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -371,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Deschide superior
 And	FindPanel		Și
 Palette-indexed picture	AttributesView		Poză indexată de paletă
-multiple disks	FindPanel		discuri multiple
 Drawing pattern	AttributesView		Model de desen
 File offset	AttributesView		Decalaj de fișier
 Name = %name	FindPanel	FindResultTitle	Nume = %name

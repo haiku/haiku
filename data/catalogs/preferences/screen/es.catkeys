@@ -6,7 +6,7 @@ Rows:	Screen		Filas:
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		No se puede configurar el modo de pantalla:\n\t%s\n
 Serial no.: %s	Screen		Núm. de serie: %s
-/other…	Screen		/otro...
+/other…	Screen		/otro…
 Keep	Screen		Mantener
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		Frecuencia horizontal:\t%lu - %lu kHz\nFrecuencia vertical:\t%lu - %lu Hz\n\nMáximo Reloj de Píxel :\t%g MHz
 Refresh rate:	Screen		Velocidad de actualización:
@@ -17,13 +17,13 @@ Current workspace	Screen		Espacio de trabajo actual
 %ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		verticalmente
 All workspaces	Screen		Todos los espacios de trabajo
-Use laptop panel:	Screen		utiliza panel del portátil
+Use laptop panel:	Screen		Utilizar panel del portátil:
 Unknown	Screen		Desconocido
 Could not write VESA mode settings file:\n\t	Screen		No pudimos escribir archivo de configuración de modo VESA:\n\t
 Display info	Screen		Información de pantalla
 Settings will revert in %seconds.	Screen		La configuración se revertirá en %seconds segundos.
 Cancel	Screen		Cancelar
-Other…	Screen		Otro...
+Other…	Screen		Otro…
 Screen	Screen		Pantalla
 Colors:	Screen		Colores:
 yes	Screen		si
@@ -51,7 +51,7 @@ Resolution:	Screen		Resolución:
 Apply	Screen		Aplicar
 horizontally	Screen		horizontalmente
 disable	Screen		desactivar
-Set background…	Screen		Configurar el fondo
+Set background…	Screen		Establecer fondo de pantalla…
 Type or use the left and right arrow keys.	Screen		Teclee o utilice las teclas de flechas a la derecha y a la izquierda.
 Screen	System name		Pantalla
 Do you wish to keep these settings?	Screen		¿Desea guardar esta configuración?

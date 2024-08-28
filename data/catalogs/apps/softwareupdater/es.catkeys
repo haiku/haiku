@@ -17,7 +17,7 @@ New packages to be installed	SoftwareUpdaterWindow	List super item label	Hay nue
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Paquetes a actualizar
 to	SoftwareUpdaterWindow	List item text	a
 Attempting to cancel the updates…	SoftwareUpdaterWindow		Intentando cancelar las actualizaciones…
-Contacting software repositories to check for package updates.	CheckManager		Conectando con los repositorios de software para comprobar actualización de paquetes
+Contacting software repositories to check for package updates.	CheckManager		Conectando con los repositorios de software para comprobar actualización de paquetes.
 Available updates found	CheckManager		Se encontraron actualizaciones disponibles
 from repository	SoftwareUpdaterWindow	List item text	desde repositorio
 Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Contactando a los repositorios de software para comprobar actualizaciones de paquetes.

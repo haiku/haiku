@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ShowImage	575555985
+1	polish	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		ShowImage
 Page setup…	Menus		Ustawienia strony…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s” (strona %d) został zmieniony. Czy chcesz go zamknąć?
@@ -25,10 +25,12 @@ Flip top to bottom	Menus		Odbij z góry na dół
 Zoom in	Menus		Przybliż
 Last page	Menus		Ostatnia strona
 Cancel	ClosePrompt		Anuluj
+Attributes	Menus		Atrybuty
 High-quality zooming	Menus		Zbliżenie wysokiej jakości
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Dokument „%s” został zmieniony. Czy chcesz go zamknąć?
 Close	Menus		Zamknij
 Selection mode	Menus		Tryb zaznaczania
+Reset rating	Menus		Zresetuj ocenę
 DPI:	PrintOptionsWindow		DPI:
 Fit image to page	PrintOptionsWindow		Dopasuj obraz do strony
 Show tool bar	Menus		Pokaż pasek narzędzi
@@ -37,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		Drukuj…
 The file '%s' could not be written.	SaveToFile		Nie można zapisać pliku „%s”.
 Quit	Menus		Zakończ
+Get info	Menus		Informacje
 Rating	Menus		Ocena
 Close document	ClosePrompt		Zamknij dokument
 Stretch to window	Menus		Rozciągnij do okna
@@ -44,6 +47,7 @@ Job setup	PrintOptionsWindow		Ustawienia zadania
 Clear selection	Menus		Wyczyść zaznaczenie
 Rotate clockwise	Menus		Obróć zgodnie z ruchem wskazówek zegara
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nie można załadować obrazu! Prawdopodobnie niepoprawny plik lub nie istnieje translator.
+Open with…	Menus		Otwórz za pomocą…
 Rotate counterclockwise	Menus		Obróć przeciwnie do ruchu wskazówek zegara
 Previous page	Menus		Poprzednia strona
 Fit to window	Menus		Wpasuj w okno

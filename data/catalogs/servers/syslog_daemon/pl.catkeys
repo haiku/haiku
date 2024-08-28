@@ -1,3 +1,4 @@
-1	polish	x-vnd.Haiku-SystemLogger	239668711
+1	polish	x-vnd.Haiku-SystemLogger	2600925901
 Syslog Daemon	SyslogDaemon		Demon syslog
 OK	SyslogDaemon		OK
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\nTen demon zbiera wszystkie komunikaty systemowe i zapisuje je do systemowego dziennika w „%s”.\n\n

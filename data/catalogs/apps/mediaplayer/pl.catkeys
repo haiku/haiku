@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	100393349
+1	polish	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisu do Kosza
 Close	MediaPlayer-PlaylistWindow		Zamknij
 Volume of background clips	MediaPlayer-SettingsWindow		Głośność klipów działających w tle
@@ -34,6 +34,7 @@ Full volume	MediaPlayer-SettingsWindow		Przy pełnej głośności
 Start media server	MediaPlayer-Main		Uruchom serwer mediów
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Wygląda na to, że serwer mediów nie jest włączony.\nCzy chcesz go uruchomić ?
 Location	MediaPlayer-InfoWin		Położenie
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		Otwieranie „%s”.
 Medium	MediaPlayer-SettingsWindow		Średnie
 Play mode	MediaPlayer-SettingsWindow		Odtwarzanie
@@ -48,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Ustawienia programu MediaPlayer
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Błędny URL!
 Aspect ratio	MediaPlayer-Main		Proporcje
+Eject device	MediaPlayer-Main		Wysuń urządzenie
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Zapisywanie listy odtwarzania nie powiodło się.\n\nBłąd: 
 <no media>	MediaPlayer-InfoWin		<brak medium>
 Hide interface	MediaPlayer-Main		Ukryj interfejs
@@ -72,6 +74,7 @@ Audio	MediaPlayer-Main		Dźwięk
 Quit	MediaPlayer-Main		Zakończ
 Redo	MediaPlayer-PlaylistWindow		Powtórz
 Move Entry	MediaPlayer-MovePLItemsCmd		Przeniesienie wpisu
+Reset rating	MediaPlayer-Main		Zresetuj ocenę
 <unknown>	PlaylistItem-author		<nieznany>
 Cancel	MediaPlayer-SettingsWindow		Anuluj
 Large	MediaPlayer-SettingsWindow		Duże
@@ -123,6 +126,7 @@ Full screen	MediaPlayer-Main		Pełny ekran
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Błąd wewnętrzny (nie udało się zablokować). Zapisywanie listy odtwarzania nie powiodło się.
 100% scale	MediaPlayer-Main		100%
+New player	MediaPlayer-Main		Nowy odtwarzacz
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nie ma czego powtórzyć>
 Bad URL	MediaPlayer-NetworkStream		Błędny URL
 Save	MediaPlayer-Main		Zapisz

@@ -10,7 +10,7 @@ dB	AudioMixer		dB
 Gain controls	AudioMixer		Controles de ganancia
 Low quality (drop/repeat samples)	AudioMixer		Calidad baja (descartar/repetir muestras)
 Output channel sources	AudioMixer		Fuentes de salida del canal
-Allow input channel remapping	AudioMixer		Permitir la entrada del canal de reasignación
+Allow input channel remapping	AudioMixer		Permitir reasignación del canal de entrada
 Display balance control for stereo connections	AudioMixer		Pantalla de control de balance para las conexiones estéreo
 Setup	AudioMixer		Configuración
 Physical input channels	AudioMixer		Canales de ingreso físicos
@@ -19,6 +19,6 @@ Resampling algorithm:	AudioMixer		Algoritmo de remuestreo:
 Mute	AudioMixer		Silencio
 Output mapping	AudioMixer		Asignación de salida
 Virtual output channels	AudioMixer		Canales virtuales de salida
-Allow output channel remapping	AudioMixer		Permitir la salida de canal de reasignación
+Allow output channel remapping	AudioMixer		Permitir reasignación del canal de salida
 Input gain controls represent:	AudioMixer		Los controles de ganancia de la entrada representan:
 Attenuate mixer output by 3 dB	AudioMixer		Atenuar en 3 dB la salida del mezclador

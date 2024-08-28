@@ -44,7 +44,7 @@ Phone	DeviceClass		Teléfono
 Laptop	DeviceClass		Ordenador portátil
 67-83% utilized	DeviceClass		67-83% utilizada
 Cordless	DeviceClass		Sin cable
-Invalid device class!\n	DeviceClass		Clase de dispositivo inválida\n
+Invalid device class!\n	DeviceClass		Clase de dispositivo inválida.\n
 Minor class: 	DeviceClass		Clase menor:
 Doll/Action figure	DeviceClass		Muñeco/Figura de Acción
 Not implemented	RemoteDevice		Sin implementar

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	661644602
+1	indonesian	x-vnd.Haiku-libtracker	1953515963
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -7,9 +7,14 @@ Open with…	ContainerWindow		Buka dengan…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Ada kesalahan saat memindah \"%name\" tempat sampah. (%error)
 Or	FindPanel		Atau
 MIME Description	AttributesView		Deskripsi MIME
+Query	FindPanel		Kueri
 before	FindPanel		sebelum
+New folder%d	FSUtils		Folder baru%d
 Volume icons	TrackerSettingsWindow		Ikon volume
 Ignore case	SelectionWindow		Abaikan huruf kapital/bukan
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Apakah Anda ingin menghapus kueri sementara atau semua kueri? Tindakan ini tidak dapat dibatalkan!
+Save query:	FindPanel		Simpan Kueri:
+Save as query template:	FindPanel		Simpan sebagai templat kueri:
 Current folder	ContainerWindow		Folder saat ini
 Finish: %time - Over %finishtime left	StatusWindow		Selesai: %time - lebih %finishtime tersisa
 Mount all disks now	AutoMounterSettings		Memasang semua disk sekarang
@@ -37,6 +42,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Kesalahan dalam ekspresi 
 Small bitmap icon	AttributesView		Ikon bitmap kecil
 Would you like to find a suitable application to open the file?	FSUtils		Apakah anda ingin menemukan aplikasi yang cocok untuk membuka file?
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Anda tidak dapat mengganti folder atau link symbolis dengan file.
+(unknown)	InfoWindow		(tidak dikenal)
 Trailing \\.	libtracker		Membuntuti \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Di %func \nfind_directory() gagal. \nSebabnya: %error
 Handles any file	OpenWithWindow		Tangani setiap file
@@ -48,6 +54,7 @@ Select…	ContainerWindow		Pilih...
 Show shared volumes on Desktop	SettingsView		Tampilkan volume berbagi pada Desktop
 Size	PoseView		Ukuran
 matches wildcard expression	SelectionWindow		sesuai dengan ungkapan wildcard
+Clear history?	FindPanel		Hapus riwayat?
 Title	Bookmark Query Columns		Judul
 Identify	ContainerWindow		Identitas
 Create link	ContainerWindow		Buat link
@@ -75,9 +82,11 @@ Select	InfoWindow		Memilih
 OK	OpenWithWindow		OKE
 Include trash	FindPanel		Termasuk sampah
 Clean up	ContainerWindow		Pembersihan
+Clear all	FindPanel		Hapus semua
 Modified	FindPanel		Diubah
  (block size: 	InfoWindow		 (ukuran blok: 
 Select all	QueryContainerWindow		Pilih semua
+Generate image thumbnails	SettingsView		Hasilkan citra mini
 Select…	FilePanelPriv		Pilih...
 An item named '%filename%' already exists.	FSUtils		Item dengan nama '%filename%' sudah ada.
 preferences	B_PREFERENCES_DIRECTORY		preferensi
@@ -101,6 +110,7 @@ Remove	FindPanel		Hapus
 Company	Person Query Columns		Perusahaan
 Recent documents	FavoritesMenu		Dokumen terbaru
 Edit templates…	TemplatesMenu		Sunting template…
+Clear temporary queries only	FindPanel		Hapus kueri sementara saja
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} lain{# bytes}}
 8-bit integer	AttributesView		integer 8-bit
 8-bit unsigned integer	AttributesView		integer unsigned 8-bit
@@ -121,10 +131,12 @@ Create relative link	ContainerWindow		Buat link relatif
 Owner	FilePermissionsView		Pemilik
 Cancel	FSClipBoard		Batal
 Modified	PoseView		Diubah
+Save as template…	FindPanel		Simpan sebagai template…
 Move to Trash	ContainerWindow		Buang ke Tong Sampah
 All files and folders	FindPanel		Semua file dan folder
 Add-ons	ContainerWindow		Pengaya
 Too many parenthesis.	libtracker		Terlalu banyak kurung.
+Save query template:	FindPanel		Simpan templat kueri:
 Increase size	ContainerWindow		Naikkan ukuran
 \nShould this be fixed?	FSUtils		\nHaruskah diperbaiki?
 URL	Bookmark Query Columns		URL
@@ -201,6 +213,7 @@ Cancel	FSUtils		Batal
 Original name	ContainerWindow		Nama asli
 Unknown	WidgetAttributeText		Tak dikenal
 32-bit integer	AttributesView		integer 32-bit
+Save as query…	FindPanel		Simpan sebagai kueri…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Nama yang ditentukan sudah digunakan sebagai nama folder. Silakan pilih nama lain.
 Modified	ContainerWindow		Diubah
 Mini icon view	ContainerWindow		Tampilan ikon mini
@@ -255,8 +268,10 @@ home	B_USER_DIRECTORY		rumah
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Tracker Buat Templat Baru
 Disk mounting during boot	AutoMounterSettings		Me-mount disk saat boot
 Don't automount	AutoMounterSettings		Jangan dikaitkan otomatis
+Node ref	AttributesView		Referensi simpul
 Could not find application \"%appname\"	OpenWithWindow		Tidak bisa menemukan aplikasi \"%appname\"
 Unmatched parenthesis.	libtracker		Tanda kurung tidak tertutup.
+New folder %d	FSUtils		Folder baru %d
 Extended attribute	AttributesView		Atribut yang diperluas
 Unmatched brackets.	libtracker		Tanda kurung yang tak sesuai.
 Error %error loading Add-On %name.	ContainerWindow		Galat %error memuat pengaya %name.
@@ -274,6 +289,7 @@ Unknown	FilePermissionsView		Tak diketahui
 Paste links	ContainerWindow		Tempel tautan
 Restoring: 	StatusWindow		Sedang memulihkan: 
 The Tracker must be running to set the default printer.	PoseView		Tracker harus dijalankan untuk mengatur printer default.
+Cancel	FindPanel		Batal
 calculating…	InfoWindow		menghitung…
 Preferred for file	OpenWithWindow		Lebih disukai untuk berkas
 OK	AutoMounterSettings		OKE
@@ -306,6 +322,7 @@ starts with	SelectionWindow		diawali dengan
 Any	AttributesView		Apa saja
 New	DeskWindow		Baru
 Invert	SelectionWindow		Balik
+Open…	FindPanel		Buka…
 Would you like to find some other suitable application?	FSUtils		Apakah anda ingin mencari beberapa aplikasi lain yang cocok?
 *+? operand may be empty.	libtracker		*+? operan mungkin kosong.
 (unknown)	AttributesView		(tidak dikenal)
@@ -350,7 +367,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Buka orangtua
 And	FindPanel		Dan
 Palette-indexed picture	AttributesView		Gambar dengan palet-terindeks
-multiple disks	FindPanel		disk berganda
 Drawing pattern	AttributesView		Pola penggambaran
 File offset	AttributesView		File offset
 Name = %name	FindPanel	FindResultTitle	Nama = %name
@@ -358,6 +374,7 @@ Subject	Email Query Columns		Subyek
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ada kesalahan ketika menyalin folder \"%name\":\n\t%error\n\nAnda ingin melanjutkan?
 You cannot create a link to the root directory.	FSUtils		Anda tidak dapat membuat link ke direktori root.
 Select all	FilePanelPriv		Pilih semua
+Clear history	FindPanel		Hapus sejarah
 Other	FilePermissionsView		Lainnya
 Automatic disk mounting	AutoMounterSettings		Pemasangan diska otomatis
 parent folder	NavMenu		folder induk

@@ -25,7 +25,7 @@ Cancel	Application Type Window		Cancelar
 Attribute	Attribute Window		Atributo
 Multiple launch	Application Type Window		Ejecución múltiple
 {0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed} other{# Application types could be removed}}
-Edit…	Application Types Window		Editar...
+Edit…	Application Types Window		Editar…
 Could not set preferred application	FileTypes Window		No se pudo establecer la aplicación preferida
 Description	FileTypes Window		Descripción
 Signature:	Application Types Window		Firma:
@@ -40,7 +40,7 @@ Don't save	Application Type Window		No guardar
 Center	Attribute Window	Attribute column alignment in Tracker	Centrar
 Done	Extension Window		Hecho
 Development	Application Types Window		Desarrollo
-Same as…	FileType Window	The same APPLICATION as ...	Mismo que...
+Same as…	FileType Window	The same APPLICATION as ...	El mismo que…
 Abort	Application Types Window		Cancelar
 Save	Application Type Window		Guardar
 %1 application type	Application Type Window		Tipo de aplicación %1
@@ -71,7 +71,7 @@ Version:	Application Types Window		Versión:
 Application types	Application Types Window		Tipos de aplicación
 Description:	Application Types Window		Descripción:
 Name:	Application Types Window		Nombre:
-Rating	Attribute ListView		Clasificación
+Rating	Attribute ListView		Calificación
 duration	Attribute ListView		duración
 File could not be opened	Preferred App Menu		No se pudo abrir el archivo
 Args only	Application Type Window		Argumentos solo
@@ -82,7 +82,7 @@ Background app	Application Type Window		Aplicación de fondo
 Recognition rule is not valid:\n\n	FileTypes Window		La regla de reconocimiento no es valida:\n\n
 Show icons in list	FileTypes Window		Mostrar iconos en la lista
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Modificable
-New resource file…	FileTypes Window		Nuevo archivo de recursos...
+New resource file…	FileTypes Window		Nuevo archivo de recursos…
 [Multiple files] file types	FileType Window		Tipos de archivo [múltiples archivos]
 Application type	Application Type Window		Tipo de aplicación
 Show in Tracker…	Application Types Window		Mostrar en el rastreador…
@@ -90,9 +90,9 @@ Type name:	FileTypes Window		Escriba el nombre:
 Visible	Attribute Window		Visible
 Select preferred application	FileTypes Window		Elegir aplicación preferida
 Path:	Application Types Window		Ruta:
-rating	Attribute ListView		clasificación
+rating	Attribute ListView		calificación
 Could not install file type	New File Type Window		No se pudo instalar el tipo de archivo
-Same as…	FileTypes Window		Igual que...
+Same as…	FileTypes Window		Igual que…
 Golden master	Application Type Window		Maestro dorado
 Checkbox	Attribute ListView		Casilla de confirmación
 FileTypes request	Preferred App Menu		Solicitud de Tipos de archivo
@@ -112,17 +112,17 @@ Signature:	Application Type Window		Firma:
 Development	Application Type Window		Desarrollo
 Golden master	Application Types Window		Maestro dorado
 Add	Extension Window		Añadir
-Open…	FileTypes Window		Abrir...
+Open…	FileTypes Window		Abrir…
 checkbox	Attribute ListView		casilla de confirmación
 Could not change file extensions	Extension Window		No se pudo cambiar la extensión del archivo
 Could not open file	FileType Window		No se pudo abrir el archivo
 Choose type	Type List Window		Escoge el tipo
-Select…	FileTypes Window		Selección...
+Select…	FileTypes Window		Selección…
 File recognition	FileTypes Window		Reconocimiento de archivo
-Application types…	FileTypes Window		Tipos de aplicaciones
-Add icon…	Icon View		Añadir ícono...
+Application types…	FileTypes Window		Tipos de aplicaciones…
+Add icon…	Icon View		Añadir ícono…
 Cancel	FileTypes Window		Cancelar
-Save into resource file…	Application Type Window		Guardar en el archivo de recursos...
+Save into resource file…	Application Type Window		Guardar en archivo de recursos…
 Special:	Attribute Window		Especial:
 Type:	Attribute Window		Tipo:
 Could not retrieve application signature	Preferred App Menu		No se ha podido recuperar la firma de aplicación
@@ -164,7 +164,7 @@ Version	Application Types Window		Versión
 Quit	FileTypes Window		Salir
 File type	FileType Window		Tipo de archivo
 Internal name:	FileTypes Window		Nombre interno:
-Add…	FileTypes Window		Agregar...
+Add…	FileTypes Window		Añadir…
 Edit icon…	Icon View		Editar icono…
 Internal name:	Attribute Window		Nombre interno:
 Show recognition rule	FileTypes Window		Mostrar regla de reconocimiento

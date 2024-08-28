@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	2943652182
+1	polish	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Mount all	MainWindow		Zamontuj wszystko
 Disk	MainWindow		Dysk
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formatuj
 Could not unmount partition	MainWindow		Nie można odmontować partycji
 Create	CreateParametersPanel		Utwórz
 File system	PartitionList		System plików
+Unknown (%s)	PartitionList		Nieznany (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Wybrana partycja nie posiada systemu partycjonowania.
 End: %s	Support		Koniec: %s
 Partition type	PartitionList		Typ partycji

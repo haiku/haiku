@@ -4,9 +4,9 @@ At least one partition must be selected!	BootManagerController		Es necesario sel
 No space available!	DrivesPage	Cannot install	¡No hay espacio disponible!
 Boot Manager is unable to read the partition table!	BootManagerController		El gestor de arranque no puede leer la tabla de particiones.
 Immediately	DefaultPartitionPage		Inmediatamente
-Uninstall Boot Manager	UninstallPage	Title	Desinstalar el Gestor de arranque.
+Uninstall Boot Manager	UninstallPage	Title	Desinstalar el Gestor de arranque
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Desconocido
-Installation of boot menu failed	BootManagerController	Title	Falló la instalación del menú de arranque.
+Installation of boot menu failed	BootManagerController	Title	Falló la instalación del menú de arranque
 Backup Master Boot Record	BootManagerController	Title	Respaldar Sector de Arranque Maestro (MBR)
 Cannot access!	DrivesPage	Cannot install	¡No se puede accesar!
 After one second	DefaultPartitionPage		Después de un segundo
@@ -39,7 +39,7 @@ Timeout: %s	DefaultPartitionPage		Tiempo de espera: %s
 The Master Boot Record could not be restored!	BootManagerController		¡No ha sido posible restaurar el sector de arranque maestro (MBR)!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		La tabla de partición del primer disco duro no es compatible con Boot Manager.\nBoot Manager solo funciona con particiones IBM PC MBR.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Seleccione la unidad en la cual se instalará o de la cual se desinstalará el gestor de arranque.
-After four seconds	DefaultPartitionPage		Despues de cuatro segundos.
+After four seconds	DefaultPartitionPage		Despues de cuatro segundos
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Desconocido %d
 First partition starts too early	BootManagerController	Title	La primera partición inicia demasiado antes
 About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Usted está a punto de sobrescribir el sector de arranque maestro ¿Desea continuar?
@@ -49,11 +49,11 @@ Next	WizardView	Button	Siguiente
 Previous	WizardView	Button	Anterior
 Uninstallation of boot menu failed	BootManagerController	Title	Falló la desinstalación del menú de arranque
 Incompatible format!	DrivesPage	Cannot install	¡Formato incompatible!
-Old Master Boot Record saved	BootManagerController	Title	El antiguo sector de arranque maestro (MBR) ha sido guardado.
+Old Master Boot Record saved	BootManagerController	Title	El antiguo sector de arranque maestro (MBR) ha sido guardado
 Please specify a default partition and a timeout.\nThe boot menu will load the default partition after the timeout unless you select another partition. You can also have the boot menu wait indefinitely for you to select a partition.\nKeep the 'ALT' key pressed to disable the timeout at boot time.	DefaultPartitionPage		Seleccione una partición predeterminada y un tiempo de espera. \nEl menú de arranque cargará la partición predeterminada cuando el tiempo de espera haya transcurrido. También es posible hacer que el menú de arranque espere un tiempo indefinido para que una partición sea seleccionada. \nPresione la tecla 'ALT' para deshabilitar el tiempo de espera durante el arranque.
 Partitions	PartitionsPage	Title	Particiones
 Uninstallation of boot menu completed	BootManagerController	Title	Se ha completado la desinstalación del menú de arranque
-After two seconds	DefaultPartitionPage		Después de dos segundos.
+After two seconds	DefaultPartitionPage		Después de dos segundos
 Partition table not compatible	BootManagerController	Title	La tabla de particiones no es compatible
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		El sector de arranque maestro del dispositivo (%DISK) ha sido restaurado exitosamente con el archivo %FILE.
 Done	BootManagerController	Button	Terminar

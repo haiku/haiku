@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2433106963
+1	hungarian	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 An unexpected error has been sent from the server [%li]	ServerHelper		A kiszolgáló váratlan hibaüzenetet küldött [%li]
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		A csomag változásnaplójának beszerzése
 Agree	ToLatestUserUsageConditionsWindow		Egyetértek
 Install %PackageTitle%	PackageManager		%PackageTitle% telepítése
 The response to the captcha was incorrect.	ServerHelper		Hibás válasz a captcha-kódra.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Verzió: %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" eltávolítása
 Downloading:	PackageInfoView		Letöltés:
 Quit	MainWindow		Kilépés
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		A csomag változásnaplójának beszerzése
 Success	UserLoginWindow		Sikeres
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (verzió: %hd.version%)

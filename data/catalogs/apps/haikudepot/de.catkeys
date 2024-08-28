@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-HaikuDepot	2433106963
+1	german	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
 An unexpected error has been sent from the server [%li]	ServerHelper		Der Server hat einen unerwarteten Fehler gesendet [%li]
 Create account	UserLoginWindow		Benutzerkonto erstellen
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Lade Änderungsprotokoll für Paket
 Agree	ToLatestUserUsageConditionsWindow		Zustimmen
 Install %PackageTitle%	PackageManager		%PackageTitle% installieren
 The response to the captcha was incorrect.	ServerHelper		Das Captcha wurde nicht richtig beantwortet.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Version %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" wird deinstalliert
 Downloading:	PackageInfoView		Aktueller Download:
 Quit	MainWindow		Beenden
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Lade Änderungsprotokoll für Paket
 Success	UserLoginWindow		Erfolg
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (Version %hd.version%)

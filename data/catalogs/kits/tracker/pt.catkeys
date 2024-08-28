@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	1980999600
+1	portuguese	x-vnd.Haiku-libtracker	778639582
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -351,7 +351,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Abrir pasta superior
 And	FindPanel		E
 Palette-indexed picture	AttributesView		Imagem de paleta indexada
-multiple disks	FindPanel		múltiplos discos
 Drawing pattern	AttributesView		Padrão de desenho
 File offset	AttributesView		Offset de ficheiro
 Name = %name	FindPanel	FindResultTitle	Nome = %name

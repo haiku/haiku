@@ -2,9 +2,9 @@
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Enviar entrada a la papelera
 Close	MediaPlayer-PlaylistWindow		Cerrar
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
-Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usar capas de hardware de video si es posible.
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Usar sobreposición por hardware de video si está disponible
 Audio	MediaPlayer-InfoWin		Audio
-Subtitle placement:	MediaPlayer-SettingsWindow		Posición del subtítulo
+Subtitle placement:	MediaPlayer-SettingsWindow		Posición del subtítulo:
 MediaPlayer	System name		MediaPlayer
 Audio track	MediaPlayer-Main		Pista de audio
 Muted	MediaPlayer-SettingsWindow		Silencio
@@ -25,9 +25,9 @@ Duration	MediaPlayer-InfoWin		Duración
 Import Entries	MediaPlayer-ImportPLItemsCmd		Importar entradas
 Open network stream	MediaPlayer-Main		Abrir transmisión de red
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera
-Open file…	MediaPlayer-Main		Abrir archivo...
+Open file…	MediaPlayer-Main		Abrir archivo…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Escalar controles en modo de pantalla completa
-View options	MediaPlayer-SettingsWindow		Ver opciones
+View options	MediaPlayer-SettingsWindow		Opciones de visualización
 %d kHz	MediaPlayer-InfoWin		%d kHz
 Full volume	MediaPlayer-SettingsWindow		Máximo volumen
 <untitled>	PlaylistItem-title		<sin título>
@@ -48,14 +48,14 @@ Bottom of screen	MediaPlayer-SettingsWindow		Parte inferior de la pantalla
 MediaPlayer settings	MediaPlayer-SettingsWindow		Configuración del Reproductor de Media
 Copyright	MediaPlayer-InfoWin		Derechos de autor
 Invalid URL inserted!	MediaPlayer-NetworkStream		URL inválida.
-Aspect ratio	MediaPlayer-Main		Relación de aspecto:
+Aspect ratio	MediaPlayer-Main		Relación de aspecto
 Eject device	MediaPlayer-Main		Expulsar dispositivo
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló.\n\nError:
 <no media>	MediaPlayer-InfoWin		<sin medios>
 Hide interface	MediaPlayer-Main		Esconder interfaz
 Error: 	MediaPlayer-Main		Error:
 Video track	MediaPlayer-Main		Pista de vídeo
-Playlist…	MediaPlayer-Main		Lista de reproducción...
+Playlist…	MediaPlayer-Main		Lista de reproducción…
 <unnamed media>	MediaPlayer-InfoWin		<multimedia sin nombrar>
 Save	MediaPlayer-PlaylistWindow		Guardar
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Desordenar las entradas
@@ -66,7 +66,7 @@ Remove Entries	MediaPlayer-RemovePLItemsCmd		Eliminar entradas
 never	MediaPlayer-SettingsWindow		nunca
 Loop audio	MediaPlayer-SettingsWindow		Repetir audio
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (mensaje incorrecto). Guardar la lista de reproducción falló.
-Open…	MediaPlayer-PlaylistWindow		Abrir...
+Open…	MediaPlayer-PlaylistWindow		Abrir…
 Revert	MediaPlayer-SettingsWindow		Revertir
 Low volume	MediaPlayer-SettingsWindow		Volumen bajo
 Audio	MediaPlayer-Main		Audio
@@ -74,7 +74,7 @@ Audio	MediaPlayer-Main		Audio
 Quit	MediaPlayer-Main		Salir
 Redo	MediaPlayer-PlaylistWindow		Rehacer
 Move Entry	MediaPlayer-MovePLItemsCmd		Mover entrada
-Reset rating	MediaPlayer-Main		Restablecer clasificación
+Reset rating	MediaPlayer-Main		Restablecer calificación
 <unknown>	PlaylistItem-author		<desconocido>
 Cancel	MediaPlayer-SettingsWindow		Cancelar
 Large	MediaPlayer-SettingsWindow		Grande
@@ -100,9 +100,9 @@ Stream URL:	MediaPlayer-NetworkStream		URL de streaming:
 Stream settings	MediaPlayer-Main		Configuración de transmisión
 none	Subtitles menu		ninguno
 Save Playlist	MediaPlayer-PlaylistWindow		Guardar lista de reproducción
-Overlay	MediaPlayer-InfoWin		Superposición
+Overlay	MediaPlayer-InfoWin		Sobreposición
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
-Rating	MediaPlayer-Main		Valoración
+Rating	MediaPlayer-Main		Calificación
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (sin memoria ). Guardar lista de reproducción falló.
 Video	MediaPlayer-Main		Video
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		No hay decodificador para manejar el formato del archivo, o el decodificador tiene problemas con esta versión del formato.
@@ -114,11 +114,11 @@ Undo	MediaPlayer-PlaylistWindow		Deshacer
 Display mode	MediaPlayer-InfoWin		Modo de visualización
 Bottom of video	MediaPlayer-SettingsWindow		Parte inferior del vídeo
 Small	MediaPlayer-SettingsWindow		Pequeño
-Settings…	MediaPlayer-Main		Configuración...
+Settings…	MediaPlayer-Main		Configuración…
 min	MediaPlayer-InfoWin	Minutes	min
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Guardar la lista de reproducción falló:\n\nError:
 Video	MediaPlayer-InfoWin		Video
-File info…	MediaPlayer-Main		Información del archivo...
+File info…	MediaPlayer-Main		Información del archivo…
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
 <unnamed>	PlaylistItem-name		<sin nombre>
 Track	Video Track Menu		Pista
@@ -131,7 +131,7 @@ New player	MediaPlayer-Main		Nueva instancia de reproductor
 Bad URL	MediaPlayer-NetworkStream		URL incorrecta
 Save	MediaPlayer-Main		Guardar
 Close window after playing video	MediaPlayer-SettingsWindow		Cerrar ventana después de reproducir video
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escalar las películas suavemente (en modo non-overlay)
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Escalar las películas suavemente (en modo de no sobreposición)
 200% scale	MediaPlayer-Main		Escala al 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		El archivo '%filename' no se pudo abrir.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Ninguno de los archivos que quería reproducir parecen ser archivos multimedia.
@@ -145,7 +145,7 @@ none	MediaPlayer-Main		ninguno
 Open clips	MediaPlayer-Main		Abrir las secuencias
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		No se pudo poner algunos archivos en la papelera.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<nada para deshacer>
-Save as…	MediaPlayer-PlaylistWindow		Guardar como...
+Save as…	MediaPlayer-PlaylistWindow		Guardar como…
 Error: 	MediaPlayer-RemovePLItemsCmd		Error:
 300% scale	MediaPlayer-Main		Escala al 300%
 Open	MediaPlayer-Main		Abrir

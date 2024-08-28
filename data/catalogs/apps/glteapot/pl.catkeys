@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-GLTeapot	400822745
+1	polish	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		Prawe
 Backface culling	TeapotWindow		Usuwanie niewidocznych powierzchni
 Add a teapot	TeapotWindow		Dodaj czajnik
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		Lewe
 Fog	TeapotWindow		Mgła
 FPS display	TeapotWindow		Wyświetl FPS
 GLTeapot	System name		GLTeapot
+Limit FPS to refresh rate	TeapotWindow		Ogranicz FPS do częstotliwości odświeżania
 Settings	TeapotWindow		Ustawienia
 Gouraud shading	TeapotWindow		Cieniowanie Gourauda
 Lighting	TeapotWindow		Oświetlenie

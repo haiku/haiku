@@ -1,9 +1,10 @@
-1	polish	x-vnd.Haiku-HaikuDepot	381023409
+1	polish	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem z pobieraniem warunków korzystania
 Available packages	MainWindow		Dostępne pakiety
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
 An unexpected error has been sent from the server [%li]	ServerHelper		Niespodziewany błąd został wysłany z serwera [%li]
 Create account	UserLoginWindow		Utwórz konto
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Pobieranie dziennika zmian pakietu
 Agree	ToLatestUserUsageConditionsWindow		Zgoda
 Install %PackageTitle%	PackageManager		Zainstaluj %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Odpowiedź na test CAPTCHA była nieprawidłowa.
@@ -30,6 +31,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Odpowiedź
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Wystąpił niespodziewany błąd „%Message%” związany z właściwością „%Property%”
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Żądany obiekt lub obiekt zależny nie został znaleziony na serwerze.
 Logout	ToLatestUserUsageConditionsWindow		Wyloguj
+Password requirements	UserLoginWindow		Wymagania dotyczące hasła
 The following additional package changes have to be made:	PackageResult		Niezbędne dodatkowe zmiany w pakietach:
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Aktualne warunki korzystania zostały zaakceptowane.
@@ -60,7 +62,7 @@ Close	UserLoginWindow		Zamknij
 The email is malformed.	UserLoginWindow		Adres e-mail jest nieprawidłowy.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizacja danych pakietów dla repozytorium „%REPO_NAME%”
 View the usage conditions	UserLoginWindow		Zobacz warunki korzystania
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Wystąpił błąd podczas pobierania warunków korzystania wymaganych to stworzenia nowego użytkownika. Sprawdź szczegóły w dzienniku i spróbuj ponownie.\nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Wystąpił błąd podczas pobierania warunków korzystania wymaganych do stworzenia nowego użytkownika. Sprawdź szczegóły w dzienniku i spróbuj ponownie.\nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
 Usage conditions agreed	ToLatestUserUsageConditionsWindow		Warunki korzystania zaakceptowane
 Size	PackageListView		Rozmiar
 Your rating was updated.	RatePackageWindow		Zaktualizowano twoją ocenę.
@@ -112,6 +114,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Wszystkie repozytoria
 Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 Network error	ServerHelper		Błąd sieci
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
 User Created	UserLoginWindow		Użytkownik utworzony
 Check for updates…	MainWindow		Sprawdź dostępność aktualizacji…
@@ -126,6 +129,8 @@ Starting the package daemon failed:\n\n%Error%	App		Uruchamianie demona pakietó
 No user ratings available.	PackageInfoView		Brak ocen użytkowników.
 <no info>	PackageInfoView		<brak informacji>
 Usage conditions download problem	UserUsageConditions		Problem z pobieraniem warunków korzystania
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Wystąpił błąd podczas pobierania wymagań dotyczących hasła niezbędnych by stworzyć nowego użytkownika. Sprawdź szczegóły w dzienniku i spróbuj ponownie. \nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
+Fetching screenshot	CacheScreenshotProcess		Pobieranie zrzutu ekranu
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Wystąpił błąd transmisji sieciowej podczas komunikacji z serwerem: %s
 Rating	PackageListView		Ocena
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizowanie ikon
@@ -141,6 +146,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Ocena użytkowników
 Installed packages	MainWindow		Zainstalowane pakiety
 Date	PackageListView		Data
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Hasło musi mieć przynajmniej %MinPasswordLength% znaków. %MinPasswordUppercaseChar% znaków musi być pisane wielką literą oraz %MinPasswordDigitsChar% znaków musi być cyframi.
 Error	App		Błąd
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Wystąpił błąd podczas pobierania warunków korzystania. Sprawdź szczegóły w dzienniku i spróbuj ponownie. \nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Odebrano dziwną odpowiedź od usługi sieciowej.
@@ -156,6 +162,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Udostępniaj Ha
 Close	PackageManager		Zamknij
 Changelog	PackageInfoView		Dziennik zmian
 About	PackageInfoView		O pakiecie
+Password requirements download problem	UserLoginWindow		Błąd pobierania wymagań dotyczących hasła
 Password:	UserLoginWindow		Hasło:
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Ta aplikacja jest zbyt stara aby porozumieć się z serwerem. Pobierz nowszą wersję aktualizując system. Minimalna wymagana wersja to „%s”.
 Stability	RatePackageWindow		Stabilność
@@ -166,11 +173,13 @@ Inactive	PackageListView		Nieaktywny
 Nickname:	UserLoginWindow		Pseudonim:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizowanie metadanych dotyczących repozytoriów
 OK	MainWindow		OK
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Użytkownicy muszą być w wieku {0, plural, one{1 roku} few{# lat} many{# lat} other{# roku}} lub starsi.
 Version %Code%	UserUsageConditions		Wersja %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Usuwanie „%PackageName%”
 Downloading:	PackageInfoView		Pobieranie:
 Quit	MainWindow		Zakończ
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Pobieranie dziennika zmian pakietu
 Success	UserLoginWindow		Powodzenie
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (wersja %hd.version%)
@@ -187,6 +196,7 @@ View agreed usage conditions…	MainWindow		Zobacz zaakceptowane warunki korzyst
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Użytkownik [%Nickname%] zalogowany, ale przed kontynuowaniem, musisz zaakceptować najnowsze warunki korzystania.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tego pakietu nie znaleziono na HaikuDepot Server, więc dodanie oceny lub edytowanie istniejącej nie jest możliwe.
 Apply	SettingsWindow		Zastosuj
+View the password requirements	UserLoginWindow		Zobacz wymagania dotyczące hasła
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Użytkownik „%Nickname%” zaakceptował wcześniej warunki korzystania, ale te od tego czasu uległy zmianie. Zaktualizowane warunki muszą zostać zaakceptowane.
 Log out	MainWindow		Wyloguj
 Comment language:	RatePackageWindow		Język komentarza:
@@ -206,6 +216,7 @@ Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Zapisywanie wy�
 Sending anonymous usage data	MainWindow		Wysyłanie anonimowych danych o korzystaniu
 Log in	UserLoginWindow		Zaloguj
 Usage conditions	UserUsageConditions		Warunki korzystania
+Populating package sizes	PopulatePkgSizesProcess		Uzupełnianie rozmiarów pakietów
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Zrzut ekranu
 Email address:	UserLoginWindow		Adres e-mail:

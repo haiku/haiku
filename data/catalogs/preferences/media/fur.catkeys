@@ -2,7 +2,7 @@
 Couldn't add volume control in Deskbar: %s\n	Media views		Impussibil zontâ il control dal volum tal Deskbar: %s\n
 Restart media services	Media views		Torne a inviâ i servizis multimediâi
 Quit	Media Window		Jes
-<none>	VideoInputMenu	Used when no video input is available	<nissun>
+<none>	VideoInputMenu	Used when no video input is available	<nissune>
 Couldn't remove volume control in Deskbar: %s\n	Media views		Impussibil gjavâ il control dal volum dal Deskbar: %s\n
 Video output:	Media views		Jessude video:
 Video input:	Media views		Jentrade video:
@@ -26,4 +26,4 @@ Audio input:	Media views		Jentrade audio:
 Channel:	Media views		Canâl:
 This hardware has no controls.	Media Window		Chest hardware nol à controi.
 Defaults	Media views		Predefinîts
-<none>	VideoOutputMenu	Used when no video output is available	<nissun>
+<none>	VideoOutputMenu	Used when no video output is available	<nissune>

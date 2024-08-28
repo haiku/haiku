@@ -8,12 +8,12 @@ Reply	Mail		Responder
 Next message	Mail		Mensaje siguiente
 Mailing	Mail		Envío de correo
 Unread	Mail		Sin leer
-Same sender	Mail		El mismo emisor
+Same sender	Mail		El mismo remitente
 Copy to new	Mail		Copiar a mensaje nuevo
 Save as draft	Mail		Guardar como borrador
 Encoding:	Mail		Codificación:
 Print	Mail		Imprimir
-Decrease quote level	Mail		Reducir el nivel de cuota
+Decrease quote level	Mail		Reducir nivel de cita
 Encoding	Mail		Codificación
 Default account:	Mail		Cuenta predeterminada:
 Message	Mail		Mensaje
@@ -33,7 +33,7 @@ Only files can be added as attachments.	Mail		Solo se pueden agregar archivos co
 Close	Mail		Cerrar
 Untitled	Mail		Sin título
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La función de remover archivos adjuntos de un correo reenviado todavía no se implementa.\nTodavía no funciona correctamente.
-Same recipient	Mail		El mismo receptor
+Same recipient	Mail		El mismo destinatario
 Previous message	Mail		Mensaje anterior
 (Address unavailable)	Mail		(Dirección indisponible)
 Mail	System name		Correo
@@ -149,10 +149,10 @@ File	Mail		Archivo
 Reply preamble:	Mail		Responder preámbulo:
 New mail message	Mail		Crear mensaje de correo
 An error occurred trying to open this signature.	Mail		Se produjo un error mientras se trataba de abrir la firma.
-Edit signatures…	Mail		Editar firmas...
+Edit signatures…	Mail		Editar firmas…
 User interface	Mail		Interfaz de usuario
 Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
-Remove attachment	Mail		Eliminar adjunto
+Remove attachment	Mail		Quitar archivo adjunto
 Set to…	Mail		Ajustar a…
 Edit	Mail		Editar
 Page setup…	Mail		Configuración de la página…
@@ -165,4 +165,4 @@ Spam	Mail		Correo basura
 Couldn't open this signature. Sorry.	Mail		No se pudo abrir la firma. Disculpe.
 Revert	Mail		Revertir
 Unknown	Mail		Desconocido
-Increase quote level	Mail		Incrementar el nivel de cuota
+Increase quote level	Mail		Aumentar nivel de cita

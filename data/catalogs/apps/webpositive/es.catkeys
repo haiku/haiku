@@ -29,7 +29,7 @@ Start page:	Settings Window		Página de inicio:
 Cancel	Download Window		Cancelar
 Settings	Settings Window		Configuración
 Downloads	WebPositive Window		Descargas
-Browse…	Settings Window		Navegar...
+Browse…	Settings Window		Navegar…
 Resume prior session	Settings Window		Continuar con sesión anterior
 Match case	WebPositive Window		Coincidir mayúsculas y minúsculas
 Proxy password:	Settings Window		Contraseña del proxy:
@@ -138,9 +138,9 @@ OK	WebPositive Window		Aceptar
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Zoom en el texto únicamente
-Save page as…	WebPositive Window		Guardar página como...
+Save page as…	WebPositive Window		Guardar página como…
 Page source error	WebPositive Window		Error del código fuente
-Auto-hide mouse pointer	Settings Window		Ocultar automáticamente el puntero del mouse.
+Auto-hide mouse pointer	Settings Window		Ocultar automáticamente el puntero del mouse
 Requesting %url	WebPositive Window		Solicitando %url
 Flags	Cookie Manager		Opciones
 Window	WebPositive Window		Ventana
@@ -153,7 +153,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Iniciar:
 Confirmation	WebPositive Window		Confirmación
 Session cookie	Cookie Manager		Cookie de sesión
-No SSE2 support	WebPositive		No tiene soporte de SSE2.
+No SSE2 support	WebPositive		No tiene soporte de SSE2
 Open all	WebPositive Window		Abrir todos
 Cut	WebPositive Window		Cortar
 Downloads	Download Window		Descargas

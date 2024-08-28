@@ -19,7 +19,7 @@ Quit	GrepWindow		Salir
 Show files in Tracker	GrepWindow		Mostrar archivos en el rastreador
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecciona los archivos que desea seguir buscado
 Trim to selection	GrepWindow		Recortar selección
-Set target…	GrepWindow		Fijar objetivos
+Set target…	GrepWindow		Fijar objetivo…
 Failed to open input pipe!	Grepper		¡Falló al abrir el conducto de entrada!
 Search	GrepWindow		Buscar
 Copy text to clipboard	GrepWindow		Copiar texto al portapapeles
@@ -35,5 +35,5 @@ TextSearch	System name		Buscar Texto
 File	GrepWindow		Archivo
 Case-sensitive	GrepWindow		Entre mayúsculas y minúsculas 
 Select all	GrepWindow		Seleccionar todo
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME No pudo abrir uno o más archivos
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME no pudo abrir uno o más archivos.
 Settings	GrepWindow		Ajustes

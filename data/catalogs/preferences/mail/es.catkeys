@@ -43,7 +43,7 @@ E-mail	System name		Correo electrónico
 Check every	Config Window		Revisar cada
 Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crear una nueva cuenta con el botón Añadir.\n\nEliminar una cuenta con el botón Borrar en el objeto seleccionado.\n\nSeleccione un objeto en la lista para cambiar sus propiedades.
 Account name:	E-Mail		Nombre de la cuenta:
-Edit mailbox menu…	Config Window		Editar menú del buzón de correo...
+Edit mailbox menu…	Config Window		Editar menú del buzón de correo…
 Server Name:	E-Mail		Nombre del servidor:
 Remove	Config Window		Eliminar
 Login name:	E-Mail		Nombre de usuario:

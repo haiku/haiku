@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2569925731
+1	swedish	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -7,10 +7,14 @@ Open with…	ContainerWindow		Öppna med...
 Error moving \"%name\" to Trash. (%error)	FSUtils		Fel vid flytt av \"%name\" till Papperskorgen. (%error)
 Or	FindPanel		Eller
 MIME Description	AttributesView		MIME-beskrivning
+Query	FindPanel		Fråga
 before	FindPanel		före
 New folder%d	FSUtils		Ny mapp %d
 Volume icons	TrackerSettingsWindow		Volymikoner
 Ignore case	SelectionWindow		Ignorera skiftesläge
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Vill du rensa tillfälliga frågor eller alla frågor? Denna åtgärd är oåterkallelig!
+Save query:	FindPanel		Spara fråga:
+Save as query template:	FindPanel		Spara som frågemall:
 Current folder	ContainerWindow		Nuvarande mapp
 Finish: %time - Over %finishtime left	StatusWindow		Klar: %time - Över %finishtime kvar
 Mount all disks now	AutoMounterSettings		Montera alla diskar nu
@@ -51,6 +55,7 @@ Select…	ContainerWindow		Markera...
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
 Size	PoseView		Storlek
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
+Clear history?	FindPanel		Rensa historik?
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identifiera
 Create link	ContainerWindow		Skapa länk
@@ -78,6 +83,7 @@ Select	InfoWindow		Markera
 OK	OpenWithWindow		OK
 Include trash	FindPanel		Inkludera papperskorg
 Clean up	ContainerWindow		Rada upp
+Clear all	FindPanel		Rensa allt
 Modified	FindPanel		Modifierad
  (block size: 	InfoWindow		 (block storlek:) 
 Select all	QueryContainerWindow		Markera allt
@@ -106,6 +112,7 @@ Remove	FindPanel		Ta bort
 Company	Person Query Columns		Företag
 Recent documents	FavoritesMenu		Senaste dokumenten
 Edit templates…	TemplatesMenu		Redigera mallar...
+Clear temporary queries only	FindPanel		Rensa endast tillfälliga frågor
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bitars integer
 8-bit unsigned integer	AttributesView		8-bitars osignerad integer
@@ -126,10 +133,12 @@ Create relative link	ContainerWindow		Skapa relativ länk
 Owner	FilePermissionsView		Ägare
 Cancel	FSClipBoard		Avbryt
 Modified	PoseView		Modifierad
+Save as template…	FindPanel		Spara som mall…
 Move to Trash	ContainerWindow		Flytta till Papperskorgen
 All files and folders	FindPanel		Alla filer och mappar
 Add-ons	ContainerWindow		Tillägg
 Too many parenthesis.	libtracker		För många parenteser.
+Save query template:	FindPanel		Spara frågemall:
 Increase size	ContainerWindow		Öka storlek
 \nShould this be fixed?	FSUtils		\nSka detta åtgärdas?
 URL	Bookmark Query Columns		URL
@@ -207,6 +216,7 @@ Cancel	FSUtils		Avbryt
 Original name	ContainerWindow		Originalnamn
 Unknown	WidgetAttributeText		Okänd
 32-bit integer	AttributesView		32-bitars integer
+Save as query…	FindPanel		Spara som fråga…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Det valda namnet används redan som namnet på katalogen. Var god välj ett annat namn.
 Modified	ContainerWindow		Ändrad
 Mini icon view	ContainerWindow		Mini ikonvy
@@ -282,6 +292,7 @@ Unknown	FilePermissionsView		Okänd
 Paste links	ContainerWindow		Klistra in länkar
 Restoring: 	StatusWindow		Återställer:
 The Tracker must be running to set the default printer.	PoseView		Tracker måste ha startats för att kunna sätta förvald printer.
+Cancel	FindPanel		Avbryt
 calculating…	InfoWindow		beräknar...
 Preferred for file	OpenWithWindow		Föredras för fil
 OK	AutoMounterSettings		OK
@@ -314,6 +325,7 @@ starts with	SelectionWindow		börjar med
 Any	AttributesView		Vilken som helst
 New	DeskWindow		Ny
 Invert	SelectionWindow		Invertera
+Open…	FindPanel		Öppna…
 Would you like to find some other suitable application?	FSUtils		Vill du söka efter ett annat program?
 *+? operand may be empty.	libtracker		*+? operand kan vara tom.
 (unknown)	AttributesView		(okänd)
@@ -359,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Öppna förälder
 And	FindPanel		Och
 Palette-indexed picture	AttributesView		Palettindexerad bild
-multiple disks	FindPanel		flera diskar
 Drawing pattern	AttributesView		Ritningsmönster
 File offset	AttributesView		Filoffset
 Name = %name	FindPanel	FindResultTitle	Namn = %name
@@ -367,6 +378,7 @@ Subject	Email Query Columns		Ämne
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av katalogen \"%name\":\n\t%error\n\nVill du fortsätta?
 You cannot create a link to the root directory.	FSUtils		Du kan inte skapa en länk till rotkatalogen.
 Select all	FilePanelPriv		Välj allt
+Clear history	FindPanel		Rensa historik
 Other	FilePermissionsView		Annan
 Automatic disk mounting	AutoMounterSettings		Montera volymer automatiskt
 parent folder	NavMenu		föräldrakatalog
@@ -415,6 +427,7 @@ Revert	TrackerSettingsWindow		Återställ
 trash	B_TRASH_DIRECTORY		papperskorg
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Om du flyttar systemmappen kommer du kanske inte kunna starta %osName!\n\nÄr du säker på att du vill göra detta?\n\nFör att flytta systemmappen ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Flytta\".
+Open query:	FindPanel		Öppna fråga:
 Close all in workspace	ContainerWindow		Stäng allt i arbetsytan
 Corrupted expression.	libtracker		Korrupt uttryck.
 Network address	AttributesView		Nätverksadress
@@ -429,6 +442,7 @@ Name	QueryPoseView		Namn
 Error %error loading add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
 Does not handle file	OpenWithWindow		Hanterar inte fil
 E-mail	Person Query Columns		E-mail
+Templates	FindPanel		Mallar
 Arrange by	ContainerWindow		Sortera efter
 Attributes	AttributesView		Attribut
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Ledsen, att spara mer än ett objekt är inte tillåtet.
@@ -497,6 +511,7 @@ Move to Trash	FSUtils		Flytta till Papperskorgen
 Cancel	PoseView		Avbryt
 Handles %type	OpenWithWindow		Hanterar %type
 Delete	PoseView		Ta bort
+Options	FindPanel		Alternativ
 Media parameter	AttributesView		Mediaparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Om du gör ändringar i hemmappen kommer kanske inte %osName fungera som det ska!\n\nÄr du säker på att du vill göra detta?\n\nFör att göra ändringar ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Jag vet vad jag håller på med\".
 Sorry, you can't copy items to the Trash.	PoseView		Du kan inte kopiera filer till Papperskorgen.

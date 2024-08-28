@@ -1,7 +1,8 @@
-1	polish	x-vnd.Haiku-MediaConverter	568323940
+1	polish	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Plik wejściowy nierozpoznany jako audio lub wideo
 Source files	MediaConverter		Pliki źródłowe
 Error writing video frame %lld	MediaConverter		Błąd zapisu ramki wideo %lld
+Audio quality: %s	MediaConverter		Jakość audio: %s
 Error converting '%filename'	MediaConverter		Błąd konwersji „%filename”
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Wybrany katalog nie znaleziony. Używanie domyślnego /boot/home
 Conversion completed	MediaConverter		Konwersja ukończona
@@ -10,6 +11,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Błąd podczas tworzenia wideo.
 Cancelling	MediaConverter		Anulowanie
 None available	Audio codecs		Brak
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Plik ma wiele ścieżek audio lub wideo, tylko pierwsza każdego typu zostanie skonwertowana.
 No file selected	MediaConverter-FileInfo		Nie wybrano pliku
 High	MediaConverter		Wysoka
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Plik nie został rozpoznany jako obsługiwany plik mediów:} few{# pliki nie zostały rozpoznane jako obsługiwane pliki mediów:} many{# plików nie zostało rozpoznanych jako obsługiwane pliki mediów:} other{# pliku nie zostało rozpoznane jako obsługiwany plik mediów:}}
@@ -24,6 +26,7 @@ Error loading a file	MediaConverter		Błąd ładowania pliku
 Encoder parameters	MediaConverter-EncoderWindow		Parametry kodeka
 Open…	Menu		Otwórz…
 Audio encoding:	MediaConverter		Kodowanie dźwięku:
+Multi-track file detected	MediaConverter		Wykryto plik z wieloma ścieżkami
 Cancelling…	MediaConverter		Anulowanie…
 Output file '%filename' created	MediaConverter		Utworzono plik wynikowy „%filename”
 Output folder	MediaConverter		Katalog wynikowy
@@ -36,6 +39,7 @@ Conversion cancelled	MediaConverter		Konwersja anulowana
 Low	MediaConverter		Niska
 Error loading files	MediaConverter		Błąd wczytywania plików
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} many{# bitów} other{# bitu}}
+Video quality: %s	MediaConverter		Jakość wideo: %s
 End   [ms]: 	MediaConverter		Koniec   [ms]: 
 Cancel	MediaConverter		Anuluj
 OK	MediaConverter-FileInfo		OK
@@ -49,8 +53,10 @@ Drop media files onto this window	MediaConverter		Upuść pliki multimedialne do
 Error read audio frame %lld	MediaConverter		Błąd odczytu ramki audio %lld
 Quit	Menu		Zakończ
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} few{# bajty} many{# bajtów} other{# bajtu}}
+Writing audio track: %s complete	MediaConverter		Zapisywanie ścieżki audio: %s ukończone
 Duration:	MediaConverter-FileInfo		Długość:
 MediaConverter	System name		MediaConverter
+Writing video track: %s complete	MediaConverter		Zapisywanie ścieżki wideo: %s ukończone
 Error launching: %strError%	MediaConverter		Błąd uruchamiania: %strError%
 Error writing audio frame %lld	MediaConverter		Błąd zapisu ramki audio %lld
 File format:	MediaConverter		Format pliku:
@@ -58,6 +64,8 @@ File	Menu		Plik
 Video quality not supported	MediaConverter		Jakość wideo nieobsługiwana
 Select this folder	MediaConverter		Wybierz ten katalog
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld-kanałowy
+Understood	MediaConverter		Zrozumiano
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Brak wideo
 Continue	MediaConverter		Kontynuuj

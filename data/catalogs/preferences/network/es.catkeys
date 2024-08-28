@@ -11,7 +11,7 @@ Other	NetworkWindow		Otro
 Sent:	IntefaceView		Enviado:
 Gateway:	IntefaceAddressView		Puerta de enlace:
 The netmask defines your local network	IntefaceAddressView		La máscara de red define su red local
-Your IP address	IntefaceAddressView		Su dirección IP:
+Your IP address	IntefaceAddressView		Su dirección IP
 DHCP	IntefaceAddressView		DHCP
 IP address:	IntefaceAddressView		Dirección IP:
 Netmask:	IntefaceAddressView		Máscara de red:
