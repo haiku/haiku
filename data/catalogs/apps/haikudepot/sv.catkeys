@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2433106963
+1	swedish	x-vnd.Haiku-HaikuDepot	355131830
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 An unexpected error has been sent from the server [%li]	ServerHelper		Ett oväntat fel har skickats från servern [%li]
 Create account	UserLoginWindow		Skapa konto
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Hämtar ändringslogg för paket
 Agree	ToLatestUserUsageConditionsWindow		Håller med
 Install %PackageTitle%	PackageManager		Installera %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchan var inkorrekt.
@@ -178,6 +179,7 @@ Version %Code%	UserUsageConditions		Version %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Avinstallerar \"%PackageName%\"
 Downloading:	PackageInfoView		Mestadels stabil
 Quit	MainWindow		Avsluta
+Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Hämtar ändringslogg för paket
 Success	UserLoginWindow		Klar
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)

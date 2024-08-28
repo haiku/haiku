@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	724917431
+1	catalan; valencian	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -371,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Obre la carpeta superior
 And	FindPanel		I
 Palette-indexed picture	AttributesView		Una imatge indexada per paleta
-multiple disks	FindPanel		discs múltiples
 Drawing pattern	AttributesView		Patró de dibuix
 File offset	AttributesView		Compensació de fitxer
 Name = %name	FindPanel	FindResultTitle	Nom = %name

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	1211951077
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	9591059
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -356,7 +356,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Άνοιγμα γονικού φακέλου
 And	FindPanel		Και
 Palette-indexed picture	AttributesView		Εικόνα με ίνδικα παλέττας
-multiple disks	FindPanel		πολλαπλοί δίσκοι
 Drawing pattern	AttributesView		Μοτίβο σχεδιασμού
 File offset	AttributesView		Στοίχιση αρχείου
 Name = %name	FindPanel	FindResultTitle	Όνομα = %name

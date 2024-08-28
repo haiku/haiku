@@ -1,5 +1,9 @@
-1	indonesian	x-vnd.Haiku-WonderBrushTranslator	2764474812
+1	indonesian	x-vnd.Haiku-WonderBrushTranslator	1289038178
+WonderBrush image translator	WonderBrushTranslator		Penerjemah citra WonderBrush
 WBI Settings	WonderBrushMain		Setting WBI
 Version %d.%d.%d, %s	WonderBrushView		Versi %d.%d.%d, %s
 written by:	WonderBrushView		ditulis oleh:
+WonderBrush images	WonderBrushTranslator		Citra-citra WonderBrush
 WonderBrush image translator	WonderBrushView		Translator gambar WonderBrush
+WonderBrush image	WonderBrushTranslator		Citra WonderBrush
+WBI Settings	WonderBrushTranslator		Pengaturan WBI

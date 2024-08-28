@@ -1,6 +1,6 @@
 1	spanish; castilian	x-vnd.Haiku-Input	130668644
 Scrolling	TouchpadPrefView		Desplazamiento
-Defaults	InputMouse		Por defecto
+Defaults	InputMouse		Valores predeterminados
 Long	KeyboardView		Largo
 Cancel	TouchpadPrefView		Cancelar
 4-Button	SettingsView		4 botones
@@ -18,7 +18,7 @@ Never	TouchpadPrefView		Nunca
 Fast	TouchpadPrefView		Rápido
 6-Button	SettingsView		6 botones
 Please confirm	TouchpadPrefView		Por favor confirme
-Click to focus	SettingsView		Clic para selección
+Click to focus	SettingsView		Clic para enfocar
 Acceleration	TouchpadPrefView		Aceleración
 Mouse speed	SettingsView		Velocidad del ratón
 Accept first click	SettingsView		Aceptar primer clic
@@ -40,7 +40,7 @@ Slow	KeyboardView		Lento
 Revert	InputMouse		Revertir
 Key repeat rate	KeyboardView		Tasa de repetición de tecla
 2-Button	SettingsView		2 botones
-Click to focus and raise	SettingsView		Haz clic para enfocar y subir
+Click to focus and raise	SettingsView		Clic para enfocar y subir
 Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Horizontal
 Focus follows mouse	SettingsView		El foco sigue al ratón

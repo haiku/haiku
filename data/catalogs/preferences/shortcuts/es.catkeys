@@ -21,7 +21,7 @@ Cancel	ShortcutsWindow		Cancelar
 *MoveMouse +20 +0	ShortcutsWindow		*MovimientodelRatón +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		Izquierda
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Atajos no puedo analizar el archivo del conjunto de claves
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Atajos no puedo analizar el archivo del conjunto de claves.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Atajos no pudo guardar tu archivo KeySet
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"Tu texto aquí\"
 Remove selected shortcut	ShortcutsWindow		Eliminar el atajo seleccionado
@@ -32,8 +32,8 @@ Save & apply	ShortcutsWindow		Guardar y aplicar
 Open	ShortcutsWindow		Abrir
 Append	ShortcutsWindow		Añadir
 Both	ShortcutsSpec		Ambos
-Save KeySet as…	ShortcutsWindow		Guardar el conjunto de claves como....
-Append KeySet…	ShortcutsWindow		Anexar conjunto de claves ...
+Save KeySet as…	ShortcutsWindow		Guardar el conjunto de claves como…
+Append KeySet…	ShortcutsWindow		Anexar conjunto de claves…
 *MouseButton 1	ShortcutsWindow		*Botóndelratón 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 Right	ShortcutsSpec		Derecha

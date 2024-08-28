@@ -4,7 +4,7 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No se puede revertir,
 Cut	Menus		Cortar
 Center	Menus		Centro
 Increase size	Menus		Aumentar tamaño
-Page setup…	Menus		Configuarción de pagina...
+Page setup…	Menus		Configuración de pagina…
 Wrap-around search	FindandReplaceWindow		Buscar desde el principio
 Untitled 	StyledEditWindow		Sin nombre
 OK	Statistics		OK
@@ -19,7 +19,7 @@ Cancel	QuitAlert		Cancelar
 Copy	Menus		Copiar
 Reload	NodeMonitorAlerts		Recargar
 line %d, column %d	StatusView		Línea %d, columna %d
-Words:	Statistics		Palabras...
+Words:	Statistics		Palabras:
 ???	LoadAlert		¿¿¿???
 Recover	NodeMonitorAlerts		Recuperar
 Error saving \"%s\":\n%s	SaveAlert		Error guardando \"%s\":\n%s
@@ -27,20 +27,20 @@ OK	RevertToSavedAlert		Aceptar
 Unlock file	StatusView		Desbloquear archivo
 Italic	Menus		Itálica
 Can't undo	Menus		No se puede deshacer
-Replace…	Menus		Reemplazar...
+Replace…	Menus		Reemplazar…
 File	Menus		Archivo
 Paste	Menus		Pegar
 Bold	Menus		Negrita
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		El archivo \"%file%\" se modificó por otra aplicación, ¿recargarlo?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		El archivo \"%file%\" se removió por otra aplicación, ¿recuperarlo?
-Lines:	Statistics		Pauta
+Lines:	Statistics		Líneas:
 Replace in all windows	FindandReplaceWindow		Reemplazar en todas las ventanas
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" tiene cambios sin guardar.\n¿Revertir a la última versión guardada? 
 Save	SaveAlert		Guardar
 Default	Open_and_SaveAsPanel		Predeterminado
 Cancel	RevertToSavedAlert		Cancelar
 Cancel	FindandReplaceWindow		Cancelar
-Statistics…	Menus		Estadísticas...
+Statistics…	Menus		Estadísticas…
 Encoding	Open_and_SaveAsPanel		Codificación
 Replace all	FindandReplaceWindow		Reemplazar todo
 Close	Menus		Cerrar
@@ -57,7 +57,7 @@ Undo typing	QuitAlert		Deshacer lo escrito
 Error loading \"%s\":\n\t%s	LoadAlert		Error cargando \"%s\":\n\t%s
 Don't save	SaveAlert		No guardar
 Reload…	Menus		Recargar…
-Print…	Menus		Imprimir...
+Print…	Menus		Imprimir…
 Quit	Menus		Quitar
 Redo typing	QuitAlert		rehacer lo escrito
 Ignore	NodeMonitorAlerts		Ignorar
@@ -80,7 +80,7 @@ OK	QuitAlert		Aceptar
 Edit	Menus		Editar
 Replace with:	FindandReplaceWindow		Reemplazar con:
 Open…	Menus		Abrir…
-Save as…	Menus		Guardar como...
+Save as…	Menus		Guardar como…
 Replace	FindandReplaceWindow		Reemplazar
 Characters:	Statistics		Carácteres:
 Don't save	QuitAlert		No guardar

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-NewMailNotification	2220310168
+1	polish	x-vnd.Haiku-NewMailNotification	2396784785
 Log window	NotifierConfigView		Okno dziennika
 none	NotifierConfigView		brak
 Alert	NotifierConfigView		Powiadomienie
@@ -7,6 +7,7 @@ Central alert	NotifierConfigView		Centralne powiadomienie
 Beep	NotifierConfigView		Sygnał dźwiękowy
 Central beep	NotifierConfigView		Centralny sygnał dźwiękowy
 {0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Jedna nowa wiadomość} few{# nowe wiadomości} many{# nowych wiadomości} other{# nowej wiadomości}}
+New mail notification	NotifierFilter		Nowe powiadomienie e-mail
 New messages	NotifierFilter		Nowe wiadomości
 Method:	NotifierConfigView		Metoda:
 Keyboard LEDs	NotifierConfigView		Diody klawiaturowe

@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku-Expander	3300517306
+1	polish	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Cel
 Other	ExpanderPreferences		Inne
 Automatically show contents listing	ExpanderPreferences		Automatycznie pokaż listę zawartości
 Expander	System name		Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz katalog docelowy
 Set source…	ExpanderMenu		Wybierz źródło…
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Cel nie jest katalogiem.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Katalog został przeniesiony, zmieniono mu nazwę lub jest nieobsługiwany.
 Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania

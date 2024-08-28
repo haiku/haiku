@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	4073987023
+1	polish	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		Ustaw do Zapisanych
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Twój główny tekst zawiera %ld niekodowalnych znaków. Być może inny zestaw znaków będzie lepiej działać? Wybierz Wyślij aby wysłać mimo wszystko (znak zastępczy będzie użyty w miejscach niekodowalnych znaków), lub wybierz Anuluj aby wrócić i poprawić to.
 Text wrapping:	Mail		Zawijanie tekstu:
@@ -38,7 +38,9 @@ Previous message	Mail		Poprzednia wiadomość
 (Address unavailable)	Mail		(Adres niedostępny)
 Mail	System name		Poczta
 Copy link location	Mail		Kopiuj adres odnośnika
+Add attachment…	Mail		Dodaj załącznik…
 Next	Mail		Następne
+Attachments:	Mail		Załączniki:
 Show icons only	Mail		Pokaż tylko ikony
 Subject:	Mail		Temat:
 OK	Mail		OK
@@ -55,6 +57,7 @@ Reply to sender	Mail		Odpowiedz nadawcy
 \\n - Newline	Mail		\\n - Nowa linia
 Copy	Mail		Skopiuj
 Add signature	Mail		Dodaj sygnaturkę
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Załącznik: %name% (Typ: %type%)
 %n - Full name	Mail		%n - Pełna nazwa
 Signature	Mail		Sygnatura
 Use default account	Mail		Użyj domyślnego konta
@@ -104,8 +107,10 @@ Start now	Mail		Rozpocznij teraz
 (Name unavailable)	Mail		(Nazwa niedostępna)
 Move to trash	Mail		Przenieś do kosza
 <none>	Mail		<brak>
+Mail settings	Mail		Ustawienia Poczty
 %d - Date	Mail		%d - Data
 Check spelling	Mail		Sprawdzanie pisowni
+Status:	Mail		Status:
 Redo	Mail		Ponów
 Leave as '%s'	Mail		Pozostaw jako „%s”
 Print…	Mail		Drukuj…

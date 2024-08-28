@@ -8,7 +8,7 @@ Couldn't launch 	MediaReplicant		No se puede lanzar
 Volume	VolumeControl		Volumen
 Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
 %ld dB	VolumeControl		%ld dB
-Media preferences…	MediaReplicant		Preferencias multimedia...
+Media preferences…	MediaReplicant		Preferencias multimedia…
 Options	MediaReplicant		Opciones
 Beep	MediaReplicant		Beep
 Open %name	DeskButton	Don't translate variable %name	Abrir %name

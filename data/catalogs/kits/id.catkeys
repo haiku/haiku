@@ -6,7 +6,7 @@ OK	PrintJob		OKE
 OK	Dragger		OKE
 gamma	AboutWindow		gamma
 development	AboutWindow		pengembangan
-{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s bita/d} other{%s bita/d}}
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s byte/s} other{%s bytes/s}}
 Print Server is not responding.	PrintJob		Server Cetak tidak merespon.
 About %app%	AboutMenuItem		Tentang %app%
 Warning	Dragger		Peringatan

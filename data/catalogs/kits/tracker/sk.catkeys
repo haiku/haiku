@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	2852782620
+1	slovak	x-vnd.Haiku-libtracker	1650422602
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -294,7 +294,6 @@ The selected item cannot be moved to the Trash. Would you like to delete it inst
 Copy	ContainerWindow		Kopírovať
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Ľutujeme, atribút „Character“ nemôže ukladať viacbajtové grafémy.
 And	FindPanel		a
-multiple disks	FindPanel		viaceré disky
 Name = %name	FindPanel	FindResultTitle	Názov = %name
 Subject	Email Query Columns		Predmet
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba pri kopírovaní „%name“:\n\t%error\n\nChcete pokračovať?

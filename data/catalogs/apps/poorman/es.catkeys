@@ -14,7 +14,7 @@ File Name	PoorMan		Nombre del archivo
 Starting up... 	PoorMan		Empezando...
 Select	PoorMan		Seleccionar
 Logging view	PoorMan		Vista de registrar
-Save console as…	PoorMan		Guardar consola como...
+Save console as…	PoorMan		Guardar consola como…
 Edit	PoorMan		Editar
 Cancel	PoorMan		Cancelar
 Directory: 	PoorMan		Directorio:
@@ -34,7 +34,7 @@ Create public_html	PoorMan		Crear public_html
 Clear hit counter	PoorMan		Despejar ficha de golpes
 Status: Stopped	PoorMan		Estado: Parado
 File	PoorMan		Archivo
-Settings…	PoorMan		Configuración...
+Settings…	PoorMan		Ajustes…
 Log To File	PoorMan		Registrar a archivo
 Connections	PoorMan		Conexiones
 Controls	PoorMan		Controles
@@ -58,7 +58,7 @@ Status: Running	PoorMan		Estado: Ejecutando
 Directory: (none)	PoorMan		Directorio: (ninguno)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una carpeta web por defecto se ha creado en \ "/ boot / home / public_html. \" \nAsegúrese de que hay un archivo HTML denominado \ "index.html \" en esa carpeta.
 Dir Created	PoorMan		Directorio creado
-Save console selections as…	PoorMan		Guardar selecciónes de consola como...
+Save console selections as…	PoorMan		Guardar selecciones de consola como…
 Quit	PoorMan		Salir
 Save log console	PoorMan		Guarder registro de consola
 Start page:	PoorMan		Página de inicio:

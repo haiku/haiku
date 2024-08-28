@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-About	1392097558
+1	polish	x-vnd.Haiku-About	3675341430
 The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 \n\nSpecial thanks to:\n	AboutView		\n\nSpecjalne podziękowania dla:\n
@@ -29,6 +29,10 @@ Licenses: 	AboutView		Licencje:
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Prawa autorskie do kodu Haiku są własnością Haiku Inc. lub autorów, gdzie jest to wyraźnie zaznaczone w źródłach. Haiku® i logo HAIKU® są zarejestrowanymi znakami towarowymi Haiku Inc.\n\n
 Copyright © 2009 Colin Percival	AboutView		Copyright © 2009 Colin Percival
 Time running:	AboutView		Czas działania:
+Visit the Haiku website	AboutView		Odwiedź stronę Haiku
+Version: %s	AboutView	Version: R1 or hrev99999	Wersja: %s
+Make a donation	AboutView		Przekaż darowiznę
+%d MiB Memory:	AboutView	2048 MiB Memory:	%d MiB pamięci:
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Wszelkie prawa zastrzeżone.
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. To oprogramowanie jest częściowo oparte na pracach Independent JPEG Group.
@@ -62,6 +66,7 @@ GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Intel (2xxx firmware)	AboutWindow		Intel (firmware 2xxx)
 License: 	AboutView		Licencja: 
 GNU GPL v2	AboutWindow		GNU GPL v2
+%d MiB used (%d%%)	AboutView	326 MiB used (16%)	%d MiB użyte (%d%%)
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha\n\n
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
 Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld Projekt Haiku. 
@@ -70,10 +75,12 @@ Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 współtwórcy Expat.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
 Translations:\n	AboutView		Tłumaczenie:\n
+Copyright © 2014-2024 Florian Bernd and Joel Höner. All rights reserved.	AboutView		Prawa autorskie © 2014-2024 Florian Bernd i Joel Höner. Wszelkie prawa zastrzeżone.
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… i prawdopodobnie paru innych, o których zapomnieliśmy wspomnieć (przepraszamy!)\n\n
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Wszelkie prawa zastrzeżone.
 BSD (2-clause)	AboutWindow		BSD (2-klauzulowa)
 Website & marketing:\n	AboutView		Strona internetowa i marketing:\n
+%d MiB used (%s)	AboutView	326 MiB used (16%)	%d MiB użyte (%s)
 %.2f GHz	AboutView	3.49 Ghz (CPU clock speed)	%.2f GHz
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 by Andy Ritger bazując na the Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		...oraz wielu ludzi, którzy wysyłają dotacje!\n\n

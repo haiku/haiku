@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DiskProbe	4193379066
+1	polish	x-vnd.Haiku-DiskProbe	1130290771
 Raw editor	AttributeWindow		Edytor binarny
 Remove	AttributeWindow		Usuń
 Close	ProbeView		Zamknij
@@ -29,7 +29,9 @@ Open file…	FileWindow		Otwórz plik…
 32 bit unsigned pointer:	TypeEditors		32-bitowy wskaźnik bez znaku:
 DiskProbe request	DiskProbe		Zapytanie DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Szesnastkowy
+Block %lld (0x%Lx)	ProbeView		Blok %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Zapis do pliku nie powiódł się:\n%s\n\nWszystkie zmiany zostaną utracone, jeśli zakończysz program.
+Native: %lld (0x%0*Lx)	ProbeView		Natywny: %lld (0x%0*Lx)
 Examine device:	OpenWindow		Zbadaj urządzenie:
 Number editor	TypeEditors		Edytor numeryczny
 Icon	TypeEditors		Ikona
@@ -115,7 +117,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		Zapytanie DiskProbe
 Double precision floating-point value:	TypeEditors		Wartość zmiennoprzecinkowa podwójnej precyzji:
 Image	TypeEditors	This is the type of view	Obraz
+Swapped: %lld (0x%0*Lx)	ProbeView		Przestawiony: %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		Czy zapisać zmiany przed zakończeniem działania aplikacji?
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		format PNG
 Number	TypeEditors	This is the type of editor	Typ numeryczny
 Edit	ProbeView		Edycja

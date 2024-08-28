@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-LaunchBox	1530497419
+1	polish	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		Ustaw opis…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Na pewno zamknąć ten panel?\n(Nie zostanie on zapamiętany.)
 OK	LaunchBox		OK
@@ -13,6 +13,7 @@ Show window border	LaunchBox		Pokaż obramowanie okna
 Failed to launch 'something', error in Pad data.	LaunchBox		Nie udało się uruchomić „czegoś”, błąd w danych panelu.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Autoaktywacja
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		Rozmiar ikon
 Open containing folder	LaunchBox		Otwórz katalog docelowy
 Add button here	LaunchBox		Dodaj przycisk tutaj

@@ -1,12 +1,14 @@
-1	polish	x-vnd.Haiku-WebPositive	861169737
+1	polish	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
 Previous	WebPositive Window		Poprzedni
+Copy	Console Window		Kopiuj
 (Finish: %date)	Download Window		(Koniec: %date)
 Open bookmarks confirmation	WebPositive Window		Potwierdzenie otwarcia zakładek
 Download folder:	Settings Window		Katalog pobierania:
 Close window	WebPositive Window		Zamknij okno
 Find:	WebPositive Window		Znajdź:
 Script console	WebPositive Window		Konsola skryptów
+There was an error setting up the bookmark.	WebPositive Window		Wystąpił błąd podczas ustawiania zakładki.
 Fonts	Settings Window		Fonty
 Path	Cookie Manager		Ścieżka
 Bookmarks	WebPositive Window		Zakładki
@@ -101,6 +103,7 @@ Apply	Settings Window		Zastosuj
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas próby pokazania katalogu zakładek.\n\nBłąd: %error
 Revert	Settings Window		Cofnij
 Copy	WebPositive Window		Kopiuj
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural, one{Ostatnia linia powtórzona # raz.} few{Ostatnia linia powtórzona # razy.} many{Ostatnia linia powtórzona # razy.} other{Ostatnia linia powtórzona # raza.}}
 Default standard font size:	Settings Window		Domyślny rozmiar fontu standardowego:
 Custom	Settings Window		Własne
 Bookmark this page	WebPositive Window		Dodaj zakładkę

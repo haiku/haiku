@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1319108693
+1	polish	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Zespoły
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Przestrzeń wymiany
 P-faults	DataSource		P-błędy
 Sems	DataSource		Semy
 Network receive	DataSource		Otrzymane
+%s faults/s	DataSource		%s błędów/s

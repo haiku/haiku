@@ -1,5 +1,5 @@
 1	spanish; castilian	x-vnd.Haiku-LaunchBox	1878360293
-Set description…	LaunchBox		Definir descripción...
+Set description…	LaunchBox		Definir descripción…
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		¿Realmente desea cerrar este pad?\n(El pad no se recordará)
 OK	LaunchBox		Aceptar
 Ignore double-click	LaunchBox		Hacer caso omiso de doble clic
@@ -10,7 +10,7 @@ Clone	LaunchBox		Clonar
 Description for '%3'	LaunchBox		Descripción para: '%3'
 Show window border	LaunchBox		Mostrar borde de ventana
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nFallo al iniciar la aplicación con la firma '%2'.\n\nError:
-Failed to launch 'something', error in Pad data.	LaunchBox		Falló al lanzar 'algo', error en dato Pad
+Failed to launch 'something', error in Pad data.	LaunchBox		Falló al lanzar 'algo', error en dato Pad.
 LaunchBox	System name		LaunchBox
 Auto-raise	LaunchBox		Auto-levantar
 %ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld

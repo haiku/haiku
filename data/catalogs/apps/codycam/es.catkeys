@@ -6,7 +6,7 @@ JPEG image	CodyCam		Imagen JPEG
 Remote host has closed the connection.\n	FtpClient		El host remoto ha cerrado la conexión.\n
 image file format expected	CodyCam		se esperaba un formato de archivo de imagen
 Every 30 minutes	CodyCam		Cada 30 minutos
-Capturing Image…	VideoConsumer.cpp		Capturando imagen...
+Capturing Image…	VideoConsumer.cpp		Capturando imagen…
 Cannot start time source!	CodyCam		No se puede iniciar fuente de tiempo.
 Waiting…	CodyCam		Esperando…
 Passive FTP	CodyCam		FTP pasivo 
@@ -33,8 +33,8 @@ Never	CodyCam		Nunca
 Every 8 hours	CodyCam		Cada 8 horas
 Cannot start the video source	CodyCam		No se puede iniciar la fuente de vídeo
 Cannot set the time source for the video source	CodyCam		No se puede establecer una fuente de tiempo para la fuente de vídeo
-Renaming…	VideoConsumer.cpp		Cambiando nombre...
-Send to…	CodyCam		Enviar a...
+Renaming…	VideoConsumer.cpp		Cambiando nombre…
+Send to…	CodyCam		Enviar a…
 Password:	CodyCam		Contraseña:
 still image filename expected	CodyCam		se esperaba nombre de archivo de imagen
 File name:	CodyCam		Nombre de archivo:
@@ -57,7 +57,7 @@ Every 5 minutes	CodyCam		Cada 5 minutos
 File upload failed	VideoConsumer.cpp		La subida de archivo falló
 Format:	CodyCam		Formato:
 Start video	CodyCam		Iniciar vídeo
-Connected…	VideoConsumer.cpp		Conectado...
+Connected…	VideoConsumer.cpp		Conectado…
 upload client name expected	CodyCam		cargar nombre de cliente previsto
 Every 15 seconds	CodyCam		Cada 15 segundos
 Error getting initial latency for the capture node	CodyCam		Error al obtener la latencia inicial para el nodo de captura
@@ -82,7 +82,7 @@ Can't find an available connection to the video window	CodyCam		no se puede enco
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		Error creando archivo de salida
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		No se pudo encontrar fuente de video.\nSe necesita una webcam para usar CodyCam.
-Logging in…	VideoConsumer.cpp		Iniciando sesión...
+Logging in…	VideoConsumer.cpp		Iniciando sesión…
 CodyCam	System name		CodyCam
 Error writing output file	VideoConsumer.cpp		Error escribiendo fichero de salida
 Capture controls	CodyCam		Controles de captura

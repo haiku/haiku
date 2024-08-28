@@ -1,9 +1,10 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2433106963
+1	friulian	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 An unexpected error has been sent from the server [%li]	ServerHelper		Al è rivât un erôr inspietât dal servidôr [%li]
 Create account	UserLoginWindow		Cree account
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Daûr a recuperâ il regjistri des modifichis pal pachet
 Agree	ToLatestUserUsageConditionsWindow		Acete
 Install %PackageTitle%	PackageManager		Instale %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.

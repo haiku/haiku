@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	1195671691
+1	spanish; castilian	x-vnd.Haiku-Installer	2288760834
 Performing installation.	InstallProgress		Realizando instalación.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Por favor, cierre la ventana de DriveSetup antes de cerrar la ventana del Instalador.
 No optional packages available.	PackagesView		No hay paquetes opcionales disponibles.
@@ -52,6 +52,7 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACION IMPO
 Additional disk space required: %s	InstallerWindow		Espacio en disco adicional requerido: %s
 Stop	InstallerWindow	In alert after pressing Stop	Detener
 Boot sector successfully written.	InstallProgress		Sector de arranque escrito correctamente.
+Failed to launch BootManager	InstallerWindow		Error al iniciar el Gestor de arranque
 Writing bootsector.	InstallProgress		Escribiendo sector de arranque.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Un error ha impedido completar la instalación:\n\nError: %s
 Restart	InstallerWindow		Reiniciar
@@ -69,14 +70,18 @@ Continue	InstallerWindow	In alert after pressing Stop	Continuar
 Scanning for disks…	InstallerWindow		Buscando discos…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Ejecutando DriveSetup…\n\nCierre DriveSetup para continuar con la instalación.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		La instalación aún no se ha completado.\n¿Confirma que quiere detenerla?
+Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		Ejecutando el Gestor de arranque…\n\nCierre el Gestor de arranque para continuar con la instalación.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		No se puede montar la partición. Por favor, elija otra.
 Set up partitions…	InstallerWindow		Configurar particiones…
 Install progress:  	InstallerWindow		Progreso de instalación:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No puede instalar los contenidos de un disco sobre sí mismos. Por favor, elija otro disco.
+Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Cierre las ventanas de Gestor de arranque y Configuración de discos antes de cerrar la ventana de Instalador.
+Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Elija el disco de origen del menú emergente. A continuación, haga clic en "Comenzar".
 OK	InstallProgress		Aceptar
 Quit BootManager	InstallerWindow		Salir del Gestor de arranque
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		¿Está seguro de querer instalar sobre el disco de arranque actual? El instalador tendrá que reiniciar la máquina.
 Onto:	InstallerWindow		En:
 Tools	InstallerWindow		Herramientas
-scanning…	InstallerWindow		buscando discos...
+scanning…	InstallerWindow		buscando discos…
+Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Elija el disco a donde quiere instalar en el menú emergente. A continuación, haga clic en "Comenzar".
 Continue	InstallerApp		Continuar

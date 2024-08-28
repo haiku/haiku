@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2569925731
+1	friulian	x-vnd.Haiku-libtracker	3817524709
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -7,10 +7,14 @@ Open with…	ContainerWindow		Vierç cun…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erôr tal spostâ \"%name\" te Scovacere. (%error)
 Or	FindPanel		O
 MIME Description	AttributesView		Descrizion MIME
+Query	FindPanel		Interogazion
 before	FindPanel		prime
 New folder%d	FSUtils		Gnove cartele%d
 Volume icons	TrackerSettingsWindow		Iconis volums
 Ignore case	SelectionWindow		Ignore maiusculis/minusculis
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Desideristu netâ lis interogazions temporaniis o dutis lis interogazions? Nol sarà pussibil tornâ indaûr cheste azion!
+Save query:	FindPanel		Salve interogazion:
+Save as query template:	FindPanel		Salve come model di interogazion:
 Current folder	ContainerWindow		Cartele atuâl
 Finish: %time - Over %finishtime left	StatusWindow		Completament: %time - Tor %finishtime restants
 Mount all disks now	AutoMounterSettings		Monte ducj i discs cumò
@@ -51,6 +55,7 @@ Select…	ContainerWindow		Selezione…
 Show shared volumes on Desktop	SettingsView		Mostre i volums condividûts sul Scritori
 Size	PoseView		Dimension
 matches wildcard expression	SelectionWindow		al coincît cu la espression cun matis (*)
+Clear history?	FindPanel		Netâ la cronologjie?
 Title	Bookmark Query Columns		Titul
 Identify	ContainerWindow		Identifiche
 Create link	ContainerWindow		Cree colegament
@@ -78,6 +83,7 @@ Select	InfoWindow		Selezione
 OK	OpenWithWindow		Va ben
 Include trash	FindPanel		Inclût scovacere
 Clean up	ContainerWindow		Met a puest
+Clear all	FindPanel		Nete dut
 Modified	FindPanel		Modificât
  (block size: 	InfoWindow		  (dimension bloc: 
 Select all	QueryContainerWindow		Selezione dutis
@@ -106,6 +112,7 @@ Remove	FindPanel		Gjave
 Company	Person Query Columns		Aziende
 Recent documents	FavoritesMenu		Documents resints
 Edit templates…	TemplatesMenu		Modifiche modei…
+Clear temporary queries only	FindPanel		Nete dome interogazions temporaniis
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# byte}}
 8-bit integer	AttributesView		Intîr a 8 bit 
 8-bit unsigned integer	AttributesView		Intîr cence segn a 8 bit
@@ -126,10 +133,12 @@ Create relative link	ContainerWindow		Cree colegament relatîf
 Owner	FilePermissionsView		Proprietari
 Cancel	FSClipBoard		Anule
 Modified	PoseView		Modificât
+Save as template…	FindPanel		Salve come model…
 Move to Trash	ContainerWindow		Sposte te Scovacere
 All files and folders	FindPanel		Ducj i files e lis cartelis
 Add-ons	ContainerWindow		Components adizionâi
 Too many parenthesis.	libtracker		Masse parentesis.
+Save query template:	FindPanel		Salve model di interogazion:
 Increase size	ContainerWindow		Aumente dimensions
 \nShould this be fixed?	FSUtils		\nIsal il câs di justâlu?
 URL	Bookmark Query Columns		URL
@@ -207,6 +216,7 @@ Cancel	FSUtils		Anule
 Original name	ContainerWindow		Non origjinâl
 Unknown	WidgetAttributeText		No cognossût
 32-bit integer	AttributesView		Intîr a 32 bit
+Save as query…	FindPanel		Salve come interogazion…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Il non specificât al è za doprât come non di une cartele. Par plasê, sielç un altri non.
 Modified	ContainerWindow		Modificât
 Mini icon view	ContainerWindow		Viodude a iconis piçulis
@@ -282,6 +292,7 @@ Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
 Restoring: 	StatusWindow		Ripristinament: 
 The Tracker must be running to set the default printer.	PoseView		Al è necessari che il Tracker al sedi in esecuzion par stabilî la stampadore predefinide.
+Cancel	FindPanel		Anule
 calculating…	InfoWindow		daûr a calcolâ…
 Preferred for file	OpenWithWindow		Preferît par file
 OK	AutoMounterSettings		Va ben
@@ -314,6 +325,7 @@ starts with	SelectionWindow		al tache cun
 Any	AttributesView		Cualsisei
 New	DeskWindow		Gnûf
 Invert	SelectionWindow		Invertìs
+Open…	FindPanel		Vierç…
 Would you like to find some other suitable application?	FSUtils		Cirî cualchi altre aplicazion adate?
 *+? operand may be empty.	libtracker		la cuantitât de operazion *+? e podarès jessi vueide.
 (unknown)	AttributesView		(no cognossût)
@@ -359,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Vierç nivel superiôr
 And	FindPanel		E
 Palette-indexed picture	AttributesView		Imagjin cun palete intabelade
-multiple disks	FindPanel		plui discs
 Drawing pattern	AttributesView		Trame
 File offset	AttributesView		Deviazion file
 Name = %name	FindPanel	FindResultTitle	Non = %name
@@ -367,6 +378,7 @@ Subject	Email Query Columns		Ogjet
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ la cartele \"%name\":\n\t%error\n\nContinuâ?
 You cannot create a link to the root directory.	FSUtils		No tu puedis creâ un colegament ae cartele lidrîs.
 Select all	FilePanelPriv		Selezione dut
+Clear history	FindPanel		Nete cronologjie
 Other	FilePermissionsView		Altri
 Automatic disk mounting	AutoMounterSettings		Montaç automatic dai discs
 parent folder	NavMenu		cartele superiôr
@@ -415,6 +427,7 @@ Revert	TrackerSettingsWindow		Ripristine
 trash	B_TRASH_DIRECTORY		scovacere
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se si sposte la cartele di sisteme o il so contignût, no si rivarà plui a inviâ %osName!\n\nContinuâ pardabon?\n\nPar spostâ distès la cartele di sisteme o il so contingût, ten fracât il tast Maiusc e fâs clic su \"Sposte\".
+Open query:	FindPanel		Vierç interogazion:
 Close all in workspace	ContainerWindow		Siere dut tal spazi di lavôr
 Corrupted expression.	libtracker		Espression corote.
 Network address	AttributesView		Direzion di rêt
@@ -429,6 +442,7 @@ Name	QueryPoseView		Non
 Error %error loading add-On %name.	ContainerWindow		Erôr %error cjariant il component adizionâl %name.
 Does not handle file	OpenWithWindow		Nol gjestìs il file
 E-mail	Person Query Columns		E-mail
+Templates	FindPanel		Modei
 Arrange by	ContainerWindow		Ordene par
 Attributes	AttributesView		Atribûts
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Mi displâs, salvâ plui di un element nol è permetût.
@@ -497,6 +511,7 @@ Move to Trash	FSUtils		Sposte te Scovacere
 Cancel	PoseView		Anule
 Handles %type	OpenWithWindow		Al gjestìs %type
 Delete	PoseView		Elimine
+Options	FindPanel		Opzions
 Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".
 Sorry, you can't copy items to the Trash.	PoseView		No tu puedis copiâ i elements inte Scovacere.

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	601506035
+1	esperanto	x-vnd.Haiku-libtracker	3694113313
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -347,7 +347,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Uzi la patran
 And	FindPanel		Kaj
 Palette-indexed picture	AttributesView		Farboplate indikita bildo
-multiple disks	FindPanel		multaj diskoj
 Drawing pattern	AttributesView		Desegna skemo
 File offset	AttributesView		Dosiera deŝovo
 Name = %name	FindPanel	FindResultTitle	Nomo = %name

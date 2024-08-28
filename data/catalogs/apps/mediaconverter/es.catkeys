@@ -1,5 +1,5 @@
 1	spanish; castilian	x-vnd.Haiku-MediaConverter	1249914255
-Input file not recognized as Audio or Video	MediaConverter		El archivo de entrada no se ha podido reconocer como un archivo de audio o video.
+Input file not recognized as Audio or Video	MediaConverter		El archivo de entrada no se ha podido reconocer como un archivo de audio o video
 Source files	MediaConverter		Archivos de entrada
 Error writing video frame %lld	MediaConverter		Error al escribir el fotograma %lld del video
 Audio quality: %s	MediaConverter		Calidad de audio: %s
@@ -24,10 +24,10 @@ OK	MediaConverter		Aceptar
 Error creating '%filename'	MediaConverter		Error al crear '%filename'
 Error loading a file	MediaConverter		Error al cargar un archivo
 Encoder parameters	MediaConverter-EncoderWindow		Parámetros del codificador
-Open…	Menu		Abrir...
+Open…	Menu		Abrir…
 Audio encoding:	MediaConverter		Codificación de audio:
-Multi-track file detected	MediaConverter		Se ha detectado un archivo de varias pistas.
-Cancelling…	MediaConverter		Cancelando...
+Multi-track file detected	MediaConverter		Se ha detectado un archivo de varias pistas
+Cancelling…	MediaConverter		Cancelando…
 Output file '%filename' created	MediaConverter		Archivo de salida '%filename' creado
 Output folder	MediaConverter		Directorio de salida
 Error creating track.	MediaConverter		Error al crear la pista.

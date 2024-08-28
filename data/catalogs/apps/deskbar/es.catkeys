@@ -17,7 +17,7 @@ Mount	DeskbarMenu		Montar
 Icon size	PreferencesWindow		Tamaño de icono
 About Haiku	DeskbarMenu		Acerca de Haiku
 Small	PreferencesWindow		Pequeño
-Show calendar…	TimeView		Mostar calendario...
+Show calendar…	TimeView		Mostar calendario…
 Find…	DeskbarMenu		Buscar…
 Power off	DeskbarMenu		Apagar
 Defaults	PreferencesWindow		Predefinidos
@@ -31,9 +31,9 @@ Quit application	WindowMenu		Salir de la aplicación
 Hide application names	PreferencesWindow		Ocultar nombres de aplicaciones
 Applications	PreferencesWindow		Aplicaciones
 Show application expander	PreferencesWindow		Mostar expansor de aplicación
-Deskbar preferences…	DeskbarMenu		Preferencias de la barra de escritorio
+Deskbar preferences…	DeskbarMenu		Preferencias de la barra de escritorio…
 Suspend	DeskbarMenu		Suspender
-Shutdown…	DeskbarMenu		Apagar...
+Shutdown…	DeskbarMenu		Apagar…
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
 Expand new applications	PreferencesWindow		Expandir nuevas aplicaciones
 Recent applications:	PreferencesWindow		Aplicaciones recientes:

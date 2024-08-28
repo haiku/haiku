@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Magnify	1465621918
+1	finnish	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  koon on oltava > 4 ja 4:n monikerta
 Decrease pixel size	Magnify-Main		Pienennä pikselikokoa
 no clip msg	In console, when clipboard is empty after clicking Copy image		ei leikesanomaa
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Kasvata ikkunan kokoa
 Save image	Magnify-Main		Tallenna kuva
 Show grid	Magnify-Main		Näytä rasteri
 Magnify	System name		Suurennuslasi
+height	Magnify-Main		korkeus
+width	Magnify-Main		leveys
 Info	Magnify-Main		Tiedot
 Show info	Magnify-Main		Näytä tiedot
 Make square	Magnify-Main		Tee neliö

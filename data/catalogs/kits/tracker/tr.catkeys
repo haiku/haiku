@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	4243797227
+1	turkish	x-vnd.Haiku-libtracker	1196428909
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -7,10 +7,14 @@ Open with…	ContainerWindow		Birlikte aç…
 Error moving \"%name\" to Trash. (%error)	FSUtils		“%name”, çöpe atılırken hata (%error)
 Or	FindPanel		veya
 MIME Description	AttributesView		MIME Tanımı
+Query	FindPanel		Sorgu
 before	FindPanel		önce
 New folder%d	FSUtils		Yeni klasör%d
 Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Geçici sorguları mı yoksa tüm sorguları mı temizlemek istiyorsunuz? Bu eylem geri alınamaz!
+Save query:	FindPanel		Sorguyu kaydet:
+Save as query template:	FindPanel		Sorgu şablonu olarak kaydet:
 Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time — Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
@@ -51,6 +55,7 @@ Select…	ContainerWindow		Seç…
 Show shared volumes on Desktop	SettingsView		Paylaşılan diskleri Masaüstü’nde göster
 Size	PoseView		Boyut
 matches wildcard expression	SelectionWindow		joker ifadesi ile eşleşir
+Clear history?	FindPanel		Geçmiş temizlensin mi?
 Title	Bookmark Query Columns		Başlık
 Identify	ContainerWindow		Tanımla
 Create link	ContainerWindow		Bağlantı oluştur
@@ -78,6 +83,7 @@ Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
 Include trash	FindPanel		Çöpe de bak
 Clean up	ContainerWindow		Toparla
+Clear all	FindPanel		Tümünü temizle
 Modified	FindPanel		Değiştirilme
  (block size: 	InfoWindow		 (blok boyutu: 
 Select all	QueryContainerWindow		Tümünü seç
@@ -106,6 +112,7 @@ Remove	FindPanel		Kaldır
 Company	Person Query Columns		Şirket
 Recent documents	FavoritesMenu		Son belgeler
 Edit templates…	TemplatesMenu		Şablonları düzenle…
+Clear temporary queries only	FindPanel		Yalnızca geçici sorguları temizle
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bayt} other{# bayt}}
 8-bit integer	AttributesView		8 bit tamsayı
 8-bit unsigned integer	AttributesView		8 bit imzalanmamış tamsayı
@@ -126,10 +133,12 @@ Create relative link	ContainerWindow		Göreceli bağlantı oluştur
 Owner	FilePermissionsView		Sahibi
 Cancel	FSClipBoard		Vazgeç
 Modified	PoseView		Değiştirilme
+Save as template…	FindPanel		Şablon olarak kaydet…
 Move to Trash	ContainerWindow		Çöpe at
 All files and folders	FindPanel		Tüm dosyalar/klasörler
 Add-ons	ContainerWindow		Eklentiler
 Too many parenthesis.	libtracker		Çok fazla parantez.
+Save query template:	FindPanel		Sorgu şablonunu kaydet:
 Increase size	ContainerWindow		Büyüt
 \nShould this be fixed?	FSUtils		\nBu düzeltilsin mi?
 URL	Bookmark Query Columns		URL
@@ -207,6 +216,7 @@ Cancel	FSUtils		Vazgeç
 Original name	ContainerWindow		Özgün ad
 Unknown	WidgetAttributeText		Bilinmeyen
 32-bit integer	AttributesView		32 bit tamsayı
+Save as query…	FindPanel		Sorgu olarak kaydet…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Belirtilen ad hâlihazırda bir klasör adı olarak kullanılıyor. Lütfen başka bir ad seçin.
 Modified	ContainerWindow		Değiştirilme
 Mini icon view	ContainerWindow		Ufak simge görünümü
@@ -282,6 +292,7 @@ Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
 Restoring: 	StatusWindow		Eski haline getiriliyor: 
 The Tracker must be running to set the default printer.	PoseView		Saptanmış yazıcıyı ayarlamak için İzleyici çalışıyor olmalıdır.
+Cancel	FindPanel		Vazgeç
 calculating…	InfoWindow		hesaplanıyor…
 Preferred for file	OpenWithWindow		Dosya için tercih edilen
 OK	AutoMounterSettings		Tamam
@@ -314,6 +325,7 @@ starts with	SelectionWindow		başlar
 Any	AttributesView		Herhangi biri
 New	DeskWindow		Yeni
 Invert	SelectionWindow		Tersine çevir
+Open…	FindPanel		Aç…
 Would you like to find some other suitable application?	FSUtils		Uygun başka bir uygulama bulmak ister misiniz?
 *+? operand may be empty.	libtracker		*+? işleneni boş olabilir
 (unknown)	AttributesView		(bilinmeyen)
@@ -359,7 +371,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		Üst klasörü aç
 And	FindPanel		ve
 Palette-indexed picture	AttributesView		Palet sıralı resim
-multiple disks	FindPanel		çoklu diskler
 Drawing pattern	AttributesView		Çizim deseni
 File offset	AttributesView		Dosya ofseti
 Name = %name	FindPanel	FindResultTitle	Ad = %name
@@ -367,6 +378,7 @@ Subject	Email Query Columns		Konu
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		“%name” klasörü kopyalanırken hata:\n\t%error\n\nİşlemi sürdürmek istiyor musunuz?
 You cannot create a link to the root directory.	FSUtils		Kök dizine bir bağlantı oluşturulamaz.
 Select all	FilePanelPriv		Tümünü seç
+Clear history	FindPanel		Geçmişi temizle
 Other	FilePermissionsView		Diğer
 Automatic disk mounting	AutoMounterSettings		Otomatik disk bağlama
 parent folder	NavMenu		üst klasör
@@ -415,6 +427,7 @@ Revert	TrackerSettingsWindow		Eski haline döndür
 trash	B_TRASH_DIRECTORY		çöp
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Sistem klasörünü veya içindekileri taşırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Üst Karakter düğmesini basılı tutun ve “Taşı”ya basın.
+Open query:	FindPanel		Sorgu aç:
 Close all in workspace	ContainerWindow		Bu çalışma alanındakileri kapat
 Corrupted expression.	libtracker		Hasar görmüş ifade.
 Network address	AttributesView		Ağ adresi
@@ -429,6 +442,7 @@ Name	QueryPoseView		Ad
 Error %error loading add-On %name.	ContainerWindow		%name eklentisi yüklenirken %error hatası.
 Does not handle file	OpenWithWindow		Dosya işlemez
 E-mail	Person Query Columns		E-posta
+Templates	FindPanel		Şablonlar
 Arrange by	ContainerWindow		Sırala
 Attributes	AttributesView		Öznitelikler
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Üzgünüm, birden fazla öge kaydetmeye izin verilmiyor.
@@ -496,6 +510,7 @@ Move to Trash	FSUtils		Çöpe at
 Cancel	PoseView		Vazgeç
 Handles %type	OpenWithWindow		%type işler
 Delete	PoseView		Sil
+Options	FindPanel		Seçenekler
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ana klasörü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Üst Karakter düğmesini basılı tutun ve “Ne yaptığımı biliyorum”a tıklayın.
 Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, herhangi bir öge çöpe kopyalanamaz.

@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	4246556324
+1	thai	x-vnd.Haiku-libtracker	3044196306
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -339,7 +339,6 @@ Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttribut
 Open parent	VirtualDirectoryWindow		เปิดพาเรนต์
 And	FindPanel		และ
 Palette-indexed picture	AttributesView		รูปภาพที่จัดทำดัชนีด้วยจานสี
-multiple disks	FindPanel		หลายดิสก์
 Drawing pattern	AttributesView		รูปแบบการวาด
 File offset	AttributesView		ไฟล์ออฟเซ็ต
 Name = %name	FindPanel	FindResultTitle	ชื่อ = %name
