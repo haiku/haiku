@@ -45,7 +45,7 @@ PopulatePkgUserRatingsFromServerProcess::Name() const
 const char*
 PopulatePkgUserRatingsFromServerProcess::Description() const
 {
-	return B_TRANSLATE("Fetching changelog for package");
+	return B_TRANSLATE("Fetching user ratings for package");
 }
 
 
