@@ -323,8 +323,10 @@ private:
 			BGridLayout*		fAttrGrid;
 			BPopUpMenu* 		fMimeTypeMenu;
 			BMenuField* 		fMimeTypeField;
-			BPopUpMenu* 		fVolMenu;
 			BPopUpMenu*			fSearchModeMenu;
+			BMenuField* 		fSearchModeField;
+			BPopUpMenu* 		fVolMenu;
+			BMenuField* 		fVolumeField;
 			BPopUpMenu* 		fRecentQueries;
 			BBox* 				fMoreOptions;
 			BTextControl* 		fQueryName;

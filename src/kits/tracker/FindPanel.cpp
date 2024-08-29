@@ -100,6 +100,8 @@ const uint32 kSwitchToQueryTemplate = 'swqt';
 const uint32 kRunSaveAsTemplatePanel = 'svtm';
 const uint32 kLatchChanged = 'ltch';
 
+static const float kPopUpIndicatorWidth = 13.0f;
+
 const char* kDragNDropTypes[] = {
 	B_QUERY_MIMETYPE,
 	B_QUERY_TEMPLATE_MIMETYPE
@@ -1146,6 +1148,15 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 	BView("MainView", B_WILL_DRAW),
 	fMode(kByNameItem),
 	fAttrGrid(NULL),
+	fMimeTypeMenu(NULL),
+	fMimeTypeField(NULL),
+	fSearchModeMenu(NULL),
+	fSearchModeField(NULL),
+	fVolMenu(NULL),
+	fVolumeField(NULL),
+	fRecentQueries(NULL),
+	fMoreOptions(NULL),
+	fQueryName(NULL),
 	fDraggableIcon(NULL),
 	fDirectorySelectPanel(NULL),
 	fAddSeparatorItemState(true)
@@ -1175,13 +1186,13 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 	fSearchModeMenu->ItemAt(initialMode == kByNameItem ? 0 :
 		(initialMode == kByAttributeItem ? 1 : 2))->SetMarked(true);
 		// mark the appropriate mode
-	BMenuField* searchModeField = new BMenuField("", "", fSearchModeMenu);
-	searchModeField->SetDivider(0.0f);
+	fSearchModeField = new BMenuField("", "", fSearchModeMenu);
+	fSearchModeField->SetDivider(0.0f);
 
 	// add popup for volume list
 	fVolMenu = new BPopUpMenu("", false, false);
-	BMenuField* volumeField = new BMenuField("", B_TRANSLATE("On"), fVolMenu);
-	volumeField->SetDivider(volumeField->StringWidth(volumeField->Label()) + 8);
+	fVolumeField = new BMenuField("", B_TRANSLATE("On"), fVolMenu);
+	fVolumeField->SetDivider(fVolumeField->StringWidth(fVolumeField->Label()) + 8);
 	AddVolumes(fVolMenu);
 	fVolMenu->AddSeparatorItem();
 	if (fDirectoryFilters.CountItems() > 0)
@@ -1221,9 +1232,9 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(fMimeTypeField)
 			.Add(mimeTypeFieldSpacer)
-			.Add(searchModeField)
+			.Add(fSearchModeField)
 			.AddStrut(B_USE_DEFAULT_SPACING)
-			.Add(volumeField)
+			.Add(fVolumeField)
 			.End()
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(queryControls);
@@ -1240,10 +1251,6 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 		AddByNameOrFormulaItems();
 	else
 		AddByAttributeItems(node);
-
-	ResizeMenuField(fMimeTypeField);
-	ResizeMenuField(searchModeField);
-	ResizeMenuField(volumeField);
 }
 
 
@@ -1441,6 +1448,8 @@ FindPanel::SaveDirectoryFiltersToFile(BNode* node)
 void
 FindPanel::AttachedToWindow()
 {
+	BView::AttachedToWindow();
+
 	FindWindow* findWindow = dynamic_cast<FindWindow*>(Window());
 	ASSERT(findWindow != NULL);
 
@@ -1494,6 +1503,11 @@ FindPanel::AttachedToWindow()
 			firstItem->SetMarked(true);
 	}
 
+	// resize menu fields after marking them
+	ResizeMenuField(fMimeTypeField);
+	ResizeMenuField(fSearchModeField);
+	ResizeMenuField(fVolumeField);
+
 	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
 }
@@ -1502,10 +1516,22 @@ FindPanel::AttachedToWindow()
 void
 FindPanel::ResizeMenuField(BMenuField* menuField)
 {
+	ASSERT(menuField != NULL);
+	if (menuField == NULL)
+		return;
+
+	BMenuBar* menuBar = menuField->MenuBar();
+	ASSERT(menuBar != NULL);
+	if (menuBar == NULL)
+		return;
+
 	BSize size;
-	menuField->GetPreferredSize(&size.width, &size.height);
+	menuBar->GetPreferredSize(&size.width, &size.height);
 
 	BMenu* menu = menuField->Menu();
+	ASSERT(menu != NULL);
+	if (menu == NULL)
+		return;
 
 	float padding = 0.0f;
 	float width = 0.0f;
@@ -1526,8 +1552,8 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 
 	for (int32 index = menu->CountItems(); index-- > 0; ) {
 		BMenuItem* item = menu->ItemAt(index);
-		if (item->Label() != NULL)
-			width = std::max(width, menuField->StringWidth(item->Label()));
+		if (item == NULL)
+			continue;
 
 		BMenu* submenu = item->Submenu();
 		if (submenu != NULL) {
@@ -1536,17 +1562,35 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 				if (subItem->Label() == NULL)
 					continue;
 
-				width = std::max(width,
-					menuField->StringWidth(subItem->Label()));
+				width = std::max(width, menuField->StringWidth(subItem->Label()));
 			}
+		} else if (item->Label() != NULL) {
+			width = std::max(width, menuField->StringWidth(item->Label()));
 		}
 	}
 
-	width = std::max(width, menuField->StringWidth(B_TRANSLATE("Multiple selections")));
+	// clip to reasonable min and max width
+	float minW = 0;
+	if (menuField == fVolumeField)
+		minW = menuField->StringWidth(B_TRANSLATE("Multiple selections"));
+	else
+		minW = be_control_look->DefaultLabelSpacing() * 10;
+	float maxW = be_control_look->DefaultLabelSpacing() * 30;
+	width = std::max(width, minW);
+	width = std::min(width, maxW);
 
-	float maxWidth = be_control_look->DefaultItemSpacing() * 20;
-	size.width = std::min(width + padding, maxWidth);
-	menuField->SetExplicitSize(size);
+	size.width = width + padding;
+
+	// set max content width to truncate long name
+	menuBar->SetMaxContentWidth(size.width);
+
+	// add room for pop-up indicator
+	size.width += kPopUpIndicatorWidth;
+
+	// make first-level menu width match
+	menu->SetMaxContentWidth(size.width);
+
+	menuBar->SetExplicitSize(size);
 }
 
 

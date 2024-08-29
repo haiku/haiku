@@ -425,7 +425,8 @@ IconMenuItem::GetContentSize(float* width, float* height)
 	if (*height < iconHeight)
 		*height = iconHeight;
 
-	*width += 20;
+	if (fDeviceIcon != NULL)
+		*width += fDeviceIcon->Bounds().Width() + be_control_look->DefaultLabelSpacing();
 }
 
 
@@ -434,7 +435,7 @@ IconMenuItem::DrawContent()
 {
 	BPoint drawPoint(ContentLocation());
 	if (fDeviceIcon != NULL)
-		drawPoint.x += (fDeviceIcon->Bounds().Width() + 1) + 4.0f;
+		drawPoint.x += fDeviceIcon->Bounds().Width() + be_control_look->DefaultLabelSpacing();
 
 	if (fHeightDelta > 0)
 		drawPoint.y += ceilf(fHeightDelta / 2);
