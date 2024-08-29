@@ -16,6 +16,9 @@
 #include <string.h>
 
 
+#ifdef _BEOS_R5_COMPATIBLE_
+
+
 bool __gR5Compatibility = false;
 addr_t __gNetworkStart;
 addr_t __gNetworkEnd;
@@ -78,3 +81,6 @@ initialize_before(image_id our_image)
 	} while (enable == 0
 		&& get_next_image_info(B_CURRENT_TEAM, (int32*)&cookie, &info) == B_OK);
 }
+
+
+#endif
