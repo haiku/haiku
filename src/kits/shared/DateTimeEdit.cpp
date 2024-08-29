@@ -106,9 +106,9 @@ TimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 
 	if (hasFocus)
 		SetLowColor(mix_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR),
-			ViewColor(), 192));
+			ui_color(B_DOCUMENT_BACKGROUND_COLOR), 192));
 	else
-		SetLowColor(ViewColor());
+		SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 
 	BString field;
 	fText.CopyCharsInto(field, fFieldPositions[index * 2],
@@ -117,7 +117,6 @@ TimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	FillRect(bounds, B_SOLID_LOW);
 	DrawString(field, point);
 }
@@ -136,7 +135,6 @@ TimeEdit::DrawSeparator(uint32 index, BRect bounds)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	DrawString(field, point);
 }
 
@@ -240,7 +238,7 @@ void
 TimeEdit::_UpdateFields()
 {
 	time_t time = fTime.Time_t();
-	
+
 	if (fFieldPositions != NULL) {
 		free(fFieldPositions);
 		fFieldPositions = NULL;
@@ -473,9 +471,9 @@ DateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 
 	if (hasFocus)
 		SetLowColor(mix_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR),
-			ViewColor(), 192));
+			ui_color(B_DOCUMENT_BACKGROUND_COLOR), 192));
 	else
-		SetLowColor(ViewColor());
+		SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 
 	BString field;
 	fText.CopyCharsInto(field, fFieldPositions[index * 2],
@@ -484,7 +482,6 @@ DateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	FillRect(bounds, B_SOLID_LOW);
 	DrawString(field, point);
 }
@@ -506,7 +503,6 @@ DateEdit::DrawSeparator(uint32 index, BRect bounds)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	DrawString(field, point);
 }
 
@@ -771,8 +767,10 @@ SectionEdit::~SectionEdit()
 void
 SectionEdit::AttachedToWindow()
 {
-	AdoptParentColors();
 	BControl::AttachedToWindow();
+
+	// Low colors are set in Draw() methods.
+	SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
 }
 
 
@@ -970,8 +968,11 @@ SectionEdit::DrawBorder(const BRect& updateRect)
 	BRect bounds(Bounds());
 	bool showFocus = (IsFocus() && Window() && Window()->IsActive());
 
-	be_control_look->DrawBorder(this, bounds, updateRect, ViewColor(),
-		B_FANCY_BORDER, showFocus ? BControlLook::B_FOCUSED : 0);
+	be_control_look->DrawTextControlBorder(this, bounds, updateRect, ViewColor(),
+		showFocus ? BControlLook::B_FOCUSED : 0);
+
+	SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	FillRect(bounds, B_SOLID_LOW);
 
 	// draw up/down control
 
@@ -987,7 +988,6 @@ SectionEdit::DrawBorder(const BRect& updateRect)
 	BPoint right(left.x + 2 * (middle.x - left.x), fUpRect.bottom - 1);
 
 	SetPenSize(2);
-	SetLowColor(ViewColor());
 
 	if (updateRect.Intersects(fUpRect)) {
 		FillRect(fUpRect, B_SOLID_LOW);
