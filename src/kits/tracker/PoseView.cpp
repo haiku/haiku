@@ -5137,6 +5137,8 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 				if (model != NULL)
 					srcList->AddItem(new entry_ref(*(model->EntryRef())));
 			}
+			if (!(forceCopy || forceMove || createRelativeLink))
+				createLink = true;
 		} else
 			CopySelectionListToEntryRefList(selectionList, srcList);
 
