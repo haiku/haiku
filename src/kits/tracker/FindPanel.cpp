@@ -1191,7 +1191,10 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 
 	// add popup for volume list
 	fVolMenu = new BPopUpMenu("", false, false);
-	fVolumeField = new BMenuField("", B_TRANSLATE("On"), fVolMenu);
+	fVolumeField = new BMenuField("",
+		B_TRANSLATE_COMMENT("Target:",
+			"The disks/folders that are searched. Similar to TextSearch's 'Set target'."),
+		fVolMenu);
 	fVolumeField->SetDivider(fVolumeField->StringWidth(fVolumeField->Label()) + 8);
 	AddVolumes(fVolMenu);
 	fVolMenu->AddSeparatorItem();
