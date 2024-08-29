@@ -107,8 +107,13 @@ UnixStreamEndpoint::Close()
 	UnixStreamEndpointLocker locker(this);
 
 	if (fState == unix_stream_endpoint_state::Connected) {
+		BReference<UnixStreamEndpoint> peerReference;
 		UnixStreamEndpointLocker peerLocker;
 		if (_LockConnectedEndpoints(locker, peerLocker) == B_OK) {
+			// The peer may be destroyed when we release it,
+			// so grab a reference for the locker's sake.
+			peerReference.SetTo(peerLocker.Get(), false);
+
 			// We're still connected. Disconnect both endpoints!
 			fPeerEndpoint->_Disconnect();
 			_Disconnect();
@@ -764,12 +769,13 @@ UnixStreamEndpoint::_LockConnectedEndpoints(UnixStreamEndpointLocker& locker,
 		// We're the child, but locking order is the other way around.
 		locker.Unlock();
 		peerLocker.SetTo(peerEndpoint, false);
-
 		locker.Lock();
 
 		// recheck our state, also whether the peer is still the same
-		if (fState != unix_stream_endpoint_state::Connected || peerEndpoint != fPeerEndpoint)
+		if (fState != unix_stream_endpoint_state::Connected || peerEndpoint != fPeerEndpoint) {
+			peerLocker.Unset();
 			RETURN_ERROR(ENOTCONN);
+		}
 	} else
 		peerLocker.SetTo(peerEndpoint, false);
 
