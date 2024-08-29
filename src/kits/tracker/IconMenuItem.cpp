@@ -186,7 +186,7 @@ ModelMenuItem::GetContentSize(float* width, float* height)
 	fHeightDelta = iconSize - *height;
 	if (*height < iconSize)
 		*height = iconSize;
-	*width = *width + iconSize / 4 + iconSize + (fExtraPad ? 18 : 0);
+	*width += iconSize / 4 + iconSize + (fExtraPad ? 18 : 0);
 }
 
 
@@ -502,15 +502,14 @@ IconMenuItem::SetMarked(bool mark)
 
 	// our topmost menu has a menu item
 
-	IconMenuItem* topLevelIconMenuItem
-		= dynamic_cast<IconMenuItem*>(topLevelItem);
-	if (topLevelIconMenuItem == NULL)
+	IconMenuItem* topLevelMenuItem = dynamic_cast<IconMenuItem*>(topLevelItem);
+	if (topLevelMenuItem == NULL)
 		return;
 
 	// our topmost menu's item is an IconMenuItem
 
 	// update the icon
-	topLevelIconMenuItem->SetIcon(fDeviceIcon);
+	topLevelMenuItem->SetIcon(fDeviceIcon);
 	menu->Invalidate();
 }
 
