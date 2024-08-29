@@ -1451,7 +1451,7 @@ FindPanel::SaveDirectoryFiltersToFile(BNode* node)
 void
 FindPanel::AttachedToWindow()
 {
-	BView::AttachedToWindow();
+	_inherited::AttachedToWindow();
 
 	FindWindow* findWindow = dynamic_cast<FindWindow*>(Window());
 	ASSERT(findWindow != NULL);
