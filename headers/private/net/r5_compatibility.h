@@ -38,6 +38,8 @@ struct r5_sockaddr_in {
 	char	sin_zero[4];
 };
 
+
+#ifdef _BEOS_R5_COMPATIBLE_
 extern bool __gR5Compatibility;
 extern addr_t __gNetworkStart;
 extern addr_t __gNetworkEnd;
@@ -67,6 +69,9 @@ check_r5_compatibility()
 	return true;
 #endif
 }
+#else
+#define check_r5_compatibility() (false)
+#endif
 
 
 #endif	// NET_R5_COMPATIBILITY_H
