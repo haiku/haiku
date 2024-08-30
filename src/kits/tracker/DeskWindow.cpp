@@ -445,7 +445,6 @@ BDeskWindow::AddWindowContextMenus(BMenu* menu)
 
 	menu->AddItem(tempateMenu);
 	tempateMenu->SetTargetForItems(PoseView());
-	tempateMenu->SetFont(be_plain_font);
 
 	menu->AddSeparatorItem();
 

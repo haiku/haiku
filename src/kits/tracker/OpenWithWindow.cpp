@@ -1066,8 +1066,6 @@ OpenWithMenu::OpenWithMenu(const char* label, const BMessage* entriesToOpen,
 {
 	InitIconPreloader();
 
-	SetFont(be_plain_font);
-
 	// too long to have triggers
 	SetTriggersEnabled(false);
 }
@@ -1085,8 +1083,6 @@ OpenWithMenu::OpenWithMenu(const char* label, const BMessage* entriesToOpen,
 	fParentWindow(parentWindow)
 {
 	InitIconPreloader();
-
-	SetFont(be_plain_font);
 
 	// too long to have triggers
 	SetTriggersEnabled(false);

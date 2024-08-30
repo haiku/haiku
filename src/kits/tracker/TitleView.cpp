@@ -307,7 +307,6 @@ BTitleView::MouseDown(BPoint where)
 
 	if (SecondaryMouseButtonDown(modifiers(), buttons)) {
 		BPopUpMenu* menu = new BPopUpMenu("Attributes", false, false);
-		menu->SetFont(be_plain_font);
 		window->NewAttributesMenu(menu);
 		window->AddMimeTypesToMenu(menu);
 		window->MarkAttributesMenu(menu);
