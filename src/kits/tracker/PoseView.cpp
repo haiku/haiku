@@ -4372,7 +4372,6 @@ RunMimeTypeDestinationMenu(const char* actionText,
 		return 0;
 
 	BPopUpMenu* menu = new BPopUpMenu("create clipping");
-	menu->SetFont(be_plain_font);
 
 	for (int32 index = 0; index < count; index++) {
 		const char* embedTypeAs = NULL;

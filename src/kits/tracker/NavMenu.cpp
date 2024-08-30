@@ -639,10 +639,15 @@ BNavMenu::NewModelItem(Model* model, const BMessage* invokeMessage,
 	BMessage* message = new BMessage(*invokeMessage);
 	message->AddRef("refs", model->EntryRef());
 
+	menu_info info;
+	get_menu_info(&info);
+	BFont menuFont;
+	menuFont.SetFamilyAndStyle(info.f_family, info.f_style);
+	menuFont.SetSize(info.font_size);
+
 	// truncate name if necessary
 	BString truncatedString(model->Name());
-	be_plain_font->TruncateString(&truncatedString, B_TRUNCATE_END,
-		GetMaxMenuWidth());
+	menuFont.TruncateString(&truncatedString, B_TRUNCATE_END, GetMaxMenuWidth());
 
 	ModelMenuItem* item = NULL;
 	if (!isContainer || suppressFolderHierarchy) {

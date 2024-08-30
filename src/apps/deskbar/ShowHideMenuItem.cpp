@@ -55,10 +55,16 @@ TShowHideMenuItem::TShowHideMenuItem(const char* title, const BList* teams,
 	fTeams(teams),
 	fAction(action)
 {
-	BFont font(be_plain_font);
-	fTitleWidth = ceilf(font.StringWidth(title));
+	// menu font
+	menu_info info;
+	get_menu_info(&info);
+	BFont menuFont;
+	menuFont.SetFamilyAndStyle(info.f_family, info.f_style);
+	menuFont.SetSize(info.font_size);
+
+	fTitleWidth = ceilf(menuFont.StringWidth(title));
 	font_height fontHeight;
-	font.GetHeight(&fontHeight);
+	menuFont.GetHeight(&fontHeight);
 	fTitleAscent = ceilf(fontHeight.ascent);
 	fTitleDescent = ceilf(fontHeight.descent + fontHeight.leading);
 }

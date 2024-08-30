@@ -328,10 +328,16 @@ BRecentItemsList::GetNextMenuItem(const BMessage* fileOpenInvokeMessage,
 
 	message->AddRef("refs", model.EntryRef());
 
+	// menu font
+	menu_info info;
+	get_menu_info(&info);
+	BFont menuFont;
+	menuFont.SetFamilyAndStyle(info.f_family, info.f_style);
+	menuFont.SetSize(info.font_size);
+
 	// Truncate the name if necessary
 	BString truncatedString(model.Name());
-	be_plain_font->TruncateString(&truncatedString, B_TRUNCATE_END,
-		BNavMenu::GetMaxMenuWidth());
+	menuFont.TruncateString(&truncatedString, B_TRUNCATE_END, BNavMenu::GetMaxMenuWidth());
 
 	ModelMenuItem* item = NULL;
 	if (!container || !fNavMenuFolders)

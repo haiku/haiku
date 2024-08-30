@@ -705,12 +705,10 @@ BContainerWindow::RepopulateMenus()
 
 	delete fFileContextMenu;
 	fFileContextMenu = new BPopUpMenu("FileContext", false, false);
-	fFileContextMenu->SetFont(be_plain_font);
 	AddFileContextMenus(fFileContextMenu);
 
 	delete fWindowContextMenu;
 	fWindowContextMenu = new BPopUpMenu("WindowContext", false, false);
-	fWindowContextMenu->SetFont(be_plain_font);
 	AddWindowContextMenus(fWindowContextMenu);
 
 	if (fMenuBar != NULL) {
@@ -1891,7 +1889,6 @@ BContainerWindow::AddFileMenu(BMenu* menu)
 				new BMessage(kIdentifyEntry)));
 		}
 		BMenu* addOnMenuItem = new BMenu(B_TRANSLATE("Add-ons"));
-		addOnMenuItem->SetFont(be_plain_font);
 		menu->AddItem(addOnMenuItem);
 	}
 
@@ -2743,7 +2740,6 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Identify"), message));
 
 	BMenu* addOnMenuItem = new BMenu(B_TRANSLATE("Add-ons"));
-	addOnMenuItem->SetFont(be_plain_font);
 	menu->AddItem(addOnMenuItem);
 
 	// set targets as needed
@@ -2812,7 +2808,6 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 				B_TRANSLATE("New"));
 			menu->AddItem(templatesMenu);
 			templatesMenu->SetTargetForItems(PoseView());
-			templatesMenu->SetFont(be_plain_font);
 		} else {
 			BMenuItem* item = new BMenuItem(B_TRANSLATE("New folder"),
 				new BMessage(kNewFolder), 'N');
@@ -2852,7 +2847,6 @@ BContainerWindow::AddWindowContextMenus(BMenu* menu)
 
 	menu->AddSeparatorItem();
 	BMenu* addOnMenuItem = new BMenu(B_TRANSLATE("Add-ons"));
-	addOnMenuItem->SetFont(be_plain_font);
 	menu->AddItem(addOnMenuItem);
 
 #if DEBUG

@@ -70,7 +70,6 @@ BDirMenu::BDirMenu(BMenuBar* bar, BMessenger target, uint32 command,
 	fMenuBar(bar),
 	fCommand(command)
 {
-	SetFont(be_plain_font);
 	if (entryName)
 		fEntryName = entryName;
 	else
