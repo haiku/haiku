@@ -202,6 +202,11 @@ const struct supported_device {
 	{0x4e71, INTEL_MODEL_JSLM,	"JasperLake"},
 
 	{0x9a49, INTEL_MODEL_TGLM,	"TigerLake"},
+	{0x9a78, INTEL_MODEL_TGLM,	"TigerLake"},
+	{0x9a40, INTEL_MODEL_TGLM,	"TigerLake"},
+	{0x9a60, INTEL_MODEL_TGLM,	"TigerLake"},
+	{0x9a68, INTEL_MODEL_TGLM,	"TigerLake"},
+	{0x9a70, INTEL_MODEL_TGLM,	"TigerLake"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
