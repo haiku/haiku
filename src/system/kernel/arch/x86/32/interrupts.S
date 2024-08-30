@@ -172,6 +172,10 @@
 		addl	$8, %esp;
 
 #	define TRACE_POST_SYSCALL()	\
+		testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi);	\
+		jnz		1f;															\
+		xor		%edx, %edx;													\
+1:																			\
 		push	%edx;							/* syscall return value */	\
 		push	%eax;														\
 		movl	IFRAME_orig_eax(%ebp), %eax;	/* syscall number */		\
@@ -642,13 +646,11 @@ STATIC_FUNCTION(handle_syscall):
 	// call the syscall function
 	call	*SYSCALL_INFO_function(%esi)
 
-	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
-	jnz		1f
-	xor		%edx, %edx
-  1:
-
 	// overwrite the values of %eax and %edx on the stack (the syscall return value)
+	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
+	jz		1f
 	movl	%edx, IFRAME_dx(%ebp)
+  1:
 	movl	%eax, IFRAME_ax(%ebp)
 
 	TRACE_POST_SYSCALL()
@@ -682,6 +684,27 @@ FUNCTION_END(handle_syscall)
   FUNCTION_END(do_pre_syscall_debug)
 
   STATIC_FUNCTION(post_syscall_work):
+	// post syscall debugging
+	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
+	jz		2f
+	pushl	-8(%ebp)				// syscall start time
+	pushl	-12(%ebp)
+	xor		%edx, %edx
+	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
+	jz		1f
+	movl	IFRAME_dx(%ebp), %edx	// syscall return value
+  1:
+	movl	IFRAME_ax(%ebp), %eax
+	push	%edx
+	push	%eax
+	lea		16(%esp), %eax			// syscall parameters
+	push	%eax
+	movl	IFRAME_orig_eax(%ebp), %eax		// syscall number
+	push	%eax
+	call	user_debug_post_syscall
+	addl	$24, %esp
+
+  2:
 	// clear the 64 bit return value and syscall restarted bits
 	testl	$(THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
 				| THREAD_FLAGS_SYSCALL_RESTARTED), THREAD_flags(%edi)
@@ -695,23 +718,6 @@ FUNCTION_END(handle_syscall)
 	cmpxchgl	%edx, THREAD_flags(%edi)
 	jnz		1b
   2:
-
-	// post syscall debugging
-	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
-	jz		1f
-	pushl	-8(%ebp)				// syscall start time
-	pushl	-12(%ebp)
-	movl	IFRAME_dx(%ebp), %edx	// syscall return value
-	movl	IFRAME_ax(%ebp), %eax
-	push	%edx
-	push	%eax
-	lea		16(%esp), %eax			// syscall parameters
-	push	%eax
-	movl	IFRAME_orig_eax(%ebp), %eax		// syscall number
-	push	%eax
-	call	user_debug_post_syscall
-	addl	$24, %esp
-  1:
   FUNCTION_END(post_syscall_work)
 
   bad_syscall_number:
