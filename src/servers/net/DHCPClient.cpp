@@ -484,6 +484,10 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fRunner(NULL),
 	fAssignedAddress(0),
 	fServer(AF_INET, NULL, DHCP_SERVER_PORT, B_UNCONFIGURED_ADDRESS_FAMILIES),
+	fStartTime(0),
+	fRequestTime(0),
+	fRenewalTime(0),
+	fRebindingTime(0),
 	fLeaseTime(0)
 {
 	fTransactionID = (uint32)system_time() ^ rand();
