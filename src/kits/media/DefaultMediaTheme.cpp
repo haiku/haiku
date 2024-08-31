@@ -286,12 +286,8 @@ TitleView::Draw(BRect updateRect)
 	BRect rect(Bounds());
 	rect.left = (rect.Width() - StringWidth(fTitle)) / 2;
 
-	SetDrawingMode(B_OP_COPY);
-	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_2_TINT));
-	DrawString(fTitle, BPoint(rect.left + 1, rect.bottom - 8));
-
 	SetDrawingMode(B_OP_OVER);
-	SetHighColor(80, 20, 20);
+	SetHighColor(mix_color(ui_color(B_PANEL_TEXT_COLOR), make_color(255, 0, 0), 100));
 	DrawString(fTitle, BPoint(rect.left, rect.bottom - 9));
 }
 
@@ -306,8 +302,7 @@ TitleView::GetPreferredSize(float *_width, float *_height)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = fontHeight.ascent + fontHeight.descent + fontHeight.leading
-			+ 8;
+		*_height = fontHeight.ascent + fontHeight.descent + fontHeight.leading + 8;
 	}
 }
 
