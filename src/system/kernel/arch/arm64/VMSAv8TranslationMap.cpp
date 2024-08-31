@@ -673,24 +673,28 @@ VMSAv8TranslationMap::Unmap(addr_t start, addr_t end)
 status_t
 VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQueue)
 {
+	uint64_t pageMask = (1UL << fPageBits) - 1;
+	uint64_t vaMask = (1UL << fVaBits) - 1;
+
+	ASSERT((address & pageMask) == 0);
+	ASSERT(ValidateVa(address));
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 	RecursiveLocker locker(fLock);
 
-	// TODO: replace this kludge
-
-	phys_addr_t pa;
-	uint64_t pte;
-	if (!WalkTable(fPageTable, fInitialLevel, address, &pa, &pte))
-		return B_ENTRY_NOT_FOUND;
-
-	uint64_t vaMask = (1UL << fVaBits) - 1;
-	MapRange(fPageTable, fInitialLevel, address & vaMask, 0, B_PAGE_SIZE, VMAction::UNMAP, 0, NULL);
+	uint64_t oldPte = 0;
+	ProcessRange(fPageTable, 0, address & vaMask, B_PAGE_SIZE, nullptr,
+		[=, &oldPte](uint64_t* ptePtr, uint64_t effectiveVa) {
+			oldPte = atomic_get_and_set64((int64_t*)ptePtr, 0);
+			asm("dsb ishst");
+			if ((oldPte & kAttrAF) != 0)
+				FlushVAFromTLBByASID(effectiveVa);
+		});
 
 	pinner.Unlock();
 	locker.Detach();
-	PageUnmapped(area, pa >> fPageBits, (tmp_pte & kAttrAF) != 0, (tmp_pte & kAttrAPReadOnly) == 0,
-		updatePageQueue);
+	PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, (oldPte & kAttrAF) != 0,
+		(oldPte & kAttrAPReadOnly) == 0, updatePageQueue);
 
 	return B_OK;
 }
@@ -749,42 +753,42 @@ VMSAv8TranslationMap::ValidateVa(addr_t va)
 status_t
 VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 {
+	*flags = 0;
+	*pa = 0;
+
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
+	uint64_t pageMask = (1UL << fPageBits) - 1;
+	uint64_t vaMask = (1UL << fVaBits) - 1;
+
+	ASSERT((va & pageMask) == 0);
 	ASSERT(ValidateVa(va));
 
-	uint64_t pte = 0;
-	bool ret = WalkTable(fPageTable, fInitialLevel, va, pa, &pte);
+	ProcessRange(fPageTable, 0, va & vaMask, B_PAGE_SIZE, nullptr,
+		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
+			uint64_t pte = atomic_get64((int64_t*)ptePtr);
+			*pa = pte & kPteAddrMask;
+			*flags |= PAGE_PRESENT | B_KERNEL_READ_AREA;
+			if ((pte & kAttrAF) != 0)
+				*flags |= PAGE_ACCESSED;
+			if ((pte & kAttrAPReadOnly) == 0)
+				*flags |= PAGE_MODIFIED;
 
-	uint32 result = 0;
-
-	if (ret) {
-		result |= PAGE_PRESENT;
-
-		if ((pte & kAttrAF) != 0)
-			result |= PAGE_ACCESSED;
-		if ((pte & kAttrAPReadOnly) == 0)
-			result |= PAGE_MODIFIED;
-
-		if ((pte & kAttrUXN) == 0)
-			result |= B_EXECUTE_AREA;
-		if ((pte & kAttrPXN) == 0)
-			result |= B_KERNEL_EXECUTE_AREA;
-
-		result |= B_KERNEL_READ_AREA;
-
-		if ((pte & kAttrAPUserAccess) != 0)
-			result |= B_READ_AREA;
-
-		if ((pte & kAttrAPReadOnly) == 0 || (pte & kAttrSWDBM) != 0) {
-			result |= B_KERNEL_WRITE_AREA;
+			if ((pte & kAttrUXN) == 0)
+				*flags |= B_EXECUTE_AREA;
+			if ((pte & kAttrPXN) == 0)
+				*flags |= B_KERNEL_EXECUTE_AREA;
 
 			if ((pte & kAttrAPUserAccess) != 0)
-				result |= B_WRITE_AREA;
-		}
-	}
+				*flags |= B_READ_AREA;
 
-	*flags = result;
+			if ((pte & kAttrAPReadOnly) == 0 || (pte & kAttrSWDBM) != 0) {
+				*flags |= B_KERNEL_WRITE_AREA;
+				if ((pte & kAttrAPUserAccess) != 0)
+					*flags |= B_WRITE_AREA;
+			}
+		});
+
 	return B_OK;
 }
 
