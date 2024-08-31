@@ -82,35 +82,22 @@ private:
 	int fPageBits;
 	int fVaBits;
 	int fMinBlockLevel;
-
 	int fInitialLevel;
-
 	int fASID;
-
-	enum class VMAction { MAP, SET_ATTR, CLEAR_FLAGS, UNMAP };
-
 	int fRefcount;
-
-	uint64_t tmp_pte; // todo: remove kludge
 
 private:
 	static uint8_t MairIndex(uint8_t type);
-	uint64_t ClearAttrFlags(uint64_t attr, uint32 flags);
-	uint64_t MoveAttrFlags(uint64_t newAttr, uint64_t oldAttr);
 	bool ValidateVa(addr_t va);
 	uint64_t* TableFromPa(phys_addr_t pa);
-	uint64_t MakeBlock(phys_addr_t pa, int level, uint64_t attr);
 	template<typename EntryRemoved>
 	void FreeTable(phys_addr_t ptPa, uint64_t va, int level, EntryRemoved &&entryRemoved);
 	phys_addr_t GetOrMakeTable(phys_addr_t ptPa, int level, int index, vm_page_reservation* reservation);
-	void MapRange(phys_addr_t ptPa, int level, addr_t va, phys_addr_t pa, size_t size,
-		VMAction action, uint64_t attr, vm_page_reservation* reservation);
 	template<typename UpdatePte>
 	void ProcessRange(phys_addr_t ptPa, int level, addr_t va, size_t size,
 		vm_page_reservation* reservation, UpdatePte &&updatePte);
 	void PerformPteBreakBeforeMake(uint64_t* ptePtr, addr_t va);
 	void FlushVAFromTLBByASID(addr_t va);
-	bool WalkTable(phys_addr_t ptPa, int level, addr_t va, phys_addr_t* pa, uint64_t* attr);
 };
 
 

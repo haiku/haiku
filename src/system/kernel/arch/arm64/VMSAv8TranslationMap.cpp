@@ -242,15 +242,6 @@ VMSAv8TranslationMap::TableFromPa(phys_addr_t pa)
 }
 
 
-uint64_t
-VMSAv8TranslationMap::MakeBlock(phys_addr_t pa, int level, uint64_t attr)
-{
-	ASSERT(level >= fMinBlockLevel && level < 4);
-
-	return pa | attr | (level == 3 ? 0x3 : 0x1);
-}
-
-
 template<typename EntryRemoved>
 void
 VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level,
@@ -408,97 +399,6 @@ VMSAv8TranslationMap::ProcessRange(phys_addr_t ptPa, int level, addr_t va, size_
 }
 
 
-void
-VMSAv8TranslationMap::MapRange(phys_addr_t ptPa, int level, addr_t va, phys_addr_t pa, size_t size,
-	VMSAv8TranslationMap::VMAction action, uint64_t attr, vm_page_reservation* reservation)
-{
-	ASSERT(level < 4);
-	ASSERT(ptPa != 0);
-	ASSERT(reservation != NULL || action != VMAction::MAP);
-
-	int tableBits = fPageBits - 3;
-	uint64_t tableMask = (1UL << tableBits) - 1;
-
-	int shift = tableBits * (3 - level) + fPageBits;
-	uint64_t entrySize = 1UL << shift;
-
-	uint64_t entryMask = entrySize - 1;
-	uint64_t nextVa = va;
-	uint64_t end = va + size;
-	int index;
-
-	// Handle misaligned header that straddles entry boundary in next-level table
-	if ((va & entryMask) != 0) {
-		uint64_t aligned = (va & ~entryMask) + entrySize;
-		if (end > aligned) {
-			index = (va >> shift) & tableMask;
-			phys_addr_t table = GetOrMakeTable(ptPa, level, index, reservation);
-			MapRange(table, level + 1, va, pa, aligned - va, action, attr, reservation);
-			nextVa = aligned;
-		}
-	}
-
-	// Handle fully aligned and appropriately sized chunks
-	while (nextVa + entrySize <= end) {
-		phys_addr_t targetPa = pa + (nextVa - va);
-		index = (nextVa >> shift) & tableMask;
-
-		bool blockAllowed = false;
-		if (action == VMAction::MAP)
-			blockAllowed = (level >= fMinBlockLevel && (targetPa & entryMask) == 0);
-		if (action == VMAction::SET_ATTR || action == VMAction::CLEAR_FLAGS)
-			blockAllowed = (GetOrMakeTable(ptPa, level, index, NULL) == 0);
-		if (action == VMAction::UNMAP)
-			blockAllowed = true;
-
-		if (blockAllowed) {
-			// Everything is aligned, we can make block mapping there
-			uint64_t* pte = TableFromPa(ptPa) + index;
-
-		retry:
-			uint64_t oldPte = atomic_get64((int64*) pte);
-
-			if (action == VMAction::MAP || (oldPte & 0x1) != 0) {
-				uint64_t newPte = 0;
-				if (action == VMAction::MAP) {
-					newPte = MakeBlock(targetPa, level, attr);
-				} else if (action == VMAction::SET_ATTR) {
-					newPte = MakeBlock(oldPte & kPteAddrMask, level, MoveAttrFlags(attr, oldPte));
-				} else if (action == VMAction::CLEAR_FLAGS) {
-					newPte = MakeBlock(oldPte & kPteAddrMask, level, ClearAttrFlags(oldPte, attr));
-				} else if (action == VMAction::UNMAP) {
-					newPte = 0;
-					tmp_pte = oldPte;
-				}
-
-				// FIXME: this might not be enough on real hardware with SMP for some cases
-				if ((uint64_t) atomic_test_and_set64((int64*) pte, newPte, oldPte) != oldPte)
-					goto retry;
-
-				if (level < 3 && (oldPte & 0x3) == 0x3) {
-					// If we're replacing existing pagetable clean it up
-					FreeTable(oldPte & kPteAddrMask, nextVa, level + 1,
-						[](int level, uint64_t oldPte) {});
-				}
-			}
-		} else {
-			// Otherwise handle mapping in next-level table
-			phys_addr_t table = GetOrMakeTable(ptPa, level, index, reservation);
-			MapRange(table, level + 1, nextVa, targetPa, entrySize, action, attr, reservation);
-		}
-		nextVa += entrySize;
-	}
-
-	// Handle misaligned tail area (or entirety of small area) in next-level table
-	if (nextVa < end) {
-		index = (nextVa >> shift) & tableMask;
-		phys_addr_t table = GetOrMakeTable(ptPa, level, index, reservation);
-		MapRange(
-			table, level + 1, nextVa, pa + (nextVa - va), end - nextVa, action, attr, reservation);
-	}
-}
-
-
 uint8_t
 VMSAv8TranslationMap::MairIndex(uint8_t type)
 {
@@ -508,33 +408,6 @@ VMSAv8TranslationMap::MairIndex(uint8_t type)
 
 	panic("MAIR entry not found");
 	return 0;
-}
-
-
-uint64_t
-VMSAv8TranslationMap::ClearAttrFlags(uint64_t attr, uint32 flags)
-{
-	attr &= kPteAttrMask;
-
-	if ((flags & PAGE_ACCESSED) != 0)
-		attr &= ~kAttrAF;
-
-	if ((flags & PAGE_MODIFIED) != 0 && (attr & kAttrSWDBM) != 0)
-		attr |= kAttrAPReadOnly;
-
-	return attr;
-}
-
-
-uint64_t
-VMSAv8TranslationMap::MoveAttrFlags(uint64_t newAttr, uint64_t oldAttr)
-{
-	if ((oldAttr & kAttrAF) != 0)
-		newAttr |= kAttrAF;
-	if (((newAttr & oldAttr) & kAttrSWDBM) != 0 && (oldAttr & kAttrAPReadOnly) == 0)
-		newAttr &= ~kAttrAPReadOnly;
-
-	return newAttr;
 }
 
 
@@ -697,43 +570,6 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 		(oldPte & kAttrAPReadOnly) == 0, updatePageQueue);
 
 	return B_OK;
-}
-
-
-bool
-VMSAv8TranslationMap::WalkTable(
-	phys_addr_t ptPa, int level, addr_t va, phys_addr_t* pa, uint64_t* rpte)
-{
-	int tableBits = fPageBits - 3;
-	uint64_t tableMask = (1UL << tableBits) - 1;
-
-	int shift = tableBits * (3 - level) + fPageBits;
-	uint64_t entrySize = 1UL << shift;
-	uint64_t entryMask = entrySize - 1;
-
-	int index = (va >> shift) & tableMask;
-
-	uint64_t pte = TableFromPa(ptPa)[index];
-	int type = pte & 0x3;
-
-	if ((type & 0x1) == 0)
-		return false;
-
-	uint64_t addr = pte & kPteAddrMask;
-	if (level < 3) {
-		if (type == 0x3) {
-			return WalkTable(addr, level + 1, va, pa, rpte);
-		} else {
-			*pa = addr | (va & entryMask);
-			*rpte = pte;
-		}
-	} else {
-		ASSERT(type == 0x3);
-		*pa = addr;
-		*rpte = pte;
-	}
-
-	return true;
 }
 
 
