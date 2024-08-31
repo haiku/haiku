@@ -829,9 +829,34 @@ VMSAv8TranslationMap::ClearFlags(addr_t va, uint32 flags)
 	ASSERT((va & pageMask) == 0);
 	ASSERT(ValidateVa(va));
 
-	MapRange(
-		fPageTable, fInitialLevel, va & vaMask, 0, B_PAGE_SIZE, VMAction::CLEAR_FLAGS, flags, NULL);
+	bool clearAF = flags & kAttrAF;
+	bool setRO = flags & kAttrAPReadOnly;
 
+	if (!clearAF && !setRO)
+		return B_OK;
+
+	ProcessRange(fPageTable, 0, va & vaMask, B_PAGE_SIZE, nullptr,
+		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
+			if (clearAF && setRO) {
+				// We need to use an atomic compare-swap loop because we must
+				// need to clear one bit while setting the other.
+				while (true) {
+					uint64_t oldPte = atomic_get64((int64_t*)ptePtr);
+					uint64_t newPte = oldPte & ~kAttrAF;
+					newPte |= kAttrAPReadOnly;
+
+                    if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte)
+						break;
+				}
+			} else if (clearAF) {
+				atomic_and64((int64_t*)ptePtr, ~kAttrAPReadOnly);
+			} else {
+				atomic_or64((int64_t*)ptePtr, kAttrAPReadOnly);
+			}
+			asm("dsb ishst"); // Ensure PTE write completed
+		});
+
+	FlushVAFromTLBByASID(va);
 	return B_OK;
 }
 
