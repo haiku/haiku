@@ -109,7 +109,7 @@ struct VMKernelAddressRangeGetFreeListLink {
 };
 
 
-struct VMKernelArea : VMArea, AVLTreeNode {
+struct VMKernelArea final : VMArea, AVLTreeNode {
 								VMKernelArea(VMAddressSpace* addressSpace,
 									uint32 wiring, uint32 protection);
 								~VMKernelArea();
