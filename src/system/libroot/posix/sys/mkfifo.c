@@ -5,6 +5,7 @@
 
 
 #include <errno.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 
 #include <errno_private.h>
@@ -15,7 +16,7 @@
 int
 mkfifo(const char *path, mode_t mode)
 {
-	RETURN_AND_SET_ERRNO(_kern_create_fifo(-1, path, mode));
+	return mkfifoat(AT_FDCWD, path, mode);
 }
 
 
