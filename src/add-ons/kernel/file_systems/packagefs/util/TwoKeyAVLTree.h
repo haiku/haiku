@@ -138,12 +138,42 @@ public:
 // #pragma mark - TwoKeyAVLTreeNodeStrategy
 
 
+template<typename Value>
+struct TwoKeyAVLTreeNode : AVLTreeNode {
+	static object_cache* sNodeCache;
+
+	static void* operator new(size_t size)
+	{
+		object_cache* cache = TwoKeyAVLTreeNode<void*>::sNodeCache;
+		const size_t nodeSize = sizeof(TwoKeyAVLTreeNode<void*>);
+		if (size != nodeSize || cache == NULL)
+			panic("unexpected size passed to operator new!");
+		return object_cache_alloc(cache, 0);
+	}
+	static void operator delete(void* object)
+	{
+		object_cache_free(TwoKeyAVLTreeNode<void*>::sNodeCache, object, 0);
+	}
+
+public:
+	TwoKeyAVLTreeNode(const Value& value)
+		:
+		AVLTreeNode(),
+		value(value)
+	{
+	}
+
+	Value	value;
+};
+
+
 template <typename PrimaryKey, typename SecondaryKey, typename Value,
 	typename PrimaryKeyCompare, typename SecondaryKeyCompare,
 	typename GetPrimaryKey, typename GetSecondaryKey>
 class TwoKeyAVLTreeNodeStrategy {
 public:
 	typedef TwoKeyAVLTreeKey<PrimaryKey, SecondaryKey> Key;
+	typedef TwoKeyAVLTreeNode<Value> Node;
 
 	TwoKeyAVLTreeNodeStrategy(
 		const PrimaryKeyCompare& primaryKeyCompare = PrimaryKeyCompare(),
@@ -156,58 +186,19 @@ public:
 		fGetPrimaryKey(getPrimaryKey),
 		fGetSecondaryKey(getSecondaryKey)
 	{
-		fObjectCache = create_object_cache("packagefs TwoKeyAVLTreeNodes", sizeof(Node), 8,
-			NULL, NULL, NULL);
-		fObjectCacheRefs = new int32(1);
-	}
-	TwoKeyAVLTreeNodeStrategy(const TwoKeyAVLTreeNodeStrategy& other)
-		:
-		fPrimaryKeyCompare(other.fPrimaryKeyCompare),
-		fSecondaryKeyCompare(other.fSecondaryKeyCompare),
-		fGetPrimaryKey(other.fGetPrimaryKey),
-		fGetSecondaryKey(other.fGetSecondaryKey),
-		fObjectCache(other.fObjectCache),
-		fObjectCacheRefs(other.fObjectCacheRefs)
-	{
-		atomic_add(fObjectCacheRefs, 1);
 	}
 	~TwoKeyAVLTreeNodeStrategy()
 	{
-		atomic_add(fObjectCacheRefs, -1);
-		if (atomic_get(fObjectCacheRefs) == 0) {
-			delete_object_cache(fObjectCache);
-			delete fObjectCacheRefs;
-		}
 	}
-
-	struct Node : AVLTreeNode {
-		static void* operator new(size_t size, object_cache* cache) {
-			if (size != sizeof(Node) || !cache)
-				panic("unexpected size passed to operator new!");
-			return object_cache_alloc(cache, 0);
-		}
-
-		Node(const Value& value)
-			:
-			AVLTreeNode(),
-			value(value)
-		{
-		}
-
-		Value	value;
-	};
 
 	inline Node* Allocate(const Key& key, const Value& value) const
 	{
-		return new(fObjectCache) Node(value);
+		return new Node(value);
 	}
 
 	inline void Free(Node* node) const
 	{
-		if (node == NULL)
-			return;
-
-		object_cache_delete<Node>(fObjectCache, node, 0);
+		delete node;
 	}
 
 	// internal use (not part of the strategy)
@@ -260,9 +251,6 @@ private:
 	SecondaryKeyCompare	fSecondaryKeyCompare;
 	GetPrimaryKey		fGetPrimaryKey;
 	GetSecondaryKey		fGetSecondaryKey;
-
-	object_cache*		fObjectCache;
-	int32*				fObjectCacheRefs;
 };
 
 

@@ -19,6 +19,7 @@
 #include <AutoDeleter.h>
 
 #include <package/hpkg/PackageFileHeapAccessorBase.h>
+#include "util/TwoKeyAVLTree.h"
 
 #include "AttributeCookie.h"
 #include "AttributeDirectoryCookie.h"
@@ -31,6 +32,8 @@
 #include "Utils.h"
 #include "Volume.h"
 
+
+template<> object_cache* TwoKeyAVLTreeNode<void*>::sNodeCache = NULL;
 
 static const uint32 kOptimalIOSize = 64 * 1024;
 
@@ -1085,6 +1088,9 @@ packagefs_std_ops(int32 op, ...)
 					PackageFileHeapAccessorBase::kChunkSize, sizeof(void*),
 					0, /* magazine capacity, count */ 2, 1, 0, NULL,
 					NULL, NULL, NULL);
+			TwoKeyAVLTreeNode<void*>::sNodeCache =
+				create_object_cache("pkgfs TKAVLTreeNodes",
+					sizeof(TwoKeyAVLTreeNode<void*>), 8, NULL, NULL, NULL);
 
 			error = PackageFSRoot::GlobalInit();
 			if (error != B_OK) {
@@ -1102,6 +1108,7 @@ packagefs_std_ops(int32 op, ...)
 		{
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
 			PackageFSRoot::GlobalUninit();
+			delete_object_cache(TwoKeyAVLTreeNode<void*>::sNodeCache);
 			delete_object_cache((object_cache*)
 				PackageFileHeapAccessorBase::sChunkCache);
 			StringConstants::Cleanup();
