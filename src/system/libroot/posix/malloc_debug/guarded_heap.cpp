@@ -18,6 +18,7 @@
 
 #include <libroot_private.h>
 #include <runtime_loader.h>
+#include <vm_defs.h>
 
 #include <TLS.h>
 
@@ -222,11 +223,22 @@ guarded_heap_segfault_handler(int signal, siginfo_t* signalInfo, void* vregs)
 
 
 static void
+guarded_heap_page_protect_raw(addr_t address, size_t size, uint32 protection)
+{
+	mprotect((void*)address, size, protection);
+	if (protection == 0)
+		madvise((void*)address, size, MADV_FREE);
+	else
+		memset((void*)address, 0xcc, size);
+}
+
+
+static void
 guarded_heap_page_protect(guarded_heap_area& area, size_t pageIndex,
 	uint32 protection)
 {
-	addr_t address = area.base + pageIndex * B_PAGE_SIZE;
-	mprotect((void*)address, B_PAGE_SIZE, protection);
+	guarded_heap_page_protect_raw(area.base + pageIndex * B_PAGE_SIZE,
+		B_PAGE_SIZE, protection);
 }
 
 
@@ -472,7 +484,8 @@ guarded_heap_area_create(guarded_heap& heap, size_t size)
 
 		void* baseAddress = NULL;
 		area_id id = create_area("guarded_heap_area", &baseAddress,
-			B_ANY_ADDRESS, trySize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+			B_ANY_ADDRESS, trySize, B_NO_LOCK,
+			B_READ_AREA | B_WRITE_AREA | B_OVERCOMMITTING_AREA);
 
 		if (id < 0)
 			continue;
@@ -536,14 +549,14 @@ guarded_heap_allocate_with_area(size_t size, size_t alignment)
 
 	if (alignment <= B_PAGE_SIZE) {
 		// Protect just the guard page.
-		mprotect((void*)((addr_t)address + pagesNeeded * B_PAGE_SIZE),
-			B_PAGE_SIZE, 0);
+		guarded_heap_page_protect_raw(
+			(addr_t)address + pagesNeeded * B_PAGE_SIZE, B_PAGE_SIZE, 0);
 	} else {
 		// Protect empty pages before the allocation start...
 		addr_t protectedStart = (addr_t)address + B_PAGE_SIZE;
 		size_t protectedSize = (addr_t)page->allocation_base - protectedStart;
 		if (protectedSize > 0)
-			mprotect((void*)protectedStart, protectedSize, 0);
+			guarded_heap_page_protect_raw(protectedStart, protectedSize, 0);
 
 		// ... and after allocation end.
 		size_t allocatedPages = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
@@ -553,7 +566,7 @@ guarded_heap_allocate_with_area(size_t size, size_t alignment)
 			- protectedStart;
 
 		// There is at least the guard page.
-		mprotect((void*)protectedStart, protectedSize, 0);
+		guarded_heap_page_protect_raw(protectedStart, protectedSize, 0);
 	}
 
 	return page->allocation_base;
