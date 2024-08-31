@@ -11,9 +11,13 @@
 #include <algorithm>
 #include <new>
 
+#include "ClassCache.h"
 #include "UnpackingAttributeCookie.h"
 #include "UnpackingAttributeDirectoryCookie.h"
 #include "Utils.h"
+
+
+CLASS_CACHE(UnpackingLeafNode);
 
 
 UnpackingLeafNode::UnpackingLeafNode(ino_t id)
@@ -212,7 +216,7 @@ UnpackingLeafNode::CloneTransferPackageNodes(ino_t id, UnpackingNode*& _newNode)
 {
 	ASSERT(fFinalPackageNode == NULL);
 
-	UnpackingLeafNode* clone = new(std::nothrow) UnpackingLeafNode(id);
+	UnpackingLeafNode* clone = new UnpackingLeafNode(id);
 	if (clone == NULL)
 		return B_NO_MEMORY;
 

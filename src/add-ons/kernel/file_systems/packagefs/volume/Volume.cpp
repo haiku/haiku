@@ -399,7 +399,7 @@ Volume::Mount(const char* parameterString)
 
 	// create the root node
 	fRootDirectory
-		= new(std::nothrow) ::RootDirectory(kRootDirectoryID, st.st_mtim);
+		= new ::RootDirectory(kRootDirectoryID, st.st_mtim);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 	fRootDirectory->Init(NULL, volumeNameString);
@@ -1394,9 +1394,9 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const String& name,
 {
 	UnpackingNode* unpackingNode;
 	if (S_ISREG(mode) || S_ISLNK(mode))
-		unpackingNode = new(std::nothrow) UnpackingLeafNode(fNextNodeID++);
+		unpackingNode = new UnpackingLeafNode(fNextNodeID++);
 	else if (S_ISDIR(mode))
-		unpackingNode = new(std::nothrow) UnpackingDirectory(fNextNodeID++);
+		unpackingNode = new UnpackingDirectory(fNextNodeID++);
 	else
 		RETURN_ERROR(B_UNSUPPORTED);
 

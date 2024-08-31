@@ -11,8 +11,11 @@
 #include "UnpackingNode.h"
 
 
-class UnpackingLeafNode : public Node, public UnpackingNode {
+class UnpackingLeafNode final : public Node, public UnpackingNode {
 public:
+	static	void*				operator new(size_t size);
+	static	void				operator delete(void* block);
+
 								UnpackingLeafNode(ino_t id);
 	virtual						~UnpackingLeafNode();
 
