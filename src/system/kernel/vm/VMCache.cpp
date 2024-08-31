@@ -52,7 +52,7 @@
 #if DEBUG_CACHE_LIST
 VMCache* gDebugCacheList;
 #endif
-static mutex sCacheListLock = MUTEX_INITIALIZER("global VMCache list");
+static rw_lock sCacheListLock = RW_LOCK_INITIALIZER("global VMCache list");
 	// The lock is also needed when the debug feature is disabled.
 
 ObjectCache* gCacheRefObjectCache;
@@ -558,23 +558,23 @@ vm_cache_init_post_heap()
 VMCache*
 vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 {
-	mutex_lock(&sCacheListLock);
+	rw_lock_read_lock(&sCacheListLock);
 
-	while (dontWait) {
+	if (dontWait) {
 		VMCacheRef* cacheRef = page->CacheRef();
 		if (cacheRef == NULL) {
-			mutex_unlock(&sCacheListLock);
+			rw_lock_read_unlock(&sCacheListLock);
 			return NULL;
 		}
 
 		VMCache* cache = cacheRef->cache;
 		if (!cache->TryLock()) {
-			mutex_unlock(&sCacheListLock);
+			rw_lock_read_unlock(&sCacheListLock);
 			return NULL;
 		}
 
 		if (cacheRef == page->CacheRef()) {
-			mutex_unlock(&sCacheListLock);
+			rw_lock_read_unlock(&sCacheListLock);
 			cache->AcquireRefLocked();
 			return cache;
 		}
@@ -586,20 +586,20 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 	while (true) {
 		VMCacheRef* cacheRef = page->CacheRef();
 		if (cacheRef == NULL) {
-			mutex_unlock(&sCacheListLock);
+			rw_lock_read_unlock(&sCacheListLock);
 			return NULL;
 		}
 
 		VMCache* cache = cacheRef->cache;
-		if (!cache->SwitchLock(&sCacheListLock)) {
+		if (!cache->SwitchFromReadLock(&sCacheListLock)) {
 			// cache has been deleted
-			mutex_lock(&sCacheListLock);
+			rw_lock_read_unlock(&sCacheListLock);
 			continue;
 		}
 
-		mutex_lock(&sCacheListLock);
+		rw_lock_read_lock(&sCacheListLock);
 		if (cache == page->Cache()) {
-			mutex_unlock(&sCacheListLock);
+			rw_lock_read_unlock(&sCacheListLock);
 			cache->AcquireRefLocked();
 			return cache;
 		}
@@ -674,14 +674,14 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 		return B_NO_MEMORY;
 
 #if DEBUG_CACHE_LIST
-	mutex_lock(&sCacheListLock);
+	rw_lock_write_lock(&sCacheListLock);
 
 	if (gDebugCacheList != NULL)
 		gDebugCacheList->debug_previous = this;
 	debug_next = gDebugCacheList;
 	gDebugCacheList = this;
 
-	mutex_unlock(&sCacheListLock);
+	rw_lock_write_unlock(&sCacheListLock);
 #endif
 
 	return B_OK;
@@ -722,7 +722,7 @@ VMCache::Delete()
 	// We lock and unlock the sCacheListLock, even if the DEBUG_CACHE_LIST is
 	// not enabled. This synchronization point is needed for
 	// vm_cache_acquire_locked_page_cache().
-	mutex_lock(&sCacheListLock);
+	rw_lock_write_lock(&sCacheListLock);
 
 #if DEBUG_CACHE_LIST
 	if (debug_previous)
@@ -735,7 +735,7 @@ VMCache::Delete()
 
 	mutex_destroy(&fLock);
 
-	mutex_unlock(&sCacheListLock);
+	rw_lock_write_unlock(&sCacheListLock);
 
 	DeleteObject();
 }
@@ -917,11 +917,11 @@ VMCache::MoveAllPages(VMCache* fromCache)
 	fromCache->fWiredPagesCount = 0;
 
 	// swap the VMCacheRefs
-	mutex_lock(&sCacheListLock);
+	rw_lock_write_lock(&sCacheListLock);
 	std::swap(fCacheRef, fromCache->fCacheRef);
 	fCacheRef->cache = this;
 	fromCache->fCacheRef->cache = fromCache;
-	mutex_unlock(&sCacheListLock);
+	rw_lock_write_unlock(&sCacheListLock);
 
 #if VM_CACHE_TRACING >= 2
 	for (VMCachePagesTree::Iterator it = pages.GetIterator();
