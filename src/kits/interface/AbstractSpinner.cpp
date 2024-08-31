@@ -1069,8 +1069,8 @@ BAbstractSpinner::ValueChanged()
 void
 BAbstractSpinner::MessageReceived(BMessage* message)
 {
-	if (!IsEnabled() && message->what == B_COLORS_UPDATED)
-		_UpdateTextViewColors(false);
+	if (message->what == B_COLORS_UPDATED)
+		_UpdateTextViewColors(IsEnabled());
 
 	BControl::MessageReceived(message);
 }
