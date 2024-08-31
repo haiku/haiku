@@ -1,10 +1,14 @@
-1	italian	x-vnd.Haiku-GLifeScreensaver	1505005443
+1	italian	x-vnd.Haiku-GLifeScreensaver	3750244792
 by Aaron Hill	GLife ScreenSaver		di Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Ritardo nella griglia della vita: nessuno
 None	GLife ScreenSaver		Nessuno
 Grid width: 	GLife ScreenSaver		Ampiezza della griglia: 
+Grid life delay: %d×	This is a factor: the × represents 'times', don't translate '%d'		Intervallo aggiornamento griglia: %d×
+Grid border: %d	GLife ScreenSaver		Bordo della griglia: %d
+Grid width: %d	GLife ScreenSaver		Larghezza della griglia: %d
 Grid border: 	GLife ScreenSaver		Bordo della griglia: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		Il \"Gioco della Vita\" in versione OpenGL
 Grid height: 	GLife ScreenSaver		Altezza della griglia: 
 4x	GLife ScreenSaver	This is a factor: the x represents 'times'	4x
 Grid life delay: 	GLife ScreenSaver		Ritardo della griglia della vita: 
+Grid height: %d	GLife ScreenSaver		Altezza della griglia: %d

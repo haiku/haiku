@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	3521820238
+1	danish	x-vnd.Haiku-libtracker	2007970539
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -75,7 +75,6 @@ Moving: 	StatusWindow		Flytter:
 Select	SelectionWindow		Vælg
 Select	InfoWindow		Vælg
 OK	OpenWithWindow		O.k.
-Include trash	FindPanel		Medtag papirkurv
 Clean up	ContainerWindow		Ryd op
 Modified	FindPanel		Ændret
  (block size: 	InfoWindow		(blokstørrelse:)
@@ -345,7 +344,6 @@ Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Nogle af de valgte elementer kan ikke flyttes til papirkurven. Vil du slette dem i stedet? (Handlingen kan ikke fortrydes).
 The entered file name is too long.	FSUtils		Det indtastede filnavn er for langt.
 Add printer…	ContainerWindow		Tilføj printer…
-On	FindPanel		På
 Permissions	ContainerWindow		Rettigheder
 Size:	InfoWindow		Størrelse:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det valgte element kan ikke flyttes til papirkurven. Vil du slette den i stedet? (Handlingen kan ikke fortrydes).

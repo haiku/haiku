@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	355131830
+1	swedish	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Version %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Avinstallerar \"%PackageName%\"
 Downloading:	PackageInfoView		Mestadels stabil
 Quit	MainWindow		Avsluta
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Hämtar ändringslogg för paket
 Success	UserLoginWindow		Klar
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)

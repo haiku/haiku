@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2756566639
+1	german	x-vnd.Haiku-libtracker	401915535
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Aushängen
 Eject when unmounting	AutoMounterSettings		Auswerfen beim Aushängen
 Searching for disks to mount…	StatusWindow		Es werden Datenträger zum Einhängen gesucht …
 Value	AttributesView		Wert
+Multiple selections	FindPanel		mehrere Ziele
 Information	InfoWindow		Informationen
 Error emptying Trash	FSUtils		Fehler beim Leeren des Papierkorbs
 Opens with:	InfoWindow		Wird geöffnet mit:
@@ -80,7 +81,6 @@ Moving: 	StatusWindow		Verschiebe:
 Select	SelectionWindow		Auswählen
 Select	InfoWindow		Auswählen
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Einschließlich Papierkorb
 Clean up	ContainerWindow		Icons ausrichten
 Clear all	FindPanel		Alle löschen
 Modified	FindPanel		Geändert
@@ -108,6 +108,7 @@ Window	ContainerWindow		Fenster
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Entfernen
 Company	Person Query Columns		Firma
+Select folders…	FindPanel		Ordner wählen…
 Recent documents	FavoritesMenu		Letzte Dokumente
 Edit templates…	TemplatesMenu		Vorlagen bearbeiten …
 Clear temporary queries only	FindPanel		Nur temporäre Queries löschen
@@ -150,6 +151,7 @@ Disks	Model		Datenträger
 Create a Query template	FindPanel		Query als Vorlage erstellen
 Size	FindPanel		Größe
 Window	FilePanelPriv		Fenster
+New submenu	ContainerWindow	Folder name of New-template submenu	Neues Untermenü
 OK	Email Query Columns		OK
 Location	QueryPoseView		Ort
 Edit query	ContainerWindow		Query bearbeiten
@@ -177,6 +179,7 @@ Open selection with:	OpenWithWindow		Auswahl öffnen mit:
 Preferences…	ContainerWindow		Einstellungen ...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Die Datei \"%document\" kann nicht geöffnet werden, weil sich das zugehörige Programm \"%app\" im Papierkorb befindet.
 Work Phone	Person Query Columns		Telefon (geschäftlich)
+Select folders	FindPanel		Ordner wählen
 Close	ContainerWindow		Schließen
 Get info	ContainerWindow		Informationen
 MIME Type	AttributesView		MIME-Typ
@@ -357,7 +360,6 @@ Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Einige der ausgewählten Objekte können nicht in den Papierkorb verschoben werden. Sollen sie stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
 The entered file name is too long.	FSUtils		Der eingegebene Dateiname ist zu lang.
 Add printer…	ContainerWindow		Drucker hinzufügen …
-On	FindPanel		auf
 Permissions	ContainerWindow		Berechtigungen
 Size:	InfoWindow		Größe:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Das ausgewählte Objekt kann nicht in den Papierkorb verschoben werden. Soll es stattdessen gelöscht werden? (Diese Aktion kann nicht rückgängig gemacht werden.)
@@ -494,6 +496,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Version:
 OK	PoseView		OK
 Add-ons	DeskWindow		Add-ons
+Add new submenu…	TemplatesMenu		Neues Untermenü…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sollen die ausgewählten Dateien wirklich in diesen Ordner kopiert oder bewegt werden?
 Find	FindPanel		Suchen
 Empty folder	NavMenu		Leerer Ordner

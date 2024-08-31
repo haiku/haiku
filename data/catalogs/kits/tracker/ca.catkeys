@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	3817524709
+1	catalan; valencian	x-vnd.Haiku-libtracker	2303675010
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -81,7 +81,6 @@ Moving: 	StatusWindow		Es mou:
 Select	SelectionWindow		Selecciona
 Select	InfoWindow		Selecciona
 OK	OpenWithWindow		D'acord
-Include trash	FindPanel		Inclou la paperera
 Clean up	ContainerWindow		Neteja
 Clear all	FindPanel		Suprimeix-ho tot
 Modified	FindPanel		Modificat
@@ -362,7 +361,6 @@ Version	OpenWithWindow		Versió
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dels elements seleccionats no es poden moure a la paperera. Els voleu suprimir? (Aquesta operació no es pot desfer.)
 The entered file name is too long.	FSUtils		El nom de fitxer introduït és massa llarg.
 Add printer…	ContainerWindow		Afegeix-hi una impressora...
-On	FindPanel		A
 Permissions	ContainerWindow		Permisos
 Size:	InfoWindow		Mida:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'element seleccionat no es pot moure a la paperera. El voleu suprimir? (Aquesta operació no es pot desfer.)

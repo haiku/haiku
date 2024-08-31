@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	3817524709
+1	hungarian	x-vnd.Haiku-libtracker	2303675010
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -81,7 +81,6 @@ Moving: 	StatusWindow		Áthelyezés:
 Select	SelectionWindow		Kijelölés
 Select	InfoWindow		Kijelölés
 OK	OpenWithWindow		Rendben
-Include trash	FindPanel		A Szemetesben is
 Clean up	ContainerWindow		Rendrakás
 Clear all	FindPanel		Összes törlése
 Modified	FindPanel		Módosítva
@@ -362,7 +361,6 @@ Version	OpenWithWindow		Verzió
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Néhányat a kiválasztott elem közül nem lehet a Szemetesbe mozgatni. Szeretnéd inkább törölni? (Nem vonható vissza.)
 The entered file name is too long.	FSUtils		A megadott fájlnév túl hosszú.
 Add printer…	ContainerWindow		Nyomtató hozzáadása…
-On	FindPanel		Hol:
 Permissions	ContainerWindow		Engedélyek
 Size:	InfoWindow		Méret:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		A kiválasztott elemet nem lehet a Szemetesbe mozgatni. Szeretnéd inkább törölni? (Nem vonható vissza.)

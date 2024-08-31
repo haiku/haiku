@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	355131830
+1	finnish	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Versio %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Poistetaan asennus \"%PackageName%\"
 Downloading:	PackageInfoView		Ladataan:
 Quit	MainWindow		Poistu
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Noudetaan pakkauksen muutoslokia
 Success	UserLoginWindow		Valmis
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versio %hd.version%)

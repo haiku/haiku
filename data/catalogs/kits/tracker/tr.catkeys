@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1196428909
+1	turkish	x-vnd.Haiku-libtracker	3977546506
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -81,7 +81,6 @@ Moving: 	StatusWindow		Taşınıyor:
 Select	SelectionWindow		Seç
 Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
-Include trash	FindPanel		Çöpe de bak
 Clean up	ContainerWindow		Toparla
 Clear all	FindPanel		Tümünü temizle
 Modified	FindPanel		Değiştirilme
@@ -362,7 +361,6 @@ Version	OpenWithWindow		Sürüm
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları çöpe taşınamaz. Bunun yerine doğrudan silmek ister misiniz (bu işlem geri alınamaz)?
 The entered file name is too long.	FSUtils		Girilen dosya adı pek uzun.
 Add printer…	ContainerWindow		Yazıcı ekle…
-On	FindPanel		Nerede
 Permissions	ContainerWindow		İzinler
 Size:	InfoWindow		Boyut:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge çöpe taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)

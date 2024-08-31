@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	3044196306
+1	thai	x-vnd.Haiku-libtracker	1530346607
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -72,7 +72,6 @@ Moving: 	StatusWindow		กำลังย้าย:
 Select	SelectionWindow		เลือก
 Select	InfoWindow		เลือก
 OK	OpenWithWindow		ตกลง
-Include trash	FindPanel		รวมขยะ
 Clean up	ContainerWindow		ลบ
 Modified	FindPanel		แก้ไข
 Select all	QueryContainerWindow		เลือกทั้งหมด
@@ -330,7 +329,6 @@ after	FindPanel		หลังจาก
 Version	OpenWithWindow		เวอร์ชั่น
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		รายการที่เลือกบางรายการไม่สามารถย้ายไปที่ถังขยะได้ คุณต้องการลบพวกเขาแทนหรือไม่? (การดำเนินการนี้ไม่สามารถย้อนกลับได้)
 Add printer…	ContainerWindow		เพิ่มเครื่องพิมพ์
-On	FindPanel		เปิด
 Permissions	ContainerWindow		อนุญาต
 Size:	InfoWindow		ขนาด:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		รายการที่เลือกไม่สามารถย้ายไปที่ถังขยะ คุณต้องการลบมันแทนหรือไม่? (การดำเนินการนี้ไม่สามารถย้อนกลับได้)

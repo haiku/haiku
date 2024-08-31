@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3817524709
+1	romanian	x-vnd.Haiku-libtracker	1462873605
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Demontează
 Eject when unmounting	AutoMounterSettings		Scoate la demontare
 Searching for disks to mount…	StatusWindow		Se caută discuri de montat…
 Value	AttributesView		Valoare
+Multiple selections	FindPanel		Selecții multiple
 Information	InfoWindow		Informații
 Error emptying Trash	FSUtils		Eroare la golirea gunoiului
 Opens with:	InfoWindow		Se deschide cu:
@@ -81,7 +82,6 @@ Moving: 	StatusWindow		În mișcare:
 Select	SelectionWindow		Selectează
 Select	InfoWindow		Selectează
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Include gunoiul
 Clean up	ContainerWindow		Curăță
 Clear all	FindPanel		Eliberează toate
 Modified	FindPanel		Modificat
@@ -110,6 +110,7 @@ Window	ContainerWindow		Fereastră
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Elimină
 Company	Person Query Columns		Companie
+Select folders…	FindPanel		Selectează dosarele…
 Recent documents	FavoritesMenu		Documente recente
 Edit templates…	TemplatesMenu		Editare șabloane…
 Clear temporary queries only	FindPanel		Eliberează doar interogările temporare
@@ -152,6 +153,7 @@ Disks	Model		Discuri
 Create a Query template	FindPanel		Creează un șablon de interogare
 Size	FindPanel		Dimensiune
 Window	FilePanelPriv		Fereastră
+New submenu	ContainerWindow	Folder name of New-template submenu	Submeniu nou
 OK	Email Query Columns		OK
 Location	QueryPoseView		Locație
 Edit query	ContainerWindow		Editează interogarea
@@ -180,6 +182,7 @@ Open selection with:	OpenWithWindow		Deschide selecția cu:
 Preferences…	ContainerWindow		Preferințe…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nu s-a putut deschide \„%document\” pentru că aplicația \„%app\” este la gunoi. 
 Work Phone	Person Query Columns		Telefon de serviciu
+Select folders	FindPanel		Selectează dosarele
 Close	ContainerWindow		Închide
 Get info	ContainerWindow		Obține informații
 MIME Type	AttributesView		Tip MIME
@@ -362,7 +365,6 @@ Version	OpenWithWindow		Versiune
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Câteva dintre elementele selectate nu pot fi mutate la gunoi. Doriți să le ștergeți în schimb? (Această operație nu poate fi inversată.)
 The entered file name is too long.	FSUtils		Numele de fișier introdus este prea lung.
 Add printer…	ContainerWindow		Adăugare imprimantă…
-On	FindPanel		Pornit
 Permissions	ContainerWindow		Permisiuni
 Size:	InfoWindow		Dimensiune:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Elementul selectat nu poate fi mutat la gunoi. Doriți să îl ștergeți în schimb? (Această operație nu poate fi inversată.)
@@ -499,6 +501,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versiune:
 OK	PoseView		OK
 Add-ons	DeskWindow		Suplimente
+Add new submenu…	TemplatesMenu		Adaugă un submeniu nou…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sigur doriți să mutați sau copiați elementul(ele) selectat(e) în acest dosar?
 Find	FindPanel		Găsește
 Empty folder	NavMenu		Dosar gol

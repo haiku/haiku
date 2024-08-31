@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	171477831
+1	italian	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposta elemento nel Cestino
 Close	MediaPlayer-PlaylistWindow		Chiudi
 Volume of background clips	MediaPlayer-SettingsWindow		Volume delle clip di sottofondo
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Impostazioni di Lettore Multime
 Copyright	MediaPlayer-InfoWin		Copyright
 Invalid URL inserted!	MediaPlayer-NetworkStream		Immesso URL invalido!
 Aspect ratio	MediaPlayer-Main		Proporzioni
+Eject device	MediaPlayer-Main		Espelli dispositivo
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Salvataggio dell'elenco di riproduzione non riuscito.\n\nErrore: 
 <no media>	MediaPlayer-InfoWin		<nessun media>
 Hide interface	MediaPlayer-Main		Nascondi interfaccia
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Schermo intero
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Errore interno (errore nel lock). Fallito il salvataggio della playlist.
 100% scale	MediaPlayer-Main		Scala 100%
+New player	MediaPlayer-Main		Nuovo riproduttore
 <nothing to redo>	MediaPlayer-PlaylistWindow		<niente da ripetere>
 Bad URL	MediaPlayer-NetworkStream		URL errato
 Save	MediaPlayer-Main		Salva

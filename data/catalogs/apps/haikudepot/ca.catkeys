@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	355131830
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Versió %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Es desinstal·la \"%PackageName%\"
 Downloading:	PackageInfoView		Es baixa:
 Quit	MainWindow		Surt
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		S'obté el registre de canvis per al paquet
 Success	UserLoginWindow		Correcte
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versió %hd.version%)

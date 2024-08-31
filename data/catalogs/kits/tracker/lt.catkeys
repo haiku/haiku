@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	1481286432
+1	lithuanian	x-vnd.Haiku-libtracker	4262404029
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -56,7 +56,6 @@ Moving: 	StatusWindow		Perkeliama:
 Select	SelectionWindow		Pažymėti
 Select	InfoWindow		Pažymėti
 OK	OpenWithWindow		Gerai
-Include trash	FindPanel		Ieškoti ir Šiukšlinėje
 Clean up	ContainerWindow		Sutvarkyti
 Modified	FindPanel		Modifikavimo data
 Select all	QueryContainerWindow		Pažymėti viską
@@ -258,7 +257,6 @@ after	FindPanel		nuo
 Version	OpenWithWindow		Versija
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Kai kurių pažymėtų elementų išmesti Šiukšlinėn negalima. Ar norite vietoje to juos pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!
 Add printer…	ContainerWindow		Pridėti spausdintuvą…
-On	FindPanel		Tome
 Permissions	ContainerWindow		Leidimai
 Size:	InfoWindow		Dydis:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Pažymėto elemento išmesti Šiukšlinėn negalima. Ar norite vietoje to jį pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!

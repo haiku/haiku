@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	355131830
+1	hungarian	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Verzió: %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" eltávolítása
 Downloading:	PackageInfoView		Letöltés:
 Quit	MainWindow		Kilépés
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		A csomag változásnaplójának beszerzése
 Success	UserLoginWindow		Sikeres
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (verzió: %hd.version%)

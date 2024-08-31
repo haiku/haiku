@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	3229361881
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1715512182
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferido
@@ -74,7 +74,6 @@ Moving: 	StatusWindow		Movendo:
 Select	SelectionWindow		Selecionar
 Select	InfoWindow		Selecionar
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Incluir lixeira
 Clean up	ContainerWindow		Organizar
 Modified	FindPanel		Modificado
 Select all	QueryContainerWindow		Selecionar tudo
@@ -339,7 +338,6 @@ after	FindPanel		após
 Version	OpenWithWindow		Versão
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alguns dos itens selecionados não podem ser movidos para a Lixeira. Você gostaria de deletá-los então? (Esta operação não pode ser desfeita).
 Add printer…	ContainerWindow		Adicionar impressora...
-On	FindPanel		Em
 Permissions	ContainerWindow		Permissões
 Size:	InfoWindow		Tamanho:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		O item selecionado não pode ser movido para a Lixeira. Ao invés disso, você deseja apagá-lo? (Esta operação não pode ser desfeita.)

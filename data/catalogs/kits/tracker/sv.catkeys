@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3817524709
+1	swedish	x-vnd.Haiku-libtracker	1462873605
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Avmontera
 Eject when unmounting	AutoMounterSettings		Mata ut vid avmontering
 Searching for disks to mount…	StatusWindow		Letar efter diskar för montering...
 Value	AttributesView		Värde
+Multiple selections	FindPanel		Flera val
 Information	InfoWindow		Information
 Error emptying Trash	FSUtils		Ett fel uppstod när Papperskorgen skulle tömmas
 Opens with:	InfoWindow		Öppnas med:
@@ -81,7 +82,6 @@ Moving: 	StatusWindow		Flyttar:
 Select	SelectionWindow		Markera
 Select	InfoWindow		Markera
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Inkludera papperskorg
 Clean up	ContainerWindow		Rada upp
 Clear all	FindPanel		Rensa allt
 Modified	FindPanel		Modifierad
@@ -110,6 +110,7 @@ Window	ContainerWindow		Fönster
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Ta bort
 Company	Person Query Columns		Företag
+Select folders…	FindPanel		Välj mappar...
 Recent documents	FavoritesMenu		Senaste dokumenten
 Edit templates…	TemplatesMenu		Redigera mallar...
 Clear temporary queries only	FindPanel		Rensa endast tillfälliga frågor
@@ -152,6 +153,7 @@ Disks	Model		Volymer
 Create a Query template	FindPanel		Skapa en sökmall
 Size	FindPanel		Storlek
 Window	FilePanelPriv		Fönster
+New submenu	ContainerWindow	Folder name of New-template submenu	Ny undermeny
 OK	Email Query Columns		OK
 Location	QueryPoseView		Plats
 Edit query	ContainerWindow		Redigera sökning
@@ -180,6 +182,7 @@ Open selection with:	OpenWithWindow		Öppna markering med:
 Preferences…	ContainerWindow		Inställningar…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Kunde inte öppna \"%document\" för att programmet \"%app\" ligger i Papperskorgen. 
 Work Phone	Person Query Columns		Jobbtelefon
+Select folders	FindPanel		Välj mappar
 Close	ContainerWindow		Stäng
 Get info	ContainerWindow		Visa information
 MIME Type	AttributesView		MIME-typ
@@ -362,7 +365,6 @@ Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Vissa av de markerade objekten kan inte flyttas till Papperskorgen. Vill du ta bort dem istället? (Denna operation kan inte ångras.)
 The entered file name is too long.	FSUtils		Det angivna filnamnet är för långt.
 Add printer…	ContainerWindow		Lägg till skrivare...
-On	FindPanel		På
 Permissions	ContainerWindow		Behörigheter
 Size:	InfoWindow		Storlek:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det markerade objektet kan inte flyttas till Papperskorgen. Vill du ta bort den istället? (Denna operation kan inte ångras.)
@@ -499,6 +501,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Version:
 OK	PoseView		OK
 Add-ons	DeskWindow		Tillägg
+Add new submenu…	TemplatesMenu		Lägg till ny undermeny...
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Är du säker på att du vill flytta eller kopiera dom valda objekt(en) till denna mapp?
 Find	FindPanel		Sök
 Empty folder	NavMenu		Tom mapp

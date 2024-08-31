@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3817524709
+1	finnish	x-vnd.Haiku-libtracker	2303675010
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -81,7 +81,6 @@ Moving: 	StatusWindow		Siirretään:
 Select	SelectionWindow		Valitse
 Select	InfoWindow		Valitse
 OK	OpenWithWindow		Valmis
-Include trash	FindPanel		Sisällytä roskakori
 Clean up	ContainerWindow		Tyhjennä
 Clear all	FindPanel		Nollaa kaikki
 Modified	FindPanel		Muokattu
@@ -362,7 +361,6 @@ Version	OpenWithWindow		Versio
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Joitakin valittuja kohteita ei voi siirtää roskakoriin. Haluaisitko sen sijaan poistaa ne? (Tätä toimintoa ei voi palauttaa.)
 The entered file name is too long.	FSUtils		Kirjoittamasi tiedostonimi on liian pitkä.
 Add printer…	ContainerWindow		Lisää tulostin...
-On	FindPanel		kohteessa
 Permissions	ContainerWindow		Käyttöoikeudet
 Size:	InfoWindow		Koko:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Valittua kohdetta ei voida siirtää roskakoriin. Haluaisitko sen sijaan poistaa sen? (Tätä toimintoa ei voida palauttaa.)

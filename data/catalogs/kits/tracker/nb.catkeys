@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	1367565713
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	4148683310
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -76,7 +76,6 @@ Moving: 	StatusWindow		Flytter:
 Select	SelectionWindow		Velg
 Select	InfoWindow		Velg
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Inkluder søppelkurv
 Clean up	ContainerWindow		Rydd opp
 Modified	FindPanel		Endret
  (block size: 	InfoWindow		 (blokkstørrelse: 
@@ -350,7 +349,6 @@ Version	OpenWithWindow		Versjon
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Noen av de valgte oppføringene kan ikke flyttes til søppelkurven. Ønsker du å slette dem i stedet? (Denne operasjonen kan ikke angres.)
 The entered file name is too long.	FSUtils		Det angitte filnavnet er for langt.
 Add printer…	ContainerWindow		Legg til skriver...
-On	FindPanel		På
 Permissions	ContainerWindow		Rettigheter
 Size:	InfoWindow		Størrelse:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Den valgte oppføringen kan ikke flyttes til søppelkurven. Ønsker du å slette den i stedet? (Denne operasjonen kan ikke angres.)

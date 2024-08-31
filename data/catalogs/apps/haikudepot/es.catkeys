@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	355131830
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema con la descarga de las condiciones de uso
 Available packages	MainWindow		Paquetes disponibles
 It was not possible to create the new user.	UserLoginWindow		No fue posible crear el nuevo usuario.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Versión %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Desinstalando \"%PackageName%\"
 Downloading:	PackageInfoView		Descargando:
 Quit	MainWindow		Salir
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Obteniendo registro de cambios para el paquete
 Success	UserLoginWindow		Éxito
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versión %hd.version%)

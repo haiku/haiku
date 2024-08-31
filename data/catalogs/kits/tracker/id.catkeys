@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	1953515963
+1	indonesian	x-vnd.Haiku-libtracker	439666264
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -80,7 +80,6 @@ Moving: 	StatusWindow		Memindahkan:
 Select	SelectionWindow		Memilih
 Select	InfoWindow		Memilih
 OK	OpenWithWindow		OKE
-Include trash	FindPanel		Termasuk sampah
 Clean up	ContainerWindow		Pembersihan
 Clear all	FindPanel		Hapus semua
 Modified	FindPanel		Diubah
@@ -358,7 +357,6 @@ Version	OpenWithWindow		Versi
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Beberapa item yang dipilih tidak dapat dipindahkan ke Sampah. Apakah anda ingin menghapusnya sebagai gantinya? (Operasi ini tidak dapat dipulihkan.)
 The entered file name is too long.	FSUtils		Nama berkas yang dimasukkan terlalu panjang.
 Add printer…	ContainerWindow		Tambah pencetak...
-On	FindPanel		Menyala
 Permissions	ContainerWindow		Hak akses
 Size:	InfoWindow		Ukuran:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Beberapa item yang dipilih tidak dapat dipindahkan ke Sampah. Apakah anda ingin menghapusnya sebagai gantinya? (Operasi ini tidak dapat dipulihkan.)

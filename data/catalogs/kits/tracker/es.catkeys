@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	3817524709
+1	spanish; castilian	x-vnd.Haiku-libtracker	2303675010
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -81,7 +81,6 @@ Moving: 	StatusWindow		Moviendo:
 Select	SelectionWindow		Seleccionar
 Select	InfoWindow		Seleccionar
 OK	OpenWithWindow		Aceptar
-Include trash	FindPanel		Incluir la papelera
 Clean up	ContainerWindow		Limpiar
 Clear all	FindPanel		Borrar todo
 Modified	FindPanel		Modificado
@@ -362,7 +361,6 @@ Version	OpenWithWindow		Versión
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Algunos de los elementos seleccionados no pueden ser movidos a la papelera. ¿Quieres eliminarlos de forma definitiva? (esta operación es irrevertible)
 The entered file name is too long.	FSUtils		El nombre de archivo ingresado es demasiado largo.
 Add printer…	ContainerWindow		Añadir impresora…
-On	FindPanel		En
 Permissions	ContainerWindow		Permisos
 Size:	InfoWindow		Tamaño:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		El elemento seleccionado no puede ser movido a la papelera. ¿Quieres borrarlo de forma definitiva? (esta operación es irreversible)

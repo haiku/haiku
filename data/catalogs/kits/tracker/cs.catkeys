@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	9591059
+1	czech	x-vnd.Haiku-libtracker	2790708656
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -75,7 +75,6 @@ Moving: 	StatusWindow		Přesouvání:
 Select	SelectionWindow		Vybrat
 Select	InfoWindow		Vybrat
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Začlenit koš
 Clean up	ContainerWindow		Vyčistit
 Modified	FindPanel		Upravené
  (block size: 	InfoWindow		 (velikost bloku: 
@@ -347,7 +346,6 @@ Version	OpenWithWindow		Verze
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Některé vybrané položky nemohou být přesunuty do Koše. Přejete si je místo toho odstranit? (Tato operace je nevratná.)
 The entered file name is too long.	FSUtils		Zvolené jméno souboru je příliš dlouhé.
 Add printer…	ContainerWindow		Přidat tiskárnu...
-On	FindPanel		Zapnuto
 Permissions	ContainerWindow		Oprávnění
 Size:	InfoWindow		Velikost:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Vybraná položka nemůže být přesunuta do Koše. Přejete si ji místo toho odstranit? (Tato operace je nevratná.)

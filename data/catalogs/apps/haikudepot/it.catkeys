@@ -1,9 +1,10 @@
-1	italian	x-vnd.Haiku-HaikuDepot	2231325175
+1	italian	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema di download delle condizioni di utilizzo
 Available packages	MainWindow		Pacchetti disponibili
 It was not possible to create the new user.	UserLoginWindow		Non è stato possble creare il nuovo utente.
 An unexpected error has been sent from the server [%li]	ServerHelper		È stato inviato un errore imprevisto dal server [%li]
 Create account	UserLoginWindow		Crea account
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Recupero del registro delle modifiche del pacchetto in corso
 Agree	ToLatestUserUsageConditionsWindow		Accetto
 Install %PackageTitle%	PackageManager		Installa %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Il captcha inserito non è corretto.
@@ -113,6 +114,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Tutti i repository
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 Network error	ServerHelper		Errore di rete
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
 User Created	UserLoginWindow		Utente Creato
 Check for updates…	MainWindow		Controllo aggiornamenti…
@@ -128,6 +130,7 @@ No user ratings available.	PackageInfoView		Nessuna valutazione utente è dispon
 <no info>	PackageInfoView		<nessuna informazione>
 Usage conditions download problem	UserUsageConditions		Problema di download delle condizioni di utilizzo
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Si è verificato un errore durante il download dei requisiti della password richiesti per creare un nuovo utente. Controlla il registro per i dettagli e riprova.\nLe informazioni su come visualizzare i log sono disponibili nella sezione HaikuDepot della Guida Utente di Haiku.
+Fetching screenshot	CacheScreenshotProcess		Recupero dello screenshot in corso
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Si è verificato un errore di rete nel tentativo di connettersi al server: %s
 Rating	PackageListView		Valutazione
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizzazione icone

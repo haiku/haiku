@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	1650422602
+1	slovak	x-vnd.Haiku-libtracker	4158422696
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -62,7 +62,6 @@ Moving: 	StatusWindow		Presúva sa:
 Select	SelectionWindow		Vybrať
 Select	InfoWindow		Vybrať
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Vrátane Koša
 Clean up	ContainerWindow		Vyčistiť
 Modified	FindPanel		Zmenené
 Select all	QueryContainerWindow		Vybrať všetky
