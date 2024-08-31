@@ -686,6 +686,7 @@ static const Translation kTranslations[] = {
 	"Romain Picard\n" \
 	"Francesco Piccinno\n" \
 	"Peter Poláčik\n" \
+	"Niklas Poslovski\n" \
 	"David Powell\n" \
 	"Jeremy Rand\n" \
 	"Hartmut Reh\n" \
