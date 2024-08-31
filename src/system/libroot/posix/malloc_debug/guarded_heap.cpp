@@ -330,24 +330,20 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 		page.flags = GUARDED_HEAP_PAGE_FLAG_USED;
 		if (i == 0) {
 			page.allocating_thread = find_thread(NULL);
-			page.freeing_thread = -1;
-			page.allocation_size = allocationSize;
-			page.allocation_base = allocationBase;
-			page.alignment = alignment;
 			page.flags |= GUARDED_HEAP_PAGE_FLAG_FIRST;
 			page.alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
 				page.stack_trace, sStackTraceDepth, 2);
-			page.free_stack_trace_depth = 0;
 			firstPage = &page;
 		} else {
 			page.allocating_thread = firstPage->allocating_thread;
-			page.freeing_thread = -1;
-			page.allocation_size = allocationSize;
-			page.allocation_base = allocationBase;
-			page.alignment = alignment;
 			page.alloc_stack_trace_depth = 0;
-			page.free_stack_trace_depth = 0;
 		}
+
+		page.freeing_thread = -1;
+		page.allocation_size = allocationSize;
+		page.allocation_base = allocationBase;
+		page.alignment = alignment;
+		page.free_stack_trace_depth = 0;
 
 		list_remove_item(&area.free_list, &page);
 
