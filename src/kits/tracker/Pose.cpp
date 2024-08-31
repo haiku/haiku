@@ -349,7 +349,6 @@ BPose::UpdateIcon(BPoint poseLoc, BPoseView* poseView)
 		rect = CalcRect(poseLoc, poseView);
 		rect.left += poseView->ListOffset();
 		rect.right = rect.left + iconSize;
-		rect.top = rect.bottom - iconSize;
 	} else {
 		BPoint location = Location(poseView);
 		rect.left = location.x;
