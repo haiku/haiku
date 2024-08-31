@@ -160,6 +160,13 @@ void
 SettingsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+		{
+			fStandardFontView->MessageReceived(message);
+			fSerifFontView->MessageReceived(message);
+			fSansSerifFontView->MessageReceived(message);
+			fFixedFontView->MessageReceived(message);
+		}
 		case MSG_APPLY:
 			_ApplySettings();
 			break;

@@ -21,7 +21,7 @@ class BBox;
 class BMenu;
 class BMenuField;
 class BPopUpMenu;
-class BStringView;
+class BTextView;
 class BView;
 
 
@@ -79,7 +79,8 @@ protected:
 			BPopUpMenu*			fFontsMenu;
 			BPopUpMenu*			fStylesMenu;
 			BPopUpMenu*			fSizesMenu;
-			BStringView*		fPreviewText;
+			BTextView*			fPreviewTextView;
+			float				fPreviewTextWidth;
 			BBox*				fPreviewBox;
 
 			BFont				fSavedFont;

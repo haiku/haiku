@@ -16,15 +16,16 @@
 
 #include <Box.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <GroupLayoutBuilder.h>
+#include <LayoutItem.h>
 #include <Locale.h>
 #include <Looper.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <String.h>
-#include <StringView.h>
-#include <LayoutItem.h>
-#include <GroupLayoutBuilder.h>
+#include <TextView.h>
 
 #include <stdio.h>
 
@@ -34,6 +35,11 @@
 
 static const float kMinSize = 8.0;
 static const float kMaxSize = 18.0;
+
+static const char* kPreviewText = B_TRANSLATE_COMMENT(
+	"The quick brown fox jumps over the lazy dog.",
+	"Don't translate this literally ! Use a phrase showing all "
+	"chars from A to Z.");
 
 static const int32 kMsgSetFamily = 'fmly';
 static const int32 kMsgSetStyle = 'styl';
@@ -80,20 +86,33 @@ FontSelectionView::FontSelectionView(const char* name, const char* label,
 	fSizesMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	// preview
-	fPreviewText = new BStringView("preview text",
-		B_TRANSLATE_COMMENT("The quick brown fox jumps over the lazy dog.",
-		"Don't translate this literally ! Use a phrase showing all "
-		"chars from A to Z."));
+	// A string view would be enough if only it handled word-wrap.
+	fPreviewTextView = new BTextView("preview text");
+	fPreviewTextView->SetFontAndColor(&fCurrentFont);
+	fPreviewTextView->SetText(kPreviewText);
+	fPreviewTextView->MakeResizable(false);
+	fPreviewTextView->SetWordWrap(true);
+	fPreviewTextView->MakeEditable(false);
+	fPreviewTextView->MakeSelectable(false);
+	fPreviewTextView->SetInsets(0, 0, 0, 0);
+	fPreviewTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fPreviewTextView->SetHighUIColor(B_PANEL_TEXT_COLOR);
 
-	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
-		B_SIZE_UNLIMITED));
-	fPreviewText->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, 1.65);
+	// determine initial line count using fCurrentFont
+	fPreviewTextWidth = be_control_look->DefaultLabelSpacing() * 58.0f;
+	float lineCount = ceilf(fCurrentFont.StringWidth(kPreviewText) / fPreviewTextWidth);
+	fPreviewTextView->SetExplicitSize(
+		BSize(fPreviewTextWidth, fPreviewTextView->LineHeight(0) * lineCount));
 
+	// box around preview
 	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
-	fPreviewBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_HALF_ITEM_SPACING)
-		.Add(fPreviewText)
-		.SetInsets(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING,
-			B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
+	fPreviewBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(fPreviewTextView)
+			.AddGlue()
+			.End()
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 		.TopView()
 	);
 	_UpdateFontPreview();
@@ -103,8 +122,8 @@ FontSelectionView::FontSelectionView(const char* name, const char* label,
 FontSelectionView::~FontSelectionView()
 {
 	// Some controls may not have been attached...
-	if (!fPreviewText->Window())
-		delete fPreviewText;
+	if (!fPreviewTextView->Window())
+		delete fPreviewTextView;
 	if (!fSizesMenuField->Window())
 		delete fSizesMenuField;
 	if (fStylesMenuField && !fStylesMenuField->Window())
@@ -128,6 +147,16 @@ void
 FontSelectionView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+		{
+			if (message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
+				rgb_color panelColor = message->GetColor(ui_color_name(B_PANEL_TEXT_COLOR),
+					make_color(255, 255, 255));
+				fPreviewTextView->SetFontAndColor(&fCurrentFont, B_FONT_ALL, &panelColor);
+			}
+			break;
+		}
+
 		case kMsgSetSize:
 		{
 			int32 size;
@@ -475,7 +504,9 @@ FontSelectionView::_SelectCurrentSize(bool select)
 void
 FontSelectionView::_UpdateFontPreview()
 {
-	fPreviewText->SetFont(&fCurrentFont);
+	fPreviewTextView->SetFontAndColor(&fCurrentFont);
+	fPreviewTextView->SetExplicitSize(
+		BSize(fPreviewTextWidth, fPreviewTextView->LineHeight(0) * fPreviewTextView->CountLines()));
 }
 
 
