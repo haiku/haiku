@@ -801,7 +801,7 @@ status_t
 VMSAv8TranslationMap::Protect(addr_t start, addr_t end, uint32 attributes, uint32 memoryType)
 {
 	ThreadCPUPinner pinner(thread_get_current_thread());
-
+	uint64_t attr = GetMemoryAttr(attributes, memoryType, fIsKernel);
 	size_t size = end - start + 1;
 
 	uint64_t pageMask = (1UL << fPageBits) - 1;
@@ -811,8 +811,23 @@ VMSAv8TranslationMap::Protect(addr_t start, addr_t end, uint32 attributes, uint3
 	ASSERT((size & pageMask) == 0);
 	ASSERT(ValidateVa(start));
 
-	uint64_t attr = GetMemoryAttr(attributes, memoryType, fIsKernel);
-	MapRange(fPageTable, fInitialLevel, start & vaMask, 0, size, VMAction::SET_ATTR, attr, NULL);
+	ProcessRange(fPageTable, 0, start & vaMask, size, nullptr,
+		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
+			// We need to use an atomic compare-swap loop because we must
+			// need to clear somes bits while setting others.
+			while (true) {
+				uint64_t oldPte = atomic_get64((int64_t*)ptePtr);
+				uint64_t newPte = oldPte & ~kPteAttrMask;
+				newPte |= attr;
+
+                if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte) {
+					asm("dsb ishst"); // Ensure PTE write completed
+					if ((oldPte & kAttrAF) != 0)
+						FlushVAFromTLBByASID(effectiveVa);
+					break;
+				}
+			}
+		});
 
 	return B_OK;
 }
