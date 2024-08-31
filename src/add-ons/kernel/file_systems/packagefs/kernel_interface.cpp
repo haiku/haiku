@@ -1081,7 +1081,7 @@ packagefs_std_ops(int32 op, ...)
 			}
 
 			PackageFileHeapAccessorBase::sChunkCache =
-				create_object_cache_etc("packagefs heap buffers",
+				create_object_cache_etc("pkgfs heap buffers",
 					PackageFileHeapAccessorBase::kChunkSize, sizeof(void*),
 					0, /* magazine capacity, count */ 2, 1, 0, NULL,
 					NULL, NULL, NULL);

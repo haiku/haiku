@@ -18,7 +18,7 @@
 		if (size != sizeof(CLASS)) \
 			panic("unexpected size passed to operator new!"); \
 		if (s##CLASS##Cache == NULL) { \
-			s##CLASS##Cache = create_object_cache("packagefs " #CLASS "s", \
+			s##CLASS##Cache = create_object_cache("pkgfs " #CLASS "s", \
 				sizeof(CLASS), 8, NULL, NULL, NULL); \
 		} \
 	\
