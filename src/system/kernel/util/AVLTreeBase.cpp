@@ -576,6 +576,7 @@ AVLTreeBase::_Remove(AVLTreeNode* node)
 		*nodeP = NULL;
 	}
 
+	node->parent = node->left = node->right = NULL;
 	fNodeCount--;
 
 	// do the balancing
