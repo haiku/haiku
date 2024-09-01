@@ -87,9 +87,9 @@ const rgb_color kSpellTextColor = {255, 0, 0, 255};
 const rgb_color kHeaderColor = {72, 72, 72, 255};
 
 const rgb_color kQuoteColors[] = {
-	{0, 0, 0x80, 0},		// 3rd, 6th, ... quote level color (blue)
-	{0, 0x80, 0, 0},		// 1st, 4th, ... quote level color (green)
-	{0x80, 0, 0, 0}			// 2nd, ... (red)
+	{0, 0, 0xff, 0},		// 3rd, 6th, ... quote level color (blue)
+	{0, 0xff, 0, 0},		// 1st, 4th, ... quote level color (green)
+	{0xff, 0, 0, 0}			// 2nd, 5th, ... quote level color (red)
 };
 const int32 kNumQuoteColors = 3;
 
@@ -484,8 +484,8 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 
 				runs[index].offset = pos;
 				runs[index].font = font;
-				runs[index].color = level > 0
-					? kQuoteColors[level % kNumQuoteColors] : ui_color(B_PANEL_TEXT_COLOR);
+				runs[index].color = level > 0 ? mix_color(ui_color(B_PANEL_TEXT_COLOR),
+					kQuoteColors[level % kNumQuoteColors], 120) : ui_color(B_PANEL_TEXT_COLOR);
 
 				pos = next;
 				if (++index >= maxStyles)
@@ -511,8 +511,8 @@ FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
 			if (wasDiff)
 				runs[index].color = kDiffColors[diff_mode('@') - 1];
 			else if (diffMode <= 0) {
-				runs[index].color = level > 0
-					? kQuoteColors[level % kNumQuoteColors] : ui_color(B_PANEL_TEXT_COLOR);
+				runs[index].color = level > 0 ? mix_color(ui_color(B_PANEL_TEXT_COLOR),
+					kQuoteColors[level % kNumQuoteColors], 120) : ui_color(B_PANEL_TEXT_COLOR);
 			} else
 				runs[index].color = kDiffColors[diffMode - 1];
 
