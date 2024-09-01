@@ -89,6 +89,7 @@ __weak_alias(herror,_herror)
  * herror --
  *	print the error indicated by the h_errno value.
  */
+__attribute__((weak))
 void
 herror(const char *s) {
 	struct iovec iov[4], *v = iov;
