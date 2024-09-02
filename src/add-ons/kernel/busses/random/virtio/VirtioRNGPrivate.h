@@ -54,7 +54,6 @@ private:
 
 			spinlock			fInterruptLock;
 			ConditionVariable	fInterruptCondition;
-			ConditionVariableEntry fInterruptConditionEntry;
 			bool				fExpectsInterrupt;
 
 			timer				fTimer;

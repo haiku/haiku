@@ -107,18 +107,20 @@ VirtioRNGDevice::_Enqueue()
 	physical_entry entry;
 	get_memory_map(&value, sizeof(value), &entry, 1);
 
+	ConditionVariableEntry conditionVariableEntry;
 	{
 		InterruptsSpinLocker locker(fInterruptLock);
 		fExpectsInterrupt = true;
-		fInterruptCondition.Add(&fInterruptConditionEntry);
+		fInterruptCondition.Add(&conditionVariableEntry);
 	}
+
 	status_t result = fVirtio->queue_request(fVirtioQueue, NULL, &entry, NULL);
 	if (result != B_OK) {
 		ERROR("queueing failed (%s)\n", strerror(result));
 		return result;
 	}
 
-	result = fInterruptConditionEntry.Wait(B_CAN_INTERRUPT);
+	result = conditionVariableEntry.Wait(B_CAN_INTERRUPT);
 
 	{
 		InterruptsSpinLocker locker(fInterruptLock);
