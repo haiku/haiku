@@ -122,13 +122,13 @@ init_driver()
 
 	load_settings();
 
-	TRACE(ERR, "%s\n", kVersion); // TODO: always???
+	TRACE(INF, "%s\n", kVersion);
 
 	for (int32 i = 0; i < MAX_DEVICES; i++)
 		gDevices[i] = NULL;
 
 	gDeviceNames[0] = NULL;
-	mutex_init(&gDriverLock, DRIVER_NAME"_devices");
+	mutex_init(&gDriverLock, DRIVER_NAME "_devices");
 
 	static usb_notify_hooks notifyHooks = {
 		&usb_audio_device_added,
