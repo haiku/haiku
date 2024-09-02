@@ -34,10 +34,9 @@ static const size_t kBlockSizes[] = {
 	512, 640, 768, 896, 1024, 1280, 1536, 1792,
 	2048, 2560, 3072, 3584, 4096, 4608, 5120, 5632,
 	6144, 6656, 7168, 7680, 8192,
-	0
 };
 
-static const size_t kNumBlockSizes = sizeof(kBlockSizes) / sizeof(size_t) - 1;
+static const size_t kNumBlockSizes = B_COUNT_OF(kBlockSizes);
 
 static object_cache* sBlockCaches[kNumBlockSizes];
 
@@ -88,7 +87,7 @@ block_alloc(size_t size, size_t alignment, uint32 flags)
 
 		// If we're not using an object cache, make sure that the memory
 		// manager knows it has to align the allocation.
-		if (size > kBlockSizes[kNumBlockSizes])
+		if (size > kBlockSizes[kNumBlockSizes - 1])
 			flags |= CACHE_ALIGN_ON_SIZE;
 	}
 
