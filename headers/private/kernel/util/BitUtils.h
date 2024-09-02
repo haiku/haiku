@@ -41,6 +41,31 @@ count_set_bits(uint32 v)
 
 
 static inline uint32
+fls(uint32 value)
+{
+	if (value == 0)
+		return 0;
+
+#if __has_builtin(__builtin_clz)
+	return ((sizeof(value) * 8) - __builtin_clz(value));
+#else
+	// https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog
+	static const uint32 masks[] = {
+		0xaaaaaaaa,
+		0xcccccccc,
+		0xf0f0f0f0,
+		0xff00ff00,
+		0xffff0000
+	};
+	uint32 result = (value & masks[0]) != 0;
+	for (int i = 4; i > 0; i--)
+		result |= ((value & masks[i]) != 0) << i;
+	return result + 1;
+#endif
+}
+
+
+static inline uint32
 log2(uint32 v)
 {
 	static const int MultiplyDeBruijnBitPosition[32] = {
