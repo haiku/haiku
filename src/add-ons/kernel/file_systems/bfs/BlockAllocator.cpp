@@ -174,6 +174,7 @@ public:
 	inline void Allocate(uint16 start, uint16 numBlocks);
 	inline void Free(uint16 start, uint16 numBlocks);
 	inline bool IsUsed(uint16 block);
+	inline uint32 NextFree(uint16 startBlock);
 
 	status_t SetTo(AllocationGroup& group, uint16 block);
 	status_t SetToWritable(Transaction& transaction, AllocationGroup& group,
@@ -267,6 +268,30 @@ AllocationBlock::IsUsed(uint16 block)
 
 	// the block bitmap is accessed in 32-bit chunks
 	return Chunk(block >> 5) & HOST_ENDIAN_TO_BFS_INT32(1UL << (block % 32));
+}
+
+
+uint32
+AllocationBlock::NextFree(uint16 startBlock)
+{
+	// Set all bits below the start block in the current chunk, to ignore them.
+	uint32 ignoreNext = (1UL << (startBlock % 32)) - 1;
+
+	for (uint32 offset = ROUNDDOWN(startBlock, 32);
+			offset < fNumBits; offset += 32) {
+		uint32 chunk = Chunk(offset >> 5);
+		chunk |= ignoreNext;
+		ignoreNext = 0;
+
+		if (chunk == UINT32_MAX)
+			continue;
+		uint32 result = offset + ffs(~chunk) - 1;
+		if (result >= fNumBits)
+			break;
+		return result;
+	}
+
+	return fNumBits;
 }
 
 
@@ -838,6 +863,12 @@ BlockAllocator::AllocateBlocks(Transaction& transaction, int32 groupIndex,
 						block = group.NumBitmapBlocks();
 						break;
 					}
+
+					// Advance the current bit to one before the next free (or last) bit,
+					// so that the next loop iteration will check the next free bit.
+					const uint32 nextFreeOffset = cached.NextFree(bit) - bit;
+					bit += nextFreeOffset - 1;
+					currentBit += nextFreeOffset - 1;
 				}
 				currentBit++;
 			}
