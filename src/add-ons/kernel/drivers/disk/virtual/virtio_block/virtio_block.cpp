@@ -72,7 +72,6 @@ typedef struct {
 	mutex					lock;
 	int32					currentRequest;
 	ConditionVariable		interruptCondition;
-	ConditionVariableEntry 	interruptConditionEntry;
 } virtio_block_driver_info;
 
 
@@ -217,15 +216,17 @@ do_io(void* cookie, IOOperation* operation)
 		* sizeof(physical_entry));
 
 	atomic_add(&info->currentRequest, 1);
-	info->interruptCondition.Add(&info->interruptConditionEntry);
 
-	info->virtio->queue_request_v(info->virtio_queue, entries,
+	ConditionVariableEntry entry;
+	info->interruptCondition.Add(&entry);
+
+	status_t result = info->virtio->queue_request_v(info->virtio_queue, entries,
 		1 + (operation->IsWrite() ? operation->VecCount() : 0 ),
 		1 + (operation->IsWrite() ? 0 : operation->VecCount()),
 		(void *)(addr_t)info->currentRequest);
 
-	status_t result = info->interruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
-		10 * 1000 * 1000);
+	if (result == B_OK)
+		result = entry.Wait(B_RELATIVE_TIMEOUT, 10 * 1000 * 1000);
 
 	size_t bytesTransferred = 0;
 	status_t status = B_OK;
