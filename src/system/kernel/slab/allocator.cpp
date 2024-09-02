@@ -165,7 +165,7 @@ block_free(void* block, uint32 flags)
 void
 block_allocator_init_boot()
 {
-	for (int index = 0; kBlockSizes[index] != 0; index++) {
+	for (int index = 0; index < kNumBlockSizes; index++) {
 		char name[32];
 		snprintf(name, sizeof(name), "block allocator: %lu",
 			kBlockSizes[index]);
