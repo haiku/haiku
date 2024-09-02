@@ -10,6 +10,29 @@
 #include <vm/VMTranslationMap.h>
 
 
+static constexpr uint64_t kPteAddrMask = (((1UL << 36) - 1) << 12);
+static constexpr uint64_t kPteAttrMask = ~(kPteAddrMask | 0x3);
+static constexpr uint64_t kPteTLBCompatMask = (kPteAddrMask | (0x3 << 2) | (0x3 << 8));
+
+static constexpr uint64_t kPteValidMask = 0x1;
+static constexpr uint64_t kPteTypeMask = 0x3;
+static constexpr uint64_t kPteTypeL012Table = 0x3;
+static constexpr uint64_t kPteTypeL12Block = 0x1;
+static constexpr uint64_t kPteTypeL3Page = 0x3;
+
+static constexpr uint64_t kAttrSWDBM = (1UL << 55);
+static constexpr uint64_t kAttrUXN = (1UL << 54);
+static constexpr uint64_t kAttrPXN = (1UL << 53);
+static constexpr uint64_t kAttrDBM = (1UL << 51);
+static constexpr uint64_t kAttrNG = (1UL << 11);
+static constexpr uint64_t kAttrAF = (1UL << 10);
+static constexpr uint64_t kAttrSHInnerShareable = (3UL << 8);
+static constexpr uint64_t kAttrAPReadOnly = (1UL << 7);
+static constexpr uint64_t kAttrAPUserAccess = (1UL << 6);
+
+static constexpr uint64_t kTLBIMask = ((1UL << 44) - 1);
+
+
 struct VMSAv8TranslationMap : public VMTranslationMap {
 public:
 	VMSAv8TranslationMap(

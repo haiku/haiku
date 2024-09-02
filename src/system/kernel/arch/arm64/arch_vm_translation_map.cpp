@@ -15,10 +15,6 @@
 
 static char sPhysicalPageMapperData[sizeof(PMAPPhysicalPageMapper)];
 
-// The base address of TTBR*_EL1 is in bits [47:1] of the register, and the
-// low bit is implicitly zero.
-static constexpr uint64_t kTtbrBasePhysAddrMask = (((1UL << 47) - 1) << 1);
-
 // Physical pointer to an empty page table, which is used for break-before-make
 // when updating TTBR0_EL1.
 static phys_addr_t sEmptyTable;
@@ -144,9 +140,6 @@ arch_vm_translation_map_init_post_area(kernel_args* args)
 }
 
 // TODO: reuse some bits from VMSAv8TranslationMap
-
-static constexpr uint64_t kPteAddrMask = (((1UL << 36) - 1) << 12);
-static constexpr uint64_t kPteAttrMask = ~(kPteAddrMask | 0x3);
 
 static uint64_t page_bits = 12;
 static uint64_t tsz = 16;

@@ -127,13 +127,6 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 
 static int page_bits = 12;
 
-static constexpr uint64_t kPteAddrMask = (((1UL << 36) - 1) << 12);
-static constexpr uint64_t kPteAttrMask = ~(kPteAddrMask | 0x3);
-static constexpr uint64_t kAttrSWDBM = (1UL << 55);
-static constexpr uint64_t kAttrAF = (1UL << 10);
-static constexpr uint64_t kAttrAP2 = (1UL << 7);
-
-
 static uint64_t*
 TableFromPa(phys_addr_t pa)
 {
@@ -154,21 +147,31 @@ fixup_entry(phys_addr_t ptPa, int level, addr_t va, bool wr)
 	int index = (va >> shift) & tableMask;
 
 	uint64_t *pte = &TableFromPa(ptPa)[index];
+	uint64_t oldPte = atomic_get64((int64*)pte);
 
-	int type = *pte & 0x3;
-	uint64_t addr = *pte & kPteAddrMask;
+	int type = oldPte & kPteTypeMask;
+	uint64_t addr = oldPte & kPteAddrMask;
 
-	if ((level == 3 && type == 0x3) || (level < 3 && type == 0x1)) {
-		if (!wr && (*pte & kAttrAF) == 0) {
-			atomic_or64((int64*)pte, kAttrAF);
+	if ((level == 3 && type == kPteTypeL3Page) || (level < 3 && type == kPteTypeL12Block)) {
+		if (!wr && (oldPte & kAttrAF) == 0) {
+			uint64_t newPte = oldPte | kAttrAF;
+            if ((uint64_t)atomic_test_and_set64((int64*)pte, newPte, oldPte) != oldPte)
+				return true; // If something changed, handle it by taking another fault
+			asm("dsb ishst");
+			asm("isb");
 			return true;
 		}
-		if (wr && (*pte & kAttrSWDBM) != 0 && (*pte & kAttrAP2) != 0) {
-			atomic_and64((int64*)pte, ~kAttrAP2);
-			asm("tlbi vaae1is, %0 \n dsb ish"::"r"(va >> page_bits));
+		if (wr && (oldPte & kAttrSWDBM) != 0 && (oldPte & kAttrAPReadOnly) != 0) {
+			uint64_t newPte = oldPte & ~kAttrAPReadOnly;
+            if ((uint64_t)atomic_test_and_set64((int64*)pte, newPte, oldPte) != oldPte)
+				return true;
+			asm("dsb ishst");
+			asm("tlbi vaae1is, %0" :: "r" ((va >> 12) & kTLBIMask));
+			asm("dsb ish");
+			asm("isb");
 			return true;
 		}
-	} else if (level < 3 && type == 0x3) {
+	} else if (level < 3 && type == kPteTypeL012Table) {
 		return fixup_entry(addr, level + 1, va, wr);
 	}
 
@@ -251,6 +254,7 @@ do_sync_handler(iframe * frame)
 				ptPa = READ_SPECIALREG(TTBR1_EL1);
 			else
 				ptPa = READ_SPECIALREG(TTBR0_EL1);
+			ptPa &= kTtbrBasePhysAddrMask;
 
 			switch (frame->esr & ISS_DATA_DFSC_MASK) {
 				case ISS_DATA_DFSC_TF_L0:
