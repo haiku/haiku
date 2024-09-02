@@ -21,11 +21,13 @@ local packages = [ FFilterByBuildFeatures
 if $(HAIKU_IS_BOOTSTRAP) != 1 && $(HAIKU_BUILD_TYPE) != minimum {
 	packages += [ FFilterByBuildFeatures
 		haiku_extras
-		haiku_source
 		makefile_engine
 		netfs
 		userland_fs
 		] ;
+	if $(HAIKU_INCLUDE_SOURCES) = 1 {
+		packages += haiku_source ;
+	}
 }
 
 local webPositiveIsAvailable ;
