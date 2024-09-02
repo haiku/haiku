@@ -35,6 +35,22 @@ public:
 typedef AutoLocker<mutex, MutexLocking> MutexLocker;
 
 
+class MutexTryLocking {
+public:
+	inline bool Lock(mutex *lockable)
+	{
+		return mutex_trylock(lockable) == B_OK;
+	}
+
+	inline void Unlock(mutex *lockable)
+	{
+		mutex_unlock(lockable);
+	}
+};
+
+typedef AutoLocker<mutex, MutexTryLocking> MutexTryLocker;
+
+
 class RecursiveLockLocking {
 public:
 	inline bool Lock(recursive_lock *lockable)
@@ -301,6 +317,7 @@ typedef AutoLocker<seqlock, InterruptsWriteSequentialLocking>
 
 using BPrivate::AutoLocker;
 using BPrivate::MutexLocker;
+using BPrivate::MutexTryLocker;
 using BPrivate::RecursiveLocker;
 using BPrivate::ReadLocker;
 using BPrivate::WriteLocker;
