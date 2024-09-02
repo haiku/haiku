@@ -82,7 +82,7 @@ private:
 			AllocationGroup* fGroups;
 			int32			fNumGroups;
 			uint32			fBlocksPerGroup;
-			uint32			fNumBlocks;
+			uint32			fNumBitmapBlocks;
 };
 
 #ifdef BFS_DEBUGGER_COMMANDS
