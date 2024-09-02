@@ -468,7 +468,7 @@ VMSAv8TranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes, uint32 m
 
 	ProcessRange(fPageTable, 0, va & vaMask, B_PAGE_SIZE, reservation,
 		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
-			phys_addr_t effectivePa = effectiveVa - (va & vaMask);
+			phys_addr_t effectivePa = effectiveVa - (va & vaMask) + pa;
 			uint64_t oldPte = atomic_get64((int64*)ptePtr);
 			uint64_t newPte = effectivePa | attr | kPteTypeL3Page;
 
