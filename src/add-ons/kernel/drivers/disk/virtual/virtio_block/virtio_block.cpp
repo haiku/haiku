@@ -7,6 +7,7 @@
 #include <condition_variable.h>
 #include <lock.h>
 #include <StackOrHeapArray.h>
+#include <util/AutoLock.h>
 #include <virtio.h>
 
 #include "virtio_blk.h"
@@ -192,7 +193,8 @@ do_io(void* cookie, IOOperation* operation)
 {
 	virtio_block_driver_info* info = (virtio_block_driver_info*)cookie;
 
-	if (mutex_trylock(&info->lock) != B_OK)
+	MutexTryLocker locker(&info->lock);
+	if (!locker.IsLocked())
 		return B_BUSY;
 
 	BStackOrHeapArray<physical_entry, 16> entries(operation->VecCount() + 2);
@@ -246,7 +248,6 @@ do_io(void* cookie, IOOperation* operation)
 
 	info->io_scheduler->OperationCompleted(operation, status,
 		bytesTransferred);
-	mutex_unlock(&info->lock);
 	return status;
 }
 
