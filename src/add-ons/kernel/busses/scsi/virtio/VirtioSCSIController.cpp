@@ -232,16 +232,21 @@ VirtioSCSIController::ExecuteRequest(scsi_ccb *ccb)
 	fRequest->FillRequest(inCount, outCount, entries);
 
 	atomic_add(&fCurrentRequest, 1);
-	fInterruptCondition.Add(&fInterruptConditionEntry);
+	ConditionVariableEntry entry;
+	fInterruptCondition.Add(&entry);
 
-	fVirtio->queue_request_v(fRequestVirtioQueue, entries,
+	result = fVirtio->queue_request_v(fRequestVirtioQueue, entries,
 		outCount, inCount, (void *)(addr_t)fCurrentRequest);
 
-	result = fInterruptConditionEntry.Wait(B_RELATIVE_TIMEOUT,
-		fRequest->Timeout());
+	if (result != B_OK)
+		ERROR("queueing failed with status: %#" B_PRIx32 "\n", result);
+	else {
+		result = entry.Wait(B_RELATIVE_TIMEOUT, fRequest->Timeout());
+		if (result != B_OK)
+			ERROR("wait failed with status: %#" B_PRIx32 "\n", result);
+	}
 
 	if (result != B_OK) {
-		ERROR("wait failed with status: %#" B_PRIx32 "\n", result);
 		fRequest->Abort();
 		return result;
 	}

@@ -93,7 +93,6 @@ private:
 
 			int32				fCurrentRequest;
 			ConditionVariable	fInterruptCondition;
-			ConditionVariableEntry fInterruptConditionEntry;
 
 			scsi_dpc_cookie		fEventDPC;
 			struct virtio_scsi_event fEventBuffers[VIRTIO_SCSI_NUM_EVENTS];
