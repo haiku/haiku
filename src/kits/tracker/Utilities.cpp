@@ -178,6 +178,10 @@ ValidateStream(BMallocIO* stream, uint32 key, int32 version)
 void
 DisallowFilenameKeys(BTextView* textView)
 {
+	// disallow control characters
+	for (uint32 i = 0; i < 0x20; ++i)
+		textView->DisallowChar(i);
+
 	textView->DisallowChar('/');
 }
 
