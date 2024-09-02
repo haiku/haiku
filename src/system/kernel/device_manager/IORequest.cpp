@@ -1052,7 +1052,7 @@ IORequest::OperationFinished(IOOperation* operation)
 	const bool partialTransfer =
 		(operation->TransferredBytes() < operation->OriginalLength());
 	const generic_size_t transferEndOffset =
-		(operation->OriginalOffset() + operation->TransferredBytes());
+		(operation->OriginalOffset() - Offset()) + operation->TransferredBytes();
 
 	if (status != B_OK || partialTransfer) {
 		if (fTransferSize > transferEndOffset)
