@@ -356,7 +356,7 @@ BackgroundImage::WorkspaceActivated(BView* view, int32 workspace, bool state)
 void
 BackgroundImage::ScreenChanged(BRect, color_space)
 {
-	if (!fIsDesktop || fShowingBitmap == NULL)
+	if (!fIsDesktop || fShowingBitmap == NULL || fShowingBitmap->fBitmap == NULL)
 		return;
 
 	if (fShowingBitmap->fMode == kCentered) {
