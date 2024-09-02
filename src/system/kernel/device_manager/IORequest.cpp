@@ -1041,7 +1041,7 @@ void
 IORequest::OperationFinished(IOOperation* operation)
 {
 	TRACE("IORequest::OperationFinished(%p, %#" B_PRIx32 "): request: %p\n",
-		operation, status, this);
+		operation, operation->Status(), this);
 
 	MutexLocker locker(fLock);
 
