@@ -62,9 +62,6 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 {
 	dprintf("arch_vm_translation_map_init\n");
 
-	// Create an empty page table for use when we don't want a userspace page table.
-	arch_vm_alloc_empty_table();
-
 	// nuke TTBR0 mapping, we use identity mapping in kernel space at KERNEL_PMAP_BASE
 	memset((void*) READ_SPECIALREG(TTBR0_EL1), 0, B_PAGE_SIZE);
 
@@ -114,6 +111,10 @@ status_t
 arch_vm_translation_map_init_post_sem(kernel_args* args)
 {
 	dprintf("arch_vm_translation_map_init_post_sem\n");
+
+	// Create an empty page table for use when we don't want a userspace page table.
+	arch_vm_alloc_empty_table();
+
 	return B_OK;
 }
 
