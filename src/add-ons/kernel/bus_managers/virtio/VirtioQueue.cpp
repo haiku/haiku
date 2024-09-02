@@ -170,7 +170,7 @@ VirtioQueue::VirtioQueue(VirtioDevice* device, uint16 queueNumber,
 	fRing.desc[fRingSize - 1].next = UINT16_MAX;
 
 	if ((fDevice->Features() & VIRTIO_FEATURE_RING_INDIRECT_DESC) != 0)
-		fIndirectMaxSize = 128;
+		fIndirectMaxSize = fRingSize;
 
 	for (uint16 i = 0; i < fRingSize; i++) {
 		fDescriptors[i] = new TransferDescriptor(this, fIndirectMaxSize);
