@@ -126,7 +126,10 @@ __create_dir_struct(int fd)
 DIR*
 fdopendir(int fd)
 {
-	DIR* dir;
+	if (fd < 0) {
+		__set_errno(EBADF);
+		return NULL;
+	}
 
 	// Since our standard file descriptors can't be used as directory file
 	// descriptors, we have to open a fresh one explicitly.
@@ -140,16 +143,16 @@ fdopendir(int fd)
 	// to fdopendir() without changing its state (like for other *at()
 	// functions), we cannot close it now.
 	// We dup2() the new FD to the previous location instead.
-	if (dup2(dirFD, fd) == -1)
+	if (dup2(dirFD, fd) == -1) {
 		close(fd);
-	else {
+	} else {
 		close(dirFD);
 		dirFD = fd;
 		fcntl(dirFD, F_SETFD, FD_CLOEXEC);
 			// reset close-on-exec which is cleared by dup()
 	}
 
-	dir = __create_dir_struct(dirFD);
+	DIR* dir = __create_dir_struct(dirFD);
 	if (dir == NULL) {
 		close(dirFD);
 		return NULL;
