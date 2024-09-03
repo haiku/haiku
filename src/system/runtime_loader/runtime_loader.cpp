@@ -229,7 +229,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 
 	// Test if the target is a symbolic link, and correct the path in this case
 
-	status = _kern_read_stat(-1, path, false, &stat, sizeof(struct stat));
+	status = _kern_read_stat(AT_FDCWD, path, false, &stat, sizeof(struct stat));
 	if (status < B_OK)
 		return status;
 
@@ -239,7 +239,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 		char *lastSlash;
 
 		// it's a link, indeed
-		status = _kern_read_link(-1, path, buffer, &length);
+		status = _kern_read_link(AT_FDCWD, path, buffer, &length);
 		if (status < B_OK)
 			return status;
 		buffer[length] = '\0';
@@ -252,7 +252,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 			strlcpy(path, buffer, pathLength);
 	}
 
-	return _kern_open(-1, path, O_RDONLY, 0);
+	return _kern_open(AT_FDCWD, path, O_RDONLY, 0);
 }
 
 
@@ -308,7 +308,7 @@ open_executable(char *name, image_type type, const char *rpath, const char* runp
 
 	if (strchr(name, '/')) {
 		// the name already contains a path, we don't have to search for it
-		fd = _kern_open(-1, name, O_RDONLY, 0);
+		fd = _kern_open(AT_FDCWD, name, O_RDONLY, 0);
 		if (fd >= 0 || type == B_APP_IMAGE)
 			return fd;
 
@@ -412,7 +412,7 @@ test_executable(const char *name, char *invoker)
 		return fd;
 
 	// see if it's executable at all
-	status = _kern_access(-1, path, X_OK, false);
+	status = _kern_access(AT_FDCWD, path, X_OK, false);
 	if (status != B_OK)
 		goto out;
 
@@ -698,7 +698,7 @@ get_executable_architecture(int fd, const char** _architecture)
 status_t
 get_executable_architecture(const char* path, const char** _architecture)
 {
-	int fd = _kern_open(-1, path, O_RDONLY, 0);
+	int fd = _kern_open(AT_FDCWD, path, O_RDONLY, 0);
 	if (fd < 0)
 		return fd;
 
