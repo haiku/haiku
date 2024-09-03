@@ -593,7 +593,7 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 	uint64_t pageMask = (1UL << fPageBits) - 1;
 	uint64_t vaMask = (1UL << fVaBits) - 1;
 
-	ASSERT((va & pageMask) == 0);
+	va &= ~pageMask;
 	ASSERT(ValidateVa(va));
 
 	ProcessRange(fPageTable, 0, va & vaMask, B_PAGE_SIZE, nullptr,
