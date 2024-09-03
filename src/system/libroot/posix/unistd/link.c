@@ -46,9 +46,7 @@ readlinkat(int fd, const char *path, char *buffer, size_t bufferSize)
 int
 symlink(const char *toPath, const char *symlinkPath)
 {
-	int status = _kern_create_symlink(-1, symlinkPath, toPath, 0);
-
-	RETURN_AND_SET_ERRNO(status);
+	return symlinkat(toPath, AT_FDCWD, symlinkPath);
 }
 
 
@@ -62,9 +60,7 @@ symlinkat(const char *toPath, int fd, const char *symlinkPath)
 int
 unlink(const char *path)
 {
-	int status = _kern_unlink(-1, path);
-
-	RETURN_AND_SET_ERRNO(status);
+	return unlinkat(AT_FDCWD, path, 0);
 }
 
 

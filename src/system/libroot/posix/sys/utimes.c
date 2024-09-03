@@ -39,7 +39,7 @@ _utimes(const char* path, const struct timeval times[2], bool traverseLink)
 	}
 
 	// traverseLeafLink == true
-	status = _kern_write_stat(-1, path, traverseLink, &stat,
+	status = _kern_write_stat(AT_FDCWD, path, traverseLink, &stat,
 		sizeof(struct stat), B_STAT_MODIFICATION_TIME | B_STAT_ACCESS_TIME);
 
 	RETURN_AND_SET_ERRNO(status);

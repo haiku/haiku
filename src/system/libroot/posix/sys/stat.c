@@ -28,37 +28,32 @@ int _lstat_beos(const char* path, struct stat_beos* beosStat);
 int
 _stat_current(const char* path, struct stat* stat)
 {
-	int status = _kern_read_stat(-1, path, true, stat, sizeof(struct stat));
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_read_stat(AT_FDCWD, path, true,
+		stat, sizeof(struct stat)));
 }
 
 
 int
 _fstat_current(int fd, struct stat* stat)
 {
-	int status = _kern_read_stat(fd, NULL, false, stat, sizeof(struct stat));
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_read_stat(fd, NULL, false,
+		stat, sizeof(struct stat)));
 }
 
 
 int
 _lstat_current(const char* path, struct stat* stat)
 {
-	int status = _kern_read_stat(-1, path, false, stat, sizeof(struct stat));
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_read_stat(AT_FDCWD, path, false,
+		stat, sizeof(struct stat)));
 }
 
 
 int
-fstatat(int fd, const char *path, struct stat *st, int flag)
+fstatat(int fd, const char* path, struct stat* stat, int flag)
 {
-	int status = _kern_read_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0,
-		st, sizeof(struct stat));
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_read_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0,
+		stat, sizeof(struct stat)));
 }
 
 

@@ -16,7 +16,7 @@
 int
 chdir(const char *path)
 {
-	RETURN_AND_SET_ERRNO(_kern_setcwd(-1, path));
+	RETURN_AND_SET_ERRNO(_kern_setcwd(AT_FDCWD, path));
 }
 
 
@@ -58,6 +58,6 @@ getcwd(char *buffer, size_t size)
 int
 rmdir(const char *path)
 {
-	RETURN_AND_SET_ERRNO(_kern_remove_dir(-1, path));
+	RETURN_AND_SET_ERRNO(_kern_remove_dir(AT_FDCWD, path));
 }
 

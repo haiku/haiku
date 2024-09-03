@@ -164,7 +164,7 @@ opendir(const char* path)
 {
 	DIR* dir;
 
-	int fd = _kern_open_dir(-1, path);
+	int fd = _kern_open_dir(AT_FDCWD, path);
 	if (fd < 0) {
 		__set_errno(fd);
 		return NULL;

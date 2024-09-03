@@ -23,7 +23,7 @@ int
 creat(const char *path, mode_t mode)
 {
 	RETURN_AND_SET_ERRNO_TEST_CANCEL(
-		_kern_open(-1, path, O_CREAT | O_TRUNC | O_WRONLY, mode & ~__gUmask));
+		_kern_open(AT_FDCWD, path, O_CREAT | O_TRUNC | O_WRONLY, mode & ~__gUmask));
 		// adapt the permissions as required by POSIX
 }
 
@@ -40,7 +40,7 @@ open(const char *path, int openMode, ...)
 		va_end(args);
 	}
 
-	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_open(-1, path, openMode, perms));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_open(AT_FDCWD, path, openMode, perms));
 }
 
 

@@ -22,7 +22,7 @@ truncate(const char *path, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
+	status = _kern_write_stat(AT_FDCWD, path, true, &stat, sizeof(struct stat),
 		B_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);

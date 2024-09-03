@@ -16,9 +16,9 @@ int
 remove(const char* path)
 {
 	// TODO: find a better way that does not require two syscalls for directories
-	int status = _kern_unlink(-1, path);
+	int status = _kern_unlink(AT_FDCWD, path);
 	if (status == B_IS_A_DIRECTORY)
-		status = _kern_remove_dir(-1, path);
+		status = _kern_remove_dir(AT_FDCWD, path);
 
 	if (status != B_OK) {
 		__set_errno(status);
@@ -27,4 +27,3 @@ remove(const char* path)
 
 	return status;
 }
-

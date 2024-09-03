@@ -41,14 +41,14 @@ common_chown(int fd, const char* path, bool followLinks, uid_t owner,
 int
 chown(const char *path, uid_t owner, gid_t group)
 {
-	return common_chown(-1, path, true, owner, group);
+	return common_chown(AT_FDCWD, path, true, owner, group);
 }
 
 
 int
 lchown(const char *path, uid_t owner, gid_t group)
 {
-	return common_chown(-1, path, false, owner, group);
+	return common_chown(AT_FDCWD, path, false, owner, group);
 }
 
 

@@ -15,7 +15,7 @@
 int
 rename(const char *from, const char *to)
 {
-	RETURN_AND_SET_ERRNO(_kern_rename(-1, from, -1, to));
+	return renameat(AT_FDCWD, from, AT_FDCWD, to);
 }
 
 

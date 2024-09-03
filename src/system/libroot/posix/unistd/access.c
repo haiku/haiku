@@ -15,17 +15,13 @@
 int
 access(const char* path, int accessMode)
 {
-	status_t status = _kern_access(-1, path, accessMode, false);
-
-	RETURN_AND_SET_ERRNO(status);
+	return faccessat(AT_FDCWD, path, accessMode, 0);
 }
 
 
 int
 faccessat(int fd, const char* path, int accessMode, int flag)
 {
-	status_t status = _kern_access(fd, path, accessMode,
-		(flag & AT_EACCESS) != 0);
-
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(_kern_access(fd, path, accessMode,
+		(flag & AT_EACCESS) != 0));
 }

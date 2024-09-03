@@ -16,7 +16,7 @@
 int
 mkdir(const char* path, mode_t mode)
 {
-	RETURN_AND_SET_ERRNO(_kern_create_dir(-1, path, mode & ~__gUmask));
+	return mkdirat(AT_FDCWD, path, mode);
 }
 
 

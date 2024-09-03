@@ -21,7 +21,7 @@ chmod(const char *path, mode_t mode)
 	status_t status;
 
 	stat.st_mode = mode;
-	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
+	status = _kern_write_stat(AT_FDCWD, path, true, &stat, sizeof(struct stat),
 		B_STAT_MODE);
 
 	RETURN_AND_SET_ERRNO(status);
