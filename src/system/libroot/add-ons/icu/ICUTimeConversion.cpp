@@ -246,7 +246,14 @@ ICUTimeConversion::_FillTmValues(const TimeZone* icuTimeZone,
 		+ calendar.get(UCAL_DST_OFFSET, icuStatus)) / 1000;
 	if (!U_SUCCESS(icuStatus))
 		return B_ERROR;
-	tmOut->tm_zone = fDataBridge->addrOfTZName[tmOut->tm_isdst ? 1 : 0];
+
+	if (tmOut->tm_gmtoff == -*fDataBridge->addrOfTimezone) {
+		tmOut->tm_zone = fDataBridge->addrOfTZName[tmOut->tm_isdst ? 1 : 0];
+	} else if (tmOut->tm_gmtoff == 0) {
+		tmOut->tm_zone = (char*)"GMT";
+	} else {
+		return B_ERROR;
+	}
 
 	return B_OK;
 }
