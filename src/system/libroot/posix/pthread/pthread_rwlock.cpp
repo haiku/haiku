@@ -66,16 +66,22 @@ struct SharedRWLock {
 
 	status_t ReadLock(uint32 flags, bigtime_t timeout)
 	{
-		return acquire_sem_etc(sem, 1, flags, timeout);
+		status_t status;
+		do {
+			status = acquire_sem_etc(sem, 1, flags, timeout);
+		} while (status == B_INTERRUPTED);
+		return status;
 	}
 
 	status_t WriteLock(uint32 flags, bigtime_t timeout)
 	{
-		status_t error = acquire_sem_etc(sem, MAX_READER_COUNT,
-			flags, timeout);
-		if (error == B_OK)
+		status_t status;
+		do {
+			status = acquire_sem_etc(sem, MAX_READER_COUNT, flags, timeout);
+		} while (status == B_INTERRUPTED);
+		if (status == B_OK)
 			owner = find_thread(NULL);
-		return error;
+		return status;
 	}
 
 	status_t Unlock()
@@ -202,12 +208,15 @@ private:
 		if (writer)
 			writer_count++;
 
-		StructureUnlock();
-		status_t error = _kern_block_thread(flags, timeout);
-		StructureLock();
+		status_t status;
+		do {
+			StructureUnlock();
+			status = _kern_block_thread(flags, timeout);
+			StructureLock();
 
-		if (!waiter.queued)
-			return waiter.status;
+			if (!waiter.queued)
+				return waiter.status;
+		} while (status == B_INTERRUPTED);
 
 		// we're still queued, which means an error (timeout, interrupt)
 		// occurred
@@ -218,7 +227,7 @@ private:
 
 		_Unblock();
 
-		return error;
+		return status;
 	}
 
 	void _Unblock()
