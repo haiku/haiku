@@ -172,6 +172,8 @@ unnamed_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 	if (timeout != NULL) {
 		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
 			+ timeout->tv_nsec / 1000;
+		if (timeout->tv_nsec < 0 || timeout->tv_nsec >= 1000000000)
+			timeoutMicros = -1;
 		switch (clock_id) {
 			case CLOCK_REALTIME:
 				flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
@@ -187,6 +189,8 @@ unnamed_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 	int result = unnamed_sem_trywait(semaphore);
 	if (result == 0)
 		return 0;
+	if (timeoutMicros < 0)
+		return EINVAL;
 
 	return _kern_mutex_sem_acquire(sem, NULL, flags, timeoutMicros);
 }
