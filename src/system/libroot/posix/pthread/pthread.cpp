@@ -263,7 +263,7 @@ pthread_detach(pthread_t thread)
 
 	flags = atomic_or(&thread->flags, THREAD_DETACHED);
 	if ((flags & THREAD_DETACHED) != 0)
-		return 0;
+		return EINVAL;
 
 	if ((flags & THREAD_DEAD) != 0)
 		free(thread);
