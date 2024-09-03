@@ -68,9 +68,7 @@ fs_write_attr(int fd, const char* attribute, uint32 type, off_t pos,
 	// 0, but it also tries to support programs which continue to write more
 	// chunks.
 	// The new Haiku way is to use fs_open_attr() to get a regular file handle
-	// and use that for writing, then use fs_close_attr() when done. As you
-	// see from this implementation, it saves 2 syscalls per writing a chunk
-	// of data.
+	// and use that for writing, then use fs_close_attr() when done.
 
 	ssize_t bytes = _kern_write_attr(fd, attribute, type, pos, buffer,
 		writeBytes);
