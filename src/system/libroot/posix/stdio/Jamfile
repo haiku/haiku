@@ -12,7 +12,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_stdio.o :
 			__freading.cpp
 			_fseek.c
-			fpurge.cpp
 			remove.c
 			rename.c
 			;
