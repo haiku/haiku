@@ -2415,7 +2415,7 @@ fd_and_path_to_dir_vnode(int fd, char* path, VnodePutter& _vnode,
 		return B_BAD_VALUE;
 	if (*path == '\0')
 		return B_ENTRY_NOT_FOUND;
-	if (fd < 0)
+	if (fd == AT_FDCWD || fd == -1)
 		return path_to_dir_vnode(path, _vnode, filename, kernel);
 
 	status_t status = get_dir_path_and_leaf(path, filename);
@@ -2770,7 +2770,7 @@ fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 	if (path != NULL && *path == '\0')
 		return B_ENTRY_NOT_FOUND;
 
-	if (fd < 0 || (path != NULL && path[0] == '/')) {
+	if ((fd == AT_FDCWD || fd == -1) || (path != NULL && path[0] == '/')) {
 		// no FD or absolute path
 		return path_to_vnode(path, traverseLeafLink, _vnode, _parentID, kernel);
 	}
