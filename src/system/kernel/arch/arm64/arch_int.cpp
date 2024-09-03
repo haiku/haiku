@@ -166,7 +166,8 @@ fixup_entry(phys_addr_t ptPa, int level, addr_t va, bool wr)
             if ((uint64_t)atomic_test_and_set64((int64*)pte, newPte, oldPte) != oldPte)
 				return true;
 			asm("dsb ishst");
-			asm("tlbi vaae1is, %0" :: "r" ((va >> 12) & kTLBIMask));
+			uint64_t ttbr0 = READ_SPECIALREG(TTBR0_EL1);
+			asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (ttbr0 & kASIDMask)));
 			asm("dsb ish");
 			asm("isb");
 			return true;
