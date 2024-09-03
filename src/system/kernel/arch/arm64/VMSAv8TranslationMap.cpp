@@ -108,7 +108,7 @@ VMSAv8TranslationMap::~VMSAv8TranslationMap()
 void
 VMSAv8TranslationMap::SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8TranslationMap *to)
 {
-	SpinLocker locker(sAsidLock);
+	InterruptsSpinLocker locker(sAsidLock);
 
 	if (!from->fIsKernel) {
 		from->fRefcount--;
@@ -321,7 +321,7 @@ VMSAv8TranslationMap::GetOrMakeTable(phys_addr_t ptPa, int level, int index,
 void
 VMSAv8TranslationMap::FlushVAFromTLBByASID(addr_t va)
 {
-	SpinLocker locker(sAsidLock);
+	InterruptsSpinLocker locker(sAsidLock);
 	if (fASID != -1) {
         asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (uint64_t(fASID) << 48)));
 		asm("dsb ish"); // Wait for TLB flush to complete
@@ -547,6 +547,9 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 			if ((oldPte & kAttrAF) != 0)
 				FlushVAFromTLBByASID(effectiveVa);
 		});
+
+	if ((oldPte & kPteValidMask) == 0)
+		return B_ENTRY_NOT_FOUND;
 
 	pinner.Unlock();
 	locker.Detach();
