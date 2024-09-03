@@ -160,7 +160,7 @@ BFile::SetTo(const char* path, uint32 openMode)
 
 	openMode |= O_CLOEXEC;
 
-	int fd = _kern_open(-1, path, openMode, DEFFILEMODE & ~__gUmask);
+	int fd = _kern_open(AT_FDCWD, path, openMode, DEFFILEMODE & ~__gUmask);
 	if (fd >= 0) {
 		set_fd(fd);
 		fMode = openMode;
