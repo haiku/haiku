@@ -122,6 +122,35 @@ main (int argc, char *argv[])
     assert (mbsinit (&state));
   }
 
+  /* Check a 4-bytes character.  */
+  {
+    memset (&state, '\0', sizeof (mbstate_t));
+
+    wc = (wchar_t) 0xBADFACE;
+    ret = mbrtowc (&wc, "\360", 1, &state);
+    assert (ret == (size_t)(-2));
+    assert (wc == (wchar_t) 0xBADFACE);
+    assert (!mbsinit (&state));
+
+    wc = (wchar_t) 0xBADFACE;
+    ret = mbrtowc (&wc, "\237", 1, &state);
+    assert (ret == (size_t)(-2));
+    assert (wc == (wchar_t) 0xBADFACE);
+    assert (!mbsinit (&state));
+
+    wc = (wchar_t) 0xBADFACE;
+    ret = mbrtowc (&wc, "\220", 1, &state);
+    assert (ret == (size_t)(-2));
+    assert (wc == (wchar_t) 0xBADFACE);
+    assert (!mbsinit (&state));
+
+    wc = (wchar_t) 0xBADFACE;
+    ret = mbrtowc (&wc, "\203", 1, &state);
+    assert (ret == 1);
+    assert (wc == (wchar_t) 0x1F403);
+    assert (mbsinit (&state));
+  }
+
   for (i = '1'; i <= '4'; ++i) {
     switch (i)
       {
