@@ -286,12 +286,18 @@ virtio_block_init_device(void* _info, void** _cookie)
 	TRACE("virtio_block: capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
 
+	uint16 requestedSize = 0;
+	if ((info->features & VIRTIO_BLK_F_SEG_MAX) != 0)
+		requestedSize = info->config.seg_max + 2;
+			// two entries are taken up by the header and result
+
 	status = info->virtio->alloc_queues(info->virtio_device, 1,
-		&info->virtio_queue);
+		&info->virtio_queue, &requestedSize);
 	if (status != B_OK) {
 		ERROR("queue allocation failed (%s)\n", strerror(status));
 		return status;
 	}
+
 	status = info->virtio->setup_interrupt(info->virtio_device,
 		virtio_block_config_callback, info);
 

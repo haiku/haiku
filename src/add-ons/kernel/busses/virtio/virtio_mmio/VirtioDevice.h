@@ -48,7 +48,7 @@ struct VirtioQueue {
 
 	VirtioQueue(VirtioDevice *dev, int32 id);
 	~VirtioQueue();
-	status_t Init();
+	status_t Init(uint16 requestedSize);
 
 	int32 AllocDesc();
 	void FreeDesc(int32 idx);

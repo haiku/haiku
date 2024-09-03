@@ -485,7 +485,7 @@ virtio_gpu_init_device(void* _info, void** _cookie)
 	// Setup queues
 	::virtio_queue virtioQueues[2];
 	status_t status = info->virtio->alloc_queues(info->virtio_device, 2,
-		virtioQueues);
+		virtioQueues, NULL);
 	if (status != B_OK) {
 		ERROR("queue allocation failed (%s)\n", strerror(status));
 		return status;

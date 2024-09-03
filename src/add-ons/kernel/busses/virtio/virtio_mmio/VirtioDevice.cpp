@@ -43,11 +43,14 @@ VirtioQueue::~VirtioQueue()
 
 
 status_t
-VirtioQueue::Init()
+VirtioQueue::Init(uint16 requestedSize)
 {
 	fDev->fRegs->queueSel = fId;
 	TRACE("queueNumMax: %d\n", fDev->fRegs->queueNumMax);
 	fQueueLen = fDev->fRegs->queueNumMax;
+	if (requestedSize != 0 && requestedSize > fQueueLen)
+		return B_BUFFER_OVERFLOW;
+
 	fDescCount = fQueueLen;
 	fDev->fRegs->queueNum = fQueueLen;
 	fLastUsed = 0;

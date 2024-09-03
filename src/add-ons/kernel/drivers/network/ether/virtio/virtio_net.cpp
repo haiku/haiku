@@ -321,7 +321,7 @@ virtio_net_init_device(void* _info, void** _cookie)
 		queueCount++;
 	::virtio_queue virtioQueues[queueCount];
 	status_t status = info->virtio->alloc_queues(info->virtio_device, queueCount,
-		virtioQueues);
+		virtioQueues, NULL);
 	if (status != B_OK) {
 		ERROR("queue allocation failed (%s)\n", strerror(status));
 		return status;

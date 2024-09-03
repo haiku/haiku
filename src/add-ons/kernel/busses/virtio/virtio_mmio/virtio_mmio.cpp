@@ -466,7 +466,7 @@ virtio_device_write_device_config(virtio_device cookie, uint8 offset,
 
 static status_t
 virtio_device_alloc_queues(virtio_device cookie, size_t count,
-	virtio_queue* queues)
+	virtio_queue* queues, uint16* requestedSizes)
 {
 	TRACE("virtio_device_alloc_queues(%p, %" B_PRIuSIZE ")\n", cookie, count);
 	VirtioDevice* dev = (VirtioDevice*)cookie;
@@ -483,7 +483,8 @@ virtio_device_alloc_queues(virtio_device cookie, size_t count,
 		if (!newQueues[i].IsSet())
 			return B_NO_MEMORY;
 
-		status_t res = newQueues[i]->Init();
+		status_t res = newQueues[i]->Init(
+			requestedSizes != NULL ? requestedSizes[i] : 0);
 		if (res < B_OK)
 			return res;
 	}

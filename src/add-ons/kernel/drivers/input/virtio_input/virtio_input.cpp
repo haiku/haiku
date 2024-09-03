@@ -283,7 +283,7 @@ virtio_input_init_device(void* _info, void** _cookie)
 	InitPackets(info, 8);
 
 	status = info->virtio->alloc_queues(info->virtio_device, 1,
-		&info->virtio_queue);
+		&info->virtio_queue, NULL);
 	if (status != B_OK) {
 		ERROR("queue allocation failed (%s)\n", strerror(status));
 		return status;

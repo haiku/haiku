@@ -117,7 +117,7 @@ typedef struct {
 		const void* buffer, size_t bufferSize);
 
 	status_t (*alloc_queues)(virtio_device cookie, size_t count,
-		virtio_queue* queues);
+		virtio_queue* queues, uint16* requestedSizes);
 
 	void (*free_queues)(virtio_device cookie);
 

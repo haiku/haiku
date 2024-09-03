@@ -82,7 +82,12 @@ VirtioSCSIController::VirtioSCSIController(device_node *node)
 	}
 
 	::virtio_queue virtioQueues[3];
-	fStatus = fVirtio->alloc_queues(fVirtioDevice, 3, virtioQueues);
+	uint16 requestedSizes[3] = { 0, 0, 0 };
+	requestedSizes[2] = fConfig.seg_max + 2;
+		// two entries are taken up by the header and result
+
+	fStatus = fVirtio->alloc_queues(fVirtioDevice, 3, virtioQueues,
+		requestedSizes);
 	if (fStatus != B_OK) {
 		ERROR("queue allocation failed (%s)\n", strerror(fStatus));
 		return;

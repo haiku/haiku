@@ -97,11 +97,12 @@ virtio_write_device_config(void* _device, uint8 offset,
 
 
 status_t
-virtio_alloc_queues(virtio_device _device, size_t count, virtio_queue *queues)
+virtio_alloc_queues(virtio_device _device, size_t count, virtio_queue *queues,
+	uint16 *requestedSizes)
 {
 	CALLED();
 	VirtioDevice *device = (VirtioDevice *)_device;
-	return device->AllocateQueues(count, queues);
+	return device->AllocateQueues(count, queues, requestedSizes);
 }
 
 

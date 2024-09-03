@@ -56,7 +56,8 @@ public:
 									const void* buffer, size_t bufferSize);
 
 			status_t			AllocateQueues(size_t count,
-									virtio_queue *queues);
+									virtio_queue *queues,
+									uint16 *requestedSizes);
 			void				FreeQueues();
 			status_t			SetupInterrupt(virtio_intr_func config_handler,
 									void *driverCookie);

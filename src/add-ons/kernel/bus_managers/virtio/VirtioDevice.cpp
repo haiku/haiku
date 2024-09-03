@@ -179,7 +179,8 @@ VirtioDevice::WriteDeviceConfig(uint8 offset, const void* buffer,
 
 
 status_t
-VirtioDevice::AllocateQueues(size_t count, virtio_queue *queues)
+VirtioDevice::AllocateQueues(size_t count, virtio_queue *queues,
+	uint16 *requestedSizes)
 {
 	if (count > VIRTIO_VIRTQUEUES_MAX_COUNT || queues == NULL)
 		return B_BAD_VALUE;
@@ -192,11 +193,24 @@ VirtioDevice::AllocateQueues(size_t count, virtio_queue *queues)
 	fQueueCount = count;
 	for (size_t index = 0; index < count; index++) {
 		uint16 size = fController->get_queue_ring_size(fCookie, index);
-		fQueues[index] = new(std::nothrow) VirtioQueue(this, index, size);
-		queues[index] = fQueues[index];
-		status = B_NO_MEMORY;
-		if (fQueues[index] != NULL)
-			status = fQueues[index]->InitCheck();
+
+		uint16 requestedSize
+			= requestedSizes != NULL ? requestedSizes[index] : 0;
+		if (requestedSize != 0) {
+			if (requestedSize > size)
+				status = B_BUFFER_OVERFLOW;
+			else
+				size = requestedSize;
+		}
+
+		if (status == B_OK) {
+			fQueues[index] = new(std::nothrow) VirtioQueue(this, index, size);
+			queues[index] = fQueues[index];
+			status = B_NO_MEMORY;
+			if (fQueues[index] != NULL)
+				status = fQueues[index]->InitCheck();
+		}
+
 		if (status != B_OK) {
 			_DestroyQueues(index + 1);
 			return status;

@@ -58,7 +58,7 @@ VirtioBalloonDevice::VirtioBalloonDevice(device_node* node)
 	fVirtio->negotiate_features(fVirtioDevice,
 		0, &fFeatures, &get_feature_name);
 
-	fStatus = fVirtio->alloc_queues(fVirtioDevice, 2, fVirtioQueues);
+	fStatus = fVirtio->alloc_queues(fVirtioDevice, 2, fVirtioQueues, NULL);
 	if (fStatus != B_OK) {
 		ERROR("queue allocation failed (%s)\n", strerror(fStatus));
 		return;
