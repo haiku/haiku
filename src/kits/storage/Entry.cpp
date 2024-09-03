@@ -561,7 +561,7 @@ BEntry::_SetTo(int dirFD, const char* path, bool traverse)
 			// if no dir FD is supplied, we need to open the current directory
 			// first
 			if (dirFD < 0) {
-				dirFD = _kern_open_dir(-1, ".");
+				dirFD = _kern_open_dir(AT_FDCWD, ".");
 				if (dirFD < 0)
 					return dirFD;
 				fdCloser.SetTo(dirFD);
@@ -612,7 +612,7 @@ BEntry::_SetTo(int dirFD, const char* path, bool traverse)
 					char* cwd = getcwd(tmpPath, B_PATH_NAME_LENGTH);
 					if (!cwd)
 						return B_ERROR;
-					dirFD = _kern_open_dir(-1, cwd);
+					dirFD = _kern_open_dir(AT_FDCWD, cwd);
 					if (dirFD < 0)
 						return dirFD;
 					fdCloser.SetTo(dirFD);
@@ -621,7 +621,7 @@ BEntry::_SetTo(int dirFD, const char* path, bool traverse)
 					|| strcmp(leafName, "..") == 0) {
 				// We have to resolve this to get the entry name. Just open
 				// the dir and let the next iteration deal with it.
-				dirFD = _kern_open_dir(-1, path);
+				dirFD = _kern_open_dir(AT_FDCWD, path);
 				if (dirFD < 0)
 					return dirFD;
 				fdCloser.SetTo(dirFD);
