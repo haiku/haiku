@@ -434,16 +434,25 @@ VMSAv8TranslationMap::GetMemoryAttr(uint32 attributes, uint32 memoryType, bool i
 
 	uint8_t type = MAIR_NORMAL_WB;
 
-	if (memoryType & B_MTR_UC)
-		type = MAIR_DEVICE_nGnRnE; // TODO: This probably should be nGnRE for PCI
-	else if (memoryType & B_MTR_WC)
-		type = MAIR_NORMAL_NC;
-	else if (memoryType & B_MTR_WT)
-		type = MAIR_NORMAL_WT;
-	else if (memoryType & B_MTR_WP)
-		type = MAIR_NORMAL_WT;
-	else if (memoryType & B_MTR_WB)
-		type = MAIR_NORMAL_WB;
+	switch (memoryType & B_MTR_MASK) {
+		case B_MTR_UC:
+			// TODO: This probably should be nGnRE for PCI
+			type = MAIR_DEVICE_nGnRnE;
+			break;
+		case B_MTR_WC:
+			type = MAIR_NORMAL_NC;
+			break;
+		case B_MTR_WT:
+			type = MAIR_NORMAL_WT;
+			break;
+		case B_MTR_WP:
+			type = MAIR_NORMAL_WT;
+			break;
+		default:
+		case B_MTR_WB:
+			type = MAIR_NORMAL_WB;
+			break;
+	}
 
 	attr |= MairIndex(type) << 2;
 
