@@ -1433,17 +1433,12 @@ DeleteSubmenu(BMenuItem* submenuItem)
 	if (submenuItem == NULL)
 		return;
 
-	BMenu* menu = submenuItem->Submenu();
-	if (menu == NULL)
+	BMenu* submenu = submenuItem->Submenu();
+	if (submenu == NULL)
 		return;
 
-	for (;;) {
-		BMenuItem* item = menu->RemoveItem((int32)0);
-		if (item == NULL)
-			return;
-
-		delete item;
-	}
+	// delete all submenu items
+	submenu->RemoveItems(0, submenu->CountItems(), true);
 }
 
 
