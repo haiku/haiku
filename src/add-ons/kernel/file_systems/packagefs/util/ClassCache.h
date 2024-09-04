@@ -18,8 +18,8 @@
 		if (size != sizeof(CLASS)) \
 			panic("unexpected size passed to operator new!"); \
 		if (s##CLASS##Cache == NULL) { \
-			s##CLASS##Cache = create_object_cache("pkgfs " #CLASS "s", \
-				sizeof(CLASS), 8, NULL, NULL, NULL); \
+			s##CLASS##Cache = create_object_cache_etc("pkgfs " #CLASS "s", \
+				sizeof(CLASS), 8, 0, 0, 0, CACHE_NO_DEPOT, NULL, NULL, NULL, NULL); \
 		} \
 	\
 		return object_cache_alloc(s##CLASS##Cache, 0); \

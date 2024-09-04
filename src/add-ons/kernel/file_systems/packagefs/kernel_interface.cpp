@@ -1086,11 +1086,12 @@ packagefs_std_ops(int32 op, ...)
 			PackageFileHeapAccessorBase::sChunkCache =
 				create_object_cache_etc("pkgfs heap buffers",
 					PackageFileHeapAccessorBase::kChunkSize, sizeof(void*),
-					0, /* magazine capacity, count */ 2, 1, 0, NULL,
-					NULL, NULL, NULL);
+					0, /* magazine capacity, count */ 2, 1,
+					0, NULL, NULL, NULL, NULL);
 			TwoKeyAVLTreeNode<void*>::sNodeCache =
-				create_object_cache("pkgfs TKAVLTreeNodes",
-					sizeof(TwoKeyAVLTreeNode<void*>), 8, NULL, NULL, NULL);
+				create_object_cache_etc("pkgfs TKAVLTreeNodes",
+					sizeof(TwoKeyAVLTreeNode<void*>), 8,
+					0, 0, 0, CACHE_NO_DEPOT, NULL, NULL, NULL, NULL);
 
 			error = PackageFSRoot::GlobalInit();
 			if (error != B_OK) {
