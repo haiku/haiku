@@ -70,11 +70,12 @@ const char* kTemplatesDirectory = "Tracker/Tracker New Templates";
 //	#pragma mark - TemplatesMenu
 
 
-TemplatesMenu::TemplatesMenu(const BMessenger &target, const char* label)
+TemplatesMenu::TemplatesMenu(const BMessenger& target, const char* label)
 	:
 	BMenu(label),
 	fTarget(target),
-	fOpenItem(NULL)
+	fOpenItem(NULL),
+	fTemplateCount(0)
 {
 }
 
@@ -144,8 +145,8 @@ TemplatesMenu::BuildMenu(bool addItems)
 {
 	// clear everything...
 	fOpenItem = NULL;
-	int32 count = CountItems();
-	while (count--)
+	fTemplateCount = CountItems();
+	while (fTemplateCount--)
 		delete RemoveItem((int32)0);
 
 	// add the folder
@@ -161,8 +162,8 @@ TemplatesMenu::BuildMenu(bool addItems)
 	path.Append(kTemplatesDirectory);
 	mkdir(path.Path(), 0777);
 
-	count = 0;
-	count += IterateTemplateDirectory(addItems, &path, this);
+	fTemplateCount = 0;
+	fTemplateCount += IterateTemplateDirectory(addItems, &path, this);
 
 	// this is the message sent to open the templates folder
 	BDirectory templatesDir(path.Path());
@@ -181,7 +182,7 @@ TemplatesMenu::BuildMenu(bool addItems)
 	if (dirRef == entry_ref())
 		fOpenItem->SetEnabled(false);
 
-	return count > 0;
+	return fTemplateCount > 0;
 }
 
 
@@ -215,9 +216,9 @@ TemplatesMenu::UpdateMenuState()
 int
 TemplatesMenu::IterateTemplateDirectory(bool addItems, BPath* path, BMenu* menu)
 {
-	uint32 count = 0;
-	if (!path || !menu)
-		return count;
+	fTemplateCount = 0;
+	if (path == NULL || menu == NULL)
+		return fTemplateCount;
 
 	BEntry entry;
 	BList subMenus;
@@ -235,13 +236,12 @@ TemplatesMenu::IterateTemplateDirectory(bool addItems, BPath* path, BMenu* menu)
 
 			BMimeType mime(mimeType);
 			if (mime.IsValid()) {
-				count++;
+				fTemplateCount++;
 
-				// If not adding items, we are just seeing if there
-				// are any to list.  So if we find one, immediately
-				// bail and return the result.
+				// We are just seeing if there are any items to add to the list.
+				// Immediately bail and return the result.
 				if (!addItems)
-					return count;
+					return fTemplateCount;
 
 				entry_ref ref;
 				entry.GetRef(&ref);
@@ -262,7 +262,8 @@ TemplatesMenu::IterateTemplateDirectory(bool addItems, BPath* path, BMenu* menu)
 							BPath subdirPath;
 							if (entry.GetPath(&subdirPath) == B_OK) {
 								BMenu* subMenu = new BMenu(fileName);
-								count += IterateTemplateDirectory(addItems, &subdirPath, subMenu);
+								fTemplateCount
+									+= IterateTemplateDirectory(addItems, &subdirPath, subMenu);
 								subMenus.AddItem((void*)subMenu);
 								continue;
 							}
@@ -314,7 +315,7 @@ TemplatesMenu::IterateTemplateDirectory(bool addItems, BPath* path, BMenu* menu)
 
 	menu->AddItem(NewSubmenuItem(*path));
 
-	return count > 0;
+	return fTemplateCount > 0;
 }
 
 
