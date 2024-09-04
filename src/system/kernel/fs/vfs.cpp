@@ -2415,7 +2415,7 @@ fd_and_path_to_dir_vnode(int fd, char* path, VnodePutter& _vnode,
 		return B_BAD_VALUE;
 	if (*path == '\0')
 		return B_ENTRY_NOT_FOUND;
-	if (fd == AT_FDCWD || fd == -1)
+	if (fd == AT_FDCWD || fd == -1 || *path == '/')
 		return path_to_dir_vnode(path, _vnode, filename, kernel);
 
 	status_t status = get_dir_path_and_leaf(path, filename);
