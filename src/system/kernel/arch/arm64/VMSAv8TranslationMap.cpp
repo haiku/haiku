@@ -464,7 +464,7 @@ VMSAv8TranslationMap::GetMemoryAttr(uint32 attributes, uint32 memoryType, bool i
 			type = MAIR_DEVICE_nGnRnE;
 			break;
 		case B_MTR_WC:
-			type = MAIR_NORMAL_NC;
+			type = MAIR_DEVICE_GRE;
 			break;
 		case B_MTR_WT:
 			type = MAIR_NORMAL_WT;
