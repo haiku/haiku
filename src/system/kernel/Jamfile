@@ -120,7 +120,8 @@ KernelLd kernel_$(TARGET_ARCH) :
 	kernel_misc.o
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
-	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
+	: --orphan-handling=warn -L $(HAIKU_TOP)/src/system/ldscripts/common/
+	  -Bdynamic -export-dynamic -dynamic-linker /foo/bar
 	  $(TARGET_KERNEL_PIC_LINKFLAGS) --no-undefined
 	:
 ;
@@ -160,7 +161,8 @@ if $(HAIKU_ARCH) in x86_64 arm {
 		kernel_misc.o
 
 		: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
-		: -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
+		: --orphan-handling=warn -L $(HAIKU_TOP)/src/system/ldscripts/common/
+		  -Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 		  $(TARGET_KERNEL_PIC_LINKFLAGS)
 	;
 }
