@@ -64,9 +64,9 @@ VirtualDirectoryPoseView::MessageReceived(BMessage* message)
 		case B_CUT:
 		case B_PASTE:
 		case kCutMoreSelectionToClipboard:
-		case kDelete:
+		case kDeleteSelection:
 		case kDuplicateSelection:
-		case kMoveToTrash:
+		case kMoveSelectionToTrash:
 		case kNewEntryFromTemplate:
 		case kNewFolder:
 			break;

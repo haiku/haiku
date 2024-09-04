@@ -186,12 +186,10 @@ LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 
 BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList, uint32 openFlags)
 	:
-	BContainerWindow(windowList, openFlags,
-		kDesktopWindowLook, kDesktopWindowFeel,
-		B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
-			| B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE
-			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
-		B_ALL_WORKSPACES, false, true),
+	BContainerWindow(windowList, openFlags, kDesktopWindowLook, kDesktopWindowFeel,
+		B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_CLOSABLE
+			| B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS,
+		B_ALL_WORKSPACES, false),
 	fDeskShelf(NULL),
 	fNodeRef(NULL),
 	fShortcutsSettings(NULL)

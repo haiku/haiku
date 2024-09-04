@@ -207,6 +207,9 @@ _IMPEXP_TRACKER status_t FSRecursiveCalcSize(BInfoWindow*,
 	CopyLoopControl* loopControl, BDirectory*, off_t* runningSize,
 	int32* fileCount, int32* dirCount);
 
+bool FSInDeskDir(const entry_ref*);
+bool FSIsQueriesDir(const entry_ref*);
+bool FSInRootDir(const entry_ref*);
 bool FSInTrashDir(const entry_ref*);
 
 // doesn't need to be exported

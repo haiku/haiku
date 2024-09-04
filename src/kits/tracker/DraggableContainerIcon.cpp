@@ -71,21 +71,21 @@ DraggableContainerIcon::MouseDown(BPoint where)
 	ThrowOnAssert(window != NULL);
 
 	// we don't like the Trash icon (because it cannot be moved)
-	if (window->IsTrash() || window->IsPrintersDir())
+	if (window->TargetModel()->IsTrash() || window->TargetModel()->IsPrintersDir())
 		return;
 
 	uint32 buttons;
 	window->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 
-	if (IconCache::sIconCache->IconHitTest(where, window->TargetModel(),
-			kNormalIcon, fIconSize)) {
+	if (IconCache::sIconCache->IconHitTest(where, window->TargetModel(), kNormalIcon, fIconSize)) {
 		// The click hit the icon, initiate a drag
 		fDragButton = buttons
 			& (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON);
 		fDragStarted = false;
 		fClickPoint = where;
-	} else
+	} else {
 		fDragButton = 0;
+	}
 
 	if (!fDragButton)
 		Window()->Activate(true);

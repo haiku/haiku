@@ -266,7 +266,6 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fOkToMapIcons(false),
 	fEnsurePosesVisible(false),
 	fShouldAutoScroll(true),
-	fIsDesktopWindow(false),
 	fIsWatchingDateFormatChange(false),
 	fHasPosesInClipboard(false),
 	fCursorCheck(false),
@@ -329,8 +328,6 @@ BPoseView::Init(const BMessage &message)
 void
 BPoseView::InitCommon()
 {
-	BContainerWindow* window = ContainerWindow();
-
 	// Create the TitleView and CountView
 	fTitleView = new BTitleView(this);
 	if (ViewMode() != kListMode)
@@ -363,7 +360,7 @@ BPoseView::InitCommon()
 		// turn on volume node monitor, metamime monitor, etc.
 
 	// populate the window
-	if (window != NULL && window->IsTrash())
+	if (TargetModel() != NULL && TargetModel()->IsTrash())
 		AddTrashPoses();
 	else
 		AddPoses(TargetModel());
@@ -392,7 +389,7 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 	if (node != NULL) {
 		const char* columnsAttr;
 		const char* columnsAttrForeign;
-		if (TargetModel() && TargetModel()->IsRoot()) {
+		if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 			columnsAttr = kAttrDisksColumns;
 			columnsAttrForeign = kAttrDisksColumnsForeign;
 		} else {
@@ -513,7 +510,7 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 		const char* viewStateAttr;
 		const char* viewStateAttrForeign;
 
-		if (TargetModel() && TargetModel()->IsRoot()) {
+		if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 			viewStateAttr = kAttrDisksViewState;
 			viewStateAttrForeign = kAttrDisksViewStateForeign;
 		} else {
@@ -551,7 +548,7 @@ BPoseView::RestoreState(AttributeStreamNode* node)
 		}
 	}
 
-	if (IsDesktopWindow() && ViewMode() == kListMode) {
+	if (IsDesktop() && ViewMode() == kListMode) {
 		// recover if desktop window view state set wrong
 		fViewState->SetViewMode(kIconMode);
 	}
@@ -569,7 +566,7 @@ BPoseView::RestoreState(const BMessage &message)
 		fViewState = viewstate;
 	}
 
-	if (IsDesktopWindow() && ViewMode() == kListMode) {
+	if (IsDesktop() && ViewMode() == kListMode) {
 		// recover if desktop window view state set wrong
 		fViewState->SetViewMode(kIconMode);
 	}
@@ -658,7 +655,7 @@ BPoseView::SaveColumnState(AttributeStreamNode* node)
 
 	const char* columnsAttr;
 	const char* columnsAttrForeign;
-	if (TargetModel() && TargetModel()->IsRoot()) {
+	if (TargetModel() != NULL && TargetModel()->IsRoot()) {
 		columnsAttr = kAttrDisksColumns;
 		columnsAttrForeign = kAttrDisksColumnsForeign;
 	} else {
@@ -762,7 +759,7 @@ BPoseView::SavePoseLocations(BRect* frameIfDesktop)
 		return;
 	}
 
-	bool isDesktop = IsDesktopWindow() && (frameIfDesktop != NULL);
+	bool isDesktop = IsDesktop() && (frameIfDesktop != NULL);
 
 	int32 poseCount = fPoseList->CountItems();
 	for (int32 index = 0; index < poseCount; index++) {
@@ -968,8 +965,8 @@ BPoseView::ScrollTo(BPoint where)
 void
 BPoseView::AttachedToWindow()
 {
-	fIsDesktopWindow = dynamic_cast<BDeskWindow*>(Window()) != NULL;
-	if (fIsDesktopWindow)
+	fIsDesktop = dynamic_cast<BDeskWindow*>(Window()) != NULL;
+	if (fIsDesktop)
 		AddFilter(new TPoseViewFilter(this));
 	else
 		ApplyBackgroundColor();
@@ -1781,7 +1778,7 @@ BPoseView::FinishPendingScroll(float &listViewScrollBy, BRect srcRect)
 bool
 BPoseView::AddPosesThreadValid(const entry_ref* ref) const
 {
-	return *(TargetModel()->EntryRef()) == *ref || ContainerWindow()->IsTrash();
+	return *(TargetModel()->EntryRef()) == *ref || TargetModel()->IsTrash();
 }
 
 
@@ -2391,15 +2388,15 @@ BPoseView::MessageReceived(BMessage* message)
 			OpenSelectionUsing();
 			break;
 
-		case kRestoreFromTrash:
+		case kRestoreSelectionFromTrash:
 			RestoreSelectionFromTrash();
 			break;
 
-		case kDelete:
+		case kDeleteSelection:
 			DoDelete();
 			break;
 
-		case kMoveToTrash:
+		case kMoveSelectionToTrash:
 			DoMoveToTrash();
 			break;
 
@@ -2441,14 +2438,8 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kIdentifyEntry:
-		{
-			bool force;
-			if (message->FindBool("force", &force) != B_OK)
-				force = false;
-
-			IdentifySelection(force);
+			IdentifySelection(message->GetBool("force", false));
 			break;
-		}
 
 		case kEditItem:
 		{
@@ -3076,7 +3067,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	// if we are the desktop.
 	BPoint scaleOffset(0, 0);
 	bool iconSizeChanged = newMode == kIconMode && oldMode == kIconMode;
-	if (!IsDesktopWindow() && iconSizeChanged) {
+	if (!IsDesktop() && iconSizeChanged) {
 		// definitely changing the icon size, so we will need to scroll
 		BRect bounds(Bounds());
 		BPoint center(bounds.LeftTop());
@@ -3121,7 +3112,7 @@ BPoseView::SetViewMode(uint32 newMode)
 	}
 
 	// check if we need to re-place poses when they are out of view
-	bool checkLocations = IsDesktopWindow() && iconSizeChanged;
+	bool checkLocations = IsDesktop() && iconSizeChanged;
 
 	BPoint oldOffset;
 	BPoint oldGrid;
@@ -3579,7 +3570,7 @@ BPoseView::PlacePose(BPose* pose, BRect &viewBounds)
 	// make pose rect a little bigger to ensure space between poses
 	rect.InsetBy(-3, 0);
 
-	bool checkValidLocation = IsDesktopWindow();
+	bool checkValidLocation = IsDesktop();
 
 	// find an empty slot to put pose into
 	while (SlotOccupied(rect, viewBounds)
@@ -3608,7 +3599,7 @@ BPoseView::PlacePose(BPose* pose, BRect &viewBounds)
 bool
 BPoseView::IsValidLocation(const BPose* pose)
 {
-	if (!IsDesktopWindow())
+	if (!IsDesktop())
 		return true;
 
 	BRect rect(pose->CalcRect(this));
@@ -3620,7 +3611,7 @@ BPoseView::IsValidLocation(const BPose* pose)
 bool
 BPoseView::IsValidLocation(const BRect& rect)
 {
-	if (!IsDesktopWindow())
+	if (!IsDesktop())
 		return true;
 
 	// on the desktop, don't allow icons outside of the view bounds
@@ -3698,7 +3689,7 @@ BPoseView::CheckAutoPlacedPoses()
 void
 BPoseView::CheckPoseVisibility(BRect* newFrame)
 {
-	bool desktop = IsDesktopWindow() && newFrame != 0;
+	bool desktop = IsDesktop() && newFrame != 0;
 
 	BRect deskFrame;
 	if (desktop) {
@@ -4014,7 +4005,7 @@ BPoseView::ScrollIntoView(BPose* pose, int32 index)
 void
 BPoseView::ScrollIntoView(BRect poseRect)
 {
-	if (IsDesktopWindow())
+	if (IsDesktop())
 		return;
 
 	BPoint oldPos = Bounds().LeftTop(), newPos = oldPos;
@@ -5489,7 +5480,7 @@ BPoseView::FSNotification(const BMessage* message)
 				BVolume volume(device);
 				if (volume.InitCheck() == B_OK)
 					CreateVolumePose(&volume, false);
-			} else if (ContainerWindow()->IsTrash()) {
+			} else if (TargetModel()->IsTrash()) {
 				// add trash items from newly mounted volume
 
 				BDirectory trashDir;
@@ -5649,14 +5640,15 @@ BPoseView::EntryMoved(const BMessage* message)
 	ThrowOnAssert(targetModel != NULL);
 
 	node_ref thisDirNode;
-	if (ContainerWindow()->IsTrash()) {
+	if (TargetModel()->IsTrash()) {
 		BDirectory trashDir;
 		if (FSGetTrashDir(&trashDir, itemNode.device) != B_OK)
 			return true;
 
 		trashDir.GetNodeRef(&thisDirNode);
-	} else
+	} else {
 		thisDirNode = *targetModel->NodeRef();
+	}
 
 	// see if we need to update window title (and folder itself)
 	if (thisDirNode == itemNode) {
@@ -5720,10 +5712,11 @@ BPoseView::EntryMoved(const BMessage* message)
 		}
 		if (pose != NULL)
 			pendingNodeMonitorCache.PoseCreatedOrMoved(this, pose);
-	} else if (oldDir == thisDirNode.node)
+	} else if (oldDir == thisDirNode.node) {
 		DeletePose(&itemNode);
-	else if (dirNode.node == thisDirNode.node)
+	} else if (dirNode.node == thisDirNode.node) {
 		EntryCreated(&dirNode, &itemNode, name);
+	}
 
 	TryUpdatingBrokenLinks();
 
@@ -7101,8 +7094,7 @@ BPoseView::ShowContextMenu(BPoint where)
 
 	window->Activate();
 	window->UpdateIfNeeded();
-	window->ShowContextMenu(where, pose == NULL ? NULL
-		: pose->TargetModel()->EntryRef());
+	window->ShowContextMenu(where, pose == NULL ? NULL : pose->TargetModel()->EntryRef());
 
 	if (fSelectionChangedHook)
 		window->SelectionChanged();
@@ -7365,7 +7357,7 @@ BPoseView::MouseDown(BPoint where)
 	if (window == NULL)
 		return;
 
-	if (IsDesktopWindow()) {
+	if (IsDesktop()) {
 		BScreen screen(Window());
 		rgb_color color = screen.DesktopColor();
 		SetLowColor(color);
@@ -8202,13 +8194,9 @@ BPoseView::OpenSelection(BPose* clickedPose, int32* index)
 	}
 
 	// check if we can use the single window mode
-	if (settings.SingleWindowBrowse()
-		&& !IsDesktopWindow()
-		&& !IsFilePanel()
-		&& (modifiers() & B_OPTION_KEY) == 0
-		&& TargetModel()->IsDirectory()
-		&& singleWindowBrowsePose
-		&& singleWindowBrowsePose->ResolvedModel()
+	if (settings.SingleWindowBrowse() && !IsDesktop() && !IsFilePanel()
+		&& (modifiers() & B_OPTION_KEY) == 0 && TargetModel()->IsDirectory()
+		&& singleWindowBrowsePose && singleWindowBrowsePose->ResolvedModel()
 		&& singleWindowBrowsePose->ResolvedModel()->IsDirectory()) {
 		// Switch to new directory
 		BMessage msg(kSwitchDirectory);
@@ -8218,7 +8206,6 @@ BPoseView::OpenSelection(BPose* clickedPose, int32* index)
 		// otherwise use standard method
 		OpenSelectionCommon(clickedPose, index, false);
 	}
-
 }
 
 
@@ -8245,11 +8232,8 @@ BPoseView::OpenSelectionCommon(BPose* clickedPose, int32* poseIndex,
 
 		// close parent window if option down and we're not the desktop
 		// and we're not in single window mode
-		if (dynamic_cast<TTracker*>(be_app) == NULL
-			|| (modifiers() & B_OPTION_KEY) == 0
-			|| IsFilePanel()
-			|| IsDesktopWindow()
-			|| TrackerSettings().SingleWindowBrowse()) {
+		if (dynamic_cast<TTracker*>(be_app) == NULL || (modifiers() & B_OPTION_KEY) == 0
+			|| IsFilePanel() || IsDesktop() || TrackerSettings().SingleWindowBrowse()) {
 			continue;
 		}
 
@@ -8315,6 +8299,39 @@ BPoseView::ApplyBackgroundColor()
 }
 
 
+bool
+BPoseView::CanUnmountSelection()
+{
+	int32 selectCount = CountSelected();
+	if (selectCount == 0)
+		return false;
+
+	BVolume boot;
+	BVolumeRoster().GetBootVolume(&boot);
+
+	for (int32 index = 0; index < selectCount; index++) {
+		BPose* pose = fSelectionList->ItemAt(index);
+		if (pose == NULL)
+			continue;
+
+		// only volumes are unmountable
+		Model* model = pose->TargetModel();
+		if (!model->IsVolume())
+			return false;
+
+		BVolume volume(model->NodeRef()->device);
+		if (volume.InitCheck() != B_OK)
+			continue;
+
+		// boot volume is unmountable
+		if (volume == boot)
+			return false;
+	}
+
+	return true;
+}
+
+
 void
 BPoseView::UnmountSelectedVolumes()
 {
@@ -8327,19 +8344,22 @@ BPoseView::UnmountSelectedVolumes()
 		if (pose == NULL)
 			continue;
 
+		// only volumes are unmountable
 		Model* model = pose->TargetModel();
-		if (model->IsVolume()) {
-			BVolume volume(model->NodeRef()->device);
-			if (volume != boot) {
-				TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-				if (tracker != NULL)
-					tracker->SaveAllPoseLocations();
+		if (!model->IsVolume())
+			continue;
 
-				BMessage message(kUnmountVolume);
-				message.AddInt32("device_id", volume.Device());
-				be_app->PostMessage(&message);
-			}
-		}
+		BVolume volume(model->NodeRef()->device);
+		if (volume.InitCheck() != B_OK)
+			continue;
+
+		// skip boot volume
+		if (volume == boot)
+			continue;
+
+		BMessage message(kUnmountVolume);
+		message.AddInt32("device_id", volume.Device());
+		be_app->PostMessage(&message);
 	}
 }
 
@@ -8401,12 +8421,6 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	delete fModel;
 	fModel = model;
 
-	// check if model is a trash dir, if so
-	// update ContainerWindow's fIsTrash, etc.
-	// variables to indicate new state
-	if (ContainerWindow() != NULL)
-		ContainerWindow()->UpdateIfTrash(model);
-
 	StopWatching();
 	ClearPoses();
 
@@ -8460,13 +8474,13 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	// be sure this happens after origin is set and window is sized
 	// properly for proper icon caching!
 
-	if (ContainerWindow() != NULL && ContainerWindow()->IsTrash())
+	if (TargetModel() != NULL && TargetModel()->IsTrash())
 		AddTrashPoses();
 	else
 		AddPoses(TargetModel());
 	TargetModel()->CloseNode();
 
-	if (!IsDesktopWindow()) {
+	if (!IsDesktop()) {
 		ApplyBackgroundColor();
 		if (ContainerWindow() != NULL)
 			ContainerWindow()->UpdateBackgroundImage();
@@ -8608,38 +8622,25 @@ BPoseView::SetDefaultPrinter()
 void
 BPoseView::OpenParent()
 {
-	if (!TargetModel() || TargetModel()->IsRoot() || IsDesktopWindow())
+	if (ParentIsRoot())
 		return;
 
 	BEntry entry(TargetModel()->EntryRef());
 	entry_ref ref;
-
-	if (FSGetParentVirtualDirectoryAware(entry, entry) != B_OK
-		|| entry.GetRef(&ref) != B_OK)
+	if (FSGetParentVirtualDirectoryAware(entry, entry) != B_OK || entry.GetRef(&ref) != B_OK)
 		return;
-
-	BEntry root("/");
-	if (!TrackerSettings().SingleWindowBrowse()
-		&& !TrackerSettings().ShowNavigator()
-		&& !TrackerSettings().ShowDisksIcon() && entry == root
-		&& (modifiers() & B_CONTROL_KEY) == 0)
-		return;
-
-	Model parentModel(&ref);
 
 	BMessage message(B_REFS_RECEIVED);
 	message.AddRef("refs", &ref);
 
-	if (dynamic_cast<TTracker*>(be_app)) {
-		// add information about the child, so that we can select it
-		// in the parent view
-		message.AddData("nodeRefToSelect", B_RAW_TYPE, TargetModel()->NodeRef(),
-			sizeof (node_ref));
+	if (dynamic_cast<TTracker*>(be_app) != NULL) {
+		// add information about the child, so that we can select it in the parent view
+		message.AddData("nodeRefToSelect", B_RAW_TYPE, TargetModel()->NodeRef(), sizeof(node_ref));
 
 		if ((modifiers() & B_OPTION_KEY) != 0 && !IsFilePanel()) {
 			// if option down, add instructions to close the parent
-			message.AddData("nodeRefsToClose", B_RAW_TYPE,
-				TargetModel()->NodeRef(), sizeof (node_ref));
+			message.AddData("nodeRefsToClose", B_RAW_TYPE, TargetModel()->NodeRef(),
+				sizeof(node_ref));
 		}
 	}
 
@@ -8647,8 +8648,28 @@ BPoseView::OpenParent()
 		BMessage msg(kSwitchDirectory);
 		msg.AddRef("refs", &ref);
 		Window()->PostMessage(&msg);
-	} else
+	} else {
 		be_app->PostMessage(&message);
+	}
+}
+
+
+bool
+BPoseView::ParentIsRoot()
+{
+	if (TargetModel()->IsDesktop() || TargetModel()->IsRoot())
+		return true;
+
+	// override by holding control key
+	if ((modifiers() & B_CONTROL_KEY) != 0)
+		return false;
+
+	BEntry entry(TargetModel()->EntryRef());
+	bool isRoot = FSGetParentVirtualDirectoryAware(entry, entry) == B_OK && FSIsRootDir(&entry);
+	if (isRoot && (TrackerSettings().SingleWindowBrowse() || TrackerSettings().ShowDisksIcon()))
+		return false;
+
+	return isRoot;
 }
 
 
@@ -8838,6 +8859,7 @@ bool
 BPoseView::SelectedVolumeIsReadOnly() const
 {
 	BVolume volume;
+	BPose* pose;
 	BEntry entry;
 	BNode parent;
 	node_ref nref;
@@ -8847,7 +8869,7 @@ BPoseView::SelectedVolumeIsReadOnly() const
 		// multiple items selected in query, consider the whole selection
 		// to be read-only if any item's volume is read-only
 		for (int32 i = 0; i < selectCount; i++) {
-			BPose* pose = fSelectionList->ItemAt(i);
+			pose = fSelectionList->ItemAt(i);
 			if (pose == NULL || pose->TargetModel() == NULL)
 				continue;
 
@@ -8861,7 +8883,11 @@ BPoseView::SelectedVolumeIsReadOnly() const
 		}
 	} else if (selectCount > 0) {
 		// only check first item's volume, assume rest are the same
-		entry.SetTo(fSelectionList->FirstItem()->TargetModel()->EntryRef());
+		pose = fSelectionList->FirstItem();
+		if (pose->TargetModel()->IsRoot())
+			return true;
+
+		entry.SetTo(pose->TargetModel()->EntryRef());
 		if (FSGetParentVirtualDirectoryAware(entry, parent) == B_OK) {
 			parent.GetNodeRef(&nref);
 			volume.SetTo(nref.device);
@@ -8881,8 +8907,7 @@ BPoseView::TargetVolumeIsReadOnly() const
 	Model* target = TargetModel();
 	BVolume volume(target->NodeRef()->device);
 
-	return target->IsQuery() || target->IsQueryTemplate()
-		|| target->IsVirtualDirectory()
+	return target->IsQuery() || target->IsQueryTemplate() || target->IsVirtualDirectory()
 		|| (volume.InitCheck() == B_OK && volume.IsReadOnly());
 }
 
@@ -9120,7 +9145,7 @@ BPoseView::BackColor(bool selected) const
 void
 BPoseView::Draw(BRect updateRect)
 {
-	if (IsDesktopWindow()) {
+	if (IsDesktop()) {
 		BScreen screen(Window());
 		rgb_color color = screen.DesktopColor();
 		SetLowColor(color);
@@ -9219,7 +9244,7 @@ BPoseView::ColumnRedraw(BRect updateRect)
 	ASSERT(ViewMode() == kListMode);
 
 #if COLUMN_MODE_ON_DESKTOP
-	if (IsDesktopWindow()) {
+	if (IsDesktop()) {
 		BScreen screen(Window());
 		rgb_color d = screen.DesktopColor();
 		SetLowColor(d);

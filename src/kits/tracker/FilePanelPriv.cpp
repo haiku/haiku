@@ -547,17 +547,13 @@ TFilePanel::SetTo(const entry_ref* ref)
 	if (ref == NULL)
 		return;
 
-	entry_ref setToRef(*ref);
-
-	bool isDesktop = SwitchDirToDesktopIfNeeded(setToRef);
-
-	BEntry entry(&setToRef);
+	BEntry entry(ref);
 	if (entry.InitCheck() != B_OK || !entry.IsDirectory())
 		return;
 
-	PoseView()->SetIsDesktop(isDesktop);
-	PoseView()->SwitchDir(&setToRef);
-	SwitchDirMenuTo(&setToRef);
+	entry_ref _ref(*ref);
+	PoseView()->SetIsDesktop(SwitchDirToDesktopIfNeeded(_ref));
+	SwitchDirMenuTo(&_ref);
 
 	AddShortcut('H', B_COMMAND_KEY, new BMessage(kSwitchToHome));
 		// our shortcut got possibly removed because the home
@@ -970,7 +966,7 @@ TFilePanel::AddFileContextMenus(BMenu* menu)
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Duplicate"),
 		new BMessage(kDuplicateSelection), 'D'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Move to Trash"),
-		new BMessage(kMoveToTrash), 'T'));
+		new BMessage(kMoveSelectionToTrash), 'T'));
 	menu->AddSeparatorItem();
 
 	BMenuItem* cutItem = new BMenuItem(B_TRANSLATE("Cut"),
@@ -1077,7 +1073,7 @@ TFilePanel::MenusBeginning()
 		&& !PoseView()->TargetVolumeIsReadOnly());
 	EnableNamedMenuItem(fMenuBar, kDuplicateSelection,
 		PoseView()->CanMoveToTrashOrDuplicate());
-	EnableNamedMenuItem(fMenuBar, kMoveToTrash,
+	EnableNamedMenuItem(fMenuBar, kMoveSelectionToTrash,
 		PoseView()->CanMoveToTrashOrDuplicate());
 	EnableNamedMenuItem(fMenuBar, kEditItem, PoseView()->CanEditName());
 
@@ -1125,7 +1121,7 @@ TFilePanel::ShowContextMenu(BPoint where, const entry_ref* ref)
 				PoseView()->CanEditName());
 			EnableNamedMenuItem(fContextMenu, kDuplicateSelection,
 				PoseView()->CanMoveToTrashOrDuplicate());
-			EnableNamedMenuItem(fContextMenu, kMoveToTrash,
+			EnableNamedMenuItem(fContextMenu, kMoveSelectionToTrash,
 				PoseView()->CanMoveToTrashOrDuplicate());
 
 			SetCutItem(fContextMenu);
