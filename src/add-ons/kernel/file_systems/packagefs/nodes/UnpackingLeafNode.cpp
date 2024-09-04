@@ -152,7 +152,7 @@ UnpackingLeafNode::RemovePackageNode(PackageNode* packageNode, dev_t deviceID)
 	// is not sorted)
 	PackageLeafNode* newestNode = fPackageNodes.Head();
 	if (isNewest && newestNode != NULL) {
-		PackageLeafNodeList::Iterator it = fPackageNodes.GetIterator();
+		PackageLeafNodeList::ConstIterator it = fPackageNodes.GetIterator();
 		it.Next();
 			// skip the first one
 		while (PackageLeafNode* otherNode = it.Next()) {

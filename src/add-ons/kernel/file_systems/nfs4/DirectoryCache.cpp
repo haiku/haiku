@@ -163,7 +163,7 @@ DirectoryCache::RemoveEntry(const char* name)
 {
 	ASSERT(name != NULL);
 
-	SinglyLinkedList<NameCacheEntry>::Iterator iterator
+	SinglyLinkedList<NameCacheEntry>::ConstIterator iterator
 		= fNameCache.GetIterator();
 	NameCacheEntry* previous = NULL;
 	NameCacheEntry* current = iterator.Next();
@@ -277,11 +277,11 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 
 	MutexLocker _(newSnapshot->fLock);
 
-	SinglyLinkedList<NameCacheEntry>::Iterator oldIt
+	SinglyLinkedList<NameCacheEntry>::ConstIterator oldIt
 		= oldSnapshot->fEntries.GetIterator();
 	NameCacheEntry* oldCurrent;
 
-	SinglyLinkedList<NameCacheEntry>::Iterator newIt
+	SinglyLinkedList<NameCacheEntry>::ConstIterator newIt
 		= newSnapshot->fEntries.GetIterator();
 	NameCacheEntry* newCurrent = newIt.Next();
 	while (newCurrent != NULL) {

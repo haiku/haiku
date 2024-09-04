@@ -994,7 +994,7 @@ Volume::_AddPackageContent(Package* package, bool notify)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	for (PackageNodeList::Iterator it = package->Nodes().GetIterator();
+	for (PackageNodeList::ConstIterator it = package->Nodes().GetIterator();
 			PackageNode* node = it.Next();) {
 		// skip over ".PackageInfo" file, it isn't part of the package content
 		if (strcmp(node->Name(),

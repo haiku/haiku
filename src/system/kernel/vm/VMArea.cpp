@@ -67,7 +67,7 @@ VMArea::Init(const char* name, uint32 allocationFlags)
 bool
 VMArea::IsWired(addr_t base, size_t size) const
 {
-	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
+	for (VMAreaWiredRangeList::ConstIterator it = fWiredRanges.GetIterator();
 			VMAreaWiredRange* range = it.Next();) {
 		if (range->IntersectsWith(base, size))
 			return true;
@@ -123,7 +123,7 @@ VMArea::Unwire(VMAreaWiredRange* range)
 VMAreaWiredRange*
 VMArea::Unwire(addr_t base, size_t size, bool writable)
 {
-	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
+	for (VMAreaWiredRangeList::ConstIterator it = fWiredRanges.GetIterator();
 			VMAreaWiredRange* range = it.Next();) {
 		if (range->implicit && range->base == base && range->size == size
 				&& range->writable == writable) {
@@ -177,7 +177,7 @@ bool
 VMArea::AddWaiterIfWired(VMAreaUnwiredWaiter* waiter, addr_t base, size_t size,
 	uint32 flags)
 {
-	for (VMAreaWiredRangeList::Iterator it = fWiredRanges.GetIterator();
+	for (VMAreaWiredRangeList::ConstIterator it = fWiredRanges.GetIterator();
 			VMAreaWiredRange* range = it.Next();) {
 		if ((flags & IGNORE_WRITE_WIRED_RANGES) != 0 && range->writable)
 			continue;

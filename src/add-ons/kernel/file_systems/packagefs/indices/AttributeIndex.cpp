@@ -342,7 +342,7 @@ AttributeIndex::NodeChanged(Node* node, uint32 statFields,
 
 	// move the iterators that point to the node to the previous node
 	if (oldTreeValue != NULL) {
-		for (IteratorList::Iterator it = iterators.GetIterator();
+		for (IteratorList::ConstIterator it = iterators.GetIterator();
 				Iterator* iterator = it.Next();) {
 			iterator->NodeChangeBegin(node);
 		}
@@ -359,7 +359,7 @@ AttributeIndex::NodeChanged(Node* node, uint32 statFields,
 	// its place, they will point to it again, otherwise to the node originally
 	// succeeding it.
 	if (oldTreeValue != NULL) {
-		for (IteratorList::Iterator it = iterators.GetIterator();
+		for (IteratorList::ConstIterator it = iterators.GetIterator();
 				Iterator* iterator = it.Next();) {
 			iterator->NodeChangeEnd(node);
 		}

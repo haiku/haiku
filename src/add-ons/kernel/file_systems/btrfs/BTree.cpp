@@ -542,7 +542,7 @@ BTree::~BTree()
 	// traversing the tree - a TreeIterator doesn't lock the inode)
 	mutex_lock(&fIteratorLock);
 
-	SinglyLinkedList<TreeIterator>::Iterator iterator
+	SinglyLinkedList<TreeIterator>::ConstIterator iterator
 		= fIterators.GetIterator();
 	while (iterator.HasNext())
 		iterator.Next()->Stop();

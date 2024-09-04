@@ -41,7 +41,7 @@ private:
 
 class PathBlocklist {
 public:
-			typedef SinglyLinkedList<BlockedPath>::Iterator Iterator;
+			typedef SinglyLinkedList<BlockedPath>::ConstIterator Iterator;
 
 public:
 								PathBlocklist();

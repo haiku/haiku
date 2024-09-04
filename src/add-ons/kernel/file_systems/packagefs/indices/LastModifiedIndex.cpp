@@ -216,7 +216,7 @@ LastModifiedIndex::NodeChanged(Node* node, uint32 statFields,
 		return;
 
 	// move the iterators that point to the node to the previous node
-	for (IteratorList::Iterator it = iterators.GetIterator();
+	for (IteratorList::ConstIterator it = iterators.GetIterator();
 			Iterator* iterator = it.Next();) {
 		iterator->NodeChangeBegin(node);
 	}
@@ -231,7 +231,7 @@ LastModifiedIndex::NodeChanged(Node* node, uint32 statFields,
 	// Move the iterators to the next node again. If the node hasn't changed
 	// its place, they will point to it again, otherwise to the node originally
 	// succeeding it.
-	for (IteratorList::Iterator it = iterators.GetIterator();
+	for (IteratorList::ConstIterator it = iterators.GetIterator();
 			Iterator* iterator = it.Next();) {
 		iterator->NodeChangeEnd(node);
 	}

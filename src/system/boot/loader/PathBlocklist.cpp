@@ -170,7 +170,7 @@ PathBlocklist::MakeEmpty()
 BlockedPath*
 PathBlocklist::_FindPath(const char* path) const
 {
-	for (PathList::Iterator it = fPaths.GetIterator(); it.HasNext();) {
+	for (PathList::ConstIterator it = fPaths.GetIterator(); it.HasNext();) {
 		BlockedPath* blockedPath = it.Next();
 		if (*blockedPath == path)
 			return blockedPath;

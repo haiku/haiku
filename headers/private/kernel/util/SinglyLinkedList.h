@@ -94,16 +94,16 @@ class SinglyLinkedList {
 		typedef SinglyLinkedListLink<Element> Link;
 
 	public:
-		class Iterator {
+		class ConstIterator {
 			public:
-				Iterator(const List* list)
+				ConstIterator(const List* list)
 					:
 					fList(list)
 				{
 					Rewind();
 				}
 
-				Iterator(const Iterator& other)
+				ConstIterator(const ConstIterator& other)
 				{
 					*this = other;
 				}
@@ -121,7 +121,7 @@ class SinglyLinkedList {
 					return element;
 				}
 
-				Iterator& operator=(const Iterator& other)
+				ConstIterator& operator=(const ConstIterator& other)
 				{
 					fList = other.fList;
 					fNext = other.fNext;
@@ -164,7 +164,7 @@ class SinglyLinkedList {
 		inline int32 Count() const;
 			// O(n)!
 
-		inline Iterator GetIterator() const	{ return Iterator(this); }
+		inline ConstIterator GetIterator() const { return ConstIterator(this); }
 
 	private:
 		Element	*fFirst;

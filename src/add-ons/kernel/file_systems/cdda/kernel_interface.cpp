@@ -1342,7 +1342,7 @@ Inode::RemoveAttribute(const char* name, bool checkNamespace)
 			if (checkNamespace && attribute->IsProtectedNamespace())
 				return B_NOT_ALLOWED;
 			// look for attribute in cookies
-			AttrCookieList::Iterator i = fAttrCookies.GetIterator();
+			AttrCookieList::ConstIterator i = fAttrCookies.GetIterator();
 			while (i.HasNext()) {
 				attr_cookie* cookie = i.Next();
 				if (cookie->current == attribute) {

@@ -126,7 +126,7 @@ ARMPagingStructures32Bit::UpdateAllPageDirs(int index,
 {
 	InterruptsSpinLocker locker(sPagingStructuresListLock);
 
-	PagingStructuresList::Iterator it = sPagingStructuresList.GetIterator();
+	PagingStructuresList::ConstIterator it = sPagingStructuresList.GetIterator();
 	while (ARMPagingStructures32Bit* info = it.Next())
 		info->pgdir_virt[index] = entry;
 }
