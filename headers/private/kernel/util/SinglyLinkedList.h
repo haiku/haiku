@@ -161,7 +161,7 @@ class SinglyLinkedList {
 
 		inline Element* GetNext(Element* element) const;
 
-		inline int32 Size() const;
+		inline int32 Count() const;
 			// O(n)!
 
 		inline Iterator GetIterator() const	{ return Iterator(this); }
@@ -300,7 +300,7 @@ SINGLY_LINKED_LIST_CLASS_NAME::GetNext(Element* element) const
 // Size
 SINGLY_LINKED_LIST_TEMPLATE_LIST
 int32
-SINGLY_LINKED_LIST_CLASS_NAME::Size() const
+SINGLY_LINKED_LIST_CLASS_NAME::Count() const
 {
 	int32 count = 0;
 	for (Element* element = First(); element; element = GetNext(element))
