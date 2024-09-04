@@ -92,6 +92,7 @@ All rights reserved.
 #include "MimeTypes.h"
 #include "Navigator.h"
 #include "Pose.h"
+#include "Shortcuts.h"
 #include "Tests.h"
 #include "Thread.h"
 #include "Tracker.h"
@@ -1656,7 +1657,7 @@ void
 BPoseView::AddPosesCompleted()
 {
 	BContainerWindow* window = ContainerWindow();
-	if (window != NULL)
+	if (window != NULL && window->ShouldAddMenus())
 		window->AddMimeTypesToMenu();
 
 	// if we're not in icon mode then we need to check for poses that
@@ -2440,7 +2441,7 @@ BPoseView::MessageReceived(BMessage* message)
 			IdentifySelection(message->GetBool("force", false));
 			break;
 
-		case kEditItem:
+		case kEditName:
 		{
 			if (ActivePose())
 				break;
@@ -6232,17 +6233,14 @@ BPoseView::DeleteSelection(bool selectNext, bool confirm)
 	if (selectCount <= 0)
 		return;
 
-	if (!CheckVolumeReadOnly(
-			fSelectionList->ItemAt(0)->TargetModel()->EntryRef())) {
+	if (!CheckVolumeReadOnly(fSelectionList->ItemAt(0)->TargetModel()->EntryRef()))
 		return;
-	}
 
-	BObjectList<entry_ref>* entriesToDelete
-		= new BObjectList<entry_ref>(selectCount, true);
+	BObjectList<entry_ref>* entriesToDelete = new BObjectList<entry_ref>(selectCount, true);
 
 	for (int32 index = 0; index < selectCount; index++) {
-		entriesToDelete->AddItem(new entry_ref(
-			*fSelectionList->ItemAt(index)->TargetModel()->EntryRef()));
+		entry_ref* ref = new entry_ref(*fSelectionList->ItemAt(index)->TargetModel()->EntryRef());
+		entriesToDelete->AddItem(ref);
 	}
 
 	Delete(entriesToDelete, selectNext, confirm);
@@ -6271,8 +6269,7 @@ BPoseView::RestoreSelectionFromTrash(bool selectNext)
 void
 BPoseView::Delete(const entry_ref &ref, bool selectNext, bool confirm)
 {
-	BObjectList<entry_ref>* entriesToDelete
-		= new BObjectList<entry_ref>(1, true);
+	BObjectList<entry_ref>* entriesToDelete = new BObjectList<entry_ref>(1, true);
 	entriesToDelete->AddItem(new entry_ref(ref));
 
 	Delete(entriesToDelete, selectNext, confirm);
@@ -6287,8 +6284,7 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool confirm)
 		return;
 	}
 
-	BObjectList<FunctionObject>* taskList =
-		new BObjectList<FunctionObject>(2, true);
+	BObjectList<FunctionObject>* taskList = new BObjectList<FunctionObject>(2, true);
 
 	// first move selection to trash,
 	taskList->AddItem(NewFunctionObject(FSDeleteRefList, list, false, confirm));
@@ -6311,8 +6307,7 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool confirm)
 			// deleted
 			Model* targetModel = TargetModel();
 			ASSERT(targetModel != NULL);
-			taskList->AddItem(NewMemberFunctionObject(
-				&TTracker::SelectPoseAtLocationSoon, tracker,
+			taskList->AddItem(NewMemberFunctionObject(&TTracker::SelectPoseAtLocationSoon, tracker,
 				*targetModel->NodeRef(), pointInPose));
 		}
 	}
@@ -6330,8 +6325,7 @@ BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
 		return;
 	}
 
-	BObjectList<FunctionObject>* taskList =
-		new BObjectList<FunctionObject>(2, true);
+	BObjectList<FunctionObject>* taskList = new BObjectList<FunctionObject>(2, true);
 
 	// first restoree selection
 	taskList->AddItem(NewFunctionObject(FSRestoreRefList, list, false));
@@ -6354,8 +6348,7 @@ BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
 			// restored
 			Model* targetModel = TargetModel();
 			ASSERT(targetModel != NULL);
-			taskList->AddItem(NewMemberFunctionObject(
-				&TTracker::SelectPoseAtLocationSoon, tracker,
+			taskList->AddItem(NewMemberFunctionObject(&TTracker::SelectPoseAtLocationSoon, tracker,
 				*targetModel->NodeRef(), pointInPose));
 		}
 	}
@@ -6391,8 +6384,7 @@ BPoseView::DoMoveToTrash()
 	if (TargetModel()->IsTrash())
 		return DeleteSelection(true, false);
 
-	bool shiftDown = (Window()->CurrentMessage()->FindInt32("modifiers")
-		& B_SHIFT_KEY) != 0;
+	bool shiftDown = (Window()->CurrentMessage()->FindInt32("modifiers") & B_SHIFT_KEY) != 0;
 	if (shiftDown)
 		DeleteSelection();
 	else
@@ -6751,7 +6743,7 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 			if (message != NULL) {
 				int32 key;
 				if (message->FindInt32("key", &key) == B_OK && key == B_F2_KEY)
-					Window()->PostMessage(kEditItem, this);
+					Window()->PostMessage(kEditName, this);
 			}
 			break;
 		}
@@ -7472,7 +7464,7 @@ BPoseView::WasClickInPath(const BPose* pose, int32 index,
 	if (entry.GetRef(&ref) == B_OK) {
 		BMessage message(B_REFS_RECEIVED);
 		message.AddRef("refs", &ref);
-		be_app->PostMessage(&message);
+		Window()->PostMessage(&message);
 		return true;
 	}
 
@@ -8596,54 +8588,53 @@ BPoseView::SetDefaultPrinter()
 void
 BPoseView::OpenParent()
 {
-	if (ParentIsRoot())
+	if (!CanOpenParent())
 		return;
 
-	BEntry entry(TargetModel()->EntryRef());
-	entry_ref ref;
-	if (FSGetParentVirtualDirectoryAware(entry, entry) != B_OK || entry.GetRef(&ref) != B_OK)
-		return;
-
-	BMessage message(B_REFS_RECEIVED);
-	message.AddRef("refs", &ref);
-
-	if (dynamic_cast<TTracker*>(be_app) != NULL) {
-		// add information about the child, so that we can select it in the parent view
-		message.AddData("nodeRefToSelect", B_RAW_TYPE, TargetModel()->NodeRef(), sizeof(node_ref));
-
-		if ((modifiers() & B_OPTION_KEY) != 0 && !IsFilePanel()) {
-			// if option down, add instructions to close the parent
-			message.AddData("nodeRefsToClose", B_RAW_TYPE, TargetModel()->NodeRef(),
-				sizeof(node_ref));
-		}
-	}
-
-	if (TrackerSettings().SingleWindowBrowse()) {
-		BMessage msg(kSwitchDirectory);
-		msg.AddRef("refs", &ref);
-		Window()->PostMessage(&msg);
-	} else {
-		be_app->PostMessage(&message);
-	}
+	BMessage message(kOpenParentDir);
+	message.AddRef("refs", TargetModel()->EntryRef());
+	Window()->PostMessage(&message);
 }
 
 
 bool
-BPoseView::ParentIsRoot()
+BPoseView::CanOpenParent()
 {
-	if (IsDesktop() || TargetModel()->IsRoot())
-		return true;
+	TrackerSettings settings;
+	BEntry entry(TargetModel()->EntryRef());
+
+	// first determine if current entry is root
+	if (IsFilePanel()) {
+		if (settings.DesktopFilePanelRoot()) {
+			if (TargetModel()->IsDesktop())
+				return false;
+		} else if (TargetModel()->IsRoot()) {
+			return false;
+		}
+	} else {
+		// deny Desktop, allow Desktop folder
+		if (IsDesktop() || TargetModel()->IsRoot())
+			return false;
+	}
 
 	// override by holding control key
 	if ((modifiers() & B_CONTROL_KEY) != 0)
+		return true;
+
+	// file panel can go below root to Desktop
+	if (IsFilePanel() && settings.DesktopFilePanelRoot())
+		return true;
+
+	BEntry parentEntry;
+	if (FSGetParentVirtualDirectoryAware(entry, parentEntry) != B_OK)
 		return false;
 
-	BEntry entry(TargetModel()->EntryRef());
-	bool isRoot = FSGetParentVirtualDirectoryAware(entry, entry) == B_OK && FSIsRootDir(&entry);
-	if (isRoot && (TrackerSettings().SingleWindowBrowse() || TrackerSettings().ShowDisksIcon()))
-		return false;
+	// if show disks is on still one more level to go
+	bool parentIsRoot = FSIsRootDir(&parentEntry);
+	if (parentIsRoot && settings.ShowDisksIcon())
+		return true;
 
-	return isRoot;
+	return !parentIsRoot;
 }
 
 
@@ -8692,8 +8683,7 @@ BPoseView::ClearSelection()
 					break;
 			}
 		} else {
-			int32 startIndex = FirstIndexAtOrBelow(
-				(int32)(bounds.top - IconPoseHeight()), true);
+			int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
 			int32 poseCount = fVSPoseList->CountItems();
 			for (int32 index = startIndex; index < poseCount; index++) {
 				BPose* pose = fVSPoseList->ItemAt(index);
@@ -8758,8 +8748,7 @@ BPoseView::ShowSelection(bool show)
 				break;
 		}
 	} else {
-		int32 startIndex = FirstIndexAtOrBelow(
-			(int32)(bounds.top - IconPoseHeight()), true);
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
 		int32 poseCount = fVSPoseList->CountItems();
 		for (int32 index = startIndex; index < poseCount; index++) {
 			BPose* pose = fVSPoseList->ItemAt(index);

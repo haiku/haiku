@@ -289,41 +289,13 @@ TTracker::TTracker()
 	gLaunchLooper = new LaunchLooper();
 	gLaunchLooper->Run();
 
-	// open desktop window
-	BContainerWindow* deskWindow = NULL;
-	BDirectory deskDir;
-	if (FSGetDeskDir(&deskDir) == B_OK) {
-		// create desktop
-		BEntry entry;
-		deskDir.GetEntry(&entry);
-		Model* model = new Model(&entry, true);
-		if (model->InitCheck() == B_OK) {
-			AutoLock<WindowList> lock(&fWindowList);
-			deskWindow = new BDeskWindow(&fWindowList);
-			AutoLock<BWindow> windowLock(deskWindow);
-			deskWindow->CreatePoseView(model);
-			deskWindow->Init();
+	// create Desktop window and lock it
+	AutoLock<WindowList> lock(&fWindowList);
+	BContainerWindow* deskWindow = new BDeskWindow(&fWindowList);
+	AutoLock<BWindow> windowLock(deskWindow);
 
-			if (TrackerSettings().ShowDisksIcon()) {
-				// create model for root of everything
-				BEntry entry("/");
-				Model model(&entry);
-				if (model.InitCheck() == B_OK) {
-					// add the root icon to desktop window
-					BMessage message;
-					message.what = B_NODE_MONITOR;
-					message.AddInt32("opcode", B_ENTRY_CREATED);
-					message.AddInt32("device", model.NodeRef()->device);
-					message.AddInt64("node", model.NodeRef()->node);
-					message.AddInt64("directory",
-						model.EntryRef()->directory);
-					message.AddString("name", model.EntryRef()->name);
-					deskWindow->PostMessage(&message, deskWindow->PoseView());
-				}
-			}
-		} else
-			delete model;
-	}
+	// init Desktop now that pose view is created and window is locked
+	deskWindow->Init();
 }
 
 

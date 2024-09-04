@@ -113,7 +113,7 @@ BInfoWindow::BInfoWindow(Model* model, int32 group_index,
 	if (list != NULL)
 		list->AddItem(this);
 
-	AddShortcut('E', 0, new BMessage(kEditItem));
+	AddShortcut('E', 0, new BMessage(kEditName));
 	AddShortcut('O', 0, new BMessage(kOpenSelection));
 	AddShortcut('U', 0, new BMessage(kUnmountVolume));
 	AddShortcut('P', 0, new BMessage(kPermissionsSelected));
@@ -266,7 +266,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kEditItem:
+		case kEditName:
 		{
 			BEntry entry(fModel->EntryRef());
 			fHeaderView->BeginEditingTitle();

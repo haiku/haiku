@@ -68,7 +68,7 @@ const uint32 kPasteLinksFromClipboard = 'Tplc';
 const uint32 kCancelSelectionToClipboard = 'Tesc';
 const uint32 kClipboardPosesChanged = 'Tcpc';
 
-const uint32 kEditItem = 'Tedt';
+const uint32 kEditName = 'Tedt';
 const uint32 kEditQuery = 'Qedt';
 const uint32 kNewFolder = 'Tnwf';
 const uint32 kNewEntryFromTemplate = 'Tnwe';

@@ -276,7 +276,7 @@ public:
 	void UnmountSelectedVolumes();
 
 	virtual void OpenParent();
-	virtual bool ParentIsRoot();
+	virtual bool CanOpenParent();
 
 	virtual void OpenSelection(BPose* clicked_pose = NULL,
 		int32* index = NULL);

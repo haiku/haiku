@@ -296,7 +296,7 @@ BFilePanel::SetPanelDirectory(const entry_ref* ref)
 	if (!lock)
 		return;
 
-	static_cast<TFilePanel*>(fWindow)->SetTo(ref);
+	static_cast<TFilePanel*>(fWindow)->SwitchDirectory(ref);
 }
 
 
@@ -312,7 +312,7 @@ BFilePanel::SetPanelDirectory(const char* path)
 	if (!lock)
 		return;
 
-	static_cast<TFilePanel*>(fWindow)->SetTo(&ref);
+	static_cast<TFilePanel*>(fWindow)->SwitchDirectory(&ref);
 }
 
 

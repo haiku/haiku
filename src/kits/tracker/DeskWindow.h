@@ -71,7 +71,6 @@ public:
 	void SaveDesktopPoseLocations();
 
 protected:
-	virtual void AddWindowContextMenus(BMenu*);
 	virtual BPoseView* NewPoseView(Model*, uint32);
 
 	virtual void WorkspaceActivated(int32, bool);
