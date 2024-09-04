@@ -10,6 +10,15 @@
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 
+
+//#define DO_TRACE
+#ifdef DO_TRACE
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 uint32_t VMSAv8TranslationMap::fHwFeature;
 uint64_t VMSAv8TranslationMap::fMair;
 
@@ -77,7 +86,8 @@ VMSAv8TranslationMap::VMSAv8TranslationMap(
 	fASID(-1),
 	fRefcount(0)
 {
-	dprintf("VMSAv8TranslationMap\n");
+	TRACE("+VMSAv8TranslationMap(%p, %d, 0x%" B_PRIxADDR ", %d, %d, %d)\n", this,
+		kernel, pageTable, pageBits, vaBits, minBlockLevel);
 
 	fInitialLevel = CalcStartLevel(fVaBits, fPageBits);
 }
@@ -85,6 +95,10 @@ VMSAv8TranslationMap::VMSAv8TranslationMap(
 
 VMSAv8TranslationMap::~VMSAv8TranslationMap()
 {
+	TRACE("-VMSAv8TranslationMap(%p)\n", this);
+	TRACE("  fIsKernel: %d, fPageTable: 0x%" B_PRIxADDR ", fASID: %d, fRefcount: %d\n",
+		fIsKernel, fPageTable, fASID, fRefcount);
+
 	ASSERT(!fIsKernel);
 	ASSERT(fRefcount == 0);
 	{
@@ -177,6 +191,7 @@ VMSAv8TranslationMap::CalcStartLevel(int vaBits, int pageBits)
 bool
 VMSAv8TranslationMap::Lock()
 {
+	TRACE("VMSAv8TranslationMap::Lock()\n");
 	recursive_lock_lock(&fLock);
 	return true;
 }
@@ -185,6 +200,7 @@ VMSAv8TranslationMap::Lock()
 void
 VMSAv8TranslationMap::Unlock()
 {
+	TRACE("VMSAv8TranslationMap::Unlock()\n");
 	if (recursive_lock_get_recursion(&fLock) == 1) {
 		// we're about to release it for the last time
 		Flush();
@@ -464,6 +480,9 @@ status_t
 VMSAv8TranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes, uint32 memoryType,
 	vm_page_reservation* reservation)
 {
+	TRACE("VMSAv8TranslationMap::Map(0x%" B_PRIxADDR ", 0x%" B_PRIxADDR
+		", 0x%x, 0x%x)\n", va, pa, attributes, memoryType);
+
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	uint64_t pageMask = (1UL << fPageBits) - 1;
@@ -509,6 +528,8 @@ VMSAv8TranslationMap::Map(addr_t va, phys_addr_t pa, uint32 attributes, uint32 m
 status_t
 VMSAv8TranslationMap::Unmap(addr_t start, addr_t end)
 {
+	TRACE("VMSAv8TranslationMap::Unmap(0x%" B_PRIxADDR ", 0x%" B_PRIxADDR
+		")\n", start, end);
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	size_t size = end - start + 1;
@@ -539,6 +560,10 @@ VMSAv8TranslationMap::Unmap(addr_t start, addr_t end)
 status_t
 VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQueue)
 {
+	TRACE("VMSAv8TranslationMap::UnmapPage(0x%" B_PRIxADDR "(%s), 0x%"
+		B_PRIxADDR ", %d)\n", (addr_t)area, area->name, address,
+		updatePageQueue);
+
 	uint64_t pageMask = (1UL << fPageBits) - 1;
 	uint64_t vaMask = (1UL << fVaBits) - 1;
 
@@ -636,6 +661,9 @@ VMSAv8TranslationMap::QueryInterrupt(
 status_t
 VMSAv8TranslationMap::Protect(addr_t start, addr_t end, uint32 attributes, uint32 memoryType)
 {
+	TRACE("VMSAv8TranslationMap::Protect(0x%" B_PRIxADDR ", 0x%"
+		B_PRIxADDR ", 0x%x, 0x%x)\n", start, end, attributes, memoryType);
+
 	ThreadCPUPinner pinner(thread_get_current_thread());
 	uint64_t attr = GetMemoryAttr(attributes, memoryType, fIsKernel);
 	size_t size = end - start + 1;
@@ -716,6 +744,10 @@ bool
 VMSAv8TranslationMap::ClearAccessedAndModified(
 	VMArea* area, addr_t address, bool unmapIfUnaccessed, bool& _modified)
 {
+	TRACE("VMSAv8TranslationMap::ClearAccessedAndModified(0x%"
+		B_PRIxADDR "(%s), 0x%" B_PRIxADDR ", %d)\n", (addr_t)area,
+		area->name, address, unmapIfUnaccessed);
+
 	RecursiveLocker locker(fLock);
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
