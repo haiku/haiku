@@ -141,11 +141,12 @@ StringPool::DumpUsageStatistics()
 	}
 
 	size_t stringCount = sStrings->CountElements();
-	size_t overhead = stringCount * (sizeof(StringData) - 1);
+	size_t overhead = stringCount * sizeof(StringData);
+	size_t tableSize = sStrings->TableSize() * sizeof(void*);
 
 	INFORM("StringPool usage:\n");
-	INFORM("  total unique strings:    %8zu, %8zu bytes, overhead: %zu bytes\n",
-		stringCount, totalStringSize, overhead);
+	INFORM("  total unique strings:    %8zu, %8zu bytes, overhead: %zu bytes + %zu bytes\n",
+		stringCount, totalStringSize, overhead, tableSize);
 	INFORM("  total strings with dups: %8zu, %8zu bytes\n", totalReferenceCount,
 		totalStringSizeWithDuplicates);
 	INFORM("  unshared strings:        %8zu\n", unsharedStringCount);
