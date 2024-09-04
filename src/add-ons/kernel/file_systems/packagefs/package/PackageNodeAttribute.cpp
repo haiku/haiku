@@ -18,9 +18,9 @@ CLASS_CACHE(PackageNodeAttribute);
 PackageNodeAttribute::PackageNodeAttribute(uint32 type,
 	const PackageData& data)
 	:
-	fData(data),
 	fName(),
 	fIndexCookie(NULL),
+	fData(data),
 	fType(type)
 {
 }

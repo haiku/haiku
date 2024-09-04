@@ -87,13 +87,6 @@ PackageNode::AddAttribute(PackageNodeAttribute* attribute)
 }
 
 
-void
-PackageNode::RemoveAttribute(PackageNodeAttribute* attribute)
-{
-	fAttributes.Remove(attribute);
-}
-
-
 PackageNodeAttribute*
 PackageNode::FindAttribute(const StringKey& name) const
 {

@@ -60,8 +60,6 @@ public:
 	virtual	off_t				FileSize() const;
 
 			void				AddAttribute(PackageNodeAttribute* attribute);
-			void				RemoveAttribute(
-									PackageNodeAttribute* attribute);
 
 			const PackageNodeAttributeList& Attributes() const
 									{ return fAttributes; }
