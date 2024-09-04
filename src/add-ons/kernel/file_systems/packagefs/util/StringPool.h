@@ -82,7 +82,7 @@ public:
 
 	static StringData* Create(const StringDataKey& key)
 	{
-		void* data = malloc(sizeof(StringData) + key.Length());
+		void* data = malloc(sizeof(StringData) + key.Length() + 1);
 		if (data == NULL)
 			return NULL;
 
@@ -91,13 +91,13 @@ public:
 
 	static StringData* Empty()
 	{
-		return &fEmptyString;
+		return fEmptyString;
 	}
 
 	static StringData* GetEmpty()
 	{
-		fEmptyString.AcquireReference();
-		return &fEmptyString;
+		fEmptyString->AcquireReference();
+		return fEmptyString;
 	}
 
 	void Delete()
@@ -152,12 +152,12 @@ private:
 	}
 
 private:
-	static StringData	fEmptyString;
+	static StringData*	fEmptyString;
 
 	StringData*	fHashNext;
 	int32		fReferenceCount;
 	uint32		fHash;
-	char		fString[1];
+	char		fString[];
 };
 
 

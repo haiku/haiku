@@ -12,8 +12,9 @@
 static const size_t kInitialStringTableSize = 128;
 
 static char sStringsBuffer[sizeof(StringDataHash)];
+static char sEmptyStringBuffer[sizeof(StringData) + 1];
 
-StringData StringData::fEmptyString(StringDataKey("", 0));
+StringData* StringData::fEmptyString;
 
 mutex StringPool::sLock;
 StringDataHash* StringPool::sStrings;
@@ -25,7 +26,7 @@ StringDataHash* StringPool::sStrings;
 /*static*/ void
 StringData::Init()
 {
-	new(&fEmptyString) StringData(StringDataKey("", 0));
+	fEmptyString = new(sEmptyStringBuffer) StringData(StringDataKey("", 0));
 }
 
 
