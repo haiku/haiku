@@ -83,11 +83,18 @@ VMSAv8TranslationMap::VMSAv8TranslationMap(
 	fPageBits(pageBits),
 	fVaBits(vaBits),
 	fMinBlockLevel(minBlockLevel),
-	fASID(-1),
+	fASID(kernel ? 0 : -1),
 	fRefcount(0)
 {
 	TRACE("+VMSAv8TranslationMap(%p, %d, 0x%" B_PRIxADDR ", %d, %d, %d)\n", this,
 		kernel, pageTable, pageBits, vaBits, minBlockLevel);
+
+	if (kernel) {
+		// ASID 0 is reserved for the kernel.
+		InterruptsSpinLocker locker(sAsidLock);
+		sAsidMapping[0] = this;
+		sAsidBitMap[0] |= 1;
+	}
 
 	fInitialLevel = CalcStartLevel(fVaBits, fPageBits);
 }
@@ -154,7 +161,8 @@ VMSAv8TranslationMap::SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8Translatio
 		return;
 	}
 
-	for (size_t i = 0; i < kNumAsids; ++i) {
+	// ASID 0 is reserved for the kernel.
+	for (size_t i = 1; i < kNumAsids; ++i) {
 		if (sAsidMapping[i]->fRefcount == 0) {
 			sAsidMapping[i]->fASID = -1;
 			to->fASID = i;
