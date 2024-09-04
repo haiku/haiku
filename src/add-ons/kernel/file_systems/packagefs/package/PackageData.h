@@ -34,14 +34,16 @@ private:
 				char			fData[kDataSize];
 				uint64			fAlignmentDummy;
 			};
-			uint8				fVersion;
+			static const uint8	fVersion = 2;
 };
 
 
 inline
 PackageData::PackageData(const PackageDataV2& data)
+#if 0
 	:
 	fVersion(2)
+#endif
 {
 	memcpy(&fData, &data, sizeof(data));
 }

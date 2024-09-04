@@ -62,14 +62,12 @@ struct PackageFile::DataAccessor {
 		fReader(NULL),
 		fFileCache(NULL)
 	{
-		mutex_init(&fLock, "file data accessor");
 	}
 
 	~DataAccessor()
 	{
 		file_cache_delete(fFileCache);
 		delete fReader;
-		mutex_destroy(&fLock);
 	}
 
 	status_t Init(dev_t deviceID, ino_t nodeID, int fd)
@@ -106,8 +104,6 @@ struct PackageFile::DataAccessor {
 
 		if (toRead > 0) {
 			IORequestOutput output(request);
-			MutexLocker locker(fLock, false, fData->Version() == 1);
-				// V2 readers are reentrant
 			status_t error = fReader->ReadDataToOutput(offset, toRead, &output);
 			if (error != B_OK)
 				RETURN_ERROR(error);
@@ -117,7 +113,6 @@ struct PackageFile::DataAccessor {
 	}
 
 private:
-	mutex							fLock;
 	Package*						fPackage;
 	PackageData*					fData;
 	BAbstractBufferedDataReader*	fReader;
