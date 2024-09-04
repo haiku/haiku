@@ -67,6 +67,8 @@ const uint32 kFSClipboardChanges = 'TCch';
 
 const uint32 kMoveToTrash = 'Ttrs';
 	// Used by ShowImage to delete images
+const uint32 kRestoreFromTrash = 'Tres';
+	// In case ShowImage ever wants to undo
 
 const uint32 kSelect = 'Tsel';
 	// Used by Open Target Folder tracker add-on to select files
