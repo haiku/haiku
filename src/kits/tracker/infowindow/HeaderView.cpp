@@ -333,9 +333,8 @@ HeaderView::MouseDown(BPoint where)
 		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 		if (SecondaryMouseButtonDown(modifiers(), buttons)) {
 			// Show contextual menu
-			BPopUpMenu* contextMenu
-				= new BPopUpMenu("FileContext", false, false);
-			if (contextMenu) {
+			BPopUpMenu* contextMenu = new BPopUpMenu("FileContext", false, false);
+			if (contextMenu != NULL) {
 				BuildContextMenu(contextMenu);
 				contextMenu->SetAsyncAutoDestruct(true);
 				contextMenu->Go(ConvertToScreen(where), true, true,
@@ -348,8 +347,8 @@ HeaderView::MouseDown(BPoint where)
 			BPoint offsetPoint;
 			offsetPoint.x = where.x - fIconRect.left;
 			offsetPoint.y = where.y - fIconRect.top;
-			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel,
-					kNormalIcon, fIconRect.Size())) {
+			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel, kNormalIcon,
+					fIconRect.Size())) {
 				// Can't drag the trash anywhere..
 				fTrackingState = fModel->IsTrash()
 					? open_only_track : icon_track;

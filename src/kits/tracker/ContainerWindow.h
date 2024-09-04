@@ -329,9 +329,7 @@ private:
 	BMessage* fDragMessage;
 	BObjectList<BString>* fCachedTypesList;
 	bool fWaitingForRefs;
-
 	bool fSaveStateIsEnabled;
-
 	bool fIsWatchingPath;
 
 	typedef BWindow _inherited;

@@ -36,8 +36,8 @@ All rights reserved.
 #include "ContainerWindow.h"
 
 #include <Alert.h>
-#include <Application.h>
 #include <AppFileInfo.h>
+#include <Application.h>
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Debug.h>
@@ -48,8 +48,8 @@ All rights reserved.
 #include <GroupLayout.h>
 #include <Keymap.h>
 #include <Locale.h>
-#include <MenuItem.h>
 #include <MenuBar.h>
+#include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PopUpMenu.h>
@@ -66,7 +66,6 @@ All rights reserved.
 #include <stdlib.h>
 
 #include "Attributes.h"
-#include "AttributeStream.h"
 #include "AutoDeleter.h"
 #include "AutoLock.h"
 #include "BackgroundImage.h"
@@ -74,26 +73,26 @@ All rights reserved.
 #include "CountView.h"
 #include "DeskWindow.h"
 #include "DraggableContainerIcon.h"
-#include "FavoritesMenu.h"
-#include "FindPanel.h"
 #include "FSClipboard.h"
 #include "FSUndoRedo.h"
 #include "FSUtils.h"
+#include "FavoritesMenu.h"
+#include "FindPanel.h"
 #include "IconMenuItem.h"
-#include "OpenWithWindow.h"
 #include "MimeTypes.h"
 #include "Model.h"
 #include "MountMenu.h"
-#include "Navigator.h"
 #include "NavMenu.h"
+#include "Navigator.h"
+#include "OpenWithWindow.h"
 #include "PoseView.h"
 #include "QueryContainerWindow.h"
 #include "SelectionWindow.h"
+#include "TemplatesMenu.h"
+#include "Thread.h"
 #include "TitleView.h"
 #include "Tracker.h"
 #include "TrackerSettings.h"
-#include "Thread.h"
-#include "TemplatesMenu.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -146,8 +145,7 @@ ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 
 
 static int32
-AddOnMenuGenerate(const entry_ref* addOnRef, BMenu* menu,
-	BContainerWindow* window)
+AddOnMenuGenerate(const entry_ref* addOnRef, BMenu* menu, BContainerWindow* window)
 {
 	BEntry entry(addOnRef);
 	BPath path;
@@ -359,12 +357,10 @@ AddMimeTypeString(BStringList& list, Model* model)
 //	#pragma mark - BContainerWindow
 
 
-BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
-	uint32 openFlags, window_look look, window_feel feel, uint32 windowFlags,
-	uint32 workspace, bool useLayout, bool isDeskWindow)
+BContainerWindow::BContainerWindow(LockingList<BWindow>* list, uint32 openFlags, window_look look,
+	window_feel feel, uint32 windowFlags, uint32 workspace, bool useLayout, bool isDeskWindow)
 	:
-	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, windowFlags,
-		workspace),
+	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, windowFlags, workspace),
 	fWindowList(list),
 	fOpenFlags(openFlags),
 	fUsesLayout(useLayout),
@@ -781,15 +777,12 @@ BContainerWindow::Init(const BMessage* message)
 	}
 
 	AddContextMenus();
-	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete),
-		PoseView());
-	AddShortcut('K', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kCleanupAll),
-		PoseView());
-	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY
-		| B_CONTROL_KEY, new BMessage(kQuitTracker));
+	AddShortcut('T', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kDelete), PoseView());
+	AddShortcut('K', B_COMMAND_KEY | B_SHIFT_KEY, new BMessage(kCleanupAll), PoseView());
+	AddShortcut('Q', B_COMMAND_KEY | B_OPTION_KEY | B_SHIFT_KEY | B_CONTROL_KEY,
+		new BMessage(kQuitTracker));
 
-	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(kOpenSelection),
-		PoseView());
+	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(kOpenSelection), PoseView());
 
 	SetSingleWindowBrowseShortcuts(settings.SingleWindowBrowse());
 
@@ -838,10 +831,8 @@ BContainerWindow::Init(const BMessage* message)
 	MarkAttributesMenu(fAttrMenu);
 	CheckScreenIntersect();
 
-	if (fBackgroundImage != NULL && !fIsDesktop
-		&& PoseView()->ViewMode() != kListMode) {
+	if (fBackgroundImage != NULL && !fIsDesktop && PoseView()->ViewMode() != kListMode)
 		fBackgroundImage->Show(PoseView(), current_workspace());
-	}
 
 	Show();
 
@@ -2153,10 +2144,10 @@ BContainerWindow::SetupNavigationMenu(const entry_ref* ref, BMenu* parent)
 	Model model(&entry);
 	entry_ref resolvedRef;
 
-	if (model.InitCheck() != B_OK
-		|| (!model.IsContainer() && !model.IsSymLink())) {
+	if (model.InitCheck() != B_OK)
 		return;
-	}
+	else if (!model.IsContainer() && !model.IsSymLink())
+		return;
 
 	if (model.IsSymLink()) {
 		if (entry.SetTo(model.EntryRef(), true) != B_OK)
@@ -2715,10 +2706,8 @@ BContainerWindow::AddFileContextMenus(BMenu* menu)
 			menu->AddSeparatorItem();
 		}
 	} else {
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Delete"),
-			new BMessage(kDelete), 0));
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Restore"),
-			new BMessage(kRestoreFromTrash), 0));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Delete"), new BMessage(kDelete), 0));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Restore"), new BMessage(kRestoreFromTrash), 0));
 	}
 
 #ifdef CUT_COPY_PASTE_IN_CONTEXT_MENU
@@ -3633,10 +3622,10 @@ BContainerWindow::AddMimeTypesToMenu(BMenu* menu)
 	}
 
 	// remove separator if it's the only item in menu
-	BMenuItem* item = menu->ItemAt(menu->CountItems() - 1);
-	if (dynamic_cast<BSeparatorItem*>(item) != NULL) {
-		menu->RemoveItem(item);
-		delete item;
+	BMenuItem* separator = menu->ItemAt(menu->CountItems() - 1);
+	if (dynamic_cast<BSeparatorItem*>(separator) != NULL) {
+		menu->RemoveItem(separator);
+		delete separator;
 	}
 
 	MarkAttributesMenu(menu);
@@ -4135,7 +4124,6 @@ BContainerWindow::SetSingleWindowBrowseShortcuts(bool enabled)
 			new BMessage(kOpenSelection), PoseView());
 		AddShortcut('L', B_COMMAND_KEY,
 			new BMessage(kNavigatorCommandSetFocus), Navigator());
-
 	} else {
 		RemoveShortcut(B_LEFT_ARROW, B_COMMAND_KEY);
 		RemoveShortcut(B_RIGHT_ARROW, B_COMMAND_KEY);

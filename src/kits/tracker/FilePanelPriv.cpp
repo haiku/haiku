@@ -64,16 +64,16 @@ All rights reserved.
 #include <Volume.h>
 #include <VolumeRoster.h>
 
-#include "Attributes.h"
 #include "AttributeStream.h"
+#include "Attributes.h"
 #include "AutoLock.h"
 #include "Commands.h"
 #include "CountView.h"
 #include "DesktopPoseView.h"
 #include "DirMenu.h"
-#include "FavoritesMenu.h"
-#include "FSUtils.h"
 #include "FSClipboard.h"
+#include "FSUtils.h"
+#include "FavoritesMenu.h"
 #include "IconMenuItem.h"
 #include "MimeTypes.h"
 #include "NavMenu.h"
@@ -166,10 +166,10 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 //	#pragma mark - TFilePanel
 
 
-TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
-	const BEntry* startDir, uint32 nodeFlavors, bool multipleSelection,
-	BMessage* message, BRefFilter* filter, uint32 openFlags, window_look look,
-	window_feel feel, uint32 windowFlags, uint32 workspace, bool hideWhenDone)
+TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* startDir,
+	uint32 nodeFlavors, bool multipleSelection, BMessage* message, BRefFilter* filter,
+	uint32 openFlags, window_look look, window_feel feel, uint32 windowFlags, uint32 workspace,
+	bool hideWhenDone)
 	:
 	BContainerWindow(0, openFlags, look, feel, windowFlags, workspace, false),
 	fDirMenu(NULL),

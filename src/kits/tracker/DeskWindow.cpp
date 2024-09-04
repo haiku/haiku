@@ -64,8 +64,8 @@ All rights reserved.
 #include "KeyInfos.h"
 #include "MountMenu.h"
 #include "PoseView.h"
-#include "Tracker.h"
 #include "TemplatesMenu.h"
+#include "Tracker.h"
 
 
 const char* kShelfPath = "tracker_shelf";
