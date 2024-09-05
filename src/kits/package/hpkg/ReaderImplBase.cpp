@@ -18,6 +18,7 @@
 
 #include <ByteOrder.h>
 #include <DataIO.h>
+#include <OS.h>
 
 #include <ZlibCompressionAlgorithm.h>
 #include <ZstdCompressionAlgorithm.h>
@@ -69,6 +70,11 @@ ReaderImplBase::AttributeHandlerContext::AttributeHandlerContext(
 }
 
 
+ReaderImplBase::AttributeHandlerContext::~AttributeHandlerContext()
+{
+}
+
+
 void
 ReaderImplBase::AttributeHandlerContext::ErrorOccurred()
 {
@@ -111,10 +117,37 @@ ReaderImplBase::AttributeHandler::NotifyDone(
 }
 
 
+// #pragma mark - AttributeHandler allocation
+
+
+void*
+ReaderImplBase::AttributeHandler::operator new(size_t size, AttributeHandlerContext* context)
+{
+	AttributeHandler* handler = (AttributeHandler*)context->handlersAllocator.Allocate(size);
+	if (handler != NULL)
+		handler->fDeleting = false;
+	return handler;
+}
+
+
+void
+ReaderImplBase::AttributeHandler::operator delete(void* pointer)
+{
+	AttributeHandler* handler = (AttributeHandler*)pointer;
+	if (!handler->fDeleting)
+		debugger("Package AttributeHandler: deleted without calling Delete()");
+
+	// Nothing else to do; memory is released by Delete().
+}
+
+
 status_t
 ReaderImplBase::AttributeHandler::Delete(AttributeHandlerContext* context)
 {
+	fDeleting = true;
 	delete this;
+
+	context->handlersAllocator.Free(this);
 	return B_OK;
 }
 
@@ -229,7 +262,7 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 			fPackageInfoValue.resolvable.version.major = value.string;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) PackageVersionAttributeHandler(
+					= new(context) PackageVersionAttributeHandler(
 						fPackageInfoValue,
 						fPackageInfoValue.resolvable.version, false);
 				if (*_handler == NULL)
@@ -242,7 +275,7 @@ ReaderImplBase::PackageResolvableAttributeHandler::HandleAttribute(
 			fPackageInfoValue.resolvable.compatibleVersion.major = value.string;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) PackageVersionAttributeHandler(
+					= new(context) PackageVersionAttributeHandler(
 						fPackageInfoValue,
 						fPackageInfoValue.resolvable.compatibleVersion, false);
 				if (*_handler == NULL)
@@ -300,7 +333,7 @@ ReaderImplBase::PackageResolvableExpressionAttributeHandler::HandleAttribute(
 				= value.string;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) PackageVersionAttributeHandler(
+					= new(context) PackageVersionAttributeHandler(
 						fPackageInfoValue,
 						fPackageInfoValue.resolvableExpression.version,
 						false);
@@ -536,7 +569,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.version.major = value.string;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) PackageVersionAttributeHandler(
+					= new(context) PackageVersionAttributeHandler(
 						fPackageInfoValue, fPackageInfoValue.version, true);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
@@ -566,7 +599,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.attributeID = B_PACKAGE_INFO_PROVIDES;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) PackageResolvableAttributeHandler(
+					= new(context) PackageResolvableAttributeHandler(
 						fPackageInfoValue);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
@@ -598,7 +631,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 					break;
 			}
 			if (_handler != NULL) {
-				*_handler = new(std::nothrow)
+				*_handler = new(context)
 					PackageResolvableExpressionAttributeHandler(
 						fPackageInfoValue);
 				if (*_handler == NULL)
@@ -626,7 +659,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 				= B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) GlobalWritableFileInfoAttributeHandler(
+					= new(context) GlobalWritableFileInfoAttributeHandler(
 						fPackageInfoValue);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
@@ -639,7 +672,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 				= B_PACKAGE_INFO_USER_SETTINGS_FILES;
 			if (_handler != NULL) {
 				*_handler
-					= new(std::nothrow) UserSettingsFileInfoAttributeHandler(
+					= new(context) UserSettingsFileInfoAttributeHandler(
 						fPackageInfoValue);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
@@ -650,7 +683,7 @@ ReaderImplBase::PackageAttributeHandler::HandleAttribute(
 			fPackageInfoValue.user.name = value.string;
 			fPackageInfoValue.attributeID = B_PACKAGE_INFO_USERS;
 			if (_handler != NULL) {
-				*_handler = new(std::nothrow) UserAttributeHandler(
+				*_handler = new(context) UserAttributeHandler(
 					fPackageInfoValue);
 				if (*_handler == NULL)
 					return B_NO_MEMORY;
@@ -734,7 +767,7 @@ ReaderImplBase::LowLevelAttributeHandler::HandleAttribute(
 
 	// create a subhandler for the attribute, if it has children
 	if (_handler != NULL) {
-		*_handler = new(std::nothrow) LowLevelAttributeHandler(id, value,
+		*_handler = new(context) LowLevelAttributeHandler(id, value,
 			fToken, token);
 		if (*_handler == NULL) {
 			context->lowLevelHandler->HandleAttributeDone((BHPKGAttributeID)id,
@@ -1129,7 +1162,7 @@ ReaderImplBase::_ParseAttributeTree(AttributeHandlerContext* context)
 		if (hasChildren) {
 			// create an ignore handler, if necessary
 			if (childHandler == NULL) {
-				childHandler = new(std::nothrow) IgnoreAttributeHandler;
+				childHandler = new(context) IgnoreAttributeHandler;
 				if (childHandler == NULL) {
 					fErrorOutput->PrintError("Error: Out of memory!\n");
 					return B_NO_MEMORY;

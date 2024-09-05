@@ -14,6 +14,7 @@
 #include <DataIO.h>
 
 #include <Array.h>
+#include <util/BumpAllocator.h>
 #include <util/SinglyLinkedList.h>
 
 #include <package/hpkg/ErrorOutput.h>
@@ -219,6 +220,8 @@ public:
 
 			BHPKGPackageSectionID	section;
 
+			BumpAllocator<>			handlersAllocator;
+
 public:
 								AttributeHandlerContext(
 									BErrorOutput* errorOutput,
@@ -232,6 +235,7 @@ public:
 										lowLevelHandler,
 									BHPKGPackageSectionID section,
 									bool ignoreUnknownAttributes);
+								~AttributeHandlerContext();
 
 			void				ErrorOccurred();
 };
@@ -240,6 +244,9 @@ public:
 class ReaderImplBase::AttributeHandler
 	: public SinglyLinkedListLinkImpl<AttributeHandler> {
 public:
+			void*				operator new(size_t size, AttributeHandlerContext* context);
+			void				operator delete(void* pointer);
+
 	virtual						~AttributeHandler();
 
 			void				SetLevel(int level);
@@ -254,6 +261,9 @@ public:
 
 protected:
 			int					fLevel;
+
+private:
+			bool				fDeleting;
 };
 
 

@@ -91,7 +91,7 @@ struct PackageReaderImpl::AttributeAttributeHandler : AttributeHandler {
 		status_t error = context->packageContentHandler->HandleEntryAttribute(
 			fEntry, &fAttribute);
 
-		delete this;
+		AttributeHandler::Delete(context);
 		return error;
 	}
 
@@ -127,7 +127,7 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 		}
 
 		// create handler
-		EntryAttributeHandler* handler = new(std::nothrow)
+		EntryAttributeHandler* handler = new(context)
 			EntryAttributeHandler(context, parentEntry, name);
 		if (handler == NULL)
 			return B_NO_MEMORY;
@@ -197,7 +197,7 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 					return error;
 
 				if (_handler != NULL) {
-					*_handler = new(std::nothrow) AttributeAttributeHandler(
+					*_handler = new(context) AttributeAttributeHandler(
 						&fEntry, value.string);
 					if (*_handler == NULL)
 						return B_NO_MEMORY;
@@ -232,7 +232,7 @@ struct PackageReaderImpl::EntryAttributeHandler : AttributeHandler {
 		else
 			context->packageContentHandler->HandleEntryDone(&fEntry);
 
-		delete this;
+		AttributeHandler::Delete(context);
 		return error;
 	}
 

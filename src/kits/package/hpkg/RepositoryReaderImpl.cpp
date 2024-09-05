@@ -74,7 +74,7 @@ public:
 							return error;
 					}
 
-					*_handler = new(std::nothrow) PackageAttributeHandler;
+					*_handler = new(context) PackageAttributeHandler;
 					if (*_handler == NULL)
 						return B_NO_MEMORY;
 
