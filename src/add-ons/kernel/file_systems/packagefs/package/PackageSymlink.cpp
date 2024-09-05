@@ -9,6 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ClassCache.h"
+
+
+CLASS_CACHE(PackageSymlink);
+
 
 PackageSymlink::PackageSymlink(Package* package, mode_t mode)
 	:

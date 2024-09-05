@@ -11,6 +11,9 @@
 
 class PackageSymlink : public PackageLeafNode {
 public:
+	static	void*				operator new(size_t size);
+	static	void				operator delete(void* block);
+
 								PackageSymlink(Package* package, mode_t mode);
 	virtual						~PackageSymlink();
 
