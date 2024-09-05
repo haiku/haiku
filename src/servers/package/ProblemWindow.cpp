@@ -228,8 +228,7 @@ ProblemWindow::_AddProblemsGui(BSolver* solver)
 
 
 void
-ProblemWindow::_AddProblem(BSolverProblem* problem,
-	const float backgroundTint)
+ProblemWindow::_AddProblem(BSolverProblem* problem, const float backgroundTint)
 {
 	BGroupView* problemGroup = new BGroupView(B_VERTICAL);
 	fContainerView->AddChild(problemGroup);
@@ -259,11 +258,9 @@ ProblemWindow::_AddProblem(BSolverProblem* problem,
 
 		int32 elementCount = solution->CountElements();
 		for (int32 l = 0; l < elementCount; l++) {
-			const BSolverProblemSolutionElement* element
-				= solution->ElementAt(l);
+			const BSolverProblemSolutionElement* element = solution->ElementAt(l);
 			BStringView* elementView = new BStringView(NULL,
-				BString().SetToFormat("- %s",
-					_SolutionElementText(element).String()));
+				BString().SetToFormat("- %s", _SolutionElementText(element).String()));
 			elementsGroup->AddView(elementView);
 			elementView->AdoptParentColors();
 		}

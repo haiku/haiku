@@ -100,8 +100,7 @@ ResultWindow::AddLocationChanges(const char* location,
 		backgroundTint = 1.04;
 	locationGroup->SetViewUIColor(B_LIST_BACKGROUND_COLOR, backgroundTint);
 
-	BStringView* locationView = new BStringView(NULL,
-		BString().SetToFormat("in %s:", location));
+	BStringView* locationView = new BStringView(NULL, BString().SetToFormat("in %s:", location));
 	locationGroup->AddChild(locationView);
 	locationView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	locationView->AdoptParentColors();
