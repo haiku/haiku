@@ -134,7 +134,6 @@ BButton::Draw(BRect updateRect)
 	BRect rect(Bounds());
 	rgb_color background = ViewColor();
 	rgb_color base = LowColor();
-	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
 
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
@@ -144,24 +143,20 @@ BButton::Draw(BRect updateRect)
 	if (_Flag(FLAG_INSIDE))
 		flags |= BControlLook::B_HOVER;
 
-	be_control_look->DrawButtonFrame(this, rect, updateRect,
-		base, background, flags);
+	be_control_look->DrawButtonFrame(this, rect, updateRect, base, background, flags);
 
-	if (fBehavior == B_POP_UP_BEHAVIOR) {
-		be_control_look->DrawButtonWithPopUpBackground(this, rect, updateRect,
-			base, flags);
-	} else {
-		be_control_look->DrawButtonBackground(this, rect, updateRect,
-			base, flags);
-	}
+	if (fBehavior == B_POP_UP_BEHAVIOR)
+		be_control_look->DrawButtonWithPopUpBackground(this, rect, updateRect, base, flags);
+	else
+		be_control_look->DrawButtonBackground(this, rect, updateRect, base, flags);
 
 	const BBitmap* icon = IconBitmap(
 		(Value() == B_CONTROL_OFF
 				? B_INACTIVE_ICON_BITMAP : B_ACTIVE_ICON_BITMAP)
 			| (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
 
-	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect, base,
-		flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &textColor);
+	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect, base, flags,
+		BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 }
 
 

@@ -361,7 +361,7 @@ SpinnerButton::Draw(BRect updateRect)
 	else
 		bgTint = B_NO_TINT;
 
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color bgColor = ViewColor();
 	if (bgColor.red + bgColor.green + bgColor.blue <= 128 * 3) {
 		// if dark background make the tint lighter
 		frameTint = 2.0f - frameTint;
@@ -1453,10 +1453,6 @@ BAbstractSpinner::_DrawLabel(BRect updateRect)
 
 	uint32 flags = be_control_look->Flags(this);
 
-	// erase the is control flag before drawing the label so that the label
-	// will get drawn using B_PANEL_TEXT_COLOR.
-	flags &= ~BControlLook::B_IS_CONTROL;
-
 	be_control_look->DrawLabel(this, label, LowColor(), flags, BPoint(x, y));
 }
 
@@ -1469,7 +1465,7 @@ BAbstractSpinner::_DrawTextView(BRect updateRect)
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ViewColor();
 	uint32 flags = 0;
 	if (!IsEnabled())
 		flags |= BControlLook::B_DISABLED;
