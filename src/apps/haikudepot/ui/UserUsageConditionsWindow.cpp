@@ -163,7 +163,8 @@ UserUsageConditionsWindow::_InitUiControls()
 {
 	fCopyView = new MarkupTextView("copy view");
 	fCopyView->SetViewUIColor(B_NO_COLOR);
-	fCopyView->SetLowColor(RGB_COLOR_WHITE);
+	fCopyView->SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	fCopyView->SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
 	fCopyView->SetInsets(8.0f);
 
 	fAgeNoteStringView = new BStringView("age note string view",
