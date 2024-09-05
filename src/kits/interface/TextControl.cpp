@@ -367,8 +367,7 @@ BTextControl::Draw(BRect updateRect)
 	if (active)
 		flags |= BControlLook::B_FOCUSED;
 
-	be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
-		flags);
+	be_control_look->DrawTextControlBorder(this, rect, updateRect, base, flags);
 
 	if (Label() != NULL) {
 		if (fLayoutData->label_layout_item != NULL) {
@@ -377,10 +376,6 @@ BTextControl::Draw(BRect updateRect)
 			rect = Bounds();
 			rect.right = fDivider - kLabelInputSpacing;
 		}
-
-		// erase the is control flag before drawing the label so that the label
-		// will get drawn using B_PANEL_TEXT_COLOR
-		flags &= ~BControlLook::B_IS_CONTROL;
 
 		be_control_look->DrawLabel(this, Label(), rect, updateRect,
 			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));

@@ -2201,6 +2201,8 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 	if (textColor != NULL)
 		glowColor = *textColor;
+	else if (view->Parent() != NULL)
+		glowColor = view->Parent()->HighColor();
 	else if ((flags & B_IS_CONTROL) != 0)
 		glowColor = ui_color(B_CONTROL_TEXT_COLOR);
 	else

@@ -434,7 +434,7 @@ BSlider::AllAttached()
 	// standard system colors manually. Due to how layouts work, this must
 	// happen here, rather than in AttachedToWindow().
 	if (Parent() == NULL)
-		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -971,12 +971,8 @@ BSlider::DrawText()
 	BRect bounds(Bounds());
 	BView* view = OffscreenView();
 
-	rgb_color base = LowColor();
+	rgb_color base = ViewColor();
 	uint32 flags = be_control_look->Flags(this);
-
-	// erase the is control flag before drawing the label so that the label
-	// will get drawn using B_PANEL_TEXT_COLOR
-	flags &= ~BControlLook::B_IS_CONTROL;
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);

@@ -2197,12 +2197,9 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 	// setup the text color
 
 	BWindow* window = view->Window();
-	bool isDesktop = window
-		&& window->Feel() == kDesktopWindowFeel
-		&& window->Look() == kDesktopWindowLook
-		&& view->Parent()
-		&& view->Parent()->Parent() == NULL
-		&& (flags & B_IGNORE_OUTLINE) == 0;
+	bool isDesktop = window != NULL && window->Feel() == kDesktopWindowFeel
+		&& window->Look() == kDesktopWindowLook && view->Parent() != NULL
+		&& view->Parent()->Parent() == NULL && (flags & B_IGNORE_OUTLINE) == 0;
 
 	rgb_color low;
 	rgb_color color;
@@ -2210,6 +2207,8 @@ HaikuControlLook::DrawLabel(BView* view, const char* label, const rgb_color& bas
 
 	if (textColor != NULL)
 		glowColor = *textColor;
+	else if (view->Parent() != NULL)
+		glowColor = view->Parent()->HighColor();
 	else if ((flags & B_IS_CONTROL) != 0)
 		glowColor = ui_color(B_CONTROL_TEXT_COLOR);
 	else
