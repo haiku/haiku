@@ -48,10 +48,8 @@ public:
 			uid_t				UserID() const			{ return 0; }
 			gid_t				GroupID() const			{ return 0; }
 
-			void				SetModifiedTime(const timespec& time)
-									{ fModifiedTime = time; }
-			const timespec&		ModifiedTime() const
-									{ return fModifiedTime; }
+			void				SetModifiedTime(const timespec& time);
+			timespec			ModifiedTime() const;
 
 	virtual	off_t				FileSize() const;
 
@@ -81,7 +79,7 @@ protected:
 			PackageDirectory*	fParent;
 			String				fName;
 			mode_t				fMode;
-			timespec			fModifiedTime;
+			bigtime_t			fModifiedTime;
 			PackageNodeAttributeList fAttributes;
 };
 

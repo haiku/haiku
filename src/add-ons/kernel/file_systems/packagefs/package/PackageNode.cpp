@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <time_private.h>
+
 #include "DebugSupport.h"
 #include "Package.h"
 #include "Utils.h"
@@ -71,6 +73,23 @@ PackageNode::VFSUninit()
 }
 
 
+void
+PackageNode::SetModifiedTime(const timespec& time)
+{
+	if (!timespec_to_bigtime(time, fModifiedTime))
+		fModifiedTime = 0;
+}
+
+
+timespec
+PackageNode::ModifiedTime() const
+{
+	timespec modifiedTime;
+	bigtime_to_timespec(fModifiedTime, modifiedTime);
+	return modifiedTime;
+}
+
+
 off_t
 PackageNode::FileSize() const
 {
@@ -123,5 +142,5 @@ PackageNode::HasPrecedenceOver(const PackageNode* other) const
 		return true;
 	if (!isSystemPkg && otherIsSystemPkg)
 		return false;
-	return fModifiedTime > other->fModifiedTime;
+	return ModifiedTime() > other->ModifiedTime();
 }
