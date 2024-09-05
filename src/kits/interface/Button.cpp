@@ -222,8 +222,11 @@ BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
 
-	// Tint default control background color to match default panel background.
-	SetLowUIColor(B_CONTROL_BACKGROUND_COLOR, 1.115);
+	// tint low color to match background
+	if (ViewColor().IsLight())
+		SetLowUIColor(B_CONTROL_BACKGROUND_COLOR, 1.115);
+	else
+		SetLowUIColor(B_CONTROL_BACKGROUND_COLOR, 0.885);
 	SetHighUIColor(B_CONTROL_TEXT_COLOR);
 
 	if (IsDefault())
