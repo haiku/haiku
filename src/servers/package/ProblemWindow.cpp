@@ -233,15 +233,18 @@ ProblemWindow::_AddProblem(BSolverProblem* problem, const float backgroundTint)
 	BGroupView* problemGroup = new BGroupView(B_VERTICAL);
 	fContainerView->AddChild(problemGroup);
 	problemGroup->GroupLayout()->SetInsets(B_USE_SMALL_INSETS);
-	problemGroup->SetViewUIColor(B_LIST_BACKGROUND_COLOR, backgroundTint);
+
+	problemGroup->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, backgroundTint);
+	problemGroup->SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
 
 	BStringView* problemView = new BStringView(NULL, problem->ToString());
 	problemGroup->AddChild(problemView);
+	problemView->AdoptParentColors();
+
 	BFont problemFont;
 	problemView->GetFont(&problemFont);
 	problemFont.SetFace(B_BOLD_FACE);
 	problemView->SetFont(&problemFont);
-	problemView->AdoptParentColors();
 
 	int32 solutionCount = problem->CountSolutions();
 	for (int k = 0; k < solutionCount; k++) {

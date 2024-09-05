@@ -98,12 +98,15 @@ ResultWindow::AddLocationChanges(const char* location,
 	float backgroundTint = B_NO_TINT;
 	if ((fContainerView->CountChildren() & 1) != 0)
 		backgroundTint = 1.04;
-	locationGroup->SetViewUIColor(B_LIST_BACKGROUND_COLOR, backgroundTint);
+
+	locationGroup->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, backgroundTint);
+	locationGroup->SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
 
 	BStringView* locationView = new BStringView(NULL, BString().SetToFormat("in %s:", location));
 	locationGroup->AddChild(locationView);
 	locationView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	locationView->AdoptParentColors();
+
 	BFont locationFont;
 	locationView->GetFont(&locationFont);
 	locationFont.SetFace(B_BOLD_FACE);
