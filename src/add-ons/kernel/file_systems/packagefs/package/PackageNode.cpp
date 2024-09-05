@@ -19,9 +19,7 @@ PackageNode::PackageNode(Package* package, mode_t mode)
 	fPackage(package),
 	fParent(NULL),
 	fName(),
-	fMode(mode),
-	fUserID(0),
-	fGroupID(0)
+	fMode(mode)
 {
 }
 

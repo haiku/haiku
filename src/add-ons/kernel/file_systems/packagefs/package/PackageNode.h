@@ -45,12 +45,8 @@ public:
 									// base class versions must be called
 
 			mode_t				Mode() const			{ return fMode; }
-
-			uid_t				UserID() const			{ return fUserID; }
-			void				SetUserID(uid_t id)		{ fUserID = id; }
-
-			gid_t				GroupID() const			{ return fGroupID; }
-			void				SetGroupID(gid_t id)	{ fGroupID = id; }
+			uid_t				UserID() const			{ return 0; }
+			gid_t				GroupID() const			{ return 0; }
 
 			void				SetModifiedTime(const timespec& time)
 									{ fModifiedTime = time; }
@@ -85,8 +81,6 @@ protected:
 			PackageDirectory*	fParent;
 			String				fName;
 			mode_t				fMode;
-			uid_t				fUserID;
-			gid_t				fGroupID;
 			timespec			fModifiedTime;
 			PackageNodeAttributeList fAttributes;
 };
