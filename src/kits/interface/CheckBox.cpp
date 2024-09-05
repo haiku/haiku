@@ -103,7 +103,14 @@ BCheckBox::Archive(BMessage* data, bool deep) const
 void
 BCheckBox::Draw(BRect updateRect)
 {
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base, textColor;
+	if (Parent() != NULL) {
+		base = Parent()->ViewColor();
+		textColor = Parent()->HighColor();
+	} else {
+		base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		textColor = ui_color(B_PANEL_TEXT_COLOR);
+	}
 
 	uint32 flags = be_control_look->Flags(this);
 	if (fOutlined)
@@ -123,9 +130,10 @@ BCheckBox::Draw(BRect updateRect)
 
 	const BBitmap* icon = IconBitmap(
 		B_INACTIVE_ICON_BITMAP | (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
+	const BAlignment alignment = BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER);
 
-	be_control_look->DrawLabel(this, Label(), icon, labelRect, updateRect,
-		base, flags);
+	be_control_look->DrawLabel(this, Label(), icon, labelRect, updateRect, base, flags, alignment,
+		&textColor);
 }
 
 
