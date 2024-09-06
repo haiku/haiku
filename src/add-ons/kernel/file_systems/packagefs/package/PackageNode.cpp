@@ -21,7 +21,8 @@ PackageNode::PackageNode(Package* package, mode_t mode)
 	fPackage(package),
 	fParent(NULL),
 	fName(),
-	fMode(mode)
+	fMode(mode),
+	fReferenceCount(1)
 {
 }
 
@@ -30,6 +31,29 @@ PackageNode::~PackageNode()
 {
 	while (PackageNodeAttribute* attribute = fAttributes.RemoveHead())
 		delete attribute;
+
+	ASSERT(fReferenceCount == 0 || fReferenceCount == 1);
+}
+
+
+void
+PackageNode::AcquireReference()
+{
+	// This and ReleaseReference() should behave the same as their equivalents in
+	// BReferenceable, but inlining the field here saves us sizeof(BReferenceable)
+	// bytes of object size (2 pointers, so 16 bytes on 64-bit systems.)
+	const int32 previousCount = atomic_add(&fReferenceCount, 1);
+	ASSERT_ALWAYS(previousCount > 0);
+}
+
+
+void
+PackageNode::ReleaseReference()
+{
+	const int32 previousCount = atomic_add(&fReferenceCount, -1);
+	if (previousCount == 1)
+		delete this;
+	ASSERT(previousCount > 0);
 }
 
 

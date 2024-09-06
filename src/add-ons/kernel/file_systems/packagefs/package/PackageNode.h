@@ -22,11 +22,14 @@ class Package;
 class PackageDirectory;
 
 
-class PackageNode : public BReferenceable, public IndexedAttributeOwner,
+class PackageNode : public IndexedAttributeOwner,
 	public SinglyLinkedListLinkImpl<PackageNode> {
 public:
 								PackageNode(Package* package, mode_t mode);
 	virtual						~PackageNode();
+
+			void				AcquireReference();
+			void				ReleaseReference();
 
 			BReference<Package>		GetPackage() const;
 									// Since PackageNode does only hold a
@@ -78,9 +81,10 @@ protected:
 	mutable BWeakReference<Package> fPackage;
 			PackageDirectory*	fParent;
 			String				fName;
-			mode_t				fMode;
-			bigtime_t			fModifiedTime;
 			PackageNodeAttributeList fAttributes;
+			bigtime_t			fModifiedTime;
+			mode_t				fMode;
+			int32				fReferenceCount;
 };
 
 
