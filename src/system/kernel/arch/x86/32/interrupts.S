@@ -57,22 +57,6 @@
 	UPDATE_THREAD_USER_TIME_COMMON()						\
 	UNLOCK_THREAD_TIME()
 
-#define UPDATE_THREAD_USER_TIME_PUSH_TIME()					\
-	call	system_time;									\
-	push	%edx;											\
-	push	%eax;											\
-															\
-	LOCK_THREAD_TIME()										\
-															\
-	/* recover the system time, note that */				\
-	/* LOCK_THREAD_TIME() leaves an address on the stack */	\
-	movl	4(%esp), %eax;									\
-	movl	8(%esp), %edx;									\
-															\
-	UPDATE_THREAD_USER_TIME_COMMON()						\
-															\
-	UNLOCK_THREAD_TIME()
-
 #define UPDATE_THREAD_KERNEL_TIME()							\
 	LOCK_THREAD_TIME()										\
 															\
@@ -624,8 +608,7 @@ STATIC_FUNCTION(handle_syscall):
 	STOP_USER_DEBUGGING()
 
 	// update the thread's user time
-	UPDATE_THREAD_USER_TIME_PUSH_TIME()
-		// leave the time on the stack (needed for post syscall debugging)
+	UPDATE_THREAD_USER_TIME()
 
 	sti								// enable interrupts
 
@@ -687,8 +670,6 @@ FUNCTION_END(handle_syscall)
 	// post syscall debugging
 	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
 	jz		2f
-	pushl	-8(%ebp)				// syscall start time
-	pushl	-12(%ebp)
 	xor		%edx, %edx
 	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
 	jz		1f

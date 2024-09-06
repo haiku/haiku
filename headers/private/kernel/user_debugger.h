@@ -122,8 +122,10 @@ struct thread_debug_info {
 
 	// profiling related part; if samples != NULL, the thread is profiled
 	struct {
-		bigtime_t		interval;
-			// sampling interval
+		union {
+			bigtime_t		interval;
+			bigtime_t		syscall_start_time;
+		};
 		area_id			sample_area;
 			// cloned sample buffer area
 		addr_t*			samples;
@@ -253,8 +255,7 @@ void init_user_debug();
 // debug event callbacks
 
 void user_debug_pre_syscall(uint32 syscall, void *args);
-void user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
-		bigtime_t startTime);
+void user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue);
 bool user_debug_exception_occurred(debug_exception_type exception, int signal);
 bool user_debug_handle_signal(int signal, struct sigaction *handler,
 		siginfo_t *info, bool deadly);

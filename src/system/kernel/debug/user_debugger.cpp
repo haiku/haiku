@@ -309,6 +309,7 @@ init_thread_debug_info(struct thread_debug_info *info)
 		info->ignore_signals = 0;
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
+		info->profile.interval = 0;
 		info->profile.samples = NULL;
 		info->profile.flush_needed = false;
 		info->profile.installed_timer = NULL;
@@ -337,6 +338,7 @@ clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 		info->ignore_signals = 0;
 		info->ignore_signals_once = 0;
 		info->profile.sample_area = -1;
+		info->profile.interval = 0;
 		info->profile.samples = NULL;
 		info->profile.flush_needed = false;
 	}
@@ -841,29 +843,33 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 
 	// check whether pre-syscall tracing is enabled for team or thread
 	int32 threadDebugFlags = atomic_get(&thread->debug_info.flags);
-	if (!(teamDebugFlags & B_TEAM_DEBUG_PRE_SYSCALL)
-			&& !(threadDebugFlags & B_THREAD_DEBUG_PRE_SYSCALL)) {
-		return;
+	if ((teamDebugFlags & B_TEAM_DEBUG_PRE_SYSCALL)
+			|| (threadDebugFlags & B_THREAD_DEBUG_PRE_SYSCALL)) {
+		// prepare the message
+		debug_pre_syscall message;
+		message.syscall = syscall;
+
+		// copy the syscall args
+		if (syscall < (uint32)kSyscallCount) {
+			if (kSyscallInfos[syscall].parameter_size > 0)
+				memcpy(message.args, args, kSyscallInfos[syscall].parameter_size);
+		}
+
+		thread_hit_debug_event(B_DEBUGGER_MESSAGE_PRE_SYSCALL, &message,
+			sizeof(message), true);
 	}
 
-	// prepare the message
-	debug_pre_syscall message;
-	message.syscall = syscall;
-
-	// copy the syscall args
-	if (syscall < (uint32)kSyscallCount) {
-		if (kSyscallInfos[syscall].parameter_size > 0)
-			memcpy(message.args, args, kSyscallInfos[syscall].parameter_size);
+	if ((teamDebugFlags & B_TEAM_DEBUG_POST_SYSCALL)
+			|| (threadDebugFlags & B_THREAD_DEBUG_POST_SYSCALL)) {
+		// The syscall_start_time storage is shared with the profiler's interval.
+		if (thread->debug_info.profile.samples == NULL)
+			thread->debug_info.profile.syscall_start_time = system_time();
 	}
-
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_PRE_SYSCALL, &message,
-		sizeof(message), true);
 }
 
 
 void
-user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
-	bigtime_t startTime)
+user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue)
 {
 	// check whether a debugger is installed
 	Thread *thread = thread_get_current_thread();
@@ -880,6 +886,12 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	if (!(teamDebugFlags & B_TEAM_DEBUG_POST_SYSCALL)
 			&& !(threadDebugFlags & B_THREAD_DEBUG_POST_SYSCALL)) {
 		return;
+	}
+
+	bigtime_t startTime = 0;
+	if (thread->debug_info.profile.samples == NULL) {
+		startTime = thread->debug_info.profile.syscall_start_time;
+		thread->debug_info.profile.syscall_start_time = 0;
 	}
 
 	// prepare the message

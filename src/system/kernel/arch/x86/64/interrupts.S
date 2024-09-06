@@ -64,8 +64,7 @@
 
 // The macros below require R12 to contain the current thread pointer. R12 is
 // callee-save so will be preserved through all function calls and only needs
-// to be obtained once. R13 is used to store the system call start time, will
-// also be preserved.
+// to be obtained once.
 
 #define LOCK_THREAD_TIME()										\
 	leaq	THREAD_time_lock(%r12), %rdi;						\
@@ -79,8 +78,6 @@
 	LOCK_THREAD_TIME()											\
 																\
 	call	system_time;										\
-																\
-	/* Preserve system_time for post syscall debug */			\
 	movq	%rax, %r13;											\
 																\
 	/* thread->user_time += now - thread->last_time; */			\
@@ -526,7 +523,6 @@ FUNCTION(x86_64_syscall_entry):
 	movq	%r14, %rdi				// syscall number
 	movq	%rsp, %rsi
 	movq	IFRAME_ax(%rbp), %rdx	// return value
-	movq	%r13, %rcx				// start time, preserved earlier
 	call	user_debug_post_syscall
 	addq	$48, %rsp
 1:

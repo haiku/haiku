@@ -81,8 +81,6 @@
 	LOCK_THREAD_TIME()											\
 																\
 	call	system_time;										\
-																\
-	/* Preserve system_time for post syscall debug */			\
 	movq	%rax, %r13;											\
 																\
 	/* thread->user_time += now - thread->last_time; */			\
@@ -364,7 +362,6 @@ FUNCTION(x86_64_sysenter32_entry):
 	movq	%r14, %rdi				// syscall number
 	movq	%rsp, %rsi
 	movq	IFRAME_ax(%rbp), %rdx	// return value
-	movq	%r13, %rcx				// start time, preserved earlier
 	call	user_debug_post_syscall
 	addq	$48, %rsp
 1:

@@ -300,6 +300,9 @@ record_syscall_stats(const Syscall& syscall, debug_post_syscall& message)
 	syscall_stats& stats = sSyscallStats[syscall.Name()];
 	stats.count++;
 
+	if (message.start_time == 0)
+		return;
+
 	bigtime_t time = message.end_time - message.start_time;
 	stats.time += time;
 	sSyscallTime += time;
@@ -457,12 +460,14 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 			print_to_string(&string, &length, ")");
 	}
 
+	bigtime_t duration = 0;
+	if (message.start_time != 0)
+		duration = message.end_time - message.start_time;
 	if (colorize) {
 		print_to_string(&string, &length, " %s(%lld us)%s\n", kTerminalTextMagenta,
-			message.end_time - message.start_time, kTerminalTextNormal);
+			duration, kTerminalTextNormal);
 	} else {
-		print_to_string(&string, &length, " (%lld us)\n",
-			message.end_time - message.start_time);
+		print_to_string(&string, &length, " (%lld us)\n", duration);
 	}
 
 //for (int32 i = 0; i < 16; i++) {
