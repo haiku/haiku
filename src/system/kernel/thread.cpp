@@ -1222,6 +1222,13 @@ fill_thread_info(Thread *thread, thread_info *info, size_t size)
 	InterruptsSpinLocker threadTimeLocker(thread->time_lock);
 	info->user_time = thread->user_time;
 	info->kernel_time = thread->kernel_time;
+	if (thread->last_time != 0) {
+		const bigtime_t current = system_time() - thread->last_time;
+		if (thread->in_kernel)
+			info->kernel_time += current;
+		else
+			info->user_time += current;
+	}
 }
 
 
