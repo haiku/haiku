@@ -328,7 +328,7 @@ init_mbufs()
 		NULL, NULL, NULL);
 	if (sJumbo9ChunkCache == NULL)
 		goto clean;
-	sJumboPageSizeCache = create_object_cache("mbuf jumbo page size chunks",
+	sJumboPageSizeCache = create_object_cache("mbuf page size chunks",
 		MJUMPAGESIZE, 0, NULL, NULL, NULL);
 	if (sJumboPageSizeCache == NULL)
 		goto clean;
