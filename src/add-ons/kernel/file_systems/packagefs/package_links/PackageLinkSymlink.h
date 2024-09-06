@@ -6,6 +6,8 @@
 #define PACKAGE_LINK_SYMLINK_H
 
 
+#include <Referenceable.h>
+
 #include "Node.h"
 
 

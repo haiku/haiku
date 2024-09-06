@@ -13,6 +13,9 @@
 #include "EmptyAttributeDirectoryCookie.h"
 
 
+DEFINE_REFERENCEABLE_ACQUIRE_RELEASE(Node, fReferenceable);
+
+
 Node::Node(ino_t id)
 	:
 	fID(id),

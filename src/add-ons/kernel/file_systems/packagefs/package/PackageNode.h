@@ -13,6 +13,7 @@
 #include <util/SinglyLinkedList.h>
 
 #include "IndexedAttributeOwner.h"
+#include "InlineReferenceable.h"
 #include "PackageNodeAttribute.h"
 #include "StringKey.h"
 
@@ -84,7 +85,7 @@ protected:
 			PackageNodeAttributeList fAttributes;
 			bigtime_t			fModifiedTime;
 			mode_t				fMode;
-			int32				fReferenceCount;
+			InlineReferenceable fReferenceable;
 };
 
 

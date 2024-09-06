@@ -9,12 +9,12 @@
 #include <fs_interface.h>
 
 #include <AutoLocker.h>
-#include <Referenceable.h>
 
 #include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
+#include "InlineReferenceable.h"
 #include "String.h"
 #include "StringKey.h"
 
@@ -34,10 +34,13 @@ enum {
 };
 
 
-class Node : public BReferenceable, public DoublyLinkedListLinkImpl<Node> {
+class Node : public DoublyLinkedListLinkImpl<Node> {
 public:
 								Node(ino_t id);
 	virtual						~Node();
+
+			void				AcquireReference();
+			void				ReleaseReference();
 
 	inline	bool				ReadLock();
 	inline	void				ReadUnlock();
@@ -96,6 +99,7 @@ protected:
 			Node*				fNameHashTableNext;
 			Node*				fIDHashTableNext;
 			uint32				fFlags;
+			InlineReferenceable	fReferenceable;
 };
 
 
