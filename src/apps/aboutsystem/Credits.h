@@ -511,21 +511,17 @@ static const Translation kTranslations[] = {
 
 #define kCurrentMaintainers \
 	"Pascal R. G. Abresch\n" \
-	"Kyle Ambroff-Kao\n" \
-	"Stephan Aßmus\n" \
 	"Máximo Castañeda\n" \
 	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
 	"Rudolf Cornelissen\n" \
 	"Adrien Destugues\n" \
-	"Oliver Ruiz Dorantes\n" \
 	"Axel Dörfler\n" \
 	"Jérôme Duval\n" \
+	"Alexander von Gluck IV\n" \
 	"René Gollent\n" \
 	"Jessica Hamilton\n" \
-	"Brian Hill\n" \
 	"Fredrik Holmqvist\n" \
-	"Philippe Houdoin\n" \
 	"David Karoly\n" \
 	"Kacper Kasper\n" \
 	"Ryan Leavengood\n" \
@@ -533,25 +529,25 @@ static const Translation kTranslations[] = {
 	"Michael Lotz\n" \
 	"Scott McCreary\n" \
 	"Puck Meerburg\n" \
-	"Fredrik Modéen\n" \
-	"Joseph R. Prostko\n" \
 	"Niels Sascha Reedijk\n" \
 	"François Revol\n" \
 	"Jonathan Schleifer\n" \
 	"John Scipione\n" \
 	"Joachim Seemer (Humdinger)\n" \
 	"Gerasim Troeglazov\n" \
-	"Alexander von Gluck IV\n" \
 	"\n"
 
 #define kPastMaintainers \
 	"Ithamar R. Adema\n" \
 	"Bruno G. Albuquerque\n" \
+	"Kyle Ambroff-Kao\n" \
+	"Stephan Aßmus\n" \
 	"Andrew Bachmann\n" \
 	"Salvatore Benedetto\n" \
 	"Dario Casalinuovo\n" \
 	"Tyler Dauwalder\n" \
 	"Alexandre Deckner\n" \
+	"Oliver Ruiz Dorantes\n" \
 	"Pawel Dziepak\n" \
 	"Daniel Furrer\n" \
 	"Andre Alves Garzia\n" \
@@ -559,6 +555,8 @@ static const Translation kTranslations[] = {
 	"Colin Günther\n" \
 	"Julian Harnath\n" \
 	"Karsten Heimrich\n" \
+	"Brian Hill\n" \
+	"Philippe Houdoin\n" \
 	"Erik Jaesler\n" \
 	"Maurice Kalinowski\n" \
 	"Euan Kirkhope\n" \
@@ -569,12 +567,14 @@ static const Translation kTranslations[] = {
 	"Matt Madia\n" \
 	"David McPaul\n" \
 	"Wim van der Meer\n" \
+	"Fredrik Modéen\n" \
 	"Hamish Morrison\n" \
-	"Michael Pfeiffer\n" \
 	"Frans Van Nispen\n" \
 	"Adi Oanca\n" \
 	"Marcus Overhagen\n" \
+	"Michael Pfeiffer\n" \
 	"Michael Phipps\n" \
+	"Joseph R. Prostko\n" \
 	"David Reid\n" \
 	"Philippe Saint-Pierre\n" \
 	"Hugo Santos\n" \
