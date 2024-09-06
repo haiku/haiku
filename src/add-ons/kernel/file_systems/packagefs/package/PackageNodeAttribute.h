@@ -16,7 +16,7 @@
 class PackageNode;
 
 
-class PackageNodeAttribute
+class PackageNodeAttribute final
 	: public SinglyLinkedListLinkImpl<PackageNodeAttribute> {
 public:
 	static	void*				operator new(size_t size);

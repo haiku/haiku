@@ -11,7 +11,7 @@
 #include "PackageNode.h"
 
 
-class PackageDirectory : public PackageNode,
+class PackageDirectory final : public PackageNode,
 	public DoublyLinkedListLinkImpl<PackageDirectory> {
 public:
 	static	void*				operator new(size_t size);

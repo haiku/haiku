@@ -56,7 +56,7 @@ private:
 };
 
 
-class RootDirectory : public UnpackingDirectory {
+class RootDirectory final : public UnpackingDirectory {
 public:
 	static	void*				operator new(size_t size);
 	static	void				operator delete(void* block);

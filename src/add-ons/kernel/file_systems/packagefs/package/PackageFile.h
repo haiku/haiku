@@ -10,7 +10,7 @@
 #include "PackageLeafNode.h"
 
 
-class PackageFile : public PackageLeafNode {
+class PackageFile final : public PackageLeafNode {
 public:
 	static	void*				operator new(size_t size);
 	static	void				operator delete(void* block);
