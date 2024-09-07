@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3817524709
+1	ukrainian	x-vnd.Haiku-libtracker	2303675010
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -81,7 +81,6 @@ Moving: 	StatusWindow		Переміщення:
 Select	SelectionWindow		Вибрати
 Select	InfoWindow		Вибрати
 OK	OpenWithWindow		ОК
-Include trash	FindPanel		Включаючи смітник
 Clean up	ContainerWindow		Очистити
 Clear all	FindPanel		Очистити все
 Modified	FindPanel		Змінений
@@ -362,7 +361,6 @@ Version	OpenWithWindow		Версія
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені до смітника. Можливо Ви бажаєте видалити їх все одно? (Операція незворотня.)
 The entered file name is too long.	FSUtils		Введене ім'я файлу занадто довге.
 Add printer…	ContainerWindow		Додати принтер…
-On	FindPanel		На
 Permissions	ContainerWindow		Дозволи
 Size:	InfoWindow		Розмір:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Деякі з вибраних елементів не можуть бути переміщені у смітник. Можливо Ви бажаєте видалити їх все одно? (Операція незворотня.)

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	778639582
+1	english	x-vnd.Haiku-libtracker	3559757179
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -75,7 +75,6 @@ Moving: 	StatusWindow		移动：
 Select	SelectionWindow		选择
 Select	InfoWindow		选择
 OK	OpenWithWindow		确定
-Include trash	FindPanel		包括垃圾箱
 Clean up	ContainerWindow		刷新
 Modified	FindPanel		修改
  (block size: 	InfoWindow		 (块大小: 
@@ -342,7 +341,6 @@ after	FindPanel		之后
 Version	OpenWithWindow		版本
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
 Add printer…	ContainerWindow		添加打印机...
-On	FindPanel		在
 Permissions	ContainerWindow		权限
 Size:	InfoWindow		大小：
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		选中项目无法移动至垃圾箱。您希望删除它们吗？（该操作将无法恢复。）

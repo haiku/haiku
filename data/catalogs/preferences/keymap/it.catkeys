@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Keymap	139266573
+1	italian	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	Tasto
 Japanese	KeymapNames		Giapponese
 US	KeymapNames		Inglese (Stati Uniti)
@@ -54,6 +54,7 @@ Ukrainian (Mac)	KeymapNames		Ucraino (Mac)
 Command:	Modifier keys window	Command key role name	Comando:
 French (Bépo)	KeymapNames		Francese (Bépo)
 Russian (Typewriter)	KeymapNames		Russo (Macchina da Scrivere)
+Caps Lock:	Modifier keys window	Caps Lock key role name	Caps Lock (Blocco Maiuscole):
 Acute trigger	Keymap window		Acuto
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Internazionale
 Italian	KeymapNames		Italiano
@@ -82,6 +83,7 @@ Shift	Keyboard Layout View	Shift key	Shift
 CONTROL	Keyboard Layout View		CONTROL
 Macedonian	KeymapNames		Macedone
 Czech (Mac)	KeymapNames		Ceco (Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Tasto Caps Lock (Blocco Maiuscole)
 Albanian	KeymapNames		Albanese
 (Current)	Keymap window		(Attuale)
 OPT	Keyboard Layout View	Very short for 'option'	OPT

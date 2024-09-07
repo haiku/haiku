@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	211169783
+1	italian	x-vnd.Haiku-libtracker	3440244824
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -7,9 +7,13 @@ Open with…	ContainerWindow		Apri con…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Errore nello spostamento di \"%name\" nel Cestino. (%error)
 Or	FindPanel		O
 MIME Description	AttributesView		Descrizione MIME
+Query	FindPanel		Interrogazione
 before	FindPanel		prima
+New folder%d	FSUtils		Nuova cartella%d
 Volume icons	TrackerSettingsWindow		Icone volumi
 Ignore case	SelectionWindow		Ignora maiuscole/minuscole
+Save query:	FindPanel		Salva interrogazione:
+Save as query template:	FindPanel		Salva interrogazione come modello:
 Current folder	ContainerWindow		Cartella corrente
 Finish: %time - Over %finishtime left	StatusWindow		Completamento: %time - %finishtime mancanti
 Mount all disks now	AutoMounterSettings		Monta tutti i dischi ora
@@ -75,7 +79,6 @@ Moving: 	StatusWindow		Spostamento di:
 Select	SelectionWindow		Seleziona
 Select	InfoWindow		Seleziona
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Includi cestino
 Clean up	ContainerWindow		Ordina icone
 Modified	FindPanel		Modificato
  (block size: 	InfoWindow		 (dimensione blocco: 
@@ -129,6 +132,7 @@ Move to Trash	ContainerWindow		Sposta nel Cestino
 All files and folders	FindPanel		Tutti i file e cartelle
 Add-ons	ContainerWindow		Componenti Aggiuntivi
 Too many parenthesis.	libtracker		Troppe parentesi.
+Save query template:	FindPanel		Salva modello di interrogazione:
 Increase size	ContainerWindow		Aumenta dimensioni
 \nShould this be fixed?	FSUtils		\nCorreggo il problema?
 URL	Bookmark Query Columns		URL
@@ -206,6 +210,7 @@ Cancel	FSUtils		Annulla
 Original name	ContainerWindow		Nome originale
 Unknown	WidgetAttributeText		Sconosciuto
 32-bit integer	AttributesView		Intero a 32 bit
+Save as query…	FindPanel		Salva interrogazione come…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Il nome specificato è già usato come nome di una cartella. Per favore, scegline un altro.
 Modified	ContainerWindow		Modificato
 Mini icon view	ContainerWindow		Visualizza icone piccole
@@ -263,6 +268,7 @@ Don't automount	AutoMounterSettings		Non montare automaticamente
 Node ref	AttributesView		Riferimento Nodo
 Could not find application \"%appname\"	OpenWithWindow		Non è stato possibile trovare l'applicazione \"%appname\"
 Unmatched parenthesis.	libtracker		Parentesi non bilanciate.
+New folder %d	FSUtils		Nuova cartella %d
 Extended attribute	AttributesView		Attributo esteso
 Unmatched brackets.	libtracker		Parentesi non bilanciate.
 Error %error loading Add-On %name.	ContainerWindow		Errore %error caricando il componente aggiuntivo %name.
@@ -330,6 +336,7 @@ To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Incolla layout
 Cancel	Tracker		Annulla
 yes	AttributesView		si
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		Errore durante la copia del file \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Rendi la stampante attiva
 Copy to	ContainerWindow		Copia in
 Name	SelectionWindow		Nome
@@ -347,7 +354,6 @@ Version	OpenWithWindow		Versione
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Alcuni degli elementi selezionati non possono essere spostati nel Cestino. Si desidera eliminarli definitivamente? (Gli elementi non potranno essere recuperati.)
 The entered file name is too long.	FSUtils		Il nome del file inserito è troppo lungo.
 Add printer…	ContainerWindow		Aggiungi stampante…
-On	FindPanel		Su
 Permissions	ContainerWindow		Permessi
 Size:	InfoWindow		Dimensione:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L'elemento selezionato non può essere spostato nel Cestino. Desideri eliminarlo definitivamente? (Gli elementi non potranno essere recuperati.)
@@ -399,6 +405,7 @@ Cannot unmount the boot volume \"%name\".	FSUtils		Non è stato possibile smonta
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Non è stato possibile aprire \"%document\" con l'applicazione \"%app\" (Simbolo mancante: %symbol). \n
 New folder	ContainerWindow		Nuova cartella
 Name	OpenWithWindow		Nome
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	Ottieni informazioni
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Si è presentato un problema sostituendo \"%name\". L'elemento potrebbe essere già stato aperto o occupato.
 Windows	TrackerSettingsWindow		Finestre
 Show space bars on volumes	SettingsView		Mostra barre dello spazio sui volumi
@@ -410,6 +417,7 @@ Revert	TrackerSettingsWindow		Ripristina
 trash	B_TRASH_DIRECTORY		cestino
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se sposti la cartella di sistema o il suo contenuto, non sarai più in grado di avviare %osName!\n\nSei sicuro di voler procedere?\n\nPer spostare la cartella di sistema o il suo contenuto, tieni premuto il tasto Maiusc e clicca su \"Sposta\".
+Open query:	FindPanel		Apri interrogazione:
 Close all in workspace	ContainerWindow		Chiudi tutto nello spazio di lavoro
 Corrupted expression.	libtracker		Espressione non valida.
 Network address	AttributesView		Indirizzo di rete
@@ -473,6 +481,7 @@ Copy layout	ContainerWindow		Copia layout
 Duplicate	ContainerWindow		Duplica
 16-bit integer	AttributesView		Intero a 16 bit
 Untitled clipping	PoseView		Appunto senza nome
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Nota: i nomi degli archivi nel file system di destinazione non sono case sensitive.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Il file \"%name\" esiste già nella cartella specificata. Sostituirlo?
 , indexed	InfoWindow		, indicizzato
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Devi trascinare e lasciare gli elementi su una delle icone del disco nella finestra \"Disks\".

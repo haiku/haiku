@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	3817524709
+1	japanese	x-vnd.Haiku-libtracker	1462873605
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		マウント解除
 Eject when unmounting	AutoMounterSettings		マウント解除時メディアを取り出す
 Searching for disks to mount…	StatusWindow		マウントできるディスクを探しています...
 Value	AttributesView		値
+Multiple selections	FindPanel		複数選択
 Information	InfoWindow		情報
 Error emptying Trash	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:
@@ -81,7 +82,6 @@ Moving: 	StatusWindow		移動中:
 Select	SelectionWindow		選択
 Select	InfoWindow		選択
 OK	OpenWithWindow		OK
-Include trash	FindPanel		ごみ箱を含む
 Clean up	ContainerWindow		アイコンの整列
 Clear all	FindPanel		すべて削除
 Modified	FindPanel		更新日時
@@ -110,6 +110,7 @@ Window	ContainerWindow		ウィンドウ
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/秒
 Remove	FindPanel		削除
 Company	Person Query Columns		会社
+Select folders…	FindPanel		フォルダーの選択…
 Recent documents	FavoritesMenu		最近使ったドキュメント
 Edit templates…	TemplatesMenu		テンプレートの編集...
 Clear temporary queries only	FindPanel		一時的なクエリのみ削除
@@ -152,6 +153,7 @@ Disks	Model		ディスク
 Create a Query template	FindPanel		クエリ雛型の作成
 Size	FindPanel		サイズ
 Window	FilePanelPriv		ウィンドウ
+New submenu	ContainerWindow	Folder name of New-template submenu	新規サブメニュー
 OK	Email Query Columns		OK
 Location	QueryPoseView		場所
 Edit query	ContainerWindow		クエリの編集
@@ -180,6 +182,7 @@ Open selection with:	OpenWithWindow		選択ファイルをアプリケーショ�
 Preferences…	ContainerWindow		設定...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%app\" はごみ箱にあるため、\"%document\" を開けません。
 Work Phone	Person Query Columns		勤務先の電話番号
+Select folders	FindPanel		フォルダーの選択
 Close	ContainerWindow		閉じる
 Get info	ContainerWindow		詳細情報...
 MIME Type	AttributesView		MIMEタイプ
@@ -362,7 +365,6 @@ Version	OpenWithWindow		バージョン
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		いくつかの選択項目はごみ箱に捨てられません。完全に削除してもよろしいですか?元に戻せないので、ご注意ください。
 The entered file name is too long.	FSUtils		入力されたファイル名が長すぎます。
 Add printer…	ContainerWindow		プリンターの追加...
-On	FindPanel		有効
 Permissions	ContainerWindow		アクセス権
 Size:	InfoWindow		サイズ:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に捨てられません。完全に削除しても良いでしょうか? 元には戻せないので、ご注意ください。
@@ -499,6 +501,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		バージョン:
 OK	PoseView		OK
 Add-ons	DeskWindow		アドオン
+Add new submenu…	TemplatesMenu		新規サブメニューの追加…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダーに移動またはコピーしますか?
 Find	FindPanel		検索
 Empty folder	NavMenu		空フォルダー

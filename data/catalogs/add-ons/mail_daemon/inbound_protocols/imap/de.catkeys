@@ -6,7 +6,7 @@ Cancel	IMAPFolderConfig		Abbrechen
 OK	IMAPFolderConfig		OK
 Server storage: %s / %s used.	IMAPFolderConfig		Serverspeicher: %s / %s belegt.
 No encryption	imap_config		Keine Verschlüsselung
-Fetching IMAP folders, please be patient…	IMAPFolderConfig		IMAP-Ordner werden angefordert, bitte warten …
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		IMAP-Ordner werden geladen, bitte warten …
 Configure IMAP Folders	imap_config		IMAP-Ordner konfigurieren
 SSL	imap_config		SSL
 Apply	IMAPFolderConfig		Anwenden

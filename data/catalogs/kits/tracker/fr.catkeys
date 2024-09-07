@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	971734249
+1	french	x-vnd.Haiku-libtracker	2231634716
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -7,6 +7,7 @@ Open with…	ContainerWindow		Ouvrir avec…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erreur en envoyant « %name » à la Corbeille. (%error)
 Or	FindPanel		Ou
 MIME Description	AttributesView		Description MIME
+Query	FindPanel		Requête
 before	FindPanel		avant
 New folder%d	FSUtils		Nouveau dossier%d
 Volume icons	TrackerSettingsWindow		Icônes des volumes
@@ -76,8 +77,8 @@ Moving: 	StatusWindow		Déplacement :
 Select	SelectionWindow		Sélectionner
 Select	InfoWindow		Sélectionner
 OK	OpenWithWindow		OK
-Include trash	FindPanel		Inclure la corbeille
 Clean up	ContainerWindow		Nettoyer
+Clear all	FindPanel		Effacer tout
 Modified	FindPanel		Modifié
  (block size: 	InfoWindow		 (taille de bloc : 
 Select all	QueryContainerWindow		Sélectionner tout
@@ -281,6 +282,7 @@ Unknown	FilePermissionsView		Inconnu
 Paste links	ContainerWindow		Coller les liens
 Restoring: 	StatusWindow		Restauration : 
 The Tracker must be running to set the default printer.	PoseView		Le Tracker doit être lancé pour pouvoir définir l’imprimante par défaut.
+Cancel	FindPanel		Annuler
 calculating…	InfoWindow		calcul…
 Preferred for file	OpenWithWindow		Préférence pour le fichier
 OK	AutoMounterSettings		OK
@@ -313,6 +315,7 @@ starts with	SelectionWindow		commence par
 Any	AttributesView		Tous
 New	DeskWindow		Nouveau
 Invert	SelectionWindow		Inverser
+Open…	FindPanel		Ouvrir…
 Would you like to find some other suitable application?	FSUtils		Souhaitez-vous rechercher une autre application appropriée ?
 *+? operand may be empty.	libtracker		Les opérandes *+? pourraient être vides.
 (unknown)	AttributesView		(inconnu)
@@ -349,7 +352,6 @@ Version	OpenWithWindow		Version
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Certains des éléments sélectionnés ne peuvent pas être envoyés à la Corbeille. Voulez vous les supprimer ? (Cette opération est irrémédiable.)
 The entered file name is too long.	FSUtils		Le nom de fichier saisi est trop long.
 Add printer…	ContainerWindow		Ajouter une imprimante…
-On	FindPanel		Sur
 Permissions	ContainerWindow		Permissions
 Size:	InfoWindow		Taille :
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		L’élément sélectionné ne peut pas être envoyé à la Corbeille. Voulez vous le supprimer ? (Cette opération est irrémédiable.)

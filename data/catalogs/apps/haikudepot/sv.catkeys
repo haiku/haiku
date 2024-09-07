@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	355131830
+1	swedish	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Betyg ej möjligt
 Package update error	MainWindow		Paketuppdateringsfel
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processer}}
 Reboot required	PackageManager		Omstart krävs
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Hämta användarbetyg för paket
 All packages	PackageListView		Alla paket
 Send	RatePackageWindow		Skicka
 Start package daemon	App		Starta paket-servicen
@@ -179,7 +180,6 @@ Version %Code%	UserUsageConditions		Version %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Avinstallerar \"%PackageName%\"
 Downloading:	PackageInfoView		Mestadels stabil
 Quit	MainWindow		Avsluta
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Hämtar ändringslogg för paket
 Success	UserLoginWindow		Klar
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (version %hd.version%)

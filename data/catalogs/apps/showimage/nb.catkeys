@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	1148406263
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		ShowImage
 Page setup…	Menus		Sideoppsett…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokumentet '%s' (side %d) er endret. Ønsker du å lukke dokumentet?
@@ -39,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		Skriv ut…
 The file '%s' could not be written.	SaveToFile		Kunne ikke skrive filen '%s'.
 Quit	Menus		Avslutt
+Get info	Menus		Få informasjon
 Rating	Menus		Vurdering
 Close document	ClosePrompt		Lukk dokument
 Stretch to window	Menus		Strekk til vindu

@@ -1,9 +1,10 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HaikuDepot	3762371345
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem med nedlasting av bruksbetingelser
 Available packages	MainWindow		Tilgjengelige pakker
 It was not possible to create the new user.	UserLoginWindow		Det var ikke mulig å opprette brukeren.
 An unexpected error has been sent from the server [%li]	ServerHelper		En uventet feil ble sendt fra serveren [%li]
 Create account	UserLoginWindow		Opprett konto
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Henter endringslogg for pakken
 Agree	ToLatestUserUsageConditionsWindow		Godta
 Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Svaret på captchaen var feil.
@@ -46,6 +47,7 @@ Rating not possible	MainWindow		Vurdering er ikke mulig
 Package update error	MainWindow		Feil ved oppdatering av pakke
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosess} other{# prosesser}}
 Reboot required	PackageManager		Omstart påkrevet
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Henter brukervurderinger for pakken
 All packages	PackageListView		Alle pakker
 Send	RatePackageWindow		Send
 Start package daemon	App		Start pakke-daemon
@@ -113,6 +115,7 @@ The user does not exist or the wrong password was supplied. Check your credentia
 All repositories	MainWindow		Alle programarkiv
 Repository update error	LocalRepositoryUpdateProcess		Feil ved oppdatering av programarkiv
 Network error	ServerHelper		Nettverksfeil
+HaikuDepot - %PackageName% %PackageVersion%	MainWindow		HaikuDepot - %PackageName% %PackageVersion%
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Det oppstod en feil under oppdatering av programarkivet: %error%
 User Created	UserLoginWindow		Bruker Opprettet
 Check for updates…	MainWindow		Se etter oppdateringer…

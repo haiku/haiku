@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3694113313
+1	esperanto	x-vnd.Haiku-libtracker	2180263614
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -74,7 +74,6 @@ Moving: 	StatusWindow		Movante:
 Select	SelectionWindow		Elekti
 Select	InfoWindow		Elekti
 OK	OpenWithWindow		Bone
-Include trash	FindPanel		Inkludante rubujon
 Clean up	ContainerWindow		Alkradigi
 Modified	FindPanel		Redaktita
 Select all	QueryContainerWindow		Elekti ĉion
@@ -338,7 +337,6 @@ after	FindPanel		post
 Version	OpenWithWindow		Versio
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Iuj el la elektitaj elementoj ne povas esti movita al la Rubujo. Ĉu vi volus forigi ilin anstataŭe? (Ĉi tiu ago ne estas malfarebla.)
 Add printer…	ContainerWindow		Aldoni presilon…
-On	FindPanel		En
 Permissions	ContainerWindow		Permesoj
 Size:	InfoWindow		Grando:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		La elektita elemento ne povas esti movita al la Rubujo. Ĉu vi volas forigi ĝin anstataŭe? (Ĉi tiu ago ne estas malfarebla.)

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	355131830
+1	polish	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem z pobieraniem warunków korzystania
 Available packages	MainWindow		Dostępne pakiety
 It was not possible to create the new user.	UserLoginWindow		Nie udało się utworzyć nowego użytkownika.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Wersja %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Usuwanie „%PackageName%”
 Downloading:	PackageInfoView		Pobieranie:
 Quit	MainWindow		Zakończ
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Pobieranie dziennika zmian pakietu
 Success	UserLoginWindow		Powodzenie
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (wersja %hd.version%)

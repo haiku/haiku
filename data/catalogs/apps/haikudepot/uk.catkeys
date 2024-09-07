@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	355131830
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2029495331
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -179,7 +179,6 @@ Version %Code%	UserUsageConditions		Версія %Code%
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Деінсталяція \«%PackageName%\»
 Downloading:	PackageInfoView		Завантаження:
 Quit	MainWindow		Вийти
-Fetching changelog for package	PopulatePkgUserRatingsFromServerProcess		Отримую журнал змін для пакета
 Success	UserLoginWindow		Успішно
 (%Votes%)	PackageInfoView		(%Votes%)
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (версія %hd.version%)

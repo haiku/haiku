@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	171477831
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern oppføring til papirkurven
 Close	MediaPlayer-PlaylistWindow		Lukk
 Volume of background clips	MediaPlayer-SettingsWindow		Volum for bakgrunnsklipp
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		MedieSpiller innstillinger
 Copyright	MediaPlayer-InfoWin		Opphavsrett
 Invalid URL inserted!	MediaPlayer-NetworkStream		Ugyldig URL satt inn!
 Aspect ratio	MediaPlayer-Main		Størrelsesforhold
+Eject device	MediaPlayer-Main		Løs ut enhet
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Feil ved lagring av spillelisten.\n\nFeil: 
 <no media>	MediaPlayer-InfoWin		<ingen medier>
 Hide interface	MediaPlayer-Main		Skjul grensesnitt
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Fullskjerm
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Intern feil (kunne ikke låse). Lagring av spillelisten mislyktes.
 100% scale	MediaPlayer-Main		100% skalering
+New player	MediaPlayer-Main		Ny spiller
 <nothing to redo>	MediaPlayer-PlaylistWindow		<ingenting å gjenta>
 Bad URL	MediaPlayer-NetworkStream		Ugyldig URL
 Save	MediaPlayer-Main		Lagre

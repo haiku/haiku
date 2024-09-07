@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	3817524709
+1	spanish; castilian	x-vnd.Haiku-libtracker	4135601423
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Desmontar
 Eject when unmounting	AutoMounterSettings		Expulsar al momento de desmontar
 Searching for disks to mount…	StatusWindow		Buscando discos para montar…
 Value	AttributesView		Valor
+Multiple selections	FindPanel		Selecciones múltiples
 Information	InfoWindow		Información
 Error emptying Trash	FSUtils		Error al vaciar la papelera
 Opens with:	InfoWindow		Abrir con:
@@ -63,6 +64,7 @@ starts with	FindPanel		empieza con
 Replace	FSUtils		Reemplazar
 ?+* follows nothing.	libtracker		?+* no sigue a nada.
 Rectangle	AttributesView		Rectángulo
+Include Trash	FindPanel		Incluir a la papelera
 Move to	ContainerWindow		Mover a
 Status	Email Query Columns		Estado
 New folder	FSUtils		Nueva carpeta
@@ -81,7 +83,6 @@ Moving: 	StatusWindow		Moviendo:
 Select	SelectionWindow		Seleccionar
 Select	InfoWindow		Seleccionar
 OK	OpenWithWindow		Aceptar
-Include trash	FindPanel		Incluir la papelera
 Clean up	ContainerWindow		Limpiar
 Clear all	FindPanel		Borrar todo
 Modified	FindPanel		Modificado
@@ -110,6 +111,7 @@ Window	ContainerWindow		Ventana
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Eliminar
 Company	Person Query Columns		Empresa
+Select folders…	FindPanel		Seleccionar carpetas…
 Recent documents	FavoritesMenu		Documentos recientes
 Edit templates…	TemplatesMenu		Editar plantillas…
 Clear temporary queries only	FindPanel		Borrar únicamente las consultas temporales
@@ -152,6 +154,7 @@ Disks	Model		Discos
 Create a Query template	FindPanel		Crear una plantilla de consulta
 Size	FindPanel		Tamaño
 Window	FilePanelPriv		Ventana
+New submenu	ContainerWindow	Folder name of New-template submenu	Nuevo submenú
 OK	Email Query Columns		OK
 Location	QueryPoseView		Localización
 Edit query	ContainerWindow		Editar consulta
@@ -180,6 +183,7 @@ Open selection with:	OpenWithWindow		Abrir selección con:
 Preferences…	ContainerWindow		Preferencias…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		No se pudo abrir \"%documento\" porque la aplicación \"%app\" está en la Basura. 
 Work Phone	Person Query Columns		Teléfono Laboral
+Select folders	FindPanel		Seleccionar carpetas
 Close	ContainerWindow		Cerrar
 Get info	ContainerWindow		Obtener información
 MIME Type	AttributesView		Tipo MIME
@@ -321,6 +325,7 @@ Open	ContainerWindow		Abrir
 Settings…	MountMenu		Ajustes…
 You cannot put the selected item(s) into the trash.	FSUtils		No se pueden poner el(los) elemento(s) seleccionado(s) en la papelera.
 Increase size	DeskWindow		Aumentar tamaño
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Objetivo:
 starts with	SelectionWindow		Empezar con
 Any	AttributesView		Cualquier
 New	DeskWindow		Nuevo
@@ -362,7 +367,6 @@ Version	OpenWithWindow		Versión
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Algunos de los elementos seleccionados no pueden ser movidos a la papelera. ¿Quieres eliminarlos de forma definitiva? (esta operación es irrevertible)
 The entered file name is too long.	FSUtils		El nombre de archivo ingresado es demasiado largo.
 Add printer…	ContainerWindow		Añadir impresora…
-On	FindPanel		En
 Permissions	ContainerWindow		Permisos
 Size:	InfoWindow		Tamaño:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		El elemento seleccionado no puede ser movido a la papelera. ¿Quieres borrarlo de forma definitiva? (esta operación es irreversible)
@@ -499,6 +503,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versión:
 OK	PoseView		Aceptar
 Add-ons	DeskWindow		Añadidos
+Add new submenu…	TemplatesMenu		Añadir nuevo submenú…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		¿Estás seguro de que quieres mover o copiar la selección a esta carpeta?
 Find	FindPanel		Encontrar
 Empty folder	NavMenu		Carpeta vacía

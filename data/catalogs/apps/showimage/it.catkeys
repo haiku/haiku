@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ShowImage	1148406263
+1	italian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		ShowImage
 Page setup…	Menus		Imposta pagina…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Il documento '%s' (pagina %d) è stato modificato. Vuoi chiudere il documento?
@@ -39,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		Stampa…
 The file '%s' could not be written.	SaveToFile		Impossibile scrivere il file '%s'.
 Quit	Menus		Esci
+Get info	Menus		Ottieni informazioni
 Rating	Menus		Valutazione
 Close document	ClosePrompt		Chiudi documento
 Stretch to window	Menus		Estendi alla finestra

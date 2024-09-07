@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	4177783451
+1	croatian	x-vnd.Haiku-libtracker	2663933752
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -57,7 +57,6 @@ Moving: 	StatusWindow		Premještam...
 Select	SelectionWindow		Odaberi
 Select	InfoWindow		Odaberi
 OK	OpenWithWindow		U redu
-Include trash	FindPanel		Uključi smeće
 Clean up	ContainerWindow		Očisti
 Modified	FindPanel		Izmjenjeno
 Select all	QueryContainerWindow		Odaberi sve
@@ -246,7 +245,6 @@ Finish: %time	StatusWindow		Završi: %time
 after	FindPanel		poslije
 Version	OpenWithWindow		Verzija
 Add printer…	ContainerWindow		Dodaj pisač...
-On	FindPanel		Uključeno
 Permissions	ContainerWindow		Dozvole
 Size:	InfoWindow		Veličina:
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Označena stavka nemože biti pomaknuta u smeće. Želite li je umjesto toga izbrisati? (ovu operaciju ne možete vratiti)

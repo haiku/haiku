@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Magnify	1465621918
+1	italian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  il fattore deve essere > 4 e un multiplo di 4
 Decrease pixel size	Magnify-Main		Diminuisci la dimensione dei pixel
 no clip msg	In console, when clipboard is empty after clicking Copy image		no clip msg
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Aumenta la dimensione della finestra
 Save image	Magnify-Main		Salva immagine
 Show grid	Magnify-Main		Mostra griglia
 Magnify	System name		Ingrandimento
+height	Magnify-Main		altezza
+width	Magnify-Main		larghezza
 Info	Magnify-Main		Informazioni
 Show info	Magnify-Main		Mostra informazioni
 Make square	Magnify-Main		Rendi la finestra quadrata
