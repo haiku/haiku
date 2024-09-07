@@ -40,7 +40,7 @@
 #endif
 
 
-static const size_t kMaxReadDirBufferSize = 64 * 1024;
+static const size_t kMaxReadDirBufferSize = B_PAGE_SIZE * 2;
 
 extern object_cache* sFileDescriptorCache;
 
