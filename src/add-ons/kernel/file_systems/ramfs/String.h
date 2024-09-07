@@ -10,27 +10,6 @@
 #include <new>
 
 
-// string_hash
-//
-// from the Dragon Book: a slightly modified hashpjw()
-static inline
-uint32
-string_hash(const char *name)
-{
-	uint32 h = 0;
-	if (name) {
-		for (; *name; name++) {
-			uint32 g = h & 0xf0000000;
-			if (g)
-				h ^= g >> 24;
-			h = (h << 4) + *name;
-		}
-	}
-	return h;
-}
-
-#ifdef __cplusplus
-
 // String
 class String {
 public:
@@ -46,8 +25,6 @@ public:
 
 	inline const char *GetString() const;
 	inline int32 GetLength() const	{ return fLength; }
-
-	inline uint32 GetHashCode() const	{ return string_hash(GetString()); }
 
 	inline String &operator=(const String &string);
 	inline bool operator==(const String &string) const;
@@ -181,7 +158,5 @@ String::_SetTo(const char *string, int32 length)
 	return result;
 }
 
-
-#endif	// __cplusplus
 
 #endif	// STRING_H

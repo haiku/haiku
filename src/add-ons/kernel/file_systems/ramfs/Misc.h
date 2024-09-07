@@ -6,8 +6,7 @@
 #define MISC_H
 
 #include <SupportDefs.h>
-
-#include "String.h"
+#include <util/StringHash.h>
 
 // min and max
 // We don't want to include <algobase.h> otherwise we also get <iostream.h>
@@ -22,7 +21,7 @@ static inline
 uint32
 node_child_hash(uint64 id, const char *name)
 {
-	return uint32(id & 0xffffffff) ^ string_hash(name);
+	return uint32(id & 0xffffffff) ^ hash_hash_string(name);
 }
 
 #endif	// MISC_H
