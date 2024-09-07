@@ -126,7 +126,7 @@ SecondaryMouseButtonDown(int32 modifiers, int32 buttons)
 
 
 uint32
-HashString(const char* string, uint32 seed)
+SeededHashString(const char* string, uint32 seed)
 {
 	char ch;
 	uint32 hash = seed;

@@ -1569,10 +1569,10 @@ SharedCacheEntry::Draw(BView* view, BPoint where, IconDrawMode mode,
 /* static */ size_t
 SharedCacheEntry::Hash(const TypeAndSignature& typeAndSignature)
 {
-	size_t hash = HashString(typeAndSignature.type, 0);
+	size_t hash = SeededHashString(typeAndSignature.type, 0);
 	if (typeAndSignature.signature != NULL
 			&& *typeAndSignature.signature != '\0')
-		hash = HashString(typeAndSignature.signature, hash);
+		hash = SeededHashString(typeAndSignature.signature, hash);
 
 	return hash;
 }
