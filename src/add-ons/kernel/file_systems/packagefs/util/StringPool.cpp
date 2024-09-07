@@ -152,5 +152,5 @@ StringPool::DumpUsageStatistics()
 		totalStringSizeWithDuplicates);
 	INFORM("  unshared strings:        %8zu\n", unsharedStringCount);
 	INFORM("  bytes saved:             %8zd\n",
-		(ssize_t)(totalStringSizeWithDuplicates - totalStringSize - overhead));
+		(ssize_t)(totalStringSizeWithDuplicates - (totalStringSize + overhead + tableSize)));
 }
