@@ -13,12 +13,14 @@
 
 #include "FontView.h"
 
+#include <algorithm>
+
 #include <string.h>
 
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <GridLayout.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MessageRunner.h>
 #include <SpaceLayoutItem.h>
@@ -33,51 +35,47 @@
 static const uint32 kMsgCheckFonts = 'chkf';
 
 
-static void
-add_font_selection_view(BGridLayout* layout, FontSelectionView* view,
-	int32& row, bool withExtraSpace)
-{
-	layout->AddItem(view->CreateFontsLabelLayoutItem(), 0, row);
-	layout->AddItem(view->CreateFontsMenuBarLayoutItem(), 1, row);
-
-	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 2, row);
-
-	layout->AddView(view->GetFontSizeSpinner(), 4, row);
-
-	row++;
-
-	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, row);
-	layout->AddView(view->PreviewBox(), 1, row, 4);
-
-	row++;
-
-	if (withExtraSpace) {
-		layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5), 0, row, 5);
-		row++;
-	}
-}
-
-
 FontView::FontView(const char* name)
 	:
 	BView(name, B_WILL_DRAW )
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	fPlainView = new FontSelectionView("plain", B_TRANSLATE("Plain font:"));
-	fBoldView = new FontSelectionView("bold", B_TRANSLATE("Bold font:"));
-	fFixedView = new FontSelectionView("fixed", B_TRANSLATE("Fixed font:"));
-	fMenuView = new FontSelectionView("menu", B_TRANSLATE("Menu font:"));
+	const char* plainLabel = B_TRANSLATE("Plain font:");
+	const char* boldLabel = B_TRANSLATE("Bold font:");
+	const char* fixedLabel = B_TRANSLATE("Fixed font:");
+	const char* menuLabel = B_TRANSLATE("Menu font:");
 
-	BGridLayout* layout = new BGridLayout(5, 5);
-	layout->SetInsets(B_USE_WINDOW_SPACING);
-	SetLayout(layout);
+	fPlainView = new FontSelectionView("plain", plainLabel);
+	fBoldView = new FontSelectionView("bold", boldLabel);
+	fFixedView = new FontSelectionView("fixed", fixedLabel);
+	fMenuView = new FontSelectionView("menu", menuLabel);
 
-	int32 row = 0;
-	add_font_selection_view(layout, fPlainView, row, true);
-	add_font_selection_view(layout, fBoldView, row, true);
-	add_font_selection_view(layout, fFixedView, row, true);
-	add_font_selection_view(layout, fMenuView, row, false);
+	// find the longest label
+	float longestLabel = StringWidth(plainLabel);
+	longestLabel = std::max(longestLabel, StringWidth(boldLabel));
+	longestLabel = std::max(longestLabel, StringWidth(fixedLabel));
+	longestLabel = std::max(longestLabel, StringWidth(menuLabel));
+	longestLabel += be_control_look->DefaultLabelSpacing();
+
+	// set the first column to the width of the longest label
+	BGridLayout* gridLayout;
+	gridLayout = (BGridLayout*)fPlainView->GetLayout();
+	gridLayout->SetMinColumnWidth(0, longestLabel);
+	gridLayout = (BGridLayout*)fBoldView->GetLayout();
+	gridLayout->SetMinColumnWidth(0, longestLabel);
+	gridLayout = (BGridLayout*)fFixedView->GetLayout();
+	gridLayout->SetMinColumnWidth(0, longestLabel);
+	gridLayout = (BGridLayout*)fMenuView->GetLayout();
+	gridLayout->SetMinColumnWidth(0, longestLabel);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(fPlainView)
+		.Add(fBoldView)
+		.Add(fFixedView)
+		.Add(fMenuView)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		.SetInsets(B_USE_WINDOW_SPACING);
 }
 
 
