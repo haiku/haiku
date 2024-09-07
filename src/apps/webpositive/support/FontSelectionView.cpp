@@ -150,9 +150,9 @@ FontSelectionView::MessageReceived(BMessage* message)
 		case B_COLORS_UPDATED:
 		{
 			if (message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
-				rgb_color panelColor = message->GetColor(ui_color_name(B_PANEL_TEXT_COLOR),
-					make_color(255, 255, 255));
-				fPreviewTextView->SetFontAndColor(&fCurrentFont, B_FONT_ALL, &panelColor);
+				rgb_color textColor;
+				if (message->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &textColor) == B_OK)
+					fPreviewTextView->SetFontAndColor(&fCurrentFont, B_FONT_ALL, &textColor);
 			}
 			break;
 		}
