@@ -92,7 +92,7 @@ protected:
 };
 
 
-const int32 kDirentBufferSize = 10 * 1024;
+const int32 kDirentBufferSize = B_PAGE_SIZE * 2;
 
 
 class CachedEntryIterator : public EntryListBase {
