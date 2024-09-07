@@ -11,34 +11,26 @@
 
 
 uint32
-hash_hash_string(const char* string)
+hash_hash_string(const char* _string)
 {
-	uint32 hash = 0;
+	const uint8* string = (const uint8*)_string;
+
+	uint32 h = 5381;
 	char c;
-
-	// we assume hash to be at least 32 bits
-	while ((c = *string++) != 0) {
-		hash ^= hash >> 28;
-		hash <<= 4;
-		hash ^= c;
-	}
-
-	return hash;
+	while ((c = *string++) != 0)
+		h = (h * 33) + c;
+	return h;
 }
 
 
 uint32
-hash_hash_string_part(const char* string, size_t maxLength)
+hash_hash_string_part(const char* _string, size_t maxLength)
 {
-	uint32 hash = 0;
+	const uint8* string = (const uint8*)_string;
+
+	uint32 h = 5381;
 	char c;
-
-	// we assume hash to be at least 32 bits
-	while (maxLength-- > 0 && (c = *string++) != 0) {
-		hash ^= hash >> 28;
-		hash <<= 4;
-		hash ^= c;
-	}
-
-	return hash;
+	while (maxLength-- > 0 && (c = *string++) != 0)
+		h = (h * 33) + c;
+	return h;
 }
