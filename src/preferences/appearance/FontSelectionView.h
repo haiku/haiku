@@ -47,7 +47,7 @@ public:
 			BLayoutItem*		CreateFontsLabelLayoutItem() const;
 			BLayoutItem*		CreateFontsMenuBarLayoutItem() const;
 			BView*				GetFontSizeSpinner() const;
-			BView*				GetPreviewBox() const;
+			BView*				PreviewBox() const;
 
 private:
 			void				_SelectCurrentFont(bool select);

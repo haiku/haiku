@@ -47,7 +47,7 @@ add_font_selection_view(BGridLayout* layout, FontSelectionView* view,
 	row++;
 
 	layout->AddItem(BSpaceLayoutItem::CreateGlue(), 0, row);
-	layout->AddView(view->GetPreviewBox(), 1, row, 4);
+	layout->AddView(view->PreviewBox(), 1, row, 4);
 
 	row++;
 

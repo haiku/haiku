@@ -17,15 +17,15 @@
 #include <Box.h>
 #include <Catalog.h>
 #include <ControlLook.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <LayoutItem.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <Spinner.h>
 #include <String.h>
 #include <TextView.h>
-#include <Spinner.h>
 
 #include <FontPrivate.h>
 
@@ -146,15 +146,11 @@ FontSelectionView::FontSelectionView(const char* name,
 
 	// box around preview
 	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
-	fPreviewBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.AddGroup(B_HORIZONTAL, 0)
-			.Add(fPreviewTextView)
-			.AddGlue()
-			.End()
-		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
-			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
-		.TopView()
-	);
+	fPreviewBox->AddChild(BLayoutBuilder::Group<>(B_HORIZONTAL, 0)
+		.Add(fPreviewTextView)
+		.AddGlue()
+		.SetInsets(B_USE_SMALL_SPACING)
+		.View());
 
 	_SelectCurrentSize();
 }
@@ -244,7 +240,7 @@ FontSelectionView::MessageReceived(BMessage* msg)
 
 
 BView*
-FontSelectionView::GetPreviewBox() const
+FontSelectionView::PreviewBox() const
 {
 	return fPreviewBox;
 }
