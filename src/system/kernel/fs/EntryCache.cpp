@@ -8,6 +8,7 @@
 
 #include <new>
 #include <vm/vm.h>
+#include <slab/Slab.h>
 
 
 static const int32 kEntryNotInArray = -1;
@@ -125,7 +126,10 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID, bool missing)
 		return B_OK;
 	}
 
-	entry = (EntryCacheEntry*)malloc(sizeof(EntryCacheEntry) + strlen(name));
+	// Avoid deadlock if system had to wait for free memory
+	entry = (EntryCacheEntry*)malloc_etc(sizeof(EntryCacheEntry) + strlen(name),
+		CACHE_DONT_WAIT_FOR_MEMORY);
+
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
