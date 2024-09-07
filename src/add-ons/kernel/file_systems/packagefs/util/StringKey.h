@@ -35,11 +35,19 @@ public:
 		return fHash;
 	}
 
+	inline int Compare(const ::StringKey& other) const
+	{
+		if (fHash == other.fHash) {
+			if (fString == other.fString)
+				return 0;
+			return strcmp(fString, other.fString);
+		}
+		return (fHash < other.fHash) ? -1 : 1;
+	}
+
 	bool operator==(const ::String& other) const
 	{
-		if (fHash != other.Hash())
-			return false;
-		return fString == other.Data() || strcmp(fString, other.Data()) == 0;
+		return Compare(StringKey(other)) == 0;
 	}
 
 	bool operator!=(const ::String& other) const
