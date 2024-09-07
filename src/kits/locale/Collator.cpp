@@ -222,6 +222,9 @@ BCollator::Instantiate(BMessage* archive)
 status_t
 BCollator::SetStrength(int8 strength) const
 {
+	if (fICUCollator == NULL)
+		return B_NO_INIT;
+
 	if (strength == B_COLLATE_DEFAULT)
 		strength = B_COLLATE_TERTIARY;
 
