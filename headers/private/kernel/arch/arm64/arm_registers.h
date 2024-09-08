@@ -501,8 +501,6 @@
 #define	MAIR_ATTR(attr, idx) ((attr) << ((idx) * 8))
 #define	 MAIR_DEVICE_nGnRnE	0x00
 #define	 MAIR_DEVICE_nGnRE	0x04
-#define	 MAIR_DEVICE_nGRE	0x08
-#define	 MAIR_DEVICE_GRE	0x0C
 #define	 MAIR_NORMAL_NC		0x44
 #define	 MAIR_NORMAL_WT		0xbb
 #define	 MAIR_NORMAL_WB		0xff

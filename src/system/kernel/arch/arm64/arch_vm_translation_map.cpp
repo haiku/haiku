@@ -72,6 +72,7 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 	uint32_t tg1 = (tcr >> 30) & 0x3;
 	uint64_t ttbr0 = READ_SPECIALREG(TTBR0_EL1);
 	uint64_t ttbr1 = READ_SPECIALREG(TTBR1_EL1);
+	uint64_t mair = READ_SPECIALREG(MAIR_EL1);
 	uint64_t mmfr1 = READ_SPECIALREG(ID_AA64MMFR1_EL1);
 	uint64_t mmfr2 = READ_SPECIALREG(ID_AA64MMFR2_EL1);
 	uint64_t sctlr = READ_SPECIALREG(SCTLR_EL1);
@@ -92,13 +93,7 @@ arch_vm_translation_map_init(kernel_args* args, VMPhysicalPageMapper** _physical
 		VMSAv8TranslationMap::fHwFeature |= VMSAv8TranslationMap::HW_COMMON_NOT_PRIVATE;
 	}
 
-	uint64_t mair = 
-		(MAIR_DEVICE_nGnRnE) |   // Uncached
-		(MAIR_DEVICE_GRE << 8) | // Write-combining
-		(MAIR_NORMAL_WT << 16) | // Write-through
-		(MAIR_NORMAL_WB << 24);  // Write-back
 	VMSAv8TranslationMap::fMair = mair;
-	WRITE_SPECIALREG(MAIR_EL1, mair);
 
 	WRITE_SPECIALREG(TCR_EL1, tcr);
 
