@@ -370,10 +370,14 @@ low_resource(uint32 resource, uint64 requirements, uint32 flags, uint32 timeout)
 			break;
 	}
 
+	ConditionVariableEntry entry;
+	if ((flags & B_RELATIVE_TIMEOUT) == 0 || timeout > 0)
+		sLowResourceWaiterCondition.Add(&entry);
+
 	release_sem(sLowResourceWaitSem);
 
-	if ((flags & B_RELATIVE_TIMEOUT) == 0 || timeout > 0)
-		sLowResourceWaiterCondition.Wait(flags, timeout);
+	if (entry.Variable() != NULL)
+		entry.Wait(flags, timeout);
 }
 
 
