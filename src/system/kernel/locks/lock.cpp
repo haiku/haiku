@@ -983,8 +983,9 @@ _mutex_lock(mutex* lock, void* _locker)
 	} else if (lock->holder == thread_get_current_thread_id()) {
 		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
-	} else if (lock->holder == 0)
+	} else if (lock->holder == 0) {
 		panic("_mutex_lock(): using uninitialized lock %p", lock);
+	}
 #else
 	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
 		lock->flags &= ~MUTEX_FLAG_RELEASED;
@@ -1012,6 +1013,9 @@ _mutex_lock(mutex* lock, void* _locker)
 #if KDEBUG
 	if (error == B_OK) {
 		ASSERT(lock->holder == waiter.thread->id);
+	} else {
+		// This should only happen when the mutex was destroyed.
+		ASSERT(waiter.thread == NULL);
 	}
 #endif
 	return error;
@@ -1099,8 +1103,9 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 	} else if (lock->holder == thread_get_current_thread_id()) {
 		panic("_mutex_lock(): double lock of %p by thread %" B_PRId32, lock,
 			lock->holder);
-	} else if (lock->holder == 0)
+	} else if (lock->holder == 0) {
 		panic("_mutex_lock(): using uninitialized lock %p", lock);
+	}
 #else
 	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
 		lock->flags &= ~MUTEX_FLAG_RELEASED;
