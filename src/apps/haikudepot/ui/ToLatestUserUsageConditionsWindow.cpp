@@ -1,5 +1,6 @@
 /*
  * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024 Haiku, Inc. All rights reserved.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -48,14 +49,12 @@ enum {
 };
 
 
-ToLatestUserUsageConditionsWindow::ToLatestUserUsageConditionsWindow(
-	BWindow* parent,
-	Model& model, const UserDetail& userDetail)
+ToLatestUserUsageConditionsWindow::ToLatestUserUsageConditionsWindow(BWindow* parent, Model& model,
+	const UserDetail& userDetail)
 	:
-	BWindow(BRect(), B_TRANSLATE("Update usage conditions"),
-		B_FLOATING_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
-		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
-			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE),
+	BWindow(BRect(), B_TRANSLATE("Update usage conditions"), B_FLOATING_WINDOW_LOOK,
+		B_MODAL_SUBSET_WINDOW_FEEL,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE | B_NOT_CLOSABLE),
 	fModel(model),
 	fUserDetail(userDetail),
 	fWorkerThread(-1),

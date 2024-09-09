@@ -1,13 +1,11 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2024 Haiku, Inc. All rights reserved.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "MarkupTextView.h"
-
-
-static const rgb_color kLightBlack = (rgb_color){ 60, 60, 60, 255 };
 
 
 MarkupTextView::MarkupTextView(const char* name)
@@ -31,7 +29,15 @@ MarkupTextView::MarkupTextView(const char* name)
 void
 MarkupTextView::SetText(const BString& markupText)
 {
-	SetTextDocument(fMarkupParser.CreateDocumentFromMarkup(markupText));
+	TextDocumentRef document(new(std::nothrow) TextDocument(), true);
+
+	CharacterStyle regularStyle(fMarkupParser.NormalCharacterStyle());
+	regularStyle.SetForegroundColor(HighUIColor());
+
+	fMarkupParser.SetStyles(regularStyle, fMarkupParser.NormalParagraphStyle());
+	fMarkupParser.AppendMarkup(document, markupText);
+
+	SetTextDocument(document);
 }
 
 
@@ -60,7 +66,8 @@ MarkupTextView::SetDisabledText(const BString& text)
 	paragraphStyle.SetAlignment(ALIGN_CENTER);
 
 	CharacterStyle disabledStyle(fMarkupParser.NormalCharacterStyle());
-	disabledStyle.SetForegroundColor(kLightBlack);
+	rgb_color disabled = tint_color(HighColor(), HighColor().IsLight() ? B_DARKEN_1_TINT : 0.853);
+	disabledStyle.SetForegroundColor(disabled);
 
 	Paragraph paragraph(paragraphStyle);
 	paragraph.Append(TextSpan(text, disabledStyle));
