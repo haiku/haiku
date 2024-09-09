@@ -113,6 +113,7 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	fModel(model)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	RotatedStringView* ownerRightLabel = new RotatedStringView("",
 		B_TRANSLATE("Owner"));
