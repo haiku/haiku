@@ -12,7 +12,6 @@
 
 #include <AutoLocker.h>
 
-#include "StringUtils.h"
 #include "Type.h"
 #include "TypeLookupConstraints.h"
 
@@ -42,7 +41,7 @@ struct GlobalTypeCache::TypeEntryHashDefinitionByName {
 
 	size_t HashKey(const BString& key) const
 	{
-		return StringUtils::HashValue(key);
+		return key.HashValue();
 	}
 
 	size_t Hash(const TypeEntry* value) const
@@ -68,7 +67,7 @@ struct GlobalTypeCache::TypeEntryHashDefinitionByID {
 
 	size_t HashKey(const BString& key) const
 	{
-		return StringUtils::HashValue(key);
+		return key.HashValue();
 	}
 
 	size_t Hash(const TypeEntry* value) const

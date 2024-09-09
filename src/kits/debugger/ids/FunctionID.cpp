@@ -10,8 +10,6 @@
 
 #include <Message.h>
 
-#include "StringUtils.h"
-
 
 // #pragma mark - FunctionID
 
@@ -55,8 +53,8 @@ FunctionID::Archive(BMessage* archive, bool deep) const
 uint32
 FunctionID::ComputeHashValue() const
 {
-	return StringUtils::HashValue(fPath) * 17
-		+ StringUtils::HashValue(fFunctionName);
+	return fPath.HashValue() * 17
+		+ fFunctionName.HashValue();
 }
 
 

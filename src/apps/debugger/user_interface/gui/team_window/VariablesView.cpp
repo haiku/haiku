@@ -42,7 +42,6 @@
 #include "StackTrace.h"
 #include "StackFrame.h"
 #include "StackFrameValues.h"
-#include "StringUtils.h"
 #include "StringValue.h"
 #include "SyntheticPrimitiveType.h"
 #include "TableCellValueEditor.h"
@@ -245,7 +244,7 @@ protected:
 	virtual	uint32 ComputeHashValue() const
 	{
 		uint32 hash = reinterpret_cast<addr_t>(fInfo);
-		hash = hash * 19 + StringUtils::HashValue(fInfo->Expression());
+		hash = hash * 19 + fInfo->Expression().HashValue();
 
 		return hash;
 	}

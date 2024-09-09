@@ -26,7 +26,6 @@
 #include "Register.h"
 #include "RegisterMap.h"
 #include "ReturnValueID.h"
-#include "StringUtils.h"
 #include "Tracing.h"
 #include "ValueLocation.h"
 #include "Variable.h"
@@ -63,7 +62,7 @@ protected:
 	virtual uint32 ComputeHashValue() const
 	{
 		uint32 hash = fFunctionID->HashValue();
-		return hash * 19 + StringUtils::HashValue(fName);
+		return hash * 19 + fName.HashValue();
 	}
 
 private:
@@ -106,7 +105,7 @@ protected:
 	virtual uint32 ComputeHashValue() const
 	{
 		uint32 hash = fFunctionID->HashValue();
-		hash = hash * 19 + StringUtils::HashValue(fName);
+		hash = hash * 19 + fName.HashValue();
 		hash = hash * 19 + fLine;
 		hash = hash * 19 + fColumn;
 		return hash;
@@ -152,7 +151,7 @@ protected:
 	virtual uint32 ComputeHashValue() const
 	{
 		uint32 hash = fFunctionID->HashValue();
-		return hash * 25 + StringUtils::HashValue(fName);
+		return hash * 25 + fName.HashValue();
 	}
 
 private:

@@ -285,7 +285,6 @@ local sources =
 	BitBuffer.cpp
 	IntegerFormatter.cpp
 	RangeList.cpp
-	StringUtils.cpp
 	Worker.cpp
 
 	# value

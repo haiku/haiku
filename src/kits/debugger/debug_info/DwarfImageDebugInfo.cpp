@@ -50,7 +50,6 @@
 #include "SourceFile.h"
 #include "StackFrame.h"
 #include "Statement.h"
-#include "StringUtils.h"
 #include "SymbolInfo.h"
 #include "TargetAddressRangeList.h"
 #include "Team.h"
@@ -247,7 +246,7 @@ struct DwarfImageDebugInfo::TypeNameKey {
 
 	uint32 HashValue() const
 	{
-		return StringUtils::HashValue(typeName);
+		return typeName.HashValue();
 	}
 
 	bool operator==(const TypeNameKey& other) const

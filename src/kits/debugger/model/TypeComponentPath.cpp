@@ -10,8 +10,6 @@
 
 #include <new>
 
-#include "StringUtils.h"
-
 
 // #pragma mark - TypeComponent
 
@@ -32,7 +30,7 @@ uint32
 TypeComponent::HashValue() const
 {
 	uint32 hash = ((uint32)index << 8) | (componentKind << 4) | typeKind;
-	return StringUtils::HashValue(name) * 13 + hash;
+	return name.HashValue() * 13 + hash;
 }
 
 

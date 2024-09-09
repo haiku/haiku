@@ -14,7 +14,6 @@
 #include "LocatableDirectory.h"
 #include "LocatableFile.h"
 #include "SourceFile.h"
-#include "StringUtils.h"
 #include "TeamFileManagerSettings.h"
 
 
@@ -58,8 +57,8 @@ struct FileManager::EntryPath {
 
 	size_t HashValue() const
 	{
-		return StringUtils::HashValue(directory)
-			^ StringUtils::HashValue(name);
+		return BString::HashValue(directory)
+			^ BString::HashValue(name);
 	}
 
 	bool operator==(const EntryPath& other) const
@@ -519,7 +518,7 @@ struct FileManager::SourceFileHashDefinition {
 
 	size_t HashKey(const BString& key) const
 	{
-		return StringUtils::HashValue(key);
+		return key.HashValue();
 	}
 
 	size_t Hash(const SourceFileEntry* value) const

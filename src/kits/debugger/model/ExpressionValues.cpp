@@ -11,7 +11,6 @@
 
 #include "FunctionID.h"
 #include "model/Thread.h"
-#include "StringUtils.h"
 
 
 struct ExpressionValues::Key {
@@ -30,7 +29,7 @@ struct ExpressionValues::Key {
 	uint32 HashValue() const
 	{
 		return function->HashValue() ^ thread->ID()
-			^ StringUtils::HashValue(expression);
+			^ expression.HashValue();
 	}
 
 	bool operator==(const Key& other) const
