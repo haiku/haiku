@@ -91,7 +91,7 @@ float
 ReadOnlyTint(rgb_color base)
 {
 	// darken tint if read-only (or lighten if dark)
-	return base.IsLight() ? B_DARKEN_1_TINT : 0.85;
+	return base.IsLight() ? B_DARKEN_1_TINT : 0.853;
 }
 
 

@@ -456,13 +456,12 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 	textView->AddFilter(new BMessageFilter(B_KEY_DOWN, TextViewKeyDownFilter));
 
 	if (view->SelectedVolumeIsReadOnly()) {
+		textView->AdoptSystemColors();
 		textView->MakeEditable(false);
 		textView->MakeSelectable(true);
-		// tint text view background color to indicate not editable
-		textView->SetViewColor(tint_color(textView->ViewColor(),
-			ReadOnlyTint(textView->ViewColor())));
-	} else
+	} else {
 		textView->AddFilter(new BMessageFilter(B_PASTE, TextViewPasteFilter));
+	}
 
 	// get full text length
 	rect.right = rect.left + textView->LineWidth();
