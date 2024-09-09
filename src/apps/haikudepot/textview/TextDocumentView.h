@@ -34,7 +34,6 @@ public:
 	virtual	void				MakeFocus(bool focus = true);
 
 	virtual	void				MouseDown(BPoint where);
-	virtual	void				MouseUp(BPoint where);
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 
@@ -106,7 +105,6 @@ private:
 			int32				fCaretBlinkToken;
 			bool				fSelectionEnabled;
 			bool				fShowCaret;
-			bool				fMouseDown;
 };
 
 #endif // TEXT_DOCUMENT_VIEW_H

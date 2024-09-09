@@ -27,6 +27,8 @@ enum {
 TextDocumentView::TextDocumentView(const char* name)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	fTextDocument(NULL),
+	fTextEditor(NULL),
 	fInsetLeft(0.0f),
 	fInsetTop(0.0f),
 	fInsetRight(0.0f),
@@ -36,8 +38,7 @@ TextDocumentView::TextDocumentView(const char* name)
 	fCaretBlinker(NULL),
 	fCaretBlinkToken(0),
 	fSelectionEnabled(true),
-	fShowCaret(false),
-	fMouseDown(false)
+	fShowCaret(false)
 {
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 
@@ -143,6 +144,9 @@ TextDocumentView::MakeFocus(bool focus)
 void
 TextDocumentView::MouseDown(BPoint where)
 {
+	if (!fTextEditor.IsSet() || !fTextDocument.IsSet())
+		return BView::MouseDown(where);
+
 	BMessage* currentMessage = NULL;
 	if (Window() != NULL)
 		currentMessage = Window()->CurrentMessage();
@@ -166,25 +170,21 @@ TextDocumentView::MouseDown(BPoint where)
 	if (currentMessage != NULL)
 		currentMessage->FindInt32("modifiers", &modifiers);
 
-	fMouseDown = true;
 	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 
 	bool extendSelection = (modifiers & B_SHIFT_KEY) != 0;
 	SetCaret(where, extendSelection);
+
+	BView::MouseDown(where);
 }
 
 
 void
-TextDocumentView::MouseUp(BPoint where)
+TextDocumentView::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
 {
-	fMouseDown = false;
-}
+	if (!fTextEditor.IsSet() || !fTextDocument.IsSet())
+		return BView::MouseMoved(where, transit, dragMessage);
 
-
-void
-TextDocumentView::MouseMoved(BPoint where, uint32 transit,
-	const BMessage* dragMessage)
-{
 	BCursor cursor(B_CURSOR_ID_I_BEAM);
 
 	if (transit != B_EXITED_VIEW) {
@@ -202,8 +202,13 @@ TextDocumentView::MouseMoved(BPoint where, uint32 transit,
 
 	SetViewCursor(&cursor);
 
-	if (fMouseDown)
+	uint32 buttons = 0;
+	if (Window() != NULL)
+		Window()->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
+	if (buttons > 0)
 		SetCaret(where, true);
+
+	BView::MouseMoved(where, transit, dragMessage);
 }
 
 
