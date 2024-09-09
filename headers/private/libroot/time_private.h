@@ -11,9 +11,8 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include <SupportDefs.h>
+#include <OS.h>
 
-#include <new>
 
 #define CLOCKS_PER_SEC_BEOS					1000
 #define CLK_TCK_BEOS						CLOCKS_PER_SEC_BEOS

@@ -7,6 +7,7 @@
 #include <StackOrHeapArray.h>
 
 #include <libroot/errno_private.h>
+#include <libroot/time_private.h>
 #include <syscalls.h>
 #include <event_queue_defs.h>
 
@@ -187,7 +188,10 @@ kevent(int kq,
 		bigtime_t timeout = 0;
 		uint32 waitFlags = 0;
 		if (tspec != NULL) {
-			timeout = (tspec->tv_sec * 1000000LL) + (tspec->tv_nsec / 1000LL);
+			if (!timespec_to_bigtime(*tspec, timeout)) {
+				__set_errno(EINVAL);
+				return -1;
+			}
 			waitFlags |= B_RELATIVE_TIMEOUT;
 		}
 
