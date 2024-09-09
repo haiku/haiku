@@ -6,10 +6,12 @@
 #ifndef CREDENTIAL_STORAGE_H
 #define CREDENTIAL_STORAGE_H
 
-#include "HashKeys.h"
-#include "HashMap.h"
+
 #include <Locker.h>
 #include <String.h>
+
+#include "HashMap.h"
+#include "HashString.h"
 
 
 class BFile;
@@ -48,10 +50,10 @@ public:
 	static	CredentialsStorage*	SessionInstance();
 	static	CredentialsStorage*	PersistentInstance();
 
-			bool				Contains(const HashKeyString& key);
-			status_t			PutCredentials(const HashKeyString& key,
+			bool				Contains(const BPrivate::HashString& key);
+			status_t			PutCredentials(const HashString& key,
 									const Credentials& credentials);
-			Credentials			GetCredentials(const HashKeyString& key);
+			Credentials			GetCredentials(const HashString& key);
 
 private:
 								CredentialsStorage(bool persistent);
@@ -63,7 +65,7 @@ private:
 									uint32 mode) const;
 
 private:
-			typedef HashMap<HashKeyString, Credentials> CredentialMap;
+			typedef HashMap<HashString, Credentials> CredentialMap;
 			CredentialMap		fCredentialMap;
 
 	static	CredentialsStorage	sPersistentInstance;
@@ -74,4 +76,3 @@ private:
 
 
 #endif // CREDENTIAL_STORAGE_H
-

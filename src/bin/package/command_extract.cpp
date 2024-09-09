@@ -260,7 +260,7 @@ private:
 
 		size_t HashKey(const char* key) const
 		{
-			return string_hash(key);
+			return BString::HashValue(key);
 		}
 
 		size_t Hash(const Entry* value) const

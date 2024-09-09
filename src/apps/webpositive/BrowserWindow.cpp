@@ -1813,7 +1813,7 @@ BrowserWindow::AuthenticationChallenge(BString message, BString& inOutUser,
 		= CredentialsStorage::SessionInstance();
 
 	// TODO: Using the message as key here is not so smart.
-	HashKeyString key(message);
+	HashString key(message);
 
 	if (failureCount == 0) {
 		if (persistentStorage->Contains(key)) {

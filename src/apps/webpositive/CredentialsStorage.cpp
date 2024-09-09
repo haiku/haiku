@@ -158,7 +158,7 @@ CredentialsStorage::PersistentInstance()
 
 
 bool
-CredentialsStorage::Contains(const HashKeyString& key)
+CredentialsStorage::Contains(const HashString& key)
 {
 	BAutolock _(this);
 
@@ -167,7 +167,7 @@ CredentialsStorage::Contains(const HashKeyString& key)
 
 
 status_t
-CredentialsStorage::PutCredentials(const HashKeyString& key,
+CredentialsStorage::PutCredentials(const HashString& key,
 	const Credentials& credentials)
 {
 	BAutolock _(this);
@@ -177,7 +177,7 @@ CredentialsStorage::PutCredentials(const HashKeyString& key,
 
 
 Credentials
-CredentialsStorage::GetCredentials(const HashKeyString& key)
+CredentialsStorage::GetCredentials(const HashString& key)
 {
 	BAutolock _(this);
 
@@ -226,7 +226,7 @@ CredentialsStorage::_SaveSettings() const
 			const CredentialMap::Entry& entry = iterator.Next();
 			if (entry.value.Archive(&credentialsArchive) != B_OK
 				|| credentialsArchive.AddString("key",
-					entry.key.value) != B_OK) {
+					entry.key.GetString()) != B_OK) {
 				break;
 			}
 			if (settingsArchive.AddMessage("credentials",

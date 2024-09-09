@@ -8,6 +8,7 @@
 
 #include <new>
 
+#include <String.h>
 #include <util/OpenHashTable.h>
 
 
@@ -16,9 +17,6 @@ namespace BPackageKit {
 namespace BHPKG {
 
 namespace BPrivate {
-
-
-uint32	hash_string(const char* string);
 
 
 struct CachedString {
@@ -57,7 +55,7 @@ struct CachedStringHashDefinition {
 
 	size_t HashKey(const char* key) const
 	{
-		return hash_string(key);
+		return BString::HashValue(key);
 	}
 
 	size_t Hash(const CachedString* value) const
