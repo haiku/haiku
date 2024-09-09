@@ -20,6 +20,9 @@ extern "C" {
 #endif
 
 
+#define PTHREAD_MAX_NAMELEN_NP	32	// B_OS_NAME_LENGTH
+
+
 extern int pthread_getattr_np(pthread_t thread, pthread_attr_t* attr);
 
 extern int pthread_getname_np(pthread_t thread, char* buffer, size_t length);
