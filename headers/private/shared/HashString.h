@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2004-2007, Ingo Weinhold <ingo_weinhold@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef HASH_STRING_H
@@ -7,28 +7,24 @@
 
 #include <SupportDefs.h>
 
-// string_hash
-//
-// from the Dragon Book: a slightly modified hashpjw()
-static inline
-uint32
-string_hash(const char *name)
+
+static inline uint32
+string_hash(const char *_string)
 {
-	uint32 h = 0;
-	if (name) {
-		for (; *name; name++) {
-			uint32 g = h & 0xf0000000;
-			if (g)
-				h ^= g >> 24;
-			h = (h << 4) + *name;
-		}
-	}
+	const uint8* string = (const uint8*)_string;
+	if (string == NULL)
+		return 0;
+
+	uint32 h = 5381;
+	char c;
+	while ((c = *string++) != 0)
+		h = (h * 33) + c;
 	return h;
 }
 
-#ifdef __cplusplus
 
 namespace BPrivate {
+
 
 // HashString
 class HashString {
@@ -60,10 +56,11 @@ private:
 	char	*fString;
 };
 
+
 }	// namespace BPrivate
+
 
 using BPrivate::HashString;
 
-#endif	// __cplusplus
 
 #endif	// HASH_STRING_H

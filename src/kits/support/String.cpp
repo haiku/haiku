@@ -227,19 +227,17 @@ BString::CountBytes(int32 fromCharOffset, int32 charCount) const
 
 
 /*static*/ uint32
-BString::HashValue(const char* string)
+BString::HashValue(const char* _string)
 {
-	// from the Dragon Book: a slightly modified hashpjw()
-    uint32 h = 0;
-    if (string != NULL) {
-        for (; *string; string++) {
-            uint32 g = h & 0xf0000000;
-            if (g)
-                h ^= g >> 24;
-            h = (h << 4) + *string;
-        }
-    }
-    return h;
+	const uint8* string = (const uint8*)_string;
+	if (string == NULL)
+		return 0;
+
+	uint32 h = 5381;
+	char c;
+	while ((c = *string++) != 0)
+		h = (h * 33) + c;
+	return h;
 }
 
 
