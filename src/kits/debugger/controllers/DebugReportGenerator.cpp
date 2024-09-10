@@ -29,7 +29,6 @@
 #include "StackFrame.h"
 #include "StackTrace.h"
 #include "Statement.h"
-#include "StringUtils.h"
 #include "SystemInfo.h"
 #include "Team.h"
 #include "TeamDebugInfo.h"
