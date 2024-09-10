@@ -20,6 +20,14 @@ extern int32 gMappedPagesCount;
 
 struct vm_page_reservation {
 	uint32	count;
+
+#if KDEBUG && defined(__cplusplus)
+	vm_page_reservation() : count(0) {}
+	~vm_page_reservation()
+	{
+		ASSERT(count == 0);
+	}
+#endif
 };
 
 

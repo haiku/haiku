@@ -3990,8 +3990,10 @@ vm_page_allocate_page_run(uint32 flags, page_num_t length,
 
 		if (foundRun) {
 			i = allocate_page_run(start, length, flags, freeClearQueueLocker);
-			if (i == length)
+			if (i == length) {
+				reservation.count = 0;
 				return &sPages[start];
+			}
 
 			// apparently a cached page couldn't be allocated -- skip it and
 			// continue
