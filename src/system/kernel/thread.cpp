@@ -2878,13 +2878,13 @@ thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum)
 //	#pragma mark - thread blocking API
 
 
-static status_t
+static int32
 thread_block_timeout(timer* timer)
 {
 	Thread* thread = (Thread*)timer->user_data;
-	timer->user_data = NULL;
 	thread_unblock(thread, B_TIMED_OUT);
 
+	timer->user_data = NULL;
 	return B_HANDLED_INTERRUPT;
 }
 
