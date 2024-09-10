@@ -202,6 +202,8 @@
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
 
+	\see SetFontAndColor()
+
 	\since BeOS R3
 */
 
@@ -232,6 +234,8 @@
 	\param name The name of the object.
 	\param flags \a flags passed to BView, \c B_FRAME_EVENTS,
 		\c B_PULSE_NEEDED and \c B_INPUT_METHOD_AWARE are always set.
+
+	\see SetFontAndColor()
 
 	\since Haiku R1
 */
@@ -1237,6 +1241,97 @@
 	        editable.
 
 	\see MakeEditable()
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\name GetFontandColor() and SetFontAndColor()
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BTextView::GetFontAndColor(int32 offset, BFont* _font,
+		rgb_color* _color) const
+	\brief Fill out \a _font and \a _color at specified text \a offset.
+
+	\param offset The text \a offset to fill in the \a _font and \a _color from.
+	\param _font The BFont to fill out.
+	\param _color The rgb_color to fill out.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextView::GetFontAndColor(BFont* _font, uint32* _mode,
+		rgb_color* _color, bool* _sameColor) const
+	\brief Fill out \a _font, \a _mode, \a _color and \a sameColor with the font
+	       and color of the current selection.
+
+	\param _font The BFont to fill out.
+	\param _mode The font mode. \see SetFontAndColor() for mode.
+	\param _color The rgb_color to fill out.
+	\param _sameColor Whether or not the color is the same as passed in.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextView::SetFontAndColor(const BFont* font, uint32 mode,
+		const rgb_color* color)
+	\brief Set \a font and text \a color of the current selection.
+	       The default \a mode is \c B_FONT_ALL.
+
+	\param font The BFont to set, a copy is made.
+	\param mode Font mode bitmap of one or more the following constants:
+	       - \c B_FONT_ALL
+	       - \c B_FONT_FAMILY_AND_STYLE
+	       - \c B_FONT_SIZE
+	       - \c B_FONT_SHEAR
+	       - \c B_FONT_ROTATION
+	       - \c B_FONT_SPACING
+	       - \c B_FONT_ENCODING
+	       - \c B_FONT_FACE
+	       - \c B_FONT_FLAGS
+	       - \c B_FONT_FALSE_BOLD_WIDTH
+	\param color The text color to set, a copy is made. \c NULL to keep the
+	       current color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
+		const BFont* font, uint32 mode, const rgb_color* color)
+	\brief Set the font and color of a selection starting at \a startoffset
+	       ending at \a endOffset. The default \a mode is \c B_FONT_ALL.
+
+	\param startOffset The start offset.
+	\param endOffset The end offset.
+	\param font The BFont to set, a copy is made.
+	\param mode Font mode bitmap of one or more the following constants:
+	       - \c B_FONT_ALL
+	       - \c B_FONT_FAMILY_AND_STYLE
+	       - \c B_FONT_SIZE
+	       - \c B_FONT_SHEAR
+	       - \c B_FONT_ROTATION
+	       - \c B_FONT_SPACING
+	       - \c B_FONT_ENCODING
+	       - \c B_FONT_FACE
+	       - \c B_FONT_FLAGS
+	       - \c B_FONT_FALSE_BOLD_WIDTH
+	\param color The text color to set, a copy is made. \c NULL to keep the
+	       current color.
 
 	\since BeOS R3
 */
