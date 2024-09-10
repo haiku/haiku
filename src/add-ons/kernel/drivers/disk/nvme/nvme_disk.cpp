@@ -780,6 +780,8 @@ nvme_disk_io(void* cookie, io_request* request)
 	if (status != B_OK)
 		TRACE_ERROR("I/O failed: %s\n", strerror(status));
 
+	readLocker.Unlock();
+
 	request->SetTransferredBytes(status != B_OK,
 		(nvme_request.lba_start * block_size) - rounded_pos);
 	request->SetStatusAndNotify(status);
