@@ -1575,6 +1575,7 @@ init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
 	cpu_ent* cpu = get_cpu_struct();
 	if (cpu->arch.vendor != VENDOR_INTEL)
 		return;
+
 	uint32 model = (cpu->arch.extended_model << 4) | cpu->arch.model;
 	cpuid_info cpuid;
 	get_current_cpuid(&cpuid, 0, 0);
@@ -1600,6 +1601,7 @@ init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
 	}
 	if (khz == 0)
 		return;
+
 	dprintf("CPU: using TSC frequency from CPUID\n");
 	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
 	// or (1000 << 32) / (tsc freq in kHz)
@@ -1615,6 +1617,7 @@ init_tsc_with_msr(kernel_args* args, uint32* conversionFactor)
 	cpu_ent* cpuEnt = get_cpu_struct();
 	if (cpuEnt->arch.vendor != VENDOR_AMD)
 		return;
+
 	uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
 	if (family < 0x10)
 		return;
@@ -1654,12 +1657,9 @@ init_tsc(kernel_args* args)
 
 	// try to find the TSC frequency with CPUID
 	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
-	if (!x86_check_feature(IA32_FEATURE_EXT_HYPERVISOR, FEATURE_EXT)) {
-		init_tsc_with_cpuid(args, &conversionFactor);
-		init_tsc_with_msr(args, &conversionFactor);
-	}
+	init_tsc_with_cpuid(args, &conversionFactor);
+	init_tsc_with_msr(args, &conversionFactor);
 	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
-
 
 #ifdef __x86_64__
 	// The x86_64 system_time() implementation uses 64-bit multiplication and
