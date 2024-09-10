@@ -801,13 +801,12 @@ struct PackageListView::RowByNameHashDefinition {
 
 	size_t HashKey(const char* key) const
 	{
-		return BPackageKit::BHPKG::BPrivate::hash_string(key);
+		return BString::HashValue(key);
 	}
 
 	size_t Hash(PackageRow* value) const
 	{
-		return BPackageKit::BHPKG::BPrivate::hash_string(
-			value->Package()->Name().String());
+		return HashKey(value->Package()->Name().String());
 	}
 
 	bool Compare(const char* key, PackageRow* value) const
