@@ -206,7 +206,7 @@ CredentialsStorage::_LoadSettings()
 			BString key;
 			if (credentialsArchive.FindString("key", &key) == B_OK) {
 				Credentials credentials(&credentialsArchive);
-				fCredentialMap.Put(key, credentials);
+				fCredentialMap.Put(key.String(), credentials);
 			}
 		}
 	}
