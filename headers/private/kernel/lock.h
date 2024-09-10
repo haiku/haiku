@@ -164,6 +164,14 @@ extern status_t mutex_switch_lock(mutex* from, mutex* to);
 extern status_t mutex_switch_from_read_lock(rw_lock* from, mutex* to);
 	// Like mutex_switch_lock(), just for switching from a read-locked rw_lock.
 
+#if KDEBUG
+extern status_t mutex_lock(mutex* lock);
+extern void mutex_unlock(mutex* lock);
+extern status_t mutex_trylock(mutex* lock);
+extern status_t mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags,
+	bigtime_t timeout);
+#endif
+
 
 // implementation private:
 
@@ -173,11 +181,12 @@ extern status_t _rw_lock_read_lock_with_timeout(rw_lock* lock,
 extern void _rw_lock_read_unlock(rw_lock* lock);
 extern void _rw_lock_write_unlock(rw_lock* lock);
 
+#if !KDEBUG
 extern status_t _mutex_lock(mutex* lock, void* locker);
 extern void _mutex_unlock(mutex* lock);
-extern status_t _mutex_trylock(mutex* lock);
 extern status_t _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags,
 	bigtime_t timeout);
+#endif
 
 
 static inline status_t
@@ -229,53 +238,41 @@ rw_lock_write_unlock(rw_lock* lock)
 }
 
 
+#if !KDEBUG
 static inline status_t
 mutex_lock(mutex* lock)
 {
-#if KDEBUG
-	return _mutex_lock(lock, NULL);
-#else
 	if (atomic_add(&lock->count, -1) < 0)
 		return _mutex_lock(lock, NULL);
 	return B_OK;
-#endif
 }
 
 
 static inline status_t
 mutex_trylock(mutex* lock)
 {
-#if KDEBUG
-	return _mutex_trylock(lock);
-#else
 	if (atomic_test_and_set(&lock->count, -1, 0) != 0)
 		return B_WOULD_BLOCK;
 	return B_OK;
-#endif
 }
 
 
 static inline status_t
 mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 {
-#if KDEBUG
-	return _mutex_lock_with_timeout(lock, timeoutFlags, timeout);
-#else
 	if (atomic_add(&lock->count, -1) < 0)
 		return _mutex_lock_with_timeout(lock, timeoutFlags, timeout);
 	return B_OK;
-#endif
 }
 
 
 static inline void
 mutex_unlock(mutex* lock)
 {
-#if !KDEBUG
 	if (atomic_add(&lock->count, 1) < -1)
-#endif
 		_mutex_unlock(lock);
 }
+#endif
 
 
 static inline void

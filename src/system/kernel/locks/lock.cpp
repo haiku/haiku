@@ -8,17 +8,25 @@
  */
 
 
-/*! Mutex and recursive_lock code */
+#include <debug.h>
 
+#if KDEBUG
+#define KDEBUG_STATIC static
+static status_t _mutex_lock(struct mutex* lock, void* locker);
+static void _mutex_unlock(struct mutex* lock);
+#else
+#define KDEBUG_STATIC
+#define mutex_lock		mutex_lock_inline
+#define mutex_unlock	mutex_unlock_inline
+#define mutex_trylock	mutex_trylock_inline
+#define mutex_lock_with_timeout	mutex_lock_with_timeout_inline
+#endif
 
 #include <lock.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-#include <OS.h>
-
-#include <debug.h>
 #include <int.h>
 #include <kernel.h>
 #include <listeners.h>
@@ -954,7 +962,7 @@ mutex_switch_from_read_lock(rw_lock* from, mutex* to)
 }
 
 
-status_t
+KDEBUG_STATIC status_t
 _mutex_lock(mutex* lock, void* _locker)
 {
 #if KDEBUG
@@ -1022,7 +1030,7 @@ _mutex_lock(mutex* lock, void* _locker)
 }
 
 
-void
+KDEBUG_STATIC void
 _mutex_unlock(mutex* lock)
 {
 	InterruptsSpinLocker locker(lock->lock);
@@ -1064,25 +1072,7 @@ _mutex_unlock(mutex* lock)
 }
 
 
-status_t
-_mutex_trylock(mutex* lock)
-{
-#if KDEBUG
-	InterruptsSpinLocker _(lock->lock);
-
-	if (lock->holder < 0) {
-		lock->holder = thread_get_current_thread_id();
-		return B_OK;
-	} else if (lock->holder == 0)
-		panic("_mutex_trylock(): using uninitialized lock %p", lock);
-	return B_WOULD_BLOCK;
-#else
-	return mutex_trylock(lock);
-#endif
-}
-
-
-status_t
+KDEBUG_STATIC status_t
 _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 {
 #if KDEBUG
@@ -1180,6 +1170,62 @@ _mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
 	}
 
 	return error;
+}
+
+
+#undef mutex_trylock
+status_t
+mutex_trylock(mutex* lock)
+{
+#if KDEBUG
+	InterruptsSpinLocker _(lock->lock);
+
+	if (lock->holder < 0) {
+		lock->holder = thread_get_current_thread_id();
+		return B_OK;
+	} else if (lock->holder == 0) {
+		panic("_mutex_trylock(): using uninitialized lock %p", lock);
+	}
+	return B_WOULD_BLOCK;
+#else
+	return mutex_trylock_inline(lock);
+#endif
+}
+
+
+#undef mutex_lock
+status_t
+mutex_lock(mutex* lock)
+{
+#if KDEBUG
+	return _mutex_lock(lock, NULL);
+#else
+	return mutex_lock_inline(lock);
+#endif
+}
+
+
+#undef mutex_unlock
+void
+mutex_unlock(mutex* lock)
+{
+#if KDEBUG
+	_mutex_unlock(lock);
+#else
+	mutex_unlock_inline(lock);
+#endif
+}
+
+
+#undef mutex_lock_with_timeout
+status_t
+mutex_lock_with_timeout(mutex* lock, uint32 timeoutFlags, bigtime_t timeout)
+{
+#if KDEBUG
+	return _mutex_lock_with_timeout(lock, timeoutFlags, timeout);
+#else
+	return mutex_lock_with_timeout_inline(lock, timeoutFlags, timeout);
+#endif
 }
 
 
