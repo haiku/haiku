@@ -82,12 +82,15 @@ AddressSpaceReadLocker::Unset()
 	Unlock();
 	if (fSpace != NULL)
 		fSpace->Put();
+	fSpace = NULL;
 }
 
 
 status_t
 AddressSpaceReadLocker::SetTo(team_id team)
 {
+	ASSERT(fSpace == NULL);
+
 	fSpace = VMAddressSpace::Get(team);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
@@ -104,6 +107,8 @@ AddressSpaceReadLocker::SetTo(team_id team)
 void
 AddressSpaceReadLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 {
+	ASSERT(fSpace == NULL);
+
 	fSpace = space;
 
 	if (getNewReference)
@@ -117,6 +122,8 @@ AddressSpaceReadLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 status_t
 AddressSpaceReadLocker::SetFromArea(area_id areaID, VMArea*& area)
 {
+	ASSERT(fSpace == NULL);
+
 	fSpace = GetAddressSpaceByAreaID(areaID);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
@@ -205,12 +212,15 @@ AddressSpaceWriteLocker::Unset()
 	Unlock();
 	if (fSpace != NULL)
 		fSpace->Put();
+	fSpace = NULL;
 }
 
 
 status_t
 AddressSpaceWriteLocker::SetTo(team_id team)
 {
+	ASSERT(fSpace == NULL);
+
 	fSpace = VMAddressSpace::Get(team);
 	if (fSpace == NULL)
 		return B_BAD_TEAM_ID;
@@ -224,6 +234,8 @@ AddressSpaceWriteLocker::SetTo(team_id team)
 void
 AddressSpaceWriteLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 {
+	ASSERT(fSpace == NULL);
+
 	fSpace = space;
 
 	if (getNewReference)
@@ -237,6 +249,8 @@ AddressSpaceWriteLocker::SetTo(VMAddressSpace* space, bool getNewReference)
 status_t
 AddressSpaceWriteLocker::SetFromArea(area_id areaID, VMArea*& area)
 {
+	ASSERT(fSpace == NULL);
+
 	fSpace = GetAddressSpaceByAreaID(areaID);
 	if (fSpace == NULL)
 		return B_BAD_VALUE;
@@ -259,6 +273,8 @@ status_t
 AddressSpaceWriteLocker::SetFromArea(team_id team, area_id areaID,
 	bool allowKernel, VMArea*& area)
 {
+	ASSERT(fSpace == NULL);
+
 	VMAreas::ReadLock();
 
 	area = VMAreas::LookupLocked(areaID);
