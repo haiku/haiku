@@ -127,7 +127,8 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID, bool missing)
 	}
 
 	// Avoid deadlock if system had to wait for free memory
-	entry = (EntryCacheEntry*)malloc_etc(sizeof(EntryCacheEntry) + strlen(name),
+	const size_t nameLen = strlen(name);
+	entry = (EntryCacheEntry*)malloc_etc(sizeof(EntryCacheEntry) + nameLen,
 		CACHE_DONT_WAIT_FOR_MEMORY);
 
 	if (entry == NULL)
@@ -138,7 +139,7 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID, bool missing)
 	entry->missing = missing;
 	entry->generation = fCurrentGeneration;
 	entry->index = kEntryNotInArray;
-	strcpy(entry->name, name);
+	memcpy(entry->name, name, nameLen + 1);
 
 	fEntries.Insert(entry);
 
