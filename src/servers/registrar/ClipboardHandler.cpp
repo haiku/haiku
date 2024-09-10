@@ -150,7 +150,7 @@ ClipboardHandler::MessageReceived(BMessage *message)
 			reply.AddInt32("result", result);
 			result = message->SendReply(&reply);
 			if (result != B_OK) {
-				reply = BMessage();
+				reply.MakeEmpty();
 				reply.what = B_REG_RESULT;
 				reply.AddInt32("result", result);
 				message->SendReply(&reply);
