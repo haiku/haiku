@@ -669,22 +669,26 @@ _rw_lock_read_lock_with_timeout(rw_lock* lock, uint32 timeoutFlags,
 void
 _rw_lock_read_unlock(rw_lock* lock)
 {
+#if KDEBUG_RW_LOCK_DEBUG
+	int32 oldCount = atomic_add(&lock->count, -1);
+	if (oldCount < RW_LOCK_WRITER_COUNT_BASE) {
+		_rw_lock_unset_read_locked(lock);
+		return;
+	}
+#endif
+
 	InterruptsSpinLocker locker(lock->lock);
 
 	// If we're still holding the write lock or if there are other readers,
 	// no-one can be woken up.
 	if (lock->holder == thread_get_current_thread_id()) {
-		ASSERT(lock->owner_count % RW_LOCK_WRITER_COUNT_BASE > 0);
+		ASSERT((lock->owner_count % RW_LOCK_WRITER_COUNT_BASE) > 0);
 		lock->owner_count--;
 		return;
 	}
 
 #if KDEBUG_RW_LOCK_DEBUG
 	_rw_lock_unset_read_locked(lock);
-
-	int32 oldCount = atomic_add(&lock->count, -1);
-	if (oldCount < RW_LOCK_WRITER_COUNT_BASE)
-		return;
 #endif
 
 	if (--lock->active_readers > 0)
