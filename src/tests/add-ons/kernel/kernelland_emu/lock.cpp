@@ -7,7 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
-#include <lock.h>
+#include <debug.h>
 
 #if KDEBUG
 #define KDEBUG_STATIC static
@@ -20,6 +20,8 @@ static void _mutex_unlock(struct mutex* lock);
 #define mutex_trylock	mutex_trylock_inline
 #define mutex_lock_with_timeout	mutex_lock_with_timeout_inline
 #endif
+
+#include <lock.h>
 
 #include <stdlib.h>
 #include <string.h>
