@@ -350,7 +350,18 @@ dump_object_info(int argc, char* argv[])
 	}
 
 	kprintf("address %p\n", object);
-	kprintf("\tobject_cache\t%p (%s)\n", cache, cache->name);
+	kprintf("\tslab_cache: %p (%s)\n", cache, cache->name);
+
+	MutexTryLocker cacheLocker(cache->lock);
+	if (cacheLocker.IsLocked()) {
+		slab* slab = cache->ObjectSlab(object);
+		const char* slabType = cache->empty.Contains(slab) ? "empty"
+			: cache->partial.Contains(slab) ? "partial"
+			: cache->full.Contains(slab) ? "full" : NULL;
+
+		kprintf("\tobject is in %s slab: %p\n", slabType, slab);
+	}
+
 	return 0;
 }
 
