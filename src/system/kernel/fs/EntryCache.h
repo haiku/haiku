@@ -37,13 +37,14 @@ struct EntryCacheKey {
 
 
 struct EntryCacheEntry {
-			EntryCacheEntry*	hash_link;
-			ino_t				node_id;
-			ino_t				dir_id;
-			int32				generation;
-			int32				index;
-			bool				missing;
-			char				name[1];
+	EntryCacheEntry*	hash_link;
+	ino_t				node_id;
+	ino_t				dir_id;
+	uint32				hash;
+	int32				generation;
+	int32				index;
+	bool				missing;
+	char				name[1];
 };
 
 
@@ -70,11 +71,13 @@ struct EntryCacheHashDefinition {
 
 	uint32 Hash(const EntryCacheEntry* value) const
 	{
-		return EntryCacheKey::Hash(value->dir_id, value->name);
+		return value->hash;
 	}
 
 	bool Compare(const EntryCacheKey& key, const EntryCacheEntry* value) const
 	{
+		if (key.hash != value->hash)
+			return false;
 		return value->dir_id == key.dir_id
 			&& strcmp(value->name, key.name) == 0;
 	}

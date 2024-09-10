@@ -88,7 +88,7 @@ EntryCache::Init()
 	// TODO: Choose generation size/count more scientifically?
 	// TODO: Add low_resource handler hook?
 	if (vm_available_memory() >= (1024*1024*1024)) {
-		entriesSize = 8096;
+		entriesSize = 8192;
 		fGenerationCount = 16;
 	}
 
@@ -136,6 +136,7 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID, bool missing)
 
 	entry->node_id = nodeID;
 	entry->dir_id = dirID;
+	entry->hash = EntryCacheKey::Hash(dirID, name);
 	entry->missing = missing;
 	entry->generation = fCurrentGeneration;
 	entry->index = kEntryNotInArray;
