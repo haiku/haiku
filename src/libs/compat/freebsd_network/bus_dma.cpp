@@ -15,9 +15,10 @@ extern "C" {
 
 #include <machine/bus.h>
 #include <vm/vm_extern.h>
-}
 
-#include <vm/vm_page.h>
+phys_addr_t vm_page_max_address();
+	// declared in <vm/vm_page.h> which we can't include here.
+}
 
 
 // #pragma mark - structures
@@ -318,7 +319,7 @@ _prepare_bounce_buffer(bus_dmamap_t map, bus_size_t reqsize, int flags)
 
 	// The contiguous allocator will round up anyway, so we might as well
 	// do it first so that we know how large our buffer really is.
-	reqsize = ROUNDUP(reqsize, B_PAGE_SIZE);
+	reqsize = roundup(reqsize, B_PAGE_SIZE);
 
 	int error = _allocate_dmamem(map->dmat, reqsize, &map->bounce_buffer, flags);
 	if (error != 0)
