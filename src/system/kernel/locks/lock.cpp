@@ -477,6 +477,7 @@ _rw_lock_set_read_locked(rw_lock* lock)
 		thread->held_read_locks[i] = lock;
 		return;
 	}
+
 	panic("too many read locks!");
 }
 
@@ -492,6 +493,8 @@ _rw_lock_unset_read_locked(rw_lock* lock)
 		thread->held_read_locks[i] = NULL;
 		return;
 	}
+
+	panic("_rw_lock_unset_read_locked(): lock %p not read-locked by current thread", lock);
 }
 
 #endif
