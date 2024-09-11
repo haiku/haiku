@@ -89,6 +89,7 @@ Directory::AddChild(Node* node)
 void
 Directory::RemoveChild(Node* node)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	Node* nextNode = fChildList.GetNext(node);
 
 	fChildTable.Remove(node);
@@ -114,6 +115,7 @@ Directory::FindChild(const StringKey& name)
 void
 Directory::AddDirectoryIterator(DirectoryIterator* iterator)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	fIterators.Add(iterator);
 }
 
@@ -121,5 +123,6 @@ Directory::AddDirectoryIterator(DirectoryIterator* iterator)
 void
 Directory::RemoveDirectoryIterator(DirectoryIterator* iterator)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	fIterators.Remove(iterator);
 }

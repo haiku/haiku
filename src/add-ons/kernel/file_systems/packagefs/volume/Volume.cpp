@@ -568,6 +568,7 @@ Volume::IOCtl(Node* node, uint32 operation, void* buffer, size_t size)
 void
 Volume::AddNodeListener(NodeListener* listener, Node* node)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	ASSERT(!listener->IsListening());
 
 	listener->StartedListening(node);
@@ -582,6 +583,7 @@ Volume::AddNodeListener(NodeListener* listener, Node* node)
 void
 Volume::RemoveNodeListener(NodeListener* listener)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	ASSERT(listener->IsListening());
 
 	Node* node = listener->ListenedNode();
@@ -604,6 +606,7 @@ Volume::RemoveNodeListener(NodeListener* listener)
 void
 Volume::AddQuery(Query* query)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	fQueries.Add(query);
 }
 
@@ -611,6 +614,7 @@ Volume::AddQuery(Query* query)
 void
 Volume::RemoveQuery(Query* query)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
 	fQueries.Remove(query);
 }
 
