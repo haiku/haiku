@@ -1775,6 +1775,8 @@ Volume::_CreateShineThroughDirectories(const char* shineThroughSetting)
 status_t
 Volume::_PublishShineThroughDirectories()
 {
+	NodeWriteLocker rootDirectoryWriteLocker(fRootDirectory);
+
 	// Iterate through the root directory children and bind the shine-through
 	// directories to the respective mount point subdirectories.
 	Node* nextNode;

@@ -94,6 +94,7 @@ packagefs_unmount(fs_volume* fsVolume)
 
 	FUNCTION("volume: %p\n", volume);
 
+	volume->WriteLock();
 	volume->Unmount();
 	delete volume;
 
