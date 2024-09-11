@@ -52,7 +52,7 @@ struct Query::QueryPolicy {
 
 	static ino_t EntryGetParentID(Entry* entry)
 	{
-		return entry->Parent()->ID();
+		return entry->GetParentUnchecked()->ID();
 	}
 
 	static Node* EntryGetNode(Entry* entry)

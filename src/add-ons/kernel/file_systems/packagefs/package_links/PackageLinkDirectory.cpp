@@ -106,7 +106,7 @@ void
 PackageLinkDirectory::AddPackage(Package* package,
 	PackageLinksListener* listener)
 {
-	NodeWriteLocker writeLocker(this);
+	DirectoryWriteLocker writeLocker(this);
 
 	// Find the insertion point in the list. We sort by mount type -- the more
 	// specific the higher the priority.
@@ -132,7 +132,7 @@ PackageLinkDirectory::RemovePackage(Package* package,
 {
 	ASSERT(package->LinkDirectory() == this);
 
-	NodeWriteLocker writeLocker(this);
+	DirectoryWriteLocker writeLocker(this);
 
 	bool firstPackage = package == fPackages.Head();
 
@@ -150,7 +150,7 @@ PackageLinkDirectory::UpdatePackageDependencies(Package* package,
 {
 	ASSERT(package->LinkDirectory() == this);
 
-	NodeWriteLocker writeLocker(this);
+	DirectoryWriteLocker writeLocker(this);
 
 	// We only need to update, if that head package is affected.
 	if (package != fPackages.Head())
@@ -201,6 +201,8 @@ PackageLinkDirectory::_Update(PackageLinksListener* listener)
 status_t
 PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	Package* package = fPackages.Head();
 	if (package == NULL)
 		return B_OK;
@@ -217,8 +219,6 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 		if (node != NULL) {
 			// link already exists -- update
 			DependencyLink* link = static_cast<DependencyLink*>(node);
-
-			NodeWriteLocker linkLocker(link);
 			link->Update(resolvablePackage, listener);
 		} else {
 			// no link for the dependency yet -- create one
@@ -236,10 +236,8 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 			AddChild(link);
 			fDependencyLinks.Add(link);
 
-			if (listener != NULL) {
-				NodeWriteLocker linkLocker(link);
+			if (listener != NULL)
 				listener->PackageLinkNodeAdded(link);
-			}
 		}
 	}
 
@@ -250,13 +248,13 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 void
 PackageLinkDirectory::_RemoveLink(Link* link, PackageLinksListener* listener)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	if (link != NULL) {
-		NodeWriteLocker linkLocker(link);
 		if (listener != NULL)
 			listener->PackageLinkNodeRemoved(link);
 
 		RemoveChild(link);
-		linkLocker.Unlock();
 		link->ReleaseReference();
 	}
 }
@@ -266,6 +264,8 @@ status_t
 PackageLinkDirectory::_CreateOrUpdateLink(Link*& link, Package* package,
 	Link::Type type, const String& name, PackageLinksListener* listener)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	if (link == NULL) {
 		link = new(std::nothrow) Link(package, type);
 		if (link == NULL)
@@ -277,15 +277,11 @@ PackageLinkDirectory::_CreateOrUpdateLink(Link*& link, Package* package,
 
 		AddChild(link);
 
-		if (listener != NULL) {
-			NodeWriteLocker lLinkLocker(link);
+		if (listener != NULL)
 			listener->PackageLinkNodeAdded(link);
-		}
 	} else {
-		NodeWriteLocker lLinkLocker(link);
 		link->Update(package, listener);
 	}
-
 
 	return B_OK;
 }

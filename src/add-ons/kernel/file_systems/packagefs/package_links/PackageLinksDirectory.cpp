@@ -53,7 +53,7 @@ PackageLinksDirectory::AddPackage(Package* package)
 		RETURN_ERROR(error);
 
 	// add the link directory
-	NodeWriteLocker writeLocker(this);
+	DirectoryWriteLocker writeLocker(this);
 	if (Node* child = FindChild(linkDirectory->Name())) {
 		// There already is an entry with the name.
 		PackageLinkDirectory* otherLinkDirectory
@@ -64,16 +64,16 @@ PackageLinksDirectory::AddPackage(Package* package)
 		// There's already a package link directory. Delete the one we created
 		// and add the package to the pre-existing one.
 		linkDirectory->RemovePackage(package, NULL);
+		linkDirectoryReference.Unset();
+
 		linkDirectory = otherLinkDirectory;
 		linkDirectory->AddPackage(package, fListener);
 	} else {
 		// No entry is in the way, so just add the link directory.
 		AddChild(linkDirectory);
 
-		if (fListener != NULL) {
-			NodeWriteLocker writeLocker(linkDirectory);
+		if (fListener != NULL)
 			fListener->PackageLinkNodeAdded(linkDirectory);
-		}
 	}
 
 	return B_OK;
@@ -83,7 +83,7 @@ PackageLinksDirectory::AddPackage(Package* package)
 void
 PackageLinksDirectory::RemovePackage(Package* package)
 {
-	NodeWriteLocker writeLocker(this);
+	DirectoryWriteLocker writeLocker(this);
 
 	// get the package's link directory and remove the package from it
 	PackageLinkDirectory* linkDirectory = package->LinkDirectory();
@@ -97,7 +97,7 @@ PackageLinksDirectory::RemovePackage(Package* package)
 	// if empty, remove the link directory itself
 	if (linkDirectory->IsEmpty()) {
 		if (fListener != NULL) {
-			NodeWriteLocker linkDirectoryWriteLocker(linkDirectory);
+			DirectoryWriteLocker linkDirectoryWriteLocker(linkDirectory);
 			fListener->PackageLinkNodeRemoved(linkDirectory);
 		}
 
@@ -109,7 +109,7 @@ PackageLinksDirectory::RemovePackage(Package* package)
 void
 PackageLinksDirectory::UpdatePackageDependencies(Package* package)
 {
-	NodeWriteLocker writeLocker(this);
+	DirectoryWriteLocker writeLocker(this);
 
 	PackageLinkDirectory* linkDirectory = package->LinkDirectory();
 	if (linkDirectory == NULL)

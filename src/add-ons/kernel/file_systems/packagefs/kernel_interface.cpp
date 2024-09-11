@@ -41,6 +41,22 @@ static const uint32 kOptimalIOSize = 64 * 1024;
 // #pragma mark - helper functions
 
 
+static bool
+lock_directory_for_node(Volume* volume, Node* node, DirectoryReadLocker& locker)
+{
+	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		locker.SetTo(directory, false, true);
+		return locker.IsLocked();
+	} else {
+		BReference<Directory> parentRef = node->GetParent();
+		if (!parentRef.IsSet())
+			return false;
+		locker.SetTo(parentRef.Get(), false, true);
+		return locker.IsLocked() && node->GetParentUnchecked() == locker.Get();
+	}
+}
+
+
 static status_t
 check_access(Node* node, int mode)
 {
@@ -76,6 +92,7 @@ packagefs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 
 	status_t error = volume->Mount(parameters);
 	if (error != B_OK) {
+		volumeWriteLocker.Unlock();
 		delete volume;
 		return error;
 	}
@@ -128,40 +145,42 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	ino_t* _vnid)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	Node* dir = (Node*)fsDir->private_node;
+	Node* node = (Node*)fsDir->private_node;
 
 	FUNCTION("volume: %p, dir: %p (%" B_PRId64 "), entry: \"%s\"\n", volume,
 		dir, dir->ID(), entryName);
 
-	if (!S_ISDIR(dir->Mode()))
+	if (!S_ISDIR(node->Mode()))
 		return B_NOT_A_DIRECTORY;
+
+	Directory* dir = dynamic_cast<Directory*>(node);
 
 	// resolve "."
 	if (strcmp(entryName, ".") == 0) {
-		Node* node;
+		Node* self;
 		*_vnid = dir->ID();
-		return volume->GetVNode(*_vnid, node);
+		return volume->GetVNode(*_vnid, self);
 	}
 
 	// resolve ".."
 	if (strcmp(entryName, "..") == 0) {
-		Node* node;
-		*_vnid = dir->Parent()->ID();
-		return volume->GetVNode(*_vnid, node);
+		Node* parent;
+		*_vnid = dir->GetParentUnchecked()->ID();
+		return volume->GetVNode(*_vnid, parent);
 	}
 
 	// resolve normal entries -- look up the node
-	NodeReadLocker dirLocker(dir);
+	DirectoryReadLocker dirLocker(dir);
 	String entryNameString;
-	Node* node = dynamic_cast<Directory*>(dir)->FindChild(StringKey(entryName));
-	if (node == NULL)
+	Node* child = dir->FindChild(StringKey(entryName));
+	if (child == NULL)
 		return B_ENTRY_NOT_FOUND;
-	BReference<Node> nodeReference(node);
+	BReference<Node> childReference(child);
 	dirLocker.Unlock();
 
 	// get the vnode reference
-	*_vnid = node->ID();
-	RETURN_ERROR(volume->GetVNode(*_vnid, node));
+	*_vnid = child->ID();
+	RETURN_ERROR(volume->GetVNode(*_vnid, child));
 }
 
 
@@ -194,13 +213,23 @@ packagefs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 	if (node == NULL)
 		return B_ENTRY_NOT_FOUND;
 	BReference<Node> nodeReference(node);
+
+	DirectoryWriteLocker dirLocker;
+	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		dirLocker.SetTo(directory, false, true);
+		if (!dirLocker.IsLocked())
+			return B_NO_INIT;
+	} else {
+		dirLocker.SetTo(node->GetParentUnchecked(), false, true);
+		if (!dirLocker.IsLocked())
+			return B_NO_INIT;
+	}
 	volumeLocker.Unlock();
 
-	NodeWriteLocker nodeLocker(node);
 	status_t error = node->VFSInit(volume->ID());
 	if (error != B_OK)
 		RETURN_ERROR(error);
-	nodeLocker.Unlock();
+	dirLocker.Unlock();
 
 	fsNode->private_node = nodeReference.Detach();
 	fsNode->ops = &gPackageFSVnodeOps;
@@ -220,9 +249,24 @@ packagefs_put_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 	FUNCTION("volume: %p, node: %p\n", volume, node);
 	TOUCH(volume);
 
-	NodeWriteLocker nodeLocker(node);
+	VolumeReadLocker volumeLocker(volume);
+	DirectoryWriteLocker dirLocker;
+	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		dirLocker.SetTo(directory, false, true);
+		ASSERT(dirLocker.IsLocked());
+	} else {
+		dirLocker.SetTo(node->GetParentUnchecked(), false, true);
+		if (dirLocker.Get() == NULL) {
+			// This node does not have a parent. This should only happen during
+			// removal, in which case we should either have the Volume write lock,
+			// or the node should have only one reference remaining.
+			ASSERT(volume->IsWriteLocked() || node->CountReferences() == 1);
+		}
+	}
+	volumeLocker.Unlock();
+
 	node->VFSUninit();
-	nodeLocker.Unlock();
+	dirLocker.Unlock();
 
 	node->ReleaseReference();
 
@@ -283,7 +327,9 @@ packagefs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 		node->ID());
 	TOUCH(volume);
 
-	NodeReadLocker nodeLocker(node);
+	DirectoryReadLocker dirLocker;
+	if (!lock_directory_for_node(volume, node, dirLocker))
+		return B_NO_INIT;
 
 	if (!S_ISLNK(node->Mode()))
 		return B_BAD_VALUE;
@@ -302,7 +348,10 @@ packagefs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 		node->ID());
 	TOUCH(volume);
 
-	NodeReadLocker nodeLocker(node);
+	DirectoryReadLocker dirLocker;
+	if (!lock_directory_for_node(volume, node, dirLocker))
+		return B_NO_INIT;
+
 	return check_access(node, mode);
 }
 
@@ -317,7 +366,9 @@ packagefs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 		node->ID());
 	TOUCH(volume);
 
-	NodeReadLocker nodeLocker(node);
+	DirectoryReadLocker dirLocker;
+	if (!lock_directory_for_node(volume, node, dirLocker))
+		return B_NO_INIT;
 
 	st->st_mode = node->Mode();
 	st->st_nlink = 1;
@@ -361,7 +412,9 @@ packagefs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 		volume, node, node->ID(), openMode);
 	TOUCH(volume);
 
-	NodeReadLocker nodeLocker(node);
+	DirectoryReadLocker dirLocker;
+	if (!lock_directory_for_node(volume, node, dirLocker))
+		return B_NO_INIT;
 
 	// check the open mode and permissions
 	if (S_ISDIR(node->Mode()) && (openMode & O_RWMASK) != O_RDONLY)
@@ -482,7 +535,7 @@ struct DirectoryCookie : DirectoryIterator {
 	{
 		if (state == 0) {
 			state = 1;
-			node = directory->Parent();
+			node = directory->GetParentUnchecked();
 			if (node == NULL)
 				node = directory;
 			return node;
@@ -535,7 +588,7 @@ packagefs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 		return error;
 
 	// create a cookie
-	NodeWriteLocker dirLocker(dir);
+	DirectoryWriteLocker dirLocker(dir);
 	DirectoryCookie* cookie = new(std::nothrow) DirectoryCookie(dir);
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
@@ -564,7 +617,7 @@ packagefs_free_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	TOUCH(volume);
 	TOUCH(node);
 
-	NodeWriteLocker dirLocker(node);
+	DirectoryWriteLocker dirLocker(dynamic_cast<Directory*>(node));
 	delete cookie;
 
 	return B_OK;
@@ -584,7 +637,7 @@ packagefs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie,
 	TOUCH(volume);
 	TOUCH(node);
 
-	NodeWriteLocker dirLocker(cookie->directory);
+	DirectoryWriteLocker dirLocker(cookie->directory);
 
 	uint32 maxCount = *_count;
 	uint32 count = 0;
@@ -648,7 +701,7 @@ packagefs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* _cookie)
 	TOUCH(volume);
 	TOUCH(node);
 
-	NodeWriteLocker dirLocker(node);
+	DirectoryWriteLocker dirLocker(dynamic_cast<Directory*>(node));
 	cookie->Rewind();
 
 	return B_OK;
@@ -673,7 +726,10 @@ packagefs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 		return error;
 
 	// create a cookie
-	NodeReadLocker nodeLocker(node);
+	DirectoryReadLocker dirLocker;
+	if (!lock_directory_for_node(volume, node, dirLocker))
+		return B_NO_INIT;
+
 	AttributeDirectoryCookie* cookie;
 	error = node->OpenAttributeDirectory(cookie);
 	if (error != B_OK)
@@ -758,7 +814,9 @@ packagefs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 			"%#x\n", volume, node, node->ID(), name, openMode);
 	TOUCH(volume);
 
-	NodeReadLocker nodeLocker(node);
+	DirectoryReadLocker dirLocker;
+	if (!lock_directory_for_node(volume, node, dirLocker))
+		return B_NO_INIT;
 
 	// check the open mode and permissions
 	if ((openMode & O_RWMASK) != O_RDONLY)

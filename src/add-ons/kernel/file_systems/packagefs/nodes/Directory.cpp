@@ -16,6 +16,7 @@ Directory::Directory(ino_t id)
 	:
 	Node(id)
 {
+	rw_lock_init(&fLock, "packagefs directory");
 }
 
 
@@ -24,9 +25,12 @@ Directory::~Directory()
 	Node* child = fChildTable.Clear(true);
 	while (child != NULL) {
 		Node* next = child->NameHashTableNext();
+		child->_SetParent(NULL);
 		child->ReleaseReference();
 		child = next;
 	}
+
+	rw_lock_destroy(&fLock);
 }
 
 
@@ -80,7 +84,7 @@ void
 Directory::AddChild(Node* node)
 {
 	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
-	ASSERT(node->Parent() == NULL);
+	ASSERT(node->fParent == NULL);
 
 	fChildTable.Insert(node);
 	fChildList.Add(node);
@@ -93,7 +97,7 @@ void
 Directory::RemoveChild(Node* node)
 {
 	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
-	ASSERT(node->Parent() == this);
+	ASSERT(node->fParent == this);
 
 	Node* nextNode = fChildList.GetNext(node);
 

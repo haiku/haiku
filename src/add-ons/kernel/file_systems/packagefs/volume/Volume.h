@@ -47,6 +47,7 @@ public:
 	inline	void				ReadUnlock() const;
 	inline	bool				WriteLock();
 	inline	void				WriteUnlock();
+	inline	bool				IsWriteLocked() const;
 
 			fs_volume*			FSVolume() const	{ return fFSVolume; }
 			dev_t				ID() const			{ return fFSVolume->id; }
@@ -230,6 +231,13 @@ void
 Volume::WriteUnlock()
 {
 	rw_lock_write_unlock(&fLock);
+}
+
+
+bool
+Volume::IsWriteLocked() const
+{
+	return find_thread(NULL) == fLock.holder;
 }
 
 

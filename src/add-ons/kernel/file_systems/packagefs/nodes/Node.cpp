@@ -9,8 +9,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AutoLocker.h>
+#include <lock.h>
+
 #include "DebugSupport.h"
+#include "Directory.h"
 #include "EmptyAttributeDirectoryCookie.h"
+
+
+static rw_lock sParentChangeLock = RW_LOCK_INITIALIZER("packagefs node parent change");
 
 
 DEFINE_INLINE_REFERENCEABLE_METHODS(Node, fReferenceable);
@@ -23,13 +30,29 @@ Node::Node(ino_t id)
 	fName(),
 	fFlags(0)
 {
-	rw_lock_init(&fLock, "packagefs node");
 }
 
 
 Node::~Node()
 {
-	rw_lock_destroy(&fLock);
+}
+
+
+BReference<Directory>
+Node::GetParent() const
+{
+	ReadLocker parentChangeLocker(sParentChangeLock);
+	if (fParent == NULL)
+		return NULL;
+	return BReference<Directory>(fParent, false);
+}
+
+
+void
+Node::_SetParent(Directory* parent)
+{
+	WriteLocker parentChangeLocker(sParentChangeLock);
+	fParent = parent;
 }
 
 
@@ -46,13 +69,6 @@ void
 Node::SetID(ino_t id)
 {
 	fID = id;
-}
-
-
-void
-Node::_SetParent(Directory* parent)
-{
-	fParent = parent;
 }
 
 

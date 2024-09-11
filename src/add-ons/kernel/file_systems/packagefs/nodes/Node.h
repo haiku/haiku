@@ -8,9 +8,8 @@
 
 #include <fs_interface.h>
 
-#include <AutoLocker.h>
+#include <Referenceable.h>
 
-#include <lock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
@@ -43,13 +42,10 @@ public:
 			void				ReleaseReference();
 			int32				CountReferences();
 
-	inline	bool				ReadLock();
-	inline	void				ReadUnlock();
-	inline	bool				WriteLock();
-	inline	void				WriteUnlock();
+			BReference<Directory> GetParent() const;
+			Directory*			GetParentUnchecked() const	{ return fParent; }
 
 			ino_t				ID() const		{ return fID; }
-			Directory*			Parent() const	{ return fParent; }
 			const String&		Name() const	{ return fName; }
 
 			Node*&				NameHashTableNext()
@@ -96,7 +92,6 @@ private:
 			void				_SetParent(Directory* parent);
 
 protected:
-			rw_lock				fLock;
 			ino_t				fID;
 			Directory*			fParent;
 			String				fName;
@@ -105,34 +100,6 @@ protected:
 			uint32				fFlags;
 			InlineReferenceable	fReferenceable;
 };
-
-
-bool
-Node::ReadLock()
-{
-	return rw_lock_read_lock(&fLock) == B_OK;
-}
-
-
-void
-Node::ReadUnlock()
-{
-	rw_lock_read_unlock(&fLock);
-}
-
-
-bool
-Node::WriteLock()
-{
-	return rw_lock_write_lock(&fLock) == B_OK;
-}
-
-
-void
-Node::WriteUnlock()
-{
-	rw_lock_write_unlock(&fLock);
-}
 
 
 bool
@@ -207,9 +174,6 @@ typedef DoublyLinkedList<Node> NodeList;
 
 typedef BOpenHashTable<NodeNameHashDefinition> NodeNameHashTable;
 typedef BOpenHashTable<NodeIDHashDefinition> NodeIDHashTable;
-
-typedef AutoLocker<Node, AutoLockerReadLocking<Node> > NodeReadLocker;
-typedef AutoLocker<Node, AutoLockerWriteLocking<Node> > NodeWriteLocker;
 
 
 #endif	// NODE_H
