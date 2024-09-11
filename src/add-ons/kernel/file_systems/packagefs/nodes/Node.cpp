@@ -23,11 +23,13 @@ Node::Node(ino_t id)
 	fName(),
 	fFlags(0)
 {
+	rw_lock_init(&fLock, "packagefs node");
 }
 
 
 Node::~Node()
 {
+	rw_lock_destroy(&fLock);
 }
 
 
