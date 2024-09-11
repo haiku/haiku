@@ -220,7 +220,7 @@ UnpackingLeafNode::CloneTransferPackageNodes(ino_t id, UnpackingNode*& _newNode)
 	if (clone == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = clone->Init(Parent(), Name());
+	status_t error = clone->Init(Name());
 	if (error != B_OK) {
 		delete clone;
 		return error;

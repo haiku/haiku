@@ -27,7 +27,7 @@ public:
 								Directory(ino_t id);
 	virtual						~Directory();
 
-	virtual	status_t			Init(Directory* parent, const String& name);
+	virtual	status_t			Init(const String& name);
 
 	virtual	mode_t				Mode() const;
 	virtual	off_t				FileSize() const;

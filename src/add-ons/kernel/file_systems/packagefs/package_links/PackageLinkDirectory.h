@@ -19,8 +19,8 @@ public:
 								PackageLinkDirectory();
 	virtual						~PackageLinkDirectory();
 
-			status_t			Init(Directory* parent, Package* package);
-	virtual	status_t			Init(Directory* parent, const String& name);
+			status_t			Init(Package* package);
+	virtual	status_t			Init(const String& name);
 
 	virtual	timespec			ModifiedTime() const;
 

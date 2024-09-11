@@ -48,7 +48,7 @@ PackageLinksDirectory::AddPackage(Package* package)
 	BReference<PackageLinkDirectory> linkDirectoryReference(linkDirectory,
 		true);
 
-	status_t error = linkDirectory->Init(this, package);
+	status_t error = linkDirectory->Init(package);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

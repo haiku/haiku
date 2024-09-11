@@ -45,10 +45,10 @@ PackageLinkDirectory::~PackageLinkDirectory()
 
 
 status_t
-PackageLinkDirectory::Init(Directory* parent, Package* package)
+PackageLinkDirectory::Init(Package* package)
 {
 	// init the directory/node
-	status_t error = Init(parent, package->VersionedName());
+	status_t error = Init(package->VersionedName());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -60,9 +60,9 @@ PackageLinkDirectory::Init(Directory* parent, Package* package)
 
 
 status_t
-PackageLinkDirectory::Init(Directory* parent, const String& name)
+PackageLinkDirectory::Init(const String& name)
 {
-	return Directory::Init(parent, name);
+	return Directory::Init(name);
 }
 
 
@@ -227,7 +227,7 @@ PackageLinkDirectory::_UpdateDependencies(PackageLinksListener* listener)
 			if (link == NULL)
 				return B_NO_MEMORY;
 
-			status_t error = link->Init(this, dependency->FileName());
+			status_t error = link->Init(dependency->FileName());
 			if (error != B_OK) {
 				delete link;
 				RETURN_ERROR(error);
@@ -271,7 +271,7 @@ PackageLinkDirectory::_CreateOrUpdateLink(Link*& link, Package* package,
 		if (link == NULL)
 			return B_NO_MEMORY;
 
-		status_t error = link->Init(this, name);
+		status_t error = link->Init(name);
 		if (error != B_OK)
 			RETURN_ERROR(error);
 

@@ -402,7 +402,7 @@ Volume::Mount(const char* parameterString)
 		= new ::RootDirectory(kRootDirectoryID, st.st_mtim);
 	if (fRootDirectory == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	fRootDirectory->Init(NULL, volumeNameString);
+	fRootDirectory->Init(volumeNameString);
 	fNodes.Insert(fRootDirectory);
 	fRootDirectory->AcquireReference();
 		// one reference for the table
@@ -1410,7 +1410,7 @@ Volume::_CreateUnpackingNode(mode_t mode, Directory* parent, const String& name,
 	Node* node = unpackingNode->GetNode();
 	BReference<Node> nodeReference(node, true);
 
-	status_t error = node->Init(parent, name);
+	status_t error = node->Init(name);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -1711,7 +1711,7 @@ Volume::_CreateShineThroughDirectory(Directory* parent, const char* name,
 	if (!nameString.SetTo(name))
 		RETURN_ERROR(B_NO_MEMORY);
 
-	status_t error = directory->Init(parent, nameString);
+	status_t error = directory->Init(nameString);
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
@@ -1855,7 +1855,6 @@ Volume::_AddPackageLinksDirectory()
 	NodeWriteLocker rootDirectoryWriteLocker(fRootDirectory);
 	NodeWriteLocker packageLinksDirectoryWriteLocker(packageLinksDirectory);
 
-	packageLinksDirectory->SetParent(fRootDirectory);
 	fRootDirectory->AddChild(packageLinksDirectory);
 
 	_AddPackageLinksNode(packageLinksDirectory);
@@ -1879,7 +1878,6 @@ Volume::_RemovePackageLinksDirectory()
 	if (packageLinksDirectory->Parent() == fRootDirectory) {
 		packageLinksDirectory->SetListener(NULL);
 		fRootDirectory->RemoveChild(packageLinksDirectory);
-		packageLinksDirectory->SetParent(NULL);
 	}
 }
 

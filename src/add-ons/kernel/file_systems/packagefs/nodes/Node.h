@@ -57,7 +57,8 @@ public:
 			Node*&				IDHashTableNext()
 									{ return fIDHashTableNext; }
 
-	virtual	status_t			Init(Directory* parent, const String& name);
+	virtual	status_t			Init(const String& name);
+			void				SetID(ino_t id);
 
 	virtual	status_t			VFSInit(dev_t deviceID);
 									// base class version must be called on
@@ -66,9 +67,6 @@ public:
 									// base class version must be called
 	inline	bool				IsKnownToVFS() const;
 	inline	bool				HasVFSInitError() const;
-
-			void				SetID(ino_t id);
-			void				SetParent(Directory* parent);
 
 	virtual	mode_t				Mode() const = 0;
 	virtual	uid_t				UserID() const;
@@ -91,6 +89,11 @@ public:
 	virtual	status_t			IndexAttribute(AttributeIndexer* indexer);
 	virtual	void*				IndexCookieForAttribute(const StringKey& name)
 									const;
+
+private:
+			friend class Directory;
+
+			void				_SetParent(Directory* parent);
 
 protected:
 			rw_lock				fLock;
