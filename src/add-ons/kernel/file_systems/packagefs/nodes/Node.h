@@ -41,6 +41,7 @@ public:
 
 			void				AcquireReference();
 			void				ReleaseReference();
+			int32				CountReferences();
 
 	inline	bool				ReadLock();
 	inline	void				ReadUnlock();

@@ -16,7 +16,7 @@
 #include "Utils.h"
 
 
-DEFINE_REFERENCEABLE_ACQUIRE_RELEASE(PackageNode, fReferenceable);
+DEFINE_INLINE_REFERENCEABLE_METHODS(PackageNode, fReferenceable);
 
 
 PackageNode::PackageNode(Package* package, mode_t mode)

@@ -15,18 +15,18 @@
  * is only sizeof(int32) == 4. */
 class InlineReferenceable {
 public:
-	InlineReferenceable()
+	inline InlineReferenceable()
 		:
 		fReferenceCount(1)
 	{
 	}
 
-	~InlineReferenceable()
+	inline ~InlineReferenceable()
 	{
 		ASSERT(fReferenceCount == 0 || fReferenceCount == 1);
 	}
 
-	int32
+	inline int32
 	AcquireReference()
 	{
 		const int32 previousCount = atomic_add(&fReferenceCount, 1);
@@ -34,7 +34,7 @@ public:
 		return previousCount;
 	}
 
-	int32
+	inline int32
 	ReleaseReference()
 	{
 		const int32 previousCount = atomic_add(&fReferenceCount, -1);
@@ -42,14 +42,21 @@ public:
 		return previousCount;
 	}
 
+	inline int32
+	CountReferences()
+	{
+		return atomic_get(&fReferenceCount);
+	}
+
 private:
 	int32	fReferenceCount;
 };
 
 
-#define DEFINE_REFERENCEABLE_ACQUIRE_RELEASE(CLASS, InlineReferenceable) \
+#define DEFINE_INLINE_REFERENCEABLE_METHODS(CLASS, InlineReferenceable) \
 	void CLASS::AcquireReference()	{ InlineReferenceable.AcquireReference(); } \
-	void CLASS::ReleaseReference()	{ if (InlineReferenceable.ReleaseReference() == 1) delete this; }
+	void CLASS::ReleaseReference()	{ if (InlineReferenceable.ReleaseReference() == 1) delete this; } \
+	int32 CLASS::CountReferences()	{ return InlineReferenceable.CountReferences(); }
 
 
 #endif	// INLINE_REFERENCEABLE_H

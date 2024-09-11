@@ -13,7 +13,7 @@
 #include "EmptyAttributeDirectoryCookie.h"
 
 
-DEFINE_REFERENCEABLE_ACQUIRE_RELEASE(Node, fReferenceable);
+DEFINE_INLINE_REFERENCEABLE_METHODS(Node, fReferenceable);
 
 
 Node::Node(ino_t id)

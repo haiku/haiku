@@ -31,6 +31,7 @@ public:
 
 			void				AcquireReference();
 			void				ReleaseReference();
+			int32				CountReferences();
 
 			BReference<Package>		GetPackage() const;
 									// Since PackageNode does only hold a
