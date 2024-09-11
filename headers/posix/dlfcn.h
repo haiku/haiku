@@ -30,13 +30,14 @@ typedef struct {
    void *dli_fbase;        /* Load address of that object */
    const char *dli_sname;  /* Name of nearest lower symbol */
    void *dli_saddr;        /* Exact value of nearest symbol */
-} Dl_info;
+} Dl_info_t;
+typedef Dl_info_t Dl_info;
 
 extern int	dlclose(void *image);
 extern char	*dlerror(void);
 extern void	*dlopen(const char *path, int mode);
 extern void *dlsym(void *image, const char *symbolName);
-extern int dladdr(const void *addr, Dl_info *info);
+extern int dladdr(const void *addr, Dl_info_t *info);
 
 #ifdef __cplusplus
 }
