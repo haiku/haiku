@@ -421,9 +421,9 @@ rw_lock_destroy(rw_lock* lock)
 	InterruptsSpinLocker locker(lock->lock);
 
 #if KDEBUG
-	if (lock->waiters != NULL && thread_get_current_thread_id()
-			!= lock->holder) {
-		panic("rw_lock_destroy(): there are blocking threads, but the caller "
+	if ((atomic_get(&lock->count) != 0 || lock->waiters != NULL)
+			&& thread_get_current_thread_id() != lock->holder) {
+		panic("rw_lock_destroy(): lock is in use and the caller "
 			"doesn't hold the write lock (%p)", lock);
 
 		locker.Unlock();
