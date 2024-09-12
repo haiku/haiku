@@ -889,6 +889,19 @@ else
 	exit 1
 fi
 
+# check is python is new enough
+# usage of python by HDS requires at least 3.9
+PYTHON_VERSION=$("$HOST_PYTHON" --version | sed -e 's/Python //')
+
+case $PYTHON_VERSION in
+	2.* | 3.[1-8].*)
+		echo "Python $PYTHON_VERSION is too old, need at least Python 3.9"
+		exit 1
+		;;
+	*)
+		;;
+esac
+
 # check if nasm can actually output ELF files
 # (the stock version in OSX can't)
 # XXX: should probably only test for x86* arch
