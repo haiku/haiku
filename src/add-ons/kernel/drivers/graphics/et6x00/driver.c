@@ -390,14 +390,14 @@ pci_info *pcii = &(di->pcii);
    /*
     * We map the whole graphics card memory area (which consist of RAM memory
     * and memory mapped registers) at once. Memory mapped registers must not
-    * be cacheble, so the whole area is mapped with B_MTR_UC (unable caching).
+	* be cacheble, so the whole area is mapped with B_UNCACHED_MEMORY.
     * We certainly could map separately the RAM memory with write combining
-    * (B_MTR_WC) and the memory mapped registers with B_MTR_UC.
+	* and the memory mapped registers with B_UNCACHED_MEMORY.
     */
     si->memoryArea = map_physical_memory(buffer,
         di->pcii.u.h0.base_registers[0],
         di->pcii.u.h0.base_register_sizes[0],
-        B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_UC,
+		B_ANY_KERNEL_BLOCK_ADDRESS | B_UNCACHED_MEMORY,
         B_READ_AREA + B_WRITE_AREA,
         &(si->memory));
 

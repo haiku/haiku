@@ -102,7 +102,7 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 
 	gart->buffer.area = map_physical_memory( "Radeon aligned PCI GART buffer",
 		(addr_t)aligned_phys,
-		size, B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		size, B_ANY_KERNEL_BLOCK_ADDRESS | B_WRITE_COMBINING_MEMORY,
 		B_READ_AREA | B_WRITE_AREA, &gart->buffer.ptr );
 
 	if( gart->buffer.area < 0 ) {

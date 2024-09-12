@@ -131,19 +131,19 @@ static bool
 add_used_mtrr(uint64 base, uint64 size, uint32 type)
 {
 	switch (type) {
-		case B_MTR_UC:
+		case B_UNCACHED_MEMORY:
 			type = IA32_MTR_UNCACHED;
 			break;
-		case B_MTR_WC:
+		case B_WRITE_COMBINING_MEMORY:
 			type = IA32_MTR_WRITE_COMBINING;
 			break;
-		case B_MTR_WT:
+		case B_WRITE_THROUGH_MEMORY:
 			type = IA32_MTR_WRITE_THROUGH;
 			break;
-		case B_MTR_WP:
+		case B_WRITE_PROTECTED_MEMORY:
 			type = IA32_MTR_WRITE_PROTECTED;
 			break;
-		case B_MTR_WB:
+		case B_WRITE_BACK_MEMORY:
 			type = IA32_MTR_WRITE_BACK;
 			break;
 		default:
@@ -340,7 +340,7 @@ update_mtrrs(update_mtrr_info& updateInfo)
 	int32 pointCount = 0;
 	for (MemoryTypeRangeList::Iterator it = sMemoryTypeRanges.GetIterator();
 			memory_type_range* range = it.Next();) {
-		if (range->type == B_MTR_UC) {
+		if (range->type == B_UNCACHED_MEMORY) {
 			// Ignore uncacheable ranges below a certain size, if requested.
 			// Since we always enforce uncacheability via the PTE attributes,
 			// this is no problem (though not recommended for performance
@@ -457,14 +457,13 @@ update_mtrrs(update_mtrr_info& updateInfo)
 		rangeList.Add(&ranges[i]);
 
 	static const uint32 kMemoryTypes[] = {
-		B_MTR_UC,
-		B_MTR_WC,
-		B_MTR_WP,
-		B_MTR_WT,
-		B_MTR_WB
+		B_UNCACHED_MEMORY,
+		B_WRITE_COMBINING_MEMORY,
+		B_WRITE_PROTECTED_MEMORY,
+		B_WRITE_THROUGH_MEMORY,
+		B_WRITE_BACK_MEMORY
 	};
-	static const int32 kMemoryTypeCount = sizeof(kMemoryTypes)
-		/ sizeof(*kMemoryTypes);
+	static const int32 kMemoryTypeCount = B_COUNT_OF(kMemoryTypes);
 
 	for (int32 i = 0; i < kMemoryTypeCount; i++) {
 		uint32 type = kMemoryTypes[i];
@@ -472,7 +471,7 @@ update_mtrrs(update_mtrr_info& updateInfo)
 		// Remove uncached and write-through ranges after processing them. This
 		// let's us leverage their intersection property with any other
 		// respectively write-back ranges.
-		bool removeRanges = type == B_MTR_UC || type == B_MTR_WT;
+		bool removeRanges = type == B_UNCACHED_MEMORY || type == B_WRITE_THROUGH_MEMORY;
 
 		optimize_memory_ranges(rangeList, type, removeRanges);
 	}
@@ -494,7 +493,7 @@ update_mtrrs(update_mtrr_info& updateInfo)
 		uint32 type = kMemoryTypes[i];
 
 		// skip write-back ranges -- that'll be the default type anyway
-		if (type == B_MTR_WB)
+		if (type == B_WRITE_BACK_MEMORY)
 			continue;
 
 		for (int32 i = 0; i < rangeCount; i++) {
@@ -661,15 +660,15 @@ static const char *
 memory_type_to_string(uint32 type)
 {
 	switch (type) {
-		case B_MTR_UC:
+		case B_UNCACHED_MEMORY:
 			return "uncacheable";
-		case B_MTR_WC:
+		case B_WRITE_COMBINING_MEMORY:
 			return "write combining";
-		case B_MTR_WT:
+		case B_WRITE_THROUGH_MEMORY:
 			return "write-through";
-		case B_MTR_WP:
+		case B_WRITE_PROTECTED_MEMORY:
 			return "write-protected";
-		case B_MTR_WB:
+		case B_WRITE_BACK_MEMORY:
 			return "write-back";
 		default:
 			return "unknown";
@@ -720,7 +719,7 @@ arch_vm_init_post_area(kernel_args *args)
 
 	// map 0 - 0xa0000 directly
 	id = map_physical_memory("dma_region", 0x0, 0xa0000,
-		B_ANY_KERNEL_ADDRESS | B_MTR_WB,
+		B_ANY_KERNEL_ADDRESS | B_WRITE_BACK_MEMORY,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &gDmaAddress);
 	if (id < 0) {
 		panic("arch_vm_init_post_area: unable to map dma region\n");
@@ -770,7 +769,7 @@ arch_vm_init_post_modules(kernel_args *args)
 	// set the physical memory ranges to write-back mode
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
 		add_memory_type_range(-1, args->physical_memory_range[i].start,
-			args->physical_memory_range[i].size, B_MTR_WB, NULL);
+			args->physical_memory_range[i].size, B_WRITE_BACK_MEMORY, NULL);
 	}
 
 	return B_OK;

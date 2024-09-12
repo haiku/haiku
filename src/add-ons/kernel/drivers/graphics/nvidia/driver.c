@@ -685,7 +685,7 @@ map_device(device_info *di)
 		/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
 		physicalAddress,
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
-		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		B_ANY_KERNEL_BLOCK_ADDRESS | B_WRITE_COMBINING_MEMORY,
 		B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA,
 		&(si->framebuffer));
 
@@ -960,7 +960,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	/* map the net DMA command buffer into vmem, using Write Combining */
 	si->dma_area = map_physical_memory(
 		"NV aligned DMA cmd buffer", (addr_t)si->dma_buffer_pci, net_buf_size,
-		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		B_ANY_KERNEL_BLOCK_ADDRESS | B_WRITE_COMBINING_MEMORY,
 		B_READ_AREA | B_WRITE_AREA, &(si->dma_buffer));
 	/* if failed with write combining try again without */
 	if (si->dma_area < 0) {

@@ -148,10 +148,10 @@ X86PagingMethod32Bit::ClearPageTableEntryFlags(page_table_entry* entry, uint32 f
 X86PagingMethod32Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 {
 	switch (memoryType) {
-		case B_MTR_UC:
+		case B_UNCACHED_MEMORY:
 			return X86_PTE_CACHING_DISABLED | X86_PTE_WRITE_THROUGH;
 
-		case B_MTR_WC:
+		case B_WRITE_COMBINING_MEMORY:
 			if (x86_use_pat())
 				return X86_PTE_PAT;
 
@@ -159,11 +159,11 @@ X86PagingMethod32Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 			// MTRR WC is "implementation defined" for Pentium Pro/II.
 			return 0;
 
-		case B_MTR_WT:
+		case B_WRITE_THROUGH_MEMORY:
 			return X86_PTE_WRITE_THROUGH;
 
-		case B_MTR_WP:
-		case B_MTR_WB:
+		case B_WRITE_PROTECTED_MEMORY:
+		case B_WRITE_BACK_MEMORY:
 		default:
 			return 0;
 	}

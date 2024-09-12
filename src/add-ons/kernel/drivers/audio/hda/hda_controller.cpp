@@ -601,7 +601,7 @@ init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 
 	if (!controller->dma_snooping) {
 		vm_set_area_memory_type(controller->corb_rirb_pos_area,
-			pe.address, B_MTR_UC);
+			pe.address, B_UNCACHED_MEMORY);
 	}
 
 	// Program CORB/RIRB for these locations
@@ -908,7 +908,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	if (!stream->controller->dma_snooping) {
 		vm_set_area_memory_type(stream->buffer_area,
-			bufferPhysicalAddress, B_MTR_UC);
+			bufferPhysicalAddress, B_UNCACHED_MEMORY);
 	}
 
 	dprintf("hda: %s(%s): Allocated %" B_PRIu32 " bytes for %" B_PRIu32
@@ -948,7 +948,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 
 	if (!stream->controller->dma_snooping) {
 		vm_set_area_memory_type(stream->buffer_descriptors_area,
-			stream->physical_buffer_descriptors, B_MTR_UC);
+			stream->physical_buffer_descriptors, B_UNCACHED_MEMORY);
 	}
 
 	dprintf("hda: %s(%s): Allocated %" B_PRIu32 " bytes for %" B_PRIu32

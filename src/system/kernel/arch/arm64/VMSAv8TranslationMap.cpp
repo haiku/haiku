@@ -508,22 +508,22 @@ VMSAv8TranslationMap::GetMemoryAttr(uint32 attributes, uint32 memoryType, bool i
 
 	uint8_t type = MAIR_NORMAL_WB;
 
-	switch (memoryType & B_MTR_MASK) {
-		case B_MTR_UC:
+	switch (memoryType & B_MEMORY_TYPE_MASK) {
+		case B_UNCACHED_MEMORY:
 			// TODO: This probably should be nGnRE for PCI
 			type = MAIR_DEVICE_nGnRnE;
 			break;
-		case B_MTR_WC:
+		case B_WRITE_COMBINING_MEMORY:
 			type = MAIR_NORMAL_NC;
 			break;
-		case B_MTR_WT:
+		case B_WRITE_THROUGH_MEMORY:
 			type = MAIR_NORMAL_WT;
 			break;
-		case B_MTR_WP:
+		case B_WRITE_PROTECTED_MEMORY:
 			type = MAIR_NORMAL_WT;
 			break;
 		default:
-		case B_MTR_WB:
+		case B_WRITE_BACK_MEMORY:
 			type = MAIR_NORMAL_WB;
 			break;
 	}

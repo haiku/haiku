@@ -168,7 +168,7 @@ nvme_pcicfg_map_bar_write_combine(void* devhandle, unsigned int bar,
 
 	// Turn on write combining for the area
 	status = vm_set_area_memory_type(area_for(*mapped_addr),
-		nvme_mem_vtophys(*mapped_addr), B_MTR_WC);
+		nvme_mem_vtophys(*mapped_addr), B_WRITE_COMBINING_MEMORY);
 	if (status != 0)
 		nvme_pcicfg_unmap_bar(devhandle, bar, *mapped_addr);
 	return status;

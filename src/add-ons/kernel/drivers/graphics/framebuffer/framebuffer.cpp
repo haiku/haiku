@@ -134,7 +134,7 @@ remap_frame_buffer(framebuffer_info& info, addr_t physicalBase, uint32 width,
 			sharedInfo.frame_buffer_area = area;
 
 			// Turn on write combining for the area
-			vm_set_area_memory_type(area, base, B_MTR_WC);
+			vm_set_area_memory_type(area, base, B_WRITE_COMBINING_MEMORY);
 
 			if (info.physical_frame_buffer_size != 0)
 				info.complete_frame_buffer_mapped = true;

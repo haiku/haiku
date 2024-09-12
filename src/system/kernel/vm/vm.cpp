@@ -1937,7 +1937,7 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
-	addressRestrictions.address_specification = addressSpec & ~B_MTR_MASK;
+	addressRestrictions.address_specification = addressSpec & ~B_MEMORY_TYPE_MASK;
 	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
 		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
 		true, &area, _address);
@@ -1948,12 +1948,12 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	cache->Unlock();
 
 	if (status == B_OK) {
-		// Set requested memory type -- use uncached if not given but allow it
-		// to be overridden by ranges that may already exist
-		uint32 memoryType = addressSpec & B_MTR_MASK;
-		bool weak = memoryType == 0;
+		// Set requested memory type -- default to uncached, but allow
+		// that to be overridden by ranges that may already exist.
+		uint32 memoryType = addressSpec & B_MEMORY_TYPE_MASK;
+		const bool weak = (memoryType == 0);
 		if (weak)
-			memoryType = B_MTR_UC;
+			memoryType = B_UNCACHED_MEMORY;
 
 		status = arch_vm_set_memory_type(area, physicalAddress, memoryType,
 			weak ? &memoryType : NULL);
@@ -2023,7 +2023,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 		addressSpec, _size, protection, vecs, vecCount));
 
 	if (!arch_vm_supports_protection(protection)
-		|| (addressSpec & B_MTR_MASK) != 0) {
+		|| (addressSpec & B_MEMORY_TYPE_MASK) != 0) {
 		return B_NOT_SUPPORTED;
 	}
 
@@ -2057,7 +2057,7 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	VMArea* area;
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
-	addressRestrictions.address_specification = addressSpec & ~B_MTR_MASK;
+	addressRestrictions.address_specification = addressSpec & ~B_MEMORY_TYPE_MASK;
 	result = map_backing_store(locker.AddressSpace(), cache, 0, name,
 		size, B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, 0,
 		&addressRestrictions, true, &area, _address);

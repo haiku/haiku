@@ -806,7 +806,7 @@ radeon_hd_init(radeon_info &info)
 		(size_t)info.shared_info->frame_buffer_size * 1024);
 
 	// Turn on write combining for the frame buffer area
-	vm_set_area_memory_type(info.framebuffer_area, fbAddr, B_MTR_WC);
+	vm_set_area_memory_type(info.framebuffer_area, fbAddr, B_WRITE_COMBINING_MEMORY);
 
 	frambufferMapper.Detach();
 

@@ -261,7 +261,7 @@ MapDevice(DeviceInfo& di)
 		areaName,
 		videoRamAddr,
 		videoRamSize,
-		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		B_ANY_KERNEL_BLOCK_ADDRESS | B_WRITE_COMBINING_MEMORY,
 		B_READ_AREA + B_WRITE_AREA,
 		&(si.videoMemAddr));
 

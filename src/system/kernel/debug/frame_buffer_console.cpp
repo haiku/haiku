@@ -507,7 +507,7 @@ frame_buffer_console_init_post_modules(kernel_args* args)
 	// try to set frame buffer memory to write combined
 
 	return vm_set_area_memory_type(sConsole.area,
-		args->frame_buffer.physical_buffer.start, B_MTR_WC);
+		args->frame_buffer.physical_buffer.start, B_WRITE_COMBINING_MEMORY);
 }
 
 

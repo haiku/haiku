@@ -168,17 +168,17 @@ X86PagingMethod64Bit::ClearTableEntryFlags(uint64_t* entryPointer,
 X86PagingMethod64Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 {
 	switch (memoryType) {
-		case B_MTR_UC:
+		case B_UNCACHED_MEMORY:
 			return X86_64_PTE_CACHING_DISABLED | X86_64_PTE_WRITE_THROUGH;
 
-		case B_MTR_WC:
+		case B_WRITE_COMBINING_MEMORY:
 			return x86_use_pat() ? X86_64_PTE_PAT : 0;
 
-		case B_MTR_WT:
+		case B_WRITE_THROUGH_MEMORY:
 			return X86_64_PTE_WRITE_THROUGH;
 
-		case B_MTR_WP:
-		case B_MTR_WB:
+		case B_WRITE_PROTECTED_MEMORY:
+		case B_WRITE_BACK_MEMORY:
 		default:
 			return 0;
 	}

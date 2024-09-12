@@ -770,7 +770,7 @@ intel_map(intel_info &info)
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
 		info.aperture_physical_base, info.aperture_size,
-		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		B_ANY_KERNEL_BLOCK_ADDRESS | B_WRITE_COMBINING_MEMORY,
 		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
 		// try again without write combining

@@ -133,7 +133,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 		buffer,
 		di->pcii.u.h0.base_registers[fb],
 		di->pcii.u.h0.base_register_sizes[fb],
-		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
+		B_ANY_KERNEL_BLOCK_ADDRESS | B_WRITE_COMBINING_MEMORY,
 		B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA,
 		(void **)&(si->local_mem));
 

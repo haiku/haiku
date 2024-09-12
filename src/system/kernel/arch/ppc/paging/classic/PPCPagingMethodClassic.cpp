@@ -308,8 +308,8 @@ PPCPagingMethodClassic::FillPageTableEntry(page_table_entry *entry,
 	entry->_reserved0 = 0;
 	entry->referenced = false;
 	entry->changed = false;
-	entry->write_through = (memoryType == B_MTR_UC) || (memoryType == B_MTR_WT);
-	entry->caching_inhibited = (memoryType == B_MTR_UC);
+	entry->write_through = (memoryType == B_UNCACHED_MEMORY) || (memoryType == B_WRITE_THROUGH_MEMORY);
+	entry->caching_inhibited = (memoryType == B_UNCACHED_MEMORY);
 	entry->memory_coherent = false;
 	entry->guarded = false;
 	entry->_reserved1 = 0;
