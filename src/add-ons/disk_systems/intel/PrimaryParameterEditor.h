@@ -16,8 +16,10 @@
 
 class PrimaryPartitionEditor : public BPartitionParameterEditor {
 public:
-								PrimaryPartitionEditor();
+								PrimaryPartitionEditor(bool create);
 	virtual						~PrimaryPartitionEditor();
+
+	virtual		void			SetTo(BPartition* partition);
 
 	virtual		BView*			View();
 
@@ -27,6 +29,7 @@ public:
 	virtual		status_t		GetParameters(BString& parameters);
 
 private:
+				bool			fCreate;
 				BView*			fView;
 				BCheckBox*		fActiveCheckBox;
 };

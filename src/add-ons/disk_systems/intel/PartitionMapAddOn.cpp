@@ -340,7 +340,7 @@ PartitionMapHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	if (type == B_CREATE_PARAMETER_EDITOR
 		|| type == B_PROPERTIES_PARAMETER_EDITOR) {
 		try {
-			*editor = new PrimaryPartitionEditor();
+			*editor = new PrimaryPartitionEditor(type == B_CREATE_PARAMETER_EDITOR);
 		} catch (std::bad_alloc&) {
 			return B_NO_MEMORY;
 		}

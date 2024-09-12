@@ -10,16 +10,20 @@
 #include <Catalog.h>
 #include <DiskDeviceTypes.h>
 #include <GroupView.h>
+#include <Partition.h>
 #include <PartitionParameterEditor.h>
 #include <Variant.h>
 #include <View.h>
+#include <driver_settings.h>
 
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PrimaryPartitionEditor"
 
 
-PrimaryPartitionEditor::PrimaryPartitionEditor()
+PrimaryPartitionEditor::PrimaryPartitionEditor(bool create)
+	:
+	fCreate(create)
 {
 	fActiveCheckBox = new BCheckBox("active", B_TRANSLATE("Active partition"),
 		NULL);
@@ -30,6 +34,21 @@ PrimaryPartitionEditor::PrimaryPartitionEditor()
 
 PrimaryPartitionEditor::~PrimaryPartitionEditor()
 {
+}
+
+
+void
+PrimaryPartitionEditor::SetTo(BPartition* partition)
+{
+	bool active = false;
+	if (fCreate) {
+		active = partition->CountChildren() == 0;
+	} else {
+		void* handle = parse_driver_settings_string(partition->Parameters());
+		active = get_driver_boolean_parameter(handle, "active", false, true);
+		unload_driver_settings(handle);
+	}
+	fActiveCheckBox->SetValue(active ? B_CONTROL_ON : B_CONTROL_OFF);
 }
 
 
