@@ -20,6 +20,7 @@ static constexpr uint64_t kPteTypeL012Table = 0x3;
 static constexpr uint64_t kPteTypeL12Block = 0x1;
 static constexpr uint64_t kPteTypeL3Page = 0x3;
 
+static constexpr uint64_t kAttrSWDIRTY = (1UL << 56);
 static constexpr uint64_t kAttrSWDBM = (1UL << 55);
 static constexpr uint64_t kAttrUXN = (1UL << 54);
 static constexpr uint64_t kAttrPXN = (1UL << 53);
