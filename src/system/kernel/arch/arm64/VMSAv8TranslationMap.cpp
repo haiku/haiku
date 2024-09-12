@@ -5,8 +5,11 @@
 #include "VMSAv8TranslationMap.h"
 
 #include <algorithm>
+#include <slab/Slab.h>
 #include <util/AutoLock.h>
 #include <util/ThreadAutoLock.h>
+#include <vm/VMAddressSpace.h>
+#include <vm/VMCache.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
 
@@ -635,6 +638,97 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 		is_pte_dirty(oldPte), updatePageQueue);
 
 	return B_OK;
+}
+
+
+void
+VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size, bool updatePageQueue)
+{
+	TRACE("VMSAv8TranslationMap::UnmapPages(0x%" B_PRIxADDR "(%s), 0x%"
+		B_PRIxADDR ", 0x%" B_PRIxSIZE ", %d)\n", (addr_t)area,
+		area->name, address, size, updatePageQueue);
+
+	uint64_t pageMask = (1UL << fPageBits) - 1;
+	uint64_t vaMask = (1UL << fVaBits) - 1;
+
+	ASSERT((address & pageMask) == 0);
+	ASSERT(ValidateVa(address));
+
+	VMAreaMappings queue;
+	ThreadCPUPinner pinner(thread_get_current_thread());
+	RecursiveLocker locker(fLock);
+
+	ProcessRange(fPageTable, fInitialLevel, address & vaMask, size, nullptr,
+		[=, &queue](uint64_t* ptePtr, uint64_t effectiveVa) {
+			uint64_t oldPte = atomic_get_and_set64((int64_t*)ptePtr, 0);
+			asm("dsb ishst");
+			if ((oldPte & kPteValidMask) == 0)
+				return;
+			if ((oldPte & kAttrAF) != 0)
+				FlushVAFromTLBByASID(effectiveVa);
+
+			if (area->cache_type == CACHE_TYPE_DEVICE)
+				return;
+
+			// get the page
+			vm_page* page = vm_lookup_page((oldPte & kPteAddrMask) >> fPageBits);
+			ASSERT(page != NULL);
+
+			DEBUG_PAGE_ACCESS_START(page);
+
+			// transfer the accessed/dirty flags to the page
+			page->accessed = (oldPte & kAttrAF) != 0;
+			page->modified = is_pte_dirty(oldPte);
+
+			// remove the mapping object/decrement the wired_count of the
+			// page
+			if (area->wiring == B_NO_LOCK) {
+				vm_page_mapping* mapping = NULL;
+				vm_page_mappings::Iterator iterator
+					= page->mappings.GetIterator();
+				while ((mapping = iterator.Next()) != NULL) {
+					if (mapping->area == area)
+						break;
+				}
+
+				ASSERT(mapping != NULL);
+
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				queue.Add(mapping);
+			} else
+				page->DecrementWiredCount();
+
+			if (!page->IsMapped()) {
+				atomic_add(&gMappedPagesCount, -1);
+
+				if (updatePageQueue) {
+					if (page->Cache()->temporary)
+						vm_page_set_state(page, PAGE_STATE_INACTIVE);
+					else if (page->modified)
+						vm_page_set_state(page, PAGE_STATE_MODIFIED);
+					else
+						vm_page_set_state(page, PAGE_STATE_CACHED);
+				}
+			}
+
+			DEBUG_PAGE_ACCESS_END(page);
+		});
+
+	// TODO: As in UnmapPage() we can lose page dirty flags here. ATM it's not
+	// really critical here, as in all cases this method is used, the unmapped
+	// area range is unmapped for good (resized/cut) and the pages will likely
+	// be freed.
+
+	locker.Unlock();
+
+	// free removed mappings
+	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
+		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
+
+	while (vm_page_mapping* mapping = queue.RemoveHead())
+		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
 }
 
 
