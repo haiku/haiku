@@ -732,6 +732,103 @@ VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size, bool
 }
 
 
+void
+VMSAv8TranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
+	bool ignoreTopCachePageFlags)
+{
+	TRACE("VMSAv8TranslationMap::UnmapArea(0x%" B_PRIxADDR "(%s), 0x%"
+		B_PRIxADDR ", 0x%" B_PRIxSIZE ", %d, %d)\n", (addr_t)area,
+		area->name, area->Base(), area->Size(), deletingAddressSpace,
+		ignoreTopCachePageFlags);
+
+	uint64_t vaMask = (1UL << fVaBits) - 1;
+
+	if (area->cache_type == CACHE_TYPE_DEVICE || area->wiring != B_NO_LOCK) {
+		UnmapPages(area, area->Base(), area->Size(), true);
+		return;
+	}
+
+	bool unmapPages = !deletingAddressSpace || !ignoreTopCachePageFlags;
+
+	RecursiveLocker locker(fLock);
+	ThreadCPUPinner pinner(thread_get_current_thread());
+
+	VMAreaMappings mappings;
+	mappings.MoveFrom(&area->mappings);
+
+	for (VMAreaMappings::Iterator it = mappings.GetIterator();
+			vm_page_mapping* mapping = it.Next();) {
+
+		vm_page* page = mapping->page;
+		page->mappings.Remove(mapping);
+
+		VMCache* cache = page->Cache();
+
+		bool pageFullyUnmapped = false;
+		if (!page->IsMapped()) {
+			atomic_add(&gMappedPagesCount, -1);
+			pageFullyUnmapped = true;
+		}
+
+		if (unmapPages || cache != area->cache) {
+			addr_t address = area->Base()
+				+ ((page->cache_offset * B_PAGE_SIZE)
+				- area->cache_offset);
+
+			uint64_t oldPte = 0;
+			ProcessRange(fPageTable, fInitialLevel, address & vaMask, B_PAGE_SIZE, nullptr,
+				[=, &oldPte](uint64_t* ptePtr, uint64_t effectiveVa) {
+					oldPte = atomic_get_and_set64((int64_t*)ptePtr, 0);
+					if ((oldPte & kAttrAF) != 0) {
+						asm("dsb ishst"); // Ensure PTE write completed
+						FlushVAFromTLBByASID(effectiveVa);
+					}
+				});
+
+			if ((oldPte & kPteValidMask) == 0) {
+				panic("page %p has mapping for area %p "
+					"(%#" B_PRIxADDR "), but has no "
+					"page table", page, area, address);
+				continue;
+			}
+
+			// transfer the accessed/dirty flags to the page and
+			// invalidate the mapping, if necessary
+			if (is_pte_dirty(oldPte))
+				page->modified = true;
+			if (oldPte & kAttrAF)
+				page->accessed = true;
+
+			if (pageFullyUnmapped) {
+				DEBUG_PAGE_ACCESS_START(page);
+
+				if (cache->temporary) {
+					vm_page_set_state(page,
+						PAGE_STATE_INACTIVE);
+				} else if (page->modified) {
+					vm_page_set_state(page,
+						PAGE_STATE_MODIFIED);
+				} else {
+					vm_page_set_state(page,
+						PAGE_STATE_CACHED);
+				}
+
+				DEBUG_PAGE_ACCESS_END(page);
+			}
+		}
+	}
+
+	locker.Unlock();
+
+	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
+		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
+
+	while (vm_page_mapping* mapping = mappings.RemoveHead())
+		vm_free_page_mapping(mapping->page->physical_page_number, mapping, freeFlags);
+}
+
+
 bool
 VMSAv8TranslationMap::ValidateVa(addr_t va)
 {
