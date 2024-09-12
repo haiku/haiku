@@ -75,6 +75,30 @@ alloc_first_free_asid(void)
 }
 
 
+static bool
+is_pte_dirty(uint64_t pte)
+{
+	return (pte & kAttrAPReadOnly) == 0;
+}
+
+
+static uint64_t
+set_pte_dirty(uint64_t pte)
+{
+	if ((pte & kAttrSWDBM) != 0)
+		return pte & ~kAttrAPReadOnly;
+
+	return pte;
+}
+
+
+static uint64_t
+set_pte_clean(uint64_t pte)
+{
+	return pte | kAttrAPReadOnly;
+}
+
+
 VMSAv8TranslationMap::VMSAv8TranslationMap(
 	bool kernel, phys_addr_t pageTable, int pageBits, int vaBits, int minBlockLevel)
 	:
@@ -604,7 +628,7 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 	pinner.Unlock();
 	locker.Detach();
 	PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, (oldPte & kAttrAF) != 0,
-		(oldPte & kAttrAPReadOnly) == 0, updatePageQueue);
+		is_pte_dirty(oldPte), updatePageQueue);
 
 	return B_OK;
 }
@@ -644,7 +668,7 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 			*flags |= PAGE_PRESENT | B_KERNEL_READ_AREA;
 			if ((pte & kAttrAF) != 0)
 				*flags |= PAGE_ACCESSED;
-			if ((pte & kAttrAPReadOnly) == 0)
+			if (is_pte_dirty(pte))
 				*flags |= PAGE_MODIFIED;
 
 			if ((pte & kAttrUXN) == 0)
@@ -655,7 +679,7 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 			if ((pte & kAttrAPUserAccess) != 0)
 				*flags |= B_READ_AREA;
 
-			if ((pte & kAttrAPReadOnly) == 0 || (pte & kAttrSWDBM) != 0) {
+			if ((pte & kAttrSWDBM) != 0) {
 				*flags |= B_KERNEL_WRITE_AREA;
 				if ((pte & kAttrAPUserAccess) != 0)
 					*flags |= B_WRITE_AREA;
@@ -703,12 +727,9 @@ VMSAv8TranslationMap::Protect(addr_t start, addr_t end, uint32 attributes, uint3
 				// Preserve access bit.
 				newPte |= oldPte & kAttrAF;
 
-				// If the new mapping is writable, preserve the dirty bit.
-				if (attributes & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) {
-					if ((oldPte & kAttrAPReadOnly) == 0) {
-						newPte &= ~kAttrAPReadOnly;
-					}
-				}
+				// Preserve the dirty bit.
+				if (is_pte_dirty(oldPte))
+					newPte = set_pte_dirty(newPte);
 
 				uint64_t oldMemoryType = oldPte & (kAttrShareability | kAttrMemoryAttrIdx);
 				uint64_t newMemoryType = newPte & (kAttrShareability | kAttrMemoryAttrIdx);
@@ -765,7 +786,7 @@ VMSAv8TranslationMap::ClearFlags(addr_t va, uint32 flags)
 				while (true) {
 					uint64_t oldPte = atomic_get64((int64_t*)ptePtr);
 					uint64_t newPte = oldPte & ~kAttrAF;
-					newPte |= kAttrAPReadOnly;
+					newPte = set_pte_clean(newPte);
 
                     if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte)
 						break;
@@ -773,7 +794,14 @@ VMSAv8TranslationMap::ClearFlags(addr_t va, uint32 flags)
 			} else if (clearAF) {
 				atomic_and64((int64_t*)ptePtr, ~kAttrAF);
 			} else {
-				atomic_or64((int64_t*)ptePtr, kAttrAPReadOnly);
+				while (true) {
+					uint64_t oldPte = atomic_get64((int64_t*)ptePtr);
+					if (!is_pte_dirty(oldPte))
+						return;
+					uint64_t newPte = set_pte_clean(oldPte);
+                    if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte)
+						break;
+				}
 			}
 			asm("dsb ishst"); // Ensure PTE write completed
 		});
@@ -809,7 +837,7 @@ VMSAv8TranslationMap::ClearAccessedAndModified(
 			while (true) {
 				oldPte = atomic_get64((int64_t*)ptePtr);
 				uint64_t newPte = oldPte & ~kAttrAF;
-				newPte |= kAttrAPReadOnly;
+				newPte = set_pte_clean(newPte);
 
 				// If the page has been not be accessed, then unmap it.
 				if (unmapIfUnaccessed && (oldPte & kAttrAF) == 0)
@@ -822,7 +850,7 @@ VMSAv8TranslationMap::ClearAccessedAndModified(
 		});
 
 	pinner.Unlock();
-	_modified = (oldPte & kAttrAPReadOnly) == 0;
+	_modified = is_pte_dirty(oldPte);
 	if ((oldPte & kAttrAF) != 0) {
 		FlushVAFromTLBByASID(address);
 		return true;
