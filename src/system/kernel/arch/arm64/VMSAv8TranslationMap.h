@@ -121,8 +121,8 @@ private:
 	template<typename UpdatePte>
 	void ProcessRange(phys_addr_t ptPa, int level, addr_t va, size_t size,
 		vm_page_reservation* reservation, UpdatePte &&updatePte);
-	uint64_t AttemptPteBreakBeforeMake(uint64_t* ptePtr, uint64_t oldPte, addr_t va);
-	void FlushVAFromTLBByASID(addr_t va);
+	bool AttemptPteBreakBeforeMake(uint64_t* ptePtr, uint64_t oldPte, addr_t va);
+	bool FlushVAIfAccessed(uint64_t pte, addr_t va);
 };
 
 
