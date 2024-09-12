@@ -1054,6 +1054,13 @@ else
 		else
 			gcc="${crossToolsPrefix}gcc"
 		fi
+
+		if [ -z "$gcc" ]; then
+			echo "Please specify the build tools to use or build (via" \
+				"--cross-tools-prefix or --build-cross-tools)." >&2
+			echo "For more info, invoke $0 --help"
+			exit 1
+		fi
 		standard_gcc_settings "$gcc"
 		targetArch=$standard_gcc_settings_targetArch
 
