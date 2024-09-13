@@ -97,6 +97,8 @@ options:
                               GDB for each arch we build the cross-tools for.
   --use-stack-protector       Build with stack protection enabled
   --efi-signing-key           Private keyfile to sign any EFI bootloaders
+  --with-python <python>      Specify python to use, instead of system
+                              default.
 
 environment variables:
   CC                          The host compiler. Defaults to "gcc".
@@ -831,6 +833,7 @@ while [ $# -gt 0 ] ; do
 			HAIKU_EFI_SIGNING_KEY="$2"
 			shift 2
 			;;
+		--with-python)	pythonPath=$2; shift 2;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -880,7 +883,9 @@ if ! $JAMSHELL -c true; then
 fi
 
 # locate python
-if python3 --version < /dev/null > /dev/null 2>&1; then
+if [ -n "$pythonPath" ] && "$pythonPath" --version < /dev/null > /dev/null 2>&1; then
+	HOST_PYTHON="$pythonPath"
+elif python3 --version < /dev/null > /dev/null 2>&1; then
 	HOST_PYTHON="python3"
 elif python --version < /dev/null > /dev/null 2>&1; then
 	HOST_PYTHON="python"
