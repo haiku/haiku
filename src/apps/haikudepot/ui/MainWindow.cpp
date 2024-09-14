@@ -187,6 +187,8 @@ MainWindow::MainWindow(const BMessage& settings)
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
 
+	_InitPreferredLanguage();
+
 	fPackageInfoListener = PackageInfoListenerRef(
 		new MainWindowPackageInfoListener(this), true);
 
@@ -293,6 +295,8 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
+
+	_InitPreferredLanguage();
 
 	fPackageInfoListener = PackageInfoListenerRef(
 		new MainWindowPackageInfoListener(this), true);

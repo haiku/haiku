@@ -36,9 +36,10 @@ LanguageMenuUtils::AddLanguagesToMenu(const LanguageRepository* repository, BMen
 	// collect all of the languages into a vector so that they can be sorted
 	// and used.
 
-	std::vector<LanguageRef> languages(repository->CountLanguages());
+	int32 count = repository->CountLanguages();
+	std::vector<LanguageRef> languages(count);
 
-	for (int32 i = repository->CountLanguages(); i >= 0; i--)
+	for (int32 i = count - 1; i >= 0; i--)
 		languages[i] = repository->LanguageAtIndex(i);
 
 	std::sort(languages.begin(), languages.end(), IsLanguageBefore);
