@@ -14,4 +14,4 @@ usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single]
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\t(solo) permitir que solo se pueda seleccionar 1 archivo\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\thace modal al FilePanel\n
 options:\n	FilePanelApp		opciones:\n
--d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directorio\tabierto en <folder>\n
+-d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tabierto en <folder>\n

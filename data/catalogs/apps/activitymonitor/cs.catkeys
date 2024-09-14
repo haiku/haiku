@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ActivityMonitor	1319108693
+1	czech	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Týmy
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		Odkládací soubor
 P-faults	DataSource		P-faults
 Sems	DataSource		Sem
 Network receive	DataSource		Přijato sítí
+%s faults/s	DataSource		%s chyb/s

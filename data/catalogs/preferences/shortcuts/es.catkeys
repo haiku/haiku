@@ -44,4 +44,4 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Abrir el conjunto de claves
 File	ShortcutsWindow		Archivo
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
-*MoveMouseTo 50% 50%	ShortcutsWindow		*Movimientodelratóna 50% 50%
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoverRatónEn 50% 50%

@@ -18,7 +18,7 @@ Duplicate	Icon-O-Matic-StylesList		複製
 32 × 32	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	32 × 32
 Rotate	Icon-O-Matic-TransformationBoxStates		回転
 Shorten	Icon-O-Matic-PropertyNames		縮める
-Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{個のトランスフォーマー} other{個のトランスフォーマー}}の移動
+Move {0, plural, one{transformer} other{transformers}}	Icon-O-Matic-MoveTransformersCmd		{0, plural, one{"個のトランスフォーマー"} other{"個のトランスフォーマー"}}の移動
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		インポートしようとしているテキストはとても長いですがよろしいですか?
 Paste	Icon-O-Matic-Properties		貼り付け
 There are too many styles. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		スタイルが多すぎます。HVIF フォーマットは最大 255 個までのスタイルをサポートします。

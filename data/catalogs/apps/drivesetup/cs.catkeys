@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	2943652182
+1	czech	x-vnd.Haiku-DriveSetup	63900332
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
@@ -42,6 +42,7 @@ Format	InitializeParametersPanel		Formátovat
 Could not unmount partition	MainWindow		Nepodařilo se odpojit svazek
 Create	CreateParametersPanel		Vytvořit
 File system	PartitionList		Systém souborů
+Unknown (%s)	PartitionList		Neznámý (%s)
 The selected partition does not contain a partitioning system.	MainWindow		Vybraný oddíl neobsahuje oddílovací systém.
 End: %s	Support		Konec: %s
 Partition type	PartitionList		Typ oddílu

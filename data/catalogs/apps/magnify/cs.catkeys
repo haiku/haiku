@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Magnify	1465621918
+1	czech	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  velikost musí být > 4 a násobkem 4
 Decrease pixel size	Magnify-Main		Snížit velikost pixelu
 no clip msg	In console, when clipboard is empty after clicking Copy image		žádná zpráva schránky
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Zvětšit velikost okna
 Save image	Magnify-Main		Uložit obrázek
 Show grid	Magnify-Main		Zobrazit mřížku
 Magnify	System name		Lupa
+height	Magnify-Main		výška
+width	Magnify-Main		šířka
 Info	Magnify-Main		Informace
 Show info	Magnify-Main		Zobrazit informace
 Make square	Magnify-Main		Udělat čtverec

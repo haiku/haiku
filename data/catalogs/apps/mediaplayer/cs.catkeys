@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaPlayer	171477831
+1	czech	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
@@ -49,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení Přehrávače médi�
 Copyright	MediaPlayer-InfoWin		Autorská práva
 Invalid URL inserted!	MediaPlayer-NetworkStream		Vloženo neplatné URL!
 Aspect ratio	MediaPlayer-Main		Poměr stran
+Eject device	MediaPlayer-Main		Vysunout zařízení
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Uložení playlistu selhalo.\n\nChyba:
 <no media>	MediaPlayer-InfoWin		<žádné médium>
 Hide interface	MediaPlayer-Main		Skrýt rozhraní
@@ -125,6 +126,7 @@ Full screen	MediaPlayer-Main		Celá obrazovka
 OK	MediaPlayer-NetworkStream		OK
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnitřní chyba (locking failed). Uložení playlistu selhalo.
 100% scale	MediaPlayer-Main		100% měřítko
+New player	MediaPlayer-Main		Nový přehrávač
 <nothing to redo>	MediaPlayer-PlaylistWindow		<nic, co by šlo vrátit>
 Bad URL	MediaPlayer-NetworkStream		Chybné URL
 Save	MediaPlayer-Main		Uložit

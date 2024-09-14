@@ -11,4 +11,4 @@ New mail notification	NotifierFilter		Notificación de nuevo correo electrónico
 New messages	NotifierFilter		Mensajes nuevos
 Method:	NotifierConfigView		Método:
 Keyboard LEDs	NotifierConfigView		Luces LED de teclado
-You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Tiene {0, plural, one{one new message} other{# new messages}} en %account.
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Tiene {0, plural, one{un mensaje nuevo} other{# mensajes nuevos}} en %account.
