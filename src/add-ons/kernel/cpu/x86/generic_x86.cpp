@@ -74,10 +74,10 @@ set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 	uint64 mask = length - 1;
 	mask = ~mask & gPhysicalMask;
 
-	TRACE("MTRR %lu: new mask %Lx\n", index, mask);
-	TRACE("  mask test base: %Lx\n", mask & base);
-	TRACE("  mask test middle: %Lx\n", mask & (base + length / 2));
-	TRACE("  mask test end: %Lx\n", mask & (base + length));
+	TRACE("MTRR %" B_PRIu32 ": new mask %" B_PRIx64 "\n", index, mask);
+	TRACE("  mask test base: %" B_PRIx64 "\n", mask & base);
+	TRACE("  mask test middle: %" B_PRIx64 "\n", mask & (base + length / 2));
+	TRACE("  mask test end: %" B_PRIx64 "\n", mask & (base + length));
 
 	index *= 2;
 		// there are two registers per slot
@@ -111,8 +111,9 @@ generic_count_mtrrs(void)
 		return 0;
 
 	mtrr_capabilities capabilities(x86_read_msr(IA32_MSR_MTRR_CAPABILITIES));
-	TRACE("CPU %ld has %u variable range MTRRs.\n", smp_get_current_cpu(),
-		(uint8)capabilities.variable_ranges);
+	TRACE("CPU %" B_PRId32 " has %u variable range MTRRs.\n",
+		smp_get_current_cpu(), (uint8)capabilities.variable_ranges);
+
 	return capabilities.variable_ranges;
 }
 
@@ -129,7 +130,7 @@ generic_init_mtrrs(uint32 count)
 	// all registers and enable MTRRs.
 	// (we leave the fixed MTRRs as is)
 	// TODO: check if the fixed MTRRs are set on all CPUs identically?
-	TRACE("generic_init_mtrrs(count = %ld)\n", count);
+	TRACE("generic_init_mtrrs(count = %" B_PRIu32 ")\n", count);
 
 	uint64 defaultType = x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE);
 	if ((defaultType & IA32_MTRR_ENABLE) == 0) {
@@ -150,7 +151,7 @@ void
 generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
 	set_mtrr(index, base, length, type);
-	TRACE("[cpu %ld] mtrrs now:\n", smp_get_current_cpu());
+	TRACE("[cpu %" B_PRId32 "] mtrrs now:\n", smp_get_current_cpu());
 	generic_dump_mtrrs(generic_count_mtrrs());
 }
 
@@ -220,7 +221,8 @@ generic_mtrr_compute_physical_mask(void)
 
 	gPhysicalMask = ((1ULL << bits) - 1) & ~(B_PAGE_SIZE - 1);
 
-	TRACE("CPU %ld has %ld physical address bits, physical mask is %016Lx\n",
+	TRACE("CPU %" B_PRId32 " has %" B_PRIu32
+		" physical address bits, physical mask is %016" B_PRIx64 "\n",
 		smp_get_current_cpu(), bits, gPhysicalMask);
 
 	return B_OK;
@@ -248,10 +250,11 @@ generic_dump_mtrrs(uint32 count)
 		uint64 length;
 		uint8 type;
 		if (generic_get_mtrr(i, &base, &length, &type) == B_OK) {
-			TRACE("[cpu %d] %lu: base: 0x%Lx; length: 0x%Lx; type: %u %s\n",
-				cpu, i, base, length, type, mtrr_type_to_string(type));
+			TRACE("[cpu %d] %" B_PRIu32 ": base: 0x%" B_PRIx64 "; length: 0x%"
+				B_PRIx64 "; type: %u %s\n", cpu, i, base, length, type,
+				mtrr_type_to_string(type));
 		} else
-			TRACE("[cpu %d] %lu: empty\n", cpu, i);
+			TRACE("[cpu %d] %" B_PRIu32 ": empty\n", cpu, i);
 	}
 #endif // TRACE_MTRR
 }
