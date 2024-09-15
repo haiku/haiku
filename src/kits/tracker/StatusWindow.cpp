@@ -645,7 +645,7 @@ BStatusView::Draw(BRect updateRect)
 	BRect bounds(Bounds());
 	be_control_look->DrawRaisedBorder(this, bounds, updateRect, ViewColor());
 
-	SetHighColor(0, 0, 0);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	BPoint tp = fStatusBar->Frame().LeftBottom();
 	font_height fh;
@@ -684,7 +684,11 @@ BStatusView::Draw(BRect updateRect)
 		DrawString(destinationString.String(), textPoint);
 	}
 
-	SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+	if (LowColor().IsLight())
+		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+	else
+		SetHighColor(tint_color(LowColor(), B_LIGHTEN_2_TINT));
+
 	font.SetSize(smallFontSize);
 	SetFont(&font, B_FONT_SIZE);
 
