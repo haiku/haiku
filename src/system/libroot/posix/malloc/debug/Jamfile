@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system libroot posix malloc_debug ;
+SubDir HAIKU_TOP src system libroot posix malloc debug ;
 
 UsePrivateHeaders libroot shared runtime_loader ;
 

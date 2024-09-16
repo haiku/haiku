@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src system libroot posix malloc_hoard2 ;
+SubDir HAIKU_TOP src system libroot posix malloc hoard2 ;
 
 UsePrivateHeaders libroot shared ;
 
