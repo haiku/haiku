@@ -44,3 +44,8 @@ dummy()
 	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler);
 	DEFINE_OFFSET_MACRO(CPU_ENT, cpu_ent, fault_handler_stack_pointer);
 }
+
+
+// fp must be located at x[29] so that we can load/store
+// x[28] and fp with a single LDP/STP instruction.
+STATIC_ASSERT(offsetof(iframe, fp) == offsetof(iframe, x) + 29 * 8);

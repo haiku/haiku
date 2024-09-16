@@ -132,10 +132,10 @@ struct iframe {
 	// return info
 	uint64 elr;
 	uint64 spsr;
-	uint64 x[20];
+	uint64 x[29];
+	uint64 fp;
 	uint64 lr;
 	uint64 sp;
-	uint64 fp;
 
 	// exception info
 	uint64 esr;
