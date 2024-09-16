@@ -11,9 +11,10 @@
 
 
 #include_next <stdlib.h>
+#include <features.h>
 
 
-#ifdef _GNU_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #ifdef __cplusplus
@@ -30,7 +31,7 @@ extern void qsort_r(void* base, size_t numElements, size_t sizeOfElement,
 #endif
 
 
-#endif /* _GNU_SOURCE */
+#endif /* _DEFAULT_SOURCE */
 
 
 #endif /* _GNU_STDLIB_H_ */

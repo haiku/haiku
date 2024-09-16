@@ -5,7 +5,7 @@
  * for further information
  */
 
-#define _GNU_SOURCE
+#define _DEFAULT_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>

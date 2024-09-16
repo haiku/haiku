@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 
+
 extern void *malloc(size_t numBytes);
 extern void *realloc(void *oldPointer, size_t newSize);
 extern void *calloc(size_t numElements, size_t size);
@@ -20,9 +21,10 @@ extern void free(void *pointer);
 extern void *memalign(size_t alignment, size_t numBytes) _ALIGNED_BY_ARG(1);
 extern void *valloc(size_t numBytes);
 
-#ifdef _GNU_SOURCE
+#ifdef _DEFAULT_SOURCE
 size_t malloc_usable_size(void *ptr);
 #endif
+
 
 #ifdef __cplusplus
 }

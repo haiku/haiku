@@ -13,7 +13,7 @@
 #include <sys/types.h>
 
 
-#ifdef _GNU_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #ifndef CPU_SETSIZE

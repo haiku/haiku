@@ -9,7 +9,8 @@
 #include_next <pthread.h>
 #include <features.h>
 
-#ifdef _GNU_SOURCE
+
+#ifdef _DEFAULT_SOURCE
 
 
 #include <sched.h>

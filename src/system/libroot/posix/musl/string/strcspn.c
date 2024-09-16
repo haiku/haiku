@@ -1,4 +1,4 @@
-#define _GNU_SOURCE
+#define _DEFAULT_SOURCE
 #include <string.h>
 
 #define BITOP(a,b,op) \
