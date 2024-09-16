@@ -86,7 +86,7 @@ extern status_t		_kern_mutex_lock(int32* mutex, const char* name,
 						uint32 flags, bigtime_t timeout);
 extern status_t		_kern_mutex_unblock(int32* mutex, uint32 flags);
 extern status_t		_kern_mutex_switch_lock(int32* fromMutex, uint32 fromFlags,
-						int32* toMutex, const char* name, uint32 toflags,
+						int32* toMutex, const char* name, uint32 toFlags,
 						bigtime_t timeout);
 extern status_t		_kern_mutex_sem_acquire(int32* sem, const char* name,
 						uint32 flags, bigtime_t timeout);
