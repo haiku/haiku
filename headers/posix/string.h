@@ -23,7 +23,7 @@ extern void		*memccpy(void *dest, const void *source, int stopByte, size_t lengt
 extern void		*memmove(void *dest, const void *source, size_t length);
 extern void		*memset(void *dest, int value, size_t length);
 
-#ifdef _GNU_SOURCE
+#ifdef _DEFAULT_SOURCE
 extern void		*memrchr(const void *source, int value, size_t length);
 #endif
 
@@ -41,7 +41,7 @@ extern char		*strchr(const char *string, int character);
 extern char		*strrchr(const char *string, int character);
 extern char		*strstr(const char *string, const char *searchString);
 
-#ifdef _GNU_SOURCE
+#ifdef _DEFAULT_SOURCE
 extern char		*strchrnul(const char *string, int character);
 #endif
 

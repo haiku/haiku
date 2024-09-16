@@ -7,9 +7,10 @@
 
 
 #include_next <math.h>
+#include <features.h>
 
 
-#ifdef _GNU_SOURCE
+#ifdef _DEFAULT_SOURCE
 
 
 #ifdef __cplusplus
