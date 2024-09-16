@@ -19,11 +19,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateSystemHeaders ;
 
 		ObjectHdrs find_directory.cpp : $(HAIKU_TOP)/src/system/libroot/os ;
+		ObjectC++Flags kernel_cpp.cpp : -fno-builtin ;
 
-		# Don't let gcc inject built-in function code. This will cause
-		# dependencies to libroot, which we don't link against.
-		SubDirCcFlags -fno-builtin ;
-		SubDirC++Flags -fno-builtin -fno-exceptions ;
+		SubDirC++Flags -fno-exceptions ;
 
 		DEFINES +=
 			KMESSAGE_CONTAINER_ONLY
