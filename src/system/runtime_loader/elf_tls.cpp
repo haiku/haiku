@@ -288,7 +288,7 @@ DynamicThreadVector::_ResizeVector(unsigned minimumSize)
 		return B_NO_MEMORY;
 
 	*fVector = (TLSBlock*)newVector;
-	memset(*fVector + oldSize + 1, 0, (size - oldSize) * sizeof(TLSBlock));
+	memset((void*)(*fVector + oldSize + 1), 0, (size - oldSize) * sizeof(TLSBlock));
 	if (fGeneration == NULL) {
 		fGeneration = new Generation;
 		if (fGeneration == NULL)
