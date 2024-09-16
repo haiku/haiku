@@ -176,10 +176,10 @@ unnamed_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 			timeoutMicros = -1;
 		switch (clock_id) {
 			case CLOCK_REALTIME:
-				flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
+				flags |= B_ABSOLUTE_REAL_TIME_TIMEOUT;
 				break;
 			case CLOCK_MONOTONIC:
-				flags = B_ABSOLUTE_TIMEOUT;
+				flags |= B_ABSOLUTE_TIMEOUT;
 				break;
 			default:
 				return EINVAL;
