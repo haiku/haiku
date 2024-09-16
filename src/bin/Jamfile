@@ -88,7 +88,6 @@ StdBinCommands
 	draggers.cpp
 	ffm.cpp
 	iroster.cpp
-	launch_roster.cpp
 	listattr.cpp
 	listfont.cpp
 	listres.cpp
@@ -136,6 +135,7 @@ StdBinCommands
 
 # standard commands that need libbe.so, libsupc++.so, and libshared.a
 StdBinCommands
+	launch_roster.cpp
 	ramdisk.cpp
 	resizefs.cpp
 	: shared be [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
