@@ -553,7 +553,7 @@ public:
 			&& menu->Superitem() != NULL) {
 			return static_cast<BlocklistMenuItem*>(menu->Superitem())
 					->GetPath(_path)
-			   && _path.Append(Label());
+				&& _path.Append(Label());
 		}
 
 		return _path.SetTo(Label());
@@ -1301,13 +1301,13 @@ add_safe_mode_menu()
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable user add-ons"));
 	item->SetData(B_SAFEMODE_DISABLE_USER_ADD_ONS);
 	item->SetType(MENU_ITEM_MARKABLE);
-    item->SetHelpText("Prevents all user installed add-ons from being loaded. "
+	item->SetHelpText("Prevents all user installed add-ons from being loaded. "
 		"Only the add-ons in the system directory will be used.");
 
 	safeMenu->AddItem(item = new(nothrow) MenuItem("Disable IDE DMA"));
 	item->SetData(B_SAFEMODE_DISABLE_IDE_DMA);
 	item->SetType(MENU_ITEM_MARKABLE);
-    item->SetHelpText("Disables IDE DMA, increasing IDE compatibility "
+	item->SetHelpText("Disables IDE DMA, increasing IDE compatibility "
 		"at the expense of performance.");
 
 #if B_HAIKU_PHYSICAL_BITS > 32
@@ -1453,8 +1453,8 @@ add_debug_menu()
 	item->SetType(MENU_ITEM_MARKABLE);
 	item->SetMarked(gKernelArgs.keep_debug_output_buffer);
 	item->SetTarget(&debug_menu_toggle_debug_syslog);
-    item->SetHelpText("Enables a special in-memory syslog buffer for this "
-    	"session that the boot loader will be able to access after rebooting.");
+	item->SetHelpText("Enables a special in-memory syslog buffer for this "
+		"session that the boot loader will be able to access after rebooting.");
 
 	ring_buffer* syslogBuffer
 		= (ring_buffer*)gKernelArgs.debug_output.Pointer();

@@ -138,8 +138,8 @@ typedef void (*daemon_hook)(void *arg, int iteration);
 /* kernel debugging facilities */
 
 /* special return codes for kernel debugger */
-#define  B_KDEBUG_CONT   2
-#define  B_KDEBUG_QUIT   3
+#define B_KDEBUG_CONT	2
+#define B_KDEBUG_QUIT	3
 
 typedef int (*debugger_command_hook)(int argc, char **argv);
 
@@ -207,7 +207,7 @@ extern void			dprintf(const char *format, ...) _PRINTFLIKE(1, 2);
 extern void			dvprintf(const char *format, va_list args);
 extern void			kprintf(const char *fmt, ...) _PRINTFLIKE(1, 2);
 
-extern void 		dump_block(const char *buffer, int size, const char *prefix);
+extern void			dump_block(const char *buffer, int size, const char *prefix);
 						/* TODO: temporary API: hexdumps given buffer */
 
 extern bool			set_dprintf_enabled(bool new_state);
