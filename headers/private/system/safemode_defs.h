@@ -15,6 +15,7 @@
 #define B_SAFEMODE_DISABLE_SMEP_SMAP		"disable_smep_smap"
 #define B_SAFEMODE_DISABLE_APM				"disable_apm"
 #define B_SAFEMODE_DISABLE_SMP				"disable_smp"
+#define B_SAFEMODE_DISABLE_PAT				"disable_pat"
 #define B_SAFEMODE_DISABLE_HYPER_THREADING	"disable_hyperthreading"
 #define B_SAFEMODE_FAIL_SAFE_VIDEO_MODE		"fail_safe_video_mode"
 #define B_SAFEMODE_4_GB_MEMORY_LIMIT		"4gb_memory_limit"

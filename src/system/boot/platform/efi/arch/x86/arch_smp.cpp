@@ -362,6 +362,16 @@ arch_smp_add_safemode_menus(Menu *menu)
 		}
 	}
 
+	cpuid_info info;
+	if (get_current_cpuid(&info, 1, 0) == B_OK
+		&& (info.regs.edx & IA32_FEATURE_PAT) != 0) {
+		menu->AddItem(item = new(nothrow) MenuItem("Disable PAT"));
+		item->SetType(MENU_ITEM_MARKABLE);
+		item->SetData(B_SAFEMODE_DISABLE_PAT);
+		item->SetHelpText("Disables using page attribute tables for memory "
+			"type setting, falling back to MTRRs.");
+	}
+
 	if (gKernelArgs.num_cpus < 2)
 		return;
 

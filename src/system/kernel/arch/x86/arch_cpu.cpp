@@ -128,6 +128,8 @@ static size_t sUcodeDataSize = 0;
 static void* sLoadedUcodeUpdate;
 static spinlock sUcodeUpdateLock = B_SPINLOCK_INITIALIZER;
 
+static bool sUsePAT = false;
+
 
 static status_t
 acpi_shutdown(bool rebootSystem)
@@ -263,6 +265,17 @@ init_mtrrs(void* _unused, int cpu)
 uint32
 x86_count_mtrrs(void)
 {
+	if (sUsePAT) {
+		// When PAT is supported, we completely ignore MTRRs and leave them as
+		// initialized by firmware. This follows the suggestion in Intel SDM
+		// that these don't usually need to be touched by anything after system
+		// init. Using page attributes is the more flexible and modern approach
+		// to memory type handling and they can override MTRRs in the critical
+		// case of write-combining, usually used for framebuffers.
+		dprintf("ignoring MTRRs due to PAT support\n");
+		return 0;
+	}
+
 	if (sCpuModule == NULL)
 		return 0;
 
@@ -306,6 +319,25 @@ x86_set_mtrrs(uint8 defaultType, const x86_mtrr_info* infos, uint32 count)
 
 	sCpuRendezvous = sCpuRendezvous2 = 0;
 	call_all_cpus(&set_mtrrs, &parameter);
+}
+
+
+static void
+init_pat(int cpu)
+{
+	disable_caches();
+
+	uint64 value = x86_read_msr(IA32_MSR_PAT);
+	dprintf("PAT MSR on CPU %d before init: %#" B_PRIx64 "\n", cpu, value);
+
+	// Use PAT entry 4 for write-combining, leave the rest as is
+	value &= ~(IA32_MSR_PAT_ENTRY_MASK << IA32_MSR_PAT_ENTRY_SHIFT(4));
+	value |= IA32_MSR_PAT_TYPE_WRITE_COMBINING << IA32_MSR_PAT_ENTRY_SHIFT(4);
+
+	dprintf("PAT MSR on CPU %d after init: %#" B_PRIx64 "\n", cpu, value);
+	x86_write_msr(IA32_MSR_PAT, value);
+
+	enable_caches();
 }
 
 
@@ -1476,6 +1508,13 @@ x86_check_feature(uint32 feature, enum x86_feature_type type)
 }
 
 
+bool
+x86_use_pat()
+{
+	return sUsePAT;
+}
+
+
 void*
 x86_get_double_fault_stack(int32 cpu, size_t* _size)
 {
@@ -1699,6 +1738,22 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 
 	if (x86_check_feature(IA32_FEATURE_MCE, FEATURE_COMMON))
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_MCE);
+
+	if (cpu == 0) {
+		bool supportsPAT = x86_check_feature(IA32_FEATURE_PAT, FEATURE_COMMON);
+		sUsePAT = supportsPAT
+			&& !get_safemode_boolean_early(args, B_SAFEMODE_DISABLE_PAT, false);
+
+		if (sUsePAT) {
+			dprintf("using PAT for memory type configuration\n");
+		} else {
+			dprintf("not using PAT for memory type configuration (%s)\n",
+				supportsPAT ? "disabled" : "unsupported");
+		}
+	}
+
+	if (sUsePAT)
+		init_pat(cpu);
 
 #ifdef __x86_64__
 	// if RDTSCP or RDPID are available write cpu number in TSC_AUX

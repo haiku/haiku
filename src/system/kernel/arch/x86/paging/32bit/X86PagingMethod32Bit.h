@@ -147,18 +147,14 @@ X86PagingMethod32Bit::ClearPageTableEntryFlags(page_table_entry* entry, uint32 f
 /*static*/ inline uint32
 X86PagingMethod32Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 {
-	// ATM we only handle the uncacheable and write-through type explicitly. For
-	// all other types we rely on the MTRRs to be set up correctly. Since we set
-	// the default memory type to write-back and since the uncacheable type in
-	// the PTE overrides any MTRR attribute (though, as per the specs, that is
-	// not recommended for performance reasons), this reduces the work we
-	// actually *have* to do with the MTRRs to setting the remaining types
-	// (usually only write-combining for the frame buffer).
 	switch (memoryType) {
 		case B_MTR_UC:
 			return X86_PTE_CACHING_DISABLED | X86_PTE_WRITE_THROUGH;
 
 		case B_MTR_WC:
+			if (x86_use_pat())
+				return X86_PTE_PAT;
+
 			// X86_PTE_WRITE_THROUGH would be closer, but the combination with
 			// MTRR WC is "implementation defined" for Pentium Pro/II.
 			return 0;
