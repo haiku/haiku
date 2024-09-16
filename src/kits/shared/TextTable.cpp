@@ -7,6 +7,8 @@
 #include <TextTable.h>
 
 #include <stdio.h>
+#include <ctype.h>
+#include <utf8_functions.h>
 
 #include <algorithm>
 
@@ -65,18 +67,39 @@ struct TextTable::Column {
 		fWidth = width;
 	}
 
-	void UpdateNeededWidth(const BString& text)
+	static int32 TextWidth(const BString& text)
 	{
 		// TODO: Full-width character support.
-		int32 textWidth = text.CountChars();
+		int32 textWidth = 0;
+		const char* string = text.String(), *stringEnd = text.String() + text.Length();
+		while (string < stringEnd) {
+			uint32 charLen = UTF8NextCharLen(string, stringEnd - string);
+			if (charLen == 1 && string[0] == '\033') {
+				// ANSI escape code.
+				charLen++;
+				if (string[charLen - 1] == '[') {
+					// Keep going until we hit an end character.
+					while (!isalpha(string[charLen - 1]) && string[charLen - 1] != '\0')
+						charLen++;
+				}
+			} else {
+				textWidth++;
+			}
+			string += charLen;
+		}
+		return textWidth;
+	}
+
+	void UpdateNeededWidth(const BString& text)
+	{
+		int32 textWidth = TextWidth(text);
 		if (textWidth > fNeededWidth)
 			fNeededWidth = textWidth;
 	}
 
 	BString Format(const BString& text)
 	{
-		// TODO: Full-width character support.
-		int32 textWidth = text.CountChars();
+		int32 textWidth = TextWidth(text);
 		if (textWidth == fWidth)
 			return text;
 
