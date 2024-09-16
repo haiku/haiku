@@ -412,6 +412,17 @@ realloc(void* oldBuffer, size_t newSize)
 }
 
 
+void*
+calloc(size_t numElements, size_t size)
+{
+	void* address = malloc(numElements * size);
+	if (address != NULL)
+		memset(address, 0, numElements * size);
+
+	return address;
+}
+
+
 void
 free(void* allocated)
 {
