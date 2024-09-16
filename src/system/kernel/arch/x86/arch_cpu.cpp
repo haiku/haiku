@@ -656,6 +656,14 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "msr_arch ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_SSBD)
 		strlcat(features, "ssbd ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_AMD_HW_PSTATE)
+		strlcat(features, "hwpstate ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_INVARIANT_TSC)
+		strlcat(features, "constant_tsc ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_CPB)
+		strlcat(features, "cpb ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_7_EDX] & IA32_FEATURE_PROC_FEEDBACK)
+		strlcat(features, "proc_feedback ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVEOPT)
 		strlcat(features, "xsaveopt ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_D_1_EAX] & IA32_FEATURE_XSAVEC)

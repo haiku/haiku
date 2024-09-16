@@ -382,7 +382,10 @@
 #define IA32_FEATURE_XSAVES			(1 << 3) // XSAVES and XRSTORS Instruction
 
 // x86 defined features from cpuid eax 0x80000007, edx register
+#define IA32_FEATURE_AMD_HW_PSTATE		(1 << 7)
 #define IA32_FEATURE_INVARIANT_TSC		(1 << 8)
+#define IA32_FEATURE_CPB				(1 << 9)
+#define IA32_FEATURE_PROC_FEEDBACK		(1 << 11)
 
 // x86 defined features from cpuid eax 0x80000008, ebx register
 #define IA32_FEATURE_CLZERO			(1 << 0)	// CLZERO instruction
