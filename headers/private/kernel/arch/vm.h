@@ -32,7 +32,7 @@ void arch_vm_aspace_swap(struct VMAddressSpace *from,
 bool arch_vm_supports_protection(uint32 protection);
 
 status_t arch_vm_set_memory_type(struct VMArea *area, phys_addr_t physicalBase,
-	uint32 type);
+	uint32 type, uint32 *effectiveType);
 void arch_vm_unset_memory_type(struct VMArea *area);
 
 #ifdef __cplusplus

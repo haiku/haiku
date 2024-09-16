@@ -130,7 +130,8 @@ arch_vm_unset_memory_type(VMArea* area)
 
 
 status_t
-arch_vm_set_memory_type(VMArea* area, phys_addr_t physicalBase, uint32 type)
+arch_vm_set_memory_type(VMArea* area, phys_addr_t physicalBase, uint32 type,
+	uint32 *effectiveType)
 {
 	// Memory type is set in page tables during mapping,
 	// no need to do anything more here.

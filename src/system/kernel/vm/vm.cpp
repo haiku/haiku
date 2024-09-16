@@ -1948,14 +1948,18 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	cache->Unlock();
 
 	if (status == B_OK) {
-		// set requested memory type -- use uncached, if not given
+		// Set requested memory type -- use uncached if not given but allow it
+		// to be overridden by ranges that may already exist
 		uint32 memoryType = addressSpec & B_MTR_MASK;
-		if (memoryType == 0)
+		bool weak = memoryType == 0;
+		if (weak)
 			memoryType = B_MTR_UC;
+
+		status = arch_vm_set_memory_type(area, physicalAddress, memoryType,
+			weak ? &memoryType : NULL);
 
 		area->SetMemoryType(memoryType);
 
-		status = arch_vm_set_memory_type(area, physicalAddress, memoryType);
 		if (status != B_OK)
 			delete_area(locker.AddressSpace(), area, false);
 	}
@@ -5345,7 +5349,7 @@ vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 	map->Unlock();
 
 	// set the physical memory type
-	status_t error = arch_vm_set_memory_type(area, physicalBase, type);
+	status_t error = arch_vm_set_memory_type(area, physicalBase, type, NULL);
 	if (error != B_OK) {
 		// reset the memory type of the area and the mapped pages
 		map->Lock();

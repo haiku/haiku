@@ -131,7 +131,8 @@ arch_vm_unset_memory_type(VMArea *area)
 
 
 status_t
-arch_vm_set_memory_type(VMArea *area, phys_addr_t physicalBase, uint32 type)
+arch_vm_set_memory_type(VMArea *area, phys_addr_t physicalBase, uint32 type,
+	uint32 *effectiveType)
 {
 	if (type == 0)
 		return B_OK;
