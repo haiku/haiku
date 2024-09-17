@@ -50,15 +50,15 @@ static const char *
 mtrr_type_to_string(uint8 type)
 {
 	switch (type) {
-		case 0:
+		case IA32_MTR_UNCACHED:
 			return "uncacheable";
-		case 1:
+		case IA32_MTR_WRITE_COMBINING:
 			return "write combining";
-		case 4:
+		case IA32_MTR_WRITE_THROUGH:
 			return "write-through";
-		case 5:
+		case IA32_MTR_WRITE_PROTECTED:
 			return "write-protected";
-		case 6:
+		case IA32_MTR_WRITE_BACK:
 			return "write-back";
 		default:
 			return "reserved";
