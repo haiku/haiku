@@ -16,6 +16,7 @@
 #include <package/hpkg/RepositoryReader.h>
 #include <package/hpkg/StandardErrorOutput.h>
 #include <package/PackageInfo.h>
+#include <package/PackageInfoContentHandler.h>
 #include <package/RepositoryInfo.h>
 
 #include "package_repo.h"
@@ -26,11 +27,13 @@ using namespace BPackageKit::BHPKG;
 using namespace BPackageKit;
 
 struct RepositoryContentListHandler : BRepositoryContentHandler {
-	RepositoryContentListHandler(bool verbose)
+	RepositoryContentListHandler(bool filenames, bool verbose)
 		:
 		fPrinter(),
 		fLevel(0),
-		fVerbose(verbose)
+		fVerbose(verbose),
+		fFilenames(filenames),
+		fPackageInfoContentHandler(fPackageInfo, NULL)
 	{
 	}
 
@@ -42,12 +45,16 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
+		if (fFilenames)
+			fPackageInfoContentHandler.HandlePackageAttribute(value);
+
 		if (value.attributeID == B_PACKAGE_INFO_NAME) {
 			if (fVerbose) {
 				printf("package-attributes:\n");
 				fPrinter.PrintName(value.string);
-			} else
+			} else if (!fFilenames) {
 				printf("\t%s\n", value.string);
+			}
 		} else {
 			if (fVerbose && !fPrinter.PrintAttribute(value)) {
 				printf("*** Invalid package attribute section: unexpected "
@@ -61,6 +68,11 @@ struct RepositoryContentListHandler : BRepositoryContentHandler {
 
 	virtual status_t HandlePackageDone(const char* packageName)
 	{
+		if (fFilenames) {
+			printf("%s%s\n", fVerbose ? "filename: " : "\t",
+				fPackageInfo.CanonicalFileName().String());
+			fPackageInfo.Clear();
+		}
 		return B_OK;
 	}
 
@@ -100,29 +112,38 @@ private:
 	PackageInfoPrinter	fPrinter;
 	int					fLevel;
 	bool				fVerbose;
+
+	bool				fFilenames;
+	BPackageInfoContentHandler fPackageInfoContentHandler;
+	BPackageInfo		fPackageInfo;
 };
 
 
 int
 command_list(int argc, const char* const* argv)
 {
-	bool verbose = false;
+	bool verbose = false, filenames = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "help", no_argument, 0, 'h' },
+			{ "filenames", no_argument, 0, 'f' },
 			{ "verbose", no_argument, 0, 'v' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "+hv", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "+hfv", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
 		switch (c) {
 			case 'h':
 				print_usage_and_exit(false);
+				break;
+
+			case 'f':
+				filenames = true;
 				break;
 
 			case 'v':
@@ -149,7 +170,7 @@ command_list(int argc, const char* const* argv)
 		return 1;
 
 	// list
-	RepositoryContentListHandler handler(verbose);
+	RepositoryContentListHandler handler(filenames, verbose);
 	error = repositoryReader.ParseContent(&handler);
 	if (error != B_OK)
 		return 1;

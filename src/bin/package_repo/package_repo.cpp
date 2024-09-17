@@ -32,6 +32,7 @@ static const char* kUsage =
 	"  list [ <options> ] <package-repo>\n"
 	"    Lists the contents of package repository file <package-repo>.\n"
 	"\n"
+	"    -f         - print canonical filenames of packages.\n"
 	"    -v         - be verbose (list attributes of all packages found).\n"
 	"\n"
 	"  update [ <options> ] <source-repo> <new-repo> <package-list-file> \n"
