@@ -46,7 +46,6 @@ struct mtrr_capabilities {
 uint64 gPhysicalMask = 0;
 
 
-#ifdef TRACE_MTRR
 static const char *
 mtrr_type_to_string(uint8 type)
 {
@@ -65,7 +64,6 @@ mtrr_type_to_string(uint8 type)
 			return "reserved";
 	}
 }
-#endif // TRACE_MTRR
 
 
 static void
@@ -152,7 +150,9 @@ generic_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 {
 	set_mtrr(index, base, length, type);
 	TRACE("[cpu %" B_PRId32 "] mtrrs now:\n", smp_get_current_cpu());
+#if TRACE_MTRR
 	generic_dump_mtrrs(generic_count_mtrrs());
+#endif
 }
 
 
@@ -232,17 +232,16 @@ generic_mtrr_compute_physical_mask(void)
 void
 generic_dump_mtrrs(uint32 count)
 {
-#ifdef TRACE_MTRR
 	if (count == 0)
 		return;
 
 	int cpu = smp_get_current_cpu();
 	uint64 defaultType = x86_read_msr(IA32_MSR_MTRR_DEFAULT_TYPE);
-	TRACE("[cpu %d] MTRRs are %sabled\n", cpu,
+	dprintf("mtrr: [cpu %d] MTRRs are %sabled\n", cpu,
 		(defaultType & IA32_MTRR_ENABLE) != 0 ? "en" : "dis");
-	TRACE("[cpu %d] default type is %u %s\n", cpu,
+	dprintf("mtrr: [cpu %d] default type is %u %s\n", cpu,
 		(uint8)defaultType, mtrr_type_to_string(defaultType));
-	TRACE("[cpu %d] fixed range MTRRs are %sabled\n", cpu,
+	dprintf("mtrr: [cpu %d] fixed range MTRRs are %sabled\n", cpu,
 		(defaultType & IA32_MTRR_ENABLE_FIXED) != 0 ? "en" : "dis");
 
 	for (uint32 i = 0; i < count; i++) {
@@ -250,13 +249,11 @@ generic_dump_mtrrs(uint32 count)
 		uint64 length;
 		uint8 type;
 		if (generic_get_mtrr(i, &base, &length, &type) == B_OK) {
-			TRACE("[cpu %d] %" B_PRIu32 ": base: 0x%" B_PRIx64 "; length: 0x%"
-				B_PRIx64 "; type: %u %s\n", cpu, i, base, length, type,
-				mtrr_type_to_string(type));
-		} else
-			TRACE("[cpu %d] %" B_PRIu32 ": empty\n", cpu, i);
+			dprintf("mtrr: [cpu %d] %" B_PRIu32 ": base: 0x%" B_PRIx64
+				"; length: 0x%" B_PRIx64 "; type: %u %s\n", cpu, i, base,
+				length, type, mtrr_type_to_string(type));
+		}
 	}
-#endif // TRACE_MTRR
 }
 
 
