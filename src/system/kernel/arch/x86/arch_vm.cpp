@@ -658,6 +658,45 @@ remove_memory_type_range(area_id areaID)
 }
 
 
+static const char *
+memory_type_to_string(uint32 type)
+{
+	switch (type) {
+		case B_MTR_UC:
+			return "uncacheable";
+		case B_MTR_WC:
+			return "write combining";
+		case B_MTR_WT:
+			return "write-through";
+		case B_MTR_WP:
+			return "write-protected";
+		case B_MTR_WB:
+			return "write-back";
+		default:
+			return "unknown";
+	}
+}
+
+
+static int
+dump_memory_type_ranges(int argc, char **argv)
+{
+	kprintf(
+		"start            end              size             area     type\n");
+
+	for (MemoryTypeRangeList::Iterator it = sMemoryTypeRanges.GetIterator();
+			memory_type_range* range = it.Next();) {
+
+		kprintf("%#16" B_PRIx64 " %#16" B_PRIx64 " %#16" B_PRIx64 " % 8"
+			B_PRId32 " %#" B_PRIx32 " %s\n", range->base,
+			range->base + range->size, range->size, range->area, range->type,
+			memory_type_to_string(range->type));
+	}
+
+	return 0;
+}
+
+
 //	#pragma mark -
 
 
@@ -688,6 +727,11 @@ arch_vm_init_post_area(kernel_args *args)
 		panic("arch_vm_init_post_area: unable to map dma region\n");
 		return B_NO_MEMORY;
 	}
+
+	add_debugger_command_etc("memory_type_ranges", &dump_memory_type_ranges,
+		"List all configured memory type ranges",
+		"\n"
+		"Lists all memory type ranges with their types and areas.\n", 0);
 
 #ifndef __x86_64__
 	return bios_init();
