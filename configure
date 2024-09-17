@@ -907,6 +907,11 @@ case $PYTHON_VERSION in
 		;;
 esac
 
+# check if wget supports --retry-on-host-error
+if wget --retry-on-host-error --version > /dev/null 2>&1; then
+	HOST_WGET_RETRY_ON_HOST_ERROR=1
+fi
+
 # check if nasm can actually output ELF files
 # (the stock version in OSX can't)
 # XXX: should probably only test for x86* arch
@@ -1159,6 +1164,7 @@ HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
 HOST_EXTENDED_REGEX_SED		?= ${HOST_EXTENDED_REGEX_SED} ;
 HOST_SHA256					?= ${HOST_SHA256} ;
 HOST_PYTHON					?= ${HOST_PYTHON} ;
+HOST_WGET_RETRY_ON_HOST_ERROR			?= ${HOST_WGET_RETRY_ON_HOST_ERROR} ;
 HAIKU_NASM					?= ${HAIKU_NASM} ;
 
 HAIKU_BUILD_ATTRIBUTES_DIR	?= "${HAIKU_BUILD_ATTRIBUTES_DIR}" ;

@@ -449,6 +449,12 @@ rule DownloadLocatedFile target : url : source
 
 	URL on $(target) = $(url) ;
 
+	if $(HOST_WGET_RETRY_ON_HOST_ERROR) {
+		WGET_RETRY_FLAGS on $(target) = "--retry-connrefused --retry-on-host-error" ;
+	} else {
+		WGET_RETRY_FLAGS on $(target) = "--retry-connrefused" ;
+	}
+
 	if $(source) {
 		Depends $(target) : $(source) ;
 	}
@@ -467,7 +473,7 @@ if $(HAIKU_NO_DOWNLOADS) = 1 {
 	actions DownloadLocatedFile1
 	{
 		source="$(2)"
-		wget --retry-connrefused --retry-on-host-error --timeout 30 -O "$(1)" $(URL) || exit 1
+		wget $(WGET_RETRY_FLAGS) --timeout 30 -O "$(1)" $(URL) || exit 1
 		touch "$(1)"
 	}
 }
