@@ -12,6 +12,7 @@
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <PCI.h>
+#include <debug.h>
 
 #include <string.h>
 #include <stdlib.h>
