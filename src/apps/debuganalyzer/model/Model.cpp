@@ -252,7 +252,7 @@ bool
 Model::ThreadWaitObjectGroup::GetThreadWaitObjects(
 	BObjectList<ThreadWaitObject>& objects)
 {
-	ThreadWaitObjectList::Iterator it = fWaitObjects.GetIterator();
+	ThreadWaitObjectList::ConstIterator it = fWaitObjects.GetIterator();
 	while (ThreadWaitObject* object = it.Next()) {
 		if (!objects.AddItem(object))
 			return false;
