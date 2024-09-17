@@ -761,6 +761,8 @@ arch_vm_init_post_modules(kernel_args *args)
 	// the x86 CPU modules are now accessible
 
 	sMemoryTypeRegisterCount = x86_count_mtrrs();
+	if (sMemoryTypeRegisterCount == 0)
+		return B_OK;
 
 	// not very likely, but play safe here
 	if (sMemoryTypeRegisterCount > kMaxMemoryTypeRegisters)
