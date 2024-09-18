@@ -573,6 +573,11 @@ add_memory_type_range(area_id areaID, uint64 base, uint64 size, uint32 type,
 			continue;
 		}
 
+		if (range->area == -1 && !x86_use_pat()) {
+			// Physical memory range in MTRRs; permit overlapping.
+			continue;
+		}
+
 		if (effectiveType != NULL) {
 			type = *effectiveType = range->type;
 			effectiveType = NULL;
