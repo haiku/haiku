@@ -218,7 +218,7 @@ ShortcutsWindow::ShortcutsWindow()
 		PostMessage(&message);
 			// tell ourselves to load this file if it exists
 	} else {
-		_AddNewSpec("/bin/setvolume -m", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_MUTE);
+		_AddNewSpec("/bin/setvolume -t", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_MUTE);
 		_AddNewSpec("/bin/setvolume -i", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_VOLUME_INCREMENT);
 		_AddNewSpec("/bin/setvolume -d", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_VOLUME_DECREMENT);
 		fLastSaved = BEntry(&keySetRef);
