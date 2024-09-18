@@ -557,7 +557,6 @@ static status_t
 add_memory_type_range(area_id areaID, uint64 base, uint64 size, uint32 type,
 	uint32 *effectiveType)
 {
-	// translate the type
 	if (type == 0)
 		return B_OK;
 
@@ -567,11 +566,11 @@ add_memory_type_range(area_id areaID, uint64 base, uint64 size, uint32 type,
 	MutexLocker locker(sMemoryTypeLock);
 
 	for (MemoryTypeRangeList::Iterator it = sMemoryTypeRanges.GetIterator();
-			memory_type_range* range = it.Next();) {
+			memory_type_range* range = it.Next(); ) {
 
 		if (range->area == areaID || range->type == type
-			|| base + size <= range->base
-			|| base >= range->base + range->size) {
+				|| base + size <= range->base
+				|| base >= range->base + range->size) {
 			continue;
 		}
 
