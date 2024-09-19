@@ -407,7 +407,7 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 		atomic_and(&dev->flags,
 			~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID | PS2_FLAG_RESEND));
 
-		acquire_sem(gControllerSem);
+		mutex_lock(&gControllerLock);
 
 		if (!(atomic_get(&dev->flags) & PS2_FLAG_KEYB)) {
 			uint8 prefix_cmd;
@@ -435,7 +435,7 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 			}
 		}
 
-		release_sem(gControllerSem);
+		mutex_unlock(&gControllerLock);
 #ifdef TRACE_PS2_DEV
 		start = system_time();
 #endif

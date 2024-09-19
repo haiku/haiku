@@ -31,7 +31,7 @@
 isa_module_info *gIsa = NULL;
 bool gActiveMultiplexingEnabled = false;
 bool gSetupComplete = false;
-sem_id gControllerSem;
+mutex gControllerLock;
 
 static int32 sIgnoreInterrupts = 0;
 
@@ -102,7 +102,7 @@ ps2_flush(void)
 {
 	int i;
 
-	acquire_sem(gControllerSem);
+	mutex_lock(&gControllerLock);
 	atomic_add(&sIgnoreInterrupts, 1);
 
 	for (i = 0; i < 64; i++) {
@@ -117,7 +117,7 @@ ps2_flush(void)
 	}
 
 	atomic_add(&sIgnoreInterrupts, -1);
-	release_sem(gControllerSem);
+	mutex_unlock(&gControllerLock);
 }
 
 
@@ -242,7 +242,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 	status_t res;
 	int i;
 
-	acquire_sem(gControllerSem);
+	mutex_lock(&gControllerLock);
 	atomic_add(&sIgnoreInterrupts, 1);
 
 #ifdef TRACE_PS2_COMMON
@@ -278,7 +278,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 #endif
 
 	atomic_add(&sIgnoreInterrupts, -1);
-	release_sem(gControllerSem);
+	mutex_unlock(&gControllerLock);
 
 	return res;
 }
@@ -355,7 +355,7 @@ ps2_init(void)
 	if (status < B_OK)
 		return status;
 
-	gControllerSem = create_sem(1, "ps/2 keyb ctrl");
+	mutex_init(&gControllerLock, "ps/2 keyb ctrl");
 
 	ps2_flush();
 
@@ -439,7 +439,7 @@ err3:
 err2:
 	ps2_dev_exit();
 err1:
-	delete_sem(gControllerSem);
+	mutex_destroy(&gControllerLock);
 	put_module(B_ISA_MODULE_NAME);
 	TRACE("ps2: init failed!\n");
 	return B_ERROR;
@@ -454,6 +454,6 @@ ps2_uninit(void)
 	remove_io_interrupt_handler(INT_PS2_KEYBOARD, &ps2_interrupt, NULL);
 	ps2_service_exit();
 	ps2_dev_exit();
-	delete_sem(gControllerSem);
+	mutex_destroy(&gControllerLock);
 	put_module(B_ISA_MODULE_NAME);
 }
