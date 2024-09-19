@@ -20,6 +20,7 @@
 #include "ps2_trackpoint.h"
 
 #include <fs/devfs.h>
+#include <util/AutoLock.h>
 
 #include <string.h>
 
@@ -387,6 +388,8 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 	for (i = 0; i < out_count; i++)
 		TRACE("ps2: ps2_dev_command tx: 0x%02x\n", out[i]);
 
+	MutexLocker controllerLocker(gControllerLock);
+
 	res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {
 		TRACE("ps2: ps2_dev_command: sem_count %" B_PRId32 ", fixing!\n",
@@ -403,11 +406,8 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 
 	res = B_OK;
 	for (i = -1; res == B_OK && i < out_count; i++) {
-
 		atomic_and(&dev->flags,
 			~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID | PS2_FLAG_RESEND));
-
-		mutex_lock(&gControllerLock);
 
 		if (!(atomic_get(&dev->flags) & PS2_FLAG_KEYB)) {
 			uint8 prefix_cmd;
@@ -435,7 +435,6 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 			}
 		}
 
-		mutex_unlock(&gControllerLock);
 #ifdef TRACE_PS2_DEV
 		start = system_time();
 #endif
