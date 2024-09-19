@@ -376,21 +376,15 @@ status_t
 standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 	int out_count, uint8* in, int in_count, bigtime_t timeout)
 {
-	status_t res;
-#ifdef TRACE_PS2_DEV
-	bigtime_t start;
-#endif
-	int32 sem_count;
-	int i;
-
 	TRACE("ps2: ps2_dev_command cmd 0x%02x, out-count %d, in-count %d, "
 		"dev %s\n", cmd, out_count, in_count, dev->name);
-	for (i = 0; i < out_count; i++)
+	for (int i = 0; i < out_count; i++)
 		TRACE("ps2: ps2_dev_command tx: 0x%02x\n", out[i]);
 
 	MutexLocker controllerLocker(gControllerLock);
 
-	res = get_sem_count(dev->result_sem, &sem_count);
+	int32 sem_count;
+	status_t res = get_sem_count(dev->result_sem, &sem_count);
 	if (res == B_OK && sem_count != 0) {
 		TRACE("ps2: ps2_dev_command: sem_count %" B_PRId32 ", fixing!\n",
 			sem_count);
@@ -405,7 +399,7 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 	dev->result_buf = in;
 
 	res = B_OK;
-	for (i = -1; res == B_OK && i < out_count; i++) {
+	for (int i = -1; res == B_OK && i < out_count; i++) {
 		atomic_and(&dev->flags,
 			~(PS2_FLAG_ACK | PS2_FLAG_NACK | PS2_FLAG_GETID | PS2_FLAG_RESEND));
 
@@ -436,7 +430,7 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 		}
 
 #ifdef TRACE_PS2_DEV
-		start = system_time();
+		bigtime_t start = system_time();
 #endif
 		res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT, timeout);
 
@@ -466,7 +460,7 @@ standard_command_timeout(ps2_dev* dev, uint8 cmd, const uint8* out,
 			atomic_and(&dev->flags, ~PS2_FLAG_CMD);
 		} else {
 #ifdef TRACE_PS2_DEV
-			start = system_time();
+			bigtime_t start = system_time();
 #endif
 			res = acquire_sem_etc(dev->result_sem, 1, B_RELATIVE_TIMEOUT,
 				timeout);
