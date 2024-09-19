@@ -377,8 +377,8 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 		return;
 	}
 
-	if (drift == 0.0f)
-		debugger("BTimeSource::PublishTime: drift must not be 0");
+	if (drift <= 0.0f)
+		debugger("BTimeSource::PublishTime: drift must be > 0");
 
 	int32 index = atomic_add(&fBuf->writeindex, 1);
 	index &= (TS_INDEX_COUNT - 1);
