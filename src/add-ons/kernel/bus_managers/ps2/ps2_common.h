@@ -26,7 +26,7 @@
 #if 1
 #	define INFO(x...) dprintf(x)
 #else
-#	define INFO(x...)
+#	define INFO(x...) do {} while (false)
 #endif
 #define ERROR(x...) dprintf(x)
 

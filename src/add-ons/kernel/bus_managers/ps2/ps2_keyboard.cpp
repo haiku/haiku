@@ -293,20 +293,22 @@ probe_keyboard(void)
 	status_t status;
 	int ids_read = 0;
 
-//  This test doesn't work relyable on some notebooks (it reports 0x03)
-//	status = ps2_command(PS2_CTRL_KEYBOARD_TEST, NULL, 0, &data, 1);
-//	if (status != B_OK || data != 0x00) {
-//		INFO("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
-//		return B_ERROR;
-//	}
+	// This test doesn't work reliably on some notebooks (it reports 0x03)
+#if 0
+	status = ps2_command(PS2_CTRL_KEYBOARD_TEST, NULL, 0, &data, 1);
+	if (status != B_OK || data != 0x00) {
+		INFO("ps2: keyboard test failed, status 0x%08lx, data 0x%02x\n", status, data);
+		return B_ERROR;
+	}
+#endif
 
 	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_RESET, NULL,
 		0, &data, 1);
-	// Checking for reset is unrealiable on some controllers. But we check
-	// ID which is good enough for linux and should be
-	// good enough for us. Reset itself is needed though.
+	// Checking for reset is unreliable on some controllers, but we check
+	// ID which is good enough for Linux and should be good enough for us.
+	// Reset is needed though.
 	if (status != B_OK || data != 0xaa) {
-		INFO("ps2: keyboard reset failed, status 0x%08" B_PRIx32 ", data 0x%02x"
+		ERROR("ps2: keyboard reset failed, status 0x%08" B_PRIx32 ", data 0x%02x"
 			"\n", status, data);
 		ids_read = 1;
 		status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
@@ -314,7 +316,7 @@ probe_keyboard(void)
 		if ((status != B_OK) || (sKeyboardIds[0] != 0xab && sKeyboardIds[0] != 0xac &&	/* Regular and NCD Sun keyboards */
 					 sKeyboardIds[0] != 0x2b && sKeyboardIds[0] != 0x5d &&	/* Trust keyboard, raw and translated */
 					 sKeyboardIds[0] != 0x60 && sKeyboardIds[0] != 0x47)) {	/* NMB SGI keyboard, raw and translated */
-			INFO("ps2: keyboard getid failed, status 0x%08" B_PRIx32 ", data 0x%02x%02x."
+			ERROR("ps2: keyboard getid failed, status 0x%08" B_PRIx32 ", data 0x%02x%02x."
 			     " Assuming no keyboard\n", status, sKeyboardIds[0], sKeyboardIds[1]);
 			return B_ERROR;
 		}
@@ -325,41 +327,43 @@ probe_keyboard(void)
 	sKeyboardRepeatRate = ((31 - 0x0b) * 280) / 31 + 20;
 	sKeyboardRepeatDelay = 500000;
 
-//	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_ENABLE_KEYBOARD, NULL, 0, NULL, 0);
+#if 0
+	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_ENABLE_KEYBOARD, NULL, 0, NULL, 0);
+#endif
 
-//  On my notebook, the keyboard controller does NACK the echo command.
-//	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_ECHO, NULL, 0, &data, 1);
-//	if (status != B_OK || data != 0xee) {
-//		INFO("ps2: keyboard echo test failed, status 0x%08lx, data 0x%02x\n", status, data);
-//		return B_ERROR;
-//	}
+	// On at least some machines, the keyboard controller does NACK the echo command.
+#if 0
+	status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB], PS2_CMD_ECHO, NULL, 0, &data, 1);
+	if (status != B_OK || data != 0xee) {
+		INFO("ps2: keyboard echo test failed, status 0x%08lx, data 0x%02x\n", status, data);
+		return B_ERROR;
+	}
+#endif
 
-// Some controllers set the disable keyboard command bit to "on" after resetting
-// the keyboard device. Read #7973 #6313 for more details.
-// So check the command byte now and re-enable the keyboard if it is the case.
+	// Some controllers set the disable keyboard command bit to "on" after resetting
+	// the keyboard device. Read #7973 #6313 for more details.
+	// So check the command byte now and re-enable the keyboard if it is the case.
 	uint8 cmdbyte = 0;
 	status = ps2_command(PS2_CTRL_READ_CMD, NULL, 0, &cmdbyte, 1);
 
 	if (status != B_OK) {
-		INFO("ps2: cannot read CMD byte on kbd probe:%#08" B_PRIx32 "\n",
+		ERROR("ps2: cannot read CMD byte on kbd probe:%#08" B_PRIx32 "\n",
 			status);
-	} else
-	if ((cmdbyte & PS2_BITS_KEYBOARD_DISABLED) == PS2_BITS_KEYBOARD_DISABLED) {
+	} else if ((cmdbyte & PS2_BITS_KEYBOARD_DISABLED) == PS2_BITS_KEYBOARD_DISABLED) {
 		cmdbyte &= ~PS2_BITS_KEYBOARD_DISABLED;
 		status = ps2_command(PS2_CTRL_WRITE_CMD, &cmdbyte, 1, NULL, 0);
 		if (status != B_OK) {
-			INFO("ps2: cannot write 0x%02x to CMD byte on kbd probe:%#08"
+			ERROR("ps2: cannot write 0x%02x to CMD byte on kbd probe:%#08"
 				B_PRIx32 "\n", cmdbyte, status);
 		}
 	}
 
 	if (!ids_read) {
 		status = ps2_dev_command(&ps2_device[PS2_DEVICE_KEYB],
-					 PS2_CMD_GET_DEVICE_ID, NULL, 0, sKeyboardIds, sizeof(sKeyboardIds));
+			PS2_CMD_GET_DEVICE_ID, NULL, 0, sKeyboardIds, sizeof(sKeyboardIds));
 
-		if (status != B_OK) {
-			INFO("ps2: cannot read keyboard device id:%#08" B_PRIx32 "\n", status);
-		}
+		if (status != B_OK)
+			ERROR("ps2: cannot read keyboard device id:%#08" B_PRIx32 "\n", status);
 	}
 
 	return B_OK;
