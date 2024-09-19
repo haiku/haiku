@@ -16,6 +16,10 @@
 namespace PackageFS {
 
 
+static const char* const kBlockedEntriesParameterName = "BlockedEntries";
+static const char* const kLegacyBlockedEntriesParameterName = "EntryBlacklist";
+
+
 // #pragma mark - PackageSettingsItem
 
 
@@ -86,7 +90,9 @@ PackageSettingsItem::Init(const driver_parameter& parameter)
 
 	for (int i = 0; i < parameter.parameter_count; i++) {
 		const driver_parameter& subParameter = parameter.parameters[i];
-		if (strcmp(subParameter.name, "EntryBlacklist") != 0)
+		if (strcmp(subParameter.name, kBlockedEntriesParameterName) != 0
+			&& strcmp(subParameter.name, kLegacyBlockedEntriesParameterName)
+				!= 0)
 			continue;
 
 		status_t error = _AddBlockedEntries(subParameter);

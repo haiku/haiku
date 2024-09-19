@@ -1550,20 +1550,6 @@ apply_safe_mode_path_blocklist()
 
 	success &= sSafeModeOptionsBuffer.Append("}\n");
 
-	// Append the option a second time using the legacy name, so it also works
-	// for older kernel.
-	// TODO remove this after R1 beta3 is released and no one is using older
-	// kernels anymore.
-	success &= sSafeModeOptionsBuffer.Append("EntryBlacklist {\n");
-
-	for (PathBlocklist::Iterator it = sPathBlocklist->GetIterator();
-		BlockedPath* path = it.Next();) {
-		success &= sSafeModeOptionsBuffer.Append(path->Path());
-		success &= sSafeModeOptionsBuffer.Append("\n", 1);
-	}
-
-	success &= sSafeModeOptionsBuffer.Append("}\n");
-
 	if (!success) {
 		dprintf("apply_safe_mode_options(): failed to append path "
 			"blocklist to buffer\n");
