@@ -589,7 +589,7 @@ VMSAv8TranslationMap::Unmap(addr_t start, addr_t end)
 		")\n", start, end);
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	size_t size = end - start;
+	size_t size = end - start + 1;
 	ASSERT(ValidateVa(start));
 
 	if (fPageTable == 0)
