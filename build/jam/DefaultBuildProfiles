@@ -89,6 +89,7 @@ rule DefineDefaultBuildProfiles
 				pe
 				timgmsoundfont
 				vision
+				wonderbrush
 				wpa_supplicant
 				# Some packages can't be built with gcc2, so we install the gcc13
 				# secondary architecture package instead in this case
@@ -105,7 +106,7 @@ rule DefineDefaultBuildProfiles
 			local architectureObject ;
 			for architectureObject in [ MultiArchSubDirSetup ] {
 				on $(architectureObject) {
-					AddHaikuImageSystemPackages openssl3 wonderbrush@gcc2 ;
+					AddHaikuImageSystemPackages openssl3 ;
 				}
 			}
 
