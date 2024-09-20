@@ -597,6 +597,7 @@ VMSAv8TranslationMap::Unmap(addr_t start, addr_t end)
 
 	ProcessRange(fPageTable, fInitialLevel, start, size, nullptr,
 		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
+			ASSERT(effectiveVa <= end);
 			uint64_t oldPte = atomic_get_and_set64((int64_t*)ptePtr, 0);
 			FlushVAIfAccessed(oldPte, effectiveVa);
 		});
@@ -888,6 +889,8 @@ VMSAv8TranslationMap::Protect(addr_t start, addr_t end, uint32 attributes, uint3
 
 	ProcessRange(fPageTable, fInitialLevel, start, size, nullptr,
 		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
+			ASSERT(effectiveVa <= end);
+
 			// We need to use an atomic compare-swap loop because we must
 			// need to clear somes bits while setting others.
 			while (true) {
