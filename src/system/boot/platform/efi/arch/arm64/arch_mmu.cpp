@@ -265,7 +265,10 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 		address = READ_SPECIALREG(TTBR1_EL1);
 	} else {
 		// ok, but USE instead TTBR0
-		address = READ_SPECIALREG(TTBR0_EL1);
+		if (arch_exception_level() == 1)
+			address = READ_SPECIALREG(TTBR0_EL1);
+		else
+			address = READ_SPECIALREG(TTBR0_EL2);
 	}
 
 	map_region(virt_addr, phys_addr, size, 0, flags, reinterpret_cast<uint64*>(address));
@@ -374,7 +377,6 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 
 	MemoryAttributeIndirection currentMair;
 
-// 	arch_mmu_allocate_page_tables();
 	arch_mmu_allocate_kernel_page_tables();
 
 	build_physical_memory_list(memory_map_size, memory_map,
