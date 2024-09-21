@@ -593,7 +593,7 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 		VMCache* cache = cacheRef->cache;
 		if (!cache->SwitchFromReadLock(&sCacheListLock)) {
 			// cache has been deleted
-			rw_lock_read_unlock(&sCacheListLock);
+			rw_lock_read_lock(&sCacheListLock);
 			continue;
 		}
 
