@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2029495331
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Оцінка неможлива
 Package update error	MainWindow		Помилка оновлення пакета
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# процес} few{# процеси} other{# процесів}}
 Reboot required	PackageManager		Потрібна перезагрузка
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Отримую оцінки користувачів для пакета
 All packages	PackageListView		Усі пакети
 Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів

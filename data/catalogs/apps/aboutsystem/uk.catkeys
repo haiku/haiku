@@ -69,7 +69,7 @@ GNU GPL v2	AboutWindow		GNU GPL v2
 %d MiB used (%d%%)	AboutView	326 MiB used (16%)	використано %d MБ (%d%%)
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Університету Окленда і Крістофу Люттероту\n\n
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
-Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld The Haiku project. /n
+Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld The Haiku project.\n
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Всі права захищені.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat maintainers.

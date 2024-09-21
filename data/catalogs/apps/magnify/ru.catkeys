@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Magnify	1465621918
+1	russian	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  размер должен быть > 4 и кратным 4
 Decrease pixel size	Magnify-Main		Уменьшить размер пикселя
 no clip msg	In console, when clipboard is empty after clicking Copy image		клип не скопировался
@@ -16,6 +16,8 @@ Increase window size	Magnify-Main		Увеличить размер окна
 Save image	Magnify-Main		Сохранить изображение
 Show grid	Magnify-Main		Показать сетку
 Magnify	System name		Увеличитель
+height	Magnify-Main		высота
+width	Magnify-Main		ширина
 Info	Magnify-Main		Информация
 Show info	Magnify-Main		Показать информацию
 Make square	Magnify-Main		Сделать квадрат
