@@ -176,7 +176,6 @@ struct fs_mount {
 namespace {
 
 struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
-	list_link		link;
 	void*			bound_to;
 	team_id			team;
 	pid_t			session;
