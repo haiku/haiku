@@ -19,9 +19,12 @@
 
 
 #include <time.h>
+#include <math.h>
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Clock"
+
 
 TOffscreenView::TOffscreenView(BRect frame, const char *name, short mRadius,
 		short hRadius, short offset, long face, bool show)
@@ -77,27 +80,27 @@ dummy_label:
 
 	// Generate minutes points array
 	for (counter = 90; counter >= 0; counter -= 6, index++) {
-		x = mRadius * cos(((360 - counter)/180.0) * 3.1415);
+		x = mRadius * cos(((360 - counter)/180.0) * M_PI);
 		x += 41;
-		y = mRadius * sin(((360 - counter)/180.0) * 3.1415);
+		y = mRadius * sin(((360 - counter)/180.0) * M_PI);
 		y += 41;
 		fMinutePoints[index].Set(x,y);
-		x = hRadius * cos(((360 - counter)/180.0) * 3.1415);
+		x = hRadius * cos(((360 - counter)/180.0) * M_PI);
 		x += 41;
-		y = hRadius * sin(((360 - counter)/180.0) * 3.1415);
+		y = hRadius * sin(((360 - counter)/180.0) * M_PI);
 		y += 41;
 		fHourPoints[index].Set(x,y);
 	}
 
 	for (counter = 354; counter > 90; counter -= 6,index++) {
-		x = mRadius * cos(((360 - counter)/180.0) * 3.1415);
+		x = mRadius * cos(((360 - counter)/180.0) * M_PI);
 		x += 41;
-		y = mRadius * sin(((360 - counter)/180.0) * 3.1415);
+		y = mRadius * sin(((360 - counter)/180.0) * M_PI);
 		y += 41;
 		fMinutePoints[index].Set(x,y);
-		x = hRadius * cos(((360 - counter)/180.0) * 3.1415);
+		x = hRadius * cos(((360 - counter)/180.0) * M_PI);
 		x += 41;
-		y = hRadius * sin(((360 - counter)/180.0) * 3.1415);
+		y = hRadius * sin(((360 - counter)/180.0) * M_PI);
 		y += 41;
 		fHourPoints[index].Set(x,y);
 	}
