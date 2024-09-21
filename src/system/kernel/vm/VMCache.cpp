@@ -560,29 +560,6 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 {
 	rw_lock_read_lock(&sCacheListLock);
 
-	if (dontWait) {
-		VMCacheRef* cacheRef = page->CacheRef();
-		if (cacheRef == NULL) {
-			rw_lock_read_unlock(&sCacheListLock);
-			return NULL;
-		}
-
-		VMCache* cache = cacheRef->cache;
-		if (!cache->TryLock()) {
-			rw_lock_read_unlock(&sCacheListLock);
-			return NULL;
-		}
-
-		if (cacheRef == page->CacheRef()) {
-			rw_lock_read_unlock(&sCacheListLock);
-			cache->AcquireRefLocked();
-			return cache;
-		}
-
-		// the cache changed in the meantime
-		cache->Unlock();
-	}
-
 	while (true) {
 		VMCacheRef* cacheRef = page->CacheRef();
 		if (cacheRef == NULL) {
@@ -591,13 +568,20 @@ vm_cache_acquire_locked_page_cache(vm_page* page, bool dontWait)
 		}
 
 		VMCache* cache = cacheRef->cache;
-		if (!cache->SwitchFromReadLock(&sCacheListLock)) {
-			// cache has been deleted
+		if (dontWait) {
+			if (!cache->TryLock()) {
+				rw_lock_read_unlock(&sCacheListLock);
+				return NULL;
+			}
+		} else {
+			if (!cache->SwitchFromReadLock(&sCacheListLock)) {
+				// cache has been deleted
+				rw_lock_read_lock(&sCacheListLock);
+				continue;
+			}
 			rw_lock_read_lock(&sCacheListLock);
-			continue;
 		}
 
-		rw_lock_read_lock(&sCacheListLock);
 		if (cache == page->Cache()) {
 			rw_lock_read_unlock(&sCacheListLock);
 			cache->AcquireRefLocked();
