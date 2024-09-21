@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ShowImage	1148406263
+1	czech	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Prohlížeč obrázků
 Page setup…	Menus		Nastavení stránky...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Dokument '%s' (stránka %d) byl změněn. Chcete jej zavřít?
@@ -39,6 +39,7 @@ OK	SaveToFile		OK
 Print…	Menus		Tisk...
 The file '%s' could not be written.	SaveToFile		Soubor '%s' nemohl být zapsán.
 Quit	Menus		Ukončit
+Get info	Menus		Informace
 Rating	Menus		Hodnocení
 Close document	ClosePrompt		Zavřít dokument
 Stretch to window	Menus		Roztáhnout do velikosti okna

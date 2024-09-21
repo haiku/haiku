@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2303675010
+1	ukrainian	x-vnd.Haiku-libtracker	4135601423
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Відключити
 Eject when unmounting	AutoMounterSettings		Вийняти після відключення
 Searching for disks to mount…	StatusWindow		Пошук дисків для підключення…
 Value	AttributesView		Значення
+Multiple selections	FindPanel		Вибрано декілька…
 Information	InfoWindow		Інформація
 Error emptying Trash	FSUtils		Помилка спустошення смітника!
 Opens with:	InfoWindow		Відкривати у програмі:
@@ -63,6 +64,7 @@ starts with	FindPanel		почати з
 Replace	FSUtils		Замінити
 ?+* follows nothing.	libtracker		?+* не слід нічого.
 Rectangle	AttributesView		Прямокутник
+Include Trash	FindPanel		Включити у пошук Смітник
 Move to	ContainerWindow		Перемістити до
 Status	Email Query Columns		Статус
 New folder	FSUtils		Каталог або Папка
@@ -103,12 +105,13 @@ Corrupted pointers.	libtracker		Пошкоджені вказівники.
 Link to:	InfoWindow		Посилання на:
 Copy here	ContainerWindow		Копіювати сюди
 Character	AttributesView		Символ
-All disks	FindPanel		Усіх дисках
+All disks	FindPanel		Усі диски
 Affine transform	AttributesView		Афінне перетворення
 Window	ContainerWindow		Вікно
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Вилучити
 Company	Person Query Columns		Компанія
+Select folders…	FindPanel		Вибрати папки…
 Recent documents	FavoritesMenu		Недавні документи
 Edit templates…	TemplatesMenu		Редагувати шаблони…
 Clear temporary queries only	FindPanel		Тільки тимчасові запити
@@ -151,6 +154,7 @@ Disks	Model		Диски
 Create a Query template	FindPanel		Створення шаблону запиту
 Size	FindPanel		Розмір
 Window	FilePanelPriv		Вікно
+New submenu	ContainerWindow	Folder name of New-template submenu	Нове підменю
 OK	Email Query Columns		ОК
 Location	QueryPoseView		Розташування
 Edit query	ContainerWindow		Редагувати запит
@@ -179,6 +183,7 @@ Open selection with:	OpenWithWindow		Відкрити вибране у:
 Preferences…	ContainerWindow		Налаштування…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Неможливо відкрити \«%document\» бо програма \«%app\» у смітнику. 
 Work Phone	Person Query Columns		Робочий телефон
+Select folders	FindPanel		Вибір папок
 Close	ContainerWindow		Закрити
 Get info	ContainerWindow		Дивитись інфо
 MIME Type	AttributesView		MIME Тип
@@ -320,6 +325,7 @@ Open	ContainerWindow		Відкрити
 Settings…	MountMenu		Налаштування…
 You cannot put the selected item(s) into the trash.	FSUtils		Ви не можете перемістити вибрані об'єкт(и) у смітник.
 Increase size	DeskWindow		Збільшити розмір
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Де шукати:
 starts with	SelectionWindow		починаючи з
 Any	AttributesView		Якийсь
 New	DeskWindow		Новий…
@@ -497,6 +503,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Версія:
 OK	PoseView		ОК
 Add-ons	DeskWindow		Доповнення
+Add new submenu…	TemplatesMenu		Додати нове підменю…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ви впевнені що бажаєте копіювати або перемістити вибрані елемент(и) до цієї папки?
 Find	FindPanel		Знайти
 Empty folder	NavMenu		Порожня папка

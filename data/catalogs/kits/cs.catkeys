@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libbe	1337497439
+1	czech	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		Všechna práva vyhrazena.
 gold master	AboutWindow		zlatý mistr
 Undo	TextView		Zpět
@@ -6,6 +6,7 @@ OK	PrintJob		OK
 OK	Dragger		OK
 gamma	AboutWindow		gama
 development	AboutWindow		vývoj
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s bajt/s} few{%s bajty/s} other{%s bajtů/s}}
 Print Server is not responding.	PrintJob		Tiskový server neodpovídá.
 About %app%	AboutMenuItem		O aplikaci %app%
 Warning	Dragger		Varování
@@ -13,15 +14,21 @@ Green:	ColorControl		Zelená:
 Redo	TextView		Opakovat
 No pages to print!	PrintJob		Není co tisknout!
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		OK
 Cut	TextView		Vyjmout
 Default	Default decorator about box		Výchozí
 Can't delete this replicant from its original application. Life goes on.	Dragger		Nelze smazat tohoto replikanta z jeho původní aplikace. Život jde dál.
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		Chyba
 Paste	TextView		Vložit
 OK	AboutWindow		OK
+%s MiB/s	StringForRate	units per second	%s MiB/s
 Special Thanks:	AboutWindow		Zvláštní poděkování:
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		Výchozí dekoratér oken Haiku.
+%s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		Odebrat replikanta
 Version	AboutWindow		Verze
 Red:	ColorControl		Červená:
@@ -30,10 +37,14 @@ Copy	TextView		Kopírovat
 Select all	TextView		Vybrat vše
 alpha	AboutWindow		alfa
 Error	PrintJob		Chyba
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		O %app…
 About %app%	AboutWindow		O aplikaci %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s bajt} few{%s bajty} other{%s bajtů}}
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		Historie verzí:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nelze nalézt aplikaci replikanta. Chybí podpis aplikace.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		Modrá:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Nelze vytvořit replikanta pro \"%description\".\n%error
 Written by:	AboutWindow		Napsal:

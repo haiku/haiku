@@ -2,7 +2,7 @@
 Delete message	ConfigView		Eliminar mensaje
 Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
 Match header	RuleFilter		Cabecera concordante
-Set flags to	ConfigView		Seleccionar banderas a 
+Set flags to	ConfigView		Establecer características como
 Header field (e.g. Subject, From, …)	ConfigView		Campos de la cabecera (por ej. Asunto, Desde, …)
 <Choose account>	ConfigView		<Elegir cuenta>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor de comodín como \"*spam*\".\nPrefije \"REGEX:\" para utilizar expresiones regulares.

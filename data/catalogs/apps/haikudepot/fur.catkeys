@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2029495331
+1	friulian	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis cundizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Valutazion dineade
 Package update error	MainWindow		Erôr di inzornament dal pachet
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
 Reboot required	PackageManager		Tornâ a inviâ necessari
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Daûr a recuperâ lis valutazions dai utents pal pachet
 All packages	PackageListView		Ducj i pachets
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets

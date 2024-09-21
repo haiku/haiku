@@ -4,7 +4,7 @@ Validating checksum for %repositoryName	RefreshRepositoryRequest		Überprüfen d
 Failed to remove transaction directory	PackageManagerKit		Der 'transaction' Ordner konnte nicht entfernt werden
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Konfiguration der Paketquelle \"%s\" nicht verfügbar. Wird übersprungen.
 Refreshing repository \"%s\" failed	PackageManagerKit		Aktualisierung der Paketquelle \"%s\" fehlgeschlagen.
-Fetching repository checksum from %url	RefreshRepositoryRequest		Abrufen der Repository Checksumme von %url
+Fetching repository checksum from %url	RefreshRepositoryRequest		Abrufen der Repository-Checksumme von %url
 Failed to get repository names	PackageManagerKit		Paketquellen-Namen nicht verfügbar
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Cache der Paketquelle \"%s\" nicht verfügbar. Wird übersprungen.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paket %s-%s hat kein passendes 'Requires' für sein Base-Paket \"%s\"

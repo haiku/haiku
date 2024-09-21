@@ -34,7 +34,7 @@ Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Gj
 Unassign path	Icon-O-Matic-UnassignPathCmd		Gjave assegnazion segn
 Remove	Icon-O-Matic-StylesList		Gjave
 Cancel	Icon-O-Matic-Menu-Settings		Anule
-PNG set	Icon-O-Matic-SavePanel		Stabilìs PNG
+PNG set	Icon-O-Matic-SavePanel		Mac di PNGs
 Transformation	Icon-O-Matic-TransformationBoxStates		Trasformazion
 Move {0, plural, one{path} other{paths}}	Icon-O-Matic-MovePathsCmd		Sposte {0, plural, one{segn} other{segns}}
 Closed	Icon-O-Matic-PropertyNames		Sierât

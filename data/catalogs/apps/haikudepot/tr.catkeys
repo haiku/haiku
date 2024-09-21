@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2029495331
+1	turkish	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# süreç}}
 Reboot required	PackageManager		Yeniden başlatma gerekli
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Paket için olan kullanıcı derecelendirmeleri getiriliyor
 All packages	PackageListView		Tüm paketler
 Send	RatePackageWindow		Gönder
 Start package daemon	App		Paket hizmetini başlat

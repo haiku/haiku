@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	401915535
+1	german	x-vnd.Haiku-libtracker	3074643353
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -64,6 +64,7 @@ starts with	FindPanel		beginnt mit
 Replace	FSUtils		Ersetzen
 ?+* follows nothing.	libtracker		?+* folgt nichts.
 Rectangle	AttributesView		Rechteck
+Include Trash	FindPanel		Einschließlich Papierkorb
 Move to	ContainerWindow		Verschieben nach
 Status	Email Query Columns		Status
 New folder	FSUtils		Neuer Ordner
@@ -319,6 +320,7 @@ Open	ContainerWindow		Öffnen
 Settings…	MountMenu		Einstellungen …
 You cannot put the selected item(s) into the trash.	FSUtils		Die ausgewählten Objekte können nicht in den Papierkorb verschoben werden.
 Increase size	DeskWindow		Vergrößern
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Ziel:
 starts with	SelectionWindow		beginnt mit
 Any	AttributesView		Alle
 New	DeskWindow		Neu

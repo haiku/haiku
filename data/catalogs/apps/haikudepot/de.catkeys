@@ -1,10 +1,10 @@
-1	german	x-vnd.Haiku-HaikuDepot	2029495331
+1	german	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problem beim Herunterladen der Nutzungsbedingungen
 Available packages	MainWindow		Verfügbare Pakete
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
 An unexpected error has been sent from the server [%li]	ServerHelper		Der Server hat einen unerwarteten Fehler gesendet [%li]
 Create account	UserLoginWindow		Benutzerkonto erstellen
-Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Lade Änderungsprotokoll für Paket
+Fetching changelog for package	PopulatePkgChangelogFromServerProcess		Änderungsprotokoll für Paket wird geladen
 Agree	ToLatestUserUsageConditionsWindow		Zustimmen
 Install %PackageTitle%	PackageManager		%PackageTitle% installieren
 The response to the captcha was incorrect.	ServerHelper		Das Captcha wurde nicht richtig beantwortet.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Bewertung nicht möglich
 Package update error	MainWindow		Fehler bei Paketaktualisierung
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# Prozess} other{# Prozesse}}
 Reboot required	PackageManager		Neustart erforderlich
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Bewertungen des Pakets werden geladen
 All packages	PackageListView		Alle Pakete
 Send	RatePackageWindow		Senden
 Start package daemon	App		Paket-Daemon starten
@@ -130,7 +131,7 @@ No user ratings available.	PackageInfoView		Keine Bewertungen vorhanden.
 <no info>	PackageInfoView		<keine Info>
 Usage conditions download problem	UserUsageConditions		Problem beim Herunterladen der Nutzungsbedingungen
 An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Beim Herunterladen der für das Erstellen eines neuen Nutzerkontos erforderlichen Kennwortvorgaben, ist ein Fehler aufgetreten.\nWie die entsprechenden Logdateien angezeigt werden können, steht im Kapitel 'HaikuDepot' des Haiku User Guide.
-Fetching screenshot	CacheScreenshotProcess		Screenshot wird geladen
+Fetching screenshot	CacheScreenshotProcess		Screenshots werden geladen
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Bei der Kommunikation mit dem Server ist ein Netzwerk-Transportfehler aufgetreten: %s
 Rating	PackageListView		Bewertung
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronisiere Icons
@@ -222,7 +223,7 @@ Email address:	UserLoginWindow		E-Mail-Adresse:
 View latest usage conditions…	MainWindow		Aktuelle Nutzungsbedingungen lesen…
 Category:	FilterView		Kategorie:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	Paket %s deinstallieren\n
-Fetching remote repository data	LocalRepositoryUpdateProcess		Abrufen von Paketquellendaten
+Fetching remote repository data	LocalRepositoryUpdateProcess		Paketquellendaten werden geladen
 Description	PackageListView		Beschreibung
 User creation error	UserLoginWindow		Fehler beim Erstellen des Benutzerkontos
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.

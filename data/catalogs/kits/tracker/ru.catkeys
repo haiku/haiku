@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4148683310
+1	russian	x-vnd.Haiku-libtracker	2994314289
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -7,6 +7,7 @@ Open with…	ContainerWindow		Открыть в…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \"%name\" в корзину. (%error)
 Or	FindPanel		или
 MIME Description	AttributesView		MIME Описание
+Query	FindPanel		Запрос
 before	FindPanel		до
 New folder%d	FSUtils		Новая папка%d
 Volume icons	TrackerSettingsWindow		Значки дисков
@@ -27,6 +28,7 @@ Unmount	ContainerWindow		Отключить
 Eject when unmounting	AutoMounterSettings		Выдвигать лоток диска при отключении
 Searching for disks to mount…	StatusWindow		Поиск дисков для подключения…
 Value	AttributesView		Значение
+Multiple selections	FindPanel		Выбрано несколько папок…
 Information	InfoWindow		Информация
 Error emptying Trash	FSUtils		Ошибка при очищении корзины!
 Opens with:	InfoWindow		Открывать в:
@@ -97,12 +99,13 @@ Corrupted pointers.	libtracker		Поврежденные указатели.
 Link to:	InfoWindow		Ссылка на:
 Copy here	ContainerWindow		Копировать сюда
 Character	AttributesView		Символьный
-All disks	FindPanel		всех дисках
+All disks	FindPanel		На всех дисках
 Affine transform	AttributesView		Аффинное преобразование
 Window	ContainerWindow		Окно
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Удалить
 Company	Person Query Columns		Компания
+Select folders…	FindPanel		Выбрать папки…
 Recent documents	FavoritesMenu		Недавние документы
 Edit templates…	TemplatesMenu		Изменить шаблоны…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байта} other{# байтов}}
@@ -125,10 +128,12 @@ Create relative link	ContainerWindow		Создать относительную 
 Owner	FilePermissionsView		Владелец
 Cancel	FSClipBoard		Отмена
 Modified	PoseView		Изменён
+Save as template…	FindPanel		Сохранить как шаблон…
 Move to Trash	ContainerWindow		В корзину
 All files and folders	FindPanel		Все файлы и папки
 Add-ons	ContainerWindow		Дополнения
 Too many parenthesis.	libtracker		Слишком много скобок.
+Save query template:	FindPanel		Сохранить шаблон запроса:
 Increase size	ContainerWindow		Увеличить размер
 \nShould this be fixed?	FSUtils		\nВы хотите это исправить?
 URL	Bookmark Query Columns		Cсылка (URL)
@@ -142,6 +147,7 @@ Disks	Model		Диски
 Create a Query template	FindPanel		Создать шаблон запроса
 Size	FindPanel		Размер
 Window	FilePanelPriv		Окно
+New submenu	ContainerWindow	Folder name of New-template submenu	Новое подменю
 OK	Email Query Columns		ОК
 Location	QueryPoseView		Путь
 Edit query	ContainerWindow		Изменить запрос
@@ -170,6 +176,7 @@ Open selection with:	OpenWithWindow		Открыть выбранное с пом
 Preferences…	ContainerWindow		Настройки…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Невозможно открыть \"%document\" поскольку программа \"%app\" находится в корзине. 
 Work Phone	Person Query Columns		Рабочий телефон
+Select folders	FindPanel		Выбор папок…
 Close	ContainerWindow		Закрыть
 Get info	ContainerWindow		Информация
 MIME Type	AttributesView		MIME тип
@@ -206,6 +213,7 @@ Cancel	FSUtils		Отмена
 Original name	ContainerWindow		Оригинальное имя
 Unknown	WidgetAttributeText		Неизвестно
 32-bit integer	AttributesView		32-битное целое
+Save as query…	FindPanel		Сохранить как запрос…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Указанное имя уже использовано в качестве имени папки. Введите какое-нибудь другое.
 Modified	ContainerWindow		Изменён
 Mini icon view	ContainerWindow		Мелкие значки
@@ -281,6 +289,7 @@ Unknown	FilePermissionsView		Неизвестно
 Paste links	ContainerWindow		Вставить ссылки
 Restoring: 	StatusWindow		Восстановление: 
 The Tracker must be running to set the default printer.	PoseView		Чтобы установить принтер по умолчанию Tracker должен быть запущен.
+Cancel	FindPanel		Отменить
 calculating…	InfoWindow		подсчёт…
 Preferred for file	OpenWithWindow		Предпочтительно для файлов
 OK	AutoMounterSettings		ОК
@@ -309,10 +318,12 @@ Open	ContainerWindow		Открыть
 Settings…	MountMenu		Настройки…
 You cannot put the selected item(s) into the trash.	FSUtils		Вы не можете переместить выбранные объекты в корзину.
 Increase size	DeskWindow		Увеличить размер
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Где искать:
 starts with	SelectionWindow		начинается на
 Any	AttributesView		Любой
 New	DeskWindow		Создать
 Invert	SelectionWindow		Инвертировать
+Open…	FindPanel		Открыть...
 Would you like to find some other suitable application?	FSUtils		Хотите найти какое-нибудь другое подходящее приложение?
 *+? operand may be empty.	libtracker		*+? операнд может быть пустым.
 (unknown)	AttributesView		(неизвестно)
@@ -426,6 +437,7 @@ Name	QueryPoseView		Имя
 Error %error loading add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
 Does not handle file	OpenWithWindow		Не поддерживает этот файл
 E-mail	Person Query Columns		Электронная почта
+Templates	FindPanel		Шаблоны
 Arrange by	ContainerWindow		Выстроить по
 Attributes	AttributesView		Атрибуты
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Извините, сохранение более одного файла недопустимо.
@@ -482,6 +494,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Версия:
 OK	PoseView		ОК
 Add-ons	DeskWindow		Дополнения
+Add new submenu…	TemplatesMenu		Добавить новое подменю…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объекты в эту папку?
 Find	FindPanel		Найти
 Empty folder	NavMenu		Пустая папка
@@ -494,6 +507,7 @@ Move to Trash	FSUtils		В корзину
 Cancel	PoseView		Отмена
 Handles %type	OpenWithWindow		Поддерживает %type
 Delete	PoseView		Удалить
+Options	FindPanel		Опции
 Media parameter	AttributesView		Параметры медиа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените домашнюю папку, %osName может вести себя непредсказуемо!\n\nВы уверены, что это нужно сделать?\n\nЧтобы изменить домашнюю папку, зажмите клавишу "Shift" и нажмите \"Я знаю, что я делаю\".
 Sorry, you can't copy items to the Trash.	PoseView		Извините, но вы не можете копировать объекты в корзину.

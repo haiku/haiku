@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1462873605
+1	swedish	x-vnd.Haiku-libtracker	4135601423
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -64,6 +64,7 @@ starts with	FindPanel		börjar med
 Replace	FSUtils		Ersätt
 ?+* follows nothing.	libtracker		?+* följer ingenting.
 Rectangle	AttributesView		Rektangel
+Include Trash	FindPanel		Inkludera papperskorgen
 Move to	ContainerWindow		Flytta till
 Status	Email Query Columns		Status
 New folder	FSUtils		Ny mapp
@@ -324,6 +325,7 @@ Open	ContainerWindow		Öppna
 Settings…	MountMenu		Inställningar...
 You cannot put the selected item(s) into the trash.	FSUtils		Du kan inte lägga de valda objekten i papperskorgen.
 Increase size	DeskWindow		Öka storleken
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Mål:
 starts with	SelectionWindow		börjar med
 Any	AttributesView		Vilken som helst
 New	DeskWindow		Ny

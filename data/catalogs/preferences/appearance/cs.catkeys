@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Appearance	663472720
+1	czech	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		Okraj ovládacího prvku
 Control mark	Colors tab		Označení ovládacího prvku
 Off	AntialiasingSettingsView		Vypnuto
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		Text vybrané položky nabídky
 Size:	Font Selection view		Velikost:
 Panel background	Colors tab		Pozadí panelu
 Plain font:	Font view		Obyčejné písmo:
+Automatically pick secondary colors	Colors tab		Automaticky vybrat náhradní barvy
 Window tab text	Colors tab		Text záložky okna
 Navigation pulse	Colors tab		Navigační puls
 LCD subpixel	AntialiasingSettingsView		LCD subpixelové

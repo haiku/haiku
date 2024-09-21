@@ -11,7 +11,7 @@ Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Controles
 FontDemo	System name		FontDemo
 Outline: %d	ControlView		Esquema: %d
-Text:	ControlView		Text:
+Text:	ControlView		Texto:
 Antialiased text	ControlView		Texto suavizado
 Bounding boxes	ControlView		Cajas con bordes
 Size: %d	ControlView		Tamaño: %d

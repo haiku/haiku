@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3977546506
+1	turkish	x-vnd.Haiku-libtracker	1514505623
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Bağlantıyı kes
 Eject when unmounting	AutoMounterSettings		Bağlantıyı keserken çıkar
 Searching for disks to mount…	StatusWindow		Bağlanacak disk aranıyor…
 Value	AttributesView		Değer
+Multiple selections	FindPanel		Çoklu seçimler
 Information	InfoWindow		Bilgi
 Error emptying Trash	FSUtils		Çöp boşaltılırken hata
 Opens with:	InfoWindow		Şununla açılır:
@@ -63,6 +64,7 @@ starts with	FindPanel		ile başlar
 Replace	FSUtils		Değiştir
 ?+* follows nothing.	libtracker		?+*, hiçbir şeyden sonra gelmiyor.
 Rectangle	AttributesView		Dikdörtgen
+Include Trash	FindPanel		Çöpte de ara
 Move to	ContainerWindow		Taşı
 Status	Email Query Columns		Durum
 New folder	FSUtils		Yeni klasör
@@ -109,6 +111,7 @@ Window	ContainerWindow		Pencere
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/sn
 Remove	FindPanel		Kaldır
 Company	Person Query Columns		Şirket
+Select folders…	FindPanel		Klasörler seç…
 Recent documents	FavoritesMenu		Son belgeler
 Edit templates…	TemplatesMenu		Şablonları düzenle…
 Clear temporary queries only	FindPanel		Yalnızca geçici sorguları temizle
@@ -151,6 +154,7 @@ Disks	Model		Diskler
 Create a Query template	FindPanel		Bir sorgu şablonu oluştur
 Size	FindPanel		Boyut
 Window	FilePanelPriv		Pencere
+New submenu	ContainerWindow	Folder name of New-template submenu	Yeni alt menü
 OK	Email Query Columns		Tamam
 Location	QueryPoseView		Konum
 Edit query	ContainerWindow		Sorguyu düzenle
@@ -179,6 +183,7 @@ Open selection with:	OpenWithWindow		Seçimi şununla aç:
 Preferences…	ContainerWindow		Tercihler…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		“%document” açılamadı; çünkü “%app” uygulaması çöpte. 
 Work Phone	Person Query Columns		İş telefonu
+Select folders	FindPanel		Klasörler seç
 Close	ContainerWindow		Kapat
 Get info	ContainerWindow		Bilgi al
 MIME Type	AttributesView		MIME türü
@@ -320,6 +325,7 @@ Open	ContainerWindow		Aç
 Settings…	MountMenu		Ayarlar…
 You cannot put the selected item(s) into the trash.	FSUtils		Seçili ögeyi/ögeleri çöpe atamazsınız.
 Increase size	DeskWindow		Büyüt
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Hedef:
 starts with	SelectionWindow		başlar
 Any	AttributesView		Herhangi biri
 New	DeskWindow		Yeni
@@ -496,6 +502,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Sürüm:
 OK	PoseView		Tamam
 Add-ons	DeskWindow		Eklentiler
+Add new submenu…	TemplatesMenu		Yeni alt menü ekle…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Seçili ögeleri bu klasöre taşımak veya kopyalamak istediğinizden emin misiniz?
 Find	FindPanel		Bul
 Empty folder	NavMenu		Boş klasör

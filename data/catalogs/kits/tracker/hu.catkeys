@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2303675010
+1	hungarian	x-vnd.Haiku-libtracker	4135601423
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Leválasztás
 Eject when unmounting	AutoMounterSettings		Kiadás leválasztáskor
 Searching for disks to mount…	StatusWindow		Csatolandó lemezek keresése…
 Value	AttributesView		Érték
+Multiple selections	FindPanel		Többszörös kijelölés
 Information	InfoWindow		Információ
 Error emptying Trash	FSUtils		Hiba történt a Szemetes ürítése közben.
 Opens with:	InfoWindow		Megnyitás ezzel:
@@ -63,6 +64,7 @@ starts with	FindPanel		eleje
 Replace	FSUtils		Csere
 ?+* follows nothing.	libtracker		?+* nem követ semmit.
 Rectangle	AttributesView		Téglalap
+Include Trash	FindPanel		A Szemetesben is
 Move to	ContainerWindow		Mozgatás
 Status	Email Query Columns		Állapot
 New folder	FSUtils		Új mappa
@@ -109,6 +111,7 @@ Window	ContainerWindow		Ablak
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/mp
 Remove	FindPanel		Eltávolítás
 Company	Person Query Columns		Szervezet
+Select folders…	FindPanel		Mappák megadása…
 Recent documents	FavoritesMenu		Legutóbbi dokumentumok
 Edit templates…	TemplatesMenu		Sablonok szerkesztése…
 Clear temporary queries only	FindPanel		Csak az ideiglenes keresések törlése
@@ -151,6 +154,7 @@ Disks	Model		Lemezek
 Create a Query template	FindPanel		Keresési sablon készítése
 Size	FindPanel		Méret
 Window	FilePanelPriv		Ablak
+New submenu	ContainerWindow	Folder name of New-template submenu	Új almenü
 OK	Email Query Columns		Rendben
 Location	QueryPoseView		Hely
 Edit query	ContainerWindow		Keresés szerkesztése
@@ -179,6 +183,7 @@ Open selection with:	OpenWithWindow		Kijelölés megnyitása ezzel:
 Preferences…	ContainerWindow		Beállítások…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nem sikerült megnyitni a dokumentumot (\"%document\"), mert a program (\"%app\") a Szemetesben van.
 Work Phone	Person Query Columns		Munkahelyi telefonszám
+Select folders	FindPanel		Mappák megadása
 Close	ContainerWindow		Bezárás
 Get info	ContainerWindow		Információ
 MIME Type	AttributesView		MIME Típus
@@ -320,6 +325,7 @@ Open	ContainerWindow		Megnyitás
 Settings…	MountMenu		Beállítások…
 You cannot put the selected item(s) into the trash.	FSUtils		A kijelölt elem(ek) nem rakható(k) a Szemetesbe.
 Increase size	DeskWindow		Méret növelése
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Cél:
 starts with	SelectionWindow		eleje
 Any	AttributesView		Bármely
 New	DeskWindow		Új
@@ -497,6 +503,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Verzió:
 OK	PoseView		Rendben
 Add-ons	DeskWindow		Kiegészítők
+Add new submenu…	TemplatesMenu		Új almenü hozzáadása…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Biztos át szeretnéd mozgatni vagy másolni a kijelölt elemeket ebbe a mappába?
 Find	FindPanel		Keresés
 Empty folder	NavMenu		Üres mappa

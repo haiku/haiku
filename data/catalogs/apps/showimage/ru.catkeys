@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	1148406263
+1	russian	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		Просмотр изображений
 Page setup…	Menus		Настройка печати…
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (страница %d) был изменен. Вы хотите закрыть его?
@@ -39,6 +39,7 @@ OK	SaveToFile		ОК
 Print…	Menus		Печать…
 The file '%s' could not be written.	SaveToFile		Невозможно записать файл '%s'.
 Quit	Menus		Выход
+Get info	Menus		Информация
 Rating	Menus		Рейтинг
 Close document	ClosePrompt		Закрыть документ
 Stretch to window	Menus		Растянуть до размеров окна

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2303675010
+1	catalan; valencian	x-vnd.Haiku-libtracker	4135601423
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Desmunta
 Eject when unmounting	AutoMounterSettings		Expulsa'l quan es desmunti
 Searching for disks to mount…	StatusWindow		Se cerquen els discs per muntar...
 Value	AttributesView		Valor
+Multiple selections	FindPanel		Seleccions múltiples
 Information	InfoWindow		Informació
 Error emptying Trash	FSUtils		Error en buidar la paperera
 Opens with:	InfoWindow		S'obre amb:
@@ -63,6 +64,7 @@ starts with	FindPanel		comença amb
 Replace	FSUtils		Reemplaça
 ?+* follows nothing.	libtracker		?+* sense res després.
 Rectangle	AttributesView		Rectangle
+Include Trash	FindPanel		Inclou-hi la paperera
 Move to	ContainerWindow		Mou a
 Status	Email Query Columns		Estat
 New folder	FSUtils		Carpeta nova
@@ -109,6 +111,7 @@ Window	ContainerWindow		Finestra
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Suprimeix
 Company	Person Query Columns		Companyia
+Select folders…	FindPanel		Selecció de carpetes...
 Recent documents	FavoritesMenu		Documents recents
 Edit templates…	TemplatesMenu		Edita les plantilles...
 Clear temporary queries only	FindPanel		Suprimeix només les consultes temporals
@@ -151,6 +154,7 @@ Disks	Model		Discs
 Create a Query template	FindPanel		Crea una plantilla de consulta
 Size	FindPanel		Mida
 Window	FilePanelPriv		Finestra
+New submenu	ContainerWindow	Folder name of New-template submenu	Submenú nou
 OK	Email Query Columns		D'acord
 Location	QueryPoseView		Ubicació
 Edit query	ContainerWindow		Edita la consulta
@@ -179,6 +183,7 @@ Open selection with:	OpenWithWindow		Obre la selecció amb:
 Preferences…	ContainerWindow		Preferències...
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		No s'ha pogut obrir \"%document\" ja que l'aplicació \"%app\" és a la paperera. 
 Work Phone	Person Query Columns		Telèfon de la feina
+Select folders	FindPanel		Selecció de carpetes
 Close	ContainerWindow		Tanca
 Get info	ContainerWindow		Informació
 MIME Type	AttributesView		Tipus MIME
@@ -320,6 +325,7 @@ Open	ContainerWindow		Obre
 Settings…	MountMenu		Paràmetres...
 You cannot put the selected item(s) into the trash.	FSUtils		No podeu posar els elements seleccionats a la paperera.
 Increase size	DeskWindow		Augmenta'n la mida
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Destinació:
 starts with	SelectionWindow		comença amb
 Any	AttributesView		Qualsevol
 New	DeskWindow		Nou
@@ -497,6 +503,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versió:
 OK	PoseView		D'acord
 Add-ons	DeskWindow		Complements
+Add new submenu…	TemplatesMenu		Afegiu-hi un submenú nou...
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Segur que voleu moure o copiar els fitxers seleccionats a aquesta carpeta?
 Find	FindPanel		Troba
 Empty folder	NavMenu		Carpeta buida

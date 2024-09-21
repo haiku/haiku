@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2303675010
+1	friulian	x-vnd.Haiku-libtracker	4135601423
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -31,6 +31,7 @@ Unmount	ContainerWindow		Dismonte
 Eject when unmounting	AutoMounterSettings		Pare fûr une volte che al è dismontât
 Searching for disks to mount…	StatusWindow		Daûr a cirî discs di montâ…
 Value	AttributesView		Valôr
+Multiple selections	FindPanel		Selezions multiplis
 Information	InfoWindow		Informazions
 Error emptying Trash	FSUtils		Erôr tal disvuedâ la scovacere
 Opens with:	InfoWindow		Vierç cun:
@@ -63,6 +64,7 @@ starts with	FindPanel		al tache cun
 Replace	FSUtils		Sostituìs
 ?+* follows nothing.	libtracker		?+* nol continue cun nuie.
 Rectangle	AttributesView		Retangul
+Include Trash	FindPanel		Inclût la Scovacere
 Move to	ContainerWindow		Sposte su
 Status	Email Query Columns		Stât
 New folder	FSUtils		Gnove cartele
@@ -109,6 +111,7 @@ Window	ContainerWindow		Barcon
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Gjave
 Company	Person Query Columns		Aziende
+Select folders…	FindPanel		Selezione cartelis…
 Recent documents	FavoritesMenu		Documents resints
 Edit templates…	TemplatesMenu		Modifiche modei…
 Clear temporary queries only	FindPanel		Nete dome interogazions temporaniis
@@ -151,6 +154,7 @@ Disks	Model		Discs
 Create a Query template	FindPanel		Cree un model di interogazion
 Size	FindPanel		Dimension
 Window	FilePanelPriv		Barcon
+New submenu	ContainerWindow	Folder name of New-template submenu	Gnûf sot-menù
 OK	Email Query Columns		Va ben
 Location	QueryPoseView		Posizion
 Edit query	ContainerWindow		Modifiche interogazion
@@ -179,6 +183,7 @@ Open selection with:	OpenWithWindow		Vierç selezion cun:
 Preferences…	ContainerWindow		Preferencis…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Nol è stât pussibil vierzi \"%document\" parcè che la aplicazion \"%app\" e je te Scovacere. 
 Work Phone	Person Query Columns		Telefon di vore
+Select folders	FindPanel		Selezione cartelis
 Close	ContainerWindow		Siere
 Get info	ContainerWindow		Oten informazions
 MIME Type	AttributesView		Gjenar MIME
@@ -320,6 +325,7 @@ Open	ContainerWindow		Vierç
 Settings…	MountMenu		Impostazions…
 You cannot put the selected item(s) into the trash.	FSUtils		No tu puedis butâ l'element(s) selezionât(s) te scovacere.
 Increase size	DeskWindow		Aumente dimensions
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Destinazion:
 starts with	SelectionWindow		al tache cun
 Any	AttributesView		Cualsisei
 New	DeskWindow		Gnûf
@@ -497,6 +503,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Version:
 OK	PoseView		Va ben
 Add-ons	DeskWindow		Components adizionâi
+Add new submenu…	TemplatesMenu		Zonte gnûf sot-menù…
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sigûrs di spostâ o copiâ i elements selezionâts su cheste cartele?
 Find	FindPanel		Cjate
 Empty folder	NavMenu		Cartele vueide
