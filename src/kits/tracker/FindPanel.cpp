@@ -2859,6 +2859,7 @@ FindPanel::AddAttrRow()
 	}
 
 	fAttrGrid = grid->GridLayout();
+	fAttrGrid->SetColumnWeight(2, 10);
 
 	AddAttributeControls(fAttrGrid->CountRows());
 
