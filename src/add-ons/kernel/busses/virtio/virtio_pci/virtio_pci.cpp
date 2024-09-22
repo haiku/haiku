@@ -11,6 +11,7 @@
 #include <bus/PCI.h>
 #include <SupportDefs.h>
 
+#include <cpu.h>
 #include <kernel.h>
 #include <virtio.h>
 
@@ -289,17 +290,27 @@ set_status(void* cookie, uint8 status)
 	CALLED();
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
 	if (bus->virtio1) {
-		uint8 *addr = (uint8*)(bus->commonCfgAddr
+		volatile uint8 *addr = (uint8*)(bus->commonCfgAddr
 			+ offsetof(struct virtio_pci_common_cfg, device_status));
-		uint8 old = 0;
-		if (status != 0)
-			old = *addr;
-		*addr = status | old;
+		if (status == 0) {
+			*addr = 0;
+			while (*addr != 0)
+				cpu_pause();
+		} else {
+			uint8 old = 0;
+			if (status != 0)
+				old = *addr;
+			*addr = status | old;
+		}
 	} else {
-		uint8 old = 0;
-		if (status != 0)
-			old = bus->pci->read_io_8(bus->device, bus->base_addr + VIRTIO_PCI_STATUS);
-		bus->pci->write_io_8(bus->device, bus->base_addr + VIRTIO_PCI_STATUS, status | old);
+		if (status == 0) {
+			bus->pci->write_io_8(bus->device, bus->base_addr + VIRTIO_PCI_STATUS, 0);
+			while (bus->pci->read_io_8(bus->device, bus->base_addr + VIRTIO_PCI_STATUS) != 0)
+				cpu_pause();
+		} else {
+			uint8 old = bus->pci->read_io_8(bus->device, bus->base_addr + VIRTIO_PCI_STATUS);
+			bus->pci->write_io_8(bus->device, bus->base_addr + VIRTIO_PCI_STATUS, status | old);
+		}
 	}
 }
 
