@@ -189,6 +189,8 @@ static constexpr uint64 TxSZ_MASK = (1 << 6) - 1;
 static constexpr uint64 T0SZ_MASK = TxSZ_MASK;
 static constexpr uint64 T1SZ_MASK = TxSZ_MASK << TCR_T1SZ_SHIFT;
 
+static constexpr uint64 IPS_MASK = 0x7UL << TCR_IPS_SHIFT;
+
 static constexpr uint64 TCR_EPD1_DISABLE = (1 << 23);
 
 static inline uint32 arch_mmu_user_address_bits()
