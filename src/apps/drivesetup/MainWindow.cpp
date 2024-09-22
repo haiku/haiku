@@ -990,7 +990,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 	if (!found) {
-		_DisplayPartitionError(B_TRANSLATE("Disk system \"%s\" not found!"));
+		_DisplayPartitionError(B_TRANSLATE("Disk system %s not found!"));
 		return;
 	}
 
@@ -1085,13 +1085,13 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		if (partition->IsDevice()) {
 			message = B_TRANSLATE("Are you sure you "
 				"want to write the changes back to disk now?\n\n"
-				"All data on the disk %s will be irretrievably lost if you "
+				"All data on the disk \"%s\" will be irretrievably lost if you "
 				"do so!");
 			message.ReplaceFirst("%s", previousName.String());
 		} else {
 			message = B_TRANSLATE("Are you sure you "
 				"want to write the changes back to disk now?\n\n"
-				"All data on the partition %s will be irretrievably lost if you "
+				"All data on the partition \"%s\" will be irretrievably lost if you "
 				"do so!");
 			message.ReplaceFirst("%s", previousName.String());
 		}
