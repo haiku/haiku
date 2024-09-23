@@ -124,6 +124,21 @@ LockingList<AddOnShortcut>* BContainerWindow::fAddOnsList
 
 namespace BPrivate {
 
+
+int
+CompareContainerWindowNodeRef(const BContainerWindow* item1, const BContainerWindow* item2)
+{
+	const node_ref* ref1 = item1->TargetModel()->NodeRef();
+	const node_ref* ref2 = item2->TargetModel()->NodeRef();
+	if (*ref1 < *ref2)
+		return -1;
+	else if (*ref1 == *ref2)
+		return 0;
+	else
+		return 1;
+}
+
+
 filter_result
 ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 {
@@ -140,6 +155,7 @@ ActivateWindowFilter(BMessage*, BHandler** target, BMessageFilter*)
 
 	return B_DISPATCH_MESSAGE;
 }
+
 
 }	// namespace BPrivate
 
@@ -1541,6 +1557,12 @@ BContainerWindow::MessageReceived(BMessage* message)
 						if (settings.SingleWindowBrowse() && Navigator() == NULL
 							&& TargetModel()->IsDirectory() && !PoseView()->IsFilePanel()
 							&& !PoseView()->IsDesktop()) {
+							SetSingleWindowBrowseShortcuts(settings.SingleWindowBrowse());
+							break;
+						}
+
+						if (settings.SingleWindowBrowse() && Navigator() == NULL
+							&& TargetModel()->IsDirectory()) {
 							fNavigator = new BNavigator(TargetModel());
 							fPoseContainer->GridLayout()->AddView(fNavigator, 0, 0, 2);
 							fNavigator->Hide();
@@ -1548,9 +1570,45 @@ BContainerWindow::MessageReceived(BMessage* message)
 								|| settings.ShowFullPathInTitleBar());
 						}
 
-						if (!settings.SingleWindowBrowse() && !PoseView()->IsDesktop()
-							&& TargetModel()->IsDesktop()) {
-							// Close the "Desktop" window, but not the Desktop
+						if (!settings.SingleWindowBrowse() && fWindowList != NULL) {
+							// close duplicate windows
+							int32 windowCount = fWindowList->CountItems();
+							BObjectList<BContainerWindow> containerList(windowCount);
+							for (int32 index = 0; index < windowCount; index++) {
+								BContainerWindow* window
+									= dynamic_cast<BContainerWindow*>(fWindowList->ItemAt(index));
+								if (window != NULL && window->TargetModel() != NULL
+									&& window->TargetModel()->NodeRef() != NULL) {
+									containerList.AddItem(window);
+								}
+							}
+
+							windowCount = containerList.CountItems();
+								// get the window count again as it may have changed
+							if (windowCount > 1) {
+								// sort containerList by node ref
+								containerList.SortItems(CompareContainerWindowNodeRef);
+
+								// go backwards from second to last item to first
+								for (int32 index = windowCount - 2; index >= 0; --index) {
+									BContainerWindow* window = containerList.ItemAt(index);
+									BContainerWindow* second = containerList.ItemAt(index + 1);
+									if (window == NULL || second == NULL)
+										continue;
+
+									const node_ref* windowRef = window->TargetModel()->NodeRef();
+									const node_ref* secondRef = second->TargetModel()->NodeRef();
+									if (*windowRef == *secondRef) {
+										// duplicate windows found, close second window
+										// use BMessenger::SendMessage(), safer than PostMessage()
+										BMessenger(second).SendMessage(B_QUIT_REQUESTED);
+									}
+								}
+							}
+						}
+
+						if (!settings.SingleWindowBrowse() && TargetModel()->IsDesktop()) {
+							// close the "Desktop" window, but not the Desktop
 							this->Quit();
 						}
 
