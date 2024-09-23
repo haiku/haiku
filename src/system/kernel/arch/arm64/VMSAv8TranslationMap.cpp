@@ -333,6 +333,8 @@ VMSAv8TranslationMap::GetOrMakeTable(phys_addr_t ptPa, int level, int index,
 	uint64_t oldPte = atomic_get64((int64*) ptePtr);
 
 	int type = oldPte & kPteTypeMask;
+	ASSERT(type != kPteTypeL12Block);
+
 	if (type == kPteTypeL012Table) {
 		// This is table entry already, just return it
 		return oldPte & kPteAddrMask;
