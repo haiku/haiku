@@ -52,6 +52,8 @@ struct cdev {
 	off_t si_mediasize;
 	dev_t si_id;
 	device_geometry* si_geometry;
+		// cylinder_count, head_count, and sectors_per_track are not always populated when mounting
+		// use si_medisize to access device size instead
 };
 
 /* Defined uid and gid values. */

@@ -3265,9 +3265,9 @@ bsd_device_init(mount* bsdVolume, const dev_t devID, const char* deviceFile, cde
 				return B_ERROR;
 			}
 			geometry->bytes_per_sector = read16(bootSector, 0xb);
-			geometry->sectors_per_track = 1;
-			geometry->cylinder_count = imageStat.st_size / geometry->bytes_per_sector;
-			geometry->head_count = 1;
+			geometry->sectors_per_track = 0;
+			geometry->cylinder_count = 0;
+			geometry->head_count = 0;
 			geometry->removable = true;
 			geometry->read_only = !(imageStat.st_mode & S_IWUSR);
 			geometry->write_once = false;
@@ -3592,6 +3592,10 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 	// like FreeBSD, the port uses 512-byte blocks as the primary unit of disk data
 	// rather then the device-dependent sector size
 	fatVolume->pm_fsinfo *= fatVolume->pm_BlkPerSec;
+	if (static_cast<uint64>(fatVolume->pm_HugeSectors) * fatVolume->pm_BlkPerSec > UINT_MAX) {
+		INFORM("pm_HugeSectors overflows when converting from sectors to 512-byte blocks\n");
+		return B_ERROR;
+	}
 	fatVolume->pm_HugeSectors *= fatVolume->pm_BlkPerSec;
 	fatVolume->pm_HiddenSects *= fatVolume->pm_BlkPerSec;
 	fatVolume->pm_FATsecs *= fatVolume->pm_BlkPerSec;
@@ -3664,14 +3668,40 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 	if (status != B_OK)
 		RETURN_ERROR(status);
 
-	// check that the partition is large enough to contain the file system
 	bool readOnly = (fatFlags & MSDOSFSMNT_RONLY) != 0;
-	device_geometry* geometry = dev->si_geometry;
-	if (geometry != NULL
-		&& fatVolume->pm_HugeSectors / fatVolume->pm_BlkPerSec
-			> geometry->sectors_per_track * geometry->cylinder_count * geometry->head_count) {
+
+	// check that the partition is large enough to contain the file system
+	if (dev->si_geometry == NULL) {
+		INFORM("si_geometry not initialized\n");
+		return B_ERROR;
+	}
+	uint32 fsSectors = fatVolume->pm_HugeSectors / fatVolume->pm_BlkPerSec;
+		// convert back from 512-byte blocks to sectors
+	if (fsSectors > dev->si_mediasize / dev->si_geometry->bytes_per_sector) {
 		INFORM("dosfs: volume extends past end of partition, mounting read-only\n");
 		readOnly = true;
+	}
+
+	// check for sector count overflow in the BPB, which is only possible for FAT32 volumes
+	if (FAT32(fatVolume) != 0) {
+		// given the size of the FAT table, how many sectors do we expect to have in the volume?
+		uint32 fatSectors = fatVolume->pm_FATsecs / fatVolume->pm_BlkPerSec;
+			// convert back from 512-byte blocks to sectors
+		uint32 minUsedFatSectors = fatSectors - 8 - (SECTORS_PER_CLUSTER(fatVolume) - 1);
+			// The math recommended by Microsoft to estimate required FAT sectors at initialization
+			// may overestimate by up to 8 sectors; fsck.fat also aligns the FAT to cluster size
+		uint32 fatEntriesPerSector = fatVolume->pm_BytesPerSec / 4;
+		uint32 minFatEntries = minUsedFatSectors * fatEntriesPerSector - (fatEntriesPerSector - 1);
+			// the last utilized sector of a FAT contains at least one entry
+		uint64 minDataSectors = (minFatEntries - 2) * SECTORS_PER_CLUSTER(fatVolume);
+			// 2 reserved cluster numbers
+		uint64 minTotalSectors = fatVolume->pm_ResSectors +
+			fatVolume->pm_FATsecs * fatVolume->pm_FATs + minDataSectors;
+		if (fsSectors < minTotalSectors) {
+			INFORM("possible sector count overflow (%" B_PRIu32 " vs. %" B_PRIu64 "), mounting "
+				"read-only\n", fsSectors, minTotalSectors);
+			readOnly = true;
+		}
 	}
 
 	status = read_label(fatVolume, dev->si_fd, bootsectorBuffer, dev->si_name);
@@ -3708,6 +3738,11 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 
 	rw_lock_init(&fatVolume->pm_fatlock.haikuRW, "fatlock");
 
+	// update this flag now so it will be applied in getblkx,
+	// but wait to set the fatVolume flags; fillinusemap is designed to run before they are set
+	if (readOnly == true)
+		bsdVolume->mnt_flag |= MNT_RDONLY;
+
 	// have the inuse map filled in
 	rw_lock_write_lock(&fatVolume->pm_fatlock.haikuRW);
 	status = B_FROM_POSIX_ERROR(fillinusemap(fatVolume));
@@ -3727,7 +3762,6 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 
 	if (readOnly == true) {
 		fatVolume->pm_flags |= MSDOSFSMNT_RONLY;
-		bsdVolume->mnt_flag |= MNT_RDONLY;
 	} else {
 		status = B_FROM_POSIX_ERROR(markvoldirty(fatVolume, 1));
 		if (status != B_OK) {

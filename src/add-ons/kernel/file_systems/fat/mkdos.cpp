@@ -228,6 +228,15 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 		size / (1024 * 1024),
 		size / (1024 * 1024 * 1024));
 
+	uint64 sectorCount = size / 512;
+	if (sectorCount > UINT_MAX) {
+		// The FAT spec only provides 32 bits to store the sector count on disk.
+		dprintf("dosfs Warning: sector count %" B_PRIu64 " won't fit in the FAT BPB. Only the "
+			"first %u sectors will be used\n", sectorCount, UINT_MAX);
+		sectorCount = UINT_MAX;
+		size = sectorCount * 512;
+	}
+
 	if (fatbits == 0) {
 		//auto determine fat type
 		if (isRawDevice && size <= FLOPPY_MAX_SIZE
@@ -350,7 +359,6 @@ _dosfs_initialize(int fd, partition_id partitionID, const char* name, const char
 	// directory, measured in sectors
 
 	// Now that clusters can be counted, verify cluster count is compatible with the FAT type
-	uint64 sectorCount = size / 512;
 	uint64 dataSec = sectorCount - (reservedSectorCount + (numFATs * FATSize) + rootDirSectors);
 	uint64 clusterCount = dataSec / sectorPerCluster;
 	if (fatbits == 12 && clusterCount > FAT12_MAX_CLUSTER_COUNT) {
