@@ -30,7 +30,6 @@ local bfsSources =
 	bfs_disk_system.cpp
 	BlockAllocator.cpp
 	BPlusTree.cpp
-	kernel_cpp.cpp
 	Attribute.cpp
 	CheckVisitor.cpp
 	Debug.cpp
@@ -53,9 +52,6 @@ KernelAddon $(SUBDIR:B) :
 
 SEARCH on [ FGristFiles $(bfsSources) ]
 	= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems bfs ] ;
-
-SEARCH on [ FGristFiles kernel_cpp.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles QueryParserUtils.cpp DeviceOpener.cpp ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

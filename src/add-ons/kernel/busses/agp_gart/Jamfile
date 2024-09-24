@@ -10,11 +10,4 @@ UsePrivateHeaders shared ;
 
 KernelAddon <agp_gart>intel :
 	intel_gart.cpp
-
-	kernel_cpp.cpp
 	;
-
-SEARCH on [ FGristFiles
-		kernel_cpp.cpp
-	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
-
