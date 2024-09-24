@@ -21,16 +21,20 @@
 #         * Needed on r1b4 due to / permissions fix needed by sshd
 #     * Shutdown VM.  DO NOT BOOT FROM NEW DISK!
 #       * Booting from new disk will cause SSH host keys to generate! (#18186)
-#   * Compress tar cvzf haiku-r1beta4-v20221222.tar.gz disk.raw
-#   * Upload to google cloud storage bucket for haiku.inc (ex: haiku-images/r1beta4/xxx)
-#     ex: gcloud storage cp ./haiku-master-x64-v20231024.tar.gz  gs://haiku-images/master/haiku-master-x64-v20231024.tar.gz
+#   * Compress tar cvzf haiku-r1beta5-x64-v20241024.tar.gz disk.raw
+#   * Upload to google cloud storage bucket for the haiku-inc project (ex: haiku-images/r1beta4/xxx)
+#     ex: gcloud storage cp ./haiku-r1beta5-x64-v20241024.tar.gz  gs://haiku-images/master/haiku-r1beta5-x64-v20241024.tar.gz
 #   * Import image (be sure to update version information below)
-#     * compute engine -> images
-#     * create image
-#     * source: Cloud storage file -> haiku-images/r1beta4/xxx
-#     * name: haiku-r1beta4-x64-v20221222
-#     * family: haiku-r1beta4-x64
-#     * description: Haiku R1/Beta4 x86_64
+#     ex: gcloud compute images create haiku-r1beta5-x64-v20241024 \
+#       --project=haiku-inc \
+#       --description=Haiku\ R1/Beta5\ x86_64 \
+#       --family=haiku-r1beta5-x64 \
+#       --source-uri=https://storage.googleapis.com/haiku-images/r1beta5/haiku-r1beta5-x64-v20240924.tar.gz \
+#       --labels=os=haiku,release=r1beta5 \
+#       --storage-location=us \
+#       --architecture=X86_64
+#     * Add allAuthenticatedUsers principal to "Compute Image User" role on the new image
+#       permissions to make it public
 
 if [ $# -ne 1 ]; then
 		echo "usage: $0 <HAIKU ROOTFS>"
@@ -47,8 +51,8 @@ echo ""
 echo "Installing basic authentication stuff..."
 # Installs gce_metadata_ssh tool for sshd. This lets you control the keys
 # of the "user" user from GKE.  ONLY "user" WORKS! We have no PAM for gce's os-login stuff
-wget https://eu.hpkg.haiku-os.org/haikuports/r1beta4/x86_64/current/packages/smolcloudtools-$SMOL_RELEASE-x86_64.hpkg \
-	-O $TARGET_ROOTFS/system/packages/smolcloudtools-$SMOL_RELEASE-x86_64.hpkg
+wget https://eu.hpkg.haiku-os.org/haikuports/current/$(uname -m)/current/packages/smolcloudtools-$SMOL_RELEASE-$(uname -m).hpkg \
+	-O $TARGET_ROOTFS/system/packages/smolcloudtools-$SMOL_RELEASE-$(uname -m).hpkg
 
 echo "Configuring ssh..."
 # Configure SSHD (reminder, sshd sees "user" as root since it is UID 0)
@@ -57,6 +61,11 @@ echo "AuthorizedKeysCommand /bin/gce_metadata_ssh" >> $TARGET_ROOTFS/system/sett
 echo "AuthorizedKeysCommandUser user" >> $TARGET_ROOTFS/system/settings/ssh/sshd_config
 echo "PasswordAuthentication no" >> $TARGET_ROOTFS/system/settings/ssh/sshd_config
 echo "PermitRootLogin without-password" >> $TARGET_ROOTFS/system/settings/ssh/sshd_config
+
+echo "Configuring kernel..."
+# GCP likes serial debug data on com0 (helps in troubleshooting)
+sed -i "s/^serial_debug_output .*$/serial_debug_output true/g" $TARGET_ROOTFS/home/config/settings/kernel/drivers/kernel
+sed -i "s/^serial_debug_port .*$/serial_debug_port 0/g" $TARGET_ROOTFS/home/config/settings/kernel/drivers/kernel
 
 unmount $TARGET_ROOTFS
 
