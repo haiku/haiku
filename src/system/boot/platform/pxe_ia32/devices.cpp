@@ -66,7 +66,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 		if (error == B_OK) {
 			char name[64];
 			ip_addr_t serverAddress = sTFTP.ServerIPAddress();
-			snprintf(name, sizeof(name), "%lu.%lu.%lu.%lu:%s",
+			snprintf(name, sizeof(name), "%u.%u.%u.%u:%s",
 				(serverAddress >> 24), (serverAddress >> 16) & 0xff,
 				(serverAddress >> 8) & 0xff, serverAddress & 0xff, fileName);
 
