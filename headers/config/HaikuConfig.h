@@ -139,7 +139,7 @@
 #endif
 
 /* BeOS R5 compatible types */
-#if defined(__HAIKU_ARCH_X86)
+#if defined(__HAIKU_ARCH_X86) && !defined(_KERNEL_MODE)
 	/* TODO: This should be "#ifdef __HAIKU_BEOS_COMPATIBLE", but this will
 	   break all gcc 4 C++ optional packages. I.e. switch that at a suitable
 	   time.
