@@ -378,8 +378,8 @@ VMSAv8TranslationMap::FlushVAIfAccessed(uint64_t pte, addr_t va)
 		return false;
 
 	InterruptsSpinLocker locker(sAsidLock);
-	if (fIsKernel) {
-		// We can't flush by ASID for kernel space.
+	if ((pte & kAttrNG) == 0) {
+		// Flush from all address spaces
 		asm("dsb ishst"); // Ensure PTE write completed
 		asm("tlbi vaae1is, %0" ::"r"(((va >> 12) & kTLBIMask)));
 		asm("dsb ish");
