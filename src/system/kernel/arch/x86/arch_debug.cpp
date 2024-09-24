@@ -135,7 +135,7 @@ static void
 set_debug_argument_variable(int32 index, uint64 value)
 {
 	char name[8];
-	snprintf(name, sizeof(name), "_arg%ld", index);
+	snprintf(name, sizeof(name), "_arg%d", index);
 	set_debug_variable(name, value);
 }
 
@@ -217,7 +217,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			case B_INT32_TYPE:
 				value = read_function_argument_value<int32>(arg, valueKnown);
 				if (valueKnown)
-					kprintf("int32: \33[34m%ld\33[0m", (int32)value);
+					kprintf("int32: \33[34m%d\33[0m", (int32)value);
 				break;
 			case B_INT16_TYPE:
 				value = read_function_argument_value<int16>(arg, valueKnown);
@@ -240,9 +240,9 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			case B_UINT32_TYPE:
 				value = read_function_argument_value<uint32>(arg, valueKnown);
 				if (valueKnown) {
-					kprintf("uint32: \33[34m%#lx\33[0m", (uint32)value);
+					kprintf("uint32: \33[34m%#x\33[0m", (uint32)value);
 					if (value < 0x100000)
-						kprintf(" (\33[34m%lu\33[0m)", (uint32)value);
+						kprintf(" (\33[34m%u\33[0m)", (uint32)value);
 				}
 				break;
 			case B_UINT16_TYPE:
@@ -276,7 +276,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 							&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
 							kprintf("NULL");
 						else
-							kprintf("\33[34m%#lx\33[0m", (uint32)value);
+							kprintf("\33[34m%#x\33[0m", (uint32)value);
 					}
 					break;
 				}
@@ -447,20 +447,21 @@ print_iframe(iframe* frame)
 	kprintf("%s iframe at %p (end = %p)\n", isUser ? "user" : "kernel", frame,
 		isUser ? (void*)(frame + 1) : (void*)&frame->user_sp);
 
-	kprintf(" eax %#-10lx    ebx %#-10lx     ecx %#-10lx  edx %#lx\n",
+	kprintf(" eax %#-10x    ebx %#-10x     ecx %#-10x  edx %#x\n",
 		frame->ax, frame->bx, frame->cx, frame->dx);
-	kprintf(" esi %#-10lx    edi %#-10lx     ebp %#-10lx  esp %#lx\n",
+	kprintf(" esi %#-10x    edi %#-10x     ebp %#-10x  esp %#x\n",
 		frame->si, frame->di, frame->bp, frame->sp);
-	kprintf(" eip %#-10lx eflags %#-10lx", frame->ip, frame->flags);
+	kprintf(" eip %#-10x eflags %#-10x", frame->ip, frame->flags);
 	if (isUser) {
 		// from user space
-		kprintf("user esp %#lx", frame->user_sp);
+		kprintf("user esp %#x", frame->user_sp);
 	}
 	kprintf("\n");
 #endif
 
-	kprintf(" vector: %#lx, error code: %#lx\n", frame->vector,
-		frame->error_code);
+	kprintf(" vector: %#lx, error code: %#lx\n",
+		(long unsigned int)frame->vector,
+		(long unsigned int)frame->error_code);
 }
 
 
@@ -597,11 +598,11 @@ get_current_iframe(Thread* thread)
 #define CHECK_DEBUG_VARIABLE(_name, _member, _settable) \
 	if (strcmp(variableName, _name) == 0) { \
 		settable = _settable; \
-		return &_member; \
+		return (addr_t*)&_member; \
 	}
 
 
-static size_t*
+static addr_t*
 find_debug_variable(const char* variableName, bool& settable)
 {
 	iframe* frame = get_current_iframe(debug_get_debugged_thread());
@@ -793,7 +794,7 @@ print_call(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		if (thread->team->address_space != NULL)
 			area = thread->team->address_space->LookupArea(eip);
 		if (area != NULL) {
-			kprintf("%ld:%s@%p + %#lx", area->id, area->name,
+			kprintf("%d:%s@%p + %#lx", area->id, area->name,
 				(void *)area->Base(), eip - area->Base());
 		}
 	}
@@ -804,9 +805,9 @@ print_call(Thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		for (int32 i = 0; i < argCount; i++) {
 			if (i > 0)
 				kprintf(", ");
-			kprintf("%#lx", *arg);
+			kprintf("%#x", *arg);
 			if (*arg > -0x10000 && *arg < 0x10000)
-				kprintf(" (%ld)", *arg);
+				kprintf(" (%d)", *arg);
 
 			set_debug_argument_variable(i + 1, *(uint32 *)arg);
 			arg++;
@@ -851,7 +852,7 @@ show_call(int argc, char **argv)
 			argCount = strtoul(argv[argc - 1] + 1, NULL, 0);
 
 		if (argCount < -2 || argCount > 16) {
-			kprintf("Invalid argument count \"%ld\".\n", argCount);
+			kprintf("Invalid argument count \"%d\".\n", argCount);
 			return 0;
 		}
 		argc--;
@@ -871,7 +872,7 @@ show_call(int argc, char **argv)
 	int32 callIndex = strtoul(argv[argc == 3 ? 2 : 1], NULL, 0);
 
 	if (thread != NULL)
-		kprintf("thread %ld, %s\n", thread->id, thread->name);
+		kprintf("thread %d, %s\n", thread->id, thread->name);
 
 	bool onKernelStack = true;
 

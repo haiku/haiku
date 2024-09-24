@@ -89,8 +89,9 @@ x86_invalid_exception(iframe* frame)
 	Thread* thread = thread_get_current_thread();
 	char name[32];
 	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread %" B_PRId32 "!\n",
-		frame->vector, exception_name(frame->vector, name, sizeof(name)),
-		frame->ip, thread ? thread->id : -1);
+		(long unsigned int)frame->vector,
+		exception_name(frame->vector, name, sizeof(name)),
+		(long unsigned int)frame->ip, thread ? thread->id : -1);
 }
 
 
@@ -99,7 +100,8 @@ x86_fatal_exception(iframe* frame)
 {
 	char name[32];
 	panic("Fatal exception \"%s\" occurred! Error code: 0x%lx\n",
-		exception_name(frame->vector, name, sizeof(name)), frame->error_code);
+		exception_name(frame->vector, name, sizeof(name)),
+		(long unsigned int)frame->error_code);
 }
 
 
@@ -207,7 +209,7 @@ x86_unexpected_exception(iframe* frame)
 		panic("Unexpected exception \"%s\" occurred in kernel mode! "
 			"Error code: 0x%lx\n",
 			exception_name(frame->vector, name, sizeof(name)),
-			frame->error_code);
+			(long unsigned int)(frame->error_code));
 	}
 }
 

@@ -185,7 +185,7 @@ apm_driver_version(uint16 version)
 	if (call_apm_bios(&regs) != B_OK)
 		return B_ERROR;
 
-	dprintf("eax: %lx, flags: %lx\n", regs.eax, regs.flags);
+	dprintf("eax: %x, flags: %x\n", regs.eax, regs.flags);
 
 	return B_OK;
 }
@@ -285,7 +285,7 @@ apm_init(kernel_args *args)
 		return B_ERROR;
 	}
 
-	TRACE(("  code32: 0x%x, 0x%lx, length 0x%x\n",
+	TRACE(("  code32: 0x%x, 0x%x, length 0x%x\n",
 		info.code32_segment_base, info.code32_segment_offset, info.code32_segment_length));
 	TRACE(("  code16: 0x%x, length 0x%x\n",
 		info.code16_segment_base, info.code16_segment_length));

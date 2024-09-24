@@ -200,8 +200,8 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 		*--stackTop = 0;
 
 	// save the stack position
-	thread->arch_info.current_stack.esp = stackTop;
-	thread->arch_info.current_stack.ss = (addr_t*)KERNEL_DATA_SELECTOR;
+	thread->arch_info.current_stack.esp = (uint32*)stackTop;
+	thread->arch_info.current_stack.ss = (uint32*)KERNEL_DATA_SELECTOR;
 }
 
 

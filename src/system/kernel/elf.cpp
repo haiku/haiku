@@ -362,7 +362,8 @@ dump_symbol(int argc, char **argv)
 				if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
 					symbolAddress
 						= (void*)(symbol->st_value + image->text_region.delta);
-					kprintf("%p %5lu %s:%s\n", symbolAddress, symbol->st_size,
+					kprintf("%p %5lu %s:%s\n", symbolAddress,
+						(long unsigned int)(symbol->st_size),
 						image->name, name);
 				}
 			}
@@ -378,7 +379,8 @@ dump_symbol(int argc, char **argv)
 						symbolAddress = (void*)(symbol->st_value
 							+ image->text_region.delta);
 						kprintf("%p %5lu %s:%s\n", symbolAddress,
-							symbol->st_size, image->name, name);
+							(long unsigned int)(symbol->st_size),
+							image->name, name);
 					}
 				}
 			}
@@ -467,7 +469,8 @@ dump_symbols(int argc, char **argv)
 			kprintf("%0*lx %s/%s %5ld %s\n", B_PRINTF_POINTER_WIDTH,
 				symbol->st_value + image->text_region.delta,
 				get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
-				symbol->st_size, image->debug_string_table + symbol->st_name);
+				(long unsigned int)(symbol->st_size),
+				image->debug_string_table + symbol->st_name);
 		}
 	} else {
 		int32 j;
@@ -486,7 +489,8 @@ dump_symbols(int argc, char **argv)
 					symbol->st_value + image->text_region.delta,
 					get_symbol_type_string(symbol),
 					get_symbol_bind_string(symbol),
-					symbol->st_size, SYMNAME(image, symbol));
+					(long unsigned int)(symbol->st_size),
+					SYMNAME(image, symbol));
 			}
 		}
 	}
