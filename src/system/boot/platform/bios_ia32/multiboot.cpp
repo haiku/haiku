@@ -20,10 +20,10 @@ dump_multiboot_info(void)
 	if (!gMultiBootInfo)
 		return;
 	dprintf("Found MultiBoot Info at %p\n", gMultiBootInfo);
-	dprintf("	flags: 0x%lx\n", gMultiBootInfo->flags);
+	dprintf("	flags: 0x%x\n", gMultiBootInfo->flags);
 
 	if (gMultiBootInfo->flags & MULTIBOOT_INFO_BOOTDEV)
-		dprintf("	boot_device: 0x%lx\n", gMultiBootInfo->boot_device);
+		dprintf("	boot_device: 0x%x\n", gMultiBootInfo->boot_device);
 
 	if (gMultiBootInfo->flags & MULTIBOOT_INFO_CMDLINE
 		&& gMultiBootInfo->cmdline)

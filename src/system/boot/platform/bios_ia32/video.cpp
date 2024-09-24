@@ -178,7 +178,7 @@ get_crtc_info_block(edid1_detailed_timing& timing)
 		/ (crtcInfo->horizontal_total / 10)
 		/ (crtcInfo->vertical_total / 10);
 
-	TRACE(("crtc: h %u/%u/%u, v %u/%u/%u, pixel clock %lu, refresh %u\n",
+	TRACE(("crtc: h %u/%u/%u, v %u/%u/%u, pixel clock %u, refresh %u\n",
 		crtcInfo->horizontal_sync_start, crtcInfo->horizontal_sync_end,
 		crtcInfo->horizontal_total, crtcInfo->vertical_sync_start,
 		crtcInfo->vertical_sync_end, crtcInfo->vertical_total,
@@ -377,13 +377,13 @@ vesa_get_edid(edid1_info *info)
 	regs.edi = 0;
 	call_bios(0x10, &regs);
 
-	TRACE(("EDID1: %lx\n", regs.eax));
+	TRACE(("EDID1: %x\n", regs.eax));
 	// %ah contains the error code
 	// %al determines whether or not the function is supported
 	if (regs.eax != 0x4f)
 		return B_NOT_SUPPORTED;
 
-	TRACE(("EDID2: ebx %lx\n", regs.ebx));
+	TRACE(("EDID2: ebx %x\n", regs.ebx));
 	// test if DDC is supported by the monitor
 	if ((regs.ebx & 3) == 0)
 		return B_NOT_SUPPORTED;
@@ -398,7 +398,7 @@ vesa_get_edid(edid1_info *info)
 	regs.es = ADDRESS_SEGMENT(&edidRaw);
 	regs.edi = ADDRESS_OFFSET(&edidRaw);
 	call_bios(0x10, &regs);
-	TRACE(("EDID3: %lx\n", regs.eax));
+	TRACE(("EDID3: %x\n", regs.eax));
 
 	if (regs.eax != 0x4f)
 		return B_NOT_SUPPORTED;
@@ -452,7 +452,7 @@ vesa_get_vbe_info_block(vbe_info_block *info)
 	if (info->signature != VESA_SIGNATURE)
 		return B_ERROR;
 
-	dprintf("VESA version = %d.%d, capabilities %lx\n", info->version.major,
+	dprintf("VESA version = %d.%d, capabilities %x\n", info->version.major,
 		info->version.minor, info->capabilities);
 
 	if (info->version.major < 2) {
@@ -485,7 +485,7 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 
 		struct vbe_mode_info modeInfo;
 		if (vesa_get_mode_info(mode, &modeInfo) == B_OK) {
-			TRACE((" 0x%03x: %u x %u x %u (a = %d, mem = %d, phy = %lx, p = %d, b = %d)\n", mode,
+			TRACE((" 0x%03x: %u x %u x %u (a = %d, mem = %d, phy = %x, p = %d, b = %d)\n", mode,
 				   modeInfo.width, modeInfo.height, modeInfo.bits_per_pixel, modeInfo.attributes,
 				   modeInfo.memory_model, modeInfo.physical_base, modeInfo.num_planes,
 				   modeInfo.num_banks));

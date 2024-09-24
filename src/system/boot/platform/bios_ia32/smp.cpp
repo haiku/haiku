@@ -67,7 +67,7 @@ apic_write(uint32 offset, uint32 data)
 static mp_floating_struct *
 smp_mp_probe(uint32 base, uint32 limit)
 {
-	TRACE(("smp_mp_probe: entry base 0x%lx, limit 0x%lx\n", base, limit));
+	TRACE(("smp_mp_probe: entry base 0x%x, limit 0x%x\n", base, limit));
 	for (uint32 *pointer = (uint32 *)base; (uint32)pointer < limit; pointer++) {
 		if (*pointer == MP_FLOATING_SIGNATURE) {
 			TRACE(("smp_mp_probe: found floating pointer structure at %p\n",
@@ -179,7 +179,7 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 				const char *cpuFamily[] = { "", "", "", "", "Intel 486",
 					"Intel Pentium", "Intel Pentium Pro", "Intel Pentium II" };
 #endif
-				TRACE(("smp: cpu#%ld: %s, apic id %d, version %d%s\n",
+				TRACE(("smp: cpu#%d: %s, apic id %d, version %d%s\n",
 					gKernelArgs.num_cpus,
 					cpuFamily[(processor->signature & 0xf00) >> 8],
 					processor->apic_id, processor->apic_version,
@@ -243,7 +243,7 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 		return B_ERROR;
 	}
 
-	dprintf("smp: apic @ %p, i/o apic @ %p, total %ld processors detected\n",
+	dprintf("smp: apic @ %p, i/o apic @ %p, total %d processors detected\n",
 		(void *)gKernelArgs.arch_args.apic_phys,
 		(void *)gKernelArgs.arch_args.ioapic_phys,
 		gKernelArgs.num_cpus);
@@ -268,7 +268,7 @@ smp_do_acpi_config(void)
 	}
 
 	gKernelArgs.arch_args.apic_phys = madt->local_apic_address;
-	TRACE(("smp: local apic address is 0x%lx\n", madt->local_apic_address));
+	TRACE(("smp: local apic address is 0x%x\n", madt->local_apic_address));
 
 	acpi_apic *apic = (acpi_apic *)((uint8 *)madt + sizeof(acpi_madt));
 	acpi_apic *end = (acpi_apic *)((uint8 *)madt + madt->header.length);
@@ -301,7 +301,7 @@ smp_do_acpi_config(void)
 
 			case ACPI_MADT_IO_APIC: {
 				acpi_io_apic *ioApic = (acpi_io_apic *)apic;
-				TRACE(("smp: found io APIC with id %u and address 0x%lx\n",
+				TRACE(("smp: found io APIC with id %u and address 0x%x\n",
 					ioApic->io_apic_id, ioApic->io_apic_address));
 				if (gKernelArgs.arch_args.ioapic_phys == 0)
 					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
@@ -348,7 +348,7 @@ calculate_apic_timer_conversion_factor(void)
 	gKernelArgs.arch_args.apic_time_cv_factor
 		= (uint32)((1000000.0/(t2 - t1)) * count);
 
-	TRACE(("APIC ticks/sec = %ld\n",
+	TRACE(("APIC ticks/sec = %d\n",
 		gKernelArgs.arch_args.apic_time_cv_factor));
 }
 
@@ -390,7 +390,7 @@ smp_init_other_cpus(void)
 	if (gKernelArgs.arch_args.apic_phys == 0)
 		return;
 
-	TRACE(("smp: found %ld cpu%s\n", gKernelArgs.num_cpus,
+	TRACE(("smp: found %d cpu%s\n", gKernelArgs.num_cpus,
 		gKernelArgs.num_cpus != 1 ? "s" : ""));
 	TRACE(("smp: apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys));
 	TRACE(("smp: ioapic_phys = %p\n",
@@ -524,7 +524,7 @@ dprintf("wait for delivery\n");
 		/* is this a local apic or an 82489dx ? */
 		numStartups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0)
 			? 2 : 0;
-dprintf("num startups = %ld\n", numStartups);
+dprintf("num startups = %d\n", numStartups);
 		for (j = 0; j < numStartups; j++) {
 			/* it's a local apic, so send STARTUP IPIs */
 dprintf("send STARTUP\n");

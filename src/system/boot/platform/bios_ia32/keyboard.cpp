@@ -75,7 +75,7 @@ check_for_boot_keys(void)
  		}
 	}
 
-	dprintf("options = %ld\n", options);
+	dprintf("options = %d\n", options);
 	return options;
 }
 

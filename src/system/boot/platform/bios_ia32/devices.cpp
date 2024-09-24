@@ -713,7 +713,7 @@ BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 			}
 
 			if (!readWorked) {
-				dprintf("reading %ld bytes from drive %u failed at %lld\n",
+				dprintf("reading %d bytes from drive %u failed at %" B_PRIdOFF "\n",
 					blocksRead, fDriveID, pos);
 				return B_ERROR;
 			}
