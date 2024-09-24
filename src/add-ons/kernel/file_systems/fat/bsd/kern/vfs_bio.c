@@ -204,13 +204,16 @@ bawrite(struct buf* bp)
 void
 brelse(struct buf* bp)
 {
+	if (bp->b_vreg != NULL) {
+		put_buf(bp);
+		return;
+	}
+
 	struct mount* bsdVolume = bp->b_vp->v_rdev->si_mountpt;
 	void* blockCache = bsdVolume->mnt_cache;
 	bool readOnly = MOUNTED_READ_ONLY(VFSTOMSDOSFS(bsdVolume));
 
-	if (bp->b_vreg != NULL) {
-		put_buf(bp);
-	} else if (bp->b_owned == false) {
+	if (bp->b_owned == false) {
 		if (readOnly == true)
 			block_cache_set_dirty(blockCache, bp->b_blkno, false, -1);
 		block_cache_put(blockCache, bp->b_blkno);
