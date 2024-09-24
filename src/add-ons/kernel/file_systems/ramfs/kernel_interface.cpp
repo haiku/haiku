@@ -145,7 +145,7 @@ ramfs_read_fs_info(fs_volume* _volume, struct fs_info *info)
 		info->total_blocks = volume->CountBlocks();
 		info->free_blocks = volume->CountFreeBlocks();
 		info->device_name[0] = '\0';
-		strncpy(info->volume_name, volume->GetName(),
+		strlcpy(info->volume_name, volume->GetName(),
 			sizeof(info->volume_name));
 		strcpy(info->fsh_name, "ramfs");
 	} else
