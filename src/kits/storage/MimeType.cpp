@@ -1200,7 +1200,7 @@ void BMimeType::_ReservedMimeType2() {}
 void BMimeType::_ReservedMimeType3() {}
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 // assignment operator.
 // Unimplemented
 BMimeType&

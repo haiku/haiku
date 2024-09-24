@@ -15,7 +15,7 @@
 #include <system_info.h>
 
 
-#if _BEOS_R5_COMPATIBLE_
+#if __HAIKU_BEOS_COMPATIBLE
 
 
 #define LEGACY_B_CPU_X86			15
@@ -143,7 +143,7 @@ _get_system_info(legacy_system_info* info, size_t size)
 }
 
 
-#endif	// _BEOS_R5_COMPATIBLE_
+#endif	// __HAIKU_BEOS_COMPATIBLE
 
 
 status_t

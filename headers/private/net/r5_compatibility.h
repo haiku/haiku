@@ -39,7 +39,7 @@ struct r5_sockaddr_in {
 };
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 extern bool __gR5Compatibility;
 extern addr_t __gNetworkStart;
 extern addr_t __gNetworkEnd;

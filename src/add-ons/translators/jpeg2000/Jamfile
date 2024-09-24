@@ -11,8 +11,6 @@ CCFLAGS += -DEXCLUDE_MIF_SUPPORT
 	-DEXCLUDE_JPG_SUPPORT 
 	-DEXCLUDE_PGX_SUPPORT ;
 
-SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
-
 AddResources JPEG2000Translator : JPEG2000Translator.rdef ;
 
 local architectureObject ;

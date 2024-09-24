@@ -16,7 +16,7 @@
 #include <string.h>
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 
 
 bool __gR5Compatibility = false;

@@ -958,7 +958,7 @@ void BAppFileInfo::_ReservedAppFileInfo2() {}
 void BAppFileInfo::_ReservedAppFileInfo3() {}
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 //!	Privatized assignment operator to prevent usage.
 BAppFileInfo&
 BAppFileInfo::operator=(const BAppFileInfo&)

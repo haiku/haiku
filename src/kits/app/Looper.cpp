@@ -881,7 +881,7 @@ void BLooper::_ReservedLooper5() {}
 void BLooper::_ReservedLooper6() {}
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 BLooper::BLooper(const BLooper& other)
 {
 	// Copy construction not allowed

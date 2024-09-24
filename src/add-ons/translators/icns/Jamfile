@@ -3,8 +3,6 @@ SubDir HAIKU_TOP src add-ons translators icns ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 	#for BaseTranslator.h and friends
 	
-SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
-
 
 AddResources ICNSTranslator : ICNSTranslator.rdef ;
 

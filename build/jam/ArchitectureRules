@@ -131,6 +131,8 @@ rule ArchitectureSetup architecture
 		# But these can stay.
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=cast-align
 			-Wno-error=format-truncation ;
+	} else {
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unknown-pragmas ;
 	}
 
 	# debug flags
@@ -149,11 +151,6 @@ rule ArchitectureSetup architecture
 
 	# TODO: Temporary work-around. Should be defined in the compiler specs
 	HAIKU_LINKFLAGS_$(architecture) += -Xlinker --no-undefined ;
-
-	if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
-		HAIKU_DEFINES_$(architecture) += _BEOS_R5_COMPATIBLE_ ;
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unknown-pragmas ;
-	}
 
 	# private shared kernel/libroot headers
 	HAIKU_PRIVATE_SYSTEM_HEADERS_$(architecture)

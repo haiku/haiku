@@ -291,7 +291,7 @@ BApplication::BApplication(BMessage* data)
 }
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 BApplication::BApplication(uint32 signature)
 {
 }

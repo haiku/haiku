@@ -168,7 +168,7 @@ void BMessageRunner::_ReservedMessageRunner5() {}
 void BMessageRunner::_ReservedMessageRunner6() {}
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 //! Privatized copy constructor to prevent usage.
 BMessageRunner::BMessageRunner(const BMessageRunner &)
 	:

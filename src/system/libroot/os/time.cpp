@@ -102,7 +102,7 @@ set_alarm(bigtime_t when, uint32 mode)
 }
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 extern "C" status_t
 set_timezone(const char* /*timezone*/)
 {

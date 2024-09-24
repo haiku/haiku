@@ -608,7 +608,7 @@ void BNodeInfo::_ReservedNodeInfo2() {}
 void BNodeInfo::_ReservedNodeInfo3() {}
 
 
-#ifdef _BEOS_R5_COMPATIBLE_
+#ifdef __HAIKU_BEOS_COMPATIBLE
 /*!	Assignment operator is declared private to prevent it from being created
 	automatically by the compiler.
 */
