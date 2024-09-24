@@ -25,6 +25,11 @@ rule ArchitectureSetup architecture
 		# for `this` in member functions), which breaks the kernel and various
 		# applications. (Linux does the same.)
 		ccBaseFlags += -fno-delete-null-pointer-checks ;
+
+		if $(architecture) = x86 {
+			# disable some builtins that are incompatible with our definitions
+			ccBaseFlags += -fno-builtin-fork -fno-builtin-vfork ;
+		}
 	}
 
 	# default architecture tuning
