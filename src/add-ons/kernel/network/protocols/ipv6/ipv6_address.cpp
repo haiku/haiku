@@ -328,7 +328,7 @@ ipv6_print_address_buffer(const sockaddr *_address, char *buffer,
 
 		if (printPort) {
 			char port[7];
-			sprintf(port, "]:%d", ntohs(address->sin6_port));
+			snprintf(port, sizeof(port), "]:%d", ntohs(address->sin6_port));
 			if (bufferSize - strlen(buffer) < strlen(port) + 1)
 				return B_NO_MEMORY;
 			strcat(buffer, port);
