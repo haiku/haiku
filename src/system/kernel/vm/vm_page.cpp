@@ -1010,29 +1010,37 @@ dump_page_long(int argc, char **argv)
 	}
 
 	if (searchMappings) {
+		struct Callback : VMTranslationMap::ReverseMappingInfoCallback {
+			VMAddressSpace*	fAddressSpace;
+
+			virtual bool HandleVirtualAddress(addr_t virtualAddress)
+			{
+				phys_addr_t physicalAddress;
+				uint32 flags = 0;
+				if (fAddressSpace->TranslationMap()->QueryInterrupt(virtualAddress,
+						&physicalAddress, &flags) != B_OK) {
+					kprintf(" aspace %" B_PRId32 ": %#"	B_PRIxADDR " (querying failed)\n",
+						fAddressSpace->ID(), virtualAddress);
+					return false;
+				}
+				VMArea* area = fAddressSpace->LookupArea(virtualAddress);
+				kprintf("  aspace %" B_PRId32 ", area %" B_PRId32 ": %#"
+					B_PRIxADDR " (%c%c%s%s)\n", fAddressSpace->ID(),
+					area != NULL ? area->id : -1, virtualAddress,
+					(flags & B_KERNEL_READ_AREA) != 0 ? 'r' : '-',
+					(flags & B_KERNEL_WRITE_AREA) != 0 ? 'w' : '-',
+					(flags & PAGE_MODIFIED) != 0 ? " modified" : "",
+					(flags & PAGE_ACCESSED) != 0 ? " accessed" : "");
+				return false;
+			}
+		} callback;
+
 		kprintf("all mappings:\n");
 		VMAddressSpace* addressSpace = VMAddressSpace::DebugFirst();
 		while (addressSpace != NULL) {
-			size_t pageCount = addressSpace->Size() / B_PAGE_SIZE;
-			for (addr_t address = addressSpace->Base(); pageCount != 0;
-					address += B_PAGE_SIZE, pageCount--) {
-				phys_addr_t physicalAddress;
-				uint32 flags = 0;
-				if (addressSpace->TranslationMap()->QueryInterrupt(address,
-						&physicalAddress, &flags) == B_OK
-					&& (flags & PAGE_PRESENT) != 0
-					&& physicalAddress / B_PAGE_SIZE
-						== page->physical_page_number) {
-					VMArea* area = addressSpace->LookupArea(address);
-					kprintf("  aspace %" B_PRId32 ", area %" B_PRId32 ": %#"
-						B_PRIxADDR " (%c%c%s%s)\n", addressSpace->ID(),
-						area != NULL ? area->id : -1, address,
-						(flags & B_KERNEL_READ_AREA) != 0 ? 'r' : '-',
-						(flags & B_KERNEL_WRITE_AREA) != 0 ? 'w' : '-',
-						(flags & PAGE_MODIFIED) != 0 ? " modified" : "",
-						(flags & PAGE_ACCESSED) != 0 ? " accessed" : "");
-				}
-			}
+			callback.fAddressSpace = addressSpace;
+			addressSpace->TranslationMap()->DebugGetReverseMappingInfo(
+				page->physical_page_number * B_PAGE_SIZE, callback);
 			addressSpace = VMAddressSpace::DebugNext(addressSpace);
 		}
 	}
