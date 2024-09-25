@@ -435,12 +435,11 @@ VMSAv8TranslationMap::ProcessRange(phys_addr_t ptPa, int level, addr_t va, size_
 	uint64_t entryMask = entrySize - 1;
 
 	uint64_t alignedDownVa = va & ~entryMask;
-	uint64_t alignedUpEnd = (va + size + (entrySize - 1)) & ~entryMask;
+	uint64_t end = va + size - 1;
 	if (level == 3)
 		ASSERT(alignedDownVa == va);
 
-    for (uint64_t effectiveVa = alignedDownVa; effectiveVa < alignedUpEnd;
-        effectiveVa += entrySize) {
+    for (uint64_t effectiveVa = alignedDownVa; effectiveVa < end; effectiveVa += entrySize) {
 		int index = ((effectiveVa & vaMask) >> shift) & tableMask;
 		uint64_t* ptePtr = TableFromPa(ptPa) + index;
 
@@ -454,11 +453,26 @@ VMSAv8TranslationMap::ProcessRange(phys_addr_t ptPa, int level, addr_t va, size_
 			if (subTable == 0)
 				continue;
 
-			uint64_t subVa = std::max(effectiveVa, va);
-			size_t subSize = std::min(size_t(entrySize - (subVa & entryMask)), size);
-            ProcessRange(subTable, level + 1, subVa, subSize, reservation, updatePte);
-
-			size -= subSize;
+			if (effectiveVa < va) {
+				// The range begins inside the slot.
+				if (effectiveVa + entrySize - 1 > end) {
+					// The range ends within the slot.
+					ProcessRange(subTable, level + 1, va, size, reservation, updatePte);
+				} else {
+					// The range extends past the end of the slot.
+					ProcessRange(subTable, level + 1, va, effectiveVa + entrySize - va, reservation, updatePte);
+				}
+			} else {
+				// The range beginning is aligned to the slot.
+				if (effectiveVa + entrySize - 1 > end) {
+					// The range ends within the slot.
+					ProcessRange(subTable, level + 1, effectiveVa, end - effectiveVa + 1,
+						reservation, updatePte);
+				} else {
+					// The range extends past the end of the slot.
+					ProcessRange(subTable, level + 1, effectiveVa, entrySize, reservation, updatePte);
+				}
+			}
 		}
 	}
 }
