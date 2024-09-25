@@ -846,6 +846,73 @@ X86VMTranslationMap64Bit::ClearAccessedAndModified(VMArea* area, addr_t address,
 }
 
 
+bool
+X86VMTranslationMap64Bit::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
+	ReverseMappingInfoCallback& callback)
+{
+	if (fLA57) {
+		kprintf("X86VMTranslationMap64Bit::DebugGetReverseMappingInfo not implemented for LA57\n");
+		return false;
+	}
+
+	const uint64* virtualPML4 = fPagingStructures->VirtualPMLTop();
+	for (uint32 i = 0; i < (fIsKernelMap ? 512 : 256); i++) {
+		if ((virtualPML4[i] & X86_64_PML4E_PRESENT) == 0)
+			continue;
+		const uint64 addressMask = (i >= 256) ? 0xffffff0000000000LL : 0;
+
+		const uint64* virtualPDPT = (uint64*)fPageMapper->GetPageTableAt(
+			virtualPML4[i] & X86_64_PML4E_ADDRESS_MASK);
+		for (uint32 j = 0; j < 512; j++) {
+			if ((virtualPDPT[j] & X86_64_PDPTE_PRESENT) == 0)
+				continue;
+
+			const uint64* virtualPageDir = (uint64*)fPageMapper->GetPageTableAt(
+				virtualPDPT[j] & X86_64_PDPTE_ADDRESS_MASK);
+			for (uint32 k = 0; k < 512; k++) {
+				if ((virtualPageDir[k] & X86_64_PDE_PRESENT) == 0)
+					continue;
+
+				if ((virtualPageDir[k] & X86_64_PDE_LARGE_PAGE) != 0) {
+					phys_addr_t largeAddress = virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK;
+					if (physicalAddress >= largeAddress
+							&& physicalAddress < (largeAddress + k64BitPageTableRange)) {
+						off_t offset = physicalAddress - largeAddress;
+						addr_t virtualAddress = i * k64BitPDPTRange
+							+ j * k64BitPageDirectoryRange
+							+ k * k64BitPageTableRange
+							+ offset;
+						virtualAddress |= addressMask;
+						if (callback.HandleVirtualAddress(virtualAddress))
+							return true;
+					}
+					continue;
+				}
+
+				const uint64* virtualPageTable = (uint64*)fPageMapper->GetPageTableAt(
+					virtualPageDir[k] & X86_64_PDE_ADDRESS_MASK);
+				for (uint32 l = 0; l < 512; l++) {
+					if ((virtualPageTable[l] & X86_64_PTE_PRESENT) == 0)
+						continue;
+
+					if ((virtualPageTable[l] & X86_64_PTE_ADDRESS_MASK) == physicalAddress) {
+						addr_t virtualAddress = i * k64BitPDPTRange
+							+ j * k64BitPageDirectoryRange
+							+ k * k64BitPageTableRange
+							+ l * B_PAGE_SIZE;
+						virtualAddress |= addressMask;
+						if (callback.HandleVirtualAddress(virtualAddress))
+							return true;
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
 X86PagingStructures*
 X86VMTranslationMap64Bit::PagingStructures() const
 {
