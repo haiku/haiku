@@ -8,7 +8,8 @@
 #include <SupportDefs.h>
 
 #define USB_AUDIO_DEVICE_CLASS 			0x01
-#define USB_AUDIO_CLASS_VERSION			0x0100
+#define USB_AUDIO_CLASS_VERSION_1		0x0100
+#define USB_AUDIO_CLASS_VERSION_2		0x0200
 
 enum {
 	USB_AUDIO_INTERFACE_AUDIO_CLASS		= 0x01
@@ -21,8 +22,8 @@ enum { // Audio Interface Subclasses
 	USB_AUDIO_INTERFACE_MIDISTREAMING_SUBCLASS
 };
 
-enum { // Audio Interface Protocol Codes	
-	USB_AUDIO_PROTOCOL_UNDEFINED =	0x00
+enum { // Audio Interface Protocol Codes
+	USB_AUDIO_PROTOCOL_UNDEFINED = 0x00
 };
 
 enum { // Audio Interface Class-Specific Descriptor Types
@@ -56,7 +57,7 @@ enum { // Audio Class-Specific AudioControl Interface descriptor subtypes
 
 
 // Class Specific Audio Control Interface Header
-// R1: Table 4-2 p.37 / R2: Table 4-5 p.48 
+// R1: Table 4-2 p.37 / R2: Table 4-5 p.48
 typedef struct {
 	uint8	length;
 	uint8	descriptor_type;		// USB_AUDIO_CS_INTERFACE
@@ -77,6 +78,43 @@ typedef struct {
 	};
 } _PACKED usb_audiocontrol_header_descriptor;
 
+// Clock Source Descriptor
+// R2: Table 4-6 p.49
+typedef struct {
+	uint8 length;
+	uint8 descriptor_type; // USB_AUDIO_CS_INTERFACE
+	uint8 descriptor_subtype; // USB_AUDIO_CLOCKSOURCE_HEADER
+	uint8 clock_id;
+	uint8 bm_attributes;
+	uint8 bm_controls;
+	uint8 assoc_terminal;
+	uint8 clock_source_idx;
+} _PACKED usb_audio_clocksource_descriptor;
+
+// Clock Selector Descriptor
+// R2: Table 4-7 p.50
+typedef struct {
+	uint8 length;
+	uint8 descriptor_type; // USB_AUDIO_CS_INTERFACE
+	uint8 descriptor_subtype; // USB_AUDIO_CLOCKSELECTOR_HEADER
+	uint8 clock_id;
+	uint8 nrinpins;
+	uint8 Csourceid[1];
+	uint8 bm_controls;
+	uint8 clockselector;
+} _PACKED usb_audio_clockselector_descriptor;
+
+// Clock Multiplier Descriptor
+// R2: Table 4-8 p.51
+typedef struct {
+	uint8	length;
+	uint8	descriptor_type;		// USB_AUDIO_CS_INTERFACE
+	uint8	descriptor_subtype; 	// USB_AUDIO_CLOCKMULTIPLIER
+	uint8   clockid;
+	uint8   clksourceid;
+	uint8   bm_controls;
+	uint8   clockmultiplier;
+} _PACKED usb_audio_clockmultiplier_descriptor;
 
 // Input Terminal Descriptor
 // R1: Table 4-3 p.39 / R2: Table 4-9, page 53
@@ -116,16 +154,16 @@ typedef struct {
 	uint8	terminal_id;
 	uint16	terminal_type;
 	uint8	assoc_terminal;
-	uint8	source_id;				
+	uint8 source_id;
 	union {
 		struct {
-			uint8	terminal;		
+			uint8 terminal;
 		} _PACKED r1;
 
 		struct {
-			uint8	clock_source_id;
-			uint16	bm_controls;	
-			uint8	terminal;		
+			uint8 clock_source_id;
+			uint16 bm_controls;
+			uint8 terminal;
 		} _PACKED r2;
 	};
 } _PACKED usb_audio_output_terminal_descriptor;
@@ -168,7 +206,7 @@ typedef struct {
 	uint8	unit_id;
 	uint8	num_input_pins;
 	uint8	input_pins[1];
-	// uint8 selector_string;								
+	// uint8 selector_string;
 } _PACKED usb_audio_selector_unit_descriptor;
 
 
@@ -182,14 +220,13 @@ typedef struct {
 	uint8	source_id;
 	union {
 		struct {
-			uint8	control_size;	
-			uint8	bma_controls[1];
+			uint8 control_size;
+			uint8 bma_controls[1];
 		//	uint8	feature_string;
 		} _PACKED r1;
 
 		struct {
-			uint32	bma_controls[1];
-		//	uint8	feature_string;	
+			uint32 bma_controls[1];
 		} _PACKED r2;
 	};
 } _PACKED usb_audio_feature_unit_descriptor;
@@ -198,13 +235,13 @@ typedef struct {
 // Processing Unit Descriptor
 // R1: Table 4-8 p.45 / R2: Table 4-20, page 66
 typedef struct {
-	uint8	length;
-	uint8	descriptor_type;		// USB_AUDIO_CS_INTERFACE
-	uint8	descriptor_subtype; 	// USB_AUDIO_AC_PROCESSING_UNIT
-	uint8	unit_id;		
-	uint16	process_type;	
-	uint8	num_input_pins;	
-	uint8	input_pins[1];	
+	uint8 length;
+	uint8 descriptor_type;		// USB_AUDIO_CS_INTERFACE
+	uint8 descriptor_subtype; 	// USB_AUDIO_AC_PROCESSING_UNIT
+	uint8 unit_id;
+	uint16 process_type;
+	uint8 num_input_pins;
+	uint8 input_pins[1];
 	// use usb_audio_output_channels_descriptor to parse the rest
 // TODO - the bmControl!!!!
 } _PACKED usb_audio_processing_unit_descriptor;
@@ -231,7 +268,7 @@ enum { // Audio Class-Specific AudioStreaming Interface descriptor subtypes
 };
 
 // Class Specific Audio Streaming Interface Descriptor
-// R1: Table 4-19 p.60 / R2: Table 4-27 p.76 
+// R1: Table 4-19 p.60 / R2: Table 4-27 p.76
 typedef struct {
 	uint8	length;
 	uint8	descriptor_type;		// USB_AUDIO_CS_INTERFACE
@@ -246,7 +283,7 @@ typedef struct {
 		struct {
 			uint8	bm_controls;
 			uint8	format_type;
-			uint32	bm_formats;	
+			uint32	bm_formats;
 			uint8	num_output_pins;
 			uint32	channel_config;
 			uint8	channel_names;
@@ -258,12 +295,12 @@ typedef struct {
 // Class-specific As Isochronous Audio Data Endpoint descriptor
 // R1: Table 4-21, p. 62 / R2: Table 4-34, page 87
 typedef struct {
-	uint8	length;	
-	uint8	descriptor_type;		// USB_AUDIO_CS_ENDPOINT
-	uint8	descriptor_subtype; 	// USB_AUDIO_EP_GENERAL
-	uint8	attributes;	
-	uint8	lock_delay_units;
-	uint16	lock_delay;	
+	uint8 length;
+	uint8 descriptor_type;		// USB_AUDIO_CS_ENDPOINT
+	uint8 descriptor_subtype; 	// USB_AUDIO_EP_GENERAL
+	uint8 attributes;
+	uint8 lock_delay_units;
+	uint16 lock_delay;
 } _PACKED usb_audio_streaming_endpoint_descriptor;
 
 
@@ -432,7 +469,7 @@ typedef struct {
 	uint8 sample_freq_type;
 	uint8 sample_freq[3];	// [0] + [1] << 8 + [2] << 16
 	//  if sample_freq_type != 1,
-	// (sample_freq_type - 1) x uint8 sample_freq[3] follows... 
+	// (sample_freq_type - 1) x uint8 sample_freq[3] follows...
 } _PACKED usb_audio_format_type_descriptor;
 */
 // bitset for feature control bitmap
