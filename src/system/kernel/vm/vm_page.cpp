@@ -3655,7 +3655,7 @@ vm_page_allocate_page(vm_page_reservation* reservation, uint32 flags)
 	}
 
 	if (page->CacheRef() != NULL)
-		panic("supposed to be free page %p has cache @! page -m %p", page, page);
+		panic("supposed to be free page %p has cache @! page %p; cache _cache", page, page);
 
 	DEBUG_PAGE_ACCESS_START(page);
 
