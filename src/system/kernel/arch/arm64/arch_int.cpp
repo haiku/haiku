@@ -165,11 +165,10 @@ fixup_entry(phys_addr_t ptPa, int level, addr_t va, bool wr)
 			uint64_t newPte = oldPte & ~kAttrAPReadOnly;
             if ((uint64_t)atomic_test_and_set64((int64*)pte, newPte, oldPte) != oldPte)
 				return true;
-			asm("dsb ishst");
-			uint64_t ttbr0 = READ_SPECIALREG(TTBR0_EL1);
-			asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (ttbr0 & kASIDMask)));
-			asm("dsb ish");
-			asm("isb");
+
+			uint64_t asid = READ_SPECIALREG(TTBR0_EL1) >> 48;
+			flush_va_if_accessed(oldPte, va, asid);
+
 			return true;
 		}
 	} else if (level < 3 && type == kPteTypeL012Table) {

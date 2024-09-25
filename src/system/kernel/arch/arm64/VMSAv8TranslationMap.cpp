@@ -372,27 +372,32 @@ VMSAv8TranslationMap::GetOrMakeTable(phys_addr_t ptPa, int level, int index,
 
 
 bool
-VMSAv8TranslationMap::FlushVAIfAccessed(uint64_t pte, addr_t va)
+flush_va_if_accessed(uint64_t pte, addr_t va, int asid)
 {
 	if (!is_pte_accessed(pte))
 		return false;
 
-	InterruptsSpinLocker locker(sAsidLock);
 	if ((pte & kAttrNG) == 0) {
 		// Flush from all address spaces
 		asm("dsb ishst"); // Ensure PTE write completed
 		asm("tlbi vaae1is, %0" ::"r"(((va >> 12) & kTLBIMask)));
 		asm("dsb ish");
 		asm("isb");
-	} else if (fASID != -1) {
+	} else if (asid != -1) {
 		asm("dsb ishst"); // Ensure PTE write completed
-        asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (uint64_t(fASID) << 48)));
+        asm("tlbi vae1is, %0" ::"r"(((va >> 12) & kTLBIMask) | (uint64_t(asid) << 48)));
 		asm("dsb ish"); // Wait for TLB flush to complete
 		asm("isb");
 		return true;
 	}
 
 	return false;
+}
+
+bool
+VMSAv8TranslationMap::FlushVAIfAccessed(uint64_t pte, addr_t va) {
+	InterruptsSpinLocker locker(sAsidLock);
+	return flush_va_if_accessed(pte, va, fASID);
 }
 
 
