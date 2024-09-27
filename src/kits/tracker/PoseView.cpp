@@ -5108,18 +5108,6 @@ BPoseView::MoveSelectionInto(Model* destFolder, BContainerWindow* srcWindow,
 		okToMove = false;
 	}
 
-	// prompt user if drag was from a query
-	if (srcWindow->TargetModel()->IsQuery()
-		&& !forceCopy && !destIsTrash && !createLink) {
-		srcWindow->UpdateIfNeeded();
-		BAlert* alert = new BAlert("",
-			B_TRANSLATE("Are you sure you want to move or copy the selected "
-			"item(s) to this folder?"), B_TRANSLATE("Cancel"),
-			B_TRANSLATE("Move"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-		alert->SetShortcut(0, B_ESCAPE);
-		okToMove = alert->Go() == 1;
-	}
-
 	if (okToMove) {
 		PoseList* selectionList = srcWindow->PoseView()->SelectionList();
 		BList* pointList = destWindow->PoseView()->GetDropPointList(clickPoint,
