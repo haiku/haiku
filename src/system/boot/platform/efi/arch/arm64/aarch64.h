@@ -204,8 +204,6 @@ static inline uint32 arch_mmu_user_address_bits()
 
 static inline uint32 arch_mmu_user_granule()
 {
-	static constexpr uint64 TCR_TG0_SHIFT = 14u;
-
 	uint64 reg = _arch_mmu_get_tcr();
 	return ((reg >> TCR_TG0_SHIFT) & TG_MASK);
 }
