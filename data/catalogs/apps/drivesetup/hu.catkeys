@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	63900332
+1	hungarian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -27,7 +27,6 @@ Write changes	MainWindow		Írás a lemezre
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nem sikerült előkészíteni a(z) %s partíciót. A lemez tartalma érintetlen maradt.
 Validation of the given creation parameters failed.	MainWindow		A létrehozáshoz megadott paramétereket nem sikerült érvényesíteni.
 Eject	MainWindow		Kiadás
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a %s lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Surface test (not implemented)	MainWindow		Felületellenőrzés (még nem működik)
 Read only	PartitionList		Csak olvasható
 The panel could not return successfully.	MainWindow		A panel sikertelenül tért vissza.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Módosítás
 Partition name:	ChangeParametersPanel		Partíció neve:
 LUKS encrypted	Encryption utils		LUKS-al kódolt
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Biztosan a lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a(z) %s partíció teljes tartalma visszavonhatatlanul meg fog semmisülni.
 Empty space	PartitionList		Üres terület
 Cancel	AbstractParametersPanel		Mégse
 Format	MainWindow		Formázás
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Paraméterek módosítása
 Rescan	MainWindow		Frissítés
 There was an error acquiring the partition row.	MainWindow		Hiba történt a partíció adatainak lekérdezésénél.
 Failed to initialize the disk %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: %s.\n
-Disk system \"%s\" not found!	MainWindow		\"%s\" lemez típus nem található!
 The partition cannot be unmounted.	MainWindow		A partíció nem választható le.
 Delete	MainWindow		Törlés
 Partition type:	ChangeParametersPanel		Partíció típusa:

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-DriveSetup	2942313478
+1	indonesian	x-vnd.Haiku-DriveSetup	4018609797
 Could not unmount partition %s.	MainWindow		Tidak dapat melepas partisi %s.
 Mount all	MainWindow		Pasang semua
 Disk	MainWindow		Diska
@@ -26,7 +26,6 @@ Write changes	MainWindow		Tulis perubahan
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inisialisasi partisi %s gagal. (Tidak ada yang ditulis ke disk.)
 Validation of the given creation parameters failed.	MainWindow		Validasi parameter penciptaan yang diberikan gagal.
 Eject	MainWindow		Keluarkan
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada disk %s akan hilang jika Anda melakukannya!
 Surface test (not implemented)	MainWindow		Tes permukaan (tidak diimplementasikan)
 Read only	PartitionList		Hanya baca
 The panel could not return successfully.	MainWindow		Panel tidak berhasil kembali.
@@ -61,7 +60,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Ubah
 Partition name:	ChangeParametersPanel		Nama partisi:
 LUKS encrypted	Encryption utils		Terenkripsi LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Anda yakin ingin menulis perubahan kembali ke disk sekarang?\n\nSemua data pada partisi %s akan hilang jika Anda melakukannya!
 Cancel	AbstractParametersPanel		Batalkan
 Format	MainWindow		Format
 OK	MainWindow		OKE
@@ -80,7 +78,6 @@ Change parameters	MainWindow		Ubah parameter
 Rescan	MainWindow		Pindai ulang
 There was an error acquiring the partition row.	MainWindow		Terjadi kesalahan saat mengambil baris partisi.
 Failed to initialize the disk %s!\n	MainWindow		Gagal menginisialisasi disk %s!\n
-Disk system \"%s\" not found!	MainWindow		Sistem diska \"%s\" tidak ditemukan!
 Delete	MainWindow		Hapus
 Partition type:	ChangeParametersPanel		Tipe partisi:
 Parameters	PartitionList		Parameter

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	63900332
+1	romanian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Nu s-a putut demonta partiția %s.
 Mount all	MainWindow		Montează toate
 Disk	MainWindow		Disc
@@ -27,7 +27,6 @@ Write changes	MainWindow		Scrie modificările
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inițializarea partiției %s a eșuat. (Nu fost scris nimic pe disc.)
 Validation of the given creation parameters failed.	MainWindow		Validarea parametrilor de creare furnizați a eșuat.
 Eject	MainWindow		Scoate
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul %s se vor pierde iremediabil dacă faceți acest lucru!
 Surface test (not implemented)	MainWindow		Test de suprafață (neimplementat)
 Read only	PartitionList		Doar citire
 The panel could not return successfully.	MainWindow		Panoul nu a putut returna cu succes.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Modifică
 Partition name:	ChangeParametersPanel		Numele partiției:
 LUKS encrypted	Encryption utils		Criptat LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția %s se vor pierde iremediabil dacă faceți acest lucru!
 Empty space	PartitionList		Spațiu liber
 Cancel	AbstractParametersPanel		Anulează
 Format	MainWindow		Formatare
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Modifică parametrii
 Rescan	MainWindow		Rescanează
 There was an error acquiring the partition row.	MainWindow		A apărut o eroare la obținerea rândului partiției.
 Failed to initialize the disk %s!\n	MainWindow		Inițializarea discului %s a eșuat!\n
-Disk system \"%s\" not found!	MainWindow		Sistemul de disc \„%s\” nu a fost găsit!
 The partition cannot be unmounted.	MainWindow		Partiția nu poate fi demontată.
 Delete	MainWindow		Șterge
 Partition type:	ChangeParametersPanel		Tipul partiției:

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DriveSetup	2258023861
+1	croatian	x-vnd.Haiku-DriveSetup	3334320180
 Could not unmount partition %s.	MainWindow		Ne mogu odmontirati particiju %s.
 Mount all	MainWindow		Montiraj sve
 Disk	MainWindow		Disk
@@ -21,7 +21,6 @@ Create…	MainWindow		Napravi...
 Write changes	MainWindow		Zapiši promjene
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Neuspjela inicijalizacija particije %s. (Ništa nije zapisano na disk.)
 Eject	MainWindow		Izbaci
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na disku %s biti će nepovratno izgubljeni ako to učinite!
 Read only	PartitionList		Samo čitanje
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Neuspjela promjena parametara particije. Nikakve promjene neće biti zapisane na disk.
 Partition %ld	DiskView		Particija %ld
@@ -44,7 +43,6 @@ Volume name	PartitionList		Ime particije
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci biti će nepovratno izgubljeni ako to učinite!
 Change	ChangeParametersPanel		Promijeni
 Partition name:	ChangeParametersPanel		Ime particije:
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite sada zapisati promjene na disk?\n\nSvi podaci na particiji %s biti će nepovratno izgubljeni ako to učinite!
 Cancel	AbstractParametersPanel		Otkaži
 Format	MainWindow		Formatiraj
 OK	MainWindow		U redu
@@ -59,7 +57,6 @@ Partition	MainWindow		Particija
 Change parameters	MainWindow		Promjeni parametere...
 Rescan	MainWindow		Ponovno skeniraj
 Failed to initialize the disk %s!\n	MainWindow		Neuspjela inicijalizacija diska %s!\n
-Disk system \"%s\" not found!	MainWindow		Sustav diska \"%s\" nije nađen!
 Delete	MainWindow		Izbriši
 Partition type:	ChangeParametersPanel		Vrsta particije:
 Parameters	PartitionList		Parametri

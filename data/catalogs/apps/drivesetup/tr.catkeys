@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	63900332
+1	turkish	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		%s bölüntüsü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -27,7 +27,6 @@ Write changes	MainWindow		Değişiklikleri yaz
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölüntüsünün ilklendirilmesi başarısız oldu (Diske hiçbir şey yazılmadı).
 Validation of the given creation parameters failed.	MainWindow		Verilen oluşturma parametrelerinin doğrulaması başarısız oldu.
 Eject	MainWindow		Çıkar
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s diski üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
 Surface test (not implemented)	MainWindow		Yüzey sınaması (işlevsel değil)
 Read only	PartitionList		Saltokunur
 The panel could not return successfully.	MainWindow		Panel başarılı bir biçimde dönemedi.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Değiştir
 Partition name:	ChangeParametersPanel		Bölüntü adı:
 LUKS encrypted	Encryption utils		LUKS şifreli
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Şimdi değişiklikleri diske yazmak istediğinizden emin misiniz?\n\n%s bölüntüsü üzerindeki tüm veri geri alınamayacak bir biçimde kaybolur!
 Empty space	PartitionList		Boş alan
 Cancel	AbstractParametersPanel		Vazgeç
 Format	MainWindow		Biçimlendir
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Parametreleri değiştir
 Rescan	MainWindow		Yeniden tara
 There was an error acquiring the partition row.	MainWindow		Bölüntü satırını alırken bir hata oluştu.
 Failed to initialize the disk %s!\n	MainWindow		%s diski ilklendirilemedi!\n
-Disk system \"%s\" not found!	MainWindow		“%s” disk sistemi bulunamadı!
 The partition cannot be unmounted.	MainWindow		Bölüntü bağlantısı kesilemiyor.
 Delete	MainWindow		Sil
 Partition type:	ChangeParametersPanel		Bölüntü türü:

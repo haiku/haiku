@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	63900332
+1	finnish	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -27,7 +27,6 @@ Write changes	MainWindow		Kirjoita muutokset
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
 Validation of the given creation parameters failed.	MainWindow		Annettujen luontiparametrien todentaminen epäonnistui.
 Eject	MainWindow		Poista asemasta
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki levyn %s tiedot katoavat palauttamattomasti, jos teet niin!
 Surface test (not implemented)	MainWindow		Pintatesti (ei toteutettu)
 Read only	PartitionList		Kirjoitussuojattu
 The panel could not return successfully.	MainWindow		Paneelin paluu epäonnistui.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Vaihda
 Partition name:	ChangeParametersPanel		Osionimi:
 LUKS encrypted	Encryption utils		LUKS-salattu
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion %s tiedot kadotetaan palauttamattomasti, jos teet niin!
 Empty space	PartitionList		Tyhjä tila
 Cancel	AbstractParametersPanel		Peru
 Format	MainWindow		Alusta
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Vaihda parametreja
 Rescan	MainWindow		Etsi uudelleen
 There was an error acquiring the partition row.	MainWindow		Osioriviä haettaessa syntyi virhe.
 Failed to initialize the disk %s!\n	MainWindow		Levyn %s alustus epäonnistui!\n
-Disk system \"%s\" not found!	MainWindow		Levyjärjestelmää ”%s” ei löytynyt!
 The partition cannot be unmounted.	MainWindow		Osion liittäminen epäonnistui.
 Delete	MainWindow		Poista
 Partition type:	ChangeParametersPanel		Osiotyyppi:

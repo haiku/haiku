@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	63900332
+1	japanese	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できません。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -27,7 +27,6 @@ Write changes	MainWindow		変更を書き込む
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		パーティション %s の初期化に失敗しました (ディスクに何も書き込まれていません)。
 Validation of the given creation parameters failed.	MainWindow		指定された作成パラメーターの検証に失敗しました。
 Eject	MainWindow		取り出す
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 Surface test (not implemented)	MainWindow		表面チェック (実装されていません)
 Read only	PartitionList		読み取り専用
 The panel could not return successfully.	MainWindow		パネルは正しく返しません。
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		変更
 Partition name:	ChangeParametersPanel		パーティション名 :
 LUKS encrypted	Encryption utils		LUKS で暗号化された
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、ディスク %s のデータがすべて失われます。
 Empty space	PartitionList		空のスペース
 Cancel	AbstractParametersPanel		中止
 Format	MainWindow		フォーマット
@@ -85,7 +83,6 @@ Change parameters	MainWindow		パラメーターの変更
 Rescan	MainWindow		ディスクの再検出
 There was an error acquiring the partition row.	MainWindow		パーティション情報を取得の際、エラーが発生しました。
 Failed to initialize the disk %s!\n	MainWindow		ディスク %s の初期化に失敗しました。\n
-Disk system \"%s\" not found!	MainWindow		ディスクシステム \"%s\" が見つかりません!
 The partition cannot be unmounted.	MainWindow		パーティションをアンマウントできません。
 Delete	MainWindow		削除
 Partition type:	ChangeParametersPanel		パーティション種別 :

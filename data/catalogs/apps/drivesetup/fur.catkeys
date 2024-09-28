@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	63900332
+1	friulian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -27,7 +27,6 @@ Write changes	MainWindow		Scrîf lis modifichis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		La inizializazion de partizion %s e je falide. (Nissune modifiche e je stade scrite sul disc.)
 Validation of the given creation parameters failed.	MainWindow		La convalide dai parametris di creazion definîts e je falide.
 Eject	MainWindow		Pare fûr
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis sul disc cumò?\n\nSe si lu fâs, ducj i dâts sul disc %s a laran pierdûts in mût irimediabil!
 Surface test (not implemented)	MainWindow		Verifiche de superficie (no implementât)
 Read only	PartitionList		Dome leture
 The panel could not return successfully.	MainWindow		Il panel nol è rivât a completâ la ativitât cun sucès.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Modifiche
 Partition name:	ChangeParametersPanel		Non de partizion:
 LUKS encrypted	Encryption utils		Cifrât cun LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Scrivi pardabon lis modifichis sul disc cumò?\n\nSe si lu fâs, ducj i dâts su la partizion %s a laran pierdûts in mût irimediabil!
 Empty space	PartitionList		Spazi vueit
 Cancel	AbstractParametersPanel		Anule
 Format	MainWindow		Formate
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Modifiche i parametris
 Rescan	MainWindow		Torne scansione
 There was an error acquiring the partition row.	MainWindow		Si è verificât un erôr te acuisizion de rie de partizion.
 Failed to initialize the disk %s!\n	MainWindow		No si è rivâts a inizializâ il disc %s!\n
-Disk system \"%s\" not found!	MainWindow		No si à cjatât il disc di sisteme \"%s\"!
 The partition cannot be unmounted.	MainWindow		Nol è pussibil dismontâ la partizion.
 Delete	MainWindow		Elimine
 Partition type:	ChangeParametersPanel		Gjenar di partizion:

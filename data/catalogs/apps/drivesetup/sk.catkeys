@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	1552940342
+1	slovak	x-vnd.Haiku-DriveSetup	2629236661
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Mount all	MainWindow		Pripojiť všetky
 Disk	MainWindow		Disk
@@ -22,7 +22,6 @@ Write changes	MainWindow		Zapísať zmeny
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nepodarilo sa inicializovať oblasť %s. (Žiadne zmeny neboli zapísané na disk.)
 Validation of the given creation parameters failed.	MainWindow		Overenie zadaných parametrov vytvorenia zlyhalo.
 Eject	MainWindow		Vysunúť
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na disku %s budú nenávratne stratené!
 Surface test (not implemented)	MainWindow		Test povrchu disku (neimplementované)
 The panel could not return successfully.	MainWindow		Panel sa nedokázal úspešne ukončiť.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa zmeniť parametre oblasti. Žiadne zmeny neboli zapísané na disk.
@@ -49,7 +48,6 @@ Volume name	PartitionList		Názov zväzku
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istý, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
 Change	ChangeParametersPanel		Zmeniť
 Partition name:	ChangeParametersPanel		Názov oblasti:
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete tieto zmeny teraz zapísať na disk?\n\nAk tak urobíte, všetky údaje na diskovej oblasti %s budú nenávratne stratené!
 Cancel	AbstractParametersPanel		Zrušiť
 Format	MainWindow		Naformátovať
 OK	MainWindow		OK
@@ -65,7 +63,6 @@ Change parameters	MainWindow		Zmeniť parametre
 Rescan	MainWindow		Znovu preskúmať
 There was an error acquiring the partition row.	MainWindow		Vyskytla sa chyba pri získavaní radu oblasti.
 Failed to initialize the disk %s!\n	MainWindow		Nepodarilo sa inicializovať disk %s!\n
-Disk system \"%s\" not found!	MainWindow		Diskový systém „%s“ nenájdený!
 Delete	MainWindow		Zmazať
 Partition type:	ChangeParametersPanel		Typ oblasti
 Parameters	PartitionList		Parametre

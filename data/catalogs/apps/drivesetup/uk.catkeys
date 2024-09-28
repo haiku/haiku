@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	63900332
+1	ukrainian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -27,7 +27,6 @@ Write changes	MainWindow		Записати зміни
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Збій ініціалізації розділу %s. (На диск нічого не було записано.)
 Validation of the given creation parameters failed.	MainWindow		Не вдалося застосувати введені при створенні параметри.
 Eject	MainWindow		Вийняти
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск просто зараз?\n\nВсі дані на диску %s будуть безпозворотно втрачені, якщо Ви продовжите!
 Surface test (not implemented)	MainWindow		Тест поверхні (не реалізовано)
 Read only	PartitionList		Лише читання
 The panel could not return successfully.	MainWindow		Панель не вдалося коректно повернути.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Змінити
 Partition name:	ChangeParametersPanel		Назва розділу:
 LUKS encrypted	Encryption utils		Шифрування LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ви впевнені, що бажаєте записати зміни на диск?\n\nВсі дані на розділі %s будуть безповоротно втрачені!
 Empty space	PartitionList		Без розмітки
 Cancel	AbstractParametersPanel		Скасувати
 Format	MainWindow		Форматувати
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Змінити параметри
 Rescan	MainWindow		Пересканувати
 There was an error acquiring the partition row.	MainWindow		Сталася помилка при одержанні списка розділів.
 Failed to initialize the disk %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
-Disk system \"%s\" not found!	MainWindow		Дискова система \«%s\» не знайдена!
 The partition cannot be unmounted.	MainWindow		Розділ не можна відключити.
 Delete	MainWindow		Видалити
 Partition type:	ChangeParametersPanel		Тип розділу:

@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-DriveSetup	2942313478
+1	thai	x-vnd.Haiku-DriveSetup	4018609797
 Could not unmount partition %s.	MainWindow		ไม่สามารถยกเลิกการต่อเชื่อมพาร์ติชัน %s
 Mount all	MainWindow		เมานต์ทั้งหมด
 Disk	MainWindow		ดิสก์
@@ -26,7 +26,6 @@ Write changes	MainWindow		เขียนการเปลี่ยนแปล
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		การเริ่มต้นพาร์ติชัน %s ล้มเหลว (ไม่มีสิ่งใดเขียนลงดิสก์)
 Validation of the given creation parameters failed.	MainWindow		การตรวจสอบพารามิเตอร์การสร้างที่กำหนดล้มเหลว
 Eject	MainWindow		ยกเลิก
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในดิสก์ %s จะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
 Surface test (not implemented)	MainWindow		การทดสอบพื้นผิว (ไม่ได้ใช้งาน)
 Read only	PartitionList		อ่านเท่านั้น
 The panel could not return successfully.	MainWindow		พาแนลเรียกคืนได้สำเร็จ
@@ -61,7 +60,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		เปลี่ยน
 Partition name:	ChangeParametersPanel		ชื่อพาร์ติชั่น:
 LUKS encrypted	Encryption utils		เข้ารหัส LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในพาร์ติชัน %s จะหายไปอย่างไม่สามารถกู้คืนได้หากคุณทำเช่นนั้น!
 Cancel	AbstractParametersPanel		ยกเลิก
 Format	MainWindow		Format
 OK	MainWindow		ตกลง
@@ -80,7 +78,6 @@ Change parameters	MainWindow		เปลี่ยนพารามิเตอ�
 Rescan	MainWindow		ค้นหาใหม่
 There was an error acquiring the partition row.	MainWindow		มีข้อผิดพลาดในการรับแถวพาร์ติชัน
 Failed to initialize the disk %s!\n	MainWindow		ไม่สามารถเริ่มต้นดิสก์ %s!\n
-Disk system \"%s\" not found!	MainWindow		ไม่พบระบบดิสก์ \"%s\"!
 Delete	MainWindow		ลบ
 Partition type:	ChangeParametersPanel		ชนิดพาร์ติชั่น:
 Parameters	PartitionList		พารามิเตอร์

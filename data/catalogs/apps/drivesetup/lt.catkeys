@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	3505687379
+1	lithuanian	x-vnd.Haiku-DriveSetup	1083453332
 Could not unmount partition %s.	MainWindow		Skaidinio „%s“ atjungti nepavyko.
 Mount all	MainWindow		Prijungti visus
 Disk	MainWindow		Diskas
@@ -22,7 +22,6 @@ Write changes	MainWindow		Įrašyti pakeitimus
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Skaidinio „%s“ suženklinti nepavyko. Pakeitimai į diską neįrašyti.
 Validation of the given creation parameters failed.	MainWindow		Nurodyti netinkami kūrimo parametrai.
 Eject	MainWindow		Išimti
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys diske „%s“, bus negrįžtamai prarasti!
 Surface test (not implemented)	MainWindow		Patikrinti paviršių (dar nerealizuota)
 The panel could not return successfully.	MainWindow		Polangiui nepavyko sėkmingai grįžti.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Skaidinio savybių pakeisti nepavyko. Į diską neįrašyti jokie pakeitimai.
@@ -48,7 +47,6 @@ Volume name	PartitionList		Tomo pavadinimas
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje, bus negrįžtamai prarasti!
 Change	ChangeParametersPanel		Keisti
 Partition name:	ChangeParametersPanel		Skaidinio pavadinimas:
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pakeitimus dabar įrašyti į diską?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje „%s“, bus negrįžtamai prarasti!
 Cancel	AbstractParametersPanel		Atsisakyti
 Format	MainWindow		Ženklinti
 OK	MainWindow		Gerai

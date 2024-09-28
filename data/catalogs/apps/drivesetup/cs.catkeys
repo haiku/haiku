@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	63900332
+1	czech	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
@@ -27,7 +27,6 @@ Write changes	MainWindow		Zapsat změny
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicializace oddílu %s selhala. (Na disk nebylo nic zapsáno.)
 Validation of the given creation parameters failed.	MainWindow		Ověření zadaných vytvářecích parametrů selhalo.
 Eject	MainWindow		Vysunout
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Určitě chcete nyní zapsat změny zpět na disk?\n\nVšechna data na disku %s budou nenávratně ztracena!
 Surface test (not implemented)	MainWindow		Test povrchu (neimplementováno)
 Read only	PartitionList		Pouze pro čtení
 The panel could not return successfully.	MainWindow		Panel se nedokázal úspěšně ukončit.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Změnit
 Partition name:	ChangeParametersPanel		Název oddílu:
 LUKS encrypted	Encryption utils		Zašifrováno pomocí LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Určitě chcete nyní zapsat změny zpět na disk?\n\nVšechna data na oddílu %s budou nenávratně ztracena!
 Empty space	PartitionList		Prázdné místo
 Cancel	AbstractParametersPanel		Zrušit
 Format	MainWindow		Formátovat
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Změnit parametry
 Rescan	MainWindow		Opět načíst
 There was an error acquiring the partition row.	MainWindow		Při získávání oddílového řádku došlo k chybě.
 Failed to initialize the disk %s!\n	MainWindow		Nepodařilo se inicializovat disk %s!\n
-Disk system \"%s\" not found!	MainWindow		Systémový disk \"%s\" nebyl nalezen!
 The partition cannot be unmounted.	MainWindow		Oddíl se nepodařilo odpojit.
 Delete	MainWindow		Odstranit
 Partition type:	ChangeParametersPanel		Typ oddílu:

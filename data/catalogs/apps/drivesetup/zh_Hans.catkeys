@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	2943652182
+1	english	x-vnd.Haiku-DriveSetup	4019948501
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -27,7 +27,6 @@ Write changes	MainWindow		写入修改
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
 Validation of the given creation parameters failed.	MainWindow		给定创建参数验证失败。
 Eject	MainWindow		弹出
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，磁盘 %s 中的所有数据将丢失，无法恢复！
 Surface test (not implemented)	MainWindow		表面测试（未执行）
 Read only	PartitionList		只读
 The panel could not return successfully.	MainWindow		面板无法成功返回。
@@ -63,7 +62,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		修改
 Partition name:	ChangeParametersPanel		分区名称:
 LUKS encrypted	Encryption utils		LUKS 加密
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n执行此操作之后，分区 %s 中的所有数据将丢失，无法恢复！
 Empty space	PartitionList		空白
 Cancel	AbstractParametersPanel		取消
 Format	MainWindow		格式化
@@ -84,7 +82,6 @@ Change parameters	MainWindow		修改参数
 Rescan	MainWindow		重新扫描
 There was an error acquiring the partition row.	MainWindow		获取分区序列出错。
 Failed to initialize the disk %s!\n	MainWindow		初始化磁盘 %s 失败！\n
-Disk system \"%s\" not found!	MainWindow		磁盘系统 \"%s\" 未发现！
 The partition cannot be unmounted.	MainWindow		分区无法挂载。
 Delete	MainWindow		删除
 Partition type:	ChangeParametersPanel		分区类型:

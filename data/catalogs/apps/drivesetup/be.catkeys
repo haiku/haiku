@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-DriveSetup	3505687379
+1	belarusian	x-vnd.Haiku-DriveSetup	1083453332
 Could not unmount partition %s.	MainWindow		Не ўдалося змантаваць падзел %s.
 Mount all	MainWindow		Зманатаваць усё
 Disk	MainWindow		Дыск
@@ -22,7 +22,6 @@ Write changes	MainWindow		Запісаць змены
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Не ўдалося ініцыялізіраваць падзел %s. (На дыск нічога не запісана.)
 Validation of the given creation parameters failed.	MainWindow		Не удалася праверка дадзеных параметраў стварэння падзелу.
 Eject	MainWindow		Выцягнуць
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Сапраўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле %s будуць беззваротна згублены!
 Surface test (not implemented)	MainWindow		Тэст паверхні (не ажыццявіма)
 The panel could not return successfully.	MainWindow		Панэль не можа вярнуцца карэктна.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не ўдалося зманіць параметры падзела. Змены не былі запісаныя на дыск.
@@ -48,7 +47,6 @@ Volume name	PartitionList		Імя тому
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле будуць беззваротна згублены!
 Change	ChangeParametersPanel		Змяніць
 Partition name:	ChangeParametersPanel		Імя падзела:
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Сапрўды жадаеце запісаць змены на дыск?\n\nУсе данные на абраным падзеле %s будуць беззваротна згублены!
 Cancel	AbstractParametersPanel		Адмяніць
 Format	MainWindow		Фарматаваць
 OK	MainWindow		ОК

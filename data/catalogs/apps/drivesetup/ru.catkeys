@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	63900332
+1	russian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Mount all	MainWindow		Подключить все
 Disk	MainWindow		Диск
@@ -27,7 +27,6 @@ Write changes	MainWindow		Записать изменения
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Не удалось инициализировать раздел %s. (Изменения не были записаны на диск.)
 Validation of the given creation parameters failed.	MainWindow		Не удалось применить введённые при создании параметры.
 Eject	MainWindow		Извлечь
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nВсе данные на диске %s будут безвозвратно потеряны, если Вы продолжите!
 Surface test (not implemented)	MainWindow		Тест поверхности (ещё не реализовано)
 Read only	PartitionList		Только для чтения
 The panel could not return successfully.	MainWindow		Панели не удалось корректно вернуться.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Изменить
 Partition name:	ChangeParametersPanel		Название раздела:
 LUKS encrypted	Encryption utils		Зашифрован с LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nЕсли вы продолжите, то все данные на разделе %s будут безвозвратно потеряны!
 Empty space	PartitionList		Без разметки
 Cancel	AbstractParametersPanel		Отмена
 Format	MainWindow		Инициализировать
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Изменить параметры
 Rescan	MainWindow		Пересканировать
 There was an error acquiring the partition row.	MainWindow		Произошла ошибка при получении списка разделов.
 Failed to initialize the disk %s!\n	MainWindow		Не удалось инициализировать раздел %s!\n
-Disk system \"%s\" not found!	MainWindow		Дисковая система \«%s\» не обнаружена!
 The partition cannot be unmounted.	MainWindow		Раздел не удаётся отмонтировать.
 Delete	MainWindow		Удалить
 Partition type:	ChangeParametersPanel		Тип раздела:

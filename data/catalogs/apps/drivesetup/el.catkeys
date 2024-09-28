@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2943652182
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	4019948501
 Could not unmount partition %s.	MainWindow		Δεν ήταν δυνατή η αποπροσάρτηση της κατάτμησης %s.
 Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
@@ -27,7 +27,6 @@ Write changes	MainWindow		Εγγραφή αλλαγών
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Η αρχικοποίηση της κατάτμησης %s απέτυχε. (Τίποτα δεν γράφτηκε στο δίσκο.)
 Validation of the given creation parameters failed.	MainWindow		Η επικύρωση των δοθέντων παραμέτρων δημιουργίας απέτυχε.
 Eject	MainWindow		Εξαγωγή
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος ότι θέλετε να εγγράψετε τις αλλαγές στον δίσκο τώρα;\n\nΌλα τα δεδομένα στον δίσκο %s θα διαγραφούν οριστικά!
 Surface test (not implemented)	MainWindow		Έλεγχος επιφάνειας (δεν υλοποιήθηκε)
 Read only	PartitionList		Μόνο για ανάγνωση
 The panel could not return successfully.	MainWindow		Το πάνελ δεν μπόρεσε να επιστρέψει τιμή με επιτυχία.
@@ -63,7 +62,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Αλλαγή
 Partition name:	ChangeParametersPanel		Όνομα κατάτμησης:
 LUKS encrypted	Encryption utils		Κρυπτογραφημένη με LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Είστε σίγουρος πως θέλετε να εγγράψετε τις αλλαγές στον δίσκο τώρα;\n\nΌλα τα δεδομένα στην κατάτμηση %s θα διαγραφούν οριστικά!
 Empty space	PartitionList		Κενός χώρος
 Cancel	AbstractParametersPanel		Άκυρο
 Format	MainWindow		Διαμόρφωση
@@ -84,7 +82,6 @@ Change parameters	MainWindow		Αλλαγή παραμέτρων
 Rescan	MainWindow		Επανάληψη σάρωσης
 There was an error acquiring the partition row.	MainWindow		Υπήρξε ένα σφάλμα κατά την απόκτηση της σειράς κατάτμησης.
 Failed to initialize the disk %s!\n	MainWindow		Η αρχικοποίηση του δίσκου %s απέτυχε!\n
-Disk system \"%s\" not found!	MainWindow		Το σύστημα δίσκου \"%s\" δεν βρέθηκε!
 The partition cannot be unmounted.	MainWindow		Η τομή δεν μπορεί να αποπροσαρτηστεί.
 Delete	MainWindow		Διαγραφή
 Partition type:	ChangeParametersPanel		Είδος κατάτμησης:

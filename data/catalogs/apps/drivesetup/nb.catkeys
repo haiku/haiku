@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	63900332
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Kunne ikke avmontere partisjon %s.
 Mount all	MainWindow		Monter alle
 Disk	MainWindow		Disk
@@ -27,7 +27,6 @@ Write changes	MainWindow		Skriv endringer
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisering av partisjonen %s var mislykket. (ingenting ble skrevet til disken.)
 Validation of the given creation parameters failed.	MainWindow		Mislykket validering av de oppgitte opprettingsparametrene.
 Eject	MainWindow		Løs ut
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disken nå?\n\nAlle data på disken %s vil gå tapt for godt hvis du gjør det!
 Surface test (not implemented)	MainWindow		Overflatetest (ikke implementert)
 Read only	PartitionList		Kun lesetilgang
 The panel could not return successfully.	MainWindow		Panelet kunne ikke returnere.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Endre
 Partition name:	ChangeParametersPanel		Partisjonsnavn:
 LUKS encrypted	Encryption utils		LUKS-kryptert
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på at du vil skrive endringene til disk nå?\n\nAlle data på partisjonen %s vil gå tapt for godt hvis du gjør det!
 Empty space	PartitionList		Tom plass
 Cancel	AbstractParametersPanel		Avbryt
 Format	MainWindow		Formater
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Endre parametere
 Rescan	MainWindow		Skann på nytt
 There was an error acquiring the partition row.	MainWindow		Det var en feil ved tilegning av partisjonsrad.
 Failed to initialize the disk %s!\n	MainWindow		Klarte ikke å initialisere disken %s!\n
-Disk system \"%s\" not found!	MainWindow		Disksystem \"%s\" ikke funnet!
 The partition cannot be unmounted.	MainWindow		Partisjonen kunne ikke avmonteres.
 Delete	MainWindow		Slett
 Partition type:	ChangeParametersPanel		Partisjonstype:

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	63900332
+1	swedish	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Mount all	MainWindow		Montera alla
 Disk	MainWindow		Disk
@@ -27,7 +27,6 @@ Write changes	MainWindow		Skriv ändringar
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initiering av partitionen %s misslyckades (Inget skrevs till disken.)
 Validation of the given creation parameters failed.	MainWindow		Utvärdering av den givna parametern misslyckades.
 Eject	MainWindow		Mata ut
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på partitionen %s kommer att raderas om du gör så!
 Surface test (not implemented)	MainWindow		Yttest (inte implementerat)
 Read only	PartitionList		Endast läsbar
 The panel could not return successfully.	MainWindow		Panelen kunde inte återskapas.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Ändra
 Partition name:	ChangeParametersPanel		Partitionsnamn:
 LUKS encrypted	Encryption utils		LUKS-krypterad
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen %s kommer att gå förlorad!
 Empty space	PartitionList		Tomt utrymme
 Cancel	AbstractParametersPanel		Avbryt
 Format	MainWindow		Format
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Ändra parametrar
 Rescan	MainWindow		Uppdatera
 There was an error acquiring the partition row.	MainWindow		Ett fel uppstod när partitionsinformationen skulle hämtas.
 Failed to initialize the disk %s!\n	MainWindow		Misslyckades att initiera partionen %s!\n
-Disk system \"%s\" not found!	MainWindow		Disksystemet \"%s\" hittades ej!
 The partition cannot be unmounted.	MainWindow		Partitionen kan inte avmonteras.
 Delete	MainWindow		Ta bort
 Partition type:	ChangeParametersPanel		Partitionstyp:

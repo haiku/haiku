@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DriveSetup	547170618
+1	esperanto	x-vnd.Haiku-DriveSetup	1623466937
 Could not unmount partition %s.	MainWindow		Ne sukcesis demeti subdiskon %s.
 Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
@@ -26,7 +26,6 @@ Write changes	MainWindow		Registri la ŝanĝojn
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Pravalorizado de la dubdisko %s malsukcesis. (Nenio estis skribita al la disko.)
 Validation of the given creation parameters failed.	MainWindow		Pravalorizado de la donitaj kreadaj parametroj malsukcesis.
 Eject	MainWindow		Eligi
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas konservi la ŝanĝojn al disko nun?\n\nĈiu datumo sur la disko %s estos senespere perdita se vi faros tion!
 Surface test (not implemented)	MainWindow		Surfaca testo (ne estas realigita)
 Read only	PartitionList		Nurlega
 The panel could not return successfully.	MainWindow		La panelo ne povis reveni sukcese.
@@ -62,7 +61,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Ŝanĝi
 Partition name:	ChangeParametersPanel		Subdiska nomo:
 LUKS encrypted	Encryption utils		Ĉifrita per LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas konservi la ŝanĝojn al disko nun?\n\nĈiu datumo en la subdisko %s estos senespere perdita se vi farus tion!
 Empty space	PartitionList		Malplena spaco
 Cancel	AbstractParametersPanel		Nuligi
 Format	MainWindow		Strukturi
@@ -83,7 +81,6 @@ Change parameters	MainWindow		Ŝanĝi parametrojn
 Rescan	MainWindow		Reskani
 There was an error acquiring the partition row.	MainWindow		Estis eraro kiam akiri la vicon de la subdisko.
 Failed to initialize the disk %s!\n	MainWindow		Ne povis pravalorizi la diskon %s!\n
-Disk system \"%s\" not found!	MainWindow		Diska sistemo \"%s\" ne estis trovita!
 The partition cannot be unmounted.	MainWindow		La subdisko ne povas estis demetita.
 Delete	MainWindow		Forigi
 Partition type:	ChangeParametersPanel		Subdiska tipo:

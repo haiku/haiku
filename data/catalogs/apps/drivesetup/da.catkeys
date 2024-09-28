@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-DriveSetup	2943652182
+1	danish	x-vnd.Haiku-DriveSetup	4019948501
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere diskafsnit %s.
 Mount all	MainWindow		Montér alle
 Disk	MainWindow		Disk
@@ -27,7 +27,6 @@ Write changes	MainWindow		Skriv ændringer
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialiseringen af diskafsnit %s mislykkedes. (Der er ikke blevet skrevet nogle ændringer til disken).
 Validation of the given creation parameters failed.	MainWindow		Validering af de angivne oprettelses parametre mislykkedes.
 Eject	MainWindow		Skub ud
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på, at du vil skrive ændringerne tilbage til disken nu?\n\nAl data på disken %s vil blive slettet for stedse!
 Surface test (not implemented)	MainWindow		Overfladetest (ikke implementeret)
 Read only	PartitionList		Skrivebeskyttet
 The panel could not return successfully.	MainWindow		Panelet kunne ikke returneres.
@@ -63,7 +62,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Ændre
 Partition name:	ChangeParametersPanel		Diskafsnitsnavn:
 LUKS encrypted	Encryption utils		LUKS-krypteret
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Er du sikker på, du vil skrive ændringerne tilbage til disken nu?\n\nAlle data på det valgte diskafsnit %s vil blive slettet for stedse!
 Empty space	PartitionList		Tom plads
 Cancel	AbstractParametersPanel		Afbryd
 Format	MainWindow		Format
@@ -84,7 +82,6 @@ Change parameters	MainWindow		Ændr parametre
 Rescan	MainWindow		Skan på ny
 There was an error acquiring the partition row.	MainWindow		Der opstod en fejl ved indhentning af diskafsnitsrækken.
 Failed to initialize the disk %s!\n	MainWindow		Kunne ikke initialisere disken %s!\n
-Disk system \"%s\" not found!	MainWindow		Disksystemet \"%s\" blev ikke fundet!
 The partition cannot be unmounted.	MainWindow		Diskafsnittet kan ikke afmonteres.
 Delete	MainWindow		Slet
 Partition type:	ChangeParametersPanel		Diskafsnitstype:

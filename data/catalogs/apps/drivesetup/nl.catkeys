@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	2943652182
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	4019948501
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -27,7 +27,6 @@ Write changes	MainWindow		Veranderingen schrijven
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisatie van de partitie %s is mislukt. (Er werd niets naar de schijf geschreven.)
 Validation of the given creation parameters failed.	MainWindow		Natrekken van de gegeven creatieparameters is mislukt.
 Eject	MainWindow		Uitwerpen
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\n&U zult alle gegevens op de %s schijf onherroepelijk kwijt zijn als u dit doet!
 Surface test (not implemented)	MainWindow		Oppervlaktetest (niet geïmplementeerd)
 Read only	PartitionList		Alleen lezen
 The panel could not return successfully.	MainWindow		Het paneel kon niet succesvol terugkeren.
@@ -63,7 +62,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Wijzigen
 Partition name:	ChangeParametersPanel		Naam partitie:
 LUKS encrypted	Encryption utils		LUKS versleuteld
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Bent u zeker dat u de veranderingen nu wilt terugschrijven naar de schijf?\n\nU zult alle gegevens op de %s partitie onherroepelijk kwijt zijn als u dit doet!
 Empty space	PartitionList		Lege ruimte
 Cancel	AbstractParametersPanel		Annuleren
 Format	MainWindow		Formatteren
@@ -84,7 +82,6 @@ Change parameters	MainWindow		Verander parameters
 Rescan	MainWindow		Opnieuw afzoeken
 There was an error acquiring the partition row.	MainWindow		Er is een fout ontstaan bij het verkrijgen van de partitieregel.
 Failed to initialize the disk %s!\n	MainWindow		Initialisatie van de schijf %s is mislukt!\n
-Disk system \"%s\" not found!	MainWindow		Mediaschema \"%s\" niet gevonden!
 The partition cannot be unmounted.	MainWindow		De partitie kan niet onttrokken worden.
 Delete	MainWindow		Verwijderen
 Partition type:	ChangeParametersPanel		Type partitie:

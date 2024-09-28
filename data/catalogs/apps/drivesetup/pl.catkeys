@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-DriveSetup	63900332
+1	polish	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		Nie można odmontować partycji %s.
 Mount all	MainWindow		Zamontuj wszystko
 Disk	MainWindow		Dysk
@@ -27,7 +27,6 @@ Write changes	MainWindow		Zapisz zmiany
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inicjalizacja partycji %s nie powiodła się. (Żadne zmiany nie zostały zapisane na dysku.)
 Validation of the given creation parameters failed.	MainWindow		Sprawdzenie poprawności parametrów tworzenia partycji nie powiodło się.
 Eject	MainWindow		Wysuń
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na dysku %s bedą bezpowrotnie utracone!
 Surface test (not implemented)	MainWindow		Test powierzchni (nie zaimplementowano)
 Read only	PartitionList		Tylko do odczytu
 The panel could not return successfully.	MainWindow		Działanie panelu zakończyło się błędem.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Zmień
 Partition name:	ChangeParametersPanel		Nazwa partycji:
 LUKS encrypted	Encryption utils		Zaszyfrowana LUKS-em
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Czy na pewno chcesz zapisać zmiany na dysk?\n\nWszystkie dane na partycji %s zostaną utracone!
 Empty space	PartitionList		Pusta przestrzeń
 Cancel	AbstractParametersPanel		Anuluj
 Format	MainWindow		Formatowanie
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Zmień parametry
 Rescan	MainWindow		Skanuj ponownie
 There was an error acquiring the partition row.	MainWindow		Wystąpił błąd podczas pobierania informacji o partycji.
 Failed to initialize the disk %s!\n	MainWindow		Błąd podczas inicjalizacji partycji %s!\n
-Disk system \"%s\" not found!	MainWindow		Typ układu dysku „%s” nie odnaleziony!
 The partition cannot be unmounted.	MainWindow		Ta partycja nie może zostać odmontowana.
 Delete	MainWindow		Usuń
 Partition type:	ChangeParametersPanel		Typ partycji:

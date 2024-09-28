@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-DriveSetup	63900332
+1	spanish; castilian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		No se pudo desmontar la partición %s.
 Mount all	MainWindow		Montar todo
 Disk	MainWindow		Disco
@@ -27,7 +27,6 @@ Write changes	MainWindow		Escribir cambios
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No se pudo inicializar la partición %s. (No se ha escrito nada en el disco).
 Validation of the given creation parameters failed.	MainWindow		Falló la validación de los parámetros de creación proporcionados.
 Eject	MainWindow		Expulsar
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que quiere escribir los cambios en el disco ahora?\n\nToda la información en el disco %s se perderá irreversiblemente si lo hace.
 Surface test (not implemented)	MainWindow		Comprobación de superficie (no implementado)
 Read only	PartitionList		Sólo lectura
 The panel could not return successfully.	MainWindow		El panel no pudo regresar exitosamente.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Cambiar
 Partition name:	ChangeParametersPanel		Nombre de la partición:
 LUKS encrypted	Encryption utils		Cifrado LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		¿Está seguro que desea escribir los cambios de regreso al disco ahora?\n\nToda la información de la partición %s se perderá irreversiblemente si lo hace!
 Empty space	PartitionList		Espacio vacío
 Cancel	AbstractParametersPanel		Cancelar
 Format	MainWindow		Formato
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Cambiar parámetros
 Rescan	MainWindow		Actualizar lista de dispositivos
 There was an error acquiring the partition row.	MainWindow		Hubo un error adquiriendo la fila de partición.
 Failed to initialize the disk %s!\n	MainWindow		¡Error al inicializar el disco %s!\n
-Disk system \"%s\" not found!	MainWindow		¡No se encuentra el disco de sistema \"%s\"!
 The partition cannot be unmounted.	MainWindow		No se puede desmontar la partición.
 Delete	MainWindow		Eliminar
 Partition type:	ChangeParametersPanel		Tipo de partición:

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	63900332
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	1140196651
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -27,7 +27,6 @@ Write changes	MainWindow		Escriu els canvis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No s'ha pogut iniciar la partició %s. (No s'han desat els canvis al disc.)
 Validation of the given creation parameters failed.	MainWindow		Ha fallat validar els paràmetres de creació indicats.
 Eject	MainWindow		Expulsa
-Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure els canvis al disc ara?\n\nSi ho feu, es perdran totes les dades del disc %s i no es podran recuperar!
 Surface test (not implemented)	MainWindow		Prova de la superfície (no està implementat)
 Read only	PartitionList		Només de lectura
 The panel could not return successfully.	MainWindow		El plafó no ha pogut tenir un retorn correcte.
@@ -64,7 +63,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Change	ChangeParametersPanel		Canvia
 Partition name:	ChangeParametersPanel		Nom de la partició:
 LUKS encrypted	Encryption utils		Encriptat amb LUKS
-Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure tots els canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades de la partició %s!
 Empty space	PartitionList		Espai buit
 Cancel	AbstractParametersPanel		Cancel·la
 Format	MainWindow		Formata
@@ -85,7 +83,6 @@ Change parameters	MainWindow		Canvia'n els paràmetres
 Rescan	MainWindow		Torna a explorar
 There was an error acquiring the partition row.	MainWindow		Hi ha hagut un error en obtenir la fila de particions.
 Failed to initialize the disk %s!\n	MainWindow		Ha fallat iniciar el disc %s!\n
-Disk system \"%s\" not found!	MainWindow		No s'ha trobat el disc de sistema \"%s\"!
 The partition cannot be unmounted.	MainWindow		La partició no es pot desmuntar.
 Delete	MainWindow		Suprimeix
 Partition type:	ChangeParametersPanel		Tipus de partició:
