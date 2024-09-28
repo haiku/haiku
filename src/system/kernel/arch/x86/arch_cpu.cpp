@@ -1747,16 +1747,29 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 	if (x86_check_feature(IA32_FEATURE_MCE, FEATURE_COMMON))
 		x86_write_cr4(x86_read_cr4() | IA32_CR4_MCE);
 
+	cpu_ent* cpuEnt = get_cpu_struct();
 	if (cpu == 0) {
 		bool supportsPAT = x86_check_feature(IA32_FEATURE_PAT, FEATURE_COMMON);
-		sUsePAT = supportsPAT
+
+		// Pentium II Errata A52 and Pentium III Errata E27 say the upper four
+		// entries of the PAT are not useable as the PAT bit is ignored for 4K
+		// PTEs. Pentium 4 Errata N46 says the PAT bit can be assumed 0 in some
+		// specific cases. To avoid issues, disable PAT on such CPUs.
+		bool brokenPAT = cpuEnt->arch.vendor == VENDOR_INTEL
+			&& cpuEnt->arch.extended_family == 0
+			&& cpuEnt->arch.extended_model == 0
+			&& ((cpuEnt->arch.family == 6 && cpuEnt->arch.model <= 13)
+				|| (cpuEnt->arch.family == 15 && cpuEnt->arch.model <= 6));
+
+		sUsePAT = supportsPAT && !brokenPAT
 			&& !get_safemode_boolean_early(args, B_SAFEMODE_DISABLE_PAT, false);
 
 		if (sUsePAT) {
 			dprintf("using PAT for memory type configuration\n");
 		} else {
 			dprintf("not using PAT for memory type configuration (%s)\n",
-				supportsPAT ? "disabled" : "unsupported");
+				supportsPAT ? (brokenPAT ? "broken" : "disabled")
+					: "unsupported");
 		}
 	}
 
@@ -1771,7 +1784,6 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 	}
 
 	// make LFENCE a dispatch serializing instruction on AMD 64bit
-	cpu_ent* cpuEnt = get_cpu_struct();
 	if (cpuEnt->arch.vendor == VENDOR_AMD) {
 		uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
 		if (family >= 0x10 && family != 0x11) {
