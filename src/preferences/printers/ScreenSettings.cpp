@@ -16,13 +16,13 @@
 #include <Path.h>
 
 
-static const char* kSettingsFileName = "Screen_data";
+static const char* kSettingsFileName = "Print_preflet_Screen_data";
 
 
 ScreenSettings::ScreenSettings()
 {
 	fWindowFrame.Set(0, 0, 450, 250);
-	BPoint offset;
+	BPoint offset(-1000, -1000);
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {

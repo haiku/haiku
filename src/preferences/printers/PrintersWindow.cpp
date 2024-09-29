@@ -104,6 +104,7 @@ PrintersWindow::PrintersWindow(ScreenSettings* settings)
 	fAddingPrinter(false)
 {
 	_BuildGUI();
+	MoveOnScreen();
 }
 
 
