@@ -24,6 +24,7 @@
 #include <ObjectList.h>
 #include <OS.h>
 #include <Screen.h>
+#include <StringList.h>
 #include <SupportDefs.h>
 
 #include <shared_cursor_area.h>
@@ -190,6 +191,8 @@ class InputServer : public BApplication {
 
 		MouseSettings* _RunningMouseSettings();
 		void _RunningMiceSettings(BList& settings);
+		void _DeviceStarted(InputDeviceListItem& item);
+		void _DeviceStopping(InputDeviceListItem& item);
 		MouseSettings* _GetSettingsForMouse(BString mouseName);
 		status_t _PostMouseControlMessage(int32 code, const BString& mouseName);
 
@@ -219,6 +222,8 @@ class InputServer : public BApplication {
 		KeyboardSettings fKeyboardSettings;
 		MultipleMouseSettings	fMouseSettings;
 		MouseSettings	fDefaultMouseSettings;
+		BStringList		fRunningMouseList;
+		BLocker 		fRunningMouseListLocker;
 
 		BPoint			fMousePos;		// current mouse position
 		key_info		fKeyInfo;		// current key info
