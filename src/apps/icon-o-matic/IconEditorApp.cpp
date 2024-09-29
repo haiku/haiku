@@ -179,6 +179,9 @@ IconEditorApp::MessageReceived(BMessage* message)
 			const char* saveText;
 			if (message->FindString("save text", &saveText) == B_OK)
 				fSavePanel->SetSaveText(saveText);
+			entry_ref saveDirectory;
+			if (message->FindRef("save directory", &saveDirectory) == B_OK)
+				fSavePanel->SetPanelDirectory(&saveDirectory);
 			fSavePanel->SetTarget(messenger);
 			fSavePanel->Show();
 			break;
