@@ -788,39 +788,45 @@ InputServer::_PostMouseControlMessage(int32 code, const BString& mouseName)
 }
 
 
+void
+InputServer::_DeviceStarted(InputDeviceListItem& item)
+{
+	if (item.Type() == B_POINTING_DEVICE && item.Running() && fRunningMouseListLocker.Lock()) {
+		fRunningMouseList.Add(item.Name());
+		fRunningMouseListLocker.Unlock();
+	}
+}
+
+
+void
+InputServer::_DeviceStopping(InputDeviceListItem& item)
+{
+	if (item.Type() == B_POINTING_DEVICE && fRunningMouseListLocker.Lock()) {
+		fRunningMouseList.Remove(item.Name());
+		fRunningMouseListLocker.Unlock();
+	}
+}
+
+
 MouseSettings*
 InputServer::_RunningMouseSettings()
 {
-	BAutolock lock(fInputDeviceListLocker);
+	BAutolock lock(fRunningMouseListLocker);
 
-	int32 count = fInputDeviceList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
-		if (item == NULL)
-			continue;
-
-		if (item->Type() == B_POINTING_DEVICE && item->Running())
-			return _GetSettingsForMouse(item->Name());
-	}
-
-	return &fDefaultMouseSettings;
+	if (fRunningMouseList.IsEmpty())
+		return &fDefaultMouseSettings;
+	return _GetSettingsForMouse(fRunningMouseList.First());
 }
 
 
 void
 InputServer::_RunningMiceSettings(BList& settings)
 {
-	BAutolock lock(fInputDeviceListLocker);
+	BAutolock lock(fRunningMouseListLocker);
 
-	int32 count = fInputDeviceList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
-		if (item == NULL)
-			continue;
-
-		if (item->Type() == B_POINTING_DEVICE && item->Running())
-			settings.AddItem(_GetSettingsForMouse(item->Name()));
-	}
+	int32 count = fRunningMouseList.CountStrings();
+	for (int32 i = 0; i < count; i++)
+		settings.AddItem(_GetSettingsForMouse(fRunningMouseList.StringAt(i)));
 }
 
 
@@ -1282,6 +1288,7 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 				InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(j);
 
 				if (item->ServerDevice() == &serverDevice && item->HasName(device->name)) {
+					_DeviceStopping(*item);
 					item->Stop();
 					if (fInputDeviceList.RemoveItem(j)) {
 						BMessage message(IS_NOTIFY_DEVICE);
@@ -1301,6 +1308,7 @@ InputServer::UnregisterDevices(BInputServerDevice& serverDevice,
 			InputDeviceListItem* item = (InputDeviceListItem*)fInputDeviceList.ItemAt(i);
 
 			if (item->ServerDevice() == &serverDevice) {
+				_DeviceStopping(*item);
 				item->Stop();
 				if (fInputDeviceList.RemoveItem(i))
 					delete item;
@@ -1348,6 +1356,7 @@ debug_printf("InputServer::RegisterDevices() device_ref already exists: %s\n", d
 				*device);
 			if (item != NULL && fInputDeviceList.AddItem(item)) {
 				item->Start();
+				_DeviceStarted(*item);
 				BMessage message(IS_NOTIFY_DEVICE);
 				message.AddBool("added", true);
 				message.AddString("name", item->Name());
@@ -1385,10 +1394,13 @@ InputServer::StartStopDevices(const char* name, input_device_type type,
 					continue;
 			}
 
-			if (doStart)
+			if (doStart) {
 				item->Start();
-			else
+				_DeviceStarted(*item);
+			} else {
+				_DeviceStopping(*item);
 				item->Stop();
+			}
 
 			BMessage message(IS_NOTIFY_DEVICE);
 			message.AddBool("started", doStart);
@@ -1426,10 +1438,13 @@ InputServer::StartStopDevices(BInputServerDevice& serverDevice, bool doStart)
 		if (doStart == item->Running())
 			continue;
 
-		if (doStart)
+		if (doStart) {
 			item->Start();
-		else
+			_DeviceStarted(*item);
+		} else {
+			_DeviceStopping(*item);
 			item->Stop();
+		}
 
 		BMessage message(IS_NOTIFY_DEVICE);
 		message.AddBool("started", doStart);
