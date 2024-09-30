@@ -645,7 +645,7 @@ VMSAv8TranslationMap::UnmapPage(VMArea* area, addr_t address, bool updatePageQue
 
 	pinner.Unlock();
 	locker.Detach();
-	PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, (oldPte & kAttrAF) != 0,
+	PageUnmapped(area, (oldPte & kPteAddrMask) >> fPageBits, is_pte_accessed(oldPte),
 		is_pte_dirty(oldPte), updatePageQueue);
 
 	return B_OK;
@@ -681,7 +681,7 @@ VMSAv8TranslationMap::UnmapPages(VMArea* area, addr_t address, size_t size, bool
 			DEBUG_PAGE_ACCESS_START(page);
 
 			// transfer the accessed/dirty flags to the page
-			page->accessed = (oldPte & kAttrAF) != 0;
+			page->accessed = is_pte_accessed(oldPte);
 			page->modified = is_pte_dirty(oldPte);
 
 			// remove the mapping object/decrement the wired_count of the
@@ -796,7 +796,7 @@ VMSAv8TranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 			// invalidate the mapping, if necessary
 			if (is_pte_dirty(oldPte))
 				page->modified = true;
-			if (oldPte & kAttrAF)
+			if (is_pte_accessed(oldPte))
 				page->accessed = true;
 
 			if (pageFullyUnmapped) {
@@ -859,7 +859,7 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 			uint64_t pte = atomic_get64((int64_t*)ptePtr);
 			*pa = pte & kPteAddrMask;
 			*flags |= PAGE_PRESENT | B_KERNEL_READ_AREA;
-			if ((pte & kAttrAF) != 0)
+			if (is_pte_accessed(pte))
 				*flags |= PAGE_ACCESSED;
 			if (is_pte_dirty(pte))
 				*flags |= PAGE_MODIFIED;
