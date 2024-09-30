@@ -141,7 +141,7 @@ VMSAv8TranslationMap::~VMSAv8TranslationMap()
 	ASSERT(fRefcount == 0);
 	{
 		ThreadCPUPinner pinner(thread_get_current_thread());
-		FreeTable(fPageTable, 0, fInitialLevel, [](int level, uint64_t oldPte) {});
+		FreeTable(fPageTable, 0, fInitialLevel);
 	}
 
 	{
@@ -277,12 +277,11 @@ VMSAv8TranslationMap::TableFromPa(phys_addr_t pa)
 }
 
 
-template<typename EntryRemoved>
 void
-VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level,
-	EntryRemoved &&entryRemoved)
+VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level)
 {
 	ASSERT(level < 4);
+	InterruptsSpinLocker locker(sAsidLock);
 
 	int tableBits = fPageBits - 3;
 	uint64_t tableSize = 1UL << tableBits;
@@ -297,20 +296,17 @@ VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level,
 		uint64_t oldPte = (uint64_t) atomic_get_and_set64((int64*) &pt[i], 0);
 
 		if (level < 3 && (oldPte & kPteTypeMask) == kPteTypeL012Table) {
-			FreeTable(oldPte & kPteAddrMask, nextVa, level + 1, entryRemoved);
+			FreeTable(oldPte & kPteAddrMask, nextVa, level + 1);
 		} else if ((oldPte & kPteTypeMask) != 0) {
 			uint64_t fullVa = (fIsKernel ? ~vaMask : 0) | nextVa;
-			asm("dsb ishst");
-			asm("tlbi vaae1is, %0" :: "r" ((fullVa >> 12) & kTLBIMask));
-			// Does it correctly flush block entries at level < 3? We don't use them anyway though.
-			// TODO: Flush only currently used ASID (using vae1is)
-			entryRemoved(level, oldPte);
+
+			// Use this rather than FlushVAIfAccessed so that we don't have to
+			// acquire sAsidLock for every entry.
+			flush_va_if_accessed(oldPte, nextVa, fASID);
 		}
 
 		nextVa += entrySize;
 	}
-
-	asm("dsb ish");
 
 	vm_page* page = vm_lookup_page(ptPa >> fPageBits);
 	DEBUG_PAGE_ACCESS_START(page);
