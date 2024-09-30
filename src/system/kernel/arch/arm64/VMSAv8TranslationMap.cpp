@@ -192,8 +192,7 @@ VMSAv8TranslationMap::SwitchUserMap(VMSAv8TranslationMap *from, VMSAv8Translatio
 		return;
 	}
 
-	// ASID 0 is reserved for the kernel.
-	for (size_t i = 1; i < kNumAsids; ++i) {
+	for (size_t i = 0; i < kNumAsids; ++i) {
 		if (sAsidMapping[i]->fRefcount == 0) {
 			sAsidMapping[i]->fASID = -1;
 			to->fASID = i;
