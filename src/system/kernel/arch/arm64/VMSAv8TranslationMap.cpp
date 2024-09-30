@@ -865,13 +865,14 @@ VMSAv8TranslationMap::Query(addr_t va, phys_addr_t* pa, uint32* flags)
 			if (is_pte_dirty(pte))
 				*flags |= PAGE_MODIFIED;
 
-			if ((pte & kAttrUXN) == 0)
-				*flags |= B_EXECUTE_AREA;
 			if ((pte & kAttrPXN) == 0)
 				*flags |= B_KERNEL_EXECUTE_AREA;
 
-			if ((pte & kAttrAPUserAccess) != 0)
+			if ((pte & kAttrAPUserAccess) != 0) {
 				*flags |= B_READ_AREA;
+				if ((pte & kAttrUXN) == 0)
+					*flags |= B_EXECUTE_AREA;
+			}
 
 			if ((pte & kAttrSWDBM) != 0) {
 				*flags |= B_KERNEL_WRITE_AREA;
