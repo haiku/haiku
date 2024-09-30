@@ -257,9 +257,9 @@ struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
 	BPoint fDelta;
 
 	ResizeState(DefaultWindowBehaviour& behavior, BPoint where,
-		bool activateOnMouseUp)
+		bool activateOnMouseUp, bool minimizeCheckOnMouseUp)
 		:
-		MouseTrackingState(behavior, where, activateOnMouseUp, true)
+		MouseTrackingState(behavior, where, activateOnMouseUp, minimizeCheckOnMouseUp)
 	{
 		fDelta = BPoint(0, 0);
 	}
@@ -930,7 +930,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 
 		case ACTION_RESIZE:
 			_NextState(new (std::nothrow) ResizeState(*this, where,
-				activateOnMouseUp));
+				activateOnMouseUp, clickCount == 2));
 			STRACE_CLICK(("===> ACTION_RESIZE\n"));
 			break;
 
