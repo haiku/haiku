@@ -964,38 +964,36 @@ VMSAv8TranslationMap::ClearFlags(addr_t va, uint32 flags)
 
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
-	uint64_t oldPte = 0;
 	ProcessRange(fPageTable, fInitialLevel, va, B_PAGE_SIZE, nullptr,
-		[=, &oldPte](uint64_t* ptePtr, uint64_t effectiveVa) {
+		[=](uint64_t* ptePtr, uint64_t effectiveVa) {
 			if (clearAF && setRO) {
 				// We need to use an atomic compare-swap loop because we must
 				// need to clear one bit while setting the other.
 				while (true) {
-					oldPte = atomic_get64((int64_t*)ptePtr);
+					uint64_t oldPte = atomic_get64((int64_t*)ptePtr);
 					uint64_t newPte = oldPte & ~kAttrAF;
 					newPte = set_pte_clean(newPte);
 
-                    if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte)
+                    if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte) {
+						FlushVAIfAccessed(oldPte, va);
 						break;
+					}
 				}
 			} else if (clearAF) {
-				oldPte = atomic_and64((int64_t*)ptePtr, ~kAttrAF);
+				atomic_and64((int64_t*)ptePtr, ~kAttrAF);
 			} else {
 				while (true) {
-					oldPte = atomic_get64((int64_t*)ptePtr);
-					if (!is_pte_dirty(oldPte)) {
-						// Avoid a TLB flush
-						oldPte = 0;
+					uint64_t oldPte = atomic_get64((int64_t*)ptePtr);
+					if (!is_pte_dirty(oldPte))
 						return;
-					}
 					uint64_t newPte = set_pte_clean(oldPte);
-                    if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte)
+                    if ((uint64_t)atomic_test_and_set64((int64_t*)ptePtr, newPte, oldPte) == oldPte) {
+						FlushVAIfAccessed(oldPte, va);
 						break;
+					}
 				}
 			}
 		});
-
-	FlushVAIfAccessed(oldPte, va);
 
 	return B_OK;
 }
