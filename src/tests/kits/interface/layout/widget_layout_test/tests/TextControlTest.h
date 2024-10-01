@@ -30,11 +30,13 @@ public:
 private:
 			void				_UpdateLabelText();
 			void				_UpdateLabelFont();
+			void				_UpdateInvalid();
 
 private:
 			BTextControl*		fTextControl;
 			LabeledCheckBox*	fLongTextCheckBox;
 			LabeledCheckBox*	fBigFontCheckBox;
+			LabeledCheckBox*	fInvalidCheckBox;
 			BFont*				fDefaultFont;
 			BFont*				fBigFont;
 };

@@ -15,18 +15,21 @@
 
 
 enum {
-	MSG_CHANGE_LABEL_TEXT	= 'chlt',
-	MSG_CHANGE_LABEL_FONT	= 'chlf'
+	MSG_CHANGE_LABEL_TEXT = 'chlt',
+	MSG_CHANGE_LABEL_FONT = 'chlf',
+	MSG_CHANGE_INVALID = 'chiv'
 };
 
 
 // constructor
 TextControlTest::TextControlTest()
-	: ControlTest("TextControl"),
-	  fLongTextCheckBox(NULL),
-	  fBigFontCheckBox(NULL),
-	  fDefaultFont(NULL),
-	  fBigFont(NULL)
+	:
+	ControlTest("TextControl"),
+	fLongTextCheckBox(NULL),
+	fBigFontCheckBox(NULL),
+	fInvalidCheckBox(NULL),
+	fDefaultFont(NULL),
+	fBigFont(NULL)
 {
 	fTextControl = new BTextControl("Label", "Some Text", NULL);
 
@@ -61,9 +64,8 @@ TextControlTest::ActivateTest(View* controls)
 
 	// BMenuField sets its background color to that of its parent in
 	// AttachedToWindow(). Override.
-	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-	fTextControl->SetViewColor(background);
-	fTextControl->SetLowColor(background);
+	fTextControl->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fTextControl->SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// long text
 	fLongTextCheckBox = new LabeledCheckBox("Long label text",
@@ -74,6 +76,9 @@ TextControlTest::ActivateTest(View* controls)
 	fBigFontCheckBox = new LabeledCheckBox("Big label font",
 		new BMessage(MSG_CHANGE_LABEL_FONT), this);
 	group->AddChild(fBigFontCheckBox);
+
+	fInvalidCheckBox = new LabeledCheckBox("Invalid Input", new BMessage(MSG_CHANGE_INVALID), this);
+	group->AddChild(fInvalidCheckBox);
 
 	_UpdateLabelText();
 	_UpdateLabelFont();
@@ -100,10 +105,26 @@ TextControlTest::MessageReceived(BMessage* message)
 		case MSG_CHANGE_LABEL_FONT:
 			_UpdateLabelFont();
 			break;
+		case MSG_CHANGE_INVALID:
+			_UpdateInvalid();
+			break;
 		default:
 			Test::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+TextControlTest::_UpdateInvalid()
+{
+	if (!fInvalidCheckBox)
+		return;
+
+	if (fInvalidCheckBox->IsSelected())
+		fTextControl->MarkAsInvalid(true);
+	else
+		fTextControl->MarkAsInvalid(false);
 }
 
 
