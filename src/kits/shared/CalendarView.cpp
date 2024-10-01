@@ -1146,7 +1146,7 @@ BCalendarView::_DrawItem(BView* owner, BRect frame, const char* text,
 		SetHighColor(tint_color(textColor, tintDisabled));
 
 	float offsetH = frame.Width() / 2.0;
-	float offsetV = frame.Height() / 2.0 + FontHeight(owner) / 2.0 - 2.0;
+	float offsetV = frame.Height() / 2.0 + FontHeight(owner) / 4.0;
 
 	BFont font(be_plain_font);
 	if (isHighlight)
