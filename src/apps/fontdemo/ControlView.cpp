@@ -475,10 +475,10 @@ ControlView::_UpdateAndSendFamily(const BMessage* message)
 {
 	_DeselectOldItems();
 
-	font_family family;
+	const char* family;
 	font_style style;
 
-	if (message->FindString("_family", (const char **)&family) == B_OK) {
+	if (message->FindString("_family", &family) == B_OK) {
 		char* name;
 		type_code typeFound = 0;
 		int32 countFound = 0;
@@ -497,7 +497,7 @@ ControlView::_UpdateAndSendFamily(const BMessage* message)
 
 		markedItem->SetMarked(true);
 
-		get_font_style(family, 0, &style);
+		get_font_style((char*)family, 0, &style);
 
 		BString string;
 		string << family << " " << style;
