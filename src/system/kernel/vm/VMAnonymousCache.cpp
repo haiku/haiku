@@ -1531,6 +1531,7 @@ swap_file_delete(const char* path)
 		* B_PAGE_SIZE;
 	mutex_unlock(&sAvailSwapSpaceLock);
 
+	truncate(path, 0);
 	close(swapFile->fd);
 	radix_bitmap_destroy(swapFile->bmp);
 	delete swapFile;
@@ -1659,6 +1660,7 @@ swap_init_post_modules()
 
 	if (!swapEnabled || swapSize < B_PAGE_SIZE) {
 		dprintf("%s: virtual_memory is disabled\n", __func__);
+		truncate(kDefaultSwapPath, 0);
 		return;
 	}
 
