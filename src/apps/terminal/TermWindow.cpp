@@ -1176,7 +1176,11 @@ TermWindow::MessageReceived(BMessage *message)
 			for (int32 i = 0; i < fTabView->CountTabs(); i++) {
 				TermView* view = _TermViewAt(i);
 				_TermViewAt(i)->SetTermFont(&font);
-				_ResizeView(view);
+				if (fFullScreen) {
+					view->SetTermSize(view->Frame(), true);
+					view->Invalidate();
+				} else
+					_ResizeView(view);
 			}
 			break;
 		}
