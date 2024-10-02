@@ -3162,12 +3162,6 @@ bge_can_use_msi(struct bge_softc *sc)
 {
 	int can_use_msi = 0;
 
-#ifdef __HAIKU__
-	// temporary workaround, the int disable happens in msi enable through
-	// setup intr in our case which undoes the re-enabling done by the driver
-	return 0;
-#endif
-
 	if (sc->bge_msi == 0)
 		return (0);
 

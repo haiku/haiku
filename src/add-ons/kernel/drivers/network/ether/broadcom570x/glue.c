@@ -42,6 +42,8 @@ int
 __haiku_disable_interrupts(device_t dev)
 {
 	struct bge_softc *sc = device_get_softc(dev);
+	if (sc->bge_flags & BGE_FLAG_MSI)
+		return 1;
 
 	uint32 notInterrupted = pci_read_config(sc->bge_dev, BGE_PCI_PCISTATE, 4)
 		& BGE_PCISTATE_INTR_STATE;
@@ -62,6 +64,9 @@ void
 __haiku_reenable_interrupts(device_t dev)
 {
 	struct bge_softc *sc = device_get_softc(dev);
+	if (sc->bge_flags & BGE_FLAG_MSI)
+		return;
+
 	BGE_SETBIT(sc, BGE_PCI_MISC_CTL, BGE_PCIMISCCTL_CLEAR_INTA);
 	BGE_CLRBIT(sc, BGE_PCI_MISC_CTL, BGE_PCIMISCCTL_MASK_PCI_INTR);
 	bge_writembx(sc, BGE_MBX_IRQ0_LO, 0);
