@@ -1092,8 +1092,7 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 	// If we don't have enough committed space to cover through to the new end
 	// of the area...
 	if (committed_size < commitment) {
-		// ToDo: should we check if the cache's virtual size is large
-		//	enough for a commitment of that size?
+		ASSERT(commitment <= ROUNDUP(virtual_end - virtual_base, B_PAGE_SIZE));
 
 		// try to commit more memory
 		status = Commit(commitment, priority);
