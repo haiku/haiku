@@ -1367,8 +1367,14 @@ BMessage::Unflatten(BDataIO* stream)
 			}
 
 			result = stream->Read(fData, fHeader->data_size);
-			if (result != (ssize_t)fHeader->data_size)
+			if (result != (ssize_t)fHeader->data_size) {
+				free(fData);
+				fData = NULL;
+				free(fFields);
+				fFields = NULL;
+				_InitHeader();
 				return result < 0 ? result : B_BAD_VALUE;
+			}
 		}
 	}
 
