@@ -113,12 +113,7 @@ CachedDataReader::Init(BAbstractBufferedDataReader* reader, off_t size)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	AutoLocker<VMCache> locker(fCache);
-
-	error = fCache->Resize(size, VM_PRIORITY_SYSTEM);
-	if (error != B_OK)
-		RETURN_ERROR(error);
-
+	fCache->virtual_end = size;
 	return B_OK;
 }
 
