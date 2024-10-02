@@ -299,6 +299,8 @@ DataContainer::_SwitchToCacheMode()
 	if (error != B_OK)
 		return error;
 
+	AutoLocker<VMCache> locker(cache);
+
 	fCache = cache;
 	fCache->temporary = 1;
 	fCache->unmergeable = 1;
