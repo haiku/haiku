@@ -1083,8 +1083,6 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 {
 	TRACE(("VMCache::SetMinimalCommitment(cache %p, commitment %" B_PRIdOFF
 		")\n", this, commitment));
-	AssertLocked();
-
 	T(SetMinimalCommitment(this, commitment));
 
 	status_t status = B_OK;
