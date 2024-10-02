@@ -546,8 +546,11 @@ allocate_area_page_protections(VMArea* area)
 	// init the page protections for all pages to that of the area
 	uint32 areaProtection = area->protection
 		& (B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA);
-	memset(area->page_protections, areaProtection | (areaProtection << 4),
-		bytes);
+	memset(area->page_protections, areaProtection | (areaProtection << 4), bytes);
+
+	// clear protections from the area
+	area->protection &= ~(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA
+		| B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA);
 	return B_OK;
 }
 
@@ -3030,6 +3033,16 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 				restart = true;
 		}
 	} while (restart);
+
+	if (area->page_protections != NULL) {
+		// Get rid of the per-page protections.
+		free_etc(area->page_protections,
+			area->address_space == VMAddressSpace::Kernel() ? HEAP_DONT_LOCK_KERNEL_SPACE : 0);
+		area->page_protections = NULL;
+
+		// Assume the existing protections don't match the new ones.
+		isWritable = !becomesWritable;
+	}
 
 	bool changePageProtection = true;
 	bool changeTopCachePagesOnly = false;
