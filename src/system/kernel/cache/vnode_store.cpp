@@ -34,6 +34,14 @@ VMVnodeCache::Init(struct vnode* vnode, uint32 allocationFlags)
 }
 
 
+status_t
+VMVnodeCache::Commit(off_t size, int priority)
+{
+	// We don't need to commit memory.
+	return B_OK;
+}
+
+
 bool
 VMVnodeCache::HasPage(off_t offset)
 {
