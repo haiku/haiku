@@ -1157,13 +1157,9 @@ VMCache::Resize(off_t newSize, int priority)
 {
 	TRACE(("VMCache::Resize(cache %p, newSize %" B_PRIdOFF ") old size %"
 		B_PRIdOFF "\n", this, newSize, this->virtual_end));
-	this->AssertLocked();
-
 	T(Resize(this, newSize));
 
-	status_t status = Commit(newSize - virtual_base, priority);
-	if (status != B_OK)
-		return status;
+	AssertLocked();
 
 	page_num_t oldPageCount = (page_num_t)((virtual_end + B_PAGE_SIZE - 1)
 		>> PAGE_SHIFT);
@@ -1176,6 +1172,10 @@ VMCache::Resize(off_t newSize, int priority)
 		while (_FreePageRange(pages.GetIterator(newPageCount, true, true)))
 			;
 	}
+
+	status_t status = Commit(newSize - virtual_base, priority);
+	if (status != B_OK)
+		return status;
 
 	virtual_end = newSize;
 	return B_OK;
