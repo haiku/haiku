@@ -1939,8 +1939,8 @@ vm_map_physical_memory(team_id team, const char* name, void** _address,
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec & ~B_MEMORY_TYPE_MASK;
 	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
-		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, 0, &addressRestrictions,
-		true, &area, _address);
+		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, CREATE_AREA_DONT_COMMIT_MEMORY,
+		&addressRestrictions, true, &area, _address);
 
 	if (status < B_OK)
 		cache->ReleaseRefLocked();
@@ -2145,7 +2145,7 @@ vm_create_null_area(team_id team, const char* name, void** address,
 	addressRestrictions.address_specification = addressSpec;
 	status = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
 		B_LAZY_LOCK, B_KERNEL_READ_AREA, B_KERNEL_READ_AREA,
-		REGION_NO_PRIVATE_MAP, flags,
+		REGION_NO_PRIVATE_MAP, flags | CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &area, address);
 
 	if (status < B_OK) {
