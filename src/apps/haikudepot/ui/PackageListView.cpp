@@ -660,8 +660,15 @@ PackageRow::UpdateRating()
 {
 	if (!fPackage.IsSet())
 		return;
-	RatingSummary summary = fPackage->CalculateRatingSummary();
-	SetField(new RatingField(summary.averageRating), kRatingColumn);
+
+	UserRatingInfoRef userRatingInfo = fPackage->UserRatingInfo();
+	UserRatingSummaryRef userRatingSummary;
+
+	if (userRatingInfo.IsSet())
+		userRatingSummary = userRatingInfo->Summary();
+
+	if (userRatingSummary.IsSet())
+		SetField(new RatingField(userRatingSummary->AverageRating()), kRatingColumn);
 }
 
 

@@ -385,23 +385,37 @@ public:
 
 		fVersionInfo->SetText(package->Version().ToString());
 
-		RatingSummary ratingSummary = package->CalculateRatingSummary();
+		UserRatingInfoRef userRatingInfo = package->UserRatingInfo();
+		UserRatingSummaryRef userRatingSummary;
 
-		fRatingView->SetRating(ratingSummary.averageRating);
+		if (userRatingInfo.IsSet()) {
+			userRatingSummary = userRatingInfo->Summary();
+		}
 
-		if (ratingSummary.ratingCount > 0) {
+		bool hasAverageRating = false;
+
+		if (userRatingSummary.IsSet()) {
+			if (userRatingSummary->AverageRating() != RATING_MISSING) {
+				hasAverageRating = true;
+			}
+		}
+
+		if (hasAverageRating) {
+			fRatingView->SetRating(userRatingSummary->AverageRating());
+
 			BString avgRating;
-			avgRating.SetToFormat("%.1f", ratingSummary.averageRating);
+			avgRating.SetToFormat("%.1f", userRatingSummary->AverageRating());
 			fAvgRating->SetText(avgRating);
 
 			BString votes;
-			votes.SetToFormat("%d", ratingSummary.ratingCount);
+			votes.SetToFormat("%d", userRatingSummary->RatingCount());
 
 			BString voteInfo(B_TRANSLATE("(%Votes%)"));
 			voteInfo.ReplaceAll("%Votes%", votes);
 
 			fVoteInfo->SetText(voteInfo);
 		} else {
+			fRatingView->SetRating(RATING_MISSING);
 			fAvgRating->SetText("");
 			fVoteInfo->SetText(B_TRANSLATE("n/a"));
 		}
@@ -416,7 +430,7 @@ public:
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fVersionInfo->SetText("");
-		fRatingView->SetRating(-1.0f);
+		fRatingView->SetRating(RATING_MISSING);
 		fAvgRating->SetText("");
 		fVoteInfo->SetText("");
 	}
@@ -909,19 +923,28 @@ public:
 		layoutBuilder.SetInsets(5);
 	}
 
-	void SetToSummary(const RatingSummary& summary) {
-		for (int32 i = 0; i < 5; i++) {
-			int32 count = summary.ratingCountByStar[4 - i];
+	void SetToSummary(const UserRatingSummaryRef summary) {
+		if (!summary.IsSet())
+			Clear();
+		else {
+			// note that the logic here inverts the ordering of the stars so that
+			// star 5 is at the top.
 
-			BString label;
-			label.SetToFormat("%" B_PRId32, count);
-			fCountViews[i]->SetText(label);
+			for (int32 i = 0; i < 5; i++) {
+				int32 count = summary->RatingCountByStar(5 - i);
 
-			if (summary.ratingCount > 0) {
-				fDiagramBarViews[i]->SetValue(
-					(float)count / summary.ratingCount);
-			} else
-				fDiagramBarViews[i]->SetValue(0.0f);
+				BString label;
+				label.SetToFormat("%" B_PRId32, count);
+				fCountViews[i]->SetText(label);
+
+				int ratingCount = summary->RatingCount();
+
+				if (ratingCount > 0) {
+					fDiagramBarViews[i]->SetValue(
+						static_cast<float>(count) / static_cast<float>(ratingCount));
+				} else
+					fDiagramBarViews[i]->SetValue(0.0f);
+			}
 		}
 	}
 
@@ -980,10 +1003,19 @@ public:
 	{
 		ClearRatings();
 
-		// TODO: Re-use rating summary already used for TitleView...
-		fRatingSummaryView->SetToSummary(package->CalculateRatingSummary());
+		UserRatingInfoRef userRatingInfo = package->UserRatingInfo();
+		UserRatingSummaryRef userRatingSummary;
 
-		int count = package->CountUserRatings();
+		if (userRatingInfo.IsSet())
+			userRatingSummary = userRatingInfo->Summary();
+
+		fRatingSummaryView->SetToSummary(userRatingSummary);
+
+		int count = 0;
+
+		if (userRatingInfo.IsSet())
+			count = userRatingInfo->CountUserRatings();
+
 		if (count == 0) {
 			BStringView* noRatingsView = new BStringView("no ratings",
 				B_TRANSLATE("No user ratings available."));
@@ -996,7 +1028,7 @@ public:
 			fRatingContainerLayout->AddView(0, noRatingsView);
 		} else {
 			for (int i = count - 1; i >= 0; i--) {
-				UserRatingRef rating = package->UserRatingAtIndex(i);
+				UserRatingRef rating = userRatingInfo->UserRatingAtIndex(i);
 					// was previously filtering comments just for the current
 					// user's language, but as there are not so many comments at
 					// the moment, just show all of them for now.

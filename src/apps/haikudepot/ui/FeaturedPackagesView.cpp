@@ -690,7 +690,15 @@ public:
 	{
 		if (!ratingRect.IsValid())
 			return;
-		RatingUtils::Draw(this, ratingRect.LeftTop(), pkg->CalculateRatingSummary().averageRating);
+
+		UserRatingInfoRef userRatingInfo = pkg->UserRatingInfo();
+
+		if (userRatingInfo.IsSet()) {
+			UserRatingSummaryRef userRatingSummary = userRatingInfo->Summary();
+
+			if (userRatingSummary.IsSet())
+				RatingUtils::Draw(this, ratingRect.LeftTop(), userRatingSummary->AverageRating());
+		}
 	}
 
 

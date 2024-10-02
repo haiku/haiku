@@ -181,10 +181,11 @@ local applicationSources =
 	PackageFilterModel.cpp
 	PackageInfo.cpp
 	PublisherInfo.cpp
-	RatingSummary.cpp
 	ScreenshotInfo.cpp
 	UserInfo.cpp
 	UserRating.cpp
+	UserRatingInfo.cpp
+	UserRatingSummary.cpp
 
 	# network + server / local processes
 	AbstractProcess.cpp

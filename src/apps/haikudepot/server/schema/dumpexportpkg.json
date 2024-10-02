@@ -14,11 +14,19 @@
     "modifyTimestamp": {
       "type": "integer"
     },
+    "isNativeDesktop": {
+      "type": "boolean",
+      "description": "True if the package supplies a Haiku native desktop application."
+    },
     "prominenceOrdering": {
       "type": "integer"
     },
     "derivedRating": {
       "type": "number"
+    },
+    "derivedRatingSampleSize": {
+      "description": "This is the number of user ratings that were used to create the derived rating. It may be zero if there are no user ratings.",
+      "type": "integer"
     },
     "hasChangelog": {
       "type": "boolean"

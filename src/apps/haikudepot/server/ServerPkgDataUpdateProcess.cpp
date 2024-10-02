@@ -129,13 +129,15 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			package->AddCategory(category);
 	}
 
-	RatingSummary summary;
-	summary.averageRating = RATING_MISSING;
-
-	if (!pkg->DerivedRatingIsNull())
-		summary.averageRating = pkg->DerivedRating();
-
-	package->SetRatingSummary(summary);
+	if (!pkg->DerivedRatingIsNull()) {
+		UserRatingInfoRef userRatingInfo(new UserRatingInfo(), true);
+		UserRatingSummaryRef userRatingSummary(new UserRatingSummary(), true);
+		// TODO; unify the naming here!
+		userRatingSummary->SetAverageRating(pkg->DerivedRating());
+		userRatingSummary->SetRatingCount(pkg->DerivedRatingSampleSize());
+		userRatingInfo->SetSummary(userRatingSummary);
+		package->SetUserRatingInfo(userRatingInfo);
+	}
 
 	package->SetHasChangelog(pkg->HasChangelog());
 

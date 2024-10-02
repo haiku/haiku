@@ -30,11 +30,9 @@ PackageInfo::PackageInfo()
 	fFullDescription(),
 	fHasChangelog(false),
 	fChangelog(),
-	fUserRatings(),
-	fDidPopulateUserRatings(false),
-	fCachedRatingSummary(),
 	fProminence(0),
 	fScreenshotInfos(),
+	fUserRatingInfo(),
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(0),
@@ -62,11 +60,9 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fFullDescription(info.Description()),
 	fHasChangelog(false),
 	fChangelog(),
-	fUserRatings(),
-	fDidPopulateUserRatings(false),
-	fCachedRatingSummary(),
 	fProminence(0),
 	fScreenshotInfos(),
+	fUserRatingInfo(),
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(info.Flags()),
@@ -104,8 +100,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 
 
 PackageInfo::PackageInfo(const BString& name, const BPackageVersion& version,
-		const PublisherInfo& publisher, const BString& shortDescription,
-		const BString& fullDescription, int32 flags, const char* architecture)
+	const PublisherInfo& publisher, const BString& shortDescription, const BString& fullDescription,
+	int32 flags, const char* architecture)
 	:
 	fName(name),
 	fTitle(),
@@ -116,11 +112,9 @@ PackageInfo::PackageInfo(const BString& name, const BPackageVersion& version,
 	fHasChangelog(false),
 	fChangelog(),
 	fCategories(),
-	fUserRatings(),
-	fDidPopulateUserRatings(false),
-	fCachedRatingSummary(),
 	fProminence(0),
 	fScreenshotInfos(),
+	fUserRatingInfo(),
 	fState(NONE),
 	fDownloadProgress(0.0),
 	fFlags(flags),
@@ -149,11 +143,9 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fHasChangelog(other.fHasChangelog),
 	fChangelog(other.fChangelog),
 	fCategories(other.fCategories),
-	fUserRatings(other.fUserRatings),
-	fDidPopulateUserRatings(other.fDidPopulateUserRatings),
-	fCachedRatingSummary(other.fCachedRatingSummary),
 	fProminence(other.fProminence),
 	fScreenshotInfos(other.fScreenshotInfos),
+	fUserRatingInfo(other.fUserRatingInfo),
 	fState(other.fState),
 	fInstallationLocations(other.fInstallationLocations),
 	fDownloadProgress(other.fDownloadProgress),
@@ -184,11 +176,9 @@ PackageInfo::operator=(const PackageInfo& other)
 	fHasChangelog = other.fHasChangelog;
 	fChangelog = other.fChangelog;
 	fCategories = other.fCategories;
-	fUserRatings = other.fUserRatings;
-	fDidPopulateUserRatings = fDidPopulateUserRatings;
-	fCachedRatingSummary = other.fCachedRatingSummary;
 	fProminence = other.fProminence;
 	fScreenshotInfos = other.fScreenshotInfos;
+	fUserRatingInfo = other.fUserRatingInfo;
 	fState = other.fState;
 	fInstallationLocations = other.fInstallationLocations;
 	fDownloadProgress = other.fDownloadProgress;
@@ -218,10 +208,9 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fHasChangelog == other.fHasChangelog
 		&& fChangelog == other.fChangelog
 		&& fCategories == other.fCategories
-		&& fUserRatings == other.fUserRatings
-		&& fCachedRatingSummary == other.fCachedRatingSummary
 		&& fProminence == other.fProminence
 		&& fScreenshotInfos == other.fScreenshotInfos
+		&& fUserRatingInfo == fUserRatingInfo
 		&& fState == other.fState
 		&& fFlags == other.fFlags
 		&& fDownloadProgress == other.fDownloadProgress
@@ -403,115 +392,20 @@ PackageInfo::IsLocalFile() const
 }
 
 
-void
-PackageInfo::ClearUserRatings()
+UserRatingInfoRef
+PackageInfo::UserRatingInfo()
 {
-	if (!fUserRatings.empty()) {
-		fUserRatings.clear();
+	return fUserRatingInfo;
+}
+
+
+void
+PackageInfo::SetUserRatingInfo(UserRatingInfoRef value)
+{
+	if (fUserRatingInfo != value) {
+		fUserRatingInfo = value;
 		_NotifyListeners(PKG_CHANGED_RATINGS);
 	}
-}
-
-
-bool
-PackageInfo::DidPopulateUserRatings() const
-{
-	return fDidPopulateUserRatings;
-}
-
-
-void
-PackageInfo::SetDidPopulateUserRatings()
-{
-	fDidPopulateUserRatings = true;
-}
-
-
-int32
-PackageInfo::CountUserRatings() const
-{
-	return fUserRatings.size();
-}
-
-
-UserRatingRef
-PackageInfo::UserRatingAtIndex(int32 index) const
-{
-	return fUserRatings[index];
-}
-
-
-void
-PackageInfo::AddUserRating(const UserRatingRef& rating)
-{
-	fUserRatings.push_back(rating);
-	_NotifyListeners(PKG_CHANGED_RATINGS);
-}
-
-
-void
-PackageInfo::SetRatingSummary(const RatingSummary& summary)
-{
-	if (fCachedRatingSummary == summary)
-		return;
-
-	fCachedRatingSummary = summary;
-
-	_NotifyListeners(PKG_CHANGED_RATINGS);
-}
-
-
-RatingSummary
-PackageInfo::CalculateRatingSummary() const
-{
-	if (fUserRatings.empty())
-		return fCachedRatingSummary;
-
-	RatingSummary summary;
-	summary.ratingCount = fUserRatings.size();
-	summary.averageRating = 0.0f;
-	int starRatingCount = sizeof(summary.ratingCountByStar) / sizeof(int);
-	for (int i = 0; i < starRatingCount; i++)
-		summary.ratingCountByStar[i] = 0;
-
-	if (summary.ratingCount <= 0)
-		return summary;
-
-	float ratingSum = 0.0f;
-
-	int ratingsSpecified = summary.ratingCount;
-	for (int i = 0; i < summary.ratingCount; i++) {
-		float rating = fUserRatings[i]->Rating();
-
-		if (rating < 0.0f)
-			rating = -1.0f;
-		else if (rating > 5.0f)
-			rating = 5.0f;
-
-		if (rating >= 0.0f)
-			ratingSum += rating;
-
-		if (rating <= 0.0f)
-			ratingsSpecified--; // No rating specified by user
-		else if (rating <= 1.0f)
-			summary.ratingCountByStar[0]++;
-		else if (rating <= 2.0f)
-			summary.ratingCountByStar[1]++;
-		else if (rating <= 3.0f)
-			summary.ratingCountByStar[2]++;
-		else if (rating <= 4.0f)
-			summary.ratingCountByStar[3]++;
-		else if (rating <= 5.0f)
-			summary.ratingCountByStar[4]++;
-	}
-
-	if (ratingsSpecified > 1)
-		ratingSum /= ratingsSpecified;
-
-	summary.averageRating = ratingSum;
-	summary.ratingCount = ratingsSpecified;
-
-	return summary;
 }
 
 

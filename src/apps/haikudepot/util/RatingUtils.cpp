@@ -100,3 +100,26 @@ RatingUtils::Draw(BView* target, BPoint at, float value,
 		target->FillRect(shadeOverRect, B_SOLID_HIGH);
 	}
 }
+
+
+/*!	With the `userRatingInfo` provided, does it make sense for the application
+	to attempt to download the user ratings? If it looks like there are none
+	then it's making no sense and if it has already downloaded some then it
+	also does not make any sense.
+*/
+/*static*/ bool
+RatingUtils::ShouldTryPopulateUserRatings(UserRatingInfoRef userRatingInfo)
+{
+	if (!userRatingInfo.IsSet())
+		return true;
+
+	UserRatingSummaryRef summary = userRatingInfo->Summary();
+
+	if (!summary.IsSet())
+		return true;
+
+	if (summary->RatingCount() == 0)
+		return false;
+
+	return !userRatingInfo->UserRatingsPopulated();
+}

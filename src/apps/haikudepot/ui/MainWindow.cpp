@@ -45,6 +45,7 @@
 #include "ProcessCoordinator.h"
 #include "ProcessCoordinatorFactory.h"
 #include "RatePackageWindow.h"
+#include "RatingUtils.h"
 #include "ScreenshotWindow.h"
 #include "SettingsWindow.h"
 #include "ShuttingDownWindow.h"
@@ -1243,13 +1244,7 @@ MainWindow::_PopulatePackageAsync(bool forcePopulate)
 		HDDEBUG("pkg [%s] not have changelog updated from server.", packageNameStr);
 	}
 
-	// TODO; (apl 4.Aug.2024) soon HDS will be able to pass through the count of user ratings; when
-	//    available this will mean we can avoid the need to fetch the user ratings if we know in
-	//    advance that there are none to get. This will reduce network chatter and speed up the
-	//    UI display. Also note that the member variable `fDidPopulateUserRatings` can then also be
-	//    removed from the `PackageInfo` class too.
-
-	if (forcePopulate || !package->DidPopulateUserRatings()) {
+	if (forcePopulate || RatingUtils::ShouldTryPopulateUserRatings(package->UserRatingInfo())) {
 		_AddProcessCoordinator(
 			ProcessCoordinatorFactory::PopulatePkgUserRatingsCoordinator(&fModel, package));
 		HDINFO("pkg [%s] will have user ratings updated from server.", packageNameStr);

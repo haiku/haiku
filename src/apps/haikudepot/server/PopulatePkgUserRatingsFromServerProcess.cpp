@@ -54,27 +54,31 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 {
 	// TODO; use API spec to code generation techniques instead of this manually written client.
 
+	status_t status = B_OK;
+
 	// Retrieve info from web-app
 	BMessage info;
 
 	BString packageName;
 	BString webAppRepositoryCode;
-	BString webAppRepositorySourceCode;
 
 	{
 		BAutolock locker(&fLock);
 		packageName = fPackageInfo->Name();
 		const DepotInfo* depot = fModel->DepotForName(fPackageInfo->DepotName());
 
-		if (depot != NULL) {
+		if (depot != NULL)
 			webAppRepositoryCode = depot->WebAppRepositoryCode();
-			webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
-		}
 	}
 
-	status_t status = fModel->GetWebAppInterface()->RetrieveUserRatingsForPackageForDisplay(
-			packageName, webAppRepositoryCode, webAppRepositorySourceCode, 0,
-			PACKAGE_INFO_MAX_USER_RATINGS, info);
+	if (status == B_OK) {
+		status = fModel->GetWebAppInterface()->RetrieveUserRatingsForPackageForDisplay(packageName,
+			webAppRepositoryCode, BString(), 0, PACKAGE_INFO_MAX_USER_RATINGS, info);
+			// ^ note intentionally not using the repository source code as this would then show
+			// too few results as it would be architecture specific.
+	}
+
+	UserRatingInfoRef userRatingInfo(new UserRatingInfo(), true);
 
 	if (status == B_OK) {
 		// Parse message
@@ -86,11 +90,6 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 		if (status == B_OK) {
 
 			if (result.FindMessage("items", &items) == B_OK) {
-
-				// TODO; later make the PackageInfo immutable to avoid the need for locking here.
-
-				BAutolock locker(&fLock);
-				fPackageInfo->ClearUserRatings();
 
 				int32 index = 0;
 				while (true) {
@@ -170,12 +169,11 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 							// note that language identifiers are "code" in HDS and "id" in Haiku
 							versionString, (uint64) createTimestamp),
 						true);
-					fPackageInfo->AddUserRating(userRating);
+					userRatingInfo->AddUserRating(userRating);
 					HDDEBUG("rating [%s] retrieved from server", code.String());
 				}
 
-				fPackageInfo->SetDidPopulateUserRatings();
-
+				userRatingInfo->SetUserRatingsPopulated();
 				HDDEBUG("did retrieve %" B_PRIi32 " user ratings for [%s]", index - 1,
 					packageName.String());
 			}
@@ -187,6 +185,98 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 		}
 	} else {
 		ServerHelper::NotifyTransportError(status);
+	}
+
+	// Now fetch the user rating summary which is derived separately as it is
+	// not just based on the user-ratings downloaded; it is calculated according
+	// to an algorithm. This is best executed server-side to avoid discrepancy.
+
+	BMessage summaryResponse;
+
+	if (status == B_OK) {
+		status = fModel->GetWebAppInterface()->RetrieveUserRatingSummaryForPackage(packageName,
+			webAppRepositoryCode, summaryResponse);
+	}
+
+	if (status == B_OK) {
+		// Parse message
+
+		UserRatingSummaryRef userRatingSummary(new UserRatingSummary(), true);
+
+		BMessage result;
+
+		// TODO; this entire BMessage handling is historical and needs to be swapped out with
+		//	generated code from the API spec; it just takes time unfortunately.
+
+		status = summaryResponse.FindMessage("result", &result);
+
+		double sampleSizeF;
+		bool hasData;
+
+		if (status == B_OK)
+			status = result.FindDouble("sampleSize", &sampleSizeF);
+
+		if (status == B_OK)
+			userRatingSummary->SetRatingCount(static_cast<int>(sampleSizeF));
+
+		hasData = status == B_OK && userRatingSummary->RatingCount() > 0;
+
+		if (hasData) {
+			double ratingF;
+
+			if (status == B_OK)
+				status = result.FindDouble("rating", &ratingF);
+
+			if (status == B_OK)
+				userRatingSummary->SetAverageRating(ratingF);
+		}
+
+		if (hasData) {
+			BMessage ratingDistributionItems;
+			BMessage item;
+
+			status = result.FindMessage("ratingDistribution", &ratingDistributionItems);
+
+			int32 index = 0;
+			while (status == B_OK) {
+				BString name;
+				name << index++;
+
+				BMessage ratingDistributionItem;
+				if (ratingDistributionItems.FindMessage(name, &ratingDistributionItem) != B_OK)
+					break;
+
+				double ratingDistributionRatingF;
+
+				if (status == B_OK) {
+					status
+						= ratingDistributionItem.FindDouble("rating", &ratingDistributionRatingF);
+				}
+
+				double ratingDistributionTotalF;
+
+				if (status == B_OK)
+					status = ratingDistributionItem.FindDouble("total", &ratingDistributionTotalF);
+
+				userRatingSummary->SetRatingByStar(static_cast<int>(ratingDistributionRatingF),
+					static_cast<int>(ratingDistributionTotalF));
+			}
+
+			userRatingInfo->SetSummary(userRatingSummary);
+		} else {
+			int32 errorCode = WebAppInterface::ErrorCodeFromResponse(summaryResponse);
+
+			if (errorCode != ERROR_CODE_NONE)
+				ServerHelper::NotifyServerJsonRpcError(summaryResponse);
+		}
+	} else {
+		ServerHelper::NotifyTransportError(status);
+	}
+
+	if (status == B_OK) {
+		// TODO; later make the PackageInfo immutable to avoid the need for locking here.
+		BAutolock locker(&fLock);
+		fPackageInfo->SetUserRatingInfo(userRatingInfo);
 	}
 
 	return status;

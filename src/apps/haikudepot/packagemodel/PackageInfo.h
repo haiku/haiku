@@ -18,9 +18,8 @@
 #include "PackageCategory.h"
 #include "PackageInfoListener.h"
 #include "PublisherInfo.h"
-#include "RatingSummary.h"
 #include "ScreenshotInfo.h"
-#include "UserRating.h"
+#include "UserRatingInfo.h"
 
 
 typedef std::set<int32> PackageInstallationLocationSet;
@@ -121,15 +120,8 @@ public:
 			int32				CountCategories() const;
 			CategoryRef			CategoryAtIndex(int32 index) const;
 
-			bool				DidPopulateUserRatings() const;
-			void				SetDidPopulateUserRatings();
-
-			void				ClearUserRatings();
-			void				AddUserRating(const UserRatingRef& rating);
-			int32				CountUserRatings() const;
-			UserRatingRef		UserRatingAtIndex(int32 index) const;
-			void				SetRatingSummary(const RatingSummary& summary);
-			RatingSummary		CalculateRatingSummary() const;
+			UserRatingInfoRef	UserRatingInfo();
+			void				SetUserRatingInfo(UserRatingInfoRef userRatingInfo);
 
 			void				SetProminence(int64 prominence);
 			int64				Prominence() const
@@ -184,13 +176,10 @@ private:
 			BString				fChangelog;
 			std::vector<CategoryRef>
 								fCategories;
-			std::vector<UserRatingRef>
-								fUserRatings;
-			bool				fDidPopulateUserRatings;
-			RatingSummary		fCachedRatingSummary;
 			int64				fProminence;
 			std::vector<ScreenshotInfoRef>
 								fScreenshotInfos;
+			UserRatingInfoRef	fUserRatingInfo;
 
 			PackageState		fState;
 			PackageInstallationLocationSet

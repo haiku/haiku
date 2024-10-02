@@ -55,6 +55,11 @@ public:
 									const BString& packageName,
 									BMessage& message);
 
+			status_t			RetrieveUserRatingSummaryForPackage(
+									const BString& packageName,
+                                    const BString& webAppRepositoryCode,
+                                    BMessage& message);
+
 			status_t			RetrieveUserRatingsForPackageForDisplay(
 									const BString& packageName,
 									const BString& webAppRepositoryCode,

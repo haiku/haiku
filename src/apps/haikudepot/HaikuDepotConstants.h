@@ -41,6 +41,7 @@ enum BitmapSize {
 
 
 #define RATING_MISSING						-1.0f
+#define RATING_MISSING_STAR					-1
 #define RATING_MIN							0.0f
 
 

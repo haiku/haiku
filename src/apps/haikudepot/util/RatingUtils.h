@@ -8,6 +8,8 @@
 
 #include <Referenceable.h>
 
+#include "UserRatingInfo.h"
+
 
 class BView;
 class BBitmap;
@@ -34,6 +36,8 @@ public:
 	static	void			Draw(BView* target, BPoint at, float value,
 								const BBitmap* star);
 	static	void			Draw(BView* target, BPoint at, float value);
+
+	static	bool			ShouldTryPopulateUserRatings(UserRatingInfoRef userRatingInfo);
 };
 
 
