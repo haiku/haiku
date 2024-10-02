@@ -1297,8 +1297,8 @@ VMCache::FlushAndRemoveAllPages()
 status_t
 VMCache::Commit(off_t size, int priority)
 {
-	committed_size = size;
-	return B_OK;
+	ASSERT_UNREACHABLE();
+	return B_NOT_SUPPORTED;
 }
 
 
