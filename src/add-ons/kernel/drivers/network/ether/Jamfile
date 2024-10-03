@@ -33,6 +33,7 @@ HaikuSubInclude sis19x ;
 HaikuSubInclude sis900 ;
 HaikuSubInclude syskonnect ;
 HaikuSubInclude via_rhine ;
+HaikuSubInclude vmx ;
 HaikuSubInclude vt612x ;
 
 # OpenBSD drivers

@@ -332,6 +332,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		sis900
 		syskonnect
 		via_rhine
+		vmx
 		vt612x
 	}@ # x86,x86_64,riscv64
 
