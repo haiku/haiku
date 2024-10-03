@@ -2480,13 +2480,17 @@ vm_clone_area(team_id team, const char* name, void** address,
 	} else if (sourceArea->cache_type == CACHE_TYPE_NULL) {
 		status = B_NOT_ALLOWED;
 	} else {
+		uint32 flags = 0;
+		if (mapping != REGION_PRIVATE_MAP)
+			flags |= CREATE_AREA_DONT_COMMIT_MEMORY;
+
 		virtual_address_restrictions addressRestrictions = {};
 		addressRestrictions.address = *address;
 		addressRestrictions.address_specification = addressSpec;
 		status = map_backing_store(targetAddressSpace, cache,
 			sourceArea->cache_offset, name, sourceArea->Size(),
 			sourceArea->wiring, protection, sourceArea->protection_max,
-			mapping, 0, &addressRestrictions,
+			mapping, flags, &addressRestrictions,
 			kernel, &newArea, address);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
