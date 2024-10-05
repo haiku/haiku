@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2024, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -75,6 +75,24 @@ const BString
 DeskbarLink::Link() const
 {
 	return fLink;
+}
+
+
+const BString
+DeskbarLink::Title() const
+{
+	BString result = "???";
+
+	if (!fLink.IsEmpty()) {
+		int32 lastSlash = fLink.FindLast('/');
+
+		if (lastSlash != B_ERROR)
+			fLink.CopyInto(result, lastSlash + 1, (fLink.Length() - lastSlash) - 1);
+		else
+			result = fLink;
+	}
+
+	return result;
 }
 
 

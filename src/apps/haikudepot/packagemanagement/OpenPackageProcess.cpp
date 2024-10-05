@@ -57,10 +57,8 @@ public:
 	virtual status_t HandleEntry(BPackageEntry* entry)
 	{
 		BString path = MakePath(entry);
-		if (path.FindFirst("data/deskbar/menu") == 0
-				&& entry->SymlinkPath() != NULL) {
-			HDINFO("found deskbar entry: %s -> %s",
-				path.String(), entry->SymlinkPath());
+		if (path.FindFirst("data/deskbar/menu") == 0 && entry->SymlinkPath() != NULL) {
+			HDINFO("found deskbar entry: %s -> %s", path.String(), entry->SymlinkPath());
 			fDeskbarLinks.push_back(DeskbarLink(path, entry->SymlinkPath()));
 		}
 		return B_OK;

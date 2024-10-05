@@ -179,8 +179,7 @@ PackageManager::_CollectPackageActionsForActivatedOrInstalled(
 	// Add OpenPackageActions for each deskbar link found in the
 	// package
 	std::vector<DeskbarLink> foundLinks;
-	if (OpenPackageProcess::FindAppToLaunch(package, foundLinks)
-		&& foundLinks.size() < 4) {
+	if (OpenPackageProcess::FindAppToLaunch(package, foundLinks) && foundLinks.size() < 4) {
 		std::vector<DeskbarLink>::const_iterator it;
 		for (it = foundLinks.begin(); it != foundLinks.end(); it++) {
 			const DeskbarLink& aLink = *it;
@@ -219,12 +218,10 @@ PackageManager::_CreateInstallPackageAction(const PackageInfoRef& package)
 
 
 PackageActionRef
-PackageManager::_CreateOpenPackageAction(const PackageInfoRef& package,
-	const DeskbarLink& link)
+PackageManager::_CreateOpenPackageAction(const PackageInfoRef& package, const DeskbarLink& link)
 {
-	BPath linkPath(link.Link());
 	BString title = B_TRANSLATE("Open %DeskbarLink%");
-	title.ReplaceAll("%DeskbarLink%", linkPath.Leaf());
+	title.ReplaceAll("%DeskbarLink%", link.Title());
 
 	BMessage deskbarLinkMessage;
 	if (link.Archive(&deskbarLinkMessage) != B_OK)
