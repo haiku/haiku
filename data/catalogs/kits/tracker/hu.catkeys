@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	4135601423
+1	hungarian	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Keresési sablon mentése:
 Increase size	ContainerWindow		Méret növelése
 \nShould this be fixed?	FSUtils		\nKi kell ezt javítani?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Mozgatás
 Floating point number	AttributesView		Lebegőpontos szám
 Cancel	ContainerWindow		Mégse
 Attributes	ContainerWindow		Jellemzők
@@ -504,7 +503,6 @@ Version:	InfoWindow		Verzió:
 OK	PoseView		Rendben
 Add-ons	DeskWindow		Kiegészítők
 Add new submenu…	TemplatesMenu		Új almenü hozzáadása…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Biztos át szeretnéd mozgatni vagy másolni a kijelölt elemeket ebbe a mappába?
 Find	FindPanel		Keresés
 Empty folder	NavMenu		Üres mappa
 Defaults	TrackerSettingsWindow		Alapértékek

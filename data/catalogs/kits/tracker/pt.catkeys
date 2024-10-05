@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	3559757179
+1	portuguese	x-vnd.Haiku-libtracker	1730240650
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -130,7 +130,6 @@ Too many parenthesis.	libtracker		Demasiados parênteses.
 Increase size	ContainerWindow		Aumentar tamanho
 \nShould this be fixed?	FSUtils		\nDeve isto ser corrigido?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Mover
 Floating point number	AttributesView		Número de vírgula flutuante
 Cancel	ContainerWindow		Cancelar
 Attributes	ContainerWindow		Atributos
@@ -470,7 +469,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versão:
 OK	PoseView		OK
 Add-ons	DeskWindow		Extensões
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Tem a certeza de que pretende mover ou copiar o(s) elemento(s) selecionado(s) para esta pasta?
 Find	FindPanel		Procurar
 Empty folder	NavMenu		Pasta vazia
 Defaults	TrackerSettingsWindow		Predefinições

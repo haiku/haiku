@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	2663933752
+1	croatian	x-vnd.Haiku-libtracker	834417223
 Created	ContainerWindow		Napravljeno
 Icon	AttributesView		Ikona
 Kind	ContainerWindow		Vrsta
@@ -94,7 +94,6 @@ All files and folders	FindPanel		Sve datoteke i mape
 Add-ons	ContainerWindow		Dodaci
 Increase size	ContainerWindow		Povećaj veličinu
 URL	Bookmark Query Columns		URL
-Move	PoseView		Premjesti
 Cancel	ContainerWindow		Odustani
 Attributes	ContainerWindow		Atributi
 Error deleting items	FSUtils		Greška pri brisanju stavki
@@ -335,7 +334,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Verzija:
 OK	PoseView		U redu
 Add-ons	DeskWindow		Dodaci
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Jeste li sigurni da želite premjestiti ili kopirati odabranu stavku(e) u ovu mapu?
 Find	FindPanel		Nađi
 Empty folder	NavMenu		Isprazni mapu
 Defaults	TrackerSettingsWindow		Zadano

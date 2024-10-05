@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	4135601423
+1	spanish; castilian	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Guardar plantilla de consulta:
 Increase size	ContainerWindow		Aumentar tamaño
 \nShould this be fixed?	FSUtils		\n¿Debería ser arreglado?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Mover
 Floating point number	AttributesView		Número de coma flotante
 Cancel	ContainerWindow		Cancelar
 Attributes	ContainerWindow		Atributos
@@ -504,7 +503,6 @@ Version:	InfoWindow		Versión:
 OK	PoseView		Aceptar
 Add-ons	DeskWindow		Añadidos
 Add new submenu…	TemplatesMenu		Añadir nuevo submenú…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		¿Estás seguro de que quieres mover o copiar la selección a esta carpeta?
 Find	FindPanel		Encontrar
 Empty folder	NavMenu		Carpeta vacía
 Defaults	TrackerSettingsWindow		Predeterminadas

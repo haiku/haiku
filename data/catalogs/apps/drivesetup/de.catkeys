@@ -1,11 +1,12 @@
-1	german	x-vnd.Haiku-DriveSetup	498796283
+1	german	x-vnd.Haiku-DriveSetup	1879840288
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
-Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Soll die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen jetzt auf den Datenträger geschrieben werden?\n\nAlle Daten auf der gewählten Partition gehen dabei unwiderruflich verloren!
 Device	PartitionList		Gerät
 Initialize	MainWindow		Initialisieren
 Could not change the parameters of the selected partition.	MainWindow		Die Parameter der ausgewählten Partition konnten nicht geändert werden.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei Soll unwiderruflich verloren!
 PGP encrypted	Encryption utils		PGP verschlüsselt
 Delete partition	MainWindow		Partition löschen
 Error: 	MainWindow	in any error alert	Fehler: 
@@ -21,6 +22,7 @@ Partition size	CreateParametersPanel		Partitionsgröße
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Mounted at	PartitionList		Eingehangen als
+Disk system %s not found!	MainWindow		Medienschema %s nicht gefunden!
 Create…	MainWindow		Anlegen …
 Write changes	MainWindow		Änderungen schreiben
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition %s fehlgeschlagen. Der Datenträger blieb unverändert.
@@ -96,6 +98,7 @@ The partition %s is already unmounted.	MainWindow		Die Partition %s ist bereits 
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
 Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem Medium \"%s\" gehen dabei unwiderruflich verloren!
 Virtual	PartitionList		Virtuell
 Virtual	DiskView		Virtuell
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf dem gewählten Datenträger gehen dabei unwiderruflich verloren!

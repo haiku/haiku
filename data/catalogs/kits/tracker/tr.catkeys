@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	1514505623
+1	turkish	x-vnd.Haiku-libtracker	3979956390
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Sorgu şablonunu kaydet:
 Increase size	ContainerWindow		Büyüt
 \nShould this be fixed?	FSUtils		\nBu düzeltilsin mi?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Taşı
 Floating point number	AttributesView		Kayan noktalı değer
 Cancel	ContainerWindow		Vazgeç
 Attributes	ContainerWindow		Öznitelikler
@@ -503,7 +502,6 @@ Version:	InfoWindow		Sürüm:
 OK	PoseView		Tamam
 Add-ons	DeskWindow		Eklentiler
 Add new submenu…	TemplatesMenu		Yeni alt menü ekle…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Seçili ögeleri bu klasöre taşımak veya kopyalamak istediğinizden emin misiniz?
 Find	FindPanel		Bul
 Empty folder	NavMenu		Boş klasör
 Defaults	TrackerSettingsWindow		Saptanmışlar

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2790708656
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	961192127
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -131,7 +131,6 @@ Too many parenthesis.	libtracker		Υπερβολικά πολλές παρενθ
 Increase size	ContainerWindow		Αύξηση μεγέθους
 \nShould this be fixed?	FSUtils		\nΠρέπει αυτό να διορθωθεί;
 URL	Bookmark Query Columns		Υπερσύνδεσμος
-Move	PoseView		Μετακίνηση
 Floating point number	AttributesView		Αριθμός με κινητή υποδιαστολή
 Cancel	ContainerWindow		Άκυρο
 Attributes	ContainerWindow		Ιδιότητες
@@ -478,7 +477,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Έκδοση:
 OK	PoseView		Εντάξει
 Add-ons	DeskWindow		Πρόσθετα
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Είστε σίγουρος ότι θα θέλατε να μεταφέρετε ή να αντιγράψετε ό,τι αντικείμενο έχετε επιλέξει σε αυτόν τον φάκελο;
 Find	FindPanel		Εύρεση
 Empty folder	NavMenu		Άδειος φάκελος
 Defaults	TrackerSettingsWindow		Προεπιλεγμένα

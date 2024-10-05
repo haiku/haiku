@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	1140196651
+1	hungarian	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Eszköz
 Initialize	MainWindow		Előkészítés
 Could not change the parameters of the selected partition.	MainWindow		Nem lehet módosítani a megadott partíció paramétereit.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Biztosan mented a változtatásokat a lemezre?\n\nMinden adat a partíción (\"%s\") visszavonhatatlanul el fog veszni!
 PGP encrypted	Encryption utils		PGP-vel kódolt
 Delete partition	MainWindow		Partíció törlése
 Error: 	MainWindow	in any error alert	Hiba: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		A megadott paramétereket
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Biztosan meg akarod formázni a partíciót \"%s\"? A végleges művelet előtt még egyszer meg kell ezt erősítened.
 DriveSetup	System name		Lemezkezelő
 Mounted at	PartitionList		Csatolási pont
+Disk system %s not found!	MainWindow		%s nem található!
 Create…	MainWindow		Létrehozás…
 Write changes	MainWindow		Írás a lemezre
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Nem sikerült előkészíteni a(z) %s partíciót. A lemez tartalma érintetlen maradt.
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		A partíció (%s) már le van
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Biztosan módosítani szeretnéd a kijelölt partíció paramétereit?\n\nLehetséges, hogy a módosítás hatására a partíció nem lesz többé felismerhető a többi operációs rendszer számára!
 Boot	PartitionList		Rendszer
 OK	AbstractParametersPanel		Rendben
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Biztosan mented a változtatásokat a lemezre?\n\nMinden adat a lemezen (\"%s\") visszavonhatatlanul el fog veszni!
 Virtual	PartitionList		Virtuális
 Virtual	DiskView		Virtuális
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Biztosan lemezre szeretnéd írni a kijelölt változtatásokat?\n\nEz esetben a lemez teljes tartalma visszavonhatatlanul meg fog semmisülni.

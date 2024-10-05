@@ -68,7 +68,7 @@ Size	PackageListView		サイズ
 Your rating was updated.	RatePackageWindow		評価が更新されました。
 All categories	FilterView		すべての分類
 ignore problem for now	PackageProblem		今は問題を無視する
-n/a	PackageInfoView		利用不可
+n/a	PackageInfoView		レーティング待ち
 Checking user details	UserDetailVerifierProcess		ユーザーの詳細を確認中
 Cancel	MainWindow		中止
 Refresh repositories	MainWindow		リポジトリの更新

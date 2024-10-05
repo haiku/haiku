@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	3559757179
+1	dutch; flemish	x-vnd.Haiku-libtracker	1730240650
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -130,7 +130,6 @@ Too many parenthesis.	libtracker		Te veel haken.
 Increase size	ContainerWindow		Vermeerder grootte
 \nShould this be fixed?	FSUtils		\nMoet dit opgelost worden?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Verplaatsen
 Floating point number	AttributesView		Decimaal getal
 Cancel	ContainerWindow		Annuleren
 Attributes	ContainerWindow		Eigenschappen
@@ -470,7 +469,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versie:
 OK	PoseView		Oké
 Add-ons	DeskWindow		Invoegtoepassingen
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Bent u zeker dat u de geselecteerde item(s) naar deze map wilt verplaatsen of kopiëren?
 Find	FindPanel		Zoeken
 Empty folder	NavMenu		Lege map
 Defaults	TrackerSettingsWindow		Standaardwaarden

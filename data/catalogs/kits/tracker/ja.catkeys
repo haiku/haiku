@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1462873605
+1	japanese	x-vnd.Haiku-libtracker	3928324372
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -143,7 +143,6 @@ Save query template:	FindPanel		クエリテンプレートの保存:
 Increase size	ContainerWindow		拡大
 \nShould this be fixed?	FSUtils		\n修復しますか?
 URL	Bookmark Query Columns		URL
-Move	PoseView		移動
 Floating point number	AttributesView		浮動小数点数
 Cancel	ContainerWindow		中止
 Attributes	ContainerWindow		属性
@@ -502,7 +501,6 @@ Version:	InfoWindow		バージョン:
 OK	PoseView		OK
 Add-ons	DeskWindow		アドオン
 Add new submenu…	TemplatesMenu		新規サブメニューの追加…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		選択された項目をこのフォルダーに移動またはコピーしますか?
 Find	FindPanel		検索
 Empty folder	NavMenu		空フォルダー
 Defaults	TrackerSettingsWindow		デフォルト

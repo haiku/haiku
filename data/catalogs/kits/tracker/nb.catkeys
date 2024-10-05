@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	4135601423
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Lagre søkemal:
 Increase size	ContainerWindow		Øk størrelse
 \nShould this be fixed?	FSUtils		\nSkal dette repareres?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Flytt
 Floating point number	AttributesView		Floating point-nummer
 Cancel	ContainerWindow		Avbryt
 Attributes	ContainerWindow		Attributter
@@ -504,7 +503,6 @@ Version:	InfoWindow		Versjon:
 OK	PoseView		OK
 Add-ons	DeskWindow		Tillegg
 Add new submenu…	TemplatesMenu		Legg til undermeny…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Er du sikker på at du vil flytte eller kopiere de(n) valgt(e) oppføringen(e) til denne mappen?
 Find	FindPanel		Finn
 Empty folder	NavMenu		Tom mappe
 Defaults	TrackerSettingsWindow		Standardinnstillinger

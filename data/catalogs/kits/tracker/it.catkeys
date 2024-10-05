@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	3440244824
+1	italian	x-vnd.Haiku-libtracker	1610728295
 Created	ContainerWindow		Creato
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Apri e rendi preferito
@@ -136,7 +136,6 @@ Save query template:	FindPanel		Salva modello di interrogazione:
 Increase size	ContainerWindow		Aumenta dimensioni
 \nShould this be fixed?	FSUtils		\nCorreggo il problema?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Sposta
 Floating point number	AttributesView		Numero in virgola mobile
 Cancel	ContainerWindow		Annulla
 Attributes	ContainerWindow		Attributi
@@ -488,7 +487,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versione:
 OK	PoseView		OK
 Add-ons	DeskWindow		Componenti Aggiuntivi
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sei sicuro di voler spostare o copiare gli elementi selezionati in questa cartella?
 Find	FindPanel		Trova
 Empty folder	NavMenu		Cartella vuota
 Defaults	TrackerSettingsWindow		Predefiniti

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	4262404029
+1	lithuanian	x-vnd.Haiku-libtracker	2432887500
 Created	ContainerWindow		Sukūrimo data
 Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
 Kind	ContainerWindow		Tipas
@@ -93,7 +93,6 @@ All files and folders	FindPanel		Visų failų ir aplankų
 Add-ons	ContainerWindow		Priedai
 Increase size	ContainerWindow		Padidinti
 \nShould this be fixed?	FSUtils		\nAr pašalinti šį nesklandumą?
-Move	PoseView		Perkelti
 Cancel	ContainerWindow		Atsisakyti
 Attributes	ContainerWindow		Požymiai
 Error deleting items	FSUtils		Klaida šalinant objektus
@@ -351,7 +350,6 @@ The file \"%name\" already exists in the specified folder. Do you want to replac
 Version:	InfoWindow		Versija:
 OK	PoseView		Gerai
 Add-ons	DeskWindow		Priedai
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ar tikrai norite perkelti arba nukopijuoti pažymėtus objektus į šį aplanką?
 Find	FindPanel		Ieškoti
 Empty folder	NavMenu		Aplankas tuščias
 Defaults	TrackerSettingsWindow		Numatytai

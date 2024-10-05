@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	4135601423
+1	friulian	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Salve model di interogazion:
 Increase size	ContainerWindow		Aumente dimensions
 \nShould this be fixed?	FSUtils		\nIsal il câs di justâlu?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Sposte
 Floating point number	AttributesView		Numar in virgule mobile
 Cancel	ContainerWindow		Anule
 Attributes	ContainerWindow		Atribûts
@@ -504,7 +503,6 @@ Version:	InfoWindow		Version:
 OK	PoseView		Va ben
 Add-ons	DeskWindow		Components adizionâi
 Add new submenu…	TemplatesMenu		Zonte gnûf sot-menù…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sigûrs di spostâ o copiâ i elements selezionâts su cheste cartele?
 Find	FindPanel		Cjate
 Empty folder	NavMenu		Cartele vueide
 Defaults	TrackerSettingsWindow		Predefinîts

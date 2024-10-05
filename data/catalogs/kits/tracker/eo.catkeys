@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	2180263614
+1	esperanto	x-vnd.Haiku-libtracker	350747085
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -127,7 +127,6 @@ Too many parenthesis.	libtracker		Tro multe da krampoj.
 Increase size	ContainerWindow		Pligrandigi
 \nShould this be fixed?	FSUtils		\nĈu tion devas ripari?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Movi
 Floating point number	AttributesView		Glitpunkta nombro
 Cancel	ContainerWindow		Nuligi
 Attributes	ContainerWindow		Atributoj
@@ -465,7 +464,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versio:
 OK	PoseView		Bone
 Add-ons	DeskWindow		Aldonaĵoj
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ĉu vi certas, ke vi volas movi aŭ kopii la elekta(j)n ero(j)n al ĉi tiu dosierujo?
 Find	FindPanel		Serĉi
 Empty folder	NavMenu		Malplena dosierujo
 Defaults	TrackerSettingsWindow		Defaŭltoj

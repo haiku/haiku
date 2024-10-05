@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	4135601423
+1	ukrainian	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Зберегти шаблон запиту:
 Increase size	ContainerWindow		Збільшити розмір
 \nShould this be fixed?	FSUtils		\nЧи треба це виправити?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Перемістити
 Floating point number	AttributesView		Число з рухомою комою
 Cancel	ContainerWindow		Скасувати
 Attributes	ContainerWindow		Атрибути
@@ -504,7 +503,6 @@ Version:	InfoWindow		Версія:
 OK	PoseView		ОК
 Add-ons	DeskWindow		Доповнення
 Add new submenu…	TemplatesMenu		Додати нове підменю…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ви впевнені що бажаєте копіювати або перемістити вибрані елемент(и) до цієї папки?
 Find	FindPanel		Знайти
 Empty folder	NavMenu		Порожня папка
 Defaults	TrackerSettingsWindow		Типові настройки

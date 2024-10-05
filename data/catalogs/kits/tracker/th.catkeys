@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-libtracker	1530346607
+1	thai	x-vnd.Haiku-libtracker	3995797374
 Created	ContainerWindow		สร้างแล้ว
 Icon	AttributesView		ไอคอน
 Open and make preferred	OpenWithWindow		เปิดและทำให้เป็นที่ต้องการ
@@ -123,7 +123,6 @@ Too many parenthesis.	libtracker		วงเล็บมากเกินไป
 Increase size	ContainerWindow		เพิ่มขนาด
 \nShould this be fixed?	FSUtils		\nสิ่งนี้ควรได้รับการแก้ไขหรือไม่
 URL	Bookmark Query Columns		URL
-Move	PoseView		ย้าย
 Floating point number	AttributesView		เลขทศนิยม
 Cancel	ContainerWindow		ยกเลิก
 Attributes	ContainerWindow		คุณลักษณะ
@@ -456,7 +455,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		เวอร์ชั่น:
 OK	PoseView		ตกลง
 Add-ons	DeskWindow		เพิ่มเติม
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		คุณแน่ใจหรือไม่ว่าต้องการย้ายหรือคัดลอกรายการที่เลือกไปยังโฟลเดอร์นี้?
 Find	FindPanel		ค้นหา
 Empty folder	NavMenu		โฟลเดอร์ว่างเปล่า
 Defaults	TrackerSettingsWindow		ค่าเริ่มต้น

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	4135601423
+1	czech	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -144,7 +144,6 @@ Save query template:	FindPanel		Uložit šablonu dotazu:
 Increase size	ContainerWindow		Zvětšit velikost
 \nShould this be fixed?	FSUtils		\nMá to být opraveno?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Přesunout
 Floating point number	AttributesView		Číslo s plovoucí řádovou čárkou
 Cancel	ContainerWindow		Zrušit
 Attributes	ContainerWindow		Atributy
@@ -504,7 +503,6 @@ Version:	InfoWindow		Verze:
 OK	PoseView		OK
 Add-ons	DeskWindow		Doplňky
 Add new submenu…	TemplatesMenu		Přidat novou podnabídku…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Opravdu chcete přesunout nebo kopírovat vybrané položky do této složky?
 Find	FindPanel		Vyhledat
 Empty folder	NavMenu		Prázdná složka
 Defaults	TrackerSettingsWindow		Výchozí

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	1140196651
+1	japanese	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できません。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		デバイス
 Initialize	MainWindow		初期化
 Could not change the parameters of the selected partition.	MainWindow		選択されたパーティションのパラメーター変更ができません。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		本当に変更をディスクに保存しますか?\n\nその場合、選択されたパーティション\"%s\"のすべてのデータが回復不能までに破壊されます!
 PGP encrypted	Encryption utils		PGP で暗号化された
 Delete partition	MainWindow		パーティションの削除
 Error: 	MainWindow	in any error alert	エラー : 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		指定されたパラメ�
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		パーティション \"%s\" をフォーマットしますか? 変更をディスクに書き込む直前に再度確認します。
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		マウント先
+Disk system %s not found!	MainWindow		ディスクシステム%sが見つかりません!
 Create…	MainWindow		新規作成...
 Write changes	MainWindow		変更を書き込む
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		パーティション %s の初期化に失敗しました (ディスクに何も書き込まれていません)。
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		パーティション %s は�
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		選択したパーティションのパラメーターを変更しますか?\n\nパーティションはほかのオペレーティングシステムからはもう認識されないかもしれません。
 Boot	PartitionList		ブート
 OK	AbstractParametersPanel		OK
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		本当に変更をディスクに保存しますか?\n\nその場合、選択されたディスク\"%s\"のすべてのデータが回復不能までに破壊されます!
 Virtual	PartitionList		仮想
 Virtual	DiskView		仮想
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		変更をすぐにディスクに保存しますか?\n\nその場合、選択されたディスクのデータがすべて失われますので、ご注意ください。

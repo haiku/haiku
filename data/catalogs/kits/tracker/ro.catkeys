@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	1462873605
+1	romanian	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -64,6 +64,7 @@ starts with	FindPanel		începe cu
 Replace	FSUtils		Înlocuiește
 ?+* follows nothing.	libtracker		?+* nu urmează nimic.
 Rectangle	AttributesView		Dreptunghi
+Include Trash	FindPanel		Include Gunoi
 Move to	ContainerWindow		Mută la
 Status	Email Query Columns		Stare
 New folder	FSUtils		Dosar nou
@@ -143,7 +144,6 @@ Save query template:	FindPanel		Salvează șablonul de interogare:
 Increase size	ContainerWindow		Mărește dimensiune
 \nShould this be fixed?	FSUtils		\nAr trebui rezolvat acest lucru?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Mută
 Floating point number	AttributesView		Număr cu virgulă mobilă
 Cancel	ContainerWindow		Anulează
 Attributes	ContainerWindow		Atribute
@@ -324,6 +324,7 @@ Open	ContainerWindow		Deschide
 Settings…	MountMenu		Configurări…
 You cannot put the selected item(s) into the trash.	FSUtils		Nu puteți pune elementul(ele) selectat(e) la gunoi.
 Increase size	DeskWindow		Mărește dimensiunea
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Țintă:
 starts with	SelectionWindow		începe cu
 Any	AttributesView		Oricare
 New	DeskWindow		Nouă
@@ -502,7 +503,6 @@ Version:	InfoWindow		Versiune:
 OK	PoseView		OK
 Add-ons	DeskWindow		Suplimente
 Add new submenu…	TemplatesMenu		Adaugă un submeniu nou…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Sigur doriți să mutați sau copiați elementul(ele) selectat(e) în acest dosar?
 Find	FindPanel		Găsește
 Empty folder	NavMenu		Dosar gol
 Defaults	TrackerSettingsWindow		Implicite

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	2007970539
+1	danish	x-vnd.Haiku-libtracker	178454010
 Created	ContainerWindow		Oprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åbn og gør foretrukket
@@ -131,7 +131,6 @@ Too many parenthesis.	libtracker		For mange parenteser.
 Increase size	ContainerWindow		Forøg størrelse
 \nShould this be fixed?	FSUtils		\nSkal dette ordnes?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Flyt
 Floating point number	AttributesView		Flydende kommatal
 Cancel	ContainerWindow		Afbryd
 Attributes	ContainerWindow		Attributter
@@ -473,7 +472,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Version:
 OK	PoseView		O.k.
 Add-ons	DeskWindow		Tilføjelser
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Er du sikker på, du vil flytte eller kopiere de valgte elementer til denne mappe?
 Find	FindPanel		Søg
 Empty folder	NavMenu		Tom mappe
 Defaults	TrackerSettingsWindow		Forvalgte indstillinger

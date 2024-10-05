@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	1431627067
+1	belarusian	x-vnd.Haiku-libtracker	3897077834
 Created	ContainerWindow		Створаны
 Open and make preferred	OpenWithWindow		Адкрыць і зрабіць пажаданай
 Kind	ContainerWindow		Род
@@ -92,7 +92,6 @@ All files and folders	FindPanel		Усе файлы і каталогі
 Add-ons	ContainerWindow		Дапаўненні
 Increase size	ContainerWindow		Павялічыць памер
 \nShould this be fixed?	FSUtils		\nЦі трэба гэта паправіць?
-Move	PoseView		Перамясціць
 Cancel	ContainerWindow		Адмена
 Attributes	ContainerWindow		Атрыбуты
 Error deleting items	FSUtils		Памылка пры выдаленні элементаў
@@ -350,7 +349,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Версія:
 OK	PoseView		OK
 Add-ons	DeskWindow		Дапаўненні
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы ўпэўнены, што жадаеце перамясціць або скапіяваць выбраныя элементы у каталог?
 Find	FindPanel		Знайсці
 Empty folder	NavMenu		Пусты каталог
 Defaults	TrackerSettingsWindow		Прадвызначаныя

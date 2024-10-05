@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2994314289
+1	russian	x-vnd.Haiku-libtracker	1608736682
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -12,6 +12,9 @@ before	FindPanel		до
 New folder%d	FSUtils		Новая папка%d
 Volume icons	TrackerSettingsWindow		Значки дисков
 Ignore case	SelectionWindow		Игнорировать регистр
+Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Вы хотите убрать временные запросы или все запросы?\nЭто действие необратимо!
+Save query:	FindPanel		Сохранить запрос:
+Save as query template:	FindPanel		Сохранить шаблон запроса:
 Current folder	ContainerWindow		Текущую папку
 Finish: %time - Over %finishtime left	StatusWindow		Окончание: %time - Осталось более %finishtime
 Mount all disks now	AutoMounterSettings		Подключить все диски сейчас
@@ -60,6 +63,7 @@ starts with	FindPanel		начинается на
 Replace	FSUtils		Заменить
 ?+* follows nothing.	libtracker		?+* ничего не следует
 Rectangle	AttributesView		Прямоугольник
+Include Trash	FindPanel		Включить поиск в Корзине
 Move to	ContainerWindow		Переместить в
 Status	Email Query Columns		Статус
 New folder	FSUtils		Новая папка
@@ -79,6 +83,7 @@ Select	SelectionWindow		Выделить
 Select	InfoWindow		Выделить
 OK	OpenWithWindow		ОК
 Clean up	ContainerWindow		Выстроить
+Clear all	FindPanel		Очистить все
 Modified	FindPanel		Изменён
  (block size: 	InfoWindow		 (размер блока: 
 Select all	QueryContainerWindow		Выделить все
@@ -108,6 +113,7 @@ Company	Person Query Columns		Компания
 Select folders…	FindPanel		Выбрать папки…
 Recent documents	FavoritesMenu		Недавние документы
 Edit templates…	TemplatesMenu		Изменить шаблоны…
+Clear temporary queries only	FindPanel		Только временные запросы
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байта} other{# байтов}}
 8-bit integer	AttributesView		8-битное целое
 8-bit unsigned integer	AttributesView		8-битное целое без знака
@@ -137,7 +143,6 @@ Save query template:	FindPanel		Сохранить шаблон запроса:
 Increase size	ContainerWindow		Увеличить размер
 \nShould this be fixed?	FSUtils		\nВы хотите это исправить?
 URL	Bookmark Query Columns		Cсылка (URL)
-Move	PoseView		Переместить
 Floating point number	AttributesView		Число с плавающей точкой
 Cancel	ContainerWindow		Отмена
 Attributes	ContainerWindow		Атрибуты
@@ -375,6 +380,7 @@ Subject	Email Query Columns		Тема
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании папки \"%name\":\n\t%error\n\nВы хотите продолжить?
 You cannot create a link to the root directory.	FSUtils		Невозможно создать ссылку на корневую папку.
 Select all	FilePanelPriv		Выделить все
+Clear history	FindPanel		Очистить историю
 Other	FilePermissionsView		Другие
 Automatic disk mounting	AutoMounterSettings		Автоматическое подключение
 parent folder	NavMenu		родительский каталог
@@ -423,6 +429,7 @@ Revert	TrackerSettingsWindow		Вернуть
 trash	B_TRASH_DIRECTORY		Корзина
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите папку system или её содержимое, вы не сможете больше загрузить %osName!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку system или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
+Open query:	FindPanel		Открыть запрос:
 Close all in workspace	ContainerWindow		Закрыть все на этом столе
 Corrupted expression.	libtracker		Поврежденное выражение.
 Network address	AttributesView		Сетевой адрес
@@ -495,7 +502,6 @@ Version:	InfoWindow		Версия:
 OK	PoseView		ОК
 Add-ons	DeskWindow		Дополнения
 Add new submenu…	TemplatesMenu		Добавить новое подменю…
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Вы уверены, что хотите скопировать или переместить выбранные объекты в эту папку?
 Find	FindPanel		Найти
 Empty folder	NavMenu		Пустая папка
 Defaults	TrackerSettingsWindow		По умолчанию

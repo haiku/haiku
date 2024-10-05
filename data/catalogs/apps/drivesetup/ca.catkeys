@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-DriveSetup	1140196651
+1	catalan; valencian	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		No s'ha pogut desmuntar la partició %s.
 Mount all	MainWindow		Munta-ho tot
 Disk	MainWindow		Disc
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispositiu
 Initialize	MainWindow		Inicia
 Could not change the parameters of the selected partition.	MainWindow		No s'han pogut canviar els paràmetres de la partició seleccionada.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Segur que voleu tornar a escriure els canvis al disc ara?\n\nTotes les dades de la partició \%s\ es perdran irremeiablement si ho feu!
 PGP encrypted	Encryption utils		PGP encriptada
 Delete partition	MainWindow		Suprimeix la partició
 Error: 	MainWindow	in any error alert	Error: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Ha fallat validar els par
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Segur que voleu formatar la partició \"%s\"? Se us preguntarà un cop més abans d'escriure els canvis al disc.
 DriveSetup	System name		Gestor de discs
 Mounted at	PartitionList		Muntada a
+Disk system %s not found!	MainWindow		No s'ha trobat el disc de sistema %s!
 Create…	MainWindow		Crea...
 Write changes	MainWindow		Escriu els canvis
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		No s'ha pogut iniciar la partició %s. (No s'han desat els canvis al disc.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		La partició %s ja està desm
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Segur que voleu canviar els paràmetres de la partició seleccionada?\n\nEls altres sistemes operatius podrien no reconèixer més la partició!
 Boot	PartitionList		Arrencada
 OK	AbstractParametersPanel		D'acord
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Segur que voleu tornar a escriure els canvis al disc ara?\n\nTotes les dades de la partició \%s\ es perdran irremeiablement si ho feu!
 Virtual	PartitionList		Virtual
 Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Segur que voleu escriure el canvis al disc ara?\n\nSi ho feu, es perdran irrecuperablement totes les dades del disc seleccionat!

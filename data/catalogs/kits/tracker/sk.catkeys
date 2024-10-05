@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	4158422696
+1	slovak	x-vnd.Haiku-libtracker	2328906167
 Created	ContainerWindow		Vytvorené
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Kind	ContainerWindow		Druh
@@ -108,7 +108,6 @@ Too many parenthesis.	libtracker		Príliš veľa zátvoriek.
 Increase size	ContainerWindow		Veľkosť zväčšenia
 \nShould this be fixed?	FSUtils		\nMalo by sa to opraviť?
 URL	Bookmark Query Columns		URL
-Move	PoseView		Presunúť
 Cancel	ContainerWindow		Zrušiť
 Attributes	ContainerWindow		Atribúty
 Error deleting items	FSUtils		Chyba pri mazaní položiek
@@ -395,7 +394,6 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Verzia:
 OK	PoseView		OK
 Add-ons	DeskWindow		Doplnky
-Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ste si istí, že chcete presunúť alebo skopírovať vybrané položky do tohto priečinka?
 Find	FindPanel		Nájsť
 Empty folder	NavMenu		Prázdny priečinok
 Defaults	TrackerSettingsWindow		Predvolené
