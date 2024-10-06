@@ -145,9 +145,6 @@ arch_start_kernel(addr_t kernelEntry)
 	// entry.
 
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
-
-	// Re-init and activate serial in a horrific post-EFI landscape. Clowns roam the land freely.
-	serial_init();
 	serial_disable();
 
 	while (true) {
@@ -169,7 +166,8 @@ arch_start_kernel(addr_t kernelEntry)
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
 		descriptor_size, descriptor_version);
 
-	// Restart serial. gUART only until we get into the kernel
+	// Re-init and activate serial in a horrific post-EFI landscape. Clowns roam the land freely.
+	serial_init();
 	serial_enable();
 
 	smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
