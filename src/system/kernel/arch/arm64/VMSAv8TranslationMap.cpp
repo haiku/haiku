@@ -251,18 +251,29 @@ VMSAv8TranslationMap::MappedSize() const
 size_t
 VMSAv8TranslationMap::MaxPagesNeededToMap(addr_t start, addr_t end) const
 {
-	size_t result = 0;
-	size_t size = end - start + 1;
+	constexpr uint64_t level3Range = B_PAGE_SIZE * 512;
+	constexpr uint64_t level2Range = level3Range * 512;
+	constexpr uint64_t level1Range = level2Range * 512;
+	constexpr uint64_t level0Range = level1Range * 512;
 
-	for (int i = fInitialLevel; i < 3; i++) {
-		int tableBits = fPageBits - 3;
-		int shift = tableBits * (3 - i) + fPageBits;
-		uint64_t entrySize = 1UL << shift;
-
-		result += size / entrySize + 2;
+	if (start == 0) {
+		start = level3Range - B_PAGE_SIZE;
+		end += start;
 	}
 
-	return result;
+	size_t requiredPages[] = {
+		end / level0Range + 1 - start / level0Range,
+		end / level1Range + 1 - start / level1Range,
+		end / level2Range + 1 - start / level2Range,
+		end / level3Range + 1 - start / level3Range
+	};
+
+	size_t ret = 0;
+	for (int i = fInitialLevel; i < 4; ++i) {
+		ret += requiredPages[i];
+	}
+
+	return ret;
 }
 
 
