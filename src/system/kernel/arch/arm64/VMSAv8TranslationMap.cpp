@@ -139,18 +139,15 @@ VMSAv8TranslationMap::~VMSAv8TranslationMap()
 
 	ASSERT(!fIsKernel);
 	ASSERT(fRefcount == 0);
-	{
-		ThreadCPUPinner pinner(thread_get_current_thread());
-		FreeTable(fPageTable, 0, fInitialLevel);
-	}
 
-	{
-		InterruptsSpinLocker locker(sAsidLock);
+	ThreadCPUPinner pinner(thread_get_current_thread());
+	InterruptsSpinLocker locker(sAsidLock);
 
-		if (fASID != -1) {
-			sAsidMapping[fASID] = NULL;
-			free_asid(fASID);
-		}
+	FreeTable(fPageTable, 0, fInitialLevel);
+
+	if (fASID != -1) {
+		sAsidMapping[fASID] = NULL;
+		free_asid(fASID);
 	}
 }
 
@@ -280,7 +277,6 @@ void
 VMSAv8TranslationMap::FreeTable(phys_addr_t ptPa, uint64_t va, int level)
 {
 	ASSERT(level < 4);
-	InterruptsSpinLocker locker(sAsidLock);
 
 	int tableBits = fPageBits - 3;
 	uint64_t tableSize = 1UL << tableBits;
