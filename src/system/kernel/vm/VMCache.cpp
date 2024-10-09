@@ -1090,7 +1090,11 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 	// If we don't have enough committed space to cover through to the new end
 	// of the area...
 	if (committed_size < commitment) {
-		ASSERT(commitment <= ROUNDUP(virtual_end - virtual_base, B_PAGE_SIZE));
+#if KDEBUG
+		const off_t size = ROUNDUP(virtual_end - virtual_base, B_PAGE_SIZE);
+		ASSERT_PRINT(commitment <= size, "cache %p, commitment %" B_PRIdOFF ", size %" B_PRIdOFF,
+			this, commitment, size);
+#endif
 
 		// try to commit more memory
 		status = Commit(commitment, priority);
