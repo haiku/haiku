@@ -2061,8 +2061,8 @@ vm_map_physical_memory_vecs(team_id team, const char* name, void** _address,
 	virtual_address_restrictions addressRestrictions = {};
 	addressRestrictions.address = *_address;
 	addressRestrictions.address_specification = addressSpec & ~B_MEMORY_TYPE_MASK;
-	result = map_backing_store(locker.AddressSpace(), cache, 0, name,
-		size, B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, 0,
+	result = map_backing_store(locker.AddressSpace(), cache, 0, name, size,
+		B_FULL_LOCK, protection, 0, REGION_NO_PRIVATE_MAP, CREATE_AREA_DONT_COMMIT_MEMORY,
 		&addressRestrictions, true, &area, _address);
 
 	if (result != B_OK)
