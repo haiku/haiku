@@ -512,6 +512,7 @@ _rw_lock_read_lock(rw_lock* lock)
 #if KDEBUG_RW_LOCK_DEBUG
 	int32 oldCount = atomic_add(&lock->count, 1);
 	if (oldCount < RW_LOCK_WRITER_COUNT_BASE) {
+		ASSERT_UNLOCKED_RW_LOCK(lock);
 		_rw_lock_set_read_locked(lock);
 		return B_OK;
 	}
@@ -524,6 +525,10 @@ _rw_lock_read_lock(rw_lock* lock)
 		lock->owner_count++;
 		return B_OK;
 	}
+
+	// If we hold a read lock already, but some other thread is waiting
+	// for a write lock, then trying to read-lock again will deadlock.
+	ASSERT_UNLOCKED_RW_LOCK(lock);
 
 	// The writer that originally had the lock when we called atomic_add() might
 	// already have gone and another writer could have overtaken us. In this
