@@ -36,7 +36,11 @@ status_t remove_physical_memory_range(uint64 start, uint64 size);
 uint64 total_physical_memory();
 
 status_t insert_physical_allocated_range(uint64 start, uint64 size);
+status_t remove_physical_allocated_range(uint64 start, uint64 size);
+
 status_t insert_virtual_allocated_range(uint64 start, uint64 size);
+status_t remove_virtual_allocated_range(uint64 start, uint64 size);
+
 void ignore_physical_memory_ranges_beyond_4gb();
 
 #ifdef __cplusplus
