@@ -682,8 +682,8 @@ void
 platform_free_heap_region(void *_base, size_t size)
 {
 	addr_t base = (addr_t)_base;
-	status_t status = remove_physical_allocated_range(base, size);
-	if (status == B_OK && sNextPhysicalAddress == (base + size))
+	remove_physical_allocated_range(base, size);
+	if (sNextPhysicalAddress == (base + size))
 		sNextPhysicalAddress -= size;
 
 	// Failures don't matter very much as regions should be freed automatically,

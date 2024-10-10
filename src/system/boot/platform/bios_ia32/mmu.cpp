@@ -829,10 +829,9 @@ void
 platform_free_heap_region(void *_base, size_t size)
 {
 	addr_t base = (addr_t)_base;
-	if (sNextPhysicalAddress == (base + size)) {
+	remove_physical_allocated_range(base, size);
+	if (sNextPhysicalAddress == (base + size))
 		sNextPhysicalAddress -= size;
-		remove_physical_allocated_range(sNextPhysicalAddress, size);
-	}
 
 	// Failures don't matter very much as regions should be freed automatically,
 	// since they're in the identity map and not stored in the kernel's page tables.

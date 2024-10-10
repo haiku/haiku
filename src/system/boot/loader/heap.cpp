@@ -385,6 +385,8 @@ FreeChunk::SetToAllocated(void* allocated)
 void
 heap_release(stage2_args* args)
 {
+	heap_print_statistics();
+
 	LargeAllocation* allocation = sLargeAllocations.Clear(true);
 	while (allocation != NULL) {
 		LargeAllocation* next = allocation->HashNext();
@@ -393,6 +395,10 @@ heap_release(stage2_args* args)
 	}
 
 	platform_free_heap_region(sHeapBase, (addr_t)sHeapEnd - (addr_t)sHeapBase);
+
+	sHeapBase = sHeapEnd = NULL;
+	memset((void*)&sFreeChunkTree, 0, sizeof(sFreeChunkTree));
+	memset((void*)&sLargeAllocations, 0, sizeof(sLargeAllocations));
 }
 
 
