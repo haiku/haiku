@@ -53,9 +53,9 @@
 const static size_t kAlignment = 8;
 	// all memory chunks will be a multiple of this
 
-const static size_t kDefaultHeapSize = (1024 + 256) * 1024;
+const static size_t kDefaultHeapSize = (1024 + 512) * 1024;
 	// default initial heap size, unless overridden by platform loader
-const static size_t kLargeAllocationThreshold = 16 * 1024;
+const static size_t kLargeAllocationThreshold = 128 * 1024;
 	// allocations of this size or larger are allocated via
 	// platform_allocate_region()
 
