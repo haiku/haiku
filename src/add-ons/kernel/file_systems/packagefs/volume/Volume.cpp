@@ -1923,6 +1923,7 @@ Volume::_AddPackageLinksNode(Node* node)
 	// If this is a directory, recursively add descendants. The directory tree
 	// for the package links isn't deep, so we can do recursion.
 	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		DirectoryReadLocker directoryReadLocker(directory);
 		for (Node* child = directory->FirstChild(); child != NULL;
 				child = directory->NextChild(child)) {
 			_AddPackageLinksNode(child);
@@ -1937,6 +1938,7 @@ Volume::_RemovePackageLinksNode(Node* node)
 	// If this is a directory, recursively remove descendants. The directory
 	// tree for the package links isn't deep, so we can do recursion.
 	if (Directory* directory = dynamic_cast<Directory*>(node)) {
+		DirectoryReadLocker directoryReadLocker(directory);
 		for (Node* child = directory->FirstChild(); child != NULL;
 				child = directory->NextChild(child)) {
 			_RemovePackageLinksNode(child);

@@ -148,7 +148,7 @@ packagefs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	Node* node = (Node*)fsDir->private_node;
 
 	FUNCTION("volume: %p, dir: %p (%" B_PRId64 "), entry: \"%s\"\n", volume,
-		dir, dir->ID(), entryName);
+		node, node->ID(), entryName);
 
 	if (!S_ISDIR(node->Mode()))
 		return B_NOT_A_DIRECTORY;

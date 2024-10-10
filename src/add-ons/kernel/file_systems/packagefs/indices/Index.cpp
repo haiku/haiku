@@ -77,7 +77,7 @@ Index::Dump()
 		if (GetIterator(it)) {
 			while (Node* node = it.Next()) {
 				PRINT("  node: `%s', dir: %" B_PRIdINO "\n",
-					node->Name().Data(), node->Parent()->ID());
+					node->Name().Data(), node->GetParentUnchecked()->ID());
 			}
 		}
 	)
