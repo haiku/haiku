@@ -4325,8 +4325,8 @@ is_page_in_physical_memory_range(kernel_args* args, phys_addr_t address)
 	// allocated
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
 		if (address >= args->physical_memory_range[i].start
-			&& address < args->physical_memory_range[i].start
-				+ args->physical_memory_range[i].size)
+			&& address < (args->physical_memory_range[i].start
+				+ args->physical_memory_range[i].size))
 			return true;
 	}
 	return false;
@@ -4375,6 +4375,32 @@ vm_allocate_early_physical_page(kernel_args* args)
 			// we got one!
 			args->physical_allocated_range[i].start -= B_PAGE_SIZE;
 			args->physical_allocated_range[i].size += B_PAGE_SIZE;
+			return nextPage / B_PAGE_SIZE;
+		}
+	}
+
+	// Try starting a new range.
+	if (args->num_physical_allocated_ranges < MAX_PHYSICAL_ALLOCATED_RANGE) {
+		const uint32 next = args->num_physical_allocated_ranges;
+		phys_addr_t lastPage = args->physical_allocated_range[next - 1].start
+			+ args->physical_allocated_range[next - 1].size;
+
+		phys_addr_t nextPage = 0;
+		for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+			// Ignore everything before the last-allocated page, as well as small ranges.
+			if (args->physical_memory_range[i].start < lastPage)
+				continue;
+			if (args->physical_memory_range[i].size < (B_PAGE_SIZE * 128))
+				continue;
+
+			nextPage = args->physical_memory_range[i].start;
+		}
+
+		if (nextPage != 0) {
+			// we got one!
+			args->num_physical_allocated_ranges++;
+			args->physical_allocated_range[next].start = nextPage;
+			args->physical_allocated_range[next].size = B_PAGE_SIZE;
 			return nextPage / B_PAGE_SIZE;
 		}
 	}
