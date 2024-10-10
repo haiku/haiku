@@ -52,6 +52,9 @@
 
 const static size_t kAlignment = 8;
 	// all memory chunks will be a multiple of this
+
+const static size_t kDefaultHeapSize = (1024 + 256) * 1024;
+	// default initial heap size, unless overridden by platform loader
 const static size_t kLargeAllocationThreshold = 16 * 1024;
 	// allocations of this size or larger are allocated via
 	// platform_allocate_region()
@@ -401,6 +404,9 @@ heap_print_statistics()
 status_t
 heap_init(stage2_args* args)
 {
+	if (args->heap_size == 0)
+		args->heap_size = kDefaultHeapSize;
+
 	void* base;
 	void* top;
 	if (platform_init_heap(args, &base, &top) < B_OK)

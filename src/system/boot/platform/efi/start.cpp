@@ -233,7 +233,6 @@ extern "C" efi_status
 efi_main(efi_handle image, efi_system_table *systemTable)
 {
 	stage2_args args;
-
 	memset(&args, 0, sizeof(stage2_args));
 
 	kImage = image;

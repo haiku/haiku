@@ -23,9 +23,6 @@
 #include "real_time_clock.h"
 
 
-#define HEAP_SIZE (512 * 1024)
-
-
 // GCC defined globals
 extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
@@ -104,7 +101,7 @@ start(void *openFirmwareEntry)
 
 	// stage2 args - might be set via the command line one day
 	stage2_args args;
-	args.heap_size = HEAP_SIZE;
+	args.heap_size = 0;
 	args.arguments = NULL;
 
 	if (of_init((intptr_t (*)(void*))openFirmwareEntry) != B_OK)

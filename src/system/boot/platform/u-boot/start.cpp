@@ -30,9 +30,6 @@ extern "C" {
 };
 
 
-#define HEAP_SIZE (128 * 1024)
-
-
 typedef struct uboot_gd {
 	// those are the only few members that we can trust
 	// others depend on compile-time config
@@ -191,7 +188,7 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 	clear_bss();
 		// call C++ constructors before doing anything else
 	call_ctors();
-	args.heap_size = HEAP_SIZE;
+	args.heap_size = 0;
 	args.arguments = NULL;
 	args.arguments_count = 0;
 	args.platform.boot_tgz_data = NULL;

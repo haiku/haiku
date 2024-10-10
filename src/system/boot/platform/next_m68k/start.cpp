@@ -19,7 +19,6 @@
 #include "keyboard.h"
 #include "nextrom.h"
 
-#define HEAP_SIZE 65536
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -246,7 +245,7 @@ start_next(const char *boot_args, struct mon_global *monitor)
 		// call C++ constructors before doing anything else
 	mg->mg_putc('I');
 
-	args.heap_size = HEAP_SIZE;
+	args.heap_size = 0;
 	args.arguments = NULL;
 
 	//serial_init();

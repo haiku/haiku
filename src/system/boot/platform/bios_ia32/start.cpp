@@ -31,9 +31,6 @@
 #include "smp.h"
 
 
-#define HEAP_SIZE ((1024 + 256) * 1024)
-
-
 // GCC defined globals
 extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
@@ -184,7 +181,7 @@ _start(void)
 	call_ctors();
 		// call C++ constructors before doing anything else
 
-	args.heap_size = HEAP_SIZE;
+	args.heap_size = 0;
 	args.arguments = NULL;
 
 	serial_init();
