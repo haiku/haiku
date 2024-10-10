@@ -1783,9 +1783,11 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 			case PAGE_STATE_FREE:
 			case PAGE_STATE_CLEAR:
 			{
-// TODO: This violates the page reservation policy, since we remove pages from
-// the free/clear queues without having reserved them before. This should happen
-// in the early boot process only, though.
+				// This violates the page reservation policy, since we remove pages
+				// from the free/clear queues without having reserved them before.
+				// This should happen in the early boot process only, though.
+				ASSERT(gKernelStartup);
+
 				DEBUG_PAGE_ACCESS_START(page);
 				VMPageQueue& queue = page->State() == PAGE_STATE_FREE
 					? sFreePageQueue : sClearPageQueue;
@@ -1805,7 +1807,7 @@ mark_page_range_in_use(page_num_t startPage, page_num_t length, bool wired)
 			case PAGE_STATE_CACHED:
 			default:
 				// uh
-				dprintf("mark_page_range_in_use: page %#" B_PRIxPHYSADDR
+				panic("mark_page_range_in_use: page %#" B_PRIxPHYSADDR
 					" in non-free state %d!\n", startPage + i, page->State());
 				break;
 		}
