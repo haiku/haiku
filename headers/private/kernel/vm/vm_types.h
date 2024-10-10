@@ -123,8 +123,6 @@ private:
 public:
 	page_num_t				cache_offset;
 								// in page size units
-								// TODO: Only 32 bit on 32 bit platforms!
-								// Introduce a new 64 bit type page_off_t!
 
 	SplayTreeLink<vm_page>	cache_link;
 	vm_page*				cache_next;
