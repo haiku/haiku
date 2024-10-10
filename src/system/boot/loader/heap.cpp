@@ -174,12 +174,8 @@ typedef IteratableSplayTree<FreeChunkTreeDefinition> FreeChunkTree;
 struct LargeAllocation {
 	LargeAllocation()
 	{
-	}
-
-	void SetTo(void* address, size_t size)
-	{
-		fAddress = address;
-		fSize = size;
+		fAddress = NULL;
+		fSize = 0;
 	}
 
 	status_t Allocate(size_t size)
@@ -387,6 +383,13 @@ FreeChunk::SetToAllocated(void* allocated)
 void
 heap_release(stage2_args* args)
 {
+	LargeAllocation* allocation = sLargeAllocations.Clear(true);
+	while (allocation != NULL) {
+		LargeAllocation* next = allocation->HashNext();
+		allocation->Free();
+		allocation = next;
+	}
+
 	platform_release_heap(args, sHeapBase);
 }
 
