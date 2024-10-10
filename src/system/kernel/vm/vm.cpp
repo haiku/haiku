@@ -264,7 +264,7 @@ struct cache_info {
 	addr_t		committed;
 };
 
-static const int kCacheInfoTableCount = 100 * 1024;
+static const uint32 kCacheInfoTableCount = 100 * 1024;
 static cache_info* sCacheInfoTable;
 
 #endif	// DEBUG_CACHE_LIST
@@ -3638,7 +3638,7 @@ dump_caches(int argc, char** argv)
 		totalCount++;
 		if (cache->source == NULL) {
 			cache_info stackInfo;
-			cache_info& info = rootCount < (uint32)kCacheInfoTableCount
+			cache_info& info = rootCount < kCacheInfoTableCount
 				? sCacheInfoTable[rootCount] : stackInfo;
 			rootCount++;
 			info.cache = cache;
@@ -3652,26 +3652,26 @@ dump_caches(int argc, char** argv)
 		cache = cache->debug_next;
 	}
 
-	if (rootCount <= (uint32)kCacheInfoTableCount) {
-		qsort(sCacheInfoTable, rootCount, sizeof(cache_info),
-			sortByPageCount
-				? &cache_info_compare_page_count
-				: &cache_info_compare_committed);
-	}
-
 	kprintf("total committed memory: %" B_PRIdOFF ", total used pages: %"
 		B_PRIuPHYSADDR "\n", totalCommitted, totalPages);
 	kprintf("%" B_PRIu32 " caches (%" B_PRIu32 " root caches), sorted by %s "
 		"per cache tree...\n\n", totalCount, rootCount, sortByPageCount ?
 			"page count" : "committed size");
 
-	if (rootCount <= (uint32)kCacheInfoTableCount) {
-		for (uint32 i = 0; i < rootCount; i++) {
-			cache_info& info = sCacheInfoTable[i];
-			dump_caches_recursively(info.cache, info, 0);
-		}
-	} else
+	if (rootCount > kCacheInfoTableCount) {
 		kprintf("Cache info table too small! Can't sort and print caches!\n");
+		return 0;
+	}
+
+	qsort(sCacheInfoTable, rootCount, sizeof(cache_info),
+		sortByPageCount
+			? &cache_info_compare_page_count
+			: &cache_info_compare_committed);
+
+	for (uint32 i = 0; i < rootCount; i++) {
+		cache_info& info = sCacheInfoTable[i];
+		dump_caches_recursively(info.cache, info, 0);
+	}
 
 	return 0;
 }
