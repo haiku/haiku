@@ -126,7 +126,9 @@ VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 void
 VMTranslationMap::DebugPrintMappingInfo(addr_t virtualAddress)
 {
+#if KDEBUG
 	kprintf("VMTranslationMap::DebugPrintMappingInfo not implemented\n");
+#endif
 }
 
 
@@ -146,7 +148,9 @@ bool
 VMTranslationMap::DebugGetReverseMappingInfo(phys_addr_t physicalAddress,
 	ReverseMappingInfoCallback& callback)
 {
+#if KDEBUG
 	kprintf("VMTranslationMap::DebugGetReverseMappingInfo not implemented\n");
+#endif
 	return false;
 }
 
