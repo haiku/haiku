@@ -665,25 +665,29 @@ platform_free_region(void *address, size_t size)
 }
 
 
-void
-platform_release_heap(struct stage2_args *args, void *base)
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
 {
-	// It will be freed automatically, since it is in the
-	// identity mapped region, and not stored in the kernel's
-	// page tables.
-}
-
-
-status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
-{
-	void *heap = (void *)get_next_physical_address(args->heap_size);
-	if (heap == NULL)
+	addr_t base = get_next_physical_address(size);
+	if (base == 0)
 		return B_NO_MEMORY;
 
-	*_base = heap;
-	*_top = (void *)((int8 *)heap + args->heap_size);
-	return B_OK;
+	if ((base + size) > (32 * 1024 * 1024))
+		panic("platform_allocate_heap_region: region end is beyond identity map");
+
+	*_base = (void*)base;
+	return size;
 }
 
 
+void
+platform_free_heap_region(void *_base, size_t size)
+{
+	addr_t base = (addr_t)_base;
+	status_t status = remove_physical_allocated_range(base, size);
+	if (status == B_OK && sNextPhysicalAddress == (base + size))
+		sNextPhysicalAddress -= size;
+
+	// Failures don't matter very much as regions should be freed automatically,
+	// since they're in the identity map and not stored in the kernel's page tables.
+}

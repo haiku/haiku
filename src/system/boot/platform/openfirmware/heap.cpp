@@ -20,29 +20,25 @@
 #endif
 
 
-status_t
-platform_init_heap(stage2_args *args, void **_base, void **_top)
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
 {
-	TRACE(("platform_init_heap()\n"));
+	TRACE(("platform_allocate_heap_region()\n"));
 
 	*_base = NULL;
-	status_t error = platform_allocate_region(_base, args->heap_size,
+	status_t error = platform_allocate_region(_base, size,
 		B_READ_AREA | B_WRITE_AREA, false);
 	if (error != B_OK)
 		return error;
 
 	printf("heap base = %p\n", *_base);
-	*_top = (void *)((int8 *)*_base + args->heap_size);
-	printf("heap top = %p\n", *_top);
-
-	return B_OK;
+	return size;
 }
 
 
 void
-platform_release_heap(stage2_args *args, void *base)
+platform_free_heap_region(void *_base, size_t size)
 {
-	if (base != NULL)
-		platform_free_region(base, args->heap_size);
+	if (_base != NULL)
+		platform_free_region(_base, size);
 }
-

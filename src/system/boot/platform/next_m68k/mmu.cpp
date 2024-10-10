@@ -150,19 +150,18 @@ platform_free_region(void *address, size_t size)
 }
 
 
-void
-platform_release_heap(struct stage2_args *args, void *base)
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
 {
-	// It will be freed automatically, since it is in the
-	// identity mapped region, and not stored in the kernel's
-	// page tables.
+	return B_UNSUPPORTED;
 }
 
 
-status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
+void
+platform_free_heap_region(void *_base, size_t size)
 {
-	return B_UNSUPPORTED;
+	// Failures don't matter very much as regions should be freed automatically,
+	// since they're in the identity map and not stored in the kernel's page tables.
 }
 
 

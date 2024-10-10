@@ -352,22 +352,21 @@ platform_free_region(void* address, size_t size)
 }
 
 
-void
-platform_release_heap(struct stage2_args* args, void* base)
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
 {
-}
-
-
-status_t
-platform_init_heap(struct stage2_args* args, void** _base, void** _top)
-{
-	addr_t heap = AllocPhysPages(args->heap_size);
+	addr_t heap = AllocPhysPages(size);
 	if (heap == 0)
 		return B_NO_MEMORY;
 
 	*_base = (void*)heap;
-	*_top = (void*)(heap + args->heap_size);
-	return B_OK;
+	return size;
+}
+
+
+void
+platform_free_heap_region(void *_base, size_t size)
+{
 }
 
 

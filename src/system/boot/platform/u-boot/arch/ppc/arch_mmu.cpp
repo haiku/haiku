@@ -102,7 +102,8 @@ static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 //static addr_t sMaxVirtualAddress = KERNEL_BASE + kMaxKernelSize;
 
 // working page directory and page table
-static void *sPageTable = 0 ;
+static void *sPageTable = 0;
+static bool sHeapRegionAllocated = false;
 
 
 static addr_t
@@ -404,25 +405,28 @@ platform_free_region(void *address, size_t size)
 }
 
 
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
+{
+	if (sHeapRegionAllocated)
+		return B_NO_MEMORY;
+	sHeapRegionAllocated = true;
+
+	// the heap is put right before the pagetable
+	void *heap = (uint8 *)sPageTable - size;
+	//FIXME: use phys addresses to allow passing args to U-Boot?
+
+	*_base = heap;
+	TRACE(("boot heap at 0x%p\n", *_base));
+	return size;
+}
+
+
 void
-platform_release_heap(struct stage2_args *args, void *base)
+platform_free_heap_region(void *_base, size_t size)
 {
 	//XXX
 	// It will be freed automatically, since it is in the
 	// identity mapped region, and not stored in the kernel's
 	// page tables.
-}
-
-
-status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
-{
-	// the heap is put right before the pagetable
-	void *heap = (uint8 *)sPageTable - args->heap_size;
-	//FIXME: use phys addresses to allow passing args to U-Boot?
-
-	*_base = heap;
-	*_top = (void *)((int8 *)heap + args->heap_size);
-	TRACE(("boot heap at 0x%p to 0x%p\n", *_base, *_top));
-	return B_OK;
 }

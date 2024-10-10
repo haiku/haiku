@@ -1,40 +1,29 @@
 /*
- * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include <boot/platform.h>
-#include <boot/stage2.h>
 
 #include "efi_platform.h"
 
 
-#define STAGE_PAGES	0x2000 /* 32 MB */
-
-
-static efi_physical_addr staging;
-
-
-extern "C" void
-platform_release_heap(struct stage2_args *args, void *base)
+extern "C" ssize_t
+platform_allocate_heap_region(size_t _size, void** _base)
 {
-	if ((void*)staging != base)
-		panic("Attempt to release heap with wrong base address!");
+	size_t pages = (_size + (B_PAGE_SIZE - 1)) / B_PAGE_SIZE;
+	efi_physical_addr base;
+	if (kBootServices->AllocatePages(AllocateAnyPages, EfiLoaderData, pages, &base) != EFI_SUCCESS)
+		return B_NO_MEMORY;
 
-	kBootServices->FreePages(staging, STAGE_PAGES);
+	*_base = (void*)base;
+	return pages * B_PAGE_SIZE;
 }
 
 
-extern "C" status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
+extern "C" void
+platform_free_heap_region(void* base, size_t size)
 {
-	if (kBootServices->AllocatePages(AllocateAnyPages, EfiLoaderData,
-			STAGE_PAGES, &staging) != EFI_SUCCESS)
-		return B_NO_MEMORY;
-
-	*_base = (void*)staging;
-	*_top = (void*)((int8*)staging + STAGE_PAGES * B_PAGE_SIZE);
-
-	return B_OK;
+	kBootServices->FreePages((efi_physical_addr)base, size / B_PAGE_SIZE);
 }

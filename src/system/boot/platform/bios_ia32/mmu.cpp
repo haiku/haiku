@@ -73,6 +73,7 @@ segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x1000000;		// 16 MB for the kernel
+static const size_t kIdentityMapEnd = (8 * 1024 * 1024);
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
@@ -170,7 +171,7 @@ add_page_table(addr_t base)
 
 	// Get new page table and clear it out
 	uint32 *pageTable = get_next_page_table();
-	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
+	if (pageTable > (uint32 *)kIdentityMapEnd) {
 		panic("tried to add page table beyond the identity mapped 8 MB "
 			"region\n");
 		return NULL;
@@ -809,25 +810,32 @@ platform_free_region(void *address, size_t size)
 }
 
 
-void
-platform_release_heap(struct stage2_args *args, void *base)
+ssize_t
+platform_allocate_heap_region(size_t size, void **_base)
 {
-	// It will be freed automatically, since it is in the
-	// identity mapped region, and not stored in the kernel's
-	// page tables.
+	addr_t base = get_next_physical_address(size);
+	if (base == 0)
+		return B_NO_MEMORY;
+
+	if ((base + size) > kIdentityMapEnd)
+		panic("platform_allocate_heap_region: region end is beyond identity map");
+
+	*_base = (void*)base;
+	return size;
 }
 
 
-status_t
-platform_init_heap(struct stage2_args *args, void **_base, void **_top)
+void
+platform_free_heap_region(void *_base, size_t size)
 {
-	void *heap = (void *)get_next_physical_address(args->heap_size);
-	if (heap == NULL)
-		return B_NO_MEMORY;
+	addr_t base = (addr_t)_base;
+	if (sNextPhysicalAddress == (base + size)) {
+		sNextPhysicalAddress -= size;
+		remove_physical_allocated_range(sNextPhysicalAddress, size);
+	}
 
-	*_base = heap;
-	*_top = (void *)((int8 *)heap + args->heap_size);
-	return B_OK;
+	// Failures don't matter very much as regions should be freed automatically,
+	// since they're in the identity map and not stored in the kernel's page tables.
 }
 
 
