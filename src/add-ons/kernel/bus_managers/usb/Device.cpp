@@ -334,7 +334,7 @@ Device::~Device()
 	if (fDefaultPipe != NULL) {
 		fDefaultPipe->PutUSBID(false);
 		fDefaultPipe->CancelQueuedTransfers(true);
-		fDefaultPipe->WaitForUnbusy();
+		fDefaultPipe->WaitForIdle();
 	}
 
 	// Destroy open endpoints. Do not send a device request to unconfigure
@@ -365,7 +365,7 @@ Device::~Device()
 				Interface* interfaceObject =
 					(Interface*)GetStack()->GetObject(interface->handle);
 				if (interfaceObject != NULL)
-					interfaceObject->SetBusy(false);
+					interfaceObject->ReleaseReference();
 				delete interfaceObject;
 				interface->handle = 0;
 			}
@@ -648,7 +648,7 @@ Device::ClearEndpoints(int32 interfaceIndex)
 			usb_endpoint_info* endpoint = &interfaceInfo->endpoint[i];
 			Pipe* pipe = (Pipe*)GetStack()->GetObject(endpoint->handle);
 			if (pipe != NULL)
-				pipe->SetBusy(false);
+				pipe->ReleaseReference();
 			delete pipe;
 			endpoint->handle = 0;
 		}

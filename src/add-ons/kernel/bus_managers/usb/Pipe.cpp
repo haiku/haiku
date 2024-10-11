@@ -375,7 +375,7 @@ ControlPipe::~ControlPipe()
 	// We do this here in case a submitted request is still running.
 	PutUSBID(false);
 	ControlPipe::CancelQueuedTransfers(true);
-	WaitForUnbusy();
+	WaitForIdle();
 
 	if (fNotifySem >= 0)
 		delete_sem(fNotifySem);

@@ -13,8 +13,7 @@ Object::Object(Stack *stack, BusManager *bus)
 	:	fParent(NULL),
 		fBusManager(bus),
 		fStack(stack),
-		fUSBID(fStack->GetUSBID(this)),
-		fBusy(0)
+		fUSBID(fStack->GetUSBID(this))
 {
 }
 
@@ -23,8 +22,7 @@ Object::Object(Object *parent)
 	:	fParent(parent),
 		fBusManager(parent->GetBusManager()),
 		fStack(parent->GetStack()),
-		fUSBID(fStack->GetUSBID(this)),
-		fBusy(0)
+		fUSBID(fStack->GetUSBID(this))
 {
 }
 
@@ -36,26 +34,26 @@ Object::~Object()
 
 
 void
-Object::PutUSBID(bool waitForUnbusy)
+Object::PutUSBID(bool waitForIdle)
 {
 	if (fUSBID != UINT32_MAX) {
 		fStack->PutUSBID(this);
 		fUSBID = UINT32_MAX;
 	}
 
-	if (waitForUnbusy)
-		WaitForUnbusy();
+	if (waitForIdle)
+		WaitForIdle();
 }
 
 
 void
-Object::WaitForUnbusy()
+Object::WaitForIdle()
 {
 	int32 retries = 20;
-	while (atomic_get(&fBusy) != 0 && retries--)
+	while (CountReferences() != 1 && retries--)
 		snooze(100);
 	if (retries <= 0)
-		panic("USB object did not become unbusy!");
+		panic("USB object did not become idle!");
 }
 
 

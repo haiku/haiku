@@ -195,46 +195,6 @@ bus_std_ops(int32 op, ...)
 }
 
 
-// #pragma mark - ObjectBusyReleaser
-
-
-class ObjectBusyReleaser {
-public:
-	ObjectBusyReleaser(Object* object) : fObject(object) {}
-
-	~ObjectBusyReleaser()
-	{
-		Release();
-	}
-
-	void Release()
-	{
-		if (fObject != NULL) {
-			fObject->SetBusy(false);
-			fObject = NULL;
-		}
-	}
-
-	inline bool IsSet() const
-	{
-		return fObject != NULL;
-	}
-
-	inline Object *Get() const
-	{
-		return fObject;
-	}
-
-	inline Object *operator->() const
-	{
-		return fObject;
-	}
-
-private:
-	Object *fObject;
-};
-
-
 // #pragma mark - public methods
 
 
@@ -266,7 +226,7 @@ const usb_device_descriptor *
 get_device_descriptor(usb_device dev)
 {
 	TRACE_MODULE("get_device_descriptor(%" B_PRId32 ")\n", dev);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return NULL;
 	Device *device = (Device *)object.Get();
@@ -280,7 +240,7 @@ get_nth_configuration(usb_device dev, uint32 index)
 {
 	TRACE_MODULE("get_nth_configuration(%" B_PRId32 ", %" B_PRIu32 ")\n",
 		dev, index);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return NULL;
 	Device *device = (Device *)object.Get();
@@ -293,7 +253,7 @@ const usb_configuration_info *
 get_configuration(usb_device dev)
 {
 	TRACE_MODULE("get_configuration(%" B_PRId32 ")\n", dev);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return NULL;
 	Device *device = (Device *)object.Get();
@@ -308,7 +268,7 @@ set_configuration(usb_device dev,
 {
 	TRACE_MODULE("set_configuration(%" B_PRId32 ", %p)\n", dev,
 		configuration);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 	Device *device = (Device *)object.Get();
@@ -321,7 +281,7 @@ status_t
 set_alt_interface(usb_device dev, const usb_interface_info *interface)
 {
 	TRACE_MODULE("set_alt_interface(%" B_PRId32 ", %p)\n", dev, interface);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 	Device *device = (Device *)object.Get();
@@ -334,7 +294,7 @@ status_t
 set_feature(usb_id handle, uint16 selector)
 {
 	TRACE_MODULE("set_feature(%" B_PRId32 ", %d)\n", handle, selector);
-	ObjectBusyReleaser object(gUSBStack->GetObject(handle));
+	BReference<Object> object(gUSBStack->GetObject(handle), true);
 	if (!object.IsSet())
 		return B_DEV_INVALID_PIPE;
 
@@ -346,7 +306,7 @@ status_t
 clear_feature(usb_id handle, uint16 selector)
 {
 	TRACE_MODULE("clear_feature(%" B_PRId32 ", %d)\n", handle, selector);
-	ObjectBusyReleaser object(gUSBStack->GetObject(handle));
+	BReference<Object> object(gUSBStack->GetObject(handle), true);
 	if (!object.IsSet())
 		return B_DEV_INVALID_PIPE;
 
@@ -361,7 +321,7 @@ get_status(usb_id handle, uint16 *status)
 	if (!status)
 		return B_BAD_VALUE;
 
-	ObjectBusyReleaser object(gUSBStack->GetObject(handle));
+	BReference<Object> object(gUSBStack->GetObject(handle), true);
 	if (!object.IsSet())
 		return B_DEV_INVALID_PIPE;
 
@@ -376,7 +336,7 @@ get_descriptor(usb_device dev, uint8 type, uint8 index, uint16 languageID,
 	TRACE_MODULE("get_descriptor(%" B_PRId32 ", 0x%02x, 0x%02x, 0x%04x, %p, "
 		"%" B_PRIuSIZE ", %p)\n",
 		dev, type, index, languageID, data, dataLength, actualLength);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 	Device *device = (Device *)object.Get();
@@ -393,7 +353,7 @@ send_request(usb_device dev, uint8 requestType, uint8 request,
 	TRACE_MODULE("send_request(%" B_PRId32 ", 0x%02x, 0x%02x, 0x%04x, 0x%04x, "
 		"%d, %p, %p)\n", dev, requestType, request, value, index, length,
 		data, actualLength);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 	Device *device = (Device *)object.Get();
@@ -411,7 +371,7 @@ queue_request(usb_device dev, uint8 requestType, uint8 request,
 	TRACE_MODULE("queue_request(%" B_PRId32 ", 0x%02x, 0x%02x, 0x%04x, 0x%04x,"
 		" %u, %p, %p, %p)\n", dev, requestType, request, value, index,
 		length, data, callback,	callbackCookie);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 	Device *device = (Device *)object.Get();
@@ -427,7 +387,7 @@ queue_interrupt(usb_pipe pipe, void *data, size_t dataLength,
 {
 	TRACE_MODULE("queue_interrupt(%" B_PRId32 ", %p, %ld, %p, %p)\n",
 		pipe, data, dataLength, callback, callbackCookie);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_INTERRUPT_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -442,7 +402,7 @@ queue_bulk(usb_pipe pipe, void *data, size_t dataLength,
 {
 	TRACE_MODULE("queue_bulk(%" B_PRId32 ", %p, %" B_PRIuSIZE ", %p, %p)\n",
 		pipe, data, dataLength, callback, callbackCookie);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -457,7 +417,7 @@ queue_bulk_v(usb_pipe pipe, iovec *vector, size_t vectorCount,
 {
 	TRACE_MODULE("queue_bulk_v(%" B_PRId32 ", %p, %" B_PRIuSIZE " %p, %p)\n",
 		pipe, vector, vectorCount, callback, callbackCookie);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -472,7 +432,7 @@ queue_bulk_v_physical(usb_pipe pipe, physical_entry *vector, size_t vectorCount,
 {
 	TRACE_MODULE("queue_bulk_v_physical(%" B_PRId32 ", %p, %" B_PRIuSIZE
 		", %p, %p)\n", pipe, vector, vectorCount, callback, callbackCookie);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_BULK_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -491,7 +451,7 @@ queue_isochronous(usb_pipe pipe, void *data, size_t dataLength,
 		"%" B_PRId32 ", %p, 0x%08" B_PRIx32 ", %p, %p)\n",
 		pipe, data, dataLength, packetDesc, packetCount, startingFrameNumber,
 		flags, callback, callbackCookie);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_ISO_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -507,7 +467,7 @@ set_pipe_policy(usb_pipe pipe, uint8 maxQueuedPackets,
 {
 	TRACE_MODULE("set_pipe_policy(%" B_PRId32 ", %d, %d, %d)\n", pipe,
 		maxQueuedPackets, maxBufferDurationMS, sampleSize);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_ISO_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -520,7 +480,7 @@ status_t
 cancel_queued_transfers(usb_pipe pipe)
 {
 	TRACE_MODULE("cancel_queued_transfers(%" B_PRId32 ")\n", pipe);
-	ObjectBusyReleaser object(gUSBStack->GetObject(pipe));
+	BReference<Object> object(gUSBStack->GetObject(pipe), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_PIPE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -532,7 +492,7 @@ status_t
 cancel_queued_requests(usb_device dev)
 {
 	TRACE_MODULE("cancel_queued_requests(%" B_PRId32 ")\n", dev);
-	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	BReference<Object> object(gUSBStack->GetObject(dev), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 	 Device *device = (Device *)object.Get();
@@ -549,7 +509,7 @@ usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 
 	switch (opcode) {
 		case 'DNAM': {
-			ObjectBusyReleaser object(gUSBStack->GetObject(*(usb_id *)buffer));
+			BReference<Object> object(gUSBStack->GetObject(*(usb_id *)buffer), true);
 			if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 				return B_BAD_VALUE;
 			Device *device = (Device *)object.Get();
@@ -589,7 +549,7 @@ get_nth_child(usb_device _hub, uint8 index, usb_device *childDevice)
 	if (!childDevice)
 		return B_BAD_VALUE;
 
-	ObjectBusyReleaser object(gUSBStack->GetObject(_hub));
+	BReference<Object> object(gUSBStack->GetObject(_hub), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_HUB) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -615,7 +575,7 @@ get_device_parent(usb_device _device, usb_device *parentHub, uint8 *portIndex)
 	if (!parentHub || !portIndex)
 		return B_BAD_VALUE;
 
-	ObjectBusyReleaser object(gUSBStack->GetObject(_device));
+	BReference<Object> object(gUSBStack->GetObject(_device), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -639,7 +599,7 @@ get_device_parent(usb_device _device, usb_device *parentHub, uint8 *portIndex)
 status_t
 reset_port(usb_device _hub, uint8 portIndex)
 {
-	ObjectBusyReleaser object(gUSBStack->GetObject(_hub));
+	BReference<Object> object(gUSBStack->GetObject(_hub), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_HUB) == 0)
 		return B_DEV_INVALID_PIPE;
 
@@ -651,7 +611,7 @@ reset_port(usb_device _hub, uint8 portIndex)
 status_t
 disable_port(usb_device _hub, uint8 portIndex)
 {
-	ObjectBusyReleaser object(gUSBStack->GetObject(_hub));
+	BReference<Object> object(gUSBStack->GetObject(_hub), true);
 	if (!object.IsSet() || (object->Type() & USB_OBJECT_HUB) == 0)
 		return B_DEV_INVALID_PIPE;
 

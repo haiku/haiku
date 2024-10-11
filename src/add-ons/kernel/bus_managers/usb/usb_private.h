@@ -137,10 +137,10 @@ public:
 		usb_id							GetUSBID(Object *object);
 		void							PutUSBID(Object *object);
 
-		// This sets the object as busy; the caller must set it un-busy.
+		// Acquires a reference to the object.
 		Object *						GetObject(usb_id id);
 
-		// only for the kernel debugger
+		// only for the kernel debugger (and doesn't acquire a reference)
 		Object *						GetObjectNoLock(usb_id id) const;
 
 		void							AddBusManager(BusManager *bus);
@@ -270,7 +270,7 @@ private:
 };
 
 
-class Object {
+class Object : public BReferenceable {
 public:
 										Object(Stack *stack, BusManager *bus);
 										Object(Object *parent);
@@ -283,8 +283,6 @@ virtual									~Object();
 		Stack *							GetStack() const { return fStack; }
 
 		usb_id							USBID() const { return fUSBID; }
-		void							SetBusy(bool busy)
-											{ atomic_add(&fBusy, busy ? 1 : -1); }
 
 virtual	uint32							Type() const { return USB_OBJECT_NONE; }
 virtual	const char *					TypeName() const { return "object"; }
@@ -295,15 +293,14 @@ virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
 
 protected:
-		void							PutUSBID(bool waitForUnbusy = true);
-		void							WaitForUnbusy();
+		void							PutUSBID(bool waitForIdle = true);
+		void							WaitForIdle();
 
 private:
 		Object *						fParent;
 		BusManager *					fBusManager;
 		Stack *							fStack;
 		usb_id							fUSBID;
-		int32							fBusy;
 };
 
 
