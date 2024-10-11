@@ -59,9 +59,10 @@ CalcWindow::CalcWindow(BRect frame, BMessage* settings)
 	fCalcView->AddChild(dragger);
 
 	BRect rect;
-	if (settings->FindRect("window frame", &rect) == B_OK)
+	if (settings->FindRect("window frame", &rect) == B_OK) {
 		SetFrame(rect);
-	else
+		MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
+	} else
 		SetFrame(frame, true);
 
 	// Add shortcut keys to menu options

@@ -136,6 +136,7 @@ CharacterWindow::CharacterWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
+		MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 	} else {
 		float scaling = be_plain_font->Size() / 12.0f;
 		ResizeTo(Frame().Width() * scaling, Frame().Height() * scaling);

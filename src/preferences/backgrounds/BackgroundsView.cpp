@@ -295,6 +295,7 @@ BackgroundsView::AllAttached()
 	if (fSettings.FindPoint("pos", &point) == B_OK) {
 		fFoundPositionSetting = true;
 		Window()->MoveTo(point);
+		Window()->MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 	}
 
 	fApply->SetEnabled(false);

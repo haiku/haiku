@@ -156,11 +156,9 @@ SudokuWindow::SudokuWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
-		frame.OffsetTo(B_ORIGIN);
 	} else {
 		float scaling = std::max(1.0f, be_plain_font->Size() / 12.0f);
 		ResizeTo(Frame().Width() * scaling, Frame().Height() * scaling);
-		frame = Bounds();
 	}
 
 	MoveOnScreen();

@@ -21,7 +21,6 @@ ActivityMonitor::ActivityMonitor()
 	: BApplication(kSignature)
 {
 	fWindow = new ActivityWindow();
-	fWindow->MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 }
 
 
