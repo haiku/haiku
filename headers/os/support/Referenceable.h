@@ -23,7 +23,7 @@ public:
 			int32				ReleaseReference();
 
 			int32				CountReferences() const
-									{ return fReferenceCount; }
+									{ return atomic_get((int32*)&fReferenceCount); }
 
 protected:
 	virtual	void				FirstReferenceAcquired();
