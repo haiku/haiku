@@ -750,7 +750,7 @@ private:
 		status_t					_CalculateBandwidth();
 
 		// Data that is related to the transfer
-		Pipe *						fPipe;
+		BReference<Pipe>			fPipe;
 		generic_io_vec				fData;
 		generic_io_vec *			fVector;
 		size_t						fVectorCount;
