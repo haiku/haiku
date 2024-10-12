@@ -34,6 +34,7 @@ PasswordWindow::PasswordWindow()
 {
 	BView* topView = new BView(Bounds(), "topView", B_FOLLOW_ALL, B_WILL_DRAW);
 	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	topView->SetHighUIColor(B_PANEL_TEXT_COLOR);
 	AddChild(topView);
 
 	BRect bounds(Bounds());
