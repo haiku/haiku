@@ -19,6 +19,7 @@
 #include <posix/realtime_sem_defs.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
+#include <time_private.h>
 #include <user_mutex_defs.h>
 
 
@@ -170,10 +171,9 @@ unnamed_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 	if (semaphore->type == SEM_TYPE_UNNAMED_SHARED)
 		flags |= B_USER_MUTEX_SHARED;
 	if (timeout != NULL) {
-		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
-			+ timeout->tv_nsec / 1000;
-		if (timeout->tv_nsec < 0 || timeout->tv_nsec >= 1000000000)
+		if (!timespec_to_bigtime(*timeout, timeoutMicros))
 			timeoutMicros = -1;
+
 		switch (clock_id) {
 			case CLOCK_REALTIME:
 				flags |= B_ABSOLUTE_REAL_TIME_TIMEOUT;
@@ -213,21 +213,18 @@ static int
 named_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 	const struct timespec* timeout)
 {
-	if (timeout != NULL
-		&& (timeout->tv_nsec < 0 || timeout->tv_nsec >= 1000000000)) {
-		status_t err = _kern_realtime_sem_wait(semaphore->u.named_sem_id,
-			B_RELATIVE_TIMEOUT, 0);
-		if (err == B_WOULD_BLOCK)
-			err = EINVAL;
-		// do nothing, return err as it is.
-		return err;
-	}
-
 	bigtime_t timeoutMicros = B_INFINITE_TIMEOUT;
 	uint32 flags = 0;
 	if (timeout != NULL) {
-		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
-			+ timeout->tv_nsec / 1000;
+		if (!timespec_to_bigtime(*timeout, timeoutMicros)) {
+			status_t err = _kern_realtime_sem_wait(semaphore->u.named_sem_id,
+				B_RELATIVE_TIMEOUT, 0);
+			if (err == B_WOULD_BLOCK)
+				err = EINVAL;
+			// do nothing, return err as it is.
+			return err;
+		}
+
 		switch (clock_id) {
 			case CLOCK_REALTIME:
 				flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
@@ -239,6 +236,7 @@ named_sem_timedwait(sem_t* semaphore, clockid_t clock_id,
 				return EINVAL;
 		}
 	}
+
 	status_t err = _kern_realtime_sem_wait(semaphore->u.named_sem_id, flags,
 		timeoutMicros);
 	if (err == B_WOULD_BLOCK)
