@@ -4351,8 +4351,58 @@ vm_allocate_early_physical_page_etc(kernel_args* args, phys_addr_t maxAddress)
 	if (maxAddress == 0)
 		maxAddress = __HAIKU_PHYS_ADDR_MAX;
 
+#if defined(__HAIKU_ARCH_PHYSICAL_64_BIT)
+	// Check if the last physical range is above the 32-bit maximum.
+	const addr_range& lastMemoryRange =
+		args->physical_memory_range[args->num_physical_memory_ranges - 1];
+	const uint64 post32bitAddr = 0x100000000LL;
+	if ((lastMemoryRange.start + lastMemoryRange.size) > post32bitAddr
+			&& args->num_physical_allocated_ranges < MAX_PHYSICAL_ALLOCATED_RANGE) {
+		// To avoid consuming physical memory in the 32-bit range (which drivers may need),
+		// ensure the last allocated range at least ends past the 32-bit boundary.
+		const addr_range& lastAllocatedRange =
+			args->physical_allocated_range[args->num_physical_allocated_ranges - 1];
+		const phys_addr_t lastAllocatedPage = lastAllocatedRange.start + lastAllocatedRange.size;
+		if (lastAllocatedPage < post32bitAddr) {
+			// Create ranges until we have one at least starting at the first point past 4GB.
+			// (Some of the logic here is similar to the new-range code at the end of the method.)
+			for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+				addr_range& memoryRange = args->physical_memory_range[i];
+				if ((memoryRange.start + memoryRange.size) < lastAllocatedPage)
+					continue;
+				if (memoryRange.size < (B_PAGE_SIZE * 128))
+					continue;
+
+				uint64 rangeStart = memoryRange.start;
+				if ((memoryRange.start + memoryRange.size) <= post32bitAddr) {
+					if (memoryRange.start < lastAllocatedPage)
+						continue;
+
+					// Range has no pages allocated and ends before the 32-bit boundary.
+				} else {
+					// Range ends past the 32-bit boundary. It could have some pages allocated,
+					// but if we're here, we know that nothing is allocated above the boundary,
+					// so we want to create a new range with it regardless.
+					if (rangeStart < post32bitAddr)
+						rangeStart = post32bitAddr;
+				}
+
+				addr_range& allocatedRange =
+					args->physical_allocated_range[args->num_physical_allocated_ranges++];
+				allocatedRange.start = rangeStart;
+				allocatedRange.size = 0;
+
+				if (rangeStart >= post32bitAddr)
+					break;
+				if (args->num_physical_allocated_ranges == MAX_PHYSICAL_ALLOCATED_RANGE)
+					break;
+			}
+		}
+	}
+#endif
+
 	// Try expanding the existing physical ranges upwards.
-	for (int32 i = args->num_physical_allocated_ranges - 1; i > 0; i--) {
+	for (int32 i = args->num_physical_allocated_ranges - 1; i >= 0; i--) {
 		addr_range& range = args->physical_allocated_range[i];
 		phys_addr_t nextPage = range.start + range.size;
 
@@ -4400,15 +4450,15 @@ vm_allocate_early_physical_page_etc(kernel_args* args, phys_addr_t maxAddress)
 
 	// Try starting a new range.
 	if (args->num_physical_allocated_ranges < MAX_PHYSICAL_ALLOCATED_RANGE) {
-		const addr_range& lastRange =
+		const addr_range& lastAllocatedRange =
 			args->physical_allocated_range[args->num_physical_allocated_ranges - 1];
-		const phys_addr_t lastPage = lastRange.start + lastRange.size;
+		const phys_addr_t lastAllocatedPage = lastAllocatedRange.start + lastAllocatedRange.size;
 
 		phys_addr_t nextPage = 0;
 		for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
 			const addr_range& range = args->physical_memory_range[i];
 			// Ignore everything before the last-allocated page, as well as small ranges.
-			if (range.start < lastPage || range.size < (B_PAGE_SIZE * 128))
+			if (range.start < lastAllocatedPage || range.size < (B_PAGE_SIZE * 128))
 				continue;
 			if (range.start > maxAddress)
 				break;
@@ -4420,8 +4470,7 @@ vm_allocate_early_physical_page_etc(kernel_args* args, phys_addr_t maxAddress)
 		if (nextPage != 0) {
 			// we got one!
 			addr_range& range =
-				args->physical_allocated_range[args->num_physical_allocated_ranges];
-			args->num_physical_allocated_ranges++;
+				args->physical_allocated_range[args->num_physical_allocated_ranges++];
 			range.start = nextPage;
 			range.size = B_PAGE_SIZE;
 			return nextPage / B_PAGE_SIZE;
