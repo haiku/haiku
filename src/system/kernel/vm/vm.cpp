@@ -4324,9 +4324,8 @@ is_page_in_physical_memory_range(kernel_args* args, phys_addr_t address)
 	// TODO: horrible brute-force method of determining if the page can be
 	// allocated
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		if (address >= args->physical_memory_range[i].start
-			&& address < (args->physical_memory_range[i].start
-				+ args->physical_memory_range[i].size))
+		const addr_range& range = args->physical_memory_range[i];
+		if (address >= range.start && address < (range.start + range.size))
 			return true;
 	}
 	return false;
@@ -4343,38 +4342,39 @@ vm_allocate_early_physical_page(kernel_args* args)
 
 	// Try expanding the existing physical ranges upwards.
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
-		phys_addr_t nextPage = args->physical_allocated_range[i].start
-			+ args->physical_allocated_range[i].size;
+		addr_range& range = args->physical_allocated_range[i];
+		phys_addr_t nextPage = range.start + range.size;
 
 		// make sure the next page does not collide with the next allocated range
-		if ((i + 1) < args->num_physical_allocated_ranges
-				&& args->physical_allocated_range[i + 1].size != 0) {
-			if (nextPage >= args->physical_allocated_range[i + 1].start)
+		if ((i + 1) < args->num_physical_allocated_ranges) {
+			addr_range& nextRange = args->physical_allocated_range[i + 1];
+			if (nextRange.size != 0 && nextPage >= nextRange.start)
 				continue;
 		}
 		// see if the next page fits in the memory block
 		if (is_page_in_physical_memory_range(args, nextPage)) {
 			// we got one!
-			args->physical_allocated_range[i].size += B_PAGE_SIZE;
+			range.size += B_PAGE_SIZE;
 			return nextPage / B_PAGE_SIZE;
 		}
 	}
 
 	// Expanding upwards didn't work, try going downwards.
 	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
-		phys_addr_t nextPage = args->physical_allocated_range[i].start - B_PAGE_SIZE;
+		addr_range& range = args->physical_allocated_range[i];
+		phys_addr_t nextPage = range.start - B_PAGE_SIZE;
 
 		// make sure the next page does not collide with the previous allocated range
-		if ((i > 0) && args->physical_allocated_range[i - 1].size != 0) {
-			if (nextPage < args->physical_allocated_range[i - 1].start
-					+ args->physical_allocated_range[i - 1].size)
+		if (i > 0) {
+			addr_range& previousRange = args->physical_allocated_range[i - 1];
+			if (previousRange.size != 0 && nextPage < (previousRange.start + previousRange.size))
 				continue;
 		}
 		// see if the next physical page fits in the memory block
 		if (is_page_in_physical_memory_range(args, nextPage)) {
 			// we got one!
-			args->physical_allocated_range[i].start -= B_PAGE_SIZE;
-			args->physical_allocated_range[i].size += B_PAGE_SIZE;
+			range.start -= B_PAGE_SIZE;
+			range.size += B_PAGE_SIZE;
 			return nextPage / B_PAGE_SIZE;
 		}
 	}
