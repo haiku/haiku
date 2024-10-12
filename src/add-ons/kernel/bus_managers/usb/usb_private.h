@@ -15,6 +15,7 @@
 
 #include "usbspec_private.h"
 #include <lock.h>
+#include <Referenceable.h>
 #include <util/Vector.h>
 
 // include vm.h before iovec_support.h for generic_memcpy, which is used by the bus drivers.
