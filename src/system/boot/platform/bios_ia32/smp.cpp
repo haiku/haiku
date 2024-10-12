@@ -30,7 +30,7 @@
 
 #define NO_SMP 0
 
-#define TRACE_SMP
+//#define TRACE_SMP
 #ifdef TRACE_SMP
 #	define TRACE(x) dprintf x
 #else
@@ -84,22 +84,22 @@ static status_t
 smp_do_mp_config(mp_floating_struct *floatingStruct)
 {
 	if (floatingStruct->config_length != 1) {
-		TRACE(("smp: unsupported structure length of %" B_PRIu8 " units\n",
-			floatingStruct->config_length));
+		dprintf("smp: unsupported structure length of %" B_PRIu8 " units\n",
+			floatingStruct->config_length);
 		return B_UNSUPPORTED;
 	}
 
-	TRACE(("smp: intel mp version %s, %s",
+	dprintf("smp: intel mp version %s, %s",
 		(floatingStruct->spec_revision == 1) ? "1.1" : "1.4",
 		(floatingStruct->mp_feature_2 & 0x80)
 			? "imcr and pic compatibility mode.\n"
-			: "virtual wire compatibility mode.\n"));
+			: "virtual wire compatibility mode.\n");
 
 	if (floatingStruct->config_table == NULL) {
 #if 1
 		// TODO: need to implement
-		TRACE(("smp: standard configuration %d unimplemented\n",
-			floatingStruct->mp_feature_1));
+		dprintf("smp: standard configuration %d unimplemented\n",
+			floatingStruct->mp_feature_1);
 		gKernelArgs.num_cpus = 1;
 		return B_OK;
 #else
@@ -123,28 +123,28 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 	gKernelArgs.num_cpus = 0;
 
 	if (config->signature != MP_CONFIG_TABLE_SIGNATURE) {
-		TRACE(("smp: invalid config table signature, aborting\n"));
+		dprintf("smp: invalid config table signature, aborting\n");
 		return B_ERROR;
 	}
 
 	if (config->base_table_length < sizeof(mp_config_table)) {
-		TRACE(("smp: config table length %" B_PRIu16
+		dprintf("smp: config table length %" B_PRIu16
 			" too short for structure, aborting\n",
-			config->base_table_length));
+			config->base_table_length);
 		return B_ERROR;
 	}
 
 	// print our new found configuration.
-	TRACE(("smp: oem id: %.8s product id: %.12s\n", config->oem,
-		config->product));
-	TRACE(("smp: base table has %d entries, extended section %d bytes\n",
-		config->num_base_entries, config->ext_length));
+	dprintf("smp: oem id: %.8s product id: %.12s\n", config->oem,
+		config->product);
+	dprintf("smp: base table has %d entries, extended section %d bytes\n",
+		config->num_base_entries, config->ext_length);
 
 	gKernelArgs.arch_args.apic_phys = (uint32)config->apic;
 	if ((gKernelArgs.arch_args.apic_phys % 4096) != 0) {
 		// MP specs mandate a 4K alignment for the local APIC(s)
-		TRACE(("smp: local apic %p has bad alignment, aborting\n",
-			(void *)gKernelArgs.arch_args.apic_phys));
+		dprintf("smp: local apic %p has bad alignment, aborting\n",
+			(void *)gKernelArgs.arch_args.apic_phys);
 		return B_ERROR;
 	}
 
@@ -190,13 +190,14 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 			}
 			case MP_BASE_BUS:
 			{
+#ifdef TRACE_SMP
 				struct mp_base_bus *bus = (struct mp_base_bus *)pointer;
+#endif
 				pointer += sizeof(struct mp_base_bus);
 
 				TRACE(("smp: bus %d: %c%c%c%c%c%c\n", bus->bus_id,
 					bus->name[0], bus->name[1], bus->name[2], bus->name[3],
 					bus->name[4], bus->name[5]));
-
 				break;
 			}
 			case MP_BASE_IO_APIC:
@@ -239,7 +240,7 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 	}
 
 	if (gKernelArgs.num_cpus == 0) {
-		TRACE(("smp: didn't find any processors, aborting\n"));
+		dprintf("smp: didn't find any processors, aborting\n");
 		return B_ERROR;
 	}
 
@@ -255,7 +256,7 @@ smp_do_mp_config(mp_floating_struct *floatingStruct)
 static status_t
 smp_do_acpi_config(void)
 {
-	TRACE(("smp: using ACPI to detect MP configuration\n"));
+	dprintf("smp: using ACPI to detect MP configuration\n");
 
 	// reset CPU count
 	gKernelArgs.num_cpus = 0;
@@ -263,12 +264,12 @@ smp_do_acpi_config(void)
 	acpi_madt *madt = (acpi_madt *)acpi_find_table(ACPI_MADT_SIGNATURE);
 
 	if (madt == NULL) {
-		TRACE(("smp: Failed to find MADT!\n"));
+		dprintf("smp: Failed to find MADT!\n");
 		return B_ERROR;
 	}
 
 	gKernelArgs.arch_args.apic_phys = madt->local_apic_address;
-	TRACE(("smp: local apic address is 0x%x\n", madt->local_apic_address));
+	dprintf("smp: local apic address is 0x%x\n", madt->local_apic_address);
 
 	acpi_apic *apic = (acpi_apic *)((uint8 *)madt + sizeof(acpi_madt));
 	acpi_apic *end = (acpi_apic *)((uint8 *)madt + madt->header.length);
@@ -283,10 +284,10 @@ smp_do_acpi_config(void)
 				}
 
 				acpi_local_apic *localApic = (acpi_local_apic *)apic;
-				TRACE(("smp: found local APIC with id %u\n",
-					localApic->apic_id));
+				dprintf("smp: found local APIC with id %u\n",
+					localApic->apic_id);
 				if ((localApic->flags & ACPI_LOCAL_APIC_ENABLED) == 0) {
-					TRACE(("smp: APIC is disabled and will not be used\n"));
+					dprintf("smp: APIC is disabled and will not be used\n");
 					break;
 				}
 
@@ -301,8 +302,8 @@ smp_do_acpi_config(void)
 
 			case ACPI_MADT_IO_APIC: {
 				acpi_io_apic *ioApic = (acpi_io_apic *)apic;
-				TRACE(("smp: found io APIC with id %u and address 0x%x\n",
-					ioApic->io_apic_id, ioApic->io_apic_address));
+				dprintf("smp: found io APIC with id %u and address 0x%x\n",
+					ioApic->io_apic_id, ioApic->io_apic_address);
 				if (gKernelArgs.arch_args.ioapic_phys == 0)
 					gKernelArgs.arch_args.ioapic_phys = ioApic->io_apic_address;
 				break;
@@ -348,8 +349,8 @@ calculate_apic_timer_conversion_factor(void)
 	gKernelArgs.arch_args.apic_time_cv_factor
 		= (uint32)((1000000.0/(t2 - t1)) * count);
 
-	TRACE(("APIC ticks/sec = %d\n",
-		gKernelArgs.arch_args.apic_time_cv_factor));
+	dprintf("APIC ticks/sec = %d\n",
+		gKernelArgs.arch_args.apic_time_cv_factor);
 }
 
 
@@ -377,12 +378,12 @@ smp_init_other_cpus(void)
 {
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_SMP, false)) {
 		// SMP has been disabled!
-		TRACE(("smp disabled per safemode setting\n"));
+		dprintf("smp disabled per safemode setting\n");
 		gKernelArgs.num_cpus = 1;
 	}
 
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_APIC, false)) {
-		TRACE(("local apic disabled per safemode setting, disabling smp\n"));
+		dprintf("local apic disabled per safemode setting, disabling smp\n");
 		gKernelArgs.arch_args.apic_phys = 0;
 		gKernelArgs.num_cpus = 1;
 	}
@@ -390,17 +391,17 @@ smp_init_other_cpus(void)
 	if (gKernelArgs.arch_args.apic_phys == 0)
 		return;
 
-	TRACE(("smp: found %d cpu%s\n", gKernelArgs.num_cpus,
-		gKernelArgs.num_cpus != 1 ? "s" : ""));
-	TRACE(("smp: apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys));
-	TRACE(("smp: ioapic_phys = %p\n",
-		(void *)gKernelArgs.arch_args.ioapic_phys));
+	dprintf("smp: found %d cpu%s\n", gKernelArgs.num_cpus,
+		gKernelArgs.num_cpus != 1 ? "s" : "");
+	dprintf("smp: apic_phys = %p\n", (void *)gKernelArgs.arch_args.apic_phys);
+	dprintf("smp: ioapic_phys = %p\n",
+		(void *)gKernelArgs.arch_args.ioapic_phys);
 
 	// map in the apic
 	gKernelArgs.arch_args.apic = (void *)mmu_map_physical_memory(
 		gKernelArgs.arch_args.apic_phys, B_PAGE_SIZE, kDefaultPageFlags);
 
-	TRACE(("smp: apic (mapped) = %p\n", (void *)gKernelArgs.arch_args.apic));
+	dprintf("smp: apic (mapped) = %p\n", (void *)gKernelArgs.arch_args.apic);
 
 	// calculate how fast the apic timer is
 	calculate_apic_timer_conversion_factor();
@@ -489,8 +490,8 @@ smp_boot_other_cpus(void (*entryFunc)(void))
 			apic_read(APIC_ERROR_STATUS);
 		}
 
-//dprintf("assert INIT\n");
 		/* send (aka assert) INIT IPI */
+		TRACE(("assert INIT\n"));
 		config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
 			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
 		apic_write(APIC_INTR_COMMAND_2, config); /* set target pe */
@@ -499,13 +500,13 @@ smp_boot_other_cpus(void (*entryFunc)(void))
 			| APIC_DELIVERY_MODE_INIT;
 		apic_write(APIC_INTR_COMMAND_1, config);
 
-dprintf("wait for delivery\n");
 		// wait for pending to end
+		TRACE(("wait for delivery\n"));
 		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 			asm volatile ("pause;");
 
-dprintf("deassert INIT\n");
 		/* deassert INIT */
+		TRACE(("deassert INIT\n"));
 		config = (apic_read(APIC_INTR_COMMAND_2) & APIC_INTR_COMMAND_2_MASK)
 			| (gKernelArgs.arch_args.cpu_apic_id[i] << 24);
 		apic_write(APIC_INTR_COMMAND_2, config);
@@ -513,8 +514,8 @@ dprintf("deassert INIT\n");
 			| APIC_TRIGGER_MODE_LEVEL | APIC_DELIVERY_MODE_INIT;
 		apic_write(APIC_INTR_COMMAND_1, config);
 
-dprintf("wait for delivery\n");
 		// wait for pending to end
+		TRACE(("wait for delivery\n"));
 		while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 			asm volatile ("pause;");
 
@@ -524,10 +525,11 @@ dprintf("wait for delivery\n");
 		/* is this a local apic or an 82489dx ? */
 		numStartups = (gKernelArgs.arch_args.cpu_apic_version[i] & 0xf0)
 			? 2 : 0;
-dprintf("num startups = %d\n", numStartups);
+		TRACE(("num startups = %d\n", numStartups));
+
 		for (j = 0; j < numStartups; j++) {
 			/* it's a local apic, so send STARTUP IPIs */
-dprintf("send STARTUP\n");
+			TRACE(("send STARTUP\n"));
 			apic_write(APIC_ERROR_STATUS, 0);
 
 			/* set target pe */
@@ -543,7 +545,7 @@ dprintf("send STARTUP\n");
 			/* wait */
 			spin(200);
 
-dprintf("wait for delivery\n");
+			TRACE(("wait for delivery\n"));
 			while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 				asm volatile ("pause;");
 		}
