@@ -4341,12 +4341,12 @@ vm_allocate_early_physical_page(kernel_args* args)
 	}
 
 	// Try expanding the existing physical ranges upwards.
-	for (uint32 i = 0; i < args->num_physical_allocated_ranges; i++) {
+	for (int32 i = args->num_physical_allocated_ranges - 1; i > 0; i--) {
 		addr_range& range = args->physical_allocated_range[i];
 		phys_addr_t nextPage = range.start + range.size;
 
 		// make sure the next page does not collide with the next allocated range
-		if ((i + 1) < args->num_physical_allocated_ranges) {
+		if ((i + 1) < (int32)args->num_physical_allocated_ranges) {
 			addr_range& nextRange = args->physical_allocated_range[i + 1];
 			if (nextRange.size != 0 && nextPage >= nextRange.start)
 				continue;
