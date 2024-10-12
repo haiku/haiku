@@ -39,7 +39,6 @@ Stack::Stack()
 		return;
 	}
 
-
 	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
 	fObjectArray = (Object **)malloc(objectArraySize);
 	if (fObjectArray == NULL) {
@@ -90,7 +89,7 @@ Stack::~Stack()
 status_t
 Stack::InitCheck()
 {
-	return B_OK;
+	return (fExploreThread >= 0) ? B_OK : B_NO_INIT;
 }
 
 
