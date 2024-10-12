@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1608736682
+1	russian	x-vnd.Haiku-libtracker	2306084894
 Created	ContainerWindow		Создан
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Открыть и сделать предпочтительным
@@ -56,6 +56,7 @@ Select…	ContainerWindow		Выделить…
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков
 Size	PoseView		Размер
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
+Clear history?	FindPanel		Очистить историю?
 Title	Bookmark Query Columns		Заголовок
 Identify	ContainerWindow		Опознать
 Create link	ContainerWindow		Создать ссылку в
@@ -117,7 +118,7 @@ Clear temporary queries only	FindPanel		Только временные запр
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байта} other{# байтов}}
 8-bit integer	AttributesView		8-битное целое
 8-bit unsigned integer	AttributesView		8-битное целое без знака
-%s info	InfoWindow	window title	Информация о %s
+%s info	InfoWindow	window title	Сведения о «%s»
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used занято -- %free свободно)
 Hide dotfiles	SettingsView		Скрывать файлы, начинающиеся с точки
 Trash	Model		Корзина
@@ -163,7 +164,7 @@ The target disk does not support creating links.	FSUtils		Принимающий
 develop	B_SYSTEM_DEVELOP_DIRECTORY		Разработка
 64-bit integer	AttributesView		64-битное целое
 Cut more	ContainerWindow		Вырезать ещё
-The Tracker must be running to see Info windows.	PoseView		Для просмотра окна Информация должен быть запущен Tracker.
+The Tracker must be running to see Info windows.	PoseView		Для просмотра окна «Информация» должен быть запущен Tracker.
 Tracker preferences	TrackerSettingsWindow		Настройки Tracker
 Read	FilePermissionsView		Чтение
 There was an error writing the attribute.	WidgetAttributeText		Произошла ошибка при записи атрибута.
@@ -171,7 +172,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Filesystem:	InfoWindow		Файловая система:
 Could not open \"%name\" (%error). 	FSUtils		Невозможно открыть \"%name\" (%error). 
 Media parameter group	AttributesView		Группа параметров медиа
-%name info	InfoWindow	InfoWindow Title	Информация о %name
+%name info	InfoWindow	InfoWindow Title	Сведения о «%name»
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Если вы переместите home, %osName может начать работать неверно!\n\nВы уверены, что хотите это сделать?\n\nЧтобы переместить папку home или её содержимое, зажмите клавишу Shift и нажмите \"Переместить\".
 Property info	AttributesView		Информация о свойствах
 Sorry, you can't create links in the Trash.	PoseView		Извините, но вы не можете создавать ссылки в корзине.

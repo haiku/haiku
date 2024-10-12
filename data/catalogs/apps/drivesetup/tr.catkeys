@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	1140196651
+1	turkish	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		%s bölüntüsü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Aygıt
 Initialize	MainWindow		İlklendir
 Could not change the parameters of the selected partition.	MainWindow		Seçili bölüntünün parametreleri değiştirilemedi.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” bölüntüsündeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
 PGP encrypted	Encryption utils		PGP şifreli
 Delete partition	MainWindow		Bölüntüyü sil
 Error: 	MainWindow	in any error alert	Hata: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Verilen ayarların doğru
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		“%s” bölüntüsünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 DriveSetup	System name		Disk İzlencesi
 Mounted at	PartitionList		Bağlama noktası
+Disk system %s not found!	MainWindow		Disk sistemi %s bulunamadı!
 Create…	MainWindow		Oluştur…
 Write changes	MainWindow		Değişiklikleri yaz
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		%s bölüntüsünün ilklendirilmesi başarısız oldu (Diske hiçbir şey yazılmadı).
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		%s bölüntüsünün bağlant
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölüntünün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüntü artık başka işletim sistemleri tarafından tanınamayabilir!
 Boot	PartitionList		Önyükleme
 OK	AbstractParametersPanel		Tamam
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Şimdi diske değişiklikleri geri yazmak istediğinizden emin misiniz?\n\n“%s” diskindeki tüm veri geri getirilemeyecek biçimde kaybolacaktır!
 Virtual	PartitionList		Sanal
 Virtual	DiskView		Sanal
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nSeçili disk üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
