@@ -81,7 +81,6 @@ static uint32 *sPageDirectory = 0;
 #ifdef _PXE_ENV
 
 static addr_t sNextPhysicalAddress = 0x112000;
-static addr_t sNextPhysicalKernelAddress = kIdentityMapEnd;
 static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0x7d000;
@@ -91,7 +90,6 @@ static const uint32 kPageTableRegionEnd = 0x8b000;
 #else
 
 static addr_t sNextPhysicalAddress = 0x100000;
-static addr_t sNextPhysicalKernelAddress = kIdentityMapEnd;
 static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
 
 static addr_t sNextPageTableAddress = 0x90000;
@@ -102,7 +100,7 @@ static const uint32 kPageTableRegionEnd = 0x9e000;
 
 
 static addr_t
-allocate_virtual(size_t size)
+get_next_virtual_address(size_t size)
 {
 	addr_t address = sNextVirtualAddress;
 	sNextVirtualAddress += size;
@@ -112,32 +110,21 @@ allocate_virtual(size_t size)
 
 
 static addr_t
-allocate_physical(size_t size, bool forKernel)
+get_next_physical_address(size_t size)
 {
 	if ((size % B_PAGE_SIZE) != 0)
 		panic("request for non-page-aligned physical memory!");
 
 	uint64 base;
-	if (!forKernel) {
-		base = sNextPhysicalAddress;
-		if ((base + size) > kIdentityMapEnd) {
-			panic("Out of identity-map physical memory!");
-			return 0;
-		}
-
-		sNextPhysicalAddress += size;
-		return base;
-	}
-
 	if (!get_free_address_range(gKernelArgs.physical_allocated_range,
-			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalKernelAddress,
+			gKernelArgs.num_physical_allocated_ranges, sNextPhysicalAddress,
 			size, &base)) {
 		panic("Out of physical memory!");
 		return 0;
 	}
 
 	insert_physical_allocated_range(base, size);
-	sNextPhysicalKernelAddress = base + size;
+	sNextPhysicalAddress = base + size;
 		// TODO: Can overflow theoretically.
 
 	return base;
@@ -147,14 +134,14 @@ allocate_physical(size_t size, bool forKernel)
 static addr_t
 get_next_virtual_page()
 {
-	return allocate_virtual(B_PAGE_SIZE);
+	return get_next_virtual_address(B_PAGE_SIZE);
 }
 
 
 static addr_t
 get_next_physical_page()
 {
-	return allocate_physical(B_PAGE_SIZE, true);
+	return get_next_physical_address(B_PAGE_SIZE);
 }
 
 
@@ -167,7 +154,7 @@ get_next_page_table()
 
 	addr_t address = sNextPageTableAddress;
 	if (address >= kPageTableRegionEnd)
-		return (uint32 *)allocate_physical(B_PAGE_SIZE, false);
+		return (uint32 *)get_next_physical_page();
 
 	sNextPageTableAddress += B_PAGE_SIZE;
 	return (uint32 *)address;
@@ -337,7 +324,7 @@ init_page_directory(void)
 	TRACE("init_page_directory\n");
 
 	// allocate a new pgdir
-	sPageDirectory = (uint32 *)allocate_physical(B_PAGE_SIZE, false);
+	sPageDirectory = (uint32 *)get_next_physical_page();
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 
 	// clear out the pgdir
@@ -647,7 +634,7 @@ mmu_init(void)
 
 	gKernelArgs.arch_args.virtual_end = KERNEL_LOAD_BASE;
 
-	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalKernelAddress;
+	gKernelArgs.physical_allocated_range[0].start = sNextPhysicalAddress;
 	gKernelArgs.physical_allocated_range[0].size = 0;
 	gKernelArgs.num_physical_allocated_ranges = 1;
 		// remember the start of the allocated physical pages
@@ -831,9 +818,12 @@ ssize_t
 platform_allocate_heap_region(size_t size, void **_base)
 {
 	size = ROUNDUP(size, B_PAGE_SIZE);
-	addr_t base = allocate_physical(size, false);
+	addr_t base = get_next_physical_address(size);
 	if (base == 0)
 		return B_NO_MEMORY;
+
+	if ((base + size) > kIdentityMapEnd)
+		panic("platform_allocate_heap_region: region end is beyond identity map");
 
 	*_base = (void*)base;
 	return size;
@@ -844,6 +834,7 @@ void
 platform_free_heap_region(void *_base, size_t size)
 {
 	addr_t base = (addr_t)_base;
+	remove_physical_allocated_range(base, size);
 	if (sNextPhysicalAddress == (base + size))
 		sNextPhysicalAddress -= size;
 
