@@ -14,6 +14,7 @@
 #include <OS.h>
 
 #include <errno_private.h>
+#include <time_private.h>
 #include <syscall_utils.h>
 
 #include <syscalls.h>
@@ -106,11 +107,9 @@ clock_nanosleep(clockid_t clockID, int flags, const struct timespec* time,
 	struct timespec* remainingTime)
 {
 	// convert time to microseconds (round up)
-	if (time->tv_sec < 0 || time->tv_nsec < 0 || time->tv_nsec >= 1000000000)
+	bigtime_t microSeconds;
+	if (!timespec_to_bigtime(*time, microSeconds))
 		RETURN_AND_TEST_CANCEL(EINVAL);
-
-	bigtime_t microSeconds = (bigtime_t)time->tv_sec * 1000000
-		+ (time->tv_nsec + 999) / 1000;
 
 	// get timeout flags
 	uint32 timeoutFlags;
