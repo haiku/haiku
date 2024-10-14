@@ -97,8 +97,6 @@ options:
                               GDB for each arch we build the cross-tools for.
   --use-stack-protector       Build with stack protection enabled
   --efi-signing-key           Private keyfile to sign any EFI bootloaders
-  --with-python <python>      Specify python to use, instead of system
-                              default.
 
 environment variables:
   CC                          The host compiler. Defaults to "gcc".
@@ -572,7 +570,7 @@ configureDir=`dirname $configurePath`
 configureEnvirons=
 for var in `env`; do
 	case "$var" in
-		CC\=*|HAIKU*\=*|JAMSHELL\=*)
+		CC\=*|HAIKU*\=*|JAMSHELL\=*|HOST_PYTHON\=*)
 			configureEnvirons="$configureEnvirons $var"
 			;;
 	esac
@@ -833,7 +831,6 @@ while [ $# -gt 0 ] ; do
 			HAIKU_EFI_SIGNING_KEY="$2"
 			shift 2
 			;;
-		--with-python)	pythonPath=$2; shift 2;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -883,24 +880,25 @@ if ! $JAMSHELL -c true; then
 fi
 
 # locate python
-if [ -n "$pythonPath" ] && "$pythonPath" --version < /dev/null > /dev/null 2>&1; then
-	HOST_PYTHON="$pythonPath"
-elif python3 --version < /dev/null > /dev/null 2>&1; then
-	HOST_PYTHON="python3"
-elif python --version < /dev/null > /dev/null 2>&1; then
-	HOST_PYTHON="python"
-else
-	echo "a python interpreter is required"
-	exit 1
+if [ -z "$HOST_PYTHON" ]; then
+	if python3 --version < /dev/null > /dev/null 2>&1; then
+		HOST_PYTHON="python3"
+	elif python --version < /dev/null > /dev/null 2>&1; then
+		HOST_PYTHON="python"
+	else
+		echo "a python interpreter is required"
+		exit 1
+	fi
 fi
 
 # check is python is new enough
 # usage of python by HDS requires at least 3.9
-PYTHON_VERSION=$("$HOST_PYTHON" --version | sed -e 's/Python //')
+PYTHON_VERSION=$("$HOST_PYTHON" --version 2>&1 | sed -e 's/Python //')
 
 case $PYTHON_VERSION in
 	2.* | 3.[1-8].*)
-		echo "Python $PYTHON_VERSION is too old, need at least Python 3.9"
+		echo "Python $PYTHON_VERSION is too old; need at least Python 3.9."
+		echo "(maybe specify a Python interpreter to use in HOST_PYTHON?)"
 		exit 1
 		;;
 	*)
