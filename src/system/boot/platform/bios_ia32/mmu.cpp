@@ -114,6 +114,9 @@ allocate_virtual(size_t size)
 static addr_t
 allocate_physical(size_t size, bool forKernel)
 {
+	if ((size % B_PAGE_SIZE) != 0)
+		panic("request for non-page-aligned physical memory!");
+
 	uint64 base;
 	if (!forKernel) {
 		base = sNextPhysicalAddress;
@@ -406,7 +409,7 @@ mmu_allocate(void *virtualAddress, size_t size)
 	TRACE("mmu_allocate: requested vaddr: %p, next free vaddr: 0x%lx, size: "
 		"%ld\n", virtualAddress, sNextVirtualAddress, size);
 
-	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+	size = HOWMANY(size, B_PAGE_SIZE);
 		// get number of pages to map
 
 	if (virtualAddress != NULL) {
@@ -419,7 +422,7 @@ mmu_allocate(void *virtualAddress, size_t size)
 
 		// is the address within the valid range?
 		if (address < KERNEL_LOAD_BASE || address + size * B_PAGE_SIZE
-			>= KERNEL_LOAD_BASE + kMaxKernelSize)
+				>= KERNEL_LOAD_BASE + kMaxKernelSize)
 			return NULL;
 
 		for (uint32 i = 0; i < size; i++) {
@@ -497,7 +500,8 @@ mmu_free(void *virtualAddress, size_t size)
 	addr_t address = (addr_t)virtualAddress;
 	addr_t pageOffset = address % B_PAGE_SIZE;
 	address -= pageOffset;
-	size = (size + pageOffset + B_PAGE_SIZE - 1) / B_PAGE_SIZE * B_PAGE_SIZE;
+	size += pageOffset;
+	size = ROUNDUP(size, B_PAGE_SIZE);
 
 	// is the address within the valid range?
 	if (address < KERNEL_LOAD_BASE || address + size > sNextVirtualAddress) {
