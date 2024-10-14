@@ -4216,7 +4216,7 @@ allocate_kernel_args(kernel_args* args)
 	TRACE(("allocate_kernel_args()\n"));
 
 	for (uint32 i = 0; i < args->num_kernel_args_ranges; i++) {
-		const addr_range& range = args->virtual_allocated_range[i];
+		const addr_range& range = args->kernel_args_range[i];
 		void* address = (void*)(addr_t)range.start;
 
 		create_area("_kernel args_", &address, B_EXACT_ADDRESS,
