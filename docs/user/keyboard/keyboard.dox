@@ -247,7 +247,7 @@ For Japanese keyboard two more constants are defined:
 \section keymap The Keymap
 
 The characters produced by each of the key codes is determined by the keymap.
-The usual way to for the user to choose and modify their keymap is the
+The usual way for the user to choose and modify their keymap is the
 Keymap preference application. A number of alternative keymaps such as dvorak
 and keymaps for different locales are available.
 
