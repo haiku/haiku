@@ -26,18 +26,10 @@
 
 typedef __haiku_uint32 fd_mask;
 
-#ifndef _howmany
-#	define _howmany(x, y) (((x) + ((y) - 1)) / (y))
-#endif
-
-#ifndef howmany
-#	define howmany(x, y) (((x) + ((y) - 1)) / (y))
-#endif
-
 #define NFDBITS (sizeof(fd_mask) * 8)	/* bits per mask */
 
 typedef struct fd_set {
-	fd_mask bits[_howmany(FD_SETSIZE, NFDBITS)];
+	fd_mask bits[((FD_SETSIZE) + ((NFDBITS) - 1)) / (NFDBITS)];
 } fd_set;
 
 #define _FD_BITSINDEX(fd) ((fd) / NFDBITS)
@@ -53,6 +45,7 @@ typedef struct fd_set {
 #define FD_COPY(source, target) (*(target) = *(source))
 
 #endif	/* FD_SET */
+
 
 #ifdef __cplusplus
 extern "C" {
