@@ -118,7 +118,6 @@ PowerStatusView::_Init()
 	fShowStatusIcon = true;
 
 	fPercent = 1.0;
-	fOnline = true;
 	fTimeLeft = 0;
 
 	fHasNotifiedLowBattery = false;
@@ -170,6 +169,7 @@ void
 PowerStatusView::_DrawBattery(BView* view, BRect rect)
 {
 	BRect lightningRect = rect;
+	BRect pauseRect = rect;
 	float quarter = floorf((rect.Height() + 1) / 4);
 	rect.top += quarter;
 	rect.bottom -= quarter;
@@ -180,6 +180,8 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 	rect.left += rect.Width() / 11;
 	lightningRect.left = rect.left;
 	lightningRect.InsetBy(0.0f, 5.0f * rect.Height() / 16);
+	pauseRect.left = rect.left;
+	pauseRect.InsetBy(rect.Width() * 0.1f, rect.Height() * 0.4f);
 
 	if (view->LowColor().IsLight())
 		view->SetHighColor(0, 0, 0);
@@ -280,7 +282,7 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 		}
 	}
 
-	if (fOnline) {
+	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0) {
 		// When charging, draw a lightning symbol over the battery.
 		view->SetHighColor(255, 255, 0, 180);
 		view->SetDrawingMode(B_OP_ALPHA);
@@ -294,6 +296,26 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 			BPoint(9, 10)
 		};
 		view->FillPolygon(points, 6, lightningRect);
+
+		view->SetDrawingMode(B_OP_OVER);
+	} else if ((fBatteryInfo.state
+			& (BATTERY_CHARGING | BATTERY_DISCHARGING | BATTERY_CRITICAL_STATE)) == 0) {
+		// When a battery is not in use at all, draw a pause symbol over the battery
+		view->SetHighColor(0, 0, 0, 96);
+		view->SetDrawingMode(B_OP_ALPHA);
+
+		static const BPoint points[] = {
+			BPoint(1, 3),
+			BPoint(1, 6),
+			BPoint(8, 6),
+			BPoint(8, 3),
+
+			BPoint(14, 3),
+			BPoint(14, 6),
+			BPoint(22, 6),
+			BPoint(22, 3)
+		};
+		view->FillPolygon(points, 8, pauseRect);
 
 		view->SetDrawingMode(B_OP_OVER);
 	}
@@ -377,7 +399,8 @@ PowerStatusView::_SetLabel(char* buffer, size_t bufferLength)
 
 	const char* open = "";
 	const char* close = "";
-	if (fOnline) {
+	if ((fBatteryInfo.state & BATTERY_DISCHARGING) == 0) {
+		// surround the percentage with () if the battery is not discharging
 		open = "(";
 		close = ")";
 	}
@@ -403,18 +426,16 @@ PowerStatusView::Update(bool force, bool notify)
 {
 	double previousPercent = fPercent;
 	time_t previousTimeLeft = fTimeLeft;
-	bool wasOnline = fOnline;
+	bool wasCharging = (fBatteryInfo.state & BATTERY_CHARGING);
 	bool hadBattery = fHasBattery;
 	_GetBatteryInfo(fBatteryID, &fBatteryInfo);
 	fHasBattery = fBatteryInfo.full_capacity > 0;
 
 	if (fBatteryInfo.full_capacity > 0 && fHasBattery) {
 		fPercent = (double)fBatteryInfo.capacity / fBatteryInfo.full_capacity;
-		fOnline = (fBatteryInfo.state & BATTERY_DISCHARGING) == 0;
 		fTimeLeft = fBatteryInfo.time_left;
 	} else {
 		fPercent = 0.0;
-		fOnline = false;
 		fTimeLeft = -1;
 	}
 
@@ -422,7 +443,6 @@ PowerStatusView::Update(bool force, bool notify)
 		// Just ignore this probe -- it obviously returned invalid values
 		fPercent = previousPercent;
 		fTimeLeft = previousTimeLeft;
-		fOnline = wasOnline;
 		fHasBattery = hadBattery;
 		return;
 	}
@@ -441,7 +461,8 @@ PowerStatusView::Update(bool force, bool notify)
 			char text[256];
 			const char* open = "";
 			const char* close = "";
-			if (fOnline) {
+			if ((fBatteryInfo.state & BATTERY_DISCHARGING) == 0) {
+				// surround the percentage with () if the battery is not discharging
 				open = "(";
 				close = ")";
 			}
@@ -498,7 +519,7 @@ PowerStatusView::Update(bool force, bool notify)
 		}
 	}
 
-	if (force || wasOnline != fOnline
+	if (force || wasCharging != (fBatteryInfo.state & BATTERY_CHARGING)
 		|| (fShowTime && fTimeLeft != previousTimeLeft)
 		|| (!fShowTime && fPercent != previousPercent)) {
 		Invalidate();
@@ -512,13 +533,13 @@ PowerStatusView::Update(bool force, bool notify)
 		|| (fTimeLeft <= kLowBatteryTimeLeft
 			&& previousTimeLeft > kLowBatteryTimeLeft);
 
-	if (!fOnline && notify && fHasBattery
+	if ((fBatteryInfo.state & BATTERY_DISCHARGING) != 0 && notify && fHasBattery
 		&& !fHasNotifiedLowBattery && justTurnedLowBattery) {
 		_NotifyLowBattery();
 		fHasNotifiedLowBattery = true;
 	}
 
-	if (fOnline && fPercent >= kFullBatteryPercentage
+	if ((fBatteryInfo.state & BATTERY_CHARGING) != 0 && fPercent >= kFullBatteryPercentage
 		&& previousPercent < kFullBatteryPercentage) {
 		system_beep("Battery charged");
 	}

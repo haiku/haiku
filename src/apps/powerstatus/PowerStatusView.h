@@ -66,7 +66,6 @@ protected:
 
 			double			fPercent;
 			time_t			fTimeLeft;
-			bool			fOnline;
 			bool			fHasBattery;
 
 			bool			fHasNotifiedLowBattery;
