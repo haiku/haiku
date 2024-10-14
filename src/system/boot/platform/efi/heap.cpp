@@ -5,6 +5,7 @@
 
 
 #include <boot/platform.h>
+#include <kernel/kernel.h>
 
 #include "efi_platform.h"
 
@@ -12,7 +13,7 @@
 extern "C" ssize_t
 platform_allocate_heap_region(size_t _size, void** _base)
 {
-	size_t pages = (_size + (B_PAGE_SIZE - 1)) / B_PAGE_SIZE;
+	size_t pages = HOWMANY(_size, B_PAGE_SIZE);
 	efi_physical_addr base;
 	if (kBootServices->AllocatePages(AllocateAnyPages, EfiLoaderData, pages, &base) != EFI_SUCCESS)
 		return B_NO_MEMORY;

@@ -85,6 +85,7 @@ is_user_address_range(const void* addr, size_t size)
 
 #define ROUNDDOWN(a, b)	(((a) / (b)) * (b))
 #define ROUNDUP(a, b)	ROUNDDOWN((a) + (b) - 1, b)
+#define HOWMANY(a, b)	(((a) + ((b) - 1)) / (b))
 
 
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))

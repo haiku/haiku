@@ -97,7 +97,7 @@ class SelectTraceEntry : public AbstractTraceEntry {
 			int sets = (readSet != NULL ? 1 : 0) + (writeSet != NULL ? 1 : 0)
 				+ (errorSet != NULL ? 1 : 0);
 			if (sets > 0 && count > 0) {
-				uint32 bytes = _howmany(count, NFDBITS) * sizeof(fd_mask);
+				uint32 bytes = HOWMANY(count, NFDBITS) * sizeof(fd_mask);
 				uint8* allocated = (uint8*)alloc_tracing_buffer(bytes * sets);
 				if (allocated != NULL) {
 					if (readSet != NULL) {
@@ -356,7 +356,7 @@ static inline void
 fd_zero(fd_set *set, int numFDs)
 {
 	if (set != NULL)
-		memset(set, 0, _howmany(numFDs, NFDBITS) * sizeof(fd_mask));
+		memset(set, 0, HOWMANY(numFDs, NFDBITS) * sizeof(fd_mask));
 }
 
 
@@ -958,7 +958,7 @@ ssize_t
 _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 	fd_set *userErrorSet, bigtime_t timeout, const sigset_t *userSigMask)
 {
-	uint32 bytes = _howmany(numFDs, NFDBITS) * sizeof(fd_mask);
+	uint32 bytes = HOWMANY(numFDs, NFDBITS) * sizeof(fd_mask);
 	int result;
 
 	if (timeout >= 0) {
