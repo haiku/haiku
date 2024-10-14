@@ -826,6 +826,7 @@ platform_free_region(void *address, size_t size)
 ssize_t
 platform_allocate_heap_region(size_t size, void **_base)
 {
+	size = ROUNDUP(size, B_PAGE_SIZE);
 	addr_t base = allocate_physical(size, false);
 	if (base == 0)
 		return B_NO_MEMORY;
