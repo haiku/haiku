@@ -6,7 +6,6 @@
 #define	_FTW_H_
 
 
-#include <features.h>
 #include <sys/stat.h>
 
 
@@ -40,5 +39,6 @@ int	nftw(const char *, int (*)(const char *, const struct stat *, int,
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif	/* _FTW_H_ */
