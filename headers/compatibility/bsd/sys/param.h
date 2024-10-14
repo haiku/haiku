@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 Haiku Inc. All Rights Reserved.
+ * Copyright 2006-2024, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BSD_SYS_PARAM_H_
@@ -13,34 +13,23 @@
 #ifdef _DEFAULT_SOURCE
 
 
-#ifndef _ALIGNBYTES
-#	define _ALIGNBYTES 7
-#endif
-#ifndef _ALIGN
-#	define _ALIGN(p) (((unsigned)(p) + _ALIGNBYTES) & ~_ALIGNBYTES)
-#endif
-
-#ifndef ALIGNBYTES
-#	define ALIGNBYTES _ALIGNBYTES
-#endif
-#ifndef ALIGN
-#	define ALIGN(p) _ALIGN(p)
-#endif
-
-#ifndef howmany
-#	define howmany(x, y) (((x) + ((y) - 1)) / (y))
-#endif
-
-#ifndef MAXLOGNAME
-#	define MAXLOGNAME 32
-#endif
-
+#define MAXLOGNAME 33
 #define NBBY 8
 
-#define nitems(x)	(sizeof((x)) / sizeof((x)[0]))
 
+#define ALIGNBYTES	_ALIGNBYTES
+#define ALIGN(p)	_ALIGN(p)
 
+#ifndef howmany
+#define	howmany(x, y)	(((x)+((y)-1))/(y))
 #endif
+#define nitems(x)	(sizeof((x)) / sizeof((x)[0]))
+#define roundup(x, y)	((((x)+((y)-1))/(y))*(y))
+#define rounddown(x, y)  (((x)/(y))*(y))
+#define powerof2(x)	((((x)-1)&(x))==0)
+
+
+#endif	/* _DEFAULT_SOURCE */
 
 
 #endif	/* _BSD_SYS_PARAM_H_ */
