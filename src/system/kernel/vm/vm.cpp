@@ -4200,11 +4200,9 @@ create_preloaded_image_areas(struct preloaded_image* _image)
 void
 vm_free_kernel_args(kernel_args* args)
 {
-	uint32 i;
-
 	TRACE(("vm_free_kernel_args()\n"));
 
-	for (i = 0; i < args->num_kernel_args_ranges; i++) {
+	for (uint32 i = 0; i < args->num_kernel_args_ranges; i++) {
 		area_id area = area_for((void*)(addr_t)args->kernel_args_range[i].start);
 		if (area >= B_OK)
 			delete_area(area);
@@ -4218,11 +4216,11 @@ allocate_kernel_args(kernel_args* args)
 	TRACE(("allocate_kernel_args()\n"));
 
 	for (uint32 i = 0; i < args->num_kernel_args_ranges; i++) {
-		void* address = (void*)(addr_t)args->kernel_args_range[i].start;
+		const addr_range& range = args->virtual_allocated_range[i];
+		void* address = (void*)(addr_t)range.start;
 
 		create_area("_kernel args_", &address, B_EXACT_ADDRESS,
-			args->kernel_args_range[i].size, B_ALREADY_WIRED,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			range.size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 }
 
@@ -4233,9 +4231,9 @@ unreserve_boot_loader_ranges(kernel_args* args)
 	TRACE(("unreserve_boot_loader_ranges()\n"));
 
 	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
+		const addr_range& range = args->virtual_allocated_range[i];
 		vm_unreserve_address_range(VMAddressSpace::KernelID(),
-			(void*)(addr_t)args->virtual_allocated_range[i].start,
-			args->virtual_allocated_range[i].size);
+			(void*)(addr_t)range.start, range.size);
 	}
 }
 
@@ -4246,18 +4244,19 @@ reserve_boot_loader_ranges(kernel_args* args)
 	TRACE(("reserve_boot_loader_ranges()\n"));
 
 	for (uint32 i = 0; i < args->num_virtual_allocated_ranges; i++) {
-		void* address = (void*)(addr_t)args->virtual_allocated_range[i].start;
+		const addr_range& range = args->virtual_allocated_range[i];
+		void* address = (void*)(addr_t)range.start;
 
 		// If the address is no kernel address, we just skip it. The
 		// architecture specific code has to deal with it.
 		if (!IS_KERNEL_ADDRESS(address)) {
 			dprintf("reserve_boot_loader_ranges(): Skipping range: %p, %"
-				B_PRIu64 "\n", address, args->virtual_allocated_range[i].size);
+				B_PRIu64 "\n", address, range.size);
 			continue;
 		}
 
 		status_t status = vm_reserve_address_range(VMAddressSpace::KernelID(),
-			&address, B_EXACT_ADDRESS, args->virtual_allocated_range[i].size, 0);
+			&address, B_EXACT_ADDRESS, range.size, 0);
 		if (status < B_OK)
 			panic("could not reserve boot loader ranges\n");
 	}
@@ -4268,48 +4267,51 @@ static addr_t
 allocate_early_virtual(kernel_args* args, size_t size, addr_t alignment)
 {
 	size = PAGE_ALIGN(size);
+	if (alignment <= B_PAGE_SIZE) {
+		// All allocations are naturally page-aligned.
+		alignment = 0;
+	} else {
+		ASSERT((alignment % B_PAGE_SIZE) == 0);
+	}
 
-	// find a slot in the virtual allocation addr range
+	// Find a slot in the virtual allocation ranges.
 	for (uint32 i = 1; i < args->num_virtual_allocated_ranges; i++) {
-		// check to see if the space between this one and the last is big enough
-		addr_t rangeStart = args->virtual_allocated_range[i].start;
-		addr_t previousRangeEnd = args->virtual_allocated_range[i - 1].start
-			+ args->virtual_allocated_range[i - 1].size;
+		// Check if the space between this one and the previous is big enough.
+		const addr_range& range = args->virtual_allocated_range[i];
+		addr_range& previousRange = args->virtual_allocated_range[i - 1];
+		const addr_t previousRangeEnd = previousRange.start + previousRange.size;
 
 		addr_t base = alignment > 0
 			? ROUNDUP(previousRangeEnd, alignment) : previousRangeEnd;
 
-		if (base >= KERNEL_BASE && base < rangeStart
-				&& rangeStart - base >= size) {
-			args->virtual_allocated_range[i - 1].size
-				+= base + size - previousRangeEnd;
+		if (base >= KERNEL_BASE && base < range.start && (range.start - base) >= size) {
+			previousRange.size += base + size - previousRangeEnd;
 			return base;
 		}
 	}
 
-	// we hadn't found one between allocation ranges. this is ok.
-	// see if there's a gap after the last one
-	int lastEntryIndex = args->num_virtual_allocated_ranges - 1;
-	addr_t lastRangeEnd = args->virtual_allocated_range[lastEntryIndex].start
-		+ args->virtual_allocated_range[lastEntryIndex].size;
+	// We didn't find one between allocation ranges. This is OK.
+	// See if there's a gap after the last one.
+	addr_range& lastRange
+		= args->virtual_allocated_range[args->num_virtual_allocated_ranges - 1];
+	const addr_t lastRangeEnd = lastRange.start + lastRange.size;
 	addr_t base = alignment > 0
 		? ROUNDUP(lastRangeEnd, alignment) : lastRangeEnd;
 	if (KERNEL_BASE + (KERNEL_SIZE - 1) - base >= size) {
-		args->virtual_allocated_range[lastEntryIndex].size
-			+= base + size - lastRangeEnd;
+		lastRange.size += base + size - lastRangeEnd;
 		return base;
 	}
 
-	// see if there's a gap before the first one
-	addr_t rangeStart = args->virtual_allocated_range[0].start;
-	if (rangeStart > KERNEL_BASE && rangeStart - KERNEL_BASE >= size) {
-		base = rangeStart - size;
+	// See if there's a gap before the first one.
+	addr_range& firstRange = args->virtual_allocated_range[0];
+	if (firstRange.start > KERNEL_BASE && (firstRange.start - KERNEL_BASE) >= size) {
+		base = firstRange.start - size;
 		if (alignment > 0)
 			base = ROUNDDOWN(base, alignment);
 
 		if (base >= KERNEL_BASE) {
-			args->virtual_allocated_range[0].start = base;
-			args->virtual_allocated_range[0].size += rangeStart - base;
+			firstRange.start = base;
+			firstRange.size += firstRange.start - base;
 			return base;
 		}
 	}
@@ -4431,7 +4433,7 @@ vm_allocate_early(kernel_args* args, size_t virtualSize, size_t physicalSize,
 	}
 
 	// map the pages
-	for (uint32 i = 0; i < PAGE_ALIGN(physicalSize) / B_PAGE_SIZE; i++) {
+	for (uint32 i = 0; i < HOWMANY(physicalSize, B_PAGE_SIZE); i++) {
 		page_num_t physicalAddress = vm_allocate_early_physical_page(args);
 		if (physicalAddress == 0)
 			panic("error allocating early page!\n");
