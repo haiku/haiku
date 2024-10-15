@@ -525,6 +525,10 @@ PowerStatusView::Update(bool force, bool notify)
 		Invalidate();
 	}
 
+	// only do low battery notices based on the aggregate virtual battery, not single batteries
+	if (fBatteryID >= 0)
+		return;
+
 	if (fPercent > kLowBatteryPercentage && fTimeLeft > kLowBatteryTimeLeft)
 		fHasNotifiedLowBattery = false;
 
@@ -594,7 +598,6 @@ PowerStatusView::_GetBatteryInfo(int batteryID, battery_info* batteryInfo)
 		for (int i = 0; i < fDriverInterface->GetBatteryCount(); i++) {
 			battery_info info;
 			fDriverInterface->GetBatteryInfo(i, &info);
-
 			if (info.full_capacity <= 0)
 				continue;
 
@@ -605,8 +608,24 @@ PowerStatusView::_GetBatteryInfo(int batteryID, battery_info* batteryInfo)
 				batteryInfo->state |= info.state;
 				batteryInfo->capacity += info.capacity;
 				batteryInfo->full_capacity += info.full_capacity;
-				batteryInfo->time_left += info.time_left;
+				batteryInfo->current_rate += info.current_rate;
 			}
+		}
+
+		// we can't rely on just adding the individual batteries' time_lefts together:
+		// not-in-use batteries show -1 time_left as they will last infinitely long with their
+		// current (zero) level of draw, despite them being in the queue to use after the current
+		// battery is out of energy. therefore to calculate an accurate time, we have to use the
+		// current total rate of (dis)charge compared to the total remaining capacity of all
+		// batteries.
+		if (batteryInfo->current_rate == 0) {
+			// some systems briefly return current_rate of 0 as the charger is plugged/unplugged
+			batteryInfo->time_left = 0;
+		} else if ((batteryInfo->state & BATTERY_CHARGING) != 0) {
+			batteryInfo->time_left = 3600 * (batteryInfo->full_capacity - batteryInfo->capacity)
+				/ batteryInfo->current_rate;
+		} else {
+			batteryInfo->time_left = 3600 * batteryInfo->capacity / batteryInfo->current_rate;
 		}
 	}
 }
