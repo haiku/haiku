@@ -12,6 +12,7 @@
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
 #include <boot/platform/generic/video.h>
+#include <boot/platform/generic/video_blitter.h>
 #include <boot/images.h>
 
 #include <stdio.h>
@@ -76,6 +77,30 @@ uncompress(const uint8 compressed[], unsigned int compressedSize,
 		status = B_ERROR;
 
 	return status;
+}
+
+
+extern "C" void
+video_blit_image(addr_t frameBuffer, const uint8 *data,
+	uint16 width, uint16 height, uint16 imageWidth, uint16 left, uint16 top)
+{
+	if (gKernelArgs.frame_buffer.depth == 4) {
+		// call platform specific code since it's really platform-specific.
+		platform_blit4(frameBuffer, data, width, height,
+			imageWidth, left, top);
+	} else {
+		BlitParameters params;
+		params.from = data;
+		params.fromWidth = imageWidth;
+		params.fromLeft = params.fromTop = 0;
+		params.fromRight = width;
+		params.fromBottom = height;
+		params.to = (uint8*)frameBuffer;
+		params.toBytesPerRow = gKernelArgs.frame_buffer.bytes_per_row;
+		params.toLeft = left;
+		params.toTop = top;
+		blit(params, gKernelArgs.frame_buffer.depth);
+	}
 }
 
 
@@ -203,6 +228,3 @@ video_display_splash(addr_t frameBuffer)
 		kSplashIconsWidth, x, y);
 	return B_OK;
 }
-
-
-
