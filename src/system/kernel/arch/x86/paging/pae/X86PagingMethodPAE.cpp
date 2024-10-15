@@ -241,7 +241,7 @@ private:
 		uint32 oldPageTableCount = virtualSize / B_PAGE_SIZE / 1024;
 		for (uint32 i = 0; i < oldPageTableCount; i++) {
 			// allocate a page
-			phys_addr_t physicalTable =_AllocatePage32Bit();
+			phys_addr_t physicalTable = _Allocate32BitPage();
 
 			// put the page into the page dir
 			page_directory_entry* entry = &fPageHolePageDir[
@@ -261,7 +261,7 @@ private:
 		// allocate and map the pages we need
 		for (uint32 i = 0; i < pagesNeeded; i++) {
 			// allocate a page
-			phys_addr_t physicalAddress =_AllocatePage32Bit();
+			phys_addr_t physicalAddress = _Allocate32BitPage();
 
 			// put the page into the page table
 			page_table_entry* entry = fPageHole + virtualBase / B_PAGE_SIZE + i;
@@ -281,21 +281,13 @@ private:
 			= (addr_t)(fAllocatedPages + pagesNeeded * B_PAGE_SIZE);
 	}
 
-	phys_addr_t _AllocatePage()
+	phys_addr_t _Allocate32BitPage()
 	{
 		phys_addr_t physicalAddress
-			= (phys_addr_t)vm_allocate_early_physical_page(fKernelArgs)
+			= (phys_addr_t)vm_allocate_early_physical_page_etc(fKernelArgs, 0xffffffff)
 				* B_PAGE_SIZE;
-		if (physicalAddress == 0)
-			panic("Failed to allocate page for the switch to PAE!");
-		return physicalAddress;
-	}
-
-	phys_addr_t _AllocatePage32Bit()
-	{
-		phys_addr_t physicalAddress = _AllocatePage();
-		if (physicalAddress > 0xffffffff) {
-			panic("Failed to allocate 32 bit addressable page for the switch "
+		if (physicalAddress == 0 || physicalAddress > 0xffffffff) {
+			panic("Failed to allocate 32-bit-addressable page for the switch "
 				"to PAE!");
 			return 0;
 		}

@@ -4337,17 +4337,30 @@ is_page_in_physical_memory_range(kernel_args* args, phys_addr_t address)
 page_num_t
 vm_allocate_early_physical_page(kernel_args* args)
 {
+	return vm_allocate_early_physical_page_etc(args);
+}
+
+
+page_num_t
+vm_allocate_early_physical_page_etc(kernel_args* args, phys_addr_t maxAddress)
+{
 	if (args->num_physical_allocated_ranges == 0) {
 		panic("early physical page allocations no longer possible!");
 		return 0;
 	}
+	if (maxAddress == 0)
+		maxAddress = __HAIKU_PHYS_ADDR_MAX;
 
 	// Try expanding the existing physical ranges upwards.
 	for (int32 i = args->num_physical_allocated_ranges - 1; i > 0; i--) {
 		addr_range& range = args->physical_allocated_range[i];
 		phys_addr_t nextPage = range.start + range.size;
 
-		// make sure the next page does not collide with the next allocated range
+		// check constraints
+		if (nextPage > maxAddress)
+			continue;
+
+		// make sure the page does not collide with the next allocated range
 		if ((i + 1) < (int32)args->num_physical_allocated_ranges) {
 			addr_range& nextRange = args->physical_allocated_range[i + 1];
 			if (nextRange.size != 0 && nextPage >= nextRange.start)
@@ -4366,7 +4379,11 @@ vm_allocate_early_physical_page(kernel_args* args)
 		addr_range& range = args->physical_allocated_range[i];
 		phys_addr_t nextPage = range.start - B_PAGE_SIZE;
 
-		// make sure the next page does not collide with the previous allocated range
+		// check constraints
+		if (nextPage > maxAddress)
+			continue;
+
+		// make sure the page does not collide with the previous allocated range
 		if (i > 0) {
 			addr_range& previousRange = args->physical_allocated_range[i - 1];
 			if (previousRange.size != 0 && nextPage < (previousRange.start + previousRange.size))
@@ -4393,6 +4410,8 @@ vm_allocate_early_physical_page(kernel_args* args)
 			// Ignore everything before the last-allocated page, as well as small ranges.
 			if (range.start < lastPage || range.size < (B_PAGE_SIZE * 128))
 				continue;
+			if (range.start > maxAddress)
+				break;
 
 			nextPage = range.start;
 			break;
