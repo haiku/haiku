@@ -13,7 +13,9 @@
 #include <boot/kernel_args.h>
 #include <boot/platform/generic/video.h>
 #include <boot/platform/generic/video_blitter.h>
+
 #include <boot/images.h>
+#include <boot/platform/generic/video_splash.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -159,22 +161,9 @@ video_display_splash(addr_t frameBuffer)
 	// TODO: support 4-bit indexed version of the images!
 
 	// render splash logo
-	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
-
-	int width = min_c(kSplashLogoWidth, gKernelArgs.frame_buffer.width);
-	int height = min_c(kSplashLogoHeight + iconsHalfHeight,
-		gKernelArgs.frame_buffer.height);
-	int placementX = max_c(0, min_c(100, kSplashLogoPlacementX));
-	int placementY = max_c(0, min_c(100, kSplashLogoPlacementY));
-
-	int x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
-	int y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
-
-	height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
-	switch (gKernelArgs.frame_buffer.depth) {
-		case 8:
-			break;
-	}
+	int width, height, x, y;
+	compute_splash_logo_placement(gKernelArgs.frame_buffer.width, gKernelArgs.frame_buffer.height,
+		width, height, x, y);
 	video_blit_image(frameBuffer, uncompressedLogo, width, height,
 		kSplashLogoWidth, x, y);
 
@@ -182,6 +171,7 @@ video_display_splash(addr_t frameBuffer)
 
 	const uint8* lowerHalfIconImage;
 	uncompressedSize = kSplashIconsWidth * kSplashIconsHeight;
+	const uint16 iconsHalfHeight = kSplashIconsHeight / 2;
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 8:
 			// pointer into the lower half of the icons image data
@@ -212,18 +202,9 @@ video_display_splash(addr_t frameBuffer)
 
 	// render initial (grayed out) icons
 	// the grayed out version is the lower half of the icons image
+	compute_splash_icons_placement(gKernelArgs.frame_buffer.width, gKernelArgs.frame_buffer.height,
+		width, height, x, y);
 
-	width = min_c(kSplashIconsWidth, gKernelArgs.frame_buffer.width);
-	height = min_c(kSplashLogoHeight + iconsHalfHeight,
-		gKernelArgs.frame_buffer.height);
-	placementX = max_c(0, min_c(100, kSplashIconsPlacementX));
-	placementY = max_c(0, min_c(100, kSplashIconsPlacementY));
-
-	x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
-	y = kSplashLogoHeight + (gKernelArgs.frame_buffer.height - height)
-		* placementY / 100;
-
-	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
 	video_blit_image(frameBuffer, lowerHalfIconImage, width, height,
 		kSplashIconsWidth, x, y);
 	return B_OK;

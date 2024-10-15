@@ -17,6 +17,7 @@
 #define __BOOTSPLASH_KERNEL__
 #include <boot/images.h>
 #include <boot/platform/generic/video_blitter.h>
+#include <boot/platform/generic/video_splash.h>
 
 #include <boot_item.h>
 #include <debug.h>
@@ -70,19 +71,12 @@ boot_splash_set_stage(int stage)
 	if (sInfo == NULL || stage < 0 || stage >= BOOT_SPLASH_STAGE_MAX)
 		return;
 
-	int iconsHalfHeight = kSplashIconsHeight / 2;
-	int width = min_c(kSplashIconsWidth, sInfo->width);
-	int height = min_c(kSplashLogoHeight + iconsHalfHeight, sInfo->height);
-	int placementX = max_c(0, min_c(100, kSplashIconsPlacementX));
-	int placementY = max_c(0, min_c(100, kSplashIconsPlacementY));
-
-	int x = (sInfo->width - width) * placementX / 100;
-	int y = kSplashLogoHeight + (sInfo->height - height) * placementY / 100;
+	int width, height, x, y;
+	compute_splash_icons_placement(sInfo->width, sInfo->height,
+		width, height, x, y);
 
 	int stageLeftEdge = width * stage / BOOT_SPLASH_STAGE_MAX;
 	int stageRightEdge = width * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
-
-	height = min_c(iconsHalfHeight, sInfo->height);
 
 	BlitParameters params;
 	params.from = sUncompressedIcons;
@@ -98,4 +92,3 @@ boot_splash_set_stage(int stage)
 
 	blit(params, sInfo->depth);
 }
-
