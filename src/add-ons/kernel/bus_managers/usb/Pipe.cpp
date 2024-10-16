@@ -21,9 +21,10 @@ Pipe::Pipe(Object *parent)
 
 Pipe::~Pipe()
 {
-	PutUSBID();
-
+	PutUSBID(false);
 	Pipe::CancelQueuedTransfers(true);
+	WaitForIdle();
+
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
 }
 
