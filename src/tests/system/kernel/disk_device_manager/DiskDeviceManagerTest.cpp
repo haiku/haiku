@@ -31,6 +31,7 @@ main(int argc, char **argv)
 	if (id < B_OK)
 		printf("creating the file device failed: %s\n", strerror(id));
 
+#if 0
 	// wait for scanning jobs to finish
 	// (that's hopefully a hack :-))
 	for (;;) {
@@ -40,6 +41,7 @@ main(int argc, char **argv)
 		}
 		snooze(50000);
 	}
+#endif
 
 	// print devices
 	for (int32 cookie = 0;

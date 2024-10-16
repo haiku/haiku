@@ -1,36 +1,27 @@
 SubDir HAIKU_TOP src tests system kernel disk_device_manager ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager jobs ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel fs ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits storage disk_device ] ;
 	# DiskDeviceTypes.cpp
 
-#UsePrivateHeaders $(DOT) ;
-UsePrivateHeaders shared ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel events ] ;
+	# Notifications.cpp
+
+UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_KERNEL_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
-UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
-UsePrivateHeaders kernel ;
 UseHeaders [ FDirName $(HAIKU_TOP) src system kernel disk_device_manager ] ;
 
-# As long as we compile for R5 userland, we define the following macros.
-SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
-SubDirC++Flags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
+DEFINES += _KERNEL_MODE ;
 
-SharedLibrary libdisk_device_manager.so :
-	ddm_operation_validation.cpp
+SharedLibrary test_disk_device_manager.so :
 #	ddm_userland_interface.cpp
 	disk_device_manager.cpp
 	KDiskDevice.cpp
-	KDiskDeviceJob.cpp
-	KDiskDeviceJobFactory.cpp
-	KDiskDeviceJobGenerator.cpp
-	KDiskDeviceJobQueue.cpp
 	KDiskDeviceManager.cpp
 	KFileDiskDevice.cpp
 	KDiskSystem.cpp
@@ -39,45 +30,24 @@ SharedLibrary libdisk_device_manager.so :
 	KPartitioningSystem.cpp
 	KPartitionListener.cpp
 	KPartitionVisitor.cpp
-	KPhysicalPartition.cpp
-	KShadowPartition.cpp
 	UserDataWriter.cpp
+
+	# disk device types
+	DiskDeviceTypes.cpp
 
 	# fs
 	KPath.cpp
 
-	# jobs
-	KCreateChildJob.cpp
-	KDefragmentJob.cpp
-	KDeleteChildJob.cpp
-	KInitializeJob.cpp
-	KMoveJob.cpp
-	KRepairJob.cpp
-	KResizeJob.cpp
-	KScanPartitionJob.cpp
-	KSetParametersJob.cpp
-	KUninitializeJob.cpp
+	# notifications
+	Notifications.cpp
 
-	# utilities
-	Locker.cpp
-	RWLocker.cpp
-
-	# disk device types
-	DiskDeviceTypes.cpp
+	: be libkernelland_emu.so [ TargetLibsupc++ ]
 ;
 
-LinkAgainst libdisk_device_manager.so
-	: <boot!home!config!lib>libkernelland_emu.so ;
-
-AbsSymLink <boot!home!config!lib>libdisk_device_manager.so
-	: libdisk_device_manager.so : /boot/home/config/lib ;
-
-SimpleTest DiskDeviceManagerTest
-	: DiskDeviceManagerTest.cpp
-	: <boot!home!config!lib>libdisk_device_manager.so be
+SimpleTest DiskDeviceManagerTest :
+	DiskDeviceManagerTest.cpp
+	: test_disk_device_manager.so be
 ;
-
-Depends DiskDeviceManagerTest : <boot!home!config!lib>libkernelland_emu.so ;
 
 # Also build all modules:
 Depends DiskDeviceManagerTest : userland_disk_system_modules ;
@@ -85,7 +55,7 @@ Depends DiskDeviceManagerTest : userland_disk_system_modules ;
 # Pseudo target for disk system modules.
 NotFile userland_disk_system_modules ;
 Depends userland_disk_system_modules :
-	<boot!home!config!lib>libkernelland_emu.so
+	libkernelland_emu.so
 	<file_system>bfs
 	<partitioning_system>intel
 	<partitioning_system>amiga_rdb

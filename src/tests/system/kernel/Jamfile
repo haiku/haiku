@@ -93,7 +93,7 @@ SimpleTest sigsuspend_test : sigsuspend_test.cpp ;
 
 SubInclude HAIKU_TOP src tests system kernel cache ;
 SubInclude HAIKU_TOP src tests system kernel fs ;
-#SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
+SubInclude HAIKU_TOP src tests system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src tests system kernel device_manager ;
 SubInclude HAIKU_TOP src tests system kernel file_corruption ;
 SubInclude HAIKU_TOP src tests system kernel scheduler ;

@@ -12,20 +12,22 @@ SharedLibrary libkernelland_emu.so :
 	KPath.cpp
 	lock.cpp
 	low_resource_manager.cpp
+	MessagingService.cpp
 	misc.cpp
 	module.cpp
+	node_monitor.cpp
 	slab.cpp
 	smp.cpp
 	team.cpp
+	vfs.cpp
 	vm.cpp
 
 	list.cpp
+	StringHash.cpp
 
 	: be [ TargetLibstdc++ ] ;
 
-AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
-	: /boot/home/config/lib : false ;
-
 SEARCH on [ FGristFiles
 		list.cpp
+		StringHash.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;

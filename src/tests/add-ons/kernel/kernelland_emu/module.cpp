@@ -16,8 +16,10 @@
 #include <Entry.h>
 #include <KernelExport.h>
 #include <module.h>
+#include <kmodule.h>
 #include <List.h>
 #include <Locker.h>
+#include <Notifications.h>
 #include <ObjectList.h>
 #include <Path.h>
 #include <String.h>
@@ -800,4 +802,18 @@ close_module_list(void *cookie)
 	TRACE(("close_module_list(%p)\n", cookie));
 	return ModuleManager::Default()->CloseModuleList(
 		(module_name_list*)cookie);
+}
+
+
+status_t
+start_watching_modules(const char* prefix, NotificationListener& listener)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+stop_watching_modules(const char* prefix, NotificationListener& listener)
+{
+	return B_NOT_SUPPORTED;
 }
