@@ -9,6 +9,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 KernelMergeObject kernel_vm.o :
 	PageCacheLocker.cpp
 	vm.cpp
+	vm_debug.cpp
 	vm_page.cpp
 	VMAddressSpace.cpp
 	VMAddressSpaceLocking.cpp

@@ -144,6 +144,7 @@ status_t vm_put_physical_page_debug(addr_t vaddr, void* handle);
 void vm_get_info(system_info *info);
 uint32 vm_num_page_faults(void);
 off_t vm_available_memory(void);
+off_t vm_available_memory_debug(void);
 off_t vm_available_not_needed_memory(void);
 off_t vm_available_not_needed_memory_debug(void);
 size_t vm_kernel_address_space_left(void);
