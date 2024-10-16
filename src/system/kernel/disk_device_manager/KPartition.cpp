@@ -20,6 +20,7 @@
 #include <Errors.h>
 #include <fs_volume.h>
 #include <KernelExport.h>
+#include <StackOrHeapArray.h>
 
 #include <ddm_userland_interface.h>
 #include <fs/devfs.h>
@@ -729,6 +730,52 @@ KPartition::GetPath(KPath* path) const
 }
 
 
+status_t
+KPartition::GetMountPoint(KPath* mountPoint) const
+{
+	if (!mountPoint || !ContainsFileSystem())
+		return B_BAD_VALUE;
+
+	ASSERT(!IsMounted());
+		// fetching the actual mounted point isn't implemented (yet)
+
+	int nameLength = 0;
+	const char* volumeName = ContentName();
+	if (volumeName != NULL)
+		nameLength = strlen(volumeName);
+	if (nameLength == 0) {
+		volumeName = Name();
+		if (volumeName != NULL)
+			nameLength = strlen(volumeName);
+		if (nameLength == 0) {
+			volumeName = "unnamed volume";
+			nameLength = strlen(volumeName);
+		}
+	}
+
+	BStackOrHeapArray<char, 128> basePath(nameLength + 2);
+	if (!basePath.IsValid())
+		return B_NO_MEMORY;
+	int32 len = snprintf(basePath, nameLength + 2, "/%s", volumeName);
+	for (int32 i = 1; i < len; i++)
+		if (basePath[i] == '/')
+			basePath[i] = '-';
+	char* path = mountPoint->LockBuffer();
+	int32 pathLen = mountPoint->BufferSize();
+	strncpy(path, basePath, pathLen);
+
+	struct stat dummy;
+	for (int i = 1; ; i++) {
+		if (stat(path, &dummy) != 0)
+			break;
+		snprintf(path, pathLen, "%s%d", (char*)basePath, i);
+	}
+
+	mountPoint->UnlockBuffer();
+	return B_OK;
+}
+
+
 void
 KPartition::SetVolumeID(dev_t volumeID)
 {
@@ -778,22 +825,6 @@ void*
 KPartition::MountCookie() const
 {
 	return fPartitionData.mount_cookie;
-}
-
-
-status_t
-KPartition::Mount(uint32 mountFlags, const char* parameters)
-{
-	// not implemented
-	return B_ERROR;
-}
-
-
-status_t
-KPartition::Unmount()
-{
-	// not implemented
-	return B_ERROR;
 }
 
 

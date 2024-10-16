@@ -44,6 +44,12 @@ SharedLibrary test_disk_device_manager.so :
 	: be libkernelland_emu.so [ TargetLibsupc++ ]
 ;
 
+UnitTestLib libkerneldiskdevicemanagertest.so :
+	DiskDeviceManagerTestAddon.cpp
+	KPartitionTest.cpp
+	: test_disk_device_manager.so [ TargetLibstdc++ ]
+;
+
 SimpleTest DiskDeviceManagerTest :
 	DiskDeviceManagerTest.cpp
 	: test_disk_device_manager.so be

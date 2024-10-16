@@ -58,7 +58,6 @@
 #include <vm/VMAddressSpace.h>
 
 #include "IORequest.h"
-#include "VMUtils.h"
 
 
 #if	ENABLE_SWAP_SUPPORT
@@ -1691,7 +1690,7 @@ swap_init_post_modules()
 			else {
 				KPath devPath, mountPoint;
 				visitor.fBestPartition->GetPath(&devPath);
-				get_mount_point(visitor.fBestPartition, &mountPoint);
+				visitor.fBestPartition->GetMountPoint(&mountPoint);
 				const char* mountPath = mountPoint.Path();
 				mkdir(mountPath, S_IRWXU | S_IRWXG | S_IRWXO);
 				swapDeviceID = _kern_mount(mountPath, devPath.Path(),
