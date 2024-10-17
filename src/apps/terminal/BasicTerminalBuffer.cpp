@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2024, Haiku, Inc. All rights reserved.
  * Copyright 2008-2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
@@ -900,6 +900,20 @@ BasicTerminalBuffer::EraseAll()
 {
 	fSoftWrappedCursor = false;
 	_Scroll(0, fHeight - 1, fHeight);
+}
+
+
+void
+BasicTerminalBuffer::EraseScrollback()
+{
+	fSoftWrappedCursor = false;
+
+	// Clear the history
+	if (fHistory != NULL)
+		fHistory->Clear();
+
+	// Update the scrollbars
+	_Invalidate(0, 0);
 }
 
 

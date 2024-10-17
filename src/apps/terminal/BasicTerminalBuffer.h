@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2024, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
@@ -149,6 +149,7 @@ public:
 			void				EraseAbove();
 			void				EraseBelow();
 			void				EraseAll();
+			void				EraseScrollback();
 			void				DeleteChars(int32 numChars);
 	inline	void				DeleteColumns();
 			void				DeleteColumnsFrom(int32 first);
