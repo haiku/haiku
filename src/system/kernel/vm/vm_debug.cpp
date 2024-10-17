@@ -11,6 +11,8 @@
 
 #include <ctype.h>
 
+#include <team.h>
+
 #include <vm/vm_page.h>
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
