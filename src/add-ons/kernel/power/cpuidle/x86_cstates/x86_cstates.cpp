@@ -109,8 +109,10 @@ cstates_idle(void)
 static void
 cstates_wait(int32* variable, int32 test)
 {
-	if (!sEnableWait)
+	if (!sEnableWait) {
+		arch_cpu_pause();
 		return;
+	}
 
 	InterruptsLocker _;
 	x86_monitor(variable, 0, 0);
