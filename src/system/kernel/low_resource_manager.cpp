@@ -330,43 +330,56 @@ dump_handlers(int argc, char** argv)
 void
 low_resource(uint32 resource, uint64 requirements, uint32 flags, uint32 timeout)
 {
+	int32 newState = B_NO_LOW_RESOURCE;
 	switch (resource) {
 		case B_KERNEL_RESOURCE_PAGES:
 			if (requirements <= kCriticalPagesLimit)
-				sLowPagesState = B_LOW_RESOURCE_CRITICAL;
+				newState = B_LOW_RESOURCE_CRITICAL;
 			else if (requirements <= kWarnPagesLimit)
-				sLowPagesState = B_LOW_RESOURCE_WARNING;
+				newState = B_LOW_RESOURCE_WARNING;
 			else
-				sLowPagesState = B_LOW_RESOURCE_NOTE;
+				newState = B_LOW_RESOURCE_NOTE;
+
+			if (sLowPagesState < newState)
+				sLowPagesState = newState;
 			break;
 
 		case B_KERNEL_RESOURCE_MEMORY: {
 			const off_t required = requirements;
 			if (required <= sCriticalMemoryLimit)
-				sLowMemoryState = B_LOW_RESOURCE_CRITICAL;
+				newState = B_LOW_RESOURCE_CRITICAL;
 			else if (required <= sWarnMemoryLimit)
-				sLowMemoryState = B_LOW_RESOURCE_WARNING;
+				newState = B_LOW_RESOURCE_WARNING;
 			else
-				sLowMemoryState = B_LOW_RESOURCE_NOTE;
+				newState = B_LOW_RESOURCE_NOTE;
+
+			if (sLowMemoryState < newState)
+				sLowMemoryState = newState;
 			break;
 		}
 
 		case B_KERNEL_RESOURCE_SEMAPHORES:
 			if (requirements <= 4)
-				sLowSemaphoresState = B_LOW_RESOURCE_CRITICAL;
+				newState = B_LOW_RESOURCE_CRITICAL;
 			else if (requirements <= 32)
-				sLowSemaphoresState = B_LOW_RESOURCE_WARNING;
+				newState = B_LOW_RESOURCE_WARNING;
 			else
-				sLowSemaphoresState = B_LOW_RESOURCE_NOTE;
+				newState = B_LOW_RESOURCE_NOTE;
+
+			if (sLowSemaphoresState < newState)
+				sLowSemaphoresState = newState;
 			break;
 
 		case B_KERNEL_RESOURCE_ADDRESS_SPACE:
 			if (requirements <= (kCriticalPagesLimit * B_PAGE_SIZE))
-				sLowSpaceState = B_LOW_RESOURCE_CRITICAL;
+				newState = B_LOW_RESOURCE_CRITICAL;
 			else if (requirements <= (kWarnPagesLimit * B_PAGE_SIZE))
-				sLowSpaceState = B_LOW_RESOURCE_WARNING;
+				newState = B_LOW_RESOURCE_WARNING;
 			else
-				sLowSpaceState = B_LOW_RESOURCE_NOTE;
+				newState = B_LOW_RESOURCE_NOTE;
+
+			if (sLowSpaceState < newState)
+				sLowSpaceState = newState;
 			break;
 	}
 
