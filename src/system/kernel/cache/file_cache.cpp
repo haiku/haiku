@@ -128,6 +128,7 @@ PrecacheIO::PrecacheIO(file_cache_ref* ref, off_t offset, generic_size_t size)
 {
 	fPageCount = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 	fCache->AcquireRefLocked();
+	fCache->AcquireStoreRef();
 }
 
 
@@ -135,6 +136,7 @@ PrecacheIO::~PrecacheIO()
 {
 	delete[] fPages;
 	delete[] fVecs;
+	fCache->ReleaseStoreRef();
 	fCache->ReleaseRefLocked();
 }
 
