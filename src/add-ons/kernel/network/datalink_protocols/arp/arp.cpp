@@ -960,6 +960,7 @@ arp_init()
 static status_t
 arp_uninit()
 {
+	ASSERT(sCache->IsEmpty());
 	unregister_generic_syscall(ARP_SYSCALLS, 1);
 	return B_OK;
 }
