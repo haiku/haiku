@@ -391,17 +391,17 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 			// The entry must be in the process of trying to remove itself from us.
 			// Clear its variable and wait for it to acknowledge this in fEntriesCount,
 			// as it is the one responsible for decrementing that.
-			const int32 oldCount = atomic_get(&fEntriesCount);
+			const int32 removedCount = atomic_get(&fEntriesCount) - 1;
 			atomic_pointer_set(&entry->fVariable, (ConditionVariable*)NULL);
 
 			// As fEntriesCount is only modified while our lock is held, nothing else
 			// will modify it while we are spinning, since we hold it at present.
 			int32 tries = 0;
-			while (atomic_get(&fEntriesCount) == oldCount) {
+			while (atomic_get(&fEntriesCount) != removedCount) {
 				tries++;
 				if ((tries % 10000) == 0)
 					dprintf("entries count was not decremented for a long time!\n");
-				cpu_pause();
+				cpu_wait(&fEntriesCount, removedCount);
 			}
 		} else {
 			SpinLocker schedulerLocker(thread->scheduler_lock);
