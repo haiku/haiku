@@ -1999,8 +1999,8 @@ retry:
 	sure that the previous block contents are preserved in that case.
 */
 static status_t
-get_writable_cached_block(block_cache* cache, off_t blockNumber, off_t base,
-	off_t length, int32 transactionID, bool cleared, void** _block)
+get_writable_cached_block(block_cache* cache, off_t blockNumber,
+	int32 transactionID, bool cleared, void** _block)
 {
 	TRACE(("get_writable_cached_block(blockNumber = %" B_PRIdOFF ", transaction = %" B_PRId32 ")\n",
 		blockNumber, transactionID));
@@ -3617,7 +3617,7 @@ block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 	// TODO: this can be done better!
 	void* block;
 	status_t status = get_writable_cached_block(cache, blockNumber,
-		blockNumber, 1, transaction, false, &block);
+		transaction, false, &block);
 	if (status == B_OK) {
 		put_cached_block((block_cache*)_cache, blockNumber);
 		return B_OK;
@@ -3628,8 +3628,8 @@ block_cache_make_writable(void* _cache, off_t blockNumber, int32 transaction)
 
 
 status_t
-block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
-	off_t length, int32 transaction, void** _block)
+block_cache_get_writable_etc(void* _cache, off_t blockNumber,
+	int32 transaction, void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
@@ -3639,7 +3639,7 @@ block_cache_get_writable_etc(void* _cache, off_t blockNumber, off_t base,
 	if (cache->read_only)
 		panic("tried to get writable block on a read-only cache!");
 
-	return get_writable_cached_block(cache, blockNumber, base, length,
+	return get_writable_cached_block(cache, blockNumber,
 		transaction, false, _block);
 }
 
@@ -3649,7 +3649,7 @@ block_cache_get_writable(void* _cache, off_t blockNumber, int32 transaction)
 {
 	void* block;
 	if (block_cache_get_writable_etc(_cache, blockNumber,
-			blockNumber, 1, transaction, &block) == B_OK)
+			transaction, &block) == B_OK)
 		return block;
 
 	return NULL;
@@ -3669,7 +3669,7 @@ block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 
 	void* block;
 	if (get_writable_cached_block((block_cache*)_cache, blockNumber,
-			blockNumber, 1, transaction, true, &block) == B_OK)
+			transaction, true, &block) == B_OK)
 		return block;
 
 	return NULL;
@@ -3677,8 +3677,7 @@ block_cache_get_empty(void* _cache, off_t blockNumber, int32 transaction)
 
 
 status_t
-block_cache_get_etc(void* _cache, off_t blockNumber, off_t base, off_t length,
-	const void** _block)
+block_cache_get_etc(void* _cache, off_t blockNumber, const void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
@@ -3707,8 +3706,7 @@ const void*
 block_cache_get(void* _cache, off_t blockNumber)
 {
 	const void* block;
-	if (block_cache_get_etc(_cache, blockNumber, blockNumber, 1, &block)
-			== B_OK)
+	if (block_cache_get_etc(_cache, blockNumber, &block) == B_OK)
 		return block;
 
 	return NULL;

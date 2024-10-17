@@ -453,7 +453,7 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 				" block_cache_get_etc()\n", readLength, diskBlock));
 			const uint8 *data;
 			status = block_cache_get_etc(volume->BlockCache(),
-				diskBlock, 0, readLength, (const void**)&data);
+				diskBlock, (const void**)&data);
 			if (status != B_OK)
 				break;
 			memcpy(buffer, data + blockOffset, readLength);

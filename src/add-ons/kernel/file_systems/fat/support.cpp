@@ -554,7 +554,7 @@ read_fsinfo(msdosfsmount* volume, const vnode* devNode)
 		const uint8* buffer;
 		const struct fsinfo* fsInfo;
 
-		status = block_cache_get_etc(volume->pm_mountp->mnt_cache, volume->pm_fsinfo, 0, 1,
+		status = block_cache_get_etc(volume->pm_mountp->mnt_cache, volume->pm_fsinfo,
 			reinterpret_cast<const void**>(&buffer));
 		if (status != B_OK)
 			RETURN_ERROR(status);

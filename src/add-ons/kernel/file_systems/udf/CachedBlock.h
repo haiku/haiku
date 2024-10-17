@@ -36,7 +36,6 @@ public:
 	inline void					Unset();
 
 	inline status_t				SetTo(off_t block);
-	inline status_t				SetTo(off_t block, off_t base, size_t length);
 	inline status_t				SetTo(long_address address);
 	template <class Accessor, class Descriptor>
 	inline status_t				SetTo(Accessor &accessor,
@@ -97,16 +96,9 @@ CachedBlock::Unset()
 inline status_t
 CachedBlock::SetTo(off_t block)
 {
-	return SetTo(block, block, 1);
-}
-
-
-inline status_t
-CachedBlock::SetTo(off_t block, off_t base, size_t length)
-{
 	Unset();
 	fBlockNumber = block;
-	return block_cache_get_etc(fVolume->BlockCache(), block, base, length,
+	return block_cache_get_etc(fVolume->BlockCache(), block,
 		(const void**)&fBlock);
 }
 
@@ -116,7 +108,7 @@ CachedBlock::SetTo(long_address address)
 {
 	off_t block;
 	if (fVolume->MapBlock(address, &block) == B_OK)
-		return SetTo(block, block, 1);
+		return SetTo(block);
 
 	return B_BAD_VALUE;
 }

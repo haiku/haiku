@@ -30,12 +30,8 @@ public:
 	inline	void				Keep();
 	inline	void				Unset();
 
-	inline status_t				SetTo(off_t block, off_t base, size_t length);
 	inline status_t				SetTo(off_t block);
 	inline status_t				SetTo(block_run run);
-	inline status_t				SetToWritable(Transaction& transaction,
-									off_t block, off_t base, size_t length,
-									bool empty = false);
 	inline status_t				SetToWritable(Transaction& transaction,
 									off_t block, bool empty = false);
 	inline status_t				SetToWritable(Transaction& transaction,
@@ -111,19 +107,11 @@ CachedBlock::Unset()
 
 
 inline status_t
-CachedBlock::SetTo(off_t block, off_t base, size_t length)
+CachedBlock::SetTo(off_t block)
 {
 	Unset();
 	fBlockNumber = block;
-	return block_cache_get_etc(fVolume->BlockCache(), block, base, length,
-		(const void**)&fBlock);
-}
-
-
-inline status_t
-CachedBlock::SetTo(off_t block)
-{
-	return SetTo(block, block, 1);
+	return block_cache_get_etc(fVolume->BlockCache(), block, (const void**)&fBlock);
 }
 
 
@@ -135,8 +123,7 @@ CachedBlock::SetTo(block_run run)
 
 
 inline status_t
-CachedBlock::SetToWritable(Transaction& transaction, off_t block, off_t base,
-	size_t length, bool empty)
+CachedBlock::SetToWritable(Transaction& transaction, off_t block, bool empty)
 {
 	Unset();
 	fBlockNumber = block;
@@ -148,14 +135,7 @@ CachedBlock::SetToWritable(Transaction& transaction, off_t block, off_t base,
 	}
 
 	return block_cache_get_writable_etc(fVolume->BlockCache(),
-		block, base, length, transaction.ID(), (void**)&fBlock);
-}
-
-
-inline status_t
-CachedBlock::SetToWritable(Transaction& transaction, off_t block, bool empty)
-{
-	return SetToWritable(transaction, block, block, 1, empty);
+		block, transaction.ID(), (void**)&fBlock);
 }
 
 

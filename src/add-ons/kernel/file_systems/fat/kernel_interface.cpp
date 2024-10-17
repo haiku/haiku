@@ -549,7 +549,7 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 	void* blockCache = bsdVolume->mnt_cache;
 	u_char* buffer;
 	status
-		= block_cache_get_writable_etc(blockCache, 0, 0, 1, -1, reinterpret_cast<void**>(&buffer));
+		= block_cache_get_writable_etc(blockCache, 0, -1, reinterpret_cast<void**>(&buffer));
 	if (status != B_OK)
 		return status;
 	// check for the extended boot signature
@@ -580,7 +580,7 @@ dosfs_write_fs_stat(fs_volume* volume, const struct fs_info* info, uint32 mask)
 		daddr_t dirOffset = bsdVolume->mnt_volentry * sizeof(direntry);
 		rootDirBlock += dirOffset / DEV_BSIZE;
 
-		status = block_cache_get_writable_etc(blockCache, rootDirBlock, 0, 1, -1,
+		status = block_cache_get_writable_etc(blockCache, rootDirBlock, -1,
 			reinterpret_cast<void**>(&rootDirBuffer));
 		if (status == B_OK) {
 			direntry* label_direntry = reinterpret_cast<direntry*>(rootDirBuffer + dirOffset);

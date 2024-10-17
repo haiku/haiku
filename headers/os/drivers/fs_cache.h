@@ -67,13 +67,13 @@ extern void block_cache_discard(void *cache, off_t blockNumber,
 extern status_t block_cache_make_writable(void *cache, off_t blockNumber,
 					int32 transaction);
 extern status_t block_cache_get_writable_etc(void *cache, off_t blockNumber,
-					off_t base, off_t length, int32 transaction, void** _block);
+					int32 transaction, void** _block);
 extern void *block_cache_get_writable(void *cache, off_t blockNumber,
 					int32 transaction);
 extern void *block_cache_get_empty(void *cache, off_t blockNumber,
 					int32 transaction);
 extern status_t block_cache_get_etc(void *cache, off_t blockNumber,
-					off_t base, off_t length, const void** _block);
+					const void** _block);
 extern const void *block_cache_get(void *cache, off_t blockNumber);
 extern status_t block_cache_set_dirty(void *cache, off_t blockNumber,
 					bool isDirty, int32 transaction);
