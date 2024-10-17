@@ -485,6 +485,14 @@ read_line(char* buffer, int32 maxLength,
 					remove_char_from_line(buffer, position, length);
 				}
 				break;
+			case 0x1f & 'D':	// CTRL-D -- continue
+				length = 0;
+				buffer[length++] = 'e';
+				buffer[length++] = 's';
+				buffer[length++] = '\0';
+				kputchar('\n');
+				done = true;
+				break;
 			case 0x1f & 'K':	// CTRL-K -- clear line after current position
 				if (position < length) {
 					// clear chars
