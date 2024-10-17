@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src add-ons kernel power cpuidle x86_cstates ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon x86_cstates :
+	x86_cstates.cpp
+	;
+

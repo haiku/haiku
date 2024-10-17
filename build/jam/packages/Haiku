@@ -105,7 +105,7 @@ AddFilesToPackage add-ons kernel power cpufreq :
 	intel_pstates@x86,x86_64
 	;
 AddFilesToPackage add-ons kernel power cpuidle :
-	intel_cstates@x86,x86_64
+	x86_cstates@x86,x86_64
 	;
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
