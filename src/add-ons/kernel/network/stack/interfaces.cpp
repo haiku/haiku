@@ -480,6 +480,7 @@ Interface::Interface(const char* interfaceName,
 Interface::~Interface()
 {
 	TRACE("Interface %p: destructor\n", this);
+	ASSERT((flags & IFF_UP) == 0);
 
 	// Uninitialize the domain datalink protocols
 
