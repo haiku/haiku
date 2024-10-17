@@ -773,8 +773,8 @@ get_cached_block(block_cache* cache, fssh_off_t blockNumber, bool* _allocated,
 	sure that the previous block contents are preserved in that case.
 */
 static fssh_status_t
-get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber, fssh_off_t base,
-	fssh_off_t length, int32_t transactionID, bool cleared, void** _block)
+get_writable_cached_block(block_cache* cache, fssh_off_t blockNumber,
+	int32_t transactionID, bool cleared, void** _block)
 {
 	TRACE(("get_writable_cached_block(blockNumber = %lld, transaction = %d)\n",
 		blockNumber, transactionID));
@@ -1641,7 +1641,7 @@ fssh_block_cache_make_writable(void* _cache, fssh_off_t blockNumber,
 	// TODO: this can be done better!
 	void* block;
 	fssh_status_t status = get_writable_cached_block(cache, blockNumber,
-		blockNumber, 1, transaction, false, &block);
+		transaction, false, &block);
 	if (status == FSSH_B_OK) {
 		put_cached_block((block_cache*)_cache, blockNumber);
 		return FSSH_B_OK;
@@ -1653,7 +1653,7 @@ fssh_block_cache_make_writable(void* _cache, fssh_off_t blockNumber,
 
 fssh_status_t
 fssh_block_cache_get_writable_etc(void* _cache, fssh_off_t blockNumber,
-	fssh_off_t base, fssh_off_t length, int32_t transaction, void** _block)
+	int32_t transaction, void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
@@ -1663,7 +1663,7 @@ fssh_block_cache_get_writable_etc(void* _cache, fssh_off_t blockNumber,
 	if (cache->read_only)
 		fssh_panic("tried to get writable block on a read-only cache!");
 
-	return get_writable_cached_block(cache, blockNumber, base, length,
+	return get_writable_cached_block(cache, blockNumber,
 		transaction, false, _block);
 }
 
@@ -1674,7 +1674,7 @@ fssh_block_cache_get_writable(void* _cache, fssh_off_t blockNumber,
 {
 	void* block;
 	fssh_status_t status = fssh_block_cache_get_writable_etc(_cache,
-		blockNumber, blockNumber, 1, transaction, &block);
+		blockNumber, transaction, &block);
 	if (status == FSSH_B_OK)
 		return block;
 
@@ -1696,7 +1696,7 @@ fssh_block_cache_get_empty(void* _cache, fssh_off_t blockNumber,
 
 	void* block;
 	if (get_writable_cached_block((block_cache*)_cache, blockNumber,
-			blockNumber, 1, transaction, true, &block) == FSSH_B_OK)
+			transaction, true, &block) == FSSH_B_OK)
 		return block;
 
 	return NULL;
@@ -1704,8 +1704,7 @@ fssh_block_cache_get_empty(void* _cache, fssh_off_t blockNumber,
 
 
 fssh_status_t
-fssh_block_cache_get_etc(void* _cache, fssh_off_t blockNumber, fssh_off_t base,
-	fssh_off_t length, const void** _block)
+fssh_block_cache_get_etc(void* _cache, fssh_off_t blockNumber, const void** _block)
 {
 	block_cache* cache = (block_cache*)_cache;
 	MutexLocker locker(&cache->lock);
@@ -1732,7 +1731,7 @@ const void*
 fssh_block_cache_get(void* _cache, fssh_off_t blockNumber)
 {
 	const void* block;
-	if (fssh_block_cache_get_etc(_cache, blockNumber, blockNumber, 1, &block)
+	if (fssh_block_cache_get_etc(_cache, blockNumber, &block)
 			== FSSH_B_OK)
 		return block;
 
