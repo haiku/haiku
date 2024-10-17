@@ -424,6 +424,8 @@ BZstdCompressionAlgorithm::_TranslateZstdError(size_t error)
 			return B_BAD_DATA;
 		case ZSTD_error_version_unsupported:
 			return B_BAD_VALUE;
+		case ZSTD_error_memory_allocation:
+			return B_NO_MEMORY;
 		case ZSTD_error_dstSize_tooSmall:
 			return B_BUFFER_OVERFLOW;
 		default:
