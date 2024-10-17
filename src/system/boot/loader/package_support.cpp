@@ -104,7 +104,7 @@ PackageVolumeState::Unset()
 const char*
 PackageVolumeState::DisplayName() const
 {
-	return fDisplayName != NULL ? fDisplayName : "Latest state";
+	return fDisplayName;
 }
 
 
@@ -115,7 +115,34 @@ PackageVolumeState::SetSystemPackage(const char* package)
 		free(fSystemPackage);
 
 	fSystemPackage = strdup(package);
-	return fSystemPackage != NULL ? B_OK : B_NO_MEMORY;
+	if (fSystemPackage == NULL)
+		return B_NO_MEMORY;
+
+	if (fName == NULL) {
+		free(fDisplayName);
+		fDisplayName = NULL;
+
+		const char* packageVersion = strchr(package, '-');
+		if (packageVersion == NULL) {
+			fDisplayName = strdup("Latest state");
+		} else {
+			ArrayDeleter<char> newDisplayName(new(std::nothrow) char[B_FILE_NAME_LENGTH]);
+			if (!newDisplayName.IsSet())
+				return B_NO_MEMORY;
+
+			packageVersion++;
+			const char* packageVersionEnd = strchr(packageVersion, '-');
+			int length = -1;
+			if (packageVersionEnd != NULL)
+				length = packageVersionEnd - packageVersion;
+
+			snprintf(newDisplayName.Get(), B_FILE_NAME_LENGTH,
+				"Latest state (%.*s)", length, packageVersion);
+			fDisplayName = newDisplayName.Detach();
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -231,7 +258,7 @@ PackageVolumeInfo::LoadOldStates()
 		status_t error;
 		for (state = fStates.GetNext(state); state != NULL;) {
 			PackageVolumeState* nextState = fStates.GetNext(state);
-			if (state->Name()) {
+			if (state->Name() != NULL) {
 				error = _InitState(packagesDirectory, fPackagesDir, state);
 				if (error != B_OK) {
 					TRACE("PackageVolumeInfo::LoadOldStates(): failed to "
@@ -277,9 +304,8 @@ PackageVolumeInfo::_InitState(Directory* packagesDirectory, DIR* dir,
 	if (!systemPackageName.IsSet())
 		return B_NO_MEMORY;
 	ArrayDeleter<char> packagePath(new(std::nothrow) char[B_PATH_NAME_LENGTH]);
-	if (!packagePath.IsSet()) {
+	if (!packagePath.IsSet())
 		return B_NO_MEMORY;
-	}
 
 	status_t error = _ParseActivatedPackagesFile(packagesDirectory, state,
 		systemPackageName.Get(), B_FILE_NAME_LENGTH);
@@ -291,7 +317,7 @@ PackageVolumeInfo::_InitState(Directory* packagesDirectory, DIR* dir,
 				B_PATH_NAME_LENGTH);
 			struct stat st;
 			if (get_stat(packagesDirectory, packagePath.Get(), st) == B_OK
-				&& S_ISREG(st.st_mode)) {
+					&& S_ISREG(st.st_mode)) {
 				state->SetSystemPackage(packagePath.Get());
 				break;
 			}
