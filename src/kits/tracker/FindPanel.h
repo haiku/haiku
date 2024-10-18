@@ -379,7 +379,7 @@ private:
 			static const int32 kBatchCount = 100;
 			static const int32 kDaysToExpire = 7;
 
-			BTrackerPrivate::TQueryWalker* fWalker;
+			BTrackerPrivate::TNodeWalker* fWalker;
 };
 
 

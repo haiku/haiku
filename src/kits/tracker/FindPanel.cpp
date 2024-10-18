@@ -3674,11 +3674,11 @@ DeleteTransientQueriesTask::Initialize()
 	PRINT(("starting up transient query killer\n"));
 	BPath path;
 	status_t result = find_directory(B_USER_DIRECTORY, &path, false);
-	if (result != B_OK) {
+	if (result != B_OK || path.Append("queries") != B_OK) {
 		state = kError;
 		return;
 	}
-	fWalker = new BTrackerPrivate::TQueryWalker(kAttrQueryLastChange " != 0");
+	fWalker = new BTrackerPrivate::TNodeWalker(path.Path());
 	state = kAllocatedWalker;
 }
 
