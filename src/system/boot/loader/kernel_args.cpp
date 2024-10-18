@@ -368,13 +368,14 @@ ignore_physical_memory_ranges_beyond_4gb()
 			continue;
 		}
 
-		if (kLimit - range.start < range.size) {
+		if ((range.start + range.size) >= kLimit) {
 			// the range is partially beyond the limit
 			dprintf("ignore_physical_memory_ranges_beyond_4gb(): ignoring "
 				"range: %#" B_PRIx64 " - %#" B_PRIx64 "\n", kLimit,
 				range.start + range.size);
 			gKernelArgs.ignored_physical_memory
 				+= range.size - (kLimit - range.start);
+			range.size = kLimit - range.start;
 		}
 
 		break;
