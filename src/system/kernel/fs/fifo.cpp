@@ -185,7 +185,7 @@ public:
 			void				NotifyBytesWritten(size_t bytes);
 			void				NotifyEndClosed(bool writer);
 
-			void				Open(int openMode);
+			status_t			Open(int openMode);
 			void				Close(file_cookie* cookie);
 			int32				ReaderCount() const { return fReaderCount; }
 			int32				WriterCount() const { return fWriterCount; }
@@ -209,7 +209,7 @@ private:
 
 			mutex				fRequestLock;
 
-			ConditionVariable	fWriteCondition;
+			ConditionVariable	fActiveCondition;
 
 			int32				fReaderCount;
 			int32				fWriterCount;
@@ -352,7 +352,7 @@ Inode::Inode()
 	fReadSelectSyncPool(NULL),
 	fWriteSelectSyncPool(NULL)
 {
-	fWriteCondition.Publish(this, "pipe");
+	fActiveCondition.Publish(this, "pipe");
 	mutex_init(&fRequestLock, "pipe request");
 
 	bigtime_t time = real_time_clock();
@@ -364,7 +364,7 @@ Inode::Inode()
 
 Inode::~Inode()
 {
-	fWriteCondition.Unpublish();
+	fActiveCondition.Unpublish();
 	mutex_destroy(&fRequestLock);
 }
 
@@ -566,7 +566,7 @@ Inode::NotifyBytesRead(size_t bytes)
 			size_t minWriteCount = request->MinimalWriteCount();
 			if (minWriteCount > 0 && minWriteCount <= writable
 					&& minWriteCount > writable - bytes) {
-				fWriteCondition.NotifyAll();
+				fActiveCondition.NotifyAll();
 				break;
 			}
 		}
@@ -620,7 +620,7 @@ Inode::NotifyEndClosed(bool writer)
 		}
 	} else {
 		// Last reader is gone. Wake up all writers.
-		fWriteCondition.NotifyAll();
+		fActiveCondition.NotifyAll();
 
 		if (fWriteSelectSyncPool)
 			notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_ERROR);
@@ -628,7 +628,7 @@ Inode::NotifyEndClosed(bool writer)
 }
 
 
-void
+status_t
 Inode::Open(int openMode)
 {
 	MutexLocker locker(RequestLock());
@@ -639,6 +639,27 @@ Inode::Open(int openMode)
 	if ((openMode & O_ACCMODE) == O_RDONLY || (openMode & O_ACCMODE) == O_RDWR)
 		fReaderCount++;
 
+	bool shouldWait = false;
+	if ((openMode & O_ACCMODE) == O_WRONLY && fReaderCount == 0) {
+		if ((openMode & O_NONBLOCK) != 0)
+			return ENXIO;
+		shouldWait = true;
+	}
+	if ((openMode & O_ACCMODE) == O_RDONLY && fWriterCount == 0
+		&& (openMode & O_NONBLOCK) == 0) {
+		shouldWait = true;
+	}
+	if (shouldWait) {
+		// prepare for waiting for the condition variable.
+		ConditionVariableEntry waitEntry;
+		fActiveCondition.Add(&waitEntry);
+		locker.Unlock();
+		status_t status = waitEntry.Wait(B_CAN_INTERRUPT);
+		if (status != B_OK)
+			return status;
+		locker.Lock();
+	}
+
 	if (fReaderCount > 0 && fWriterCount > 0) {
 		TRACE("Inode %p::Open(): fifo becomes active\n", this);
 		fBuffer.CreateBuffer();
@@ -647,8 +668,9 @@ Inode::Open(int openMode)
 		// notify all waiting writers that they can start
 		if (fWriteSelectSyncPool)
 			notify_select_event_pool(fWriteSelectSyncPool, B_SELECT_WRITE);
-		fWriteCondition.NotifyAll();
+		fActiveCondition.NotifyAll();
 	}
+	return B_OK;
 }
 
 
@@ -682,7 +704,7 @@ Inode::Close(file_cookie* cookie)
 		// Notify any still reading writers to stop
 		// TODO: This only works reliable if there is only one writer - we could
 		// do the same thing done for the read requests.
-		fWriteCondition.NotifyAll(B_FILE_ERROR);
+		fActiveCondition.NotifyAll(B_FILE_ERROR);
 	}
 
 	if (fReaderCount == 0 && fWriterCount == 0) {
@@ -888,7 +910,11 @@ fifo_open(fs_volume* _volume, fs_vnode* _node, int openMode,
 
 	TRACE("  open cookie = %p\n", cookie);
 	cookie->open_mode = openMode;
-	inode->Open(openMode);
+	status_t status = inode->Open(openMode);
+	if (status != B_OK) {
+		free(cookie);
+		return status;
+	}
 
 	*_cookie = (void*)cookie;
 
