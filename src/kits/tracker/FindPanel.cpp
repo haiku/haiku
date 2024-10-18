@@ -1040,6 +1040,31 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 		new BMessage(kSelectDirectoryFilter)));
 	LoadDirectoryFiltersFromFile(node);
 
+	if (!editTemplateOnly) {
+		BPoint draggableIconOrigin(0, 0);
+		BMessage dragNDropMessage(B_SIMPLE_DATA);
+		dragNDropMessage.AddInt32("be:actions", B_COPY_TARGET);
+		dragNDropMessage.AddString("be:types", B_FILE_MIME_TYPE);
+		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[0]);
+		dragNDropMessage.AddString("be:filetypes", kDragNDropTypes[1]);
+		dragNDropMessage.AddString("be:actionspecifier",
+			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[0]));
+		dragNDropMessage.AddString("be:actionspecifier",
+			B_TRANSLATE_NOCOLLECT(kDragNDropActionSpecifiers[1]));
+
+		BMessenger self(this);
+		BRect draggableRect = DraggableIcon::PreferredRect(draggableIconOrigin,
+			B_LARGE_ICON);
+		fDraggableIcon = new DraggableQueryIcon(draggableRect,
+			"saveHere", &dragNDropMessage, self,
+			B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
+		fDraggableIcon->SetExplicitMaxSize(
+			BSize(draggableRect.right - draggableRect.left,
+				draggableRect.bottom - draggableRect.top));
+		BCursor grabCursor(B_CURSOR_ID_GRAB);
+		fDraggableIcon->SetViewCursor(&grabCursor);
+	}
+
 	// add Search button
 	BButton* button;
 	if (editTemplateOnly) {
@@ -1050,6 +1075,12 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 			new BMessage(kFindButton), B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
 	}
 	button->MakeDefault(true);
+
+	BView* icon = fDraggableIcon;
+	if (icon == NULL) {
+		icon = new BBox("no draggable icon", B_WILL_DRAW, B_NO_BORDER);
+		icon->SetExplicitMaxSize(BSize(0, 0));
+	}
 
 	BView* mimeTypeFieldSpacer = new BBox("MimeTypeMenuSpacer", B_WILL_DRAW, B_NO_BORDER);
 	mimeTypeFieldSpacer->SetExplicitMaxSize(BSize(0, 0));
@@ -1081,6 +1112,11 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(queryBox)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.AddGroup(B_VERTICAL)
+				.AddGlue()
+				.Add(icon)
+				.AddGlue()
+			.End()
 			.AddGlue()
 			.AddGroup(B_VERTICAL)
 				.Add(button)
@@ -3725,18 +3761,6 @@ TrackerBuildRecentFindItemsMenu(const char* title)
 
 
 //	#pragma mark -
-
-void
-DraggableQueryIcon::Draw(BRect updateRect)
-{
-	BRect rect(Bounds());
-	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
-	be_control_look->DrawBorder(this, rect, updateRect, base, B_PLAIN_BORDER, 0,
-		BControlLook::B_BOTTOM_BORDER);
-	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base, 0,
-		BControlLook::B_ALL_BORDERS & ~BControlLook::B_LEFT_BORDER);
-	DraggableIcon::Draw(updateRect);
-}
 
 
 DraggableQueryIcon::DraggableQueryIcon(BRect frame, const char* name,

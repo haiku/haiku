@@ -402,7 +402,6 @@ public:
 
 protected:
 	virtual bool 				DragStarted(BMessage*);
-	virtual	void				Draw(BRect);
 };
 
 
