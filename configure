@@ -707,18 +707,18 @@ while [ $# -gt 0 ] ; do
 			HAIKU_PORTS="`absolute_path $4`"
 			HAIKU_IS_BOOTSTRAP=1
 			HAIKU_NO_DOWNLOADS=1
-			check_file_exists "$HOST_HAIKU_PORTER" || (
+			if ! check_file_exists "$HOST_HAIKU_PORTER"; then
 				echo "Invalid path to haikuporter: $HOST_HAIKU_PORTER" >&2
 				exit 1
-			)
-			check_dir_exists "$HAIKU_PORTS" || (
+			fi
+			if ! check_dir_exists "$HAIKU_PORTS"; then
 				echo "Non-existent directory $HAIKU_PORTS" >&2
 				exit 1
-			)
-			check_dir_exists "$HAIKU_PORTS_CROSS" || (
+			fi
+			if ! check_dir_exists "$HAIKU_PORTS_CROSS"; then
 				echo "Non-existent directory $HAIKU_PORTS_CROSS" >&2
 				exit 1
-			)
+			fi
 			shift 4
 			;;
 		--cross-tools-source)
