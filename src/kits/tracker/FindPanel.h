@@ -173,7 +173,6 @@ private:
 			status_t 			SaveQueryAsAttributes(BNode*, BEntry*, bool queryTemplate,
 									const BMessage* oldAttributes = 0,
 									const BPoint* oldLocation = 0, bool temporary = true);
-			status_t			GetQueryLastChangeTimeFromFile(BMessage* message);
 
 			void 				GetDefaultName(BString&);
 			// dynamic date is a date such as 'today'

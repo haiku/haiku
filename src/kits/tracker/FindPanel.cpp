@@ -867,50 +867,6 @@ FindWindow::Find()
 }
 
 
-status_t
-FindWindow::GetQueryLastChangeTimeFromFile(BMessage* message)
-{
-	// params checking
-	if (message == NULL)
-		return B_BAD_VALUE;
-
-	struct attr_info info;
-	status_t error = fFile->GetAttrInfo(kAttrQueryLastChange, &info);
-	if (error == B_OK) {
-		if (info.type == B_MESSAGE_TYPE) {
-			char* buffer = new char[info.size];
-			ssize_t readSize = fFile->ReadAttr(kAttrQueryLastChange, B_MESSAGE_TYPE, 0, buffer,
-				static_cast<size_t>(info.size));
-			if (readSize == info.size) {
-				if (message->Unflatten(buffer) == B_OK) {
-					delete[] buffer;
-						// Delete the dynamically allocated memory in both situations
-					return B_OK;
-				} else {
-					delete[] buffer;
-						// Delete the dynamically allocated memory in both situations.
-					return B_ERROR;
-				}
-			}
-		} else if (info.type == B_INT32_TYPE) {
-			int32 previousChangedTime;
-			if (fFile->ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &previousChangedTime,
-					(int32)info.size)
-				== sizeof(int32)) {
-				return message->AddInt32(kAttrQueryLastChange, previousChangedTime);
-			} else {
-				return B_ERROR;
-			}
-		}
-
-		// If it reaches till here, that means the entry type is wrong!
-		return B_BAD_VALUE;
-	} else {
-		return error;
-	}
-}
-
-
 bool
 FindWindow::FindSaveCommon(bool find)
 {
@@ -932,11 +888,7 @@ FindWindow::FindSaveCommon(bool find)
 		hadLocation = FSGetPoseLocation(fFile, &location);
 	}
 
-	BMessage message;
 	if (replaceOriginal) {
-		if (GetQueryLastChangeTimeFromFile(&message) != B_OK)
-			message.MakeEmpty();
-
 		fFile->Unset();
 		entry.Remove();
 			// remove the current entry - need to do this to quit the
@@ -976,11 +928,8 @@ FindWindow::FindSaveCommon(bool find)
 	ASSERT(fFile->InitCheck() == B_OK);
 
 	int32 currentTime = (int32)time(0);
-	message.AddInt32(kAttrQueryLastChange, currentTime);
-	ssize_t size = message.FlattenedSize();
-	char* buffer = new char[size];
-	if (message.Flatten(buffer, size) == B_OK)
-		fFile->WriteAttr(kAttrQueryLastChange, B_MESSAGE_TYPE, 0, buffer, (int32)size);
+	fFile->WriteAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &currentTime,
+		sizeof(int32));
 
 	SaveQueryAsAttributes(fFile, &entry, !find, newFile ? 0 : &oldAttributes,
 		(hadLocation && keepPoseLocation) ? &location : 0, newFile);
@@ -2705,53 +2654,16 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* t
 					bool isTemporary = true;
 					node.ReadAttr("_trk/temporary", B_BOOL_TYPE, 0, &isTemporary, sizeof(bool));
 
-					struct attr_info info;
-					if (node.GetAttrInfo(kAttrQueryLastChange, &info) != B_OK)
-						continue;
-
-					if (info.type == B_MESSAGE_TYPE) {
-						BString bufferString;
-						char* buffer = bufferString.LockBuffer(info.size);
-						BMessage message;
-						if (node.ReadAttr(kAttrQueryLastChange, B_MESSAGE_TYPE, 0, buffer,
-								static_cast<size_t>(info.size))
-							!= info.size || message.Unflatten(buffer) != B_OK)
-							continue;
-						bufferString.UnlockBuffer();
-
-						int32 count;
-						if (message.GetInfo(kAttrQueryLastChange, NULL, &count) != B_OK)
-							continue;
-
-						for (int32 i = 0; i < count; i++) {
-							int32 time;
-							if (message.FindInt32(kAttrQueryLastChange, i, &time)
-								== B_OK) {
-								EntryWithDate* item = new EntryWithDate(ref, time);
-								if (((isTemporary && includeTemporaryQueries)
-										|| (!isTemporary
-											&& includePersistedQueries))
-									&& !CheckForDuplicates(&recentQueries, item)) {
-									recentQueries.AddItem(item);
-								} else {
-									delete item;
-								}
-							}
-						}
-					}
-					if (info.type == B_INT32_TYPE) {
-						int32 changeTime;
-						if (node.ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &changeTime,
-								sizeof(int32))
-							== sizeof(int32)) {
-							EntryWithDate* item = new EntryWithDate(ref, changeTime);
-							if (((isTemporary && includeTemporaryQueries)
-									|| (!isTemporary && includePersistedQueries))
-								&& !CheckForDuplicates(&recentQueries, item)) {
-								recentQueries.AddItem(item);
-							} else {
-								delete item;
-							}
+					int32 changeTime;
+					if (node.ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &changeTime,
+							sizeof(int32)) == sizeof(int32)) {
+						EntryWithDate* item = new EntryWithDate(ref, changeTime);
+						if (((isTemporary && includeTemporaryQueries)
+								|| (!isTemporary && includePersistedQueries))
+							&& !CheckForDuplicates(&recentQueries, item)) {
+							recentQueries.AddItem(item);
+						} else {
+							delete item;
 						}
 					}
 				}
