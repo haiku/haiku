@@ -222,7 +222,8 @@ public:
 			status_t 			SetCurrentMimeType(BMenuItem* item);
 			status_t 			SetCurrentMimeType(const char* label);
 
-			BPopUpMenu* 		VolMenu() const { return fVolMenu; }
+			BPopUpMenu* 		VolMenu(int32* firstVolumeItem = NULL,
+									int32* volumeItemsCount = NULL) const;
 			uint32 				Mode() const { return fMode; }
 
 	static 	uint32 				InitialMode(const BNode* entry);
@@ -249,12 +250,10 @@ public:
 			void				LoadDirectoryFiltersFromFile(const BNode*);
 
 private:
-	// populates the type menu
 	void 						AddMimeTypesToMenu();
 	static 	bool 				AddOneMimeTypeToMenu(const ShortMimeInfo*, void* castToMenu);
 
-			// populates the volume menu
-			void 				AddVolumes(BMenu*);
+			void 				AddVolumes();
 
 			void 				ShowVolumeMenuLabel();
 
@@ -320,6 +319,7 @@ private:
 			BPopUpMenu*			fSearchModeMenu;
 			BMenuField* 		fSearchModeField;
 			BPopUpMenu* 		fVolMenu;
+			int32				fFirstVolumeItem, fVolumeItemsCount;
 			BMenuField* 		fVolumeField;
 			BPopUpMenu* 		fRecentQueries;
 			BBox* 				fMoreOptions;

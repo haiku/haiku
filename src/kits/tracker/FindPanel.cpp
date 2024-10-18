@@ -215,26 +215,6 @@ MoreOptionsStruct::QueryTemporary(const BNode* node)
 //	#pragma mark - FindWindow
 
 
-int32
-GetNumberOfVolumes()
-{
-	static int32 numberOfVolumes = -1;
-	if (numberOfVolumes >= 0)
-		return numberOfVolumes;
-
-	int32 count = 0;
-	BVolumeRoster volumeRoster;
-	BVolume volume;
-	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsPersistent() && volume.KnowsQuery() && volume.KnowsAttr())
-			++count;
-	}
-
-	numberOfVolumes = count;
-	return numberOfVolumes;
-}
-
-
 FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 	:
 	BWindow(BRect(), B_TRANSLATE("Find"), B_TITLED_WINDOW,
@@ -375,17 +355,6 @@ FindWindow::UpdateFileReferences(const entry_ref* ref)
 }
 
 
-void
-ClearMenu(BMenu* menu)
-{
-	int32 count = menu->CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BMenuItem* item = menu->RemoveItem(static_cast<int32>(0));
-		delete item;
-	}
-}
-
-
 status_t
 FindWindow::DeleteQueryOrTemplate(BEntry* entry)
 {
@@ -425,7 +394,8 @@ CheckForDuplicates(BObjectList<entry_ref>* list, entry_ref* ref)
 void
 FindWindow::PopulateTemplatesMenu()
 {
-	ClearMenu(fTemplatesMenu);
+	fTemplatesMenu->RemoveItems(0, fTemplatesMenu->CountItems(), true);
+
 	BObjectList<entry_ref> templates(10, true);
 	BVolumeRoster roster;
 	BVolume volume;
@@ -627,25 +597,6 @@ FindWindow::SaveQueryAttributes(BNode* file, bool queryTemplate)
 }
 
 
-void
-MarkVolumeAccordingToDirectoryFilter(BMenu* menu, entry_ref* ref)
-{
-	int32 startingIndex = 2;
-	int32 endingIndex = 2 + GetNumberOfVolumes();
-	for (int32 index = startingIndex; index < endingIndex; ++index) {
-		BMenuItem* item = menu->ItemAt(index);
-		if (item->IsMarked())
-			continue;
-		BMessage* message = item->Message();
-		dev_t device;
-		if (message->FindInt32("device", &device) != B_OK)
-			continue;
-		if (device == ref->device)
-			item->SetMarked(true);
-	}
-}
-
-
 status_t
 FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate,
 	const BMessage* oldAttributes, const BPoint* oldLocation, bool temporary)
@@ -678,18 +629,30 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate
 
 	fBackground->SaveDirectoryFiltersToFile(file);
 
-	BMenu* volMenu = fBackground->VolMenu();
+	int32 firstVolumeItem, volumeItemsCount;
+	BMenu* volMenu = fBackground->VolMenu(&firstVolumeItem, &volumeItemsCount);
 	ASSERT(volMenu != NULL);
 
 	int32 numberOfDirectoryFilters = fBackground->fDirectoryFilters.CountItems();
-	for (int32 i = 0; i < numberOfDirectoryFilters; ++i)
-		MarkVolumeAccordingToDirectoryFilter(volMenu, fBackground->fDirectoryFilters.ItemAt(i));
+	for (int32 i = 0; i < numberOfDirectoryFilters; ++i) {
+		const entry_ref* ref = fBackground->fDirectoryFilters.ItemAt(i);
+		for (int32 j = 0; j < volumeItemsCount; j++) {
+			BMenuItem* item = volMenu->ItemAt(firstVolumeItem + j);
+			if (item->IsMarked())
+				continue;
+			BMessage* message = item->Message();
+			dev_t device;
+			if (message->FindInt32("device", &device) != B_OK)
+				continue;
+			if (device == ref->device)
+				item->SetMarked(true);
+		}
+	}
 
 	bool addAllVolumes = volMenu->ItemAt(0)->IsMarked();
-	int32 numberOfVolumes = GetNumberOfVolumes();
 	BMessage messageContainingVolumeInfo;
-	for (int32 i = 2; i < numberOfVolumes + 2; ++i) {
-		BMenuItem* volumeMenuItem = volMenu->ItemAt(i);
+	for (int32 i = 0; i < volumeItemsCount; i++) {
+		BMenuItem* volumeMenuItem = volMenu->ItemAt(firstVolumeItem + i);
 		BMessage* messageOfVolumeMenuItem = volumeMenuItem->Message();
 		dev_t device;
 		if (messageOfVolumeMenuItem->FindInt32("device", &device) != B_OK)
@@ -959,13 +922,11 @@ FindWindow::MessageReceived(BMessage* message)
 						// something reasonable happens
 				}
 			}
-		}
-		// Refresh Template Menu
-		ClearMenu(fTemplatesMenu);
-		PopulateTemplatesMenu();
 
-		fSaveQueryOrTemplateItem->SetEnabled(true);
-		break;
+			PopulateTemplatesMenu();
+			fSaveQueryOrTemplateItem->SetEnabled(true);
+			break;
+		}
 
 		case kSwitchToQueryTemplate:
 		{
@@ -1071,7 +1032,7 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate, bool ed
 			"The disks/folders that are searched. Similar to TextSearch's 'Set target'."),
 		fVolMenu);
 	fVolumeField->SetDivider(fVolumeField->StringWidth(fVolumeField->Label()) + 8);
-	AddVolumes(fVolMenu);
+	AddVolumes();
 	fVolMenu->AddSeparatorItem();
 	if (fDirectoryFilters.CountItems() > 0)
 		fVolMenu->AddSeparatorItem();
@@ -1491,15 +1452,13 @@ void
 FindPanel::ShowVolumeMenuLabel()
 {
 	// find out if more than one items are marked
-	int32 totalVolumes = GetNumberOfVolumes();
 	int32 selectedVolumesCount = 0;
 
 	BMenuItem* lastSelectedVolumeItem = NULL;
-
-	for (int32 i = 2; i < totalVolumes + 2; ++i) {
-		BMenuItem* volumeItem = fVolMenu->ItemAt(i);
+	for (int32 i = 0; i < fVolumeItemsCount; ++i) {
+		BMenuItem* volumeItem = fVolMenu->ItemAt(fFirstVolumeItem + i);
 		if (volumeItem->IsMarked()) {
-			++selectedVolumesCount;
+			selectedVolumesCount++;
 			lastSelectedVolumeItem = volumeItem;
 		}
 	}
@@ -1508,7 +1467,7 @@ FindPanel::ShowVolumeMenuLabel()
 		PopUpMenuSetTitle(fVolMenu, B_TRANSLATE_COMMENT(kMultipleSelections, kMultiSelectComment));
 	} else if (fDirectoryFilters.CountItems() == 1) {
 		PopUpMenuSetTitle(fVolMenu, fDirectoryFilters.ItemAt(0)->name);
-	} else if (selectedVolumesCount == 0 || selectedVolumesCount == totalVolumes) {
+	} else if (selectedVolumesCount == 0 || selectedVolumesCount == fVolumeItemsCount) {
 		fVolMenu->ItemAt(0)->SetMarked(true);
 		PopUpMenuSetTitle(fVolMenu, fVolMenu->ItemAt(0)->Label());
 	} else if (selectedVolumesCount == 1) {
@@ -1572,10 +1531,8 @@ FindPanel::Draw(BRect)
 void
 FindPanel::UnmarkDisks()
 {
-	int32 startingIndex = 2;
-	int32 endingIndex = 2 + GetNumberOfVolumes();
-	for (int32 i = startingIndex; i < endingIndex; ++i)
-		fVolMenu->ItemAt(i)->SetMarked(false);
+	for (int32 i = 0; i < fVolumeItemsCount; ++i)
+		fVolMenu->ItemAt(fFirstVolumeItem + i)->SetMarked(false);
 
 	fVolMenu->ItemAt(0)->SetMarked(false);
 }
@@ -1640,7 +1597,7 @@ FindPanel::MessageReceived(BMessage* message)
 			}
 
 			int32 count = fVolMenu->CountItems();
-			int32 startingIndex = 3 + GetNumberOfVolumes();
+			int32 startingIndex = 3 + fVolumeItemsCount;
 			int32 endingIndex = count - 2;
 			for (int32 i = startingIndex; i < endingIndex; ++i) {
 				BMenuItem* menuItem = fVolMenu->ItemAt(i);
@@ -1648,6 +1605,7 @@ FindPanel::MessageReceived(BMessage* message)
 				entry_ref ref;
 				if (!message || message->FindRef("refs", &ref) != B_OK)
 					continue;
+
 				RemoveDirectoryFilter(&ref);
 				menuItem->SetMarked(false);
 			}
@@ -2313,8 +2271,8 @@ FindPanel::SetCurrentMimeType(const char* label)
 }
 
 
-static
-void AddSubtype(BString& text, const BMimeType& type)
+static void
+AddSubtype(BString& text, const BMimeType& type)
 {
 	text.Append(" (");
 	text.Append(strchr(type.Type(), '/') + 1);
@@ -2448,15 +2406,18 @@ FindPanel::AddMimeTypesToMenu()
 
 
 void
-FindPanel::AddVolumes(BMenu* menu)
+FindPanel::AddVolumes()
 {
 	// ToDo: add calls to this to rebuild the menu when a volume gets mounted
 
 	BMessage* message = new BMessage(kVolumeItem);
 	message->AddInt32("device", -1);
-	menu->AddItem(new BMenuItem(B_TRANSLATE("All disks"), message));
-	menu->AddSeparatorItem();
-	PopUpMenuSetTitle(menu, B_TRANSLATE("All disks"));
+	fVolMenu->AddItem(new BMenuItem(B_TRANSLATE("All disks"), message));
+	fVolMenu->AddSeparatorItem();
+	PopUpMenuSetTitle(fVolMenu, B_TRANSLATE("All disks"));
+
+	fFirstVolumeItem = fVolMenu->CountItems();
+	fVolumeItemsCount = 0;
 
 	BVolumeRoster roster;
 	BVolume volume;
@@ -2476,14 +2437,26 @@ FindPanel::AddVolumes(BMenu* menu)
 
 			message = new BMessage(kVolumeItem);
 			message->AddInt32("device", volume.Device());
-			menu->AddItem(new ModelMenuItem(&model, model.Name(), message));
+			fVolMenu->AddItem(new ModelMenuItem(&model, model.Name(), message));
+			fVolumeItemsCount++;
 		}
 	}
 
-	if (menu->ItemAt(0))
-		menu->ItemAt(0)->SetMarked(true);
+	if (fVolMenu->ItemAt(0))
+		fVolMenu->ItemAt(0)->SetMarked(true);
 
-	menu->SetTargetForItems(this);
+	fVolMenu->SetTargetForItems(this);
+}
+
+
+BPopUpMenu*
+FindPanel::VolMenu(int32* firstVolumeItem, int32* volumeItemsCount) const
+{
+	if (firstVolumeItem != NULL)
+		*firstVolumeItem = fFirstVolumeItem;
+	if (volumeItemsCount != NULL)
+		*volumeItemsCount = fVolumeItemsCount;
+	return fVolMenu;
 }
 
 
@@ -2972,9 +2945,9 @@ FindPanel::RestoreWindowState(const BNode* node)
 
 	LoadDirectoryFiltersFromFile(node);
 	// mark or unmark "All disks"
-	if (selectedVolumes == GetNumberOfVolumes()) {
+	if (selectedVolumes == fVolumeItemsCount) {
 		fVolMenu->ItemAt(0)->SetMarked(true);
-		for (int32 i = 0; i < GetNumberOfVolumes() + 2; ++i)
+		for (int32 i = 0; i < fVolumeItemsCount + 2; ++i)
 			fVolMenu->ItemAt(i)->SetMarked(false);
 	}
 	ShowVolumeMenuLabel();
