@@ -44,7 +44,6 @@ All rights reserved.
 #include <string.h>
 #include <strings.h>
 
-#include <Alert.h>
 #include <Application.h>
 #include <Box.h>
 #include <Button.h>
@@ -260,9 +259,8 @@ FindWindow::FindWindow(const entry_ref* newRef, bool editIfTemplateOnly)
 		}
 	} else {
 		// no initial query, fall back on the default query template
-		BEntry entry;
-		GetDefaultQuery(entry);
-		entry.GetRef(&fRef);
+		BDirectory directory(GetQueriesDirectory().Path());
+		BEntry entry(&directory, "default");
 
 		if (entry.Exists())
 			fFile = TryOpening(&fRef);
@@ -317,11 +315,9 @@ FindWindow::BuildMenuBar()
 	fHistoryMenu = new BMenu(B_TRANSLATE("Recent queries"));
 	BMessenger messenger(fBackground);
 	FindPanel::AddRecentQueries(fHistoryMenu, false, &messenger, kSwitchToQueryTemplate, false);
-	if (fHistoryMenu->CountItems() > 0) {
-		fHistoryMenu->AddSeparatorItem();
-		fHistoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear history"),
-			new BMessage(kClearHistory)));
-	}
+
+	IconMenuItem* historyMenuItem = new IconMenuItem(fHistoryMenu,
+		new BMessage(kOpenDir), B_DIR_MIMETYPE);
 
 	BMenuItem* saveAsQueryItem = new BMenuItem(B_TRANSLATE("Save as query" B_UTF8_ELLIPSIS), NULL);
 	BMessage* saveAsQueryMessage = new BMessage(kOpenSaveAsPanel);
@@ -340,7 +336,7 @@ FindWindow::BuildMenuBar()
 	fQueryMenu->AddItem(saveAsQueryItem);
 	fQueryMenu->AddItem(saveAsQueryTemplateItem);
 	fQueryMenu->AddSeparatorItem();
-	fQueryMenu->AddItem(fHistoryMenu);
+	fQueryMenu->AddItem(historyMenuItem);
 
 	fSearchInTrash = new BMenuItem(
 		B_TRANSLATE("Include Trash"), new BMessage(kSearchInTrashOptionClicked));
@@ -412,68 +408,7 @@ FindWindow::DeleteQueryOrTemplate(BEntry* entry)
 }
 
 
-void
-FindWindow::ClearHistoryOrTemplates(bool clearTemplates, bool temporaryOnly)
-{
-	BVolumeRoster roster;
-	BVolume volume;
-	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsPersistent() && volume.KnowsQuery() && volume.KnowsAttr()) {
-			BQuery query;
-			query.SetVolume(&volume);
-			query.SetPredicate("_trk/recentQuery == 1");
-			if (query.Fetch() != B_OK)
-				continue;
-
-			BEntry entry;
-			entry_ref ref;
-			while (query.GetNextEntry(&entry) == B_OK) {
-				entry.GetRef(&ref);
-				if (FSInTrashDir(&ref) && !BEntry(&ref).Exists())
-					continue;
-				char type[B_MIME_TYPE_LENGTH];
-				BNodeInfo(new BNode(&entry)).GetType(type);
-				if (strcmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0) {
-					if (clearTemplates)
-						DeleteQueryOrTemplate(&entry);
-					else
-						continue;
-				}
-
-				if (!clearTemplates) {
-					BFile file(&entry, B_READ_ONLY);
-					bool isTemporary;
-					if (file.ReadAttr("_trk/temporary", B_BOOL_TYPE, 0, &isTemporary,
-						sizeof(isTemporary))
-					== sizeof(isTemporary)) {
-						if (!temporaryOnly) {
-							DeleteQueryOrTemplate(&entry);
-						} else {
-							if (isTemporary)
-								DeleteQueryOrTemplate(&entry);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if (clearTemplates) {
-		ClearMenu(fTemplatesMenu);
-	} else {
-		ClearMenu(fHistoryMenu);
-		BMessenger messenger(fBackground);
-		FindPanel::AddRecentQueries(fHistoryMenu, false, &messenger, kSwitchToQueryTemplate, false,
-			false, true);
-		if (fHistoryMenu->CountItems() > 0) {
-			fHistoryMenu->AddSeparatorItem();
-			fHistoryMenu->AddItem(new BMenuItem(B_TRANSLATE("Clear history"),
-				new BMessage(kClearHistory)));
-		}
-	}
-}
-
-bool
+static bool
 CheckForDuplicates(BObjectList<entry_ref>* list, entry_ref* ref)
 {
 	// Simple Helper Function To Check For Duplicates Within an Entry List of Templates
@@ -552,16 +487,16 @@ FindWindow::TryOpening(const entry_ref* ref)
 }
 
 
-void
-FindWindow::GetDefaultQuery(BEntry& entry)
+BPath
+FindWindow::GetQueriesDirectory()
 {
 	BPath path;
 	if (find_directory(B_USER_DIRECTORY, &path, true) == B_OK
-		&& path.Append("queries") == B_OK
-		&& (mkdir(path.Path(), 0777) == 0 || errno == EEXIST)) {
-		BDirectory directory(path.Path());
-		entry.SetTo(&directory, "default");
+			&& path.Append("queries") == B_OK
+			&& (mkdir(path.Path(), 0777) == 0 || errno == EEXIST)) {
+		return path;
 	}
+	return BPath();
 }
 
 
@@ -903,11 +838,9 @@ FindWindow::FindSaveCommon(bool find)
 
 	if (newFile) {
 		// create query file in the user's directory
-		BPath path;
+		BPath path = GetQueriesDirectory();
 		// there might be no queries folder yet, create one
-		if (find_directory(B_USER_DIRECTORY, &path, true) == B_OK
-			&& path.Append("queries") == B_OK
-			&& (mkdir(path.Path(), 0777) == 0 || errno == EEXIST)) {
+		if (path.Path()[0] != '\0') {
 			// either use the user specified name, or go with the name
 			// generated from the predicate, etc.
 			BString name;
@@ -942,6 +875,18 @@ void
 FindWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case kOpenDir:
+		{
+			BMessage message(B_REFS_RECEIVED);
+			BEntry entry(GetQueriesDirectory().Path());
+			entry_ref ref;
+			if (entry.GetRef(&ref) == B_OK) {
+				message.AddRef("refs", &ref);
+				be_app->PostMessage(&message);
+			}
+			break;
+		}
+
 		case kFindButton:
 			Find();
 			break;
@@ -954,23 +899,6 @@ FindWindow::MessageReceived(BMessage* message)
 		{
 			BEntry entry(&fRef);
 			SaveQueryAsAttributes(fFile, &entry, IsQueryTemplate(fFile), 0, 0, false);
-			break;
-		}
-
-		case kClearHistory:
-		{
-			// BAlert will manage its memory independently
-			BAlert* alert = new BAlert(B_TRANSLATE("Clear history?"),
-				B_TRANSLATE("Do you want to clear temporary queries or all queries?"
-					" This action is irreversible!"),
-				B_TRANSLATE("Cancel"),
-				B_TRANSLATE("Clear all"),
-				B_TRANSLATE("Clear temporary queries only"), B_WIDTH_AS_USUAL, B_OFFSET_SPACING,
-				B_WARNING_ALERT);
-			alert->SetShortcut(0, B_ESCAPE);
-			int32 choice = alert->Go();
-			if (choice)
-				ClearHistoryOrTemplates(false, choice == 2);
 			break;
 		}
 

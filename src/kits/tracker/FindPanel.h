@@ -74,8 +74,6 @@ const uint32 kByFormulaItem = 'Fbyq';
 const uint32 kAddItem = 'Fadd';
 const uint32 kRemoveItem = 'Frem';
 
-const uint32 kClearHistory = 'FClH';
-const uint32 kClearTemplates = 'FClT';
 const uint32 kSaveQueryOrTemplate = 'FSaQ';
 const uint32 kOpenSaveAsPanel = 'Fosv';
 const uint32 kOpenLoadQueryPanel = 'Folo';
@@ -158,8 +156,7 @@ protected:
 
 private:
 	static 	BFile* 				TryOpening(const entry_ref* ref);
-	// when opening an empty panel, use the default query to set the panel up
-	static 	void 				GetDefaultQuery(BEntry& entry);
+	static 	BPath 				GetQueriesDirectory();
 			void 				SaveQueryAttributes(BNode* file, bool templateQuery);
 
 			// retrieve the results
