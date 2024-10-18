@@ -3627,7 +3627,7 @@ vm_allocate_early_physical_page_etc(kernel_args* args, phys_addr_t maxAddress)
 	if (maxAddress == 0)
 		maxAddress = __HAIKU_PHYS_ADDR_MAX;
 
-#if defined(__HAIKU_ARCH_PHYSICAL_64_BIT)
+#if defined(B_HAIKU_PHYSICAL_64_BIT)
 	// Check if the last physical range is above the 32-bit maximum.
 	const addr_range& lastMemoryRange =
 		args->physical_memory_range[args->num_physical_memory_ranges - 1];
