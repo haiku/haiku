@@ -370,11 +370,16 @@ protected:
 				kError
 			};
 
+			static bool			QueryOldEnough(Model* model);
+
 protected:
 			State 				state;
 
 private:
-			BTrackerPrivate::TNodeWalker* fWalker;
+			static const int32 kBatchCount = 100;
+			static const int32 kDaysToExpire = 7;
+
+			BTrackerPrivate::TQueryWalker* fWalker;
 };
 
 

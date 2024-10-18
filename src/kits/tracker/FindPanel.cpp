@@ -3678,12 +3678,10 @@ DeleteTransientQueriesTask::Initialize()
 		state = kError;
 		return;
 	}
-	fWalker = new BTrackerPrivate::TNodeWalker(path.Path());
+	fWalker = new BTrackerPrivate::TQueryWalker(kAttrQueryLastChange " != 0");
 	state = kAllocatedWalker;
 }
 
-
-const int32 kBatchCount = 100;
 
 bool
 DeleteTransientQueriesTask::GetSome()
@@ -3707,10 +3705,8 @@ DeleteTransientQueriesTask::GetSome()
 }
 
 
-const int32 kDaysToExpire = 7;
-
-static bool
-QueryOldEnough(Model* model)
+bool
+DeleteTransientQueriesTask::QueryOldEnough(Model* model)
 {
 	// check if it is old and ready to be deleted
 	time_t now = time(0);
