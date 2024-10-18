@@ -42,8 +42,6 @@ BootstrapPackageRepository HaikuPortsCross
 	zstd_bootstrap_devel-1.5.5-1
 	:
 	# repository architecture packages (stage 2)
-	libsolv_bootstrap-0.3.0_haiku_2014_12_22-1
-	libsolv_bootstrap_devel-0.3.0_haiku_2014_12_22-1
 	:
 	# source packages
 	bash_bootstrap
@@ -60,7 +58,6 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap
 	less_bootstrap
 	libffi_bootstrap
-	libsolv_bootstrap
 	m4_bootstrap
 	make_bootstrap
 	ncurses6_bootstrap
