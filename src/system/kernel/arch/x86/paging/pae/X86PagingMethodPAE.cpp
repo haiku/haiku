@@ -584,6 +584,16 @@ status_t
 X86PagingMethodPAE::Init(kernel_args* args,
 	VMPhysicalPageMapper** _physicalPageMapper)
 {
+	// Ignore all memory beyond the maximum PAE address.
+	static const phys_addr_t kLimit = 1ULL << 36;
+	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
+		addr_range& range = args->physical_memory_range[i];
+		if (range.start >= kLimit)
+			range.size = 0;
+		else if ((range.start + range.size) > kLimit)
+			range.size = kLimit - range.start;
+	}
+
 	// switch to PAE
 	ToPAESwitcher(args).Switch(fKernelVirtualPageDirPointerTable,
 		fKernelPhysicalPageDirPointerTable, fEarlyPageStructures,
