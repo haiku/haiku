@@ -243,9 +243,7 @@ public:
 	// populate the recent query menu with query templates and recent queries
 	static 	void 				AddRecentQueries(BMenu*, bool addSaveAsItem,
 									const BMessenger* target, uint32 what,
-									bool includeTemplates = true,
-									bool includeTemporaryQueries = true,
-									bool includePersistedQueries = true);
+									bool includeTemplates = true);
 
 			status_t			SaveDirectoryFiltersToFile(BNode*);
 			void				LoadDirectoryFiltersFromFile(const BNode*);

@@ -713,8 +713,6 @@ FindWindow::SaveQueryAsAttributes(BNode* file, BEntry* entry, bool queryTemplate
 		}
 	}
 
-	file->WriteAttr("_trk/temporary", B_BOOL_TYPE, 0, &temporary, sizeof(temporary));
-
 	MoreOptionsStruct saveMoreOptions;
 	saveMoreOptions.searchTrash = fSearchInTrash->IsMarked();
 	saveMoreOptions.temporary = temporary;
@@ -2546,8 +2544,8 @@ CheckForDuplicates(BObjectList<EntryWithDate>* list, EntryWithDate* entry)
 
 
 void
-FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* target, uint32 what,
-	bool includeTemplates, bool includeTemporaryQueries, bool includePersistedQueries)
+FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* target,
+	uint32 what, bool includeTemplates)
 {
 	BObjectList<entry_ref> templates(10, true);
 	BObjectList<EntryWithDate> recentQueries(10, true);
@@ -2557,8 +2555,7 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* t
 	BVolume volume;
 	roster.Rewind();
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		if (volume.IsPersistent() && volume.KnowsQuery()
-			&& volume.KnowsAttr()) {
+		if (volume.IsPersistent() && volume.KnowsQuery() && volume.KnowsAttr()) {
 			BQuery query;
 			query.SetVolume(&volume);
 			query.SetPredicate("_trk/recentQuery == 1");
@@ -2579,16 +2576,11 @@ FindPanel::AddRecentQueries(BMenu* menu, bool addSaveAsItem, const BMessenger* t
 				if (strcasecmp(type, B_QUERY_TEMPLATE_MIMETYPE) == 0 && includeTemplates) {
 					templates.AddItem(new entry_ref(ref));
 				} else if (strcasecmp(type, B_QUERY_MIMETYPE) == 0) {
-					bool isTemporary = true;
-					node.ReadAttr("_trk/temporary", B_BOOL_TYPE, 0, &isTemporary, sizeof(bool));
-
 					int32 changeTime;
 					if (node.ReadAttr(kAttrQueryLastChange, B_INT32_TYPE, 0, &changeTime,
 							sizeof(int32)) == sizeof(int32)) {
 						EntryWithDate* item = new EntryWithDate(ref, changeTime);
-						if (((isTemporary && includeTemporaryQueries)
-								|| (!isTemporary && includePersistedQueries))
-							&& !CheckForDuplicates(&recentQueries, item)) {
+						if (!CheckForDuplicates(&recentQueries, item)) {
 							recentQueries.AddItem(item);
 						} else {
 							delete item;
