@@ -126,17 +126,3 @@ swap_words(void *data, size_t size)
 		word++;
 	}
 }
-
-
-int
-fls(unsigned mask)
-{
-	if (mask == 0)
-		return 0;
-	int pos = 1;
-	while (mask != 1) {
-		mask >>= 1;
-		pos++;
-	}
-	return pos;
-}
