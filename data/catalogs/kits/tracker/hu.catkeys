@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2306084894
+1	hungarian	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -12,7 +12,6 @@ before	FindPanel		előtte
 New folder%d	FSUtils		Új mappa %d
 Volume icons	TrackerSettingsWindow		Lemez ikonok
 Ignore case	SelectionWindow		Nem betűérzékeny
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Minden ideiglenes vagy az összes keresést törölni szeretnéd? Ez a művelet nem vonható vissza!
 Save query:	FindPanel		Keresés mentése:
 Save as query template:	FindPanel		Mentés keresési sablonként:
 Current folder	ContainerWindow		Jelenlegi mappa
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Kijelölés…
 Show shared volumes on Desktop	SettingsView		Megosztott lemezek megjelenítése az Asztalon
 Size	PoseView		Méret
 matches wildcard expression	SelectionWindow		megfelel a helyettesítő kifejezésnek
-Clear history?	FindPanel		Törüljük az előzményeket?
 Title	Bookmark Query Columns		Cím
 Identify	ContainerWindow		Azonosítás
 Create link	ContainerWindow		Hivatkozás készítése
@@ -84,7 +82,6 @@ Select	SelectionWindow		Kijelölés
 Select	InfoWindow		Kijelölés
 OK	OpenWithWindow		Rendben
 Clean up	ContainerWindow		Rendrakás
-Clear all	FindPanel		Összes törlése
 Modified	FindPanel		Módosítva
  (block size: 	InfoWindow		 (blokk-méret: 
 Select all	QueryContainerWindow		Összes kijelölése
@@ -114,7 +111,6 @@ Company	Person Query Columns		Szervezet
 Select folders…	FindPanel		Mappák megadása…
 Recent documents	FavoritesMenu		Legutóbbi dokumentumok
 Edit templates…	TemplatesMenu		Sablonok szerkesztése…
-Clear temporary queries only	FindPanel		Csak az ideiglenes keresések törlése
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bájt} other{# bájt}}
 8-bit integer	AttributesView		8-bites egész
 8-bit unsigned integer	AttributesView		8-bites előjel nélküli egész
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Ismeretlen
 Paste links	ContainerWindow		Hivatkozások beillesztése
 Restoring: 	StatusWindow		Visszaállítás:
 The Tracker must be running to set the default printer.	PoseView		A Nyomkövetőnek futnia kell az alapértelmezett nyomtató megadásához.
-Cancel	FindPanel		Mégse
 calculating…	InfoWindow		számolás…
 Preferred for file	OpenWithWindow		Előnyben részesítve a fájlnak
 OK	AutoMounterSettings		Rendben
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Tárgy
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Hiba történt a mappa másolása közben: \"%name\"\n\t%error\n\nSzeretnéd folytatni?
 You cannot create a link to the root directory.	FSUtils		Nem lehet hivatkozást létrehozni a gyökérmappához.
 Select all	FilePanelPriv		Összes kijelölése
-Clear history	FindPanel		Előzmények törlése
 Other	FilePermissionsView		Mindenki
 Automatic disk mounting	AutoMounterSettings		Automatikus lemezcsatolás
 parent folder	NavMenu		szülőmappa

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2306084894
+1	ukrainian	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -12,7 +12,6 @@ before	FindPanel		до
 New folder%d	FSUtils		Нова папка%d
 Volume icons	TrackerSettingsWindow		Значки томів
 Ignore case	SelectionWindow		Ігнорувати регістр
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Ви хочете прибрати тимчасові запити або всі запити?\nЦя дія незворотна!
 Save query:	FindPanel		Зберегти запит:
 Save as query template:	FindPanel		Зберегти як шаблон запиту:
 Current folder	ContainerWindow		Поточна папка
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Вибрати…
 Show shared volumes on Desktop	SettingsView		Показати спільні томи на робочому столі
 Size	PoseView		Розмір
 matches wildcard expression	SelectionWindow		відповідає шаблону виразу
-Clear history?	FindPanel		Очистити історію?
 Title	Bookmark Query Columns		Заголовок
 Identify	ContainerWindow		Визначити
 Create link	ContainerWindow		Створити посилання
@@ -84,7 +82,6 @@ Select	SelectionWindow		Вибрати
 Select	InfoWindow		Вибрати
 OK	OpenWithWindow		ОК
 Clean up	ContainerWindow		Очистити
-Clear all	FindPanel		Очистити все
 Modified	FindPanel		Змінений
  (block size: 	InfoWindow		 (розмір блоку: 
 Select all	QueryContainerWindow		Вибрати все
@@ -114,7 +111,6 @@ Company	Person Query Columns		Компанія
 Select folders…	FindPanel		Вибрати папки…
 Recent documents	FavoritesMenu		Недавні документи
 Edit templates…	TemplatesMenu		Редагувати шаблони…
-Clear temporary queries only	FindPanel		Тільки тимчасові запити
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# байт} few{# байти} other{# байтів}}
 8-bit integer	AttributesView		8-бітове ціле
 8-bit unsigned integer	AttributesView		8-бітове ціле беззнакове
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Невідомий
 Paste links	ContainerWindow		Вставити посилання
 Restoring: 	StatusWindow		Відновлення: 
 The Tracker must be running to set the default printer.	PoseView		Щоб встановити принтер за замовчуванням потрібен запущений Tracker.
-Cancel	FindPanel		Скасувати
 calculating…	InfoWindow		обчислення…
 Preferred for file	OpenWithWindow		Насамперед для файлу
 OK	AutoMounterSettings		ОК
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Тема
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання папки \«%name\»:\n\t%error\n\nБажаєте продовжити?
 You cannot create a link to the root directory.	FSUtils		Ви не можете створювати посилання на кореневий каталог.
 Select all	FilePanelPriv		Вибрати все
-Clear history	FindPanel		Очистити історію
 Other	FilePermissionsView		Інший
 Automatic disk mounting	AutoMounterSettings		Підключати автоматично
 parent folder	NavMenu		батьківський каталог

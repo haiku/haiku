@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2306084894
+1	catalan; valencian	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -12,7 +12,6 @@ before	FindPanel		abans
 New folder%d	FSUtils		Carpeta nova %d
 Volume icons	TrackerSettingsWindow		Icones dels volums
 Ignore case	SelectionWindow		Ignora les diferències de majúscules i minúscules
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Voleu netejar les consultes temporals o totes les consultes? Aquesta acció és irreversible!
 Save query:	FindPanel		Desa la consulta:
 Save as query template:	FindPanel		Desa la consulta com a plantilla:
 Current folder	ContainerWindow		Carpeta actual
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Seleccioneu...
 Show shared volumes on Desktop	SettingsView		Mostra els volums compartits a l'escriptori
 Size	PoseView		Mida
 matches wildcard expression	SelectionWindow		es correspon amb l'expressió regular
-Clear history?	FindPanel		Voleu netejar-ne l'historial?
 Title	Bookmark Query Columns		Títol
 Identify	ContainerWindow		Identifica com a
 Create link	ContainerWindow		Crea un enllaç
@@ -84,7 +82,6 @@ Select	SelectionWindow		Selecciona
 Select	InfoWindow		Selecciona
 OK	OpenWithWindow		D'acord
 Clean up	ContainerWindow		Neteja
-Clear all	FindPanel		Suprimeix-ho tot
 Modified	FindPanel		Modificat
  (block size: 	InfoWindow		 (mida de bloc: 
 Select all	QueryContainerWindow		Selecciona-ho tot
@@ -114,7 +111,6 @@ Company	Person Query Columns		Companyia
 Select folders…	FindPanel		Selecció de carpetes...
 Recent documents	FavoritesMenu		Documents recents
 Edit templates…	TemplatesMenu		Edita les plantilles...
-Clear temporary queries only	FindPanel		Suprimeix només les consultes temporals
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Enter de 8 bits
 8-bit unsigned integer	AttributesView		Enter de 8 bits no signat
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Desconegut
 Paste links	ContainerWindow		Enganxa els enllaços
 Restoring: 	StatusWindow		Es restaura: 
 The Tracker must be running to set the default printer.	PoseView		El Rastrejador ha d'executar-se per establir la impressora predeterminada.
-Cancel	FindPanel		Cancel·la
 calculating…	InfoWindow		es calcula...
 Preferred for file	OpenWithWindow		Preferit pel fitxer
 OK	AutoMounterSettings		D'acord
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Assumpte
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar la carpeta \"%name\":\n\t%error\n\nVoleu continuar?
 You cannot create a link to the root directory.	FSUtils		No podeu fer cap enllaç amb la carpeta d'arrel.
 Select all	FilePanelPriv		Selecciona-ho tot
-Clear history	FindPanel		Neteja'n l'historial
 Other	FilePermissionsView		Altres
 Automatic disk mounting	AutoMounterSettings		Muntatge automàtic de discs
 parent folder	NavMenu		carpeta pare

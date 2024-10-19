@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	1140196651
+1	romanian	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Nu s-a putut demonta partiția %s.
 Mount all	MainWindow		Montează toate
 Disk	MainWindow		Disc
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Dispozitiv
 Initialize	MainWindow		Inițializare
 Could not change the parameters of the selected partition.	MainWindow		Nu s-au putut modifica parametrii partiției selectate.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția \„%s\” vor fi pierdute iremediabil dacă faceți asta!
 PGP encrypted	Encryption utils		Criptat PGP
 Delete partition	MainWindow		Șterge partiția
 Error: 	MainWindow	in any error alert	Eroare: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Validarea parametrilor fu
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați partiția \„%s\”? Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
 DriveSetup	System name		DriveSetup
 Mounted at	PartitionList		Montat la
+Disk system %s not found!	MainWindow		Sistemul de disc %s nu a fost găsit!
 Create…	MainWindow		Creare…
 Write changes	MainWindow		Scrie modificările
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inițializarea partiției %s a eșuat. (Nu fost scris nimic pe disc.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		Partiția %s este deja demont
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sigur doriți să modificați parametrii partiției selectate?\n\nEste posibil ca partiția să nu mai fie recunoscută de alte sisteme de operare!
 Boot	PartitionList		Boot
 OK	AbstractParametersPanel		OK
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul \„%s\” vor fi pierdute iremediabil dacă faceți asta!
 Virtual	PartitionList		Virtual
 Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul selectat se vor pierde iremediabil dacă faceți acest lucru!

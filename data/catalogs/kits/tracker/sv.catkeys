@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	2306084894
+1	swedish	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Skapad
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
@@ -12,7 +12,6 @@ before	FindPanel		före
 New folder%d	FSUtils		Ny mapp %d
 Volume icons	TrackerSettingsWindow		Volymikoner
 Ignore case	SelectionWindow		Ignorera skiftesläge
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Vill du rensa tillfälliga frågor eller alla frågor? Denna åtgärd är oåterkallelig!
 Save query:	FindPanel		Spara fråga:
 Save as query template:	FindPanel		Spara som frågemall:
 Current folder	ContainerWindow		Nuvarande mapp
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Markera...
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet
 Size	PoseView		Storlek
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
-Clear history?	FindPanel		Rensa historik?
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identifiera
 Create link	ContainerWindow		Skapa länk
@@ -84,7 +82,6 @@ Select	SelectionWindow		Markera
 Select	InfoWindow		Markera
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Rada upp
-Clear all	FindPanel		Rensa allt
 Modified	FindPanel		Modifierad
  (block size: 	InfoWindow		 (block storlek:) 
 Select all	QueryContainerWindow		Markera allt
@@ -114,7 +111,6 @@ Company	Person Query Columns		Företag
 Select folders…	FindPanel		Välj mappar...
 Recent documents	FavoritesMenu		Senaste dokumenten
 Edit templates…	TemplatesMenu		Redigera mallar...
-Clear temporary queries only	FindPanel		Rensa endast tillfälliga frågor
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bitars integer
 8-bit unsigned integer	AttributesView		8-bitars osignerad integer
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Okänd
 Paste links	ContainerWindow		Klistra in länkar
 Restoring: 	StatusWindow		Återställer:
 The Tracker must be running to set the default printer.	PoseView		Tracker måste ha startats för att kunna sätta förvald printer.
-Cancel	FindPanel		Avbryt
 calculating…	InfoWindow		beräknar...
 Preferred for file	OpenWithWindow		Föredras för fil
 OK	AutoMounterSettings		OK
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Ämne
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av katalogen \"%name\":\n\t%error\n\nVill du fortsätta?
 You cannot create a link to the root directory.	FSUtils		Du kan inte skapa en länk till rotkatalogen.
 Select all	FilePanelPriv		Välj allt
-Clear history	FindPanel		Rensa historik
 Other	FilePermissionsView		Annan
 Automatic disk mounting	AutoMounterSettings		Montera volymer automatiskt
 parent folder	NavMenu		föräldrakatalog

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	2306084894
+1	czech	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Vytvořeno
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otevři a nastav preferovanou
@@ -12,7 +12,6 @@ before	FindPanel		před
 New folder%d	FSUtils		Nový adresář%d
 Volume icons	TrackerSettingsWindow		Ikony svazků
 Ignore case	SelectionWindow		Ignorovat velikost znaků
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Chcete odstranit dočasné dotazy, nebo všechny? Smazání je nevratné!
 Save query:	FindPanel		Uložit dotaz:
 Save as query template:	FindPanel		Uložit jako šablonu dotazu:
 Current folder	ContainerWindow		Současný adresář
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Vybrat...
 Show shared volumes on Desktop	SettingsView		Zobrazit sdílené svazky na ploše
 Size	PoseView		Velikost
 matches wildcard expression	SelectionWindow		Shoda s výrazem se zástupnými znaky
-Clear history?	FindPanel		Smazat historii?
 Title	Bookmark Query Columns		Název
 Identify	ContainerWindow		Rozpoznat
 Create link	ContainerWindow		Vytvořit odkaz
@@ -84,7 +82,6 @@ Select	SelectionWindow		Vybrat
 Select	InfoWindow		Vybrat
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Vyčistit
-Clear all	FindPanel		Smazat vše
 Modified	FindPanel		Upravené
  (block size: 	InfoWindow		 (velikost bloku: 
 Select all	QueryContainerWindow		Vybrat vše
@@ -114,7 +111,6 @@ Company	Person Query Columns		Společnost
 Select folders…	FindPanel		Vybrat adresáře…
 Recent documents	FavoritesMenu		Nedávné dokumenty
 Edit templates…	TemplatesMenu		Upravit šablony...
-Clear temporary queries only	FindPanel		Smazat pouze dočastné dotazy
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bajt} few{# bajty} other{# bajtů}}
 8-bit integer	AttributesView		8 bitové celé číslo
 8-bit unsigned integer	AttributesView		8 bitové přirozené číslo
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Neznámý
 Paste links	ContainerWindow		Vložit odkazy
 Restoring: 	StatusWindow		Obnovuji: 
 The Tracker must be running to set the default printer.	PoseView		Pro nastavení výchozí tiskárny musí běžet Tracker.
-Cancel	FindPanel		Zrušit
 calculating…	InfoWindow		počítání...
 Preferred for file	OpenWithWindow		Preferovaná pro soubor
 OK	AutoMounterSettings		OK
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Předmět
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba kopírování složky \"%name\":\n\t%error\n\nPřejete si pokračovat?
 You cannot create a link to the root directory.	FSUtils		Nelze vytvořit odkaz v kořenovém adresáři.
 Select all	FilePanelPriv		Vybrat vše
-Clear history	FindPanel		Smazat historii
 Other	FilePermissionsView		Ostatní
 Automatic disk mounting	AutoMounterSettings		Automatické připojení disku
 parent folder	NavMenu		nadřazený adresář

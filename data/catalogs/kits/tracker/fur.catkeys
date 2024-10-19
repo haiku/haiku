@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2306084894
+1	friulian	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -12,7 +12,6 @@ before	FindPanel		prime
 New folder%d	FSUtils		Gnove cartele%d
 Volume icons	TrackerSettingsWindow		Iconis volums
 Ignore case	SelectionWindow		Ignore maiusculis/minusculis
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Desideristu netâ lis interogazions temporaniis o dutis lis interogazions? Nol sarà pussibil tornâ indaûr cheste azion!
 Save query:	FindPanel		Salve interogazion:
 Save as query template:	FindPanel		Salve come model di interogazion:
 Current folder	ContainerWindow		Cartele atuâl
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Selezione…
 Show shared volumes on Desktop	SettingsView		Mostre i volums condividûts sul Scritori
 Size	PoseView		Dimension
 matches wildcard expression	SelectionWindow		al coincît cu la espression cun matis (*)
-Clear history?	FindPanel		Netâ la cronologjie?
 Title	Bookmark Query Columns		Titul
 Identify	ContainerWindow		Identifiche
 Create link	ContainerWindow		Cree colegament
@@ -84,7 +82,6 @@ Select	SelectionWindow		Selezione
 Select	InfoWindow		Selezione
 OK	OpenWithWindow		Va ben
 Clean up	ContainerWindow		Met a puest
-Clear all	FindPanel		Nete dut
 Modified	FindPanel		Modificât
  (block size: 	InfoWindow		  (dimension bloc: 
 Select all	QueryContainerWindow		Selezione dutis
@@ -114,7 +111,6 @@ Company	Person Query Columns		Aziende
 Select folders…	FindPanel		Selezione cartelis…
 Recent documents	FavoritesMenu		Documents resints
 Edit templates…	TemplatesMenu		Modifiche modei…
-Clear temporary queries only	FindPanel		Nete dome interogazions temporaniis
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# byte}}
 8-bit integer	AttributesView		Intîr a 8 bit 
 8-bit unsigned integer	AttributesView		Intîr cence segn a 8 bit
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
 Restoring: 	StatusWindow		Ripristinament: 
 The Tracker must be running to set the default printer.	PoseView		Al è necessari che il Tracker al sedi in esecuzion par stabilî la stampadore predefinide.
-Cancel	FindPanel		Anule
 calculating…	InfoWindow		daûr a calcolâ…
 Preferred for file	OpenWithWindow		Preferît par file
 OK	AutoMounterSettings		Va ben
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Ogjet
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ la cartele \"%name\":\n\t%error\n\nContinuâ?
 You cannot create a link to the root directory.	FSUtils		No tu puedis creâ un colegament ae cartele lidrîs.
 Select all	FilePanelPriv		Selezione dut
-Clear history	FindPanel		Nete cronologjie
 Other	FilePermissionsView		Altri
 Automatic disk mounting	AutoMounterSettings		Montaç automatic dai discs
 parent folder	NavMenu		cartele superiôr

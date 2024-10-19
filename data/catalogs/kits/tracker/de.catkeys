@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1245126824
+1	german	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -12,7 +12,6 @@ before	FindPanel		vor
 New folder%d	FSUtils		Neuer Ordner%d
 Volume icons	TrackerSettingsWindow		Datenträger-Icons
 Ignore case	SelectionWindow		Ignoriere Groß-/Kleinschreibung
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Sollen nur temporäre oder alle Queries gelöscht werden? Achtung, das kann nicht rückgängig gemacht werden!
 Save query:	FindPanel		Query speichern:
 Save as query template:	FindPanel		Query-Vorlage speichern:
 Current folder	ContainerWindow		Aktueller Ordner
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Auswählen …
 Show shared volumes on Desktop	SettingsView		Netzwerk-Laufwerke auf dem Desktop zeigen
 Size	PoseView		Größe
 matches wildcard expression	SelectionWindow		entspricht Platzhalter-Ausdruck
-Clear history?	FindPanel		Historie löschen?
 Title	Bookmark Query Columns		Titel
 Identify	ContainerWindow		Identifizieren
 Create link	ContainerWindow		Verknüpfung erstellen
@@ -70,6 +68,7 @@ Status	Email Query Columns		Status
 New folder	FSUtils		Neuer Ordner
 Junk on end.	libtracker		Müll am Ende.
 New Query	FindPanel		Neue Query
+system	B_SYSTEM_DIRECTORY		System
 Preparing to delete items…	StatusWindow		Löschen wird vorbereitet …
 Open %name with:	OpenWithWindow		%name öffnen mit:
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" hat ein nicht-unterstütztes Programmformat.
@@ -83,13 +82,13 @@ Select	SelectionWindow		Auswählen
 Select	InfoWindow		Auswählen
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Icons ausrichten
-Clear all	FindPanel		Alle löschen
 Modified	FindPanel		Geändert
  (block size: 	InfoWindow		 (Blockgröße: 
 Select all	QueryContainerWindow		Alles auswählen
 Generate image thumbnails	SettingsView		Miniaturbilder erstellen
 Select…	FilePanelPriv		Auswählen …
 An item named '%filename%' already exists.	FSUtils		Ein Objekt '%filename%' existiert bereits.
+preferences	B_PREFERENCES_DIRECTORY		Einstellungsandwendungen
 Name	Person Query Columns		Name
 Skip all	FSUtils		Alle überspringen
 Corrupted opcode.	libtracker		Fehlerhafter Opcode.
@@ -112,7 +111,6 @@ Company	Person Query Columns		Firma
 Select folders…	FindPanel		Ordner wählen…
 Recent documents	FavoritesMenu		Letzte Dokumente
 Edit templates…	TemplatesMenu		Vorlagen bearbeiten …
-Clear temporary queries only	FindPanel		Nur temporäre Queries löschen
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{(# Byte)} other{(# Bytes)}}
 8-bit integer	AttributesView		Integer 8-bit
 8-bit unsigned integer	AttributesView		Integer 8-bit, vorzeichenlos
@@ -159,6 +157,7 @@ Edit query	ContainerWindow		Query bearbeiten
 Previously mounted disks	AutoMounterSettings		Zuletzt eingehängte Datenträger
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Dateien können nicht mit Ordnern oder Verknüpfungen ersetzt werden.
 The target disk does not support creating links.	FSUtils		Der Zieldatenträger unterstützt das Erstellen von Verknüpfungen nicht.
+develop	B_SYSTEM_DEVELOP_DIRECTORY		Entwicklung
 64-bit integer	AttributesView		Integer 64-bit
 Cut more	ContainerWindow		Mehr ausschneiden
 The Tracker must be running to see Info windows.	PoseView		Um Info-Fenster zeigen zu können, muss Tracker laufen.
@@ -292,7 +291,6 @@ Unknown	FilePermissionsView		Unbekannt
 Paste links	ContainerWindow		Verknüpfungen einfügen
 Restoring: 	StatusWindow		Wiederherstellen von:
 The Tracker must be running to set the default printer.	PoseView		Um einen Standarddrucker zu setzen, muss der Tracker laufen.
-Cancel	FindPanel		Abbrechen
 calculating…	InfoWindow		Berechnung läuft …
 Preferred for file	OpenWithWindow		Bevorzugt für Datei
 OK	AutoMounterSettings		OK
@@ -306,6 +304,7 @@ no	AttributesView		nein
 Recent folders	ContainerWindow		Letzte Ordner
 Desktop	Model		Desktop
 Select all	ContainerWindow		Alles auswählen
+apps	B_APPS_DIRECTORY		Anwendungen
 Error calculating folder size.	InfoWindow		Fehler beim Ermitteln der Ordnergröße.
 Delete	FSUtils		Löschen
 Duplicate	FilePanelPriv		Duplizieren
@@ -313,6 +312,7 @@ Edit name	ContainerWindow		Umbenennen
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" konnte nicht geöffnet werden (Fehlendes Symbol: %symbol).\n
 ASCII Text	AttributesView		ASCII Text
 Atom reference	AttributesView		Atom Referenz
+config	B_USER_CONFIG_DIRECTORY		Einstellungen
 Error moving \"%name\".	FSUtils		Fehler beim Verschieben von \"%name\".
 Select…	QueryContainerWindow		Auswählen …
 Open	ContainerWindow		Öffnen
@@ -376,7 +376,6 @@ Subject	Email Query Columns		Betreff
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren des Ordners \"%name\":\n\t%error\n\nSoll fortgefahren werden?
 You cannot create a link to the root directory.	FSUtils		Auf das Root-Verzeichnis des Laufwerks kann keine Verknüpfung erstellt werden.
 Select all	FilePanelPriv		Alles auswählen
-Clear history	FindPanel		Historie löschen
 Other	FilePermissionsView		Andere
 Automatic disk mounting	AutoMounterSettings		Automatisch Einhängen
 parent folder	NavMenu		Übergeordneter Ordner

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DeskCalc	1039932692
+1	german	x-vnd.Haiku-DeskCalc	2154833291
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
@@ -39,6 +39,7 @@ exp	CalcView		exp
 atan	CalcView		atan
 9	CalcView		9
 .	CalcView		,
+DeskCalc	System name		Rechner
 Degrees	CalcView		Grad
 7	CalcView		7
 !	CalcView		!

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ProcessController	2349086807
+1	german	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		Fehler beim Speichern der Datei
 Display priority	ProcessController		Anzeigen-Priorität
 That's no Fun!	ProcessController		Nicht lustig!
@@ -36,6 +36,7 @@ Quit an application	ProcessController		Anwendung beenden
 Cancel	ProcessController		Abbrechen
 Install in Deskbar	ProcessController		In Deskbar installieren
 Debug this team!	ProcessController		Dieses Team debuggen!
+ProcessController	System name		Prozessanzeige
 Lowest active priority	ProcessController		Niedrigste aktive Priorität
 Restart Tracker	ProcessController		Tracker neu starten
 System resources & caches…	ProcessController		Systemressourcen & Cache …

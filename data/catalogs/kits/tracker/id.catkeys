@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2905117031
+1	indonesian	x-vnd.Haiku-libtracker	1235931665
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -12,7 +12,6 @@ before	FindPanel		sebelum
 New folder%d	FSUtils		Folder baru%d
 Volume icons	TrackerSettingsWindow		Ikon volume
 Ignore case	SelectionWindow		Abaikan huruf kapital/bukan
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Apakah Anda ingin menghapus kueri sementara atau semua kueri? Tindakan ini tidak dapat dibatalkan!
 Save query:	FindPanel		Simpan Kueri:
 Save as query template:	FindPanel		Simpan sebagai templat kueri:
 Current folder	ContainerWindow		Folder saat ini
@@ -54,7 +53,6 @@ Select…	ContainerWindow		Pilih...
 Show shared volumes on Desktop	SettingsView		Tampilkan volume berbagi pada Desktop
 Size	PoseView		Ukuran
 matches wildcard expression	SelectionWindow		sesuai dengan ungkapan wildcard
-Clear history?	FindPanel		Hapus riwayat?
 Title	Bookmark Query Columns		Judul
 Identify	ContainerWindow		Identitas
 Create link	ContainerWindow		Buat link
@@ -81,7 +79,6 @@ Select	SelectionWindow		Memilih
 Select	InfoWindow		Memilih
 OK	OpenWithWindow		OKE
 Clean up	ContainerWindow		Pembersihan
-Clear all	FindPanel		Hapus semua
 Modified	FindPanel		Diubah
  (block size: 	InfoWindow		 (ukuran blok: 
 Select all	QueryContainerWindow		Pilih semua
@@ -109,7 +106,6 @@ Remove	FindPanel		Hapus
 Company	Person Query Columns		Perusahaan
 Recent documents	FavoritesMenu		Dokumen terbaru
 Edit templates…	TemplatesMenu		Sunting template…
-Clear temporary queries only	FindPanel		Hapus kueri sementara saja
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} lain{# bytes}}
 8-bit integer	AttributesView		integer 8-bit
 8-bit unsigned integer	AttributesView		integer unsigned 8-bit
@@ -287,7 +283,6 @@ Unknown	FilePermissionsView		Tak diketahui
 Paste links	ContainerWindow		Tempel tautan
 Restoring: 	StatusWindow		Sedang memulihkan: 
 The Tracker must be running to set the default printer.	PoseView		Tracker harus dijalankan untuk mengatur printer default.
-Cancel	FindPanel		Batal
 calculating…	InfoWindow		menghitung…
 Preferred for file	OpenWithWindow		Lebih disukai untuk berkas
 OK	AutoMounterSettings		OKE
@@ -371,7 +366,6 @@ Subject	Email Query Columns		Subyek
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ada kesalahan ketika menyalin folder \"%name\":\n\t%error\n\nAnda ingin melanjutkan?
 You cannot create a link to the root directory.	FSUtils		Anda tidak dapat membuat link ke direktori root.
 Select all	FilePanelPriv		Pilih semua
-Clear history	FindPanel		Hapus sejarah
 Other	FilePermissionsView		Lainnya
 Automatic disk mounting	AutoMounterSettings		Pemasangan diska otomatis
 parent folder	NavMenu		folder induk

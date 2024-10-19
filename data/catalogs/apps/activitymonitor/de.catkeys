@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	3951509502
+1	german	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaphoren
 TX	DataSource	Shorter version for Sending	Senden
@@ -15,6 +15,7 @@ Receiving	DataSource		Empfangen
 Remove graph	ActivityView		Graph entfernen
 Swap space	DataSource		Auslagerungsspeicher
 CPU	DataSource		CPU
+ActivityMonitor	System name		Systemaktivität
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Aktualisierungsintervall:
 RX	DataSource	Shorter version for Receiving.	Empfangen

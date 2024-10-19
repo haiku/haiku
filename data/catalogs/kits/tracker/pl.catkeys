@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	474158481
+1	polish	x-vnd.Haiku-libtracker	3099940411
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -12,7 +12,6 @@ before	FindPanel		przed
 New folder%d	FSUtils		Nowy katalog%d
 Volume icons	TrackerSettingsWindow		Ikony dysków
 Ignore case	SelectionWindow		Ignoruj wielkość liter
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Chcesz wyczyścić tylko tymczasowe czy wszystkie zapytania? To działanie jest nieodwracalne!
 Save query:	FindPanel		Zapisz zapytanie:
 Save as query template:	FindPanel		Zapisz jako szablon zapytania:
 Current folder	ContainerWindow		Bieżący katalog
@@ -55,7 +54,6 @@ Select…	ContainerWindow		Zaznacz…
 Show shared volumes on Desktop	SettingsView		Pokaż współdzielone woluminy na Pulpicie
 Size	PoseView		Rozmiar
 matches wildcard expression	SelectionWindow		pasuje do wyrażenia ze znakami wieloznacznymi
-Clear history?	FindPanel		Wyczyścić historię?
 Title	Bookmark Query Columns		Tytuł
 Identify	ContainerWindow		Rozpoznaj
 Create link	ContainerWindow		Utwórz dowiązanie
@@ -82,7 +80,6 @@ Select	SelectionWindow		Wybierz
 Select	InfoWindow		Wybierz
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Wyczyść
-Clear all	FindPanel		Wyczyść wszystkie
 Modified	FindPanel		Zmodyfikowano
  (block size: 	InfoWindow		 (rozmiar bloku: 
 Select all	QueryContainerWindow		Zaznacz wszystko
@@ -111,7 +108,6 @@ Remove	FindPanel		Usuń
 Company	Person Query Columns		Firma
 Recent documents	FavoritesMenu		Ostatnio otwierane dokumenty
 Edit templates…	TemplatesMenu		Modyfikuj szablony…
-Clear temporary queries only	FindPanel		Wyczyść tylko tymczasowe zapytania
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bajt} few{# bajty} many{# bajtów} other{# bajta}}
 8-bit integer	AttributesView		8-bitowa liczba całkowita
 8-bit unsigned integer	AttributesView		8-bitowa liczba całkowita bez znaku
@@ -290,7 +286,6 @@ Unknown	FilePermissionsView		Nieznany
 Paste links	ContainerWindow		Wklej odnośniki
 Restoring: 	StatusWindow		Przywracanie: 
 The Tracker must be running to set the default printer.	PoseView		Tracker musi być uruchomiony, aby ustawić domyślną drukarkę.
-Cancel	FindPanel		Anuluj
 calculating…	InfoWindow		obliczanie…
 Preferred for file	OpenWithWindow		Preferowane dla pliku
 OK	AutoMounterSettings		OK
@@ -375,7 +370,6 @@ Subject	Email Query Columns		Temat
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu folderu „%name”:\n\t%error\n\nCzy chcesz kontynuować?
 You cannot create a link to the root directory.	FSUtils		Nie możesz utworzyć skrótu do katalogu głównego.
 Select all	FilePanelPriv		Zaznacz wszystko
-Clear history	FindPanel		Wyczyść historię
 Other	FilePermissionsView		Inne
 Automatic disk mounting	AutoMounterSettings		Automatyczne montowanie dysku
 parent folder	NavMenu		katalog nadrzędny

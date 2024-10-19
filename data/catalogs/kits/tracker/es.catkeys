@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2306084894
+1	spanish; castilian	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -12,7 +12,6 @@ before	FindPanel		Antes
 New folder%d	FSUtils		Nueva carpeta%d
 Volume icons	TrackerSettingsWindow		Iconos de volumenes
 Ignore case	SelectionWindow		Ignorar supuesto
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		¿Desea borrar las consultas temporales o todas las consultas? ¡Esta acción es irreversible!
 Save query:	FindPanel		Guardar consulta:
 Save as query template:	FindPanel		Guardar como plantilla de consulta:
 Current folder	ContainerWindow		Carpeta actual
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Seleccionar…
 Show shared volumes on Desktop	SettingsView		Mostrar las carpetas compartidas en el escritorio
 Size	PoseView		Tamaño
 matches wildcard expression	SelectionWindow		coincide con la expresión comodín
-Clear history?	FindPanel		¿Borrar el historial?
 Title	Bookmark Query Columns		Título
 Identify	ContainerWindow		Identificar
 Create link	ContainerWindow		Crear enlace
@@ -84,7 +82,6 @@ Select	SelectionWindow		Seleccionar
 Select	InfoWindow		Seleccionar
 OK	OpenWithWindow		Aceptar
 Clean up	ContainerWindow		Limpiar
-Clear all	FindPanel		Borrar todo
 Modified	FindPanel		Modificado
  (block size: 	InfoWindow		 (tamaño de bloque: 
 Select all	QueryContainerWindow		Seleccionar todo
@@ -114,7 +111,6 @@ Company	Person Query Columns		Empresa
 Select folders…	FindPanel		Seleccionar carpetas…
 Recent documents	FavoritesMenu		Documentos recientes
 Edit templates…	TemplatesMenu		Editar plantillas…
-Clear temporary queries only	FindPanel		Borrar únicamente las consultas temporales
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		Entero de 8 bits
 8-bit unsigned integer	AttributesView		Entero de 8 bits sin signo
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Desconocido
 Paste links	ContainerWindow		Pegar enlaces
 Restoring: 	StatusWindow		Restaurando:
 The Tracker must be running to set the default printer.	PoseView		Tracker debe estar en ejecución para configurar la impresora por defecto.
-Cancel	FindPanel		Cancelar
 calculating…	InfoWindow		calculando…
 Preferred for file	OpenWithWindow		Preferencia para el archivo
 OK	AutoMounterSettings		Aceptar
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Asunto
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error copiando la carpeta \"%name\":\n\t%error\n\n¿Deseas continuar?
 You cannot create a link to the root directory.	FSUtils		No puede crear un enlace a la carpeta raíz.
 Select all	FilePanelPriv		Seleccionar todo
-Clear history	FindPanel		Borrar historial
 Other	FilePermissionsView		Otro
 Automatic disk mounting	AutoMounterSettings		Montar discos automáticamente
 parent folder	NavMenu		Carpeta de nivel superior

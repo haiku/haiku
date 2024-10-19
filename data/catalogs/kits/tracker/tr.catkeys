@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	3979956390
+1	turkish	x-vnd.Haiku-libtracker	2310771024
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen kıl
@@ -12,7 +12,6 @@ before	FindPanel		önce
 New folder%d	FSUtils		Yeni klasör%d
 Volume icons	TrackerSettingsWindow		Disk simgeleri
 Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Geçici sorguları mı yoksa tüm sorguları mı temizlemek istiyorsunuz? Bu eylem geri alınamaz!
 Save query:	FindPanel		Sorguyu kaydet:
 Save as query template:	FindPanel		Sorgu şablonu olarak kaydet:
 Current folder	ContainerWindow		Geçerli klasör
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Seç…
 Show shared volumes on Desktop	SettingsView		Paylaşılan diskleri Masaüstü’nde göster
 Size	PoseView		Boyut
 matches wildcard expression	SelectionWindow		joker ifadesi ile eşleşir
-Clear history?	FindPanel		Geçmiş temizlensin mi?
 Title	Bookmark Query Columns		Başlık
 Identify	ContainerWindow		Tanımla
 Create link	ContainerWindow		Bağlantı oluştur
@@ -84,7 +82,6 @@ Select	SelectionWindow		Seç
 Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
 Clean up	ContainerWindow		Toparla
-Clear all	FindPanel		Tümünü temizle
 Modified	FindPanel		Değiştirilme
  (block size: 	InfoWindow		 (blok boyutu: 
 Select all	QueryContainerWindow		Tümünü seç
@@ -114,7 +111,6 @@ Company	Person Query Columns		Şirket
 Select folders…	FindPanel		Klasörler seç…
 Recent documents	FavoritesMenu		Son belgeler
 Edit templates…	TemplatesMenu		Şablonları düzenle…
-Clear temporary queries only	FindPanel		Yalnızca geçici sorguları temizle
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# bayt} other{# bayt}}
 8-bit integer	AttributesView		8 bit tamsayı
 8-bit unsigned integer	AttributesView		8 bit imzalanmamış tamsayı
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
 Restoring: 	StatusWindow		Eski haline getiriliyor: 
 The Tracker must be running to set the default printer.	PoseView		Saptanmış yazıcıyı ayarlamak için İzleyici çalışıyor olmalıdır.
-Cancel	FindPanel		Vazgeç
 calculating…	InfoWindow		hesaplanıyor…
 Preferred for file	OpenWithWindow		Dosya için tercih edilen
 OK	AutoMounterSettings		Tamam
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Konu
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		“%name” klasörü kopyalanırken hata:\n\t%error\n\nİşlemi sürdürmek istiyor musunuz?
 You cannot create a link to the root directory.	FSUtils		Kök dizine bir bağlantı oluşturulamaz.
 Select all	FilePanelPriv		Tümünü seç
-Clear history	FindPanel		Geçmişi temizle
 Other	FilePermissionsView		Diğer
 Automatic disk mounting	AutoMounterSettings		Otomatik disk bağlama
 parent folder	NavMenu		üst klasör

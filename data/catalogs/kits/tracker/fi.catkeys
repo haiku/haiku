@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	474158481
+1	finnish	x-vnd.Haiku-libtracker	3099940411
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -12,7 +12,6 @@ before	FindPanel		ennen
 New folder%d	FSUtils		Uusi kansio%d
 Volume icons	TrackerSettingsWindow		Taltiokuvakkeet
 Ignore case	SelectionWindow		Ohita kirjainkoko
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Haluatko poistaa tilapäiset kyselyt vai kaikki kyselyt? Tämä toiminto on peruuttamaton!
 Save query:	FindPanel		Tallenna kysely:
 Save as query template:	FindPanel		Tallenna kysely mallinteena:
 Current folder	ContainerWindow		Nykyiset kansiot
@@ -55,7 +54,6 @@ Select…	ContainerWindow		Valitse...
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä
 Size	PoseView		Koko
 matches wildcard expression	SelectionWindow		täsmää jokerimerkkilausekkeeseen
-Clear history?	FindPanel		Nollaatko historian?
 Title	Bookmark Query Columns		Otsikko
 Identify	ContainerWindow		Tunnista
 Create link	ContainerWindow		Luo linkki
@@ -82,7 +80,6 @@ Select	SelectionWindow		Valitse
 Select	InfoWindow		Valitse
 OK	OpenWithWindow		Valmis
 Clean up	ContainerWindow		Tyhjennä
-Clear all	FindPanel		Nollaa kaikki
 Modified	FindPanel		Muokattu
  (block size: 	InfoWindow		 (lohkokoko: 
 Select all	QueryContainerWindow		Valitse kaikki
@@ -111,7 +108,6 @@ Remove	FindPanel		Poista
 Company	Person Query Columns		Yritys
 Recent documents	FavoritesMenu		Äskettäiset asiakirjat
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
-Clear temporary queries only	FindPanel		Poista vain tilapäiset kyselyt
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# tavu} other{# tavua}}
 8-bit integer	AttributesView		8-bittinen kokonaisluku
 8-bit unsigned integer	AttributesView		8-bittinen etumerkitön kokonaisluku
@@ -290,7 +286,6 @@ Unknown	FilePermissionsView		Tuntematon
 Paste links	ContainerWindow		Liitä linkit
 Restoring: 	StatusWindow		Palautetaan: 
 The Tracker must be running to set the default printer.	PoseView		Oletustulostimen asettamiseksi Seuraajan on oltava käynnissä.
-Cancel	FindPanel		Peru
 calculating…	InfoWindow		lasketaan...
 Preferred for file	OpenWithWindow		Ensisijainen tiedostolle
 OK	AutoMounterSettings		Valmis
@@ -375,7 +370,6 @@ Subject	Email Query Columns		Aihe
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa kansiota ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 You cannot create a link to the root directory.	FSUtils		Et voi luoda linkkiä juurihakemistoon.
 Select all	FilePanelPriv		Valitse kaikki
-Clear history	FindPanel		Nollaa historia
 Other	FilePermissionsView		Muu
 Automatic disk mounting	AutoMounterSettings		Automaattinen levyliittäminen
 parent folder	NavMenu		ylemmän tason kansio

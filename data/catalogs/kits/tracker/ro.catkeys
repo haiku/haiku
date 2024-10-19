@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2306084894
+1	romanian	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -12,7 +12,6 @@ before	FindPanel		înainte de
 New folder%d	FSUtils		Dosar nou%d
 Volume icons	TrackerSettingsWindow		Pictograme de volum
 Ignore case	SelectionWindow		Ignoră majusculele
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Doriți să eliberați interogările temporare sau toate interogările? Această acțiune nu este reversibilă!
 Save query:	FindPanel		Salvează interogarea:
 Save as query template:	FindPanel		Salvează ca șablon de interogare:
 Current folder	ContainerWindow		Dosar curent
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Selectare…
 Show shared volumes on Desktop	SettingsView		Arată volumele partajate pe desktop
 Size	PoseView		Dimensiune
 matches wildcard expression	SelectionWindow		se potrivește expresiei metacaracter
-Clear history?	FindPanel		Eliberați istoricul?
 Title	Bookmark Query Columns		Titlu
 Identify	ContainerWindow		Identifică
 Create link	ContainerWindow		Crează o legătură
@@ -84,7 +82,6 @@ Select	SelectionWindow		Selectează
 Select	InfoWindow		Selectează
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Curăță
-Clear all	FindPanel		Eliberează toate
 Modified	FindPanel		Modificat
  (block size: 	InfoWindow		 (dimensiune bloc: 
 Select all	QueryContainerWindow		Selectează toate
@@ -114,7 +111,6 @@ Company	Person Query Columns		Companie
 Select folders…	FindPanel		Selectează dosarele…
 Recent documents	FavoritesMenu		Documente recente
 Edit templates…	TemplatesMenu		Editare șabloane…
-Clear temporary queries only	FindPanel		Eliberează doar interogările temporare
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		întreg pe 8 biți
 8-bit unsigned integer	AttributesView		întreg fără semn pe 8 biți
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Necunoscut
 Paste links	ContainerWindow		Lipește legăturile
 Restoring: 	StatusWindow		Se restaurează: 
 The Tracker must be running to set the default printer.	PoseView		Tracker-ul trebuie să ruleze pentru a stabili imprimanta implicită.
-Cancel	FindPanel		Anulează
 calculating…	InfoWindow		se calculează…
 Preferred for file	OpenWithWindow		Preferat pentru fișier
 OK	AutoMounterSettings		OK
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Subiect
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea dosarului \„%name\”:\n\t%error\n\nDoriți să continuați?
 You cannot create a link to the root directory.	FSUtils		Nu puteți crea o legătură către directorul root.
 Select all	FilePanelPriv		Selectează toate
-Clear history	FindPanel		Eliberează istoricul
 Other	FilePermissionsView		Altele
 Automatic disk mounting	AutoMounterSettings		Montare de disc automată
 parent folder	NavMenu		dosar superior

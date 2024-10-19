@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	2306084894
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -12,7 +12,6 @@ before	FindPanel		før
 New folder%d	FSUtils		Ny mappe%d
 Volume icons	TrackerSettingsWindow		Volumikoner
 Ignore case	SelectionWindow		Ikke skill mellom store og små bokstaver
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		Vil du slette midlertidige søk eller alle søk? Denne handlingen er irreversibel!
 Save query:	FindPanel		Lagre søk:
 Save as query template:	FindPanel		Lagre som søkemal:
 Current folder	ContainerWindow		Nåværende mappe
@@ -56,7 +55,6 @@ Select…	ContainerWindow		Velg...
 Show shared volumes on Desktop	SettingsView		Vis delte volumer på skrivebordet
 Size	PoseView		Størrelse
 matches wildcard expression	SelectionWindow		treffer wildcard uttrykk
-Clear history?	FindPanel		Tøm logg?
 Title	Bookmark Query Columns		Tittel
 Identify	ContainerWindow		Identifiser
 Create link	ContainerWindow		Lag lenke
@@ -84,7 +82,6 @@ Select	SelectionWindow		Velg
 Select	InfoWindow		Velg
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Rydd opp
-Clear all	FindPanel		Tøm alt
 Modified	FindPanel		Endret
  (block size: 	InfoWindow		 (blokkstørrelse: 
 Select all	QueryContainerWindow		Merk alle
@@ -114,7 +111,6 @@ Company	Person Query Columns		Selskap
 Select folders…	FindPanel		Velg mapper…
 Recent documents	FavoritesMenu		Siste dokumenter
 Edit templates…	TemplatesMenu		Rediger maler
-Clear temporary queries only	FindPanel		Slett kun midlertidige søk
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
 8-bit integer	AttributesView		8-bit integer
 8-bit unsigned integer	AttributesView		8-bit unsigned integer
@@ -295,7 +291,6 @@ Unknown	FilePermissionsView		Ukjent
 Paste links	ContainerWindow		Lim inn lenker
 Restoring: 	StatusWindow		Gjenoppretter:
 The Tracker must be running to set the default printer.	PoseView		Trackeren må kjøre for å angi standardskriver.
-Cancel	FindPanel		Avbryt
 calculating…	InfoWindow		kalkulerer...
 Preferred for file	OpenWithWindow		Foretrukket for fil
 OK	AutoMounterSettings		OK
@@ -381,7 +376,6 @@ Subject	Email Query Columns		Emne
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Feil ved kopiering av mappen \"%name\":\n\t%error\n\nØnsker du å fortsette?
 You cannot create a link to the root directory.	FSUtils		Du kan ikke lage en lenke til rotkatalogen.
 Select all	FilePanelPriv		Merk alle
-Clear history	FindPanel		Tøm logg
 Other	FilePermissionsView		Andre
 Automatic disk mounting	AutoMounterSettings		Automatisk diskmontering
 parent folder	NavMenu		overmappe

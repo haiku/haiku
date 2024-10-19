@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	1879840288
+1	german	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -21,6 +21,7 @@ Failed to format the partition %s!\n	MainWindow		Formatierung der Partition %s f
 Partition size	CreateParametersPanel		Partitionsgröße
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
+DriveSetup	System name		Datenträgerverwaltung
 Mounted at	PartitionList		Eingehangen als
 Disk system %s not found!	MainWindow		Medienschema %s nicht gefunden!
 Create…	MainWindow		Anlegen …

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	402118187
+1	french	x-vnd.Haiku-libtracker	3228167985
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -78,7 +78,6 @@ Select	SelectionWindow		Sélectionner
 Select	InfoWindow		Sélectionner
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		Nettoyer
-Clear all	FindPanel		Effacer tout
 Modified	FindPanel		Modifié
  (block size: 	InfoWindow		 (taille de bloc : 
 Select all	QueryContainerWindow		Sélectionner tout
@@ -281,7 +280,6 @@ Unknown	FilePermissionsView		Inconnu
 Paste links	ContainerWindow		Coller les liens
 Restoring: 	StatusWindow		Restauration : 
 The Tracker must be running to set the default printer.	PoseView		Le Tracker doit être lancé pour pouvoir définir l’imprimante par défaut.
-Cancel	FindPanel		Annuler
 calculating…	InfoWindow		calcul…
 Preferred for file	OpenWithWindow		Préférence pour le fichier
 OK	AutoMounterSettings		OK

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-CharacterMap	547332410
+1	german	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse mathematische Symbole B
 Latin extended E	UnicodeBlocks		Lateinisch (Erweiterung E)
@@ -38,6 +38,7 @@ Enclosed ideographic supplement	UnicodeBlocks		Geschlossene ideografische Erweit
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		Vertikale Formen
 Miscellaneous mathematical symbols A	UnicodeBlocks		Diverse mathematische Symbole A
+CharacterMap	System name		Zeichentabelle
 Latin extended D	UnicodeBlocks		Lateinisch (Erweiterung D)
 Aegean numbers	UnicodeBlocks		Ägäische Zahlen
 Hangul syllables	UnicodeBlocks		Hangul-Silben

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaConverter	1436080178
+1	german	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
 Source files	MediaConverter		Quelldateien
 Error writing video frame %lld	MediaConverter		Fehler beim Schreiben von Video-Frame %lld
@@ -55,6 +55,7 @@ Quit	Menu		Beenden
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# Byte} other{# Bytes}}
 Writing audio track: %s complete	MediaConverter		Schreibe Audiospur: %s fertig
 Duration:	MediaConverter-FileInfo		Dauer:
+MediaConverter	System name		Medien-Formatwandler
 Writing video track: %s complete	MediaConverter		Schreibe Videospur: %s fertig
 Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
 Error writing audio frame %lld	MediaConverter		Fehler beim Schreiben von Audio-Frame %lld

@@ -1,10 +1,10 @@
-1	japanese	x-vnd.Haiku-libtracker	3928324372
+1	japanese	x-vnd.Haiku-libtracker	316454464
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
 Kind	ContainerWindow		種類
 Open with…	ContainerWindow		指定アプリケーションで開く...
-Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨てようとしたら、エラーが発生しました。(%error)
+Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に捨てる際に、エラーが発生しました。(%error)
 Or	FindPanel		または
 MIME Description	AttributesView		MIME 説明
 Query	FindPanel		クエリ
@@ -12,7 +12,6 @@ before	FindPanel		以前
 New folder%d	FSUtils		新規フォルダー%d
 Volume icons	TrackerSettingsWindow		ディスクアイコン
 Ignore case	SelectionWindow		大文字小文字を区別しない
-Do you want to clear temporary queries or all queries? This action is irreversible!	FindPanel		一時的なクエリまたはすべてのクエリを削除しますか? この動作は戻せません!
 Save query:	FindPanel		クエリの保存:
 Save as query template:	FindPanel		クエリテンプレートとして保存:
 Current folder	ContainerWindow		現在のフォルダー
@@ -33,7 +32,7 @@ Searching for disks to mount…	StatusWindow		マウントできるディスク�
 Value	AttributesView		値
 Multiple selections	FindPanel		複数選択
 Information	InfoWindow		情報
-Error emptying Trash	FSUtils		ごみ箱を空にしている途中でエラーが発生しました。
+Error emptying Trash	FSUtils		ごみ箱を空にしている際にエラーが発生しました。
 Opens with:	InfoWindow		アプリケーション:
 Size	QueryPoseView		サイズ
 Disk mount	TrackerSettingsWindow		ディスクのマウント
@@ -56,7 +55,6 @@ Select…	ContainerWindow		選択...
 Show shared volumes on Desktop	SettingsView		共有ディスクをデスクトップに表示
 Size	PoseView		サイズ
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
-Clear history?	FindPanel		履歴を消去しますか?
 Title	Bookmark Query Columns		タイトル
 Identify	ContainerWindow		ファイル形式を判別
 Create link	ContainerWindow		リンクの作成
@@ -64,6 +62,7 @@ starts with	FindPanel		指定文字列で始まる
 Replace	FSUtils		置換
 ?+* follows nothing.	libtracker		?+* のうしろに何もありません。
 Rectangle	AttributesView		四角
+Include Trash	FindPanel		ごみ箱を含める
 Move to	ContainerWindow		次へ移動
 Status	Email Query Columns		状態
 New folder	FSUtils		新規フォルダー
@@ -83,7 +82,6 @@ Select	SelectionWindow		選択
 Select	InfoWindow		選択
 OK	OpenWithWindow		OK
 Clean up	ContainerWindow		アイコンの整列
-Clear all	FindPanel		すべて削除
 Modified	FindPanel		更新日時
  (block size: 	InfoWindow		 (ブロックサイズ: 
 Select all	QueryContainerWindow		すべて選択
@@ -113,7 +111,6 @@ Company	Person Query Columns		会社
 Select folders…	FindPanel		フォルダーの選択…
 Recent documents	FavoritesMenu		最近使ったドキュメント
 Edit templates…	TemplatesMenu		テンプレートの編集...
-Clear temporary queries only	FindPanel		一時的なクエリのみ削除
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# バイト} other{# バイト}}
 8-bit integer	AttributesView		8 ビット整数
 8-bit unsigned integer	AttributesView		8 ビット符号無し整数
@@ -294,7 +291,6 @@ Unknown	FilePermissionsView		不明
 Paste links	ContainerWindow		リンクを貼り付ける
 Restoring: 	StatusWindow		元に戻しています:
 The Tracker must be running to set the default printer.	PoseView		デフォルトプリンターを設定するにはTrackerが動作している必要があります。
-Cancel	FindPanel		キャンセル
 calculating…	InfoWindow		計算中...
 Preferred for file	OpenWithWindow		関連付けの第一優先
 OK	AutoMounterSettings		OK
@@ -379,7 +375,6 @@ Subject	Email Query Columns		件名
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" フォルダーの移動中にエラーが発生:\n\t%error\n\nそれでも続けますか?
 You cannot create a link to the root directory.	FSUtils		ルートフォルダーにリンクを作成できません。
 Select all	FilePanelPriv		すべて選択
-Clear history	FindPanel		履歴の消去
 Other	FilePermissionsView		その他
 Automatic disk mounting	AutoMounterSettings		ディスクの自動マウント
 parent folder	NavMenu		親フォルダー

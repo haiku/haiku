@@ -1,10 +1,11 @@
-1	german	x-vnd.Haiku-MediaPlayer	328199515
+1	german	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eintrag in den Papierkorb verschieben
 Close	MediaPlayer-PlaylistWindow		Schließen
 Volume of background clips	MediaPlayer-SettingsWindow		Wiedergabe im Hintergrund
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardware-Overlay verwenden, falls verfügbar
 Audio	MediaPlayer-InfoWin		Audio
 Subtitle placement:	MediaPlayer-SettingsWindow		Untertitelposition:
+MediaPlayer	System name		Medienspieler
 Audio track	MediaPlayer-Main		Audiospur
 Muted	MediaPlayer-SettingsWindow		Stumm geschaltet
 OK	MediaPlayer-RemovePLItemsCmd		OK
