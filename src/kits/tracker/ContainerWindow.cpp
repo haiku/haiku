@@ -1554,9 +1554,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 						break;
 
 					case kSingleWindowBrowseChanged:
-						if (settings.SingleWindowBrowse() && Navigator() == NULL
-							&& TargetModel()->IsDirectory() && !PoseView()->IsFilePanel()
-							&& !PoseView()->IsDesktop()) {
+						if (PoseView()->IsFilePanel() || PoseView()->IsDesktop()) {
 							SetSingleWindowBrowseShortcuts(settings.SingleWindowBrowse());
 							break;
 						}

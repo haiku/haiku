@@ -8657,7 +8657,7 @@ BPoseView::OpenParent()
 bool
 BPoseView::ParentIsRoot()
 {
-	if (TargetModel()->IsDesktop() || TargetModel()->IsRoot())
+	if (IsDesktop() || TargetModel()->IsRoot())
 		return true;
 
 	// override by holding control key
