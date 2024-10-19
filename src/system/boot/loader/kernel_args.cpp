@@ -368,7 +368,7 @@ ignore_physical_memory_ranges_beyond_4gb()
 			continue;
 		}
 
-		if ((range.start + range.size) >= kLimit) {
+		if ((range.start + range.size) > kLimit) {
 			// the range is partially beyond the limit
 			dprintf("ignore_physical_memory_ranges_beyond_4gb(): ignoring "
 				"range: %#" B_PRIx64 " - %#" B_PRIx64 "\n", kLimit,
