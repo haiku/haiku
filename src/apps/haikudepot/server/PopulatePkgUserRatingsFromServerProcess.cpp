@@ -191,6 +191,8 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 	// not just based on the user-ratings downloaded; it is calculated according
 	// to an algorithm. This is best executed server-side to avoid discrepancy.
 
+	// TODO; re-enable this logic when HDS version 1.0.166 is released.
+	/*
 	BMessage summaryResponse;
 
 	if (status == B_OK) {
@@ -272,6 +274,7 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 	} else {
 		ServerHelper::NotifyTransportError(status);
 	}
+	*/
 
 	if (status == B_OK) {
 		// TODO; later make the PackageInfo immutable to avoid the need for locking here.
