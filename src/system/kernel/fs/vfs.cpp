@@ -9610,7 +9610,7 @@ _user_create_pipe(int* userFDs)
 	fds[0] = open_vnode(vnode, O_RDONLY | O_NONBLOCK, false);
 	fds[1] = open_vnode(vnode, O_WRONLY, false);
 	// Reset O_NONBLOCK
-	_kern_fcntl(fds[0], F_SETFL, 0);
+	common_fcntl(fds[0], F_SETFL, 0, false);
 
 	FDCloser closer0(fds[0], false);
 	FDCloser closer1(fds[1], false);
