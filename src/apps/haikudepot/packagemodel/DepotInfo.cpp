@@ -199,8 +199,12 @@ DepotInfo::HasAnyProminentPackages() const
 	std::vector<PackageInfoRef>::const_iterator it;
 	for (it = fPackages.begin(); it != fPackages.end(); it++) {
 		const PackageInfoRef& package = *it;
-		if (package->IsProminent())
-			return true;
+		const PackageClassificationInfoRef& classification = package->PackageClassificationInfo();
+
+		if (classification.IsSet()) {
+			if (classification->IsProminent())
+				return true;
+		}
 	}
 	return false;
 }

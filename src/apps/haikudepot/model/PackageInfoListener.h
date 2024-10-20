@@ -19,12 +19,12 @@ enum {
 	PKG_CHANGED_STATE						= 1 << 5,
 	PKG_CHANGED_ICON						= 1 << 6,
 	PKG_CHANGED_CHANGELOG					= 1 << 7,
-	PKG_CHANGED_CATEGORIES					= 1 << 8,
-	PKG_CHANGED_PROMINENCE					= 1 << 9,
-	PKG_CHANGED_SIZE						= 1 << 10,
-	PKG_CHANGED_DEPOT						= 1 << 11,
-	PKG_CHANGED_VERSION						= 1 << 12,
-	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 13
+	PKG_CHANGED_CLASSIFICATION				= 1 << 8,
+		// ^ This covers categories, prominence and is native desktop
+	PKG_CHANGED_SIZE						= 1 << 9,
+	PKG_CHANGED_DEPOT						= 1 << 10,
+	PKG_CHANGED_VERSION						= 1 << 11,
+	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 12
 	// ...
 };
 

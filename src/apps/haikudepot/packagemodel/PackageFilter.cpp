@@ -72,9 +72,9 @@ private:
 
 class CategoryFilter : public PackageFilter {
 public:
-	CategoryFilter(const BString& category)
+	CategoryFilter(const BString& categoryCode)
 		:
-		fCategory(category)
+		fCategoryCode(categoryCode)
 	{
 	}
 
@@ -83,23 +83,21 @@ public:
 		if (!package.IsSet())
 			return false;
 
-		for (int i = package->CountCategories() - 1; i >= 0; i--) {
-			const CategoryRef& category = package->CategoryAtIndex(i);
-			if (!category.IsSet())
-				continue;
-			if (category->Code() == fCategory)
-				return true;
-		}
-		return false;
+		PackageClassificationInfoRef classificationInfo = package->PackageClassificationInfo();
+
+		if (!classificationInfo.IsSet())
+			return false;
+
+		return classificationInfo->HasCategoryByCode(CategoryCode());
 	}
 
-	const BString& Category() const
+	const BString& CategoryCode() const
 	{
-		return fCategory;
+		return fCategoryCode;
 	}
 
 private:
-	BString		fCategory;
+	BString		fCategoryCode;
 };
 
 

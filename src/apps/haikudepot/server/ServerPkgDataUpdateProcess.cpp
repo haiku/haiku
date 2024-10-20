@@ -93,6 +93,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	package->StartCollatingChanges();
 
+	PackageClassificationInfoRef packageClassificationInfo(new PackageClassificationInfo(), true);
+
 	if (0 != pkg->CountPkgVersions()) {
 
 			// this makes the assumption that the only version will be the
@@ -126,7 +128,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			HDERROR("unable to find the category for [%s]",
 				categoryCode->String());
 		} else
-			package->AddCategory(category);
+			packageClassificationInfo->AddCategory(category);
 	}
 
 	if (!pkg->DerivedRatingIsNull()) {
@@ -142,7 +144,10 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	package->SetHasChangelog(pkg->HasChangelog());
 
 	if (!pkg->ProminenceOrderingIsNull())
-		package->SetProminence(pkg->ProminenceOrdering());
+		packageClassificationInfo->SetProminence(static_cast<uint32>(pkg->ProminenceOrdering()));
+
+	if (!pkg->IsNativeDesktopIsNull())
+		packageClassificationInfo->SetIsNativeDesktop(pkg->IsNativeDesktop());
 
 	int32 countPkgScreenshots = pkg->CountPkgScreenshots();
 
@@ -160,6 +165,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			fDepotName.String());
 
 	fCount++;
+
+	package->SetPackageClassificationInfo(packageClassificationInfo);
 
 	package->EndCollatingChanges();
 

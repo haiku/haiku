@@ -109,6 +109,9 @@ UserRatingInfo::operator==(const UserRatingInfo& other) const
 	if (UserRatingsPopulated() != other.UserRatingsPopulated())
 		return false;
 
+	if (CountUserRatings() != other.CountUserRatings())
+		return false;
+
 	for (int32 i = CountUserRatings() - 1; i >= 0; i--) {
 		if (other.UserRatingAtIndex(i) != UserRatingAtIndex(i))
 			return false;

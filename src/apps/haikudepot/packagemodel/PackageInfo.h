@@ -15,7 +15,7 @@
 
 #include "Language.h"
 #include "List.h"
-#include "PackageCategory.h"
+#include "PackageClassificationInfo.h"
 #include "PackageInfoListener.h"
 #include "PublisherInfo.h"
 #include "ScreenshotInfo.h"
@@ -115,20 +115,14 @@ public:
 			const BString&		FileName() const
 									{ return fFileName; }
 
-			void				ClearCategories();
-			bool				AddCategory(const CategoryRef& category);
-			int32				CountCategories() const;
-			CategoryRef			CategoryAtIndex(int32 index) const;
+			void				SetPackageClassificationInfo(
+									PackageClassificationInfoRef value);
+			PackageClassificationInfoRef
+								PackageClassificationInfo() const
+									{ return fPackageClassificationInfo; }
 
 			UserRatingInfoRef	UserRatingInfo();
 			void				SetUserRatingInfo(UserRatingInfoRef userRatingInfo);
-
-			void				SetProminence(int64 prominence);
-			int64				Prominence() const
-									{ return fProminence; }
-			bool				HasProminence() const
-									{ return fProminence != 0; }
-			bool				IsProminent() const;
 
 			void				ClearScreenshotInfos();
 			void				AddScreenshotInfo(
@@ -174,9 +168,8 @@ private:
 			BString				fFullDescription;
 			bool				fHasChangelog;
 			BString				fChangelog;
-			std::vector<CategoryRef>
-								fCategories;
-			int64				fProminence;
+			PackageClassificationInfoRef
+								fPackageClassificationInfo;
 			std::vector<ScreenshotInfoRef>
 								fScreenshotInfos;
 			UserRatingInfoRef	fUserRatingInfo;

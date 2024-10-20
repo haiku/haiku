@@ -415,16 +415,31 @@ public:
 		packageB.
 	*/
 
-	static bool _IsPackageBefore(const PackageInfoRef& packageA,
-		const PackageInfoRef& packageB)
+	static bool _IsPackageBefore(const PackageInfoRef& packageA, const PackageInfoRef& packageB)
 	{
 		if (!packageA.IsSet() || !packageB.IsSet())
 			HDFATAL("unexpected NULL reference in a referencable");
-		int c = _CmpProminences(packageA->Prominence(), packageB->Prominence());
+
+		uint32 prominenceA = 0;
+		uint32 prominenceB = 0;
+
+		PackageClassificationInfoRef classificationInfoA = packageA->PackageClassificationInfo();
+		PackageClassificationInfoRef classificationInfoB = packageB->PackageClassificationInfo();
+
+		if (classificationInfoA.IsSet())
+			prominenceA = classificationInfoA->Prominence();
+
+		if (classificationInfoB.IsSet())
+			prominenceB = classificationInfoB->Prominence();
+
+		int c = static_cast<int>(prominenceA) - static_cast<int>(prominenceB);
+
 		if (c == 0)
 			c = packageA->Title().ICompare(packageB->Title());
+
 		if (c == 0)
 			c = packageA->Name().Compare(packageB->Name());
+
 		return c < 0;
 	}
 

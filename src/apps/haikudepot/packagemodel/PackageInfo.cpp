@@ -30,7 +30,7 @@ PackageInfo::PackageInfo()
 	fFullDescription(),
 	fHasChangelog(false),
 	fChangelog(),
-	fProminence(0),
+	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
 	fState(NONE),
@@ -60,7 +60,7 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fFullDescription(info.Description()),
 	fHasChangelog(false),
 	fChangelog(),
-	fProminence(0),
+	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
 	fState(NONE),
@@ -111,8 +111,7 @@ PackageInfo::PackageInfo(const BString& name, const BPackageVersion& version,
 	fFullDescription(fullDescription),
 	fHasChangelog(false),
 	fChangelog(),
-	fCategories(),
-	fProminence(0),
+	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
 	fState(NONE),
@@ -142,8 +141,7 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fFullDescription(other.fFullDescription),
 	fHasChangelog(other.fHasChangelog),
 	fChangelog(other.fChangelog),
-	fCategories(other.fCategories),
-	fProminence(other.fProminence),
+	fPackageClassificationInfo(other.fPackageClassificationInfo),
 	fScreenshotInfos(other.fScreenshotInfos),
 	fUserRatingInfo(other.fUserRatingInfo),
 	fState(other.fState),
@@ -175,8 +173,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fFullDescription = other.fFullDescription;
 	fHasChangelog = other.fHasChangelog;
 	fChangelog = other.fChangelog;
-	fCategories = other.fCategories;
-	fProminence = other.fProminence;
+	fPackageClassificationInfo = other.fPackageClassificationInfo;
 	fScreenshotInfos = other.fScreenshotInfos;
 	fUserRatingInfo = other.fUserRatingInfo;
 	fState = other.fState;
@@ -207,8 +204,7 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fFullDescription == other.fFullDescription
 		&& fHasChangelog == other.fHasChangelog
 		&& fChangelog == other.fChangelog
-		&& fCategories == other.fCategories
-		&& fProminence == other.fProminence
+		&& fPackageClassificationInfo == other.fPackageClassificationInfo
 		&& fScreenshotInfos == other.fScreenshotInfos
 		&& fUserRatingInfo == fUserRatingInfo
 		&& fState == other.fState
@@ -291,46 +287,13 @@ PackageInfo::IsSystemPackage() const
 }
 
 
-int32
-PackageInfo::CountCategories() const
-{
-	return fCategories.size();
-}
-
-
-CategoryRef
-PackageInfo::CategoryAtIndex(int32 index) const
-{
-	return fCategories[index];
-}
-
-
 void
-PackageInfo::ClearCategories()
+PackageInfo::SetPackageClassificationInfo(PackageClassificationInfoRef value)
 {
-	if (!fCategories.empty()) {
-		fCategories.clear();
-		_NotifyListeners(PKG_CHANGED_CATEGORIES);
+	if (value != fPackageClassificationInfo) {
+		fPackageClassificationInfo = value;
+		_NotifyListeners(PKG_CHANGED_CLASSIFICATION);
 	}
-}
-
-
-bool
-PackageInfo::AddCategory(const CategoryRef& category)
-{
-	std::vector<CategoryRef>::const_iterator itInsertionPt
-		= std::lower_bound(
-			fCategories.begin(),
-			fCategories.end(),
-			category,
-			&IsPackageCategoryBefore);
-
-	if (itInsertionPt == fCategories.end()) {
-		fCategories.push_back(category);
-		_NotifyListeners(PKG_CHANGED_CATEGORIES);
-		return true;
-	}
-	return false;
 }
 
 
@@ -409,21 +372,7 @@ PackageInfo::SetUserRatingInfo(UserRatingInfoRef value)
 }
 
 
-void
-PackageInfo::SetProminence(int64 prominence)
-{
-	if (fProminence != prominence) {
-		fProminence = prominence;
-		_NotifyListeners(PKG_CHANGED_PROMINENCE);
-	}
-}
 
-
-bool
-PackageInfo::IsProminent() const
-{
-	return HasProminence() && Prominence() <= PROMINANCE_ORDERING_PROMINENT_MAX;
-}
 
 
 void

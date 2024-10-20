@@ -720,7 +720,7 @@ MainWindow::Consume(ProcessCoordinator *item)
 void
 MainWindow::PackageChanged(const PackageInfoEvent& event)
 {
-	uint32 watchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_PROMINENCE;
+	uint32 watchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_CLASSIFICATION;
 	if ((event.Changes() & watchedChanges) != 0) {
 		PackageInfoRef ref(event.Package());
 		BMessage message(MSG_PACKAGE_CHANGED);
@@ -988,8 +988,13 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 	}
 
 	if (matches) {
-		if (package->IsProminent())
-			fFeaturedPackagesView->AddPackage(package);
+		PackageClassificationInfoRef classification = package->PackageClassificationInfo();
+
+		if (classification.IsSet()) {
+			if (classification->IsProminent())
+				fFeaturedPackagesView->AddPackage(package);
+		}
+
 		fPackageListView->AddPackage(package);
 	} else {
 		fFeaturedPackagesView->RemovePackage(package);
