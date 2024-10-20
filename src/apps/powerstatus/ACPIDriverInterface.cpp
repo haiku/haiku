@@ -97,6 +97,13 @@ Battery::UpdateBatteryInfo()
 		|| info.capacity < 0)
 		return B_BAD_DATA;
 
+	if ((fCachedInfo.capacity == 0 && info.capacity > 0)
+		|| (fCachedInfo.capacity > 0 && info.capacity == 0)) {
+		// if capacity went from zero to non-zero or vice-versa, we likely just had a battery
+		// connected or disconnected from the system so refresh the full fExtendedBatteryInfo
+		GetExtendedBatteryInfo(&fExtendedBatteryInfo);
+	}
+
 	fCachedInfo = info;
 	return B_OK;
 }

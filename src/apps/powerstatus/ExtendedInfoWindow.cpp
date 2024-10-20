@@ -111,7 +111,7 @@ BatteryInfoView::_GetTextForLine(size_t line)
 				&& fBatteryExtendedInfo.oem_info[0] == '\0')
 				string = B_TRANSLATE("Empty battery slot");
 			else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0)
-				string = B_TRANSLATE("Damaged battery");
+				string = B_TRANSLATE("Damaged or missing battery");
 			else
 				string = B_TRANSLATE("Battery unused");
 			break;

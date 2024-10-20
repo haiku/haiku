@@ -318,6 +318,29 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 		view->FillPolygon(points, 8, pauseRect);
 
 		view->SetDrawingMode(B_OP_OVER);
+	} else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0) {
+		// When a battery is damaged or missing, draw an X over it
+		view->SetHighColor(200, 0, 0, 96);
+		view->SetDrawingMode(B_OP_ALPHA);
+
+		static const BPoint points[] = {
+			BPoint(1, 1),
+			BPoint(1, 2),
+			BPoint(20, 6),
+			BPoint(22, 6),
+			BPoint(22, 5),
+			BPoint(3, 1),
+
+			BPoint(20, 1),
+			BPoint(1, 5),
+			BPoint(1, 6),
+			BPoint(3, 6),
+			BPoint(22, 2),
+			BPoint(22, 1)
+		};
+		view->FillPolygon(points, 12, lightningRect);
+
+		view->SetDrawingMode(B_OP_OVER);
 	}
 
 	view->SetHighColor(0, 0, 0);
@@ -429,7 +452,7 @@ PowerStatusView::Update(bool force, bool notify)
 	bool wasCharging = (fBatteryInfo.state & BATTERY_CHARGING);
 	bool hadBattery = fHasBattery;
 	_GetBatteryInfo(fBatteryID, &fBatteryInfo);
-	fHasBattery = fBatteryInfo.full_capacity > 0;
+	fHasBattery = fBatteryInfo.full_capacity > 0 && fBatteryInfo.state != BATTERY_CRITICAL_STATE;
 
 	if (fBatteryInfo.full_capacity > 0 && fHasBattery) {
 		fPercent = (double)fBatteryInfo.capacity / fBatteryInfo.full_capacity;
@@ -605,7 +628,12 @@ PowerStatusView::_GetBatteryInfo(int batteryID, battery_info* batteryInfo)
 				*batteryInfo = info;
 				first = false;
 			} else {
-				batteryInfo->state |= info.state;
+				if ((batteryInfo->state & BATTERY_CRITICAL_STATE) == 0) {
+					// don't propagate CRITICAL_STATE to the aggregate battery.
+					// one battery charging means "the system is charging" but one battery having
+					// been removed does not mean "the system has no battery"
+					batteryInfo->state |= info.state;
+				}
 				batteryInfo->capacity += info.capacity;
 				batteryInfo->full_capacity += info.full_capacity;
 				batteryInfo->current_rate += info.current_rate;
