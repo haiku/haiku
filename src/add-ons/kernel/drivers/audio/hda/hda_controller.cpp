@@ -272,17 +272,17 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream,
 
 	stream->Write8(HDAC_STREAM_STATUS, status);
 
+	if ((status & STATUS_BUFFER_COMPLETED) == 0) {
+		dprintf("hda: stream buffer not completed (id: %" B_PRIu32 ", "
+			"status 0x%" B_PRIx32 ")\n", stream->id, status);
+		return false;
+	}
+
 	if ((status & STATUS_FIFO_ERROR) != 0)
 		dprintf("hda: stream fifo error (id:%" B_PRIu32 ")\n", stream->id);
 	if ((status & STATUS_DESCRIPTOR_ERROR) != 0) {
 		dprintf("hda: stream descriptor error (id:%" B_PRIu32 ")\n",
 			stream->id);
-	}
-
-	if ((status & STATUS_BUFFER_COMPLETED) == 0) {
-		dprintf("hda: stream buffer not completed (id:%" B_PRIu32 ")\n",
-			stream->id);
-		return false;
 	}
 
 	// Normally we should use the DMA position for the stream. Apparently there
