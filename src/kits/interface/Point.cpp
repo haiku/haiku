@@ -32,7 +32,7 @@ BPoint::ConstrainTo(BRect rect)
 void
 BPoint::PrintToStream() const
 {
-	printf("BPoint(x:%.0f, y:%.0f)\n", x, y);
+	printf("BPoint(x:%f, y:%f)\n", x, y);
 }
 
 
