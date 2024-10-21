@@ -344,16 +344,6 @@ extern scsi_for_sim_interface *gSCSI;
 
 #ifdef __cplusplus
 
-template <class T>
-int count_bits_set(T value)
-{
-	int count = 0;
-	for (T mask = 1; mask; mask <<= 1)
-		if (value & mask)
-			count++;
-	return count;
-}
-
 inline
 status_t
 wait_until_set(volatile uint32 *reg, uint32 bits, bigtime_t timeout)
