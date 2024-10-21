@@ -939,14 +939,12 @@ DirectoryIterator::SetTo(const char* path, const char* subPath, bool recursive)
 	Unset();
 	fRecursive = recursive;
 
+	const bool disableUserAddOns = get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
+
 	if (path == NULL) {
-		// add default paths
+		// add default paths in reverse order as AddPath() will add on a stack
 		KPath pathBuffer;
-
-		bool disableUserAddOns = get_safemode_boolean(
-			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
-
-		for (uint32 i = 0; i < sizeof(kDriverPaths) / sizeof(kDriverPaths[0]); i++) {
+		for (int32 i = B_COUNT_OF(kDriverPaths) - 1; i >= 0; i--) {
 			if (i < 3 && disableUserAddOns)
 				continue;
 
