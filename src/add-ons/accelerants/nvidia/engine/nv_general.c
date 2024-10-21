@@ -721,6 +721,14 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "G72");
 		status = nvxx_general_powerup();
 		break;
+	case 0x01da10de: /* Nvidia Quadro NVS 110M */
+		si->ps.card_type = G72;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia Quadro NVS 110M");
+		sprintf(si->adi.chipset, "G72");
+		status = nvxx_general_powerup();
+		break;
 	case 0x01dd10de: /* Nvidia Geforce 7500 LE */
 		si->ps.card_type = G72;
 		si->ps.card_arch = NV40A;
