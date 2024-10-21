@@ -13,6 +13,9 @@
 
 #define MEDIA_SOUNDS_BEEP				"Beep"
 #define MEDIA_SOUNDS_STARTUP			"Startup"
+#define MEDIA_SOUNDS_INFORMATION_ALERT	"Information alert"
+#define MEDIA_SOUNDS_IMPORTANT_ALERT	"Important alert"
+#define MEDIA_SOUNDS_ERROR_ALERT		"Error alert"
 #define MEDIA_SOUNDS_KEY_DOWN			"Key down"
 #define MEDIA_SOUNDS_KEY_REPEAT			"Key repeat"
 #define MEDIA_SOUNDS_KEY_UP				"Key up"
