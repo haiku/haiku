@@ -529,12 +529,11 @@ get_priority(const char* path)
 	};
 	KPath pathBuffer;
 
-	for (uint32 index = 0; index < sizeof(whichPath) / sizeof(whichPath[0]);
-			index++) {
+	for (uint32 index = 0; index < B_COUNT_OF(whichPath); index++) {
 		if (__find_directory(whichPath[index], gBootDevice, false,
 			pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
 			pathBuffer.UnlockBuffer();
-			if (!strncmp(pathBuffer.Path(), path, pathBuffer.BufferSize()))
+			if (strncmp(pathBuffer.Path(), path, pathBuffer.Length()) == 0)
 				return index;
 		} else
 			pathBuffer.UnlockBuffer();
@@ -593,7 +592,7 @@ add_driver(const char* path, image_id image)
 	legacy_driver* driver = sDriverHash->Lookup(get_leaf(path));
 	if (driver != NULL) {
 		// we know this driver
-		if (strcmp(driver->path, path) != 0) {
+		if (strcmp(driver->path, path) != 0 && priority >= driver->priority) {
 			// TODO: do properly, but for now we just update the path if it
 			// isn't the same anymore so rescanning of drivers will work in
 			// case this driver was loaded so early that it has a boot module
@@ -604,7 +603,7 @@ add_driver(const char* path, image_id image)
 			driver->binary_updated = true;
 		}
 
-		// TODO: check if this driver is a different one and has precendence
+		// TODO: check if this driver is a different one and has precedence
 		// (ie. common supersedes system).
 		//dprintf("new driver has priority %ld, old %ld\n", priority, driver->priority);
 		if (priority >= driver->priority) {
@@ -749,14 +748,14 @@ handle_driver_events(void* /*_fs*/, int /*iteration*/)
 			}
 
 			case kAddWatcher:
-				TRACE(("  add watcher %ld:%lld\n", event->node.device,
+				TRACE(("  add watcher %" B_PRId32 ":%" B_PRIdINO "\n", event->node.device,
 					event->node.node));
 				add_node_listener(event->node.device, event->node.node,
 					B_WATCH_STAT | B_WATCH_NAME, sDriverWatcher);
 				break;
 
 			case kRemoveWatcher:
-				TRACE(("  remove watcher %ld:%lld\n", event->node.device,
+				TRACE(("  remove watcher %" B_PRId32 ":%" B_PRIdINO "\n", event->node.device,
 					event->node.node));
 				remove_node_listener(event->node.device, event->node.node,
 					sDriverWatcher);
