@@ -39,10 +39,10 @@ is_sg_list_dma_safe(scsi_ccb *request)
 	scsi_bus_info *bus = request->bus;
 	const physical_entry *sg_list = request->sg_list;
 	uint32 sg_count = request->sg_count;
-	uint32 dma_boundary = bus->dma_params.dma_boundary;
-	uint32 alignment = bus->dma_params.alignment;
-	uint32 max_sg_block_size = bus->dma_params.max_sg_block_size;
-	uint32 cur_idx;
+	const uint32 dma_boundary = bus->dma_params.dma_boundary;
+	const uint32 alignment = bus->dma_params.alignment;
+	const uint32 max_sg_block_size = bus->dma_params.max_sg_block_size;
+	const uint64 high_address = bus->dma_params.high_address;
 
 	// not too many S/G list entries
 	if (sg_count > bus->dma_params.max_sg_blocks) {
@@ -54,8 +54,8 @@ is_sg_list_dma_safe(scsi_ccb *request)
 	if (dma_boundary == ~(uint32)0 && alignment == 0 && max_sg_block_size == 0)
 		return true;
 
-	// argh - controller is a bit picky, so make sure he likes us
-	for (cur_idx = sg_count; cur_idx >= 1; --cur_idx, ++sg_list) {
+	// argh - controller is a bit picky, so make sure it likes us
+	for (uint32 cur_idx = sg_count; cur_idx >= 1; --cur_idx, ++sg_list) {
 		phys_addr_t max_len;
 
 		// calculate space upto next dma boundary crossing and
@@ -77,6 +77,12 @@ is_sg_list_dma_safe(scsi_ccb *request)
 
 		if (((sg_list->address + sg_list->size) & alignment) != 0) {
 			SHOW_FLOW(0, "end of S/G-entry has bad alignment @%" B_PRIxPHYSADDR,
+				sg_list->address + sg_list->size);
+			return false;
+		}
+
+		if ((sg_list->address + sg_list->size) > high_address) {
+			SHOW_FLOW(0, "S/G-entry above high address @%" B_PRIxPHYSADDR,
 				sg_list->address + sg_list->size);
 			return false;
 		}

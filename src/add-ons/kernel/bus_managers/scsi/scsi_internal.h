@@ -79,6 +79,7 @@ typedef struct dma_params {
 	uint32 dma_boundary;
 	uint32 max_sg_block_size;
 	uint32 max_sg_blocks;
+	uint64 high_address;
 } dma_params;
 
 

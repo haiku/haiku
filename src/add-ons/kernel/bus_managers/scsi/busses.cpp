@@ -217,6 +217,9 @@ scsi_init_bus(device_node *node, void **cookie)
 	if (pnp->get_attr_uint32(node, B_DMA_MAX_SEGMENT_COUNT,
 			&bus->dma_params.max_sg_blocks, true) != B_OK)
 		bus->dma_params.max_sg_blocks = ~0;
+	if (pnp->get_attr_uint64(node, B_DMA_HIGH_ADDRESS,
+			&bus->dma_params.high_address, true) != B_OK)
+		bus->dma_params.high_address = ~0;
 
 	// do some sanity check:
 	bus->dma_params.max_sg_block_size &= ~bus->dma_params.alignment;
