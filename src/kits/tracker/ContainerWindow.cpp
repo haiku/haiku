@@ -1788,8 +1788,7 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 	menu->AddItem(Shortcuts()->SelectItem());
 	menu->AddItem(Shortcuts()->SelectAllItem());
 	menu->AddItem(Shortcuts()->InvertSelectionItem());
-	if (!TargetModel()->IsTrash())
-		menu->AddItem(Shortcuts()->OpenParentItem());
+	menu->AddItem(Shortcuts()->OpenParentItem());
 	menu->AddItem(Shortcuts()->CloseItem());
 	menu->AddItem(Shortcuts()->CloseAllInWorkspaceItem());
 	menu->AddSeparatorItem();
@@ -2633,7 +2632,7 @@ BContainerWindow::AddWindowContextMenu(BMenu* menu)
 	// see UpdateMenu() and SetupArrangeByMenu()
 	menu->AddItem(Shortcuts()->SelectItem());
 	menu->AddItem(Shortcuts()->SelectAllItem());
-	if (!TargetModel()->IsTrash() && !TargetModel()->IsDesktop())
+	if (!TargetModel()->IsDesktop())
 		menu->AddItem(Shortcuts()->OpenParentItem());
 	menu->AddSeparatorItem();
 
