@@ -603,9 +603,13 @@ if [ -z "$CC" ]; then
 	CC=gcc
 fi
 if [ $(is_legacy_gcc $($CC -dumpversion)) -ne 0 ]; then
-	echo The host tools cannot be built with a legacy version of GCC.
-	echo Please specify a more modern compiler in the "CC" environ.
-	exit 1
+	if [ $platform == "Haiku" ] && [ $platformMachine == "BePC" ]; then
+		CC=gcc-x86
+	else
+		echo The host tools cannot be built with a legacy version of GCC.
+		echo Please specify a more modern compiler in the "CC" environ.
+		exit 1
+	fi
 fi
 
 # detect the build platform
