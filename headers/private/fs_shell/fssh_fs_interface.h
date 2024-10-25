@@ -165,7 +165,7 @@ struct fssh_fs_vnode_ops {
 				fssh_fs_cookie cookie, uint8_t event, fssh_selectsync *sync);
 	fssh_status_t (*deselect)(fssh_fs_volume *volume, fssh_fs_vnode *vnode,
 				fssh_fs_cookie cookie, uint8_t event, fssh_selectsync *sync);
-	fssh_status_t (*fsync)(fssh_fs_volume *volume, fssh_fs_vnode *vnode);
+	fssh_status_t (*fsync)(fssh_fs_volume *volume, fssh_fs_vnode *vnode, bool dataOnly);
 
 	fssh_status_t (*read_symlink)(fssh_fs_volume *volume, fssh_fs_vnode *link,
 				char *buffer, fssh_size_t *_bufferSize);

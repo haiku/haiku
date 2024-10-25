@@ -351,7 +351,7 @@ ramfs_set_flags(fs_volume* /*fs*/, fs_vnode* /*node*/, void* /*cookie*/,
 
 
 static status_t
-ramfs_fsync(fs_volume* /*fs*/, fs_vnode* /*node*/)
+ramfs_fsync(fs_volume* /*fs*/, fs_vnode* /*node*/, bool dataOnly)
 {
 	FUNCTION_START();
 	return B_OK;

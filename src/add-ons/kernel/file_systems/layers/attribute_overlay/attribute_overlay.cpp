@@ -1262,13 +1262,13 @@ overlay_deselect(fs_volume *volume, fs_vnode *vnode, void *cookie, uint8 event,
 
 
 static status_t
-overlay_fsync(fs_volume *volume, fs_vnode *vnode)
+overlay_fsync(fs_volume *volume, fs_vnode *vnode, bool dataOnly)
 {
 	OverlayInode *node = (OverlayInode *)vnode->private_node;
 	fs_vnode *superVnode = node->SuperVnode();
 
 	if (superVnode->ops->fsync != NULL)
-		return superVnode->ops->fsync(volume->super_volume, superVnode);
+		return superVnode->ops->fsync(volume->super_volume, superVnode, dataOnly);
 
 	return B_OK;
 }

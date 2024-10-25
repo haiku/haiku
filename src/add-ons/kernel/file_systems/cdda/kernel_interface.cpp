@@ -1675,7 +1675,7 @@ cdda_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 
 
 static status_t
-cdda_fsync(fs_volume* _volume, fs_vnode* _node)
+cdda_fsync(fs_volume* _volume, fs_vnode* _node, bool dataOnly)
 {
 	return B_OK;
 }

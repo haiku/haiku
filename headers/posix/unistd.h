@@ -72,7 +72,7 @@
 #define _POSIX_SPAWN						(200809L)
 #define _POSIX_SPIN_LOCKS					(-1)
 #define _POSIX_SPORADIC_SERVER				(-1)
-#define _POSIX_SYNCHRONIZED_IO				(-1) /* missing fdatasync() */
+#define _POSIX_SYNCHRONIZED_IO				(200809L)
 #define _POSIX_THREAD_ATTR_STACKADDR		(200809L)
 #define _POSIX_THREAD_ATTR_STACKSIZE		(200809L)
 #define _POSIX_THREAD_CPUTIME				(200809L)
@@ -401,6 +401,7 @@ extern off_t	lseek(int fd, off_t offset, int whence);
 
 extern void		sync(void);
 extern int		fsync(int fd);
+extern int		fdatasync(int fd);
 
 extern int		chown(const char *path, uid_t owner, gid_t group);
 extern int		fchown(int fd, uid_t owner, gid_t group);

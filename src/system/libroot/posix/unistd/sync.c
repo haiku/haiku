@@ -18,7 +18,14 @@
 int
 fsync(int fd)
 {
-	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_fsync(fd));
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_fsync(fd, false));
+}
+
+
+int
+fdatasync(int fd)
+{
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(_kern_fsync(fd, true));
 }
 
 

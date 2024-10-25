@@ -1175,7 +1175,7 @@ dosfs_get_file_map(fs_volume* volume, fs_vnode* vnode, off_t position, size_t le
 
 
 static status_t
-dosfs_fsync(fs_volume* volume, fs_vnode* vnode)
+dosfs_fsync(fs_volume* volume, fs_vnode* vnode, bool dataOnly)
 {
 	struct vnode* bsdNode = reinterpret_cast<struct vnode*>(vnode->private_node);
 

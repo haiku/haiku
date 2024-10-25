@@ -988,7 +988,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// will be discarded
 
 	if (!vnode->IsRemoved() && HAS_FS_CALL(vnode, fsync))
-		FS_CALL_NO_PARAMS(vnode, fsync);
+		FS_CALL(vnode, fsync, false);
 
 	// Note: If this vnode has a cache attached, there will still be two
 	// references to that cache at this point. The last one belongs to the vnode
@@ -6416,9 +6416,9 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 
 
 static status_t
-common_sync(int fd, bool kernel)
+common_sync(int fd, bool dataOnly, bool kernel)
 {
-	FUNCTION(("common_fsync: entry. fd %d kernel %d\n", fd, kernel));
+	FUNCTION(("common_sync: entry. fd %d kernel %d, data only %d\n", fd, kernel, dataOnly));
 
 	struct vnode* vnode;
 	FileDescriptorPutter descriptor(get_fd_and_vnode(fd, &vnode, kernel));
@@ -6427,7 +6427,7 @@ common_sync(int fd, bool kernel)
 
 	status_t status;
 	if (HAS_FS_CALL(vnode, fsync))
-		status = FS_CALL_NO_PARAMS(vnode, fsync);
+		status = FS_CALL(vnode, fsync, dataOnly);
 	else
 		status = B_UNSUPPORTED;
 
@@ -8439,9 +8439,9 @@ _kern_fcntl(int fd, int op, size_t argument)
 
 
 status_t
-_kern_fsync(int fd)
+_kern_fsync(int fd, bool dataOnly)
 {
-	return common_sync(fd, true);
+	return common_sync(fd, dataOnly, true);
 }
 
 
@@ -9272,9 +9272,9 @@ _user_fcntl(int fd, int op, size_t argument)
 
 
 status_t
-_user_fsync(int fd)
+_user_fsync(int fd, bool dataOnly)
 {
-	return common_sync(fd, false);
+	return common_sync(fd, dataOnly, false);
 }
 
 

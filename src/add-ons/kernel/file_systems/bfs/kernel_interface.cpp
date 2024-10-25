@@ -849,7 +849,7 @@ bfs_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie, int flags)
 
 
 static status_t
-bfs_fsync(fs_volume* _volume, fs_vnode* _node)
+bfs_fsync(fs_volume* _volume, fs_vnode* _node, bool dataOnly)
 {
 	FUNCTION();
 

@@ -1189,7 +1189,7 @@ devfs_free_cookie(fs_volume* _volume, fs_vnode* _vnode, void* _cookie)
 
 
 static status_t
-devfs_fsync(fs_volume* _volume, fs_vnode* _v)
+devfs_fsync(fs_volume* _volume, fs_vnode* _v, bool dataOnly)
 {
 	return B_OK;
 }

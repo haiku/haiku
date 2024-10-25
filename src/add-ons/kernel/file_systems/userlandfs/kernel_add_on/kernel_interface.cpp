@@ -344,7 +344,7 @@ userlandfs_deselect(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 
 // userlandfs_fsync
 static status_t
-userlandfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode)
+userlandfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode, bool dataOnly)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_fsync(%p, %p)\n", volume, fsNode->private_node));

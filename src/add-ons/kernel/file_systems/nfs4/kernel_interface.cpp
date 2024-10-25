@@ -492,7 +492,7 @@ nfs4_set_flags(fs_volume* volume, fs_vnode* vnode, void* _cookie, int flags)
 
 
 static status_t
-nfs4_fsync(fs_volume* volume, fs_vnode* vnode)
+nfs4_fsync(fs_volume* volume, fs_vnode* vnode, bool dataOnly)
 {
 	VnodeToInode* vti = reinterpret_cast<VnodeToInode*>(vnode->private_node);
 	TRACE("volume = %p, vnode = %" B_PRIi64 "\n", volume, vti->ID());

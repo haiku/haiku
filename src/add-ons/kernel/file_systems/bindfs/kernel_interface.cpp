@@ -422,7 +422,7 @@ bindfs_deselect(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 
 
 static status_t
-bindfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode)
+bindfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode, bool dataOnly)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
@@ -432,7 +432,7 @@ bindfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode)
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
-	return sourceNode->ops->fsync(sourceVolume, sourceNode);
+	return sourceNode->ops->fsync(sourceVolume, sourceNode, dataOnly);
 }
 
 

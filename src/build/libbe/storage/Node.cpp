@@ -229,7 +229,7 @@ BNode::Unlock()
 status_t
 BNode::Sync()
 {
-	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_fsync(fFd);
+	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_fsync(fFd, false);
 }
 
 

@@ -638,7 +638,7 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// will be discarded
 
 	if (!vnode->remove && HAS_FS_CALL(vnode, fsync))
-		FS_CALL_NO_PARAMS(vnode, fsync);
+		FS_CALL(vnode, fsync, false);
 
 	if (!vnode->unpublished) {
 		if (vnode->remove)
@@ -3619,7 +3619,7 @@ common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 
 
 static fssh_status_t
-common_sync(int fd, bool kernel)
+common_sync(int fd, bool dataOnly, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
@@ -3632,7 +3632,7 @@ common_sync(int fd, bool kernel)
 		return FSSH_B_FILE_ERROR;
 
 	if (HAS_FS_CALL(vnode, fsync))
-		status = FS_CALL_NO_PARAMS(vnode, fsync);
+		status = FS_CALL(vnode, fsync, dataOnly);
 	else
 		status = FSSH_EOPNOTSUPP;
 
@@ -4904,7 +4904,7 @@ fs_sync(fssh_dev_t device)
 				put_vnode(previousVnode);
 
 			if (HAS_FS_CALL(vnode, fsync))
-				FS_CALL_NO_PARAMS(vnode, fsync);
+				FS_CALL(vnode, fsync, false);
 
 			// the next vnode might change until we lock the vnode list again,
 			// but this vnode won't go away since we keep a reference to it.
@@ -5245,7 +5245,7 @@ _kern_fcntl(int fd, int op, uint32_t argument)
 fssh_status_t
 _kern_fsync(int fd)
 {
-	return common_sync(fd, true);
+	return common_sync(fd, false, true);
 }
 
 

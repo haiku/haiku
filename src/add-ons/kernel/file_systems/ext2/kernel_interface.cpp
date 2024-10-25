@@ -576,7 +576,7 @@ ext2_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie, int flags)
 
 
 static status_t
-ext2_fsync(fs_volume* _volume, fs_vnode* _node)
+ext2_fsync(fs_volume* _volume, fs_vnode* _node, bool dataOnly)
 {
 	Inode* inode = (Inode*)_node->private_node;
 	return inode->Sync();

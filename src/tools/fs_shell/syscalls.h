@@ -35,7 +35,7 @@ int				_kern_open_dir_entry_ref(fssh_dev_t device, fssh_ino_t inode,
 					const char *name);
 int				_kern_open_dir(int fd, const char *path);
 fssh_status_t 	_kern_fcntl(int fd, int op, uint32_t argument);
-fssh_status_t	_kern_fsync(int fd);
+fssh_status_t	_kern_fsync(int fd, bool dataOnly);
 fssh_status_t	_kern_lock_node(int fd);
 fssh_status_t	_kern_unlock_node(int fd);
 fssh_status_t	_kern_create_dir_entry_ref(fssh_dev_t device, fssh_ino_t inode,

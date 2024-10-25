@@ -552,7 +552,7 @@ HaikuKernelVolume::FSync(void* _node)
 
 	if (!node->ops->fsync)
 		return B_BAD_VALUE;
-	return node->ops->fsync(&fVolume, node);
+	return node->ops->fsync(&fVolume, node, false);
 }
 
 // ReadSymlink

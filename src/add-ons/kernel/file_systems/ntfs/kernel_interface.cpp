@@ -942,7 +942,7 @@ fs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 
 
 static status_t
-fs_fsync(fs_volume* _volume, fs_vnode* _node)
+fs_fsync(fs_volume* _volume, fs_vnode* _node, bool dataOnly)
 {
 	CALLED();
 	vnode* node = (vnode*)_node->private_node;

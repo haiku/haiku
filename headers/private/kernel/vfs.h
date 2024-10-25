@@ -185,7 +185,7 @@ int			_user_open_dir_entry_ref(dev_t device, ino_t inode,
 int			_user_open_dir(int fd, const char *path);
 int			_user_open_parent_dir(int fd, char *name, size_t nameLength);
 status_t	_user_fcntl(int fd, int op, size_t argument);
-status_t	_user_fsync(int fd);
+status_t	_user_fsync(int fd, bool dataOnly);
 status_t	_user_flock(int fd, int op);
 status_t	_user_read_stat(int fd, const char *path, bool traverseLink,
 				struct stat *stat, size_t statSize);

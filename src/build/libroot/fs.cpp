@@ -823,7 +823,7 @@ _kern_dup(int fd)
 
 // _kern_fsync
 status_t
-_kern_fsync(int fd)
+_kern_fsync(int fd, bool dataOnly)
 {
 	// get the descriptor
 	FileDescriptor *descriptor
