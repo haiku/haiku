@@ -407,6 +407,14 @@ getblkx(struct vnode* vp, daddr_t blkno, daddr_t dblkno, int size, int slpflag, 
 		if (status != 0)
 			return B_TO_POSIX_ERROR(status);
 
+#ifdef _KERNEL_MODE
+		// for high block counts, try to get all blocks in one disk read
+		if (cBlockCount > 4) {
+			size_t prefetchBlocks = cBlockCount;
+			block_cache_prefetch(blockCache, dblkno, &prefetchBlocks);
+		}
+#endif // _KERNEL_MODE
+
 		for (i = 0; i < cBlockCount && status == B_OK; i++) {
 			if (readOnly == true)
 				newBuf->b_bcpointers[i] = (void*)block_cache_get(blockCache, dblkno + i);

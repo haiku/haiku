@@ -92,6 +92,8 @@ extern fssh_status_t	fssh_block_cache_set_dirty(void *_cache,
 							int32_t transaction);
 extern void				fssh_block_cache_put(void *_cache,
 							fssh_off_t blockNumber);
+extern fssh_status_t	fssh_block_cache_prefetch(void* _cache, fssh_off_t blockNumber,
+							fssh_size_t* _numBlocks);
 
 /* file cache */
 extern void *			fssh_file_cache_create(fssh_mount_id mountID,

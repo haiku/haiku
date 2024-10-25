@@ -1779,3 +1779,10 @@ fssh_block_cache_put(void* _cache, fssh_off_t blockNumber)
 	put_cached_block(cache, blockNumber);
 }
 
+
+fssh_status_t
+fssh_block_cache_prefetch(void* _cache, fssh_off_t blockNumber, fssh_size_t* _numBlocks)
+{
+	*_numBlocks = 0;
+	return FSSH_B_UNSUPPORTED;
+}

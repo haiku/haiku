@@ -78,6 +78,7 @@ extern const void *block_cache_get(void *cache, off_t blockNumber);
 extern status_t block_cache_set_dirty(void *cache, off_t blockNumber,
 					bool isDirty, int32 transaction);
 extern void block_cache_put(void *cache, off_t blockNumber);
+extern status_t block_cache_prefetch(void* cache, off_t blockNumber, size_t* _numBlocks);
 
 /* file cache */
 extern void *file_cache_create(dev_t mountID, ino_t vnodeID, off_t size);

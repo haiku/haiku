@@ -2894,6 +2894,7 @@ dosfs_readdir(fs_volume* volume, fs_vnode* vnode, void* cookie, struct dirent* b
 				break;
 			dirBuf->d_ino = ino;
 
+
 			dirBuf->d_dev = volume->id;
 
 			// Is this direntry associated with a chain of previous winentries?
@@ -3742,6 +3743,14 @@ fat_volume_init(vnode* devvp, mount* bsdVolume, const uint64_t fatFlags, const c
 	// but wait to set the fatVolume flags; fillinusemap is designed to run before they are set
 	if (readOnly == true)
 		bsdVolume->mnt_flag |= MNT_RDONLY;
+
+	// attempt to read the FAT into memory in advance of fillinusemap, to prevent fillinusemap
+	// from doing a separate disk read for each block
+	if (fatVolume->pm_FATsecs > 4) {
+		size_t fatBlocks = fatVolume->pm_FATsecs;
+		block_cache_prefetch(bsdVolume->mnt_cache, static_cast<off_t>(fatVolume->pm_fatblk),
+			&fatBlocks);
+	}
 
 	// have the inuse map filled in
 	rw_lock_write_lock(&fatVolume->pm_fatlock.haikuRW);
