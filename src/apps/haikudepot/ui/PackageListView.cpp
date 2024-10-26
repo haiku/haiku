@@ -663,12 +663,15 @@ PackageRow::UpdateRating()
 
 	UserRatingInfoRef userRatingInfo = fPackage->UserRatingInfo();
 	UserRatingSummaryRef userRatingSummary;
+	float averageRating = RATING_MISSING;
 
 	if (userRatingInfo.IsSet())
 		userRatingSummary = userRatingInfo->Summary();
 
 	if (userRatingSummary.IsSet())
-		SetField(new RatingField(userRatingSummary->AverageRating()), kRatingColumn);
+		averageRating = userRatingSummary->AverageRating();
+
+	SetField(new RatingField(averageRating), kRatingColumn);
 }
 
 
