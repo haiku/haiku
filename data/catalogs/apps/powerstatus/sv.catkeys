@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PowerStatus	4080343264
+1	swedish	x-vnd.Haiku-PowerStatus	1876447050
 Run in window	PowerStatus		Kör i fönster
 Extended battery info	PowerStatus		Ytterligare batteriinformation
 Show status icon	PowerStatus		Visa statusikon
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Batterikapaciteten är låg
 Model number: 	PowerStatus		Modellnummer:
 Battery unused	PowerStatus		Batteri oanvänt
 Type: 	PowerStatus		Typ:
-Damaged battery	PowerStatus		Skadat batteri
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Du kan köra BatteriStatus i ett fönster eller i Deskbar.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Laddar ur batteriet

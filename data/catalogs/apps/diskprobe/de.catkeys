@@ -15,7 +15,7 @@ Text	TypeEditors	This is the type of editor	Text
 File offset: 	ProbeView		Datei-Offset: 
 Add	ProbeView		Hinzu
 64 bit signed value:	TypeEditors		64-Bit-Wert mit Vorzeichen:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Soll das Attribut \"%s\" wirklich von der Datei \"%s\" entfernt werden?\n\nDiese Aktion kann nicht rückgängig gemacht werden.
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Soll das Attribut „%s“ wirklich von der Datei „%s“ entfernt werden?\n\nDiese Aktion kann nicht rückgängig gemacht werden.
 No type editor available	AttributeWindow		Kein Editor für diesen Typ vorhanden
 Print…	ProbeView		Drucken …
 New…	FileWindow		Neu …

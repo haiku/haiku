@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	4080343264
+1	ukrainian	x-vnd.Haiku-PowerStatus	1876447050
 Run in window	PowerStatus		Запустити у вікні
 Extended battery info	PowerStatus		Розширені дані батареї
 Show status icon	PowerStatus		Показати значок стану
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Батарея розряджена
 Model number: 	PowerStatus		Номер моделі: 
 Battery unused	PowerStatus		Батарея не використовується
 Type: 	PowerStatus		Тип: 
-Damaged battery	PowerStatus		Батарея пошкоджена
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar.
  mAh	PowerStatus		 мА·год
 Battery discharging	PowerStatus		Батарея розряджена

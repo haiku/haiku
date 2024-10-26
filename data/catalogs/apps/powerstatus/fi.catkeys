@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PowerStatus	4080343264
+1	finnish	x-vnd.Haiku-PowerStatus	1876447050
 Run in window	PowerStatus		Suorita ikkunassa
 Extended battery info	PowerStatus		Laajennetut akkutiedot
 Show status icon	PowerStatus		Näytä tilakuvake
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Akku lähes tyhjä
 Model number: 	PowerStatus		Mallinumero: 
 Battery unused	PowerStatus		Akku käyttämätön
 Type: 	PowerStatus		Tyyppi: 
-Damaged battery	PowerStatus		Vaurioitunut akku
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Voit suorittaa Virtatilan ikkunassa tai asentaa sen Työpöytäpalkkiin.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Akkulatauksen purkaminen

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	1085070685
+1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	3176141767
 Run in window	PowerStatus		Em modo janela
 Extended battery info	PowerStatus		Informação da reserva de bateria
 Show status icon	PowerStatus		Mostrar ícone de estado
@@ -15,7 +15,6 @@ Battery low	PowerStatus		Bateria fraca
 Model number: 	PowerStatus		Número do modelo: 
 Battery unused	PowerStatus		Bateria sem uso
 Type: 	PowerStatus		Tipo: 
-Damaged battery	PowerStatus		Bateria danificada
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Você pode rodar o Estado de Energia numa janela ou instalá-lo na Deskbar
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Descarregando bateria

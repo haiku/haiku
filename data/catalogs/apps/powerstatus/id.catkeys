@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-PowerStatus	3173765686
+1	indonesian	x-vnd.Haiku-PowerStatus	969869472
 Run in window	PowerStatus		Jalankan di jendela
 Extended battery info	PowerStatus		Info baterai tambahan
 Show status icon	PowerStatus		Tampilkan ikon status
@@ -15,7 +15,6 @@ Battery low	PowerStatus		Baterai lemah
 Model number: 	PowerStatus		Nomor model: 
 Battery unused	PowerStatus		Baterai tidak digunakan
 Type: 	PowerStatus		Tipe: 
-Damaged battery	PowerStatus		Baterai rusak
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Anda dapat menjalankan PowerStatus di jendela atau menginstalnya di Deskbar.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Pengosongan baterai

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-PowerStatus	4080343264
+1	czech	x-vnd.Haiku-PowerStatus	1876447050
 Run in window	PowerStatus		Spustit v okně
 Extended battery info	PowerStatus		Podrobnější informace o baterii
 Show status icon	PowerStatus		Zobrazit ikonu stavu
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Nízká úroveň baterie
 Model number: 	PowerStatus		Číslo modelu: 
 Battery unused	PowerStatus		Baterie nevyužita
 Type: 	PowerStatus		Typ: 
-Damaged battery	PowerStatus		Poškozená baterie
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Můžete spouštět PowerStatus v okně nebo jej nainstalovat do panelu.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Baterie se vybíjí

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	4080343264
+1	french	x-vnd.Haiku-PowerStatus	1876447050
 Run in window	PowerStatus		Exécuter en fenêtre
 Extended battery info	PowerStatus		Informations additionnelles
 Show status icon	PowerStatus		Afficher l’icône d’état
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Batterie faible
 Model number: 	PowerStatus		Numéro de modèle : 
 Battery unused	PowerStatus		Batterie inutilisée
 Type: 	PowerStatus		Type : 
-Damaged battery	PowerStatus		Batterie endommagée
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vous pouvez exécuter « État d’énergie » dans une fenêtre ou l’installer dans la Deskbar.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Consommation des batteries

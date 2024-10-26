@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3228167985
+1	french	x-vnd.Haiku-libtracker	636792694
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -12,6 +12,8 @@ before	FindPanel		avant
 New folder%d	FSUtils		Nouveau dossier%d
 Volume icons	TrackerSettingsWindow		Icônes des volumes
 Ignore case	SelectionWindow		Ignorer la casse
+Save query:	FindPanel		Sauvegarder la requête :
+Save as query template:	FindPanel		Sauvegarder en tant que modèle de requête :
 Current folder	ContainerWindow		Dossier courant
 Finish: %time - Over %finishtime left	StatusWindow		Fin : %time - il reste plus de %finishtime
 Mount all disks now	AutoMounterSettings		Monter tous les disques maintenant
@@ -59,6 +61,7 @@ starts with	FindPanel		commence par
 Replace	FSUtils		Remplacer
 ?+* follows nothing.	libtracker		?+* ne faisant suite à rien.
 Rectangle	AttributesView		Rectangle
+Include Trash	FindPanel		Inclure la corbeille
 Move to	ContainerWindow		Déplacer vers
 Status	Email Query Columns		État
 New folder	FSUtils		Nouveau dossier
@@ -126,6 +129,7 @@ Create relative link	ContainerWindow		Créer un lien relatif
 Owner	FilePermissionsView		Propriétaire
 Cancel	FSClipBoard		Annuler
 Modified	PoseView		Modifié
+Save as template…	FindPanel		Enregistrer comme modèle…
 Move to Trash	ContainerWindow		Envoyer à la Corbeille
 All files and folders	FindPanel		Tout les fichiers et dossiers
 Add-ons	ContainerWindow		Extensions
@@ -205,6 +209,7 @@ Cancel	FSUtils		Annuler
 Original name	ContainerWindow		Nom d’origine
 Unknown	WidgetAttributeText		Inconnu
 32-bit integer	AttributesView		Entier 32-bits
+Save as query…	FindPanel		Sauvegarder en tant que requête :
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Le nom indiqué est déjà utilisé comme nom de dossier. Veuillez en choisir un autre.
 Modified	ContainerWindow		Modifié
 Mini icon view	ContainerWindow		Vue en petites icônes
@@ -308,6 +313,7 @@ Open	ContainerWindow		Ouvrir
 Settings…	MountMenu		Réglages…
 You cannot put the selected item(s) into the trash.	FSUtils		Vous ne pouvez pas déplacer l(es) élément(s) sélectionné(s) vers la corbeille.
 Increase size	DeskWindow		Augmenter la taille
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Cible :
 starts with	SelectionWindow		commence par
 Any	AttributesView		Tous
 New	DeskWindow		Nouveau
@@ -411,6 +417,7 @@ Revert	TrackerSettingsWindow		Rétablir
 trash	B_TRASH_DIRECTORY		corbeille
 %ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier système ou son contenu, vous ne pourrez plus démarrer %osName !\n\nÊtes vous sûr de vouloir le faire ?\n\nPour déplacez quand-même le dossier système ou son contenu, maintenez la touche Majuscule enfoncée et cliquez sur « Déplacer ».
+Open query:	FindPanel		Ouvrir la requête :
 Close all in workspace	ContainerWindow		Fermer tout dans l’espace de travail
 Corrupted expression.	libtracker		Expression corrompu.
 Network address	AttributesView		Adresse réseau
@@ -425,6 +432,7 @@ Name	QueryPoseView		Nom
 Error %error loading add-On %name.	ContainerWindow		Erreur %error au chargement de l’extension %name.
 Does not handle file	OpenWithWindow		Ne gère pas le fichier
 E-mail	Person Query Columns		Courriel
+Templates	FindPanel		Modèles
 Arrange by	ContainerWindow		Trier par
 Attributes	AttributesView		Attributs
 Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, il n’est pas permis de sauvegarder plus d’un élément.
@@ -492,6 +500,7 @@ Move to Trash	FSUtils		Envoyer à la corbeille
 Cancel	PoseView		Annuler
 Handles %type	OpenWithWindow		Support de « %type »
 Delete	PoseView		Supprimer
+Options	FindPanel		Options
 Media parameter	AttributesView		Paramètre média
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérer votre dossier d’accueil, %osName pourrait ne plus se comporter correctement!\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même d’accueil, maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.

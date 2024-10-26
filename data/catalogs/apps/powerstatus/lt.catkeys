@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PowerStatus	2428503748
+1	lithuanian	x-vnd.Haiku-PowerStatus	224607534
 Run in window	PowerStatus		Paleisti lange
 Extended battery info	PowerStatus		Išsamesni baterijos duomenys
 Show status icon	PowerStatus		Rodyti būsenos piktogramą
@@ -13,7 +13,6 @@ Quit	PowerStatus		Baigti darbą
 Model number: 	PowerStatus		Modelio numeris: 
 Battery unused	PowerStatus		Baterija nenaudojama
 Type: 	PowerStatus		Tipas: 
-Damaged battery	PowerStatus		Baterija pažeista
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Šią programą galite paleisti atskirame lange arba patalpinti pranešimų srityje.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Baterija iškraunama

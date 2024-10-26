@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PowerStatus	1085070685
+1	dutch; flemish	x-vnd.Haiku-PowerStatus	3176141767
 Run in window	PowerStatus		Actief in venster
 Extended battery info	PowerStatus		Uitgebreide accu-informatie
 Show status icon	PowerStatus		Toon status-icoon
@@ -15,7 +15,6 @@ Battery low	PowerStatus		Accu bijna leeg
 Model number: 	PowerStatus		Modelnummer
 Battery unused	PowerStatus		Accu ongebruikt
 Type: 	PowerStatus		Type:
-Damaged battery	PowerStatus		Beschadigde batterij
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		U kunt PowerStatus in een venster in actie hebben of in Deskbar installeren.
  mAh	PowerStatus		mAh
 Battery discharging	PowerStatus		Accu bezig met ontladen

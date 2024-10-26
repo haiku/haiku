@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-PowerStatus	1085070685
+1	esperanto	x-vnd.Haiku-PowerStatus	3176141767
 Run in window	PowerStatus		Ekruli fenestre
 Extended battery info	PowerStatus		Plia informo pri akumulilo
 Show status icon	PowerStatus		Montri piktogramon de stato
@@ -15,7 +15,6 @@ Battery low	PowerStatus		La akumulilo estas malplena
 Model number: 	PowerStatus		Numero de modelo: 
 Battery unused	PowerStatus		Akumulilo ne estas uzata
 Type: 	PowerStatus		Speco: 
-Damaged battery	PowerStatus		Akumulilo estas rompita
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Vi povas ruli Bateriostato fenestre aŭ instali Laborstrie.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Malŝargado de akumulilo

@@ -8,7 +8,7 @@ There were no updates found.	CheckManager		Keine Aktualisierungen gefunden.
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		Aktualisierungen noch nicht abgeschlossen, trotzdem beenden?
 Updates found	SoftwareUpdaterWindow		Aktualisierungen gefunden
 Update now	SoftwareUpdaterWindow		Jetzt aktualisieren
-For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Aus unerfindlichen Gründen konnte der Rechner nicht neu gestartet werden.
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Aus unerfindlichen Gründen konnte der Computer nicht neu gestartet werden.
 OK	UpdateManager		OK
 Unrecognized argument	SoftwareUpdaterApp	Error message	Unbekannter Parameter
 There were no updates found.	CheckAction		Es wurden keine Aktualisierungen gefunden.
@@ -36,7 +36,7 @@ Full sync	SoftwareUpdaterWindow	Alert button label	Full sync
 Quit	SoftwareUpdaterWindow	Button label	Beenden
 Updates have been successfully installed.	UpdateManager		Aktualisierungen wurden erfolgreich installiert.
 Exception occurred while updating packages : %s\n	UpdateAction		Eine Ausnahme trat bei der Aktualisierung von Paketen auf: %s\n
-A reboot is necessary to complete the update process.	UpdateManager		Um die Aktualisierung abzuschließen, muss der Rechner neu gestartet werden.
+A reboot is necessary to complete the update process.	UpdateManager		Um die Aktualisierung abzuschließen, muss der Computer neu gestartet werden.
 Exception occurred while checking for updates: %s\n	CheckAction		Eine Ausnahme trat bei der Suche nach Aktualisierungen auf: %s\n
 Packages are being updated	UpdateManager		Pakete werden aktualisiert
 Cancel	SoftwareUpdaterWindow		Abbrechen

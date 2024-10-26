@@ -9,7 +9,7 @@ Generate system information	DevicesView		Systeminformationen erstellen
 Unknown	DeviceACPI		Unbekannt
 Class info	DevicePCI		Klassen-Info
 USB bus	Device		USB-Bus
-Computer	DevicesView		Rechner
+Computer	DevicesView		Computer
 Communications	DeviceSCSI		Kommunikation
 Mass storage controller	Device		Massenspeicher-Controller
 Connection	DevicesView		Verbindung

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PowerStatus	3173765686
+1	slovak	x-vnd.Haiku-PowerStatus	969869472
 Run in window	PowerStatus		Spúšťať v okne
 Extended battery info	PowerStatus		Rozšírené info o batérii
 Show status icon	PowerStatus		Zobrazovať stavovú ikonu
@@ -15,7 +15,6 @@ Battery low	PowerStatus		Nízka úroveň batérie
 Model number: 	PowerStatus		Číslo modelu: 
 Battery unused	PowerStatus		Batéria nepoužitá
 Type: 	PowerStatus		Typ: 
-Damaged battery	PowerStatus		Poškodená batéria
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Stav napájania môžete spúšťať v okne alebo ho nainštalovať do Panelu.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Batéria sa vybíja

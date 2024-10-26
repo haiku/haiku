@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	4080343264
+1	russian	x-vnd.Haiku-PowerStatus	1876447050
 Run in window	PowerStatus		Запустить в окне
 Extended battery info	PowerStatus		Расширенные сведения о батарее
 Show status icon	PowerStatus		Показать значок статуса
@@ -16,7 +16,6 @@ Battery low	PowerStatus		Низкий заряд батареи
 Model number: 	PowerStatus		Номер модели: 
 Battery unused	PowerStatus		Батарея не используется
 Type: 	PowerStatus		Тип: 
-Damaged battery	PowerStatus		Повреждённая батарея
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Вы можете запустить PowerStatus в окне или установить его в Deskbar.
  mAh	PowerStatus		 мА·ч
 Battery discharging	PowerStatus		Батарея разряжается
