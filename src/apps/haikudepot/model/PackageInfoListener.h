@@ -11,20 +11,19 @@
 
 
 enum {
-	PKG_CHANGED_TITLE						= 1 << 0,
-	PKG_CHANGED_SUMMARY						= 1 << 1,
-	PKG_CHANGED_DESCRIPTION					= 1 << 2,
-	PKG_CHANGED_RATINGS						= 1 << 3,
-	PKG_CHANGED_SCREENSHOTS					= 1 << 4,
-	PKG_CHANGED_STATE						= 1 << 5,
-	PKG_CHANGED_ICON						= 1 << 6,
-	PKG_CHANGED_CHANGELOG					= 1 << 7,
-	PKG_CHANGED_CLASSIFICATION				= 1 << 8,
+	PKG_CHANGED_LOCALIZED_TEXT				= 1 << 0,
+		// ^ Covers title, summary, description and changelog.
+	PKG_CHANGED_RATINGS						= 1 << 1,
+	PKG_CHANGED_SCREENSHOTS					= 1 << 2,
+	PKG_CHANGED_STATE						= 1 << 3,
+	PKG_CHANGED_ICON						= 1 << 4,
+	PKG_CHANGED_CHANGELOG					= 1 << 5,
+	PKG_CHANGED_CLASSIFICATION				= 1 << 6,
 		// ^ This covers categories, prominence and is native desktop
-	PKG_CHANGED_SIZE						= 1 << 9,
-	PKG_CHANGED_DEPOT						= 1 << 10,
-	PKG_CHANGED_VERSION						= 1 << 11,
-	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 12
+	PKG_CHANGED_SIZE						= 1 << 7,
+	PKG_CHANGED_DEPOT						= 1 << 8,
+	PKG_CHANGED_VERSION						= 1 << 9,
+	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 10
 	// ...
 };
 

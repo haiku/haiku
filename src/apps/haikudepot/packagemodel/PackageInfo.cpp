@@ -23,13 +23,9 @@
 PackageInfo::PackageInfo()
 	:
 	fName(),
-	fTitle(),
 	fVersion(),
 	fPublisher(),
-	fShortDescription(),
-	fFullDescription(),
-	fHasChangelog(false),
-	fChangelog(),
+	fLocalizedText(),
 	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
@@ -53,13 +49,8 @@ PackageInfo::PackageInfo()
 PackageInfo::PackageInfo(const BPackageInfo& info)
 	:
 	fName(info.Name()),
-	fTitle(),
 	fVersion(info.Version()),
 	fPublisher(),
-	fShortDescription(info.Summary()),
-	fFullDescription(info.Description()),
-	fHasChangelog(false),
-	fChangelog(),
 	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
@@ -96,51 +87,20 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 		publisherName.Prepend("© ");
 
 	fPublisher = PublisherInfo(publisherName, publisherURL);
-}
 
-
-PackageInfo::PackageInfo(const BString& name, const BPackageVersion& version,
-	const PublisherInfo& publisher, const BString& shortDescription, const BString& fullDescription,
-	int32 flags, const char* architecture)
-	:
-	fName(name),
-	fTitle(),
-	fVersion(version),
-	fPublisher(publisher),
-	fShortDescription(shortDescription),
-	fFullDescription(fullDescription),
-	fHasChangelog(false),
-	fChangelog(),
-	fPackageClassificationInfo(),
-	fScreenshotInfos(),
-	fUserRatingInfo(),
-	fState(NONE),
-	fDownloadProgress(0.0),
-	fFlags(flags),
-	fSystemDependency(false),
-	fArchitecture(architecture),
-	fLocalFilePath(),
-	fFileName(),
-	fSize(0),
-	fDepotName(""),
-	fViewed(false),
-	fIsCollatingChanges(false),
-	fCollatedChanges(0),
-	fVersionCreateTimestamp(0)
-{
+	fLocalizedText = PackageLocalizedTextRef(new PackageLocalizedText(), true);
+	fLocalizedText->SetTitle(info.Name());
+	fLocalizedText->SetSummary(info.Summary());
+	fLocalizedText->SetDescription(info.Description());
 }
 
 
 PackageInfo::PackageInfo(const PackageInfo& other)
 	:
 	fName(other.fName),
-	fTitle(other.fTitle),
 	fVersion(other.fVersion),
 	fPublisher(other.fPublisher),
-	fShortDescription(other.fShortDescription),
-	fFullDescription(other.fFullDescription),
-	fHasChangelog(other.fHasChangelog),
-	fChangelog(other.fChangelog),
+	fLocalizedText(other.fLocalizedText),
 	fPackageClassificationInfo(other.fPackageClassificationInfo),
 	fScreenshotInfos(other.fScreenshotInfos),
 	fUserRatingInfo(other.fUserRatingInfo),
@@ -166,13 +126,9 @@ PackageInfo&
 PackageInfo::operator=(const PackageInfo& other)
 {
 	fName = other.fName;
-	fTitle = other.fTitle;
 	fVersion = other.fVersion;
 	fPublisher = other.fPublisher;
-	fShortDescription = other.fShortDescription;
-	fFullDescription = other.fFullDescription;
-	fHasChangelog = other.fHasChangelog;
-	fChangelog = other.fChangelog;
+	fLocalizedText = other.fLocalizedText;
 	fPackageClassificationInfo = other.fPackageClassificationInfo;
 	fScreenshotInfos = other.fScreenshotInfos;
 	fUserRatingInfo = other.fUserRatingInfo;
@@ -197,13 +153,9 @@ bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
 	return fName == other.fName
-		&& fTitle == other.fTitle
 		&& fVersion == other.fVersion
 		&& fPublisher == other.fPublisher
-		&& fShortDescription == other.fShortDescription
-		&& fFullDescription == other.fFullDescription
-		&& fHasChangelog == other.fHasChangelog
-		&& fChangelog == other.fChangelog
+		&& fLocalizedText == other.fLocalizedText
 		&& fPackageClassificationInfo == other.fPackageClassificationInfo
 		&& fScreenshotInfos == other.fScreenshotInfos
 		&& fUserRatingInfo == fUserRatingInfo
@@ -226,56 +178,22 @@ PackageInfo::operator!=(const PackageInfo& other) const
 }
 
 
-void
-PackageInfo::SetTitle(const BString& title)
+PackageLocalizedTextRef
+PackageInfo::LocalizedText() const
 {
-	if (fTitle != title) {
-		fTitle = title;
-		_NotifyListeners(PKG_CHANGED_TITLE);
-	}
-}
-
-
-const BString&
-PackageInfo::Title() const
-{
-	return fTitle.Length() > 0 ? fTitle : fName;
+	return fLocalizedText;
 }
 
 
 void
-PackageInfo::SetShortDescription(const BString& description)
+PackageInfo::SetLocalizedText(PackageLocalizedTextRef value)
 {
-	if (fShortDescription != description) {
-		fShortDescription = description;
-		_NotifyListeners(PKG_CHANGED_SUMMARY);
-	}
-}
-
-
-void
-PackageInfo::SetFullDescription(const BString& description)
-{
-	if (fFullDescription != description) {
-		fFullDescription = description;
-		_NotifyListeners(PKG_CHANGED_DESCRIPTION);
-	}
-}
-
-
-void
-PackageInfo::SetHasChangelog(bool value)
-{
-	fHasChangelog = value;
-}
-
-
-void
-PackageInfo::SetChangelog(const BString& changelog)
-{
-	if (fChangelog != changelog) {
-		fChangelog = changelog;
+	if (fLocalizedText != value) {
+		fLocalizedText = value;
+		_NotifyListeners(PKG_CHANGED_LOCALIZED_TEXT);
 		_NotifyListeners(PKG_CHANGED_CHANGELOG);
+			// TODO; separate out these later - they are bundled for now to keep the existing
+			// logic working.
 	}
 }
 
@@ -370,9 +288,6 @@ PackageInfo::SetUserRatingInfo(UserRatingInfoRef value)
 		_NotifyListeners(PKG_CHANGED_RATINGS);
 	}
 }
-
-
-
 
 
 void

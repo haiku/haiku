@@ -45,6 +45,7 @@
 #include "PackageContentsView.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 #include "ProcessCoordinatorFactory.h"
 #include "RatingView.h"
 #include "ScrollableGroupView.h"
@@ -371,7 +372,9 @@ public:
 		else
 			fIconView->UnsetBitmap();
 
-		fTitleView->SetText(package->Title());
+		BString title;
+		PackageUtils::TitleOrName(package, title);
+		fTitleView->SetText(title);
 
 		BString publisher = package->Publisher().Name();
 		if (publisher.CountChars() > 45) {
@@ -767,7 +770,16 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
-		fDescriptionView->SetText(package->ShortDescription(), package->FullDescription());
+		PackageLocalizedTextRef localizedText = package->LocalizedText();
+		BString summary = "";
+		BString description = "";
+
+		if (localizedText.IsSet()) {
+			summary = localizedText->Summary();
+        	description = localizedText->Description();
+		}
+
+		fDescriptionView->SetText(summary, description);
 		fWebsiteIconView->SetBitmap(SharedIcons::IconHTMLPackage16Scaled());
 		_SetContactInfo(fWebsiteLinkView, package->Publisher().Website());
 	}
@@ -1140,7 +1152,14 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
-		const BString& changelog = package->Changelog();
+		PackageLocalizedTextRef localizedText = package->LocalizedText();
+		BString changelog;
+
+		if (localizedText.IsSet()) {
+			if (localizedText->HasChangelog())
+				changelog = localizedText->Changelog();
+		}
+
 		if (changelog.Length() > 0)
 			fTextView->SetText(changelog);
 		else
@@ -1201,11 +1220,20 @@ public:
 		if (switchToDefaultTab)
 			Select(TAB_ABOUT);
 
-		TabAt(TAB_CHANGELOG)->SetEnabled(
-			package.IsSet() && package->HasChangelog());
-		TabAt(TAB_CONTENTS)->SetEnabled(
-			package.IsSet()
-				&& (package->State() == ACTIVATED || package->IsLocalFile()));
+		bool enableChangelogTab = false;
+		bool enableContentsTab = false;
+
+		if (package.IsSet()) {
+			PackageLocalizedTextRef localizedText = package->LocalizedText();
+
+			if (localizedText.IsSet())
+				enableChangelogTab = localizedText->HasChangelog();
+
+			enableContentsTab = package->State() == ACTIVATED || package->IsLocalFile();
+		}
+
+		TabAt(TAB_CHANGELOG)->SetEnabled(enableChangelogTab);
+		TabAt(TAB_CONTENTS)->SetEnabled(enableContentsTab);
 		Invalidate(TabFrame(TAB_CHANGELOG));
 		Invalidate(TabFrame(TAB_CONTENTS));
 
@@ -1321,20 +1349,16 @@ PackageInfoView::MessageReceived(BMessage* message)
 
 			BAutolock _(fModel->Lock());
 
-			if ((changes & PKG_CHANGED_SUMMARY) != 0
-				|| (changes & PKG_CHANGED_DESCRIPTION) != 0
+			if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0
-				|| (changes & PKG_CHANGED_TITLE) != 0
 				|| (changes & PKG_CHANGED_RATINGS) != 0
 				|| (changes & PKG_CHANGED_STATE) != 0
 				|| (changes & PKG_CHANGED_CHANGELOG) != 0) {
 				fPagesView->SetPackage(package, false);
 			}
 
-			if ((changes & PKG_CHANGED_TITLE) != 0
-				|| (changes & PKG_CHANGED_RATINGS) != 0) {
+			if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0 || (changes & PKG_CHANGED_RATINGS) != 0)
 				fTitleView->SetPackage(package);
-			}
 
 			if ((changes & PKG_CHANGED_STATE) != 0)
 				fPackageActionView->SetPackage(package);

@@ -20,6 +20,7 @@
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "Model.h"
+#include "PackageUtils.h"
 #include "SharedIcons.h"
 #include "WebAppInterface.h"
 
@@ -162,17 +163,19 @@ ScreenshotWindow::SetOnCloseMessage(
 void
 ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 {
+	if (!package.IsSet())
+		HDFATAL("attempt to provide an unset package");
+
 	if (fPackage == package)
 		return;
 
 	fPackage = package;
-
 	BString title = B_TRANSLATE("Screenshot");
-	if (package.IsSet()) {
-		title = package->Title();
-		_DownloadScreenshot();
-	}
+	PackageUtils::TitleOrName(fPackage, title);
 	SetTitle(title);
+
+	if (package.IsSet())
+		_DownloadScreenshot();
 
 	atomic_set(&fCurrentScreenshotIndex, 0);
 

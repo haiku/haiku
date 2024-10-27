@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2024, Andrew Lindesay <apl@lindesay.co.nz>.
 
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -13,7 +13,7 @@
 #include <Catalog.h>
 
 #include "Logger.h"
-#include "PackageUtils.h"
+#include "PackageKitUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -93,14 +93,15 @@ off_t
 PopulatePkgSizesProcess::_DeriveSize(const PackageInfoRef package) const
 {
 	BPath path;
-	if (PackageUtils::DeriveLocalFilePath(package.Get(), path) == B_OK) {
+	if (PackageKitUtils::DeriveLocalFilePath(package.Get(), path) == B_OK) {
 		BEntry entry(path.Path());
 		struct stat s = {};
 		if (entry.GetStat(&s) == B_OK)
 			return s.st_size;
 		else
 			HDDEBUG("unable to get the size of local file [%s]", path.Path());
-	} else
+	} else {
 		HDDEBUG("unable to get the local file of package [%s]", package->Name().String());
+	}
 	return 0;
 }

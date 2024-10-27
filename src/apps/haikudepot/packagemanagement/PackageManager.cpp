@@ -39,6 +39,7 @@
 #include "Logger.h"
 #include "OpenPackageProcess.h"
 #include "PackageInfo.h"
+#include "PackageUtils.h"
 #include "ProblemWindow.h"
 #include "ResultWindow.h"
 
@@ -192,28 +193,32 @@ PackageManager::_CollectPackageActionsForActivatedOrInstalled(
 PackageActionRef
 PackageManager::_CreateUninstallPackageAction(const PackageInfoRef& package)
 {
-	BString title = B_TRANSLATE("Uninstall %PackageTitle%");
-	title.ReplaceAll("%PackageTitle%", package->Title());
+	BString actionTitle = B_TRANSLATE("Uninstall %PackageTitle%");
+	BString packageTitle;
+	PackageUtils::TitleOrName(package, packageTitle);
+	actionTitle.ReplaceAll("%PackageTitle%", packageTitle);
 
 	BMessage message(MSG_PKG_UNINSTALL);
-	message.AddString(KEY_TITLE, title);
+	message.AddString(KEY_TITLE, actionTitle);
 	message.AddString(KEY_PACKAGE_NAME, package->Name());
 
-	return PackageActionRef(new PackageAction(title, message));
+	return PackageActionRef(new PackageAction(actionTitle, message), true);
 }
 
 
 PackageActionRef
 PackageManager::_CreateInstallPackageAction(const PackageInfoRef& package)
 {
-	BString title = B_TRANSLATE("Install %PackageTitle%");
-	title.ReplaceAll("%PackageTitle%", package->Title());
+	BString actionTitle = B_TRANSLATE("Install %PackageTitle%");
+	BString packageTitle;
+	PackageUtils::TitleOrName(package, packageTitle);
+	actionTitle.ReplaceAll("%PackageTitle%", packageTitle);
 
 	BMessage message(MSG_PKG_INSTALL);
-	message.AddString(KEY_TITLE, title);
+	message.AddString(KEY_TITLE, actionTitle);
 	message.AddString(KEY_PACKAGE_NAME, package->Name());
 
-	return PackageActionRef(new PackageAction(title, message));
+	return PackageActionRef(new PackageAction(actionTitle, message), true);
 }
 
 
@@ -232,7 +237,7 @@ PackageManager::_CreateOpenPackageAction(const PackageInfoRef& package, const De
 	message.AddMessage(KEY_DESKBAR_LINK, &deskbarLinkMessage);
 	message.AddString(KEY_PACKAGE_NAME, package->Name());
 
-	return PackageActionRef(new PackageAction(title, message));
+	return PackageActionRef(new PackageAction(title, message), true);
 }
 
 

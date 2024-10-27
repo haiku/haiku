@@ -95,6 +95,17 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	PackageClassificationInfoRef packageClassificationInfo(new PackageClassificationInfo(), true);
 
+	PackageLocalizedTextRef localizedText = package->LocalizedText();
+
+	if (localizedText.IsSet()) {
+		localizedText
+			= PackageLocalizedTextRef(new PackageLocalizedText(*(localizedText.Get())), true);
+	} else {
+		localizedText = PackageLocalizedTextRef(new PackageLocalizedText(), true);
+	}
+
+	localizedText->SetHasChangelog(pkg->HasChangelog());
+
 	if (0 != pkg->CountPkgVersions()) {
 
 			// this makes the assumption that the only version will be the
@@ -103,13 +114,13 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		DumpExportPkgVersion* pkgVersion = pkg->PkgVersionsItemAt(0);
 
 		if (!pkgVersion->TitleIsNull())
-			package->SetTitle(*(pkgVersion->Title()));
+			localizedText->SetTitle(*(pkgVersion->Title()));
 
 		if (!pkgVersion->SummaryIsNull())
-			package->SetShortDescription(*(pkgVersion->Summary()));
+			localizedText->SetSummary(*(pkgVersion->Summary()));
 
 		if (!pkgVersion->DescriptionIsNull())
-			package->SetFullDescription(*(pkgVersion->Description()));
+			localizedText->SetDescription(*(pkgVersion->Description()));
 
 		if (!pkgVersion->PayloadLengthIsNull())
 			package->SetSize(static_cast<off_t>(pkgVersion->PayloadLength()));
@@ -141,8 +152,6 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		package->SetUserRatingInfo(userRatingInfo);
 	}
 
-	package->SetHasChangelog(pkg->HasChangelog());
-
 	if (!pkg->ProminenceOrderingIsNull())
 		packageClassificationInfo->SetProminence(static_cast<uint32>(pkg->ProminenceOrdering()));
 
@@ -160,6 +169,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			static_cast<int32>(screenshot->Length())
 		), true));
 	}
+
+	package->SetLocalizedText(localizedText);
 
 	HDTRACE("did populate data for [%s] (%s)", pkg->Name()->String(),
 			fDepotName.String());

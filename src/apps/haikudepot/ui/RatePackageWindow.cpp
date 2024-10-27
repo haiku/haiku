@@ -26,6 +26,7 @@
 #include "LanguageMenuUtils.h"
 #include "Logger.h"
 #include "MarkupParser.h"
+#include "PackageUtils.h"
 #include "RatingView.h"
 #include "ServerHelper.h"
 #include "SharedIcons.h"
@@ -393,21 +394,26 @@ RatePackageWindow::_RefreshPackageData()
 void
 RatePackageWindow::SetPackage(const PackageInfoRef& package)
 {
+	if (!package.IsSet())
+		HDFATAL("attempt to provide an unset package");
+
 	BAutolock locker(this);
 	if (!locker.IsLocked() || fWorkerThread >= 0)
 		return;
 
 	fPackage = package;
+	BString packageTitle;
+	PackageUtils::TitleOrName(fPackage, packageTitle);
 
 	BString windowTitle(B_TRANSLATE("Rate %Package%"));
-	windowTitle.ReplaceAll("%Package%", package->Title());
+	windowTitle.ReplaceAll("%Package%", packageTitle);
 	SetTitle(windowTitle);
 
 	// See if the user already made a rating for this package,
 	// pre-fill the UI with that rating. (When sending the rating, the
 	// old one will be replaced.)
-	thread_id thread = spawn_thread(&_QueryRatingThreadEntry,
-		"Query rating", B_NORMAL_PRIORITY, this);
+	thread_id thread
+		= spawn_thread(&_QueryRatingThreadEntry, "Query rating", B_NORMAL_PRIORITY, this);
 	if (thread >= 0)
 		_SetWorkerThread(thread);
 }

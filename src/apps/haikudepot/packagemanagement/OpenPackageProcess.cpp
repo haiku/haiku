@@ -29,7 +29,7 @@
 #include <package/hpkg/PackageReader.h>
 
 #include "Logger.h"
-#include "PackageUtils.h"
+#include "PackageKitUtils.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "OpenPackageProcess"
@@ -198,7 +198,7 @@ OpenPackageProcess::FindAppToLaunch(const PackageInfoRef& package,
 		return false;
 
 	BPath packagePath;
-	if (PackageUtils::DeriveLocalFilePath(package, packagePath) != B_OK) {
+	if (PackageKitUtils::DeriveLocalFilePath(package, packagePath) != B_OK) {
 		HDDEBUG("unable to derive local file path for package");
 		return false;
 	}

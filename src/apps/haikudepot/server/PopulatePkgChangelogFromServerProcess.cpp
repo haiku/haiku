@@ -66,13 +66,23 @@ PopulatePkgChangelogFromServerProcess::RunInternal()
 		result = responsePayload.FindMessage("result", &resultMessage);
 
 		if (result == B_OK) {
-			if (resultMessage.FindString("content", &content) == B_OK)
+			if (resultMessage.FindString("content", &content) == B_OK) {
 				content.Trim();
 
-			if (!content.IsEmpty()) {
+				PackageLocalizedTextRef localizedText = fPackageInfo->LocalizedText();
+
+				if (localizedText.IsSet()) {
+					localizedText = PackageLocalizedTextRef(
+						new PackageLocalizedText(*(localizedText.Get())), true);
+				} else {
+					localizedText = PackageLocalizedTextRef(new PackageLocalizedText(), true);
+				}
+
+				localizedText->SetChangelog(content);
+
 				// TODO; later work to make the `PackageInfo` immutable to avoid this locking
 				BAutolock locker(fModel->Lock());
-				fPackageInfo->SetChangelog(content);
+				fPackageInfo->SetLocalizedText(localizedText);
 				HDDEBUG("changelog populated for [%s]", packageName.String());
 			} else {
 				HDDEBUG("no changelog present for [%s]", packageName.String());

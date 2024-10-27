@@ -180,10 +180,8 @@ public:
 		for (int32 i = fSearchTerms.CountStrings() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.StringAt(i);
 			if (!_TextContains(package->Name(), term)
-				&& !_TextContains(package->Title(), term)
 				&& !_TextContains(package->Publisher().Name(), term)
-				&& !_TextContains(package->ShortDescription(), term)
-				&& !_TextContains(package->FullDescription(), term)) {
+				&& !_AcceptsPackageFromLocalizedText(package, term)) {
 				return false;
 			}
 		}
@@ -211,6 +209,22 @@ private:
  		int32 index = text.FindFirst(string);
  		return index >= 0;
  	}
+
+	bool _AcceptsPackageFromLocalizedText(const PackageInfoRef& package,
+		const BString& searchTerm) const
+	{
+		if (!package.IsSet())
+			return false;
+
+		PackageLocalizedTextRef localizedText = package->LocalizedText();
+
+		if (!localizedText.IsSet())
+			return false;
+
+		return _TextContains(localizedText->Title(), searchTerm)
+        	&& _TextContains(localizedText->Summary(), searchTerm)
+        	&& _TextContains(localizedText->Description(), searchTerm);
+	}
 
 private:
  	BStringList fSearchTerms;

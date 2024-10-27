@@ -181,6 +181,7 @@ local applicationSources =
 	PackageFilter.cpp
 	PackageFilterModel.cpp
 	PackageInfo.cpp
+	PackageLocalizedText.cpp
 	PublisherInfo.cpp
 	ScreenshotInfo.cpp
 	UserInfo.cpp
@@ -222,6 +223,7 @@ local applicationSources =
 	DataIOUtils.cpp
 	LanguageMenuUtils.cpp
 	LocaleUtils.cpp
+	PackageKitUtils.cpp
 	PackageUtils.cpp
 	StorageUtils.cpp
 	StringUtils.cpp

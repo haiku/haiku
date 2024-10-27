@@ -1241,12 +1241,16 @@ MainWindow::_PopulatePackageAsync(bool forcePopulate)
 
 	const char* packageNameStr = package->Name().String();
 
-	if (package->HasChangelog() && (forcePopulate || package->Changelog().IsEmpty())) {
-		_AddProcessCoordinator(
-			ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(&fModel, package));
-		HDINFO("pkg [%s] will have changelog updated from server.", packageNameStr);
-	} else {
-		HDDEBUG("pkg [%s] not have changelog updated from server.", packageNameStr);
+	PackageLocalizedTextRef localized = package->LocalizedText();
+
+	if (localized.IsSet()) {
+		if (localized->HasChangelog() && (forcePopulate || localized->Changelog().IsEmpty())) {
+			_AddProcessCoordinator(
+				ProcessCoordinatorFactory::PopulatePkgChangelogCoordinator(&fModel, package));
+			HDINFO("pkg [%s] will have changelog updated from server.", packageNameStr);
+		} else {
+			HDDEBUG("pkg [%s] not have changelog updated from server.", packageNameStr);
+		}
 	}
 
 	if (forcePopulate || RatingUtils::ShouldTryPopulateUserRatings(package->UserRatingInfo())) {

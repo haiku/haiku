@@ -1,6 +1,6 @@
 /*
  * Copyright 2015, TigerKid001.
- * Copyright 2020-2022, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2024, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -23,7 +23,7 @@
 
 #include "GeneralContentScrollView.h"
 #include "Logger.h"
-#include "PackageUtils.h"
+#include "PackageKitUtils.h"
 
 #include <package/PackageDefs.h>
 #include <package/hpkg/NoErrorOutput.h>
@@ -333,7 +333,7 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 {
 	BPath packagePath;
 
-	if (PackageUtils::DeriveLocalFilePath(&package, packagePath) != B_OK) {
+	if (PackageKitUtils::DeriveLocalFilePath(&package, packagePath) != B_OK) {
 		HDDEBUG("unable to obtain local file path");
 		return false;
 	}

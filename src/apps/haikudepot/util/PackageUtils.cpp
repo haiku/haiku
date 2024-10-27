@@ -1,69 +1,51 @@
 /*
- * Copyright 2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2024, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "PackageUtils.h"
 
 
-using namespace BPackageKit;
+/*!	This method will obtain the title from the package if this is possible or
+	otherwise it will return the name of the package.
+*/
 
-
-/*static*/
-status_t PackageUtils::DeriveLocalFilePath(const PackageInfo* package,
-	BPath& path)
+/*static*/ void
+PackageUtils::TitleOrName(const PackageInfoRef package, BString& title)
 {
-	if (package->IsLocalFile()) {
-		path.SetTo(package->LocalFilePath());
-		return B_OK;
-	}
-
-	path.Unset();
-	BPackageInstallationLocation installationLocation
-		= DeriveInstallLocation(package);
-	directory_which which;
-	status_t result = _DeriveDirectoryWhich(installationLocation, &which);
-
-	if (result == B_OK)
-		result = find_directory(which, &path);
-
-	if (result == B_OK)
-		path.Append(package->FileName());
-
-	return result;
+	PackageUtils::Title(package, title);
+	if (title.IsEmpty() && package.IsSet())
+		title.SetTo(package->Name());
 }
 
 
-/*static*/ status_t
-PackageUtils::_DeriveDirectoryWhich(
-	BPackageInstallationLocation location,
-	directory_which* which)
+/*static*/ void
+PackageUtils::Title(const PackageInfoRef package, BString& title)
 {
-	switch (location) {
-		case B_PACKAGE_INSTALLATION_LOCATION_SYSTEM:
-			*which = B_SYSTEM_PACKAGES_DIRECTORY;
-			break;
-		case B_PACKAGE_INSTALLATION_LOCATION_HOME:
-			*which = B_USER_PACKAGES_DIRECTORY;
-			break;
-		default:
-			debugger("illegal state: unsupported package installation"
-				"location");
-			return B_BAD_VALUE;
+	if (package.IsSet()) {
+		PackageLocalizedTextRef localizedText = package->LocalizedText();
+
+		if (localizedText.IsSet())
+			title.SetTo(localizedText->Title());
+		else
+			title.SetTo("");
+	} else {
+		title.SetTo("");
 	}
-	return B_OK;
 }
 
 
-/*static*/ BPackageInstallationLocation
-PackageUtils::DeriveInstallLocation(const PackageInfo* package)
+/*static*/ void
+PackageUtils::Summary(const PackageInfoRef package, BString& summary)
 {
-	const PackageInstallationLocationSet& locations
-		= package->InstallationLocations();
+	if (package.IsSet()) {
+		PackageLocalizedTextRef localizedText = package->LocalizedText();
 
-	// If the package is already installed, return its first installed location
-	if (locations.size() != 0)
-		return static_cast<BPackageInstallationLocation>(*locations.begin());
-
-	return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
+		if (localizedText.IsSet())
+			summary.SetTo(localizedText->Summary());
+		else
+			summary.SetTo("");
+	} else {
+		summary.SetTo("");
+	}
 }

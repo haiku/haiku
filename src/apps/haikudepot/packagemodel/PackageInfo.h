@@ -17,6 +17,7 @@
 #include "List.h"
 #include "PackageClassificationInfo.h"
 #include "PackageInfoListener.h"
+#include "PackageLocalizedText.h"
 #include "PublisherInfo.h"
 #include "ScreenshotInfo.h"
 #include "UserRatingInfo.h"
@@ -46,14 +47,6 @@ class PackageInfo : public BReferenceable {
 public:
 								PackageInfo();
 								PackageInfo(const BPackageInfo& info);
-								PackageInfo(
-									const BString& name,
-									const BPackageVersion& version,
-									const PublisherInfo& publisher,
-									const BString& shortDescription,
-									const BString& fullDescription,
-									int32 packageFlags,
-									const char* architecture);
 								PackageInfo(const PackageInfo& other);
 
 			PackageInfo&		operator=(const PackageInfo& other);
@@ -62,26 +55,17 @@ public:
 
 			const BString&		Name() const
 									{ return fName; }
-			void				SetTitle(const BString& title);
-			const BString&		Title() const;
+
+			PackageLocalizedTextRef
+								LocalizedText() const;
+			void				SetLocalizedText(PackageLocalizedTextRef value);
+
 			const BPackageVersion&
 								Version() const
 									{ return fVersion; }
-			void				SetShortDescription(const BString& description);
-			const BString&		ShortDescription() const
-									{ return fShortDescription; }
-			void				SetFullDescription(const BString& description);
-			const BString&		FullDescription() const
-									{ return fFullDescription; }
 			const PublisherInfo& Publisher() const
 									{ return fPublisher; }
 
-			void				SetHasChangelog(bool value);
-			bool				HasChangelog() const
-									{ return fHasChangelog; }
-			void				SetChangelog(const BString& changelog);
-			const BString&		Changelog() const
-									{ return fChangelog; }
 
 			int32				Flags() const
 									{ return fFlags; }
@@ -161,13 +145,10 @@ private:
 
 private:
 			BString				fName;
-			BString				fTitle;
 			BPackageVersion		fVersion;
 			PublisherInfo		fPublisher;
-			BString				fShortDescription;
-			BString				fFullDescription;
-			bool				fHasChangelog;
-			BString				fChangelog;
+			PackageLocalizedTextRef
+								fLocalizedText;
 			PackageClassificationInfoRef
 								fPackageClassificationInfo;
 			std::vector<ScreenshotInfoRef>

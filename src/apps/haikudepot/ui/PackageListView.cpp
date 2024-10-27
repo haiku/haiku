@@ -24,6 +24,7 @@
 
 #include "LocaleUtils.h"
 #include "Logger.h"
+#include "PackageUtils.h"
 #include "RatingUtils.h"
 #include "SharedIcons.h"
 #include "WorkStatusView.h"
@@ -630,8 +631,10 @@ PackageRow::UpdateIconAndTitle()
 {
 	if (!fPackage.IsSet())
 		return;
-	SetField(new PackageIconAndTitleField(
-		fPackage->Name(), fPackage->Title()), kTitleColumn);
+
+	BString title;
+	PackageUtils::TitleOrName(fPackage, title);
+	SetField(new PackageIconAndTitleField(fPackage->Name(), title), kTitleColumn);
 }
 
 
@@ -650,8 +653,11 @@ PackageRow::UpdateSummary()
 {
 	if (!fPackage.IsSet())
 		return;
-	SetField(new BStringField(fPackage->ShortDescription()),
-		kDescriptionColumn);
+
+	BString summary;
+	PackageUtils::Summary(fPackage, summary);
+	// TODO; `kDescriptionColumn` seems wrong here?
+	SetField(new BStringField(summary), kDescriptionColumn);
 }
 
 
@@ -933,10 +939,10 @@ PackageListView::MessageReceived(BMessage* message)
 			BAutolock _(fModel->Lock());
 			PackageRow* row = _FindRow(name);
 			if (row != NULL) {
-				if ((changes & PKG_CHANGED_TITLE) != 0)
+				if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0) {
 					row->UpdateIconAndTitle();
-				if ((changes & PKG_CHANGED_SUMMARY) != 0)
 					row->UpdateSummary();
+				}
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
 					row->UpdateRating();
 				if ((changes & PKG_CHANGED_STATE) != 0)

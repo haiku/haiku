@@ -27,6 +27,7 @@
 #include "MainWindow.h"
 #include "MarkupTextView.h"
 #include "MessagePackageListener.h"
+#include "PackageUtils.h"
 #include "RatingUtils.h"
 #include "RatingView.h"
 #include "SharedIcons.h"
@@ -434,8 +435,13 @@ public:
 
 		int c = static_cast<int>(prominenceA) - static_cast<int>(prominenceB);
 
-		if (c == 0)
-			c = packageA->Title().ICompare(packageB->Title());
+		if (c == 0) {
+			BString titleA;
+			BString titleB;
+			PackageUtils::Title(packageA, titleA);
+			PackageUtils::Title(packageB, titleB);
+			c = titleA.ICompare(titleB);
+		}
 
 		if (c == 0)
 			c = packageA->Name().Compare(packageB->Name());
@@ -646,14 +652,17 @@ public:
 		fTitleFont->GetHeight(&fontHeight);
 		BPoint pt = textRect.LeftTop() + BPoint(0.0, + fontHeight.ascent);
 
-		BString renderedText = pkg->Title();
+		BString title;
+		PackageUtils::TitleOrName(pkg, title);
+
+		BString renderedText = title;
 		float installedIconAllowance = installedIconBitmap->Bounds().Width() * 1.5;
 		TruncateString(&renderedText, B_TRUNCATE_END, textRect.Width() - installedIconAllowance);
 
 		DrawString(renderedText, pt);
 
 		if (pkg->State() == ACTIVATED) {
-			float stringWidth = StringWidth(pkg->Title());
+			float stringWidth = StringWidth(title);
 			BRect iconRect = BRect(
 				BPoint(textRect.left + stringWidth + (installedIconBitmap->Bounds().Width() / 2.0),
 				textRect.top + (textRect.Height() / 2.0)
@@ -737,7 +746,8 @@ public:
 			(textRect.Size().Height() / 2.0) - ((fontHeight.ascent + fontHeight.descent) / 2.0)
 				+ fontHeight.ascent);
 
-		BString summary(pkg->ShortDescription());
+		BString summary;
+		PackageUtils::Summary(pkg, summary);
 		TruncateString(&summary, B_TRUNCATE_END, textRect.Width());
 
 		DrawString(summary, pt);
