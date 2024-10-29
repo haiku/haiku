@@ -51,6 +51,7 @@ extern void		*malloc(size_t size);
 extern int		posix_memalign(void **_pointer, size_t alignment, size_t size);
 extern void 	*aligned_alloc(size_t alignment, size_t size) _ALIGNED_BY_ARG(1);
 extern void		*realloc(void *oldPointer, size_t newSize);
+extern void		*reallocarray(void *ptr, size_t nelem, size_t elsize);
 
 /* process termination */
 extern void		abort(void) __attribute__((noreturn));
