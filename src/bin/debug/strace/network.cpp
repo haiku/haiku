@@ -124,10 +124,6 @@ patch_network()
 	shutdown->GetParameter("how")->SetHandler(
 		new EnumTypeHandler(kShutdownHowMap));
 
-	Syscall *createPipe = get_syscall("_kern_create_pipe");
-	createPipe->ParameterAt(0)->SetOut(true);
-	createPipe->ParameterAt(0)->SetCount(2);
-
 	Syscall *socketPair = get_syscall("_kern_socketpair");
 	socketPair->ParameterAt(3)->SetOut(true);
 	socketPair->ParameterAt(3)->SetCount(2);

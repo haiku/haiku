@@ -295,7 +295,7 @@ extern status_t		_kern_unlink(int fd, const char *path);
 extern status_t		_kern_rename(int oldDir, const char *oldpath, int newDir,
 						const char *newpath);
 extern status_t		_kern_create_fifo(int fd, const char *path, mode_t perms);
-extern status_t		_kern_create_pipe(int *fds);
+extern status_t		_kern_create_pipe(int *fds, int flags);
 extern status_t		_kern_access(int fd, const char *path, int mode,
 						bool effectiveUserGroup);
 extern ssize_t		_kern_select(int numfds, struct fd_set *readSet,

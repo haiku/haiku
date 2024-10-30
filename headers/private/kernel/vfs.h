@@ -206,7 +206,7 @@ status_t	_user_unlink(int fd, const char *path);
 status_t	_user_rename(int oldFD, const char *oldpath, int newFD,
 				const char *newpath);
 status_t	_user_create_fifo(int fd, const char *path, mode_t perms);
-status_t	_user_create_pipe(int *fds);
+status_t	_user_create_pipe(int *fds, int flags);
 status_t	_user_access(int fd, const char *path, int mode,
 				bool effectiveUserGroup);
 ssize_t		_user_select(int numfds, fd_set *readSet, fd_set *writeSet,

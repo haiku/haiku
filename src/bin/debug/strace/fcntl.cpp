@@ -93,5 +93,10 @@ patch_fcntl()
 	fcntl->GetParameter("argument")->SetHandler(
 		new TypeHandlerSelector(kFcntlTypeHandlers,
 				1, TypeHandlerFactory<void *>::Create()));
+
+	Syscall *createPipe = get_syscall("_kern_create_pipe");
+	createPipe->ParameterAt(0)->SetOut(true);
+	createPipe->ParameterAt(0)->SetCount(2);
+	createPipe->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kOpenFlags));
 }
 

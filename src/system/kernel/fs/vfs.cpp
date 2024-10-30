@@ -9579,8 +9579,12 @@ _user_create_fifo(int fd, const char* userPath, mode_t perms)
 
 
 status_t
-_user_create_pipe(int* userFDs)
+_user_create_pipe(int* userFDs, int flags)
 {
+	// check acceptable flags
+	if ((flags & ~(O_NONBLOCK | O_CLOEXEC)) != 0)
+		return B_BAD_VALUE;
+
 	// rootfs should support creating FIFOs, but let's be sure
 	if (!HAS_FS_CALL(sRoot, create_special_node))
 		return B_UNSUPPORTED;
@@ -9606,10 +9610,11 @@ _user_create_pipe(int* userFDs)
 	// Everything looks good so far. Open two FDs for reading respectively
 	// writing, O_NONBLOCK to avoid blocking on open with O_RDONLY
 	int fds[2];
-	fds[0] = open_vnode(vnode, O_RDONLY | O_NONBLOCK, false);
-	fds[1] = open_vnode(vnode, O_WRONLY, false);
-	// Reset O_NONBLOCK
-	common_fcntl(fds[0], F_SETFL, 0, false);
+	fds[0] = open_vnode(vnode, O_RDONLY | O_NONBLOCK | flags, false);
+	fds[1] = open_vnode(vnode, O_WRONLY | flags, false);
+	// Reset O_NONBLOCK if requested
+	if ((flags & O_NONBLOCK) == 0)
+		common_fcntl(fds[0], F_SETFL, flags & O_NONBLOCK, false);
 
 	FDCloser closer0(fds[0], false);
 	FDCloser closer1(fds[1], false);

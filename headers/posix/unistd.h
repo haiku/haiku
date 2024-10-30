@@ -341,6 +341,7 @@ extern int		fchdir(int fd);
 extern char		*getcwd(char *buffer, size_t size);
 
 extern int		pipe(int fildes[2]);
+extern int		pipe2(int fildes[2], int flags);
 extern int		dup(int fd);
 extern int		dup2(int fd1, int fd2);
 extern int		close(int fd);
