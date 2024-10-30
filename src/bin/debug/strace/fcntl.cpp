@@ -98,5 +98,9 @@ patch_fcntl()
 	createPipe->ParameterAt(0)->SetOut(true);
 	createPipe->ParameterAt(0)->SetCount(2);
 	createPipe->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kOpenFlags));
+
+	Syscall *dup2 = get_syscall("_kern_dup2");
+	dup2->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kOpenFlags));
+
 }
 

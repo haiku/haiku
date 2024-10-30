@@ -250,7 +250,7 @@ ssize_t		_user_read_dir(int fd, struct dirent *buffer, size_t bufferSize,
 status_t	_user_rewind_dir(int fd);
 status_t	_user_close(int fd);
 int			_user_dup(int fd);
-int			_user_dup2(int ofd, int nfd);
+int			_user_dup2(int ofd, int nfd, int flags);
 status_t	_user_lock_node(int fd);
 status_t	_user_unlock_node(int fd);
 status_t	_user_preallocate(int fd, off_t offset, off_t length);

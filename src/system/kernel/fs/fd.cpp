@@ -373,7 +373,7 @@ dup_fd(int fd, bool kernel)
 	We do dup2() directly to be thread-safe.
 */
 static int
-dup2_fd(int oldfd, int newfd, bool kernel)
+dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 {
 	struct file_descriptor* evicted = NULL;
 	struct io_context* context;
@@ -383,6 +383,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	// quick check
 	if (oldfd < 0 || newfd < 0)
 		return B_FILE_ERROR;
+	if ((flags & ~O_CLOEXEC) != 0)
+		return B_BAD_VALUE;
 
 	// Get current I/O context and lock it
 	context = get_current_io_context(kernel);
@@ -418,7 +420,7 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 		deselect_select_infos(evicted, selectInfos, true);
 	}
 
-	fd_set_close_on_exec(context, newfd, false);
+	fd_set_close_on_exec(context, newfd, (flags & O_CLOEXEC) != 0);
 
 	mutex_unlock(&context->io_mutex);
 
@@ -1014,9 +1016,9 @@ _user_dup(int fd)
 
 
 int
-_user_dup2(int ofd, int nfd)
+_user_dup2(int ofd, int nfd, int flags)
 {
-	return dup2_fd(ofd, nfd, false);
+	return dup2_fd(ofd, nfd, flags, false);
 }
 
 
@@ -1206,8 +1208,8 @@ _kern_dup(int fd)
 
 
 int
-_kern_dup2(int ofd, int nfd)
+_kern_dup2(int ofd, int nfd, int flags)
 {
-	return dup2_fd(ofd, nfd, true);
+	return dup2_fd(ofd, nfd, flags, true);
 }
 

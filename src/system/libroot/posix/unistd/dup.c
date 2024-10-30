@@ -22,5 +22,12 @@ dup(int fd)
 int
 dup2(int oldFD, int newFD)
 {
-	RETURN_AND_SET_ERRNO(_kern_dup2(oldFD, newFD));
+	return dup3(oldFD, newFD, 0);
+}
+
+
+int
+dup3(int oldFD, int newFD, int flags)
+{
+	RETURN_AND_SET_ERRNO(_kern_dup2(oldFD, newFD, flags));
 }
