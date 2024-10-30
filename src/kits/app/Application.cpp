@@ -337,7 +337,7 @@ BApplication::~BApplication()
 		link.StartMessage(B_QUIT_REQUESTED);
 		link.Flush();
 	}
-	delete_port(fServerLink->SenderPort());
+	// the sender port belongs to the app_server
 	delete_port(fServerLink->ReceiverPort());
 	delete fServerLink;
 #endif	// RUN_WITHOUT_APP_SERVER
@@ -1465,7 +1465,7 @@ BApplication::_ConnectToServer()
 void
 BApplication::_ReconnectToServer()
 {
-	delete_port(fServerLink->SenderPort());
+	// the sender port belongs to the app_server
 	delete_port(fServerLink->ReceiverPort());
 
 	if (_ConnectToServer() != B_OK)
