@@ -79,10 +79,19 @@ static const enum_info kShutdownHow[] = {
 };
 
 
+static const FlagsTypeHandler::FlagInfo kSocketFlagInfos[] = {
+	FLAG_INFO_ENTRY(SOCK_NONBLOCK),
+	FLAG_INFO_ENTRY(SOCK_CLOEXEC),
+
+	{ 0, NULL }
+};
+
+
 static FlagsTypeHandler::FlagsList kRecvFlags;
 static EnumTypeHandler::EnumMap kSocketFamilyMap;
 static EnumTypeHandler::EnumMap kSocketTypeMap;
 static EnumTypeHandler::EnumMap kShutdownHowMap;
+static FlagsTypeHandler::FlagsList kSocketFlags;
 
 
 void
@@ -99,6 +108,9 @@ patch_network()
 	}
 	for (int i = 0; kShutdownHow[i].name != NULL; i++) {
 		kShutdownHowMap[kShutdownHow[i].index] = kShutdownHow[i].name;
+	}
+	for (int i = 0; kSocketFlagInfos[i].name != NULL; i++) {
+		kSocketFlags.push_back(kSocketFlagInfos[i]);
 	}
 
 	Syscall *recv = get_syscall("_kern_recv");
@@ -118,7 +130,7 @@ patch_network()
 	socket->GetParameter("family")->SetHandler(
 		new EnumTypeHandler(kSocketFamilyMap));
 	socket->GetParameter("type")->SetHandler(
-		new EnumTypeHandler(kSocketTypeMap));
+		new EnumFlagsTypeHandler(kSocketTypeMap, kSocketFlags));
 
 	Syscall *shutdown = get_syscall("_kern_shutdown_socket");
 	shutdown->GetParameter("how")->SetHandler(
@@ -130,5 +142,8 @@ patch_network()
 	socketPair->GetParameter("family")->SetHandler(
 		new EnumTypeHandler(kSocketFamilyMap));
 	socketPair->GetParameter("type")->SetHandler(
-		new EnumTypeHandler(kSocketTypeMap));
+		new EnumFlagsTypeHandler(kSocketTypeMap, kSocketFlags));
+
+	Syscall *accept = get_syscall("_kern_accept");
+	accept->GetParameter("flags")->SetHandler(new FlagsTypeHandler(kSocketFlags));
 }

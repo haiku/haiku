@@ -264,7 +264,7 @@ status_t	_user_connect(int socket, const struct sockaddr *address,
 				socklen_t addressLength);
 status_t	_user_listen(int socket, int backlog);
 int			_user_accept(int socket, struct sockaddr *address,
-				socklen_t *_addressLength);
+				socklen_t *_addressLength, int flags);
 ssize_t		_user_recv(int socket, void *data, size_t length, int flags);
 ssize_t		_user_recvfrom(int socket, void *data, size_t length, int flags,
 				struct sockaddr *address, socklen_t *_addressLength);

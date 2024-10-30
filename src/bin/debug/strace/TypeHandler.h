@@ -35,7 +35,7 @@ public:
 	virtual string GetReturnValue(Context &, uint64 value) = 0;
 };
 
-class EnumTypeHandler : public TypeHandler {
+class EnumTypeHandler : virtual public TypeHandler {
 public:
 	typedef std::map<int, const char *> EnumMap;
 
@@ -44,13 +44,13 @@ public:
 	string GetParameterValue(Context &c, Parameter *, const void *);
 	string GetReturnValue(Context &, uint64 value);
 
-	string RenderValue(Context &, unsigned int value) const;
+	virtual string RenderValue(Context &, unsigned int value) const;
 
-private:
+protected:
 	const EnumMap &fMap;
 };
 
-class FlagsTypeHandler : public TypeHandler {
+class FlagsTypeHandler : virtual public TypeHandler {
 public:
 	struct FlagInfo {
 		unsigned int value;
@@ -63,10 +63,20 @@ public:
 	string GetParameterValue(Context &c, Parameter *, const void *);
 	string GetReturnValue(Context &, uint64 value);
 
-	string RenderValue(Context &, unsigned int value) const;
+	virtual string RenderValue(Context &, unsigned int value) const;
 
 private:
 	const FlagsList &fList;
+};
+
+class EnumFlagsTypeHandler : public EnumTypeHandler {
+public:
+	EnumFlagsTypeHandler(const EnumMap &, const FlagsTypeHandler::FlagsList &);
+
+	string RenderValue(Context &, unsigned int value) const;
+
+private:
+	const FlagsTypeHandler::FlagsList &fList;
 };
 
 // currently limited to select ints

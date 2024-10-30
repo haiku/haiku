@@ -365,7 +365,7 @@ extern status_t		_kern_connect(int socket, const struct sockaddr *address,
 						socklen_t addressLength);
 extern status_t		_kern_listen(int socket, int backlog);
 extern int			_kern_accept(int socket, struct sockaddr *address,
-						socklen_t *_addressLength);
+						socklen_t *_addressLength, int flags);
 extern ssize_t		_kern_recv(int socket, void *data, size_t length,
 						int flags);
 extern ssize_t		_kern_recvfrom(int socket, void *data, size_t length,

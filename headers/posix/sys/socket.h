@@ -47,6 +47,9 @@ typedef uint8_t sa_family_t;
 #define	SOCK_SEQPACKET	5
 #define SOCK_MISC	255
 
+#define SOCK_NONBLOCK 	0x00040000
+#define SOCK_CLOEXEC 	0x00080000
+
 /* Socket options for SOL_SOCKET level */
 #define	SOL_SOCKET		-1
 
@@ -163,6 +166,7 @@ extern "C" {
 #endif
 
 int 	accept(int socket, struct sockaddr *address, socklen_t *_addressLength);
+int 	accept4(int socket, struct sockaddr *address, socklen_t *_addressLength, int flags);
 int		bind(int socket, const struct sockaddr *address,
 			socklen_t addressLength);
 int		connect(int socket, const struct sockaddr *address,

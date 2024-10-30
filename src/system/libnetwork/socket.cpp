@@ -192,6 +192,13 @@ listen(int socket, int backlog)
 extern "C" int
 accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 {
+	return accept4(socket, _address, _addressLength, 0);
+}
+
+
+extern "C" int
+accept4(int socket, struct sockaddr *_address, socklen_t *_addressLength, int flags)
+{
 	bool r5compatible = check_r5_compatibility();
 	struct sockaddr haikuAddr;
 
@@ -206,7 +213,7 @@ accept(int socket, struct sockaddr *_address, socklen_t *_addressLength)
 		addressLength = _addressLength ? *_addressLength : 0;
 	}
 
-	int acceptSocket = _kern_accept(socket, address, &addressLength);
+	int acceptSocket = _kern_accept(socket, address, &addressLength, flags);
 
 	pthread_testcancel();
 

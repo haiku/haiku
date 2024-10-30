@@ -25,6 +25,9 @@ SimpleTest unix_send_test : unix_send_test.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_connection_test : tcp_connection_test.cpp
 	: $(TARGET_NETWORK_LIBS) ;
 
+SimpleTest test4 : test4.c
+	: $(TARGET_NETWORK_LIBS) ;
+
 SubInclude HAIKU_TOP src tests system network icmp ;
 SubInclude HAIKU_TOP src tests system network ipv6 ;
 SubInclude HAIKU_TOP src tests system network multicast ;
