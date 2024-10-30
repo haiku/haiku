@@ -130,12 +130,14 @@ PackageIconTarRepository::PackageIconTarRepository()
 	fDefaultIconCache(LIMIT_ICON_CACHE),
 	fIconDataBuffer(new BMallocIO())
 {
+	_InitDefaultVectorIcon();
 }
 
 
 PackageIconTarRepository::~PackageIconTarRepository()
 {
 	delete fIconDataBuffer;
+	delete fDefaultIconVectorData;
 }
 
 
@@ -158,8 +160,6 @@ PackageIconTarRepository::Init(BPath& tarPath)
 	BAutolock locker(&fLock);
 
 	_Close();
-
-	_InitDefaultVectorIcon();
 
 	status_t result = B_OK;
 
@@ -214,10 +214,6 @@ PackageIconTarRepository::_Close()
 	delete fTarIo;
 	fTarIo = NULL;
 	fIconTarPtrs.Clear();
-
-	delete fDefaultIconVectorData;
-	fDefaultIconVectorData = NULL;
-	fDefaultIconVectorDataSize = 0;
 	fDefaultIconCache.Clear();
 }
 
