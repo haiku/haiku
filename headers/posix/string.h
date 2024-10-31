@@ -22,6 +22,8 @@ extern void		*memcpy(void *dest, const void *source, size_t length);
 extern void		*memccpy(void *dest, const void *source, int stopByte, size_t length);
 extern void		*memmove(void *dest, const void *source, size_t length);
 extern void		*memset(void *dest, int value, size_t length);
+extern void 	*memmem(const void *source, size_t sourceLength,
+	const void *search, size_t searchLength);
 
 #ifdef _DEFAULT_SOURCE
 extern void		*memrchr(const void *source, int value, size_t length);
