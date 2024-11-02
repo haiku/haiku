@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-PowerStatus	1876447050
+1	catalan; valencian	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Executa en una finestra
 Extended battery info	PowerStatus		Informació ampliada de la bateria
 Show status icon	PowerStatus		Mostra la icona de l'estat
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Número del model:
 Battery unused	PowerStatus		Bateria no usada
 Type: 	PowerStatus		Tipus: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Podeu executar l'Estat de l'energia en una finestra o instal·lar-lo a la barra d’escriptori.
+Damaged or missing battery	PowerStatus		La bateria està malmesa o no hi és.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		La bateria es descarrega.
 Design voltage: 	PowerStatus		Voltatge de disseny: 

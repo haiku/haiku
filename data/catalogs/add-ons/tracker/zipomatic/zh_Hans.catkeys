@@ -4,7 +4,7 @@ Filename: %s	file:ZipOMaticWindow.cpp		文件名：%s
 Do you want to stop them?	file:ZipOMatic.cpp		您想停止运行它们吗？
 Error creating archive	file:ZipOMaticWindow.cpp		创建档案出错
 Stop them	file:ZipOMatic.cpp		停止它们
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		你确定停止创建档案吗？
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		您确定要停止创建档案吗？
 Preparing to archive	file:ZipperThread.cpp		准备归档
 Let them continue	file:ZipOMatic.cpp		让它们继续
 Continue	file:ZipOMaticWindow.cpp		继续

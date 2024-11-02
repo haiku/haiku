@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	4019948501
+1	english	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		设备
 Initialize	MainWindow		初始化
 Could not change the parameters of the selected partition.	MainWindow		无法修改所选分区参数。
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
 PGP encrypted	Encryption utils		PGP 加密
 Delete partition	MainWindow		删除分区
 Error: 	MainWindow	in any error alert	错误：
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		指定参数验证失败�
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		您是否确定格式化分区 \"%s\" ？在磁盘写入修改前，您将需要再次确认。
 DriveSetup	System name		磁盘管理器
 Mounted at	PartitionList		挂载于
+Disk system %s not found!	MainWindow		找不到磁盘系统 %s！
 Create…	MainWindow		创建…
 Write changes	MainWindow		写入修改
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		初始化分区 %s 失败。(修改未写入磁盘。)
@@ -41,6 +43,7 @@ Format	InitializeParametersPanel		格式化
 Could not unmount partition	MainWindow		无法卸载分区
 Create	CreateParametersPanel		创建
 File system	PartitionList		文件系统
+Unknown (%s)	PartitionList		未知 (%s)
 The selected partition does not contain a partitioning system.	MainWindow		选中分区不包含分区系统。
 End: %s	Support		末尾：%s
 Partition type	PartitionList		分区类型
@@ -96,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		分区 %s 已经卸载。
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		是否确定修改所选分区参数？\n\n该分区以后可能无法被其他操作系统所识别！
 Boot	PartitionList		启动
 OK	AbstractParametersPanel		确定
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		您确定现在要将更改写回磁盘吗？\n\n如果这样做，分区 \"%s\" 上的所有数据都将不可挽回地丢失！
 Virtual	PartitionList		虚拟
 Virtual	DiskView		虚拟
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，选中磁盘中的所有数据将丢失，无法恢复！

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Appearance	663472720
+1	english	x-vnd.Haiku-Appearance	211365410
 Control border	Colors tab		控件边界
 Control mark	Colors tab		控件标记
 Off	AntialiasingSettingsView		关闭
@@ -43,6 +43,7 @@ Selected menu item text	Colors tab		选择菜单文本
 Size:	Font Selection view		大小：
 Panel background	Colors tab		面板背景
 Plain font:	Font view		常规字体：
+Automatically pick secondary colors	Colors tab		自动选取次要颜色
 Window tab text	Colors tab		窗口标签文本
 Navigation pulse	Colors tab		导航引导
 LCD subpixel	AntialiasingSettingsView		LCD 亚像素精度

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ActivityMonitor	1319108693
+1	english	x-vnd.Haiku-ActivityMonitor	2467534740
 Teams	DataSource		团队
 Semaphores	DataSource		信号量
 TX	DataSource	Shorter version for Sending	TX
@@ -45,3 +45,4 @@ Swap	DataSource		交换分区
 P-faults	DataSource		页面错误
 Sems	DataSource		Sems
 Network receive	DataSource		网络接收
+%s faults/s	DataSource		%s 错误/秒

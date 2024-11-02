@@ -1,12 +1,14 @@
-1	english	x-vnd.Haiku-WebPositive	2894241046
+1	english	x-vnd.Haiku-WebPositive	2942427387
 Authentication required	Authentication Panel		需要认证
 Previous	WebPositive Window		上一个
+Copy	Console Window		复制
 (Finish: %date)	Download Window		(完成: %date)
 Open bookmarks confirmation	WebPositive Window		确认打开书签
 Download folder:	Settings Window		下载文件夹：
 Close window	WebPositive Window		关闭窗口
 Find:	WebPositive Window		查找：
 Script console	WebPositive Window		脚本控制台
+There was an error setting up the bookmark.	WebPositive Window		设置书签时出错。
 Fonts	Settings Window		字体
 Path	Cookie Manager		路径
 Bookmarks	WebPositive Window		书签
@@ -21,7 +23,7 @@ Find previous	WebPositive Window		查找上一个
 Full screen	WebPositive Window		全屏
 Downloads in progress	WebPositive		正在下载
 Copy URL to clipboard	Download Window		复制 URL 到剪切板
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	你想同时打开 %addedCount 个书签吗？
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	您想同时打开 %addedCount 个书签吗？
 Clone current page	Settings Window		克隆当前页面
 Start page:	Settings Window		启动页面：
 Cancel	Download Window		取消
@@ -101,6 +103,7 @@ Apply	Settings Window		应用
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	尝试显示书签目录发生错误。\n\n错误：%error
 Revert	Settings Window		恢复
 Copy	WebPositive Window		复制
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Last line repeated # time.}其它{Last line repeated # times.}}
 Default standard font size:	Settings Window		默认标准字体大小：
 Custom	Settings Window		自定义
 Bookmark this page	WebPositive Window		添加页面到书签
@@ -114,18 +117,49 @@ Proxy server requires authentication	Settings Window		代理服务器需要认�
 Cancel	Settings Window		取消
 Reset size	WebPositive Window		重置大小
 History	WebPositive Window		历史
+Do you really want to clear the browsing history?	WebPositive Window		确定要清理浏览历史记录吗？
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	查找下一个出现的搜索词
 Fixed font:	Settings Window		固定字体：
 Quit	WebPositive Window		退出
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	查找上一个出现的搜索词
 Remember username and password for this site	Authentication Panel		记住这个网站的用户名和密码
+(Finish: %date - %duration left)	Download Window		(完成还需: %date - %duration)
+Cookie manager	Cookie Manager		Cookie 管理器
+Show home button	Settings Window		显示主页按钮
+Start new session	Settings Window		启动新会话
 The cookie jar is empty!	Cookie Manager		Cookie列表是空的!
+Value	Cookie Manager		值
+Remove missing	Download Window		删除所缺失的文件
 Paste	WebPositive Window		粘贴
 Double-click or middle-click to open new tab.	Tab Manager		双击或者中键点击打开新标签页。
 Next	WebPositive Window		下一个
 Bookmark error	WebPositive Window		书签错误
 OK	WebPositive Window		确定
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% of %expectedSize%, %rate%/s)
+WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		仅缩放文本
 Save page as…	WebPositive Window		页面保存为…
+Page source error	WebPositive Window		网页源代码错误
+Auto-hide mouse pointer	Settings Window		自动隐藏鼠标指针
+Requesting %url	WebPositive Window		正在请求 %url
+Flags	Cookie Manager		标志
+Window	WebPositive Window		窗口
+Proxy server address:	Settings Window		代理服务器地址:
+Search page:	Settings Window		搜索页:
+Settings	WebPositive Window		设置
+Clear	URL Bar		清除
+Loading %url	WebPositive Window		正在加载 %url
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	敏捷的棕色狐狸跳过了懒狗。
+Start up:	Settings Window		起始页：
 Confirmation	WebPositive Window		确认
+Session cookie	Cookie Manager		会话 cookie
+No SSE2 support	WebPositive		不支持 SSE2
+Open all	WebPositive Window		全部打开
+Cut	WebPositive Window		剪切
 Downloads	Download Window		下载
+Open blank page	Settings Window		打开空白页
 Clear history	WebPositive Window		清空历史记录
 Cancel	WebPositive Window		取消
+Script console	Console Window		脚本控制台
+Copy	URL Bar		复制
+Open start page	Settings Window		打开起始页

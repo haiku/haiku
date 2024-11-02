@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1730240650
+1	english	x-vnd.Haiku-libtracker	3876005449
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -6,10 +6,13 @@ Kind	ContainerWindow		种类
 Open with…	ContainerWindow		打开方式...
 Error moving \"%name\" to Trash. (%error)	FSUtils		移动 \"%name\" 到垃圾箱出错。（%error）
 Or	FindPanel		或者
-MIME Description	AttributesView		MIME描述
+MIME Description	AttributesView		MIME 描述
+Query	FindPanel		查询
 before	FindPanel		之前
 Volume icons	TrackerSettingsWindow		卷图标
 Ignore case	SelectionWindow		忽略事件
+Save query:	FindPanel		保存查询:
+Save as query template:	FindPanel		另存为查询模板：
 Current folder	ContainerWindow		当前目录
 Finish: %time - Over %finishtime left	StatusWindow		完成：%time - 剩余 %finishtime
 Mount all disks now	AutoMounterSettings		挂载所有磁盘
@@ -26,6 +29,7 @@ Unmount	ContainerWindow		卸载
 Eject when unmounting	AutoMounterSettings		卸载并弹出
 Searching for disks to mount…	StatusWindow		搜索挂载磁盘...
 Value	AttributesView		值
+Multiple selections	FindPanel		多重选择
 Information	InfoWindow		信息
 Error emptying Trash	FSUtils		清空垃圾箱出错!
 Opens with:	InfoWindow		打开方式：
@@ -57,9 +61,10 @@ starts with	FindPanel		启动方式：
 Replace	FSUtils		替换
 ?+* follows nothing.	libtracker		?+* 前面什么也没有。
 Rectangle	AttributesView		矩形
+Include Trash	FindPanel		包含垃圾箱
 Move to	ContainerWindow		移动到
 Status	Email Query Columns		状态
-New folder	FSUtils		新建文件
+New folder	FSUtils		新建目录
 Junk on end.	libtracker		连续抛弃。
 New Query	FindPanel		新建查询
 system	B_SYSTEM_DIRECTORY		系统
@@ -81,6 +86,7 @@ Modified	FindPanel		修改
 Select all	QueryContainerWindow		全选
 Generate image thumbnails	SettingsView		生成图片缩略图
 Select…	FilePanelPriv		选择...
+An item named '%filename%' already exists.	FSUtils		一个名叫'%filename%' 的项目已存在
 preferences	B_PREFERENCES_DIRECTORY		系统设置
 Name	Person Query Columns		名称
 Skip all	FSUtils		跳过所有
@@ -101,6 +107,7 @@ Window	ContainerWindow		窗口
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		删除
 Company	Person Query Columns		公司
+Select folders…	FindPanel		选择目录…
 Recent documents	FavoritesMenu		最近文本
 Edit templates…	TemplatesMenu		编辑模版...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# byte} other{# bytes}}
@@ -123,10 +130,12 @@ Create relative link	ContainerWindow		创建相对链接
 Owner	FilePermissionsView		拥有者
 Cancel	FSClipBoard		取消
 Modified	PoseView		修改
+Save as template…	FindPanel		另存为模板…
 Move to Trash	ContainerWindow		移动到垃圾箱
 All files and folders	FindPanel		所有文件及目录
 Add-ons	ContainerWindow		附加组件
 Too many parenthesis.	libtracker		太多括号。
+Save query template:	FindPanel		保存查询模板:
 Increase size	ContainerWindow		增加尺寸
 \nShould this be fixed?	FSUtils		\n 是否应该进行修复？
 URL	Bookmark Query Columns		URL
@@ -139,12 +148,13 @@ Disks	Model		磁盘
 Create a Query template	FindPanel		创建查询模板
 Size	FindPanel		尺寸
 Window	FilePanelPriv		窗口
+New submenu	ContainerWindow	Folder name of New-template submenu	新建子菜单
 OK	Email Query Columns		确定
 Location	QueryPoseView		位置
 Edit query	ContainerWindow		编辑查询
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# byte)} other{(# bytes)}}
 Previously mounted disks	AutoMounterSettings		已挂载磁盘
-You cannot replace a file with a folder or a symbolic link.	FSUtils		您无法使用文件夹或符号链接替换文件。
+You cannot replace a file with a folder or a symbolic link.	FSUtils		您无法使用目录或符号链接替换文件。
 The target disk does not support creating links.	FSUtils		目标磁盘不支持创建链接。
 develop	B_SYSTEM_DEVELOP_DIRECTORY		开发
 64-bit integer	AttributesView		64位整数
@@ -158,7 +168,7 @@ Filesystem:	InfoWindow		文件系统：
 Could not open \"%name\" (%error). 	FSUtils		无法打开 \"%name\"（%error）。
 Media parameter group	AttributesView		媒体参数组
 %name info	InfoWindow	InfoWindow Title	%name 信息
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		如果移动 主文件夹 ，%osName 可能无法正常工作！\n\n您确定要这样做吗？\n\n如果仍要移动 主文件夹，按住 Shift 键并点击 \"移动\"。
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		如果移动主目录， %osName 可能无法正常工作！\n\n您确定要这样做吗？\n\n如果仍要移动主目录，按住 Shift 键并点击 \"移动\"。
 Property info	AttributesView		属性信息
 Sorry, you can't create links in the Trash.	PoseView		对不起，您无法在垃圾箱中创建链接。
 From	Email Query Columns		从
@@ -167,6 +177,7 @@ Open selection with:	OpenWithWindow		打开选中：
 Preferences…	ContainerWindow		首选项…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		无法打开\"%document\"，\"%app\" 程序处于垃圾箱中。
 Work Phone	Person Query Columns		办公电话
+Select folders	FindPanel		选择目录
 Close	ContainerWindow		关闭
 Get info	ContainerWindow		获取信息
 MIME Type	AttributesView		MIME类型
@@ -203,6 +214,7 @@ Cancel	FSUtils		取消
 Original name	ContainerWindow		原始名称
 Unknown	WidgetAttributeText		未知
 32-bit integer	AttributesView		32位整数
+Save as query…	FindPanel		另存为查询…
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		指定名称已经作为目录名使用。请选择其他命名。
 Modified	ContainerWindow		修改
 Mini icon view	ContainerWindow		迷你视图
@@ -252,6 +264,7 @@ Cut	FilePanelPriv		剪切
 Finish: after several years	StatusWindow		完成：在几年之后
 Favorites	FilePanelPriv		选择
 Point	AttributesView		点
+You can't move or copy items to read-only volumes.	PoseView		您不能将项目移动或复制到只读分区（卷）。
 home	B_USER_DIRECTORY		主目录
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		文件浏览器新模板
 Disk mounting during boot	AutoMounterSettings		启动时挂载磁盘
@@ -259,10 +272,11 @@ Don't automount	AutoMounterSettings		手动挂载
 Node ref	AttributesView		节点参考号
 Could not find application \"%appname\"	OpenWithWindow		未找到 \"%appname\" 程序。
 Unmatched parenthesis.	libtracker		括号不成对。
+New folder %d	FSUtils		新建目录 %d
 Extended attribute	AttributesView		扩展属性
 Unmatched brackets.	libtracker		括号不成对。
 Error %error loading Add-On %name.	ContainerWindow		错误 %error，载入附加组件 %name 出错 。
-You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		你正试图将项目：\n\t%name%dest\n替换为：\n\t%name%src\n\n您确定将其替换为您正在 %movemode 的项目吗？
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		您正试图将项目：\n\t%name%dest\n替换为：\n\t%name%src\n\n您确定将其替换为您正在 %movemode 的项目吗？
 Empty Trash	ContainerWindow		清空垃圾箱
 no supporting apps	OpenWithWindow		无支持应用程序
 32-bit unsigned integer	AttributesView		32位无号整数
@@ -303,10 +317,12 @@ Open	ContainerWindow		打开
 Settings…	MountMenu		设置...
 You cannot put the selected item(s) into the trash.	FSUtils		您不能够将所选项放入垃圾箱。
 Increase size	DeskWindow		增大尺寸
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	目标：
 starts with	SelectionWindow		启动方式
 Any	AttributesView		任何
 New	DeskWindow		新建
 Invert	SelectionWindow		恢复
+Open…	FindPanel		打开…
 Would you like to find some other suitable application?	FSUtils		您希望使用其他可用应用程序吗？
 *+? operand may be empty.	libtracker		*+? 操作数可能为空。
 (unknown)	AttributesView		(未知)
@@ -325,9 +341,11 @@ To: %dir	StatusWindow		到：%dir
 Paste layout	ContainerWindow		粘贴布局
 Cancel	Tracker		取消
 yes	AttributesView		是
+Error copying file \"%name\":\n\t%error\n\n	FSUtils		复制 \"%name\" 出错:\n\t%error\n\n
 Make active printer	ContainerWindow		创建活动打印机
 Copy to	ContainerWindow		复制到
 Name	SelectionWindow		名称
+Location	Default Query Columns		位置
 by attribute	FindPanel		属性
 Write	FilePermissionsView		编辑
 If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		如果修改系统目录或其内容，将不能够启动 %osName ！\n\n您确定要这么做吗？\n\n如果仍要修改系统目录或其内容，请按下 Shift 键并点击 \"我知道我正在做什么\"。
@@ -339,6 +357,7 @@ after	FindPanel		之后
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, one{<# data byte>} other{<# bytes of data>}}
 Version	OpenWithWindow		版本
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		某些选中项目无法移动到垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
+The entered file name is too long.	FSUtils		输入的文件名太长。
 Add printer…	ContainerWindow		添加打印机...
 Permissions	ContainerWindow		权限
 Size:	InfoWindow		大小：
@@ -386,11 +405,12 @@ Some items already exist in this folder with the same names as the items you are
 When	Email Query Columns		何时
 Object	AttributesView		对象
 Paste	ContainerWindow		粘贴
-An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在, 可能包括 \nitems 用同样的名称,你愿意用在该文件夹包中含由 %verb替代它吗?
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在，可能包括 \nitems 用同样的名称，您愿意用在该文件夹包中含由 %verb替代它吗?
 Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"，使用软件 \"%app\"（缺失符号： %symbol）。\n
 New folder	ContainerWindow		新建文件夹
 Name	OpenWithWindow		名称
+Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	获取信息
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		试图替换 \"%name\" 失败。该项目可能为空或者处于忙碌状态。
 Windows	TrackerSettingsWindow		窗口
 Show space bars on volumes	SettingsView		显示卷进度栏
@@ -400,7 +420,9 @@ Emptying Trash… 	StatusWindow		清空垃圾箱...
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # file} other{for # files}}
 Revert	TrackerSettingsWindow		恢复
 trash	B_TRASH_DIRECTORY		垃圾箱
+%ld × %ld	DeskWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		如果移动系统文件夹或其内容，将不能够启动 %osName！\n\n您确定要这么做吗？\n\n如果仍要移动系统文件夹或其内容，按住 Shift 键并点击 \"移动\"。
+Open query:	FindPanel		打开查询：
 Close all in workspace	ContainerWindow		在所有工作区关闭
 Corrupted expression.	libtracker		表达式损坏。
 Network address	AttributesView		网络地址
@@ -415,6 +437,7 @@ Name	QueryPoseView		名称
 Error %error loading add-On %name.	ContainerWindow		错误 %error，载入附加组件 %name 出错。
 Does not handle file	OpenWithWindow		不处理文件
 E-mail	Person Query Columns		E-mail
+Templates	FindPanel		模板
 Arrange by	ContainerWindow		排序方式
 Attributes	AttributesView		属性
 Sorry, saving more than one item is not allowed.	FilePanelPriv		对不起，不允许保存多个项目。
@@ -424,6 +447,7 @@ the config folder	FSUtils		配置目录
 Sorry, could not create a new folder.	FSUtils		对不起，无法新建目录。
 MIME Signature	AttributesView		MIME 签名
 Select all	VirtualDirectoryWindow		全选
+%ld × %ld	ContainerWindow	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Rename	FSUtils	button label	重命名
 Clean up all	ContainerWindow		清空
 Add current folder	FilePanelPriv		添加当前目录
@@ -463,12 +487,14 @@ Copy layout	ContainerWindow		复制布局
 Duplicate	ContainerWindow		副本
 16-bit integer	AttributesView		16位整数
 Untitled clipping	PoseView		未命名片段
+Note: file names in the destination file system are not case-sensitive.\n	FSUtils		注意：目标文件系统中的文件名不区分大小写。\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定目录中已经存在 \"%name\" 文件。您确定要将其替换吗？
 , indexed	InfoWindow		，已索引
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必须放置项目到 \"Disks\" 窗口中的磁盘图标。
 Version:	InfoWindow		版本:
 OK	PoseView		确定
 Add-ons	DeskWindow		附加组件
+Add new submenu…	TemplatesMenu		添加新的子菜单…
 Find	FindPanel		搜索
 Empty folder	NavMenu		清空目录
 Defaults	TrackerSettingsWindow		默认
@@ -480,6 +506,7 @@ Move to Trash	FSUtils		移动到垃圾箱
 Cancel	PoseView		取消
 Handles %type	OpenWithWindow		处理 %type
 Delete	PoseView		删除
+Options	FindPanel		选项
 Media parameter	AttributesView		媒体参数
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		如果修改主目录，%osName 可能无法正常工作！\n\n您确定这么做吗？\n\n如果您仍要修改主目录，按下 Shift 按键并点击 \"我知道我正在做什么\"。
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
@@ -494,8 +521,10 @@ Create a Query	FindPanel		创建查询
 Close	QueryContainerWindow		关闭
 I know what I'm doing	FSUtils	button label	我明白我在干什么
 Preparing to copy items…	StatusWindow		准备复制项目...
+%lld B	WidgetAttributeText	The filesize symbol for byte	%lld B
 Entry ref	AttributesView		入口编号
 Icon view	ContainerWindow		图标视图
+The entered folder name is too long.	FSUtils		输入的文件夹名称太长。
 Name	ContainerWindow		名称
 Preferred for %type	OpenWithWindow		首选 %type
 Free space color	SettingsView		空闲空间颜色

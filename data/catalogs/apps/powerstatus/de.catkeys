@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-PowerStatus	1876447050
+1	german	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Im Fenster ausführen
 Extended battery info	PowerStatus		Erweiterte Akku-Infos
 Show status icon	PowerStatus		Statusicon anzeigen
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Modellnummer:
 Battery unused	PowerStatus		Akku unbenutzt
 Type: 	PowerStatus		Typ:
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Die Akku-Anzeige kann im Fenster dargestellt oder in der Deskbar installiert werden.
+Damaged or missing battery	PowerStatus		Akku fehlt oder ist beschädigt
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Akku wird entladen
 Design voltage: 	PowerStatus		Spannung (lt. Hersteller):

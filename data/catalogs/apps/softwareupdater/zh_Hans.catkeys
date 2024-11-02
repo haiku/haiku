@@ -8,7 +8,7 @@ There were no updates found.	CheckManager		未找到更新。
 Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		更新未完成, 确定要退出吗?
 Updates found	SoftwareUpdaterWindow		找到可用更新
 Update now	SoftwareUpdaterWindow		立即更新
-For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		因为某些原因, 我们无法重启你的电脑.
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		因为某些原因, 我们无法重启您的电脑.
 OK	UpdateManager		确定
 Unrecognized argument	SoftwareUpdaterApp	Error message	无法识别的参数
 There were no updates found.	CheckAction		未找到可用更新.

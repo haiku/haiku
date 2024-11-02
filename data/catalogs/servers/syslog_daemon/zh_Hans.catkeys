@@ -1,3 +1,4 @@
-1	english	x-vnd.Haiku-SystemLogger	239668711
+1	english	x-vnd.Haiku-SystemLogger	2600925901
 Syslog Daemon	SyslogDaemon		Syslog 后台
 OK	SyslogDaemon		确定
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n此守护程序收集所有系统消息并将其写入 \"%s\"处的系统范围日志。\n\n

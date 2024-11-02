@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	100393349
+1	english	x-vnd.Haiku-MediaPlayer	2577505948
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
@@ -34,6 +34,7 @@ Full volume	MediaPlayer-SettingsWindow		最大音量
 Start media server	MediaPlayer-Main		启动媒体服务器
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		媒体服务器未运行.\n是否启动媒体服务器?
 Location	MediaPlayer-InfoWin		位置
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
 Opening '%s'.	MediaPlayer-Main		正在打开 '%s'。
 Medium	MediaPlayer-SettingsWindow		中号
 Play mode	MediaPlayer-SettingsWindow		播放模式
@@ -48,6 +49,7 @@ MediaPlayer settings	MediaPlayer-SettingsWindow		媒体播放器设置
 Copyright	MediaPlayer-InfoWin		版权
 Invalid URL inserted!	MediaPlayer-NetworkStream		无效的 URL 地址！
 Aspect ratio	MediaPlayer-Main		长宽比
+Eject device	MediaPlayer-Main		弹出设备
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		保存播放列表失败。\n\n错误: 
 <no media>	MediaPlayer-InfoWin		<没有媒体>
 Hide interface	MediaPlayer-Main		隐藏界面
@@ -72,6 +74,7 @@ Audio	MediaPlayer-Main		音频
 Quit	MediaPlayer-Main		退出
 Redo	MediaPlayer-PlaylistWindow		重做
 Move Entry	MediaPlayer-MovePLItemsCmd		移动项目
+Reset rating	MediaPlayer-Main		重置评级
 <unknown>	PlaylistItem-author		<未知>
 Cancel	MediaPlayer-SettingsWindow		取消
 Large	MediaPlayer-SettingsWindow		大

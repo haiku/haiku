@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	1337497439
+1	english	x-vnd.Haiku-libbe	658791763
 All Rights Reserved.	AboutWindow		保留所有权利
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
@@ -13,15 +13,21 @@ Green:	ColorControl		绿色:
 Redo	TextView		恢复
 No pages to print!	PrintJob		无打印页！
 beta	AboutWindow		beta
+%s MiB	StringForSize	size unit	%s MiB
 OK	ZombieReplicantView		确定
 Cut	TextView		剪切
 Default	Default decorator about box		默认
 Can't delete this replicant from its original application. Life goes on.	Dragger		无法从原始应用中删除克隆控件。它将继续存在。
+%s KiB	StringForSize	size unit	%s KiB
 Error	ZombieReplicantView		错误
 Paste	TextView		粘贴
 OK	AboutWindow		确定
+%s MiB/s	StringForRate	units per second	%s MiB/s
 Special Thanks:	AboutWindow		特别感谢：
+%s TiB	StringForSize	size unit	%s TiB
 Default Haiku window decorator.	Default decorator about box		默认 Haiku 窗口主题。
+%s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
 Remove replicant	Dragger		删除克隆控件
 Version	AboutWindow		版本
 Red:	ColorControl		红色:
@@ -30,10 +36,13 @@ Copy	TextView		复制
 Select all	TextView		全选
 alpha	AboutWindow		测试
 Error	PrintJob		错误
+%s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		关于 %app...
 About %app%	AboutWindow		关于 %app%
+%s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		版本历史：
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
 Blue:	ColorControl		蓝色:
 Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		无法为 \"%description\" 创建克隆控件。\n%error
 Written by:	AboutWindow		编写：

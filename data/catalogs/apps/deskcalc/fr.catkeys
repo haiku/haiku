@@ -1,11 +1,13 @@
-1	french	x-vnd.Haiku-DeskCalc	3726442921
+1	french	x-vnd.Haiku-DeskCalc	2154833291
 cos	CalcView		cos
 3	CalcView		3
 (	CalcView		(
 BS	CalcView		SUPPR
 1	CalcView		1
 acos	CalcView		acos
+E	CalcView		E
 /	CalcView		/
+C	CalcView		C
 8	CalcView		8
 ceil	CalcView		plafond
 -	CalcView		-

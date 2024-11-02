@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Screen	1226202253
+1	english	x-vnd.Haiku-Screen	2577971458
 no	Screen		否
 bits/pixel	Screen		位/像素
 15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
 Rows:	Screen		行：
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		屏幕模式无法设置为：\n\t%s\n
+Serial no.: %s	Screen		序列号.: %s
 /other…	Screen		/其他...
 Keep	Screen		保持
 Horizonal frequency:\t%lu - %lu kHz\nVertical frequency:\t%lu - %lu Hz\n\nMaximum pixel clock:\t%g MHz	Screen		水平频率：\t%lu - %lu kHz\n垂直频率：\t%lu - %lu Hz\n\n最大像素频率：\t%g MHz
@@ -13,9 +14,11 @@ Video format:	Screen		视频格式：
 Undo	Screen		撤销
 OK	Screen		确定
 Current workspace	Screen		当前工作区
+%ld × %ld	Screen	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 vertically	Screen		垂直
 All workspaces	Screen		所有工作区
 Use laptop panel:	Screen		使用笔记本面板：
+Unknown	Screen		未知
 Could not write VESA mode settings file:\n\t	Screen		无法写入 VESA 模式设置文件：\n\t
 Display info	Screen		显示器
 Settings will revert in %seconds.	Screen		设置将会在 %seconds 秒之后恢复。

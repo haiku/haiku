@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-GLTeapot	400822745
+1	english	x-vnd.Haiku-GLTeapot	1263334963
 Right	TeapotWindow		右边
 Backface culling	TeapotWindow		隐面消除
 Add a teapot	TeapotWindow		添加茶壶
@@ -15,6 +15,7 @@ Lower left	TeapotWindow		左下角
 Fog	TeapotWindow		模糊
 FPS display	TeapotWindow		FPS 显示
 GLTeapot	System name		GL 茶壶
+Limit FPS to refresh rate	TeapotWindow		为刷新率限制 FPS
 Settings	TeapotWindow		设置
 Gouraud shading	TeapotWindow		高氏渲染
 Lighting	TeapotWindow		灯光

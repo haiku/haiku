@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	3099940411
+1	finnish	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -30,6 +30,7 @@ Unmount	ContainerWindow		Irrota
 Eject when unmounting	AutoMounterSettings		Poista laitteesta irrotettaessa
 Searching for disks to mount…	StatusWindow		Etsitään liitettäviä levyjä...
 Value	AttributesView		Arvo
+Multiple selections	FindPanel		Useita valintoja
 Information	InfoWindow		Tietoja
 Error emptying Trash	FSUtils		Virhe tyhjennettäessä roskakoria
 Opens with:	InfoWindow		Avautuu sovelluksella:
@@ -61,6 +62,7 @@ starts with	FindPanel		alkaa kohteella
 Replace	FSUtils		Korvaa
 ?+* follows nothing.	libtracker		?+* seuraavat ei mitään.
 Rectangle	AttributesView		Suorakaide
+Include Trash	FindPanel		Sisällytä roskakori
 Move to	ContainerWindow		Siirrä kohteeseen
 Status	Email Query Columns		Tila
 New folder	FSUtils		Uusi kansio
@@ -106,6 +108,7 @@ Window	ContainerWindow		Ikkuna
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 Remove	FindPanel		Poista
 Company	Person Query Columns		Yritys
+Select folders…	FindPanel		Valitse kansiot…
 Recent documents	FavoritesMenu		Äskettäiset asiakirjat
 Edit templates…	TemplatesMenu		Muokkaa mallinteita...
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# tavu} other{# tavua}}
@@ -146,6 +149,7 @@ Disks	Model		Levyt
 Create a Query template	FindPanel		Luo kyselymallinne
 Size	FindPanel		Koko
 Window	FilePanelPriv		Ikkuna
+New submenu	ContainerWindow	Folder name of New-template submenu	Uusi alivalikko
 OK	Email Query Columns		Valmis
 Location	QueryPoseView		Sijainti
 Edit query	ContainerWindow		Muokkaa kyselyä
@@ -174,6 +178,7 @@ Open selection with:	OpenWithWindow		Avaa valinta sovelluksella:
 Preferences…	ContainerWindow		Asetukset…
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Asiakirjan ”%document” avaus epäonnistui, koska sovellus ”%app” on roskakorissa. 
 Work Phone	Person Query Columns		Työpuhelin
+Select folders	FindPanel		Valitse kansiot
 Close	ContainerWindow		Sulje
 Get info	ContainerWindow		Hae tiedot
 MIME Type	AttributesView		MIME-tyyppi
@@ -314,6 +319,7 @@ Open	ContainerWindow		Avaa
 Settings…	MountMenu		Asetukset...
 You cannot put the selected item(s) into the trash.	FSUtils		Et voi laittaa valittuja kohteita roskakoriin.
 Increase size	DeskWindow		Kasvata kokoa
+Target:	FindPanel	The disks/folders that are searched. Similar to TextSearch's 'Set target'.	Kohde:
 starts with	SelectionWindow		alkaa kohteella
 Any	AttributesView		Mikä tahansa
 New	DeskWindow		Uusi
@@ -490,6 +496,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Version:	InfoWindow		Versio:
 OK	PoseView		Valmis
 Add-ons	DeskWindow		Lisäosat
+Add new submenu…	TemplatesMenu		Lisää uusi alivalikko…
 Find	FindPanel		Haku
 Empty folder	NavMenu		Tyhjä kansio
 Defaults	TrackerSettingsWindow		Oletukset

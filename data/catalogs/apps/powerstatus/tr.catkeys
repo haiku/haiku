@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-PowerStatus	1876447050
+1	turkish	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Pencere içinde çalış
 Extended battery info	PowerStatus		Ek pil bilgisi
 Show status icon	PowerStatus		Durum simgesini göster
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Model numarası:
 Battery unused	PowerStatus		Pil kullanılmamış
 Type: 	PowerStatus		Tür: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Güç Durumu’nu bir pencere içinde çalıştırabilir veya Masaüstü Çubuğu’na kurabilirsiniz.
+Damaged or missing battery	PowerStatus		Hasarlı veya eksik pil
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Pil boşalıyor
 Design voltage: 	PowerStatus		Fabrika çıkış voltaj: 

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2029495331
+1	finnish	x-vnd.Haiku-HaikuDepot	2555742361
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -47,6 +47,7 @@ Rating not possible	MainWindow		Arvosanojen antaminen ei ole mahdollista
 Package update error	MainWindow		Pakkauksen päivitysvirhe
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# prosessi} other{# prosessia}}
 Reboot required	PackageManager		Tarvitaan uudelleenkäynnistys
+Fetching user ratings for package	PopulatePkgUserRatingsFromServerProcess		Noudetaan pakkauksen käyttäjäarvosanoja
 All packages	PackageListView		Kaikki pakkaukset
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi

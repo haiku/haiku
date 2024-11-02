@@ -66,4 +66,4 @@ File:	FileSelectionPage	Text control label	文件：
 Error reading partition table	BootManagerController	Title	分区表读取出错
 Back	BootManagerController	Button	退后
 The boot manager has been successfully installed on your system.	BootManagerController		引导管理器已经成功安装到您的系统。
-The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		旧的主引导记录(MBR)无法保存到%s。你可以继续安装，但是引导菜单将无法卸载。
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		旧的主引导记录(MBR)无法保存到%s。您可以继续安装，但是引导菜单将无法卸载。

@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Keymap	1938595652
+1	english	x-vnd.Haiku-Keymap	2089182029
 Key	Modifier keys window	As in a computer keyboard key	按键
 Japanese	KeymapNames		日语
 US	KeymapNames		美国
 PG ↑	Keyboard Layout View	Very short for 'page up'	上翻 ↑
 Brazilian	KeymapNames		巴西
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (美国)
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		德沃夏克
 Option:	Modifier keys window	Option key role name	选项：
 Cancel	Modifier keys window		取消

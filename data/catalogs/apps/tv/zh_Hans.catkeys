@@ -1,7 +1,8 @@
-1	english	x-vnd.Haiku.TV	3120244932
+1	english	x-vnd.Haiku.TV	3276365230
 No menu	MainWin		隐藏菜单栏
 No border	MainWin		无边框
 Error, connecting to interface failed:\n\n	MainWin		错误，无法连接到接口：\n\n
+force 720 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	强制分辨率为720x576，宽高比为4:3
 Full screen	MainWin		全屏
 Scale to native size	MainWin		恢复原始大小
 unknown	MainWin		未知
@@ -16,7 +17,9 @@ Channel	MainWin		频道
 Previous channel	MainWin		上一个频道
 OK	MainWin		确定
 TV	MainWin		电视
+force 544 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	强制分辨率为544x576，宽高比为4:3
 Settings	MainWin		设置
+force 704 × 576, display aspect 4:3	MainWin	The '×' is the Unicode multiplication sign U+00D7	强制分辨率为704x576，宽高比为4:3
 TV	System name		电视
 Settings…	MainWin		设置…
 None	MainWin		无

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PowerStatus	1876447050
+1	hungarian	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Futtatás ablakban
 Extended battery info	PowerStatus		Akkumulátor információ
 Show status icon	PowerStatus		Állapotikon megjelenítése
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Típusszám:
 Battery unused	PowerStatus		Használatlan akku
 Type: 	PowerStatus		Típus: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Futtathatod az Energiaállapotot egy ablakban, vagy az Asztalsávra telepítheted azt.
+Damaged or missing battery	PowerStatus		Hibás vagy hiányzó akkumulátor
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Akku használatban
 Design voltage: 	PowerStatus		Tervezett feszültség: 

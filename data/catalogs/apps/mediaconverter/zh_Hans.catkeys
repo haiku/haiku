@@ -1,7 +1,8 @@
-1	english	x-vnd.Haiku-MediaConverter	568323940
+1	english	x-vnd.Haiku-MediaConverter	1249914255
 Input file not recognized as Audio or Video	MediaConverter		输入文件未被识别为音频或视频
 Source files	MediaConverter		源文件
 Error writing video frame %lld	MediaConverter		写入视频帧 %lld 错误
+Audio quality: %s	MediaConverter		音质: %s
 Error converting '%filename'	MediaConverter		转换 '%filename' 错误
 Selected directory not found. Defaulting to /boot/home	MediaConverter		所选目录未找到。默认为 /boot/home
 Conversion completed	MediaConverter		转换结束
@@ -10,6 +11,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		创建视频错误。
 Cancelling	MediaConverter		取消
 None available	Audio codecs		无可用
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		该文件有多个音频或视频轨道，但只有第一个会被转换。
 No file selected	MediaConverter-FileInfo		无选中文件
 High	MediaConverter		高
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
@@ -24,6 +26,7 @@ Error loading a file	MediaConverter		载入文件错误
 Encoder parameters	MediaConverter-EncoderWindow		编码器参数
 Open…	Menu		打开...
 Audio encoding:	MediaConverter		音频编码：
+Multi-track file detected	MediaConverter		检测到多轨文件
 Cancelling…	MediaConverter		取消...
 Output file '%filename' created	MediaConverter		输出文件 '%filename' 已创建
 Output folder	MediaConverter		输出目录
@@ -36,6 +39,7 @@ Conversion cancelled	MediaConverter		转换取消
 Low	MediaConverter		低
 Error loading files	MediaConverter		载入文件错误
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		画质: %s
 End   [ms]: 	MediaConverter		结束 [ms]：
 Cancel	MediaConverter		取消
 OK	MediaConverter-FileInfo		确定
@@ -49,8 +53,10 @@ Drop media files onto this window	MediaConverter		拖放媒体文件到窗口
 Error read audio frame %lld	MediaConverter		读取音频帧错误 %lld
 Quit	Menu		退出
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Writing audio track: %s complete	MediaConverter		正在写入音轨：已完成 %s 
 Duration:	MediaConverter-FileInfo		持续时间：
 MediaConverter	System name		媒体转换器
+Writing video track: %s complete	MediaConverter		正在写入视频轨道：已完成 %s
 Error launching: %strError%	MediaConverter		启动错误：%strError%
 Error writing audio frame %lld	MediaConverter		写入音频帧错误 %lld
 File format:	MediaConverter		文件格式：
@@ -58,6 +64,8 @@ File	Menu		文件
 Video quality not supported	MediaConverter		视频质量不支持
 Select this folder	MediaConverter		选中该文件件
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld 通道
+Understood	MediaConverter		明了
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		无视频
 Continue	MediaConverter		继续

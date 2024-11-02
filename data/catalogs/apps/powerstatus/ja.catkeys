@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PowerStatus	1876447050
+1	japanese	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		ウィンドウモードで起動
 Extended battery info	PowerStatus		拡張バッテリー情報
 Show status icon	PowerStatus		状態アイコンの表示
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		モデルナンバー:
 Battery unused	PowerStatus		使用していないバッテリー
 Type: 	PowerStatus		タイプ: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		"バッテリーの状態" をウィンドウモードで起動することや、 Deskbar にインストールすることができます。
+Damaged or missing battery	PowerStatus		壊れたか存在しないバッテリー
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		放電中
 Design voltage: 	PowerStatus		設計電圧:

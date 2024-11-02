@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DiskProbe	4193379066
+1	english	x-vnd.Haiku-DiskProbe	1019405323
 Raw editor	AttributeWindow		Raw 编辑器
 Remove	AttributeWindow		删除
 Close	ProbeView		关闭
@@ -29,6 +29,7 @@ Open file…	FileWindow		打开文件…
 32 bit unsigned pointer:	TypeEditors		32 位无符号浮点数：
 DiskProbe request	DiskProbe		DiskProbe 要求
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	十六进制
+Block %lld (0x%Lx)	ProbeView		区块 %lld (0x%Lx)
 Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		写入文件失败：\n%s\n\n退出之后所有的设置将会丢失。
 Examine device:	OpenWindow		检测硬件：
 Number editor	TypeEditors		序列号编辑器
@@ -115,7 +116,9 @@ Could not read image	TypeEditors	Image means here a picture file, not a disk ima
 DiskProbe request	ProbeView		磁盘扫描器要求
 Double precision floating-point value:	TypeEditors		双精度浮点型数：
 Image	TypeEditors	This is the type of view	图像
+Swapped: %lld (0x%0*Lx)	ProbeView		已交换： %lld (0x%0*Lx)
 Save changes before closing?	ProbeView		关闭之前保存？
+%s, %g × %g, %s	TypeEditors	The '×' is the Unicode multiplication sign U+00D7	%s, %g × %g, %s
 PNG format	TypeEditors		PNG 格式
 Number	TypeEditors	This is the type of editor	数字
 Edit	ProbeView		编辑

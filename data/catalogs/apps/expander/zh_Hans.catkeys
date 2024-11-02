@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Expander	3300517306
+1	english	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		目标文件
 Other	ExpanderPreferences		其他
 Automatically show contents listing	ExpanderPreferences		自动显示内容列表
 Expander	System name		归档管理器
 Expander: Choose destination	DirectoryFilePanel		归档管理器：选择目标文件
 Set source…	ExpanderMenu		设定源文件…
+OK	ExpanderWindow		确定
 The destination is not a folder.	ExpanderWindow		目标文件不是一个文件夹。
 The folder was either moved, renamed or not supported.	ExpanderWindow		文件夹被移动、重命名或者不受支持。
 Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。

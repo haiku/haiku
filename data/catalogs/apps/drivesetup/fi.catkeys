@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	1140196651
+1	finnish	x-vnd.Haiku-DriveSetup	2521240656
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -6,6 +6,7 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		Laite
 Initialize	MainWindow		Alusta
 Could not change the parameters of the selected partition.	MainWindow		Valitun osion parametrien vaihtaminen epäonnistui.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion \"%s\" tiedot menetetään peruuttamattomasti, jos teet niin!
 PGP encrypted	Encryption utils		PGP-salattu
 Delete partition	MainWindow		Poista osio
 Error: 	MainWindow	in any error alert	Virhe: 
@@ -22,6 +23,7 @@ Validation of the given parameters failed.	MainWindow		Annettujen parametrien to
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa osion ”%s”? Samaa kysytään uudelleen ennen muutosten kirjoittamista levylle.
 DriveSetup	System name		Levyasema-asetukset
 Mounted at	PartitionList		Liittämispiste:
+Disk system %s not found!	MainWindow		Levyjärjestelmä %s ei löytynyt!
 Create…	MainWindow		Luo…
 Write changes	MainWindow		Kirjoita muutokset
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Osion %s alustus epäonnistui. (Mitään ei ole kirjoitettu levylle.)
@@ -97,6 +99,7 @@ The partition %s is already unmounted.	MainWindow		Osio %s on jo liitetty.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Oletko varma, että haluat vaihtaa valitun osion parametreja?\n\nMuut käyttöjärjestelmät eivät ehkä enää tunnista osiota!
 Boot	PartitionList		Käynnistä
 OK	AbstractParametersPanel		Valmis
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk \"%s\" will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki osion \"%s\" tiedot menetetään peruuttamattomasti, jos teet niin!
 Virtual	PartitionList		Virtuaalinen
 Virtual	DiskView		Virtuaalinen
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Oletko varma, että haluat nyt kirjoittaa muutokset takaisin levylle?\n\nKaikki valitun osion tiedot katoavat palauttamattomasti, jos teet niin!
