@@ -156,7 +156,7 @@ cleanup_tmp_sg(scsi_ccb *ccb)
 		ccb, ccb->data, ccb->data_length);
 
 	res = unlock_memory(ccb->data, ccb->data_length, B_DMA_IO
-		|  ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
+		| ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
 
 	if (res != B_OK) {
 		SHOW_FLOW0(3, "Cannot unlock previously locked memory!");

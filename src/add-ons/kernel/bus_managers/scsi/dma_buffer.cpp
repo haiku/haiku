@@ -465,6 +465,7 @@ scsi_release_dma_buffer(scsi_ccb *request)
 	release_sem(device->dma_buffer_owner);
 
 	request->buffered = false;
+	request->dma_buffer = NULL;
 }
 
 
