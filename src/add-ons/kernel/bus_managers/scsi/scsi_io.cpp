@@ -512,7 +512,7 @@ scsi_sync_io(scsi_ccb *request)
 	acquire_sem(request->completion_sem);
 
 	if (tmp_sg)
-		cleanup_tmp_sg(request);
+		cleanup_temp_sg(request);
 }
 
 

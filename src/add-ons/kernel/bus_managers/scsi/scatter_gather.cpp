@@ -1,7 +1,6 @@
 /*
- * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2024, Haiku, Inc. All rights reserved.
  * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
- *
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,11 +14,10 @@
 
 #include <string.h>
 #include <iovec.h>
+#include <slab/Slab.h>
 
-#include <algorithm>
 
-
-static locked_pool_cookie temp_sg_pool;
+static object_cache* sTempScatterGatherPool = NULL;
 
 
 static bool
@@ -29,7 +27,7 @@ fill_temp_sg(scsi_ccb *ccb)
 	scsi_bus_info *bus = ccb->bus;
 	uint32 dma_boundary = bus->dma_params.dma_boundary;
 	uint32 max_sg_block_size = bus->dma_params.max_sg_block_size;
-	uint32 max_sg_blocks = std::min(bus->dma_params.max_sg_blocks,
+	uint32 max_sg_blocks = min_c(bus->dma_params.max_sg_blocks,
 		(uint32)MAX_TEMP_SG_FRAGMENTS);
 	iovec vec = {
 		ccb->data,
@@ -63,7 +61,7 @@ fill_temp_sg(scsi_ccb *ccb)
 			max_len = (dma_boundary + 1) -
 				(temp_sg[cur_idx].address & dma_boundary);
 			// restrict size per sg item
-			max_len = std::min(max_len, (addr_t)max_sg_block_size);
+			max_len = min_c(max_len, (addr_t)max_sg_block_size);
 
 			SHOW_FLOW(4, "addr=%#" B_PRIxPHYSADDR ", size=%" B_PRIxPHYSADDR
 				", max_len=%" B_PRIxADDR ", idx=%" B_PRId32 ", num=%"
@@ -98,8 +96,6 @@ too_complex:
 }
 
 
-/** create temporary SG for request */
-
 bool
 create_temp_sg(scsi_ccb *ccb)
 {
@@ -109,7 +105,7 @@ create_temp_sg(scsi_ccb *ccb)
 	SHOW_FLOW(3, "ccb=%p, data=%p, data_length=%" B_PRIu32, ccb, ccb->data,
 		ccb->data_length);
 
-	ccb->sg_list = temp_sg = (physical_entry*)locked_pool->alloc(temp_sg_pool);
+	ccb->sg_list = temp_sg = (physical_entry*)object_cache_alloc(sTempScatterGatherPool, 0);
 	if (temp_sg == NULL) {
 		SHOW_ERROR0(2, "cannot allocate memory for IO request!");
 		return false;
@@ -131,24 +127,13 @@ create_temp_sg(scsi_ccb *ccb)
 		| ((ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_IN ? B_READ_DEVICE : 0));
 
 err:
-	locked_pool->free(temp_sg_pool, temp_sg);
+	object_cache_free(sTempScatterGatherPool, temp_sg, 0);
 	return false;
 }
 
 
-/** cleanup temporary SG list */
-
 void
-uninit_temp_sg(void)
-{
-	locked_pool->destroy(temp_sg_pool);
-}
-
-
-/** destroy SG list buffer */
-
-void
-cleanup_tmp_sg(scsi_ccb *ccb)
+cleanup_temp_sg(scsi_ccb *ccb)
 {
 	status_t res;
 
@@ -163,27 +148,32 @@ cleanup_tmp_sg(scsi_ccb *ccb)
 		panic("Cannot unlock previously locked memory!");
 	}
 
-	locked_pool->free(temp_sg_pool, (physical_entry *)ccb->sg_list);
+	object_cache_free(sTempScatterGatherPool, (void*)ccb->sg_list, 0);
 
 	// restore previous state
 	ccb->sg_list = NULL;
 }
 
 
-/** create SG list buffer */
+//! #pragma mark - initialization/uninitialization
+
 
 int
 init_temp_sg(void)
 {
-	temp_sg_pool = locked_pool->create(
-		MAX_TEMP_SG_FRAGMENTS * sizeof(physical_entry),
-		sizeof(physical_entry) - 1, 0,
-		B_PAGE_SIZE, MAX_TEMP_SG_LISTS, 1,
-		"scsi_temp_sg_pool", B_CONTIGUOUS, NULL, NULL, NULL);
-
-	if (temp_sg_pool == NULL)
+	sTempScatterGatherPool = create_object_cache("scsi temp s/g",
+		MAX_TEMP_SG_FRAGMENTS * sizeof(physical_entry), 0,
+		NULL, NULL, NULL);
+	if (sTempScatterGatherPool == NULL)
 		return B_NO_MEMORY;
 
+	object_cache_set_minimum_reserve(sTempScatterGatherPool, 1);
 	return B_OK;
 }
 
+
+void
+uninit_temp_sg()
+{
+	delete_object_cache(sTempScatterGatherPool);
+}

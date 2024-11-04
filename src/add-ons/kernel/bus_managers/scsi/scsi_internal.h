@@ -279,9 +279,9 @@ void scsi_resubmit_request(scsi_ccb *request);
 void scsi_request_finished(scsi_ccb *request, uint num_requests);
 
 
-// scatter_gather.c
+// scatter_gather
 bool create_temp_sg(scsi_ccb *ccb);
-void cleanup_tmp_sg(scsi_ccb *ccb);
+void cleanup_temp_sg(scsi_ccb *ccb);
 
 int init_temp_sg(void);
 void uninit_temp_sg(void);
