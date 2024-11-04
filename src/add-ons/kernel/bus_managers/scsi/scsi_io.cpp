@@ -158,9 +158,6 @@ submit_autosense(scsi_ccb *request)
 	// request is not emulated
 	device->auto_sense_request->emulated = false;
 
-	// initial SIM state for this request
-	request->sim_state = 0;
-
 	device->auto_sense_originator = request;
 
 	// make it next request to process
@@ -471,9 +468,6 @@ scsi_async_io(scsi_ccb *request)
 	request->ordered = (request->flags & SCSI_ORDERED_QTAG) != 0;
 
 	SHOW_FLOW(3, "ordered=%d", request->ordered);
-
-	// give SIM a well-defined first state
-	request->sim_state = 0;
 
 	// make sure device/bus is not blocked
 	if (!scsi_check_enqueue_request(request))

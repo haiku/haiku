@@ -99,8 +99,6 @@
 
 #define SCSI_MAX_CDB_SIZE 16	// max size of cdb
 #define SCSI_MAX_SENSE_SIZE	64	// max size of sense data
-#define SCSI_SIM_PRIV	1536	// SIM private data; this may be a bit much but
-								// we currently need that for the compatibility layer
 
 // bus/device handle
 typedef struct scsi_bus_info *scsi_bus;
@@ -155,10 +153,6 @@ typedef struct scsi_ccb {
 	const physical_entry *orig_sg_list;
 	uint16		orig_sg_count;
 	uint32		orig_data_length;
-
-	// private SIM data
-	uchar		sim_state;			// set to zero when request is submitted first time
-	uchar		sim_priv[SCSI_SIM_PRIV];	/* SIM private data area */
 } scsi_ccb;
 
 
@@ -253,7 +247,6 @@ typedef struct {
 	uchar		version_num;			/* Version number for the SIM/HBA */
 	uchar		hba_inquiry;			/* Mimic of INQ byte 7 for the HBA */
 	uchar		hba_misc;				/* Misc HBA feature flags */
-	uint32		sim_priv;				/* Size of SIM private data area */
 	uchar		vuhba_flags[SCSI_VUHBA];/* Vendor unique capabilities */
 	uchar		initiator_id;			/* ID of the HBA on the SCSI bus */
 	uint32		hba_queue_size;			// size of adapters command queue

@@ -255,7 +255,6 @@ ATAChannel::PathInquiry(scsi_path_inquiry *info)
 {
 	info->hba_inquiry = SCSI_PI_TAG_ABLE | SCSI_PI_WIDE_16;
 	info->hba_misc = 0;
-	info->sim_priv = 0;
 	info->initiator_id = 2;
 	info->hba_queue_size = 1;
 	memset(info->vuhba_flags, 0, sizeof(info->vuhba_flags));
