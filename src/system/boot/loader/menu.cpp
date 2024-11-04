@@ -1190,6 +1190,21 @@ add_boot_volume_item(Menu* menu, Directory* volume, const char* name)
 			volumeInfo.Unset();
 	}
 
+	// Display the size of this boot partition, if we can.
+	Partition* partition;
+	if (gRoot->GetPartitionFor(volume, &partition) == B_OK) {
+		float size = partition->Size() / (1024.0 * 1024.0);
+		const char* unit = "MiB";
+		if (size > 1024.0) {
+			size /= 1024.0;
+			unit = "GiB";
+		}
+
+		char* newName = (char*)alloca(128);
+		snprintf(newName, 128, "%s (%f %s)", name, size, unit);
+		name = newName;
+	}
+
 	BootVolumeMenuItem* item = new(nothrow) BootVolumeMenuItem(name);
 	menu->AddItem(item);
 
