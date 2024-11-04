@@ -232,8 +232,8 @@ ObjectCache::ReturnObjectToSlab(slab* source, void* object, uint32 flags)
 		partial.Remove(source);
 
 		if (empty_count < pressure
-			&& total_objects - used_count - source->size
-				>= min_object_reserve) {
+				|| (total_objects - (used_count + source->size))
+					< min_object_reserve) {
 			empty_count++;
 			empty.Add(source);
 		} else {
