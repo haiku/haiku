@@ -152,9 +152,12 @@ submit_autosense(scsi_ccb *request)
 
 	// no DMA buffer (we made sure that the data buffer fulfills all
 	// limitations)
-	request->buffered = false;
+	device->auto_sense_request->buffered = false;
 	// don't let any request bypass us
-	request->ordered = true;
+	device->auto_sense_request->ordered = true;
+	// request is not emulated
+	device->auto_sense_request->emulated = false;
+
 	// initial SIM state for this request
 	request->sim_state = 0;
 
