@@ -194,3 +194,16 @@ tcsetsid(int fd, pid_t pid)
 	return ioctl(fd, TIOCSCTTY, NULL);
 }
 
+
+int
+tcgetwinsize(int fd, struct winsize* winsize)
+{
+	return ioctl(fd, TIOCGWINSZ, winsize, sizeof(*winsize));
+}
+
+
+int
+tcsetwinsize(int fd, const struct winsize* winsize)
+{
+	return ioctl(fd, TIOCSWINSZ, winsize, sizeof(*winsize));
+}

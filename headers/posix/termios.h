@@ -234,6 +234,8 @@ extern int		tcflow(int fd, int action);
 extern int		tcflush(int fd, int queueSelector);
 extern pid_t	tcgetsid(int fd);
 extern int		tcsetsid(int fd, pid_t pid);
+extern int		tcgetwinsize(int fd, struct winsize* winsize);
+extern int		tcsetwinsize(int fd, const struct winsize* winsize);
 
 #ifdef __cplusplus
 }
