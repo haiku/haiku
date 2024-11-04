@@ -19,7 +19,7 @@ struct HashedSlab : slab {
 };
 
 
-struct HashedObjectCache : ObjectCache {
+struct HashedObjectCache final : ObjectCache {
 								HashedObjectCache();
 
 	static	HashedObjectCache*	Create(const char* name, size_t object_size,

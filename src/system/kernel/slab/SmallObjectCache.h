@@ -11,7 +11,7 @@
 #include "ObjectCache.h"
 
 
-struct SmallObjectCache : ObjectCache {
+struct SmallObjectCache final : ObjectCache {
 	static	SmallObjectCache*	Create(const char* name, size_t object_size,
 									size_t alignment, size_t maximum,
 									size_t magazineCapacity,
