@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 
@@ -27,19 +28,30 @@ grantpt(int masterFD)
 }
 
 
-char*
-ptsname(int masterFD)
+int
+ptsname_r(int masterFD, char* name, size_t namesize)
 {
 	int32 index;
 	if (ioctl(masterFD, B_IOCTL_GET_TTY_INDEX, &index, sizeof(index)) < 0)
-		return NULL;
+		return errno;
 
-	static char buffer[32];
-	
+	if (name == NULL)
+		return EINVAL;
+
 	char letter = 'p';
-	snprintf(buffer, sizeof(buffer), "/dev/tt/%c%" B_PRIx32,
-		char(letter + index / 16), index % 16);
+	int length = snprintf(name, namesize, "/dev/tt/%c%" B_PRIx32, char(letter + index / 16),
+		index % 16);
+	return (length + 1) > (int)namesize ? ERANGE : 0;
+}
 
+
+char*
+ptsname(int masterFD)
+{
+	static char buffer[32];
+	errno = ptsname_r(masterFD, buffer, sizeof(buffer));
+	if (errno != 0 && errno != ERANGE)
+		return NULL;
 	return buffer;
 }
 
@@ -47,6 +59,7 @@ ptsname(int masterFD)
 int
 unlockpt(int masterFD)
 {
-	// Noting to do ATM.
+	// Nothing to do ATM.
 	return 0;
 }
+

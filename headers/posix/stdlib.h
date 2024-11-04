@@ -183,6 +183,7 @@ extern int		getsubopt(char **optionp, char * const *keylistp,
 extern int		posix_openpt(int openFlags);
 extern int		grantpt(int masterFD);
 extern char*	ptsname(int masterFD);
+extern int		ptsname_r(int masterFD, char *path, size_t maxSize);
 extern int		unlockpt(int masterFD);
 
 /* internal accessor to value for MB_CUR_MAX */
