@@ -22,7 +22,7 @@ status_t remove_ancillary_data(ancillary_data_container* container, void* data,
 void* move_ancillary_data(ancillary_data_container* from,
 			ancillary_data_container* to);
 
-void* next_ancillary_data(ancillary_data_container* container,
+void* next_ancillary_data(const ancillary_data_container* container,
 			void* previousData, ancillary_data_header* _header);
 
 

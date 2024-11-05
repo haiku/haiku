@@ -243,24 +243,15 @@ process_ancillary_data(net_socket* socket, ancillary_data_container* container,
 		return B_OK;
 	}
 
-	ancillary_data_header header;
-	void* data = NULL;
+	if (socket->first_info->process_ancillary_data == NULL)
+		return B_NOT_SUPPORTED;
 
-	while ((data = next_ancillary_data(container, data, &header)) != NULL) {
-		if (socket->first_info->process_ancillary_data == NULL)
-			return B_NOT_SUPPORTED;
+	ssize_t bytesWritten = socket->first_info->process_ancillary_data(
+		socket->first_protocol, container, dataBuffer, dataBufferLen);
+	if (bytesWritten < 0)
+		return bytesWritten;
 
-		ssize_t bytesWritten = socket->first_info->process_ancillary_data(
-			socket->first_protocol, &header, data, dataBuffer, dataBufferLen);
-		if (bytesWritten < 0)
-			return bytesWritten;
-
-		dataBuffer += bytesWritten;
-		dataBufferLen -= bytesWritten;
-	}
-
-	messageHeader->msg_controllen -= dataBufferLen;
-
+	messageHeader->msg_controllen = bytesWritten;
 	return B_OK;
 }
 

@@ -101,7 +101,7 @@ struct net_protocol_module_info {
 	status_t	(*add_ancillary_data)(net_protocol* self,
 					ancillary_data_container* container, const cmsghdr* header);
 	ssize_t		(*process_ancillary_data)(net_protocol* self,
-					const ancillary_data_header* header, const void* data,
+					const ancillary_data_container* container,
 					void* buffer, size_t bufferSize);
 	ssize_t		(*process_ancillary_data_no_container)(net_protocol* self,
 					net_buffer* buffer, void* data, size_t bufferSize);
