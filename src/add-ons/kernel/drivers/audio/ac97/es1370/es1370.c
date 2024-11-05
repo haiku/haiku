@@ -57,7 +57,7 @@ es1370_mem_new(es1370_dev *card, size_t size)
 	if ((mem = malloc(sizeof(*mem))) == NULL)
 		return (NULL);
 
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "es1370 buffer", false);
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "es1370 buffer", true);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);

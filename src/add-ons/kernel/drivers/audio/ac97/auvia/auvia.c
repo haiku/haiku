@@ -73,7 +73,7 @@ auvia_mem_new(auvia_dev *card, size_t size)
 	if ((mem = malloc(sizeof(*mem))) == NULL)
 		return (NULL);
 
-	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "auvia buffer", false);
+	mem->area = alloc_mem(&mem->phy_base, &mem->log_base, size, "auvia buffer", true);
 	mem->size = size;
 	if (mem->area < B_OK) {
 		free(mem);
