@@ -471,6 +471,20 @@ ConditionVariable::Dump() const
 }
 
 
+/*static*/ status_t
+ConditionVariable::DebugGetType(ConditionVariable* cvar, char* name, size_t size)
+{
+	// Use debug_memcpy to handle faults in case the structure is corrupt.
+	const char* pointer;
+	status_t status = debug_memcpy(B_CURRENT_TEAM, &pointer,
+		(int8*)cvar + offsetof(ConditionVariable, fObjectType), sizeof(const char*));
+	if (status != B_OK)
+		return status;
+
+	return debug_strlcpy(B_CURRENT_TEAM, name, pointer, size);
+}
+
+
 static int
 list_condition_variables(int argc, char** argv)
 {
@@ -503,7 +517,6 @@ dump_condition_variable(int argc, char** argv)
 
 		set_debug_variable("_cvar", (addr_t)variable);
 		set_debug_variable("_object", (addr_t)variable->Object());
-
 	} else
 		kprintf("no condition variable at or with key %p\n", (void*)address);
 
@@ -535,19 +548,4 @@ condition_variable_init()
 		"List condition variables",
 		"\n"
 		"Lists all published condition variables\n", 0);
-}
-
-
-ssize_t
-debug_condition_variable_type_strlcpy(ConditionVariable* cvar, char* name, size_t size)
-{
-	const int32 typePointerOffset = offsetof(ConditionVariable, fObjectType);
-
-	const char* pointer;
-	status_t status = debug_memcpy(B_CURRENT_TEAM, &pointer,
-		(int8*)cvar + typePointerOffset, sizeof(const char*));
-	if (status != B_OK)
-		return status;
-
-	return debug_strlcpy(B_CURRENT_TEAM, name, pointer, size);
 }

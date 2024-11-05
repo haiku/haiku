@@ -1,6 +1,6 @@
 /*
  * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_CONDITION_VARIABLE_H
@@ -75,8 +75,10 @@ public:
 			const void*			Object() const		{ return fObject; }
 			const char*			ObjectType() const	{ return fObjectType; }
 
+	// Debug methods.
 	static	void				ListAll();
 			void				Dump() const;
+	static	status_t			DebugGetType(ConditionVariable* cvar, char* name, size_t size);
 
 private:
 	static 	int32				_Notify(const void* object, bool all, status_t result);
@@ -97,8 +99,6 @@ protected:
 
 			friend struct ConditionVariableEntry;
 			friend struct ConditionVariableHashDefinition;
-			friend ssize_t debug_condition_variable_type_strlcpy(ConditionVariable* cvar,
-				char* name, size_t size);
 };
 
 

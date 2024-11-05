@@ -1711,7 +1711,7 @@ _dump_thread_info(Thread *thread, bool shortInfo)
 				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
 				{
 					char name[5];
-					ssize_t length = debug_condition_variable_type_strlcpy(
+					ssize_t length = ConditionVariable::DebugGetType(
 						(ConditionVariable*)thread->wait.object, name, sizeof(name));
 					if (length > 0)
 						kprintf("cvar:%*s %p   ", 4, name, thread->wait.object);
