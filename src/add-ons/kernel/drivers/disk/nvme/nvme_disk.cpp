@@ -723,7 +723,7 @@ nvme_disk_io(void* cookie, io_request* request)
 
 	// See if we need to bounce due to rounding.
 	const off_t rounded_pos = ROUNDDOWN(request->Offset(), block_size);
-	phys_size_t rounded_len = ROUNDUP(request->Length() + (request->Offset()
+	const phys_size_t rounded_len = ROUNDUP(request->Length() + (request->Offset()
 		- rounded_pos), block_size);
 	if (rounded_pos != request->Offset() || rounded_len != request->Length())
 		bounceAll = true;
@@ -732,9 +732,6 @@ nvme_disk_io(void* cookie, io_request* request)
 		// Let the bounced I/O routine take care of everything from here.
 		return nvme_disk_bounced_io(handle, request);
 	}
-
-	nvme_request.lba_start = rounded_pos / block_size;
-	nvme_request.lba_count = rounded_len / block_size;
 
 	// No bouncing was required.
 	ReadLocker readLocker;
@@ -750,6 +747,7 @@ nvme_disk_io(void* cookie, io_request* request)
 
 	const uint32 max_io_blocks = handle->info->max_io_blocks;
 	int32 remaining = nvme_request.iovec_count;
+	nvme_request.lba_start = rounded_pos / block_size;
 	while (remaining > 0) {
 		nvme_request.iovec_count = min_c(remaining,
 			NVME_MAX_SGL_DESCRIPTORS / 2);
