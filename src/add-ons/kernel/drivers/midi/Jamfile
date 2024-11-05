@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src add-ons kernel drivers midi ;
 
+SubInclude HAIKU_TOP src add-ons kernel drivers midi mpu401 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers midi usb_midi ;
