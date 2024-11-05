@@ -194,7 +194,7 @@ finish_autosense(scsi_device_info *device)
 	}
 
 	// inform peripheral driver
-	release_sem_etc(orig_request->completion_sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
+	orig_request->completion_cond.NotifyAll();
 }
 
 
@@ -325,7 +325,7 @@ scsi_request_finished(scsi_ccb *request, uint num_requests)
 	else {
 		// tell peripheral driver about completion
 		if (!do_autosense)
-			release_sem_etc(request->completion_sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
+			request->completion_cond.NotifyAll();
 	}
 }
 
@@ -483,7 +483,7 @@ err2:
 	if (request->buffered)
 		scsi_release_dma_buffer(request);
 err:
-	release_sem(request->completion_sem);
+	request->completion_cond.NotifyAll(B_ERROR);
 	return;
 }
 
@@ -508,8 +508,12 @@ scsi_sync_io(scsi_ccb *request)
 		}
 	}
 
+	ConditionVariableEntry entry;
+	request->completion_cond.Add(&entry);
+
 	scsi_async_io(request);
-	acquire_sem(request->completion_sem);
+
+	entry.Wait();
 
 	if (tmp_sg)
 		cleanup_temp_sg(request);
@@ -567,7 +571,7 @@ scsi_abort(scsi_ccb *req_to_abort)
 				scsi_release_dma_buffer(req_to_abort);
 
 			// tell peripheral driver about
-			release_sem_etc(req_to_abort->completion_sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
+			req_to_abort->completion_cond.NotifyAll(B_CANCELED);
 
 			if (start_retry)
 				release_sem(bus->start_service);

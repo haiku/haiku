@@ -342,9 +342,12 @@ read_write(scsi_periph_device_info *device, scsi_ccb *request,
 		//if (status != B_OK)
 		//	return status;
 
+		ConditionVariableEntry entry;
+		request->completion_cond.Add(&entry);
+
 		device->scsi->async_io(request);
 
-		acquire_sem(request->completion_sem);
+		entry.Wait();
 
 		// ask generic peripheral layer what to do now
 		res = periph_check_error(device, request);

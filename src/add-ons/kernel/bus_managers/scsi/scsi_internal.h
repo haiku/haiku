@@ -110,8 +110,6 @@ typedef struct scsi_bus_info {
 
 	struct scsi_device_info *waiting_devices;	// devices ready to receive requests
 
-	locked_pool_cookie ccb_pool;	// ccb pool (one per bus)
-
 	device_node *node;		// pnp node of bus
 
 	struct dma_params dma_params;	// dma restrictions of controller
@@ -210,7 +208,7 @@ enum {
 
 // state of ccb
 enum {
-	SCSI_STATE_FREE = 0,
+	SCSI_STATE_INVALID = 0,
 	SCSI_STATE_INWORK = 1,
 	SCSI_STATE_QUEUED = 2,
 	SCSI_STATE_SENT = 3,
@@ -238,8 +236,8 @@ uchar scsi_inquiry_path(scsi_bus bus, scsi_path_inquiry *inquiry_data);
 scsi_ccb *scsi_alloc_ccb(scsi_device_info *device);
 void scsi_free_ccb(scsi_ccb *ccb);
 
-status_t scsi_init_ccb_alloc(scsi_bus_info *bus);
-void scsi_uninit_ccb_alloc(scsi_bus_info *bus);
+status_t init_ccb_alloc();
+void uninit_ccb_alloc();
 
 
 // devices.c
