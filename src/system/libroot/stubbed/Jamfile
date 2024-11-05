@@ -10,11 +10,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local stubsSource ;
 		if $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
 			stubsSource = [ FGristFiles libroot_stubs_legacy.c ] ;
+		} else if $(TARGET_PACKAGING_ARCH) = x86 {
+			stubsSource = [ FGristFiles libroot_stubs.c libroot_stubs_x86.c ] ;
 		} else if $(TARGET_PACKAGING_ARCH) = sparc {
 			stubsSource = [ FGristFiles libroot_stubs.c libroot_stubs_sparc.c ] ;
 		} else {
 			stubsSource = [ FGristFiles libroot_stubs.c ] ;
 		}
+
 		local stubsObject = $(stubsSource:S=$(SUFOBJ)) ;
 		CCFLAGS on $(stubsObject) = -Wno-missing-prototypes -fno-builtin ;
 		Depends $(stubsObject) : $(stubsSource) ;
