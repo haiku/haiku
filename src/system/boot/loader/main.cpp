@@ -14,7 +14,6 @@
 #include <boot/heap.h>
 #include <boot/PathBlocklist.h>
 #include <boot/stdio.h>
-#include <boot/net/NetStack.h>
 #include <system_revision.h>
 
 #include "file_systems/packagefs/packagefs.h"
