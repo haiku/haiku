@@ -11,7 +11,6 @@
 
 #include <bus/SCSI.h>
 #include <scsi_cmds.h>
-#include <locked_pool.h>
 #include <device_manager.h>
 #include <lock.h>
 
@@ -216,7 +215,6 @@ enum {
 };
 
 
-extern locked_pool_interface *locked_pool;
 extern device_manager_info *pnp;
 
 extern scsi_for_sim_interface scsi_for_sim_module;

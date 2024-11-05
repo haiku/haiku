@@ -66,7 +66,6 @@ AddFilesToFloppyBootArchive system add-ons kernel file_systems
 	: $(SYSTEM_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive system add-ons kernel generic :
 	ata_adapter
-	locked_pool
 	scsi_periph
 	;
 AddFilesToFloppyBootArchive system add-ons kernel partitioning_systems :
@@ -155,7 +154,6 @@ AddBootModuleSymlinksToFloppyBootArchive [ FFilterByBuildFeatures
 	$(SYSTEM_ADD_ONS_BUS_MANAGERS)
 	openpic@ppc
 	ata_adapter
-	locked_pool
 	scsi_periph
 	generic_x86@x86
 	ahci

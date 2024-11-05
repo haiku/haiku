@@ -48,7 +48,6 @@ AddFilesToPackage add-ons kernel generic :
 	ata_adapter
 	bios@x86,x86_64
 	dpc
-	locked_pool
 	mpu401
 	scsi_periph
 	<module>tty
@@ -242,7 +241,6 @@ AddBootModuleSymlinksToPackage
 	usb
 	openpic@ppc
 	ata_adapter
-	locked_pool
 	scsi_periph
 	ahci
 	generic_ide_pci

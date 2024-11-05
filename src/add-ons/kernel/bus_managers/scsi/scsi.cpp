@@ -5,12 +5,10 @@
 
 #include "scsi_internal.h"
 
-locked_pool_interface *locked_pool;
 device_manager_info *pnp;
 
 module_dependency module_dependencies[] = {
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
-	{ LOCKED_POOL_MODULE_NAME, (module_info **)&locked_pool },
 	{}
 };
 

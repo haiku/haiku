@@ -83,7 +83,6 @@ AddFilesToPackage add-ons kernel generic :
 	ata_adapter
 	bios@x86,x86_64
 	dpc
-	locked_pool
 	mpu401
 	scsi_periph
 	smbios@x86,x86_64
@@ -325,7 +324,6 @@ AddBootModuleSymlinksToPackage
 	intel
 	it8211
 	legacy_sata
-	locked_pool
 	mmc
 	mmc_disk
 	nvme_disk
