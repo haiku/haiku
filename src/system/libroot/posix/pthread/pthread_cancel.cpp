@@ -130,5 +130,5 @@ pthread_testcancel(void)
 	static const int32 kFlags = THREAD_CANCELED | THREAD_CANCEL_ENABLED;
 
 	if ((~atomic_get(&thread->flags) & kFlags) == 0)
-		pthread_exit(NULL);
+		pthread_exit(PTHREAD_CANCELED);
 }
