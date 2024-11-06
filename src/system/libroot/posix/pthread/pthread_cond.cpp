@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include <syscall_utils.h>
+#include <time_private.h>
 
 #include <syscalls.h>
 #include <user_mutex_defs.h>
@@ -133,11 +134,10 @@ int
 pthread_cond_clockwait(pthread_cond_t* cond, pthread_mutex_t* mutex,
 	clockid_t clock_id, const struct timespec* abstime)
 {
-	if (abstime == NULL || abstime->tv_nsec < 0 || abstime->tv_nsec >= 1000 * 1000 * 1000)
+	bigtime_t timeoutMicros;
+	if (abstime == NULL || !timespec_to_bigtime(*abstime, timeoutMicros))
 		RETURN_AND_TEST_CANCEL(EINVAL);
 
-	bigtime_t timeoutMicros = ((bigtime_t)abstime->tv_sec) * 1000000
-		+ abstime->tv_nsec / 1000;
 	uint32 flags = 0;
 	switch (clock_id) {
 		case CLOCK_REALTIME:
