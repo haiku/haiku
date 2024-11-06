@@ -361,16 +361,15 @@ extern int		symlinkat(const char *toPath, int fd, const char *symlinkPath);
 
 extern int      ftruncate(int fd, off_t newSize);
 extern int      truncate(const char *path, off_t newSize);
-
 struct ioctl_args {
-	void* argument;
-	size_t size;
+    void* argument;
+    size_t size;
 };
 int __ioctl(int fd, ulong cmd, struct ioctl_args args);
 #ifndef __cplusplus
 extern int		ioctl(int fd, unsigned long op, ...);
 #ifndef _KERNEL_MODE
-#define ioctl(a, b, c...) __ioctl(a, b, (struct ioctl_args){ (void*)c })
+#define ioctl(a, b, c...) __ioctl(a, b, (struct ioctl_args){ c })
 #endif
 #else
 inline int
