@@ -405,7 +405,7 @@ usb_disk_operation_interrupt(device_lun *lun, uint8* operation,
 	// step 3 : wait for the device to send the interrupt ACK
 	if (operation[0] != SCSI_REQUEST_SENSE_6) {
 		interrupt_status_wrapper status;
-		result =  receive_csw_interrupt(device, &status);
+		result = receive_csw_interrupt(device, &status);
 		if (result != B_OK) {
 			// in case of a stall or error clear the stall and try again
 			TRACE("Error receiving interrupt: %s. Retrying...\n",
@@ -488,7 +488,7 @@ usb_disk_operation_bulk(device_lun *lun, uint8 *operation, size_t operationLengt
 	}
 
 	usb_massbulk_command_status_wrapper status;
-	result =  receive_csw_bulk(device, &status);
+	result = receive_csw_bulk(device, &status);
 	if (result != B_OK) {
 		// in case of a stall or error clear the stall and try again
 		usb_disk_clear_halt(device->bulk_in);
@@ -1214,6 +1214,9 @@ usb_disk_attach(device_node *node, usb_device newDevice, void **cookie)
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to initialize logical units: %s\n",
 			strerror(result));
+
+		if (device->is_ufi)
+			gUSBModule->cancel_queued_transfers(device->interrupt);
 		usb_disk_free_device_and_luns(device);
 		return result;
 	}
