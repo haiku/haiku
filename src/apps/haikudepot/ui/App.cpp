@@ -26,6 +26,7 @@
 #include "AppUtils.h"
 #include "Logger.h"
 #include "MainWindow.h"
+#include "PackageUtils.h"
 #include "ServerHelper.h"
 #include "ServerSettings.h"
 #include "SharedIcons.h"
@@ -385,7 +386,8 @@ App::_Open(const BEntry& entry)
 		return;
 	}
 
-	package->SetLocalFilePath(path.Path());
+	PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
+	localInfo->SetLocalFilePath(path.Path());
 
 	// Set if the package is active
 	//
@@ -412,9 +414,10 @@ App::_Open(const BEntry& entry)
 		}
 	}
 
-	if (active) {
-		package->SetState(ACTIVATED);
-	}
+	if (active)
+		localInfo->SetState(ACTIVATED);
+
+	package->SetLocalInfo(localInfo);
 
 	BMessage settings;
 	_LoadSettings(settings);

@@ -25,8 +25,9 @@
 #include <Path.h>
 
 #include "HaikuDepotConstants.h"
-#include "Logger.h"
 #include "LocaleUtils.h"
+#include "Logger.h"
+#include "PackageUtils.h"
 #include "StorageUtils.h"
 
 
@@ -237,14 +238,18 @@ Model::SetStateForPackagesByName(BStringList& packageNames, PackageState state)
 		PackageInfoRef packageInfo = PackageForName(packageName);
 
 		if (packageInfo.IsSet()) {
-			packageInfo->SetState(state);
-			HDINFO("did update package [%s] with state [%s]",
-				packageName.String(), package_state_to_string(state));
+			// TODO; make this immutable
+
+			PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(packageInfo);
+			localInfo->SetState(state);
+			packageInfo->SetLocalInfo(localInfo);
+
+			HDINFO("did update package [%s] with state [%s]", packageName.String(),
+				PackageUtils::StateToString(state));
 		}
 		else {
-			HDINFO("was unable to find package [%s] so was not possible to set"
-				" the state to [%s]", packageName.String(),
-				package_state_to_string(state));
+			HDINFO("was unable to find package [%s] so was not possible to set the state to [%s]",
+				packageName.String(), PackageUtils::StateToString(state));
 		}
 	}
 }

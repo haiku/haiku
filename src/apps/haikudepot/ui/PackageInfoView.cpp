@@ -499,7 +499,7 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
-		if (package->State() == DOWNLOADING) {
+		if (PackageUtils::State(package) == DOWNLOADING) {
 			AdoptDownloadProgress(package);
 		} else {
 			AdoptActions(package);
@@ -544,7 +544,7 @@ public:
 			fLayout->AddView(fStatusBar);
 		}
 
-		fStatusBar->SetTo(package->DownloadProgress() * 100.0);
+		fStatusBar->SetTo(PackageUtils::DownloadProgress(package) * 100.0);
 	}
 
 	void Clear()
@@ -1229,7 +1229,7 @@ public:
 			if (localizedText.IsSet())
 				enableChangelogTab = localizedText->HasChangelog();
 
-			enableContentsTab = package->State() == ACTIVATED || package->IsLocalFile();
+			enableContentsTab = PackageUtils::IsActivatedOrLocalFile(package);
 		}
 
 		TabAt(TAB_CHANGELOG)->SetEnabled(enableChangelogTab);
@@ -1352,7 +1352,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 			if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0
 				|| (changes & PKG_CHANGED_RATINGS) != 0
-				|| (changes & PKG_CHANGED_STATE) != 0
+				|| (changes & PKG_CHANGED_LOCAL_INFO) != 0
 				|| (changes & PKG_CHANGED_CHANGELOG) != 0) {
 				fPagesView->SetPackage(package, false);
 			}
@@ -1360,7 +1360,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 			if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0 || (changes & PKG_CHANGED_RATINGS) != 0)
 				fTitleView->SetPackage(package);
 
-			if ((changes & PKG_CHANGED_STATE) != 0)
+			if ((changes & PKG_CHANGED_LOCAL_INFO) != 0)
 				fPackageActionView->SetPackage(package);
 
 			break;

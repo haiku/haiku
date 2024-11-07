@@ -7,7 +7,6 @@
 #define PACKAGE_INFO_H
 
 
-#include <set>
 #include <vector>
 
 #include <Referenceable.h>
@@ -17,26 +16,11 @@
 #include "List.h"
 #include "PackageClassificationInfo.h"
 #include "PackageInfoListener.h"
+#include "PackageLocalInfo.h"
 #include "PackageLocalizedText.h"
 #include "PublisherInfo.h"
 #include "ScreenshotInfo.h"
 #include "UserRatingInfo.h"
-
-
-typedef std::set<int32> PackageInstallationLocationSet;
-
-
-enum PackageState {
-	NONE		= 0,
-	INSTALLED	= 1,
-	DOWNLOADING	= 2,
-	ACTIVATED	= 3,
-	UNINSTALLED	= 4,
-	PENDING		= 5,
-};
-
-
-const char* package_state_to_string(PackageState state);
 
 
 using BPackageKit::BPackageInfo;
@@ -66,38 +50,8 @@ public:
 			const PublisherInfo& Publisher() const
 									{ return fPublisher; }
 
-
-			int32				Flags() const
-									{ return fFlags; }
-			bool				IsSystemPackage() const;
-
-			bool				IsSystemDependency() const
-									{ return fSystemDependency; }
-			void				SetSystemDependency(bool isDependency);
-
 			const BString		Architecture() const
 									{ return fArchitecture; }
-
-			PackageState		State() const
-									{ return fState; }
-			void				SetState(PackageState state);
-
-			const PackageInstallationLocationSet&
-								InstallationLocations() const
-									{ return fInstallationLocations; }
-			void				AddInstallationLocation(int32 location);
-			void				ClearInstallationLocations();
-
-			float				DownloadProgress() const
-									{ return fDownloadProgress; }
-			void				SetDownloadProgress(float progress);
-
-			void				SetLocalFilePath(const char* path);
-			const BString&		LocalFilePath() const
-									{ return fLocalFilePath; }
-			bool				IsLocalFile() const;
-			const BString&		FileName() const
-									{ return fFileName; }
 
 			void				SetPackageClassificationInfo(
 									PackageClassificationInfoRef value);
@@ -105,22 +59,17 @@ public:
 								PackageClassificationInfo() const
 									{ return fPackageClassificationInfo; }
 
-			UserRatingInfoRef	UserRatingInfo();
+			UserRatingInfoRef	UserRatingInfo() const;
 			void				SetUserRatingInfo(UserRatingInfoRef userRatingInfo);
+
+			PackageLocalInfoRef	LocalInfo() const;
+			void				SetLocalInfo(PackageLocalInfoRef& localInfo);
 
 			void				ClearScreenshotInfos();
 			void				AddScreenshotInfo(
 									const ScreenshotInfoRef& info);
 			int32				CountScreenshotInfos() const;
 			ScreenshotInfoRef	ScreenshotInfoAtIndex(int32 index) const;
-
-			void				SetSize(off_t size);
-			off_t				Size() const
-									{ return fSize; }
-
-			void				SetViewed();
-			bool				Viewed() const
-									{ return fViewed; }
 
 			void				SetVersionCreateTimestamp(uint64 value);
 			uint64				VersionCreateTimestamp() const
@@ -154,21 +103,12 @@ private:
 			std::vector<ScreenshotInfoRef>
 								fScreenshotInfos;
 			UserRatingInfoRef	fUserRatingInfo;
+			PackageLocalInfoRef	fLocalInfo;
 
-			PackageState		fState;
-			PackageInstallationLocationSet
-								fInstallationLocations;
-			float				fDownloadProgress;
 			std::vector<PackageInfoListenerRef>
 								fListeners;
-			int32				fFlags;
-			bool				fSystemDependency;
 			BString				fArchitecture;
-			BString				fLocalFilePath;
-			BString				fFileName;
-			off_t				fSize;
 			BString				fDepotName;
-			bool				fViewed;
 
 			bool				fIsCollatingChanges;
 			uint32				fCollatedChanges;

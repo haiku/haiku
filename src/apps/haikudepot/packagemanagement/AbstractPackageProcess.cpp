@@ -9,9 +9,11 @@
 
 #include "AbstractPackageProcess.h"
 
+#include "Logger.h"
 #include "Model.h"
 #include "PackageKitUtils.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 
 
 using namespace BPackageKit;
@@ -51,3 +53,43 @@ AbstractPackageProcess::FindPackageByName(const BString& name)
 }
 
 
+// TODO; will refactor once the models go immutable.
+void
+AbstractPackageProcess::SetPackageState(PackageInfoRef& package, PackageState state)
+{
+	if (package.IsSet()) {
+		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
+		localInfo->SetState(state);
+		package->SetLocalInfo(localInfo);
+	} else {
+		HDERROR("setting state, but the package is not set");
+	}
+}
+
+
+// TODO; will refactor once the models go immutable.
+void
+AbstractPackageProcess::SetPackageDownloadProgress(PackageInfoRef& package, float value)
+{
+	if (package.IsSet()) {
+		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
+		localInfo->SetDownloadProgress(value);
+		package->SetLocalInfo(localInfo);
+	} else {
+		HDERROR("setting progress, but the package is not set");
+	}
+}
+
+
+// TODO; will refactor once the models go immutable.
+void
+AbstractPackageProcess::ClearPackageInstallationLocations(PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
+		localInfo->ClearInstallationLocations();
+		package->SetLocalInfo(localInfo);
+	} else {
+		HDERROR("clearing installation locations, but the package is not set");
+	}
+}

@@ -28,8 +28,7 @@ public:
 private:
 			void				_InitContentPopulator();
 	static	int32				_ContentPopulatorThread(void* arg);
-			bool				_PopulatePackageContents(
-									const PackageInfo& package);
+			bool				_PopulatePackageContents(const PackageInfoRef& package);
 
 private:
 			BOutlineListView*	fContentListView;

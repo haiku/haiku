@@ -11,7 +11,8 @@
 #include <String.h>
 
 
-class ScreenshotInfo : public BReferenceable {
+class ScreenshotInfo : public BReferenceable
+{
 public:
 								ScreenshotInfo();
 								ScreenshotInfo(const BString& code,

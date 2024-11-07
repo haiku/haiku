@@ -29,16 +29,9 @@ PackageInfo::PackageInfo()
 	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
-	fState(NONE),
-	fDownloadProgress(0.0),
-	fFlags(0),
-	fSystemDependency(false),
+	fLocalInfo(),
 	fArchitecture(),
-	fLocalFilePath(),
-	fFileName(),
-	fSize(0),
 	fDepotName(""),
-	fViewed(false),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0),
 	fVersionCreateTimestamp(0)
@@ -54,16 +47,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fPackageClassificationInfo(),
 	fScreenshotInfos(),
 	fUserRatingInfo(),
-	fState(NONE),
-	fDownloadProgress(0.0),
-	fFlags(info.Flags()),
-	fSystemDependency(false),
 	fArchitecture(info.ArchitectureName()),
-	fLocalFilePath(),
-	fFileName(info.FileName()),
-	fSize(0), // TODO: Retrieve local file size
 	fDepotName(""),
-	fViewed(false),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0),
 	fVersionCreateTimestamp(0)
@@ -92,6 +77,11 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fLocalizedText->SetTitle(info.Name());
 	fLocalizedText->SetSummary(info.Summary());
 	fLocalizedText->SetDescription(info.Description());
+
+	// TODO: Retrieve local file size
+	fLocalInfo = PackageLocalInfoRef(new PackageLocalInfo(), true);
+	fLocalInfo->SetFlags(info.Flags());
+	fLocalInfo->SetFileName(info.FileName());
 }
 
 
@@ -104,17 +94,9 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fPackageClassificationInfo(other.fPackageClassificationInfo),
 	fScreenshotInfos(other.fScreenshotInfos),
 	fUserRatingInfo(other.fUserRatingInfo),
-	fState(other.fState),
-	fInstallationLocations(other.fInstallationLocations),
-	fDownloadProgress(other.fDownloadProgress),
-	fFlags(other.fFlags),
-	fSystemDependency(other.fSystemDependency),
+	fLocalInfo(other.fLocalInfo),
 	fArchitecture(other.fArchitecture),
-	fLocalFilePath(other.fLocalFilePath),
-	fFileName(other.fFileName),
-	fSize(other.fSize),
 	fDepotName(other.fDepotName),
-	fViewed(other.fViewed),
 	fIsCollatingChanges(false),
 	fCollatedChanges(0),
 	fVersionCreateTimestamp(other.fVersionCreateTimestamp)
@@ -132,18 +114,10 @@ PackageInfo::operator=(const PackageInfo& other)
 	fPackageClassificationInfo = other.fPackageClassificationInfo;
 	fScreenshotInfos = other.fScreenshotInfos;
 	fUserRatingInfo = other.fUserRatingInfo;
-	fState = other.fState;
-	fInstallationLocations = other.fInstallationLocations;
-	fDownloadProgress = other.fDownloadProgress;
-	fFlags = other.fFlags;
-	fSystemDependency = other.fSystemDependency;
 	fArchitecture = other.fArchitecture;
-	fLocalFilePath = other.fLocalFilePath;
-	fFileName = other.fFileName;
-	fSize = other.fSize;
 	fDepotName = other.fDepotName;
-	fViewed = other.fViewed;
 	fVersionCreateTimestamp = other.fVersionCreateTimestamp;
+	fLocalInfo = other.fLocalInfo;
 
 	return *this;
 }
@@ -153,20 +127,14 @@ bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
 	return fName == other.fName
+		&& fLocalInfo == other.fLocalInfo
 		&& fVersion == other.fVersion
 		&& fPublisher == other.fPublisher
 		&& fLocalizedText == other.fLocalizedText
 		&& fPackageClassificationInfo == other.fPackageClassificationInfo
 		&& fScreenshotInfos == other.fScreenshotInfos
 		&& fUserRatingInfo == fUserRatingInfo
-		&& fState == other.fState
-		&& fFlags == other.fFlags
-		&& fDownloadProgress == other.fDownloadProgress
-		&& fSystemDependency == other.fSystemDependency
 		&& fArchitecture == other.fArchitecture
-		&& fLocalFilePath == other.fLocalFilePath
-		&& fFileName == other.fFileName
-		&& fSize == other.fSize
 		&& fVersionCreateTimestamp == other.fVersionCreateTimestamp;
 }
 
@@ -198,83 +166,8 @@ PackageInfo::SetLocalizedText(PackageLocalizedTextRef value)
 }
 
 
-bool
-PackageInfo::IsSystemPackage() const
-{
-	return (fFlags & BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE) != 0;
-}
-
-
-void
-PackageInfo::SetPackageClassificationInfo(PackageClassificationInfoRef value)
-{
-	if (value != fPackageClassificationInfo) {
-		fPackageClassificationInfo = value;
-		_NotifyListeners(PKG_CHANGED_CLASSIFICATION);
-	}
-}
-
-
-void
-PackageInfo::SetSystemDependency(bool isDependency)
-{
-	fSystemDependency = isDependency;
-}
-
-
-void
-PackageInfo::SetState(PackageState state)
-{
-	if (fState != state) {
-		fState = state;
-		if (fState != DOWNLOADING)
-			fDownloadProgress = 0.0;
-		_NotifyListeners(PKG_CHANGED_STATE);
-	}
-}
-
-
-void
-PackageInfo::AddInstallationLocation(int32 location)
-{
-	fInstallationLocations.insert(location);
-	SetState(ACTIVATED);
-		// TODO: determine how to differentiate between installed and active.
-}
-
-
-void
-PackageInfo::ClearInstallationLocations()
-{
-	fInstallationLocations.clear();
-}
-
-
-void
-PackageInfo::SetDownloadProgress(float progress)
-{
-	fState = DOWNLOADING;
-	fDownloadProgress = progress;
-	_NotifyListeners(PKG_CHANGED_STATE);
-}
-
-
-void
-PackageInfo::SetLocalFilePath(const char* path)
-{
-	fLocalFilePath = path;
-}
-
-
-bool
-PackageInfo::IsLocalFile() const
-{
-	return !fLocalFilePath.IsEmpty() && fInstallationLocations.empty();
-}
-
-
 UserRatingInfoRef
-PackageInfo::UserRatingInfo()
+PackageInfo::UserRatingInfo() const
 {
 	return fUserRatingInfo;
 }
@@ -286,6 +179,33 @@ PackageInfo::SetUserRatingInfo(UserRatingInfoRef value)
 	if (fUserRatingInfo != value) {
 		fUserRatingInfo = value;
 		_NotifyListeners(PKG_CHANGED_RATINGS);
+	}
+}
+
+
+PackageLocalInfoRef
+PackageInfo::LocalInfo() const
+{
+	return fLocalInfo;
+}
+
+
+void
+PackageInfo::SetLocalInfo(PackageLocalInfoRef& localInfo)
+{
+	if (fLocalInfo != localInfo) {
+		fLocalInfo = localInfo;
+		_NotifyListeners(PKG_CHANGED_LOCAL_INFO);
+	}
+}
+
+
+void
+PackageInfo::SetPackageClassificationInfo(PackageClassificationInfoRef value)
+{
+	if (value != fPackageClassificationInfo) {
+		fPackageClassificationInfo = value;
+		_NotifyListeners(PKG_CHANGED_CLASSIFICATION);
 	}
 }
 
@@ -319,23 +239,6 @@ PackageInfo::AddScreenshotInfo(const ScreenshotInfoRef& info)
 {
 	fScreenshotInfos.push_back(info);
 	_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
-}
-
-
-void
-PackageInfo::SetSize(int64 size)
-{
-	if (fSize != size) {
-		fSize = size;
-		_NotifyListeners(PKG_CHANGED_SIZE);
-	}
-}
-
-
-void
-PackageInfo::SetViewed()
-{
-	fViewed = true;
 }
 
 
@@ -426,27 +329,5 @@ PackageInfo::_NotifyListenersImmediate(uint32 changes)
 		const PackageInfoListenerRef listener = *it;
 		if (listener.IsSet())
 			listener->PackageChanged(event);
-	}
-}
-
-
-const char* package_state_to_string(PackageState state)
-{
-	switch (state) {
-		case NONE:
-			return "NONE";
-		case INSTALLED:
-			return "INSTALLED";
-		case DOWNLOADING:
-			return "DOWNLOADING";
-		case ACTIVATED:
-			return "ACTIVATED";
-		case UNINSTALLED:
-			return "UNINSTALLED";
-		case PENDING:
-			return "PENDING";
-		default:
-			debugger("unknown package state");
-			return "???";
 	}
 }

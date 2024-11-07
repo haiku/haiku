@@ -181,6 +181,7 @@ local applicationSources =
 	PackageFilter.cpp
 	PackageFilterModel.cpp
 	PackageInfo.cpp
+	PackageLocalInfo.cpp
 	PackageLocalizedText.cpp
 	PublisherInfo.cpp
 	ScreenshotInfo.cpp

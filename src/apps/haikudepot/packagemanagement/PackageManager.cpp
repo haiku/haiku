@@ -142,10 +142,18 @@ void
 PackageManager::CollectPackageActions(PackageInfoRef package,
 		Collector<PackageActionRef>& actionList)
 {
-	if (package->IsSystemPackage() || package->IsSystemDependency())
+	if (!package.IsSet())
 		return;
 
-	switch (package->State()) {
+	PackageLocalInfoRef localInfo = package->LocalInfo();
+
+	if (!localInfo.IsSet())
+		return;
+
+	if (localInfo->IsSystemPackage() || localInfo->IsSystemDependency())
+		return;
+
+	switch (PackageUtils::State(package)) {
 		case ACTIVATED:
 		case INSTALLED:
 			_CollectPackageActionsForActivatedOrInstalled(package, actionList);
@@ -489,7 +497,9 @@ BSolverPackage*
 PackageManager::_GetSolverPackage(PackageInfoRef package)
 {
 	int32 flags = BSolver::B_FIND_IN_NAME;
-	if (package->State() == ACTIVATED || package->State() == INSTALLED)
+	PackageState state = PackageUtils::State(package);
+
+	if (state == ACTIVATED || state == INSTALLED)
 		flags |= BSolver::B_FIND_INSTALLED_ONLY;
 
 	BObjectList<BSolverPackage> packages;
@@ -499,9 +509,9 @@ PackageManager::_GetSolverPackage(PackageInfoRef package)
 			BSolverPackage* solverPackage = packages.ItemAt(i);
 			if (solverPackage->Name() != package->Name())
 				continue;
-			else if (package->State() == NONE
-				&& dynamic_cast<BPackageManager::RemoteRepository*>(
-					solverPackage->Repository()) == NULL) {
+			else if (state == NONE
+				&& dynamic_cast<BPackageManager::RemoteRepository*>(solverPackage->Repository())
+					== NULL) {
 				continue;
 			}
 			return solverPackage;

@@ -17,16 +17,14 @@
 class PackageKitUtils
 {
 public:
-	static	status_t		DeriveLocalFilePath(const PackageInfo* package,
-								BPath& result);
+	static	status_t		DeriveLocalFilePath(const PackageInfoRef package, BPath& result);
 
 	static	BPackageKit::BPackageInstallationLocation
-							DeriveInstallLocation(const PackageInfo* package);
+							DeriveInstallLocation(const PackageInfoRef package);
 
 private:
 	static	status_t		_DeriveDirectoryWhich(
-								BPackageKit::BPackageInstallationLocation
-									location,
+								BPackageKit::BPackageInstallationLocation location,
 								directory_which* which);
 };
 

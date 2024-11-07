@@ -10,6 +10,7 @@
 
 
 #include "PackageFilter.h"
+#include "PackageUtils.h"
 
 
 PackageFilter::~PackageFilter()
@@ -62,7 +63,7 @@ public:
 
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		return package->State() == fState;
+		return PackageUtils::State(package) == fState;
 	}
 
 private:

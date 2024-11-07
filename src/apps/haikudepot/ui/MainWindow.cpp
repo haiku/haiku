@@ -42,6 +42,7 @@
 #include "PackageInfoView.h"
 #include "PackageListView.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 #include "ProcessCoordinator.h"
 #include "ProcessCoordinatorFactory.h"
 #include "RatePackageWindow.h"
@@ -720,7 +721,7 @@ MainWindow::Consume(ProcessCoordinator *item)
 void
 MainWindow::PackageChanged(const PackageInfoEvent& event)
 {
-	uint32 watchedChanges = PKG_CHANGED_STATE | PKG_CHANGED_CLASSIFICATION;
+	uint32 watchedChanges = PKG_CHANGED_LOCAL_INFO | PKG_CHANGED_CLASSIFICATION;
 	if ((event.Changes() & watchedChanges) != 0) {
 		PackageInfoRef ref(event.Package());
 		BMessage message(MSG_PACKAGE_CHANGED);
@@ -1051,8 +1052,10 @@ MainWindow::_IncrementViewCounter(const PackageInfoRef package)
 	{
 		AutoLocker<BLocker> modelLocker(fModel.Lock());
 		bool canShareAnonymousUsageData = fModel.CanShareAnonymousUsageData();
-		if (canShareAnonymousUsageData && !package->Viewed()) {
-			package->SetViewed();
+		if (canShareAnonymousUsageData && !PackageUtils::Viewed(package)) {
+			PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
+			localInfo->SetViewed();
+			package->SetLocalInfo(localInfo);
 			shouldIncrementViewCounter = true;
 		}
 	}

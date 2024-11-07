@@ -28,6 +28,7 @@
 #include "Logger.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 
 #include <package/Context.h>
 #include <package/manager/Exceptions.h>
@@ -201,6 +202,8 @@ LocalPkgDataLoadProcess::RunInternal()
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
 
+		PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(modelInfo);
+
 		// The package list here considers those packages that are installed
 		// in the system as well as those that exist in remote repositories.
 		// It is better if the 'depot name' is from the remote repository
@@ -239,23 +242,21 @@ LocalPkgDataLoadProcess::RunInternal()
 
 			remotePackages[modelInfo->Name()] = modelInfo;
 		} else {
-			if (repository == static_cast<const BSolverRepository*>(
-					manager.SystemRepository())) {
-				modelInfo->AddInstallationLocation(
-					B_PACKAGE_INSTALLATION_LOCATION_SYSTEM);
-				if (!modelInfo->IsSystemPackage()) {
-					systemInstalledPackages[repoPackageInfo.FileName()]
-						= modelInfo;
-				}
-			} else if (repository == static_cast<const BSolverRepository*>(
-					manager.HomeRepository())) {
-				modelInfo->AddInstallationLocation(
-					B_PACKAGE_INSTALLATION_LOCATION_HOME);
+			if (repository == static_cast<const BSolverRepository*>(manager.SystemRepository())) {
+				localInfo->AddInstallationLocation(B_PACKAGE_INSTALLATION_LOCATION_SYSTEM);
+				if (!localInfo->IsSystemPackage())
+					systemInstalledPackages[repoPackageInfo.FileName()] = modelInfo;
+			} else if (repository
+				== static_cast<const BSolverRepository*>(manager.HomeRepository())) {
+				localInfo->AddInstallationLocation(B_PACKAGE_INSTALLATION_LOCATION_HOME);
 			}
+
 		}
 
-		if (modelInfo->IsSystemPackage())
+		if (localInfo->IsSystemPackage())
 			systemFlaggedPackages.Add(repoPackageInfo.FileName());
+
+		modelInfo->SetLocalInfo(localInfo);
 	}
 
 	BAutolock lock(fModel->Lock());
@@ -355,8 +356,13 @@ LocalPkgDataLoadProcess::RunInternal()
 			if (element->Type() == BSolverResultElement::B_TYPE_INSTALL) {
 				PackageInfoMap::iterator it = systemInstalledPackages.find(
 					package->Info().FileName());
-				if (it != systemInstalledPackages.end())
-					it->second->SetSystemDependency(true);
+				if (it != systemInstalledPackages.end()) {
+					PackageInfoRef systemInstalledPackage = it->second;
+					PackageLocalInfoRef localInfo
+						= PackageUtils::NewLocalInfo(systemInstalledPackage);
+					localInfo->SetSystemDependency(true);
+					systemInstalledPackage->SetLocalInfo(localInfo);
+				}
 			}
 		}
 	} catch (BFatalErrorException& ex) {

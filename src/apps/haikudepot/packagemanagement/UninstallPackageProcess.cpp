@@ -25,6 +25,7 @@
 #include "AppUtils.h"
 #include "Logger.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -70,11 +71,14 @@ status_t
 UninstallPackageProcess::RunInternal()
 {
 	fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES);
+
 	PackageInfoRef ref(fPackage);
-	PackageState state = ref->State();
+	PackageState state = PackageUtils::State(fPackage);
+	const char* packageName = ref->Name().String();
+
 	fPackageManager->SetCurrentActionPackage(ref, false);
 	fPackageManager->AddProgressListener(this);
-	const char* packageName = ref->Name().String();
+
 	try {
 		fPackageManager->Uninstall(&packageName, 1);
 	} catch (BFatalErrorException& ex) {
@@ -85,7 +89,7 @@ UninstallPackageProcess::RunInternal()
 			ex.Details().String());
 		AppUtils::NotifySimpleError(B_TRANSLATE("Fatal error"), errorString,
 			B_STOP_ALERT);
-		ref->SetState(state);
+		SetPackageState(ref, state);
 		return ex.Error();
 	} catch (BAbortedByUserException& ex) {
 		return B_OK;
@@ -94,14 +98,11 @@ UninstallPackageProcess::RunInternal()
 	} catch (BException& ex) {
 		HDERROR("Exception occurred while uninstalling package %s: %s",
 			packageName, ex.Message().String());
-		ref->SetState(state);
+		SetPackageState(ref, state);
 		return B_ERROR;
 	}
 
 	fPackageManager->RemoveProgressListener(this);
-
-	ref->ClearInstallationLocations();
-	ref->SetState(NONE);
 
 	return B_OK;
 }
@@ -129,6 +130,7 @@ UninstallPackageProcess::ApplyingChangesDone(
 	std::vector<PackageInfoRef>::iterator it;
 	for (it = fRemovedPackages.begin(); it != fRemovedPackages.end(); it++) {
 		PackageInfoRef packageInfoRef = *it;
-		packageInfoRef->SetState(NONE);
+		SetPackageState(packageInfoRef, NONE);
+		ClearPackageInstallationLocations(packageInfoRef);
 	}
 }

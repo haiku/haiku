@@ -24,6 +24,7 @@
 #include "GeneralContentScrollView.h"
 #include "Logger.h"
 #include "PackageKitUtils.h"
+#include "PackageUtils.h"
 
 #include <package/PackageDefs.h>
 #include <package/hpkg/NoErrorOutput.h>
@@ -244,30 +245,28 @@ PackageContentsView::AllAttached()
 void
 PackageContentsView::SetPackage(const PackageInfoRef& package)
 {
+	PackageState packageState = PackageUtils::State(package);
+
 	// When getting a ref to the same package, don't return when the
 	// package state has changed, since in that case, we may now be able
 	// to read contents where we previously could not. (For example, the
 	// package has been installed.)
-	if (fPackage == package
-		&& (!package.IsSet() || package->State() == fLastPackageState)) {
+	if (fPackage == package && (!package.IsSet() || packageState == fLastPackageState))
 		return;
-	}
 
 	Clear();
 
 	{
 		BAutolock lock(&fPackageLock);
 		fPackage = package;
-		fLastPackageState = package.IsSet() ? package->State() : NONE;
+		fLastPackageState = packageState;
 	}
 
 	// if the package is not installed and is not a local file on disk then
 	// there is no point in attempting to populate data for it.
 
-	if (package.IsSet()
-			&& (package->State() == ACTIVATED || package->IsLocalFile())) {
+	if (PackageUtils::IsActivatedOrLocalFile(package))
 		release_sem_etc(fContentPopulatorSem, 1, 0);
-	}
 }
 
 
@@ -313,7 +312,7 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 		}
 
 		if (package.IsSet()) {
-			if (!view->_PopulatePackageContents(*package.Get())) {
+			if (!view->_PopulatePackageContents(package)) {
 				if (view->LockLooperWithTimeout(1000000) == B_OK) {
 					view->fContentListView->AddItem(
 						new BStringItem(B_TRANSLATE("<Package contents not "
@@ -329,11 +328,11 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 
 
 bool
-PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
+PackageContentsView::_PopulatePackageContents(const PackageInfoRef& package)
 {
 	BPath packagePath;
 
-	if (PackageKitUtils::DeriveLocalFilePath(&package, packagePath) != B_OK) {
+	if (PackageKitUtils::DeriveLocalFilePath(package, packagePath) != B_OK) {
 		HDDEBUG("unable to obtain local file path");
 		return false;
 	}
@@ -351,8 +350,7 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 	}
 
 	// Scan package contents and populate list
-	PackageContentOutliner contentHandler(fContentListView, &package,
-		fPackageLock, fPackage);
+	PackageContentOutliner contentHandler(fContentListView, package.Get(), fPackageLock, fPackage);
 	status = reader.ParseContent(&contentHandler);
 	if (status != B_OK) {
 		HDINFO("PackageContentsView::_PopulatePackageContents(): "

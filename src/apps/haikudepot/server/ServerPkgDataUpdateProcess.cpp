@@ -17,15 +17,16 @@
 #include <StopWatch.h>
 #include <Url.h>
 
-#include "Logger.h"
-#include "ServerSettings.h"
-#include "StorageUtils.h"
 #include "DumpExportPkg.h"
 #include "DumpExportPkgCategory.h"
 #include "DumpExportPkgJsonListener.h"
 #include "DumpExportPkgScreenshot.h"
 #include "DumpExportPkgVersion.h"
 #include "HaikuDepotConstants.h"
+#include "Logger.h"
+#include "PackageUtils.h"
+#include "ServerSettings.h"
+#include "StorageUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -95,14 +96,8 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	PackageClassificationInfoRef packageClassificationInfo(new PackageClassificationInfo(), true);
 
-	PackageLocalizedTextRef localizedText = package->LocalizedText();
-
-	if (localizedText.IsSet()) {
-		localizedText
-			= PackageLocalizedTextRef(new PackageLocalizedText(*(localizedText.Get())), true);
-	} else {
-		localizedText = PackageLocalizedTextRef(new PackageLocalizedText(), true);
-	}
+	PackageLocalizedTextRef localizedText = PackageUtils::NewLocalizedText(package);
+	PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(package);
 
 	localizedText->SetHasChangelog(pkg->HasChangelog());
 
@@ -123,7 +118,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			localizedText->SetDescription(*(pkgVersion->Description()));
 
 		if (!pkgVersion->PayloadLengthIsNull())
-			package->SetSize(static_cast<off_t>(pkgVersion->PayloadLength()));
+			localInfo->SetSize(static_cast<off_t>(pkgVersion->PayloadLength()));
 
 		if (!pkgVersion->CreateTimestampIsNull())
 			package->SetVersionCreateTimestamp(pkgVersion->CreateTimestamp());
@@ -171,6 +166,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	}
 
 	package->SetLocalizedText(localizedText);
+	package->SetLocalInfo(localInfo);
 
 	HDTRACE("did populate data for [%s] (%s)", pkg->Name()->String(),
 			fDepotName.String());

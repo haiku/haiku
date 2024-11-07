@@ -34,6 +34,7 @@
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -139,17 +140,17 @@ InstallPackageProcess::RunInternal()
 		| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 		| BPackageManager::B_REFRESH_REPOSITORIES);
 	PackageInfoRef ref(fPackage);
-	PackageState state = ref->State();
-	ref->SetState(PENDING);
+	PackageState state = PackageUtils::State(ref);
+	SetPackageState(ref, PENDING);
 
 	fPackageManager->SetCurrentActionPackage(ref, true);
 	fPackageManager->AddProgressListener(this);
 
-	BString packageName;
-	if (ref->IsLocalFile())
-		packageName = ref->LocalFilePath();
-	else
-		packageName = ref->Name();
+	BString packageName = ref->Name();
+	PackageLocalInfoRef localInfo = ref->LocalInfo();
+
+	if (localInfo.IsSet() && localInfo->IsLocalFile())
+		packageName = localInfo->LocalFilePath();
 
 	const char* packageNameString = packageName.String();
 	try {
@@ -163,13 +164,13 @@ InstallPackageProcess::RunInternal()
 		AppUtils::NotifySimpleError(B_TRANSLATE("Fatal error"), errorString,
 			B_STOP_ALERT);
 		_SetDownloadedPackagesState(NONE);
-		ref->SetState(state);
+		SetPackageState(ref, state);
 		return ex.Error();
 	} catch (BAbortedByUserException& ex) {
 		HDINFO("Installation of package %s is aborted by user: %s",
 			packageNameString, ex.Message().String());
 		_SetDownloadedPackagesState(NONE);
-		ref->SetState(state);
+		SetPackageState(ref, state);
 		return B_OK;
 	} catch (BNothingToDoException& ex) {
 		HDINFO("Nothing to do while installing package %s: %s",
@@ -179,7 +180,7 @@ InstallPackageProcess::RunInternal()
 		HDERROR("Exception occurred while installing package %s: %s",
 			packageNameString, ex.Message().String());
 		_SetDownloadedPackagesState(NONE);
-		ref->SetState(state);
+		SetPackageState(ref, state);
 		return B_ERROR;
 	}
 
@@ -209,7 +210,7 @@ InstallPackageProcess::DownloadProgressChanged(
 	}
 	PackageInfoRef ref(FindPackageByName(simplePackageName));
 	if (ref.IsSet()) {
-		ref->SetDownloadProgress(progress);
+		SetPackageDownloadProgress(ref, progress);
 		_SetDownloadProgress(simplePackageName, progress);
 	} else {
 		HDERROR("unable to find the package info for simple package name [%s]",
@@ -233,7 +234,7 @@ InstallPackageProcess::DownloadProgressComplete(const char* packageName)
 			simplePackageName.String());
 		return;
 	}
-	ref->SetDownloadProgress(1.0);
+	SetPackageDownloadProgress(ref, 1.0);
 	fDownloadedPackages.insert(ref);
 }
 
@@ -249,7 +250,7 @@ InstallPackageProcess::ConfirmedChanges(
 	for (int32 i = 0; (package = activationList.ItemAt(i)); i++) {
 		PackageInfoRef ref(FindPackageByName(package->Info().Name()));
 		if (ref.IsSet())
-			ref->SetState(PENDING);
+			SetPackageState(ref, PENDING);
 	}
 }
 
@@ -259,7 +260,8 @@ InstallPackageProcess::_SetDownloadedPackagesState(PackageState state)
 {
 	for (PackageInfoSet::iterator it = fDownloadedPackages.begin();
 			it != fDownloadedPackages.end(); ++it) {
-		(*it)->SetState(state);
+		PackageInfoRef ref = (*it);
+		SetPackageState(ref, state);
 	}
 }
 

@@ -28,6 +28,10 @@ public:
 protected:
 			PackageInfoRef		FindPackageByName(const BString& name);
 
+			void				SetPackageState(PackageInfoRef& package, PackageState state);
+			void				SetPackageDownloadProgress(PackageInfoRef& package, float value);
+			void				ClearPackageInstallationLocations(PackageInfoRef& package);
+
 protected:
 			PackageManager*		fPackageManager;
 			PackageInfoRef		fPackage;

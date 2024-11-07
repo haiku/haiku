@@ -10,10 +10,15 @@ using namespace BPackageKit;
 
 
 /*static*/ status_t
-PackageKitUtils::DeriveLocalFilePath(const PackageInfo* package, BPath& path)
+PackageKitUtils::DeriveLocalFilePath(const PackageInfoRef package, BPath& path)
 {
-	if (package->IsLocalFile()) {
-		path.SetTo(package->LocalFilePath());
+	if (!package.IsSet())
+		return B_ERROR;
+
+	PackageLocalInfoRef localInfo = package->LocalInfo();
+
+	if (localInfo.IsSet() && localInfo->IsLocalFile()) {
+		path.SetTo(localInfo->LocalFilePath());
 		return B_OK;
 	}
 
@@ -26,7 +31,7 @@ PackageKitUtils::DeriveLocalFilePath(const PackageInfo* package, BPath& path)
 		result = find_directory(which, &path);
 
 	if (result == B_OK)
-		path.Append(package->FileName());
+		path.Append(localInfo->FileName());
 
 	return result;
 }
@@ -52,13 +57,20 @@ PackageKitUtils::_DeriveDirectoryWhich(BPackageInstallationLocation location,
 
 
 /*static*/ BPackageInstallationLocation
-PackageKitUtils::DeriveInstallLocation(const PackageInfo* package)
+PackageKitUtils::DeriveInstallLocation(const PackageInfoRef package)
 {
-	const PackageInstallationLocationSet& locations = package->InstallationLocations();
+	if (package.IsSet()) {
 
-	// If the package is already installed, return its first installed location
-	if (locations.size() != 0)
-		return static_cast<BPackageInstallationLocation>(*locations.begin());
+		PackageLocalInfoRef localInfo = package->LocalInfo();
+
+		if (localInfo.IsSet()) {
+			const PackageInstallationLocationSet& locations = localInfo->InstallationLocations();
+
+			// If the package is already installed, return its first installed location
+			if (locations.size() != 0)
+				return static_cast<BPackageInstallationLocation>(*locations.begin());
+		}
+	}
 
 	return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 }

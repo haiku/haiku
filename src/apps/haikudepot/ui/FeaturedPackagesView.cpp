@@ -661,7 +661,7 @@ public:
 
 		DrawString(renderedText, pt);
 
-		if (pkg->State() == ACTIVATED) {
+		if (PackageUtils::State(pkg) == ACTIVATED) {
 			float stringWidth = StringWidth(title);
 			BRect iconRect = BRect(
 				BPoint(textRect.left + stringWidth + (installedIconBitmap->Bounds().Width() / 2.0),

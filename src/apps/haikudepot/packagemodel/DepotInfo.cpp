@@ -11,6 +11,7 @@
 #include <algorithm>
 
 #include "Logger.h"
+#include "PackageUtils.h"
 
 
 // #pragma mark - Sorting Functions
@@ -170,12 +171,18 @@ DepotInfo::SyncPackagesFromDepot(const DepotInfoRef& other)
 		PackageInfoRef otherPackage = other->PackageAtIndex(i);
 		PackageInfoRef myPackage = PackageByName(otherPackage->Name());
 
-		if (myPackage.Get() != NULL) {
-			myPackage->SetState(otherPackage->State());
-			myPackage->SetLocalFilePath(otherPackage->LocalFilePath());
-			myPackage->SetSystemDependency(otherPackage->IsSystemDependency());
-		}
-		else {
+		if (myPackage.IsSet()) {
+			PackageLocalInfoRef localInfo = PackageUtils::NewLocalInfo(myPackage);
+			PackageLocalInfoRef otherLocalInfo = otherPackage->LocalInfo();
+
+			if (otherLocalInfo.IsSet()) {
+				localInfo->SetState(otherLocalInfo->State());
+				localInfo->SetLocalFilePath(otherLocalInfo->LocalFilePath());
+				localInfo->SetSystemDependency(otherLocalInfo->IsSystemDependency());
+			}
+
+			myPackage->SetLocalInfo(localInfo);
+		} else {
 			HDINFO("%s: new package: '%s'", fName.String(),
 				otherPackage->Name().String());
 			AddPackage(otherPackage);
