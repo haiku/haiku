@@ -12,6 +12,7 @@
 
 #include <AutoLocker.h>
 #include <syscalls.h>
+#include <time_private.h>
 #include <user_mutex_defs.h>
 #include <user_thread.h>
 #include <util/DoublyLinkedList.h>
@@ -352,10 +353,12 @@ pthread_rwlock_tryrdlock(pthread_rwlock_t* lock)
 
 int
 pthread_rwlock_clockrdlock(pthread_rwlock_t* lock, clockid_t clock_id,
-            const struct timespec *abstime)
+	const struct timespec *abstime)
 {
-	bigtime_t timeout = abstime->tv_sec * 1000000LL
-		+ abstime->tv_nsec / 1000LL;
+	bigtime_t timeout;
+	if (abstime == NULL || !timespec_to_bigtime(*abstime, timeout))
+		return EINVAL;
+
 	uint32 flags = 0;
 	if (timeout >= 0) {
 		switch (clock_id) {
@@ -412,11 +415,13 @@ pthread_rwlock_trywrlock(pthread_rwlock_t* lock)
 
 
 int
-pthread_rwlock_clockwrlock (pthread_rwlock_t* lock, clockid_t clock_id,
+pthread_rwlock_clockwrlock(pthread_rwlock_t* lock, clockid_t clock_id,
 	const struct timespec *abstime)
 {
-	bigtime_t timeout = abstime->tv_sec * 1000000LL
-		+ abstime->tv_nsec / 1000LL;
+	bigtime_t timeout;
+	if (abstime == NULL || !timespec_to_bigtime(*abstime, timeout))
+		return EINVAL;
+
 	uint32 flags = 0;
 	if (timeout >= 0) {
 		switch (clock_id) {
@@ -510,4 +515,3 @@ pthread_rwlockattr_setpshared(pthread_rwlockattr_t* _attr, int shared)
 
 	return 0;
 }
-

@@ -12,6 +12,7 @@
 #include <syscall_utils.h>
 
 #include <errno_private.h>
+#include <time_private.h>
 #include <syscalls.h>
 
 
@@ -28,10 +29,11 @@ sigtimedwait(const sigset_t* set, siginfo_t* info,
 	uint32 flags;
     bigtime_t timeoutMicros;
 	if (timeout != NULL) {
-		timeoutMicros = system_time();
+		if (!timespec_to_bigtime(*timeout, timeoutMicros))
+			RETURN_AND_SET_ERRNO(EINVAL);
+
+		timeoutMicros += system_time();
 		flags = B_ABSOLUTE_TIMEOUT;
-	    timeoutMicros += (bigtime_t)timeout->tv_sec * 1000000
-        	+ timeout->tv_nsec / 1000;
 	} else {
 		flags = 0;
 		timeoutMicros = 0;

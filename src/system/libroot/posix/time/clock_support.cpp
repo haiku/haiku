@@ -55,9 +55,7 @@ clock_getres(clockid_t clockID, struct timespec* resolution)
 int
 clock_gettime(clockid_t clockID, struct timespec* time)
 {
-	// get the time in microseconds
 	bigtime_t microSeconds;
-
 	switch (clockID) {
 		case CLOCK_MONOTONIC:
 			microSeconds = system_time();
@@ -75,10 +73,7 @@ clock_gettime(clockid_t clockID, struct timespec* time)
 		}
 	}
 
-	// set the result
-	time->tv_sec = microSeconds / 1000000;
-	time->tv_nsec = (microSeconds % 1000000) * 1000;
-
+	bigtime_to_timespec(microSeconds, *time);
 	return 0;
 }
 
@@ -90,13 +85,9 @@ clock_settime(clockid_t clockID, const struct timespec* time)
 	if (clockID == CLOCK_MONOTONIC)
 		RETURN_AND_SET_ERRNO(EINVAL);
 
-	// check timespec validity
-	if (time->tv_sec < 0 || time->tv_nsec < 0 || time->tv_nsec >= 1000000000)
+	bigtime_t microSeconds;
+	if (!timespec_to_bigtime(*time, microSeconds))
 		RETURN_AND_SET_ERRNO(EINVAL);
-
-	// convert to microseconds and set the clock
-	bigtime_t microSeconds = (bigtime_t)time->tv_sec * 1000000
-		+ time->tv_nsec / 1000;
 
 	RETURN_AND_SET_ERRNO(_kern_set_clock(clockID, microSeconds));
 }
@@ -130,8 +121,7 @@ clock_nanosleep(clockid_t clockID, int flags, const struct timespec* time,
 	// remaining wait time.
 	if (error == B_INTERRUPTED && remainingTime != NULL) {
 		if (remainingMicroSeconds > 0) {
-			remainingTime->tv_sec = remainingMicroSeconds / 1000000;
-			remainingTime->tv_nsec = (remainingMicroSeconds % 1000000) * 1000;
+			bigtime_to_timespec(remainingMicroSeconds, *remainingTime);
 		} else {
 			// We were slow enough that the wait time passed anyway.
 			error = B_OK;

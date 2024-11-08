@@ -15,6 +15,7 @@
 
 #include <syscalls.h>
 #include <user_mutex_defs.h>
+#include <time_private.h>
 
 
 #define MUTEX_TYPE_BITS		0x0000000f
@@ -118,13 +119,9 @@ int
 pthread_mutex_clocklock(pthread_mutex_t* mutex, clockid_t clock_id,
 	const struct timespec* abstime)
 {
-	// translate the timeout
-	bool invalidTime = false;
 	bigtime_t timeout = 0;
-	if (abstime != NULL && abstime->tv_nsec < 1000 * 1000 * 1000
-		&& abstime->tv_nsec >= 0) {
-		timeout = abstime->tv_sec * 1000000LL + abstime->tv_nsec / 1000LL;
-	} else
+	bool invalidTime = false;
+	if (abstime == NULL || !timespec_to_bigtime(*abstime, timeout))
 		invalidTime = true;
 
 	uint32 flags = 0;
