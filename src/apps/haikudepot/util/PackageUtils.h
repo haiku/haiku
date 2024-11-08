@@ -15,6 +15,8 @@ public:
 	static	void			Title(const PackageInfoRef& package, BString& title);
 	static	void			Summary(const PackageInfoRef& package, BString& summary);
 
+	static	bool			IsNativeDesktop(const PackageInfoRef& package);
+
 	static PackageLocalizedTextRef
 							NewLocalizedText(const PackageInfoRef& package);
 

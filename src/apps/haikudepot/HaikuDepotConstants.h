@@ -91,6 +91,7 @@ enum {
 	RSRC_INSTALLED							= 530,
 	RSRC_ARROW_LEFT							= 540,
 	RSRC_ARROW_RIGHT						= 550,
+	RSRC_NATIVE								= 560,
 };
 
 

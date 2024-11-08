@@ -45,6 +45,12 @@
 // The title area will be this many times the width of an "M".
 #define M_COUNT_TITLE 10
 
+// The fraction of the icon width that is left of the trailing icon
+#define TRAILING_ICON_PADDING_LEFT_FACTOR 0.1
+
+// The faction of an M-space that is left between the title and the first trailing icon.
+#define TITLE_RIGHT_TRAILING_ICON_PADDING_M_FACTOR 0.1
+
 
 // #pragma mark - PackageView
 
@@ -642,11 +648,32 @@ public:
 		if (!textRect.IsValid())
 			return;
 
-		const BBitmap* installedIconBitmap = SharedIcons::IconInstalled16Scaled()->Bitmap();
+		std::vector<BitmapHolderRef> trailingIconBitmaps;
+
+		if (PackageUtils::State(pkg) == ACTIVATED)
+			trailingIconBitmaps.push_back(SharedIcons::IconInstalled16Scaled());
+
+		if (PackageUtils::IsNativeDesktop(pkg))
+			trailingIconBitmaps.push_back(SharedIcons::IconNative16Scaled());
+
+		float trailingIconsWidth = 0.0f;
+
+		for (std::vector<BitmapHolderRef>::iterator it = trailingIconBitmaps.begin();
+				it != trailingIconBitmaps.end(); it++) {
+			trailingIconsWidth += (*it)->Bitmap()->Bounds().Width()
+				* (1.0 + TRAILING_ICON_PADDING_LEFT_FACTOR);
+		}
 
 		SetDrawingMode(B_OP_COPY);
 		SetHighUIColor(selected ? B_LIST_SELECTED_ITEM_TEXT_COLOR : B_LIST_ITEM_TEXT_COLOR);
 		SetFont(fTitleFont);
+
+		float titleRightTrailingIconsPadding = 0.0f;
+
+		if (!trailingIconBitmaps.empty()) {
+			titleRightTrailingIconsPadding = StringWidth("M")
+				* TITLE_RIGHT_TRAILING_ICON_PADDING_M_FACTOR;
+		}
 
 		font_height fontHeight;
 		fTitleFont->GetHeight(&fontHeight);
@@ -656,21 +683,35 @@ public:
 		PackageUtils::TitleOrName(pkg, title);
 
 		BString renderedText = title;
-		float installedIconAllowance = installedIconBitmap->Bounds().Width() * 1.5;
-		TruncateString(&renderedText, B_TRUNCATE_END, textRect.Width() - installedIconAllowance);
+		TruncateString(&renderedText, B_TRUNCATE_END, textRect.Width()
+			- (titleRightTrailingIconsPadding + trailingIconsWidth));
 
 		DrawString(renderedText, pt);
 
-		if (PackageUtils::State(pkg) == ACTIVATED) {
-			float stringWidth = StringWidth(title);
-			BRect iconRect = BRect(
-				BPoint(textRect.left + stringWidth + (installedIconBitmap->Bounds().Width() / 2.0),
-				textRect.top + (textRect.Height() / 2.0)
-					- (installedIconBitmap->Bounds().Height() / 2.0)),
-				installedIconBitmap->Bounds().Size());
-			SetDrawingMode(B_OP_ALPHA);
-			DrawBitmap(installedIconBitmap, installedIconBitmap->Bounds(), iconRect,
-				B_FILTER_BITMAP_BILINEAR);
+		// now draw the trailing icons.
+
+		float stringWidth = StringWidth(title);
+		float trailingIconX = textRect.left + stringWidth + titleRightTrailingIconsPadding;
+		float trailingIconMidY = textRect.top + (textRect.Height() / 2.0);
+
+		SetDrawingMode(B_OP_ALPHA);
+
+		for (std::vector<BitmapHolderRef>::iterator it = trailingIconBitmaps.begin();
+				it != trailingIconBitmaps.end(); it++) {
+			const BBitmap* bitmap = (*it)->Bitmap();
+			BRect bitmapBounds = bitmap->Bounds();
+
+            float trailingIconTopLeftPtX = ceilf(
+            	trailingIconX + (bitmapBounds.Width() * TRAILING_ICON_PADDING_LEFT_FACTOR)) + 0.5;
+            float trailingIconTopLeftPtY = ceilf(
+            	trailingIconMidY - (bitmapBounds.Height() / 2.0)) + 0.5;
+
+			BRect trailingIconRect(BPoint(trailingIconTopLeftPtX, trailingIconTopLeftPtY),
+				bitmap->Bounds().Size());
+
+			DrawBitmap(bitmap, bitmapBounds, trailingIconRect, B_FILTER_BITMAP_BILINEAR);
+
+			trailingIconX = trailingIconRect.right;
 		}
 	}
 

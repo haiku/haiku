@@ -80,7 +80,8 @@ public:
 								PackageIconAndTitleField(
 									const char* packageName,
 									const char* string,
-									bool isActivated);
+									bool isActivated,
+									bool isNativeDesktop);
 	virtual						~PackageIconAndTitleField();
 
 			const BString		PackageName() const
@@ -89,9 +90,13 @@ public:
 			bool				IsActivated() const
 									{ return fIsActivated; }
 
+			bool				IsNativeDesktop() const
+									{ return fIsNativeDesktop; }
+
 private:
 			const BString		fPackageName;
 			const bool			fIsActivated;
+			const bool			fIsNativeDesktop;
 };
 
 
@@ -243,11 +248,12 @@ private:
 
 
 PackageIconAndTitleField::PackageIconAndTitleField(const char* packageName, const char* string,
-	bool isActivated)
+	bool isActivated, bool isNativeDesktop)
 	:
 	Inherited(string),
 	fPackageName(packageName),
-	fIsActivated(isActivated)
+	fIsActivated(isActivated),
+	fIsNativeDesktop(isNativeDesktop)
 {
 }
 
@@ -402,28 +408,38 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		// TODO (andponlin) factor this out as this method is getting too large.
 
 		BSize iconSize = BControlLook::ComposeIconSize(16);
-		BSize indicatorSize = BControlLook::ComposeIconSize(8);
+		BSize trailingIconSize = BControlLook::ComposeIconSize(8);
+		float trailingIconPaddingFactor = 0.2f;
 		BRect iconRect;
 		BRect titleRect;
-		BRect activatedIndicatorRect;
 		float titleTextWidth = 0.0f;
 		float textMargin = 8.0f; // copied from ColumnTypes.cpp
-		bool showActivated = packageIconAndTitleField->IsActivated();
+
+		std::vector<BitmapHolderRef> trailingIconBitmaps;
+
+		if (packageIconAndTitleField->IsActivated())
+			trailingIconBitmaps.push_back(SharedIcons::IconInstalled16Scaled());
+
+		if (packageIconAndTitleField->IsNativeDesktop())
+			trailingIconBitmaps.push_back(SharedIcons::IconNative16Scaled());
 
 		// If there is not enough space then drop the "activated" indicator in order to make more
 		// room for the title.
 
-		if (showActivated) {
+		float trailingIconsWidth = static_cast<float>(trailingIconBitmaps.size())
+			* (trailingIconSize.Width() * (1.0 + trailingIconPaddingFactor));
+
+		if (!trailingIconBitmaps.empty()) {
 			static float sMinimalTextPart = -1.0;
 
 			if (sMinimalTextPart < 0.0)
 				sMinimalTextPart = parent->StringWidth("M") * 5.0;
 
 			float minimalWidth
-				= iconSize.Width() + indicatorSize.Width() + sTextMargin + sMinimalTextPart;
+				= iconSize.Width() + trailingIconsWidth + sTextMargin + sMinimalTextPart;
 
 			if (rect.Width() <= minimalWidth)
-				showActivated = false;
+				trailingIconBitmaps.clear();
 		}
 
 		// Calculate the location of the icon.
@@ -436,9 +452,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 
 		titleRect = rect;
 		titleRect.left = iconRect.right;
-
-		if (showActivated)
-			titleRect.right -= (indicatorSize.Width() + sTextMargin);
+		titleRect.right -= trailingIconsWidth;
 
 		// Figure out if the text needs to be truncated.
 
@@ -447,13 +461,6 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		parent->TruncateString(&truncatedString, fTruncateMode, textWidth);
 		packageIconAndTitleField->SetClippedString(truncatedString.String());
 		titleTextWidth = parent->StringWidth(truncatedString);
-
-		// Calculate the location of the activated indicator.
-
-		activatedIndicatorRect
-			= BRect(BPoint(ceilf(titleRect.left + titleTextWidth + (1.5f * textMargin)) + 0.5f,
-						ceilf(iconRect.top) + 0.5f),
-				indicatorSize);
 
 		// Draw the icon.
 
@@ -479,13 +486,33 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 
 		DrawString(packageIconAndTitleField->ClippedString(), parent, titleRect);
 
-		// draw the installed indicator icon.
+		// Draw the trailing icons
 
-		if (showActivated) {
-			const BBitmap* installedIconBitmap = SharedIcons::IconInstalled16Scaled()->Bitmap();
+		if (!trailingIconBitmaps.empty()) {
+
+			BRect trailingIconRect(
+				BPoint(titleRect.left + titleTextWidth + textMargin, iconRect.top),
+				trailingIconSize);
+
 			parent->SetDrawingMode(B_OP_ALPHA);
-			parent->DrawBitmap(installedIconBitmap, installedIconBitmap->Bounds(),
-				activatedIndicatorRect, B_FILTER_BITMAP_BILINEAR);
+
+			for (std::vector<BitmapHolderRef>::iterator it = trailingIconBitmaps.begin();
+					it != trailingIconBitmaps.end(); it++) {
+				const BBitmap* bitmap = (*it)->Bitmap();
+				BRect bitmapBounds = bitmap->Bounds();
+
+				BRect trailingIconAlignedRect
+					= BRect(BPoint(ceilf(trailingIconRect.LeftTop().x) + 0.5,
+						ceilf(trailingIconRect.LeftTop().y) + 0.5),
+					trailingIconRect.Size());
+
+				parent->DrawBitmap(bitmap, bitmapBounds, trailingIconAlignedRect,
+					B_FILTER_BITMAP_BILINEAR);
+
+				trailingIconRect.OffsetBy(
+					trailingIconSize.Width() * (1.0 + trailingIconPaddingFactor), 0);
+			}
+
 			parent->SetDrawingMode(B_OP_OVER);
 		}
 
@@ -680,9 +707,8 @@ PackageRow::UpdateIconAndTitle()
 	BString title;
 	PackageUtils::TitleOrName(fPackage, title);
 
-	BField* field
-		= new PackageIconAndTitleField(fPackage->Name(), title,
-			PackageUtils::State(fPackage) == ACTIVATED);
+	BField* field = new PackageIconAndTitleField(fPackage->Name(), title,
+		PackageUtils::State(fPackage) == ACTIVATED, PackageUtils::IsNativeDesktop(fPackage));
 	SetField(field, kTitleColumn);
 }
 

@@ -52,6 +52,20 @@ PackageUtils::Summary(const PackageInfoRef& package, BString& summary)
 }
 
 
+/*static*/ bool
+PackageUtils::IsNativeDesktop(const PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageClassificationInfoRef classificationInfo = package->PackageClassificationInfo();
+
+		if (classificationInfo.IsSet())
+			return classificationInfo->IsNativeDesktop();
+	}
+
+	return false;
+}
+
+
 /*static*/ PackageLocalizedTextRef
 PackageUtils::NewLocalizedText(const PackageInfoRef& package)
 {

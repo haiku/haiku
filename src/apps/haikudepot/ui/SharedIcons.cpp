@@ -22,6 +22,7 @@ BitmapHolderRef SharedIcons::sIconInstalled16Scaled;
 BitmapHolderRef SharedIcons::sIconArrowLeft22Scaled;
 BitmapHolderRef SharedIcons::sIconArrowRight22Scaled;
 BitmapHolderRef SharedIcons::sIconHTMLPackage16Scaled;
+BitmapHolderRef SharedIcons::sNative16Scaled;
 
 
 /*static*/ BitmapHolderRef
@@ -101,6 +102,15 @@ SharedIcons::IconHTMLPackage16Scaled()
 }
 
 
+/*static*/ BitmapHolderRef
+SharedIcons::IconNative16Scaled()
+{
+	if (!SharedIcons::sNative16Scaled.IsSet())
+		SharedIcons::sNative16Scaled = SharedIcons::_CreateIconForResource(RSRC_NATIVE, 16);
+	return SharedIcons::sNative16Scaled;
+}
+
+
 /*static*/ void
 SharedIcons::UnsetAllIcons()
 {
@@ -110,6 +120,7 @@ SharedIcons::UnsetAllIcons()
 	sIconInstalled16Scaled.Unset();
 	sIconArrowLeft22Scaled.Unset();
 	sIconArrowRight22Scaled.Unset();
+	sNative16Scaled.Unset();
 
 	sIconHTMLPackage16Scaled.Unset();
 }

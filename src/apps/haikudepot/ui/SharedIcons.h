@@ -22,6 +22,7 @@ public:
 	static	BitmapHolderRef	IconInstalled16Scaled();
 	static	BitmapHolderRef	IconArrowLeft22Scaled();
 	static	BitmapHolderRef	IconArrowRight22Scaled();
+	static	BitmapHolderRef	IconNative16Scaled();
 
 	// icons from mime types
 	static	BitmapHolderRef	IconHTMLPackage16Scaled();
@@ -43,6 +44,7 @@ private:
 	static	BitmapHolderRef	sIconArrowLeft22Scaled;
 	static	BitmapHolderRef	sIconArrowRight22Scaled;
 	static	BitmapHolderRef	sIconHTMLPackage16Scaled;
+	static	BitmapHolderRef	sNative16Scaled;
 
 };
 
