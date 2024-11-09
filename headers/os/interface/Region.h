@@ -29,13 +29,20 @@ public:
 								BRegion();
 								BRegion(const BRegion& other);
 								BRegion(const BRect rect);
+#if defined(__cplusplus) && __cplusplus >= 201103L
+								BRegion(BRegion&& other);
+#endif
 	virtual						~BRegion();
 
 			BRegion&			operator=(const BRegion& other);
+#if defined(__cplusplus) && __cplusplus >= 201103L
+			BRegion&			operator=(BRegion&& other);
+#endif
 			bool				operator==(const BRegion& other) const;
 
 			void				Set(BRect rect);
 			void				Set(clipping_rect clipping);
+			void				MoveFrom(BRegion& other);
 
 			BRect				Frame() const;
 			clipping_rect		FrameInt() const;

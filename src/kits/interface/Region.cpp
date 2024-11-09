@@ -59,6 +59,19 @@ BRegion::BRegion(const BRect rect)
 }
 
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
+BRegion::BRegion(BRegion&& other)
+	:
+	fCount(0),
+	fDataSize(0),
+	fBounds((clipping_rect){ 0, 0, 0, 0 }),
+	fData(NULL)
+{
+	MoveFrom(other);
+}
+#endif
+
+
 // NOTE: private constructor
 BRegion::BRegion(const clipping_rect& clipping)
 	:
@@ -95,6 +108,17 @@ BRegion::operator=(const BRegion& other)
 }
 
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
+BRegion&
+BRegion::operator=(BRegion&& other)
+{
+	MoveFrom(other);
+
+	return *this;
+}
+#endif
+
+
 bool
 BRegion::operator==(const BRegion& other) const
 {
@@ -125,6 +149,30 @@ BRegion::Set(clipping_rect clipping)
 		fData[0] = fBounds = _ConvertToInternal(clipping);
 	} else
 		MakeEmpty();
+}
+
+
+void
+BRegion::MoveFrom(BRegion& other)
+{
+	if (other.CountRects() <= 0) {
+		MakeEmpty();
+		return;
+	}
+	if (other.CountRects() == 1) {
+		Set(other.FrameInt());
+		other.MakeEmpty();
+		return;
+	}
+	fCount = other.fCount;
+	fDataSize = other.fDataSize;
+	fBounds = other.fBounds;
+	fData = other.fData;
+
+	other.fCount = 0;
+	other.fDataSize = 0;
+	other.fBounds = (clipping_rect){ 0, 0, 0, 0 };
+	other.fData = NULL;
 }
 
 
