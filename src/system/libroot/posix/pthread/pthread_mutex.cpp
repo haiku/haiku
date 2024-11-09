@@ -138,12 +138,9 @@ pthread_mutex_clocklock(pthread_mutex_t* mutex, clockid_t clock_id,
 	}
 
 	status_t status = __pthread_mutex_lock(mutex, flags, timeout);
-	if (status != B_OK && invalidTime) {
-		// The timespec was not valid and the mutex could not be locked
-		// immediately.
-		return EINVAL;
-	}
 
+	if (status != B_OK && invalidTime)
+		return EINVAL;
 	return status;
 }
 

@@ -355,9 +355,10 @@ int
 pthread_rwlock_clockrdlock(pthread_rwlock_t* lock, clockid_t clock_id,
 	const struct timespec *abstime)
 {
-	bigtime_t timeout;
+	bigtime_t timeout = 0;
+	bool invalidTime = false;
 	if (abstime == NULL || !timespec_to_bigtime(*abstime, timeout))
-		return EINVAL;
+		invalidTime = true;
 
 	uint32 flags = 0;
 	if (timeout >= 0) {
@@ -379,7 +380,9 @@ pthread_rwlock_clockrdlock(pthread_rwlock_t* lock, clockid_t clock_id,
 	else
 		error = ((LocalRWLock*)lock)->ReadLock(flags, timeout);
 
-	return error == B_TIMED_OUT ? EBUSY : error;
+	if (error != B_OK && invalidTime)
+		return EINVAL;
+	return (error == B_TIMED_OUT) ? EBUSY : error;
 }
 
 
@@ -418,9 +421,10 @@ int
 pthread_rwlock_clockwrlock(pthread_rwlock_t* lock, clockid_t clock_id,
 	const struct timespec *abstime)
 {
-	bigtime_t timeout;
+	bigtime_t timeout = 0;
+	bool invalidTime = false;
 	if (abstime == NULL || !timespec_to_bigtime(*abstime, timeout))
-		return EINVAL;
+		invalidTime = true;
 
 	uint32 flags = 0;
 	if (timeout >= 0) {
@@ -442,7 +446,9 @@ pthread_rwlock_clockwrlock(pthread_rwlock_t* lock, clockid_t clock_id,
 	else
 		error = ((LocalRWLock*)lock)->WriteLock(flags, timeout);
 
-	return error == B_TIMED_OUT ? EBUSY : error;
+	if (error != B_OK && invalidTime)
+		return EINVAL;
+	return (error == B_TIMED_OUT) ? EBUSY : error;
 }
 
 

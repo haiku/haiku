@@ -35,12 +35,11 @@ sigtimedwait(const sigset_t* set, siginfo_t* info,
 	// translate the timeout
 	uint32 flags;
 	bigtime_t timeoutMicros = 0;
+	bool invalidTime = false;
 	if (timeout != NULL) {
 		if (!timespec_to_bigtime(*timeout, timeoutMicros))
-			RETURN_AND_SET_ERRNO(EINVAL);
-
-		timeoutMicros += system_time();
-		flags = B_ABSOLUTE_TIMEOUT;
+			invalidTime = true;
+		flags = B_RELATIVE_TIMEOUT;
 	} else {
 		flags = 0;
 		timeoutMicros = 0;
@@ -49,6 +48,9 @@ sigtimedwait(const sigset_t* set, siginfo_t* info,
 	status_t error = _kern_sigwait(set, info, flags, timeoutMicros);
 
 	pthread_testcancel();
+
+	if (error != B_OK && invalidTime)
+		error = EINVAL;
 
 	if (error != B_OK)
 		RETURN_AND_SET_ERRNO(error);
