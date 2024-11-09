@@ -239,7 +239,7 @@ label_to_fat(char* label)
 
 /*! Convert a volume label from the format stored on disk into a normal string.
 	@param name A character array of length 11 or a C string of size 12.
-	@post Name is null-teriminated after the last non-space character.
+	@post Name is null-terminated after the last non-space character, and converted to lower case.
 */
 void
 label_from_fat(char* name)
@@ -250,6 +250,11 @@ label_from_fat(char* name)
 			break;
 	}
 	name[i + 1] = 0;
+
+	for (; i >= 0; i--) {
+		if (name[i] >= 'A' && name[i] <= 'Z')
+			name[i] += 'a' - 'A';
+	}
 }
 
 
