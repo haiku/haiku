@@ -155,7 +155,8 @@ filter_result PadBlocker::Filter(BMessage *message, BList *outList)
 	{
 		case B_KEY_UP: case B_KEY_DOWN:
 		{
-			_lastKeyUp = system_time();	//update timestamp
+			if (!message->HasInt32("be:key_repeat"))
+				_lastKeyUp = system_time();	//update timestamp
 			break;
 		}
 
