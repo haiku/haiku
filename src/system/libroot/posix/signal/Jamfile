@@ -32,7 +32,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			sigset.cpp
 			sigset_accessors.cpp
 			sigsuspend.cpp
-			sigtimedwait.cpp
 			sigwait.cpp
 			sigwaitinfo.cpp
 			strsignal.cpp
