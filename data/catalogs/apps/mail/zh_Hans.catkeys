@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	4073987023
+1	english	x-vnd.Be-MAIL	262401742
 Set to Saved	Mail		设置为保存
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		您的正文中包含的 %ld 属于无法识别的编码类型。 可能改变编码类型之后会更好的运行？ 点击“发送”继续(系统将会选择一种合适的类型来代替无法编码的类型)，或者点击“取消”，进行修复。
 Text wrapping:	Mail		文本加密：
@@ -38,7 +38,9 @@ Previous message	Mail		上一个
 (Address unavailable)	Mail		（地址不可用）
 Mail	System name		电子邮件
 Copy link location	Mail		复制链接
+Add attachment…	Mail		添加附件…
 Next	Mail		下一个
+Attachments:	Mail		附件：
 Show icons only	Mail		只显示图标
 Subject:	Mail		主题：
 OK	Mail		确定
@@ -55,6 +57,7 @@ Reply to sender	Mail		回复发件人
 \\n - Newline	Mail		\\n - 插入空行
 Copy	Mail		复制
 Add signature	Mail		添加署名
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	附件: %name% (格式: %type%)
 %n - Full name	Mail		%n - 全名
 Signature	Mail		样式
 Use default account	Mail		使用默认账户
@@ -104,8 +107,10 @@ Start now	Mail		开始
 (Name unavailable)	Mail		（名称不可用）
 Move to trash	Mail		移动到垃圾箱
 <none>	Mail		<无>
+Mail settings	Mail		邮件设置
 %d - Date	Mail		%d - 日期
 Check spelling	Mail		检查拼写
+Status:	Mail		状态：
 Redo	Mail		重复
 Leave as '%s'	Mail		标记为 '%s'
 Print…	Mail		打印中…

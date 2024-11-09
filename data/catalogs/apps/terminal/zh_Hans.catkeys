@@ -1,8 +1,9 @@
-1	english	x-vnd.Haiku-Terminal	3313539377
+1	english	x-vnd.Haiku-Terminal	686383766
 Close other tabs	Terminal TermWindow		关闭其他标签
 Insert path	Terminal TermView		插入路径  
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
 Text encoding	Terminal TermWindow		文字编码
+Colors	Terminal ThemeWindow		颜色
 OK	Terminal SetTitleWindow		确定
 Edit	Terminal TermWindow		编辑
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		-h, --help, 显示帮助页面\n-t, --title, 设置窗口标题\n-f, --fullscreen, 启动全屏模式\n-w, --working-directory, 设置初始工作目录\n
@@ -100,6 +101,7 @@ ANSI bright red color	Terminal ThemeView		ANSI 亮红
 Use left Option as Meta key	Terminal AppearancePrefView		将左 Option 键设为 Meta 键
 Find	Terminal FindWindow		查找
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了当前标签标题。可以使用下述的\n占位符：\n
+Save to file…	Terminal ThemeWindow		保存至文件…
 Font:	Terminal AppearancePrefView		字体：
 Paste	Terminal TermWindow		粘贴
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式指定窗口标题。可以使用如下\n占位符：
@@ -107,8 +109,10 @@ ANSI bright magenta color	Terminal ThemeView		ANSI 亮洋红色
 Copy here	Terminal TermView		复制到此  
 Use default shell	Terminal Shell		使用默认shell
 red	Terminal ThemeView		红
+white	Terminal ThemeView		白色
 Open link	Terminal TermView		打开链接
 Text	Terminal ThemeView		文本
+ANSI bright yellow color	Terminal ThemeView		ANSI 亮黄色
 Not found.	Terminal TermWindow		未找到。  
 ANSI black color	Terminal ThemeView		ANSI 黑色
 Find…	Terminal TermWindow		查找…

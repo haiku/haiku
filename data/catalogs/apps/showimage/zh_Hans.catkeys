@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	575555985
+1	english	x-vnd.Haiku-ShowImage	2453396430
 ShowImage	System name		图像查看器
 Page setup…	Menus		页面启动...
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		文档'%s' (page %d) 已经改变。是否关闭文档？
@@ -25,10 +25,12 @@ Flip top to bottom	Menus		自上向下翻转
 Zoom in	Menus		放大
 Last page	Menus		最后一页
 Cancel	ClosePrompt		取消
+Attributes	Menus		属性
 High-quality zooming	Menus		优质缩放
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		文档 '%s' 已经改变。是否关闭文档?
 Close	Menus		关闭
 Selection mode	Menus		选择模式
+Reset rating	Menus		重置评级
 DPI:	PrintOptionsWindow		像素:
 Fit image to page	PrintOptionsWindow		图像适合页面大小
 Show tool bar	Menus		显示工具栏
@@ -37,6 +39,7 @@ OK	SaveToFile		确认
 Print…	Menus		打印...
 The file '%s' could not be written.	SaveToFile		无法写文件'%s'
 Quit	Menus		退出
+Get info	Menus		获取信息
 Rating	Menus		评级
 Close document	ClosePrompt		关闭文档
 Stretch to window	Menus		伸展到窗口
@@ -44,6 +47,7 @@ Job setup	PrintOptionsWindow		安装
 Clear selection	Menus		清空选中
 Rotate clockwise	Menus		顺时针旋转
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		无法打开图像！可能文件或者图像解码器不存在。
+Open with…	Menus		打开方式…
 Rotate counterclockwise	Menus		逆时针旋转
 Previous page	Menus		上一页
 Fit to window	Menus		适合窗口

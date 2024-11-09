@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-LaunchBox	1530497419
+1	english	x-vnd.Haiku-LaunchBox	1878360293
 Set description…	LaunchBox		设置描述...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		确定关闭该面板？\n（该面板将不被保存。）
 OK	LaunchBox		确定
@@ -13,6 +13,7 @@ Show window border	LaunchBox		显示窗口边界
 Failed to launch 'something', error in Pad data.	LaunchBox		启动“某个应用”失败，Pad 数据出错。
 LaunchBox	System name		启动栏
 Auto-raise	LaunchBox		自动提升
+%ld × %ld	LaunchBox	The '×' is the Unicode multiplication sign U+00D7	%ld × %ld
 Icon size	LaunchBox		图标尺寸
 Open containing folder	LaunchBox		打开所在文件夹
 Add button here	LaunchBox		在此处添加按钮

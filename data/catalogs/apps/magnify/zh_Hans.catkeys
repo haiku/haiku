@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Magnify	3730034159
+1	english	x-vnd.Haiku-Magnify	1278916508
   size must be > 4 and a multiple of 4	Console		  大小必须 > 4 或者是 4 的倍数
 Decrease pixel size	Magnify-Main		缩小像素尺寸
 no clip msg	In console, when clipboard is empty after clicking Copy image		无剪切消息
@@ -15,6 +15,8 @@ Increase window size	Magnify-Main		放大窗口尺寸
 Save image	Magnify-Main		保存图像
 Show grid	Magnify-Main		显示网格
 Magnify	System name		放大镜
+height	Magnify-Main		高
+width	Magnify-Main		宽
 Info	Magnify-Main		信息
 Show info	Magnify-Main		显示信息
 Make square	Magnify-Main		创建方形

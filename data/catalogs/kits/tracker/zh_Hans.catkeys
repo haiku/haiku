@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	3876005449
+1	english	x-vnd.Haiku-libtracker	636899528
 Created	ContainerWindow		创建
 Icon	AttributesView		图标
 Open and make preferred	OpenWithWindow		打开并创建首选
@@ -9,6 +9,7 @@ Or	FindPanel		或者
 MIME Description	AttributesView		MIME 描述
 Query	FindPanel		查询
 before	FindPanel		之前
+New folder%d	FSUtils		新建目录%d
 Volume icons	TrackerSettingsWindow		卷图标
 Ignore case	SelectionWindow		忽略事件
 Save query:	FindPanel		保存查询:
@@ -306,6 +307,7 @@ Select all	ContainerWindow		全选
 apps	B_APPS_DIRECTORY		应用
 Error calculating folder size.	InfoWindow		文件夹大小计算错误。
 Delete	FSUtils		删除
+Duplicate	FilePanelPriv		副本
 Edit name	ContainerWindow		编辑名称
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
 ASCII Text	AttributesView		ASCII文本
@@ -408,7 +410,7 @@ Paste	ContainerWindow		粘贴
 An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		一个条目名称 \"%name\"已经在这个文件夹中存在，可能包括 \nitems 用同样的名称，您愿意用在该文件夹包中含由 %verb替代它吗?
 Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"，使用软件 \"%app\"（缺失符号： %symbol）。\n
-New folder	ContainerWindow		新建文件夹
+New folder	ContainerWindow		新建目录
 Name	OpenWithWindow		名称
 Get info	Tracker	Tracker's 'Get info' panel [ALT+I]	获取信息
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		试图替换 \"%name\" 失败。该项目可能为空或者处于忙碌状态。
@@ -511,7 +513,7 @@ Media parameter	AttributesView		媒体参数
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		如果修改主目录，%osName 可能无法正常工作！\n\n您确定这么做吗？\n\n如果您仍要修改主目录，按下 Shift 按键并点击 \"我知道我正在做什么\"。
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
 Invert selection	VirtualDirectoryWindow		反选
-New folder	FilePanelPriv		新建文件夹
+New folder	FilePanelPriv		新建目录
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# items}}
 Name	AttributesView		名称
 Invalid bracket range.	libtracker		无效的等级范围。

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	2577505948
+1	english	x-vnd.Haiku-MediaPlayer	390961765
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		移除条目到垃圾桶
 Close	MediaPlayer-PlaylistWindow		关闭
 Volume of background clips	MediaPlayer-SettingsWindow		背景剪辑音量
@@ -126,6 +126,7 @@ Full screen	MediaPlayer-Main		全屏
 OK	MediaPlayer-NetworkStream		确定
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部错误（加锁失败）。保存播放列表失败。
 100% scale	MediaPlayer-Main		100% 缩放
+New player	MediaPlayer-Main		新播放器
 <nothing to redo>	MediaPlayer-PlaylistWindow		<无需重做>
 Bad URL	MediaPlayer-NetworkStream		URL 错误
 Save	MediaPlayer-Main		保存

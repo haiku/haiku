@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PowerStatus	1876447050
+1	english	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		在窗口中运行
 Extended battery info	PowerStatus		附加电池信息
 Show status icon	PowerStatus		显示状态图标
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		型号：
 Battery unused	PowerStatus		未使用电池
 Type: 	PowerStatus		输入：
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		您可以在窗口中运行 PowerStatus 或将其安装到桌面栏。
+Damaged or missing battery	PowerStatus		电池损坏或缺失
  mAh	PowerStatus		 毫安时
 Battery discharging	PowerStatus		电池供电
 Design voltage: 	PowerStatus		设计电压：

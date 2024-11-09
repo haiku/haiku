@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PowerStatus	1876447050
+1	romanian	x-vnd.Haiku-PowerStatus	1104524835
 Run in window	PowerStatus		Rulează în fereastră
 Extended battery info	PowerStatus		Informații extinse despre baterie
 Show status icon	PowerStatus		Arată pictograma de stare
@@ -17,6 +17,7 @@ Model number: 	PowerStatus		Număr de model:
 Battery unused	PowerStatus		Baterie neutilizată
 Type: 	PowerStatus		Tip: 
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți rula PowerStatus într-o fereastră sau îl puteți instala în deskbar.
+Damaged or missing battery	PowerStatus		Baterie lipsă sau deteriorată
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Se descarcă bateria
 Design voltage: 	PowerStatus		Voltajul modelului: 
