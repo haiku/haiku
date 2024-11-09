@@ -50,6 +50,9 @@ class BShape : public BArchivable {
 public:
 								BShape();
 								BShape(const BShape& other);
+#if defined(__cplusplus) && __cplusplus >= 201103L
+								BShape(BShape&& other);
+#endif
 								BShape(BMessage* archive);
 	virtual						~BShape();
 
@@ -58,11 +61,15 @@ public:
 									bool deep = true) const;
 
 			BShape&				operator=(const BShape& other);
+#if defined(__cplusplus) && __cplusplus >= 201103L
+			BShape&				operator=(BShape&& other);
+#endif
 
 			bool				operator==(const BShape& other) const;
 			bool				operator!=(const BShape& other) const;
 
 			void				Clear();
+			void				MoveFrom(BShape& other);
 			BRect				Bounds() const;
 			BPoint				CurrentPosition() const;
 

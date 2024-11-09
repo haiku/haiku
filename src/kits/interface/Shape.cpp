@@ -143,6 +143,15 @@ BShape::BShape(const BShape& other)
 }
 
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
+BShape::BShape(BShape&& other)
+{
+	InitData();
+	MoveFrom(other);
+}
+#endif
+
+
 BShape::BShape(BMessage* archive)
 	:
 	BArchivable(archive)
@@ -250,6 +259,17 @@ BShape::operator=(const BShape& other)
 }
 
 
+#if defined(__cplusplus) && __cplusplus >= 201103L
+BShape&
+BShape::operator=(BShape&& other)
+{
+	MoveFrom(other);
+
+	return *this;
+}
+#endif
+
+
 bool
 BShape::operator==(const BShape& other) const
 {
@@ -300,6 +320,20 @@ BShape::Clear()
 
 	fState = 0;
 	fBuildingOp = 0;
+}
+
+
+void
+BShape::MoveFrom(BShape& other)
+{
+	fState = other.fState;
+	fBuildingOp = other.fBuildingOp;
+
+	shape_data* data = (shape_data*)fPrivateData;
+	fPrivateData = other.fPrivateData;
+	other.fPrivateData = data;
+
+	other.Clear();
 }
 
 
