@@ -174,6 +174,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fIsVesa(false),
 	fBootWorkspaceApplied(false),
+	fUserSelectedColorSpace(NULL),
 	fOtherRefresh(NULL),
 	fScreenMode(this),
 	fUndoScreenMode(this),
