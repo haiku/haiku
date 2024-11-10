@@ -29,6 +29,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_main.o :
 			assert.cpp
 			cat.cpp
+			devctl.c
 			dlfcn.c
 			dirent.cpp
 			errno.c
