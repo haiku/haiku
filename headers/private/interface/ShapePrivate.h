@@ -9,6 +9,7 @@
 #ifndef SHAPE_PRIVATE_H
 #define SHAPE_PRIVATE_H
 
+#include <Shape.h>
 #include <Point.h>
 #include <Rect.h>
 #include <Referenceable.h>
@@ -94,6 +95,22 @@ public:
 
 		return bounds;
 	}
+};
+
+
+class BShape::Private {
+public:
+								Private(BShape& shape) : fShape(shape) {}
+
+			void				GetData(int32* opCount, int32* ptCount,
+									uint32** opList, BPoint** ptList);
+			void				SetData(int32 opCount, int32 ptCount,
+									const uint32* opList,
+									const BPoint* ptList);
+			shape_data*			PrivateData() {return (shape_data*)fShape.fPrivateData;}
+
+private:
+			BShape&				fShape;
 };
 
 

@@ -87,6 +87,8 @@ public:
 									const BPoint& point);
 			status_t			Close();
 
+	class Private;
+
 private:
 	// FBC padding
 	virtual	status_t			Perform(perform_code code, void* data);
@@ -97,17 +99,9 @@ private:
 	virtual	void				_ReservedShape4();
 
 private:
+	friend class Private;
 	friend class BShapeIterator;
-	friend class BView;
-	friend class BFont;
-	friend class BPrivate::PicturePlayer;
-	friend class BPrivate::ServerLink;
 
-			void				GetData(int32* opCount, int32* ptCount,
-									uint32** opList, BPoint** ptList);
-			void				SetData(int32 opCount, int32 ptCount,
-									const uint32* opList,
-									const BPoint* ptList);
 			void				InitData();
 			bool				AllocatePts(int32 count);
 			bool				AllocateOps(int32 count);

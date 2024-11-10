@@ -25,6 +25,7 @@
 #include <GradientConic.h>
 #include <Region.h>
 #include <Shape.h>
+#include <ShapePrivate.h>
 #include <StackOrHeapArray.h>
 
 #include <ServerProtocol.h>
@@ -105,7 +106,7 @@ ServerLink::ReadShape(BShape* shape)
 	if (ptCount > 0)
 		fReceiver->Read(ptList, ptCount * sizeof(BPoint));
 
-	shape->SetData(opCount, ptCount, opList, ptList);
+	BShape::Private(*shape).SetData(opCount, ptCount, opList, ptList);
 	return B_OK;
 }
 
@@ -117,7 +118,7 @@ ServerLink::AttachShape(BShape& shape)
 	uint32* opList;
 	BPoint* ptList;
 
-	shape.GetData(&opCount, &ptCount, &opList, &ptList);
+	BShape::Private(shape).GetData(&opCount, &ptCount, &opList, &ptList);
 
 	fSender->Attach(&opCount, sizeof(int32));
 	fSender->Attach(&ptCount, sizeof(int32));

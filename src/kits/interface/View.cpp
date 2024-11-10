@@ -4067,7 +4067,7 @@ BView::StrokeShape(BShape* shape, ::pattern pattern)
 	if (shape == NULL || fOwner == NULL)
 		return;
 
-	shape_data* sd = (shape_data*)shape->fPrivateData;
+	shape_data* sd = BShape::Private(*shape).PrivateData();
 	if (sd->opCount == 0 || sd->ptCount == 0)
 		return;
 
@@ -4088,7 +4088,7 @@ BView::FillShape(BShape* shape, ::pattern pattern)
 	if (shape == NULL || fOwner == NULL)
 		return;
 
-	shape_data* sd = (shape_data*)(shape->fPrivateData);
+	shape_data* sd = BShape::Private(*shape).PrivateData();
 	if (sd->opCount == 0 || sd->ptCount == 0)
 		return;
 
@@ -4109,7 +4109,7 @@ BView::FillShape(BShape* shape, const BGradient& gradient)
 	if (shape == NULL || fOwner == NULL)
 		return;
 
-	shape_data* sd = (shape_data*)(shape->fPrivateData);
+	shape_data* sd = BShape::Private(*shape).PrivateData();
 	if (sd->opCount == 0 || sd->ptCount == 0)
 		return;
 
@@ -5977,7 +5977,7 @@ BView::_ClipToShape(BShape* shape, bool inverse)
 	if (shape == NULL)
 		return;
 
-	shape_data* sd = (shape_data*)shape->fPrivateData;
+	shape_data* sd = BShape::Private(*shape).PrivateData();
 	if (sd->opCount == 0 || sd->ptCount == 0)
 		return;
 

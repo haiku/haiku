@@ -22,6 +22,7 @@
 #include <Gradient.h>
 #include <PictureProtocol.h>
 #include <Shape.h>
+#include <ShapePrivate.h>
 
 #include <AutoDeleter.h>
 #include <StackOrHeapArray.h>
@@ -1062,7 +1063,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 				// TODO: remove BShape data copying
 				BShape shape;
-				shape.SetData(*opCount, *pointCount, opList, pointList);
+				BShape::Private(shape).SetData(*opCount, *pointCount, opList, pointList);
 
 				callbacks.draw_shape(userData, shape,
 					header->op == B_PIC_FILL_SHAPE);
@@ -1163,7 +1164,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 				// TODO: remove BShape data copying
 				BShape shape;
-				shape.SetData(*opCount, *pointCount, opList, pointList);
+				BShape::Private(shape).SetData(*opCount, *pointCount, opList, pointList);
 
 				callbacks.draw_shape_gradient(userData, shape, *gradient,
 					header->op == B_PIC_FILL_SHAPE_GRADIENT);
