@@ -277,6 +277,7 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 			}
 
 			message->AddInt64("when", movements.timestamp);
+			message->AddInt32("be:device_subtype", B_TABLET_DEVICE_SUBTYPE);
 			message->AddInt32("buttons", movements.buttons);
 			message->AddFloat("x", movements.xpos);
 			message->AddFloat("y", movements.ypos);
@@ -287,6 +288,7 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 			message = new BMessage(B_MOUSE_MOVED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
+				message->AddInt32("be:device_subtype", B_TABLET_DEVICE_SUBTYPE);
 				message->AddInt32("buttons", movements.buttons);
 				message->AddFloat("x", movements.xpos);
 				message->AddFloat("y", movements.ypos);
@@ -307,6 +309,7 @@ EasyPenInputDevice::DeviceWatcher(void *arg)
 			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
+				message->AddInt32("be:device_subtype", B_TABLET_DEVICE_SUBTYPE);
 				message->AddFloat("be:wheel_delta_x", movements.wheel_xdelta);
 				message->AddFloat("be:wheel_delta_y", movements.wheel_ydelta);
 

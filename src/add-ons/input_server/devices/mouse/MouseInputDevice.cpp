@@ -517,7 +517,11 @@ MouseDevice::_ControlThread()
 				&& message->AddFloat("be:wheel_delta_x",
 					movements.wheel_xdelta) == B_OK
 				&& message->AddFloat("be:wheel_delta_y",
-					movements.wheel_ydelta) == B_OK)
+					movements.wheel_ydelta) == B_OK
+				&& message->AddInt32("be:device_subtype",
+					fIsTouchpad
+						? B_TOUCHPAD_DEVICE_SUBTYPE
+						: B_MOUSE_DEVICE_SUBTYPE) == B_OK)
 				fTarget.EnqueueMessage(message);
 			else
 				delete message;
@@ -637,7 +641,9 @@ MouseDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 	if (message->AddInt64("when", when) < B_OK
 		|| message->AddInt32("buttons", buttons) < B_OK
 		|| message->AddInt32("x", deltaX) < B_OK
-		|| message->AddInt32("y", deltaY) < B_OK) {
+		|| message->AddInt32("y", deltaY) < B_OK
+		|| message->AddInt32("be:device_subtype",
+			fIsTouchpad ? B_TOUCHPAD_DEVICE_SUBTYPE : B_MOUSE_DEVICE_SUBTYPE) < B_OK) {
 		delete message;
 		return NULL;
 	}

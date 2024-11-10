@@ -1681,12 +1681,23 @@ InputServer::_SanitizeEvents(EventList& events)
 	for (int32 index = 0; BMessage* event = (BMessage*)events.ItemAt(index);
 			index++) {
 		switch (event->what) {
+			case B_MOUSE_WHEEL_CHANGED:
+			{
+				int32 device;
+				if (event->FindInt32("be:device_subtype", &device) != B_OK)
+					event->AddInt32("be:device_subtype", B_UNKNOWN_DEVICE_SUBTYPE);
+
+				break;
+			}
 	   		case B_MOUSE_MOVED:
 	   		case B_MOUSE_DOWN:
 	   		{
-	   			int32 buttons;
+				int32 buttons, device;
 	   			if (event->FindInt32("buttons", &buttons) != B_OK)
 	   				event->AddInt32("buttons", 0);
+
+				if (event->FindInt32("be:device_subtype", &device) != B_OK)
+					event->AddInt32("be:device_subtype", B_UNKNOWN_DEVICE_SUBTYPE);
 
 	   			// supposed to fall through
 	   		}
