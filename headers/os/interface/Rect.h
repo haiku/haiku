@@ -26,6 +26,7 @@ public:
 								BRect(BPoint leftTop, BPoint rightBottom);
 								BRect(BPoint leftTop, BSize size);
 								BRect(float side);
+								BRect(float width, float height);
 
 			BRect&				operator=(const BRect& other);
 			void				Set(float left, float top, float right,
@@ -178,6 +179,17 @@ BRect::BRect(float side)
 	top(0),
 	right(side - 1),
 	bottom(side - 1)
+{
+}
+
+
+inline
+BRect::BRect(float width, float height)
+	:
+	left(0),
+	top(0),
+	right(width),
+	bottom(height)
 {
 }
 
