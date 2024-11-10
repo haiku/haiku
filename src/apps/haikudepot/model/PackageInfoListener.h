@@ -18,12 +18,10 @@ enum {
 	PKG_CHANGED_LOCAL_INFO					= 1 << 3,
 		// ^ Covers state, download and size.
 	PKG_CHANGED_ICON						= 1 << 4,
-	PKG_CHANGED_CHANGELOG					= 1 << 5,
-	PKG_CHANGED_CLASSIFICATION				= 1 << 6,
+		// ^ Handled slightly differently.
+	PKG_CHANGED_CLASSIFICATION				= 1 << 5,
 		// ^ This covers categories, prominence and is native desktop
-	PKG_CHANGED_DEPOT						= 1 << 8,
-	PKG_CHANGED_VERSION						= 1 << 9,
-	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 10
+	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 6
 	// ...
 };
 

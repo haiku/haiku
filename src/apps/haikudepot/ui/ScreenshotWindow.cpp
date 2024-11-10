@@ -258,12 +258,14 @@ ScreenshotWindow::_DownloadThread()
 	if (!fPackage.IsSet())
 		HDINFO("package not set");
 	else {
-		if (fPackage->CountScreenshotInfos() == 0)
-    		HDINFO("package has no screenshots");
-    	else {
-    		int32 index = atomic_get(&fCurrentScreenshotIndex);
-    		info = fPackage->ScreenshotInfoAtIndex(index);
-    	}
+		PackageScreenshotInfoRef screenshotInfo = fPackage->ScreenshotInfo();
+
+		if (!screenshotInfo.IsSet() || screenshotInfo->Count() == 0) {
+			HDINFO("package has no screenshots");
+		} else {
+			int32 index = atomic_get(&fCurrentScreenshotIndex);
+			info = screenshotInfo->ScreenshotAtIndex(index);
+		}
 	}
 
 	Unlock();
@@ -306,12 +308,18 @@ ScreenshotWindow::_MaxWidthAndHeightOfAllScreenshots()
 
 	// Find out dimensions of the largest screenshot of this package
 	if (fPackage.IsSet()) {
-		int count = fPackage->CountScreenshotInfos();
+		PackageScreenshotInfoRef screenshotInfo = fPackage->ScreenshotInfo();
+		int count = 0;
+
+		if (screenshotInfo.IsSet())
+			count = screenshotInfo->Count();
+
 		for(int32 i = 0; i < count; i++) {
-			const ScreenshotInfoRef& info = fPackage->ScreenshotInfoAtIndex(i);
-			if (info.Get() != NULL) {
-				float w = (float) info->Width();
-				float h = (float) info->Height();
+			const ScreenshotInfoRef& screenshot = screenshotInfo->ScreenshotAtIndex(i);
+
+			if (screenshot.IsSet()) {
+				float w = static_cast<float>(screenshot->Width());
+				float h = static_cast<float>(screenshot->Height());
 				if (w > size.Width())
 					size.SetWidth(w);
 				if (h > size.Height())
@@ -344,7 +352,14 @@ ScreenshotWindow::_ResizeToFitAndCenter()
 void
 ScreenshotWindow::_UpdateToolBar()
 {
-	const int32 numScreenshots = fPackage->CountScreenshotInfos();
+	int32 numScreenshots = 0;
+
+	if (fPackage.IsSet()) {
+		PackageScreenshotInfoRef screenshotInfo = fPackage->ScreenshotInfo();
+		if (screenshotInfo.IsSet())
+			numScreenshots = screenshotInfo->Count();
+	}
+
 	const int32 currentIndex = atomic_get(&fCurrentScreenshotIndex);
 
 	fToolBar->SetActionEnabled(MSG_PREVIOUS_SCREENSHOT,

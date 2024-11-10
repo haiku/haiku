@@ -183,6 +183,7 @@ local applicationSources =
 	PackageInfo.cpp
 	PackageLocalInfo.cpp
 	PackageLocalizedText.cpp
+	PackageScreenshotInfo.cpp
 	PublisherInfo.cpp
 	ScreenshotInfo.cpp
 	UserInfo.cpp

@@ -1352,8 +1352,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 			if ((changes & PKG_CHANGED_LOCALIZED_TEXT) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0
 				|| (changes & PKG_CHANGED_RATINGS) != 0
-				|| (changes & PKG_CHANGED_LOCAL_INFO) != 0
-				|| (changes & PKG_CHANGED_CHANGELOG) != 0) {
+				|| (changes & PKG_CHANGED_LOCAL_INFO) != 0) {
 				fPagesView->SetPackage(package, false);
 			}
 
@@ -1460,14 +1459,22 @@ PackageInfoView::_ScreenshotThumbCoordinate(const PackageInfoRef& package)
 {
 	if (!package.IsSet())
 		return ScreenshotCoordinate();
-	if (package->CountScreenshotInfos() == 0)
+
+	PackageScreenshotInfoRef screenshotInfo = package->ScreenshotInfo();
+
+	if (!screenshotInfo.IsSet() || screenshotInfo->Count() == 0)
+		return ScreenshotCoordinate();
+
+	ScreenshotInfoRef screenshot = screenshotInfo->ScreenshotAtIndex(0);
+
+	if (!screenshot.IsSet())
 		return ScreenshotCoordinate();
 
 	uint32 screenshotSizeScaled
 		= MAX(static_cast<uint32>(BControlLook::ComposeIconSize(kScreenshotSize).Width()),
 			MAX_IMAGE_SIZE);
 
-	return ScreenshotCoordinate(package->ScreenshotInfoAtIndex(0)->Code(), screenshotSizeScaled + 1,
+	return ScreenshotCoordinate(screenshot->Code(), screenshotSizeScaled + 1,
 		screenshotSizeScaled + 1);
 }
 

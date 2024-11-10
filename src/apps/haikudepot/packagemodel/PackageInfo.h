@@ -7,8 +7,6 @@
 #define PACKAGE_INFO_H
 
 
-#include <vector>
-
 #include <Referenceable.h>
 #include <package/PackageInfo.h>
 
@@ -18,6 +16,7 @@
 #include "PackageInfoListener.h"
 #include "PackageLocalInfo.h"
 #include "PackageLocalizedText.h"
+#include "PackageScreenshotInfo.h"
 #include "PublisherInfo.h"
 #include "ScreenshotInfo.h"
 #include "UserRatingInfo.h"
@@ -36,6 +35,8 @@ public:
 			PackageInfo&		operator=(const PackageInfo& other);
 			bool				operator==(const PackageInfo& other) const;
 			bool				operator!=(const PackageInfo& other) const;
+
+			uint32				DiffMask(const PackageInfo& other) const;
 
 			const BString&		Name() const
 									{ return fName; }
@@ -57,7 +58,7 @@ public:
 									PackageClassificationInfoRef value);
 			PackageClassificationInfoRef
 								PackageClassificationInfo() const
-									{ return fPackageClassificationInfo; }
+									{ return fClassificationInfo; }
 
 			UserRatingInfoRef	UserRatingInfo() const;
 			void				SetUserRatingInfo(UserRatingInfoRef userRatingInfo);
@@ -65,11 +66,10 @@ public:
 			PackageLocalInfoRef	LocalInfo() const;
 			void				SetLocalInfo(PackageLocalInfoRef& localInfo);
 
-			void				ClearScreenshotInfos();
-			void				AddScreenshotInfo(
-									const ScreenshotInfoRef& info);
-			int32				CountScreenshotInfos() const;
-			ScreenshotInfoRef	ScreenshotInfoAtIndex(int32 index) const;
+			PackageScreenshotInfoRef
+								ScreenshotInfo() const
+									{ return fScreenshotInfo; }
+			void				SetScreenshotInfo(PackageScreenshotInfoRef value);
 
 			void				SetVersionCreateTimestamp(uint64 value);
 			uint64				VersionCreateTimestamp() const
@@ -95,26 +95,27 @@ private:
 private:
 			BString				fName;
 			BPackageVersion		fVersion;
+				// milliseconds since epoch
+			uint64				fVersionCreateTimestamp;
 			PublisherInfo		fPublisher;
+			BString				fArchitecture;
+			BString				fDepotName;
+
 			PackageLocalizedTextRef
 								fLocalizedText;
 			PackageClassificationInfoRef
-								fPackageClassificationInfo;
-			std::vector<ScreenshotInfoRef>
-								fScreenshotInfos;
+								fClassificationInfo;
+			PackageScreenshotInfoRef
+								fScreenshotInfo;
 			UserRatingInfoRef	fUserRatingInfo;
 			PackageLocalInfoRef	fLocalInfo;
 
 			std::vector<PackageInfoListenerRef>
 								fListeners;
-			BString				fArchitecture;
-			BString				fDepotName;
-
 			bool				fIsCollatingChanges;
 			uint32				fCollatedChanges;
 
-			uint64				fVersionCreateTimestamp;
-				// milliseconds since epoch
+
 };
 
 

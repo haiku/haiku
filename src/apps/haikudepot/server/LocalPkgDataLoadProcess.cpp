@@ -235,7 +235,8 @@ LocalPkgDataLoadProcess::RunInternal()
 				HDDEBUG("pkg [%s] repository [%s] not recognized --> ignored",
 					modelInfo->Name().String(), repositoryName.String());
 			} else {
-				(*it)->AddPackage(modelInfo);
+				DepotInfoRef depot = *it;
+				depot->AddPackage(modelInfo);
 				HDTRACE("pkg [%s] assigned to [%s]",
 					modelInfo->Name().String(), repositoryName.String());
 			}

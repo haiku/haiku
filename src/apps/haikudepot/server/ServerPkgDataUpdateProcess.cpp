@@ -51,7 +51,7 @@ public:
 			uint32				Count();
 
 private:
-			int32				IndexOfPackageByName(const BString& name) const;
+	static	ScreenshotInfoRef	_CreateScreenshot(DumpExportPkgScreenshot* screenshot);
 
 private:
 			BString				fDepotName;
@@ -154,17 +154,14 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 		packageClassificationInfo->SetIsNativeDesktop(pkg->IsNativeDesktop());
 
 	int32 countPkgScreenshots = pkg->CountPkgScreenshots();
+	PackageScreenshotInfoRef screenshotInfo(new PackageScreenshotInfo(), true);
 
 	for (i = 0; i < countPkgScreenshots; i++) {
 		DumpExportPkgScreenshot* screenshot = pkg->PkgScreenshotsItemAt(i);
-		package->AddScreenshotInfo(ScreenshotInfoRef(new ScreenshotInfo(
-			*(screenshot->Code()),
-			static_cast<int32>(screenshot->Width()),
-			static_cast<int32>(screenshot->Height()),
-			static_cast<int32>(screenshot->Length())
-		), true));
+		screenshotInfo->AddScreenshot(_CreateScreenshot(screenshot));
 	}
 
+	package->SetScreenshotInfo(screenshotInfo);
 	package->SetLocalizedText(localizedText);
 	package->SetLocalInfo(localInfo);
 
@@ -178,6 +175,16 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 	package->EndCollatingChanges();
 
 	return !fStoppable->WasStopped();
+}
+
+
+/*static*/ ScreenshotInfoRef
+PackageFillingPkgListener::_CreateScreenshot(DumpExportPkgScreenshot* screenshot)
+{
+	return ScreenshotInfoRef(
+		new ScreenshotInfo(*(screenshot->Code()), static_cast<int32>(screenshot->Width()),
+			static_cast<int32>(screenshot->Height()), static_cast<int32>(screenshot->Length())),
+		true);
 }
 
 

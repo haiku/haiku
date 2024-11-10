@@ -1000,10 +1000,6 @@ PackageListView::MessageReceived(BMessage* message)
 				}
 				if ((changes & PKG_CHANGED_ICON) != 0)
 					row->UpdateIconAndTitle();
-				if ((changes & PKG_CHANGED_DEPOT) != 0)
-					row->UpdateRepository();
-				if ((changes & PKG_CHANGED_VERSION) != 0)
-					row->UpdateVersion();
 				if ((changes & PKG_CHANGED_VERSION_CREATE_TIMESTAMP) != 0)
 					row->UpdateVersionCreateTimestamp();
 			}

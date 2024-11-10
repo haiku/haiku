@@ -123,7 +123,10 @@ DepotInfo::AddPackage(PackageInfoRef& package)
 			fPackages.end(),
 			package,
 			&_IsPackageBefore);
-	fPackages.insert(itInsertionPt, package);
+	if (fPackages.end() != itInsertionPt && (*itInsertionPt)->Name() == package->Name())
+		*itInsertionPt = package;
+	else
+		fPackages.insert(itInsertionPt, package);
 }
 
 
