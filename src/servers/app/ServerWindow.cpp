@@ -4099,23 +4099,22 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-/*
+// TODO: disabled without explanation in hrev19264. investigate problem and enable
+#if 0
 		case AS_VIEW_SET_BLENDING_MODE:
 		{
 			ViewBlendingModeInfo info;
 			link.Read<ViewBlendingModeInfo>(&info);
 
-			picture->BeginOp(B_PIC_SET_BLENDING_MODE);
-			picture->AddInt16((int16)info.sourceAlpha);
-			picture->AddInt16((int16)info.alphaFunction);
-			picture->EndOp();
+			picture->WriteSetBlendingMode(info.sourceAlpha, info.alphaFunction);
 
 			fCurrentView->CurrentState()->SetBlendingMode(info.sourceAlpha,
 				info.alphaFunction);
 			fWindow->GetDrawingEngine()->SetBlendingMode(info.sourceAlpha,
 				info.alphaFunction);
 			break;
-		}*/
+		}
+#endif
 		default:
 			return false;
 	}

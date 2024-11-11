@@ -42,6 +42,8 @@ public:
 									const join_mode& join,
 									const float& miterLimit);
 			status_t			WriteSetFillRule(int32 fillRule);
+			status_t			WriteSetBlendingMode(source_alpha srcAlpha,
+									alpha_function alphaFunc);
 			status_t			WriteSetScale(const float& scale);
 			status_t			WriteSetTransform(BAffineTransform transform);
 			status_t			WriteTranslateBy(double x, double y);

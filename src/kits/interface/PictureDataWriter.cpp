@@ -172,6 +172,22 @@ PictureDataWriter::WriteSetFillRule(int32 fillRule)
 
 
 status_t
+PictureDataWriter::WriteSetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
+{
+	try {
+		BeginOp(B_PIC_SET_BLENDING_MODE);
+		Write<int16>(srcAlpha);
+		Write<int16>(alphaFunc);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteSetScale(const float& scale)
 {
 	try {
