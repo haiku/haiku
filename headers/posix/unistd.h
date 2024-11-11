@@ -366,8 +366,8 @@ extern int		__ioctl(int fd, ulong cmd, void* argument, size_t size);
 #ifndef __cplusplus
 extern int		ioctl(int fd, unsigned long op, ...);
 #define _IOCTL2(a, b) 		__ioctl(a, b, NULL, 0)
-#define _IOCTL3(a, b, c)	__ioctl(a, b, (void*)c, 0)
-#define _IOCTL4(a, b, c, d)	__ioctl(a, b, (void*)c, d)
+#define _IOCTL3(a, b, c)	__ioctl(a, b, (void*)(c), 0)
+#define _IOCTL4(a, b, c, d)	__ioctl(a, b, (void*)(c), d)
 #define _IOCTL(ARG1, ARG2, ARG3, ARG4, NAME, ...) NAME
 #define ioctl(...) _IOCTL(__VA_ARGS__, _IOCTL4, _IOCTL3, _IOCTL2)(__VA_ARGS__)
 #else
