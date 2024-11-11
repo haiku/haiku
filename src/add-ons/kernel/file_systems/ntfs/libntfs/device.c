@@ -606,9 +606,9 @@ s64 ntfs_device_size_get(struct ntfs_device *dev, int block_size)
 		partition_info partitionInfo;
 		device_geometry geometry;
 
-		if (dev->d_ops->ioctl(dev, B_GET_PARTITION_INFO, &partitionInfo) == 0)
+		if (dev->d_ops->control(dev, B_GET_PARTITION_INFO, &partitionInfo) == 0)
 			size = partitionInfo.size;
-		else if (dev->d_ops->ioctl(dev, B_GET_GEOMETRY, &geometry) == 0) {
+		else if (dev->d_ops->control(dev, B_GET_GEOMETRY, &geometry) == 0) {
 			size = (off_t)geometry.cylinder_count * geometry.sectors_per_track
 				* geometry.head_count * geometry.bytes_per_sector;
 		}

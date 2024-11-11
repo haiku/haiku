@@ -111,7 +111,7 @@ struct ntfs_device_operations {
 			s64 offset);
 	int (*sync)(struct ntfs_device *dev);
 	int (*stat)(struct ntfs_device *dev, struct stat *buf);
-	int (*ioctl)(struct ntfs_device *dev, unsigned long request,
+	int (*control)(struct ntfs_device *dev, unsigned long request,
 			void *argp);
 };
 

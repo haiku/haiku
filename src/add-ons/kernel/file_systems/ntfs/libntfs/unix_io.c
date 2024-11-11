@@ -388,5 +388,5 @@ struct ntfs_device_operations ntfs_device_unix_io_ops = {
 	.pwrite		= ntfs_device_unix_io_pwrite,
 	.sync		= ntfs_device_unix_io_sync,
 	.stat		= ntfs_device_unix_io_stat,
-	.ioctl		= ntfs_device_unix_io_ioctl,
+	.control	= ntfs_device_unix_io_ioctl,
 };
