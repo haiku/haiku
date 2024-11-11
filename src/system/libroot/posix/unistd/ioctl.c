@@ -14,9 +14,9 @@
 
 
 int
-__ioctl(int fd, ulong cmd, struct ioctl_args args)
+__ioctl(int fd, ulong cmd, void* argument, size_t size)
 {
-	RETURN_AND_SET_ERRNO(_kern_ioctl(fd, cmd, args.argument, args.size));
+	RETURN_AND_SET_ERRNO(_kern_ioctl(fd, cmd, argument, size));
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2015 Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UNISTD_H_
@@ -361,21 +361,20 @@ extern int		symlinkat(const char *toPath, int fd, const char *symlinkPath);
 
 extern int      ftruncate(int fd, off_t newSize);
 extern int      truncate(const char *path, off_t newSize);
-struct ioctl_args {
-    void* argument;
-    size_t size;
-};
-int __ioctl(int fd, ulong cmd, struct ioctl_args args);
+
+extern int		__ioctl(int fd, ulong cmd, void* argument, size_t size);
 #ifndef __cplusplus
 extern int		ioctl(int fd, unsigned long op, ...);
-#ifndef _KERNEL_MODE
-#define ioctl(a, b, c...) __ioctl(a, b, (struct ioctl_args){ c })
-#endif
+#define _IOCTL2(a, b) 		__ioctl(a, b, NULL, 0)
+#define _IOCTL3(a, b, c)	__ioctl(a, b, (void*)c, 0)
+#define _IOCTL4(a, b, c, d)	__ioctl(a, b, (void*)c, d)
+#define _IOCTL(ARG1, ARG2, ARG3, ARG4, NAME, ...) NAME
+#define ioctl(...) _IOCTL(__VA_ARGS__, _IOCTL4, _IOCTL3, _IOCTL2)(__VA_ARGS__)
 #else
 inline int
 ioctl(int fd, unsigned long op, void* argument = NULL, size_t size = 0)
 {
-	return __ioctl(fd, op, (struct ioctl_args){ argument, size });
+	return __ioctl(fd, op, argument, size);
 }
 #endif
 
