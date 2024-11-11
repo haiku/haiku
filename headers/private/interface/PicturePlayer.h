@@ -37,8 +37,7 @@ struct picture_player_callbacks {
 	void (*draw_rect)(void* userData, const BRect& rect, bool fill);
 	void (*draw_round_rect)(void* userData, const BRect& rect,
 		const BPoint& radii, bool fill);
-	void (*draw_bezier)(void* userData, size_t numControlPoints,
-		const BPoint controlPoints[], bool fill);
+	void (*draw_bezier)(void* userData, const BPoint controlPoints[4], bool fill);
 	void (*draw_arc)(void* userData, const BPoint& center, const BPoint& radii,
 		float startTheta, float arcTheta, bool fill);
 	void (*draw_ellipse)(void* userData, const BRect& rect, bool fill);
@@ -97,7 +96,7 @@ struct picture_player_callbacks {
 		size_t length, const BPoint locations[], size_t locationCount);
 	void (*draw_rect_gradient)(void* userData, const BRect& rect, BGradient& gradient, bool fill);
 	void (*draw_round_rect_gradient)(void* userData, const BRect& rect, const BPoint& radii, BGradient& gradient, bool fill);
-	void (*draw_bezier_gradient)(void* userData, size_t numControlPoints, const BPoint controlPoints[], BGradient& gradient, bool fill);
+	void (*draw_bezier_gradient)(void* userData, const BPoint controlPoints[4], BGradient& gradient, bool fill);
 	void (*draw_arc_gradient)(void* userData, const BPoint& center, const BPoint& radii, float startTheta, float arcTheta, BGradient& gradient, bool fill);
 	void (*draw_ellipse_gradient)(void* userData, const BRect& rect, BGradient& gradient, bool fill);
 	void (*draw_polygon_gradient)(void* userData, size_t numPoints, const BPoint points[], bool isClosed, BGradient& gradient, bool fill);

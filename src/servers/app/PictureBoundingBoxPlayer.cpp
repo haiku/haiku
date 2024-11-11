@@ -256,7 +256,7 @@ determine_bounds_draw_round_rect(void* _state, const BRect& _rect,
 
 
 static void
-determine_bounds_bezier(BoundingBoxState* state, const BPoint* viewPoints,
+determine_bounds_bezier(BoundingBoxState* state, const BPoint viewPoints[4],
 	BRect& outRect)
 {
 	// Note: this is an approximation which results in a rectangle which
@@ -281,8 +281,8 @@ determine_bounds_bezier(BoundingBoxState* state, const BPoint* viewPoints,
 
 
 static void
-determine_bounds_draw_bezier(void* _state, size_t numPoints,
-	const BPoint viewPoints[], bool fill)
+determine_bounds_draw_bezier(void* _state,
+	const BPoint viewPoints[4], bool fill)
 {
 	TRACE_BB("%p draw bezier fill=%d (%.2f %.2f) (%.2f %.2f) "
 		"(%.2f %.2f) (%.2f %.2f)\n",
@@ -294,10 +294,6 @@ determine_bounds_draw_bezier(void* _state, size_t numPoints,
 		viewPoints[3].x, viewPoints[3].y);
 	BoundingBoxState* const state =
 		reinterpret_cast<BoundingBoxState*>(_state);
-
-	const size_t kSupportedPoints = 4;
-	if (numPoints != kSupportedPoints)
-		return;
 
 	BRect rect;
 	determine_bounds_bezier(state, viewPoints, rect);

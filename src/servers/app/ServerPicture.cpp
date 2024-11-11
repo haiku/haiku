@@ -323,17 +323,14 @@ draw_round_rect(void* _canvas, const BRect& _rect, const BPoint& radii,
 
 
 static void
-draw_bezier(void* _canvas, size_t numPoints, const BPoint viewPoints[],
-	bool fill)
+draw_bezier(void* _canvas, const BPoint viewPoints[4], bool fill)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 
-	const size_t kSupportedPoints = 4;
-	if (numPoints != kSupportedPoints)
-		return;
+	const size_t kNumPoints = 4;
 
-	BPoint points[kSupportedPoints];
-	canvas->PenToScreenTransform().Apply(points, viewPoints, kSupportedPoints);
+	BPoint points[kNumPoints];
+	canvas->PenToScreenTransform().Apply(points, viewPoints, kNumPoints);
 	canvas->GetDrawingEngine()->DrawBezier(points, fill);
 }
 
@@ -429,19 +426,16 @@ draw_round_rect_gradient(void* _canvas, const BRect& _rect, const BPoint& radii,
 
 
 static void
-draw_bezier_gradient(void* _canvas, size_t numPoints, const BPoint viewPoints[], BGradient& gradient,
-	bool fill)
+draw_bezier_gradient(void* _canvas, const BPoint viewPoints[4], BGradient& gradient, bool fill)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 
-	const size_t kSupportedPoints = 4;
-	if (numPoints != kSupportedPoints)
-		return;
+	const size_t kNumPoints = 4;
 
-	BPoint points[kSupportedPoints];
+	BPoint points[kNumPoints];
 	const SimpleTransform transform =
 		canvas->PenToScreenTransform();
-	transform.Apply(points, viewPoints, kSupportedPoints);
+	transform.Apply(points, viewPoints, kNumPoints);
 	transform.Apply(&gradient);
 	canvas->GetDrawingEngine()->FillBezier(points, gradient);
 }

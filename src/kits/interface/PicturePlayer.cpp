@@ -81,11 +81,9 @@ draw_round_rect(void* _context, const BRect& rect, const BPoint& radii,
 
 
 static void
-draw_bezier(void* _context, size_t numPoints, const BPoint _points[], bool fill)
+draw_bezier(void* _context, const BPoint _points[4], bool fill)
 {
 	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	if (numPoints != 4)
-		return;
 
 	BPoint points[4] = { _points[0], _points[1], _points[2], _points[3] };
 	((void (*)(void*, BPoint*))context->function_table[fill ? 8 : 7])(
@@ -544,11 +542,9 @@ draw_round_rect_gradient(void* _context, const BRect& rect, const BPoint& radii,
 
 
 static void
-draw_bezier_gradient(void* _context, size_t numPoints, const BPoint _points[], BGradient& gradient, bool fill)
+draw_bezier_gradient(void* _context, const BPoint _points[4], BGradient& gradient, bool fill)
 {
 	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
-	if (numPoints != 4)
-		return;
 
 	BPoint points[4] = { _points[0], _points[1], _points[2], _points[3] };
 	((void (*)(void*, BPoint*, BGradient&))context->function_table[fill ? 60 : 61])(
@@ -989,8 +985,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 					break;
 				}
 
-				callbacks.draw_bezier(userData, kNumControlPoints,
-					controlPoints, header->op == B_PIC_FILL_BEZIER);
+				callbacks.draw_bezier(userData, controlPoints, header->op == B_PIC_FILL_BEZIER);
 				break;
 			}
 
@@ -1113,8 +1108,8 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				}
 				ObjectDeleter<BGradient> gradientDeleter(gradient);
 
-				callbacks.draw_bezier_gradient(userData, kNumControlPoints,
-					controlPoints, *gradient, header->op == B_PIC_FILL_BEZIER_GRADIENT);
+				callbacks.draw_bezier_gradient(userData, controlPoints, *gradient,
+					header->op == B_PIC_FILL_BEZIER_GRADIENT);
 				break;
 			}
 
