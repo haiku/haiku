@@ -198,10 +198,7 @@ update_device_send_stats(struct net_device* device, status_t status, size_t pack
 		atomic_add((int32*)&device->stats.send.packets, 1);
 		atomic_add64((int64*)&device->stats.send.bytes, packetSize);
 	} else {
-		if (status == ENOBUFS || status == EMSGSIZE)
-			atomic_add((int32*)&device->stats.send.dropped, 1);
-		else
-			atomic_add((int32*)&device->stats.send.errors, 1);
+		atomic_add((int32*)&device->stats.send.errors, 1);
 	}
 }
 
