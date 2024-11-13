@@ -346,6 +346,24 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 				return B_BAD_ADDRESS;
 			return compat_receive(cookie, (net_buffer**)arg);
 
+		case SIOCGIFSTATS:
+		{
+			struct ifreq_stats stats;
+			stats.receive.packets = ifp->if_data.ifi_ipackets;
+			stats.receive.errors = ifp->if_data.ifi_ierrors;
+			stats.receive.bytes = ifp->if_data.ifi_ibytes;
+			stats.receive.multicast_packets = ifp->if_data.ifi_imcasts;
+			stats.receive.dropped = ifp->if_data.ifi_iqdrops;
+			stats.send.packets = ifp->if_data.ifi_opackets;
+			stats.send.errors = ifp->if_data.ifi_oerrors;
+			stats.send.bytes = ifp->if_data.ifi_obytes;
+			stats.send.multicast_packets = ifp->if_data.ifi_omcasts;
+			stats.send.dropped = ifp->if_data.ifi_oqdrops;
+			stats.collisions = ifp->if_data.ifi_collisions;
+			memcpy(arg, &stats, sizeof(stats));
+			return B_OK;
+		}
+
 		case SIOCSIFFLAGS:
 		case SIOCSIFMEDIA:
 		case SIOCSIFMTU:
