@@ -69,14 +69,15 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 
 	usb_interface_list *list = Configuration()->interface;
 	Object *object = GetStack()->GetObject(list->active->endpoint[0].handle);
-	if (object && (object->Type() & USB_OBJECT_INTERRUPT_PIPE) != 0) {
+	if (object != NULL && (object->Type() & USB_OBJECT_INTERRUPT_PIPE) != 0) {
 		fInterruptPipe = (InterruptPipe *)object;
 		fInterruptPipe->QueueInterrupt(fInterruptStatus,
 			sizeof(fInterruptStatus), InterruptCallback, this);
 	} else {
 		TRACE_ALWAYS("no interrupt pipe found\n");
 	}
-	object->ReleaseReference();
+	if (object != NULL)
+		object->ReleaseReference();
 
 	// Wait some time before powering up the ports
 	if (!isRootHub)
