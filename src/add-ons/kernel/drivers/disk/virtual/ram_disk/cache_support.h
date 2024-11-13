@@ -25,7 +25,6 @@ cache_get_pages(VMCache* cache, off_t offset, off_t length, bool isWrite, vm_pag
 				continue;
 			}
 
-			DEBUG_PAGE_ACCESS_START(page);
 			page->busy = true;
 		} else
 			missingPages++;
@@ -79,7 +78,6 @@ cache_put_pages(VMCache* cache, off_t offset, off_t length, vm_page** pages, boo
 					vm_page_free(NULL, page);
 			} else {
 				cache->MarkPageUnbusy(page);
-				DEBUG_PAGE_ACCESS_END(page);
 			}
 		}
 
