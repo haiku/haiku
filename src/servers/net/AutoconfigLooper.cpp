@@ -172,11 +172,12 @@ AutoconfigLooper::_NetworkMonitorNotification(BMessage* message)
 			if (message->FindInt32("media", &media) != B_OK)
 				break;
 
-			if ((fLastMediaStatus & IFM_ACTIVE) == 0
-				&& (media & IFM_ACTIVE) != 0) {
+			if ((fLastMediaStatus & IFM_ACTIVE) == 0 && (media & IFM_ACTIVE) != 0) {
 				// Reconfigure the interface when we have a link again
 				_ConfigureIPv4();
 				//_ConfigureIPv6();	// TODO: router advertisement and dhcpv6
+			} else if ((fLastMediaStatus & IFM_ACTIVE) != 0 && (media & IFM_ACTIVE) == 0) {
+				_RemoveClient();
 			}
 
 			fLastMediaStatus = media;
