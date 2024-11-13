@@ -1761,18 +1761,13 @@ EHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 				descriptor = descriptor->next_log;
 			}
 
-			if (!force) {
-				// if the transfer is canceled by force, the one causing the
-				// cancel is probably not the one who initiated the transfer
-				// and the callback is likely not safe anymore
-				transfer_entry *entry
-					= (transfer_entry *)malloc(sizeof(transfer_entry));
-				if (entry != NULL) {
-					entry->transfer = current->transfer;
-					current->transfer = NULL;
-					entry->next = list;
-					list = entry;
-				}
+			transfer_entry *entry
+				= (transfer_entry *)malloc(sizeof(transfer_entry));
+			if (entry != NULL) {
+				entry->transfer = current->transfer;
+				current->transfer = NULL;
+				entry->next = list;
+				list = entry;
 			}
 
 			current->canceled = true;
@@ -1785,7 +1780,13 @@ EHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 
 	while (list != NULL) {
 		transfer_entry *next = list->next;
-		list->transfer->Finished(B_CANCELED, 0);
+
+		// if the transfer is canceled by force, the one causing the
+		// cancel is possibly not the one who initiated the transfer
+		// and the callback is likely not safe anymore
+		if (!force)
+			list->transfer->Finished(B_CANCELED, 0);
+
 		delete list->transfer;
 		free(list);
 		list = next;

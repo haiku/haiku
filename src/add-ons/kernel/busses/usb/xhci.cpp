@@ -1117,12 +1117,8 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		if (td->transfer == NULL)
 			continue;
 
-		// We can't cancel or delete transfers under "force", as they probably
-		// are not safe to use anymore.
-		if (!force) {
-			transfers[transfersCount] = td->transfer;
-			transfersCount++;
-		}
+		transfers[transfersCount] = td->transfer;
+		transfersCount++;
 		td->transfer = NULL;
 	}
 
@@ -1179,7 +1175,12 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	endpointLocker.Unlock();
 
 	for (int32 i = 0; i < transfersCount; i++) {
-		transfers[i]->Finished(B_CANCELED, 0);
+		// If the transfer is canceled by force, the one causing the
+		// cancel is possibly not the one who initiated the transfer
+		// and the callback is likely not safe anymore.
+		if (!force)
+			transfers[i]->Finished(B_CANCELED, 0);
+
 		delete transfers[i];
 	}
 

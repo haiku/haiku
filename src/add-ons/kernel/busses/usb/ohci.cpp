@@ -704,38 +704,34 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 			current->endpoint->head_physical_descriptor
 				= current->endpoint->tail_physical_descriptor;
 
-			if (!force) {
-				if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
-					ohci_isochronous_td *descriptor
-						= (ohci_isochronous_td *)current->first_descriptor;
-					while (descriptor) {
-						uint16 frame = OHCI_ITD_GET_STARTING_FRAME(
-							descriptor->flags);
-						_ReleaseIsochronousBandwidth(frame,
-							OHCI_ITD_GET_FRAME_COUNT(descriptor->flags));
-						if (descriptor
-								== (ohci_isochronous_td*)current->last_descriptor)
-							// this is the last ITD of the transfer
-							break;
+			if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
+				ohci_isochronous_td *descriptor
+					= (ohci_isochronous_td *)current->first_descriptor;
+				while (descriptor) {
+					uint16 frame = OHCI_ITD_GET_STARTING_FRAME(
+						descriptor->flags);
+					_ReleaseIsochronousBandwidth(frame,
+						OHCI_ITD_GET_FRAME_COUNT(descriptor->flags));
+					if (descriptor
+							== (ohci_isochronous_td*)current->last_descriptor)
+						// this is the last ITD of the transfer
+						break;
 
-						descriptor
-							= (ohci_isochronous_td *)
-							descriptor->next_done_descriptor;
-					}
-				}
-
-				// If the transfer is canceled by force, the one causing the
-				// cancel is probably not the one who initiated the transfer
-				// and the callback is likely not safe anymore
-				transfer_entry *entry
-					= (transfer_entry *)malloc(sizeof(transfer_entry));
-				if (entry != NULL) {
-					entry->transfer = current->transfer;
-					current->transfer = NULL;
-					entry->next = list;
-					list = entry;
+					descriptor
+						= (ohci_isochronous_td *)
+						descriptor->next_done_descriptor;
 				}
 			}
+
+			transfer_entry *entry
+				= (transfer_entry *)malloc(sizeof(transfer_entry));
+			if (entry != NULL) {
+				entry->transfer = current->transfer;
+				current->transfer = NULL;
+				entry->next = list;
+				list = entry;
+			}
+
 			current->canceled = true;
 		}
 		current = current->link;
@@ -745,7 +741,13 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 
 	while (list != NULL) {
 		transfer_entry *next = list->next;
-		list->transfer->Finished(B_CANCELED, 0);
+
+		// If the transfer is canceled by force, the one causing the
+		// cancel is possibly not the one who initiated the transfer
+		// and the callback is likely not safe anymore
+		if (!force)
+			list->transfer->Finished(B_CANCELED, 0);
+
 		delete list->transfer;
 		free(list);
 		list = next;
