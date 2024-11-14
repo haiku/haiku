@@ -197,6 +197,12 @@ platform_init_video(void)
 			&& info->PixelInformation.BlueMask == 0x0000FF
 			&& info->PixelInformation.ReservedMask == 0) {
 			depth = 24;
+		} else if (info->PixelFormat == PixelBitMask
+			&& info->PixelInformation.RedMask == 0xF800
+			&& info->PixelInformation.GreenMask == 0x07E0
+			&& info->PixelInformation.BlueMask == 0x001F
+			&& info->PixelInformation.ReservedMask == 0) {
+			depth = 16;
 		} else {
 			TRACE(("  pixel format: %x unsupported\n",
 				info->PixelFormat));
@@ -209,7 +215,7 @@ platform_init_video(void)
 			videoMode->mode = mode;
 			videoMode->width = info->HorizontalResolution;
 			videoMode->height = info->VerticalResolution;
-			videoMode->bits_per_pixel = info->PixelFormat == PixelBitMask ? 24 : 32;
+			videoMode->bits_per_pixel = depth;
 			videoMode->bytes_per_row = info->PixelsPerScanLine * depth / 8;
 			add_video_mode(videoMode);
 		}
