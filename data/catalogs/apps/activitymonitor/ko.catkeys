@@ -1,0 +1,48 @@
+1	korean	x-vnd.Haiku-ActivityMonitor	2467534740
+Teams	DataSource		팀
+Semaphores	DataSource		세마포어
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		블럭 캐시 메모리
+%lld ms	SettingsWindow		%lld 밀리초
+Media nodes	DataSource		미디어 노드
+Text clipboard	DataSource		텍스트 클립보드
+Network send	DataSource		네트워크 송신
+Cache	DataSource		캐쉬
+Running applications	DataSource		실행중인 어플리케이션
+CPU usage (combined)	DataSource		CPU 사용량 (합계)
+Threads	DataSource		쓰레드
+Receiving	DataSource		받는 중
+Remove graph	ActivityView		그래프 제거
+Swap space	DataSource		가상메모리 공간
+CPU	DataSource		CPU 
+ActivityMonitor	System name		활동감시기
+CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		업데이트 시간 간격:
+RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		설정...
+Block cache	DataSource		블럭 캐시
+Memory	DataSource		메모리
+CPU usage	DataSource		CPU 사용량
+CPU speed	DataSource		CPU 속도
+Quit	ActivityWindow		나가기
+Raw clipboard	DataSource		순수 클립보드
+Settings	ActivityWindow		설정
+Used memory	DataSource		사용돤 메모리
+Show legend	ActivityView		설명 보이기
+Cached memory	DataSource		캐시된 메모리
+CPU %d usage	DataSource		CPU %d 사용
+CPU %d speed	DataSource		CPU 속도 %d
+File	ActivityWindow		파일
+Ports	DataSource		포트
+Page faults	DataSource		페이지 폴트
+Additional items	ActivityView		추가 아이템
+Apps	DataSource		어플리케이션
+Add graph	ActivityWindow		그래프 추가
+Sending	DataSource		보내는 중
+Always on top	ActivityWindow		항상 맨 위로
+Swap	DataSource		스왑
+%lld sec.	SettingsWindow		%lld 초
+P-faults	DataSource		페이지 폴트
+Sems	DataSource		Sems  
+Network receive	DataSource		네트워크 수신
+%s faults/s	DataSource		%s 폴트/초

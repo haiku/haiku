@@ -1,0 +1,84 @@
+1	korean	x-vnd.Haiku-CodyCam	1473646925
+destination directory expected	CodyCam		대상 디렉토리 지정이 필요합니다
+reply: '%s'\n	SftpClient		응답: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (실제 비밀번호 송신)
+JPEG image	CodyCam		JPEG 이미지
+Remote host has closed the connection.\n	FtpClient		원격 호스트가 연결을 종료했습니다.\n
+image file format expected	CodyCam		이미지 파일 형식이 요구됨
+Every 30 minutes	CodyCam		매 30분마다
+Capturing Image…	VideoConsumer.cpp		이미지 갈무리중…
+Cannot start time source!	CodyCam		시간 원본을 시작할 수 없음!
+Waiting…	CodyCam		대기중…
+Passive FTP	CodyCam		패시브 FTP
+Every 10 minutes	CodyCam		매 10분마다
+Every minute	CodyCam		매 분마다
+Capture Rate Menu	CodyCam		갈무리 빈도 메뉴
+Cannot seek time source!	CodyCam		시간 원본을 찾을 수 없습니다!
+Server login failed	VideoConsumer.cpp		서버 로그인 실패
+on or off expected	Settings	Do not translate 'on' and 'off'	켬 이나 끔이 요구됨
+invalid upload client %ld\n	VideoConsumer.cpp		올바르지 않은 업로드 클라이언트 %ld\n
+Every 30 seconds	CodyCam		매 30초마다
+Cannot create a video window	CodyCam		비디오 창을 만들 수 없음
+Cannot register the video window	CodyCam		비디오 창을 등록할 수 없습니다
+capture rate expected	CodyCam		갈무리 빈도가 요구됨
+Quit	CodyCam		나가기
+Cannot connect the video source to the video window	CodyCam		비디오 창에 비디어 원본을 연결 할 수 없음
+read: %d\n	SftpClient		읽기: %d\n
+Every 2 hours	CodyCam		매 2시간마다
+Cannot get a time source	CodyCam		시간 원본을 얻을 수 없음
+Every 4 hours	CodyCam		매 4시간마다
+cmd: '%s'\n	FtpClient		명령: '%s'\n
+Never	CodyCam		절대 안함
+Every 8 hours	CodyCam		매 8시간마다
+Cannot start the video source	CodyCam		비디오 원본을 시작 할 수 없음
+Cannot set the time source for the video source	CodyCam		비디오 원본의 시간 원본을 설정할 수 없음
+Renaming…	VideoConsumer.cpp		이름 바꾸는 중...
+Send to…	CodyCam		보내기…
+Password:	CodyCam		암호:
+still image filename expected	CodyCam		정지 이미지 파일이름이 요구됨
+File name:	CodyCam		파일 이름:
+Directory:	CodyCam		디렉토리:
+Error setting type of output file	VideoConsumer.cpp		츨력 파일의 형식 설정 에러
+Cannot find an available video stream	CodyCam		가능한 비디오 스트림을 찾을 수 없음
+password expected	CodyCam		암호가 요구됨
+SFTP	CodyCam		SFTP
+Output	CodyCam		출력
+server address expected	CodyCam		서버 주소가 요구됨
+Cannot start the video window	CodyCam		비디오 창을 시작할 수 없음
+reply: %d, %d\n	FtpClient		응답: %d, %d\n
+Cannot set the time source for the video window	CodyCam		비디오 창의 시간 원본을 설정할 수 없음
+Every 15 minutes	CodyCam		매 15분마다
+Every 24 hours	CodyCam		매 24시간마다
+Image Format Menu	CodyCam		이미지 형식 메뉴
+Every 5 minutes	CodyCam		매 5분마다
+Format:	CodyCam		형식:
+Start video	CodyCam		비디오 시작
+Connected…	VideoConsumer.cpp		연결됨…
+upload client name expected	CodyCam		업로드 클라이언트 이름이 요구됨
+Every 15 seconds	CodyCam		매 15초마다
+Error getting initial latency for the capture node	CodyCam		갈무리 노드의 초기 대기 얻기 에러
+password	CodyCam		암호
+Local	CodyCam		지역
+Stop video	CodyCam		비디오 정지
+Last Capture: 	VideoConsumer.cpp		마지막 갈무리: 
+Rate:	CodyCam		빈도:
+Couldn't find requested directory on server	VideoConsumer.cpp		요청되는 디렉토리나 서버를 찾을 수 없음
+Cannot find the media roster	CodyCam		미디어 등록을 찾을 수 없음
+Type:	CodyCam		형식:
+Rename failed	VideoConsumer.cpp		이름바꾸기 실패함
+unrecognized upload client specified	CodyCam		인식할 수 없는 업로드 클라이언트가 지정됨
+Server:	CodyCam		서버:
+Login:	CodyCam		로그인:
+File	CodyCam		파일
+read: %ld\n	SftpClient		읽기: %ld\n
+Every hour	CodyCam		매 시간마다
+login ID expected	CodyCam		로그인 ID 가 요구됨
+Video settings	CodyCam		비디오 설정
+Can't find an available connection to the video window	CodyCam		비디오 창에 가능한 연결을 찾을 수 없음
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		출력 파일 만들기 에러
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		비디오 소스를 찾을 수 없습니다.\nCodyCam을 사용하려면 웹캠이 필요합니다.
+Logging in…	VideoConsumer.cpp		로그인 중…
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		츨력 파일 쓰기 에러
+Capture controls	CodyCam		갈무리 제어

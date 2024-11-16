@@ -7,14 +7,14 @@ Error converting '%filename'	MediaConverter		转换 '%filename' 错误
 Selected directory not found. Defaulting to /boot/home	MediaConverter		所选目录未找到。默认为 /boot/home
 Conversion completed	MediaConverter		转换结束
 Audio:	MediaConverter-FileInfo		音频：
-MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:保存目录
 Error creating video.	MediaConverter		创建视频错误。
 Cancelling	MediaConverter		取消
 None available	Audio codecs		无可用
 The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		该文件有多个音频或视频轨道，但只有第一个会被转换。
 No file selected	MediaConverter-FileInfo		无选中文件
 High	MediaConverter		高
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{该文件未被识别为受支持的媒体文件:} other{# 文件未被识别为受支持的媒体文件:}}
 File Error	MediaConverter-FileInfo		文件错误
 None available	Video codecs		无可用
 Output format	MediaConverter		输出格式

@@ -1,0 +1,24 @@
+1	korean	x-vnd.Haiku-GLTeapot	1263334963
+Right	TeapotWindow		오른쪽
+Backface culling	TeapotWindow		배면 따 모으기
+Add a teapot	TeapotWindow		찻주전자 더하기
+Yellow	TeapotWindow		노란색
+Perspective	TeapotWindow		원근감
+Off	TeapotWindow		끄기
+Quit	TeapotWindow		종료
+Green	TeapotWindow		녹색
+Blue	TeapotWindow		파란색
+White	TeapotWindow		흰색
+Upper center	TeapotWindow		위쪽 가운데
+Filled polygons	TeapotWindow		폴리곤 채우기
+Lower left	TeapotWindow		왼쪽 아래
+Fog	TeapotWindow		안개
+FPS display	TeapotWindow		FPS 표시
+GLTeapot	System name		GL찻주전자
+Limit FPS to refresh rate	TeapotWindow		FPS를 재생 빈도로 제한
+Settings	TeapotWindow		설정
+Gouraud shading	TeapotWindow		구로 셰이딩
+Lighting	TeapotWindow		조명효과
+Z-buffered	TeapotWindow		Z-버퍼드
+Red	TeapotWindow		빨간색
+Lights	TeapotWindow		조명

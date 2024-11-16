@@ -1,0 +1,46 @@
+1	korean	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		구간반복
+Cannot find default audio hardware	RecorderWindow		기본 오디오 하드웨어를 찾을 수 없음
+Cannot find the temporary file created to hold the new recording	RecorderWindow		새 녹음을 저장하기 위해 생성된 임시 파일을 찾을 수 없습니다
+Sample size:	RecorderWindow		샘플 크기:
+Nothing to play	RecorderWindow		재생할 것이 없음
+None of the files appear to be audio files.	RecorderWindow		모든 파일이 오디오 파일이 아닙니다.
+Duration: 	RecorderWindow		길이: 
+File info	RecorderWindow		파일 정보
+Drop files here	SoundListView		여기에 파일 끌어다 놓기
+Input	RecorderWindow		입력
+Some of the files don't appear to be audio files.	RecorderWindow		일부 파일은 오디오 파일이 아닙니다.
+Stop	RecorderWindow		정지
+Format:	RecorderWindow		형식:
+Sound List	RecorderWindow		사운드 목록
+Compression: 	RecorderWindow		압축: 
+Rewind	RecorderWindow		되감기
+Sample rate:	RecorderWindow		샘플링 비율:
+Invalid audio files	RecorderWindow		올바르지 않은 오디오 파일
+ seconds	RecorderWindow		 초
+OK	RecorderWindow		확인
+Cannot open the temporary file created to hold the new recording	RecorderWindow		새 녹음을 저장하기 위해 생성된 임시 파일을 열 수 없습니다
+Input:	RecorderWindow		입력:
+Forward	RecorderWindow		빨리감기
+Play	RecorderWindow		재생
+SoundRecorder	System name		SoundRecorder
+Channels:	RecorderWindow		채널:
+ bits	RecorderWindow		 비트
+None	RecorderWindow		없음
+Record	RecorderWindow		녹음
+Sample size: 	RecorderWindow		샘플 크기:
+Cannot recognize this file as a media file	RecorderWindow		이 파일을 미디어 파일로 인식할 수 없습니다
+Format: 	RecorderWindow		형식:
+File name: 	RecorderWindow		파일 이름:
+Cannot connect to the selected sound input	RecorderWindow		선택된 사운드 입력에 연결 할 수 없습니다
+Cannot get the file to play	RecorderWindow		파일을 재생 할 수 없습니다
+Cannot record a sound that long	RecorderWindow		그렇게 오랫동안 녹음 할 수는 없습니다
+Duration:	RecorderWindow		재생시간:
+Compression:	RecorderWindow		압축:
+Cannot find an unused name to use for the new recording	RecorderWindow		새 녹음을 저장하기 위해 미사용중인 이름을 찾을 수 없습니다
+Channels: 	RecorderWindow		채널: 
+Save	RecorderWindow		저장
+Sample rate: 	RecorderWindow		샘플링 비율: 
+Cannot connect to media server	RecorderWindow		미디어서버에 연결할 수 없습니다
+The file doesn't appear to be an audio file.	RecorderWindow		오디오 파일이 아닙니다
+File name:	RecorderWindow		파일 이름:

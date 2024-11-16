@@ -1,0 +1,77 @@
+1	korean	x-vnd.Haiku-MediaConverter	1249914255
+Input file not recognized as Audio or Video	MediaConverter		입력 파일을 오디오나 비디오 파일로 인식할 수 없습니다
+Source files	MediaConverter		소스 파일
+Error writing video frame %lld	MediaConverter		%lld 비디오 프레임 기록 오류가 발생했습니다
+Audio quality: %s	MediaConverter		오디오 품질: %s
+Error converting '%filename'	MediaConverter		'%filename' 변환 중에 오류 발생
+Selected directory not found. Defaulting to /boot/home	MediaConverter		선택한 디렉터리를 찾을 수 없습니다. /boot/home을 기본 경로로 사용합니다
+Conversion completed	MediaConverter		변환 완료됨
+Audio:	MediaConverter-FileInfo		오디오:
+MediaConverter+:SaveDirectory	MediaConverter		마디어변환기+:저장디렉토리
+Error creating video.	MediaConverter		비디오 생성 오류가 발생했습니다.
+Cancelling	MediaConverter		취소중
+None available	Audio codecs		가능한 것이 없음
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		파일에 복수의 오디오나 비디오 트랙이 존재합니다. 각각의 첫 번째 트랙만 변환됩니다.
+No file selected	MediaConverter-FileInfo		선택된 파일이 없음
+High	MediaConverter		높음
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{파일을 지원되는 미디어 파일로 인식할 수 없습니다:} other{#개 파일을 지원되는 미디어 파일로 인식할 수 없습니다:}}
+File Error	MediaConverter-FileInfo		파일 에러
+None available	Video codecs		가능한 것이 없음
+Output format	MediaConverter		출력 형식
+%.1f kHz mono	MediaFileInfo		%.1f kHz 모노
+%.1f kHz stereo	MediaFileInfo		%.1f kHz 스테레오
+OK	MediaConverter		확인
+Error creating '%filename'	MediaConverter		'%filename' 만드는 중에 오류 발생
+Error loading a file	MediaConverter		파일 불러오는 중에 오류 발생
+Encoder parameters	MediaConverter-EncoderWindow		인코더 매개변수
+Open…	Menu		열기...
+Audio encoding:	MediaConverter		오디오 인코딩:
+Multi-track file detected	MediaConverter		다중 트랙 파일이 탐지되었습니다
+Cancelling…	MediaConverter		취소하는 중...
+Output file '%filename' created	MediaConverter		출력파일 '%filename' 만들어짐
+Output folder	MediaConverter		출력 폴더
+Error creating track.	MediaConverter		트랙 생성 오류가 발생했습니다.
+ seconds	MediaFileInfo		 초
+Video using parameters form settings	MediaConverter		매개 변수 폼 설정을 사용한 동영상
+Video:	MediaConverter-FileInfo		동영상:
+Select	MediaConverter		선택
+Conversion cancelled	MediaConverter		변환이 취소됨
+Low	MediaConverter		낮음
+Error loading files	MediaConverter		파일들  불러오는 중에 오류 발생
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# 비트} other{# 비트}}
+Video quality: %s	MediaConverter		비디오 품질: %s
+End   [ms]: 	MediaConverter		끝  [ms]: 
+Cancel	MediaConverter		취소
+OK	MediaConverter-FileInfo		확인
+Video encoding:	MediaConverter		동영상 인코딩
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		파일 정보를 읽는 중에 오류가 발생했습니다.\n\n오류: 
+Error	MediaConverter		오류
+File details	MediaConverter		파일의 세부사항
+No audio	Audio codecs list		오디오 파일 없음
+Drop media files onto this window	MediaConverter		이 창에 미디어 파일 떨어트리기
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# 프레임} other{# 프레임}}
+Error read audio frame %lld	MediaConverter		%lld 오디오 프레임을 불러오는 데 오류가 발생했습니다
+Quit	Menu		끝내기
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# 바이트} other{# 바이트}}
+Writing audio track: %s complete	MediaConverter		오디오 트랙 기록 중 : %s 완료됨
+Duration:	MediaConverter-FileInfo		재생시간:
+MediaConverter	System name		미디어변환기
+Writing video track: %s complete	MediaConverter		비디오 트랙 기록 중 : %s 완료됨
+Error launching: %strError%	MediaConverter		시작 중 오류 발생: %strError%
+Error writing audio frame %lld	MediaConverter		%lld 오디오 프레임 기록 오류가 발생했습니다
+File format:	MediaConverter		파일 형식:
+File	Menu		파일
+Video quality not supported	MediaConverter		동영상 화질은 지원하지 않음
+Select this folder	MediaConverter		이 폴더 선택
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld 채널
+Understood	MediaConverter		확인했습니다
+%u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps
+%d bit 	MediaFileInfo		%d 비트
+No video	Video codecs list		동영상 없음
+Continue	MediaConverter		계속
+Convert	MediaConverter		변환
+Audio quality not supported	MediaConverter		오디오 음질은 지원하지 않음
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		해당 경로에 기록할 수 없습니다: %strPath%. 기본 경로를 사용합니다: /boot/home
+Error read video frame %lld	MediaConverter		%lld 비디오 프레임을 불러오는 데 오류가 발생했습니다
+Preview	MediaConverter		미리보기
+Start [ms]: 	MediaConverter		시작 [ms]: 

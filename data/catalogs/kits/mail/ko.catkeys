@@ -1,0 +1,11 @@
+1	korean	x-vnd.Haiku-libmail	3450478295
+Partially download messages larger than	ProtocolConfigView		다음보다 큰 메세지는 분할하여 다운로드
+Password:	ProtocolConfigView		비밀번호:
+Remove mail from server when deleted	ProtocolConfigView		지울 때 서버의 메일도 같이 삭제
+Mail server:	ProtocolConfigView		메일 서버:
+Select…	MailKit		선택...
+Connection type:	ProtocolConfigView		연결 형태:
+KB	ProtocolConfigView	kilo byte	KB
+Leave mail on server	ProtocolConfigView		서버에 메일을 남겨 둠
+Username:	ProtocolConfigView		사용자 이름:
+Login type:	ProtocolConfigView		로그인 형식:

@@ -1,0 +1,15 @@
+1	korean	x-vnd.Haiku-IMAP	1343128980
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		\"%server%\" 서버에 연결할 수 없습니다 : \n%error%
+Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		IMAP 폴더 구독을 업데이트하는 중입니다. 잠시만 기다려주세요…
+Failed to fetch available storage.	IMAPFolderConfig		사용 가능한 저장소를 가져오는 데 실패했습니다.
+Cancel	IMAPFolderConfig		취소
+OK	IMAPFolderConfig		확인
+Server storage: %s / %s used.	IMAPFolderConfig		서버 저장소 용량: %s / %s이(가) 사용되었습니다.
+No encryption	imap_config		암호화 없음
+Fetching IMAP folders, please be patient…	IMAPFolderConfig		IMAP 폴더를 가져 오는 중입니다. 잠시만 기다려주세요…
+Configure IMAP Folders	imap_config		IMAP 폴더 설정
+SSL	imap_config		SSL
+Apply	IMAPFolderConfig		적용
+status	IMAPFolderConfig		상태
+IMAP Folders	IMAPFolderConfig		IMAP 폴더들
+Destination:	imap_config		대상:

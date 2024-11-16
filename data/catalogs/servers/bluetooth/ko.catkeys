@@ -1,0 +1,7 @@
+1	korean	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		블루투스 서버를 중지할 수 없습니다.
+Bluetooth error	BluetoothReplicant		블루투스 오류
+Settings…	BluetoothReplicant		설정…
+OK	BluetoothReplicant		확인
+Error: %status%	BluetoothReplicant		오류: %status%
+Quit	BluetoothReplicant		종료

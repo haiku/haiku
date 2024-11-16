@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Magnify	1278916508
+1	english	x-vnd.Haiku-Magnify	3309471563
   size must be > 4 and a multiple of 4	Console		  大小必须 > 4 或者是 4 的倍数
 Decrease pixel size	Magnify-Main		缩小像素尺寸
 no clip msg	In console, when clipboard is empty after clicking Copy image		无剪切消息
@@ -10,6 +10,7 @@ Decrease window size	Magnify-Main		缩小窗口尺寸
 Remove a crosshair	Magnify-Main		删除十字光标
 Add a crosshair	Magnify-Main		添加十字光标
 Freeze image	Magnify-Main		冻结图像
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
 usage: magnify [size] (magnify size * size pixels)	Console		使用: magnify [size] (magnify size * size pixels)
 Increase window size	Magnify-Main		放大窗口尺寸
 Save image	Magnify-Main		保存图像

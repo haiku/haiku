@@ -1,0 +1,40 @@
+1	korean	x-vnd.Haiku-Installer	3454709863
+Performing installation.	InstallProgress		설치 작업중.
+Please close the DriveSetup window before closing the Installer window.	InstallerWindow		설치프로그램 창을 닫기 전에 드라이브설정 창을 닫기 바랍니다.
+<none>	InstallerWindow	No partition available	<없음>
+Installer	System name		설치프로그램
+Unknown Type	InstallProgress	Partition content type	알수 없는 형식
+README	InstallerApp		README
+Quit	InstallerWindow		나가기
+Write boot sector to '%s'	InstallerWindow		부트 섹터는 '%s'에 기록됨
+Welcome to the Haiku Installer!\n\n	InstallerApp		Haiku 설치프로그램에 오신 것을 환영합니다!\n\n
+?? of ??	InstallerWindow	Unknown progress	?? 의 ??
+Quit DriveSetup	InstallerWindow		드라이브설정 나가기
+%1ld of %2ld	InstallerWindow	number of files copied	%1ld 의 %2ld
+Install from:	InstallerWindow		원본:
+Additional disk space required: 0.0 KiB	InstallerWindow		추가로 요구되는 디스크 용량 0.0 KiB
+???	InstallerWindow	Unknown currently copied item	???
+Hide optional packages	InstallerWindow		선택적인 패키지 숨기기
+???	InstallerWindow	Unknown partition name	???
+Quit	InstallerApp		나가기
+OK	InstallerWindow		확인
+IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAIKU를 설치하기 전의 중요 정보!\n\n
+Stop	InstallerWindow	In alert after pressing Stop	정지
+Boot sector successfully written.	InstallProgress		부트 섹터가 성공적으로 기록되었습니다.
+Restart	InstallerWindow		다시 시작
+The disk can't be mounted. Please choose a different disk.	InstallProgress		이 디스크는 마운트 할 수 없습니다. 다른 디스크를 선택해 주십시오.
+Collecting copy information.	InstallProgress		복사 정보 모으는 중.
+Show optional packages	InstallerWindow		선택적인 패키지 보기
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		대상 디스크에는 충분한 공간이 없습니다. 다른 디스크를 선택하거나 설치 옵션 항목을 선택 해제하기 바랍니다.
+Installation canceled.	InstallProgress		설치가 취소됨.
+Stop	InstallerWindow		정지
+Continue	InstallerWindow	In alert after pressing Stop	계속
+Scanning for disks…	InstallerWindow		디스크 검색중…
+The partition can't be mounted. Please choose a different partition.	InstallProgress		이 파티션을 마운트 할 수 없습니다.다른 파티션을 선탹해 주십시오.
+Set up partitions…	InstallerWindow		파티션 설정…
+Install progress:  	InstallerWindow		설치 과정:  
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		당신은 이 디스크에 설치 할 수 없습니다. 다른 디스크를 선택하십시오.
+OK	InstallProgress		확인
+Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		당신은 현재의 부팅 디스크에 설치하겠습니까? 만약 당신이 계속 진행한다면 설치프로그램은  컴퓨터를 재부팅하게 될 것입니다.
+scanning…	InstallerWindow		탐색중…
+Continue	InstallerApp		계속

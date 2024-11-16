@@ -1,0 +1,3 @@
+1	korean	x-vnd.Haiku-FTPService	4086152171
+FTP server	FTPServiceAddOn		FTP 서버
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		FTP 서버는 원격지에서 FTP 프로토콜을 통해 이 시스템의 파일에 접근할 수 있도록 합니다.\n\n이 프로토콜은 암호화 되지 않아 안전하지 않으므로 주의가 필요합니다.

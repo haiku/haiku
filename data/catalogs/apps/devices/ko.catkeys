@@ -1,0 +1,83 @@
+1	korean	x-vnd.Haiku-Devices	911816421
+ACPI bus	DevicesView		ACPI 버스
+Encryption controller	Device		암호화 컨트롤러
+Devices	System name		장치
+USB bus	DevicesView		USB 버스
+Graphics Peripheral	DeviceSCSI		그래픽 장치
+Processor	Device		프로세서
+Generate system information	DevicesView		시스템 정보 생성
+Unknown	DeviceACPI		알 수 없음
+Class info	DevicePCI		클래스 정보
+USB bus	Device		USB 버스
+Computer	DevicesView		컴퓨터
+Communications	DeviceSCSI		통신
+Mass storage controller	Device		대용량 저장 장치 컨트롤러
+Connection	DevicesView		연결
+Printer	DeviceSCSI		프린터
+ACPI Processor Namespace '%2'	DeviceACPI		ACPI 프로세서 이름공간 '%2'
+Manufacturer	Device		제조사
+Scanner	DeviceSCSI		스캐너
+Memory controller	Device		메모리 제어기
+Unknown device	DevicesView		알 수 없는 장치
+Unknown	DevicePCI		알 수 없음
+ACPI node '%1'	DeviceACPI		ACPI 노드 '%1'
+Optical Drive	DeviceSCSI		광학 드라이브
+Name	PropertyList		이름
+Manufacturer	DeviceSCSI		제조사
+Device name	Device		장치 이름
+Satellite communications controller	Device		위성 통신 컨트롤러
+Device class	DeviceSCSI		장치 클래스
+Device	Device		장치
+Input device controller	Device		입력 장치 컨트롤러
+ACPI System Indicator	DeviceACPI		ACPI 시스템 지시기
+PCI bus	DevicesView		PCI 버스
+ACPI System Bus	DeviceACPI		ACPI 시스템 버스
+Tape Drive	DeviceSCSI		테이프 장치
+Changer	DeviceSCSI		교환기
+Serial bus controller	Device		시리얼 버스 컨트롤러
+Refresh devices	DevicesView		장치 새로고침
+Category	DevicesView		종류
+RBC	DeviceSCSI		RBC
+Device paths	Device		장치 경로
+Unknown device	Device		알 수 없는 장치
+Wireless controller	Device		무선 컨트롤러
+Generic system peripheral	Device		일반 시스템 주변 기기
+Value	PropertyList		값
+Devices	DevicesView		장치
+Device name	DeviceACPI		장치 이름
+Card Reader	DeviceSCSI		카드 리더
+Display controller	Device		디스플레이 컨트롤러
+ACPI Button '%1'	DeviceACPI		ACPI 버튼 '%1'
+ACPI <unknown>	DeviceACPI		ACPI <알수없음>
+Device name	DevicePCI		장치 이름
+Disk Drive	DeviceSCSI		디스크 드라이브
+Report compatibility	DevicesView		호환성 보고서
+Other	DeviceSCSI		기타
+Computer	Device		컴퓨터
+PCI bus	Device		PCI 버스
+Enclosure	DeviceSCSI		인클로저
+ACPI Thermal Zone	DeviceACPI		ACPI 터미널 지역
+Order by:	DevicesView		정렬:
+Intelligent controller	Device		지능형 컨트롤러
+Multimedia controller	Device		멀티미디어 컨트롤러
+Quit	DevicesView		종료
+ISA bus	Device		ISA 버스
+ISA bus	DevicesView		ISA 버스
+Processor	DeviceSCSI		프로세서
+Bridge	Device		브리지
+Worm	DeviceSCSI		웜(일회 기록 다회 읽기 장치)
+CD-ROM	DeviceSCSI		컴팩트 디스크
+Manufacturer	DevicePCI		제조사
+Bridge	DeviceSCSI		브리지
+Signal processing controller	Device		신호 처리 컨트롤러
+Device name	DeviceSCSI		장치 이름
+Docking station	Device		도킹 스테이션
+Array	DeviceSCSI		배열
+Unclassified device	Device		분류되지 않은 장치
+Manufacturer	DeviceACPI		제조사
+ACPI controller	Device		ACPI 제어기
+Network controller	Device		네트워크 컨트롤러
+Driver used	Device		사용된 드라이버
+Communication controller	Device		통신 컨트롤러
+ACPI bus	Device		ACPI 버스
+unknown	Device		알 수 없음

@@ -1,0 +1,14 @@
+1	korean	x-vnd.Haiku-NewMailNotification	2396784785
+Log window	NotifierConfigView		로그 창
+none	NotifierConfigView		없음
+Alert	NotifierConfigView		경고
+OK	NotifierFilter		확인
+Central alert	NotifierConfigView		전역 경고창
+Beep	NotifierConfigView		알림음
+Central beep	NotifierConfigView		전역 알림음
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{한 건의 새 메시지} other{#건의 새 메시지}}
+New mail notification	NotifierFilter		새 메일 알림
+New messages	NotifierFilter		새 메세지
+Method:	NotifierConfigView		방법:
+Keyboard LEDs	NotifierConfigView		키보드 LED
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		%account 계정에 {0, plural, one{한 건의 새 메시지} other{#건의 새 메시지}}가 있습니다.

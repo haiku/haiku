@@ -1,0 +1,54 @@
+1	korean	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		계정 설정
+\t\t· Outgoing	Config Window		\t\t· 보낸 편지함
+An error occurred while creating the config view: %error.	Config Views		설정 화면을 생성하는 데 오류가 발생하였습니다: %error.
+E-mail address:	E-Mail		메알 주소:
+Create new account	AutoConfigWindow		새 계정 만들기
+While sending and receiving	Config Window		보내고 받는 동안
+Error!	Config Views		오류!
+Apply	Config Window		적용
+Incoming mail filters	Config Views		메일 필터 불러오는 중
+Outgoing mail filters	Config Views		메일 필터 내보내는 중
+Server name:	E-Mail		서버 이름:
+Add	Config Window		추가
+Back	AutoConfigWindow		뒤로
+Real name:	E-Mail		실제 이름:
+Real name:	Config Views		실제 이름:
+\t\t· E-mail filters	Config Window		\t\t·메일 필터
+Outgoing	E-Mail		보낸 편지함
+Accounts	Config Window		계정
+Outgoing	Config Window		보낸 편지함
+Remove	Config Views		제거
+Show notifications:	Config Window		알림 보기:
+Settings	Config Window		설정
+Never	Config Window	show status window	안함
+Account name:	Config Views		계정 이름:
+\t\t· Incoming	Config Window		\t\t· 받은 편지함
+Enter a valid e-mail address.	AutoConfigWindow		올바른 메일 주소를 입력하십시오.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\n일반 설정은 되돌릴 수 없습니다.\n\n일반 설정을 가져오는 중 오류가 발생하였습니다:\n%s\n
+Incoming	E-Mail		받은 편지함
+Choose Protocol	E-Mail		프로토콜 선택
+Return address:	Config Views		반송 주소:
+Password:	E-Mail		비밀번호:
+Error retrieving general settings: %s\n	Config Window		일반 설정을 가져오는 중 오류가 발생하였습니다:%s\n
+The filter could not be moved. Deleting filter.	Config Views		필터를 이동할 수 없습니다. 핕터를 지우는 중입니다.
+OK	Config Views		확인
+Revert	Config Window		되돌리기
+Incoming	Config Window		받은 편지함
+Finish	AutoConfigWindow		완료
+Add filter	Config Views		필터 추가
+Account settings	Config Views		계정 설정
+minutes	Config Window		분
+E-mail	System name		메일
+Check every	Config Window		모두 확인
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		추가 버튼을 눌러 새 계정을 생성합니다.\n\n선택한 항목의 제거 버튼을 눌러 계정을 제거합니다.\n\n목록에서 항목을 선택하여 설정을 편집합니다.
+Account name:	E-Mail		계정 이름:
+Edit mailbox menu…	Config Window		편지함 메뉴 편집…
+Server Name:	E-Mail		서버 이름:
+Remove	Config Window		제거
+Login name:	E-Mail		로그인 이름:
+While sending	Config Window		보내는 동안
+OK	Config Window		확인
+OK	AutoConfigWindow		확인
+Next	AutoConfigWindow		다음
+Error	Config Window		오류

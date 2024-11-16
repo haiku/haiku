@@ -1,0 +1,17 @@
+1	korean	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		여기에 파일을 끌어다 놓으십시오.
+Filename: %s	file:ZipOMaticWindow.cpp		파일이름: %s
+Do you want to stop them?	file:ZipOMatic.cpp		작업을 중단하시겠습니까?
+Error creating archive	file:ZipOMaticWindow.cpp		압축파일 생성 중 오류 발생
+Stop them	file:ZipOMatic.cpp		작업 정지
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		압축파일 생성을 중단하시겠습니까?
+Preparing to archive	file:ZipperThread.cpp		압축 준비중
+Let them continue	file:ZipOMatic.cpp		작업 계속
+Continue	file:ZipOMaticWindow.cpp		계속
+Archive created OK	file:ZipOMaticWindow.cpp		압축파일 생성 완료
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{#개 파일 추가됨.} other{#개 파일 추가됨.}}
+Stop	file:ZipOMaticWindow.cpp		중지
+Stopped	file:ZipOMaticWindow.cpp		중지됨
+Archive	file:ZipperThread.cpp		압축파일
+Creating archive: %s	file:ZipOMaticWindow.cpp		압축파일 생성 중: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		{0, plural, one{#개의} other{#개의}} Zip-O-Matic이 실행 중입니다.\n\n

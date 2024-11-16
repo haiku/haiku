@@ -1,0 +1,165 @@
+1	korean	x-vnd.Haiku-WebPositive	2942427387
+Authentication required	Authentication Panel		인증이 필요합니다
+Previous	WebPositive Window		이전
+Copy	Console Window		복사
+(Finish: %date)	Download Window		(완료: %date)
+Open bookmarks confirmation	WebPositive Window		북마크 확인 열기
+Download folder:	Settings Window		다운로드 폴더:
+Close window	WebPositive Window		창 닫기
+Find:	WebPositive Window		찾기:
+Script console	WebPositive Window		스크립트 콘솔
+There was an error setting up the bookmark.	WebPositive Window		북마크 설정 과정에서 오류가 발생했습니다.
+Fonts	Settings Window		글꼴
+Path	Cookie Manager		경로
+Bookmarks	WebPositive Window		북마크
+Use proxy server to connect to the internet	Settings Window		프록시 서버를 통하여 인터넷 통신
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 불러오기 완료
+Auto-hide interface in full screen mode	Settings Window		전체화면 모드에서 인터페이스 자동 숨김
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	북마크 폴더를 가져오는 데 오류가 발생했습니다.\n\n오류: %error
+Delete	Cookie Manager		삭제
+(Finish: %date - Over %duration left)	Download Window		(완료: %date - %duration 남음)
+Open containing folder	Download Window		저장된 폴더 열기
+Find previous	WebPositive Window		이전 찾기
+Full screen	WebPositive Window		전체화면
+Downloads in progress	WebPositive		다운로드 진행 중
+Copy URL to clipboard	Download Window		URL을 클립보드에 복사
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount개의 북마크를 모두 동시에 여시겠습니까?
+Clone current page	Settings Window		현재 페이지 복제
+Start page:	Settings Window		시작 페이지:
+Cancel	Download Window		취소
+Settings	Settings Window		설정
+Downloads	WebPositive Window		다운로드
+Browse…	Settings Window		찾아보기…
+Resume prior session	Settings Window		이전 세션 재개
+Match case	WebPositive Window		대소문자 구분
+Proxy password:	Settings Window		프록시 비밀번호:
+Size:	Font Selection view		크기:
+Page source	WebPositive Window		페이지 소스
+Proxy server port:	Settings Window		프록시 서버 포트:
+Error opening downloads folder	Download Window		다운로드 폴더를 여는데 오류가 발생했습니다
+Show bookmark bar	WebPositive Window		북마크바 보기
+Find	WebPositive Window		찾기
+Standard font:	Settings Window		표준 글꼴:
+Open download error	Download Window		다운로드 오류 열기
+General	Settings Window		일반
+New tabs:	Settings Window		새 탭:
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 불러오기 실패
+Open downloads folder	Download Window		다운로드 폴더 열기
+Proxy server	Settings Window		프록시 서버
+Darn!	WebPositive		이런!
+Decrease size	WebPositive Window		크기 줄이기
+Default fixed font size:	Settings Window		기본 고정 글꼴 크기:
+Sans serif font:	Settings Window		산세리프 글꼴:
+Clear	WebPositive Window		지우기
+The download could not be opened.	Download Window		다운로드를 열 수 없습니다.
+Cookies for %s	Cookie Manager		%s의 쿠키
+Close	Download Window		닫기
+WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - 검색 문자열
+Reload	WebPositive Window		새로고침
+Expiration	Cookie Manager		만료
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU가 너무 오래되어 WebPositive가 요구하는 SSE2 확장을 지원하지 않아 실행할 수 없습니다. 대신 NetSurf를 설치하는 것을 권장드립니다.
+Download finished	Download Window		다운로드 완료
+Cookie manager	WebPositive Window		쿠키 관리자
+OK	Authentication Panel		확인
+Hide password text	Authentication Panel		비밀번호 문자 숨기기
+Username:	Authentication Panel		사용자 이름:
+Name	Cookie Manager		이름
+Remove finished	Download Window		삭제 완료
+Earlier	WebPositive Window		더 이전
+Edit	WebPositive Window		편집
+Back	WebPositive Window		뒤로
+Yesterday	WebPositive Window		어제
+Quit	WebPositive		종료
+Download aborted	Download Window		다운로드 중단됨
+Number of days to keep links in History menu:	Settings Window		검색기록 메뉴에 링크를 유지할 기간:
+Password:	Authentication Panel		비밀번호:
+Forward	WebPositive Window		앞으로
+Clear	Console Window		지우기
+Cut	URL Bar		자르기
+View	WebPositive Window		보기
+Paste	URL Bar		붙여넣기
+Find next	WebPositive Window		문자열 찾기
+Open search page	Settings Window		검색 페이지 열기
+Increase size	WebPositive Window		크기 키우기
+New tab	WebPositive Window		새 탭
+Today	WebPositive Window		오늘
+Open location	WebPositive Window		위치 열기
+New browser window	Download Window		새 브라우저 창
+Open	Download Window		열기
+New window	WebPositive Window		새 창
+New windows:	Settings Window		새 창:
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	다운로드 폴더를 열 수 없습니다.\n\n오류: %error
+Cancel	Authentication Panel		취소
+Style:	Font Selection view		스타일:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	북마크 파일을 만드는 데 오류가 발생했습니다.\n\n오류: %error
+OK	Download Window		확인
+Proxy username:	Settings Window		프록시 사용자 이름:
+Manage bookmarks	WebPositive Window		북마크 관리
+/s)	Download Window	...as in 'per second'	/초)
+Restart	Download Window		재시작
+Serif font:	Settings Window		세리프 글꼴:
+Apply	Settings Window		적용
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	북마크 폴더를 표시하는 데 오류가 발생했습니다.\n\n오류: %error
+Revert	Settings Window		되돌리기
+Copy	WebPositive Window		복사
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{마지막 줄이 #번 반복되었습니다.}other{마지막 줄이 #번 반복되었습니다.}}
+Default standard font size:	Settings Window		기본 표준 글꼴 크기:
+Custom	Settings Window		사용자 정의
+Bookmark this page	WebPositive Window		이 페이지를 북마크에 추가
+Show tabs if only one page is open	Settings Window		페이지가 하나만 열려 있을 때 탭 표시
+Close tab	WebPositive Window		탭 닫기
+Remove	Download Window		제거
+About	WebPositive Window		대하여
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		진행 중인 다운로드가 아직 남아있습니다. 정말 지금 WebPositive를 종료하시겠습니까?
+Continue downloads	WebPositive		이어서 다운로드
+Proxy server requires authentication	Settings Window		프록시 서버가 인증을 요구합니다
+Cancel	Settings Window		취소
+Reset size	WebPositive Window		크기 되돌리기
+History	WebPositive Window		검색기록
+Do you really want to clear the browsing history?	WebPositive Window		검색기록을 모두 지우시겠습니까?
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	찾는 문자열의 다음 위치 찾기
+Fixed font:	Settings Window		고정폭 글꼴:
+Quit	WebPositive Window		종료
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	찾는 문자열의 이전 위치 찾기
+Remember username and password for this site	Authentication Panel		이 사이트의 사용자 이름과 비밀번호를 기억합니다
+(Finish: %date - %duration left)	Download Window		(완료: %date - %duration 남음)
+Cookie manager	Cookie Manager		쿠키 관리자
+Show home button	Settings Window		홈 버튼 보이기
+Start new session	Settings Window		새 세션 시작
+The cookie jar is empty!	Cookie Manager		쿠기 단지가 비었습니다!
+Value	Cookie Manager		값
+Remove missing	Download Window		찾을 수 없는 항목 제거
+Paste	WebPositive Window		붙여넣기
+Double-click or middle-click to open new tab.	Tab Manager		더블클릭이나 가운데 클릭으로 새 탭 열기
+Next	WebPositive Window		다음
+Bookmark error	WebPositive Window		북마크 오류
+OK	WebPositive Window		확인
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%expectedSize% 중 %currentSize%, %rate%/초)
+WebPositive	Download Window		WebPositive
+Zoom text only	WebPositive Window		문자만 키우기
+Save page as…	WebPositive Window		페이지를 다른 이름으로 저장…
+Page source error	WebPositive Window		페이지 소스 오류
+Auto-hide mouse pointer	Settings Window		마우스 포인터 자동 숨김
+Requesting %url	WebPositive Window		%url 요청 중
+Flags	Cookie Manager		플래그
+Window	WebPositive Window		창
+Proxy server address:	Settings Window		프록시 서버 주소:
+Search page:	Settings Window		검색 페이지:
+Settings	WebPositive Window		설정
+Clear	URL Bar		지우기
+Loading %url	WebPositive Window		%url 로딩 중
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	다람쥐 헌 쳇바퀴에 타고파
+Start up:	Settings Window		시작:
+Confirmation	WebPositive Window		확인
+Session cookie	Cookie Manager		세션 쿠키
+No SSE2 support	WebPositive		SSE2 지원 없음
+Open all	WebPositive Window		모두 열기
+Cut	WebPositive Window		자르기
+Downloads	Download Window		다운로드
+Open blank page	Settings Window		빈 페이지 열기
+Clear history	WebPositive Window		검색기록 지우기
+Cancel	WebPositive Window		취소
+Script console	Console Window		스크립트 콘솔
+Copy	URL Bar		복사
+Open start page	Settings Window		시작 페이지 열기

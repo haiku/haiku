@@ -1,0 +1,29 @@
+1	korean	x-vnd.Haiku-Media	582516163
+Couldn't add volume control in Deskbar: %s\n	Media views		데스크바에 음량 조절기를 추가할 수 없습니다: %s\n
+Restart media services	Media views		미디어 서비스 재시작
+Quit	Media Window		종료
+<none>	VideoInputMenu	Used when no video input is available	<없음>
+Couldn't remove volume control in Deskbar: %s\n	Media views		데스크바에서 음량 조절기를 제거 할 수 없습니다: %s\n
+Video output:	Media views		비디오 출력:
+Video input:	Media views		비디오 입력:
+Audio output:	Media views		오디오 출력:
+Please select a SoundFont.	Midi View		사운드 폰트를 선택하십시오.
+There are no SoundFonts installed.	Midi View		설치된 사운드 폰트가 없습니다.
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		지금 종료하면 미디어 서비스 재기동을 중지합니다. 미디어 기능이 불안정하거나 작동하지 않을 수 있습니다.
+Could not connect to the media server.\nWould you like to start it ?	Media Window		미디어 서버에 연결 할 수 없습니다.\n지금 시작 하시겠습니까?
+Video settings	Media Window		비디오 설정
+Audio mixer	Media Window		오디오 믹서
+Show volume control on Deskbar	Media views		데스크바에 음량 조절기 표시하기
+Start media server	Media Window		미디어 서버 시작
+Audio settings	Media Window		오디오 설정
+Quit anyway	Media Window		그냥 종료하기
+Media	System name		미디어
+Warning!	Media Window		주의!
+MIDI Settings	Media Window		MIDI 설정
+SoundFonts	Midi View		사운드 폰트
+Audio input:	Media views		오디오 입력:
+<none>	Media views		<없음>
+Channel:	Media views		채널:
+This hardware has no controls.	Media Window		이 하드웨어는 어떤 컨트롤도 없습니다.
+Defaults	Media views		기본설정
+<none>	VideoOutputMenu	Used when no video output is available	<없음>

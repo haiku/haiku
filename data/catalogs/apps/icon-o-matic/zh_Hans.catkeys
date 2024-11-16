@@ -1,10 +1,13 @@
-1	english	x-vnd.haiku-icon_o_matic	2309931376
+1	english	x-vnd.haiku-icon_o_matic	55353010
 None	Icon-O-Matic-Properties		无
+Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路径
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
 Add empty	Icon-O-Matic-ShapesList		添加空白
 Opening the icon failed!	Icon-O-Matic-Main		打开图标失败！
+Reverse path	Icon-O-Matic-ReversePathCmd		逆向路径
 Bleep!	Icon-O-Matic-Exporter	Exporter - Continue in error dialog	哔哔声!
 Add with path	Icon-O-Matic-ShapesList		添加路径
+Paste properties	Icon-O-Matic-Properties		粘贴属性
 Copy	Icon-O-Matic-Properties		复制
 Color	Icon-O-Matic-PropertyNames		颜色
 Format	Icon-O-Matic-SavePanel		格式
@@ -26,6 +29,7 @@ BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
 Transform	Icon-O-Matic-PathManipulator		转换
 Add shape with style	Icon-O-Matic-Menu-Shape		添加模型（包含样式）
 Change color	Icon-O-Matic-SetColorCmd		改变颜色
+Unassign path	Icon-O-Matic-UnassignPathCmd		取消路径分配
 Remove	Icon-O-Matic-StylesList		删除
 Cancel	Icon-O-Matic-Menu-Settings		取消
 Transformation	Icon-O-Matic-TransformationBoxStates		转换
@@ -34,37 +38,49 @@ Closed	Icon-O-Matic-PropertyNames		关闭
 Height	Icon-O-Matic-PropertyNames		高度
 warning	Icon-O-Matic-SVGExport		警告
 File	Icon-O-Matic-Menus		文件
+any of the other lists to	Icon-O-Matic-PropertiesList	Empty property list - 2nd line	任意其他列表
 Properties	Icon-O-Matic-Menus		属性
 Path	Icon-O-Matic-PropertyNames		路径
 Path	Icon-O-Matic-Menus		路径
 Stroke	Transformation		描边
 Flip	Icon-O-Matic-PathManipulator		翻转
+edit its properties here.	Icon-O-Matic-PropertiesList	Empty property list - 3rd line	在这里编辑其属性。
+Move pivot	Icon-O-Matic-TransformationBoxStates		移动枢轴
 Opacity	Icon-O-Matic-PropertyNames		透明度
 OK	Icon-O-Matic-ColorPicker		确定
 Error: 	Icon-O-Matic-Main		错误：
 Saving your document failed!	Icon-O-Matic-Exporter		文档保存失败！
 Snap to grid	Icon-O-Matic-Menu-Settings		对齐网格
 Opening the document failed!	Icon-O-Matic-Main		打开文档失败！
+One or more of the paths have too many vertices. The HVIF format supports a maximum of 255 vertices per path.	Icon-O-Matic-FlatIconExporter		一条或多条路径的顶点太多。HVIF 格式最多支持每条路径 255 个顶点。
 Add with path & style	Icon-O-Matic-ShapesList		添加路径与样式
 Shape	Icon-O-Matic-Menus		模型
 <unavailable>	Icon-O-Matic-StyleTypes		<不可用>
+Edit gradient	Icon-O-Matic-SetGradientCmd		编辑渐变
 Min LOD	Icon-O-Matic-PropertyNames		最小层次细节
+Redo: %action%	Icon-O-Matic-Main		重做: %action%
 Add	Icon-O-Matic-TransformersList		添加
 Settings	Icon-O-Matic-Menus		设置
 Scale X	Icon-O-Matic-PropertyNames		比例 X
 Add	Icon-O-Matic-PathsList		添加
 Remove	Icon-O-Matic-PathManipulator		删除
 Duplicate	Icon-O-Matic-ShapesList		副本
+Alpha	Icon-O-Matic-PropertyNames		Alpha
 Contour	Transformation		轮廓
+Insert vertex	Icon-O-Matic-InsertPointCmd		插入顶点
 Rounding	Icon-O-Matic-PropertyNames		倒角
 Joins	Icon-O-Matic-PropertyNames		连接
+There are too many shapes. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		太多形状。HVIF 格式最多支持 255 个。
 Cancel	Icon-O-Matic-ColorPicker		取消
 Duplicate	Icon-O-Matic-PathsList		副本
 Save	Icon-O-Matic-Menu-Settings		保存
+Click on an object in	Icon-O-Matic-PropertiesList	Empty property list - 1st line	点击一个对象于
 Export as…	Icon-O-Matic-Menu-File		导出为...
+Undo: %action%	Icon-O-Matic-Main		撤消: %action%
 Diamond	Icon-O-Matic-StyleTypes		菱形
 Don't save	Icon-O-Matic-Menu-Settings		不保存
 Add shape with path	Icon-O-Matic-Menu-Shape		添加模型（包含路径）
+Bummer	Icon-O-Matic-Main	Cancel button - error alert	糟糕
 Translation X	Icon-O-Matic-PropertyNames		平移 X
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		数据加载时，图标套件 并未从 SVG 中解析所有数据。覆盖原文件，将不会再显示该信息。
 Rotate indices backwards	Icon-O-Matic-PathsList		逆时针旋转
@@ -72,30 +88,41 @@ Overwrite	Icon-O-Matic-SVGExport		覆盖
 Cancel	Icon-O-Matic-SVGExport		取消
 Open…	Icon-O-Matic-Menu-File		打开...
 Remove	Icon-O-Matic-ShapesList		删除
+HVIF source code	Icon-O-Matic-SavePanel		HVIF 源码
 Drop shapes	Icon-O-Matic-ShapesList		拽入样式
+Save icon	Icon-O-Matic-SavePanel	Dialog title	保存图标
 Linear	Icon-O-Matic-StyleTypes		线性
+Add vertex	Icon-O-Matic-AddPointCmd		添加顶点
 Clean up	Icon-O-Matic-PathsList		清理
 Split	Icon-O-Matic-PathManipulator		分割
 Move	Icon-O-Matic-TransformationBoxStates		移动
+There are too many paths. The HVIF format supports a maximum of 255.	Icon-O-Matic-FlatIconExporter		路径过多。HVIF 格式最多支持 255 条。
 Conic	Icon-O-Matic-StyleTypes		圆锥线
 Name	Icon-O-Matic-PropertyNames		名称
 Reset transformation	Icon-O-Matic-StylesList		重置转换
 Reverse	Icon-O-Matic-PathsList		撤销
 Remove	Icon-O-Matic-PathsList		删除
+64 × 64	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	64 × 64
+Load error	Icon-O-Matic-SVGImport		加载错误
 Style type	Icon-O-Matic-StyleTypes		样式类型
 Quit	Icon-O-Matic-Menu-File		退出
 Gradient	Icon-O-Matic-StyleTypes		渐变
+Color (#%02x%02x%02x)	Icon-O-Matic-Main	Style name after dropping a color	颜色 (#%02x%02x%02x)
 Add shape with path & style	Icon-O-Matic-Menu-Shape		添加模型包含路径与样式
 Radial	Icon-O-Matic-StyleTypes		射线
 Text too long	Icon-O-Matic-StyledTextImport		文本太长
 Caps	Icon-O-Matic-PropertyNames		大写
 OK	Icon-O-Matic-SVGImport		确定
+Import text	Icon-O-Matic-StyledTextImport		导入文本
 Append…	Icon-O-Matic-Menu-File		附加...
 Scale Y	Icon-O-Matic-PropertyNames		比例 Y
+Export icon	Icon-O-Matic-SavePanel	Dialog title	导出图标
 Rotate indices forwards	Icon-O-Matic-PathsList		顺时针旋转
 Save	Icon-O-Matic-Menu-File		保存
+Cancel	Icon-O-Matic-StyledTextImport		取消
 Add circle	Icon-O-Matic-PathsList		添加圆形
 Freeze transformation	Icon-O-Matic-ShapesList		冻结转换
+META:ICON attribute	Icon-O-Matic-SavePanel		META:ICON 属性
 Untitled	Icon-O-Matic-Main		未命名
 Max LOD	Icon-O-Matic-PropertyNames		最大层次细节
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		关闭前是否保存当前图标修改？
@@ -103,6 +130,7 @@ Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		打
 Save as…	Icon-O-Matic-Menu-File		保存为...
 Swatches	Icon-O-Matic-Menus		调色板
 <modify path>	Icon-O-Matic-PathCmd		<修改路径>
+Set %property%	Icon-O-Matic-Properties	Don't translate %property%	设置 %property%
 Icon-O-Matic	System name		图标套件
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<无撤销任务>
 Add	Icon-O-Matic-StylesList		添加
@@ -114,11 +142,14 @@ Invert selection	Icon-O-Matic-Properties		反向选择
 <unkown property>	Icon-O-Matic-PropertyNames		<未知属性>
 Pick a color	Icon-O-Matic-ColorPicker		选择颜色
 Settings…	Icon-O-Matic-SavePanel		设置...
+Select all	Icon-O-Matic-PathManipulator		全选
 Add with style	Icon-O-Matic-ShapesList		添加包含样式
 New	Icon-O-Matic-Menu-File		新建
+Change perspective	Icon-O-Matic-PerspectiveCommand		改变视角
 Gradient type	Icon-O-Matic-StyleTypes		渐变类型
 Export	Icon-O-Matic-Menu-File		导出
 Width	Icon-O-Matic-PropertyNames		宽度
+Add reference image	Icon-O-Matic-ShapesList		添加参考图像
 Style	Icon-O-Matic-Menus		样式
 Off	Icon-O-Matic-Menu-Settings		关闭
 Edit	Icon-O-Matic-Menus		编辑

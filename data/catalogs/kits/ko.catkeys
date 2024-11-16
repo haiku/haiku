@@ -1,0 +1,50 @@
+1	korean	x-vnd.Haiku-libbe	1445751563
+All Rights Reserved.	AboutWindow		All Rights Reserved.
+gold master	AboutWindow		골드 마스터
+Undo	TextView		실행취소
+OK	PrintJob		확인
+OK	Dragger		확인
+gamma	AboutWindow		감마
+development	AboutWindow		개발
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s 바이트/초} other{%s 바이트/초}}
+Print Server is not responding.	PrintJob		인쇄 서버가 응답하지 않습니다.
+About %app%	AboutMenuItem		%app%에 대하여
+Warning	Dragger		경고
+Green:	ColorControl		녹색:
+Redo	TextView		다시하기
+No pages to print!	PrintJob		인쇄할 페이지가 없습니다!
+beta	AboutWindow		베타
+%s MiB	StringForSize	size unit	%s MiB
+OK	ZombieReplicantView		확인
+Cut	TextView		자르기
+Default	Default decorator about box		기본값
+Can't delete this replicant from its original application. Life goes on.	Dragger		원래 응용 프로그램에서 레플리컨트를 지울 수 없습니다. 삶은 그렇게 계속되지요.
+%s KiB	StringForSize	size unit	%s KiB
+Error	ZombieReplicantView		오류
+Paste	TextView		붙여넣기
+OK	AboutWindow		확인
+%s MiB/s	StringForRate	units per second	%s MiB/s
+Special Thanks:	AboutWindow		Special Thanks:
+%s TiB	StringForSize	size unit	%s TiB
+Default Haiku window decorator.	Default decorator about box		기본 Haiku 윈도우 테마.
+%s GiB	StringForSize	size unit	%s GiB
+%s B	StringForSize	size unit, narrow space	%s B
+Remove replicant	Dragger		레플리컨트 제거
+Version	AboutWindow		버전
+Red:	ColorControl		빨강색:
+<empty>	Menu		<비어있음>
+Copy	TextView		복사
+Select all	TextView		전체 선택
+alpha	AboutWindow		알파
+Error	PrintJob		오류
+%s TiB/s	StringForRate	units per second	%s TiB/s
+About %app…	Dragger		%app에 대하여…
+About %app%	AboutWindow		%app%에 대하여
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s 바이트} other{%s 바이트}}
+%s GiB/s	StringForRate	units per second	%s GiB/s
+Version history:	AboutWindow		버전 이력:
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		레플리컨트를 위한 응용 프로그램을 찾을 수 없습니다. 응용 프로그램 서명이 제공되지 않았습니다.\n%error
+%s KiB/s	StringForRate	units per second	%s KiB/s
+Blue:	ColorControl		파랑색:
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		\"%description\"의 레플리컨트를 생성할 수 없습니다.\n%error
+Written by:	AboutWindow		작성자:

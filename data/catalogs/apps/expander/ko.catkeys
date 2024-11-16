@@ -1,0 +1,24 @@
+1	korean	x-vnd.Haiku-Expander	2407744200
+Expander: Choose destination	DirectoryFilePanel		Expander:  대상 선택
+Close window when done expanding	ExpanderPreferences		압출이 다 풀렸을 때 창 닫기
+Settings	ExpanderMenu		설정
+Expand	ExpanderWindow		압축풀기
+Same directory as source (archive) file	ExpanderPreferences		소스(압축) 파일과 같은 디렉토리
+Cancel	ExpanderWindow		취소
+Expander settings	ExpanderPreferences		압축풀기 설정
+Error when expanding archive	ExpanderWindow		압축파일 압축 풀때 에러 발생
+Expand	ExpanderMenu		압축풀기
+Settings…	ExpanderMenu		설정…
+Select current	DirectoryFilePanel		현재 폴더 선택
+File expanded	ExpanderWindow		파일 압축이 풀림
+Automatically expand files	ExpanderPreferences		자옫으로 파일 압축 풀기
+Select	DirectoryFilePanel		선택
+Set destination…	ExpanderMenu		압축 풀 위치 지정…
+Continue	ExpanderWindow		계속
+Cancel	ExpanderPreferences		취소
+Use:	ExpanderPreferences		사용:
+Expander: Open	ExpanderWindow		압축풀기: 열기
+Hide contents	ExpanderWindow		내용 숨기기
+Source	ExpanderWindow		원본
+The destination is read only.	ExpanderWindow		대상은 읽기 전용입니다.
+Select	ExpanderPreferences		선택

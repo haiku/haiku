@@ -1,0 +1,49 @@
+1	korean	x-vnd.Be-TSKB	316181764
+Auto-hide	PreferencesWindow		자동 숨김
+Show all	WindowMenu		모두 보이기
+Edit in Tracker…	PreferencesWindow		트래커에서 편집…
+Menu	PreferencesWindow		메뉴
+Tracker always first	PreferencesWindow		항상 트래커를 맨앞에
+Hide clock	TimeView		시계 숨기기
+Large	PreferencesWindow		크게
+<Deskbar folder is empty>	DeskbarMenu		<데스크바 폴더가 비어있습니다>
+Recent documents	DeskbarMenu		최근 문서
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		응용 프로그램
+Always on top	PreferencesWindow		항상 위에
+Restart system	DeskbarMenu		시스템 재시작
+Recent documents:	PreferencesWindow		최근 문서:
+Auto-raise	PreferencesWindow		자동 확장
+Mount	DeskbarMenu		마운트
+Icon size	PreferencesWindow		아이콘 크기
+About Haiku	DeskbarMenu		Haiku에 대하여
+Small	PreferencesWindow		작게
+Show calendar…	TimeView		달력 보이기
+Find…	DeskbarMenu		찾기...
+Power off	DeskbarMenu		전원 끄기
+Defaults	PreferencesWindow		기본값
+Show replicants	DeskbarMenu		레플리컨트 보이기
+No windows	WindowMenu		창 없음
+Show clock	Tray		시계 보이기
+Close all	WindowMenu		모두 닫기
+Deskbar preferences	PreferencesWindow		데스크바 환경설정
+About this system	DeskbarMenu		시스템 정보
+Quit application	WindowMenu		응용프로그램 끝내기
+Hide application names	PreferencesWindow		응용 프로그램 이름 숨기기
+Applications	PreferencesWindow		응용 프로그램
+Show application expander	PreferencesWindow		응용 프로그램 확장 보기
+Deskbar preferences…	DeskbarMenu		데스크바 환경설정...
+Suspend	DeskbarMenu		절전
+Shutdown…	DeskbarMenu		시스템 종료…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		데모
+Expand new applications	PreferencesWindow		새 응용 프로그램 확장
+Recent applications:	PreferencesWindow		최근 응용 프로그램:
+Recent folders:	PreferencesWindow		최근 폴더:
+Recent folders	DeskbarMenu		최근 폴더
+Recent applications	DeskbarMenu		최근 응용 프로그램
+Hide all	WindowMenu		모두 숨기기
+Sort applications by name	PreferencesWindow		이름 순으로 응용 프로그램 정렬
+Revert	PreferencesWindow		되돌리기
+Window	PreferencesWindow		창
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		환경설정
+Time preferences…	TimeView		시간 설정…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		데스크탑 애플릿

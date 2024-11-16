@@ -1,0 +1,17 @@
+1	korean	x-vnd.Haiku-keystore_server	2429996361
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		다음 작업을 수행합니다:\n%accessString%\n\n
+This application doesn't yet have the required privileges.	AppAccessRequestWindow		이 응용 프로그램은 아직 필요한 권한이 없습니다.
+Keyring:	KeyRequestWindow		키링:
+requests access to keyring:\n%keyringName%\n\n	AppAccessRequestWindow		키링에 대한 엑세스를 요청합니다:\n%keyringName%\n\n
+Application keyring access	AppAccessRequestWindow		응용 프로그램 키링 액세스
+Disallow	AppAccessRequestWindow		허용하지 않음
+Allow once	AppAccessRequestWindow		한 번만 허용
+Unlock keyring	KeyRequestWindow		키링 잠금 해제
+An application wants to access the keyring below, but it is locked with a passphrase. Please enter the passphrase to unlock the keyring.\nIf you unlock the keyring, it stays unlocked until the system is shut down or the keyring is manually locked again.\nIf you cancel this dialog the keyring will remain locked.	KeyRequestWindow		응용 프로그램이 아래의 키링에 액세스하려 하지만 암호로 잠겨있습니다. 키링을 잠금 해제하려면 암호를 입력하십시오.\n만약 키링의 잠금을 해제하면, 시스템이 종료되거나 키링이 수동적으로 다시 잠길 때까지 잠금이 해제된 상태로 유지됩니다.\n이 대화 상자를 취소하면 키링은 계속 잠겨있습니다.
+Password:	KeyRequestWindow		비밀번호:
+Cancel	KeyRequestWindow		취소
+This application has been updated since it was last granted access.	AppAccessRequestWindow		이 응용 프로그램은 마지막으로 액세스 권한이 부여된 이후에 업데이트 되었습니다.
+Allow always	AppAccessRequestWindow		항상 허용
+Unlock	KeyRequestWindow		잠금 해제
+The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		응용 프로그램:\n%signature% (%path%)\n\n
+This application hasn't been granted access before.	AppAccessRequestWindow		이 응용 프로그램은 이전에 액세스 권한이 부여되지 않았습니다.

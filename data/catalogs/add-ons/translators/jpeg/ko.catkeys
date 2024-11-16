@@ -1,0 +1,21 @@
+1	korean	x-vnd.Haiku-JPEGTranslator	1627696380
+Read	JPEGTranslator		불러오기
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be 비트맵 형식 (JPEG 변환기)
+Show warning messages	JPEGTranslator		경고 메세지 표시
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		100% 잉크 사용을 위해서는 CMYK 코드를 0으로 설정하십시오
+JPEG Library Error: %s\n	be_jerror		JPEG 라이브러리 오류: %s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nIJG library 라이브러리에 기반함 © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n\"무손실\" 인코딩 지원 패치 제작 Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\n색상공간 변환 루틴 제작 Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		없음
+About	JPEGTranslator		대하여
+Version %d.%d.%d	JPEGTranslator		버전 %d.%d.%d
+Write black-and-white images as RGB24	JPEGTranslator		흑백 이미지를 RGB24 형식으로 기록
+Use progressive compression	JPEGTranslator		프로그레시브 압축 사용
+Make file smaller (sligthtly worse quality)	JPEGTranslator		파일을 더 작게 만들기 (품질이 조금 낮아짐)
+High	JPEGTranslator		높음
+Read greyscale images as RGB32	JPEGTranslator		회색조 이미지를 RGB32 형식으로 불러오기
+Output quality	JPEGTranslator		출력 품질
+Low	JPEGTranslator		낮음
+Write	JPEGTranslator		기록
+Prevent colors 'washing out'	JPEGTranslator		색상 바램 방지
+JPEG Library Warning: %s\n	be_jerror		JPEG 라이브러리 경고: %s\n
+JPEG images	JPEGTranslator		JPEG 이미지

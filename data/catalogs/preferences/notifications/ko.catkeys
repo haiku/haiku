@@ -1,0 +1,34 @@
+1	korean	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		왼쪽 아래
+Application does not have a valid signature	NotificationView	Alert message	응용 프로그램이 올바른 서명을 가지고 있지 않습니다
+Status	NotificationView		상태
+Add…	NotificationView		추가…
+Lower right	GeneralView		오른쪽 아래
+Muted	NotificationView		알림 꺼짐
+ is already listed	NotificationView	Alert message	 은(는) 이미 목록에 있습니다
+OK	PrefletWin		확인
+Notifications	PrefletWin		알림
+Notifications preflet sample	PrefletWin		알림 메세지 예시
+Mute notifications from this application	NotificationView		이 응용 프로그램의 알림 끄기
+wide	GeneralView	Window width: Slider high text	넓게
+narrow	GeneralView	Window width: Slider low text	좁게
+Revert	PrefletWin		되돌리기
+Applications	PrefletView		응용 프로그램
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{시간제한: # 초}other{시간제한: # 초}}
+Upper right	GeneralView		오른쪽 위
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		설정을 저장하는 중 오류가 발생했습니다.\n디스크 공간이 부족한 것 같습니다.
+Defaults	PrefletWin		기본값
+Upper left	GeneralView		왼쪽 위
+Window width	GeneralView		창 너비
+Applications	NotificationView		응용 프로그램
+General	PrefletView		일반
+OK	NotificationView		확인
+Follow Deskbar	GeneralView		데스크바 따라가기
+Notifications	System name		알림
+Allowed	NotificationView		허용됨
+Duration:	GeneralView		길이:
+Application	NotificationView		응용 프로그램
+Enable notifications	GeneralView		알림 활성화
+This is a test notification message	PrefletWin		알림 시험용 메세지입니다
+Remove	NotificationView		제거
+Position:	GeneralView		위치:

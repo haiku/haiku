@@ -1,0 +1,12 @@
+1	korean	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		정리하는 중.
+Starting media_services.	MediaDefs		미디어 서비스 시작 중.
+Stopping media_addon_server.	MediaDefs		미디어 추가기능 서버 정지 중.
+Waiting for media_addon_server to quit.	MediaDefs		미디어 추가기능 서버 종료 대기 중.
+Telling media_addon_server to quit.	MediaDefs		미디어 추가기능 서버 종료 요청 중.
+Ready for use.	MediaDefs		준비 완료.
+Stopping media server…	MediaDefs		미디어 서버 정지 중…
+Waiting for media_server to quit.	MediaDefs		미디어 서버 종료 대기 중.
+Done shutting down.	MediaDefs		종료가 완료되었습니다.
+Error occurred starting media services.	MediaDefs		미디어 서비스 시작 중 오류가 발생했습니다.
+Media Service	MediaDefs		미디어 서비스

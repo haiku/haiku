@@ -1,0 +1,50 @@
+1	korean	x-vnd.Haiku-Input	130668644
+Scrolling	TouchpadPrefView		스크롤링
+Defaults	InputMouse		기본값
+Long	KeyboardView		길게
+Cancel	TouchpadPrefView		취소
+4-Button	SettingsView		4버튼
+Slow	TouchpadPrefView		느리게
+Tapping sensitivity	TouchpadPrefView		두드리기 민감도
+Device List	InputWindow		장치 목록
+Double-click speed	SettingsView		더블클릭 속도
+5-Button	SettingsView		5버튼
+Typing test area	KeyboardView		입력 테스트
+Mouse type:	SettingsView		마우스 종류:
+Revert	InputKeyboard		되돌리기
+Fast	KeyboardView		빠르게
+Off	TouchpadPrefView		끄기
+Never	TouchpadPrefView		절대 안함
+Fast	TouchpadPrefView		빠르게
+6-Button	SettingsView		6버튼
+Please confirm	TouchpadPrefView		확인 해 주십시오
+Click to focus	SettingsView		클릭하여 포커스
+Acceleration	TouchpadPrefView		가속
+Mouse speed	SettingsView		마우스 속도
+Accept first click	SettingsView		첫 번째 클릭 인식
+OK	TouchpadPrefView		확인
+Horizontal scrolling	TouchpadPrefView		수평 스크롤링
+Delay until key repeat	KeyboardView		키 반복 지연시간
+Keyboard lock delay	TouchpadPrefView		키보드 잠금 지연시간
+Two finger scrolling	TouchpadPrefView		두손가락 스크롤링
+Input	System name		입력
+Mouse acceleration	SettingsView		마우스 가속
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		새 스크롤 영역이 너무 넓어 일반 마우스 동작에 영향을 줄 수 있습니다. 정말로 변경하시겠습니까?
+High	TouchpadPrefView		높게
+Defaults	TouchpadPrefView		기본값
+1-Button	SettingsView		1버튼
+Defaults	InputKeyboard		기본값
+Quick	TouchpadPrefView		빠르게
+Short	KeyboardView		짧게
+Slow	KeyboardView		느리게
+Revert	InputMouse		되돌리기
+Key repeat rate	KeyboardView		키 반복 속도
+2-Button	SettingsView		2버튼
+Click to focus and raise	SettingsView		클릭하여 포커스 및 위로 올리기
+Vertical	TouchpadPrefView		수직
+Horizontal	TouchpadPrefView		수평
+Focus follows mouse	SettingsView		마우스 따라 포커스 이동
+Focus mode:	SettingsView		포커스 모드:
+Double-click test area	SettingsView		더블클릭 테스트
+3-Button	SettingsView		3버튼
+Revert	TouchpadPrefView		되돌리기

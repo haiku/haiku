@@ -1,0 +1,5 @@
+1	korean	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		현재 시각 보존
+Manually adjust time…	dstcheck		직접 시간 조정…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		주의!\n\n일광절약시간제로 인해 컴퓨터의 시계가 1시간 어긋나 있을 수 있습니다.\n현재 컴퓨터는 시각을 %current time%으로 인식하고 있습니다.\n\n해당 시각이 정확합니까?
+Ask me later	dstcheck		나중에 묻기

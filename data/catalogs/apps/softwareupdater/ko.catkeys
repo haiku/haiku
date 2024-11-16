@@ -1,0 +1,63 @@
+1	korean	x-vnd.haiku-softwareupdater	153492771
+Updating version	SoftwareUpdaterWindow	List item text	업데이트 될 버전
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		{0, plural, one{#개의 패키지} other{#개의 패키지}} 업데이트를 설치하려면 여기를 클릭하세요.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	제거 될 패키지
+No active network connection was found	UpdateManager	Error message	사용 가능한 네트워크 연결을 찾을 수 없습니다
+Quit	SoftwareUpdaterWindow	Alert button label	종료
+There were no updates found.	CheckManager		업데이트를 찾을 수 없습니다.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		업데이트가 아직 완료되지 않았습니다. 정말 종료하시겠습니까?
+Updates found	SoftwareUpdaterWindow		업데이트 찾음
+Update now	SoftwareUpdaterWindow		지금 업데이트
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		컴퓨터를 재부팅 할 수 없습니다.
+OK	UpdateManager		확인
+Unrecognized argument	SoftwareUpdaterApp	Error message	인식할 수 없는 인자
+There were no updates found.	CheckAction		업데이트를 찾을 수 없습니다.
+No updates available	UpdateAction		사용 가능한 업데이트가 없습니다.
+New packages to be installed	SoftwareUpdaterWindow	List super item label	새로 설치 될 패키지
+Packages to be updated	SoftwareUpdaterWindow	List super item label	업데이트 될 패키지
+Attempting to cancel the updates…	SoftwareUpdaterWindow		업데이트를 취소하려고 시도하는 중…
+Contacting software repositories to check for package updates.	CheckManager		패키지 업데이트 확인을 위해 소프트웨어 저장소와 통신 중입니다.
+Available updates found	CheckManager		사용 가능한 업데이트를 발견했습니다
+from repository	SoftwareUpdaterWindow	List item text	저장소로부터
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		패키지 업데이트 확인을 위해 소프트웨어 저장소와 통신 중입니다.
+Cancelling updates	SoftwareUpdaterWindow		업데이트 취소 중
+Cancel	SoftwareUpdaterWindow	Alert button label	취소
+There were no updates found.	UpdateAction		업데이트를 찾을 수 없습니다.
+OK	SoftwareUpdaterWindow		확인
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		다음 업데이트 옵션 중 하나를 선택하십시오:\n\n업데이트:\n\t설치되어 있는 모든 패키지를 업데이트합니다.\n전체 동기화:\n\t설치된 패키지를 저장소와 동기화합니다.
+The following changes will be made:	SoftwareUpdaterWindow		다음 변경사항이 반영 될 예정입니다:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		매개변수가 더 이상 사용 가능하지 않습니다\n
+Fatal error while checking for updates: %s\n	CheckAction		업데이트 확인 중 치명적인 오류가 발생했습니다: %s\n
+SoftwareUpdater	System name		SoftwareUpdater
+No active network connection was found.\n	CheckManager		사용 가능한 네트워크 연결을 찾을 수 없습니다.\n
+Applying changes	UpdateManager		변경사항 반영
+Full sync	SoftwareUpdaterWindow	Alert button label	전체 동기화
+Quit	SoftwareUpdaterWindow	Button label	종료
+Updates have been successfully installed.	UpdateManager		업데이트가 성공적으로 완료되었씁니다.
+Exception occurred while updating packages : %s\n	UpdateAction		패키지 업데이트 중 예외가 발생했습니다 : %s\n
+A reboot is necessary to complete the update process.	UpdateManager		업데이트 완료를 위해서 재부팅이 필요합니다.
+Exception occurred while checking for updates: %s\n	CheckAction		업데이트 확인 중 예외가 발생했습니다 : %s\n
+Packages are being updated	UpdateManager		패키기가 업데이트 되는 중입니다
+Cancel	SoftwareUpdaterWindow		취소
+Don't quit	SoftwareUpdaterWindow		종료하지 않기
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		여기를 클릭하여 SoftwareUpdater를 실행하세요. 일부 업데이트는 선택하기 전에 질문에 대한 답을 요구할 수 있습니다.
+Checking for updates	SoftwareUpdaterWindow		업데이트 확인 중
+Updates completed	UpdateManager		완료된 업데이트
+Reboot	SoftwareUpdaterWindow		재부팅
+Show more details	SoftwareUpdaterWindow		상세 정보 더 보기
+Installing version	SoftwareUpdaterWindow	List item text	설치 중인 버전
+Checking for updates	CheckManager		업데이트 확인 중
+No remote repositories are available	UpdateManager	Error message	사용 가능한 우너격 저장소가 없습니다
+Software {0, plural, one{update} other{updates}} available	CheckManager		소프트웨어 {0, plural, one{업데이트가} other{업데이트가}} 사용 가능합니다
+Reboot	SoftwareUpdaterWindow	Button label	재부팅
+Update	SoftwareUpdaterWindow	Alert button label	업데이트
+Open Repositories	SoftwareUpdaterWindow	Alert button label	저장소 목록 열기
+Updates did not complete	UpdateAction		업데이트를 완료하지 못했습니다
+Invalid update type, cannot continue with updates	UpdateAction		업데이트 형식이 잘못되어 계속 진행할 수 없습니다
+Uninstalling version	SoftwareUpdaterWindow	List item text	삭제 중인 버전
+%i of %i	UpdateManager	Do not translate %i	%i / %i
+Quit	SoftwareUpdaterWindow		종료
+No updates available	CheckManager		사용 가능한 업데이트가 없습니다
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	사용법: SoftwareUpdater <명령> [ <옵션> ]\n설치된 패키지를 업데이트합니다.\n\n명령:\nupdate - 설치된 모든 패키지에 대해 저장소에서 업데이트를 찾습니다.\ncheck - 사용 가능한 업데이트를 확인하여 화면에 표시합니다.\nfull-sync - 설치된 패키지들을 저장소와 동기화합니다.\n\n옵션:\n-h or --help 사용 설명서를 표시합니다\n-v or --verbose 모든 진행 사항을 출력합니다\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	사용 가능한 원격 저장소가 없습니다. 저장소 설정이나 pkgman 명령을 통하여 저장소가 활성화 되어있는지 확인이 필요합니다.
+Downloading packages	UpdateManager		패키지 다운로드 중

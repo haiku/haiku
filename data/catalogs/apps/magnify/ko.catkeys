@@ -1,0 +1,23 @@
+1	korean	x-vnd.Haiku-Magnify	3309471563
+  size must be > 4 and a multiple of 4	Console		  크기는 4보다 큰 4의 배수이어야 합니다
+Decrease pixel size	Magnify-Main		픽셀 크기 줄이기
+no clip msg	In console, when clipboard is empty after clicking Copy image		클립보드 내용 없음
+Increase pixel size	Magnify-Main		픽셀 크기 늘리기
+magnify: size must be a multiple of 4	Console		magnify: 크기는 반드시 4의 배수이어야 합니다
+Stick coordinates	Magnify-Main		좌표 고정
+Copy image	Magnify-Main		이미지 복사
+Decrease window size	Magnify-Main		창 크기 줄이기
+Remove a crosshair	Magnify-Main		십자선 제거
+Add a crosshair	Magnify-Main		십자선 추가
+Freeze image	Magnify-Main		정지 이미지
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height @ {0, plural, one{# 픽셀/픽셀} other{# 픽셀/픽셀}}
+usage: magnify [size] (magnify size * size pixels)	Console		사용법: magnify [크기] (크기 * 크기 픽셀로 확대)
+Increase window size	Magnify-Main		창 크기 늘리기
+Save image	Magnify-Main		이미지 저장
+Show grid	Magnify-Main		격자 보기
+Magnify	System name		Magnify
+height	Magnify-Main		높이
+width	Magnify-Main		너비
+Info	Magnify-Main		정보
+Show info	Magnify-Main		정보 보기
+Make square	Magnify-Main		정사각형 만들기

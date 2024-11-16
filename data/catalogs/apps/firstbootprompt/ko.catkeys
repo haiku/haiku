@@ -1,0 +1,88 @@
+1	korean	x-vnd.Haiku-FirstBootPrompt	189132197
+Japanese	KeymapNames		일본어
+US	KeymapNames		영어(미국)
+Cancel	BootPromptWindow		취소
+Esperanto	KeymapNames		에스페란토
+Belarusian	KeymapNames		벨라루스어
+Brazilian	KeymapNames		포르투갈어(브라질)
+Dvorak	KeymapNames		영어(드보락)
+Polish	KeymapNames		폴란드어
+Try Haiku	BootPromptWindow		Haiku 체험하기
+Latin-American	KeymapNames		라틴아메리카
+Ukrainian	KeymapNames		우크라이나어
+Russian (Yawert)	KeymapNames		러시아어(Yawert)
+United-Kingdom	KeymapNames		영어(영국)
+Welcome!	BootPromptWindow		환영합니다!
+Quit Haiku	System name		Haiku 종료
+Turkish (Type-F)	KeymapNames		튀르키예어(Type-F)
+Serbian (Cyrillic)	KeymapNames		세르비아어(키릴문자)
+Belgian (point)	KeymapNames		벨기에어(Point)
+Bulgarian (Cyrillic)	KeymapNames		불가리아어(키릴문자)
+Finnish	KeymapNames		핀란드어
+Swedish	KeymapNames		스웨덴어
+Svorak	KeymapNames		스보락
+German	KeymapNames		독일어(독일)
+Swiss-German	KeymapNames		독일어(스위스)
+Keymap	BootPromptWindow		키보드배열
+Spanish (Dvorak)	KeymapNames		스페인어(드보락)
+US-International	KeymapNames		US-인터네셔널
+Czech	KeymapNames		체코어
+Turkish (Type-Q)	KeymapNames		튀르키예어(Type-Q)
+Slovak	KeymapNames		슬로바키아어
+Russian (Udmurt, Komi, Mari)	KeymapNames		러시아어(Udmurt, Komi, Mari)
+Thai (TIS-820.2538)	KeymapNames		태국어(TIS-820.2538)
+Colemak	KeymapNames		콜맥
+Dvorak (programmer's)	KeymapNames		드보락(프로그래머용)
+Russian (Mac)	KeymapNames		러시아어(Mac)
+German (Mac)	KeymapNames		독일어(Mac)
+Arabic (102)	KeymapNames		아랍어(102)
+Belarusian (Latin)	KeymapNames		벨라루스어(라틴)
+Belarusian (Mac)	KeymapNames		벨라루스어(Mac)
+Hebrew	KeymapNames		히브리어
+Greek	KeymapNames		그리스어
+Croatian	KeymapNames		크로아티아어
+Faeroese	KeymapNames		페로 제도
+Polish (Typewriter)	KeymapNames		폴란드어(타자기)
+French (Mac)	KeymapNames		프랑스어(Mac)
+Spanish	KeymapNames		스페인어
+Try it out	BootPromptWindow		체험해보기
+Ukrainian (Mac)	KeymapNames		우크라이나어(Mac)
+Estonian	KeymapNames		에스토니아어
+Install Haiku	BootPromptWindow		Haiku 설치
+French (Bépo)	KeymapNames		프랑스어(Bépo)
+Restart system	BootPromptWindow		시스템 재시작
+Serbian (Latin)	KeymapNames		세르비아어(라틴)
+Russian (Typewriter)	KeymapNames		러시아어(타자기)
+French	KeymapNames		프랑스어
+Italian	KeymapNames		이탈리아어
+Portuguese	KeymapNames		포르투갈어
+Swiss-French	KeymapNames		프랑스어(스위스)
+Slovene	KeymapNames		슬로베니아어
+French (NF Z71-300)	KeymapNames		프랑스어(NF Z71-300)
+Lithuanian	KeymapNames		리투아니아어
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		카자흐어
+Language	BootPromptWindow		언어
+Lithuanian (Standard)	KeymapNames		리투아니아어(표준)
+Belgian (comma)	KeymapNames		벨기에어(콤마)
+Custom	BootPromptWindow		사용자 정의
+Norwegian	KeymapNames		노르웨이어
+Danish	KeymapNames		덴마크어
+Bulgarian (Phonetic)	KeymapNames		불가리아어(포네틱)
+Canadian-French	KeymapNames		프랑스어(캐나다)
+Welcome to Haiku!	BootPromptWindow		Haiku에 오신 것을 환영합니다!
+Russian	KeymapNames		러시아어
+Hungarian	KeymapNames		헝가리어
+Install	BootPromptWindow		설치
+Irish	KeymapNames		아일랜드어
+Romanian	KeymapNames		루마니아어
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		정말 창을 닫으시겠습니까? 시스템을 재시작 하게 됩니다!
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haiku를 체험 해 주셔서 감사합니다! 좋아하시길 바랄게요!\n\n선호하는 언어와 키보드 배치를 선택하세요. 설정은 Haiku 실행 중에도 언제든지 바꿀 수 있습니다.\n(주의: Haiku의 응용프로그램 및 각종 요소들에 대한 번역은 계속 진행되고 있습니다. 따라서 종종 번역이 되지 않은 부분을 볼 수 있으며, 원하시면 <www.haiku-os.org>를 통하여 직접 참여하실 수도 있습니다.)\n지금 바로 Haiku를 설치할 수 있습니다. 아니면 우선 체험을 해보시겠습니까?
+Czech (Mac)	KeymapNames		체코어(Mac)
+Macedonian	KeymapNames		마케도니아어
+Brazilian (ABNT2)	KeymapNames		포르투갈어(브라질, ABNT2)
+Albanian	KeymapNames		알바니아어
+Dutch	KeymapNames		네덜란드어
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	저희의 OS를 체험 해 주셔서 감사합니다! 좋아하시길 바랄게요!\n\n선호하는 언어와 키보드 배치를 선택하세요. 설정은 나중에 언제든지 바꿀 수 있습니다.\n(주의: Haiku의 응용프로그램 및 각종 요소들에 대한 번역은 계속 진행되고 있습니다. 따라서 종종 번역이 되지 않은 부분을 볼 수 있으며, 원하시면 <www.haiku-os.org>를 통하여 직접 참여하실 수도 있습니다.)\n지금 바로 OS를 설치할 수 있습니다. 아니면 우선 체험을 해보시겠습니까?
+Friulian	KeymapNames		프리울리어
+Icelandic	KeymapNames		아이슬란드어

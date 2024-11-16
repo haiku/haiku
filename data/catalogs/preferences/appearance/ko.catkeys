@@ -1,0 +1,80 @@
+1	korean	x-vnd.Haiku-Appearance	211365410
+Control border	Colors tab		컨트롤 테두리
+Control mark	Colors tab		선택된 컨트롤
+Off	AntialiasingSettingsView		끄기
+Window border	Colors tab		창 테두리
+Inactive window tab	Colors tab		비활성화된 윈도우 탭
+Defaults	APRWindow		기본설정
+Shadow	Colors tab		그림자
+Document background	Colors tab		문서 배경
+List background	Colors tab		목록 배경
+No effect on running applications	DecorSettingsView		실행 중인 응용 프로그램에는 적용되지 않습니다
+Fixed font:	Font view		고정폭 글꼴:
+Appearance	System name		외양
+Reduce colored edges filter strength:	AntialiasingSettingsView		색깔있는 가장자리 필터 강도 줄이기:
+Glyph hinting:	AntialiasingSettingsView		문자 힌팅:
+Default Haiku ControlLook	DecorSettingsView		기본 Haiku 컨트롤 테마
+Menu item text	Colors tab		메뉴 아이템 텍스트
+About decorator	DecorSettingsView		윈도우 테마에 대하여
+Antialiasing menu	AntialiasingSettingsView		메뉴 안티앨리어싱
+Success	Colors tab		성공
+About	DecorSettingsView		대하여
+Shine	Colors tab		밝은 부분
+Arrow style	DecorSettingsView		화살표 스타일
+On	AntialiasingSettingsView		켜기
+Decorator:	DecorSettingsView		윈도우 테마:
+Menu background	Colors tab		메뉴 배경
+Revert	APRWindow		되돌리기
+List item text	Colors tab		목록 항목 텍스트
+OK	DecorSettingsView		확인
+Control text	Colors tab		컨트롤 텍스트
+Look and feel	APRWindow		인터페이스 테마
+Selected menu item background	Colors tab		선택된 메뉴 아이템 배경
+Link active	Colors tab		활성 링크
+Antialiasing	APRWindow		안티앨리어싱
+Menu font:	Font view		메뉴 글꼴:
+Bold font:	Font view		굵은 글꼴:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n제작자:\n\t%decorAuthors\n\nURL: %decorURL\n라이선스: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		윈도우 테마 선택
+Failure	Colors tab		실패
+Strong	AntialiasingSettingsView		강하게
+Double:	DecorSettingsView		이중 화살표:
+Selected menu item text	Colors tab		선택된 메뉴 아이템 텍스트
+Size:	Font Selection view		크기:
+Panel background	Colors tab		패널 배경
+Plain font:	Font view		일반 글꼴:
+Automatically pick secondary colors	Colors tab		자동으로 보조 색상 선택
+Window tab text	Colors tab		윈도우 탭 텍스트
+Navigation pulse	Colors tab		탐색창 반짝임
+LCD subpixel	AntialiasingSettingsView		LCD 서브픽셀
+Window tab	Colors tab		윈도우 탭
+Link text	Colors tab		링크 텍스트
+Tooltip background	Colors tab		도구도움말 배경
+ControlLook:	DecorSettingsView		컨트롤 테마:
+Scroll bar thumb	Colors tab		스크롤바 핸들
+Default	DecorSettingsView		기본값
+Link visited	Colors tab		방문한 링크
+Selected menu item border	Colors tab		선택된 메뉴 아이템 테두리
+Tooltip text	Colors tab		도구도움말 텍스트
+Control background	Colors tab		컨트롤 배경
+Selected list item text	Colors tab		선택한 목록 항목 텍스트
+Selected list item background	Colors tab		선택한 목록 항목 배경
+Inactive window tab text	Colors tab		비활성화된 윈도우 탭 텍스트
+Navigation base	Colors tab		탐색창 배경
+Fonts	APRWindow		글꼴
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Grayscale	AntialiasingSettingsView		회색조
+Antialiasing type:	AntialiasingSettingsView		안티앨리어싱 종류:
+Panel text	Colors tab		패널 텍스트
+Hinting menu	AntialiasingSettingsView		메뉴 힌팅
+Scroll bar:	DecorSettingsView		스크롤바:
+Choose ControlLook	DecorSettingsView		컨트롤 테마 선택
+Monospaced fonts only	AntialiasingSettingsView		고정폭 글꼴만 사용
+Document text	Colors tab		문서 텍스트
+Inactive window border	Colors tab		비활성화된 창 테두리
+Colors	APRWindow		색상
+About control look	DecorSettingsView		컨트롤 테마에 대하여
+Control highlight	Colors tab		컨트롤 강조
+Status bar	Colors tab		상태표시줄
+Link hover	Colors tab		가리킨 링크
+Single:	DecorSettingsView		단일화살표:

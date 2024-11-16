@@ -1,0 +1,23 @@
+1	korean	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		{0, plural, one{#개 파일} other{#개 파일}}의 크기 %size%
+Scanning %refName%	Scanner		%refName% 탐색 중
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d개 파일
+Size	Info Window		크기
+Rescan	Pie View		다시 탐색
+Kind	Info Window		종류
+file unavailable	Pie View		파일을 사용할 수 없음
+no supporting apps	Pie View		지원하는 응용 프로그램이 없음
+Path	Info Window		경로
+Scan	Status View		탐색
+Rescan	Status View		다시 탐색
+file unavailable	Status View		파일을 사용할 수 없음
+Get info	Pie View		정보 보기
+DiskUsage	System name		DiskUsage
+Created	Info Window		생성 일시
+Modified	Info Window		마지막 수정
+Abort	Status View		중단
+Open with	Pie View		다음으로 열기
+Open	Pie View		열기
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{#개 파일} other{#개 파일}}
+%a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
+Free on %refName%	Scanner		%refName%의 여유 공간

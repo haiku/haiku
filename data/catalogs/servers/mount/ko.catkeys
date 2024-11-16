@@ -1,0 +1,14 @@
+1	korean	x-vnd.Haiku-mount_server	599204450
+Mount read-only	AutoMounter		읽기 전용으로 마운트
+Error mounting volume:\n\n%s	AutoMounter		볼륨 마운트 오류:\n\n%s
+Cancel	AutoMounter		취소
+OK	AutoMounter		확인
+Unmount error	AutoMounter		마운트 해제 오류
+The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		이 볼륨의 파일 시스템은 Be 파일 시스템이 아닙니다. Haiku의 버그로 인해 발생 가능한 의도하지 않은 데이터 손실을 방지하기 위해 읽기 전용 모드로 마운트하는 것을 권장합니다.
+Mount read/write	AutoMounter		읽기/쓰기 모드로 마운트
+Could not unmount disk \"%s\":\n\t%s	AutoMounter		디스크 \"%s\"를 마운트 해제 할 수 없습니다:\n\t%s
+Mounting volume '%s'\n\n	AutoMounter		볼륨 마운트 중 '%s'\n\n
+Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		디스크 \"%s\"를 마운트 해제 할 수 없습니다:\n\t%s\n\n강제로 마운트를 해제 하시겠습니까?\n\n주의: 이 불륨에 기록중인 응용 프로그램이 있었다면, 지금 마운트 해제 시 데이터 손실이 발생할 수 있습니다.\n
+Force unmount	AutoMounter		마운트 강제 해제
+Mount error	AutoMounter		마운트 오류
+Mount warning	AutoMounter		마운트 경고

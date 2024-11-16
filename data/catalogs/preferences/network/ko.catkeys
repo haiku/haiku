@@ -1,0 +1,55 @@
+1	korean	x-vnd.Haiku-Network	543099905
+Ethernet device	InterfaceListItem		이더넷 장치
+Link speed:	IntefaceView		링크 속도:
+disconnected	IntefaceView		연결 끊김
+WPA	WPA protected network		WPA
+Network:	IntefaceView		네트워크:
+Received:	IntefaceView		수신됨:
+New…	NetworkWindow		신규…
+no link	InterfaceListItem		링크 없음
+Other	NetworkWindow		기타
+Sent:	IntefaceView		보냄:
+Gateway:	IntefaceAddressView		게이트웨이:
+The netmask defines your local network	IntefaceAddressView		넷마스크는 로컬 네트워크를 정의합니다
+Your IP address	IntefaceAddressView		IP 주소
+DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP 주소:
+Netmask:	IntefaceAddressView		넷마스크:
+EAP	EAP protected network		EAP
+Services	NetworkWindow		서비스
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		NetworkStatus를 Deskbar에 설치하는데 실패했습니다: %s
+Revert	NetworkWindow		되돌리기
+off	ServiceListItem		끄기
+WEP	WEP protected network		WEP
+<no wireless networks found>	IntefaceView		<무선 네트워크를 찾을 수 없음>
+Enable	IntefaceView		활성화
+connected	IntefaceView		연결됨
+Apply	IntefaceAddressView		적용
+Disable	ServiceView		비활성화
+WPA2	WPA2 protected network		WPA2
+Show network status in Deskbar	NetworkWindow		Deskbar에 네트워크 상태 표시하기
+Mode:	IntefaceAddressView		모드:
+connected	InterfaceListItem		연결됨
+OK	NetworkWindow		확인
+Static	IntefaceAddressView		고정
+launch error	NetworkWindow		실행 오류
+Renegotiate	IntefaceView		재협상
+MAC address:	IntefaceView		MAC 주소:
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+disabled	InterfaceListItem		비활성화됨
+Dial-up connection	InterfaceListItem		전화접속
+on	ServiceListItem		켜기
+The method for obtaining an IP address	IntefaceAddressView		IP주소를 받아오는 방법
+disconnected	InterfaceListItem		연결 끊김
+Automatic	IntefaceAddressView		자동
+Choose automatically	IntefaceView		자동으로 선택
+Status:	IntefaceView		상태:
+Disable	IntefaceView		비활성화
+Manage…	NetworkWindow		관리…
+open	Open network		열기
+Network	System name		네트워크
+Your gateway to the internet	IntefaceAddressView		인터넷으로 가기 위한 관문
+Enable	ServiceView		활성화
+Wireless device	InterfaceListItem		무선 장치
+Disabled	IntefaceAddressView		비활성화됨
+VPN connection	InterfaceListItem		VPN연결

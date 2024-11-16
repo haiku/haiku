@@ -1,0 +1,31 @@
+1	korean	x-vnd.Haiku-Locale	1312749322
+Medium format:	TimeFormatSettings		중간 길이 형식:
+ERROR	TimeFormatSettings		오류
+Negative:	TimeFormatSettings		음수:
+Language	Locale Preflet Window		언어
+Short format:	TimeFormatSettings		짧은 형식:
+24 hour	TimeFormatSettings		24 시간
+Locale	Locale Preflet Window		로케일
+Time	TimeFormatSettings		시간
+Defaults	Locale Preflet Window		기본설정
+Locale	System name		로케일
+Date	TimeFormatSettings		날짜
+OK	Locale Preflet Window		확인
+Long format:	TimeFormatSettings		긴 형식:
+Numbers	TimeFormatSettings		숫자
+Available languages	Locale Preflet Window		사용 가능한 언어
+Locale	Locale Preflet		로케일
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		사용 가능한 언어가 없습니다! 이 설정판을 사용할 수 없습니다!
+Formatting	Locale Preflet Window		형식
+Use month/day-names from preferred language	TimeFormatSettings		선호하는 언어의 월 및 일 이름 사용
+already chosen	LanguageListView		이미 선택됨
+Preferred languages	Locale Preflet Window		선호하는 언어
+Full format:	TimeFormatSettings		전체 형식:
+Cancel	Locale Preflet Window		취소
+Revert	Locale Preflet Window		되돌리기
+Translate application and folder names	TimeFormatSettings		응용 프로그램 및 폴더 이름 번역
+12 hour	TimeFormatSettings		12 시간
+Positive:	TimeFormatSettings		양수:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		변경사항을 적용하려면 데스트바와 트래커를 다시 시작해야합니다. 지금 다시 시작하시겠습니까?
+Restart	Locale Preflet Window		다시 시작
+Currency	TimeFormatSettings		통화

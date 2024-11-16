@@ -1,0 +1,7 @@
+1	korean	x-vnd.Haiku-ICNSTranslator	660278989
+Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		가능한 크기 : 16, 32, 48, 128, 256, 512, 1024
+Valid colors: RGB32, RGBA32	ICNSConfig		가능한 색상: RGB32, RGBA32
+Version %d.%d.%d, %s	ICNSConfig		버전 %d.%d.%d, %s
+Apple icon translator	ICNSConfig		애플 아이콘 변환기
+Apple icons	ICNSTranslator		애플 아이콘
+Apple icon translator	ICNSTranslator		애플 아이콘 변환기

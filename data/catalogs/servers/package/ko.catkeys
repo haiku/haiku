@@ -1,0 +1,16 @@
+1	korean	x-vnd.haiku-package_daemon	1440586681
+Package changes	PackageResult	Window title	패키지 변경
+uninstall package %s\n	PackageResult	Don't change '%s' variable	%s 패키지 삭제\n
+ignore problem for now	PackageProblem		이번만 문제 무시
+solution %d:	PackageProblem	Don't change the %d variable	해결 방안 %d:
+The following problems have been encountered. Please select a solution for each:	PackageProblem		다음과 같은 문제가 발생했습니다. 각각에 대해 해결책을 선택하십시오:
+Apply changes	PackageResult		변경 사항 적용
+Package daemon	PackageManager		패키지 데몬
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	%s 패키지를 저장소 %s에서 설치\n
+The following additional package changes have to be made:	PackageResult		다음과 같은 추가 패키지 변경이 필요합니다:
+Warning	PackageManager		경고
+Cancel	PackageProblem		취소
+don't activate package %source%	PackageProblem	don't change '%source%	%source% 패키지를 활성화하지 마십시오
+Cancel	PackageResult		취소
+Retry	PackageProblem		재시도
+Package problems	PackageProblem	Window title	패키지 문제

@@ -1,0 +1,48 @@
+1	korean	x-vnd.Haiku-Time	3691539601
+OK	Time		확인
+Message receiving failed	Time		메세지 수신 실패
+Australia	Time		오스트레일리아
+America	Time		미국
+Reset to default server list	Time		기본 서버 목록으로 되돌리기
+Could not resolve server address	Time		서버 주소를 확인할 수 없습니다
+Time & Date	System name		시간 및 날짜
+Set time zone	Time		시간대 설정
+Waiting for answer failed	Time		응답 대기 실패
+<Other>	Time		<기타>
+Received invalid time	Time		올바르지 않은 시간이 되돌아옴
+Remove	Time		지우기
+Synchronize again	Time		다시 동기화
+Asia	Time		아시아
+Try all servers	Time		모든 서버 시도
+Time	Time		시간
+Current time:	Time		현재 시간:
+The following error occured while synchronizing:\n%s: %s	Time		동기화 중 오류가 발생했습니다:\n%s: %s
+Europe	Time		유럽
+Show day of week	Time		요일 표시하기
+Local time (Windows compatible)	Time		지역 시간 (윈도우즈 호환)
+Hardware clock set to:	Time		하드웨어 시계 설정:
+Arctic	Time		북극
+Antarctica	Time		남극
+GMT (UNIX compatible)	Time		그리니치 표준시(UNIX 호환)
+Africa	Time		아프리카
+Stop	Time		정지
+Time zone	Time		시간대
+Clock	Time		시계
+Network time	Time		네트워크 시간
+Sending request failed	Time		요청 발송 실패
+Preview time:	Time		시간 미리보기:
+\nNow: 	Time		\n지금: 
+Could not create socket	Time		소켓을 만들 수 없습니다
+Pacific	Time		태평양
+Atlantic	Time		대서양
+Show clock in Deskbar	Time		데스크바에 시계 보이기
+Display time with seconds	Time		초 단위 표시하기
+Time	System name		시간
+Show time zone	Time		시간대 표시하기
+Synchronize at boot	Time		부트시 동기화
+Indian	Time		인도
+Revert	Time		되돌리기
+Date and time	Time		날짜와 시간
+The following error occured while synchronizing:\n%s	Time		동기화 중 오류가 발생했습니다:\n%s
+Synchronize	Time		동기화
+Add	Time		추가

@@ -1,0 +1,110 @@
+1	korean	x-vnd.haiku-icon_o_matic	4180942047
+None	Icon-O-Matic-Properties		없음
+Add empty	Icon-O-Matic-ShapesList		빈 공간 더하기
+Opening the icon failed!	Icon-O-Matic-Main		아이콘 열기 실패!
+Add with path	Icon-O-Matic-ShapesList		경로와 함께 더하기
+Copy	Icon-O-Matic-Properties		복사
+Color	Icon-O-Matic-PropertyNames		색상
+Format	Icon-O-Matic-SavePanel		서식
+Color	Icon-O-Matic-StyleTypes		색상
+Select	Icon-O-Matic-Properties		선택
+Reset transformation	Icon-O-Matic-ShapesList		변환 재설정
+Duplicate	Icon-O-Matic-StylesList		복제
+Rotate	Icon-O-Matic-TransformationBoxStates		회전
+Shorten	Icon-O-Matic-PropertyNames		짧게 하기
+Paste	Icon-O-Matic-Properties		붙여넣기
+Close	Icon-O-Matic-Menu-File		닫기
+Add rect	Icon-O-Matic-PathsList		직각 더하기
+Rotation	Icon-O-Matic-PropertyNames		회전
+Transform	Icon-O-Matic-PathManipulator		변환
+Add shape with style	Icon-O-Matic-Menu-Shape		스타일에 모양 더하기
+Remove	Icon-O-Matic-StylesList		제거
+Cancel	Icon-O-Matic-Menu-Settings		취소
+Transformation	Icon-O-Matic-TransformationBoxStates		변환
+Closed	Icon-O-Matic-PropertyNames		닫힘
+<nothing to redo>	Icon-O-Matic-Menu-Edit		<다시 실행 할 것이 없음>
+Height	Icon-O-Matic-PropertyNames		높이
+warning	Icon-O-Matic-SVGExport		경고
+File	Icon-O-Matic-Menus		파일
+Properties	Icon-O-Matic-Menus		특성
+Path	Icon-O-Matic-PropertyNames		경로
+Path	Icon-O-Matic-Menus		경로
+Stroke	Transformation		획
+Flip	Icon-O-Matic-PathManipulator		뒤집기
+Opacity	Icon-O-Matic-PropertyNames		붕투명
+OK	Icon-O-Matic-ColorPicker		확인
+Error: 	Icon-O-Matic-Main		오류:
+Saving your document failed!	Icon-O-Matic-Exporter		당신의 문서를 저장하기 실패함!
+Snap to grid	Icon-O-Matic-Menu-Settings		격자에 맞추기
+Opening the document failed!	Icon-O-Matic-Main		문서 열기 실패함!
+Add with path & style	Icon-O-Matic-ShapesList		경로& 스타일 함께 더하기
+Shape	Icon-O-Matic-Menus		모양
+<unavailable>	Icon-O-Matic-StyleTypes		<가능하지 않음>
+Min LOD	Icon-O-Matic-PropertyNames		최소 LOD 
+Add	Icon-O-Matic-TransformersList		더하기
+Scale X	Icon-O-Matic-PropertyNames		x 축
+Add	Icon-O-Matic-PathsList		더하기
+Remove	Icon-O-Matic-PathManipulator		제거
+Duplicate	Icon-O-Matic-ShapesList		복제
+Contour	Transformation		윤곽
+Rounding	Icon-O-Matic-PropertyNames		원모양
+Joins	Icon-O-Matic-PropertyNames		연결
+Cancel	Icon-O-Matic-ColorPicker		취소
+Duplicate	Icon-O-Matic-PathsList		복제
+Save	Icon-O-Matic-Menu-Settings		저장
+Export as…	Icon-O-Matic-Menu-File		다른 형식으로 내보내기...
+Diamond	Icon-O-Matic-StyleTypes		마름모꼴
+Add shape with path	Icon-O-Matic-Menu-Shape		경로에 모양 더하기
+Translation X	Icon-O-Matic-PropertyNames		X 변환
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		그것이 로드될 때 Icon-O-Matic는 SVG에서 모든 데이터를 해석하지 않을 수 있습니다. 원래 파일을 덮어 씀으로써, 그 정보는 지금 없어질 것입니다.
+Rotate indices backwards	Icon-O-Matic-PathsList		거꾸로 회전 지수
+Overwrite	Icon-O-Matic-SVGExport		덮어 쓰기
+Cancel	Icon-O-Matic-SVGExport		취소
+Open…	Icon-O-Matic-Menu-File		열기...
+Remove	Icon-O-Matic-ShapesList		제거
+Linear	Icon-O-Matic-StyleTypes		직선
+Clean up	Icon-O-Matic-PathsList		깨끗하게 하기
+Split	Icon-O-Matic-PathManipulator		나누기
+Move	Icon-O-Matic-TransformationBoxStates		이동
+Conic	Icon-O-Matic-StyleTypes		원뿔
+Name	Icon-O-Matic-PropertyNames		이름
+Reset transformation	Icon-O-Matic-StylesList		변환 재설정
+Reverse	Icon-O-Matic-PathsList		뒤집기
+Remove	Icon-O-Matic-PathsList		지우기
+Style type	Icon-O-Matic-StyleTypes		스타일 형식
+Quit	Icon-O-Matic-Menu-File		끝내기
+Gradient	Icon-O-Matic-StyleTypes		기울기
+Add shape with path & style	Icon-O-Matic-Menu-Shape		경로&스타일을 함께 모양에 더하기
+Radial	Icon-O-Matic-StyleTypes		방사형
+Caps	Icon-O-Matic-PropertyNames		캡스
+OK	Icon-O-Matic-SVGImport		확인
+Append…	Icon-O-Matic-Menu-File		추가...
+Scale Y	Icon-O-Matic-PropertyNames		Y 축
+Rotate indices forwards	Icon-O-Matic-PathsList		회전 전달 지수
+Save	Icon-O-Matic-Menu-File		저장
+Add circle	Icon-O-Matic-PathsList		원 더하기
+Freeze transformation	Icon-O-Matic-ShapesList		변환 고정
+Untitled	Icon-O-Matic-Main		제목없음
+Max LOD	Icon-O-Matic-PropertyNames		최대 LOD
+Save as…	Icon-O-Matic-Menu-File		다른 이름으로 저장...
+Swatches	Icon-O-Matic-Menus		견본
+<modify path>	Icon-O-Matic-PathCmd		<수정된 경로>
+Icon-O-Matic	System name		아이콘-오-매틱
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<실행 취소할 것이 없음>
+Add	Icon-O-Matic-StylesList		더하기
+Translation Y	Icon-O-Matic-PropertyNames		Y 변환
+Scale	Icon-O-Matic-TransformationBoxStates		비율
+All	Icon-O-Matic-Properties		모두
+Transformer	Icon-O-Matic-Menus		트랜스포머
+Invert selection	Icon-O-Matic-Properties		선택 반전
+<unkown property>	Icon-O-Matic-PropertyNames		<알 수 없는 속성>
+Pick a color	Icon-O-Matic-ColorPicker		색상 선택
+Settings…	Icon-O-Matic-SavePanel		설정...
+Add with style	Icon-O-Matic-ShapesList		스타일과 함께 더하기
+New	Icon-O-Matic-Menu-File		새 파일
+Gradient type	Icon-O-Matic-StyleTypes		경사 종류
+Export	Icon-O-Matic-Menu-File		내보내기
+Width	Icon-O-Matic-PropertyNames		너비
+Style	Icon-O-Matic-Menus		스타일
+Off	Icon-O-Matic-Menu-Settings		끄기
+Edit	Icon-O-Matic-Menus		편집

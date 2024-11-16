@@ -1,0 +1,17 @@
+1	korean	x-vnd.Haiku-MatchHeader	1946584206
+Delete message	ConfigView		메세지 삭제
+Match \"%attribute\" against \"%regex\"	RuleFilter		\"%attribute\" 속성이 \"%regex\" 조건에 일치
+Match header	RuleFilter		헤더 일치
+Set flags to	ConfigView		플래그 설정
+Header field (e.g. Subject, From, …)	ConfigView		헤더 필드 (예 : 제목, 보낸 사람,…)
+<Choose account>	ConfigView		<계정 선택>
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		와일드카드는 \"*spam*\"과 같은 형태이어야 합니다.\n정규식을 사용하려면 \"REGEX:\" 접두사를 사용하십시오.
+Then	ConfigView		한다면
+If	ConfigView		만약
+Set as read	ConfigView		읽은 상태로 설정
+Reply with	ConfigView		회신
+<Choose action>	ConfigView		<할 일 선택>
+Move to	ConfigView		이동
+this field is based on the action	ConfigView		이 필드는 행동을 기반으로 합니다
+Account	ConfigView		계정
+has	ConfigView		을(를) 가진

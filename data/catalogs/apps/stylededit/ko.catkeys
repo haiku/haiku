@@ -1,0 +1,91 @@
+1	korean	x-vnd.Haiku-StyledEdit	3760185556
+Document statistics	Statistics		문서 통계
+Cannot revert, file not found: \"%s\".	RevertToSavedAlert		파일을 찾을 수 없어 되돌릴 수 없습니다: \"%s\".
+Cut	Menus		자르기
+Center	Menus		가운데
+Increase size	Menus		크기 키우기
+Page setup…	Menus		페이지 설정...
+Wrap-around search	FindandReplaceWindow		끝에서 되돌아와 찾기
+Untitled 	StyledEditWindow		제목없음 
+OK	Statistics		확인
+Find	FindandReplaceWindow		찾기
+New	Menus		새 파일
+Document	Menus		문서
+Search backwards	FindandReplaceWindow		반대 방향으로 찾기
+Find again	Menus		다시 찾기
+Read-only	StatusView		읽기전용
+Save	Menus		저장
+Cancel	QuitAlert		취소
+Copy	Menus		복사
+Reload	NodeMonitorAlerts		새로고침
+line %d, column %d	StatusView		%d행, %d열
+Words:	Statistics		단어:
+???	LoadAlert		???
+Recover	NodeMonitorAlerts		복구
+Error saving \"%s\":\n%s	SaveAlert		 \"%s\" 저장하는 중 오류가 발생했습니다:\n%s
+OK	RevertToSavedAlert		확인
+Unlock file	StatusView		파일 잠금 해제
+Italic	Menus		이탤릭
+Can't undo	Menus		되돌릴 수 없습니다
+Replace…	Menus		바꾸기…
+File	Menus		파일
+Paste	Menus		붙여넣기
+Bold	Menus		굵게
+File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		\"%file%\" 파일이 다른 응용 프로그램에서 편집되었습니다. 새로 고치시겠습니까?
+File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" 파일이 다른 응용 프로그램에서 삭제되었습니다. 복구 하시겠습니까?
+Lines:	Statistics		행:
+Replace in all windows	FindandReplaceWindow		모든 창에서 바꾸기
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\"에 아직 저장하지 않은 변경사항이 있습니다.\n최근 저장된 버전으로 되돌리시겠습니까? 
+Save	SaveAlert		저장
+Default	Open_and_SaveAsPanel		기본
+Cancel	RevertToSavedAlert		취소
+Cancel	FindandReplaceWindow		취소
+Statistics…	Menus		통계..
+Encoding	Open_and_SaveAsPanel		인코딩
+Replace all	FindandReplaceWindow		모두 바꾸기
+Close	Menus		닫기
+Error loading \"%s\":\n\tUnsupported format	LoadAlert		 \"%s\"을(를) 불러오는 데 오류가 발생했습니다:\n\t지원하지 않는 형식입니다
+Left	Menus		왼쪽
+Default	Menus		기본
+OK	SaveAlert		확인
+Color	Menus		색상
+Save changes to the document \"%s\"? 	QuitAlert		 \"%s\" 문서의 변경사항을 저장하겠습니까? 
+StyledEdit	System name		StyledEdit
+Underline	Menus		밑줄
+Find:	FindandReplaceWindow		찾기:
+Undo typing	QuitAlert		입력 취소
+Error loading \"%s\":\n\t%s	LoadAlert		\"%s\"을(를) 불러오는 데 오류가 발생했습니다:\n\t%s
+Don't save	SaveAlert		저장 안함
+Reload…	Menus		새로고침…
+Print…	Menus		인쇄...
+Quit	Menus		종료
+Redo typing	QuitAlert		다시 입력
+Ignore	NodeMonitorAlerts		무시
+Wrap lines	Menus		줄 바꾸기
+Text encoding	Menus		텍스트 인코딩
+Unable to unlock file\n\t%s	QuitAlert		파일을 잠금 해제할 수 없습니다\n\t%s
+Modified	StatusView		수정됨
+OK	LoadAlert		확인
+Save	QuitAlert		저장
+Case-sensitive	FindandReplaceWindow		대소문자 구별
+Find selection	Menus		선택된 부분에서 찾기
+Find…	Menus		찾기…
+Cancel	SaveAlert		취소
+Revert	RevertToSavedAlert		되돌리기
+Size	Menus		크기
+Decrease size	Menus		크기 줄이기
+Autodetect	Menus		자동 인식
+Replace next	Menus		다음 바꾸기
+OK	QuitAlert		확인
+Edit	Menus		편집
+Replace with:	FindandReplaceWindow		바꿀 단어:
+Open…	Menus		열기…
+Save as…	Menus		다른 이름으로 저장...
+Replace	FindandReplaceWindow		바꾸기
+Characters:	Statistics		문자:
+Don't save	QuitAlert		저장 안함
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		이 파일은 읽기 전용으로 표시되어 있습니다. 변경사항을 \"%s\" 문서에 저장 하시겠습니까? 
+Font	Menus		글꼴
+Align	Menus		정렬
+Select all	Menus		모두 선택
+Right	Menus		오른쪽

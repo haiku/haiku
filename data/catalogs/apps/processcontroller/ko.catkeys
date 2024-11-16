@@ -1,0 +1,49 @@
+1	korean	x-vnd.Haiku-ProcessController	415082887
+Error saving file	ProcessController		파일 저장 중 오류가 발생했습니다
+Display priority	ProcessController		디스플레이 우선순위
+That's no Fun!	ProcessController		재미 없어요!
+What do you want to do with the team \"%s\"?	ProcessController		\"%s\" 프로세스 팀을 어떻게 하시겠습니까?
+Your setting file could not be saved!\n(%s)	ProcessController		설정 파일을 저장할 수 없습니다!\n(%s)
+Processor %d	ProcessController		프로세서 %d
+Live in the Deskbar	ProcessController		데스크바에 두기
+Kill this team!	ProcessController		강제종료
+OK	ProcessController		확인
+You can run ProcessController in a window or install it in the Deskbar.	ProcessController		프로세스제어기를 창으로 실행시키거나 데스크바에 설치할 수 있습니다.
+Real-time priority	ProcessController		실시간 우선순위
+Custom priority	ProcessController		사용자 정의 우선순위
+Debug this thread!	ProcessController		스레드 디버그
+Low priority	ProcessController		낮은 우선순위
+Urgent display priority	ProcessController		긴급 디스플레이 우선순위
+Memory usage	ProcessController		메모리 사용량
+Ok!	ProcessController		확인!
+Normal priority	ProcessController		보통 우선순위
+Restart Deskbar	ProcessController		데스크바 다시 시작
+About ProcessController…	ProcessController		프로세스제어기에 관하여...
+Usage: %s [-deskbar]\n	ProcessController		사용법: %s [-deskbar]\n
+Please confirm	ProcessController		확인해주십시오
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
+Urgent priority	ProcessController		긴급 우선순위
+What do you want to do with the thread \"%s\"?	ProcessController		\"%s\" 스레드를 어떻게 하시겠습니까?
+Idle priority	ProcessController		유휴 우선순위
+Real-time display priority	ProcessController		실시간 디스플레이 우선순위
+Threads and CPU usage	ProcessController		스레드 및 CPU 사용량
+Quit application	ProcessController		프로그램 종료
+Info	ProcessController		정보
+Kill this thread!	ProcessController		스레드 강제종료
+This team is already gone…	ProcessController		프로세스 팀이 이미 없어졌습니다…
+Gone teams…	ProcessController		없어진 프로세스 팀입니다…
+Quit an application	ProcessController		프로그램 종료
+Cancel	ProcessController		취소
+Install in Deskbar	ProcessController		데스크바에 설치
+Debug this team!	ProcessController		프로세스 팀 디버그
+ProcessController	System name		프로세스제어기
+Lowest active priority	ProcessController		가장 낮은 활성 우선순위
+Restart Tracker	ProcessController		트래커 다시 시작
+System resources & caches…	ProcessController		시스템 자원 및 캐시...
+Damned!	ProcessController		이런 젠장!
+New Terminal	ProcessController		새 터미널
+Power saving	ProcessController		전원 절약
+ProcessController is already installed in Deskbar.	ProcessController		프로세스제어기가 이미 데스크바에 설치되어 있습니다.
+This is the last active processor…\nYou can't turn it off!	ProcessController		마지막 활성 프로세스입니다…\n종료할 수 없습니다!
+This thread is already gone…	ProcessController		스레드가 이미 없어졌습니다...
+Run in window	ProcessController		창으로 실행

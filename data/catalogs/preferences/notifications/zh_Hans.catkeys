@@ -14,7 +14,7 @@ wide	GeneralView	Window width: Slider high text	宽
 narrow	GeneralView	Window width: Slider low text	窄
 Revert	PrefletWin		还原
 Applications	PrefletView		应用程序
-{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{超时: # second}other{超时: # seconds}}
 Upper right	GeneralView		右上方
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		首选项保存时发生错误。\n可能硬盘空间不足。
 Defaults	PrefletWin		默认

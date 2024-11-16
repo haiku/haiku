@@ -1,0 +1,14 @@
+1	korean	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		POP3 인증에 실패했습니다. 서버 메시지:\n
+Destination:	ConfigView		대상:
+Error while logging in to %serv	smtp		%serv에 로그인 하는 중 에러 발생
+Connecting to server…	smtp		서버에 연결중...
+Unencrypted	ConfigView		암호화되지 않음
+. The server says:\n	smtp		. 서버의 메세지:\n
+Error while opening connection to %serv	smtp		%serv에 연결하는 중 에러 발생
+. The server said:\n	smtp		. 서버의 메세지:\n
+None	ConfigView		없음
+SMTP server:	ConfigView		SMTP 서버: 
+ESMTP	ConfigView		ESMTP
+POP3 before SMTP	ConfigView		SMTP 전에 POP3
+SSL	ConfigView		SSL

@@ -1,0 +1,27 @@
+1	korean	x-vnd.Haiku-GLInfo	1282327690
+Maximum clipping planes	Capabilities		최대 절단면 수
+Maximum evaluators equation order	Capabilities		최대 평가 방정식 차수
+Texture stack size	Capabilities		텍스처 스택 크기
+GL Info	System name		GL 정보
+Information	InfoView		정보
+Attributes stack size	Capabilities		속성 스택 크기
+Maximum lights	Capabilities		최대 광원 수
+Extensions	Extensions		확장
+Available extensions	Extensions		사용 가능한 확장
+Maximum recommended vertex elements	Capabilities		최대 권고 버텍스 요수 수
+Value	Capabilities		값
+Name stack size	Capabilities		이름 스택 크기
+Capabilities	Capabilities		현재 능력
+Maximum texture units	Capabilities		최대 텍스처 유닛 수
+Unknown or missing OpenGL renderer.	InfoView		알 수 없거나 없어진 OpenGL 렌더러입니다.
+Capability	Capabilities		능력
+Maximum 2D texture size	Capabilities		최대 2차원 텍스처 크기
+Auxiliary buffer(s)	Capabilities		보조 버퍼
+Unknown vendor	InfoView		알 수 없는 제조사
+Maximum convolution	Capabilities		최대 회선 가능 횟수
+Maximum 3D texture size	Capabilities		최대 3차원 텍스처 크기
+Maximum recommended index elements	Capabilities		최대 권고 인덱스 요소 수
+Unknown version	InfoView		알 수 없는 버전
+List stack size	Capabilities		목록 스택 크기
+Model stack size	Capabilities		모델 스택 크기
+Projection stack size	Capabilities		전사 스택 크기

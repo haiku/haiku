@@ -1,0 +1,24 @@
+1	korean	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		IPv6 주소:
+Quit	NetworkStatusView		종료
+Unknown	NetworkStatusView		알 수 없음
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		네트워크 설정을 열 수 없습니다.\n\n오류: 
+Install in Deskbar	NetworkStatus		데스크바에 설치
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		NetworkStatus 옵션:\n\t--deskbar\t데스크바에 자동으로 레플리컨트 추가\n\t--help\t\t이 정보를 출력하고 종료
+Open network preferences…	NetworkStatusView		네트워크 설정 열기…
+NetworkStatus	System name		NetworkStatus
+Broadcast:	NetworkStatusView		브로드캐스트:
+OK	NetworkStatusView		확인
+No link	NetworkStatusView		연결 안됨
+Could not join wireless network:\n	NetworkStatusView		무선 네트워크에 연결할 수 없습니다:\n
+Ready	NetworkStatusView		준비됨
+Network Status	NetworkStatusView		네트워크 상태
+Deskbar is not running, giving up.	NetworkStatus		데스크바가 실행 중이 아닙니다.
+Netmask:	NetworkStatusView		넷마스크:
+No stateful configuration	NetworkStatusView		스테이트풀 설정이 없습니다
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		NetworkStatus 를 창에서 실행시키거나 데스크바에 설치 할 수 있습니다.
+IPv4 address:	NetworkStatusView		IPv4 주소:
+%ifaceName information:\n	NetworkStatusView		%ifaceName 정보:\n
+Run in window	NetworkStatus		창으로 실행
+<no wireless networks found>	NetworkStatusView		<무선 네트워크를 찾을 수 없음>
+Configuring	NetworkStatusView		설정 중

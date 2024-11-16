@@ -1,0 +1,9 @@
+1	korean	application/x-vnd.Cortex.InfoView	562724120
+Offset	InfoView		오프셋
+Description	DormantNodeInfoView		설명
+Byte order	InfoView		바이트 순서
+Connection	InfoView		연결
+Output formats	DormantNodeInfoView		출력 형식
+History	InfoView		이력
+Input formats	DormantNodeInfoView		입력 형식
+Signature	AppNodeInfoView		서명

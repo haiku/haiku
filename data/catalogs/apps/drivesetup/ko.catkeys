@@ -1,0 +1,81 @@
+1	korean	x-vnd.Haiku-DriveSetup	1351267116
+Could not unmount partition %s.	MainWindow		%s 파티션을 마운트 해제할 수 없습니다.
+Mount all	MainWindow		모두 마운트
+Disk	MainWindow		디스크
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		변경 사항을 지금 디스크에 기록하시겠습니까?\n\n선택된 파티션의 모든 데이터가 영원히 지워질것입니다!
+Device	PartitionList		장치
+Initialize	MainWindow		초기화
+Could not change the parameters of the selected partition.	MainWindow		선택된 파티션의 인자를 변경할 수 없습니다.
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition \"%s\" will be irretrievably lost if you do so!	MainWindow		변경 사항을 지금 디스크에 기록하시겠습니까?\n\n파티션 \"%s\"의 모든 데이터가 영원히 지워질것입니다!
+PGP encrypted	Encryption utils		PGP 암호화
+Delete partition	MainWindow		파티션 지우기
+Error: 	MainWindow	in any error alert	오류: 
+Removable	PartitionList		제거 가능
+Block size	PartitionList		블록 크기
+The panel experienced a problem!	MainWindow		패널에 문제가 발생했습니다!
+Device	DiskView		장치
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		정말로 인텔 확장 파티션을 포맷하시겠습니까? 계속할 경우 속해 있는 모든 하위 파티션을 덮어쓰게 됩니다. 변경사항을 디스크에 기록하기 전에 한번 더 확인을 요청할 것입니다.
+Physical block size	PartitionList		물리적 블록 크기
+Unmount	MainWindow		마운트 해제
+Failed to format the partition %s!\n	MainWindow		파티션 %s를 포맷할 수 없습니다!\n
+Partition size	CreateParametersPanel		파티션 크기
+Validation of the given parameters failed.	MainWindow		주어진 인자 검증에 실패했습니다.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		정말로 파티션 \"%s\"을 포맷하시겠습니까? 변경사항을 디스크에 기록하기 전에 한번 더 확인을 요청할 것입니다.
+DriveSetup	System name		DriveSetup
+Mounted at	PartitionList		마운트 위치
+Disk system %s not found!	MainWindow		디스크 시스템 %s를 찾을 수 없습니다!
+Create…	MainWindow		생성…
+Write changes	MainWindow		변경사항 기록
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		파티션 %s를 초기화하는데 실패했습니다. (디스크에 아무 것도 기록되지 않았습니다.)
+Validation of the given creation parameters failed.	MainWindow		주어진 생성 매개 변수의 유효성 검사에 실패했습니다.
+Eject	MainWindow		꺼내기
+Surface test (not implemented)	MainWindow		표면 검사 (아직 구현안됨)
+Read only	PartitionList		읽기전용
+The panel could not return successfully.	MainWindow		패널이 정상적으로 돌아갈 수 없습니다.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		파티션의 매개변수를 수정할 수 없습니다. 변경사항이 디스크에 기록되지 않았습니다.
+Partition %ld	DiskView		파티션 %ld
+There's no space on the partition where a child partition could be created.	MainWindow		파티션에 자식 파티션을 만들 공간이 없습니다.
+No disk devices have been recognized.	DiskView		어떤 디스크 장치도 찾을 수 업습니다.
+Attributes	PartitionList		속성
+Failed to delete the partition. No changes have been written to disk.	MainWindow		파티션 삭제를 실패했습니다. 변경사항이 디스크에 기록되지 않았습니다.
+Change parameters…	MainWindow		매개변수 변경…
+Format	InitializeParametersPanel		포맷
+Could not unmount partition	MainWindow		파티션을 마운트 해제할 수 없습니다
+Create	CreateParametersPanel		생성
+File system	PartitionList		파일 시스템
+Unknown (%s)	PartitionList		알 수 없음 (%s)
+The selected partition does not contain a partitioning system.	MainWindow		선택된 파티션에 파티션 시스템이 없습니다.
+End: %s	Support		끝: %s
+Partition type	PartitionList		파티션 종류
+Unable to find the selected partition by ID.	MainWindow		선택된 파티션 ID를 찾을 수 없습니다.
+The currently selected partition is not empty.	MainWindow		선택된 파티션이 비어있지 않습니다.
+Wipe (not implemented)	MainWindow		지우기 (구현되지 않음)
+The currently selected partition does not have a parent partition.	MainWindow		현재 선택된 파티션은 부모 파티션을 가지고 있지 않습니다.
+Validation of the given initialization parameters failed.	MainWindow		지정된 초기화 매개 변수의 유효성 검사에 실패했습니다.
+You need to select a partition entry from the list.	MainWindow		당신은 목록에서 파티션 엔트리를 선택해야 합니다.
+Volume name	PartitionList		볼륨 이름
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n 그렇게 하면 파티션의 모든 데이타는 영구적으로 지워지게 될 것입니다!
+Cancel	AbstractParametersPanel		취소
+OK	MainWindow		확인
+Could not delete the selected partition.	MainWindow		선택된 파티션을 지울 수 없습니다.
+There was an error preparing the disk for modifications.	MainWindow		수정을 위해 디스크를 준비하는 중에 에러가 발생했습니다.
+Cancel	MainWindow		취소
+Partition	MainWindow		파티션
+Rescan	MainWindow		다시 스캔
+There was an error acquiring the partition row.	MainWindow		파티션 열의 정보를 얻는 과정에서 에러가 발생했습니다.
+Delete	MainWindow		지우기
+Parameters	PartitionList		매개변수
+Cannot delete the selected partition.	MainWindow		선택한 파티션을 지울 수 없습니다.
+Continue	MainWindow		계속
+Could not mount partition %s.	MainWindow		%s 파티션을 마운트 할 수 없습니다.
+The selected disk is read-only.	MainWindow		선택된 디스크는 읽기만 가능합니다.
+The partition %s is already unmounted.	MainWindow		이 파티션 %s은(는) 이미 마운트 해제되엇습니다.
+OK	AbstractParametersPanel		확인
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		당신은 지금 디스크에 변경 사항을 기록하기를 바랍니까?\n\n그렇게 하면 선택된 디스크의 모든 데이타는 영구적으로 지워지게될 것입니다!
+Select a partition from the list below.	DiskView		아래의 목록에서 파티션 선택.
+Active	PartitionList		활성
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		당신은 선택된 파티션을 지우기를 원합니까?\n\n그렇게 하면 파티션의 모든 데이타는 영구적으로 지워지게될 것입니다!n
+The partition %s is already mounted.	MainWindow		이 파티션 %s은(는) 이미 마운트되었습니다.
+Size	PartitionList		크기
+Creation of the partition has failed.	MainWindow		파티션 만들기 실패함.
+Mount	MainWindow		마운트

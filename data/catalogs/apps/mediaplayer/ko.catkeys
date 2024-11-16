@@ -1,0 +1,159 @@
+1	korean	x-vnd.Haiku-MediaPlayer	390961765
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		항목을 쓰레기통에 버리기
+Close	MediaPlayer-PlaylistWindow		닫기
+Volume of background clips	MediaPlayer-SettingsWindow		백그라운드 클립의 음량
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		가능한 경우 하드웨어 비디오 오버레이 사용
+Audio	MediaPlayer-InfoWin		오디오
+Subtitle placement:	MediaPlayer-SettingsWindow		자막 위치:
+MediaPlayer	System name		MediaPlayer
+Audio track	MediaPlayer-Main		오디오 트랙
+Muted	MediaPlayer-SettingsWindow		음소거
+OK	MediaPlayer-RemovePLItemsCmd		확인
+Open Playlist	MediaPlayer-PlaylistWindow		재생목록 열기
+Subtitles	MediaPlayer-Main		자막
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app%에서 내부 오류가 발생하였습니다. 파일을 열 수 없습니다.
+DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+File info	MediaPlayer-InfoWin		파일 정보
+raw audio	MediaPlayer-InfoWin		원본 오디오
+Select all	MediaPlayer-PlaylistWindow		전체 선택
+Move Entries	MediaPlayer-MovePLItemsCmd		항목 이동
+OK	MediaPlayer-Main		확인
+Remove	MediaPlayer-PlaylistWindow		제거
+<unknown>	MediaPlayer-InfoWin		<알 수 없음>
+Resume:	MediaPlayer-SettingsWindow		이어보기:
+Duration	MediaPlayer-InfoWin		기간
+Import Entries	MediaPlayer-ImportPLItemsCmd		항목 가져오기
+Open network stream	MediaPlayer-Main		네트워크 스트림 열기
+Move file to Trash	MediaPlayer-PlaylistWindow		파일을 쓰레기통으로 이동
+Open file…	MediaPlayer-Main		파일 열기…
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		전체화면 모드에서 비율에 따라 컨트롤 크기 조정
+View options	MediaPlayer-SettingsWindow		옵션 보기
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Full volume	MediaPlayer-SettingsWindow		최대 음량
+<untitled>	PlaylistItem-title		<제목없음>
+Start media server	MediaPlayer-Main		미디어 서버 시작
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		미디어 서버가 실행중이 아닙니다.\n실행하시겠습니까?
+Location	MediaPlayer-InfoWin		위치
+%lu × %lu	MediaPlayer-InfoWin	The '×' is the Unicode multiplication sign U+00D7	%lu × %lu
+Opening '%s'.	MediaPlayer-Main		 '%s' 여는 중.
+Medium	MediaPlayer-SettingsWindow		중간
+Play mode	MediaPlayer-SettingsWindow		재생 모드
+Playlist	MediaPlayer-PlaylistWindow		재생목록
+%d Bit	MediaPlayer-InfoWin		%d 비트
+Track	Audio Track Menu		트랙
+Close	MediaPlayer-Main		닫기
+Save error	MediaPlayer-PlaylistWindow		저장 오류
+Attributes	MediaPlayer-Main		속성
+Bottom of screen	MediaPlayer-SettingsWindow		화면 아래
+MediaPlayer settings	MediaPlayer-SettingsWindow		MediaPlayer 설정
+Copyright	MediaPlayer-InfoWin		Copyright
+Invalid URL inserted!	MediaPlayer-NetworkStream		잘못된 URL이 삽입되었습니다!
+Aspect ratio	MediaPlayer-Main		종횡비
+Eject device	MediaPlayer-Main		장치 꺼내기
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		재생목록 저장에 실패했습니다.\n\n오류: 
+<no media>	MediaPlayer-InfoWin		<미디어 없음>
+Hide interface	MediaPlayer-Main		인터페이스 숨기기
+Error: 	MediaPlayer-Main		오류: 
+Video track	MediaPlayer-Main		비디오 트랙
+Playlist…	MediaPlayer-Main		재생목록…
+<unnamed media>	MediaPlayer-InfoWin		<이름 없는 미디어>
+Save	MediaPlayer-PlaylistWindow		저장
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		무작위로 섞기
+Cancel	MediaPlayer-NetworkStream		취소
+Nothing to Play	MediaPlayer-Main		재생할 것이 없습니다
+OK	MediaPlayer-SettingsWindow		확인
+Remove Entries	MediaPlayer-RemovePLItemsCmd		항목 제거
+never	MediaPlayer-SettingsWindow		하지 않음
+Loop audio	MediaPlayer-SettingsWindow		오디오 반복재생
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		내부 오류가 발생했습니다 (잘못된 메세지). 재생목록을 저장할 수 없습니다.
+Open…	MediaPlayer-PlaylistWindow		열기…
+Revert	MediaPlayer-SettingsWindow		되돌리기
+Low volume	MediaPlayer-SettingsWindow		낮은 음량
+Audio	MediaPlayer-Main		오디오
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{모노} =2{스테레오} other{# 채널}}
+Quit	MediaPlayer-Main		종료
+Redo	MediaPlayer-PlaylistWindow		다시하기
+Move Entry	MediaPlayer-MovePLItemsCmd		항목 이동
+Reset rating	MediaPlayer-Main		평가 재설정
+<unknown>	PlaylistItem-author		<알 수 없음>
+Cancel	MediaPlayer-SettingsWindow		취소
+Large	MediaPlayer-SettingsWindow		큼
+Import Entry	MediaPlayer-ImportPLItemsCmd		항목 가져오기
+unknown format	MediaPlayer-InfoWin		알 수 없는 형식
+Track %d	MediaPlayer-Main		트랙 %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		파일을 전부 쓰레기통으로 옮길 수 없습니다.
+Total duration: %s	MediaPlayer-PlaylistWindow		전체 길이: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		쓰레기통에 버리는 데 오류가 발생하였습니다
+50% scale	MediaPlayer-Main		50% 스케일
+Drop files to play	MediaPlayer-Main		재생하려면 파일을 올려놓으십시오
+Copy Entry	MediaPlayer-CopyPLItemsCmd		항목 복사
+Close window after playing audio	MediaPlayer-SettingsWindow		오디오 재생 후 창 닫기
+Edit	MediaPlayer-PlaylistWindow		편집
+Copy Entries	MediaPlayer-CopyPLItemsCmd		항목 복사
+Always on top	MediaPlayer-Main		항상 맨 위에
+Open	MediaPlayer-PlaylistWindow		열기
+always	MediaPlayer-SettingsWindow		항상
+Loop video	MediaPlayer-SettingsWindow		비디오 반복재생
+Stream URL:	MediaPlayer-NetworkStream		스트림 URL:
+<unknown>	PlaylistItem-album		<알 수 없음>
+Stream settings	MediaPlayer-Main		스트림 설정
+none	Subtitles menu		없음
+Save Playlist	MediaPlayer-PlaylistWindow		재생목록 저장
+Overlay	MediaPlayer-InfoWin		오버레이
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (시네마스코프)
+Rating	MediaPlayer-Main		평가
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		내부 오류가 발생했습니다 (메모리 부족). 재생목록을 저장할 수 없습니다.
+Video	MediaPlayer-Main		비디오
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		이 파일 형식을 재생할 수 있는 디코더가 설치되어있지 않았거나, 디코더가 특정 버전의 파일 형식을 재생하는데 문제가 있을 수 있습니다.
+Lock Peaks	MediaPlayer-PeakView		피크 잠금
+none	Audio track menu		없음
+Open network stream	MediaPlayer-NetworkStream		네트워크 스트림 열기
+Automatically start playing	MediaPlayer-SettingsWindow		자동 재생 시작
+Undo	MediaPlayer-PlaylistWindow		되돌리기
+Display mode	MediaPlayer-InfoWin		표시 모드
+Bottom of video	MediaPlayer-SettingsWindow		비디오 아래쪽
+Small	MediaPlayer-SettingsWindow		작음
+Settings…	MediaPlayer-Main		설정…
+min	MediaPlayer-InfoWin	Minutes	분
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		재생목록을 저장할 수 없습니다:\n\n오류: 
+Video	MediaPlayer-InfoWin		비디오
+File info…	MediaPlayer-Main		파일 정보…
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (미국식)
+<unnamed>	PlaylistItem-name		<이름없음>
+Track	Video Track Menu		트랙
+Full screen	MediaPlayer-Main		전체화면
+OK	MediaPlayer-NetworkStream		확인
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		내부 오류가 발생했습니다 (파일 잠금 실패). 재생목록을 저장할 수 없습니다.
+100% scale	MediaPlayer-Main		100% 스케일
+New player	MediaPlayer-Main		새 재생기
+<nothing to redo>	MediaPlayer-PlaylistWindow		<다시 할 것이 없음>
+Bad URL	MediaPlayer-NetworkStream		잘못된 URL
+Save	MediaPlayer-Main		저장
+Close window after playing video	MediaPlayer-SettingsWindow		비디오 재생 후 창 닫기
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		비디오를 부드럽게 크기조정 (오버레이 없음)
+200% scale	MediaPlayer-Main		200% 스케일
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		'%filename'을 열 수 없습니다.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		재생하려는 파일들 중 미디어 파일이 없습니다.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		항목 제거
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		항목을 쓰레기통에 버림
+Subtitle size:	MediaPlayer-SettingsWindow		자막 크기:
+No aspect correction	MediaPlayer-Main		종횡비 조정 안함
+raw video	MediaPlayer-InfoWin		원본 비디오
+Container	MediaPlayer-InfoWin		컨테이너
+none	MediaPlayer-Main		없음
+Open clips	MediaPlayer-Main		클립 열기
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		일부 파일을 쓰레기통에 버릴 수 없습니다.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<되돌릴 것이 없음>
+Save as…	MediaPlayer-PlaylistWindow		다른 이름으로 저장…
+Error: 	MediaPlayer-RemovePLItemsCmd		오류: 
+300% scale	MediaPlayer-Main		300% 스케일
+Open	MediaPlayer-Main		열기
+ask every time	MediaPlayer-SettingsWindow		항상 묻기
+(not supported)	MediaPlayer-InfoWin		(지원되지 않음)
+Randomize	MediaPlayer-PlaylistWindow		무작위
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		끄기
+400% scale	MediaPlayer-Main		400% 스케일
+h	MediaPlayer-InfoWin	Hours	시간
+OK	MediaPlayer-PlaylistWindow		확인

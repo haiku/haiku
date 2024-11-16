@@ -1,0 +1,64 @@
+1	korean	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		패키지 설명
+none	PackageView		없음
+Continue	PackageInstall		계속
+Running post-installation scripts	PackageInstall		설치 후 스크립트 실행 중
+Package installer	PackageView		패키지 설치 프로그램
+All existing files will be skipped?	PackageView		모든 존재하는 파일을 건너 뛰시겠습니까?
+Replace	PackageView		바꾸기
+All existing files will be replaced?	PackageView		모든 존재하는 파일을 바꾸시겠습니까?
+Other…	PackageView		기타...
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		심볼릭 링크 '%s'이(가) 주어진 경로에 이미 존재합니다.\n링크를 패키지에서 제공하는 것으로 대체하거나 건너 뛰시겠습니까?
+Stop	PackageStatus		정지
+Install to:	PackageView		설치할 곳:
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		주어진 패키지가 이미 시스템에 설치되어 있습니다. 기존 패키지를 제거하고 설치를 계속 하시겠습니까?
+Skip all	PackageView		모두 건너뛰기
+The installation of the package has been aborted.	PackageView		패키지 설치가 중단되었습니다.
+No installation type selected	PackageView		설치 형식을 선택하지 않음
+Do you want to remember this decision for the rest of this installation?\n	PackageView		설치 괴정동안 현재 결정 사항을 계속 기억하시겠습니까?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		선택된 패키지가 시스템에서 제거되지 않았습니다. 설치된 해당 패키지 정보 파일이 잘못되었을 수 있습니다.
+Install…	UninstallView		설치…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		항목 '%s'이(가) 주어진 경로에 이미 존재합니다.\n항목을 패키지에 포함된 것으로 교체하거나 건너 뛰시겠습니까?
+Installing files and folders	PackageInstall		파일 및 폴더 설치중
+Installed packages	UninstallWindow		설치된 패키지
+Remove	UninstallView		제거
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		요청한 패키지를 시스템에 설치하는 데 실패했습니다. 해당 패키지 파일에 문제가 있을 수 있습니다. 패키지 배포자에게 문의하십시오.
+OK	UninstallView		확인
+Accept	PackageTextViewer		수락
+Abort	PackageView		중단
+Disclaimer	PackageTextViewer		면책사항
+Preparing package	PackageInstall		패키지 준비중
+The package you requested has been successfully installed on your system.	PackageView		요청한 패키지가 시스템에 설치되었습니다.
+Installation progress	PackageView		설치 진행
+Decline	PackageTextViewer		거부
+Continue	PackageTextViewer		계속
+Installing package	PackageStatus		패키지 설치중
+Install %name%	PackageView		%name% 설치
+%index% of %total%	PackageInstall		%total% 중 %index%
+No package selected.	UninstallView		패키지가 선택되지 않았습니다.
+%name% (%size% free)	PackageView		%name% (%size% 유휴)
+Error while installing the package\n	PackageView		패키지 설치 중 오류가 발생했습니다\n
+Finishing installation	PackageInstall		설치 완료중
+No package available.	PackageInfo		가능한 패키지가 없습니다.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		스크립트 '%s'이(가) 지정된 경로에 이미 존재합니다.\n스크립트를 패키지가 제공하는 것으로 바꾸거나 건너 뛰시겠습니까?
+Installation type:	PackageView		설치 형식:
+The package you selected has been successfully removed from your system.	UninstallView		선택된 패키지가 시스템에서 제거되었습니다.
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		패키지 파일의 크기가 맞지 않는 것 같습니다. 패키지가 잘못되었거나 만들어진 후에 수정 것 같습니다. 계속하시겠습니까?
+%name% (%size%)	PackageView		%name% (%size%)
+Abort	PackageInstall		중단
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		파일 '%s'이(가) 주어진 경로에 이미 존재합니다.\n파일을 패키지가 제공하는 것으로 바꾸거나 건너 뛰시겠습니까?
+Replace all	PackageView		모두 바꾸기
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		패키지를 읽을 수 없습니다.\n요청된 파일이 올바른 BsOS .pkg 패키지가 아닐 수 있습니다.
+Continue	PackageInfo		계속
+No package selected.	PackageInfo		패키지가 선택되지 않았습니다.
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		오류! \"%s\"은(는) 올바른 경로가 아닙니다.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		디렉터리 '%s'이(가) 주어진 경로에 이미 존재합니다.\n디렉터리를 패키지가 제공하는 것으로 바꾸거나 건너 뛰시겠습니까?
+LegacyPackageInstaller	System name		LegacyPackageInstaller
+Ask again	PackageView		다시 묻기
+Begin	PackageView		시작
+OK	PackageView		확인
+Abort	PackageInfo		중단
+Done	PackageInstall		완료
+Error (%s)! Could not open \"%s\".\n	Packageinstaller main		오류 (%s)! \"%s\"을(를) 열 수 없습니다.\n
+Skip	PackageView		건너뛰기
+Image not loaded correctly	PackageImageViewer		이미지가 올바르게 불러 들여지지 않았습니다

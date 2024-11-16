@@ -1,0 +1,168 @@
+1	korean	x-vnd.Be-MAIL	262401742
+Set to Saved	Mail		저장하도록 설정
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		본문에 인코딩 할수없는 문자가 %ld 개 있습니다. 다른 문자 세트를 사용하면 작동할 수 있습니다. 무시하고 전송하려면 보내기 버튼을 누르십시오. (인코딩 할수 없는 문자는 대체 문자가 사용됨) 또는 취소를 선택한 후 돌아가서 수정하십시오.
+Text wrapping:	Mail		텍스트 줄바꿈 : 
+Show icons & labels	Mail		아이콘 및 라벨 보기
+(Date unavailable)	Mail		(날짜를 사용할 수 없음)
+Reply	Mail		회신
+Next message	Mail		다음 메세지
+Mailing	Mail		메일링
+Unread	Mail		읽지 않음
+Same sender	Mail		동일한 발신자
+Copy to new	Mail		새 메일로 복사
+Save as draft	Mail		초안으로 저장
+Encoding:	Mail		인코딩 : 
+Print	Mail		인쇄
+Decrease quote level	Mail		인용 수준 내리기
+Encoding	Mail		인코딩
+Default account:	Mail		기본 계정 : 
+Message	Mail		메세지
+Bcc:	Mail		숨은참조: 
+New	Mail		새로 만들기
+Save	Mail		저장
+Undo	Mail		되돌리기
+Button bar:	Mail		버튼 바:
+%e wrote:\\n	Mail		%e 작성함:\\n
+Save changes to this signature?	Mail		이 서명의 변경 사항을 저장 하시겠습니까?
+Save attachment…	Mail		첨부 저장…
+Paste	Mail		붙여넣기
+E-mail draft could not be saved!	Mail		메일 초안을 저장할 수 없습니다!
+Don't send	Mail		보내지 않음
+sent	B_USER_DIRECTORY/mail/sent		보냄
+Only files can be added as attachments.	Mail		파일만 첨부할 수 있습니다.
+Close	Mail		닫기
+Untitled	Mail		제목 없음
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		전달받은 메일에서 첨부를 제거하는 기능은 아직 구현되지 않았습니다\n아직 정상적으로 작동하지 않을 수 있습니다.
+Same recipient	Mail		동일한 수신자
+Previous message	Mail		이전 메세지
+(Address unavailable)	Mail		(주소를 사용할 수 없음)
+Mail	System name		메일
+Copy link location	Mail		링크 위치 복사
+Add attachment…	Mail		첨부 추가…
+Next	Mail		다음
+Attachments:	Mail		첨부:
+Show icons only	Mail		아이콘만 보기
+Subject:	Mail		제목:
+OK	Mail		확인
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	확인
+Quit	Mail		종료
+Title:	Mail		제목:
+Account from mail	Mail		메일의 게정
+%e - E-mail address	Mail		%e - 이메일 주소
+Cc:	Mail		참조:
+No matches	Mail		일치하는 항목 없음
+Queries	Mail		쿼리
+Cut	Mail		자르기
+Reply to sender	Mail		보낸 사람에게 회신
+\\n - Newline	Mail		\\n - 줄바꿈
+Copy	Mail		복사
+Add signature	Mail		서명 추가
+Attachment: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	첨부: %name% (형식: %type%)
+%n - Full name	Mail		%n - 전체 이름
+Signature	Mail		서명
+Use default account	Mail		기본 계정 사용
+draft	B_USER_DIRECTORY/mail/draft		초안
+Really delete this signature? This cannot be undone.	Mail		이 서명을 삭제 하시겠습니까? 삭제한 서명은 복원 할 수 없습니다.
+spam	B_USER_DIRECTORY/mail/spam		스팸
+Reply to all	Mail		전체 회신
+Cancel	Mail		취소
+Off	Mail		끄기
+Set to %s	Mail		%s(으)로 설정
+Signature:	Mail		서명 : 
+Forward without attachments	Mail		첨부 없이 전달
+queries	B_USER_DIRECTORY/mail/queries		쿼리
+View	Mail		보기
+Signatures	Mail		서명
+On	Mail		켜기
+Find	Mail		검색
+Sorry, could not find an application that supports the 'Person' data type.	Mail		'Person'데이터 타입을 지원하는 응용 프로그램을 찾을 수 없습니다.
+Date:	Mail		날짜 : 
+Expert	Mail		전문가
+Automatically mark mail as read:	Mail		자동으로 읽은 메일로 표시:
+Close and 	Mail		닫은 후
+Colored quotes:	Mail		색깔있는 인용문:
+Automatic	Mail		자동
+Open this link	Mail		링크 열기
+Auto signature:	Mail		자동 서명 : 
+Same subject	Mail		동일한 제목
+Send	Mail		보내기
+Open draft	Mail		초안 열기
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	'New'로 남겨둠
+Random	Mail		무작위
+Attach attributes:	Mail		파일 첨부:
+Find again	Mail		다시 찾기
+Size:	Mail		크기:
+To:	Mail		받는 사람:
+Need Tracker to move items to trash	Mail		항목을 휴지통으로 이동하려면 Tracker가 필요합니다
+The mail_daemon could not be started:\n\t	Mail		mail_daemon을 시작할 수 없습니다:\n\t
+<no account found>	Mail		<계정을 찾을 수 없습니다>
+Mail couldn't find its dictionary.	Mail		Mail에서 사전을 찾을 수 없습니다.
+helpful message	Mail		도움이 되는 메세지
+ Read 	Mail		 읽음 
+Font:	Mail		글꼴 : 
+Accounts…	Mail		계정…
+Previous	Mail		이전
+Include file attributes in attachments	Mail		첨부 시 파일 속성 포함
+Start now	Mail		지금 시작
+(Name unavailable)	Mail		(이름을 사용할 수 없음)
+Move to trash	Mail		휴지통으로 이동
+<none>	Mail		<없음>
+Mail settings	Mail		메일 설정
+%d - Date	Mail		%d - 날짜
+Check spelling	Mail		맞춤법 검사
+Status:	Mail		상태:
+Redo	Mail		다시하기
+Leave as '%s'	Mail		'%s'으(로) 남겨두기
+Print…	Mail		인쇄...
+Settings…	Mail		설정...
+Warn unencodable:	Mail		인코딩 불가 경고하기:
+Trash	Mail		휴지통
+Show raw message	Mail		메세지 원본 보기
+Find…	Mail		찾기…
+Select all	Mail		전체 선택
+Show header	Mail		헤더 표시
+Reply account:	Mail		회신 계정:
+Sorry	Mail		죄송합니다
+Forward	Mail		전달
+Open attachment	Mail		첨부 열기
+mail	B_USER_DIRECTORY/mail		메일
+Save this message as a draft before closing?	Mail		닫기 전에 이 메시지를 초안으로 저장 하시겠습니까?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon이 실행중 이 아닙니다. 이 메시지는 대기열 에 있으며 mail_daemon이 시작될 때 전송됩니다.
+None	Mail		없음
+Resend	Mail		다시 보내기
+Hide	Mail		숨기기
+From:	Mail		보낸 사람:
+No file attributes, just plain data	Mail		파일 속성 없는 데이터
+Add	Mail		추가
+out	B_USER_DIRECTORY/mail/out		발송함
+Send this message before closing?	Mail		닫기 전에 이 메시지를 보내시겠습니까?
+in	B_USER_DIRECTORY/mail/in		수신함
+Open	Mail		열기
+Don't save	Mail		저장 안함
+Leave same	Mail		변경하지 않음
+An error occurred trying to save the attachment.	Mail		첨부 저장 중 오류가 발생했습니다.
+Save address	Mail		주소 저장
+Initial spell check mode:	Mail		최초 맞춤법 검사 모드:
+Edit queries…	Mail		쿼리 편집…
+There is no installed handler for URL links.	Mail		URL 링크에 연결된 처리기가 없습니다.
+File	Mail		파일
+Reply preamble:	Mail		회신 머릿말:
+New mail message	Mail		새 메일 메세지
+An error occurred trying to open this signature.	Mail		서명을 여는 중 오류가 발생했습니다.
+Edit signatures…	Mail		서명 편집…
+User interface	Mail		사용자 인터페이스
+Inconsistency occurred in the undo/redo buffer.	Mail		되돌리기/다시실행 버퍼에서 불일치가 발생했습니다.
+Remove attachment	Mail		첨부 제거
+Set to…	Mail		다음으로 설정…
+Edit	Mail		편집
+Page setup…	Mail		페이지 설정…
+An error occurred trying to save this signature.	Mail		서명을 저장하는 중 오류가 발생했습니다.
+Beginner	Mail		초보자
+Send message	Mail		메시지 보내기
+Delete	Mail		삭제
+Put your favorite e-mail queries and query templates in this folder.	Mail		자주 사용하는 메일 쿼리와 쿼리 템플릿을 이 폴더에 넣으십시오.
+Spam	Mail		스팸
+Couldn't open this signature. Sorry.	Mail		서명을 열 수 없습니다.
+Revert	Mail		되돌리기
+Unknown	Mail		알수없음
+Increase quote level	Mail		인용 수준 올리기

@@ -1,0 +1,42 @@
+1	korean	x-vnd.Haiku-ChartDemo	446404305
+(high) 100% 	ChartWindow		(높음) 100% 
+Spiral	ChartWindow		소용돌이
+Orange	ChartWindow		오렌지색
+Display:	ChartWindow		화면출력:
+Pink	ChartWindow		분홍색
+Animation:	ChartWindow		애니매이션:
+Auto demo	ChartWindow		자동 데모
+ 0.6 f/s  (logarithmic scale)	ChartWindow		0.6 f/s (로그 스케일)
+Red	ChartWindow		빨강색
+None	ChartWindow		없음
+600.0 f/s	ChartWindow		600.0 프레임/초
+Fast motion	ChartWindow		빠른 움직임
+Special	ChartWindow		특수효과
+White	ChartWindow		흰색
+Star density	ChartWindow		별들의 밀집도
+Chaos	ChartWindow		카오스
+Amas	ChartWindow		별 무리
+Yellow	ChartWindow		노랑색
+Frames/s	ChartWindow		프레임/초
+CPU load	ChartWindow		CPU 부하
+Green	ChartWindow		녹색
+Colors	ChartWindow		색상
+Refresh rate	ChartWindow		화면 재생 빈도
+Full screen	ChartWindow		전체 화면
+Status	ChartWindow		상태
+Off	ChartWindow		끄기
+Battle	ChartWindow		전투
+Blue	ChartWindow		파랑색
+Slow rotation	ChartWindow		느린 회전
+Novas	ChartWindow		노바
+Slow motion	ChartWindow		느린 움직임
+Comet	ChartWindow		혜성
+2 threads	ChartWindow		2 쓰레드
+DrawBitmap	ChartWindow		DrawBitmap
+LineArray	ChartWindow		LineArray
+ 5% (low)	ChartWindow		 5% (낮음)
+DirectWindow	ChartWindow		DirectWindow
+Free motion	ChartWindow		자유 이동
+Space color	ChartWindow		공간 색상
+Chart	System name		차트
+Space:	ChartWindow		공간:

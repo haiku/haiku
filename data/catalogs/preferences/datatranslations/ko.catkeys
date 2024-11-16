@@ -1,0 +1,17 @@
+1	korean	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		경로:
+Name:	DataTranslations		이름:
+DataTranslations - Note	DataTranslations		데이터변환 - 참고
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		'%name'은 변환기가 아닌 것으로 판단되어 설치되지 않습니다.
+Could not install %s:\n%s	DataTranslations		%s를 설치 할 수 없음:\n%s
+OK	DataTranslations		확인
+Cancel	DataTranslations		취소
+Info:	DataTranslations		정보:
+DataTranslations - Error	DataTranslations		데이터변환 - 오류
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		이 제어판을 통하여 다른 설정이 없는 응용 프로그램에 적용할 변환기의 기본값을 설정합니다.
+The new translator has been installed successfully.	DataTranslations		새로운 번환기가 성공적으로 설치되었습니다.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		'%name' 아이템이 이미 변환기 폴더에 존재합니다! 기존 변환기에 덮어 쓰겠습니까?
+DataTranslations	System name		데이터변환
+Info	DataTranslations		정보
+Overwrite	DataTranslations		덮어쓰기
+Version:	DataTranslations		버젼:

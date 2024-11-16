@@ -1,19 +1,22 @@
-1	english	x-vnd.Haiku-Keymap	2089182029
+1	english	x-vnd.Haiku-Keymap	83366860
 Key	Modifier keys window	As in a computer keyboard key	按键
 Japanese	KeymapNames		日语
 US	KeymapNames		美国
-PG ↑	Keyboard Layout View	Very short for 'page up'	上翻 ↑
+PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
+Scroll Lock	Keyboard Layout View		Scroll Lock
 Brazilian	KeymapNames		巴西
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (美国)
+Right Option	Keyboard Layout View		右 Option
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		德沃夏克
 Option:	Modifier keys window	Option key role name	选项：
 Cancel	Modifier keys window		取消
 Sample and clipboard:	Keymap window		示例和剪贴板：
 Polish	KeymapNames		波兰
+Right Shift	Keyboard Layout View		右 Shift
 Latin-American	KeymapNames		拉丁美洲
 Ukrainian	KeymapNames		乌克兰
-PAGE ↓	Keyboard Layout View		下翻 ↓
+PAGE ↓	Keyboard Layout View		PAGE ↓
 DEL	Keyboard Layout View		DEL
 United-Kingdom	KeymapNames		英国
 Turkish (Type-F)	KeymapNames		土耳其(F型)
@@ -25,9 +28,9 @@ Spanish (Dvorak)	KeymapNames		西班牙(德沃夏克)
 Option	Keyboard Layout View	Option key	选项
 US-International	KeymapNames		美国-国际
 Turkish (Type-Q)	KeymapNames		土耳其 (Q型)
-Revert	Modifier keys window		取消
+Revert	Modifier keys window		还原
 Slovak	KeymapNames		斯洛伐克
-CAPS LOCK	Keyboard Layout View		大写锁定
+CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
 Dvorak (programmer's)	KeymapNames		Dvorak (程序员版)
 PRINT	Keyboard Layout View		PRINT
@@ -38,7 +41,8 @@ Belarusian (Mac)	KeymapNames		白俄罗斯 (Mac)
 Croatian	KeymapNames		克罗地亚
 PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		设置修饰键
-Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium 国际版
+Right Command	Keyboard Layout View		右 Command
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (美国)
@@ -49,45 +53,125 @@ COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		乌克兰（Mac）
 Command:	Modifier keys window	Command key role name	命令：
 French (Bépo)	KeymapNames		法语（Bépo）
+Russian (Typewriter)	KeymapNames		俄文（打字机）
+Caps Lock:	Modifier keys window	Caps Lock key role name	大小写锁定键:
 Acute trigger	Keymap window		触发尖重音符
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s 国际版
+Italian	KeymapNames		意大利语
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan 国际版
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (美国)
+French (NF Z71-300)	KeymapNames		法语(NF Z71-300)
 Modifier keys	Modifier keys window		修饰键
+ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 国际版
+Kazakh	KeymapNames		哈萨克语
+Left Option	Keyboard Layout View		左 Option
 Save as…	Keymap window		保存为...
+Lithuanian (Standard)	KeymapNames		立陶宛语(标准)
 Error: duplicate keys	Modifier keys window		错误：重复按键
+NUM	Keyboard Layout View	Very short for 'num lock'	NUM
+Bulgarian (Phonetic)	KeymapNames		保加利亚 (拼音)
+Kinesis Advantage	KeyboardLayoutNames		Kinesis Advantage 键盘
+Canadian-French	KeymapNames		加拿大法语
+Hungarian	KeymapNames		匈牙利语
+Right Control	Keyboard Layout View		右 Ctrl
 Control	Keyboard Layout View	Control key	Control
+Irish	KeymapNames		爱尔兰语
 Remove	Keyboard Layout View		删除
-Tilde trigger	Keymap window		触发颚化字符
+Tilde trigger	Keymap window		触发波浪号
+Caps Lock	Keyboard Layout View		Caps Lock
 Shift	Keyboard Layout View	Shift key	Shift
-(Current)	Keymap window		（当前）
+CONTROL	Keyboard Layout View		CTRL
+Macedonian	KeymapNames		马其顿语
+Czech (Mac)	KeymapNames		捷克语(Mac)
+Caps Lock key	Modifier keys window	Label of key above Shift, usually Caps Lock	Caps Lock 键
+Albanian	KeymapNames		阿尔巴尼亚语
+(Current)	Keymap window		(当前)
+OPT	Keyboard Layout View	Very short for 'option'	OPT
+Friulian	KeymapNames		弗留利语
+END	Keyboard Layout View		END
+Esperanto	KeymapNames		世界语
+Belarusian	KeymapNames		白俄罗斯语
 Warning: left and right key roles do not match	Modifier keys window		警告：左右键规则不匹配
 Circumflex trigger	Keymap window		触发音调符号
-Role	Modifier keys window	As in the role of a modifier key	作用
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
+Russian (Yawert)	KeymapNames		俄语(Yawert)
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e 国际版
+Bulgarian (Cyrillic)	KeymapNames		保加利亚语(西里尔语)
+Swedish	KeymapNames		瑞典语
+CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
+Role	Modifier keys window	As in the role of a modifier key	角色
+Svorak	KeymapNames		Svorak 键盘
+ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (美国)
+German	KeymapNames		德语
+Swiss-German	KeymapNames		瑞士德语
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
 Czech	KeymapNames		捷克语
+Russian (Udmurt, Komi, Mari)	KeymapNames		俄语(乌德穆尔语，科米语，马里语)
+Thai (TIS-820.2538)	KeymapNames		泰语 (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	控制：
 Generic 105-key International	KeyboardLayoutNames		国际通用105键
 Disabled	Modifier keys window	Do nothing	禁用
 Select dead keys	Keymap window		选择废键：
+Russian (Mac)	KeymapNames		俄语(Mac)
+ESC	Keyboard Layout View		ESC
+Belarusian (Latin)	KeymapNames		白俄罗斯语(拉丁语)
+Hebrew	KeymapNames		希伯来语
 Layout	Keymap window		布局
-Revert	Keymap window		取消
+Greek	KeymapNames		希腊语
+Revert	Keymap window		还原
+CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		触发雕刻字符
 Menu	Keyboard Layout View	Menu key	菜单
+Faeroese	KeymapNames		法罗语
 Quit	Keymap window		退出
+Polish (Typewriter)	KeymapNames		波兰语 (打字机)
+French (Mac)	KeymapNames		法语(Mac)
 User:	Keymap window		用户：
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium 扩展国际版
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt 键
-Shift:	Modifier keys window	Shift key role name	Shift：
+SHIFT	Keyboard Layout View		SHIFT
+Estonian	KeymapNames		爱沙尼亚语
+Serbian (Latin)	KeymapNames		塞尔维亚语(拉丁语)
+French	KeymapNames		法语
+Portuguese	KeymapNames		葡萄牙语
+Swiss-French	KeymapNames		瑞士法语
+Shift:	Modifier keys window	Shift key role name	Shift 键：
 Keymap	System name		键盘映射
+Slovene	KeymapNames		斯洛文尼亚语
+Lithuanian	KeymapNames		立陶宛语
+Left Command	Keyboard Layout View		左 Command
 Set modifier keys…	Keymap window		设置修饰键…
-Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
+Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为 Haiku 模式
 Defaults	Keymap window		默认
+ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		系统：
+ThinkPad International	KeyboardLayoutNames		ThinkPad 国际版
+Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum 扩展 (美国)
 Switch shortcut keys	Keymap window		切换快捷键
+NUM LOCK	Keyboard Layout View		NUM LOCK
+MENU	Keyboard Layout View		菜单
 Belgian (comma)	KeymapNames		比利时语（comma）
+Norwegian	KeymapNames		挪威语
 Font	Keymap window		字体
+Danish	KeymapNames		丹麦语
+Generic 104-key	KeyboardLayoutNames		通用 104 键
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
+Russian	KeymapNames		俄语
+PAUSE	Keyboard Layout View		PAUSE
+TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
+Romanian	KeymapNames		罗马尼亚语
+CMD	Keyboard Layout View	Very short for 'command'	CMD
 Command	Keyboard Layout View	Command key	命令
-SCROLL	Keyboard Layout View		滚动锁定
+Left Shift	Keyboard Layout View		左 Shift
+SCROLL	Keyboard Layout View		SCROLL
 File	Keymap window		文件
 Brazilian (ABNT2)	KeymapNames		巴西语 (ABNT2)
+INS	Keyboard Layout View		INS
+OPTION	Keyboard Layout View		OPTION
+Dutch	KeymapNames		荷兰语
 Diaeresis trigger	Keymap window		触发分音符号
+Icelandic	KeymapNames		冰岛语
 Open…	Keymap window		打开..
+Left Control	Keyboard Layout View		左 Ctrl
+ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (美国)
+Num Lock	Keyboard Layout View		Num Lock

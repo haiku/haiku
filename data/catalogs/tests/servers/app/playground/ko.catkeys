@@ -1,0 +1,32 @@
+1	korean	x-vnd.Haiku-Playground	1375574837
+Line	Playground		직선
+Fill	Playground		채우기
+Over	Playground		오버
+Quit	Playground		종료
+Rect	Playground		사각형
+Select	Playground		선택
+Click and drag to draw an object	Playground		클릭 & 드래그하여 객체를 그립니다
+Controls	Playground		컨트롤
+Round rect	Playground		둥근 사각형
+Alpha:	Playground		불투명도:
+Mode:	Playground		모드:
+Submenu	Playground		하위메뉴
+Copy	Playground		복사
+Cancel	Playground		취소
+Clear	Playground		지우기
+Min	Playground		최소
+Blend	Playground		혼합
+Invert	Playground		반전
+Clear all drawing objects?	Playground		모든 객체를 지우시겠습니까?
+Width:	Playground		너비:
+Alpha	Playground		투명도
+New object	Playground		새 객체
+Test	Playground		테스트
+Max	Playground		최대
+Add	Playground		합산
+Playground	System name		Playground
+Erase	Playground		지우기
+File	Playground		파일
+Subtract	Playground		감산
+<pick>	Playground		<선택>
+Ellipse	Playground		타원

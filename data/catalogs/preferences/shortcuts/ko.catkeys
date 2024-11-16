@@ -1,0 +1,47 @@
+1	korean	x-vnd.Haiku-Shortcuts	3834857117
+*MouseUp	ShortcutsWindow		*MouseUp
+Application	ShortcutsWindow		응용 프로그램
+Option	ShortcutsSpec	Name for modifier on keyboard	Option
+Save changes before closing?	ShortcutsWindow		닫기 전에 변경 사항을 저장 하시겠습니까?
+Revert to saved	ShortcutsWindow		저장된 정보로 되돌림
+Don't save	ShortcutsWindow		저장 안함
+*MouseDown	ShortcutsWindow		*MouseDown
+*Beep	ShortcutsWindow		*Beep
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		설정한 키 셋을 저장할 수 없습니다.
+Save	ShortcutsWindow		저장
+Either	ShortcutsSpec		양 쪽 모두
+Oh no	ShortcutsWindow		오 이런
+Key	ShortcutsWindow		키
+*SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage application/x-vnd.Be-TRAK 'Tfnd'
+Select	ShortcutsWindow		선택
+Shortcuts	System name		단축키
+Quit	ShortcutsWindow		종료
+(Choose application with file requester)	ShortcutsWindow		(파일 요청자가 있는 응용 프로그램 선택)
+Cancel	ShortcutsWindow		취소
+*MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
+Control	ShortcutsSpec	Name for modifier on keyboard	Control
+Left	ShortcutsSpec		왼쪽
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		키 셋 파일을 읽어들일 수 없습니다!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		키 셋 파일을 저장할 수 없습니다!
+*InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"여기에 원하는 텍스트를 입력하세요\"
+Remove selected shortcut	ShortcutsWindow		선택한 단축키 제거
+Error, NULL state description?	ShortcutsSpec		오류, NULL 상태 설명자?
+Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		키 셋 파일을 열 수 없습니다!
+Save & apply	ShortcutsWindow		저장하고 적용
+Open	ShortcutsWindow		열기
+Append	ShortcutsWindow		추가
+Both	ShortcutsSpec		양 쪽 동시
+Save KeySet as…	ShortcutsWindow		다른 이름으로 키 셋 저장…
+Append KeySet…	ShortcutsWindow		키 셋 추가…
+*MouseButton 1	ShortcutsWindow		*MouseButton 1
+*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
+Right	ShortcutsSpec		오른쪽
+OK	ShortcutsWindow		확인
+Add new shortcut	ShortcutsWindow		새 단축키 추가
+(None)	ShortcutsSpec		(없음)
+Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
+Open KeySet…	ShortcutsWindow		키 셋 열기…
+File	ShortcutsWindow		파일
+*LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
+*MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

@@ -1,0 +1,42 @@
+1	korean	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	올바르지 않은 URL입니다.
+Repository URL:	AddRepoWindow	Text box label	저장소 URL:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	%name%의 저장소 캐시를 새로고침 하는 데 오류가 발생했습니다
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	저장소 %name%를 삭제하는 데 오류가 발생했습니다
+Unknown	Constants	Unknown repository name	알 수 없음
+Remove all	RepositoriesView	Button label	모두 제거
+Enable repositories to use with package management:	RepositoriesView	Label text	패키지 관리자에서 사용할 수 있도록 저장소 활성화:
+Disable	RepositoriesView	Button label	비활성화
+Cancel task	TaskTimer	Button label	작업 취소
+Changes completed	RepositoriesView	Status view text	변경 완료
+Details	TaskLooper	Job log details header	상세
+Enabled	RepoRow	Tag in the Status column	활성화
+Remove	Constants	Button label	제거
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	저장소 %url%을 활성화하는 데 오류가 발생했습니다
+Remove this repository?	RepositoriesView	Removal alert confirmation message	이 저장소를 제거하시겠습니까?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	저장소 %name%에 대한 작업이 완료되는 데 시간이 오래 걸립니다.
+Completed	TaskLooper	Completed task status message	완료됨
+OK	Constants	Button label	확인
+Status	RepositoriesView	Column title	상태
+Name	RepositoriesView	Column title	이름
+Add	AddRepoWindow	Button label	추가
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	현재 활성화된 저장소의 이름을 가져올 수 없습니다.
+Enable all	RepositoriesView	Button label	전체 활성화
+Aborted	TaskLooper	Aborted task status message	중단됨
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	활성화
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	%name%의 저장소 설정을 가져오는 데 오류가 발생했습니다.
+Description	TaskLooper	Failed task error description	설명
+Failed	TaskLooper	Failed task status message	실패함
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	좋은 소식입니다! 저장소 %name%에 대한 작업이 완료되었습니다.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	일부 작업이 아직 실행 주입니다. 모두 중단하고 종료하시겠습니까?
+This repository URL already exists.	RepositoriesView	Error message	저장소 URL이 이미 존재합니다.
+Repositories	System name		Repositories
+Changes pending:	RepositoriesView	Status view text	대기중인 변경사항:
+Remove	RepositoriesView	Button label	제거
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	저장소를 제거하시겠습니까?
+Keep trying	TaskTimer	Button label	계속 시도 중
+Cancel	Constants	Button label	취소
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	각 저장소마다 하나의 URL만 사용할 수 있습니다. 선택사항을 변경하십시오.
+Stop and quit	RepositoriesWindow	Button label	중지 및 종료
+Disable all	RepositoriesView	Button label	모두 비활성화

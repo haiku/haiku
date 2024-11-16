@@ -1,0 +1,4 @@
+1	korean	x-vnd.Haiku-SystemLogger	2600925901
+Syslog Daemon	SyslogDaemon		Syslog 데몬
+OK	SyslogDaemon		확인
+%s\n\nThis daemon collects all system messages and writes them to the system-wide log at \"%s\".\n\n	SyslogDaemon		%s\n\n이 데몬은 모든 시스템 메세지를 수집하여 \"%s\"에 있는 전역 시스템 로그에 저장합니다.\n\n

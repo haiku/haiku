@@ -1,0 +1,38 @@
+1	korean	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		%source%에서 %target%으로 아키텍처 변경 허용
+install %source% from excluded repository	SolverProblemSolution		제외된 저장소의 %source% 설치
+unspecified problem	SolverProblem		정의되지 않은 문제
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		패키지 %source%에서 %dependency% 패키지를 의존성으로 요구하지만 어느 공급자를 통해서도 설치할 수 없음
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		패키지 %source%에 의해 %dependency% (%target% 제공) 의존성이 암시적으로 도태됨
+nothing provides requested %dependency%	SolverProblem		요청된 %dependency% 의존성 패키지를 어디에서도 제공하지 않음
+do not keep %source% installed	SolverProblemSolution		%source%을(를) 설치된 상태로 유지하지 않음
+do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection%\" 패키지를 지우지 않음
+install %source% despite its inferior architecture	SolverProblemSolution		하위 아키텍처임에도 %source% 설치
+conflicting requests	SolverProblem		충돌되는 요청
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		\"%selection%\" 패키지의 최신 버전을 설치하지 않음
+allow replacement of %source% with %target%	SolverProblemSolution		%source%를 %target%으로 대체 허용
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		패키지 %source%에 의해 %dependency% (%target% 제공) 의존성이 도태됨
+do not forbid installation of %source%	SolverProblemSolution		%source% 설치를 차단하지 않음
+allow downgrade of %source% to %target%	SolverProblemSolution		%source%에서 %target%으로 다운그레이드 허용
+dependency problem	SolverProblem		의존성 문제
+%dependency% is provided by the system	SolverProblem		%dependency% 의존성은 시스템에서 제공함
+keep %source% despite its inferior architecture	SolverProblemSolution		하위 아키텍처임에도 %source% 유지
+%source% does not belong to a distupgrade repository	SolverProblem		%source%은(는) 배포판 업그레이드 저장소에 없음
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		패키지 %source% 설치 시 %dependency% (%target% 제공) 의존성이 도태됨
+allow name change of %source% to %target%	SolverProblemSolution		%source%에서 %target%으로 이름 변경 허용
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		패키지 %source%이(가) %dependency% (%target% 제공) 의존성과 충돌함
+do something	SolverProblemSolution		무엇이든 실행
+install %selection% despite its old version	SolverProblemSolution		이전 버전임에도 %selection% 설치
+cannot install both %source% and %target%	SolverProblem		%source%와 %target%을(를) 동시에 설치할 수 없음
+package %source% is not installable	SolverProblem		패키지 %source%이(가) 설치 가능한 패키지가 아님
+problem with installed package %source%	SolverProblem		패키지 %source% 설치 시 문제가 발생함
+allow deinstallation of %source%	SolverProblemSolution		%source% 설치 제거 허용
+keep %source% from excluded repository	SolverProblemSolution		제외된 저장소의 %source% 패키지 유지
+keep old %source%	SolverProblemSolution		이전 %source% 유지
+package %source% conflicts with %dependency% provided by itself	SolverProblem		패키지 %source%이(가) 자신의 의존성 %dependency%와 충돌함
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		\"%sourceVendor%\" (%source%)에서 \"%targetVendor%\" (%target%)로 제조사 변경 허용
+do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" 잠그지 않음
+do not install \"%selection%\"	SolverProblemSolution		\"%selection%\" 설치하지 않음
+nothing provides %dependency% needed by %source%	SolverProblem		%dependency%을(를) 어디에서도 제공하지 않음 (%source%에서 요구)
+%source% has inferior architecture	SolverProblem		%source%이(가) 하위 아키텍처를 사용함
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		해석할 수 있는 모든 \"%selection%\" 설치하지 않음

@@ -1,0 +1,8 @@
+1	korean	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		응용프로그램:\n\n      %app\n\n에서 오류가 발생하여 계속 실행할 수 없습니다. Haiku가 응용프로그램을 중단시키고 정리할 것입니다.
+Oh yeah!	DebugServer		오 예!
+Debug	DebugServer		디버그
+Terminate	DebugServer		중단
+Save report	DebugServer		보고서 저장
+Write core file	DebugServer		코어파일 작성
+Oh no!	DebugServer		이런 안돼!

@@ -1,0 +1,137 @@
+1	korean	x-vnd.Haiku-Terminal	686383766
+Close other tabs	Terminal TermWindow		다른 탭 닫기
+Insert path	Terminal TermView		경로 삽입
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		터미널에서 셸을 실행 할 수 없습니다.
+Text encoding	Terminal TermWindow		텍스트 인코딩
+Colors	Terminal ThemeWindow		색상
+OK	Terminal SetTitleWindow		확인
+Edit	Terminal TermWindow		편집
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h, --help 이 도움말 표시\n  -t, --title 창 제목 설정\n  -f, --fullscreen 전체화면으로 시작\n  -w, --working-directory 최초 작업 디렉터리 지정\n
+Select all	Terminal TermWindow		전체선택
+Confirm exit if active programs exist	Terminal AppearancePrefView		실행 중인 프로그램이 있을 경우 종료 전에 확인하기
+Color scheme:	Terminal ThemeView		색상 테마:
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\t현재 탭에서 실행 중인 프로세스의 현재 작업 디렉터리\n\t\t\t선택적으로 최대 경로 항목 개수를 지정할 수 있습니다\n\t\t\t예시: '%2d' - 최대 2개 항목\n\t%T\t-\t현재 로케일에서의 터미널 프로그램 이름.\n\t%e\t-\t현재 탭의 인코딩. UTF-8인 경우 표시되지 않음.\n\t%i\t-\t창의 인덱스 번호.\n\t%p\t-\t현재 탭에서 실행 중인 프로세스 이름.\n\t%t\t-\t현재 탭 이름.
+Copy	Terminal TermWindow		복사
+Edit tab title…	Terminal TermWindow		탭 이름 편집...
+Print	Terminal TermWindow		인쇄
+Settings	Terminal TermWindow		설정
+%app% settings	Terminal PrefWindow	window title	%app% 설정
+ANSI bright black color	Terminal ThemeView		ANSI 밝은 검정색
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\t현재 실행 중인 프로세스의 작업 디렉터리.\n\t\t\t선택적으로 최대 경로 항목 개수를 지정할 수 있습니다\n\t\t\t예시: '%2d' - 최대 2개 항목\n\t%i\t-\t탭의 인덱스 번호.\n\t%e\t-\t현재 탭의 인코딩. UTF-8인 경우 표시되지 않음.\n\t%p\t-\t현재 실행 중인 프로세스 이름
+Use default	Terminal SetTitleWindow		기본값 사용
+Close tab	Terminal TermWindow		탭 닫기
+Error!	Terminal getString		오류!
+Colors…	Terminal TermWindow		색상…
+Appearance	Terminal PrefWindow		외양
+Set tab title	Terminal TermWindow		탭 이름 설정
+Create link here	Terminal TermView		여기에 링크 만들기
+Encoding:	Terminal AppearancePrefView		인코딩:
+yellow	Terminal ThemeView		노랑색
+Change directory	Terminal TermView		디렉터리 바꾸기
+Custom	Terminal AppearancePrefView	Window size	사용자 설정
+Page setup…	Terminal TermWindow		페이지 설정...
+ANSI yellow color	Terminal ThemeView		ANSI 노랑색
+Cancel	Terminal TermView		취소
+Defaults	Terminal PrefWindow		기본값
+black	Terminal ThemeView		검정색
+Revert	Terminal PrefWindow		되돌리기
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	터미널
+Use selection	Terminal FindWindow		선텍된 부분 사용
+Find next	Terminal TermWindow		다음 찾기
+Copy link location	Terminal TermView		링크 위치 복사
+Background	Terminal ThemeView		배경
+Window title:	Terminal AppearancePrefView		창 이름:
+New tab	Terminal TermWindow		새 탭
+magenta	Terminal ThemeView		마젠타
+Allow bold text	Terminal AppearancePrefView		굵은 문자 허용
+Window title…	Terminal TermWindow		창 이름...
+ANSI blue color	Terminal ThemeView		ANSI 파란색
+blue	Terminal ThemeView		파란색
+Open path	Terminal TermView		경로 열기
+Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\"를 실행할 수 없습니다:\n\t%error
+Terminal	System name		터미널
+Custom	Terminal colors scheme		사용자 지정
+Really close?	Terminal TermWindow		정말 닫으시겠습니까?
+Font size	Terminal TermWindow		글꼴 크기
+OK	Terminal TermApp		확인
+ANSI bright blue color	Terminal ThemeView		ANSI 밝은 파란색
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		프로세스 \"%1\"이 아직 실행중입니다.\n터미널을 닫을 시 해당 프로세스가 강제 종료 될 것입니다.
+Unrecognized option \"%s\"\n	Terminal arguments parsing		인식할 수 없는 옵션 \"%s\"\n
+Tab title:	Terminal AppearancePrefView		탭 이름:
+Text not found.	Terminal TermWindow		텍스트를 찾을 수 없습니다.
+Match word	Terminal FindWindow		단어 일치
+New Terminal	Terminal TermWindow		새 터미널
+Find failed	Terminal TermWindow		찾기 실패
+Quit	Terminal TermWindow		조료
+Match case	Terminal FindWindow		대소문자 구분
+Find previous	Terminal TermWindow		이전 찾기
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		탭 이름을 특정하기 위한 패턴. 다음 임지 문자열을\n사용할 수 있습니다:
+Close	Terminal TermWindow		닫기
+Save to file…	Terminal PrefWindow		파일로 저장…
+Defaults	Terminal ThemeWindow		기본값
+Copy path	Terminal TermView		경로 복사
+Window size	Terminal TermWindow		창 크기
+Selected text	Terminal ThemeView		선택된 텍스트
+Copy absolute path	Terminal TermView		절대 경로 복사
+Cancel	Terminal TermWindow		취소
+ANSI cyan color	Terminal ThemeView		ANSI 청록색
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		프로세스 \"%1\"이 아직 실행중입니다.\n탭을 닫을 시 해당 프로세스가 강제 종료 될 것입니다.
+Full screen	Terminal TermWindow		전체화면
+Shell 	Terminal TermWindow		셸 
+Revert	Terminal ThemeWindow		되돌리기
+ANSI green color	Terminal ThemeView		ANSI 초록색
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' 문자.\n\t%<\t-\t이후의 플레이스홀더가 비어있지 않은 경우에만\n\t\t\t보여지는 섹션을 시작합니다.\n\t%>\t-\t이전 %< 섹션과 현재 플레이스홀더 사이가 비어있지 않은\n\t\t\t경우에만 보여지는 섹션을 시작합니다.\n\t%-\t-\t%< 또는 %> 섹션을 끝냅니다.\n\n플레이스홀더 값이 비어있지 않은 경우 '%'와 형식 문자 사이의 영숫자를 제외한\n모든 문자는 공백만 삽입되며, %< 섹션에 추가됩니다.
+ANSI bright cyan color	Terminal ThemeView		ANSI 밝은 청록색
+Tab title:	Terminal TermWindow		탭 이름:
+Window title:	Terminal TermWindow		창 이름:
+ANSI white color	Terminal ThemeView		ANSI 흰색
+Window size:	Terminal AppearancePrefView		창 크기:
+Switch Terminals	Terminal TermWindow		터미널 전환
+Decrease	Terminal TermWindow		작게
+Settings…	Terminal TermWindow		환경 설정...
+Cancel	Terminal SetTitleWindow		취소
+Blinking cursor	Terminal AppearancePrefView		깜박이는 커서
+Use text:	Terminal FindWindow		텍스트 사용:
+Close active tab	Terminal TermWindow		활성된 탭 닫기
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 창 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
+Selected background	Terminal ThemeView		선택영역 배경
+Save as default	Terminal TermWindow		기본값으로 저장
+Nothing is selected.	Terminal TermWindow		선택된 것이 없습니다.
+ANSI bright red color	Terminal ThemeView		ANSI 밝은 빨간색
+Use left Option as Meta key	Terminal AppearancePrefView		왼쪽 Option키를 메타 키로 사용
+Find	Terminal FindWindow		찾기
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		이 패턴은 탭 제목에서 사용됩니다. 다음과 같은 자리 맞추개가 \n사용됨:\n
+Save to file…	Terminal ThemeWindow		파일로 저장…
+Font:	Terminal AppearancePrefView		글꼴:
+Paste	Terminal TermWindow		붙여넣기
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		이 패턴은 창 제목을 결정합니다. 다음의 예시를\n그대로 사용할 수 있습니다:
+ANSI bright magenta color	Terminal ThemeView		ANSI 밝은 마젠타
+Copy here	Terminal TermView		여기에 복사
+Use default shell	Terminal Shell		기본 셀 사용
+red	Terminal ThemeView		빨강
+white	Terminal ThemeView		흰색
+Open link	Terminal TermView		링크 열기
+Text	Terminal ThemeView		텍스트
+ANSI bright yellow color	Terminal ThemeView		ANSI 밝은 노란색
+Not found.	Terminal TermWindow		찾을수 없음.
+ANSI black color	Terminal ThemeView		ANSI 검정색
+Find…	Terminal TermWindow		찾기...
+No search string was entered.	Terminal TermWindow		찾을 문자열이 입력되지 않았습니다.
+Move here	Terminal TermView		여기로 이동
+Abort	Terminal Shell		정보
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		다음 프로세스가 아직 실행중입니다:\n\n\t%1\n\n이대로 터미널을 닫을 경우 프로세스가 강제 종료됩니다.
+Set window title	Terminal TermWindow		창 이름 설정
+ANSI red color	Terminal ThemeView		ANSI 빨간색
+Increase	Terminal TermWindow		크게
+green	Terminal ThemeView		초록
+ANSI bright green color	Terminal ThemeView		ANSI 밝은 초록색
+OK	Terminal TermWindow		확인
+Text under cursor	Terminal ThemeView		커서 위치의 텍스트
+ANSI bright white color	Terminal ThemeView		ANSI 밝은 흰색
+Close window	Terminal TermWindow		창 닫기
+ANSI magenta color	Terminal ThemeView		ANSI 마젠타
+Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku 터미널\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [옵션] [셸]\n
+cyan	Terminal ThemeView		청록색
+Clear all	Terminal TermWindow		모두 지우기
+Cursor	Terminal ThemeView		커서
+Search forward	Terminal FindWindow		앞으로 찾기
