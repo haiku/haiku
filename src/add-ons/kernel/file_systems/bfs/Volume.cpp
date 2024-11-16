@@ -82,7 +82,7 @@ disk_super_block::Initialize(const char* diskName, off_t numBlocks,
 
 	int32 bitsPerBlock = blockSize << 3;
 	off_t bitmapBlocks = (numBlocks + bitsPerBlock - 1) / bitsPerBlock;
-	int32 blocksPerGroup = 1;
+	int32 bitmapBlocksPerGroup = 1;
 	int32 groupShift = 13;
 
 	for (int32 i = 8192; i < bitsPerBlock; i *= 2) {
@@ -97,19 +97,20 @@ disk_super_block::Initialize(const char* diskName, off_t numBlocks,
 	int32 numGroups;
 
 	while (true) {
-		numGroups = (bitmapBlocks + blocksPerGroup - 1) / blocksPerGroup;
+		numGroups = (bitmapBlocks + bitmapBlocksPerGroup - 1) / bitmapBlocksPerGroup;
 		if (numGroups > kDesiredAllocationGroups) {
 			if (groupShift == 16)
 				break;
 
 			groupShift++;
-			blocksPerGroup *= 2;
+			bitmapBlocksPerGroup *= 2;
 		} else
 			break;
 	}
 
 	num_ags = HOST_ENDIAN_TO_BFS_INT32(numGroups);
-	blocks_per_ag = HOST_ENDIAN_TO_BFS_INT32(blocksPerGroup);
+	// blocks_per_ag holds the number of bitmap blocks that are in each allocation group
+	blocks_per_ag = HOST_ENDIAN_TO_BFS_INT32(bitmapBlocksPerGroup);
 	ag_shift = HOST_ENDIAN_TO_BFS_INT32(groupShift);
 }
 
