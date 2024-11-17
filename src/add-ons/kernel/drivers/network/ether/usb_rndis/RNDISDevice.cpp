@@ -273,10 +273,20 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 			return result;
 		}
 
-		if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
+		if (fStatusRead == B_CANCELED) {
+			// The transfer was canceled, so no data was actually received.
+			*numBytes = 0;
+			return fStatusRead;
+		}
+
+		if ((fStatusRead != B_OK) && !fRemoved) {
+			// In other error cases (triggered by the device), we need to clear the "halt" feature
+			// so that the next transfers will work.
 			TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusRead);
-			result = gUSBModule->clear_feature(fReadEndpoint,
-				USB_FEATURE_ENDPOINT_HALT);
+
+			gUSBModule->cancel_queued_transfers(fReadEndpoint);
+
+			result = gUSBModule->clear_feature(fReadEndpoint, USB_FEATURE_ENDPOINT_HALT);
 			if (result != B_OK) {
 				TRACE_ALWAYS("failed to clear halt state on read\n");
 				*numBytes = 0;
@@ -401,10 +411,18 @@ RNDISDevice::Write(const uint8 *buffer, size_t *numBytes)
 		return result;
 	}
 
-	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED && !fRemoved) {
+	if (fStatusWrite == B_CANCELED) {
+		// The transfer was canceled, so no data was actually sent.
+		*numBytes = 0;
+		return fStatusWrite;
+	}
+
+	if ((fStatusWrite != B_OK) && !fRemoved) {
 		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusWrite);
-		result = gUSBModule->clear_feature(fWriteEndpoint,
-			USB_FEATURE_ENDPOINT_HALT);
+
+		gUSBModule->cancel_queued_transfers(fReadEndpoint);
+
+		result = gUSBModule->clear_feature(fWriteEndpoint, USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
 			TRACE_ALWAYS("failed to clear halt state on write\n");
 			*numBytes = 0;
@@ -826,6 +844,7 @@ RNDISDevice::_NotifyCallback(void *cookie, int32 status, void *_data,
 
 	if (status != B_OK) {
 		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", status);
+
 		if (gUSBModule->clear_feature(device->fNotifyEndpoint,
 			USB_FEATURE_ENDPOINT_HALT) != B_OK)
 			TRACE_ALWAYS("failed to clear halt state in notify hook\n");
