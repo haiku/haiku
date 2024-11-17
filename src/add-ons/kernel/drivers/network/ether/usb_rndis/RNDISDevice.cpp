@@ -483,59 +483,6 @@ RNDISDevice::Removed()
 
 
 status_t
-RNDISDevice::CompareAndReattach(usb_device device)
-{
-	const usb_device_descriptor *deviceDescriptor
-		= gUSBModule->get_device_descriptor(device);
-
-	if (deviceDescriptor == NULL) {
-		TRACE_ALWAYS("failed to get device descriptor\n");
-		return B_ERROR;
-	}
-
-	if (deviceDescriptor->vendor_id != fVendorID
-		&& deviceDescriptor->product_id != fProductID) {
-		// this certainly isn't the same device
-		return B_BAD_VALUE;
-	}
-
-	// this might be the same device that was replugged - read the MAC address
-	// (which should be at the same index) to make sure
-	uint8 macBuffer[6];
-	if (_ReadMACAddress(device, macBuffer) != B_OK
-		|| memcmp(macBuffer, fMACAddress, sizeof(macBuffer)) != 0) {
-		// reading the MAC address failed or they are not the same
-		return B_BAD_VALUE;
-	}
-
-	// this is the same device that was replugged - clear the removed state,
-	// re-setup the endpoints and transfers and open the device if it was
-	// previously opened
-	fDevice = device;
-	fRemoved = false;
-	status_t result = _SetupDevice();
-	if (result != B_OK) {
-		fRemoved = true;
-		return result;
-	}
-
-	// in case notifications do not work we will have a hardcoded connection
-	// need to register that and notify the network stack ourselfs if this is
-	// the case as the open will not result in a corresponding notification
-	bool noNotifications = (fMediaConnectState == MEDIA_STATE_CONNECTED);
-
-	if (fOpen) {
-		fOpen = false;
-		result = Open();
-		if (result == B_OK && noNotifications && fLinkStateChangeSem >= B_OK)
-			release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
-	}
-
-	return B_OK;
-}
-
-
-status_t
 RNDISDevice::_SendCommand(const void* data, size_t length)
 {
 	size_t actualLength;

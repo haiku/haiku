@@ -28,8 +28,6 @@ public:
 		void				Removed();
 		bool				IsRemoved() { return fRemoved; };
 
-		status_t			CompareAndReattach(usb_device device);
-
 private:
 static	void				_ReadCallback(void *cookie, int32 status,
 								void *data, size_t actualLength);
