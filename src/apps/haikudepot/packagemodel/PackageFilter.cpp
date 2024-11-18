@@ -223,8 +223,8 @@ private:
 			return false;
 
 		return _TextContains(localizedText->Title(), searchTerm)
-        	&& _TextContains(localizedText->Summary(), searchTerm)
-        	&& _TextContains(localizedText->Description(), searchTerm);
+        	|| _TextContains(localizedText->Summary(), searchTerm)
+        	|| _TextContains(localizedText->Description(), searchTerm);
 	}
 
 private:
