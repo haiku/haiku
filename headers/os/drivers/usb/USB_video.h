@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, Adrien Destugues, pulkomandy@pulkomandy.tk
+ * Copyright 2016-2024, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under terms of the MIT license.
  */
 
@@ -171,18 +171,18 @@ enum { // Camera Terminal Control Selectors
 
 enum { // Processing Unit Control Selectors
 	USB_VIDEO_PU_CONTROL_UNDEFINED 							= 0x00,
-	USB_VIDEO_PU_BACKLIGHT_COMPENSATION_CONTROL 			= 0x01,	
+	USB_VIDEO_PU_BACKLIGHT_COMPENSATION_CONTROL 			= 0x01,
 	USB_VIDEO_PU_BRIGHTNESS_CONTROL 						= 0x02,
 	USB_VIDEO_PU_CONTRAST_CONTROL 							= 0x03,
 	USB_VIDEO_PU_GAIN_CONTROL 								= 0x04,
 	USB_VIDEO_PU_POWER_LINE_FREQUENCY_CONTROL 				= 0x05,
 	USB_VIDEO_PU_HUE_CONTROL 								= 0x06,
-	USB_VIDEO_PU_SATURATION_CONTROL 						= 0x07,	
+	USB_VIDEO_PU_SATURATION_CONTROL 						= 0x07,
 	USB_VIDEO_PU_SHARPNESS_CONTROL 							= 0x08,
 	USB_VIDEO_PU_GAMMA_CONTROL 								= 0x09,
 	USB_VIDEO_PU_WHITE_BALANCE_TEMPERATURE_CONTROL 			= 0x0A,
 	USB_VIDEO_PU_WHITE_BALANCE_TEMPERATURE_AUTO_CONTROL 	= 0x0B,
-	USB_VIDEO_PU_WHITE_BALANCE_TEMPERATURE_COMPONENT_CONTROL 	= 0x0C,
+	USB_VIDEO_PU_WHITE_BALANCE_COMPONENT_CONTROL 			= 0x0C,
 	USB_VIDEO_PU_WHITE_BALANCE_COMPONENT_AUTO_CONTROL 		= 0x0D,
 	USB_VIDEO_PU_DIGITAL_MULTIPLEXER_CONTROL 				= 0x0E,
 	USB_VIDEO_PU_DIGITAL_MULTIPLEXER_LIMIT_CONTROL 			= 0x0F,
@@ -277,9 +277,9 @@ typedef struct {
 	uint8 descriptor_type;
 	uint8 descriptor_sub_type;
 	uint8 unit_id;
-	uint8 nr_in_pins;
-	uint8* source_id;
-	uint8 selector;
+	uint8 num_input_pins;
+	uint8 source_id[0];
+	uint8   Selector() const { return source_id[num_input_pins]; }
 } _PACKED usb_video_selector_unit_descriptor;
 
 
@@ -325,26 +325,13 @@ typedef struct {
 	uint8 unit_id;
 	uint8 guid_extension_code[16];
 	uint8 num_controls;
-	uint8 nr_in_pins;
+	uint8 num_input_pins;
 	uint8 source_id[0];
-#if 0
-	// Remaining part of the structure can't be encoded because source_id has
-	// a variable size
-	uint8 control_size;
-	struct controls {
-		B_LBITFIELD8_8 (
-				vendor_specific0 : 1,
-				vendor_specific1 : 1,
-				vendor_specific2 : 1,
-				vendor_specific3 : 1,
-				vendor_specific4 : 1,
-				vendor_specific5 : 1,
-				vendor_specific6 : 1,
-				vendor_specific7 : 1
-			     );
-	} * _controls;
-	uint8 extension;
-#endif
+
+	uint8	ControlSize() const { return source_id[num_input_pins]; }
+	const uint8*	Controls() const { return &source_id[num_input_pins + 1]; }
+	uint8	Extension() const
+		{	return source_id[num_input_pins + ControlSize() + 1]; }
 } _PACKED usb_video_extension_unit_descriptor;
 
 
@@ -405,14 +392,14 @@ typedef struct {
 
 	union {
 		struct {
-			uint16	focal_length_min;
-			uint16	focal_length_max;
-			uint16	focal_length;
+			uint16	objective_focal_length_min;
+			uint16	objective_focal_length_max;
+			uint16	ocular_focal_length;
 			uint8	control_size;
 			uint8	controls[3];
 		} _PACKED camera;
 	};
-} _PACKED usb_video_input_terminal_descriptor;
+} _PACKED usb_video_camera_input_terminal_descriptor;
 
 
 typedef struct {
@@ -455,7 +442,7 @@ typedef struct {
 				update_frame_segment: 1,
 				reserved: 2 // (control_size*8-1): Set to zero.
 			     );
-	} * _ma_controls;
+	} _ma_controls[0];
 } _PACKED usb_video_class_specific_vs_interface_input_header_descriptor;
 
 
@@ -468,7 +455,7 @@ typedef struct {
 	uint8	descriptor_subtype; 	// USB_VIDEO_VC_OUTPUT_TERMINAL
 	uint8	terminal_id;
 	uint16	terminal_type;
-	uint8	assoc_terminal;
+	uint8	associated_terminal;
 	uint8	source_id;
 	uint8	terminal;
 } _PACKED usb_video_output_terminal_descriptor;
@@ -500,7 +487,7 @@ typedef struct {
 				comp_window_size: 1,
 				reserved: 4 // (control_size*8-1) Set to zero.
 			     );
-	} * _ma_controls;
+	} _ma_controls[0];
 } _PACKED usb_video_class_specific_vs_interface_output_header_descriptor;
 
 
@@ -541,7 +528,7 @@ typedef struct {
 				B_LBITFIELD16_3 (
 						analog_video_standard: 1,
 						analog_video_lock_status: 1,
-						reserved: 14 // Reserved. Se to zero.
+						reserved: 14 // Reserved. Set to zero.
 						);
 			} _control_b;
 		} _controls;
@@ -551,7 +538,7 @@ typedef struct {
 				B_LBITFIELD16_3 (
 					analog_video_standard: 1,
 					analog_video_lock_status: 1,
-					reserved: 14 // Reserved. Se to zero.
+					reserved: 14 // Reserved. Set to zero.
 				);
 			} _control_b;
 			struct control_a {
@@ -578,8 +565,9 @@ typedef struct {
 #endif
 		uint8_t controls[4];
 	};
-	uint8 processing;
-	union {
+
+	uint8   Processing() const { return controls[control_size]; }
+	typedef union {
 		struct {
 			B_LBITFIELD8_8 (
 				none: 1,
@@ -593,7 +581,8 @@ typedef struct {
 			);
 		} _video_standards;
 		uint8_t video_standards;
-	};
+	} video_standards;
+	video_standards VideoStandards() const { return *(video_standards*)&controls[control_size+1]; }
 } _PACKED usb_video_processing_unit_descriptor;
 
 
@@ -693,7 +682,7 @@ typedef struct {
 	union {
 		struct {
 			uint32	min_frame_interval;
-			uint32	max_frame_tnterval;
+			uint32	max_frame_interval;
 			uint32	frame_interval_step;
 		} continuous;
 		uint32	discrete_frame_intervals[0];
@@ -702,7 +691,6 @@ typedef struct {
 
 
 typedef struct {
-	uint8 length; // 34 bytes
 	struct hint {
 		B_LBITFIELD16_5 (
 				frame_interval: 1,
@@ -733,7 +721,7 @@ typedef struct {
 	uint8 prefered_version;
 	uint8 min_version;
 	uint8 max_version;
-} _PACKED usb_video_video_probe_and_commit_controls;
+} _PACKED usb_video_probe_and_commit_controls;
 
 
 typedef struct {
@@ -755,9 +743,12 @@ typedef struct {
 	struct pattern_size {
 		uint16 width;
 		uint16 height;
-	} * _pattern_size;
-	uint8 num_compression_pattern;
-	uint8* compression;
+	} _pattern_size[0];
+	uint8 NumCompressionPatterns() const { return *(CompressionPatterns() - 1); }
+	const uint8* CompressionPatterns() const {
+		return ((const uint8*)_pattern_size + sizeof(pattern_size)
+			* num_image_size_patterns + sizeof(uint8));
+	}
 } _PACKED usb_video_still_image_frame_descriptor;
 
 

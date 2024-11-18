@@ -84,7 +84,7 @@ DumpVideoCSInterfaceDescriptorOutputTerminal(
 		descriptor->terminal_type,
 			TerminalTypeName(descriptor->terminal_type));
 	printf("                    Associated Terminal %u\n",
-		descriptor->assoc_terminal);
+		descriptor->associated_terminal);
 	printf("                    Source ID ......... %u\n",
 		descriptor->source_id);
 	printf("                    Terminal .......... %u\n",
@@ -94,7 +94,7 @@ DumpVideoCSInterfaceDescriptorOutputTerminal(
 
 void
 DumpVideoCSInterfaceDescriptorInputTerminal(
-	const usb_video_input_terminal_descriptor* descriptor)
+	const usb_video_camera_input_terminal_descriptor* descriptor)
 {
 	printf("                    Type .............. 0x%02x\n",
 		descriptor->descriptor_type);
@@ -111,11 +111,11 @@ DumpVideoCSInterfaceDescriptorInputTerminal(
 	if (descriptor->terminal_type == USB_VIDEO_CAMERA_IN)
 	{
 		printf("                    Min. Focal length . %u\n",
-			descriptor->camera.focal_length_min);
+			descriptor->camera.objective_focal_length_min);
 		printf("                    Max. Focal length . %u\n",
-			descriptor->camera.focal_length_min);
+			descriptor->camera.objective_focal_length_min);
 		printf("                    Focal length ...... %u\n",
-			descriptor->camera.focal_length);
+			descriptor->camera.ocular_focal_length);
 		printf("                    Controls .......... %02x%02x%02x\n",
 			descriptor->camera.controls[0],
 			descriptor->camera.controls[1],
@@ -199,9 +199,9 @@ DumpVideoCSInterfaceDescriptorProcessingUnit(
 	}
 	printf("\n");
 	printf("                    Processing ........ %u\n",
-		descriptor->processing);
+		descriptor->Processing());
 	printf("                    Video Standards ... 0x%02x\n",
-		descriptor->video_standards);
+		descriptor->VideoStandards().video_standards);
 }
 
 
@@ -255,7 +255,7 @@ DumpVideoControlCSInterfaceDescriptor(const usb_generic_descriptor* descriptor)
 			break;
 		case USB_VIDEO_VC_INPUT_TERMINAL:
 			DumpVideoCSInterfaceDescriptorInputTerminal(
-				(usb_video_input_terminal_descriptor*)descriptor);
+				(usb_video_camera_input_terminal_descriptor*)descriptor);
 			break;
 		case USB_VIDEO_VC_OUTPUT_TERMINAL:
 			DumpVideoCSInterfaceDescriptorOutputTerminal(

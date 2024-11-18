@@ -10,6 +10,7 @@
 
 #include "CamDevice.h"
 #include "USB_video.h"
+#include <usb/USB_video.h>
 
 
 class UVCCamDevice : public CamDevice {
@@ -51,7 +52,7 @@ private:
 
 			void				_AddProcessingParameter(BParameterGroup* group,
 									int32 index,
-									const usbvc_processing_unit_descriptor*
+									const usb_video_processing_unit_descriptor*
 										descriptor);
 			float				_AddParameter(BParameterGroup* group,
 									BParameterGroup** subgroup, int32 index,

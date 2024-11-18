@@ -142,8 +142,9 @@ status_t
 CamRoster::LoadExternalAddons()
 {
 	PRINT((CH "()" CT));
-	// FIXME
+	// TODO implement external add-ons
 	return B_ERROR;
+#if 0
 	int32 index;
 	int32 sclass;
 	status_t err;
@@ -162,6 +163,7 @@ CamRoster::LoadExternalAddons()
 			err));
 	}
 	return B_OK;
+#endif
 }
 
 
