@@ -29,7 +29,9 @@ const static uint32 kMaxUnusedVnodes = 8192;
 	Innermost lock. Must not be held when acquiring any other lock.
 */
 static mutex sUnusedVnodesLock = MUTEX_INITIALIZER("unused vnodes");
-static list sUnusedVnodeList;
+typedef DoublyLinkedList<Vnode, DoublyLinkedListMemberGetLink<Vnode, &Vnode::unused_link> >
+	UnusedVnodeList;
+static UnusedVnodeList sUnusedVnodeList;
 static uint32 sUnusedVnodes = 0;
 
 static const int32 kMaxHotVnodes = 1024;
@@ -56,7 +58,7 @@ flush_hot_vnodes_locked()
 
 		if (vnode->IsHot()) {
 			if (vnode->IsUnused()) {
-				list_add_item(&sUnusedVnodeList, vnode);
+				sUnusedVnodeList.Add(vnode);
 				sUnusedVnodes++;
 			}
 			vnode->SetHot(false);
@@ -146,7 +148,7 @@ vnode_used(Vnode* vnode)
 
 	if (!vnode->IsHot()) {
 		MutexLocker unusedLocker(sUnusedVnodesLock);
-		list_remove_item(&sUnusedVnodeList, vnode);
+		sUnusedVnodeList.Remove(vnode);
 		sUnusedVnodes--;
 	}
 }
@@ -174,7 +176,7 @@ vnode_to_be_freed(Vnode* vnode)
 		}
 	} else if (vnode->IsUnused()) {
 		MutexLocker unusedLocker(sUnusedVnodesLock);
-		list_remove_item(&sUnusedVnodeList, vnode);
+		sUnusedVnodeList.Remove(vnode);
 		sUnusedVnodes--;
 	}
 

@@ -24,14 +24,14 @@ typedef struct vnode Vnode;
 
 
 struct vnode : fs_vnode, DoublyLinkedListLinkImpl<vnode> {
-			struct vnode*		next;
+			struct vnode*		hash_next;
 			VMCache*			cache;
 			struct fs_mount*	mount;
 			struct vnode*		covered_by;
 			struct vnode*		covers;
 			struct advisory_locking* advisory_locking;
 			struct file_descriptor* mandatory_locked_by;
-			list_link			unused_link;
+			DoublyLinkedListLink<struct vnode> unused_link;
 			ino_t				id;
 			dev_t				device;
 			int32				ref_count;
@@ -83,7 +83,6 @@ private:
 	static	const uint32		kBucketCount		= 32;
 
 			struct LockWaiter : DoublyLinkedListLinkImpl<LockWaiter> {
-				LockWaiter*		next;
 				Thread*			thread;
 				struct vnode*	vnode;
 			};

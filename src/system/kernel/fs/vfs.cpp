@@ -291,7 +291,7 @@ struct VnodeHash {
 
 	ValueType*& GetLink(ValueType* value) const
 	{
-		return value->next;
+		return value->hash_next;
 	}
 };
 
@@ -1319,8 +1319,7 @@ free_unused_vnodes(int32 level)
 
 		// get the first node
 		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
-		struct vnode* vnode = (struct vnode*)list_get_first_item(
-			&sUnusedVnodeList);
+		struct vnode* vnode = sUnusedVnodeList.First();
 		unusedVnodesLocker.Unlock();
 
 		if (vnode == NULL)
@@ -1336,7 +1335,7 @@ free_unused_vnodes(int32 level)
 		// has been touched in the meantime, i.e. it is no longer the least
 		// recently used unused vnode and we rather don't free it.
 		unusedVnodesLocker.Lock();
-		if (vnode != list_get_first_item(&sUnusedVnodeList))
+		if (vnode != sUnusedVnodeList.First())
 			continue;
 		unusedVnodesLocker.Unlock();
 
@@ -5262,10 +5261,6 @@ vfs_init(kernel_args* args)
 	if (sVnodeTable == NULL || sVnodeTable->Init(VNODE_HASH_TABLE_SIZE) != B_OK)
 		panic("vfs_init: error creating vnode hash table\n");
 
-	struct vnode dummy_vnode;
-	list_init_etc(&sUnusedVnodeList, offset_of_member(dummy_vnode, unused_link));
-
-	struct fs_mount dummyMount;
 	sMountsTable = new(std::nothrow) MountTable();
 	if (sMountsTable == NULL
 			|| sMountsTable->Init(MOUNTS_HASH_TABLE_SIZE) != B_OK)
