@@ -482,6 +482,95 @@ DumpVideoFrameDescriptor(const usb_video_frame_descriptor* descriptor)
 }
 
 
+static const char*
+ColorPrimariesString(uint8_t value)
+{
+	switch (value) {
+		case 0:
+			return "Unspecified";
+		case 1:
+			return "BT.709, sRGB";
+		case 2:
+			return "BT.470-2 (M)";
+		case 3:
+			return "BT.470-2 (B, G)";
+		case 4:
+			return "SMPTE 170M";
+		case 5:
+			return "SMPTE 240M";
+		default:
+			return "??";
+	}
+}
+
+
+static const char*
+TransferCharacteristicsString(uint8_t value)
+{
+	switch (value) {
+		case 0:
+			return "Unspecified";
+		case 1:
+			return "BT.709";
+		case 2:
+			return "BT.470-2 (M)";
+		case 3:
+			return "BT.470-2 (B, G)";
+		case 4:
+			return "SMPTE 170M";
+		case 5:
+			return "SMPTE 240M";
+		case 6:
+			return "Linear (V = Lc)";
+		case 7:
+			return "sRGB";
+		default:
+			return "??";
+	}
+}
+
+static const char*
+MatrixCoefficientsString(uint8_t value)
+{
+	switch (value) {
+		case 0:
+			return "Unspecified";
+		case 1:
+			return "BT.709";
+		case 2:
+			return "FCC";
+		case 3:
+			return "BT.470-2 (B, G)";
+		case 4:
+			return "SMPTE 170M (BT.601)";
+		case 5:
+			return "SMPTE 240M";
+		default:
+			return "??";
+	}
+}
+
+
+static void
+DumpVideoStreamColorFormatDescriptor(const usb_video_color_matching_descriptor* descriptor)
+{
+	printf("                    Type ..................... 0x%02x (VideoStream Interface)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype .................. 0x%02x (%s)\n",
+		descriptor->descriptor_sub_type,
+		VSInterfaceString(descriptor->descriptor_sub_type));
+	printf("                    Color Primaries .......... 0x%02x (%s)\n",
+		descriptor->color_primaries,
+		ColorPrimariesString(descriptor->color_primaries));
+	printf("                    Transfer characteristics . 0x%02x (%s)\n",
+		descriptor->transfer_characteristics,
+		TransferCharacteristicsString(descriptor->transfer_characteristics));
+	printf("                    Matrix coefficients ...... 0x%02x (%s)\n",
+		descriptor->matrix_coefficients,
+		MatrixCoefficientsString(descriptor->matrix_coefficients));
+}
+
+
 void
 DumpVideoStreamCSInterfaceDescriptor(const usb_generic_descriptor* descriptor)
 {
@@ -500,6 +589,9 @@ DumpVideoStreamCSInterfaceDescriptor(const usb_generic_descriptor* descriptor)
 		case USB_VIDEO_VS_FRAME_UNCOMPRESSED:
 		case USB_VIDEO_VS_FRAME_MJPEG:
 			DumpVideoFrameDescriptor((usb_video_frame_descriptor*)descriptor);
+			break;
+		case USB_VIDEO_VS_COLORFORMAT:
+			DumpVideoStreamColorFormatDescriptor((usb_video_color_matching_descriptor*)descriptor);
 			break;
 		default:
 			DumpDescriptorData(descriptor);
