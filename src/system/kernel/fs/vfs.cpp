@@ -1294,7 +1294,8 @@ free_unused_vnodes(int32 level)
 	// determine how many nodes to free
 	uint32 count = 1;
 	{
-		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
+		ReadLocker hotVnodesReadLocker(sHotVnodesLock);
+		InterruptsSpinLocker unusedVnodesLocker(sUnusedVnodesLock);
 
 		switch (level) {
 			case B_LOW_RESOURCE_NOTE:
@@ -1316,9 +1317,10 @@ free_unused_vnodes(int32 level)
 
 	for (uint32 i = 0; i < count; i++) {
 		ReadLocker vnodesReadLocker(sVnodeLock);
+		ReadLocker hotVnodesReadLocker(sHotVnodesLock);
 
 		// get the first node
-		MutexLocker unusedVnodesLocker(sUnusedVnodesLock);
+		InterruptsSpinLocker unusedVnodesLocker(sUnusedVnodesLock);
 		struct vnode* vnode = sUnusedVnodeList.First();
 		unusedVnodesLocker.Unlock();
 
@@ -1347,6 +1349,7 @@ free_unused_vnodes(int32 level)
 
 		// write back changes and free the node
 		nodeLocker.Unlock();
+		hotVnodesReadLocker.Unlock();
 		vnodesReadLocker.Unlock();
 
 		if (vnode->cache != NULL)
