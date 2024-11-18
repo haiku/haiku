@@ -45,7 +45,7 @@ static const size_t kMaxReadDirBufferSize = B_PAGE_SIZE * 2;
 extern object_cache* sFileDescriptorCache;
 
 
-static struct file_descriptor* get_fd_locked(struct io_context* context,
+static struct file_descriptor* get_fd_locked(const struct io_context* context,
 	int fd);
 static struct file_descriptor* remove_fd(struct io_context* context, int fd);
 static void deselect_select_infos(file_descriptor* descriptor,
@@ -93,7 +93,7 @@ alloc_fd(void)
 
 
 bool
-fd_close_on_exec(struct io_context* context, int fd)
+fd_close_on_exec(const struct io_context* context, int fd)
 {
 	return CHECK_BIT(context->fds_close_on_exec[fd / 8], fd & 7) ? true : false;
 }
@@ -122,7 +122,7 @@ new_fd_etc(struct io_context* context, struct file_descriptor* descriptor,
 	if (firstIndex < 0 || (uint32)firstIndex >= context->table_size)
 		return B_BAD_VALUE;
 
-	mutex_lock(&context->io_mutex);
+	WriteLocker locker(context->lock);
 
 	for (i = firstIndex; i < context->table_size; i++) {
 		if (!context->fds[i]) {
@@ -130,19 +130,14 @@ new_fd_etc(struct io_context* context, struct file_descriptor* descriptor,
 			break;
 		}
 	}
-	if (fd < 0) {
-		fd = B_NO_MORE_FDS;
-		goto err;
-	}
+	if (fd < 0)
+		return B_NO_MORE_FDS;
 
 	TFD(NewFD(context, fd, descriptor));
 
 	context->fds[fd] = descriptor;
 	context->num_used_fds++;
 	atomic_add(&descriptor->open_count, 1);
-
-err:
-	mutex_unlock(&context->io_mutex);
 
 	return fd;
 }
@@ -253,7 +248,7 @@ inc_fd_ref_count(struct file_descriptor* descriptor)
 
 
 static struct file_descriptor*
-get_fd_locked(struct io_context* context, int fd)
+get_fd_locked(const struct io_context* context, int fd)
 {
 	if (fd < 0 || (uint32)fd >= context->table_size)
 		return NULL;
@@ -274,18 +269,17 @@ get_fd_locked(struct io_context* context, int fd)
 
 
 struct file_descriptor*
-get_fd(struct io_context* context, int fd)
+get_fd(const struct io_context* context, int fd)
 {
-	MutexLocker _(context->io_mutex);
-
+	ReadLocker locker(context->lock);
 	return get_fd_locked(context, fd);
 }
 
 
 struct file_descriptor*
-get_open_fd(struct io_context* context, int fd)
+get_open_fd(const struct io_context* context, int fd)
 {
-	MutexLocker _(context->io_mutex);
+	ReadLocker locker(context->lock);
 
 	file_descriptor* descriptor = get_fd_locked(context, fd);
 	if (descriptor == NULL)
@@ -307,7 +301,7 @@ remove_fd(struct io_context* context, int fd)
 	if (fd < 0)
 		return NULL;
 
-	mutex_lock(&context->io_mutex);
+	WriteLocker locker(context->lock);
 
 	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
@@ -332,8 +326,6 @@ remove_fd(struct io_context* context, int fd)
 	if (selectInfos != NULL)
 		deselect_select_infos(descriptor, selectInfos, true);
 
-	mutex_unlock(&context->io_mutex);
-
 	return disconnected ? NULL : descriptor;
 }
 
@@ -354,12 +346,11 @@ dup_fd(int fd, bool kernel)
 
 	// now put the fd in place
 	status = new_fd(context, descriptor);
-	if (status < 0)
+	if (status < 0) {
 		put_fd(descriptor);
-	else {
-		mutex_lock(&context->io_mutex);
+	} else {
+		WriteLocker locker(context->lock);
 		fd_set_close_on_exec(context, status, false);
-		mutex_unlock(&context->io_mutex);
 	}
 
 	return status;
@@ -388,7 +379,7 @@ dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 
 	// Get current I/O context and lock it
 	context = get_current_io_context(kernel);
-	mutex_lock(&context->io_mutex);
+	WriteLocker locker(context->lock);
 
 	// Check if the fds are valid (mutex must be locked because
 	// the table size could be changed)
@@ -396,7 +387,6 @@ dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 		|| (uint32)newfd >= context->table_size
 		|| context->fds[oldfd] == NULL
 		|| (context->fds[oldfd]->open_mode & O_DISCONNECTED) != 0) {
-		mutex_unlock(&context->io_mutex);
 		return B_FILE_ERROR;
 	}
 
@@ -422,7 +412,7 @@ dup2_fd(int oldfd, int newfd, int flags, bool kernel)
 
 	fd_set_close_on_exec(context, newfd, (flags & O_CLOEXEC) != 0);
 
-	mutex_unlock(&context->io_mutex);
+	locker.Unlock();
 
 	// Say bye bye to the evicted fd
 	if (evicted) {
@@ -550,7 +540,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 		// define before the context locker, so it will be destroyed after it
 
 	io_context* context = get_current_io_context(kernel);
-	MutexLocker locker(context->io_mutex);
+	ReadLocker readLocker(context->lock);
 
 	descriptor.SetTo(get_fd_locked(context, fd));
 	if (!descriptor.IsSet())
@@ -573,7 +563,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 	// deselect() will be called on it after it is closed.
 	atomic_add(&descriptor->open_count, 1);
 
-	locker.Unlock();
+	readLocker.Unlock();
 
 	// select any events asked for
 	uint32 selectedEvents = 0;
@@ -590,7 +580,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 
 	// Add the info to the IO context. Even if nothing has been selected -- we
 	// always support B_EVENT_INVALID.
-	locker.Lock();
+	WriteLocker writeLocker(context->lock);
 	if (context->fds[fd] != descriptor.Get()) {
 		// Someone close()d the index in the meantime. deselect() all
 		// events.
@@ -630,7 +620,7 @@ deselect_fd(int32 fd, struct select_info* info, bool kernel)
 		// define before the context locker, so it will be destroyed after it
 
 	io_context* context = get_current_io_context(kernel);
-	MutexLocker locker(context->io_mutex);
+	WriteLocker locker(context->lock);
 
 	descriptor.SetTo(get_fd_locked(context, fd));
 	if (!descriptor.IsSet())

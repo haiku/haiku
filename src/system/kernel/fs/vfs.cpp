@@ -1055,7 +1055,7 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	ReadLocker locker(sVnodeLock);
 	AutoLocker<Vnode> nodeLocker(vnode);
 
-	int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
+	const int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
 
 	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
@@ -1931,7 +1931,7 @@ disconnect_mount_or_vnode_fds(struct fs_mount* mount,
 		io_context* context = team->io_context;
 		if (context == NULL)
 			continue;
-		MutexLocker contextLocker(context->io_mutex);
+		WriteLocker contextLocker(context->lock);
 
 		teamLocker.Unlock();
 
@@ -2347,15 +2347,14 @@ path_to_vnode(char* path, bool traverseLink, VnodePutter& _vnode,
 			_vnode.SetTo(start);
 			return B_OK;
 		}
-
 	} else {
-		struct io_context* context = get_current_io_context(kernel);
+		const struct io_context* context = get_current_io_context(kernel);
 
-		mutex_lock(&context->io_mutex);
+		rw_lock_read_lock(&context->lock);
 		start = context->cwd;
 		if (start != NULL)
 			inc_vnode_ref_count(start);
-		mutex_unlock(&context->io_mutex);
+		rw_lock_read_unlock(&context->lock);
 
 		if (start == NULL)
 			return B_ERROR;
@@ -2867,9 +2866,9 @@ get_new_fd(struct fd_ops* ops, struct fs_mount* mount, struct vnode* vnode,
 		return B_NO_MORE_FDS;
 	}
 
-	mutex_lock(&context->io_mutex);
+	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (openMode & O_CLOEXEC) != 0);
-	mutex_unlock(&context->io_mutex);
+	rw_lock_write_unlock(&context->lock);
 
 	return fd;
 }
@@ -3623,8 +3622,6 @@ is_user_in_group(gid_t gid)
 static status_t
 free_io_context(io_context* context)
 {
-	uint32 i;
-
 	TIOC(FreeIOContext(context));
 
 	if (context->root)
@@ -3633,16 +3630,16 @@ free_io_context(io_context* context)
 	if (context->cwd)
 		put_vnode(context->cwd);
 
-	mutex_lock(&context->io_mutex);
+	rw_lock_write_lock(&context->lock);
 
-	for (i = 0; i < context->table_size; i++) {
+	for (uint32 i = 0; i < context->table_size; i++) {
 		if (struct file_descriptor* descriptor = context->fds[i]) {
 			close_fd(context, descriptor);
 			put_fd(descriptor);
 		}
 	}
 
-	mutex_destroy(&context->io_mutex);
+	rw_lock_destroy(&context->lock);
 
 	remove_node_monitors(context);
 	free(context->fds);
@@ -3655,22 +3652,16 @@ free_io_context(io_context* context)
 static status_t
 resize_monitor_table(struct io_context* context, const int newSize)
 {
-	int	status = B_OK;
-
 	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
 		return B_BAD_VALUE;
 
-	mutex_lock(&context->io_mutex);
+	WriteLocker locker(context->lock);
 
-	if ((size_t)newSize < context->num_monitors) {
-		status = B_BUSY;
-		goto out;
-	}
+	if ((size_t)newSize < context->num_monitors)
+		return B_BUSY;
+
 	context->max_monitors = newSize;
-
-out:
-	mutex_unlock(&context->io_mutex);
-	return status;
+	return B_OK;
 }
 
 
@@ -4575,19 +4566,15 @@ extern "C" status_t
 vfs_get_cwd(dev_t* _mountID, ino_t* _vnodeID)
 {
 	// Get current working directory from io context
-	struct io_context* context = get_current_io_context(false);
-	status_t status = B_OK;
+	const struct io_context* context = get_current_io_context(false);
 
-	mutex_lock(&context->io_mutex);
+	ReadLocker locker(context->lock);
+	if (context->cwd == NULL)
+		return B_ERROR;
 
-	if (context->cwd != NULL) {
-		*_mountID = context->cwd->device;
-		*_vnodeID = context->cwd->id;
-	} else
-		status = B_ERROR;
-
-	mutex_unlock(&context->io_mutex);
-	return status;
+	*_mountID = context->cwd->device;
+	*_vnodeID = context->cwd->id;
+	return B_OK;
 }
 
 
@@ -4895,10 +4882,8 @@ vfs_release_posix_lock(io_context* context, struct file_descriptor* descriptor)
 void
 vfs_exec_io_context(io_context* context)
 {
-	uint32 i;
-
-	for (i = 0; i < context->table_size; i++) {
-		mutex_lock(&context->io_mutex);
+	for (uint32 i = 0; i < context->table_size; i++) {
+		rw_lock_write_lock(&context->lock);
 
 		struct file_descriptor* descriptor = context->fds[i];
 		bool remove = false;
@@ -4910,7 +4895,7 @@ vfs_exec_io_context(io_context* context)
 			remove = true;
 		}
 
-		mutex_unlock(&context->io_mutex);
+		rw_lock_write_unlock(&context->lock);
 
 		if (remove) {
 			close_fd(context, descriptor);
@@ -4924,7 +4909,7 @@ vfs_exec_io_context(io_context* context)
 	of the parent io_control if it is given.
 */
 io_context*
-vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
+vfs_new_io_context(const io_context* parentContext, bool purgeCloseOnExec)
 {
 	io_context* context = (io_context*)malloc(sizeof(io_context));
 	if (context == NULL)
@@ -4935,11 +4920,11 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	memset(context, 0, sizeof(io_context));
 	context->ref_count = 1;
 
-	MutexLocker parentLocker;
+	ReadLocker parentLocker;
 
 	size_t tableSize;
 	if (parentContext != NULL) {
-		parentLocker.SetTo(parentContext->io_mutex, false);
+		parentLocker.SetTo(parentContext->lock, false);
 		tableSize = parentContext->table_size;
 	} else
 		tableSize = DEFAULT_FD_TABLE_SIZE;
@@ -4961,13 +4946,11 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 
-	mutex_init(&context->io_mutex, "I/O context");
+	rw_lock_init(&context->lock, "I/O context");
 
 	// Copy all parent file descriptors
 
 	if (parentContext != NULL) {
-		size_t i;
-
 		mutex_lock(&sIOContextRootLock);
 		context->root = parentContext->root;
 		if (context->root)
@@ -4979,12 +4962,12 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 			inc_vnode_ref_count(context->cwd);
 
 		if (parentContext->inherit_fds) {
-			for (i = 0; i < tableSize; i++) {
+			for (size_t i = 0; i < tableSize; i++) {
 				struct file_descriptor* descriptor = parentContext->fds[i];
 
 				if (descriptor != NULL
-					&& (descriptor->open_mode & O_DISCONNECTED) == 0) {
-					bool closeOnExec = fd_close_on_exec(parentContext, i);
+						&& (descriptor->open_mode & O_DISCONNECTED) == 0) {
+					const bool closeOnExec = fd_close_on_exec(parentContext, i);
 					if (closeOnExec && purgeCloseOnExec)
 						continue;
 
@@ -5046,7 +5029,7 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 
 	TIOC(ResizeIOContext(context, newSize));
 
-	MutexLocker _(context->io_mutex);
+	WriteLocker locker(context->lock);
 
 	uint32 oldSize = context->table_size;
 	int oldCloseOnExitBitmapSize = (oldSize + 7) / 8;
@@ -5216,7 +5199,7 @@ vfs_getrlimit(int resource, struct rlimit* rlp)
 		case RLIMIT_NOFILE:
 		{
 			struct io_context* context = get_current_io_context(false);
-			MutexLocker _(context->io_mutex);
+			ReadLocker _(context->lock);
 
 			rlp->rlim_cur = context->table_size;
 			rlp->rlim_max = MAX_FD_TABLE_SIZE;
@@ -5226,7 +5209,7 @@ vfs_getrlimit(int resource, struct rlimit* rlp)
 		case RLIMIT_NOVMON:
 		{
 			struct io_context* context = get_current_io_context(false);
-			MutexLocker _(context->io_mutex);
+			ReadLocker _(context->lock);
 
 			rlp->rlim_cur = context->max_monitors;
 			rlp->rlim_max = MAX_NODE_MONITORS;
@@ -6241,9 +6224,9 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 			// Set file descriptor flags
 
 			// O_CLOEXEC is the only flag available at this time
-			mutex_lock(&context->io_mutex);
+			rw_lock_write_lock(&context->lock);
 			fd_set_close_on_exec(context, fd, (argument & FD_CLOEXEC) != 0);
-			mutex_unlock(&context->io_mutex);
+			rw_lock_write_unlock(&context->lock);
 
 			status = B_OK;
 			break;
@@ -6252,9 +6235,9 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		case F_GETFD:
 		{
 			// Get file descriptor flags
-			mutex_lock(&context->io_mutex);
+			rw_lock_read_lock(&context->lock);
 			status = fd_close_on_exec(context, fd) ? FD_CLOEXEC : 0;
-			mutex_unlock(&context->io_mutex);
+			rw_lock_read_unlock(&context->lock);
 			break;
 		}
 
@@ -6293,9 +6276,9 @@ common_fcntl(int fd, int op, size_t argument, bool kernel)
 		{
 			status = new_fd_etc(context, descriptor.Get(), (int)argument);
 			if (status >= 0) {
-				mutex_lock(&context->io_mutex);
+				rw_lock_write_lock(&context->lock);
 				fd_set_close_on_exec(context, status, op == F_DUPFD_CLOEXEC);
-				mutex_unlock(&context->io_mutex);
+				rw_lock_write_unlock(&context->lock);
 
 				atomic_add(&descriptor->ref_count, 1);
 			}
@@ -8128,25 +8111,23 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos,
 static status_t
 get_cwd(char* buffer, size_t size, bool kernel)
 {
-	// Get current working directory from io context
-	struct io_context* context = get_current_io_context(kernel);
-	status_t status;
-
 	FUNCTION(("vfs_get_cwd: buf %p, size %ld\n", buffer, size));
 
-	mutex_lock(&context->io_mutex);
+	// Get current working directory from io context
+	const struct io_context* context = get_current_io_context(kernel);
+	rw_lock_read_lock(&context->lock);
 
 	struct vnode* vnode = context->cwd;
-	if (vnode)
+	if (vnode != NULL)
 		inc_vnode_ref_count(vnode);
 
-	mutex_unlock(&context->io_mutex);
+	rw_lock_read_unlock(&context->lock);
 
-	if (vnode) {
-		status = dir_vnode_to_path(vnode, buffer, size, kernel);
-		put_vnode(vnode);
-	} else
-		status = B_ERROR;
+	if (vnode == NULL)
+		return B_ERROR;
+
+	status_t status = dir_vnode_to_path(vnode, buffer, size, kernel);
+	put_vnode(vnode);
 
 	return status;
 }
@@ -8180,13 +8161,13 @@ set_cwd(int fd, char* path, bool kernel)
 
 	// Get current io context and lock
 	context = get_current_io_context(kernel);
-	mutex_lock(&context->io_mutex);
+	rw_lock_write_lock(&context->lock);
 
 	// save the old current working directory first
 	oldDirectory = context->cwd;
 	context->cwd = vnode.Detach();
 
-	mutex_unlock(&context->io_mutex);
+	rw_lock_write_unlock(&context->lock);
 
 	if (oldDirectory)
 		put_vnode(oldDirectory);
@@ -8292,14 +8273,14 @@ _kern_get_next_fd_info(team_id teamID, uint32* _cookie, fd_info* info,
 	BReference<Team> teamReference(team, true);
 
 	// now that we have a team reference, its I/O context won't go away
-	io_context* context = team->io_context;
-	MutexLocker contextLocker(context->io_mutex);
+	const io_context* context = team->io_context;
+	ReadLocker contextLocker(context->lock);
 
 	uint32 slot = *_cookie;
 
 	struct file_descriptor* descriptor;
 	while (slot < context->table_size
-		&& (descriptor = context->fds[slot]) == NULL) {
+			&& (descriptor = context->fds[slot]) == NULL) {
 		slot++;
 	}
 

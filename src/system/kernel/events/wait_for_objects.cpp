@@ -949,7 +949,7 @@ check_max_fds(int numFDs)
 		return true;
 
 	struct io_context *context = get_current_io_context(false);
-	MutexLocker(&context->io_mutex);
+	ReadLocker locker(&context->lock);
 	return (size_t)numFDs <= context->table_size;
 }
 

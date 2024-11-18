@@ -4558,7 +4558,7 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 		dev_t cwdDevice;
 		ino_t cwdDirectory;
 		{
-			MutexLocker ioContextLocker(ioContext->io_mutex);
+			ReadLocker ioContextLocker(ioContext->lock);
 			vfs_vnode_to_node_ref(ioContext->cwd, &cwdDevice, &cwdDirectory);
 		}
 

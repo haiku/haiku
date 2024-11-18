@@ -392,9 +392,9 @@ create_socket_fd(net_socket* socket, int flags, bool kernel)
 		put_fd(descriptor);
 	}
 
-	mutex_lock(&context->io_mutex);
+	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (oflags & O_CLOEXEC) != 0);
-	mutex_unlock(&context->io_mutex);
+	rw_lock_write_unlock(&context->lock);
 
 	return fd;
 }

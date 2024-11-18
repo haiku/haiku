@@ -623,9 +623,9 @@ _user_event_queue_create(int openFlags)
 		return fd;
 	}
 
-	mutex_lock(&context->io_mutex);
+	rw_lock_write_lock(&context->lock);
 	fd_set_close_on_exec(context, fd, (openFlags & O_CLOEXEC) != 0);
-	mutex_unlock(&context->io_mutex);
+	rw_lock_write_unlock(&context->lock);
 
 	deleter.Detach();
 	return fd;

@@ -47,8 +47,9 @@ struct vnode;
 /** The I/O context of a process/team, holds the fd array among others */
 typedef struct io_context {
 	struct vnode *root;
+
+	mutable rw_lock lock;
 	struct vnode *cwd;
-	mutex		io_mutex;
 	int32		ref_count;
 	uint32		table_size;
 	uint32		num_used_fds;
@@ -70,7 +71,7 @@ status_t	vfs_init(struct kernel_args *args);
 status_t	vfs_bootstrap_file_systems(void);
 void		vfs_mount_boot_file_system(struct kernel_args *args);
 void		vfs_exec_io_context(io_context *context);
-io_context*	vfs_new_io_context(io_context* parentContext,
+io_context*	vfs_new_io_context(const io_context *parentContext,
 				bool purgeCloseOnExec);
 void		vfs_get_io_context(io_context *context);
 void		vfs_put_io_context(io_context *context);
