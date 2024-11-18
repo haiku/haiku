@@ -204,7 +204,7 @@ BTimeSource::RealTimeFor(bigtime_t performance_time,
 		if (last_drift == 1.0f)
 			return last_real_time - with_latency + perf_time_difference;
 
-		debugger("BTimeSource::PerformanceTimeFor: performance time too large");
+		debugger("BTimeSource::RealTimeFor: performance time too large");
 	}
 
 	return last_real_time - with_latency
