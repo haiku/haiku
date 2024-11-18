@@ -424,7 +424,7 @@ static status_t dir_vnode_to_path(struct vnode* vnode, char* buffer,
 	size_t bufferSize, bool kernel);
 static status_t fd_and_path_to_vnode(int fd, char* path, bool traverseLeafLink,
 	VnodePutter& _vnode, ino_t* _parentID, bool kernel);
-static void inc_vnode_ref_count(struct vnode* vnode);
+static int32 inc_vnode_ref_count(struct vnode* vnode);
 static status_t dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree,
 	bool reenter);
 static inline void put_vnode(struct vnode* vnode);
@@ -733,7 +733,7 @@ get_mount(dev_t id, struct fs_mount** _mount)
 
 	struct vnode* rootNode = mount->root_vnode;
 	if (mount->unmounting || rootNode == NULL || rootNode->IsBusy()
-		|| rootNode->ref_count == 0) {
+			|| rootNode->ref_count == 0) {
 		// might have been called during a mount/unmount operation
 		return B_BUSY;
 	}
@@ -998,9 +998,10 @@ free_vnode(struct vnode* vnode, bool reenter)
 	// file_cache_create()), so that this vnode's ref count has the chance to
 	// ever drop to 0. Deleting the file cache now, will cause the next to last
 	// cache reference to be released, which will also release a (no longer
-	// existing) vnode reference. To avoid problems, we set the vnode's ref
-	// count, so that it will neither become negative nor 0.
-	vnode->ref_count = 2;
+	// existing) vnode reference. To ensure that will be ignored, and that no
+	// other consumers will acquire this vnode in the meantime, we make the
+	// vnode's ref count negative.
+	vnode->ref_count = -1;
 
 	if (!vnode->IsUnpublished()) {
 		if (vnode->IsRemoved())
@@ -1056,7 +1057,6 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	AutoLocker<Vnode> nodeLocker(vnode);
 
 	const int32 oldRefCount = atomic_add(&vnode->ref_count, -1);
-
 	ASSERT_PRINT(oldRefCount > 0, "vnode %p\n", vnode);
 
 	TRACE(("dec_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
@@ -1107,13 +1107,16 @@ dec_vnode_ref_count(struct vnode* vnode, bool alwaysFree, bool reenter)
 	node.
 
 	\param vnode the vnode.
+	\returns the old reference count.
 */
-static void
+static int32
 inc_vnode_ref_count(struct vnode* vnode)
 {
-	atomic_add(&vnode->ref_count, 1);
+	const int32 oldCount = atomic_add(&vnode->ref_count, 1);
 	TRACE(("inc_vnode_ref_count: vnode %p, ref now %" B_PRId32 "\n", vnode,
-		vnode->ref_count));
+		oldCount + 1));
+	ASSERT(oldCount >= 0);
+	return oldCount;
 }
 
 
@@ -1161,9 +1164,23 @@ get_vnode(dev_t mountID, ino_t vnodeID, struct vnode** _vnode, bool canWait,
 	int32 tries = BUSY_VNODE_RETRIES;
 restart:
 	struct vnode* vnode = lookup_vnode(mountID, vnodeID);
+
+	if (vnode != NULL && !vnode->IsBusy()) {
+		// Try to increment the vnode's reference count without locking.
+		// (We can't use atomic_add here, as if the vnode is unused,
+		// we need to hold its lock to mark it used again.)
+		const int32 oldRefCount = atomic_get(&vnode->ref_count);
+		if (oldRefCount > 0 && atomic_test_and_set(&vnode->ref_count,
+				oldRefCount + 1, oldRefCount) == oldRefCount) {
+			rw_lock_read_unlock(&sVnodeLock);
+			*_vnode = vnode;
+			return B_OK;
+		}
+	}
+
 	AutoLocker<Vnode> nodeLocker(vnode);
 
-	if (vnode && vnode->IsBusy()) {
+	if (vnode != NULL && vnode->IsBusy()) {
 		// vnodes in the Removed state (except ones still Unpublished)
 		// which are also Busy will disappear soon, so we do not wait for them.
 		const bool doNotWait = vnode->IsRemoved() && !vnode->IsUnpublished();
@@ -1184,14 +1201,11 @@ restart:
 
 	TRACE(("get_vnode: tried to lookup vnode, got %p\n", vnode));
 
-	status_t status;
-
-	if (vnode) {
-		if (vnode->ref_count == 0) {
+	if (vnode != NULL) {
+		if (inc_vnode_ref_count(vnode) == 0) {
 			// this vnode has been unused before
 			vnode_used(vnode);
 		}
-		inc_vnode_ref_count(vnode);
 
 		nodeLocker.Unlock();
 		rw_lock_read_unlock(&sVnodeLock);
@@ -1200,7 +1214,7 @@ restart:
 		rw_lock_read_unlock(&sVnodeLock);
 			// unlock -- create_new_vnode_and_lock() write-locks on success
 		bool nodeCreated;
-		status = create_new_vnode_and_lock(mountID, vnodeID, vnode,
+		status_t status = create_new_vnode_and_lock(mountID, vnodeID, vnode,
 			nodeCreated);
 		if (status != B_OK)
 			return status;
@@ -7975,11 +7989,10 @@ fs_sync(dev_t device)
 		if (vnode == NULL || vnode->IsBusy())
 			continue;
 
-		if (vnode->ref_count == 0) {
+		if (inc_vnode_ref_count(vnode) == 0) {
 			// this vnode has been unused before
 			vnode_used(vnode);
 		}
-		inc_vnode_ref_count(vnode);
 
 		locker.Unlock();
 
