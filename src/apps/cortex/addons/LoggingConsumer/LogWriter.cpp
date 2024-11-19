@@ -266,8 +266,11 @@ LogWriter::HandleMessage(log_what what, const log_message& msg)
 		break;
 
 	case LOG_BUFFER_HANDLED:
-		sprintf(buf, "\tstart = %" B_PRIdBIGTIME ", offset = %" B_PRIdBIGTIME "\n",
-			msg.buffer_data.start_time, msg.buffer_data.offset);
+		sprintf(buf, "\tstart = %" B_PRIdBIGTIME ", offset = %" B_PRIdBIGTIME ", size = %zu/%zu, "
+			"flags = %" B_PRIx32 ", id = %" B_PRId32 ", type = %d\n",
+			msg.buffer_data.start_time, msg.buffer_data.offset, msg.buffer_data.size_used,
+			msg.buffer_data.size_available, msg.buffer_data.flags, msg.buffer_data.id,
+			msg.buffer_data.type);
 		mWriteBuf += buf;
 		if (msg.buffer_data.offset < 0)
 		{
