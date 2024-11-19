@@ -1998,7 +1998,7 @@ mark_block_unbusy_reading(block_cache* cache, cached_block* block)
 	cache->busy_reading_count--;
 
 	if ((cache->busy_reading_waiters && cache->busy_reading_count == 0)
-		|| block->busy_reading_waiters) {
+			|| block->busy_reading_waiters) {
 		cache->busy_reading_waiters = false;
 		block->busy_reading_waiters = false;
 		cache->busy_reading_condition.NotifyAll();
@@ -2018,9 +2018,7 @@ wait_for_busy_reading_block(block_cache* cache, cached_block* block)
 		block->busy_reading_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2038,9 +2036,7 @@ wait_for_busy_reading_blocks(block_cache* cache)
 		cache->busy_reading_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2058,9 +2054,7 @@ wait_for_busy_writing_block(block_cache* cache, cached_block* block)
 		block->busy_writing_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2078,9 +2072,7 @@ wait_for_busy_writing_blocks(block_cache* cache)
 		cache->busy_writing_waiters = true;
 
 		mutex_unlock(&cache->lock);
-
 		entry.Wait();
-
 		mutex_lock(&cache->lock);
 	}
 }
@@ -2190,6 +2182,9 @@ retry:
 	} else if (block->busy_reading) {
 		// The block is currently busy_reading - wait and try again later
 		wait_for_busy_reading_block(cache, block);
+
+		// The block may have been deleted or replaced in the meantime,
+		// so we must look it up in the hash again after waiting.
 		goto retry;
 	}
 
