@@ -86,6 +86,43 @@ IOSchedulerRoster::NextID()
 //	#pragma mark - debug methods and initialization
 
 
+void
+IOSchedulerRoster::Dump() const
+{
+	kprintf("IOSchedulerRoster at %p\n", this);
+	kprintf("  mutex:   %p\n", &fLock);
+	kprintf("  next ID: %" B_PRId32 "\n", fNextID);
+
+	kprintf("  schedulers:");
+	for (IOSchedulerList::ConstIterator it
+				= fSchedulers.GetIterator();
+			IOScheduler* scheduler = it.Next();) {
+		kprintf(" %p", scheduler);
+	}
+	kprintf("\n");
+}
+
+
+static int
+dump_io_scheduler_roster(int argc, char** argv)
+{
+	IOSchedulerRoster* roster;
+	if (argc == 1) {
+		roster = IOSchedulerRoster::Default();
+	} else if (argc == 2) {
+		roster = (IOSchedulerRoster*)parse_expression(argv[1]);
+		if (roster == NULL)
+			return -1;
+	} else {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	roster->Dump();
+	return 0;
+}
+
+
 static int
 dump_io_scheduler(int argc, char** argv)
 {
@@ -175,6 +212,11 @@ IOSchedulerRoster::Init()
 {
 	new(&sDefaultInstance) IOSchedulerRoster;
 
+	add_debugger_command_etc("io_scheduler_roster", &dump_io_scheduler_roster,
+		"Dump an I/O scheduler roster",
+		"<scheduler-roster>\n"
+		"Dumps I/O scheduler roster at address <scheduler-roster>.\n"
+		"If unspecified, dump the default roster.\n", 0);
 	add_debugger_command_etc("io_scheduler", &dump_io_scheduler,
 		"Dump an I/O scheduler",
 		"<scheduler>\n"
