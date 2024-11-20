@@ -559,12 +559,13 @@ do {									\
 	mflags = (m)->m_flags;						\
 	IFQ_ENQUEUE(&(ifp)->if_snd, m, err);				\
 	if ((err) == 0) {						\
-		(ifp)->if_obytes += len + (adj);			\
+		if_inc_counter((ifp), IFCOUNTER_OBYTES, len + (adj));	\
 		if (mflags & M_MCAST)					\
-			(ifp)->if_omcasts++;				\
+			if_inc_counter((ifp), IFCOUNTER_OMCASTS, 1);	\
 		if (((ifp)->if_drv_flags & IFF_DRV_OACTIVE) == 0)	\
 			if_start(ifp);					\
-	}								\
+	} else								\
+		if_inc_counter((ifp), IFCOUNTER_OQDROPS, 1);		\
 } while (0)
 
 #define	IFQ_HANDOFF(ifp, m, err)					\
