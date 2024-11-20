@@ -30,7 +30,6 @@
 #include "AbstractModuleDevice.h"
 #include "devfs_private.h"
 #include "id_generator.h"
-#include "IORequest.h"
 #include "io_resources.h"
 #include "IOSchedulerRoster.h"
 
@@ -287,90 +286,6 @@ dump_attribute(device_attr* attr, int32 level)
 			kprintf("raw data");
 	}
 	kprintf("\n");
-}
-
-
-static int
-dump_io_scheduler(int argc, char** argv)
-{
-	if (argc != 2) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
-	IOScheduler* scheduler = (IOScheduler*)parse_expression(argv[1]);
-	scheduler->Dump();
-	return 0;
-}
-
-
-static int
-dump_io_request_owner(int argc, char** argv)
-{
-	if (argc != 2) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
-	IORequestOwner* owner = (IORequestOwner*)parse_expression(argv[1]);
-	owner->Dump();
-	return 0;
-}
-
-
-static int
-dump_io_request(int argc, char** argv)
-{
-	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-io-request>\n", argv[0]);
-		return 0;
-	}
-
-	IORequest* request = (IORequest*)parse_expression(argv[1]);
-	request->Dump();
-	return 0;
-}
-
-
-static int
-dump_io_operation(int argc, char** argv)
-{
-	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-io-operation>\n", argv[0]);
-		return 0;
-	}
-
-	IOOperation* operation = (IOOperation*)parse_expression(argv[1]);
-	operation->Dump();
-	return 0;
-}
-
-
-static int
-dump_io_buffer(int argc, char** argv)
-{
-	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-io-buffer>\n", argv[0]);
-		return 0;
-	}
-
-	IOBuffer* buffer = (IOBuffer*)parse_expression(argv[1]);
-	buffer->Dump();
-	return 0;
-}
-
-
-static int
-dump_dma_buffer(int argc, char** argv)
-{
-	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-dma-buffer>\n", argv[0]);
-		return 0;
-	}
-
-	DMABuffer* buffer = (DMABuffer*)parse_expression(argv[1]);
-	buffer->Dump();
-	return 0;
 }
 
 
@@ -2466,19 +2381,6 @@ device_manager_init(struct kernel_args* args)
 
 	add_debugger_command("dm_tree", &dump_device_nodes,
 		"dump device node tree");
-	add_debugger_command_etc("io_scheduler", &dump_io_scheduler,
-		"Dump an I/O scheduler",
-		"<scheduler>\n"
-		"Dumps I/O scheduler at address <scheduler>.\n", 0);
-	add_debugger_command_etc("io_request_owner", &dump_io_request_owner,
-		"Dump an I/O request owner",
-		"<owner>\n"
-		"Dumps I/O request owner at address <owner>.\n", 0);
-	add_debugger_command("io_request", &dump_io_request, "dump an I/O request");
-	add_debugger_command("io_operation", &dump_io_operation,
-		"dump an I/O operation");
-	add_debugger_command("io_buffer", &dump_io_buffer, "dump an I/O buffer");
-	add_debugger_command("dma_buffer", &dump_dma_buffer, "dump a DMA buffer");
 
 	init_node_tree();
 
