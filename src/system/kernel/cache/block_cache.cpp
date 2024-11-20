@@ -1586,7 +1586,7 @@ BlockPrefetcher::_IOFinished(status_t status, generic_size_t bytesTransferred)
 		_RemoveAllocated(fNumAllocated, fNumAllocated);
 
 		TB(Error(cache, fBlockNumber, "prefetch starting here failed", status));
-		TRACE_ALWAYS("BlockPrefetcher::_IOFinishedCallback: transferred only %" B_PRIuSIZE
+		TRACE_ALWAYS("BlockPrefetcher::_IOFinished: transferred only %" B_PRIuGENADDR
 			" bytes in attempt to read %" B_PRIuSIZE " blocks (start block %" B_PRIdOFF "): %s\n",
 			bytesTransferred, fNumAllocated, fBlockNumber, strerror(status));
 	} else {
