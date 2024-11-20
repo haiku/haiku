@@ -13,7 +13,8 @@
 extern "C" {
 #endif
 
-status_t blue_screen_init(void);
+status_t blue_screen_init_early();
+status_t blue_screen_init();
 status_t blue_screen_enter(bool debugOutput);
 
 bool blue_screen_paging_enabled(void);

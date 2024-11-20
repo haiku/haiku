@@ -1689,6 +1689,9 @@ debug_init(kernel_args* args)
 
 	debug_paranoia_init();
 	arch_debug_console_init(args);
+
+	if (frame_buffer_console_init(args) == B_OK && blue_screen_init_early() == B_OK)
+		sBlueScreenOutput = true;
 }
 
 
@@ -1715,7 +1718,7 @@ debug_init_post_vm(kernel_args* args)
 
 	debug_heap_init();
 	debug_variables_init();
-	frame_buffer_console_init(args);
+	frame_buffer_console_init_post_vm(args);
 	tracing_init();
 }
 
@@ -1735,7 +1738,7 @@ debug_init_post_settings(struct kernel_args* args)
 	sDebugScreenEnabled = get_safemode_boolean("debug_screen", false);
 
 	if ((sBlueScreenOutput || sDebugScreenEnabled)
-		&& blue_screen_init() != B_OK)
+			&& blue_screen_init() != B_OK)
 		sBlueScreenOutput = sDebugScreenEnabled = false;
 
 	if (sDebugScreenEnabled)
