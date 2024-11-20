@@ -775,9 +775,7 @@ int
 ether_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 	struct route *ro)
 {
-	int error = 0;
-	IFQ_HANDOFF(ifp, m, error);
-	return error;
+	return ifp->if_transmit(ifp, m);
 }
 
 
