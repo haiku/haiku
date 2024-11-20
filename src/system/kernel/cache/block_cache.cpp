@@ -346,7 +346,7 @@ private:
 	static	void			_IOFinishedCallback(void* cookie, io_request* request,
 									status_t status, bool partialTransfer,
 									generic_size_t bytesTransferred);
-			void			_IOFinished(status_t status, size_t bytesTransferred);
+			void			_IOFinished(status_t status, generic_size_t bytesTransferred);
 
 			void				_RemoveAllocated(size_t unbusyCount, size_t removeCount);
 
