@@ -345,7 +345,7 @@ public:
 private:
 	static	void			_IOFinishedCallback(void* cookie, io_request* request,
 									status_t status, bool partialTransfer,
-									size_t bytesTransferred);
+									generic_size_t bytesTransferred);
 			void			_IOFinished(status_t status, size_t bytesTransferred);
 
 			void				_RemoveAllocated(size_t unbusyCount, size_t removeCount);
@@ -1569,7 +1569,7 @@ BlockPrefetcher::ReadAsync(MutexLocker& cacheLocker)
 
 /*static*/ void
 BlockPrefetcher::_IOFinishedCallback(void* cookie, io_request* request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
+	bool partialTransfer, generic_size_t bytesTransferred)
 {
 	TRACE(("BlockPrefetcher::_IOFinishedCallback: status %s, partial %d\n",
 		strerror(status), partialTransfer));
@@ -1578,7 +1578,7 @@ BlockPrefetcher::_IOFinishedCallback(void* cookie, io_request* request, status_t
 
 
 void
-BlockPrefetcher::_IOFinished(status_t status, size_t bytesTransferred)
+BlockPrefetcher::_IOFinished(status_t status, generic_size_t bytesTransferred)
 {
 	MutexLocker locker(&fCache->lock);
 
@@ -1590,7 +1590,7 @@ BlockPrefetcher::_IOFinished(status_t status, size_t bytesTransferred)
 			" bytes in attempt to read %" B_PRIuSIZE " blocks (start block %" B_PRIdOFF "): %s\n",
 			bytesTransferred, fNumAllocated, fBlockNumber, strerror(status));
 	} else {
-		for (size_t i = 0; i < fNumAllocated; ++i) {
+		for (size_t i = 0; i < fNumAllocated; i++) {
 			TB(Read(cache, fBlockNumber + i));
 			mark_block_unbusy_reading(fCache, fBlocks[i]);
 			fBlocks[i]->last_accessed = system_time() / 1000000L;
