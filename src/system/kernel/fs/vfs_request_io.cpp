@@ -292,8 +292,9 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 	generic_size_t length = request->Length();
 
 	status_t error = B_OK;
+	bool partial = false;
 
-	for (; error == B_OK && length > 0
+	for (; error == B_OK && length > 0 && !partial
 			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
 		uint8* vecBase = (uint8*)vector.iov_base;
 		generic_size_t vecLength = min_c(vector.iov_len, length);
@@ -309,8 +310,12 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 				fileVecs[0].length = vecLength;
 				fileVecCount = 1;
 			}
-			if (error != B_OK || fileVecCount == 0)
+			if (error != B_OK)
 				break;
+			if (fileVecCount == 0) {
+				partial = true;
+				break;
+			}
 
 			for (size_t i = 0; i < fileVecCount; i++) {
 				const file_io_vec& fileVec = fileVecs[i];
@@ -325,15 +330,17 @@ do_synchronous_iterative_vnode_io(struct vnode* vnode, void* openCookie,
 				vecBase += transferred;
 				vecLength -= transferred;
 
-				if (transferred != toTransfer)
+				if (transferred != toTransfer) {
+					partial = true;
 					break;
+				}
 			}
 		}
 	}
 
 	buffer->FreeVirtualVecCookie(virtualVecCookie);
 
-	bool partial = length > 0;
+	partial = (partial || length > 0);
 	size_t bytesTransferred = request->Length() - length;
 	request->SetTransferredBytes(partial, bytesTransferred);
 	if (finished != NULL)
