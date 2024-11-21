@@ -738,14 +738,20 @@ public:
 
 	void _DrawPackagePublisher(BRect textRect, PackageInfoRef pkg, bool selected)
 	{
-		_DrawPackageGenericTextSlug(textRect, pkg->Publisher().Name(), selected);
+		BString publisherName = PackageUtils::PublisherName(pkg);
+		_DrawPackageGenericTextSlug(textRect, publisherName, selected);
 	}
 
 
 	void _DrawPackageChronologicalInfo(BRect textRect, PackageInfoRef pkg, bool selected)
 	{
+		PackageVersionRef version = PackageUtils::Version(pkg);
+
+		if (!version.IsSet())
+			return;
+
 		BString versionCreateTimestampPresentation
-			= LocaleUtils::TimestampToDateString(pkg->VersionCreateTimestamp());
+			= LocaleUtils::TimestampToDateString(version->CreateTimestamp());
 		_DrawPackageGenericTextSlug(textRect, versionCreateTimestampPresentation, selected);
 	}
 

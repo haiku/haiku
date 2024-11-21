@@ -184,6 +184,9 @@ Model::HasDepot(const BString& name) const
 const DepotInfoRef
 Model::DepotForName(const BString& name) const
 {
+	if (name.IsEmpty())
+		return DepotInfoRef();
+
 	std::vector<DepotInfoRef>::const_iterator it;
 	for (it = fDepots.begin(); it != fDepots.end(); it++) {
 		DepotInfoRef aDepot = *it;
@@ -280,14 +283,10 @@ Model::SetCanShareAnonymousUsageData(bool value)
 bool
 Model::CanPopulatePackage(const PackageInfoRef& package)
 {
-	const BString& depotName = package->DepotName();
-
-	if (depotName.IsEmpty())
-		return false;
-
+	const BString depotName = PackageUtils::DepotName(package);
 	const DepotInfoRef& depot = DepotForName(depotName);
 
-	if (depot.Get() == NULL)
+	if (!depot.IsSet())
 		return false;
 
 	return !depot->WebAppRepositoryCode().IsEmpty();

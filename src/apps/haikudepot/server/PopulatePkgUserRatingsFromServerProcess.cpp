@@ -14,6 +14,7 @@
 #include <Catalog.h>
 
 #include "Logger.h"
+#include "PackageUtils.h"
 #include "ServerHelper.h"
 
 
@@ -65,7 +66,9 @@ PopulatePkgUserRatingsFromServerProcess::RunInternal()
 	{
 		BAutolock locker(&fLock);
 		packageName = fPackageInfo->Name();
-		const DepotInfo* depot = fModel->DepotForName(fPackageInfo->DepotName());
+
+		BString depotName = PackageUtils::DepotName(fPackageInfo);
+		const DepotInfo* depot = fModel->DepotForName(depotName);
 
 		if (depot != NULL)
 			webAppRepositoryCode = depot->WebAppRepositoryCode();

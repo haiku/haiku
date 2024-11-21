@@ -21,7 +21,8 @@ enum {
 		// ^ Handled slightly differently.
 	PKG_CHANGED_CLASSIFICATION				= 1 << 5,
 		// ^ This covers categories, prominence and is native desktop
-	PKG_CHANGED_VERSION_CREATE_TIMESTAMP	= 1 << 6
+	PKG_CHANGED_CORE_INFO					= 1 << 6
+		// ^ covers the version change timestamp
 	// ...
 };
 

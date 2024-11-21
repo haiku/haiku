@@ -376,17 +376,27 @@ public:
 		PackageUtils::TitleOrName(package, title);
 		fTitleView->SetText(title);
 
-		BString publisher = package->Publisher().Name();
-		if (publisher.CountChars() > 45) {
-			fPublisherView->SetToolTip(publisher);
-			fPublisherView->SetText(publisher.TruncateChars(45)
-				.Append(B_UTF8_ELLIPSIS));
-		} else {
-			fPublisherView->SetToolTip("");
-			fPublisherView->SetText(publisher);
+		BString publisherName = PackageUtils::PublisherName(package);
+		BString versionString = "???";
+
+		PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+		if (coreInfo.IsSet()) {
+			PackageVersionRef version = coreInfo->Version();
+
+			if (version.IsSet())
+				versionString = version->ToString();
 		}
 
-		fVersionInfo->SetText(package->Version().ToString());
+		if (publisherName.CountChars() > 45) {
+			fPublisherView->SetToolTip(publisherName);
+			fPublisherView->SetText(publisherName.TruncateChars(45).Append(B_UTF8_ELLIPSIS));
+		} else {
+			fPublisherView->SetToolTip("");
+			fPublisherView->SetText(publisherName);
+		}
+
+		fVersionInfo->SetText(versionString);
 
 		UserRatingInfoRef userRatingInfo = package->UserRatingInfo();
 		UserRatingSummaryRef userRatingSummary;
@@ -770,18 +780,31 @@ public:
 
 	void SetPackage(const PackageInfoRef package)
 	{
-		PackageLocalizedTextRef localizedText = package->LocalizedText();
 		BString summary = "";
-		BString description = "";
+    	BString description = "";
+    	BString publisherWebsite = "";
 
-		if (localizedText.IsSet()) {
-			summary = localizedText->Summary();
-        	description = localizedText->Description();
+		if (package.IsSet()) {
+			PackageLocalizedTextRef localizedText = package->LocalizedText();
+
+			if (localizedText.IsSet()) {
+				summary = localizedText->Summary();
+        		description = localizedText->Description();
+			}
+
+			PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+			if (coreInfo.IsSet()) {
+				PackagePublisherInfoRef publisher = coreInfo->Publisher();
+
+				if (publisher.IsSet())
+					publisherWebsite = publisher->Website();
+			}
 		}
 
 		fDescriptionView->SetText(summary, description);
 		fWebsiteIconView->SetBitmap(SharedIcons::IconHTMLPackage16Scaled());
-		_SetContactInfo(fWebsiteLinkView, package->Publisher().Website());
+		_SetContactInfo(fWebsiteLinkView, publisherWebsite);
 	}
 
 	void Clear()

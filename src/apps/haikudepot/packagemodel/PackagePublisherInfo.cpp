@@ -6,10 +6,10 @@
  */
 
 
-#include "PublisherInfo.h"
+#include "PackagePublisherInfo.h"
 
 
-PublisherInfo::PublisherInfo()
+PackagePublisherInfo::PackagePublisherInfo()
 	:
 	fName(),
 	fWebsite()
@@ -17,7 +17,7 @@ PublisherInfo::PublisherInfo()
 }
 
 
-PublisherInfo::PublisherInfo(const BString& name, const BString& website)
+PackagePublisherInfo::PackagePublisherInfo(const BString& name, const BString& website)
 	:
 	fName(name),
 	fWebsite(website)
@@ -25,7 +25,7 @@ PublisherInfo::PublisherInfo(const BString& name, const BString& website)
 }
 
 
-PublisherInfo::PublisherInfo(const PublisherInfo& other)
+PackagePublisherInfo::PackagePublisherInfo(const PackagePublisherInfo& other)
 	:
 	fName(other.fName),
 	fWebsite(other.fWebsite)
@@ -33,8 +33,8 @@ PublisherInfo::PublisherInfo(const PublisherInfo& other)
 }
 
 
-PublisherInfo&
-PublisherInfo::operator=(const PublisherInfo& other)
+PackagePublisherInfo&
+PackagePublisherInfo::operator=(const PackagePublisherInfo& other)
 {
 	fName = other.fName;
 	fWebsite = other.fWebsite;
@@ -43,14 +43,14 @@ PublisherInfo::operator=(const PublisherInfo& other)
 
 
 bool
-PublisherInfo::operator==(const PublisherInfo& other) const
+PackagePublisherInfo::operator==(const PackagePublisherInfo& other) const
 {
 	return fName == other.fName && fWebsite == other.fWebsite;
 }
 
 
 bool
-PublisherInfo::operator!=(const PublisherInfo& other) const
+PackagePublisherInfo::operator!=(const PackagePublisherInfo& other) const
 {
 	return !(*this == other);
 }

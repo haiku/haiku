@@ -15,6 +15,15 @@ public:
 	static	void			Title(const PackageInfoRef& package, BString& title);
 	static	void			Summary(const PackageInfoRef& package, BString& summary);
 
+	static	PackageVersionRef
+							Version(const PackageInfoRef& package);
+	static	const BString	Architecture(const PackageInfoRef& package);
+	static	const BString	DepotName(const PackageInfoRef& package);
+	static	const BString	PublisherName(const PackageInfoRef& package);
+
+	static	PackageCoreInfoRef
+							NewCoreInfo(const PackageInfoRef& package);
+
 	static	bool			IsNativeDesktop(const PackageInfoRef& package);
 
 	static PackageLocalizedTextRef

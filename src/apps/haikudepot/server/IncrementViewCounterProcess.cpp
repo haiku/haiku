@@ -7,6 +7,7 @@
 #include <Catalog.h>
 
 #include "Logger.h"
+#include "PackageUtils.h"
 #include "ServerHelper.h"
 #include "WebAppInterface.h"
 
@@ -57,22 +58,17 @@ IncrementViewCounterProcess::RunInternal()
 		return B_OK;
 	}
 
-	if (!fPackage.IsSet()) {
-		HDERROR("the package is not present to increment the view counter");
-		return B_ERROR;
-	}
-
-	DepotInfoRef depot = fModel->DepotForName(fPackage->DepotName());
+	BString depotName = PackageUtils::DepotName(fPackage);
+	DepotInfoRef depot = fModel->DepotForName(depotName);
 
 	if (!depot.IsSet()) {
-		HDERROR("the package's depot is not present to increment the view "
-			"counter");
+		HDERROR("the package's depot is not present to increment the view counter");
 		return B_ERROR;
 	}
 
 	if (depot->WebAppRepositorySourceCode().IsEmpty()) {
-		HDERROR("cannot increment view counter because depot has no web app "
-			"repository source code");
+		HDERROR(
+			"cannot increment view counter because depot has no web app repository source code");
 		return B_BAD_DATA;
 	}
 
@@ -88,8 +84,7 @@ IncrementViewCounterProcess::RunInternal()
 			int32 errorCode = WebAppInterface::ErrorCodeFromResponse(resultEnvelope);
 			switch (errorCode) {
 				case ERROR_CODE_NONE:
-					HDINFO("did increment the view counter for [%s]",
-						fPackage->Name().String());
+					HDINFO("did increment the view counter for [%s]", fPackage->Name().String());
 					return result;
 				case ERROR_CODE_OBJECTNOTFOUND:
 					HDINFO("server was not able to find the package [%s]",
@@ -97,8 +92,8 @@ IncrementViewCounterProcess::RunInternal()
 					return B_NAME_NOT_FOUND;
 				default:
 					HDERROR("a problem has arisen incrementing the view "
-					"counter for pkg [%s] w/ error code %" B_PRId32,
-					fPackage->Name().String(), errorCode);
+							"counter for pkg [%s] w/ error code %" B_PRId32,
+						fPackage->Name().String(), errorCode);
 					result = B_ERROR;
 					break;
 			}

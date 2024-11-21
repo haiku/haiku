@@ -67,6 +67,8 @@ public:
 									const PackageInfoEvent& event);
 
 private:
+	static	const BString		_WindowTitleForPackage(const PackageInfoRef& pkg);
+
 			std::vector<DepotInfoRef>
 								_CreateSnapshotOfDepots();
 

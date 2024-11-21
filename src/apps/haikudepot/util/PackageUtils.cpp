@@ -52,6 +52,66 @@ PackageUtils::Summary(const PackageInfoRef& package, BString& summary)
 }
 
 
+/*static*/ const BString
+PackageUtils::DepotName(const PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+		if (coreInfo.IsSet())
+			return coreInfo->DepotName();
+	}
+
+	return BString();
+}
+
+
+/*static*/ PackageVersionRef
+PackageUtils::Version(const PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+		if (coreInfo.IsSet())
+			return coreInfo->Version();
+	}
+
+	return PackageVersionRef();
+}
+
+
+/*static*/ const BString
+PackageUtils::Architecture(const PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+		if (coreInfo.IsSet())
+			return coreInfo->Architecture();
+	}
+
+	return "";
+}
+
+
+/*static*/ const BString
+PackageUtils::PublisherName(const PackageInfoRef& package)
+{
+	if (package.IsSet()) {
+		PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+		if (coreInfo.IsSet()) {
+			PackagePublisherInfoRef publisherInfo = coreInfo->Publisher();
+
+			if (publisherInfo.IsSet())
+				return publisherInfo->Name();
+		}
+	}
+
+	return "";
+}
+
+
 /*static*/ bool
 PackageUtils::IsNativeDesktop(const PackageInfoRef& package)
 {
@@ -177,6 +237,21 @@ PackageUtils::NewLocalInfo(const PackageInfoRef& package)
 		return PackageLocalInfoRef(new PackageLocalInfo(*(localInfo.Get())), true);
 
 	return PackageLocalInfoRef(new PackageLocalInfo(), true);
+}
+
+
+/*static*/ PackageCoreInfoRef
+PackageUtils::NewCoreInfo(const PackageInfoRef& package)
+{
+	if (!package.IsSet())
+		HDFATAL("it is not possible to get the `CoreInfo` from a not-existing package");
+
+	PackageCoreInfoRef coreInfo = package->CoreInfo();
+
+	if (coreInfo.IsSet())
+		return PackageCoreInfoRef(new PackageCoreInfo(*(coreInfo.Get())), true);
+
+	return PackageCoreInfoRef(new PackageCoreInfo(), true);
 }
 
 

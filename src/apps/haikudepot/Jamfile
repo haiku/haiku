@@ -178,13 +178,15 @@ local applicationSources =
 	Language.cpp
 	PackageCategory.cpp
 	PackageClassificationInfo.cpp
+	PackageCoreInfo.cpp
 	PackageFilter.cpp
 	PackageFilterModel.cpp
 	PackageInfo.cpp
 	PackageLocalInfo.cpp
 	PackageLocalizedText.cpp
+	PackagePublisherInfo.cpp
 	PackageScreenshotInfo.cpp
-	PublisherInfo.cpp
+	PackageVersion.cpp
 	ScreenshotInfo.cpp
 	UserInfo.cpp
 	UserRating.cpp
