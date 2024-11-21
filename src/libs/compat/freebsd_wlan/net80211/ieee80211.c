@@ -438,6 +438,40 @@ ieee80211_ifdetach(struct ieee80211com *ic)
 	IEEE80211_LOCK_DESTROY(ic);
 }
 
+/*
+ * Called by drivers during attach to set the supported
+ * cipher set for software encryption.
+ */
+void
+ieee80211_set_software_ciphers(struct ieee80211com *ic,
+    uint32_t cipher_suite)
+{
+	ieee80211_crypto_set_supported_software_ciphers(ic, cipher_suite);
+}
+
+/*
+ * Called by drivers during attach to set the supported
+ * cipher set for hardware encryption.
+ */
+void
+ieee80211_set_hardware_ciphers(struct ieee80211com *ic,
+    uint32_t cipher_suite)
+{
+	ieee80211_crypto_set_supported_hardware_ciphers(ic, cipher_suite);
+}
+
+/*
+ * Called by drivers during attach to set the supported
+ * key management suites by the driver/hardware.
+ */
+void
+ieee80211_set_driver_keymgmt_suites(struct ieee80211com *ic,
+    uint32_t keymgmt_set)
+{
+	ieee80211_crypto_set_supported_driver_keymgmt(ic,
+	    keymgmt_set);
+}
+
 struct ieee80211com *
 ieee80211_find_com(const char *name)
 {
@@ -2652,4 +2686,35 @@ ieee80211_channel_type_char(const struct ieee80211_channel *c)
 	if (IEEE80211_IS_CHAN_B(c))
 		return 'b';
 	return 'f';
+}
+
+/*
+ * Determine whether the given key in the given VAP is a global key.
+ * (key index 0..3, shared between all stations on a VAP.)
+ *
+ * This is either a WEP key or a GROUP key.
+ *
+ * Note this will NOT return true if it is a IGTK key.
+ */
+bool
+ieee80211_is_key_global(const struct ieee80211vap *vap,
+    const struct ieee80211_key *key)
+{
+	return (&vap->iv_nw_keys[0] <= key &&
+	    key < &vap->iv_nw_keys[IEEE80211_WEP_NKID]);
+}
+
+/*
+ * Determine whether the given key in the given VAP is a unicast key.
+ */
+bool
+ieee80211_is_key_unicast(const struct ieee80211vap *vap,
+    const struct ieee80211_key *key)
+{
+	/*
+	 * This is a short-cut for now; eventually we will need
+	 * to support multiple unicast keys, IGTK, etc) so we
+	 * will absolutely need to fix the key flags.
+	 */
+	return (!ieee80211_is_key_global(vap, key));
 }
