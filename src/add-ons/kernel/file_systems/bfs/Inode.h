@@ -357,6 +357,8 @@ public:
 	status_t SetToWritable(Transaction& transaction, const Inode* inode,
 		bool empty = false)
 	{
+		Unset();
+		fVolume = inode->GetVolume();
 		return CachedBlock::SetToWritable(transaction,
 			fVolume->VnodeToBlock(inode->ID()), empty);
 	}
