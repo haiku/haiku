@@ -27,19 +27,25 @@ struct Query::QueryPolicy {
 	typedef ::Inode Node;
 
 	struct Index : ::Index {
+		bool isSpecialTime;
+
 		Index(Context* context)
 			:
-			::Index(context->fVolume)
+			::Index(context->fVolume),
+			isSpecialTime(false)
 		{
 		}
 	};
 
 	struct IndexIterator : TreeIterator {
 		off_t offset;
+		bool isSpecialTime;
 
 		IndexIterator(BPlusTree* tree)
 			:
-			TreeIterator(tree)
+			TreeIterator(tree),
+			offset(0),
+			isSpecialTime(false)
 		{
 		}
 	};
@@ -71,7 +77,6 @@ struct Query::QueryPolicy {
 
 	static ssize_t EntryGetName(Inode* inode, void* buffer, size_t bufferSize)
 	{
-		RecursiveLocker locker(&inode->SmallDataLock());
 		status_t status = inode->GetName((char*)buffer, bufferSize);
 		if (status != B_OK)
 			return status;
@@ -99,7 +104,17 @@ struct Query::QueryPolicy {
 
 	static status_t IndexSetTo(Index& index, const char* attribute)
 	{
-		return index.SetTo(attribute);
+		status_t status = index.SetTo(attribute);
+		if (status == B_OK) {
+			// The special time flag is set if the time values are shifted
+			// 64-bit values to reduce the number of duplicates.
+			// We have to be able to compare them against unshifted values
+			// later. The only index which needs this is the last_modified
+			// index, but we may want to open that feature for other indices,
+			// too one day.
+			index.isSpecialTime = (strcmp(attribute, "last_modified") == 0);
+		}
+		return status;
 	}
 
 	static void IndexUnset(Index& index)
@@ -132,6 +147,7 @@ struct Query::QueryPolicy {
 		if (iterator == NULL)
 			return NULL;
 
+		iterator->isSpecialTime = index.isSpecialTime;
 		return iterator;
 	}
 
@@ -145,6 +161,13 @@ struct Query::QueryPolicy {
 	static status_t IndexIteratorFind(IndexIterator* iterator,
 		const void* value, size_t size)
 	{
+		int64 shiftedTime;
+		if (iterator->isSpecialTime) {
+			// int64 time index; convert value.
+			shiftedTime = *(int64*)value << INODE_TIME_SHIFT;
+			value = &shiftedTime;
+		}
+
 		return iterator->Find((const uint8*)value, size);
 	}
 
@@ -157,6 +180,11 @@ struct Query::QueryPolicy {
 			bufferSize, &iterator->offset, &duplicate);
 		if (status != B_OK)
 			return status;
+
+		if (iterator->isSpecialTime) {
+			// int64 time index; convert value.
+			*(int64*)indexValue >>= INODE_TIME_SHIFT;
+		}
 
 		*_keyLength = keyLength;
 		*_duplicate = duplicate;
@@ -203,7 +231,7 @@ struct Query::QueryPolicy {
 
 	static time_t NodeGetLastModifiedTime(Inode* inode)
 	{
-		return inode->Node().LastModifiedTime();
+		return bfs_inode::ToSecs(inode->Node().LastModifiedTime());
 	}
 
 	static status_t NodeGetAttribute(NodeHolder& holder, Inode* inode,
