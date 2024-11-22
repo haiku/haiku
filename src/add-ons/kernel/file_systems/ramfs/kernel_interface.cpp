@@ -1509,158 +1509,155 @@ private:
 };
 
 
-// ramfs_create_attr
 static status_t
 ramfs_create_attr(fs_volume* _volume, fs_vnode* _node, const char *name,
 	uint32 type, int openMode, void** _cookie)
 {
-
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 
-	if (VolumeWriteLocker locker = volume) {
-		// try to find the attribute
-		Attribute *attribute = NULL;
-		node->FindAttribute(name, &attribute);
-
-		// in case the attribute exists we fail if required by the openMode
-		if (attribute && (openMode & O_EXCL))
-			RETURN_ERROR(B_FILE_EXISTS);
-
-		// creating and truncating require write permission
-		int accessMode = open_mode_to_access(openMode);
-		if (!attribute || (openMode & O_TRUNC))
-			accessMode |= ACCESS_W;
-
-		// check required permissions against node permissions
-		status_t error = node->CheckPermissions(accessMode);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		// create the cookie
-		AttributeCookie *cookie = new(nothrow) AttributeCookie();
-		if (!cookie)
-			return B_NO_MEMORY;
-		ObjectDeleter<AttributeCookie> cookieDeleter(cookie);
-
-		// init the cookie
-		error = cookie->Init(name, openMode);
-		if (error != B_OK)
-			RETURN_ERROR(error);
-
-		// if not existing yet, create the attribute and set its type
-		if (!attribute) {
-			error = node->CreateAttribute(name, &attribute);
-			if (error != B_OK)
-				RETURN_ERROR(error);
-
-			attribute->SetType(type);
-
-			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
-				B_ATTR_CREATED);
-
-		// else truncate if requested
-		} else if (openMode & O_TRUNC) {
-			error = attribute->SetSize(0);
-			if (error != B_OK)
-				return error;
-
-			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
-				B_ATTR_CHANGED);
-		}
-		NodeMTimeUpdater mTimeUpdater(node);
-
-		// success
-		cookieDeleter.Detach();
-		*_cookie = cookie;
-	} else
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
+
+	// try to find the attribute
+	Attribute *attribute = NULL;
+	node->FindAttribute(name, &attribute);
+
+	// in case the attribute exists we fail if required by the openMode
+	if (attribute && (openMode & O_EXCL))
+		RETURN_ERROR(B_FILE_EXISTS);
+
+	// creating and truncating require write permission
+	int accessMode = open_mode_to_access(openMode);
+	if (!attribute || (openMode & O_TRUNC))
+		accessMode |= ACCESS_W;
+
+	// check required permissions against node permissions
+	status_t error = node->CheckPermissions(accessMode);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// create the cookie
+	AttributeCookie *cookie = new(nothrow) AttributeCookie();
+	if (!cookie)
+		return B_NO_MEMORY;
+	ObjectDeleter<AttributeCookie> cookieDeleter(cookie);
+
+	// init the cookie
+	error = cookie->Init(name, openMode);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// if not existing yet, create the attribute and set its type
+	if (!attribute) {
+		error = node->CreateAttribute(name, &attribute);
+		if (error != B_OK)
+			RETURN_ERROR(error);
+
+		attribute->SetType(type);
+
+		notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
+			B_ATTR_CREATED);
+
+	// else truncate if requested
+	} else if (openMode & O_TRUNC) {
+		error = attribute->SetSize(0);
+		if (error != B_OK)
+			return error;
+
+		notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
+			B_ATTR_CHANGED);
+	}
+	NodeMTimeUpdater mTimeUpdater(node);
+
+	// success
+	cookieDeleter.Detach();
+	*_cookie = cookie;
 
 	return B_OK;
 }
 
 
-// ramfs_open_attr
 static status_t
 ramfs_open_attr(fs_volume* _volume, fs_vnode* _node, const char *name,
 	int openMode, void** _cookie)
 {
-//	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 
 	FUNCTION(("node: %lld\n", node->GetID()));
+
 	status_t error = B_OK;
 
-	if (VolumeWriteLocker locker = volume) {
-		// find the attribute
-		Attribute *attribute = NULL;
-		if (error == B_OK)
-			error = node->FindAttribute(name, &attribute);
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
-		// truncating requires write permission
-		int accessMode = open_mode_to_access(openMode);
-		if (error == B_OK && (openMode & O_TRUNC))
-			accessMode |= ACCESS_W;
+	// find the attribute
+	Attribute *attribute = NULL;
+	if (error == B_OK)
+		error = node->FindAttribute(name, &attribute);
 
-		// check open mode against permissions
-		if (error == B_OK)
-			error = node->CheckPermissions(accessMode);
+	// truncating requires write permission
+	int accessMode = open_mode_to_access(openMode);
+	if (error == B_OK && (openMode & O_TRUNC))
+		accessMode |= ACCESS_W;
 
-		// create the cookie
-		AttributeCookie *cookie = NULL;
+	// check open mode against permissions
+	if (error == B_OK)
+		error = node->CheckPermissions(accessMode);
+
+	// create the cookie
+	AttributeCookie *cookie = NULL;
+	if (error == B_OK) {
+		cookie = new(nothrow) AttributeCookie();
+		if (cookie) {
+			SET_ERROR(error, cookie->Init(name, openMode));
+		} else {
+			SET_ERROR(error, B_NO_MEMORY);
+		}
+	}
+
+	// truncate if requested
+	if (error == B_OK && (openMode & O_TRUNC)) {
+		error = attribute->SetSize(0);
+
 		if (error == B_OK) {
-			cookie = new(nothrow) AttributeCookie();
-			if (cookie) {
-				SET_ERROR(error, cookie->Init(name, openMode));
-			} else {
-				SET_ERROR(error, B_NO_MEMORY);
-			}
+			notify_attribute_changed(volume->GetID(), -1, node->GetID(),
+				name, B_ATTR_CHANGED);
 		}
+	}
+	NodeMTimeUpdater mTimeUpdater(node);
 
-		// truncate if requested
-		if (error == B_OK && (openMode & O_TRUNC)) {
-			error = attribute->SetSize(0);
+	// set result / cleanup on failure
+	if (error == B_OK)
+		*_cookie = cookie;
+	else if (cookie)
+		delete cookie;
 
-			if (error == B_OK) {
-				notify_attribute_changed(volume->GetID(), -1, node->GetID(),
-					name, B_ATTR_CHANGED);
-			}
-		}
-		NodeMTimeUpdater mTimeUpdater(node);
-
-		// set result / cleanup on failure
-		if (error == B_OK)
-			*_cookie = cookie;
-		else if (cookie)
-			delete cookie;
-	} else
-		SET_ERROR(error, B_ERROR);
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_close_attr
 static status_t
 ramfs_close_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
-//	FUNCTION_START();
+	FUNCTION(("node: %lld\n", node->GetID()));
+
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 
-	FUNCTION(("node: %lld\n", node->GetID()));
-	status_t error = B_OK;
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
 	// notify listeners
-	if (VolumeReadLocker locker = volume) {
-		notify_if_stat_changed(volume, node);
-	} else
-		SET_ERROR(error, B_ERROR);
-	return error;
+	notify_if_stat_changed(volume, node);
+	return B_OK;
 }
 
 
-// ramfs_free_attr_cookie
 static status_t
 ramfs_free_attr_cookie(fs_volume* /*fs*/, fs_vnode* /*_node*/, void* _cookie)
 {
@@ -1671,44 +1668,47 @@ ramfs_free_attr_cookie(fs_volume* /*fs*/, fs_vnode* /*_node*/, void* _cookie)
 }
 
 
-// ramfs_read_attr
 static status_t
 ramfs_read_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 	void *buffer, size_t *bufferSize)
 {
-//	FUNCTION_START();
+	FUNCTION_START();
+
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 
 	AttributeCookie *cookie = (AttributeCookie*)_cookie;
 
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
 	status_t error = B_OK;
-	if (VolumeReadLocker locker = volume) {
-		// find the attribute
-		Attribute *attribute = NULL;
-		if (error == B_OK)
-			error = node->FindAttribute(cookie->GetName(), &attribute);
 
-		// check permissions
-		int accessMode = open_mode_to_access(cookie->GetOpenMode());
-		if (error == B_OK && !(accessMode & ACCESS_R))
-			SET_ERROR(error, B_NOT_ALLOWED);
+	// find the attribute
+	Attribute *attribute = NULL;
+	if (error == B_OK)
+		error = node->FindAttribute(cookie->GetName(), &attribute);
 
-		// read
-		if (error == B_OK)
-			error = attribute->ReadAt(pos, buffer, *bufferSize, bufferSize);
-	} else
-		SET_ERROR(error, B_ERROR);
+	// check permissions
+	int accessMode = open_mode_to_access(cookie->GetOpenMode());
+	if (error == B_OK && !(accessMode & ACCESS_R))
+		SET_ERROR(error, B_NOT_ALLOWED);
+
+	// read
+	if (error == B_OK)
+		error = attribute->ReadAt(pos, buffer, *bufferSize, bufferSize);
+
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_write_attr
 static status_t
 ramfs_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	off_t pos, const void *buffer, size_t *bufferSize)
 {
-	//	FUNCTION_START();
+	FUNCTION_START();
+
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 	AttributeCookie *cookie = (AttributeCookie*)_cookie;
@@ -1717,75 +1717,77 @@ ramfs_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	// Don't allow writing the reserved attributes.
 	const char *name = cookie->GetName();
 	if (name[0] == '\0' || !strcmp(name, "name")
-		|| !strcmp(name, "last_modified") || !strcmp(name, "size")) {
+			|| !strcmp(name, "last_modified") || !strcmp(name, "size")) {
 		// FUNCTION(("failed: node: %s, attribute: %s\n",
 		//	node->GetName(), name));
 		RETURN_ERROR(B_NOT_ALLOWED);
 	}
 
-	if (VolumeWriteLocker locker = volume) {
-		NodeMTimeUpdater mTimeUpdater(node);
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
-		// find the attribute
-		Attribute *attribute = NULL;
-		if (error == B_OK)
-			error = node->FindAttribute(cookie->GetName(), &attribute);
+	NodeMTimeUpdater mTimeUpdater(node);
 
-		// check permissions
-		int accessMode = open_mode_to_access(cookie->GetOpenMode());
-		if (error == B_OK && !(accessMode & ACCESS_W))
-			SET_ERROR(error, B_NOT_ALLOWED);
+	// find the attribute
+	Attribute *attribute = NULL;
+	if (error == B_OK)
+		error = node->FindAttribute(cookie->GetName(), &attribute);
 
-		// write the data
-		if (error == B_OK)
-			error = attribute->WriteAt(pos, buffer, *bufferSize, bufferSize);
+	// check permissions
+	int accessMode = open_mode_to_access(cookie->GetOpenMode());
+	if (error == B_OK && !(accessMode & ACCESS_W))
+		SET_ERROR(error, B_NOT_ALLOWED);
 
-		// notify listeners
-		if (error == B_OK) {
-			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
-				B_ATTR_CHANGED);
-		}
-	} else
-		SET_ERROR(error, B_ERROR);
+	// write the data
+	if (error == B_OK)
+		error = attribute->WriteAt(pos, buffer, *bufferSize, bufferSize);
+
+	// notify listeners
+	if (error == B_OK) {
+		notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
+			B_ATTR_CHANGED);
+	}
 
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_read_attr_stat
 static status_t
 ramfs_read_attr_stat(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	struct stat *st)
 {
 //	FUNCTION_START();
+
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 	AttributeCookie *cookie = (AttributeCookie*)_cookie;
 	status_t error = B_OK;
 
-	if (VolumeReadLocker locker = volume) {
-		// find the attribute
-		Attribute *attribute = NULL;
-		if (error == B_OK)
-			error = node->FindAttribute(cookie->GetName(), &attribute);
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
-		// check permissions
-		int accessMode = open_mode_to_access(cookie->GetOpenMode());
-		if (error == B_OK && !(accessMode & ACCESS_R))
-			SET_ERROR(error, B_NOT_ALLOWED);
+	// find the attribute
+	Attribute *attribute = NULL;
+	if (error == B_OK)
+		error = node->FindAttribute(cookie->GetName(), &attribute);
 
-		// read
-		if (error == B_OK) {
-			st->st_type = attribute->GetType();
-			st->st_size = attribute->GetSize();
-		}
-	} else
-		SET_ERROR(error, B_ERROR);
+	// check permissions
+	int accessMode = open_mode_to_access(cookie->GetOpenMode());
+	if (error == B_OK && !(accessMode & ACCESS_R))
+		SET_ERROR(error, B_NOT_ALLOWED);
+
+	// read
+	if (error == B_OK) {
+		st->st_type = attribute->GetType();
+		st->st_size = attribute->GetSize();
+	}
+
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_rename_attr
 static status_t
 ramfs_rename_attr(fs_volume* /*fs*/, fs_vnode* /*_fromNode*/,
 	const char */*fromName*/, fs_vnode* /*_toNode*/, const char */*toName*/)
@@ -1795,7 +1797,6 @@ ramfs_rename_attr(fs_volume* /*fs*/, fs_vnode* /*_fromNode*/,
 }
 
 
-// ramfs_remove_attr
 static status_t
 ramfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char *name)
 {
@@ -1804,28 +1805,29 @@ ramfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char *name)
 	Node* node = (Node*)_node->private_node;
 	status_t error = B_OK;
 
-	if (VolumeWriteLocker locker = volume) {
-		NodeMTimeUpdater mTimeUpdater(node);
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
 
-		// check permissions
-		error = node->CheckPermissions(ACCESS_W);
+	NodeMTimeUpdater mTimeUpdater(node);
 
-		// find the attribute
-		Attribute *attribute = NULL;
-		if (error == B_OK)
-			error = node->FindAttribute(name, &attribute);
+	// check permissions
+	error = node->CheckPermissions(ACCESS_W);
 
-		// delete it
-		if (error == B_OK)
-			error = node->DeleteAttribute(attribute);
+	// find the attribute
+	Attribute *attribute = NULL;
+	if (error == B_OK)
+		error = node->FindAttribute(name, &attribute);
 
-		// notify listeners
-		if (error == B_OK) {
-			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
-				B_ATTR_REMOVED);
-		}
-	} else
-		SET_ERROR(error, B_ERROR);
+	// delete it
+	if (error == B_OK)
+		error = node->DeleteAttribute(attribute);
+
+	// notify listeners
+	if (error == B_OK) {
+		notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
+			B_ATTR_REMOVED);
+	}
 
 	RETURN_ERROR(error);
 }
@@ -1843,30 +1845,31 @@ public:
 };
 
 
-// ramfs_open_index_dir
 static status_t
 ramfs_open_index_dir(fs_volume* _volume, void** _cookie)
 {
 	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
+
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
 	status_t error = B_OK;
-	if (VolumeReadLocker locker = volume) {
-		// check whether an index directory exists
-		if (volume->GetIndexDirectory()) {
-			IndexDirCookie *cookie = new(nothrow) IndexDirCookie;
-			if (cookie)
-				*_cookie = cookie;
-			else
-				SET_ERROR(error, B_NO_MEMORY);
-		} else
-			SET_ERROR(error, B_ENTRY_NOT_FOUND);
+	// check whether an index directory exists
+	if (volume->GetIndexDirectory()) {
+		IndexDirCookie *cookie = new(nothrow) IndexDirCookie;
+		if (cookie)
+			*_cookie = cookie;
+		else
+			SET_ERROR(error, B_NO_MEMORY);
 	} else
-		SET_ERROR(error, B_ERROR);
+		SET_ERROR(error, B_ENTRY_NOT_FOUND);
+
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_close_index_dir
 static status_t
 ramfs_close_index_dir(fs_volume* /*fs*/, void* /*_cookie*/)
 {
@@ -1875,7 +1878,6 @@ ramfs_close_index_dir(fs_volume* /*fs*/, void* /*_cookie*/)
 }
 
 
-// ramfs_free_index_dir_cookie
 static status_t
 ramfs_free_index_dir_cookie(fs_volume* /*fs*/, void* _cookie)
 {
@@ -1886,7 +1888,6 @@ ramfs_free_index_dir_cookie(fs_volume* /*fs*/, void* _cookie)
 }
 
 
-// ramfs_read_index_dir
 static status_t
 ramfs_read_index_dir(fs_volume* _volume, void* _cookie,
 	struct dirent *buffer, size_t bufferSize, uint32 *count)
@@ -1896,36 +1897,36 @@ ramfs_read_index_dir(fs_volume* _volume, void* _cookie,
 	IndexDirCookie *cookie = (IndexDirCookie*)_cookie;
 	status_t error = B_OK;
 
-	if (VolumeReadLocker locker = volume) {
-		// get the next index
-		Index *index = volume->GetIndexDirectory()->IndexAt(
-			cookie->index_index++);
-		if (index) {
-			const char *name = index->GetName();
-			size_t nameLen = strlen(name);
-			// check, whether the entry fits into the buffer,
-			// and fill it in
-			size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
-			if (length <= bufferSize) {
-				buffer->d_dev = volume->GetID();
-				buffer->d_ino = -1;	// indices don't have a node ID
-				memcpy(buffer->d_name, name, nameLen);
-				buffer->d_name[nameLen] = '\0';
-				buffer->d_reclen = length;
-				*count = 1;
-			} else {
-				SET_ERROR(error, B_BUFFER_OVERFLOW);
-			}
-		} else
-			*count = 0;
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	// get the next index
+	Index *index = volume->GetIndexDirectory()->IndexAt(
+		cookie->index_index++);
+	if (index) {
+		const char *name = index->GetName();
+		size_t nameLen = strlen(name);
+		// check, whether the entry fits into the buffer,
+		// and fill it in
+		size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
+		if (length <= bufferSize) {
+			buffer->d_dev = volume->GetID();
+			buffer->d_ino = -1;	// indices don't have a node ID
+			memcpy(buffer->d_name, name, nameLen);
+			buffer->d_name[nameLen] = '\0';
+			buffer->d_reclen = length;
+			*count = 1;
+		} else {
+			SET_ERROR(error, B_BUFFER_OVERFLOW);
+		}
 	} else
-		SET_ERROR(error, B_ERROR);
+		*count = 0;
 
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_rewind_index_dir
 static status_t
 ramfs_rewind_index_dir(fs_volume* /*fs*/, void* _cookie)
 {
@@ -1936,7 +1937,6 @@ ramfs_rewind_index_dir(fs_volume* /*fs*/, void* _cookie)
 }
 
 
-// ramfs_create_index
 static status_t
 ramfs_create_index(fs_volume* _volume, const char *name, uint32 type,
 	uint32 /*flags*/)
@@ -1946,96 +1946,101 @@ ramfs_create_index(fs_volume* _volume, const char *name, uint32 type,
 	status_t error = B_OK;
 
 	// only root is allowed to manipulate the indices
-	if (geteuid() != 0) {
-		SET_ERROR(error, B_NOT_ALLOWED);
-	} else if (VolumeWriteLocker locker = volume) {
-		// get the index directory
-		if (IndexDirectory *indexDir = volume->GetIndexDirectory()) {
-			// check whether an index with that name does already exist
-			if (indexDir->FindIndex(name)) {
-				SET_ERROR(error, B_FILE_EXISTS);
-			} else {
-				// create the index
-				AttributeIndex *index;
-				error = indexDir->CreateIndex(name, type, &index);
-			}
-		} else
-			SET_ERROR(error, B_ENTRY_NOT_FOUND);
+	if (geteuid() != 0)
+		RETURN_ERROR(B_NOT_ALLOWED);
+
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	// get the index directory
+	if (IndexDirectory *indexDir = volume->GetIndexDirectory()) {
+		// check whether an index with that name does already exist
+		if (indexDir->FindIndex(name)) {
+			SET_ERROR(error, B_FILE_EXISTS);
+		} else {
+			// create the index
+			AttributeIndex *index;
+			error = indexDir->CreateIndex(name, type, &index);
+		}
 	} else
-		SET_ERROR(error, B_ERROR);
+		SET_ERROR(error, B_ENTRY_NOT_FOUND);
 
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_remove_index
 static status_t
 ramfs_remove_index(fs_volume* _volume, const char *name)
 {
 	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
 	status_t error = B_OK;
+
 	// only root is allowed to manipulate the indices
-	if (geteuid() != 0) {
-		SET_ERROR(error, B_NOT_ALLOWED);
-	} else if (VolumeWriteLocker locker = volume) {
-		// get the index directory
-		if (IndexDirectory *indexDir = volume->GetIndexDirectory()) {
-			// check whether an index with that name does exist
-			if (Index *index = indexDir->FindIndex(name)) {
-				// don't delete a special index
-				if (indexDir->IsSpecialIndex(index)) {
-					SET_ERROR(error, B_BAD_VALUE);
-				} else
-					indexDir->DeleteIndex(index);
+	if (geteuid() != 0)
+		RETURN_ERROR(B_NOT_ALLOWED);
+
+	VolumeWriteLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	// get the index directory
+	if (IndexDirectory *indexDir = volume->GetIndexDirectory()) {
+		// check whether an index with that name does exist
+		if (Index *index = indexDir->FindIndex(name)) {
+			// don't delete a special index
+			if (indexDir->IsSpecialIndex(index)) {
+				SET_ERROR(error, B_BAD_VALUE);
 			} else
-				SET_ERROR(error, B_ENTRY_NOT_FOUND);
+				indexDir->DeleteIndex(index);
 		} else
 			SET_ERROR(error, B_ENTRY_NOT_FOUND);
 	} else
-		SET_ERROR(error, B_ERROR);
+		SET_ERROR(error, B_ENTRY_NOT_FOUND);
+
 	RETURN_ERROR(error);
 }
 
 
-// ramfs_read_index_stat
 static status_t
 ramfs_read_index_stat(fs_volume* _volume, const char *name, struct stat *st)
 {
 	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
 	status_t error = B_OK;
-	if (VolumeReadLocker locker = volume) {
-		// get the index directory
-		if (IndexDirectory *indexDir = volume->GetIndexDirectory()) {
-			// find the index
-			if (Index *index = indexDir->FindIndex(name)) {
-				st->st_type = index->GetType();
-				if (index->HasFixedKeyLength())
-					st->st_size = index->GetKeyLength();
-				else
-					st->st_size = kMaxIndexKeyLength;
-				st->st_atime = 0;	// TODO: index times
-				st->st_mtime = 0;	// ...
-				st->st_ctime = 0;	// ...
-				st->st_crtime = 0;	// ...
-				st->st_uid = 0;		// root owns the indices
-				st->st_gid = 0;		//
-			} else
-				SET_ERROR(error, B_ENTRY_NOT_FOUND);
+
+	VolumeReadLocker locker(volume);
+	if (!locker.IsLocked())
+		RETURN_ERROR(B_ERROR);
+
+	// get the index directory
+	if (IndexDirectory *indexDir = volume->GetIndexDirectory()) {
+		// find the index
+		if (Index *index = indexDir->FindIndex(name)) {
+			st->st_type = index->GetType();
+			if (index->HasFixedKeyLength())
+				st->st_size = index->GetKeyLength();
+			else
+				st->st_size = kMaxIndexKeyLength;
+			st->st_atime = 0;	// TODO: index times
+			st->st_mtime = 0;	// ...
+			st->st_ctime = 0;	// ...
+			st->st_crtime = 0;	// ...
+			st->st_uid = 0;		// root owns the indices
+			st->st_gid = 0;		//
 		} else
 			SET_ERROR(error, B_ENTRY_NOT_FOUND);
 	} else
-		SET_ERROR(error, B_ERROR);
+		SET_ERROR(error, B_ENTRY_NOT_FOUND);
+
 	RETURN_ERROR(error);
 }
 
 
 // #pragma mark - Queries
 
-// Query implementation by Axel Dörfler. Slightly adjusted.
 
-// ramfs_open_query
 static status_t
 ramfs_open_query(fs_volume* _volume, const char *queryString, uint32 flags,
 	port_id port, uint32 token, void** _cookie)
@@ -2064,7 +2069,6 @@ ramfs_open_query(fs_volume* _volume, const char *queryString, uint32 flags,
 }
 
 
-// ramfs_close_query
 static status_t
 ramfs_close_query(fs_volume* /*fs*/, void* /*cookie*/)
 {
@@ -2073,7 +2077,6 @@ ramfs_close_query(fs_volume* /*fs*/, void* /*cookie*/)
 }
 
 
-// ramfs_free_query_cookie
 static status_t
 ramfs_free_query_cookie(fs_volume* _volume, void* _cookie)
 {
@@ -2093,7 +2096,6 @@ ramfs_free_query_cookie(fs_volume* _volume, void* _cookie)
 }
 
 
-// ramfs_read_query
 static status_t
 ramfs_read_query(fs_volume* _volume, void* _cookie, struct dirent *buffer,
 	size_t bufferSize, uint32 *count)
