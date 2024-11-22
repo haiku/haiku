@@ -1031,6 +1031,7 @@ dosfs_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 	mount* bsdVolume = reinterpret_cast<mount*>(volume->private_volume);
 	msdosfsmount* fatVolume = reinterpret_cast<msdosfsmount*>(bsdVolume->mnt_data);
 	struct vnode* bsdNode = reinterpret_cast<struct vnode*>(vnode->private_node);
+	denode* fatNode = reinterpret_cast<denode*>(bsdNode->v_data);
 
 #ifndef FS_SHELL
 	if (io_request_is_write(request) && MOUNTED_READ_ONLY(fatVolume) != 0) {
@@ -1052,6 +1053,8 @@ dosfs_io(fs_volume* volume, fs_vnode* vnode, void* cookie, io_request* request)
 		return B_UNSUPPORTED;
 
 	rw_lock_read_lock(&bsdNode->v_vnlock->haikuRW);
+
+	acquire_vnode(volume, fatNode->de_inode);
 
 	RETURN_ERROR(do_iterative_fd_io(fatVolume->pm_dev->si_fd, request, iterative_io_get_vecs_hook,
 		iterative_io_finished_hook, bsdNode));
@@ -3870,8 +3873,10 @@ iterative_io_finished_hook(void* cookie, io_request* request, status_t status, b
 	size_t bytesTransferred)
 {
 	vnode* bsdNode = reinterpret_cast<vnode*>(cookie);
+	denode* fatNode = reinterpret_cast<denode*>(bsdNode->v_data);
 
 	rw_lock_read_unlock(&bsdNode->v_vnlock->haikuRW);
+	put_vnode(bsdNode->v_mount->mnt_fsvolume, fatNode->de_inode);
 
 	return B_OK;
 }
