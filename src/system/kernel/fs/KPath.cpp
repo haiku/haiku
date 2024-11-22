@@ -80,7 +80,7 @@ status_t
 KPath::SetTo(const char* path, int32 flags, size_t bufferSize)
 {
 	if (bufferSize == 0)
-		bufferSize = B_PATH_NAME_LENGTH + 1;
+		bufferSize = B_PATH_NAME_LENGTH;
 
 	// free the previous buffer, if the buffer size differs
 	if (fBuffer != NULL && fBufferSize != bufferSize) {
@@ -249,11 +249,13 @@ KPath::DetachBuffer()
 {
 	char* buffer = fBuffer;
 
-	if (fBufferSize == (B_PATH_NAME_LENGTH + 1)) {
+#ifdef _KERNEL_MODE
+	if (fBufferSize == B_PATH_NAME_LENGTH) {
 		buffer = (char*)malloc(fBufferSize);
 		memcpy(buffer, fBuffer, fBufferSize);
 		_FreeBuffer();
 	}
+#endif
 
 	if (fBuffer != NULL) {
 		fBuffer = NULL;
@@ -427,7 +429,7 @@ KPath::_AllocateBuffer()
 {
 	if (fBuffer == NULL && fBufferSize != 0) {
 #ifdef _KERNEL_MODE
-		if (fBufferSize == (B_PATH_NAME_LENGTH + 1))
+		if (fBufferSize == B_PATH_NAME_LENGTH)
 			fBuffer = (char*)object_cache_alloc(sPathNameCache, 0);
 		else
 #endif
@@ -448,7 +450,7 @@ void
 KPath::_FreeBuffer()
 {
 #ifdef _KERNEL_MODE
-	if (fBufferSize == (B_PATH_NAME_LENGTH + 1))
+	if (fBufferSize == B_PATH_NAME_LENGTH)
 		object_cache_free(sPathNameCache, fBuffer, 0);
 	else
 #endif

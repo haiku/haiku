@@ -5284,7 +5284,7 @@ vfs_init(kernel_args* args)
 		panic("vfs_init: error creating mounts hash table\n");
 
 	sPathNameCache = create_object_cache("vfs path names",
-		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
+		B_PATH_NAME_LENGTH, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
 
