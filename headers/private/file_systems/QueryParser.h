@@ -267,7 +267,7 @@ private:
 						Equation& operator=(const Equation& other);
 							// no implementation
 
-			status_t	ConvertValue(type_code type);
+			status_t	ConvertValue(type_code type, uint32 size);
 			bool		CompareTo(const uint8* value, size_t size);
 			uint8*		Value() const { return (uint8*)&fValue; }
 
@@ -275,7 +275,7 @@ private:
 			char*		fString;
 			union value<QueryPolicy> fValue;
 			type_code	fType;
-			size_t		fSize;
+			uint32		fSize;
 			bool		fIsPattern;
 
 			int32		fScore;
@@ -585,8 +585,14 @@ Equation<QueryPolicy>::_IsOperatorChar(char c) const
 
 template<typename QueryPolicy>
 status_t
-Equation<QueryPolicy>::ConvertValue(type_code type)
+Equation<QueryPolicy>::ConvertValue(type_code type, uint32 size)
 {
+	// Perform type coercion up-front, so we don't re-convert every time.
+	if (type == B_MIME_STRING_TYPE)
+		type = B_STRING_TYPE;
+	else if (type == B_TIME_TYPE)
+		type = (size == 4) ? B_INT32_TYPE : B_INT64_TYPE;
+
 	// Has the type already been converted?
 	if (type == fType)
 		return B_OK;
@@ -594,9 +600,6 @@ Equation<QueryPolicy>::ConvertValue(type_code type)
 	char* string = fString;
 
 	switch (type) {
-		case B_MIME_STRING_TYPE:
-			type = B_STRING_TYPE;
-			// supposed to fall through
 		case B_STRING_TYPE:
 			strncpy(fValue.String, string, QueryPolicy::kMaxFileNameLength);
 			fValue.String[QueryPolicy::kMaxFileNameLength - 1] = '\0';
@@ -610,9 +613,6 @@ Equation<QueryPolicy>::ConvertValue(type_code type)
 			fValue.Int32 = strtoul(string, &string, 0);
 			fSize = sizeof(uint32);
 			break;
-		case B_TIME_TYPE:
-			type = B_INT64_TYPE;
-			// supposed to fall through
 		case B_INT64_TYPE:
 			fValue.Int64 = strtoll(string, &string, 0);
 			fSize = sizeof(int64);
@@ -744,7 +744,7 @@ Equation<QueryPolicy>::Match(Entry* entry, Node* node,
 	}
 
 	// prepare own value for use, if it is possible to convert it
-	status_t status = ConvertValue(type);
+	status_t status = ConvertValue(type, size);
 	if (status == B_OK)
 		status = CompareTo(buffer, size) ? MATCH_OK : NO_MATCH;
 
@@ -821,7 +821,8 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 		type = QueryPolicy::IndexGetType(index);
 	}
 
-	if (ConvertValue(type) < B_OK)
+	int32 keySize = QueryPolicy::IndexGetKeySize(index);
+	if (ConvertValue(type, keySize) < B_OK)
 		return B_BAD_VALUE;
 
 	*iterator = QueryPolicy::IndexCreateIterator(index);
@@ -833,8 +834,6 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 			|| Term<QueryPolicy>::fOp == OP_GREATER_THAN_OR_EQUAL || fIsPattern)
 		&& fHasIndex) {
 		// set iterator to the exact position
-
-		int32 keySize = QueryPolicy::IndexGetKeySize(index);
 
 		// At this point, fIsPattern is only true if it's a string type, and fOp
 		// is either OP_EQUAL or OP_UNEQUAL
