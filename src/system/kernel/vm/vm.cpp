@@ -6241,7 +6241,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			ssize_t commitmentChange = 0;
 			for (addr_t pageAddress = area->Base() + offset;
 					pageAddress < currentAddress; pageAddress += B_PAGE_SIZE) {
-				if (topCache->LookupPage(pageAddress) != NULL) {
+				if (topCache->LookupPage(pageAddress - area->Base()) != NULL) {
 					// This page should already be accounted for in the commitment.
 					continue;
 				}
