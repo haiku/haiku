@@ -136,12 +136,14 @@ InstallPackageProcess::Progress()
 status_t
 InstallPackageProcess::RunInternal()
 {
+	PackageInfoRef ref(fPackage);
+	SetPackageState(ref, PENDING);
+
 	fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES
 		| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 		| BPackageManager::B_REFRESH_REPOSITORIES);
-	PackageInfoRef ref(fPackage);
+
 	PackageState state = PackageUtils::State(ref);
-	SetPackageState(ref, PENDING);
 
 	fPackageManager->SetCurrentActionPackage(ref, true);
 	fPackageManager->AddProgressListener(this);
