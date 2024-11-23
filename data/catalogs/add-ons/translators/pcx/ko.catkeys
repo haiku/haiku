@@ -1,6 +1,8 @@
-1	korean	x-vnd.Haiku-PCXTranslator	2307793683
+1	korean	x-vnd.Haiku-PCXTranslator	938242683
 PCX Settings	main		PCX 설정
 Version %d.%d.%d, %s	ConfigView		버젼 %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCX변환기 설정
+PCX image translator	PCXTranslator		PCX 이미지 변환기
 PCX %lu bit image	PCXTranslator		PCX %lu 비트 이미지
-PCX images	PCXTranslator		PCX 이미지들
+PCX images	PCXTranslator		PCX 이미지
+PCX image translator	ConfigView		PCX 이미지 변환기

@@ -37,7 +37,7 @@ Lines:	Statistics		행:
 Replace in all windows	FindandReplaceWindow		모든 창에서 바꾸기
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\"에 아직 저장하지 않은 변경사항이 있습니다.\n최근 저장된 버전으로 되돌리시겠습니까? 
 Save	SaveAlert		저장
-Default	Open_and_SaveAsPanel		기본
+Default	Open_and_SaveAsPanel		기본값
 Cancel	RevertToSavedAlert		취소
 Cancel	FindandReplaceWindow		취소
 Statistics…	Menus		통계..
@@ -46,7 +46,7 @@ Replace all	FindandReplaceWindow		모두 바꾸기
 Close	Menus		닫기
 Error loading \"%s\":\n\tUnsupported format	LoadAlert		 \"%s\"을(를) 불러오는 데 오류가 발생했습니다:\n\t지원하지 않는 형식입니다
 Left	Menus		왼쪽
-Default	Menus		기본
+Default	Menus		기본값
 OK	SaveAlert		확인
 Color	Menus		색상
 Save changes to the document \"%s\"? 	QuitAlert		 \"%s\" 문서의 변경사항을 저장하겠습니까? 

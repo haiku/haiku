@@ -1,0 +1,10 @@
+1	korean	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		입력 형식
+Channels:	CortexAudioAdapter		채널:
+stereo	CortexAudioAdapter		스테레오
+mono	CortexAudioAdapter		모노
+Output format	CortexAudioAdapter		출력 형식
+Audio input	CortexAddOnsCommon		오디오 입력
+Sample format:	CortexAudioAdapter		샘플 형식:
+Audio output	CortexAddOnsCommon		오디오 출력
+%groupname% parameters	CortexAddOnsCommon		%groupname% 매개변수

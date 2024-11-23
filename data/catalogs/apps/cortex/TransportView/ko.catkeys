@@ -1,0 +1,17 @@
+1	korean	application/x-vnd.Cortex.TransportView	1363437839
+(none)	TransportView		(없음)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# 노드} other{# 노드}}
+Start	TransportView		시작
+No errors.	TransportView		오류 없음.
+Offline	TransportView		오프라인
+(???)	TransportView		(???)
+Stop	TransportView		정지
+(no group)	TransportView		(그룹 없음)
+Drop data	TransportView		데이터 드롭
+Recording	TransportView		기록
+Increase latency	TransportView		레이턴시 증가
+Time source:	TransportView		시간 원천:
+DAC time source	TransportView		DAC 시간 원천
+Decrease precision	TransportView		정확도 감소
+System clock	TransportView		시스템 시계
+Run mode:	TransportView		작동 모드:

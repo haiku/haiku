@@ -1,0 +1,8 @@
+1	korean	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		테마
+Start control panel	ParameterWindow		제어판 시작
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% 매개변수
+OK	ParameterWindow		확인
+Window	ParameterWindow		창
+Could not start control panel (%error%)	ParameterWindow		제어판을 시작할 수 없습니다 (%error%)
+Close	ParameterWindow		닫기

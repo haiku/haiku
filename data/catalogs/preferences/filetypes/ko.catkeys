@@ -99,7 +99,7 @@ FileTypes request	Preferred App Menu		파일 형식이 요구됨
 no icon	FileTypes Window		아이콘 없음
 Single launch	Application Type Window		단일 실행
 %s file type	FileType Window		%s 파일 형식
-Default	Attribute ListView		기본
+Default	Attribute ListView		기본값
 Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		상위 형식의 제거는 되돌릴수 없습니다.\n상위 형식에 속한 모든 파일 형식을 잃어버리게 될것입니다!\n\n당신은 정말로 이 작업을 하시겠습니까? 모든 그룹을 제거하려면, Shift키를 길게 누르고 \"제거\"를 누르십시오.
 String	Attribute ListView		문자열
 Add type	New File Type Window		형식 추가

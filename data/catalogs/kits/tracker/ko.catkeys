@@ -499,7 +499,7 @@ Add-ons	DeskWindow		추가기능
 Add new submenu…	TemplatesMenu		새 하위메뉴 추가…
 Find	FindPanel		찾기
 Empty folder	NavMenu		빈 폴더
-Defaults	TrackerSettingsWindow		기본
+Defaults	TrackerSettingsWindow		기본값
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		선택 항목을 복사할 목적지 볼륨의 여유 공간이 부족합니다.
 True-color picture	AttributesView		트루컬러 그림
 Add-ons	FilePanelPriv		추가기능

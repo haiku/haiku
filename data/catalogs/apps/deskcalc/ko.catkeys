@@ -39,7 +39,7 @@ exp	CalcView		exp
 atan	CalcView		atan
 9	CalcView		9
 .	CalcView		.
-DeskCalc	System name		DeskCalc
+DeskCalc	System name		계산기
 Degrees	CalcView		Degrees
 7	CalcView		7
 !	CalcView		!

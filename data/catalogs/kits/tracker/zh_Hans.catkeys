@@ -116,7 +116,7 @@ Edit templates…	TemplatesMenu		编辑模版...
 8-bit unsigned integer	AttributesView		8位无符号整数
 %s info	InfoWindow	window title	%s 详情
 %capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
-Hide dotfiles	SettingsView		隐藏 dotfiles
+Hide dotfiles	SettingsView		隐藏 .开头文件
 Trash	Model		垃圾箱
 Enable type-ahead filtering	SettingsView		启用输入提示过滤
 copy	FSUtils	filename copy	复制

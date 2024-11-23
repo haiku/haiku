@@ -1,12 +1,14 @@
-1	korean	x-vnd.Haiku-ICOTranslator	3663236908
+1	korean	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		커서
 Version %d.%d.%d, %s	ConfigView		버젼 %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		윈도우즈 %s %ld 비트 이미지
-Valid icon sizes are 16, 32, or 48	ConfigView		사용 가능한 아이콘 크기는 16,32나 48임
+Valid icon sizes are 16, 32, or 48	ConfigView		사용 가능한 아이콘 크기는 16,32나 48
 Windows icons	ICOTranslator		Windows 아이콘
 Enforce valid icon sizes	ConfigView		올바른 아이콘 크기만 사용
 ICO Settings	main		ICO 설정
 Windows icon translator	ICOTranslator		Windows 아이콘 변환기
+pixels in either direction.	ConfigView		픽셀의 정방형 입니다.
+Write 32 bit images on true color input	ConfigView		트루컬러 입력을 32비트 이미지로 기록
 Icon	ICOTranslator		아이콘
 ICOTranslator Settings	ConfigView		ICO 변환기 설정
 Windows icon translator	ConfigView		Windows 아이콘 변환기

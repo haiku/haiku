@@ -14,7 +14,7 @@ Current Swap:	SettingsWindow		현재 스왑:
 Load defaults	SettingsWindow		기본값 불러오기
 Use boot volume	SettingsWindow		부트 볼륨 사용
 Automatic swap management	SettingsWindow		자동 스왑 관리
-Defaults	SettingsWindow		기본설정
+Defaults	SettingsWindow		기본값
 Quit	SettingsWindow		종료
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		가상메모리를 해제할 경우 메모리가 부족할 때 원하지 않은 시스템 불안정성을 가져올 수 있습니다.\n메모리가 부족하게 될 때 까지는 가상메모리가 시스템 성능에 영향을 미치지 않습니다.\n\n그럼에도 정말로 해제 하시겠습니까?
 Enable virtual memory	SettingsWindow		가상 메모리 사용

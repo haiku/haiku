@@ -14,7 +14,7 @@ Filled polygons	TeapotWindow		폴리곤 채우기
 Lower left	TeapotWindow		왼쪽 아래
 Fog	TeapotWindow		안개
 FPS display	TeapotWindow		FPS 표시
-GLTeapot	System name		GL찻주전자
+GLTeapot	System name		GLTeapot
 Limit FPS to refresh rate	TeapotWindow		FPS를 재생 빈도로 제한
 Settings	TeapotWindow		설정
 Gouraud shading	TeapotWindow		구로 셰이딩

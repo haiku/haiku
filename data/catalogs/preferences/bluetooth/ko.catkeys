@@ -1,7 +1,7 @@
 1	korean	x-vnd.Haiku-BluetoothPrefs	3945807779
 Start bluetooth services…	Window		블루투스 서비스 시작…
 From all devices	Settings view		모든 장치에서
-Defaults	Window		기본설정
+Defaults	Window		기본값
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		원격 장치의 블루투스 기능이 활성화 되어있는지 확인이 필요합니다. '조회'를 누르면 탐색을 시작합니다. 이름을 검색하는데 시간이 얼마나 걸릴 지는 확실히진 않지만, 장치마다 3초 이상 걸리지는 않을 것입니다. 이후 해당 장치를 페어링 할 수 있도록 기본 목록에 추가가 가능해질 것입니다.
 Laptop	Settings view		랩탑
 Scanning progress	Inquiry panel		탐색 중

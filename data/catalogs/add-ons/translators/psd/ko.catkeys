@@ -1,0 +1,22 @@
+1	korean	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
+Uncompressed	PSDConfig		비압축
+Indexed	PSDLoader		인덱싱 됨
+Grayscale	PSDLoader		회색조
+Photoshop image translator	PSDConfig		포토샵 이미지 변환기
+Photoshop image translator	PSDTranslator		포토샵 이미지 변환기
+Version %d.%d.%d, %s	PSDConfig		버전 %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		포토샵 문서 (PSD 파일)
+Photoshop image	PSDTranslator		포토샵 이미지
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		대용량 포토샵 문서 (PSB 파일)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		포토샵 이미지 (%s)
+PSDTranslator Settings	PSDConfig		PSD 변환기 설정
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		비트맵
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		압축: 
+Format: 	PSDConfig		형식: 
+Multichannel	PSDLoader		다중 채널
+Duotone	PSDLoader		2색조

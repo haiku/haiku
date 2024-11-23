@@ -1,7 +1,11 @@
-1	korean	x-vnd.Haiku-RTFTranslator	3736645044
-Version %d.%d.%d, %s	ConfigView		버젼 %d.%d.%d, %s
+1	korean	x-vnd.Haiku-RTFTranslator	334451110
+Version %d.%d.%d, %s	ConfigView		버전 %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF 텍스트 파일
-RTF-Translator Settings	ConfigView		RTF-변환기 설정
+RTF-Translator Settings	ConfigView		RTF 변환기 설정
+Rich Text Format (RTF) translator	ConfigView		리치 텍스트 형식 (RTF) 변환기
 RTF Settings	main		RTF 설정
-RichTextFormat file	RTFTranslator		리치텍스트형식 파일
+RichTextFormat file	RTFTranslator		리치 텍스트 형식 파일
+Be style text file	RTFTranslator		Be 스타일 텍스트 파일
+Plain text file	RTFTranslator		일반 텍스트 파일
+Rich Text Format translator	RTFTranslator		리치 텍스트 형식 변환기
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		리치 텍스트 형식 변환기 v%d.%d.%d %s

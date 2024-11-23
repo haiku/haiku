@@ -1,4 +1,4 @@
-1	korean	application/x-vnd.Cortex.InfoView	562724120
+1	korean	application/x-vnd.Cortex.InfoView	3788145961
 Offset	InfoView		오프셋
 Description	DormantNodeInfoView		설명
 Byte order	InfoView		바이트 순서
@@ -7,3 +7,51 @@ Output formats	DormantNodeInfoView		출력 형식
 History	InfoView		이력
 Input formats	DormantNodeInfoView		입력 형식
 Signature	AppNodeInfoView		서명
+Video data between	InfoView		다음 사이의 비디오 데이터
+Any number	DormantNodeInfoView	For 'Max. instances' field	제한 없음
+Flags	InfoView		플래그
+Media output	InfoView		미디어 출력
+Active lines	InfoView		활성 라인
+Buffer size	InfoView		버퍼 크기
+\n- Quality:	FileNodeInfoView		\n- 품질:
+Kinds	LiveNodeInfoView		종류
+Application	AppNodeInfoView		응용 프로그램
+Max. instances	DormantNodeInfoView		최대 인스턴스
+\n- Duration:	FileNodeInfoView		\n- 기간:
+Dormant media node	DormantNodeInfoView		유휴 미디어 노드
+Latency	LiveNodeInfoView		레이턴시
+Media type	InfoView		미디어 형식
+Live media node	LiveNodeInfoView		실시간 미디어 노드
+Field rate	InfoView		필드 비율
+Kinds	DormantNodeInfoView		종류
+%title% info	InfoView		%title% 정보
+Node ID	LiveNodeInfoView		노드 ID
+Resolution	InfoView		해상도
+Chunk size	InfoView		덩어리 크기
+File format	AppNodeInfoView		파일 형식
+Matrix mask	InfoView		매트릭스 마스크
+Channel mask	InfoView		채널 마스크
+Orientation	InfoView		방향
+Live file-interface node	FileNodeInfoView		실시간 파일 인터페이스 노드
+Channels	InfoView		채널
+Sample rate	InfoView		샘플링 비율
+File format	FileNodeInfoView		파일 형식
+(no file)	FileNodeInfoView		(파일 없음)
+Media input	InfoView		미디어 입력
+Bit rate	InfoView		비트레이트
+Input format	DormantNodeInfoView		입력 형식
+Format	InfoView		형식
+Version	AppNodeInfoView		버전
+AddOn ID	DormantNodeInfoView		애드온 ID
+Frame size	InfoView		프레임 크기
+Run mode	LiveNodeInfoView		실행 모드
+\n- Codec:	FileNodeInfoView		\n- 코덱:
+Port	LiveNodeInfoView		포트
+Output format	DormantNodeInfoView		출력 형식
+Aspect ratio	InfoView		화면비율
+Application-owned node	AppNodeInfoView		응용 프로그램 노드
+Tracks	FileNodeInfoView		트랙
+Source	InfoView		원본
+Destination	InfoView		목적지
+Copyright	FileNodeInfoView		저작권
+ID:	FileNodeInfoView		ID:

@@ -14,7 +14,7 @@ None available	Audio codecs		无可用
 The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		该文件有多个音频或视频轨道，但只有第一个会被转换。
 No file selected	MediaConverter-FileInfo		无选中文件
 High	MediaConverter		高
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{该文件未被识别为受支持的媒体文件:} other{# 文件未被识别为受支持的媒体文件:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{该文件未被识别为受支持的媒体文件:} other{# 个文件未被识别为受支持的媒体文件:}}
 File Error	MediaConverter-FileInfo		文件错误
 None available	Video codecs		无可用
 Output format	MediaConverter		输出格式
@@ -62,7 +62,7 @@ Error writing audio frame %lld	MediaConverter		写入音频帧错误 %lld
 File format:	MediaConverter		文件格式：
 File	Menu		文件
 Video quality not supported	MediaConverter		视频质量不支持
-Select this folder	MediaConverter		选中该文件件
+Select this folder	MediaConverter		选中该目录
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld 通道
 Understood	MediaConverter		明了
 %u × %u, %.2ffps	MediaFileInfo	Width × Height, fps;The '×' is the Unicode multiplication sign U+00D7	%u × %u, %.2ffps

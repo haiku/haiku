@@ -1,4 +1,4 @@
-1	korean	x-vnd.mmu.AutoRaise	3979250029
+1	korean	x-vnd.mmu.AutoRaise	3527604525
 AutoRaise, (c) 2002, mmu_man\nEnjoy :-)	AutoRaiseIcon		AutoRaise, (c) 2002, mmu_man\nEnjoy :-)
 2 s	AutoRaiseIcon		2초
 OK	AutoRaiseIcon		확인
@@ -10,6 +10,16 @@ Delay	AutoRaiseIcon		지연
 Active	AutoRaiseIcon		활성
 0.1 s	AutoRaiseIcon		0.1초
 Default (all windows)	AutoRaiseIcon		기본값(전체 창)
+Instant warping (ffm)	AutoRaiseIcon		바로 마우스 포인터 이동 (마우스 따라 포커싱)
 About AutoRaise…	AutoRaiseIcon		AutoRaise에 대하여…
 Normal	AutoRaiseIcon		일반
 0.5 s	AutoRaiseIcon		0.5초
+Deskbar only (touch)	AutoRaiseIcon		데스크바만 적용 (보이는 영역)
+4 s	AutoRaiseIcon		4초
+Focus follows mouse	AutoRaiseIcon		마우스를 따라 포커싱
+Deskbar only (over its area)	AutoRaiseIcon		데스크바만 적용 (전체 영역)
+Inactive behaviour	AutoRaiseIcon		비활성시 동작
+Mode	AutoRaiseIcon		모드
+Warping (ffm)	AutoRaiseIcon		마우스 포인터 이동 (마우스 따라 포커싱)
+Remove from tray	AutoRaiseIcon		트레이에서 지우기
+3 s	AutoRaiseIcon		3초

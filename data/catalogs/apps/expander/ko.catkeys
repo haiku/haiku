@@ -1,24 +1,52 @@
-1	korean	x-vnd.Haiku-Expander	2407744200
-Expander: Choose destination	DirectoryFilePanel		Expander:  대상 선택
-Close window when done expanding	ExpanderPreferences		압출이 다 풀렸을 때 창 닫기
+1	korean	x-vnd.Haiku-Expander	3239308358
+Destination	ExpanderWindow		목적지
+Other	ExpanderPreferences		기타
+Automatically show contents listing	ExpanderPreferences		자동으로 내용 목록 보여주기
+Expander	System name		Expander
+Expander: Choose destination	DirectoryFilePanel		Expander: 목적지를 선택하십시오
+Set source…	ExpanderMenu		원본 설정…
+OK	ExpanderWindow		확인
+The destination is not a folder.	ExpanderWindow		목적지가 폴더가 아닙니다.
+The folder was either moved, renamed or not supported.	ExpanderWindow		폴더가 이동되었거나 이름이 변경되었거나 또는 지원되지 않습니다.
+Close window when done expanding	ExpanderPreferences		압축을 푼 후 창을 닫습니다
+Close	ExpanderMenu		닫기
+Create	ExpanderWindow		생성
+Creating listing for '%s'…	ExpanderWindow		'%s'의 목록 생성 중…
+Show contents	ExpanderMenu		내용 보여주기
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		정말 압축 해제를 중단 하시겠습니까? 풀려진 파일이 완전하지 않을 수 있습니다.
 Settings	ExpanderMenu		설정
 Expand	ExpanderWindow		압축풀기
-Same directory as source (archive) file	ExpanderPreferences		소스(압축) 파일과 같은 디렉토리
+Open destination folder after extraction	ExpanderPreferences		압축을 푼 후 목적지 폴더를 엽니다
+Same directory as source (archive) file	ExpanderPreferences		원본(압축) 파일과 같은 디렉터리
+Stop	ExpanderWindow		정지
 Cancel	ExpanderWindow		취소
-Expander settings	ExpanderPreferences		압축풀기 설정
-Error when expanding archive	ExpanderWindow		압축파일 압축 풀때 에러 발생
+Expander settings	ExpanderPreferences		Expander 설정
+Error when expanding archive	ExpanderWindow		압축을 푸는 중 오류가 발생했습니다
 Expand	ExpanderMenu		압축풀기
+Failed to create the destination folder.	ExpanderWindow		목적지 폴더를 생성할 수 없습니다.
 Settings…	ExpanderMenu		설정…
 Select current	DirectoryFilePanel		현재 폴더 선택
-File expanded	ExpanderWindow		파일 압축이 풀림
-Automatically expand files	ExpanderPreferences		자옫으로 파일 압축 풀기
+Expanding '%s'…	ExpanderWindow		'%s' 압축 푸는 중…
+OK	ExpanderPreferences		확인
+File expanded	ExpanderWindow		압축풀기가 완료되었습니다
+Automatically expand files	ExpanderPreferences		자동으로 압축 풀기
 Select	DirectoryFilePanel		선택
+Show contents	ExpanderWindow		내용 보여주기
+Stop	ExpanderMenu		정지
+Select '%s'…	DirectoryFilePanel		'%s' 선택…
+Expansion	ExpanderPreferences		확장
 Set destination…	ExpanderMenu		압축 풀 위치 지정…
 Continue	ExpanderWindow		계속
+ is not supported	ExpanderWindow		 은(는) 지원되지 않습니다
 Cancel	ExpanderPreferences		취소
 Use:	ExpanderPreferences		사용:
-Expander: Open	ExpanderWindow		압축풀기: 열기
+Destination folder	ExpanderPreferences		목적지 폴더
+Expander: Open	ExpanderWindow		Expander: 열기
+Leave destination folder path empty	ExpanderPreferences		목적지 폴더 경로를 비워둡니다
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		목적지 폴더가 존재하지 않습니다. 새로 생성하시겠습니까?
+The file doesn't exist	ExpanderWindow		파일이 존재하지 않습니다
 Hide contents	ExpanderWindow		내용 숨기기
 Source	ExpanderWindow		원본
-The destination is read only.	ExpanderWindow		대상은 읽기 전용입니다.
+The destination is read only.	ExpanderWindow		목적지가 읽기 전용입니다.
 Select	ExpanderPreferences		선택
+File	ExpanderMenu		파일
