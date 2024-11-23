@@ -1648,7 +1648,7 @@ ramfs_close_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Volume* volume = (Volume*)_volume->private_volume;
 	Node* node = (Node*)_node->private_node;
 
-	VolumeReadLocker locker(volume);
+	VolumeWriteLocker locker(volume);
 	if (!locker.IsLocked())
 		RETURN_ERROR(B_ERROR);
 
