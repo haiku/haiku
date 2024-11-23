@@ -167,6 +167,8 @@ public:
 	bool IteratorLock();
 	void IteratorUnlock();
 
+	recursive_lock&	AttributeIteratorLocker() { return fAttributeIteratorLocker; }
+
 protected:
 	fs_volume*				fVolume;
 
@@ -186,6 +188,7 @@ private:
 	EntryListenerList		fAnyEntryListeners;
 
 	recursive_lock			fIteratorLocker;
+	recursive_lock			fAttributeIteratorLocker;
 
 	recursive_lock			fQueryLocker;
 	QueryList				fQueries;

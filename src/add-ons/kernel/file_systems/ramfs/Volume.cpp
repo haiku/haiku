@@ -141,6 +141,7 @@ Volume::Volume(fs_volume* volume)
 {
 	rw_lock_init(&fLocker, "ramfs volume");
 	recursive_lock_init(&fIteratorLocker, "ramfs iterators");
+	recursive_lock_init(&fAttributeIteratorLocker, "ramfs attribute iterators");
 	recursive_lock_init(&fQueryLocker, "ramfs queries");
 }
 
@@ -149,6 +150,7 @@ Volume::~Volume()
 {
 	Unmount();
 
+	recursive_lock_destroy(&fAttributeIteratorLocker);
 	recursive_lock_destroy(&fIteratorLocker);
 	recursive_lock_destroy(&fQueryLocker);
 	rw_lock_destroy(&fLocker);
@@ -777,4 +779,3 @@ Volume::IteratorUnlock()
 {
 	recursive_lock_unlock(&fIteratorLocker);
 }
-
