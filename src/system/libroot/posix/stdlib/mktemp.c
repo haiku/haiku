@@ -46,7 +46,7 @@
 #include <errno_private.h>
 
 
-static int _gettemp(char *, int *, int, int);
+static int _gettemp(char *, int *, int, int, int);
 
 static const char padchar[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -55,7 +55,7 @@ int
 mkstemps(char *path, int slen)
 {
 	int fd;
-	return _gettemp(path, &fd, 0, slen) ? fd : -1;
+	return _gettemp(path, &fd, 0, slen, 0) ? fd : -1;
 }
 
 
@@ -63,7 +63,18 @@ int
 mkstemp(char *path)
 {
 	int fd;
-	if (_gettemp(path, &fd, 0, 0))
+	if (_gettemp(path, &fd, 0, 0, 0))
+		return fd;
+
+	return -1;
+}
+
+
+int
+mkostemp(char *path, int oflags)
+{
+	int fd;
+	if (_gettemp(path, &fd, 0, 0, oflags))
 		return fd;
 
 	return -1;
@@ -74,14 +85,14 @@ char *
 mkdtemp(path)
 	char *path;
 {
-	return (_gettemp(path, (int *)NULL, 1, 0) ? path : (char *)NULL);
+	return (_gettemp(path, (int *)NULL, 1, 0, 0) ? path : (char *)NULL);
 }
 
 
 char *
 mktemp(char *path)
 {
-	if (_gettemp(path, (int *)NULL, 0, 0))
+	if (_gettemp(path, (int *)NULL, 0, 0, 0))
 		return path;
 
 	return NULL;
@@ -89,7 +100,7 @@ mktemp(char *path)
 
 
 static int
-_gettemp(char *path, int *doopen, int domkdir, int slen)
+_gettemp(char *path, int *doopen, int domkdir, int slen, int oflags)
 {
 	char *start, *trv, *suffp;
 	char *pad;
@@ -149,7 +160,7 @@ _gettemp(char *path, int *doopen, int domkdir, int slen)
 
 	for (;;) {
 		if (doopen) {
-			if ((*doopen = open(path, O_CREAT|O_EXCL|O_RDWR, 0600)) >= 0)
+			if ((*doopen = open(path, O_CREAT | O_EXCL | O_RDWR | oflags, 0600)) >= 0)
 				return 1;
 			if (errno != EEXIST)
 				return 0;

@@ -68,6 +68,7 @@ extern int		system(const char *command);
 extern char		*mktemp(char *name);
 extern char		*mkdtemp(char *templat);
 extern int		mkstemp(char *templat);
+extern int		mkostemp(char *templat, int oflags);
 
 extern char		*ecvt(double value, int digits, int *_decimalPoint, int *_sign);
 extern char		*fcvt(double value, int precision, int *_decimalPoint,
