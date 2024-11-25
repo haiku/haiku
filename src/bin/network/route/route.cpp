@@ -431,6 +431,10 @@ main(int argc, char** argv)
 			i++;
 			break;
 		} else if (parse_address(familyIndex, argv[i], destination)) {
+			if (destination.IsEmpty()) {
+				defaultRoute = true;
+				route.flags = RTF_DEFAULT;
+			}
 			i++;
 			break;
 		}
