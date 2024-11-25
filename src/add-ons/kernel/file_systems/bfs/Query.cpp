@@ -122,13 +122,12 @@ struct Query::QueryPolicy {
 		index.Unset();
 	}
 
-	static int32 IndexGetWeightedScore(Index& index, int32 score)
+	static int32 IndexGetSize(Index& index)
 	{
-		// take index size into account (1024 is the current node size
-		// in our B+trees)
-		// 2048 * 2048 == 4194304 is the maximum score (for an empty
-		// tree, since the header + 1 node are already 2048 bytes)
-		return score * ((2048 * 1024LL) / index.Node()->Size());
+		off_t size = index.Node()->Size() / index.Node()->GetVolume()->BlockSize();
+		if (size > INT32_MAX)
+			return INT32_MAX;
+		return size;
 	}
 
 	static type_code IndexGetType(Index& index)

@@ -368,7 +368,8 @@ Equation<QueryPolicy>::Equation(const char** expr)
 	fAttribute(NULL),
 	fString(NULL),
 	fType(0),
-	fIsPattern(false)
+	fIsPattern(false),
+	fScore(INT32_MAX)
 {
 	const char* string = *expr;
 	const char* start = string;
@@ -760,34 +761,35 @@ Equation<QueryPolicy>::CalculateScore(Index &index)
 	// And the code could also need some real world testing :-)
 
 	// do we have to operate on a "foreign" index?
-	if (Term<QueryPolicy>::fOp == OP_UNEQUAL
-		|| QueryPolicy::IndexSetTo(index, fAttribute) < B_OK) {
-		fScore = 0;
+	if (QueryPolicy::IndexSetTo(index, fAttribute) < B_OK) {
+		fScore = INT32_MAX;
+		return;
+	}
+
+	fScore = QueryPolicy::IndexGetSize(index);
+
+	if (Term<QueryPolicy>::fOp == OP_UNEQUAL) {
+		// we'll need to scan the whole index
 		return;
 	}
 
 	// if we have a pattern, how much does it help our search?
 	if (fIsPattern) {
-		fScore = getFirstPatternSymbol(fString) << 3;
+		const int32 firstSymbolIndex = getFirstPatternSymbol(fString);
 
-		// Even if the first pattern symbol is at position 0,
-		// there's still an index, so don't let our score revert to zero.
-		if (fScore == 0)
-			fScore = 1;
+		// Guess how much of the index we will be able to skip.
+		const int32 divisor = (firstSymbolIndex > 3) ? 4 : (firstSymbolIndex + 1);
+		fScore /= divisor;
 	} else {
 		// Score by operator
 		if (Term<QueryPolicy>::fOp == OP_EQUAL) {
-			// higher than pattern="255 chars+*"
-			fScore = 2048;
+			// higher than most patterns
+			fScore /= (fSize > 8) ? 8 : fSize;
 		} else {
-			// the pattern search is regarded cheaper when you have at
-			// least one character to set your index to
-			fScore = 5;
+			// better than nothing, anyway
+			fScore /= 2;
 		}
 	}
-
-	// take index size into account
-	fScore = QueryPolicy::IndexGetWeightedScore(index, fScore);
 }
 
 
@@ -1035,7 +1037,7 @@ Operator<QueryPolicy>::Match(Entry* entry, Node* node, const char* attribute,
 		// choose the term with the better score for OP_OR
 		Term<QueryPolicy>* first;
 		Term<QueryPolicy>* second;
-		if (fRight->Score() > fLeft->Score()) {
+		if (fRight->Score() < fLeft->Score()) {
 			first = fLeft;
 			second = fRight;
 		} else {
@@ -1082,16 +1084,14 @@ Operator<QueryPolicy>::Score() const
 {
 	if (Term<QueryPolicy>::fOp == OP_AND) {
 		// return the one with the better score
-		if (fRight->Score() > fLeft->Score())
+		if (fRight->Score() < fLeft->Score())
 			return fRight->Score();
-
 		return fLeft->Score();
 	}
 
 	// for OP_OR, be honest, and return the one with the worse score
-	if (fRight->Score() < fLeft->Score())
+	if (fRight->Score() > fLeft->Score())
 		return fRight->Score();
-
 	return fLeft->Score();
 }
 
@@ -1496,13 +1496,13 @@ Query<QueryPolicy>::Rewind()
 			} else {
 				// For OP_AND, we can use the scoring system to decide which
 				// path to add
-				if (op->Right()->Score() > op->Left()->Score())
+				if (op->Right()->Score() < op->Left()->Score())
 					stack.Push(op->Right());
 				else
 					stack.Push(op->Left());
 			}
 		} else if (term->Op() == OP_EQUATION
-			|| fStack.Push((Equation<QueryPolicy>*)term) != B_OK)
+				|| fStack.Push((Equation<QueryPolicy>*)term) != B_OK)
 			QUERY_FATAL("Unknown term on stack or stack error\n");
 	}
 

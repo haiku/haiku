@@ -99,7 +99,7 @@ struct Query::QueryPolicy {
 	{
 	}
 
-	static int32 IndexGetWeightedScore(Index& index, int32 score)
+	static int32 IndexGetSize(Index& index)
 	{
 		return 0;
 	}
