@@ -4363,7 +4363,11 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 		addressSpace == VMAddressSpace::Kernel()
 			? VM_PRIORITY_SYSTEM : VM_PRIORITY_USER);
 
+#ifdef TRACE_FAULTS
+	const bool logFaults = true;
+#else
 	const bool logFaults = !isUser;
+#endif
 	while (true) {
 		context.addressSpaceLocker.Lock();
 
