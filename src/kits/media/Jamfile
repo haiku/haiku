@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src kits media ;
 
 AddResources libmedia.so : libmedia.rdef ;
 
-UsePrivateHeaders app media shared ;
+UsePrivateHeaders app media kernel shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
 UsePrivateHeaders [ FDirName interface ] ;
 
@@ -70,7 +70,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			request_data.cpp
 			SharedBufferList.cpp
 			TrackReader.cpp
-			TimedEventQueuePrivate.cpp
 			TimeSourceObject.cpp
 			TimeSourceObjectManager.cpp
 			SoundPlayNode.cpp
