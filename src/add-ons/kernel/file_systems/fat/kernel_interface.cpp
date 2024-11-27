@@ -791,7 +791,9 @@ dosfs_walk(fs_volume* volume, fs_vnode* dir, const char* name, ino_t* _id)
 	status_t status = B_FROM_POSIX_ERROR(
 		msdosfs_lookup_ino(bsdDir, NULL, bsdName.Data(), &dirClust, &dirOffset));
 	if (status != B_OK) {
-		entry_cache_add_missing(volume->id, fatDir->de_inode, bsdName.Data()->cn_nameptr);
+		// we don't add a 'missing' entry to the entry cache because it would persist after a file
+		// with this name is created, if the created entry is not in the same case as the entry
+		// cache entry
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 	}
 	// msdosfs_lookup_ino will return 0 for cluster number if looking up .. in a directory
