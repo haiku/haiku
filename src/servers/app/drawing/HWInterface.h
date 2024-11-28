@@ -35,13 +35,6 @@ class ServerBitmap;
 class UpdateQueue;
 
 
-enum {
-	HW_ACC_COPY_REGION					= 0x00000001,
-	HW_ACC_FILL_REGION					= 0x00000002,
-	HW_ACC_INVERT_REGION				= 0x00000004,
-};
-
-
 class HWInterfaceListener {
 public:
 								HWInterfaceListener();
@@ -116,20 +109,6 @@ public:
 
 	virtual status_t			GetAccelerantPath(BString& path);
 	virtual status_t			GetDriverPath(BString& path);
-
-	// query for available hardware accleration and perform it
-	// (Initialize() must have been called already)
-	virtual	uint32				AvailableHWAcceleration() const
-									{ return 0; }
-
-	virtual	void				CopyRegion(const clipping_rect* sortedRectList,
-									uint32 count, int32 xOffset, int32 yOffset)
-									{}
-	virtual	void				FillRegion(/*const*/ BRegion& region,
-									const rgb_color& color, bool autoSync) {}
-	virtual	void				InvertRegion(/*const*/ BRegion& region) {}
-
-	virtual	void				Sync() {}
 
 	// cursor handling (these do their own Read/Write locking)
 			ServerCursorReference Cursor() const;

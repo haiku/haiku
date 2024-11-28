@@ -180,8 +180,6 @@ DrawingEngine::DrawingEngine(HWInterface* interface)
 	:
 	fPainter(new Painter()),
 	fGraphicsCard(NULL),
-	fAvailableHWAccleration(0),
-	fSuspendSyncLevel(0),
 	fCopyToFront(true)
 {
 	SetHWInterface(interface);
@@ -249,7 +247,6 @@ DrawingEngine::FrameBufferChanged()
 {
 	if (!fGraphicsCard) {
 		fPainter->DetachFromBuffer();
-		fAvailableHWAccleration = 0;
 		return;
 	}
 
@@ -257,8 +254,6 @@ DrawingEngine::FrameBufferChanged()
 	// in the thread that changed the frame buffer...
 	if (LockExclusiveAccess()) {
 		fPainter->AttachToBuffer(fGraphicsCard->DrawingBuffer());
-		// available HW acceleration might have changed
-		fAvailableHWAccleration = fGraphicsCard->AvailableHWAcceleration();
 		UnlockExclusiveAccess();
 	}
 }
@@ -401,29 +396,6 @@ DrawingEngine::SetTransform(const BAffineTransform& transform, int32 xOffset,
 	int32 yOffset)
 {
 	fPainter->SetTransform(transform, xOffset, yOffset);
-}
-
-
-// #pragma mark -
-
-
-void
-DrawingEngine::SuspendAutoSync()
-{
-	ASSERT_PARALLEL_LOCKED();
-
-	fSuspendSyncLevel++;
-}
-
-
-void
-DrawingEngine::Sync()
-{
-	ASSERT_PARALLEL_LOCKED();
-
-	fSuspendSyncLevel--;
-	if (fSuspendSyncLevel == 0)
-		fGraphicsCard->Sync();
 }
 
 
@@ -626,32 +598,12 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 	// to. If their "indegree" count reaches zero, put them onto the
 	// stack as well.
 
-	clipping_rect* sortedRectList = NULL;
-	int32 nextSortedIndex = 0;
-
-	if (fAvailableHWAccleration & HW_ACC_COPY_REGION) {
-		sortedRectList = new(std::nothrow) clipping_rect[count];
-		if (sortedRectList == NULL)
-			return;
-	}
-
 	while (!inDegreeZeroNodes.empty()) {
 		node* n = inDegreeZeroNodes.top();
 		inDegreeZeroNodes.pop();
 
-		// do the software implementation or add to sorted
-		// rect list for using the HW accelerated version
-		// later
-		if (sortedRectList) {
-			sortedRectList[nextSortedIndex].left	= (int32)n->rect.left;
-			sortedRectList[nextSortedIndex].top		= (int32)n->rect.top;
-			sortedRectList[nextSortedIndex].right	= (int32)n->rect.right;
-			sortedRectList[nextSortedIndex].bottom	= (int32)n->rect.bottom;
-			nextSortedIndex++;
-		} else {
-			BRect touched = CopyRect(n->rect, xOffset, yOffset);
-			fGraphicsCard->Invalidate(touched);
-		}
+		BRect touched = CopyRect(n->rect, xOffset, yOffset);
+		fGraphicsCard->Invalidate(touched);
 
 		for (int32 k = 0; k < n->next_pointer; k++) {
 			n->pointers[k]->in_degree--;
@@ -659,17 +611,6 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 				inDegreeZeroNodes.push(n->pointers[k]);
 		}
 	}
-
-	// trigger the HW accelerated version if it was available
-	if (sortedRectList) {
-		fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
-		if (fGraphicsCard->IsDoubleBuffered()) {
-			fGraphicsCard->Invalidate(
-				region->Frame().OffsetByCopy(xOffset, yOffset));
-		}
-	}
-
-	delete[] sortedRectList;
 }
 
 
@@ -684,14 +625,7 @@ DrawingEngine::InvertRect(BRect r)
 	if (!transaction.IsDirty())
 		return;
 
-	// try hardware optimized version first
-	if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
-		BRegion region(r);
-		region.IntersectWith(fPainter->ClippingRegion());
-		fGraphicsCard->InvertRegion(region);
-	} else {
-		fPainter->InvertRect(r);
-	}
+	fPainter->InvertRect(r);
 }
 
 
@@ -926,15 +860,7 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 	if (!transaction.IsDirty())
 		return;
 
-	// try hardware optimized version first
-	if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
-		BRegion region(r);
-		region.IntersectWith(fPainter->ClippingRegion());
-		fGraphicsCard->FillRegion(region, color,
-			fSuspendSyncLevel == 0 || transaction.WasOverlaysHidden());
-	} else {
-		fPainter->FillRect(r, color);
-	}
+	fPainter->FillRect(r, color);
 }
 
 
@@ -962,16 +888,9 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 
 	DrawTransaction transaction(this, r);
 
-	// try hardware optimized version first
-	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
-		&& frame.Width() * frame.Height() > 100) {
-		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
-			|| transaction.WasOverlaysHidden());
-	} else {
-		int32 count = r.CountRects();
-		for (int32 i = 0; i < count; i++)
-			fPainter->FillRectNoClipping(r.RectAtInt(i), color);
-	}
+	int32 count = r.CountRects();
+	for (int32 i = 0; i < count; i++)
+		fPainter->FillRectNoClipping(r.RectAtInt(i), color);
 }
 
 
@@ -1008,45 +927,6 @@ DrawingEngine::FillRect(BRect r)
 	if (!transaction.IsDirty())
 		return;
 
-	if (fPainter->IsIdentityTransform()) {
-		// TODO the accelerated code path may also be used for transforms that
-		// only scale and translate (but don't shear or rotate).
-
-		if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
-			// try hardware optimized version first
-			// if the rect is large enough
-			if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-				if (fPainter->Pattern() == B_SOLID_HIGH
-					&& (fPainter->DrawingMode() == B_OP_COPY
-						|| fPainter->DrawingMode() == B_OP_OVER)) {
-					BRegion region(r);
-					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, fPainter->HighColor(),
-						fSuspendSyncLevel == 0
-							|| transaction.WasOverlaysHidden());
-					return;
-				} else if (fPainter->Pattern() == B_SOLID_LOW
-						&& fPainter->DrawingMode() == B_OP_COPY) {
-					BRegion region(r);
-					region.IntersectWith(fPainter->ClippingRegion());
-					fGraphicsCard->FillRegion(region, fPainter->LowColor(),
-						fSuspendSyncLevel == 0
-							|| transaction.WasOverlaysHidden());
-					return;
-				}
-			}
-		}
-
-		if ((fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
-			&& fPainter->Pattern() == B_SOLID_HIGH
-			&& fPainter->DrawingMode() == B_OP_INVERT) {
-			BRegion region(r);
-			region.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->InvertRegion(region);
-			return;
-		}
-	}
-
 	fPainter->FillRect(r);
 }
 
@@ -1076,34 +956,6 @@ DrawingEngine::FillRegion(BRegion& r)
 	DrawTransaction transaction(this, clipped);
 	if (!transaction.IsDirty())
 		return;
-
-	if (fPainter->IsIdentityTransform()) {
-		// try hardware optimized version first
-		if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0) {
-			if (fPainter->Pattern() == B_SOLID_HIGH
-				&& (fPainter->DrawingMode() == B_OP_COPY
-					|| fPainter->DrawingMode() == B_OP_OVER)) {
-				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, fPainter->HighColor(),
-					fSuspendSyncLevel == 0 || transaction.WasOverlaysHidden());
-				return;
-			} else if (fPainter->Pattern() == B_SOLID_LOW
-				&& fPainter->DrawingMode() == B_OP_COPY) {
-				r.IntersectWith(fPainter->ClippingRegion());
-				fGraphicsCard->FillRegion(r, fPainter->LowColor(),
-					fSuspendSyncLevel == 0 || transaction.WasOverlaysHidden());
-				return;
-			}
-		}
-
-		if ((fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
-			&& fPainter->Pattern() == B_SOLID_HIGH
-			&& fPainter->DrawingMode() == B_OP_INVERT) {
-			r.IntersectWith(fPainter->ClippingRegion());
-			fGraphicsCard->InvertRegion(r);
-			return;
-		}
-	}
 
 	int32 count = r.CountRects();
 	for (int32 i = 0; i < count; i++)
