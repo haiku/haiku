@@ -142,7 +142,6 @@ public:
 			RenderingBuffer*	DrawingBuffer() const;
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
-			void				SetAsyncDoubleBuffered(bool doubleBuffered);
 	virtual	bool				IsDoubleBuffered() const = 0;
 
 	// Invalidate is used for scheduling an area for updating
@@ -249,9 +248,6 @@ protected:
 			int					fVGADevice;
 
 private:
-			ObjectDeleter<UpdateQueue>
-								fUpdateExecutor;
-
 			BList				fListeners;
 };
 

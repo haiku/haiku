@@ -25,7 +25,6 @@ StaticLibrary libasdrawing.a :
 	drawing_support.cpp
 	DrawingEngine.cpp
 	MallocBuffer.cpp
-	UpdateQueue.cpp
 	PatternHandler.cpp
 	Overlay.cpp
 
