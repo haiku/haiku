@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	55353010
+1	english	x-vnd.haiku-icon_o_matic	2174914786
 None	Icon-O-Matic-Properties		无
 Clean up path	Icon-O-Matic-CleanUpPathCmd		清理路径
 16 × 16	Icon-O-Matic-Menu-Settings	The '×' is the Unicode multiplication sign U+00D7	16 × 16
@@ -29,6 +29,7 @@ BEOS:ICON attribute	Icon-O-Matic-SavePanel		BEOS:ICON 属性
 Transform	Icon-O-Matic-PathManipulator		转换
 Add shape with style	Icon-O-Matic-Menu-Shape		添加模型（包含样式）
 Change color	Icon-O-Matic-SetColorCmd		改变颜色
+Remove {0, plural, one{vertex} other{vertices}}	Icon-O-Matic-RemovePointsCmd		Remove {0, plural, one{个顶点} other{个顶点}}
 Unassign path	Icon-O-Matic-UnassignPathCmd		取消路径分配
 Remove	Icon-O-Matic-StylesList		删除
 Cancel	Icon-O-Matic-Menu-Settings		取消

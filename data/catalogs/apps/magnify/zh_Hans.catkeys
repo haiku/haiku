@@ -10,8 +10,8 @@ Decrease window size	Magnify-Main		缩小窗口尺寸
 Remove a crosshair	Magnify-Main		删除十字光标
 Add a crosshair	Magnify-Main		添加十字光标
 Freeze image	Magnify-Main		冻结图像
-%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}
-usage: magnify [size] (magnify size * size pixels)	Console		使用: magnify [size] (magnify size * size pixels)
+%width × %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main	The '×' is the Unicode multiplication sign U+00D7	%width × %height  @ {0, plural, one{# 像素/像素} other{# 像素/像素}}
+usage: magnify [size] (magnify size * size pixels)	Console		使用: magnify [size] (放大 size*size 像素)
 Increase window size	Magnify-Main		放大窗口尺寸
 Save image	Magnify-Main		保存图像
 Show grid	Magnify-Main		显示网格
