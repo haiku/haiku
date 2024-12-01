@@ -417,10 +417,9 @@ setup_queue(void* cookie, uint16 queue, phys_addr_t phy, phys_addr_t phyAvail,
 {
 	CALLED();
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
-	if (queue >= bus->queue_count)
-		return B_BAD_VALUE;
-
 	if (bus->virtio1) {
+		if (queue >= bus->queue_count)
+			return B_BAD_VALUE;
 		volatile uint16* queueSelect = (uint16*)(bus->commonCfgAddr
 			+ offsetof(struct virtio_pci_common_cfg, queue_select));
 		*queueSelect = queue;
@@ -603,6 +602,7 @@ init_bus(device_node* node, void** bus_cookie)
 	if (bus == NULL) {
 		return B_NO_MEMORY;
 	}
+	memset(bus, 0, sizeof(virtio_pci_sim_info));
 
 	pci_device_module_info* pci;
 	pci_device* device;
@@ -694,7 +694,8 @@ init_bus(device_node* node, void** bus_cookie)
 
 		volatile uint16 *queueCount = (uint16*)(bus->commonCfgAddr
 			+ offsetof(struct virtio_pci_common_cfg, num_queues));
-		bus->notifyOffsets = new addr_t[*queueCount];
+		bus->queue_count = *queueCount;
+		bus->notifyOffsets = new addr_t[bus->queue_count];
 
 	} else {
 		// legacy interrupt
