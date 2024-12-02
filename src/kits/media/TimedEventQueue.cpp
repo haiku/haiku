@@ -138,9 +138,10 @@ class BPrivate::TimedEventQueueData {
 public:
 	TimedEventQueueData()
 		:
-		fLock("BTimedEventQueue"),
-		fEntryAllocationLock(MUTEX_INITIALIZER("BTimedEventQueue entry allocation"))
+		fLock("BTimedEventQueue")
 	{
+		mutex_init(&fEntryAllocationLock, "BTimedEventQueue entry allocation");
+
 		fEventCount = 0;
 		fCleanupHook = NULL;
 		fCleanupHookContext = NULL;
