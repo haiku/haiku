@@ -10,6 +10,7 @@
 #include <MediaDebug.h>
 #include <InterfaceDefs.h>
 #include <util/DoublyLinkedList.h>
+#include <locks.h>
 
 
 //	#pragma mark - media_timed_event
@@ -123,10 +124,14 @@ operator>(const media_timed_event& a, const media_timed_event& b)
 //	#pragma mark - BTimedEventQueue
 
 
+namespace {
+
 struct queue_entry : public DoublyLinkedListLinkImpl<queue_entry> {
 	media_timed_event	event;
 };
 typedef DoublyLinkedList<queue_entry> QueueEntryList;
+
+} // namespace
 
 
 class BPrivate::TimedEventQueueData {
@@ -134,7 +139,7 @@ public:
 	TimedEventQueueData()
 		:
 		fLock("BTimedEventQueue"),
-		fEntryAllocationLock("BTimedEventQueue entry allocation")
+		fEntryAllocationLock(MUTEX_INITIALIZER("BTimedEventQueue entry allocation"))
 	{
 		fEventCount = 0;
 		fCleanupHook = NULL;
@@ -151,7 +156,7 @@ public:
 
 	queue_entry* AllocateEntry()
 	{
-		BAutolock locker(fEntryAllocationLock);
+		MutexLocker locker(fEntryAllocationLock);
 		if (fFreeEntries.Head() != NULL)
 			return fFreeEntries.RemoveHead();
 
@@ -167,7 +172,7 @@ public:
 
 	void FreeEntry(queue_entry* entry)
 	{
-		BAutolock locker(fEntryAllocationLock);
+		MutexLocker locker(fEntryAllocationLock);
 		fFreeEntries.Add(entry);
 
 		// TODO: Chunks are currently only freed in the destructor.
@@ -187,7 +192,7 @@ public:
 	void* 				fCleanupHookContext;
 
 private:
-	BLocker				fEntryAllocationLock;
+	mutex				fEntryAllocationLock;
 	QueueEntryList		fFreeEntries;
 	QueueEntryList		fChunkHeads;
 	queue_entry			fInlineEntries[8];
@@ -206,6 +211,8 @@ BTimedEventQueue::BTimedEventQueue()
 BTimedEventQueue::~BTimedEventQueue()
 {
 	CALLED();
+
+	FlushEvents(0, B_ALWAYS);
 	delete fData;
 }
 
