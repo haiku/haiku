@@ -2504,6 +2504,28 @@ page_writer(void* /*unused*/)
 
 			cache->AcquireRefLocked();
 			numPages++;
+
+			// Write adjacent pages at the same time, if they're also modified.
+			if (cache->temporary)
+				continue;
+			while (page->cache_next != NULL && numPages < kNumPages) {
+				page = page->cache_next;
+				if (page->busy || page->State() != PAGE_STATE_MODIFIED)
+					break;
+				if (page->WiredCount() > 0)
+					break;
+
+				DEBUG_PAGE_ACCESS_START(page);
+				sModifiedPageQueue.RequeueUnlocked(page, true);
+				run.AddPage(page);
+				DEBUG_PAGE_ACCESS_END(page);
+
+				cache->AcquireStoreRef();
+				cache->AcquireRefLocked();
+				numPages++;
+				if (maxPagesToSee > 0)
+					maxPagesToSee--;
+			}
 		}
 
 #ifdef TRACE_VM_PAGE
