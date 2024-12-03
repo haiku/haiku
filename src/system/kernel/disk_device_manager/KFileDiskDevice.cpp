@@ -112,6 +112,8 @@ KFileDiskDevice::Unset()
 
 	free(fFilePath);
 	fFilePath = NULL;
+
+	KDiskDevice::Unset();
 }
 
 
