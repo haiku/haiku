@@ -8,13 +8,17 @@
 #ifndef _K_DISK_DEVICE_PARTITION_H
 #define _K_DISK_DEVICE_PARTITION_H
 
+
 #include <disk_device_manager.h>
 #include <Vector.h>
 
+
 struct user_partition_data;
+
 
 namespace BPrivate {
 namespace DiskDevice {
+
 
 class UserDataWriter;
 
@@ -24,6 +28,7 @@ class KPartitionListener;
 class KPartitionVisitor;
 class KPath;
 class KPhysicalPartition;
+
 
 //!	\brief Class representing a single partition.
 class KPartition {
@@ -235,9 +240,12 @@ protected:
 	static int32		sNextID;
 };
 
+
 } // namespace DiskDevice
 } // namespace BPrivate
 
+
 using BPrivate::DiskDevice::KPartition;
+
 
 #endif	// _K_DISK_DEVICE_PARTITION_H

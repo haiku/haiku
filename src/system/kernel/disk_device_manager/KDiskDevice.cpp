@@ -51,17 +51,14 @@ KDiskDevice::~KDiskDevice()
 status_t
 KDiskDevice::SetTo(const char* path)
 {
-	// check initialization and parameter
-	status_t error = InitCheck();
-	if (error != B_OK)
-		return error;
 	if (!path)
 		return B_BAD_VALUE;
 	Unset();
-	// set the path
-	error = set_string(fDeviceData.path, path);
+
+	status_t error = set_string(fDeviceData.path, path);
 	if (error != B_OK)
 		return error;
+
 	// open the device
 	fFD = open(path, O_RDONLY);
 	if (fFD < 0)
@@ -72,6 +69,7 @@ KDiskDevice::SetTo(const char* path)
 		return error;
 	if (fMediaStatus == B_DEV_MEDIA_CHANGED)
 		fMediaStatus = B_OK;
+
 	// get device geometry
 	if (fMediaStatus == B_OK) {
 		error = GetGeometry(&fDeviceData.geometry);
@@ -82,9 +80,7 @@ KDiskDevice::SetTo(const char* path)
 		_ResetGeometry();
 	}
 
-	// set device flags
 	_UpdateDeviceFlags();
-	// update partition data
 	_InitPartitionData();
 	return B_OK;
 }
@@ -105,13 +101,6 @@ KDiskDevice::Unset()
 		fDeviceData.path = NULL;
 	}
 	_ResetGeometry();
-}
-
-
-status_t
-KDiskDevice::InitCheck() const
-{
-	return B_OK;
 }
 
 
@@ -257,13 +246,6 @@ KDiskDevice::UpdateGeometry()
 }
 
 
-status_t
-KDiskDevice::SetPath(const char* path)
-{
-	return set_string(fDeviceData.path, path);
-}
-
-
 const char*
 KDiskDevice::Path() const
 {
@@ -288,13 +270,6 @@ KDiskDevice::GetPath(KPath* path) const
 	if (!fDeviceData.path)
 		return B_NO_INIT;
 	return path->SetPath(fDeviceData.path);
-}
-
-
-void
-KDiskDevice::SetFD(int fd)
-{
-	fFD = fd;
 }
 
 
