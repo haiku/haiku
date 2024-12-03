@@ -364,8 +364,12 @@ synchronous_io(io_request* request, DoIO& io)
 	off_t offset = request->Offset();
 	generic_size_t length = request->Length();
 
-	for (; length > 0
-			&& buffer->GetNextVirtualVec(virtualVecCookie, vector) == B_OK;) {
+	status_t status = B_OK;
+	while (length > 0) {
+		status = buffer->GetNextVirtualVec(virtualVecCookie, vector);
+		if (status != B_OK)
+			break;
+
 		void* vecBase = (void*)(addr_t)vector.iov_base;
 		size_t vecLength = min_c(vector.iov_len, length);
 
@@ -373,13 +377,9 @@ synchronous_io(io_request* request, DoIO& io)
 			find_thread(NULL), offset, vecBase, vecLength);
 
 		size_t transferred = vecLength;
-		status_t error = io.IO(offset, vecBase, &transferred);
-		if (error != B_OK) {
-			TRACE_RIO("[%ld]   I/O failed: %#lx\n", find_thread(NULL), error);
-			buffer->FreeVirtualVecCookie(virtualVecCookie);
-			request->SetStatusAndNotify(error);
-			return error;
-		}
+		status = io.IO(offset, vecBase, &transferred);
+		if (status != B_OK)
+			break;
 
 		offset += transferred;
 		length -= transferred;
@@ -388,12 +388,13 @@ synchronous_io(io_request* request, DoIO& io)
 			break;
 	}
 
-	TRACE_RIO("[%ld] synchronous_io() succeeded\n", find_thread(NULL));
+	TRACE_RIO("[%ld] synchronous_io() finished: %#lx\n",
+		find_thread(NULL), status);
 
 	buffer->FreeVirtualVecCookie(virtualVecCookie);
 	request->SetTransferredBytes(length > 0, request->Length() - length);
-	request->SetStatusAndNotify(B_OK);
-	return B_OK;
+	request->SetStatusAndNotify(status);
+	return status;
 }
 
 
