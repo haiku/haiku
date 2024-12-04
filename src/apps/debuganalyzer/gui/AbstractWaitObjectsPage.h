@@ -134,7 +134,7 @@ private:
 					if (object == 0)
 						return false;
 
-					char buffer[16];
+					char buffer[20];
 					snprintf(buffer, sizeof(buffer), "%#lx", object);
 					value.SetTo(buffer);
 					return true;
@@ -145,7 +145,7 @@ private:
 					if (object == 0)
 						return false;
 
-					char buffer[16];
+					char buffer[20];
 					snprintf(buffer, sizeof(buffer), "%#lx", object);
 					value.SetTo(buffer);
 					return true;
