@@ -4834,7 +4834,7 @@ static status_t
 vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 {
 	// is newSize a multiple of B_PAGE_SIZE?
-	if (newSize & (B_PAGE_SIZE - 1))
+	if ((newSize & (B_PAGE_SIZE - 1)) != 0)
 		return B_BAD_VALUE;
 
 	// lock all affected address spaces and the cache
@@ -6087,8 +6087,7 @@ _user_create_area(const char* userName, void** userAddress, uint32 addressSpec,
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	if (addressSpec == B_EXACT_ADDRESS
-		&& IS_KERNEL_ADDRESS(address))
+	if (addressSpec == B_EXACT_ADDRESS && IS_KERNEL_ADDRESS(address))
 		return B_BAD_VALUE;
 
 	if (addressSpec == B_ANY_ADDRESS)
