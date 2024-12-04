@@ -2224,7 +2224,7 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 		}
 
 		if (status != B_OK) {
-			if (leafName != NULL) {
+			if (leafName != NULL && !directoryFound) {
 				strlcpy(leafName, path, B_FILE_NAME_LENGTH);
 				_vnode.SetTo(vnode.Detach());
 			}
@@ -5413,16 +5413,16 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 				status = vnode_path_to_vnode(directory, clonedName, true,
 					kernel, vnode, NULL, clonedName);
 				if (status != B_OK) {
+					if (status != B_ENTRY_NOT_FOUND || !vnode.IsSet())
+						return status;
+
 					// vnode is not found, but maybe it has a parent and we can create it from
 					// there. In that case, vnode_path_to_vnode has set vnode to the latest
-					// directory found in the path
-					if (status == B_ENTRY_NOT_FOUND) {
-						directory = vnode.Detach();
-						dirPutter.SetTo(directory);
-						name = clonedName;
-						create = true;
-					} else
-						return status;
+					// directory found in the path.
+					directory = vnode.Detach();
+					dirPutter.SetTo(directory);
+					name = clonedName;
+					create = true;
 				}
 			}
 
