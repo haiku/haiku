@@ -2168,8 +2168,6 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 	status_t status = B_OK;
 	ino_t lastParentID = vnode->id;
 	while (true) {
-		char* nextPath;
-
 		TRACE(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path,
 			path));
 
@@ -2179,16 +2177,17 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 
 		// walk to find the next path component ("path" will point to a single
 		// path component), and filter out multiple slashes
-		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/';
-				nextPath++);
+		char* nextPath = path + 1;
+		while (*nextPath != '\0' && *nextPath != '/')
+			nextPath++;
 
 		bool directoryFound = false;
 		if (*nextPath == '/') {
 			directoryFound = true;
 			*nextPath = '\0';
-			do
+			do {
 				nextPath++;
-			while (*nextPath == '/');
+			} while (*nextPath == '/');
 		}
 
 		// See if the '..' is at a covering vnode move to the covered
@@ -2232,20 +2231,15 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 			return status;
 		}
 
-		// If the new node is a symbolic link, resolve it (if we've been told
-		// to do it)
-		if (S_ISLNK(nextVnode->Type())
-			&& (traverseLeafLink || directoryFound)) {
-			size_t bufferSize;
-			char* buffer;
-
+		// If the new node is a symbolic link, resolve it (if we've been told to)
+		if (S_ISLNK(nextVnode->Type()) && (traverseLeafLink || directoryFound)) {
 			TRACE(("traverse link\n"));
 
-			if (count + 1 > B_MAX_SYMLINKS)
+			if ((count + 1) > B_MAX_SYMLINKS)
 				return B_LINK_LIMIT;
 
-			bufferSize = B_PATH_NAME_LENGTH;
-			buffer = (char*)object_cache_alloc(sPathNameCache, 0);
+			size_t bufferSize = B_PATH_NAME_LENGTH;
+			char* buffer = (char*)object_cache_alloc(sPathNameCache, 0);
 			if (buffer == NULL)
 				return B_NO_MEMORY;
 
@@ -2303,8 +2297,9 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 					_vnode.SetTo(nextVnode.Detach());
 				return status;
 			}
-		} else
+		} else {
 			lastParentID = vnode->id;
+		}
 
 		// decrease the ref count on the old dir we just looked up into
 		vnode.Unset();
@@ -2318,7 +2313,7 @@ vnode_path_to_vnode(struct vnode* start, char* path, bool traverseLeafLink,
 	}
 
 	_vnode.SetTo(vnode.Detach());
-	if (_parentID)
+	if (_parentID != NULL)
 		*_parentID = lastParentID;
 
 	return B_OK;
@@ -5451,10 +5446,8 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 
 		status = FS_CALL(directory, create, name, openMode | O_EXCL, perms,
 			&cookie, &newID);
-		if (status != B_OK
-			&& ((openMode & O_EXCL) != 0 || status != B_FILE_EXISTS)) {
+		if (status != B_OK && ((openMode & O_EXCL) != 0 || status != B_FILE_EXISTS))
 			return status;
-		}
 	}
 
 	if (status != B_OK)
