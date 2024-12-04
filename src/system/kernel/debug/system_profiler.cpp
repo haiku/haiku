@@ -1290,6 +1290,11 @@ SystemProfiler::_WaitObjectUsed(addr_t object, uint32 type)
 		}
 
 		case THREAD_BLOCK_TYPE_OTHER_OBJECT:
+		{
+			name = "other object";
+			break;
+		}
+
 		case THREAD_BLOCK_TYPE_SNOOZE:
 		case THREAD_BLOCK_TYPE_SIGNAL:
 		default:
