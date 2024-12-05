@@ -1,0 +1,561 @@
+/*
+ * Copyright 2024 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina, cafeina@world
+ *
+ * Corresponds to:
+ *		headers/os/interface/Shelf.h	hrev58367
+ *		src/kits/interface/Shelf.cpp	hrev58367
+ */
+
+
+/*!
+	\file Shelf.h
+	\ingroup interface
+	\ingroup libbe
+	\brief BShelf class definition.
+*/
+
+
+/*!
+	\class BShelf
+	\ingroup interface
+	\ingroup libbe
+	\brief A container attached to a BView that accepts BDragger objects
+		(replicants).
+
+	A BShelf object creates a container where to store BDragger
+	objects, also known as "replicants". When the user drops a replicant
+	on the shelf, or a shelf is loaded from an archived message, it will
+	load and display it as a child object. Once created, it could
+	either save the replicant's data in a filesystem entry or in a
+	BDataIO data stream and retrieve the data from either source to display the
+	replicant.
+
+	During the construction, or afterwards with SetAllowsDragging(), it
+	can be configured to allow or disallow to accept the replicants
+	dropped by the user onto the shelf. This behavior can be queried by
+	calling the method AllowsDragging().
+
+	The \a shelfType parameter from the constructors allows the shelf to
+	have a filter-like system. This is reflected in the archived field
+	\c shelf_type. In this way, the shelf could reject any replicant
+	whose shelf type does not match shelf's type, or the other way around.
+	But the shelf accepts by default the replicants without a type (and
+	a shelf without a type could also accept any kind of replicants, as
+	long as they do not reject it). However, this behavior can be disabled
+	by using the type enforcement with SetTypeEnforced(), allowing the
+	shelf to reject any replicant strictly without the same type of the shelf.
+	The state of this behavior can be queried with IsTypeEnforced().
+
+	When a replicant was unable to be loaded, a "zombie view" could be
+	deployed instead. "Zombie views" are placeholder views that are deployed
+	in place of a replicant whose application of origin cannot be found.
+	This behavior can be modified to disable the generation of zombie views
+	with SetAllowsZombies(), or to hide them with SetDisplayZombies().
+	AllowsZombies() and DisplaysZombies() queries the state of any of those
+	behaviors.
+
+	This class supports the standard scripting protocol.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BShelf::BShelf(BView* view, bool allowDrags = true,
+		const char* shelfType = NULL)
+	\brief Creates a BShelf object that is attached to a view.
+
+	\param[in] view The container BView.
+	\param[in] allowDrags Specifies if the shelf accepts replicants dragged
+		to it by the user or not.
+	\param[in] shelfType Specifies a filter-like name for the object's
+		underlying BHandler. This can be used to reject BDragger objects
+		whose names does not match shelfType.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BShelf::BShelf(const entry_ref* ref, BView* view,
+		bool allowDrags = true,
+		const char* shelfType = NULL)
+	\brief Creates a BShelf object that is attached to a view, and sets
+		\a ref as the source from where to load the archived BDragger objects
+		and where to save them.
+
+	\param[in] ref The filesystem entry from where the archived BDragger objects
+		will be loaded during the initialization and saved.
+	\param[in] view The container BView.
+	\param[in] allowDrags Specifies if the shelf accepts replicants dragged
+		to it by the user or not.
+	\param[in] shelfType Specifies a filter-like name for the object's
+		underlying BHandler. This can be used to reject BDragger objects
+		whose names does not match shelfType.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BShelf::BShelf(BDataIO* stream, BView* view,
+		bool allowDrags = true,
+		const char* shelfType = NULL)
+	\brief Creates a BShelf object that is attached to a view, and sets
+		\a stream as the data stream source from where to load the archived
+		BDragger objects and where to save them.
+
+	\param[in] stream The data stream from where the archived BDragger objects
+		will be loaded during the initialization and saved.
+	\param[in] view The container BView.
+	\param[in] allowDrags Specifies if the shelf accepts replicants dragged
+		to it by the user or not.
+	\param[in] shelfType Specifies a filter-like name for the object's
+		underlying BHandler. This can be used to reject BDragger objects
+		whose names does not match shelfType.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BShelf::BShelf(BMessage* archive)
+	\brief Unimplemented.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn virtual BShelf::~BShelf()
+	\brief The destructor calls Save(), frees the data sources and replicant
+		data of the replicants and detaches itself from the container BView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BArchivable* BShelf::Instantiate(BMessage* archive)
+	\brief Unimplemented.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn	status_t BShelf::Archive(BMessage* archive, bool deep = true) const
+	\brief Unimplemented.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+/*!
+	\fn void BShelf::MessageReceived(BMessage* message)
+	\brief Handle \a message received by the associated looper.
+
+	\param message The \a message received by the associated looper.
+
+	\sa BHandler::MessageReceived()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::Save()
+	\brief Saves the BShelf contents as an archived BMessage into a filesystem
+		entry or BDataIO stream if any of them were specified with the
+		constructor.
+
+	In case there was not a data destination specified with the constructor, it
+	can be set with SetSaveLocation().
+
+	\return A status code.
+	\retval B_OK The operation was performed successfully.
+	\retval	B_ERROR The archiving operation failed, or there was not any
+		data destination specified.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BShelf::SetDirty(bool state)
+	\brief Sets the "dirty" state flag. This flag is used by the application and
+	is also automatically applied when the save location is changed.
+
+	\param state \c true to set it as "dirty", or \c false to remove the flag.
+
+	\sa IsDirty()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::IsDirty() const
+	\brief Retrieves the "dirty" flag status of the shelf.
+
+	\return \c true if the shelf is "dirty", or \c false otherwise.
+
+	\sa SetDirty(bool)
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::GetSupportedSuites(BMessage* data)
+	\brief Report the suites of messages this control understands.
+
+	Adds the string "suite/vnd.Be-shelf" to the message.
+
+	\sa BHandler::GetSupportedSuites()
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::AllowsDragging() const
+	\brief Check if the user is able to drag replicants to the shelf.
+
+	\return \c true if the shelf accepts the replicants dragged into it,
+		or \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BShelf::SetAllowsDragging(bool state)
+	\brief Allows or disallows the shelf to accept the replicants dragged
+		into it by the user.
+
+	\param[in] state \c true to allow dragging, or \c false to disallow it.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::AllowsZombies() const
+	\brief Checks if zombie views are allowed in the shelf.
+
+	\return \c true if the shelf allows zombie views, or \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BShelf::SetAllowsZombies(bool state)
+	\brief Sets the shelf to allow zombie views or not.
+
+	\param state \c true if zombie views are allowed, or \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::DisplaysZombies() const
+	\brief Checks if zombie views are displayed on the shelf.
+
+	\return \c true if the shelf displays zombie views, or \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BShelf::SetDisplaysZombies(bool state)
+	\brief Sets the shelf to display zombie views or not.
+
+	\param state \c true if zombie views are displayed, or \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::IsTypeEnforced() const
+	\brief Checks if the shelf enforces the type or not.
+
+	\return \c true if the shelf enforces the type filtering,
+		or \c false otherwise.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BShelf::SetTypeEnforced(bool state)
+	\brief Sets the type enforcement flag.
+
+	\param state \c true to enforce the type and reject replicants
+		without the same type, or \c false to disable the enforcement.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::SetSaveLocation(BDataIO* stream)
+	\brief Configures the save location of the shelf data to \a stream.
+
+	It also sets the "dirty" flag.
+
+	\retval B_OK The save location was set to \a stream.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::SetSaveLocation(const entry_ref* ref)
+	\brief Configures the save location of the shelf data to \a ref.
+
+	It also sets the "dirty" flag.
+
+	\retval B_OK The save location was set to \a ref.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BDataIO* BShelf::SaveLocation(entry_ref* ref) const
+	\brief Retrieves the save location for the shelf data.
+
+	If \a ref is not \c NULL, there it will be saved an entry_ref of the saving
+	location.
+
+	\return A BDataIO stream where the shelf data is saved, or \c NULL if the
+		saving location does not translate into a BDataIO.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::AddReplicant(BMessage* archive, BPoint location)
+	\brief Adds a replicant whose data is in \a archive to the shelf
+	in \a location.
+
+	This method is automatically called when a replicant is dropped on
+	the shelf.
+
+	If type enforcement is enabled, the replicant must have the same type,
+	otherwise it will be rejected.
+
+	\param archive The archive data from where the replicant information is
+		retrieved.
+	\param location The place where the replicant was dropped on the shelf.
+
+	\return A status code.
+	\retval B_ERROR One of these happened: \n- the replicant's type and
+	shelf's type does not match; \n- the replicant data was rejected by
+	CanAcceptReplicantMessage(); \n- the replicant only allows a unique
+	instance and there is already an instance of the replicant on the shelf;
+	\n- the object could not be instantiated and the archive did not
+	contain an instantiated BView; \n- the replicant could not be loaded, and
+	the creation of a zombie view was disabled.
+	\retval B_OK The replicant was added successfully.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::DeleteReplicant(BView* replicant)
+	\brief Removes the replicant referred by the \a replicant BView.
+
+	\param[in] replicant The view identified by the \a replicant BView.
+
+	\return A status code.
+	\retval B_OK The replicant was removed successfully.
+	\retval B_BAD_VALUE There is no replicant identified by such BView.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::DeleteReplicant(BMessage* archive)
+	\brief Removes the replicant identified by the \a archive
+	replicant message.
+
+	\param[in] archive The replicant's data archive of reference.
+
+	\return A status code.
+	\retval B_OK The replicant was removed successfully.
+	\retval B_BAD_VALUE There is no replicant identified by such message.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BShelf::DeleteReplicant(int32 index)
+	\brief Removes the replicant identified by \a index.
+
+	\param[in] index The replicant's index number.
+
+	\return A status code.
+	\retval B_OK The replicant was removed successfully.
+	\retval B_BAD_INDEX There is no replicant identified by such index.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BShelf::CountReplicants() const
+	\brief Tells the number of replicants currently contained by the shelf.
+
+	\return The number of attached replicants.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BMessage* BShelf::ReplicantAt(int32 index, BView** view = NULL,
+		uint32* uid = NULL,
+		status_t* perr = NULL) const
+	\brief Retrieves the replicant data referenced by its \a index.
+
+	\param[in] index The replicant index.
+	\param[out] view If not \c NULL, returns the respective BView of
+		the replicant at \a index, or \c NULL otherwise.
+	\param[out] uid If not \c NULL, returns the unique identifier of
+		the replicant at \a index, or \code ~(uint32)0 \endcode
+		(maximum value of an unsigned integer) otherwise.
+	\param[out] perr If not \c NULL, returns the replicant's current
+		status code (usually B_OK if everything is OK), or
+		\c B_BAD_INDEX otherwise.
+
+	\return A replicant's data message, or NULL if there is not a
+		replicant at such \a index.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BShelf::IndexOf(const BView* replicantView) const
+	\brief Returns the index of a replicant identified by its
+		\a replicantView view.
+
+	\param[in] replicantView The replicant's BView.
+
+	\return The index of the specified replicant, or \c -1 if
+		it does not exist.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BShelf::IndexOf(const BMessage* archive) const
+	\brief Returns the index of a replicant identified by its
+		\a archive replicant message.
+
+	\param[in] archive The replicant's message archive.
+
+	\return The index of the specified replicant, or \c -1 if
+		it does not exist.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BShelf::IndexOf(uint32 id) const
+	\brief Returns the index of a replicant identified by its
+		unique identifier \a id.
+
+	\param[in] id The replicant's unique identifier.
+
+	\return The index of the specified replicant, or \c -1 if
+		it does not exist.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::CanAcceptReplicantMessage(BMessage* archive) const
+	\brief Determines if the \a archive message where the replicant should
+		be contained is formatted as expected.
+
+	It is called during the execution of AddReplicant().
+
+	An undesired format of the message makes it to return to false and
+	discard it.
+
+	\param[in] archive The replicant's message.
+
+	\retval true The replicant was accepted.
+	\retval false The replicant was rejected.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BShelf::CanAcceptReplicantView(BRect rect,
+		BView* view, BMessage* archive) const
+	\brief Determines whether the replicant's view is accepted or rejected.
+
+	It is called during the execution of AddReplicant().
+
+	If the view has not been accepted, the replicant will be rejected.
+
+	\param[in] rect The rect that the replicant will occupy on the shelf.
+	\param[in] view The replicant's view.
+	\param[in] archive The replicant's archived message.
+
+	\retval true The replicant was accepted.
+	\retval false The replicant was rejected.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BPoint BShelf::AdjustReplicantBy(BRect rect, BMessage* archive) const
+	\brief Adjusts the replicant's location to fit the rect in the shelf.
+
+	Called upon a replicant was dropped on the shelf.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BShelf::ReplicantDeleted(int32 index,
+		const BMessage* archive,
+		const BView *replicant)
+	\brief Unimplemented.
+
+	\since BeOS R3
+*/

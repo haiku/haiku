@@ -1,0 +1,254 @@
+/*
+ * Copyright 2024 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina, cafeina@world
+ *
+ * Corresponds to:
+ *		headers/os/game/GameSound.h	hrev58367
+ *		src/kits/game/GameSound.cpp	hrev58367
+ */
+
+
+/*!
+	\file GameSound.h
+	\ingroup game
+	\ingroup libbe
+	\brief Provides the BGameSound base class.
+*/
+
+
+/*!
+	\class BGameSound
+	\ingroup game
+	\ingroup libbe
+	\brief BGameSound is the base class used in the other sound classes in
+	the kit.
+
+	This class is not meant to be used directly. Any of the derived classes
+	should be used instead.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn BGameSound::BGameSound(BGameSoundDevice* device = NULL)
+	\brief Creates a BGameSound object.
+
+	The \a device parameter is currently unused and has to be defined as \c NULL.
+	Currently the class itself will retrieve the default device.
+
+	\param[in] device The sound device to be used.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual BGameSound::~BGameSound()
+	\brief Destroys the BGameSound object and frees the memory it uses.
+
+	It releases any buffer connected to the game sound device and then
+	releases the device itself.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual BGameSound* BGameSound::Clone() = 0
+	\brief Pure virtual method to create a copy of the BGameSound object.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn status_t BGameSound::InitCheck() const
+	\brief Verifies if the BGameSound object was successfully initialized.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn BGameSoundDevice* BGameSound::Device() const
+	\brief Returns a pointer to the sound playback device.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn gs_id BGameSound::ID() const
+	\brief Returns the identifier of the sound associated with the BGameSound
+		object.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn const gs_audio_format& BGameSound::Format() const
+	\brief Returns a gs_audio_format struct instance with the format of the sound
+		associated with the BGameSound object.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\name Playback
+*/
+
+
+//! @{
+
+
+/*!
+	\fn virtual status_t BGameSound::StartPlaying()
+	\brief Plays the sound in the playback device.
+
+	\retval B_OK Playback started successfully.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual bool BGameSound::IsPlaying()
+	\brief Checks whether the sound is being played or not in the playback
+		device.
+
+	\retval true The sound is currently being played.
+	\retval false The sound is not being played.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual status_t BGameSound::StopPlaying()
+	\brief Stops the playback of a sound currently playing.
+
+	\retval B_OK The sound stopped playing.
+
+	\since BeOS R4.5
+*/
+
+
+//! @}
+
+
+/*!
+	\name Sound Attributes
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BGameSound::SetGain(float gain, bigtime_t duration = 0)
+	\brief Sets the gain of the sound, that is, the amount of amplification of the
+		input signal.
+
+	The \a gain is represented as a proportion, from 0.0 as the lowest to 1.0 as
+	the highest level of gain.
+
+	A non-zero \a duration makes the transition from the current gain to the new
+	gain take place over time in the amount set (in microseconds). If it is \c 0,
+	the change occurs immediately instead.
+
+	\param[in] gain Level of sound gain.
+	\param[in] duration Duration of transition from the older gain level to the
+		newer level.
+
+	\retval B_OK The gain was applied successfully.
+	\retval B_BAD_VALUE An out-of-bounds value for the gain was provided
+		(not being 0.0 <= gain <= 1.0).
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn status_t BGameSound::SetPan(float pan, bigtime_t duration = 0)
+	\brief Sets the panning of the sound, that is, the distribution of the audio
+		signal anywhere in the stereophonic sound field.
+
+	A value of \a pan of -1.0 sets the sound at the most left side, 0.0 at the
+	front, and 1.0 at the most right side.
+
+	A non-zero \a duration makes the transition from the current pan to the new
+	pan take place over time in the amount set (in microseconds). If it is \c 0,
+	the change occurs immediately instead.
+
+	\param[in] pan Level of panning.
+	\param[in] duration Duration of transition from the older panning value to
+		the newer value.
+
+	\retval B_OK The pan was applied successfully.
+	\retval B_ERROR The BGameSound's sound was not initialized.
+	\retval B_BAD_VALUE An out-of-bounds value for the pan was provided
+		(not being -1.0 <= pan <= 1.0).
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn float BGameSound::Gain()
+	\brief Retrieves the current level of gain of the sound.
+
+	If there is no sound initialized, by default it returns 0.0.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn float BGameSound::Pan()
+	\brief Retrieves the current value of panning of the sound.
+
+	If there is no sound initialized, by default it returns 0.0.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual status_t BGameSound::SetAttributes(gs_attribute* attributes, size_t attributeCount)
+	\brief Sets the attributes for the current sound.
+
+	\param[in] attributes An array of the group of attributes to be applied to the
+		sound.
+	\param[in] attributeCount The number of those attributes.
+
+	\retval B_OK The attributes were applied successfully, or no error.
+	\retval B_ERROR The BGameSound's sound was not initialized.
+	\retval others Depending on the type of attribute.
+
+	\since BeOS R4.5
+*/
+
+
+/*!
+	\fn virtual status_t BGameSound::GetAttributes(gs_attribute* attributes, size_t attributeCount)
+	\brief Retrieves the attributes of the current sound.
+
+	\a attributes is a pre-allocated array of gs_attribute structures, with the
+	"attribute" field of each one pre-filled with the desired attribute's
+	identifier, for which the information is going to be retrieved.
+
+	\param[out] attributes The gs_attribute list where to save the attributes.
+	\param[in] attributeCount The number of items in the \a attributes list.
+
+	\retval B_OK The attributes were retrieved successfully.
+	\retval B_ERROR The BGameSound's sound was not initialized.
+
+	\since BeOS R4.5
+*/
+
