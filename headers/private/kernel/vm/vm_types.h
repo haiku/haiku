@@ -148,7 +148,6 @@ private:
 public:
 	bool					busy : 1;
 	bool					busy_writing : 1;
-		// used in VMAnonymousCache::Merge()
 	bool					accessed : 1;
 	bool					modified : 1;
 	uint8					_unused : 1;
