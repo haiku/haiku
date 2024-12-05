@@ -307,7 +307,7 @@ void
 BackgroundsView::MessageReceived(BMessage* message)
 {
 	// Color drop
-	if (message->WasDropped()) {
+	if (message->WasDropped() && fPicker->IsEnabled()) {
 		rgb_color *clr;
 		ssize_t out_size;
 		if (message->FindData("RGBColor", B_RGB_COLOR_TYPE,
