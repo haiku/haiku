@@ -3630,7 +3630,7 @@ allocate_early_virtual(kernel_args* args, size_t size, addr_t alignment)
 	const addr_t lastRangeEnd = lastRange.start + lastRange.size;
 	addr_t base = alignment > 0
 		? ROUNDUP(lastRangeEnd, alignment) : lastRangeEnd;
-	if ((KERNEL_BASE + (KERNEL_SIZE - 1) - base) >= size) {
+	if ((KERNEL_TOP - base) >= size) {
 		lastRange.size += base + size - lastRangeEnd;
 		return base;
 	}
