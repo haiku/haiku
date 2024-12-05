@@ -2177,9 +2177,6 @@ dosfs_open(fs_volume* volume, fs_vnode* vnode, int openMode, void** _cookie)
 	if ((bsdVolume->mnt_flag & MNT_RDONLY) != 0 || (fatNode->de_Attributes & ATTR_READONLY) != 0)
 		openMode = (openMode & ~O_RWMASK) | O_RDONLY;
 
-	if ((openMode & O_TRUNC) != 0 && (openMode & O_RWMASK) == O_RDONLY)
-		return B_NOT_ALLOWED;
-
 	status_t status = _dosfs_access(bsdVolume, bsdNode, open_mode_to_access(openMode));
 	if (status != B_OK)
 		RETURN_ERROR(status);

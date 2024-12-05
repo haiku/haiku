@@ -2833,12 +2833,14 @@ get_new_fd(struct fd_ops* ops, struct fs_mount* mount, struct vnode* vnode,
 
 	// If the vnode is locked, we don't allow creating a new file/directory
 	// file_descriptor for it
-	if (vnode && vnode->mandatory_locked_by != NULL
-		&& (ops == &sFileOps || ops == &sDirectoryOps))
+	if (vnode != NULL && vnode->mandatory_locked_by != NULL
+			&& (ops == &sFileOps || ops == &sDirectoryOps))
 		return B_BUSY;
 
 	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
 		return B_BAD_VALUE;
+	if ((openMode & O_RWMASK) == O_RDONLY && (openMode & O_TRUNC) != 0)
+		return B_NOT_ALLOWED;
 
 	descriptor = alloc_fd();
 	if (!descriptor)

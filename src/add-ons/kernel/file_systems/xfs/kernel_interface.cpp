@@ -274,8 +274,7 @@ xfs_open(fs_volume * /*_volume*/, fs_vnode *_node, int openMode,
 	if (inode->IsDirectory() && (openMode & O_RWMASK) != 0)
 		return B_IS_A_DIRECTORY;
 
-	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode)
-		| (openMode & O_TRUNC ? W_OK : 0));
+	status_t status =  inode->CheckPermissions(open_mode_to_access(openMode));
 	if (status != B_OK)
 		return status;
 
@@ -556,8 +555,7 @@ xfs_open_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
 
 	Inode* inode = (Inode*)_node->private_node;
 
-	int accessMode = open_mode_to_access(openMode) | (openMode & O_TRUNC ? W_OK : 0);
-	status = inode->CheckPermissions(accessMode);
+	status = inode->CheckPermissions(open_mode_to_access(openMode));
 	if (status < B_OK)
 		return status;
 

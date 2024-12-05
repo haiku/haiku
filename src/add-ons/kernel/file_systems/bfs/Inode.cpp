@@ -2669,8 +2669,7 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 				return B_NOT_A_DIRECTORY;
 
 			// we want to open the file, so we should have the rights to do so
-			if (inode->CheckPermissions(open_mode_to_access(openMode)
-					| ((openMode & O_TRUNC) != 0 ? W_OK : 0)) != B_OK)
+			if (inode->CheckPermissions(open_mode_to_access(openMode)) != B_OK)
 				return B_NOT_ALLOWED;
 
 			if ((openMode & O_TRUNC) != 0) {
