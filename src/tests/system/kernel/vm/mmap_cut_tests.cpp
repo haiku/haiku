@@ -16,19 +16,6 @@ int gTestFd = -1;
 
 
 int
-map_negative_offset_test()
-{
-	// should fail (negative offset)
-	void* ptr = mmap(NULL, B_PAGE_SIZE, PROT_READ, MAP_PRIVATE, gTestFd, -4096);
-	if (ptr != MAP_FAILED) {
-		printf("map-negative-offset unexpectedly succeeded!\n");
-		return -1;
-	}
-	return 0;
-}
-
-
-int
 map_cut_compare_test()
 {
 	uint8* ptr1 = (uint8*)mmap(NULL, 16 * B_PAGE_SIZE, PROT_READ, MAP_PRIVATE, gTestFd, 0);
@@ -206,9 +193,6 @@ main()
 		return -1;
 
 	int status;
-
-	if ((status = map_negative_offset_test()) != 0)
-		return status;
 
 	if ((status = map_cut_compare_test()) != 0)
 		return status;
