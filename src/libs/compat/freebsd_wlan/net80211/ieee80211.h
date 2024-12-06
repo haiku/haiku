@@ -931,6 +931,7 @@ enum ieee80211_vht_mcs_support {
 	IEEE80211_VHT_MCS_NOT_SUPPORTED		= 3	/* not supported */
 };
 
+/* 802.11ac-2013, 8.4.2.160.3 Supported VHT-MCS and NSS Set field */
 struct ieee80211_vht_mcs_info {
 	uint16_t rx_mcs_map;
 	uint16_t rx_highest;
@@ -973,7 +974,7 @@ struct ieee80211_vht_operation {
 
 #define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_MASK	0x0000000C
 #define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_MASK_S	2
-#define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_NONE		0
+#define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_NO160		0
 #define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_160MHZ		1
 #define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_160_80P80MHZ	2
 #define	IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_RESERVED	3
