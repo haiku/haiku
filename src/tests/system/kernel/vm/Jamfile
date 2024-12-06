@@ -1,21 +1,17 @@
 SubDir HAIKU_TOP src tests system kernel vm ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel vm ] ;
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src system kernel fs ] ;
-
-UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateKernelHeaders ;
 
-UnitTestLib libkernelvmtest.so
-	: KernelVMTestAddon.cpp
-	  VMGetMountPointTest.cpp
+SimpleTest cow_bug113_test : cow_bug113_test.cpp ;
 
-	  # vm
-	  VMUtils.cpp
+SimpleTest page_fault_cache_merge_test : page_fault_cache_merge_test.cpp ;
 
-	  # fs
-	  KPath.cpp
+SimpleTest mmap_resize_test : mmap_resize_test.cpp ;
+SimpleTest mmap_cut_tests : mmap_cut_tests.cpp ;
+SimpleTest mmap_fixed_test : mmap_fixed_test.cpp ;
 
-	: [ TargetLibstdc++ ]
-;
+SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
 
+SimpleTest transfer_area_test : transfer_area_test.cpp ;
+
+SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;

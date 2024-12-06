@@ -5,8 +5,6 @@ UsePrivateHeaders shared ;
 
 SimpleTest advisory_locking_test : advisory_locking_test.cpp ;
 
-SimpleTest cow_bug113_test : cow_bug113_test.cpp ;
-
 SimpleTest fibo_load_image : fibo_load_image.cpp ;
 SimpleTest fibo_fork : fibo_fork.cpp ;
 SimpleTest fibo_exec : fibo_exec.cpp ;
@@ -33,8 +31,6 @@ SimpleTest node_monitor_test :
 	: be
 ;
 
-SimpleTest page_fault_cache_merge_test : page_fault_cache_merge_test.cpp ;
-
 SimpleTest path_resolution_test : path_resolution_test.cpp ;
 
 SimpleTest port_close_test_1 : port_close_test_1.cpp ;
@@ -54,13 +50,7 @@ SimpleTest port_wakeup_test_7 : port_wakeup_test_7.cpp ;
 SimpleTest port_wakeup_test_8 : port_wakeup_test_8.cpp ;
 SimpleTest port_wakeup_test_9 : port_wakeup_test_9.cpp ;
 
-SimpleTest mmap_resize_test : mmap_resize_test.cpp ;
-SimpleTest mmap_cut_tests : mmap_cut_tests.cpp ;
-SimpleTest mmap_fixed_test : mmap_fixed_test.cpp ;
-
 SimpleTest null_poll_test : null_poll_test.cpp ;
-
-SimpleTest reserved_areas_test : reserved_areas_test.cpp ;
 
 SimpleTest select_check : select_check.cpp ;
 SimpleTest select_close_test : select_close_test.cpp ;
@@ -74,8 +64,6 @@ SimpleTest syscall_restart_test : syscall_restart_test.cpp
 
 SimpleTest syscall_time : syscall_time.cpp ;
 
-SimpleTest transfer_area_test : transfer_area_test.cpp ;
-
 SimpleTest wait_test_1 : wait_test_1.c ;
 SimpleTest wait_test_2 : wait_test_2.cpp ;
 SimpleTest wait_test_3 : wait_test_3.cpp ;
@@ -86,8 +74,6 @@ SimpleTest wait_for_objects_test : wait_for_objects_test.cpp ;
 SimpleTest yield_test : yield_test.cpp ;
 
 SimpleTest sigint_bug113_test : sigint_bug113_test.cpp ;
-
-SimpleTest set_area_protection_test1 : set_area_protection_test1.cpp ;
 
 SimpleTest sigsuspend_test : sigsuspend_test.cpp ;
 
