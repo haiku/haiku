@@ -2259,7 +2259,8 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	TRACE(("_vm_map_file(fd = %d, offset = %" B_PRIdOFF ", size = %lu, mapping "
 		"%" B_PRIu32 ")\n", fd, offset, size, mapping));
 
-	offset = ROUNDDOWN(offset, B_PAGE_SIZE);
+	if ((offset % B_PAGE_SIZE) != 0)
+		return B_BAD_VALUE;
 	size = PAGE_ALIGN(size);
 
 	if (mapping == REGION_NO_PRIVATE_MAP)
@@ -2370,6 +2371,12 @@ _vm_map_file(team_id team, const char* name, void** _address,
 		return status;
 
 	cache->Lock();
+
+	if (cache->virtual_base > offset
+			|| PAGE_ALIGN(cache->virtual_end) < (off_t)(offset + size)) {
+		cache->ReleaseRefAndUnlock();
+		return B_BAD_VALUE;
+	}
 
 	VMArea* area;
 	virtual_address_restrictions addressRestrictions = {};
