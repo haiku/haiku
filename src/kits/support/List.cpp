@@ -39,7 +39,6 @@ BList::BList(int32 blockSize)
 {
 	if (fBlockSize <= 0)
 		fBlockSize = 1;
-	_ResizeArray(fItemCount);
 }
 
 
@@ -474,6 +473,9 @@ void BList::_ReservedList2() {}
 bool
 BList::_ResizeArray(int32 count)
 {
+	if (fPhysicalSize == count)
+		return true;
+
 	// calculate the new physical size
 	// by doubling the existing size
 	// until we can hold at least count items
