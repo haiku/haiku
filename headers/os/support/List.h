@@ -11,7 +11,7 @@
 
 class BList {
 public:
-								BList(int32 count = 20);
+								BList(int32 blockSize = 20);
 								BList(const BList& other);
 	virtual						~BList();
 
