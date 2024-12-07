@@ -207,10 +207,59 @@ ps2_setup_active_multiplexing(bool *enabled)
 		goto no_support;
 	}
 
-	INFO("ps2: active multiplexing v%d.%d enabled\n", (in >> 4), in & 0xf);
+	INFO("ps2: active multiplexing v%d.%d detected\n", (in >> 4), in & 0xf);
+
+	// Additional check to make sure multiplexing is actually working:
+	// Send a byte using the local loopback feature. When the byteis read back, it should have the
+	// system/error bit set to 0 if active multiplexing is enabled and working.
+	// The flow is similar to a ps2_command, but we need to check this specific bit in the middle
+	// of the operation (before reading the data byte).
+	mutex_lock(&gControllerLock);
+	atomic_add(&sIgnoreInterrupts, 1);
+
+	res = ps2_wait_write();
+	if (res != B_OK) {
+		INFO("ps2: active multiplexing command write check fail: %s\n", strerror(res));
+		goto no_support_unlock;
+	}
+	ps2_write_ctrl(PS2_CTRL_AUX_LOOPBACK);
+
+	res = ps2_wait_write();
+	if (res != B_OK) {
+		INFO("ps2: active multiplexing data write check fail: %s\n", strerror(res));
+		goto no_support_unlock;
+	}
+
+	ps2_write_data(0xf0);
+
+	res = ps2_wait_read();
+
+	if (res != B_OK) {
+		INFO("ps2: active multiplexing data read check fail: %s\n", strerror(res));
+		goto no_support_unlock;
+	}
+
+	res = ps2_read_ctrl();
+	in = ps2_read_data();
+
+	if (in != 0xf0) {
+		INFO("ps2: active multiplexing loopback check fail: %s\n", strerror(res));
+		goto no_support_unlock;
+	}
+
+	if ((res & 0x25) == 0x25) {
+		INFO("ps2: active multiplexing error bit is stuck\n");
+		goto no_support_unlock;
+	}
+
+	atomic_add(&sIgnoreInterrupts, -1);
+	mutex_unlock(&gControllerLock);
 	*enabled = true;
 	goto done;
 
+no_support_unlock:
+	atomic_add(&sIgnoreInterrupts, -1);
+	mutex_unlock(&gControllerLock);
 no_support:
 	TRACE("ps2: active multiplexing not supported\n");
 	*enabled = false;
