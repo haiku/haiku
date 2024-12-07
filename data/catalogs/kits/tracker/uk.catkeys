@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	636899528
+1	ukrainian	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Зберегти як шаблон запит
 Current folder	ContainerWindow		Поточна папка
 Finish: %time - Over %finishtime left	StatusWindow		Закінчення: %time – Залишилось більше %finishtime
 Mount all disks now	AutoMounterSettings		Підключити усі диски зараз
-Name	PoseView		Назва
 Location:	InfoWindow		Розташування:
+Name	PoseView		Назва
 Kind:	InfoWindow		Тип:
 contains	FindPanel		містить
 Open	FilePanelPriv		Відкрити
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		До: %dir
 Paste layout	ContainerWindow		Вставити макет
 Cancel	Tracker		Скасувати
 yes	AttributesView		так
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Помилка копіювання файлу \«%name\»:\n\t%error\n\n
 Make active printer	ContainerWindow		Зробити принтер активним
 Copy to	ContainerWindow		Копіювати до
 Name	SelectionWindow		Назва
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Копіювати макет
 Duplicate	ContainerWindow		Дублікат
 16-bit integer	AttributesView		16-бітове ціле
 Untitled clipping	PoseView		Фрагмент без назви
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Примітка: файлова система призначення не чутлива до регістру.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \«%name\» вже існує у цій папці. Замінити його?
 , indexed	InfoWindow		, індексовано
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Вам потрібно скинути об'єкт на будь-який із значків диска у вікні \«Диски\».

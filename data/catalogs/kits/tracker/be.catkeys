@@ -11,8 +11,8 @@ Ignore case	SelectionWindow		Не ўлічваць рэгістр
 Current folder	ContainerWindow		Цякучы каталог
 Finish: %time - Over %finishtime left	StatusWindow		Завяршэнне: %time - Засталося каля %finishtime
 Mount all disks now	AutoMounterSettings		Мантаваць усе дыскі зараз
-Name	PoseView		Імя
 Location:	InfoWindow		Месцазнаходжанне:
+Name	PoseView		Імя
 Kind:	InfoWindow		Род:
 contains	FindPanel		месціць
 Open	FilePanelPriv		Адкрыць

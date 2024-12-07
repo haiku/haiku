@@ -1,4 +1,4 @@
-1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	636899528
+1	bokmål, norwegian; norwegian bokmål	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Opprettet
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Åpne og gjør til standard
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Lagre som søkemal:
 Current folder	ContainerWindow		Nåværende mappe
 Finish: %time - Over %finishtime left	StatusWindow		Ferdig: %time - Mer enn %finishtime left
 Mount all disks now	AutoMounterSettings		Monter alle disker nå
-Name	PoseView		Navn
 Location:	InfoWindow		Sted:
+Name	PoseView		Navn
 Kind:	InfoWindow		Type:
 contains	FindPanel		inneholder
 Open	FilePanelPriv		Åpne
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		Til %dir
 Paste layout	ContainerWindow		Lim inn layout
 Cancel	Tracker		Avbryt
 yes	AttributesView		ja
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Feil ved kopiering av filen \%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Sett som aktiv skriver
 Copy to	ContainerWindow		Kopier til
 Name	SelectionWindow		Navn
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Kopier layout
 Duplicate	ContainerWindow		Dupliser
 16-bit integer	AttributesView		16-bit integer
 Untitled clipping	PoseView		Utklipp uten navn
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Merk: destinasjonens filsystem skiller ikke mellom store og små bokstaver i filnavn.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen \"%name\" eksisterer allerede i den spesifiserte mappen. Ønsker du å erstatte den?
 , indexed	InfoWindow		, indeksert
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Du må slippe elementer på et av diskikonene i \"Disks\"-vinduet

@@ -1,7 +1,7 @@
 1	english	x-vnd.Haiku-DiskUsage	2951688400
 %size% in {0, plural, one{# file} other{# files}}	Info Window		%size% 大小 {0, plural, one{# 个文件} other{# 个文件}}
-Scanning %refName%	Scanner		扫描 %refName% 
-%d files	Status View	For UI layouting only, use the longest plural form for your language	%d 文件
+Scanning %refName%	Scanner		正在扫描 %refName% 
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d 个文件
 Size	Info Window		大小
 Rescan	Pie View		重新扫描
 Kind	Info Window		种类

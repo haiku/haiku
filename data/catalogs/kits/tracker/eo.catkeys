@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Malatenti usklecon
 Current folder	ContainerWindow		Nuna dosierujo
 Finish: %time - Over %finishtime left	StatusWindow		Fino: %time - Ĉirkaŭ %finishtime restis
 Mount all disks now	AutoMounterSettings		Surmeti ĉiujn diskojn nun
-Name	PoseView		Nomo
 Location:	InfoWindow		Loko:
+Name	PoseView		Nomo
 Kind:	InfoWindow		Speco:
 contains	FindPanel		enhavas
 Open	FilePanelPriv		Uzi

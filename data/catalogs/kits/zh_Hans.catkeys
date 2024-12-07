@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	658791763
+1	english	x-vnd.Haiku-libbe	2519775385
 All Rights Reserved.	AboutWindow		保留所有权利
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
@@ -6,6 +6,7 @@ OK	PrintJob		确定
 OK	Dragger		确定
 gamma	AboutWindow		伽马
 development	AboutWindow		开发
+{0, plural, one{%s byte/s} other{%s bytes/s}}	StringForRate	units per second	{0, plural, one{%s 字节/秒} other{%s 字节/秒}}
 Print Server is not responding.	PrintJob		打印服务未响应。
 About %app%	AboutMenuItem		关于 %app%
 Warning	Dragger		警告

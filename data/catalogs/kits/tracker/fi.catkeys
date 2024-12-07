@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	636899528
+1	finnish	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Tallenna kysely mallinteena:
 Current folder	ContainerWindow		Nykyiset kansiot
 Finish: %time - Over %finishtime left	StatusWindow		Loppuu: %time - Yli %finistime jäljellä
 Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
-Name	PoseView		Nimi
 Location:	InfoWindow		Sijainti:
+Name	PoseView		Nimi
 Kind:	InfoWindow		Tyyppi:
 contains	FindPanel		sisältää
 Open	FilePanelPriv		Avaa
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		Vastaanottaja: %dir
 Paste layout	ContainerWindow		Liitä sijoittelu
 Cancel	Tracker		Peru
 yes	AttributesView		kyllä
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Virhe kopioitaessa tiedostoa \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Aseta aktiivinen tulostin
 Copy to	ContainerWindow		Kopioi kohteeseen
 Name	SelectionWindow		Nimi
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Kopioi sijoittelu
 Duplicate	ContainerWindow		Kaksoiskappale
 16-bit integer	AttributesView		16-bittinen kokonaisluku
 Untitled clipping	PoseView		Otsikoton leikkaus
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Huomaa: tiedostonimet kohdetiedostojärjestelmässä eivät ole kirjainkoosta riippuvia.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto ”%name” on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
 , indexed	InfoWindow		, indeksoitu
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudotettava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.

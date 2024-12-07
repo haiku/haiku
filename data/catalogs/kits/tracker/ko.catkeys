@@ -1,4 +1,4 @@
-1	korean	x-vnd.Haiku-libtracker	636899528
+1	korean	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		생성일
 Icon	AttributesView		아이콘
 Open and make preferred	OpenWithWindow		열고 연결 프로그램으로 지정
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		쿼리 템플릿으로 저장:
 Current folder	ContainerWindow		현재 폴더
 Finish: %time - Over %finishtime left	StatusWindow		완료: %time - %finishtime 이상 남음
 Mount all disks now	AutoMounterSettings		모든 디스크 지금 마운트
-Name	PoseView		이름
 Location:	InfoWindow		위치:
+Name	PoseView		이름
 Kind:	InfoWindow		종류:
 contains	FindPanel		포함함
 Open	FilePanelPriv		열기
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		목적지: %dir
 Paste layout	ContainerWindow		배치 붙여넣기
 Cancel	Tracker		취소
 yes	AttributesView		네
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		파일 \"%name\" 복사 중 오류가 발생했습니다:\n\t%error\n\n
 Make active printer	ContainerWindow		활성 프린터 만들기
 Copy to	ContainerWindow		다음으로 복사
 Name	SelectionWindow		이름
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		배치 복사
 Duplicate	ContainerWindow		복제
 16-bit integer	AttributesView		16비트 정수
 Untitled clipping	PoseView		제목 없는 클립보드
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		주의: 목적지 파일 시스템은 파일명의 대소문자를 구분하지 않습니다.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		\"%name\" 파일이 지정된 폴더에 이미 존재합니다. 대체하시겠습니까?
 , indexed	InfoWindow		, 인덱싱 됨
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"디스크\" 창의 디스크 아이콘들 중 하나에 항목을 끌어다 놓아야 합니다.

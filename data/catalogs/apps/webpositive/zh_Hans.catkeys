@@ -103,7 +103,7 @@ Apply	Settings Window		应用
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	尝试显示书签目录发生错误。\n\n错误：%error
 Revert	Settings Window		恢复
 Copy	WebPositive Window		复制
-{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Last line repeated # time.}其它{Last line repeated # times.}}
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{最后一行重复了 # 次。}other{最后一行重复了 # 次。}}
 Default standard font size:	Settings Window		默认标准字体大小：
 Custom	Settings Window		自定义
 Bookmark this page	WebPositive Window		添加页面到书签

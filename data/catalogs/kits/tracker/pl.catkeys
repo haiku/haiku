@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3099940411
+1	polish	x-vnd.Haiku-libtracker	2406282221
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Zapisz jako szablon zapytania:
 Current folder	ContainerWindow		Bieżący katalog
 Finish: %time - Over %finishtime left	StatusWindow		Koniec o: %time - Pozostało %finishtime
 Mount all disks now	AutoMounterSettings		Zamontuj wszystkie dyski
-Name	PoseView		Nazwa
 Location:	InfoWindow		Położenie:
+Name	PoseView		Nazwa
 Kind:	InfoWindow		Typ:
 contains	FindPanel		zawiera
 Open	FilePanelPriv		Otwórz
@@ -337,7 +337,6 @@ To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Wklej układ
 Cancel	Tracker		Anuluj
 yes	AttributesView		tak
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Błąd podczas kopiowania pliku „%name”:\n\t%error\n\n
 Make active printer	ContainerWindow		Ustaw jako aktywną drukarkę
 Copy to	ContainerWindow		Kopiuj do
 Name	SelectionWindow		Nazwa
@@ -483,7 +482,6 @@ Copy layout	ContainerWindow		Kopiuj motyw
 Duplicate	ContainerWindow		Duplikuj
 16-bit integer	AttributesView		16-bitowa liczba całkowita
 Untitled clipping	PoseView		Wycinek bez nazwy
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Uwaga: wielkość liter w nazwach na docelowym systemie plików ma znaczenie.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Plik o nazwie „%name” już istnieje w tej lokalizacji. Czy chcesz go zamienić?
 , indexed	InfoWindow		, indeksowany
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Musisz upuścić obiekty na jednej z ikon dysków w oknie „Dyski”.

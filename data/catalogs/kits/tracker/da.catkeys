@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Skel ikke mellem store og små bogstaver
 Current folder	ContainerWindow		Nuværende mappe
 Finish: %time - Over %finishtime left	StatusWindow		Færdig: %time - Over %finishtime tilbage
 Mount all disks now	AutoMounterSettings		Montér alle diske nu
-Name	PoseView		Navn
 Location:	InfoWindow		Placering:
+Name	PoseView		Navn
 Kind:	InfoWindow		Slags:
 contains	FindPanel		indeholder
 Open	FilePanelPriv		Åbn

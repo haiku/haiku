@@ -11,4 +11,4 @@ New mail notification	NotifierFilter		新邮件通知
 New messages	NotifierFilter		新消息
 Method:	NotifierConfigView		方法：
 Keyboard LEDs	NotifierConfigView		键盘LED
-You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		您的账户 %account 有{0, plural, one{one new message} other{# new messages}} 。
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		您的账户 %account 有{0, plural, one{一条新消息} other{# 条新消息}} 。

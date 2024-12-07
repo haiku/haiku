@@ -12,8 +12,8 @@ Ignore case	SelectionWindow		ละเว้นกรณี
 Current folder	ContainerWindow		โฟลเดอร์ปัจจุบัน
 Finish: %time - Over %finishtime left	StatusWindow		เสร็จ:%time - มากกว่า %finishtime คงเหลือ
 Mount all disks now	AutoMounterSettings		เมาท์ดิสก์ทั้งหมดตอนนี้
-Name	PoseView		ชื่อ
 Location:	InfoWindow		สถานที่:
+Name	PoseView		ชื่อ
 Kind:	InfoWindow		ชนิด:
 contains	FindPanel		มี
 Open	FilePanelPriv		เปิด

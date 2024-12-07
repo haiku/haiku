@@ -4,7 +4,7 @@ Cannot find default audio hardware	RecorderWindow		未发现默认音频设备
 Cannot find the temporary file created to hold the new recording	RecorderWindow		未找到存储新记录的临时文件
 Sample size:	RecorderWindow		示例大小：
 Nothing to play	RecorderWindow		无播放文件
-None of the files appear to be audio files.	RecorderWindow		所有文件都不是音频文件。
+None of the files appear to be audio files.	RecorderWindow		这些文件似乎都不是音频文件。
 Duration: 	RecorderWindow		录制时间：
 File info	RecorderWindow		文件信息
 Drop files here	SoundListView		在这里放置文件
@@ -35,12 +35,12 @@ File name: 	RecorderWindow		文件名：
 Cannot connect to the selected sound input	RecorderWindow		无法连接到选中声音输入
 Cannot get the file to play	RecorderWindow		无法播放文件
 Cannot record a sound that long	RecorderWindow		无法进行长时间的记录
-Duration:	RecorderWindow		音长：
+Duration:	RecorderWindow		持续时间：
 Compression:	RecorderWindow		压缩：
 Cannot find an unused name to use for the new recording	RecorderWindow		未找到用于新记录的未使用文件名。
-Channels: 	RecorderWindow		频道：
+Channels: 	RecorderWindow		通道：
 Save	RecorderWindow		保存
-Sample rate: 	RecorderWindow		比率示例：
+Sample rate: 	RecorderWindow		采样率: 
 Cannot connect to media server	RecorderWindow		无法连接到媒体服务组件
 The file doesn't appear to be an audio file.	RecorderWindow		该文件不是音频文件。
 File name:	RecorderWindow		文件名：

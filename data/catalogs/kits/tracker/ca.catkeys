@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	636899528
+1	catalan; valencian	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Desa la consulta com a plantilla:
 Current folder	ContainerWindow		Carpeta actual
 Finish: %time - Over %finishtime left	StatusWindow		Fi: %time - falten %finishtime
 Mount all disks now	AutoMounterSettings		Munta tots els discs ara
-Name	PoseView		Nom
 Location:	InfoWindow		Ubicació:
+Name	PoseView		Nom
 Kind:	InfoWindow		Tipus:
 contains	FindPanel		conté
 Open	FilePanelPriv		Obre
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
 Cancel	Tracker		Cancel·la
 yes	AttributesView		sí
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Error a l'hora de copiar el fitxer \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Estableix com a impressora activa
 Copy to	ContainerWindow		Copia a
 Name	SelectionWindow		Nom
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Copia la disposició
 Duplicate	ContainerWindow		Duplica
 16-bit integer	AttributesView		Enter de 16 bits
 Untitled clipping	PoseView		Retall sense títol
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Nota: els noms de fitxers del sistema de fitxers de destinació no distingeixen entre majúscules i minúscules.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Ja existeix un fitxer amb el nom \"%name\" a la carpeta especificada. El voleu reemplaçar?
 , indexed	InfoWindow		, indexat
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".

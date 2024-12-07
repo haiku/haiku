@@ -13,8 +13,8 @@ Ignore case	SelectionWindow		Ignorar caso
 Current folder	ContainerWindow		Pasta atual
 Finish: %time - Over %finishtime left	StatusWindow		Término: %time - Mais de %finishtime restante
 Mount all disks now	AutoMounterSettings		Montar todos os discos agora
-Name	PoseView		Nome
 Location:	InfoWindow		Local:
+Name	PoseView		Nome
 Kind:	InfoWindow		Tipo:
 contains	FindPanel		contém
 Open	FilePanelPriv		Abrir

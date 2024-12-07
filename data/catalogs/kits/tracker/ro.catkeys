@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	636899528
+1	romanian	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Salvează ca șablon de interogare:
 Current folder	ContainerWindow		Dosar curent
 Finish: %time - Over %finishtime left	StatusWindow		Finalizare: %time - peste %finishtime rămase
 Mount all disks now	AutoMounterSettings		Montează toate discurile acum
-Name	PoseView		Nume
 Location:	InfoWindow		Locație:
+Name	PoseView		Nume
 Kind:	InfoWindow		Fel:
 contains	FindPanel		conține
 Open	FilePanelPriv		Deschide
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		La: %dir
 Paste layout	ContainerWindow		Lipește aranjamentul
 Cancel	Tracker		Anulează
 yes	AttributesView		da
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Eroare la copierea fișierului \„%name\”:\n\t%error\n\n
 Make active printer	ContainerWindow		Stabilește ca imprimantă activă
 Copy to	ContainerWindow		Copiază la
 Name	SelectionWindow		Nume
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Copiază aranjamentul
 Duplicate	ContainerWindow		Duplică
 16-bit integer	AttributesView		întreg pe 16 biți
 Untitled clipping	PoseView		Tăietură fără nume
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Notă: numele fișierelor din sistemul de fișiere destinație nu sunt sensibile la majuscule.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Fișierul \„%name\” există deja în dosarul specificat. Doriți să îl înlocuiți?
 , indexed	InfoWindow		, indexat
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Trebuie să plasați elementele pe una din pictogramele de disc în fereastra \„Disks\”.

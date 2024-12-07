@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	1235931665
+1	indonesian	x-vnd.Haiku-libtracker	2113020779
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Simpan sebagai templat kueri:
 Current folder	ContainerWindow		Folder saat ini
 Finish: %time - Over %finishtime left	StatusWindow		Selesai: %time - lebih %finishtime tersisa
 Mount all disks now	AutoMounterSettings		Memasang semua disk sekarang
-Name	PoseView		Nama
 Location:	InfoWindow		Lokasi:
+Name	PoseView		Nama
 Kind:	InfoWindow		Jenis:
 contains	FindPanel		berisi
 Open	FilePanelPriv		Buka
@@ -334,7 +334,6 @@ To: %dir	StatusWindow		Ke: %dir
 Paste layout	ContainerWindow		Temple layout
 Cancel	Tracker		Batal
 yes	AttributesView		ya
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Galat menyalin file \"%name\":\n\t%error\n\n
 Make active printer	ContainerWindow		Membuat printer aktif
 Copy to	ContainerWindow		Salin ke
 Name	SelectionWindow		Nama

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	636899528
+1	hungarian	x-vnd.Haiku-libtracker	4238208634
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -17,8 +17,8 @@ Save as query template:	FindPanel		Mentés keresési sablonként:
 Current folder	ContainerWindow		Jelenlegi mappa
 Finish: %time - Over %finishtime left	StatusWindow		Befejezés: %time - Több, mint %finishtime van hátra
 Mount all disks now	AutoMounterSettings		Összes lemez csatolása most
-Name	PoseView		Név
 Location:	InfoWindow		Útvonal:
+Name	PoseView		Név
 Kind:	InfoWindow		Típus:
 contains	FindPanel		tartalmazza
 Open	FilePanelPriv		Megnyitás
@@ -343,7 +343,6 @@ To: %dir	StatusWindow		Ide: %dir
 Paste layout	ContainerWindow		Elrendezés beillesztése
 Cancel	Tracker		Mégse
 yes	AttributesView		igen
-Error copying file \"%name\":\n\t%error\n\n	FSUtils		Hia történt a fájl \"%name\" másolása közben:\n\t%error\n\n
 Make active printer	ContainerWindow		Beállítás aktív nyomtatónak
 Copy to	ContainerWindow		Másolás
 Name	SelectionWindow		A név
@@ -489,7 +488,6 @@ Copy layout	ContainerWindow		Elrendezés másolása
 Duplicate	ContainerWindow		Megkettőzés
 16-bit integer	AttributesView		16-bites egész
 Untitled clipping	PoseView		Névtelen kivágás
-Note: file names in the destination file system are not case-sensitive.\n	FSUtils		Megjegyzés: a fájlnevek a cél-fájlrendszeren nem kis-/nagybetű érzékenyek.\n
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy ilyen nevű fájl: \"%name\". Szeretnéd felülírni?
 , indexed	InfoWindow		, indexelt
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Húzzon elemeket a \"Lemezek\" ablakban az egyik lemez ikonjára.
