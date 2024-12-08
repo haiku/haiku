@@ -12,5 +12,5 @@
 # On some video cards, the VESA driver is able to inject custom video resolutions in the BIOS.
 # This does not modify the BIOS in the hardware, the changes are erased on reboot. However,
 # this is outside of VESA specifications and sometimes results in a black screen. As a result,
-# this feature is disabled by default.
+# this feature is disabled by default for most cards.
 #bios_patching true

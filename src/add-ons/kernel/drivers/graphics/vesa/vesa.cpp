@@ -62,7 +62,8 @@ vbe_call_finish(bios_state* state)
 
 
 static status_t
-find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size)
+find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size, uint16_t& vendorId,
+	uint16_t& productId)
 {
 	// TODO: when we port this over to the new driver API, this mechanism can be
 	// used to find the right device_node
@@ -83,6 +84,8 @@ find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size)
 				// found it!
 				base = info.u.h0.base_registers[i];
 				size = info.u.h0.base_register_sizes[i];
+				vendorId = info.vendor_id;
+				productId = info.device_id;
 
 				put_module(B_PCI_MODULE_NAME);
 				return B_OK;
@@ -367,8 +370,10 @@ vesa_init(vesa_info& info)
 
 	// Find out which PCI device we belong to, so that we know its frame buffer
 	// size
-	find_graphics_card(bufferInfo->physical_frame_buffer,
-		info.physical_frame_buffer, info.physical_frame_buffer_size);
+	uint16_t vendorId = 0;
+	uint16_t productId = 0;
+	find_graphics_card(bufferInfo->physical_frame_buffer, info.physical_frame_buffer,
+		info.physical_frame_buffer_size, vendorId, productId);
 
 	size_t modesSize = 0;
 	vesa_mode* modes = (vesa_mode*)get_boot_item(VESA_MODES_BOOT_INFO,
@@ -420,14 +425,35 @@ vesa_init(vesa_info& info)
 	if (status != B_OK)
 		return status;
 
-	void* settings = load_driver_settings("vesa");
+	// Determine if BIOS patching can be used to inject extra video modes not available in the
+	// VESA BIOS. Enable this by default only on cards where it was confirmed to work.
 	bool patchingAllowed = false;
+
+	static const struct {
+		uint16_t vendor;
+		uint16_t device;
+	} kSupportedDevices[] = {
+		{ 0x8086, 0x0046 },
+		{ 0x8086, 0x0be1 },
+	};
+
+	for (size_t i = 0; i < B_COUNT_OF(kSupportedDevices); i++) {
+		if (vendorId == kSupportedDevices[i].vendor && productId == kSupportedDevices[i].device) {
+			patchingAllowed = true;
+			break;
+		}
+	}
+
+	// Allow the user to enable or disable the setting manually if they want to.
+	void* settings = load_driver_settings("vesa");
 	if (settings != NULL) {
 		patchingAllowed = get_driver_boolean_parameter(settings, "bios_patching",
 			patchingAllowed, true);
 		unload_driver_settings(settings);
 	}
 
+	// Finally, if the setting is enabled, see if we can identify the type of BIOS we are dealing
+	// with, and can locate the videomode tables we need to patch.
 	if (patchingAllowed)
 		vesa_identify_bios(state, &sharedInfo);
 	else
