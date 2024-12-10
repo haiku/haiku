@@ -805,6 +805,7 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 		return B_ENTRY_NOT_FOUND;
 
 	type_code type;
+	int32 keySize;
 
 	// Special case for OP_UNEQUAL - it will always operate through the whole
 	// index but we need the call to the original index to get the correct type
@@ -812,7 +813,13 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 		// Try to get an index that holds all files (name)
 		// Also sets the default type for all attributes without index
 		// to string.
-		type = status < B_OK ? B_STRING_TYPE : QueryPolicy::IndexGetType(index);
+		if (status == B_OK) {
+			type = QueryPolicy::IndexGetType(index);
+			keySize = QueryPolicy::IndexGetKeySize(index);
+		} else {
+			type = B_STRING_TYPE;
+			keySize = 0;
+		}
 
 		if (QueryPolicy::IndexSetTo(index, "name") != B_OK)
 			return B_ENTRY_NOT_FOUND;
@@ -821,9 +828,9 @@ Equation<QueryPolicy>::PrepareQuery(Context* /*context*/, Index& index,
 	} else {
 		fHasIndex = true;
 		type = QueryPolicy::IndexGetType(index);
+		keySize = QueryPolicy::IndexGetKeySize(index);
 	}
 
-	int32 keySize = QueryPolicy::IndexGetKeySize(index);
 	if (ConvertValue(type, keySize) < B_OK)
 		return B_BAD_VALUE;
 
