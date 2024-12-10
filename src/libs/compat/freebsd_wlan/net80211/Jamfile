@@ -16,12 +16,14 @@ SubDirC++Flags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto rijndael ] ;
 
-# The reason we use a KernelMergeObject followed by KernelStaticLibrary
-# instead of KernelStaticLibrary directly is to force all objects,
-# not just the ones the driver links against, to be linked into
-# the final binary. Otherwise, certain objects which export no symbols
-# save SYSINIT() would not be linked at all, and in order for this
-# module to function properly, they must be.
+# The reason we use a KernelMergeObject followed by KernelStaticLibrary is to
+# force all objects, not just the ones a driver links against, to be linked
+# into the final binary. Otherwise, certain objects which export no symbols
+# besides SYSINIT() would not be linked at all, and in order for this module
+# to function properly, they must be.
+
+SubDirCcFlags -fvisibility=hidden ;
+SubDirC++Flags -fvisibility=hidden ;
 KernelMergeObject freebsd_wlan.o :
 	ieee80211.c
 	ieee80211_action.c
