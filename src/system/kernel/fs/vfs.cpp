@@ -1351,8 +1351,10 @@ free_unused_vnodes(int32 level)
 		// has been touched in the meantime, i.e. it is no longer the least
 		// recently used unused vnode and we rather don't free it.
 		unusedVnodesLocker.Lock();
-		if (vnode != sUnusedVnodeList.First())
+		if (vnode != sUnusedVnodeList.First()) {
+			unusedVnodesLocker.Unlock();
 			continue;
+		}
 		unusedVnodesLocker.Unlock();
 
 		ASSERT(!vnode->IsBusy());
