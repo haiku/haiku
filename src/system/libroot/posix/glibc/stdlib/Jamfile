@@ -24,27 +24,29 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			drand48_r.c
 			drand48-iter.c
 			erand48.c
-			erand48_r.c
 			fpioconst.c
 			jrand48.c
-			jrand48_r.c
 			inlines.c
 			lcong48.c
-			lcong48_r.c
 			lrand48.c
-			lrand48_r.c
 			mrand48.c
-			mrand48_r.c
 			nrand48.c
-			nrand48_r.c
 			random_r.c
 			seed48.c
-			seed48_r.c
 			srand48.c
-			srand48_r.c
 			strtod.c
 			strtold.c
 			strtof.c
+
+			# These are nonstandard but were declared in BeOS's headers.
+			erand48_r.c
+			jrand48_r.c
+			lcong48_r.c
+			lrand48_r.c
+			mrand48_r.c
+			nrand48_r.c
+			seed48_r.c
+			srand48_r.c
 			;
 	}
 }
