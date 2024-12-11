@@ -4697,10 +4697,11 @@ vm_kernel_address_space_left(void)
 void
 vm_unreserve_memory(size_t amount)
 {
+	if (amount == 0)
+		return;
+
 	mutex_lock(&sAvailableMemoryLock);
-
 	sAvailableMemory += amount;
-
 	mutex_unlock(&sAvailableMemoryLock);
 }
 
