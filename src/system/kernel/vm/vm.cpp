@@ -3141,7 +3141,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 			status = vm_copy_on_write_area(cache, NULL);
 		} else {
 			// No consumers, so we don't need to insert a new one.
-			if (cache->source != NULL && cache->temporary) {
+			if (cache->temporary) {
 				// the cache's commitment must contain all possible pages
 				status = cache->Commit(cache->virtual_end - cache->virtual_base,
 					team == VMAddressSpace::KernelID()
@@ -6316,7 +6316,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		cacheChainLocker.LockAllSourceCaches();
 
 		// Adjust the committed size, if necessary.
-		if (topCache->source != NULL && topCache->temporary) {
+		if (topCache->temporary) {
 			const bool becomesWritable = (protection & B_WRITE_AREA) != 0;
 			ssize_t commitmentChange = 0;
 			const off_t areaCacheBase = area->Base() - area->cache_offset;
