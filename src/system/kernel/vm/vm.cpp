@@ -2271,6 +2271,12 @@ _vm_map_file(team_id team, const char* name, void** _address,
 	uint32 mappingFlags = 0;
 	if (unmapAddressRange)
 		mappingFlags |= CREATE_AREA_UNMAP_ADDRESS_RANGE;
+	if (mapping == REGION_PRIVATE_MAP) {
+		// For privately mapped read-only regions, skip committing memory.
+		// (If protections are changed later on, memory will be committed then.)
+		if ((protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0)
+			mappingFlags |= CREATE_AREA_DONT_COMMIT_MEMORY;
+	}
 
 	if (fd < 0) {
 		virtual_address_restrictions virtualRestrictions = {};
@@ -2304,11 +2310,6 @@ _vm_map_file(team_id team, const char* name, void** _address,
 			protectionMax = protection | B_USER_PROTECTION;
 		else
 			protectionMax = protection | (B_USER_PROTECTION & ~B_WRITE_AREA);
-	} else if (mapping == REGION_PRIVATE_MAP) {
-		// For privately mapped read-only regions, skip committing memory.
-		// (If protections are changed later on, memory will be committed then.)
-		if ((protection & B_WRITE_AREA) == 0)
-			mappingFlags |= CREATE_AREA_DONT_COMMIT_MEMORY;
 	}
 
 	// get the vnode for the object, this also grabs a ref to it
