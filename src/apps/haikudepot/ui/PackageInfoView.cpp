@@ -234,10 +234,10 @@ private:
 
 class TitleView : public BGroupView {
 public:
-	TitleView(PackageIconRepository& packageIconRepository)
+	TitleView(Model* model)
 		:
 		BGroupView("title view", B_HORIZONTAL),
-		fPackageIconRepository(packageIconRepository)
+		fModel(model)
 	{
 		fIconView = new BitmapView("package icon view");
 		fTitleView = new BStringView("package title view", "");
@@ -364,8 +364,8 @@ public:
 	{
 		BitmapHolderRef bitmapHolderRef;
 		BSize iconSize = BControlLook::ComposeIconSize(32.0);
-		status_t iconResult = fPackageIconRepository.GetIcon(package->Name(), iconSize.Width() + 1,
-			bitmapHolderRef);
+		status_t iconResult = _PackageIconRepository().GetIcon(package->Name(),
+			iconSize.Width() + 1, bitmapHolderRef);
 
 		if (iconResult == B_OK)
 			fIconView->SetBitmap(bitmapHolderRef);
@@ -433,6 +433,8 @@ public:
 			fVoteInfo->SetText(B_TRANSLATE("n/a"));
 		}
 
+		fRatingLayout->SetVisible(_PackageCanHaveRatings(package));
+
 		InvalidateLayout();
 		Invalidate();
 	}
@@ -449,7 +451,33 @@ public:
 	}
 
 private:
-	PackageIconRepository&			fPackageIconRepository;
+
+	PackageIconRepository& _PackageIconRepository()
+	{
+		BAutolock _(fModel->Lock());
+		return fModel->GetPackageIconRepository();
+	}
+
+	/*!	It is only possible for a package to have ratings if it is associated with a server-side
+		repository (depot). Otherwise there will be no means to display ratings.
+	*/
+	bool _PackageCanHaveRatings(const PackageInfoRef package)
+	{
+		BString depotName = PackageUtils::DepotName(package);
+
+		if (depotName == SINGLE_PACKAGE_DEPOT_NAME)
+			return false;
+
+		const DepotInfoRef depotInfo = fModel->DepotForName(depotName);
+
+		if (depotInfo.IsSet())
+			return !depotInfo->WebAppRepositoryCode().IsEmpty();
+
+		return false;
+	}
+
+private:
+	Model*							fModel;
 
 	BitmapView*						fIconView;
 
@@ -1204,9 +1232,10 @@ private:
 
 class PagesView : public BTabView {
 public:
-	PagesView()
+	PagesView(Model* model)
 		:
-		BTabView("pages view", B_WIDTH_FROM_WIDEST)
+		BTabView("pages view", B_WIDTH_FROM_WIDEST),
+		fModel(model)
 	{
 		SetBorder(B_NO_BORDER);
 
@@ -1243,6 +1272,7 @@ public:
 		if (switchToDefaultTab)
 			Select(TAB_ABOUT);
 
+		bool enableUserRatingsTab = false;
 		bool enableChangelogTab = false;
 		bool enableContentsTab = false;
 
@@ -1253,10 +1283,12 @@ public:
 				enableChangelogTab = localizedText->HasChangelog();
 
 			enableContentsTab = PackageUtils::IsActivatedOrLocalFile(package);
+			enableUserRatingsTab = _PackageCanHaveRatings(package);
 		}
 
 		TabAt(TAB_CHANGELOG)->SetEnabled(enableChangelogTab);
 		TabAt(TAB_CONTENTS)->SetEnabled(enableContentsTab);
+		TabAt(TAB_RATINGS)->SetEnabled(enableUserRatingsTab);
 		Invalidate(TabFrame(TAB_CHANGELOG));
 		Invalidate(TabFrame(TAB_CONTENTS));
 
@@ -1275,6 +1307,27 @@ public:
 	}
 
 private:
+
+	/*!	It is only possible for a package to have ratings if it is associated with a server-side
+		repository (depot). Otherwise there will be no means to display ratings.
+	*/
+	bool _PackageCanHaveRatings(const PackageInfoRef package)
+	{
+		BString depotName = PackageUtils::DepotName(package);
+
+		if (depotName == SINGLE_PACKAGE_DEPOT_NAME)
+			return false;
+
+		const DepotInfoRef depotInfo = fModel->DepotForName(depotName);
+
+		if (depotInfo.IsSet())
+			return !depotInfo->WebAppRepositoryCode().IsEmpty();
+
+		return false;
+	}
+
+private:
+	Model*				fModel;
 	AboutView*			fAboutView;
 	UserRatingsView*	fUserRatingsView;
 	ChangelogView*		fChangelogView;
@@ -1315,12 +1368,12 @@ PackageInfoView::PackageInfoView(Model* model,
 
 	fCardLayout->SetVisibleItem((int32)0);
 
-	fTitleView = new TitleView(fModel->GetPackageIconRepository());
+	fTitleView = new TitleView(fModel);
 	fPackageActionView = new PackageActionView(processCoordinatorConsumer,
 		model);
 	fPackageActionView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNSET));
-	fPagesView = new PagesView();
+	fPagesView = new PagesView(model);
 
 	BLayoutBuilder::Group<>(packageCard)
 		.AddGroup(B_HORIZONTAL, 0.0f)

@@ -314,7 +314,7 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 
 	// add the single package into the model so that any internal
 	// business logic is able to find the package.
-	DepotInfoRef depot(new DepotInfo("single-pkg-depot"), true);
+	DepotInfoRef depot(new DepotInfo(SINGLE_PACKAGE_DEPOT_NAME), true);
 	depot->AddPackage(package);
 	fModel.MergeOrAddDepot(depot);
 

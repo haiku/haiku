@@ -40,7 +40,6 @@ public:
 							NewLocalInfo(const PackageInfoRef& package);
 
 	static	const char*		StateToString(PackageState state);
-
 };
 
 #endif // PACKAGE_UTILS_H
