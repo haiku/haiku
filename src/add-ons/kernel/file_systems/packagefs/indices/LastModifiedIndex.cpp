@@ -200,7 +200,7 @@ LastModifiedIndex::NodeChanged(Node* node, uint32 statFields,
 	const OldNodeAttributes& oldAttributes)
 {
 	IteratorList iterators;
-	iterators.MoveFrom(fIteratorsToUpdate);
+	iterators.TakeFrom(fIteratorsToUpdate);
 
 	time_t oldLastModified = oldAttributes.ModifiedTime().tv_sec;
 	time_t newLastModified = node->ModifiedTime().tv_sec;

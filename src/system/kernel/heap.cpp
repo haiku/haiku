@@ -2009,10 +2009,10 @@ deferred_deleter(void *arg, int iteration)
 		return;
 
 	DeferredFreeList entries;
-	entries.MoveFrom(&sDeferredFreeList);
+	entries.TakeFrom(&sDeferredFreeList);
 
 	DeferredDeletableList deletables;
-	deletables.MoveFrom(&sDeferredDeletableList);
+	deletables.TakeFrom(&sDeferredDeletableList);
 
 	locker.Unlock();
 

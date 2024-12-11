@@ -887,7 +887,7 @@ PPCVMTranslationMap460::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	RecursiveLocker locker(fLock);
 
 	VMAreaMappings mappings;
-	mappings.MoveFrom(&area->mappings);
+	mappings.TakeFrom(&area->mappings);
 
 	for (VMAreaMappings::Iterator it = mappings.GetIterator();
 			vm_page_mapping* mapping = it.Next();) {

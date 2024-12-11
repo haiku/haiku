@@ -159,7 +159,7 @@ move_ancillary_data(ancillary_data_container* from,
 		return NULL;
 
 	ancillary_data *ancillaryData = from->data_list.Head();
-	to->data_list.MoveFrom(&from->data_list);
+	to->data_list.TakeFrom(&from->data_list);
 
 	return ancillaryData != NULL ? ancillaryData->Data() : NULL;
 }

@@ -204,7 +204,7 @@ VMPageQueue::AppendUnlocked(PageList& pages, uint32 count)
 
 	InterruptsSpinLocker locker(fLock);
 
-	fPages.MoveFrom(&pages);
+	fPages.TakeFrom(&pages);
 	fCount += count;
 }
 

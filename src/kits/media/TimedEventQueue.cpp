@@ -502,7 +502,7 @@ BTimedEventQueue::DoForEach(for_each_hook hook, void* context,
 
 	if (resort) {
 		QueueEntryList entries;
-		entries.MoveFrom(&fData->fEvents);
+		entries.TakeFrom(&fData->fEvents);
 		fData->fEventCount = 0;
 
 		while (queue_entry* entry = entries.RemoveHead())

@@ -3170,9 +3170,9 @@ team_remove_team(Team* team, pid_t& _signalGroup)
 		insert_team_into_parent(sKernelTeam, child);
 
 		// move job control entries too
-		sKernelTeam->stopped_children.entries.MoveFrom(
+		sKernelTeam->stopped_children.entries.TakeFrom(
 			&team->stopped_children.entries);
-		sKernelTeam->continued_children.entries.MoveFrom(
+		sKernelTeam->continued_children.entries.TakeFrom(
 			&team->continued_children.entries);
 
 		// If the team was a session leader with controlling terminal,
@@ -3741,7 +3741,7 @@ AssociatedDataOwner::PrepareForDeletion()
 
 	// move all data to a temporary list and unset the owner
 	DataList list;
-	list.MoveFrom(&fList);
+	list.TakeFrom(&fList);
 
 	for (DataList::Iterator it = list.GetIterator();
 		AssociatedData* data = it.Next();) {

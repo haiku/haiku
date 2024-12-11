@@ -365,7 +365,7 @@ IOSchedulerSimple::_Finisher()
 			} else {
 				// Remove the request from the request owner.
 				IORequestOwner* owner = request->Owner();
-				owner->requests.MoveFrom(&owner->completed_requests);
+				owner->requests.TakeFrom(&owner->completed_requests);
 				owner->requests.Remove(request);
 				request->SetOwner(NULL);
 
@@ -809,6 +809,6 @@ IOSchedulerSimple::_GetRequestOwner(team_id team, thread_id thread,
 		existingOwners.Add(owner);
 	}
 
-	fUnusedRequestOwners.MoveFrom(&existingOwners);
+	fUnusedRequestOwners.TakeFrom(&existingOwners);
 	return owner;
 }

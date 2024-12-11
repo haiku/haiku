@@ -215,7 +215,7 @@ Node::RemoveAttribute(Attribute *attribute)
 	if (nextAttr != NULL) {
 		DoublyLinkedList<AttributeIterator> *nextIterators
 			= nextAttr->GetAttributeIteratorList();
-		nextIterators->MoveFrom(iterators);
+		nextIterators->TakeFrom(iterators);
 	} else
 		iterators->RemoveAll();
 

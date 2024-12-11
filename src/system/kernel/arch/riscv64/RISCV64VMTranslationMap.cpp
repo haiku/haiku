@@ -479,7 +479,7 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 	ThreadCPUPinner pinner(thread_get_current_thread());
 
 	VMAreaMappings mappings;
-	mappings.MoveFrom(&area->mappings);
+	mappings.TakeFrom(&area->mappings);
 
 	for (VMAreaMappings::Iterator it = mappings.GetIterator();
 			vm_page_mapping* mapping = it.Next();) {

@@ -3881,7 +3881,7 @@ allocate_page_run(page_num_t start, page_num_t length, uint32 flags,
 
 	// add pages to target queue
 	if (pageState < PAGE_STATE_FIRST_UNQUEUED) {
-		freePages.MoveFrom(&clearPages);
+		freePages.TakeFrom(&clearPages);
 		sPageQueues[pageState].AppendUnlocked(freePages, length);
 	}
 

@@ -231,7 +231,7 @@ UnpackingLeafNode::CloneTransferPackageNodes(ino_t id, UnpackingNode*& _newNode)
 	fFinalPackageNode = fPackageNodes.Head();
 	if (fFinalPackageNode != NULL) {
 		fFinalPackageNode->AcquireReference();
-		clone->fPackageNodes.MoveFrom(&fPackageNodes);
+		clone->fPackageNodes.TakeFrom(&fPackageNodes);
 	}
 
 	_newNode = clone;

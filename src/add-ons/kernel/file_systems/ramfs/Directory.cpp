@@ -205,7 +205,7 @@ Directory::RemoveEntry(Entry *entry)
 			if (nextEntry) {
 				DoublyLinkedList<EntryIterator> *nextIterators
 					= nextEntry->GetEntryIteratorList();
-				nextIterators->MoveFrom(iterators);
+				nextIterators->TakeFrom(iterators);
 			} else
 				iterators->RemoveAll();
 			GetVolume()->IteratorUnlock();

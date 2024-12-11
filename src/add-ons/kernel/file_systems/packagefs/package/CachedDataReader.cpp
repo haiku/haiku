@@ -436,7 +436,7 @@ CachedDataReader::_UnlockCacheLine(CacheLineLocker* lineLocker)
 	fCacheLineLockers.Remove(lineLocker);
 
 	if (CacheLineLocker* nextLineLocker = lineLocker->Queue().RemoveHead()) {
-		nextLineLocker->Queue().MoveFrom(&lineLocker->Queue());
+		nextLineLocker->Queue().TakeFrom(&lineLocker->Queue());
 		fCacheLineLockers.Insert(nextLineLocker);
 		nextLineLocker->WakeUp();
 	}

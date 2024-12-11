@@ -70,5 +70,5 @@ Resolvable::MoveDependencies(ResolvableDependencyList& dependencies)
 		dependency->SetResolvable(NULL);
 	}
 
-	dependencies.MoveFrom(&fDependencies);
+	dependencies.TakeFrom(&fDependencies);
 }
