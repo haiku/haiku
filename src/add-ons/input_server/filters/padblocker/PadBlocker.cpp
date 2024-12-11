@@ -170,7 +170,7 @@ filter_result PadBlocker::Filter(BMessage *message, BList *outList)
 
 			// only block touchpad devices
 			if (message->FindInt32("be:device_subtype", &device) != B_OK
-				|| device != B_TOUCHPAD_DEVICE_SUBTYPE)
+				|| device != B_TOUCHPAD_POINTING_DEVICE)
 				break;
 
 			bigtime_t now = system_time();

@@ -383,7 +383,7 @@ TabletDevice::_ControlThread()
 					&& message->AddFloat("be:wheel_delta_y",
 						movements.wheel_ydelta) == B_OK
 					&& message->AddInt32("be:device_subtype",
-						B_TABLET_DEVICE_SUBTYPE) == B_OK)
+						B_TABLET_POINTING_DEVICE) == B_OK)
 					fTarget.EnqueueMessage(message);
 				else
 					delete message;
@@ -437,7 +437,7 @@ TabletDevice::_BuildMouseMessage(uint32 what, uint64 when, uint32 buttons,
 		|| message->AddFloat("x", xPosition) < B_OK
 		|| message->AddFloat("y", yPosition) < B_OK
 		|| message->AddInt32("be:device_subtype",
-			B_TABLET_DEVICE_SUBTYPE) < B_OK) {
+			B_TABLET_POINTING_DEVICE) < B_OK) {
 		delete message;
 		return NULL;
 	}
