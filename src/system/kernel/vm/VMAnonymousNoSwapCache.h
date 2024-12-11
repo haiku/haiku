@@ -39,7 +39,7 @@ public:
 	virtual	status_t			Fault(struct VMAddressSpace* aspace,
 									off_t offset);
 
-	virtual	void				MergeStore(VMCache* source);
+	virtual	void				Merge(VMCache* source);
 
 protected:
 	virtual	void				DeleteObject();
