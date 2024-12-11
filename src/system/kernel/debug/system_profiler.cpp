@@ -1227,7 +1227,7 @@ SystemProfiler::_WaitObjectCreated(addr_t object, uint32 type)
 	// If found, remove it and add it to the free list. This might sound weird,
 	// but it makes sense, since we lazily track *used* wait objects only.
 	// I.e. the object in the table is now guaranteedly obsolete.
-	if (waitObject) {
+	if (waitObject != NULL) {
 		fWaitObjectTable.RemoveUnchecked(waitObject);
 		fUsedWaitObjects.Remove(waitObject);
 		fFreeWaitObjects.Add(waitObject, false);
