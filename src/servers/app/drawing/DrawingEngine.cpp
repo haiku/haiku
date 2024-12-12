@@ -851,9 +851,6 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	// NOTE: Write locking because we might use HW acceleration.
-	// This needs to be investigated, I'm doing this because of
-	// gut feeling.
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
 	DrawTransaction transaction(this, r);
