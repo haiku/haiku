@@ -200,7 +200,7 @@ public:
 private:
 	friend class DrawTransaction;
 
-			void			_CopyRect(bool isGraphicsMemory, uint8* bits,
+			void			_CopyRect(uint8* bits,
 								uint32 width, uint32 height, uint32 bytesPerRow,
 								int32 xOffset, int32 yOffset) const;
 
