@@ -14,10 +14,17 @@
 #include <debug.h>
 #include <kernel.h>
 #include <real_time_clock.h>
+#include <syscall_clock_info.h>
 #include <team.h>
 #include <thread_types.h>
 #include <UserEvent.h>
 #include <util/AutoLock.h>
+
+
+#define CPUCLOCK_TEAM		0x00000000
+#define CPUCLOCK_THREAD		0x80000000
+#define CPUCLOCK_SPECIAL	0xc0000000
+#define CPUCLOCK_ID_MASK	(~(CPUCLOCK_SPECIAL))
 
 
 // Minimum interval length in microseconds for a periodic timer. This is not a
@@ -1505,13 +1512,24 @@ user_timer_get_clock(clockid_t clockID, bigtime_t& _time)
 			team_id teamID;
 			if (clockID == CLOCK_PROCESS_CPUTIME_ID) {
 				teamID = B_CURRENT_TEAM;
-			} else {
-				if (clockID < 0)
+			} else if ((clockID & CPUCLOCK_THREAD) == CPUCLOCK_THREAD) {
+				thread_id threadID = clockID & CPUCLOCK_ID_MASK;
+				// get the thread
+				Thread* thread = Thread::Get(threadID);
+				if (thread == NULL)
 					return B_BAD_VALUE;
-				if (clockID == team_get_kernel_team_id())
+				BReference<Thread> threadReference(thread, true);
+				if (thread->team == team_get_kernel_team())
 					return B_NOT_ALLOWED;
+				// get the time
+				InterruptsSpinLocker timeLocker(thread->time_lock);
+				_time = thread->CPUTime(false);
 
-				teamID = clockID;
+				return B_OK;
+			} else if ((clockID & CPUCLOCK_TEAM) == CPUCLOCK_TEAM) {
+				teamID = clockID & CPUCLOCK_ID_MASK;
+				if (teamID == team_get_kernel_team_id())
+					return B_NOT_ALLOWED;
 			}
 
 			// get the team
@@ -1657,13 +1675,31 @@ _user_set_clock(clockid_t clockID, bigtime_t time)
 			team_id teamID;
 			if (clockID == CLOCK_PROCESS_CPUTIME_ID) {
 				teamID = B_CURRENT_TEAM;
-			} else {
-				if (clockID < 0)
+			} else if ((clockID & CPUCLOCK_THREAD) != 0) {
+				thread_id threadID = clockID & CPUCLOCK_ID_MASK;
+				if (threadID < 0)
 					return B_BAD_VALUE;
-				if (clockID == team_get_kernel_team_id())
+				// get the thread
+				Thread* thread = Thread::Get(threadID);
+				if (thread == NULL)
+					return B_BAD_VALUE;
+				BReference<Thread> threadReference(thread, true);
+				if (thread->team == team_get_kernel_team())
 					return B_NOT_ALLOWED;
 
-				teamID = clockID;
+				// set the time offset
+				InterruptsSpinLocker timeLocker(thread->time_lock);
+				bigtime_t diff = time - thread->CPUTime(false);
+				thread->cpu_clock_offset += diff;
+
+				thread_clock_changed(thread, diff);
+				return B_OK;
+			} else {
+				teamID = clockID & CPUCLOCK_ID_MASK;
+				if (teamID < 0)
+					return B_BAD_VALUE;
+				if (teamID == team_get_kernel_team_id())
+					return B_NOT_ALLOWED;
 			}
 
 			// get the team
@@ -1682,6 +1718,34 @@ _user_set_clock(clockid_t clockID, bigtime_t time)
 		}
 	}
 
+	return B_OK;
+}
+
+
+status_t
+_user_get_cpuclockid(thread_id id, int32 which, clockid_t* userclockID)
+{
+	clockid_t clockID;
+	if (which != TEAM_ID && which != THREAD_ID)
+		return B_BAD_VALUE;
+
+	if (which == TEAM_ID) {
+		Team* team = Team::Get(id);
+		if (team == NULL)
+			return B_BAD_VALUE;
+		clockID = id | CPUCLOCK_TEAM;
+	} else if (which == THREAD_ID) {
+		Thread* thread = Thread::Get(id);
+		if (thread == NULL)
+			return B_BAD_VALUE;
+		clockID = id | CPUCLOCK_THREAD;
+	}
+
+	if (userclockID != NULL
+		&& (!IS_USER_ADDRESS(userclockID)
+			|| user_memcpy(userclockID, &clockID, sizeof(clockID)) != B_OK)) {
+		return B_BAD_ADDRESS;
+	}
 	return B_OK;
 }
 

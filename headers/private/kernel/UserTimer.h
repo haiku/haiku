@@ -261,6 +261,7 @@ void		user_timer_check_team_user_timers(Team* team);
 
 status_t	_user_get_clock(clockid_t clockID, bigtime_t* _time);
 status_t	_user_set_clock(clockid_t clockID, bigtime_t time);
+status_t	_user_get_cpuclockid(thread_id id, int32 which, clockid_t* _clockID);
 
 int32		_user_create_timer(clockid_t clockID, thread_id threadID,
 				uint32 flags, const struct sigevent* event,

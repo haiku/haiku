@@ -43,6 +43,7 @@ SimpleTest <test>truncate : truncate.cpp ;
 SimpleTest init_rld_after_fork_test : init_rld_after_fork_test.cpp ;
 SimpleTest user_thread_fork_test : user_thread_fork_test.cpp ;
 SimpleTest pthread_barrier_test : pthread_barrier_test.cpp ;
+SimpleTest pthread_clock_test : pthread_clock_test.cpp ;
 SimpleTest posix_spawn_test : posix_spawn_test.cpp ;
 SimpleTest posix_spawn_redir_test : posix_spawn_redir_test.c ;
 SimpleTest posix_spawn_redir_err : posix_spawn_redir_err.c ;
