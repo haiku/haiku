@@ -113,7 +113,6 @@ private:
 
 public:
 	VMCache*				cache;
-	vint32					no_cache_change;
 	off_t					cache_offset;
 	uint32					cache_type;
 	VMAreaMappings			mappings;

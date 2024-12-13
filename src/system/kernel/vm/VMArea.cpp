@@ -30,7 +30,6 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 	wiring(wiring),
 	memory_type(0),
 	cache(NULL),
-	no_cache_change(0),
 	cache_offset(0),
 	cache_type(0),
 	page_protections(NULL),
