@@ -3004,14 +3004,14 @@ vm_copy_area(team_id team, const char* name, void** _address,
 		cache->AcquireRefLocked();
 	}
 
-	// If the source area is writable, we need to move it one layer up as well
-	if (!sharedArea) {
-		if (writableCopy) {
-			// TODO: do something more useful if this fails!
-			if (vm_copy_on_write_area(cache,
-					wiredPages > 0 ? &wiredPagesReservation : NULL) < B_OK) {
-				panic("vm_copy_on_write_area() failed!\n");
-			}
+	// If the source area is writable, we need to move it one layer up as well.
+	if (!sharedArea && writableCopy) {
+		status_t status = vm_copy_on_write_area(cache,
+			wiredPages > 0 ? &wiredPagesReservation : NULL);
+		if (status != B_OK) {
+			cacheLocker.Unlock();
+			delete_area(targetAddressSpace, target, false);
+			return status;
 		}
 	}
 
