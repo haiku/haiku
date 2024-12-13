@@ -2733,7 +2733,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 	// deeper and we create a new cache inbetween.
 
 	// create an anonymous cache
-	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache, false, 0,
+	status_t status = VMCacheFactory::CreateAnonymousCache(upperCache,
+		lowerCache->CanOvercommit(), 0,
 		lowerCache->GuardSize() / B_PAGE_SIZE,
 		dynamic_cast<VMAnonymousNoSwapCache*>(lowerCache) == NULL,
 		VM_PRIORITY_USER);
@@ -6317,7 +6318,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		cacheChainLocker.LockAllSourceCaches();
 
 		// Adjust the committed size, if necessary.
-		if (topCache->temporary) {
+		if (topCache->temporary && !topCache->CanOvercommit()) {
 			const bool becomesWritable = (protection & B_WRITE_AREA) != 0;
 			ssize_t commitmentChange = 0;
 			const off_t areaCacheBase = area->Base() - area->cache_offset;
