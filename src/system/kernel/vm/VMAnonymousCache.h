@@ -47,7 +47,7 @@ public:
 	virtual	status_t			Adopt(VMCache* source, off_t offset,
 									off_t size, off_t newOffset);
 
-	virtual	status_t			Discard(off_t offset, off_t size);
+	virtual	ssize_t				Discard(off_t offset, off_t size);
 
 	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);

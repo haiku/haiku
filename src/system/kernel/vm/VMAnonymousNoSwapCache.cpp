@@ -58,10 +58,21 @@ VMAnonymousNoSwapCache::Init(bool canOvercommit, int32 numPrecommittedPages,
 }
 
 
+ssize_t
+VMAnonymousNoSwapCache::Discard(off_t offset, off_t size)
+{
+	const ssize_t discarded = VMCache::Discard(offset, size);
+	if (discarded > 0 && fCanOvercommit)
+		Commit(committed_size - discarded, VM_PRIORITY_USER);
+	return discarded;
+}
+
+
 status_t
 VMAnonymousNoSwapCache::Commit(off_t size, int priority)
 {
 	AssertLocked();
+	ASSERT(size >= (page_count * B_PAGE_SIZE));
 
 	// If we can overcommit, we don't commit here, but in Fault(). We always
 	// unreserve memory, if we're asked to shrink our commitment, though.

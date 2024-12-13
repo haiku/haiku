@@ -604,11 +604,14 @@ VMAnonymousCache::Rebase(off_t newBase, int priority)
 }
 
 
-status_t
+ssize_t
 VMAnonymousCache::Discard(off_t offset, off_t size)
 {
 	_FreeSwapPageRange(offset, offset + size);
-	return VMCache::Discard(offset, size);
+	const ssize_t discarded = VMCache::Discard(offset, size);
+	if (discarded > 0 && fCanOvercommit)
+		Commit(committed_size - discarded, VM_PRIORITY_USER);
+	return discarded;
 }
 
 
@@ -720,6 +723,7 @@ VMAnonymousCache::Commit(off_t size, int priority)
 	TRACE("%p->VMAnonymousCache::Commit(%" B_PRIdOFF ")\n", this, size);
 
 	AssertLocked();
+	ASSERT(size >= (page_count * B_PAGE_SIZE));
 
 	// If we can overcommit, we don't commit here, but in Fault(). We always
 	// unreserve memory, if we're asked to shrink our commitment, though.

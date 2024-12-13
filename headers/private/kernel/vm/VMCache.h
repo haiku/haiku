@@ -135,7 +135,7 @@ public:
 	virtual	status_t			Adopt(VMCache* source, off_t offset, off_t size,
 									off_t newOffset);
 
-	virtual	status_t			Discard(off_t offset, off_t size);
+	virtual	ssize_t				Discard(off_t offset, off_t size);
 
 			status_t			FlushAndRemoveAllPages();
 
@@ -220,7 +220,7 @@ private:
 			void				_RemoveConsumer(VMCache* consumer);
 
 			bool				_FreePageRange(VMCachePagesTree::Iterator it,
-									page_num_t* toPage);
+									page_num_t* toPage, page_num_t* discarded);
 
 private:
 			int32				fRefCount;

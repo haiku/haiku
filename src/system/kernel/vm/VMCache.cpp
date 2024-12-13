@@ -1106,7 +1106,7 @@ VMCache::SetMinimalCommitment(off_t commitment, int priority)
 
 bool
 VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
-	page_num_t* toPage = NULL)
+	page_num_t* toPage = NULL, page_num_t* discarded = NULL)
 {
 	for (vm_page* page = it.Next();
 		page != NULL && (toPage == NULL || page->cache_offset < *toPage);
@@ -1118,6 +1118,8 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 				// as we might cause a deadlock this way
 				page->busy_writing = false;
 					// this will notify the writer to free the page
+				if (discarded != NULL)
+					(*discarded)++;
 				continue;
 			}
 
@@ -1138,6 +1140,8 @@ VMCache::_FreePageRange(VMCachePagesTree::Iterator it,
 			// removing the current node is safe.
 
 		vm_page_free(this, page);
+		if (discarded != NULL)
+			(*discarded)++;
 	}
 
 	return false;
@@ -1241,15 +1245,16 @@ VMCache::Adopt(VMCache* source, off_t offset, off_t size, off_t newOffset)
 
 
 /*! Discards pages in the given range. */
-status_t
+ssize_t
 VMCache::Discard(off_t offset, off_t size)
 {
+	page_num_t discarded = 0;
 	page_num_t startPage = offset >> PAGE_SHIFT;
 	page_num_t endPage = (offset + size + B_PAGE_SIZE - 1) >> PAGE_SHIFT;
-	while (_FreePageRange(pages.GetIterator(startPage, true, true), &endPage))
+	while (_FreePageRange(pages.GetIterator(startPage, true, true), &endPage, &discarded))
 		;
 
-	return B_OK;
+	return (discarded * B_PAGE_SIZE);
 }
 
 
