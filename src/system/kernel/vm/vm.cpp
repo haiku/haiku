@@ -602,7 +602,7 @@ compute_area_page_commitment(VMArea* area)
 	size_t pages = 0;
 	for (size_t i = 0; i < bytes; i++) {
 		const uint8 protection = area->page_protections[i];
-		const off_t pageOffset = bytes * 2 * B_PAGE_SIZE;
+		const off_t pageOffset = area->cache_offset + (i * 2 * B_PAGE_SIZE);
 		if (area->cache->LookupPage(pageOffset) != NULL)
 			pages++;
 		else
@@ -767,6 +767,12 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		allocationFlags = 0;
 	}
 
+	int resizePriority = priority;
+	if (area->page_protections != NULL) {
+		// We'll adjust commitments directly, rather than letting VMCache do it.
+		resizePriority = -1;
+	}
+
 	VMCache* cache = vm_area_get_locked_cache(area);
 	VMCacheChainLocker cacheChainLocker(cache);
 	cacheChainLocker.LockAllSourceCaches();
@@ -779,7 +785,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	const addr_t oldSize = area->Size();
 
 	// Cut the end only?
-	if (offset > 0 && size == area->Size() - offset) {
+	if (offset > 0 && size == (area->Size() - offset)) {
 		status_t error = addressSpace->ShrinkAreaTail(area, offset,
 			allocationFlags);
 		if (error != B_OK)
@@ -804,13 +810,13 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Resize() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			cache->Resize(cache->virtual_base + offset, priority);
+			status_t status = cache->Resize(cache->virtual_base + offset, resizePriority);
+			ASSERT_ALWAYS(status == B_OK);
 		}
 
 		if (area->page_protections != NULL) {
-			// Resize() adjusts the commitment, so we must do this after that.
 			const size_t newCommitmentPages = compute_area_page_commitment(area);
-			cache->Commit(newCommitmentPages * B_PAGE_SIZE, VM_PRIORITY_USER);
+			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
 
 		if (onlyCacheUser)
@@ -856,19 +862,19 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// Since VMCache::Rebase() can temporarily drop the lock, we must
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
-			cache->Rebase(cache->virtual_base + size, priority);
+			status_t status = cache->Rebase(cache->virtual_base + size, resizePriority);
+			ASSERT_ALWAYS(status == B_OK);
 		}
 
+		area->cache_offset += size;
 		if (area->page_protections != NULL) {
-			// Rebase() adjusts the commitment, so we must do this after that.
 			const size_t newCommitmentPages = compute_area_page_commitment(area);
-			cache->Commit(newCommitmentPages * B_PAGE_SIZE, VM_PRIORITY_USER);
+			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
 
 		if (onlyCacheUser)
 			cache->ReleaseRefAndUnlock();
 
-		area->cache_offset += size;
 		return B_OK;
 	}
 
@@ -942,7 +948,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			// unlock all lower caches to prevent locking order inversion.
 			cacheChainLocker.Unlock(cache);
 			areaCacheLocker.SetTo(cache, true);
-			cache->Resize(cache->virtual_base + firstNewSize, priority);
+			error = cache->Resize(cache->virtual_base + firstNewSize, resizePriority);
+			ASSERT_ALWAYS(error == B_OK);
 				// Don't unlock the cache yet because we might have to resize it back.
 				// (Or we might have to modify its commitment, if we have page_protections.)
 
@@ -955,7 +962,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		if (error != B_OK) {
 			// Restore the original cache.
-			cache->Resize(cache->virtual_base + oldSize, priority);
+			cache->Resize(cache->virtual_base + oldSize, resizePriority);
 
 			// Move the pages back.
 			status_t readoptStatus = cache->Adopt(secondCache,
@@ -1021,10 +1028,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// Shrink commitments.
 		const size_t areaCommitPages = compute_area_page_commitment(area);
-		area->cache->Commit(areaCommitPages * B_PAGE_SIZE, VM_PRIORITY_USER);
+		area->cache->Commit(areaCommitPages * B_PAGE_SIZE, priority);
 
 		const size_t secondCommitPages = compute_area_page_commitment(secondArea);
-		secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, VM_PRIORITY_USER);
+		secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, priority);
 
 		// Set the correct page protections for the second area.
 		VMTranslationMap* map = addressSpace->TranslationMap();
