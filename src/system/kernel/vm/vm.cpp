@@ -768,7 +768,8 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	}
 
 	int resizePriority = priority;
-	if (area->page_protections != NULL) {
+	const bool overcommitting = (area->protection & B_OVERCOMMITTING_AREA) != 0;
+	if (area->page_protections != NULL && !overcommitting) {
 		// We'll adjust commitments directly, rather than letting VMCache do it.
 		resizePriority = -1;
 	}
@@ -867,7 +868,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		area->cache_offset += size;
-		if (area->page_protections != NULL) {
+		if (area->page_protections != NULL && !overcommitting) {
 			const size_t newCommitmentPages = compute_area_page_commitment(area);
 			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
@@ -923,7 +924,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// Create a new cache for the second area.
 		VMCache* secondCache;
 		error = VMCacheFactory::CreateAnonymousCache(secondCache,
-			area->protection & B_OVERCOMMITTING_AREA, 0, 0,
+			overcommitting, 0, 0,
 			dynamic_cast<VMAnonymousNoSwapCache*>(cache) == NULL, priority);
 		if (error != B_OK) {
 			addressSpace->ShrinkAreaTail(area, oldSize, allocationFlags);
@@ -1026,12 +1027,14 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// We don't need this anymore.
 		free_etc(areaOldProtections, allocationFlags);
 
-		// Shrink commitments.
-		const size_t areaCommitPages = compute_area_page_commitment(area);
-		area->cache->Commit(areaCommitPages * B_PAGE_SIZE, priority);
+		if (!overcommitting) {
+			// Shrink commitments.
+			const size_t areaCommitPages = compute_area_page_commitment(area);
+			area->cache->Commit(areaCommitPages * B_PAGE_SIZE, priority);
 
-		const size_t secondCommitPages = compute_area_page_commitment(secondArea);
-		secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, priority);
+			const size_t secondCommitPages = compute_area_page_commitment(secondArea);
+			secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, priority);
+		}
 
 		// Set the correct page protections for the second area.
 		VMTranslationMap* map = addressSpace->TranslationMap();
