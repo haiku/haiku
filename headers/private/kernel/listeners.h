@@ -80,7 +80,7 @@ struct WaitObjectListener : DoublyLinkedListLinkImpl<WaitObjectListener> {
 
 typedef DoublyLinkedList<WaitObjectListener> WaitObjectListenerList;
 extern WaitObjectListenerList gWaitObjectListeners;
-extern spinlock gWaitObjectListenerLock;
+extern rw_spinlock gWaitObjectListenerLock;
 
 
 template<typename Parameter1>
@@ -89,7 +89,7 @@ NotifyWaitObjectListeners(void (WaitObjectListener::*hook)(Parameter1),
 	Parameter1 parameter1)
 {
 	if (!gWaitObjectListeners.IsEmpty()) {
-		InterruptsSpinLocker locker(gWaitObjectListenerLock);
+		InterruptsReadSpinLocker locker(gWaitObjectListenerLock);
 		WaitObjectListenerList::Iterator it
 			= gWaitObjectListeners.GetIterator();
 		while (WaitObjectListener* listener = it.Next())
@@ -105,7 +105,7 @@ NotifyWaitObjectListeners(
 	Parameter1 parameter1, Parameter2 parameter2)
 {
 	if (!gWaitObjectListeners.IsEmpty()) {
-		InterruptsSpinLocker locker(gWaitObjectListenerLock);
+		InterruptsReadSpinLocker locker(gWaitObjectListenerLock);
 		WaitObjectListenerList::Iterator it
 			= gWaitObjectListeners.GetIterator();
 		while (WaitObjectListener* listener = it.Next())

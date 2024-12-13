@@ -321,7 +321,7 @@ SystemProfiler::~SystemProfiler()
 
 	// stop wait object listening
 	if (fWaitObjectNotificationsRequested) {
-		InterruptsSpinLocker locker(gWaitObjectListenerLock);
+		InterruptsWriteSpinLocker locker(gWaitObjectListenerLock);
 		remove_wait_object_listener(this);
 	}
 
@@ -514,7 +514,7 @@ SystemProfiler::Init()
 		scheduler_add_listener(this);
 		fSchedulerNotificationsRequested = true;
 
-		InterruptsSpinLocker waitObjectLocker(gWaitObjectListenerLock);
+		InterruptsWriteSpinLocker waitObjectLocker(gWaitObjectListenerLock);
 		add_wait_object_listener(this);
 		fWaitObjectNotificationsRequested = true;
 		waitObjectLocker.Unlock();

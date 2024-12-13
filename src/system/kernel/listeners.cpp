@@ -7,7 +7,7 @@
 
 
 WaitObjectListenerList gWaitObjectListeners;
-spinlock gWaitObjectListenerLock = B_SPINLOCK_INITIALIZER;
+rw_spinlock gWaitObjectListenerLock = B_RW_SPINLOCK_INITIALIZER;
 
 
 WaitObjectListener::~WaitObjectListener()
