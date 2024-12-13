@@ -2946,7 +2946,7 @@ vm_copy_area(team_id team, const char* name, void** _address,
 
 		for (size_t i = 0; i < bytes; i++) {
 			if ((targetPageProtections[i]
-					& (B_WRITE_AREA | B_WRITE_AREA << 4)) != 0) {
+					& (B_WRITE_AREA | (B_WRITE_AREA << 4))) != 0) {
 				writableCopy = true;
 				break;
 			}
