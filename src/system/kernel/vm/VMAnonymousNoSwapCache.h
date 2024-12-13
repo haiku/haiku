@@ -22,6 +22,7 @@ public:
 									int32 numGuardPages,
 									uint32 allocationFlags);
 
+	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 

@@ -1298,6 +1298,13 @@ VMCache::FlushAndRemoveAllPages()
 }
 
 
+bool
+VMCache::CanOvercommit()
+{
+	return false;
+}
+
+
 status_t
 VMCache::Commit(off_t size, int priority)
 {

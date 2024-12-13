@@ -149,6 +149,7 @@ public:
 									{ return fRefCount; }
 
 	// backing store operations
+	virtual	bool				CanOvercommit();
 	virtual	status_t			Commit(off_t size, int priority);
 	virtual	bool				HasPage(off_t offset);
 

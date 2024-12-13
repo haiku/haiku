@@ -739,6 +739,13 @@ VMAnonymousCache::Commit(off_t size, int priority)
 
 
 bool
+VMAnonymousCache::CanOvercommit()
+{
+	return fCanOvercommit;
+}
+
+
+bool
 VMAnonymousCache::HasPage(off_t offset)
 {
 	if (_SwapBlockGetAddress(offset >> PAGE_SHIFT) != SWAP_SLOT_NONE)

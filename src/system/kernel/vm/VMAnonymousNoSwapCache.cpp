@@ -95,6 +95,13 @@ VMAnonymousNoSwapCache::Commit(off_t size, int priority)
 
 
 bool
+VMAnonymousNoSwapCache::CanOvercommit()
+{
+	return fCanOvercommit;
+}
+
+
+bool
 VMAnonymousNoSwapCache::HasPage(off_t offset)
 {
 	return false;
