@@ -1172,15 +1172,16 @@ VMCache::Resize(off_t newSize, int priority)
 		>> PAGE_SHIFT);
 
 	if (newPageCount < oldPageCount) {
-		// we need to remove all pages in the cache outside of the new virtual
-		// size
+		// Remove all pages in the cache outside of the new virtual size.
 		while (_FreePageRange(pages.GetIterator(newPageCount, true, true)))
 			;
 	}
 
-	status_t status = Commit(newSize - virtual_base, priority);
-	if (status != B_OK)
-		return status;
+	if (priority >= 0) {
+		status_t status = Commit(newSize - virtual_base, priority);
+		if (status != B_OK)
+			return status;
+	}
 
 	virtual_end = newSize;
 	return B_OK;
@@ -1200,21 +1201,22 @@ VMCache::Rebase(off_t newBase, int priority)
 {
 	TRACE(("VMCache::Rebase(cache %p, newBase %lld) old base %lld\n",
 		this, newBase, this->virtual_base));
-	this->AssertLocked();
-
 	T(Rebase(this, newBase));
 
-	status_t status = Commit(virtual_end - newBase, priority);
-	if (status != B_OK)
-		return status;
+	AssertLocked();
 
 	page_num_t basePage = (page_num_t)(newBase >> PAGE_SHIFT);
 
 	if (newBase > virtual_base) {
-		// we need to remove all pages in the cache outside of the new virtual
-		// base
+		// Remove all pages in the cache outside of the new virtual base.
 		while (_FreePageRange(pages.GetIterator(), &basePage))
 			;
+	}
+
+	if (priority >= 0) {
+		status_t status = Commit(virtual_end - newBase, priority);
+		if (status != B_OK)
+			return status;
 	}
 
 	virtual_base = newBase;
