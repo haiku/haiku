@@ -1653,6 +1653,7 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 
 	physical_address_restrictions stackPhysicalRestrictions;
 	bool doReserveMemory = false;
+	addr_t reservedMemory = 0;
 	switch (wiring) {
 		case B_NO_LOCK:
 			break;
@@ -1660,8 +1661,6 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 		case B_LAZY_LOCK:
 		case B_CONTIGUOUS:
 			doReserveMemory = true;
-			break;
-		case B_ALREADY_WIRED:
 			break;
 		case B_LOMEM:
 			stackPhysicalRestrictions = *physicalAddressRestrictions;
@@ -1680,16 +1679,21 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 			// TODO: We don't really support this mode efficiently. Just fall
 			// through for now ...
 		case B_32_BIT_CONTIGUOUS:
-			#if B_HAIKU_PHYSICAL_BITS > 32
+#if B_HAIKU_PHYSICAL_BITS > 32
 				if (vm_page_max_address() >= (phys_addr_t)1 << 32) {
 					stackPhysicalRestrictions = *physicalAddressRestrictions;
 					stackPhysicalRestrictions.high_address
 						= (phys_addr_t)1 << 32;
 					physicalAddressRestrictions = &stackPhysicalRestrictions;
 				}
-			#endif
+#endif
 			wiring = B_CONTIGUOUS;
 			doReserveMemory = true;
+			break;
+		case B_ALREADY_WIRED:
+			ASSERT(gKernelStartup);
+			// The used memory will already be accounted for.
+			reservedMemory = size;
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -1728,7 +1732,6 @@ vm_create_anonymous_area(team_id team, const char *name, addr_t size,
 	// chances of failure, since while holding the write lock to the address
 	// space (if it is the kernel address space that is), the low memory handler
 	// won't be able to free anything for us.
-	addr_t reservedMemory = 0;
 	if (doReserveMemory) {
 		bigtime_t timeout = (flags & CREATE_AREA_DONT_WAIT) != 0 ? 0 : 1000000;
 		if (vm_try_reserve_memory(size, priority, timeout) != B_OK)
@@ -3921,7 +3924,6 @@ vm_init(kernel_args* args)
 
 	// initialize some globals
 	vm_page_init_num_pages(args);
-	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
 	slab_init(args);
 

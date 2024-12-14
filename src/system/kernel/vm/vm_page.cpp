@@ -3431,6 +3431,9 @@ vm_page_init(kernel_args *args)
 	// prevent future allocations from the kernel args ranges
 	args->num_physical_allocated_ranges = 0;
 
+	// report initially available memory
+	vm_unreserve_memory(vm_page_num_free_pages() * B_PAGE_SIZE);
+
 	// The target of actually free pages. This must be at least the system
 	// reserve, but should be a few more pages, so we don't have to extract
 	// a cached page with each allocation.
