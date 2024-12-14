@@ -98,7 +98,7 @@ Proxy username:	Settings Window		代理用户名：
 Manage bookmarks	WebPositive Window		管理书签
 /s)	Download Window	...as in 'per second'	/秒)
 Restart	Download Window		重新启动
-Serif font:	Settings Window		线称字体：
+Serif font:	Settings Window		衬线字体：
 Apply	Settings Window		应用
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	尝试显示书签目录发生错误。\n\n错误：%error
 Revert	Settings Window		恢复

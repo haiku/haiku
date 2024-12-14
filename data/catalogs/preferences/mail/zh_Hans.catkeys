@@ -33,7 +33,7 @@ Password:	E-Mail		密码：
 Error retrieving general settings: %s\n	Config Window		恢复常用设置出错：%s\n
 The filter could not be moved. Deleting filter.	Config Views		该过滤器无法移动。请删除过滤器。
 OK	Config Views		确定
-Revert	Config Window		取消
+Revert	Config Window		恢复
 Incoming	Config Window		收件箱
 Finish	AutoConfigWindow		完成
 Add filter	Config Views		添加过滤器

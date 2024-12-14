@@ -12,7 +12,7 @@ No effect on running applications	DecorSettingsView		对运行中程序无效果
 Fixed font:	Font view		等宽字体：
 Appearance	System name		外观
 Reduce colored edges filter strength:	AntialiasingSettingsView		减小彩色边缘滤色强度:
-Glyph hinting:	AntialiasingSettingsView		象形文字微调：
+Glyph hinting:	AntialiasingSettingsView		字形微调：
 Default Haiku ControlLook	DecorSettingsView		Haiku 默认控件外观
 Menu item text	Colors tab		菜单项文本
 About decorator	DecorSettingsView		关于主题
@@ -24,7 +24,7 @@ Arrow style	DecorSettingsView		箭头样式
 On	AntialiasingSettingsView		开启
 Decorator:	DecorSettingsView		窗口装饰：
 Menu background	Colors tab		菜单背景
-Revert	APRWindow		取消
+Revert	APRWindow		恢复
 List item text	Colors tab		列表项文本
 OK	DecorSettingsView		确定
 Control text	Colors tab		控件文本

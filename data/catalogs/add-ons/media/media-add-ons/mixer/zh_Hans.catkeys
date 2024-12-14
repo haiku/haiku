@@ -13,12 +13,12 @@ Output channel sources	AudioMixer		输出通道源
 Allow input channel remapping	AudioMixer		启用输入频道重映射
 Display balance control for stereo connections	AudioMixer		为立体声系统显示均衡控制器
 Setup	AudioMixer		配置
-Physical input channels	AudioMixer		物理输入频道
+Physical input channels	AudioMixer		物理输入通道
 Input channel destinations	AudioMixer		输入通道目标
 Resampling algorithm:	AudioMixer		重新采样算法:
 Mute	AudioMixer		静音
 Output mapping	AudioMixer		输出映射
 Virtual output channels	AudioMixer		虚拟输出通道
-Allow output channel remapping	AudioMixer		启用输出频道重映射
+Allow output channel remapping	AudioMixer		启用输出通道重映射
 Input gain controls represent:	AudioMixer		输入增益控制表示：
 Attenuate mixer output by 3 dB	AudioMixer		衰减混音输出 3dB

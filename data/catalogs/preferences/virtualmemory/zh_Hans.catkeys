@@ -5,7 +5,7 @@ OK	VirtualMemoryApp		确定
 Use volume:	SettingsWindow		已用磁卷：
 Turn off	SettingsWindow		关闭
 Changes will take effect upon reboot.	SettingsWindow		重启之后，更改将会生效！
-Revert	SettingsWindow		取消
+Revert	SettingsWindow		恢复
 Keep enabled	SettingsWindow		保持启用
 The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		配置文件中置顶的设置无效。您可以载入默认设置或者退出。
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		虚拟内存\n\t由 Axel Dörfler 编写\n\t 版权所有 2005 Haiku Inc.\n

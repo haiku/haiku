@@ -1,7 +1,7 @@
 1	english	x-vnd.Be-PRNT	1465107170
 Test page	TestPageView		测试页
 Remove	PrintersWindow		删除
-Red	TestPageView		绿
+Red	TestPageView		红
 Default Printer	PrinterListView		默认打印机
 <pick one>	AddPrinterDialog		<选择一个>
 Connected to:	AddPrinterDialog		连接到：
@@ -31,9 +31,9 @@ Yellow	TestPageView		黄
 Black	TestPageView		黑
 Printer type:	AddPrinterDialog		打印机类型：
 Printers	System name		打印机
-{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{没有待处理的任务}=1{1 项待处理的任务}other{# 项待处理的任务}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
-Green	TestPageView		红
+Green	TestPageView		绿
 Print test page	PrintersWindow		打印测试页面
 Restart job	PrintersWindow		重启任务
 Driver: %driver%	PrinterListView		驱动程序：%driver%

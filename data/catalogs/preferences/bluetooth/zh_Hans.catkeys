@@ -41,7 +41,7 @@ Scanning completed.	Inquiry panel		扫描完成。
 Smart phone	Settings view		智能手机
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		无蓝牙本地设备接入系统。
 Default inquiry time:	Settings view		默认查询时间：
-Revert	Window		取消
+Revert	Window		恢复
 Refresh local devices…	Window		刷新本地设备...
 Server	Settings view		服务器
  packets: 	Device View		数据包：

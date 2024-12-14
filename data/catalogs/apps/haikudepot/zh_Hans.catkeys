@@ -173,7 +173,7 @@ Inactive	PackageListView		未激活
 Nickname:	UserLoginWindow		昵称:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		正在同步仓库元数据信息
 OK	MainWindow		确定
-Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		用户年龄需高于 {0, plural, one{# 岁} other{# 岁}}.
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		用户年龄需高于 {0, plural, one{# 岁} other{# 岁}}。
 Version %Code%	UserUsageConditions		版本 %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# 个项目} other{# 个项目}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		卸载 \"%PackageName%\"

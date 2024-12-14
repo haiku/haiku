@@ -10,7 +10,7 @@ Don't save	ShortcutsWindow		不保存
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		无法保存您的按键设置。
 Save	ShortcutsWindow		保存
 Either	ShortcutsSpec		任意一个
-Oh no	ShortcutsWindow		Oh no
+Oh no	ShortcutsWindow		哦，不
 Key	ShortcutsWindow		按键
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*SendMessage 应用程序/x-vnd.Be-TARK 'Tfnd'
 Select	ShortcutsWindow		选择

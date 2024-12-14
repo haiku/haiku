@@ -4,7 +4,7 @@ OK	ShutdownProcess		确定
 Do you really want to shut down the system?	ShutdownProcess		您确定要关闭系统吗？
 Shutdown status	ShutdownProcess		关闭状态
 Shut down	ShutdownProcess		关闭
-The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\" 应用可能陷入模式面板。
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\" 应用可能陷入模态面板。
 System is shut down	ShutdownProcess		系统正在关闭
 Restart system	ShutdownProcess		重启系统
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		\"%appName%\" 应用取消了关闭进程。

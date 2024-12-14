@@ -1,7 +1,7 @@
 1	english	x-vnd.Haiku-Screen	2577971458
 no	Screen		否
 bits/pixel	Screen		位/像素
-15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
+15 bits/pixel, 32768 colors	Screen		15 位/像素，32768 色
 Rows:	Screen		行：
 %.1f Hz	Screen		%.1f Hz
 The screen mode could not be set:\n\t%s\n	Screen		屏幕模式无法设置为：\n\t%s\n
@@ -29,7 +29,7 @@ Colors:	Screen		颜色：
 yes	Screen		是
 Swap displays:	Screen		交替显示：
 8 bits/pixel, 256 colors	Screen		8 位/像素，256 色
-Revert	Screen		还原
+Revert	Screen		恢复
 always	Screen		总是
 Confirm changes	Screen		确认修改
 Warning	Screen		警告
@@ -47,7 +47,7 @@ Combine displays:	Screen		组合显示：
 Unknown mode	Screen		未知模式
 About	Screen		关于
 Columns:	Screen		列：
-Resolution:	Screen		分辨率
+Resolution:	Screen		分辨率:
 Apply	Screen		应用
 horizontally	Screen		水平
 disable	Screen		禁用

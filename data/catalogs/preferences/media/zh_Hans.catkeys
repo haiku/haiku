@@ -10,11 +10,11 @@ Audio output:	Media views		音频输出：
 Please select a SoundFont.	Midi View		请选择音色库。
 There are no SoundFonts installed.	Midi View		没有安装音色库。
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		退出媒体播放器将会中止媒体服务重新启动。将会出现未知情况或者媒体功能不可用。
-Could not connect to the media server.\nWould you like to start it ?	Media Window		链接 media server 失败.\n是否重新启动 ?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		连接多媒体服务失败。\n是否重新启动 ?
 Video settings	Media Window		视频设置
 Audio mixer	Media Window		音频混合器
 Show volume control on Deskbar	Media views		在桌面栏中显示声音控制
-Start media server	Media Window		启动 media server
+Start media server	Media Window		启动多媒体服务
 Audio settings	Media Window		音频设置
 Quit anyway	Media Window		强制退出
 Media	System name		多媒体
@@ -23,7 +23,7 @@ MIDI Settings	Media Window		音频设备数字接口(MIDI)设置
 SoundFonts	Midi View		音色库
 Audio input:	Media views		音频输入：
 <none>	Media views		<无>
-Channel:	Media views		频道：
+Channel:	Media views		通道：
 This hardware has no controls.	Media Window		硬件控制失败。
 Defaults	Media views		默认
 <none>	VideoOutputMenu	Used when no video output is available	<无>

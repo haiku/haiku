@@ -29,7 +29,7 @@ Encoding:	Terminal AppearancePrefView		编码：
 yellow	Terminal ThemeView		黄色
 Change directory	Terminal TermView		更改目录
 Custom	Terminal AppearancePrefView	Window size	自定义
-Page setup…	Terminal TermWindow		页面设置...  
+Page setup…	Terminal TermWindow		页面设置...
 ANSI yellow color	Terminal ThemeView		ANSI 黄
 Cancel	Terminal TermView		取消
 Defaults	Terminal PrefWindow		默认主题

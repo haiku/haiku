@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	2519775385
+1	english	x-vnd.Haiku-libbe	1445751563
 All Rights Reserved.	AboutWindow		保留所有权利
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
@@ -40,6 +40,7 @@ Error	PrintJob		错误
 %s TiB/s	StringForRate	units per second	%s TiB/s
 About %app…	Dragger		关于 %app...
 About %app%	AboutWindow		关于 %app%
+{0, plural, one{%s byte} other{%s bytes}}	StringForSize	size unit	{0, plural, one{%s 字节} other{%s 字节}}
 %s GiB/s	StringForRate	units per second	%s GiB/s
 Version history:	AboutWindow		版本历史：
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		无法定位克隆控件应用。未提供应用程序署名。\n%error
