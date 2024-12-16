@@ -185,6 +185,11 @@ fork(void)
 pid_t
 vfork(void)
 {
-	return fork();
+	thread_id thread = _kern_fork();
+	if (thread < 0) {
+		// something went wrong
+		__set_errno(thread);
+		thread = -1;
+	}
+	return thread;
 }
-
