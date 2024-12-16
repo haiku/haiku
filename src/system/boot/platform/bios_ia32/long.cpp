@@ -354,6 +354,8 @@ long_start_kernel()
 	long_gdt_init();
 	debug_cleanup();
 	long_mmu_init();
+	heap_release();
+
 	convert_kernel_args();
 
 	// Save the kernel entry point address.

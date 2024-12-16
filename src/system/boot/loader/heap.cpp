@@ -383,7 +383,7 @@ FreeChunk::SetToAllocated(void* allocated)
 
 
 void
-heap_release(stage2_args* args)
+heap_release()
 {
 	heap_print_statistics();
 
