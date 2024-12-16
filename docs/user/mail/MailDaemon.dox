@@ -1,0 +1,196 @@
+/*
+ * Copyright 2024 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina, cafeina@world
+ *
+ * Corresponds to:
+ *		headers/os/mail/MailDaemon.h	hrev58367
+ *		src/kits/mail/MailDaemon.cpp	hrev58367
+ */
+
+
+/*!
+	\file MailDaemon.h
+	\ingroup mail
+	\ingroup libmail
+	\brief Provides the BMailDaemon class.
+*/
+
+
+/*!
+	\class BMailDaemon
+	\ingroup mail
+	\ingroup libmail
+	\brief Provides user level access to the mail_daemon to perform common
+		mail tasks such as check for new messages or send queued messages.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMailDaemon::BMailDaemon()
+	\brief Creates a BMailDaemon object that communicates with the
+		mail_daemon server.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BMailDaemon::~BMailDaemon()
+	\brief Frees all resources associated with this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Mail tasks
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BMailDaemon::CheckMail(int32 accountID = -1)
+	\brief Asks the mail_daemon to check if there are new messages for the
+		account with ID \a accountID.
+
+	If \a accountID is \c -1, it will check for new messages for all
+	the available accounts.
+
+	\param[in] accountID The ID of the account.
+
+	\retval B_OK The request has been sent successfully.
+	\retval B_MAIL_NO_DAEMON The mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailDaemon::CheckAndSendQueuedMail(int32 accountID = -1)
+	\brief Asks the mail_daemon to check if there are new messages and
+		to send any queued messages pending to be sent, for the
+		account with ID \a accountID.
+
+	If \a accountID is \c -1, it will check for new messages and send the
+	queued messages for all the available accounts.
+
+	\param[in] accountID The ID of the account.
+
+	\retval B_OK The request has been sent successfully.
+	\retval B_MAIL_NO_DAEMON The mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailDaemon::SendQueuedMail()
+	\brief Asks the mail_daemon to send any queued message pending to be sent.
+
+	\retval B_OK The request has been sent successfully.
+	\retval B_MAIL_NO_DAEMON The mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BMailDaemon::CountNewMessages(bool waitForFetchCompletion = false)
+	\brief Asks the mail_daemon how many new messages there are.
+
+	\param[in] waitForFetchCompletion If \c true, it will make the count
+		once the mail server fetching is completed.
+
+	\return The number of new messages, or \c B_MAIL_NO_DAEMON if the
+		mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailDaemon::MarkAsRead(int32 account, const entry_ref& ref, read_flags flag = B_READ)
+	\brief Requests the mail_daemon to mark an e-mail message as read
+		or unread.
+
+	\param[in] account The account's ID.
+	\param[in] ref The entry_ref of the target message.
+	\param[in] flag Can be one of these: \c B_UNREAD, \c B_SEEN, \c B_READ.
+
+	\retval B_OK The request has been sent successfully.
+	\retval B_MAIL_NO_DAEMON The mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailDaemon::FetchBody(const entry_ref& ref, BMessenger* listener = NULL)
+	\brief Requests the mail_daemon to retrieve the message's body.
+
+	If \a listener is not \c NULL, it will receive a \c B_MAIL_BODY_FETCHED
+	notification after the e-mail message's body was fetched successfully, or else
+	an error code if something went wrong.
+
+	\param[in] ref The entry_ref of the target message.
+	\param[in] listener A BMessenger where a reply will be sent to.
+
+	\retval B_OK The request has been sent successfully.
+	\retval B_MAIL_NO_DAEMON The mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Running status
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BMailDaemon::Launch()
+	\brief Launches the mail_daemon.
+
+	\retval B_OK The mail_daemon has been launched successfully.
+	\retval B_ALREADY_RUNNING The mail_daemon is already running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BMailDaemon::IsRunning()
+	\brief Checks if the mail_daemon is running.
+
+	\retval true The mail_daemon is running.
+	\retval false The mail_daemon is not running.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMailDaemon::Quit()
+	\brief Request the mail_daemon to quit.
+
+	\retval B_OK The request has been sent successfully.
+	\retval B_MAIL_NO_DAEMON The mail_daemon is not currently running.
+
+	\since Haiku R1
+*/
+
+//! @}
+

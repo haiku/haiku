@@ -15,6 +15,7 @@
 /*!
 	\class BTextMailComponent
 	\ingroup mail
+	\ingroup libmail
 	\brief A component that stores plain text.
 
 	It uses UTF8 text as its canonical format and reads and writes

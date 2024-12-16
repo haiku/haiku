@@ -1,0 +1,665 @@
+/*
+ * Copyright 2024 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina, cafeina@world
+ *
+ * Corresponds to:
+ *		headers/os/mail/MailAttachment.h	hrev58367
+ *		src/kits/mail/MailAttachment.cpp	hrev58367
+ */
+
+
+/*!
+	\file MailAttachment.h
+	\ingroup mail
+	\ingroup libmail
+	\brief Provides the BMailAttachment abstract class, as well as the derived
+		classes BSimpleMailAttachment and BAttributedMailAttachment.
+*/
+
+
+///// BMailAttachment /////
+
+
+/*!
+	\class BMailAttachment
+	\ingroup mail
+	\ingroup libmail
+	\brief Abstract interface for objects that handle mail attachments.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Attachment's filename
+*/
+
+
+//! @{
+
+
+/*!
+	\fn virtual void BMailAttachment::SetFileName(const char *name) = 0
+	\brief Pure virtual to change the filename of the attachment.
+
+	\param[in] name The new filename string.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailAttachment::FileName(char *name) = 0
+	\brief Pure virtual to return the filename of the attachment.
+
+	\param[out] name A pre-allocated variable of \c B_FILE_NAME_LENGTH length
+		where to write the filename.
+
+	\return A status code.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\fn virtual status_t BMailAttachment::SetTo(BFile *file, bool deleteFileWhenDone = false) = 0
+	\brief Pure virtual to initialize the object's attached file.
+
+	\param[in] file A file for the attachment's data.
+	\param[in] deleteFileWhenDone Tells if the file has to be deleted when
+		this object is destroyed.
+
+	\return A status code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailAttachment::SetTo(entry_ref *ref) = 0
+	\brief Pure virtual to initialize the object's attached file.
+
+	\param[in] ref An entry_ref for the attachment's data.
+
+	\return A status code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BMailAttachment::InitCheck() = 0
+	\brief Pure virtual to check if the object was successfully initialized.
+
+	\return A status code.
+
+	\since Haiku R1
+*/
+
+
+///// BSimpleMailAttachment /////
+
+/*!
+	\class BSimpleMailAttachment
+	\ingroup mail
+	\ingroup libmail
+	\brief Represents a basic mail attachment.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSimpleMailAttachment::BSimpleMailAttachment(BPositionIO *dataToAttach, mail_encoding encoding = base64)
+	\brief Creates and initializes an attachment object from a BPositionIO
+		based data stream.
+
+	\param[in] dataToAttach The data to attach.
+	\param[in] encoding The encoding format to use in the attachment object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSimpleMailAttachment::BSimpleMailAttachment(const void *dataToAttach, size_t lengthOfData, mail_encoding encoding = base64)
+	\brief Creates and initializes an attachment object from a buffer.
+
+	This constructor takes ownership of the data. This means that the data is
+	deleted upon new calls of SetDecodedData() and when the object is destroyed
+	as well.
+
+	\param[in] dataToAttach A buffer for the attachment data.
+	\param[in] lengthOfData The buffer length.
+	\param[in] encoding The encoding format to use in the attachment object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSimpleMailAttachment::BSimpleMailAttachment(BFile *file, bool delete_when_done)
+	\brief Creates and initializes an attachment object from a file.
+
+	\param[in] file A file for the attachment.
+	\param[in] delete_when_done Tells if the file has to be deleted when
+		this object is destroyed.
+
+	\sa SetTo(BFile*, bool)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSimpleMailAttachment::BSimpleMailAttachment(entry_ref *ref)
+	\brief Creates and initializes an attachment object from a filesystem entry.
+
+	\param[in] ref The filesystem entry from where to retrieve the attachment's data.
+
+	\sa SetTo(entry_ref*)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BSimpleMailAttachment::BSimpleMailAttachment()
+	\brief Creates an uninitialized BSimpleMailAttachment object.
+
+	It can be later be initialized with either SetTo(BFile*, bool) or
+	SetTo(entry_ref *).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BSimpleMailAttachment::~BSimpleMailAttachment()
+	\brief Frees all resources associated with this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::SetTo(BFile *file, bool delete_file_when_done = false)
+	\brief Initializes the object to the specified \a file.
+
+	\param[in] file A file for the attachment.
+	\param[in] delete_file_when_done Tells if the file has to be deleted when
+		this object is destroyed.
+
+	\return \c B_OK on success or an error code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::SetTo(entry_ref *ref)
+	\brief Initializes the object to the specified entry_ref.
+
+	\param[in] ref The entry_ref for the attachment's data.
+
+	\return \c B_OK on success or an error code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::InitCheck()
+	\brief Checks whether the object has been properly initialized or not.
+
+	\return \c B_OK if the object has been properly initialized, or
+		\c B_NO_INIT otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Attachment's filename
+*/
+
+
+//! @{
+
+
+/*!
+	\fn virtual void BSimpleMailAttachment::SetFileName(const char *name)
+	\brief Changes the attachment's filename.
+
+	\param[in] name The new filename string for the attachment.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::FileName(char *name)
+	\brief Returns the attachment's filename.
+
+	\param[out] name A pre-allocated variable of \c B_FILE_NAME_LENGTH length
+		where to write the filename.
+
+	\retval B_OK The filename was retrieved successfully.
+	\retval B_NAME_NOT_FOUND The filename could not be found.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Attachment's data
+*/
+
+
+//! @{
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::GetDecodedData(BPositionIO *data)
+	\brief Converts the attachment's encoded data back to its unencoded form and
+		writes the result into \a data.
+
+	\param[out] data A BPositionIO based data stream where to write the
+		output data.
+
+	\retval B_OK The attachment's data was written into \a data successfully.
+	\retval B_IO_ERROR There is internally no data associated with this
+		attachment.
+	\retval B_BAD_VALUE \a data is invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BPositionIO *BSimpleMailAttachment::GetDecodedData()
+	\brief Decodes the attachment's encoded data and returns the result
+		to a BPositionIO based data stream.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::SetDecodedData(BPositionIO *data)
+	\brief Sets the attachment's content to \a data.
+
+	\param[in] data The data stream from where the data will be copied.
+
+	\retval B_OK No error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::SetDecodedData(const void *data, size_t length)
+	\brief Sets the attachment's content to the contents in the \a data generic
+		buffer of \a length.
+
+	This overloaded version takes ownership of the data buffer, so the data is
+	deleted upon new calls of SetDecodedData() and when the object is destroyed
+	as well.
+
+	\param[in] data The buffer from where obtain the new contents of the
+		attachment.
+	\param[in] length The buffer's length.
+
+	\retval B_OK No error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::SetDecodedDataAndDeleteWhenDone(BPositionIO *data)
+	\brief Sets the attachment's content to the contents contained in \a data.
+
+	This method takes ownership of the data buffer, so the data is
+	deleted upon new calls of SetDecodedData() and when the object is destroyed
+	as well.
+
+	\param[in] data The source from where obtain the new contents of the
+		attachment.
+
+	\retval B_OK No error.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Encoding
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BSimpleMailAttachment::SetEncoding(mail_encoding encoding = base64)
+	\brief Sets the Content-Transfer-Encoding header to \a encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding BSimpleMailAttachment::Encoding()
+	\brief Returns the current Content-Transfer-Encoding header value.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::SetToRFC822(BPositionIO *data, size_t length, bool parse_now = false)
+	\brief Sets this object from a \a data stream in a
+	<a href="https://www.ietf.org/rfc/rfc822.txt">RFC-822</a> compliant format.
+
+	Initializes this component to the RFC 822 format data in \a data, starting at
+	\c data->Position(), for up to \a length bytes.
+
+	If \a parse_now is \c false, then the data will not be parsed (encoded) until
+	RenderToRFC822() is called.
+
+	\param[in] data The data source.
+	\param[in] length The data's length.
+	\param[in] parse_now Whether the data will be parsed now or not.
+
+	\retval B_OK The operation was performed successfully.
+	\retval B_ERROR Error in MIME headers' length.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BSimpleMailAttachment::RenderToRFC822(BPositionIO *render_to)
+	\brief Renders the component into RFC-822 format.
+
+	\return \c B_OK if everything was performed successfully, or an error code
+	otherwise.
+
+	\since Haiku R1
+*/
+
+
+///// BAttributedMailAttachment /////
+
+
+/*!
+	\class BAttributedMailAttachment
+	\ingroup mail
+	\ingroup libmail
+	\brief Represents an mail attachment compatible with Be File System attributes.
+
+	This class builds a multipart container where the attached file is copied
+	alongside its Be File System attributes, allowing to send or receive files
+	without losing those filesystem attributes.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAttributedMailAttachment::BAttributedMailAttachment()
+	\brief Creates an uninitialized BAttributedMailAttachment object.
+
+	It can be later be initialized with either SetTo(BFile*, bool) or
+	SetTo(entry_ref *).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAttributedMailAttachment::BAttributedMailAttachment(BFile *file, bool delete_when_done)
+	\brief Creates and initializes an attachment object from a file.
+
+	\param[in] file A file to be used for the attachment.
+	\param[in] delete_when_done Tells if the file has to be deleted when
+		this object is destroyed.
+
+	\sa SetTo(BFile*, bool)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BAttributedMailAttachment::BAttributedMailAttachment(entry_ref *ref)
+	\brief Creates and initializes an attachment object from a filesystem entry.
+
+	\param[in] ref The filesystem entry from where to retrieve the attachment's data.
+
+	\sa SetTo(entry_ref*)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BAttributedMailAttachment::~BAttributedMailAttachment()
+	\brief Frees all resources associated with this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::SetTo(BFile *file, bool delete_file_when_done = false)
+	\brief Initializes the object to the specified \a file.
+
+	\param[in] file A file to be used for the attachment.
+	\param[in] delete_file_when_done Tells if the file has to be deleted when
+		this object is destroyed.
+
+	\return \c B_OK on success or an error code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::SetTo(entry_ref *ref)
+	\brief Initializes the object to the specified entry_ref.
+
+	\param[in] ref An entry_ref for the attachment's data.
+
+	\return \c B_OK on success or an error code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::InitCheck()
+	\brief Checks whether the object has been properly initialized or not.
+
+	\return \c B_OK if the object has been properly initialized, or
+		\c B_NO_INIT otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BAttributedMailAttachment::SaveToDisk(BEntry* entry)
+	\brief Stores the attachment's decoded data in a temporary file on disk.
+
+	The file path will be saved to \a entry.
+
+	\param[out] entry A pre-allocated BEntry where to write the
+		temporary file path.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Encoding
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BAttributedMailAttachment::SetEncoding(mail_encoding encoding)
+	\brief Sets the Content-Transfer-Encoding header to \a encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding BAttributedMailAttachment::Encoding()
+	\brief Returns the current Content-Transfer-Encoding header value.
+
+	\since Haiku R1
+*/
+
+//! @}
+
+
+/*!
+	\name Attachment's filename
+*/
+
+
+//! @{
+
+
+/*!
+	\fn virtual void BAttributedMailAttachment::SetFileName(const char *name)
+	\brief Changes the attachment's filename.
+
+	\param[in] name The new filename string for the attachment.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::FileName(char *name)
+	\brief Returns the attachment's filename.
+
+	\param[out] name A pre-allocated variable of \c B_FILE_NAME_LENGTH length
+		where to write the filename.
+
+	\retval B_OK The filename was retrieved successfully.
+	\retval B_NAME_NOT_FOUND The filename could not be found.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Attachment's data
+*/
+
+
+//! @{
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::GetDecodedData(BPositionIO *data)
+	\brief Retrieves the attachment's decoded data with its attributes and
+		writes them into \a data.
+
+	\param[out] data A BPositionIO based data stream where to write the
+		output data.
+
+	\retval B_OK The decoded data and attributes were retrieved successfully.
+	\retval B_IO_ERROR There is internally no data associated with this
+		attachment.
+	\retval B_BAD_VALUE \a data is invalid.
+
+	\since Haiku R1
+*/
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::SetDecodedData(BPositionIO *data)
+	\brief Sets the attachment's attributes and data to \a data.
+
+	\param[in] data The data stream from where the data and the attributes will
+		be copied.
+
+	\retval B_OK No error.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::SetToRFC822(BPositionIO *data, size_t length, bool parse_now = false)
+	\brief Sets this object from a \a data stream in a
+	<a href="https://www.ietf.org/rfc/rfc822.txt">RFC-822</a> compliant format.
+
+	Initializes this component to the RFC 822 format data in \a data, starting at
+	\c data->Position(), for up to \a length bytes.
+
+	If \a parse_now is \c false, then the data will not be parsed until
+	RenderToRFC822() is called.
+
+	\param[in] data The data source.
+	\param[in] length The data's length.
+	\param[in] parse_now Whether the data will be parsed now or not.
+
+	\retval B_OK The operation was performed successfully.
+	\retval B_BAD_TYPE The underlying multipart container mimetype is invalid.
+	\retval B_BAD_VALUE The data and attributes are \c NULL.
+	\retval B_NO_MEMORY Not enough memory to decode the attachment's attributes.
+	\retval B_IO_ERROR Input/output error retrieving the attributes' data.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::RenderToRFC822(BPositionIO *render_to)
+	\brief Renders the component into RFC-822 format.
+
+	\return \c B_OK if everything was performed successfully, or an error code
+	otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual status_t BAttributedMailAttachment::MIMEType(BMimeType *mime)
+	\brief Places the MIME type of the data into \a mime.
+
+	\param[out] mime A pre-allocated BMimeType variable where to write
+		the mimetype.
+
+	\since Haiku R1
+*/

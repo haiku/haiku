@@ -1,0 +1,308 @@
+/*
+ * Copyright 2024 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		cafeina, cafeina@world
+ *
+ * Corresponds to:
+ *		headers/os/mail/mail_encoding.h	hrev58367
+ *		src/kits/mail/mail_encoding.cpp	hrev58367
+ *		src/kits/support/Base64.cpp		hrev58367
+ */
+
+/*!
+	\file mail_encoding.h
+	\ingroup mail
+	\ingroup libmail
+	\brief Provides tools to convert data to or from a content encoding format.
+
+	The "7bit" and "8bit" encodings do not perform a binary-to-text
+	conversion but copy the input data into an output buffer. "base64" and
+	"quoted-printable" are as defined in
+	<a href="https://www.rfc-editor.org/rfc/rfc2045.html">RFC 2045</a>.
+	"uuencode" content format is as defined in the
+	<a href="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/uuencode.html">POSIX</a>
+	specification.
+*/
+
+
+/*!
+	\def B_MAIL_NULL_CONVERSION
+	\brief Do not specify a character set for converting, rely on
+		autodetection instead.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_MAIL_UTF8_CONVERSION
+	\brief Specifies the UTF-8 character set when converting from or to UTF-8.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\def B_MAIL_US_ASCII_CONVERSION
+	\brief Specifies the 7bit ASCII character set (a subset of UTF-8) when
+		converting from or to 7bit.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::base64
+	\brief Base64 binary-to-text encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::quoted_printable
+	\brief quoted-printable binary-to-text encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::seven_bit
+	\brief 7bit encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::eight_bit
+	\brief 8bit encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::uuencode
+	\brief uuencode binary-to-text encoding.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::null_encoding
+	\brief Used to indicate the encoding, will not be changed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding::no_encoding
+	\brief Represents an undefined encoding or no encoding at all.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t encode(mail_encoding encoding, char *out, const char *in,
+	off_t length, int headerMode)
+	\brief Encodes data to a content encoding.
+
+	Converts an arbitrary input data \a in of \a length bytes as \a encoding
+	into \a out.
+
+	This wrapper function can be used to convert to base64 or quoted-printable,
+	or in the case of using 7bit, 8bit or \c no_encoding, to copy the data from
+	\a in to \a out. However, it is unable to convert the data to uuencode.
+
+	\a headerMode is used when the output will be used in a header,
+	and is only used for conversions to quoted-printable or base64,
+	ignored otherwise.
+
+	\param[in] encoding Target encoding.
+	\param[out] out Where the output data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+	\param[in] headerMode Whether the output data will be used in
+		a header or not.
+
+	\return The amount of bytes written, or \c -1 if the encoding is
+	not compatible nor recognized.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t decode(mail_encoding encoding, char *out, const char *in, off_t length, int underscore_is_space)
+	\brief Decodes data from a certain encoding.
+
+	Takes an input data \a in of \a length bytes and converts it back from
+	\a encoding to its unencoded form into \a out.
+
+	This wrapper function can be used to convert an input data in base64,
+	quoted-printable or uuencoding formats to its original form. However, if
+	\a encoding is not recognized, it will not perform any operation and will
+	return \c -1. On the other hand, if \a encoding is equal to \c seven_bit,
+	\c eight_bit or \c no_encoding, it will just make a copy of the data.
+
+	\a underscore_is_space is only useful when converting from quoted-printable
+	encoding, when the data is going to be decoded from a header field.
+
+	\param[in] encoding Input data's encoding.
+	\param[out] out Where the resulting data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+	\param[in] underscore_is_space Should be equal to \c 1 to indicate when
+		decoding a header field.
+
+	\return The amount of bytes written, or \c -1 if the encoding is
+	not compatible nor recognized.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t max_encoded_length(mail_encoding encoding, off_t cur_length)
+	\brief Returns the output size of a certain encoding, given
+		an input data has \a cur_length of length.
+
+	It can perform the calculation for base64, quoted-printable, 7bit and 8bit.
+	If \a encoding is equal to \c no_encoding, it will just return the same
+	value as \a cur_length. However, this function cannot perform the
+	calculation for uuencode.
+
+	\param[in] encoding The target encoding.
+	\param[in] cur_length The input data's length.
+
+	\return The amount of bytes the conversion to \a encoding
+		will take if the input data is of \a cur_length, or \c -1 if
+		the encoding is not compatible nor recognized.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn mail_encoding encoding_for_cte(const char *content_transfer_encoding)
+	\brief Returns a mail_encoding value for the \a content_transfer_encoding
+		string.
+
+	\param[in] content_transfer_encoding A string with the name of the encoding:
+		\n- \c "uuencode" for mail_encoding::uuencode
+		\n- \c "base64" for mail_encoding::base64
+		\n- \c "quoted-printable" for mail_encoding::quoted_printable
+		\n- \c "7bit" for mail_encoding::seven_bit
+		\n- \c "8bit" for mail_encoding::eight_bit
+		\n- Other strings or if \a content_transfer_encoding is \c NULL
+		return mail_encoding::no_encoding
+
+	\return A mail_encoding value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t encode_base64(char *out, const char *in, off_t length, int headerMode)
+	\brief Encodes a string to base64.
+
+	Converts an input data \a in of \a length bytes as base64 into \a out.
+
+	\a headerMode is used when the output will be used in a header, where
+	there should not be any line breaks.
+
+	\param[out] out Where the resulting data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+	\param[in] headerMode Whether the output data will be used in
+		a header or not.
+
+	\return The amount of bytes written.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t decode_base64(char *out, const char *in, off_t length)
+	\brief Decodes a base64 data buffer.
+
+	Takes an input data \a in encoded in base64 of \a length bytes and converts
+	it back to its unencoded form into \a out.
+
+	\param[out] out Where the output data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+
+	\return The amount of bytes written.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t encode_qp(char *out, const char *in, off_t length, int headerMode)
+	\brief Encodes an input data to quoted-printable.
+
+	Converts an input data \a in of \a length bytes as quoted-printable into
+	\a out.
+
+	\a headerMode is used when the output will be used in a header, where
+	there should not be any line breaks.
+
+	\param[out] out Where the output data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+	\param[in] headerMode Whether the output data will be used in
+		a header or not.
+
+	\return The amount of bytes written.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t decode_qp(char *out, const char *in, off_t length, int underscore_is_space)
+	\brief Decodes a quoted-printable data buffer.
+
+	Takes an input data \a in encoded in quoted-printable of \a length bytes and
+	converts it back to its unencoded form into \a out.
+
+	\param[out] out Where the output data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+	\param[in] underscore_is_space Should be equal to \c 1 to indicate when
+		decoding a header field.
+
+	\return The amount of bytes written.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ssize_t uu_decode(char *out, const char *in, off_t length)
+	\brief Decodes a uuencoded data buffer.
+
+	Takes an input data \a in encoded in uuencode of \a length bytes and
+	converts it back to its unencoded form into \a out.
+
+	\param[out] out Where the output data will be written to.
+	\param[in] in Input data.
+	\param[in] length Input data's length.
+
+	\return The amount of bytes written.
+
+	\since Haiku R1
+*/
+
+

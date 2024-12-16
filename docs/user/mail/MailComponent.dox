@@ -15,6 +15,7 @@
 /*!
 	\file MailComponent.h
 	\ingroup mail
+	\ingroup libmail
 	\brief Provides the BMailComponent and BTextMailComponent classes.
 */
 
@@ -68,6 +69,7 @@
 /*!
 	\class BMailComponent
 	\ingroup mail
+	\ingroup libmail
 	\brief The base class for most of the Mail Kit.
 
 	Note that BMailComponent is not abstract, and is useful
