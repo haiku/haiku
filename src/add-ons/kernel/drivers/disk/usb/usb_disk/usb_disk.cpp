@@ -691,7 +691,7 @@ usb_disk_request_sense(device_lun *lun, err_act *_action)
 	} else if (parameter.sense_key == SCSI_SENSE_KEY_UNIT_ATTENTION
 		&& status != B_DEV_NO_MEDIA) {
 		lun->media_present = true;
-	} else if (status == B_DEV_NOT_READY) {
+	} else if (status == B_DEV_NOT_READY || status == B_DEV_NO_MEDIA) {
 		lun->media_present = false;
 		usb_disk_reset_capacity(lun);
 	}
@@ -985,6 +985,9 @@ usb_disk_synchronize(device_lun *lun, bool force)
 	if (!lun->should_sync && !force)
 		return B_OK;
 
+	if (!lun->media_present)
+		return B_DEV_NO_MEDIA;
+
 	uint8 commandBlock[12];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
@@ -1277,8 +1280,12 @@ static status_t
 usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 	struct transfer_data data, size_t *length)
 {
+	if (!lun->media_present)
+		return B_DEV_NO_MEDIA;
+
 	uint8 commandBlock[16];
 	memset(commandBlock, 0, sizeof(commandBlock));
+
 	if (lun->device->is_ufi) {
 		commandBlock[0] = SCSI_READ_12;
 		commandBlock[1] = lun->logical_unit_number << 5;
@@ -1339,6 +1346,9 @@ static status_t
 usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 	struct transfer_data data, size_t *length)
 {
+	if (!lun->media_present)
+		return B_DEV_NO_MEDIA;
+
 	uint8 commandBlock[16];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
