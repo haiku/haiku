@@ -3091,6 +3091,7 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 
 		cacheLocker.SetTo(cache, true);	// already locked
 
+		// enforce restrictions
 		if (!kernel && (area->address_space == VMAddressSpace::Kernel()
 				|| (area->protection & B_KERNEL_AREA) != 0)) {
 			dprintf("vm_set_area_protection: team %" B_PRId32 " tried to "
@@ -3107,10 +3108,9 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 				area->protection_max, areaID, area->name);
 			return B_NOT_ALLOWED;
 		}
-
 		if (team != VMAddressSpace::KernelID()
 			&& area->address_space->ID() != team) {
-			// unless you're the kernel, you are only allowed to set
+			// unless you're the kernel, you're only allowed to set
 			// the protection of your own areas
 			return B_NOT_ALLOWED;
 		}
@@ -4917,14 +4917,18 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		cacheLocker.SetTo(cache, true);	// already locked
 
 		// enforce restrictions
+		const team_id team = team_get_current_team_id();
 		if (!kernel && (area->address_space == VMAddressSpace::Kernel()
 				|| (area->protection & B_KERNEL_AREA) != 0)) {
 			dprintf("vm_resize_area: team %" B_PRId32 " tried to "
 				"resize kernel area %" B_PRId32 " (%s)\n",
-				team_get_current_team_id(), areaID, area->name);
+				team, areaID, area->name);
 			return B_NOT_ALLOWED;
 		}
-		// TODO: Enforce all restrictions (team, etc.)!
+		if (!kernel && area->address_space->ID() != team) {
+			// unless you're the kernel, you're only allowed to resize your own areas
+			return B_NOT_ALLOWED;
+		}
 
 		oldSize = area->Size();
 		if (newSize == oldSize)
@@ -5831,8 +5835,11 @@ transfer_area(area_id id, void** _address, uint32 addressSpec, team_id target,
 	if (status != B_OK)
 		return status;
 
-	if (!kernel && info.team != thread_get_current_thread()->team->id)
-		return B_PERMISSION_DENIED;
+	// enforce restrictions
+	if (!kernel && (info.team != team_get_current_team_id()
+			|| (info.protection & B_KERNEL_AREA) != 0)) {
+		return B_NOT_ALLOWED;
+	}
 
 	// We need to mark the area cloneable so the following operations work.
 	status = set_area_protection(id, info.protection | B_CLONEABLE_AREA);
@@ -6050,8 +6057,6 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 status_t
 _user_resize_area(area_id area, size_t newSize)
 {
-	// TODO: Since we restrict deleting of areas to those owned by the team,
-	// we should also do that for resizing (check other functions, too).
 	return vm_resize_area(area, newSize, false);
 }
 
