@@ -659,23 +659,6 @@ status_t RISCV64VMTranslationMap::Protect(addr_t base, addr_t top,
 }
 
 
-status_t
-RISCV64VMTranslationMap::ProtectPage(VMArea* area, addr_t address,
-	uint32 attributes)
-{
-	NOT_IMPLEMENTED_PANIC();
-	return B_OK;
-}
-
-
-status_t
-RISCV64VMTranslationMap::ProtectArea(VMArea* area, uint32 attributes)
-{
-	NOT_IMPLEMENTED_PANIC();
-	return B_NOT_SUPPORTED;
-}
-
-
 static inline uint64
 ConvertAccessedFlags(uint32 flags)
 {
