@@ -945,14 +945,16 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		secondCacheLocker.SetTo(secondCache, true);
 		secondCache->temporary = cache->temporary;
 		secondCache->virtual_base = secondCacheOffset;
-		secondCache->virtual_end = secondCache->virtual_base + secondSize;
+		error = secondCache->Resize(secondCache->virtual_base + secondSize, resizePriority);
 
-		if (cache->source != NULL)
-			cache->source->AddConsumer(secondCache);
+		if (error == B_OK) {
+			if (cache->source != NULL)
+				cache->source->AddConsumer(secondCache);
 
-		// Transfer the concerned pages from the first cache.
-		error = secondCache->Adopt(cache, secondCache->virtual_base, secondSize,
-			secondCache->virtual_base);
+			// Transfer the concerned pages from the first cache.
+			error = secondCache->Adopt(cache, secondCache->virtual_base, secondSize,
+				secondCache->virtual_base);
+		}
 
 		if (error == B_OK) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
@@ -968,7 +970,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			error = map_backing_store(addressSpace, secondCache,
 				secondCacheOffset, area->name, secondSize,
 				area->wiring, area->protection, area->protection_max,
-				REGION_NO_PRIVATE_MAP, 0,
+				REGION_NO_PRIVATE_MAP, CREATE_AREA_DONT_COMMIT_MEMORY,
 				&addressRestrictions, kernel, &secondArea, NULL);
 		}
 
@@ -1039,12 +1041,16 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	}
 
 	if (resizePriority == -1) {
-		// Shrink commitments.
-		const size_t areaCommitPages = compute_area_page_commitment(area);
-		area->cache->Commit(areaCommitPages * B_PAGE_SIZE, priority);
+		// Adjust commitments.
+		const off_t areaCommit = compute_area_page_commitment(area) * B_PAGE_SIZE;
+		if (areaCommit < area->cache->committed_size) {
+			secondArea->cache->committed_size += area->cache->committed_size - areaCommit;
+			area->cache->committed_size = areaCommit;
+		}
+		area->cache->Commit(areaCommit, priority);
 
-		const size_t secondCommitPages = compute_area_page_commitment(secondArea);
-		secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, priority);
+		const off_t secondCommit = compute_area_page_commitment(secondArea) * B_PAGE_SIZE;
+		secondArea->cache->Commit(secondCommit, priority);
 	}
 
 	if (_secondArea != NULL)
