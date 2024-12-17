@@ -1045,10 +1045,13 @@ VMAnonymousCache::Merge(VMCache* _source)
 	_MergeSwapPages(source);
 
 	// Move all not shadowed pages from the source to the consumer cache.
-	if (source->page_count < page_count)
-		_MergePagesSmallerSource(source);
-	else
+	if (source->page_count > page_count
+			&& source->virtual_base == virtual_base
+			&& source->virtual_end == virtual_end) {
 		_MergePagesSmallerConsumer(source);
+	} else {
+		VMCache::Merge(source);
+	}
 }
 
 
@@ -1216,36 +1219,18 @@ VMAnonymousCache::_Commit(off_t size, int priority)
 
 
 void
-VMAnonymousCache::_MergePagesSmallerSource(VMAnonymousCache* source)
-{
-	// The source cache has less pages than the consumer (this cache), so we
-	// iterate through the source's pages and move the ones that are not
-	// shadowed up to the consumer.
-
-	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
-			vm_page* page = it.Next();) {
-		// Note: Removing the current node while iterating through a
-		// IteratableSplayTree is safe.
-		vm_page* consumerPage = LookupPage(
-			(off_t)page->cache_offset << PAGE_SHIFT);
-		if (consumerPage == NULL) {
-			// the page is not yet in the consumer cache - move it upwards
-			ASSERT_PRINT(!page->busy, "page: %p", page);
-			MovePage(page);
-		}
-	}
-}
-
-
-void
 VMAnonymousCache::_MergePagesSmallerConsumer(VMAnonymousCache* source)
 {
 	// The consumer (this cache) has less pages than the source, so we move the
 	// consumer's pages to the source (freeing shadowed ones) and finally just
 	// all pages of the source back to the consumer.
 
-	for (VMCachePagesTree::Iterator it = pages.GetIterator();
-		vm_page* page = it.Next();) {
+	// It is possible that some of the pages we are moving here are actually "busy".
+	// Since all the pages that belong to this cache will belong to it again by
+	// the time we unlock, that should be fine.
+
+	VMCachePagesTree::Iterator it = pages.GetIterator();
+	while (vm_page* page = it.Next()) {
 		// If a source page is in the way, remove and free it.
 		vm_page* sourcePage = source->LookupPage(
 			(off_t)page->cache_offset << PAGE_SHIFT);

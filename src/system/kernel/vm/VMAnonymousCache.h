@@ -90,8 +90,6 @@ private:
 			swap_addr_t			_SwapBlockGetAddress(off_t pageIndex);
 			status_t			_Commit(off_t size, int priority);
 
-			void				_MergePagesSmallerSource(
-									VMAnonymousCache* source);
 			void				_MergePagesSmallerConsumer(
 									VMAnonymousCache* source);
 			void				_MergeSwapPages(VMAnonymousCache* source);

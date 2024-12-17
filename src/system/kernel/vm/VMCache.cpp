@@ -852,6 +852,7 @@ VMCache::MovePage(vm_page* page, off_t offset)
 
 	AssertLocked();
 	oldCache->AssertLocked();
+	ASSERT(offset >= virtual_base && (offset + B_PAGE_SIZE) <= virtual_end);
 
 	// remove from old cache
 	oldCache->pages.Remove(page);
@@ -1391,8 +1392,14 @@ VMCache::Fault(struct VMAddressSpace *aspace, off_t offset)
 void
 VMCache::Merge(VMCache* source)
 {
-	for (VMCachePagesTree::Iterator it = source->pages.GetIterator();
-			vm_page* page = it.Next();) {
+	const page_num_t firstOffset = ROUNDDOWN(virtual_base, B_PAGE_SIZE) >> PAGE_SHIFT,
+		endOffset = (page_num_t)((virtual_end + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
+
+	VMCachePagesTree::Iterator it = source->pages.GetIterator();
+	while (vm_page* page = it.Next()) {
+		if (page->cache_offset < firstOffset || page->cache_offset >= endOffset)
+			continue;
+
 		// Note: Removing the current node while iterating through a
 		// IteratableSplayTree is safe.
 		vm_page* consumerPage = LookupPage(
