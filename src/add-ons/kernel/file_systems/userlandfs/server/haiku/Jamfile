@@ -24,6 +24,7 @@ DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 SharedLibrary libuserlandfs_haiku_kernel.so
 	:
 	# kernelland_emu
+	AVLTreeBase.cpp
 	condition_variable.cpp
 	debug.cpp
 	lock.cpp
@@ -58,6 +59,10 @@ SharedLibrary libuserlandfs_haiku_kernel.so
 SEARCH on [ FGristFiles
 		Notifications.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel events ] ;
+
+SEARCH on [ FGristFiles
+		AVLTreeBase.cpp
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 SEARCH on [ FGristFiles
 		block_cache.cpp
