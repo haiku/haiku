@@ -788,7 +788,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// If no one else uses the area's cache and it's an anonymous cache, we can
 	// resize or split it, too.
 	bool onlyCacheUser = cache->areas.First() == area && cache->areas.GetNext(area) == NULL
-		&& cache->consumers.IsEmpty() && area->cache_type == CACHE_TYPE_RAM;
+		&& cache->consumers.IsEmpty() && cache->type == CACHE_TYPE_RAM;
 
 	const addr_t oldSize = area->Size();
 
@@ -889,9 +889,10 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// The tough part -- cut a piece out of the middle of the area.
 	// We do that by shrinking the area to the begin section and creating a
 	// new area for the end section.
-	addr_t firstNewSize = offset;
-	addr_t secondBase = address + size;
-	addr_t secondSize = area->Size() - offset - size;
+	const addr_t firstNewSize = offset;
+	const addr_t secondBase = address + size;
+	const addr_t secondSize = area->Size() - offset - size;
+	const off_t secondCacheOffset = area->cache_offset + (secondBase - area->Base());
 
 	// unmap pages
 	unmap_pages(area, address, area->Size() - firstNewSize);
@@ -943,13 +944,15 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		secondCache->Lock();
 		secondCacheLocker.SetTo(secondCache, true);
 		secondCache->temporary = cache->temporary;
-		secondCache->virtual_base = area->cache_offset;
-		secondCache->virtual_end = area->cache_offset + secondSize;
+		secondCache->virtual_base = secondCacheOffset;
+		secondCache->virtual_end = secondCache->virtual_base + secondSize;
+
+		if (cache->source != NULL)
+			cache->source->AddConsumer(secondCache);
 
 		// Transfer the concerned pages from the first cache.
-		off_t adoptOffset = area->cache_offset + secondBase - area->Base();
-		error = secondCache->Adopt(cache, adoptOffset, secondSize,
-			area->cache_offset);
+		error = secondCache->Adopt(cache, secondCache->virtual_base, secondSize,
+			secondCache->virtual_base);
 
 		if (error == B_OK) {
 			// Since VMCache::Resize() can temporarily drop the lock, we must
@@ -963,7 +966,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 			// Map the second area.
 			error = map_backing_store(addressSpace, secondCache,
-				area->cache_offset, area->name, secondSize,
+				secondCacheOffset, area->name, secondSize,
 				area->wiring, area->protection, area->protection_max,
 				REGION_NO_PRIVATE_MAP, 0,
 				&addressRestrictions, kernel, &secondArea, NULL);
@@ -975,7 +978,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 			// Move the pages back.
 			status_t readoptStatus = cache->Adopt(secondCache,
-				area->cache_offset, secondSize, adoptOffset);
+				secondCache->virtual_base, secondSize, secondCache->virtual_base);
 			if (readoptStatus != B_OK) {
 				// Some (swap) pages have not been moved back and will be lost
 				// once the second cache is deleted.
@@ -997,8 +1000,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		cache->ReleaseRefLocked();
 	} else {
 		// Reuse the existing cache.
-		error = map_backing_store(addressSpace, cache, area->cache_offset
-				+ (secondBase - area->Base()),
+		error = map_backing_store(addressSpace, cache, secondCacheOffset,
 			area->name, secondSize, area->wiring, area->protection,
 			area->protection_max, REGION_NO_PRIVATE_MAP, 0,
 			&addressRestrictions, kernel, &secondArea, NULL);
