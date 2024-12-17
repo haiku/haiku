@@ -1171,7 +1171,7 @@ VMCache::Resize(off_t newSize, int priority)
 	}
 
 	if (priority >= 0) {
-		status_t status = Commit(newSize - virtual_base, priority);
+		status_t status = Commit(PAGE_ALIGN(newSize - virtual_base), priority);
 		if (status != B_OK)
 			return status;
 	}
@@ -1207,7 +1207,7 @@ VMCache::Rebase(off_t newBase, int priority)
 	}
 
 	if (priority >= 0) {
-		status_t status = Commit(virtual_end - newBase, priority);
+		status_t status = Commit(PAGE_ALIGN(virtual_end - newBase), priority);
 		if (status != B_OK)
 			return status;
 	}
