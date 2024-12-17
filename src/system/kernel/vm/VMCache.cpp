@@ -625,6 +625,8 @@ VMCache::VMCache()
 
 VMCache::~VMCache()
 {
+	ASSERT(fRefCount == 0 && page_count == 0);
+
 	object_cache_delete(gCacheRefObjectCache, fCacheRef);
 }
 
@@ -692,6 +694,7 @@ VMCache::Delete()
 		// remove it
 		pages.Remove(page);
 		page->SetCacheRef(NULL);
+		page_count--;
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			page->physical_page_number));
