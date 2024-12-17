@@ -1034,21 +1034,6 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 		// We don't need this anymore.
 		free_etc(areaOldProtections, allocationFlags);
-
-		// Set the correct page protections for the second area.
-		VMTranslationMap* map = addressSpace->TranslationMap();
-		map->Lock();
-		for (VMCachePagesTree::Iterator it
-				= secondArea->cache->pages.GetIterator();
-				vm_page* page = it.Next();) {
-			if (is_page_in_area(secondArea, page)) {
-				addr_t address = virtual_page_address(secondArea, page);
-				uint32 pageProtection
-					= get_area_page_protection(secondArea, address);
-				map->ProtectPage(secondArea, address, pageProtection);
-			}
-		}
-		map->Unlock();
 	}
 
 	if (resizePriority == -1) {
