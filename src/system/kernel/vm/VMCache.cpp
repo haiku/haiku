@@ -1418,7 +1418,7 @@ VMCache::Merge(VMCache* source)
 status_t
 VMCache::AcquireUnreferencedStoreRef()
 {
-	return B_OK;
+	return B_ERROR;
 }
 
 
