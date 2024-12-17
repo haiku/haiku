@@ -220,7 +220,7 @@ private:
 			void				_RemoveConsumer(VMCache* consumer);
 
 			bool				_FreePageRange(VMCachePagesTree::Iterator it,
-									page_num_t* toPage, page_num_t* discarded);
+									page_num_t* toPage, page_num_t* freedPages);
 
 private:
 			int32				fRefCount;
