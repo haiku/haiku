@@ -780,7 +780,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 	// If no one else uses the area's cache and it's an anonymous cache, we can
 	// resize or split it, too.
-	bool onlyCacheUser = cache->areas == area && area->cache_next == NULL
+	bool onlyCacheUser = cache->areas.First() == area && cache->areas.GetNext(area) == NULL
 		&& cache->consumers.IsEmpty() && area->cache_type == CACHE_TYPE_RAM;
 
 	const addr_t oldSize = area->Size();
@@ -1110,7 +1110,7 @@ discard_area_range(VMArea* area, addr_t address, addr_t size)
 	// If someone else uses the area's cache or it's not an anonymous cache, we
 	// can't discard.
 	VMCache* cache = vm_area_get_locked_cache(area);
-	if (cache->areas != area || area->cache_next != NULL
+	if (cache->areas.First() != area || VMArea::CacheList::GetNext(area) != NULL
 		|| !cache->consumers.IsEmpty() || cache->type != CACHE_TYPE_RAM) {
 		return B_OK;
 	}
@@ -2827,8 +2827,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 				DEBUG_PAGE_ACCESS_END(copiedPage);
 			} else {
 				// Change the protection of this page in all areas.
-				for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
-						tempArea = tempArea->cache_next) {
+				for (VMArea* tempArea = upperCache->areas.First(); tempArea != NULL;
+						tempArea = upperCache->areas.GetNext(tempArea)) {
 					if (!is_page_in_area(tempArea, page))
 						continue;
 
@@ -2854,8 +2854,8 @@ vm_copy_on_write_area(VMCache* lowerCache,
 		ASSERT(lowerCache->WiredPagesCount() == 0);
 
 		// just change the protection of all areas
-		for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
-				tempArea = tempArea->cache_next) {
+		for (VMArea* tempArea = upperCache->areas.First(); tempArea != NULL;
+				tempArea = upperCache->areas.GetNext(tempArea)) {
 			if (tempArea->page_protections != NULL) {
 				// Change the protection of all pages in this area.
 				VMTranslationMap* map = tempArea->address_space->TranslationMap();
@@ -3125,8 +3125,8 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
 		// vm_copy_on_write_area(), all areas of the cache) doesn't have any
 		// wired ranges.
 		if (!isWritable && becomesWritable && !cache->consumers.IsEmpty()) {
-			for (VMArea* otherArea = cache->areas; otherArea != NULL;
-					otherArea = otherArea->cache_next) {
+			for (VMArea* otherArea = cache->areas.First(); otherArea != NULL;
+					otherArea = cache->areas.GetNext(otherArea)) {
 				if (wait_if_area_is_wired(otherArea, &locker, &cacheLocker)) {
 					restart = true;
 					break;
@@ -4939,8 +4939,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 
 		if (oldSize < newSize) {
 			// We need to check if all areas of this cache can be resized.
-			for (VMArea* current = cache->areas; current != NULL;
-					current = current->cache_next) {
+			for (VMArea* current = cache->areas.First(); current != NULL;
+					current = cache->areas.GetNext(current)) {
 				if (!current->address_space->CanResizeArea(current, newSize))
 					return B_ERROR;
 				anyKernelArea
@@ -4949,8 +4949,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 		} else {
 			// We're shrinking the areas, so we must make sure the affected
 			// ranges are not wired.
-			for (VMArea* current = cache->areas; current != NULL;
-					current = current->cache_next) {
+			for (VMArea* current = cache->areas.First(); current != NULL;
+					current = cache->areas.GetNext(current)) {
 				anyKernelArea
 					|= current->address_space == VMAddressSpace::Kernel();
 
@@ -4978,8 +4978,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 			return status;
 	}
 
-	for (VMArea* current = cache->areas; current != NULL;
-			current = current->cache_next) {
+	for (VMArea* current = cache->areas.First(); current != NULL;
+			current = cache->areas.GetNext(current)) {
 		status = current->address_space->ResizeArea(current, newSize,
 			allocationFlags);
 		if (status != B_OK)
@@ -5032,8 +5032,8 @@ vm_resize_area(area_id areaID, size_t newSize, bool kernel)
 	if (status != B_OK) {
 		// Something failed -- resize the areas back to their original size.
 		// This can fail, too, in which case we're seriously screwed.
-		for (VMArea* current = cache->areas; current != NULL;
-				current = current->cache_next) {
+		for (VMArea* current = cache->areas.First(); current != NULL;
+				current = cache->areas.GetNext(current)) {
 			if (current->address_space->ResizeArea(current, oldSize,
 					allocationFlags) != B_OK) {
 				panic("vm_resize_area(): Failed and not being able to restore "

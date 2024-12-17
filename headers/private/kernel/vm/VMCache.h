@@ -15,6 +15,7 @@
 #include <util/DoublyLinkedList.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
+#include <vm/VMArea.h>
 
 #include "kernel_debug_config.h"
 
@@ -188,7 +189,7 @@ protected:
 	virtual	void				DeleteObject() = 0;
 
 public:
-			VMArea*				areas;
+			VMArea::CacheList	areas;
 			ConsumerList		consumers;
 				// list of caches that use this cache as a source
 			VMCachePagesTree	pages;

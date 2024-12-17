@@ -33,9 +33,7 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 	cache_offset(0),
 	cache_type(0),
 	page_protections(NULL),
-	address_space(addressSpace),
-	cache_next(NULL),
-	cache_prev(NULL)
+	address_space(addressSpace)
 {
 	new (&mappings) VMAreaMappings;
 }

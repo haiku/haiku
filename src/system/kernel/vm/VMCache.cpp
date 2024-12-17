@@ -611,7 +611,7 @@ VMCacheRef::VMCacheRef(VMCache* cache)
 bool
 VMCache::_IsMergeable() const
 {
-	return areas == NULL && temporary && !unmergeable
+	return areas.IsEmpty() && temporary && !unmergeable
 		&& !consumers.IsEmpty() && consumers.Head() == consumers.Tail();
 }
 
@@ -636,7 +636,6 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 {
 	mutex_init(&fLock, "VMCache");
 
-	areas = NULL;
 	fRefCount = 1;
 	source = NULL;
 	virtual_base = 0;
@@ -677,7 +676,7 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 void
 VMCache::Delete()
 {
-	if (areas != NULL)
+	if (!areas.IsEmpty())
 		panic("cache %p to be deleted still has areas", this);
 	if (!consumers.IsEmpty())
 		panic("cache %p to be deleted still has consumers", this);
@@ -980,15 +979,11 @@ status_t
 VMCache::InsertAreaLocked(VMArea* area)
 {
 	TRACE(("VMCache::InsertAreaLocked(cache %p, area %p)\n", this, area));
-	AssertLocked();
-
 	T(InsertArea(this, area));
 
-	area->cache_next = areas;
-	if (area->cache_next)
-		area->cache_next->cache_prev = area;
-	area->cache_prev = NULL;
-	areas = area;
+	AssertLocked();
+
+	areas.Insert(area, false);
 
 	AcquireStoreRef();
 
@@ -1011,12 +1006,7 @@ VMCache::RemoveArea(VMArea* area)
 
 	AutoLocker<VMCache> locker(this);
 
-	if (area->cache_prev)
-		area->cache_prev->cache_next = area->cache_next;
-	if (area->cache_next)
-		area->cache_next->cache_prev = area->cache_prev;
-	if (areas == area)
-		areas = area->cache_next;
+	areas.Remove(area);
 
 	return B_OK;
 }
@@ -1030,12 +1020,11 @@ VMCache::TransferAreas(VMCache* fromCache)
 {
 	AssertLocked();
 	fromCache->AssertLocked();
-	ASSERT(areas == NULL);
+	ASSERT(areas.IsEmpty());
 
-	areas = fromCache->areas;
-	fromCache->areas = NULL;
+	areas.TakeFrom(&fromCache->areas);
 
-	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+	for (VMArea* area = areas.First(); area != NULL; area = areas.GetNext(area)) {
 		area->cache = this;
 		AcquireRefLocked();
 		fromCache->ReleaseRefLocked();
@@ -1051,7 +1040,7 @@ VMCache::CountWritableAreas(VMArea* ignoreArea) const
 {
 	uint32 count = 0;
 
-	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+	for (VMArea* area = areas.First(); area != NULL; area = areas.GetNext(area)) {
 		if (area != ignoreArea
 			&& (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
 			count++;
@@ -1471,7 +1460,7 @@ VMCache::Dump(bool showPages) const
 #endif
 	kprintf("  areas:\n");
 
-	for (VMArea* area = areas; area != NULL; area = area->cache_next) {
+	for (VMArea* area = areas.First(); area != NULL; area = areas.GetNext(area)) {
 		kprintf("    area 0x%" B_PRIx32 ", %s\n", area->id, area->name);
 		kprintf("\tbase_addr:  0x%lx, size: 0x%lx\n", area->Base(),
 			area->Size());
