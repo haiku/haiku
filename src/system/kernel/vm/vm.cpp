@@ -1139,7 +1139,7 @@ discard_area_range(VMArea* area, addr_t address, addr_t size)
 	// Since VMCache::Discard() can temporarily drop the lock, we must
 	// unlock all lower caches to prevent locking order inversion.
 	cacheChainLocker.Unlock(cache);
-	cache->Discard(cache->virtual_base + offset, size);
+	cache->Discard(area->cache_offset + offset, size);
 
 	if (commitmentChange != 0)
 		cache->Commit(cache->committed_size + commitmentChange, VM_PRIORITY_USER);
