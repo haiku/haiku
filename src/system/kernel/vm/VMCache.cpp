@@ -959,10 +959,11 @@ void
 VMCache::AddConsumer(VMCache* consumer)
 {
 	TRACE(("add consumer vm cache %p to cache %p\n", consumer, this));
+	T(AddConsumer(this, consumer));
+
 	AssertLocked();
 	consumer->AssertLocked();
-
-	T(AddConsumer(this, consumer));
+	ASSERT(consumer->source == NULL);
 
 	consumer->source = this;
 	consumers.Add(consumer);
