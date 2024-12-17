@@ -18,7 +18,9 @@ int gTestFd = -1;
 int
 map_cut_compare_test()
 {
-	uint8* ptr1 = (uint8*)mmap(NULL, 16 * B_PAGE_SIZE, PROT_READ, MAP_PRIVATE, gTestFd, 0);
+	const size_t size = 16 * B_PAGE_SIZE;
+	uint8* ptr1 = (uint8*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, gTestFd, 0);
+
 	uint8 chunk[128];
 	memcpy(chunk, &ptr1[3 * B_PAGE_SIZE], sizeof(chunk));
 
@@ -32,13 +34,15 @@ map_cut_compare_test()
 		printf("map-cut-compare test failed!\n");
 		return status;
 	}
-	return 0;
+
+	return munmap(ptr1, size);
 }
 
 
 int
 map_protect_cut_test1()
 {
+	const size_t size = B_PAGE_SIZE * 4;
 	uint8* ptr = (uint8*)mmap(NULL, B_PAGE_SIZE * 4, PROT_NONE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
@@ -58,14 +62,16 @@ map_protect_cut_test1()
 		printf("map-protect-cut test failed!\n");
 		return -1;
 	}
-	return 0;
+
+	return munmap(ptr, size);
 }
 
 
 int
 map_protect_cut_test2()
 {
-	uint8* ptr = (uint8*)mmap(NULL, B_PAGE_SIZE * 4, PROT_READ | PROT_WRITE,
+	const size_t size = B_PAGE_SIZE * 4;
+	uint8* ptr = (uint8*)mmap(NULL, size, PROT_READ | PROT_WRITE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
 	// store any value
@@ -80,7 +86,7 @@ map_protect_cut_test2()
 			MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0) == NULL)
 		return -1;
 
-	// make the tail accessible again (changes commitment size)
+	// make the tail accessible again
 	if (mprotect(ptr + B_PAGE_SIZE * 3, B_PAGE_SIZE, PROT_READ | PROT_WRITE) != 0)
 		return -1;
 
@@ -105,14 +111,16 @@ map_protect_cut_test2()
 		printf("map-protect-cut test failed!\n");
 		return -1;
 	}
-	return 0;
+
+	return munmap(ptr, size);
 }
 
 
 int
 map_cut_protect_test()
 {
-	uint8* ptr = (uint8*)mmap(NULL, B_PAGE_SIZE * 4, PROT_NONE,
+	const size_t size = B_PAGE_SIZE * 4;
+	uint8* ptr = (uint8*)mmap(NULL, size, PROT_NONE,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
 	// cut the area in the middle
@@ -120,12 +128,13 @@ map_cut_protect_test()
 			MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0) == NULL)
 		return -1;
 
-	// now make the tail accessible
+	// now make the tail accessible (changes commitment size)
 	mprotect(ptr + B_PAGE_SIZE * 3, B_PAGE_SIZE, PROT_READ | PROT_WRITE);
 
 	// store any value
 	ptr[B_PAGE_SIZE * 3] = 'a';
-	return 0;
+
+	return munmap(ptr, size);
 }
 
 
