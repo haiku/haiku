@@ -111,49 +111,54 @@ GetLinkFlavor(const Model* model, bool resolve = true)
 static filter_result
 key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 {
-	ASSERT(filter != NULL);
 	if (filter == NULL)
 		return B_DISPATCH_MESSAGE;
 
-	TFilePanel* panel = dynamic_cast<TFilePanel*>(filter->Looper());
-	ASSERT(panel != NULL);
+	BLooper* looper = filter->Looper();
+	if (looper == NULL)
+		return B_DISPATCH_MESSAGE;
 
-	if (panel == NULL)
+	TFilePanel* panel = dynamic_cast<TFilePanel*>(looper);
+	if (panel == NULL || panel->TrackingMenu())
 		return B_DISPATCH_MESSAGE;
 
 	BPoseView* view = panel->PoseView();
-	if (panel->TrackingMenu())
+	if (view == NULL)
 		return B_DISPATCH_MESSAGE;
 
 	uchar key;
 	if (message->FindInt8("byte", (int8*)&key) != B_OK)
 		return B_DISPATCH_MESSAGE;
 
-	int32 modifier = 0;
-	message->FindInt32("modifiers", &modifier);
+	int32 modifiers = message->GetInt32("modifiers", 0);
 
-	if (modifier & B_COMMAND_KEY && key == B_UP_ARROW) {
-		filter->Looper()->PostMessage(kOpenParentDir);
-		return B_SKIP_MESSAGE;
+	if ((modifiers & B_COMMAND_KEY) != 0) {
+		switch (key) {
+			case B_UP_ARROW:
+				looper->PostMessage(kOpenParentDir);
+				return B_SKIP_MESSAGE;
+
+			case 'w':
+				looper->PostMessage(kCancelButton);
+				return B_SKIP_MESSAGE;
+
+			default:
+				break;
+		}
 	}
 
-	if (modifier & B_COMMAND_KEY && key == 'w') {
-		filter->Looper()->PostMessage(kCancelButton);
-		return B_SKIP_MESSAGE;
-	}
-
-	if (!modifier && key == B_ESCAPE) {
-		if (view->ActivePose())
+	if (modifiers == 0 && key == B_ESCAPE) {
+		if (view->ActivePose() != NULL)
 			view->CommitActivePose(false);
 		else if (view->IsFiltering())
-			filter->Looper()->PostMessage(B_CANCEL, *handler);
+			looper->PostMessage(B_CANCEL, *handler);
 		else
-			filter->Looper()->PostMessage(kCancelButton);
+			looper->PostMessage(kCancelButton);
 
 		return B_SKIP_MESSAGE;
 	}
 
-	if (key == B_RETURN && view->ActivePose()) {
+	if (key == B_RETURN && view->ActivePose() != NULL) {
 		view->CommitActivePose();
 
 		return B_SKIP_MESSAGE;
@@ -264,8 +269,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target, const BEntry* s
 	fPoseView->SetFlags(fPoseView->Flags() | B_NAVIGABLE);
 	fPoseView->SetPoseEditing(false);
 	AddCommonFilter(new BMessageFilter(B_KEY_DOWN, key_down_filter));
-	AddCommonFilter(new BMessageFilter(B_SIMPLE_DATA,
-		TFilePanel::MessageDropFilter));
+	AddCommonFilter(new BMessageFilter(B_SIMPLE_DATA, TFilePanel::MessageDropFilter));
 	AddCommonFilter(new BMessageFilter(B_NODE_MONITOR, TFilePanel::FSFilter));
 
 	// inter-application observing
@@ -292,8 +296,7 @@ TFilePanel::~TFilePanel()
 
 
 filter_result
-TFilePanel::MessageDropFilter(BMessage* message, BHandler**,
-	BMessageFilter* filter)
+TFilePanel::MessageDropFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 {
 	if (message == NULL || !message->WasDropped())
 		return B_DISPATCH_MESSAGE;
@@ -534,8 +537,7 @@ TFilePanel::SetRefFilter(BRefFilter* filter)
 	if (favoritesItem == NULL)
 		return;
 
-	FavoritesMenu* favoritesSubMenu
-		= dynamic_cast<FavoritesMenu*>(favoritesItem->Submenu());
+	FavoritesMenu* favoritesSubMenu = dynamic_cast<FavoritesMenu*>(favoritesItem->Submenu());
 	if (favoritesSubMenu != NULL)
 		favoritesSubMenu->SetRefFilter(filter);
 }

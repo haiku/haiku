@@ -2668,10 +2668,8 @@ BPoseView::MessageReceived(BMessage* message)
 					{
 						TrackerSettings settings;
 						bool hideDotFiles;
-						if (message->FindBool("HideDotFiles",
-								&hideDotFiles) == B_OK) {
+						if (message->FindBool("HideDotFiles", &hideDotFiles) == B_OK)
 							settings.SetHideDotFiles(hideDotFiles);
-						}
 
 						Refresh();
 						break;
@@ -3291,10 +3289,8 @@ BPoseView::UpdatePosesClipboardModeFromClipboard(BMessage* clipboardReport)
 
 			if (!fullInvalidateNeeded) {
 				if (ViewMode() == kListMode) {
-					if (fFiltering) {
-						pose = fFilteredPoseList->FindPose(&clipNode->node,
-							&foundNodeIndex);
-					}
+					if (fFiltering)
+						pose = fFilteredPoseList->FindPose(&clipNode->node, &foundNodeIndex);
 
 					if (pose != NULL) {
 						loc.y = foundNodeIndex * fListElemHeight;
@@ -3455,8 +3451,7 @@ BPoseView::NewFolder(const BMessage* message)
 			if (fFilteredPoseList->FindPose(&nodeRef, &index) == NULL) {
 				float scrollBy = 0;
 				BRect bounds = Bounds();
-				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
-					scrollBy, true, &index);
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true, &index);
 			}
 		}
 
@@ -5692,8 +5687,7 @@ BPoseView::EntryMoved(const BMessage* message)
 					if (!visible && FilterPose(pose)) {
 						BRect bounds = Bounds();
 						float scrollBy = 0;
-						AddPoseToList(fFilteredPoseList, true, true, pose,
-							bounds, scrollBy, true);
+						AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true);
 					} else if (visible && !FilterPose(pose))
 						RemoveFilteredPose(pose, index);
 					else if (visible)
@@ -5860,10 +5854,8 @@ BPoseView::AttributeChanged(const BMessage* message)
 			&index) != NULL;
 		int32 poseListIndex = index;
 
-		if (fFiltering) {
-			visible = fFilteredPoseList->FindPose(
-				poseModel->NodeRef(), &index) != NULL;
-		}
+		if (fFiltering)
+			visible = fFilteredPoseList->FindPose(poseModel->NodeRef(), &index) != NULL;
 
 		BPoint loc(0, index * fListElemHeight);
 		if (attrName != NULL && poseModel->Node() != NULL) {
@@ -5884,8 +5876,7 @@ BPoseView::AttributeChanged(const BMessage* message)
 				visible = true;
 				float scrollBy = 0;
 				BRect bounds = Bounds();
-				AddPoseToList(fFilteredPoseList, true, true, pose, bounds,
-					scrollBy, true);
+				AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy, true);
 				continue;
 			} else if (visible && !FilterPose(pose)) {
 				RemoveFilteredPose(pose, index);
@@ -6688,10 +6679,8 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 			if (IsFilePanel())
 				_inherited::KeyDown(bytes, count);
 			else {
-				if (ViewMode() == kListMode
-					&& TrackerSettings().TypeAheadFiltering()) {
+				if (ViewMode() == kListMode && TrackerSettings().TypeAheadFiltering())
 					break;
-				}
 
 				if (fSelectionList->IsEmpty())
 					sMatchString.Truncate(0);
@@ -6781,9 +6770,8 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 		{
 			// handle typeahead selection / filtering
 
-			if (ViewMode() == kListMode
-				&& TrackerSettings().TypeAheadFiltering()) {
-				if (key == ' ' && modifiers() & B_SHIFT_KEY) {
+			if (ViewMode() == kListMode && TrackerSettings().TypeAheadFiltering()) {
+				if (key == ' ' && (modifiers() & B_SHIFT_KEY) != 0) {
 					if (fFilterStrings.LastItem()->Length() == 0)
 						break;
 
@@ -6812,10 +6800,8 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 			// figure out the time at which the keypress happened
 			bigtime_t eventTime;
 			BMessage* message = Window()->CurrentMessage();
-			if (message == NULL
-				|| message->FindInt64("when", &eventTime) < B_OK) {
+			if (message == NULL || message->FindInt64("when", &eventTime) < B_OK)
 				eventTime = system_time();
-			}
 
 			// add char to existing matchString or start new match string
 			if (eventTime - fLastKeyTime < (doubleClickSpeed * 2))
@@ -9839,8 +9825,7 @@ BPoseView::FrameForPose(BPose* targetPose, bool convert, BRect* poseRect)
 				frameIsValid = false;
 		}
 	} else {
-		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top
-			- IconPoseHeight()), true);
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
 		int32 poseCount = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < poseCount; index++) {
@@ -9985,8 +9970,7 @@ BPoseView::HiliteDropTarget(bool hiliteState)
 				break;
 		}
 	} else {
-		int32 startIndex = FirstIndexAtOrBelow(
-			(int32)(bounds.top - IconPoseHeight()), true);
+		int32 startIndex = FirstIndexAtOrBelow((int32)(bounds.top - IconPoseHeight()), true);
 		int32 poseCount = fVSPoseList->CountItems();
 
 		for (int32 index = startIndex; index < poseCount; index++) {
@@ -10376,15 +10360,13 @@ BPoseView::FilterChanged()
 	int32 stringCount = fFilterStrings.CountItems();
 	int32 length = fFilterStrings.LastItem()->CountChars();
 
-	if (!fFiltering && (length > 0 || fRefFilter != NULL))
+	if (!fFiltering && (length > 0 || fRefFilter != NULL)) {
 		StartFiltering();
-	else if (fFiltering && stringCount == 1 && length == 0
-		&& fRefFilter == NULL) {
+	} else if (fFiltering && stringCount == 1 && length == 0 && fRefFilter == NULL) {
 		ClearFilter();
 	} else {
 		if (fLastFilterStringCount > stringCount
-			|| (fLastFilterStringCount == stringCount
-				&& fLastFilterStringLength > length)
+			|| (fLastFilterStringCount == stringCount && fLastFilterStringLength > length)
 			|| fRefFilter != NULL) {
 			// something was removed, need to start over
 			fFilteredPoseList->MakeEmpty();
