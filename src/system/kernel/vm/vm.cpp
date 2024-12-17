@@ -597,6 +597,12 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 static inline uint32
 compute_area_page_commitment(VMArea* area)
 {
+	if (area->page_protections == NULL) {
+		if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
+			return area->Size();
+		return area->cache->page_count * B_PAGE_SIZE;
+	}
+
 	const size_t bytes = area_page_protections_size(area->Size());
 	const bool oddPageCount = ((area->Size() / B_PAGE_SIZE) % 2) != 0;
 	size_t pages = 0;
@@ -768,8 +774,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	}
 
 	int resizePriority = priority;
-	const bool overcommitting = (area->protection & B_OVERCOMMITTING_AREA) != 0;
-	if (area->page_protections != NULL && !overcommitting) {
+	const bool overcommitting = (area->protection & B_OVERCOMMITTING_AREA) != 0,
+		writable = (area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0;
+	if ((area->page_protections != NULL || !writable) && !overcommitting) {
 		// We'll adjust commitments directly, rather than letting VMCache do it.
 		resizePriority = -1;
 	}
@@ -815,7 +822,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			ASSERT_ALWAYS(status == B_OK);
 		}
 
-		if (area->page_protections != NULL) {
+		if (resizePriority == -1) {
 			const size_t newCommitmentPages = compute_area_page_commitment(area);
 			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
@@ -868,7 +875,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		}
 
 		area->cache_offset += size;
-		if (area->page_protections != NULL && !overcommitting) {
+		if (resizePriority == -1) {
 			const size_t newCommitmentPages = compute_area_page_commitment(area);
 			cache->Commit(newCommitmentPages * B_PAGE_SIZE, priority);
 		}
@@ -956,8 +963,9 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 
 			// Map the second area.
 			error = map_backing_store(addressSpace, secondCache,
-				area->cache_offset, area->name, secondSize, area->wiring,
-				area->protection, area->protection_max, REGION_NO_PRIVATE_MAP, 0,
+				area->cache_offset, area->name, secondSize,
+				area->wiring, area->protection, area->protection_max,
+				REGION_NO_PRIVATE_MAP, 0,
 				&addressRestrictions, kernel, &secondArea, NULL);
 		}
 
@@ -1027,15 +1035,6 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 		// We don't need this anymore.
 		free_etc(areaOldProtections, allocationFlags);
 
-		if (!overcommitting) {
-			// Shrink commitments.
-			const size_t areaCommitPages = compute_area_page_commitment(area);
-			area->cache->Commit(areaCommitPages * B_PAGE_SIZE, priority);
-
-			const size_t secondCommitPages = compute_area_page_commitment(secondArea);
-			secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, priority);
-		}
-
 		// Set the correct page protections for the second area.
 		VMTranslationMap* map = addressSpace->TranslationMap();
 		map->Lock();
@@ -1050,6 +1049,15 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 			}
 		}
 		map->Unlock();
+	}
+
+	if (resizePriority == -1) {
+		// Shrink commitments.
+		const size_t areaCommitPages = compute_area_page_commitment(area);
+		area->cache->Commit(areaCommitPages * B_PAGE_SIZE, priority);
+
+		const size_t secondCommitPages = compute_area_page_commitment(secondArea);
+		secondArea->cache->Commit(secondCommitPages * B_PAGE_SIZE, priority);
 	}
 
 	if (_secondArea != NULL)
