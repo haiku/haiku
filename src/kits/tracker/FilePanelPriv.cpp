@@ -150,7 +150,7 @@ key_down_filter(BMessage* message, BHandler** handler, BMessageFilter* filter)
 	if (modifiers == 0 && key == B_ESCAPE) {
 		if (view->ActivePose() != NULL)
 			view->CommitActivePose(false);
-		else if (view->IsFiltering())
+		else if (view->IsTypeAheadFiltering())
 			looper->PostMessage(B_CANCEL, *handler);
 		else
 			looper->PostMessage(kCancelButton);
