@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2023, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,8 @@
 #include <Locale.h>
 
 #include <package/solver/SolverPackage.h>
+#include <package/solver/SolverPackageSpecifier.h>
+#include <package/solver/SolverPackageSpecifierList.h>
 #include <TextTable.h>
 
 #include "Command.h"
@@ -55,6 +57,9 @@ static const char* const kLongUsage =
 	"    Only find installed packages.\n"
 	"  -u, --uninstalled-only\n"
 	"    Only find not installed packages.\n"
+	"  -n, --not-required\n"
+	"    List only the packages that are not required by any other package.\n"
+	"    Note: Implies --all, and omits listing \"_source\" and \"_debuginfo\" packages.\n"
 	"  -r, --requirements\n"
 	"    Search packages with <search-string> as requirements.\n"
 	"  -s <scope>, --search-scope=<scope>\n"
@@ -136,6 +141,75 @@ compare_packages(const BSolverPackage* a, const BSolverPackage* b,
 }
 
 
+struct ResolvableExpressionComparator {
+	bool operator()(const BPackageResolvableExpression& a,
+		const BPackageResolvableExpression& b) const
+	{
+		return a.ToString() < b.ToString();
+	}
+};
+
+
+static status_t
+filter_required_packages(const BPackageManager& packageManager,
+	BObjectList<BSolverPackage>& packages)
+{
+	std::set<BSolverPackage*> packagesSet;
+	BSolverPackageSpecifierList requirements;
+	for (int32 i = 0; i < packages.CountItems(); i++) {
+		BSolverPackage* package = packages.ItemAt(i);
+		if (package->Name().EndsWith("_source") || package->Name().EndsWith("_debuginfo"))
+			continue;
+
+		packagesSet.insert(package);
+
+		BObjectList<BPackageResolvableExpression> requiresList
+			= package->Info().RequiresList();
+		for (int32 j = 0; j < requiresList.CountItems(); j++)
+			requirements.AppendSpecifier(requiresList.ItemAt(j)->ToString());
+	}
+	packages.MakeEmpty();
+
+	BObjectList<BSolverPackage> requiredPackages;
+	const BSolverPackageSpecifier* unmatched;
+	status_t status = packageManager.Solver()->FindPackages(requirements,
+		0, requiredPackages, &unmatched);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed to filter required packages: %s\n", strerror(status));
+		if (unmatched != NULL) {
+			// Try to find the package this requirement comes from.
+			std::set<BSolverPackage*>::const_iterator setIterator = packagesSet.begin();
+			for (; setIterator != packagesSet.end(); setIterator++) {
+				BSolverPackage* package = *setIterator;
+				BObjectList<BPackageResolvableExpression> requiresList
+					= package->Info().RequiresList();
+				for (int32 j = 0; j < requiresList.CountItems(); j++) {
+					if (requiresList.ItemAt(j)->ToString() != unmatched->SelectString())
+						continue;
+
+					fprintf(stderr, "\t(unmatched: %s, required by %s)\n",
+						unmatched->SelectString().String(), package->Name().String());
+					return status;
+				}
+			}
+
+			// We couldn't find it, just print the requirement itself.
+			fprintf(stderr, "\t(unmatched: %s)\n", unmatched->SelectString().String());
+		}
+		return status;
+	}
+
+	for (int32 i = 0; i < requiredPackages.CountItems(); i++)
+		packagesSet.erase(requiredPackages.ItemAt(i));
+
+	std::set<BSolverPackage*>::const_iterator setIterator = packagesSet.begin();
+	for (; setIterator != packagesSet.end(); setIterator++)
+		packages.AddItem(*setIterator);
+
+	return B_OK;
+}
+
+
 int
 SearchCommand::Execute(int argc, const char* const* argv)
 {
@@ -144,12 +218,14 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	bool nameOnly = false;
 	bool fullSearch = false;
 	bool listAll = false;
+	bool listNotRequiredOnly = false;
 	bool details = false;
 	bool requirements = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
 			{ "all", no_argument, 0, 'a' },
+			{ "not-required", no_argument, 0, 'n' },
 			{ "debug", required_argument, 0, OPTION_DEBUG },
 			{ "details", no_argument, 0, 'D' },
 			{ "help", no_argument, 0, 'h' },
@@ -161,7 +237,7 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "aDhiurs:", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "aDhinurs:", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -195,6 +271,10 @@ SearchCommand::Execute(int argc, const char* const* argv)
 				requirements = true;
 				break;
 
+			case 'n':
+				listNotRequiredOnly = true;
+				break;
+
 			case 's':
 				if (strcmp(optarg, "name") == 0)
 					nameOnly = true;
@@ -211,12 +291,13 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		}
 	}
 
-	// The remaining argument is the search string. Ignored when --all has been
+	// The remaining argument is the search string. Ignored when --all or --not-required has been
 	// specified.
-	if ((!listAll && argc != optind + 1) || (listAll && requirements))
+	if ((!(listAll || listNotRequiredOnly) && argc != optind + 1)
+		|| ((listAll || listNotRequiredOnly) && requirements))
 		PrintUsageAndExit(true);
 
-	const char* searchString = listAll ? "" : argv[optind++];
+	const char* searchString = (listAll || listNotRequiredOnly) ? "" : argv[optind++];
 
 	// create the solver
 	PackageManager packageManager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
@@ -249,6 +330,12 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	if (packages.IsEmpty()) {
 		printf("No matching packages found.\n");
 		return 0;
+	}
+
+	if (listNotRequiredOnly) {
+		error = filter_required_packages(packageManager, packages);
+		if (error != B_OK)
+			return error;
 	}
 
 	// sort packages by name and installation location/repository
