@@ -57,8 +57,8 @@ int
 map_past_end_test()
 {
 	void* ptr = mmap(NULL, B_PAGE_SIZE, PROT_READ, MAP_PRIVATE, gTestFD, B_PAGE_SIZE * 4);
-	if (ptr != MAP_FAILED) {
-		printf("map-past end 1 unexpectedly succeeded!\n");
+	if (ptr == MAP_FAILED) {
+		printf("map-past end 1 unexpectedly failed!\n");
 		return -1;
 	}
 
