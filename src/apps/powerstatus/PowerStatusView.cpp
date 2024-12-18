@@ -170,16 +170,16 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 {
 	BRect lightningRect = rect;
 	BRect pauseRect = rect;
-	float quarter = floorf((rect.Height() + 1) / 4);
-	rect.top += quarter;
-	rect.bottom -= quarter;
+	float margin = floorf((rect.Height() + 1) / 4.5f);
+	rect.top += margin;
+	rect.bottom -= margin;
 
 	rect.InsetBy(2, 0);
 
 	float left = rect.left;
 	rect.left += rect.Width() / 11;
 	lightningRect.left = rect.left;
-	lightningRect.InsetBy(0.0f, 5.0f * rect.Height() / 16);
+	lightningRect.InsetBy(0.0f, rect.Height() * 0.25f);
 	pauseRect.left = rect.left;
 	pauseRect.InsetBy(rect.Width() * 0.1f, rect.Height() * 0.4f);
 
@@ -190,7 +190,7 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 
 	float gap = 1;
 	if (rect.Height() > 8) {
-		gap = ceilf((rect.left - left) / 2);
+		gap = max_c(1.0f, floorf((rect.left - left) / 2));
 
 		// left
 		view->FillRect(BRect(rect.left, rect.top, rect.left + gap - 1,
@@ -221,31 +221,30 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 	if (fHasBattery) {
 		// draw unfilled area
 		rgb_color unfilledColor = make_color(0x4c, 0x4c, 0x4c);
-		if (view->LowColor().IsDark()) {
-			unfilledColor.red = 256 - unfilledColor.red;
-			unfilledColor.green = 256 - unfilledColor.green;
-			unfilledColor.blue = 256 - unfilledColor.blue;
-		}
+		if (view->LowColor().IsDark())
+			unfilledColor = make_color(0xb4, 0xb4, 0xb4);
 
 		BRect unfilled = rect;
 		if (percent > 0.0)
-			unfilled.left += unfilled.Width() * percent;
+			unfilled.right = unfilled.left + unfilled.Width() * (1 - percent);
 
 		view->SetHighColor(unfilledColor);
 		view->FillRect(unfilled);
 
 		if (percent > 0.0) {
 			// draw filled area
-			rgb_color fillColor;
-			if (percent <= kLowBatteryPercentage)
+			rgb_color fillColor = make_color(20, 180, 0);
+			if (percent <= kLowBatteryPercentage) {
 				fillColor.set_to(180, 0, 0);
-			else if (percent <= kNoteBatteryPercentage)
+			} else if (percent <= kNoteBatteryPercentage) {
 				fillColor.set_to(200, 140, 0);
-			else
-				fillColor.set_to(20, 180, 0);
+			} else if ((fBatteryInfo.state & ~BATTERY_NOT_CHARGING) == 0) {
+				// When a battery is not in use at all, draw it in blue.
+				fillColor.set_to(50, 150, 255, 255);
+			}
 
 			BRect fill = rect;
-			fill.right = fill.left + fill.Width() * percent;
+			fill.left += fill.Width() * (1 - percent);
 
 			// draw bevel
 			rgb_color bevelLightColor  = tint_color(fillColor, 0.2);
@@ -296,26 +295,6 @@ PowerStatusView::_DrawBattery(BView* view, BRect rect)
 			BPoint(9, 10)
 		};
 		view->FillPolygon(points, 6, lightningRect);
-
-		view->SetDrawingMode(B_OP_OVER);
-	} else if ((fBatteryInfo.state
-			& (BATTERY_CHARGING | BATTERY_DISCHARGING | BATTERY_CRITICAL_STATE)) == 0) {
-		// When a battery is not in use at all, draw a pause symbol over the battery
-		view->SetHighColor(0, 0, 0, 96);
-		view->SetDrawingMode(B_OP_ALPHA);
-
-		static const BPoint points[] = {
-			BPoint(1, 3),
-			BPoint(1, 6),
-			BPoint(8, 6),
-			BPoint(8, 3),
-
-			BPoint(14, 3),
-			BPoint(14, 6),
-			BPoint(22, 6),
-			BPoint(22, 3)
-		};
-		view->FillPolygon(points, 8, pauseRect);
 
 		view->SetDrawingMode(B_OP_OVER);
 	} else if ((fBatteryInfo.state & BATTERY_CRITICAL_STATE) != 0) {
@@ -472,7 +451,7 @@ PowerStatusView::Update(bool force, bool notify)
 
 	if (fInDeskbar) {
 		// make sure the tray icon is (just) large enough
-		float width = fShowStatusIcon ? Bounds().Height() : 0;
+		float width = fShowStatusIcon ? floorf(Bounds().Height() * 1.15f) : 0;
 
 		if (fShowLabel) {
 			char text[64];
@@ -720,7 +699,7 @@ PowerStatusReplicant::PowerStatusReplicant(BRect frame, int32 resizingMode,
 			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 		AddChild(dragger);
 	} else
-		Update(false,false);
+		Update(false, false);
 }
 
 
@@ -998,6 +977,6 @@ PowerStatusReplicant::_OpenExtendedWindow()
 extern "C" _EXPORT BView*
 instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
-	return new PowerStatusReplicant(BRect(0, 0, maxHeight - 1, maxHeight - 1),
-		B_FOLLOW_NONE, true);
+	return new PowerStatusReplicant(BRect(0, 0, maxWidth - 1, maxHeight - 1),
+		B_FOLLOW_TOP, true);
 }
