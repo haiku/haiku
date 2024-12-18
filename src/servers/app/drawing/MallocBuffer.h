@@ -14,7 +14,6 @@ class MallocBuffer : public RenderingBuffer {
 	virtual						~MallocBuffer();
 
 	virtual	status_t			InitCheck() const;
-	virtual	bool				IsGraphicsMemory() const { return false; }
 
 	virtual	color_space			ColorSpace() const;
 	virtual	void*				Bits() const;

@@ -13,7 +13,6 @@ class BitmapBuffer : public RenderingBuffer {
 	virtual						~BitmapBuffer();
 
 	virtual	status_t			InitCheck() const;
-	virtual	bool				IsGraphicsMemory() const { return false; }
 
 	virtual	color_space			ColorSpace() const;
 	virtual	void*				Bits() const;

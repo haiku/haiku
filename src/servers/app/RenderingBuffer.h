@@ -13,8 +13,6 @@ class RenderingBuffer {
 
 	virtual	status_t			InitCheck() const = 0;
 
-	virtual	bool				IsGraphicsMemory() const = 0;
-
 	virtual	color_space			ColorSpace() const = 0;
 	virtual	void*				Bits() const = 0;
 	virtual	uint32				BytesPerRow() const = 0;
