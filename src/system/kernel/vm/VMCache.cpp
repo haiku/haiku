@@ -611,7 +611,7 @@ VMCacheRef::VMCacheRef(VMCache* cache)
 bool
 VMCache::_IsMergeable() const
 {
-	return areas.IsEmpty() && temporary && !unmergeable
+	return areas.IsEmpty() && temporary
 		&& !consumers.IsEmpty() && consumers.Head() == consumers.Tail();
 }
 
@@ -642,7 +642,6 @@ VMCache::Init(uint32 cacheType, uint32 allocationFlags)
 	virtual_end = 0;
 	committed_size = 0;
 	temporary = 0;
-	unmergeable = 0;
 	page_count = 0;
 	fWiredPagesCount = 0;
 	type = cacheType;
@@ -1561,21 +1560,22 @@ void
 VMCache::_RemoveConsumer(VMCache* consumer)
 {
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, this));
-	consumer->AssertLocked();
-
 	T(RemoveConsumer(this, consumer));
 
-	// Remove the store ref before locking the cache. Otherwise we'd call into
-	// the VFS while holding the cache lock, which would reverse the usual
-	// locking order.
-	ReleaseStoreRef();
+	consumer->AssertLocked();
 
-	// remove the consumer from the cache, but keep its reference until later
+	// Remove the consumer from the cache, but keep its reference until the end.
 	Lock();
 	consumers.Remove(consumer);
 	consumer->source = NULL;
+	Unlock();
 
-	ReleaseRefAndUnlock();
+	// Release the store ref without holding the cache lock, as calling into
+	// the VFS while holding the cache lock would reverse the usual locking order.
+	ReleaseStoreRef();
+
+	// Now release the consumer's reference.
+	ReleaseRef();
 }
 
 
