@@ -63,8 +63,11 @@ fs_identify_partition(int fd, partition_data* partition, void** _cookie)
 		return -1;
 	}
 
+	if (strcmp(((const char*)&boot) + 3, "NTFS") != 0)
+		return -1;
+
 	if (!ntfs_boot_sector_is_ntfs(&boot)) {
-		ERROR("identify_partition: boot signature doesn't match\n");
+		ERROR("identify_partition: boot signature invalid\n");
 		return -1;
 	}
 

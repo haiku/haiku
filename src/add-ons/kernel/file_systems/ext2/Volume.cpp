@@ -42,9 +42,16 @@
 
 
 bool
+ext2_super_block::IsMagicValid()
+{
+	return Magic() == (uint32)EXT2_SUPER_BLOCK_MAGIC;
+}
+
+
+bool
 ext2_super_block::IsValid()
 {
-	if (Magic() != (uint32)EXT2_SUPER_BLOCK_MAGIC
+	if (!IsMagicValid()
 			|| BlockShift() > 16
 			|| BlocksPerGroup() != (1UL << BlockShift()) * 8
 			|| InodeSize() > (1UL << BlockShift())
@@ -850,6 +857,9 @@ Volume::Identify(int fd, ext2_super_block* superBlock)
 	if (read_pos(fd, EXT2_SUPER_BLOCK_OFFSET, superBlock,
 			sizeof(ext2_super_block)) != sizeof(ext2_super_block))
 		return B_IO_ERROR;
+
+	if (!superBlock->IsMagicValid())
+		return B_BAD_VALUE;
 
 	if (!superBlock->IsValid()) {
 		FATAL("invalid superblock!\n");

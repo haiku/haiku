@@ -33,11 +33,18 @@ static const int32 kDesiredAllocationGroups = 56;
 
 
 bool
+disk_super_block::IsMagicValid() const
+{
+	return Magic1() == (int32)SUPER_BLOCK_MAGIC1
+		&& Magic2() == (int32)SUPER_BLOCK_MAGIC2
+		&& Magic3() == (int32)SUPER_BLOCK_MAGIC3;
+}
+
+
+bool
 disk_super_block::IsValid() const
 {
-	if (Magic1() != (int32)SUPER_BLOCK_MAGIC1
-		|| Magic2() != (int32)SUPER_BLOCK_MAGIC2
-		|| Magic3() != (int32)SUPER_BLOCK_MAGIC3
+	if (!IsMagicValid()
 		|| (int32)block_size != inode_size
 		|| ByteOrder() != SUPER_BLOCK_FS_LENDIAN
 		|| (1UL << BlockShift()) != BlockSize()
@@ -499,10 +506,14 @@ Volume::DeleteCheckVisitor()
 Volume::CheckSuperBlock(const uint8* data, uint32* _offset)
 {
 	disk_super_block* superBlock = (disk_super_block*)(data + 512);
-	if (superBlock->IsValid()) {
-		if (_offset != NULL)
-			*_offset = 512;
-		return B_OK;
+	if (superBlock->IsMagicValid()) {
+		if (superBlock->IsValid()) {
+			if (_offset != NULL)
+				*_offset = 512;
+			return B_OK;
+		}
+
+		FATAL(("invalid superblock at offset 512!\n"));
 	}
 
 #ifndef BFS_LITTLE_ENDIAN_ONLY

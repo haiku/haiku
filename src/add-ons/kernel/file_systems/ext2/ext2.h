@@ -161,6 +161,7 @@ struct ext2_super_block {
 	void SetReadOnlyFeatures(uint32 readOnlyFeatures)
 		{ read_only_features = B_HOST_TO_LENDIAN_INT32(readOnlyFeatures); }
 
+	bool IsMagicValid();
 	bool IsValid();
 		// implemented in Volume.cpp
 } _PACKED;

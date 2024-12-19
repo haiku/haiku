@@ -40,10 +40,17 @@
 
 
 bool
+btrfs_super_block::IsMagicValid() const
+{
+	return strncmp(magic, BTRFS_SUPER_BLOCK_MAGIC, sizeof(magic)) == 0;
+}
+
+
+bool
 btrfs_super_block::IsValid() const
 {
 	// TODO: check some more values!
-	if (strncmp(magic, BTRFS_SUPER_BLOCK_MAGIC, sizeof(magic)) != 0)
+	if (!IsMagicValid())
 		return false;
 
 	return true;
@@ -543,6 +550,9 @@ Volume::Identify(int fd, btrfs_super_block* superBlock)
 	if (read_pos(fd, BTRFS_SUPER_BLOCK_OFFSET, superBlock,
 			sizeof(btrfs_super_block)) != sizeof(btrfs_super_block))
 		return B_IO_ERROR;
+
+	if (!superBlock->IsMagicValid())
+		return B_BAD_VALUE;
 
 	if (!superBlock->IsValid()) {
 		ERROR("invalid superblock!\n");
