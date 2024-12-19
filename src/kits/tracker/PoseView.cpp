@@ -8355,6 +8355,7 @@ BPoseView::ClearPoses()
 
 	// clear all pose lists
 	fPoseList->MakeEmpty();
+	fFilteredPoseList->MakeEmpty();
 	fMimeTypeListIsDirty = true;
 	fVSPoseList->MakeEmpty();
 	fZombieList->MakeEmpty();
