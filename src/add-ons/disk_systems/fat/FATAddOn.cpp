@@ -43,7 +43,7 @@ static const uint32 kDiskSystemFlags =
 #define TRACE printf
 
 FATAddOn::FATAddOn()
-	: BDiskSystemAddOn(kPartitionTypeFAT32, kDiskSystemFlags)
+	: BDiskSystemAddOn(kPartitionTypeFAT32)
 {
 }
 

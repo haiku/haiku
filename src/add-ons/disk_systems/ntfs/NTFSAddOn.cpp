@@ -43,8 +43,9 @@ static const uint32 kDiskSystemFlags =
 
 #define TRACE printf
 
+
 NTFSAddOn::NTFSAddOn()
-	: BDiskSystemAddOn(kPartitionTypeNTFS, kDiskSystemFlags)
+	: BDiskSystemAddOn(kPartitionTypeNTFS)
 {
 }
 
