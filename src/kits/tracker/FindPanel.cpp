@@ -71,6 +71,7 @@ All rights reserved.
 #include <SeparatorView.h>
 #include <Size.h>
 #include <SpaceLayoutItem.h>
+#include <StringFormat.h>
 #include <TextControl.h>
 #include <TextView.h>
 #include <View.h>
@@ -109,9 +110,6 @@ static const char* kDragNDropActionSpecifiers[] = {
 	B_TRANSLATE_MARK("Create a Query"),
 	B_TRANSLATE_MARK("Create a Query template")
 };
-
-static const char* kMultipleSelections = "multiple selections";
-static const char* kMultiSelectComment = "The user has selected multiple menu items";
 
 const uint32 kAttachFile = 'attf';
 
@@ -1447,7 +1445,7 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 	// clip to reasonable min and max width
 	float minW = 0;
 	if (menuField == fVolumeField)
-		minW = menuField->StringWidth(B_TRANSLATE("Multiple selections"));
+		minW = menuField->StringWidth(MultipleSelectionsTitle(99));
 	else
 		minW = be_control_look->DefaultLabelSpacing() * 10;
 	float maxW = be_control_look->DefaultLabelSpacing() * 30;
@@ -1499,20 +1497,39 @@ FindPanel::ShowVolumeMenuLabel()
 		}
 	}
 
-	if (fDirectoryFilters.CountItems() > 1) {
-		PopUpMenuSetTitle(fVolMenu, B_TRANSLATE_COMMENT(kMultipleSelections, kMultiSelectComment));
-	} else if (fDirectoryFilters.CountItems() == 1) {
+	bool allVolumes = selectedVolumesCount == fVolumeItemsCount;
+
+	if (selectedVolumesCount == 0 && fDirectoryFilters.CountItems() == 1) {
+		// 1 directory filter selected
+		fVolMenu->ItemAt(0)->SetMarked(false);
 		PopUpMenuSetTitle(fVolMenu, fDirectoryFilters.ItemAt(0)->name);
-	} else if (selectedVolumesCount == 0 || selectedVolumesCount == fVolumeItemsCount) {
-		fVolMenu->ItemAt(0)->SetMarked(true);
-		PopUpMenuSetTitle(fVolMenu, fVolMenu->ItemAt(0)->Label());
-	} else if (selectedVolumesCount == 1) {
+	} else if (selectedVolumesCount == 1 && fDirectoryFilters.CountItems() == 0) {
+		// 1 volume selected
 		fVolMenu->ItemAt(0)->SetMarked(false);
 		PopUpMenuSetTitle(fVolMenu, lastSelectedVolumeItem->Label());
-	} else {
+	} else if (fDirectoryFilters.CountItems() > 1 || (!allVolumes && selectedVolumesCount > 1)) {
+		// multiple selections
 		fVolMenu->ItemAt(0)->SetMarked(false);
-		PopUpMenuSetTitle(fVolMenu, B_TRANSLATE_COMMENT(kMultipleSelections, kMultiSelectComment));
+		int32 selectedCount = selectedVolumesCount + fDirectoryFilters.CountItems();
+		PopUpMenuSetTitle(fVolMenu, MultipleSelectionsTitle(selectedCount));
+	} else {
+		// All disks (no selection or all volumes selected)
+		fVolMenu->ItemAt(0)->SetMarked(true);
+		PopUpMenuSetTitle(fVolMenu, fVolMenu->ItemAt(0)->Label());
 	}
+}
+
+
+const char*
+FindPanel::MultipleSelectionsTitle(int32 count)
+{
+	static BStringFormat format(B_TRANSLATE_COMMENT(
+		"{0, plural, one{# selected} other{# selected}}",
+		"\"1 selected (singular)\" or \"2 selected (plural)\""));
+	BString selected;
+	format.Format(selected, count);
+
+	return selected;
 }
 
 

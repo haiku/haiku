@@ -256,6 +256,7 @@ private:
 			void 				AddVolumes();
 
 			void 				ShowVolumeMenuLabel();
+			const char*			MultipleSelectionsTitle(int32);
 
 			// add one more attribute item to the attr view
 			void 				AddAttrRow();
