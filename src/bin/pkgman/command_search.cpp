@@ -141,15 +141,6 @@ compare_packages(const BSolverPackage* a, const BSolverPackage* b,
 }
 
 
-struct ResolvableExpressionComparator {
-	bool operator()(const BPackageResolvableExpression& a,
-		const BPackageResolvableExpression& b) const
-	{
-		return a.ToString() < b.ToString();
-	}
-};
-
-
 static status_t
 filter_required_packages(const BPackageManager& packageManager,
 	BObjectList<BSolverPackage>& packages)
