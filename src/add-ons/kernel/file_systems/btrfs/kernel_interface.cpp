@@ -1055,11 +1055,15 @@ btrfs_remove_attr(fs_volume* _volume, fs_vnode* vnode,
 static uint32
 btrfs_get_supported_operations(partition_data* partition, uint32 mask)
 {
+#if 0
 	// TODO: We should at least check the partition size.
 	return B_DISK_SYSTEM_SUPPORTS_INITIALIZING
 		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
-//		| B_DISK_SYSTEM_SUPPORTS_WRITING
+		| B_DISK_SYSTEM_SUPPORTS_WRITING
 		;
+#else
+	return 0;
+#endif
 }
 
 
