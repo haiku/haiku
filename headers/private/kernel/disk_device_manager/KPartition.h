@@ -137,8 +137,6 @@ public:
 
 	void SetDevice(KDiskDevice *device);
 	KDiskDevice *Device() const;
-
-	void SetParent(KPartition *parent);
 	KPartition *Parent() const;
 
 	status_t AddChild(KPartition *partition, int32 index = -1);

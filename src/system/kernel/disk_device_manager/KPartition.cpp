@@ -858,14 +858,6 @@ KPartition::Device() const
 }
 
 
-void
-KPartition::SetParent(KPartition* parent)
-{
-	// Must be called in a {Add,Remove}Child() only!
-	fParent = parent;
-}
-
-
 KPartition*
 KPartition::Parent() const
 {
@@ -898,7 +890,7 @@ KPartition::AddChild(KPartition* partition, int32 index)
 		_UpdateChildIndices(count, index);
 		fPartitionData.child_count++;
 
-		partition->SetParent(this);
+		partition->fParent = this;
 		partition->SetDevice(Device());
 		partition->SetPhysicalBlockSize(PhysicalBlockSize());
 
@@ -961,7 +953,7 @@ KPartition::RemoveChild(int32 index)
 		_UpdateChildIndices(index, fChildren.Count());
 		partition->SetIndex(-1);
 		fPartitionData.child_count--;
-		partition->SetParent(NULL);
+		partition->fParent = NULL;
 		partition->SetDevice(NULL);
 		// notify listeners
 		FireChildRemoved(partition, index);
