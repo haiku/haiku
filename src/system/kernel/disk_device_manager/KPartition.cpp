@@ -80,7 +80,6 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.status = B_PARTITION_UNRECOGNIZED;
 	fPartitionData.flags = B_PARTITION_BUSY;
 	fPartitionData.volume = -1;
-	fPartitionData.mount_cookie = NULL;
 	fPartitionData.name = NULL;
 	fPartitionData.content_name = NULL;
 	fPartitionData.type = NULL;
@@ -811,23 +810,6 @@ KPartition::VolumeID() const
 }
 
 
-void
-KPartition::SetMountCookie(void* cookie)
-{
-	if (fPartitionData.mount_cookie != cookie) {
-		fPartitionData.mount_cookie = cookie;
-		FireMountCookieChanged(cookie);
-	}
-}
-
-
-void*
-KPartition::MountCookie() const
-{
-	return fPartitionData.mount_cookie;
-}
-
-
 status_t
 KPartition::SetParameters(const char* parameters)
 {
@@ -1532,18 +1514,6 @@ KPartition::FireVolumeIDChanged(dev_t volumeID)
 		for (ListenerSet::Iterator it = fListeners->Begin();
 			 it != fListeners->End(); ++it) {
 			(*it)->VolumeIDChanged(this, volumeID);
-		}
-	}
-}
-
-
-void
-KPartition::FireMountCookieChanged(void* cookie)
-{
-	if (fListeners) {
-		for (ListenerSet::Iterator it = fListeners->Begin();
-			 it != fListeners->End(); ++it) {
-			(*it)->MountCookieChanged(this, cookie);
 		}
 	}
 }

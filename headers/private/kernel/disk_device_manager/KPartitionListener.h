@@ -28,7 +28,6 @@ public:
 	virtual void TypeChanged(KPartition *partition, const char *type);
 	virtual void IDChanged(KPartition *partition, partition_id id);
 	virtual void VolumeIDChanged(KPartition *partition, dev_t volumeID);
-	virtual void MountCookieChanged(KPartition *partition, void *cookie);
 	virtual void ParametersChanged(KPartition *partition,
 								   const char *parameters);
 	virtual void ContentParametersChanged(KPartition *partition,

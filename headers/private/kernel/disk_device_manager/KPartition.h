@@ -125,9 +125,6 @@ public:
 	void SetVolumeID(dev_t volumeID);
 	dev_t VolumeID() const;
 
-	void SetMountCookie(void *cookie);
-	void *MountCookie() const;
-
 	// Parameters
 
 	status_t SetParameters(const char *parameters);
@@ -207,7 +204,6 @@ protected:
 	void FireTypeChanged(const char *type);
 	void FireIDChanged(partition_id id);
 	void FireVolumeIDChanged(dev_t volumeID);
-	void FireMountCookieChanged(void *cookie);
 	void FireParametersChanged(const char *parameters);
 	void FireContentParametersChanged(const char *parameters);
 	void FireChildAdded(KPartition *child, int32 index);

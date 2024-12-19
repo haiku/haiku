@@ -7672,9 +7672,8 @@ fs_mount(char* path, const char* device, const char* fsName, uint32 flags,
 		inc_vnode_ref_count(sRoot);
 	}
 
-	// supply the partition (if any) with the mount cookie and mark it mounted
+	// supply the partition (if any) with the mount ID and mark it mounted
 	if (partition) {
-		partition->SetMountCookie(mount->volume->private_volume);
 		partition->SetVolumeID(mount->id);
 
 		// keep a partition reference as long as the partition is mounted
@@ -7917,7 +7916,6 @@ fs_unmount(char* path, dev_t mountID, uint32 flags, bool kernel)
 	// dereference the partition and mark it unmounted
 	if (partition) {
 		partition->SetVolumeID(-1);
-		partition->SetMountCookie(NULL);
 
 		if (mount->owns_file_device)
 			KDiskDeviceManager::Default()->DeleteFileDevice(partition->ID());
