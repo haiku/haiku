@@ -1407,12 +1407,9 @@ static inline bool
 wait_if_address_range_is_wired(VMAddressSpace* addressSpace, addr_t base,
 	size_t size, LockerType* locker)
 {
-	for (VMAddressSpace::AreaRangeIterator it
-		= addressSpace->GetAreaRangeIterator(base, size);
-			VMArea* area = it.Next();) {
-
-		AreaCacheLocker cacheLocker(vm_area_get_locked_cache(area));
-
+	VMAddressSpace::AreaRangeIterator it = addressSpace->GetAreaRangeIterator(base, size);
+	while (VMArea* area = it.Next()) {
+		AreaCacheLocker cacheLocker(area);
 		if (wait_if_area_range_is_wired(area, base, size, locker, &cacheLocker))
 			return true;
 	}
@@ -2505,13 +2502,11 @@ vm_clone_area(team_id team, const char* name, void** address,
 	uint32 addressSpec, uint32 protection, uint32 mapping, area_id sourceID,
 	bool kernel)
 {
-	VMArea* newArea = NULL;
-	VMArea* sourceArea;
-
 	// Check whether the source area exists and is cloneable. If so, mark it
 	// B_SHARED_AREA, so that we don't get problems with copy-on-write.
 	{
 		AddressSpaceWriteLocker locker;
+		VMArea* sourceArea;
 		status_t status = locker.SetFromArea(sourceID, sourceArea);
 		if (status != B_OK)
 			return status;
@@ -2540,47 +2535,52 @@ vm_clone_area(team_id team, const char* name, void** address,
 	if (status != B_OK)
 		return status;
 
-	sourceArea = lookup_area(sourceAddressSpace, sourceID);
+	VMArea* sourceArea = lookup_area(sourceAddressSpace, sourceID);
 	if (sourceArea == NULL)
 		return B_BAD_VALUE;
 
 	if (!kernel && (sourceArea->protection & B_KERNEL_AREA) != 0)
 		return B_NOT_ALLOWED;
 
-	VMCache* cache = vm_area_get_locked_cache(sourceArea);
+	AreaCacheLocker cacheLocker(sourceArea);
+	VMCache* cache = cacheLocker.Get();
 
 	if (!kernel && sourceAddressSpace != targetAddressSpace
-		&& (sourceArea->protection & B_CLONEABLE_AREA) == 0) {
+			&& (sourceArea->protection & B_CLONEABLE_AREA) == 0) {
 #if KDEBUG
 		Team* team = thread_get_current_thread()->team;
 		dprintf("team \"%s\" (%" B_PRId32 ") attempted to clone area \"%s\" (%"
 			B_PRId32 ")!\n", team->Name(), team->id, sourceArea->name, sourceID);
 #endif
-		status = B_NOT_ALLOWED;
-	} else if (sourceArea->cache_type == CACHE_TYPE_NULL) {
-		status = B_NOT_ALLOWED;
-	} else {
-		uint32 flags = 0;
-		if (mapping != REGION_PRIVATE_MAP)
-			flags |= CREATE_AREA_DONT_COMMIT_MEMORY;
-
-		virtual_address_restrictions addressRestrictions = {};
-		addressRestrictions.address = *address;
-		addressRestrictions.address_specification = addressSpec;
-		status = map_backing_store(targetAddressSpace, cache,
-			sourceArea->cache_offset, name, sourceArea->Size(),
-			sourceArea->wiring, protection, sourceArea->protection_max,
-			mapping, flags, &addressRestrictions,
-			kernel, &newArea, address);
+		return B_NOT_ALLOWED;
 	}
-	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
-		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
-		// to create a new cache, and has therefore already acquired a reference
-		// to the source cache - but otherwise it has no idea that we need
-		// one.
+	if (sourceArea->cache_type == CACHE_TYPE_NULL)
+		return B_NOT_ALLOWED;
+
+	uint32 mappingFlags = 0;
+	if (mapping != REGION_PRIVATE_MAP)
+		mappingFlags |= CREATE_AREA_DONT_COMMIT_MEMORY;
+
+	virtual_address_restrictions addressRestrictions = {};
+	VMArea* newArea;
+	addressRestrictions.address = *address;
+	addressRestrictions.address_specification = addressSpec;
+	status = map_backing_store(targetAddressSpace, cache,
+		sourceArea->cache_offset, name, sourceArea->Size(),
+		sourceArea->wiring, protection, sourceArea->protection_max,
+		mapping, mappingFlags, &addressRestrictions,
+		kernel, &newArea, address);
+	if (status < B_OK)
+		return status;
+
+	if (mapping != REGION_PRIVATE_MAP) {
+		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed to
+		// create a new cache, and has therefore already acquired a reference
+		// to the source cache - but otherwise it has no idea that we need one.
 		cache->AcquireRefLocked();
 	}
-	if (status == B_OK && newArea->wiring == B_FULL_LOCK) {
+
+	if (newArea->wiring == B_FULL_LOCK) {
 		// we need to map in everything at this point
 		if (sourceArea->cache_type == CACHE_TYPE_DEVICE) {
 			// we don't have actual pages to map but a physical area
@@ -2639,14 +2639,8 @@ vm_clone_area(team_id team, const char* name, void** address,
 			vm_page_unreserve_pages(&reservation);
 		}
 	}
-	if (status == B_OK)
-		newArea->cache_type = sourceArea->cache_type;
 
-	vm_area_put_locked_cache(cache);
-
-	if (status < B_OK)
-		return status;
-
+	newArea->cache_type = sourceArea->cache_type;
 	return newArea->id;
 }
 
