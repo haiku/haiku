@@ -9,7 +9,9 @@
 #	error This file is included from <boot/stage2_args.h> only
 #endif
 
+#include <boot/disk_identifier.h>
 struct platform_stage2_args {
+	bios_drive_checksum*	drives;
 };
 
 #endif	/* KERNEL_BOOT_PLATFORM_BIOS_IA32_STAGE2_H */

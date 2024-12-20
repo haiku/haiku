@@ -17,7 +17,7 @@
 	- detection of medium capacity
 */
 
-
+#include <boot/disk_identifier.h>
 #include <bus/SCSI.h>
 #include <scsi_cmds.h>
 #include <Drivers.h>
@@ -70,6 +70,10 @@ typedef struct scsi_periph_callbacks {
 	// (you don't need to call periph->media_changed, but it's doesn't if you do)
 	// ccb - request at your disposal
 	void (*media_changed)(periph_device_cookie cookie, scsi_ccb *request);
+
+	// *** check sums
+	// store the check sums as computed by the bios_ia32 bootloader
+	void (*set_blocks_check_sums)(periph_device_cookie cookie, check_sum check_sums[NUM_DISK_CHECK_SUMS]);
 } scsi_periph_callbacks;
 
 typedef struct scsi_block_range {
@@ -116,6 +120,9 @@ typedef struct scsi_periph_interface {
 	// block ioctls
 	status_t (*ioctl)(scsi_periph_handle handle, int op, void *buffer,
 		size_t length);
+
+	status_t (*set_blocks_check_sums)(scsi_periph_device device, check_sum *check_sums);
+	
 	// check medium capacity (calls set_capacity callback on success)
 	// request - ccb for this device; is used to talk to device
 	status_t (*check_capacity)(scsi_periph_device device, scsi_ccb *request);

@@ -6,7 +6,7 @@
 #ifndef _SCSI_DISK_H
 #define _SCSI_DISK_H
 
-
+#include <boot/disk_identifier.h>
 #include <device_manager.h>
 #include <scsi.h>
 #include <scsi_periph.h>
@@ -21,23 +21,24 @@ struct IOScheduler;
 
 
 struct das_driver_info {
-	device_node*			node;
+	device_node*		node;
 	::scsi_periph_device	scsi_periph_device;
-	::scsi_device			scsi_device;
+	::scsi_device		scsi_device;
 	scsi_device_interface*	scsi;
-	IOScheduler*			io_scheduler;
-	DMAResource*			dma_resource;
+	IOScheduler*		io_scheduler;
+	DMAResource*		dma_resource;
 
-	uint64					capacity;
-	uint32					block_size;
-	uint32					physical_block_size;
+	uint64			capacity;
+	uint32			block_size;
+	uint32			physical_block_size;
 
-	bool					removable;
+	bool			removable;
+	uint8			drive_id;
 };
 
 struct das_handle {
 	::scsi_periph_handle	scsi_periph_handle;
-	das_driver_info*		info;
+	das_driver_info*	info;
 };
 
 #endif	/* _SCSI_DISK_H */

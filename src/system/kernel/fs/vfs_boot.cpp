@@ -230,12 +230,12 @@ DiskBootMethod::IsBootDevice(KDiskDevice* device, bool strict)
 
 			// check if the check sums match, too
 			for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
-				if (disk->device.unknown.check_sums[i].offset == -1)
+				if (disk->device.unknown.bios_check_sums.checksum[i].offset == -1)
 					continue;
 
 				if (compute_check_sum(device,
-						disk->device.unknown.check_sums[i].offset)
-							!= disk->device.unknown.check_sums[i].sum) {
+						disk->device.unknown.bios_check_sums.checksum[i].offset)
+							!= disk->device.unknown.bios_check_sums.checksum[i].sum) {
 					return false;
 				}
 			}

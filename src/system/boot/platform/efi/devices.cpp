@@ -268,8 +268,8 @@ platform_register_boot_device(Node *device)
 
 	for (uint32 i = 0; i < NUM_DISK_CHECK_SUMS; ++i) {
 		off_t offset = get_next_check_sum_offset(i, device->Size());
-		identifier.device.unknown.check_sums[i].offset = offset;
-		identifier.device.unknown.check_sums[i].sum = compute_check_sum(device,
+		identifier.device.unknown.bios_check_sums.checksum[i].offset = offset;
+		identifier.device.unknown.bios_check_sums.checksum[i].sum = compute_check_sum(device,
 			offset);
 	}
 

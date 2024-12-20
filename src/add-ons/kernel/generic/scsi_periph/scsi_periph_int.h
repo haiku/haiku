@@ -9,6 +9,7 @@
 
 #include <stddef.h>
 
+#include <boot/disk_identifier.h>
 #include <scsi_periph.h>
 #include <device_manager.h>
 
@@ -92,7 +93,7 @@ status_t periph_handle_free(scsi_periph_handle_info *handle);
 status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
 status_t periph_trim_device(scsi_periph_device_info *device, scsi_ccb *request,
 	scsi_block_range* ranges, uint32 rangeCount, uint64* trimmedBlocks);
-
+status_t periph_set_blocks_check_sums(scsi_periph_device_info *device, check_sum *checksums);
 
 // device.c
 

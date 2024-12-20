@@ -134,6 +134,7 @@ static scsi_periph_interface sSCSIPeripheralModule = {
 	periph_read_write,
 	periph_io,
 	periph_ioctl,
+	periph_set_blocks_check_sums,
 	periph_check_capacity,
 	periph_synchronize_cache,
 	periph_trim_device,
